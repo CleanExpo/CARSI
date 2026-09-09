@@ -1,0 +1,45 @@
+{
+  "slug": "introduction-to-advanced-structural-drying-concepts",
+  "seoTitle": "Introduction to Advanced Structural Drying Concepts | CARSI",
+  "metaDescription": "This course addresses advanced structural drying concepts required for complex, large, and specialty restoration projects.",
+  "imageAlt": "CARSI course: Introduction to Advanced Structural Drying Concepts",
+  "og": {
+    "title": "Introduction to Advanced Structural Drying Concepts | CARSI",
+    "description": "This course addresses advanced structural drying concepts required for complex, large, and specialty restoration projects."
+  },
+  "keywords": [
+    "advanced structural drying concepts",
+    "advanced building science",
+    "controlled drying methods",
+    "complex drying verification",
+    "specialty restoration drying"
+  ],
+  "faq": [
+    {
+      "q": "What does the Introduction to Advanced Structural Drying Concepts course cover?",
+      "a": "This course addresses advanced structural drying concepts required for complex, large, and specialty restoration projects."
+    },
+    {
+      "q": "What does the Introduction to Advanced Structural Drying Concepts course help learners understand?",
+      "a": "It covers advanced building science as it applies to moisture behaviour, controlled drying methods at an advanced level, verification processes for complex completions, large loss project management, and specialist drying knowledge for non-standard materials and environments."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Introduction to Advanced Structural Drying Concepts",
+    "description": "This course addresses advanced structural drying concepts required for complex, large, and specialty restoration projects. It covers advanced building science as it applies to moisture behaviour, controlled drying methods at an advanced level, verification processes for complex completions, large loss project management, and specialist drying knowledge for non-standard materials and environments. Designed for experienced technicians seeking technical advancement toward project management and specialist roles.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "29",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

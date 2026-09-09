@@ -1,0 +1,50 @@
+{
+  "slug": "donning-and-doffing-ppe",
+  "seoTitle": "Donning and Doffing PPE Course Australia | CARSI",
+  "metaDescription": "Learn correct PPE donning and doffing for contaminated environments. Doffing is where most self-contamination happens - sequence, technique and reasoning.",
+  "imageAlt": "CARSI course thumbnail: Donning and Doffing PPE",
+  "og": {
+    "title": "Donning and Doffing PPE | CARSI",
+    "description": "Correct procedures for putting on and taking off personal protective equipment in contaminated environments. Covers sequences, technique, the transition zone, PPE disposal, and recognising heat exhaustion and heat stroke in workers wearing PPE."
+  },
+  "keywords": [
+    "donning and doffing ppe course",
+    "ppe training australia",
+    "ppe removal sequence training",
+    "contaminated site ppe course",
+    "restoration ppe training",
+    "heat stress ppe awareness"
+  ],
+  "faq": [
+    {
+      "q": "Why does this course focus so heavily on doffing?",
+      "a": "Because doffing is where most self-contamination events occur. A worker who has used PPE effectively throughout a job can undo that protection completely through incorrect removal, so the course teaches the sequence, the technique and the reasoning behind each step."
+    },
+    {
+      "q": "What topics are covered?",
+      "a": "The purpose and types of PPE used in restoration and cleaning work, correct donning and doffing sequences and techniques for different PPE combinations, managing the transition zone, PPE disposal, and recognising and responding to heat exhaustion and heat stroke in workers wearing PPE."
+    },
+    {
+      "q": "Does the course cover heat stress while wearing PPE?",
+      "a": "Yes. Recognising and responding to heat exhaustion and heat stroke in workers wearing PPE is one of the topics covered, alongside the donning and doffing sequences themselves."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Donning and Doffing PPE",
+    "description": "A course on the correct procedures for putting on and taking off personal protective equipment in contaminated environments. Covers the purpose and types of PPE used in restoration and cleaning work, donning and doffing sequences for different PPE combinations, managing the transition zone, PPE disposal, and recognising heat exhaustion and heat stroke in workers wearing PPE.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "39",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

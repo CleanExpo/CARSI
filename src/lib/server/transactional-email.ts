@@ -85,7 +85,9 @@ export async function sendRecertReminderEmail(params: {
   appOrigin: string;
 }): Promise<SendEmailResult> {
   const base = params.appOrigin.replace(/\/$/, '');
-  const renewalsUrl = `${base}/dashboard/credentials`;
+  // See RECERT_LINK in recert-reminders.ts: `/dashboard/credentials` has no index page and no
+  // redirect, so this link 404'd. The credentials wallet lives under /dashboard/student/.
+  const renewalsUrl = `${base}/dashboard/student/credentials`;
   const { html, text } = renderRecertReminderEmail({
     appOrigin: params.appOrigin,
     name: params.name,

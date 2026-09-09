@@ -1,0 +1,40 @@
+{
+  "slug": "restoration-project-management-premium",
+  "seoTitle": "Restoration Project Management & Client Comms — Premium | CARSI",
+  "metaDescription": "Scopes, estimates, stakeholder updates, and handover documentation for restoration supervisors and lead technicians.",
+  "imageAlt": "CARSI course: Restoration Project Management & Client Communication — Premium",
+  "og": {
+    "title": "Restoration Project Management & Client Comms — Premium | CARSI",
+    "description": "Scopes, estimates, stakeholder updates, and handover documentation for restoration supervisors and lead technicians."
+  },
+  "keywords": [
+    "Restoration Project Management & Client Communication — Premium",
+    "restoration project management premium",
+    "restoration project training",
+    "communication premium course"
+  ],
+  "faq": [
+    {
+      "q": "What does the Restoration Project Management & Client Communication — Premium course cover?",
+      "a": "A paid professional skills course: translate technical work into clear project plans, commercial communication, and defensible documentation."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Restoration Project Management & Client Communication — Premium",
+    "description": "A paid professional skills course: translate technical work into clear project plans, commercial communication, and defensible documentation. Purchase once for lifetime access to this title (CARSI Pro subscribers may access the full catalogue separately).",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "179",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

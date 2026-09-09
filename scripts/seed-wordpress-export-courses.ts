@@ -22,7 +22,7 @@ import 'dotenv/config';
 import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { Prisma } from '../src/generated/prisma/client';
 import { prisma } from '../src/lib/prisma';
@@ -70,7 +70,7 @@ async function ensureInstructorsFromCatalog() {
   return data;
 }
 
-function wpRowToCourseData(
+export function wpRowToCourseData(
   wp: WpExportCourseRow,
   instructorId: string
 ): Omit<Prisma.LmsCourseCreateInput, 'slug' | 'id' | 'modules'> {
@@ -91,8 +91,40 @@ function wpRowToCourseData(
     level: wp.level ?? null,
     category: wp.category ?? null,
     tags: jsonInput(wp.tags),
-    iicrcDiscipline: wp.iicrc_discipline ?? null,
-    cecHours: wp.cec_hours ?? null,
+    // LICENCE-CRITICAL, BOTH FIELDS FAIL CLOSED. Do not restore `wp.*` here.
+    //
+    // This function builds a row that is written straight to `lms_courses` and rendered to
+    // the public. Reading these two fields from the WooCommerce export bypassed every control
+    // the repo has, because both controls live downstream of the seed:
+    //
+    // MEASURED THROUGH THE ACTUAL CODE PATH, not off the export file — the two disagree, and
+    // an earlier version of this comment quoted the file and was wrong on both counts.
+    // `getPublishedWpImportRows()` excludes catalogue-overlapping slugs and maps what survives
+    // through `enrichCourseWithCecHours`, so only 37 rows reach this function, not the 84
+    // published rows in courses.json. Of those 37, on 2026-09-07:
+    //
+    //  - `iicrcDiscipline`: 5 rows STILL carry one (WRT / ASD) — nothing in the import path
+    //    touches this column. THIS IS A LIVE EXPOSURE. The field renders as a visible
+    //    "IICRC <acronym>" badge, and migration 20260907010000 nulled it on 35 live courses,
+    //    verified against production the same day (35/35). Running this seed with the old
+    //    `wp.iicrc_discipline` mapping would have put the badge back on those 5. A migration
+    //    is not durable while a seed can write the column back — that is the defect this
+    //    pinning closes. Founder ruling 2026-07-10, CLAUDE.md.
+    //
+    //  - `cecHours`: 0 rows carry a value by the time they arrive — `enrichCourseWithCecHours`
+    //    has already resolved every one to null against the registry. So the old
+    //    `wp.cec_hours ?? null` mapping was NOT publishing unapproved CEC hours, and any claim
+    //    that it was is false; a release reviewer caught exactly that overstatement here.
+    //    Pinning to 0 is deliberate DEFENCE IN DEPTH, not a live fix: it removes this function's
+    //    dependence on an upstream caller continuing to enrich, and 0 is the documented explicit
+    //    opt-out so the resolver never derives a value downstream either. Founder directive
+    //    2026-07-09.
+    //
+    // A course becomes CEC-bearing only when the founder adds it to the approvals registry
+    // (`data/seed/cec-approvals.json`), never by being imported. Pinned by
+    // scripts/seed-wordpress-export-courses.test.mjs — GP-519.
+    iicrcDiscipline: null,
+    cecHours: 0,
     meta: jsonInput(wp.meta),
     isPublished: true,
   };
@@ -160,11 +192,18 @@ async function main() {
   );
 }
 
-main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+// Run ONLY when invoked as a CLI. Previously `main()` was called at import time, so merely
+// importing this module — as a test must, to check the fail-closed fields above — would have
+// run a live database seed. Using `pathToFileURL(process.argv[1]).href` rather than a
+// `file://` + argv concat, because this checkout's path contains a space and the naive form
+// breaks on any path needing percent-encoding (CLAUDE.md).
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main()
+    .catch((e) => {
+      console.error(e);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
+}

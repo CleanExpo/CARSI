@@ -85,6 +85,20 @@ jobs:
       - name: CARSI designation registry guard
         run: npm run check:designations
 
+      # Model currency. The previous checker (src/ai/version-checks/check-model-currency.ts)
+      # read apps/backend/.env.local — a directory this repo does not have — so it audited an
+      # empty list and reported "all current" for ever; it was also wired to no script and no
+      # job, so nothing ever ran it. The approved registry sat on a superseded Opus id from
+      # 07/05/2026 to 06/09/2026 as a result. This guard scans the source tree instead, FAILS
+      # if it scanned nothing, expires the registry 90 days after its declared review date,
+      # and blocks any hardcoded model id the registry does not list.
+      - name: Model currency guard
+        run: npm run check:model-currency
+
+      # Non-vacuity proof for the guard above, same reasoning as the self-tests below.
+      - name: Model currency guard self-test
+        run: npm run test:model-currency
+
       # Course-visibility predicate. `status` is canonical (#137); reading the legacy
       # `isPublished` column alone hid 20 published courses from pathways, pathway progress and
       # team assignment. Hand-grepping for this missed readers twice, so it is enforced here.
@@ -123,6 +137,13 @@ jobs:
       # CEC-inference incidents.
       - name: IICRC / CEC compliance guard
         run: npm run check:iicrc-compliance
+
+      # The seed is the ONE writer that can put `iicrc_discipline` back into lms_courses, and
+      # it lives in scripts/, which is outside check:iicrc-compliance's SCANNED_DIRS. Without
+      # this step a revert of that pin merges green — the exact "control exists but never runs"
+      # shape GP-519 was filed about. Asserts against the real WooCommerce export. GP-519.
+      - name: WordPress seed licence pinning
+        run: npm run test:seed-wp-licence
 
       # Proves the compliance guard's specific-CEC-hour rule is non-vacuous: it fires on a
       # static "earns/awards N IICRC CEC(s)" claim on a non-approved course (incl. the looser

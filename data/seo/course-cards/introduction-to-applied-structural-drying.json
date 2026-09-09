@@ -1,0 +1,41 @@
+{
+  "slug": "introduction-to-applied-structural-drying",
+  "seoTitle": "Introduction to Applied Structural Drying | CARSI",
+  "metaDescription": "Introduction to Applied Structural Drying: This course moves from foundational concepts to applied practice.",
+  "imageAlt": "CARSI course: Introduction to Applied Structural Drying",
+  "og": {
+    "title": "Introduction to Applied Structural Drying | CARSI",
+    "description": "Introduction to Applied Structural Drying: This course moves from foundational concepts to applied practice."
+  },
+  "keywords": [
+    "applied structural drying course",
+    "structural assembly drying",
+    "drying equipment operation",
+    "material-specific drying techniques",
+    "drying monitoring records"
+  ],
+  "faq": [
+    {
+      "q": "What does the Introduction to Applied Structural Drying course cover?",
+      "a": "This course moves from foundational concepts to applied practice, equipping technicians to assess real building components affected by water damage, understand drying dynamics in structural assemblies, deploy and operate drying equipment correctly, apply specific drying techniques to different material types, and produce monitoring and documentation records that meet IICRC and insurance requirements."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Introduction to Applied Structural Drying",
+    "description": "This course moves from foundational concepts to applied practice, equipping technicians to assess real building components affected by water damage, understand drying dynamics in structural assemblies, deploy and operate drying equipment correctly, apply specific drying techniques to different material types, and produce monitoring and documentation records that meet IICRC and insurance requirements. Content is aligned with the IICRC S500 standard and Australian WHS legislation.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "29",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

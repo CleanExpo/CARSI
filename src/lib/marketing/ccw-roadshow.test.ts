@@ -31,10 +31,11 @@ describe('resolveInitialEventSlug (QR/vanity-URL preselect)', () => {
 });
 
 describe('event capacity config', () => {
-  it('caps Melbourne at 20, Sydney at 12, Brisbane at 15', () => {
+  it('caps Melbourne at 20, Sydney at 12, Brisbane at 10', () => {
     expect(getCcwRoadshowEvent('melbourne')?.capacity).toBe(20);
     expect(getCcwRoadshowEvent('sydney')?.capacity).toBe(12);
-    expect(getCcwRoadshowEvent('brisbane')?.capacity).toBe(15);
+    // Brisbane 15 -> 10: founder capped the paid September sitting at ten seats.
+    expect(getCcwRoadshowEvent('brisbane')?.capacity).toBe(10);
   });
 
   it('maps every event to a calendar event id', () => {

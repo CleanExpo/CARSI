@@ -139,3 +139,6 @@ data/wordpress-export/*
 # Prisma 7 generated client (`npm run postinstall` / `prisma generate`)
 src/generated/prisma/
 .handoff-logs/
+
+# GP-567 audit: live-site snapshot, regenerate with scripts/audit/fetch-live.sh
+.audit-cache/

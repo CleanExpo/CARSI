@@ -1,0 +1,45 @@
+{
+  "slug": "introduction-to-forensic-investigations-for-water-losses",
+  "seoTitle": "Introduction to Forensic Investigations for Water Losses | CARSI",
+  "metaDescription": "Forensic water loss investigations: causes, spread, remediation adequacy and evidence.",
+  "imageAlt": "CARSI course: Introduction to Forensic Investigations for Water Losses",
+  "og": {
+    "title": "Introduction to Forensic Investigations for Water Losses | CARSI",
+    "description": "Forensic water loss investigations: causes, spread, remediation adequacy and evidence."
+  },
+  "keywords": [
+    "forensic water loss investigations",
+    "water damage failure analysis",
+    "restoration evidence gathering",
+    "water loss expert findings",
+    "forensic remediation review"
+  ],
+  "faq": [
+    {
+      "q": "What does the Introduction to Forensic Investigations for Water Losses course cover?",
+      "a": "This course equips restoration professionals with a systematic forensic methodology, evidence-gathering techniques, failure analysis skills, the ability to present findings professionally, and an understanding of how to establish the financial cost of a loss.\n\nTopics covered: the circumstances that trigger forensic investigations, forensic investigation methods, failure analysis of building systems and materials, presenting findings to insurers and legal representatives, and establishing the total cost of loss.\n\nStandards applied: IICRC S500, relevant Australian Standard AS 4349 series (inspection of buildings), state civil procedure rules for expert evidence."
+    },
+    {
+      "q": "What is the focus of the Introduction to Forensic Investigations for Water Losses course?",
+      "a": "Forensic water damage investigations are conducted to answer specific factual questions about a water loss: what caused it, when it started, how far it spread, and whether the remediation was adequate."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Introduction to Forensic Investigations for Water Losses",
+    "description": "Forensic water damage investigations are conducted to answer specific factual questions about a water loss: what caused it, when it started, how far it spread, and whether the remediation was adequate. This course equips restoration professionals with a systematic forensic methodology, evidence-gathering techniques, failure analysis skills, the ability to present findings professionally, and an understanding of how to establish the financial cost of a loss.\n\nTopics covered: the circumstances that trigger forensic investigations, forensic investigation methods, failure analysis of building systems and materials, presenting findings to insurers and legal representatives, and establishing the total cost of loss.\n\nStandards applied: IICRC S500, relevant Australian Standard AS 4349 series (inspection of buildings), state civil procedure rules for expert evidence.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "29",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

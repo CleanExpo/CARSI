@@ -114,7 +114,7 @@ An AI feature or agent process is done only when:
 
 ## Near-Term Strengthening Opportunities
 
-- Update `src/ai/version-checks/check-model-currency.ts` so it reads the actual root `.env*` files instead of an old `apps/backend/.env.local` path.
+- ~~Update `src/ai/version-checks/check-model-currency.ts` so it reads the actual root `.env*` files instead of an old `apps/backend/.env.local` path.~~ **Done 06/09/2026.** That file was deleted and replaced by `scripts/check-model-currency.mjs`, which scans the source tree rather than an env file, fails when it scans nothing, and expires the registry after 90 days. Wired into CI as `check:model-currency` with a self-test (`test:model-currency`) that proves it goes red on each defect.
 - Align `src/lib/anthropic/types.ts` and `client.ts` with current Anthropic API constraints before enabling them in production.
 - Add route-level tests for `app/api/lms/public/chat/route.ts` using mocked provider responses.
 - Add a lightweight model-routing wrapper so provider calls are not scattered through routes.

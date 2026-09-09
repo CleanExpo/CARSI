@@ -1,0 +1,45 @@
+{
+  "slug": "introduction-to-advanced-drying-equipment-and-methods",
+  "seoTitle": "Introduction to Advanced Drying Equipment and Methods | CARSI",
+  "metaDescription": "Introduction to Advanced Drying Equipment and Methods: advanced drying equipment and methods used in complex structural drying projects.",
+  "imageAlt": "CARSI course: Introduction to Advanced Drying Equipment and Methods",
+  "og": {
+    "title": "Introduction to Advanced Drying Equipment and Methods | CARSI",
+    "description": "Introduction to Advanced Drying Equipment and Methods: advanced drying equipment and methods used in complex structural drying projects."
+  },
+  "keywords": [
+    "advanced drying equipment training",
+    "desiccant dehumidification systems",
+    "drying plant operation",
+    "air treatment technology",
+    "drying monitoring software"
+  ],
+  "faq": [
+    {
+      "q": "What does the Introduction to Advanced Drying Equipment and Methods course cover?",
+      "a": "This course covers the advanced drying equipment and methods used in complex structural drying projects, including desiccant dehumidification systems, the mechanical elements of drying plant, air treatment technologies, monitoring equipment, and software tools for drying project management."
+    },
+    {
+      "q": "What does the Introduction to Advanced Drying Equipment and Methods course help learners understand?",
+      "a": "It is designed for technicians who need to operate, select, and manage advanced equipment on commercial, large loss, and specialty drying projects."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Introduction to Advanced Drying Equipment and Methods",
+    "description": "This course covers the advanced drying equipment and methods used in complex structural drying projects, including desiccant dehumidification systems, the mechanical elements of drying plant, air treatment technologies, monitoring equipment, and software tools for drying project management. It is designed for technicians who need to operate, select, and manage advanced equipment on commercial, large loss, and specialty drying projects. Aligned with the IICRC S500 standard and Australian equipment safety requirements.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "29",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

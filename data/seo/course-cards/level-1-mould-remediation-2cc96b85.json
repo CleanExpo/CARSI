@@ -1,0 +1,45 @@
+{
+  "slug": "level-1-mould-remediation-2cc96b85",
+  "seoTitle": "Level 1 — Mould Remediation | CARSI",
+  "metaDescription": "You learn what mould is, why it grows, and how to safely clean small surface mould on non-porous areas under one square metre.",
+  "imageAlt": "CARSI course: Level 1 — Mould Remediation",
+  "og": {
+    "title": "Level 1 — Mould Remediation | CARSI",
+    "description": "You learn what mould is, why it grows, and how to safely clean small surface mould on non-porous areas under one square metre."
+  },
+  "keywords": [
+    "Level 1 mould remediation",
+    "small area mould cleaning",
+    "non-porous mould training",
+    "surface mould safety",
+    "mould waste disposal"
+  ],
+  "faq": [
+    {
+      "q": "What does the Level 1 — Mould Remediation course cover?",
+      "a": "Covers basic PPE, how to read a Safety Data Sheet, how to inspect before you start, the step-by-step cleaning process, and how to bag and dispose of waste correctly."
+    },
+    {
+      "q": "What is the focus of the Level 1 — Mould Remediation course?",
+      "a": "You learn what mould is, why it grows, and how to safely clean small surface mould on non-porous areas under one square metre."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Level 1 — Mould Remediation",
+    "description": "You learn what mould is, why it grows, and how to safely clean small surface mould on non-porous areas under one square metre. Covers basic PPE, how to read a Safety Data Sheet, how to inspect before you start, the step-by-step cleaning process, and how to bag and dispose of waste correctly. Ends with guidance on when a job is too big for Level 1 and needs to go up a level.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "49",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

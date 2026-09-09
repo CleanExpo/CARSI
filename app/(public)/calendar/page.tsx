@@ -13,6 +13,11 @@ import {
 import { getBackendOrigin } from '@/lib/env/public-url';
 import { filterExcludedEvents } from '@/lib/calendar/event-exclusions';
 import {
+  buildCalendarCourseEntries,
+  groupCoursesByTopic,
+} from '@/lib/calendar/carsi-course-listing';
+import { getPublishedCourseListItemsFromDatabase } from '@/lib/server/public-courses-list';
+import {
   marketingHubCard,
   marketingHubSectionLabel,
   marketingTextMuted,
@@ -23,9 +28,9 @@ import {
 import { OG_IMAGES } from '@/lib/seo/og-image';
 
 export const metadata: Metadata = {
-  title: 'Industry Calendar — Restoration & Indoor Environment Events',
+  title: 'Industry Calendar — Australian Restoration Courses & Events',
   description:
-    'National calendar of Australian restoration, HVAC, flooring, and indoor environment industry events — conferences, training, webinars, and workshops. Stay connected with your industry.',
+    'Australian-produced CARSI courses you can start any time, plus a national calendar of restoration, HVAC, flooring, and indoor environment industry events — conferences, training, webinars, and workshops.',
   keywords: [
     'restoration industry events',
     'HVAC conferences Australia',
@@ -228,8 +233,25 @@ export default async function CalendarPage({
   const { type, category } = await searchParams;
   const { data: events, total } = await getEvents(type, category);
 
+  // CARSI's own Australian courses, read from CARSI's own database rather than the upstream
+  // events backend. Measured 2026-09-07: that backend was unreachable and this page rendered
+  // three "Event slot — calendar populating" placeholders and nothing else. A page that is
+  // indexed and empty is worse than one that shows what CARSI actually sells.
+  //
+  // Failure here must NOT take the page down — the industry events are still worth showing on
+  // their own, exactly as the events fetch already degrades to an empty list.
+  let courseEntries: ReturnType<typeof buildCalendarCourseEntries> = [];
+  try {
+    courseEntries = buildCalendarCourseEntries(await getPublishedCourseListItemsFromDatabase());
+  } catch {
+    courseEntries = [];
+  }
+  const courseTopics = groupCoursesByTopic(courseEntries);
+
   const grouped = groupByMonth(events);
-  const placeholderCount = Math.max(0, 3 - events.length);
+  // Only pad with placeholders when there is genuinely nothing else on the page. Showing
+  // "calendar populating" above a full list of real courses reads as a broken page.
+  const placeholderCount = courseEntries.length > 0 ? 0 : Math.max(0, 3 - events.length);
 
   const breadcrumbs = [
     { name: 'Home', url: 'https://carsi.com.au' },
@@ -327,6 +349,51 @@ export default async function CalendarPage({
               </section>
             )}
           </div>
+        )}
+
+        {courseTopics.length > 0 && (
+          <section className="mt-16" aria-labelledby="carsi-courses-heading">
+            <h2 id="carsi-courses-heading" className={`mb-2 text-lg ${marketingHubSectionLabel}`}>
+              CARSI Australian courses
+            </h2>
+            <p className={`mb-8 max-w-3xl text-sm ${marketingTextMuted}`}>
+              Australian-produced training you can start whenever you like — no fixed dates, no
+              travel. {courseEntries.length} course{courseEntries.length === 1 ? '' : 's'} available
+              now, written to Australian standards, voltages and units.
+            </p>
+
+            <div className="space-y-10">
+              {courseTopics.map(({ topic, courses }) => (
+                <div key={topic}>
+                  <h3 className={`mb-3 text-sm ${marketingTextStrong}`}>{topic}</h3>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {courses.map((course) => (
+                      <Link
+                        key={course.slug}
+                        href={course.href}
+                        className={`${marketingHubCard} block transition hover:opacity-90`}
+                      >
+                        <span className={`${marketingTopicPill} mb-3 inline-block`}>
+                          {course.isFree ? 'Free' : 'Paid'}
+                        </span>
+                        <span className={`block text-base ${marketingTextStrong}`}>
+                          {course.title}
+                        </span>
+                        {course.summary && (
+                          <span className={`mt-2 block text-sm ${marketingTextMuted}`}>
+                            {course.summary}
+                          </span>
+                        )}
+                        <span className={`mt-3 block text-xs ${marketingTextSubtle}`}>
+                          {course.availability}
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
         )}
       </MarketingPageShell>
     </>

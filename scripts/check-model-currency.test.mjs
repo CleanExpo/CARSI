@@ -1,0 +1,253 @@
+#!/usr/bin/env node
+/**
+ * Self-test for the model-currency guard.
+ *
+ * The guard it replaced could not fail — it read a directory this repo does not
+ * have, audited an empty list, and reported "all current" for ever. So the only
+ * thing worth asserting here is the opposite property: that this guard DOES go
+ * red, and for the stated reason, once each defect is present.
+ *
+ * Every mutant is applied to in-memory inputs of the pure `evaluate()` function.
+ * Nothing on disk is touched, so this cannot damage a working tree the way a
+ * file-mutating harness can.
+ *
+ * Run: node scripts/check-model-currency.test.mjs
+ */
+import {
+  evaluate,
+  findHardcodedIds,
+  parseRegistry,
+  isExempt,
+  MAX_AGE_DAYS,
+} from './check-model-currency.mjs';
+
+let failures = 0;
+const check = (name, ok, detail = '') => {
+  if (ok) {
+    console.log(`  ok   ${name}`);
+  } else {
+    console.error(`  FAIL ${name}${detail ? ` — ${detail}` : ''}`);
+    failures++;
+  }
+};
+const matches = (errors, needle) => errors.some((e) => e.includes(needle));
+
+const NOW = new Date('2026-09-06T00:00:00Z');
+const HEALTHY = {
+  reviewed: '2026-09-01',
+  entries: [
+    { id: 'claude-opus-5', status: 'current' },
+    { id: 'claude-sonnet-5', status: 'current' },
+  ],
+  filesScanned: 1142,
+  hardcoded: [{ file: 'src/x.ts', id: 'claude-opus-5' }],
+  now: NOW,
+};
+
+console.log('model-currency guard self-test\n');
+
+// --- Positive control -------------------------------------------------------
+// If this does not pass, every "the mutant made it fail" result below is
+// meaningless, because the guard would be failing regardless of the mutant.
+console.log('positive control (healthy input must be clean):');
+const clean = evaluate(HEALTHY);
+check('healthy input produces zero errors', clean.length === 0, clean.join('; '));
+
+// --- Mutant 1: staleness ----------------------------------------------------
+console.log('\nmutant: registry review date older than the limit');
+const stale = evaluate({
+  ...HEALTHY,
+  reviewed: '2026-01-01', // 248 days before NOW, limit is 90
+});
+check('goes red', stale.length > 0);
+check('names staleness, not something else', matches(stale, 'last reviewed'), stale.join('; '));
+check('states the limit', matches(stale, String(MAX_AGE_DAYS)));
+
+// Boundary: one day inside the limit must still pass, one day outside must fail.
+// Without this pair the check could be firing on any date at all.
+const dayMs = 86400000;
+const justInside = new Date(NOW.getTime() - (MAX_AGE_DAYS - 1) * dayMs).toISOString().slice(0, 10);
+const justOutside = new Date(NOW.getTime() - (MAX_AGE_DAYS + 1) * dayMs).toISOString().slice(0, 10);
+check(
+  `${MAX_AGE_DAYS - 1} days old still passes`,
+  evaluate({ ...HEALTHY, reviewed: justInside }).length === 0,
+);
+check(
+  `${MAX_AGE_DAYS + 1} days old fails`,
+  evaluate({ ...HEALTHY, reviewed: justOutside }).length > 0,
+);
+
+// --- Mutant 2: no review date at all ---------------------------------------
+console.log('\nmutant: REGISTRY_REVIEWED missing entirely');
+const undated = evaluate({ ...HEALTHY, reviewed: null });
+check('goes red', undated.length > 0);
+check('names the missing constant', matches(undated, 'REGISTRY_REVIEWED'));
+
+// --- Mutant 3: vacuity, scanned nothing ------------------------------------
+// This is the exact defect that made the previous guard worthless.
+console.log('\nmutant: the scan reached zero files');
+const noFiles = evaluate({ ...HEALTHY, filesScanned: 0, hardcoded: [] });
+check('goes red', noFiles.length > 0);
+check('says it examined nothing', matches(noFiles, 'examined'), noFiles.join('; '));
+
+// --- Mutant 4: vacuity, registry parsed to nothing -------------------------
+console.log('\nmutant: the registry parsed to zero entries');
+const noEntries = evaluate({ ...HEALTHY, entries: [], hardcoded: [] });
+check('goes red', noEntries.length > 0);
+check('names the registry', matches(noEntries, 'parsed 0 entries'));
+
+// --- Mutant 5: drift, an id the registry does not list ---------------------
+console.log('\nmutant: source hardcodes an unregistered model id');
+const drift = evaluate({
+  ...HEALTHY,
+  hardcoded: [{ file: 'packages/shared/src/types/models.ts', id: 'claude-opus-4-8' }],
+});
+check('goes red', drift.length > 0);
+check('names the offending id', matches(drift, 'claude-opus-4-8'));
+check('names the offending file', matches(drift, 'packages/shared/src/types/models.ts'));
+
+// --- Mutant 6: drift, a deprecated id --------------------------------------
+console.log('\nmutant: source uses an id the registry marks deprecated');
+const deprecated = evaluate({
+  ...HEALTHY,
+  entries: [{ id: 'claude-opus-4-8', status: 'deprecated' }],
+  hardcoded: [{ file: 'src/x.ts', id: 'claude-opus-4-8' }],
+});
+check('goes red', deprecated.length > 0);
+check('says deprecated', matches(deprecated, 'deprecated'));
+
+// --- Regex aim: the false-positive class that was actually hit -------------
+// A loose /claude-.../i matched the crawler user-agents in app/robots.ts. Assert
+// BOTH directions: the precondition (a real id is still detected) and the
+// negative (user-agents are not). Without the precondition, a regex that matched
+// nothing at all would sail through the negative half.
+console.log('\nregex aim (both directions, so a dead pattern cannot pass):');
+const read = (f) =>
+  ({
+    'src/real.ts': `const m = 'claude-opus-5'; const g = "gemini-2.0-flash-exp";`,
+    'app/robots.ts': `userAgent: 'Claude-SearchBot'\nuserAgent: 'Claude-User'`,
+  })[f];
+const realHits = findHardcodedIds(['src/real.ts'], read).found.map((h) => h.id);
+check('PRECONDITION: a genuine model id is still detected', realHits.includes('claude-opus-5'));
+check('a genuine Google id is still detected', realHits.includes('gemini-2.0-flash-exp'));
+const uaHits = findHardcodedIds(['app/robots.ts'], read).found;
+check('crawler user-agents are NOT reported as models', uaHits.length === 0, JSON.stringify(uaHits));
+
+// Legacy Anthropic ids put the generation BEFORE the family name. An earlier
+// version of this pattern required the family immediately after "claude-", so it
+// missed every Claude 3 id — a fail-open on the oldest ids, which are the ones
+// most worth catching. Raised as P1 by independent review 06/09/2026.
+const legacyRead = (f) =>
+  ({
+    'src/legacy.ts': `a='claude-3-5-sonnet-20240620'; b="claude-3-opus-20240229"; c='claude-3-haiku-20240307';`,
+  })[f];
+const legacyHits = findHardcodedIds(['src/legacy.ts'], legacyRead).found.map((h) => h.id);
+check('legacy claude-3-5-sonnet id is detected', legacyHits.includes('claude-3-5-sonnet-20240620'));
+check('legacy claude-3-opus id is detected', legacyHits.includes('claude-3-opus-20240229'));
+check('legacy claude-3-haiku id is detected', legacyHits.includes('claude-3-haiku-20240307'));
+
+// Alias and platform shapes, all raised by independent review 06/09/2026.
+const aliasRead = (f) =>
+  ({
+    'src/alias.ts':
+      `a='anthropic/claude-3.5-sonnet'; b="claude-3-5-sonnet-v2@20241022"; ` +
+      `c='gemini-exp-1206'; d='gemini-1.png'; e='logo-imagen-4.svg';`,
+  })[f];
+const aliasHits = findHardcodedIds(['src/alias.ts'], aliasRead).found.map((h) => h.id);
+check('OpenRouter alias ending at the family is detected', aliasHits.includes('claude-3.5-sonnet'));
+check('Vertex/Bedrock @-versioned id is detected', aliasHits.includes('claude-3-5-sonnet-v2@20241022'));
+check('gemini-exp-* id is detected', aliasHits.includes('gemini-exp-1206'));
+check('a filename is NOT reported as a model', !aliasHits.some((id) => id.endsWith('.png')), aliasHits.join(','));
+check('an .svg asset is NOT reported as a model', !aliasHits.some((id) => id.endsWith('.svg')));
+
+// Pre-family ids have no family name at all. Finite, frozen set. Round 3.
+const oldRead = (f) =>
+  ({ 'src/old.ts': `a='claude-2.1'; b="claude-2.0"; c='claude-1.3'; d='claude-2.png';` })[f];
+const oldHits = findHardcodedIds(['src/old.ts'], oldRead).found.map((h) => h.id);
+check('claude-2.1 is detected', oldHits.includes('claude-2.1'));
+check('claude-2.0 is detected', oldHits.includes('claude-2.0'));
+check('claude-1.3 is detected', oldHits.includes('claude-1.3'));
+check('claude-2.png is still excluded as a filename', !oldHits.includes('claude-2.png'), oldHits.join(','));
+
+// --- Unreadable paths must fail, not shrink the scan silently --------------
+// filesScanned === 0 only catches a total wipeout. One EACCES used to mean "that
+// file has no model ids". Raised as P1 by independent review 06/09/2026.
+console.log('\ncoverage holes:');
+const throwOnRead = () => {
+  const e = new Error('denied');
+  e.code = 'EACCES';
+  throw e;
+};
+const unreadable = findHardcodedIds(['src/locked.ts'], throwOnRead);
+check('an unreadable file is reported, not skipped', unreadable.unreadable.length === 1);
+check('...and it is not counted as a clean file', unreadable.found.length === 0);
+const holed = evaluate({ ...HEALTHY, unreadable: ['src/locked.ts (EACCES)'] });
+check('a coverage hole fails the guard', holed.length > 0);
+check('and says the result would be unsound', matches(holed, 'holes'), holed.join('; '));
+
+// --- Exemptions cannot swallow the codebase --------------------------------
+console.log('\nexemption scope:');
+check('the guard exempts its own source', isExempt('scripts/check-model-currency.mjs'));
+check('the guard exempts the registry module', isExempt('src/ai/model-registry/providers/gemini.ts'));
+check('an ordinary consumer is NOT exempt', !isExempt('packages/shared/src/types/models.ts'));
+check('an ordinary app file is NOT exempt', !isExempt('src/lib/tools/index.ts'));
+
+// --- Registry parser -------------------------------------------------------
+console.log('\nregistry parser:');
+const parsed = parseRegistry(
+  `export const REGISTRY_REVIEWED = '2026-09-06';\n` +
+    `{ id: 'claude-opus-5', provider: 'anthropic', status: 'current' },\n` +
+    `{ id: 'old-one', provider: 'anthropic', status: 'deprecated' },`,
+);
+check('reads the review date', parsed.reviewed === '2026-09-06');
+check('reads both entries', parsed.entries.length === 2, JSON.stringify(parsed.entries));
+check('reads status', parsed.entries[1]?.status === 'deprecated');
+check('a registry with no date reads as null', parseRegistry('{}').reviewed === null);
+
+// A commented-out entry must NOT count as approved. Before this, commenting an
+// entry out silently kept it approved, so a developer could keep using a model
+// the registry no longer lists. Raised as P1 by independent review 06/09/2026.
+const commented = parseRegistry(
+  `export const REGISTRY_REVIEWED = '2026-09-06';\n` +
+    `{ id: 'live-one', provider: 'anthropic', status: 'current' },\n` +
+    `// { id: 'commented-out', provider: 'anthropic', status: 'current' },\n` +
+    `/* { id: 'block-commented', provider: 'anthropic', status: 'current' }, */\n`,
+);
+const commentedIds = commented.entries.map((e) => e.id);
+check('PRECONDITION: the live entry is still parsed', commentedIds.includes('live-one'));
+check('a // commented entry is NOT approved', !commentedIds.includes('commented-out'), commentedIds.join(','));
+check('a /* block */ commented entry is NOT approved', !commentedIds.includes('block-commented'));
+check('the review date survives comment stripping', commented.reviewed === '2026-09-06');
+
+// A notes string containing the characters `status: 'current'` must NOT be read
+// as the entry's status. The old single-regex parser matched the FIRST status:
+// it found, so prose could mask a deprecated model. Raised as P1 by independent
+// review 06/09/2026; fixed by scanning fields instead of pattern-matching.
+const masked = parseRegistry(
+  `export const REGISTRY_REVIEWED = '2026-09-06';\n` +
+    `{\n` +
+    `  id: 'sneaky-model',\n` +
+    `  notes: 'Previous status: "current" — see the migration note',\n` +
+    `  status: 'deprecated',\n` +
+    `},\n`,
+);
+check('PRECONDITION: the entry is parsed at all', masked.entries.length === 1, JSON.stringify(masked.entries));
+check(
+  'prose cannot mask the real status',
+  masked.entries[0]?.status === 'deprecated',
+  `got ${masked.entries[0]?.status}`,
+);
+// And the drift check must therefore still reject a use of it.
+const maskedDrift = evaluate({
+  ...HEALTHY,
+  entries: masked.entries,
+  hardcoded: [{ file: 'src/x.ts', id: 'sneaky-model' }],
+});
+check('a deprecated model hidden behind prose is still blocked', maskedDrift.length > 0);
+
+console.log(
+  failures === 0
+    ? '\nPASS: the guard fails on every defect it claims to catch.'
+    : `\nFAIL: ${failures} self-test assertion(s) failed.`,
+);
+process.exit(failures === 0 ? 0 : 1);

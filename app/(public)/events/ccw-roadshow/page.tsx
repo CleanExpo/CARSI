@@ -24,6 +24,7 @@ import {
   marketingTopicPill,
 } from '@/lib/marketing/marketing-ui';
 import {
+  allowsFreeEntryRegistration,
   ccwRoadshowCampaignPillars,
   ccwRoadshowEvents,
   ccwRoadshowFacilityAdvantages,
@@ -44,7 +45,7 @@ const canonical = `${siteUrl}${ccwRoadshowPath}`;
 export const metadata: Metadata = {
   title: 'Grow Your Cleaning Business | CARSI x CCW Roadshow 2026',
   description:
-    'Free for CCW past and current customers. Spend two practical days with Phill McGurk at CCW Melbourne, Sydney or Brisbane and claim a free entry token when you register.',
+    'Spend two practical days with Phill McGurk at CCW Melbourne, Sydney or Brisbane. Melbourne is free for past and current CCW customers; Sydney and Brisbane seats are booked through Carpet Cleaners Warehouse.',
   alternates: { canonical },
   keywords: [
     'carpet cleaning training Melbourne',
@@ -81,7 +82,7 @@ const faqs = [
   {
     question: 'How much does it cost?',
     answer:
-      'All CCW past and current customers can attend free. Register on the CARSI event page to claim a free entry token for check-in.',
+      'Melbourne is free for past and current CCW customers - register on the CARSI event page to claim a free entry token for check-in. Sydney and Brisbane are paid seats booked through Carpet Cleaners Warehouse, not on this page.',
   },
   {
     question: 'Where are the Melbourne, Sydney and Brisbane events held?',
@@ -128,7 +129,9 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
           organiserName="CARSI and Carpet Cleaners Warehouse"
           organiserUrl="https://www.carsi.com.au"
           ticketUrl={canonical}
-          isFree
+          // Per city, not blanket. Emitting isFree for a paid seat publishes a false
+          // price in Event schema, which search engines surface directly.
+          isFree={allowsFreeEntryRegistration(event)}
           image={`${siteUrl}/og-image.png`}
           eventType="BusinessEvent"
         />
@@ -170,7 +173,9 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#ed9d24] opacity-40" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-[#ed9d24]" />
                 </span>
-                {focusEvent ? `${focusEvent.city} · ${focusEvent.dates}` : 'Melbourne, Sydney + Brisbane · Jul-Aug 2026'}
+                {focusEvent
+                  ? `${focusEvent.city} · ${focusEvent.dates}`
+                  : `Melbourne, Sydney + Brisbane · ${ccwRoadshowEvents.map((e) => e.dates).join(', ')}`}
               </span>
 
               <p className={`mt-5 ${marketingEyebrowAmber}`}>
@@ -192,13 +197,31 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
               <div className="mt-8 grid gap-3 sm:grid-cols-3">
                 <div className={marketingStatCard}>
                   <CalendarDays className="mb-3 h-4 w-4 text-[#146fc2] dark:text-[#7ec5ff]" aria-hidden />
-                  <p className="text-sm font-semibold text-slate-900 dark:text-white/90">Jul-Aug 2026</p>
-                  <p className={`mt-1 ${marketingBodySm}`}>Melbourne 22-23 Jul, Sydney 30-31 Jul, Brisbane 11-12 Aug</p>
+                  <p className="text-sm font-semibold text-slate-900 dark:text-white/90">2026 dates</p>
+                  {/* Derived, not restated. This line previously hardcoded "Brisbane 11-12 Aug"
+                      and stayed a month stale after the data module moved. */}
+                  <p className={`mt-1 ${marketingBodySm}`}>
+                    {ccwRoadshowEvents.map((event) => `${event.city} ${event.dates}`).join(', ')}
+                  </p>
                 </div>
                 <div className={marketingStatCard}>
                   <Users className="mb-3 h-4 w-4 text-[#ed9d24]/80" aria-hidden />
-                  <p className="text-sm font-semibold text-slate-900 dark:text-white/90">Free CCW entry</p>
-                  <p className={`mt-1 ${marketingBodySm}`}>Past/current customers claim a token</p>
+                  {/* Per city. A blanket "Free CCW entry" chip advertised paid seats
+                      as free even after the schema and FAQ were corrected. */}
+                  <p className="text-sm font-semibold text-slate-900 dark:text-white/90">
+                    {focusEvent
+                      ? allowsFreeEntryRegistration(focusEvent)
+                        ? 'Free CCW entry'
+                        : 'Booked through CCW'
+                      : 'Entry varies by city'}
+                  </p>
+                  <p className={`mt-1 ${marketingBodySm}`}>
+                    {focusEvent
+                      ? allowsFreeEntryRegistration(focusEvent)
+                        ? 'Past/current customers claim a token'
+                        : 'Seats are sold by Carpet Cleaners Warehouse'
+                      : 'Melbourne is free for CCW customers. Sydney and Brisbane are paid seats booked through CCW.'}
+                  </p>
                 </div>
                 <div className={marketingStatCard}>
                   <Sparkles className="mb-3 h-4 w-4 text-[#146fc2] dark:text-[#7ec5ff]" aria-hidden />
@@ -332,12 +355,32 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
               </div>
             </div>
 
+            {/* The $0 ticket packages describe the free-entry rail only. Rendering them
+                while focused on a paid city published a price of $0.00 for a seat the
+                founder is selling, which is worse than showing no price at all. */}
+            {focusEvent && !allowsFreeEntryRegistration(focusEvent) ? (
+              <div className={`p-5 ${marketingStatCard}`}>
+                <p className={marketingEyebrowPill}>Booked through CCW</p>
+                <h2 className="mt-4 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+                  {focusEvent.city} seats are sold by Carpet Cleaners Warehouse
+                </h2>
+                <p className={`mt-3 ${marketingBodySm}`}>
+                  {focusEvent.city} is not part of the free CCW entry offer. Contact Carpet
+                  Cleaners Warehouse to book a place for {focusEvent.dates}.
+                </p>
+              </div>
+            ) : (
             <div className={`p-5 ${marketingStatCard}`}>
               <p className={marketingEyebrowPill}>Free CCW customer entry</p>
               <h2 className="mt-4 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
                 {ccwRoadshowFreeEntryOffer.headline}
               </h2>
-              <p className={`mt-3 ${marketingBodySm}`}>{ccwRoadshowFreeEntryOffer.detail}</p>
+              <p className={`mt-3 ${marketingBodySm}`}>
+                {ccwRoadshowFreeEntryOffer.detail}
+                {focusEvent
+                  ? ''
+                  : ' This applies to Melbourne only — Sydney and Brisbane are paid seats booked through Carpet Cleaners Warehouse.'}
+              </p>
               <div className="mt-5 space-y-3">
                 {ccwRoadshowTicketPackages.map((pkg) => (
                   <div key={pkg.id} className={`p-4 ${marketingPanel}`}>
@@ -356,6 +399,7 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
                 Claim your free entry token <ArrowRight className="h-4 w-4" aria-hidden />
               </Link>
             </div>
+            )}
           </div>
         </section>
 

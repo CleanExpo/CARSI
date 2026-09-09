@@ -1,0 +1,41 @@
+{
+  "slug": "level-3-mould-remediation-c5797369",
+  "seoTitle": "Level 3 — Mould Remediation | CARSI",
+  "metaDescription": "Level 3 — Mould Remediation: Designed for large-scale contamination over ten square metres involving structural materials.",
+  "imageAlt": "CARSI course: Level 3 — Mould Remediation",
+  "og": {
+    "title": "Level 3 — Mould Remediation | CARSI",
+    "description": "Level 3 — Mould Remediation: Designed for large-scale contamination over ten square metres involving structural materials."
+  },
+  "keywords": [
+    "Level 3 mould remediation",
+    "large-scale mould remediation",
+    "HVAC mould remediation",
+    "complex mould containment",
+    "advanced mould risk assessment"
+  ],
+  "faq": [
+    {
+      "q": "What does the Level 3 — Mould Remediation course cover?",
+      "a": "Designed for large-scale contamination over ten square metres involving structural materials, HVAC systems, and high-risk environments like hospitals, schools, and aged care facilities."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Level 3 — Mould Remediation",
+    "description": "Designed for large-scale contamination over ten square metres involving structural materials, HVAC systems, and high-risk environments like hospitals, schools, and aged care facilities. You learn advanced risk assessment, full-scale containment design with negative pressure monitoring, respirator fit-testing obligations, heat management planning for extended PPE use, psychrometric analysis for drying, moisture mapping across large sites, how different building materials affect remediation decisions, and how to lead a complex project to close-out — potentially alongside an independent industrial hygienist for air clearance testing.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "148.95",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

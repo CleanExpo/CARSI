@@ -1,0 +1,45 @@
+{
+  "slug": "fsrt-fire-smoke-restoration-core",
+  "seoTitle": "Fire & Smoke Restoration — Core Principles | CARSI",
+  "metaDescription": "Safety on fire-affected sites, soot behaviour, cleaning chemistry, and deodorisation planning.",
+  "imageAlt": "CARSI course: Fire & Smoke Restoration — Core Principles",
+  "og": {
+    "title": "Fire & Smoke Restoration — Core Principles | CARSI",
+    "description": "Safety on fire-affected sites, soot behaviour, cleaning chemistry, and deodorisation planning."
+  },
+  "keywords": [
+    "fire smoke restoration core course",
+    "smoke residue cleaning",
+    "fire affected property restoration",
+    "odour restoration planning",
+    "contents and structure cleaning"
+  ],
+  "faq": [
+    {
+      "q": "What does Fire & Smoke Restoration — Core Principles cover?",
+      "a": "Foundational fire and smoke restoration concepts for technicians working on residential and commercial smoke-affected properties."
+    },
+    {
+      "q": "Which syllabus topics are listed for Fire & Smoke Restoration — Core Principles?",
+      "a": "Syllabus topics include Module 1 — Site safety & stabilisation; Module 2 — Smoke residue types; Module 3 — Surface cleaning mechanics; Module 4 — Contents vs structure workflow; Module 5 — Odour science overview; Module 6 — Equipment for air quality."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Fire & Smoke Restoration — Core Principles",
+    "description": "Foundational fire and smoke restoration concepts for technicians working on residential and commercial smoke-affected properties. Syllabus topics include Module 1 — Site safety & stabilisation; Module 2 — Smoke residue types; Module 3 — Surface cleaning mechanics; Module 4 — Contents vs structure workflow; Module 5 — Odour science overview; Module 6 — Equipment for air quality.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "slug": "carsi-maintenance-toolbox-talks-monthly-refreshers",
+  "seoTitle": "Floor Care Toolbox Talks - Monthly Refreshers | CARSI",
+  "metaDescription": "Short Australian toolbox talks for floor-care teams - one topic per session, five minutes each, with a new talk added every month to keep crews sharp.",
+  "imageAlt": "CARSI course thumbnail: CARSI Maintenance — Toolbox Talks (Monthly Refreshers)",
+  "og": {
+    "title": "CARSI Maintenance - Toolbox Talks (Monthly Refreshers)",
+    "description": "Short, sharp Australian toolbox talks for professional floor-care teams. One topic per session, five minutes each, to keep the whole crew sharp between onboarding and re-certification. A new talk is added each month."
+  },
+  "keywords": [
+    "toolbox talks cleaning industry",
+    "floor care safety training australia",
+    "monthly safety refresher training",
+    "cleaning crew toolbox talk",
+    "sds ppe toolbox talk",
+    "rcd machine safety training",
+    "safe work australia toolbox talks"
+  ],
+  "faq": [
+    {
+      "q": "How long does each toolbox talk take?",
+      "a": "Five minutes, with one topic per session. They are designed to be short and sharp so a whole crew can run one before starting work."
+    },
+    {
+      "q": "What topics do the toolbox talks cover?",
+      "a": "Site arrival, chemical, PPE and SDS handling, machine and RCD safety, vehicle pre-start, wet-floor and hazard control, confidentiality and photos, cross-contamination, and slip resistance."
+    },
+    {
+      "q": "Are the talks kept up to date?",
+      "a": "Yes. A new talk is added each month, so the series works as an ongoing refresher between onboarding and re-certification rather than a one-off session."
+    },
+    {
+      "q": "Are these written for Australian workplaces?",
+      "a": "Yes. They are Australian-produced and reference 230 V and RCD safety, AS/NZS standards, Safe Work Australia guidance, and the Poisons Information line on 13 11 26."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "CARSI Maintenance - Toolbox Talks (Monthly Refreshers)",
+    "description": "Short, sharp Australian toolbox talks for professional floor-care teams - one topic per session, five minutes each, to keep the whole crew sharp between onboarding and re-certification. A new talk is added each month. Covers site arrival, chemical, PPE and SDS handling, machine and RCD safety, vehicle pre-start, wet-floor and hazard control, confidentiality and photos, cross-contamination, and slip resistance.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

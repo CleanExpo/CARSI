@@ -1,0 +1,3124 @@
+{
+  "schema": "gp567-inventory/1",
+  "generated_at_utc": "2026-09-07T07:55:49Z",
+  "generated_by": "scripts/audit/build-inventory.mjs",
+  "live_snapshot_access_date": "2026-09-07",
+  "source_counts_observed": {
+    "live_sitemap_course_urls": 80,
+    "live_jsonld_itemlist_entries": 80,
+    "legacy_wordpress_export_records": 95,
+    "legacy_published": 84,
+    "seed_catalog_courses": 71,
+    "total_distinct_slugs": 182
+  },
+  "card_claimed_counts_UNOBSERVED": {
+    "note": "GP-567 states \"93 planned / 5 seeded\" and \"31 parity gaps\". Recorded verbatim; NOT reproduced by this run. Do not treat as verified.",
+    "planned": 93,
+    "seeded": 5,
+    "parity_gaps": 31
+  },
+  "status_counts": {
+    "LEGACY_ONLY_PARITY_GAP": 78,
+    "LIVE_ONLY": 18,
+    "LIVE_AND_SEED_NOT_IN_LEGACY": 45,
+    "SEED_ONLY_NOT_LIVE": 24,
+    "LIVE_AND_LEGACY_NOT_SEEDED": 15,
+    "ALL_THREE": 2
+  },
+  "rows": [
+    {
+      "slug": "adjusters",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Insurance Adjusters and Their Roles",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "admin-sole-trader",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Admin - Sole Trader",
+      "legacy_status": "published",
+      "legacy_cec_hours": 4,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "advanced-applied",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Advanced Applied Structural Drying",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": "ASD",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "advancedstructural",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Advanced Structural Drying Concepts",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": "ASD",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "affiliate-membership",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Affiliate Membership",
+      "legacy_status": "draft",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "agi-smallbusiness",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "AGI Essentials: A Practical Guide for Small Business Success",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "air-movers-for-professional-restoration-specs-selection-on-site-assessment",
+      "status": "LIVE_ONLY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": false
+      },
+      "title": "Air Movers for Professional Restoration: Specs, Selection & On-Site Assessment",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": 0,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "air-quality-and-odour",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Air Quality and Odour: Identification and Deodorisation Essentials",
+      "legacy_status": "draft",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": "OCT",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "air-quality-and-odour-identification-and-deodorisation-essentials",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Air Quality and Odour: Identification and Deodorisation Essentials",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 0,
+      "seed_iicrc_discipline": null,
+      "live_price": 0,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "antiques",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Restoration of Antiques and Fine Furnishings",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "applied-microbial",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Applied Microbial Remediation",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "asbestos",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Asbestos: Asbestos Awareness",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "asbestos-awareness-for-restoration-technicians",
+      "status": "SEED_ONLY_NOT_LIVE",
+      "present": {
+        "live": false,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "CARSI Asbestos Awareness for Restoration",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 0,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "asd-structural-drying-core",
+      "status": "LIVE_ONLY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": false
+      },
+      "title": "Applied Structural Drying — Core Concepts",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": 0,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "assessing-indoor-environment-conditions",
+      "status": "SEED_ONLY_NOT_LIVE",
+      "present": {
+        "live": false,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "CARSI Indoor Environment Assessment Practitioner",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 0,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "asthmaallergy",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Asthma and Allergy Course",
+      "legacy_status": "published",
+      "legacy_cec_hours": 6,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "avian-influenza-awareness-restoration-iaq-facilities",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Australian H5 Bird Flu Awareness for Restoration, IAQ and Facility Professionals",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 0,
+      "seed_iicrc_discipline": null,
+      "live_price": 149,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "biologicalcontaminants",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Biological Contaminants and Treatments",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "carpet-cleaning",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Basic Carpet Cleaning and Drying",
+      "legacy_status": "published",
+      "legacy_cec_hours": 1,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "carpet-cleaning-basics",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Carpet Cleaning Basics",
+      "legacy_status": "published",
+      "legacy_cec_hours": 3,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "carpet-cleaning-basics-b66757ce",
+      "status": "LIVE_ONLY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": false
+      },
+      "title": "CARPET CLEANING BASICS",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": 55,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "carpet-cleaning-technician-fundamentals",
+      "status": "SEED_ONLY_NOT_LIVE",
+      "present": {
+        "live": false,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "CARSI Carpet Cleaning Practitioner",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 0,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "carsi-chatgpt-ebook",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "CARSI CHATGPT EBook",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "carsi-maintenance-toolbox-talks-monthly-refreshers",
+      "status": "LIVE_ONLY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": false
+      },
+      "title": "CARSI Maintenance — Toolbox Talks (Monthly Refreshers)",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": 0,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "category-3-sewage-black-water-remediation",
+      "status": "SEED_ONLY_NOT_LIVE",
+      "present": {
+        "live": false,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "CARSI Contaminated-Water Practitioner",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 0,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "cct-commercial-carpet-core",
+      "status": "LIVE_ONLY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": false
+      },
+      "title": "Commercial Carpet Care — Core Methods",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": 0,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "ccw-carsi-truckmount-operations",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Truckmount Operations Course — HydraMaster & Sapphire Scientific (Australian configuration)",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 0,
+      "seed_iicrc_discipline": null,
+      "live_price": 0,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "chat-gpt",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Comprehensive Chat GPT Cheat Sheet",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "collaborative-development-your-personal-ai-assistant",
+      "status": "LIVE_AND_LEGACY_NOT_SEEDED",
+      "present": {
+        "live": true,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Collaborative Development — Your Personal AI Assistant",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": 49,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "commercial-floor-care-schools-childcare",
+      "status": "SEED_ONLY_NOT_LIVE",
+      "present": {
+        "live": false,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Commercial Floor Care for Schools & Childcare Contracts",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 0,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "complex-water-losses",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Consulting for Complex Water Losses",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": "WRT",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "controlled-drying",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Controlled Environment Drying Methods",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": "ASD",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "dehumidifiers",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Refrigerant Dehumidifiers for Water Loss Restoration",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": "WRT",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "difficult-materials",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Drying Difficult Materials",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": "ASD",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "documenting-and-reporting-air-quality-improvements",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Documenting and Reporting Air Quality Improvements",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 0,
+      "seed_iicrc_discipline": null,
+      "live_price": 28.98,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "donning-and-doffing-ppe",
+      "status": "LIVE_AND_LEGACY_NOT_SEEDED",
+      "present": {
+        "live": true,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Donning and Doffing PPE",
+      "legacy_status": "published",
+      "legacy_cec_hours": 1,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": 39,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "drying-healthcare",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Drying Health Care Facilities",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": "ASD",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "drying-techniques",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Drying Techniques and Equipment",
+      "legacy_status": "published",
+      "legacy_cec_hours": 1,
+      "legacy_iicrc_discipline": "ASD",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "drying-transportation",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Drying Transportation and Vehicles",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": "ASD",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "dryingprotocol",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Developing a Drying Protocol",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": "ASD",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "duct-cleaning",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Residential Duct Cleaning",
+      "legacy_status": "draft",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "dust-and-particulates-in-indoor-air-control-and-cleaning-strategies",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Dust and Particulates in Indoor Air: Control and Cleaning Strategies",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 0,
+      "seed_iicrc_discipline": null,
+      "live_price": 0,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "dust-particulates-in-indoor-air",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Dust and Particulates in Indoor Air: Control and Cleaning Strategies",
+      "legacy_status": "draft",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "educational",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Drying Educational and Institutional Sites",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": "ASD",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "exterior-envelope-drying",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Exterior Envelope Drying Strategies",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": "ASD",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "fire-smoke-damage-restoration-fundamentals",
+      "status": "SEED_ONLY_NOT_LIVE",
+      "present": {
+        "live": false,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "CARSI Fire & Smoke Restoration Practitioner",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 0,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "floor-care-onboarding-operational-readiness",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "CARSI Maintenance Company Onboarding — Professional Floor Care & Operational Readiness",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 0,
+      "seed_iicrc_discipline": null,
+      "live_price": 0,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "forensic",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Forensic Investigations for Water Losses",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": "WRT",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "foundation-membership",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Foundation Membership",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "free-library",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Free Library",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "fsrt-fire-smoke-restoration-core",
+      "status": "LIVE_ONLY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": false
+      },
+      "title": "Fire & Smoke Restoration — Core Principles",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": 0,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "fundamental-business-framework",
+      "status": "LIVE_AND_LEGACY_NOT_SEEDED",
+      "present": {
+        "live": true,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Fundamental Business Framework",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": 770,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "glass-cleaning-course",
+      "status": "LIVE_AND_LEGACY_NOT_SEEDED",
+      "present": {
+        "live": true,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Glass Cleaning Course",
+      "legacy_status": "published",
+      "legacy_cec_hours": 1,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": 20,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "heat-drying",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Heat Drying Systems Assistance",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": "ASD",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "hospitality",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Drying Hospitality and Lodging Sites",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": "ASD",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "hvac-systems-and-indoor-air-quality",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "HVAC Systems and Indoor Air Quality: What Every Technician Should Know",
+      "legacy_status": "draft",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "hvac-systems-and-indoor-air-quality-what-every-technician-should-know",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "HVAC Systems and Indoor Air Quality: What Every Technician Should Know",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 0,
+      "seed_iicrc_discipline": null,
+      "live_price": 0,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "hvacsystems",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to HVAC Systems and Drying Strategies",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": "ASD",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "industrial-2",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Drying Industrial and Manufacturing Sites",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": "ASD",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "infection-control-in-child-care",
+      "status": "LIVE_AND_LEGACY_NOT_SEEDED",
+      "present": {
+        "live": true,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Infection Control in Child Care",
+      "legacy_status": "published",
+      "legacy_cec_hours": 3,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": 99,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "infectious-control-for-the-business-owner",
+      "status": "LIVE_AND_LEGACY_NOT_SEEDED",
+      "present": {
+        "live": true,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Infectious Control for the Business Owner",
+      "legacy_status": "published",
+      "legacy_cec_hours": 7,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": 275,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "infrared",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Infrared Thermography for Drying",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": "ASD",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "initial-inspection-report-course",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Initial Inspection Report Course",
+      "legacy_status": "published",
+      "legacy_cec_hours": 1,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "insurance-adjusters-and-their-roles",
+      "status": "LIVE_ONLY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": false
+      },
+      "title": "Insurance Adjusters and Their Roles",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": 0,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-advanced-applied-structural-drying",
+      "status": "LIVE_ONLY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": false
+      },
+      "title": "Introduction to Advanced Applied Structural Drying",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": 0,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-advanced-drying-equipment-and-methods",
+      "status": "ALL_THREE",
+      "present": {
+        "live": true,
+        "legacy": true,
+        "seed": true
+      },
+      "title": "Introduction to Advanced Drying Equipment and Methods",
+      "legacy_status": "published",
+      "legacy_cec_hours": 1,
+      "legacy_iicrc_discipline": "ASD",
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": 29,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-advanced-structural-drying-concepts",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Advanced Structural Drying Concepts",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": 29,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-air-quality-fundamentals",
+      "status": "ALL_THREE",
+      "present": {
+        "live": true,
+        "legacy": true,
+        "seed": true
+      },
+      "title": "Introduction to Air Quality Fundamentals",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": 29,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-applied-microbial-remediation",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Applied Microbial Remediation",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": 29,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-applied-structural-drying",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Applied Structural Drying",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": 29,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-asbestos-asbestos-awareness",
+      "status": "LIVE_ONLY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": false
+      },
+      "title": "Introduction to Asbestos: Asbestos Awareness",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": 29,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-basic-carpet-cleaning-and-drying",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Basic Carpet Cleaning and Drying",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": 29,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-biological-contaminants-and-treatments",
+      "status": "SEED_ONLY_NOT_LIVE",
+      "present": {
+        "live": false,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Biological Contaminants and Treatments",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "introduction-to-consulting-for-complex-water-losses",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Consulting for Complex Water Losses",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": 29,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-controlled-environment-drying-methods",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Controlled Environment Drying Methods",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": 29,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-creating-a-clean-air-environment",
+      "status": "LIVE_AND_LEGACY_NOT_SEEDED",
+      "present": {
+        "live": true,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Creating a Clean Air Environment",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": 29,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-creating-a-clean-air-environment-best-practices-for-final-cleara",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Creating a Clean Air Environment: Best Practices for Final Clearance and Handover",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": 28.97,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-developing-a-drying-protocol",
+      "status": "SEED_ONLY_NOT_LIVE",
+      "present": {
+        "live": false,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Developing a Drying Protocol",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "introduction-to-digital-moisture-mapping",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Digital Moisture Mapping",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": 29,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-drying-difficult-materials",
+      "status": "SEED_ONLY_NOT_LIVE",
+      "present": {
+        "live": false,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Drying Difficult Materials",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "introduction-to-drying-educational-and-institutional-sites",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Drying Educational and Institutional Sites",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 0,
+      "seed_iicrc_discipline": null,
+      "live_price": 0,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-drying-health-care-facilities",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Drying Health Care Facilities",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 0,
+      "seed_iicrc_discipline": null,
+      "live_price": 0,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-drying-hospitality-and-lodging-sites",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Drying Hospitality and Lodging Sites",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 0,
+      "seed_iicrc_discipline": null,
+      "live_price": 0,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-drying-industrial-and-manufacturing-sites",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Drying Industrial and Manufacturing Sites",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 0,
+      "seed_iicrc_discipline": null,
+      "live_price": 0,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-drying-techniques-and-equipment",
+      "status": "SEED_ONLY_NOT_LIVE",
+      "present": {
+        "live": false,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Drying Techniques and Equipment",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "introduction-to-drying-transportation-and-vehicles",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Drying Transportation and Vehicles",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 0,
+      "seed_iicrc_discipline": null,
+      "live_price": 0,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-exterior-envelope-drying-strategies",
+      "status": "SEED_ONLY_NOT_LIVE",
+      "present": {
+        "live": false,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Exterior Envelope Drying Strategies",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "introduction-to-forensic-investigations-for-water-losses",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Forensic Investigations for Water Losses",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": 29,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-hvac-systems-and-drying-strategies",
+      "status": "SEED_ONLY_NOT_LIVE",
+      "present": {
+        "live": false,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to HVAC Systems and Drying Strategies",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "introduction-to-iaq-and-mould",
+      "status": "LIVE_ONLY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": false
+      },
+      "title": "Introduction to IAQ and Mould",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": 29,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-iaq-and-mould-understanding-airborne-spread",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to IAQ and Mould",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "introduction-to-iaq-and-mould-understanding-airborne-spread-and-containment",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to IAQ and Mould: Understanding Airborne Spread and Containment",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": 29,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-improving-indoor-air-quality-after-water-damage",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Improving Indoor Air Quality After Water Damage",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": 29,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-improving-indoor-air-quality-after-waterdamage",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Improving Indoor Air Quality After Water Damage",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": "WRT",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "introduction-to-infrared-thermography-for-drying",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Infrared Thermography for Drying",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 0,
+      "seed_iicrc_discipline": null,
+      "live_price": 0,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-large-loss-drying-projects",
+      "status": "SEED_ONLY_NOT_LIVE",
+      "present": {
+        "live": false,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Large Loss Drying Projects",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "introduction-to-monitoring-air-quality-job-site",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Monitoring Air Quality on the Job Site",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "introduction-to-monitoring-air-quality-on-the-job-site",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Monitoring Air Quality on the Job Site",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": 29,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-mould-identification-and-remediation",
+      "status": "SEED_ONLY_NOT_LIVE",
+      "present": {
+        "live": false,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Mould Identification and Remediation",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "introduction-to-odour-control-and-removal-techniques",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Odour Control and Removal Techniques",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": 29,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-porous-materials-drying",
+      "status": "SEED_ONLY_NOT_LIVE",
+      "present": {
+        "live": false,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Porous Materials Drying",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "introduction-to-project-management-for-water-losses",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Project Management for Water Losses",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": 29,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-psychrometry-and-the-drying-process",
+      "status": "SEED_ONLY_NOT_LIVE",
+      "present": {
+        "live": false,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Psychrometry and the Drying Process",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "introduction-to-psychrometry-science-and-calculations",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Psychrometry Science and Calculations",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": 29,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-recovery-of-submerged-items-and-contents",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Recovery of Submerged Items and Contents",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 0,
+      "seed_iicrc_discipline": null,
+      "live_price": 0,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-residential-duct-cleaning",
+      "status": "LIVE_ONLY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": false
+      },
+      "title": "Introduction to Residential Duct Cleaning",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": 0,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-restoration-of-antiques-and-fine-furnishings",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Restoration of Antiques and Fine Furnishings",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 0,
+      "seed_iicrc_discipline": null,
+      "live_price": 0,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-safety-procedures-for-water-damage-work",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Safety Procedures for Water Damage Work",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": 29,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-smoke-and-soot-damage-restoration",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Smoke and Soot Damage Restoration",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": 29,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-structural-drying-concepts",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Structural Drying Concepts",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": 29,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-ultraviolet-light-and-fluorescence",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Ultraviolet Light and Fluorescence",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 0,
+      "seed_iicrc_discipline": null,
+      "live_price": 0,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-upholstery-cleaning-and-drying",
+      "status": "SEED_ONLY_NOT_LIVE",
+      "present": {
+        "live": false,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Upholstery Cleaning and Drying",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "introduction-to-using-personal-protective-equipment",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Using Personal Protective Equipment",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": 29,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-water-damage-estimating",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Water Damage Estimating",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": 29,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-water-damage-in-commercial-buildings",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Water Damage in Commercial Buildings",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": 29,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-water-damage-litigation-support",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Water Damage Litigation Support",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 0,
+      "seed_iicrc_discipline": null,
+      "live_price": 0,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-water-damage-marketing-and-sales",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Water Damage Marketing and Sales",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": 29,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-water-damage-principles",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Water Damage Principles",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": 29,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-water-damage-restoration",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Water Damage Restoration",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": 29,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "introduction-to-water-damage-restoration-course",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Water Damage Restoration",
+      "legacy_status": "published",
+      "legacy_cec_hours": 1,
+      "legacy_iicrc_discipline": "WRT",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "introduction-to-water-extraction-methods",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Introduction to Water Extraction Methods",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 1,
+      "seed_iicrc_discipline": null,
+      "live_price": 29,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "job-safety-and-environmental-analysis-jsea-course",
+      "status": "LIVE_AND_LEGACY_NOT_SEEDED",
+      "present": {
+        "live": true,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Job Safety and Environmental Analysis (JSEA) Course",
+      "legacy_status": "published",
+      "legacy_cec_hours": 1,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": 20,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "large-loss-mastery-course",
+      "status": "LIVE_ONLY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": false
+      },
+      "title": "Large Loss Mastery Course",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": 0,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "large-loss-mastery-course-split-payment",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Large Loss Mastery Course Split Payment",
+      "legacy_status": "draft",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "large-loss-mastery-super-course",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Large Loss Mastery Course",
+      "legacy_status": "draft",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "largelossdrying",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Large Loss Drying Projects",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": "ASD",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "laser-measure",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Laser Measurer Assistance Video",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "level-1-mould-remediation",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Level 1 Mould Remediation",
+      "legacy_status": "published",
+      "legacy_cec_hours": 2,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "level-1-mould-remediation-2cc96b85",
+      "status": "LIVE_ONLY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": false
+      },
+      "title": "Level 1 — Mould Remediation",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": 49,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "level-2-mould-remediation",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Level 2 - Mould Remediation",
+      "legacy_status": "draft",
+      "legacy_cec_hours": 4,
+      "legacy_iicrc_discipline": "AMRT",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "level-2-mould-remediation-30ee3492",
+      "status": "LIVE_ONLY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": false
+      },
+      "title": "Level 2 — Mould Remediation",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": 49,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "level-3-mould-remediation",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Level 3 - Mould Remediation",
+      "legacy_status": "draft",
+      "legacy_cec_hours": 5,
+      "legacy_iicrc_discipline": "AMRT",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "level-3-mould-remediation-c5797369",
+      "status": "LIVE_ONLY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": false
+      },
+      "title": "Level 3 — Mould Remediation",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": 148.95,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "litigation-support",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Water Damage Litigation Support",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": "WRT",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "marketing-course",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Marketing Course",
+      "legacy_status": "published",
+      "legacy_cec_hours": 1,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "membership",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Growth Membership",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "microbe-clean-basic-understanding-course",
+      "status": "LIVE_AND_LEGACY_NOT_SEEDED",
+      "present": {
+        "live": true,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Microbe Clean Basic Understanding Course",
+      "legacy_status": "published",
+      "legacy_cec_hours": 5,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": 99,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "moisture-mapping",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Digital Moisture Mapping",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "moisture-meter-course",
+      "status": "LIVE_AND_LEGACY_NOT_SEEDED",
+      "present": {
+        "live": true,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Moisture Meter Course",
+      "legacy_status": "published",
+      "legacy_cec_hours": 3,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": 39,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "moisture-mould-and-indoor-air-quality-understanding-the-link",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Moisture, Mould, and Indoor Air Quality: Understanding the Link",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 0,
+      "seed_iicrc_discipline": null,
+      "live_price": 0,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "mould-identification",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Mould Identification and Remediation",
+      "legacy_status": "draft",
+      "legacy_cec_hours": 1,
+      "legacy_iicrc_discipline": "AMRT",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "mould-remediation-fundamentals",
+      "status": "SEED_ONLY_NOT_LIVE",
+      "present": {
+        "live": false,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "CARSI Mould Remediation Practitioner",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 0,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "neosan-labs-product-training-course",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "NeoSan Labs Product Training",
+      "legacy_status": "published",
+      "legacy_cec_hours": 5,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "odour-control",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Odour Control and Removal Techniques",
+      "legacy_status": "published",
+      "legacy_cec_hours": 1,
+      "legacy_iicrc_discipline": "OCT",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "porous-drying",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Porous Materials Drying",
+      "legacy_status": "published",
+      "legacy_cec_hours": 1,
+      "legacy_iicrc_discipline": "ASD",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "psychrometry-building-science-for-drying",
+      "status": "SEED_ONLY_NOT_LIVE",
+      "present": {
+        "live": false,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "CARSI Psychrometry & Building Science for Drying",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 0,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "psychrometry-drying",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Psychrometry and the Drying Process",
+      "legacy_status": "published",
+      "legacy_cec_hours": 1,
+      "legacy_iicrc_discipline": "ASD",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "refrigerant-dehumidifiers-for-water-loss-restoration",
+      "status": "LIVE_ONLY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": false
+      },
+      "title": "Refrigerant Dehumidifiers for Water Loss Restoration",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": 0,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "restoration-project-management-premium",
+      "status": "LIVE_ONLY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": false
+      },
+      "title": "Restoration Project Management & Client Communication — Premium",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": 179,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "risk-assessment-course",
+      "status": "LIVE_AND_LEGACY_NOT_SEEDED",
+      "present": {
+        "live": true,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Risk Assessment Course",
+      "legacy_status": "published",
+      "legacy_cec_hours": 2,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": 99,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "safe-work-method-statements-swms-course",
+      "status": "LIVE_AND_LEGACY_NOT_SEEDED",
+      "present": {
+        "live": true,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Safe Work Method Statements (SWMS) Course",
+      "legacy_status": "published",
+      "legacy_cec_hours": 1,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": 20,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "safety-data-sheet-sds-course",
+      "status": "LIVE_AND_LEGACY_NOT_SEEDED",
+      "present": {
+        "live": true,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Safety Data Sheet (SDS) Course",
+      "legacy_status": "published",
+      "legacy_cec_hours": 2,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": 20,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "safety-procedures",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Safety Procedures for Water Damage Work",
+      "legacy_status": "published",
+      "legacy_cec_hours": 1,
+      "legacy_iicrc_discipline": "WRT",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "science",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Psychrometry Science and Calculations",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "smokeandsoot",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Smoke and Soot Damage Restoration",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "social-media-marketing",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Social Media Marketing",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "standard-operating-procedures-sop-course",
+      "status": "LIVE_AND_LEGACY_NOT_SEEDED",
+      "present": {
+        "live": true,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Standard Operating Procedures (SOP) Course",
+      "legacy_status": "published",
+      "legacy_cec_hours": 1,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": 20,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "structural-drying",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Structural Drying Concepts",
+      "legacy_status": "published",
+      "legacy_cec_hours": 1,
+      "legacy_iicrc_discipline": "ASD",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "structural-drying-2",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Applied Structural Drying",
+      "legacy_status": "published",
+      "legacy_cec_hours": 1,
+      "legacy_iicrc_discipline": "ASD",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "structural-drying-fundamentals",
+      "status": "SEED_ONLY_NOT_LIVE",
+      "present": {
+        "live": false,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "CARSI Structural Drying Practitioner",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 0,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "submerged-items-recovery",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Recovery of Submerged Items and Contents",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "technician-flow-chart",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Technician Flow Chart",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "tile-cleaning-for-carpet-cleaners",
+      "status": "LIVE_ONLY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": false
+      },
+      "title": "Tile Cleaning for Carpet Cleaners",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": 0,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "timber-drying",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Timber Drying Systems Assistance",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": "ASD",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "timber-floor",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Timber Floor Drying Assistance",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": "ASD",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "timber-floor-assessment-restoration",
+      "status": "SEED_ONLY_NOT_LIVE",
+      "present": {
+        "live": false,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "CARSI Timber Floor Restoration Practitioner",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 0,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "trauma-crime-scene-decontamination-fundamentals",
+      "status": "SEED_ONLY_NOT_LIVE",
+      "present": {
+        "live": false,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "CARSI Trauma & Biohazard Decontamination Practitioner",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 0,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "ultraviolet",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Ultraviolet Light and Fluorescence",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "upholstery",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Upholstery Cleaning and Drying",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": "ASD",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "using-air-scrubbers-and-afds",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Using Air Scrubbers and AFDs to Improve Job Site Air Quality",
+      "legacy_status": "draft",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "using-air-scrubbers-and-afds-to-improve-job-site-air-quality",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Using Air Scrubbers and AFDs to Improve Job Site Air Quality",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 0,
+      "seed_iicrc_discipline": null,
+      "live_price": 0,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "using-atp-to-create-protocols",
+      "status": "LIVE_AND_LEGACY_NOT_SEEDED",
+      "present": {
+        "live": true,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Using ATP to Create Protocols",
+      "legacy_status": "published",
+      "legacy_cec_hours": 1,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": 20,
+      "live_currency": "AUD"
+    },
+    {
+      "slug": "using-ppe",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Using Personal Protective Equipment",
+      "legacy_status": "published",
+      "legacy_cec_hours": 1,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "water-damage",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Water Damage Principles",
+      "legacy_status": "published",
+      "legacy_cec_hours": 1,
+      "legacy_iicrc_discipline": "WRT",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "water-damage-commercial",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Water Damage in Commercial Buildings",
+      "legacy_status": "published",
+      "legacy_cec_hours": 1,
+      "legacy_iicrc_discipline": "WRT",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "water-damage-estimating",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Water Damage Estimating",
+      "legacy_status": "published",
+      "legacy_cec_hours": 1,
+      "legacy_iicrc_discipline": "WRT",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "water-damage-marketing",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Water Damage Marketing and Sales",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": "WRT",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "water-damage-restoration-fundamentals",
+      "status": "SEED_ONLY_NOT_LIVE",
+      "present": {
+        "live": false,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "CARSI Water Restoration Practitioner",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 0,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "water-extraction",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Water Extraction Methods",
+      "legacy_status": "published",
+      "legacy_cec_hours": 1,
+      "legacy_iicrc_discipline": "WRT",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "water-losses",
+      "status": "LEGACY_ONLY_PARITY_GAP",
+      "present": {
+        "live": false,
+        "legacy": true,
+        "seed": false
+      },
+      "title": "Introduction to Project Management for Water Losses",
+      "legacy_status": "published",
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": "WRT",
+      "seed_cec_hours": null,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "whs-fundamentals-for-restoration-and-cleaning-professionals",
+      "status": "SEED_ONLY_NOT_LIVE",
+      "present": {
+        "live": false,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Work Health and Safety (WHS) Fundamentals for Restoration and Cleaning Professionals",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 0,
+      "seed_iicrc_discipline": null,
+      "live_price": null,
+      "live_currency": null
+    },
+    {
+      "slug": "wrt-water-damage-essentials",
+      "status": "LIVE_AND_SEED_NOT_IN_LEGACY",
+      "present": {
+        "live": true,
+        "legacy": false,
+        "seed": true
+      },
+      "title": "Water Damage Restoration — Essentials",
+      "legacy_status": null,
+      "legacy_cec_hours": null,
+      "legacy_iicrc_discipline": null,
+      "seed_cec_hours": 0,
+      "seed_iicrc_discipline": null,
+      "live_price": 0,
+      "live_currency": "AUD"
+    }
+  ]
+}

@@ -12,6 +12,7 @@ import {
 import {
   ccwRoadshowFreeEntryOffer,
   ccwRoadshowPath,
+  allowsFreeEntryRegistration,
   getCcwRoadshowEvent,
   getCcwRoadshowTicketPackage,
   isValidExperienceBand,
@@ -104,6 +105,18 @@ export async function POST(request: NextRequest) {
     }
     if (!ticketPackage) {
       return NextResponse.json({ detail: 'Select a valid ticket package.' }, { status: 400 });
+    }
+    // Fail closed on any event that is not on the free-entry rail. Without this the
+    // endpoint would keep minting CCW-FREE tokens for an event the founder is selling
+    // as a paid seat, so a stale link would hand out free places to a $495 event.
+    if (!allowsFreeEntryRegistration(event)) {
+      return NextResponse.json(
+        {
+          detail:
+            'Seats for this event are booked through Carpet Cleaners Warehouse, not on this page.',
+        },
+        { status: 409 },
+      );
     }
 
     let attributionSource: AttributionSource | null;

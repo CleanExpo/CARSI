@@ -1,0 +1,45 @@
+{
+  "slug": "introduction-to-applied-microbial-remediation",
+  "seoTitle": "Introduction to Applied Microbial Remediation | CARSI",
+  "metaDescription": "Applied microbial remediation: identifying, containing and verifying microbial contamination in built environments.",
+  "imageAlt": "CARSI course: Introduction to Applied Microbial Remediation",
+  "og": {
+    "title": "Introduction to Applied Microbial Remediation | CARSI",
+    "description": "Applied microbial remediation: identifying, containing and verifying microbial contamination in built environments."
+  },
+  "keywords": [
+    "applied microbial remediation course",
+    "microbial contamination assessment",
+    "remediation containment planning",
+    "microbial outcome verification",
+    "built environment remediation"
+  ],
+  "faq": [
+    {
+      "q": "What does the Introduction to Applied Microbial Remediation course cover?",
+      "a": "This course provides restoration professionals with the practical framework to assess microbial amplification events, plan and execute compliant remediation, verify outcomes with measurable evidence, and meet the contractor standards required by insurers and regulatory bodies in Australia."
+    },
+    {
+      "q": "What does the Introduction to Applied Microbial Remediation course help learners understand?",
+      "a": "Applied microbial remediation is the systematic process of identifying, containing, removing, and verifying the elimination of microbial contamination in built environments."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Introduction to Applied Microbial Remediation",
+    "description": "Applied microbial remediation is the systematic process of identifying, containing, removing, and verifying the elimination of microbial contamination in built environments. This course provides restoration professionals with the practical framework to assess microbial amplification events, plan and execute compliant remediation, verify outcomes with measurable evidence, and meet the contractor standards required by insurers and regulatory bodies in Australia.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "29",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

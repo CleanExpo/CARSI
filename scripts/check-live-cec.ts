@@ -1,23 +1,26 @@
 /**
- * Live CEC compliance guard (GP-498 recurrence guard).
+ * Live CEC compliance guard (GP-498 recurrence guard) — CLI wrapper.
  *
- * Asserts the connected (prod) DB shows NO unapproved IICRC CEC claims. It runs the
- * remediation planner in READ-ONLY mode: if any course's stored `cec_hours` disagrees
- * with the approvals registry SSOT — a stale positive that would render an unapproved
- * badge, or an approved course showing the wrong hours — the guard FAILS.
+ * Asserts the connected (prod) DB shows NO unapproved IICRC CEC claims: if any course's
+ * stored `cec_hours` disagrees with the approvals registry SSOT — a stale positive that would
+ * render an unapproved badge, or an approved course showing the wrong hours — the guard FAILS.
  *
- * This catches the drift the repo-file scans (`check:iicrc-compliance`) cannot see: the
- * GP-498 exposure lived in persisted prod-DB rows, not in the repo. Robust by
- * construction — it reads the same DB the pages render from and the same planner the
- * remediation writes, so there is no fragile HTML/RSC scraping.
+ * This catches drift the repo-file scans (`check:iicrc-compliance`) cannot see, because the
+ * GP-498 exposure lived in persisted prod-DB rows, not in the repo.
  *
  *   DATABASE_URL="<PROD>" npx tsx scripts/check-live-cec.ts
  *
- * Exit 0 = clean; exit 1 = unapproved/incorrect CEC claims found (offending slugs listed).
+ * Exit 0 = clean; exit 1 = unapproved/incorrect CEC claims found, or the check could not run.
+ *
+ * THE SCHEDULED GUARD NO LONGER RUNS THIS. GitHub's runners cannot reach the production
+ * database (trusted-source list is two IPs plus `monkfish-app`), so the nightly job now calls
+ * `/api/cron/live-cec-check` on the deployed app instead. Both paths call the same
+ * `runLiveCecCheck`, so this remains the correct way to run the guard by hand from a trusted
+ * IP, and it cannot drift from what the scheduled job asserts.
  */
 import 'dotenv/config';
 
-import { planCecRemediation } from '../src/lib/seed/cec-remediation';
+import { describeDrift, isClean, runLiveCecCheck } from '../src/lib/server/live-cec-check';
 
 async function main() {
   if (!process.env.DATABASE_URL?.trim()) {
@@ -27,30 +30,22 @@ async function main() {
 
   const { prisma } = await import('../src/lib/prisma');
   try {
-    const courses = await prisma.lmsCourse.findMany({ select: { slug: true, cecHours: true } });
-    const drift = planCecRemediation(
-      courses.map((c) => ({ slug: c.slug, current: c.cecHours == null ? null : Number(c.cecHours) }))
-    );
+    const result = await runLiveCecCheck(prisma as never);
+    const driftCount = result.unapproved.length + result.wrongHours.length;
 
     console.log(
-      `Scanned ${courses.length} courses on the connected DB — ${drift.length} with CEC drift.`
+      `Scanned ${result.scanned} courses on the connected DB — ${driftCount} with CEC drift.`
     );
-    if (drift.length === 0) {
+    if (isClean(result)) {
       console.log('✓ Live CEC compliance guard passed — every course matches the approvals registry.');
       return;
     }
 
-    const unapproved = drift.filter((d) => d.target === 0);
-    const wrongHours = drift.filter((d) => d.target > 0);
-
     console.error(
       '\n✖ Live CEC compliance guard FAILED — the DB shows CEC claims the registry does not back:'
     );
-    for (const d of unapproved) {
-      console.error(`  ${d.slug}: shows ${d.current} CEC — no IICRC approval in the registry (should be 0)`);
-    }
-    for (const d of wrongHours) {
-      console.error(`  ${d.slug}: shows ${d.current} CEC — registry approves ${d.target}`);
+    for (const line of describeDrift(result)) {
+      console.error(`  ${line}`);
     }
     console.error(
       '\nFix: run scripts/clear-unapproved-cec-hours.ts against this DB, or add the genuine ' +

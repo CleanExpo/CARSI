@@ -304,7 +304,10 @@ const SCANNED_DIRS = [
 
 // Seed JSON is production copy (course descriptions, marketing prose) that ships to the
 // live DB via the PRE_DEPLOY seeder — scan it too (gap closed 2026-07-09).
-const JSON_SCANNED_DIRS = ['data/seed/', '.curation/', 'data/wordpress-export/'];
+// data/seo/ holds the SEO course cards, whose copy the course page renders into page
+// metadata and FAQPage JSON-LD. That is published, citable copy in exactly the sense
+// that made public/ in-scope on 2026-08-07, so banned branding here would ship live.
+const JSON_SCANNED_DIRS = ['data/seed/', '.curation/', 'data/wordpress-export/', 'data/seo/'];
 
 // Static files served verbatim from the site root. These are the surfaces AI engines read
 // and quote — llms.txt and the citation packs exist specifically to be cited — so banned
@@ -413,7 +416,7 @@ if (staged) {
   // CI / manual: scan all tracked source-copy files.
   let list = '';
   try {
-    list = execSync('git ls-files', { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+    list = execSync('git ls-files --cached --others --exclude-standard', { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
   } catch (err) {
     console.error('check-iicrc-terminology: failed to list tracked files:', err.message);
     process.exit(1);

@@ -1,0 +1,56 @@
+{
+  "slug": "collaborative-development-your-personal-ai-assistant",
+  "seoTitle": "AI for Cleaning and Restoration Businesses | CARSI",
+  "metaDescription": "A hands-on course teaching cleaning and restoration operators to use ChatGPT and Claude for reports, scopes, JSEA and SWMS drafts, SOPs and client emails.",
+  "imageAlt": "CARSI course thumbnail: Collaborative Development — Your Personal AI Assistant",
+  "og": {
+    "title": "Collaborative Development - Your Personal AI Assistant | CARSI",
+    "description": "An interactive course for cleaning and restoration operators. Work with AI language tools in real time to produce documentation, marketing, compliance and communication outputs for your own business. No prior technology experience required."
+  },
+  "keywords": [
+    "ai for restoration business",
+    "chatgpt for cleaning business",
+    "ai prompts for tradies australia",
+    "ai scope of works water damage",
+    "jsea swms ai drafting",
+    "ai training for small business australia",
+    "claude for business documentation"
+  ],
+  "faq": [
+    {
+      "q": "Do I need any technology experience to take this course?",
+      "a": "No. No prior technology experience is required. The course is structured around doing rather than reading, so you work with the tools in real time and produce outputs for your own business as you go."
+    },
+    {
+      "q": "Which AI tools does the course use?",
+      "a": "It works with AI language tools that are accessible and free to use, specifically ChatGPT and Claude, and also refers to Gemini. The focus is on instructing them effectively rather than on the tools themselves."
+    },
+    {
+      "q": "What will I actually produce during the course?",
+      "a": "You are guided through prompts for a water damage scope of works, a mould remediation JSEA, an end-of-job client letter, an SOP for a specific cleaning task, a Google Business Profile description, and a social media post for a recent job."
+    },
+    {
+      "q": "Can I rely on AI output for compliance documents?",
+      "a": "No. The course is explicit that AI tools produce confident-sounding content that may be factually incorrect, and that any document carrying professional, legal or compliance significance must be reviewed by a competent human before use. That review step is treated as non-negotiable."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Collaborative Development - Your Personal AI Assistant",
+    "description": "An interactive course introducing cleaning and restoration business operators to AI language tools such as ChatGPT and Claude, and guiding them through the documentation, marketing, compliance and communication tasks that consume time in a restoration or cleaning business. Covers prompt construction, real business outputs, the limitations of AI, and a staged plan for introducing AI tools to a business.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "49",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    },
+    "coursePrerequisites": "No prior technology experience is required."
+  }
+}

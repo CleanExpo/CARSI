@@ -1,0 +1,40 @@
+{
+  "slug": "microbe-clean-basic-understanding-course",
+  "seoTitle": "Microbe Clean Basic Understanding Course | CARSI",
+  "metaDescription": "Microbiology for infection control and hygiene work in Australian commercial and residential environments.",
+  "imageAlt": "CARSI course: Microbe Clean Basic Understanding Course",
+  "og": {
+    "title": "Microbe Clean Basic Understanding Course | CARSI",
+    "description": "Microbiology for infection control and hygiene work in Australian commercial and residential environments."
+  },
+  "keywords": [
+    "Microbe Clean Basic Understanding Course",
+    "microbe clean basic understanding",
+    "microbe clean training",
+    "basic understanding course"
+  ],
+  "faq": [
+    {
+      "q": "What does the Microbe Clean Basic Understanding course cover?",
+      "a": "This course provides cleaning and restoration professionals with a comprehensive, practical foundation in microbiology as it applies to infection control and hygiene work in Australian commercial and residential environments."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Microbe Clean Basic Understanding Course",
+    "description": "This course provides cleaning and restoration professionals with a comprehensive, practical foundation in microbiology as it applies to infection control and hygiene work in Australian commercial and residential environments. It covers virus and bacteria biology, cleaning and disinfection chemistry, cross-contamination prevention, PPE selection, WHS documentation, and safe chemical handling — giving technicians everything they need to work safely and compliantly in biologically contaminated environments.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "99",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

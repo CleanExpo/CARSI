@@ -1,0 +1,40 @@
+{
+  "slug": "introduction-to-creating-a-clean-air-environment",
+  "seoTitle": "Introduction to Creating a Clean Air Environment | CARSI",
+  "metaDescription": "Clean air environments: final clearance assessments, air quality testing and client communication.",
+  "imageAlt": "CARSI course: Introduction to Creating a Clean Air Environment",
+  "og": {
+    "title": "Introduction to Creating a Clean Air Environment | CARSI",
+    "description": "Clean air environments: final clearance assessments, air quality testing and client communication."
+  },
+  "keywords": [
+    "Introduction to Creating a Clean Air Environment",
+    "introduction creating clean air environment",
+    "introduction creating training",
+    "air environment course"
+  ],
+  "faq": [
+    {
+      "q": "What does the Introduction to Creating a Clean Air Environment course cover?",
+      "a": "This course equips restoration professionals with the practical skills and documentation standards required to deliver a verifiable clean air environment at project completion."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Introduction to Creating a Clean Air Environment",
+    "description": "This course equips restoration professionals with the practical skills and documentation standards required to deliver a verifiable clean air environment at project completion. Participants will learn how to conduct final clearance assessments, use air quality testing equipment, perform visual inspections, and communicate results to clients — all aligned with IICRC standards and Australian compliance requirements.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "29",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

@@ -1,0 +1,570 @@
+{
+  "capturedAt": "2026-09-06T09:54:30.109Z",
+  "source": "https://www.carsi.com.au/api/lms/courses/<slug>",
+  "scanned": 80,
+  "unreachable": 0,
+  "total": 80,
+  "affected": 35,
+  "rows": [
+    {
+      "id": "b94287b8-8c1b-4291-be78-c591139d31c1",
+      "slug": "asd-structural-drying-core",
+      "before": {
+        "title": "Applied Structural Drying — Core Concepts (ASD-aligned)",
+        "description": "Builds on water restoration fundamentals with a focus on structural drying, documentation rigour, and complex assemblies.",
+        "short_description": "Deepen drying science for structural assemblies: monitoring, vapour pressure, and advanced equipment strategies.",
+        "iicrc_discipline": "ASD"
+      },
+      "after": {
+        "title": "Applied Structural Drying — Core Concepts",
+        "description": "Builds on water restoration fundamentals with a focus on structural drying, documentation rigour, and complex assemblies.",
+        "short_description": "Deepen drying science for structural assemblies: monitoring, vapour pressure, and advanced equipment strategies.",
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "b4bec511-4064-40ad-b767-3d5127fcf044",
+      "slug": "carpet-cleaning-basics-b66757ce",
+      "before": {
+        "title": "CARPET CLEANING BASICS",
+        "description": "Carpet cleaning is one of the most common services delivered by restoration and cleaning professionals across Australia. Whether you're working in a residential home, a commercial office, or responding to an insurance-related water loss, the ability to clean carpet effectively, safely, and in accordance with recognised standards is a fundamental professional skill.",
+        "short_description": null,
+        "iicrc_discipline": "CCT"
+      },
+      "after": {
+        "title": "CARPET CLEANING BASICS",
+        "description": "Carpet cleaning is one of the most common services delivered by restoration and cleaning professionals across Australia. Whether you're working in a residential home, a commercial office, or responding to an insurance-related water loss, the ability to clean carpet effectively, safely, and in accordance with recognised standards is a fundamental professional skill.",
+        "short_description": null,
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "92e57aaf-5865-4a9b-85ed-af64f2096cbe",
+      "slug": "cct-commercial-carpet-core",
+      "before": {
+        "title": "Commercial Carpet Care — Core Methods (CCT-aligned)",
+        "description": "Practical commercial carpet maintenance aligned with professional cleaning expectations in education, retail, and strata settings.",
+        "short_description": "Fibres, soil chemistry, machine methods, and maintenance planning for commercial textile flooring.",
+        "iicrc_discipline": "CCT"
+      },
+      "after": {
+        "title": "Commercial Carpet Care — Core Methods",
+        "description": "Practical commercial carpet maintenance aligned with professional cleaning expectations in education, retail, and strata settings.",
+        "short_description": "Fibres, soil chemistry, machine methods, and maintenance planning for commercial textile flooring.",
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "3c94dae1-11af-4dba-8ef9-f5255c0caf69",
+      "slug": "fsrt-fire-smoke-restoration-core",
+      "before": {
+        "title": "Fire & Smoke Restoration — Core Principles (FSRT-aligned)",
+        "description": "Foundational fire and smoke restoration concepts for technicians working on residential and commercial smoke-affected properties.",
+        "short_description": "Safety on fire-affected sites, soot behaviour, cleaning chemistry, and deodorisation planning.",
+        "iicrc_discipline": "FSRT"
+      },
+      "after": {
+        "title": "Fire & Smoke Restoration — Core Principles",
+        "description": "Foundational fire and smoke restoration concepts for technicians working on residential and commercial smoke-affected properties.",
+        "short_description": "Safety on fire-affected sites, soot behaviour, cleaning chemistry, and deodorisation planning.",
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "cc928109-09a6-44f2-98dd-5e06c4310540",
+      "slug": "introduction-to-advanced-applied-structural-drying",
+      "before": {
+        "title": "Introduction to Advanced Applied Structural Drying",
+        "description": "This course is designed for experienced technicians moving into advanced structural drying practice and project management. It covers psychrometric analysis as a practical drying management tool, how to develop comprehensive drying strategies for complex losses, advanced moisture removal techniques, systematic progress monitoring, and the formal completion verification process required for complex and large loss restoration projects. Aligned with the IICRC S500 standard and Australian commercial restoration requirements.",
+        "short_description": "This course is designed for experienced technicians moving into advanced structural drying practice and project management. It covers psychrometric analysis as a practical drying management tool, how to develop comprehensive drying strategies for complex losses, advanced moisture removal techniques, systematic progress monitoring, and the formal completion verification process required for complex and large loss restoration projects. Aligned with the IICRC S500 standard and A",
+        "iicrc_discipline": "ASD"
+      },
+      "after": {
+        "title": "Introduction to Advanced Applied Structural Drying",
+        "description": "This course is designed for experienced technicians moving into advanced structural drying practice and project management. It covers psychrometric analysis as a practical drying management tool, how to develop comprehensive drying strategies for complex losses, advanced moisture removal techniques, systematic progress monitoring, and the formal completion verification process required for complex and large loss restoration projects. Aligned with the IICRC S500 standard and Australian commercial restoration requirements.",
+        "short_description": "This course is designed for experienced technicians moving into advanced structural drying practice and project management. It covers psychrometric analysis as a practical drying management tool, how to develop comprehensive drying strategies for complex losses, advanced moisture removal techniques, systematic progress monitoring, and the formal completion verification process required for complex and large loss restoration projects. Aligned with the IICRC S500 standard and A",
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "0d4a43ed-2ddf-4127-87c6-0bbf028b1c91",
+      "slug": "introduction-to-advanced-drying-equipment-and-methods",
+      "before": {
+        "title": "Introduction to Advanced Drying Equipment and Methods",
+        "description": "This course covers the advanced drying equipment and methods used in complex structural drying projects, including desiccant dehumidification systems, the mechanical elements of drying plant, air treatment technologies, monitoring equipment, and software tools for drying project management. It is designed for technicians who need to operate, select, and manage advanced equipment on commercial, large loss, and specialty drying projects. Aligned with the IICRC S500 standard and Australian equipment safety requirements.",
+        "short_description": "This course covers the advanced drying equipment and methods used in complex structural drying projects, including desiccant dehumidification systems, the mechanical elements of drying plant, air treatment technologies, monitoring equipment, and software tools for drying project management. It is designed for technicians who need to operate, select, and manage advanced equipment on commercial, large loss, and specialty drying projects. Aligned with the IICRC S500 standard and",
+        "iicrc_discipline": "ASD"
+      },
+      "after": {
+        "title": "Introduction to Advanced Drying Equipment and Methods",
+        "description": "This course covers the advanced drying equipment and methods used in complex structural drying projects, including desiccant dehumidification systems, the mechanical elements of drying plant, air treatment technologies, monitoring equipment, and software tools for drying project management. It is designed for technicians who need to operate, select, and manage advanced equipment on commercial, large loss, and specialty drying projects. Aligned with the IICRC S500 standard and Australian equipment safety requirements.",
+        "short_description": "This course covers the advanced drying equipment and methods used in complex structural drying projects, including desiccant dehumidification systems, the mechanical elements of drying plant, air treatment technologies, monitoring equipment, and software tools for drying project management. It is designed for technicians who need to operate, select, and manage advanced equipment on commercial, large loss, and specialty drying projects. Aligned with the IICRC S500 standard and",
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "d5931601-9833-42b2-b124-e01599aee0c1",
+      "slug": "introduction-to-advanced-structural-drying-concepts",
+      "before": {
+        "title": "Introduction to Advanced Structural Drying Concepts",
+        "description": "This course addresses advanced structural drying concepts required for complex, large, and specialty restoration projects. It covers advanced building science as it applies to moisture behaviour, controlled drying methods at an advanced level, verification processes for complex completions, large loss project management, and specialist drying knowledge for non-standard materials and environments. Designed for experienced technicians seeking technical advancement toward project management and specialist roles.",
+        "short_description": "This course addresses advanced structural drying concepts required for complex, large, and specialty restoration projects. It covers advanced building science as it applies to moisture behaviour, controlled drying methods at an advanced level, verification processes for complex completions, large loss project management, and specialist drying knowledge for non-standard materials and environments. Designed for experienced technicians seeking technical advancement toward projec",
+        "iicrc_discipline": "ASD"
+      },
+      "after": {
+        "title": "Introduction to Advanced Structural Drying Concepts",
+        "description": "This course addresses advanced structural drying concepts required for complex, large, and specialty restoration projects. It covers advanced building science as it applies to moisture behaviour, controlled drying methods at an advanced level, verification processes for complex completions, large loss project management, and specialist drying knowledge for non-standard materials and environments. Designed for experienced technicians seeking technical advancement toward project management and specialist roles.",
+        "short_description": "This course addresses advanced structural drying concepts required for complex, large, and specialty restoration projects. It covers advanced building science as it applies to moisture behaviour, controlled drying methods at an advanced level, verification processes for complex completions, large loss project management, and specialist drying knowledge for non-standard materials and environments. Designed for experienced technicians seeking technical advancement toward projec",
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "4332007d-ce9b-4350-8720-2935f185b220",
+      "slug": "introduction-to-applied-microbial-remediation",
+      "before": {
+        "title": "Introduction to Applied Microbial Remediation",
+        "description": "Applied microbial remediation is the systematic process of identifying, containing, removing, and verifying the elimination of microbial contamination in built environments. This course provides restoration professionals with the practical framework to assess microbial amplification events, plan and execute compliant remediation, verify outcomes with measurable evidence, and meet the contractor standards required by insurers and regulatory bodies in Australia.",
+        "short_description": "Applied microbial remediation is the systematic process of identifying, containing, removing, and verifying the elimination of microbial contamination in built environments. This course provides restoration professionals with the practical framework to assess microbial amplification events, plan and execute compliant remediation, verify outcomes with measurable evidence, and meet the contractor standards required by insurers and regulatory bodies in Australia.",
+        "iicrc_discipline": "AMRT"
+      },
+      "after": {
+        "title": "Introduction to Applied Microbial Remediation",
+        "description": "Applied microbial remediation is the systematic process of identifying, containing, removing, and verifying the elimination of microbial contamination in built environments. This course provides restoration professionals with the practical framework to assess microbial amplification events, plan and execute compliant remediation, verify outcomes with measurable evidence, and meet the contractor standards required by insurers and regulatory bodies in Australia.",
+        "short_description": "Applied microbial remediation is the systematic process of identifying, containing, removing, and verifying the elimination of microbial contamination in built environments. This course provides restoration professionals with the practical framework to assess microbial amplification events, plan and execute compliant remediation, verify outcomes with measurable evidence, and meet the contractor standards required by insurers and regulatory bodies in Australia.",
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "cd1d3356-b4a5-41fa-9881-e210df4cb51b",
+      "slug": "introduction-to-applied-structural-drying",
+      "before": {
+        "title": "Introduction to Applied Structural Drying",
+        "description": "This course moves from foundational concepts to applied practice, equipping technicians to assess real building components affected by water damage, understand drying dynamics in structural assemblies, deploy and operate drying equipment correctly, apply specific drying techniques to different material types, and produce monitoring and documentation records that meet IICRC and insurance requirements. Content is aligned with the IICRC S500 standard and Australian WHS legislation.",
+        "short_description": "This course moves from foundational concepts to applied practice, equipping technicians to assess real building components affected by water damage, understand drying dynamics in structural assemblies, deploy and operate drying equipment correctly, apply specific drying techniques to different material types, and produce monitoring and documentation records that meet IICRC and insurance requirements. Content is aligned with the IICRC S500 standard and Australian WHS legislati",
+        "iicrc_discipline": "ASD"
+      },
+      "after": {
+        "title": "Introduction to Applied Structural Drying",
+        "description": "This course moves from foundational concepts to applied practice, equipping technicians to assess real building components affected by water damage, understand drying dynamics in structural assemblies, deploy and operate drying equipment correctly, apply specific drying techniques to different material types, and produce monitoring and documentation records that meet IICRC and insurance requirements. Content is aligned with the IICRC S500 standard and Australian WHS legislation.",
+        "short_description": "This course moves from foundational concepts to applied practice, equipping technicians to assess real building components affected by water damage, understand drying dynamics in structural assemblies, deploy and operate drying equipment correctly, apply specific drying techniques to different material types, and produce monitoring and documentation records that meet IICRC and insurance requirements. Content is aligned with the IICRC S500 standard and Australian WHS legislati",
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "453e4783-989f-41e7-8a41-87c01994af78",
+      "slug": "introduction-to-basic-carpet-cleaning-and-drying",
+      "before": {
+        "title": "Introduction to Basic Carpet Cleaning and Drying",
+        "description": "Welcome to Introduction to Basic Carpet Cleaning and Drying, a foundational course developed by CARSI — the Centre for Applied Restoration and Specialist Industries. This course is designed specifically for technicians entering the carpet cleaning and restoration industry in Australia, and for those already working in the field who wish to consolidate and formalise their practical knowledge.\n\nCarpet cleaning is far more than running a machine across a floor. It is a technical discipline that requires a thorough understanding of how carpets are constructed, how different fibre types respond to moisture and chemical treatments, how water damage affects floor coverings at a structural level, what equipment is appropriate for each job, and how to dry carpets effectively and safely once cleaning is complete. Done correctly, carpet cleaning extends the life of a floor covering, protects the health of building occupants, and prevents secondary damage such as mould growth, subfloor deterioration, and adhesive failure.\n\nThis course is aligned with the IICRC CCT (Carpet Cleaning Technician) standard, which is internationally recognised as the benchmark for professional carpet cleaning. It also incorporates guidance from Safe Work Australia, relevant Australian Standards, and accepted best practice across the restoration industry in Australia.\n\nWho This Course Is For\nThis course suits a wide range of learners, including:\n•\tNew technicians entering the carpet cleaning or restoration industry\n•\tSole traders and small business owners looking to formalise their skills\n•\tWater damage restoration technicians who work with wet or damaged carpet\n•\tCleaning staff working in commercial, residential, or institutional environments\n•\tBusiness owners seeking to ensure their team operates to a professional standard\n\nWhat You Will Learn\nAcross five modules, this course takes you through the complete carpet cleaning and drying process from first principles. By the time you complete this course, you will have a solid working knowledge of:\n•\tHow carpets are constructed and why construction type matters for cleaning\n•\tThe effects of water damage on carpet, underlay, and subfloor\n•\tThe equipment used in professional carpet cleaning and how to use it correctly\n•\tCleaning products, their chemistry, and how to select and apply them safely\n•\tDrying techniques and how to achieve effective, efficient drying outcomes",
+        "short_description": null,
+        "iicrc_discipline": "CCT"
+      },
+      "after": {
+        "title": "Introduction to Basic Carpet Cleaning and Drying",
+        "description": "Welcome to Introduction to Basic Carpet Cleaning and Drying, a foundational course developed by CARSI — the Centre for Applied Restoration and Specialist Industries. This course is designed specifically for technicians entering the carpet cleaning and restoration industry in Australia, and for those already working in the field who wish to consolidate and formalise their practical knowledge.\n\nCarpet cleaning is far more than running a machine across a floor. It is a technical discipline that requires a thorough understanding of how carpets are constructed, how different fibre types respond to moisture and chemical treatments, how water damage affects floor coverings at a structural level, what equipment is appropriate for each job, and how to dry carpets effectively and safely once cleaning is complete. Done correctly, carpet cleaning extends the life of a floor covering, protects the health of building occupants, and prevents secondary damage such as mould growth, subfloor deterioration, and adhesive failure.\n\nThis course is aligned with the IICRC CCT (Carpet Cleaning Technician) standard, which is internationally recognised as the benchmark for professional carpet cleaning. It also incorporates guidance from Safe Work Australia, relevant Australian Standards, and accepted best practice across the restoration industry in Australia.\n\nWho This Course Is For\nThis course suits a wide range of learners, including:\n•\tNew technicians entering the carpet cleaning or restoration industry\n•\tSole traders and small business owners looking to formalise their skills\n•\tWater damage restoration technicians who work with wet or damaged carpet\n•\tCleaning staff working in commercial, residential, or institutional environments\n•\tBusiness owners seeking to ensure their team operates to a professional standard\n\nWhat You Will Learn\nAcross five modules, this course takes you through the complete carpet cleaning and drying process from first principles. By the time you complete this course, you will have a solid working knowledge of:\n•\tHow carpets are constructed and why construction type matters for cleaning\n•\tThe effects of water damage on carpet, underlay, and subfloor\n•\tThe equipment used in professional carpet cleaning and how to use it correctly\n•\tCleaning products, their chemistry, and how to select and apply them safely\n•\tDrying techniques and how to achieve effective, efficient drying outcomes",
+        "short_description": null,
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "14da9287-89a8-4f00-ab54-7d1f0805e5b6",
+      "slug": "introduction-to-consulting-for-complex-water-losses",
+      "before": {
+        "title": "Introduction to Consulting for Complex Water Losses",
+        "description": "Complex water losses — large commercial events, multi-tenancy building floods, heritage buildings, infrastructure failures affecting multiple properties — require a consulting capability that goes beyond field restoration skills. This course addresses the advanced professional skills needed to assess, plan, resource, coordinate, and document the restoration of complex water loss events.\n\nTopics covered: loss assessment for complex events, strategic drying plan development, specification and procurement of restoration resources, multi-trade coordination in complex restoration environments, and documentation systems for large and complex losses.\n\nStandards applied: IICRC S500, IICRC ASD, Safe Work Australia Model WHS Regulations, National Construction Code.",
+        "short_description": "Complex water losses — large commercial events, multi-tenancy building floods, heritage buildings, infrastructure failures affecting multiple properties — require a consulting capability that goes beyond field restoration skills. This course addresses the advanced professional skills needed to assess, plan, resource, coordinate, and document the restoration of complex water loss events.",
+        "iicrc_discipline": "WRT / ASD"
+      },
+      "after": {
+        "title": "Introduction to Consulting for Complex Water Losses",
+        "description": "Complex water losses — large commercial events, multi-tenancy building floods, heritage buildings, infrastructure failures affecting multiple properties — require a consulting capability that goes beyond field restoration skills. This course addresses the advanced professional skills needed to assess, plan, resource, coordinate, and document the restoration of complex water loss events.\n\nTopics covered: loss assessment for complex events, strategic drying plan development, specification and procurement of restoration resources, multi-trade coordination in complex restoration environments, and documentation systems for large and complex losses.\n\nStandards applied: IICRC S500, IICRC ASD, Safe Work Australia Model WHS Regulations, National Construction Code.",
+        "short_description": "Complex water losses — large commercial events, multi-tenancy building floods, heritage buildings, infrastructure failures affecting multiple properties — require a consulting capability that goes beyond field restoration skills. This course addresses the advanced professional skills needed to assess, plan, resource, coordinate, and document the restoration of complex water loss events.",
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "79d34cae-5b67-4837-ae94-d8381558d2c3",
+      "slug": "introduction-to-controlled-environment-drying-methods",
+      "before": {
+        "title": "Introduction to Controlled Environment Drying Methods",
+        "description": "This course covers the controlled environment approach to structural drying — where physical containment, managed airflow, controlled energy input, and systematic monitoring are combined to create a drying zone that is isolated from uncontrolled external conditions and managed to maximise drying efficiency. Used in complex residential losses, commercial restoration, specialty environments, and situations where contamination control is required alongside drying.",
+        "short_description": "This course covers the controlled environment approach to structural drying — where physical containment, managed airflow, controlled energy input, and systematic monitoring are combined to create a drying zone that is isolated from uncontrolled external conditions and managed to maximise drying efficiency. Used in complex residential losses, commercial restoration, specialty environments, and situations where contamination control is required alongside drying.",
+        "iicrc_discipline": "ASD"
+      },
+      "after": {
+        "title": "Introduction to Controlled Environment Drying Methods",
+        "description": "This course covers the controlled environment approach to structural drying — where physical containment, managed airflow, controlled energy input, and systematic monitoring are combined to create a drying zone that is isolated from uncontrolled external conditions and managed to maximise drying efficiency. Used in complex residential losses, commercial restoration, specialty environments, and situations where contamination control is required alongside drying.",
+        "short_description": "This course covers the controlled environment approach to structural drying — where physical containment, managed airflow, controlled energy input, and systematic monitoring are combined to create a drying zone that is isolated from uncontrolled external conditions and managed to maximise drying efficiency. Used in complex residential losses, commercial restoration, specialty environments, and situations where contamination control is required alongside drying.",
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "39377efb-bbd6-40f5-ab5c-7245c4e77bf7",
+      "slug": "introduction-to-digital-moisture-mapping",
+      "before": {
+        "title": "Introduction to Digital Moisture Mapping",
+        "description": "Digital moisture mapping transforms individual moisture meter readings into a structured, spatial record of moisture distribution across an entire job site. This course covers the systematic collection of moisture data in the field, the use of data management software to organise and store that data, the analysis of moisture distribution patterns to guide drying decisions, the generation of professional reports for insurance and client communication, and the optimisation of the overall drying process using digital moisture map data. All content is aligned with IICRC S500 Applied Structural Drying documentation requirements and the expectations of Australian insurers for drying project records.",
+        "short_description": "Digital moisture mapping transforms individual moisture meter readings into a structured, spatial record of moisture distribution across an entire job site. This course covers the systematic collection of moisture data in the field, the use of data management software to organise and store that data, the analysis of moisture distribution patterns to guide drying decisions, the generation of professional reports for insurance and client communication, and the optimisation of t",
+        "iicrc_discipline": "WRT"
+      },
+      "after": {
+        "title": "Introduction to Digital Moisture Mapping",
+        "description": "Digital moisture mapping transforms individual moisture meter readings into a structured, spatial record of moisture distribution across an entire job site. This course covers the systematic collection of moisture data in the field, the use of data management software to organise and store that data, the analysis of moisture distribution patterns to guide drying decisions, the generation of professional reports for insurance and client communication, and the optimisation of the overall drying process using digital moisture map data. All content is aligned with IICRC S500 Applied Structural Drying documentation requirements and the expectations of Australian insurers for drying project records.",
+        "short_description": "Digital moisture mapping transforms individual moisture meter readings into a structured, spatial record of moisture distribution across an entire job site. This course covers the systematic collection of moisture data in the field, the use of data management software to organise and store that data, the analysis of moisture distribution patterns to guide drying decisions, the generation of professional reports for insurance and client communication, and the optimisation of t",
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "438f800a-735b-47ef-8aef-cbe6b2ef1356",
+      "slug": "introduction-to-forensic-investigations-for-water-losses",
+      "before": {
+        "title": "Introduction to Forensic Investigations for Water Losses",
+        "description": "Forensic water damage investigations are conducted to answer specific factual questions about a water loss: what caused it, when it started, how far it spread, and whether the remediation was adequate. This course equips restoration professionals with a systematic forensic methodology, evidence-gathering techniques, failure analysis skills, the ability to present findings professionally, and an understanding of how to establish the financial cost of a loss.\n\nTopics covered: the circumstances that trigger forensic investigations, forensic investigation methods, failure analysis of building systems and materials, presenting findings to insurers and legal representatives, and establishing the total cost of loss.\n\nStandards applied: IICRC S500, relevant Australian Standard AS 4349 series (inspection of buildings), state civil procedure rules for expert evidence.",
+        "short_description": "Forensic water damage investigations are conducted to answer specific factual questions about a water loss: what caused it, when it started, how far it spread, and whether the remediation was adequate. This course equips restoration professionals with a systematic forensic methodology, evidence-gathering techniques, failure analysis skills, the ability to present findings professionally, and an understanding of how to establish the financial cost of a loss.",
+        "iicrc_discipline": "WRT"
+      },
+      "after": {
+        "title": "Introduction to Forensic Investigations for Water Losses",
+        "description": "Forensic water damage investigations are conducted to answer specific factual questions about a water loss: what caused it, when it started, how far it spread, and whether the remediation was adequate. This course equips restoration professionals with a systematic forensic methodology, evidence-gathering techniques, failure analysis skills, the ability to present findings professionally, and an understanding of how to establish the financial cost of a loss.\n\nTopics covered: the circumstances that trigger forensic investigations, forensic investigation methods, failure analysis of building systems and materials, presenting findings to insurers and legal representatives, and establishing the total cost of loss.\n\nStandards applied: IICRC S500, relevant Australian Standard AS 4349 series (inspection of buildings), state civil procedure rules for expert evidence.",
+        "short_description": "Forensic water damage investigations are conducted to answer specific factual questions about a water loss: what caused it, when it started, how far it spread, and whether the remediation was adequate. This course equips restoration professionals with a systematic forensic methodology, evidence-gathering techniques, failure analysis skills, the ability to present findings professionally, and an understanding of how to establish the financial cost of a loss.",
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "22120136-7607-424a-bef8-1647d3aabb85",
+      "slug": "introduction-to-iaq-and-mould",
+      "before": {
+        "title": "Introduction to IAQ and Mould",
+        "description": "This course provides restoration professionals with a working knowledge of how mould affects indoor air quality (IAQ), how airborne mould spreads, and how to contain and remediate it in accordance with IICRC S520 and Australian workplace health standards. Participants will leave with practical skills in containment, air management, and post-remediation monitoring.",
+        "short_description": "This course provides restoration professionals with a working knowledge of how mould affects indoor air quality (IAQ), how airborne mould spreads, and how to contain and remediate it in accordance with IICRC S520 and Australian workplace health standards. Participants will leave with practical skills in containment, air management, and post-remediation monitoring.",
+        "iicrc_discipline": "AMRT"
+      },
+      "after": {
+        "title": "Introduction to IAQ and Mould",
+        "description": "This course provides restoration professionals with a working knowledge of how mould affects indoor air quality (IAQ), how airborne mould spreads, and how to contain and remediate it in accordance with IICRC S520 and Australian workplace health standards. Participants will leave with practical skills in containment, air management, and post-remediation monitoring.",
+        "short_description": "This course provides restoration professionals with a working knowledge of how mould affects indoor air quality (IAQ), how airborne mould spreads, and how to contain and remediate it in accordance with IICRC S520 and Australian workplace health standards. Participants will leave with practical skills in containment, air management, and post-remediation monitoring.",
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "6c67e281-bb45-4205-ba55-52a911539e71",
+      "slug": "introduction-to-odour-control-and-removal-techniques",
+      "before": {
+        "title": "Introduction to Odour Control and Removal Techniques",
+        "description": "This course provides restoration and cleaning professionals with the practical knowledge to identify, assess, contain, and eliminate odour in residential and commercial environments. Covering odour chemistry, containment strategies, air purification, counteractants, and surface treatment methods, the course is grounded in real-world application and aligned with IICRC OCT standards and Australian workplace safety requirements. The focus throughout is on source elimination, not odour masking.",
+        "short_description": "This course provides restoration and cleaning professionals with the practical knowledge to identify, assess, contain, and eliminate odour in residential and commercial environments. Covering odour chemistry, containment strategies, air purification, counteractants, and surface treatment methods, the course is grounded in real-world application and aligned with IICRC OCT standards and Australian workplace safety requirements. The focus throughout is on source elimination, not",
+        "iicrc_discipline": "OCT"
+      },
+      "after": {
+        "title": "Introduction to Odour Control and Removal Techniques",
+        "description": "This course provides restoration and cleaning professionals with the practical knowledge to identify, assess, contain, and eliminate odour in residential and commercial environments. Covering odour chemistry, containment strategies, air purification, counteractants, and surface treatment methods, the course is grounded in real-world application and aligned with IICRC OCT standards and Australian workplace safety requirements. The focus throughout is on source elimination, not odour masking.",
+        "short_description": "This course provides restoration and cleaning professionals with the practical knowledge to identify, assess, contain, and eliminate odour in residential and commercial environments. Covering odour chemistry, containment strategies, air purification, counteractants, and surface treatment methods, the course is grounded in real-world application and aligned with IICRC OCT standards and Australian workplace safety requirements. The focus throughout is on source elimination, not",
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "dcb37525-4e46-419d-ad7d-140f280fb2bf",
+      "slug": "introduction-to-project-management-for-water-losses",
+      "before": {
+        "title": "Introduction to Project Management for Water Losses",
+        "description": "A water damage project that is managed well produces an accurate scope, efficient execution, minimal callbacks, satisfied clients and insurers, and a profitable job. A project that is managed poorly produces the opposite of all of these. Project management in water damage restoration is the application of structured processes — not bureaucracy — to ensure that the right things happen in the right order, by the right people, on time.\n\nTopics covered: initial response procedures that set the job up for success, project planning for water damage restoration, execution management and daily monitoring, professional project closeout, and risk management throughout the project lifecycle.\n\nStandards applied: IICRC S500, Safe Work Australia Model WHS Act, Australian insurance claims management requirements.",
+        "short_description": "A water damage project that is managed well produces an accurate scope, efficient execution, minimal callbacks, satisfied clients and insurers, and a profitable job. A project that is managed poorly produces the opposite of all of these. Project management in water damage restoration is the application of structured processes — not bureaucracy — to ensure that the right things happen in the right order, by the right people, on time.",
+        "iicrc_discipline": "WRT"
+      },
+      "after": {
+        "title": "Introduction to Project Management for Water Losses",
+        "description": "A water damage project that is managed well produces an accurate scope, efficient execution, minimal callbacks, satisfied clients and insurers, and a profitable job. A project that is managed poorly produces the opposite of all of these. Project management in water damage restoration is the application of structured processes — not bureaucracy — to ensure that the right things happen in the right order, by the right people, on time.\n\nTopics covered: initial response procedures that set the job up for success, project planning for water damage restoration, execution management and daily monitoring, professional project closeout, and risk management throughout the project lifecycle.\n\nStandards applied: IICRC S500, Safe Work Australia Model WHS Act, Australian insurance claims management requirements.",
+        "short_description": "A water damage project that is managed well produces an accurate scope, efficient execution, minimal callbacks, satisfied clients and insurers, and a profitable job. A project that is managed poorly produces the opposite of all of these. Project management in water damage restoration is the application of structured processes — not bureaucracy — to ensure that the right things happen in the right order, by the right people, on time.",
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "26ef53e1-1fe7-415e-b690-a0563d876dca",
+      "slug": "introduction-to-psychrometry-science-and-calculations",
+      "before": {
+        "title": "Introduction to Psychrometry Science and Calculations",
+        "description": "Psychrometrics is the science of the physical and thermodynamic properties of moist air. For restoration professionals, it provides the analytical framework for every structural drying decision — from equipment selection and placement to monitoring drying progress and determining when drying is complete. This course covers the psychrometric chart, key calculations, instrumentation, applied drying strategy, and the impact of atmospheric conditions on drying performance, aligned with IICRC S500 and ASD standards.",
+        "short_description": "Psychrometrics is the science of the physical and thermodynamic properties of moist air. For restoration professionals, it provides the analytical framework for every structural drying decision — from equipment selection and placement to monitoring drying progress and determining when drying is complete. This course covers the psychrometric chart, key calculations, instrumentation, applied drying strategy, and the impact of atmospheric conditions on drying performance, aligne",
+        "iicrc_discipline": "ASD"
+      },
+      "after": {
+        "title": "Introduction to Psychrometry Science and Calculations",
+        "description": "Psychrometrics is the science of the physical and thermodynamic properties of moist air. For restoration professionals, it provides the analytical framework for every structural drying decision — from equipment selection and placement to monitoring drying progress and determining when drying is complete. This course covers the psychrometric chart, key calculations, instrumentation, applied drying strategy, and the impact of atmospheric conditions on drying performance, aligned with IICRC S500 and ASD standards.",
+        "short_description": "Psychrometrics is the science of the physical and thermodynamic properties of moist air. For restoration professionals, it provides the analytical framework for every structural drying decision — from equipment selection and placement to monitoring drying progress and determining when drying is complete. This course covers the psychrometric chart, key calculations, instrumentation, applied drying strategy, and the impact of atmospheric conditions on drying performance, aligne",
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "594c9233-989b-4572-8831-cc53254b5fcd",
+      "slug": "introduction-to-safety-procedures-for-water-damage-work",
+      "before": {
+        "title": "Introduction to Safety Procedures for Water Damage Work",
+        "description": "Water damage restoration creates a unique combination of overlapping hazards — electrical, biological, chemical, physical, and ergonomic — that can escalate rapidly if not managed with structured safety procedures. This course provides technicians with the practical protocols to assess hazards, select PPE, control exposures, and manage equipment safely in every water damage scenario.",
+        "short_description": "Water damage restoration creates a unique combination of overlapping hazards — electrical, biological, chemical, physical, and ergonomic — that can escalate rapidly if not managed with structured safety procedures. This course provides technicians with the practical protocols to assess hazards, select PPE, control exposures, and manage equipment safely in every water damage scenario.",
+        "iicrc_discipline": "WRT"
+      },
+      "after": {
+        "title": "Introduction to Safety Procedures for Water Damage Work",
+        "description": "Water damage restoration creates a unique combination of overlapping hazards — electrical, biological, chemical, physical, and ergonomic — that can escalate rapidly if not managed with structured safety procedures. This course provides technicians with the practical protocols to assess hazards, select PPE, control exposures, and manage equipment safely in every water damage scenario.",
+        "short_description": "Water damage restoration creates a unique combination of overlapping hazards — electrical, biological, chemical, physical, and ergonomic — that can escalate rapidly if not managed with structured safety procedures. This course provides technicians with the practical protocols to assess hazards, select PPE, control exposures, and manage equipment safely in every water damage scenario.",
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "cc0d7305-8500-4396-93ff-81d27125a9df",
+      "slug": "introduction-to-smoke-and-soot-damage-restoration",
+      "before": {
+        "title": "Introduction to Smoke and Soot Damage Restoration",
+        "description": "This course equips restoration professionals with the knowledge to assess, contain, and remediate fire, smoke, and soot damage in residential and commercial buildings. It covers the chemistry of fire dynamics, systematic damage assessment methodology, the behaviour of smoke particulates in structures, the challenges of cleaning smoke-affected surfaces and contents, and odour control methods specific to fire events. Content is grounded in IICRC S700 standards and Australian safety and environmental compliance requirements.",
+        "short_description": "This course equips restoration professionals with the knowledge to assess, contain, and remediate fire, smoke, and soot damage in residential and commercial buildings. It covers the chemistry of fire dynamics, systematic damage assessment methodology, the behaviour of smoke particulates in structures, the challenges of cleaning smoke-affected surfaces and contents, and odour control methods specific to fire events. Content is grounded in IICRC S700 standards and Australian sa",
+        "iicrc_discipline": "FSRT"
+      },
+      "after": {
+        "title": "Introduction to Smoke and Soot Damage Restoration",
+        "description": "This course equips restoration professionals with the knowledge to assess, contain, and remediate fire, smoke, and soot damage in residential and commercial buildings. It covers the chemistry of fire dynamics, systematic damage assessment methodology, the behaviour of smoke particulates in structures, the challenges of cleaning smoke-affected surfaces and contents, and odour control methods specific to fire events. Content is grounded in IICRC S700 standards and Australian safety and environmental compliance requirements.",
+        "short_description": "This course equips restoration professionals with the knowledge to assess, contain, and remediate fire, smoke, and soot damage in residential and commercial buildings. It covers the chemistry of fire dynamics, systematic damage assessment methodology, the behaviour of smoke particulates in structures, the challenges of cleaning smoke-affected surfaces and contents, and odour control methods specific to fire events. Content is grounded in IICRC S700 standards and Australian sa",
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "903bcd2a-1995-4395-84c5-056b67dc5a43",
+      "slug": "introduction-to-structural-drying-concepts",
+      "before": {
+        "title": "Introduction to Structural Drying Concepts",
+        "description": "This course introduces water damage restoration technicians to the foundational concepts that underpin all structural drying work. It covers the science of how buildings respond to moisture, how drying dynamics operate in real structures, how to monitor drying progress accurately, what equipment systems are available and how they work together, and what standards define successful completion. Every module is directly applicable to job site decision-making. Content is aligned with the IICRC S500 Standard for Professional Water Damage Restoration and Australian WHS requirements.",
+        "short_description": "This course introduces water damage restoration technicians to the foundational concepts that underpin all structural drying work. It covers the science of how buildings respond to moisture, how drying dynamics operate in real structures, how to monitor drying progress accurately, what equipment systems are available and how they work together, and what standards define successful completion. Every module is directly applicable to job site decision-making. Content is aligned ",
+        "iicrc_discipline": "ASD"
+      },
+      "after": {
+        "title": "Introduction to Structural Drying Concepts",
+        "description": "This course introduces water damage restoration technicians to the foundational concepts that underpin all structural drying work. It covers the science of how buildings respond to moisture, how drying dynamics operate in real structures, how to monitor drying progress accurately, what equipment systems are available and how they work together, and what standards define successful completion. Every module is directly applicable to job site decision-making. Content is aligned with the IICRC S500 Standard for Professional Water Damage Restoration and Australian WHS requirements.",
+        "short_description": "This course introduces water damage restoration technicians to the foundational concepts that underpin all structural drying work. It covers the science of how buildings respond to moisture, how drying dynamics operate in real structures, how to monitor drying progress accurately, what equipment systems are available and how they work together, and what standards define successful completion. Every module is directly applicable to job site decision-making. Content is aligned ",
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "ea922365-47d8-46ba-8523-7510a23f18ef",
+      "slug": "introduction-to-water-damage-estimating",
+      "before": {
+        "title": "Introduction to Water Damage Estimating",
+        "description": "An accurate, defensible estimate is the foundation of a profitable water damage job. Estimating errors — missed items, incorrect quantities, wrong unit rates — produce jobs that lose money, create disputes with insurers, or overcharge clients. This course builds the estimation skills that translate inspection findings into accurate scopes and fair, defensible pricing.\n\nTopics covered: systematic site assessment as the foundation of estimation, scope development methodology, material and labour quantification, insurance estimating requirements and platforms, and bid analysis for commercial and competitive tender situations.\n\nStandards applied: IICRC S500, Australian insurance industry estimating standards, relevant state contractor licensing requirements.",
+        "short_description": "An accurate, defensible estimate is the foundation of a profitable water damage job. Estimating errors — missed items, incorrect quantities, wrong unit rates — produce jobs that lose money, create disputes with insurers, or overcharge clients. This course builds the estimation skills that translate inspection findings into accurate scopes and fair, defensible pricing.",
+        "iicrc_discipline": "WRT"
+      },
+      "after": {
+        "title": "Introduction to Water Damage Estimating",
+        "description": "An accurate, defensible estimate is the foundation of a profitable water damage job. Estimating errors — missed items, incorrect quantities, wrong unit rates — produce jobs that lose money, create disputes with insurers, or overcharge clients. This course builds the estimation skills that translate inspection findings into accurate scopes and fair, defensible pricing.\n\nTopics covered: systematic site assessment as the foundation of estimation, scope development methodology, material and labour quantification, insurance estimating requirements and platforms, and bid analysis for commercial and competitive tender situations.\n\nStandards applied: IICRC S500, Australian insurance industry estimating standards, relevant state contractor licensing requirements.",
+        "short_description": "An accurate, defensible estimate is the foundation of a profitable water damage job. Estimating errors — missed items, incorrect quantities, wrong unit rates — produce jobs that lose money, create disputes with insurers, or overcharge clients. This course builds the estimation skills that translate inspection findings into accurate scopes and fair, defensible pricing.",
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "44e46211-5430-43fd-a8e8-8649606b9eec",
+      "slug": "introduction-to-water-damage-in-commercial-buildings",
+      "before": {
+        "title": "Introduction to Water Damage in Commercial Buildings",
+        "description": "Commercial water damage events differ from residential losses in scale, complexity, stakeholder management requirements, business interruption impact, and regulatory compliance obligations. A restoration professional who understands the specific characteristics of commercial water damage is better equipped to assess, scope, and manage these high-value, high-complexity jobs to a successful outcome.\n\nTopics covered: common causes of water damage in commercial buildings, major building system vulnerabilities, the business and financial impacts of commercial water losses, drying strategy considerations specific to commercial environments, and reconstruction and reinstatement factors.\n\nStandards applied: IICRC S500, Building Code of Australia (BCA/NCC), Safe Work Australia Model WHS Regulations, relevant state commercial tenancy legislation.",
+        "short_description": "Commercial water damage events differ from residential losses in scale, complexity, stakeholder management requirements, business interruption impact, and regulatory compliance obligations. A restoration professional who understands the specific characteristics of commercial water damage is better equipped to assess, scope, and manage these high-value, high-complexity jobs to a successful outcome.",
+        "iicrc_discipline": "WRT"
+      },
+      "after": {
+        "title": "Introduction to Water Damage in Commercial Buildings",
+        "description": "Commercial water damage events differ from residential losses in scale, complexity, stakeholder management requirements, business interruption impact, and regulatory compliance obligations. A restoration professional who understands the specific characteristics of commercial water damage is better equipped to assess, scope, and manage these high-value, high-complexity jobs to a successful outcome.\n\nTopics covered: common causes of water damage in commercial buildings, major building system vulnerabilities, the business and financial impacts of commercial water losses, drying strategy considerations specific to commercial environments, and reconstruction and reinstatement factors.\n\nStandards applied: IICRC S500, Building Code of Australia (BCA/NCC), Safe Work Australia Model WHS Regulations, relevant state commercial tenancy legislation.",
+        "short_description": "Commercial water damage events differ from residential losses in scale, complexity, stakeholder management requirements, business interruption impact, and regulatory compliance obligations. A restoration professional who understands the specific characteristics of commercial water damage is better equipped to assess, scope, and manage these high-value, high-complexity jobs to a successful outcome.",
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "c7b31440-e157-4b75-8e59-15025a4224be",
+      "slug": "introduction-to-water-damage-marketing-and-sales",
+      "before": {
+        "title": "Introduction to Water Damage Marketing and Sales",
+        "description": "This course covers the specific marketing and sales skills required to grow a water damage restoration business in Australia. Unlike general marketing courses, every module is tailored to the unique dynamics of restoration work — emergency response, insurance involvement, referral networks, and professional credibility. You will learn to generate leads, close jobs consultatively, deliver exceptional client service, expand your market, and use certification to differentiate your business.",
+        "short_description": "This course covers the specific marketing and sales skills required to grow a water damage restoration business in Australia. Unlike general marketing courses, every module is tailored to the unique dynamics of restoration work — emergency response, insurance involvement, referral networks, and professional credibility. You will learn to generate leads, close jobs consultatively, deliver exceptional client service, expand your market, and use certification to differentiate yo",
+        "iicrc_discipline": "WRT"
+      },
+      "after": {
+        "title": "Introduction to Water Damage Marketing and Sales",
+        "description": "This course covers the specific marketing and sales skills required to grow a water damage restoration business in Australia. Unlike general marketing courses, every module is tailored to the unique dynamics of restoration work — emergency response, insurance involvement, referral networks, and professional credibility. You will learn to generate leads, close jobs consultatively, deliver exceptional client service, expand your market, and use certification to differentiate your business.",
+        "short_description": "This course covers the specific marketing and sales skills required to grow a water damage restoration business in Australia. Unlike general marketing courses, every module is tailored to the unique dynamics of restoration work — emergency response, insurance involvement, referral networks, and professional credibility. You will learn to generate leads, close jobs consultatively, deliver exceptional client service, expand your market, and use certification to differentiate yo",
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "07753e88-f8e2-423f-b66d-098d2e94e036",
+      "slug": "introduction-to-water-damage-principles",
+      "before": {
+        "title": "Introduction to Water Damage Principles",
+        "description": "This course establishes the foundational principles that underpin professional water damage restoration practice. Understanding the science behind moisture behaviour, psychrometrics, microbial risk, and damage assessment allows restoration professionals to make informed decisions on site rather than applying fixed procedures that may not suit the specific conditions of each job.\n\nTopics covered: health and safety as the non-negotiable foundation of all restoration work, remediation principles and decision-making frameworks, applied psychrometrics for structural drying, microbial risk recognition and management, and systematic damage assessment.\n\nStandards applied: IICRC S500, IICRC S520, Safe Work Australia Model WHS Regulations.",
+        "short_description": "This course establishes the foundational principles that underpin professional water damage restoration practice. Understanding the science behind moisture behaviour, psychrometrics, microbial risk, and damage assessment allows restoration professionals to make informed decisions on site rather than applying fixed procedures that may not suit the specific conditions of each job.",
+        "iicrc_discipline": "WRT"
+      },
+      "after": {
+        "title": "Introduction to Water Damage Principles",
+        "description": "This course establishes the foundational principles that underpin professional water damage restoration practice. Understanding the science behind moisture behaviour, psychrometrics, microbial risk, and damage assessment allows restoration professionals to make informed decisions on site rather than applying fixed procedures that may not suit the specific conditions of each job.\n\nTopics covered: health and safety as the non-negotiable foundation of all restoration work, remediation principles and decision-making frameworks, applied psychrometrics for structural drying, microbial risk recognition and management, and systematic damage assessment.\n\nStandards applied: IICRC S500, IICRC S520, Safe Work Australia Model WHS Regulations.",
+        "short_description": "This course establishes the foundational principles that underpin professional water damage restoration practice. Understanding the science behind moisture behaviour, psychrometrics, microbial risk, and damage assessment allows restoration professionals to make informed decisions on site rather than applying fixed procedures that may not suit the specific conditions of each job.",
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "ade9fe2a-47e8-4218-afe1-c2f897864cf0",
+      "slug": "introduction-to-water-damage-restoration",
+      "before": {
+        "title": "Introduction to Water Damage Restoration",
+        "description": "This course provides a structured introduction to the complete water damage restoration process for practitioners entering the industry or seeking to formalise their understanding of the field. It covers the end-to-end workflow from site safety through inspection, moisture control, extraction, and equipment setup — providing the operational framework on which all more advanced restoration knowledge is built.\n\nTopics covered: health and safety obligations in water damage environments, systematic damage inspection procedures, moisture source identification and control, water extraction methods overview, and drying equipment selection and setup.\n\nStandards applied: IICRC S500, Safe Work Australia Model WHS Act and Regulations.",
+        "short_description": "This course provides a structured introduction to the complete water damage restoration process for practitioners entering the industry or seeking to formalise their understanding of the field. It covers the end-to-end workflow from site safety through inspection, moisture control, extraction, and equipment setup — providing the operational framework on which all more advanced restoration knowledge is built.",
+        "iicrc_discipline": "WRT"
+      },
+      "after": {
+        "title": "Introduction to Water Damage Restoration",
+        "description": "This course provides a structured introduction to the complete water damage restoration process for practitioners entering the industry or seeking to formalise their understanding of the field. It covers the end-to-end workflow from site safety through inspection, moisture control, extraction, and equipment setup — providing the operational framework on which all more advanced restoration knowledge is built.\n\nTopics covered: health and safety obligations in water damage environments, systematic damage inspection procedures, moisture source identification and control, water extraction methods overview, and drying equipment selection and setup.\n\nStandards applied: IICRC S500, Safe Work Australia Model WHS Act and Regulations.",
+        "short_description": "This course provides a structured introduction to the complete water damage restoration process for practitioners entering the industry or seeking to formalise their understanding of the field. It covers the end-to-end workflow from site safety through inspection, moisture control, extraction, and equipment setup — providing the operational framework on which all more advanced restoration knowledge is built.",
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "bc09932a-927d-4e69-ba9c-f1425509bb72",
+      "slug": "introduction-to-water-extraction-methods",
+      "before": {
+        "title": "Introduction to Water Extraction Methods",
+        "description": "Water extraction is the most time-critical task in any water damage response. Every minute standing water remains in contact with porous building materials increases absorption depth, extends the drying timeline, and increases secondary damage costs. This course covers the operational fundamentals of professional water extraction: why it matters, how to do it safely, what equipment to use, how to apply the right technique for the material type, and how to manage waste correctly.\n\nTopics covered: the purpose and urgency of extraction, site safety assessment before extraction begins, extraction equipment selection, extraction techniques for different material types, and compliant waste disposal.\n\nStandards applied: IICRC S500, Safe Work Australia Model WHS Regulations, state EPA waste disposal requirements.",
+        "short_description": "Water extraction is the most time-critical task in any water damage response. Every minute standing water remains in contact with porous building materials increases absorption depth, extends the drying timeline, and increases secondary damage costs. This course covers the operational fundamentals of professional water extraction: why it matters, how to do it safely, what equipment to use, how to apply the right technique for the material type, and how to manage waste correct",
+        "iicrc_discipline": "WRT"
+      },
+      "after": {
+        "title": "Introduction to Water Extraction Methods",
+        "description": "Water extraction is the most time-critical task in any water damage response. Every minute standing water remains in contact with porous building materials increases absorption depth, extends the drying timeline, and increases secondary damage costs. This course covers the operational fundamentals of professional water extraction: why it matters, how to do it safely, what equipment to use, how to apply the right technique for the material type, and how to manage waste correctly.\n\nTopics covered: the purpose and urgency of extraction, site safety assessment before extraction begins, extraction equipment selection, extraction techniques for different material types, and compliant waste disposal.\n\nStandards applied: IICRC S500, Safe Work Australia Model WHS Regulations, state EPA waste disposal requirements.",
+        "short_description": "Water extraction is the most time-critical task in any water damage response. Every minute standing water remains in contact with porous building materials increases absorption depth, extends the drying timeline, and increases secondary damage costs. This course covers the operational fundamentals of professional water extraction: why it matters, how to do it safely, what equipment to use, how to apply the right technique for the material type, and how to manage waste correct",
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "01846065-e12c-4b87-b78c-279d6ffb6ebf",
+      "slug": "level-1-mould-remediation-2cc96b85",
+      "before": {
+        "title": "Level 1 — Mould Remediation",
+        "description": "You learn what mould is, why it grows, and how to safely clean small surface mould on non-porous areas under one square metre. Covers basic PPE, how to read a Safety Data Sheet, how to inspect before you start, the step-by-step cleaning process, and how to bag and dispose of waste correctly. Ends with guidance on when a job is too big for Level 1 and needs to go up a level.",
+        "short_description": null,
+        "iicrc_discipline": "AMRT"
+      },
+      "after": {
+        "title": "Level 1 — Mould Remediation",
+        "description": "You learn what mould is, why it grows, and how to safely clean small surface mould on non-porous areas under one square metre. Covers basic PPE, how to read a Safety Data Sheet, how to inspect before you start, the step-by-step cleaning process, and how to bag and dispose of waste correctly. Ends with guidance on when a job is too big for Level 1 and needs to go up a level.",
+        "short_description": null,
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "e52da273-96de-4b5d-a97d-0fba8a069262",
+      "slug": "level-2-mould-remediation-30ee3492",
+      "before": {
+        "title": "Level 2 — Mould Remediation",
+        "description": "Builds directly on Level 1 and takes you into more complex jobs — one to ten square metres, semi-porous materials like plasterboard and timber framing. You learn how Australian WHS laws apply to this work, how to set up proper containment with negative air pressure, how to use moisture meters to track drying, how to manage biological hazards and stronger chemicals, how to complete a JSEA, how to document a job professionally, and how to handle emergencies and notifiable incidents. Covers the full remediation process from material removal through to waste disposal and job close-out.",
+        "short_description": null,
+        "iicrc_discipline": "AMRT"
+      },
+      "after": {
+        "title": "Level 2 — Mould Remediation",
+        "description": "Builds directly on Level 1 and takes you into more complex jobs — one to ten square metres, semi-porous materials like plasterboard and timber framing. You learn how Australian WHS laws apply to this work, how to set up proper containment with negative air pressure, how to use moisture meters to track drying, how to manage biological hazards and stronger chemicals, how to complete a JSEA, how to document a job professionally, and how to handle emergencies and notifiable incidents. Covers the full remediation process from material removal through to waste disposal and job close-out.",
+        "short_description": null,
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "f03dbaec-33c6-4631-b2e0-86becbd24a94",
+      "slug": "level-3-mould-remediation-c5797369",
+      "before": {
+        "title": "Level 3 — Mould Remediation",
+        "description": "Designed for large-scale contamination over ten square metres involving structural materials, HVAC systems, and high-risk environments like hospitals, schools, and aged care facilities. You learn advanced risk assessment, full-scale containment design with negative pressure monitoring, respirator fit-testing obligations, heat management planning for extended PPE use, psychrometric analysis for drying, moisture mapping across large sites, how different building materials affect remediation decisions, and how to lead a complex project to close-out — potentially alongside an independent industrial hygienist for air clearance testing.",
+        "short_description": null,
+        "iicrc_discipline": "AMRT"
+      },
+      "after": {
+        "title": "Level 3 — Mould Remediation",
+        "description": "Designed for large-scale contamination over ten square metres involving structural materials, HVAC systems, and high-risk environments like hospitals, schools, and aged care facilities. You learn advanced risk assessment, full-scale containment design with negative pressure monitoring, respirator fit-testing obligations, heat management planning for extended PPE use, psychrometric analysis for drying, moisture mapping across large sites, how different building materials affect remediation decisions, and how to lead a complex project to close-out — potentially alongside an independent industrial hygienist for air clearance testing.",
+        "short_description": null,
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "6df6b6a4-436a-4085-a837-3b4363497660",
+      "slug": "moisture-meter-course",
+      "before": {
+        "title": "Moisture Meter Course",
+        "description": "Moisture meters are the primary measurement instrument in structural drying. Every drying decision, every drying goal, every insurance documentation entry, and every clearance determination in water damage restoration depends on accurate moisture meter readings. This course covers the complete operational knowledge required to use moisture meters correctly in the field: how moisture content is measured, the reading process, accuracy assurance, reference scales, temperature effects, the relationship between moisture and wood warping, moisture testing protocols, prevention strategies, operational tips, accuracy factors, material-specific considerations, the types of meters available, maintenance requirements, and the common mistakes that produce unreliable results. All content is aligned with IICRC S500 drying standards and Australian insurance documentation requirements.",
+        "short_description": "Moisture meters are the primary measurement instrument in structural drying. Every drying decision, every drying goal, every insurance documentation entry, and every clearance determination in water damage restoration depends on accurate moisture meter readings. This course covers the complete operational knowledge required to use moisture meters correctly in the field: how moisture content is measured, the reading process, accuracy assurance, reference scales, temperature ef",
+        "iicrc_discipline": "WRT"
+      },
+      "after": {
+        "title": "Moisture Meter Course",
+        "description": "Moisture meters are the primary measurement instrument in structural drying. Every drying decision, every drying goal, every insurance documentation entry, and every clearance determination in water damage restoration depends on accurate moisture meter readings. This course covers the complete operational knowledge required to use moisture meters correctly in the field: how moisture content is measured, the reading process, accuracy assurance, reference scales, temperature effects, the relationship between moisture and wood warping, moisture testing protocols, prevention strategies, operational tips, accuracy factors, material-specific considerations, the types of meters available, maintenance requirements, and the common mistakes that produce unreliable results. All content is aligned with IICRC S500 drying standards and Australian insurance documentation requirements.",
+        "short_description": "Moisture meters are the primary measurement instrument in structural drying. Every drying decision, every drying goal, every insurance documentation entry, and every clearance determination in water damage restoration depends on accurate moisture meter readings. This course covers the complete operational knowledge required to use moisture meters correctly in the field: how moisture content is measured, the reading process, accuracy assurance, reference scales, temperature ef",
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "9189f4e7-ace1-4aea-9da2-2675d6ea9070",
+      "slug": "refrigerant-dehumidifiers-for-water-loss-restoration",
+      "before": {
+        "title": "Refrigerant Dehumidifiers for Water Loss Restoration",
+        "description": "The refrigerant dehumidifier is the primary moisture removal tool in structural drying. Understanding how it works, how to size it correctly, how to operate it at peak efficiency, and how to maintain it properly directly determines the speed and cost of every water loss restoration you attend. This course provides the technical grounding needed to use refrigerant dehumidifiers as precision drying tools, not just equipment you put in a room and hope for the best.\n\nTopics covered: refrigerant dehumidifier operating principles, low grain refrigerant technology, dehumidifier sizing calculations, temperature and efficiency relationships, refrigerant types and their implications, essential accessories, maintenance procedures, practical application scenarios, and safety requirements.\n\nStandards applied: IICRC S500, IICRC S520, Australian Refrigeration and Air Conditioning (RAC) regulations, Safe Work Australia.",
+        "short_description": "The refrigerant dehumidifier is the primary moisture removal tool in structural drying. Understanding how it works, how to size it correctly, how to operate it at peak efficiency, and how to maintain it properly directly determines the speed and cost of every water loss restoration you attend. This course provides the technical grounding needed to use refrigerant dehumidifiers as precision drying tools, not just equipment you put in a room and hope for the best.",
+        "iicrc_discipline": "WRT / ASD"
+      },
+      "after": {
+        "title": "Refrigerant Dehumidifiers for Water Loss Restoration",
+        "description": "The refrigerant dehumidifier is the primary moisture removal tool in structural drying. Understanding how it works, how to size it correctly, how to operate it at peak efficiency, and how to maintain it properly directly determines the speed and cost of every water loss restoration you attend. This course provides the technical grounding needed to use refrigerant dehumidifiers as precision drying tools, not just equipment you put in a room and hope for the best.\n\nTopics covered: refrigerant dehumidifier operating principles, low grain refrigerant technology, dehumidifier sizing calculations, temperature and efficiency relationships, refrigerant types and their implications, essential accessories, maintenance procedures, practical application scenarios, and safety requirements.\n\nStandards applied: IICRC S500, IICRC S520, Australian Refrigeration and Air Conditioning (RAC) regulations, Safe Work Australia.",
+        "short_description": "The refrigerant dehumidifier is the primary moisture removal tool in structural drying. Understanding how it works, how to size it correctly, how to operate it at peak efficiency, and how to maintain it properly directly determines the speed and cost of every water loss restoration you attend. This course provides the technical grounding needed to use refrigerant dehumidifiers as precision drying tools, not just equipment you put in a room and hope for the best.",
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "463b3049-3517-4759-8741-e4a5941429f7",
+      "slug": "restoration-project-management-premium",
+      "before": {
+        "title": "Restoration Project Management & Client Communication — Premium",
+        "description": "A paid professional skills course: translate technical work into clear project plans, commercial communication, and defensible documentation. Purchase once for lifetime access to this title (CARSI Pro subscribers may access the full catalogue separately).",
+        "short_description": "Scopes, estimates, stakeholder updates, and handover documentation for restoration supervisors and lead technicians.",
+        "iicrc_discipline": "ASD"
+      },
+      "after": {
+        "title": "Restoration Project Management & Client Communication — Premium",
+        "description": "A paid professional skills course: translate technical work into clear project plans, commercial communication, and defensible documentation. Purchase once for lifetime access to this title (CARSI Pro subscribers may access the full catalogue separately).",
+        "short_description": "Scopes, estimates, stakeholder updates, and handover documentation for restoration supervisors and lead technicians.",
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "0c859974-db77-4ffd-9046-23f0ca8277f2",
+      "slug": "tile-cleaning-for-carpet-cleaners",
+      "before": {
+        "title": "Tile Cleaning for Carpet Cleaners",
+        "description": "Understand the importance of tile cleaning in addition to carpet cleaning.\nLearn the different types of tiles and their specific cleaning needs.\nMaster the chemistry behind cleaning solutions.\nDevelop skills for sealing tiles and grout.\nExplore maintenance practices and strategies for upselling services.",
+        "short_description": null,
+        "iicrc_discipline": "CCT"
+      },
+      "after": {
+        "title": "Tile Cleaning for Carpet Cleaners",
+        "description": "Understand the importance of tile cleaning in addition to carpet cleaning.\nLearn the different types of tiles and their specific cleaning needs.\nMaster the chemistry behind cleaning solutions.\nDevelop skills for sealing tiles and grout.\nExplore maintenance practices and strategies for upselling services.",
+        "short_description": null,
+        "iicrc_discipline": null
+      }
+    },
+    {
+      "id": "9e07219f-9fb8-4c49-95ea-ddb1564caf6c",
+      "slug": "wrt-water-damage-essentials",
+      "before": {
+        "title": "Water Damage Restoration — Essentials (WRT-aligned)",
+        "description": "A concise, WRT-aligned introduction to water damage restoration fundamentals: categories of water, classes of loss, safety, and the core drying workflow.",
+        "short_description": "WRT-aligned essentials of water damage restoration.",
+        "iicrc_discipline": "WRT"
+      },
+      "after": {
+        "title": "Water Damage Restoration — Essentials",
+        "description": "A concise introduction to water damage restoration fundamentals: categories of water, classes of loss, safety, and the core drying workflow.",
+        "short_description": "Essentials of water damage restoration: categories of water, classes of loss, safety, and the core drying workflow.",
+        "iicrc_discipline": null
+      }
+    }
+  ]
+}

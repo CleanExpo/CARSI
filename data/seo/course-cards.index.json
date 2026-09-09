@@ -1,4 +1,59 @@
 {
+ "air-movers-for-professional-restoration-specs-selection-on-site-assessment": {
+  "slug": "air-movers-for-professional-restoration-specs-selection-on-site-assessment",
+  "seoTitle": "Air Mover Selection and Placement Course | CARSI",
+  "metaDescription": "An Australian course on air movers for restoration work: airflow, static pressure and lift, axial versus centrifugal selection, placement by class of loss.",
+  "imageAlt": "CARSI course thumbnail: Air Movers for Professional Restoration: Specs, Selection & On-Site Assessment",
+  "og": {
+   "title": "Air Movers for Professional Restoration | CARSI",
+   "description": "Choose and place air movers with confidence. Covers airflow, static pressure and lift, axial versus centrifugal versus low-profile selection, placement and quantity by class of loss, and amps, GPOs and scaling on 230 V power."
+  },
+  "keywords": [
+   "air mover course australia",
+   "air mover selection restoration",
+   "axial vs centrifugal air mover",
+   "structural drying equipment training",
+   "restoration airflow training",
+   "class of loss air mover placement",
+   "restoration equipment course australia"
+  ],
+  "faq": [
+   {
+    "q": "What does this air mover course cover?",
+    "a": "It covers airflow, static pressure and lift; axial, centrifugal and low-profile selection; placement and quantity by class of loss; amps, GPOs and scaling; clean, grey, sewage and mould conditions; and buying plus on-site assessment."
+   },
+   {
+    "q": "Is this course written for Australian conditions?",
+    "a": "Yes. It is written for the Australian market throughout, using 230 V / 50 Hz power, 10 A GPOs, metric units, and equipment available in Australia as at July 2026."
+   },
+   {
+    "q": "Should low-profile air movers be my main drying equipment?",
+    "a": "No. The course makes this its through-line: low-profile units have a place, but they should not be the primary air mover for a professional firm. The aim is to match the air mover to the job."
+   },
+   {
+    "q": "How much does this course cost?",
+    "a": "It is free to enrol. The live course page lists it as a free course, so you can start it without paying."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Air Movers for Professional Restoration: Specs, Selection and On-Site Assessment",
+   "description": "An Australian course on selecting, placing and scaling air movers for restoration work. Covers airflow, static pressure and lift; axial, centrifugal and low-profile selection; placement and quantity by class of loss; amps, GPOs and scaling on 230 V power; clean, grey, sewage and mould conditions; and buying plus on-site assessment.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
  "air-quality-and-odour-identification-and-deodorisation-essentials": {
   "slug": "air-quality-and-odour-identification-and-deodorisation-essentials",
   "seoTitle": "Odour Identification & Deodorisation Course | CARSI",
@@ -113,6 +168,111 @@
    "coursePrerequisites": "None — awareness training for restoration, IAQ, facility, strata and insurance-support professionals."
   }
  },
+ "carpet-cleaning-basics-b66757ce": {
+  "slug": "carpet-cleaning-basics-b66757ce",
+  "seoTitle": "Carpet Cleaning Basics Course Australia | CARSI",
+  "metaDescription": "Learn to clean carpet effectively, safely and to recognised standards - for residential, commercial and insurance-related water loss work in Australia.",
+  "imageAlt": "CARSI course thumbnail: CARPET CLEANING BASICS",
+  "og": {
+   "title": "Carpet Cleaning Basics | CARSI",
+   "description": "Carpet cleaning is one of the most common services delivered by restoration and cleaning professionals across Australia. This course builds the fundamental skill of cleaning carpet effectively, safely and in accordance with recognised standards."
+  },
+  "keywords": [
+   "carpet cleaning course australia",
+   "carpet cleaning basics training",
+   "carpet cleaning standards australia",
+   "commercial carpet cleaning course",
+   "carpet cleaning water damage",
+   "professional carpet cleaning training"
+  ],
+  "faq": [
+   {
+    "q": "Who is this carpet cleaning course for?",
+    "a": "It is written for restoration and cleaning professionals across Australia, whether the work is in a residential home, a commercial office, or a response to an insurance-related water loss."
+   },
+   {
+    "q": "What will I be able to do after this course?",
+    "a": "You will be able to clean carpet effectively, safely and in accordance with recognised standards. Carpet cleaning is one of the most common services in the industry, so this is treated as a fundamental professional skill."
+   },
+   {
+    "q": "Does this course apply to insurance water-damage work?",
+    "a": "Yes. The course is framed around the three settings where carpet cleaning is delivered - a residential home, a commercial office, and a response to an insurance-related water loss."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Carpet Cleaning Basics",
+   "description": "Carpet cleaning is one of the most common services delivered by restoration and cleaning professionals across Australia. This course builds the ability to clean carpet effectively, safely and in accordance with recognised standards, across residential, commercial and insurance-related water loss work.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "55",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "carsi-maintenance-toolbox-talks-monthly-refreshers": {
+  "slug": "carsi-maintenance-toolbox-talks-monthly-refreshers",
+  "seoTitle": "Floor Care Toolbox Talks - Monthly Refreshers | CARSI",
+  "metaDescription": "Short Australian toolbox talks for floor-care teams - one topic per session, five minutes each, with a new talk added every month to keep crews sharp.",
+  "imageAlt": "CARSI course thumbnail: CARSI Maintenance — Toolbox Talks (Monthly Refreshers)",
+  "og": {
+   "title": "CARSI Maintenance - Toolbox Talks (Monthly Refreshers)",
+   "description": "Short, sharp Australian toolbox talks for professional floor-care teams. One topic per session, five minutes each, to keep the whole crew sharp between onboarding and re-certification. A new talk is added each month."
+  },
+  "keywords": [
+   "toolbox talks cleaning industry",
+   "floor care safety training australia",
+   "monthly safety refresher training",
+   "cleaning crew toolbox talk",
+   "sds ppe toolbox talk",
+   "rcd machine safety training",
+   "safe work australia toolbox talks"
+  ],
+  "faq": [
+   {
+    "q": "How long does each toolbox talk take?",
+    "a": "Five minutes, with one topic per session. They are designed to be short and sharp so a whole crew can run one before starting work."
+   },
+   {
+    "q": "What topics do the toolbox talks cover?",
+    "a": "Site arrival, chemical, PPE and SDS handling, machine and RCD safety, vehicle pre-start, wet-floor and hazard control, confidentiality and photos, cross-contamination, and slip resistance."
+   },
+   {
+    "q": "Are the talks kept up to date?",
+    "a": "Yes. A new talk is added each month, so the series works as an ongoing refresher between onboarding and re-certification rather than a one-off session."
+   },
+   {
+    "q": "Are these written for Australian workplaces?",
+    "a": "Yes. They are Australian-produced and reference 230 V and RCD safety, AS/NZS standards, Safe Work Australia guidance, and the Poisons Information line on 13 11 26."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "CARSI Maintenance - Toolbox Talks (Monthly Refreshers)",
+   "description": "Short, sharp Australian toolbox talks for professional floor-care teams - one topic per session, five minutes each, to keep the whole crew sharp between onboarding and re-certification. A new talk is added each month. Covers site arrival, chemical, PPE and SDS handling, machine and RCD safety, vehicle pre-start, wet-floor and hazard control, confidentiality and photos, cross-contamination, and slip resistance.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
  "ccw-carsi-truckmount-operations": {
   "slug": "ccw-carsi-truckmount-operations",
   "seoTitle": "Truckmount Operations Course (Australian) | CARSI",
@@ -161,7 +321,69 @@
     "sameAs": "https://carsi.com.au"
    },
    "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "99",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   },
    "coursePrerequisites": "None — open entry"
+  }
+ },
+ "collaborative-development-your-personal-ai-assistant": {
+  "slug": "collaborative-development-your-personal-ai-assistant",
+  "seoTitle": "AI for Cleaning and Restoration Businesses | CARSI",
+  "metaDescription": "A hands-on course teaching cleaning and restoration operators to use ChatGPT and Claude for reports, scopes, JSEA and SWMS drafts, SOPs and client emails.",
+  "imageAlt": "CARSI course thumbnail: Collaborative Development — Your Personal AI Assistant",
+  "og": {
+   "title": "Collaborative Development - Your Personal AI Assistant | CARSI",
+   "description": "An interactive course for cleaning and restoration operators. Work with AI language tools in real time to produce documentation, marketing, compliance and communication outputs for your own business. No prior technology experience required."
+  },
+  "keywords": [
+   "ai for restoration business",
+   "chatgpt for cleaning business",
+   "ai prompts for tradies australia",
+   "ai scope of works water damage",
+   "jsea swms ai drafting",
+   "ai training for small business australia",
+   "claude for business documentation"
+  ],
+  "faq": [
+   {
+    "q": "Do I need any technology experience to take this course?",
+    "a": "No. No prior technology experience is required. The course is structured around doing rather than reading, so you work with the tools in real time and produce outputs for your own business as you go."
+   },
+   {
+    "q": "Which AI tools does the course use?",
+    "a": "It works with AI language tools that are accessible and free to use, specifically ChatGPT and Claude, and also refers to Gemini. The focus is on instructing them effectively rather than on the tools themselves."
+   },
+   {
+    "q": "What will I actually produce during the course?",
+    "a": "You are guided through prompts for a water damage scope of works, a mould remediation JSEA, an end-of-job client letter, an SOP for a specific cleaning task, a Google Business Profile description, and a social media post for a recent job."
+   },
+   {
+    "q": "Can I rely on AI output for compliance documents?",
+    "a": "No. The course is explicit that AI tools produce confident-sounding content that may be factually incorrect, and that any document carrying professional, legal or compliance significance must be reviewed by a competent human before use. That review step is treated as non-negotiable."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Collaborative Development - Your Personal AI Assistant",
+   "description": "An interactive course introducing cleaning and restoration business operators to AI language tools such as ChatGPT and Claude, and guiding them through the documentation, marketing, compliance and communication tasks that consume time in a restoration or cleaning business. Covers prompt construction, real business outputs, the limitations of AI, and a staged plan for introducing AI tools to a business.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "49",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   },
+   "coursePrerequisites": "No prior technology experience is required."
   }
  },
  "commercial-floor-care-schools-childcare": {
@@ -187,7 +409,7 @@
   "faq": [
    {
     "q": "Does this course award IICRC CECs?",
-    "a": "No. This is professional development and contract-readiness training. It is not an IICRC-accredited course and does not award IICRC Continuing Education Credits (CECs). Where it references a standard such as ANSI/IICRC S100, it treats it as a recognised standard of care, not law."
+    "a": "No. This is professional development and contract-readiness training. It is not accredited by the IICRC and does not award IICRC Continuing Education Credits (CECs). Where it references a standard such as ANSI/IICRC S100, it treats it as a recognised standard of care, not law."
    },
    {
     "q": "What floor-care services does the course cover?",
@@ -206,7 +428,7 @@
    "@context": "https://schema.org",
    "@type": "Course",
    "name": "Commercial Floor Care for Schools & Childcare Contracts",
-   "description": "A free CARSI professional-development course taking experienced cleaners to a contract-ready floor-care service for Australian schools and childcare centres, covering carpet, tile and grout, vinyl strip and seal, and pressure washing, each paired with the WHS, SDS, child-safety, slip-resistance and run-off requirements a contract expects. This is contract-readiness training; it is not an IICRC-accredited course and does not award IICRC Continuing Education Credits (CECs).",
+   "description": "A free CARSI professional-development course taking experienced cleaners to a contract-ready floor-care service for Australian schools and childcare centres, covering carpet, tile and grout, vinyl strip and seal, and pressure washing, each paired with the WHS, SDS, child-safety, slip-resistance and run-off requirements a contract expects. This is contract-readiness training; it is not accredited by the IICRC and does not award IICRC Continuing Education Credits (CECs).",
    "provider": {
     "@type": "Organization",
     "name": "CARSI",
@@ -277,6 +499,56 @@
     "availability": "https://schema.org/InStock"
    },
    "coursePrerequisites": "None — open entry"
+  }
+ },
+ "donning-and-doffing-ppe": {
+  "slug": "donning-and-doffing-ppe",
+  "seoTitle": "Donning and Doffing PPE Course Australia | CARSI",
+  "metaDescription": "Learn correct PPE donning and doffing for contaminated environments. Doffing is where most self-contamination happens - sequence, technique and reasoning.",
+  "imageAlt": "CARSI course thumbnail: Donning and Doffing PPE",
+  "og": {
+   "title": "Donning and Doffing PPE | CARSI",
+   "description": "Correct procedures for putting on and taking off personal protective equipment in contaminated environments. Covers sequences, technique, the transition zone, PPE disposal, and recognising heat exhaustion and heat stroke in workers wearing PPE."
+  },
+  "keywords": [
+   "donning and doffing ppe course",
+   "ppe training australia",
+   "ppe removal sequence training",
+   "contaminated site ppe course",
+   "restoration ppe training",
+   "heat stress ppe awareness"
+  ],
+  "faq": [
+   {
+    "q": "Why does this course focus so heavily on doffing?",
+    "a": "Because doffing is where most self-contamination events occur. A worker who has used PPE effectively throughout a job can undo that protection completely through incorrect removal, so the course teaches the sequence, the technique and the reasoning behind each step."
+   },
+   {
+    "q": "What topics are covered?",
+    "a": "The purpose and types of PPE used in restoration and cleaning work, correct donning and doffing sequences and techniques for different PPE combinations, managing the transition zone, PPE disposal, and recognising and responding to heat exhaustion and heat stroke in workers wearing PPE."
+   },
+   {
+    "q": "Does the course cover heat stress while wearing PPE?",
+    "a": "Yes. Recognising and responding to heat exhaustion and heat stroke in workers wearing PPE is one of the topics covered, alongside the donning and doffing sequences themselves."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Donning and Doffing PPE",
+   "description": "A course on the correct procedures for putting on and taking off personal protective equipment in contaminated environments. Covers the purpose and types of PPE used in restoration and cleaning work, donning and doffing sequences for different PPE combinations, managing the transition zone, PPE disposal, and recognising heat exhaustion and heat stroke in workers wearing PPE.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "39",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
   }
  },
  "dust-and-particulates-in-indoor-air-control-and-cleaning-strategies": {
@@ -393,6 +665,107 @@
    "coursePrerequisites": "None — internal induction for CARSI Maintenance Company floor-care staff."
   }
  },
+ "fundamental-business-framework": {
+  "slug": "fundamental-business-framework",
+  "seoTitle": "Cleaning and Restoration Business Course Australia | CARSI",
+  "metaDescription": "The most comprehensive CARSI business course - a complete operating system for building, running and scaling a cleaning or restoration business in Australia.",
+  "imageAlt": "CARSI course thumbnail: Fundamental Business Framework",
+  "og": {
+   "title": "Fundamental Business Framework | CARSI",
+   "description": "A complete operating system for building and scaling a cleaning or restoration business in Australia. Covers the full business lifecycle from foundational setup through to exit, with the systems, strategies and knowledge to build a business that runs professionally and profitably."
+  },
+  "keywords": [
+   "cleaning business course australia",
+   "restoration business training",
+   "scaling a cleaning business",
+   "restoration business systems",
+   "business exit planning trades",
+   "cleaning business profitability course",
+   "restoration company operating system"
+  ],
+  "faq": [
+   {
+    "q": "What does the Fundamental Business Framework cover?",
+    "a": "It covers the full business lifecycle, from foundational setup through to exit. It is presented as a complete operating system for building and scaling a cleaning or restoration business in Australia."
+   },
+   {
+    "q": "Who is this course for?",
+    "a": "Owners of cleaning and restoration businesses who want the systems, strategies and knowledge to run professionally, generate sustainable profit, and grow the business beyond the personal capacity of the owner."
+   },
+   {
+    "q": "Does the course cover selling or exiting the business?",
+    "a": "Yes. It covers the full business lifecycle, from foundational setup through to exit."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Fundamental Business Framework",
+   "description": "The most comprehensive CARSI business course - a complete operating system for building and scaling a cleaning or restoration business in Australia. Covering the full business lifecycle from foundational setup through to exit, it equips owners with the systems, strategies and knowledge required to build a business that operates professionally, generates sustainable profit, and can grow beyond the personal capacity of the owner.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "770",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "glass-cleaning-course": {
+  "slug": "glass-cleaning-course",
+  "seoTitle": "Professional Glass Cleaning Course Australia | CARSI",
+  "metaDescription": "Streak-free glass cleaning for cleaning and restoration technicians - site assessment, chemistry and technique, window track cleaning, and a knowledge quiz.",
+  "imageAlt": "CARSI course thumbnail: Glass Cleaning Course",
+  "og": {
+   "title": "Glass Cleaning Course | CARSI",
+   "description": "Professional glass cleaning technique for restoration and cleaning technicians. Streaks, smearing and scratching are avoidable with correct technique, appropriate tools and properly prepared cleaning solutions. Includes video demonstration and window track cleaning."
+  },
+  "keywords": [
+   "glass cleaning course australia",
+   "window cleaning training",
+   "streak free glass cleaning technique",
+   "commercial window cleaning course",
+   "window track cleaning",
+   "post construction glass cleaning"
+  ],
+  "faq": [
+   {
+    "q": "When do technicians need professional glass cleaning skills?",
+    "a": "Restoration and cleaning technicians are frequently called on to clean glass after water damage events, construction works and renovation projects, and as part of routine commercial cleaning contracts."
+   },
+   {
+    "q": "What causes streaks and scratching, and can they be avoided?",
+    "a": "Poorly executed glass cleaning produces streaks, smearing and scratching. All of these are avoidable with correct technique, appropriate tools and properly prepared cleaning solutions, which is what the course sets out to build."
+   },
+   {
+    "q": "What is included in the course?",
+    "a": "The complete glass cleaning workflow: pre-job planning and preparation, the cleaning process itself, supplementary video guidance, bonus content on window track cleaning, and a knowledge assessment. Content is aligned with professional cleaning standards relevant to the Australian market."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Glass Cleaning Course",
+   "description": "Professional glass cleaning for restoration and cleaning technicians working after water damage events, construction and renovation works, and on routine commercial contracts. Covers site assessment and equipment preparation, glass cleaning chemistry and technique, a practical video demonstration reference, window track cleaning procedures, and a quiz to confirm knowledge retention.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "20",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
  "hvac-systems-and-indoor-air-quality-what-every-technician-should-know": {
   "slug": "hvac-systems-and-indoor-air-quality-what-every-technician-should-know",
   "seoTitle": "HVAC & Indoor Air Quality for Technicians | CARSI",
@@ -448,6 +821,106 @@
     "availability": "https://schema.org/InStock"
    },
    "coursePrerequisites": "None — open entry"
+  }
+ },
+ "infection-control-in-child-care": {
+  "slug": "infection-control-in-child-care",
+  "seoTitle": "Infection Control in Child Care Course Australia | CARSI",
+  "metaDescription": "Infection control for cleaners working in Australian childcare settings - the protocols and practical skills needed to meet National Quality Framework duties.",
+  "imageAlt": "CARSI course thumbnail: Infection Control in Child Care",
+  "og": {
+   "title": "Infection Control in Child Care | CARSI",
+   "description": "Childcare environments present unique infection control challenges. This course gives cleaning professionals the knowledge, protocols and practical skills to deliver compliant, effective infection control in childcare settings in Australia."
+  },
+  "keywords": [
+   "infection control childcare australia",
+   "childcare cleaning course",
+   "national quality framework cleaning",
+   "early learning centre cleaning training",
+   "childcare infection control protocols",
+   "cleaning compliance childcare"
+  ],
+  "faq": [
+   {
+    "q": "Why do childcare settings need their own infection control course?",
+    "a": "Childcare environments present unique challenges: young children have immature immune systems, engage in high-contact behaviour, and share toys and surfaces continuously. They are also legally protected by strict regulatory requirements under the National Quality Framework."
+   },
+   {
+    "q": "Who is this course for?",
+    "a": "Cleaning professionals who work in childcare settings in Australia and need to deliver infection control that is both compliant and effective."
+   },
+   {
+    "q": "What does the course provide?",
+    "a": "The specific knowledge, protocols and practical skills needed to deliver compliant, effective infection control in Australian childcare settings."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Infection Control in Child Care",
+   "description": "Childcare environments present unique infection control challenges - young children have immature immune systems, engage in high-contact behaviour, share toys and surfaces continuously, and are protected by strict regulatory requirements under the National Quality Framework. This course provides cleaning professionals with the knowledge, protocols and practical skills needed to deliver compliant, effective infection control in childcare settings in Australia.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "99",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "infectious-control-for-the-business-owner": {
+  "slug": "infectious-control-for-the-business-owner",
+  "seoTitle": "Infection Control for Cleaning Business Owners | CARSI",
+  "metaDescription": "Build and defend an infection control service offering - the science, legal obligations, WHS documentation, chemical management and ATP hygiene verification.",
+  "imageAlt": "CARSI course thumbnail: Infectious Control for the Business Owner",
+  "og": {
+   "title": "Infectious Control for the Business Owner | CARSI",
+   "description": "For owners and managers responsible for building, operating and defending an infection control service offering. Covers the science, the business and legal obligations, WHS documentation, chemical management, ATP hygiene verification and the operational frameworks behind a compliant service."
+  },
+  "keywords": [
+   "infection control business course",
+   "cleaning business compliance training",
+   "atp hygiene verification",
+   "whs documentation cleaning business",
+   "infection control service offering",
+   "commercial infection control services australia"
+  ],
+  "faq": [
+   {
+    "q": "Who is this course designed for?",
+    "a": "Business owners and managers in the cleaning and restoration industry who are responsible for building, operating and defending an infection control service offering."
+   },
+   {
+    "q": "What does the course cover?",
+    "a": "The science of infection control, the business and legal obligations, pre-job preparation, WHS documentation, chemical management, ATP hygiene verification, and the operational frameworks needed to deliver the service."
+   },
+   {
+    "q": "Which markets does it address?",
+    "a": "Australian commercial and residential markets, with the aim of delivering infection control services that are compliant, profitable and defensible."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Infectious Control for the Business Owner",
+   "description": "A course for business owners and managers in the cleaning and restoration industry who are responsible for building, operating and defending an infection control service offering. It covers the science of infection control, the business and legal obligations, pre-job preparation, WHS documentation, chemical management, ATP hygiene verification, and the operational frameworks needed to deliver compliant, profitable and defensible infection control services in Australian commercial and residential markets.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "275",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
   }
  },
  "introduction-to-air-quality-fundamentals": {
@@ -1411,7 +1884,2003 @@
     "sameAs": "https://carsi.com.au"
    },
    "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "49",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   },
    "coursePrerequisites": "None — open entry"
+  }
+ },
+ "asd-structural-drying-core": {
+  "slug": "asd-structural-drying-core",
+  "seoTitle": "Applied Structural Drying — Core Concepts | CARSI",
+  "metaDescription": "Deepen drying science for structural assemblies: monitoring, vapour pressure, and advanced equipment strategies.",
+  "imageAlt": "CARSI course: Applied Structural Drying — Core Concepts",
+  "og": {
+   "title": "Applied Structural Drying — Core Concepts | CARSI",
+   "description": "Deepen drying science for structural assemblies: monitoring, vapour pressure, and advanced equipment strategies."
+  },
+  "keywords": [
+   "structural drying core course",
+   "structural drying monitoring",
+   "vapour pressure drying",
+   "concealed assembly drying",
+   "advanced drying equipment"
+  ],
+  "faq": [
+   {
+    "q": "What does Applied Structural Drying — Core Concepts cover?",
+    "a": "Builds on water restoration fundamentals with a focus on structural drying, documentation rigour, and complex assemblies."
+   },
+   {
+    "q": "Which syllabus topics are listed for Applied Structural Drying — Core Concepts?",
+    "a": "Syllabus topics include Module 2 — Vapour pressure & drying forces; Module 3 — Cavities & concealed assemblies; Module 4 — Supplemental heat & conditioning; Module 5 — Hardwood & engineered flooring; Module 6 — Concrete & lightweight slab systems; Module 7 — Monitoring plans & KPIs."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Applied Structural Drying — Core Concepts",
+   "description": "Builds on water restoration fundamentals with a focus on structural drying, documentation rigour, and complex assemblies. Syllabus topics include Module 2 — Vapour pressure & drying forces; Module 3 — Cavities & concealed assemblies; Module 4 — Supplemental heat & conditioning; Module 5 — Hardwood & engineered flooring; Module 6 — Concrete & lightweight slab systems; Module 7 — Monitoring plans & KPIs.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "cct-commercial-carpet-core": {
+  "slug": "cct-commercial-carpet-core",
+  "seoTitle": "Commercial Carpet Care — Core Methods | CARSI",
+  "metaDescription": "Fibres, soil chemistry, machine methods, and maintenance planning for commercial textile flooring.",
+  "imageAlt": "CARSI course: Commercial Carpet Care — Core Methods",
+  "og": {
+   "title": "Commercial Carpet Care — Core Methods | CARSI",
+   "description": "Fibres, soil chemistry, machine methods, and maintenance planning for commercial textile flooring."
+  },
+  "keywords": [
+   "commercial carpet core course",
+   "commercial carpet maintenance",
+   "textile flooring cleaning",
+   "hot water carpet extraction",
+   "low-moisture carpet systems"
+  ],
+  "faq": [
+   {
+    "q": "What does Commercial Carpet Care — Core Methods cover?",
+    "a": "Practical commercial carpet maintenance aligned with professional cleaning expectations in education, retail, and strata settings."
+   },
+   {
+    "q": "Which syllabus topics are listed for Commercial Carpet Care — Core Methods?",
+    "a": "Syllabus topics include Module 1 — Fibre ID & construction; Module 2 — Soil types & traffic patterns; Module 3 — Pre-inspection & testing; Module 4 — Dry soil removal; Module 5 — Hot water extraction methods; Module 6 — Low-moisture & interim systems."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Commercial Carpet Care — Core Methods",
+   "description": "Practical commercial carpet maintenance aligned with professional cleaning expectations in education, retail, and strata settings. Syllabus topics include Module 1 — Fibre ID & construction; Module 2 — Soil types & traffic patterns; Module 3 — Pre-inspection & testing; Module 4 — Dry soil removal; Module 5 — Hot water extraction methods; Module 6 — Low-moisture & interim systems.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "fsrt-fire-smoke-restoration-core": {
+  "slug": "fsrt-fire-smoke-restoration-core",
+  "seoTitle": "Fire & Smoke Restoration — Core Principles | CARSI",
+  "metaDescription": "Safety on fire-affected sites, soot behaviour, cleaning chemistry, and deodorisation planning.",
+  "imageAlt": "CARSI course: Fire & Smoke Restoration — Core Principles",
+  "og": {
+   "title": "Fire & Smoke Restoration — Core Principles | CARSI",
+   "description": "Safety on fire-affected sites, soot behaviour, cleaning chemistry, and deodorisation planning."
+  },
+  "keywords": [
+   "fire smoke restoration core course",
+   "smoke residue cleaning",
+   "fire affected property restoration",
+   "odour restoration planning",
+   "contents and structure cleaning"
+  ],
+  "faq": [
+   {
+    "q": "What does Fire & Smoke Restoration — Core Principles cover?",
+    "a": "Foundational fire and smoke restoration concepts for technicians working on residential and commercial smoke-affected properties."
+   },
+   {
+    "q": "Which syllabus topics are listed for Fire & Smoke Restoration — Core Principles?",
+    "a": "Syllabus topics include Module 1 — Site safety & stabilisation; Module 2 — Smoke residue types; Module 3 — Surface cleaning mechanics; Module 4 — Contents vs structure workflow; Module 5 — Odour science overview; Module 6 — Equipment for air quality."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Fire & Smoke Restoration — Core Principles",
+   "description": "Foundational fire and smoke restoration concepts for technicians working on residential and commercial smoke-affected properties. Syllabus topics include Module 1 — Site safety & stabilisation; Module 2 — Smoke residue types; Module 3 — Surface cleaning mechanics; Module 4 — Contents vs structure workflow; Module 5 — Odour science overview; Module 6 — Equipment for air quality.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "insurance-adjusters-and-their-roles": {
+  "slug": "insurance-adjusters-and-their-roles",
+  "seoTitle": "Insurance Adjusters and Their Roles | CARSI",
+  "metaDescription": "Insurance Adjusters and Their Roles: This course explains who insurance adjusters are.",
+  "imageAlt": "CARSI course: Insurance Adjusters and Their Roles",
+  "og": {
+   "title": "Insurance Adjusters and Their Roles | CARSI",
+   "description": "Insurance Adjusters and Their Roles: This course explains who insurance adjusters are."
+  },
+  "keywords": [
+   "insurance adjuster restoration training",
+   "water damage claim documentation",
+   "restoration scope review",
+   "insurance claims communication",
+   "loss adjuster relationships"
+  ],
+  "faq": [
+   {
+    "q": "What does the Insurance Adjusters and Their Roles course cover?",
+    "a": "This course explains who insurance adjusters are, what their role is in the water damage restoration process, how restoration businesses interact with them professionally, and what documentation and communication practices support a productive working relationship."
+   },
+   {
+    "q": "What does the Insurance Adjusters and Their Roles course help learners understand?",
+    "a": "Understanding the adjuster's role and perspective allows restoration professionals to work more efficiently within the insurance process, reduce delays in claim authorisation, and build credibility with insurers as a preferred restoration provider. An insurance adjuster (also known as a loss adjuster or claims assessor) is a professional engaged by an insurance company to investigate, assess, and determine the appropriate settlement for an insurance claim."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Insurance Adjusters and Their Roles",
+   "description": "This course explains who insurance adjusters are, what their role is in the water damage restoration process, how restoration businesses interact with them professionally, and what documentation and communication practices support a productive working relationship. Understanding the adjuster's role and perspective allows restoration professionals to work more efficiently within the insurance process, reduce delays in claim authorisation, and build credibility with insurers as a preferred restoration provider.\n\nAn insurance adjuster (also known as a loss adjuster or claims assessor) is a professional engaged by an insurance company to investigate, assess, and determine the appropriate settlement for an insurance claim. In water damage restoration, the adjuster's role is to: confirm that the event is covered by the policy, assess the scope and quantum of the loss, review and authorise the proposed restoration scope and cost, and manage the claim to settlement.\n\nThere are three primary types of adjusters relevant to restoration professionals. Staff adjusters are employed directly by the insurance company and manage claims as part of their regular employment. Independent adjusters are engaged by insurance companies on a contract basis to handle specific claims — often used for claims requiring specialist assessment or for surge capacity after major weather events. Public adjusters are engaged by the policyholder (your client) rather than the insurer, to advocate for the policyholder's interests in the claim. Understanding which type of adjuster you are dealing with clarifies their obligations and loyalties within the claims process.\n\nThe first interaction with an adjuster on a water damage job is typically the scope review — the adjuster reviews your proposed restoration scope and cost estimate to determine whether it is reasonable and covered by the policy. A clearly written, well-documented scope with supporting moisture data, photographs, and IICRC-referenced methodology is far easier for an adjuster to approve than a poorly documented scope with vague descriptions and no supporting data.\n\nCommon reasons adjusters request revisions or additional information: scope items without adequate justification (why is this area included in the drying scope?), quantities without supporting measurements, product costs without line-item detail, labour rates without reference to the applicable award or schedule, and completion claims without documentation of dry standard achievement.\n\nThe restoration professional's documentation is the adjuster's primary evidence base for approving the claim. Comprehensive, accurate documentation — consistent with IICRC S500 methodology and Australian insurance documentation standards — reduces revision requests, speeds claim approval, and builds the adjuster's confidence in the restoration business as a reliable provider.\n\nSpecific documentation that adjusters require: initial inspection report with water category and class determination, moisture readings at initial assessment and at each monitoring visit, equipment deployment records (what equipment, deployed where, for how long), daily site attendance records, photographic evidence at each stage, and completion report with final moisture readings confirming dry standard achievement.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "introduction-to-advanced-applied-structural-drying": {
+  "slug": "introduction-to-advanced-applied-structural-drying",
+  "seoTitle": "Introduction to Advanced Applied Structural Drying | CARSI",
+  "metaDescription": "This course is designed for experienced technicians moving into advanced structural drying practice and project management.",
+  "imageAlt": "CARSI course: Introduction to Advanced Applied Structural Drying",
+  "og": {
+   "title": "Introduction to Advanced Applied Structural Drying | CARSI",
+   "description": "This course is designed for experienced technicians moving into advanced structural drying practice and project management."
+  },
+  "keywords": [
+   "advanced applied structural drying",
+   "psychrometric drying analysis",
+   "complex loss drying strategy",
+   "structural drying project management",
+   "drying completion verification"
+  ],
+  "faq": [
+   {
+    "q": "What does the Introduction to Advanced Applied Structural Drying course cover?",
+    "a": "It covers psychrometric analysis as a practical drying management tool, how to develop comprehensive drying strategies for complex losses, advanced moisture removal techniques, systematic progress monitoring, and the formal completion verification process required for complex and large loss restoration projects."
+   },
+   {
+    "q": "What does the Introduction to Advanced Applied Structural Drying course help learners understand?",
+    "a": "This course is designed for experienced technicians moving into advanced structural drying practice and project management."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Introduction to Advanced Applied Structural Drying",
+   "description": "This course is designed for experienced technicians moving into advanced structural drying practice and project management. It covers psychrometric analysis as a practical drying management tool, how to develop comprehensive drying strategies for complex losses, advanced moisture removal techniques, systematic progress monitoring, and the formal completion verification process required for complex and large loss restoration projects. Aligned with the IICRC S500 standard and Australian commercial restoration requirements.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "introduction-to-advanced-drying-equipment-and-methods": {
+  "slug": "introduction-to-advanced-drying-equipment-and-methods",
+  "seoTitle": "Introduction to Advanced Drying Equipment and Methods | CARSI",
+  "metaDescription": "Introduction to Advanced Drying Equipment and Methods: advanced drying equipment and methods used in complex structural drying projects.",
+  "imageAlt": "CARSI course: Introduction to Advanced Drying Equipment and Methods",
+  "og": {
+   "title": "Introduction to Advanced Drying Equipment and Methods | CARSI",
+   "description": "Introduction to Advanced Drying Equipment and Methods: advanced drying equipment and methods used in complex structural drying projects."
+  },
+  "keywords": [
+   "advanced drying equipment training",
+   "desiccant dehumidification systems",
+   "drying plant operation",
+   "air treatment technology",
+   "drying monitoring software"
+  ],
+  "faq": [
+   {
+    "q": "What does the Introduction to Advanced Drying Equipment and Methods course cover?",
+    "a": "This course covers the advanced drying equipment and methods used in complex structural drying projects, including desiccant dehumidification systems, the mechanical elements of drying plant, air treatment technologies, monitoring equipment, and software tools for drying project management."
+   },
+   {
+    "q": "What does the Introduction to Advanced Drying Equipment and Methods course help learners understand?",
+    "a": "It is designed for technicians who need to operate, select, and manage advanced equipment on commercial, large loss, and specialty drying projects."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Introduction to Advanced Drying Equipment and Methods",
+   "description": "This course covers the advanced drying equipment and methods used in complex structural drying projects, including desiccant dehumidification systems, the mechanical elements of drying plant, air treatment technologies, monitoring equipment, and software tools for drying project management. It is designed for technicians who need to operate, select, and manage advanced equipment on commercial, large loss, and specialty drying projects. Aligned with the IICRC S500 standard and Australian equipment safety requirements.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "29",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "introduction-to-advanced-structural-drying-concepts": {
+  "slug": "introduction-to-advanced-structural-drying-concepts",
+  "seoTitle": "Introduction to Advanced Structural Drying Concepts | CARSI",
+  "metaDescription": "This course addresses advanced structural drying concepts required for complex, large, and specialty restoration projects.",
+  "imageAlt": "CARSI course: Introduction to Advanced Structural Drying Concepts",
+  "og": {
+   "title": "Introduction to Advanced Structural Drying Concepts | CARSI",
+   "description": "This course addresses advanced structural drying concepts required for complex, large, and specialty restoration projects."
+  },
+  "keywords": [
+   "advanced structural drying concepts",
+   "advanced building science",
+   "controlled drying methods",
+   "complex drying verification",
+   "specialty restoration drying"
+  ],
+  "faq": [
+   {
+    "q": "What does the Introduction to Advanced Structural Drying Concepts course cover?",
+    "a": "This course addresses advanced structural drying concepts required for complex, large, and specialty restoration projects."
+   },
+   {
+    "q": "What does the Introduction to Advanced Structural Drying Concepts course help learners understand?",
+    "a": "It covers advanced building science as it applies to moisture behaviour, controlled drying methods at an advanced level, verification processes for complex completions, large loss project management, and specialist drying knowledge for non-standard materials and environments."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Introduction to Advanced Structural Drying Concepts",
+   "description": "This course addresses advanced structural drying concepts required for complex, large, and specialty restoration projects. It covers advanced building science as it applies to moisture behaviour, controlled drying methods at an advanced level, verification processes for complex completions, large loss project management, and specialist drying knowledge for non-standard materials and environments. Designed for experienced technicians seeking technical advancement toward project management and specialist roles.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "29",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "introduction-to-applied-microbial-remediation": {
+  "slug": "introduction-to-applied-microbial-remediation",
+  "seoTitle": "Introduction to Applied Microbial Remediation | CARSI",
+  "metaDescription": "Applied microbial remediation: identifying, containing and verifying microbial contamination in built environments.",
+  "imageAlt": "CARSI course: Introduction to Applied Microbial Remediation",
+  "og": {
+   "title": "Introduction to Applied Microbial Remediation | CARSI",
+   "description": "Applied microbial remediation: identifying, containing and verifying microbial contamination in built environments."
+  },
+  "keywords": [
+   "applied microbial remediation course",
+   "microbial contamination assessment",
+   "remediation containment planning",
+   "microbial outcome verification",
+   "built environment remediation"
+  ],
+  "faq": [
+   {
+    "q": "What does the Introduction to Applied Microbial Remediation course cover?",
+    "a": "This course provides restoration professionals with the practical framework to assess microbial amplification events, plan and execute compliant remediation, verify outcomes with measurable evidence, and meet the contractor standards required by insurers and regulatory bodies in Australia."
+   },
+   {
+    "q": "What does the Introduction to Applied Microbial Remediation course help learners understand?",
+    "a": "Applied microbial remediation is the systematic process of identifying, containing, removing, and verifying the elimination of microbial contamination in built environments."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Introduction to Applied Microbial Remediation",
+   "description": "Applied microbial remediation is the systematic process of identifying, containing, removing, and verifying the elimination of microbial contamination in built environments. This course provides restoration professionals with the practical framework to assess microbial amplification events, plan and execute compliant remediation, verify outcomes with measurable evidence, and meet the contractor standards required by insurers and regulatory bodies in Australia.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "29",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "introduction-to-applied-structural-drying": {
+  "slug": "introduction-to-applied-structural-drying",
+  "seoTitle": "Introduction to Applied Structural Drying | CARSI",
+  "metaDescription": "Introduction to Applied Structural Drying: This course moves from foundational concepts to applied practice.",
+  "imageAlt": "CARSI course: Introduction to Applied Structural Drying",
+  "og": {
+   "title": "Introduction to Applied Structural Drying | CARSI",
+   "description": "Introduction to Applied Structural Drying: This course moves from foundational concepts to applied practice."
+  },
+  "keywords": [
+   "applied structural drying course",
+   "structural assembly drying",
+   "drying equipment operation",
+   "material-specific drying techniques",
+   "drying monitoring records"
+  ],
+  "faq": [
+   {
+    "q": "What does the Introduction to Applied Structural Drying course cover?",
+    "a": "This course moves from foundational concepts to applied practice, equipping technicians to assess real building components affected by water damage, understand drying dynamics in structural assemblies, deploy and operate drying equipment correctly, apply specific drying techniques to different material types, and produce monitoring and documentation records that meet IICRC and insurance requirements."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Introduction to Applied Structural Drying",
+   "description": "This course moves from foundational concepts to applied practice, equipping technicians to assess real building components affected by water damage, understand drying dynamics in structural assemblies, deploy and operate drying equipment correctly, apply specific drying techniques to different material types, and produce monitoring and documentation records that meet IICRC and insurance requirements. Content is aligned with the IICRC S500 standard and Australian WHS legislation.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "29",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "introduction-to-asbestos-asbestos-awareness": {
+  "slug": "introduction-to-asbestos-asbestos-awareness",
+  "seoTitle": "Introduction to Asbestos: Asbestos Awareness | CARSI",
+  "metaDescription": "Asbestos awareness for cleaning and restoration professionals working safely in the Australian built environment.",
+  "imageAlt": "CARSI course: Introduction to Asbestos: Asbestos Awareness",
+  "og": {
+   "title": "Introduction to Asbestos: Asbestos Awareness | CARSI",
+   "description": "Asbestos awareness for cleaning and restoration professionals working safely in the Australian built environment."
+  },
+  "keywords": [
+   "introduction asbestos awareness",
+   "asbestos awareness training",
+   "asbestos-containing materials",
+   "asbestos site response",
+   "asbestos reporting obligations"
+  ],
+  "faq": [
+   {
+    "q": "What does the Introduction to Asbestos: Asbestos Awareness course cover?",
+    "a": "This course provides cleaning and restoration professionals with the essential asbestos awareness knowledge required to work safely in the Australian built environment."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Introduction to Asbestos: Asbestos Awareness",
+   "description": "This course provides cleaning and restoration professionals with the essential asbestos awareness knowledge required to work safely in the Australian built environment. Asbestos-containing materials (ACMs) are present in a significant proportion of Australian buildings constructed before 1990, and encountering them unexpectedly is a real occupational risk. This course does not qualify you to remove asbestos — it equips you to identify, avoid, report, and respond correctly when asbestos is encountered during routine work.\n\nTopics covered: the history and widespread use of asbestos in Australia, the health dangers and mechanisms of disease, types of asbestos-containing materials you may encounter on site, correct handling and avoidance protocols, what to do when ACMs are damaged or disturbed, documentation and reporting obligations, training and certification requirements, and the legal and regulatory framework.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "29",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "introduction-to-basic-carpet-cleaning-and-drying": {
+  "slug": "introduction-to-basic-carpet-cleaning-and-drying",
+  "seoTitle": "Introduction to Basic Carpet Cleaning and Drying | CARSI",
+  "metaDescription": "Welcome to Introduction to Basic Carpet Cleaning and Drying, a foundational course developed by CARSI — the Centre for Applied Restoration and Specialist Industries.",
+  "imageAlt": "CARSI course: Introduction to Basic Carpet Cleaning and Drying",
+  "og": {
+   "title": "Introduction to Basic Carpet Cleaning and Drying | CARSI",
+   "description": "Welcome to Introduction to Basic Carpet Cleaning and Drying, a foundational course developed by CARSI — the Centre for Applied Restoration and Specialist Industries."
+  },
+  "keywords": [
+   "Introduction to Basic Carpet Cleaning and Drying",
+   "introduction basic carpet cleaning and drying",
+   "introduction basic training",
+   "cleaning drying course"
+  ],
+  "faq": [
+   {
+    "q": "What does the Introduction to Basic Carpet Cleaning and Drying course cover?",
+    "a": "Across five modules, this course takes you through the complete carpet cleaning and drying process from first principles."
+   },
+   {
+    "q": "What does the Introduction to Basic Carpet Cleaning and Drying course help learners understand?",
+    "a": "This course is designed specifically for technicians entering the carpet cleaning and restoration industry in Australia, and for those already working in the field who wish to consolidate and formalise their practical knowledge. Carpet cleaning is far more than running a machine across a floor."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Introduction to Basic Carpet Cleaning and Drying",
+   "description": "Welcome to Introduction to Basic Carpet Cleaning and Drying, a foundational course developed by CARSI — the Centre for Applied Restoration and Specialist Industries. This course is designed specifically for technicians entering the carpet cleaning and restoration industry in Australia, and for those already working in the field who wish to consolidate and formalise their practical knowledge.\n\nCarpet cleaning is far more than running a machine across a floor. It is a technical discipline that requires a thorough understanding of how carpets are constructed, how different fibre types respond to moisture and chemical treatments, how water damage affects floor coverings at a structural level, what equipment is appropriate for each job, and how to dry carpets effectively and safely once cleaning is complete. It also incorporates guidance from Safe Work Australia, relevant Australian Standards, and accepted best practice across the restoration industry in Australia.\n\nThis course suits a wide range of learners, including:\n• New technicians entering the carpet cleaning or restoration industry\n• Sole traders and small business owners looking to formalise their skills\n• Water damage restoration technicians who work with wet or damaged carpet\n• Cleaning staff working in commercial, residential, or institutional environments\n• Business owners seeking to ensure their team operates to a professional standard\n\nAcross five modules, this course takes you through the complete carpet cleaning and drying process from first principles. By the time you complete this course, you will have a solid working knowledge of:\n• How carpets are constructed and why construction type matters for cleaning\n• The effects of water damage on carpet, underlay, and subfloor\n• The equipment used in professional carpet cleaning and how to use it correctly\n• Cleaning products, their chemistry, and how to select and apply them safely\n• Drying techniques and how to achieve effective, efficient drying outcomes",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "29",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "introduction-to-consulting-for-complex-water-losses": {
+  "slug": "introduction-to-consulting-for-complex-water-losses",
+  "seoTitle": "Introduction to Consulting for Complex Water Losses | CARSI",
+  "metaDescription": "Complex water losses require advanced skills to assess, plan, resource, coordinate and document restoration events.",
+  "imageAlt": "CARSI course: Introduction to Consulting for Complex Water Losses",
+  "og": {
+   "title": "Introduction to Consulting for Complex Water Losses | CARSI",
+   "description": "Complex water losses require advanced skills to assess, plan, resource, coordinate and document restoration events."
+  },
+  "keywords": [
+   "complex water losses course",
+   "large loss restoration consulting",
+   "strategic drying plans",
+   "multi-trade restoration coordination",
+   "complex loss documentation"
+  ],
+  "faq": [
+   {
+    "q": "What does the Introduction to Consulting for Complex Water Losses course cover?",
+    "a": "Complex water losses — large commercial events, multi-tenancy building floods, heritage buildings, infrastructure failures affecting multiple properties — require a consulting capability that goes beyond field restoration skills."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Introduction to Consulting for Complex Water Losses",
+   "description": "Complex water losses — large commercial events, multi-tenancy building floods, heritage buildings, infrastructure failures affecting multiple properties — require a consulting capability that goes beyond field restoration skills.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "29",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "introduction-to-controlled-environment-drying-methods": {
+  "slug": "introduction-to-controlled-environment-drying-methods",
+  "seoTitle": "Introduction to Controlled Environment Drying Methods | CARSI",
+  "metaDescription": "Introduction to Controlled Environment Drying Methods: controlled environment approach to structural drying.",
+  "imageAlt": "CARSI course: Introduction to Controlled Environment Drying Methods",
+  "og": {
+   "title": "Introduction to Controlled Environment Drying Methods | CARSI",
+   "description": "Introduction to Controlled Environment Drying Methods: controlled environment approach to structural drying."
+  },
+  "keywords": [
+   "Introduction to Controlled Environment Drying Methods",
+   "introduction controlled environment drying methods",
+   "introduction controlled training",
+   "drying methods course"
+  ],
+  "faq": [
+   {
+    "q": "What does the Introduction to Controlled Environment Drying Methods course cover?",
+    "a": "This course covers the controlled environment approach to structural drying — where physical containment, managed airflow, controlled energy input, and systematic monitoring are combined to create a drying zone that is isolated from uncontrolled external conditions and managed to maximise drying efficiency."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Introduction to Controlled Environment Drying Methods",
+   "description": "This course covers the controlled environment approach to structural drying — where physical containment, managed airflow, controlled energy input, and systematic monitoring are combined to create a drying zone that is isolated from uncontrolled external conditions and managed to maximise drying efficiency. Used in complex residential losses, commercial restoration, specialty environments, and situations where contamination control is required alongside drying.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "29",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "introduction-to-creating-a-clean-air-environment": {
+  "slug": "introduction-to-creating-a-clean-air-environment",
+  "seoTitle": "Introduction to Creating a Clean Air Environment | CARSI",
+  "metaDescription": "Clean air environments: final clearance assessments, air quality testing and client communication.",
+  "imageAlt": "CARSI course: Introduction to Creating a Clean Air Environment",
+  "og": {
+   "title": "Introduction to Creating a Clean Air Environment | CARSI",
+   "description": "Clean air environments: final clearance assessments, air quality testing and client communication."
+  },
+  "keywords": [
+   "Introduction to Creating a Clean Air Environment",
+   "introduction creating clean air environment",
+   "introduction creating training",
+   "air environment course"
+  ],
+  "faq": [
+   {
+    "q": "What does the Introduction to Creating a Clean Air Environment course cover?",
+    "a": "This course equips restoration professionals with the practical skills and documentation standards required to deliver a verifiable clean air environment at project completion."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Introduction to Creating a Clean Air Environment",
+   "description": "This course equips restoration professionals with the practical skills and documentation standards required to deliver a verifiable clean air environment at project completion. Participants will learn how to conduct final clearance assessments, use air quality testing equipment, perform visual inspections, and communicate results to clients — all aligned with IICRC standards and Australian compliance requirements.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "29",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "introduction-to-digital-moisture-mapping": {
+  "slug": "introduction-to-digital-moisture-mapping",
+  "seoTitle": "Introduction to Digital Moisture Mapping | CARSI",
+  "metaDescription": "Digital moisture mapping transforms individual moisture meter readings into a structured, spatial record of moisture distribution across an entire job site.",
+  "imageAlt": "CARSI course: Introduction to Digital Moisture Mapping",
+  "og": {
+   "title": "Introduction to Digital Moisture Mapping | CARSI",
+   "description": "Digital moisture mapping transforms individual moisture meter readings into a structured, spatial record of moisture distribution across an entire job site."
+  },
+  "keywords": [
+   "Introduction to Digital Moisture Mapping",
+   "introduction digital moisture mapping",
+   "introduction digital training",
+   "moisture mapping course"
+  ],
+  "faq": [
+   {
+    "q": "What does the Introduction to Digital Moisture Mapping course cover?",
+    "a": "This course covers the systematic collection of moisture data in the field, the use of data management software to organise and store that data, the analysis of moisture distribution patterns to guide drying decisions, the generation of professional reports for insurance and client communication, and the optimisation of the overall drying process using digital moisture map data."
+   },
+   {
+    "q": "What is the focus of the Introduction to Digital Moisture Mapping course?",
+    "a": "Digital moisture mapping transforms individual moisture meter readings into a structured, spatial record of moisture distribution across an entire job site."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Introduction to Digital Moisture Mapping",
+   "description": "Digital moisture mapping transforms individual moisture meter readings into a structured, spatial record of moisture distribution across an entire job site. This course covers the systematic collection of moisture data in the field, the use of data management software to organise and store that data, the analysis of moisture distribution patterns to guide drying decisions, the generation of professional reports for insurance and client communication, and the optimisation of the overall drying process using digital moisture map data. All content is aligned with IICRC S500 Applied Structural Drying documentation requirements and the expectations of Australian insurers for drying project records.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "29",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "introduction-to-forensic-investigations-for-water-losses": {
+  "slug": "introduction-to-forensic-investigations-for-water-losses",
+  "seoTitle": "Introduction to Forensic Investigations for Water Losses | CARSI",
+  "metaDescription": "Forensic water loss investigations: causes, spread, remediation adequacy and evidence.",
+  "imageAlt": "CARSI course: Introduction to Forensic Investigations for Water Losses",
+  "og": {
+   "title": "Introduction to Forensic Investigations for Water Losses | CARSI",
+   "description": "Forensic water loss investigations: causes, spread, remediation adequacy and evidence."
+  },
+  "keywords": [
+   "forensic water loss investigations",
+   "water damage failure analysis",
+   "restoration evidence gathering",
+   "water loss expert findings",
+   "forensic remediation review"
+  ],
+  "faq": [
+   {
+    "q": "What does the Introduction to Forensic Investigations for Water Losses course cover?",
+    "a": "This course equips restoration professionals with a systematic forensic methodology, evidence-gathering techniques, failure analysis skills, the ability to present findings professionally, and an understanding of how to establish the financial cost of a loss.\n\nTopics covered: the circumstances that trigger forensic investigations, forensic investigation methods, failure analysis of building systems and materials, presenting findings to insurers and legal representatives, and establishing the total cost of loss.\n\nStandards applied: IICRC S500, relevant Australian Standard AS 4349 series (inspection of buildings), state civil procedure rules for expert evidence."
+   },
+   {
+    "q": "What is the focus of the Introduction to Forensic Investigations for Water Losses course?",
+    "a": "Forensic water damage investigations are conducted to answer specific factual questions about a water loss: what caused it, when it started, how far it spread, and whether the remediation was adequate."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Introduction to Forensic Investigations for Water Losses",
+   "description": "Forensic water damage investigations are conducted to answer specific factual questions about a water loss: what caused it, when it started, how far it spread, and whether the remediation was adequate. This course equips restoration professionals with a systematic forensic methodology, evidence-gathering techniques, failure analysis skills, the ability to present findings professionally, and an understanding of how to establish the financial cost of a loss.\n\nTopics covered: the circumstances that trigger forensic investigations, forensic investigation methods, failure analysis of building systems and materials, presenting findings to insurers and legal representatives, and establishing the total cost of loss.\n\nStandards applied: IICRC S500, relevant Australian Standard AS 4349 series (inspection of buildings), state civil procedure rules for expert evidence.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "29",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "introduction-to-iaq-and-mould": {
+  "slug": "introduction-to-iaq-and-mould",
+  "seoTitle": "Introduction to IAQ and Mould | CARSI",
+  "metaDescription": "Introduction to IAQ and Mould: how mould affects indoor air quality (IAQ).",
+  "imageAlt": "CARSI course: Introduction to IAQ and Mould",
+  "og": {
+   "title": "Introduction to IAQ and Mould | CARSI",
+   "description": "Introduction to IAQ and Mould: how mould affects indoor air quality (IAQ)."
+  },
+  "keywords": [
+   "Introduction to IAQ and Mould",
+   "introduction iaq and mould",
+   "introduction iaq training",
+   "iaq mould course"
+  ],
+  "faq": [
+   {
+    "q": "What does the Introduction to IAQ and Mould course cover?",
+    "a": "This course provides restoration professionals with a working knowledge of how mould affects indoor air quality (IAQ), how airborne mould spreads, and how to contain and remediate it in accordance with IICRC S520 and Australian workplace health standards."
+   },
+   {
+    "q": "What does the Introduction to IAQ and Mould course help learners understand?",
+    "a": "Participants will leave with practical skills in containment, air management, and post-remediation monitoring."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Introduction to IAQ and Mould",
+   "description": "This course provides restoration professionals with a working knowledge of how mould affects indoor air quality (IAQ), how airborne mould spreads, and how to contain and remediate it in accordance with IICRC S520 and Australian workplace health standards. Participants will leave with practical skills in containment, air management, and post-remediation monitoring.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "29",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "introduction-to-monitoring-air-quality-on-the-job-site": {
+  "slug": "introduction-to-monitoring-air-quality-on-the-job-site",
+  "seoTitle": "Introduction to Monitoring Air Quality on the Job Site | CARSI",
+  "metaDescription": "This course develops practical, on-site air quality monitoring skills for restoration technicians.",
+  "imageAlt": "CARSI course: Introduction to Monitoring Air Quality on the Job Site",
+  "og": {
+   "title": "Introduction to Monitoring Air Quality on the Job Site | CARSI",
+   "description": "This course develops practical, on-site air quality monitoring skills for restoration technicians."
+  },
+  "keywords": [
+   "Introduction to Monitoring Air Quality on the Job Site",
+   "introduction monitoring air quality the job site",
+   "introduction monitoring training",
+   "job site course"
+  ],
+  "faq": [
+   {
+    "q": "What does the Introduction to Monitoring Air Quality on the Job Site course cover?",
+    "a": "This course develops practical, on-site air quality monitoring skills for restoration technicians."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Introduction to Monitoring Air Quality on the Job Site",
+   "description": "This course develops practical, on-site air quality monitoring skills for restoration technicians. Participants will learn how to identify airborne contaminants, select and operate monitoring equipment, apply safety protocols, and produce compliant field documentation — all within Australian workplace health and safety (WHS) requirements and IICRC best practices.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "29",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "introduction-to-odour-control-and-removal-techniques": {
+  "slug": "introduction-to-odour-control-and-removal-techniques",
+  "seoTitle": "Introduction to Odour Control and Removal Techniques | CARSI",
+  "metaDescription": "Odour control and removal: identify, assess, contain and eliminate odour in residential and commercial environments.",
+  "imageAlt": "CARSI course: Introduction to Odour Control and Removal Techniques",
+  "og": {
+   "title": "Introduction to Odour Control and Removal Techniques | CARSI",
+   "description": "Odour control and removal: identify, assess, contain and eliminate odour in residential and commercial environments."
+  },
+  "keywords": [
+   "Introduction to Odour Control and Removal Techniques",
+   "introduction odour control and removal techniques",
+   "introduction odour training",
+   "removal techniques course"
+  ],
+  "faq": [
+   {
+    "q": "What does the Introduction to Odour Control and Removal Techniques course cover?",
+    "a": "This course provides restoration and cleaning professionals with the practical knowledge to identify, assess, contain, and eliminate odour in residential and commercial environments."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Introduction to Odour Control and Removal Techniques",
+   "description": "This course provides restoration and cleaning professionals with the practical knowledge to identify, assess, contain, and eliminate odour in residential and commercial environments. The focus throughout is on source elimination, not odour masking.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "29",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "introduction-to-project-management-for-water-losses": {
+  "slug": "introduction-to-project-management-for-water-losses",
+  "seoTitle": "Introduction to Project Management for Water Losses | CARSI",
+  "metaDescription": "A water damage project that is managed well produces an accurate scope, efficient execution, minimal callbacks, satisfied clients and insurers, and a profitable job.",
+  "imageAlt": "CARSI course: Introduction to Project Management for Water Losses",
+  "og": {
+   "title": "Introduction to Project Management for Water Losses | CARSI",
+   "description": "A water damage project that is managed well produces an accurate scope, efficient execution, minimal callbacks, satisfied clients and insurers, and a profitable job."
+  },
+  "keywords": [
+   "water loss project management",
+   "restoration project planning",
+   "water damage job monitoring",
+   "restoration project closeout",
+   "water loss risk management"
+  ],
+  "faq": [
+   {
+    "q": "What does the Introduction to Project Management for Water Losses course cover?",
+    "a": "Project management in water damage restoration is the application of structured processes — not bureaucracy — to ensure that the right things happen in the right order, by the right people, on time.\n\nTopics covered: initial response procedures that set the job up for success, project planning for water damage restoration, execution management and daily monitoring, professional project closeout, and risk management throughout the project lifecycle.\n\nStandards applied: IICRC S500, Safe Work Australia Model WHS Act, Australian insurance claims management requirements."
+   },
+   {
+    "q": "What is the focus of the Introduction to Project Management for Water Losses course?",
+    "a": "A water damage project that is managed well produces an accurate scope, efficient execution, minimal callbacks, satisfied clients and insurers, and a profitable job."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Introduction to Project Management for Water Losses",
+   "description": "A water damage project that is managed well produces an accurate scope, efficient execution, minimal callbacks, satisfied clients and insurers, and a profitable job. A project that is managed poorly produces the opposite of all of these. Project management in water damage restoration is the application of structured processes — not bureaucracy — to ensure that the right things happen in the right order, by the right people, on time.\n\nTopics covered: initial response procedures that set the job up for success, project planning for water damage restoration, execution management and daily monitoring, professional project closeout, and risk management throughout the project lifecycle.\n\nStandards applied: IICRC S500, Safe Work Australia Model WHS Act, Australian insurance claims management requirements.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "29",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "introduction-to-psychrometry-science-and-calculations": {
+  "slug": "introduction-to-psychrometry-science-and-calculations",
+  "seoTitle": "Introduction to Psychrometry Science and Calculations | CARSI",
+  "metaDescription": "Psychrometrics is the science of the physical and thermodynamic properties of moist air.",
+  "imageAlt": "CARSI course: Introduction to Psychrometry Science and Calculations",
+  "og": {
+   "title": "Introduction to Psychrometry Science and Calculations | CARSI",
+   "description": "Psychrometrics is the science of the physical and thermodynamic properties of moist air."
+  },
+  "keywords": [
+   "Introduction to Psychrometry Science and Calculations",
+   "introduction psychrometry science and calculations",
+   "introduction psychrometry training",
+   "science calculations course"
+  ],
+  "faq": [
+   {
+    "q": "What does the Introduction to Psychrometry Science and Calculations course cover?",
+    "a": "For restoration professionals, it provides the analytical framework for every structural drying decision — from equipment selection and placement to monitoring drying progress and determining when drying is complete."
+   },
+   {
+    "q": "What is the focus of the Introduction to Psychrometry Science and Calculations course?",
+    "a": "Psychrometrics is the science of the physical and thermodynamic properties of moist air."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Introduction to Psychrometry Science and Calculations",
+   "description": "Psychrometrics is the science of the physical and thermodynamic properties of moist air. For restoration professionals, it provides the analytical framework for every structural drying decision — from equipment selection and placement to monitoring drying progress and determining when drying is complete.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "29",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "introduction-to-safety-procedures-for-water-damage-work": {
+  "slug": "introduction-to-safety-procedures-for-water-damage-work",
+  "seoTitle": "Introduction to Safety Procedures for Water Damage Work | CARSI",
+  "metaDescription": "Water damage restoration creates overlapping hazards that require structured safety procedures.",
+  "imageAlt": "CARSI course: Introduction to Safety Procedures for Water Damage Work",
+  "og": {
+   "title": "Introduction to Safety Procedures for Water Damage Work | CARSI",
+   "description": "Water damage restoration creates overlapping hazards that require structured safety procedures."
+  },
+  "keywords": [
+   "Introduction to Safety Procedures for Water Damage Work",
+   "introduction safety procedures for water damage work",
+   "introduction safety training",
+   "damage work course"
+  ],
+  "faq": [
+   {
+    "q": "What does the Introduction to Safety Procedures for Water Damage Work course cover?",
+    "a": "This course provides technicians with the practical protocols to assess hazards, select PPE, control exposures, and manage equipment safely in every water damage scenario."
+   },
+   {
+    "q": "What is the focus of the Introduction to Safety Procedures for Water Damage Work course?",
+    "a": "Water damage restoration creates a unique combination of overlapping hazards — electrical, biological, chemical, physical, and ergonomic — that can escalate rapidly if not managed with structured safety procedures."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Introduction to Safety Procedures for Water Damage Work",
+   "description": "Water damage restoration creates a unique combination of overlapping hazards — electrical, biological, chemical, physical, and ergonomic — that can escalate rapidly if not managed with structured safety procedures. This course provides technicians with the practical protocols to assess hazards, select PPE, control exposures, and manage equipment safely in every water damage scenario.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "29",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "introduction-to-smoke-and-soot-damage-restoration": {
+  "slug": "introduction-to-smoke-and-soot-damage-restoration",
+  "seoTitle": "Introduction to Smoke and Soot Damage Restoration | CARSI",
+  "metaDescription": "Smoke and soot restoration: assessing, containing and cleaning fire-affected properties.",
+  "imageAlt": "CARSI course: Introduction to Smoke and Soot Damage Restoration",
+  "og": {
+   "title": "Introduction to Smoke and Soot Damage Restoration | CARSI",
+   "description": "Smoke and soot restoration: assessing, containing and cleaning fire-affected properties."
+  },
+  "keywords": [
+   "Introduction to Smoke and Soot Damage Restoration",
+   "introduction smoke and soot damage restoration",
+   "introduction smoke training",
+   "damage restoration course"
+  ],
+  "faq": [
+   {
+    "q": "What does the Introduction to Smoke and Soot Damage Restoration course cover?",
+    "a": "This course equips restoration professionals with the knowledge to assess, contain, and remediate fire, smoke, and soot damage in residential and commercial buildings."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Introduction to Smoke and Soot Damage Restoration",
+   "description": "This course equips restoration professionals with the knowledge to assess, contain, and remediate fire, smoke, and soot damage in residential and commercial buildings. It covers the chemistry of fire dynamics, systematic damage assessment methodology, the behaviour of smoke particulates in structures, the challenges of cleaning smoke-affected surfaces and contents, and odour control methods specific to fire events. Content is grounded in IICRC S700 standards and Australian safety and environmental compliance requirements.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "29",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "introduction-to-structural-drying-concepts": {
+  "slug": "introduction-to-structural-drying-concepts",
+  "seoTitle": "Introduction to Structural Drying Concepts | CARSI",
+  "metaDescription": "This course introduces water damage restoration technicians to the foundational concepts that underpin all structural drying work.",
+  "imageAlt": "CARSI course: Introduction to Structural Drying Concepts",
+  "og": {
+   "title": "Introduction to Structural Drying Concepts | CARSI",
+   "description": "This course introduces water damage restoration technicians to the foundational concepts that underpin all structural drying work."
+  },
+  "keywords": [
+   "Introduction to Structural Drying Concepts",
+   "introduction structural drying concepts",
+   "introduction structural training",
+   "drying concepts course"
+  ],
+  "faq": [
+   {
+    "q": "What does the Introduction to Structural Drying Concepts course cover?",
+    "a": "It covers the science of how buildings respond to moisture, how drying dynamics operate in real structures, how to monitor drying progress accurately, what equipment systems are available and how they work together, and what standards define successful completion."
+   },
+   {
+    "q": "What is the focus of the Introduction to Structural Drying Concepts course?",
+    "a": "This course introduces water damage restoration technicians to the foundational concepts that underpin all structural drying work."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Introduction to Structural Drying Concepts",
+   "description": "This course introduces water damage restoration technicians to the foundational concepts that underpin all structural drying work. It covers the science of how buildings respond to moisture, how drying dynamics operate in real structures, how to monitor drying progress accurately, what equipment systems are available and how they work together, and what standards define successful completion. Every module is directly applicable to job site decision-making. Content is aligned with the IICRC S500 Standard for Professional Water Damage Restoration and Australian WHS requirements.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "29",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "introduction-to-using-personal-protective-equipment": {
+  "slug": "introduction-to-using-personal-protective-equipment",
+  "seoTitle": "Introduction to Using Personal Protective Equipment | CARSI",
+  "metaDescription": "This course provides cleaning and restoration professionals with practical working knowledge of the personal protective equipment (PPE) used in their daily roles.",
+  "imageAlt": "CARSI course: Introduction to Using Personal Protective Equipment",
+  "og": {
+   "title": "Introduction to Using Personal Protective Equipment | CARSI",
+   "description": "This course provides cleaning and restoration professionals with practical working knowledge of the personal protective equipment (PPE) used in their daily roles."
+  },
+  "keywords": [
+   "Introduction to Using Personal Protective Equipment",
+   "introduction using personal protective equipment",
+   "introduction using training",
+   "protective equipment course"
+  ],
+  "faq": [
+   {
+    "q": "What does the Introduction to Using Personal Protective Equipment course cover?",
+    "a": "This course provides cleaning and restoration professionals with practical working knowledge of the personal protective equipment (PPE) used in their daily roles."
+   },
+   {
+    "q": "What does the Introduction to Using Personal Protective Equipment course help learners understand?",
+    "a": "PPE is the last line of defence in the hierarchy of controls — understanding its correct use is a WHS obligation, not just a best practice.\n\nTopics covered: respiratory protection selection, fit-checking, and correct use; eye and face protection types and applications; head protection in restoration environments; hearing protection selection and correct fitting; and body protection including gloves, coveralls, and chemical-resistant clothing."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Introduction to Using Personal Protective Equipment",
+   "description": "This course provides cleaning and restoration professionals with practical working knowledge of the personal protective equipment (PPE) used in their daily roles. You will learn to select the right PPE for specific hazards, wear it correctly, maintain it in serviceable condition, and understand its limitations. PPE is the last line of defence in the hierarchy of controls — understanding its correct use is a WHS obligation, not just a best practice.\n\nTopics covered: respiratory protection selection, fit-checking, and correct use; eye and face protection types and applications; head protection in restoration environments; hearing protection selection and correct fitting; and body protection including gloves, coveralls, and chemical-resistant clothing.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "29",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "introduction-to-water-damage-estimating": {
+  "slug": "introduction-to-water-damage-estimating",
+  "seoTitle": "Introduction to Water Damage Estimating | CARSI",
+  "metaDescription": "An accurate, defensible estimate is the foundation of a profitable water damage job.",
+  "imageAlt": "CARSI course: Introduction to Water Damage Estimating",
+  "og": {
+   "title": "Introduction to Water Damage Estimating | CARSI",
+   "description": "An accurate, defensible estimate is the foundation of a profitable water damage job."
+  },
+  "keywords": [
+   "water damage estimating training",
+   "restoration scope development",
+   "insurance estimating",
+   "water loss bid analysis",
+   "defensible restoration estimates"
+  ],
+  "faq": [
+   {
+    "q": "What does the Introduction to Water Damage Estimating course cover?",
+    "a": "This course builds the estimation skills that translate inspection findings into accurate scopes and fair, defensible pricing.\n\nTopics covered: systematic site assessment as the foundation of estimation, scope development methodology, material and labour quantification, insurance estimating requirements and platforms, and bid analysis for commercial and competitive tender situations.\n\nStandards applied: IICRC S500, Australian insurance industry estimating standards, relevant state contractor licensing requirements."
+   },
+   {
+    "q": "What is the focus of the Introduction to Water Damage Estimating course?",
+    "a": "An accurate, defensible estimate is the foundation of a profitable water damage job."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Introduction to Water Damage Estimating",
+   "description": "An accurate, defensible estimate is the foundation of a profitable water damage job. Estimating errors — missed items, incorrect quantities, wrong unit rates — produce jobs that lose money, create disputes with insurers, or overcharge clients. This course builds the estimation skills that translate inspection findings into accurate scopes and fair, defensible pricing.\n\nTopics covered: systematic site assessment as the foundation of estimation, scope development methodology, material and labour quantification, insurance estimating requirements and platforms, and bid analysis for commercial and competitive tender situations.\n\nStandards applied: IICRC S500, Australian insurance industry estimating standards, relevant state contractor licensing requirements.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "29",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "introduction-to-water-damage-in-commercial-buildings": {
+  "slug": "introduction-to-water-damage-in-commercial-buildings",
+  "seoTitle": "Introduction to Water Damage in Commercial Buildings | CARSI",
+  "metaDescription": "Introduction to Water Damage in Commercial Buildings: Commercial water damage events differ from residential losses in scale.",
+  "imageAlt": "CARSI course: Introduction to Water Damage in Commercial Buildings",
+  "og": {
+   "title": "Introduction to Water Damage in Commercial Buildings | CARSI",
+   "description": "Introduction to Water Damage in Commercial Buildings: Commercial water damage events differ from residential losses in scale."
+  },
+  "keywords": [
+   "commercial water damage training",
+   "commercial building water loss",
+   "business interruption restoration",
+   "commercial drying strategy",
+   "commercial restoration planning"
+  ],
+  "faq": [
+   {
+    "q": "What does the Introduction to Water Damage in Commercial Buildings course cover?",
+    "a": "A restoration professional who understands the specific characteristics of commercial water damage is better equipped to assess, scope, and manage these high-value, high-complexity jobs to a successful outcome.\n\nTopics covered: common causes of water damage in commercial buildings, major building system vulnerabilities, the business and financial impacts of commercial water losses, drying strategy considerations specific to commercial environments, and reconstruction and reinstatement factors.\n\nStandards applied: IICRC S500, Building Code of Australia (BCA/NCC), Safe Work Australia Model WHS Regulations, relevant state commercial tenancy legislation."
+   },
+   {
+    "q": "What is the focus of the Introduction to Water Damage in Commercial Buildings course?",
+    "a": "Commercial water damage events differ from residential losses in scale, complexity, stakeholder management requirements, business interruption impact, and regulatory compliance obligations."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Introduction to Water Damage in Commercial Buildings",
+   "description": "Commercial water damage events differ from residential losses in scale, complexity, stakeholder management requirements, business interruption impact, and regulatory compliance obligations. A restoration professional who understands the specific characteristics of commercial water damage is better equipped to assess, scope, and manage these high-value, high-complexity jobs to a successful outcome.\n\nTopics covered: common causes of water damage in commercial buildings, major building system vulnerabilities, the business and financial impacts of commercial water losses, drying strategy considerations specific to commercial environments, and reconstruction and reinstatement factors.\n\nStandards applied: IICRC S500, Building Code of Australia (BCA/NCC), Safe Work Australia Model WHS Regulations, relevant state commercial tenancy legislation.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "29",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "introduction-to-water-damage-marketing-and-sales": {
+  "slug": "introduction-to-water-damage-marketing-and-sales",
+  "seoTitle": "Introduction to Water Damage Marketing and Sales | CARSI",
+  "metaDescription": "This course covers the specific marketing and sales skills required to grow a water damage restoration business in Australia.",
+  "imageAlt": "CARSI course: Introduction to Water Damage Marketing and Sales",
+  "og": {
+   "title": "Introduction to Water Damage Marketing and Sales | CARSI",
+   "description": "This course covers the specific marketing and sales skills required to grow a water damage restoration business in Australia."
+  },
+  "keywords": [
+   "water damage sales training",
+   "restoration business marketing",
+   "emergency restoration leads",
+   "restoration referral networks",
+   "consultative restoration sales"
+  ],
+  "faq": [
+   {
+    "q": "What does the Introduction to Water Damage Marketing and Sales course cover?",
+    "a": "This course covers the specific marketing and sales skills required to grow a water damage restoration business in Australia."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Introduction to Water Damage Marketing and Sales",
+   "description": "This course covers the specific marketing and sales skills required to grow a water damage restoration business in Australia. Unlike general marketing courses, every module is tailored to the unique dynamics of restoration work — emergency response, insurance involvement, referral networks, and professional credibility. You will learn to generate leads, close jobs consultatively, deliver exceptional client service, expand your market, and use certification to differentiate your business.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "29",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "introduction-to-water-damage-principles": {
+  "slug": "introduction-to-water-damage-principles",
+  "seoTitle": "Introduction to Water Damage Principles | CARSI",
+  "metaDescription": "This course establishes the foundational principles that underpin professional water damage restoration practice.",
+  "imageAlt": "CARSI course: Introduction to Water Damage Principles",
+  "og": {
+   "title": "Introduction to Water Damage Principles | CARSI",
+   "description": "This course establishes the foundational principles that underpin professional water damage restoration practice."
+  },
+  "keywords": [
+   "water damage principles training",
+   "moisture behaviour",
+   "structural drying psychrometrics",
+   "microbial risk recognition",
+   "water damage assessment"
+  ],
+  "faq": [
+   {
+    "q": "What does the Introduction to Water Damage Principles course cover?",
+    "a": "Understanding the science behind moisture behaviour, psychrometrics, microbial risk, and damage assessment allows restoration professionals to make informed decisions on site rather than applying fixed procedures that may not suit the specific conditions of each job.\n\nTopics covered: health and safety as the non-negotiable foundation of all restoration work, remediation principles and decision-making frameworks, applied psychrometrics for structural drying, microbial risk recognition and management, and systematic damage assessment.\n\nStandards applied: IICRC S500, IICRC S520, Safe Work Australia Model WHS Regulations."
+   },
+   {
+    "q": "What does the Introduction to Water Damage Principles course help learners understand?",
+    "a": "This course establishes the foundational principles that underpin professional water damage restoration practice."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Introduction to Water Damage Principles",
+   "description": "This course establishes the foundational principles that underpin professional water damage restoration practice. Understanding the science behind moisture behaviour, psychrometrics, microbial risk, and damage assessment allows restoration professionals to make informed decisions on site rather than applying fixed procedures that may not suit the specific conditions of each job.\n\nTopics covered: health and safety as the non-negotiable foundation of all restoration work, remediation principles and decision-making frameworks, applied psychrometrics for structural drying, microbial risk recognition and management, and systematic damage assessment.\n\nStandards applied: IICRC S500, IICRC S520, Safe Work Australia Model WHS Regulations.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "29",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "introduction-to-water-damage-restoration": {
+  "slug": "introduction-to-water-damage-restoration",
+  "seoTitle": "Introduction to Water Damage Restoration | CARSI",
+  "metaDescription": "Water damage restoration: site safety, inspection, moisture control, extraction and equipment setup.",
+  "imageAlt": "CARSI course: Introduction to Water Damage Restoration",
+  "og": {
+   "title": "Introduction to Water Damage Restoration | CARSI",
+   "description": "Water damage restoration: site safety, inspection, moisture control, extraction and equipment setup."
+  },
+  "keywords": [
+   "water damage restoration training",
+   "water extraction methods",
+   "moisture source control",
+   "drying equipment setup",
+   "water damage inspection"
+  ],
+  "faq": [
+   {
+    "q": "What does the Introduction to Water Damage Restoration course cover?",
+    "a": "This course provides a structured introduction to the complete water damage restoration process for practitioners entering the industry or seeking to formalise their understanding of the field."
+   },
+   {
+    "q": "What does the Introduction to Water Damage Restoration course help learners understand?",
+    "a": "It covers the end-to-end workflow from site safety through inspection, moisture control, extraction, and equipment setup — providing the operational framework on which all more advanced restoration knowledge is built.\n\nTopics covered: health and safety obligations in water damage environments, systematic damage inspection procedures, moisture source identification and control, water extraction methods overview, and drying equipment selection and setup.\n\nStandards applied: IICRC S500, Safe Work Australia Model WHS Act and Regulations."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Introduction to Water Damage Restoration",
+   "description": "This course provides a structured introduction to the complete water damage restoration process for practitioners entering the industry or seeking to formalise their understanding of the field. It covers the end-to-end workflow from site safety through inspection, moisture control, extraction, and equipment setup — providing the operational framework on which all more advanced restoration knowledge is built.\n\nTopics covered: health and safety obligations in water damage environments, systematic damage inspection procedures, moisture source identification and control, water extraction methods overview, and drying equipment selection and setup.\n\nStandards applied: IICRC S500, Safe Work Australia Model WHS Act and Regulations.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "29",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "introduction-to-water-extraction-methods": {
+  "slug": "introduction-to-water-extraction-methods",
+  "seoTitle": "Introduction to Water Extraction Methods | CARSI",
+  "metaDescription": "Water extraction is the most time-critical task in any water damage response.",
+  "imageAlt": "CARSI course: Introduction to Water Extraction Methods",
+  "og": {
+   "title": "Introduction to Water Extraction Methods | CARSI",
+   "description": "Water extraction is the most time-critical task in any water damage response."
+  },
+  "keywords": [
+   "water extraction training",
+   "water damage extraction methods",
+   "restoration extraction equipment",
+   "water loss response",
+   "structural drying preparation"
+  ],
+  "faq": [
+   {
+    "q": "What does the Introduction to Water Extraction Methods course cover?",
+    "a": "This course covers the operational fundamentals of professional water extraction: why it matters, how to do it safely, what equipment to use, how to apply the right technique for the material type, and how to manage waste correctly.\n\nTopics covered: the purpose and urgency of extraction, site safety assessment before extraction begins, extraction equipment selection, extraction techniques for different material types, and compliant waste disposal.\n\nStandards applied: IICRC S500, Safe Work Australia Model WHS Regulations, state EPA waste disposal requirements."
+   },
+   {
+    "q": "What is the focus of the Introduction to Water Extraction Methods course?",
+    "a": "Water extraction is the most time-critical task in any water damage response."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Introduction to Water Extraction Methods",
+   "description": "Water extraction is the most time-critical task in any water damage response. Every minute standing water remains in contact with porous building materials increases absorption depth, extends the drying timeline, and increases secondary damage costs. This course covers the operational fundamentals of professional water extraction: why it matters, how to do it safely, what equipment to use, how to apply the right technique for the material type, and how to manage waste correctly.\n\nTopics covered: the purpose and urgency of extraction, site safety assessment before extraction begins, extraction equipment selection, extraction techniques for different material types, and compliant waste disposal.\n\nStandards applied: IICRC S500, Safe Work Australia Model WHS Regulations, state EPA waste disposal requirements.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "29",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "job-safety-and-environmental-analysis-jsea-course": {
+  "slug": "job-safety-and-environmental-analysis-jsea-course",
+  "seoTitle": "Job Safety and Environmental Analysis (JSEA) Course | CARSI",
+  "metaDescription": "A Job Safety and Environmental Analysis (JSEA) is a dynamic, task-specific hazard identification and control tool used before starting work each day.",
+  "imageAlt": "CARSI course: Job Safety and Environmental Analysis (JSEA) Course",
+  "og": {
+   "title": "Job Safety and Environmental Analysis (JSEA) Course | CARSI",
+   "description": "A Job Safety and Environmental Analysis (JSEA) is a dynamic, task-specific hazard identification and control tool used before starting work each day."
+  },
+  "keywords": [
+   "Job Safety and Environmental Analysis (JSEA) Course",
+   "job safety and environmental analysis jsea",
+   "job safety training",
+   "analysis jsea course"
+  ],
+  "faq": [
+   {
+    "q": "What does the Job Safety and Environmental Analysis (JSEA) course cover?",
+    "a": "This course covers how to complete a JSEA correctly and embed it as a daily practice in restoration operations."
+   },
+   {
+    "q": "What is the focus of the Job Safety and Environmental Analysis (JSEA) course?",
+    "a": "A Job Safety and Environmental Analysis (JSEA) is a dynamic, task-specific hazard identification and control tool used before starting work each day."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Job Safety and Environmental Analysis (JSEA) Course",
+   "description": "A Job Safety and Environmental Analysis (JSEA) is a dynamic, task-specific hazard identification and control tool used before starting work each day. Unlike a SWMS, a JSEA is completed by the crew on site and adapted to actual site conditions. This course covers how to complete a JSEA correctly and embed it as a daily practice in restoration operations.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "20",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "large-loss-mastery-course": {
+  "slug": "large-loss-mastery-course",
+  "seoTitle": "Large Loss Mastery Course | CARSI",
+  "metaDescription": "The Large Loss Mastery Course is the most advanced operational and business course in the CARSI curriculum.",
+  "imageAlt": "CARSI course: Large Loss Mastery Course",
+  "og": {
+   "title": "Large Loss Mastery Course | CARSI",
+   "description": "The Large Loss Mastery Course is the most advanced operational and business course in the CARSI curriculum."
+  },
+  "keywords": [
+   "Large Loss Mastery Course",
+   "large loss mastery",
+   "large loss training",
+   "loss mastery course"
+  ],
+  "faq": [
+   {
+    "q": "What does the Large Loss Mastery course cover?",
+    "a": "This course covers the complete framework for successfully delivering large loss projects and building a business capable of competing in this high-value segment.\n\nLarge loss restoration in Australia is a commercially significant market segment."
+   },
+   {
+    "q": "What does the Large Loss Mastery course help learners understand?",
+    "a": "It is designed for experienced restoration professionals who are moving into large loss project management or who are seeking to grow their business into the large loss segment of the Australian restoration market."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Large Loss Mastery Course",
+   "description": "The Large Loss Mastery Course is the most advanced operational and business course in the CARSI curriculum. It is designed for experienced restoration professionals who are moving into large loss project management or who are seeking to grow their business into the large loss segment of the Australian restoration market. A large loss event — a water damage event affecting a commercial building, multi-storey complex, or major industrial facility — requires a fundamentally different set of skills, systems, and resources to standard residential restoration. This course covers the complete framework for successfully delivering large loss projects and building a business capable of competing in this high-value segment.\n\nLarge loss restoration in Australia is a commercially significant market segment. Commercial and strata water damage events, post-storm recovery projects, and industrial loss events regularly generate project values from $100,000 to several million dollars. Business operators who have the systems, certification, documentation capability, and equipment relationships to credibly respond to large loss events operate in a substantially higher-value market than those limited to residential losses.\n\nThe course covers: project management structure for large loss events, equipment logistics and specialist subcontractor management, insurer and loss adjuster relationship management for complex claims, documentation systems for multi-week and multi-area projects, business development strategies for accessing commercial and institutional large loss work, risk management and liability considerations for large scale restoration projects, and the financial management considerations specific to large loss projects including cash flow during extended projects and milestone invoicing.\n\nThis course is delivered in combination with advanced technical content covering desiccant drying systems, large building structural drying, industrial and commercial facility-specific drying considerations, and multi-trade coordination on complex restoration projects.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "level-1-mould-remediation-2cc96b85": {
+  "slug": "level-1-mould-remediation-2cc96b85",
+  "seoTitle": "Level 1 — Mould Remediation | CARSI",
+  "metaDescription": "You learn what mould is, why it grows, and how to safely clean small surface mould on non-porous areas under one square metre.",
+  "imageAlt": "CARSI course: Level 1 — Mould Remediation",
+  "og": {
+   "title": "Level 1 — Mould Remediation | CARSI",
+   "description": "You learn what mould is, why it grows, and how to safely clean small surface mould on non-porous areas under one square metre."
+  },
+  "keywords": [
+   "Level 1 mould remediation",
+   "small area mould cleaning",
+   "non-porous mould training",
+   "surface mould safety",
+   "mould waste disposal"
+  ],
+  "faq": [
+   {
+    "q": "What does the Level 1 — Mould Remediation course cover?",
+    "a": "Covers basic PPE, how to read a Safety Data Sheet, how to inspect before you start, the step-by-step cleaning process, and how to bag and dispose of waste correctly."
+   },
+   {
+    "q": "What is the focus of the Level 1 — Mould Remediation course?",
+    "a": "You learn what mould is, why it grows, and how to safely clean small surface mould on non-porous areas under one square metre."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Level 1 — Mould Remediation",
+   "description": "You learn what mould is, why it grows, and how to safely clean small surface mould on non-porous areas under one square metre. Covers basic PPE, how to read a Safety Data Sheet, how to inspect before you start, the step-by-step cleaning process, and how to bag and dispose of waste correctly. Ends with guidance on when a job is too big for Level 1 and needs to go up a level.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "49",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "level-2-mould-remediation-30ee3492": {
+  "slug": "level-2-mould-remediation-30ee3492",
+  "seoTitle": "Level 2 — Mould Remediation | CARSI",
+  "metaDescription": "Builds directly on Level 1 and takes you into more complex jobs — one to ten square metres, semi-porous materials like plasterboard and timber framing.",
+  "imageAlt": "CARSI course: Level 2 — Mould Remediation",
+  "og": {
+   "title": "Level 2 — Mould Remediation | CARSI",
+   "description": "Builds directly on Level 1 and takes you into more complex jobs — one to ten square metres, semi-porous materials like plasterboard and timber framing."
+  },
+  "keywords": [
+   "Level 2 mould remediation",
+   "plasterboard mould remediation",
+   "negative pressure containment",
+   "mould JSEA training",
+   "biological hazard control"
+  ],
+  "faq": [
+   {
+    "q": "What does the Level 2 — Mould Remediation course cover?",
+    "a": "Covers the full remediation process from material removal through to waste disposal and job close-out."
+   },
+   {
+    "q": "What is the focus of the Level 2 — Mould Remediation course?",
+    "a": "Builds directly on Level 1 and takes you into more complex jobs — one to ten square metres, semi-porous materials like plasterboard and timber framing."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Level 2 — Mould Remediation",
+   "description": "Builds directly on Level 1 and takes you into more complex jobs — one to ten square metres, semi-porous materials like plasterboard and timber framing. You learn how Australian WHS laws apply to this work, how to set up proper containment with negative air pressure, how to use moisture meters to track drying, how to manage biological hazards and stronger chemicals, how to complete a JSEA, how to document a job professionally, and how to handle emergencies and notifiable incidents. Covers the full remediation process from material removal through to waste disposal and job close-out.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "49",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "level-3-mould-remediation-c5797369": {
+  "slug": "level-3-mould-remediation-c5797369",
+  "seoTitle": "Level 3 — Mould Remediation | CARSI",
+  "metaDescription": "Level 3 — Mould Remediation: Designed for large-scale contamination over ten square metres involving structural materials.",
+  "imageAlt": "CARSI course: Level 3 — Mould Remediation",
+  "og": {
+   "title": "Level 3 — Mould Remediation | CARSI",
+   "description": "Level 3 — Mould Remediation: Designed for large-scale contamination over ten square metres involving structural materials."
+  },
+  "keywords": [
+   "Level 3 mould remediation",
+   "large-scale mould remediation",
+   "HVAC mould remediation",
+   "complex mould containment",
+   "advanced mould risk assessment"
+  ],
+  "faq": [
+   {
+    "q": "What does the Level 3 — Mould Remediation course cover?",
+    "a": "Designed for large-scale contamination over ten square metres involving structural materials, HVAC systems, and high-risk environments like hospitals, schools, and aged care facilities."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Level 3 — Mould Remediation",
+   "description": "Designed for large-scale contamination over ten square metres involving structural materials, HVAC systems, and high-risk environments like hospitals, schools, and aged care facilities. You learn advanced risk assessment, full-scale containment design with negative pressure monitoring, respirator fit-testing obligations, heat management planning for extended PPE use, psychrometric analysis for drying, moisture mapping across large sites, how different building materials affect remediation decisions, and how to lead a complex project to close-out — potentially alongside an independent industrial hygienist for air clearance testing.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "148.95",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "microbe-clean-basic-understanding-course": {
+  "slug": "microbe-clean-basic-understanding-course",
+  "seoTitle": "Microbe Clean Basic Understanding Course | CARSI",
+  "metaDescription": "Microbiology for infection control and hygiene work in Australian commercial and residential environments.",
+  "imageAlt": "CARSI course: Microbe Clean Basic Understanding Course",
+  "og": {
+   "title": "Microbe Clean Basic Understanding Course | CARSI",
+   "description": "Microbiology for infection control and hygiene work in Australian commercial and residential environments."
+  },
+  "keywords": [
+   "Microbe Clean Basic Understanding Course",
+   "microbe clean basic understanding",
+   "microbe clean training",
+   "basic understanding course"
+  ],
+  "faq": [
+   {
+    "q": "What does the Microbe Clean Basic Understanding course cover?",
+    "a": "This course provides cleaning and restoration professionals with a comprehensive, practical foundation in microbiology as it applies to infection control and hygiene work in Australian commercial and residential environments."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Microbe Clean Basic Understanding Course",
+   "description": "This course provides cleaning and restoration professionals with a comprehensive, practical foundation in microbiology as it applies to infection control and hygiene work in Australian commercial and residential environments. It covers virus and bacteria biology, cleaning and disinfection chemistry, cross-contamination prevention, PPE selection, WHS documentation, and safe chemical handling — giving technicians everything they need to work safely and compliantly in biologically contaminated environments.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "99",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "moisture-meter-course": {
+  "slug": "moisture-meter-course",
+  "seoTitle": "Moisture Meter Course | CARSI",
+  "metaDescription": "Moisture meters are the primary measurement instrument in structural drying.",
+  "imageAlt": "CARSI course: Moisture Meter Course",
+  "og": {
+   "title": "Moisture Meter Course | CARSI",
+   "description": "Moisture meters are the primary measurement instrument in structural drying."
+  },
+  "keywords": [
+   "moisture meter training course",
+   "moisture reading accuracy",
+   "structural drying measurements",
+   "moisture testing protocols",
+   "water damage documentation"
+  ],
+  "faq": [
+   {
+    "q": "What does the Moisture Meter course cover?",
+    "a": "This course covers the complete operational knowledge required to use moisture meters correctly in the field: how moisture content is measured, the reading process, accuracy assurance, reference scales, temperature effects, the relationship between moisture and wood warping, moisture testing protocols, prevention strategies, operational tips, accuracy factors, material-specific considerations, the types of meters available, maintenance requirements, and the common mistakes that produce unreliable results."
+   },
+   {
+    "q": "What is the focus of the Moisture Meter course?",
+    "a": "Moisture meters are the primary measurement instrument in structural drying."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Moisture Meter Course",
+   "description": "Moisture meters are the primary measurement instrument in structural drying. Every drying decision, every drying goal, every insurance documentation entry, and every clearance determination in water damage restoration depends on accurate moisture meter readings. This course covers the complete operational knowledge required to use moisture meters correctly in the field: how moisture content is measured, the reading process, accuracy assurance, reference scales, temperature effects, the relationship between moisture and wood warping, moisture testing protocols, prevention strategies, operational tips, accuracy factors, material-specific considerations, the types of meters available, maintenance requirements, and the common mistakes that produce unreliable results. All content is aligned with IICRC S500 drying standards and Australian insurance documentation requirements.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "39",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "refrigerant-dehumidifiers-for-water-loss-restoration": {
+  "slug": "refrigerant-dehumidifiers-for-water-loss-restoration",
+  "seoTitle": "Refrigerant Dehumidifiers for Water Loss Restoration | CARSI",
+  "metaDescription": "The refrigerant dehumidifier is the primary moisture removal tool in structural drying.",
+  "imageAlt": "CARSI course: Refrigerant Dehumidifiers for Water Loss Restoration",
+  "og": {
+   "title": "Refrigerant Dehumidifiers for Water Loss Restoration | CARSI",
+   "description": "The refrigerant dehumidifier is the primary moisture removal tool in structural drying."
+  },
+  "keywords": [
+   "refrigerant dehumidifier training",
+   "dehumidifier sizing calculations",
+   "structural drying equipment",
+   "low grain refrigerant",
+   "dehumidifier maintenance"
+  ],
+  "faq": [
+   {
+    "q": "What does the Refrigerant Dehumidifiers for Water Loss Restoration course cover?",
+    "a": "This course provides the technical grounding needed to use refrigerant dehumidifiers as precision drying tools, not just equipment you put in a room and hope for the best.\n\nTopics covered: refrigerant dehumidifier operating principles, low grain refrigerant technology, dehumidifier sizing calculations, temperature and efficiency relationships, refrigerant types and their implications, essential accessories, maintenance procedures, practical application scenarios, and safety requirements.\n\nStandards applied: IICRC S500, IICRC S520, Australian Refrigeration and Air Conditioning (RAC) regulations, Safe Work Australia."
+   },
+   {
+    "q": "What does the Refrigerant Dehumidifiers for Water Loss Restoration course help learners understand?",
+    "a": "Understanding how it works, how to size it correctly, how to operate it at peak efficiency, and how to maintain it properly directly determines the speed and cost of every water loss restoration you attend."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Refrigerant Dehumidifiers for Water Loss Restoration",
+   "description": "The refrigerant dehumidifier is the primary moisture removal tool in structural drying. Understanding how it works, how to size it correctly, how to operate it at peak efficiency, and how to maintain it properly directly determines the speed and cost of every water loss restoration you attend. This course provides the technical grounding needed to use refrigerant dehumidifiers as precision drying tools, not just equipment you put in a room and hope for the best.\n\nTopics covered: refrigerant dehumidifier operating principles, low grain refrigerant technology, dehumidifier sizing calculations, temperature and efficiency relationships, refrigerant types and their implications, essential accessories, maintenance procedures, practical application scenarios, and safety requirements.\n\nStandards applied: IICRC S500, IICRC S520, Australian Refrigeration and Air Conditioning (RAC) regulations, Safe Work Australia.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "restoration-project-management-premium": {
+  "slug": "restoration-project-management-premium",
+  "seoTitle": "Restoration Project Management & Client Comms — Premium | CARSI",
+  "metaDescription": "Scopes, estimates, stakeholder updates, and handover documentation for restoration supervisors and lead technicians.",
+  "imageAlt": "CARSI course: Restoration Project Management & Client Communication — Premium",
+  "og": {
+   "title": "Restoration Project Management & Client Comms — Premium | CARSI",
+   "description": "Scopes, estimates, stakeholder updates, and handover documentation for restoration supervisors and lead technicians."
+  },
+  "keywords": [
+   "Restoration Project Management & Client Communication — Premium",
+   "restoration project management premium",
+   "restoration project training",
+   "communication premium course"
+  ],
+  "faq": [
+   {
+    "q": "What does the Restoration Project Management & Client Communication — Premium course cover?",
+    "a": "A paid professional skills course: translate technical work into clear project plans, commercial communication, and defensible documentation."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Restoration Project Management & Client Communication — Premium",
+   "description": "A paid professional skills course: translate technical work into clear project plans, commercial communication, and defensible documentation. Purchase once for lifetime access to this title (CARSI Pro subscribers may access the full catalogue separately).",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "179",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "risk-assessment-course": {
+  "slug": "risk-assessment-course",
+  "seoTitle": "Risk Assessment Course | CARSI",
+  "metaDescription": "Risk assessment is the foundation of every legally compliant WHS management system.",
+  "imageAlt": "CARSI course: Risk Assessment Course",
+  "og": {
+   "title": "Risk Assessment Course | CARSI",
+   "description": "Risk assessment is the foundation of every legally compliant WHS management system."
+  },
+  "keywords": [
+   "WHS risk assessment training",
+   "restoration risk matrix",
+   "JSEA training",
+   "SWMS writing",
+   "worker consultation"
+  ],
+  "faq": [
+   {
+    "q": "What does the Risk Assessment course cover?",
+    "a": "This course provides restoration and cleaning professionals with a complete, practical risk assessment framework — from understanding Australian WHS law to building and using a risk matrix, completing a JSEA, writing a SWMS, and conducting genuine consultation with workers."
+   },
+   {
+    "q": "What is the focus of the Risk Assessment course?",
+    "a": "Risk assessment is the foundation of every legally compliant WHS management system."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Risk Assessment Course",
+   "description": "Risk assessment is the foundation of every legally compliant WHS management system. This course provides restoration and cleaning professionals with a complete, practical risk assessment framework — from understanding Australian WHS law to building and using a risk matrix, completing a JSEA, writing a SWMS, and conducting genuine consultation with workers. Every module is grounded in real restoration and remediation scenarios.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "99",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "safe-work-method-statements-swms-course": {
+  "slug": "safe-work-method-statements-swms-course",
+  "seoTitle": "Safe Work Method Statements (SWMS) Course | CARSI",
+  "metaDescription": "Safe Work Method Statements for high-risk work in cleaning and restoration.",
+  "imageAlt": "CARSI course: Safe Work Method Statements (SWMS) Course",
+  "og": {
+   "title": "Safe Work Method Statements (SWMS) Course | CARSI",
+   "description": "Safe Work Method Statements for high-risk work in cleaning and restoration."
+  },
+  "keywords": [
+   "Safe Work Method Statements (SWMS) Course",
+   "safe work method statements swms",
+   "safe work training",
+   "statements swms course"
+  ],
+  "faq": [
+   {
+    "q": "What does the Safe Work Method Statements (SWMS) course cover?",
+    "a": "This course equips cleaning and restoration professionals with the knowledge to understand, prepare, and implement Safe Work Method Statements for high-risk work activities."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Safe Work Method Statements (SWMS) Course",
+   "description": "This course equips cleaning and restoration professionals with the knowledge to understand, prepare, and implement Safe Work Method Statements for high-risk work activities. Under Australian WHS legislation, SWMS preparation is a legal requirement before high-risk construction work commences. This course covers what an SWMS is, when it is legally required, how to prepare a compliant and genuinely useful SWMS, and how to implement and review SWMS in a cleaning or restoration business.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "20",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "safety-data-sheet-sds-course": {
+  "slug": "safety-data-sheet-sds-course",
+  "seoTitle": "Safety Data Sheet (SDS) Course | CARSI",
+  "metaDescription": "Reading and applying Safety Data Sheets for hazardous chemicals in cleaning and restoration.",
+  "imageAlt": "CARSI course: Safety Data Sheet (SDS) Course",
+  "og": {
+   "title": "Safety Data Sheet (SDS) Course | CARSI",
+   "description": "Reading and applying Safety Data Sheets for hazardous chemicals in cleaning and restoration."
+  },
+  "keywords": [
+   "Safety Data Sheet (SDS) Course",
+   "safety data sheet sds",
+   "safety data training",
+   "sheet sds course"
+  ],
+  "faq": [
+   {
+    "q": "What does the Safety Data Sheet (SDS) course cover?",
+    "a": "The Safety Data Sheet course provides cleaning and restoration professionals with the knowledge to read, interpret, and apply Safety Data Sheets for every hazardous chemical used in their work."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Safety Data Sheet (SDS) Course",
+   "description": "The Safety Data Sheet course provides cleaning and restoration professionals with the knowledge to read, interpret, and apply Safety Data Sheets for every hazardous chemical used in their work. Under Australian WHS legislation, SDS access and worker familiarity is a legal requirement. This course covers what an SDS contains, which sections are most relevant to field operations, how to use SDS information in real chemical exposure situations, and the obligations of both employers and workers regarding SDS management.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "20",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "standard-operating-procedures-sop-course": {
+  "slug": "standard-operating-procedures-sop-course",
+  "seoTitle": "Standard Operating Procedures (SOP) Course | CARSI",
+  "metaDescription": "Developing and maintaining Standard Operating Procedures for cleaning and restoration businesses.",
+  "imageAlt": "CARSI course: Standard Operating Procedures (SOP) Course",
+  "og": {
+   "title": "Standard Operating Procedures (SOP) Course | CARSI",
+   "description": "Developing and maintaining Standard Operating Procedures for cleaning and restoration businesses."
+  },
+  "keywords": [
+   "Standard Operating Procedures (SOP) Course",
+   "standard operating procedures sop",
+   "standard operating training",
+   "procedures sop course"
+  ],
+  "faq": [
+   {
+    "q": "What does the Standard Operating Procedures (SOP) course cover?",
+    "a": "This course provides cleaning and restoration professionals with the knowledge to develop, implement, and maintain Standard Operating Procedures for their business operations."
+   },
+   {
+    "q": "What does the Standard Operating Procedures (SOP) course help learners understand?",
+    "a": "SOPs are the foundation of consistent quality, safe practice, and scalable business performance."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Standard Operating Procedures (SOP) Course",
+   "description": "This course provides cleaning and restoration professionals with the knowledge to develop, implement, and maintain Standard Operating Procedures for their business operations. SOPs are the foundation of consistent quality, safe practice, and scalable business performance. This course covers what SOPs are, why they are essential in a professional cleaning or restoration business, how to write SOPs that are actually used, and how to implement and maintain an SOP system across a team.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "20",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "tile-cleaning-for-carpet-cleaners": {
+  "slug": "tile-cleaning-for-carpet-cleaners",
+  "seoTitle": "Tile Cleaning for Carpet Cleaners | CARSI",
+  "metaDescription": "Tile cleaning for carpet cleaners: tile types, chemistry, sealing and maintenance.",
+  "imageAlt": "CARSI course: Tile Cleaning for Carpet Cleaners",
+  "og": {
+   "title": "Tile Cleaning for Carpet Cleaners | CARSI",
+   "description": "Tile cleaning for carpet cleaners: tile types, chemistry, sealing and maintenance."
+  },
+  "keywords": [
+   "tile cleaning training course",
+   "tile and grout cleaning",
+   "tile cleaning chemistry",
+   "tile sealing training",
+   "tile maintenance services"
+  ],
+  "faq": [
+   {
+    "q": "What does the Tile Cleaning for Carpet Cleaners course cover?",
+    "a": "Understand the importance of tile cleaning in addition to carpet cleaning.\n\nLearn the different types of tiles and their specific cleaning needs.\n\nMaster the chemistry behind cleaning solutions.\n\nDevelop skills for sealing tiles and grout.\n\nExplore maintenance practices and strategies for upselling services."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Tile Cleaning for Carpet Cleaners",
+   "description": "Understand the importance of tile cleaning in addition to carpet cleaning.\n\nLearn the different types of tiles and their specific cleaning needs.\n\nMaster the chemistry behind cleaning solutions.\n\nDevelop skills for sealing tiles and grout.\n\nExplore maintenance practices and strategies for upselling services.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
+  }
+ },
+ "using-atp-to-create-protocols": {
+  "slug": "using-atp-to-create-protocols",
+  "seoTitle": "Using ATP to Create Protocols | CARSI",
+  "metaDescription": "ATP (adenosine triphosphate) bioluminescence testing is the industry standard method for verifying surface hygiene after cleaning and disinfection.",
+  "imageAlt": "CARSI course: Using ATP to Create Protocols",
+  "og": {
+   "title": "Using ATP to Create Protocols | CARSI",
+   "description": "ATP (adenosine triphosphate) bioluminescence testing is the industry standard method for verifying surface hygiene after cleaning and disinfection."
+  },
+  "keywords": [
+   "Using ATP to Create Protocols",
+   "using atp create protocols",
+   "using atp training",
+   "create protocols course"
+  ],
+  "faq": [
+   {
+    "q": "What does the Using ATP to Create Protocols course cover?",
+    "a": "This course teaches restoration and hygiene professionals how to use ATP meters correctly, how to interpret results, how to establish site-specific benchmarks, and how to build ATP-based cleaning verification protocols that satisfy insurance, regulatory, and client audit requirements."
+   },
+   {
+    "q": "What is the focus of the Using ATP to Create Protocols course?",
+    "a": "ATP (adenosine triphosphate) bioluminescence testing is the industry standard method for verifying surface hygiene after cleaning and disinfection."
+   }
+  ],
+  "courseJsonLd": {
+   "@context": "https://schema.org",
+   "@type": "Course",
+   "name": "Using ATP to Create Protocols",
+   "description": "ATP (adenosine triphosphate) bioluminescence testing is the industry standard method for verifying surface hygiene after cleaning and disinfection. This course teaches restoration and hygiene professionals how to use ATP meters correctly, how to interpret results, how to establish site-specific benchmarks, and how to build ATP-based cleaning verification protocols that satisfy insurance, regulatory, and client audit requirements.",
+   "provider": {
+    "@type": "Organization",
+    "name": "CARSI",
+    "sameAs": "https://carsi.com.au"
+   },
+   "inLanguage": "en-AU",
+   "offers": {
+    "@type": "Offer",
+    "price": "20",
+    "priceCurrency": "AUD",
+    "availability": "https://schema.org/InStock"
+   }
   }
  }
 }

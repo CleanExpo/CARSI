@@ -46,6 +46,12 @@
       "sameAs": "https://carsi.com.au"
     },
     "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "49",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    },
     "coursePrerequisites": "None — open entry"
   }
 }
