@@ -60,6 +60,7 @@ const staticPages = [
   })),
   // Industry sub-pages
   { path: '/industries/aged-care', priority: 0.7, changeFreq: 'monthly' as const },
+  { path: '/industries/facility-management', priority: 0.72, changeFreq: 'monthly' as const },
   { path: '/industries/childcare', priority: 0.7, changeFreq: 'monthly' as const },
   { path: '/industries/healthcare', priority: 0.7, changeFreq: 'monthly' as const },
   { path: '/industries/construction', priority: 0.7, changeFreq: 'monthly' as const },
