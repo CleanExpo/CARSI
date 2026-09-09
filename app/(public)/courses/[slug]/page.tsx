@@ -321,6 +321,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
   const aggregateRating = course.id
     ? await getAggregateRating(course.id).catch(() => null)
     : null;
+  const resolvedMarketing = getResolvedCourseMarketing(course, designation);
 
   return (
     <>
@@ -335,6 +336,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
         teaches={designation ? [designation.disciplineTopic] : undefined}
         aggregateRating={aggregateRating ?? undefined}
         credentialAwarded={designation?.name}
+        authoredCourseJsonLd={resolvedMarketing?.courseJsonLd}
       />
       {course.intro_video_url ? (
         <VideoObjectSchema
@@ -349,7 +351,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
       <BreadcrumbSchema items={breadcrumbs} />
       {(() => {
         // AEO/GEO: FAQPage JSON-LD from the course's marketing metadata (data/seo/course-cards).
-        const faqs = getResolvedCourseMarketing(course, designation)?.faq;
+        const faqs = resolvedMarketing?.faq;
         return faqs?.length ? <SchemaMarkup schema={buildFaqSchema({ faqs })} /> : null;
       })()}
 

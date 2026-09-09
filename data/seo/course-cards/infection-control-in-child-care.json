@@ -1,0 +1,50 @@
+{
+  "slug": "infection-control-in-child-care",
+  "seoTitle": "Infection Control in Child Care Course Australia | CARSI",
+  "metaDescription": "Infection control for cleaners working in Australian childcare settings - the protocols and practical skills needed to meet National Quality Framework duties.",
+  "imageAlt": "CARSI course thumbnail: Infection Control in Child Care",
+  "og": {
+    "title": "Infection Control in Child Care | CARSI",
+    "description": "Childcare environments present unique infection control challenges. This course gives cleaning professionals the knowledge, protocols and practical skills to deliver compliant, effective infection control in childcare settings in Australia."
+  },
+  "keywords": [
+    "infection control childcare australia",
+    "childcare cleaning course",
+    "national quality framework cleaning",
+    "early learning centre cleaning training",
+    "childcare infection control protocols",
+    "cleaning compliance childcare"
+  ],
+  "faq": [
+    {
+      "q": "Why do childcare settings need their own infection control course?",
+      "a": "Childcare environments present unique challenges: young children have immature immune systems, engage in high-contact behaviour, and share toys and surfaces continuously. They are also legally protected by strict regulatory requirements under the National Quality Framework."
+    },
+    {
+      "q": "Who is this course for?",
+      "a": "Cleaning professionals who work in childcare settings in Australia and need to deliver infection control that is both compliant and effective."
+    },
+    {
+      "q": "What does the course provide?",
+      "a": "The specific knowledge, protocols and practical skills needed to deliver compliant, effective infection control in Australian childcare settings."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Infection Control in Child Care",
+    "description": "Childcare environments present unique infection control challenges - young children have immature immune systems, engage in high-contact behaviour, share toys and surfaces continuously, and are protected by strict regulatory requirements under the National Quality Framework. This course provides cleaning professionals with the knowledge, protocols and practical skills needed to deliver compliant, effective infection control in childcare settings in Australia.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "99",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

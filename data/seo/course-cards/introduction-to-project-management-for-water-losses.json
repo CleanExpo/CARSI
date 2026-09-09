@@ -1,0 +1,45 @@
+{
+  "slug": "introduction-to-project-management-for-water-losses",
+  "seoTitle": "Introduction to Project Management for Water Losses | CARSI",
+  "metaDescription": "A water damage project that is managed well produces an accurate scope, efficient execution, minimal callbacks, satisfied clients and insurers, and a profitable job.",
+  "imageAlt": "CARSI course: Introduction to Project Management for Water Losses",
+  "og": {
+    "title": "Introduction to Project Management for Water Losses | CARSI",
+    "description": "A water damage project that is managed well produces an accurate scope, efficient execution, minimal callbacks, satisfied clients and insurers, and a profitable job."
+  },
+  "keywords": [
+    "water loss project management",
+    "restoration project planning",
+    "water damage job monitoring",
+    "restoration project closeout",
+    "water loss risk management"
+  ],
+  "faq": [
+    {
+      "q": "What does the Introduction to Project Management for Water Losses course cover?",
+      "a": "Project management in water damage restoration is the application of structured processes — not bureaucracy — to ensure that the right things happen in the right order, by the right people, on time.\n\nTopics covered: initial response procedures that set the job up for success, project planning for water damage restoration, execution management and daily monitoring, professional project closeout, and risk management throughout the project lifecycle.\n\nStandards applied: IICRC S500, Safe Work Australia Model WHS Act, Australian insurance claims management requirements."
+    },
+    {
+      "q": "What is the focus of the Introduction to Project Management for Water Losses course?",
+      "a": "A water damage project that is managed well produces an accurate scope, efficient execution, minimal callbacks, satisfied clients and insurers, and a profitable job."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Introduction to Project Management for Water Losses",
+    "description": "A water damage project that is managed well produces an accurate scope, efficient execution, minimal callbacks, satisfied clients and insurers, and a profitable job. A project that is managed poorly produces the opposite of all of these. Project management in water damage restoration is the application of structured processes — not bureaucracy — to ensure that the right things happen in the right order, by the right people, on time.\n\nTopics covered: initial response procedures that set the job up for success, project planning for water damage restoration, execution management and daily monitoring, professional project closeout, and risk management throughout the project lifecycle.\n\nStandards applied: IICRC S500, Safe Work Australia Model WHS Act, Australian insurance claims management requirements.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "29",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

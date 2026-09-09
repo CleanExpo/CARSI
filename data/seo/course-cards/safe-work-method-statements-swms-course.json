@@ -1,0 +1,40 @@
+{
+  "slug": "safe-work-method-statements-swms-course",
+  "seoTitle": "Safe Work Method Statements (SWMS) Course | CARSI",
+  "metaDescription": "Safe Work Method Statements for high-risk work in cleaning and restoration.",
+  "imageAlt": "CARSI course: Safe Work Method Statements (SWMS) Course",
+  "og": {
+    "title": "Safe Work Method Statements (SWMS) Course | CARSI",
+    "description": "Safe Work Method Statements for high-risk work in cleaning and restoration."
+  },
+  "keywords": [
+    "Safe Work Method Statements (SWMS) Course",
+    "safe work method statements swms",
+    "safe work training",
+    "statements swms course"
+  ],
+  "faq": [
+    {
+      "q": "What does the Safe Work Method Statements (SWMS) course cover?",
+      "a": "This course equips cleaning and restoration professionals with the knowledge to understand, prepare, and implement Safe Work Method Statements for high-risk work activities."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Safe Work Method Statements (SWMS) Course",
+    "description": "This course equips cleaning and restoration professionals with the knowledge to understand, prepare, and implement Safe Work Method Statements for high-risk work activities. Under Australian WHS legislation, SWMS preparation is a legal requirement before high-risk construction work commences. This course covers what an SWMS is, when it is legally required, how to prepare a compliant and genuinely useful SWMS, and how to implement and review SWMS in a cleaning or restoration business.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "20",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "slug": "introduction-to-monitoring-air-quality-on-the-job-site",
+  "seoTitle": "Introduction to Monitoring Air Quality on the Job Site | CARSI",
+  "metaDescription": "This course develops practical, on-site air quality monitoring skills for restoration technicians.",
+  "imageAlt": "CARSI course: Introduction to Monitoring Air Quality on the Job Site",
+  "og": {
+    "title": "Introduction to Monitoring Air Quality on the Job Site | CARSI",
+    "description": "This course develops practical, on-site air quality monitoring skills for restoration technicians."
+  },
+  "keywords": [
+    "Introduction to Monitoring Air Quality on the Job Site",
+    "introduction monitoring air quality the job site",
+    "introduction monitoring training",
+    "job site course"
+  ],
+  "faq": [
+    {
+      "q": "What does the Introduction to Monitoring Air Quality on the Job Site course cover?",
+      "a": "This course develops practical, on-site air quality monitoring skills for restoration technicians."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Introduction to Monitoring Air Quality on the Job Site",
+    "description": "This course develops practical, on-site air quality monitoring skills for restoration technicians. Participants will learn how to identify airborne contaminants, select and operate monitoring equipment, apply safety protocols, and produce compliant field documentation — all within Australian workplace health and safety (WHS) requirements and IICRC best practices.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "29",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

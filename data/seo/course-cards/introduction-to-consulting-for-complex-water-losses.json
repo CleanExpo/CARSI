@@ -1,0 +1,41 @@
+{
+  "slug": "introduction-to-consulting-for-complex-water-losses",
+  "seoTitle": "Introduction to Consulting for Complex Water Losses | CARSI",
+  "metaDescription": "Complex water losses require advanced skills to assess, plan, resource, coordinate and document restoration events.",
+  "imageAlt": "CARSI course: Introduction to Consulting for Complex Water Losses",
+  "og": {
+    "title": "Introduction to Consulting for Complex Water Losses | CARSI",
+    "description": "Complex water losses require advanced skills to assess, plan, resource, coordinate and document restoration events."
+  },
+  "keywords": [
+    "complex water losses course",
+    "large loss restoration consulting",
+    "strategic drying plans",
+    "multi-trade restoration coordination",
+    "complex loss documentation"
+  ],
+  "faq": [
+    {
+      "q": "What does the Introduction to Consulting for Complex Water Losses course cover?",
+      "a": "Complex water losses — large commercial events, multi-tenancy building floods, heritage buildings, infrastructure failures affecting multiple properties — require a consulting capability that goes beyond field restoration skills."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Introduction to Consulting for Complex Water Losses",
+    "description": "Complex water losses — large commercial events, multi-tenancy building floods, heritage buildings, infrastructure failures affecting multiple properties — require a consulting capability that goes beyond field restoration skills.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "29",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

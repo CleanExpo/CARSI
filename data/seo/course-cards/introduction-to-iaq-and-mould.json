@@ -1,0 +1,44 @@
+{
+  "slug": "introduction-to-iaq-and-mould",
+  "seoTitle": "Introduction to IAQ and Mould | CARSI",
+  "metaDescription": "Introduction to IAQ and Mould: how mould affects indoor air quality (IAQ).",
+  "imageAlt": "CARSI course: Introduction to IAQ and Mould",
+  "og": {
+    "title": "Introduction to IAQ and Mould | CARSI",
+    "description": "Introduction to IAQ and Mould: how mould affects indoor air quality (IAQ)."
+  },
+  "keywords": [
+    "Introduction to IAQ and Mould",
+    "introduction iaq and mould",
+    "introduction iaq training",
+    "iaq mould course"
+  ],
+  "faq": [
+    {
+      "q": "What does the Introduction to IAQ and Mould course cover?",
+      "a": "This course provides restoration professionals with a working knowledge of how mould affects indoor air quality (IAQ), how airborne mould spreads, and how to contain and remediate it in accordance with IICRC S520 and Australian workplace health standards."
+    },
+    {
+      "q": "What does the Introduction to IAQ and Mould course help learners understand?",
+      "a": "Participants will leave with practical skills in containment, air management, and post-remediation monitoring."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Introduction to IAQ and Mould",
+    "description": "This course provides restoration professionals with a working knowledge of how mould affects indoor air quality (IAQ), how airborne mould spreads, and how to contain and remediate it in accordance with IICRC S520 and Australian workplace health standards. Participants will leave with practical skills in containment, air management, and post-remediation monitoring.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "29",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "slug": "introduction-to-water-damage-estimating",
+  "seoTitle": "Introduction to Water Damage Estimating | CARSI",
+  "metaDescription": "An accurate, defensible estimate is the foundation of a profitable water damage job.",
+  "imageAlt": "CARSI course: Introduction to Water Damage Estimating",
+  "og": {
+    "title": "Introduction to Water Damage Estimating | CARSI",
+    "description": "An accurate, defensible estimate is the foundation of a profitable water damage job."
+  },
+  "keywords": [
+    "water damage estimating training",
+    "restoration scope development",
+    "insurance estimating",
+    "water loss bid analysis",
+    "defensible restoration estimates"
+  ],
+  "faq": [
+    {
+      "q": "What does the Introduction to Water Damage Estimating course cover?",
+      "a": "This course builds the estimation skills that translate inspection findings into accurate scopes and fair, defensible pricing.\n\nTopics covered: systematic site assessment as the foundation of estimation, scope development methodology, material and labour quantification, insurance estimating requirements and platforms, and bid analysis for commercial and competitive tender situations.\n\nStandards applied: IICRC S500, Australian insurance industry estimating standards, relevant state contractor licensing requirements."
+    },
+    {
+      "q": "What is the focus of the Introduction to Water Damage Estimating course?",
+      "a": "An accurate, defensible estimate is the foundation of a profitable water damage job."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Introduction to Water Damage Estimating",
+    "description": "An accurate, defensible estimate is the foundation of a profitable water damage job. Estimating errors — missed items, incorrect quantities, wrong unit rates — produce jobs that lose money, create disputes with insurers, or overcharge clients. This course builds the estimation skills that translate inspection findings into accurate scopes and fair, defensible pricing.\n\nTopics covered: systematic site assessment as the foundation of estimation, scope development methodology, material and labour quantification, insurance estimating requirements and platforms, and bid analysis for commercial and competitive tender situations.\n\nStandards applied: IICRC S500, Australian insurance industry estimating standards, relevant state contractor licensing requirements.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "29",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

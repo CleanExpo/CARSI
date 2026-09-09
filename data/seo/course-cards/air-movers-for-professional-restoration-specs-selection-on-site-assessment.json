@@ -1,0 +1,55 @@
+{
+  "slug": "air-movers-for-professional-restoration-specs-selection-on-site-assessment",
+  "seoTitle": "Air Mover Selection and Placement Course | CARSI",
+  "metaDescription": "An Australian course on air movers for restoration work: airflow, static pressure and lift, axial versus centrifugal selection, placement by class of loss.",
+  "imageAlt": "CARSI course thumbnail: Air Movers for Professional Restoration: Specs, Selection & On-Site Assessment",
+  "og": {
+    "title": "Air Movers for Professional Restoration | CARSI",
+    "description": "Choose and place air movers with confidence. Covers airflow, static pressure and lift, axial versus centrifugal versus low-profile selection, placement and quantity by class of loss, and amps, GPOs and scaling on 230 V power."
+  },
+  "keywords": [
+    "air mover course australia",
+    "air mover selection restoration",
+    "axial vs centrifugal air mover",
+    "structural drying equipment training",
+    "restoration airflow training",
+    "class of loss air mover placement",
+    "restoration equipment course australia"
+  ],
+  "faq": [
+    {
+      "q": "What does this air mover course cover?",
+      "a": "It covers airflow, static pressure and lift; axial, centrifugal and low-profile selection; placement and quantity by class of loss; amps, GPOs and scaling; clean, grey, sewage and mould conditions; and buying plus on-site assessment."
+    },
+    {
+      "q": "Is this course written for Australian conditions?",
+      "a": "Yes. It is written for the Australian market throughout, using 230 V / 50 Hz power, 10 A GPOs, metric units, and equipment available in Australia as at July 2026."
+    },
+    {
+      "q": "Should low-profile air movers be my main drying equipment?",
+      "a": "No. The course makes this its through-line: low-profile units have a place, but they should not be the primary air mover for a professional firm. The aim is to match the air mover to the job."
+    },
+    {
+      "q": "How much does this course cost?",
+      "a": "It is free to enrol. The live course page lists it as a free course, so you can start it without paying."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Air Movers for Professional Restoration: Specs, Selection and On-Site Assessment",
+    "description": "An Australian course on selecting, placing and scaling air movers for restoration work. Covers airflow, static pressure and lift; axial, centrifugal and low-profile selection; placement and quantity by class of loss; amps, GPOs and scaling on 230 V power; clean, grey, sewage and mould conditions; and buying plus on-site assessment.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

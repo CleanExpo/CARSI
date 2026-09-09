@@ -1,0 +1,45 @@
+{
+  "slug": "risk-assessment-course",
+  "seoTitle": "Risk Assessment Course | CARSI",
+  "metaDescription": "Risk assessment is the foundation of every legally compliant WHS management system.",
+  "imageAlt": "CARSI course: Risk Assessment Course",
+  "og": {
+    "title": "Risk Assessment Course | CARSI",
+    "description": "Risk assessment is the foundation of every legally compliant WHS management system."
+  },
+  "keywords": [
+    "WHS risk assessment training",
+    "restoration risk matrix",
+    "JSEA training",
+    "SWMS writing",
+    "worker consultation"
+  ],
+  "faq": [
+    {
+      "q": "What does the Risk Assessment course cover?",
+      "a": "This course provides restoration and cleaning professionals with a complete, practical risk assessment framework — from understanding Australian WHS law to building and using a risk matrix, completing a JSEA, writing a SWMS, and conducting genuine consultation with workers."
+    },
+    {
+      "q": "What is the focus of the Risk Assessment course?",
+      "a": "Risk assessment is the foundation of every legally compliant WHS management system."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Risk Assessment Course",
+    "description": "Risk assessment is the foundation of every legally compliant WHS management system. This course provides restoration and cleaning professionals with a complete, practical risk assessment framework — from understanding Australian WHS law to building and using a risk matrix, completing a JSEA, writing a SWMS, and conducting genuine consultation with workers. Every module is grounded in real restoration and remediation scenarios.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "99",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

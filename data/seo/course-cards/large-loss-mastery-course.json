@@ -1,0 +1,44 @@
+{
+  "slug": "large-loss-mastery-course",
+  "seoTitle": "Large Loss Mastery Course | CARSI",
+  "metaDescription": "The Large Loss Mastery Course is the most advanced operational and business course in the CARSI curriculum.",
+  "imageAlt": "CARSI course: Large Loss Mastery Course",
+  "og": {
+    "title": "Large Loss Mastery Course | CARSI",
+    "description": "The Large Loss Mastery Course is the most advanced operational and business course in the CARSI curriculum."
+  },
+  "keywords": [
+    "Large Loss Mastery Course",
+    "large loss mastery",
+    "large loss training",
+    "loss mastery course"
+  ],
+  "faq": [
+    {
+      "q": "What does the Large Loss Mastery course cover?",
+      "a": "This course covers the complete framework for successfully delivering large loss projects and building a business capable of competing in this high-value segment.\n\nLarge loss restoration in Australia is a commercially significant market segment."
+    },
+    {
+      "q": "What does the Large Loss Mastery course help learners understand?",
+      "a": "It is designed for experienced restoration professionals who are moving into large loss project management or who are seeking to grow their business into the large loss segment of the Australian restoration market."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Large Loss Mastery Course",
+    "description": "The Large Loss Mastery Course is the most advanced operational and business course in the CARSI curriculum. It is designed for experienced restoration professionals who are moving into large loss project management or who are seeking to grow their business into the large loss segment of the Australian restoration market. A large loss event — a water damage event affecting a commercial building, multi-storey complex, or major industrial facility — requires a fundamentally different set of skills, systems, and resources to standard residential restoration. This course covers the complete framework for successfully delivering large loss projects and building a business capable of competing in this high-value segment.\n\nLarge loss restoration in Australia is a commercially significant market segment. Commercial and strata water damage events, post-storm recovery projects, and industrial loss events regularly generate project values from $100,000 to several million dollars. Business operators who have the systems, certification, documentation capability, and equipment relationships to credibly respond to large loss events operate in a substantially higher-value market than those limited to residential losses.\n\nThe course covers: project management structure for large loss events, equipment logistics and specialist subcontractor management, insurer and loss adjuster relationship management for complex claims, documentation systems for multi-week and multi-area projects, business development strategies for accessing commercial and institutional large loss work, risk management and liability considerations for large scale restoration projects, and the financial management considerations specific to large loss projects including cash flow during extended projects and milestone invoicing.\n\nThis course is delivered in combination with advanced technical content covering desiccant drying systems, large building structural drying, industrial and commercial facility-specific drying considerations, and multi-trade coordination on complex restoration projects.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

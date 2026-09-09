@@ -1,0 +1,40 @@
+{
+  "slug": "introduction-to-smoke-and-soot-damage-restoration",
+  "seoTitle": "Introduction to Smoke and Soot Damage Restoration | CARSI",
+  "metaDescription": "Smoke and soot restoration: assessing, containing and cleaning fire-affected properties.",
+  "imageAlt": "CARSI course: Introduction to Smoke and Soot Damage Restoration",
+  "og": {
+    "title": "Introduction to Smoke and Soot Damage Restoration | CARSI",
+    "description": "Smoke and soot restoration: assessing, containing and cleaning fire-affected properties."
+  },
+  "keywords": [
+    "Introduction to Smoke and Soot Damage Restoration",
+    "introduction smoke and soot damage restoration",
+    "introduction smoke training",
+    "damage restoration course"
+  ],
+  "faq": [
+    {
+      "q": "What does the Introduction to Smoke and Soot Damage Restoration course cover?",
+      "a": "This course equips restoration professionals with the knowledge to assess, contain, and remediate fire, smoke, and soot damage in residential and commercial buildings."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Introduction to Smoke and Soot Damage Restoration",
+    "description": "This course equips restoration professionals with the knowledge to assess, contain, and remediate fire, smoke, and soot damage in residential and commercial buildings. It covers the chemistry of fire dynamics, systematic damage assessment methodology, the behaviour of smoke particulates in structures, the challenges of cleaning smoke-affected surfaces and contents, and odour control methods specific to fire events. Content is grounded in IICRC S700 standards and Australian safety and environmental compliance requirements.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "29",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

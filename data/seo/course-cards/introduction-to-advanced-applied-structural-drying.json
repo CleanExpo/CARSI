@@ -1,0 +1,45 @@
+{
+  "slug": "introduction-to-advanced-applied-structural-drying",
+  "seoTitle": "Introduction to Advanced Applied Structural Drying | CARSI",
+  "metaDescription": "This course is designed for experienced technicians moving into advanced structural drying practice and project management.",
+  "imageAlt": "CARSI course: Introduction to Advanced Applied Structural Drying",
+  "og": {
+    "title": "Introduction to Advanced Applied Structural Drying | CARSI",
+    "description": "This course is designed for experienced technicians moving into advanced structural drying practice and project management."
+  },
+  "keywords": [
+    "advanced applied structural drying",
+    "psychrometric drying analysis",
+    "complex loss drying strategy",
+    "structural drying project management",
+    "drying completion verification"
+  ],
+  "faq": [
+    {
+      "q": "What does the Introduction to Advanced Applied Structural Drying course cover?",
+      "a": "It covers psychrometric analysis as a practical drying management tool, how to develop comprehensive drying strategies for complex losses, advanced moisture removal techniques, systematic progress monitoring, and the formal completion verification process required for complex and large loss restoration projects."
+    },
+    {
+      "q": "What does the Introduction to Advanced Applied Structural Drying course help learners understand?",
+      "a": "This course is designed for experienced technicians moving into advanced structural drying practice and project management."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Introduction to Advanced Applied Structural Drying",
+    "description": "This course is designed for experienced technicians moving into advanced structural drying practice and project management. It covers psychrometric analysis as a practical drying management tool, how to develop comprehensive drying strategies for complex losses, advanced moisture removal techniques, systematic progress monitoring, and the formal completion verification process required for complex and large loss restoration projects. Aligned with the IICRC S500 standard and Australian commercial restoration requirements.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

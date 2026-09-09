@@ -1,0 +1,45 @@
+{
+  "slug": "level-2-mould-remediation-30ee3492",
+  "seoTitle": "Level 2 — Mould Remediation | CARSI",
+  "metaDescription": "Builds directly on Level 1 and takes you into more complex jobs — one to ten square metres, semi-porous materials like plasterboard and timber framing.",
+  "imageAlt": "CARSI course: Level 2 — Mould Remediation",
+  "og": {
+    "title": "Level 2 — Mould Remediation | CARSI",
+    "description": "Builds directly on Level 1 and takes you into more complex jobs — one to ten square metres, semi-porous materials like plasterboard and timber framing."
+  },
+  "keywords": [
+    "Level 2 mould remediation",
+    "plasterboard mould remediation",
+    "negative pressure containment",
+    "mould JSEA training",
+    "biological hazard control"
+  ],
+  "faq": [
+    {
+      "q": "What does the Level 2 — Mould Remediation course cover?",
+      "a": "Covers the full remediation process from material removal through to waste disposal and job close-out."
+    },
+    {
+      "q": "What is the focus of the Level 2 — Mould Remediation course?",
+      "a": "Builds directly on Level 1 and takes you into more complex jobs — one to ten square metres, semi-porous materials like plasterboard and timber framing."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Level 2 — Mould Remediation",
+    "description": "Builds directly on Level 1 and takes you into more complex jobs — one to ten square metres, semi-porous materials like plasterboard and timber framing. You learn how Australian WHS laws apply to this work, how to set up proper containment with negative air pressure, how to use moisture meters to track drying, how to manage biological hazards and stronger chemicals, how to complete a JSEA, how to document a job professionally, and how to handle emergencies and notifiable incidents. Covers the full remediation process from material removal through to waste disposal and job close-out.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "49",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

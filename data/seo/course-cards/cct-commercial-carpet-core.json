@@ -1,0 +1,45 @@
+{
+  "slug": "cct-commercial-carpet-core",
+  "seoTitle": "Commercial Carpet Care — Core Methods | CARSI",
+  "metaDescription": "Fibres, soil chemistry, machine methods, and maintenance planning for commercial textile flooring.",
+  "imageAlt": "CARSI course: Commercial Carpet Care — Core Methods",
+  "og": {
+    "title": "Commercial Carpet Care — Core Methods | CARSI",
+    "description": "Fibres, soil chemistry, machine methods, and maintenance planning for commercial textile flooring."
+  },
+  "keywords": [
+    "commercial carpet core course",
+    "commercial carpet maintenance",
+    "textile flooring cleaning",
+    "hot water carpet extraction",
+    "low-moisture carpet systems"
+  ],
+  "faq": [
+    {
+      "q": "What does Commercial Carpet Care — Core Methods cover?",
+      "a": "Practical commercial carpet maintenance aligned with professional cleaning expectations in education, retail, and strata settings."
+    },
+    {
+      "q": "Which syllabus topics are listed for Commercial Carpet Care — Core Methods?",
+      "a": "Syllabus topics include Module 1 — Fibre ID & construction; Module 2 — Soil types & traffic patterns; Module 3 — Pre-inspection & testing; Module 4 — Dry soil removal; Module 5 — Hot water extraction methods; Module 6 — Low-moisture & interim systems."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Commercial Carpet Care — Core Methods",
+    "description": "Practical commercial carpet maintenance aligned with professional cleaning expectations in education, retail, and strata settings. Syllabus topics include Module 1 — Fibre ID & construction; Module 2 — Soil types & traffic patterns; Module 3 — Pre-inspection & testing; Module 4 — Dry soil removal; Module 5 — Hot water extraction methods; Module 6 — Low-moisture & interim systems.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

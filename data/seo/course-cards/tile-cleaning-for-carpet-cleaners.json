@@ -1,0 +1,41 @@
+{
+  "slug": "tile-cleaning-for-carpet-cleaners",
+  "seoTitle": "Tile Cleaning for Carpet Cleaners | CARSI",
+  "metaDescription": "Tile cleaning for carpet cleaners: tile types, chemistry, sealing and maintenance.",
+  "imageAlt": "CARSI course: Tile Cleaning for Carpet Cleaners",
+  "og": {
+    "title": "Tile Cleaning for Carpet Cleaners | CARSI",
+    "description": "Tile cleaning for carpet cleaners: tile types, chemistry, sealing and maintenance."
+  },
+  "keywords": [
+    "tile cleaning training course",
+    "tile and grout cleaning",
+    "tile cleaning chemistry",
+    "tile sealing training",
+    "tile maintenance services"
+  ],
+  "faq": [
+    {
+      "q": "What does the Tile Cleaning for Carpet Cleaners course cover?",
+      "a": "Understand the importance of tile cleaning in addition to carpet cleaning.\n\nLearn the different types of tiles and their specific cleaning needs.\n\nMaster the chemistry behind cleaning solutions.\n\nDevelop skills for sealing tiles and grout.\n\nExplore maintenance practices and strategies for upselling services."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Tile Cleaning for Carpet Cleaners",
+    "description": "Understand the importance of tile cleaning in addition to carpet cleaning.\n\nLearn the different types of tiles and their specific cleaning needs.\n\nMaster the chemistry behind cleaning solutions.\n\nDevelop skills for sealing tiles and grout.\n\nExplore maintenance practices and strategies for upselling services.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}

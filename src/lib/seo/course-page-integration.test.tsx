@@ -92,4 +92,29 @@ describe('course page SEO truth integration', () => {
     ).toBe(true);
     expect(schemaStrings(schema).some(hasContradictoryPriceClaim)).toBe(false);
   });
+
+  it('renders authored descriptive Course JSON-LD while live database commerce and identity win', async () => {
+    const page = await CourseDetailPage({ params: Promise.resolve({ slug }) });
+    const html = renderToStaticMarkup(page);
+    const schemas = Array.from(
+      html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g),
+      (match) => JSON.parse(match[1]) as Record<string, unknown>,
+    );
+    const courseSchemas = schemas.filter((schema) => schema['@type'] === 'Course');
+
+    expect(courseSchemas).toHaveLength(1);
+    const [schema] = courseSchemas;
+    expect(schema.name).toBe(paidCourse.title);
+    expect(schema.url).toBe(`https://carsi.com.au/courses/${slug}`);
+    expect(schema.description).toContain('identifying, assessing and deodorising indoor air odours');
+    expect(schema.coursePrerequisites).toBe('None — open entry');
+    expect(schema.inLanguage).toBe('en-AU');
+    expect(schema.offers).toMatchObject({
+      url: `https://carsi.com.au/courses/${slug}`,
+      price: 29,
+      priceCurrency: 'AUD',
+      availability: 'https://schema.org/InStock',
+      category: 'Paid',
+    });
+  });
 });

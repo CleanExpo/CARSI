@@ -1,0 +1,44 @@
+{
+  "slug": "introduction-to-using-personal-protective-equipment",
+  "seoTitle": "Introduction to Using Personal Protective Equipment | CARSI",
+  "metaDescription": "This course provides cleaning and restoration professionals with practical working knowledge of the personal protective equipment (PPE) used in their daily roles.",
+  "imageAlt": "CARSI course: Introduction to Using Personal Protective Equipment",
+  "og": {
+    "title": "Introduction to Using Personal Protective Equipment | CARSI",
+    "description": "This course provides cleaning and restoration professionals with practical working knowledge of the personal protective equipment (PPE) used in their daily roles."
+  },
+  "keywords": [
+    "Introduction to Using Personal Protective Equipment",
+    "introduction using personal protective equipment",
+    "introduction using training",
+    "protective equipment course"
+  ],
+  "faq": [
+    {
+      "q": "What does the Introduction to Using Personal Protective Equipment course cover?",
+      "a": "This course provides cleaning and restoration professionals with practical working knowledge of the personal protective equipment (PPE) used in their daily roles."
+    },
+    {
+      "q": "What does the Introduction to Using Personal Protective Equipment course help learners understand?",
+      "a": "PPE is the last line of defence in the hierarchy of controls — understanding its correct use is a WHS obligation, not just a best practice.\n\nTopics covered: respiratory protection selection, fit-checking, and correct use; eye and face protection types and applications; head protection in restoration environments; hearing protection selection and correct fitting; and body protection including gloves, coveralls, and chemical-resistant clothing."
+    }
+  ],
+  "courseJsonLd": {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": "Introduction to Using Personal Protective Equipment",
+    "description": "This course provides cleaning and restoration professionals with practical working knowledge of the personal protective equipment (PPE) used in their daily roles. You will learn to select the right PPE for specific hazards, wear it correctly, maintain it in serviceable condition, and understand its limitations. PPE is the last line of defence in the hierarchy of controls — understanding its correct use is a WHS obligation, not just a best practice.\n\nTopics covered: respiratory protection selection, fit-checking, and correct use; eye and face protection types and applications; head protection in restoration environments; hearing protection selection and correct fitting; and body protection including gloves, coveralls, and chemical-resistant clothing.",
+    "provider": {
+      "@type": "Organization",
+      "name": "CARSI",
+      "sameAs": "https://carsi.com.au"
+    },
+    "inLanguage": "en-AU",
+    "offers": {
+      "@type": "Offer",
+      "price": "29",
+      "priceCurrency": "AUD",
+      "availability": "https://schema.org/InStock"
+    }
+  }
+}
