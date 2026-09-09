@@ -179,6 +179,8 @@ export default async function AgedCareIndustryPage() {
         description="Mould, air quality and carpet courses for technicians servicing aged care. Ask about team seats if a contractor or provider is training more than one person."
         ctaText="Talk to CARSI"
         ctaHref="/contact"
+        secondaryHref="/industries/facility-management"
+        secondaryText="Facility managers"
         accentColor={ACCENT_COLOR}
       />
     </IndustryPageLayout>
