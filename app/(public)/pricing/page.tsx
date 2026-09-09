@@ -104,9 +104,9 @@ export default function PricingPage() {
                 : 'Buy any course individually. Free Library for everyone — no card required. Yearly membership and Teams plans are coming soon.'}
             </p>
             <p className="mx-auto mt-4 max-w-2xl rounded-lg border border-[#f2cf8f] bg-[#fff8ed] px-4 py-3 text-sm leading-relaxed text-[#7a3500]">
-              CARSI courses carry CARSI Southern Hemisphere Restoration Designations. They are not IICRC
-              certification courses — IICRC certifications are obtained through IICRC-approved schools
-              and examinations.
+              CARSI courses carry CARSI Southern Hemisphere Restoration Designations. They are not
+              IICRC certification courses — IICRC certifications are obtained through IICRC-approved
+              schools and examinations.
             </p>
           </section>
 
@@ -131,6 +131,31 @@ export default function PricingPage() {
               className="inline-flex min-h-11 items-center justify-center rounded-lg bg-[#9a4a00] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#7a3500]"
             >
               Find my pathway
+            </Link>
+          </section>
+
+          <section
+            aria-label="Facility management crews"
+            className="mb-10 grid gap-5 rounded-xl border border-[#b8dbfb] bg-[#eef7ff] p-6 shadow-sm md:grid-cols-[1fr_auto] md:items-center"
+          >
+            <div>
+              <p className="mb-2 text-[11px] font-semibold tracking-[0.18em] text-[#146fc2] uppercase">
+                Training more than one technician?
+              </p>
+              <h2 className="text-xl font-semibold text-slate-950">
+                Hospital, aged-care and hotel crews
+              </h2>
+              <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
+                Published team prices are below. The facility-management page maps those seats to
+                the live site pathways and the employer proof-pack. Team checkout is coming soon —
+                contact CARSI to start a crew.
+              </p>
+            </div>
+            <Link
+              href="/industries/facility-management"
+              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-[#146fc2] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#0f5fa8]"
+            >
+              Facility management path
             </Link>
           </section>
 
@@ -256,9 +281,7 @@ function MembershipCard({
         ) : null}
         <div className="flex items-baseline gap-1">
           <span className="text-3xl font-bold text-slate-950">{price}</span>
-          {price !== 'FREE' ? (
-            <span className="text-sm text-slate-500">{priceSuffix}</span>
-          ) : null}
+          {price !== 'FREE' ? <span className="text-sm text-slate-500">{priceSuffix}</span> : null}
         </div>
         <p className="mt-1 text-xs text-slate-500">{helper ?? priceSuffix}</p>
       </div>
