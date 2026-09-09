@@ -165,9 +165,11 @@ export default async function HospitalityIndustryPage() {
         subtitle="Hospitality training"
         title="Train the crew that protects inventory"
         price={industryBundlePriceLabel('hospitality')}
-        description="Water damage, carpet care and odour control courses for hotel maintenance teams and subcontractors. Bulk licensing available for multi-property groups."
-        ctaText="Request team pricing"
+        description="Water damage, carpet care and odour control courses for hotel maintenance teams and subcontractors. Ask about team seats for multi-property groups."
+        ctaText="Talk to CARSI"
         ctaHref="/contact"
+        secondaryHref="/industries/facility-management"
+        secondaryText="Facility managers"
         accentColor={ACCENT_COLOR}
       />
     </IndustryPageLayout>
