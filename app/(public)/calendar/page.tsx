@@ -1,7 +1,7 @@
-import type { Metadata } from 'next';
-import Link from 'next/link';
-import { BreadcrumbSchema } from '@/components/seo';
-import { MarketingPageShell, marketingPageInnerClass } from '@/components/marketing/MarketingPageShell';
+import {
+  MarketingPageShell,
+  marketingPageInnerClass,
+} from '@/components/marketing/MarketingPageShell';
 import {
   HubCtaBanner,
   HubEmptyState,
@@ -10,13 +10,13 @@ import {
   HubPlaceholderCard,
   HubSecondaryPills,
 } from '@/components/marketing/hub/HubUi';
-import { getBackendOrigin } from '@/lib/env/public-url';
-import { filterExcludedEvents } from '@/lib/calendar/event-exclusions';
+import { BreadcrumbSchema } from '@/components/seo';
 import {
   buildCalendarCourseEntries,
   groupCoursesByTopic,
 } from '@/lib/calendar/carsi-course-listing';
-import { getPublishedCourseListItemsFromDatabase } from '@/lib/server/public-courses-list';
+import { filterExcludedEvents } from '@/lib/calendar/event-exclusions';
+import { getBackendOrigin } from '@/lib/env/public-url';
 import {
   marketingHubCard,
   marketingHubSectionLabel,
@@ -26,6 +26,9 @@ import {
   marketingTopicPill,
 } from '@/lib/marketing/marketing-ui';
 import { OG_IMAGES } from '@/lib/seo/og-image';
+import { getPublishedCourseListItemsFromDatabase } from '@/lib/server/public-courses-list';
+import type { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Industry Calendar — Australian Restoration Courses & Events',
@@ -374,7 +377,7 @@ export default async function CalendarPage({
                         className={`${marketingHubCard} block transition hover:opacity-90`}
                       >
                         <span className={`${marketingTopicPill} mb-3 inline-block`}>
-                          {course.isFree ? 'Free' : 'Paid'}
+                          {course.isFree ? 'Free' : (course.priceLabel ?? 'Paid')}
                         </span>
                         <span className={`block text-base ${marketingTextStrong}`}>
                           {course.title}
