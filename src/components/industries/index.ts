@@ -8,6 +8,8 @@ export { IndustryEvidenceLinks } from './IndustryEvidenceLinks';
 export { IndustryFAQSection } from './IndustryFAQSection';
 export { IndustryHero } from './IndustryHero';
 export { IndustryPageLayout } from './IndustryPageLayout';
+export { IndustryProofPack } from './IndustryProofPack';
 export { IndustryRecommendedCourses } from './IndustryRecommendedCourses';
+export { IndustrySitePathways } from './IndustrySitePathways';
 export { IndustrySearchTopics } from './IndustrySearchTopics';
 export { IndustryWhySection } from './IndustryWhySection';
