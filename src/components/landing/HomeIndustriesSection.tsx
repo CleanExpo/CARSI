@@ -4,6 +4,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import {
   ArrowRight,
   Baby,
+  Briefcase,
   Building2,
   GraduationCap,
   HandHeart,
@@ -34,6 +35,14 @@ const SECTORS = [
     icon: HeartPulse,
     description: 'Infection control and moisture response for clinical environments.',
     chips: ['Infection control', 'Mould response', 'Compliance ready'],
+  },
+  {
+    slug: 'facility-management',
+    label: 'Facility management',
+    icon: Briefcase,
+    description:
+      'Team records and published seat prices for the crews on hospital, aged-care and hotel contracts.',
+    chips: ['Team seats', 'CEC tracking', 'Proof-pack'],
   },
   {
     slug: 'hospitality',
@@ -117,7 +126,7 @@ const SECTORS = [
 const spring = { type: 'spring' as const, stiffness: 120, damping: 22 };
 
 /**
- * Interactive sector explorer. A rail of twelve sector links drives a large
+ * Interactive sector explorer. A rail of sector links drives a large
  * premium preview panel: hovering or focusing a sector crossfades the panel to
  * that sector's icon, description, outcome chips, and pathway link. The rail
  * collapses to a horizontally scrollable chip row on small screens.
