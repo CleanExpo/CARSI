@@ -10,6 +10,10 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('@/lib/api/stripe', () => ({
   constructWebhookEvent: mocks.construct,
+  resolveStripeWebhookSecret: () => 'whsec_test_webhook_secret',
+  isVerifiedStripeEventShape: (event: { id?: string; object?: string }) =>
+    typeof event.id === 'string' && event.id.startsWith('evt_') && event.object === 'event',
+  webhookLivemodeMatchesApiKey: () => true,
   getStripeClient: () => ({
     paymentIntents: { retrieve: vi.fn().mockResolvedValue({ invoice: null }) },
     checkout: { sessions: { list: vi.fn().mockResolvedValue({ data: [{ id: 'cs_early' }] }) } },
@@ -42,7 +46,7 @@ const ORIGINAL_ENV = { ...process.env };
 
 beforeEach(() => {
   vi.clearAllMocks();
-  process.env.STRIPE_WEBHOOK_SECRET = 'test_webhook_secret';
+  process.env.STRIPE_WEBHOOK_SECRET = 'whsec_test_webhook_secret';
   process.env.DATABASE_URL = 'postgresql://offline.invalid/test';
   mocks.claim.mockResolvedValue({ claimed: true });
   mocks.persistReversal.mockRejectedValue(new Error('reversal ledger unavailable'));
@@ -50,6 +54,8 @@ beforeEach(() => {
   mocks.markProcessed.mockResolvedValue(undefined);
   mocks.construct.mockReturnValue({
     id: 'evt_early_refund',
+    object: 'event',
+    livemode: false,
     type: 'charge.refunded',
     created: 1_784_467_200,
     data: {
@@ -72,9 +78,12 @@ describe('Stripe webhook durable attribution reversal', () => {
     const response = await POST(
       new Request('https://carsi.com.au/api/lms/webhooks/stripe', {
         method: 'POST',
-        headers: { 'stripe-signature': 'offline-signature' },
+        headers: {
+          'content-type': 'application/json',
+          'stripe-signature': `t=1710000000,v1=${'ab'.repeat(32)}`,
+        },
         body: '{}',
-      }) as never,
+      }) as never
     );
 
     expect(response.status).toBe(500);
