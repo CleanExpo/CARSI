@@ -191,19 +191,62 @@ export async function getPaymentIntent(paymentIntentId: string) {
 // Webhook Helpers
 // ---------------------------------------------------------------------------
 
-/**
- * Verify and construct a Stripe webhook event from the raw body.
- * Use in API routes that receive Stripe webhooks.
- */
-export function constructWebhookEvent(rawBody: string | Buffer, signature: string): Stripe.Event {
-  const stripe = getStripeClient();
-  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
+/** Stripe's default replay window. Passed explicitly so it cannot silently widen. */
+export const STRIPE_WEBHOOK_TOLERANCE_SECONDS = 300;
 
-  if (!endpointSecret) {
+export function normalizeStripeWebhookSecret(rawSecret: string): string {
+  return rawSecret
+    .trim()
+    .replace(/^['"`]+|['"`]+$/g, '')
+    .replace(/\s+/g, '');
+}
+
+export function resolveStripeWebhookSecret(rawSecret = process.env.STRIPE_WEBHOOK_SECRET || ''): string {
+  const secret = normalizeStripeWebhookSecret(rawSecret);
+  if (!secret.startsWith('whsec_') || secret.length < 16) {
     throw new Error('Stripe webhook secret not configured. Set STRIPE_WEBHOOK_SECRET in .env');
   }
+  return secret;
+}
 
-  return stripe.webhooks.constructEvent(rawBody, signature, endpointSecret);
+export function isVerifiedStripeEventShape(event: {
+  id?: unknown;
+  object?: unknown;
+}): event is { id: string; object: 'event' } {
+  return (
+    typeof event.id === 'string' &&
+    event.id.startsWith('evt_') &&
+    event.object === 'event'
+  );
+}
+
+/**
+ * A live API key must only process `livemode: true` events (and test keys the
+ * inverse). Unknown key shapes do not drop a signature-verified event.
+ */
+export function webhookLivemodeMatchesApiKey(
+  livemode: boolean,
+  rawKey = process.env.STRIPE_SECRET_KEY || '',
+): boolean {
+  const key = normalizeStripeSecretKey(rawKey);
+  if (key.startsWith('sk_live_') || key.startsWith('rk_live_')) return livemode === true;
+  if (key.startsWith('sk_test_') || key.startsWith('rk_test_')) return livemode === false;
+  return true;
+}
+
+/**
+ * Verify and construct a Stripe webhook event from the raw body.
+ * Uses the static Stripe webhook helper so verification does not depend on
+ * `STRIPE_SECRET_KEY` being present or valid.
+ */
+export function constructWebhookEvent(rawBody: string | Buffer, signature: string): Stripe.Event {
+  const endpointSecret = resolveStripeWebhookSecret();
+  return Stripe.webhooks.constructEvent(
+    rawBody,
+    signature,
+    endpointSecret,
+    STRIPE_WEBHOOK_TOLERANCE_SECONDS,
+  );
 }
 
 // ---------------------------------------------------------------------------
