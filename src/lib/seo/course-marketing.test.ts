@@ -289,6 +289,29 @@ describe('current repository truth', () => {
     expect(sourceCards).toEqual(cardsIndex);
   });
 
+  it('keeps every card meta description inside the length search engines render', () => {
+    // Observed on carsi.com.au 2026-09-10: three cards shipped 173-192 chars and were
+    // cut off in the SERP - the exact defect the card programme exists to remove.
+    const tooLong = Object.entries(cardsIndex)
+      .map(([slug, card]) => [slug, card.metaDescription.length] as const)
+      .filter(([, length]) => length > 165);
+
+    expect(tooLong).toEqual([]);
+  });
+
+  it('never writes a money amount into FAQ prose', () => {
+    // FAQPage JSON-LD is the one card surface the page renders, and
+    // resolveCourseMarketingTruth cannot correct a price inside it: it catches a
+    // zero-price claim on a paid course, but nothing catches "AUD $29" once the real
+    // price moves. The page's own offers block already renders a current price.
+    const money = /(?:A?\$\s*\d|\b\d+\s*(?:dollars|AUD)\b)/i;
+    const offenders = Object.entries(cardsIndex)
+      .filter(([, card]) => card.faq.some((entry) => money.test(`${entry.q} ${entry.a}`)))
+      .map(([slug]) => slug);
+
+    expect(offenders).toEqual([]);
+  });
+
   it('resolves all 24 surfaced paid courses without a commerce contradiction', () => {
     const failures: string[] = [];
 
