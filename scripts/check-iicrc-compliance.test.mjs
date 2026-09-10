@@ -13,7 +13,7 @@
  *     whitespace-only variant of an allowlisted line still passes (normalisation); planted claim
  *     fires and a clean line is silent.
  */
-import { evaluateContent, normaliseLine, IICRC_INSTITUTION_CONNECTORS } from './check-iicrc-compliance.mjs';
+import { evaluateContent, normaliseLine, ALLOWLISTS } from './check-iicrc-compliance.mjs';
 
 // A non-approved course fixture path (no slug appears in cec-approvals.json → not slug-exempt).
 const NON_APPROVED = 'data/seed/courses-catalog.json';
@@ -141,167 +141,96 @@ if (evaluateContent(NON_APPROVED, spacedVariant, allowG).length > 0) fail('white
 if (evaluateContent(NON_APPROVED, 'This course awards 4 IICRC CECs.', EMPTY).length === 0) fail('planted "awards 4 IICRC CECs" did not fire.');
 if (evaluateContent(NON_APPROVED, 'This course is Australian-produced. Ten-question knowledge check.', EMPTY).length > 0) fail('clean line fired the guard.');
 
-// ── Line-wrapped allow phrases (2026-09-10) ─────────────────────────────────
-// Prettier wraps JSX prose, and on main the wrap fell between "IICRC-approved"
-// and "schools". The allow pattern already permitted that phrase, but the scan
-// is line-by-line so it could never match — the guard fired on the exact
-// disclaimer CLAUDE.md prescribes, and the cheapest way to green CI would have
-// been deleting a licence-protective sentence. The ALLOW window now spans the
-// following line; the BAN window deliberately does not.
-const WRAPPED_LEGITIMATE = [
-  ['obtained-through, wrapped after "IICRC-approved"',
-   'CARSI does not deliver IICRC certification. IICRC certifications are obtained through IICRC-approved\n              schools and examinations.'],
-  ['bought-from, wrapped after "IICRC-approved"',
-   'A certification is bought once per discipline, from an IICRC-approved\n          school and its examination.'],
-  // A possessive can lead a REAL IICRC examination - the apostrophe alone must not decide.
-  ['possessive leading a real examination',
-   'Certification comes from an IICRC-approved school\u2019s examination.'],
-  // Authored prose is also split by JS string concatenation, not only by a Prettier wrap.
-  // This is the live sentence in src/components/seo/JsonLd.tsx.
-  // A markdown list item ends its sentence at the line break. The ALLOW window must not glue
-  // the NEXT item onto it - doing so appended "3." to a phrase that had already terminated and
-  // blocked this real line (docs/marketing/lead-magnets/government-contractor-guide.md:308).
-  ['list item ending at the line break, next item follows',
-   'obtained through an IICRC-approved school and examination\n3. **Keep your CECs current with CARSI** - options are at carsi.com.au/pricing'],
-  ['sentence split across a JS concat seam',
-   "'approval. IICRC certification itself is obtained through an IICRC-approved school and ' +\n  'examination.';"],
-];
-for (const [name, text] of WRAPPED_LEGITIMATE) {
-  if (evaluateContent(NON_APPROVED, text, EMPTY).length > 0) {
-    fail(`legitimate wrapped phrase should PASS: ${name}\n    ${text.replace(/\n/g, '\\n')}`);
+// ── "IICRC-approved": block by default, exact human allowlist (v4, 2026-09-10) ─
+// Four regex allow-patterns were each defeated by a new prose construction (see the rule's
+// comment). The control is no longer a pattern - it is a human reading a sentence - so the tests
+// below check the MECHANISM, not a shape: the shipped allowlist passes, near-misses do not, a
+// wrap fragment cannot be approved, and an empty allowlist blocks everything.
+
+// 1. POSITIVE CONTROL, generated from the shipped allowlist. Every approved line must pass; if
+//    one does not, the guard is blocking a licence disclaimer the founder already approved.
+let approvedChecked = 0;
+for (const entry of ALLOWLISTS.iicrcApprovedLines) {
+  approvedChecked += 1;
+  if (evaluateContent(NON_APPROVED, entry).length > 0) {
+    fail(`allowlisted line should PASS:\n    ${entry.slice(0, 140)}`);
   }
 }
-
-// The widened window must not excuse a real violation. Each of these keeps the
-// banned claim intact on its own line; the next line is innocent prose.
-const WRAPPED_STILL_BANNED = [
-  ['CARSI offering, innocent next line',
-   'Our IICRC-approved courses get you certified.\n              Enrol today and start straight away.'],
-  ['banned claim wrapped, no allow noun anywhere',
-   'Every CARSI course is IICRC-approved\n              and recognised industry wide.'],
-  // Found by independent review of 9a65cc8d, which built the wrapped form. Probing it
-  // showed the ONE-LINE form passed on base too: the allow pattern matched
-  // "IICRC-approved school" inside "IICRC-approved school courses", so a CARSI offering
-  // was read as a third-party institution. Pre-existing hole, not introduced by the
-  // wrap window. Both forms are pinned here.
-  ['school modifying courses, one line',
-   'Our IICRC-approved school courses get you certified.'],
-  ['school modifying courses, wrapped',
-   'Our IICRC-approved\nschool courses get you certified.'],
-  ['examination modifying courses',
-   'Buy our IICRC-approved examination courses today.'],
-  // ROUND 2 (2026-09-10). The fix above excluded the ONE offering noun review had used
-  // ("courses"), so the next review walked past it with "training" - and probing then showed
-  // "programs", "workshops", "classes" and "course of study" had been through all along, on one
-  // line, since long before the wrap window existed. Enumerating what BREAKS fails open forever.
-  // v2 inverts it: the institution noun is allowed only where it ENDS its noun phrase, so an
-  // offering noun blocks without the pattern naming it. These pin one instance of each shape;
-  // the exhaustive institution x offering cross product is generated by the c3 partition probe.
-  ['school modifying training, one line',
-   'Our IICRC-approved school training gets you certified.'],
-  ['school modifying training, wrapped',
-   'Our IICRC-approved\nschool training gets you certified.'],
-  ['possessive institution modifying an offering',
-   "Our IICRC-approved school's training programs get you certified."],
-  ['connector leading an offering rather than an institution',
-   'Our IICRC-approved schools and training get you certified.'],
-  ['offering reached across a JS concat seam',
-   "Our IICRC-approved school ' + 'training gets you certified."],
-  ['course of study as a CARSI offering',
-   'Our IICRC-approved course of study gets you certified.'],
-];
-for (const [name, text] of WRAPPED_STILL_BANNED) {
-  if (evaluateContent(NON_APPROVED, text, EMPTY).length === 0) {
-    fail(`banned claim should still BLOCK across a wrap: ${name}\n    ${text.replace(/\n/g, '\\n')}`);
-  }
+if (approvedChecked === 0) {
+  fail('the IICRC-approved allowlist is empty - this control proved nothing');
 }
 
-// ── GENERATED partition: institution chain x offering noun (v3, 2026-09-10) ─
-// The hand-written cases above pin one instance of each shape a human thought of, which is
-// exactly the trap v1 and v2 both fell into. v1 excluded the single offering noun review had
-// used; v2 judged only the FIRST institution noun, so review round 3 reached an offering noun
-// through a connector - `school's examination courses`. v2's generator could not have caught
-// that: every frame it built had ONE institution noun, so the control had the same blind spot
-// as the pattern it was checking.
-//
-// v3 derives the frames from IICRC_INSTITUTION_CONNECTORS, the same list the allow pattern is
-// built from, so adding a connector there automatically generates the attacks against it.
-const INSTITUTION_NOUNS = ['school', 'schools', 'examination', 'examinations', 'exam', 'exams', 'instructor', 'instructors'];
-const OFFERING_NOUNS = [
-  'courses', 'course', 'training', 'programs', 'programmes', 'workshops', 'classes', 'modules',
-  'sessions', 'qualifications', 'certifications', 'certificates', 'curriculum', 'bootcamps',
-  'seminars', 'webinars', 'tuition', 'education', 'accreditation', 'designations', 'credentials',
-];
-const CONNECTOR_SAMPLES = IICRC_INSTITUTION_CONNECTORS.flatMap((c) => c.samples);
-// A preposition is NOT a connector here (see IICRC_PHRASE_TERMINATORS). These frames hold that
-// open: `at` was a terminator in v2 and left everything after it unjudged.
-const PREPOSITION_SAMPLES = [' at ', ' at a registered '];
-
-// Every way an offering noun can be reached from "IICRC-approved": directly, through one
-// connector, through a connector to a second institution noun, through two hops (which a future
-// `*` -> `?` edit on the chain would reopen), and through a preposition.
-const OFFERING_REACHES = [];
-for (const institution of INSTITUTION_NOUNS) {
-  OFFERING_REACHES.push([`${institution} `, 'direct']);
-  for (const connector of [...CONNECTOR_SAMPLES, ...PREPOSITION_SAMPLES]) {
-    OFFERING_REACHES.push([`${institution}${connector}`, 'one hop']);
-    OFFERING_REACHES.push([`${institution}${connector}examination `, 'via a second institution']);
-    OFFERING_REACHES.push([`${institution}${connector}examination${connector}instructor `, 'two hops']);
-  }
-}
-const OFFERING_FRAMES = [
-  ['one line', (reach, o) => `Our IICRC-approved ${reach}${o} get you certified.`],
-  ['wrapped', (reach, o) => `Our IICRC-approved\n${reach}${o} get you certified.`],
-  ['concat seam', (reach, o) => `Our IICRC-approved ${reach}' + '${o} get you certified.`],
-];
-
-let generatedCases = 0;
-for (const [reach, shape] of OFFERING_REACHES) {
-  for (const offering of OFFERING_NOUNS) {
-    for (const [frame, build] of OFFERING_FRAMES) {
-      const text = build(reach, offering);
-      generatedCases += 1;
-      if (evaluateContent(NON_APPROVED, text, EMPTY).length === 0) {
-        fail(`generated CARSI-offering claim should BLOCK [${shape}, ${frame}]\n    ${text.replace(/\n/g, '\\n')}`);
-      }
+// 2. NEAR-MISS, generated from the same allowlist. Splicing a CARSI offering noun into an
+//    approved sentence must block: exact match means a near-miss is not "close enough". This is
+//    generated rather than hand-written because a hand-written near-miss only ever tests the
+//    variant its author imagined - the failure that produced four review rounds.
+let nearMissChecked = 0;
+for (const entry of ALLOWLISTS.iicrcApprovedLines) {
+  for (const offering of ['courses', 'training', 'programs']) {
+    const nearMiss = entry.replace(/IICRC([\s-])approved/i, `IICRC$1approved ${offering} from`);
+    if (nearMiss === entry) continue;
+    nearMissChecked += 1;
+    if (evaluateContent(NON_APPROVED, nearMiss).length === 0) {
+      fail(`near-miss of an approved line should BLOCK:\n    ${nearMiss.slice(0, 140)}`);
     }
   }
 }
-// A generator that produced nothing would pass in silence, which is the failure this whole
-// section exists to prevent.
-const EXPECTED_GENERATED = OFFERING_REACHES.length * OFFERING_NOUNS.length * OFFERING_FRAMES.length;
-if (generatedCases !== EXPECTED_GENERATED) {
-  fail(`offering-noun partition did not generate: ${generatedCases} of ${EXPECTED_GENERATED}`);
+if (nearMissChecked < ALLOWLISTS.iicrcApprovedLines.size) {
+  fail(`near-miss control did not generate: ${nearMissChecked} of ${ALLOWLISTS.iicrcApprovedLines.size}`);
 }
 
-// A complete institution chain must still be ALLOWED at every depth - the partition must not
-// have been closed by simply blocking everything.
-const COMPLETE_CHAINS = [
-  'Certification comes from an IICRC-approved school.',
-  'Certification comes from an IICRC-approved schools and examinations.',
-  'Certification comes from an IICRC-approved school and its examination.',
-  'Certification comes from an IICRC-approved school’s examination.',
-  'Certification comes from an IICRC-approved School/Instructor listing.'.replace(' listing.', '.'),
+// 3. Every construction the four review rounds found. None is in the allowlist, so each blocks
+//    for the same reason rather than each needing its own rule. Kept as a regression record of
+//    what the regex versions permitted.
+const REVIEW_ROUND_PAYLOADS = [
+  ['r1 institution modifying courses', 'Our IICRC-approved school courses get you certified.'],
+  ['r1 same, across a wrap', 'Our IICRC-approved\nschool courses get you certified.'],
+  ['r2 institution modifying training', 'Our IICRC-approved school training gets you certified.'],
+  ['r3 offering through a possessive', "Our IICRC-approved school's examination courses get you certified."],
+  ['r3 offering through "and"', 'Our IICRC-approved school and examination courses get you certified.'],
+  ['r3 offering through "/"', 'Our IICRC-approved school/examination courses get you certified.'],
+  ['r4 offering after a comma', 'Our IICRC-approved school, courses get you certified.'],
+  ['r4 offering after an ampersand', 'Our IICRC-approved school & courses get you certified.'],
+  ['r4 offering via the CE branch', 'Our IICRC-approved CE courses get you certified.'],
+  ['offering after a semicolon', 'Our IICRC-approved school; courses get you certified.'],
+  ['offering after a colon', 'Our IICRC-approved school: courses get you certified.'],
+  ['offering after an em dash', 'Our IICRC-approved school — courses get you certified.'],
+  ['offering after a preposition', 'Our IICRC-approved school at examination courses get you certified.'],
+  ['offering via the CEC-provider branch', 'Our IICRC-approved CEC provider courses get you certified.'],
+  // GP-583 and GP-584 were documented residuals of the regex versions. Exact-line matching
+  // closes both FOR THIS RULE - pinned here so a future change cannot quietly reopen them.
+  ['GP-583 bare possessive claim', 'Our IICRC-approved school.'],
+  ['GP-584 allow co-occurring with a violation',
+   'Our IICRC-approved courses get you certified. CARSI is a CEC provider.'],
 ];
-for (const text of COMPLETE_CHAINS) {
-  if (evaluateContent(NON_APPROVED, text, EMPTY).length > 0) {
-    fail(`complete institution chain should PASS:\n    ${text}`);
+for (const [name, text] of REVIEW_ROUND_PAYLOADS) {
+  if (evaluateContent(NON_APPROVED, text).length === 0) {
+    fail(`CARSI-offering claim should BLOCK: ${name}\n    ${text.replace(/\n/g, '\\n')}`);
   }
 }
 
-// `at` is NOT a terminator (v3). It was one in v1-v2, and it left every span after it unjudged,
-// so round 1's payload passed one preposition later. This fixture was written in 9a65cc8d as a
-// PASS case; it is inverted rather than deleted so the change is visible. Nothing on the tree
-// uses this shape - `at` re-enters only as a bounded connector if live copy ever needs it.
-const PREPOSITION_NOT_A_TERMINATOR = [
-  ['offering reached through a preposition',
-   'Our IICRC-approved school at examination courses get you certified.'],
-  ['v1 fixture, now fail-closed',
-   'Sit the IICRC-approved\nexamination at a registered school.'],
-];
-for (const [name, text] of PREPOSITION_NOT_A_TERMINATOR) {
-  if (evaluateContent(NON_APPROVED, text, EMPTY).length === 0) {
-    fail(`a preposition must not terminate the phrase: ${name}\n    ${text.replace(/\n/g, '\\n')}`);
+// 4. A wrap fragment must not be approvable. An entry ENDING on the banned phrase says nothing
+//    about the noun on the following line, so honouring it would permit every continuation.
+//    The loader drops such entries; this proves it, and proves the joined form still works.
+const DANGLING_ENTRY = 'deliver IICRC certification. IICRC certifications are obtained through IICRC-approved';
+const WRAPPED_SOURCE = `${DANGLING_ENTRY}\n              schools and examinations.`;
+const EVASION_AFTER_FRAGMENT = `${DANGLING_ENTRY}\n              school courses get you certified.`;
+if (evaluateContent(NON_APPROVED, WRAPPED_SOURCE, { iicrcApprovedLines: new Set([DANGLING_ENTRY]) }).length === 0) {
+  fail('a dangling allowlist entry was honoured - it wildcards every continuation of the wrap');
+}
+if (evaluateContent(NON_APPROVED, EVASION_AFTER_FRAGMENT, { iicrcApprovedLines: new Set([DANGLING_ENTRY]) }).length === 0) {
+  fail('a dangling allowlist entry let a CARSI-offering claim through on the wrapped line');
+}
+if (evaluateContent(NON_APPROVED, WRAPPED_SOURCE,
+      { iicrcApprovedLines: new Set([normaliseLine(WRAPPED_SOURCE)]) }).length > 0) {
+  fail('the JOINED text of a wrapped disclaimer should be approvable');
+}
+
+// 5. Fail-closed. An empty allowlist blocks every approved line - the guard never falls back to
+//    a pattern, and there is no branch left that could quietly allow one.
+for (const entry of ALLOWLISTS.iicrcApprovedLines) {
+  if (evaluateContent(NON_APPROVED, entry, EMPTY).length === 0) {
+    fail(`with an EMPTY allowlist every line must block, this did not:\n    ${entry.slice(0, 120)}`);
   }
 }
 
@@ -310,7 +239,7 @@ if (failed > 0) {
   process.exit(1);
 }
 console.log(
-  `✓ IICRC/CEC compliance guard self-test passed (${generatedCases} generated offering-noun cases) ` +
+  `✓ IICRC/CEC compliance guard self-test passed (${approvedChecked} allowlisted lines, ${nearMissChecked} generated near-misses) ` +
   `(${MUST_BLOCK.length} block, ${GENUINE_ALLOWLISTABLE.length} genuine block+allowlist, ` +
   `${MUST_PASS_ALWAYS.length} always-pass, near-miss + normalisation + plant/clean controls OK).`
 );

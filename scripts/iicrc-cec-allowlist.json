@@ -1,5 +1,35 @@
 {
   "version": 1,
   "note": "Human-maintained exact-line allowlist for the IICRC/CEC compliance guard (scripts/check-iicrc-compliance.mjs) — licence-critical. Every static 'N IICRC CEC(s)' claim on a scanned surface is BLOCKED by default; a line ships ONLY if its exact normalised text (leading/trailing whitespace trimmed, internal whitespace collapsed to single spaces; case and wording preserved) appears in approvedLines below. This is exact-string match — NO patterns, NO wildcards, NO fuzzy matching — so a near-miss variant still blocks. Add a line here ONLY after human review confirming it is a genuine IICRC program-requirement fact (e.g. an IICRC recertification-requirement statement), never a course CEC-award claim. A course-award claim must instead carry ZERO CEC number. Ships EMPTY: on the live tree there are no numbered IICRC-CEC lines, so nothing legitimate is blocked today. Validated indirectly by scripts/check-iicrc-compliance.test.mjs.",
-  "approvedLines": []
+  "approvedLines": [],
+  "iicrcApprovedLines": [
+    "\"disclaimer\": \"Educational assessment. CARSI is an IICRC-approved CEC provider; this is CARSI-original Australian training, not IICRC certification.\",",
+    "'Chiefly because they are not the same purchase, and the prices are not substitutes for one another. A certification course buys an IICRC certification, once, through an IICRC-approved school and its examination. A CARSI course buys a CARSI Southern Hemisphere Restoration Designation and, where that particular course has been approved by the IICRC, credits toward keeping a certification you already hold. Delivery costs differ on top of that: a classroom course carries a venue, an instructor for three days and your travel, and takes you off the tools while it runs. Treat them as two separate line items in a training budget rather than as alternatives to each other.',",
+    "'Commercial cleaning businesses expand into restoration by upskilling existing staff with IICRC CEC courses in the core disciplines. CRT (Carpet Restoration), WRT (Water Damage Restoration), and OCT (Odour Control) are the most common entry points. This continuing-education grounding helps cleaners offer restoration work alongside routine cleaning contracts, increasing revenue per client. CARSI delivers CEC courses, not IICRC certification — certification is obtained through IICRC-approved schools.',",
+    "'No, and any provider telling you otherwise is misleading you. IICRC certification is earned through an IICRC-approved school and its examination. CARSI is accredited as an IICRC CEC provider, which is a different standing: CARSI courses carry CARSI Southern Hemisphere Restoration Designations in their own right, and where an individual course has been approved by the IICRC, the credits it carries are shown on that course and tracked in your dashboard.',",
+    "'No. CARSI is an IICRC CEC Accredited provider. Where the IICRC has approved a course, CEC hours appear on the course page and in the learner dashboard after a pass. IICRC certification is obtained only through IICRC-approved schools and examinations.',",
+    "'No. CARSI is an IICRC CEC Accredited provider. Where the IICRC has approved a course, its CEC hours are shown on the course page and recorded in your learner dashboard when you pass. IICRC certification itself is obtained only through IICRC-approved schools and examinations.',",
+    "'Two different purchases. A certification course is a one-off you buy once per discipline from an IICRC-approved school. CECs are the recurring cost of keeping that certification current, year after year. This page is about the recurring half, because that is the one that repeats for the life of your career.',",
+    "'approval. IICRC certification itself is obtained through an IICRC-approved school and ' +",
+    "'obtained only through IICRC-approved schools and examinations.';",
+    "* from an IICRC-approved school. CECs are the RECURRING cost of keeping it.",
+    "**One important distinction before you plan your training:** IICRC certification itself (WRT, ASD, FSRT and so on) is obtained only through IICRC-approved schools and examinations. CARSI is an IICRC CEC Accredited provider. CARSI courses do not grant IICRC certification.",
+    "- CECs must be earned through IICRC-approved CE providers",
+    "1. **Closes the certification gap** — Technicians who need IICRC certification book it through an IICRC-approved school and examination. Everyone who already holds a certification keeps it current with IICRC CEC Accredited courses through CARSI, so every credential on the capability statement is active and auditable.",
+    "2. **Start with WRT** — Water Restoration Technician is the foundation credential for government restoration panel work, obtained through an IICRC-approved school and examination",
+    ": 'IICRC certification is obtained separately through IICRC-approved schools and examinations.'}",
+    "? 'It earns IICRC Continuing Education Credits (CECs) toward maintaining an existing IICRC certification, which is obtained separately through IICRC-approved schools and examinations.'",
+    "Restoration Designations. IICRC certification is obtained through an IICRC-approved school,",
+    "These are certifications awarded by IICRC-approved schools and examinations, not",
+    "buy an IICRC certification once per discipline, from an IICRC-approved school and its",
+    "certification courses — IICRC certifications are obtained through IICRC-approved schools",
+    "deliver IICRC certification. IICRC certifications are obtained through IICRC-approved schools and examinations.",
+    "is a one-off certification bought from an IICRC-approved school. The second is",
+    "not deliver IICRC certification and we do not claim to — that comes from an IICRC-approved school",
+    "obtained through IICRC-approved schools and examinations; CARSI courses carry CARSI’s own Southern Hemisphere Restoration Designations.",
+    "obtained through an IICRC-approved school and examination.{' '}",
+    "same thing. A certification is bought once per discipline, from an IICRC-approved school and its examination. Continuing education recurs for as long as the",
+    "| **3–6** | Book IICRC certification (WRT minimum) through an IICRC-approved school. Keep existing credentials current with CARSI IICRC CEC Accredited courses. | iicrc.org + carsi.com.au |"
+  ],
+  "_note_iicrcApprovedLines": "Exact normalised lines permitted to contain \"IICRC-approved\". Block-by-default: a line not listed here is a finding, and a near-miss variant does NOT match. Two entries are the JOINED text of a line and the one after it, because the phrase wraps and its noun sits on the next line; the loader REFUSES any entry ending on the phrase itself, since that would permit every possible continuation. Adding a line here is a licence decision - read the whole sentence and confirm it does not claim the IICRC approved a CARSI course."
 }
