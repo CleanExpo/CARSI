@@ -784,3 +784,13 @@ cards and training-cost comparison figures were left as he pushed them. Local ha
 findability only: sitemap, footer, pricing link, mobile layout on the cost page, calendar
 AUD labels on his course list. Do not “correct” his Brisbane/Sydney dates or CEC cron
 status codes — those are operations.
+
+## Discoveries — 2026-09-10 Stripe webhook probe noise
+
+Production logged `StripeSignatureVerificationError` with an empty `stripe-signature`
+and body `{}`. That is not a failed checkout: Stripe always signs deliveries. The
+handler now classifies missing/malformed signature, empty or oversized body, and
+non-JSON content-type, then `constructEvent` (static, `whsec_` only, 300s
+tolerance). Live/test mode must match the API key. GET is 405. Probes get a
+generic 400 — do not treat them as a payment rollback. Health checks must hit
+`/api/health`, not `/api/lms/webhooks/stripe`.
