@@ -67,7 +67,13 @@ const BANNED = [
   // GAP CLOSED — "IICRC-approved" as a CARSI offering. Legitimate uses (real IICRC schools /
   // exams / the CE-provider program / board-approval process) are allowed.
   { re: /\bIICRC[\s-]*approved\b/i,
-    allow: /\bIICRC[\s-]*approved\s+(school|examination|exam|instructor|course\s+of\s+study)|IICRC[\s-]*board[\s-]*approv|(CE|CEC)[\s-]*provider|IICRC[\s-]*approv\w*\s+CE\b/i,
+    // The institution noun must not be modifying "course(s)". "IICRC-approved school"
+    // describes a third party and is legitimate; "IICRC-approved school courses" is a
+    // CARSI offering and is exactly what this rule bans. The original pattern matched
+    // the second as if it were the first, so `Our IICRC-approved school courses get you
+    // certified.` passed on ONE line before any of this change - a pre-existing hole,
+    // found 2026-09-10 when an independent review constructed the wrapped variant.
+    allow: /\bIICRC[\s-]*approved\s+(?:(?:school|examination|exam|instructor)s?\b(?!\s+courses?\b)|course\s+of\s+study)|IICRC[\s-]*board[\s-]*approv|(CE|CEC)[\s-]*provider|IICRC[\s-]*approv\w*\s+CE\b/i,
     message: 'Bare "IICRC-approved" implies IICRC approves CARSI\'s courses/certifications — say "IICRC CEC Accredited".' },
   // GAP CLOSED — "get / certified ... with CARSI" without IICRC adjacency.
   { re: /\b(get|gain|become|be)\s+certified\b[^.\n]{0,24}\bwith\s+CARSI\b/i, allow: null,

@@ -169,6 +169,17 @@ const WRAPPED_STILL_BANNED = [
    'Our IICRC-approved courses get you certified.\n              Enrol today and start straight away.'],
   ['banned claim wrapped, no allow noun anywhere',
    'Every CARSI course is IICRC-approved\n              and recognised industry wide.'],
+  // Found by independent review of 9a65cc8d, which built the wrapped form. Probing it
+  // showed the ONE-LINE form passed on base too: the allow pattern matched
+  // "IICRC-approved school" inside "IICRC-approved school courses", so a CARSI offering
+  // was read as a third-party institution. Pre-existing hole, not introduced by the
+  // wrap window. Both forms are pinned here.
+  ['school modifying courses, one line',
+   'Our IICRC-approved school courses get you certified.'],
+  ['school modifying courses, wrapped',
+   'Our IICRC-approved\nschool courses get you certified.'],
+  ['examination modifying courses',
+   'Buy our IICRC-approved examination courses today.'],
 ];
 for (const [name, text] of WRAPPED_STILL_BANNED) {
   if (evaluateContent(NON_APPROVED, text, EMPTY).length === 0) {
