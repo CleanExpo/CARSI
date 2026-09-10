@@ -257,6 +257,26 @@ for (const entry of ALLOWLISTS.iicrcApprovedLines) {
   }
 }
 
+// (f) Trailing text after an approved statement, on the SAME line, must block. Review round 6
+//     reported this as passing; it does not, and this pins that. Appending anything changes the
+//     normalised text, so the exact match fails. What round 6 actually found was a claim on a
+//     SEPARATE line carrying no "IICRC-approved" at all, which this rule's ban never sees and
+//     which belongs to the "get certified" rule - GP-586.
+const ANY_APPROVED = [...ALLOWLISTS.iicrcApprovedLines].find((e) => e.includes('school and examination'));
+if (!ANY_APPROVED) {
+  fail('no multi-clause approved statement found - control (f) proved nothing');
+} else {
+  const TRAILING = [
+    ['plain', ANY_APPROVED + ' CARSI courses get you certified.'],
+    ['concat', ANY_APPROVED + ' " + "CARSI courses get you certified."'],
+  ];
+  for (const [shape, text] of TRAILING) {
+    if (evaluateContent(NON_APPROVED, text).length === 0) {
+      fail('trailing text appended to an approved statement must BLOCK (' + shape + ')');
+    }
+  }
+}
+
 // 5. Fail-closed. An empty allowlist blocks every approved line - the guard never falls back to
 //    a pattern, and there is no branch left that could quietly allow one.
 for (const entry of ALLOWLISTS.iicrcApprovedLines) {
