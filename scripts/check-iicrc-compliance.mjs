@@ -49,6 +49,57 @@ function loadApprovedSlugsFromRegistry() {
   }
 }
 
+/** The institutions the IICRC genuinely approves. "IICRC-approved school" describes a third
+ *  party and is legitimate; "IICRC-approved school courses" is a CARSI offering and is exactly
+ *  what the rule bans - the noun has stopped being the head of the phrase and become a modifier. */
+const IICRC_INSTITUTION = String.raw`(?:schools?|examinations?|exams?|instructors?)`;
+
+/** SAFE-SET PARTITION (v2, 2026-09-10). What may FOLLOW the institution noun, enumerated.
+ *
+ *  Two independent reviews defeated the previous shape in two rounds. v1 allowed the institution
+ *  noun and then excluded the one word seen breaking it (`(?!\s+courses?\b)`), so round 2 walked
+ *  straight past it with `school training`; probing afterwards showed `programs`, `workshops`,
+ *  `classes` and `course of study` were all already through, on ONE line, since long before the
+ *  line-wrap change. Enumerating what BREAKS fails open forever: there is always another noun.
+ *
+ *  So this enumerates what is SAFE instead. The allow fires only when the institution noun ENDS
+ *  its noun phrase - end of window, punctuation, a bare `at`, or a connector (`and`/`or`/`/`/
+ *  possessive `'s`) that leads to ANOTHER institution noun. Any content noun following it is, by
+ *  construction, not in the set, so it blocks without this pattern ever having to name it. A
+ *  follower nobody anticipated over-blocks (CI goes red, the word gets added after review) rather
+ *  than failing open - the safe direction for a licence-critical gate.
+ *
+ *  Note `'`/`’` are terminators only when NOT possessive: `school's examination` is a real IICRC
+ *  examination, `school's training programs` is a CARSI offering wearing an apostrophe.
+ *
+ *  KNOWN LIMIT (documented, not hidden - GP-581). A bare possessive claim with no offering noun,
+ *  `Our IICRC-approved school.`, still passes: whether "our" makes the school CARSI's own is a
+ *  question about free prose, not about this phrase, and the CEC_NUMBER note below records what
+ *  seven rounds of regex-over-free-prose cost. Unchanged from every prior version of this guard.
+ */
+const IICRC_INSTITUTION_ENDS_PHRASE = String.raw`(?=` + [
+  String.raw`\s*$`,                                    // end of the scan window
+  String.raw`\s*["”.,;:!?)\]}<{&—–]`,                  // punctuation / JSX boundary
+  String.raw`\s*['’](?!s)`,                            // quote, but never possessive
+  String.raw`\s+-\s`,                                  // spaced hyphen, not school-based
+  String.raw`\s+at\b`,                                 // "examination at a registered school"
+  String.raw`\s+(?:and|or)\s+(?:(?:its|their|the|an?)\s+)?` + IICRC_INSTITUTION,
+  String.raw`\s*['’]s\s+` + IICRC_INSTITUTION,
+  String.raw`\s*/\s*` + IICRC_INSTITUTION,
+].join('|') + String.raw`)`;
+
+/** Allow for the bare-"IICRC-approved" rule: a complete institution noun phrase, or one of the
+ *  cores that are true of CARSI under any surrounding prose (board approval, CE/CEC provider
+ *  standing). `course of study` was removed in v2 - it appears nowhere on the tree and
+ *  `Our IICRC-approved course of study` was a straight hole. */
+const IICRC_APPROVED_ALLOW = new RegExp(
+  String.raw`\bIICRC[\s-]*approved\s+` + IICRC_INSTITUTION + String.raw`\b` + IICRC_INSTITUTION_ENDS_PHRASE +
+  String.raw`|IICRC[\s-]*board[\s-]*approv` +
+  String.raw`|(CE|CEC)[\s-]*provider` +
+  String.raw`|IICRC[\s-]*approv\w*\s+CE\b`,
+  'i'
+);
+
 const BANNED = [
   { re: /\bIICRC[\s-]+courses?\b/i, allow: /\bIICRC[\s-]+(CEC|Continuing[\s-]+Education[\s-]+Credit)/i,
     message: 'Use "IICRC CEC course(s)", not "IICRC course(s)".' },
@@ -65,15 +116,10 @@ const BANNED = [
   { re: /\bIICRC[\s-]+courses?[\s-]+accredit\w*\b/i, allow: null,
     message: 'Do not imply IICRC accredits CARSI\'s courses — say "IICRC CEC Accredited course(s)".' },
   // GAP CLOSED — "IICRC-approved" as a CARSI offering. Legitimate uses (real IICRC schools /
-  // exams / the CE-provider program / board-approval process) are allowed.
+  // exams / the CE-provider program / board-approval process) are allowed — see
+  // IICRC_APPROVED_ALLOW for why the institution noun must be a COMPLETE noun phrase.
   { re: /\bIICRC[\s-]*approved\b/i,
-    // The institution noun must not be modifying "course(s)". "IICRC-approved school"
-    // describes a third party and is legitimate; "IICRC-approved school courses" is a
-    // CARSI offering and is exactly what this rule bans. The original pattern matched
-    // the second as if it were the first, so `Our IICRC-approved school courses get you
-    // certified.` passed on ONE line before any of this change - a pre-existing hole,
-    // found 2026-09-10 when an independent review constructed the wrapped variant.
-    allow: /\bIICRC[\s-]*approved\s+(?:(?:school|examination|exam|instructor)s?\b(?!\s+courses?\b)|course\s+of\s+study)|IICRC[\s-]*board[\s-]*approv|(CE|CEC)[\s-]*provider|IICRC[\s-]*approv\w*\s+CE\b/i,
+    allow: IICRC_APPROVED_ALLOW,
     message: 'Bare "IICRC-approved" implies IICRC approves CARSI\'s courses/certifications — say "IICRC CEC Accredited".' },
   // GAP CLOSED — "get / certified ... with CARSI" without IICRC adjacency.
   { re: /\b(get|gain|become|be)\s+certified\b[^.\n]{0,24}\bwith\s+CARSI\b/i, allow: null,
@@ -190,6 +236,10 @@ const EXEMPT = [
 function inScope(f) { const n = f.replace(/\\/g, '/'); return SCANNED_DIRS.some((d) => n.startsWith(d)); }
 function isExempt(f) { const n = f.replace(/\\/g, '/'); return EXEMPT.some((e) => n === e || n.endsWith('/' + e)); }
 
+/** Collapse a JavaScript/TypeScript string-concatenation seam (`' + '`, `" + "`) so the ALLOW
+ *  window reads as rendered prose rather than as source. Used for the allow test only. */
+function collapseConcatSeams(s) { return s.replace(/['"\u2019]\s*\+\s*['"\u2019]/g, ''); }
+
 function scanLine(file, lineNo, content, findings, allowlist, nextLine = '') {
   // A specific CEC-hour claim is exempt ONLY when the file belongs to a founder-approved
   // course — i.e. its path contains a slug listed in CEC_APPROVED_SLUGS (empty = none approved).
@@ -216,7 +266,13 @@ function scanLine(file, lineNo, content, findings, allowlist, nextLine = '') {
       // IICRC-approved schools"), and the cheapest way to green CI would have been
       // deleting a licence-protective disclaimer. Widening the ALLOW window, never
       // the BAN window, keeps the blocked surface identical.
-      const allowWindow = nextLine ? `${content} ${nextLine}` : content;
+      // Authored prose is also split by JS string concatenation, not only by a Prettier wrap:
+      // JsonLd.tsx ships "...an IICRC-approved school and ' +" / "'examination." — one sentence
+      // across a `' + '` seam. Collapsing the seam makes the ALLOW window read the prose a user
+      // actually sees. This TIGHTENS rather than loosens: without it the closing quote would read
+      // as a phrase-ending terminator, so "...school ' + 'training programs" would be excused as
+      // a complete noun phrase. The BAN window is untouched — the blocked surface is identical.
+      const allowWindow = collapseConcatSeams(nextLine ? `${content} ${nextLine}` : content);
       flagged = !(rule.allow && rule.allow.test(allowWindow));
     }
     if (flagged) {
