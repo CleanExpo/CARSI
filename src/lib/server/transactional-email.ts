@@ -14,6 +14,7 @@ import {
   type RoadshowEmailKind,
 } from '@/lib/server/ccw-roadshow-registration-email';
 import { isEmailConfigured, sendEmail, type SendEmailResult } from '@/lib/server/email';
+import { isProvisionalPasswordHash } from '@/lib/server/lms-auth';
 import { buildUnsubscribeUrl } from '@/lib/server/email-preferences';
 import {
   renderAdminPasswordResetEmail,
@@ -146,7 +147,7 @@ export async function sendEnrollmentWelcomeEmail(params: {
   const { studentId, courseSlug, appOrigin } = params;
   const user = await prisma.lmsUser.findUnique({
     where: { id: studentId },
-    select: { email: true, fullName: true },
+    select: { email: true, fullName: true, hashedPassword: true },
   });
   const course = await prisma.lmsCourse.findUnique({
     where: { slug: courseSlug.trim().toLowerCase() },
@@ -161,6 +162,12 @@ export async function sendEnrollmentWelcomeEmail(params: {
   const startUrl = `${base}${learnPath}`;
   const dashboardUrl = `${base}/dashboard/student`;
   const name = user.fullName?.trim() || user.email.split('@')[0];
+  // A Stripe-only guest never set a password, so every link in this email leads
+  // to a login they cannot perform. Send them to set one first. This points at
+  // the existing /forgot-password PAGE, not a minted token — deliberately, so
+  // the enrolment path gains no new authenticating surface (cf. P0-A).
+  const needsPasswordSetup = isProvisionalPasswordHash(user.hashedPassword ?? '');
+  const setPasswordUrl = `${base}/forgot-password`;
 
   const { html, text } = renderEnrollmentWelcomeEmail({
     appOrigin: base,
@@ -168,6 +175,8 @@ export async function sendEnrollmentWelcomeEmail(params: {
     courseTitle: course.title,
     startUrl,
     dashboardUrl,
+    needsPasswordSetup,
+    setPasswordUrl,
     offers: params.offers,
   });
 

@@ -391,6 +391,13 @@ export function renderEnrollmentWelcomeEmail(params: {
   courseTitle: string;
   startUrl: string;
   dashboardUrl: string;
+  /**
+   * True when the recipient's account has no password yet (a Stripe-only guest).
+   * Every course link requires a login, so the email must lead with setting one.
+   */
+  needsPasswordSetup?: boolean;
+  /** Where to set that password — the /forgot-password page, never a token. */
+  setPasswordUrl?: string;
   /** CCW roadshow attendee offers (already gated/selected by the caller). */
   offers?: CcwAttendeeOffer[];
 }): RenderedEmail {
@@ -412,6 +419,42 @@ export function renderEnrollmentWelcomeEmail(params: {
     ? `\n\nYour attendee offers:\n` +
       offers.map((o) => `- ${o.label}${o.url ? `: ${o.url}` : ''}`).join('\n')
     : '';
+
+  // A buyer with no password yet cannot open any of the course links below, so
+  // the whole email has to lead with setting one. Anything else sends a paying
+  // customer to a sign-in screen that will tell them "Invalid credentials".
+  if (params.needsPasswordSetup && params.setPasswordUrl) {
+    return render(
+      {
+        appOrigin: params.appOrigin,
+        preheader: `Set your password to start ${params.courseTitle}`,
+        eyebrow: 'Enrolment confirmed',
+        title: 'One step before you start',
+        greeting: `Hi ${params.name},`,
+        paragraphs: [
+          `Your payment went through and ${params.courseTitle} is yours. You just need a password before you can open it.`,
+          'Set one now and you go straight into the course. It takes about a minute, and you only do it once.',
+        ],
+        details: [
+          { label: 'Course', value: params.courseTitle },
+          { label: 'Status', value: 'Paid — waiting on your password' },
+          { label: 'Next action', value: 'Set your password, then start lesson 1' },
+        ],
+        cta: { label: 'Set your password', href: params.setPasswordUrl },
+        noteHtml:
+          `${offersHtml}Enter this same email address on that page and we'll send you a link to set your password. ` +
+          `Once you're in, ${brandLink(params.startUrl, 'start lesson 1')} or open ` +
+          `${brandLink(params.dashboardUrl, 'My Learning')} any time. If anything goes wrong, just reply to this email.`,
+      },
+      `Hi ${params.name},\n\nYour payment went through and ${params.courseTitle} is yours. ` +
+        `You just need a password before you can open it.\n\n` +
+        `Set your password: ${params.setPasswordUrl}\n` +
+        `(Enter this same email address and we'll send you a link.)\n\n` +
+        `Once you're in — start lesson 1: ${params.startUrl}\n` +
+        `My Learning: ${params.dashboardUrl}${offersText}\n\n` +
+        `If anything goes wrong, just reply to this email.`
+    );
+  }
 
   return render(
     {
