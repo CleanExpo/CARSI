@@ -13,7 +13,7 @@
  *     whitespace-only variant of an allowlisted line still passes (normalisation); planted claim
  *     fires and a clean line is silent.
  */
-import { evaluateContent, normaliseLine } from './check-iicrc-compliance.mjs';
+import { evaluateContent, normaliseLine, IICRC_INSTITUTION_CONNECTORS } from './check-iicrc-compliance.mjs';
 
 // A non-approved course fixture path (no slug appears in cec-approvals.json → not slug-exempt).
 const NON_APPROVED = 'data/seed/courses-catalog.json';
@@ -153,13 +153,16 @@ const WRAPPED_LEGITIMATE = [
    'CARSI does not deliver IICRC certification. IICRC certifications are obtained through IICRC-approved\n              schools and examinations.'],
   ['bought-from, wrapped after "IICRC-approved"',
    'A certification is bought once per discipline, from an IICRC-approved\n          school and its examination.'],
-  ['wrapped before "examination"',
-   'Sit the IICRC-approved\nexamination at a registered school.'],
   // A possessive can lead a REAL IICRC examination - the apostrophe alone must not decide.
   ['possessive leading a real examination',
    'Certification comes from an IICRC-approved school\u2019s examination.'],
   // Authored prose is also split by JS string concatenation, not only by a Prettier wrap.
   // This is the live sentence in src/components/seo/JsonLd.tsx.
+  // A markdown list item ends its sentence at the line break. The ALLOW window must not glue
+  // the NEXT item onto it - doing so appended "3." to a phrase that had already terminated and
+  // blocked this real line (docs/marketing/lead-magnets/government-contractor-guide.md:308).
+  ['list item ending at the line break, next item follows',
+   'obtained through an IICRC-approved school and examination\n3. **Keep your CECs current with CARSI** - options are at carsi.com.au/pricing'],
   ['sentence split across a JS concat seam',
    "'approval. IICRC certification itself is obtained through an IICRC-approved school and ' +\n  'examination.';"],
 ];
@@ -213,43 +216,93 @@ for (const [name, text] of WRAPPED_STILL_BANNED) {
   }
 }
 
-// ── GENERATED partition: institution noun x offering noun (2026-09-10) ──────
-// The cases above pin one instance of each shape a human thought of, which is exactly the
-// trap v1 fell into: it excluded the single offering noun review had used, and the next
-// review walked past it with the next noun. So the class is closed by GENERATION, not by
-// enumeration - every institution noun the allow pattern admits, crossed with offering
-// nouns it must never admit, in each frame that reaches the allow window. A future edit
-// that re-opens a modifier position anywhere fails here without anyone adding a case.
+// ── GENERATED partition: institution chain x offering noun (v3, 2026-09-10) ─
+// The hand-written cases above pin one instance of each shape a human thought of, which is
+// exactly the trap v1 and v2 both fell into. v1 excluded the single offering noun review had
+// used; v2 judged only the FIRST institution noun, so review round 3 reached an offering noun
+// through a connector - `school's examination courses`. v2's generator could not have caught
+// that: every frame it built had ONE institution noun, so the control had the same blind spot
+// as the pattern it was checking.
+//
+// v3 derives the frames from IICRC_INSTITUTION_CONNECTORS, the same list the allow pattern is
+// built from, so adding a connector there automatically generates the attacks against it.
 const INSTITUTION_NOUNS = ['school', 'schools', 'examination', 'examinations', 'exam', 'exams', 'instructor', 'instructors'];
 const OFFERING_NOUNS = [
   'courses', 'course', 'training', 'programs', 'programmes', 'workshops', 'classes', 'modules',
   'sessions', 'qualifications', 'certifications', 'certificates', 'curriculum', 'bootcamps',
   'seminars', 'webinars', 'tuition', 'education', 'accreditation', 'designations', 'credentials',
 ];
-const OFFERING_FRAMES = [
-  ['one line', (i, o) => `Our IICRC-approved ${i} ${o} get you certified.`],
-  ['wrapped', (i, o) => `Our IICRC-approved\n${i} ${o} get you certified.`],
-  ['possessive', (i, o) => `Our IICRC-approved ${i}'s ${o} get you certified.`],
-  ['connector', (i, o) => `Our IICRC-approved ${i} and ${o} get you certified.`],
-  ['concat seam', (i, o) => `Our IICRC-approved ${i} ' + '${o} get you certified.`],
-];
-let generatedCases = 0;
+const CONNECTOR_SAMPLES = IICRC_INSTITUTION_CONNECTORS.flatMap((c) => c.samples);
+// A preposition is NOT a connector here (see IICRC_PHRASE_TERMINATORS). These frames hold that
+// open: `at` was a terminator in v2 and left everything after it unjudged.
+const PREPOSITION_SAMPLES = [' at ', ' at a registered '];
+
+// Every way an offering noun can be reached from "IICRC-approved": directly, through one
+// connector, through a connector to a second institution noun, through two hops (which a future
+// `*` -> `?` edit on the chain would reopen), and through a preposition.
+const OFFERING_REACHES = [];
 for (const institution of INSTITUTION_NOUNS) {
+  OFFERING_REACHES.push([`${institution} `, 'direct']);
+  for (const connector of [...CONNECTOR_SAMPLES, ...PREPOSITION_SAMPLES]) {
+    OFFERING_REACHES.push([`${institution}${connector}`, 'one hop']);
+    OFFERING_REACHES.push([`${institution}${connector}examination `, 'via a second institution']);
+    OFFERING_REACHES.push([`${institution}${connector}examination${connector}instructor `, 'two hops']);
+  }
+}
+const OFFERING_FRAMES = [
+  ['one line', (reach, o) => `Our IICRC-approved ${reach}${o} get you certified.`],
+  ['wrapped', (reach, o) => `Our IICRC-approved\n${reach}${o} get you certified.`],
+  ['concat seam', (reach, o) => `Our IICRC-approved ${reach}' + '${o} get you certified.`],
+];
+
+let generatedCases = 0;
+for (const [reach, shape] of OFFERING_REACHES) {
   for (const offering of OFFERING_NOUNS) {
     for (const [frame, build] of OFFERING_FRAMES) {
-      const text = build(institution, offering);
+      const text = build(reach, offering);
       generatedCases += 1;
       if (evaluateContent(NON_APPROVED, text, EMPTY).length === 0) {
-        fail(`generated CARSI-offering claim should BLOCK [${frame}]\n    ${text.replace(/\n/g, '\\n')}`);
+        fail(`generated CARSI-offering claim should BLOCK [${shape}, ${frame}]\n    ${text.replace(/\n/g, '\\n')}`);
       }
     }
   }
 }
 // A generator that produced nothing would pass in silence, which is the failure this whole
 // section exists to prevent.
-const EXPECTED_GENERATED = INSTITUTION_NOUNS.length * OFFERING_NOUNS.length * OFFERING_FRAMES.length;
+const EXPECTED_GENERATED = OFFERING_REACHES.length * OFFERING_NOUNS.length * OFFERING_FRAMES.length;
 if (generatedCases !== EXPECTED_GENERATED) {
   fail(`offering-noun partition did not generate: ${generatedCases} of ${EXPECTED_GENERATED}`);
+}
+
+// A complete institution chain must still be ALLOWED at every depth - the partition must not
+// have been closed by simply blocking everything.
+const COMPLETE_CHAINS = [
+  'Certification comes from an IICRC-approved school.',
+  'Certification comes from an IICRC-approved schools and examinations.',
+  'Certification comes from an IICRC-approved school and its examination.',
+  'Certification comes from an IICRC-approved school’s examination.',
+  'Certification comes from an IICRC-approved School/Instructor listing.'.replace(' listing.', '.'),
+];
+for (const text of COMPLETE_CHAINS) {
+  if (evaluateContent(NON_APPROVED, text, EMPTY).length > 0) {
+    fail(`complete institution chain should PASS:\n    ${text}`);
+  }
+}
+
+// `at` is NOT a terminator (v3). It was one in v1-v2, and it left every span after it unjudged,
+// so round 1's payload passed one preposition later. This fixture was written in 9a65cc8d as a
+// PASS case; it is inverted rather than deleted so the change is visible. Nothing on the tree
+// uses this shape - `at` re-enters only as a bounded connector if live copy ever needs it.
+const PREPOSITION_NOT_A_TERMINATOR = [
+  ['offering reached through a preposition',
+   'Our IICRC-approved school at examination courses get you certified.'],
+  ['v1 fixture, now fail-closed',
+   'Sit the IICRC-approved\nexamination at a registered school.'],
+];
+for (const [name, text] of PREPOSITION_NOT_A_TERMINATOR) {
+  if (evaluateContent(NON_APPROVED, text, EMPTY).length === 0) {
+    fail(`a preposition must not terminate the phrase: ${name}\n    ${text.replace(/\n/g, '\\n')}`);
+  }
 }
 
 if (failed > 0) {

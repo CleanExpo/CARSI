@@ -54,46 +54,74 @@ function loadApprovedSlugsFromRegistry() {
  *  what the rule bans - the noun has stopped being the head of the phrase and become a modifier. */
 const IICRC_INSTITUTION = String.raw`(?:schools?|examinations?|exams?|instructors?)`;
 
-/** SAFE-SET PARTITION (v2, 2026-09-10). What may FOLLOW the institution noun, enumerated.
+/** Connectors that join one institution noun to ANOTHER ("schools and examinations",
+ *  "school's examination", "School/Instructor"). Exported so the test suite generates its
+ *  attack frames from the SAME list the pattern is built from: adding a connector here
+ *  automatically generates the attacks against it, instead of relying on someone remembering
+ *  to hand-write a case. v3 exists because that gap was real - v2's generator used one
+ *  institution noun per frame, so it never produced `school's examination courses`, and the
+ *  pattern had the matching gap. */
+export const IICRC_INSTITUTION_CONNECTORS = [
+  { pattern: String.raw`\s+(?:and|or)\s+(?:(?:its|their|the|an?)\s+)?`, samples: [' and ', ' or ', ' and its '] },
+  { pattern: String.raw`\s*['’]s\s+`, samples: ["'s ", '’s '] },
+  { pattern: String.raw`\s*/\s*`, samples: ['/', ' / '] },
+];
+
+/** What may follow the institution noun phrase once it is COMPLETE. Terminators only - a
+ *  connector is not a terminator, it continues the chain and the chain must still terminate.
  *
- *  Two independent reviews defeated the previous shape in two rounds. v1 allowed the institution
- *  noun and then excluded the one word seen breaking it (`(?!\s+courses?\b)`), so round 2 walked
- *  straight past it with `school training`; probing afterwards showed `programs`, `workshops`,
- *  `classes` and `course of study` were all already through, on ONE line, since long before the
- *  line-wrap change. Enumerating what BREAKS fails open forever: there is always another noun.
- *
- *  So this enumerates what is SAFE instead. The allow fires only when the institution noun ENDS
- *  its noun phrase - end of window, punctuation, a bare `at`, or a connector (`and`/`or`/`/`/
- *  possessive `'s`) that leads to ANOTHER institution noun. Any content noun following it is, by
- *  construction, not in the set, so it blocks without this pattern ever having to name it. A
- *  follower nobody anticipated over-blocks (CI goes red, the word gets added after review) rather
- *  than failing open - the safe direction for a licence-critical gate.
- *
- *  Note `'`/`’` are terminators only when NOT possessive: `school's examination` is a real IICRC
+ *  `'`/`’` terminate only when NOT possessive: `school's examination` is a real IICRC
  *  examination, `school's training programs` is a CARSI offering wearing an apostrophe.
  *
- *  KNOWN LIMIT (documented, not hidden - GP-581). A bare possessive claim with no offering noun,
- *  `Our IICRC-approved school.`, still passes: whether "our" makes the school CARSI's own is a
- *  question about free prose, not about this phrase, and the CEC_NUMBER note below records what
- *  seven rounds of regex-over-free-prose cost. Unchanged from every prior version of this guard.
- */
-const IICRC_INSTITUTION_ENDS_PHRASE = String.raw`(?=` + [
-  String.raw`\s*$`,                                    // end of the scan window
-  String.raw`\s*["”.,;:!?)\]}<{&—–]`,                  // punctuation / JSX boundary
-  String.raw`\s*['’](?!s)`,                            // quote, but never possessive
-  String.raw`\s+-\s`,                                  // spaced hyphen, not school-based
-  String.raw`\s+at\b`,                                 // "examination at a registered school"
-  String.raw`\s+(?:and|or)\s+(?:(?:its|their|the|an?)\s+)?` + IICRC_INSTITUTION,
-  String.raw`\s*['’]s\s+` + IICRC_INSTITUTION,
-  String.raw`\s*/\s*` + IICRC_INSTITUTION,
-].join('|') + String.raw`)`;
+ *  A bare preposition (`at`) was a terminator in v2 and is deliberately NOT one here. It left
+ *  everything after it unjudged, so `Our IICRC-approved school at examination courses get you
+ *  certified.` - round 1's payload, one preposition later - passed. It re-enters only as a
+ *  bounded connector, if live copy ever needs it; nothing on the tree does today. */
+const IICRC_PHRASE_TERMINATORS = [
+  String.raw`\s*$`,                    // end of the scan window
+  String.raw`\s*["”.,;:!?)\]}<{&—–]`, // punctuation / markdown / JSX boundary
+  String.raw`\s*['’](?!s)`,       // quote, but never possessive
+  String.raw`\s+-\s`,                  // spaced hyphen, not school-based
+];
 
-/** Allow for the bare-"IICRC-approved" rule: a complete institution noun phrase, or one of the
+/** SAFE-SET PARTITION (v3, 2026-09-10). Enumerate what is SAFE, never what breaks.
+ *
+ *  Three independent review rounds shaped this. v1 allowed an institution noun then excluded
+ *  the one offering noun review had used (`(?!\s+courses?\b)`); round 2 walked past it with
+ *  `training`, and probing showed `programs`, `workshops`, `classes` and `course of study` had
+ *  been through all along, on ONE line, since before the wrap window existed. Enumerating what
+ *  BREAKS fails open forever: there is always another noun.
+ *
+ *  v2 inverted it, but judged only the FIRST institution noun, so round 3 reached an offering
+ *  noun through a connector: `school's examination courses`, `school and examination courses`,
+ *  `school/examination courses`.
+ *
+ *  v3 states the invariant the previous two versions each half-held: NO SPAN AFTER THE LAST
+ *  INSTITUTION NOUN IS LEFT UNJUDGED. The allow admits a CHAIN of institution nouns joined by
+ *  connectors, and the chain must then TERMINATE. An offering noun terminates nothing, so it
+ *  blocks at any depth without this pattern ever naming it - `school`, `school's examination`
+ *  and `school and its examination` all have to end the same way. A follower nobody anticipated
+ *  over-blocks (CI red, add it after review) rather than failing open.
+ *
+ *  KNOWN LIMIT (documented, not hidden - GP-583). A bare possessive claim with no offering noun,
+ *  `Our IICRC-approved school.`, still passes: whether "our" makes the school CARSI's own is a
+ *  question about free prose, not about this phrase.
+ *  KNOWN LIMIT (GP-584). Every rule here is line-wide - an allow anywhere on the line excuses a
+ *  ban anywhere else on it, so a legitimate "CEC provider" sentence sharing a line with a
+ *  violation suppresses it. Architectural, predates this rule, affects all of BANNED.
+ */
+const IICRC_INSTITUTION_CHAIN =
+  IICRC_INSTITUTION + String.raw`\b` +
+  String.raw`(?:(?:` + IICRC_INSTITUTION_CONNECTORS.map((c) => c.pattern).join('|') + String.raw`)` +
+  IICRC_INSTITUTION + String.raw`\b)*` +
+  String.raw`(?=` + IICRC_PHRASE_TERMINATORS.join('|') + String.raw`)`;
+
+/** Allow for the bare-"IICRC-approved" rule: a COMPLETE institution noun phrase, or one of the
  *  cores that are true of CARSI under any surrounding prose (board approval, CE/CEC provider
  *  standing). `course of study` was removed in v2 - it appears nowhere on the tree and
  *  `Our IICRC-approved course of study` was a straight hole. */
 const IICRC_APPROVED_ALLOW = new RegExp(
-  String.raw`\bIICRC[\s-]*approved\s+` + IICRC_INSTITUTION + String.raw`\b` + IICRC_INSTITUTION_ENDS_PHRASE +
+  String.raw`\bIICRC[\s-]*approved\s+` + IICRC_INSTITUTION_CHAIN +
   String.raw`|IICRC[\s-]*board[\s-]*approv` +
   String.raw`|(CE|CEC)[\s-]*provider` +
   String.raw`|IICRC[\s-]*approv\w*\s+CE\b`,
@@ -240,6 +268,21 @@ function isExempt(f) { const n = f.replace(/\\/g, '/'); return EXEMPT.some((e) =
  *  window reads as rendered prose rather than as source. Used for the allow test only. */
 function collapseConcatSeams(s) { return s.replace(/['"\u2019]\s*\+\s*['"\u2019]/g, ''); }
 
+/** Does the next line CONTINUE the current line's sentence, or start a new block?
+ *
+ *  The ALLOW window spans the following line because a Prettier wrap lands mid-phrase. A new
+ *  markdown/JSX block is not a wrap - it is the next thing. Joining one on anyway appends its
+ *  first token to a phrase that already ended, which blocked a real disclaimer:
+ *  docs/marketing/lead-magnets/government-contractor-guide.md:308 is a numbered list item
+ *  ending "...an IICRC-approved school and examination" with no full stop, and the window
+ *  glued the NEXT list item's "3." onto it, so the phrase never terminated.
+ *
+ *  Refusing to join here narrows the allow window, so it cannot excuse anything the previous
+ *  behaviour blocked. */
+function continuesPhrase(line) {
+  return line.trim() !== '' && !/^\s*(?:[-*+]\s|\d+[.)]\s|#{1,6}\s|>|\||`{3})/.test(line);
+}
+
 function scanLine(file, lineNo, content, findings, allowlist, nextLine = '') {
   // A specific CEC-hour claim is exempt ONLY when the file belongs to a founder-approved
   // course — i.e. its path contains a slug listed in CEC_APPROVED_SLUGS (empty = none approved).
@@ -272,7 +315,9 @@ function scanLine(file, lineNo, content, findings, allowlist, nextLine = '') {
       // actually sees. This TIGHTENS rather than loosens: without it the closing quote would read
       // as a phrase-ending terminator, so "...school ' + 'training programs" would be excused as
       // a complete noun phrase. The BAN window is untouched — the blocked surface is identical.
-      const allowWindow = collapseConcatSeams(nextLine ? `${content} ${nextLine}` : content);
+      const allowWindow = collapseConcatSeams(
+        nextLine && continuesPhrase(nextLine) ? `${content} ${nextLine}` : content
+      );
       flagged = !(rule.allow && rule.allow.test(allowWindow));
     }
     if (flagged) {
