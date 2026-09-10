@@ -7,45 +7,52 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type Stripe from 'stripe';
 
-import { constructWebhookEvent, getStripeClient } from '@/lib/api/stripe';
-import { processCcwRoadshowBookingConfirmation } from '@/lib/server/ccw-roadshow-booking-email';
+import { parseAttributionJourneyId } from '@/lib/analytics/event-attribution';
+import {
+  constructWebhookEvent,
+  getStripeClient,
+  isVerifiedStripeEventShape,
+  resolveStripeWebhookSecret,
+  webhookLivemodeMatchesApiKey,
+} from '@/lib/api/stripe';
+import { prisma } from '@/lib/prisma';
 import { getAppOrigin } from '@/lib/server/app-url';
+import { processCcwRoadshowBookingConfirmation } from '@/lib/server/ccw-roadshow-booking-email';
 import { notifyCrmEnrollmentCreated } from '@/lib/server/crm-enrollment-notify';
 import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
-import { ensureGuestUserFromStripeEmail } from '@/lib/server/guest-checkout';
-import { sendGa4PurchaseEvent } from '@/lib/server/ga4-measurement-protocol';
-import { parseAttributionJourneyId } from '@/lib/analytics/event-attribution';
 import {
   persistAttributedRevenueReversal,
   recordAttributedStage,
 } from '@/lib/server/event-attribution';
+import { sendGa4PurchaseEvent } from '@/lib/server/ga4-measurement-protocol';
+import { ensureGuestUserFromStripeEmail } from '@/lib/server/guest-checkout';
 import { sessionClaimsForUserId } from '@/lib/server/lms-auth';
-import { prisma } from '@/lib/prisma';
+import { markOrgSubscriptionStatusBySubscriptionId } from '@/lib/server/org-subscription-store';
 import { captureServerError } from '@/lib/server/sentry';
-import {
-  claimStripeWebhookEvent,
-  markStripeWebhookEventProcessed,
-  releaseStripeWebhookEventClaim,
-} from '@/lib/server/stripe-webhook-idempotency';
-import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase';
-import { shouldRetryWebhookFulfillment } from '@/lib/server/stripe-webhook-policy';
 import { resolveStripePaymentReference } from '@/lib/server/stripe-payment-reference';
 import {
-  revokeEnrollmentsByPaymentReference,
-  reactivateDisputeWonEnrollmentsByPaymentReference,
   isDisputeWon,
+  reactivateDisputeWonEnrollmentsByPaymentReference,
+  revokeEnrollmentsByPaymentReference,
 } from '@/lib/server/stripe-revocation';
 import {
   readInvoiceIdFromPaymentIntent,
   readSubscriptionIdFromPaymentIntent,
 } from '@/lib/server/stripe-subscription-map';
-import { markSubscriptionStatusBySubscriptionId } from '@/lib/server/subscription-store';
-import { markTeamSubscriptionStatusBySubscriptionId } from '@/lib/server/team-subscription-store';
-import { markOrgSubscriptionStatusBySubscriptionId } from '@/lib/server/org-subscription-store';
 import {
-  handleSubscriptionEvent,
-  isSubscriptionEvent,
-} from '@/lib/server/subscription-webhook';
+  claimStripeWebhookEvent,
+  markStripeWebhookEventProcessed,
+  releaseStripeWebhookEventClaim,
+} from '@/lib/server/stripe-webhook-idempotency';
+import {
+  classifyDeclaredWebhookLength,
+  classifyStripeWebhookEnvelope,
+  shouldRetryWebhookFulfillment,
+} from '@/lib/server/stripe-webhook-policy';
+import { markSubscriptionStatusBySubscriptionId } from '@/lib/server/subscription-store';
+import { handleSubscriptionEvent, isSubscriptionEvent } from '@/lib/server/subscription-webhook';
+import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase';
+import { markTeamSubscriptionStatusBySubscriptionId } from '@/lib/server/team-subscription-store';
 
 /**
  * WS3 / GP-447 boundary note: this handler only sends the one-off course
@@ -151,7 +158,7 @@ async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
         markOrgSubscriptionStatusBySubscriptionId(subscriptionId, 'canceled'),
       ]);
       console.warn(
-        `[stripe webhook] revoked subscription entitlement for subscription=${subscriptionId} (${reason})`,
+        `[stripe webhook] revoked subscription entitlement for subscription=${subscriptionId} (${reason})`
       );
     }
   } catch (error) {
@@ -267,23 +274,58 @@ async function handleDisputeWonRegrant(event: Stripe.Event): Promise<void> {
   }
 }
 
-export async function POST(request: NextRequest) {
-  const rawBody = await request.text();
-  const stripeSignature = request.headers.get('stripe-signature') ?? '';
+const INVALID_WEBHOOK = { error: 'Invalid webhook' } as const;
 
-  if (!process.env.STRIPE_WEBHOOK_SECRET?.trim()) {
+export async function GET() {
+  return NextResponse.json(INVALID_WEBHOOK, { status: 405, headers: { Allow: 'POST' } });
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    resolveStripeWebhookSecret();
+  } catch {
     return NextResponse.json(
       { error: 'Stripe webhook not configured (STRIPE_WEBHOOK_SECRET).' },
-      { status: 503 }
+      { status: 503 },
     );
+  }
+
+  const declaredLength = classifyDeclaredWebhookLength(request.headers.get('content-length'));
+  if (declaredLength) {
+    console.warn('[stripe webhook] rejected delivery', { reason: declaredLength });
+    return NextResponse.json(INVALID_WEBHOOK, { status: 413 });
+  }
+
+  const rawBody = await request.text();
+  const stripeSignature = request.headers.get('stripe-signature');
+  const envelopeReject = classifyStripeWebhookEnvelope(stripeSignature, rawBody, {
+    contentType: request.headers.get('content-type'),
+  });
+  if (envelopeReject) {
+    console.warn('[stripe webhook] rejected delivery', { reason: envelopeReject });
+    const status = envelopeReject === 'body_too_large' ? 413 : 400;
+    return NextResponse.json(INVALID_WEBHOOK, { status });
   }
 
   let event: Stripe.Event;
   try {
-    event = constructWebhookEvent(rawBody, stripeSignature);
-  } catch (e) {
-    console.error('[stripe webhook] signature verification failed:', e);
-    return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
+    event = constructWebhookEvent(rawBody, (stripeSignature ?? '').trim());
+  } catch {
+    console.warn('[stripe webhook] signature verification failed');
+    return NextResponse.json(INVALID_WEBHOOK, { status: 400 });
+  }
+
+  if (!isVerifiedStripeEventShape(event)) {
+    console.warn('[stripe webhook] rejected delivery', { reason: 'invalid_event_shape' });
+    return NextResponse.json(INVALID_WEBHOOK, { status: 400 });
+  }
+
+  if (!webhookLivemodeMatchesApiKey(event.livemode)) {
+    console.warn('[stripe webhook] rejected delivery', { reason: 'mode_mismatch' });
+    return NextResponse.json(
+      { error: 'Stripe webhook not configured (mode mismatch).' },
+      { status: 503 },
+    );
   }
 
   if (!process.env.DATABASE_URL?.trim()) {
@@ -292,8 +334,9 @@ export async function POST(request: NextRequest) {
 
   // Event-ID idempotency: claim the event before any side effects so Stripe's
   // at-least-once delivery cannot double-process (duplicate enrolments/emails).
-  const stripeWebhookEvents = (prisma as unknown as { stripeWebhookEvent: StripeWebhookEventDelegate })
-    .stripeWebhookEvent;
+  const stripeWebhookEvents = (
+    prisma as unknown as { stripeWebhookEvent: StripeWebhookEventDelegate }
+  ).stripeWebhookEvent;
   const claim = await claimStripeWebhookEvent(stripeWebhookEvents, event);
   if (!claim.claimed) {
     console.warn('[stripe webhook] duplicate event, skipped', { id: event.id, type: event.type });
@@ -386,7 +429,7 @@ export async function POST(request: NextRequest) {
     const ref = resolveStripePaymentReference(session.id);
     if (!ref) {
       console.error(
-        '[stripe webhook] checkout.session.completed missing a session id — skipping fulfillment to avoid non-idempotent provisioning',
+        '[stripe webhook] checkout.session.completed missing a session id — skipping fulfillment to avoid non-idempotent provisioning'
       );
       return await acknowledge();
     }
@@ -409,7 +452,7 @@ export async function POST(request: NextRequest) {
           revenueCents: typeof session.amount_total === 'number' ? session.amount_total : undefined,
           currency: session.currency,
           transactionId: ref,
-        },
+        }
       );
 
       if (!fulfilled.alreadyEnrolled && fulfilled.enrollmentId && fulfilled.courseId) {
@@ -426,8 +469,7 @@ export async function POST(request: NextRequest) {
 
         // WS3 / GP-447: server-side `purchase` event (GA4 Measurement Protocol).
         // Never blocks fulfilment — the utility itself no-ops/swallows errors.
-        const valueAud =
-          typeof session.amount_total === 'number' ? session.amount_total / 100 : 0;
+        const valueAud = typeof session.amount_total === 'number' ? session.amount_total / 100 : 0;
         void sendGa4PurchaseEvent({
           clientId: ref,
           userId: claims.sub,
@@ -454,7 +496,10 @@ export async function POST(request: NextRequest) {
     // Unexpected failure around fulfillment — release the claim so Stripe's retry
     // can re-process this event instead of it being skipped as a duplicate.
     console.error('[stripe webhook] unexpected error (returning 500 so Stripe retries):', e);
-    void captureServerError(e, { route: '/api/lms/webhooks/stripe', tags: { eventType: event.type } });
+    void captureServerError(e, {
+      route: '/api/lms/webhooks/stripe',
+      tags: { eventType: event.type },
+    });
     return await retryLater('Stripe webhook processing failed.');
   }
 }
