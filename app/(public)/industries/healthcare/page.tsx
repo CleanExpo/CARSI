@@ -81,7 +81,7 @@ const faqs = [
   {
     question: 'Does CARSI deliver IICRC certification for hospital work?',
     answer:
-      'No. CARSI is an IICRC CEC Accredited provider. Where the IICRC has approved a course, its CEC hours are shown on the course page and recorded in your learner dashboard when you pass. IICRC certification itself is obtained only through IICRC-approved schools and examinations.',
+      'No. CARSI is an IICRC CEC Accredited provider. Where the IICRC has approved a course, its CEC hours are shown on the course page and recorded in your learner dashboard when you pass. IICRC certification itself is obtained only through schools and examinations approved by the IICRC.',
   },
   {
     question: 'What mould training applies to healthcare facilities in Australia?',

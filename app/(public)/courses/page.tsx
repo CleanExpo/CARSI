@@ -181,8 +181,8 @@ export default async function CoursesPage({
           </p>
           <p className="mt-3 rounded-lg border border-[#f2cf8f] bg-[#fff8ed] px-4 py-3 text-sm leading-relaxed text-[#7a3500]">
             CARSI courses carry CARSI Southern Hemisphere Restoration Designations. They are not IICRC
-            certification courses — IICRC certifications are obtained through IICRC-approved schools
-            and examinations.
+            certification courses — IICRC certifications are obtained through schools and
+            examinations approved by the IICRC.
           </p>
           <div className="mt-4 rounded-lg border border-[#b8dbfb] bg-white px-4 py-3 shadow-sm">
             <p className="text-sm leading-relaxed text-slate-700">
@@ -249,7 +249,7 @@ export default async function CoursesPage({
               className="mx-auto mb-4 max-w-xl text-center text-xs text-slate-600"
             >
               A reference map of the IICRC&rsquo;s own certification disciplines, for context.
-              These are certifications awarded by IICRC-approved schools and examinations, not
+              These are certifications awarded by schools and examinations approved by the IICRC, not
               CARSI courses — CARSI courses carry CARSI Southern Hemisphere Restoration
               Designations.
             </p>

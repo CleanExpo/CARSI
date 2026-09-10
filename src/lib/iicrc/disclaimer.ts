@@ -20,4 +20,4 @@ export const IICRC_CEC_DISCLAIMER_LONG =
   'CARSI is an IICRC CEC Accredited provider. CARSI courses earn IICRC ' +
   'Continuing Education Credits (CECs) toward maintaining an existing IICRC ' +
   'certification — they are not IICRC certification. IICRC certification is ' +
-  'obtained only through IICRC-approved schools and examinations.';
+  'obtained only through schools and examinations approved by the IICRC.';

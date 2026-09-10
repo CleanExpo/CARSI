@@ -184,8 +184,8 @@ export const CREDENTIAL_DISCLAIMER =
   // Provider standing is true and stays; course-level eligibility now depends on approval.
   'A CARSI-issued credential — not an IICRC certification. CARSI is an IICRC CEC Accredited ' +
   'provider; a course displays IICRC CECs only where that course holds IICRC ' +
-  'approval. IICRC certification itself is obtained through an IICRC-approved school and ' +
-  'examination.';
+  'approval. IICRC certification itself is obtained through a school and examination ' +
+  'approved by the IICRC.';
 
 function normalizeCoursePrice(price: number | undefined): number | undefined {
   if (typeof price !== 'number' || !Number.isFinite(price) || price < 0) return undefined;
