@@ -86,12 +86,11 @@ const BANNED = [
   // Fail-closed: an empty or unreadable allowlist blocks every one of them.
   { re: /\bIICRC[\s-]*approved\b/i,
     allowlisted: 'iicrcApprovedLines',
-    // Two live lines wrap with the phrase dangling at the end ("...obtained through
-    // IICRC-approved" / "...from an IICRC-approved"), so their noun sits on the NEXT line. For
-    // those the approved unit is the JOINED text - see refuseDanglingEntries for why a human
-    // must not be allowed to approve the fragment alone.
-    allowlistWindow: true,
-    allowlistDangling: /IICRC[\s-]*approv\w*["'\s]*$/i,
+
+    // The approved unit is the smallest window of 1..N lines STARTING at the flagged line
+    // that ends at a sentence terminator (see isCompleteStatement). Prose wraps; a claim does
+    // not stop being one claim because Prettier broke it across six lines.
+    allowlistMaxWindow: 6,
     message: 'Bare "IICRC-approved" implies IICRC approves CARSI\'s courses/certifications — say "IICRC CEC Accredited". Every line naming it is blocked by default; a legitimate line ships ONLY by adding its exact text to scripts/iicrc-cec-allowlist.json (iicrcApprovedLines) after human review.' },
   // GAP CLOSED — "get / certified ... with CARSI" without IICRC adjacency.
   { re: /\b(get|gain|become|be)\s+certified\b[^.\n]{0,24}\bwith\s+CARSI\b/i, allow: null,
@@ -160,16 +159,35 @@ function loadAllowlists() {
     new Set((Array.isArray(v) ? v : []).filter((l) => typeof l === 'string' && l.trim()).map(normaliseLine));
   return {
     approvedLines: toSet(parsed?.approvedLines),
-    iicrcApprovedLines: refuseDanglingEntries(toSet(parsed?.iicrcApprovedLines)),
+    iicrcApprovedLines: refuseIncompleteEntries(toSet(parsed?.iicrcApprovedLines)),
   };
 }
 
-/** An allowlist entry that ENDS on the banned phrase is a wildcard, not an approval: the noun it
- *  is claiming to approve sits on the following line, which this entry says nothing about, so
- *  approving it would permit every possible continuation. Such entries are dropped rather than
- *  honoured - the human must approve the joined text instead (see `allowlistWindow`). */
-function refuseDanglingEntries(set) {
-  return new Set([...set].filter((line) => !/IICRC[\s-]*approv\w*["'\s]*$/i.test(line)));
+/** Is this text a COMPLETE statement - one that cannot be continued by whatever follows it?
+ *
+ *  An entry that stops mid-sentence is a wildcard, not an approval: it says nothing about the
+ *  rest of its own sentence, so approving it permits every possible continuation. Round 5 of
+ *  review proved that with a real one, and 12 of the 27 entries had the same shape.
+ *
+ *  `:` and `,` are deliberately NOT terminators - `:` introduces a list ("IICRC-approved
+ *  schools: courses, exams") and `,` coordinates one, and both leaked in round 4. A comma is
+ *  allowed only in the CLOSER set, where it is structural (a JSON line ends `.",`) and can
+ *  only ever follow a real terminator.
+ *
+ *  A markdown table row or list item is complete by structure: the newline ends it.
+ *
+ *  This test runs on entries the founder wrote, not on prose an attacker controls, so its
+ *  failure direction is the safe one: a terminator this does not know about means the entry is
+ *  REFUSED and CI goes red, never that a claim slips through. That is what separates it from
+ *  the four allow-patterns it replaces. */
+function isCompleteStatement(text, sourceLine = '') {
+  if (/[.!?;][)\]}{'"\u2019\u201d,\s]*$/.test(text)) return true;
+  return /^\s*(?:\|.*\||[-*+]\s|\d+[.)]\s)/.test(sourceLine);
+}
+
+/** Drop entries that are not complete statements. */
+function refuseIncompleteEntries(set) {
+  return new Set([...set].filter((line) => isCompleteStatement(line, line)));
 }
 
 const ALLOWLISTS = loadAllowlists();
@@ -227,7 +245,7 @@ const EXEMPT = [
 function inScope(f) { const n = f.replace(/\\/g, '/'); return SCANNED_DIRS.some((d) => n.startsWith(d)); }
 function isExempt(f) { const n = f.replace(/\\/g, '/'); return EXEMPT.some((e) => n === e || n.endsWith('/' + e)); }
 
-function scanLine(file, lineNo, content, findings, allowlist, nextLine = '') {
+function scanLine(file, lineNo, content, findings, allowlist, followingLines = []) {
   // A specific CEC-hour claim is exempt ONLY when the file belongs to a founder-approved
   // course — i.e. its path contains a slug listed in CEC_APPROVED_SLUGS (empty = none approved).
   const nf = file.replace(/\\/g, '/');
@@ -240,15 +258,19 @@ function scanLine(file, lineNo, content, findings, allowlist, nextLine = '') {
       // Block EVERY matching line unless its exact normalised text is human-approved in that
       // rule's allowlist. No regex exemption — the human review is the control.
       const approved = allowlist[rule.allowlisted] ?? new Set();
-      const line = normaliseLine(content);
-      // A line that ENDS on the banned phrase has its noun on the NEXT line, so approving the
-      // line alone would permit every possible continuation. Refused at LOOKUP, not only at
-      // load, so the property holds however the set was built - the joined form is the only
-      // way such a line ships.
-      const dangling = rule.allowlistDangling?.test(line) ?? false;
-      flagged =
-        !(!dangling && approved.has(line)) &&
-        !(rule.allowlistWindow && nextLine && approved.has(normaliseLine(`${content} ${nextLine}`)));
+      // Try progressively longer windows starting at this line. Approving a LINE is not enough
+      // when the line's sentence continues: round 5 of review kept an approved first line and
+      // changed only its wrapped continuation to a CARSI-offering claim, and the scan stayed
+      // green. So the unit that gets approved must be a COMPLETE statement, and any edit
+      // anywhere inside it changes the text and stops it matching.
+      const window = rule.allowlistMaxWindow ?? 1;
+      flagged = true;
+      for (let k = 0; k < window && flagged; k++) {
+        const text = normaliseLine([content, ...followingLines.slice(0, k)].join(' '));
+        // Completeness is enforced HERE, not only when the file is loaded, so the property
+        // holds however the set was built. An entry that stops mid-sentence never matches.
+        if (approved.has(text) && isCompleteStatement(text, content)) flagged = false;
+      }
     } else {
       // Regex-allow rules are unchanged and still test the line as a whole.
       flagged = !(rule.allow && rule.allow.test(content));
@@ -273,7 +295,7 @@ export function evaluateContent(file, text, allowlist = ALLOWLISTS) {
   const findings = [];
   const lines = text.split('\n');
   for (let i = 0; i < lines.length; i++) {
-    scanLine(file, i + 1, lines[i], findings, sets, lines[i + 1] ?? '');
+    scanLine(file, i + 1, lines[i], findings, sets, lines.slice(i + 1, i + 6));
   }
   return findings;
 }

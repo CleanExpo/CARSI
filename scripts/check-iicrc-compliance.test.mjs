@@ -209,21 +209,52 @@ for (const [name, text] of REVIEW_ROUND_PAYLOADS) {
   }
 }
 
-// 4. A wrap fragment must not be approvable. An entry ENDING on the banned phrase says nothing
-//    about the noun on the following line, so honouring it would permit every continuation.
-//    The loader drops such entries; this proves it, and proves the joined form still works.
-const DANGLING_ENTRY = 'deliver IICRC certification. IICRC certifications are obtained through IICRC-approved';
-const WRAPPED_SOURCE = `${DANGLING_ENTRY}\n              schools and examinations.`;
-const EVASION_AFTER_FRAGMENT = `${DANGLING_ENTRY}\n              school courses get you certified.`;
-if (evaluateContent(NON_APPROVED, WRAPPED_SOURCE, { iicrcApprovedLines: new Set([DANGLING_ENTRY]) }).length === 0) {
-  fail('a dangling allowlist entry was honoured - it wildcards every continuation of the wrap');
+// 4. An approved entry must be a COMPLETE STATEMENT, and the whole of it is load-bearing.
+//    Round 5 of review kept an approved first line and changed only its wrapped continuation
+//    into a CARSI-offering claim; the scan stayed green. 12 of the 27 entries had that shape.
+//    An entry that stops mid-sentence says nothing about the rest of its own sentence, so
+//    approving it would permit any continuation.
+const WRAPPED_FIRST_LINE =
+  "'approval. IICRC certification itself is obtained through an IICRC-approved school and ' +";
+const REAL_CONTINUATION = `${WRAPPED_FIRST_LINE}\n  'examination.';`;
+const EVIL_CONTINUATION = `${WRAPPED_FIRST_LINE}\n  'courses get you certified.';`;
+const JSONLD = 'src/components/seo/JsonLd.tsx';
+
+// (a) The incomplete first line is REFUSED as an entry, so it cannot be approved at all.
+const withFragment = { iicrcApprovedLines: new Set([normaliseLine(WRAPPED_FIRST_LINE)]) };
+if (evaluateContent(JSONLD, REAL_CONTINUATION, withFragment).length === 0) {
+  fail('an entry that stops mid-sentence was honoured — it wildcards every continuation');
 }
-if (evaluateContent(NON_APPROVED, EVASION_AFTER_FRAGMENT, { iicrcApprovedLines: new Set([DANGLING_ENTRY]) }).length === 0) {
-  fail('a dangling allowlist entry let a CARSI-offering claim through on the wrapped line');
+if (evaluateContent(JSONLD, EVIL_CONTINUATION, withFragment).length === 0) {
+  fail('an incomplete entry let a CARSI-offering claim through on its continuation');
 }
-if (evaluateContent(NON_APPROVED, WRAPPED_SOURCE,
-      { iicrcApprovedLines: new Set([normaliseLine(WRAPPED_SOURCE)]) }).length > 0) {
-  fail('the JOINED text of a wrapped disclaimer should be approvable');
+
+// (b) The complete two-line statement IS approvable ...
+const completeStatement = { iicrcApprovedLines: new Set([normaliseLine(REAL_CONTINUATION)]) };
+if (evaluateContent(JSONLD, REAL_CONTINUATION, completeStatement).length > 0) {
+  fail('a complete wrapped statement should be approvable');
+}
+
+// (c) ... and round 5's attack is dead against it: the continuation is inside the approved
+//     text, so changing it changes the text and it no longer matches.
+if (evaluateContent(JSONLD, EVIL_CONTINUATION, completeStatement).length === 0) {
+  fail('round 5 attack: editing the continuation of an approved statement must BLOCK');
+}
+
+// (d) The same holds for an edit to a line inside the window that does not mention IICRC at
+//     all. This is intended, not collateral: for a licence disclaimer, re-approval on edit is
+//     the correct behaviour, and it is what makes (c) hold.
+const UNRELATED_EDIT = `${WRAPPED_FIRST_LINE}\n  'examination today.';`;
+if (evaluateContent(JSONLD, UNRELATED_EDIT, completeStatement).length === 0) {
+  fail('editing any line inside an approved statement must BLOCK until it is re-approved');
+}
+
+// (e) Every shipped entry is a complete statement — the loader drops anything else, so if a
+//     future edit leaves one hanging it disappears from the set rather than wildcarding.
+for (const entry of ALLOWLISTS.iicrcApprovedLines) {
+  if (!/[.!?;][)\]}{'"’”,\s]*$/.test(entry) && !/^\s*(?:\|.*\||[-*+]\s|\d+[.)]\s)/.test(entry)) {
+    fail(`a shipped allowlist entry is not a complete statement:\n    ${entry.slice(-90)}`);
+  }
 }
 
 // 5. Fail-closed. An empty allowlist blocks every approved line - the guard never falls back to
