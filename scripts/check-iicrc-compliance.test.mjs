@@ -141,6 +141,41 @@ if (evaluateContent(NON_APPROVED, spacedVariant, allowG).length > 0) fail('white
 if (evaluateContent(NON_APPROVED, 'This course awards 4 IICRC CECs.', EMPTY).length === 0) fail('planted "awards 4 IICRC CECs" did not fire.');
 if (evaluateContent(NON_APPROVED, 'This course is Australian-produced. Ten-question knowledge check.', EMPTY).length > 0) fail('clean line fired the guard.');
 
+// ── Line-wrapped allow phrases (2026-09-10) ─────────────────────────────────
+// Prettier wraps JSX prose, and on main the wrap fell between "IICRC-approved"
+// and "schools". The allow pattern already permitted that phrase, but the scan
+// is line-by-line so it could never match — the guard fired on the exact
+// disclaimer CLAUDE.md prescribes, and the cheapest way to green CI would have
+// been deleting a licence-protective sentence. The ALLOW window now spans the
+// following line; the BAN window deliberately does not.
+const WRAPPED_LEGITIMATE = [
+  ['obtained-through, wrapped after "IICRC-approved"',
+   'CARSI does not deliver IICRC certification. IICRC certifications are obtained through IICRC-approved\n              schools and examinations.'],
+  ['bought-from, wrapped after "IICRC-approved"',
+   'A certification is bought once per discipline, from an IICRC-approved\n          school and its examination.'],
+  ['wrapped before "examination"',
+   'Sit the IICRC-approved\nexamination at a registered school.'],
+];
+for (const [name, text] of WRAPPED_LEGITIMATE) {
+  if (evaluateContent(NON_APPROVED, text, EMPTY).length > 0) {
+    fail(`legitimate wrapped phrase should PASS: ${name}\n    ${text.replace(/\n/g, '\\n')}`);
+  }
+}
+
+// The widened window must not excuse a real violation. Each of these keeps the
+// banned claim intact on its own line; the next line is innocent prose.
+const WRAPPED_STILL_BANNED = [
+  ['CARSI offering, innocent next line',
+   'Our IICRC-approved courses get you certified.\n              Enrol today and start straight away.'],
+  ['banned claim wrapped, no allow noun anywhere',
+   'Every CARSI course is IICRC-approved\n              and recognised industry wide.'],
+];
+for (const [name, text] of WRAPPED_STILL_BANNED) {
+  if (evaluateContent(NON_APPROVED, text, EMPTY).length === 0) {
+    fail(`banned claim should still BLOCK across a wrap: ${name}\n    ${text.replace(/\n/g, '\\n')}`);
+  }
+}
+
 if (failed > 0) {
   console.error(`\n✖ IICRC/CEC compliance guard self-test failed — ${failed} case(s).`);
   process.exit(1);

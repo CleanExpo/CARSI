@@ -184,7 +184,7 @@ const EXEMPT = [
 function inScope(f) { const n = f.replace(/\\/g, '/'); return SCANNED_DIRS.some((d) => n.startsWith(d)); }
 function isExempt(f) { const n = f.replace(/\\/g, '/'); return EXEMPT.some((e) => n === e || n.endsWith('/' + e)); }
 
-function scanLine(file, lineNo, content, findings, allowlist) {
+function scanLine(file, lineNo, content, findings, allowlist, nextLine = '') {
   // A specific CEC-hour claim is exempt ONLY when the file belongs to a founder-approved
   // course — i.e. its path contains a slug listed in CEC_APPROVED_SLUGS (empty = none approved).
   const nf = file.replace(/\\/g, '/');
@@ -199,7 +199,19 @@ function scanLine(file, lineNo, content, findings, allowlist) {
       flagged = !allowlist.has(normaliseLine(content));
     } else {
       // BANNED rules: line-wide, exempt-if-`allow`.
-      flagged = !(rule.allow && rule.allow.test(content));
+      //
+      // The BAN is tested on this line alone. The ALLOW is tested on this line joined
+      // to the next, because Prettier wraps JSX prose and a wrap lands mid-phrase.
+      // On 2026-09-10 both `IICRC-approved` findings on main were the legitimate
+      // "IICRC-approved / schools" disclaimer split across a line break: the allow
+      // pattern below already permits it, but could never match because "school"
+      // sat on the following line. The guard therefore fired on the exact sentence
+      // CLAUDE.md prescribes ("IICRC certification is obtained only through
+      // IICRC-approved schools"), and the cheapest way to green CI would have been
+      // deleting a licence-protective disclaimer. Widening the ALLOW window, never
+      // the BAN window, keeps the blocked surface identical.
+      const allowWindow = nextLine ? `${content} ${nextLine}` : content;
+      flagged = !(rule.allow && rule.allow.test(allowWindow));
     }
     if (flagged) {
       findings.push(`  ${file}:${lineNo}: ${rule.message}\n    → ${content.trim().slice(0, 150)}`);
@@ -214,7 +226,9 @@ function scanLine(file, lineNo, content, findings, allowlist) {
 export function evaluateContent(file, text, allowlist = ALLOWLIST) {
   const findings = [];
   const lines = text.split('\n');
-  for (let i = 0; i < lines.length; i++) scanLine(file, i + 1, lines[i], findings, allowlist);
+  for (let i = 0; i < lines.length; i++) {
+    scanLine(file, i + 1, lines[i], findings, allowlist, lines[i + 1] ?? '');
+  }
   return findings;
 }
 
