@@ -1,11 +1,11 @@
 {
   "slug": "commercial-floor-care-schools-childcare",
   "seoTitle": "Commercial Floor Care for Schools & Childcare | CARSI",
-  "metaDescription": "A free CARSI course in contract-ready floor care for schools and childcare: carpet, tile and grout, vinyl strip and seal, and pressure washing.",
+  "metaDescription": "A CARSI course in contract-ready floor care for schools and childcare: carpet, tile and grout, vinyl strip and seal, and pressure washing.",
   "imageAlt": "Cleaning contractor stripping and sealing a vinyl floor with wet-floor barriers in an empty Australian school hall.",
   "og": {
-    "title": "Commercial Floor Care for Schools & Childcare — Free CARSI Course",
-    "description": "A free CARSI course taking cleaners to a contract-ready floor-care service for schools and childcare — carpet, tile and grout, vinyl strip and seal, pressure washing, plus the compliance it expects."
+    "title": "Commercial Floor Care for Schools & Childcare | CARSI",
+    "description": "A CARSI course taking cleaners to a contract-ready floor-care service for schools and childcare — carpet, tile and grout, vinyl strip and seal, pressure washing, plus the compliance it expects."
   },
   "keywords": [
     "commercial floor care",
@@ -40,7 +40,7 @@
     "@context": "https://schema.org",
     "@type": "Course",
     "name": "Commercial Floor Care for Schools & Childcare Contracts",
-    "description": "A free CARSI professional-development course taking experienced cleaners to a contract-ready floor-care service for Australian schools and childcare centres, covering carpet, tile and grout, vinyl strip and seal, and pressure washing, each paired with the WHS, SDS, child-safety, slip-resistance and run-off requirements a contract expects. This is contract-readiness training; it is not accredited by the IICRC and does not award IICRC Continuing Education Credits (CECs).",
+    "description": "A CARSI professional-development course taking experienced cleaners to a contract-ready floor-care service for Australian schools and childcare centres, covering carpet, tile and grout, vinyl strip and seal, and pressure washing, each paired with the WHS, SDS, child-safety, slip-resistance and run-off requirements a contract expects. This is contract-readiness training; it is not accredited by the IICRC and does not award IICRC Continuing Education Credits (CECs).",
     "provider": {
       "@type": "Organization",
       "name": "CARSI",

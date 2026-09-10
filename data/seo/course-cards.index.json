@@ -114,7 +114,7 @@
  "avian-influenza-awareness-restoration-iaq-facilities": {
   "slug": "avian-influenza-awareness-restoration-iaq-facilities",
   "seoTitle": "H5 Bird Flu Awareness for Restoration Teams | CARSI",
-  "metaDescription": "A free, calm CARSI awareness course for Australian restoration, IAQ and facility teams: report sightings correctly, protect workers and document work.",
+  "metaDescription": "A calm CARSI awareness course for Australian restoration, IAQ and facility teams: report sightings correctly, protect workers and document work.",
   "imageAlt": "Facility professional recording observations and following the reporting pathway calmly at an Australian coastal site.",
   "og": {
    "title": "H5 Bird Flu Awareness for Restoration & Facility Teams | CARSI",
@@ -276,7 +276,7 @@
  "ccw-carsi-truckmount-operations": {
   "slug": "ccw-carsi-truckmount-operations",
   "seoTitle": "Truckmount Operations Course (Australian) | CARSI",
-  "metaDescription": "A CARSI and CCW operator course for HydraMaster and Sapphire Scientific truck-mounts in Australian configuration — safe operating procedures, carbon monoxide safety, road safety and servicing.",
+  "metaDescription": "A CARSI and CCW operator course for HydraMaster and Sapphire Scientific truck-mounts in Australia: safe operation, carbon monoxide safety and servicing.",
   "imageAlt": "Operator running a petrol-engine truck-mount carpet cleaning unit from an Australian work van",
   "og": {
    "title": "Truckmount Operations — HydraMaster & Sapphire Scientific | CARSI",
@@ -389,11 +389,11 @@
  "commercial-floor-care-schools-childcare": {
   "slug": "commercial-floor-care-schools-childcare",
   "seoTitle": "Commercial Floor Care for Schools & Childcare | CARSI",
-  "metaDescription": "A free CARSI course in contract-ready floor care for schools and childcare: carpet, tile and grout, vinyl strip and seal, and pressure washing.",
+  "metaDescription": "A CARSI course in contract-ready floor care for schools and childcare: carpet, tile and grout, vinyl strip and seal, and pressure washing.",
   "imageAlt": "Cleaning contractor stripping and sealing a vinyl floor with wet-floor barriers in an empty Australian school hall.",
   "og": {
-   "title": "Commercial Floor Care for Schools & Childcare — Free CARSI Course",
-   "description": "A free CARSI course taking cleaners to a contract-ready floor-care service for schools and childcare — carpet, tile and grout, vinyl strip and seal, pressure washing, plus the compliance it expects."
+   "title": "Commercial Floor Care for Schools & Childcare | CARSI",
+   "description": "A CARSI course taking cleaners to a contract-ready floor-care service for schools and childcare — carpet, tile and grout, vinyl strip and seal, pressure washing, plus the compliance it expects."
   },
   "keywords": [
    "commercial floor care",
@@ -428,7 +428,7 @@
    "@context": "https://schema.org",
    "@type": "Course",
    "name": "Commercial Floor Care for Schools & Childcare Contracts",
-   "description": "A free CARSI professional-development course taking experienced cleaners to a contract-ready floor-care service for Australian schools and childcare centres, covering carpet, tile and grout, vinyl strip and seal, and pressure washing, each paired with the WHS, SDS, child-safety, slip-resistance and run-off requirements a contract expects. This is contract-readiness training; it is not accredited by the IICRC and does not award IICRC Continuing Education Credits (CECs).",
+   "description": "A CARSI professional-development course taking experienced cleaners to a contract-ready floor-care service for Australian schools and childcare centres, covering carpet, tile and grout, vinyl strip and seal, and pressure washing, each paired with the WHS, SDS, child-safety, slip-resistance and run-off requirements a contract expects. This is contract-readiness training; it is not accredited by the IICRC and does not award IICRC Continuing Education Credits (CECs).",
    "provider": {
     "@type": "Organization",
     "name": "CARSI",
@@ -475,10 +475,6 @@
    {
     "q": "Why is documenting air quality important?",
     "a": "Documentation supports health and safety compliance, provides data for insurance claims and serves as evidence in disputes. The course shows how to record readings at regular intervals and note the actions taken to mitigate contaminants."
-   },
-   {
-    "q": "How much does this course cost?",
-    "a": "The course is priced at AUD $28.98 and is open to cleaning and restoration professionals with no prerequisites."
    }
   ],
   "courseJsonLd": {
@@ -957,7 +953,7 @@
    },
    {
     "q": "Is this course suitable for beginners?",
-    "a": "Yes. It is a foundational course for cleaning and restoration professionals who are just starting out or reinforcing the basics, priced at AUD $29 with no prerequisites."
+    "a": "Yes. It is a foundational course for cleaning and restoration professionals who are just starting out or reinforcing the basics."
    }
   ],
   "courseJsonLd": {
@@ -1839,7 +1835,7 @@
  "wrt-water-damage-essentials": {
   "slug": "wrt-water-damage-essentials",
   "seoTitle": "Water Damage Restoration Course — Essentials | CARSI",
-  "metaDescription": "A CARSI continuing-education course on water damage restoration fundamentals — water categories, classes of loss, site safety, extraction, dehumidification and psychrometry.",
+  "metaDescription": "A CARSI course on water damage restoration fundamentals: water categories, classes of loss, site safety, extraction, dehumidification and psychrometry.",
   "imageAlt": "Restoration technician moisture-mapping a water-damaged Australian home during drying setup",
   "og": {
    "title": "Water Damage Restoration: Essentials | CARSI",
