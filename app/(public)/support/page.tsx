@@ -77,7 +77,7 @@ export default function SupportPage() {
         <h2 className={marketingLegalH2}>Continuing education credits</h2>
         <p>
           CARSI is an IICRC CEC Accredited provider and issues its own CARSI Southern Hemisphere
-          Restoration Designations. IICRC certification is obtained through an IICRC-approved school,
+          Restoration Designations. IICRC certification is obtained through a school approved by the IICRC,
           by sitting its examination — not from CARSI.
         </p>
         <p>

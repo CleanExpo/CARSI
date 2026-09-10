@@ -108,8 +108,8 @@ work, that is an evidence trail rather than a training certificate in a filing c
 
 To be straight with you about what CARSI is and is not. CARSI issues its own credentials, the
 CARSI Southern Hemisphere Restoration Designations. We are an IICRC CEC Accredited provider. We do
-not deliver IICRC certification and we do not claim to — that comes from an IICRC-approved school
-and examination. Per-course CEC approval is applied for course by course, and I would rather tell
+not deliver IICRC certification and we do not claim to — that comes from a school and examination
+approved by the IICRC. Per-course CEC approval is applied for course by course, and I would rather tell
 you that now than have you discover it later.
 
 **What I am proposing.** A pilot with five to fifteen of your franchisees, on our Teams plan,

@@ -482,7 +482,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                     </span>{' '}
                     CARSI is an IICRC CEC Accredited provider, so this course counts toward
                     maintaining a certification you already hold. IICRC certification itself is
-                    obtained through an IICRC-approved school and examination.{' '}
+                    obtained through a school and examination approved by the IICRC.{' '}
                     {/* Both credential critics asked for a verification path. One already exists
                         and is public — app/(public)/verify/credential/[credentialId] and
                         /verify/training-record, neither auth-gated — but the course page linked
@@ -1094,8 +1094,8 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                     {/* GP-498: assert this course earns CECs only when it has registry-approved
                         CEC hours; unapproved courses make no CEC-earning claim. */}
                     {course.cec_hours
-                      ? 'It earns IICRC Continuing Education Credits (CECs) toward maintaining an existing IICRC certification, which is obtained separately through IICRC-approved schools and examinations.'
-                      : 'IICRC certification is obtained separately through IICRC-approved schools and examinations.'}
+                      ? 'It earns IICRC Continuing Education Credits (CECs) toward maintaining an existing IICRC certification, which is obtained separately through schools and examinations approved by the IICRC.'
+                      : 'IICRC certification is obtained separately through schools and examinations approved by the IICRC.'}
                   </p>
                 </div>
               </section>

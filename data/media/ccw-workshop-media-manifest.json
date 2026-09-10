@@ -14,7 +14,7 @@
       "#f6f8fb"
     ],
     "voiceId": "ELEVENLABS_VOICE_ID (unset in Synthex prod — required only for the phase-2 talking-presenter videos; phase-1 b-roll needs no voice)",
-    "styleNotes": "Australian-produced, clean scientific-professional, 230V/10A context, metric, AU workplaces. No text in imagery implying IICRC certification — CARSI is an IICRC-approved CEC provider only. No fabricated performance claims baked into any asset.",
+    "styleNotes": "Australian-produced, clean scientific-professional, 230V/10A context, metric, AU workplaces. No text in imagery implying IICRC certification — CARSI is an IICRC CEC Accredited provider only. No fabricated performance claims baked into any asset.",
     "targetConsumer": "Synthex /api/media/generate/{image,video,voice}"
   },
   "note": "Source of truth for the images/video the CCW training modules and marketing need. Consumed by the Synthex bridge (scripts/generate-course-media.mjs). Each entry.request is a verbatim payload for the matching Synthex media-gen endpoint. Outputs land in the Synthex media library tagged with entry.tags, and the asset map is written back to ccw-workshop-media-assets.generated.json.",

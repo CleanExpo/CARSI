@@ -64,7 +64,7 @@ When searching for relevant panels, look for these category descriptions:
 
 Government procurement officers evaluate contractors on documented competency. IICRC (Institute of Inspection Cleaning and Restoration Certification) is a globally recognised standard for restoration qualifications, and many Australian government tender specifications for restoration work reference IICRC standards and certifications.
 
-**One important distinction before you plan your training:** IICRC certification itself (WRT, ASD, FSRT and so on) is obtained only through IICRC-approved schools and examinations. CARSI is an IICRC CEC Accredited provider. CARSI courses do not grant IICRC certification.
+**One important distinction before you plan your training:** IICRC certification itself (WRT, ASD, FSRT and so on) is obtained only through schools and examinations approved by the IICRC. CARSI is an IICRC CEC Accredited provider. CARSI courses do not grant IICRC certification.
 
 **What procurement officers look for:**
 
@@ -102,7 +102,7 @@ Government procurement officers evaluate contractors on documented competency. I
 IICRC certifications require ongoing education to maintain active status:
 
 - **14 CECs per certification** over a defined cycle
-- CECs must be earned through IICRC-approved CE providers
+- CECs must be earned through CE providers approved by the IICRC
 - CARSI is an IICRC CEC Accredited provider
 - Government panels may audit your CEC records — keep them current
 
@@ -257,7 +257,7 @@ The business has been operating for several years with steady commercial and ins
 
 **What a panel-ready business changes:**
 
-1. **Closes the certification gap** — Technicians who need IICRC certification book it through an IICRC-approved school and examination. Everyone who already holds a certification keeps it current with IICRC CEC Accredited courses through CARSI, so every credential on the capability statement is active and auditable.
+1. **Closes the certification gap** — Technicians who need IICRC certification book it through a school and examination approved by the IICRC. Everyone who already holds a certification keeps it current with IICRC CEC Accredited courses through CARSI, so every credential on the capability statement is active and auditable.
 
 2. **Builds a WHS management system** — Engages a WHS consultant to formalise existing procedures into a documented management system, with SWMS for all high-risk activities.
 
@@ -280,7 +280,7 @@ Panel evaluators score documented evidence, not assertions. A certification tabl
 | Week        | Action                                                                              | Resources                                       |
 | ----------- | ----------------------------------------------------------------------------------- | ----------------------------------------------- |
 | **1–2**     | Audit current certifications. Identify gaps.                                                                    | CARSI pathway tool at carsi.com.au/pathways    |
-| **3–6**     | Book IICRC certification (WRT minimum) through an IICRC-approved school. Keep existing credentials current with CARSI IICRC CEC Accredited courses. | iicrc.org + carsi.com.au                       |
+| **3–6**     | Book IICRC certification (WRT minimum) through a school approved by the IICRC. Keep existing credentials current with CARSI IICRC CEC Accredited courses. | iicrc.org + carsi.com.au                       |
 | **5–6**     | Review and upgrade insurance policies.                                                                          | Your insurance broker                          |
 | **5–8**     | Build or formalise WHS management system. Complete all SWMS.                                                    | WHS consultant or SafeWork Australia templates |
 | **7–8**     | Prepare capability statement. Gather project case studies and references.                                       | See the structure in Chapter 4                 |
@@ -305,7 +305,7 @@ Panel evaluators score documented evidence, not assertions. A certification tabl
 **Ready to get panel-ready?**
 
 1. **Assess your team's certifications** — Visit carsi.com.au/pathways to see which IICRC credentials your target panels call for
-2. **Start with WRT** — Water Restoration Technician is the foundation credential for government restoration panel work, obtained through an IICRC-approved school and examination
+2. **Start with WRT** — Water Restoration Technician is the foundation credential for government restoration panel work, obtained through a school and examination approved by the IICRC
 3. **Keep your CECs current with CARSI** — Individual and team membership options are at carsi.com.au/pricing
 
 ---

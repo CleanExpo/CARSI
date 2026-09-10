@@ -54,7 +54,7 @@ export const facilityManagementFaqs = [
   {
     question: 'Does CARSI deliver IICRC certification for those contracts?',
     answer:
-      'No. CARSI is an IICRC CEC Accredited provider. Where the IICRC has approved a course, CEC hours appear on the course page and in the learner dashboard after a pass. IICRC certification is obtained only through IICRC-approved schools and examinations.',
+      'No. CARSI is an IICRC CEC Accredited provider. Where the IICRC has approved a course, CEC hours appear on the course page and in the learner dashboard after a pass. IICRC certification is obtained only through schools and examinations approved by the IICRC.',
   },
   {
     question: 'Can a manager buy seats for a whole crew?',

@@ -20,7 +20,7 @@ import { OG_IMAGES } from '@/lib/seo/og-image';
  *    IICRC certification". CARSI is an IICRC CEC provider; it does not deliver
  *    IICRC certification, and copy implying otherwise is a licence-critical
  *    defect (CLAUDE.md, IICRC CEC terminology). Certification is a one-off bought
- *    from an IICRC-approved school. CECs are the RECURRING cost of keeping it.
+ *    from a school approved by the IICRC. CECs are the RECURRING cost of keeping it.
  *    Those are different purchases, and saying so is both compliant and truer.
  *
  * CARSI's own price comes from INDIVIDUAL_TIERS rather than a literal, so it
@@ -53,17 +53,17 @@ const FAQ_ITEMS = [
   {
     question: 'Does a CARSI course make me IICRC certified?',
     answer:
-      'No, and any provider telling you otherwise is misleading you. IICRC certification is earned through an IICRC-approved school and its examination. CARSI is accredited as an IICRC CEC provider, which is a different standing: CARSI courses carry CARSI Southern Hemisphere Restoration Designations in their own right, and where an individual course has been approved by the IICRC, the credits it carries are shown on that course and tracked in your dashboard.',
+      'No, and any provider telling you otherwise is misleading you. IICRC certification is earned through a school approved by the IICRC and its examination. CARSI is accredited as an IICRC CEC provider, which is a different standing: CARSI courses carry CARSI Southern Hemisphere Restoration Designations in their own right, and where an individual course has been approved by the IICRC, the credits it carries are shown on that course and tracked in your dashboard.',
   },
   {
     question: 'So what am I actually comparing?',
     answer:
-      'Two different purchases. A certification course is a one-off you buy once per discipline from an IICRC-approved school. CECs are the recurring cost of keeping that certification current, year after year. This page is about the recurring half, because that is the one that repeats for the life of your career.',
+      'Two different purchases. A certification course is a one-off you buy once per discipline from a school approved by the IICRC. CECs are the recurring cost of keeping that certification current, year after year. This page is about the recurring half, because that is the one that repeats for the life of your career.',
   },
   {
     question: 'Why is a CARSI course priced differently from a certification course?',
     answer:
-      'Chiefly because they are not the same purchase, and the prices are not substitutes for one another. A certification course buys an IICRC certification, once, through an IICRC-approved school and its examination. A CARSI course buys a CARSI Southern Hemisphere Restoration Designation and, where that particular course has been approved by the IICRC, credits toward keeping a certification you already hold. Delivery costs differ on top of that: a classroom course carries a venue, an instructor for three days and your travel, and takes you off the tools while it runs. Treat them as two separate line items in a training budget rather than as alternatives to each other.',
+      'Chiefly because they are not the same purchase, and the prices are not substitutes for one another. A certification course buys an IICRC certification, once, through a school approved by the IICRC and its examination. A CARSI course buys a CARSI Southern Hemisphere Restoration Designation and, where that particular course has been approved by the IICRC, credits toward keeping a certification you already hold. Delivery costs differ on top of that: a classroom course carries a venue, an instructor for three days and your travel, and takes you off the tools while it runs. Treat them as two separate line items in a training budget rather than as alternatives to each other.',
   },
   {
     question: 'What does a CARSI course cost?',
@@ -139,7 +139,7 @@ export default function RestorationTrainingCostPage() {
           </h2>
           <p className="mt-3 text-[15px] leading-relaxed text-[#7a3500]">
             A certification course and a continuing education course are not competing products. You
-            buy an IICRC certification once per discipline, from an IICRC-approved school and its
+            buy an IICRC certification once per discipline, from a school approved by the IICRC and its
             examination. Keeping that certification current is a separate, recurring cost for the
             rest of your career. CARSI is an accredited IICRC CEC provider and sits on the recurring
             side. CARSI does not deliver IICRC certification, and no CARSI course will make you
@@ -157,7 +157,7 @@ export default function RestorationTrainingCostPage() {
           </h2>
           <p className="mt-3 text-[15px] leading-relaxed text-slate-700">
             Read these as two separate line items, not as two prices for the same thing. The first
-            is a one-off certification bought from an IICRC-approved school. The second is
+            is a one-off certification bought from a school approved by the IICRC. The second is
             continuing education, which recurs for as long as you hold the certification.
           </p>
 
@@ -206,8 +206,8 @@ export default function RestorationTrainingCostPage() {
             <table className="w-full border-collapse text-left text-[15px]">
               <caption className="sr-only">
                 What each purchase costs. These are two different purchases, not two prices for the
-                same thing. A certification is bought once per discipline, from an IICRC-approved
-                school and its examination. Continuing education recurs for as long as the
+                same thing. A certification is bought once per discipline, from a school approved by
+                the IICRC and its examination. Continuing education recurs for as long as the
                 certification is held.
               </caption>
               <thead>
