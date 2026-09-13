@@ -3,7 +3,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getPostLoginRedirectPath } from '@/lib/admin/admin-auth';
 import { signSessionToken } from '@/lib/auth/session-jwt';
 import { SESSION_SENTINEL_COOKIE } from '@/lib/auth/session-sentinel';
-import { authenticateWithPassword } from '@/lib/server/lms-auth';
+import {
+  authenticateWithPassword,
+  loginFailureKindForEmail,
+  NEEDS_PASSWORD_SETUP_MESSAGE,
+} from '@/lib/server/lms-auth';
 import { applyRateLimit, clientIpFrom } from '@/lib/rate-limit';
 
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
@@ -52,6 +56,16 @@ export async function POST(request: NextRequest) {
 
     const claims = await authenticateWithPassword(email, password);
     if (!claims) {
+      if ((await loginFailureKindForEmail(email)) === 'needs_password_setup') {
+        return NextResponse.json(
+          {
+            error: NEEDS_PASSWORD_SETUP_MESSAGE,
+            code: 'needs_password_setup',
+            reset_path: '/forgot-password',
+          },
+          { status: 401 },
+        );
+      }
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 

@@ -205,10 +205,16 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
         return;
       }
     } catch (err) {
-      if (err instanceof ApiClientError && err.status === 404) {
+      if (err instanceof ApiClientError && err.status === 409) {
+        const learn =
+          typeof err.payload?.learn_path === 'string' ? err.payload.learn_path : null;
+        if (learn && learn.startsWith('/') && !learn.startsWith('//') && !learn.includes('://')) {
+          window.location.href = learn;
+          return;
+        }
+        setError(err.message || 'You already own this course.');
+      } else if (err instanceof ApiClientError && err.status === 404) {
         setError('Checkout service is not configured yet. Please contact support.');
-      } else if (err instanceof Error && err.message.includes('409')) {
-        setError('You are already enrolled in this course.');
       } else {
         setError('Something went wrong. Please try again.');
       }

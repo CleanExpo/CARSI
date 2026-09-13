@@ -21,6 +21,31 @@ export function guestEnrolEmailIsUsable(value: string): boolean {
   return email.includes('@') && email.length >= 3 && !email.includes(' ');
 }
 
+function isSafeInternalPath(path: string): boolean {
+  return path.startsWith('/') && !path.startsWith('//') && !path.includes('://');
+}
+
+/**
+ * Where to send a guest who already owns the course (409 from checkout).
+ * Prefer set-password for unclaimed provisional accounts, then sign-in,
+ * then the learn path. Never follow an off-site URL.
+ */
+export function guestCheckoutRefusalDestination(data: {
+  already_enrolled?: boolean;
+  needs_password_setup?: boolean;
+  reset_path?: string;
+  login_path?: string;
+  learn_path?: string;
+}): string | null {
+  if (!data.already_enrolled) return null;
+  if (data.needs_password_setup && data.reset_path && isSafeInternalPath(data.reset_path)) {
+    return data.reset_path;
+  }
+  if (data.login_path && isSafeInternalPath(data.login_path)) return data.login_path;
+  if (data.learn_path && isSafeInternalPath(data.learn_path)) return data.learn_path;
+  return '/forgot-password';
+}
+
 type Props = {
   slug: string;
   priceAud: number;
@@ -112,7 +137,17 @@ export function GuestEnrolForm({ slug, priceAud, isFree, showTeamOption = false 
       const data = (await res.json().catch(() => ({}))) as {
         checkout_url?: string;
         detail?: string;
+        already_enrolled?: boolean;
+        needs_password_setup?: boolean;
+        reset_path?: string;
+        login_path?: string;
+        learn_path?: string;
       };
+      const refusal = guestCheckoutRefusalDestination(data);
+      if (refusal) {
+        window.location.href = refusal;
+        return;
+      }
       if (!res.ok) {
         setError(data.detail ?? 'Checkout could not start');
         return;

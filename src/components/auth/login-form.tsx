@@ -30,6 +30,7 @@ export function LoginForm() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [needsPasswordSetup, setNeedsPasswordSetup] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
   const form = useForm<FormData>({
@@ -68,6 +69,7 @@ export function LoginForm() {
   async function onSubmit(values: FormData) {
     setIsLoading(true);
     setError(null);
+    setNeedsPasswordSetup(false);
 
     const { email, password } = getCredentialsFromForm(values);
 
@@ -104,10 +106,13 @@ export function LoginForm() {
       const data = (await response.json()) as {
         error?: string;
         redirect_to?: string;
+        code?: string;
+        reset_path?: string;
       };
 
       if (!response.ok) {
         setError(data.error || 'Login failed');
+        setNeedsPasswordSetup(data.code === 'needs_password_setup');
         toast({ title: data.error || 'Login failed', variant: 'destructive' });
         setIsLoading(false);
         return;
@@ -178,14 +183,21 @@ export function LoginForm() {
           )}
         />
         {error && (
-          <p
-            className="text-destructive text-sm"
+          <div
+            className="text-destructive space-y-1 text-sm"
             role="alert"
             aria-live="assertive"
             id="login-error"
           >
-            {error}
-          </p>
+            <p>{error}</p>
+            {needsPasswordSetup ? (
+              <p>
+                <a href="/forgot-password" className="underline underline-offset-2">
+                  Set your password
+                </a>
+              </p>
+            ) : null}
+          </div>
         )}
         <button
           type="submit"

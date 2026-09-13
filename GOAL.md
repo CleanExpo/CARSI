@@ -123,3 +123,8 @@ e2e/` matches nothing across all five specs, and the only checkout call under te
 - 2026-09-09: Gate 0. Merged Phil’s 13 commits (licence guards, live CEC cron, roadshow
   dates, AU training-cost page, 80 course cards) without overwriting them. Local Track 1/2
   work stayed. Hardened findability and calendar price labels only. RWR unchanged.
+- 2026-09-13: Gate 0. **Customer-visible delta (pending merge):** a guest who already paid
+  can no longer be charged a second time for the same course, and login no longer says
+  "Invalid credentials" when the account has only a provisional password — it points them
+  at `/forgot-password`. RWR still blocked on founder actions #808 (email the six) and
+  #809 (refund Brighttouch's second $49). Code path: PR on `cursor/guest-checkout-lockout-d48a`.

@@ -794,3 +794,11 @@ non-JSON content-type, then `constructEvent` (static, `whsec_` only, 300s
 tolerance). Live/test mode must match the API key. GET is 405. Probes get a
 generic 400 — do not treat them as a payment rollback. Health checks must hit
 `/api/health`, not `/api/lms/webhooks/stripe`.
+
+## Discoveries — 2026-09-13 guest checkout lockout (P0 #806 / #807)
+
+Paid guests were created with `provisional:<uuid>` and told "Invalid credentials" on
+sign-in. Checkout opened Stripe with no enrolment check, so a retry charged twice
+(Brighttouch, 30 Aug). #810 already fixed the welcome-email CTA. This session adds the
+enrolment-before-Stripe guard and the login recovery copy. Founder emails (#808) and
+the single Brighttouch refund (#809) stay out of agent scope.
