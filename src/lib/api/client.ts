@@ -19,7 +19,8 @@ export class ApiClientError extends Error {
     message: string,
     public status: number,
     public errorCode?: string,
-    public requestId?: string
+    public requestId?: string,
+    public payload?: Record<string, unknown>,
   ) {
     super(message);
     this.name = 'ApiClientError';
@@ -121,11 +122,17 @@ async function fetchApi<T>(
     }
 
     if (!response.ok) {
-      const error: ApiError = await response.json().catch(() => ({
+      const error = (await response.json().catch(() => ({
         detail: `HTTP ${response.status}: ${response.statusText}`,
-      }));
+      }))) as ApiError & Record<string, unknown>;
 
-      throw new ApiClientError(error.detail, response.status, error.error_code, error.request_id);
+      throw new ApiClientError(
+        error.detail,
+        response.status,
+        error.error_code,
+        error.request_id,
+        error,
+      );
     }
 
     // Handle 204 No Content

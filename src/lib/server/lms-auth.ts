@@ -25,6 +25,44 @@ export function isProvisionalPasswordHash(hash: string): boolean {
   return isJwtProvisionedPasswordHash(hash) || hash.startsWith(PROVISIONAL_PASSWORD_PREFIX);
 }
 
+export type LoginFailureKind = 'invalid' | 'needs_password_setup';
+
+/**
+ * Copy for a guest-checkout account that has never had a human-set password.
+ * Do not use "Invalid credentials" here — that reads as a typo, and those
+ * buyers never received a password they could type.
+ */
+export const NEEDS_PASSWORD_SETUP_MESSAGE =
+  'This account does not have a password yet. Set one from the link we send you — it is not that the password was wrong.';
+
+/**
+ * After a failed password check: if the row is an unclaimed provisional
+ * account, point the buyer at set-password. Every other miss stays a generic
+ * invalid so login cannot enumerate established accounts.
+ */
+export function classifyLoginFailure(
+  user: { isActive: boolean; hashedPassword: string } | null | undefined,
+): LoginFailureKind {
+  if (user?.isActive && isProvisionalPasswordHash(user.hashedPassword)) {
+    return 'needs_password_setup';
+  }
+  return 'invalid';
+}
+
+export async function loginFailureKindForEmail(email: string): Promise<LoginFailureKind> {
+  const normalized = email.trim().toLowerCase();
+  if (!normalized) return 'invalid';
+  try {
+    const user = await prisma.lmsUser.findUnique({
+      where: { email: normalized },
+      select: { isActive: true, hashedPassword: true },
+    });
+    return classifyLoginFailure(user);
+  } catch {
+    return 'invalid';
+  }
+}
+
 /** An opaque, non-authenticating placeholder for an unclaimed provisional account. */
 export function provisionalPasswordHash(): string {
   return `${PROVISIONAL_PASSWORD_PREFIX}${randomUUID()}`;

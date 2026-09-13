@@ -48,10 +48,11 @@ export default function ForgotPasswordPage() {
     >
       <div className="mb-6 space-y-1.5">
         <h1 className="text-2xl font-bold text-slate-950">
-          Reset password
+          Set or reset your password
         </h1>
         <p className="text-sm text-slate-600">
-          Enter your email address and we&apos;ll send you a reset link
+          Enter your email address and we&apos;ll send you a link to set or reset your password.
+          Use this if you bought a course as a guest and never chose one.
         </p>
         <p className="text-xs font-semibold tracking-wide text-[#146fc2]">
           IICRC CEC Accredited restoration courses

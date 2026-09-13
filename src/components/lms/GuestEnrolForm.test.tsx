@@ -1,7 +1,11 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 
-import { GuestEnrolForm, guestEnrolEmailIsUsable } from './GuestEnrolForm';
+import {
+  GuestEnrolForm,
+  guestCheckoutRefusalDestination,
+  guestEnrolEmailIsUsable,
+} from './GuestEnrolForm';
 
 /**
  * WS1 fix 4 (GP-543, directive break 6). Observed live on carsi.com.au on 2026-09-03: the paid
@@ -101,5 +105,45 @@ describe('GuestEnrolForm: the promise, the fields and the button all match what 
   it('positive control: the pre-fix paid copy fails the paid checks', () => {
     expect(OLD_PAID_PROMISE).toMatch(/create your account and pay/i);
     expect(OLD_PAID_PROMISE).not.toMatch(/after payment/i);
+  });
+});
+
+describe('guestCheckoutRefusalDestination — already-enrolled checkout 409', () => {
+  it('sends a provisional guest to set-password, not back into Stripe', () => {
+    expect(
+      guestCheckoutRefusalDestination({
+        already_enrolled: true,
+        needs_password_setup: true,
+        reset_path: '/forgot-password',
+        learn_path: '/dashboard/learn/level-1-mould-remediation-2cc96b85',
+      }),
+    ).toBe('/forgot-password');
+  });
+
+  it('sends an established guest to sign in', () => {
+    expect(
+      guestCheckoutRefusalDestination({
+        already_enrolled: true,
+        login_path: '/login?next=%2Fdashboard%2Flearn%2Fodour-control',
+        learn_path: '/dashboard/learn/odour-control',
+      }),
+    ).toBe('/login?next=%2Fdashboard%2Flearn%2Fodour-control');
+  });
+
+  it('ignores an off-site reset path', () => {
+    expect(
+      guestCheckoutRefusalDestination({
+        already_enrolled: true,
+        needs_password_setup: true,
+        reset_path: 'https://evil.example/reset',
+        learn_path: '/dashboard/learn/x',
+      }),
+    ).toBe('/dashboard/learn/x');
+  });
+
+  it('does nothing when the response is not an already-enrolled refusal', () => {
+    expect(guestCheckoutRefusalDestination({ checkout_url: 'https://stripe.test' } as never)).toBe(
+      null,
+    );
   });
 });

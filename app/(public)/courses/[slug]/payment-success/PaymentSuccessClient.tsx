@@ -188,6 +188,11 @@ export function PaymentSuccessClient() {
             <p className="text-sm text-white/60">
               Create your password for{' '}
               <strong className="text-white/80">{sessionEmail}</strong> to access your course.
+              If you leave this page, use{' '}
+              <a href="/forgot-password" className="text-[#2490ed] underline underline-offset-2">
+                Set your password
+              </a>{' '}
+              with this same email — you will not need to pay again.
             </p>
             <form onSubmit={handleGuestComplete} className="space-y-3">
               <div className="space-y-1.5">

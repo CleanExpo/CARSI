@@ -28,6 +28,10 @@ import {
 import { getOrCreateCourseBySlug } from '@/lib/server/course-catalog-sync';
 import { getEntitlements } from '@/lib/server/entitlements';
 import { getFirstLessonLearnPath } from '@/lib/server/first-lesson';
+import {
+  alreadyEnrolledCheckoutPayload,
+  findActivePaidCourseOwnership,
+} from '@/lib/server/paid-course-ownership';
 import { getPublishedCourseForCheckout } from '@/lib/server/public-courses-list';
 import { captureServerError } from '@/lib/server/sentry';
 import {
@@ -165,6 +169,44 @@ export async function POST(request: NextRequest) {
         isFreeCatalog = c.isFree === true || !Number.isFinite(listAud) || listAud <= 0;
       } catch {
         dbCourse = null;
+      }
+    }
+
+    // Never charge again for a course this buyer already owns. Guests hit this
+    // path with only an email (no session); signed-in buyers hit it with studentId.
+    // A `team` purchase is seats for other people and must still go through.
+    //
+    // The check is keyed on course, not customer: buying a *different* course is
+    // a real sale (live data: five distinct courses in one sitting is a good
+    // customer, not a billing error). Revoked / refunded rows do not count —
+    // those buyers are allowed to pay again.
+    if (purchaseMode !== 'team' && dbCourse) {
+      try {
+        const ownership = await findActivePaidCourseOwnership({
+          studentId,
+          email: customerEmail,
+          courseId: dbCourse.id,
+        });
+        if (ownership) {
+          const learnPath =
+            learnNext ?? `/dashboard/learn/${encodeURIComponent(normalized)}`;
+          return NextResponse.json(
+            alreadyEnrolledCheckoutPayload({
+              signedIn: Boolean(studentId),
+              hashedPassword: ownership.hashedPassword,
+              learnPath,
+            }),
+            { status: 409 },
+          );
+        }
+      } catch (err) {
+        // Charge path: if we cannot prove they do *not* already own it, do not
+        // open Stripe. A transient lookup failure must not become a second charge.
+        console.error('[checkout] ownership lookup failed, refusing charge:', err);
+        return NextResponse.json(
+          { detail: 'Could not verify enrolment just now. Please try again shortly.' },
+          { status: 503 },
+        );
       }
     }
 
