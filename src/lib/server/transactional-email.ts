@@ -3,6 +3,7 @@
  * Uses branded templates from email-templates.ts and delivery from email.ts.
  */
 
+import { buildGuestPasswordSetupPath } from '@/lib/auth/guest-recovery-path';
 import { signEmailUnsubscribeToken } from '@/lib/auth/session-jwt';
 import { ccwRoadshowEvents } from '@/lib/marketing/ccw-roadshow';
 import { selectPrepurchaseVoucher } from '@/lib/marketing/ccw-roadshow-offers';
@@ -167,7 +168,10 @@ export async function sendEnrollmentWelcomeEmail(params: {
   // the existing /forgot-password PAGE, not a minted token — deliberately, so
   // the enrolment path gains no new authenticating surface (cf. P0-A).
   const needsPasswordSetup = isProvisionalPasswordHash(user.hashedPassword ?? '');
-  const setPasswordUrl = `${base}/forgot-password`;
+  const setPasswordUrl = `${base}${buildGuestPasswordSetupPath({
+    email: user.email,
+    next: learnPath,
+  })}`;
 
   const { html, text } = renderEnrollmentWelcomeEmail({
     appOrigin: base,
