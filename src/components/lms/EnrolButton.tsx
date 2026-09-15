@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/components/auth/auth-provider';
 import { CoursePurchaseOptions } from '@/components/lms/CoursePurchaseOptions';
-import { GuestEnrolForm } from '@/components/lms/GuestEnrolForm';
+import { GuestEnrolForm, guestCheckoutRefusalDestination } from '@/components/lms/GuestEnrolForm';
 import { Button } from '@/components/ui/button';
 import { authApi } from '@/lib/api/auth';
 import { apiClient, ApiClientError } from '@/lib/api/client';
@@ -206,10 +206,15 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
       }
     } catch (err) {
       if (err instanceof ApiClientError && err.status === 409) {
-        const learn =
-          typeof err.payload?.learn_path === 'string' ? err.payload.learn_path : null;
-        if (learn && learn.startsWith('/') && !learn.startsWith('//') && !learn.includes('://')) {
-          window.location.href = learn;
+        const refusal = guestCheckoutRefusalDestination({
+          already_enrolled: err.payload?.already_enrolled === true || Boolean(err.payload?.learn_path),
+          needs_password_setup: err.payload?.needs_password_setup === true,
+          reset_path: typeof err.payload?.reset_path === 'string' ? err.payload.reset_path : undefined,
+          login_path: typeof err.payload?.login_path === 'string' ? err.payload.login_path : undefined,
+          learn_path: typeof err.payload?.learn_path === 'string' ? err.payload.learn_path : undefined,
+        });
+        if (refusal) {
+          window.location.href = refusal;
           return;
         }
         setError(err.message || 'You already own this course.');
