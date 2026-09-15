@@ -1,16 +1,13 @@
 'use client';
 
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { apiClient, ApiClientError } from '@/lib/api/client';
+import { buildGuestPasswordSetupPath, isSafeInternalPath } from '@/lib/auth/guest-recovery-path';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-
-function isSafeInternalPath(path: string): boolean {
-  return path.startsWith('/') && !path.startsWith('//') && !path.includes('://');
-}
 
 type Phase = 'confirming' | 'guest_setup' | 'done' | 'error';
 
@@ -80,7 +77,7 @@ export function PaymentSuccessClient() {
           if (!cancelled) {
             setPhase('error');
             setConfirmError(
-              'We could not confirm your enrolment. Your payment is safe — please contact support if this persists.',
+              'We could not confirm your enrolment. Your payment is safe — please contact support if this persists.'
             );
           }
           return;
@@ -98,13 +95,13 @@ export function PaymentSuccessClient() {
 
       try {
         const info = await fetch(
-          `/api/lms/checkout/session?session_id=${encodeURIComponent(sessionId)}`,
+          `/api/lms/checkout/session?session_id=${encodeURIComponent(sessionId)}`
         ).then(
           (r) =>
             r.json() as Promise<{
               email?: string;
               guest_checkout?: boolean;
-            }>,
+            }>
         );
         if (!cancelled && info.email) {
           setSessionEmail(info.email);
@@ -186,10 +183,15 @@ export function PaymentSuccessClient() {
           <CardContent className="space-y-4 p-8">
             <h1 className="text-2xl font-bold text-white">Payment successful</h1>
             <p className="text-sm text-white/60">
-              Create your password for{' '}
-              <strong className="text-white/80">{sessionEmail}</strong> to access your course.
-              If you leave this page, use{' '}
-              <a href="/forgot-password" className="text-[#2490ed] underline underline-offset-2">
+              Create your password for <strong className="text-white/80">{sessionEmail}</strong> to
+              access your course. If you leave this page, use{' '}
+              <a
+                href={buildGuestPasswordSetupPath({
+                  email: sessionEmail,
+                  next: nextPath,
+                })}
+                className="text-[#2490ed] underline underline-offset-2"
+              >
                 Set your password
               </a>{' '}
               with this same email — you will not need to pay again.
@@ -241,7 +243,7 @@ export function PaymentSuccessClient() {
               ? 'Taking you to your first lesson…'
               : phase === 'confirming'
                 ? 'Please wait a moment.'
-                : confirmError ?? 'Redirecting…'}
+                : (confirmError ?? 'Redirecting…')}
           </p>
         </CardContent>
       </Card>
