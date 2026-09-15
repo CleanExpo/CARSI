@@ -114,10 +114,13 @@ describe('guestCheckoutRefusalDestination — already-enrolled checkout 409', ()
       guestCheckoutRefusalDestination({
         already_enrolled: true,
         needs_password_setup: true,
-        reset_path: '/forgot-password',
+        reset_path:
+          '/forgot-password?paid=1&email=buyer%40carsi.com.au&next=%2Fdashboard%2Flearn%2Flevel-1-mould-remediation-2cc96b85',
         learn_path: '/dashboard/learn/level-1-mould-remediation-2cc96b85',
-      }),
-    ).toBe('/forgot-password');
+      })
+    ).toBe(
+      '/forgot-password?paid=1&email=buyer%40carsi.com.au&next=%2Fdashboard%2Flearn%2Flevel-1-mould-remediation-2cc96b85'
+    );
   });
 
   it('sends an established guest to sign in', () => {
@@ -126,7 +129,7 @@ describe('guestCheckoutRefusalDestination — already-enrolled checkout 409', ()
         already_enrolled: true,
         login_path: '/login?next=%2Fdashboard%2Flearn%2Fodour-control',
         learn_path: '/dashboard/learn/odour-control',
-      }),
+      })
     ).toBe('/login?next=%2Fdashboard%2Flearn%2Fodour-control');
   });
 
@@ -137,13 +140,13 @@ describe('guestCheckoutRefusalDestination — already-enrolled checkout 409', ()
         needs_password_setup: true,
         reset_path: 'https://evil.example/reset',
         learn_path: '/dashboard/learn/x',
-      }),
+      })
     ).toBe('/dashboard/learn/x');
   });
 
   it('does nothing when the response is not an already-enrolled refusal', () => {
     expect(guestCheckoutRefusalDestination({ checkout_url: 'https://stripe.test' } as never)).toBe(
-      null,
+      null
     );
   });
 });
