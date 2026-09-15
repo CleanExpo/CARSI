@@ -1,23 +1,21 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
-import { useToast } from '@/hooks/use-toast';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { PasswordInput } from '@/components/ui/password-input';
 import { Label } from '@/components/ui/label';
-import Link from 'next/link';
+import { PasswordInput } from '@/components/ui/password-input';
+import { useToast } from '@/hooks/use-toast';
 import { authApi } from '@/lib/api/auth';
 import { isSafeInternalPath } from '@/lib/auth/guest-recovery-path';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
 
 function ResetPasswordForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
   const token = searchParams.get('token') ?? '';
   const nextRaw = searchParams.get('next') ?? '';
-  const afterLogin = isSafeInternalPath(nextRaw)
-    ? `/login?next=${encodeURIComponent(nextRaw)}`
-    : '/login';
+  const safeNext = isSafeInternalPath(nextRaw) ? nextRaw : '';
+  const afterLogin = safeNext ? `/login?next=${encodeURIComponent(safeNext)}` : '/login';
 
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -50,11 +48,17 @@ function ResetPasswordForm() {
     setIsError(false);
 
     try {
-      const result = await authApi.confirmPasswordReset(token, password);
+      const result = await authApi.confirmPasswordReset(token, password, safeNext || null);
       setMessage(result.message);
       toast({ title: result.message || 'Password updated successfully' });
       setDone(true);
-      setTimeout(() => router.push(afterLogin), 3000);
+      const dest =
+        typeof result.redirect_to === 'string' && isSafeInternalPath(result.redirect_to)
+          ? result.redirect_to
+          : afterLogin;
+      setTimeout(() => {
+        window.location.href = dest;
+      }, 800);
     } catch (err) {
       setIsError(true);
       setMessage(err instanceof Error ? err.message : 'Reset failed. The link may have expired.');
@@ -69,25 +73,19 @@ function ResetPasswordForm() {
 
   return (
     <div
-      className="rounded-xl bg-white p-6 shadow-xl shadow-slate-200/70 ring-1 ring-slate-200 sm:p-8"
+      className="rounded-xl bg-white p-6 shadow-xl ring-1 shadow-slate-200/70 ring-slate-200 sm:p-8"
       style={{
         border: '1px solid rgba(15,23,42,0.05)',
       }}
     >
       <div className="mb-6 space-y-1.5">
-        <h1 className="text-2xl font-bold text-slate-950">
-          Set new password
-        </h1>
-        <p className="text-sm text-slate-600">
-          Choose a strong password for your CARSI account
-        </p>
+        <h1 className="text-2xl font-bold text-slate-950">Set new password</h1>
+        <p className="text-sm text-slate-600">Choose a strong password for your CARSI account</p>
       </div>
 
       {done ? (
         <div className="space-y-4">
-          <p className="text-sm font-medium text-emerald-700">
-            {message} Redirecting to sign in…
-          </p>
+          <p className="text-sm font-medium text-emerald-700">{message} Opening your course…</p>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -118,7 +116,10 @@ function ResetPasswordForm() {
             />
           </div>
           {message && (
-            <p className="text-sm" style={{ color: isError ? 'hsl(var(--destructive))' : '#334155' }}>
+            <p
+              className="text-sm"
+              style={{ color: isError ? 'hsl(var(--destructive))' : '#334155' }}
+            >
               {message}
             </p>
           )}
