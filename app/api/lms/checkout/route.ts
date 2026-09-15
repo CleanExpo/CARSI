@@ -172,6 +172,15 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Charge path: if Postgres is configured but we could not load the course
+    // row, skip the ownership check would open a second Stripe session. Refuse.
+    if (process.env.DATABASE_URL?.trim() && !dbCourse && purchaseMode !== 'team') {
+      return NextResponse.json(
+        { detail: 'Could not verify enrolment just now. Please try again shortly.' },
+        { status: 503 },
+      );
+    }
+
     // Never charge again for a course this buyer already owns. Guests hit this
     // path with only an email (no session); signed-in buyers hit it with studentId.
     // A `team` purchase is seats for other people and must still go through.
@@ -195,6 +204,7 @@ export async function POST(request: NextRequest) {
               signedIn: Boolean(studentId),
               hashedPassword: ownership.hashedPassword,
               learnPath,
+              email: customerEmail,
             }),
             { status: 409 },
           );
