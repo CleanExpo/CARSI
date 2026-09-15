@@ -1,13 +1,13 @@
 'use client';
 
-import { Suspense, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import Link from 'next/link';
+import { useToast } from '@/hooks/use-toast';
 import { authApi } from '@/lib/api/auth';
 import { isSafeInternalPath, isUsableRecoveryEmail } from '@/lib/auth/guest-recovery-path';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { Suspense, useState } from 'react';
 
 function ForgotPasswordForm() {
   const searchParams = useSearchParams();
@@ -18,7 +18,7 @@ function ForgotPasswordForm() {
   const safeNext = nextPath && isSafeInternalPath(nextPath) ? nextPath : null;
 
   const [email, setEmail] = useState(() =>
-    isUsableRecoveryEmail(prefill) ? prefill.trim().toLowerCase() : '',
+    isUsableRecoveryEmail(prefill) ? prefill.trim().toLowerCase() : ''
   );
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -32,7 +32,9 @@ function ForgotPasswordForm() {
 
     try {
       const result = await authApi.requestPasswordReset(email, safeNext);
-      const successText = result.message || 'If an account exists for that email, a password reset link has been sent.';
+      const successText =
+        result.message ||
+        'If an account exists for that email, a password reset link has been sent.';
       setMessage(successText);
       setIsError(false);
       toast({ title: successText });
@@ -51,15 +53,13 @@ function ForgotPasswordForm() {
 
   return (
     <div
-      className="rounded-xl bg-white p-6 shadow-xl shadow-slate-200/70 ring-1 ring-slate-200 sm:p-8"
+      className="rounded-xl bg-white p-6 shadow-xl ring-1 shadow-slate-200/70 ring-slate-200 sm:p-8"
       style={{
         border: '1px solid rgba(15,23,42,0.05)',
       }}
     >
       <div className="mb-6 space-y-1.5">
-        <h1 className="text-2xl font-bold text-slate-950">
-          Set or reset your password
-        </h1>
+        <h1 className="text-2xl font-bold text-slate-950">Set or reset your password</h1>
         {paidLockout ? (
           <p className="rounded-md border border-[#f2cf8f] bg-[#fff8ed] px-3 py-2 text-sm text-[#7a3500]">
             Your course is already paid. Set a password here — you will not be charged again.
@@ -87,13 +87,11 @@ function ForgotPasswordForm() {
             onChange={(e) => setEmail(e.target.value)}
             required
             autoComplete="username"
+            readOnly={paidLockout && isUsableRecoveryEmail(email)}
           />
         </div>
         {message && (
-          <p
-            className="text-sm"
-            style={{ color: isError ? 'hsl(var(--destructive))' : '#334155' }}
-          >
+          <p className="text-sm" style={{ color: isError ? 'hsl(var(--destructive))' : '#334155' }}>
             {message}
             {!isError ? ' Check junk if it is not in your inbox within a few minutes.' : null}
           </p>
