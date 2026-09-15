@@ -1,3 +1,4 @@
+import { buildGuestPasswordSetupPath } from '@/lib/auth/guest-recovery-path';
 import { isEnrolmentAccessAllowed } from '@/lib/server/enrollment-access';
 import { isProvisionalPasswordHash } from '@/lib/server/lms-auth';
 import { prisma } from '@/lib/prisma';
@@ -39,6 +40,7 @@ export function alreadyEnrolledCheckoutPayload(input: {
   signedIn: boolean;
   hashedPassword: string;
   learnPath: string;
+  email?: string;
 }): AlreadyEnrolledCheckoutBody {
   const learnPath = safeInternalPath(input.learnPath);
   const needsPassword = isProvisionalPasswordHash(input.hashedPassword);
@@ -50,7 +52,7 @@ export function alreadyEnrolledCheckoutPayload(input: {
       already_enrolled: true,
       learn_path: learnPath,
       needs_password_setup: true,
-      reset_path: '/forgot-password',
+      reset_path: buildGuestPasswordSetupPath({ email: input.email, next: learnPath }),
     };
   }
 
