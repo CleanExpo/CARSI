@@ -1,15 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 import { authApi } from '@/lib/api/auth';
+import { isSafeInternalPath, isUsableRecoveryEmail } from '@/lib/auth/guest-recovery-path';
 
-export default function ForgotPasswordPage() {
+function ForgotPasswordForm() {
+  const searchParams = useSearchParams();
   const { toast } = useToast();
-  const [email, setEmail] = useState('');
+  const prefill = searchParams.get('email') ?? '';
+  const paidLockout = searchParams.get('paid') === '1';
+  const nextPath = searchParams.get('next');
+  const safeNext = nextPath && isSafeInternalPath(nextPath) ? nextPath : null;
+
+  const [email, setEmail] = useState(() =>
+    isUsableRecoveryEmail(prefill) ? prefill.trim().toLowerCase() : '',
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false);
@@ -21,8 +31,8 @@ export default function ForgotPasswordPage() {
     setIsError(false);
 
     try {
-      const result = await authApi.requestPasswordReset(email);
-      const successText = result.message || 'A password reset link has been sent to your email.';
+      const result = await authApi.requestPasswordReset(email, safeNext);
+      const successText = result.message || 'If an account exists for that email, a password reset link has been sent.';
       setMessage(successText);
       setIsError(false);
       toast({ title: successText });
@@ -50,10 +60,17 @@ export default function ForgotPasswordPage() {
         <h1 className="text-2xl font-bold text-slate-950">
           Set or reset your password
         </h1>
-        <p className="text-sm text-slate-600">
-          Enter your email address and we&apos;ll send you a link to set or reset your password.
-          Use this if you bought a course as a guest and never chose one.
-        </p>
+        {paidLockout ? (
+          <p className="rounded-md border border-[#f2cf8f] bg-[#fff8ed] px-3 py-2 text-sm text-[#7a3500]">
+            Your course is already paid. Set a password here — you will not be charged again.
+            {safeNext ? ' After you set it, sign in and the course will open.' : ''}
+          </p>
+        ) : (
+          <p className="text-sm text-slate-600">
+            Enter your email address and we&apos;ll send you a link to set or reset your password.
+            Use this if you bought a course as a guest and never chose one.
+          </p>
+        )}
         <p className="text-xs font-semibold tracking-wide text-[#146fc2]">
           IICRC CEC Accredited restoration courses
         </p>
@@ -69,6 +86,7 @@ export default function ForgotPasswordPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            autoComplete="username"
           />
         </div>
         {message && (
@@ -77,14 +95,7 @@ export default function ForgotPasswordPage() {
             style={{ color: isError ? 'hsl(var(--destructive))' : '#334155' }}
           >
             {message}
-            {isError && message.includes('No account found') && (
-              <>
-                {' '}
-                <Link href="/register" className="underline underline-offset-2">
-                  Create an account
-                </Link>
-              </>
-            )}
+            {!isError ? ' Check junk if it is not in your inbox within a few minutes.' : null}
           </p>
         )}
         <button
@@ -106,5 +117,13 @@ export default function ForgotPasswordPage() {
         </Link>
       </div>
     </div>
+  );
+}
+
+export default function ForgotPasswordPage() {
+  return (
+    <Suspense>
+      <ForgotPasswordForm />
+    </Suspense>
   );
 }
