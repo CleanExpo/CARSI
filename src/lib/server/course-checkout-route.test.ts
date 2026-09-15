@@ -129,7 +129,7 @@ describe('a buyer who already has a paid enrolment for this course', () => {
         slug: COURSE_SLUG,
         customer_email: 'brighttouchcleaner@gmail.com',
         guest_checkout: true,
-      }),
+      })
     );
     const body = (await res.json()) as {
       already_enrolled?: boolean;
@@ -142,7 +142,9 @@ describe('a buyer who already has a paid enrolment for this course', () => {
     expect(res.status).toBe(409);
     expect(body.already_enrolled).toBe(true);
     expect(body.learn_path).toBe(LEARN);
-    expect(body.reset_path).toBe('/forgot-password');
+    expect(body.reset_path?.startsWith('/forgot-password?')).toBe(true);
+    expect(body.reset_path).toContain('paid=1');
+    expect(body.reset_path).toContain('brighttouchcleaner');
     expect(body.checkout_url).toBeUndefined();
     expect(body.detail?.toLowerCase()).toContain('already own');
     expect(mocks.createStripe).not.toHaveBeenCalled();
@@ -160,7 +162,7 @@ describe('the same buyer buying a different course', () => {
         slug: 'odour-control',
         customer_email: 'admin@cqldr.com.au',
         guest_checkout: true,
-      }),
+      })
     );
     const body = (await res.json()) as { checkout_url?: string };
 
@@ -181,7 +183,7 @@ describe('a team seat purchase', () => {
         customer_email: 'owner@example.test',
         purchase_mode: 'team',
         team_seat_count: 3,
-      }),
+      })
     );
 
     expect(res.status).toBe(200);
@@ -199,6 +201,17 @@ describe('a revoked enrolment', () => {
 
     expect(res.status).toBe(200);
     expect(mocks.createStripe).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('the course row missing while the database is configured', () => {
+  it('opens no Stripe session — ownership cannot be proven', async () => {
+    mocks.dbCourse.mockRejectedValue(new Error('relation does not exist'));
+
+    const res = await POST(request({ slug: COURSE_SLUG, customer_email: 'buyer@example.test' }));
+
+    expect(res.status).toBe(503);
+    expect(mocks.createStripe).not.toHaveBeenCalled();
   });
 });
 
