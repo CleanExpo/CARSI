@@ -14,15 +14,12 @@ import {
 } from '@/lib/checkout-purchase-mode';
 import { trackFunnelEvent } from '@/lib/analytics/track-funnel-event';
 import { TurnstileWidget } from '@/components/security/TurnstileWidget';
+import { isSafeInternalPath } from '@/lib/auth/guest-recovery-path';
 
 /** Fail-closed client check: empty or space-only email never reaches checkout or free enrol. */
 export function guestEnrolEmailIsUsable(value: string): boolean {
   const email = value.trim();
   return email.includes('@') && email.length >= 3 && !email.includes(' ');
-}
-
-function isSafeInternalPath(path: string): boolean {
-  return path.startsWith('/') && !path.startsWith('//') && !path.includes('://');
 }
 
 /**
