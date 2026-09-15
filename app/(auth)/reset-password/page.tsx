@@ -7,12 +7,17 @@ import { PasswordInput } from '@/components/ui/password-input';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 import { authApi } from '@/lib/api/auth';
+import { isSafeInternalPath } from '@/lib/auth/guest-recovery-path';
 
 function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
   const token = searchParams.get('token') ?? '';
+  const nextRaw = searchParams.get('next') ?? '';
+  const afterLogin = isSafeInternalPath(nextRaw)
+    ? `/login?next=${encodeURIComponent(nextRaw)}`
+    : '/login';
 
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -49,7 +54,7 @@ function ResetPasswordForm() {
       setMessage(result.message);
       toast({ title: result.message || 'Password updated successfully' });
       setDone(true);
-      setTimeout(() => router.push('/login'), 3000);
+      setTimeout(() => router.push(afterLogin), 3000);
     } catch (err) {
       setIsError(true);
       setMessage(err instanceof Error ? err.message : 'Reset failed. The link may have expired.');
