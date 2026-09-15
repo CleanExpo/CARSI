@@ -31,6 +31,7 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [needsPasswordSetup, setNeedsPasswordSetup] = useState(false);
+  const [resetPath, setResetPath] = useState('/forgot-password');
   const formRef = useRef<HTMLFormElement>(null);
 
   const form = useForm<FormData>({
@@ -70,6 +71,7 @@ export function LoginForm() {
     setIsLoading(true);
     setError(null);
     setNeedsPasswordSetup(false);
+    setResetPath('/forgot-password');
 
     const { email, password } = getCredentialsFromForm(values);
 
@@ -113,6 +115,15 @@ export function LoginForm() {
       if (!response.ok) {
         setError(data.error || 'Login failed');
         setNeedsPasswordSetup(data.code === 'needs_password_setup');
+        if (
+          data.code === 'needs_password_setup' &&
+          typeof data.reset_path === 'string' &&
+          data.reset_path.startsWith('/') &&
+          !data.reset_path.startsWith('//') &&
+          !data.reset_path.includes('://')
+        ) {
+          setResetPath(data.reset_path);
+        }
         toast({ title: data.error || 'Login failed', variant: 'destructive' });
         setIsLoading(false);
         return;
@@ -192,7 +203,7 @@ export function LoginForm() {
             <p>{error}</p>
             {needsPasswordSetup ? (
               <p>
-                <a href="/forgot-password" className="underline underline-offset-2">
+                <a href={resetPath} className="underline underline-offset-2">
                   Set your password
                 </a>
               </p>
