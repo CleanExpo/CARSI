@@ -135,11 +135,11 @@ export const authApi = {
   /**
    * Request a password reset email.
    */
-  async requestPasswordReset(email: string): Promise<{ message: string }> {
+  async requestPasswordReset(email: string, next?: string | null): Promise<{ message: string }> {
     const res = await fetch('/api/auth/forgot-password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email, ...(next ? { next } : {}) }),
       credentials: 'include',
     });
     const data = await res.json().catch(() => ({}));
