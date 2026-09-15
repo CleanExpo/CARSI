@@ -1,11 +1,11 @@
 'use client';
 
-import { useRef, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useToast } from '@/hooks/use-toast';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useSearchParams } from 'next/navigation';
+import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import { useToast } from '@/hooks/use-toast';
 
 import {
   Form,
@@ -37,7 +37,10 @@ export function LoginForm() {
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: '',
+      email: (() => {
+        const fromQuery = searchParams.get('email') ?? '';
+        return fromQuery.includes('@') ? fromQuery.trim().toLowerCase() : '';
+      })(),
       password: '',
     },
     mode: 'onChange',
@@ -90,8 +93,7 @@ export function LoginForm() {
     form.setValue('password', parsed.data.password, { shouldDirty: true });
 
     try {
-      const nextParam =
-        searchParams.get('next') ?? searchParams.get('redirect') ?? undefined;
+      const nextParam = searchParams.get('next') ?? searchParams.get('redirect') ?? undefined;
 
       const response = await fetch('/api/auth/login', {
         method: 'POST',
