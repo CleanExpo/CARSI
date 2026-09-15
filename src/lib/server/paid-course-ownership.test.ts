@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { provisionalPasswordHash } from '@/lib/server/lms-auth';
 
@@ -14,11 +14,8 @@ vi.mock('@/lib/prisma', () => ({
   },
 }));
 
-const {
-  alreadyOwnsPaidCourse,
-  alreadyEnrolledCheckoutPayload,
-  findActivePaidCourseOwnership,
-} = await import('@/lib/server/paid-course-ownership');
+const { alreadyOwnsPaidCourse, alreadyEnrolledCheckoutPayload, findActivePaidCourseOwnership } =
+  await import('@/lib/server/paid-course-ownership');
 
 describe('alreadyOwnsPaidCourse', () => {
   it('is true only for access-granting enrolment statuses', () => {
@@ -38,10 +35,13 @@ describe('alreadyEnrolledCheckoutPayload', () => {
       signedIn: false,
       hashedPassword: provisionalPasswordHash(),
       learnPath,
+      email: 'brighttouchcleaner@gmail.com',
     });
     expect(body.already_enrolled).toBe(true);
     expect(body.needs_password_setup).toBe(true);
-    expect(body.reset_path).toBe('/forgot-password');
+    expect(body.reset_path?.startsWith('/forgot-password?')).toBe(true);
+    expect(body.reset_path).toContain('paid=1');
+    expect(body.reset_path).toContain('brighttouchcleaner');
     expect(body.learn_path).toBe(learnPath);
     expect(body.detail.toLowerCase()).toContain('set a password');
     expect(body.detail.toLowerCase()).not.toContain('invalid credentials');
@@ -113,7 +113,7 @@ describe('findActivePaidCourseOwnership', () => {
       findActivePaidCourseOwnership({
         email: 'admin@cqldr.com.au',
         courseId: 'course-other',
-      }),
+      })
     ).resolves.toBeNull();
   });
 
@@ -126,7 +126,7 @@ describe('findActivePaidCourseOwnership', () => {
         studentId: 'user-1',
         email: 'refunded@example.test',
         courseId: 'course-1',
-      }),
+      })
     ).resolves.toBeNull();
   });
 });
