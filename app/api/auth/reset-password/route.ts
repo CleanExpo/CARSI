@@ -1,15 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { verifyPasswordResetToken } from '@/lib/auth/session-jwt';
+import { getPostLoginRedirectPath } from '@/lib/admin/admin-auth';
+import { isSafeInternalPath } from '@/lib/auth/guest-recovery-path';
+import { SESSION_SENTINEL_COOKIE } from '@/lib/auth/session-sentinel';
+import { signSessionToken, verifyPasswordResetToken } from '@/lib/auth/session-jwt';
 import { validateNewPassword } from '@/lib/auth/password-policy';
-import { hashPassword } from '@/lib/server/lms-auth';
+import { hashPassword, sessionClaimsForUserId } from '@/lib/server/lms-auth';
 import { prisma } from '@/lib/prisma';
+
+const COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const token = typeof body.token === 'string' ? body.token.trim() : '';
     const newPassword = typeof body.new_password === 'string' ? body.new_password : '';
+    const requestedNext = typeof body.next === 'string' && isSafeInternalPath(body.next) ? body.next : null;
 
     if (!token || !newPassword) {
       return NextResponse.json(
@@ -42,7 +48,33 @@ export async function POST(request: NextRequest) {
       data: { hashedPassword: await hashPassword(newPassword) },
     });
 
-    return NextResponse.json({ message: 'Password updated successfully.' });
+    const claims = await sessionClaimsForUserId(userId);
+    if (!claims) {
+      return NextResponse.json({
+        message: 'Password updated successfully.',
+        redirect_to: '/login',
+      });
+    }
+
+    const access_token = await signSessionToken(claims);
+    const redirect_to = getPostLoginRedirectPath(claims, requestedNext);
+    const response = NextResponse.json({
+      message: 'Password updated successfully.',
+      signed_in: true,
+      redirect_to,
+    });
+
+    const cookieOptions = {
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax' as const,
+      path: '/',
+      maxAge: COOKIE_MAX_AGE,
+    };
+    response.cookies.set('auth_token', access_token, { ...cookieOptions, httpOnly: true });
+    response.cookies.set('carsi_token', access_token, { ...cookieOptions, httpOnly: true });
+    response.cookies.set(SESSION_SENTINEL_COOKIE, '1', { ...cookieOptions, httpOnly: false });
+
+    return response;
   } catch (error) {
     console.error('[reset-password] failed:', error instanceof Error ? error.message : String(error));
     return NextResponse.json({ error: 'Reset service unavailable' }, { status: 502 });
