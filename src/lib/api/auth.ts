@@ -152,13 +152,18 @@ export const authApi = {
   /**
    * Consume a reset token and set a new password.
    */
-  async confirmPasswordReset(token: string, newPassword: string): Promise<{ message: string }> {
+  async confirmPasswordReset(
+    token: string,
+    newPassword: string,
+    next?: string | null,
+  ): Promise<{ message: string; redirect_to?: string; signed_in?: boolean }> {
     const res = await fetch('/api/auth/reset-password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         token,
         new_password: newPassword,
+        ...(next ? { next } : {}),
       }),
       credentials: 'include',
     });
@@ -166,6 +171,6 @@ export const authApi = {
     if (!res.ok) {
       throw new Error((data as { error?: string }).error || 'Reset failed');
     }
-    return data as { message: string };
+    return data as { message: string; redirect_to?: string; signed_in?: boolean };
   },
 };
