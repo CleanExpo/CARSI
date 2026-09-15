@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getPostLoginRedirectPath } from '@/lib/admin/admin-auth';
+import { buildGuestPasswordSetupPath } from '@/lib/auth/guest-recovery-path';
 import { signSessionToken } from '@/lib/auth/session-jwt';
 import { SESSION_SENTINEL_COOKIE } from '@/lib/auth/session-sentinel';
 import {
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest) {
           {
             error: NEEDS_PASSWORD_SETUP_MESSAGE,
             code: 'needs_password_setup',
-            reset_path: '/forgot-password',
+            reset_path: buildGuestPasswordSetupPath({ email, next: requestedNext ?? undefined }),
           },
           { status: 401 },
         );
