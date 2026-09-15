@@ -52,7 +52,7 @@ describe('a guest whose account has only a provisional password', () => {
     mocks.loginFailureKind.mockResolvedValue('needs_password_setup');
 
     const res = await POST(
-      request({ email: 'brighttouchcleaner@gmail.com', password: 'whatever' }),
+      request({ email: 'brighttouchcleaner@gmail.com', password: 'whatever' })
     );
     const body = (await res.json()) as {
       error?: string;
@@ -62,7 +62,8 @@ describe('a guest whose account has only a provisional password', () => {
 
     expect(res.status).toBe(401);
     expect(body.code).toBe('needs_password_setup');
-    expect(body.reset_path).toBe('/forgot-password');
+    expect(body.reset_path?.startsWith('/forgot-password?')).toBe(true);
+    expect(body.reset_path).toContain('brighttouchcleaner');
     expect(body.error?.toLowerCase()).not.toContain('invalid credentials');
     expect(body.error?.toLowerCase()).toMatch(/password/);
     expect(mocks.signSession).not.toHaveBeenCalled();
