@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { isSafeInternalPath } from '@/lib/auth/guest-recovery-path';
 import { signPasswordResetToken } from '@/lib/auth/session-jwt';
-import { sendPasswordResetEmail, isEmailConfigured } from '@/lib/server/auth-email';
-import { getAppOrigin } from '@/lib/server/app-url';
 import { prisma } from '@/lib/prisma';
 import { applyRateLimit, clientIpFrom } from '@/lib/rate-limit';
+import { getAppOrigin } from '@/lib/server/app-url';
+import { isEmailConfigured, sendPasswordResetEmail } from '@/lib/server/auth-email';
 
 // Neutral message returned whether or not the account exists, so the endpoint
 // cannot be used to enumerate registered email addresses.
@@ -23,7 +24,7 @@ function tooMany(resetAt: number) {
     {
       status: 429,
       headers: { 'Retry-After': String(Math.ceil((resetAt - Date.now()) / 1000)) },
-    },
+    }
   );
 }
 
@@ -31,17 +32,19 @@ export async function POST(request: NextRequest) {
   try {
     const ip = clientIpFrom(
       request.headers.get('x-forwarded-for'),
-      request.headers.get('x-real-ip'),
+      request.headers.get('x-real-ip')
     );
     const ipRl = applyRateLimit(`forgot-pw-ip:${ip}`, IP_LIMIT, IP_WINDOW_MS);
     if (!ipRl.ok) return tooMany(ipRl.resetAt);
 
-    const { email } = await request.json();
+    const body = (await request.json()) as { email?: unknown; next?: unknown };
+    const email = body.email;
     if (!email || typeof email !== 'string') {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
     }
 
     const normalized = email.trim().toLowerCase();
+    const next = typeof body.next === 'string' && isSafeInternalPath(body.next) ? body.next : '';
 
     const emailRl = applyRateLimit(`forgot-pw-email:${normalized}`, EMAIL_LIMIT, EMAIL_WINDOW_MS);
     if (!emailRl.ok) return tooMany(emailRl.resetAt);
@@ -60,7 +63,9 @@ export async function POST(request: NextRequest) {
     if (user?.isActive) {
       const token = await signPasswordResetToken(user.id);
       const base = getAppOrigin(request);
-      const link = `${base}/reset-password?token=${encodeURIComponent(token)}`;
+      const link = next
+        ? `${base}/reset-password?token=${encodeURIComponent(token)}&next=${encodeURIComponent(next)}`
+        : `${base}/reset-password?token=${encodeURIComponent(token)}`;
 
       const emailResult = await sendPasswordResetEmail({
         to: normalized,
