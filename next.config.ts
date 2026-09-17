@@ -59,6 +59,9 @@ const nextConfig: NextConfig = {
     return [
       { source: '/student', destination: '/dashboard/student', permanent: true },
       { source: '/student/:path*', destination: '/dashboard/student/:path*', permanent: true },
+      // IICRC's public online-CEC listing links to /restoration-courses (404 until
+      // 17/09/2026). `:path*` also matches the bare path and any sub-path.
+      { source: '/restoration-courses/:path*', destination: '/courses', permanent: true },
       // CCW Business Growth Days convenience redirects → the combined event page.
       // (/ccw-melbourne and /ccw-sydney are real dedicated pages, not redirects.)
       { source: '/ccw-roadshow', destination: '/events/ccw-roadshow', permanent: false },
