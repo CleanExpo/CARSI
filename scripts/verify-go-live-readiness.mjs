@@ -21,6 +21,9 @@
  *   1  at least one check failed
  *   2  no check failed, but at least one could not be judged because of the infrastructure
  *      (gateway 502/504, a 503 with no app message, or no connection). That is NOT "disabled".
+ *
+ * DigitalOcean's edge rewrites an app 503 into an HTML 504 and sends the app's real status in
+ * `x-do-orig-status`. That header is trusted when present; see classifyResponse().
  */
 import { pathToFileURL } from 'node:url';
 
@@ -39,29 +42,53 @@ export function tierCtaTestId(tierId, comingSoon) {
 const GATEWAY_STATUSES = new Set([502, 504]);
 
 /**
+ * The status the APP returned. DigitalOcean App Platform's edge rewrites an app 503 into its own
+ * HTML 504 page (measured on carsi.com.au 17/09/2026) and reports the app's real status in the
+ * `x-do-orig-status` header. When that header holds a valid status, it is the one to judge.
+ *
+ * @param {{ status: number | null, origStatus?: number | null }} res
+ */
+export function appStatus(res) {
+  return Number.isInteger(res.origStatus) ? res.origStatus : res.status;
+}
+
+/** "HTTP 503 (edge rewrote to 504)" when the edge changed the status, else "HTTP 503". */
+export function describeStatus(res) {
+  const app = appStatus(res);
+  return app !== res.status ? `HTTP ${app} (edge rewrote to ${res.status})` : `HTTP ${res.status}`;
+}
+
+/**
  * What a response means, separating the app's own answers from the platform's.
  *
- * The app's intentional "switched off" 503 always carries a JSON `detail` message. A gateway
- * (DigitalOcean's load balancer) answers 502/504, or a 503 without that message, when the app
- * is down or slow. Reading those as "disabled" would report a broken site as a healthy dark one.
+ * With `x-do-orig-status`: the app's status decides. 503 is the app's intentional "switched
+ * off" (the edge has replaced its JSON body, so there is no `detail` to read). Any other 5xx
+ * from the app is an infrastructure failure.
  *
- * @param {{ status: number | null, json?: unknown, error?: unknown }} res
+ * Without the header: the app's own 503 carries a JSON `detail` message. A gateway answers
+ * 502/504, or a 503 without that message, when the app is down or slow. Reading those as
+ * "disabled" would report a broken site as a healthy dark one.
+ *
+ * @param {{ status: number | null, origStatus?: number | null, json?: unknown, error?: unknown }} res
  * @returns {'infrastructure' | 'disabled' | 'auth-required' | 'ok' | 'unexpected'}
  */
 export function classifyResponse(res) {
   if (res.error || res.status == null) return 'infrastructure';
-  if (GATEWAY_STATUSES.has(res.status)) return 'infrastructure';
-  if (res.status === 503) {
+  const fromEdge = Number.isInteger(res.origStatus);
+  const status = appStatus(res);
+  if (fromEdge && status >= 500) return status === 503 ? 'disabled' : 'infrastructure';
+  if (GATEWAY_STATUSES.has(status)) return 'infrastructure';
+  if (status === 503) {
     const detail = res.json && typeof res.json === 'object' ? res.json.detail : undefined;
     return typeof detail === 'string' && detail.trim() !== '' ? 'disabled' : 'infrastructure';
   }
-  if (res.status === 401) return 'auth-required';
-  if (res.status >= 200 && res.status < 300) return 'ok';
+  if (status === 401) return 'auth-required';
+  if (status >= 200 && status < 300) return 'ok';
   return 'unexpected';
 }
 
 function infra(name, res) {
-  const why = res.error ? `no response (${res.error})` : `HTTP ${res.status}`;
+  const why = res.error ? `no response (${res.error})` : describeStatus(res);
   return { name, result: 'INFRA', detail: `${why}: infrastructure failure, not "disabled"` };
 }
 
@@ -82,7 +109,7 @@ export function pricingCardState(html, tierId) {
 export function checkPricingCard({ name, res, tierId, expectOnSale }) {
   if (classifyResponse(res) === 'infrastructure') return infra(name, res);
   if (classifyResponse(res) !== 'ok') {
-    return { name, result: 'FAIL', detail: `HTTP ${res.status}` };
+    return { name, result: 'FAIL', detail: describeStatus(res) };
   }
   const state = pricingCardState(res.text ?? '', tierId);
   const want = expectOnSale ? 'buy' : 'coming-soon';
@@ -105,7 +132,7 @@ export function checkTeamsCheckout({ res, expectOnSale }) {
   return {
     name,
     result: kind === want && !res.json?.url ? 'OK' : 'FAIL',
-    detail: `HTTP ${res.status} (${kind})`,
+    detail: `${describeStatus(res)} (${kind})`,
   };
 }
 
@@ -120,7 +147,7 @@ export function checkIndividualCheckout({ res }) {
   return {
     name,
     result: kind !== 'ok' && !res.json?.url ? 'OK' : 'FAIL',
-    detail: `HTTP ${res.status} (${kind})`,
+    detail: `${describeStatus(res)} (${kind})`,
   };
 }
 
@@ -130,8 +157,8 @@ export function checkSubscriptionStatus({ res }) {
   if (classifyResponse(res) === 'infrastructure') return infra(name, res);
   return {
     name,
-    result: res.status === 200 && res.json?.has_subscription === false ? 'OK' : 'FAIL',
-    detail: JSON.stringify(res.json ?? res.status),
+    result: appStatus(res) === 200 && res.json?.has_subscription === false ? 'OK' : 'FAIL',
+    detail: res.json ? JSON.stringify(res.json) : describeStatus(res),
   };
 }
 
@@ -141,8 +168,8 @@ export function checkDirectoryHealth({ res }) {
   if (classifyResponse(res) === 'infrastructure') return infra(name, res);
   return {
     name,
-    result: res.status === 200 && res.json?.listingCount === 0 ? 'OK' : 'FAIL',
-    detail: JSON.stringify(res.json ?? res.status),
+    result: appStatus(res) === 200 && res.json?.listingCount === 0 ? 'OK' : 'FAIL',
+    detail: res.json ? JSON.stringify(res.json) : describeStatus(res),
   };
 }
 
@@ -192,7 +219,9 @@ async function request(base, path, init = {}) {
     } catch {
       json = null;
     }
-    return { status: res.status, json, text };
+    const orig = Number.parseInt(res.headers.get('x-do-orig-status') ?? '', 10);
+    const origStatus = orig >= 100 && orig <= 599 ? orig : null;
+    return { status: res.status, origStatus, json, text };
   } catch (e) {
     return {
       status: null,

@@ -3,7 +3,9 @@
  *
  * The case that matters most: a DigitalOcean gateway 502/504 (or a bare 503) must be reported
  * as an infrastructure failure, never as "the plan is switched off". Both look like "not on
- * sale" from outside, and only one of them is healthy.
+ * sale" from outside, and only one of them is healthy. The reverse matters too: DO's edge
+ * rewrites the app's intentional 503 into an HTML 504 and keeps the real status in
+ * `x-do-orig-status`, and that must read as switched off, not as an outage.
  */
 import { createServer, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
@@ -43,6 +45,43 @@ describe('classifyResponse', () => {
 
   it('no connection is infrastructure', () => {
     expect(classifyResponse({ status: null, error: 'ECONNREFUSED' })).toBe('infrastructure');
+  });
+
+  describe('DigitalOcean edge rewrite (x-do-orig-status)', () => {
+    // The shape measured on carsi.com.au 17/09/2026: HTML 504 body, app status in the header.
+    const edge = (origStatus: number | null) => ({ status: 504, origStatus, json: null });
+
+    it('504 + x-do-orig-status 503 is the app switched off (disabled)', () => {
+      expect(classifyResponse(edge(503))).toBe('disabled');
+    });
+
+    it('504 with no header is infrastructure', () => {
+      expect(classifyResponse(edge(null))).toBe('infrastructure');
+      expect(classifyResponse({ status: 504, json: null })).toBe('infrastructure');
+    });
+
+    it('504 + x-do-orig-status 504 is infrastructure', () => {
+      expect(classifyResponse(edge(504))).toBe('infrastructure');
+    });
+
+    it('any other app 5xx behind the edge is infrastructure', () => {
+      for (const s of [500, 502]) expect(classifyResponse(edge(s))).toBe('infrastructure');
+    });
+
+    it('the header wins over the outer status for non-errors too', () => {
+      expect(classifyResponse({ status: 504, origStatus: 401, json: null })).toBe('auth-required');
+      expect(classifyResponse({ status: 200, origStatus: 200, json: {} })).toBe('ok');
+    });
+
+    it('records both statuses in the check output', () => {
+      const off = checkTeamsCheckout({ res: edge(503), expectOnSale: false });
+      expect(off.result).toBe('OK');
+      expect(off.detail).toBe('HTTP 503 (edge rewrote to 504) (disabled)');
+      const broken = checkTeamsCheckout({ res: edge(504), expectOnSale: false });
+      expect(broken.result).toBe('INFRA');
+      expect(broken.detail).toContain('HTTP 504');
+      expect(broken.detail).not.toContain('edge rewrote');
+    });
   });
 
   it('401, 2xx and anything else', () => {
@@ -153,7 +192,8 @@ describe('runChecks against a local stand-in site', () => {
     res.end(JSON.stringify(body));
   };
 
-  function darkSite(teamsCheckoutStatus: number) {
+  /** `teamsOrigStatus` set = the DigitalOcean edge shape: HTML 504 + x-do-orig-status. */
+  function darkSite(teamsCheckoutStatus: number, teamsOrigStatus?: string) {
     const methods: string[] = [];
     const handler: Parameters<typeof createServer>[0] = (req, res) => {
       methods.push(`${req.method} ${req.url}`);
@@ -173,7 +213,10 @@ describe('runChecks against a local stand-in site', () => {
           return json(res, 401, { detail: 'Sign in to start your membership.' });
         case '/api/lms/subscription/teams/checkout':
           if (teamsCheckoutStatus === 504) {
-            res.writeHead(504, { 'content-type': 'text/html' });
+            res.writeHead(504, {
+              'content-type': 'text/html',
+              ...(teamsOrigStatus ? { 'x-do-orig-status': teamsOrigStatus } : {}),
+            });
             res.end('<html>upstream request timeout</html>');
             return;
           }
@@ -209,6 +252,21 @@ describe('runChecks against a local stand-in site', () => {
     const results = await runChecks({ base, env: { ALLOW_PRICE_LOOKUP_KEY: 'true' } });
     const teams = results.find((r: { name: string }) => r.name.startsWith('Teams checkout'));
     expect(teams.result).toBe('INFRA');
+    expect(exitCodeFor(results)).toBe(2);
+  });
+
+  it('the DO edge rewrite (504 + x-do-orig-status: 503) is read as switched off (exit 0)', async () => {
+    const base = await serve(darkSite(504, '503').handler);
+    const results = await runChecks({ base, env: { ALLOW_PRICE_LOOKUP_KEY: 'true' } });
+    const teams = results.find((r: { name: string }) => r.name.startsWith('Teams checkout'));
+    expect(teams.result).toBe('OK');
+    expect(teams.detail).toContain('HTTP 503 (edge rewrote to 504)');
+    expect(exitCodeFor(results)).toBe(0);
+  });
+
+  it('504 + x-do-orig-status: 504 still exits 2', async () => {
+    const base = await serve(darkSite(504, '504').handler);
+    const results = await runChecks({ base, env: { ALLOW_PRICE_LOOKUP_KEY: 'true' } });
     expect(exitCodeFor(results)).toBe(2);
   });
 
