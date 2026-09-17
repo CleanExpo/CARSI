@@ -53,7 +53,15 @@ const PERIODS: { id: AdminOpsPeriod; label: string }[] = [
   { id: 'all', label: 'All time' },
 ];
 
-function DeltaChip({ current, previous, show }: { current: number; previous: number; show: boolean }) {
+function DeltaChip({
+  current,
+  previous,
+  show,
+}: {
+  current: number;
+  previous: number;
+  show: boolean;
+}) {
   if (!show) return null;
   const pct = momDeltaPct(current, previous);
   if (pct === null) {
@@ -290,7 +298,9 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
         <div className="mb-4 flex items-end justify-between gap-3">
           <div>
             <h2 className="text-sm font-semibold text-white/88">Learner pipeline</h2>
-            <p className="mt-1 text-xs text-white/45">Where paid and enrolled seats sit right now.</p>
+            <p className="mt-1 text-xs text-white/45">
+              Where paid and enrolled seats sit right now.
+            </p>
           </div>
         </div>
         <div className="grid gap-3 md:grid-cols-3">
@@ -321,7 +331,10 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
           <p className="mt-1 text-xs text-white/45">Gold is recognised AUD. Blue is enrolments.</p>
           <div className="mt-4 h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={data.ops.monthly} margin={{ top: 8, right: 8, left: -8, bottom: 0 }}>
+              <ComposedChart
+                data={data.ops.monthly}
+                margin={{ top: 8, right: 8, left: -8, bottom: 0 }}
+              >
                 <CartesianGrid strokeDasharray="4 6" stroke="rgba(255,255,255,0.06)" />
                 <XAxis
                   dataKey="month"
@@ -391,7 +404,9 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                     <div className="h-1 overflow-hidden rounded-full bg-white/8">
                       <div
                         className="h-full rounded-full bg-[#ed9d24]"
-                        style={{ width: `${Math.max(6, Math.round((row.revenueAud / max) * 100))}%` }}
+                        style={{
+                          width: `${Math.max(6, Math.round((row.revenueAud / max) * 100))}%`,
+                        }}
                       />
                     </div>
                     <p className="mt-1 text-[11px] text-white/35">
