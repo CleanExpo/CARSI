@@ -1,3 +1,4 @@
+import { withReticle } from '@reticlehq/next';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -154,4 +155,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withReticle(nextConfig);
