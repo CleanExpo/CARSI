@@ -7,6 +7,28 @@
     {
       "tool": "reticle_act",
       "anchor": {
+        "kind": "testid",
+        "value": "pricing-pro_annual-coming-soon"
+      },
+      "args": {},
+      "action": "hover",
+      "expect": {
+        "element": {
+          "testid": "pricing-pro_annual-coming-soon"
+        },
+        "text": {
+          "contains": "Start membership",
+          "absent": true
+        },
+        "console": {
+          "level": "error",
+          "absent": true
+        }
+      }
+    },
+    {
+      "tool": "reticle_act",
+      "anchor": {
         "kind": "role",
         "role": "button",
         "name": "What's included in a yearly membership?"
@@ -26,6 +48,6 @@
     }
   ],
   "startPath": "/pricing",
-  "intent": "A visitor on /pricing opens the FAQ \"What's included in a yearly membership?\" and is told plainly that yearly membership is coming soon and cannot be bought yet (no advertising ahead of shipping).",
+  "intent": "A visitor on /pricing sees the yearly membership buy button in its disabled \"Coming soon\" state (the coming-soon test id is present and the live \"Start membership\" label is absent), and the FAQ \"What's included in a yearly membership?\" says plainly that it cannot be bought yet (no advertising ahead of shipping).",
   "intentId": "flow:pricing-yearly-not-on-sale"
 }
