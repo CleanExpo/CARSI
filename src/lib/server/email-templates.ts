@@ -606,6 +606,68 @@ export function renderYearlyMembershipEmail(params: {
   );
 }
 
+/**
+ * Pre-renewal reminder (Australian Consumer Law practice: tell the subscriber
+ * before an automatic renewal charges them). Every value comes from the Stripe
+ * upcoming invoice; the caller refuses to render when any is missing.
+ */
+export function renderRenewalReminderEmail(params: {
+  appOrigin: string;
+  name: string;
+  planLabel: string;
+  /** Team plans only: the team the plan belongs to. */
+  teamName?: string;
+  renewalDateLabel: string;
+  /** e.g. "A$795.00 incl. GST" */
+  amountLabel: string;
+  manageUrl: string;
+  /** How the subscriber cancels before the renewal date (plain sentence). */
+  cancelInstruction: string;
+}): RenderedEmail {
+  const planFor = params.teamName ? `${params.planLabel} for ${params.teamName}` : params.planLabel;
+  const lead = `Your ${planFor} renews automatically on ${params.renewalDateLabel}. On that date we will charge ${params.amountLabel} to the payment method on file.`;
+  const noAction =
+    'You do not need to do anything to keep your access. It will continue without interruption.';
+  const cancel = `If you do not want to renew, cancel before ${params.renewalDateLabel}. ${params.cancelInstruction} Your access continues until the end of the current period and you will not be charged again.`;
+
+  const details: CarsiEmailDetail[] = [
+    { label: 'Plan', value: params.planLabel },
+    ...(params.teamName ? [{ label: 'Team', value: params.teamName }] : []),
+    { label: 'Renewal date', value: params.renewalDateLabel },
+    { label: 'Amount', value: params.amountLabel },
+  ];
+
+  return render(
+    {
+      appOrigin: params.appOrigin,
+      preheader: `Your ${params.planLabel} renews on ${params.renewalDateLabel}`,
+      eyebrow: 'Renewal reminder',
+      title: 'Your plan renews soon',
+      greeting: `Hi ${params.name},`,
+      paragraphs: [lead, noAction, cancel],
+      details,
+      cta: { label: 'Manage your plan', href: params.manageUrl },
+      noteHtml: `Manage billing, update your card or cancel from ${brandLink(params.manageUrl, 'your plan page')}.`,
+    },
+    [
+      `Hi ${params.name},`,
+      '',
+      lead,
+      '',
+      noAction,
+      '',
+      cancel,
+      '',
+      `Plan: ${params.planLabel}`,
+      ...(params.teamName ? [`Team: ${params.teamName}`] : []),
+      `Renewal date: ${params.renewalDateLabel}`,
+      `Amount: ${params.amountLabel}`,
+      '',
+      `Manage your plan: ${params.manageUrl}`,
+    ].join('\n')
+  );
+}
+
 export function renderAdminPasswordResetEmail(params: {
   appOrigin: string;
   memberName: string;

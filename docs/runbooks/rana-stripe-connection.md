@@ -98,6 +98,7 @@ The webhook route already exists and is signature-verified + idempotent. You onl
    - `customer.subscription.deleted`
    - `invoice.paid`
    - `invoice.payment_failed`
+   - `invoice.upcoming` — **required for the pre-renewal reminder email** (see Step C2). Without it no subscriber is told before an automatic renewal charges them.
    - `charge.dispute.closed` — **required for the dispute-won re-grant**: when a chargeback is resolved in your favour (`status = won`), the route restores the one-off enrolment that `charge.dispute.created` revoked. The handler is inert until this event is enabled on the endpoint.
 
    > **Testing the dispute-won re-grant.** Unlike `charge.dispute.created` (which the test card `4000 0000 0000 0259` fires directly), `charge.dispute.closed` with `status = won` is **not** a built-in `stripe trigger` event and **cannot** be produced by a test card — you have to close a dispute. Two ways, in Test mode:
@@ -106,6 +107,34 @@ The webhook route already exists and is signature-verified + idempotent. You onl
    >
    > Do **not** use `stripe-mock` for this — per Stripe's own guidance it returns hardcoded, behaviour-less responses and won't exercise the route. The re-grant + out-of-order-ordering logic is already unit-covered in `src/lib/server/stripe-revocation.test.ts`; this checklist is only for the end-to-end webhook wiring.
 4. Copy the endpoint's **Signing secret** (`whsec_...`) and confirm it matches `STRIPE_WEBHOOK_SECRET` in DigitalOcean for that mode. Test mode and Live mode have **different** signing secrets — use the right one per environment.
+
+---
+
+## Step C2 — Turn on upcoming-renewal events (founder dashboard setting, REQUIRED before go-live)
+
+Australian Consumer Law practice: a subscriber must be reminded **before** an automatic renewal charges them. The app sends that reminder when Stripe delivers `invoice.upcoming`. Stripe only sends that event when the account is set up to, so this is a **founder dashboard decision**. The code does not and cannot change it, and no env var controls it.
+
+1. Stripe Dashboard → **Settings → Billing → Subscriptions and emails** (the "Manage invoices sent to customers" / **Upcoming renewal events** section; Stripe may rename it).
+2. Turn on **Send upcoming renewal events** (Stripe's wording may differ) and set the lead time. Stripe applies **one** lead time to every plan:
+   - The yearly membership and all Teams plans are yearly, so **30 days** is the common choice for yearly plans. Do not go below **7 days**.
+   - The organisation plan is monthly. The app does **not** send it a reminder today (only the yearly membership and Teams plans are covered), so the lead time does not affect it.
+3. Make sure `invoice.upcoming` is ticked on the webhook endpoint (Step C, item 3).
+4. **Customer portal cancellation.** The reminder tells yearly members to cancel from **Manage billing & payment method** on `/subscribe`, which opens the Stripe customer portal. In **Settings → Billing → Customer portal**, allow customers to **cancel subscriptions** and set cancellation to **at the end of the billing period**, so the email's promise ("your access continues until the end of the current period") is true.
+5. Do this in Test mode first, then Live. Test it with a **Test Clock**: advance to inside the lead time and confirm one email arrives.
+
+What the app does with the event (`src/lib/server/renewal-reminder.ts`):
+
+| Situation | Result |
+|---|---|
+| Yearly membership or Teams plan, invoice has an AUD amount and a payment date | One email to the billing email on the invoice (fallback: the member, or the team owner), showing plan, renewal date, amount (for example `A$795.00 incl. GST`), how to cancel, and that no action is needed to continue. A matching bell notification is saved. |
+| The same renewal is delivered again (Stripe retry or a second event) | Nothing is sent. Dedupe key: `renewal_reminder:<subscription id>:<renewal date>` in `lms_notifications`. |
+| Amount or payment date missing, currency not AUD, or amount is zero | Nothing is sent. A warning is logged with the reason (`missing_amount`, `missing_renewal_date`, `non_aud_currency`, `zero_amount`). |
+| Subscription already set to cancel, or it is an organisation plan | Nothing is sent (`not_renewing`, `unsupported_plan`). |
+| The email fails, or Mailtrap is not configured | The webhook returns 500, the error goes to Sentry, and Stripe retries. Nothing is recorded, so the retry sends it. |
+
+**Open items for the founder:**
+- **Teams owners have no self-serve cancel button.** The billing portal route only serves individual members. The Teams reminder tells owners to reply or email `support@carsi.com.au`, and someone must then set that subscription to cancel at period end in the Stripe Dashboard. Decide who handles those requests before Teams goes on sale, or add a Teams portal.
+- **GST wording.** The email says "incl. GST". That is only true if each Price is GST-inclusive, or if Stripe Tax adds GST. The yearly membership is inclusive (Step A). Teams GST treatment is still an open decision (see the Teams notes below). If any plan ends up charged without GST, change the wording in `formatRenewalAmount` first.
 
 ---
 
@@ -156,7 +185,8 @@ Before go-live, confirm no yearly/Teams subscription was ever charged in the pas
 ## What to hand back to the founder
 
 - Confirmation that the **Live** Price exists with lookup key `carsi_pro_annual`, A$795.00/year, **GST inclusive**.
-- Confirmation the five subscription webhook events are enabled on the live endpoint.
+- Confirmation the five subscription webhook events, plus `invoice.upcoming`, are enabled on the live endpoint.
+- Confirmation that upcoming renewal events are on in Stripe Billing settings, with the lead time chosen (Step C2), and that portal cancellation is set to "at end of billing period".
 - The Step D test-mode evidence (subscribe works; test-clock lapse blocks new enrolment; progress + certificate retained; replay = single grant; non-member = 403; **refund/chargeback revokes catalogue access while retaining progress + certificate**).
 - The Step E zero-historical-charges result.
 - The moment `SUBSCRIPTIONS_ENABLED=true` is set live (the membership goes on sale at that instant).
