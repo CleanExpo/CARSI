@@ -2,8 +2,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { BreadcrumbSchema, FAQSchema } from '@/components/seo';
-import { INDIVIDUAL_TIERS } from '@/lib/lms/pricing-tiers';
+import { PER_COURSE_PRICE_FALLBACK_LABEL, perCoursePriceLabel } from '@/lib/lms/pricing-tiers';
 import { OG_IMAGES } from '@/lib/seo/og-image';
+import { getPublicCatalogueFacts } from '@/lib/server/public-catalogue-facts';
 
 /**
  * AU price-anchoring page (BACKLOG row 14).
@@ -23,11 +24,16 @@ import { OG_IMAGES } from '@/lib/seo/og-image';
  *    from a school approved by the IICRC. CECs are the RECURRING cost of keeping it.
  *    Those are different purchases, and saying so is both compliant and truer.
  *
- * CARSI's own price comes from INDIVIDUAL_TIERS rather than a literal, so it
- * cannot drift away from /pricing. Per-course is the only tier quoted because it
- * is the only tier without `comingSoon: true` — pointing a buyer at a tier whose
+ * CARSI's own price is the lowest published paid-course price, read from the
+ * same catalogue source as /courses and /pricing (perCoursePriceLabel), so it
+ * cannot drift away from either. Per-course is the only tier quoted because it
+ * is the only tier that is always on sale — pointing a buyer at a tier whose
  * checkout cannot be delivered is the fastest way to lose them.
  */
+
+// Same ISR window as the homepage: the build-time prerender has no catalogue, so
+// the price is filled in on the first revalidation at run time.
+export const revalidate = 300;
 
 const CHECKED_ON = '8 September 2026';
 
@@ -46,10 +52,8 @@ const COMPARISON = {
 
 const COMPARISON_TOTAL = COMPARISON.courseFee + COMPARISON.examFee;
 
-const perCourse = INDIVIDUAL_TIERS.find((tier) => tier.id === 'per_course');
-const PER_COURSE_LABEL = perCourse?.priceLabel ?? 'From $20';
-
-const FAQ_ITEMS = [
+function buildFaqItems(perCourseLabel: string | null) {
+  return [
   {
     question: 'Does a CARSI course make me IICRC certified?',
     answer:
@@ -67,13 +71,16 @@ const FAQ_ITEMS = [
   },
   {
     question: 'What does a CARSI course cost?',
-    answer: `Courses are bought individually, ${PER_COURSE_LABEL.toLowerCase()}. You pay once for the course, your completion is recorded, and any IICRC CECs the course carries are tracked in your dashboard.`,
+    answer: `Courses are bought individually, ${
+      perCourseLabel ? perCourseLabel.toLowerCase() : 'at the price shown on each course'
+    }. You pay once for the course, your completion is recorded, and any IICRC CECs the course carries are tracked in your dashboard.`,
   },
   {
     question: 'Is the comparison price on this page current?',
     answer: `It was read directly off the provider's own booking page on ${CHECKED_ON} and is quoted with the source linked so you can check it yourself. Prices move; if you are reading this well after that date, open the link and confirm.`,
   },
-];
+  ];
+}
 
 export const metadata: Metadata = {
   title: 'What restoration training actually costs in Australia',
@@ -99,7 +106,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RestorationTrainingCostPage() {
+export default async function RestorationTrainingCostPage() {
+  const facts = await getPublicCatalogueFacts();
+  const perCourseLabel = perCoursePriceLabel(facts.minPaidCoursePriceAud);
+  const PER_COURSE_LABEL = perCourseLabel ?? PER_COURSE_PRICE_FALLBACK_LABEL;
+  const FAQ_ITEMS = buildFaqItems(perCourseLabel);
   return (
     <>
       <BreadcrumbSchema

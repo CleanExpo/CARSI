@@ -10,7 +10,7 @@ import {
   LANDING_LEAD_CLASS,
   PUBLIC_SHELL_INNER_CLASS,
 } from '@/components/landing/public-shell-width';
-import { INDIVIDUAL_TIERS } from '@/lib/lms/pricing-tiers';
+import { INDIVIDUAL_TIERS, PER_COURSE_PRICE_FALLBACK_LABEL } from '@/lib/lms/pricing-tiers';
 
 function buildHomeTiers(subscriptionsEnabled: boolean) {
   const perCourse = INDIVIDUAL_TIERS.find((t) => t.id === 'per_course');
@@ -59,8 +59,11 @@ function Perforation({ notchClass }: { notchClass: string }) {
  */
 export function HomePricingSection({
   subscriptionsEnabled = false,
+  perCoursePriceLabel,
 }: {
   subscriptionsEnabled?: boolean;
+  /** "From $N" from the live catalogue; omitted when the lowest price is unknown. */
+  perCoursePriceLabel?: string;
 }) {
   const reduceMotion = useReducedMotion();
   const { perCourse, yearly } = buildHomeTiers(subscriptionsEnabled);
@@ -79,11 +82,11 @@ export function HomePricingSection({
     },
     {
       name: perCourse?.name ?? 'Per course',
-      price: perCourse?.priceLabel ?? 'From $20',
+      price: perCoursePriceLabel ?? perCourse?.priceLabel ?? PER_COURSE_PRICE_FALLBACK_LABEL,
       cadence: 'per course',
       description:
         perCourse?.description ??
-        'Pay once per IICRC CEC Accredited course. CECs tracked on completion.',
+        'Pay once per course. CECs are tracked on completion, only for courses the IICRC has approved.',
       features: ['Pay once, keep access', 'IICRC CECs on approved courses', 'Start immediately'],
       cta: perCourse?.cta ?? 'Browse courses',
       href: perCourse?.href ?? '/courses',
