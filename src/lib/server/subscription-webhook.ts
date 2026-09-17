@@ -13,6 +13,9 @@
  *                                              linked subscription (renewal)
  *  - invoice.payment_failed                  → refresh (Stripe has already moved
  *                                              the subscription to past_due)
+ *  - invoice.upcoming                        → pre-renewal reminder email for the
+ *                                              yearly membership and Teams plans
+ *                                              (see renewal-reminder.ts)
  */
 
 import type Stripe from 'stripe';
@@ -47,6 +50,7 @@ import {
   resolveTeamIdForOrgSubscription,
   updateOrgSubscriptionFromStripe,
 } from '@/lib/server/org-subscription-store';
+import { sendUpcomingRenewalReminder } from '@/lib/server/renewal-reminder';
 import { trackSubscriptionLifecycleEvent } from '@/lib/server/subscription-analytics';
 
 /** Stripe subscription lifecycle + invoice events this module owns. */
@@ -56,6 +60,7 @@ export const SUBSCRIPTION_EVENT_TYPES = new Set<string>([
   'customer.subscription.deleted',
   'invoice.paid',
   'invoice.payment_failed',
+  'invoice.upcoming',
 ]);
 
 export function isSubscriptionEvent(type: string): boolean {
@@ -385,6 +390,21 @@ export async function handleSubscriptionEvent(event: Stripe.Event): Promise<void
         console.error('[subscription-webhook] invoice subscription refresh failed:', error);
         throw error; // transient — let the route return 5xx so Stripe retries
       }
+      return;
+    }
+
+    case 'invoice.upcoming': {
+      const invoice = event.data.object as Stripe.Invoice;
+      const subscriptionId = readInvoiceSubscriptionId(invoice);
+      if (!subscriptionId) return; // not a subscription renewal — not ours
+      // Authoritative plan + cancel state. A lookup failure throws → 5xx → retry.
+      const subscription = await getStripeClient().subscriptions.retrieve(subscriptionId);
+      // Throws when the email fails, so the route reports it and Stripe retries.
+      await sendUpcomingRenewalReminder({
+        invoice,
+        subscription,
+        kind: subscriptionKind(subscription),
+      });
       return;
     }
 
