@@ -132,6 +132,7 @@
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@ffprobe-installer/ffprobe": "^2.1.2",
     "@playwright/test": "^1.49.1",
+    "@reticlehq/core": "^2.14.0",
     "@reticlehq/next": "^2.14.0",
     "@reticlehq/react": "^2.14.0",
     "@tailwindcss/postcss": "^4.1.18",
