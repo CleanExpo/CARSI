@@ -7,6 +7,7 @@ import {
   Calendar,
   Check,
   CheckCircle2,
+  ChevronDown,
   Clock,
   Copy,
   Download,
@@ -21,7 +22,6 @@ import {
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
-import { Cell, Pie, PieChart, Tooltip } from 'recharts';
 
 import { formatAud } from '@/lib/admin/admin-ops-format';
 import type {
@@ -42,14 +42,7 @@ import {
 import { AdminCourseMultiPicker } from '@/components/admin/AdminCourseMultiPicker';
 import { ProgressBar } from '@/components/lms/ProgressBar';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -63,22 +56,30 @@ import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { renewalStatusLabel, type RenewalStatus } from '@/types/iicrc-renewal';
 
-const chartTooltipProps = {
-  contentStyle: {
-    backgroundColor: 'rgba(10, 14, 26, 0.97)',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
-    borderRadius: 14,
-    padding: '10px 14px',
-  },
-  itemStyle: { color: 'rgba(255, 255, 255, 0.95)', fontSize: 13 },
-} as const;
-
 function isCecEligibleEnrollment(enrollment: AdminCourseProgressForUser): boolean {
   // Registry-only, fail-closed (GP-498). Eligibility derives SOLELY from registry-resolved CEC
   // hours. A non-empty discipline is NOT IICRC approval and must never make an enrollment
   // CEC-eligible on its own (that was the fail-open leak). Mirrors courseEligibleForIicrcCecSubmission.
   return enrollment.resolvedCecHours != null && enrollment.resolvedCecHours > 0;
 }
+
+function isNotStarted(enrollment: AdminCourseProgressForUser): boolean {
+  return enrollment.completionPct < 100 && enrollment.completedLessons === 0;
+}
+
+function nextLesson(enrollment: AdminCourseProgressForUser): string | null {
+  const open = enrollment.modules.find((m) => !m.completed);
+  return open ? `${open.title} · ${open.lessonTitle}` : null;
+}
+
+function enrollmentUrgency(enrollment: AdminCourseProgressForUser): number {
+  if (isNotStarted(enrollment)) return 0;
+  if (enrollment.completionPct < 100) return 1;
+  if (isCecEligibleEnrollment(enrollment) && enrollment.renewalStatus !== 'sent') return 2;
+  return 3;
+}
+
+type CourseFilter = 'all' | 'stuck' | 'progress' | 'done' | 'cec';
 
 function CourseEnrollmentCard({
   enrollment,
@@ -89,8 +90,10 @@ function CourseEnrollmentCard({
   hasIicrcMemberNumber,
   selectable,
   selected,
+  modulesOpen,
+  onToggleModules,
   onToggleSelect,
-  onRevoke,
+  onAskRevoke,
   onMarkComplete,
   onSendIicrc,
   onDownloadCertificate,
@@ -103,25 +106,31 @@ function CourseEnrollmentCard({
   hasIicrcMemberNumber: boolean;
   selectable: boolean;
   selected: boolean;
+  modulesOpen: boolean;
+  onToggleModules: () => void;
   onToggleSelect: () => void;
-  onRevoke: (id: string) => void;
+  onAskRevoke: () => void;
   onMarkComplete: (id: string) => void;
   onSendIicrc: (id: string) => void;
   onDownloadCertificate: (id: string, slug: string) => void;
 }) {
   const statusLabel = enrollment.status.replace(/_/g, ' ');
   const isComplete = enrollment.completionPct >= 100;
+  const stuck = isNotStarted(enrollment);
   const cecEligible = isCecEligibleEnrollment(enrollment);
   const renewalAlreadySent =
     enrollment.renewalStatus === 'sent' ||
     enrollment.renewalStatus === 'approved' ||
     enrollment.renewalStatus === 'completed';
   const canSendIicrc = isComplete && cecEligible && hasIicrcMemberNumber && !renewalAlreadySent;
+  const upcoming = nextLesson(enrollment);
+
   return (
     <article
       className={cn(
         adminGlassCard,
         'overflow-hidden p-0',
+        stuck && 'border-amber-400/25',
         isComplete && 'border-emerald-400/20',
         selected && 'ring-1 ring-[#2490ed]/45'
       )}
@@ -143,8 +152,12 @@ function CourseEnrollmentCard({
           <div className="min-w-0 flex-1 space-y-2">
             <div className="flex flex-wrap items-center gap-2">
               <StatusBadge label={statusLabel} tone={enrollmentStatusTone(enrollment.status)} />
-              {enrollment.discipline ? (
-                <StatusBadge label={enrollment.discipline} tone="info" />
+              {stuck ? <StatusBadge label="Not started" tone="warning" /> : null}
+              {enrollment.paymentReference ? <StatusBadge label="Paid" tone="info" /> : null}
+              {enrollment.listPriceAud > 0 ? (
+                <span className="text-xs text-white/45 tabular-nums">
+                  {formatAud(enrollment.listPriceAud)}
+                </span>
               ) : null}
               {enrollment.resolvedCecHours != null && enrollment.resolvedCecHours > 0 ? (
                 <span className="text-xs text-white/45">{enrollment.resolvedCecHours} CEC</span>
@@ -154,85 +167,82 @@ function CourseEnrollmentCard({
               {enrollment.courseTitle}
             </h3>
             <p className="text-sm text-white/48">
-              {enrollment.completedLessons} of {enrollment.totalLessons} lessons ·{' '}
-              {enrollment.completedModules} modules complete
+              {enrollment.completedLessons} of {enrollment.totalLessons} lessons
               {enrollment.remainingLessons > 0 ? ` · ${enrollment.remainingLessons} remaining` : ''}
             </p>
-            <dl className="grid gap-2 text-xs text-white/42 sm:grid-cols-2">
-              <div>
-                <dt className="font-medium text-white/35">Enrolled</dt>
-                <dd className="mt-0.5 text-white/65">{formatAdminDate(enrollment.enrolledAt)}</dd>
-              </div>
-              <div>
-                <dt className="font-medium text-white/35">Completed</dt>
-                <dd className="mt-0.5 text-white/65">
-                  {enrollment.completedAt ? formatAdminDate(enrollment.completedAt) : 'In progress'}
-                </dd>
-              </div>
-            </dl>
+            {upcoming && !isComplete ? (
+              <p className="text-sm text-[#7ec5ff]/90">Next: {upcoming}</p>
+            ) : null}
+            <p className="text-xs text-white/40">
+              Enrolled {formatAdminDate(enrollment.enrolledAt)}
+              {enrollment.completedAt
+                ? ` · finished ${formatAdminDate(enrollment.completedAt)}`
+                : ''}
+            </p>
           </div>
-          <div className="flex flex-wrap items-center justify-end gap-2">
+          <div className="flex flex-col items-end gap-2">
             <div
               className="text-2xl font-black tabular-nums"
               style={{ color: completionColor(enrollment.completionPct) }}
             >
               {enrollment.completionPct}%
             </div>
-            {!isComplete ? (
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                className="h-9 rounded-lg border-white/10 bg-white/[0.06] text-white/85 hover:bg-white/10"
-                disabled={pendingComplete || pendingRevoke}
-                onClick={() => onMarkComplete(enrollment.enrollmentId)}
-              >
-                {pendingComplete ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                ) : (
-                  <>
-                    <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />
-                    Mark complete
-                  </>
-                )}
-              </Button>
-            ) : null}
-            {isComplete ? (
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                className="h-9 rounded-lg border-white/10 bg-white/[0.06] text-white/85 hover:bg-white/10"
-                disabled={pendingDownloadCertificate || pendingRevoke || pendingComplete}
-                onClick={() =>
-                  onDownloadCertificate(enrollment.enrollmentId, enrollment.courseSlug)
-                }
-              >
-                {pendingDownloadCertificate ? (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                ) : (
-                  <>
-                    <Download className="mr-1.5 h-3.5 w-3.5" />
-                    Certificate
-                  </>
-                )}
-              </Button>
-            ) : null}
-            <Button
-              type="button"
-              size="icon"
-              variant="destructive"
-              className="h-10 w-10 shrink-0 rounded-xl"
-              disabled={pendingRevoke || pendingComplete}
-              onClick={() => onRevoke(enrollment.enrollmentId)}
-              title="Remove enrollment"
-            >
-              {pendingRevoke ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              {!isComplete ? (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  className="h-9 rounded-lg border-white/10 bg-white/[0.06] text-white/85 hover:bg-white/10"
+                  disabled={pendingComplete || pendingRevoke}
+                  onClick={() => onMarkComplete(enrollment.enrollmentId)}
+                >
+                  {pendingComplete ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <>
+                      <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />
+                      Mark complete
+                    </>
+                  )}
+                </Button>
               ) : (
-                <Trash2 className="h-4 w-4" />
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  className="h-9 rounded-lg border-white/10 bg-white/[0.06] text-white/85 hover:bg-white/10"
+                  disabled={pendingDownloadCertificate || pendingRevoke || pendingComplete}
+                  onClick={() =>
+                    onDownloadCertificate(enrollment.enrollmentId, enrollment.courseSlug)
+                  }
+                >
+                  {pendingDownloadCertificate ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <>
+                      <Download className="mr-1.5 h-3.5 w-3.5" />
+                      Certificate
+                    </>
+                  )}
+                </Button>
               )}
-            </Button>
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="h-9 w-9 text-white/35 hover:bg-red-500/10 hover:text-red-200"
+                disabled={pendingRevoke || pendingComplete}
+                onClick={onAskRevoke}
+                title="Remove enrolment"
+              >
+                {pendingRevoke ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Trash2 className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
           </div>
         </div>
         <div className="mt-4">
@@ -241,7 +251,7 @@ function CourseEnrollmentCard({
         {isComplete && cecEligible ? (
           <div className="mt-4 rounded-xl border border-[#2490ed]/20 bg-[#2490ed]/[0.06] px-4 py-3">
             <p className="text-[10px] font-semibold tracking-[0.18em] text-[#7ec5ff]/80 uppercase">
-              IICRC renewal
+              IICRC CEC hours
             </p>
             <div className="mt-2 flex flex-wrap items-center gap-2">
               {enrollment.renewalStatus ? (
@@ -268,12 +278,6 @@ function CourseEnrollmentCard({
                   Sent {formatAdminDateTime(enrollment.renewalSentAt)}
                 </span>
               ) : null}
-              {enrollment.renewalCommunicationCount > 0 ? (
-                <span className="text-xs text-white/40">
-                  {enrollment.renewalCommunicationCount} message
-                  {enrollment.renewalCommunicationCount === 1 ? '' : 's'}
-                </span>
-              ) : null}
             </div>
             <div className="mt-3 flex flex-wrap items-center gap-2">
               {canSendIicrc ? (
@@ -289,7 +293,7 @@ function CourseEnrollmentCard({
                   ) : (
                     <>
                       <Mail className="mr-1.5 h-3.5 w-3.5" />
-                      Send IICRC email
+                      Send CEC hours
                     </>
                   )}
                 </Button>
@@ -302,7 +306,6 @@ function CourseEnrollmentCard({
                   href={`/admin/iicrc-cec/${enrollment.renewalSubmissionId}`}
                   className="inline-flex items-center gap-1 text-xs font-medium text-[#7ec5ff] hover:underline"
                 >
-                  <Mail className="h-3 w-3" />
                   View communication log
                 </Link>
               ) : null}
@@ -310,37 +313,51 @@ function CourseEnrollmentCard({
           </div>
         ) : null}
       </div>
-      <div className="bg-black/15 px-5 py-4 sm:px-6">
-        <p className="mb-3 text-[10px] font-semibold tracking-[0.18em] text-white/38 uppercase">
-          Modules
-        </p>
-        <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
-          {enrollment.modules.map((m) => (
-            <div
-              key={m.moduleNo}
-              className={cn(
-                'flex gap-3 rounded-xl border px-3 py-3 text-sm transition-colors',
-                m.completed
-                  ? 'border-emerald-400/25 bg-emerald-400/[0.08]'
-                  : 'border-white/[0.08] bg-white/[0.02]'
-              )}
-            >
+      <button
+        type="button"
+        onClick={onToggleModules}
+        className="flex w-full items-center justify-between bg-black/15 px-5 py-3 text-left text-xs text-white/50 hover:bg-black/25 sm:px-6"
+      >
+        <span>
+          {enrollment.completedModules} of {enrollment.modules.length} modules complete
+        </span>
+        <span className="inline-flex items-center gap-1">
+          {modulesOpen ? 'Hide modules' : 'Show modules'}
+          <ChevronDown
+            className={cn('h-3.5 w-3.5 transition-transform', modulesOpen && 'rotate-180')}
+          />
+        </span>
+      </button>
+      {modulesOpen ? (
+        <div className="bg-black/15 px-5 pb-4 sm:px-6">
+          <div className="grid gap-2 sm:grid-cols-2">
+            {enrollment.modules.map((m) => (
               <div
+                key={m.moduleNo}
                 className={cn(
-                  'mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold',
-                  m.completed ? 'bg-emerald-400/20 text-emerald-200' : 'bg-white/8 text-white/45'
+                  'flex gap-3 rounded-xl border px-3 py-3 text-sm',
+                  m.completed
+                    ? 'border-emerald-400/25 bg-emerald-400/[0.08]'
+                    : 'border-white/[0.08] bg-white/[0.02]'
                 )}
               >
-                {m.completed ? <CheckCircle2 className="h-3.5 w-3.5" /> : m.moduleNo}
+                <div
+                  className={cn(
+                    'mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold',
+                    m.completed ? 'bg-emerald-400/20 text-emerald-200' : 'bg-white/8 text-white/45'
+                  )}
+                >
+                  {m.completed ? <CheckCircle2 className="h-3.5 w-3.5" /> : m.moduleNo}
+                </div>
+                <div className="min-w-0">
+                  <div className="font-medium text-white/88">{m.title}</div>
+                  <div className="mt-0.5 truncate text-xs text-white/42">{m.lessonTitle}</div>
+                </div>
               </div>
-              <div className="min-w-0">
-                <div className="font-medium text-white/88">{m.title}</div>
-                <div className="mt-0.5 truncate text-xs text-white/42">{m.lessonTitle}</div>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      ) : null}
     </article>
   );
 }
@@ -358,6 +375,7 @@ export function AdminUserDetailClient({
   const [selectedCourseSlugs, setSelectedCourseSlugs] = useState<Set<string>>(() => new Set());
   const [pendingGrant, setPendingGrant] = useState(false);
   const [pendingRevokeId, setPendingRevokeId] = useState<string | null>(null);
+  const [revokeTarget, setRevokeTarget] = useState<AdminCourseProgressForUser | null>(null);
   const [pendingCompleteIds, setPendingCompleteIds] = useState<Set<string>>(() => new Set());
   const [selectedEnrollmentIds, setSelectedEnrollmentIds] = useState<Set<string>>(() => new Set());
   const [pendingSendIicrcIds, setPendingSendIicrcIds] = useState<Set<string>>(() => new Set());
@@ -374,6 +392,10 @@ export function AdminUserDetailClient({
     emailSent: boolean;
   } | null>(null);
   const [passwordCopied, setPasswordCopied] = useState(false);
+  const [emailCopied, setEmailCopied] = useState(false);
+  const [courseFilter, setCourseFilter] = useState<CourseFilter>('all');
+  const [openModules, setOpenModules] = useState<Set<string>>(() => new Set());
+  const [grantOpen, setGrantOpen] = useState(user.enrollments.length === 0);
 
   const incompleteEnrollments = useMemo(
     () => user.enrollments.filter((e) => e.completionPct < 100),
@@ -393,20 +415,80 @@ export function AdminUserDetailClient({
   const totalLessonsDone = user.enrollments.reduce((a, e) => a + e.completedLessons, 0);
   const totalLessons = user.enrollments.reduce((a, e) => a + e.totalLessons, 0);
 
-  const gaugeData = useMemo(
-    () => [
-      { name: 'done', value: user.overallCompletionPct },
-      { name: 'rest', value: Math.max(0, 100 - user.overallCompletionPct) },
-    ],
-    [user.overallCompletionPct]
-  );
-
   const cecEligibleCompleted = useMemo(
     () => user.enrollments.filter((e) => e.completionPct >= 100 && isCecEligibleEnrollment(e)),
     [user.enrollments]
   );
 
+  const cecReadyToSend = useMemo(
+    () =>
+      cecEligibleCompleted.filter((e) => {
+        const sent =
+          e.renewalStatus === 'sent' ||
+          e.renewalStatus === 'approved' ||
+          e.renewalStatus === 'completed';
+        return !sent;
+      }),
+    [cecEligibleCompleted]
+  );
+
   const hasIicrcMemberNumber = Boolean(user.iicrcMemberNumber?.trim());
+
+  const visibleEnrollments = useMemo(() => {
+    const filtered = user.enrollments.filter((e) => {
+      if (courseFilter === 'stuck') return isNotStarted(e);
+      if (courseFilter === 'progress') return e.completionPct > 0 && e.completionPct < 100;
+      if (courseFilter === 'done') return e.completionPct >= 100;
+      if (courseFilter === 'cec') return isCecEligibleEnrollment(e);
+      return true;
+    });
+    return [...filtered].sort((a, b) => enrollmentUrgency(a) - enrollmentUrgency(b));
+  }, [user.enrollments, courseFilter]);
+
+  const nextActions = useMemo(() => {
+    const items: { id: string; title: string; detail: string; href?: string }[] = [];
+    if (!user.isVerified) {
+      items.push({
+        id: 'verify',
+        title: 'Account is unverified',
+        detail: 'They may bounce on sign-in. Reset password if they are locked out.',
+      });
+    }
+    if (user.neverStartedCount > 0) {
+      items.push({
+        id: 'start',
+        title: `${user.neverStartedCount} paid or enrolled course${user.neverStartedCount === 1 ? '' : 's'} not opened`,
+        detail: 'Lead with the next lesson on the cards below.',
+      });
+    }
+    if (cecReadyToSend.length > 0 && !hasIicrcMemberNumber) {
+      items.push({
+        id: 'member',
+        title: `${cecReadyToSend.length} IICRC CEC course${cecReadyToSend.length === 1 ? '' : 's'} ready`,
+        detail: 'Need their IICRC member number before hours can be sent.',
+      });
+    } else if (cecReadyToSend.length > 0) {
+      items.push({
+        id: 'cec',
+        title: `Send ${cecReadyToSend.length} IICRC CEC hour pack${cecReadyToSend.length === 1 ? '' : 's'}`,
+        detail: 'Approved hours only — this does not issue IICRC certification.',
+      });
+    }
+    if (!user.isActive) {
+      items.push({
+        id: 'inactive',
+        title: 'Account is inactive',
+        detail: 'Do not promise access until the account is restored.',
+      });
+    }
+    return items;
+  }, [
+    user.isVerified,
+    user.neverStartedCount,
+    user.isActive,
+    cecReadyToSend,
+    hasIicrcMemberNumber,
+  ]);
 
   async function grantSelectedCourses() {
     setActionError(null);
@@ -419,11 +501,7 @@ export function AdminUserDetailClient({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ studentId: user.userId, courseSlugs: slugs }),
       });
-      const payload = (await res.json().catch(() => ({}))) as {
-        detail?: string;
-        created?: number;
-        alreadyEnrolled?: number;
-      };
+      const payload = (await res.json().catch(() => ({}))) as { detail?: string };
       if (!res.ok) {
         setActionError(payload.detail ?? 'Could not grant course access');
         return;
@@ -452,6 +530,7 @@ export function AdminUserDetailClient({
         next.delete(enrollmentId);
         return next;
       });
+      setRevokeTarget(null);
       router.refresh();
     } catch {
       setActionError('Could not remove course. Please check your connection and try again.');
@@ -510,7 +589,7 @@ export function AdminUserDetailClient({
     const iicrcMemberNumber = user.iicrcMemberNumber?.trim();
     if (!iicrcMemberNumber) {
       setActionError(
-        'Add an IICRC member number to this learner profile before sending renewal email.'
+        'Add an IICRC member number to this learner profile before sending CEC hours.'
       );
       return;
     }
@@ -526,8 +605,6 @@ export function AdminUserDetailClient({
           enrollmentId,
           studentId: user.userId,
           iicrcMemberNumber,
-          // GP-498: no cecHours override — the submission resolver derives CEC solely from the
-          // approvals registry, so an override is inert. Not sent, to keep the payload honest.
         }),
       });
       const payload = (await res.json().catch(() => ({}))) as {
@@ -539,7 +616,7 @@ export function AdminUserDetailClient({
       if (res.status === 202 || payload.status === 'processing') {
         setActionSuccess(
           payload.detail ??
-            'IICRC renewal email is being sent. Refresh in a moment or check Admin → IICRC CEC.'
+            'IICRC CEC hours email is being sent. Refresh in a moment or check Admin → IICRC CEC.'
         );
         router.refresh();
         return;
@@ -547,17 +624,17 @@ export function AdminUserDetailClient({
       if (!res.ok) {
         if (res.status === 504) {
           setActionError(
-            'Request timed out while sending to IICRC. Check Admin → IICRC CEC for whether the email was logged.'
+            'Request timed out while sending CEC hours. Check Admin → IICRC CEC for whether the email was logged.'
           );
           return;
         }
-        setActionError(payload.detail ?? 'Could not send IICRC renewal email');
+        setActionError(payload.detail ?? 'Could not send IICRC CEC hours email');
         return;
       }
       if (payload.alreadySent) {
-        setActionSuccess('IICRC renewal email was already sent for this course.');
+        setActionSuccess('IICRC CEC hours email was already sent for this course.');
       } else if (payload.status === 'sent') {
-        setActionSuccess('IICRC renewal email sent successfully.');
+        setActionSuccess('IICRC CEC hours email sent.');
       } else if (payload.status === 'failed') {
         setActionError(
           payload.detail ?? 'IICRC email delivery failed — check the communication log.'
@@ -565,7 +642,7 @@ export function AdminUserDetailClient({
       } else if (payload.status === 'skipped') {
         setActionError(
           payload.detail ??
-            'IICRC submission was skipped — verify course CEC eligibility, MAILTRAP_API_KEY, and completion status.'
+            'IICRC CEC submission was skipped — verify course CEC eligibility, MAILTRAP_API_KEY, and completion status.'
         );
       }
       router.refresh();
@@ -640,6 +717,16 @@ export function AdminUserDetailClient({
     }
   }
 
+  async function copyEmail() {
+    try {
+      await navigator.clipboard.writeText(user.email);
+      setEmailCopied(true);
+      window.setTimeout(() => setEmailCopied(false), 2000);
+    } catch {
+      setActionError('Could not copy email.');
+    }
+  }
+
   async function downloadCertificate(enrollmentId: string, courseSlug: string) {
     setActionError(null);
     setPendingDownloadIds(new Set([enrollmentId]));
@@ -673,8 +760,28 @@ export function AdminUserDetailClient({
   const enrollDisabled = selectedCourseSlugs.size === 0 || pendingGrant || grantableCount === 0;
   const enrollButtonLabel =
     selectedCourseSlugs.size > 0
-      ? `Enroll in ${selectedCourseSlugs.size} course${selectedCourseSlugs.size === 1 ? '' : 's'}`
-      : 'Enroll learner';
+      ? `Enrol in ${selectedCourseSlugs.size} course${selectedCourseSlugs.size === 1 ? '' : 's'}`
+      : 'Enrol learner';
+
+  const filters: { id: CourseFilter; label: string; count: number }[] = [
+    { id: 'all', label: 'All', count: user.enrollments.length },
+    {
+      id: 'stuck',
+      label: 'Not started',
+      count: user.enrollments.filter(isNotStarted).length,
+    },
+    {
+      id: 'progress',
+      label: 'In progress',
+      count: user.enrollments.filter((e) => e.completionPct > 0 && e.completionPct < 100).length,
+    },
+    { id: 'done', label: 'Complete', count: completedCourses },
+    {
+      id: 'cec',
+      label: 'CEC',
+      count: user.enrollments.filter(isCecEligibleEnrollment).length,
+    },
+  ];
 
   return (
     <div className="relative px-5 py-8 pb-24 sm:px-8 sm:py-10">
@@ -683,16 +790,16 @@ export function AdminUserDetailClient({
         aria-hidden
         style={{
           background:
-            'radial-gradient(900px 420px at 8% -5%, rgba(36, 144, 237, 0.16), transparent 55%), radial-gradient(600px 360px at 92% 5%, rgba(34, 211, 238, 0.07), transparent 50%)',
+            'radial-gradient(900px 420px at 8% -5%, rgba(36, 144, 237, 0.16), transparent 55%), radial-gradient(600px 360px at 92% 5%, rgba(237, 157, 36, 0.06), transparent 50%)',
         }}
       />
 
       <Link
-        href="/admin"
-        className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-white/55 transition-colors hover:text-white/90"
+        href="/admin/users"
+        className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-white/55 transition-colors hover:text-white/90"
       >
         <ArrowLeft className="h-4 w-4" />
-        Back to learner directory
+        Customer directory
       </Link>
 
       {actionSuccess ? (
@@ -714,14 +821,14 @@ export function AdminUserDetailClient({
       ) : null}
 
       <header className={cn(adminGlassCard, 'mb-6 overflow-hidden p-0')}>
-        <div className="border-b border-white/[0.06] bg-gradient-to-br from-[#2490ed]/10 via-transparent to-transparent px-6 py-8 sm:px-8">
+        <div className="border-b border-white/[0.06] px-6 py-7 sm:px-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div className="flex min-w-0 gap-5">
               <LearnerAvatar user={user} size="lg" />
               <div className="min-w-0 space-y-3">
                 <div className="flex flex-wrap items-center gap-2">
                   <StatusBadge
-                    label={user.isActive ? 'Active account' : 'Inactive'}
+                    label={user.isActive ? 'Active' : 'Inactive'}
                     tone={user.isActive ? 'success' : 'muted'}
                   />
                   <StatusBadge
@@ -735,21 +842,22 @@ export function AdminUserDetailClient({
                 <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
                   {displayName}
                 </h1>
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-white/55">
-                  <span className="inline-flex items-center gap-1.5">
+                <div className="flex flex-wrap items-center gap-2 text-sm text-white/55">
+                  <a
+                    href={`mailto:${user.email}`}
+                    className="inline-flex items-center gap-1.5 hover:text-white"
+                  >
                     <Mail className="h-3.5 w-3.5 shrink-0" />
                     {user.email}
-                  </span>
-                  {user.spentAud > 0 ? (
-                    <span className="text-white/70 tabular-nums">
-                      {formatAud(user.spentAud)} recognised
-                    </span>
-                  ) : null}
-                  {user.neverStartedCount > 0 ? (
-                    <span className="text-[#f2cf8f]">
-                      {user.neverStartedCount} course not started
-                    </span>
-                  ) : null}
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => void copyEmail()}
+                    className="inline-flex items-center gap-1 rounded-md border border-white/10 px-2 py-0.5 text-xs text-white/60 hover:text-white"
+                  >
+                    {emailCopied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                    {emailCopied ? 'Copied' : 'Copy'}
+                  </button>
                   {user.iicrcMemberNumber ? (
                     <span className="inline-flex items-center gap-1.5">
                       <Hash className="h-3.5 w-3.5 shrink-0" />
@@ -759,46 +867,46 @@ export function AdminUserDetailClient({
                 </div>
               </div>
             </div>
-            <div className="relative mx-auto h-[140px] w-[140px] shrink-0 lg:mx-0">
-              <PieChart width={140} height={140}>
-                <Pie
-                  data={gaugeData}
-                  dataKey="value"
-                  cx={70}
-                  cy={70}
-                  innerRadius={40}
-                  outerRadius={57}
-                  startAngle={90}
-                  endAngle={-270}
-                  stroke="none"
-                >
-                  <Cell fill="#2490ed" />
-                  <Cell fill="rgba(255,255,255,0.07)" />
-                </Pie>
-                <Tooltip {...chartTooltipProps} />
-              </PieChart>
-              <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                <span
-                  className="text-3xl font-black tabular-nums"
-                  style={{ color: completionColor(user.overallCompletionPct) }}
-                >
-                  {user.overallCompletionPct}%
-                </span>
-                <span className="text-[10px] font-semibold tracking-[0.2em] text-white/38 uppercase">
-                  overall
-                </span>
-              </div>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                type="button"
+                variant="secondary"
+                className="h-10 rounded-xl border-white/10 bg-white/[0.06] text-white hover:bg-white/10"
+                onClick={openPasswordDialog}
+              >
+                <KeyRound className="mr-2 h-4 w-4" />
+                Reset password
+              </Button>
+              <a
+                href={`mailto:${user.email}`}
+                className="inline-flex h-10 items-center rounded-xl bg-[#2490ed] px-4 text-sm font-semibold text-white hover:bg-[#1a7fd4]"
+              >
+                Email customer
+              </a>
             </div>
           </div>
+          <div className="mt-6">
+            <div className="mb-2 flex items-center justify-between text-xs text-white/40">
+              <span>Overall completion</span>
+              <span
+                className="tabular-nums"
+                style={{ color: completionColor(user.overallCompletionPct) }}
+              >
+                {user.overallCompletionPct}%
+              </span>
+            </div>
+            <ProgressBar percentage={user.overallCompletionPct} label="Overall completion" />
+          </div>
         </div>
-        <div className="grid gap-px bg-white/[0.06] sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-px bg-white/[0.06] sm:grid-cols-2 lg:grid-cols-5">
           {[
-            { label: 'Enrollments', value: user.enrollments.length, icon: BookOpen },
-            { label: 'Courses complete', value: completedCourses, icon: Award },
+            { label: 'Recognised', value: formatAud(user.spentAud), icon: Award },
+            { label: 'Enrolments', value: user.enrollments.length, icon: BookOpen },
+            { label: 'Complete', value: completedCourses, icon: CheckCircle2 },
             {
-              label: 'Lessons done',
+              label: 'Lessons',
               value: `${totalLessonsDone}/${totalLessons}`,
-              icon: CheckCircle2,
+              icon: Clock,
             },
             {
               label: 'Last active',
@@ -815,7 +923,7 @@ export function AdminUserDetailClient({
                 </p>
                 <p
                   className={cn(
-                    'mt-0.5 font-bold text-white/90 tabular-nums',
+                    'mt-0.5 truncate font-bold text-white/90 tabular-nums',
                     stat.small ? 'text-sm' : 'text-xl'
                   )}
                 >
@@ -827,153 +935,185 @@ export function AdminUserDetailClient({
         </div>
       </header>
 
-      <div className="grid gap-6 xl:grid-cols-12">
-        <Card className={cn(adminGlassCard, 'xl:col-span-4')}>
-          <CardHeader className="border-b border-white/[0.06] pb-4">
-            <CardTitle className="flex items-center gap-2 text-base text-white/88">
-              <UserRound className="h-4 w-4 text-[#7ec5ff]" />
-              Account details
-            </CardTitle>
-            <CardDescription className="text-white/45">
-              Profile and membership information
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4 pt-5 text-sm">
-            <dl className="space-y-3">
-              <div className="flex justify-between gap-4 border-b border-white/[0.05] pb-3">
-                <dt className="text-white/42">Member since</dt>
-                <dd className="text-right font-medium text-white/85">
-                  {formatAdminDate(user.createdAt)}
-                </dd>
-              </div>
-              <div className="flex justify-between gap-4 border-b border-white/[0.05] pb-3">
-                <dt className="text-white/42">Profile updated</dt>
-                <dd className="text-right font-medium text-white/85">
-                  {formatAdminDate(user.updatedAt)}
-                </dd>
-              </div>
-              <div className="flex justify-between gap-4 border-b border-white/[0.05] pb-3">
-                <dt className="text-white/42">Platform role</dt>
-                <dd className="text-right font-medium text-white/85">{user.role ?? 'student'}</dd>
-              </div>
-              <div className="flex justify-between gap-4 border-b border-white/[0.05] pb-3">
-                <dt className="text-white/42">IICRC expiry</dt>
-                <dd className="text-right font-medium text-white/85">
-                  {user.iicrcExpiryDate ? formatAdminDate(user.iicrcExpiryDate) : '—'}
-                </dd>
-              </div>
-              <div className="flex justify-between gap-4">
-                <dt className="text-white/42">LMS roles</dt>
-                <dd className="text-right font-medium text-white/85">
-                  {roleNames.length > 0 ? roleNames.join(', ') : '—'}
-                </dd>
-              </div>
-            </dl>
-            {!user.iicrcMemberNumber ? (
-              <p className="rounded-lg border border-amber-400/20 bg-amber-400/5 px-3 py-2 text-xs text-amber-100/80">
-                No IICRC member number on file. Add it from the learner profile when they update
-                credentials.
-              </p>
-            ) : null}
+      {nextActions.length > 0 ? (
+        <section className="mb-6 rounded-2xl border border-amber-400/20 bg-amber-400/[0.05] p-5">
+          <p className="text-[11px] font-semibold tracking-[0.16em] text-amber-100/70 uppercase">
+            Do next
+          </p>
+          <ul className="mt-3 space-y-3">
+            {nextActions.map((item) => (
+              <li key={item.id}>
+                <p className="text-sm font-medium text-white/90">{item.title}</p>
+                <p className="text-xs text-white/45">{item.detail}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : (
+        <p className="mb-6 text-sm text-white/40">Nothing urgent on this account.</p>
+      )}
 
-            <div className="rounded-xl border border-white/[0.08] bg-black/20 p-4">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="flex items-center gap-2 text-sm font-semibold text-white/88">
-                    <KeyRound className="h-4 w-4 text-[#7ec5ff]" />
-                    Password
-                  </p>
-                  <p className="mt-1 text-xs text-white/45">
-                    Generate a secure password or set a custom one. Optionally email it to the
-                    learner.
-                  </p>
-                </div>
+      <div className="grid gap-6 xl:grid-cols-12">
+        <div className="space-y-6 xl:order-1 xl:col-span-8">
+          <div className="flex flex-wrap gap-2">
+            {filters.map((f) =>
+              f.count === 0 && f.id !== 'all' ? null : (
+                <button
+                  key={f.id}
+                  type="button"
+                  onClick={() => setCourseFilter(f.id)}
+                  className={cn(
+                    'rounded-full border px-3 py-1.5 text-xs font-medium',
+                    courseFilter === f.id
+                      ? 'border-[#2490ed]/50 bg-[#2490ed]/15 text-[#7ec5ff]'
+                      : 'border-white/10 text-white/55 hover:text-white/80'
+                  )}
+                >
+                  {f.label} {f.count}
+                </button>
+              )
+            )}
+          </div>
+
+          {incompleteEnrollments.length > 0 ? (
+            <div
+              className={cn(
+                adminGlassCard,
+                'flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between'
+              )}
+            >
+              <p className="text-sm text-white/55">
+                {incompleteEnrollments.length} course
+                {incompleteEnrollments.length === 1 ? '' : 's'} still open
+                {selectedCount > 0 ? (
+                  <span className="text-white/80"> · {selectedCount} selected</span>
+                ) : null}
+              </p>
+              <div className="flex flex-wrap items-center gap-2">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-9 text-white/60 hover:text-white"
+                  disabled={bulkCompletePending}
+                  onClick={selectAllIncomplete}
+                >
+                  Select incomplete
+                </Button>
+                {selectedCount > 0 ? (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-9 text-white/60 hover:text-white"
+                    disabled={bulkCompletePending}
+                    onClick={clearSelection}
+                  >
+                    Clear
+                  </Button>
+                ) : null}
                 <Button
                   type="button"
                   size="sm"
-                  className="h-8 shrink-0 rounded-lg bg-[#2490ed] px-3 text-xs font-semibold hover:bg-[#1a7fd4]"
-                  onClick={openPasswordDialog}
+                  className="h-9 rounded-lg bg-[#2490ed] px-4 font-semibold hover:bg-[#1a7fd4]"
+                  disabled={selectedCount === 0 || bulkCompletePending}
+                  onClick={() => void markEnrollmentsComplete([...selectedEnrollmentIds])}
                 >
-                  Reset password
+                  {bulkCompletePending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <>
+                      <CheckCircle2 className="mr-1.5 h-4 w-4" />
+                      Mark {selectedCount > 0 ? selectedCount : ''} complete
+                    </>
+                  )}
                 </Button>
               </div>
             </div>
+          ) : null}
 
-            {cecEligibleCompleted.length > 0 ? (
-              <div className="rounded-xl border border-[#2490ed]/20 bg-[#2490ed]/[0.05] p-4">
-                <div className="flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-[#7ec5ff]" />
-                  <p className="text-sm font-semibold text-white/88">Manual IICRC renewal</p>
-                </div>
-                <p className="mt-1 text-xs text-white/45">
-                  Send certificate of completion to IICRC using member number{' '}
-                  <span className="font-medium text-white/70">{user.iicrcMemberNumber}</span>
-                </p>
-                <ul className="mt-3 space-y-2">
-                  {cecEligibleCompleted.map((e) => {
-                    const alreadySent =
-                      e.renewalStatus === 'sent' ||
-                      e.renewalStatus === 'approved' ||
-                      e.renewalStatus === 'completed';
-                    return (
-                      <li
-                        key={e.enrollmentId}
-                        className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-white/[0.06] bg-black/20 px-3 py-2"
-                      >
-                        <div className="min-w-0">
-                          <p className="truncate text-xs font-medium text-white/80">
-                            {e.courseTitle}
-                          </p>
-                          {e.resolvedCecHours != null && e.resolvedCecHours > 0 ? (
-                            <p className="text-[10px] text-white/40">
-                              {e.resolvedCecHours} CEC hours
-                            </p>
-                          ) : null}
-                        </div>
-                        {alreadySent ? (
-                          <StatusBadge label="Sent" tone="success" />
-                        ) : hasIicrcMemberNumber ? (
-                          <Button
-                            type="button"
-                            size="sm"
-                            className="h-7 rounded-lg bg-[#2490ed] px-2.5 text-[11px] font-semibold hover:bg-[#1a7fd4]"
-                            disabled={pendingSendIicrcIds.has(e.enrollmentId)}
-                            onClick={() => void sendIicrcRenewalEmail(e.enrollmentId)}
-                          >
-                            {pendingSendIicrcIds.has(e.enrollmentId) ? (
-                              <Loader2 className="h-3 w-3 animate-spin" />
-                            ) : (
-                              'Send email'
-                            )}
-                          </Button>
-                        ) : null}
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            ) : null}
-          </CardContent>
-        </Card>
+          {visibleEnrollments.length > 0 ? (
+            <div className="space-y-4">
+              {visibleEnrollments.map((e) => {
+                const isIncomplete = e.completionPct < 100;
+                return (
+                  <CourseEnrollmentCard
+                    key={e.enrollmentId}
+                    enrollment={e}
+                    hasIicrcMemberNumber={hasIicrcMemberNumber}
+                    pendingSendIicrc={pendingSendIicrcIds.has(e.enrollmentId)}
+                    pendingDownloadCertificate={pendingDownloadIds.has(e.enrollmentId)}
+                    selectable={isIncomplete}
+                    selected={selectedEnrollmentIds.has(e.enrollmentId)}
+                    modulesOpen={openModules.has(e.enrollmentId)}
+                    onToggleModules={() =>
+                      setOpenModules((prev) => {
+                        const next = new Set(prev);
+                        if (next.has(e.enrollmentId)) next.delete(e.enrollmentId);
+                        else next.add(e.enrollmentId);
+                        return next;
+                      })
+                    }
+                    pendingRevoke={pendingRevokeId === e.enrollmentId}
+                    pendingComplete={pendingCompleteIds.has(e.enrollmentId)}
+                    onToggleSelect={() => toggleEnrollmentSelection(e.enrollmentId)}
+                    onAskRevoke={() => setRevokeTarget(e)}
+                    onMarkComplete={
+                      bulkCompletePending ? () => {} : (id) => void markEnrollmentsComplete([id])
+                    }
+                    onSendIicrc={(id) => void sendIicrcRenewalEmail(id)}
+                    onDownloadCertificate={(id, slug) => void downloadCertificate(id, slug)}
+                  />
+                );
+              })}
+            </div>
+          ) : user.enrollments.length === 0 ? (
+            <div
+              className={cn(
+                adminGlassCard,
+                'flex flex-col items-center justify-center gap-4 py-16 text-center'
+              )}
+            >
+              <Calendar className="h-10 w-10 text-white/25" strokeWidth={1.25} />
+              <p className="text-sm font-medium text-white/70">No course enrolments yet</p>
+              <p className="max-w-sm text-xs text-white/45">
+                Open Add courses on the right and enrol them so support can see the next lesson.
+              </p>
+            </div>
+          ) : (
+            <p className="text-sm text-white/40">No courses in this filter.</p>
+          )}
+        </div>
 
-        <div className="space-y-6 xl:col-span-8">
+        <aside className="space-y-6 xl:order-2 xl:col-span-4">
           <Card className={cn(adminGlassCard, 'overflow-visible')}>
-            <CardHeader className="space-y-4 border-b border-white/[0.06] pb-4">
-              <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#2490ed]/25 bg-[#2490ed]/10">
-                  <Shield className="h-5 w-5 text-[#7ec5ff]" strokeWidth={1.75} />
+            <CardHeader className="border-b border-white/[0.06] pb-4">
+              <button
+                type="button"
+                className="flex w-full items-start justify-between gap-3 text-left"
+                onClick={() => setGrantOpen((open) => !open)}
+              >
+                <div className="flex items-start gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#2490ed]/25 bg-[#2490ed]/10">
+                    <Shield className="h-5 w-5 text-[#7ec5ff]" strokeWidth={1.75} />
+                  </div>
+                  <div>
+                    <CardTitle className="text-base text-white/88">Add courses</CardTitle>
+                    <CardDescription className="text-white/45">
+                      Grant access when they have paid or you are covering a seat
+                    </CardDescription>
+                  </div>
                 </div>
-                <div>
-                  <CardTitle className="text-base text-white/88">Course enrollments</CardTitle>
-                  <CardDescription className="text-white/45">
-                    Assign courses, mark completions for CEC support, or remove access
-                  </CardDescription>
-                </div>
-              </div>
-              <div className="space-y-3">
-                <div className="text-[10px] font-semibold tracking-[0.16em] text-white/38 uppercase">
-                  Add courses
-                </div>
+                <ChevronDown
+                  className={cn(
+                    'mt-1 h-4 w-4 text-white/40 transition-transform',
+                    grantOpen && 'rotate-180'
+                  )}
+                />
+              </button>
+            </CardHeader>
+            {grantOpen ? (
+              <CardContent className="space-y-3 pt-5">
                 <AdminCourseMultiPicker
                   courses={catalogCourses}
                   enrolledSlugs={enrolledSlugs}
@@ -985,160 +1125,134 @@ export function AdminUserDetailClient({
                   enrollDisabled={enrollDisabled}
                 />
                 {grantableCount === 0 ? (
-                  <p className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/45">
-                    This learner is already enrolled in every course in the catalog.
+                  <p className="text-xs text-white/45">
+                    Already enrolled in every catalogue course.
                   </p>
                 ) : null}
-              </div>
-            </CardHeader>
-            <CardFooter className="flex flex-col gap-3 border-t border-white/[0.06] bg-black/20 px-6 py-4">
-              <p className="text-sm text-white/50">
-                {selectedCourseSlugs.size > 0 ? (
-                  <>
-                    <span className="font-medium text-white/85">
-                      {selectedCourseSlugs.size} course
-                      {selectedCourseSlugs.size === 1 ? '' : 's'} ready to assign
-                    </span>
-                    {' · '}Confirm enrollment below
-                  </>
-                ) : (
-                  'Select one or more courses, then confirm enrollment'
-                )}
-              </p>
-              <Button
-                type="button"
-                className="h-12 w-full rounded-xl bg-[#2490ed] px-6 text-base font-semibold text-white shadow-lg shadow-[#2490ed]/25 hover:bg-[#1a7fd4] disabled:opacity-40"
-                disabled={enrollDisabled}
-                onClick={() => void grantSelectedCourses()}
-              >
-                {pendingGrant ? <Loader2 className="h-4 w-4 animate-spin" /> : enrollButtonLabel}
-              </Button>
-            </CardFooter>
+                <Button
+                  type="button"
+                  className="h-11 w-full rounded-xl bg-[#2490ed] font-semibold hover:bg-[#1a7fd4] disabled:opacity-40"
+                  disabled={enrollDisabled}
+                  onClick={() => void grantSelectedCourses()}
+                >
+                  {pendingGrant ? <Loader2 className="h-4 w-4 animate-spin" /> : enrollButtonLabel}
+                </Button>
+              </CardContent>
+            ) : null}
           </Card>
 
-          {user.enrollments.length > 0 ? (
-            <div className="space-y-5">
-              {incompleteEnrollments.length > 0 ? (
-                <div
-                  className={cn(
-                    adminGlassCard,
-                    'flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between'
-                  )}
-                >
-                  <p className="text-sm text-white/55">
-                    {incompleteEnrollments.length} course
-                    {incompleteEnrollments.length === 1 ? '' : 's'} not fully complete
-                    {selectedCount > 0 ? (
-                      <span className="text-white/80"> · {selectedCount} selected</span>
-                    ) : null}
-                  </p>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="h-9 text-white/60 hover:text-white"
-                      disabled={bulkCompletePending}
-                      onClick={selectAllIncomplete}
-                    >
-                      Select all incomplete
-                    </Button>
-                    {selectedCount > 0 ? (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="h-9 text-white/60 hover:text-white"
-                        disabled={bulkCompletePending}
-                        onClick={clearSelection}
-                      >
-                        Clear
-                      </Button>
-                    ) : null}
-                    <Button
-                      type="button"
-                      size="sm"
-                      className="h-9 rounded-lg bg-[#2490ed] px-4 font-semibold hover:bg-[#1a7fd4]"
-                      disabled={selectedCount === 0 || bulkCompletePending}
-                      onClick={() => void markEnrollmentsComplete([...selectedEnrollmentIds])}
-                    >
-                      {bulkCompletePending ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <>
-                          <CheckCircle2 className="mr-1.5 h-4 w-4" />
-                          Mark {selectedCount > 0 ? selectedCount : ''} complete
-                        </>
-                      )}
-                    </Button>
-                  </div>
+          <Card className={cn(adminGlassCard)}>
+            <CardHeader className="border-b border-white/[0.06] pb-4">
+              <CardTitle className="flex items-center gap-2 text-base text-white/88">
+                <UserRound className="h-4 w-4 text-[#7ec5ff]" />
+                Account
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 pt-5 text-sm">
+              <dl className="space-y-3">
+                <div className="flex justify-between gap-4">
+                  <dt className="text-white/42">Member since</dt>
+                  <dd className="text-right font-medium text-white/85">
+                    {formatAdminDate(user.createdAt)}
+                  </dd>
                 </div>
-              ) : null}
-              {user.enrollments.map((e) => {
-                const isIncomplete = e.completionPct < 100;
-                return (
-                  <CourseEnrollmentCard
-                    key={e.enrollmentId}
-                    enrollment={e}
-                    hasIicrcMemberNumber={hasIicrcMemberNumber}
-                    pendingSendIicrc={pendingSendIicrcIds.has(e.enrollmentId)}
-                    pendingDownloadCertificate={pendingDownloadIds.has(e.enrollmentId)}
-                    selectable={isIncomplete}
-                    selected={selectedEnrollmentIds.has(e.enrollmentId)}
-                    pendingRevoke={pendingRevokeId === e.enrollmentId}
-                    pendingComplete={pendingCompleteIds.has(e.enrollmentId)}
-                    onToggleSelect={() => toggleEnrollmentSelection(e.enrollmentId)}
-                    onRevoke={bulkCompletePending ? () => {} : (id) => void revokeEnrollment(id)}
-                    onMarkComplete={
-                      bulkCompletePending ? () => {} : (id) => void markEnrollmentsComplete([id])
-                    }
-                    onSendIicrc={(id) => void sendIicrcRenewalEmail(id)}
-                    onDownloadCertificate={(id, slug) => void downloadCertificate(id, slug)}
-                  />
-                );
-              })}
-            </div>
-          ) : (
-            <div
-              className={cn(
-                adminGlassCard,
-                'flex flex-col items-center justify-center gap-4 py-16 text-center'
-              )}
-            >
-              <Calendar className="h-10 w-10 text-white/25" strokeWidth={1.25} />
-              <p className="text-sm font-medium text-white/70">No course enrollments yet</p>
-              {selectedCourseSlugs.size > 0 ? (
-                <>
-                  <p className="max-w-sm text-xs text-white/45">
-                    {selectedCourseSlugs.size} course
-                    {selectedCourseSlugs.size === 1 ? '' : 's'} selected — use the blue{' '}
-                    <span className="font-medium text-white/65">Enroll</span> button in the panel
-                    above to grant access.
-                  </p>
-                  <Button
-                    type="button"
-                    className="h-11 rounded-xl bg-[#2490ed] px-8 font-semibold text-white hover:bg-[#1a7fd4] disabled:opacity-40"
-                    disabled={enrollDisabled}
-                    onClick={() => void grantSelectedCourses()}
-                  >
-                    {pendingGrant ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      enrollButtonLabel
-                    )}
-                  </Button>
-                </>
-              ) : (
-                <p className="max-w-sm text-xs text-white/45">
-                  Select courses in the panel above, then click{' '}
-                  <span className="font-medium text-white/65">Enroll learner</span> to grant access
-                  and start tracking modules and completion.
+                <div className="flex justify-between gap-4">
+                  <dt className="text-white/42">Role</dt>
+                  <dd className="text-right font-medium text-white/85">{user.role ?? 'student'}</dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-white/42">IICRC expiry</dt>
+                  <dd className="text-right font-medium text-white/85">
+                    {user.iicrcExpiryDate ? formatAdminDate(user.iicrcExpiryDate) : '—'}
+                  </dd>
+                </div>
+              </dl>
+              {!user.iicrcMemberNumber ? (
+                <p className="rounded-lg border border-amber-400/20 bg-amber-400/5 px-3 py-2 text-xs text-amber-100/80">
+                  No IICRC member number — CEC hours cannot be filed for them yet.
                 </p>
-              )}
-            </div>
-          )}
-        </div>
+              ) : null}
+            </CardContent>
+          </Card>
+
+          {cecEligibleCompleted.length > 0 ? (
+            <Card className={cn(adminGlassCard)}>
+              <CardHeader className="border-b border-white/[0.06] pb-4">
+                <CardTitle className="text-base text-white/88">IICRC CEC packs</CardTitle>
+                <CardDescription className="text-white/45">
+                  Approved hours only. CARSI does not issue IICRC certification.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2 pt-5">
+                {cecEligibleCompleted.map((e) => {
+                  const alreadySent =
+                    e.renewalStatus === 'sent' ||
+                    e.renewalStatus === 'approved' ||
+                    e.renewalStatus === 'completed';
+                  return (
+                    <div
+                      key={e.enrollmentId}
+                      className="flex items-center justify-between gap-2 rounded-lg border border-white/[0.06] px-3 py-2"
+                    >
+                      <p className="truncate text-xs text-white/80">{e.courseTitle}</p>
+                      {alreadySent ? (
+                        <StatusBadge label="Sent" tone="success" />
+                      ) : hasIicrcMemberNumber ? (
+                        <Button
+                          type="button"
+                          size="sm"
+                          className="h-7 rounded-lg bg-[#2490ed] px-2.5 text-[11px] font-semibold hover:bg-[#1a7fd4]"
+                          disabled={pendingSendIicrcIds.has(e.enrollmentId)}
+                          onClick={() => void sendIicrcRenewalEmail(e.enrollmentId)}
+                        >
+                          {pendingSendIicrcIds.has(e.enrollmentId) ? (
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                          ) : (
+                            'Send'
+                          )}
+                        </Button>
+                      ) : (
+                        <StatusBadge label="Need number" tone="warning" />
+                      )}
+                    </div>
+                  );
+                })}
+              </CardContent>
+            </Card>
+          ) : null}
+        </aside>
       </div>
+
+      <Dialog open={Boolean(revokeTarget)} onOpenChange={(open) => !open && setRevokeTarget(null)}>
+        <DialogContent className="border-white/10 bg-[#0a0f1a] text-white sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Remove this enrolment?</DialogTitle>
+            <DialogDescription className="text-white/50">
+              {revokeTarget
+                ? `${revokeTarget.courseTitle} will disappear from ${displayName}'s account. Paid access is not refunded from here.`
+                : ''}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="ghost"
+              className="text-white/70"
+              onClick={() => setRevokeTarget(null)}
+            >
+              Keep enrolment
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={!revokeTarget || pendingRevokeId === revokeTarget.enrollmentId}
+              onClick={() => revokeTarget && void revokeEnrollment(revokeTarget.enrollmentId)}
+            >
+              Remove
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog
         open={passwordDialogOpen}
