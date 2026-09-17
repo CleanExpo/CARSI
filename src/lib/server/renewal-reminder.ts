@@ -13,11 +13,14 @@
  *    is logged. Nothing is inferred from the catalogue price.
  *  - An email that did not send THROWS. The webhook route's existing failure
  *    path then reports it (Sentry) and returns 5xx so Stripe retries.
- *  - Idempotency: the route already dedupes by Stripe event id. On top of that
- *    a sent reminder is recorded as an `LmsNotification` (unique `dedupeKey` =
- *    subscription + renewal date), so a second event for the same renewal is a
- *    no-op. The record is written AFTER the email sends: a crash between the two
- *    can at worst repeat a reminder, never silently drop one.
+ *  - Idempotency: the route already dedupes by Stripe event id. On top of that,
+ *    each renewal is CLAIMED before sending by inserting an `LmsNotification`
+ *    whose `dedupeKey` (subscription + renewal date) is unique in the database.
+ *    Only the delivery that wins the insert sends, so concurrent deliveries with
+ *    different event ids send once. A failed send removes the claim and throws
+ *    so Stripe's retry can send. Known limit: a process killed between the claim
+ *    and the send leaves a claim with no email; that reminder is then not
+ *    retried automatically.
  */
 
 import type Stripe from 'stripe';
@@ -186,6 +189,34 @@ async function resolveRecipient(
   };
 }
 
+function isUniqueViolation(error: unknown): boolean {
+  return Boolean(
+    error && typeof error === 'object' && (error as { code?: unknown }).code === 'P2002',
+  );
+}
+
+/**
+ * Remove the claim after a failed send so Stripe's retry can send. If the
+ * removal itself fails the claim stays and blocks every retry, so that is
+ * reported to Sentry for a person to clear; the caller still throws.
+ */
+async function releaseClaim(subscriptionId: string, dedupeKey: string): Promise<void> {
+  try {
+    await prisma.lmsNotification.delete({ where: { dedupeKey } });
+  } catch (error) {
+    if ((error as { code?: unknown } | null)?.code === 'P2025') return; // already gone
+    console.error('[renewal-reminder] could not release claim after failed send; reminder is blocked', {
+      subscriptionId,
+      dedupeKey,
+    });
+    void captureServerError(error, {
+      route: '/api/lms/webhooks/stripe',
+      tags: { eventType: 'invoice.upcoming', stage: 'release_renewal_reminder_claim' },
+      extra: { dedupeKey },
+    });
+  }
+}
+
 function skip(
   subscriptionId: string,
   reason: RenewalReminderSkipReason,
@@ -249,21 +280,9 @@ export async function sendUpcomingRenewalReminder(params: {
   });
   const subject = `Your ${recipient.planLabel} renews on ${renewalDateLabel}`;
 
-  const result = await sendEmail({
-    to: recipient.to,
-    subject,
-    html,
-    text,
-    replyTo: SUPPORT_EMAIL,
-  });
-  if (!result.sent) {
-    console.error('[renewal-reminder] email not sent', {
-      subscriptionId,
-      reason: result.reason,
-    });
-    throw new Error(`renewal reminder email not sent (${result.reason ?? 'unknown'})`);
-  }
-
+  // Claim before send (compare-and-set on the unique dedupe_key). Only the
+  // delivery whose insert wins may send; a concurrent delivery for the same
+  // renewal hits the unique violation and sends nothing.
   try {
     await prisma.lmsNotification.create({
       data: {
@@ -277,16 +296,30 @@ export async function sendUpcomingRenewalReminder(params: {
       select: { id: true },
     });
   } catch (error) {
-    // The email DID send, so do not throw: a 5xx would make Stripe retry and
-    // send it again. Surface the lost record loudly instead.
-    console.error('[renewal-reminder] sent but could not record the reminder', {
+    if (isUniqueViolation(error)) return skip(subscriptionId, 'already_sent');
+    throw error; // transient — 5xx, Stripe retries, nothing was sent
+  }
+
+  let result: Awaited<ReturnType<typeof sendEmail>>;
+  try {
+    result = await sendEmail({
+      to: recipient.to,
+      subject,
+      html,
+      text,
+      replyTo: SUPPORT_EMAIL,
+    });
+  } catch (error) {
+    result = { sent: false, reason: 'send_failed' };
+    console.error('[renewal-reminder] email send threw', { subscriptionId, error });
+  }
+  if (!result.sent) {
+    console.error('[renewal-reminder] email not sent', {
       subscriptionId,
-      dedupeKey,
+      reason: result.reason,
     });
-    void captureServerError(error, {
-      route: '/api/lms/webhooks/stripe',
-      tags: { eventType: 'invoice.upcoming', stage: 'record_renewal_reminder' },
-    });
+    await releaseClaim(subscriptionId, dedupeKey);
+    throw new Error(`renewal reminder email not sent (${result.reason ?? 'unknown'})`);
   }
 
   console.info('[renewal-reminder] sent', { subscriptionId, dedupeKey, messageId: result.messageId });

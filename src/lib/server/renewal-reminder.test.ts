@@ -15,8 +15,15 @@ import type Stripe from 'stripe';
 
 const h = vi.hoisted(() => {
   const notifications = new Map<string, { id: string; userId: string; dedupeKey: string }>();
+  const race = {
+    /** When set, the NEXT dedupe lookup reads the store, then waits on this gate. */
+    gate: null as Promise<void> | null,
+    /** Resolves once the gated call has read the store and is parked. */
+    parked: null as (() => void) | null,
+  };
   return {
     notifications,
+    race,
     sendEmail: vi.fn(async (_p: unknown) => ({ sent: true, messageId: 'msg_1' }) as {
       sent: boolean;
       messageId?: string;
@@ -27,9 +34,16 @@ const h = vi.hoisted(() => {
     resolveTeamId: vi.fn(async () => 'team-1' as string | null),
     prisma: {
       lmsNotification: {
-        findUnique: vi.fn(async ({ where }: { where: { dedupeKey: string } }) =>
-          notifications.get(where.dedupeKey) ?? null,
-        ),
+        findUnique: vi.fn(async ({ where }: { where: { dedupeKey: string } }) => {
+          const row = notifications.get(where.dedupeKey) ?? null;
+          if (race.gate) {
+            const gate = race.gate;
+            race.gate = null;
+            race.parked?.();
+            await gate;
+          }
+          return row;
+        }),
         create: vi.fn(
           async ({ data }: { data: { userId: string; dedupeKey: string } }) => {
             if (notifications.has(data.dedupeKey)) {
@@ -40,6 +54,12 @@ const h = vi.hoisted(() => {
             return { id: row.id };
           },
         ),
+        delete: vi.fn(async ({ where }: { where: { dedupeKey: string } }) => {
+          const row = notifications.get(where.dedupeKey);
+          if (!row) throw Object.assign(new Error('not found'), { code: 'P2025' });
+          notifications.delete(where.dedupeKey);
+          return row;
+        }),
       },
       lmsUser: {
         findUnique: vi.fn(async ({ where }: { where: { id: string } }) => {
@@ -144,6 +164,8 @@ const lastEmail = () => h.sendEmail.mock.calls.at(-1)?.[0] as SentEmail;
 beforeEach(() => {
   vi.clearAllMocks();
   h.notifications.clear();
+  h.race.gate = null;
+  h.race.parked = null;
   h.subscriptionsRetrieve.mockImplementation(async (id: string) =>
     id === 'sub_ind_1' ? subscription('pro_annual') : subscription('starter'),
   );
@@ -211,6 +233,34 @@ describe('invoice.upcoming renewal reminder', () => {
     expect(h.prisma.lmsNotification.create).toHaveBeenCalledTimes(1);
   });
 
+  it('CONCURRENT deliveries with different event ids for the same renewal send exactly once', async () => {
+    let release!: () => void;
+    h.race.gate = new Promise<void>((r) => (release = r));
+    const parked = new Promise<void>((r) => (h.race.parked = r));
+
+    // Delivery A reads the dedupe store (empty) and is parked there.
+    const a = handleSubscriptionEvent(upcomingEvent('sub_ind_1', {}, 'evt_race_a'));
+    await parked;
+    // Delivery B runs to completion while A is parked.
+    await handleSubscriptionEvent(upcomingEvent('sub_ind_1', {}, 'evt_race_b'));
+    // A resumes with its stale "nothing sent yet" view.
+    release();
+    await a;
+
+    expect(h.sendEmail).toHaveBeenCalledTimes(1);
+    expect(h.notifications.size).toBe(1);
+  });
+
+  it('when the claim cannot be removed after a failed send, it still throws (never reports success)', async () => {
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    h.sendEmail.mockResolvedValueOnce({ sent: false, reason: 'send_failed' });
+    h.prisma.lmsNotification.delete.mockRejectedValueOnce(new Error('db down'));
+    await expect(handleSubscriptionEvent(upcomingEvent('sub_ind_1'))).rejects.toThrow(
+      /renewal reminder/i,
+    );
+    err.mockRestore();
+  });
+
   it('missing amount sends nothing and records nothing', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     await handleSubscriptionEvent(upcomingEvent('sub_ind_1', { amount_due: undefined }));
@@ -253,12 +303,13 @@ describe('invoice.upcoming renewal reminder', () => {
     await expect(handleSubscriptionEvent(upcomingEvent('sub_ind_1'))).rejects.toThrow(
       /renewal reminder/i,
     );
-    expect(h.prisma.lmsNotification.create).not.toHaveBeenCalled();
+    // No claim/record survives the failed send.
+    expect(h.notifications.size).toBe(0);
 
     // Stripe's retry then succeeds and sends exactly once more.
     await handleSubscriptionEvent(upcomingEvent('sub_ind_1'));
     expect(h.sendEmail).toHaveBeenCalledTimes(2);
-    expect(h.prisma.lmsNotification.create).toHaveBeenCalledTimes(1);
+    expect(h.notifications.size).toBe(1);
     err.mockRestore();
   });
 
@@ -266,7 +317,7 @@ describe('invoice.upcoming renewal reminder', () => {
     const err = vi.spyOn(console, 'error').mockImplementation(() => {});
     h.sendEmail.mockResolvedValueOnce({ sent: false, reason: 'not_configured' });
     await expect(handleSubscriptionEvent(upcomingEvent('sub_ind_1'))).rejects.toThrow();
-    expect(h.prisma.lmsNotification.create).not.toHaveBeenCalled();
+    expect(h.notifications.size).toBe(0);
     err.mockRestore();
   });
 

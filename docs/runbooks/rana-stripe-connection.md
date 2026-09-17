@@ -130,7 +130,10 @@ What the app does with the event (`src/lib/server/renewal-reminder.ts`):
 | The same renewal is delivered again (Stripe retry or a second event) | Nothing is sent. Dedupe key: `renewal_reminder:<subscription id>:<renewal date>` in `lms_notifications`. |
 | Amount or payment date missing, currency not AUD, or amount is zero | Nothing is sent. A warning is logged with the reason (`missing_amount`, `missing_renewal_date`, `non_aud_currency`, `zero_amount`). |
 | Subscription already set to cancel, or it is an organisation plan | Nothing is sent (`not_renewing`, `unsupported_plan`). |
-| The email fails, or Mailtrap is not configured | The webhook returns 500, the error goes to Sentry, and Stripe retries. Nothing is recorded, so the retry sends it. |
+| Two deliveries for the same renewal arrive at the same time | Each tries to save the dedupe record first. Only the one whose save succeeds sends the email. |
+| The email fails, or Mailtrap is not configured | The saved record is removed, the webhook returns 500, the error goes to Sentry, and Stripe retries, so the retry can send. |
+
+Known limit: if the server is killed after the record is saved but before the email goes out, that reminder is not retried. If Sentry reports `release_renewal_reminder_claim`, the record could not be removed after a failed send. In either case, delete that `lms_notifications` row (its `dedupe_key` is in the log) so a retry can send.
 
 **Open items for the founder:**
 - **Teams owners have no self-serve cancel button.** The billing portal route only serves individual members. The Teams reminder tells owners to reply or email `support@carsi.com.au`, and someone must then set that subscription to cancel at period end in the Stripe Dashboard. Decide who handles those requests before Teams goes on sale, or add a Teams portal.
