@@ -66,12 +66,14 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, signOut } = useAuth();
-  const usersActive = pathname === '/admin' || pathname.startsWith('/admin/users');
+  const overviewActive = pathname === '/admin';
+  const usersActive = pathname.startsWith('/admin/users');
   // The Facility course has its own quick-access tab below; don't light the
   // generic Courses tab as well when we're on it.
   const facilityCourseId = '6011d465-1981-487b-84e3-a53b10a2bd07';
   const coursesActive =
-    pathname.startsWith('/admin/courses') && !pathname.startsWith(`/admin/courses/${facilityCourseId}`);
+    pathname.startsWith('/admin/courses') &&
+    !pathname.startsWith(`/admin/courses/${facilityCourseId}`);
   const facilityCourseActive = pathname.startsWith(`/admin/courses/${facilityCourseId}`);
   const discountsActive = pathname.startsWith('/admin/discounts');
   const contactsActive = pathname.startsWith('/admin/contacts');
@@ -111,7 +113,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         </div>
 
         <nav className="flex flex-1 flex-col gap-0.5 px-2 py-4">
-          <NavButton href="/admin" label="Users" icon={Users} active={usersActive} />
+          <NavButton href="/admin" label="Overview" icon={BarChart3} active={overviewActive} />
+          <NavButton href="/admin/users" label="Users" icon={Users} active={usersActive} />
           <NavButton href="/admin/courses" label="Courses" icon={BookOpen} active={coursesActive} />
           <NavButton
             href={`/admin/courses/${facilityCourseId}`}
