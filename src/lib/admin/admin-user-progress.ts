@@ -1,5 +1,8 @@
+import {
+  loadAdminCatalogSource,
+  type AdminCatalogCourseOption,
+} from '@/lib/admin/admin-catalog-source';
 import type { AdminCatalogCourse } from '@/lib/admin/load-admin-catalog';
-import { loadAdminCatalogSource, type AdminCatalogCourseOption } from '@/lib/admin/admin-catalog-source';
 import { buildAdminCatalogFromSeed } from '@/lib/lms-seed-catalog';
 import { prisma } from '@/lib/prisma';
 import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
@@ -22,6 +25,8 @@ export type AdminCourseProgressForUser = {
   enrolledAt: string;
   completedAt: string | null;
   paymentReference: string | null;
+  certificateIssuedAt: string | null;
+  listPriceAud: number;
   /** Registry-resolved CEC hours (GP-498) — null when the course has no IICRC approval.
    *  Named distinctly from the raw `cecHours` column so no surface can render the stale value. */
   resolvedCecHours: number | null;
@@ -54,6 +59,10 @@ export type AdminUserProgress = {
   enrollmentCount: number;
   completedCourseCount: number;
   activeCourseCount: number;
+  neverStartedCount: number;
+  paidEnrollmentCount: number;
+  certificatesCount: number;
+  spentAud: number;
   enrollments: AdminCourseProgressForUser[];
 };
 
@@ -119,14 +128,32 @@ type EnrollmentRow = {
   paymentReference: string | null;
   enrolledAt: Date;
   completedAt: Date | null;
+  certificateIssuedAt: Date | null;
   course: {
     id: string;
     slug: string;
     title: string;
     iicrcDiscipline: string | null;
+    isFree: boolean;
+    priceAud: unknown;
     modules: { lessons: { id: string }[] }[];
   };
 };
+
+export function listPriceAudFromCourse(course: { isFree: boolean; priceAud: unknown }): number {
+  if (course.isFree) return 0;
+  const n = Number(course.priceAud);
+  return Number.isFinite(n) && n > 0 ? Math.round(n * 100) / 100 : 0;
+}
+
+export function enrollmentLooksPaid(e: {
+  status: string;
+  paymentReference: string | null;
+}): boolean {
+  const status = (e.status ?? '').toLowerCase();
+  if (status === 'refunded' || status === 'revoked') return false;
+  return Boolean(e.paymentReference?.trim());
+}
 
 type UserRow = {
   id: string;
@@ -143,7 +170,7 @@ type UserRow = {
 
 function lessonCountForEnrollment(
   e: EnrollmentRow,
-  catalogBySlug: Map<string, AdminCatalogCourse>,
+  catalogBySlug: Map<string, AdminCatalogCourse>
 ): number {
   const fromCatalog = catalogBySlug.get(e.course.slug.trim().toLowerCase())?.moduleCount;
   if (fromCatalog != null && fromCatalog > 0) return fromCatalog;
@@ -159,7 +186,7 @@ function completedLessonsForEnrollment(
   userId: string,
   e: EnrollmentRow,
   totalLessons: number,
-  completedLessonCounts: Map<string, number>,
+  completedLessonCounts: Map<string, number>
 ): number {
   if (normalizeEnrollmentStatus(e.status) === 'completed') {
     return totalLessons;
@@ -187,7 +214,7 @@ export function mapUserToAdminProgress(
 ): AdminUserProgress {
   const totalLessonsSum = userEnrollments.reduce(
     (acc, e) => acc + lessonCountForEnrollment(e, catalogBySlug),
-    0,
+    0
   );
 
   const completedLessonsSum = userEnrollments.reduce((acc, e) => {
@@ -205,7 +232,7 @@ export function mapUserToAdminProgress(
       user.id,
       e,
       totalLessons,
-      completedLessonCounts,
+      completedLessonCounts
     );
     const completedModules = completedLessons;
     const remainingLessons = Math.max(0, totalLessons - completedModules);
@@ -223,6 +250,8 @@ export function mapUserToAdminProgress(
       enrolledAt: e.enrolledAt.toISOString(),
       completedAt: e.completedAt?.toISOString() ?? null,
       paymentReference: e.paymentReference,
+      certificateIssuedAt: e.certificateIssuedAt?.toISOString() ?? null,
+      listPriceAud: listPriceAudFromCourse(e.course),
       // REGISTRY-ONLY, FAIL-CLOSED (GP-498). The admin user-detail view derives IICRC-submission
       // eligibility and the "N CEC" badge from this value — so it must be the gated registry
       // figure, never the stale WP-import `cecHours`. No approval → null (ineligible, no badge).
@@ -243,8 +272,17 @@ export function mapUserToAdminProgress(
 
   const completedCourseCount = enrollmentsProgress.filter((e) => e.completionPct >= 100).length;
   const activeCourseCount = enrollmentsProgress.filter(
-    (e) => e.completionPct > 0 && e.completionPct < 100,
+    (e) => e.completionPct > 0 && e.completionPct < 100
   ).length;
+  const neverStartedCount = enrollmentsProgress.filter((e) => {
+    const status = normalizeEnrollmentStatus(e.status);
+    return status === 'active' && e.completedLessons === 0;
+  }).length;
+  const paidEnrollmentCount = userEnrollments.filter(enrollmentLooksPaid).length;
+  const certificatesCount = userEnrollments.filter((e) => e.certificateIssuedAt).length;
+  const spentAud = userEnrollments
+    .filter(enrollmentLooksPaid)
+    .reduce((sum, e) => sum + listPriceAudFromCourse(e.course), 0);
 
   return {
     userId: user.id,
@@ -262,6 +300,10 @@ export function mapUserToAdminProgress(
     enrollmentCount: enrollmentsProgress.length,
     completedCourseCount,
     activeCourseCount,
+    neverStartedCount,
+    paidEnrollmentCount,
+    certificatesCount,
+    spentAud,
     enrollments: enrollmentsProgress.sort((a, b) => b.completionPct - a.completionPct),
   };
 }
@@ -274,12 +316,15 @@ const enrollmentSelect = {
   paymentReference: true,
   enrolledAt: true,
   completedAt: true,
+  certificateIssuedAt: true,
   course: {
     select: {
       id: true,
       slug: true,
       title: true,
       iicrcDiscipline: true,
+      isFree: true,
+      priceAud: true,
       modules: {
         orderBy: { orderIndex: 'asc' },
         select: {
