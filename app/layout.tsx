@@ -1,4 +1,3 @@
-import { ReticleDev } from './reticle-dev';
 import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import { Outfit, Plus_Jakarta_Sans } from 'next/font/google';
@@ -118,7 +117,6 @@ export default function RootLayout({
         className={`${outfit.variable} ${plusJakarta.variable} font-sans`}
         suppressHydrationWarning
       >
-        {process.env.NODE_ENV === 'development' ? <ReticleDev /> : null}
         <AuthProvider>
           <ThemeProvider initialTheme="light">
             <ServiceWorkerRegistration />
