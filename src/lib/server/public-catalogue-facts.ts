@@ -14,9 +14,31 @@ export type PublicCatalogueFacts = {
   publishedCourseCount: number;
   /** Distinct IICRC discipline codes present on those courses (uppercase), sorted. */
   disciplineCodes: string[];
+  /**
+   * Lowest price (AUD) among published courses that are not free, or null when unknown.
+   * Feeds the per-course "From $N" label on /pricing, so it is never a hardcoded figure.
+   */
+  minPaidCoursePriceAud: number | null;
   /** Where the numbers came from — same resolution order as the course catalogue. */
   source: CatalogueFactsSource;
 };
+
+/**
+ * Lowest price among paid courses. Free courses and non-positive or unreadable prices are
+ * skipped, because "From $0" would advertise a price nobody pays for a paid course.
+ */
+export function minPaidCoursePrice(
+  items: Array<{ price_aud?: number | string | null; is_free?: boolean | null }>
+): number | null {
+  let min: number | null = null;
+  for (const item of items) {
+    if (item.is_free) continue;
+    const price = Number(item.price_aud);
+    if (!Number.isFinite(price) || price <= 0) continue;
+    if (min === null || price < min) min = price;
+  }
+  return min;
+}
 
 function collectDisciplineCodes(
   disciplines: Array<string | null | undefined>
@@ -40,6 +62,7 @@ export function deriveCatalogueFactsFromCourseItems(
   return {
     publishedCourseCount: items.length,
     disciplineCodes: collectDisciplineCodes(items.map((i) => i.discipline)),
+    minPaidCoursePriceAud: minPaidCoursePrice(items),
     source,
   };
 }
@@ -56,7 +79,12 @@ async function fetchBackendCatalogueFacts(): Promise<PublicCatalogueFacts | null
     clearTimeout(timeoutId);
     if (!res.ok) return null;
     const data = (await res.json()) as {
-      items?: Array<{ discipline?: string | null; iicrc_discipline?: string | null }>;
+      items?: Array<{
+        discipline?: string | null;
+        iicrc_discipline?: string | null;
+        price_aud?: number | string | null;
+        is_free?: boolean | null;
+      }>;
       total?: number;
     };
     const items = Array.isArray(data.items) ? data.items : [];
@@ -72,6 +100,7 @@ async function fetchBackendCatalogueFacts(): Promise<PublicCatalogueFacts | null
     return {
       publishedCourseCount: total > 0 ? total : items.length,
       disciplineCodes: [...codes].sort(),
+      minPaidCoursePriceAud: minPaidCoursePrice(items),
       source: 'api',
     };
   } catch {
@@ -90,7 +119,7 @@ async function computePublicCatalogueFacts(): Promise<PublicCatalogueFacts> {
   // At build time the DB/backend are unreachable; return the empty fallback instantly
   // so ISR pages prerender without hanging, then hydrate real facts at runtime (#129).
   if (isBuildPhase()) {
-    return { publishedCourseCount: 0, disciplineCodes: [], source: 'none' };
+    return { publishedCourseCount: 0, disciplineCodes: [], minPaidCoursePriceAud: null, source: 'none' };
   }
 
   if (process.env.DATABASE_URL?.trim()) {
@@ -99,11 +128,14 @@ async function computePublicCatalogueFacts(): Promise<PublicCatalogueFacts> {
       if (count > 0) {
         const rows = await prisma.lmsCourse.findMany({
           where: lmsPublishedCourseWhere,
-          select: { iicrcDiscipline: true },
+          select: { iicrcDiscipline: true, priceAud: true, isFree: true },
         });
         return {
           publishedCourseCount: count,
           disciplineCodes: collectDisciplineCodes(rows.map((r) => r.iicrcDiscipline)),
+          minPaidCoursePriceAud: minPaidCoursePrice(
+            rows.map((r) => ({ price_aud: Number(r.priceAud), is_free: r.isFree }))
+          ),
           source: 'database',
         };
       }
@@ -118,6 +150,7 @@ async function computePublicCatalogueFacts(): Promise<PublicCatalogueFacts> {
   return {
     publishedCourseCount: 0,
     disciplineCodes: [],
+    minPaidCoursePriceAud: null,
     source: 'none',
   };
 }

@@ -3,7 +3,7 @@
  * subscription status (WS1-E2, GP-442), for the owner dashboard seats/usage view
  * and member "included in your team membership" affordances.
  *
- * When SUBSCRIPTIONS_ENABLED is off, or the user is not signed in, returns the
+ * When SUBSCRIPTIONS_ENABLED or TEAMS_SUBSCRIPTIONS_ENABLED is off, or the user is not signed in, returns the
  * "no team subscription" payload so behaviour is unchanged until enabled. Fails
  * closed on any error.
  */
@@ -12,7 +12,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { getTeamEntitlements } from '@/lib/server/entitlements';
-import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
+import { teamSubscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 
 const NO_TEAM_SUBSCRIPTION = {
   has_team_subscription: false,
@@ -28,7 +28,7 @@ const NO_TEAM_SUBSCRIPTION = {
 };
 
 export async function GET(request: NextRequest) {
-  if (!subscriptionsEnabled()) {
+  if (!teamSubscriptionsEnabled()) {
     return NextResponse.json(NO_TEAM_SUBSCRIPTION);
   }
 

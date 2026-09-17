@@ -29,15 +29,42 @@ export interface TeamTier {
   comingSoon?: boolean;
 }
 
+/**
+ * Shown when the lowest published course price cannot be read (no database and no API, or the
+ * build-time prerender). Deliberately carries no number: a stale "From $X" is a wrong price
+ * claim, and a missing figure is not.
+ */
+export const PER_COURSE_PRICE_FALLBACK_LABEL = 'Priced per course';
+
+/**
+ * "From $N" for the per-course tier, built from the lowest price among PAID published
+ * courses (`PublicCatalogueFacts.minPaidCoursePriceAud`), which comes from the same source as
+ * the `/courses` list. Returns null when there is no usable figure, so each caller decides
+ * what to say instead of printing a guess.
+ */
+export function perCoursePriceLabel(
+  minPaidCoursePriceAud: number | null | undefined
+): string | null {
+  if (typeof minPaidCoursePriceAud !== 'number') return null;
+  if (!Number.isFinite(minPaidCoursePriceAud) || minPaidCoursePriceAud <= 0) return null;
+  const amount = Number.isInteger(minPaidCoursePriceAud)
+    ? String(minPaidCoursePriceAud)
+    : minPaidCoursePriceAud.toFixed(2);
+  return `From $${amount}`;
+}
+
 export const INDIVIDUAL_TIERS: IndividualTier[] = [
   {
     id: 'per_course',
-    // Published course prices currently range from $20 to $770; keep this in sync
-    // with the actual lowest-priced published course, not an assumed/rounded figure.
     name: 'Per course',
-    priceLabel: 'From $20',
+    // The real "From $N" figure is derived at render time from the live catalogue via
+    // perCoursePriceLabel(); this static value is only the no-data fallback.
+    priceLabel: PER_COURSE_PRICE_FALLBACK_LABEL,
     priceCents: null,
-    description: 'Pay once per IICRC CEC Accredited course. CECs tracked on completion.',
+    // Not every course carries IICRC CECs, so this must not call every per-course purchase
+    // "IICRC CEC Accredited". Only courses the IICRC has approved for CECs earn them.
+    description:
+      'Pay once per course. CECs are tracked on completion, only for courses the IICRC has approved.',
     cta: 'Browse courses',
     href: '/courses',
   },

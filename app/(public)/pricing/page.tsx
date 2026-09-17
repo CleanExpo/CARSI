@@ -3,10 +3,13 @@ import Link from 'next/link';
 
 import { PricingTiers } from '@/components/pricing/PricingTiers';
 import { BreadcrumbSchema, FAQSchema } from '@/components/seo';
+import { PER_COURSE_PRICE_FALLBACK_LABEL, perCoursePriceLabel } from '@/lib/lms/pricing-tiers';
 import { OG_IMAGES } from '@/lib/seo/og-image';
-import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
+import { getPublicCatalogueFacts } from '@/lib/server/public-catalogue-facts';
+import { subscriptionsEnabled, teamSubscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 
-// `subscriptionsEnabled()` reads process.env at render time. Without this the
+// The two flag readers (`subscriptionsEnabled()`, `teamSubscriptionsEnabled()`) read
+// process.env at render time. Without this the
 // page is statically prerendered at BUILD time and served s-maxage=31536000,
 // so the flag's value is baked into the HTML and a run-time env var can never
 // reach it — flipping the flag would require a full rebuild, which is exactly
@@ -15,11 +18,14 @@ export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(): Promise<Metadata> {
   const live = subscriptionsEnabled();
+  const teamsLive = teamSubscriptionsEnabled();
   return {
     title: 'Pricing — Restoration Training Online',
-    description: live
+    description: teamsLive
       ? 'Buy any CARSI course individually or choose yearly membership and Teams plans. Free Library available to everyone, no card required.'
-      : 'Buy any CARSI course individually — with IICRC CEC tracking and verified certificates. Free Library available to everyone, no card required. Yearly membership and Teams plans are coming soon.',
+      : live
+        ? 'Buy any CARSI course individually or choose yearly membership. Free Library available to everyone, no card required. Teams plans are coming soon.'
+        : 'Buy any CARSI course individually — with IICRC CEC tracking and verified certificates. Free Library available to everyone, no card required. Yearly membership and Teams plans are coming soon.',
     keywords: [
       'CARSI pricing',
       'restoration training membership',
@@ -31,9 +37,11 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       images: OG_IMAGES,
       title: 'Pricing | CARSI — Restoration Training Online',
-      description: live
+      description: teamsLive
         ? 'Free Library, per-course enrolment, yearly membership, and Teams seat plans.'
-        : 'Free Library for everyone and per-course enrolment, available today. Yearly membership and Teams plans are coming soon.',
+        : live
+          ? 'Free Library, per-course enrolment and yearly membership. Teams plans are coming soon.'
+          : 'Free Library for everyone and per-course enrolment, available today. Yearly membership and Teams plans are coming soon.',
       type: 'website',
       url: 'https://carsi.com.au/pricing',
     },
@@ -80,9 +88,13 @@ const FREE_FEATURES = [
   'ChatGPT Cheat Sheet for Restorers',
 ];
 
-export default function PricingPage() {
+export default async function PricingPage() {
   const live = subscriptionsEnabled();
+  const teamsLive = teamSubscriptionsEnabled();
   const faqItems = buildFaqItems(live);
+  const facts = await getPublicCatalogueFacts();
+  const perCourseLabel =
+    perCoursePriceLabel(facts.minPaidCoursePriceAud) ?? PER_COURSE_PRICE_FALLBACK_LABEL;
 
   return (
     <>
@@ -99,9 +111,11 @@ export default function PricingPage() {
               Membership &amp; Pricing
             </h1>
             <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-slate-600">
-              {live
+              {teamsLive
                 ? 'Buy any course individually, unlock 100% access with yearly membership, or choose Teams seat plans for your crew.'
-                : 'Buy any course individually. Free Library for everyone — no card required. Yearly membership and Teams plans are coming soon.'}
+                : live
+                  ? 'Buy any course individually or unlock 100% access with yearly membership. Teams plans are coming soon.'
+                  : 'Buy any course individually. Free Library for everyone — no card required. Yearly membership and Teams plans are coming soon.'}
             </p>
             <p className="mx-auto mt-4 max-w-2xl rounded-lg border border-[#f2cf8f] bg-[#fff8ed] px-4 py-3 text-sm leading-relaxed text-[#7a3500]">
               CARSI courses carry CARSI Southern Hemisphere Restoration Designations. CARSI does not
@@ -154,8 +168,10 @@ export default function PricingPage() {
               </h2>
               <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
                 Published team prices are below. The facility-management page maps those seats to
-                the live site pathways and the employer proof-pack. Team checkout is coming soon —
-                contact CARSI to start a crew.
+                the live site pathways and the employer proof-pack.{' '}
+                {teamsLive
+                  ? 'Start a Teams plan below, or contact CARSI to plan a larger crew.'
+                  : 'Team checkout is coming soon — contact CARSI to start a crew.'}
               </p>
             </div>
             <Link
@@ -166,7 +182,11 @@ export default function PricingPage() {
             </Link>
           </section>
 
-          <PricingTiers subscriptionsEnabled={live} />
+          <PricingTiers
+            subscriptionsEnabled={live}
+            teamsEnabled={teamsLive}
+            perCoursePriceLabel={perCourseLabel}
+          />
 
           <section aria-label="Free Library" className="mb-16">
             <div className="mx-auto max-w-md">

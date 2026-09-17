@@ -16,7 +16,17 @@ The code is already merged and deployed **dark**. It does nothing user-visible u
 | Stripe Price lookup key | `carsi_pro_annual` |
 | Optional explicit Price env var | `STRIPE_PRICE_PRO_ANNUAL` (a `price_...` id) |
 | Feature flag env var | `SUBSCRIPTIONS_ENABLED=true` |
+| Teams + organisation flag (separate, leave off for a yearly-only launch) | `TEAMS_SUBSCRIPTIONS_ENABLED=true` |
 | Webhook endpoint (already exists) | `https://carsi.com.au/api/lms/webhooks/stripe` |
+
+**Two switches.** `SUBSCRIPTIONS_ENABLED` turns on the individual yearly membership. Teams seat plans and the organisation monthly plan need **both** `SUBSCRIPTIONS_ENABLED` and `TEAMS_SUBSCRIPTIONS_ENABLED`. So the yearly membership can go on sale by itself while Teams and org stay "coming soon".
+
+| `SUBSCRIPTIONS_ENABLED` | `TEAMS_SUBSCRIPTIONS_ENABLED` | Yearly membership | Teams + org |
+|---|---|---|---|
+| off | off | coming soon | coming soon |
+| off | on | coming soon | coming soon |
+| on | off | **on sale** | coming soon (routes return 503) |
+| on | on | **on sale** | **on sale** |
 
 Price resolution order in code: **`STRIPE_PRICE_PRO_ANNUAL` if set, otherwise look up the active Price whose `lookup_key` is `carsi_pro_annual`.** So you can do either — setting the env var is optional if the lookup key is in place. If neither resolves, checkout fails **closed** with an honest "Membership purchasing is not yet available" message. It never charges against a wrong Price.
 
@@ -79,6 +89,28 @@ In the DigitalOcean App Platform console for the CARSI app → **Settings → Ap
 1. `SUBSCRIPTIONS_ENABLED` = `true`  — **leave this OFF/unset until Steps A + D are done and verified.** This is the go/no-go switch.
 2. `STRIPE_PRICE_PRO_ANNUAL` = `price_...` — **optional.** Set it to the Price id from Step A if you want an explicit binding; otherwise the code resolves by lookup key `carsi_pro_annual` at runtime and caches it.
 3. Confirm the already-present Stripe vars are correct for the target mode: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`.
+4. `TEAMS_SUBSCRIPTIONS_ENABLED` — **leave unset (or `false`) for the yearly-only launch.** Setting it has no effect while `SUBSCRIPTIONS_ENABLED` is off.
+
+### Automated check before and after the flip
+
+Run this from a laptop. It only reads (GET requests, plus one unauthenticated checkout POST that is refused before anything is charged):
+
+```bash
+# Before the flip: both plans must still look "coming soon".
+BASE_URL=https://carsi.com.au npm run verify:go-live-readiness
+
+# After setting SUBSCRIPTIONS_ENABLED=true (yearly only), say what you expect to see.
+# STRIPE_PRICE_PRO_ANNUAL must hold the same price_... id you set in DigitalOcean;
+# the script checks its shape and never prints it.
+EXPECT_SUBSCRIPTIONS_ENABLED=true STRIPE_PRICE_PRO_ANNUAL=price_... \
+  BASE_URL=https://carsi.com.au npm run verify:go-live-readiness
+```
+
+- `EXPECT_SUBSCRIPTIONS_ENABLED` / `EXPECT_TEAMS_SUBSCRIPTIONS_ENABLED` (default `false`) tell the script which state `/pricing` and the Teams checkout should be in.
+- If you chose lookup-key resolution and did not set `STRIPE_PRICE_PRO_ANNUAL`, add `ALLOW_PRICE_LOOKUP_KEY=true`. The script then reports the price as **not checked**, not as passed. Confirm the `carsi_pro_annual` Price in Stripe yourself.
+- Exit `0` = every check passed. Exit `1` = at least one check failed. Exit `2` = the site could not be judged, because the gateway answered `502`/`504` (or a `503` with no app message), or the request never connected. **An exit `2` is an infrastructure problem on DigitalOcean, not "the plan is switched off".** Fix it and run again.
+- **DigitalOcean rewrites the app's 503.** When a switched-off route answers 503, DigitalOcean App Platform's edge replaces it with its own generic HTML **504** page and keeps the app's real status in the `x-do-orig-status` response header (measured on carsi.com.au, 17/09/2026). The script reads that header, so this shows as `HTTP 503 (edge rewrote to 504) (disabled)` and passes. A 504 without that header, or with `x-do-orig-status: 504`, is still an infrastructure failure.
+- **User-experience note, not fixed here:** because of that rewrite, a browser or API client calling a switched-off route (for example `/api/lms/subscription/portal`, Teams checkout or org checkout) sees DigitalOcean's generic error page, not the app's "not yet available" message.
 
 Saving env vars triggers a redeploy. The additive database migration (`lms_subscriptions`) runs automatically in the existing **PRE_DEPLOY `prisma migrate deploy`** job — you do **not** run migrations by hand.
 
@@ -198,9 +230,10 @@ Before go-live, confirm no yearly/Teams subscription was ever charged in the pas
 
 # WS1-E2 / E3 — Teams seat plans + Organisation monthly (GP-442 / GP-443)
 
-E2 (Teams seats) and E3 (organisation monthly) ship behind the **same**
-`SUBSCRIPTIONS_ENABLED` flag and the **same** webhook endpoint as E1. Nothing is
-user-visible until (a) the Prices exist, and (b) the flag is on. The webhook
+E2 (Teams seats) and E3 (organisation monthly) need **both**
+`SUBSCRIPTIONS_ENABLED` and their own `TEAMS_SUBSCRIPTIONS_ENABLED` flag, and use
+the **same** webhook endpoint as E1. Nothing is user-visible until (a) the
+Prices exist, and (b) both flags are on. The webhook
 routes each subscription to the right record by its `plan` metadata, so no new
 webhook or new events are needed — the same five events from Step C cover E2/E3.
 
@@ -234,7 +267,15 @@ Notes:
 Optional explicit bindings (the app resolves by lookup key without them):
 `STRIPE_PRICE_TEAMS_STARTER`, `STRIPE_PRICE_TEAMS_GROWTH`,
 `STRIPE_PRICE_TEAMS_FULL_LIBRARY`, `STRIPE_PRICE_ORG_MONTHLY`.
-The go/no-go flag is the same `SUBSCRIPTIONS_ENABLED=true`.
+The go/no-go switch is `TEAMS_SUBSCRIPTIONS_ENABLED=true`, set only once
+`SUBSCRIPTIONS_ENABLED=true` is already on. Rollback = set
+`TEAMS_SUBSCRIPTIONS_ENABLED=false`; the yearly membership is unaffected.
+
+**Known gap before Teams goes on sale:** the Teams cards advertise "+$49/seat",
+"+$39/seat" and "+$29/seat", but seat expansion raises the subscription
+`quantity` on the tier's single Price, so each extra seat is billed at that
+Price's unit amount, not the advertised per-seat figure. Resolve this (per-seat
+Prices, or change the labels) before setting `TEAMS_SUBSCRIPTIONS_ENABLED=true`.
 
 ## E3 — flip the onboarding course off `isFree` (ops, LAST)
 Once the org Price exists, the flag is on, and at least one org is provisioned

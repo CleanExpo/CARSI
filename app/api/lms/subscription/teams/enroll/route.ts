@@ -23,10 +23,10 @@ import { enrollStudentInCourse } from '@/lib/server/enrollment-service';
 import { getTeamEntitlements } from '@/lib/server/entitlements';
 import { getFirstLessonLearnPath } from '@/lib/server/first-lesson';
 import { getPublishedCourseForCheckout } from '@/lib/server/public-courses-list';
-import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
+import { teamSubscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 
 export async function POST(request: NextRequest) {
-  if (!subscriptionsEnabled()) {
+  if (!teamSubscriptionsEnabled()) {
     return NextResponse.json({ detail: 'Teams membership is not yet available.' }, { status: 503 });
   }
 

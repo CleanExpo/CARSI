@@ -3,14 +3,14 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { runSerializable } from '@/lib/server/db-tx';
-import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
+import { teamSubscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 import { enrollTeamMemberInPurchasedCourse } from '@/lib/server/team-course-purchase';
 
 /** POST /api/lms/teams/invite/accept — accept invite token. */
 export async function POST(request: NextRequest) {
   // Membership-mutating route: gated behind the subscriptions flag for
   // consistency with the sibling Teams/org routes (teams/enroll, org/enroll, …).
-  if (!subscriptionsEnabled()) {
+  if (!teamSubscriptionsEnabled()) {
     return NextResponse.json({ detail: 'Teams membership is not yet available.' }, { status: 503 });
   }
 
