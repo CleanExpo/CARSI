@@ -3,12 +3,15 @@
  * (SUBSCRIPTIONS_ENABLED). Teams and org need BOTH; the yearly membership needs only its own.
  *
  * Every combination of the two flags is exercised, against the flag readers AND against the
- * five purchase/entitlement routes, because a route that kept reading `subscriptionsEnabled()`
+ * six purchase/entitlement/membership routes, because a route that kept reading `subscriptionsEnabled()`
  * would put Teams on sale the moment the yearly membership launched.
  *
  * Each route is driven with NO session. Every one of them reads the flag before the session, so
  * a gated route answers 503 and an open one reaches the sign-in check and answers 401. Nothing
  * below the session check runs, which is why Stripe and the database are stubs that throw.
+ *
+ * The onboarding routes read the Teams flag only after the session, so they are covered with a
+ * signed-in user in onboarding-org-flag.test.ts.
  */
 import { NextRequest } from 'next/server';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -87,6 +90,7 @@ const ROUTES = [
   ],
   ['org checkout', () => import('../../../app/api/lms/subscription/org/checkout/route')],
   ['org enroll', () => import('../../../app/api/lms/subscription/org/enroll/route')],
+  ['teams invite accept', () => import('../../../app/api/lms/teams/invite/accept/route')],
 ] as const;
 
 function post(): NextRequest {
