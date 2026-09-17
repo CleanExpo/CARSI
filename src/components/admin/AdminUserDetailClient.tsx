@@ -1,8 +1,5 @@
 'use client';
 
-import Link from 'next/link';
-import { useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import {
   ArrowLeft,
   Award,
@@ -21,10 +18,17 @@ import {
   Trash2,
   UserRound,
 } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useMemo, useState } from 'react';
 import { Cell, Pie, PieChart, Tooltip } from 'recharts';
 
-import type { AdminCatalogCourseOption, AdminUserProgress } from '@/lib/admin/admin-user-progress';
-import type { AdminCourseProgressForUser } from '@/lib/admin/admin-user-progress';
+import { formatAud } from '@/lib/admin/admin-ops-format';
+import type {
+  AdminCatalogCourseOption,
+  AdminCourseProgressForUser,
+  AdminUserProgress,
+} from '@/lib/admin/admin-user-progress';
 
 import {
   adminGlassCard,
@@ -35,11 +39,17 @@ import {
   LearnerAvatar,
   StatusBadge,
 } from '@/components/admin/admin-learner-ui';
-import { renewalStatusLabel, type RenewalStatus } from '@/types/iicrc-renewal';
 import { AdminCourseMultiPicker } from '@/components/admin/AdminCourseMultiPicker';
 import { ProgressBar } from '@/components/lms/ProgressBar';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -51,6 +61,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
+import { renewalStatusLabel, type RenewalStatus } from '@/types/iicrc-renewal';
 
 const chartTooltipProps = {
   contentStyle: {
@@ -112,7 +123,7 @@ function CourseEnrollmentCard({
         adminGlassCard,
         'overflow-hidden p-0',
         isComplete && 'border-emerald-400/20',
-        selected && 'ring-1 ring-[#2490ed]/45',
+        selected && 'ring-1 ring-[#2490ed]/45'
       )}
     >
       <div className="border-b border-white/[0.06] px-5 py-4 sm:px-6">
@@ -139,13 +150,13 @@ function CourseEnrollmentCard({
                 <span className="text-xs text-white/45">{enrollment.resolvedCecHours} CEC</span>
               ) : null}
             </div>
-            <h3 className="text-lg font-semibold tracking-tight text-white/95">{enrollment.courseTitle}</h3>
+            <h3 className="text-lg font-semibold tracking-tight text-white/95">
+              {enrollment.courseTitle}
+            </h3>
             <p className="text-sm text-white/48">
               {enrollment.completedLessons} of {enrollment.totalLessons} lessons ·{' '}
               {enrollment.completedModules} modules complete
-              {enrollment.remainingLessons > 0
-                ? ` · ${enrollment.remainingLessons} remaining`
-                : ''}
+              {enrollment.remainingLessons > 0 ? ` · ${enrollment.remainingLessons} remaining` : ''}
             </p>
             <dl className="grid gap-2 text-xs text-white/42 sm:grid-cols-2">
               <div>
@@ -193,7 +204,9 @@ function CourseEnrollmentCard({
                 size="sm"
                 className="h-9 rounded-lg border-white/10 bg-white/[0.06] text-white/85 hover:bg-white/10"
                 disabled={pendingDownloadCertificate || pendingRevoke || pendingComplete}
-                onClick={() => onDownloadCertificate(enrollment.enrollmentId, enrollment.courseSlug)}
+                onClick={() =>
+                  onDownloadCertificate(enrollment.enrollmentId, enrollment.courseSlug)
+                }
               >
                 {pendingDownloadCertificate ? (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -214,7 +227,11 @@ function CourseEnrollmentCard({
               onClick={() => onRevoke(enrollment.enrollmentId)}
               title="Remove enrollment"
             >
-              {pendingRevoke ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+              {pendingRevoke ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Trash2 className="h-4 w-4" />
+              )}
             </Button>
           </div>
         </div>
@@ -237,7 +254,8 @@ function CourseEnrollmentCard({
                       ? 'success'
                       : enrollment.renewalStatus === 'awaiting_response'
                         ? 'warning'
-                        : enrollment.renewalStatus === 'failed' || enrollment.renewalStatus === 'rejected'
+                        : enrollment.renewalStatus === 'failed' ||
+                            enrollment.renewalStatus === 'rejected'
                           ? 'warning'
                           : 'muted'
                   }
@@ -293,7 +311,9 @@ function CourseEnrollmentCard({
         ) : null}
       </div>
       <div className="bg-black/15 px-5 py-4 sm:px-6">
-        <p className="mb-3 text-[10px] font-semibold tracking-[0.18em] text-white/38 uppercase">Modules</p>
+        <p className="mb-3 text-[10px] font-semibold tracking-[0.18em] text-white/38 uppercase">
+          Modules
+        </p>
         <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
           {enrollment.modules.map((m) => (
             <div
@@ -302,15 +322,13 @@ function CourseEnrollmentCard({
                 'flex gap-3 rounded-xl border px-3 py-3 text-sm transition-colors',
                 m.completed
                   ? 'border-emerald-400/25 bg-emerald-400/[0.08]'
-                  : 'border-white/[0.08] bg-white/[0.02]',
+                  : 'border-white/[0.08] bg-white/[0.02]'
               )}
             >
               <div
                 className={cn(
                   'mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold',
-                  m.completed
-                    ? 'bg-emerald-400/20 text-emerald-200'
-                    : 'bg-white/8 text-white/45',
+                  m.completed ? 'bg-emerald-400/20 text-emerald-200' : 'bg-white/8 text-white/45'
                 )}
               >
                 {m.completed ? <CheckCircle2 className="h-3.5 w-3.5" /> : m.moduleNo}
@@ -359,13 +377,16 @@ export function AdminUserDetailClient({
 
   const incompleteEnrollments = useMemo(
     () => user.enrollments.filter((e) => e.completionPct < 100),
-    [user.enrollments],
+    [user.enrollments]
   );
 
-  const enrolledSlugs = useMemo(() => new Set(user.enrollments.map((e) => e.courseSlug)), [user.enrollments]);
+  const enrolledSlugs = useMemo(
+    () => new Set(user.enrollments.map((e) => e.courseSlug)),
+    [user.enrollments]
+  );
   const grantableCount = useMemo(
     () => catalogCourses.filter((c) => !enrolledSlugs.has(c.slug)).length,
-    [catalogCourses, enrolledSlugs],
+    [catalogCourses, enrolledSlugs]
   );
 
   const completedCourses = user.enrollments.filter((e) => e.completionPct >= 100).length;
@@ -377,12 +398,12 @@ export function AdminUserDetailClient({
       { name: 'done', value: user.overallCompletionPct },
       { name: 'rest', value: Math.max(0, 100 - user.overallCompletionPct) },
     ],
-    [user.overallCompletionPct],
+    [user.overallCompletionPct]
   );
 
   const cecEligibleCompleted = useMemo(
     () => user.enrollments.filter((e) => e.completionPct >= 100 && isCecEligibleEnrollment(e)),
-    [user.enrollments],
+    [user.enrollments]
   );
 
   const hasIicrcMemberNumber = Boolean(user.iicrcMemberNumber?.trim());
@@ -474,7 +495,9 @@ export function AdminUserDetailClient({
       setSelectedEnrollmentIds(new Set());
       router.refresh();
     } catch {
-      setActionError('Could not mark courses complete. Please check your connection and try again.');
+      setActionError(
+        'Could not mark courses complete. Please check your connection and try again.'
+      );
     } finally {
       setPendingCompleteIds(new Set());
     }
@@ -486,7 +509,9 @@ export function AdminUserDetailClient({
 
     const iicrcMemberNumber = user.iicrcMemberNumber?.trim();
     if (!iicrcMemberNumber) {
-      setActionError('Add an IICRC member number to this learner profile before sending renewal email.');
+      setActionError(
+        'Add an IICRC member number to this learner profile before sending renewal email.'
+      );
       return;
     }
 
@@ -514,7 +539,7 @@ export function AdminUserDetailClient({
       if (res.status === 202 || payload.status === 'processing') {
         setActionSuccess(
           payload.detail ??
-            'IICRC renewal email is being sent. Refresh in a moment or check Admin → IICRC CEC.',
+            'IICRC renewal email is being sent. Refresh in a moment or check Admin → IICRC CEC.'
         );
         router.refresh();
         return;
@@ -522,7 +547,7 @@ export function AdminUserDetailClient({
       if (!res.ok) {
         if (res.status === 504) {
           setActionError(
-            'Request timed out while sending to IICRC. Check Admin → IICRC CEC for whether the email was logged.',
+            'Request timed out while sending to IICRC. Check Admin → IICRC CEC for whether the email was logged.'
           );
           return;
         }
@@ -534,11 +559,13 @@ export function AdminUserDetailClient({
       } else if (payload.status === 'sent') {
         setActionSuccess('IICRC renewal email sent successfully.');
       } else if (payload.status === 'failed') {
-        setActionError(payload.detail ?? 'IICRC email delivery failed — check the communication log.');
+        setActionError(
+          payload.detail ?? 'IICRC email delivery failed — check the communication log.'
+        );
       } else if (payload.status === 'skipped') {
         setActionError(
           payload.detail ??
-            'IICRC submission was skipped — verify course CEC eligibility, MAILTRAP_API_KEY, and completion status.',
+            'IICRC submission was skipped — verify course CEC eligibility, MAILTRAP_API_KEY, and completion status.'
         );
       }
       router.refresh();
@@ -619,7 +646,7 @@ export function AdminUserDetailClient({
     try {
       const res = await fetch(
         `/api/admin/enrollments/${encodeURIComponent(enrollmentId)}/certificate?studentId=${encodeURIComponent(user.userId)}`,
-        { credentials: 'include' },
+        { credentials: 'include' }
       );
       if (!res.ok) {
         const payload = (await res.json().catch(() => ({}))) as { detail?: string };
@@ -643,8 +670,7 @@ export function AdminUserDetailClient({
 
   const bulkCompletePending = pendingCompleteIds.size > 0;
   const selectedCount = selectedEnrollmentIds.size;
-  const enrollDisabled =
-    selectedCourseSlugs.size === 0 || pendingGrant || grantableCount === 0;
+  const enrollDisabled = selectedCourseSlugs.size === 0 || pendingGrant || grantableCount === 0;
   const enrollButtonLabel =
     selectedCourseSlugs.size > 0
       ? `Enroll in ${selectedCourseSlugs.size} course${selectedCourseSlugs.size === 1 ? '' : 's'}`
@@ -706,12 +732,24 @@ export function AdminUserDetailClient({
                     <StatusBadge key={r} label={r} tone="info" />
                   ))}
                 </div>
-                <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">{displayName}</h1>
+                <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                  {displayName}
+                </h1>
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-white/55">
                   <span className="inline-flex items-center gap-1.5">
                     <Mail className="h-3.5 w-3.5 shrink-0" />
                     {user.email}
                   </span>
+                  {user.spentAud > 0 ? (
+                    <span className="text-white/70 tabular-nums">
+                      {formatAud(user.spentAud)} recognised
+                    </span>
+                  ) : null}
+                  {user.neverStartedCount > 0 ? (
+                    <span className="text-[#f2cf8f]">
+                      {user.neverStartedCount} course not started
+                    </span>
+                  ) : null}
                   {user.iicrcMemberNumber ? (
                     <span className="inline-flex items-center gap-1.5">
                       <Hash className="h-3.5 w-3.5 shrink-0" />
@@ -746,7 +784,9 @@ export function AdminUserDetailClient({
                 >
                   {user.overallCompletionPct}%
                 </span>
-                <span className="text-[10px] font-semibold tracking-[0.2em] text-white/38 uppercase">overall</span>
+                <span className="text-[10px] font-semibold tracking-[0.2em] text-white/38 uppercase">
+                  overall
+                </span>
               </div>
             </div>
           </div>
@@ -755,17 +795,28 @@ export function AdminUserDetailClient({
           {[
             { label: 'Enrollments', value: user.enrollments.length, icon: BookOpen },
             { label: 'Courses complete', value: completedCourses, icon: Award },
-            { label: 'Lessons done', value: `${totalLessonsDone}/${totalLessons}`, icon: CheckCircle2 },
-            { label: 'Last active', value: formatAdminDateTime(user.lastActiveAt), icon: Clock, small: true },
+            {
+              label: 'Lessons done',
+              value: `${totalLessonsDone}/${totalLessons}`,
+              icon: CheckCircle2,
+            },
+            {
+              label: 'Last active',
+              value: formatAdminDateTime(user.lastActiveAt),
+              icon: Clock,
+              small: true,
+            },
           ].map((stat) => (
             <div key={stat.label} className="flex items-center gap-3 bg-black/20 px-5 py-4">
               <stat.icon className="h-4 w-4 shrink-0 text-[#7ec5ff]" strokeWidth={1.75} />
               <div className="min-w-0">
-                <p className="text-[10px] font-semibold tracking-[0.14em] text-white/38 uppercase">{stat.label}</p>
+                <p className="text-[10px] font-semibold tracking-[0.14em] text-white/38 uppercase">
+                  {stat.label}
+                </p>
                 <p
                   className={cn(
                     'mt-0.5 font-bold text-white/90 tabular-nums',
-                    stat.small ? 'text-sm' : 'text-xl',
+                    stat.small ? 'text-sm' : 'text-xl'
                   )}
                 >
                   {stat.value}
@@ -783,17 +834,23 @@ export function AdminUserDetailClient({
               <UserRound className="h-4 w-4 text-[#7ec5ff]" />
               Account details
             </CardTitle>
-            <CardDescription className="text-white/45">Profile and membership information</CardDescription>
+            <CardDescription className="text-white/45">
+              Profile and membership information
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 pt-5 text-sm">
             <dl className="space-y-3">
               <div className="flex justify-between gap-4 border-b border-white/[0.05] pb-3">
                 <dt className="text-white/42">Member since</dt>
-                <dd className="text-right font-medium text-white/85">{formatAdminDate(user.createdAt)}</dd>
+                <dd className="text-right font-medium text-white/85">
+                  {formatAdminDate(user.createdAt)}
+                </dd>
               </div>
               <div className="flex justify-between gap-4 border-b border-white/[0.05] pb-3">
                 <dt className="text-white/42">Profile updated</dt>
-                <dd className="text-right font-medium text-white/85">{formatAdminDate(user.updatedAt)}</dd>
+                <dd className="text-right font-medium text-white/85">
+                  {formatAdminDate(user.updatedAt)}
+                </dd>
               </div>
               <div className="flex justify-between gap-4 border-b border-white/[0.05] pb-3">
                 <dt className="text-white/42">Platform role</dt>
@@ -814,7 +871,8 @@ export function AdminUserDetailClient({
             </dl>
             {!user.iicrcMemberNumber ? (
               <p className="rounded-lg border border-amber-400/20 bg-amber-400/5 px-3 py-2 text-xs text-amber-100/80">
-                No IICRC member number on file. Add it from the learner profile when they update credentials.
+                No IICRC member number on file. Add it from the learner profile when they update
+                credentials.
               </p>
             ) : null}
 
@@ -826,7 +884,8 @@ export function AdminUserDetailClient({
                     Password
                   </p>
                   <p className="mt-1 text-xs text-white/45">
-                    Generate a secure password or set a custom one. Optionally email it to the learner.
+                    Generate a secure password or set a custom one. Optionally email it to the
+                    learner.
                   </p>
                 </div>
                 <Button
@@ -862,9 +921,13 @@ export function AdminUserDetailClient({
                         className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-white/[0.06] bg-black/20 px-3 py-2"
                       >
                         <div className="min-w-0">
-                          <p className="truncate text-xs font-medium text-white/80">{e.courseTitle}</p>
+                          <p className="truncate text-xs font-medium text-white/80">
+                            {e.courseTitle}
+                          </p>
                           {e.resolvedCecHours != null && e.resolvedCecHours > 0 ? (
-                            <p className="text-[10px] text-white/40">{e.resolvedCecHours} CEC hours</p>
+                            <p className="text-[10px] text-white/40">
+                              {e.resolvedCecHours} CEC hours
+                            </p>
                           ) : null}
                         </div>
                         {alreadySent ? (
@@ -948,11 +1011,7 @@ export function AdminUserDetailClient({
                 disabled={enrollDisabled}
                 onClick={() => void grantSelectedCourses()}
               >
-                {pendingGrant ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  enrollButtonLabel
-                )}
+                {pendingGrant ? <Loader2 className="h-4 w-4 animate-spin" /> : enrollButtonLabel}
               </Button>
             </CardFooter>
           </Card>
@@ -963,7 +1022,7 @@ export function AdminUserDetailClient({
                 <div
                   className={cn(
                     adminGlassCard,
-                    'flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between',
+                    'flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between'
                   )}
                 >
                   <p className="text-sm text-white/55">
@@ -1029,13 +1088,9 @@ export function AdminUserDetailClient({
                     pendingRevoke={pendingRevokeId === e.enrollmentId}
                     pendingComplete={pendingCompleteIds.has(e.enrollmentId)}
                     onToggleSelect={() => toggleEnrollmentSelection(e.enrollmentId)}
-                    onRevoke={
-                      bulkCompletePending ? () => {} : (id) => void revokeEnrollment(id)
-                    }
+                    onRevoke={bulkCompletePending ? () => {} : (id) => void revokeEnrollment(id)}
                     onMarkComplete={
-                      bulkCompletePending
-                        ? () => {}
-                        : (id) => void markEnrollmentsComplete([id])
+                      bulkCompletePending ? () => {} : (id) => void markEnrollmentsComplete([id])
                     }
                     onSendIicrc={(id) => void sendIicrcRenewalEmail(id)}
                     onDownloadCertificate={(id, slug) => void downloadCertificate(id, slug)}
@@ -1047,7 +1102,7 @@ export function AdminUserDetailClient({
             <div
               className={cn(
                 adminGlassCard,
-                'flex flex-col items-center justify-center gap-4 py-16 text-center',
+                'flex flex-col items-center justify-center gap-4 py-16 text-center'
               )}
             >
               <Calendar className="h-10 w-10 text-white/25" strokeWidth={1.25} />
@@ -1085,7 +1140,10 @@ export function AdminUserDetailClient({
         </div>
       </div>
 
-      <Dialog open={passwordDialogOpen} onOpenChange={(open) => (open ? setPasswordDialogOpen(true) : closePasswordDialog())}>
+      <Dialog
+        open={passwordDialogOpen}
+        onOpenChange={(open) => (open ? setPasswordDialogOpen(true) : closePasswordDialog())}
+      >
         <DialogContent className="border-white/10 bg-[#0a0f1a] text-white sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-white">
@@ -1111,7 +1169,7 @@ export function AdminUserDetailClient({
                   <Input
                     readOnly
                     value={resetResult.password}
-                    className="font-mono text-sm border-white/10 bg-black/30 text-white"
+                    className="border-white/10 bg-black/30 font-mono text-sm text-white"
                   />
                   <Button
                     type="button"
@@ -1119,11 +1177,7 @@ export function AdminUserDetailClient({
                     className="shrink-0 border-white/10 bg-white/[0.06] text-white hover:bg-white/10"
                     onClick={() => void copyResetPassword()}
                   >
-                    {passwordCopied ? (
-                      <Check className="h-4 w-4" />
-                    ) : (
-                      <Copy className="h-4 w-4" />
-                    )}
+                    {passwordCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                   </Button>
                 </div>
               </div>
@@ -1140,11 +1194,13 @@ export function AdminUserDetailClient({
                       'rounded-xl border px-3 py-3 text-left text-sm transition-colors',
                       passwordMode === 'generate'
                         ? 'border-[#2490ed]/40 bg-[#2490ed]/10 text-white'
-                        : 'border-white/10 bg-white/[0.03] text-white/70 hover:bg-white/[0.05]',
+                        : 'border-white/10 bg-white/[0.03] text-white/70 hover:bg-white/[0.05]'
                     )}
                   >
                     <span className="font-medium">Generate secure password</span>
-                    <p className="mt-1 text-xs text-white/45">Recommended — random Carsi-… format</p>
+                    <p className="mt-1 text-xs text-white/45">
+                      Recommended — random Carsi-… format
+                    </p>
                   </button>
                   <button
                     type="button"
@@ -1153,7 +1209,7 @@ export function AdminUserDetailClient({
                       'rounded-xl border px-3 py-3 text-left text-sm transition-colors',
                       passwordMode === 'custom'
                         ? 'border-[#2490ed]/40 bg-[#2490ed]/10 text-white'
-                        : 'border-white/10 bg-white/[0.03] text-white/70 hover:bg-white/[0.05]',
+                        : 'border-white/10 bg-white/[0.03] text-white/70 hover:bg-white/[0.05]'
                     )}
                   >
                     <span className="font-medium">Set custom password</span>
