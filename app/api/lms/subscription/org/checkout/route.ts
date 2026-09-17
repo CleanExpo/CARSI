@@ -10,7 +10,7 @@
  * so the webhook can map the subscription back to the org and refresh its
  * lifecycle. Reuses `LmsTeam` as the org container (unlimited seats).
  *
- * Ships DARK behind SUBSCRIPTIONS_ENABLED and FAILS CLOSED at every uncertain
+ * Ships DARK behind SUBSCRIPTIONS_ENABLED + TEAMS_SUBSCRIPTIONS_ENABLED and FAILS CLOSED at every uncertain
  * step (flag off / not signed in / Stripe unconfigured / Price unresolvable).
  */
 
@@ -24,12 +24,12 @@ import {
   checkoutSessionIdempotencyKey,
   checkoutSessionExpiresAt,
 } from '@/lib/server/membership-checkout-reservation';
-import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
+import { teamSubscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 
 const UNAVAILABLE = 'Organisation subscription purchasing is not yet available.';
 
 export async function POST(request: NextRequest) {
-  if (!subscriptionsEnabled()) {
+  if (!teamSubscriptionsEnabled()) {
     return NextResponse.json({ detail: UNAVAILABLE }, { status: 503 });
   }
 

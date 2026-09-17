@@ -4,7 +4,7 @@ import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { enrollStudentInCourse } from '@/lib/server/enrollment-service';
 import { getOrgEntitlements } from '@/lib/server/entitlements';
 import { getOnboardingCourseBySlug } from '@/lib/server/onboarding-programs';
-import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
+import { teamSubscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 
 type Ctx = { params: Promise<{ slug: string }> };
 
@@ -16,7 +16,7 @@ type Ctx = { params: Promise<{ slug: string }> };
  * else must complete checkout first — direct enrolment stays gated (402) so the
  * course can safely be flipped off `isFree` without stranding non-subscribers.
  *
- * Ships DARK: when SUBSCRIPTIONS_ENABLED is off, the org path is inert and the
+ * Ships DARK: when SUBSCRIPTIONS_ENABLED or TEAMS_SUBSCRIPTIONS_ENABLED is off, the org path is inert and the
  * route behaves exactly as before (always 402). Fails closed on any uncertainty.
  */
 export async function POST(request: NextRequest, ctx: Ctx) {
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest, ctx: Ctx) {
   }
 
   // Org-subscription entitlement path (dark behind the flag).
-  if (subscriptionsEnabled()) {
+  if (teamSubscriptionsEnabled()) {
     const ent = await getOrgEntitlements(claims.sub);
     const inScope =
       ent.hasActiveOrg &&

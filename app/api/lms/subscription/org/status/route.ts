@@ -3,7 +3,7 @@
  * subscription status (WS1-E3, GP-443), for the org dashboard and the honest
  * "included in your organisation subscription" affordance.
  *
- * When SUBSCRIPTIONS_ENABLED is off, or the user is not signed in, returns the
+ * When SUBSCRIPTIONS_ENABLED or TEAMS_SUBSCRIPTIONS_ENABLED is off, or the user is not signed in, returns the
  * "no org subscription" payload so behaviour is unchanged until enabled. Fails
  * closed on any error.
  */
@@ -12,7 +12,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { getOrgEntitlements } from '@/lib/server/entitlements';
-import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
+import { teamSubscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 
 const NO_ORG_SUBSCRIPTION = {
   has_org_subscription: false,
@@ -25,7 +25,7 @@ const NO_ORG_SUBSCRIPTION = {
 };
 
 export async function GET(request: NextRequest) {
-  if (!subscriptionsEnabled()) {
+  if (!teamSubscriptionsEnabled()) {
     return NextResponse.json(NO_ORG_SUBSCRIPTION);
   }
 

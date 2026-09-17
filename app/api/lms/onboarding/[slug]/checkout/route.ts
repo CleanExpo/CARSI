@@ -14,7 +14,7 @@ import {
   checkoutSessionIdempotencyKey,
   checkoutSessionExpiresAt,
 } from '@/lib/server/membership-checkout-reservation';
-import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
+import { teamSubscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 import { prisma } from '@/lib/prisma';
 
 type Ctx = { params: Promise<{ slug: string }> };
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest, ctx: Ctx) {
     course.title.replace(/^CARSI Maintenance Company Onboarding — /, '').trim()
   ).slice(0, 200);
 
-  if (subscriptionsEnabled()) {
+  if (teamSubscriptionsEnabled()) {
     const priceId = await resolveOrgMonthlyPriceId();
     if (priceId) {
       if (organisationName.length < 2) {

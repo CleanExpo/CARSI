@@ -10,7 +10,7 @@
  * increase with proration (handled by the seat-expansion route). This is the
  * simplest correct model — no per-seat Price, no bespoke proration maths.
  *
- * Ships DARK behind SUBSCRIPTIONS_ENABLED and FAILS CLOSED at every uncertain
+ * Ships DARK behind SUBSCRIPTIONS_ENABLED + TEAMS_SUBSCRIPTIONS_ENABLED and FAILS CLOSED at every uncertain
  * step (flag off / not signed in / Stripe unconfigured / Price unresolvable /
  * already on another team) — exactly the E1 pattern.
  *
@@ -32,13 +32,13 @@ import {
   checkoutSessionExpiresAt,
   reserveTeamCheckout,
 } from '@/lib/server/membership-checkout-reservation';
-import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
+import { teamSubscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 
 const UNAVAILABLE = 'Teams membership purchasing is not yet available.';
 const TEAMS_SUBSCRIPTION_TIER = 'teams_subscription';
 
 export async function POST(request: NextRequest) {
-  if (!subscriptionsEnabled()) {
+  if (!teamSubscriptionsEnabled()) {
     return NextResponse.json({ detail: UNAVAILABLE }, { status: 503 });
   }
 

@@ -23,3 +23,18 @@ function envTrue(value: string | undefined): boolean {
 export function subscriptionsEnabled(): boolean {
   return envTrue(process.env.SUBSCRIPTIONS_ENABLED);
 }
+
+/**
+ * True when Teams seat plans AND the organisation monthly plan are live.
+ *
+ * Needs BOTH `SUBSCRIPTIONS_ENABLED` and `TEAMS_SUBSCRIPTIONS_ENABLED`. The
+ * yearly membership can therefore go on sale by itself, while Teams and org
+ * stay "coming soon" until their own switch is flipped. Turning off
+ * `SUBSCRIPTIONS_ENABLED` still turns everything off. Every Teams and org
+ * surface (checkout, enrol, seat expansion, status, invite accept, the
+ * onboarding org path and the Teams cards on /pricing) reads this, never
+ * `subscriptionsEnabled()` alone.
+ */
+export function teamSubscriptionsEnabled(): boolean {
+  return subscriptionsEnabled() && envTrue(process.env.TEAMS_SUBSCRIPTIONS_ENABLED);
+}
