@@ -1,3 +1,4 @@
+import { withReticle } from '@reticlehq/next';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -157,4 +158,6 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// Reticle (dev-time browser verification) only wraps the config for next dev.
+// Any other NODE_ENV, including unset or test, gets the plain config.
+export default process.env.NODE_ENV === 'development' ? withReticle(nextConfig) : nextConfig;
