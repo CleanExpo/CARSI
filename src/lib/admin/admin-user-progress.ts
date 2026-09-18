@@ -60,6 +60,8 @@ export type AdminUserProgress = {
   completedCourseCount: number;
   activeCourseCount: number;
   neverStartedCount: number;
+  /** Paid seat, still active, zero lessons — the “Bought, not started” filter. */
+  boughtNotStartedCount: number;
   paidEnrollmentCount: number;
   certificatesCount: number;
   spentAud: number;
@@ -278,6 +280,16 @@ export function mapUserToAdminProgress(
     const status = normalizeEnrollmentStatus(e.status);
     return status === 'active' && e.completedLessons === 0;
   }).length;
+  const boughtNotStartedCount = userEnrollments.filter((e) => {
+    const status = normalizeEnrollmentStatus(e.status);
+    const done = completedLessonsForEnrollment(
+      user.id,
+      e,
+      lessonCountForEnrollment(e, catalogBySlug),
+      completedLessonCounts
+    );
+    return enrollmentLooksPaid(e) && status === 'active' && done === 0;
+  }).length;
   const paidEnrollmentCount = userEnrollments.filter(enrollmentLooksPaid).length;
   const certificatesCount = userEnrollments.filter((e) => e.certificateIssuedAt).length;
   const spentAud = userEnrollments
@@ -301,6 +313,7 @@ export function mapUserToAdminProgress(
     completedCourseCount,
     activeCourseCount,
     neverStartedCount,
+    boughtNotStartedCount,
     paidEnrollmentCount,
     certificatesCount,
     spentAud,
