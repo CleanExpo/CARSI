@@ -2,7 +2,7 @@
 
 import { ChevronRight, Search } from 'lucide-react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useMemo, useState } from 'react';
 
 import {
@@ -24,53 +24,20 @@ import {
 } from '@/components/ui/table';
 import type { AdminDashboardUserEntry } from '@/lib/admin/admin-dashboard-data';
 import { formatAud } from '@/lib/admin/admin-ops-format';
+import {
+  ADMIN_USER_SEGMENTS,
+  matchesAdminUserSegment,
+  parseAdminUserSegment,
+  type AdminUserSegment,
+} from '@/lib/admin/admin-user-segments';
 import { cn } from '@/lib/utils';
-
-type Segment =
-  | 'all'
-  | 'new'
-  | 'active'
-  | 'never_started'
-  | 'in_progress'
-  | 'completed'
-  | 'incomplete'
-  | 'paid'
-  | 'inactive';
-
-const SEGMENTS: { id: Segment; label: string }[] = [
-  { id: 'all', label: 'All' },
-  { id: 'new', label: 'New this month' },
-  { id: 'active', label: 'Active learners' },
-  { id: 'never_started', label: 'Bought, not started' },
-  { id: 'in_progress', label: 'In progress' },
-  { id: 'completed', label: 'Completed a course' },
-  { id: 'incomplete', label: 'Incomplete' },
-  { id: 'paid', label: 'Has a payment' },
-  { id: 'inactive', label: 'Account off' },
-];
-
-function matchesSegment(u: AdminDashboardUserEntry, segment: Segment, now: Date): boolean {
-  if (segment === 'all') return true;
-  if (segment === 'inactive') return !u.isActive;
-  if (segment === 'paid') return u.paidEnrollmentCount > 0;
-  if (segment === 'never_started') return u.neverStartedCount > 0;
-  if (segment === 'in_progress') return u.activeCourseCount > 0;
-  if (segment === 'completed') return u.completedCourseCount > 0;
-  if (segment === 'incomplete')
-    return u.enrollmentCount > 0 && u.completedCourseCount < u.enrollmentCount;
-  if (segment === 'active') return u.activeCourseCount > 0 || Boolean(u.lastActiveAt);
-  if (segment === 'new') {
-    const created = new Date(u.createdAt);
-    return created.getFullYear() === now.getFullYear() && created.getMonth() === now.getMonth();
-  }
-  return true;
-}
 
 export function AdminUsersClient({ users }: { users: AdminDashboardUserEntry[] }) {
   const searchParams = useSearchParams();
-  const initial = (searchParams.get('segment') as Segment) || 'all';
-  const [segment, setSegment] = useState<Segment>(
-    SEGMENTS.some((s) => s.id === initial) ? initial : 'all'
+  const router = useRouter();
+  const pathname = usePathname();
+  const [segment, setSegment] = useState<AdminUserSegment>(() =>
+    parseAdminUserSegment(searchParams.get('segment'))
   );
   const [query, setQuery] = useState('');
   const now = useMemo(() => new Date(), []);
@@ -78,7 +45,7 @@ export function AdminUsersClient({ users }: { users: AdminDashboardUserEntry[] }
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return users.filter((u) => {
-      if (!matchesSegment(u, segment, now)) return false;
+      if (!matchesAdminUserSegment(u, segment, now)) return false;
       if (!q) return true;
       return [u.fullName, u.email, u.iicrcMemberNumber]
         .filter(Boolean)
@@ -87,6 +54,15 @@ export function AdminUsersClient({ users }: { users: AdminDashboardUserEntry[] }
         .includes(q);
     });
   }, [users, segment, query, now]);
+
+  function goToSegment(next: AdminUserSegment) {
+    setSegment(next);
+    const params = new URLSearchParams(searchParams.toString());
+    if (next === 'all') params.delete('segment');
+    else params.set('segment', next);
+    const qs = params.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  }
 
   return (
     <div className="px-5 py-8 pb-20 sm:px-8 sm:py-10">
@@ -99,11 +75,11 @@ export function AdminUsersClient({ users }: { users: AdminDashboardUserEntry[] }
       </header>
 
       <div className="mb-5 flex flex-wrap gap-2">
-        {SEGMENTS.map((s) => (
+        {ADMIN_USER_SEGMENTS.map((s) => (
           <button
             key={s.id}
             type="button"
-            onClick={() => setSegment(s.id)}
+            onClick={() => goToSegment(s.id)}
             className={cn(
               'rounded-full border px-3 py-1.5 text-xs font-medium',
               segment === s.id
@@ -122,7 +98,7 @@ export function AdminUsersClient({ users }: { users: AdminDashboardUserEntry[] }
             <div>
               <CardTitle className="text-base font-semibold text-white/88">Directory</CardTitle>
               <CardDescription className="text-white/45">
-                {filtered.length.toLocaleString()} shown · {users.length.toLocaleString()} total
+                {filtered.length.toLocaleString()} match · {users.length.toLocaleString()} total
               </CardDescription>
             </div>
             <div className="relative w-full max-w-sm">
@@ -175,8 +151,8 @@ export function AdminUsersClient({ users }: { users: AdminDashboardUserEntry[] }
                               {u.fullName ?? u.email}
                             </span>
                             {!u.isActive ? <StatusBadge label="Off" tone="muted" /> : null}
-                            {u.neverStartedCount > 0 ? (
-                              <StatusBadge label="Not started" tone="muted" />
+                            {u.boughtNotStartedCount > 0 ? (
+                              <StatusBadge label="Not started" tone="warning" />
                             ) : null}
                           </div>
                           <div className="truncate text-xs text-white/42">{u.email}</div>
