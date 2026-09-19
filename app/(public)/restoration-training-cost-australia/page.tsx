@@ -1,6 +1,16 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
+import { HomeFaqSection } from '@/components/landing/HomeFaqSection';
+import { HomeFinalCtaSection } from '@/components/landing/HomeFinalCtaSection';
+import { HomeTrustStrip } from '@/components/landing/HomeTrustStrip';
+import {
+  LANDING_DISPLAY_H2_CLASS,
+  LANDING_EYEBROW_CLASS,
+  LANDING_LEAD_CLASS,
+  PUBLIC_SHELL_INNER_CLASS,
+} from '@/components/landing/public-shell-width';
+import { PlatformNav } from '@/components/marketing/PlatformNav';
 import { BreadcrumbSchema, FAQSchema } from '@/components/seo';
 import { PER_COURSE_PRICE_FALLBACK_LABEL, perCoursePriceLabel } from '@/lib/lms/pricing-tiers';
 import { OG_IMAGES } from '@/lib/seo/og-image';
@@ -125,45 +135,63 @@ export default async function RestorationTrainingCostPage() {
       />
       <FAQSchema questions={FAQ_ITEMS} />
 
-      <main className="mx-auto max-w-3xl px-4 py-14">
-        <header>
-          <p className="text-sm font-semibold tracking-wide text-[#7a3500] uppercase">
-            Australian pricing, in Australian dollars
-          </p>
-          <h1 className="mt-3 text-4xl leading-tight font-bold text-slate-900">
+      <section className="relative overflow-hidden border-b border-slate-200/70 bg-white">
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_12%_0%,rgba(36,144,237,0.11),transparent_58%)]"
+          aria-hidden
+        />
+        <div className={`relative ${PUBLIC_SHELL_INNER_CLASS} py-16 md:py-24`}>
+          <p className={LANDING_EYEBROW_CLASS}>Australian pricing, in Australian dollars</p>
+          <h1 className="mt-3 max-w-3xl font-[family-name:var(--font-display)] text-[2.15rem] leading-[1.1] font-semibold tracking-[-0.02em] text-slate-950 md:text-[3.1rem] md:leading-[1.06]">
             What restoration training actually costs in Australia
           </h1>
-          <p className="mt-5 text-lg leading-relaxed text-slate-700">
+          <p className={`mt-5 max-w-2xl text-pretty ${LANDING_LEAD_CLASS}`}>
             Training gets sold with the price at the bottom of the page, so here it is at the top.
             Below is one published Australian course fee, read off the provider&rsquo;s own booking
             page, set beside what a CARSI course costs. Every figure is dated and linked, so you can
             check it rather than take our word for it.
           </p>
-        </header>
+          <PlatformNav current="/restoration-training-cost-australia" />
+        </div>
+      </section>
 
-        <section
-          aria-labelledby="different-purchases"
-          className="mt-12 rounded-lg border border-[#f2cf8f] bg-[#fff8ed] px-5 py-5"
-        >
-          <h2 id="different-purchases" className="text-lg font-semibold text-[#7a3500]">
+      <HomeTrustStrip
+        stats={[
+          { value: `$${COMPARISON_TOTAL}`, label: 'One-off cert example' },
+          { value: PER_COURSE_LABEL, label: 'CARSI per course' },
+          { value: CHECKED_ON, label: 'Comparison checked' },
+          { value: 'AUD', label: 'All figures' },
+        ]}
+      />
+
+      <section
+        aria-labelledby="different-purchases"
+        className="border-t border-slate-200/70 bg-[#fafbfc] py-16 md:py-24"
+      >
+        <div className={PUBLIC_SHELL_INNER_CLASS}>
+          <p className={LANDING_EYEBROW_CLASS}>Two purchases</p>
+          <h2 id="different-purchases" className={`mt-3 max-w-2xl ${LANDING_DISPLAY_H2_CLASS}`}>
             First, the thing most comparisons get wrong
           </h2>
-          <p className="mt-3 text-[15px] leading-relaxed text-[#7a3500]">
+          <p className={`mt-4 max-w-2xl ${LANDING_LEAD_CLASS}`}>
             A certification course and a continuing education course are not competing products. You
-            buy an IICRC certification once per discipline, from a school approved by the IICRC and its
-            examination. Keeping that certification current is a separate, recurring cost for the
+            buy an IICRC certification once per discipline, from a school approved by the IICRC and
+            its examination. Keeping that certification current is a separate, recurring cost for the
             rest of your career. CARSI is an accredited IICRC CEC provider and sits on the recurring
-            side. CARSI does not deliver IICRC certification, and no CARSI course will make you
-            IICRC certified.
+            side. CARSI does not deliver IICRC certification, and no CARSI course will make you IICRC
+            certified.
           </p>
-          <p className="mt-3 text-[15px] leading-relaxed text-[#7a3500]">
+          <p className={`mt-4 max-w-2xl ${LANDING_LEAD_CLASS}`}>
             So the honest question is not &ldquo;which is cheaper&rdquo;. It is: once you hold a
             certification, what does it cost you every year to keep it?
           </p>
-        </section>
+        </div>
+      </section>
 
-        <section aria-labelledby="the-numbers" className="mt-12">
-          <h2 id="the-numbers" className="text-2xl font-bold text-slate-900">
+        <section aria-labelledby="the-numbers" className="border-t border-slate-200/70 bg-white py-16 md:py-24">
+          <div className={PUBLIC_SHELL_INNER_CLASS}>
+          <p className={LANDING_EYEBROW_CLASS}>The ledger</p>
+          <h2 id="the-numbers" className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>
             The numbers
           </h2>
           <p className="mt-3 text-[15px] leading-relaxed text-slate-700">
@@ -296,62 +324,57 @@ export default async function RestorationTrainingCostPage() {
             on {CHECKED_ON}. It is one Australian provider and one course, quoted so you can verify
             it — not a survey of the market, and not the only option worth looking at.
           </p>
+          </div>
         </section>
 
-        <section aria-labelledby="hidden-cost" className="mt-12">
-          <h2 id="hidden-cost" className="text-2xl font-bold text-slate-900">
+        <section aria-labelledby="hidden-cost" className="border-t border-slate-200/70 bg-[#fafbfc] py-16 md:py-24">
+          <div className={PUBLIC_SHELL_INNER_CLASS}>
+          <p className={LANDING_EYEBROW_CLASS}>Off the invoice</p>
+          <h2 id="hidden-cost" className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>
             The cost that never appears on the invoice
           </h2>
-          <p className="mt-4 text-[15px] leading-relaxed text-slate-700">
+          <p className={`mt-4 max-w-2xl ${LANDING_LEAD_CLASS}`}>
             A three-day course costs you the fee plus three days you were not earning. We are not
             going to invent a day rate for you, because yours is the only one that matters. Take
             what your crew bills in a day, multiply by three, and add it to the course fee. For most
             restoration businesses that second number is the larger of the two.
           </p>
-          <p className="mt-4 text-[15px] leading-relaxed text-slate-700">
+          <p className={`mt-4 max-w-2xl ${LANDING_LEAD_CLASS}`}>
             That is the whole argument for online CECs. Not that classroom training is bad —
             hands-on certification training is worth doing properly and in person. It is that your{' '}
             <em>recurring</em> credit-keeping should not keep costing you days on site.
           </p>
+          </div>
         </section>
 
-        <section aria-labelledby="next" className="mt-12 border-t border-slate-200 pt-8">
-          <h2 id="next" className="text-2xl font-bold text-slate-900">
+        <section aria-labelledby="next" className="border-t border-slate-200/70 bg-white py-16 md:py-24">
+          <div className={PUBLIC_SHELL_INNER_CLASS}>
+          <p className={LANDING_EYEBROW_CLASS}>Next</p>
+          <h2 id="next" className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>
             Have a look at what a course costs
           </h2>
-          <p className="mt-3 text-[15px] leading-relaxed text-slate-700">
+          <p className={`mt-3 max-w-xl ${LANDING_LEAD_CLASS}`}>
             Every course lists its own price and the CECs it carries, where it carries any.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
-              className="inline-flex min-h-11 items-center justify-center rounded-md bg-[#7a3500] px-5 py-3 text-[15px] font-semibold text-white transition hover:bg-[#5e2900] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#7a3500]"
+              className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#146fc2] px-7 text-sm font-semibold text-white hover:bg-[#0f5fa8]"
               href="/courses"
             >
               Browse courses
             </Link>
             <Link
-              className="inline-flex min-h-11 items-center justify-center rounded-md border border-slate-300 px-5 py-3 text-[15px] font-semibold text-slate-800 transition hover:border-slate-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-600"
+              className="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-200 bg-white px-7 text-sm font-semibold text-slate-800 hover:border-[#2490ed]/40 hover:text-[#146fc2]"
               href="/pricing"
             >
               See all pricing
             </Link>
           </div>
+          </div>
         </section>
 
-        <section aria-labelledby="faq" className="mt-14">
-          <h2 id="faq" className="text-2xl font-bold text-slate-900">
-            Questions people actually ask
-          </h2>
-          <dl className="mt-6 space-y-6">
-            {FAQ_ITEMS.map((item) => (
-              <div key={item.question}>
-                <dt className="text-[15px] font-semibold text-slate-900">{item.question}</dt>
-                <dd className="mt-2 text-[15px] leading-relaxed text-slate-700">{item.answer}</dd>
-              </div>
-            ))}
-          </dl>
-        </section>
-      </main>
+        <HomeFaqSection faqs={FAQ_ITEMS} />
+        <HomeFinalCtaSection />
     </>
   );
 }
