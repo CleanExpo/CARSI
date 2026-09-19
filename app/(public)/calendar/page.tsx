@@ -1,14 +1,18 @@
+import type { Metadata } from 'next';
+import Link from 'next/link';
+
+import { HomeFinalCtaSection } from '@/components/landing/HomeFinalCtaSection';
+import { HomeTrustStrip } from '@/components/landing/HomeTrustStrip';
 import {
-  COMMUNITY_CARD_CLASS,
-  CommunityHubShell,
-} from '@/components/marketing/hub/CommunityHubShell';
-import {
-  HubCtaBanner,
-  HubEmptyState,
-  HubFilterPills,
-  HubPlaceholderCard,
-  HubSecondaryPills,
-} from '@/components/marketing/hub/HubUi';
+  LANDING_DISPLAY_H2_CLASS,
+  LANDING_EYEBROW_CLASS,
+  LANDING_LEAD_CLASS,
+  PUBLIC_SHELL_INNER_CLASS,
+} from '@/components/landing/public-shell-width';
+import { CalendarAnytimeCourses } from '@/components/marketing/hub/CalendarAnytimeCourses';
+import { CalendarEventLedger, CalendarMonthJump } from '@/components/marketing/hub/CalendarAgenda';
+import { COMMUNITY_NAV } from '@/components/marketing/hub/community-nav';
+import { HubEmptyState, HubFilterPills, HubSecondaryPills } from '@/components/marketing/hub/HubUi';
 import { BreadcrumbSchema } from '@/components/seo';
 import {
   buildCalendarCourseEntries,
@@ -18,8 +22,6 @@ import { filterExcludedEvents } from '@/lib/calendar/event-exclusions';
 import { getBackendOrigin } from '@/lib/env/public-url';
 import { OG_IMAGES } from '@/lib/seo/og-image';
 import { getPublishedCourseListItemsFromDatabase } from '@/lib/server/public-courses-list';
-import type { Metadata } from 'next';
-import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Industry Calendar — Australian Restoration Courses & Events',
@@ -67,17 +69,6 @@ const INDUSTRY_SEGMENTS = [
   'Standards & Compliance',
 ];
 
-const EVENT_TYPE_COLOURS: Record<string, string> = {
-  conference: 'bg-[#eef7ff] text-[#146fc2] dark:bg-[rgba(36,144,237,0.15)] dark:text-[#2490ed]',
-  training: 'bg-emerald-50 text-emerald-700 dark:bg-[rgba(52,211,153,0.15)] dark:text-[#34d399]',
-  'iicrc-school': 'bg-[#eef7ff] text-[#146fc2] dark:bg-[rgba(36,144,237,0.15)] dark:text-[#2490ed]',
-  'carsi-training': 'bg-sky-50 text-sky-700 dark:bg-[rgba(56,189,248,0.15)] dark:text-[#38bdf8]',
-  webinar: 'bg-violet-50 text-violet-700 dark:bg-[rgba(167,139,250,0.15)] dark:text-[#a78bfa]',
-  workshop: 'bg-amber-50 text-amber-700 dark:bg-[rgba(251,191,36,0.15)] dark:text-[#fbbf24]',
-  networking: 'bg-red-50 text-red-600 dark:bg-[rgba(248,113,113,0.15)] dark:text-[#f87171]',
-  other: 'bg-slate-100 text-slate-600 dark:bg-white/[0.08] dark:text-white/50',
-};
-
 interface EventSummary {
   id: string;
   title: string;
@@ -119,29 +110,10 @@ async function getEvents(eventType?: string, category?: string): Promise<EventLi
     clearTimeout(timeoutId);
     if (!res.ok) return { data: [], total: 0, limit: 50, offset: 0 };
     const json = (await res.json()) as EventListResponse;
-    // Hard exclusion (founder directive): the excluded coaching brand must never appear
-    // on the calendar — see src/lib/calendar/event-exclusions.ts.
     return { ...json, data: filterExcludedEvents(json.data ?? []) };
   } catch {
     return { data: [], total: 0, limit: 50, offset: 0 };
   }
-}
-
-function formatEventDate(start: string, end: string | null): string {
-  const startDt = new Date(start);
-  const opts: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', year: 'numeric' };
-  if (!end) return startDt.toLocaleDateString('en-AU', opts);
-
-  const endDt = new Date(end);
-  if (startDt.toDateString() === endDt.toDateString()) {
-    return startDt.toLocaleDateString('en-AU', opts);
-  }
-  const startStr = startDt.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
-  return `${startStr} – ${endDt.toLocaleDateString('en-AU', opts)}`;
-}
-
-function formatMonth(iso: string): string {
-  return new Date(iso).toLocaleDateString('en-AU', { month: 'long', year: 'numeric' });
 }
 
 function groupByMonth(events: EventSummary[]): [string, EventSummary[]][] {
@@ -153,73 +125,19 @@ function groupByMonth(events: EventSummary[]): [string, EventSummary[]][] {
     existing.push(event);
     grouped.set(key, existing);
   }
-  return Array.from(grouped.entries()).sort(([a], [b]) => a.localeCompare(b));
+  return Array.from(grouped.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, list]) => [key, list.sort((a, b) => a.start_date.localeCompare(b.start_date))]);
 }
 
-function EventCard({ event }: { event: EventSummary }) {
-  const typeColour = EVENT_TYPE_COLOURS[event.event_type] ?? EVENT_TYPE_COLOURS.other;
-  const locationStr = event.is_virtual
-    ? 'Online'
-    : [event.location_name, event.location_city, event.location_state].filter(Boolean).join(', ') ||
-      'Australia';
-
-  return (
-    <Link
-      href={`/calendar/${event.id}`}
-      className={`group flex flex-col gap-3 ${COMMUNITY_CARD_CLASS}`}
-    >
-      <div className="flex flex-wrap items-center gap-2">
-        <span
-          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${typeColour}`}
-        >
-          {event.event_type}
-        </span>
-        {event.is_free && (
-          <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700 dark:bg-[rgba(52,211,153,0.12)] dark:text-[#34d399]">
-            Free
-          </span>
-        )}
-        {event.featured && (
-          <span className="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-700 dark:bg-[rgba(251,191,36,0.12)] dark:text-[#fbbf24]">
-            Featured
-          </span>
-        )}
-      </div>
-
-      <h3
-        className="text-base leading-snug font-semibold text-slate-950 transition-colors group-hover:text-[#146fc2]"
-      >
-        {event.title}
-      </h3>
-
-      <div className="flex flex-col gap-1 text-sm text-slate-500">
-        <span>{formatEventDate(event.start_date, event.end_date)}</span>
-        <span className="flex items-center gap-1.5">
-          <span
-            className={`h-1.5 w-1.5 flex-shrink-0 rounded-full ${event.is_virtual ? 'bg-violet-500' : 'bg-[#2490ed]'}`}
-          />
-          {locationStr}
-        </span>
-      </div>
-
-      {event.organiser_name && (
-        <p className="text-xs text-slate-400">By {event.organiser_name}</p>
-      )}
-
-      {event.industry_categories.length > 0 && (
-        <div className="mt-auto flex flex-wrap gap-1">
-          {event.industry_categories.slice(0, 3).map((cat) => (
-            <span
-              key={cat}
-              className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs text-slate-500"
-            >
-              {cat}
-            </span>
-          ))}
-        </div>
-      )}
-    </Link>
-  );
+function nextEventCopy(event: EventSummary | undefined): string | null {
+  if (!event) return null;
+  const when = new Date(event.start_date).toLocaleDateString('en-AU', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  });
+  return `Next dated listing: ${event.title} · ${when}`;
 }
 
 export default async function CalendarPage({
@@ -230,13 +148,6 @@ export default async function CalendarPage({
   const { type, category } = await searchParams;
   const { data: events, total } = await getEvents(type, category);
 
-  // CARSI's own Australian courses, read from CARSI's own database rather than the upstream
-  // events backend. Measured 2026-09-07: that backend was unreachable and this page rendered
-  // three "Event slot — calendar populating" placeholders and nothing else. A page that is
-  // indexed and empty is worse than one that shows what CARSI actually sells.
-  //
-  // Failure here must NOT take the page down — the industry events are still worth showing on
-  // their own, exactly as the events fetch already degrades to an empty list.
   let courseEntries: ReturnType<typeof buildCalendarCourseEntries> = [];
   try {
     courseEntries = buildCalendarCourseEntries(await getPublishedCourseListItemsFromDatabase());
@@ -244,11 +155,17 @@ export default async function CalendarPage({
     courseEntries = [];
   }
   const courseTopics = groupCoursesByTopic(courseEntries);
-
   const grouped = groupByMonth(events);
-  // Only pad with placeholders when there is genuinely nothing else on the page. Showing
-  // "calendar populating" above a full list of real courses reads as a broken page.
   const placeholderCount = courseEntries.length > 0 ? 0 : Math.max(0, 3 - events.length);
+  const nextUp = events.slice().sort((a, b) => a.start_date.localeCompare(b.start_date))[0];
+  const monthJumps = grouped.map(([key, list]) => ({
+    key,
+    label: new Date(list[0].start_date).toLocaleDateString('en-AU', {
+      month: 'short',
+      year: 'numeric',
+    }),
+    count: list.length,
+  }));
 
   const breadcrumbs = [
     { name: 'Home', url: 'https://carsi.com.au' },
@@ -259,37 +176,95 @@ export default async function CalendarPage({
     <>
       <BreadcrumbSchema items={breadcrumbs} />
 
-      <CommunityHubShell
-        eyebrow="Community & resources"
-        title="Industry Calendar"
-        description="National calendar of conferences, training, webinars, and workshops across the restoration, HVAC, flooring, and indoor environment industries."
+      <section className="relative overflow-hidden border-b border-slate-200/70 bg-white">
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_80%_0%,rgba(36,144,237,0.12),transparent_58%)]"
+          aria-hidden
+        />
+        <div className={`relative ${PUBLIC_SHELL_INNER_CLASS} py-16 md:py-24`}>
+          <div className="grid items-end gap-12 lg:grid-cols-[minmax(0,1.2fr)_minmax(240px,0.7fr)]">
+            <div>
+              <p className={LANDING_EYEBROW_CLASS}>Industry calendar</p>
+              <h1 className="mt-3 max-w-3xl font-[family-name:var(--font-display)] text-[2.15rem] leading-[1.1] font-semibold tracking-[-0.02em] text-slate-950 md:text-[3.1rem] md:leading-[1.06]">
+                Dated field days, then start-anytime courses
+              </h1>
+              <p className={`mt-5 max-w-2xl text-pretty ${LANDING_LEAD_CLASS}`}>
+                National conferences, training, webinars and workshops for restoration and indoor
+                environment crews — plus Australian-produced CARSI courses you can open tonight.
+              </p>
+              {nextEventCopy(nextUp) ? (
+                <p className="mt-6 max-w-xl text-sm font-medium text-slate-700">
+                  {nextEventCopy(nextUp)}
+                </p>
+              ) : null}
+              <nav className="mt-8 flex flex-wrap gap-2" aria-label="Community and resources">
+                {COMMUNITY_NAV.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`rounded-full border px-3 py-1.5 text-[11px] font-medium transition ${
+                      item.href === '/calendar'
+                        ? 'border-[#146fc2] bg-[#146fc2] text-white'
+                        : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-[#2490ed]/40 hover:text-[#146fc2]'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+            <div className="rounded-2xl border border-slate-200/80 bg-[#fafbfc] p-6">
+              <p className="text-[10px] font-semibold tracking-[0.18em] text-slate-400 uppercase">
+                Today · Australia
+              </p>
+              <p className="mt-3 font-[family-name:var(--font-display)] text-[3rem] leading-none font-semibold tracking-[-0.04em] text-slate-950 tabular-nums">
+                {new Date().toLocaleDateString('en-AU', { day: '2-digit' })}
+              </p>
+              <p className="mt-2 text-sm text-slate-500">
+                {new Date().toLocaleDateString('en-AU', {
+                  weekday: 'long',
+                  month: 'long',
+                  year: 'numeric',
+                })}
+              </p>
+              <p className="mt-5 text-xs leading-relaxed text-slate-400">
+                Dated listings stay on the rail. Self-paced CARSI courses never receive a made-up
+                start date.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <HomeTrustStrip
         stats={[
           { value: total > 0 ? String(total) : '—', label: 'Upcoming events' },
-          { value: String(courseEntries.length), label: 'CARSI courses' },
-          { value: 'AU', label: 'National' },
-          { value: 'Free', label: 'To list' },
+          { value: String(courseEntries.length), label: 'Start-anytime courses' },
+          { value: String(monthJumps.length || '—'), label: 'Months on the rail' },
+          { value: 'Free', label: 'To list an event' },
         ]}
-      >
-        <div className="mb-4">
-          <HubFilterPills
-            items={EVENT_TYPES}
-            activeValue={type}
-            allLabel="All Types"
-            buildHref={(value) => {
-              const params = new URLSearchParams();
-              if (value) params.set('type', value);
-              if (category) params.set('category', category);
-              const qs = params.toString();
-              return qs ? `/calendar?${qs}` : '/calendar';
-            }}
-          />
-        </div>
+      />
 
-        <div className="mb-10">
+      <section className="border-t border-slate-200/70 bg-white py-10 md:py-12">
+        <div className={PUBLIC_SHELL_INNER_CLASS}>
+          <div className="mb-5">
+            <HubFilterPills
+              items={EVENT_TYPES}
+              activeValue={type}
+              allLabel="All types"
+              buildHref={(value) => {
+                const params = new URLSearchParams();
+                if (value) params.set('type', value);
+                if (category) params.set('category', category);
+                const qs = params.toString();
+                return qs ? `/calendar?${qs}` : '/calendar';
+              }}
+            />
+          </div>
           <HubSecondaryPills
             items={INDUSTRY_SEGMENTS.map((seg) => ({ value: seg, label: seg }))}
             activeValue={category}
-            allLabel="All Segments"
+            allLabel="All segments"
             buildHref={(value) => {
               const params = new URLSearchParams();
               if (type) params.set('type', type);
@@ -299,100 +274,52 @@ export default async function CalendarPage({
             }}
           />
         </div>
+      </section>
 
-        <HubCtaBanner
-          title="Have an industry event to list?"
-          description="Submit it for free — we review and publish within 24 hours."
-          href="/submit/event"
-          ctaLabel="Submit Event"
-        />
-
-        {grouped.length === 0 && placeholderCount === 0 ? (
-          <HubEmptyState>
-            {type || category
-              ? 'No upcoming events match your filters — try a different combination.'
-              : 'No upcoming events yet — check back soon or submit your event above.'}
-          </HubEmptyState>
-        ) : (
-          <div className="space-y-12">
-            {grouped.map(([monthKey, monthEvents]) => (
-              <section key={monthKey}>
-                <h2 className="mb-4 text-[11px] font-medium tracking-[0.24em] text-[#146fc2] uppercase">
-                  {formatMonth(monthEvents[0].start_date)}
-                </h2>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {monthEvents.map((event) => (
-                    <EventCard key={event.id} event={event} />
-                  ))}
-                </div>
-              </section>
-            ))}
-            {placeholderCount > 0 && (
-              <section>
-                <h2 className="mb-4 text-[11px] font-medium tracking-[0.24em] text-[#146fc2] uppercase">
-                  Upcoming
-                </h2>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {Array.from({ length: placeholderCount }, (_, i) => (
-                    <HubPlaceholderCard
-                      key={`placeholder-${i}`}
-                      message={`Event slot ${i + 1} — calendar populating`}
-                    />
-                  ))}
-                </div>
-              </section>
-            )}
-          </div>
-        )}
-
-        {courseTopics.length > 0 && (
-          <section className="mt-16" aria-labelledby="carsi-courses-heading">
-            <h2
-              id="carsi-courses-heading"
-              className="mb-2 text-[11px] font-medium tracking-[0.24em] text-[#146fc2] uppercase"
-            >
-              CARSI Australian courses
-            </h2>
-            <p className="mb-8 max-w-3xl text-sm leading-relaxed text-slate-500">
-              Australian-produced training you can start whenever you like — no fixed dates, no
-              travel. {courseEntries.length} course{courseEntries.length === 1 ? '' : 's'} available
-              now, written to Australian standards, voltages and units.
-            </p>
-
-            <div className="space-y-10">
-              {courseTopics.map(({ topic, courses }) => (
-                <div key={topic}>
-                  <h3 className="mb-3 text-sm font-semibold text-slate-950">{topic}</h3>
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {courses.map((course) => (
-                      <Link
-                        key={course.slug}
-                        href={course.href}
-                        className={`${COMMUNITY_CARD_CLASS} block`}
-                      >
-                        <span className="mb-3 inline-block rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-[11px] text-slate-600">
-                          {course.isFree ? 'Free' : (course.priceLabel ?? 'Paid')}
-                        </span>
-                        <span className="block text-base font-semibold text-slate-950">
-                          {course.title}
-                        </span>
-                        {course.summary && (
-                          <span className="mt-2 block text-sm text-slate-500">
-                            {course.summary}
-                          </span>
-                        )}
-                        <span className="mt-3 block text-xs text-slate-400">
-                          {course.availability}
-                        </span>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              ))}
+      <section className="border-t border-slate-200/70 bg-[#fafbfc] py-16 md:py-24">
+        <div className={PUBLIC_SHELL_INNER_CLASS}>
+          <div className="mb-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className={LANDING_EYEBROW_CLASS}>Agenda</p>
+              <h2 className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>The dated rail</h2>
+              <p className={`mt-4 max-w-xl ${LANDING_LEAD_CLASS}`}>
+                Jump a month, then read each listing as a date stamp plus the job-site context.
+              </p>
             </div>
-          </section>
-        )}
-      </CommunityHubShell>
+            <CalendarMonthJump months={monthJumps} />
+          </div>
+
+          {grouped.length === 0 && placeholderCount === 0 ? (
+            <HubEmptyState>
+              {type || category
+                ? 'No upcoming events match your filters — try a different combination.'
+                : 'No upcoming dated events yet — check back soon or submit yours below.'}
+            </HubEmptyState>
+          ) : (
+            <CalendarEventLedger grouped={grouped} placeholderCount={placeholderCount} />
+          )}
+        </div>
+      </section>
+
+      <CalendarAnytimeCourses topics={courseTopics} courseCount={courseEntries.length} />
+
+      <section className="relative overflow-hidden border-t border-slate-200/70 bg-[#eef5fb] py-16 md:py-20">
+        <div className={`relative ${PUBLIC_SHELL_INNER_CLASS} text-center`}>
+          <p className={LANDING_EYEBROW_CLASS}>List an event</p>
+          <h2 className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>Have a day the trade should see?</h2>
+          <p className={`mx-auto mt-4 max-w-lg ${LANDING_LEAD_CLASS}`}>
+            Submit it for free. We review and publish within 24 hours.
+          </p>
+          <Link
+            href="/submit/event"
+            className="mt-8 inline-flex min-h-12 items-center justify-center rounded-full bg-[#146fc2] px-8 text-sm font-semibold text-white shadow-[0_14px_40px_-16px_rgba(20,111,194,0.55)] transition hover:bg-[#0f5fa8]"
+          >
+            Submit event
+          </Link>
+        </div>
+      </section>
+
+      <HomeFinalCtaSection />
     </>
   );
 }
