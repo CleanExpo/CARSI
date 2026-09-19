@@ -1,6 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
+import {
+  COMMUNITY_CARD_CLASS,
+  CommunityHubShell,
+} from '@/components/marketing/hub/CommunityHubShell';
+
 export const metadata: Metadata = {
   title: 'Submit to CARSI Hub | Industry Resource Directory',
   description:
@@ -10,7 +15,6 @@ export const metadata: Metadata = {
 
 interface SubmissionType {
   type: string;
-  icon: string;
   title: string;
   description: string;
   detail: string;
@@ -19,56 +23,48 @@ interface SubmissionType {
 const SUBMISSION_TYPES: SubmissionType[] = [
   {
     type: 'podcast',
-    icon: '🎙',
     title: 'Podcast',
     description: 'Submit a podcast show for inclusion in the CARSI podcast directory.',
     detail: 'Restoration, HVAC, cleaning, IAQ, and adjacent trades.',
   },
   {
     type: 'youtube_channel',
-    icon: '▶',
     title: 'YouTube Channel',
     description: 'Nominate a YouTube channel that produces quality trade content.',
     detail: 'Educational, how-to, product reviews, and industry commentary.',
   },
   {
     type: 'professional',
-    icon: '👤',
     title: 'Professional Profile',
     description: 'List yourself or a colleague in the CARSI professional directory.',
     detail: 'Technicians, consultants, trainers, and industry specialists.',
   },
   {
     type: 'event',
-    icon: '📅',
     title: 'Industry Event',
     description: 'Submit a conference, trade show, workshop, or webinar.',
     detail: 'Australian and international events relevant to the trades.',
   },
   {
     type: 'job',
-    icon: '💼',
     title: 'Job Listing',
     description: 'Post a job opening for restoration, HVAC, or cleaning trade roles.',
     detail: 'Full-time, part-time, contract, and apprenticeship positions.',
   },
   {
     type: 'article',
-    icon: 'DOC',
     title: 'Article',
     description: 'Submit a technical article, case study, or industry opinion piece.',
     detail: 'Original content from practitioners, researchers, and vendors.',
   },
   {
     type: 'case_study',
-    icon: 'LOG',
     title: 'Field Case Study',
     description: 'Submit an anonymised job note or field observation for CARSI review.',
     detail: 'Methods, limits, outcomes, lessons, sources, and no customer-identifying details.',
   },
   {
     type: 'news_source',
-    icon: '📰',
     title: 'News Source',
     description: 'Nominate an industry publication or news outlet for the directory.',
     detail: 'Newsletters, magazines, journals, and online publications.',
@@ -77,91 +73,49 @@ const SUBMISSION_TYPES: SubmissionType[] = [
 
 export default function SubmitIndexPage() {
   return (
-    <main className="min-h-screen bg-[#050505] px-4 py-16">
-      <div className="mx-auto max-w-5xl">
-        {/* Header */}
-        <div className="mb-12">
-          <div
-            className="mb-4 inline-flex items-center gap-2 rounded-sm px-3 py-1.5 text-xs font-semibold tracking-wider uppercase"
-            style={{
-              background: 'rgba(0,245,255,0.08)',
-              border: '0.5px solid rgba(0,245,255,0.2)',
-              color: '#00F5FF',
-            }}
+    <CommunityHubShell
+      eyebrow="Community & resources"
+      title="Submit to the Hub"
+      description="Help us build Australia’s most comprehensive resource directory for restoration, HVAC, and cleaning trade professionals. All submissions are reviewed before publication."
+      stats={[
+        { value: String(SUBMISSION_TYPES.length), label: 'Submission types' },
+        { value: '5d', label: 'Review window' },
+        { value: 'Free', label: 'To list' },
+        { value: 'AU', label: 'Trade focus' },
+      ]}
+    >
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {SUBMISSION_TYPES.map((item, index) => (
+          <Link
+            key={item.type}
+            href={`/submit/${item.type}`}
+            className={`group flex flex-col ${COMMUNITY_CARD_CLASS}`}
           >
-            CARSI Industry Hub
-          </div>
-          <h1 className="mb-4 text-4xl font-bold tracking-tight text-white/90 md:text-5xl">
-            Submit to the Hub
-          </h1>
-          <p className="max-w-2xl text-base leading-relaxed text-white/50">
-            Help us build Australia&apos;s most comprehensive resource directory for restoration,
-            HVAC, and cleaning trade professionals. All submissions are reviewed before publication.
-          </p>
-        </div>
-
-        {/* Submission type grid */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {SUBMISSION_TYPES.map((item) => (
-            <Link
-              key={item.type}
-              href={`/submit/${item.type}`}
-              className="group flex flex-col gap-4 rounded-sm border border-white/[0.06] bg-white/[0.02] p-6 transition-all duration-200 hover:border-[rgba(0,245,255,0.2)] hover:bg-white/[0.04]"
-            >
-              {/* Icon */}
-              <div
-                className="flex h-10 w-10 items-center justify-center rounded-sm text-xl text-white/80"
-                style={{
-                  background: 'rgba(255,255,255,0.04)',
-                  border: '0.5px solid rgba(255,255,255,0.07)',
-                }}
-                aria-hidden="true"
-              >
-                {item.icon}
-              </div>
-
-              {/* Content */}
-              <div className="flex flex-1 flex-col gap-2">
-                <h2 className="text-base font-semibold text-white/85 transition-colors group-hover:text-white">
-                  {item.title}
-                </h2>
-                <p className="text-sm leading-relaxed text-white/70">{item.description}</p>
-                <p className="text-xs text-white/70">{item.detail}</p>
-              </div>
-
-              {/* CTA */}
-              <div
-                className="flex items-center gap-1.5 text-xs font-semibold tracking-wide transition-colors group-hover:text-[#00F5FF]"
-                style={{ color: 'rgba(0,245,255,0.6)' }}
-              >
-                Submit
-                <span
-                  className="transition-transform group-hover:translate-x-0.5"
-                  aria-hidden="true"
-                >
-                  →
-                </span>
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        {/* Footer note */}
-        <div className="mt-10 rounded-sm border-[0.5px] border-white/[0.06] bg-white/[0.02] px-6 py-4">
-          <p className="text-xs leading-relaxed text-white/60">
-            All submissions are reviewed by the CARSI editorial team. We aim to respond within{' '}
-            <span className="text-white/55">5 business days</span>. Approved listings are published
-            free of charge. Commercial advertising enquiries should be directed to{' '}
-            <Link
-              href="/contact"
-              className="text-white/55 underline underline-offset-2 hover:text-white/75"
-            >
-              contact CARSI
-            </Link>
-            .
-          </p>
-        </div>
+            <p className="font-mono text-[11px] font-semibold tracking-[0.16em] text-[#146fc2]">
+              {String(index + 1).padStart(2, '0')}
+            </p>
+            <h2 className="mt-3 font-[family-name:var(--font-display)] text-lg font-semibold text-slate-950 group-hover:text-[#146fc2]">
+              {item.title}
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-slate-500">{item.description}</p>
+            <p className="mt-2 text-xs leading-relaxed text-slate-400">{item.detail}</p>
+            <span className="mt-5 text-sm font-semibold text-[#146fc2]">Submit →</span>
+          </Link>
+        ))}
       </div>
-    </main>
+
+      <p className="mt-10 max-w-3xl text-sm leading-relaxed text-slate-500">
+        All submissions are reviewed by the CARSI editorial team. We aim to respond within 5
+        business days. Approved listings are published free of charge. Commercial advertising
+        enquiries should be directed to{' '}
+        <Link
+          href="/contact"
+          className="font-semibold text-[#146fc2] underline-offset-4 hover:underline"
+        >
+          contact CARSI
+        </Link>
+        .
+      </p>
+    </CommunityHubShell>
   );
 }
