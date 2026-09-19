@@ -3,6 +3,9 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
+import { AdminPagination } from '@/components/admin/AdminPagination';
+import { useAdminListPaging } from '@/components/admin/use-admin-list-paging';
+
 type CourseOption = { id: string; title: string };
 
 type AssessmentRow = {
@@ -182,6 +185,7 @@ export function PracticalAssessmentAuthorClient() {
   }
 
   const maxTotal = editing ? editing.criteria.reduce((a, c) => a + (c.maxPoints || 0), 0) : 0;
+  const assessmentPaging = useAdminListPaging(assessments);
 
   return (
     <div className="flex max-w-3xl flex-col gap-6 p-6">
@@ -375,7 +379,7 @@ export function PracticalAssessmentAuthorClient() {
             </p>
           )}
           <div className="flex flex-col gap-3">
-            {assessments.map((a) => (
+            {assessmentPaging.pageRows.map((a) => (
               <div
                 key={a.id}
                 className="flex items-start justify-between gap-4 rounded-xl border border-white/10 bg-white/[0.03] p-5"
@@ -415,6 +419,17 @@ export function PracticalAssessmentAuthorClient() {
               </div>
             ))}
           </div>
+          {assessments.length > 0 ? (
+            <div className="mt-4">
+              <AdminPagination
+                page={assessmentPaging.page}
+                pageCount={assessmentPaging.pageCount}
+                onPageChange={assessmentPaging.setPage}
+                pageSize={assessmentPaging.pageSize}
+                onPageSizeChange={assessmentPaging.changePageSize}
+              />
+            </div>
+          ) : null}
         </>
       )}
     </div>
