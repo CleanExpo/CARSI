@@ -23,6 +23,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 
+import { AdminPagination } from '@/components/admin/AdminPagination';
+import { useAdminListPaging } from '@/components/admin/use-admin-list-paging';
 import { formatAud } from '@/lib/admin/admin-ops-format';
 import type {
   AdminCatalogCourseOption,
@@ -444,6 +446,14 @@ export function AdminUserDetailClient({
     });
     return [...filtered].sort((a, b) => enrollmentUrgency(a) - enrollmentUrgency(b));
   }, [user.enrollments, courseFilter]);
+
+  const enrollmentPaging = useAdminListPaging(visibleEnrollments, courseFilter);
+  const {
+    page: safeEnrollmentPage,
+    pageCount: enrollmentPageCount,
+    pageRows: pagedEnrollments,
+    setPage: setEnrollmentPage,
+  } = enrollmentPaging;
 
   const nextActions = useMemo(() => {
     const items: { id: string; title: string; detail: string; href?: string }[] = [];
@@ -961,7 +971,9 @@ export function AdminUserDetailClient({
                 <button
                   key={f.id}
                   type="button"
-                  onClick={() => setCourseFilter(f.id)}
+                  onClick={() => {
+                    setCourseFilter(f.id);
+                  }}
                   className={cn(
                     'rounded-full border px-3 py-1.5 text-xs font-medium',
                     courseFilter === f.id
@@ -1034,7 +1046,7 @@ export function AdminUserDetailClient({
 
           {visibleEnrollments.length > 0 ? (
             <div className="space-y-4">
-              {visibleEnrollments.map((e) => {
+              {pagedEnrollments.map((e) => {
                 const isIncomplete = e.completionPct < 100;
                 return (
                   <CourseEnrollmentCard
@@ -1066,6 +1078,15 @@ export function AdminUserDetailClient({
                   />
                 );
               })}
+              {enrollmentPageCount > 1 ? (
+                <AdminPagination
+                  page={safeEnrollmentPage}
+                  pageCount={enrollmentPageCount}
+                  onPageChange={setEnrollmentPage}
+                  pageSize={enrollmentPaging.pageSize}
+                  onPageSizeChange={enrollmentPaging.changePageSize}
+                />
+              ) : null}
             </div>
           ) : user.enrollments.length === 0 ? (
             <div
