@@ -25,7 +25,9 @@ import {
   Users,
 } from 'lucide-react';
 
+import { AdminPagination } from '@/components/admin/AdminPagination';
 import { adminGlassCard } from '@/components/admin/admin-learner-ui';
+import { useAdminListPaging } from '@/components/admin/use-admin-list-paging';
 import { cn } from '@/lib/utils';
 
 interface CohortSummary {
@@ -219,6 +221,8 @@ export function AdminCohortAnalytics() {
       { label: '30d active', enrollments: data.active_learners_30d, completions: data.completions_30d },
     ];
   }, [data]);
+
+  const coursePaging = useAdminListPaging(data?.courses ?? []);
 
   if (loading) {
     return (
@@ -443,7 +447,7 @@ export function AdminCohortAnalytics() {
 
       <ChartPanel
         title="Course cohort table"
-        subtitle="Full breakdown — top 40 courses"
+        subtitle="Full course breakdown"
         icon={BookOpen}
         accent="#2490ed"
       >
@@ -459,7 +463,7 @@ export function AdminCohortAnalytics() {
               </tr>
             </thead>
             <tbody>
-              {data.courses.slice(0, 40).map((c) => (
+              {coursePaging.pageRows.map((c) => (
                 <tr key={c.course_id} className="border-b border-white/[0.04] text-white/75 transition-colors hover:bg-white/[0.03]">
                   <td className="max-w-[260px] truncate px-4 py-2.5 font-medium">{c.course_title}</td>
                   <td className="px-4 py-2.5">
@@ -494,6 +498,17 @@ export function AdminCohortAnalytics() {
               ))}
             </tbody>
           </table>
+          {data.courses.length > 0 ? (
+            <div className="border-t border-white/[0.06] px-4 py-4">
+              <AdminPagination
+                page={coursePaging.page}
+                pageCount={coursePaging.pageCount}
+                onPageChange={coursePaging.setPage}
+                pageSize={coursePaging.pageSize}
+                onPageSizeChange={coursePaging.changePageSize}
+              />
+            </div>
+          ) : null}
         </div>
       </ChartPanel>
     </div>
