@@ -18,7 +18,9 @@ import {
   Zap,
 } from 'lucide-react';
 
+import { AdminPagination } from '@/components/admin/AdminPagination';
 import { adminGlassCard, formatAdminDateTime } from '@/components/admin/admin-learner-ui';
+import { useAdminListPaging } from '@/components/admin/use-admin-list-paging';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -134,6 +136,9 @@ export default function AdminContactsPage() {
   function handleLeadFilter(intent: string) {
     setLeadIntent(intent);
   }
+
+  const paging = useAdminListPaging(items, leadIntent);
+  const { page: safePage, pageCount, pageRows, start: pageStart, setPage } = paging;
 
   function openReply(row: ContactRow) {
     setReplyOpen(row.id);
@@ -278,7 +283,7 @@ export default function AdminContactsPage() {
       ) : null}
 
       <div className="space-y-4">
-        {items.map((row) => {
+        {pageRows.map((row) => {
           const fullName = `${row.first_name} ${row.last_name}`.trim();
           const hasLeadContext = row.lead_context && Object.keys(row.lead_context).length > 0;
           return (
@@ -492,6 +497,21 @@ export default function AdminContactsPage() {
             </article>
           );
         })}
+
+        {!loading && items.length > 0 ? (
+          <div className="flex flex-col items-center gap-3 pt-2">
+            <p className="text-xs text-white/40">
+              Showing {pageStart + 1}–{pageStart + pageRows.length} of {items.length}
+            </p>
+            <AdminPagination
+              page={safePage}
+              pageCount={pageCount}
+              onPageChange={setPage}
+              pageSize={paging.pageSize}
+              onPageSizeChange={paging.changePageSize}
+            />
+          </div>
+        ) : null}
 
         {!loading && items.length === 0 ? (
           <div className={cn(adminGlassCard, 'flex flex-col items-center justify-center gap-3 py-20 text-center')}>
