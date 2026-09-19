@@ -1,15 +1,7 @@
 import type { AdminDashboardUserEntry } from '@/lib/admin/admin-dashboard-data';
 
 export type AdminUserSegment =
-  | 'all'
-  | 'new'
-  | 'active'
-  | 'never_started'
-  | 'in_progress'
-  | 'completed'
-  | 'incomplete'
-  | 'paid'
-  | 'inactive';
+  'all' | 'new' | 'active' | 'never_started' | 'in_progress' | 'completed' | 'paid' | 'inactive';
 
 export const ADMIN_USER_SEGMENTS: { id: AdminUserSegment; label: string }[] = [
   { id: 'all', label: 'All' },
@@ -18,12 +10,24 @@ export const ADMIN_USER_SEGMENTS: { id: AdminUserSegment; label: string }[] = [
   { id: 'never_started', label: 'Bought, not started' },
   { id: 'in_progress', label: 'In progress' },
   { id: 'completed', label: 'Completed a course' },
-  { id: 'incomplete', label: 'Incomplete' },
   { id: 'paid', label: 'Has a payment' },
   { id: 'inactive', label: 'Account off' },
 ];
 
-export const ADMIN_USERS_PAGE_SIZE = 10;
+export const ADMIN_USERS_PAGE_SIZE = 9;
+
+export const ADMIN_USERS_PAGE_SIZE_OPTIONS = [9, 18, 27, 36, 50] as const;
+
+export type AdminUsersPageSize = (typeof ADMIN_USERS_PAGE_SIZE_OPTIONS)[number];
+
+export function parseAdminUsersPageSize(
+  raw: string | number | null | undefined
+): AdminUsersPageSize {
+  const n = typeof raw === 'number' ? raw : Number(raw);
+  return (ADMIN_USERS_PAGE_SIZE_OPTIONS as readonly number[]).includes(n)
+    ? (n as AdminUsersPageSize)
+    : ADMIN_USERS_PAGE_SIZE;
+}
 
 function progressPct(u: Pick<AdminDashboardUserEntry, 'overallCompletionPct'>): number {
   return u.overallCompletionPct;
@@ -56,7 +60,6 @@ export function matchesAdminUserSegment(
   if (segment === 'never_started') return isBoughtNotStarted(u);
   if (segment === 'in_progress' || segment === 'active') return isActiveLearner(u);
   if (segment === 'completed') return u.enrollmentCount > 0 && pct === 100;
-  if (segment === 'incomplete') return u.enrollmentCount > 0 && pct <= 99;
   if (segment === 'new') {
     const created = new Date(u.createdAt);
     return created.getFullYear() === now.getFullYear() && created.getMonth() === now.getMonth();
