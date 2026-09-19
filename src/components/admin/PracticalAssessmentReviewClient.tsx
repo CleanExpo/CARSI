@@ -3,6 +3,9 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 
+import { AdminPagination } from '@/components/admin/AdminPagination';
+import { useAdminListPaging } from '@/components/admin/use-admin-list-paging';
+
 type QueueItem = {
   id: string;
   status: string;
@@ -146,6 +149,7 @@ export function PracticalAssessmentReviewClient() {
   const currentTotal = active ? active.criteria.reduce((a, c) => a + (scores[c.id] ?? 0), 0) : 0;
   const projectedPct = maxTotal > 0 ? Math.round((currentTotal / maxTotal) * 100) : 0;
   const wouldPass = active ? projectedPct >= active.assessment.passThreshold : false;
+  const queuePaging = useAdminListPaging(queue);
 
   return (
     <div className="flex max-w-4xl flex-col gap-6 p-6">
@@ -294,7 +298,7 @@ export function PracticalAssessmentReviewClient() {
             </p>
           )}
           <div className="flex flex-col gap-3">
-            {queue.map((item) => (
+            {queuePaging.pageRows.map((item) => (
               <div
                 key={item.id}
                 className="flex items-start justify-between gap-4 rounded-xl border border-white/10 bg-white/[0.03] p-5"
@@ -320,6 +324,17 @@ export function PracticalAssessmentReviewClient() {
               </div>
             ))}
           </div>
+          {queue.length > 0 ? (
+            <div className="mt-4">
+              <AdminPagination
+                page={queuePaging.page}
+                pageCount={queuePaging.pageCount}
+                onPageChange={queuePaging.setPage}
+                pageSize={queuePaging.pageSize}
+                onPageSizeChange={queuePaging.changePageSize}
+              />
+            </div>
+          ) : null}
         </>
       )}
     </div>
