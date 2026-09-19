@@ -109,7 +109,7 @@ RWR; it compounds slowly and must not be read as revenue movement.
   is not scanned, per the next entry.
 - 2026-08-16 · **The licence guards do not scan the repo-root operating files.**
   `check-iicrc-compliance` scans `app/ src/ templates/ docs/marketing/ docs/content/ data/seed/
-data/voice/ public/courses/`; `check-iicrc-terminology` a similar list plus `public/`. None
+  data/voice/ public/courses/`; `check-iicrc-terminology` a similar list plus `public/`. None
   match `GOAL.md`, `BACKLOG.md`, `DECISIONS.md` or `ENGINE.md`, so a green run says nothing about
   their contents. That is defensible — they are internal notes, the same class as the explicitly
   exempted `CLAUDE.md` — but it means "guards green" must never be quoted as evidence that
