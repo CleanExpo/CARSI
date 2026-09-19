@@ -13,10 +13,11 @@ import {
 } from 'lucide-react';
 import { useEffect, useId, useRef } from 'react';
 
-import { sourceToEditorHtml } from '@/lib/lms/visual-course-html';
+import { persistVisualMarks, sourceToEditorHtml } from '@/lib/lms/visual-course-html';
 import { cn } from '@/lib/utils';
 
 function run(command: string, value?: string) {
+  document.execCommand('styleWithCSS', false, 'false');
   document.execCommand(command, false, value);
 }
 
@@ -57,7 +58,7 @@ export function MarkdownEditor({
   }, [value]);
 
   function emitHtml() {
-    const html = editorRef.current?.innerHTML ?? '';
+    const html = persistVisualMarks(editorRef.current?.innerHTML ?? '');
     skipOuter.current = true;
     onChange(html);
   }
