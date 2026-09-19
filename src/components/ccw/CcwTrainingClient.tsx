@@ -20,7 +20,6 @@ import {
   ArrowRight,
   BookOpen,
   CheckCircle2,
-  ChevronDown,
   Download,
   Eye,
   EyeOff,
@@ -224,7 +223,10 @@ export function CcwTrainingClient() {
       />
 
       {/* Your trainer */}
-      <section className="border-t border-slate-200/70 bg-[#fafbfc] py-16 md:py-24" aria-labelledby="ccw-trainer-heading">
+      <section
+        className="border-t border-slate-200/70 bg-[#fafbfc] py-16 md:py-24"
+        aria-labelledby="ccw-trainer-heading"
+      >
         <div className={PUBLIC_SHELL_INNER_CLASS}>
           <p className={LANDING_EYEBROW_CLASS}>Your trainer</p>
           <h2 id="ccw-trainer-heading" className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>
@@ -234,222 +236,227 @@ export function CcwTrainingClient() {
             The two days you are about to do are built from a library of real IICRC standards and
             distilled into a CARSI original curriculum you can take home.
           </p>
-        <div className="mt-10 grid gap-4 sm:grid-cols-2">
-          {trainerMeta.map(({ term, text }) => (
-            <div key={term} className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm md:p-6">
-              <p className="text-[10px] font-semibold tracking-[0.18em] text-[#146fc2] uppercase">
-                {term}
-              </p>
-              <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                {text}
-              </p>
-            </div>
-          ))}
-        </div>
+          <div className="mt-10 grid gap-4 sm:grid-cols-2">
+            {trainerMeta.map(({ term, text }) => (
+              <div
+                key={term}
+                className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm md:p-6"
+              >
+                <p className="text-[10px] font-semibold tracking-[0.18em] text-[#146fc2] uppercase">
+                  {term}
+                </p>
+                <p className="mt-2 text-sm leading-relaxed text-slate-600">{text}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Agenda */}
-      <section className="border-t border-slate-200/70 bg-white py-16 md:py-24" aria-labelledby="ccw-agenda-heading">
+      <section
+        className="border-t border-slate-200/70 bg-white py-16 md:py-24"
+        aria-labelledby="ccw-agenda-heading"
+      >
         <div className={PUBLIC_SHELL_INNER_CLASS}>
           <p className={LANDING_EYEBROW_CLASS}>Agenda</p>
           <h2 id="ccw-agenda-heading" className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>
             Two days — five deliverables
           </h2>
-        <div className="mt-10 grid gap-6 lg:grid-cols-2 lg:gap-8">
-          <div className="flex flex-col rounded-2xl border border-slate-200/80 bg-[#fafbfc] p-6 md:p-8">
-            <div className="mb-4 flex items-center gap-2 border-b border-slate-200/80 pb-4">
-              <GraduationCap className="h-5 w-5 text-[#146fc2]" aria-hidden />
-              <span className="text-sm font-semibold text-slate-950">Day 1</span>
+          <div className="mt-10 grid gap-6 lg:grid-cols-2 lg:gap-8">
+            <div className="flex flex-col rounded-2xl border border-slate-200/80 bg-[#fafbfc] p-6 md:p-8">
+              <div className="mb-4 flex items-center gap-2 border-b border-slate-200/80 pb-4">
+                <GraduationCap className="h-5 w-5 text-[#146fc2]" aria-hidden />
+                <span className="text-sm font-semibold text-slate-950">Day 1</span>
+              </div>
+              <p className="mb-4 text-xs font-medium tracking-wide text-slate-600 uppercase dark:text-white/55">
+                Carpet &amp; Stain Fundamentals
+              </p>
+              <ul className="list-none space-y-0">
+                {agendaDay1.map((line) => (
+                  <AgendaLine key={line} text={line} />
+                ))}
+              </ul>
             </div>
-            <p className="mb-4 text-xs font-medium tracking-wide text-slate-600 uppercase dark:text-white/55">
-              Carpet &amp; Stain Fundamentals
-            </p>
-            <ul className="list-none space-y-0">
-              {agendaDay1.map((line) => (
-                <AgendaLine key={line} text={line} />
-              ))}
-            </ul>
-          </div>
-          <div className="flex flex-col rounded-2xl border border-slate-200/80 bg-[#fafbfc] p-6 md:p-8">
-            <div className="mb-4 flex items-center gap-2 border-b border-slate-200/80 pb-4">
-              <GraduationCap className="h-5 w-5 text-[#146fc2]" aria-hidden />
-              <span className="text-sm font-semibold text-slate-950">Day 2</span>
+            <div className="flex flex-col rounded-2xl border border-slate-200/80 bg-[#fafbfc] p-6 md:p-8">
+              <div className="mb-4 flex items-center gap-2 border-b border-slate-200/80 pb-4">
+                <GraduationCap className="h-5 w-5 text-[#146fc2]" aria-hidden />
+                <span className="text-sm font-semibold text-slate-950">Day 2</span>
+              </div>
+              <p className="mb-4 text-xs font-medium tracking-wide text-slate-600 uppercase dark:text-white/55">
+                Upholstery · Hard Floors · Business · Maintenance
+              </p>
+              <ul className="list-none space-y-0">
+                {agendaDay2.map((line) => (
+                  <AgendaLine key={line} text={line} />
+                ))}
+              </ul>
             </div>
-            <p className="mb-4 text-xs font-medium tracking-wide text-slate-600 uppercase dark:text-white/55">
-              Upholstery · Hard Floors · Business · Maintenance
-            </p>
-            <ul className="list-none space-y-0">
-              {agendaDay2.map((line) => (
-                <AgendaLine key={line} text={line} />
-              ))}
-            </ul>
           </div>
-        </div>
         </div>
       </section>
 
       {/* What's included */}
-      <section className="border-t border-slate-200/70 bg-[#fafbfc] py-16 md:py-24" aria-labelledby="ccw-included-heading">
+      <section
+        className="border-t border-slate-200/70 bg-[#fafbfc] py-16 md:py-24"
+        aria-labelledby="ccw-included-heading"
+      >
         <div className={PUBLIC_SHELL_INNER_CLASS}>
           <p className={LANDING_EYEBROW_CLASS}>Deliverables</p>
           <h2 id="ccw-included-heading" className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>
             What&apos;s included
           </h2>
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {included.map(({ icon: Icon, title, body }) => (
-            <div
-              key={title}
-              className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm"
-            >
-              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-[#fafbfc]">
-                <Icon className="h-5 w-5 text-[#146fc2]" aria-hidden />
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {included.map(({ icon: Icon, title, body }) => (
+              <div
+                key={title}
+                className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm"
+              >
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-[#fafbfc]">
+                  <Icon className="h-5 w-5 text-[#146fc2]" aria-hidden />
+                </div>
+                <h3 className="text-sm font-semibold text-slate-950">{title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-slate-500">{body}</p>
               </div>
-              <h3 className="text-sm font-semibold text-slate-950">{title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-slate-500">
-                {body}
-              </p>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Materials gate */}
-      <section className="border-t border-slate-200/70 bg-white py-16 md:py-24" aria-labelledby="ccw-access-heading">
+      <section
+        className="border-t border-slate-200/70 bg-white py-16 md:py-24"
+        aria-labelledby="ccw-access-heading"
+      >
         <div className={PUBLIC_SHELL_INNER_CLASS}>
-        <div className="mb-8 text-center md:mb-10">
-          <p className={LANDING_EYEBROW_CLASS}>Participants</p>
-          <h2 id="ccw-access-heading" className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>
-            Workshop materials
-          </h2>
-          <p className={`mx-auto mt-3 max-w-md ${LANDING_LEAD_CLASS}`}>
-            Unlock below to download the take-home pack for your cohort.
-          </p>
-        </div>
+          <div className="mb-8 text-center md:mb-10">
+            <p className={LANDING_EYEBROW_CLASS}>Participants</p>
+            <h2 id="ccw-access-heading" className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>
+              Workshop materials
+            </h2>
+            <p className={`mx-auto mt-3 max-w-md ${LANDING_LEAD_CLASS}`}>
+              Unlock below to download the take-home pack for your cohort.
+            </p>
+          </div>
 
-        <div className="mx-auto w-full max-w-xl">
-          {!unlocked ? (
-            <div className="rounded-2xl border border-slate-200/80 bg-[#fafbfc] p-8 shadow-sm md:p-10">
-              {!gateOpen ? (
-                <div className="text-center">
-                  <p className="text-sm leading-relaxed text-slate-600">
-                    Use the password shared with you for this cohort to open the download.
-                  </p>
-                  <Button
-                    type="button"
-                    size="lg"
-                    className="mt-8 w-full rounded-xl bg-[#146fc2] text-[15px] font-semibold text-white shadow-lg shadow-[#2490ed]/20 hover:bg-[#1769b8] sm:w-auto sm:min-w-[220px]"
-                    onClick={() => setGateOpen(true)}
-                  >
-                    Access Course
-                    <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
-                  </Button>
-                </div>
-              ) : (
-                <form onSubmit={onUnlock} className="space-y-6">
+          <div className="mx-auto w-full max-w-xl">
+            {!unlocked ? (
+              <div className="rounded-2xl border border-slate-200/80 bg-[#fafbfc] p-8 shadow-sm md:p-10">
+                {!gateOpen ? (
                   <div className="text-center">
-                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-slate-200 bg-white text-[#146fc2]">
-                      <Lock className="h-6 w-6" aria-hidden />
+                    <p className="text-sm leading-relaxed text-slate-600">
+                      Use the password shared with you for this cohort to open the download.
+                    </p>
+                    <Button
+                      type="button"
+                      size="lg"
+                      className="mt-8 w-full rounded-xl bg-[#146fc2] text-[15px] font-semibold text-white shadow-lg shadow-[#2490ed]/20 hover:bg-[#1769b8] sm:w-auto sm:min-w-[220px]"
+                      onClick={() => setGateOpen(true)}
+                    >
+                      Access Course
+                      <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
+                    </Button>
+                  </div>
+                ) : (
+                  <form onSubmit={onUnlock} className="space-y-6">
+                    <div className="text-center">
+                      <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-slate-200 bg-white text-[#146fc2]">
+                        <Lock className="h-6 w-6" aria-hidden />
+                      </div>
+                      <p className="text-sm font-medium text-slate-950">Enter access password</p>
+                      <p className="mt-1 text-xs text-slate-500">Case-sensitive.</p>
                     </div>
-                    <p className="text-sm font-medium text-slate-950">
-                      Enter access password
-                    </p>
-                    <p className="mt-1 text-xs text-slate-500">
-                      Case-sensitive.
-                    </p>
-                  </div>
-                  <div className="relative">
-                    <Input
-                      id="ccw-training-password"
-                      name="password"
-                      type={showPw ? 'text' : 'password'}
-                      autoComplete="off"
-                      autoFocus
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Password"
-                      className={`h-12 pr-12 ${marketingInput}`}
-                      aria-invalid={error ? true : undefined}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPw(!showPw)}
-                      className="absolute top-1/2 right-2 -translate-y-1/2 rounded-lg p-2 text-slate-600 hover:bg-slate-100 hover:text-slate-700 dark:text-white/55 dark:hover:bg-white/5 dark:hover:text-white/75"
-                      aria-label={showPw ? 'Hide password' : 'Show password'}
-                    >
-                      {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                  </div>
-                  {error ? (
-                    <p className="text-center text-sm text-red-400/90" role="alert">
-                      {error}
-                    </p>
-                  ) : null}
-                  <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      className="text-slate-600 hover:text-slate-800 dark:text-white/55 dark:hover:text-white/75"
-                      onClick={() => {
-                        setGateOpen(false);
-                        setError(null);
-                        setPassword('');
-                      }}
-                    >
-                      Back
-                    </Button>
-                    <Button
-                      type="submit"
-                      disabled={pending || !password.trim()}
-                      className="rounded-xl bg-[#146fc2] hover:bg-[#1769b8]"
-                    >
-                      {pending ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Verifying…
-                        </>
-                      ) : (
-                        'Unlock'
-                      )}
-                    </Button>
-                  </div>
-                </form>
-              )}
-            </div>
-          ) : (
-            <section
-              id="materials"
-              className="scroll-mt-28 rounded-2xl border border-emerald-500/25 bg-emerald-50 p-8 shadow-sm md:p-10 dark:bg-linear-to-b dark:from-emerald-500/8 dark:to-white/2 dark:shadow-[0_24px_80px_rgba(0,0,0,0.35)]"
-            >
-              <div className="mb-6 flex items-start gap-3">
-                <CheckCircle2 className="mt-0.5 h-6 w-6 shrink-0 text-emerald-400/90" aria-hidden />
-                <div>
-                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
-                    You&apos;re in
-                  </h3>
-                  <p className="mt-1 text-sm leading-relaxed text-slate-600 dark:text-white/50">
-                    Download the workshop pack. This session remembers unlock in your browser; use
-                    the password again if you return in a new session.
-                  </p>
-                </div>
+                    <div className="relative">
+                      <Input
+                        id="ccw-training-password"
+                        name="password"
+                        type={showPw ? 'text' : 'password'}
+                        autoComplete="off"
+                        autoFocus
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Password"
+                        className={`h-12 pr-12 ${marketingInput}`}
+                        aria-invalid={error ? true : undefined}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPw(!showPw)}
+                        className="absolute top-1/2 right-2 -translate-y-1/2 rounded-lg p-2 text-slate-600 hover:bg-slate-100 hover:text-slate-700 dark:text-white/55 dark:hover:bg-white/5 dark:hover:text-white/75"
+                        aria-label={showPw ? 'Hide password' : 'Show password'}
+                      >
+                        {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                    {error ? (
+                      <p className="text-center text-sm text-red-400/90" role="alert">
+                        {error}
+                      </p>
+                    ) : null}
+                    <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        className="text-slate-600 hover:text-slate-800 dark:text-white/55 dark:hover:text-white/75"
+                        onClick={() => {
+                          setGateOpen(false);
+                          setError(null);
+                          setPassword('');
+                        }}
+                      >
+                        Back
+                      </Button>
+                      <Button
+                        type="submit"
+                        disabled={pending || !password.trim()}
+                        className="rounded-xl bg-[#146fc2] hover:bg-[#1769b8]"
+                      >
+                        {pending ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Verifying…
+                          </>
+                        ) : (
+                          'Unlock'
+                        )}
+                      </Button>
+                    </div>
+                  </form>
+                )}
               </div>
-              <a
-                href={CCW_COURSE_ZIP_HREF}
-                download
-                className="inline-flex w-full items-center justify-center gap-3 rounded-xl border border-white/10 bg-[#146fc2] px-6 py-4 text-sm font-semibold text-white transition hover:bg-[#1769b8] sm:w-auto"
+            ) : (
+              <section
+                id="materials"
+                className="scroll-mt-28 rounded-2xl border border-emerald-500/25 bg-emerald-50 p-8 shadow-sm md:p-10 dark:bg-linear-to-b dark:from-emerald-500/8 dark:to-white/2 dark:shadow-[0_24px_80px_rgba(0,0,0,0.35)]"
               >
-                <Download className="h-5 w-5 shrink-0" aria-hidden />
-                Download workshop pack (ZIP)
-              </a>
-              <p className="mt-4 font-mono text-[11px] break-all text-slate-600 dark:text-white/55">
-                {CCW_COURSE_ZIP_PATH.replace(/^\//, '')}
-              </p>
-            </section>
-          )}
-        </div>
-      </section>
-
+                <div className="mb-6 flex items-start gap-3">
+                  <CheckCircle2
+                    className="mt-0.5 h-6 w-6 shrink-0 text-emerald-400/90"
+                    aria-hidden
+                  />
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+                      You&apos;re in
+                    </h3>
+                    <p className="mt-1 text-sm leading-relaxed text-slate-600 dark:text-white/50">
+                      Download the workshop pack. This session remembers unlock in your browser; use
+                      the password again if you return in a new session.
+                    </p>
+                  </div>
+                </div>
+                <a
+                  href={CCW_COURSE_ZIP_HREF}
+                  download
+                  className="inline-flex w-full items-center justify-center gap-3 rounded-xl border border-white/10 bg-[#146fc2] px-6 py-4 text-sm font-semibold text-white transition hover:bg-[#1769b8] sm:w-auto"
+                >
+                  <Download className="h-5 w-5 shrink-0" aria-hidden />
+                  Download workshop pack (ZIP)
+                </a>
+                <p className="mt-4 font-mono text-[11px] break-all text-slate-600 dark:text-white/55">
+                  {CCW_COURSE_ZIP_PATH.replace(/^\//, '')}
+                </p>
+              </section>
+            )}
+          </div>
         </div>
       </section>
 
