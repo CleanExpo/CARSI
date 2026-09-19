@@ -2,31 +2,36 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { cache } from 'react';
 
+import { HomeFaqSection } from '@/components/landing/HomeFaqSection';
+import { HomeFinalCtaSection } from '@/components/landing/HomeFinalCtaSection';
+import { HomeTrustStrip } from '@/components/landing/HomeTrustStrip';
+import {
+  LANDING_DISPLAY_H2_CLASS,
+  LANDING_EYEBROW_CLASS,
+  LANDING_LEAD_CLASS,
+  PUBLIC_SHELL_INNER_CLASS,
+} from '@/components/landing/public-shell-width';
 import { BundlePricingCard } from '@/components/lms/BundlePricingCard';
 import { CourseGrid } from '@/components/lms/CourseGrid';
 import { IICRCDisciplineMap } from '@/components/lms/diagrams/IICRCDisciplineMap';
-import { CitablePassage, ItemListSchema } from '@/components/seo';
+import { ItemListSchema } from '@/components/seo';
 import { CECCalculator } from '@/components/tools/CECCalculator';
-import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
+import type { CourseListItem } from '@/lib/course-list-item';
 import { getBackendOrigin, getPublicSiteUrl } from '@/lib/env/public-url';
 import {
   coursesIndexMetaDescription,
   deriveCatalogueFactsFromCourseItems,
+  formatCourseCountForCopy,
 } from '@/lib/server/public-catalogue-facts';
 import { getPublishedCourseListItemsFromDatabase } from '@/lib/server/public-courses-list';
-import type { CourseListItem } from '@/lib/course-list-item';
+import { ArrowRight, Compass } from 'lucide-react';
 
-// ISR: cache the catalogue render, refreshed every 5 minutes (issue #129).
-// Discipline-filter variants that read searchParams still render per-request.
 export const revalidate = 300;
 
 export async function generateMetadata(): Promise<Metadata> {
   const { items } = await getCoursesCached();
   const facts = deriveCatalogueFactsFromCourseItems(items);
   return {
-    // Not "IICRC CEC Accredited ... Courses". That brands every catalogue course as CEC
-    // accredited, which is false while the approvals registry is empty. CARSI's CEC provider
-    // standing is stated in the description instead, where it is accurate.
     title: 'Restoration and Cleaning Courses',
     description: coursesIndexMetaDescription(facts),
     alternates: { canonical: '/courses' },
@@ -90,7 +95,6 @@ async function getCourses() {
   return getCoursesFromBackend();
 }
 
-/** One catalogue fetch per request (shared by the page and `generateMetadata`). */
 const getCoursesCached = cache(getCourses);
 
 function courseSchemaPrice(course: CourseListItem): number | undefined {
@@ -110,6 +114,30 @@ function dedupeCoursesBySlug(items: CourseListItem[]): CourseListItem[] {
   });
 }
 
+function buildCatalogueFaqs(publishedCourseCount: number) {
+  const countPhrase =
+    publishedCourseCount > 0
+      ? `Our ${publishedCourseCount} courses range from`
+      : 'Our courses range from';
+
+  return [
+    {
+      question: 'What courses does CARSI offer?',
+      answer: `CARSI is an IICRC CEC Accredited provider, and its courses carry CARSI Southern Hemisphere Restoration Designations — CARSI-issued credentials, not IICRC certifications. The catalogue covers water damage restoration, carpet repair, structural drying, mould remediation, fire and smoke restoration, odour control and carpet cleaning, all produced for Australian and New Zealand conditions. ${countPhrase} beginner modules for people just starting, through intermediate refreshers and advanced practice modules for experienced professionals. Courses are delivered online so technicians can study at their own pace. Eligible courses show their CEC value so learners can track continuing education without implying IICRC delivery status.`,
+    },
+    {
+      question: 'How do I choose the right course?',
+      answer:
+        'Your choice depends on your current role and career goals. Water damage restoration is the most common starting point. Carpet repair suits flooring and soft-furnishing work. Structural drying builds moisture control for structure. Mould remediation covers assessment and remediation. Fire and smoke restoration addresses post-fire cleanup. Odour control focuses on identifying and neutralising sources. Carpet cleaning targets commercial contract cleaners. Each pathway leads to a CARSI Southern Hemisphere Restoration Designation.',
+    },
+    {
+      question: 'What are IICRC Continuing Education Credits (CECs)?',
+      answer:
+        'IICRC Continuing Education Credits (CECs) are the industry standard for tracking professional development in cleaning and restoration. IICRC members and certified technicians continue their education through CECs within each certification cycle. A CARSI course may carry a specific CEC value only after the IICRC has approved that course for CECs. Courses awaiting approval show no CEC value. Upon completing an approved course, CECs are recorded in your CARSI dashboard and can be exported for submission to the IICRC. CARSI also provides verifiable digital credentials with a public URL.',
+    },
+  ];
+}
+
 export default async function CoursesPage({
   searchParams,
 }: {
@@ -127,10 +155,7 @@ export default async function CoursesPage({
     typeof discipline === 'string' && discipline.trim() !== ''
       ? discipline.trim().toUpperCase()
       : undefined;
-  const [bundles, { items: courses }] = await Promise.all([
-    getBundles(),
-    getCoursesCached(),
-  ]);
+  const [bundles, { items: courses }] = await Promise.all([getBundles(), getCoursesCached()]);
   const displayCourses = dedupeCoursesBySlug(courses);
   const displayTotal = displayCourses.length;
   const catalogueFacts = deriveCatalogueFactsFromCourseItems(displayCourses);
@@ -148,8 +173,19 @@ export default async function CoursesPage({
     };
   });
 
+  const stats = [
+    {
+      value:
+        displayTotal > 0 ? formatCourseCountForCopy(displayTotal) : `${displayTotal}`,
+      label: 'Published courses',
+    },
+    { value: '24/7', label: 'Study anytime' },
+    { value: 'AUD', label: 'Priced for Australia' },
+    { value: 'CEC', label: 'Hours only when approved' },
+  ];
+
   return (
-    <main id="main-content" className="relative z-10 min-h-screen bg-[#f6f8fb] text-slate-900">
+    <>
       <ItemListSchema
         name="CARSI restoration training courses"
         description={coursesIndexMetaDescription(catalogueFacts)}
@@ -157,255 +193,120 @@ export default async function CoursesPage({
         itemType="Course"
       />
 
-      <div
-        className="pointer-events-none fixed inset-0 z-0"
-        style={{
-          background:
-            'radial-gradient(ellipse 80% 42% at 50% 0%, rgba(36,144,237,0.12) 0%, transparent 58%)',
-        }}
-        aria-hidden="true"
-      />
-
-      <div className="relative z-10 mx-auto px-6 py-8 sm:py-10">
-        {/* ── Hero header ── */}
-        <header className="mb-6">
-          <h1 className="font-display text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
-            Restoration Training Courses
+      <section className="relative overflow-hidden border-b border-slate-200/70 bg-white">
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_20%_0%,rgba(36,144,237,0.12),transparent_58%)]"
+          aria-hidden
+        />
+        <div className={`relative ${PUBLIC_SHELL_INNER_CLASS} py-16 md:py-24`}>
+          <p className={LANDING_EYEBROW_CLASS}>Course catalogue</p>
+          <h1
+            className={`mt-3 max-w-3xl font-[family-name:var(--font-display)] text-[2.15rem] leading-[1.1] font-semibold tracking-[-0.02em] text-slate-950 md:text-[3.1rem] md:leading-[1.06]`}
+          >
+            Restoration training you can start tonight
           </h1>
-          <p className="mt-2 text-sm text-slate-600">
+          <p className={`mt-5 max-w-2xl text-pretty ${LANDING_LEAD_CLASS}`}>
             {displayTotal} beginner, intermediate, and advanced course
-            {displayTotal !== 1 ? 's' : ''} across water damage restoration, carpet repair,
-            structural drying, mould remediation, fire &amp; smoke restoration, odour control and
-            carpet cleaning — track your own{' '}
-            <AcronymTooltip term="CEC">CECs</AcronymTooltip> online, at your own pace
+            {displayTotal !== 1 ? 's' : ''} across water damage, carpet, structural drying, mould,
+            fire and smoke, odour control and commercial cleaning — produced for Australian
+            conditions, studied around the roster.
           </p>
-          <p className="mt-3 rounded-lg border border-[#f2cf8f] bg-[#fff8ed] px-4 py-3 text-sm leading-relaxed text-[#7a3500]">
-            CARSI courses carry CARSI Southern Hemisphere Restoration Designations. They are not IICRC
-            certification courses — IICRC certifications are obtained through schools and
+
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+            <a
+              href="#catalogue"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#146fc2] px-7 text-sm font-semibold text-white shadow-[0_14px_40px_-16px_rgba(20,111,194,0.55)] transition hover:bg-[#0f5fa8] focus-visible:ring-2 focus-visible:ring-[#2490ed]/45 focus-visible:outline-none"
+            >
+              Browse the catalogue
+              <ArrowRight className="h-4 w-4" aria-hidden />
+            </a>
+            <Link
+              href="/pathways"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-slate-200/90 bg-white px-7 text-sm font-semibold text-slate-800 transition hover:border-[#2490ed]/40 hover:text-[#146fc2] focus-visible:ring-2 focus-visible:ring-[#2490ed]/35 focus-visible:outline-none"
+            >
+              <Compass className="h-4 w-4" aria-hidden />
+              Guided pathway advisor
+            </Link>
+            <Link
+              href="/pricing"
+              className="inline-flex min-h-12 items-center justify-center text-sm font-semibold text-[#146fc2] underline-offset-4 hover:underline"
+            >
+              Membership covers every published course
+            </Link>
+          </div>
+
+          <p className="mt-8 max-w-2xl rounded-2xl border border-[#f2cf8f]/80 bg-[#fff8ed] px-5 py-4 text-sm leading-relaxed text-[#7a3500]">
+            CARSI courses carry CARSI Southern Hemisphere Restoration Designations. They are not
+            IICRC certification courses — IICRC certifications are obtained through schools and
             examinations approved by the IICRC.
           </p>
-          <div className="mt-4 rounded-lg border border-[#b8dbfb] bg-white px-4 py-3 shadow-sm">
-            <p className="text-sm leading-relaxed text-slate-700">
-              Not sure where to start, or comparing several courses?{' '}
-              <Link
-                href="/pathways"
-                className="font-semibold text-[#146fc2] underline decoration-[#146fc2]/30 underline-offset-4 transition-colors hover:text-[#0f5fa8]"
-              >
-                Use the guided pathway advisor
-              </Link>{' '}
-              to choose by trade goal, CEC need, team rollout, or facility risk.{' '}
-              <Link
-                href="/pricing"
-                className="font-semibold text-[#146fc2] underline decoration-[#146fc2]/30 underline-offset-4 transition-colors hover:text-[#0f5fa8]"
-              >
-                Membership gives 100% access to all published courses
-              </Link>
-              .
+        </div>
+      </section>
+
+      <HomeTrustStrip stats={stats} />
+
+      <section
+        id="catalogue"
+        className="relative border-t border-slate-200/70 bg-white py-16 md:py-24"
+      >
+        <div className={PUBLIC_SHELL_INNER_CLASS}>
+          <div className="mb-10 max-w-2xl">
+            <p className={LANDING_EYEBROW_CLASS}>All published courses</p>
+            <h2 className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>Filter by topic, then open a card</h2>
+            <p className={`mt-4 ${LANDING_LEAD_CLASS}`}>
+              Same cards as the homepage — price, duration, and CEC hours only when the IICRC has
+              approved that course.
             </p>
           </div>
-        </header>
+          <CourseGrid courses={displayCourses} initialTab={disciplineTab ?? 'All'} surface="light" />
+        </div>
+      </section>
 
-        {/* ── Course Grid (primary content — above the fold) ── */}
-        <section className="mb-10">
-          <div
-            className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:p-5"
-            style={{
-              border: '1px solid rgba(15,23,42,0.04)',
-            }}
-          >
-            <CourseGrid courses={displayCourses} initialTab={disciplineTab ?? 'All'} />
-          </div>
-        </section>
-
-        {/* ── Industry Bundles ── */}
-        {bundles.length > 0 && (
-          <section className="mb-10">
-            <h2 className="mb-4 text-lg font-semibold text-slate-950">
-              Industry Bundles
-            </h2>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {bundles.length > 0 && (
+        <section className="relative border-t border-slate-200/70 bg-[#fafbfc] py-16 md:py-24">
+          <div className={PUBLIC_SHELL_INNER_CLASS}>
+            <p className={LANDING_EYEBROW_CLASS}>Bundles</p>
+            <h2 className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>Industry packs</h2>
+            <p className={`mt-4 mb-10 max-w-xl ${LANDING_LEAD_CLASS}`}>
+              Grouped seats when a crew needs more than one course in the same season.
+            </p>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
               {bundles.map((b: any) => (
                 <BundlePricingCard key={b.id} bundle={b} />
               ))}
             </div>
-          </section>
-        )}
+          </div>
+        </section>
+      )}
 
-        {/* ── IICRC Discipline Map ── */}
-        <section className="mb-10">
-          <div
-            className="rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200"
-            style={{
-              border: '1px solid rgba(15,23,42,0.04)',
-            }}
-          >
-            <h2
-              className="font-display mb-3 text-center text-lg font-semibold text-slate-950"
-            >
-              How the IICRC certification disciplines fit together
+      <section className="relative border-t border-slate-200/70 bg-white py-16 md:py-24">
+        <div className={PUBLIC_SHELL_INNER_CLASS}>
+          <div className="mx-auto max-w-2xl text-center">
+            <p className={LANDING_EYEBROW_CLASS}>IICRC context</p>
+            <h2 className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>
+              How IICRC certification disciplines fit together
             </h2>
-            <p
-              className="mx-auto mb-4 max-w-xl text-center text-xs text-slate-600"
-            >
-              A reference map of the IICRC&rsquo;s own certification disciplines, for context.
-              These are certifications awarded by schools and examinations approved by the IICRC, not
-              CARSI courses — CARSI courses carry CARSI Southern Hemisphere Restoration
-              Designations.
+            <p className={`mx-auto mt-4 ${LANDING_LEAD_CLASS}`}>
+              A reference map of the IICRC&rsquo;s own certification disciplines. These are
+              certifications awarded by schools and examinations approved by the IICRC, not CARSI
+              courses — CARSI courses carry CARSI Southern Hemisphere Restoration Designations.
             </p>
+          </div>
+          <div className="mt-10 rounded-2xl border border-slate-200/80 bg-[#fafbfc] p-6 shadow-sm md:p-10">
             <IICRCDisciplineMap />
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* ── CEC Calculator ── */}
-        <div className="mb-10">
+      <section className="relative border-t border-slate-200/70 bg-[#fafbfc] py-16 md:py-20">
+        <div className={PUBLIC_SHELL_INNER_CLASS}>
           <CECCalculator />
         </div>
+      </section>
 
-        {/* ── GEO Q&A Sections (SEO content — collapsed accordion) ── */}
-        <section className="mb-8">
-          <h2 className="font-display mb-4 text-lg font-semibold text-slate-950">
-            Frequently Asked Questions
-          </h2>
-          <div className="space-y-3">
-            {/* Q1 — What courses does CARSI offer? */}
-            <details
-              className="group rounded-lg border border-slate-200 bg-white shadow-sm"
-              style={{
-                border: '1px solid rgba(15,23,42,0.1)',
-              }}
-            >
-              <summary
-                className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold text-slate-900 select-none"
-              >
-                <span>What courses does CARSI offer?</span>
-                <svg
-                  className="h-4 w-4 shrink-0 transition-transform duration-200 group-open:rotate-180"
-                  style={{ color: '#64748b' }}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                </svg>
-              </summary>
-              <div className="px-5 pb-5">
-                <CitablePassage variant="faq-answer" className="text-sm leading-relaxed text-slate-600">
-                  CARSI is an <AcronymTooltip term="IICRC" /> <AcronymTooltip term="CEC" />{' '}
-                  Accredited provider, and its courses carry CARSI Southern Hemisphere Restoration
-                  Designations — CARSI-issued credentials, not IICRC certifications. The catalogue
-                  covers water damage restoration, carpet repair, structural drying, mould
-                  remediation, fire and smoke restoration, odour control and carpet cleaning, all
-                  produced for Australian and New Zealand conditions. Completion is recorded as a
-                  verifiable digital credential.{' '}
-                  {catalogueFacts.publishedCourseCount > 0 ? (
-                    <>Our {catalogueFacts.publishedCourseCount} courses range from</>
-                  ) : (
-                    <>Our courses range from</>
-                  )}{' '}
-                  beginner modules for people just starting, through intermediate refreshers and
-                  advanced practice modules for experienced professionals. Courses are delivered
-                  online, allowing Australian restoration technicians to study at their own pace
-                  from any location. Eligible courses show their <AcronymTooltip term="CEC" /> value
-                  so learners can track continuing education progress without implying{' '}
-                  <AcronymTooltip term="IICRC" /> delivery status.
-                </CitablePassage>
-              </div>
-            </details>
-
-            {/* Q2 — How do I choose the right discipline? */}
-            <details
-              className="group rounded-lg border border-slate-200 bg-white shadow-sm"
-              style={{
-                border: '1px solid rgba(15,23,42,0.1)',
-              }}
-            >
-              <summary
-                className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold text-slate-900 select-none"
-              >
-                <span>
-                  How do I choose the right course?
-                </span>
-                <svg
-                  className="h-4 w-4 shrink-0 transition-transform duration-200 group-open:rotate-180"
-                  style={{ color: '#64748b' }}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                </svg>
-              </summary>
-              <div className="px-5 pb-5">
-                <CitablePassage variant="faq-answer" className="text-sm leading-relaxed text-slate-600">
-                  Your choice depends on your current role and career goals. Water damage
-                  restoration is the most common starting point, providing foundational knowledge
-                  applicable across all restoration work including flood damage, burst pipes, and
-                  storm recovery. Carpet repair and reinstallation suits technicians working in
-                  flooring and soft furnishing restoration. Structural drying builds on water damage
-                  restoration with advanced moisture control techniques for structural elements.
-                  Mould remediation covers mould assessment and remediation, an increasingly
-                  regulated area across Australian states. Fire and smoke restoration addresses
-                  post-fire cleanup and deodorisation. Odour control focuses on identifying and
-                  neutralising odour sources in residential and commercial settings. Carpet cleaning
-                  targets contract cleaners working in commercial environments. Each pathway leads
-                  to a CARSI Southern Hemisphere Restoration Designation.
-                </CitablePassage>
-              </div>
-            </details>
-
-            {/* Q3 — What are CECs? */}
-            <details
-              className="group rounded-lg border border-slate-200 bg-white shadow-sm"
-              style={{
-                border: '1px solid rgba(15,23,42,0.1)',
-              }}
-            >
-              <summary
-                className="flex cursor-pointer items-center justify-between px-5 py-4 text-sm font-semibold text-slate-900 select-none"
-              >
-                <span>
-                  What are <AcronymTooltip term="IICRC" /> Continuing Education Credits (
-                  <AcronymTooltip term="CEC">CECs</AcronymTooltip>)?
-                </span>
-                <svg
-                  className="h-4 w-4 shrink-0 transition-transform duration-200 group-open:rotate-180"
-                  style={{ color: '#64748b' }}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                </svg>
-              </summary>
-              <div className="px-5 pb-5">
-                <CitablePassage variant="faq-answer" className="text-sm leading-relaxed text-slate-600">
-                  <AcronymTooltip term="IICRC" /> Continuing Education Credits (
-                  <AcronymTooltip term="CEC">CECs</AcronymTooltip>) are the industry standard for
-                  tracking professional development in the cleaning and restoration sector.
-                  IICRC members and certified technicians continue their education through{' '}
-                  <AcronymTooltip term="CEC">CECs</AcronymTooltip> within each certification cycle
-                  to maintain their credentials with the Institute of Inspection, Cleaning and
-                  Restoration Certification. A CARSI course may carry a specific{' '}
-                  <AcronymTooltip term="CEC" /> value only after the{' '}
-                  <AcronymTooltip term="IICRC" /> has approved that course for{' '}
-                  <AcronymTooltip term="CEC">CECs</AcronymTooltip>. Courses awaiting approval show
-                  no CEC value. Upon completing an approved course, your{' '}
-                  <AcronymTooltip term="CEC">CECs</AcronymTooltip> are automatically recorded in
-                  your CARSI student dashboard and can be exported for submission to the{' '}
-                  <AcronymTooltip term="IICRC" />. CARSI also provides verifiable digital
-                  credentials with a public URL that employers and clients can use to confirm your
-                  qualifications. This system ensures your professional development is documented,
-                  portable, and recognised internationally across the restoration industry.
-                </CitablePassage>
-              </div>
-            </details>
-          </div>
-        </section>
-      </div>
-    </main>
+      <HomeFaqSection faqs={buildCatalogueFaqs(catalogueFacts.publishedCourseCount)} />
+      <HomeFinalCtaSection />
+    </>
   );
 }
