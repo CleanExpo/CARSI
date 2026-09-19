@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { renderSVG } from 'uqr';
 
+import { AdminPagination } from '@/components/admin/AdminPagination';
+import { useAdminListPaging } from '@/components/admin/use-admin-list-paging';
 import { ccwRoadshowEvents } from '@/lib/marketing/ccw-roadshow';
 import {
   describeWelcomeEmailFailure,
@@ -427,6 +429,7 @@ export function AdminCcwSignInsClient() {
     ? renderSVG(checkInLink.checkInUrl, { border: 4, ecc: 'M', pixelSize: 7 })
     : '';
   const qrSrc = qrSvg ? `data:image/svg+xml;charset=utf-8,${encodeURIComponent(qrSvg)}` : '';
+  const rosterPaging = useAdminListPaging(roster?.rows ?? [], eventSlug);
 
   return (
     <div className="space-y-6 p-6 text-white">
@@ -584,7 +587,7 @@ export function AdminCcwSignInsClient() {
               </tr>
             </thead>
             <tbody>
-              {roster.rows.map((row) => (
+              {rosterPaging.pageRows.map((row) => (
                 <tr key={row.signInId} className="border-b border-white/8 align-top last:border-0">
                   <td className="p-3">
                     <span className="font-semibold">{row.fullName}</span>
@@ -658,6 +661,17 @@ export function AdminCcwSignInsClient() {
               ))}
             </tbody>
           </table>
+          {roster.rows.length > 0 ? (
+            <div className="border-t border-white/10 px-3 py-4">
+              <AdminPagination
+                page={rosterPaging.page}
+                pageCount={rosterPaging.pageCount}
+                onPageChange={rosterPaging.setPage}
+                pageSize={rosterPaging.pageSize}
+                onPageSizeChange={rosterPaging.changePageSize}
+              />
+            </div>
+          ) : null}
         </div>
       )}
 
