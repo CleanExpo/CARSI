@@ -24,7 +24,7 @@ export function MeetTheBoard({ members }: { members: BoardMember[] }) {
               onClick={() => setOpenName(open ? null : m.name)}
               aria-expanded={open}
               aria-controls={panelId}
-              className="flex w-full items-center gap-4 px-5 py-4 text-left transition hover:bg-white/5"
+              className="flex w-full items-center gap-4 px-5 py-4 text-left transition hover:bg-slate-50"
             >
               {m.photoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -53,7 +53,7 @@ export function MeetTheBoard({ members }: { members: BoardMember[] }) {
               />
             </button>
             {open && (
-              <div id={panelId} className="border-t border-white/8 px-5 py-4">
+              <div id={panelId} className="border-t border-slate-200/80 px-5 py-4">
                 <p className={`text-sm leading-relaxed ${marketingTextMuted}`}>{m.bio}</p>
                 {m.profileUrl && (
                   <a
