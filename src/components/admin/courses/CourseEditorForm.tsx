@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronDown, ChevronUp, DollarSign, Loader2, Plus, Trash2, Upload } from 'lucide-react';
+import { DollarSign, Loader2, Upload } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
@@ -250,15 +250,6 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
     setModules((prev) => mergeModulesFromArticle(prev, parsed.sections, newModuleKey));
   }
 
-  function moveModule(i: number, dir: -1 | 1) {
-    const j = i + dir;
-    if (j < 0 || j >= modules.length) return;
-    const next = [...modules];
-    [next[i], next[j]] = [next[j], next[i]];
-    setModules(next);
-    writeArticleFromModules(next);
-  }
-
   async function onUploadFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     e.target.value = '';
@@ -362,9 +353,14 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
         return;
       }
       if (!payload.modules.some((m) => m.title)) {
-        toast({ title: 'Each module needs a title', variant: 'destructive' });
-        setSaving(false);
-        return;
+        payload.modules = [
+          {
+            id: modules[0]?.id,
+            title: payload.title,
+            textContent: article.trim() || payload.description || undefined,
+            videoUrl: modules[0]?.videoUrl.trim() || undefined,
+          },
+        ];
       }
       if (!isFree && resolvedPrice <= 0) {
         toast({
@@ -812,10 +808,8 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
           <div>
             <SectionTitle>Course article</SectionTitle>
             <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/50">
-              One Markdown piece for the whole course, like a Medium article. Start with{' '}
-              <code className="rounded bg-white/10 px-1 text-[11px]"># Title</code>, write the lead,
-              then a <code className="rounded bg-white/10 px-1 text-[11px]">## Module</code> heading
-              for each module. Preview is what students see.
+              The whole course lives here — every module&apos;s reading is in this article. Type
+              normally. Select words and use the toolbar to make a title, a heading, or bold.
             </p>
           </div>
           <MarkdownEditor
@@ -825,107 +819,8 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
             value={article}
             onChange={applyArticle}
             minRows={28}
-            placeholder={
-              '# Course title\n\nLead paragraph for the buyer.\n\n## First module\n\nWrite this module here.\n\n## Second module\n\nContinue the article.'
-            }
+            placeholder="Course title — then the full article, including every module."
           />
-        </section>
-
-        <section className={cn(panelClass, 'space-y-5 p-5 sm:p-6')}>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <SectionTitle>Modules</SectionTitle>
-            <button
-              type="button"
-              onClick={() => {
-                const next = [...modules, emptyModule()];
-                setModules(next);
-                writeArticleFromModules(next);
-              }}
-              className="inline-flex items-center gap-2 rounded-xl bg-[#2490ed] px-4 py-2 text-xs font-semibold text-white shadow-[0_6px_20px_-6px_rgba(36,144,237,0.55)] transition-transform hover:scale-[1.02] active:scale-[0.98]"
-            >
-              <Plus className="h-4 w-4" />
-              Add module
-            </button>
-          </div>
-
-          <div className="space-y-5">
-            {modules.map((mod, idx) => (
-              <div key={mod.key} className={cn(panelClass, 'space-y-4 border-white/8 p-4 sm:p-5')}>
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="text-xs font-bold tracking-wide text-white/50 uppercase">
-                    Module {idx + 1}
-                  </span>
-                  <div className="flex items-center gap-0.5">
-                    <button
-                      type="button"
-                      className="rounded-lg p-2 text-white/45 transition-colors hover:bg-white/10 hover:text-white"
-                      onClick={() => moveModule(idx, -1)}
-                      disabled={idx === 0}
-                      aria-label="Move up"
-                    >
-                      <ChevronUp className="h-4 w-4" />
-                    </button>
-                    <button
-                      type="button"
-                      className="rounded-lg p-2 text-white/45 transition-colors hover:bg-white/10 hover:text-white"
-                      onClick={() => moveModule(idx, 1)}
-                      disabled={idx === modules.length - 1}
-                      aria-label="Move down"
-                    >
-                      <ChevronDown className="h-4 w-4" />
-                    </button>
-                    <button
-                      type="button"
-                      className="rounded-lg p-2 text-red-400/85 transition-colors hover:bg-red-500/15"
-                      onClick={() => {
-                        const next = modules.filter((_, i) => i !== idx);
-                        setModules(next);
-                        writeArticleFromModules(next);
-                      }}
-                      disabled={modules.length <= 1}
-                      aria-label="Remove module"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-white/65">Module title</Label>
-                  <Input
-                    value={mod.title}
-                    onChange={(e) => {
-                      const next = modules.map((x, i) =>
-                        i === idx ? { ...x, title: e.target.value } : x
-                      );
-                      setModules(next);
-                      writeArticleFromModules(next);
-                    }}
-                    required
-                    className={cn('h-11', fieldClass)}
-                    placeholder="Required"
-                  />
-                </div>
-                <p className="text-xs text-white/40">
-                  Reading lives under{' '}
-                  <span className="font-medium text-white/60">## {mod.title || 'this module'}</span>{' '}
-                  in the course article above.
-                </p>
-                <div className="space-y-2">
-                  <Label className="text-white/65">Video URL (optional)</Label>
-                  <Input
-                    value={mod.videoUrl}
-                    onChange={(e) =>
-                      setModules((m) =>
-                        m.map((x, i) => (i === idx ? { ...x, videoUrl: e.target.value } : x))
-                      )
-                    }
-                    className={cn('h-11', fieldClass)}
-                    placeholder="YouTube, Vimeo, or direct .mp4"
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
         </section>
 
         <div className="flex flex-wrap gap-3 border-t border-white/10 pt-8">
