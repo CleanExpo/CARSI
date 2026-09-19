@@ -16,12 +16,7 @@ interface CourseHubContextProps {
 }
 
 /**
- * CourseHubContext — sidebar widget for course detail pages.
- *
- * Fetches career/hub context for a given course and renders a "Career
- * Opportunities" panel with job-keyword tags that link to the Hub job board.
- *
- * Design: glass panel (#060a14 bg, white/6 border), #2490ed keyword badges.
+ * Sidebar career context for a public course page — same light panel language as the homepage.
  */
 export function CourseHubContext({ slug }: CourseHubContextProps) {
   const [data, setData] = useState<HubContextData | null>(null);
@@ -43,15 +38,15 @@ export function CourseHubContext({ slug }: CourseHubContextProps) {
 
   return (
     <aside
-      className="rounded-sm border border-white/[0.06] bg-[#060a14] p-5"
+      className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm"
       aria-label="Career opportunities for this discipline"
     >
-      <h3 className="mb-3 text-xs font-semibold tracking-widest text-white/60 uppercase">
-        Career Opportunities
+      <h3 className="mb-3 text-[11px] font-medium tracking-[0.24em] text-[#146fc2] uppercase">
+        Career opportunities
       </h3>
 
       {data.pathway_name && (
-        <p className="mb-3 text-sm font-medium text-white/80">{data.pathway_name}</p>
+        <p className="mb-3 text-sm font-semibold text-slate-950">{data.pathway_name}</p>
       )}
 
       <ul className="flex flex-wrap gap-2" aria-label="Related job keywords">
@@ -59,7 +54,7 @@ export function CourseHubContext({ slug }: CourseHubContextProps) {
           <li key={keyword}>
             <a
               href={`/hub/jobs?q=${encodeURIComponent(keyword)}`}
-              className="inline-block rounded-sm bg-[#2490ed]/10 px-2.5 py-1 text-xs font-medium text-[#2490ed] transition-colors hover:bg-[#2490ed]/20"
+              className="inline-block rounded-full bg-[#eef5fb] px-3 py-1 text-xs font-medium text-[#146fc2] transition-colors hover:bg-[#dbebff]"
             >
               {keyword}
             </a>
@@ -68,9 +63,9 @@ export function CourseHubContext({ slug }: CourseHubContextProps) {
       </ul>
 
       {data.related_disciplines.length > 1 && (
-        <p className="mt-4 text-xs text-white/60">
+        <p className="mt-4 text-xs text-slate-500">
           Also relevant to:{' '}
-          <span className="text-white/50">
+          <span className="text-slate-600">
             {data.related_disciplines.filter((d) => d !== data.discipline).join(', ')}
           </span>
         </p>
