@@ -1,23 +1,17 @@
 import type { Metadata } from 'next';
 
-import { MarketingPageShell } from '@/components/marketing/MarketingPageShell';
+import {
+  COMMUNITY_CARD_CLASS,
+  CommunityHubShell,
+} from '@/components/marketing/hub/CommunityHubShell';
 import {
   HubCategoryPills,
   HubEmptyState,
-  HubPageHeader,
   HubPlaceholderCard,
   HubSectionLabel,
 } from '@/components/marketing/hub/HubUi';
 import { BreadcrumbSchema, NewsArticleSchema } from '@/components/seo';
 import { getBackendOrigin, getPublicSiteUrl } from '@/lib/env/public-url';
-import {
-  marketingEyebrowPill,
-  marketingHubCard,
-  marketingTextMuted,
-  marketingTextStrong,
-  marketingTextSubtle,
-  marketingTopicPill,
-} from '@/lib/marketing/marketing-ui';
 import { OG_IMAGES } from '@/lib/seo/og-image';
 
 const siteUrl = getPublicSiteUrl();
@@ -134,7 +128,7 @@ function NewsCard({ article }: { article: NewsArticle }) {
       href={article.source_url}
       target="_blank"
       rel="noopener noreferrer"
-      className={`group flex flex-col gap-3 p-6 ${marketingHubCard}`}
+      className={`group flex flex-col gap-3 ${COMMUNITY_CARD_CLASS}`}
     >
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
@@ -144,10 +138,10 @@ function NewsCard({ article }: { article: NewsArticle }) {
             </span>
           )}
           {article.source_name && (
-            <span className={`text-xs ${marketingTextSubtle}`}>{article.source_name}</span>
+            <span className="text-xs text-slate-400">{article.source_name}</span>
           )}
         </div>
-        <span className={`text-xs ${marketingTextSubtle}`}>{timeAgo(article.published_at)}</span>
+        <span className="text-xs text-slate-400">{timeAgo(article.published_at)}</span>
       </div>
 
       {article.image_url && (
@@ -162,13 +156,13 @@ function NewsCard({ article }: { article: NewsArticle }) {
       )}
 
       <h2
-        className={`text-base leading-snug font-semibold transition-colors group-hover:text-[#146fc2] dark:group-hover:text-[#7ec5ff] ${marketingTextStrong}`}
+        className="text-base leading-snug font-semibold text-slate-950 transition-colors group-hover:text-[#146fc2]"
       >
         {title}
       </h2>
 
       {article.ai_summary && (
-        <p className={`line-clamp-3 text-sm leading-relaxed ${marketingTextMuted}`}>
+        <p className="line-clamp-3 text-sm leading-relaxed text-slate-500">
           {article.ai_summary}
         </p>
       )}
@@ -176,14 +170,17 @@ function NewsCard({ article }: { article: NewsArticle }) {
       {article.ai_tags.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
           {article.ai_tags.slice(0, 4).map((tag) => (
-            <span key={tag} className={marketingTopicPill}>
+            <span
+              key={tag}
+              className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-[11px] text-slate-500"
+            >
               #{tag}
             </span>
           ))}
         </div>
       )}
 
-      <div className={`mt-auto flex items-center justify-between text-xs ${marketingTextSubtle}`}>
+      <div className="mt-auto flex items-center justify-between text-xs text-slate-400">
         <span>{article.author ? `By ${article.author}` : ''}</span>
         <span className="text-[#146fc2]/70 transition-colors group-hover:text-[#146fc2] dark:text-[#7ec5ff]/70 dark:group-hover:text-[#7ec5ff]">
           Read article ↗
@@ -230,35 +227,27 @@ export default async function NewsPage({
         />
       ))}
 
-      <MarketingPageShell id="main-content">
-        <HubPageHeader
-          eyebrow={
-            <>
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#2490ed]" aria-hidden />
-              Live Feed
-            </>
-          }
-          eyebrowClassName={marketingEyebrowPill}
-          title="Industry News"
-          description="AI-curated news from leading trade publications — restoration, HVAC, flooring, indoor air quality, and the broader Australian construction industry."
-          meta={
-            <>
-              {total > 0 ? <span>{total} articles</span> : null}
-              {last_updated ? (
-                <span>
-                  Updated{' '}
-                  {isToday(last_updated)
-                    ? 'today'
-                    : new Date(last_updated).toLocaleDateString('en-AU', {
-                        day: 'numeric',
-                        month: 'short',
-                      })}
-                </span>
-              ) : null}
-            </>
-          }
-        />
-
+      <CommunityHubShell
+        eyebrow="Community & resources"
+        title="Industry News"
+        description="AI-curated news from leading trade publications — restoration, HVAC, flooring, indoor air quality, and the broader Australian construction industry."
+        stats={[
+          { value: total > 0 ? String(total) : 'Live', label: 'Articles' },
+          {
+            value: last_updated
+              ? isToday(last_updated)
+                ? 'Today'
+                : new Date(last_updated).toLocaleDateString('en-AU', {
+                    day: 'numeric',
+                    month: 'short',
+                  })
+              : '—',
+            label: 'Last update',
+          },
+          { value: 'AU', label: 'Trade press' },
+          { value: '24/7', label: 'Feed' },
+        ]}
+      >
         <div className="mb-10">
           <HubCategoryPills basePath="/news" categories={CATEGORIES} activeCategory={category} />
         </div>
@@ -299,7 +288,7 @@ export default async function NewsPage({
             )}
           </>
         )}
-      </MarketingPageShell>
+      </CommunityHubShell>
     </>
   );
 }
