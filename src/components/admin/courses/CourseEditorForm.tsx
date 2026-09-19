@@ -5,16 +5,20 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 
+import { MarkdownEditor } from '@/components/admin/MarkdownEditor';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
-import { CourseFormattedBody } from '@/components/lms/CourseFormattedBody';
 import { CourseTextThumbnail } from '@/components/lms/CourseTextThumbnail';
 import { IICRC_DISCIPLINE_SHORT } from '@/lib/iicrc-discipline-display';
+import {
+  composeCourseArticle,
+  mergeModulesFromArticle,
+  parseCourseArticle,
+} from '@/lib/lms/course-article-markdown';
 
 type Mod = {
   key: string;
@@ -111,7 +115,9 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
   const [resolvedCecHours, setResolvedCecHours] = useState<string | null>(null);
   const [resolvedDurationHours, setResolvedDurationHours] = useState<string | null>(null);
   const [modules, setModules] = useState<Mod[]>([emptyModule()]);
+  const [article, setArticle] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [savedFingerprint, setSavedFingerprint] = useState('');
 
   const load = useCallback(async () => {
     if (!courseId) return;
@@ -139,7 +145,7 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
       setCecExcluded(Boolean(c.cecExcluded));
       setResolvedCecHours(c.resolvedCecHours ?? null);
       setResolvedDurationHours(c.resolvedDurationHours ?? null);
-      setModules(
+      const loadedMods =
         c.modules.length > 0
           ? c.modules.map((m) => ({
               key: m.id,
@@ -148,8 +154,15 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
               textContent: m.textContent,
               videoUrl: m.videoUrl,
             }))
-          : [emptyModule()]
-      );
+          : [emptyModule()];
+      setModules(loadedMods);
+      const loadedArticle = composeCourseArticle({
+        title: c.title,
+        description: c.description,
+        modules: loadedMods,
+      });
+      setArticle(loadedArticle);
+      setSavedFingerprint(loadedArticle);
     } catch {
       toast({ title: 'Could not load course', variant: 'destructive' });
       router.push('/admin/courses');
@@ -162,6 +175,33 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing RA-4192 rule promotion; behaviour-preserving suppression, real fix tracked separately
     void load();
   }, [load]);
+
+  useEffect(() => {
+    if (courseId) return;
+    setArticle(
+      composeCourseArticle({
+        title,
+        description,
+        modules,
+      })
+    );
+    // Seed the blank article once for a new course.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [courseId]);
+
+  const isDirty = courseId
+    ? Boolean(savedFingerprint) && article !== savedFingerprint
+    : Boolean(article.trim() || modules.some((m) => m.videoUrl));
+
+  useEffect(() => {
+    const onBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (!isDirty || saving) return;
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', onBeforeUnload);
+    return () => window.removeEventListener('beforeunload', onBeforeUnload);
+  }, [isDirty, saving]);
 
   async function runWorkflow(action: 'save_draft' | 'submit_review' | 'publish') {
     if (!courseId) return;
@@ -192,14 +232,31 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
     }
   }
 
+  function writeArticleFromModules(nextMods: Mod[], nextTitle = title, nextLead = description) {
+    setArticle(
+      composeCourseArticle({
+        title: nextTitle,
+        description: nextLead,
+        modules: nextMods,
+      })
+    );
+  }
+
+  function applyArticle(next: string) {
+    setArticle(next);
+    const parsed = parseCourseArticle(next);
+    if (parsed.title) setTitle(parsed.title);
+    setDescription(parsed.description);
+    setModules((prev) => mergeModulesFromArticle(prev, parsed.sections, newModuleKey));
+  }
+
   function moveModule(i: number, dir: -1 | 1) {
     const j = i + dir;
     if (j < 0 || j >= modules.length) return;
-    setModules((prev) => {
-      const next = [...prev];
-      [next[i], next[j]] = [next[j], next[i]];
-      return next;
-    });
+    const next = [...modules];
+    [next[i], next[j]] = [next[j], next[i]];
+    setModules(next);
+    writeArticleFromModules(next);
   }
 
   async function onUploadFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -272,9 +329,11 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
       const resolvedPrice = isFree ? 0 : Number.isFinite(price) ? price : 0;
       const parsedCec = cecHours.trim() ? Number.parseFloat(cecHours) : null;
       const parsedDuration = durationHours.trim() ? Number.parseFloat(durationHours) : null;
+      const parsedArticle = parseCourseArticle(article);
+      const mergedModules = mergeModulesFromArticle(modules, parsedArticle.sections, newModuleKey);
       const payload = {
-        title: title.trim(),
-        description: description.trim(),
+        title: (parsedArticle.title || title).trim(),
+        description: parsedArticle.description.trim(),
         thumbnailUrl: thumbnailUrl.trim(),
         introVideoUrl: introVideoUrl.trim() || undefined,
         introThumbnailUrl: introThumbnailUrl.trim() || undefined,
@@ -289,7 +348,7 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
             : null,
         iicrcDiscipline: iicrcDiscipline.trim() || null,
         level: level.trim() || null,
-        modules: modules.map((m) => ({
+        modules: mergedModules.map((m) => ({
           id: m.id,
           title: m.title.trim(),
           textContent: m.textContent.trim() || undefined,
@@ -403,37 +462,15 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
                 <Input
                   id="course-title"
                   value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+                  onChange={(e) => {
+                    const nextTitle = e.target.value;
+                    setTitle(nextTitle);
+                    writeArticleFromModules(modules, nextTitle, description);
+                  }}
                   required
                   className={cn('h-11', fieldClass)}
                   placeholder="e.g. Water Damage Restoration Essentials"
                 />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="course-desc" className="text-white/65">
-                  Description
-                </Label>
-                <Textarea
-                  id="course-desc"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  rows={5}
-                  className={cn('min-h-[120px] resize-y', fieldClass)}
-                  placeholder="Plain text: lines starting with ## are headings; lines starting with > are quotes. Legacy HTML still works."
-                />
-                <p className="text-xs leading-relaxed text-white/40">
-                  Optional: <code className="rounded bg-white/10 px-1 py-0.5 text-[10px]">## Section</code>{' '}
-                  and <code className="rounded bg-white/10 px-1 py-0.5 text-[10px]">&gt; Pull quote</code>
-                  . Blank line separates paragraphs.
-                </p>
-                {description.trim() ? (
-                  <div className="rounded-xl border border-white/10 bg-black/40 p-4">
-                    <p className="mb-2 text-[10px] font-semibold tracking-wider text-white/40 uppercase">
-                      Preview
-                    </p>
-                    <CourseFormattedBody text={description} />
-                  </div>
-                ) : null}
               </div>
             </section>
 
@@ -546,9 +583,9 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
               </p>
               {cecMissing && !cecExcluded ? (
                 <p className="rounded-lg border border-amber-500/35 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
-                  This course has no registry-approved CEC hours, so it shows no CEC to learners. Add
-                  a founder-confirmed approval to the registry to publish CEC hours — editing the
-                  field below will not change the published value.
+                  This course has no registry-approved CEC hours, so it shows no CEC to learners.
+                  Add a founder-confirmed approval to the registry to publish CEC hours — editing
+                  the field below will not change the published value.
                 </p>
               ) : null}
               {cecExcluded ? (
@@ -609,10 +646,7 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
                     id="iicrc-discipline"
                     value={iicrcDiscipline}
                     onChange={(e) => setIicrcDiscipline(e.target.value)}
-                    className={cn(
-                      'h-11 w-full rounded-md border px-3 text-sm',
-                      fieldClass
-                    )}
+                    className={cn('h-11 w-full rounded-md border px-3 text-sm', fieldClass)}
                   >
                     <option value="">General / not discipline-specific</option>
                     {Object.entries(IICRC_DISCIPLINE_SHORT).map(([code, label]) => (
@@ -680,7 +714,9 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
                   <CourseTextThumbnail
                     variant="admin"
                     title={title.trim() || 'Untitled course'}
-                    priceLabel={isFree ? 'Free' : `AUD ${Number.parseFloat(priceAud || '0').toFixed(0)}`}
+                    priceLabel={
+                      isFree ? 'Free' : `AUD ${Number.parseFloat(priceAud || '0').toFixed(0)}`
+                    }
                     isFree={isFree}
                     moduleCount={modules.length}
                     draft={!published}
@@ -752,7 +788,9 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
                   <CourseTextThumbnail
                     variant="admin"
                     title={title.trim() || 'Untitled course'}
-                    priceLabel={isFree ? 'Free' : `AUD ${Number.parseFloat(priceAud || '0').toFixed(0)}`}
+                    priceLabel={
+                      isFree ? 'Free' : `AUD ${Number.parseFloat(priceAud || '0').toFixed(0)}`
+                    }
                     isFree={isFree}
                     moduleCount={modules.length}
                     draft={!published}
@@ -761,9 +799,7 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
                         ? null
                         : 'Intro video cover — upload an image or use the catalogue thumbnail.'
                     }
-                    backdropImageSrc={
-                      (introThumbnailUrl.trim() || thumbnailUrl.trim()) || undefined
-                    }
+                    backdropImageSrc={introThumbnailUrl.trim() || thumbnailUrl.trim() || undefined}
                     backdropImageLoading="eager"
                   />
                 </div>
@@ -772,12 +808,39 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
           </div>
         </div>
 
+        <section className={cn(panelClass, 'space-y-4 p-5 sm:p-6')}>
+          <div>
+            <SectionTitle>Course article</SectionTitle>
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/50">
+              One Markdown piece for the whole course, like a Medium article. Start with{' '}
+              <code className="rounded bg-white/10 px-1 text-[11px]"># Title</code>, write the lead,
+              then a <code className="rounded bg-white/10 px-1 text-[11px]">## Module</code> heading
+              for each module. Preview is what students see.
+            </p>
+          </div>
+          <MarkdownEditor
+            id="course-article"
+            label="Course article"
+            variant="article"
+            value={article}
+            onChange={applyArticle}
+            minRows={28}
+            placeholder={
+              '# Course title\n\nLead paragraph for the buyer.\n\n## First module\n\nWrite this module here.\n\n## Second module\n\nContinue the article.'
+            }
+          />
+        </section>
+
         <section className={cn(panelClass, 'space-y-5 p-5 sm:p-6')}>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <SectionTitle>Modules</SectionTitle>
             <button
               type="button"
-              onClick={() => setModules((m) => [...m, emptyModule()])}
+              onClick={() => {
+                const next = [...modules, emptyModule()];
+                setModules(next);
+                writeArticleFromModules(next);
+              }}
               className="inline-flex items-center gap-2 rounded-xl bg-[#2490ed] px-4 py-2 text-xs font-semibold text-white shadow-[0_6px_20px_-6px_rgba(36,144,237,0.55)] transition-transform hover:scale-[1.02] active:scale-[0.98]"
             >
               <Plus className="h-4 w-4" />
@@ -814,7 +877,11 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
                     <button
                       type="button"
                       className="rounded-lg p-2 text-red-400/85 transition-colors hover:bg-red-500/15"
-                      onClick={() => setModules((m) => m.filter((_, i) => i !== idx))}
+                      onClick={() => {
+                        const next = modules.filter((_, i) => i !== idx);
+                        setModules(next);
+                        writeArticleFromModules(next);
+                      }}
                       disabled={modules.length <= 1}
                       aria-label="Remove module"
                     >
@@ -826,30 +893,23 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
                   <Label className="text-white/65">Module title</Label>
                   <Input
                     value={mod.title}
-                    onChange={(e) =>
-                      setModules((m) =>
-                        m.map((x, i) => (i === idx ? { ...x, title: e.target.value } : x))
-                      )
-                    }
+                    onChange={(e) => {
+                      const next = modules.map((x, i) =>
+                        i === idx ? { ...x, title: e.target.value } : x
+                      );
+                      setModules(next);
+                      writeArticleFromModules(next);
+                    }}
                     required
                     className={cn('h-11', fieldClass)}
                     placeholder="Required"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-white/65">Reading / text (optional)</Label>
-                  <Textarea
-                    value={mod.textContent}
-                    onChange={(e) =>
-                      setModules((m) =>
-                        m.map((x, i) => (i === idx ? { ...x, textContent: e.target.value } : x))
-                      )
-                    }
-                    rows={5}
-                    className={cn('font-mono text-sm', fieldClass)}
-                    placeholder="Plain text or HTML"
-                  />
-                </div>
+                <p className="text-xs text-white/40">
+                  Reading lives under{' '}
+                  <span className="font-medium text-white/60">## {mod.title || 'this module'}</span>{' '}
+                  in the course article above.
+                </p>
                 <div className="space-y-2">
                   <Label className="text-white/65">Video URL (optional)</Label>
                   <Input
