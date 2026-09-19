@@ -9,16 +9,9 @@ import {
   LANDING_LEAD_CLASS,
   PUBLIC_SHELL_INNER_CLASS,
 } from '@/components/landing/public-shell-width';
+import { COMMUNITY_NAV } from '@/components/marketing/hub/community-nav';
 
-export const COMMUNITY_NAV = [
-  { href: '/news', label: 'Industry News' },
-  { href: '/jobs', label: 'Jobs Board' },
-  { href: '/calendar', label: 'Industry Calendar' },
-  { href: '/research', label: 'Research' },
-  { href: '/youtube', label: 'YouTube Hub' },
-  { href: '/ideas', label: 'Community Ideas' },
-  { href: '/submit', label: 'Submit Content' },
-] as const;
+export { COMMUNITY_NAV };
 
 export const COMMUNITY_CARD_CLASS =
   'rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm transition hover:border-[#2490ed]/35 hover:shadow-[0_18px_40px_-24px_rgba(20,111,194,0.35)]';
