@@ -21,12 +21,22 @@ import {
   Wrench,
 } from 'lucide-react';
 
+import { HomeFaqSection } from '@/components/landing/HomeFaqSection';
+import { HomeFinalCtaSection } from '@/components/landing/HomeFinalCtaSection';
+import { HomeTrustStrip } from '@/components/landing/HomeTrustStrip';
+import {
+  LANDING_DISPLAY_H2_CLASS,
+  LANDING_EYEBROW_CLASS,
+  LANDING_LEAD_CLASS,
+  PUBLIC_SHELL_INNER_CLASS,
+} from '@/components/landing/public-shell-width';
 import { MarketingGrowthLinks } from '@/components/marketing/MarketingGrowthLinks';
 import { MarketingSectionHeader } from '@/components/marketing/MarketingSectionHeader';
 import {
   MarketingPageShell,
   marketingPageInnerWideClass,
 } from '@/components/marketing/MarketingPageShell';
+import { PlatformNav } from '@/components/marketing/PlatformNav';
 import { BreadcrumbSchema, FAQSchema } from '@/components/seo';
 import {
   marketingBtnPrimary,
@@ -68,8 +78,8 @@ function SourceList({ sources }: { sources: StartSmartSource[] }) {
         >
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-sm font-semibold text-slate-900 dark:text-white/90">{source.label}</p>
-              <p className="mt-2 text-xs leading-5 text-slate-600 dark:text-white/55">{source.note}</p>
+              <p className="text-sm font-semibold text-slate-950">{source.label}</p>
+              <p className="mt-2 text-xs leading-5 text-slate-500">{source.note}</p>
             </div>
             <ExternalLink className="mt-0.5 h-4 w-4 shrink-0 text-[#146fc2] dark:text-[#7ec5ff]" aria-hidden="true" />
           </div>
@@ -81,7 +91,7 @@ function SourceList({ sources }: { sources: StartSmartSource[] }) {
 
 function Pill({ children }: { children: string }) {
   return (
-    <span className="rounded-full border border-[#2490ed]/20 bg-[#2490ed]/10 px-3 py-1 text-xs font-medium text-[#146fc2] dark:text-[#7ec5ff]">
+    <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600">
       {children}
     </span>
   );
@@ -100,7 +110,7 @@ function ReadinessPillarCard({ pillar }: { pillar: StartSmartReadinessPillar }) 
   return (
     <Link
       href={pillar.href}
-      className={`group p-5 ${marketingPanel} ${marketingPanelHover}`}
+      className="group rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm hover:border-[#2490ed]/40"
     >
       <div className={`mb-4 ${marketingIconWrap}`}>
         <Icon className="h-5 w-5" aria-hidden="true" />
@@ -221,7 +231,7 @@ function LeadPathCard({ path }: { path: StartSmartLeadPath }) {
   return (
     <Link
       href={path.href}
-      className={`group p-5 ${marketingPanel} ${marketingPanelHover}`}
+      className="group rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm hover:border-[#2490ed]/40"
     >
       <div className={`mb-4 ${marketingIconWrap}`}>
         <Icon className="h-5 w-5" aria-hidden="true" />
@@ -271,11 +281,16 @@ export function StartSmartHub({ siteUrl }: { siteUrl: string }) {
   ];
 
   return (
-    <MarketingPageShell innerClassName={marketingPageInnerWideClass}>
+    <>
       <BreadcrumbSchema items={breadcrumbs} />
       <FAQSchema questions={startSmartHubFaqs} />
 
-        <section className="grid gap-8 pb-10 pt-2 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
+        <section className="relative overflow-hidden border-b border-slate-200/70 bg-white">
+          <div
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_15%_0%,rgba(36,144,237,0.11),transparent_58%)]"
+            aria-hidden
+          />
+          <div className={`relative ${PUBLIC_SHELL_INNER_CLASS} grid gap-8 py-16 md:py-24 lg:grid-cols-[1.15fr_0.85fr] lg:items-end`}>
           <div>
             <div className="mb-5 flex flex-wrap gap-2">
               <Pill>Carpet cleaning startup</Pill>
@@ -283,91 +298,109 @@ export function StartSmartHub({ siteUrl }: { siteUrl: string }) {
               <Pill>Existing cleaners</Pill>
               <Pill>Equipment decisions</Pill>
             </div>
-            <p className={`mb-3 ${marketingEyebrow}`}>
+            <p className={LANDING_EYEBROW_CLASS}>
               CARSI Start Smart pathway
             </p>
-            <h1 className="font-display max-w-4xl text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl text-slate-900 dark:text-white/90">
+            <h1 className="mt-3 max-w-4xl font-[family-name:var(--font-display)] text-[2.15rem] leading-[1.1] font-semibold tracking-[-0.02em] text-slate-950 md:text-[3.1rem] md:leading-[1.06]">
               Start or add carpet cleaning with knowledge before risk.
             </h1>
-            <p className="mt-5 max-w-3xl text-base leading-7 sm:text-lg text-slate-600 dark:text-white/68">
+            <p className={`mt-5 max-w-3xl text-pretty ${LANDING_LEAD_CLASS}`}>
               CARSI helps new operators, existing cleaners and business buyers understand the science,
               equipment, quoting and trust signals behind professional carpet cleaning before they spend
               money or take customer work.
             </p>
+            <PlatformNav current="/start-carpet-cleaning-business" />
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-              <Link href="/courses?discipline=CCT" className={marketingBtnPrimary}>
-                Explore CCT courses <ArrowRight className="h-4 w-4" />
+              <Link
+                href="/courses"
+                className="inline-flex min-h-12 items-center gap-2 rounded-full bg-[#146fc2] px-7 text-sm font-semibold text-white hover:bg-[#0f5fa8]"
+              >
+                Explore CARSI courses <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link href="/pricing" className={marketingBtnSecondary}>
+              <Link
+                href="/pricing"
+                className="inline-flex min-h-12 items-center rounded-full border border-slate-200 bg-white px-7 text-sm font-semibold text-slate-800 hover:border-[#2490ed]/40 hover:text-[#146fc2]"
+              >
                 View membership
               </Link>
             </div>
           </div>
 
-          <div className={`p-5 ${marketingPanel}`}>
-            <p className={`text-xs font-semibold tracking-[0.14em] ${marketingEyebrowAmber}`}>
+          <div className="rounded-2xl border border-slate-200/80 bg-[#fafbfc] p-5">
+            <p className="text-xs font-semibold tracking-[0.14em] text-[#a85500] uppercase">
               Direct answer for AI search
             </p>
-            <p className="mt-3 text-lg leading-7 text-slate-900 dark:text-white/90">
+            <p className="mt-3 text-lg leading-7 text-slate-950">
               Carpet cleaning can look like an easy-entry business, but professional results depend on
               fibre knowledge, chemistry, equipment selection, quoting, safety and customer trust.
               CARSI is the education step before the purchase, the pitch or the acquisition.
             </p>
-            <div className="mt-5 grid grid-cols-3 gap-3">
-              {[
-                ['8', 'sub-pillars'],
-                ['CCT', 'core discipline'],
-                ['24/7', 'online learning'],
-              ].map(([value, label]) => (
-                <div key={label} className="rounded-xl border border-slate-200/80 dark:border-white/6 bg-slate-50 dark:bg-white/[0.03] p-3">
-                  <p className="font-mono text-xl text-slate-900 dark:text-white">{value}</p>
-                  <p className="mt-1 text-xs text-slate-600 dark:text-white/55">
-                    {label}
-                  </p>
-                </div>
-              ))}
-            </div>
+          </div>
           </div>
         </section>
 
-        <section className={marketingSection}>
-          <MarketingSectionHeader
-            eyebrow="Choose your starting point"
-            title="Sub-pillar pages built for search intent"
-            body="Each page answers a real-world question: starting from zero, adding carpet cleaning to a cleaning business, buying a business, choosing equipment, learning chemistry, pricing work, building trust and picking a service model."
-          />
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <HomeTrustStrip
+          stats={[
+            { value: '8', label: 'Sub-pillars' },
+            { value: '4', label: 'Readiness gates' },
+            { value: '24/7', label: 'Online learning' },
+            { value: 'AU', label: 'Market context' },
+          ]}
+        />
+
+        <section className="border-t border-slate-200/70 bg-[#fafbfc] py-16 md:py-24">
+          <div className={PUBLIC_SHELL_INNER_CLASS}>
+          <p className={LANDING_EYEBROW_CLASS}>Choose your starting point</p>
+          <h2 className={`mt-3 max-w-2xl ${LANDING_DISPLAY_H2_CLASS}`}>
+            Sub-pillar pages built for search intent
+          </h2>
+          <p className={`mt-4 max-w-2xl ${LANDING_LEAD_CLASS}`}>
+            Each page answers a real-world question: starting from zero, adding carpet cleaning to a
+            cleaning business, buying a business, choosing equipment, learning chemistry, pricing
+            work, building trust and picking a service model.
+          </p>
+          <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {startSmartPages.map((page) => (
               <Link
                 key={page.slug}
                 href={`${startSmartBasePath}/${page.slug}`}
-                className={`group p-5 ${marketingPanel} ${marketingPanelHover}`}
+                className="group rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm hover:border-[#2490ed]/40"
               >
-                <div className={`mb-4 ${marketingIconWrap}`}>
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-[#fafbfc] text-[#146fc2]">
                   <Compass className="h-5 w-5" aria-hidden="true" />
                 </div>
-                <p className={`text-xs font-semibold tracking-[0.14em] ${marketingEyebrowAmber}`}>
+                <p className="text-xs font-semibold tracking-[0.14em] text-[#a85500] uppercase">
                   {page.eyebrow}
                 </p>
-                <h2 className="mt-2 text-base font-semibold text-slate-900 dark:text-white/90">
+                <h2 className="mt-2 text-base font-semibold text-slate-950">
                   {page.shortTitle}
                 </h2>
-                <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-white/55">
+                <p className="mt-3 text-sm leading-6 text-slate-500">
                   {page.directAnswer}
                 </p>
-                <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#146fc2] dark:text-[#7ec5ff]">
+                <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#146fc2]">
                   Read page <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
                 </span>
               </Link>
             ))}
           </div>
+          </div>
         </section>
 
+        <div className="border-t border-slate-200/70 bg-white py-16 md:py-24">
+          <div className={PUBLIC_SHELL_INNER_CLASS}>
         <ProfessionalReadinessLoop />
+          </div>
+        </div>
 
+        <div className="border-t border-slate-200/70 bg-[#fafbfc] py-16 md:py-24">
+          <div className={PUBLIC_SHELL_INNER_CLASS}>
         <StartSmartLeadPaths paths={startSmartLeadPaths} />
+          </div>
+        </div>
 
-        <section className={`grid gap-5 ${marketingSection} lg:grid-cols-3`}>
+        <section className="border-t border-slate-200/70 bg-white py-16 md:py-24">
+          <div className={`${PUBLIC_SHELL_INNER_CLASS} grid gap-5 lg:grid-cols-3`}>
           {[
             {
               icon: Brain,
@@ -385,43 +418,31 @@ export function StartSmartHub({ siteUrl }: { siteUrl: string }) {
               body: 'Schema, source links, CARSI positioning and llms.txt support make the pathway easier for answer engines to understand.',
             },
           ].map(({ icon: Icon, title, body }) => (
-            <div key={title} className={`p-5 ${marketingPanel}`}>
-              <Icon className="h-6 w-6 text-[#146fc2] dark:text-[#7ec5ff]" aria-hidden="true" />
-              <h2 className="mt-4 text-lg font-semibold text-slate-900 dark:text-white/90">
+            <div key={title} className="rounded-2xl border border-slate-200/80 bg-[#fafbfc] p-5">
+              <Icon className="h-6 w-6 text-[#146fc2]" aria-hidden="true" />
+              <h2 className="mt-4 text-lg font-semibold text-slate-950">
                 {title}
               </h2>
-              <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-white/55">
+              <p className="mt-2 text-sm leading-6 text-slate-500">
                 {body}
               </p>
             </div>
           ))}
-        </section>
-
-        <section className={marketingSection}>
-          <MarketingSectionHeader
-            eyebrow="Frequent questions"
-            title="Clear answers for people and answer engines"
-          />
-          <div className="grid gap-3 md:grid-cols-2">
-            {startSmartHubFaqs.map((faq) => (
-              <details key={faq.question} className={`p-4 ${marketingPanel}`}>
-                <summary className="cursor-pointer text-sm font-semibold text-slate-900 dark:text-white/90">
-                  {faq.question}
-                </summary>
-                <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-white/55">
-                  {faq.answer}
-                </p>
-              </details>
-            ))}
           </div>
         </section>
 
-        <section className={marketingSection}>
-          <MarketingSectionHeader
-            eyebrow="Trusted references"
-            title="Source-backed, not hype-backed"
-            body="CARSI should be discoverable anywhere in the world, but the pages stay honest: online learning supports competence; local legal, insurance and certification requirements still need to be checked."
-          />
+        <HomeFaqSection faqs={startSmartHubFaqs} />
+
+        <section className="border-t border-slate-200/70 bg-[#fafbfc] py-16 md:py-24">
+          <div className={PUBLIC_SHELL_INNER_CLASS}>
+          <p className={LANDING_EYEBROW_CLASS}>Trusted references</p>
+          <h2 className={`mt-3 max-w-2xl ${LANDING_DISPLAY_H2_CLASS}`}>Source-backed, not hype-backed</h2>
+          <p className={`mt-4 max-w-2xl ${LANDING_LEAD_CLASS}`}>
+            CARSI should be discoverable anywhere in the world, but the pages stay honest: online
+            learning supports competence; local legal, insurance and certification requirements still
+            need to be checked.
+          </p>
+          <div className="mt-10">
           <SourceList
             sources={[
               {
@@ -446,10 +467,15 @@ export function StartSmartHub({ siteUrl }: { siteUrl: string }) {
               },
             ]}
           />
+          </div>
+          </div>
         </section>
 
+        <div className={`${PUBLIC_SHELL_INNER_CLASS} py-12`}>
         <MarketingGrowthLinks currentHref={startSmartBasePath} />
-    </MarketingPageShell>
+        </div>
+        <HomeFinalCtaSection />
+    </>
   );
 }
 
