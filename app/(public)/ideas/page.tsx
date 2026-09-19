@@ -1,8 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { apiClient } from '@/lib/api/client';
+
 import { useAuth } from '@/components/auth/auth-provider';
+import { CommunityHubShell } from '@/components/marketing/hub/CommunityHubShell';
+import { apiClient } from '@/lib/api/client';
 
 interface CourseIdea {
   id: string;
@@ -14,14 +16,6 @@ interface CourseIdea {
   ai_outline: object | null;
   created_at: string | null;
 }
-
-const DISCIPLINE_COLOURS: Record<string, string> = {
-  WRT: 'bg-cyan-950 text-cyan-400',
-  CRT: 'bg-blue-950 text-blue-400',
-  OCT: 'bg-purple-950 text-purple-400',
-  ASD: 'bg-emerald-950 text-emerald-400',
-  CCT: 'bg-amber-950 text-amber-400',
-};
 
 const STATUS_LABELS: Record<string, string> = {
   idea: 'Idea',
@@ -61,67 +55,69 @@ export default function CourseIdeasPage() {
   }
 
   return (
-    <main className="flex max-w-3xl flex-col gap-8 px-4 py-12">
-      <div className="flex flex-col gap-2">
-        <h1 className="font-mono text-3xl font-bold text-slate-900 dark:text-white">Course Ideas</h1>
-        <p className="text-sm leading-relaxed text-slate-600 dark:text-white/50">
-          Vote for courses you&apos;d like CARSI to build. Instructors use your votes to prioritise
-          development.
-        </p>
-      </div>
+    <CommunityHubShell
+      eyebrow="Community & resources"
+      title="Community Ideas"
+      description="Vote for courses you would like CARSI to build. Instructors use your votes to prioritise development."
+      stats={[
+        { value: loading ? '…' : String(ideas.length), label: 'Ideas' },
+        { value: user ? 'Ready' : 'Sign in', label: 'To vote' },
+        { value: 'CEC', label: 'When approved' },
+        { value: 'AU', label: 'For the field' },
+      ]}
+    >
+      {loading ? <p className="text-sm text-slate-500">Loading…</p> : null}
+      {error ? <p className="text-sm text-red-600">{error}</p> : null}
 
-      {loading && <p className="text-sm text-slate-600 dark:text-white/55">Loading…</p>}
-      {error && <p className="text-sm text-red-400">{error}</p>}
-
-      {!loading && !error && ideas.length === 0 && (
-        <p className="text-sm text-slate-600 dark:text-white/55">No course ideas yet. Be the first to suggest one!</p>
-      )}
+      {!loading && !error && ideas.length === 0 ? (
+        <div className="rounded-2xl border border-slate-200/80 bg-white px-6 py-16 text-center">
+          <p className="text-sm text-slate-500">
+            No course ideas yet. Be the first to suggest one.
+          </p>
+        </div>
+      ) : null}
 
       <div className="flex flex-col gap-4">
         {ideas.map((idea) => (
           <div
             key={idea.id}
-            className="flex items-start gap-4 rounded-sm border border-white/[0.06] bg-zinc-900 p-5"
+            className="flex items-start gap-4 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm"
           >
-            {/* Vote button */}
             <button
               onClick={() => handleVote(idea.id)}
               disabled={votingId === idea.id}
-              className="flex min-w-[52px] flex-col items-center gap-0.5 rounded-sm border border-white/[0.08] bg-zinc-800 px-3 py-2 transition-colors hover:border-cyan-500/40 hover:bg-zinc-700 disabled:opacity-50"
+              className="flex min-w-[52px] flex-col items-center gap-0.5 rounded-xl border border-slate-200 bg-[#fafbfc] px-3 py-2 text-slate-700 transition hover:border-[#2490ed]/40 hover:text-[#146fc2] disabled:opacity-50"
             >
-              <span className="text-xs text-white/60">▲</span>
-              <span className="font-mono text-sm font-bold text-white">{idea.vote_count}</span>
+              <span className="text-xs">▲</span>
+              <span className="font-mono text-sm font-bold">{idea.vote_count}</span>
             </button>
 
-            {/* Content */}
             <div className="flex flex-1 flex-col gap-2">
               <div className="flex flex-wrap items-center gap-2">
-                <h2 className="font-mono text-sm font-semibold text-white">{idea.title}</h2>
-                {idea.iicrc_discipline && (
-                  <span
-                    className={`rounded-sm px-2 py-0.5 font-mono text-xs font-semibold ${
-                      DISCIPLINE_COLOURS[idea.iicrc_discipline] ?? 'bg-zinc-800 text-zinc-400'
-                    }`}
-                  >
+                <h2 className="font-[family-name:var(--font-display)] text-base font-semibold text-slate-950">
+                  {idea.title}
+                </h2>
+                {idea.iicrc_discipline ? (
+                  <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-[11px] font-medium text-slate-600">
                     {idea.iicrc_discipline}
                   </span>
-                )}
-                <span className="rounded-sm bg-zinc-800 px-2 py-0.5 font-mono text-xs text-white/60">
+                ) : null}
+                <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-[11px] text-slate-500">
                   {STATUS_LABELS[idea.status] ?? idea.status}
                 </span>
-                {idea.ai_outline && (
-                  <span className="rounded-sm bg-emerald-950 px-2 py-0.5 font-mono text-xs text-emerald-400">
-                    AI outline ready
+                {idea.ai_outline ? (
+                  <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[11px] text-emerald-700">
+                    Outline ready
                   </span>
-                )}
+                ) : null}
               </div>
-              {idea.description && (
-                <p className="text-sm leading-relaxed text-white/50">{idea.description}</p>
-              )}
+              {idea.description ? (
+                <p className="text-sm leading-relaxed text-slate-500">{idea.description}</p>
+              ) : null}
             </div>
           </div>
         ))}
       </div>
-    </main>
+    </CommunityHubShell>
   );
 }
