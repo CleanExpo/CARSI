@@ -1,24 +1,18 @@
-import type { Metadata } from 'next';
-import { BreadcrumbSchema, VideoObjectSchema } from '@/components/seo';
-import { MarketingPageShell, marketingPageInnerClass } from '@/components/marketing/MarketingPageShell';
+import {
+  COMMUNITY_CARD_CLASS,
+  CommunityHubShell,
+} from '@/components/marketing/hub/CommunityHubShell';
 import {
   HubCategoryPills,
   HubEmptyState,
-  HubPageHeader,
   HubPlaceholderCard,
   HubSectionLabel,
   HubSuggestBanner,
 } from '@/components/marketing/hub/HubUi';
+import { BreadcrumbSchema, VideoObjectSchema } from '@/components/seo';
 import { getBackendOrigin } from '@/lib/env/public-url';
-import {
-  marketingHubCard,
-  marketingPanel,
-  marketingTextMuted,
-  marketingTextStrong,
-  marketingTextSubtle,
-  marketingTopicPill,
-} from '@/lib/marketing/marketing-ui';
 import { OG_IMAGES } from '@/lib/seo/og-image';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'YouTube Channel Directory | CARSI Industry Hub',
@@ -125,10 +119,8 @@ function ChannelCard({ channel }: { channel: YouTubeChannel }) {
       href={channel.channel_url}
       target="_blank"
       rel="noopener noreferrer"
-      className={`group flex flex-col gap-4 p-6 ${marketingHubCard} ${
-        isCarsi
-          ? 'border-[#2490ed]/35 bg-[#eef7ff]/60 dark:border-[#2490ed]/40 dark:bg-[#2490ed]/10'
-          : ''
+      className={`group flex flex-col gap-4 ${COMMUNITY_CARD_CLASS} ${
+        isCarsi ? 'border-[#2490ed]/35 bg-[#eef7ff]/60' : ''
       }`}
     >
       <div className="flex items-start gap-4">
@@ -137,11 +129,15 @@ function ChannelCard({ channel }: { channel: YouTubeChannel }) {
           <img
             src={channel.thumbnail_url}
             alt={channel.name}
-            className="h-14 w-14 flex-shrink-0 rounded-full object-cover ring-2 ring-slate-200/80 dark:ring-white/10"
+            className="h-14 w-14 flex-shrink-0 rounded-full object-cover ring-2 ring-slate-200/80"
           />
         ) : (
           <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-red-50 ring-2 ring-slate-200/80 dark:bg-[rgba(255,0,0,0.15)] dark:ring-white/10">
-            <svg className="h-6 w-6 text-red-500 dark:text-red-400" fill="currentColor" viewBox="0 0 24 24">
+            <svg
+              className="h-6 w-6 text-red-500 dark:text-red-400"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1C4.5 20.4 12 20.4 12 20.4s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8ZM9.6 15.6V8.4l6.3 3.6-6.3 3.6Z" />
             </svg>
           </div>
@@ -149,9 +145,7 @@ function ChannelCard({ channel }: { channel: YouTubeChannel }) {
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <h2
-              className={`text-base leading-snug font-semibold transition-colors group-hover:text-[#2490ed] ${marketingTextStrong}`}
-            >
+            <h2 className="text-base leading-snug font-semibold text-slate-950 transition-colors group-hover:text-[#146fc2]">
               {channel.name}
             </h2>
             {isCarsi && (
@@ -167,14 +161,14 @@ function ChannelCard({ channel }: { channel: YouTubeChannel }) {
           </div>
 
           {channel.custom_url && (
-            <p className={`mt-0.5 text-xs ${marketingTextSubtle}`}>{channel.custom_url}</p>
+            <p className="mt-0.5 text-xs text-slate-400">{channel.custom_url}</p>
           )}
 
           {channel.subscriber_count !== null && (
-            <p className={`mt-1 text-xs font-medium ${marketingTextMuted}`}>
+            <p className="mt-1 text-xs font-medium text-slate-500">
               {formatSubscribers(channel.subscriber_count)}
               {channel.video_count !== null && (
-                <span className={`ml-2 ${marketingTextSubtle}`}>· {channel.video_count} videos</span>
+                <span className="ml-2 text-slate-400">· {channel.video_count} videos</span>
               )}
             </p>
           )}
@@ -182,15 +176,16 @@ function ChannelCard({ channel }: { channel: YouTubeChannel }) {
       </div>
 
       {channel.description && (
-        <p className={`line-clamp-2 text-sm leading-relaxed ${marketingTextMuted}`}>
-          {channel.description}
-        </p>
+        <p className="line-clamp-2 text-sm leading-relaxed text-slate-500">{channel.description}</p>
       )}
 
       {channel.industry_categories.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
           {channel.industry_categories.slice(0, 4).map((cat) => (
-            <span key={cat} className={`rounded-md px-2 py-0.5 text-xs capitalize ${marketingTopicPill}`}>
+            <span
+              key={cat}
+              className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs text-slate-500 capitalize"
+            >
               {cat}
             </span>
           ))}
@@ -198,13 +193,13 @@ function ChannelCard({ channel }: { channel: YouTubeChannel }) {
       )}
 
       {channel.latest_upload_title && (
-        <div className={`rounded-lg px-3 py-2.5 ${marketingPanel}`}>
-          <p className={`mb-1 text-xs ${marketingTextSubtle}`}>Latest video</p>
-          <p className={`line-clamp-1 text-xs font-medium ${marketingTextMuted}`}>
+        <div className="rounded-lg border border-slate-200/80 bg-[#fafbfc] px-3 py-2.5">
+          <p className="mb-1 text-xs text-slate-400">Latest video</p>
+          <p className="line-clamp-1 text-xs font-medium text-slate-600">
             {channel.latest_upload_title}
           </p>
           {channel.latest_upload_date && (
-            <p className={`mt-0.5 text-xs ${marketingTextSubtle}`}>
+            <p className="mt-0.5 text-xs text-slate-400">
               {new Date(channel.latest_upload_date).toLocaleDateString('en-AU', {
                 day: 'numeric',
                 month: 'short',
@@ -215,7 +210,7 @@ function ChannelCard({ channel }: { channel: YouTubeChannel }) {
         </div>
       )}
 
-      <div className={`mt-auto flex items-center justify-between text-xs ${marketingTextSubtle}`}>
+      <div className="mt-auto flex items-center justify-between text-xs text-slate-400">
         <span className="text-red-500/70 dark:text-[#ff4444]/60">youtube.com</span>
         <span className="text-[#146fc2] transition-colors group-hover:text-[#2490ed] dark:text-[#7ec5ff]">
           Visit channel ↗
@@ -262,43 +257,25 @@ export default async function YouTubePage({
           />
         ))}
 
-      <MarketingPageShell
-        id="main-content"
-        innerClassName={`${marketingPageInnerClass} mx-auto max-w-7xl`}
+      <CommunityHubShell
+        eyebrow="Community & resources"
+        title="Industry YouTube Channels"
+        description="The best YouTube channels for Australian restoration, HVAC, flooring, indoor air quality, and environmental professionals — curated and updated weekly by CARSI."
+        stats={[
+          { value: total > 0 ? String(total) : '—', label: 'Channels' },
+          {
+            value: synced_at
+              ? new Date(synced_at).toLocaleDateString('en-AU', {
+                  day: 'numeric',
+                  month: 'short',
+                })
+              : 'Weekly',
+            label: synced_at ? 'Stats updated' : 'Curated',
+          },
+          { value: 'AU', label: 'Trade focus' },
+          { value: 'Free', label: 'To watch' },
+        ]}
       >
-        <HubPageHeader
-          eyebrow={
-            <>
-              <svg className="h-4 w-4 text-red-500" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
-                <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1C4.5 20.4 12 20.4 12 20.4s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1C24 15.9 24 12 24 12s0-3.9-.5-5.8ZM9.6 15.6V8.4l6.3 3.6-6.3 3.6Z" />
-              </svg>
-              YouTube Directory
-            </>
-          }
-          title="Industry YouTube Channels"
-          description="The best YouTube channels for Australian restoration, HVAC, flooring, indoor air quality, and environmental professionals — curated and updated weekly by CARSI."
-          meta={
-            <>
-              {total > 0 && <span>{total} channels</span>}
-              {synced_at ? (
-                <span>
-                  Stats updated{' '}
-                  {new Date(synced_at).toLocaleDateString('en-AU', {
-                    day: 'numeric',
-                    month: 'short',
-                  })}
-                </span>
-              ) : (
-                // GP-431: don't leak an internal "pending API key" status to the
-                // public. The channels below are real and curated; only the
-                // optional view-count stats sync is unwired, so say nothing about
-                // a stats cadence until it is.
-                <span>Curated weekly by CARSI</span>
-              )}
-            </>
-          }
-        />
-
         <div className="mb-10">
           <HubCategoryPills basePath="/youtube" categories={CATEGORIES} activeCategory={category} />
         </div>
@@ -324,9 +301,7 @@ export default async function YouTubePage({
           <>
             {industryChannels.length > 0 && (
               <>
-                {carsiChannels.length > 0 && (
-                  <HubSectionLabel>Industry Channels</HubSectionLabel>
-                )}
+                {carsiChannels.length > 0 && <HubSectionLabel>Industry Channels</HubSectionLabel>}
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                   {industryChannels.map((c) => (
                     <ChannelCard key={c.id} channel={c} />
@@ -346,7 +321,7 @@ export default async function YouTubePage({
           href="/contact"
           ctaLabel="Suggest a Channel"
         />
-      </MarketingPageShell>
+      </CommunityHubShell>
     </>
   );
 }
