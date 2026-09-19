@@ -4,7 +4,9 @@ import { useCallback, useEffect, useState } from 'react';
 import { Loader2, Mail, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 
+import { AdminPagination } from '@/components/admin/AdminPagination';
 import { adminGlassCard, formatAdminDateTime } from '@/components/admin/admin-learner-ui';
+import { useAdminListPaging } from '@/components/admin/use-admin-list-paging';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -120,6 +122,9 @@ export function AdminIicrcCecSubmissionsClient() {
     }
   }
 
+  const paging = useAdminListPaging(rows);
+  const { page: safePage, pageCount, pageRows, setPage } = paging;
+
   return (
     <div className="px-6 py-8">
       <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
@@ -185,7 +190,7 @@ export function AdminIicrcCecSubmissionsClient() {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/[0.06]">
-              {rows.map((row) => (
+              {pageRows.map((row) => (
                 <tr key={row.id} className="bg-white/[0.015] hover:bg-white/[0.03]">
                   <td className="px-4 py-3 align-top">
                     <p className="font-medium text-white/90">{row.student_name}</p>
@@ -271,6 +276,15 @@ export function AdminIicrcCecSubmissionsClient() {
               ))}
             </tbody>
           </table>
+          <div className="border-t border-white/[0.06] px-4 py-4">
+            <AdminPagination
+              page={safePage}
+              pageCount={pageCount}
+              onPageChange={setPage}
+              pageSize={paging.pageSize}
+              onPageSizeChange={paging.changePageSize}
+            />
+          </div>
         </div>
       )}
     </div>
