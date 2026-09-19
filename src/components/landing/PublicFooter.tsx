@@ -1,6 +1,6 @@
-import type { ReactNode } from 'react';
-import Link from 'next/link';
 import { ArrowUpRight, Mail, MapPin, MessageCircle } from 'lucide-react';
+import Link from 'next/link';
+import type { ReactNode } from 'react';
 
 import {
   PUBLIC_CHROME_FOOTER_CLASS,
@@ -353,9 +353,8 @@ function FooterExternalLinkLight({ href, children }: { href: string; children: R
 /**
  * Light editorial footer for the redesigned landing surfaces. Airy hairline
  * layout on white: gradient hairline top edge, editorial masthead, four link
- * columns beside a refined contact card, a polished legal baseline and a giant
- * low-contrast CARSI watermark as the closing brand moment. Same content and
- * links as the chrome footer.
+ * columns beside a refined contact card and a polished legal baseline. Same
+ * content and links as the chrome footer.
  */
 function LightFooter() {
   return (
@@ -555,13 +554,6 @@ function LightFooter() {
             <AcronymTooltip term="RTO" />
           </p>
         </div>
-      </div>
-
-      {/* Closing brand moment: giant low-contrast wordmark cropped at the bottom edge */}
-      <div className="pointer-events-none relative flex justify-center select-none" aria-hidden>
-        <span className="-mb-[0.3em] font-[family-name:var(--font-display)] text-[clamp(7rem,19vw,24rem)] leading-none font-semibold tracking-[-0.04em] whitespace-nowrap text-transparent [-webkit-text-stroke:1px_rgba(15,23,42,0.07)]">
-          CARSI
-        </span>
       </div>
     </footer>
   );
