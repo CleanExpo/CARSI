@@ -1,9 +1,16 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Headphones, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 
-import { MarketingPageShell } from '@/components/marketing/MarketingPageShell';
-import { MarketingSectionHeader } from '@/components/marketing/MarketingSectionHeader';
+import { HomeFinalCtaSection } from '@/components/landing/HomeFinalCtaSection';
+import { HomeTrustStrip } from '@/components/landing/HomeTrustStrip';
+import {
+  LANDING_DISPLAY_H2_CLASS,
+  LANDING_EYEBROW_CLASS,
+  LANDING_LEAD_CLASS,
+  PUBLIC_SHELL_INNER_CLASS,
+} from '@/components/landing/public-shell-width';
+import { PlatformNav } from '@/components/marketing/PlatformNav';
 import {
   PodcastCarsiHero,
   PodcastCategoryPills,
@@ -13,14 +20,6 @@ import {
 } from '@/components/marketing/podcast/PodcastShowCard';
 import { BreadcrumbSchema, PodcastSeriesSchema } from '@/components/seo';
 import { getBackendOrigin, getPublicSiteUrl } from '@/lib/env/public-url';
-import {
-  marketingBtnSecondary,
-  marketingEyebrowPill,
-  marketingHeading,
-  marketingPanel,
-  marketingTextMuted,
-  marketingTextSubtle,
-} from '@/lib/marketing/marketing-ui';
 import { OG_IMAGES } from '@/lib/seo/og-image';
 
 const siteUrl = getPublicSiteUrl();
@@ -145,73 +144,89 @@ export default async function PodcastPage({
           />
         ))}
 
-      <MarketingPageShell id="main-content">
-        <header className="pb-8 sm:pb-10">
-          <p className={`mb-4 inline-flex items-center gap-2 ${marketingEyebrowPill}`}>
-            <Headphones className="h-3.5 w-3.5" aria-hidden />
-            CARSI Industry Hub
-          </p>
-          <h1 className={marketingHeading}>Podcast directory</h1>
-          <p className={`mt-5 max-w-2xl text-base leading-relaxed sm:text-lg ${marketingTextMuted}`}>
+      <section className="relative overflow-hidden border-b border-slate-200/70 bg-white">
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_80%_0%,rgba(36,144,237,0.11),transparent_58%)]"
+          aria-hidden
+        />
+        <div className={`relative ${PUBLIC_SHELL_INNER_CLASS} py-16 md:py-24`}>
+          <p className={LANDING_EYEBROW_CLASS}>CARSI Industry Hub</p>
+          <h1 className="mt-3 max-w-3xl font-[family-name:var(--font-display)] text-[2.15rem] leading-[1.1] font-semibold tracking-[-0.02em] text-slate-950 md:text-[3.1rem] md:leading-[1.06]">
+            Podcast directory
+          </h1>
+          <p className={`mt-5 max-w-2xl text-pretty ${LANDING_LEAD_CLASS}`}>
             The best podcasts for Australian restoration, HVAC, flooring, and indoor environment
             professionals — curated by CARSI.
           </p>
-          {total > 0 ? (
-            <p className={`mt-2 text-sm ${marketingTextSubtle}`}>{total} podcasts catalogued</p>
-          ) : null}
-        </header>
-
-        <div className="mb-8">
-          <PodcastCategoryPills categories={CATEGORIES} activeCategory={category} searchQuery={q} />
+          <PlatformNav current="/podcast" />
         </div>
+      </section>
 
-        {q ? (
-          <div className="mb-6 flex flex-wrap items-center gap-3">
-            <p className={`text-sm ${marketingTextMuted}`}>
-              Results for <span className="font-medium text-slate-800 dark:text-white/85">&quot;{q}&quot;</span>
-            </p>
-            <Link
-              href={category ? `/podcast?category=${encodeURIComponent(category)}` : '/podcast'}
-              className="text-xs text-[#146fc2] underline-offset-2 hover:underline dark:text-[#8fd0ff]"
-            >
-              Clear search
-            </Link>
+      <HomeTrustStrip
+        stats={[
+          { value: total > 0 ? String(total) : '—', label: 'Shows listed' },
+          { value: String(CATEGORIES.length), label: 'Topics' },
+          { value: 'AU', label: 'Industry focus' },
+          { value: '24/7', label: 'Listen anytime' },
+        ]}
+      />
+
+      <section className="border-t border-slate-200/70 bg-[#fafbfc] py-10">
+        <div className={PUBLIC_SHELL_INNER_CLASS}>
+          <PodcastCategoryPills categories={CATEGORIES} activeCategory={category} searchQuery={q} />
+          {q ? (
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <p className="text-sm text-slate-500">
+                Results for <span className="font-medium text-slate-800">&quot;{q}&quot;</span>
+              </p>
+              <Link
+                href={category ? `/podcast?category=${encodeURIComponent(category)}` : '/podcast'}
+                className="text-xs text-[#146fc2] underline-offset-2 hover:underline"
+              >
+                Clear search
+              </Link>
+            </div>
+          ) : null}
+        </div>
+      </section>
+
+      {carsiShow && !category && !q ? (
+        <section className="border-t border-slate-200/70 bg-white py-16 md:py-24" aria-label="CARSI original podcast">
+          <div className={PUBLIC_SHELL_INNER_CLASS}>
+            <p className={LANDING_EYEBROW_CLASS}>CARSI production</p>
+            <h2 className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>Our flagship show</h2>
+            <div className="mt-10">
+              <PodcastCarsiHero show={carsiShow} />
+            </div>
           </div>
-        ) : null}
+        </section>
+      ) : null}
 
-        {carsiShow && !category && !q ? (
-          <section className="mb-12" aria-label="CARSI original podcast">
-            <MarketingSectionHeader
-              eyebrow="CARSI production"
-              title="Our flagship show"
-              pill={false}
-              className="mb-5"
-            />
-            <PodcastCarsiHero show={carsiShow} />
-          </section>
-        ) : null}
-
-        <section aria-label="Industry podcast directory">
+      <section
+        className="border-t border-slate-200/70 bg-[#fafbfc] py-16 md:py-24"
+        aria-label="Industry podcast directory"
+      >
+        <div className={PUBLIC_SHELL_INNER_CLASS}>
           {!category && !q ? (
-            <MarketingSectionHeader
-              eyebrow="Industry directory"
-              title="Podcasts for restoration pros"
-              body="Filter by category or browse the full catalogue."
-              pill={false}
-              className="mb-6"
-            />
+            <>
+              <p className={LANDING_EYEBROW_CLASS}>Industry directory</p>
+              <h2 className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>Podcasts for restoration pros</h2>
+              <p className={`mt-4 max-w-xl ${LANDING_LEAD_CLASS}`}>
+                Filter by category or browse the full catalogue.
+              </p>
+            </>
           ) : null}
 
           {industryShows.length === 0 && placeholderCount === 0 ? (
-            <div className={`p-12 text-center sm:p-16 ${marketingPanel}`}>
-              <p className={marketingTextMuted}>
+            <div className="mt-10 rounded-2xl border border-slate-200/80 bg-white p-12 text-center shadow-sm">
+              <p className="text-sm text-slate-500">
                 {category || q
                   ? 'No podcasts match your filters. Try a different category or search term.'
                   : 'No podcasts listed yet — check back soon.'}
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {industryShows.map((show) => (
                 <PodcastShowCard key={show.id} show={show} />
               ))}
@@ -220,26 +235,31 @@ export default async function PodcastPage({
               ))}
             </div>
           )}
-        </section>
+        </div>
+      </section>
 
-        <section
-          className={`mt-12 flex flex-col gap-4 rounded-2xl p-6 sm:flex-row sm:items-center sm:justify-between ${marketingPanel}`}
-          aria-label="Submit a podcast"
-        >
+      <section
+        className="border-t border-slate-200/70 bg-white py-16"
+        aria-label="Submit a podcast"
+      >
+        <div className={`${PUBLIC_SHELL_INNER_CLASS} flex flex-col gap-4 rounded-2xl border border-slate-200/80 bg-[#fafbfc] p-6 sm:flex-row sm:items-center sm:justify-between`}>
           <div>
-            <p className="text-base font-semibold text-slate-900 dark:text-white/90">
-              Know a podcast we should list?
-            </p>
-            <p className={`mt-1 text-sm ${marketingTextMuted}`}>
+            <p className="text-base font-semibold text-slate-950">Know a podcast we should list?</p>
+            <p className="mt-1 text-sm text-slate-500">
               Submit industry podcasts for review — free to list for indoor environment professionals.
             </p>
           </div>
-          <Link href="/contact" className={`inline-flex shrink-0 items-center gap-2 ${marketingBtnSecondary}`}>
+          <Link
+            href="/contact"
+            className="inline-flex shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-800 hover:border-[#2490ed]/40 hover:text-[#146fc2]"
+          >
             <Plus className="h-4 w-4" aria-hidden />
             Submit podcast
           </Link>
-        </section>
-      </MarketingPageShell>
+        </div>
+      </section>
+
+      <HomeFinalCtaSection />
     </>
   );
 }
