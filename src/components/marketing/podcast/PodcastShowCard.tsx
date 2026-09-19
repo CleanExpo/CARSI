@@ -1,15 +1,6 @@
 import { Mic2, Radio } from 'lucide-react';
 import Link from 'next/link';
 
-import {
-  marketingPanel,
-  marketingPanelHover,
-  marketingTextMuted,
-  marketingTextStrong,
-  marketingTextSubtle,
-  marketingTopicPill,
-} from '@/lib/marketing/marketing-ui';
-
 export interface PodcastShowData {
   id: string;
   name: string;
@@ -32,8 +23,7 @@ const PLATFORM_STYLES: Record<string, string> = {
   Apple: 'bg-[#9933FF] text-white',
   YouTube: 'bg-[#FF0000] text-white',
   Amazon: 'bg-[#FF9900] text-white',
-  Website:
-    'border border-slate-300/90 bg-slate-50 text-slate-700 dark:border-white/15 dark:bg-white/[0.06] dark:text-white/80',
+  Website: 'border border-slate-200 bg-slate-50 text-slate-700',
 };
 
 function formatEpisodeDate(iso: string | null): string | null {
@@ -80,30 +70,26 @@ export function PodcastCarsiHero({ show }: { show: PodcastShowData }) {
   const latest = formatEpisodeDate(show.latest_episode_date);
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-[#2490ed]/25 bg-gradient-to-br from-[#eef7ff] via-white to-[#f8fbff] p-6 sm:p-8 dark:border-[#2490ed]/30 dark:from-[#2490ed]/14 dark:via-[#0a0f18] dark:to-[#060a14]">
-      <div
-        className="pointer-events-none absolute -top-20 -right-10 h-56 w-56 rounded-full bg-[#2490ed]/15 blur-3xl dark:bg-[#2490ed]/25"
-        aria-hidden
-      />
-      <div className="relative flex flex-col gap-5 sm:flex-row sm:items-start">
-        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-[#2490ed]/30 bg-[#2490ed]/10 text-[#146fc2] dark:text-[#8fd0ff] sm:h-20 sm:w-20">
+    <div className="rounded-2xl border border-[#146fc2] bg-white p-6 shadow-sm sm:p-8">
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
+        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-slate-200 bg-[#fafbfc] text-[#146fc2] sm:h-20 sm:w-20">
           <Mic2 className="h-8 w-8 sm:h-9 sm:w-9" aria-hidden />
         </div>
         <div className="min-w-0 flex-1">
           <div className="mb-2 flex flex-wrap items-center gap-2">
-            <span className="rounded-full border border-[#2490ed]/25 bg-[#eef7ff] px-2.5 py-0.5 text-[10px] font-semibold tracking-wide text-[#146fc2] uppercase dark:border-[#2490ed]/35 dark:bg-[#2490ed]/15 dark:text-[#8fd0ff]">
+            <span className="rounded-full border border-[#146fc2] bg-[#146fc2] px-2.5 py-0.5 text-[10px] font-semibold tracking-wide text-white uppercase">
               CARSI Original
             </span>
-            <span className="rounded-full border border-amber-500/25 bg-amber-50 px-2.5 py-0.5 text-[10px] font-semibold text-amber-800 dark:border-amber-400/30 dark:bg-amber-500/10 dark:text-amber-300">
+            <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-[10px] font-semibold text-slate-600">
               Featured
             </span>
           </div>
-          <h2 className={`text-xl font-bold leading-snug sm:text-2xl ${marketingTextStrong}`}>{show.name}</h2>
-          {show.host ? <p className={`mt-1 text-sm ${marketingTextSubtle}`}>Hosted by {show.host}</p> : null}
+          <h2 className="text-xl font-semibold leading-snug text-slate-950 sm:text-2xl">{show.name}</h2>
+          {show.host ? <p className="mt-1 text-sm text-slate-500">Hosted by {show.host}</p> : null}
           {show.description ? (
-            <p className={`mt-3 max-w-2xl text-sm leading-relaxed ${marketingTextMuted}`}>{show.description}</p>
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-600">{show.description}</p>
           ) : null}
-          <div className={`mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs ${marketingTextSubtle}`}>
+          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-400">
             {show.episode_count != null ? <span>{show.episode_count} episodes</span> : null}
             {latest ? <span>Latest episode {latest}</span> : null}
           </div>
@@ -118,32 +104,32 @@ export function PodcastShowCard({ show }: { show: PodcastShowData }) {
   const latest = formatEpisodeDate(show.latest_episode_date);
 
   return (
-    <article className={`flex h-full flex-col gap-3 p-5 ${marketingPanel} ${marketingPanelHover}`}>
+    <article className="flex h-full flex-col gap-3 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="mb-1.5 flex flex-wrap items-center gap-2">
             {show.featured ? (
-              <span className="rounded-full border border-amber-500/25 bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-800 dark:border-amber-400/30 dark:bg-amber-500/10 dark:text-amber-300">
+              <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold text-slate-600">
                 Featured
               </span>
             ) : null}
-            <span className={`text-[10px] font-medium tracking-wide uppercase ${marketingTextSubtle}`}>
+            <span className="text-[10px] font-medium tracking-wide text-slate-400 uppercase">
               {show.country}
             </span>
           </div>
-          <h3 className={`text-base font-semibold leading-snug ${marketingTextStrong}`}>{show.name}</h3>
-          {show.host ? <p className={`mt-0.5 truncate text-xs ${marketingTextSubtle}`}>{show.host}</p> : null}
+          <h3 className="text-base font-semibold leading-snug text-slate-950">{show.name}</h3>
+          {show.host ? <p className="mt-0.5 truncate text-xs text-slate-500">{show.host}</p> : null}
         </div>
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200/90 bg-slate-50 text-[#146fc2] dark:border-white/10 dark:bg-white/[0.04] dark:text-[#8fd0ff]">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-[#fafbfc] text-[#146fc2]">
           <Radio className="h-4 w-4" aria-hidden />
         </div>
       </div>
 
       {show.description ? (
-        <p className={`line-clamp-3 text-sm leading-relaxed ${marketingTextMuted}`}>{show.description}</p>
+        <p className="line-clamp-3 text-sm leading-relaxed text-slate-600">{show.description}</p>
       ) : null}
 
-      <div className={`flex flex-wrap gap-x-3 gap-y-1 text-xs ${marketingTextSubtle}`}>
+      <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-400">
         {show.episode_count != null ? <span>{show.episode_count} episodes</span> : null}
         {latest ? <span>Latest {latest}</span> : null}
       </div>
@@ -151,7 +137,10 @@ export function PodcastShowCard({ show }: { show: PodcastShowData }) {
       {show.industry_categories.length > 0 ? (
         <div className="flex flex-wrap gap-1.5">
           {show.industry_categories.slice(0, 3).map((cat) => (
-            <span key={cat} className={marketingTopicPill}>
+            <span
+              key={cat}
+              className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-[11px] text-slate-600"
+            >
               {cat}
             </span>
           ))}
@@ -165,10 +154,10 @@ export function PodcastShowCard({ show }: { show: PodcastShowData }) {
 
 export function PodcastPlaceholderCard() {
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-dashed border-slate-300/90 bg-slate-50/50 p-5 dark:border-white/10 dark:bg-white/[0.02]">
-      <div className="h-4 w-3/4 animate-pulse rounded bg-slate-200/80 dark:bg-white/[0.06]" />
-      <div className="h-3 w-1/2 animate-pulse rounded bg-slate-200/60 dark:bg-white/[0.04]" />
-      <div className="h-12 w-full animate-pulse rounded-lg bg-slate-200/50 dark:bg-white/[0.03]" />
+    <div className="flex flex-col gap-3 rounded-2xl border border-dashed border-slate-300 bg-white p-5">
+      <div className="h-4 w-3/4 animate-pulse rounded bg-slate-100" />
+      <div className="h-3 w-1/2 animate-pulse rounded bg-slate-100" />
+      <div className="h-12 w-full animate-pulse rounded-lg bg-slate-50" />
     </div>
   );
 }
@@ -182,15 +171,14 @@ export function PodcastCategoryPills({
   activeCategory?: string;
   searchQuery?: string;
 }) {
-
   return (
     <div className="flex flex-wrap gap-2">
       <Link
         href={searchQuery ? `/podcast?q=${encodeURIComponent(searchQuery)}` : '/podcast'}
         className={
           !activeCategory
-            ? 'rounded-full bg-[#146fc2] px-4 py-1.5 text-sm font-semibold text-white shadow-sm'
-            : marketingTopicPill + ' px-4 py-1.5 transition hover:border-[#2490ed]/35'
+            ? 'rounded-full bg-[#146fc2] px-4 py-1.5 text-sm font-semibold text-white'
+            : 'rounded-full border border-slate-200 bg-slate-50 px-4 py-1.5 text-sm text-slate-600 hover:border-[#2490ed]/40 hover:text-[#146fc2]'
         }
       >
         All
@@ -204,8 +192,8 @@ export function PodcastCategoryPills({
             href={href}
             className={
               active
-                ? 'rounded-full bg-[#146fc2] px-4 py-1.5 text-sm font-semibold text-white shadow-sm'
-                : marketingTopicPill + ' px-4 py-1.5 transition hover:border-[#2490ed]/35'
+                ? 'rounded-full bg-[#146fc2] px-4 py-1.5 text-sm font-semibold text-white'
+                : 'rounded-full border border-slate-200 bg-slate-50 px-4 py-1.5 text-sm text-slate-600 hover:border-[#2490ed]/40 hover:text-[#146fc2]'
             }
           >
             {cat}
