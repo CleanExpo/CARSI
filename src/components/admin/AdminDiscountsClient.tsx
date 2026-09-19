@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Loader2, Search, Tag, X } from 'lucide-react';
 
+import { AdminPagination } from '@/components/admin/AdminPagination';
+import { useAdminListPaging } from '@/components/admin/use-admin-list-paging';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -218,6 +220,9 @@ export function AdminDiscountsClient() {
       setRevokeId(null);
     }
   }
+
+  const paging = useAdminListPaging(rows);
+  const { page: safePage, pageCount, pageRows, setPage } = paging;
 
   if (loading && !stats) {
     return (
@@ -440,7 +445,7 @@ export function AdminDiscountsClient() {
                 </tr>
               </thead>
               <tbody>
-                {rows.map((r) => (
+                {pageRows.map((r) => (
                   <tr key={r.id} className="border-b border-white/[0.06] text-white/80">
                     <td className="py-3 pr-2 align-top">
                       <div className="font-medium">{r.userEmail}</div>
@@ -488,6 +493,17 @@ export function AdminDiscountsClient() {
               </tbody>
             </table>
             {rows.length === 0 ? <p className="py-8 text-center text-sm text-white/45">No discounts yet.</p> : null}
+            {rows.length > 0 ? (
+              <div className="mt-4">
+                <AdminPagination
+                  page={safePage}
+                  pageCount={pageCount}
+                  onPageChange={setPage}
+                  pageSize={paging.pageSize}
+                  onPageSizeChange={paging.changePageSize}
+                />
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
