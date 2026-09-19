@@ -615,6 +615,12 @@
 /* Course article preview/student body: headings must stay cream on navy.
    Tailwind prose-invert + brand blue utilities otherwise paint # / ## / ### as
    dark-blue-on-navy. Unlayered so this beats @layer utilities. */
+.course-article-body :is(strong, b) {
+  font-weight: 700;
+}
+.course-article-body :is(em, i) {
+  font-style: italic;
+}
 .course-article-body {
   color: rgba(255, 255, 255, 0.9);
   --tw-prose-body: rgba(255, 255, 255, 0.9);
