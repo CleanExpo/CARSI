@@ -93,6 +93,8 @@ nul
 !public/**/*.png
 !public/**/*.jpg
 !public/**/*.jpeg
+!app/icon.png
+!app/apple-icon.png
 login-section.md
 
 # Backend-level Claude hook shim (auto-generated to fix CWD drift)
