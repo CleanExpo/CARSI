@@ -1,14 +1,14 @@
-import type { Metadata, Viewport } from 'next';
-import Script from 'next/script';
-import { Outfit, Plus_Jakarta_Sans } from 'next/font/google';
-import './globals.css';
-import { AppToastProvider } from '@/hooks/use-toast';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
 import { AuthProvider } from '@/components/auth/auth-provider';
-import { OrganizationSchema, WebsiteSchema } from '@/components/seo';
 import { ServiceWorkerRegistration } from '@/components/lms/ServiceWorkerRegistration';
+import { OrganizationSchema, WebsiteSchema } from '@/components/seo';
+import { AppToastProvider } from '@/hooks/use-toast';
 import { getPublicSiteUrl } from '@/lib/env/public-url';
+import type { Metadata, Viewport } from 'next';
+import { Outfit, Plus_Jakarta_Sans } from 'next/font/google';
+import Script from 'next/script';
+import './globals.css';
 
 const outfit = Outfit({
   subsets: ['latin'],
@@ -46,6 +46,14 @@ export const metadata: Metadata = {
   creator: 'CARSI',
   publisher: 'CARSI',
   manifest: '/manifest.json',
+  icons: {
+    icon: [
+      { url: '/logo/favicon.png', type: 'image/png', sizes: '512x512' },
+      { url: '/logo/favicon.png', type: 'image/png', sizes: '32x32' },
+    ],
+    shortcut: '/logo/favicon.png',
+    apple: [{ url: '/logo/favicon.png', sizes: '180x180', type: 'image/png' }],
+  },
   robots: {
     index: true,
     follow: true,
