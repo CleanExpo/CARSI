@@ -1,12 +1,11 @@
 import {
-  MarketingPageShell,
-  marketingPageInnerClass,
-} from '@/components/marketing/MarketingPageShell';
+  COMMUNITY_CARD_CLASS,
+  CommunityHubShell,
+} from '@/components/marketing/hub/CommunityHubShell';
 import {
   HubCtaBanner,
   HubEmptyState,
   HubFilterPills,
-  HubPageHeader,
   HubPlaceholderCard,
   HubSecondaryPills,
 } from '@/components/marketing/hub/HubUi';
@@ -17,14 +16,6 @@ import {
 } from '@/lib/calendar/carsi-course-listing';
 import { filterExcludedEvents } from '@/lib/calendar/event-exclusions';
 import { getBackendOrigin } from '@/lib/env/public-url';
-import {
-  marketingHubCard,
-  marketingHubSectionLabel,
-  marketingTextMuted,
-  marketingTextStrong,
-  marketingTextSubtle,
-  marketingTopicPill,
-} from '@/lib/marketing/marketing-ui';
 import { OG_IMAGES } from '@/lib/seo/og-image';
 import { getPublishedCourseListItemsFromDatabase } from '@/lib/server/public-courses-list';
 import type { Metadata } from 'next';
@@ -175,7 +166,7 @@ function EventCard({ event }: { event: EventSummary }) {
   return (
     <Link
       href={`/calendar/${event.id}`}
-      className={`group flex flex-col gap-3 p-5 ${marketingHubCard}`}
+      className={`group flex flex-col gap-3 ${COMMUNITY_CARD_CLASS}`}
     >
       <div className="flex flex-wrap items-center gap-2">
         <span
@@ -196,12 +187,12 @@ function EventCard({ event }: { event: EventSummary }) {
       </div>
 
       <h3
-        className={`text-base leading-snug font-semibold transition-colors group-hover:text-[#2490ed] ${marketingTextStrong}`}
+        className="text-base leading-snug font-semibold text-slate-950 transition-colors group-hover:text-[#146fc2]"
       >
         {event.title}
       </h3>
 
-      <div className={`flex flex-col gap-1 text-sm ${marketingTextMuted}`}>
+      <div className="flex flex-col gap-1 text-sm text-slate-500">
         <span>{formatEventDate(event.start_date, event.end_date)}</span>
         <span className="flex items-center gap-1.5">
           <span
@@ -212,13 +203,16 @@ function EventCard({ event }: { event: EventSummary }) {
       </div>
 
       {event.organiser_name && (
-        <p className={`text-xs ${marketingTextSubtle}`}>By {event.organiser_name}</p>
+        <p className="text-xs text-slate-400">By {event.organiser_name}</p>
       )}
 
       {event.industry_categories.length > 0 && (
         <div className="mt-auto flex flex-wrap gap-1">
           {event.industry_categories.slice(0, 3).map((cat) => (
-            <span key={cat} className={`rounded-md px-2 py-0.5 text-xs ${marketingTopicPill}`}>
+            <span
+              key={cat}
+              className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs text-slate-500"
+            >
               {cat}
             </span>
           ))}
@@ -265,22 +259,17 @@ export default async function CalendarPage({
     <>
       <BreadcrumbSchema items={breadcrumbs} />
 
-      <MarketingPageShell
-        id="main-content"
-        innerClassName={`${marketingPageInnerClass} mx-auto max-w-7xl`}
+      <CommunityHubShell
+        eyebrow="Community & resources"
+        title="Industry Calendar"
+        description="National calendar of conferences, training, webinars, and workshops across the restoration, HVAC, flooring, and indoor environment industries."
+        stats={[
+          { value: total > 0 ? String(total) : '—', label: 'Upcoming events' },
+          { value: String(courseEntries.length), label: 'CARSI courses' },
+          { value: 'AU', label: 'National' },
+          { value: 'Free', label: 'To list' },
+        ]}
       >
-        <HubPageHeader
-          eyebrow={
-            <>
-              <span className="h-1.5 w-1.5 rounded-full bg-[#2490ed]" />
-              CARSI Industry Hub
-            </>
-          }
-          title="Industry Calendar"
-          description="National calendar of conferences, training, webinars, and workshops across the restoration, HVAC, flooring, and indoor environment industries."
-          meta={total > 0 ? <span>{total} upcoming events</span> : undefined}
-        />
-
         <div className="mb-4">
           <HubFilterPills
             items={EVENT_TYPES}
@@ -328,7 +317,7 @@ export default async function CalendarPage({
           <div className="space-y-12">
             {grouped.map(([monthKey, monthEvents]) => (
               <section key={monthKey}>
-                <h2 className={`mb-4 text-lg ${marketingHubSectionLabel}`}>
+                <h2 className="mb-4 text-[11px] font-medium tracking-[0.24em] text-[#146fc2] uppercase">
                   {formatMonth(monthEvents[0].start_date)}
                 </h2>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -340,7 +329,9 @@ export default async function CalendarPage({
             ))}
             {placeholderCount > 0 && (
               <section>
-                <h2 className={marketingHubSectionLabel}>Upcoming</h2>
+                <h2 className="mb-4 text-[11px] font-medium tracking-[0.24em] text-[#146fc2] uppercase">
+                  Upcoming
+                </h2>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {Array.from({ length: placeholderCount }, (_, i) => (
                     <HubPlaceholderCard
@@ -356,10 +347,13 @@ export default async function CalendarPage({
 
         {courseTopics.length > 0 && (
           <section className="mt-16" aria-labelledby="carsi-courses-heading">
-            <h2 id="carsi-courses-heading" className={`mb-2 text-lg ${marketingHubSectionLabel}`}>
+            <h2
+              id="carsi-courses-heading"
+              className="mb-2 text-[11px] font-medium tracking-[0.24em] text-[#146fc2] uppercase"
+            >
               CARSI Australian courses
             </h2>
-            <p className={`mb-8 max-w-3xl text-sm ${marketingTextMuted}`}>
+            <p className="mb-8 max-w-3xl text-sm leading-relaxed text-slate-500">
               Australian-produced training you can start whenever you like — no fixed dates, no
               travel. {courseEntries.length} course{courseEntries.length === 1 ? '' : 's'} available
               now, written to Australian standards, voltages and units.
@@ -368,26 +362,26 @@ export default async function CalendarPage({
             <div className="space-y-10">
               {courseTopics.map(({ topic, courses }) => (
                 <div key={topic}>
-                  <h3 className={`mb-3 text-sm ${marketingTextStrong}`}>{topic}</h3>
+                  <h3 className="mb-3 text-sm font-semibold text-slate-950">{topic}</h3>
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {courses.map((course) => (
                       <Link
                         key={course.slug}
                         href={course.href}
-                        className={`${marketingHubCard} block transition hover:opacity-90`}
+                        className={`${COMMUNITY_CARD_CLASS} block`}
                       >
-                        <span className={`${marketingTopicPill} mb-3 inline-block`}>
+                        <span className="mb-3 inline-block rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-[11px] text-slate-600">
                           {course.isFree ? 'Free' : (course.priceLabel ?? 'Paid')}
                         </span>
-                        <span className={`block text-base ${marketingTextStrong}`}>
+                        <span className="block text-base font-semibold text-slate-950">
                           {course.title}
                         </span>
                         {course.summary && (
-                          <span className={`mt-2 block text-sm ${marketingTextMuted}`}>
+                          <span className="mt-2 block text-sm text-slate-500">
                             {course.summary}
                           </span>
                         )}
-                        <span className={`mt-3 block text-xs ${marketingTextSubtle}`}>
+                        <span className="mt-3 block text-xs text-slate-400">
                           {course.availability}
                         </span>
                       </Link>
@@ -398,7 +392,7 @@ export default async function CalendarPage({
             </div>
           </section>
         )}
-      </MarketingPageShell>
+      </CommunityHubShell>
     </>
   );
 }
