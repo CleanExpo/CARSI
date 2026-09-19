@@ -663,6 +663,12 @@
   color: #f2cf8f !important;
 }
 
+.course-visual-editor:empty:before {
+  content: attr(data-placeholder);
+  color: rgb(255 255 255 / 0.32);
+  pointer-events: none;
+}
+
 /* WS1 fix 5 (GP-544): while Margot's chat panel is open (FloatingChat mirrors its state as
    `data-margot-open` on <html>), the lesson footer gains enough bottom clearance to scroll
    above the 560px panel and its launcher (606px container plus margin) at every width. The
