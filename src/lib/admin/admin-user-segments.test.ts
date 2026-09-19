@@ -2,7 +2,12 @@ import { describe, expect, it } from 'vitest';
 
 import type { AdminDashboardUserEntry } from '@/lib/admin/admin-dashboard-data';
 
-import { matchesAdminUserSegment, parseAdminUserSegment } from './admin-user-segments';
+import {
+  ADMIN_USERS_PAGE_SIZE,
+  matchesAdminUserSegment,
+  parseAdminUserSegment,
+  parseAdminUsersPageSize,
+} from './admin-user-segments';
 
 function user(partial: Partial<AdminDashboardUserEntry>): AdminDashboardUserEntry {
   return {
@@ -64,17 +69,6 @@ describe('matchesAdminUserSegment', () => {
     expect(matchesAdminUserSegment(mixed, 'completed', now)).toBe(false);
   });
 
-  it('Incomplete is 0–99% with at least one enrolment', () => {
-    const zero = user({ overallCompletionPct: 0, enrollmentCount: 1 });
-    const mid = user({ overallCompletionPct: 50, enrollmentCount: 2, completedCourseCount: 1 });
-    const done = user({ overallCompletionPct: 100, enrollmentCount: 1 });
-    const empty = user({ overallCompletionPct: 0, enrollmentCount: 0 });
-    expect(matchesAdminUserSegment(zero, 'incomplete', now)).toBe(true);
-    expect(matchesAdminUserSegment(mid, 'incomplete', now)).toBe(true);
-    expect(matchesAdminUserSegment(done, 'incomplete', now)).toBe(false);
-    expect(matchesAdminUserSegment(empty, 'incomplete', now)).toBe(false);
-  });
-
   it('Account off is the LMS flag', () => {
     expect(matchesAdminUserSegment(user({ isActive: false }), 'inactive', now)).toBe(true);
     expect(matchesAdminUserSegment(user({ isActive: true }), 'inactive', now)).toBe(false);
@@ -93,6 +87,20 @@ describe('matchesAdminUserSegment', () => {
 describe('parseAdminUserSegment', () => {
   it('falls back to all on junk', () => {
     expect(parseAdminUserSegment('nope')).toBe('all');
+    expect(parseAdminUserSegment('incomplete')).toBe('all');
     expect(parseAdminUserSegment('active')).toBe('active');
+  });
+});
+
+describe('parseAdminUsersPageSize', () => {
+  it('defaults to 9 users per page', () => {
+    expect(ADMIN_USERS_PAGE_SIZE).toBe(9);
+    expect(parseAdminUsersPageSize(null)).toBe(9);
+    expect(parseAdminUsersPageSize('7')).toBe(9);
+  });
+
+  it('accepts the offered page sizes', () => {
+    expect(parseAdminUsersPageSize('18')).toBe(18);
+    expect(parseAdminUsersPageSize(36)).toBe(36);
   });
 });
