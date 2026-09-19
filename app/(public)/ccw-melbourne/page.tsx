@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 import { getPublicSiteUrl } from '@/lib/env/public-url';
 
-import { CcwRoadshowContent } from '../events/ccw-roadshow/page';
+import { CcwRoadshowContent } from '@/components/marketing/CcwRoadshowPage';
 import { getCcwRoadshowEvent } from '@/lib/marketing/ccw-roadshow';
 
 const siteUrl = getPublicSiteUrl();
