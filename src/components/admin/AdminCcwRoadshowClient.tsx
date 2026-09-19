@@ -2,6 +2,9 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
+import { AdminPagination } from '@/components/admin/AdminPagination';
+import { useAdminListPaging } from '@/components/admin/use-admin-list-paging';
+
 type CitySummary = {
   slug: string;
   city: string;
@@ -162,6 +165,9 @@ export function AdminCcwRoadshowClient() {
 
   if (loading) return <div className="p-6 text-white">Loading registry…</div>;
 
+  const paging = useAdminListPaging(rows);
+  const { page: safePage, pageCount, pageRows, setPage } = paging;
+
   return (
     <div className="space-y-6 p-6 text-white">
       <div className="flex items-center justify-between gap-4">
@@ -223,7 +229,7 @@ export function AdminCcwRoadshowClient() {
             </tr>
           </thead>
           <tbody>
-            {rows.map((row) => (
+            {pageRows.map((row) => (
               <tr
                 key={row.registrationId}
                 className="border-b border-white/8 align-top last:border-0 odd:bg-white/[0.025] hover:bg-white/[0.055]"
@@ -303,6 +309,17 @@ export function AdminCcwRoadshowClient() {
             ))}
           </tbody>
         </table>
+        {rows.length > 0 ? (
+          <div className="border-t border-white/10 px-3 py-4">
+            <AdminPagination
+              page={safePage}
+              pageCount={pageCount}
+              onPageChange={setPage}
+              pageSize={paging.pageSize}
+              onPageSizeChange={paging.changePageSize}
+            />
+          </div>
+        ) : null}
       </div>
     </div>
   );
