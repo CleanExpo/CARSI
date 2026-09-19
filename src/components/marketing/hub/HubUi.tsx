@@ -1,51 +1,10 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 
-import {
-  marketingBody,
-  marketingBtnPrimary,
-  marketingEmptyState,
-  marketingEyebrowPill,
-  marketingFilterPillActive,
-  marketingFilterPillInactive,
-  marketingFilterPillMutedActive,
-  marketingFilterPillMutedInactive,
-  marketingHeading,
-  marketingHubCtaBanner,
-  marketingHubPlaceholder,
-  marketingHubSectionLabel,
-  marketingPanel,
-  marketingTextMuted,
-  marketingTextStrong,
-  marketingTextSubtle,
-} from '@/lib/marketing/marketing-ui';
-
-export function HubPageHeader({
-  eyebrow,
-  title,
-  description,
-  meta,
-  eyebrowClassName = marketingEyebrowPill,
-}: {
-  eyebrow: ReactNode;
-  title: string;
-  description: string;
-  meta?: ReactNode;
-  eyebrowClassName?: string;
-}) {
-  return (
-    <header className="mb-10 md:mb-12">
-      <div className={`mb-4 inline-flex items-center gap-2 ${eyebrowClassName}`}>{eyebrow}</div>
-      <h1 className={`mb-4 ${marketingHeading}`}>{title}</h1>
-      <p className={`max-w-2xl ${marketingBody}`}>{description}</p>
-      {meta ? (
-        <div className={`mt-3 flex flex-wrap items-center gap-4 text-sm ${marketingTextSubtle}`}>
-          {meta}
-        </div>
-      ) : null}
-    </header>
-  );
-}
+const pillBase =
+  'inline-flex min-h-9 items-center rounded-full border px-3.5 text-[12px] font-medium transition';
+const pillActive = `${pillBase} border-[#146fc2] bg-[#146fc2] text-white`;
+const pillIdle = `${pillBase} border-slate-200 bg-white text-slate-600 hover:border-[#2490ed]/40 hover:text-[#146fc2]`;
 
 export function HubCategoryPills({
   basePath,
@@ -74,17 +33,14 @@ export function HubCategoryPills({
 
   return (
     <div className="flex flex-wrap gap-2">
-      <Link
-        href={buildHref()}
-        className={!activeCategory ? marketingFilterPillActive : marketingFilterPillInactive}
-      >
+      <Link href={buildHref()} className={!activeCategory ? pillActive : pillIdle}>
         {allLabel}
       </Link>
       {categories.map((cat) => (
         <Link
           key={cat}
           href={buildHref(cat)}
-          className={activeCategory === cat ? marketingFilterPillActive : marketingFilterPillInactive}
+          className={activeCategory === cat ? pillActive : pillIdle}
         >
           {cat}
         </Link>
@@ -106,17 +62,14 @@ export function HubFilterPills({
 }) {
   return (
     <div className="flex flex-wrap gap-2">
-      <Link
-        href={buildHref()}
-        className={!activeValue ? marketingFilterPillActive : marketingFilterPillInactive}
-      >
+      <Link href={buildHref()} className={!activeValue ? pillActive : pillIdle}>
         {allLabel}
       </Link>
       {items.map((item) => (
         <Link
           key={item.value}
           href={buildHref(item.value)}
-          className={activeValue === item.value ? marketingFilterPillActive : marketingFilterPillInactive}
+          className={activeValue === item.value ? pillActive : pillIdle}
         >
           {item.label}
         </Link>
@@ -138,19 +91,14 @@ export function HubSecondaryPills({
 }) {
   return (
     <div className="flex flex-wrap gap-2">
-      <Link
-        href={buildHref()}
-        className={!activeValue ? marketingFilterPillMutedActive : marketingFilterPillMutedInactive}
-      >
+      <Link href={buildHref()} className={!activeValue ? pillActive : pillIdle}>
         {allLabel}
       </Link>
       {items.map((item) => (
         <Link
           key={item.value}
           href={buildHref(item.value)}
-          className={
-            activeValue === item.value ? marketingFilterPillMutedActive : marketingFilterPillMutedInactive
-          }
+          className={activeValue === item.value ? pillActive : pillIdle}
         >
           {item.label}
         </Link>
@@ -161,8 +109,8 @@ export function HubSecondaryPills({
 
 export function HubEmptyState({ children }: { children: ReactNode }) {
   return (
-    <div className={marketingEmptyState}>
-      <p className={marketingTextMuted}>{children}</p>
+    <div className="rounded-2xl border border-slate-200/80 bg-white px-6 py-16 text-center">
+      <p className="text-sm leading-relaxed text-slate-500">{children}</p>
     </div>
   );
 }
@@ -179,12 +127,17 @@ export function HubCtaBanner({
   ctaLabel: string;
 }) {
   return (
-    <div className={`mb-10 ${marketingHubCtaBanner}`}>
+    <div className="mb-10 flex flex-col items-start justify-between gap-4 rounded-2xl border border-slate-200/80 bg-white p-6 sm:flex-row sm:items-center">
       <div>
-        <p className={`text-sm font-medium ${marketingTextStrong}`}>{title}</p>
-        <p className={`mt-1 text-xs ${marketingTextSubtle}`}>{description}</p>
+        <p className="font-[family-name:var(--font-display)] text-lg font-semibold text-slate-950">
+          {title}
+        </p>
+        <p className="mt-1 text-sm text-slate-500">{description}</p>
       </div>
-      <Link href={href} className={marketingBtnPrimary}>
+      <Link
+        href={href}
+        className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full bg-[#146fc2] px-6 text-sm font-semibold text-white hover:bg-[#0f5fa8]"
+      >
         {ctaLabel}
       </Link>
     </div>
@@ -193,17 +146,21 @@ export function HubCtaBanner({
 
 export function HubPlaceholderCard({ message }: { message: string }) {
   return (
-    <div className={marketingHubPlaceholder}>
-      <div className="h-4 w-3/4 animate-pulse rounded bg-slate-200/80 dark:bg-white/[0.06]" />
-      <div className="h-3 w-1/2 animate-pulse rounded bg-slate-200/60 dark:bg-white/[0.04]" />
-      <div className="h-10 w-full animate-pulse rounded-lg bg-slate-200/50 dark:bg-white/[0.03]" />
-      <p className={`mt-auto text-xs ${marketingTextSubtle}`}>{message}</p>
+    <div className="flex flex-col gap-3 rounded-2xl border border-slate-200/80 bg-white p-6">
+      <div className="h-4 w-3/4 animate-pulse rounded bg-slate-200/80" />
+      <div className="h-3 w-1/2 animate-pulse rounded bg-slate-200/60" />
+      <div className="h-10 w-full animate-pulse rounded-lg bg-slate-200/50" />
+      <p className="mt-auto text-xs text-slate-400">{message}</p>
     </div>
   );
 }
 
 export function HubSectionLabel({ children }: { children: ReactNode }) {
-  return <h2 className={`mb-4 ${marketingHubSectionLabel}`}>{children}</h2>;
+  return (
+    <h2 className="mb-5 text-[11px] font-medium tracking-[0.24em] text-[#146fc2] uppercase">
+      {children}
+    </h2>
+  );
 }
 
 export function HubSuggestBanner({
@@ -218,10 +175,15 @@ export function HubSuggestBanner({
   ctaLabel: string;
 }) {
   return (
-    <div className={`mt-16 p-8 text-center ${marketingPanel}`}>
-      <h3 className={`mb-2 text-lg font-semibold ${marketingTextStrong}`}>{title}</h3>
-      <p className={`mb-4 text-sm ${marketingTextMuted}`}>{description}</p>
-      <Link href={href} className={marketingBtnPrimary}>
+    <div className="mt-16 rounded-2xl border border-slate-200/80 bg-white p-8 text-center">
+      <h3 className="font-[family-name:var(--font-display)] text-xl font-semibold text-slate-950">
+        {title}
+      </h3>
+      <p className="mx-auto mt-2 max-w-lg text-sm leading-relaxed text-slate-500">{description}</p>
+      <Link
+        href={href}
+        className="mt-6 inline-flex min-h-11 items-center justify-center rounded-full bg-[#146fc2] px-6 text-sm font-semibold text-white hover:bg-[#0f5fa8]"
+      >
         {ctaLabel}
       </Link>
     </div>
