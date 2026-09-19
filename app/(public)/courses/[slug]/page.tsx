@@ -1,30 +1,36 @@
-import Link from 'next/link';
-import { notFound, redirect } from 'next/navigation';
-import { Metadata } from 'next';
 import { CourseViewTracker } from '@/components/analytics/CourseViewTracker';
-import { CoursesIndexLink } from '@/components/lms/CoursesIndexLink';
-import { EnrolButton } from '@/components/lms/EnrolButton';
+import {
+  LANDING_DISPLAY_H2_CLASS,
+  LANDING_EYEBROW_CLASS,
+  LANDING_LEAD_CLASS,
+  PUBLIC_SHELL_INNER_CLASS,
+} from '@/components/landing/public-shell-width';
 import { CourseFormattedBody } from '@/components/lms/CourseFormattedBody';
-import { CourseThumbnail } from '@/components/lms/CourseThumbnail';
 import { CourseHubContext } from '@/components/lms/CourseHubContext';
-import { CourseSchema, BreadcrumbSchema, VideoObjectSchema } from '@/components/seo';
+import { CoursesIndexLink } from '@/components/lms/CoursesIndexLink';
+import { CourseThumbnail } from '@/components/lms/CourseThumbnail';
+import { EnrolButton } from '@/components/lms/EnrolButton';
+import { BreadcrumbSchema, CourseSchema, VideoObjectSchema } from '@/components/seo';
+import {
+  getDesignationForCourseSlug,
+  type DesignationDefinition,
+} from '@/lib/designations/registry';
+import { getBackendOrigin, getPublicSiteUrl } from '@/lib/env/public-url';
+import { stripLegacyPurchaseCta } from '@/lib/lms/format-course-body';
+import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
+import { normalizePublicAssetUrl } from '@/lib/remote-image';
 import { SchemaMarkup, buildFaqSchema } from '@/lib/schema';
 import {
   buildCourseFallbackKeywords,
   getCourseMarketing,
   resolveCourseMarketingTruth,
 } from '@/lib/seo/course-marketing';
-import { getBackendOrigin, getPublicSiteUrl } from '@/lib/env/public-url';
-import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
-import { normalizePublicAssetUrl } from '@/lib/remote-image';
 import { OG_IMAGES, OG_IMAGE_URLS } from '@/lib/seo/og-image';
-import { getPublishedCourseDetailBySlugFromDatabase } from '@/lib/server/public-courses-list';
 import { getAggregateRating } from '@/lib/server/course-reviews';
-import { stripLegacyPurchaseCta } from '@/lib/lms/format-course-body';
-import {
-  getDesignationForCourseSlug,
-  type DesignationDefinition,
-} from '@/lib/designations/registry';
+import { getPublishedCourseDetailBySlugFromDatabase } from '@/lib/server/public-courses-list';
+import { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound, redirect } from 'next/navigation';
 
 // ISR: render each course detail on demand and cache for 5 minutes (issue #129).
 // Build-safe via the build-phase guard in getCourse's DB reader; publish busts the
@@ -272,17 +278,8 @@ function getAudienceItems(
  * Inline style constants (Scientific Luxury glass panel system)
  * --------------------------------------------------------------------------- */
 
-const glassPanel = {
-  background: 'rgba(255,255,255,0.04)',
-  backdropFilter: 'blur(24px) saturate(160%)',
-  WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-  border: '1px solid rgba(255,255,255,0.07)',
-} as const;
-
-const glassPanelSubtle = {
-  background: 'rgba(255,255,255,0.03)',
-  border: '1px solid rgba(255,255,255,0.06)',
-} as const;
+const panelClass = 'rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm';
+const sectionHeadingClass = `mb-5 ${LANDING_DISPLAY_H2_CLASS} !text-[1.55rem] md:!text-[1.85rem]`;
 
 /* ---------------------------------------------------------------------------
  * Page Component
@@ -318,9 +315,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
   ];
 
   // AggregateRating for Course rich results — omit silently if unavailable (build/no reviews).
-  const aggregateRating = course.id
-    ? await getAggregateRating(course.id).catch(() => null)
-    : null;
+  const aggregateRating = course.id ? await getAggregateRating(course.id).catch(() => null) : null;
   const resolvedMarketing = getResolvedCourseMarketing(course, designation);
 
   return (
@@ -355,117 +350,72 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
         return faqs?.length ? <SchemaMarkup schema={buildFaqSchema({ faqs })} /> : null;
       })()}
 
-      <main id="main-content" className="relative min-h-screen" style={{ background: '#060a14' }}>
-        {/* ── Mesh background ── */}
-        <div className="mesh-bg" aria-hidden="true">
-          <div className="mesh-blob mesh-blob-1" />
-          <div className="mesh-blob mesh-blob-2" />
-        </div>
-
-        {/* ── Hero Section ── */}
-        <section className="relative z-10">
+      <div>
+        <section className="relative overflow-hidden border-b border-slate-200/70 bg-white">
           <div
-            style={{
-              background: 'linear-gradient(180deg, rgba(237,157,36,0.06) 0%, transparent 100%)',
-            }}
-          >
-            <div className="mx-auto max-w-[1200px] px-4 pt-8 pb-12 sm:px-6 lg:px-8">
-              {/* Breadcrumb nav */}
-              <nav className="mb-8" aria-label="Breadcrumb">
-                <ol
-                  className="flex items-center gap-1.5 text-xs"
-                  style={{ color: 'rgba(255,255,255,0.6)' }}
-                >
-                  <li>
-                    <Link href="/" className="transition-colors hover:text-white/60">
-                      Home
-                    </Link>
-                  </li>
-                  <li aria-hidden="true">/</li>
-                  <li>
-                    <CoursesIndexLink className="transition-colors hover:text-white/60">
-                      Courses
-                    </CoursesIndexLink>
-                  </li>
-                  <li aria-hidden="true">/</li>
-                  <li style={{ color: 'rgba(255,255,255,0.55)' }}>{course.title}</li>
-                </ol>
-              </nav>
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_80%_0%,rgba(36,144,237,0.10),transparent_58%)]"
+            aria-hidden
+          />
+          <div className={`relative ${PUBLIC_SHELL_INNER_CLASS} pt-8 pb-16 md:pt-10 md:pb-20`}>
+            <nav className="mb-8" aria-label="Breadcrumb">
+              <ol className="flex flex-wrap items-center gap-1.5 text-xs text-slate-500">
+                <li>
+                  <Link href="/" className="transition-colors hover:text-[#146fc2]">
+                    Home
+                  </Link>
+                </li>
+                <li aria-hidden="true">/</li>
+                <li>
+                  <CoursesIndexLink className="transition-colors hover:text-[#146fc2]">
+                    Courses
+                  </CoursesIndexLink>
+                </li>
+                <li aria-hidden="true">/</li>
+                <li className="text-slate-700">{course.title}</li>
+              </ol>
+            </nav>
 
-              <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
-                {/* ── Hero Left: Title & Meta ── */}
-                <div className="lg:col-span-2">
-                  {/* Badges */}
-                  <div className="mb-5 flex flex-wrap items-center gap-2">
-                    {designation && (
-                      <span
-                        className="rounded-sm px-2.5 py-1 text-xs font-semibold tracking-wide uppercase"
-                        style={{
-                          background: 'rgba(237,157,36,0.15)',
-                          color: '#ed9d24',
-                          border: '1px solid rgba(237,157,36,0.25)',
-                        }}
-                      >
-                        CARSI Designation
-                      </span>
-                    )}
-                    {course.level && (
-                      <span
-                        className="rounded-sm px-2.5 py-1 text-xs font-medium"
-                        style={{
-                          background: 'rgba(255,255,255,0.06)',
-                          color: 'rgba(255,255,255,0.6)',
-                          border: '1px solid rgba(255,255,255,0.08)',
-                        }}
-                      >
-                        {course.level}
-                      </span>
-                    )}
-                    {course.category && (
-                      <span
-                        className="rounded-sm px-2.5 py-1 text-xs font-medium"
-                        style={{
-                          background: 'rgba(255,255,255,0.06)',
-                          color: 'rgba(255,255,255,0.6)',
-                          border: '1px solid rgba(255,255,255,0.08)',
-                        }}
-                      >
-                        {course.category}
-                      </span>
-                    )}
-                    {course.cec_hours && (
-                      <span
-                        className="rounded-sm px-2.5 py-1 text-xs font-medium"
-                        style={{
-                          background: 'rgba(0,245,255,0.08)',
-                          color: '#00F5FF',
-                          border: '1px solid rgba(0,245,255,0.15)',
-                        }}
-                      >
-                        {course.cec_hours} CECs
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Title */}
-                  <h1
-                    className="mb-4 text-3xl leading-tight font-bold tracking-tight sm:text-4xl lg:text-5xl"
-                    style={{ color: 'rgba(255,255,255,0.95)' }}
-                  >
-                    {course.title}
-                  </h1>
-
-                  {/* CARSI designation this course earns */}
+            <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
+              {/* ── Hero Left: Title & Meta ── */}
+              <div className="lg:col-span-2">
+                {/* Badges */}
+                <div className="mb-5 flex flex-wrap items-center gap-2">
+                  <p className={`${LANDING_EYEBROW_CLASS} mr-2`}>Course</p>
                   {designation && (
-                    <p
-                      className="mb-4 text-sm font-medium tracking-wide"
-                      style={{ color: '#ed9d24' }}
-                    >
-                      Earns the {designation.name}
-                    </p>
+                    <span className="rounded-full border border-[#ed9d24]/35 bg-[#fff8ed] px-3 py-1 text-[11px] font-semibold tracking-wide text-[#a85500] uppercase">
+                      CARSI Designation
+                    </span>
                   )}
+                  {course.level && (
+                    <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-medium text-slate-600">
+                      {course.level}
+                    </span>
+                  )}
+                  {course.category && (
+                    <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-medium text-slate-600">
+                      {course.category}
+                    </span>
+                  )}
+                  {course.cec_hours && (
+                    <span className="rounded-full border border-[#b8dbfb] bg-[#eef5fb] px-3 py-1 text-[11px] font-medium text-[#146fc2]">
+                      {course.cec_hours} CECs
+                    </span>
+                  )}
+                </div>
 
-                  {/* Credential clarity, above the fold.
+                {/* Title */}
+                <h1 className="mb-4 font-[family-name:var(--font-display)] text-[2rem] leading-[1.12] font-semibold tracking-[-0.02em] text-slate-950 sm:text-[2.6rem] lg:text-[3rem] lg:leading-[1.06]">
+                  {course.title}
+                </h1>
+
+                {/* CARSI designation this course earns */}
+                {designation && (
+                  <p className="mb-4 text-sm font-semibold text-[#a85500]">
+                    Earns the {designation.name}
+                  </p>
+                )}
+
+                {/* Credential clarity, above the fold.
                       CARSI's strongest and most honest differentiator — that this is CARSI's own
                       credential and CARSI is a CEC provider rather than a certifying body — was
                       stated only in a mid-page bullet and again near the page bottom. A buyer
@@ -473,290 +423,237 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                       Wording is fixed and licence-bound: "IICRC CEC Accredited" never appears
                       without CEC, and no discipline acronym brands the course
                       (CLAUDE.md § IICRC CEC terminology, enforced by check:iicrc-compliance). */}
-                  <p
-                    className="mb-4 max-w-2xl text-sm leading-relaxed"
-                    style={{ color: 'rgba(255,255,255,0.7)' }}
-                  >
-                    <span style={{ color: 'rgba(255,255,255,0.92)', fontWeight: 600 }}>
-                      A CARSI-issued credential — not an IICRC certification.
-                    </span>{' '}
-                    CARSI is an IICRC CEC Accredited provider, so this course counts toward
-                    maintaining a certification you already hold. IICRC certification itself is
-                    obtained through a school and examination approved by the IICRC.{' '}
-                    {/* Both credential critics asked for a verification path. One already exists
+                <p className={`mb-4 max-w-2xl ${LANDING_LEAD_CLASS}`}>
+                  <span className="font-semibold text-slate-900">
+                    A CARSI-issued credential — not an IICRC certification.
+                  </span>{' '}
+                  CARSI is an IICRC CEC Accredited provider, so this course counts toward
+                  maintaining a certification you already hold. IICRC certification itself is
+                  obtained through a school and examination approved by the IICRC.{' '}
+                  {/* Both credential critics asked for a verification path. One already exists
                         and is public — app/(public)/verify/credential/[credentialId] and
                         /verify/training-record, neither auth-gated — but the course page linked
                         it zero times, so the buyer had no way to know the credential is checkable
                         at source. Surface it where the credential is sold. */}
-                    <Link
-                      href="/verify/training-record"
-                      className="underline underline-offset-2"
-                      style={{ color: '#ed9d24' }}
-                    >
-                      Every CARSI credential gets a public verification page
-                    </Link>{' '}
-                    an employer or insurer can check without contacting us.
-                  </p>
-
-                  {/* Star rating (social proof) — only when the course has published reviews */}
-                  {aggregateRating && (
-                    <div
-                      className="mb-4 inline-flex items-center gap-2"
-                      aria-label={`Rated ${aggregateRating.ratingValue} out of 5 from ${aggregateRating.reviewCount} reviews`}
-                    >
-                      <span aria-hidden style={{ color: '#ed9d24', letterSpacing: '2px', fontSize: '18px' }}>
-                        {'★'.repeat(Math.round(aggregateRating.ratingValue))}
-                        <span style={{ color: 'rgba(255,255,255,0.25)' }}>
-                          {'★'.repeat(5 - Math.round(aggregateRating.ratingValue))}
-                        </span>
-                      </span>
-                      <span className="text-sm font-semibold" style={{ color: 'rgba(255,255,255,0.9)' }}>
-                        {aggregateRating.ratingValue.toFixed(1)}
-                      </span>
-                      <span className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                        ({aggregateRating.reviewCount} review{aggregateRating.reviewCount === 1 ? '' : 's'})
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Short description or description excerpt */}
-                  <p
-                    className="mb-6 max-w-2xl text-base leading-relaxed sm:text-lg"
-                    style={{ color: 'rgba(255,255,255,0.55)' }}
+                  <Link
+                    href="/verify/training-record"
+                    className="font-semibold text-[#146fc2] underline underline-offset-2"
                   >
-                    {course.short_description ??
-                      course.description?.slice(0, 280) ??
-                      'Australian-produced restoration training built for the Southern-Hemisphere restoration industry.'}
-                  </p>
+                    Every CARSI credential gets a public verification page
+                  </Link>{' '}
+                  an employer or insurer can check without contacting us.
+                </p>
 
-                  {/* Instructor */}
-                  {course.instructor && (
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="flex h-10 w-10 items-center justify-center rounded-sm text-sm font-bold"
-                        style={{
-                          background: 'rgba(237,157,36,0.15)',
-                          color: '#ed9d24',
-                          border: '1px solid rgba(237,157,36,0.2)',
-                        }}
-                      >
-                        {course.instructor.full_name
-                          .split(' ')
-                          .map((n) => n[0])
-                          .join('')
-                          .slice(0, 2)}
-                      </div>
-                      <div>
-                        <p
-                          className="text-sm font-medium"
-                          style={{ color: 'rgba(255,255,255,0.8)' }}
-                        >
-                          {course.instructor.full_name}
-                        </p>
-                        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                          Course Instructor
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Quick stats row — mobile only (desktop has sidebar) */}
+                {/* Star rating (social proof) — only when the course has published reviews */}
+                {aggregateRating && (
                   <div
-                    className="mt-8 grid grid-cols-3 gap-4 rounded-sm p-4 lg:hidden"
-                    style={glassPanelSubtle}
+                    className="mb-4 inline-flex items-center gap-2"
+                    aria-label={`Rated ${aggregateRating.ratingValue} out of 5 from ${aggregateRating.reviewCount} reviews`}
                   >
-                    <div className="text-center">
-                      <p className="text-lg font-bold" style={{ color: '#ed9d24' }}>
-                        {price}
-                      </p>
-                      <p className="text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                        {course.is_free || priceNum === 0 ? 'No cost' : 'AUD'}
-                      </p>
-                    </div>
-                    {course.cec_hours && (
-                      <div className="text-center">
-                        <p className="text-lg font-bold" style={{ color: '#00F5FF' }}>
-                          {course.cec_hours}
-                        </p>
-                        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                          CECs
-                        </p>
-                      </div>
-                    )}
-                    {course.duration_hours && (
-                      <div className="text-center">
-                        <p className="text-lg font-bold" style={{ color: 'rgba(255,255,255,0.8)' }}>
-                          {course.duration_hours}h
-                        </p>
-                        <p className="text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                          Duration
-                        </p>
-                      </div>
-                    )}
+                    <span aria-hidden className="text-lg tracking-[2px] text-[#ed9d24]">
+                      {'★'.repeat(Math.round(aggregateRating.ratingValue))}
+                      <span className="text-slate-300">
+                        {'★'.repeat(5 - Math.round(aggregateRating.ratingValue))}
+                      </span>
+                    </span>
+                    <span className="text-sm font-semibold text-slate-950">
+                      {aggregateRating.ratingValue.toFixed(1)}
+                    </span>
+                    <span className="text-sm text-slate-500">
+                      ({aggregateRating.reviewCount} review
+                      {aggregateRating.reviewCount === 1 ? '' : 's'})
+                    </span>
                   </div>
+                )}
 
-                  {/* Mobile enrol button */}
-                  <div className="mt-6 lg:hidden">
-                    <EnrolButton slug={course.slug} priceAud={priceNum} isFree={course.is_free} />
+                {/* Short description or description excerpt */}
+                <p className="mb-6 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">
+                  {course.short_description ??
+                    course.description?.slice(0, 280) ??
+                    'Australian-produced restoration training built for the Southern-Hemisphere restoration industry.'}
+                </p>
+
+                {/* Instructor */}
+                {course.instructor && (
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#ed9d24]/30 bg-[#fff8ed] text-sm font-bold text-[#a85500]">
+                      {course.instructor.full_name
+                        .split(' ')
+                        .map((n) => n[0])
+                        .join('')
+                        .slice(0, 2)}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-slate-900">
+                        {course.instructor.full_name}
+                      </p>
+                      <p className="text-xs text-slate-500">Course instructor</p>
+                    </div>
                   </div>
+                )}
+
+                {/* Quick stats row — mobile only (desktop has sidebar) */}
+                <div className="mt-8 grid grid-cols-3 gap-4 rounded-2xl border border-slate-200/80 bg-slate-50 p-4 lg:hidden">
+                  <div className="text-center">
+                    <p className="text-lg font-semibold text-[#a85500]">{price}</p>
+                    <p className="text-xs text-slate-500">
+                      {course.is_free || priceNum === 0 ? 'No cost' : 'AUD'}
+                    </p>
+                  </div>
+                  {course.cec_hours && (
+                    <div className="text-center">
+                      <p className="text-lg font-semibold text-[#146fc2]">{course.cec_hours}</p>
+                      <p className="text-xs text-slate-500">CECs</p>
+                    </div>
+                  )}
+                  {course.duration_hours && (
+                    <div className="text-center">
+                      <p className="text-lg font-semibold text-slate-900">
+                        {course.duration_hours}h
+                      </p>
+                      <p className="text-xs text-slate-500">Duration</p>
+                    </div>
+                  )}
                 </div>
 
-                {/* ── Hero Right: Sticky Price Card (desktop) ── */}
-                <div className="hidden lg:block">
-                  <div className="sticky top-8">
-                    {/* Intro/marketing video trailer (plays inline when the course has one) */}
-                    {course.intro_video_url ? (
-                      <div className="mb-4 overflow-hidden rounded-2xl border border-white/10 bg-black">
-                        {/youtube\.com|youtu\.be/.test(course.intro_video_url) ? (
-                          <iframe
-                            src={(() => {
-                              const url = course.intro_video_url;
-                              const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
-                              const id = m ? m[1] : '';
-                              return `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1`;
-                            })()}
-                            title={`${course.title} — intro video`}
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                            className="aspect-video w-full"
-                          />
-                        ) : (
-                          <video
-                            controls
-                            preload="metadata"
-                            poster={thumbnailUrl ?? undefined}
-                            className="aspect-video w-full"
-                            src={course.intro_video_url}
-                          >
-                            Your browser does not support the video tag.
-                          </video>
-                        )}
-                      </div>
-                    ) : null}
-                    {/* Thumbnail */}
-                    <CourseThumbnail
-                      src={thumbnailUrl}
-                      title={course.title}
-                      category={course.category}
-                      discipline={designation?.disciplineTopic ?? null}
-                      priceLabel={
-                        course.is_free || priceNum === 0 ? 'Free' : `$${priceNum.toFixed(0)} AUD`
-                      }
-                      isFree={course.is_free || priceNum === 0}
-                      moduleCount={course.module_count ?? null}
-                      level={course.level}
-                      cecHoursLabel={course.cec_hours}
-                      durationHours={course.duration_hours}
-                      shortDescription={course.short_description}
-                      instructorName={course.instructor?.full_name ?? null}
-                    />
+                {/* Mobile enrol button */}
+                <div className="mt-6 lg:hidden">
+                  <EnrolButton slug={course.slug} priceAud={priceNum} isFree={course.is_free} />
+                </div>
+              </div>
 
-                    {/* Price card */}
-                    <div className="rounded-sm p-6" style={glassPanel}>
-                      {/* Price */}
-                      <div className="mb-1">
-                        <span
-                          className="text-3xl font-bold"
-                          style={{ color: 'rgba(255,255,255,0.95)' }}
-                        >
-                          {price}
-                        </span>
-                        {!course.is_free && priceNum > 0 && (
-                          <span
-                            className="ml-2 text-sm"
-                            style={{ color: 'rgba(255,255,255,0.6)' }}
-                          >
-                            AUD
-                          </span>
-                        )}
-                      </div>
-                      <p className="mb-6 text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                        {course.is_free || priceNum === 0
-                          ? 'Free access — no payment required'
-                          : 'One-time payment — lifetime access'}
-                      </p>
-
-                      {/* Enrol CTA */}
-                      <div className="mb-6">
-                        <EnrolButton
-                          slug={course.slug}
-                          priceAud={priceNum}
-                          isFree={course.is_free}
+              {/* ── Hero Right: Sticky Price Card (desktop) ── */}
+              <div className="hidden lg:block">
+                <div className="sticky top-8">
+                  {/* Intro/marketing video trailer (plays inline when the course has one) */}
+                  {course.intro_video_url ? (
+                    <div className="mb-4 overflow-hidden rounded-2xl border border-white/10 bg-black">
+                      {/youtube\.com|youtu\.be/.test(course.intro_video_url) ? (
+                        <iframe
+                          src={(() => {
+                            const url = course.intro_video_url;
+                            const m = url.match(
+                              /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/
+                            );
+                            const id = m ? m[1] : '';
+                            return `https://www.youtube.com/embed/${id}?rel=0&modestbranding=1`;
+                          })()}
+                          title={`${course.title} — intro video`}
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                          className="aspect-video w-full"
                         />
-                      </div>
-
-                      {/* Pro subscription note */}
-                      <p
-                        className="mb-6 text-center text-xs"
-                        style={{ color: 'rgba(255,255,255,0.7)' }}
-                      >
-                        or included with{' '}
-                        <Link
-                          href="/subscribe"
-                          className="underline transition-colors"
-                          style={{ color: '#00F5FF' }}
+                      ) : (
+                        <video
+                          controls
+                          preload="metadata"
+                          poster={thumbnailUrl ?? undefined}
+                          className="aspect-video w-full"
+                          src={course.intro_video_url}
                         >
-                          CARSI Pro
-                        </Link>{' '}
-                        — $795/yr
-                      </p>
+                          Your browser does not support the video tag.
+                        </video>
+                      )}
+                    </div>
+                  ) : null}
+                  {/* Thumbnail */}
+                  <CourseThumbnail
+                    src={thumbnailUrl}
+                    title={course.title}
+                    category={course.category}
+                    discipline={designation?.disciplineTopic ?? null}
+                    priceLabel={
+                      course.is_free || priceNum === 0 ? 'Free' : `$${priceNum.toFixed(0)} AUD`
+                    }
+                    isFree={course.is_free || priceNum === 0}
+                    moduleCount={course.module_count ?? null}
+                    level={course.level}
+                    cecHoursLabel={course.cec_hours}
+                    durationHours={course.duration_hours}
+                    shortDescription={course.short_description}
+                    instructorName={course.instructor?.full_name ?? null}
+                  />
 
-                      {/* Divider */}
-                      <div
-                        className="mb-5"
-                        style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
-                      />
+                  {/* Price card */}
+                  <div className={`${panelClass} mt-4`}>
+                    <div className="mb-1">
+                      <span className="font-[family-name:var(--font-display)] text-3xl font-semibold text-slate-950">
+                        {price}
+                      </span>
+                      {!course.is_free && priceNum > 0 && (
+                        <span className="ml-2 text-sm text-slate-500">AUD</span>
+                      )}
+                    </div>
+                    <p className="mb-6 text-xs text-slate-500">
+                      {course.is_free || priceNum === 0
+                        ? 'Free access — no payment required'
+                        : 'One-time payment — lifetime access'}
+                    </p>
 
-                      {/* Course meta */}
-                      <div className="space-y-3">
-                        {course.duration_hours && (
-                          <div className="flex items-center justify-between text-sm">
-                            <span style={{ color: 'rgba(255,255,255,0.65)' }}>Duration</span>
-                            <span style={{ color: 'rgba(255,255,255,0.8)' }}>
-                              {course.duration_hours} hours
-                            </span>
-                          </div>
-                        )}
-                        {course.cec_hours && (
-                          <div className="flex items-center justify-between text-sm">
-                            <span style={{ color: 'rgba(255,255,255,0.65)' }}>CECs awarded</span>
-                            <span style={{ color: '#00F5FF' }}>{course.cec_hours} credits</span>
-                          </div>
-                        )}
-                        {course.level && (
-                          <div className="flex items-center justify-between text-sm">
-                            <span style={{ color: 'rgba(255,255,255,0.65)' }}>Level</span>
-                            <span style={{ color: 'rgba(255,255,255,0.8)' }}>{course.level}</span>
-                          </div>
-                        )}
-                        {designation && (
-                          <div className="flex items-center justify-between gap-4 text-sm">
-                            <span style={{ color: 'rgba(255,255,255,0.65)' }}>Designation</span>
-                            <span className="text-right" style={{ color: '#ed9d24' }}>
-                              {designation.name}
-                            </span>
-                          </div>
-                        )}
-                        <div className="flex items-center justify-between text-sm">
-                          <span style={{ color: 'rgba(255,255,255,0.65)' }}>Format</span>
-                          <span style={{ color: 'rgba(255,255,255,0.8)' }}>
-                            Online / Self-paced
+                    {/* Enrol CTA */}
+                    <div className="mb-6">
+                      <EnrolButton slug={course.slug} priceAud={priceNum} isFree={course.is_free} />
+                    </div>
+
+                    {/* Pro subscription note */}
+                    <p className="mb-6 text-center text-xs text-slate-500">
+                      or included with{' '}
+                      <Link href="/subscribe" className="font-semibold text-[#146fc2] underline">
+                        CARSI Pro
+                      </Link>{' '}
+                      — $795/yr
+                    </p>
+
+                    <div className="mb-5 border-t border-slate-200/80" />
+
+                    <div className="space-y-3 text-sm">
+                      {course.duration_hours && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-500">Duration</span>
+                          <span className="font-medium text-slate-900">
+                            {course.duration_hours} hours
                           </span>
                         </div>
-                        <div className="flex items-center justify-between text-sm">
-                          <span style={{ color: 'rgba(255,255,255,0.65)' }}>Certificate</span>
-                          <span style={{ color: 'rgba(255,255,255,0.8)' }}>Digital credential</span>
+                      )}
+                      {course.cec_hours && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-500">CECs awarded</span>
+                          <span className="font-medium text-[#146fc2]">
+                            {course.cec_hours} credits
+                          </span>
                         </div>
+                      )}
+                      {course.level && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-500">Level</span>
+                          <span className="font-medium text-slate-900">{course.level}</span>
+                        </div>
+                      )}
+                      {designation && (
+                        <div className="flex items-center justify-between gap-4">
+                          <span className="text-slate-500">Designation</span>
+                          <span className="text-right font-medium text-[#a85500]">
+                            {designation.name}
+                          </span>
+                        </div>
+                      )}
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-500">Format</span>
+                        <span className="font-medium text-slate-900">Online / Self-paced</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-500">Certificate</span>
+                        <span className="font-medium text-slate-900">Digital credential</span>
                       </div>
                     </div>
+                  </div>
 
-                    {/* Career context */}
-                    <div className="mt-4">
-                      <CourseHubContext
-                        discipline={designation?.disciplineTopic ?? ''}
-                        slug={course.slug}
-                      />
-                    </div>
+                  {/* Career context */}
+                  <div className="mt-4">
+                    <CourseHubContext
+                      discipline={designation?.disciplineTopic ?? ''}
+                      slug={course.slug}
+                    />
                   </div>
                 </div>
               </div>
@@ -765,50 +662,36 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
         </section>
 
         {/* ── Content Sections ── */}
-        <div className="relative z-10 mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
+        <div
+          className={`relative border-t border-slate-200/70 bg-[#fafbfc] py-16 ${PUBLIC_SHELL_INNER_CLASS}`}
+        >
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-3">
             {/* Left column: content sections */}
             <div className="space-y-10 pb-20 lg:col-span-2">
               {/* ── Full Description ── */}
               {course.description && (
                 <section>
-                  <h2
-                    className="mb-4 text-xl font-bold"
-                    style={{ color: 'rgba(255,255,255,0.92)' }}
-                  >
-                    About This Course
-                  </h2>
-                  <div className="rounded-sm p-6" style={glassPanelSubtle}>
-                    <CourseFormattedBody text={course.description} />
+                  <h2 className={sectionHeadingClass}>About This Course</h2>
+                  <div className={panelClass}>
+                    <CourseFormattedBody text={course.description} tone="light" />
                   </div>
                 </section>
               )}
 
               {/* ── What You'll Learn ── */}
               <section>
-                <h2 className="mb-4 text-xl font-bold" style={{ color: 'rgba(255,255,255,0.92)' }}>
-                  What You&apos;ll Learn
-                </h2>
-                <div className="rounded-sm p-6" style={glassPanel}>
+                <h2 className={sectionHeadingClass}>What You&apos;ll Learn</h2>
+                <div className={panelClass}>
                   <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     {learningOutcomes.map((outcome) => (
                       <li key={outcome} className="flex items-start gap-3">
                         <span
-                          className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-sm text-xs"
-                          style={{
-                            background: 'rgba(0,255,136,0.1)',
-                            color: '#00FF88',
-                          }}
+                          className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#e8f7ee] text-xs text-[#157a55]"
                           aria-hidden="true"
                         >
                           &#10003;
                         </span>
-                        <span
-                          className="text-sm leading-relaxed"
-                          style={{ color: 'rgba(255,255,255,0.7)' }}
-                        >
-                          {outcome}
-                        </span>
+                        <span className="text-sm leading-relaxed text-slate-600">{outcome}</span>
                       </li>
                     ))}
                   </ul>
@@ -820,13 +703,8 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                   stores every module and lesson title; name them. */}
               {course.syllabus && course.syllabus.length > 0 && (
                 <section>
-                  <h2
-                    className="mb-4 text-xl font-bold"
-                    style={{ color: 'rgba(255,255,255,0.92)' }}
-                  >
-                    Syllabus
-                  </h2>
-                  <p className="mb-4 text-sm" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                  <h2 className={sectionHeadingClass}>Syllabus</h2>
+                  <p className="mb-4 text-sm text-slate-500">
                     {course.syllabus.length} module{course.syllabus.length === 1 ? '' : 's'}
                     {course.lesson_count
                       ? ` · ${course.lesson_count} lesson${course.lesson_count === 1 ? '' : 's'}`
@@ -835,21 +713,13 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                   </p>
                   <ol className="space-y-4">
                     {course.syllabus.map((mod, modIndex) => (
-                      <li key={mod.id} className="rounded-sm p-6" style={glassPanelSubtle}>
-                        <h3
-                          className="mb-3 text-base font-semibold"
-                          style={{ color: 'rgba(255,255,255,0.92)' }}
-                        >
-                          <span style={{ color: 'rgba(255,255,255,0.45)' }}>
-                            Module {modIndex + 1}
-                          </span>
+                      <li key={mod.id} className={panelClass}>
+                        <h3 className="mb-3 text-base font-semibold text-slate-950">
+                          <span className="text-slate-400">Module {modIndex + 1}</span>
                           {' — '}
                           {mod.title}
                           {typeof mod.duration_minutes === 'number' && (
-                            <span
-                              className="ml-2 text-sm font-normal"
-                              style={{ color: 'rgba(255,255,255,0.5)' }}
-                            >
+                            <span className="ml-2 text-sm font-normal text-slate-500">
                               {mod.duration_minutes} min
                             </span>
                           )}
@@ -859,30 +729,20 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                             {mod.lessons.map((lesson) => (
                               <li
                                 key={lesson.id}
-                                className="flex items-start gap-3 text-sm leading-relaxed"
-                                style={{ color: 'rgba(255,255,255,0.7)' }}
+                                className="flex items-start gap-3 text-sm leading-relaxed text-slate-600"
                               >
-                                <span aria-hidden="true" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                                <span aria-hidden="true" className="text-slate-300">
                                   •
                                 </span>
                                 <span>
                                   {lesson.title}
                                   {typeof lesson.duration_minutes === 'number' && (
-                                    <span
-                                      className="ml-2"
-                                      style={{ color: 'rgba(255,255,255,0.45)' }}
-                                    >
+                                    <span className="ml-2 text-slate-400">
                                       {lesson.duration_minutes} min
                                     </span>
                                   )}
                                   {lesson.is_preview && (
-                                    <span
-                                      className="ml-2 rounded-sm px-1.5 py-0.5 text-xs font-medium"
-                                      style={{
-                                        background: 'rgba(255,255,255,0.1)',
-                                        color: 'rgba(255,255,255,0.75)',
-                                      }}
-                                    >
+                                    <span className="ml-2 rounded-full bg-[#eef5fb] px-2 py-0.5 text-xs font-medium text-[#146fc2]">
                                       Preview
                                     </span>
                                   )}
@@ -903,36 +763,21 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                   audience a preview exists for could never see one. Surface it before signup. */}
               {previewLesson?.preview_body && (
                 <section>
-                  <h2
-                    className="mb-4 text-xl font-bold"
-                    style={{ color: 'rgba(255,255,255,0.92)' }}
-                  >
-                    Read a free lesson
-                  </h2>
-                  <div className="rounded-sm p-6" style={glassPanel}>
-                    <h3
-                      className="mb-1 text-base font-semibold"
-                      style={{ color: 'rgba(255,255,255,0.92)' }}
-                    >
+                  <h2 className={sectionHeadingClass}>Read a free lesson</h2>
+                  <div className={panelClass}>
+                    <h3 className="mb-1 text-base font-semibold text-slate-950">
                       {previewLesson.title}
                     </h3>
-                    <p className="mb-4 text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                      Free preview — no account needed
-                    </p>
-                    <CourseFormattedBody text={previewLesson.preview_body} />
+                    <p className="mb-4 text-xs text-slate-500">Free preview — no account needed</p>
+                    <CourseFormattedBody text={previewLesson.preview_body} tone="light" />
                   </div>
                 </section>
               )}
 
               {/* ── Course Details Grid ── */}
               <section>
-                <h2 className="mb-4 text-xl font-bold" style={{ color: 'rgba(255,255,255,0.92)' }}>
-                  Course Details
-                </h2>
-                <div
-                  className="grid grid-cols-2 gap-px overflow-hidden rounded-sm sm:grid-cols-3"
-                  style={{ background: 'rgba(255,255,255,0.06)' }}
-                >
+                <h2 className={sectionHeadingClass}>Course Details</h2>
+                <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-slate-200 bg-slate-200/70 sm:grid-cols-3">
                   {[
                     {
                       label: 'Level',
@@ -971,18 +816,12 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
                       accent: false,
                     },
                   ].map((item) => (
-                    <div key={item.label} className="p-5" style={{ background: '#060a14' }}>
-                      <p
-                        className="mb-1 text-xs font-medium tracking-wider uppercase"
-                        style={{ color: 'rgba(255,255,255,0.7)' }}
-                      >
+                    <div key={item.label} className="bg-white p-5">
+                      <p className="mb-1 text-[11px] font-medium tracking-[0.16em] text-slate-400 uppercase">
                         {item.label}
                       </p>
                       <p
-                        className="text-sm font-semibold"
-                        style={{
-                          color: item.accent ? '#ed9d24' : 'rgba(255,255,255,0.8)',
-                        }}
+                        className={`text-sm font-semibold ${item.accent ? 'text-[#a85500]' : 'text-slate-900'}`}
                       >
                         {item.value}
                       </p>
@@ -993,29 +832,18 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
 
               {/* ── Who This Course Is For ── */}
               <section>
-                <h2 className="mb-4 text-xl font-bold" style={{ color: 'rgba(255,255,255,0.92)' }}>
-                  Who This Course Is For
-                </h2>
-                <div className="rounded-sm p-6" style={glassPanelSubtle}>
+                <h2 className={sectionHeadingClass}>Who This Course Is For</h2>
+                <div className={panelClass}>
                   <ul className="space-y-3">
                     {audienceItems.map((item) => (
                       <li key={item} className="flex items-start gap-3">
                         <span
-                          className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-sm text-xs"
-                          style={{
-                            background: 'rgba(237,157,36,0.1)',
-                            color: '#ed9d24',
-                          }}
+                          className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#fff8ed] text-xs text-[#a85500]"
                           aria-hidden="true"
                         >
                           &#8594;
                         </span>
-                        <span
-                          className="text-sm leading-relaxed"
-                          style={{ color: 'rgba(255,255,255,0.6)' }}
-                        >
-                          {item}
-                        </span>
+                        <span className="text-sm leading-relaxed text-slate-500">{item}</span>
                       </li>
                     ))}
                   </ul>
@@ -1024,71 +852,41 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
 
               {/* ── Credential & CEC Section ── */}
               <section>
-                <h2 className="mb-4 text-xl font-bold" style={{ color: 'rgba(255,255,255,0.92)' }}>
-                  Credential &amp; CECs
-                </h2>
-                <div className="rounded-sm p-6" style={glassPanel}>
+                <h2 className={sectionHeadingClass}>Credential &amp; CECs</h2>
+                <div className={panelClass}>
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
-                      <div
-                        className="mb-3 flex h-10 w-10 items-center justify-center rounded-sm"
-                        style={{
-                          background: 'rgba(0,245,255,0.08)',
-                          border: '1px solid rgba(0,245,255,0.15)',
-                        }}
-                      >
-                        <span style={{ color: '#00F5FF', fontSize: '18px' }}>&#9733;</span>
+                      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full border border-[#b8dbfb] bg-[#eef5fb]">
+                        <span className="text-lg text-[#146fc2]">&#9733;</span>
                       </div>
-                      <h3
-                        className="mb-1 text-sm font-semibold"
-                        style={{ color: 'rgba(255,255,255,0.85)' }}
-                      >
+                      <h3 className="mb-1 text-sm font-semibold text-slate-900">
                         Digital Credential
                       </h3>
-                      <p
-                        className="text-xs leading-relaxed"
-                        style={{ color: 'rgba(255,255,255,0.7)' }}
-                      >
+                      <p className="text-sm text-xs leading-relaxed text-slate-600">
                         Receive a verifiable digital credential with a unique public URL. Share
                         directly to LinkedIn or include in job applications.
                       </p>
                     </div>
                     <div>
-                      <div
-                        className="mb-3 flex h-10 w-10 items-center justify-center rounded-sm"
-                        style={{
-                          background: 'rgba(237,157,36,0.1)',
-                          border: '1px solid rgba(237,157,36,0.2)',
-                        }}
-                      >
-                        <span style={{ color: '#ed9d24', fontSize: '18px' }}>&#9670;</span>
+                      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full border border-[#ed9d24]/30 bg-[#fff8ed]">
+                        <span className="text-lg text-[#a85500]">&#9670;</span>
                       </div>
-                      <h3
-                        className="mb-1 text-sm font-semibold"
-                        style={{ color: 'rgba(255,255,255,0.85)' }}
-                      >
+                      <h3 className="mb-1 text-sm font-semibold text-slate-900">
                         {/* GP-498: only claim IICRC CEC tracking when this course has
                             registry-approved CEC hours; otherwise no CEC claim is made. */}
                         {course.cec_hours ? 'IICRC CEC Tracking' : 'Progress Tracking'}
                       </h3>
-                      <p
-                        className="text-xs leading-relaxed"
-                        style={{ color: 'rgba(255,255,255,0.7)' }}
-                      >
+                      <p className="text-sm text-xs leading-relaxed text-slate-600">
                         {course.cec_hours
                           ? `This course awards ${course.cec_hours} IICRC Continuing Education Credits. Credits are automatically recorded and exportable for IICRC submission.`
                           : 'Your progress and completion are recorded automatically in your CARSI dashboard, with a verifiable digital credential on completion.'}
                       </p>
                     </div>
                   </div>
-                  <p
-                    className="mt-6 border-t pt-4 text-xs leading-relaxed"
-                    style={{
-                      color: 'rgba(255,255,255,0.6)',
-                      borderColor: 'rgba(255,255,255,0.08)',
-                    }}
-                  >
-                    {designation ? `${designation.name} is a CARSI credential that ` : 'This CARSI course '}
+                  <p className="mt-6 border-t border-slate-200/80 pt-4 text-xs leading-relaxed text-slate-500">
+                    {designation
+                      ? `${designation.name} is a CARSI credential that `
+                      : 'This CARSI course '}
                     complements the IICRC — it is Southern-Hemisphere training the IICRC does not
                     offer, not an IICRC certification.{' '}
                     {/* GP-498: assert this course earns CECs only when it has registry-approved
@@ -1102,7 +900,10 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
 
               {/* ── Career context (mobile) ── */}
               <div className="lg:hidden">
-                <CourseHubContext discipline={designation?.disciplineTopic ?? ''} slug={course.slug} />
+                <CourseHubContext
+                  discipline={designation?.disciplineTopic ?? ''}
+                  slug={course.slug}
+                />
               </div>
             </div>
 
@@ -1112,51 +913,35 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
         </div>
 
         {/* ── Bottom CTA ── */}
-        <section className="relative z-10">
-          <div
-            style={{
-              background: 'linear-gradient(180deg, transparent 0%, rgba(237,157,36,0.04) 100%)',
-            }}
-          >
-            <div className="mx-auto max-w-[800px] px-4 py-20 text-center sm:px-6">
-              <h2
-                className="mb-3 text-2xl font-bold sm:text-3xl"
-                style={{ color: 'rgba(255,255,255,0.92)' }}
-              >
-                Ready to advance your career?
-              </h2>
-              <p
-                className="mx-auto mb-8 max-w-lg text-sm leading-relaxed"
-                style={{ color: 'rgba(255,255,255,0.7)' }}
-              >
-                {course.cec_hours
-                  ? `Earn ${course.cec_hours} IICRC CECs and receive a verifiable digital credential upon completion of ${course.title}.`
-                  : `Complete ${course.title} and receive a verifiable digital credential for your professional portfolio.`}
+        <section className="relative overflow-hidden border-t border-slate-200/70 bg-[#eef5fb]">
+          <div className={`mx-auto max-w-2xl py-20 text-center ${PUBLIC_SHELL_INNER_CLASS}`}>
+            <p className={LANDING_EYEBROW_CLASS}>Enrol</p>
+            <h2 className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>Ready to advance your career?</h2>
+            <p className="mx-auto mb-8 max-w-lg text-sm leading-relaxed text-slate-600">
+              {course.cec_hours
+                ? `Earn ${course.cec_hours} IICRC CECs and receive a verifiable digital credential upon completion of ${course.title}.`
+                : `Complete ${course.title} and receive a verifiable digital credential for your professional portfolio.`}
+            </p>
+
+            <div className="mx-auto flex max-w-sm flex-col items-center gap-4">
+              <div className="w-full">
+                <EnrolButton slug={course.slug} priceAud={priceNum} isFree={course.is_free} />
+              </div>
+              <p className="text-xs text-slate-500">
+                {course.is_free || priceNum === 0
+                  ? 'Free — no payment or credit card required'
+                  : 'Secure checkout — or access all courses with CARSI Pro'}
               </p>
+            </div>
 
-              <div className="mx-auto flex max-w-sm flex-col items-center gap-4">
-                <div className="w-full">
-                  <EnrolButton slug={course.slug} priceAud={priceNum} isFree={course.is_free} />
-                </div>
-                <p className="text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>
-                  {course.is_free || priceNum === 0
-                    ? 'Free — no payment or credit card required'
-                    : 'Secure checkout — or access all courses with CARSI Pro'}
-                </p>
-              </div>
-
-              <div className="mt-8">
-                <CoursesIndexLink
-                  className="text-sm underline transition-colors"
-                  style={{ color: 'rgba(255,255,255,0.6)' }}
-                >
-                  Browse all courses
-                </CoursesIndexLink>
-              </div>
+            <div className="mt-8">
+              <CoursesIndexLink className="text-sm text-slate-500 underline transition-colors">
+                Browse all courses
+              </CoursesIndexLink>
             </div>
           </div>
         </section>
-      </main>
+      </div>
     </>
   );
 }
