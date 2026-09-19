@@ -44,6 +44,7 @@ type CourseDto = {
   durationHours?: string | null;
   iicrcDiscipline?: string | null;
   level?: string | null;
+  category?: string | null;
   resolvedCecHours?: string | null;
   cecMissing?: boolean;
   cecExcluded?: boolean;
@@ -110,6 +111,7 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
   const [durationHours, setDurationHours] = useState('');
   const [iicrcDiscipline, setIicrcDiscipline] = useState('');
   const [level, setLevel] = useState('');
+  const [category, setCategory] = useState('');
   const [cecMissing, setCecMissing] = useState(false);
   const [cecExcluded, setCecExcluded] = useState(false);
   const [resolvedCecHours, setResolvedCecHours] = useState<string | null>(null);
@@ -141,6 +143,7 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
       setDurationHours(c.durationHours ?? '');
       setIicrcDiscipline(c.iicrcDiscipline ?? '');
       setLevel(c.level ?? '');
+      setCategory(c.category ?? '');
       setCecMissing(Boolean(c.cecMissing));
       setCecExcluded(Boolean(c.cecExcluded));
       setResolvedCecHours(c.resolvedCecHours ?? null);
@@ -339,6 +342,7 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
             : null,
         iicrcDiscipline: iicrcDiscipline.trim() || null,
         level: level.trim() || null,
+        category: category.trim() || null,
         modules: mergedModules.map((m) => ({
           id: m.id,
           title: m.title.trim(),
@@ -416,9 +420,35 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
             >
               ← Back to courses
             </Link>
-            <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
-              {courseId ? 'Edit course' : 'Create course'}
-            </h1>
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                {courseId ? 'Edit course' : 'Create course'}
+              </h1>
+              {courseId ? (
+                <span
+                  className={cn(
+                    'rounded-full border px-2.5 py-0.5 text-[10px] font-bold tracking-wide uppercase',
+                    workflowStatus === 'published'
+                      ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-200'
+                      : workflowStatus === 'in_review'
+                        ? 'border-amber-400/30 bg-amber-400/10 text-amber-200'
+                        : 'border-white/10 bg-white/5 text-white/55'
+                  )}
+                >
+                  {workflowStatus === 'in_review' ? 'In review' : workflowStatus}
+                </span>
+              ) : null}
+              {isDirty ? (
+                <span className="rounded-full border border-[#ed9d24]/35 bg-[#ed9d24]/10 px-2.5 py-0.5 text-[10px] font-semibold tracking-wide text-[#ed9d24] uppercase">
+                  Unsaved
+                </span>
+              ) : null}
+              {cecMissing && !cecExcluded ? (
+                <span className="rounded-full border border-amber-500/35 bg-amber-500/10 px-2.5 py-0.5 text-[10px] font-semibold tracking-wide text-amber-100 uppercase">
+                  CEC missing
+                </span>
+              ) : null}
+            </div>
             <p className="max-w-2xl text-sm leading-relaxed text-white/50">
               Full-width editor — set catalogue copy, pricing in AUD, thumbnail, and ordered
               modules. Paid courses require a price; free courses ignore the price field on save.
@@ -664,6 +694,21 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
                     placeholder="e.g. Professional development"
                   />
                 </div>
+                <div className="space-y-2 sm:col-span-2">
+                  <Label htmlFor="course-category" className="text-white/65">
+                    Category
+                  </Label>
+                  <Input
+                    id="course-category"
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className={cn('h-11', fieldClass)}
+                    placeholder="e.g. Restoration, Truckmount, Facilities"
+                  />
+                  <p className="text-xs text-white/40">
+                    Used to group courses on the admin catalogue filters.
+                  </p>
+                </div>
               </div>
             </section>
           </div>
@@ -823,21 +868,28 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
           />
         </section>
 
-        <div className="flex flex-wrap gap-3 border-t border-white/10 pt-8">
-          <button
-            type="submit"
-            disabled={saving || uploading}
-            className="inline-flex min-w-[148px] items-center justify-center gap-2 rounded-xl bg-[#ed9d24] px-6 py-3 text-sm font-semibold text-white shadow-[0_8px_28px_-8px_rgba(237,157,36,0.55)] transition-[transform,box-shadow] duration-200 hover:shadow-[0_12px_32px_-8px_rgba(237,157,36,0.65)] disabled:opacity-50"
-          >
-            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-            {saving ? 'Saving…' : 'Save course'}
-          </button>
-          <Link
-            href="/admin/courses"
-            className="inline-flex items-center justify-center rounded-xl border border-white/15 px-6 py-3 text-sm font-medium text-white/75 hover:bg-white/5"
-          >
-            Cancel
-          </Link>
+        <div className="sticky bottom-0 z-20 -mx-4 mt-2 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 bg-[#0c101c]/95 px-4 py-4 backdrop-blur-md sm:-mx-6 sm:px-6 lg:-mx-10 lg:px-10">
+          <p className="text-xs text-white/40">
+            {isDirty
+              ? 'You have unsaved article changes.'
+              : 'All article changes saved in this session.'}
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="submit"
+              disabled={saving || uploading}
+              className="inline-flex min-w-[148px] items-center justify-center gap-2 rounded-xl bg-[#ed9d24] px-6 py-3 text-sm font-semibold text-white shadow-[0_8px_28px_-8px_rgba(237,157,36,0.55)] disabled:opacity-50"
+            >
+              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              {saving ? 'Saving…' : 'Save course'}
+            </button>
+            <Link
+              href="/admin/courses"
+              className="inline-flex items-center justify-center rounded-xl border border-white/15 px-6 py-3 text-sm font-medium text-white/75 hover:bg-white/5"
+            >
+              Cancel
+            </Link>
+          </div>
         </div>
       </form>
     </div>
