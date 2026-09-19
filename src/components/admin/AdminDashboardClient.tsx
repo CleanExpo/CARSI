@@ -25,7 +25,9 @@ import {
   YAxis,
 } from 'recharts';
 
+import { AdminPagination } from '@/components/admin/AdminPagination';
 import { formatAdminDate } from '@/components/admin/admin-learner-ui';
+import { useAdminListPaging } from '@/components/admin/use-admin-list-paging';
 import type { AdminDashboardClientData } from '@/lib/admin/admin-dashboard-data';
 import {
   formatAud,
@@ -85,6 +87,7 @@ function DeltaChip({
 
 export function AdminDashboardClient({ data }: { data: AdminDashboardClientData }) {
   const [period, setPeriod] = useState<AdminOpsPeriod>('this_month');
+  const revenuePaging = useAdminListPaging(data.ops.topByRevenue);
   const snapshot =
     data.ops[
       period === 'this_month'
@@ -386,14 +389,15 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
             <p className="pt-16 text-center text-sm text-white/40">No paid enrolments yet.</p>
           ) : (
             <ol className="mt-5 space-y-3">
-              {data.ops.topByRevenue.map((row, i) => {
+              {revenuePaging.pageRows.map((row, i) => {
                 const max = data.ops.topByRevenue[0]?.revenueAud || 1;
+                const rank = revenuePaging.start + i + 1;
                 return (
                   <li key={row.title}>
                     <div className="mb-1 flex items-baseline justify-between gap-3">
                       <span className="truncate text-sm text-white/88">
                         <span className="mr-2 font-mono text-[11px] text-white/35">
-                          {String(i + 1).padStart(2, '0')}
+                          {String(rank).padStart(2, '0')}
                         </span>
                         {row.title}
                       </span>
@@ -417,6 +421,17 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
               })}
             </ol>
           )}
+          {data.ops.topByRevenue.length > 0 ? (
+            <div className="mt-4">
+              <AdminPagination
+                page={revenuePaging.page}
+                pageCount={revenuePaging.pageCount}
+                onPageChange={revenuePaging.setPage}
+                pageSize={revenuePaging.pageSize}
+                onPageSizeChange={revenuePaging.changePageSize}
+              />
+            </div>
+          ) : null}
         </div>
       </section>
 
@@ -540,6 +555,9 @@ function AttentionCard({
   icon: typeof BadgeCheck;
   tone?: 'warn';
 }) {
+  const paging = useAdminListPaging(rows);
+  const { page: safePage, pageCount, pageRows, setPage } = paging;
+
   return (
     <div
       className={cn(
@@ -559,16 +577,32 @@ function AttentionCard({
       {rows.length === 0 ? (
         <p className="mt-6 text-sm text-white/40">{empty}</p>
       ) : (
-        <ul className="mt-4 space-y-3">
-          {rows.map((row) => (
-            <li key={`${row.href}-${row.meta}`}>
-              <Link href={row.href} className="block rounded-lg px-1 py-0.5 hover:bg-white/[0.04]">
-                <p className="truncate text-sm text-white/88">{row.title}</p>
-                <p className="truncate text-xs text-white/42">{row.meta}</p>
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul className="mt-4 space-y-3">
+            {pageRows.map((row) => (
+              <li key={`${row.href}-${row.meta}`}>
+                <Link
+                  href={row.href}
+                  className="block rounded-lg px-1 py-0.5 hover:bg-white/[0.04]"
+                >
+                  <p className="truncate text-sm text-white/88">{row.title}</p>
+                  <p className="truncate text-xs text-white/42">{row.meta}</p>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          {rows.length > 0 ? (
+            <div className="mt-4">
+              <AdminPagination
+                page={safePage}
+                pageCount={pageCount}
+                onPageChange={setPage}
+                pageSize={paging.pageSize}
+                onPageSizeChange={paging.changePageSize}
+              />
+            </div>
+          ) : null}
+        </>
       )}
     </div>
   );
