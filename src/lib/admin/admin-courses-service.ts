@@ -61,6 +61,7 @@ export type AdminCourseWriteInput = {
   durationHours?: number | null;
   iicrcDiscipline?: string | null;
   level?: string | null;
+  category?: string | null;
   modules: AdminModuleInput[];
 };
 
@@ -166,6 +167,7 @@ export function parseAdminCourseWriteBody(body: unknown): AdminCourseWriteInput 
     durationHours: parseOptionalHours(o.durationHours),
     iicrcDiscipline: parseOptionalTrimmedString(o.iicrcDiscipline),
     level: parseOptionalTrimmedString(o.level),
+    category: parseOptionalTrimmedString(o.category),
     modules,
   };
 }
@@ -482,6 +484,7 @@ export function courseToAdminDto(course: CourseWithCurriculum) {
     durationHours: course.durationHours != null ? String(course.durationHours) : null,
     iicrcDiscipline: course.iicrcDiscipline,
     level: course.level,
+    category: course.category,
     resolvedCecHours: resolved != null ? String(resolved) : null,
     cecMissing: !isCecExcludedSlug(course.slug) && resolved == null,
     cecExcluded: isCecExcludedSlug(course.slug),
@@ -742,7 +745,7 @@ export async function adminCreateCourse(
           priceAud,
           isFree: Boolean(input.isFree),
           level: input.level?.trim() || null,
-          category: null,
+          category: input.category?.trim() || null,
           cecHours: input.cecHours ?? null,
           durationHours: input.durationHours ?? null,
           iicrcDiscipline: input.iicrcDiscipline?.trim() || null,
@@ -829,6 +832,7 @@ export async function adminUpdateCourse(
             ? { iicrcDiscipline: input.iicrcDiscipline?.trim() || null }
             : {}),
           ...(input.level !== undefined ? { level: input.level?.trim() || null } : {}),
+          ...(input.category !== undefined ? { category: input.category?.trim() || null } : {}),
         },
       });
 
