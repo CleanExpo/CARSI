@@ -2,7 +2,7 @@
 
 import {
   Bold,
-  Code,
+  Heading1,
   Heading2,
   Image as ImageIcon,
   Italic,
@@ -10,29 +10,14 @@ import {
   List,
   ListOrdered,
   Quote,
-  Table,
 } from 'lucide-react';
-import { useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef } from 'react';
 
-import { CourseFormattedBody } from '@/components/lms/CourseFormattedBody';
+import { sourceToEditorHtml } from '@/lib/lms/visual-course-html';
 import { cn } from '@/lib/utils';
 
-type Mode = 'write' | 'preview';
-
-function wrapSelection(
-  value: string,
-  start: number,
-  end: number,
-  before: string,
-  after: string,
-  placeholder: string
-): { next: string; selStart: number; selEnd: number } {
-  const selected = value.slice(start, end);
-  const inner = selected || placeholder;
-  const next = `${value.slice(0, start)}${before}${inner}${after}${value.slice(end)}`;
-  const selStart = start + before.length;
-  const selEnd = selStart + inner.length;
-  return { next, selStart, selEnd };
+function run(command: string, value?: string) {
+  document.execCommand(command, false, value);
 }
 
 export function MarkdownEditor({
@@ -56,63 +41,117 @@ export function MarkdownEditor({
 }) {
   const generatedId = useId();
   const fieldId = id ?? generatedId;
-  const [mode, setMode] = useState<Mode>('write');
-  const areaRef = useRef<HTMLTextAreaElement>(null);
+  const editorRef = useRef<HTMLDivElement>(null);
+  const skipOuter = useRef(false);
+  const article = variant === 'article';
 
-  function apply(before: string, after: string, placeholder: string) {
-    const el = areaRef.current;
-    const start = el?.selectionStart ?? value.length;
-    const end = el?.selectionEnd ?? value.length;
-    const { next, selStart, selEnd } = wrapSelection(value, start, end, before, after, placeholder);
-    onChange(next);
-    requestAnimationFrame(() => {
-      el?.focus();
-      el?.setSelectionRange(selStart, selEnd);
-    });
+  useEffect(() => {
+    const el = editorRef.current;
+    if (!el) return;
+    if (skipOuter.current) {
+      skipOuter.current = false;
+      return;
+    }
+    const html = sourceToEditorHtml(value);
+    if (el.innerHTML !== html) el.innerHTML = html;
+  }, [value]);
+
+  function emitHtml() {
+    const html = editorRef.current?.innerHTML ?? '';
+    skipOuter.current = true;
+    onChange(html);
   }
 
-  function applyLinePrefix(prefix: string) {
-    const el = areaRef.current;
-    const start = el?.selectionStart ?? 0;
-    const lineStart = value.lastIndexOf('\n', start - 1) + 1;
-    const next = `${value.slice(0, lineStart)}${prefix}${value.slice(lineStart)}`;
-    onChange(next);
-    requestAnimationFrame(() => {
-      el?.focus();
-      const pos = start + prefix.length;
-      el?.setSelectionRange(pos, pos);
-    });
+  function focusEditor() {
+    editorRef.current?.focus();
+  }
+
+  function insertModuleHeading() {
+    focusEditor();
+    const n = ((editorRef.current?.innerHTML ?? '').match(/<h2\b/gi) ?? []).length + 1;
+    run('insertHTML', `<h2>Module ${n} — </h2><p><br></p>`);
+    emitHtml();
   }
 
   const tools = [
     {
-      icon: Heading2,
-      label: 'Module heading',
+      icon: Heading1,
+      label: 'Title',
       onClick: () => {
-        const n = (value.match(/^##\s+/gm) ?? []).length + 1;
-        applyLinePrefix(`## Module ${n} — `);
+        focusEditor();
+        run('formatBlock', 'h1');
+        emitHtml();
       },
     },
-    { icon: Bold, label: 'Bold', onClick: () => apply('**', '**', 'bold') },
-    { icon: Italic, label: 'Italic', onClick: () => apply('_', '_', 'italic') },
-    { icon: Quote, label: 'Quote', onClick: () => applyLinePrefix('> ') },
-    { icon: List, label: 'Bullet list', onClick: () => applyLinePrefix('- ') },
-    { icon: ListOrdered, label: 'Numbered list', onClick: () => applyLinePrefix('1. ') },
-    { icon: Link2, label: 'Link', onClick: () => apply('[', '](https://)', 'link text') },
+    { icon: Heading2, label: 'Module heading', onClick: insertModuleHeading },
+    {
+      icon: Bold,
+      label: 'Bold',
+      onClick: () => {
+        focusEditor();
+        run('bold');
+        emitHtml();
+      },
+    },
+    {
+      icon: Italic,
+      label: 'Italic',
+      onClick: () => {
+        focusEditor();
+        run('italic');
+        emitHtml();
+      },
+    },
+    {
+      icon: Quote,
+      label: 'Quote',
+      onClick: () => {
+        focusEditor();
+        run('formatBlock', 'blockquote');
+        emitHtml();
+      },
+    },
+    {
+      icon: List,
+      label: 'Bullet list',
+      onClick: () => {
+        focusEditor();
+        run('insertUnorderedList');
+        emitHtml();
+      },
+    },
+    {
+      icon: ListOrdered,
+      label: 'Numbered list',
+      onClick: () => {
+        focusEditor();
+        run('insertOrderedList');
+        emitHtml();
+      },
+    },
+    {
+      icon: Link2,
+      label: 'Link',
+      onClick: () => {
+        const href = window.prompt('Link address', 'https://');
+        if (!href) return;
+        focusEditor();
+        run('createLink', href);
+        emitHtml();
+      },
+    },
     {
       icon: ImageIcon,
       label: 'Image',
-      onClick: () => apply('![', '](https://)', 'description'),
-    },
-    { icon: Code, label: 'Code', onClick: () => apply('`', '`', 'code') },
-    {
-      icon: Table,
-      label: 'Table',
-      onClick: () => apply('\n| Column | Column |\n| --- | --- |\n| ', ' |  |\n', 'cell'),
+      onClick: () => {
+        const src = window.prompt('Image address', 'https://');
+        if (!src) return;
+        focusEditor();
+        run('insertHTML', `<p><img src="${src.replace(/"/g, '')}" alt=""></p>`);
+        emitHtml();
+      },
     },
   ];
-
-  const article = variant === 'article';
 
   return (
     <div
@@ -121,82 +160,57 @@ export function MarkdownEditor({
         article && 'border-white/14 bg-[#0c1018]'
       )}
     >
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 px-2 py-1.5">
-        <div className="flex flex-wrap items-center gap-0.5">
-          {tools.map((t) => (
-            <button
-              key={t.label}
-              type="button"
-              title={t.label}
-              disabled={disabled || mode === 'preview'}
-              onClick={t.onClick}
-              className="rounded-lg p-2 text-white/50 transition-colors hover:bg-white/8 hover:text-white disabled:opacity-30"
-            >
-              <t.icon className="h-3.5 w-3.5" />
-              <span className="sr-only">{t.label}</span>
-            </button>
-          ))}
-        </div>
-        <div className="flex rounded-lg border border-white/10 p-0.5">
-          {(['write', 'preview'] as const).map((m) => (
-            <button
-              key={m}
-              type="button"
-              onClick={() => setMode(m)}
-              className={cn(
-                'rounded-md px-2.5 py-1 text-[11px] font-medium capitalize',
-                mode === m ? 'bg-white/10 text-white' : 'text-white/45 hover:text-white/75'
-              )}
-            >
-              {m}
-            </button>
-          ))}
-        </div>
+      <div className="flex flex-wrap items-center gap-0.5 border-b border-white/10 px-2 py-1.5">
+        {tools.map((t) => (
+          <button
+            key={t.label}
+            type="button"
+            title={t.label}
+            disabled={disabled}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={t.onClick}
+            className="rounded-lg p-2 text-white/50 transition-colors hover:bg-white/8 hover:text-white disabled:opacity-30"
+          >
+            <t.icon className="h-3.5 w-3.5" />
+            <span className="sr-only">{t.label}</span>
+          </button>
+        ))}
       </div>
 
-      {mode === 'write' ? (
-        <textarea
-          id={fieldId}
-          ref={areaRef}
-          value={value}
-          disabled={disabled}
-          onChange={(e) => onChange(e.target.value)}
-          rows={minRows}
-          placeholder={placeholder}
-          spellCheck
-          className={cn(
-            'w-full resize-y bg-transparent outline-none placeholder:text-white/30',
-            article
-              ? "min-h-[min(72vh,880px)] px-8 py-10 text-left font-['Times_New_Roman',Times,serif] text-[18px] leading-[1.85] text-white/92 sm:px-16"
-              : 'min-h-[180px] px-4 py-3 font-mono text-[13px] leading-relaxed text-white/90'
-          )}
-        />
-      ) : (
-        <div
-          className={cn(
-            article
-              ? 'min-h-[min(72vh,880px)] w-full px-5 py-8 text-left sm:px-8'
-              : 'min-h-[180px] px-5 py-4'
-          )}
-        >
-          {value.trim() ? (
-            <div className="course-article-body w-full text-left">
-              <CourseFormattedBody text={value} tone="dark" layout="article" />
-            </div>
-          ) : (
-            <p className="text-sm text-white/35">Nothing to preview yet.</p>
-          )}
-        </div>
-      )}
+      <div
+        id={fieldId}
+        ref={editorRef}
+        role="textbox"
+        aria-multiline
+        aria-label={label ?? 'Course article'}
+        aria-disabled={disabled}
+        contentEditable={!disabled}
+        suppressContentEditableWarning
+        data-placeholder={placeholder ?? 'Start writing the course…'}
+        onInput={emitHtml}
+        onPaste={(e) => {
+          const html = e.clipboardData.getData('text/html');
+          const text = e.clipboardData.getData('text/plain');
+          if (!html && !text) return;
+          e.preventDefault();
+          const insert = html ? sourceToEditorHtml(html) : sourceToEditorHtml(text);
+          run('insertHTML', insert || text);
+          emitHtml();
+        }}
+        className={cn(
+          'course-article-body course-visual-editor w-full overflow-auto bg-transparent outline-none',
+          article
+            ? "min-h-[min(72vh,880px)] px-8 py-10 text-left font-['Times_New_Roman',Times,serif] text-[18px] leading-[1.85] sm:px-16"
+            : 'min-h-[180px] px-4 py-3 text-[15px] leading-relaxed text-white/90'
+        )}
+        style={{ minHeight: article ? undefined : `${Math.max(minRows, 8) * 1.6}rem` }}
+      />
 
       <div className="flex items-center justify-between border-t border-white/8 px-3 py-1.5 text-[10px] text-white/30">
         <span>
           {label ? `${label} · ` : ''}
-          {article
-            ? 'One article for the whole course — use ## for each module'
-            : 'Markdown — students see this formatting'}
+          Select text and use the toolbar — students see this formatting, not tags
         </span>
-        <span className="tabular-nums">{value.length.toLocaleString()} characters</span>
       </div>
     </div>
   );
