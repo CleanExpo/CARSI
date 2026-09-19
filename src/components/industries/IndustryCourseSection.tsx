@@ -1,10 +1,10 @@
-import { CourseGrid } from '@/components/lms/CourseGrid';
 import {
   LANDING_DISPLAY_H2_CLASS,
   LANDING_EYEBROW_CLASS,
   LANDING_LEAD_CLASS,
+  PUBLIC_SHELL_INNER_CLASS,
 } from '@/components/landing/public-shell-width';
-import { marketingPanel } from '@/lib/marketing/marketing-ui';
+import { CourseGrid } from '@/components/lms/CourseGrid';
 
 interface Course {
   id: string;
@@ -36,26 +36,22 @@ export function IndustryCourseSection({
       : 'All';
 
   return (
-    <section id="industry-courses" className="scroll-mt-28 py-16 md:py-24">
-      <div className="mb-9 grid gap-6 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
-        <div>
-          <p className={LANDING_EYEBROW_CLASS}>Approved course pathway</p>
-          <h2 className={`mt-4 ${LANDING_DISPLAY_H2_CLASS}`}>
-            {disciplineList} <br aria-hidden />
-            <span className="text-[#146fc2]">for {industryName.toLowerCase()}</span>
-          </h2>
-        </div>
-        <p className={`max-w-2xl lg:justify-self-end ${LANDING_LEAD_CLASS}`}>
-          These recommendations are pinned to live IICRC CEC Accredited introductions, not generated
-          from broad discipline labels. Open a course to check its current hour value, learning
-          outcomes and enrolment details.
+    <section
+      id="industry-courses"
+      className="scroll-mt-28 border-t border-slate-200/70 bg-white py-16 md:py-24"
+    >
+      <div className={PUBLIC_SHELL_INNER_CLASS}>
+        <p className={LANDING_EYEBROW_CLASS}>Approved course pathway</p>
+        <h2 className={`mt-3 max-w-2xl ${LANDING_DISPLAY_H2_CLASS}`}>
+          {disciplineList} for {industryName.toLowerCase()}
+        </h2>
+        <p className={`mt-4 max-w-2xl ${LANDING_LEAD_CLASS}`}>
+          These recommendations are pinned to live IICRC CEC Accredited introductions. Open a course
+          to check its current hour value, outcomes and enrolment details.
         </p>
-      </div>
-
-      <div
-        className={`rounded-[1.75rem] p-3 shadow-[0_28px_80px_-52px_rgba(15,23,42,0.35)] sm:p-5 ${marketingPanel}`}
-      >
-        <CourseGrid courses={courses} initialTab={defaultTab} surface="auto" />
+        <div className="mt-10">
+          <CourseGrid courses={courses} initialTab={defaultTab} surface="light" />
+        </div>
       </div>
     </section>
   );
