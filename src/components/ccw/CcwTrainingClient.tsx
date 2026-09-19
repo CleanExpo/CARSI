@@ -1,15 +1,21 @@
 'use client';
 
-import { MarketingGrowthLinks } from '@/components/marketing/MarketingGrowthLinks';
+import { HomeFaqSection } from '@/components/landing/HomeFaqSection';
+import { HomeFinalCtaSection } from '@/components/landing/HomeFinalCtaSection';
+import { HomeTrustStrip } from '@/components/landing/HomeTrustStrip';
 import {
-  MarketingPageShell,
-  marketingPageInnerNarrowClass,
-} from '@/components/marketing/MarketingPageShell';
+  LANDING_DISPLAY_H2_CLASS,
+  LANDING_EYEBROW_CLASS,
+  LANDING_LEAD_CLASS,
+  PUBLIC_SHELL_INNER_CLASS,
+} from '@/components/landing/public-shell-width';
+import { MarketingGrowthLinks } from '@/components/marketing/MarketingGrowthLinks';
+import { PlatformNav } from '@/components/marketing/PlatformNav';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { CCW_COURSE_ZIP_HREF, CCW_COURSE_ZIP_PATH } from '@/lib/ccw/course-zip';
 import { ccwWorkshopPath } from '@/lib/marketing/marketing-growth-links';
-import { marketingHeading, marketingInput, marketingPanel } from '@/lib/marketing/marketing-ui';
+import { marketingInput } from '@/lib/marketing/marketing-ui';
 import {
   ArrowRight,
   BookOpen,
@@ -112,7 +118,7 @@ const faq = [
 
 function AgendaLine({ text }: { text: string }) {
   return (
-    <li className="border-b border-slate-200/80 py-3 text-sm leading-relaxed text-slate-600 last:border-0 dark:border-white/6 dark:text-white/55">
+    <li className="border-b border-slate-200/80 py-3 text-sm leading-relaxed text-slate-600 last:border-0">
       {text}
     </li>
   );
@@ -182,81 +188,79 @@ export function CcwTrainingClient() {
     [password]
   );
 
+  const faqs = faq.map((item) => ({ question: item.q, answer: item.a }));
+
   return (
-    <MarketingPageShell innerClassName={marketingPageInnerNarrowClass}>
-      {/* Hero */}
-      <header className="text-center">
-        <p className="mb-4 text-[10px] font-semibold tracking-[0.22em] text-slate-600 uppercase dark:text-white/55">
-          CARSI · 2 DAYS · HANDS-ON
-        </p>
-        <h1 className={`text-balance ${marketingHeading}`}>The Carpet Cleaning Workshop</h1>
+    <>
+      <section className="relative overflow-hidden border-b border-slate-200/70 bg-white">
         <div
-          className="mx-auto mt-6 h-px w-16 bg-linear-to-r from-transparent via-[#2490ed]/80 to-transparent"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_80%_0%,rgba(36,144,237,0.11),transparent_58%)]"
           aria-hidden
         />
-        <p className="mx-auto mt-6 max-w-3xl text-sm leading-relaxed tracking-wide text-slate-600 md:text-[15px] dark:text-white/55">
-          {PILLAR_LINE}
-        </p>
-        <p className="mx-auto mt-4 max-w-2xl text-xs font-medium text-[#146fc2] dark:text-[#7ec5ff]/90 md:text-sm">
-          {ANCHORED_HERO}
-        </p>
-        <p className="mx-auto mt-8 max-w-2xl text-base leading-relaxed text-pretty text-slate-600 md:text-lg dark:text-white/50">
-          This page is for enrolled participants to access the workshop resource pack after your
-          session.
-        </p>
-      </header>
+        <div className={`relative ${PUBLIC_SHELL_INNER_CLASS} py-16 text-center md:py-24`}>
+          <p className={LANDING_EYEBROW_CLASS}>CARSI · 2 days · Hands-on</p>
+          <h1 className="mx-auto mt-3 max-w-3xl font-[family-name:var(--font-display)] text-[2.15rem] leading-[1.1] font-semibold tracking-[-0.02em] text-slate-950 md:text-[3.1rem] md:leading-[1.06]">
+            The Carpet Cleaning Workshop
+          </h1>
+          <p className={`mx-auto mt-5 max-w-2xl ${LANDING_LEAD_CLASS}`}>{PILLAR_LINE}</p>
+          <p className="mx-auto mt-3 text-sm font-medium text-[#146fc2]">{ANCHORED_HERO}</p>
+          <p className={`mx-auto mt-6 max-w-xl ${LANDING_LEAD_CLASS}`}>
+            This page is for enrolled participants to access the workshop resource pack after your
+            session.
+          </p>
+          <div className="flex justify-center">
+            <PlatformNav current="/ccw-training" />
+          </div>
+        </div>
+      </section>
+
+      <HomeTrustStrip
+        stats={[
+          { value: '2 days', label: 'Workshop' },
+          { value: '5', label: 'Deliverables' },
+          { value: '3 tiers', label: 'Newby · Intermediate · Pro' },
+          { value: 'ZIP', label: 'Take-home pack' },
+        ]}
+      />
 
       {/* Your trainer */}
-      <section className="mt-20 md:mt-24" aria-labelledby="ccw-trainer-heading">
-        <div className="mb-8 border-b border-white/8 pb-6">
-          <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-600 uppercase dark:text-white/55">
-            Your trainer
-          </p>
-          <h2
-            id="ccw-trainer-heading"
-            className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl dark:text-white"
-          >
+      <section className="border-t border-slate-200/70 bg-[#fafbfc] py-16 md:py-24" aria-labelledby="ccw-trainer-heading">
+        <div className={PUBLIC_SHELL_INNER_CLASS}>
+          <p className={LANDING_EYEBROW_CLASS}>Your trainer</p>
+          <h2 id="ccw-trainer-heading" className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>
             Phill McGurk — CARSI
           </h2>
-          <p className="mx-auto mt-4 max-w-3xl text-sm leading-relaxed text-pretty text-slate-600 md:text-base dark:text-white/50">
+          <p className={`mt-4 max-w-2xl ${LANDING_LEAD_CLASS}`}>
             The two days you are about to do are built from a library of real IICRC standards and
             distilled into a CARSI original curriculum you can take home.
           </p>
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="mt-10 grid gap-4 sm:grid-cols-2">
           {trainerMeta.map(({ term, text }) => (
-            <div key={term} className={`rounded-2xl p-5 md:p-6 ${marketingPanel}`}>
-              <p className="text-[10px] font-semibold tracking-[0.18em] text-[#146fc2] dark:text-[#7ec5ff] uppercase">
+            <div key={term} className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm md:p-6">
+              <p className="text-[10px] font-semibold tracking-[0.18em] text-[#146fc2] uppercase">
                 {term}
               </p>
-              <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-white/60">
+              <p className="mt-2 text-sm leading-relaxed text-slate-600">
                 {text}
               </p>
             </div>
           ))}
         </div>
+        </div>
       </section>
 
       {/* Agenda */}
-      <section className="mt-20 md:mt-24" aria-labelledby="ccw-agenda-heading">
-        <div className="mb-8 flex flex-col gap-2 border-b border-white/8 pb-6 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-600 uppercase dark:text-white/55">
-              Agenda
-            </p>
-            <h2
-              id="ccw-agenda-heading"
-              className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl dark:text-white"
-            >
-              Two Days — Five Deliverables
-            </h2>
-          </div>
-        </div>
-        <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
-          <div className={`flex flex-col rounded-2xl p-6 md:p-8 ${marketingPanel}`}>
-            <div className="mb-4 flex items-center gap-2 border-b border-white/8 pb-4">
-              <GraduationCap className="h-5 w-5 text-[#146fc2] dark:text-[#7ec5ff]" aria-hidden />
-              <span className="text-sm font-semibold text-slate-900 dark:text-white/90">Day 1</span>
+      <section className="border-t border-slate-200/70 bg-white py-16 md:py-24" aria-labelledby="ccw-agenda-heading">
+        <div className={PUBLIC_SHELL_INNER_CLASS}>
+          <p className={LANDING_EYEBROW_CLASS}>Agenda</p>
+          <h2 id="ccw-agenda-heading" className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>
+            Two days — five deliverables
+          </h2>
+        <div className="mt-10 grid gap-6 lg:grid-cols-2 lg:gap-8">
+          <div className="flex flex-col rounded-2xl border border-slate-200/80 bg-[#fafbfc] p-6 md:p-8">
+            <div className="mb-4 flex items-center gap-2 border-b border-slate-200/80 pb-4">
+              <GraduationCap className="h-5 w-5 text-[#146fc2]" aria-hidden />
+              <span className="text-sm font-semibold text-slate-950">Day 1</span>
             </div>
             <p className="mb-4 text-xs font-medium tracking-wide text-slate-600 uppercase dark:text-white/55">
               Carpet &amp; Stain Fundamentals
@@ -267,10 +271,10 @@ export function CcwTrainingClient() {
               ))}
             </ul>
           </div>
-          <div className={`flex flex-col rounded-2xl p-6 md:p-8 ${marketingPanel}`}>
-            <div className="mb-4 flex items-center gap-2 border-b border-white/8 pb-4">
-              <GraduationCap className="h-5 w-5 text-[#146fc2] dark:text-[#7ec5ff]" aria-hidden />
-              <span className="text-sm font-semibold text-slate-900 dark:text-white/90">Day 2</span>
+          <div className="flex flex-col rounded-2xl border border-slate-200/80 bg-[#fafbfc] p-6 md:p-8">
+            <div className="mb-4 flex items-center gap-2 border-b border-slate-200/80 pb-4">
+              <GraduationCap className="h-5 w-5 text-[#146fc2]" aria-hidden />
+              <span className="text-sm font-semibold text-slate-950">Day 2</span>
             </div>
             <p className="mb-4 text-xs font-medium tracking-wide text-slate-600 uppercase dark:text-white/55">
               Upholstery · Hard Floors · Business · Maintenance
@@ -282,62 +286,54 @@ export function CcwTrainingClient() {
             </ul>
           </div>
         </div>
+        </div>
       </section>
 
       {/* What's included */}
-      <section className="mt-20 md:mt-24" aria-labelledby="ccw-included-heading">
-        <div className="mb-8">
-          <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-600 uppercase dark:text-white/55">
-            Deliverables
-          </p>
-          <h2
-            id="ccw-included-heading"
-            className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl dark:text-white"
-          >
+      <section className="border-t border-slate-200/70 bg-[#fafbfc] py-16 md:py-24" aria-labelledby="ccw-included-heading">
+        <div className={PUBLIC_SHELL_INNER_CLASS}>
+          <p className={LANDING_EYEBROW_CLASS}>Deliverables</p>
+          <h2 id="ccw-included-heading" className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>
             What&apos;s included
           </h2>
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {included.map(({ icon: Icon, title, body }) => (
             <div
               key={title}
-              className="glass-card rounded-2xl p-6 transition-none hover:translate-y-0"
+              className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm"
             >
-              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-white/8 bg-white/4">
-                <Icon className="h-5 w-5 text-[#146fc2] dark:text-[#7ec5ff]" aria-hidden />
+              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-[#fafbfc]">
+                <Icon className="h-5 w-5 text-[#146fc2]" aria-hidden />
               </div>
-              <h3 className="text-sm font-semibold text-slate-900 dark:text-white/95">{title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-white/55">
+              <h3 className="text-sm font-semibold text-slate-950">{title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-slate-500">
                 {body}
               </p>
             </div>
           ))}
         </div>
+        </div>
       </section>
 
       {/* Materials gate */}
-      <section className="mt-20 md:mt-28" aria-labelledby="ccw-access-heading">
+      <section className="border-t border-slate-200/70 bg-white py-16 md:py-24" aria-labelledby="ccw-access-heading">
+        <div className={PUBLIC_SHELL_INNER_CLASS}>
         <div className="mb-8 text-center md:mb-10">
-          <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-600 uppercase dark:text-white/55">
-            Participants
-          </p>
-          <h2
-            id="ccw-access-heading"
-            className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl dark:text-white"
-          >
+          <p className={LANDING_EYEBROW_CLASS}>Participants</p>
+          <h2 id="ccw-access-heading" className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>
             Workshop materials
           </h2>
-          <p className="mx-auto mt-2 max-w-md text-sm text-slate-600 dark:text-white/55">
+          <p className={`mx-auto mt-3 max-w-md ${LANDING_LEAD_CLASS}`}>
             Unlock below to download the take-home pack for your cohort.
           </p>
         </div>
 
         <div className="mx-auto w-full max-w-xl">
           {!unlocked ? (
-            <div className="glass-strong rounded-2xl p-8 shadow-[0_24px_80px_rgba(0,0,0,0.45)] md:p-10">
+            <div className="rounded-2xl border border-slate-200/80 bg-[#fafbfc] p-8 shadow-sm md:p-10">
               {!gateOpen ? (
                 <div className="text-center">
-                  <p className="text-sm leading-relaxed text-slate-600 dark:text-white/50">
+                  <p className="text-sm leading-relaxed text-slate-600">
                     Use the password shared with you for this cohort to open the download.
                   </p>
                   <Button
@@ -353,13 +349,13 @@ export function CcwTrainingClient() {
               ) : (
                 <form onSubmit={onUnlock} className="space-y-6">
                   <div className="text-center">
-                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-[#2490ed]/30 bg-[#2490ed]/10 text-[#146fc2] dark:text-[#7ec5ff]">
+                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-slate-200 bg-white text-[#146fc2]">
                       <Lock className="h-6 w-6" aria-hidden />
                     </div>
-                    <p className="text-sm font-medium text-slate-900 dark:text-white/90">
+                    <p className="text-sm font-medium text-slate-950">
                       Enter access password
                     </p>
-                    <p className="mt-1 text-xs text-slate-600 dark:text-white/55">
+                    <p className="mt-1 text-xs text-slate-500">
                       Case-sensitive.
                     </p>
                   </div>
@@ -454,41 +450,14 @@ export function CcwTrainingClient() {
         </div>
       </section>
 
-      {/* FAQ */}
-      <section className="mx-auto mt-20 max-w-3xl md:mt-24" aria-labelledby="ccw-faq-heading">
-        <div className="mb-8 text-center">
-          <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-600 uppercase dark:text-white/55">
-            Help
-          </p>
-          <h2
-            id="ccw-faq-heading"
-            className="mt-1 text-xl font-semibold tracking-tight text-slate-900 md:text-2xl dark:text-white"
-          >
-            Frequently asked questions
-          </h2>
-        </div>
-        <div className="space-y-2">
-          {faq.map((item) => (
-            <details
-              key={item.q}
-              className={`group rounded-xl px-5 py-1 transition-colors open:bg-slate-100 dark:open:bg-white/3 ${marketingPanel}`}
-            >
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-left text-sm font-medium text-slate-800 dark:text-white/85 [&::-webkit-details-marker]:hidden">
-                {item.q}
-                <ChevronDown
-                  className="h-4 w-4 shrink-0 text-slate-600 transition-transform group-open:rotate-180 dark:text-white/55"
-                  aria-hidden
-                />
-              </summary>
-              <p className="border-t border-slate-200/80 pt-0 pb-4 text-sm leading-relaxed text-slate-600 dark:border-white/6 dark:text-white/55">
-                {item.a}
-              </p>
-            </details>
-          ))}
         </div>
       </section>
 
-      <MarketingGrowthLinks currentHref={ccwWorkshopPath} />
-    </MarketingPageShell>
+      <HomeFaqSection faqs={faqs} />
+      <div className={`${PUBLIC_SHELL_INNER_CLASS} py-12`}>
+        <MarketingGrowthLinks currentHref={ccwWorkshopPath} />
+      </div>
+      <HomeFinalCtaSection />
+    </>
   );
 }
