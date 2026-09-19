@@ -1,4 +1,48 @@
+import { looksLikeHtmlFragment } from '@/lib/lms/format-course-body';
+
+import { promoteAtxHeadings } from './visual-course-html';
+
 const MODULE_HEADING = /^Module\s+(\d+)\s*(?:[—–\-:]\s*(.+))?$/i;
+
+function decodeBasicEntities(s: string): string {
+  return s
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&mdash;/gi, '—')
+    .replace(/&ndash;/gi, '–')
+    .replace(/&rsquo;|&lsquo;|&#39;|&apos;/gi, "'")
+    .replace(/&rdquo;|&ldquo;|&quot;/gi, '"')
+    .replace(/&amp;/gi, '&');
+}
+
+function stripTags(html: string): string {
+  return decodeBasicEntities(
+    html
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+  );
+}
+
+function parseHtmlArticle(raw: string): CourseArticleParse {
+  const source = promoteAtxHeadings(raw.replace(/\r\n/g, '\n').trim());
+  const h1 = source.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i);
+  const title: string | null = h1 ? stripTags(h1[1] ?? '') || null : null;
+  const afterTitle = h1 && h1.index !== undefined ? source.slice(h1.index + h1[0].length) : source;
+
+  const parts = afterTitle.split(/<h2\b[^>]*>/i);
+  const description = (parts[0] ?? '').trim();
+  const sections: CourseArticleSection[] = [];
+  for (const chunk of parts.slice(1)) {
+    const close = chunk.search(/<\/h2>/i);
+    const headingHtml = close === -1 ? chunk : chunk.slice(0, close);
+    const body = close === -1 ? '' : chunk.slice(close + 5).trim();
+    const heading = stripTags(headingHtml) || 'Untitled module';
+    if (!heading && !body) continue;
+    sections.push({ title: stripModuleHeadingLabel(heading), body });
+  }
+
+  return { title, description, sections };
+}
 
 /** Strip a "Module 2 — Dry" heading down to the module title we store. */
 export function stripModuleHeadingLabel(heading: string): string {
@@ -47,6 +91,10 @@ export function parseCourseArticle(raw: string): CourseArticleParse {
   const source = raw.replace(/\r\n/g, '\n').trim();
   if (!source) return { title: null, description: '', sections: [] };
 
+  if (looksLikeHtmlFragment(source) || /<h[1-6]\b/i.test(source)) {
+    return parseHtmlArticle(source);
+  }
+
   const lines = source.split('\n');
   let title: string | null = null;
   let i = 0;
@@ -79,7 +127,8 @@ export function mergeModulesFromArticle<
     const byTitle = existing.findIndex(
       (m, idx) => !used.has(idx) && m.title.trim() === section.title
     );
-    const pick = byTitle >= 0 ? byTitle : existing.findIndex((_, idx) => !used.has(idx) && idx === index);
+    const pick =
+      byTitle >= 0 ? byTitle : existing.findIndex((_, idx) => !used.has(idx) && idx === index);
     if (pick >= 0) used.add(pick);
     const prior = pick >= 0 ? existing[pick] : undefined;
     return {
