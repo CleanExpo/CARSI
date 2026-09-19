@@ -1,26 +1,18 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { BreadcrumbSchema } from '@/components/seo';
-import { MarketingPageShell, marketingPageInnerClass } from '@/components/marketing/MarketingPageShell';
+import {
+  COMMUNITY_CARD_CLASS,
+  CommunityHubShell,
+} from '@/components/marketing/hub/CommunityHubShell';
 import {
   HubCategoryPills,
   HubCtaBanner,
   HubEmptyState,
-  HubPageHeader,
   HubPlaceholderCard,
   HubSecondaryPills,
 } from '@/components/marketing/hub/HubUi';
 import { getBackendOrigin } from '@/lib/env/public-url';
-import {
-  marketingBtnSecondary,
-  marketingFilterPillActive,
-  marketingFilterPillInactive,
-  marketingHubCard,
-  marketingTextStrong,
-  marketingTextMuted,
-  marketingTextSubtle,
-  marketingTopicPill,
-} from '@/lib/marketing/marketing-ui';
 import { OG_IMAGES } from '@/lib/seo/og-image';
 
 export const metadata: Metadata = {
@@ -145,16 +137,16 @@ function JobCard({ job }: { job: JobSummary }) {
   return (
     <Link
       href={`/jobs/${job.id}`}
-      className={`group flex flex-col gap-3 p-5 ${marketingHubCard}`}
+      className={`group flex flex-col gap-3 ${COMMUNITY_CARD_CLASS}`}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           <h3
-            className={`truncate text-base leading-snug font-semibold transition-colors group-hover:text-[#2490ed] ${marketingTextStrong}`}
+            className="truncate text-base leading-snug font-semibold text-slate-950 transition-colors group-hover:text-[#146fc2]"
           >
             {job.title}
           </h3>
-          <p className={`mt-0.5 truncate text-sm ${marketingTextMuted}`}>{job.company_name}</p>
+          <p className="mt-0.5 truncate text-sm text-slate-500">{job.company_name}</p>
         </div>
         {job.featured && (
           <span className="inline-flex flex-shrink-0 items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-[rgba(251,191,36,0.12)] dark:text-[#fbbf24]">
@@ -163,23 +155,26 @@ function JobCard({ job }: { job: JobSummary }) {
         )}
       </div>
 
-      <div className={`flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm ${marketingTextMuted}`}>
-        <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs ${marketingTopicPill}`}>
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm text-slate-500">
+        <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs text-slate-600">
           {EMPLOYMENT_TYPE_LABELS[job.employment_type] ?? job.employment_type}
         </span>
         <span className="flex items-center gap-1.5">
           <span
-            className={`h-1.5 w-1.5 flex-shrink-0 rounded-full ${job.is_remote ? 'bg-emerald-500' : 'bg-slate-400 dark:bg-white/30'}`}
+            className={`h-1.5 w-1.5 flex-shrink-0 rounded-full ${job.is_remote ? 'bg-emerald-500' : 'bg-slate-400'}`}
           />
           {locationStr}
         </span>
-        {salary && <span className="font-medium text-emerald-700 dark:text-[#34d399]">{salary}</span>}
+        {salary && <span className="font-medium text-emerald-700">{salary}</span>}
       </div>
 
       {job.industry_categories.length > 0 && (
         <div className="flex flex-wrap gap-1">
           {job.industry_categories.slice(0, 3).map((cat) => (
-            <span key={cat} className={`rounded-md px-2 py-0.5 text-xs ${marketingTopicPill}`}>
+            <span
+              key={cat}
+              className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs text-slate-500"
+            >
               {cat}
             </span>
           ))}
@@ -187,17 +182,17 @@ function JobCard({ job }: { job: JobSummary }) {
       )}
 
       <div className="mt-auto flex items-center justify-between gap-2">
-        <p className={`text-xs ${marketingTextSubtle}`}>{timeAgo(job.created_at)}</p>
+        <p className="text-xs text-slate-400">{timeAgo(job.created_at)}</p>
         <div className="flex items-center gap-2">
           {job.source !== 'manual' && (
-            <span className={`text-xs capitalize ${marketingTextSubtle}`}>via {job.source}</span>
+            <span className="text-xs capitalize text-slate-400">via {job.source}</span>
           )}
           {job.apply_url ? (
             <span className="text-xs font-medium text-[#146fc2] transition-colors group-hover:text-[#2490ed] dark:text-[#7ec5ff]">
               Apply ↗
             </span>
           ) : (
-            <span className={`text-xs ${marketingTextSubtle}`}>View →</span>
+            <span className="text-xs text-slate-400">View →</span>
           )}
         </div>
       </div>
@@ -235,22 +230,17 @@ export default async function JobsPage({
     <>
       <BreadcrumbSchema items={breadcrumbs} />
 
-      <MarketingPageShell
-        id="main-content"
-        innerClassName={`${marketingPageInnerClass} mx-auto max-w-7xl`}
+      <CommunityHubShell
+        eyebrow="Community & resources"
+        title="Industry Jobs"
+        description="Jobs across the Australian restoration, HVAC, flooring, and indoor environment industries. Posted directly by employers — no recruitment fees."
+        stats={[
+          { value: total > 0 ? String(total) : 'Open', label: 'Listings' },
+          { value: 'AU', label: 'States & remote' },
+          { value: 'Free', label: 'To post' },
+          { value: '30d', label: 'Listing window' },
+        ]}
       >
-        <HubPageHeader
-          eyebrow={
-            <>
-              <span className="h-1.5 w-1.5 rounded-full bg-[#2490ed]" />
-              CARSI Industry Hub
-            </>
-          }
-          title="Industry Jobs"
-          description="Jobs across the Australian restoration, HVAC, flooring, and indoor environment industries. Posted directly by employers — no recruitment fees."
-          meta={total > 0 ? <span>{total} active listings</span> : undefined}
-        />
-
         <div className="mb-4">
           <HubCategoryPills
             basePath="/jobs"
@@ -306,7 +296,10 @@ export default async function JobsPage({
         {totalPages > 1 && (
           <nav className="mt-10 flex items-center justify-center gap-2" aria-label="Pagination">
             {page > 1 && (
-              <Link href={buildPageUrl(page - 1)} className={marketingBtnSecondary}>
+              <Link
+                href={buildPageUrl(page - 1)}
+                className="inline-flex min-h-10 items-center rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-800"
+              >
                 ← Previous
               </Link>
             )}
@@ -320,15 +313,17 @@ export default async function JobsPage({
                 }, [])
                 .map((p, idx) =>
                   p === 'ellipsis' ? (
-                    <span key={`ellipsis-${idx}`} className={`px-2 ${marketingTextSubtle}`}>
+                    <span key={`ellipsis-${idx}`} className="px-2 text-slate-400">
                       …
                     </span>
                   ) : (
                     <Link
                       key={p}
                       href={buildPageUrl(p as number)}
-                      className={`min-w-[36px] rounded-xl px-3 py-2 text-center text-sm transition-colors ${
-                        p === page ? marketingFilterPillActive : marketingFilterPillInactive
+                      className={`min-w-[36px] rounded-full px-3 py-2 text-center text-sm ${
+                        p === page
+                          ? 'bg-[#146fc2] font-semibold text-white'
+                          : 'border border-slate-200 bg-white text-slate-600'
                       }`}
                     >
                       {p}
@@ -337,13 +332,16 @@ export default async function JobsPage({
                 )}
             </div>
             {page < totalPages && (
-              <Link href={buildPageUrl(page + 1)} className={marketingBtnSecondary}>
+              <Link
+                href={buildPageUrl(page + 1)}
+                className="inline-flex min-h-10 items-center rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-800"
+              >
                 Next →
               </Link>
             )}
           </nav>
         )}
-      </MarketingPageShell>
+      </CommunityHubShell>
     </>
   );
 }
