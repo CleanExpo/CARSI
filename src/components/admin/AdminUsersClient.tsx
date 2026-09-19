@@ -1,10 +1,12 @@
 'use client';
 
-import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import { ChevronRight, Search } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useMemo, useState } from 'react';
 
+import { AdminPagination } from '@/components/admin/AdminPagination';
+import { useAdminListPaging } from '@/components/admin/use-admin-list-paging';
 import {
   LearnerAvatar,
   StatusBadge,
@@ -25,7 +27,6 @@ import {
 import type { AdminDashboardUserEntry } from '@/lib/admin/admin-dashboard-data';
 import { formatAud } from '@/lib/admin/admin-ops-format';
 import {
-  ADMIN_USERS_PAGE_SIZE,
   ADMIN_USER_SEGMENTS,
   matchesAdminUserSegment,
   parseAdminUserSegment,
@@ -41,7 +42,6 @@ export function AdminUsersClient({ users }: { users: AdminDashboardUserEntry[] }
     parseAdminUserSegment(searchParams.get('segment'))
   );
   const [query, setQuery] = useState('');
-  const [page, setPage] = useState(1);
   const now = useMemo(() => new Date(), []);
 
   const filtered = useMemo(() => {
@@ -57,14 +57,11 @@ export function AdminUsersClient({ users }: { users: AdminDashboardUserEntry[] }
     });
   }, [users, segment, query, now]);
 
-  const pageCount = Math.max(1, Math.ceil(filtered.length / ADMIN_USERS_PAGE_SIZE));
-  const safePage = Math.min(page, pageCount);
-  const pageStart = (safePage - 1) * ADMIN_USERS_PAGE_SIZE;
-  const pageRows = filtered.slice(pageStart, pageStart + ADMIN_USERS_PAGE_SIZE);
+  const paging = useAdminListPaging(filtered, `${segment}|${query}`);
+  const { page: safePage, pageCount, pageRows, start: pageStart, setPage } = paging;
 
   function goToSegment(next: AdminUserSegment) {
     setSegment(next);
-    setPage(1);
     const params = new URLSearchParams(searchParams.toString());
     if (next === 'all') params.delete('segment');
     else params.set('segment', next);
@@ -117,7 +114,6 @@ export function AdminUsersClient({ users }: { users: AdminDashboardUserEntry[] }
                 value={query}
                 onChange={(e) => {
                   setQuery(e.target.value);
-                  setPage(1);
                 }}
                 placeholder="Search name or email…"
                 className="h-10 w-full rounded-xl border border-white/10 bg-black/25 pr-3 pl-9 text-sm text-white/85 outline-none placeholder:text-white/35 focus:border-[#2490ed]/40"
@@ -217,30 +213,17 @@ export function AdminUsersClient({ users }: { users: AdminDashboardUserEntry[] }
             </Table>
           </div>
           {filtered.length > 0 ? (
-            <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+            <div className="space-y-3 px-4 py-3">
               <p className="text-xs text-white/40">
                 Showing {pageStart + 1}–{pageStart + pageRows.length} of {filtered.length}
               </p>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  disabled={safePage <= 1}
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  className="inline-flex h-9 items-center gap-1 rounded-lg border border-white/10 px-3 text-xs text-white/70 disabled:opacity-35"
-                >
-                  <ChevronLeft className="h-3.5 w-3.5" />
-                  Previous
-                </button>
-                <button
-                  type="button"
-                  disabled={safePage >= pageCount}
-                  onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
-                  className="inline-flex h-9 items-center gap-1 rounded-lg border border-white/10 px-3 text-xs text-white/70 disabled:opacity-35"
-                >
-                  Next
-                  <ChevronRight className="h-3.5 w-3.5" />
-                </button>
-              </div>
+              <AdminPagination
+                page={safePage}
+                pageCount={pageCount}
+                onPageChange={setPage}
+                pageSize={paging.pageSize}
+                onPageSizeChange={paging.changePageSize}
+              />
             </div>
           ) : null}
         </CardContent>
