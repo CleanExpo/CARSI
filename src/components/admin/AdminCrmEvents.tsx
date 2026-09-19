@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
 import { Activity, CheckCircle2, Radio, XCircle } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 
+import { AdminPagination } from '@/components/admin/AdminPagination';
 import { adminGlassCard } from '@/components/admin/admin-learner-ui';
+import { useAdminListPaging } from '@/components/admin/use-admin-list-paging';
 import { cn } from '@/lib/utils';
 
 interface CrmEventRow {
@@ -65,19 +67,24 @@ export function AdminCrmEvents() {
 
   const deliveredCount = items.filter((i) => i.status === 'delivered').length;
   const failedCount = items.filter((i) => i.status === 'failed').length;
+  const eventPaging = useAdminListPaging(items);
 
   if (loading) {
-    return (
-      <div className={cn(adminGlassCard, 'h-48 animate-pulse bg-white/[0.04]')} />
-    );
+    return <div className={cn(adminGlassCard, 'h-48 animate-pulse bg-white/[0.04]')} />;
   }
 
   if (items.length === 0) {
     return (
-      <div className={cn(adminGlassCard, 'flex flex-col items-center justify-center gap-3 py-16 text-center')}>
+      <div
+        className={cn(
+          adminGlassCard,
+          'flex flex-col items-center justify-center gap-3 py-16 text-center'
+        )}
+      >
         <Activity className="h-10 w-10 text-white/20" />
         <p className="text-sm text-white/50">
-          No CRM events yet. Set <code className="rounded bg-white/10 px-1.5 py-0.5 text-white/70">CRM_WEBHOOK_URL</code>{' '}
+          No CRM events yet. Set{' '}
+          <code className="rounded bg-white/10 px-1.5 py-0.5 text-white/70">CRM_WEBHOOK_URL</code>{' '}
           to sync contact and enrollment activity.
         </p>
       </div>
@@ -88,15 +95,21 @@ export function AdminCrmEvents() {
     <div className="grid gap-6 xl:grid-cols-12">
       <div className="grid gap-4 sm:grid-cols-3 xl:col-span-4">
         <div className={cn(adminGlassCard, 'p-4')}>
-          <p className="text-[10px] font-semibold tracking-[0.14em] text-white/38 uppercase">Events logged</p>
+          <p className="text-[10px] font-semibold tracking-[0.14em] text-white/38 uppercase">
+            Events logged
+          </p>
           <p className="mt-2 text-2xl font-bold text-white">{items.length}</p>
         </div>
         <div className={cn(adminGlassCard, 'p-4')}>
-          <p className="text-[10px] font-semibold tracking-[0.14em] text-emerald-400/80 uppercase">Delivered</p>
+          <p className="text-[10px] font-semibold tracking-[0.14em] text-emerald-400/80 uppercase">
+            Delivered
+          </p>
           <p className="mt-2 text-2xl font-bold text-emerald-300">{deliveredCount}</p>
         </div>
         <div className={cn(adminGlassCard, 'p-4')}>
-          <p className="text-[10px] font-semibold tracking-[0.14em] text-red-300/80 uppercase">Failed</p>
+          <p className="text-[10px] font-semibold tracking-[0.14em] text-red-300/80 uppercase">
+            Failed
+          </p>
           <p className="mt-2 text-2xl font-bold text-red-300">{failedCount}</p>
         </div>
       </div>
@@ -128,15 +141,24 @@ export function AdminCrmEvents() {
         </div>
       ) : null}
 
-      <div className={cn(adminGlassCard, 'overflow-hidden xl:col-span-12', statusBreakdown.length > 1 ? '' : 'xl:col-span-8')}>
+      <div
+        className={cn(
+          adminGlassCard,
+          'overflow-hidden xl:col-span-12',
+          statusBreakdown.length > 1 ? '' : 'xl:col-span-8'
+        )}
+      >
         <div className="relative">
-          <div className="absolute left-[23px] top-0 bottom-0 w-px bg-gradient-to-b from-[#2490ed]/40 via-white/10 to-transparent" />
+          <div className="absolute top-0 bottom-0 left-[23px] w-px bg-gradient-to-b from-[#2490ed]/40 via-white/10 to-transparent" />
           <ul className="divide-y divide-white/[0.05]">
-            {items.map((row) => {
+            {eventPaging.pageRows.map((row) => {
               const tone = statusTone(row.status);
               const Icon = tone.icon;
               return (
-                <li key={row.id} className="relative flex gap-4 px-5 py-4 transition-colors hover:bg-white/[0.02]">
+                <li
+                  key={row.id}
+                  className="relative flex gap-4 px-5 py-4 transition-colors hover:bg-white/[0.02]"
+                >
                   <div
                     className="relative z-[1] mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/10 bg-[#0a0e1a]"
                     style={{ color: tone.color }}
@@ -145,9 +167,11 @@ export function AdminCrmEvents() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-medium text-white/85">{formatEventType(row.event_type)}</span>
+                      <span className="font-medium text-white/85">
+                        {formatEventType(row.event_type)}
+                      </span>
                       <span
-                        className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
+                        className="rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase"
                         style={{
                           background: `${tone.color}18`,
                           color: tone.color,
@@ -173,6 +197,17 @@ export function AdminCrmEvents() {
               );
             })}
           </ul>
+          {items.length > 0 ? (
+            <div className="border-t border-white/[0.06] px-4 py-4">
+              <AdminPagination
+                page={eventPaging.page}
+                pageCount={eventPaging.pageCount}
+                onPageChange={eventPaging.setPage}
+                pageSize={eventPaging.pageSize}
+                onPageSizeChange={eventPaging.changePageSize}
+              />
+            </div>
+          ) : null}
         </div>
       </div>
     </div>
