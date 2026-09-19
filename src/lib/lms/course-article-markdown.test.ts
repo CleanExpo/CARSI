@@ -33,6 +33,16 @@ describe('composeCourseArticle / parseCourseArticle', () => {
     expect(parsed.description).toBe('Lead paragraph.');
     expect(parsed.sections[0]).toEqual({ title: 'One', body: 'Body' });
   });
+
+  it('splits a visual HTML article on h1 and h2', () => {
+    const parsed = parseCourseArticle(
+      '<h1>Indoor assessment</h1><p>A lead &mdash; for the buyer.</p><h2>Module 1 — Scope</h2><p>Walk the building.</p>'
+    );
+    expect(parsed.title).toBe('Indoor assessment');
+    expect(parsed.description).toContain('A lead');
+    expect(parsed.sections[0]?.title).toBe('Scope');
+    expect(parsed.sections[0]?.body).toContain('Walk the building');
+  });
 });
 
 describe('mergeModulesFromArticle', () => {
