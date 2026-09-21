@@ -55,7 +55,7 @@ function render(overrides: Partial<LessonFooterNavProps> = {}): string {
       onShare={noop}
       error={null}
       {...overrides}
-    />,
+    />
   );
 }
 
@@ -80,12 +80,18 @@ function isDisabled(tag: string): boolean {
 }
 
 function shownText(html: string): string {
-  return html.replace(/<[^>]+>/g, ' ').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
+  return html
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 /** The open-panel rule as shipped: `html[data-margot-open] .lesson-footer-nav { padding-bottom: <n>rem }`. */
 function openPanelClearanceRem(css: string): number | null {
-  const m = css.match(/html\[data-margot-open\]\s+\.lesson-footer-nav\s*\{[^}]*padding-bottom:\s*([\d.]+)rem/);
+  const m = css.match(
+    /html\[data-margot-open\]\s+\.lesson-footer-nav\s*\{[^}]*padding-bottom:\s*([\d.]+)rem/
+  );
   return m ? Number(m[1]) : null;
 }
 
@@ -99,7 +105,9 @@ describe('LessonFooterNav: nothing sits under the bottom-right launcher or the o
     expect(isDisabled('<button class="disabled:opacity-50" type="button">')).toBe(false);
     expect(isDisabled('<button class="x" disabled="" type="button">')).toBe(true);
     // The stylesheet probe reads a real rule and rejects a missing or short one.
-    expect(openPanelClearanceRem('html[data-margot-open] .lesson-footer-nav { padding-bottom: 40rem; }')).toBe(40);
+    expect(
+      openPanelClearanceRem('html[data-margot-open] .lesson-footer-nav { padding-bottom: 40rem; }')
+    ).toBe(40);
     expect(openPanelClearanceRem('.lesson-footer-nav { padding-bottom: 40rem; }')).toBeNull();
   });
 
@@ -125,15 +133,15 @@ describe('LessonFooterNav: nothing sits under the bottom-right launcher or the o
     expect(rem as number).toBeGreaterThanOrEqual(OPEN_CLEARANCE_MIN_REM);
   });
 
-  it('renders Previous, Next and Mark lesson complete, in that order, before completion', () => {
+  it('renders Previous, Next and Mark complete & continue, in that order, before completion', () => {
     const html = render();
     const text = shownText(html);
-    expect(text).toMatch(/Previous.*Next.*Mark lesson complete/);
+    expect(text).toMatch(/Previous.*Next.*Mark complete & continue/);
     expect(text).not.toContain('Share progress');
     expect(text).not.toContain('Lesson completed');
     expect(isDisabled(buttonTag(html, 'Previous'))).toBe(false);
     expect(isDisabled(buttonTag(html, 'Next'))).toBe(false);
-    expect(isDisabled(buttonTag(html, 'Mark lesson complete'))).toBe(false);
+    expect(isDisabled(buttonTag(html, 'Mark complete'))).toBe(false);
   });
 
   it('after completion shows Share progress and a disabled Lesson completed button', () => {
@@ -154,7 +162,9 @@ describe('LessonFooterNav: nothing sits under the bottom-right launcher or the o
 
   it('shows the completion error left-aligned, as an alert, on its own line', () => {
     const html = render({ error: 'Could not save progress' });
-    expect(html).toMatch(/<p[^>]*role="alert"[^>]*class="[^"]*\btext-left\b[^"]*"[^>]*>Could not save progress<\/p>/);
+    expect(html).toMatch(
+      /<p[^>]*role="alert"[^>]*class="[^"]*\btext-left\b[^"]*"[^>]*>Could not save progress<\/p>/
+    );
     expect(html).not.toMatch(/text-right/);
   });
 });
