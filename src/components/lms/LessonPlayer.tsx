@@ -124,6 +124,11 @@ export function LessonPlayer({
 
   return (
     <div className="space-y-4">
+      {lessonNumber && totalLessons ? (
+        <p className="text-xs font-semibold tracking-wide text-slate-500 uppercase">
+          Lesson {lessonNumber} of {totalLessons}
+        </p>
+      ) : null}
       <div className="flex items-start gap-3">
         <h1 className="flex-1 text-2xl font-bold text-slate-900">{lesson.title}</h1>
         <div className="flex shrink-0 gap-2">
