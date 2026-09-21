@@ -16,6 +16,7 @@ interface PathwayProgress {
   courses_total: number;
   courses_completed: number;
   progress_percent: number;
+  courses?: Array<{ enrolled?: boolean }>;
 }
 
 export function PathwayProgressCard() {
@@ -30,34 +31,10 @@ export function PathwayProgressCard() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) {
-    return (
-      <section className={`${dash.card} p-6`}>
-        <p className={`text-sm ${dash.muted}`}>Loading pathway progress…</p>
-      </section>
-    );
-  }
+  const active = pathways.filter((p) => (p.courses ?? []).some((c) => c.enrolled === true));
 
-  if (pathways.length === 0) {
-    return (
-      <section className={`${dash.card} p-6`}>
-        <div className="flex items-start gap-3">
-          <Route className="mt-0.5 h-5 w-5 shrink-0 text-[#2490ed]" aria-hidden />
-          <div>
-            <h2 className={dash.h2}>Certification pathways</h2>
-            <p className={`mt-1 text-sm ${dash.muted}`}>
-              Structured IICRC journeys will appear here once pathways are linked to courses.
-            </p>
-            <Link
-              href="/dashboard/pathways"
-              className="mt-3 inline-block text-sm font-medium text-[#146fc2] hover:underline"
-            >
-              Explore pathways
-            </Link>
-          </div>
-        </div>
-      </section>
-    );
+  if (loading || active.length === 0) {
+    return null;
   }
 
   return (

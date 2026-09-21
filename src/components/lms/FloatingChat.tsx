@@ -61,9 +61,10 @@ interface Message {
 }
 
 const SUGGESTED_PROMPTS = [
-  'Which water damage courses do you offer?',
-  'How do CEC credits work?',
-  'How do I find my certificates?',
+  'Where did I stop?',
+  'How many CECs do I have?',
+  'Where is my certificate?',
+  'What should I learn next?',
 ];
 
 /**
@@ -880,7 +881,7 @@ export default function FloatingChat() {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder="Ask about courses, CECs, or your account…"
+                    placeholder="How can I help with your learning?"
                     maxLength={2000}
                     className="min-w-0 flex-1 rounded-xl border border-white/[0.08] bg-white/[0.06] px-3.5 py-2.5 text-sm text-white/85 placeholder-white/30 transition-colors outline-none focus:border-[#2490ed]/55"
                     disabled={loading}
