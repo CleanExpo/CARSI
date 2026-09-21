@@ -2,15 +2,11 @@
 
 import { CourseThumbnail } from '@/components/lms/CourseThumbnail';
 import { ProgressBar } from '@/components/lms/ProgressBar';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { dash } from '@/lib/dashboard-light-ui';
+import { formatLearnerActivity } from '@/lib/learner-course-cta';
 import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
 import { getOnboardingLearnPath, getOnboardingProgramPath } from '@/lib/onboarding/navigation';
-import { Award, Building2, CheckCircle2, PlayCircle } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
 export interface EnrollmentListItem {
   id: string;
@@ -23,6 +19,8 @@ export interface EnrollmentListItem {
   thumbnail_url?: string | null;
   last_lesson_id?: string | null;
   last_lesson_title?: string | null;
+  last_activity_at?: string | null;
+  completed_at?: string | null;
   all_lessons_complete?: boolean;
   certificate_issued_at?: string | null;
   cec_submission_status?: string | null;
@@ -34,8 +32,6 @@ interface EnrolledCourseListProps {
 }
 
 export function EnrolledCourseList({ enrollments }: EnrolledCourseListProps) {
-  const router = useRouter();
-
   if (enrollments.length === 0) {
     return null;
   }
@@ -45,7 +41,7 @@ export function EnrolledCourseList({ enrollments }: EnrolledCourseListProps) {
   }
 
   return (
-    <ul className="space-y-4">
+    <ul className="space-y-3">
       {enrollments.map((enr) => {
         const onboarding = isOnboardingCourse({ slug: enr.course_slug });
         const learnBase = getOnboardingLearnPath(enr.course_slug);
@@ -54,119 +50,81 @@ export function EnrolledCourseList({ enrollments }: EnrolledCourseListProps) {
             ? getOnboardingLearnPath(enr.course_slug, enr.last_lesson_id)
             : learnBase;
         const hubHref = getOnboardingProgramPath(enr.course_slug);
-        const openHref = onboarding ? hubHref : continueHref;
         const done = enr.all_lessons_complete === true || enr.status === 'completed';
         const cecSubmitted = enr.cec_submission_status === 'sent';
-        const cecSubmittedAt = enr.cec_submitted_at
-          ? new Date(enr.cec_submitted_at).toLocaleString(undefined, {
-              dateStyle: 'medium',
-              timeStyle: 'short',
-            })
-          : null;
+        const completedLabel = formatLearnerActivity(enr.completed_at ?? enr.certificate_issued_at);
+        const activityLabel = formatLearnerActivity(enr.last_activity_at ?? enr.enrolled_at);
+        const primaryLabel = done
+          ? 'View course'
+          : enr.completion_percentage <= 0
+            ? 'Start course'
+            : 'Continue';
 
         return (
-          <li key={enr.id}>
-            {/*
-              Card is clickable as a convenience, but must not expose a
-              competing `role="link"`/tabIndex on the whole card: it already
-              contains real <a>/<button> descendants (Continue, Program hub,
-              Certificate) that stop propagation. A card-level interactive
-              role here creates nested-interactive controls, which conflicts
-              with WCAG 4.1.2 (Name, Role, Value) and confuses screen reader
-              and keyboard navigation. Keyboard/AT users reach every action
-              via the real controls inside; the click-to-navigate affordance
-              below is a pointer-only convenience.
-            */}
-            <Card
-              className={dash.enrollmentCard}
-              style={{ cursor: 'pointer' }}
-              onClick={() => router.push(openHref)}
-            >
-              <CardContent className="p-0">
-                <div className="flex flex-col gap-5 p-5 sm:flex-row sm:gap-8 sm:p-6">
-                  <div className="shrink-0 overflow-hidden rounded-xl ring-1 ring-slate-200 sm:w-52">
-                    <CourseThumbnail compact src={enr.thumbnail_url} title={enr.course_title} />
-                  </div>
-                  <div className="min-w-0 flex-1 space-y-3">
-                    <div className="flex flex-wrap items-start justify-between gap-2">
-                      <h3 className="text-lg font-semibold tracking-tight text-slate-900 transition-colors group-hover:text-[#146fc2]">
-                        {enr.course_title}
-                      </h3>
-                      {done ? (
-                        <Badge className="border-emerald-200 bg-emerald-50 text-emerald-800">
-                          Completed
-                        </Badge>
-                      ) : (
-                        <Badge variant="outline" className="border-slate-200 text-slate-600">
-                          In progress
-                        </Badge>
-                      )}
-                      {onboarding ? (
-                        <Badge className="gap-1 border-[#2490ed]/25 bg-[#eef7ff] text-[#146fc2]">
-                          <Building2 className="h-3 w-3" aria-hidden />
-                          Organisation program
-                        </Badge>
-                      ) : null}
-                      {cecSubmitted ? (
-                        <Badge className="gap-1 border-sky-200 bg-sky-50 text-sky-800">
-                          <CheckCircle2 className="h-3 w-3" aria-hidden />
-                          CEC submitted
-                        </Badge>
-                      ) : null}
-                    </div>
-                    {enr.last_lesson_title && !done ? (
-                      <p className="text-xs text-slate-500">
-                        Last: <span className="text-slate-700">{enr.last_lesson_title}</span>
-                      </p>
-                    ) : null}
-                    {cecSubmitted && cecSubmittedAt ? (
-                      <p className="text-xs text-sky-700">IICRC submission sent {cecSubmittedAt}</p>
-                    ) : null}
-                    <div className="max-w-md text-slate-800">
+          <li key={enr.id} className="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
+            <div className="flex flex-col gap-4 sm:flex-row sm:gap-6">
+              <div className="shrink-0 overflow-hidden rounded-lg sm:w-44">
+                <CourseThumbnail compact src={enr.thumbnail_url} title={enr.course_title} />
+              </div>
+              <div className="min-w-0 flex-1 space-y-2.5">
+                <h3 className="text-base font-semibold tracking-tight text-slate-900 sm:text-lg">
+                  {enr.course_title}
+                </h3>
+                {!done ? (
+                  <>
+                    <p className="text-sm tabular-nums text-slate-600">
+                      {enr.completion_percentage}% complete
+                    </p>
+                    <div className="max-w-md">
                       <ProgressBar percentage={enr.completion_percentage} label="Progress" />
                     </div>
-                    <div className="flex flex-wrap gap-2 pt-1">
-                      <Button asChild className="gap-2 rounded-lg bg-[#146fc2] text-white hover:bg-[#0f5fa8]">
-                        <Link href={continueHref} onClick={(e) => e.stopPropagation()}>
-                          <PlayCircle className="h-4 w-4" />
-                          {done ? 'Review lessons' : onboarding ? 'Continue lesson' : 'Continue learning'}
-                        </Link>
-                      </Button>
-                      {onboarding ? (
-                        <Button
-                          asChild
-                          variant="outline"
-                          className="gap-2 rounded-lg border-[#2490ed]/25 text-[#146fc2] hover:bg-[#eef7ff]"
-                        >
-                          <Link href={hubHref} onClick={(e) => e.stopPropagation()}>
-                            <Building2 className="h-4 w-4" />
-                            Program hub
-                          </Link>
-                        </Button>
-                      ) : null}
-                      {done ? (
-                        <Button
-                          asChild
-                          variant="outline"
-                          className="gap-2 rounded-lg border-amber-200 text-amber-800 hover:bg-amber-50"
-                        >
-                          <a
-                            href={certificateHref(enr.id)}
-                            download
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <Award className="h-4 w-4" />
-                            {enr.certificate_issued_at
-                              ? 'Download certificate'
-                              : 'Generate certificate'}
-                          </a>
-                        </Button>
-                      ) : null}
-                    </div>
-                  </div>
+                    {enr.last_lesson_title ? (
+                      <p className="text-sm text-slate-500">
+                        Next: <span className="text-slate-800">{enr.last_lesson_title}</span>
+                      </p>
+                    ) : null}
+                    {activityLabel ? (
+                      <p className="text-sm text-slate-500">
+                        Last activity: <span className="text-slate-800">{activityLabel}</span>
+                      </p>
+                    ) : null}
+                  </>
+                ) : (
+                  <>
+                    {completedLabel ? (
+                      <p className="text-sm text-slate-500">Completed {completedLabel}</p>
+                    ) : null}
+                    <p className="text-sm text-slate-500">
+                      Certificate:{' '}
+                      {enr.certificate_issued_at ? 'Available' : 'Can be generated'}
+                    </p>
+                    <p className="text-sm text-slate-500">
+                      CEC: {cecSubmitted ? 'Submitted' : 'Not submitted'}
+                    </p>
+                  </>
+                )}
+                <div className="flex flex-wrap gap-2 pt-1">
+                  <Link href={continueHref} className={dash.btnPrimary}>
+                    {primaryLabel}
+                  </Link>
+                  {onboarding ? (
+                    <Link href={hubHref} className={dash.btnSecondary}>
+                      Program hub
+                    </Link>
+                  ) : null}
+                  {done ? (
+                    <>
+                      <Link href="/dashboard/student/credentials" className={dash.btnSecondary}>
+                        View certificate
+                      </Link>
+                      <a href={certificateHref(enr.id)} className={dash.btnGhost} download>
+                        Download certificate
+                      </a>
+                    </>
+                  ) : null}
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </li>
         );
       })}
