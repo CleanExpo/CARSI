@@ -91,7 +91,11 @@ export function LessonFooterNav({
           className="rounded-md bg-emerald-600 text-white hover:bg-emerald-500 disabled:opacity-50"
           onClick={onComplete}
         >
-          {completed ? 'Lesson completed' : 'Mark lesson complete'}
+          {completed
+            ? 'Lesson completed'
+            : hasNext
+              ? 'Mark complete & continue'
+              : 'Mark lesson complete'}
         </Button>
       </div>
       {error ? (
