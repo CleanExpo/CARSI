@@ -52,21 +52,23 @@ export function isDashboardNavActive(pathname: string, href: string): boolean {
 
 export function getDashboardSectionLabel(pathname: string): string {
   const p = normalizeDashboardPath(pathname);
-  if (p === '/dashboard') return 'Overview';
+  if (p === '/dashboard') return 'Home';
   if (p.startsWith('/dashboard/onboarding')) return 'Onboarding';
-  if (p.startsWith('/dashboard/courses')) return 'Courses';
+  if (p.startsWith('/dashboard/courses')) return 'Course Catalogue';
   if (p.startsWith('/dashboard/learn')) return 'Learning';
   if (p.startsWith('/dashboard/student/credentials') || p.startsWith('/dashboard/credentials/')) {
     return 'Certificates';
   }
-  if (p.startsWith('/dashboard/student/leaderboard')) return 'Recognition';
+  if (p.startsWith('/dashboard/student/leaderboard')) return 'Achievements';
   if (p.startsWith('/dashboard/student/notes')) return 'Notes';
+  if (p.startsWith('/dashboard/student/assessments')) return 'Assessments';
   if (p.startsWith('/dashboard/student/profile')) return 'Profile';
-  if (p.startsWith('/dashboard/student')) return 'My learning';
-  if (p.startsWith('/dashboard/pathways')) return 'Pathways';
+  if (p.startsWith('/dashboard/student')) return 'My Learning';
+  if (p.startsWith('/dashboard/pathways')) return 'Learning path';
   if (p.startsWith('/dashboard/team')) return 'Team';
   if (p.startsWith('/dashboard/instructor')) return 'Instructor';
   if (p.startsWith('/dashboard/settings')) return 'Settings';
+  if (p.startsWith('/dashboard/help')) return 'Help';
   if (p.startsWith('/admin')) return 'Admin';
-  return 'Dashboard';
+  return 'Home';
 }
