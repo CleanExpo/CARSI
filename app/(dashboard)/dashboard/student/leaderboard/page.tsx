@@ -1,7 +1,11 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useCallback, useEffect, useState } from 'react';
+
+import { ErrorBanner } from '@/components/lms/ErrorBanner';
+import { apiClient } from '@/lib/api/client';
+import { dash } from '@/lib/dashboard-light-ui';
 
 interface LeaderboardEntry {
   rank: number;
@@ -14,42 +18,41 @@ interface LeaderboardEntry {
 interface LeaderboardResponse {
   period_label: string;
   period_timezone: string;
-  discipline: string | null;
   items: LeaderboardEntry[];
 }
 
-const LEVEL_COLOURS: Record<number, string> = {
-  1: 'text-zinc-400',
-  2: 'text-emerald-400',
-  3: 'text-cyan-400',
-  4: 'text-blue-400',
-  5: 'text-purple-400',
-  6: 'text-amber-400',
-};
+interface LevelData {
+  total_xp: number;
+  current_level: number;
+  level_title: string;
+  total_cec_lifetime?: number;
+}
 
-const DISCIPLINE_OPTIONS = [
-  { value: '', label: 'All disciplines' },
-  { value: 'WRT', label: 'WRT' },
-  { value: 'OCT', label: 'OCT' },
-  { value: 'AMRT', label: 'AMRT' },
-  { value: 'FSRT', label: 'FSRT' },
-  { value: 'CRT', label: 'CRT' },
-  { value: 'CCT', label: 'CCT' },
-  { value: 'ASD', label: 'ASD' },
-] as const;
+interface EnrollmentHint {
+  status: string;
+  all_lessons_complete?: boolean;
+  certificate_issued_at?: string | null;
+}
 
 function normalizeLeaderboardPayload(data: unknown): LeaderboardEntry[] {
   if (Array.isArray(data)) return data as LeaderboardEntry[];
-  if (data && typeof data === 'object' && 'items' in data && Array.isArray((data as LeaderboardResponse).items)) {
+  if (
+    data &&
+    typeof data === 'object' &&
+    'items' in data &&
+    Array.isArray((data as LeaderboardResponse).items)
+  ) {
     return (data as LeaderboardResponse).items;
   }
   return [];
 }
 
 export default function LeaderboardPage() {
-  const [discipline, setDiscipline] = useState<string>('');
   const [meta, setMeta] = useState<{ period_label: string; period_timezone: string } | null>(null);
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
+  const [level, setLevel] = useState<LevelData | null>(null);
+  const [completedCount, setCompletedCount] = useState(0);
+  const [certificateCount, setCertificateCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -57,151 +60,125 @@ export default function LeaderboardPage() {
     setLoading(true);
     setError(null);
     try {
-      const qs = discipline ? `?discipline=${encodeURIComponent(discipline)}` : '';
-      const res = await fetch(`/api/lms/gamification/leaderboard${qs}`);
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(typeof err?.detail === 'string' ? err.detail : res.statusText);
+      const [boardRes, levelData, enrollments] = await Promise.all([
+        fetch('/api/lms/gamification/leaderboard').then(async (res) => {
+          if (!res.ok) throw new Error('board');
+          return res.json() as Promise<LeaderboardResponse | LeaderboardEntry[]>;
+        }),
+        apiClient.get<LevelData>('/api/lms/gamification/me/level').catch(() => null),
+        apiClient
+          .get<EnrollmentHint[]>('/api/lms/enrollments/me')
+          .catch(() => [] as EnrollmentHint[]),
+      ]);
+      setEntries(normalizeLeaderboardPayload(boardRes));
+      if (
+        boardRes &&
+        typeof boardRes === 'object' &&
+        !Array.isArray(boardRes) &&
+        'period_label' in boardRes
+      ) {
+        setMeta({ period_label: boardRes.period_label, period_timezone: boardRes.period_timezone });
       }
-      const data = (await res.json()) as LeaderboardResponse | LeaderboardEntry[];
-      const items = normalizeLeaderboardPayload(data);
-      setEntries(items);
-      if (data && typeof data === 'object' && !Array.isArray(data) && 'period_label' in data) {
-        setMeta({
-          period_label: data.period_label,
-          period_timezone: data.period_timezone,
-        });
-      } else {
-        setMeta(null);
-      }
+      setLevel(levelData);
+      const done = enrollments.filter((e) => e.status === 'completed' || e.all_lessons_complete);
+      setCompletedCount(done.length);
+      setCertificateCount(done.filter((e) => e.certificate_issued_at).length);
     } catch {
-      setError('Could not load leaderboard.');
+      setError('Your achievements could not be loaded.');
       setEntries([]);
     } finally {
       setLoading(false);
     }
-  }, [discipline]);
+  }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing RA-4192 rule promotion; behaviour-preserving suppression, real fix tracked separately
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- fetch-on-mount
     load();
   }, [load]);
 
-  const periodLabel =
-    meta?.period_label ??
-    new Intl.DateTimeFormat('en-AU', {
-      timeZone: 'Australia/Sydney',
-      month: 'long',
-      year: 'numeric',
-    }).format(new Date());
+  const cec = level?.total_cec_lifetime ?? 0;
+  const milestones = [
+    { id: 'first-course', label: 'First course completed', earned: completedCount >= 1 },
+    { id: 'first-cert', label: 'First certificate', earned: certificateCount >= 1 },
+    { id: 'cec', label: 'CEC hours recorded', earned: cec > 0 },
+    { id: 'multi', label: 'Multiple courses completed', earned: completedCount >= 2 },
+  ];
+  const anyMilestone = milestones.some((m) => m.earned);
 
   return (
-    <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
-      <div className="flex flex-col gap-2">
-        <p className="font-mono text-[10px] tracking-[0.2em] text-slate-400 uppercase">
-          Community
-        </p>
-        <h1 className="font-mono text-2xl font-bold text-slate-900">Monthly recognition</h1>
-        <p className="text-sm text-slate-500">
-          {periodLabel} ({meta?.period_timezone ?? 'Australia/Sydney'}) — top learners by
-          completion-based activity this month. Names are{' '}
-          <span className="text-slate-700">anonymous by default</span>; you can opt in to a display
-          name from{' '}
-          <Link
-            href="/dashboard/student/profile#recognition"
-            className="text-[#146fc2] underline-offset-2 hover:underline"
-          >
-            your profile
+    <div className="max-w-9xl mx-auto flex w-full flex-col gap-8 pb-16">
+      <header>
+        <h1 className={dash.h1}>Achievements</h1>
+        <p className={`mt-2 ${dash.lead}`}>Your learning milestones.</p>
+      </header>
+
+      {loading ? (
+        <div className="h-40 animate-pulse rounded-xl bg-slate-100" aria-busy="true" />
+      ) : null}
+
+      {error ? <ErrorBanner message={error} onRetry={load} /> : null}
+
+      {!loading && !error && !anyMilestone ? (
+        <div className="rounded-xl border border-dashed border-slate-300 bg-white px-6 py-10 text-center">
+          <p className="font-medium text-slate-900">
+            Your achievements will appear as you complete learning milestones.
+          </p>
+          <Link href="/dashboard/courses" className={`mt-6 ${dash.btnSecondary}`}>
+            Browse courses
           </Link>
-          . Rankings reset each calendar month.
-        </p>
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <span className="font-mono text-[10px] tracking-widest text-slate-400 uppercase">
-          IICRC discipline
-        </span>
-        <div className="flex flex-wrap gap-2">
-          {DISCIPLINE_OPTIONS.map((opt) => {
-            const active = discipline === opt.value;
-            return (
-              <button
-                key={opt.value || 'all'}
-                type="button"
-                onClick={() => setDiscipline(opt.value)}
-                className={`rounded-sm border px-3 py-1.5 font-mono text-xs transition-colors ${
-                  active
-                    ? 'border-[#2490ed]/50 bg-[#2490ed]/15 text-[#146fc2]'
-                    : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 hover:text-slate-800'
-                }`}
-              >
-                {opt.label}
-              </button>
-            );
-          })}
         </div>
-        <p className="text-xs text-slate-400">
-          Filter limits XP to courses tagged with that discipline. Your level still reflects all
-          completed learning.
-        </p>
-      </div>
+      ) : null}
 
-      {loading && <p className="text-sm text-slate-500">Loading…</p>}
+      {!loading && !error && anyMilestone ? (
+        <ul className="space-y-2">
+          {milestones
+            .filter((m) => m.earned)
+            .map((m) => (
+              <li
+                key={m.id}
+                className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800"
+              >
+                {m.label}
+              </li>
+            ))}
+        </ul>
+      ) : null}
 
-      {error && <p className="text-sm text-red-400">{error}</p>}
-
-      {!loading && !error && entries.length === 0 && (
-        <p className="text-sm text-slate-500">
-          No qualifying activity this month for this view. Complete a lesson or course to appear —
-          or check back after others begin the month&apos;s training.
-        </p>
-      )}
-
-      {entries.length > 0 && (
-        <div className="flex flex-col divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white shadow-sm">
-          {entries.map((entry, index) => {
-            const topTier = entry.rank <= 3;
-
-            return (
-              <div
+      {!loading && !error && entries.length > 0 ? (
+        <section>
+          <h2 className={dash.h2}>This month</h2>
+          <p className={`mt-1 text-sm ${dash.muted}`}>
+            {meta?.period_label ?? 'Current month'} · completion-based activity.{' '}
+            <Link
+              href="/dashboard/student/profile#recognition"
+              className="text-[#146fc2] hover:underline"
+            >
+              Choose how you appear
+            </Link>
+            .
+          </p>
+          <ol className="mt-4 divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white">
+            {entries.map((entry, index) => (
+              <li
                 key={`${entry.rank}-${index}`}
-                className={`flex items-center justify-between gap-4 px-4 py-4 ${
-                  topTier ? 'bg-slate-50' : ''
-                }`}
+                className="flex items-center justify-between gap-4 px-4 py-3"
               >
-                <div className="flex min-w-0 items-center gap-4">
-                  <span
-                    className="w-10 shrink-0 text-center font-mono text-sm text-slate-500"
-                    aria-label={`Rank ${entry.rank}`}
-                  >
-                    {entry.rank}
-                  </span>
-                  <div className="min-w-0 flex flex-col gap-0.5">
-                    <span className="truncate font-mono text-sm text-slate-900">{entry.display_name}</span>
-                    <span
-                      className={`font-mono text-xs ${LEVEL_COLOURS[entry.current_level] ?? 'text-zinc-400'}`}
-                    >
-                      Level {entry.current_level} — {entry.level_title}
-                    </span>
-                  </div>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-slate-900">
+                    {entry.display_name}
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    Level {entry.current_level} · {entry.level_title}
+                  </p>
                 </div>
-
-                <div className="flex shrink-0 flex-col items-end gap-0.5">
-                  <span className="font-mono text-sm font-semibold text-slate-900 tabular-nums">
-                    {entry.total_xp.toLocaleString()}
-                  </span>
-                  <span className="text-[10px] tracking-wider text-slate-400 uppercase">XP</span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      <p className="text-xs leading-relaxed text-slate-400">
-        XP is earned from lesson and course completions only — not from quizzes or social features.
-        This board is meant as lightweight industry recognition, not a competition for points.
-      </p>
-    </main>
+                <p className="text-sm text-slate-600 tabular-nums">
+                  {entry.total_xp.toLocaleString()} XP
+                </p>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ) : null}
+    </div>
   );
 }
