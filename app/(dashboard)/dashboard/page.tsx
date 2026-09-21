@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
 
 import { DashboardLearningSection } from '@/components/dashboard/DashboardLearningSection';
-import { getLearnerDashboardSummary, getResumeSnapshotForStudent } from '@/lib/server/learner-dashboard-data';
+import {
+  getLearnerDashboardSummary,
+  getResumeSnapshotForStudent,
+} from '@/lib/server/learner-dashboard-data';
 import { listOnboardingProgramsForUser } from '@/lib/server/onboarding-programs';
 import { getNextCourseRecommendationsForStudent } from '@/lib/server/renewal-summary';
 import { getServerSessionClaims } from '@/lib/server/session-server';
