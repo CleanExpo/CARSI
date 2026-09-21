@@ -2,19 +2,21 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { DashboardCatalogueHeader } from '@/components/layout/DashboardCatalogueHeader';
-import { OnboardingSpotlight } from '@/components/onboarding/OnboardingSpotlight';
+import { CourseBrowseProvider } from '@/components/lms/CourseBrowseContext';
 import { CourseGrid } from '@/components/lms/CourseGrid';
 import { CourseSearchBar } from '@/components/lms/CourseSearchBar';
-import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
+import { OnboardingSpotlight } from '@/components/onboarding/OnboardingSpotlight';
 import { getDashboardCoursesForSession } from '@/lib/server/dashboard-courses';
+import { getEnrollmentsForStudent } from '@/lib/server/learner-dashboard-data';
 import { listOnboardingProgramsForUser } from '@/lib/server/onboarding-programs';
 import type { DashboardCourseStatusFilter } from '@/lib/server/public-courses-list';
+import { getNextCourseRecommendationsForStudent } from '@/lib/server/renewal-summary';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Courses | Dashboard | CARSI',
-  description: 'Browse CARSI courses from your dashboard.',
+  title: 'Course Catalogue | CARSI',
+  description: 'Find training that fits your professional goals.',
 };
 
 function parseStatus(raw: string | string[] | undefined): DashboardCourseStatusFilter {
@@ -44,7 +46,7 @@ export default async function DashboardCoursesPage({
   // from the cookie itself and coerces the requested status; the page only decides whether to
   // offer the filter at all. `status` below is the status actually queried.
   const { claims, canSeeDrafts, status, courses } = await getDashboardCoursesForSession(
-    parseStatus(sp.status),
+    parseStatus(sp.status)
   );
   const rawDiscipline = sp.discipline;
   const discipline =
@@ -59,36 +61,30 @@ export default async function DashboardCoursesPage({
       : undefined;
 
   const total = courses.length;
-  const onboardingPrograms =
-    claims && process.env.DATABASE_URL?.trim()
-      ? await listOnboardingProgramsForUser(claims.sub)
-      : [];
+  const userId = claims?.sub;
+  const dbReady = Boolean(userId && process.env.DATABASE_URL?.trim());
+  const onboardingPrograms = userId && dbReady ? await listOnboardingProgramsForUser(userId) : [];
+  const enrollments = userId && dbReady ? await getEnrollmentsForStudent(userId) : [];
+  const recommended = userId && dbReady ? await getNextCourseRecommendationsForStudent(userId) : [];
+  const enrolledSlugs = enrollments.map((e) => e.course_slug);
+  const recommendedSlugs = recommended.map((c) => c.slug);
 
   const filterBtn =
     'inline-flex min-h-[40px] items-center rounded-lg px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50';
 
   return (
-    <main id="main-content" className="relative z-10 min-h-screen bg-[#f6f8fb] text-slate-900">
-      <div
-        className="pointer-events-none fixed inset-0 z-0"
-        style={{
-          background:
-            'radial-gradient(ellipse 80% 42% at 50% 0%, rgba(36,144,237,0.12) 0%, transparent 58%)',
-        }}
-        aria-hidden="true"
-      />
-
-      <div className="relative z-10 mx-auto px-6 py-8 sm:py-10">
+    <main className="max-w-9xl relative z-10 mx-auto w-full text-slate-900">
+      <div className="px-1 py-2 sm:py-4">
         <DashboardCatalogueHeader />
         <header className="mb-6">
           <h1 className="font-display text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
-            Courses
+            Course catalogue
           </h1>
           <p className="mt-2 text-sm text-slate-600">
-            {total} course{total !== 1 ? 's' : ''}
+            Find training that fits your professional goals.
             {canSeeDrafts
-              ? ' — filter by catalogue status. Draft courses are ordered with the most modules first.'
-              : ' in the catalogue.'}
+              ? ` ${total} course${total !== 1 ? 's' : ''} — filter by catalogue status.`
+              : ` ${total} course${total !== 1 ? 's' : ''} available.`}
           </p>
         </header>
 
@@ -103,7 +99,11 @@ export default async function DashboardCoursesPage({
         </div>
 
         {canSeeDrafts ? (
-          <div className="mb-6 flex flex-wrap gap-2" role="tablist" aria-label="Filter by publish status">
+          <div
+            className="mb-6 flex flex-wrap gap-2"
+            role="tablist"
+            aria-label="Filter by publish status"
+          >
             {(
               [
                 { key: 'all' as const, label: 'All' },
@@ -148,17 +148,22 @@ export default async function DashboardCoursesPage({
           >
             {courses.length === 0 ? (
               <p className="py-12 text-center text-sm text-slate-600">
-                No courses in this view. Connect <code className="text-slate-800">DATABASE_URL</code>{' '}
-                or choose another filter.
+                No courses in this view. Try another filter or search.
               </p>
             ) : (
-              <CourseGrid
-                courses={courses}
-                initialTab={disciplineTab ?? 'All'}
-                showModulesSort
-                initialSortBy={status === 'draft' ? 'modules' : 'updated'}
-                surface="light"
-              />
+              <CourseBrowseProvider
+                courseLinkBase="/dashboard/courses"
+                enrolledSlugs={enrolledSlugs}
+              >
+                <CourseGrid
+                  courses={courses}
+                  initialTab={disciplineTab ?? 'All'}
+                  showModulesSort
+                  initialSortBy={status === 'draft' ? 'modules' : 'updated'}
+                  surface="light"
+                  recommendedSlugs={recommendedSlugs}
+                />
+              </CourseBrowseProvider>
             )}
           </div>
         </section>
@@ -168,7 +173,6 @@ export default async function DashboardCoursesPage({
           <Link href="/courses" className="text-[#146fc2] underline-offset-2 hover:underline">
             /courses
           </Link>
-          . Disciplines follow <AcronymTooltip term="IICRC" /> groupings.
         </p>
       </div>
     </main>
