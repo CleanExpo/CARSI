@@ -51,11 +51,13 @@ export async function POST(request: NextRequest, ctx: Ctx) {
 
     let earned = 0;
     let totalPoints = 0;
+    let correctCount = 0;
     for (const q of quiz.questions) {
       totalPoints += q.points;
       const selected = answers[q.id];
       if (typeof selected === 'number' && selected === q.correctIndex) {
         earned += q.points;
+        correctCount += 1;
       }
     }
 
@@ -101,6 +103,8 @@ export async function POST(request: NextRequest, ctx: Ctx) {
       score_percent: scorePercent,
       passed,
       pass_percentage: quiz.passPercentage,
+      correct_count: correctCount,
+      question_count: quiz.questions.length,
       attempts_remaining: Math.max(0, quiz.attemptsAllowed - result.attemptsUsed - 1),
     });
   } catch (e) {
