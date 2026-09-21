@@ -6,8 +6,9 @@ import Link from 'next/link';
 
 import { useCourseBrowseBase } from '@/components/lms/CourseBrowseContext';
 import { CourseTextThumbnail } from '@/components/lms/CourseTextThumbnail';
+import { catalogueCourseCta } from '@/lib/learner-course-cta';
 import { isOnboardingCourse, ONBOARDING_BRAND } from '@/lib/onboarding/enterprise';
-import { resolveDashboardCourseHref } from '@/lib/onboarding/navigation';
+import { getOnboardingLearnPath, resolveDashboardCourseHref } from '@/lib/onboarding/navigation';
 
 interface CourseCardProps {
   /** First visible cards: eager load + higher fetch priority (catalog / home grids). */
@@ -64,15 +65,18 @@ export function CourseCard({ course, priorityImage, variant = 'catalog' }: Cours
   // stored value is honoured, and it is rendered as a plain-English topic, never an acronym.
   const discipline = course.discipline ?? null;
 
-  const { courseLinkBase } = useCourseBrowseBase();
+  const { courseLinkBase, enrolledSlugs } = useCourseBrowseBase();
   const thumbSrc = course.thumbnail_url ?? undefined;
   const isFeatured = variant === 'featured';
   const onboarding = isOnboardingCourse({ slug: course.slug, category: course.category });
-  const href = resolveDashboardCourseHref({
+  const enrolled = enrolledSlugs.has(course.slug);
+  const detailHref = resolveDashboardCourseHref({
     slug: course.slug,
     category: course.category,
     courseLinkBase,
   });
+  const href = enrolled ? getOnboardingLearnPath(course.slug) : detailHref;
+  const cta = catalogueCourseCta(enrolled);
   const displayTitle = onboarding
     ? course.title.replace(`${ONBOARDING_BRAND} — `, '')
     : course.title;
@@ -145,14 +149,14 @@ export function CourseCard({ course, priorityImage, variant = 'catalog' }: Cours
 
           <Link
             href={href}
-            aria-label={`View course: ${course.title}`}
+            aria-label={`${cta}: ${course.title}`}
             className={
               isFeatured
                 ? 'inline-flex shrink-0 items-center gap-1 rounded-lg bg-[#146fc2] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#0f5fa8] focus-visible:ring-2 focus-visible:ring-[#2490ed]/40 focus-visible:outline-none'
                 : 'inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-[#146fc2] transition hover:text-[#0f5fa8] focus-visible:ring-2 focus-visible:ring-[#2490ed]/40 focus-visible:outline-none dark:text-[#8fd0ff] dark:hover:text-white'
             }
           >
-            View
+            {cta}
             <ArrowRight className="h-3.5 w-3.5" aria-hidden />
           </Link>
         </div>
