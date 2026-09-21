@@ -1,10 +1,9 @@
 'use client';
 
-import { ArrowRight, Building2, PlayCircle } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
-import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
-import { getOnboardingProgramPath } from '@/lib/onboarding/navigation';
+import { dash } from '@/lib/dashboard-light-ui';
 
 /** Mirrors `ResumeSnapshot` from learner dashboard API — kept client-local to avoid server imports. */
 export type ContinueLearningSnapshot = {
@@ -18,62 +17,40 @@ export type ContinueLearningSnapshot = {
 
 export function ContinueLearningBanner({
   snapshot,
+  progressPercent,
 }: {
   snapshot: ContinueLearningSnapshot | null;
+  progressPercent?: number | null;
 }) {
   if (!snapshot) return null;
 
-  const onboarding = isOnboardingCourse({ slug: snapshot.course_slug });
-  const programHref = getOnboardingProgramPath(snapshot.course_slug);
+  const pct =
+    typeof progressPercent === 'number' && Number.isFinite(progressPercent)
+      ? Math.min(100, Math.max(0, Math.round(progressPercent)))
+      : null;
 
   return (
-    <section
-      className="relative overflow-hidden rounded-2xl border border-[#2490ed]/25 bg-gradient-to-br from-[#eef7ff] via-white to-white px-5 py-6 shadow-sm sm:px-8"
-      aria-label="Continue learning"
-    >
-      <div
-        className="pointer-events-none absolute top-0 -right-16 h-40 w-40 rounded-full bg-[#2490ed]/10 blur-3xl"
-        aria-hidden
-      />
-      <div className="relative flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex gap-4">
-          <div
-            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-[#2490ed]/20 bg-white text-[#146fc2] shadow-sm"
-            aria-hidden
-          >
-            <PlayCircle className="h-7 w-7" strokeWidth={1.5} />
+    <section className="rounded-2xl border border-slate-200 bg-white px-5 py-6 sm:px-8" aria-label="Continue learning">
+      <p className={dash.eyebrow}>Continue learning</p>
+      <h2 className={`mt-2 ${dash.h2}`}>{snapshot.course_title}</h2>
+      {pct != null ? (
+        <>
+          <p className="mt-2 text-sm tabular-nums text-slate-600">{pct}% complete</p>
+          <div className="mt-2 h-2 max-w-md overflow-hidden rounded-full bg-slate-100">
+            <div className="h-full rounded-full bg-[#2490ed]" style={{ width: `${pct}%` }} />
           </div>
-          <div className="min-w-0">
-            <p className="text-[11px] font-semibold tracking-[0.2em] text-[#146fc2] uppercase">
-              Continue where you left off
-            </p>
-            <p className="mt-1 truncate text-lg font-semibold text-slate-900">{snapshot.course_title}</p>
-            <p className="mt-0.5 truncate text-sm text-slate-600">
-              {snapshot.lesson_title
-                ? `Lesson: ${snapshot.lesson_title}`
-                : 'Resume your last lesson'}
-            </p>
-          </div>
-        </div>
-        <div className="flex flex-wrap gap-2 sm:shrink-0">
-        <Link
-          href={snapshot.resume_href}
-          className="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-xl bg-[#146fc2] px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0f5fa8] sm:self-center"
-        >
-          Resume
-          <ArrowRight className="h-4 w-4" aria-hidden />
-        </Link>
-        {onboarding ? (
-          <Link
-            href={programHref}
-            className="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-xl border border-[#2490ed]/25 bg-white px-5 py-3 text-sm font-semibold text-[#146fc2] transition hover:bg-[#eef7ff] sm:self-center"
-          >
-            <Building2 className="h-4 w-4" aria-hidden />
-            Program hub
-          </Link>
+        </>
+      ) : null}
+      <p className="mt-3 text-sm text-slate-600">
+        Next lesson
+        {snapshot.lesson_title ? (
+          <span className="font-medium text-slate-900"> {snapshot.lesson_title}</span>
         ) : null}
-        </div>
-      </div>
+      </p>
+      <Link href={snapshot.resume_href} className={`mt-5 ${dash.btnPrimary}`}>
+        Continue learning
+        <ArrowRight className="h-4 w-4" aria-hidden />
+      </Link>
     </section>
   );
 }
