@@ -5,7 +5,13 @@ import { Search, SlidersHorizontal } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useTheme } from '@/components/ThemeProvider';
+import {
+  CATALOGUE_PAGE_SIZE_DEFAULT,
+  paginateCatalogueRows,
+  type CataloguePageSizeChoice,
+} from '@/lib/catalogue-pagination';
 import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
+import { CataloguePagination } from './CataloguePagination';
 import { CourseCard } from './CourseCard';
 import { CourseGridSkeleton } from './CourseCardSkeleton';
 
@@ -14,7 +20,18 @@ const smoothEase: [number, number, number, number] = [0.4, 0, 0.2, 1];
 // Topic tabs (de-IICRC 2026-07-10): CARSI does not brand courses with IICRC
 // discipline acronyms, so the catalogue filters by plain restoration topic
 // (matched against course title/category), not by WRT/ASD/etc.
-const DISCIPLINE_TABS = ['All', 'Onboarding', 'Water Damage', 'Mould', 'Fire & Smoke', 'Cleaning', 'Free'] as const;
+const DISCIPLINE_TABS = [
+  'All',
+  'Recommended',
+  'Onboarding',
+  'IICRC CEC',
+  'Water Damage',
+  'Mould',
+  'Fire & Smoke',
+  'HVAC',
+  'Cleaning',
+  'Free',
+] as const;
 type DisciplineTab = (typeof DISCIPLINE_TABS)[number];
 type PriceFilter = 'all' | 'free' | 'paid';
 type CecFilter = 'all' | 'has-cec';
@@ -27,6 +44,8 @@ const tabColors: Record<string, string> = {
   Mould: '#27ae60',
   'Fire & Smoke': '#f05a35',
   Cleaning: '#17b8d4',
+  HVAC: '#0e7490',
+  'IICRC CEC': '#146fc2',
 };
 
 // WCAG AA light-mode accents — darkened so active-tab text clears 4.5:1 on its pale tint over white.
@@ -36,6 +55,8 @@ const tabColorsLight: Record<string, string> = {
   Mould: '#157a55',
   'Fire & Smoke': '#c2410c',
   Cleaning: '#0e7490',
+  HVAC: '#0e7490',
+  'IICRC CEC': '#0f5fa8',
 };
 
 interface Course {
@@ -69,6 +90,8 @@ interface CourseGridProps {
   initialSortBy?: 'title' | 'price' | 'updated' | 'modules';
   /** Light, dark, or follow global theme (default). */
   surface?: 'light' | 'dark' | 'auto';
+  /** Real recommendation slugs; hides the Recommended tab when empty. */
+  recommendedSlugs?: readonly string[];
 }
 
 type SortKey = 'title' | 'price' | 'updated' | 'modules';
@@ -102,25 +125,50 @@ function sortCourses(courses: Course[], sortBy: SortKey): Course[] {
  */
 const TAB_KEYWORDS: Partial<Record<DisciplineTab, readonly string[]>> = {
   'Water Damage': [
-    'WATER', 'DRYING', 'MOISTURE', 'PSYCHROMETRY', 'EXTRACTION', 'DEHUMIDIF',
-    'FLOOD', 'AIR MOVER', 'THERMOGRAPHY', 'SUBMERGED',
+    'WATER',
+    'DRYING',
+    'MOISTURE',
+    'PSYCHROMETRY',
+    'EXTRACTION',
+    'DEHUMIDIF',
+    'FLOOD',
+    'AIR MOVER',
+    'THERMOGRAPHY',
+    'SUBMERGED',
   ],
   Mould: [
-    'MOULD', 'MOLD', 'MICROBIAL', 'IAQ', 'INDOOR AIR', 'AIR QUALITY',
-    'CONTAINMENT', 'INFECTION', 'AIR SCRUBBER',
+    'MOULD',
+    'MOLD',
+    'MICROBIAL',
+    'IAQ',
+    'INDOOR AIR',
+    'AIR QUALITY',
+    'CONTAINMENT',
+    'INFECTION',
+    'AIR SCRUBBER',
   ],
   'Fire & Smoke': ['FIRE', 'SMOKE', 'SOOT', 'ODOUR', 'ODOR', 'DEODORIS'],
   Cleaning: ['CLEANING', 'CARPET', 'UPHOLSTERY', 'TILE', 'TEXTILE', 'TRUCK-MOUNT', 'TRUCKMOUNT'],
+  HVAC: ['HVAC', 'AIR CONDITION', 'HEATING', 'VENTILAT', 'REFRIGERANT'],
 };
 
-function matchesDiscipline(course: Course, tab: DisciplineTab): boolean {
+function matchesDiscipline(
+  course: Course,
+  tab: DisciplineTab,
+  recommendedSlugs: ReadonlySet<string>
+): boolean {
   if (tab === 'All') return true;
+  if (tab === 'Recommended') return recommendedSlugs.has(course.slug);
   if (tab === 'Onboarding') {
     return isOnboardingCourse({ slug: course.slug, category: course.category });
   }
   if (tab === 'Free') {
     const p = priceNum(course.price_aud);
     return course.is_free === true || p === 0;
+  }
+  if (tab === 'IICRC CEC') {
+    const hours = Number.parseFloat(String(course.cec_hours ?? ''));
+    return Number.isFinite(hours) && hours > 0;
   }
   // Match the topic tab against the course's category AND title (WP-era courses
   // often have a null category, so title is needed). `discipline` is retained for
@@ -188,13 +236,19 @@ export function CourseGrid({
   showModulesSort = false,
   initialSortBy,
   surface = 'auto',
+  recommendedSlugs = [],
 }: CourseGridProps) {
   const { theme } = useTheme();
   const isDark = surface === 'auto' ? theme === 'dark' : surface === 'dark';
   const controlClass = isDark
     ? 'h-11 rounded-xl border border-white/10 bg-[#080c14]/80 px-3 text-sm text-white outline-none focus:border-[#2490ed]/50 focus:ring-1 focus:ring-[#2490ed]/25'
     : 'h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-800 shadow-sm focus:border-[#2490ed] focus:ring-2 focus:ring-[#2490ed]/20 focus:outline-none';
-  const validInitial: DisciplineTab = (DISCIPLINE_TABS as readonly string[]).includes(initialTab)
+  const recommendedSet = useMemo(() => new Set(recommendedSlugs), [recommendedSlugs]);
+  const visibleTabs = useMemo(
+    () => DISCIPLINE_TABS.filter((tab) => tab !== 'Recommended' || recommendedSet.size > 0),
+    [recommendedSet]
+  );
+  const validInitial: DisciplineTab = (visibleTabs as readonly string[]).includes(initialTab)
     ? (initialTab as DisciplineTab)
     : 'All';
 
@@ -213,19 +267,35 @@ export function CourseGrid({
     return 'updated';
   });
   const didFallbackTab = useRef(false);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState<CataloguePageSizeChoice>(CATALOGUE_PAGE_SIZE_DEFAULT);
+  const filterResetKey = [
+    activeTab,
+    searchQuery,
+    levelFilter,
+    priceFilter,
+    cecFilter,
+    durationFilter,
+    tagFilter,
+    sortBy,
+  ].join('|');
+
+  useEffect(() => {
+    setPage(1);
+  }, [filterResetKey]);
 
   // URL ?discipline=WRT with sparse `discipline` fields used to yield zero rows; reset to All once.
   useEffect(() => {
     if (didFallbackTab.current || loading || courses.length === 0) return;
     if (validInitial === 'All') return;
-    const n = courses.filter((c) => matchesDiscipline(c, validInitial)).length;
+    const n = courses.filter((c) => matchesDiscipline(c, validInitial, recommendedSet)).length;
     if (n === 0) {
       didFallbackTab.current = true;
       // One-time correction once data loads, guarded by the ref above.
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setActiveTab('All');
     }
-  }, [courses, loading, validInitial]);
+  }, [courses, loading, validInitial, recommendedSet]);
 
   const levelOptions = useMemo(() => {
     const levels = new Set<string>();
@@ -249,31 +319,28 @@ export function CourseGrid({
 
   const filtered = useMemo(() => {
     const q = searchQuery.toLowerCase();
-    const base = courses.filter(
-      (c) => {
-        const p = priceNum(c.price_aud);
-        const priceMatches =
-          priceFilter === 'all' ||
-          (priceFilter === 'free' ? c.is_free === true || p === 0 : p > 0);
-        const levelMatches = levelFilter === 'all' || normalizedLevel(c) === levelFilter;
-        const cecMatches = cecFilter === 'all' || Boolean(c.cec_hours?.trim());
+    const base = courses.filter((c) => {
+      const p = priceNum(c.price_aud);
+      const priceMatches =
+        priceFilter === 'all' || (priceFilter === 'free' ? c.is_free === true || p === 0 : p > 0);
+      const levelMatches = levelFilter === 'all' || normalizedLevel(c) === levelFilter;
+      const cecMatches = cecFilter === 'all' || Boolean(c.cec_hours?.trim());
 
-        return (
-          matchesDiscipline(c, activeTab) &&
-          priceMatches &&
-          levelMatches &&
-          cecMatches &&
-          matchesDuration(c, durationFilter) &&
-          matchesTag(c, tagFilter) &&
+      return (
+        matchesDiscipline(c, activeTab, recommendedSet) &&
+        priceMatches &&
+        levelMatches &&
+        cecMatches &&
+        matchesDuration(c, durationFilter) &&
+        matchesTag(c, tagFilter) &&
         (q === '' ||
           c.title.toLowerCase().includes(q) ||
           (c.short_description ?? '').toLowerCase().includes(q) ||
           (c.category ?? '').toLowerCase().includes(q) ||
           c.slug.toLowerCase().includes(q) ||
           (c.tags ?? []).some((t) => t.toLowerCase().includes(q)))
-        );
-      }
-    );
+      );
+    });
     return sortCourses(base, sortBy);
   }, [
     courses,
@@ -285,7 +352,10 @@ export function CourseGrid({
     cecFilter,
     durationFilter,
     tagFilter,
+    recommendedSet,
   ]);
+
+  const paging = paginateCatalogueRows(filtered, page, pageSize);
 
   return (
     <div>
@@ -299,7 +369,7 @@ export function CourseGrid({
         role="tablist"
         aria-label="Filter by topic"
       >
-        {DISCIPLINE_TABS.map((tab) => {
+        {visibleTabs.map((tab) => {
           const isActive = activeTab === tab;
           const accentColor =
             (isDark ? tabColors[tab] : (tabColorsLight[tab] ?? tabColors[tab])) ?? '#0f5fa8';
@@ -350,7 +420,7 @@ export function CourseGrid({
               aria-label="Search courses"
               className={
                 isDark
-                  ? 'h-11 w-full rounded-xl border border-white/10 bg-[#080c14]/80 py-2 pr-4 pl-9 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-[#2490ed]/50 focus:ring-1 focus:ring-[#2490ed]/25'
+                  ? 'h-11 w-full rounded-xl border border-white/10 bg-[#080c14]/80 py-2 pr-4 pl-9 text-sm text-white transition outline-none placeholder:text-white/30 focus:border-[#2490ed]/50 focus:ring-1 focus:ring-[#2490ed]/25'
                   : 'h-11 w-full rounded-lg border border-slate-300 bg-white py-2 pr-4 pl-9 text-sm text-slate-900 shadow-sm transition focus:border-[#2490ed] focus:ring-2 focus:ring-[#2490ed]/20 focus:outline-none'
               }
             />
@@ -454,18 +524,33 @@ export function CourseGrid({
       {loading ? (
         <CourseGridSkeleton />
       ) : filtered.length > 0 ? (
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
-          {filtered.map((course, i) => (
-            <motion.div
-              key={course.id}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, ease: smoothEase, delay: i * 0.05 }}
-            >
-              <CourseCard course={course} priorityImage={i < 9} />
-            </motion.div>
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
+            {paging.pageRows.map((course, i) => (
+              <motion.div
+                key={course.id}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, ease: smoothEase, delay: Math.min(i, 8) * 0.05 }}
+              >
+                <CourseCard course={course} priorityImage={i < 4} />
+              </motion.div>
+            ))}
+          </div>
+          <CataloguePagination
+            page={paging.page}
+            pageCount={paging.pageCount}
+            pageSize={pageSize}
+            start={paging.start}
+            end={paging.end}
+            total={paging.total}
+            onPageChange={setPage}
+            onPageSizeChange={(size) => {
+              setPageSize(size);
+              setPage(1);
+            }}
+          />
+        </>
       ) : (
         <div className="py-20 text-center">
           <p className={`text-sm ${isDark ? 'text-white/55' : 'text-slate-600'}`}>
