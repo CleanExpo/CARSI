@@ -29,7 +29,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           id="main-content"
           className="dashboard-light relative z-10 flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto overscroll-y-contain text-slate-900"
         >
-        <div className="flex min-h-0 w-full max-w-none min-w-0 flex-1 flex-col px-4 py-6 sm:px-6 sm:py-8 lg:px-10 lg:py-10">
+        <div className="flex min-h-0 w-full max-w-none min-w-0 flex-1 flex-col px-4 py-6 pb-24 sm:px-6 sm:py-8 md:pb-10 lg:px-10 lg:py-10">
           <PageTransition>{children}</PageTransition>
         </div>
         </main>
