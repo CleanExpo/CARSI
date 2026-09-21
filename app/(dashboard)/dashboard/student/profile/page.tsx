@@ -3,9 +3,10 @@
 import { useAuth } from '@/components/auth/auth-provider';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 import type { User } from '@/lib/api/auth';
 import { apiClient } from '@/lib/api/client';
-import { useToast } from '@/hooks/use-toast';
+import { dash } from '@/lib/dashboard-light-ui';
 import {
   Award,
   BookOpen,
@@ -18,12 +19,11 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
-import { dash } from '@/lib/dashboard-light-ui';
 
 const SECTIONS = [
   { id: 'overview', label: 'Overview' },
   { id: 'account', label: 'Account' },
-  { id: 'recognition', label: 'Recognition' },
+  { id: 'recognition', label: 'Achievements' },
   { id: 'iicrc', label: 'IICRC & renewal' },
 ] as const;
 
@@ -121,7 +121,7 @@ export default function StudentProfilePage() {
       });
       setProfile(data);
       await refreshUser();
-      toast({ title: 'Recognition preferences saved' });
+      toast({ title: 'Achievement preferences saved' });
     } catch {
       toast({ title: 'Could not save recognition settings', variant: 'destructive' });
     } finally {
@@ -162,21 +162,22 @@ export default function StudentProfilePage() {
     );
   }
 
-  const displayName = profile?.full_name?.trim() || authUser.full_name || authUser.email?.split('@')[0];
+  const displayName =
+    profile?.full_name?.trim() || authUser.full_name || authUser.email?.split('@')[0];
   const roleLabel = authUser.roles?.[0] ?? 'student';
   const certs = profile?.iicrc_certifications ?? [];
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 pb-20 lg:flex-row lg:gap-12">
+    <div className="max-w-9xl mx-auto flex w-full flex-col gap-10 pb-20 lg:flex-row lg:gap-12">
       <nav
         className="lg:sticky lg:top-6 lg:h-fit lg:w-52 lg:shrink-0"
         aria-label="Profile sections"
       >
         <Link
-          href="/dashboard/student"
+          href="/dashboard"
           className="mb-6 inline-flex items-center gap-1 text-xs font-medium text-[#146fc2] hover:underline"
         >
-          ← Back to My learning
+          ← Back to Home
         </Link>
         <p className="mb-3 text-[10px] font-semibold tracking-[0.2em] text-slate-400 uppercase">
           Profile
@@ -200,11 +201,11 @@ export default function StudentProfilePage() {
             Shortcuts
           </p>
           <Link
-            href="/dashboard/student"
+            href="/dashboard"
             className="flex items-center gap-2 rounded-lg px-2 py-2 text-xs text-slate-500 transition hover:bg-slate-50 hover:text-slate-800"
           >
             <LayoutDashboard className="h-3.5 w-3.5 shrink-0" />
-            Dashboard
+            Home
           </Link>
           <Link
             href="/dashboard/courses"
@@ -231,7 +232,7 @@ export default function StudentProfilePage() {
         ) : null}
 
         {loading ? (
-          <div className="space-y-4 animate-pulse">
+          <div className="animate-pulse space-y-4">
             <div className="h-40 rounded-2xl bg-slate-50" />
             <div className="h-32 rounded-2xl bg-slate-50" />
           </div>
@@ -275,7 +276,7 @@ export default function StudentProfilePage() {
                   href="/dashboard/student"
                   className="inline-flex shrink-0 items-center gap-2 self-start rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-800 transition hover:border-[#2490ed]/35 hover:bg-[#2490ed]/10"
                 >
-                  Go to learning
+                  Continue learning
                   <ChevronRight className="h-4 w-4 opacity-70" />
                 </Link>
               </div>
@@ -294,10 +295,7 @@ export default function StudentProfilePage() {
                 Your sign-in email is managed for security. Update the name shown across your
                 dashboard and certificates.
               </p>
-              <form
-                onSubmit={saveAccount}
-                className={`space-y-5 ${dash.panelInset} p-6 sm:p-8`}
-              >
+              <form onSubmit={saveAccount} className={`space-y-5 ${dash.panelInset} p-6 sm:p-8`}>
                 <div>
                   <label htmlFor="full_name" className="block text-xs font-medium text-slate-500">
                     Full name
@@ -328,7 +326,7 @@ export default function StudentProfilePage() {
                 </div>
                 <div>
                   <span className="block text-xs font-medium text-slate-500">Account ID</span>
-                  <p className="mt-2 font-mono text-xs text-slate-500 break-all">{authUser.id}</p>
+                  <p className="mt-2 font-mono text-xs break-all text-slate-500">{authUser.id}</p>
                 </div>
                 <Button
                   type="submit"
@@ -343,14 +341,14 @@ export default function StudentProfilePage() {
             <section id="recognition" className="scroll-mt-24">
               <div className="mb-4 flex items-center gap-2">
                 <Award className="h-4 w-4 text-[#2490ed]" aria-hidden />
-                <h2 className="text-lg font-semibold text-slate-900">Recognition</h2>
+                <h2 className="text-lg font-semibold text-slate-900">Achievements</h2>
               </div>
               <p className="mb-6 text-sm text-slate-500">
-                The monthly board highlights completion-based activity for the current calendar month
-                (Australia/Sydney). It is{' '}
-                <span className="text-slate-700">anonymous by default</span> — only an optional label
-                you enter here can appear publicly. Your email and account name are never shown on
-                the board.
+                The monthly board highlights completion-based activity for the current calendar
+                month (Australia/Sydney). It is{' '}
+                <span className="text-slate-700">anonymous by default</span> — only an optional
+                label you enter here can appear publicly. Your email and account name are never
+                shown on the board.
               </p>
               <form
                 onSubmit={saveRecognition}
@@ -383,7 +381,7 @@ export default function StudentProfilePage() {
                     value={leaderboardName}
                     onChange={(ev) => setLeaderboardName(ev.target.value.slice(0, 48))}
                     disabled={!leaderboardShow}
-                    placeholder="e.g. Alex K., WRT · QLD"
+                    placeholder="e.g. Alex K., QLD"
                     className={`mt-2 w-full max-w-md ${dash.input} disabled:cursor-not-allowed disabled:opacity-45`}
                     autoComplete="off"
                   />
@@ -410,15 +408,15 @@ export default function StudentProfilePage() {
                 </h2>
               </div>
               <p className="mb-6 text-sm text-slate-500">
-                Used for your renewal cockpit, <AcronymTooltip term="CEC" /> tracking, and reporting.
-                Keep your member number and renewal date current.
+                Used for your renewal cockpit, <AcronymTooltip term="CEC" /> tracking, and
+                reporting. Keep your member number and renewal date current.
               </p>
-              <form
-                onSubmit={saveIicrc}
-                className={`space-y-5 ${dash.panelInset} p-6 sm:p-8`}
-              >
+              <form onSubmit={saveIicrc} className={`space-y-5 ${dash.panelInset} p-6 sm:p-8`}>
                 <div>
-                  <label htmlFor="iicrc_member" className="block text-xs font-medium text-slate-500">
+                  <label
+                    htmlFor="iicrc_member"
+                    className="block text-xs font-medium text-slate-500"
+                  >
                     IICRC member number
                   </label>
                   <input
@@ -432,7 +430,10 @@ export default function StudentProfilePage() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="iicrc_expiry" className="block text-xs font-medium text-slate-500">
+                  <label
+                    htmlFor="iicrc_expiry"
+                    className="block text-xs font-medium text-slate-500"
+                  >
                     Certification / renewal expiry date
                   </label>
                   <div className="mt-2 flex max-w-md items-center gap-2">
@@ -447,7 +448,10 @@ export default function StudentProfilePage() {
                   </div>
                 </div>
                 <div>
-                  <label htmlFor="iicrc_card_url" className="block text-xs font-medium text-slate-500">
+                  <label
+                    htmlFor="iicrc_card_url"
+                    className="block text-xs font-medium text-slate-500"
+                  >
                     Member card image URL
                   </label>
                   <input
@@ -465,7 +469,9 @@ export default function StudentProfilePage() {
                 </div>
                 {certs.length > 0 ? (
                   <div>
-                    <span className="block text-xs font-medium text-slate-500">Certifications on file</span>
+                    <span className="block text-xs font-medium text-slate-500">
+                      Certifications on file
+                    </span>
                     <ul className="mt-3 divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white">
                       {certs.map((c, i) => (
                         <li
