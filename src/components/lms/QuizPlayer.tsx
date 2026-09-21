@@ -26,6 +26,7 @@ interface Quiz {
   pass_percentage: number;
   time_limit_minutes: number | null;
   attempts_allowed: number;
+  attempts_used?: number;
   questions: QuizQuestion[];
 }
 
@@ -79,6 +80,7 @@ export function QuizPlayer({ quiz, onSubmit, variant = 'default' }: QuizPlayerPr
   // course permanently. Before this guard, `handleSubmit` called `onSubmit` with nothing to stop
   // a second call, so one impatient double-click on a slow connection spent two of the three.
   const [submitting, setSubmitting] = useState(false);
+  const [started, setStarted] = useState(false);
   const enterprise = variant === 'enterprise';
 
   const answeredCount = Object.keys(answers).length;
@@ -95,42 +97,27 @@ export function QuizPlayer({ quiz, onSubmit, variant = 'default' }: QuizPlayerPr
     await runGuardedSubmit(submitting, setSubmitting, () => onSubmit(answers));
   }
 
-  if (!enterprise) {
+  if (!enterprise && !started) {
+    const remaining = Math.max(0, quiz.attempts_allowed - (quiz.attempts_used ?? 0));
     return (
-      <div className="space-y-8">
-        <div>
-          <h2 className="text-2xl font-bold">{quiz.title}</h2>
-          <p className="text-muted-foreground text-sm">
-            Passing score: {quiz.pass_percentage}% &nbsp;|&nbsp; Attempts allowed:{' '}
-            {quiz.attempts_allowed}
-          </p>
-        </div>
-        {quiz.questions.map((q, qIdx) => (
-          <fieldset key={q.id} className="space-y-3">
-            <legend className="text-base font-medium">
-              <span className="text-muted-foreground mr-1">{qIdx + 1}.</span> {q.question_text}
-            </legend>
-            {q.options.map((opt, idx) => (
-              <label
-                key={idx}
-                className="hover:bg-muted/50 flex cursor-pointer items-center gap-3 rounded-lg border p-3"
-              >
-                <input
-                  type="radio"
-                  name={q.id}
-                  value={idx}
-                  checked={answers[q.id] === idx}
-                  onChange={() => handleSelect(q.id, idx)}
-                />
-                {opt.text}
-              </label>
-            ))}
-          </fieldset>
-        ))}
-        <Button onClick={handleSubmit} disabled={submitting}>
-          {submitting ? 'Submitting…' : 'Submit Quiz'}
+      <section className="rounded-xl border border-slate-200 bg-white px-5 py-8 sm:px-8">
+        <p className={dash.eyebrow}>Final assessment</p>
+        <h2 className={`mt-2 ${dash.h2}`}>{quiz.title}</h2>
+        <ul className="mt-4 space-y-1.5 text-sm text-slate-600">
+          <li>{quiz.questions.length} questions</li>
+          {quiz.time_limit_minutes ? <li>Time limit: {quiz.time_limit_minutes} minutes</li> : null}
+          <li>Pass requirement: {quiz.pass_percentage}%</li>
+          <li>
+            {remaining} attempt{remaining === 1 ? '' : 's'} remaining
+          </li>
+        </ul>
+        <Button type="button" className="mt-6" onClick={() => setStarted(true)} disabled={remaining === 0}>
+          Begin assessment
         </Button>
-      </div>
+        {remaining === 0 ? (
+          <p className="mt-3 text-sm text-slate-500">No attempts remaining for this assessment.</p>
+        ) : null}
+      </section>
     );
   }
 
@@ -247,6 +234,70 @@ export function QuizPlayer({ quiz, onSubmit, variant = 'default' }: QuizPlayerPr
         ))}
       </ol>
     </div>
+  );
+}
+
+export function LearnerQuizResult({
+  passed,
+  scorePercent,
+  passPercentage,
+  correctCount,
+  questionCount,
+  attemptsRemaining,
+  onContinue,
+  onReview,
+  saving,
+}: {
+  passed: boolean;
+  scorePercent: number;
+  passPercentage: number;
+  correctCount?: number | null;
+  questionCount?: number | null;
+  attemptsRemaining?: number | null;
+  onContinue: () => void;
+  onReview?: () => void;
+  saving?: boolean;
+}) {
+  return (
+    <section className="rounded-xl border border-slate-200 bg-white px-5 py-8 text-center sm:px-8" role="status">
+      <p className={dash.eyebrow}>{passed ? 'Assessment complete' : 'Assessment not passed'}</p>
+      {correctCount != null && questionCount != null ? (
+        <p className="mt-3 text-lg font-semibold tabular-nums text-slate-900">
+          {correctCount} / {questionCount} correct
+        </p>
+      ) : null}
+      <p className="mt-2 text-sm text-slate-600">
+        Score {scorePercent}% · pass mark {passPercentage}%
+        {passed ? ' · Passed' : ''}
+      </p>
+      {!passed && attemptsRemaining != null ? (
+        <p className="mt-2 text-sm text-slate-500">
+          {attemptsRemaining > 0
+            ? `${attemptsRemaining} attempt${attemptsRemaining === 1 ? '' : 's'} remaining.`
+            : 'No attempts remaining. Review the course material before asking support for help.'}
+        </p>
+      ) : null}
+      <div className="mt-6 flex flex-wrap justify-center gap-2">
+        {passed ? (
+          <Button type="button" onClick={onContinue} disabled={saving}>
+            {saving ? 'Saving…' : 'Continue'}
+          </Button>
+        ) : (
+          <>
+            {onReview ? (
+              <Button type="button" variant="outline" onClick={onReview}>
+                Review course
+              </Button>
+            ) : null}
+            {attemptsRemaining == null || attemptsRemaining > 0 ? (
+              <Button type="button" onClick={onContinue} disabled={saving}>
+                Try again
+              </Button>
+            ) : null}
+          </>
+        )}
+      </div>
+    </section>
   );
 }
 
