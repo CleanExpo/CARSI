@@ -1,174 +1,147 @@
 'use client';
 
-import {
-  Award,
-  BookOpen,
-  Building2,
-  ChevronDown,
-  ClipboardCheck,
-  FileText,
-  GraduationCap,
-  LayoutDashboard,
-  ListOrdered,
-  LogOut,
-  Route,
-  User,
-  Users,
-} from 'lucide-react';
+import { Building2, LogOut, Route, Users } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useAuth } from '@/components/auth/auth-provider';
 import { ViewModeToggle } from '@/components/layout/ViewModeToggle';
+import { apiClient } from '@/lib/api/client';
 import { getDashboardSectionLabel, isDashboardNavActive } from '@/lib/dashboard-nav-active';
+import {
+  LEARNER_NAV_ACCOUNT,
+  LEARNER_NAV_PRIMARY,
+  LEARNER_NAV_RECORDS,
+  type LearnerNavItem,
+} from '@/lib/learner-nav';
 
-const disciplines = [
-  { code: 'WRT', label: 'Water', color: '#2490ed' },
-  { code: 'ASD', label: 'Structural drying', color: '#6c63ff' },
-  { code: 'AMRT', label: 'Microbial', color: '#27ae60' },
-  { code: 'FSRT', label: 'Fire & smoke', color: '#f05a35' },
-  { code: 'CCT', label: 'Commercial carpet', color: '#17b8d4' },
-];
-
-type NavItem = {
-  href: string;
-  label: string;
-  icon: typeof LayoutDashboard;
-  adminOnly?: boolean;
-  instructorOnly?: boolean;
-};
-
-const primaryNav: NavItem[] = [
-  { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
-  { href: '/dashboard/onboarding', label: 'Onboarding', icon: Building2 },
-  { href: '/dashboard/courses', label: 'Browse courses', icon: BookOpen },
-  { href: '/dashboard/student', label: 'My learning', icon: GraduationCap },
-  { href: '/dashboard/student/profile', label: 'Profile', icon: User },
-  { href: '/dashboard/student/credentials', label: 'Certificates', icon: Award },
-  { href: '/dashboard/student/leaderboard', label: 'Recognition', icon: ListOrdered },
-  { href: '/dashboard/student/notes', label: 'Notes', icon: FileText },
-  { href: '/dashboard/student/assessments', label: 'Assessments', icon: ClipboardCheck },
-  { href: '/dashboard/pathways', label: 'Pathways', icon: Route },
-  { href: '/dashboard/team', label: 'Team', icon: Users },
-];
+function NavLink({ item, pathname }: { item: LearnerNavItem; pathname: string }) {
+  const active = isDashboardNavActive(pathname, item.href);
+  const Icon = item.icon;
+  return (
+    <Link
+      href={item.href}
+      className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-150"
+      style={
+        active
+          ? { background: '#eef7ff', color: '#146fc2', border: '1px solid #b8dbfb' }
+          : { color: '#475569', border: '1px solid transparent' }
+      }
+    >
+      <Icon className="h-4 w-4 shrink-0 opacity-90" aria-hidden />
+      <span className="min-w-0 flex-1 truncate">{item.label}</span>
+      {active ? (
+        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#2490ed]" aria-hidden />
+      ) : null}
+    </Link>
+  );
+}
 
 export function LMSContextPanel() {
   const pathname = usePathname();
   const { user } = useAuth();
-  const [filtersOpen, setFiltersOpen] = useState(false);
-
-  const isAdmin = user?.roles?.includes('admin') ?? false;
-  const isInstructor = isAdmin || (user?.roles?.includes('instructor') ?? false);
   const section = getDashboardSectionLabel(pathname);
+  const [showTeam, setShowTeam] = useState(pathname.startsWith('/dashboard/team'));
+  const [showPathways, setShowPathways] = useState(pathname.startsWith('/dashboard/pathways'));
+  const showOnboarding = pathname.startsWith('/dashboard/onboarding');
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const onTeamRoute = pathname.startsWith('/dashboard/team');
+      const onPathwayRoute = pathname.startsWith('/dashboard/pathways');
+      try {
+        const [teamRes, pathwayRes] = await Promise.all([
+          apiClient.get<{ team: unknown | null }>('/api/lms/teams/me'),
+          apiClient.get<{
+            pathways?: Array<{ courses?: Array<{ enrolled?: boolean }> }>;
+          }>('/api/lms/pathways/me/progress'),
+        ]);
+        if (cancelled) return;
+        setShowTeam(Boolean(teamRes?.team) || onTeamRoute);
+        const belongs = (pathwayRes.pathways ?? []).some((p) =>
+          (p.courses ?? []).some((c) => c.enrolled === true)
+        );
+        setShowPathways(belongs || onPathwayRoute);
+      } catch {
+        if (!cancelled) {
+          setShowTeam(onTeamRoute);
+          setShowPathways(onPathwayRoute);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [pathname]);
 
   return (
     <aside
       className="z-10 hidden h-screen max-h-screen w-[min(100%,260px)] shrink-0 flex-col overflow-hidden overscroll-none border-r border-slate-200 bg-white md:flex md:flex-col"
-      style={{
-        boxShadow: '1px 0 0 rgba(15,23,42,0.04)',
-      }}
+      style={{ boxShadow: '1px 0 0 rgba(15,23,42,0.04)' }}
     >
-      {/* Fixed header — does not scroll */}
       <div className="shrink-0 border-b border-slate-200 px-4 py-5">
         <p className="text-[10px] font-semibold tracking-[0.2em] text-[#146fc2] uppercase">CARSI</p>
         <p className="mt-1.5 text-[15px] font-semibold tracking-tight text-slate-950">{section}</p>
-        <p className="mt-1 text-xs leading-snug text-slate-500">Learning workspace</p>
+        <p className="mt-1 text-xs leading-snug text-slate-500">Your learning</p>
         <div className="mt-3">
           <ViewModeToggle tone="light" />
         </div>
       </div>
 
-      {/* Scrollable: menu + filters only; sidebar shell stays fixed */}
-      <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain px-2 py-4 [scrollbar-gutter:stable]">
-        <nav className="flex flex-col gap-0.5" aria-label="Section navigation">
-          <p className="mb-2 px-2 text-[10px] font-semibold tracking-wider text-slate-500 uppercase">
-            Menu
-          </p>
-          {primaryNav.map((item) => {
-            if (item.adminOnly && !isAdmin) return null;
-            if (item.instructorOnly && !isInstructor) return null;
-            const active = isDashboardNavActive(pathname, item.href);
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-150"
-                style={
-                  active
-                    ? {
-                        background: '#eef7ff',
-                        color: '#146fc2',
-                        border: '1px solid #b8dbfb',
-                      }
-                    : {
-                        color: '#475569',
-                        border: '1px solid transparent',
-                      }
-                }
-              >
-                <Icon className="h-4 w-4 shrink-0 opacity-90" aria-hidden />
-                <span className="min-w-0 flex-1 truncate">{item.label}</span>
-                {active ? (
-                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#2490ed]" aria-hidden />
-                ) : null}
-              </Link>
-            );
-          })}
-        </nav>
+      <div className="min-h-0 flex-1 [scrollbar-gutter:stable] overflow-x-hidden overflow-y-auto overscroll-contain px-2 py-4">
+        <nav className="flex flex-col gap-0.5" aria-label="Learner navigation">
+          {LEARNER_NAV_PRIMARY.map((item) => (
+            <NavLink key={item.href} item={item} pathname={pathname} />
+          ))}
 
-        <div className="mt-6 border-t border-slate-200 pt-4">
-          <p className="mb-2 px-3 text-[10px] font-semibold tracking-wider text-slate-500 uppercase">
-            Program types
-          </p>
-          <Link
-            href="/dashboard/onboarding"
-            className="mb-3 flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-[#146fc2] transition hover:bg-[#eef7ff]"
-          >
-            <Building2 className="h-4 w-4 shrink-0" aria-hidden />
-            Organisation onboarding
-          </Link>
-          <button
-            type="button"
-            onClick={() => setFiltersOpen((v) => !v)}
-            className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-[10px] font-semibold tracking-wider text-slate-500 uppercase transition hover:bg-slate-100"
-          >
-            <span>Filter by discipline</span>
-            <ChevronDown
-              className={`h-3.5 w-3.5 shrink-0 transition-transform ${filtersOpen ? 'rotate-180' : ''}`}
-              aria-hidden
-            />
-          </button>
-          {filtersOpen ? (
-            <div className="mt-2 max-h-40 space-y-1 overflow-y-auto pr-1 pl-1">
-              {disciplines.map((d) => (
-                <Link
-                  key={d.code}
-                  href={`/dashboard/courses?discipline=${d.code}`}
-                  className="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-slate-600 transition hover:bg-slate-100 hover:text-slate-950"
-                >
-                  <span
-                    className="h-1.5 w-1.5 shrink-0 rounded-full"
-                    style={{ backgroundColor: d.color }}
-                  />
-                  <span className="font-mono text-[10px] font-bold" style={{ color: d.color }}>
-                    {d.code}
-                  </span>
-                  <span className="truncate">{d.label}</span>
-                </Link>
-              ))}
-            </div>
+          <div className="my-3 border-t border-slate-200" />
+
+          {LEARNER_NAV_RECORDS.map((item) => (
+            <NavLink key={item.href} item={item} pathname={pathname} />
+          ))}
+
+          {showPathways || showOnboarding || showTeam ? (
+            <>
+              <div className="my-3 border-t border-slate-200" />
+              {showPathways ? (
+                <NavLink
+                  item={{ href: '/dashboard/pathways', label: 'Learning path', icon: Route }}
+                  pathname={pathname}
+                />
+              ) : null}
+              {showOnboarding ? (
+                <NavLink
+                  item={{
+                    href: '/dashboard/onboarding',
+                    label: 'Organisation onboarding',
+                    icon: Building2,
+                  }}
+                  pathname={pathname}
+                />
+              ) : null}
+              {showTeam ? (
+                <NavLink
+                  item={{ href: '/dashboard/team', label: 'Team', icon: Users }}
+                  pathname={pathname}
+                />
+              ) : null}
+            </>
           ) : null}
-        </div>
+        </nav>
       </div>
 
-      {/* Fixed footer — sign out always visible */}
       <div className="shrink-0 border-t border-slate-200 px-2 py-3">
+        <nav className="flex flex-col gap-0.5" aria-label="Account">
+          {LEARNER_NAV_ACCOUNT.map((item) => (
+            <NavLink key={item.href} item={item} pathname={pathname} />
+          ))}
+        </nav>
         <a
           href="/api/auth/logout"
           data-testid="dashboard-sign-out"
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-950"
+          className="mt-0.5 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-950"
           title={user?.email ? `Sign out (${user.email})` : 'Sign out'}
         >
           <LogOut className="h-4 w-4 shrink-0 opacity-90" aria-hidden />
