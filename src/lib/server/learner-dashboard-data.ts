@@ -15,6 +15,8 @@ export interface EnrollmentDto {
   thumbnail_url?: string | null;
   last_lesson_id?: string | null;
   last_lesson_title?: string | null;
+  last_activity_at?: string | null;
+  completed_at?: string | null;
   all_lessons_complete?: boolean;
   certificate_issued_at?: string | null;
   cec_submission_status?: string | null;
@@ -78,7 +80,7 @@ function mapEnrollmentRow(
       modules: { lessons: { id: string; title: string }[] }[];
     };
   },
-  progressByLesson: Map<string, { completed: boolean }>,
+  progressByLesson: Map<string, { completed: boolean; lastAccessedAt?: Date | null }>,
   cecSubmission?: { status: string; sent_at: string | null } | null,
 ): EnrollmentDto {
   const lessonIds: string[] = [];
@@ -107,6 +109,12 @@ function mapEnrollmentRow(
   const lastId = e.lastAccessedLessonId;
   const lastTitle = lastId ? (lessonTitleById.get(lastId) ?? null) : null;
 
+  let lastActivity: Date | null = null;
+  for (const id of lessonIds) {
+    const at = progressByLesson.get(id)?.lastAccessedAt;
+    if (at && (!lastActivity || at > lastActivity)) lastActivity = at;
+  }
+
   return {
     id: e.id,
     course_id: e.courseId,
@@ -118,6 +126,8 @@ function mapEnrollmentRow(
     thumbnail_url: normalizePublicAssetUrl(e.course.thumbnailUrl),
     last_lesson_id: lastId,
     last_lesson_title: lastTitle,
+    last_activity_at: lastActivity?.toISOString() ?? e.enrolledAt.toISOString(),
+    completed_at: e.completedAt?.toISOString() ?? null,
     all_lessons_complete: allLessonsComplete,
     certificate_issued_at: e.certificateIssuedAt?.toISOString() ?? null,
     cec_submission_status: cecSubmission?.status ?? null,
@@ -167,7 +177,7 @@ export async function getLearnerDashboardSummary(
         ? []
         : await prisma.lmsLessonProgress.findMany({
             where: { studentId: userId, lessonId: { in: allLessonIds } },
-            select: { lessonId: true, completed: true },
+            select: { lessonId: true, completed: true, lastAccessedAt: true },
           });
 
     const progressByLesson = new Map(progressRows.map((p) => [p.lessonId, p]));
