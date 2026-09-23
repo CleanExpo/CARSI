@@ -6,14 +6,8 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 /**
- * The lesson page's footer: Previous / Next, then the completion actions (WS1 fix 5, GP-544).
- *
- * Measured live on 2026-09-03: Margot's launcher is fixed at the bottom-right corner (a 214 by
- * 66 pill on desktop, 121 by 66 on a phone) and covered the right-aligned "Mark lesson
- * complete" button at 1200, 820 and 390 widths before the chat was even opened; the open
- * 420 by 560 panel covers it too. So every control here stays at the LEFT of the content
- * column, never pushed to the right edge, and the row keeps bottom clearance for the launcher
- * when the page is scrolled to the end. Both are pinned by LessonFooterNav.test.tsx.
+ * The lesson page's footer: Previous / Next on the left, completion on the right.
+ * `lesson-footer-nav` still clears Margot's open panel (app/globals.css).
  */
 export interface LessonFooterNavProps {
   hasPrev: boolean;
@@ -27,18 +21,15 @@ export interface LessonFooterNavProps {
   error: string | null;
 }
 
-/**
- * The row: left-aligned on every width; pb-24 (6rem) clears the 66px launcher plus its margin
- * while the chat is closed. `lesson-footer-nav` is the hook for the open-panel rule in
- * app/globals.css: while FloatingChat holds `data-margot-open` on <html>, the row gets enough
- * bottom clearance (40rem) to scroll above the 560px panel and its launcher at every width.
- */
 export const LESSON_FOOTER_ROW_CLASS =
-  'lesson-footer-nav mt-8 flex flex-col gap-4 border-t border-slate-200 pt-6 pb-24 sm:flex-row sm:flex-wrap sm:items-center sm:justify-start sm:gap-6';
+  'lesson-footer-nav mt-6 flex w-full min-w-0 flex-col gap-3 pb-8 sm:justify-start';
 
-/** The completion actions: left-aligned, beside Previous / Next. */
+/** The completion actions: packed together; the parent pins them to the right. */
 export const LESSON_FOOTER_ACTIONS_CLASS =
   'flex flex-wrap items-center justify-start gap-2 sm:gap-3';
+
+const navBtn =
+  'h-11 gap-1.5 rounded-lg border border-slate-300 bg-transparent px-4 text-sm font-medium text-slate-700 shadow-none hover:bg-slate-50 hover:text-slate-950 disabled:opacity-40';
 
 export function LessonFooterNav({
   hasPrev,
@@ -54,17 +45,15 @@ export function LessonFooterNav({
   return (
     <div className={LESSON_FOOTER_ROW_CLASS} data-testid="lesson-footer">
       <div
-        className={cn(
-          'sticky bottom-6 z-20 inline-flex max-w-full flex-wrap items-center justify-start gap-2 rounded-2xl border px-2 py-2 shadow-[0_10px_40px_-12px_rgba(15,23,42,0.28)] backdrop-blur-md',
-          completed ? 'border-emerald-200 bg-emerald-50/90' : 'border-slate-200/90 bg-white/95'
-        )}
+        data-testid="lesson-footer-dock"
+        className="flex w-full min-w-0 items-center gap-3"
       >
-        <div className="flex flex-wrap items-center gap-1">
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             type="button"
             variant="outline"
             disabled={!hasPrev}
-            className="h-11 gap-1 rounded-xl border-slate-200 bg-white px-3.5 text-slate-700 shadow-sm"
+            className={navBtn}
             onClick={onPrev}
           >
             <ChevronLeft className="h-4 w-4" />
@@ -74,43 +63,45 @@ export function LessonFooterNav({
             type="button"
             variant="outline"
             disabled={!hasNext}
-            className="h-11 gap-1 rounded-xl border-slate-200 bg-white px-3.5 text-slate-700 shadow-sm"
+            className={navBtn}
             onClick={onNext}
           >
             Next
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
-        <div className={LESSON_FOOTER_ACTIONS_CLASS} data-testid="lesson-footer-actions">
-          {completed ? (
+        <div className="ml-auto flex justify-end">
+          <div className={LESSON_FOOTER_ACTIONS_CLASS} data-testid="lesson-footer-actions">
+            {completed ? (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onShare}
+                className="h-11 gap-1.5 rounded-lg border-[#146fc2] bg-white px-4 text-sm font-medium text-[#146fc2] shadow-none hover:bg-[#eef7ff]"
+              >
+                <Share2 className="h-4 w-4" aria-hidden />
+                Share progress
+              </Button>
+            ) : null}
             <Button
               type="button"
-              variant="outline"
-              onClick={onShare}
-              className="h-11 gap-1.5 rounded-xl border-[#2490ed]/35 bg-[#eef7ff] px-3.5 text-[#146fc2] hover:bg-[#dceeff]"
+              disabled={saving || completed}
+              className={cn(
+                'h-11 gap-1.5 rounded-lg px-6 text-sm font-semibold shadow-none disabled:opacity-50',
+                completed
+                  ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-100'
+                  : 'bg-[#146fc2] text-white hover:bg-[#0f5fa8]'
+              )}
+              onClick={onComplete}
             >
-              <Share2 className="h-4 w-4" aria-hidden />
-              Share progress
+              {completed
+                ? 'Lesson completed'
+                : hasNext
+                  ? 'Mark complete & continue'
+                  : 'Mark lesson complete'}
+              <Check className="h-4 w-4" aria-hidden />
             </Button>
-          ) : null}
-          <Button
-            type="button"
-            disabled={saving || completed}
-            className={cn(
-              'h-11 gap-1.5 rounded-xl px-5 text-[15px] font-semibold shadow-md disabled:opacity-50',
-              completed
-                ? 'bg-emerald-100 text-emerald-800 shadow-none hover:bg-emerald-100'
-                : 'bg-emerald-600 text-white hover:bg-emerald-500'
-            )}
-            onClick={onComplete}
-          >
-            {completed
-              ? 'Lesson completed'
-              : hasNext
-                ? 'Mark complete & continue'
-                : 'Mark lesson complete'}
-            <Check className="h-4 w-4" aria-hidden />
-          </Button>
+          </div>
         </div>
       </div>
       {error ? (
