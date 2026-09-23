@@ -3,6 +3,8 @@
  * learner-facing course and lesson text (references, footers, overview copy).
  */
 
+import { stripAiWritingSigns } from '@/lib/lms/strip-ai-writing-signs';
+
 const VENDOR_DOC_REF_PARTS = [
   /\s*\|\s*Anthropic Claude documentation/gi,
   /\s*\|\s*OpenAI ChatGPT documentation/gi,
@@ -39,13 +41,14 @@ const PROSE_REPLACEMENTS: Array<[RegExp, string]> = [
   ],
 ];
 
-const VENDOR_REF_PART =
-  /^(?:anthropic claude documentation|openai chatgpt documentation)$/i;
+const VENDOR_REF_PART = /^(?:anthropic claude documentation|openai chatgpt documentation)$/i;
 
 function tidyReferenceLine(text: string): string {
   let out = text;
   for (const re of VENDOR_DOC_REF_PARTS) {
-    out = out.replace(re, (match) => (match.trimStart().startsWith('Reference:') ? 'Reference: ' : ' | '));
+    out = out.replace(re, (match) =>
+      match.trimStart().startsWith('Reference:') ? 'Reference: ' : ' | '
+    );
   }
 
   out = out
@@ -68,7 +71,7 @@ function tidyReferenceLine(text: string): string {
 export function sanitizeLearnerContent(text: string | null | undefined): string | null {
   if (!text?.trim()) return text ?? null;
 
-  let out = text;
+  let out = stripAiWritingSigns(text);
   for (const [re, replacement] of PROSE_REPLACEMENTS) {
     out = out.replace(re, replacement);
   }

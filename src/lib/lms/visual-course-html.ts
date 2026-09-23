@@ -1,6 +1,7 @@
 import { looksLikeHtmlFragment } from '@/lib/lms/format-course-body';
 
 import { looksLikeMarkdown, markdownToSafeHtml, sanitizeCourseHtml } from './markdown-course-body';
+import { stripAiWritingSigns } from './strip-ai-writing-signs';
 
 function escapeHtml(s: string): string {
   return s
@@ -94,5 +95,5 @@ export function promoteInlineTopicLines(html: string): string {
 
 /** HTML students see — same conversion as the admin visual editor. */
 export function sourceToStudentHtml(raw: string): string {
-  return sanitizeCourseHtml(promoteInlineTopicLines(sourceToEditorHtml(raw)));
+  return sanitizeCourseHtml(promoteInlineTopicLines(sourceToEditorHtml(stripAiWritingSigns(raw))));
 }
