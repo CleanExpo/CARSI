@@ -73,3 +73,26 @@ export function sourceToEditorHtml(raw: string): string {
 
   return sanitizeCourseHtml(html);
 }
+
+/**
+ * Imported lessons often store a topic label as the first line of a paragraph
+ * (`<p>Bonding Damage<br/>The rest…`). The admin visual editor shows those as
+ * headings; promote them the same way for students without changing the stored copy.
+ */
+export function promoteInlineTopicLines(html: string): string {
+  return html.replace(
+    /<p(?:\s[^>]*)?>\s*([^<]{2,80})\s*<br\s*\/?>\s*([\s\S]*?)<\/p>/gi,
+    (all, title: string, rest: string) => {
+      const label = title.replace(/&nbsp;/gi, ' ').trim();
+      if (!label || /[.!?]/.test(label)) return all;
+      const body = rest.trim();
+      if (!body) return all;
+      return `<h3>${label}</h3><p>${body}</p>`;
+    }
+  );
+}
+
+/** HTML students see — same conversion as the admin visual editor. */
+export function sourceToStudentHtml(raw: string): string {
+  return sanitizeCourseHtml(promoteInlineTopicLines(sourceToEditorHtml(raw)));
+}
