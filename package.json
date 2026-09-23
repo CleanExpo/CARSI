@@ -116,6 +116,8 @@
     "db:sync-specialty-modules": "npx tsx scripts/sync-specialty-modules-from-collection-txt.ts",
     "db:seed-specialty-collection-txt": "npx tsx scripts/seed-carsi-specialty-courses-collection-txt.ts",
     "db:strip-ai-vendor-refs": "npx tsx scripts/strip-ai-vendor-references-from-lms.ts",
+    "db:strip-ai-writing": "npx tsx scripts/strip-ai-writing-from-courses.ts",
+    "test:strip-ai-writing": "vitest run src/lib/lms/strip-ai-writing-signs.test.ts",
     "ccw:scrape:plan": "npx tsx scripts/scrape-ccw-products.ts --plan",
     "ccw:scrape": "npx tsx scripts/scrape-ccw-products.ts",
     "check:course-completeness": "node scripts/check-course-completeness.mjs",
