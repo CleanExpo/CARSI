@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 import { apiClient } from '@/lib/api/client';
-import { dash } from '@/lib/dashboard-light-ui';
 
 interface PathwayProgress {
   pathway_id: string;
@@ -38,15 +37,15 @@ export function PathwayProgressCard() {
   }
 
   return (
-    <section className={`${dash.card} p-6`}>
+    <section className="learner-home-surface learner-home-card overflow-hidden rounded-[1.25rem] p-6">
       <div className="mb-5 flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
-          <Route className="h-5 w-5 text-[#2490ed]" aria-hidden />
-          <h2 className={dash.h2}>Your pathways</h2>
+          <Route className="h-5 w-5 text-sky-300" aria-hidden />
+          <h2 className="text-xl font-semibold tracking-tight text-white">Your pathways</h2>
         </div>
         <Link
           href="/dashboard/pathways"
-          className="text-xs font-medium text-[#146fc2] hover:underline"
+          className="text-xs font-medium text-sky-200 hover:text-white"
         >
           View all
         </Link>
@@ -56,26 +55,26 @@ export function PathwayProgressCard() {
           <li key={p.pathway_id}>
             <Link
               href={`/pathways/${p.slug}`}
-              className="block rounded-xl border border-slate-200 bg-slate-50 p-4 transition-colors hover:border-[#2490ed]/30 hover:bg-white"
+              className="learner-home-inset block rounded-xl p-4 transition hover:border-sky-200/30"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="font-medium text-slate-900">{p.title}</p>
+                  <p className="font-medium text-white">{p.title}</p>
                   {p.target_certification ? (
-                    <p className={`mt-0.5 text-xs ${dash.muted}`}>{p.target_certification}</p>
+                    <p className="mt-0.5 text-xs text-slate-300/80">{p.target_certification}</p>
                   ) : null}
                 </div>
-                <span className="shrink-0 text-sm font-semibold text-[#146fc2] tabular-nums">
+                <span className="shrink-0 text-sm font-semibold text-sky-200 tabular-nums">
                   {p.progress_percent}%
                 </span>
               </div>
-              <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-slate-200">
-                <div
-                  className="h-full rounded-full bg-[#2490ed] transition-all"
+              <div className="learner-home-bar mt-3 h-1.5 overflow-hidden rounded-full bg-white/10">
+                <i
+                  className="rounded-full bg-gradient-to-r from-sky-300 to-[#2490ed]"
                   style={{ width: `${p.progress_percent}%` }}
                 />
               </div>
-              <p className={`mt-2 text-xs ${dash.subtle}`}>
+              <p className="mt-2 text-xs text-slate-400">
                 {p.courses_completed} of {p.courses_total} courses complete
               </p>
             </Link>
