@@ -630,9 +630,9 @@ export function LearnCourseShell({ slug }: { slug: string }) {
 
   if (curriculumError || !curriculum) {
     return (
-      <div className="mx-auto max-w-lg rounded-xl border border-slate-200 bg-white p-8 text-center">
-        <p className="text-slate-800">We could not load this course.</p>
-        <Button asChild variant="outline" className="mt-4 border-slate-300 text-slate-700">
+      <div className="learner-home-surface mx-auto max-w-lg rounded-[1.25rem] p-8 text-center">
+        <p className="text-white">We could not load this course.</p>
+        <Button asChild variant="outline" className="mt-4 border-white/20 bg-transparent text-sky-100 hover:bg-white/10">
           <Link href="/dashboard/student">Back to My Learning</Link>
         </Button>
       </div>
@@ -641,9 +641,9 @@ export function LearnCourseShell({ slug }: { slug: string }) {
 
   if (curriculum.modules.length === 0 || flatLessons.length === 0) {
     return (
-      <div className="mx-auto max-w-lg rounded-xl border border-slate-200 bg-white p-8 text-center">
-        <p className="text-slate-800">This course does not have any lessons yet.</p>
-        <Button asChild variant="outline" className="mt-4 border-slate-300 text-slate-700">
+      <div className="learner-home-surface mx-auto max-w-lg rounded-[1.25rem] p-8 text-center">
+        <p className="text-white">This course does not have any lessons yet.</p>
+        <Button asChild variant="outline" className="mt-4 border-white/20 bg-transparent text-sky-100 hover:bg-white/10">
           <Link href="/dashboard/student">Back to My Learning</Link>
         </Button>
       </div>
@@ -651,7 +651,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
   }
 
   return (
-    <div className="flex w-full max-w-none min-w-0 flex-col gap-6">
+    <div className="learner-home flex w-full max-w-none min-w-0 flex-col gap-6">
       {isOnboardingProgram ? (
         <CampusTopBar
           section="Onboarding · Learn"
@@ -723,9 +723,9 @@ export function LearnCourseShell({ slug }: { slug: string }) {
       ) : null}
 
       {online && !reliabilityTipDismissed ? (
-        <div className="flex items-start justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs leading-relaxed text-slate-500">
+        <div className="learner-home-surface flex items-start justify-between gap-3 rounded-xl px-4 py-3 text-xs leading-relaxed text-slate-300">
           <p>
-            <span className="font-medium text-slate-600">Reliability tip · </span>
+            <span className="font-medium text-white">Reliability tip · </span>
             Open each lesson once while you have signal so your installed PWA can cache lesson API
             responses and static assets — helpful for patchy field coverage. PDFs and videos cache
             when your browser fetches them.
@@ -740,7 +740,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
               }
               setReliabilityTipDismissed(true);
             }}
-            className="shrink-0 rounded-md border border-slate-300 px-2 py-1 text-[10px] font-medium tracking-wide text-slate-500 uppercase hover:border-slate-300 hover:text-slate-700"
+            className="shrink-0 rounded-md border border-white/15 px-2 py-1 text-[10px] font-medium tracking-wide text-slate-300 uppercase hover:border-sky-200/40 hover:text-white"
           >
             Dismiss
           </button>
@@ -781,7 +781,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
 
         <div className="min-w-0 flex-1">
           {view === 'module' && activeModuleId && !activeModule ? (
-            <p className="rounded-xl border border-slate-200 bg-white px-6 py-8 text-center text-slate-600">
+            <p className="learner-home-surface rounded-[1.25rem] px-6 py-8 text-center text-slate-300">
               This module is not part of this course, or the link is out of date.
             </p>
           ) : view === 'module' && activeModule ? (
@@ -833,7 +833,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                     className={
                       isOnboardingProgram
                         ? 'min-w-0'
-                        : 'rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-8'
+                        : 'overflow-hidden rounded-[1.25rem] border border-sky-200/20 bg-white p-5 shadow-[0_24px_52px_-26px_rgba(14,116,184,0.38)] sm:p-8'
                     }
                   >
                     {loadingQuiz ? (
