@@ -400,25 +400,24 @@ export function CourseTextThumbnail({
               ) : null}
             </div>
 
+            <h3
+              className={cn(
+                'mt-2 line-clamp-3 text-base leading-snug font-bold sm:text-lg',
+                hasBackdrop ? 'text-white' : 'text-slate-950'
+              )}
+            >
+              {title}
+            </h3>
             {shortDescription?.trim() ? (
               <p
                 className={cn(
-                  'mt-2 line-clamp-3 text-[11px] leading-relaxed',
+                  'mt-1.5 line-clamp-2 text-xs leading-relaxed',
                   hasBackdrop ? 'text-white/80' : 'text-slate-700'
                 )}
               >
                 {shortDescription}
               </p>
-            ) : (
-              <h3
-                className={cn(
-                  'mt-2 line-clamp-3 text-sm font-bold leading-snug',
-                  hasBackdrop ? 'text-white' : 'text-slate-950'
-                )}
-              >
-                {title}
-              </h3>
-            )}
+            ) : null}
 
             {hasCardStats ? (
               <div
