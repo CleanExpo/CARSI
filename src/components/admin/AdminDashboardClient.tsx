@@ -169,7 +169,7 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
             </span>
             Command board
             {generatedLabel ? <span className="text-white/35">· {generatedLabel}</span> : null}
-          </div>
+        </div>
           <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
             What needs you today
           </h1>
@@ -305,7 +305,7 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
               Where paid and enrolled seats sit right now.
             </p>
           </div>
-        </div>
+                </div>
         <div className="grid gap-3 md:grid-cols-3">
           {funnel.map((step) => (
             <Link
@@ -333,30 +333,30 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
           <h2 className="text-sm font-semibold text-white/88">Revenue and seats by month</h2>
           <p className="mt-1 text-xs text-white/45">Gold is recognised AUD. Blue is enrolments.</p>
           <div className="mt-4 h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer width="100%" height="100%">
               <ComposedChart
                 data={data.ops.monthly}
                 margin={{ top: 8, right: 8, left: -8, bottom: 0 }}
               >
                 <CartesianGrid strokeDasharray="4 6" stroke="rgba(255,255,255,0.06)" />
-                <XAxis
+                      <XAxis
                   dataKey="month"
                   tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 10 }}
-                  tickLine={false}
-                />
-                <YAxis
+                        tickLine={false}
+                      />
+                      <YAxis
                   yAxisId="aud"
                   tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 10 }}
-                  tickLine={false}
-                  axisLine={false}
+                        tickLine={false}
+                        axisLine={false}
                   width={44}
-                />
-                <YAxis
+                      />
+                      <YAxis
                   yAxisId="count"
                   orientation="right"
                   tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 10 }}
-                  tickLine={false}
-                  axisLine={false}
+                        tickLine={false}
+                        axisLine={false}
                   width={28}
                 />
                 <Tooltip {...chartTooltipProps} />
@@ -368,12 +368,12 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                   stroke="#ed9d24"
                   fill="#ed9d24"
                   fillOpacity={0.16}
-                />
-                <Bar
+                      />
+                      <Bar
                   yAxisId="count"
-                  dataKey="enrollments"
+                        dataKey="enrollments"
                   name="Enrolments"
-                  fill="#2490ed"
+                        fill="#2490ed"
                   radius={[6, 6, 0, 0]}
                   barSize={16}
                 />
@@ -412,7 +412,7 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
                           width: `${Math.max(6, Math.round((row.revenueAud / max) * 100))}%`,
                         }}
                       />
-                    </div>
+                </div>
                     <p className="mt-1 text-[11px] text-white/35">
                       {row.enrollments} paid seat{row.enrollments === 1 ? '' : 's'}
                     </p>
@@ -432,7 +432,7 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
               />
             </div>
           ) : null}
-        </div>
+              </div>
       </section>
 
       <section className="mb-8 rounded-3xl border border-white/10 bg-white/[0.03] p-5">
@@ -491,7 +491,7 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
       </section>
 
       <p className="mt-10">
-        <Link
+                        <Link
           href="/admin/users"
           className="inline-flex items-center gap-2 text-sm font-medium text-[#7ec5ff] hover:underline"
         >
@@ -499,7 +499,7 @@ export function AdminDashboardClient({ data }: { data: AdminDashboardClientData 
           <ArrowRight className="h-4 w-4" />
         </Link>
       </p>
-    </div>
+                            </div>
   );
 }
 
@@ -536,7 +536,7 @@ function PulseStat({
     return (
       <Link href={href} className={cn(className, 'block')}>
         {inner}
-      </Link>
+                        </Link>
     );
   }
   return <div className={className}>{inner}</div>;
@@ -571,7 +571,7 @@ function AttentionCard({
         <span className="inline-flex items-center gap-2">
           <Icon className="h-4 w-4 text-white/40" />
           {title}
-        </span>
+                          </span>
         <span className="font-mono text-xs text-white/35">{rows.length}</span>
       </h2>
       {rows.length === 0 ? (
@@ -581,13 +581,13 @@ function AttentionCard({
           <ul className="mt-4 space-y-3">
             {pageRows.map((row) => (
               <li key={`${row.href}-${row.meta}`}>
-                <Link
+                        <Link
                   href={row.href}
                   className="block rounded-lg px-1 py-0.5 hover:bg-white/[0.04]"
-                >
+                        >
                   <p className="truncate text-sm text-white/88">{row.title}</p>
                   <p className="truncate text-xs text-white/42">{row.meta}</p>
-                </Link>
+                        </Link>
               </li>
             ))}
           </ul>
