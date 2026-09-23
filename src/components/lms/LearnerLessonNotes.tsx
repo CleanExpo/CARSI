@@ -5,9 +5,7 @@ import Link from 'next/link';
 import type { RefObject } from 'react';
 
 import { Button } from '@/components/ui/button';
-import { dash } from '@/lib/dashboard-light-ui';
 import type { NoteFormatAction } from '@/lib/lms/note-formatting';
-import { cn } from '@/lib/utils';
 
 const TOOLS: Array<{ action: NoteFormatAction; label: string; Icon: typeof Bold }> = [
   { action: 'heading', label: 'Heading', Icon: Heading2 },
@@ -45,11 +43,11 @@ export function LearnerLessonNotes({
 
   return (
     <section
-      className={cn(dash.panel, 'mt-6 overflow-hidden')}
+      className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white"
       aria-labelledby="lesson-notes-heading"
     >
       <div className="flex items-center gap-3 border-b border-slate-100 bg-gradient-to-r from-[#eef7ff] to-white px-5 py-3.5">
-        <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white text-[#146fc2] shadow-sm ring-1 ring-[#b8dbfb]">
+        <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white text-[#146fc2] ring-1 ring-[#b8dbfb]">
           <StickyNote className="h-4 w-4" aria-hidden />
         </span>
         <div className="min-w-0">
@@ -72,7 +70,7 @@ export function LearnerLessonNotes({
 
       <div className="p-5 sm:p-6">
         <div
-          className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-inner"
+          className="overflow-hidden rounded-xl border border-slate-200 bg-white"
           role="group"
           aria-label="Note editor"
         >
