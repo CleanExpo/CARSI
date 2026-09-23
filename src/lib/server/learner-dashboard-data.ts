@@ -21,6 +21,12 @@ export interface EnrollmentDto {
   certificate_issued_at?: string | null;
   cec_submission_status?: string | null;
   cec_submitted_at?: string | null;
+  description?: string | null;
+  category?: string | null;
+  /** Registry-approved CEC hours only; null when the course is not CEC-approved. */
+  cec_hours?: number | null;
+  lessons_total?: number;
+  lessons_completed?: number;
 }
 
 export interface LearnerDashboardSummary {
@@ -77,11 +83,14 @@ function mapEnrollmentRow(
       slug: string;
       thumbnailUrl: string | null;
       durationHours: unknown;
+      description?: string | null;
+      shortDescription?: string | null;
+      category?: string | null;
       modules: { lessons: { id: string; title: string }[] }[];
     };
   },
   progressByLesson: Map<string, { completed: boolean; lastAccessedAt?: Date | null }>,
-  cecSubmission?: { status: string; sent_at: string | null } | null,
+  cecSubmission?: { status: string; sent_at: string | null } | null
 ): EnrollmentDto {
   const lessonIds: string[] = [];
   const lessonTitleById = new Map<string, string>();
@@ -132,6 +141,11 @@ function mapEnrollmentRow(
     certificate_issued_at: e.certificateIssuedAt?.toISOString() ?? null,
     cec_submission_status: cecSubmission?.status ?? null,
     cec_submitted_at: cecSubmission?.sent_at ?? null,
+    description: e.course.shortDescription?.trim() || e.course.description?.trim() || null,
+    category: e.course.category ?? null,
+    cec_hours: resolveLmsCourseCecHours({ slug: e.course.slug }),
+    lessons_total: total,
+    lessons_completed: completed,
   };
 }
 
@@ -157,6 +171,9 @@ export async function getLearnerDashboardSummary(
             slug: true,
             durationHours: true,
             thumbnailUrl: true,
+            description: true,
+            shortDescription: true,
+            category: true,
             modules: {
               select: {
                 lessons: { select: { id: true, title: true } },
@@ -190,7 +207,7 @@ export async function getLearnerDashboardSummary(
     }
 
     const enrollments = rows.map((r) =>
-      mapEnrollmentRow(r, progressByLesson, cecByEnrollment.get(r.id) ?? null),
+      mapEnrollmentRow(r, progressByLesson, cecByEnrollment.get(r.id) ?? null)
     );
 
     let active = 0;
@@ -240,6 +257,9 @@ export type ResumeSnapshot = {
   /** Deep link into LearnCourseShell (`?lesson=`). */
   resume_href: string;
   last_accessed_at: string;
+  course_description: string | null;
+  lesson_index: number;
+  lesson_total: number;
 };
 
 export async function getResumeSnapshotForStudent(userId: string): Promise<ResumeSnapshot | null> {
@@ -253,6 +273,8 @@ export async function getResumeSnapshotForStudent(userId: string): Promise<Resum
           select: {
             title: true,
             slug: true,
+            description: true,
+            shortDescription: true,
             modules: {
               orderBy: { orderIndex: 'asc' },
               select: {
@@ -267,18 +289,32 @@ export async function getResumeSnapshotForStudent(userId: string): Promise<Resum
 
     const lessonMeta = new Map<
       string,
-      { title: string; courseSlug: string; courseTitle: string }
+      {
+        title: string;
+        courseSlug: string;
+        courseTitle: string;
+        courseDescription: string | null;
+        lessonIndex: number;
+        lessonTotal: number;
+      }
     >();
     const allLessonIds: string[] = [];
     for (const e of rows) {
       const slug = e.course.slug;
       const title = e.course.title;
-      for (const m of e.course.modules) {
-        for (const l of m.lessons) {
-          allLessonIds.push(l.id);
-          lessonMeta.set(l.id, { title: l.title, courseSlug: slug, courseTitle: title });
-        }
-      }
+      const desc = e.course.shortDescription?.trim() || e.course.description?.trim() || null;
+      const flat = e.course.modules.flatMap((m) => m.lessons);
+      flat.forEach((l, i) => {
+        allLessonIds.push(l.id);
+        lessonMeta.set(l.id, {
+          title: l.title,
+          courseSlug: slug,
+          courseTitle: title,
+          courseDescription: desc,
+          lessonIndex: i + 1,
+          lessonTotal: flat.length,
+        });
+      });
     }
 
     if (allLessonIds.length === 0) return null;
@@ -335,6 +371,9 @@ export async function getResumeSnapshotForStudent(userId: string): Promise<Resum
       lesson_title: meta.title,
       resume_href: `/dashboard/learn/${encodeURIComponent(meta.courseSlug)}?lesson=${encodeURIComponent(global.lessonId)}`,
       last_accessed_at: global.at.toISOString(),
+      course_description: meta.courseDescription,
+      lesson_index: meta.lessonIndex,
+      lesson_total: meta.lessonTotal,
     };
   } catch (err) {
     console.error('[resume-snapshot]', err);
