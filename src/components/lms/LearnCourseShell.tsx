@@ -8,6 +8,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CampusTopBar } from '@/components/layout/CampusTopBar';
 import { CourseCompletionBanner } from '@/components/lms/CourseCompletionBanner';
 import { LearnerCourseOutline } from '@/components/lms/LearnerCourseOutline';
+import { LearnerLessonNotes } from '@/components/lms/LearnerLessonNotes';
 import { LearnModuleOverview } from '@/components/lms/LearnModuleOverview';
 import { LessonFooterNav } from '@/components/lms/LessonFooterNav';
 import { LessonPlayer } from '@/components/lms/LessonPlayer';
@@ -767,6 +768,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
               modules={curriculum.modules}
               activeLessonId={activeLessonId}
               onSelectLesson={selectLesson}
+              onSelectModule={selectModuleOverview}
             />
           )}
         </aside>
@@ -865,24 +867,26 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                           </div>
                         ) : (
                           // WS1 fix 5 (GP-544): every completion action clears Margot; see LessonFooterNav.
-                        <div className="lesson-footer-nav mt-6 space-y-3 pb-24">
-                          <LearnerQuizResult
-                            passed={quizResult.passed}
-                            scorePercent={quizResult.score_percent}
-                            passPercentage={quizResult.pass_percentage ?? quizData.pass_percentage}
-                            correctCount={quizResult.correct_count}
-                            questionCount={quizResult.question_count ?? quizData.questions.length}
-                            attemptsRemaining={quizResult.attempts_remaining}
-                            saving={savingComplete}
-                            onContinue={handleQuizContinue}
-                            onReview={prevLesson ? () => selectLesson(prevLesson.id) : undefined}
-                          />
-                          {completeError ? (
-                            <p role="alert" className="text-sm text-red-600">
-                              {completeError}
-                            </p>
-                          ) : null}
-                        </div>
+                          <div className="lesson-footer-nav mt-6 space-y-3 pb-24">
+                            <LearnerQuizResult
+                              passed={quizResult.passed}
+                              scorePercent={quizResult.score_percent}
+                              passPercentage={
+                                quizResult.pass_percentage ?? quizData.pass_percentage
+                              }
+                              correctCount={quizResult.correct_count}
+                              questionCount={quizResult.question_count ?? quizData.questions.length}
+                              attemptsRemaining={quizResult.attempts_remaining}
+                              saving={savingComplete}
+                              onContinue={handleQuizContinue}
+                              onReview={prevLesson ? () => selectLesson(prevLesson.id) : undefined}
+                            />
+                            {completeError ? (
+                              <p role="alert" className="text-sm text-red-600">
+                                {completeError}
+                              </p>
+                            ) : null}
+                          </div>
                         )
                       ) : null}
                     </>
@@ -923,74 +927,6 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                           />
                         ) : (
                           <>
-                            <div className="mt-8 rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
-                              <div className="mb-2 flex items-center justify-between gap-2">
-                                <h3 className="text-sm font-semibold text-slate-800">Notes</h3>
-                                {loadingNote ? (
-                                  <span className="text-xs text-slate-600">Loading…</span>
-                                ) : null}
-                              </div>
-                              <div className="mb-2 flex flex-wrap gap-1.5">
-                                {(
-                                  [
-                                    ['heading', 'H'],
-                                    ['quote', 'Quote'],
-                                    ['bullet', 'List'],
-                                    ['bold', 'Bold'],
-                                    ['italic', 'Italic'],
-                                  ] as Array<[NoteFormatAction, string]>
-                                ).map(([action, label]) => (
-                                  <button
-                                    key={action}
-                                    type="button"
-                                    onClick={() => applyFormat(action)}
-                                    className="rounded border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] text-slate-600 hover:border-slate-300 hover:text-slate-900"
-                                  >
-                                    {label}
-                                  </button>
-                                ))}
-                              </div>
-                              <textarea
-                                ref={noteEditorRef}
-                                value={noteText}
-                                onChange={(e) => setNoteText(e.target.value)}
-                                rows={5}
-                                placeholder="Write your lesson notes here…"
-                                className="w-full resize-y rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-[#2490ed]/45 focus:ring-2 focus:ring-[#2490ed]/20 focus:outline-none"
-                              />
-                              <div className="mt-3 flex flex-wrap items-center gap-2">
-                                <Button
-                                  type="button"
-                                  onClick={() => void saveLessonNote()}
-                                  disabled={savingNote || deletingNote || loadingNote}
-                                  className="h-8 rounded-md bg-[#146fc2] px-3 text-xs text-white hover:bg-[#0f5fa8] disabled:opacity-50"
-                                >
-                                  {savingNote ? 'Saving…' : 'Save note'}
-                                </Button>
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  onClick={() => void deleteLessonNote()}
-                                  disabled={
-                                    savingNote || deletingNote || loadingNote || !noteText.trim()
-                                  }
-                                  className="h-8 border-slate-300 px-3 text-xs text-slate-800"
-                                >
-                                  {deletingNote ? 'Deleting…' : 'Delete note'}
-                                </Button>
-                                <Link
-                                  href="/dashboard/student/notes"
-                                  className="ml-auto text-xs text-[#146fc2] hover:underline"
-                                >
-                                  View all notes
-                                </Link>
-                              </div>
-                              {noteStatus ? (
-                                <p className="mt-2 text-xs text-slate-500">{noteStatus}</p>
-                              ) : null}
-                            </div>
-                            {/* WS1 fix 5 (GP-544): the footer keeps every control at the left of the
-                          column, clear of Margot's fixed bottom-right launcher and panel. */}
                             <LessonFooterNav
                               hasPrev={Boolean(prevLesson)}
                               hasNext={Boolean(nextLesson)}
@@ -1001,6 +937,18 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                               onComplete={() => void toggleComplete(true)}
                               onShare={openLessonSharePrompt}
                               error={completeError}
+                            />
+                            <LearnerLessonNotes
+                              noteText={noteText}
+                              onNoteChange={setNoteText}
+                              noteEditorRef={noteEditorRef}
+                              onFormat={applyFormat}
+                              onSaveNote={() => void saveLessonNote()}
+                              onDeleteNote={() => void deleteLessonNote()}
+                              loadingNote={loadingNote}
+                              savingNote={savingNote}
+                              deletingNote={deletingNote}
+                              noteStatus={noteStatus}
                             />
                           </>
                         )
