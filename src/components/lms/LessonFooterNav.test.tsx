@@ -35,7 +35,8 @@ const PRE_FIX_ROW_CLASS =
 const PRE_FIX_ACTIONS_CLASS = 'flex flex-wrap items-center justify-end gap-2 sm:gap-3';
 
 const PUSHED_RIGHT = /\bjustify-(between|end)\b|\bml-auto\b|\bsm:justify-(between|end)\b/;
-const CLOSED_CLEARANCE = /\bpb-(2[4-9]|[3-9]\d)\b/; // at least 6rem for the 66px launcher
+const CLOSED_CLEARANCE = /\bpb-8\b/;
+const DOCK_SPLIT = /\bml-auto\b/;
 const OPEN_HOOK = 'lesson-footer-nav';
 // The open panel is 560px tall inside a 606px container; 38rem (608px) is the floor.
 const OPEN_CLEARANCE_MIN_REM = 38;
@@ -111,7 +112,7 @@ describe('LessonFooterNav: nothing sits under the bottom-right launcher or the o
     expect(openPanelClearanceRem('.lesson-footer-nav { padding-bottom: 40rem; }')).toBeNull();
   });
 
-  it('the row and the actions are left-aligned, and the row clears the closed launcher', () => {
+  it('keeps Previous/Next on the left and complete on the right, clear of Margot', () => {
     const html = render();
     const row = classOf(html, 'lesson-footer');
     const actions = classOf(html, 'lesson-footer-actions');
@@ -122,6 +123,7 @@ describe('LessonFooterNav: nothing sits under the bottom-right launcher or the o
     expect(row).toMatch(/\bsm:justify-start\b/);
     expect(actions).toMatch(/\bjustify-start\b/);
     expect(row).toMatch(CLOSED_CLEARANCE);
+    expect(html).toMatch(DOCK_SPLIT);
   });
 
   it('the row carries the open-panel hook and the stylesheet gives it room to scroll above the panel', () => {
