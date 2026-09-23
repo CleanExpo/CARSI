@@ -43,25 +43,25 @@ export function LearnerLessonNotes({
 
   return (
     <section
-      className="mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white"
+      className="learner-home-surface learner-home-card mt-6 overflow-hidden rounded-[1.25rem]"
       aria-labelledby="lesson-notes-heading"
     >
-      <div className="flex items-center gap-3 border-b border-slate-100 bg-gradient-to-r from-[#eef7ff] to-white px-5 py-3.5">
-        <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white text-[#146fc2] ring-1 ring-[#b8dbfb]">
+      <div className="flex items-center gap-3 border-b border-white/10 px-5 py-3.5">
+        <span className="learner-home-inset inline-flex h-8 w-8 items-center justify-center rounded-lg text-sky-200">
           <StickyNote className="h-4 w-4" aria-hidden />
         </span>
         <div className="min-w-0">
-          <h3 id="lesson-notes-heading" className="text-sm font-semibold text-slate-900">
+          <h3 id="lesson-notes-heading" className="text-sm font-semibold text-white">
             Lesson notes
           </h3>
-          <p className="text-xs text-slate-500">Private to you. Saved against this lesson.</p>
+          <p className="text-xs text-slate-300/80">Private to you. Saved against this lesson.</p>
         </div>
         {loadingNote ? (
           <span className="ml-auto text-xs text-slate-400">Loading…</span>
         ) : (
           <Link
             href="/dashboard/student/notes"
-            className="ml-auto shrink-0 text-xs font-medium text-[#146fc2] hover:underline"
+            className="ml-auto shrink-0 text-xs font-medium text-sky-200 hover:text-white"
           >
             All notes
           </Link>
@@ -70,11 +70,11 @@ export function LearnerLessonNotes({
 
       <div className="p-5 sm:p-6">
         <div
-          className="overflow-hidden rounded-xl border border-slate-200 bg-white"
+          className="overflow-hidden rounded-xl border border-white/10 bg-white/5"
           role="group"
           aria-label="Note editor"
         >
-          <div className="flex flex-wrap gap-1 border-b border-slate-100 bg-slate-50/90 px-2 py-1.5">
+          <div className="flex flex-wrap gap-1 border-b border-white/10 bg-white/5 px-2 py-1.5">
             {TOOLS.map(({ action, label, Icon }) => (
               <button
                 key={action}
@@ -82,7 +82,7 @@ export function LearnerLessonNotes({
                 title={label}
                 aria-label={label}
                 onClick={() => onFormat(action)}
-                className="inline-flex h-8 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-slate-600 transition hover:bg-white hover:text-slate-900 hover:shadow-sm"
+                className="inline-flex h-8 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-slate-300 transition hover:bg-white/10 hover:text-white"
               >
                 <Icon className="h-3.5 w-3.5" aria-hidden />
                 <span className="hidden sm:inline">{label}</span>
@@ -95,7 +95,7 @@ export function LearnerLessonNotes({
             onChange={(e) => onNoteChange(e.target.value)}
             rows={6}
             placeholder="Jot a reminder, a hazard, or a question for the job site…"
-            className="w-full resize-y border-0 bg-transparent px-4 py-3 text-[15px] leading-relaxed text-slate-900 placeholder:text-slate-400 focus:ring-0 focus:outline-none"
+            className="w-full resize-y border-0 bg-transparent px-4 py-3 text-[15px] leading-relaxed text-white placeholder:text-slate-500 focus:ring-0 focus:outline-none"
           />
         </div>
 
@@ -104,7 +104,7 @@ export function LearnerLessonNotes({
             type="button"
             onClick={onSaveNote}
             disabled={busy}
-            className="h-9 rounded-lg bg-[#146fc2] px-4 text-sm text-white hover:bg-[#0f5fa8] disabled:opacity-50"
+            className="h-9 rounded-full bg-white px-4 text-sm text-slate-950 hover:bg-sky-50 disabled:opacity-50"
           >
             {savingNote ? 'Saving…' : 'Save note'}
           </Button>
@@ -113,13 +113,13 @@ export function LearnerLessonNotes({
             variant="outline"
             onClick={onDeleteNote}
             disabled={busy || empty}
-            className="h-9 gap-1.5 border-slate-200 px-3 text-sm text-slate-600 hover:border-red-200 hover:text-red-700"
+            className="h-9 gap-1.5 border-white/15 bg-transparent px-3 text-sm text-sky-100 hover:border-red-300/40 hover:text-red-200"
           >
             <Trash2 className="h-3.5 w-3.5" aria-hidden />
             {deletingNote ? 'Deleting…' : 'Delete'}
           </Button>
           {noteStatus ? (
-            <p className="text-xs text-slate-500" role="status">
+            <p className="text-xs text-slate-300" role="status">
               {noteStatus}
             </p>
           ) : null}
