@@ -669,6 +669,45 @@
   color: #f2cf8f !important;
 }
 
+/* Learner / dashboard article: same hierarchy as the admin visual editor, on white. */
+.course-article-body--light {
+  color: #334155;
+  --tw-prose-body: #334155;
+  --tw-prose-headings: #0f172a;
+  --tw-prose-bold: #0f172a;
+  --tw-prose-links: #146fc2;
+  --tw-prose-quotes: #475569;
+  --tw-prose-counters: #146fc2;
+  --tw-prose-bullets: #146fc2;
+}
+.course-article-body--light :is(h1, h2, h3, h4, h5, h6),
+.course-article-body--light :is(h1, h2, h3, h4, h5, h6) * {
+  color: #0f172a !important;
+}
+.course-article-body--light h1 {
+  border-bottom-color: #b8dbfb;
+}
+.course-article-body--light h2,
+.course-article-body--light h2 * {
+  color: #146fc2 !important;
+}
+.course-article-body--light .course-mod-kicker {
+  color: #146fc2 !important;
+}
+.course-article-body--light :is(ul, ol) {
+  padding-left: 1.35rem;
+}
+.course-article-body--light ul {
+  list-style: disc;
+}
+.course-article-body--light ol {
+  list-style: decimal;
+}
+.course-article-body--light blockquote {
+  border-left-color: #2490ed;
+  color: #475569;
+}
+
 .course-visual-editor:empty:before {
   content: attr(data-placeholder);
   color: rgb(255 255 255 / 0.32);
