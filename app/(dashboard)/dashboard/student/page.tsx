@@ -8,8 +8,11 @@ import {
 import { EnrolledCourseList } from '@/components/lms/EnrolledCourseList';
 import { ErrorBanner } from '@/components/lms/ErrorBanner';
 import { PathwayProgressCard } from '@/components/lms/PathwayProgressCard';
-import { OnboardingProgramsStrip, OnboardingQuickLink } from '@/components/onboarding/OnboardingProgramsStrip';
 import { PushNotificationPrompt } from '@/components/lms/PushNotificationPrompt';
+import {
+  OnboardingProgramsStrip,
+  OnboardingQuickLink,
+} from '@/components/onboarding/OnboardingProgramsStrip';
 import { apiClient } from '@/lib/api/client';
 import { dash } from '@/lib/dashboard-light-ui';
 import { ArrowRight } from 'lucide-react';
@@ -93,8 +96,7 @@ export default function StudentDashboardPage() {
   }, [user, fetchSub, fetchEnrollments, fetchResume]);
 
   const inProgress = useMemo(
-    () =>
-      enrollments.filter((e) => e.status !== 'completed' && e.all_lessons_complete !== true),
+    () => enrollments.filter((e) => e.status !== 'completed' && e.all_lessons_complete !== true),
     [enrollments]
   );
   const completed = useMemo(
@@ -104,14 +106,12 @@ export default function StudentDashboardPage() {
   const visible = tab === 'completed' ? completed : inProgress;
 
   return (
-    <div className="mx-auto w-full max-w-5xl space-y-8 pb-16">
+    <div className="max-w-9xl mx-auto w-full space-y-8 pb-16">
       <PushNotificationPrompt />
 
       <header>
         <h1 className={dash.h1}>My Learning</h1>
-        <p className={`mt-2 max-w-xl ${dash.lead}`}>
-          Your courses, progress and learning history.
-        </p>
+        <p className={`mt-2 max-w-xl ${dash.lead}`}>Your courses, progress and learning history.</p>
       </header>
 
       {tab === 'progress' ? <ContinueLearningBanner snapshot={resume} /> : null}
@@ -156,7 +156,7 @@ export default function StudentDashboardPage() {
             }`}
           >
             {t.label}
-            <span className="ml-1.5 tabular-nums text-slate-400">{t.count}</span>
+            <span className="ml-1.5 text-slate-400 tabular-nums">{t.count}</span>
           </button>
         ))}
         <OnboardingQuickLink />
@@ -168,12 +168,17 @@ export default function StudentDashboardPage() {
         ) : enrollmentsLoading ? (
           <div className="space-y-3" aria-busy="true" aria-label="Loading courses">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-36 animate-pulse rounded-xl border border-slate-200 bg-slate-100" />
+              <div
+                key={i}
+                className="h-36 animate-pulse rounded-xl border border-slate-200 bg-slate-100"
+              />
             ))}
           </div>
         ) : enrollments.length === 0 ? (
           <div className="rounded-xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center">
-            <p className="text-base font-medium text-slate-900">You have not enrolled in a course yet.</p>
+            <p className="text-base font-medium text-slate-900">
+              You have not enrolled in a course yet.
+            </p>
             <p className={`mx-auto mt-2 max-w-sm ${dash.muted}`}>
               Browse the catalogue and start a course. It will appear here with progress.
             </p>
