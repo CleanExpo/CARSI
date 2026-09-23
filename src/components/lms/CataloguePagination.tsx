@@ -22,6 +22,8 @@ type CataloguePaginationProps = {
   total: number;
   onPageChange: (page: number) => void;
   onPageSizeChange: (size: CataloguePageSizeChoice) => void;
+  /** Dark matches the learner Home / dashboard catalogue surface. */
+  tone?: 'light' | 'dark';
 };
 
 function currentNumericSize(pageSize: CataloguePageSizeChoice): number {
@@ -31,9 +33,11 @@ function currentNumericSize(pageSize: CataloguePageSizeChoice): number {
 function RowsPerPage({
   pageSize,
   onPageSizeChange,
+  tone = 'light',
 }: {
   pageSize: CataloguePageSizeChoice;
   onPageSizeChange: (size: CataloguePageSizeChoice) => void;
+  tone?: 'light' | 'dark';
 }) {
   const inferredCustom = pageSize !== 'all' && !isCataloguePageSizePreset(pageSize);
   const [customOpen, setCustomOpen] = useState(inferredCustom);
@@ -72,10 +76,12 @@ function RowsPerPage({
   return (
     <div className="flex flex-wrap items-center gap-2">
       <label className="inline-flex items-center gap-2">
-        <span className="whitespace-nowrap">Rows per page</span>
+        <span className="whitespace-nowrap">
+          {tone === 'dark' ? 'Courses per page' : 'Rows per page'}
+        </span>
         <select
           value={selectValue}
-          aria-label="Rows per page"
+          aria-label={tone === 'dark' ? 'Courses per page' : 'Rows per page'}
           onChange={(e) => {
             const value = e.target.value;
             if (value === 'all') {
@@ -91,7 +97,7 @@ function RowsPerPage({
             setCustomOpen(false);
             onPageSizeChange(parseCataloguePageSizeChoice(value));
           }}
-          className="h-8 rounded-full border border-slate-200 bg-white px-2.5 text-xs font-medium text-slate-700 shadow-sm focus-visible:ring-2 focus-visible:ring-[#146fc2]/45 focus-visible:outline-none"
+          className="h-10 rounded-full border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-900 shadow-sm focus-visible:ring-2 focus-visible:ring-[#146fc2]/45 focus-visible:outline-none"
         >
           {CATALOGUE_PAGE_SIZE_PRESETS.map((size) => (
             <option key={size} value={size}>
@@ -120,7 +126,7 @@ function RowsPerPage({
               commitCustom((e.target as HTMLInputElement).value);
             }
           }}
-          className="h-8 w-20 rounded-full border border-slate-200 bg-white px-2.5 text-xs font-medium text-slate-700 tabular-nums shadow-sm focus-visible:ring-2 focus-visible:ring-[#146fc2]/45 focus-visible:outline-none"
+          className="h-10 w-20 rounded-full border border-slate-200 bg-white px-2.5 text-xs font-semibold text-slate-900 tabular-nums shadow-sm focus-visible:ring-2 focus-visible:ring-[#146fc2]/45 focus-visible:outline-none"
         />
       ) : null}
     </div>
@@ -136,6 +142,7 @@ export function CataloguePagination({
   total,
   onPageChange,
   onPageSizeChange,
+  tone = 'light',
 }: CataloguePaginationProps) {
   if (total === 0) return null;
 
@@ -143,12 +150,12 @@ export function CataloguePagination({
   const atStart = page <= 1;
   const atEnd = page >= pageCount;
   const compactBtn =
-    'inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#146fc2]/45 focus-visible:ring-offset-2';
+    'inline-flex h-10 min-w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#146fc2]/45';
 
   return (
-    <div className="mt-8 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+    <div className="mt-8 flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white px-4 py-4 shadow-sm lg:flex-row lg:items-center lg:justify-between">
       <nav
-        className="inline-flex max-w-full items-center gap-0.5 overflow-x-auto rounded-full border border-slate-200 bg-white px-1.5 py-1 shadow-sm"
+        className="inline-flex max-w-full items-center gap-1 overflow-x-auto rounded-full border border-slate-200 bg-slate-50 px-1.5 py-1"
         aria-label="Course catalogue pagination"
       >
         <button
@@ -157,7 +164,7 @@ export function CataloguePagination({
           aria-label="Previous page"
           onClick={() => onPageChange(page - 1)}
           className={`${compactBtn} ${
-            atStart ? 'cursor-not-allowed text-slate-300' : 'text-slate-600 hover:bg-slate-100'
+            atStart ? 'cursor-not-allowed text-slate-300' : 'text-slate-800 hover:bg-white'
           }`}
         >
           <ChevronLeft className="h-4 w-4" aria-hidden />
@@ -167,7 +174,7 @@ export function CataloguePagination({
           item === 'ellipsis' ? (
             <span
               key={`ellipsis-${index}`}
-              className="hidden h-8 min-w-6 items-center justify-center px-1 text-xs text-slate-400 select-none sm:inline-flex"
+              className="hidden h-10 min-w-6 items-center justify-center px-1 text-sm text-slate-500 select-none sm:inline-flex"
               aria-hidden
             >
               …
@@ -182,7 +189,7 @@ export function CataloguePagination({
               className={`${compactBtn} tabular-nums ${
                 item === page
                   ? 'bg-[#146fc2] text-white shadow-sm'
-                  : 'hidden text-slate-600 hover:bg-slate-100 sm:inline-flex'
+                  : 'hidden text-slate-800 hover:bg-white sm:inline-flex'
               }`}
             >
               {item}
@@ -196,16 +203,18 @@ export function CataloguePagination({
           aria-label="Next page"
           onClick={() => onPageChange(page + 1)}
           className={`${compactBtn} ${
-            atEnd ? 'cursor-not-allowed text-slate-300' : 'text-slate-600 hover:bg-slate-100'
+            atEnd ? 'cursor-not-allowed text-slate-300' : 'text-slate-800 hover:bg-white'
           }`}
         >
           <ChevronRight className="h-4 w-4" aria-hidden />
         </button>
       </nav>
 
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-500">
-        <p aria-live="polite">{formatCatalogueResultRange(start, end, total)}</p>
-        <RowsPerPage pageSize={pageSize} onPageSizeChange={onPageSizeChange} />
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm font-medium text-slate-800">
+        <p aria-live="polite">
+          {`${formatCatalogueResultRange(start, end, total)} · Page ${page} of ${pageCount}`}
+        </p>
+        <RowsPerPage pageSize={pageSize} onPageSizeChange={onPageSizeChange} tone={tone} />
       </div>
     </div>
   );
