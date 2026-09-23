@@ -104,7 +104,7 @@ export function HomeGrowthSection({ stops }: { stops: RoadshowStop[] }) {
         <div className="absolute inset-0 [mask-image:radial-gradient(ellipse_55%_50%_at_38%_60%,black,transparent)] opacity-40">
           <div
             className="h-full w-full"
-            style={{
+          style={{
               backgroundImage: 'radial-gradient(rgba(15,23,42,0.07) 1px, transparent 1px)',
               backgroundSize: '26px 26px',
             }}
@@ -132,11 +132,11 @@ export function HomeGrowthSection({ stops }: { stops: RoadshowStop[] }) {
             whileInView={{ opacity: 1, y: 0, rotate: -1.25 }}
             viewport={{ once: true, amount: 0.35 }}
             transition={{ ...spring, stiffness: 90 }}
-          >
-            <div
+                >
+                  <div
               className="pointer-events-none absolute -inset-8 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(237,157,36,0.12),transparent_65%)] blur-2xl"
-              aria-hidden
-            />
+                    aria-hidden
+                  />
 
             <div className="relative flex overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_40px_80px_-40px_rgba(15,23,42,0.35)]">
               {/* Ticket body */}
@@ -155,8 +155,8 @@ export function HomeGrowthSection({ stops }: { stops: RoadshowStop[] }) {
                   </div>
                   <span className="rounded-full border border-[#ed9d24]/35 bg-[#fff8ef] px-2.5 py-1 text-[9px] font-semibold tracking-[0.14em] text-[#a85500] uppercase">
                     Live event
-                  </span>
-                </div>
+                    </span>
+                  </div>
 
                 <p className="mt-5 text-[9px] font-semibold tracking-[0.32em] text-slate-400 uppercase">
                   Event pass · 2026 circuit
@@ -221,12 +221,12 @@ export function HomeGrowthSection({ stops }: { stops: RoadshowStop[] }) {
                         }}
                       />
                     ))}
-                  </div>
+          </div>
                   <span className="pb-0.5 text-[9px] tracking-[0.18em] text-slate-400 uppercase tabular-nums">
                     No. GD-2607-AU
                   </span>
-                </div>
-              </div>
+        </div>
+      </div>
 
               {/* Perforation with punched notches, clipped by the ticket edge */}
               <div className="relative w-0 border-l border-dashed border-slate-300" aria-hidden>
@@ -304,7 +304,7 @@ export function HomeGrowthSection({ stops }: { stops: RoadshowStop[] }) {
                       <span className="min-w-0 flex-1">
                         <span className="flex items-center justify-between gap-3">
                           <span className="text-[10px] font-semibold tracking-[0.16em] text-slate-400 uppercase">
-                            {item.label}
+                          {item.label}
                           </span>
                           <span className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-[#146fc2] opacity-0 transition group-hover:opacity-100 group-focus-visible:opacity-100">
                             {item.cta}
@@ -318,7 +318,7 @@ export function HomeGrowthSection({ stops }: { stops: RoadshowStop[] }) {
                           {item.title}
                         </span>
                         <span className="mt-0.5 block text-sm text-slate-500">{item.detail}</span>
-                      </span>
+                        </span>
                       <span className="sr-only">
                         Pathway {index + 1} of {homePathwayItems.length}
                       </span>
@@ -335,8 +335,8 @@ export function HomeGrowthSection({ stops }: { stops: RoadshowStop[] }) {
               viewport={{ once: true, amount: 0.5 }}
               transition={{ ...spring, delay: 0.55 }}
             >
-              <Link
-                href={ccwWorkshopHref}
+            <Link
+              href={ccwWorkshopHref}
                 className="group mt-7 inline-flex max-w-full items-center gap-3.5 rounded-xl border border-dashed border-[#ed9d24]/50 bg-[#fff8ef] py-3 pr-4 pl-3.5 transition hover:border-[#ed9d24]/80 hover:bg-[#fff3e0] focus-visible:ring-2 focus-visible:ring-[#ed9d24]/45 focus-visible:outline-none"
               >
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#ed9d24] to-[#c97b0a] text-white shadow-[0_10px_20px_-10px_rgba(237,157,36,0.7)]">
@@ -348,13 +348,13 @@ export function HomeGrowthSection({ stops }: { stops: RoadshowStop[] }) {
                   </span>
                   <span className="block truncate text-sm font-semibold text-slate-900 transition group-hover:text-[#a85500]">
                     2-Day Carpet Cleaning Workshop
-                  </span>
-                </span>
+              </span>
+              </span>
                 <ArrowRight
                   className="h-4 w-4 shrink-0 text-[#a85500] transition group-hover:translate-x-0.5"
                   aria-hidden
                 />
-              </Link>
+            </Link>
             </motion.div>
           </div>
         </div>
