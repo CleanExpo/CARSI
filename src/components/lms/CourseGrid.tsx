@@ -90,6 +90,8 @@ interface CourseGridProps {
   initialSortBy?: 'title' | 'price' | 'updated' | 'modules';
   /** Light, dark, or follow global theme (default). */
   surface?: 'light' | 'dark' | 'auto';
+  /** Card treatment. Premium matches learner Home / credentials. */
+  cardVariant?: 'catalog' | 'featured' | 'premium';
   /** Real recommendation slugs; hides the Recommended tab when empty. */
   recommendedSlugs?: readonly string[];
 }
@@ -236,6 +238,7 @@ export function CourseGrid({
   showModulesSort = false,
   initialSortBy,
   surface = 'auto',
+  cardVariant = 'catalog',
   recommendedSlugs = [],
 }: CourseGridProps) {
   const { theme } = useTheme();
@@ -416,7 +419,7 @@ export function CourseGrid({
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search courses..."
+              placeholder="Search by title, topic or keyword"
               aria-label="Search courses"
               className={
                 isDark
@@ -458,8 +461,8 @@ export function CourseGrid({
             aria-label="Filter by CEC availability"
             className={controlClass}
           >
-            <option value="all">All CECs</option>
-            <option value="has-cec">CEC eligible</option>
+            <option value="all">Any CEC status</option>
+            <option value="has-cec">Approved IICRC CEC</option>
           </select>
 
           <select
@@ -533,7 +536,7 @@ export function CourseGrid({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, ease: smoothEase, delay: Math.min(i, 8) * 0.05 }}
               >
-                <CourseCard course={course} priorityImage={i < 4} />
+                <CourseCard course={course} priorityImage={i < 4} variant={cardVariant} />
               </motion.div>
             ))}
           </div>
@@ -545,6 +548,7 @@ export function CourseGrid({
             end={paging.end}
             total={paging.total}
             onPageChange={setPage}
+            tone="light"
             onPageSizeChange={(size) => {
               setPageSize(size);
               setPage(1);
