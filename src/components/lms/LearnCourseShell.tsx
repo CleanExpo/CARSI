@@ -8,6 +8,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { CampusTopBar } from '@/components/layout/CampusTopBar';
 import { CourseCompletionBanner } from '@/components/lms/CourseCompletionBanner';
 import { LearnerCourseOutline } from '@/components/lms/LearnerCourseOutline';
+import { LearnerCourseProgress } from '@/components/lms/LearnerCourseProgress';
 import { LearnerLessonNotes } from '@/components/lms/LearnerLessonNotes';
 import { LearnModuleOverview } from '@/components/lms/LearnModuleOverview';
 import { LessonFooterNav } from '@/components/lms/LessonFooterNav';
@@ -607,15 +608,16 @@ export function LearnCourseShell({ slug }: { slug: string }) {
         })
       : false);
 
-  const onboardingProgressPct = useMemo(() => {
-    if (!curriculum) return 0;
+  const courseProgress = useMemo(() => {
+    if (!curriculum) return { percent: 0, done: 0, total: 0 };
     const total = curriculum.modules.reduce((s, m) => s + m.lessons.length, 0);
     const done = curriculum.modules.reduce(
       (s, m) => s + m.lessons.filter((l) => l.completed).length,
       0
     );
-    return total > 0 ? Math.round((done / total) * 100) : 0;
+    return { percent: total > 0 ? Math.round((done / total) * 100) : 0, done, total };
   }, [curriculum]);
+  const onboardingProgressPct = courseProgress.percent;
 
   if (loadingCurriculum) {
     return (
@@ -666,7 +668,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
           ]}
         />
       ) : (
-        <header className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <Link
               href={`/dashboard/courses/${encodeURIComponent(curriculum.course.slug)}`}
@@ -680,7 +682,11 @@ export function LearnCourseShell({ slug }: { slug: string }) {
               </p>
             ) : null}
           </div>
-          <p className="text-sm text-slate-600 tabular-nums">{onboardingProgressPct}% complete</p>
+          <LearnerCourseProgress
+            percent={courseProgress.percent}
+            done={courseProgress.done}
+            total={courseProgress.total}
+          />
         </header>
       )}
       {isOnboardingProgram ? (
@@ -822,123 +828,94 @@ export function LearnCourseShell({ slug }: { slug: string }) {
               ) : lessonError ? (
                 <p className="text-red-600">{lessonError}</p>
               ) : lessonDetail ? (
-                <article
-                  className={
-                    isOnboardingProgram
-                      ? 'min-w-0'
-                      : 'rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-8'
-                  }
-                >
-                  {loadingQuiz ? (
-                    <div className="mb-6 flex items-center gap-2 text-slate-500">
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                      Loading assessment…
-                    </div>
-                  ) : null}
-                  {quizData ? (
-                    <>
-                      {!quizResult ? (
-                        <QuizPlayer
-                          quiz={quizData}
-                          variant={isOnboardingProgram ? 'enterprise' : 'default'}
-                          // Return the promise, do NOT `void` it. `void submitQuiz(a)` discards
-                          // the promise, so QuizPlayer's `await onSubmit(...)` resolved instantly
-                          // and its in-flight double-submit guard protected a near-zero window —
-                          // which is the whole point of the guard, since a quiz allows 3 attempts
-                          // and one double-click on a slow connection spends two of them.
-                          onSubmit={(a) => submitQuiz(a)}
-                        />
-                      ) : null}
-                      {quizResult ? (
-                        isOnboardingProgram ? (
-                          // WS1 fix 5 (GP-544): every completion action clears Margot; see LessonFooterNav.
-                          <div className="lesson-footer-nav mt-6 pb-24">
-                            <EnterpriseQuizResult
-                              passed={quizResult.passed}
-                              scorePercent={quizResult.score_percent}
-                              passPercentage={quizData.pass_percentage}
-                              onContinue={handleQuizContinue}
-                            />
-                            {completeError ? (
-                              <p role="alert" className="mt-2 text-sm text-red-600">
-                                {completeError}
-                              </p>
-                            ) : null}
-                          </div>
-                        ) : (
-                          // WS1 fix 5 (GP-544): every completion action clears Margot; see LessonFooterNav.
-                          <div className="lesson-footer-nav mt-6 space-y-3 pb-24">
-                            <LearnerQuizResult
-                              passed={quizResult.passed}
-                              scorePercent={quizResult.score_percent}
-                              passPercentage={
-                                quizResult.pass_percentage ?? quizData.pass_percentage
-                              }
-                              correctCount={quizResult.correct_count}
-                              questionCount={quizResult.question_count ?? quizData.questions.length}
-                              attemptsRemaining={quizResult.attempts_remaining}
-                              saving={savingComplete}
-                              onContinue={handleQuizContinue}
-                              onReview={prevLesson ? () => selectLesson(prevLesson.id) : undefined}
-                            />
-                            {completeError ? (
-                              <p role="alert" className="text-sm text-red-600">
-                                {completeError}
-                              </p>
-                            ) : null}
-                          </div>
-                        )
-                      ) : null}
-                    </>
-                  ) : (
-                    <LessonPlayer
-                      lesson={lessonDetail.lesson}
-                      resources={lessonDetail.resources}
-                      variant={isOnboardingProgram ? 'enterprise' : 'default'}
-                      moduleTitle={activeModule?.title}
-                      completed={currentMeta?.completed}
-                      lessonNumber={lessonPosition?.current}
-                      totalLessons={lessonPosition?.total}
-                      moduleLessonNumber={moduleLessonPosition?.current}
-                      moduleLessonTotal={moduleLessonPosition?.total}
-                      courseProgressPercent={isOnboardingProgram ? onboardingProgressPct : null}
-                      footer={
-                        isOnboardingProgram ? (
-                          <EnterpriseLessonFooter
-                            noteText={noteText}
-                            onNoteChange={setNoteText}
-                            noteEditorRef={noteEditorRef}
-                            onFormat={applyFormat}
-                            onSaveNote={() => void saveLessonNote()}
-                            onDeleteNote={() => void deleteLessonNote()}
-                            loadingNote={loadingNote}
-                            savingNote={savingNote}
-                            deletingNote={deletingNote}
-                            noteStatus={noteStatus}
-                            onPrevious={() => prevLesson && selectLesson(prevLesson.id)}
-                            onNext={() => nextLesson && selectLesson(nextLesson.id)}
-                            hasPrevious={Boolean(prevLesson)}
-                            hasNext={Boolean(nextLesson)}
-                            onShare={openLessonSharePrompt}
-                            showShare={Boolean(currentMeta?.completed)}
-                            onComplete={() => void toggleComplete(true)}
-                            savingComplete={savingComplete}
-                            completed={Boolean(currentMeta?.completed)}
+                <>
+                  <article
+                    className={
+                      isOnboardingProgram
+                        ? 'min-w-0'
+                        : 'rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-8'
+                    }
+                  >
+                    {loadingQuiz ? (
+                      <div className="mb-6 flex items-center gap-2 text-slate-500">
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        Loading assessment…
+                      </div>
+                    ) : null}
+                    {quizData ? (
+                      <>
+                        {!quizResult ? (
+                          <QuizPlayer
+                            quiz={quizData}
+                            variant={isOnboardingProgram ? 'enterprise' : 'default'}
+                            // Return the promise, do NOT `void` it. `void submitQuiz(a)` discards
+                            // the promise, so QuizPlayer's `await onSubmit(...)` resolved instantly
+                            // and its in-flight double-submit guard protected a near-zero window —
+                            // which is the whole point of the guard, since a quiz allows 3 attempts
+                            // and one double-click on a slow connection spends two of them.
+                            onSubmit={(a) => submitQuiz(a)}
                           />
-                        ) : (
-                          <>
-                            <LessonFooterNav
-                              hasPrev={Boolean(prevLesson)}
-                              hasNext={Boolean(nextLesson)}
-                              onPrev={() => prevLesson && selectLesson(prevLesson.id)}
-                              onNext={() => nextLesson && selectLesson(nextLesson.id)}
-                              completed={Boolean(currentMeta?.completed)}
-                              saving={savingComplete}
-                              onComplete={() => void toggleComplete(true)}
-                              onShare={openLessonSharePrompt}
-                              error={completeError}
-                            />
-                            <LearnerLessonNotes
+                        ) : null}
+                        {quizResult ? (
+                          isOnboardingProgram ? (
+                            // WS1 fix 5 (GP-544): every completion action clears Margot; see LessonFooterNav.
+                            <div className="lesson-footer-nav mt-6 pb-24">
+                              <EnterpriseQuizResult
+                                passed={quizResult.passed}
+                                scorePercent={quizResult.score_percent}
+                                passPercentage={quizData.pass_percentage}
+                                onContinue={handleQuizContinue}
+                              />
+                              {completeError ? (
+                                <p role="alert" className="mt-2 text-sm text-red-600">
+                                  {completeError}
+                                </p>
+                              ) : null}
+                            </div>
+                          ) : (
+                            // WS1 fix 5 (GP-544): every completion action clears Margot; see LessonFooterNav.
+                            <div className="lesson-footer-nav mt-6 space-y-3 pb-24">
+                              <LearnerQuizResult
+                                passed={quizResult.passed}
+                                scorePercent={quizResult.score_percent}
+                                passPercentage={
+                                  quizResult.pass_percentage ?? quizData.pass_percentage
+                                }
+                                correctCount={quizResult.correct_count}
+                                questionCount={
+                                  quizResult.question_count ?? quizData.questions.length
+                                }
+                                attemptsRemaining={quizResult.attempts_remaining}
+                                saving={savingComplete}
+                                onContinue={handleQuizContinue}
+                                onReview={
+                                  prevLesson ? () => selectLesson(prevLesson.id) : undefined
+                                }
+                              />
+                              {completeError ? (
+                                <p role="alert" className="text-sm text-red-600">
+                                  {completeError}
+                                </p>
+                              ) : null}
+                            </div>
+                          )
+                        ) : null}
+                      </>
+                    ) : (
+                      <LessonPlayer
+                        lesson={lessonDetail.lesson}
+                        resources={lessonDetail.resources}
+                        variant={isOnboardingProgram ? 'enterprise' : 'default'}
+                        moduleTitle={activeModule?.title}
+                        completed={currentMeta?.completed}
+                        lessonNumber={lessonPosition?.current}
+                        totalLessons={lessonPosition?.total}
+                        moduleLessonNumber={moduleLessonPosition?.current}
+                        moduleLessonTotal={moduleLessonPosition?.total}
+                        courseProgressPercent={isOnboardingProgram ? onboardingProgressPct : null}
+                        footer={
+                          isOnboardingProgram ? (
+                            <EnterpriseLessonFooter
                               noteText={noteText}
                               onNoteChange={setNoteText}
                               noteEditorRef={noteEditorRef}
@@ -949,13 +926,49 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                               savingNote={savingNote}
                               deletingNote={deletingNote}
                               noteStatus={noteStatus}
+                              onPrevious={() => prevLesson && selectLesson(prevLesson.id)}
+                              onNext={() => nextLesson && selectLesson(nextLesson.id)}
+                              hasPrevious={Boolean(prevLesson)}
+                              hasNext={Boolean(nextLesson)}
+                              onShare={openLessonSharePrompt}
+                              showShare={Boolean(currentMeta?.completed)}
+                              onComplete={() => void toggleComplete(true)}
+                              savingComplete={savingComplete}
+                              completed={Boolean(currentMeta?.completed)}
                             />
-                          </>
-                        )
-                      }
-                    />
-                  )}
-                </article>
+                          ) : null
+                        }
+                      />
+                    )}
+                  </article>
+                  {!isOnboardingProgram && !quizData ? (
+                    <>
+                      <LessonFooterNav
+                        hasPrev={Boolean(prevLesson)}
+                        hasNext={Boolean(nextLesson)}
+                        onPrev={() => prevLesson && selectLesson(prevLesson.id)}
+                        onNext={() => nextLesson && selectLesson(nextLesson.id)}
+                        completed={Boolean(currentMeta?.completed)}
+                        saving={savingComplete}
+                        onComplete={() => void toggleComplete(true)}
+                        onShare={openLessonSharePrompt}
+                        error={completeError}
+                      />
+                      <LearnerLessonNotes
+                        noteText={noteText}
+                        onNoteChange={setNoteText}
+                        noteEditorRef={noteEditorRef}
+                        onFormat={applyFormat}
+                        onSaveNote={() => void saveLessonNote()}
+                        onDeleteNote={() => void deleteLessonNote()}
+                        loadingNote={loadingNote}
+                        savingNote={savingNote}
+                        deletingNote={deletingNote}
+                        noteStatus={noteStatus}
+                      />
+                    </>
+                  ) : null}
+                </>
               ) : null}
             </>
           ) : (
