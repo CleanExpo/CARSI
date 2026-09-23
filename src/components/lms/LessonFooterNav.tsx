@@ -29,7 +29,7 @@ export const LESSON_FOOTER_ACTIONS_CLASS =
   'flex flex-wrap items-center justify-start gap-2 sm:gap-3';
 
 const navBtn =
-  'h-11 gap-1.5 rounded-lg border border-slate-300 bg-transparent px-4 text-sm font-medium text-slate-700 shadow-none hover:bg-slate-50 hover:text-slate-950 disabled:opacity-40';
+  'h-11 gap-1.5 rounded-full border border-slate-300 bg-white px-4 text-sm font-medium text-slate-700 shadow-none hover:border-sky-300 hover:bg-sky-50 hover:text-slate-950 disabled:opacity-40';
 
 export function LessonFooterNav({
   hasPrev,
@@ -77,7 +77,7 @@ export function LessonFooterNav({
                 type="button"
                 variant="outline"
                 onClick={onShare}
-                className="h-11 gap-1.5 rounded-lg border-[#146fc2] bg-white px-4 text-sm font-medium text-[#146fc2] shadow-none hover:bg-[#eef7ff]"
+                className="h-11 gap-1.5 rounded-full border-[#146fc2] bg-white px-4 text-sm font-medium text-[#146fc2] shadow-none hover:bg-[#eef7ff]"
               >
                 <Share2 className="h-4 w-4" aria-hidden />
                 Share progress
@@ -87,7 +87,7 @@ export function LessonFooterNav({
               type="button"
               disabled={saving || completed}
               className={cn(
-                'h-11 gap-1.5 rounded-lg px-6 text-sm font-semibold shadow-none disabled:opacity-50',
+                'h-11 gap-1.5 rounded-full px-6 text-sm font-semibold shadow-none disabled:opacity-50',
                 completed
                   ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-100'
                   : 'bg-[#146fc2] text-white hover:bg-[#0f5fa8]'
