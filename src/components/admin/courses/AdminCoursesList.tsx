@@ -28,6 +28,7 @@ import {
   uniqueSortedLabels,
   type AdminCourseCecFilter,
   type AdminCourseListFilters,
+  type AdminCourseListRow,
   type AdminCoursePriceFilter,
   type AdminCourseSortKey,
   type AdminCourseStatusFilter,
@@ -36,28 +37,7 @@ import {
 import { normalizeImageSrcForApp } from '@/lib/remote-image';
 import { cn } from '@/lib/utils';
 
-type Row = {
-  id: string;
-  slug: string;
-  title: string;
-  thumbnailUrl: string | null;
-  moduleCount: number;
-  isFree: boolean;
-  priceAud: number;
-  published: boolean;
-  workflow_status?: 'draft' | 'in_review' | 'published';
-  updatedAt: string;
-  category?: string | null;
-  level?: string | null;
-  iicrcDiscipline?: string | null;
-  cecHoursLabel?: string | null;
-  durationHours?: string | null;
-  resolvedCecHours?: string | null;
-  cecMissing?: boolean;
-  cecExcluded?: boolean;
-  resolvedDurationHours?: string | null;
-  durationMissing?: boolean;
-};
+type Row = AdminCourseListRow;
 
 function AdminCourseListThumb({
   thumbnailUrl,
@@ -923,7 +903,7 @@ export function AdminCoursesList() {
             >
               <div className="relative aspect-video overflow-hidden bg-black/40">
                 <AdminCourseListThumb
-                  thumbnailUrl={c.thumbnailUrl}
+                  thumbnailUrl={c.thumbnailUrl ?? null}
                   eager={index < 9}
                   title={c.title}
                   moduleCount={c.moduleCount}

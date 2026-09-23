@@ -8,6 +8,7 @@ export type AdminCourseListRow = {
   id: string;
   slug: string;
   title: string;
+  thumbnailUrl?: string | null;
   moduleCount: number;
   isFree: boolean;
   priceAud: number;
@@ -16,9 +17,14 @@ export type AdminCourseListRow = {
   updatedAt: string;
   category?: string | null;
   level?: string | null;
+  iicrcDiscipline?: string | null;
+  cecHoursLabel?: string | null;
+  durationHours?: string | null;
+  resolvedCecHours?: string | null;
   cecMissing?: boolean;
   cecExcluded?: boolean;
-  resolvedCecHours?: string | null;
+  resolvedDurationHours?: string | null;
+  durationMissing?: boolean;
 };
 
 export type AdminCourseListFilters = {
@@ -133,7 +139,10 @@ export function matchesAdminCourseFilters(
 
   const q = filters.q.trim().toLowerCase();
   if (!q) return true;
-  const hay = [row.title, row.slug, row.category, row.level].filter(Boolean).join(' ').toLowerCase();
+  const hay = [row.title, row.slug, row.category, row.level]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
   return hay.includes(q);
 }
 
@@ -186,7 +195,10 @@ export function summariseAdminCourses(rows: AdminCourseListRow[]) {
   return { total: rows.length, published, draft, inReview, cecMissing, free, paid };
 }
 
-export function uniqueSortedLabels(rows: AdminCourseListRow[], key: 'category' | 'level'): string[] {
+export function uniqueSortedLabels(
+  rows: AdminCourseListRow[],
+  key: 'category' | 'level'
+): string[] {
   const set = new Set<string>();
   for (const row of rows) {
     const v = row[key]?.trim();
