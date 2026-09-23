@@ -15,7 +15,7 @@ export function LearnerCourseProgress({
 
   return (
     <div
-      className="flex items-center gap-3 rounded-2xl border border-[#2490ed]/20 bg-gradient-to-br from-[#eef7ff] via-white to-white px-3 py-2.5 shadow-[0_8px_24px_-16px_rgba(20,111,194,0.55)]"
+      className="learner-home-surface learner-home-card flex items-center gap-3 rounded-2xl px-3 py-2.5"
       role="progressbar"
       aria-valuemin={0}
       aria-valuemax={100}
@@ -24,7 +24,7 @@ export function LearnerCourseProgress({
     >
       <div className="relative h-14 w-14 shrink-0">
         <svg width="56" height="56" viewBox="0 0 56 56" className="-rotate-90" aria-hidden>
-          <circle cx="28" cy="28" r={RING} fill="none" stroke="#dbeafe" strokeWidth="5" />
+          <circle cx="28" cy="28" r={RING} fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="5" />
           <circle
             cx="28"
             cy="28"
@@ -39,25 +39,25 @@ export function LearnerCourseProgress({
           />
           <defs>
             <linearGradient id="learner-progress-ring" x1="0" y1="0" x2="56" y2="56">
-              <stop offset="0%" stopColor="#146fc2" />
+              <stop offset="0%" stopColor="#7dd3fc" />
               <stop offset="100%" stopColor="#2490ed" />
             </linearGradient>
           </defs>
         </svg>
-        <span className="absolute inset-0 flex items-center justify-center text-[11px] font-semibold text-[#146fc2] tabular-nums">
+        <span className="absolute inset-0 flex items-center justify-center text-[11px] font-semibold text-white tabular-nums">
           {pct}%
         </span>
       </div>
       <div className="min-w-0 sm:w-44">
-        <p className="text-sm font-semibold text-slate-900">
+        <p className="text-sm font-semibold text-white">
           {pct === 100 ? 'Course complete' : 'In progress'}
         </p>
-        <p className="mt-0.5 text-xs text-slate-500">
+        <p className="mt-0.5 text-xs text-slate-300/80">
           {done} of {total} lesson{total === 1 ? '' : 's'}
         </p>
-        <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-100">
-          <div
-            className="h-full rounded-full bg-gradient-to-r from-[#146fc2] to-[#2490ed] transition-[width] duration-500 ease-out"
+        <div className="learner-home-bar mt-2 h-1.5 overflow-hidden rounded-full bg-white/10">
+          <i
+            className="rounded-full bg-gradient-to-r from-sky-300 to-[#2490ed] transition-[width] duration-500 ease-out"
             style={{ width: `${pct}%` }}
           />
         </div>
