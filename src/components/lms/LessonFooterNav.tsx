@@ -1,8 +1,9 @@
 'use client';
 
-import { ChevronLeft, ChevronRight, Share2 } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, Share2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 /**
  * The lesson page's footer: Previous / Next, then the completion actions (WS1 fix 5, GP-544).
@@ -36,7 +37,8 @@ export const LESSON_FOOTER_ROW_CLASS =
   'lesson-footer-nav mt-8 flex flex-col gap-4 border-t border-slate-200 pt-6 pb-24 sm:flex-row sm:flex-wrap sm:items-center sm:justify-start sm:gap-6';
 
 /** The completion actions: left-aligned, beside Previous / Next. */
-export const LESSON_FOOTER_ACTIONS_CLASS = 'flex flex-wrap items-center justify-start gap-2 sm:gap-3';
+export const LESSON_FOOTER_ACTIONS_CLASS =
+  'flex flex-wrap items-center justify-start gap-2 sm:gap-3';
 
 export function LessonFooterNav({
   hasPrev,
@@ -51,52 +53,65 @@ export function LessonFooterNav({
 }: LessonFooterNavProps) {
   return (
     <div className={LESSON_FOOTER_ROW_CLASS} data-testid="lesson-footer">
-      <div className="flex flex-wrap gap-2">
-        <Button
-          type="button"
-          variant="outline"
-          disabled={!hasPrev}
-          className="gap-1 border-slate-300 text-slate-700"
-          onClick={onPrev}
-        >
-          <ChevronLeft className="h-4 w-4" />
-          Previous
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          disabled={!hasNext}
-          className="gap-1 border-slate-300 text-slate-700"
-          onClick={onNext}
-        >
-          Next
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-      </div>
-      <div className={LESSON_FOOTER_ACTIONS_CLASS} data-testid="lesson-footer-actions">
-        {completed ? (
+      <div
+        className={cn(
+          'sticky bottom-6 z-20 inline-flex max-w-full flex-wrap items-center justify-start gap-2 rounded-2xl border px-2 py-2 shadow-[0_10px_40px_-12px_rgba(15,23,42,0.28)] backdrop-blur-md',
+          completed ? 'border-emerald-200 bg-emerald-50/90' : 'border-slate-200/90 bg-white/95'
+        )}
+      >
+        <div className="flex flex-wrap items-center gap-1">
           <Button
             type="button"
             variant="outline"
-            onClick={onShare}
-            className="gap-1.5 border-[#2490ed]/35 bg-[#2490ed]/10 text-[#146fc2] hover:bg-[#2490ed]/20"
+            disabled={!hasPrev}
+            className="h-11 gap-1 rounded-xl border-slate-200 bg-white px-3.5 text-slate-700 shadow-sm"
+            onClick={onPrev}
           >
-            <Share2 className="h-4 w-4" aria-hidden />
-            Share progress
+            <ChevronLeft className="h-4 w-4" />
+            Previous
           </Button>
-        ) : null}
-        <Button
-          type="button"
-          disabled={saving || completed}
-          className="rounded-md bg-emerald-600 text-white hover:bg-emerald-500 disabled:opacity-50"
-          onClick={onComplete}
-        >
-          {completed
-            ? 'Lesson completed'
-            : hasNext
-              ? 'Mark complete & continue'
-              : 'Mark lesson complete'}
-        </Button>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={!hasNext}
+            className="h-11 gap-1 rounded-xl border-slate-200 bg-white px-3.5 text-slate-700 shadow-sm"
+            onClick={onNext}
+          >
+            Next
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+        <div className={LESSON_FOOTER_ACTIONS_CLASS} data-testid="lesson-footer-actions">
+          {completed ? (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onShare}
+              className="h-11 gap-1.5 rounded-xl border-[#2490ed]/35 bg-[#eef7ff] px-3.5 text-[#146fc2] hover:bg-[#dceeff]"
+            >
+              <Share2 className="h-4 w-4" aria-hidden />
+              Share progress
+            </Button>
+          ) : null}
+          <Button
+            type="button"
+            disabled={saving || completed}
+            className={cn(
+              'h-11 gap-1.5 rounded-xl px-5 text-[15px] font-semibold shadow-md disabled:opacity-50',
+              completed
+                ? 'bg-emerald-100 text-emerald-800 shadow-none hover:bg-emerald-100'
+                : 'bg-emerald-600 text-white hover:bg-emerald-500'
+            )}
+            onClick={onComplete}
+          >
+            {completed
+              ? 'Lesson completed'
+              : hasNext
+                ? 'Mark complete & continue'
+                : 'Mark lesson complete'}
+            <Check className="h-4 w-4" aria-hidden />
+          </Button>
+        </div>
       </div>
       {error ? (
         <p role="alert" className="w-full text-left text-sm text-red-600">
