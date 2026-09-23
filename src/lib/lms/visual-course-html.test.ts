@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { persistVisualMarks, promoteAtxHeadings, sourceToEditorHtml } from './visual-course-html';
+import {
+  persistVisualMarks,
+  promoteAtxHeadings,
+  promoteInlineTopicLines,
+  sourceToEditorHtml,
+  sourceToStudentHtml,
+} from './visual-course-html';
 
 describe('sourceToEditorHtml', () => {
   it('turns Markdown headings into real heading tags', () => {
@@ -40,6 +46,26 @@ describe('persistVisualMarks', () => {
       '<h1>Title</h1><p>Wear <span style="font-weight:700">PPE</span> on site.</p>'
     );
     expect(html).toMatch(/<strong>PPE<\/strong>/);
+  });
+});
+
+describe('sourceToStudentHtml', () => {
+  it('keeps admin HTML headings and lists', () => {
+    const html = sourceToStudentHtml(
+      '<h3>Learning objectives</h3><p>By the end of this course you will be able to:</p><ul><li>Identify bonding damage.</li></ul>'
+    );
+    expect(html).toMatch(/<h3>/i);
+    expect(html).toMatch(/<ul>/i);
+    expect(html).toContain('Learning objectives');
+    expect(html).not.toContain('&lt;h3&gt;');
+  });
+
+  it('turns a topic label above a br into a heading', () => {
+    const html = promoteInlineTopicLines(
+      '<p>Bonding Damage<br/>Prolonged moisture exposure across aged joints.</p>'
+    );
+    expect(html).toMatch(/<h3>Bonding Damage<\/h3>/);
+    expect(html).toMatch(/<p>Prolonged moisture/);
   });
 });
 
