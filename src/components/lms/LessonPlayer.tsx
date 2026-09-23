@@ -4,20 +4,20 @@ import { Download } from 'lucide-react';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
-import { Badge } from '@/components/ui/badge';
 import { CourseFormattedBody } from '@/components/lms/CourseFormattedBody';
 import { DriveFileViewer } from '@/components/lms/DriveFileViewer';
 import { FlashcardDeck } from '@/components/lms/FlashcardDeck';
 import { SlideDeckViewer } from '@/components/lms/SlideDeckViewer';
+import { EnterpriseLessonContent } from '@/components/onboarding/EnterpriseLessonContent';
+import { EnterpriseLessonHeader } from '@/components/onboarding/EnterpriseLessonHeader';
+import { EnterpriseLessonSidebar } from '@/components/onboarding/EnterpriseLessonSidebar';
+import { Badge } from '@/components/ui/badge';
 import { dash } from '@/lib/dashboard-light-ui';
 import {
   isFlashcardResource,
   isSlidesResource,
   type LessonResource,
 } from '@/lib/lms/lesson-resources';
-import { EnterpriseLessonContent } from '@/components/onboarding/EnterpriseLessonContent';
-import { EnterpriseLessonHeader } from '@/components/onboarding/EnterpriseLessonHeader';
-import { EnterpriseLessonSidebar } from '@/components/onboarding/EnterpriseLessonSidebar';
 import { cn } from '@/lib/utils';
 
 interface Lesson {
@@ -103,11 +103,14 @@ export function LessonPlayer({
               />
             ))}
             {flashcardDecks.map((deck, i) => (
-              <FlashcardDeck key={`flashcards-${i}`} label={deck.label} cards={deck.cards} enterprise />
+              <FlashcardDeck
+                key={`flashcards-${i}`}
+                label={deck.label}
+                cards={deck.cards}
+                enterprise
+              />
             ))}
-            {downloads.length > 0 ? (
-              <DownloadsPanel downloads={downloads} enterprise />
-            ) : null}
+            {downloads.length > 0 ? <DownloadsPanel downloads={downloads} enterprise /> : null}
           </div>
           <aside className="xl:sticky xl:top-6">
             <EnterpriseLessonSidebar
@@ -186,7 +189,7 @@ function renderDefaultContent(lesson: Lesson) {
       if (!lesson.drive_file_id) return <p className="text-slate-500">No file attached.</p>;
       return <DriveFileViewer driveFileId={lesson.drive_file_id} />;
     default:
-      return <CourseFormattedBody text={lesson.content_body} tone="light" />;
+      return <CourseFormattedBody text={lesson.content_body} tone="light" layout="article" />;
   }
 }
 
