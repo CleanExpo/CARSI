@@ -924,43 +924,149 @@ html[data-margot-open] .lesson-footer-nav {
 .learner-home {
   position: relative;
 }
-.learner-home-mesh {
+.learner-home::before {
+  content: '';
   pointer-events: none;
   position: absolute;
-  inset: -4rem -2rem auto;
+  inset: -5rem -2rem auto;
   height: 28rem;
   background:
-    radial-gradient(42rem 22rem at 8% -10%, rgba(36, 144, 237, 0.18), transparent 62%),
-    radial-gradient(36rem 20rem at 92% 0%, rgba(99, 102, 241, 0.12), transparent 58%),
-    radial-gradient(28rem 16rem at 50% 40%, rgba(14, 165, 233, 0.08), transparent 70%);
-  filter: blur(8px);
+    radial-gradient(36rem 20rem at 6% -8%, rgba(36, 144, 237, 0.16), transparent 64%),
+    radial-gradient(28rem 16rem at 92% 0%, rgba(99, 102, 241, 0.1), transparent 60%);
+  filter: blur(10px);
 }
-.learner-home-glass {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.72));
-  backdrop-filter: blur(18px) saturate(140%);
-  -webkit-backdrop-filter: blur(18px) saturate(140%);
-  border: 1px solid rgba(255, 255, 255, 0.7);
+.learner-home-surface {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(32rem 18rem at 0% -30%, rgba(125, 211, 252, 0.38), transparent 58%),
+    radial-gradient(26rem 16rem at 110% -10%, rgba(129, 140, 248, 0.32), transparent 50%),
+    radial-gradient(22rem 14rem at 80% 130%, rgba(14, 165, 233, 0.22), transparent 52%),
+    linear-gradient(160deg, #243656 0%, #121c30 42%, #0a1220 100%);
+  border: 1px solid rgba(186, 230, 253, 0.22);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.8) inset,
-    0 18px 40px -28px rgba(15, 23, 42, 0.28);
+    0 1px 0 rgba(255, 255, 255, 0.16) inset,
+    0 0 0 1px rgba(8, 47, 73, 0.35),
+    0 28px 60px -24px rgba(14, 116, 184, 0.55);
+  color: #f8fafc;
+}
+.learner-home-surface::before {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
+  background-size:
+    34px 34px,
+    34px 34px,
+    160px 160px;
+  mix-blend-mode: soft-light;
+  mask-image: radial-gradient(90% 80% at 85% -10%, #000 10%, transparent 78%);
+}
+.learner-home-surface::after {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  width: 22rem;
+  height: 22rem;
+  right: -6rem;
+  top: -8rem;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 40% 40%, rgba(186, 230, 253, 0.55), transparent 42%),
+    radial-gradient(circle at 70% 70%, rgba(99, 102, 241, 0.28), transparent 58%);
+  filter: blur(8px);
+  animation: learner-orb 16s ease-in-out infinite;
+}
+.learner-home-surface > * {
+  position: relative;
+  z-index: 1;
+}
+.learner-home-surface--hero {
+  background:
+    radial-gradient(36rem 20rem at -5% -40%, rgba(125, 211, 252, 0.5), transparent 55%),
+    radial-gradient(28rem 18rem at 108% 0%, rgba(167, 139, 250, 0.32), transparent 48%),
+    radial-gradient(24rem 16rem at 50% 120%, rgba(14, 165, 233, 0.28), transparent 50%),
+    linear-gradient(155deg, #2a4468 0%, #152338 46%, #0b1526 100%);
+}
+.learner-home-inset {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03));
+  border: 1px solid rgba(186, 230, 253, 0.16);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset;
+}
+.learner-home-hero-panel {
+  background:
+    radial-gradient(18rem 14rem at 50% 30%, rgba(56, 189, 248, 0.22), transparent 62%),
+    linear-gradient(180deg, rgba(8, 47, 73, 0.35), rgba(15, 23, 42, 0.15));
+  border-left: 1px solid rgba(186, 230, 253, 0.14);
+}
+.learner-home-thumb {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(18rem 10rem at 18% -10%, rgba(224, 242, 254, 0.55), transparent 52%),
+    radial-gradient(14rem 9rem at 92% 90%, rgba(99, 102, 241, 0.5), transparent 58%),
+    linear-gradient(135deg, #2563eb 0%, #0ea5e9 46%, #082f49 100%);
+}
+.learner-home-thumb::before {
+  content: '';
+  position: absolute;
+  inset: -30%;
+  background: repeating-radial-gradient(
+    circle at 72% 28%,
+    rgba(255, 255, 255, 0.2) 0 1px,
+    transparent 1px 22px
+  );
+}
+.learner-home-thumb::after {
+  content: '';
+  position: absolute;
+  width: 10rem;
+  height: 10rem;
+  right: -1.25rem;
+  bottom: -2.25rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow:
+    0 0 0 16px rgba(255, 255, 255, 0.07),
+    0 0 0 32px rgba(255, 255, 255, 0.04);
+}
+.learner-home-thumb--indigo {
+  background:
+    radial-gradient(16rem 10rem at 85% -10%, rgba(237, 233, 254, 0.5), transparent 52%),
+    linear-gradient(145deg, #4f46e5 0%, #2563eb 48%, #1e1b4b 100%);
+}
+.learner-home-thumb--teal {
+  background:
+    radial-gradient(16rem 10rem at 8% 110%, rgba(153, 246, 228, 0.42), transparent 52%),
+    linear-gradient(155deg, #0e7490 0%, #0284c7 48%, #042f2e 100%);
 }
 .learner-home-card {
   transition:
-    transform 240ms ease,
-    box-shadow 240ms ease,
-    border-color 240ms ease;
+    transform 280ms ease,
+    box-shadow 280ms ease,
+    border-color 280ms ease;
 }
 .learner-home-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-4px);
+  border-color: rgba(186, 230, 253, 0.42);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.9) inset,
-    0 22px 50px -24px rgba(20, 111, 194, 0.28);
+    0 1px 0 rgba(255, 255, 255, 0.2) inset,
+    0 32px 64px -22px rgba(14, 165, 233, 0.5);
+}
+.learner-home-bar {
+  box-shadow: 0 0 0 1px rgba(186, 230, 253, 0.08) inset;
 }
 .learner-home-bar > i {
   display: block;
   height: 100%;
   transform-origin: left center;
   animation: learner-bar-in 800ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.75);
 }
 .learner-home-rings {
   animation: learner-ring-drift 18s ease-in-out infinite;
