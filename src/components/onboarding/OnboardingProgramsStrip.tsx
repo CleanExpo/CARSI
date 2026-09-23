@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react';
 
 import { OnboardingSpotlight, type OnboardingSpotlightProgram } from '@/components/onboarding/OnboardingSpotlight';
 import { apiClient } from '@/lib/api/client';
-import { dash } from '@/lib/dashboard-light-ui';
 
 export function OnboardingProgramsStrip() {
   const [programs, setPrograms] = useState<OnboardingSpotlightProgram[] | null>(null);
@@ -20,7 +19,7 @@ export function OnboardingProgramsStrip() {
 
   if (programs === null) {
     return (
-      <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-6 text-sm text-slate-500">
+      <div className="learner-home-surface flex items-center gap-2 rounded-[1.25rem] px-5 py-6 text-sm text-slate-300">
         <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
         Loading organisation programs…
       </div>
@@ -36,7 +35,7 @@ export function OnboardingQuickLink() {
   return (
     <Link
       href="/dashboard/onboarding"
-      className={`${dash.btnSecondary} gap-2 border-[#2490ed]/25 bg-[#eef7ff]/50 text-[#146fc2] hover:bg-[#eef7ff]`}
+      className="inline-flex min-h-11 items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-sky-300 hover:text-[#146fc2]"
     >
       <Building2 className="h-4 w-4" aria-hidden />
       Organisation onboarding
