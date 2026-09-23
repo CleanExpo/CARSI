@@ -5,6 +5,7 @@ import {
   getLearnerDashboardSummary,
   getResumeSnapshotForStudent,
 } from '@/lib/server/learner-dashboard-data';
+import { getLearnerLevelPayload } from '@/lib/server/learner-xp';
 import { listOnboardingProgramsForUser } from '@/lib/server/onboarding-programs';
 import { getNextCourseRecommendationsForStudent } from '@/lib/server/renewal-summary';
 import { getServerSessionClaims } from '@/lib/server/session-server';
@@ -27,6 +28,14 @@ export default async function DashboardPage() {
   const resume = userId && dbConfigured ? await getResumeSnapshotForStudent(userId) : null;
   const recommendations =
     userId && dbConfigured ? await getNextCourseRecommendationsForStudent(userId) : [];
+  let streakDays = 0;
+  if (userId && dbConfigured) {
+    try {
+      streakDays = (await getLearnerLevelPayload(userId)).current_streak;
+    } catch {
+      streakDays = 0;
+    }
+  }
 
   return (
     <DashboardLearningSection
@@ -37,6 +46,7 @@ export default async function DashboardPage() {
       onboardingPrograms={onboardingPrograms}
       dbConfigured={dbConfigured}
       enrolmentQueryFailed={enrolmentQueryFailed}
+      streakDays={streakDays}
     />
   );
 }
