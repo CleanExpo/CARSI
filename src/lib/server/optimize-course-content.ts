@@ -31,8 +31,9 @@ export class OptimizeCourseError extends Error {
 
 const META_KEY = 'optimizeDraft';
 export const OPTIMIZE_APPLIED_META_KEY = 'optimizeAppliedAt';
+export const OPTIMIZE_BEFORE_META_KEY = 'optimizeBefore';
 const MIN_MODULES = 7;
-const MAX_MODULES = 10;
+const MAX_MODULES = 24;
 export const RECAP_MODULE_TITLE = 'What you learnt';
 const MAX_MODULE_SOURCE_CHARS = 4_500;
 const MAX_TOTAL_SOURCE_CHARS = 22_000;
@@ -75,7 +76,8 @@ Rules you must follow:
 - Use the supplied course as the only factual foundation. Expand explanation and practical application. Do not invent personal stories, certifications, qualifications, statistics, CEC hours, IICRC approvals, or claims that are not in the source.
 - You may write in a field-tech voice. Do not claim to be Phill McGurk or invent his (or anyone's) credentials.
 - Keep the course title, learning intent, discipline, and audience unchanged.
-- Keep existing module titles. You may add extra modules so the course has 7-10 modules, staying on the same subject.
+- Keep existing module titles. Expand to the asked module count. The last module is always the recap.
+- Paying customers need usable training, not a wall of theory. Each module must include: a realistic job-site scenario, at least one short quotation of what a customer, assessor or tech would actually say, and a practical example of how to handle it. Do not invent named people, certifications, statistics or standards. Typical dialogue is fine if it is clearly an example.
 - Never paste IICRC standard sections, tables, or procedures. Nominative mention only (e.g. "aligned to ANSI/IICRC S500") if the source already does that.
 - Never imply CARSI delivers IICRC certification or IICRC courses. If CEC is not in the source, do not add CEC hours.
 - Do not brand the course with IICRC discipline acronyms (WRT, ASD, AMRT, FSRT, CCT, TCST).
@@ -224,10 +226,18 @@ export function ensureModuleParagraphs(text: string): string {
   return chunks.join('\n\n');
 }
 
-export function targetModuleCount(existingCount: number): number {
-  if (existingCount >= MIN_MODULES && existingCount <= MAX_MODULES) return existingCount;
-  if (existingCount > MAX_MODULES) return MAX_MODULES;
-  return 8;
+/** Higher AUD price buys a denser course. */
+export function targetModuleCount(existingCount: number, priceAud = 0): number {
+  const paidWell = priceAud >= 199;
+  const premium = priceAud >= 399;
+
+  if (existingCount >= 10) {
+    const floor = premium ? 18 : paidWell ? 16 : 15;
+    return Math.min(MAX_MODULES, Math.max(floor, existingCount + 5));
+  }
+  if (existingCount === 8 || existingCount === 9) return 10;
+  if (existingCount <= 5) return paidWell ? 9 : 8;
+  return paidWell ? 10 : 9;
 }
 
 export function parseTitleList(raw: string): string[] {
@@ -246,8 +256,12 @@ export function isRecapModuleTitle(title: string): boolean {
   return /\bwhat you learn|\brecap\b|\bkey takeaways?\b/i.test(title);
 }
 
-export function planModuleTitles(existingTitles: string[], suggested: string[]): string[] {
-  const target = targetModuleCount(existingTitles.length);
+export function planModuleTitles(
+  existingTitles: string[],
+  suggested: string[],
+  priceAud = 0
+): string[] {
+  const target = targetModuleCount(existingTitles.length, priceAud);
   const bodyTarget = Math.max(MIN_MODULES - 1, target - 1);
   const out: string[] = [];
   const seen = new Set<string>();
@@ -352,6 +366,46 @@ export function hasOptimizeApplied(meta: unknown): boolean {
   return typeof (meta as Record<string, unknown>)[OPTIMIZE_APPLIED_META_KEY] === 'string';
 }
 
+export function readOptimizeAppliedAt(meta: unknown): string | null {
+  if (!meta || typeof meta !== 'object' || Array.isArray(meta)) return null;
+  const v = (meta as Record<string, unknown>)[OPTIMIZE_APPLIED_META_KEY];
+  return typeof v === 'string' && v.trim() ? v : null;
+}
+
+/** Paid courses only. Re-run only when never applied, or the course was edited after apply. */
+export function paidCourseNeedsOptimize(input: {
+  isFree: boolean;
+  updatedAt: Date;
+  meta: unknown;
+}): boolean {
+  if (input.isFree) return false;
+  const applied = readOptimizeAppliedAt(input.meta);
+  if (!applied) return true;
+  const appliedMs = Date.parse(applied);
+  if (!Number.isFinite(appliedMs)) return true;
+  return input.updatedAt.getTime() > appliedMs + 3_000;
+}
+
+export async function snapshotCourseBeforeOptimize(
+  courseId: string,
+  existingMeta: unknown,
+  modules: Array<{ title: string; textContent: string }>
+): Promise<void> {
+  const next = metaObject(existingMeta);
+  next[OPTIMIZE_BEFORE_META_KEY] = {
+    snapshotAt: new Date().toISOString(),
+    moduleCount: modules.length,
+    modules: modules.map((m) => ({
+      title: m.title,
+      textContent: m.textContent.slice(0, 8_000),
+    })),
+  };
+  await prisma.lmsCourse.update({
+    where: { id: courseId },
+    data: { meta: JSON.parse(JSON.stringify(next)) as Prisma.InputJsonValue },
+  });
+}
+
 function metaObject(meta: unknown): Record<string, unknown> {
   if (meta && typeof meta === 'object' && !Array.isArray(meta)) {
     return { ...(meta as Record<string, unknown>) };
@@ -442,27 +496,37 @@ export async function generateOptimizedCourseDraft(
 
   const foundation = foundationFromCourse(dto);
   const existingTitles = dto.modules.map((m) => m.title);
-  const target = targetModuleCount(existingTitles.length);
+  const target = targetModuleCount(existingTitles.length, dto.priceAud);
 
   onProgress?.({ step: 'outline', message: `Planning ${target} modules…`, percent: 16 });
   let suggested: string[] = [];
   if (existingTitles.length < target) {
+    const existingList = existingTitles.map((t, i) => i + 1 + '. ' + t).join('\n') || '(none)';
+    const extraCount = target - existingTitles.length;
     const outlineRaw = await anthropicComplete({
       system: SYSTEM_PROMPT,
       maxTokens: 800,
       timeoutMs: 60_000,
-      user: `List ${target} module titles for this course. Keep every existing title unchanged and in the same order. Add extra titles only to reach ${target}. Same subject only. The last title must be exactly "${RECAP_MODULE_TITLE}".
-
-Existing titles:
-${existingTitles.map((t, i) => `${i + 1}. ${t}`).join('\n') || '(none)'}
-
-${foundation}
-
-Return a numbered list of titles only. No JSON.`,
+      user: [
+        'List ' +
+          target +
+          ' module titles for this course. Keep every existing title unchanged and in the same order. Add ' +
+          extraCount +
+          ' extra titles on the same subject. The last title must be exactly "' +
+          RECAP_MODULE_TITLE +
+          '".',
+        '',
+        'Existing titles:',
+        existingList,
+        '',
+        foundation,
+        '',
+        'Return a numbered list of titles only. No JSON.',
+      ].join('\n'),
     });
     suggested = parseTitleList(outlineRaw);
   }
-  const planned = planModuleTitles(existingTitles, suggested);
+  const planned = planModuleTitles(existingTitles, suggested, dto.priceAud);
 
   const written: OptimizedModuleDraft[] = [];
   for (let i = 0; i < planned.length; i += 1) {
@@ -486,28 +550,33 @@ Return a numbered list of titles only. No JSON.`,
         maxTokens: 4096,
         timeoutMs: 120_000,
         user: isRecap
-          ? `Course: ${dto.title}
-This is the LAST module. Title: ${RECAP_MODULE_TITLE}
-
-It is a recap of what the learner should now be able to do. Cover the earlier modules only — do not introduce a new topic or invent facts.
-
-Earlier modules:
-${planned
-  .slice(0, -1)
-  .map((t, n) => `${n + 1}. ${t}`)
-  .join('\n')}
-
-${foundation}
-
-Write 3–4 substantial paragraphs: what they learnt, how they should handle it on a job, common mistakes to avoid, and what to check before they leave site.
-Return the body as plain text. No JSON. No title line. No markdown fences.`
-          : `Course: ${dto.title}
-Module ${i + 1} of ${planned.length}: ${title}
-
-${existingBody ? `Existing module text (keep the facts):\n${existingBody}` : foundation}
-
-Write 3–4 substantial paragraphs of practical field instruction for this module.
-Return the body as plain text. No JSON. No title line. No markdown fences.`,
+          ? [
+              'Course: ' + dto.title,
+              'This is the LAST module. Title: ' + RECAP_MODULE_TITLE,
+              '',
+              'It is a recap of what the learner should now be able to do. Cover the earlier modules only. Do not introduce a new topic or invent facts.',
+              '',
+              'Earlier modules:',
+              planned
+                .slice(0, -1)
+                .map((t, n) => n + 1 + '. ' + t)
+                .join('\n'),
+              '',
+              foundation,
+              '',
+              'Write 3-4 substantial paragraphs: what they learnt, a job they should now handle, a short example quotation from a customer or assessor, common mistakes, and what to check before they leave site.',
+              'Return the body as plain text. No JSON. No title line. No markdown fences.',
+            ].join('\n')
+          : [
+              'Course: ' + dto.title,
+              'Module ' + (i + 1) + ' of ' + planned.length + ': ' + title,
+              '',
+              existingBody ? 'Existing module text (keep the facts):\n' + existingBody : foundation,
+              '',
+              'Write 3-4 substantial paragraphs a paying technician can use on the next job.',
+              'Include a realistic scenario, at least one short quotation (customer, insurer or tech), and a practical example of what to do. Stay on the source facts. No invented stats, names of real people, or standards text.',
+              'Return the body as plain text. No JSON. No title line. No markdown fences.',
+            ].join('\n'),
       });
       try {
         textContent = ensureModuleParagraphs(extractModuleBody(raw));
@@ -606,11 +675,31 @@ export async function applyOptimizedCourseDraft(
 export async function optimizeAndApplyCourse(courseId: string): Promise<{
   courseId: string;
   title: string;
+  previousModuleCount: number;
   moduleCount: number;
+  summary: string;
 }> {
+  const existing = await adminGetCourse(courseId);
+  if (!existing) throw new OptimizeCourseError('Not found', 404);
+  const dto = courseToAdminDto(existing);
+  if (dto.isFree) {
+    throw new OptimizeCourseError('Free courses are not optimised by cron', 400);
+  }
+  const previousModuleCount = dto.modules.length;
+  await snapshotCourseBeforeOptimize(
+    courseId,
+    existing.meta,
+    dto.modules.map((m) => ({ title: m.title, textContent: m.textContent }))
+  );
   const draft = await generateOptimizedCourseDraft(courseId);
   const course = await applyOptimizedCourseDraft(courseId, draft.token);
-  return { courseId, title: course.title, moduleCount: course.modules.length };
+  const moduleCount = course.modules.length;
+  const added = Math.max(0, moduleCount - previousModuleCount);
+  const summary =
+    added > 0
+      ? `Rewrote ${previousModuleCount} modules and added ${added} (now ${moduleCount}), including a recap and job-site examples.`
+      : `Rewrote ${moduleCount} modules with practical scenarios and a recap.`;
+  return { courseId, title: course.title, previousModuleCount, moduleCount, summary };
 }
 
 export { AnthropicAPIError };

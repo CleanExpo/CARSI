@@ -123,8 +123,10 @@ export function OptimizeCourseReview({ courseId }: Props) {
           <h1 className="text-2xl font-bold text-white sm:text-3xl">Optimize content</h1>
           <p className="max-w-2xl text-sm leading-relaxed text-white/50">{courseTitle}</p>
           <p className="max-w-2xl text-sm leading-relaxed text-white/40">
-            Builds 7–10 modules with 3–4 paragraphs each. The last module is a recap of what you
-            learnt. Pricing and media stay unchanged. Review, then save to the database.
+            Module count follows the current course and its price: about 8-9 from five modules, 10
+            from eight, 15 or more from ten. Higher-priced courses get more modules. Writing
+            includes scenarios and example quotations. The last module is a recap. Review, then
+            save.
           </p>
         </div>
         <div className="flex shrink-0 flex-wrap gap-3">
