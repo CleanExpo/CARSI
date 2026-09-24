@@ -134,6 +134,6 @@ services:
       - key: GOOGLE_CALENDAR_OAUTH_REFRESH_TOKEN
         scope: RUN_TIME
 
-# No scheduled job. Run optimisation only when you fire this curl (hours, not minutes):
-# curl -fsS --max-time 28800 -H "Authorization: Bearer $CRON_SECRET" \
+# No scheduled job. Curl returns in seconds (202). Work + email continue on the app.
+# curl -S -H "Authorization: Bearer $CRON_SECRET" \
 #   "$NEXT_PUBLIC_APP_URL/api/cron/optimize-course-content"

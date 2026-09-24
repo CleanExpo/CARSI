@@ -1,36 +1,49 @@
 import { NextResponse } from 'next/server';
 
 import { requireCron } from '@/lib/server/cron-auth';
-import { OptimizeCourseError } from '@/lib/server/optimize-course-content';
+import { resolveAnthropicConfig } from '@/lib/server/anthropic-client';
 import {
   parseOptimizeCronSearch,
-  runOptimizeCoursesCron,
+  startOptimizeCoursesCron,
 } from '@/lib/server/optimize-courses-cron';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-export const maxDuration = 28800;
 
 /**
- * Manual only. Paid courses that still need optimisation, one after another.
- * One email at the end. Does not schedule itself.
+ * Manual only. Returns immediately so Cloudflare cannot 524.
+ * Work continues on the web service. One email at the end.
  */
 export async function GET(request: Request) {
   const denied = requireCron(request);
   if (denied) return denied;
   if (!process.env.DATABASE_URL?.trim()) {
-    return NextResponse.json({ ok: true, processed: 0, reason: 'no_database' });
+    return NextResponse.json({ ok: true, started: false, reason: 'no_database' });
+  }
+  if (!resolveAnthropicConfig().configured) {
+    return NextResponse.json(
+      { ok: false, detail: 'ANTHROPIC_API_KEY is not configured' },
+      { status: 503 }
+    );
   }
 
   const { limit } = parseOptimizeCronSearch(new URL(request.url));
-  try {
-    const result = await runOptimizeCoursesCron({ limit });
-    return NextResponse.json({ ok: true, ...result, timestamp: new Date().toISOString() });
-  } catch (e) {
-    if (e instanceof OptimizeCourseError) {
-      return NextResponse.json({ ok: false, detail: e.message }, { status: e.status });
-    }
-    console.error('[cron/optimize-course-content]', e);
-    return NextResponse.json({ ok: false, detail: 'Cron failed' }, { status: 500 });
+  const { started } = startOptimizeCoursesCron({ limit });
+  if (!started) {
+    return NextResponse.json({
+      ok: true,
+      started: false,
+      alreadyRunning: true,
+      timestamp: new Date().toISOString(),
+    });
   }
+  return NextResponse.json(
+    {
+      ok: true,
+      started: true,
+      detail: 'Optimising paid courses in the background. You will get one email when it finishes.',
+      timestamp: new Date().toISOString(),
+    },
+    { status: 202 }
+  );
 }

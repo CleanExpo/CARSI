@@ -110,7 +110,8 @@ export async function runOptimizeCoursesCron(opts?: {
   const batch = opts?.limit != null ? pending.slice(0, opts.limit) : pending;
   const results: OptimizeCronRow[] = [];
 
-  for (const course of batch) {
+  for (const [index, course] of batch.entries()) {
+    console.info(`[cron/optimize-course-content] ${index + 1}/${batch.length} ${course.title}`);
     try {
       results.push(await optimizeAndApplyCourse(course.id));
     } catch (e) {
@@ -144,4 +145,31 @@ export async function runOptimizeCoursesCron(opts?: {
   }
 
   return result;
+}
+
+let backgroundRun: Promise<void> | null = null;
+
+export function isOptimizeCronRunning(): boolean {
+  return backgroundRun != null;
+}
+
+/** Starts the catalogue run without holding the HTTP request open (Cloudflare 524). */
+export function startOptimizeCoursesCron(opts?: { limit?: number }): { started: boolean } {
+  if (backgroundRun) return { started: false };
+  backgroundRun = runOptimizeCoursesCron(opts)
+    .then((result) => {
+      console.info('[cron/optimize-course-content] finished', {
+        processed: result.processed,
+        updated: result.updated,
+        failed: result.failed,
+        remaining: result.remaining,
+      });
+    })
+    .catch((e) => {
+      console.error('[cron/optimize-course-content] background failed', e);
+    })
+    .finally(() => {
+      backgroundRun = null;
+    });
+  return { started: true };
 }
