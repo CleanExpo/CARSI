@@ -448,10 +448,14 @@ function foundationFromCourse(dto: ReturnType<typeof courseToAdminDto>): string 
   let used = parts.join('\n\n').length;
   dto.modules.forEach((mod, i) => {
     const body = htmlToPlain(mod.textContent).slice(0, MAX_MODULE_SOURCE_CHARS);
-    const block = `\nModule ${i + 1}: ${mod.title}\n${body || '(no text yet)'}`;
+    const block = '\nModule ' + (i + 1) + ': ' + mod.title + '\n' + (body || '(no text yet)');
     if (used + block.length > MAX_TOTAL_SOURCE_CHARS) {
       parts.push(
-        `\nModule ${i + 1}: ${mod.title}\n(truncated — title only to stay within size limits)`
+        '\nModule ' +
+          (i + 1) +
+          ': ' +
+          mod.title +
+          '\n(truncated, title only to stay within size limits)'
       );
       return;
     }
