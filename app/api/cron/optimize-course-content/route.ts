@@ -12,9 +12,8 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 300;
 
 /**
- * Sequential catalogue optimiser. Each hit processes the next pending course
- * (7–10 modules, 3–4 paragraphs) and writes it to the database.
- * Schedule hourly with `Authorization: Bearer $CRON_SECRET`.
+ * DigitalOcean scheduled job. Paid courses only. Skips already-optimised
+ * courses until they are edited. One course per run.
  */
 export async function GET(request: Request) {
   const denied = requireCron(request);
@@ -23,9 +22,9 @@ export async function GET(request: Request) {
     return NextResponse.json({ ok: true, processed: 0, reason: 'no_database' });
   }
 
-  const { limit, force } = parseOptimizeCronSearch(new URL(request.url));
+  const { limit } = parseOptimizeCronSearch(new URL(request.url));
   try {
-    const result = await runOptimizeCoursesCron({ limit, force });
+    const result = await runOptimizeCoursesCron({ limit });
     return NextResponse.json({ ok: true, ...result, timestamp: new Date().toISOString() });
   } catch (e) {
     if (e instanceof OptimizeCourseError) {
