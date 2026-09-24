@@ -95,6 +95,15 @@ services:
       - key: OPENROUTER_MODEL
         scope: RUN_TIME
 
+      # Course-content optimiser (admin + DigitalOcean scheduled job).
+      # Job hits GET /api/cron/optimize-course-content with Bearer CRON_SECRET.
+      - key: ANTHROPIC_API_KEY
+        scope: RUN_TIME
+      - key: ANTHROPIC_OPTIMIZE_MODEL
+        scope: RUN_TIME
+      - key: CRON_SECRET
+        scope: RUN_TIME
+
       - key: NEXT_PUBLIC_FRONTEND_URL
         scope: RUN_AND_BUILD_TIME
       - key: NEXT_PUBLIC_APP_URL
@@ -123,4 +132,27 @@ services:
       - key: GOOGLE_CALENDAR_CLIENT_SECRET
         scope: RUN_TIME
       - key: GOOGLE_CALENDAR_OAUTH_REFRESH_TOKEN
+        scope: RUN_TIME
+
+jobs:
+  - name: optimize-course-content
+    github:
+      repo: CleanExpo/CARSI
+      branch: main
+    dockerfile_path: deploy/Dockerfile
+    source_dir: /
+    kind: JOB
+    instance_count: 1
+    instance_size_slug: apps-s-1vcpu-1gb
+    # Hourly. One course per run so the 5-minute job window can finish.
+    schedule:
+      cron: '20 * * * *'
+    run_command: >-
+      sh -c 'curl -fsS --max-time 280
+      -H "Authorization: Bearer $CRON_SECRET"
+      "$NEXT_PUBLIC_APP_URL/api/cron/optimize-course-content"'
+    envs:
+      - key: CRON_SECRET
+        scope: RUN_TIME
+      - key: NEXT_PUBLIC_APP_URL
         scope: RUN_TIME
