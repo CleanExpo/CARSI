@@ -27,14 +27,16 @@ export type OptimizeCronResult = {
   results: OptimizeCronRow[];
 };
 
-function parseLimit(raw: string | null): number {
-  const n = raw ? Number.parseInt(raw, 10) : 1;
-  if (!Number.isFinite(n) || n < 1) return 1;
-  return Math.min(n, 5);
+function parseLimit(raw: string | null): number | undefined {
+  if (raw == null || raw.trim() === '') return undefined;
+  const n = Number.parseInt(raw, 10);
+  if (!Number.isFinite(n) || n < 1) return undefined;
+  return Math.min(n, 200);
 }
 
-export function parseOptimizeCronSearch(url: URL): { limit: number } {
-  return { limit: parseLimit(url.searchParams.get('limit')) };
+export function parseOptimizeCronSearch(url: URL): { limit?: number } {
+  const limit = parseLimit(url.searchParams.get('limit'));
+  return limit == null ? {} : { limit };
 }
 
 export function buildOptimizeCronEmail(result: OptimizeCronResult): {
@@ -96,7 +98,6 @@ export async function runOptimizeCoursesCron(opts?: {
     throw new OptimizeCourseError('ANTHROPIC_API_KEY is not configured', 503);
   }
 
-  const limit = opts?.limit ?? 1;
   const courses = await prisma.lmsCourse.findMany({
     orderBy: { updatedAt: 'asc' },
     select: { id: true, title: true, meta: true, isFree: true, updatedAt: true },
@@ -106,7 +107,7 @@ export async function runOptimizeCoursesCron(opts?: {
   const pending = paid.filter((c) =>
     paidCourseNeedsOptimize({ isFree: c.isFree, updatedAt: c.updatedAt, meta: c.meta })
   );
-  const batch = pending.slice(0, limit);
+  const batch = opts?.limit != null ? pending.slice(0, opts.limit) : pending;
   const results: OptimizeCronRow[] = [];
 
   for (const course of batch) {

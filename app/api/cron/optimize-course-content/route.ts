@@ -9,11 +9,11 @@ import {
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-export const maxDuration = 300;
+export const maxDuration = 28800;
 
 /**
- * DigitalOcean scheduled job. Paid courses only. Skips already-optimised
- * courses until they are edited. One course per run.
+ * Manual only. Paid courses that still need optimisation, one after another.
+ * One email at the end. Does not schedule itself.
  */
 export async function GET(request: Request) {
   const denied = requireCron(request);

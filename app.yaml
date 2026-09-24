@@ -134,25 +134,6 @@ services:
       - key: GOOGLE_CALENDAR_OAUTH_REFRESH_TOKEN
         scope: RUN_TIME
 
-jobs:
-  - name: optimize-course-content
-    github:
-      repo: CleanExpo/CARSI
-      branch: main
-    dockerfile_path: deploy/Dockerfile
-    source_dir: /
-    kind: JOB
-    instance_count: 1
-    instance_size_slug: apps-s-1vcpu-1gb
-    # Hourly. One course per run so the 5-minute job window can finish.
-    schedule:
-      cron: '20 * * * *'
-    run_command: >-
-      sh -c 'curl -fsS --max-time 280
-      -H "Authorization: Bearer $CRON_SECRET"
-      "$NEXT_PUBLIC_APP_URL/api/cron/optimize-course-content"'
-    envs:
-      - key: CRON_SECRET
-        scope: RUN_TIME
-      - key: NEXT_PUBLIC_APP_URL
-        scope: RUN_TIME
+# No scheduled job. Run optimisation only when you fire this curl (hours, not minutes):
+# curl -fsS --max-time 28800 -H "Authorization: Bearer $CRON_SECRET" \
+#   "$NEXT_PUBLIC_APP_URL/api/cron/optimize-course-content"

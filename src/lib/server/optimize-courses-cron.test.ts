@@ -12,8 +12,8 @@ describe('optimize courses cron helpers', () => {
   it('defaults to one course per tick', () => {
     expect(
       parseOptimizeCronSearch(new URL('https://carsi.com.au/api/cron/optimize-course-content'))
-    ).toEqual({ limit: 1 });
-    expect(parseOptimizeCronSearch(new URL('https://x.test/c?limit=9'))).toEqual({ limit: 5 });
+    ).toEqual({});
+    expect(parseOptimizeCronSearch(new URL('https://x.test/c?limit=9'))).toEqual({ limit: 9 });
   });
 
   it('never queues free courses and skips unchanged paid ones', () => {
