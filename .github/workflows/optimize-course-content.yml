@@ -1,0 +1,19 @@
+name: Optimise course content (hourly)
+
+# Processes one pending LMS course per run (7–10 modules). Re-runs skip finished courses.
+# Repo secret CRON_SECRET must match the app CRON_SECRET.
+
+on:
+  schedule:
+    - cron: '20 * * * *'
+  workflow_dispatch: {}
+
+jobs:
+  optimize-next-course:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger next-course optimise cron
+        run: |
+          curl -fsS --max-time 280 -X GET \
+            "https://carsi.com.au/api/cron/optimize-course-content" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
