@@ -738,6 +738,14 @@ export function AdminCoursesList() {
             </span>
           </p>
           <div className="flex flex-wrap gap-2">
+            {selected.size === 1 ? (
+              <Link
+                href={`/admin/courses/${[...selected][0]}/optimize`}
+                className="rounded-lg border border-white/15 px-3 py-2 text-xs font-medium text-white/75 hover:bg-white/5"
+              >
+                Optimize content
+              </Link>
+            ) : null}
             <button
               type="button"
               onClick={() => setSelected(new Set())}
@@ -870,13 +878,21 @@ export function AdminCoursesList() {
                   </td>
                   <td className="px-3 py-3 text-white/50">{formatAdminDate(c.updatedAt)}</td>
                   <td className="px-3 py-3 text-right" onClick={(e) => e.stopPropagation()}>
-                    <Link
-                      href={`/admin/courses/${c.id}`}
-                      className="inline-flex items-center gap-1 text-xs font-medium text-[#7ec5ff] hover:text-white"
-                    >
-                      <Pencil className="h-3.5 w-3.5" />
-                      Edit
-                    </Link>
+                    <div className="flex flex-col items-end gap-2">
+                      <Link
+                        href={`/admin/courses/${c.id}`}
+                        className="inline-flex items-center gap-1 text-xs font-medium text-[#7ec5ff] hover:text-white"
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                        Edit
+                      </Link>
+                      <Link
+                        href={`/admin/courses/${c.id}/optimize`}
+                        className="text-xs font-medium text-white/50 hover:text-white"
+                      >
+                        Optimize
+                      </Link>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -961,6 +977,13 @@ export function AdminCoursesList() {
                   >
                     <Pencil className="h-3.5 w-3.5" />
                     Edit
+                  </Link>
+                  <Link
+                    href={`/admin/courses/${c.id}/optimize`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="inline-flex items-center justify-center rounded-lg border border-white/12 px-3 py-2 text-xs font-medium text-white/70 hover:bg-white/5"
+                  >
+                    Optimize
                   </Link>
                   <button
                     type="button"
