@@ -460,6 +460,14 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
             ) : null}
           </div>
           <div className="flex shrink-0 flex-wrap gap-3">
+            {courseId ? (
+              <Link
+                href={`/admin/courses/${courseId}/optimize`}
+                className="inline-flex items-center justify-center rounded-xl border border-white/15 px-6 py-3 text-sm font-medium text-white/75 transition-colors hover:border-white/25 hover:bg-white/5"
+              >
+                Optimize content
+              </Link>
+            ) : null}
             <button
               type="submit"
               disabled={saving || uploading}
