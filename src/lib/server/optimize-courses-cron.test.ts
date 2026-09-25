@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  freeCourseNeedsOptimize,
   paidCourseNeedsOptimize,
   planModuleTitles,
   RECAP_MODULE_TITLE,
@@ -12,8 +13,14 @@ describe('optimize courses cron helpers', () => {
   it('defaults to one course per tick', () => {
     expect(
       parseOptimizeCronSearch(new URL('https://carsi.com.au/api/cron/optimize-course-content'))
-    ).toEqual({});
-    expect(parseOptimizeCronSearch(new URL('https://x.test/c?limit=9'))).toEqual({ limit: 9 });
+    ).toEqual({ scope: 'paid' });
+    expect(parseOptimizeCronSearch(new URL('https://x.test/c?limit=9'))).toEqual({
+      limit: 9,
+      scope: 'paid',
+    });
+    expect(parseOptimizeCronSearch(new URL('https://x.test/c?scope=free'))).toEqual({
+      scope: 'free',
+    });
   });
 
   it('never queues free courses and skips unchanged paid ones', () => {
@@ -29,6 +36,19 @@ describe('optimize courses cron helpers', () => {
     ).toBe(false);
   });
 
+  it('queues free courses only and skips unchanged free ones', () => {
+    const now = new Date();
+    expect(freeCourseNeedsOptimize({ isFree: false, updatedAt: now, meta: null })).toBe(false);
+    expect(freeCourseNeedsOptimize({ isFree: true, updatedAt: now, meta: null })).toBe(true);
+    expect(
+      freeCourseNeedsOptimize({
+        isFree: true,
+        updatedAt: now,
+        meta: { optimizeAppliedAt: new Date(now.getTime() + 5_000).toISOString() },
+      })
+    ).toBe(false);
+  });
+
   it('builds a summary email for the founder inbox', () => {
     const mail = buildOptimizeCronEmail({
       processed: 1,
@@ -36,6 +56,7 @@ describe('optimize courses cron helpers', () => {
       skipped: 4,
       failed: 0,
       remaining: 2,
+      scope: 'paid',
       results: [
         {
           courseId: '1',

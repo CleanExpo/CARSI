@@ -135,5 +135,9 @@ services:
         scope: RUN_TIME
 
 # No scheduled job. Curl returns in seconds (202). Work + email continue on the app.
+# Paid:
 # curl -S -H "Authorization: Bearer $CRON_SECRET" \
 #   "$NEXT_PUBLIC_APP_URL/api/cron/optimize-course-content"
+# Free:
+# curl -S -H "Authorization: Bearer $CRON_SECRET" \
+#   "$NEXT_PUBLIC_APP_URL/api/cron/optimize-free-course-content"

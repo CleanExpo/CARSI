@@ -2,12 +2,15 @@ import { prisma } from '@/lib/prisma';
 import { resolveAnthropicConfig } from '@/lib/server/anthropic-client';
 import { isEmailConfigured, sendEmail } from '@/lib/server/email';
 import {
+  freeCourseNeedsOptimize,
   optimizeAndApplyCourse,
   OptimizeCourseError,
   paidCourseNeedsOptimize,
 } from '@/lib/server/optimize-course-content';
 
 export const OPTIMIZE_CRON_EMAIL = 'ranamuzamil1199@gmail.com';
+
+export type OptimizeCronScope = 'paid' | 'free';
 
 export type OptimizeCronRow = {
   courseId: string;
@@ -24,6 +27,7 @@ export type OptimizeCronResult = {
   skipped: number;
   failed: number;
   remaining: number;
+  scope: OptimizeCronScope;
   results: OptimizeCronRow[];
 };
 
@@ -34,9 +38,11 @@ function parseLimit(raw: string | null): number | undefined {
   return Math.min(n, 200);
 }
 
-export function parseOptimizeCronSearch(url: URL): { limit?: number } {
+export function parseOptimizeCronSearch(url: URL): { limit?: number; scope: OptimizeCronScope } {
   const limit = parseLimit(url.searchParams.get('limit'));
-  return limit == null ? {} : { limit };
+  const raw = url.searchParams.get('scope')?.trim().toLowerCase();
+  const scope: OptimizeCronScope = raw === 'free' ? 'free' : 'paid';
+  return limit == null ? { scope } : { limit, scope };
 }
 
 export function buildOptimizeCronEmail(result: OptimizeCronResult): {
@@ -44,13 +50,18 @@ export function buildOptimizeCronEmail(result: OptimizeCronResult): {
   text: string;
   html: string;
 } {
-  const subject = `Course optimisation: ${result.updated} updated, ${result.failed} failed`;
+  const paid = result.scope !== 'free';
+  const label = paid ? 'Paid' : 'Free';
+  const skippedHint = paid
+    ? 'Skipped (free, already done, or unchanged)'
+    : 'Skipped (paid, already done, or unchanged)';
+  const subject = `${label} course optimisation: ${result.updated} updated, ${result.failed} failed`;
   const lines = [
-    'Paid course optimisation summary',
+    `${label} course optimisation summary`,
     '',
-    `Paid courses processed: ${result.processed}`,
+    `${label} courses processed: ${result.processed}`,
     `Successfully updated: ${result.updated}`,
-    `Skipped (free, already done, or unchanged): ${result.skipped}`,
+    `${skippedHint}: ${result.skipped}`,
     `Failed: ${result.failed}`,
     `Still waiting: ${result.remaining}`,
     '',
@@ -65,11 +76,11 @@ export function buildOptimizeCronEmail(result: OptimizeCronResult): {
     );
   }
   const text = lines.join('\n');
-  const html = `<p>Paid course optimisation summary</p>
+  const html = `<p>${label} course optimisation summary</p>
 <ul>
-<li>Paid courses processed: ${result.processed}</li>
+<li>${label} courses processed: ${result.processed}</li>
 <li>Successfully updated: ${result.updated}</li>
-<li>Skipped (free, already done, or unchanged): ${result.skipped}</li>
+<li>${escapeHtml(skippedHint)}: ${result.skipped}</li>
 <li>Failed: ${result.failed}</li>
 <li>Still waiting: ${result.remaining}</li>
 </ul>
@@ -93,27 +104,34 @@ function escapeHtml(s: string): string {
 
 export async function runOptimizeCoursesCron(opts?: {
   limit?: number;
+  scope?: OptimizeCronScope;
 }): Promise<OptimizeCronResult> {
   if (!resolveAnthropicConfig().configured) {
     throw new OptimizeCourseError('ANTHROPIC_API_KEY is not configured', 503);
   }
 
+  const scope: OptimizeCronScope = opts?.scope === 'free' ? 'free' : 'paid';
   const courses = await prisma.lmsCourse.findMany({
     orderBy: { updatedAt: 'asc' },
     select: { id: true, title: true, meta: true, isFree: true, updatedAt: true },
   });
 
-  const paid = courses.filter((c) => !c.isFree);
-  const pending = paid.filter((c) =>
-    paidCourseNeedsOptimize({ isFree: c.isFree, updatedAt: c.updatedAt, meta: c.meta })
+  const pool = courses.filter((c) => (scope === 'free' ? c.isFree : !c.isFree));
+  const pending = pool.filter((c) =>
+    scope === 'free'
+      ? freeCourseNeedsOptimize({ isFree: c.isFree, updatedAt: c.updatedAt, meta: c.meta })
+      : paidCourseNeedsOptimize({ isFree: c.isFree, updatedAt: c.updatedAt, meta: c.meta })
   );
   const batch = opts?.limit != null ? pending.slice(0, opts.limit) : pending;
   const results: OptimizeCronRow[] = [];
+  const allowFree = scope === 'free';
 
   for (const [index, course] of batch.entries()) {
-    console.info(`[cron/optimize-course-content] ${index + 1}/${batch.length} ${course.title}`);
+    console.info(
+      `[cron/optimize-course-content] ${scope} ${index + 1}/${batch.length} ${course.title}`
+    );
     try {
-      results.push(await optimizeAndApplyCourse(course.id));
+      results.push(await optimizeAndApplyCourse(course.id, { allowFree }));
     } catch (e) {
       results.push({
         courseId: course.id,
@@ -131,6 +149,7 @@ export async function runOptimizeCoursesCron(opts?: {
     skipped: courses.length - pending.length,
     failed,
     remaining: Math.max(0, pending.length - batch.length),
+    scope,
     results,
   };
 
@@ -154,11 +173,15 @@ export function isOptimizeCronRunning(): boolean {
 }
 
 /** Starts the catalogue run without holding the HTTP request open (Cloudflare 524). */
-export function startOptimizeCoursesCron(opts?: { limit?: number }): { started: boolean } {
+export function startOptimizeCoursesCron(opts?: { limit?: number; scope?: OptimizeCronScope }): {
+  started: boolean;
+} {
   if (backgroundRun) return { started: false };
-  backgroundRun = runOptimizeCoursesCron(opts)
+  const scope: OptimizeCronScope = opts?.scope === 'free' ? 'free' : 'paid';
+  backgroundRun = runOptimizeCoursesCron({ ...opts, scope })
     .then((result) => {
       console.info('[cron/optimize-course-content] finished', {
+        scope: result.scope,
         processed: result.processed,
         updated: result.updated,
         failed: result.failed,

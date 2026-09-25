@@ -372,6 +372,14 @@ export function readOptimizeAppliedAt(meta: unknown): string | null {
   return typeof v === 'string' && v.trim() ? v : null;
 }
 
+function appliedAtNeedsOptimize(updatedAt: Date, meta: unknown): boolean {
+  const applied = readOptimizeAppliedAt(meta);
+  if (!applied) return true;
+  const appliedMs = Date.parse(applied);
+  if (!Number.isFinite(appliedMs)) return true;
+  return updatedAt.getTime() > appliedMs + 3_000;
+}
+
 /** Paid courses only. Re-run only when never applied, or the course was edited after apply. */
 export function paidCourseNeedsOptimize(input: {
   isFree: boolean;
@@ -379,11 +387,17 @@ export function paidCourseNeedsOptimize(input: {
   meta: unknown;
 }): boolean {
   if (input.isFree) return false;
-  const applied = readOptimizeAppliedAt(input.meta);
-  if (!applied) return true;
-  const appliedMs = Date.parse(applied);
-  if (!Number.isFinite(appliedMs)) return true;
-  return input.updatedAt.getTime() > appliedMs + 3_000;
+  return appliedAtNeedsOptimize(input.updatedAt, input.meta);
+}
+
+/** Free courses only. Same apply-once / edited-after-apply rule as paid. */
+export function freeCourseNeedsOptimize(input: {
+  isFree: boolean;
+  updatedAt: Date;
+  meta: unknown;
+}): boolean {
+  if (!input.isFree) return false;
+  return appliedAtNeedsOptimize(input.updatedAt, input.meta);
 }
 
 export async function snapshotCourseBeforeOptimize(
@@ -676,7 +690,10 @@ export async function applyOptimizedCourseDraft(
   return courseToAdminDto(updated);
 }
 
-export async function optimizeAndApplyCourse(courseId: string): Promise<{
+export async function optimizeAndApplyCourse(
+  courseId: string,
+  opts?: { allowFree?: boolean }
+): Promise<{
   courseId: string;
   title: string;
   previousModuleCount: number;
@@ -686,8 +703,11 @@ export async function optimizeAndApplyCourse(courseId: string): Promise<{
   const existing = await adminGetCourse(courseId);
   if (!existing) throw new OptimizeCourseError('Not found', 404);
   const dto = courseToAdminDto(existing);
-  if (dto.isFree) {
-    throw new OptimizeCourseError('Free courses are not optimised by cron', 400);
+  if (dto.isFree && !opts?.allowFree) {
+    throw new OptimizeCourseError('Free courses are not optimised by the paid cron', 400);
+  }
+  if (!dto.isFree && opts?.allowFree) {
+    throw new OptimizeCourseError('Paid courses are not optimised by the free cron', 400);
   }
   const previousModuleCount = dto.modules.length;
   await snapshotCourseBeforeOptimize(
