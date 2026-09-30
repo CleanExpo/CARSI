@@ -35,7 +35,9 @@ const MIN_BODY = 2000; // below this = stub
 const MIN_PER_LESSON = 500; // below this avg = thin
 
 const args = process.argv.slice(2);
-const enforceArg = (args.find((a) => a.startsWith('--enforce=')) || '').slice('--enforce='.length);
+const enforceArgs = args.filter((a) => a === '--enforce' || a.startsWith('--enforce='));
+const enforcementRequested = enforceArgs.length > 0;
+const enforceArg = (enforceArgs[0] || '').slice('--enforce='.length);
 const enforceSet = enforceArg === 'all' ? 'all' : new Set(enforceArg.split(',').map((s) => s.trim()).filter(Boolean));
 const jsonOut = args.includes('--json');
 
@@ -122,9 +124,30 @@ if (!isCli) {
 
 const scored = courses.map(scoreCourse);
 
+// Decide enforcement before choosing a report format. JSON is a presentation
+// option, never a way to disable the release-set checks.
+const selected = scored.filter((s) => enforceSet === 'all' || enforceSet.has(s.slug));
+const knownSlugs = new Set(scored.map((s) => s.slug));
+const missing = enforceSet === 'all' ? [] : [...enforceSet].filter((slug) => !knownSlugs.has(slug));
+const failing = selected.filter((s) => !s.complete);
+let enforcementError = null;
+if (enforcementRequested) {
+  if (enforceArgs.length !== 1 || !enforceArg.trim()) {
+    enforcementError = 'Pass one non-empty --enforce=<slug,…|all> release set.';
+  } else if (missing.length) {
+    enforcementError = `Unknown enforced course slug(s): ${missing.join(', ')}`;
+  } else if (selected.length === 0) {
+    enforcementError = 'The enforced release set contains no courses.';
+  }
+}
+const exitCode = enforcementError ? 2 : enforcementRequested && failing.length ? 1 : 0;
+
 if (jsonOut) {
-  console.log(JSON.stringify({ total: scored.length, scored }, null, 2));
-  process.exit(0);
+  console.log(JSON.stringify({ total: scored.length, scored, enforcement: {
+    requested: enforcementRequested, selected: selected.map((s) => s.slug),
+    missing, failing: failing.map((s) => s.slug), error: enforcementError, exitCode,
+  } }, null, 2));
+  process.exit(exitCode);
 }
 
 // ── report ──────────────────────────────────────────────────────────────────
@@ -147,12 +170,14 @@ const done = scored.filter((s) => s.complete).length;
 console.log(`\n  Finalised (all bars green): ${done} / ${scored.length}`);
 
 // ── enforcement ───────────────────────────────────────────────────────────────
-if (enforceSet !== 'all' && enforceSet.size === 0) {
+if (!enforcementRequested) {
   console.log('\n  (advisory mode — pass --enforce=<slug,…|all> to fail CI on open gaps)\n');
   process.exit(0);
 }
-const inSet = (s) => enforceSet === 'all' || enforceSet.has(s.slug);
-const failing = scored.filter((s) => inSet(s) && !s.complete);
+if (enforcementError) {
+  console.error(`\n  ✖ ${enforcementError}\n`);
+  process.exit(exitCode);
+}
 if (failing.length) {
   console.error(`\n  ✖ ${failing.length} enforced course(s) have open gaps:`);
   for (const s of failing) console.error(`     ${s.slug}: ${s.open.join(', ')}`);
