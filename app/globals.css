@@ -913,6 +913,31 @@
   pointer-events: none;
 }
 
+.marketing-compose-editor ul {
+  margin: 0.75em 0;
+  padding-left: 1.5em;
+  list-style: disc;
+}
+.marketing-compose-editor ol {
+  margin: 0.75em 0;
+  padding-left: 1.5em;
+  list-style: decimal;
+}
+.marketing-compose-editor p {
+  margin: 0 0 0.75em;
+}
+.marketing-compose-editor a {
+  color: #2490ed;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.marketing-compose-editor blockquote {
+  margin: 0.75em 0;
+  padding-left: 1em;
+  border-left: 3px solid #cbd5e1;
+  color: #475569;
+}
+
 /* WS1 fix 5 (GP-544): while Margot's chat panel is open (FloatingChat mirrors its state as
    `data-margot-open` on <html>), the lesson footer gains enough bottom clearance to scroll
    above the 560px panel and its launcher (606px container plus margin) at every width. The

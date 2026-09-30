@@ -354,14 +354,18 @@ export function renderAdminMarketingEmail(params: {
   name: string;
   title: string;
   body: string;
+  bodyHtml?: string | null;
   imageUrl?: string | null;
   unsubscribeUrl: string;
 }): RenderedEmail {
   const imageHtml = params.imageUrl
     ? `<p style="margin: 0 0 16px;"><img src="${escapeHtml(params.imageUrl)}" alt="" width="420" style="display:block;max-width:100%;height:auto;border:0;" /></p>`
     : '';
-  const bodyHtml = `${imageHtml}<div style="margin: 0 0 4px;">${formatMarketingBodyAsHtml(params.body)}</div>${phillMarketingSignatureHtml(params.appOrigin)}`;
-  const plainBody = formatMarketingBodyAsPlainText(params.body);
+  const messageInner = params.bodyHtml?.trim()
+    ? `<div style="margin: 0 0 4px; font-family: ${BRAND.font}; font-size: 15px; line-height: 1.65; color: ${BRAND.text};">${params.bodyHtml}</div>`
+    : `<div style="margin: 0 0 4px;">${formatMarketingBodyAsHtml(params.body)}</div>`;
+  const bodyHtml = `${imageHtml}${messageInner}${phillMarketingSignatureHtml(params.appOrigin)}`;
+  const plainBody = params.body.trim() || formatMarketingBodyAsPlainText(params.body);
   return render(
     {
       appOrigin: params.appOrigin,

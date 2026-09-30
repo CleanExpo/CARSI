@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getAdminSessionOrNull } from '@/lib/admin/admin-session';
-import { prisma } from '@/lib/prisma';
 import {
   MAX_MARKETING_RECIPIENTS,
   sendAdminMarketingEmails,
 } from '@/lib/server/admin-marketing-email';
+import {
+  listMarketingRecipientIdsForSelectAll,
+  listMarketingRecipients,
+  parseMarketingListPageSize,
+} from '@/lib/server/admin-marketing-list';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -20,25 +24,25 @@ export async function GET(request: NextRequest) {
   }
 
   const q = request.nextUrl.searchParams.get('q')?.trim() ?? '';
+  const selectAll = request.nextUrl.searchParams.get('selectAll') === '1';
+
   try {
-    const users = await prisma.lmsUser.findMany({
-      where: {
-        isActive: true,
-        emailOptOut: false,
-        ...(q.length >= 3
-          ? {
-              OR: [
-                { email: { contains: q, mode: 'insensitive' as const } },
-                { fullName: { contains: q, mode: 'insensitive' as const } },
-              ],
-            }
-          : {}),
-      },
-      select: { id: true, email: true, fullName: true },
-      take: q.length >= 3 ? 40 : 50,
-      orderBy: { email: 'asc' },
-    });
-    return NextResponse.json({ users });
+    if (selectAll) {
+      const { users, total } = await listMarketingRecipientIdsForSelectAll(q);
+      return NextResponse.json({
+        users,
+        total,
+        cappedSelectAll: Math.min(total, MAX_MARKETING_RECIPIENTS),
+      });
+    }
+
+    const page = Math.max(
+      1,
+      Number.parseInt(request.nextUrl.searchParams.get('page') ?? '1', 10) || 1
+    );
+    const pageSize = parseMarketingListPageSize(request.nextUrl.searchParams.get('pageSize'));
+    const result = await listMarketingRecipients({ q, page, pageSize });
+    return NextResponse.json(result);
   } catch (e) {
     console.error('[admin/marketing-email] list', e);
     return NextResponse.json({ detail: 'Could not load customers' }, { status: 500 });
@@ -55,6 +59,7 @@ export async function POST(request: NextRequest) {
     userIds?: unknown;
     subject?: unknown;
     body?: unknown;
+    bodyHtml?: unknown;
     imageUrl?: unknown;
   };
   try {
@@ -68,6 +73,7 @@ export async function POST(request: NextRequest) {
     : [];
   const subject = typeof body.subject === 'string' ? body.subject : '';
   const message = typeof body.body === 'string' ? body.body : '';
+  const bodyHtml = typeof body.bodyHtml === 'string' ? body.bodyHtml : null;
   const imageUrl = typeof body.imageUrl === 'string' ? body.imageUrl : null;
 
   try {
@@ -75,6 +81,7 @@ export async function POST(request: NextRequest) {
       userIds,
       subject,
       body: message,
+      bodyHtml,
       imageUrl,
     });
     console.info(
@@ -108,11 +115,8 @@ export async function POST(request: NextRequest) {
     if (code === 'INVALID_SUBJECT') {
       return NextResponse.json({ detail: 'Add a subject (max 120 characters).' }, { status: 400 });
     }
-    if (code === 'INVALID_BODY') {
-      return NextResponse.json(
-        { detail: 'Add the email body (max 8,000 characters).' },
-        { status: 400 }
-      );
+    if (code === 'INVALID_BODY' || code === 'INVALID_BODY_HTML') {
+      return NextResponse.json({ detail: 'Add the email body.' }, { status: 400 });
     }
     console.error('[admin/marketing-email] send', e);
     return NextResponse.json({ detail: 'Send failed' }, { status: 500 });

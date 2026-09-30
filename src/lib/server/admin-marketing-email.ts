@@ -4,6 +4,10 @@ import { getAppOrigin } from '@/lib/server/app-url';
 import { isEmailConfigured, sendEmail } from '@/lib/server/email';
 import { buildUnsubscribeUrl } from '@/lib/server/email-preferences';
 import { renderAdminMarketingEmail } from '@/lib/server/email-templates';
+import {
+  marketingHtmlToPlainText,
+  sanitizeMarketingEmailBodyHtml,
+} from '@/lib/server/marketing-email-html';
 
 export const MAX_MARKETING_RECIPIENTS = 80;
 export const MAX_MARKETING_SUBJECT = 120;
@@ -52,6 +56,7 @@ export async function sendAdminMarketingEmails(input: {
   userIds: string[];
   subject: string;
   body: string;
+  bodyHtml?: string | null;
   imageUrl?: string | null;
 }): Promise<MarketingSendResult> {
   if (!isEmailConfigured()) {
@@ -59,12 +64,21 @@ export async function sendAdminMarketingEmails(input: {
   }
 
   const subject = input.subject.trim();
-  const body = input.body.trim();
+  let bodyHtml: string | null = null;
+  let bodyPlain = input.body.trim();
+  if (input.bodyHtml?.trim()) {
+    try {
+      bodyHtml = sanitizeMarketingEmailBodyHtml(input.bodyHtml);
+      bodyPlain = marketingHtmlToPlainText(bodyHtml);
+    } catch {
+      throw new Error('INVALID_BODY_HTML');
+    }
+  }
+  if (!bodyPlain || bodyPlain.length > MAX_MARKETING_BODY) {
+    throw new Error('INVALID_BODY');
+  }
   if (!subject || subject.length > MAX_MARKETING_SUBJECT) {
     throw new Error('INVALID_SUBJECT');
-  }
-  if (!body || body.length > MAX_MARKETING_BODY) {
-    throw new Error('INVALID_BODY');
   }
 
   const ids = [...new Set(input.userIds.map((id) => id.trim()).filter(isUuid))];
@@ -95,7 +109,8 @@ export async function sendAdminMarketingEmails(input: {
       appOrigin,
       name,
       title: subject,
-      body,
+      body: bodyPlain,
+      bodyHtml,
       imageUrl,
       unsubscribeUrl,
     });
