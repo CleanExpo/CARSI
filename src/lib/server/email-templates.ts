@@ -37,6 +37,67 @@ export function formatPlainMessageAsHtml(message: string): string {
   return escapeHtml(message.trim()).replace(/\n/g, '<br>');
 }
 
+const MARKETING_BODY_P = `margin: 0 0 14px; font-family: ${BRAND.font}; font-size: 15px; line-height: 1.65; color: ${BRAND.text};`;
+const MARKETING_BODY_LIST = `margin: 0 0 14px 0; padding-left: 20px; font-family: ${BRAND.font}; font-size: 15px; line-height: 1.65; color: ${BRAND.text};`;
+
+function linkifyEscapedText(escaped: string): string {
+  return escaped.replace(
+    /(https?:\/\/[^\s<]+[^\s<.,;:!?)])/g,
+    (url) =>
+      `<a href="${url}" style="color: ${BRAND.cyan}; text-decoration: underline; text-underline-offset: 3px;">${url}</a>`
+  );
+}
+
+function applyInlineMarketingEmphasis(escaped: string): string {
+  return escaped.replace(/\*\*(.+?)\*\*/g, `<strong style="color: ${BRAND.text};">$1</strong>`);
+}
+
+function isBulletLine(line: string): boolean {
+  return /^[-*•]\s+/.test(line.trim());
+}
+
+function stripBulletPrefix(line: string): string {
+  return line.trim().replace(/^[-*•]\s+/, '');
+}
+
+/** Plain-text admin body → readable HTML paragraphs and lists (no raw HTML input). */
+export function formatMarketingBodyAsHtml(message: string): string {
+  const normalized = message.replace(/\r\n/g, '\n').trim();
+  if (!normalized) return '';
+
+  const blocks = normalized.split(/\n\s*\n/);
+  const parts: string[] = [];
+
+  for (const block of blocks) {
+    const lines = block.split('\n').map((l) => l.trimEnd());
+    const nonEmpty = lines.filter((l) => l.trim().length > 0);
+    if (nonEmpty.length === 0) continue;
+
+    if (nonEmpty.every(isBulletLine)) {
+      const items = nonEmpty
+        .map((line) => {
+          const inner = applyInlineMarketingEmphasis(
+            linkifyEscapedText(escapeHtml(stripBulletPrefix(line)))
+          );
+          return `<li style="margin: 0 0 8px;">${inner}</li>`;
+        })
+        .join('');
+      parts.push(`<ul style="${MARKETING_BODY_LIST}">${items}</ul>`);
+      continue;
+    }
+
+    const paragraph = nonEmpty.join(' ');
+    const inner = applyInlineMarketingEmphasis(linkifyEscapedText(escapeHtml(paragraph)));
+    parts.push(`<p style="${MARKETING_BODY_P}">${inner}</p>`);
+  }
+
+  return parts.join('\n');
+}
+
+export function formatMarketingBodyAsPlainText(message: string): string {
+  return message.replace(/\r\n/g, '\n').trim();
+}
+
 export function buildCarsiWordmarkHtml(appOrigin: string): string {
   const home = escapeHtml(appOrigin);
   const letterBase = `font-family: ${BRAND.font}; font-weight: 800; font-size: 42px; line-height: 1; letter-spacing: 0.14em;`;
@@ -64,6 +125,8 @@ export type CarsiEmailContent = {
   paragraphs?: string[];
   details?: CarsiEmailDetail[];
   messageHtml?: string;
+  /** When true, render messageHtml without the "Message" label and inner box (marketing). */
+  messageHtmlBare?: boolean;
   cta?: { label: string; href: string };
   noteHtml?: string;
 };
@@ -119,7 +182,14 @@ export function buildCarsiEmailHtml(options: CarsiEmailContent): string {
       : '';
 
   const messageBlock = options.messageHtml
-    ? `
+    ? options.messageHtmlBare
+      ? `
+      <tr>
+        <td style="padding: 0 0 20px;">
+          ${options.messageHtml}
+        </td>
+      </tr>`
+      : `
       <tr>
         <td style="padding: 0 0 20px;">
           <p style="margin: 0 0 8px; font-family: ${BRAND.font}; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: ${BRAND.textMuted};">Message</p>
@@ -255,6 +325,55 @@ export function renderRecertReminderEmail(params: {
       noteHtml: `Open ${brandLink(params.renewalsUrl, 'Credentials')} to track CEC progress and submit your renewal.`,
     },
     `Hi ${params.name},\n\n${lead}\n\nComplete CEC-eligible courses and submit your renewal.\n\nCredentials: ${params.renewalsUrl}`
+  );
+}
+
+const PHILL_MARKETING_SIGNATURE_TEXT = `Phill McGurk
+Founder | CARSI
+IICRC Triple Master | Bio Forensic Master Cleaner
+25+ years in carpet cleaning and restoration
++61 457 123 005
+carsi.com.au | support@carsi.com.au
+CARSI | Restoration training — IICRC CEC Accredited`;
+
+function phillMarketingSignatureHtml(appOrigin: string): string {
+  const home = escapeHtml(appOrigin);
+  return `<p style="margin: 24px 0 0; font-family: ${BRAND.font}; font-size: 14px; line-height: 1.55; color: ${BRAND.text};">
+      <strong>Phill McGurk</strong><br />
+      Founder | CARSI<br />
+      IICRC Triple Master | Bio Forensic Master Cleaner<br />
+      25+ years in carpet cleaning and restoration<br />
+      +61 457 123 005<br />
+      ${brandLink(home, 'carsi.com.au')} | ${brandLink('mailto:support@carsi.com.au', 'support@carsi.com.au')}<br />
+      CARSI | Restoration training — IICRC CEC Accredited
+    </p>`;
+}
+
+export function renderAdminMarketingEmail(params: {
+  appOrigin: string;
+  name: string;
+  title: string;
+  body: string;
+  imageUrl?: string | null;
+  unsubscribeUrl: string;
+}): RenderedEmail {
+  const imageHtml = params.imageUrl
+    ? `<p style="margin: 0 0 16px;"><img src="${escapeHtml(params.imageUrl)}" alt="" width="420" style="display:block;max-width:100%;height:auto;border:0;" /></p>`
+    : '';
+  const bodyHtml = `${imageHtml}<div style="margin: 0 0 4px;">${formatMarketingBodyAsHtml(params.body)}</div>${phillMarketingSignatureHtml(params.appOrigin)}`;
+  const plainBody = formatMarketingBodyAsPlainText(params.body);
+  return render(
+    {
+      appOrigin: params.appOrigin,
+      preheader: params.title,
+      eyebrow: 'From CARSI',
+      title: params.title,
+      greeting: `Hi ${params.name},`,
+      messageHtml: bodyHtml,
+      messageHtmlBare: true,
+      noteHtml: `This is a CARSI Learning update. ${brandLink(params.unsubscribeUrl, 'Unsubscribe')} from marketing emails. CARSI Learning · Australia · ${brandLink(params.appOrigin, 'carsi.com.au')}`,
+    },
+    `Hi ${params.name},\n\n${plainBody}\n\n${params.imageUrl ? `Image: ${params.imageUrl}\n\n` : ''}${PHILL_MARKETING_SIGNATURE_TEXT}\n\nUnsubscribe: ${params.unsubscribeUrl}\nCARSI Learning · ${params.appOrigin}`
   );
 }
 

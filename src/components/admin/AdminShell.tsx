@@ -10,6 +10,7 @@ import {
   GraduationCap,
   LogOut,
   Mail,
+  Megaphone,
   Percent,
   Send,
   Users,
@@ -77,6 +78,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const facilityCourseActive = pathname.startsWith(`/admin/courses/${facilityCourseId}`);
   const discountsActive = pathname.startsWith('/admin/discounts');
   const contactsActive = pathname.startsWith('/admin/contacts');
+  const marketingActive = pathname.startsWith('/admin/marketing');
   const analyticsActive = pathname.startsWith('/admin/analytics');
   const yearlyMembershipActive = pathname.startsWith('/admin/yearly-membership');
   const iicrcCecActive = pathname.startsWith('/admin/iicrc-cec');
@@ -156,6 +158,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             active={assessmentsActive}
           />
           <NavButton href="/admin/contacts" label="Contacts" icon={Mail} active={contactsActive} />
+          <NavButton
+            href="/admin/marketing"
+            label="Marketing"
+            icon={Megaphone}
+            active={marketingActive}
+          />
           <NavButton
             href="/admin/ccw-roadshow"
             label="CCW Roadshow"
