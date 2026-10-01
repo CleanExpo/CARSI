@@ -6,19 +6,17 @@
  *   2. Student authentication flow
  *   3. Course detail page from catalogue link
  *
- * These tests mock backend responses so they run without a live backend.
+ * Catalogue journeys use the same course seed as CI. The invalid-login case
+ * mocks its API response; other journeys exercise the running application.
  */
 
 import { test, expect } from '@playwright/test';
 
-// ---------------------------------------------------------------------------
-// Shared helpers
-// ---------------------------------------------------------------------------
-
-const DETAIL_COURSE = {
-  slug: 'wrt-water-damage-essentials',
-  title: 'Water Damage Restoration — Essentials',
-};
+import {
+  WATER_COURSE as DETAIL_COURSE,
+  NON_WATER_COURSE,
+  CARPET_COURSE,
+} from './catalogue-fixtures';
 
 // =========================================================================
 // Journey 1: Public visitor browses course catalogue
@@ -82,12 +80,13 @@ test.describe('Public course catalogue', () => {
     // Default ("All") view lists every published course, including a non-water one
     // (the air-quality / odour essentials course). Assert it is present before
     // filtering so the post-filter "hidden" check below is meaningful.
-    const nonWaterHeading = results.getByRole('heading', {
-      name: 'Air Quality and Odour: Identification and Deodorisation Essentials',
+    const nonWaterLink = results.getByRole('link', {
+      name: `View course: ${NON_WATER_COURSE.title}`,
       exact: true,
     });
-    await expect(nonWaterHeading).toHaveCount(1);
-    await expect(nonWaterHeading).toBeVisible({ timeout: 10_000 });
+    await expect(nonWaterLink).toHaveCount(1);
+    await expect(nonWaterLink).toHaveAttribute('href', `/courses/${NON_WATER_COURSE.slug}`);
+    await expect(nonWaterLink).toBeVisible({ timeout: 10_000 });
 
     // Click the "Water Damage" topic tab (de-IICRC: topic tabs replace WRT/ASD/etc).
     const waterTab = page.getByRole('tab', { name: 'Water Damage', exact: true });
@@ -96,30 +95,43 @@ test.describe('Public course catalogue', () => {
 
     // The water-damage course (matched by title/category) is shown and the
     // air-quality / odour course is filtered out — the topic tab narrows the set.
-    const waterHeading = results.getByRole('heading', { name: DETAIL_COURSE.title, exact: true });
-    await expect(waterHeading).toHaveCount(1);
-    await expect(waterHeading).toBeVisible();
-    await expect(nonWaterHeading).toHaveCount(0);
+    const waterLink = results.getByRole('link', {
+      name: `View course: ${DETAIL_COURSE.title}`,
+      exact: true,
+    });
+    await expect(waterLink).toHaveCount(1);
+    await expect(waterLink).toHaveAttribute('href', `/courses/${DETAIL_COURSE.slug}`);
+    await expect(waterLink).toBeVisible();
+    await expect(nonWaterLink).toHaveCount(0);
   });
 
   test('search narrows results', async ({ page }) => {
     await page.goto('/courses');
 
-    // Type into the search box
-    const searchInput = page.getByRole('textbox', { name: 'Search courses', exact: true });
-    await searchInput.fill('Carpet');
-
     const results = page.getByRole('region', { name: 'Course results', exact: true });
     await expect(results).toHaveCount(1);
-    const carpetHeading = results.getByRole('heading', {
-      name: 'CARSI Carpet Cleaning Practitioner',
+    await results.getByRole('combobox', { name: 'Rows per page', exact: true }).selectOption('all');
+    const waterLink = results.getByRole('link', {
+      name: `View course: ${DETAIL_COURSE.title}`,
       exact: true,
     });
-    await expect(carpetHeading).toHaveCount(1);
-    await expect(carpetHeading).toBeVisible();
-    await expect(
-      results.getByRole('heading', { name: DETAIL_COURSE.title, exact: true })
-    ).toHaveCount(0);
+    await expect(waterLink).toHaveCount(1);
+    await expect(waterLink).toBeVisible();
+
+    const searchInput = page.getByRole('textbox', { name: 'Search courses', exact: true });
+    await searchInput.fill('Carpet');
+    const carpetLink = results.getByRole('link', {
+      name: `View course: ${CARPET_COURSE.title}`,
+      exact: true,
+    });
+    await expect(carpetLink).toHaveCount(1);
+    await expect(carpetLink).toHaveAttribute('href', `/courses/${CARPET_COURSE.slug}`);
+    await expect(carpetLink).toBeVisible();
+    await expect(waterLink).toHaveCount(0);
+
+    await searchInput.clear();
+    await expect(waterLink).toHaveCount(1);
+    await expect(waterLink).toBeVisible();
   });
 
   test('sort dropdown is present', async ({ page }) => {

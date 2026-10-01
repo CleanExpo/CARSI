@@ -131,6 +131,12 @@ jobs:
           format: 'sarif'
           output: 'trivy-results.sarif'
           severity: 'CRITICAL,HIGH'
+          exit-code: '1'
+          limit-severities-for-sarif: 'true'
+
+      - name: Test Trivy severity gate
+        if: always()
+        run: node --test scripts/trivy-policy.test.mjs
 
       - name: Upload Trivy report
         if: always()

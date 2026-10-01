@@ -18,7 +18,7 @@ export const PLACEHOLDER_RE = /xxx|your[_-]|example|redacted|placeholder|changem
 
 /**
  * The secret-looking token in a line, or null. A placeholder-shaped token
- * (ck_xxx, sk_test_placeholder…) is ignored.
+ * (for example, a token whose suffix is a placeholder label) is ignored.
  */
 export function findSecretToken(content) {
   const match = content.match(SECRET_RE);
