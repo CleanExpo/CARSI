@@ -12,7 +12,11 @@ import { prepareCourseOutline } from './CourseDetailOutline';
 
 vi.mock('@/components/ThemeProvider', () => ({ useTheme: () => ({ theme: 'light' }) }));
 vi.mock('./CourseCard', () => ({
-  CourseCard: ({ course }: { course: { title: string } }) => <div>{course.title}</div>,
+  CourseCard: ({ course }: { course: { title: string } }) => (
+    <article>
+      <h3>{course.title}</h3>
+    </article>
+  ),
 }));
 
 (
@@ -135,6 +139,94 @@ describe('pagination state transitions', () => {
     expect(container.querySelector('[aria-current="page"]')?.getAttribute('aria-label')).toBe(
       'Page 1'
     );
+  });
+});
+
+describe('catalogue results region', () => {
+  const waterTitle = 'Water Damage Restoration — Essentials';
+  const nonWaterTitle = 'Air Quality and Odour: Identification and Deodorisation Essentials';
+  const courses = [
+    { id: 'water', slug: 'water-essentials', title: waterTitle, price_aud: 49 },
+    ...Array.from({ length: 15 }, (_, i) => ({
+      id: `water-${i}`,
+      slug: `water-${i}`,
+      title: `Water course ${i}`,
+      price_aud: 49,
+    })),
+    { id: 'air', slug: 'air-quality', title: nonWaterTitle, price_aud: 49 },
+  ];
+  const results = () =>
+    container.querySelector<HTMLElement>('section[aria-label="Course results"]')!;
+  const headings = (element: Element) =>
+    Array.from(element.querySelectorAll('h3')).map((node) => node.textContent);
+  const tab = (name: string) =>
+    Array.from(container.querySelectorAll<HTMLButtonElement>('[role="tab"]')).find(
+      (button) => button.textContent === name
+    )!;
+
+  it('filters actual results independently of matching promoted courses and restores All', () => {
+    act(() =>
+      root.render(
+        <>
+          <aside aria-label="Featured courses">
+            <h3>{waterTitle}</h3>
+            <h3>{nonWaterTitle}</h3>
+          </aside>
+          <CourseGrid courses={courses} surface="light" />
+        </>
+      )
+    );
+    expect(container.querySelectorAll('section[aria-label="Course results"]')).toHaveLength(1);
+    const region = results();
+    expect(headings(region)).toContain(waterTitle);
+    // Absence on the first page cannot prove that a filter works.
+    expect(headings(region)).not.toContain(nonWaterTitle);
+    const rows = region.querySelector<HTMLSelectElement>('select[aria-label="Rows per page"]')!;
+    act(() => {
+      rows.value = 'all';
+      rows.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    expect(headings(region)).toContain(nonWaterTitle);
+    expect(headings(container).filter((title) => title === waterTitle)).toHaveLength(2);
+    expect(headings(container).filter((title) => title === nonWaterTitle)).toHaveLength(2);
+
+    act(() => tab('Water Damage').click());
+    expect(tab('Water Damage').getAttribute('aria-selected')).toBe('true');
+    expect(headings(region)).toContain(waterTitle);
+    expect(headings(region)).not.toContain(nonWaterTitle);
+    expect(headings(container.querySelector('aside')!)).toEqual([waterTitle, nonWaterTitle]);
+
+    act(() => tab('All').click());
+    expect(results()).toBe(region);
+    expect(headings(region)).toContain(waterTitle);
+    expect(headings(region)).toContain(nonWaterTitle);
+  });
+
+  it('keeps loading, search results and empty states inside the same named region', () => {
+    act(() => root.render(<CourseGrid courses={courses} loading surface="light" />));
+    const region = results();
+    expect(region.getAttribute('aria-busy')).toBe('true');
+    expect(headings(region)).toHaveLength(0);
+    act(() => root.render(<CourseGrid courses={courses} surface="light" />));
+    expect(results()).toBe(region);
+    expect(region.getAttribute('aria-busy')).toBe('false');
+    const search = container.querySelector<HTMLInputElement>('input[aria-label="Search courses"]')!;
+    const query = (value: string) =>
+      act(() => {
+        Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!.call(
+          search,
+          value
+        );
+        search.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+    query('Air Quality');
+    expect(headings(region)).toEqual([nonWaterTitle]);
+    query('No matching course');
+    expect(headings(region)).toHaveLength(0);
+    expect(region.textContent).toContain('No courses found for "No matching course"');
+    query('Water Damage');
+    expect(headings(region)).toEqual([waterTitle]);
+    expect(region.textContent).not.toContain('No courses found');
   });
 });
 

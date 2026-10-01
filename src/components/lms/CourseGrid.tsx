@@ -526,44 +526,46 @@ export function CourseGrid({
       </div>
 
       {/* Grid */}
-      {loading ? (
-        <CourseGridSkeleton />
-      ) : filtered.length > 0 ? (
-        <>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
-            {paging.pageRows.map((course, i) => (
-              <motion.div
-                key={course.id}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, ease: smoothEase, delay: Math.min(i, 8) * 0.05 }}
-              >
-                <CourseCard course={course} priorityImage={i < 4} variant={cardVariant} />
-              </motion.div>
-            ))}
+      <section aria-label="Course results" aria-busy={loading}>
+        {loading ? (
+          <CourseGridSkeleton />
+        ) : filtered.length > 0 ? (
+          <>
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
+              {paging.pageRows.map((course, i) => (
+                <motion.div
+                  key={course.id}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, ease: smoothEase, delay: Math.min(i, 8) * 0.05 }}
+                >
+                  <CourseCard course={course} priorityImage={i < 4} variant={cardVariant} />
+                </motion.div>
+              ))}
+            </div>
+            <CataloguePagination
+              page={paging.page}
+              pageCount={paging.pageCount}
+              pageSize={pageSize}
+              start={paging.start}
+              end={paging.end}
+              total={paging.total}
+              onPageChange={setPage}
+              tone="light"
+              onPageSizeChange={(size) => {
+                setPageSize(size);
+                setPage(1);
+              }}
+            />
+          </>
+        ) : (
+          <div className="py-20 text-center">
+            <p className={`text-sm ${isDark ? 'text-white/55' : 'text-slate-600'}`}>
+              No courses found{searchQuery ? ` for "${searchQuery}"` : ''}.
+            </p>
           </div>
-          <CataloguePagination
-            page={paging.page}
-            pageCount={paging.pageCount}
-            pageSize={pageSize}
-            start={paging.start}
-            end={paging.end}
-            total={paging.total}
-            onPageChange={setPage}
-            tone="light"
-            onPageSizeChange={(size) => {
-              setPageSize(size);
-              setPage(1);
-            }}
-          />
-        </>
-      ) : (
-        <div className="py-20 text-center">
-          <p className={`text-sm ${isDark ? 'text-white/55' : 'text-slate-600'}`}>
-            No courses found{searchQuery ? ` for "${searchQuery}"` : ''}.
-          </p>
-        </div>
-      )}
+        )}
+      </section>
     </div>
   );
 }

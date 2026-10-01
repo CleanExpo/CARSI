@@ -45,10 +45,24 @@ test.describe('Public course catalogue', () => {
     await page.goto('/courses');
 
     // Page heading
-    await expect(page.locator('h1')).toContainText('Restoration training you can start tonight');
+    const heading = page.getByRole('heading', {
+      level: 1,
+      name: 'Restoration training you can start tonight',
+      exact: true,
+    });
+    await expect(heading).toHaveCount(1, { timeout: 15_000 });
+    await expect(heading).toBeVisible({ timeout: 15_000 });
 
     // Topic tabs rendered (de-IICRC: plain restoration topics, no discipline acronyms)
-    for (const tab of ['All', 'Onboarding', 'Water Damage', 'Mould', 'Fire & Smoke', 'Cleaning', 'Free']) {
+    for (const tab of [
+      'All',
+      'Onboarding',
+      'Water Damage',
+      'Mould',
+      'Fire & Smoke',
+      'Cleaning',
+      'Free',
+    ]) {
       await expect(page.getByRole('tab', { name: tab, exact: true })).toBeVisible();
     }
   });
@@ -58,18 +72,21 @@ test.describe('Public course catalogue', () => {
   }) => {
     await page.goto('/courses');
 
-    const main = page.getByRole('main');
+    const results = page.getByRole('region', { name: 'Course results', exact: true });
+    await expect(results).toHaveCount(1);
 
     // The catalogue is paginated. Select all rows before asserting the non-water
     // seed is visible; otherwise its absence only proves it is not on page one.
-    await main.getByRole('combobox', { name: 'Rows per page', exact: true }).selectOption('all');
+    await results.getByRole('combobox', { name: 'Rows per page', exact: true }).selectOption('all');
 
     // Default ("All") view lists every published course, including a non-water one
     // (the air-quality / odour essentials course). Assert it is present before
     // filtering so the post-filter "hidden" check below is meaningful.
-    const nonWaterHeading = main
-      .getByRole('heading', { name: /Air Quality and Odour/i })
-      .first();
+    const nonWaterHeading = results.getByRole('heading', {
+      name: 'Air Quality and Odour: Identification and Deodorisation Essentials',
+      exact: true,
+    });
+    await expect(nonWaterHeading).toHaveCount(1);
     await expect(nonWaterHeading).toBeVisible({ timeout: 10_000 });
 
     // Click the "Water Damage" topic tab (de-IICRC: topic tabs replace WRT/ASD/etc).
@@ -79,8 +96,10 @@ test.describe('Public course catalogue', () => {
 
     // The water-damage course (matched by title/category) is shown and the
     // air-quality / odour course is filtered out — the topic tab narrows the set.
-    await expect(main.getByRole('heading', { name: DETAIL_COURSE.title })).toBeVisible();
-    await expect(nonWaterHeading).toBeHidden();
+    const waterHeading = results.getByRole('heading', { name: DETAIL_COURSE.title, exact: true });
+    await expect(waterHeading).toHaveCount(1);
+    await expect(waterHeading).toBeVisible();
+    await expect(nonWaterHeading).toHaveCount(0);
   });
 
   test('search narrows results', async ({ page }) => {
@@ -90,12 +109,17 @@ test.describe('Public course catalogue', () => {
     const searchInput = page.getByRole('textbox', { name: 'Search courses', exact: true });
     await searchInput.fill('Carpet');
 
-    // Assert on a visible course CARD, not any text node — the tag-filter <select>
-    // now contains a hidden "carpet cleaning" <option> that getByText would match first.
+    const results = page.getByRole('region', { name: 'Course results', exact: true });
+    await expect(results).toHaveCount(1);
+    const carpetHeading = results.getByRole('heading', {
+      name: 'CARSI Carpet Cleaning Practitioner',
+      exact: true,
+    });
+    await expect(carpetHeading).toHaveCount(1);
+    await expect(carpetHeading).toBeVisible();
     await expect(
-      page.locator('a[href*="/courses/"]').filter({ hasText: /Carpet/i }).first()
-    ).toBeVisible();
-    await expect(page.getByText(DETAIL_COURSE.title)).not.toBeVisible();
+      results.getByRole('heading', { name: DETAIL_COURSE.title, exact: true })
+    ).toHaveCount(0);
   });
 
   test('sort dropdown is present', async ({ page }) => {
