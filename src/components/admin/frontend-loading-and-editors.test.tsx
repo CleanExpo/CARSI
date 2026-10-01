@@ -120,6 +120,25 @@ describe('editor tool events', () => {
 });
 
 describe('request and navigation lifecycle', () => {
+  it('keeps the last recipient page visible but non-actionable while search refreshes', async () => {
+    const next = deferred<Response>();
+    const payload = (name: string) => ({
+      users: [{ id: name, email: `${name}@example.test`, fullName: name }],
+      total: 1, page: 1, pageSize: 25, totalPages: 1, cappedSelectAll: 80,
+    });
+    vi.mocked(fetch).mockResolvedValueOnce(json(payload('Previous recipient'))).mockReturnValueOnce(next.promise);
+    await act(async () => root.render(<AdminMarketingEmailClient />));
+    input('input[placeholder="Search name or email (3+ letters)"]', 'n');
+    expect(container.textContent).toContain('Previous recipient');
+    expect(container.textContent).toContain('Updating recipients');
+    expect(container.querySelector<HTMLInputElement>('input[type="checkbox"]')?.disabled).toBe(true);
+    expect(button('Select page').disabled).toBe(true);
+    await act(async () => next.resolve(json(payload('New recipient'))));
+    expect(container.textContent).not.toContain('Previous recipient');
+    expect(container.textContent).toContain('New recipient');
+    expect(container.querySelector<HTMLInputElement>('input[type="checkbox"]')?.disabled).toBe(false);
+  });
+
   it('keeps roadshow hook order stable from the initial loading screen to the registry', async () => {
     const response = deferred<Response>();
     vi.mocked(fetch).mockReturnValue(response.promise);

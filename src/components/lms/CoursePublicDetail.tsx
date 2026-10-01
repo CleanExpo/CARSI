@@ -228,7 +228,7 @@ export function CoursePublicDetail({
                 <p className="font-[family-name:var(--font-display)] text-[2rem] font-semibold tracking-[-0.03em] text-slate-950">
                   {priceLabel}
                   {!course.is_free && priceNum > 0 ? (
-                    <span className="ml-1.5 text-sm font-medium text-slate-400">AUD</span>
+                    <span className="ml-1.5 text-sm font-medium text-slate-600">AUD</span>
                   ) : null}
                 </p>
                 <p className="mt-1 text-xs text-slate-500">
@@ -287,7 +287,7 @@ export function CoursePublicDetail({
                 key={outcome}
                 className="md:border-l md:border-slate-200/70 md:pl-8 md:first:border-l-0 md:first:pl-0"
               >
-                <p className="font-[family-name:var(--font-display)] text-[2rem] leading-none font-semibold text-slate-300 tabular-nums">
+                <p className="font-[family-name:var(--font-display)] text-[2rem] leading-none font-semibold text-slate-600 tabular-nums">
                   {String(i + 1).padStart(2, '0')}
                 </p>
                 <p className="mt-4 text-sm leading-relaxed text-slate-600">{outcome}</p>
@@ -312,14 +312,14 @@ export function CoursePublicDetail({
             <ol className="mt-12 divide-y divide-slate-200/80 border-y border-slate-200/80">
               {course.syllabus.map((mod, modIndex) => (
                 <li key={mod.id} className="grid gap-4 py-7 sm:grid-cols-[4.5rem_1fr] sm:gap-8">
-                  <p className="font-[family-name:var(--font-display)] text-[2rem] leading-none font-semibold text-slate-300 tabular-nums">
+                  <p className="font-[family-name:var(--font-display)] text-[2rem] leading-none font-semibold text-slate-600 tabular-nums">
                     {String(modIndex + 1).padStart(2, '0')}
                   </p>
                   <div>
                     <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold text-slate-950">
                       {mod.title}
                       {typeof mod.duration_minutes === 'number' ? (
-                        <span className="ml-2 text-sm font-normal text-slate-400">
+                        <span className="ml-2 text-sm font-normal text-slate-600">
                           {mod.duration_minutes} min
                         </span>
                       ) : null}

@@ -45,7 +45,7 @@ test.describe('Public course catalogue', () => {
     await page.goto('/courses');
 
     // Page heading
-    await expect(page.locator('h1')).toContainText('Restoration Training Courses');
+    await expect(page.locator('h1')).toContainText('Restoration training you can start tonight');
 
     // Topic tabs rendered (de-IICRC: plain restoration topics, no discipline acronyms)
     for (const tab of ['All', 'Onboarding', 'Water Damage', 'Mould', 'Fire & Smoke', 'Cleaning', 'Free']) {
@@ -59,6 +59,10 @@ test.describe('Public course catalogue', () => {
     await page.goto('/courses');
 
     const main = page.getByRole('main');
+
+    // The catalogue is paginated. Select all rows before asserting the non-water
+    // seed is visible; otherwise its absence only proves it is not on page one.
+    await main.getByRole('combobox', { name: 'Rows per page', exact: true }).selectOption('all');
 
     // Default ("All") view lists every published course, including a non-water one
     // (the air-quality / odour essentials course). Assert it is present before
@@ -83,7 +87,7 @@ test.describe('Public course catalogue', () => {
     await page.goto('/courses');
 
     // Type into the search box
-    const searchInput = page.locator('input[placeholder="Search courses..."]');
+    const searchInput = page.getByRole('textbox', { name: 'Search courses', exact: true });
     await searchInput.fill('Carpet');
 
     // Assert on a visible course CARD, not any text node — the tag-filter <select>
