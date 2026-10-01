@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { getLiveness } from '@/lib/server/health';
+import { getBuildIdentity, type BuildIdentity } from '@/lib/server/build-identity';
 
 // Always run live — a health check that can be statically/edge cached would
 // report a stale status and defeat the gate.
@@ -10,6 +11,7 @@ interface HealthResponse {
   status: 'healthy' | 'unhealthy';
   timestamp: string;
   version: string;
+  build: BuildIdentity;
   uptime: number;
   environment: string;
   checks: { ai: boolean };
@@ -37,6 +39,7 @@ export async function GET(): Promise<NextResponse<HealthResponse>> {
     status: liveness.status,
     timestamp: new Date().toISOString(),
     version: process.env.npm_package_version || '1.0.0',
+    build: getBuildIdentity(),
     uptime: Math.floor((Date.now() - startTime) / 1000),
     environment: process.env.NODE_ENV || 'development',
     checks: liveness.checks,
@@ -47,5 +50,8 @@ export async function GET(): Promise<NextResponse<HealthResponse>> {
     },
   };
 
-  return NextResponse.json(response, { status: liveness.httpStatus });
+  return NextResponse.json(response, {
+    status: liveness.httpStatus,
+    headers: { 'Cache-Control': 'no-store' },
+  });
 }
