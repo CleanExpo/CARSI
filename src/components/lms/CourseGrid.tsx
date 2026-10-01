@@ -283,9 +283,11 @@ export function CourseGrid({
     sortBy,
   ].join('|');
 
-  useEffect(() => {
+  const [previousFilterKey, setPreviousFilterKey] = useState(filterResetKey);
+  if (previousFilterKey !== filterResetKey) {
+    setPreviousFilterKey(filterResetKey);
     setPage(1);
-  }, [filterResetKey]);
+  }
 
   // URL ?discipline=WRT with sparse `discipline` fields used to yield zero rows; reset to All once.
   useEffect(() => {

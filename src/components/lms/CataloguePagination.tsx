@@ -1,7 +1,7 @@
 'use client';
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import {
   CATALOGUE_PAGE_SIZE_DEFAULT,
@@ -45,19 +45,18 @@ function RowsPerPage({
     inferredCustom ? String(pageSize) : String(currentNumericSize(pageSize))
   );
 
-  useEffect(() => {
+  const [previousPageSize, setPreviousPageSize] = useState(pageSize);
+  if (previousPageSize !== pageSize) {
+    setPreviousPageSize(pageSize);
     if (pageSize === 'all') {
       setCustomOpen(false);
-      return;
-    }
-    if (isCataloguePageSizePreset(pageSize) && !customOpen) {
-      setDraft(String(pageSize));
-    }
-    if (inferredCustom) {
+    } else if (inferredCustom) {
       setCustomOpen(true);
       setDraft(String(pageSize));
+    } else if (!customOpen) {
+      setDraft(String(pageSize));
     }
-  }, [pageSize, inferredCustom, customOpen]);
+  }
 
   const selectValue = customOpen ? 'custom' : pageSize === 'all' ? 'all' : String(pageSize);
 
@@ -95,6 +94,7 @@ function RowsPerPage({
               return;
             }
             setCustomOpen(false);
+            setDraft(value);
             onPageSizeChange(parseCataloguePageSizeChoice(value));
           }}
           className="h-10 rounded-full border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-900 shadow-sm focus-visible:ring-2 focus-visible:ring-[#146fc2]/45 focus-visible:outline-none"

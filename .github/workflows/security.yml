@@ -153,16 +153,12 @@ jobs:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
 
+      - name: Test security summary truthfulness
+        run: node --test scripts/security-scan-summary.test.mjs
+
       - name: Display security scan results
-        run: |
-          echo "# Security Scan Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## Required Scans Completed:" >> $GITHUB_STEP_SUMMARY
-          echo "- [PASS] NPM Audit (no token required)" >> $GITHUB_STEP_SUMMARY
-          echo "- [PASS] Trivy Container Scan (no token required)" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## Optional Scans:" >> $GITHUB_STEP_SUMMARY
-          echo "- [OPT] Snyk Security Scans (requires SNYK_TOKEN secret)" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "All required security scans completed successfully." >> $GITHUB_STEP_SUMMARY
-          echo "Please review the artifact reports for detailed findings." >> $GITHUB_STEP_SUMMARY
+        if: always()
+        env:
+          NPM_AUDIT_RESULT: ${{ needs.npm-audit.result }}
+          TRIVY_RESULT: ${{ needs.trivy-scan.result }}
+        run: node scripts/security-scan-summary.mjs

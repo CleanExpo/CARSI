@@ -3,7 +3,7 @@
 import { DollarSign, Loader2, Upload } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 
 import { MarkdownEditor } from '@/components/admin/MarkdownEditor';
 import { Input } from '@/components/ui/input';
@@ -87,6 +87,10 @@ function SectionTitle({ children }: { children: ReactNode }) {
 }
 
 export function CourseEditorForm({ courseId }: { courseId?: string }) {
+  return <CourseEditorFormContent key={courseId ?? 'new'} courseId={courseId} />;
+}
+
+function CourseEditorFormContent({ courseId }: { courseId?: string }) {
   const router = useRouter();
   const { toast } = useToast();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -117,80 +121,71 @@ export function CourseEditorForm({ courseId }: { courseId?: string }) {
   const [resolvedCecHours, setResolvedCecHours] = useState<string | null>(null);
   const [resolvedDurationHours, setResolvedDurationHours] = useState<string | null>(null);
   const [modules, setModules] = useState<Mod[]>([emptyModule()]);
-  const [article, setArticle] = useState('');
+  const [article, setArticle] = useState(() =>
+    courseId ? '' : composeCourseArticle({ title: '', description: '', modules })
+  );
   const [uploading, setUploading] = useState(false);
   const [savedFingerprint, setSavedFingerprint] = useState('');
 
-  const load = useCallback(async () => {
-    if (!courseId) return;
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/admin/courses/${courseId}`, { credentials: 'include' });
-      if (!res.ok) throw new Error('Failed to load course');
-      const data = (await res.json()) as { course: CourseDto };
-      const c = data.course;
-      setSlugReadOnly(c.slug);
-      setTitle(c.title);
-      setDescription(c.description);
-      setThumbnailUrl(c.thumbnailUrl);
-      setIntroVideoUrl(c.introVideoUrl ?? '');
-      setIntroThumbnailUrl(c.introThumbnailUrl ?? '');
-      setIsFree(c.isFree);
-      setPriceAud(String(Number(c.priceAud)));
-      setPublished(c.published);
-      setWorkflowStatus(c.workflow_status ?? (c.published ? 'published' : 'draft'));
-      setCecHours(c.cecHours ?? '');
-      setDurationHours(c.durationHours ?? '');
-      setIicrcDiscipline(c.iicrcDiscipline ?? '');
-      setLevel(c.level ?? '');
-      setCategory(c.category ?? '');
-      setCecMissing(Boolean(c.cecMissing));
-      setCecExcluded(Boolean(c.cecExcluded));
-      setResolvedCecHours(c.resolvedCecHours ?? null);
-      setResolvedDurationHours(c.resolvedDurationHours ?? null);
-      const loadedMods =
-        c.modules.length > 0
-          ? c.modules.map((m) => ({
-              key: m.id,
-              id: m.id,
-              title: m.title,
-              textContent: m.textContent,
-              videoUrl: m.videoUrl,
-            }))
-          : [emptyModule()];
-      setModules(loadedMods);
-      const loadedArticle = composeCourseArticle({
-        title: c.title,
-        description: c.description,
-        modules: loadedMods,
-      });
-      setArticle(loadedArticle);
-      setSavedFingerprint(loadedArticle);
-    } catch {
-      toast({ title: 'Could not load course', variant: 'destructive' });
-      router.push('/admin/courses');
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    const controller = new AbortController();
+    const { signal } = controller;
+    async function load() {
+      if (!courseId) return;
+      try {
+        const res = await fetch(`/api/admin/courses/${courseId}`, { credentials: 'include', signal });
+        if (!res.ok) throw new Error('Failed to load course');
+        const data = (await res.json()) as { course: CourseDto };
+        if (signal.aborted) return;
+        const c = data.course;
+        setSlugReadOnly(c.slug);
+        setTitle(c.title);
+        setDescription(c.description);
+        setThumbnailUrl(c.thumbnailUrl);
+        setIntroVideoUrl(c.introVideoUrl ?? '');
+        setIntroThumbnailUrl(c.introThumbnailUrl ?? '');
+        setIsFree(c.isFree);
+        setPriceAud(String(Number(c.priceAud)));
+        setPublished(c.published);
+        setWorkflowStatus(c.workflow_status ?? (c.published ? 'published' : 'draft'));
+        setCecHours(c.cecHours ?? '');
+        setDurationHours(c.durationHours ?? '');
+        setIicrcDiscipline(c.iicrcDiscipline ?? '');
+        setLevel(c.level ?? '');
+        setCategory(c.category ?? '');
+        setCecMissing(Boolean(c.cecMissing));
+        setCecExcluded(Boolean(c.cecExcluded));
+        setResolvedCecHours(c.resolvedCecHours ?? null);
+        setResolvedDurationHours(c.resolvedDurationHours ?? null);
+        const loadedMods =
+          c.modules.length > 0
+            ? c.modules.map((m) => ({
+                key: m.id,
+                id: m.id,
+                title: m.title,
+                textContent: m.textContent,
+                videoUrl: m.videoUrl,
+              }))
+            : [emptyModule()];
+        setModules(loadedMods);
+        const loadedArticle = composeCourseArticle({
+          title: c.title,
+          description: c.description,
+          modules: loadedMods,
+        });
+        setArticle(loadedArticle);
+        setSavedFingerprint(loadedArticle);
+      } catch {
+        if (signal.aborted) return;
+        toast({ title: 'Could not load course', variant: 'destructive' });
+        router.push('/admin/courses');
+      } finally {
+        if (!signal.aborted) setLoading(false);
+      }
     }
-  }, [courseId, router, toast]);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing RA-4192 rule promotion; behaviour-preserving suppression, real fix tracked separately
     void load();
-  }, [load]);
-
-  useEffect(() => {
-    if (courseId) return;
-    setArticle(
-      composeCourseArticle({
-        title,
-        description,
-        modules,
-      })
-    );
-    // Seed the blank article once for a new course.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [courseId]);
+    return () => controller.abort();
+  }, [courseId, router, toast]);
 
   const isDirty = courseId
     ? Boolean(savedFingerprint) && article !== savedFingerprint
