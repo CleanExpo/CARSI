@@ -58,6 +58,12 @@ const nextConfig: NextConfig = {
   devIndicators: false,
   async redirects() {
     return [
+      // Existing marketing links use /signup; keep the course return path and
+      // attribution query intact while sending learners to the real form.
+      { source: '/signup', destination: '/register', permanent: true },
+      // Personal onboarding is a dashboard modal, not the enterprise-only
+      // /dashboard/onboarding hub. Give public visitors a useful starting point.
+      { source: '/onboarding', destination: '/pathways', permanent: false },
       { source: '/student', destination: '/dashboard/student', permanent: true },
       { source: '/student/:path*', destination: '/dashboard/student/:path*', permanent: true },
       // IICRC's public online-CEC listing links to /restoration-courses (404 until
