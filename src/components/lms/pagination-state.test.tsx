@@ -12,7 +12,11 @@ import { prepareCourseOutline } from './CourseDetailOutline';
 
 vi.mock('@/components/ThemeProvider', () => ({ useTheme: () => ({ theme: 'light' }) }));
 vi.mock('./CourseCard', () => ({
-  CourseCard: ({ course }: { course: { title: string } }) => <div>{course.title}</div>,
+  CourseCard: ({ course }: { course: { title: string } }) => (
+    <article>
+      <h3>{course.title}</h3>
+    </article>
+  ),
 }));
 
 (

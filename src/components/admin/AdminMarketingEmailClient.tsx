@@ -46,7 +46,7 @@ export function AdminMarketingEmailClient() {
 
   const requestKey = JSON.stringify([query, page, pageSize, reload]);
   const loadingList = customerResult?.key !== requestKey;
-  const list = loadingList ? null : customerResult?.list;
+  const list = customerResult?.list;
   const listError = loadingList ? '' : customerResult?.error;
 
   useEffect(() => {
@@ -243,6 +243,7 @@ export function AdminMarketingEmailClient() {
             <button
               type="button"
               onClick={selectAllOnPage}
+              disabled={loadingList}
               className="rounded-lg border border-white/15 bg-white/5 px-2.5 py-1 text-xs font-medium text-white/85 hover:bg-white/10"
             >
               Select page
@@ -250,6 +251,7 @@ export function AdminMarketingEmailClient() {
             <button
               type="button"
               onClick={() => void selectAllMatching()}
+              disabled={loadingList}
               className="rounded-lg border border-[#2490ed]/40 bg-[#2490ed]/15 px-2.5 py-1 text-xs font-medium text-sky-100 hover:bg-[#2490ed]/25"
             >
               Select all matching (max {MAX_SEND})
@@ -285,7 +287,9 @@ export function AdminMarketingEmailClient() {
 
           <ul className="mt-3 min-h-[200px] flex-1 space-y-0.5 overflow-y-auto rounded-lg border border-white/8 bg-black/20 p-1">
             {loadingList ? (
-              <li className="px-3 py-6 text-center text-sm text-white/40">Loading…</li>
+              <li role="status" className="px-3 py-6 text-center text-sm text-white/40">
+                {list ? 'Updating recipients… Previous results are temporarily read-only.' : 'Loading…'}
+              </li>
             ) : null}
             {!loadingList && list?.users.length === 0 ? (
               <li className="px-3 py-6 text-center text-sm text-white/40">No customers found.</li>
@@ -297,6 +301,7 @@ export function AdminMarketingEmailClient() {
                     type="checkbox"
                     className="mt-1 size-4 rounded border-white/20"
                     checked={Boolean(selected[u.id])}
+                    disabled={loadingList}
                     onChange={() => toggle(u)}
                   />
                   <span className="min-w-0 flex-1">
@@ -312,7 +317,7 @@ export function AdminMarketingEmailClient() {
             <div className="mt-3 flex items-center justify-between gap-2">
               <button
                 type="button"
-                disabled={page <= 1}
+                disabled={loadingList || page <= 1}
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 className="inline-flex items-center gap-1 rounded-lg border border-white/10 px-2 py-1 text-xs text-white/70 disabled:opacity-30"
               >
@@ -324,7 +329,7 @@ export function AdminMarketingEmailClient() {
               </span>
               <button
                 type="button"
-                disabled={page >= list.totalPages}
+                disabled={loadingList || page >= list.totalPages}
                 onClick={() => setPage((p) => p + 1)}
                 className="inline-flex items-center gap-1 rounded-lg border border-white/10 px-2 py-1 text-xs text-white/70 disabled:opacity-30"
               >

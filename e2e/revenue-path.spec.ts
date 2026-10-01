@@ -52,7 +52,8 @@ test.describe('Authenticated learner journey @authenticated', () => {
     await page.waitForLoadState('domcontentloaded');
     // A real session must NOT bounce to /login.
     await expect(page).toHaveURL(/\/dashboard\/student/, { timeout: 20_000 });
-    await expect(page.getByRole('link', { name: /courses/i }).first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole('heading', { name: 'My Learning', exact: true })).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole('link', { name: 'Browse catalogue', exact: true })).toHaveAttribute('href', '/dashboard/courses');
   });
 
   test('enrolled course page opens for the student', async ({ page }) => {

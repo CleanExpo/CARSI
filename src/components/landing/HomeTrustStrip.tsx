@@ -35,7 +35,7 @@ export function HomeTrustStrip({ stats }: { stats: Stat[] }) {
                 <p className="font-[family-name:var(--font-display)] text-2xl font-semibold tracking-[-0.02em] text-slate-950 tabular-nums md:text-[1.85rem]">
                   {stat.value}
                 </p>
-                <p className="mt-1 text-[10px] font-semibold tracking-[0.16em] text-slate-400 uppercase">
+                <p className="mt-1 text-[10px] font-semibold tracking-[0.16em] text-slate-600 uppercase">
                   {stat.label}
                 </p>
               </motion.div>

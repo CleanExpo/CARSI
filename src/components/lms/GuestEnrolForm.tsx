@@ -255,7 +255,7 @@ export function GuestEnrolForm({ slug, priceAud, isFree, showTeamOption = false 
       </Button>
       <p className="text-center text-xs text-white/40">
         Already have an account?{' '}
-        <a href={`/login?next=${encodeURIComponent(`/courses/${slug}`)}`} className="text-[#2490ed] hover:underline">
+        <a href={`/login?next=${encodeURIComponent(`/courses/${slug}`)}`} className="text-[#146fc2] underline underline-offset-2 hover:no-underline">
           Sign in
         </a>
       </p>
