@@ -21,6 +21,18 @@ function run(command: string, value?: string) {
   document.execCommand(command, false, value);
 }
 
+const tools = [
+  { icon: Heading1, label: 'Title', action: 'formatBlock', value: 'h1' },
+  { icon: Heading2, label: 'Module heading', action: 'module' },
+  { icon: Bold, label: 'Bold', action: 'bold' },
+  { icon: Italic, label: 'Italic', action: 'italic' },
+  { icon: Quote, label: 'Quote', action: 'formatBlock', value: 'blockquote' },
+  { icon: List, label: 'Bullet list', action: 'insertUnorderedList' },
+  { icon: ListOrdered, label: 'Numbered list', action: 'insertOrderedList' },
+  { icon: Link2, label: 'Link', action: 'link' },
+  { icon: ImageIcon, label: 'Image', action: 'image' },
+];
+
 export function MarkdownEditor({
   id,
   label,
@@ -74,85 +86,27 @@ export function MarkdownEditor({
     emitHtml();
   }
 
-  const tools = [
-    {
-      icon: Heading1,
-      label: 'Title',
-      onClick: () => {
-        focusEditor();
-        run('formatBlock', 'h1');
-        emitHtml();
-      },
-    },
-    { icon: Heading2, label: 'Module heading', onClick: insertModuleHeading },
-    {
-      icon: Bold,
-      label: 'Bold',
-      onClick: () => {
-        focusEditor();
-        run('bold');
-        emitHtml();
-      },
-    },
-    {
-      icon: Italic,
-      label: 'Italic',
-      onClick: () => {
-        focusEditor();
-        run('italic');
-        emitHtml();
-      },
-    },
-    {
-      icon: Quote,
-      label: 'Quote',
-      onClick: () => {
-        focusEditor();
-        run('formatBlock', 'blockquote');
-        emitHtml();
-      },
-    },
-    {
-      icon: List,
-      label: 'Bullet list',
-      onClick: () => {
-        focusEditor();
-        run('insertUnorderedList');
-        emitHtml();
-      },
-    },
-    {
-      icon: ListOrdered,
-      label: 'Numbered list',
-      onClick: () => {
-        focusEditor();
-        run('insertOrderedList');
-        emitHtml();
-      },
-    },
-    {
-      icon: Link2,
-      label: 'Link',
-      onClick: () => {
-        const href = window.prompt('Link address', 'https://');
-        if (!href) return;
-        focusEditor();
-        run('createLink', href);
-        emitHtml();
-      },
-    },
-    {
-      icon: ImageIcon,
-      label: 'Image',
-      onClick: () => {
-        const src = window.prompt('Image address', 'https://');
-        if (!src) return;
-        focusEditor();
-        run('insertHTML', `<p><img src="${src.replace(/"/g, '')}" alt=""></p>`);
-        emitHtml();
-      },
-    },
-  ];
+  function handleTool(action: string, value?: string) {
+    if (action === 'module') {
+      insertModuleHeading();
+      return;
+    }
+    if (action === 'link') {
+      const href = window.prompt('Link address', 'https://');
+      if (!href) return;
+      focusEditor();
+      run('createLink', href);
+    } else if (action === 'image') {
+      const src = window.prompt('Image address', 'https://');
+      if (!src) return;
+      focusEditor();
+      run('insertHTML', `<p><img src="${src.replace(/"/g, '')}" alt=""></p>`);
+    } else {
+      focusEditor();
+      run(action, value);
+    }
+    emitHtml();
+  }
 
   return (
     <div
@@ -169,7 +123,7 @@ export function MarkdownEditor({
             title={t.label}
             disabled={disabled}
             onMouseDown={(e) => e.preventDefault()}
-            onClick={t.onClick}
+            onClick={() => handleTool(t.action, t.value)}
             className="rounded-lg p-2 text-white/50 transition-colors hover:bg-white/8 hover:text-white disabled:opacity-30"
           >
             <t.icon className="h-3.5 w-3.5" />

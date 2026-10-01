@@ -133,7 +133,7 @@ function buildCatalogueFaqs(publishedCourseCount: number) {
     {
       question: 'What are IICRC Continuing Education Credits (CECs)?',
       answer:
-        'IICRC Continuing Education Credits (CECs) are the industry standard for tracking professional development in cleaning and restoration. IICRC members and certified technicians continue their education through CECs within each certification cycle. A CARSI course may carry a specific CEC value only after the IICRC has approved that course for CECs. Courses awaiting approval show no CEC value. Upon completing an approved course, CECs are recorded in your CARSI dashboard and can be exported for submission to the IICRC. CARSI also provides verifiable digital credentials with a public URL.',
+        'IICRC Continuing Education Credits (CECs) are the industry standard for tracking professional development in cleaning and restoration. IICRC members and certified technicians continue their education through CECs within each certification cycle. A CARSI course shows a CEC value only when that course has a recorded IICRC approval. Courses awaiting approval show no CEC value. Upon completing an approved course, CECs are recorded in your CARSI dashboard and can be exported for submission to the IICRC. CARSI also provides verifiable digital credentials with a public URL.',
     },
   ];
 }
@@ -236,9 +236,9 @@ export default async function CoursesPage({
           </div>
 
           <p className="mt-8 max-w-2xl rounded-2xl border border-[#f2cf8f]/80 bg-[#fff8ed] px-5 py-4 text-sm leading-relaxed text-[#7a3500]">
-            CARSI courses carry CARSI Southern Hemisphere Restoration Designations. They are not
-            IICRC certification courses — IICRC certifications are obtained through schools and
-            examinations approved by the IICRC.
+            CARSI courses carry CARSI Southern Hemisphere Restoration Designations. These are
+            CARSI-issued credentials, not IICRC certifications. IICRC certification is obtained
+            through schools and examinations approved by the IICRC.
           </p>
         </div>
       </section>

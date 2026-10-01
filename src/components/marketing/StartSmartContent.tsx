@@ -40,7 +40,6 @@ import { PlatformNav } from '@/components/marketing/PlatformNav';
 import { BreadcrumbSchema, FAQSchema } from '@/components/seo';
 import {
   marketingBtnPrimary,
-  marketingBtnSecondary,
   marketingEyebrow,
   marketingEyebrowAmber,
   marketingIconWrap,

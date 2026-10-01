@@ -1,7 +1,7 @@
 'use client';
 
 import { ChevronLeft, ChevronRight, ImagePlus, Search, Send, X } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { adminGlassCard } from '@/components/admin/admin-learner-ui';
 import {
@@ -27,7 +27,12 @@ const MAX_SEND = 80;
 
 export function AdminMarketingEmailClient() {
   const [query, setQuery] = useState('');
-  const [list, setList] = useState<ListResponse | null>(null);
+  const [customerResult, setCustomerResult] = useState<{
+    key: string;
+    list: ListResponse | null;
+    error: string;
+  } | null>(null);
+  const [reload, setReload] = useState(0);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState<(typeof PAGE_SIZES)[number]>(25);
   const [selected, setSelected] = useState<Record<string, Customer>>({});
@@ -36,36 +41,47 @@ export function AdminMarketingEmailClient() {
   const [imageUrl, setImageUrl] = useState('');
   const [uploading, setUploading] = useState(false);
   const [sending, setSending] = useState(false);
-  const [loadingList, setLoadingList] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const loadCustomers = useCallback(async (opts: { q: string; page: number; pageSize: number }) => {
-    setLoadingList(true);
-    const params = new URLSearchParams({
-      page: String(opts.page),
-      pageSize: String(opts.pageSize),
-    });
-    if (opts.q.trim().length >= 3) params.set('q', opts.q.trim());
-    const res = await fetch(`/api/admin/marketing-email?${params}`);
-    const data = (await res.json().catch(() => ({}))) as ListResponse & { detail?: string };
-    setLoadingList(false);
-    if (!res.ok) {
-      setError(data.detail || 'Could not load customers');
-      return;
-    }
-    setList(data);
-  }, []);
+  const requestKey = JSON.stringify([query, page, pageSize, reload]);
+  const loadingList = customerResult?.key !== requestKey;
+  const list = loadingList ? null : customerResult?.list;
+  const listError = loadingList ? '' : customerResult?.error;
 
   useEffect(() => {
-    void loadCustomers({ q: query, page, pageSize });
-  }, [loadCustomers, query, page, pageSize]);
+    const controller = new AbortController();
+    async function loadCustomers() {
+      const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
+      if (query.trim().length >= 3) params.set('q', query.trim());
+      try {
+        const res = await fetch(`/api/admin/marketing-email?${params}`, {
+          signal: controller.signal,
+        });
+        const data = (await res.json().catch(() => ({}))) as ListResponse & { detail?: string };
+        if (!res.ok) throw new Error(data.detail || 'Could not load customers');
+        if (!controller.signal.aborted) {
+          setCustomerResult({ key: requestKey, list: data, error: '' });
+        }
+      } catch (e) {
+        if (!controller.signal.aborted) {
+          setCustomerResult({
+            key: requestKey,
+            list: null,
+            error: e instanceof Error ? e.message : 'Could not load customers',
+          });
+        }
+      }
+    }
+    void loadCustomers();
+    return () => controller.abort();
+  }, [query, page, pageSize, requestKey]);
 
-  async function search(e: React.FormEvent) {
+  function search(e: React.FormEvent) {
     e.preventDefault();
     setError('');
     setPage(1);
-    await loadCustomers({ q: query, page: 1, pageSize });
+    setReload((previous) => previous + 1);
   }
 
   function toggle(user: Customer) {
@@ -379,7 +395,7 @@ export function AdminMarketingEmailClient() {
               />
             ) : null}
           </div>
-          {error ? <p className="text-sm text-amber-300">{error}</p> : null}
+          {error || listError ? <p className="text-sm text-amber-300">{error || listError}</p> : null}
           {success ? <p className="text-sm text-emerald-300">{success}</p> : null}
           <Button type="button" onClick={() => void send()} disabled={sending}>
             <Send className="mr-2 h-4 w-4" />

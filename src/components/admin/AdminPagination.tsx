@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import {
@@ -28,9 +28,11 @@ function RowsPerPage({
   const usingCustom = pageSize !== 'all' && !isAdminPageSizePreset(pageSize);
   const [draft, setDraft] = useState(usingCustom ? String(pageSize) : '');
 
-  useEffect(() => {
-    setDraft(pageSize !== 'all' && !isAdminPageSizePreset(pageSize) ? String(pageSize) : '');
-  }, [pageSize]);
+  const [previousPageSize, setPreviousPageSize] = useState(pageSize);
+  if (previousPageSize !== pageSize) {
+    setPreviousPageSize(pageSize);
+    setDraft(usingCustom ? String(pageSize) : '');
+  }
 
   const selectValue = pageSize === 'all' ? 'all' : isAdminPageSizePreset(pageSize) ? String(pageSize) : 'custom';
 

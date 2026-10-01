@@ -146,6 +146,27 @@ const MUST_PASS = [
     'not-a-certification disclaimer',
     'A CARSI-issued credential — not an IICRC certification. CARSI is an IICRC CEC Accredited provider.',
   ],
+  // PR #841: preserve approval gates, honest disclaimers and optimiser prohibitions.
+  [
+    'catalogue approval gate',
+    'A CARSI course shows a CEC value only when that course has a recorded IICRC approval.',
+  ],
+  [
+    'catalogue credential disclaimer',
+    'CARSI courses carry CARSI Southern Hemisphere Restoration Designations. These are CARSI-issued credentials, not IICRC certifications.',
+  ],
+  [
+    'pathway approval check and credential disclaimer',
+    'CEC approval is course-specific. Check individual course pages for current approval details before planning certification renewal. Each pathway is a CARSI journey with CARSI-issued designations, not IICRC certifications.',
+  ],
+  [
+    'optimiser forbids delivering certification and courses for the IICRC',
+    'Never imply CARSI delivers certification or courses on behalf of the IICRC. If CEC is not in the source, do not add CEC hours.',
+  ],
+  [
+    'optimiser forbids comma-separated acronym branding',
+    'Never brand the course with IICRC discipline acronyms (WRT, ASD, AMRT, FSRT, CCT, TCST).',
+  ],
   // Plain CARSI framing with no IICRC branding at all.
   ['CARSI own designation', 'Earns the CARSI Water Restoration Practitioner designation'],
   ['plain topic wording', 'CARSI water damage restoration training for Australian technicians'],
