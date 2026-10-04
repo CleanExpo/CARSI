@@ -16,6 +16,7 @@ import { CourseGrid } from '@/components/lms/CourseGrid';
 import { IICRCDisciplineMap } from '@/components/lms/diagrams/IICRCDisciplineMap';
 import { ItemListSchema } from '@/components/seo';
 import { CECCalculator } from '@/components/tools/CECCalculator';
+import { resolveDisciplineParam } from '@/lib/catalogue/discipline-param';
 import type { CourseListItem } from '@/lib/course-list-item';
 import { getBackendOrigin, getPublicSiteUrl } from '@/lib/env/public-url';
 import {
@@ -41,7 +42,7 @@ export async function generateMetadata(): Promise<Metadata> {
 interface SearchParams {
   category?: string;
   level?: string;
-  discipline?: string;
+  discipline?: string | string[];
 }
 
 async function getBundles() {
@@ -144,17 +145,8 @@ export default async function CoursesPage({
   searchParams: Promise<SearchParams>;
 }) {
   const sp = await searchParams;
-  const rawDiscipline = sp.discipline;
-  const discipline =
-    typeof rawDiscipline === 'string'
-      ? rawDiscipline
-      : Array.isArray(rawDiscipline)
-        ? rawDiscipline[0]
-        : undefined;
-  const disciplineTab =
-    typeof discipline === 'string' && discipline.trim() !== ''
-      ? discipline.trim().toUpperCase()
-      : undefined;
+  // GP-592: map ?discipline= (topic label or legacy URL code) to a real topic tab.
+  const disciplineTab = resolveDisciplineParam(sp.discipline);
   const [bundles, { items: courses }] = await Promise.all([getBundles(), getCoursesCached()]);
   const displayCourses = dedupeCoursesBySlug(courses);
   const displayTotal = displayCourses.length;
