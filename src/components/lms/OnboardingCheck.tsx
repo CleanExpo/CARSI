@@ -1,9 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { OnboardingWizard } from './OnboardingWizard';
 import { apiClient } from '@/lib/api/client';
+import {
+  readSkipped,
+  rememberSkipped,
+  shouldShowOnboardingWizard,
+} from '@/lib/onboarding/wizard-gate';
 
 interface UserProfile {
   onboarding_completed: boolean;
@@ -11,9 +16,11 @@ interface UserProfile {
 }
 
 export function OnboardingCheck() {
-  const [showWizard, setShowWizard] = useState(false);
+  const [needsOnboarding, setNeedsOnboarding] = useState(false);
+  const [skipped, setSkipped] = useState(false);
   const [checked, setChecked] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     let cancelled = false;
@@ -22,12 +29,15 @@ export function OnboardingCheck() {
       try {
         const profile = await apiClient.get<UserProfile>('/api/lms/auth/me');
         if (!cancelled && !profile.onboarding_completed) {
-          setShowWizard(true);
+          setNeedsOnboarding(true);
         }
       } catch {
         // not authenticated or network error — silently skip onboarding check
       } finally {
-        if (!cancelled) setChecked(true);
+        if (!cancelled) {
+          setSkipped(readSkipped());
+          setChecked(true);
+        }
       }
     }
 
@@ -37,13 +47,26 @@ export function OnboardingCheck() {
     };
   }, []);
 
-  if (!checked || !showWizard) return null;
+  // GP-593: never over a lesson, and not again once skipped this session.
+  const show =
+    checked &&
+    shouldShowOnboardingWizard({
+      onboardingCompleted: !needsOnboarding,
+      pathname,
+      skippedThisSession: skipped,
+    });
+
+  if (!show) return null;
 
   return (
     <OnboardingWizard
-      isOpen={showWizard}
+      isOpen
+      onSkip={() => {
+        rememberSkipped();
+        setSkipped(true);
+      }}
       onComplete={(destination) => {
-        setShowWizard(false);
+        setNeedsOnboarding(false);
         router.push(destination);
       }}
     />
