@@ -27,6 +27,8 @@ export interface OnboardingResponse {
 interface OnboardingWizardProps {
   isOpen: boolean;
   onComplete: (destination: string) => void;
+  /** GP-593: when set, a "Skip for now" control closes the wizard without answering. */
+  onSkip?: () => void;
   /** Open at this step (0-based). Production opens at 0; the licence test renders every step. */
   initialStep?: number;
   /** Open on the recommendation screen. Production never sets it; the licence test renders it. */
@@ -69,6 +71,7 @@ const slideVariants = {
 export function OnboardingWizard({
   isOpen,
   onComplete,
+  onSkip,
   initialStep = 0,
   initialResult,
 }: OnboardingWizardProps) {
@@ -171,6 +174,15 @@ export function OnboardingWizard({
         className="relative w-full max-w-lg rounded-sm border border-white/[0.06] p-8"
         style={{ background: '#060a14' }}
       >
+        {!result && onSkip && (
+          <button
+            type="button"
+            onClick={onSkip}
+            className="absolute top-3 right-3 rounded-sm px-2 py-1 text-xs text-white/50 transition-colors hover:text-white focus-visible:ring-2 focus-visible:ring-[#2490ed]/50 focus-visible:outline-none"
+          >
+            Skip for now
+          </button>
+        )}
         {!result && (
           <div className="mb-8 flex items-center justify-center gap-2">
             {FLOW.map((_, i) => (
