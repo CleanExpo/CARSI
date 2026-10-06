@@ -1,4 +1,4 @@
-import { ArrowUpRight, Mail, MapPin, MessageCircle } from 'lucide-react';
+import { ArrowUpRight, Mail, MapPin, MessageCircle, PlayCircle } from 'lucide-react';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
@@ -51,6 +51,17 @@ const eventLinks = [
   { label: 'CCW Sydney', href: '/ccw-sydney' },
   { label: 'CCW Materials', href: '/ccw-materials' },
 ];
+
+/**
+ * RestoreAssist — sister product: job software for restoration contractors.
+ * The explainer link targets the `#overview` section of the RestoreAssist
+ * marketing home (components/landing/concepts/claim-folio/ClaimFolioLanding.tsx
+ * in that repo), which carries the product-overview video and `scroll-mt-24`.
+ * If that anchor ever moves, the link degrades to the top of the page rather
+ * than 404ing, so it is safe to ship ahead of any RestoreAssist deploy.
+ */
+const RESTOREASSIST_URL = 'https://restoreassist.app';
+const RESTOREASSIST_EXPLAINER_URL = 'https://restoreassist.app/#overview';
 
 const socialLinks = [
   { label: 'Facebook', href: 'https://www.facebook.com/CARSIaus' },
@@ -233,6 +244,28 @@ export function PublicFooter({ tone = 'chrome' }: { tone?: 'chrome' | 'light' } 
                     {social.label}
                   </FooterExternalLink>
                 ))}
+              </div>
+            </div>
+
+            <div className="mt-6 border-t border-white/[0.06] pt-5">
+              <p className="mb-3 text-[10px] font-semibold tracking-[0.16em] text-white/60 uppercase">
+                Job software
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <FooterExternalLink href={RESTOREASSIST_URL}>RestoreAssist</FooterExternalLink>
+                <a
+                  href={RESTOREASSIST_EXPLAINER_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group inline-flex min-h-8 items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[11px] font-medium text-white/65 transition-all duration-200 hover:border-[#2490ed]/35 hover:bg-[#2490ed]/10 hover:text-white"
+                >
+                  <PlayCircle className="h-3.5 w-3.5 shrink-0 text-[#7ec5ff]/80" aria-hidden />
+                  <span>Explainer videos</span>
+                  <ArrowUpRight
+                    className="h-3 w-3 shrink-0 opacity-50 group-hover:opacity-90"
+                    aria-hidden
+                  />
+                </a>
               </div>
             </div>
           </div>
@@ -504,6 +537,30 @@ function LightFooter() {
                     {social.label}
                   </FooterExternalLinkLight>
                 ))}
+              </div>
+            </div>
+
+            <div className="mt-6 border-t border-slate-200/80 pt-5">
+              <p className="mb-3 text-[10px] font-semibold tracking-[0.16em] text-slate-600 uppercase">
+                Job software
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <FooterExternalLinkLight href={RESTOREASSIST_URL}>
+                  RestoreAssist
+                </FooterExternalLinkLight>
+                <a
+                  href={RESTOREASSIST_EXPLAINER_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group inline-flex min-h-8 items-center gap-1.5 rounded-full border border-slate-300/70 bg-white px-3 py-1.5 text-[11px] font-medium text-slate-600 transition-all duration-200 hover:border-[#146fc2]/40 hover:bg-[#146fc2]/[0.06] hover:text-slate-900"
+                >
+                  <PlayCircle className="h-3.5 w-3.5 shrink-0 text-[#146fc2]/75" aria-hidden />
+                  <span>Explainer videos</span>
+                  <ArrowUpRight
+                    className="h-3 w-3 shrink-0 opacity-50 group-hover:opacity-90"
+                    aria-hidden
+                  />
+                </a>
               </div>
             </div>
           </div>
