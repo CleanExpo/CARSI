@@ -70,8 +70,25 @@ describe('renamed course slugs', () => {
     });
   });
 
-  it('keeps the SEO card under the new slug only', () => {
+  it('covers every slug renamed in the seed catalogue (review round 4)', () => {
+    expect(renamedCourseSlug('amrt-microbial-remediation-core')).toBe('microbial-remediation-core');
+    expect(renamedCourseSlug('carpet-cleaning-technician-fundamentals')).toBe('carpet-cleaning-fundamentals');
+  });
+
+  it('redirects the AMRT seed slug only once the database holds the new one', async () => {
+    const req = new NextRequest('https://www.carsi.com.au/courses/amrt-microbial-remediation-core');
+    const before = async (slug: string) => slug === 'amrt-microbial-remediation-core';
+    const after = async (slug: string) => slug === 'microbial-remediation-core';
+    expect(await renamedCourseRedirect(req, before)).toBeNull();
+    const res = await renamedCourseRedirect(req, after);
+    expect(res?.status).toBe(301);
+    expect(res?.headers.get('location')).toBe('https://www.carsi.com.au/courses/microbial-remediation-core');
+  });
+
+  it('keeps the SEO card under the new slug only, where the course has one', () => {
     for (const [from, to] of Object.entries(RENAMED_COURSE_SLUGS)) {
+      if (!existsSync(join(REPO_ROOT, 'data/seo/course-cards', `${to}.json`)) &&
+          !existsSync(join(REPO_ROOT, 'data/seo/course-cards', `${from}.json`))) continue;
       expect(existsSync(join(REPO_ROOT, 'data/seo/course-cards', `${to}.json`))).toBe(true);
       expect(existsSync(join(REPO_ROOT, 'data/seo/course-cards', `${from}.json`))).toBe(false);
     }

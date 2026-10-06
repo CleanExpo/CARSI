@@ -49,7 +49,8 @@ import { pathToFileURL } from 'node:url';
  * "Applied–Structural–Drying" are the same title (independent review, 06/10/2026, reproduced
  * both bypasses). \s already covers the no-break space.
  */
-const TITLE_WORD_SEP = '[\\s_\\-\\u2010-\\u2015\\u2212]+';
+// A string join (`'Applied ' + 'Structural Drying'`) separates words as well as whitespace does.
+const TITLE_WORD_SEP = '(?:[\\s_\\-\\u2010-\\u2015\\u2212]|["\'`]\\s*\\+\\s*["\'`])+';
 
 function designationNames(sep = '\\s+') {
   const and = `(?:and|&)`;
@@ -72,7 +73,8 @@ function designationNames(sep = '\\s+') {
  * Only the approved title AS THE WHOLE QUOTED VALUE is exempt, optionally followed by " | CARSI"
  * suffixes that also end the value. Independent review (06/10/2026, two rounds) showed that any
  * looser anchoring erased the approved title inside a different one — "… Drying Masterclass",
- * "… Drying course Masterclass" and "… Drying | CARSI Masterclass" all passed.
+ * "… Drying course Masterclass" and "… Drying | CARSI Masterclass" all passed. A value joined to
+ * another string with `+` is not a whole value either (round 4: 'Introduction to …' + ' Masterclass').
  */
 function registryTitlesCarryingDesignations() {
   const registry = JSON.parse(
@@ -85,7 +87,7 @@ function registryTitlesCarryingDesignations() {
   if (titles.length === 0) return null;
   const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   return new RegExp(
-    `(?<=["'\`])(?:${titles.map(esc).join('|')})(?=(?:\\s*\\|\\s*CARSI)*["'\`])`,
+    `(?<!\\+\\s*["'\`])(?<=["'\`])(?:${titles.map(esc).join('|')})(?=(?:\\s*\\|\\s*CARSI)*["'\`](?!\\s*\\+))`,
     'gi'
   );
 }
@@ -328,14 +330,15 @@ const BANNED = [
     // above keys on the ACRONYM, so "Applied Structural Drying — Core Concepts" shipped as a
     // live course title (06/10/2026) with no guard able to see it: the designation name with
     // the acronym removed is still the designation. Two shapes count as naming a course:
-    //  - the phrase inside a `title` value (TS `title: '…'` or JSON `"title": "…"`);
+    //  - the phrase inside a `title` value (TS `title: '…'` or JSON `"title": "…"`), including a
+    //    value built from quoted pieces joined with `+` (review round 4);
     //  - the phrase directly followed by a course noun ("… Fundamentals", "… — Core", "… course").
     // Spaces only between words, deliberately: a hyphenated slug is the URL, which the live
     // catalogue guard audits, and a slug in a JSON key is not rendered copy.
     // Audience usage ("for water damage restoration technicians") matches neither shape and
     // stays allowed, as does a third-person reference to the IICRC certification itself.
     re: new RegExp(
-      `\\btitle["']?\\s*[:=]\\s*["'\`][^"'\`\\n]*\\b${designationNames(TITLE_WORD_SEP)}|\\b${designationNames(TITLE_WORD_SEP)}\\b(?:\\s*[—–:]\\s*|\\s+-\\s*|\\s+)(?:core|essentials|fundamentals|basics|course|courses|training|class|classes|module|modules|program|programme|workshop|masterclass)\\b`,
+      `\\btitle["']?\\s*[:=]\\s*(?:["'\`][^"'\`\\n]*["'\`]\\s*\\+\\s*)*["'\`][^"'\`\\n]*\\b${designationNames(TITLE_WORD_SEP)}|\\b${designationNames(TITLE_WORD_SEP)}\\b(?:\\s*[—–:]\\s*|\\s+-\\s*|\\s+)(?:core|essentials|fundamentals|basics|course|courses|training|class|classes|module|modules|program|programme|workshop|masterclass)\\b`,
       'i'
     ),
     allow: null,

@@ -18,8 +18,11 @@ export const RENAMED_COURSE_SLUGS: Readonly<Record<string, string>> = {
   'fsrt-fire-smoke-restoration-core': 'fire-smoke-restoration-core',
   'cct-commercial-carpet-core': 'commercial-carpet-core',
   'introduction-to-advanced-applied-structural-drying': 'introduction-to-advanced-structural-drying',
-  // carpet-cleaning-technician-fundamentals -> carpet-cleaning-fundamentals is renamed in the seed
-  // too, but it is an unpublished draft with no public URL, so it needs no redirect.
+  // Renamed in the seed but not in the live catalogue on 06/10/2026 (public API 404 for both
+  // names). Mapped anyway: the redirect only fires once the old row is gone and the new row
+  // exists, so it is inert until a database actually holds the new slug.
+  'amrt-microbial-remediation-core': 'microbial-remediation-core',
+  'carpet-cleaning-technician-fundamentals': 'carpet-cleaning-fundamentals',
 };
 
 /** The renamed slug for `slug`, or null when it was never renamed. */

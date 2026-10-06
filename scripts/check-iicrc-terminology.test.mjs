@@ -102,6 +102,10 @@ const MUST_BLOCK = [
   ['registry title + "course" + more (review P1, round 3)', 'export const probe = { title: "Introduction to Applied Structural Drying course Masterclass" };'],
   ['registry title + "| CARSI" + more (review P1, round 3)', 'export const probe = { title: "Introduction to Applied Structural Drying | CARSI Masterclass" };'],
   ['registry title inside a sentence + course noun', '"q": "What does the Introduction to Applied Structural Drying course cover?",'],
+  ['registry title concatenated with a suffix (review P1, round 4)', "export const probe = { title: 'Introduction to Applied Structural Drying' + ' Masterclass' };"],
+  ['registry title + CARSI concatenated with a suffix (review P1, round 4)', "export const probe = { title: 'Introduction to Applied Structural Drying | CARSI' + ' Masterclass' };"],
+  ['designation split across concatenated pieces', "export const probe = { title: 'Applied ' + 'Structural Drying' };"],
+  ['prefix concatenated onto a registry title', "export const probe = { title: 'Advanced ' + 'Introduction to Applied Structural Drying' };"],
   ['microbial designation name in a quiz title', '"title": "Applied Microbial Remediation: Mould Fundamentals — Knowledge Check",'],
 ];
 
