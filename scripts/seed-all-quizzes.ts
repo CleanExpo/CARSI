@@ -40,7 +40,7 @@ const QUIZ_FILES = [
   'psychrometry-building-science-for-drying-quiz.json',
   'fire-smoke-damage-restoration-fundamentals-quiz.json',
   'trauma-crime-scene-decontamination-fundamentals-quiz.json',
-  'carpet-cleaning-technician-fundamentals-quiz.json',
+  'carpet-cleaning-fundamentals-quiz.json',
   'timber-floor-assessment-restoration-quiz.json',
   'assessing-indoor-environment-conditions-quiz.json',
 ];

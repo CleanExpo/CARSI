@@ -1832,8 +1832,8 @@
    "coursePrerequisites": "None — suitable for restoration professionals, contractors and environmental technicians."
   }
  },
- "wrt-water-damage-essentials": {
-  "slug": "wrt-water-damage-essentials",
+ "water-damage-essentials": {
+  "slug": "water-damage-essentials",
   "seoTitle": "Water Damage Restoration Course — Essentials | CARSI",
   "metaDescription": "A CARSI course on water damage restoration fundamentals: water categories, classes of loss, site safety, extraction, dehumidification and psychrometry.",
   "imageAlt": "Restoration technician moisture-mapping a water-damaged Australian home during drying setup",
@@ -1889,13 +1889,13 @@
    "coursePrerequisites": "None — open entry"
   }
  },
- "asd-structural-drying-core": {
-  "slug": "asd-structural-drying-core",
-  "seoTitle": "Applied Structural Drying — Core Concepts | CARSI",
+ "structural-drying-core": {
+  "slug": "structural-drying-core",
+  "seoTitle": "Structural Drying — Core Concepts | CARSI",
   "metaDescription": "Deepen drying science for structural assemblies: monitoring, vapour pressure, and advanced equipment strategies.",
-  "imageAlt": "CARSI course: Applied Structural Drying — Core Concepts",
+  "imageAlt": "CARSI course: Structural Drying — Core Concepts",
   "og": {
-   "title": "Applied Structural Drying — Core Concepts | CARSI",
+   "title": "Structural Drying — Core Concepts | CARSI",
    "description": "Deepen drying science for structural assemblies: monitoring, vapour pressure, and advanced equipment strategies."
   },
   "keywords": [
@@ -1907,18 +1907,18 @@
   ],
   "faq": [
    {
-    "q": "What does Applied Structural Drying — Core Concepts cover?",
+    "q": "What does Structural Drying — Core Concepts cover?",
     "a": "Builds on water restoration fundamentals with a focus on structural drying, documentation rigour, and complex assemblies."
    },
    {
-    "q": "Which syllabus topics are listed for Applied Structural Drying — Core Concepts?",
+    "q": "Which syllabus topics are listed for Structural Drying — Core Concepts?",
     "a": "Syllabus topics include Module 2 — Vapour pressure & drying forces; Module 3 — Cavities & concealed assemblies; Module 4 — Supplemental heat & conditioning; Module 5 — Hardwood & engineered flooring; Module 6 — Concrete & lightweight slab systems; Module 7 — Monitoring plans & KPIs."
    }
   ],
   "courseJsonLd": {
    "@context": "https://schema.org",
    "@type": "Course",
-   "name": "Applied Structural Drying — Core Concepts",
+   "name": "Structural Drying — Core Concepts",
    "description": "Builds on water restoration fundamentals with a focus on structural drying, documentation rigour, and complex assemblies. Syllabus topics include Module 2 — Vapour pressure & drying forces; Module 3 — Cavities & concealed assemblies; Module 4 — Supplemental heat & conditioning; Module 5 — Hardwood & engineered flooring; Module 6 — Concrete & lightweight slab systems; Module 7 — Monitoring plans & KPIs.",
    "provider": {
     "@type": "Organization",
@@ -1934,8 +1934,8 @@
    }
   }
  },
- "cct-commercial-carpet-core": {
-  "slug": "cct-commercial-carpet-core",
+ "commercial-carpet-core": {
+  "slug": "commercial-carpet-core",
   "seoTitle": "Commercial Carpet Care — Core Methods | CARSI",
   "metaDescription": "Fibres, soil chemistry, machine methods, and maintenance planning for commercial textile flooring.",
   "imageAlt": "CARSI course: Commercial Carpet Care — Core Methods",
@@ -1979,8 +1979,8 @@
    }
   }
  },
- "fsrt-fire-smoke-restoration-core": {
-  "slug": "fsrt-fire-smoke-restoration-core",
+ "fire-smoke-restoration-core": {
+  "slug": "fire-smoke-restoration-core",
   "seoTitle": "Fire & Smoke Restoration — Core Principles | CARSI",
   "metaDescription": "Safety on fire-affected sites, soot behaviour, cleaning chemistry, and deodorisation planning.",
   "imageAlt": "CARSI course: Fire & Smoke Restoration — Core Principles",
@@ -2069,13 +2069,13 @@
    }
   }
  },
- "introduction-to-advanced-applied-structural-drying": {
-  "slug": "introduction-to-advanced-applied-structural-drying",
-  "seoTitle": "Introduction to Advanced Applied Structural Drying | CARSI",
+ "introduction-to-advanced-structural-drying": {
+  "slug": "introduction-to-advanced-structural-drying",
+  "seoTitle": "Introduction to Advanced Structural Drying | CARSI",
   "metaDescription": "This course is designed for experienced technicians moving into advanced structural drying practice and project management.",
-  "imageAlt": "CARSI course: Introduction to Advanced Applied Structural Drying",
+  "imageAlt": "CARSI course: Introduction to Advanced Structural Drying",
   "og": {
-   "title": "Introduction to Advanced Applied Structural Drying | CARSI",
+   "title": "Introduction to Advanced Structural Drying | CARSI",
    "description": "This course is designed for experienced technicians moving into advanced structural drying practice and project management."
   },
   "keywords": [
@@ -2087,18 +2087,18 @@
   ],
   "faq": [
    {
-    "q": "What does the Introduction to Advanced Applied Structural Drying course cover?",
+    "q": "What does the Introduction to Advanced Structural Drying course cover?",
     "a": "It covers psychrometric analysis as a practical drying management tool, how to develop comprehensive drying strategies for complex losses, advanced moisture removal techniques, systematic progress monitoring, and the formal completion verification process required for complex and large loss restoration projects."
    },
    {
-    "q": "What does the Introduction to Advanced Applied Structural Drying course help learners understand?",
+    "q": "What does the Introduction to Advanced Structural Drying course help learners understand?",
     "a": "This course is designed for experienced technicians moving into advanced structural drying practice and project management."
    }
   ],
   "courseJsonLd": {
    "@context": "https://schema.org",
    "@type": "Course",
-   "name": "Introduction to Advanced Applied Structural Drying",
+   "name": "Introduction to Advanced Structural Drying",
    "description": "This course is designed for experienced technicians moving into advanced structural drying practice and project management. It covers psychrometric analysis as a practical drying management tool, how to develop comprehensive drying strategies for complex losses, advanced moisture removal techniques, systematic progress monitoring, and the formal completion verification process required for complex and large loss restoration projects. Aligned with the IICRC S500 standard and Australian commercial restoration requirements.",
    "provider": {
     "@type": "Organization",
@@ -2214,7 +2214,7 @@
    "description": "Applied microbial remediation: identifying, containing and verifying microbial contamination in built environments."
   },
   "keywords": [
-   "applied microbial remediation course",
+   "microbial remediation course",
    "microbial contamination assessment",
    "remediation containment planning",
    "microbial outcome verification",
@@ -2222,11 +2222,11 @@
   ],
   "faq": [
    {
-    "q": "What does the Introduction to Applied Microbial Remediation course cover?",
+    "q": "What does Introduction to Applied Microbial Remediation cover?",
     "a": "This course provides restoration professionals with the practical framework to assess microbial amplification events, plan and execute compliant remediation, verify outcomes with measurable evidence, and meet the contractor standards required by insurers and regulatory bodies in Australia."
    },
    {
-    "q": "What does the Introduction to Applied Microbial Remediation course help learners understand?",
+    "q": "What does Introduction to Applied Microbial Remediation help learners understand?",
     "a": "Applied microbial remediation is the systematic process of identifying, containing, removing, and verifying the elimination of microbial contamination in built environments."
    }
   ],
@@ -2259,7 +2259,7 @@
    "description": "Introduction to Applied Structural Drying: This course moves from foundational concepts to applied practice."
   },
   "keywords": [
-   "applied structural drying course",
+   "structural drying course",
    "structural assembly drying",
    "drying equipment operation",
    "material-specific drying techniques",
@@ -2267,7 +2267,7 @@
   ],
   "faq": [
    {
-    "q": "What does the Introduction to Applied Structural Drying course cover?",
+    "q": "What does Introduction to Applied Structural Drying cover?",
     "a": "This course moves from foundational concepts to applied practice, equipping technicians to assess real building components affected by water damage, understand drying dynamics in structural assemblies, deploy and operate drying equipment correctly, apply specific drying techniques to different material types, and produce monitoring and documentation records that meet IICRC and insurance requirements."
    }
   ],

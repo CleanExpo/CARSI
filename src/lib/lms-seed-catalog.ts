@@ -45,7 +45,7 @@ const SEED_COURSES: SeedCourseFull[] = [
   {
     export: {
       wp_id: 9001,
-      slug: 'wrt-water-damage-essentials',
+      slug: 'water-damage-essentials',
       title: 'Water Damage Restoration — Essentials',
       short_description:
         'Foundations of water damage assessment, extraction, drying, and documentation for Australian restoration technicians.',
@@ -187,8 +187,8 @@ const SEED_COURSES: SeedCourseFull[] = [
   {
     export: {
       wp_id: 9002,
-      slug: 'asd-structural-drying-core',
-      title: 'Applied Structural Drying — Core Concepts',
+      slug: 'structural-drying-core',
+      title: 'Structural Drying — Core Concepts',
       short_description:
         'Deepen drying science for structural assemblies: monitoring, vapour pressure, and advanced equipment strategies.',
       description:
@@ -251,7 +251,7 @@ const SEED_COURSES: SeedCourseFull[] = [
   {
     export: {
       wp_id: 9003,
-      slug: 'amrt-microbial-remediation-core',
+      slug: 'microbial-remediation-core',
       title: 'Microbial Remediation — Core Principles',
       short_description:
         'Assessment, containment, remediation workflow, and post-verification thinking for microbial-affected buildings.',
@@ -315,7 +315,7 @@ const SEED_COURSES: SeedCourseFull[] = [
   {
     export: {
       wp_id: 9004,
-      slug: 'fsrt-fire-smoke-restoration-core',
+      slug: 'fire-smoke-restoration-core',
       title: 'Fire & Smoke Restoration — Core Principles',
       short_description:
         'Safety on fire-affected sites, soot behaviour, cleaning chemistry, and deodorisation planning.',
@@ -379,7 +379,7 @@ const SEED_COURSES: SeedCourseFull[] = [
   {
     export: {
       wp_id: 9005,
-      slug: 'cct-commercial-carpet-core',
+      slug: 'commercial-carpet-core',
       title: 'Commercial Carpet Care — Core Methods',
       short_description:
         'Fibres, soil chemistry, machine methods, and maintenance planning for commercial textile flooring.',

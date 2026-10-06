@@ -1,8 +1,11 @@
 import { NextRequest } from 'next/server';
 
 import { updateSession } from '@/lib/api/middleware';
+import { lookupCourseSlugInDatabase, renamedCourseRedirect } from '@/lib/seo/renamed-course-slugs';
 
 export async function proxy(request: NextRequest) {
+  const renamed = await renamedCourseRedirect(request, lookupCourseSlugInDatabase);
+  if (renamed) return renamed;
   return updateSession(request);
 }
 
@@ -15,4 +18,3 @@ export const config = {
     '/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|.*\\.[^/]+$).*)',
   ],
 };
-

@@ -19,7 +19,7 @@ External sends, spend, pricing and licence-critical claims NEVER default — the
 | 12 | Level names for the CARSI tier ladder (Foundation → Practitioner → Advanced → top tier TBD) | No default — naming is founder-owned. Agents propose 3 naming sets; you pick. | 2026-08-30 | OPEN |
 | 13 | Public Research Notes page (1 distilled, cited note/week) — go? | Default: YES at Gate 1 — it is the E-E-A-T engine | 2026-08-30 | OPEN |
 | 14 | Paywalled-journal budget for the evidence sweep | Default: OPEN-ACCESS ONLY (commits no spend). Any paid source is a new cost → founder-only. | 2026-08-30 | OPEN |
-| 15 | GP-523-D1 — course URL slugs still carry a lowercase IICRC discipline prefix (`cct-commercial-carpet-core`, plus wrt/asd/amrt/fsrt) | Default: KEEP the slugs for now; rename ships only with 301 redirects in a follow-up. Rendered copy is already clean and stays guarded. | 2026-08-25 | OPEN |
+| 15 | GP-523-D1 — course URL slugs still carry a lowercase IICRC discipline prefix (`cct-commercial-carpet-core`, plus wrt/asd/amrt/fsrt) | Default: KEEP the slugs for now; rename ships only with 301 redirects in a follow-up. Rendered copy is already clean and stays guarded. | 2026-08-25 | **DECIDED 2026-10-06** — Phill: rename. Code (database-gated 301s, repo rename, designation-name guards) in branch `fix/carsi-designation-slugs`; the live data edit runs after that merge (BACKLOG #31). |
 
 | 16 | **Prod-DB access path for the 43 live courses absent from repo seed** — 4 live courses carry banned IICRC designation branding on carsi.com.au NOW (`CCT-aligned`, `WRT`, `FSRT-aligned`, `ASD-aligned`); 3 of the 4 are not in the repo, so no agent can reach them | No default — licence-critical. Escalates daily. | 2026-08-21 | OPEN |
 

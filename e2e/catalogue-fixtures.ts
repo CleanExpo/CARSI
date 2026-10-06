@@ -28,7 +28,7 @@ export function publishedCourseFixture(slug: string) {
   };
 }
 
-export const WATER_COURSE = publishedCourseFixture('wrt-water-damage-essentials');
+export const WATER_COURSE = publishedCourseFixture('water-damage-essentials');
 export const NON_WATER_COURSE = publishedCourseFixture(
   'air-quality-and-odour-identification-and-deodorisation-essentials'
 );

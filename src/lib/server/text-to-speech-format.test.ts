@@ -25,7 +25,7 @@ describe('stripMarkdownForSpeech', () => {
 
   it('converts markdown links to link text only', () => {
     expect(
-      stripMarkdownForSpeech('[Water Damage Essentials](/courses/wrt-water-damage-essentials)')
+      stripMarkdownForSpeech('[Water Damage Essentials](/courses/water-damage-essentials)')
     ).toBe('Water Damage Essentials');
   });
 

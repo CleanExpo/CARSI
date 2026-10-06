@@ -86,6 +86,29 @@ const MUST_BLOCK = [
     'a third-person school mention does not exempt the claim beside it',
     'CARSI is an IICRC Approved School — certification is obtained through an IICRC approved school.',
   ],
+  // Designation NAME rule (06/10/2026). The live title that shipped with no acronym in it:
+  // the designation spelled out is still the designation.
+  ['designation name in a course title (live 06/10/2026)', "title: 'Applied Structural Drying — Core Concepts',"],
+  ['designation name in a JSON title', '"title": "Introduction to Advanced Applied Structural Drying | CARSI",'],
+  ['designation name + course noun', 'Welcome to Carpet Cleaning Technician Fundamentals.'],
+  ['designation name + course noun, ampersand form', 'Fire & Smoke Restoration Technician course for crews'],
+  // Independent review 06/10/2026: hyphens between the designation words bypassed the rule.
+  ['hyphenated designation name in a title (review P1)', 'export const probe = { title: "Applied-Structural-Drying — Core Concepts" };'],
+  ['underscored designation name + course noun', 'Carpet_Cleaning_Technician Fundamentals for new starters'],
+  ['spaced dash before the course noun', 'Applied Structural Drying - Core Concepts'],
+  ['en-dash designation name in a title (review P1, round 2)', 'export const probe = { title: "Applied\u2013Structural\u2013Drying \u2014 Core Concepts" };'],
+  ['registry title as the PREFIX of another title (review P1, round 2)', 'export const probe = { title: "Introduction to Applied Structural Drying Masterclass" };'],
+  ['registry title + suffix copy (review P1, round 2)', '"title": "Introduction to Applied Structural Drying \u2014 Core Concepts",'],
+  ['registry title + "course" + more (review P1, round 3)', 'export const probe = { title: "Introduction to Applied Structural Drying course Masterclass" };'],
+  ['registry title + "| CARSI" + more (review P1, round 3)', 'export const probe = { title: "Introduction to Applied Structural Drying | CARSI Masterclass" };'],
+  ['registry title inside a sentence + course noun', '"q": "What does the Introduction to Applied Structural Drying course cover?",'],
+  ['registry title concatenated with a suffix (review P1, round 4)', "export const probe = { title: 'Introduction to Applied Structural Drying' + ' Masterclass' };"],
+  ['registry title + CARSI concatenated with a suffix (review P1, round 4)', "export const probe = { title: 'Introduction to Applied Structural Drying | CARSI' + ' Masterclass' };"],
+  ['designation split across concatenated pieces', "export const probe = { title: 'Applied ' + 'Structural Drying' };"],
+  ['commented join after a registry title (review P1, round 5)', "export const probe = { title: 'Introduction to Applied Structural Drying' /* join */ + ' Masterclass' };"],
+  ['commented join inside a designation (review P1, round 5)', "t = { title: 'Applied '/* x */ + 'Structural Drying — Core Concepts' };"],
+  ['prefix concatenated onto a registry title', "export const probe = { title: 'Advanced ' + 'Introduction to Applied Structural Drying' };"],
+  ['microbial designation name in a quiz title', '"title": "Applied Microbial Remediation: Mould Fundamentals — Knowledge Check",'],
 ];
 
 const MUST_PASS = [
@@ -170,6 +193,16 @@ const MUST_PASS = [
   // Plain CARSI framing with no IICRC branding at all.
   ['CARSI own designation', 'Earns the CARSI Water Restoration Practitioner designation'],
   ['plain topic wording', 'CARSI water damage restoration training for Australian technicians'],
+  // Designation NAME rule: the exact IICRC-approved CEC class titles (cec-approvals.json),
+  // audience usage, and slugs are not course branding.
+  ['IICRC-approved registry title', '"title": "Introduction to Applied Structural Drying",'],
+  ['IICRC-approved registry title named in a question, no course noun', '"q": "What does Introduction to Applied Microbial Remediation cover?",'],
+  ['IICRC-approved registry title + repeated CARSI suffix', '"title": "Introduction to Applied Structural Drying | CARSI | CARSI",'],
+  ['IICRC-approved registry title + CARSI suffix', '"title": "Introduction to Applied Structural Drying | CARSI",'],
+  ['audience usage of a designation name', 'This course is for water damage restoration technicians in Australia.'],
+  ['the renamed course title', "title: 'Structural Drying — Core Concepts',"],
+  ['a hyphenated slug is the URL, audited live', '"courseSlug": "applied-structural-drying-core",'],
+  ['a hyphenated slug + course noun is still a slug', 'href="/courses/carpet-cleaning-technician-fundamentals"'],
 ];
 
 let failed = 0;
