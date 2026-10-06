@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { conversationOwner, type ConversationAccess } from './margot-conversation-access';
 
 export type MargotTurn = { role: 'user' | 'assistant'; content: string };
 
@@ -21,11 +22,12 @@ function cleanContent(content: string): string {
   return content.trim().slice(0, MAX_STORED_MESSAGE_LEN);
 }
 
-export async function loadMargotHistory(conversationId: string): Promise<MargotTurn[]> {
+export async function loadMargotHistory(conversationId: string, access: ConversationAccess): Promise<MargotTurn[]> {
+  const userId = await conversationOwner(conversationId, access);
   if (!dbEnabled()) return [];
 
   const rows = await prisma.margotMessage.findMany({
-    where: { conversationId },
+    where: { conversationId, conversation: { userId } },
     orderBy: { createdAt: 'asc' },
     take: MAX_HISTORY_LOAD,
     select: { role: true, content: true },
@@ -39,61 +41,77 @@ export async function loadMargotHistory(conversationId: string): Promise<MargotT
     }));
 }
 
-export async function appendMargotTurn(params: {
+type MargotWriteParams = {
   conversationId: string;
+  access: ConversationAccess;
+  meta?: MargotConversationMeta;
+};
+
+/** Reserve the first user entry and immutable ownership before exposing its ID. */
+export async function appendMargotUserTurn(params: MargotWriteParams & { userMessage: string }): Promise<void> {
+  const content = cleanContent(params.userMessage);
+  if (!content) throw new Error('Empty user message');
+  await persistMargotMessages(params, [{ role: 'user', content }], true);
+}
+
+export async function appendMargotTurn(params: MargotWriteParams & {
   userMessage: string;
   assistantMessage: string;
   model?: string | null;
-  meta?: MargotConversationMeta;
+  userMessageAlreadyStored?: boolean;
 }): Promise<void> {
-  if (!dbEnabled()) return;
-
   const userContent = cleanContent(params.userMessage);
   const assistantContent = cleanContent(params.assistantMessage);
   if (!userContent || !assistantContent) return;
+  const messages = params.userMessageAlreadyStored ? [] : [{ role: 'user', content: userContent }];
+  await persistMargotMessages(params, [...messages, {
+    role: 'assistant', content: assistantContent, model: params.model ?? null,
+  }]);
+}
 
+async function persistMargotMessages(
+  params: MargotWriteParams,
+  messages: Array<{ role: string; content: string; model?: string | null }>,
+  createNew = false,
+): Promise<void> {
+  const userId = await conversationOwner(params.conversationId, params.access);
+  if (!dbEnabled()) return;
   await prisma.$transaction(async (tx) => {
-    await tx.margotConversation.upsert({
-      where: { id: params.conversationId },
-      create: {
-        id: params.conversationId,
-        userId: params.meta?.userId ?? null,
+    if (createNew) {
+      // A first request may only create its new server-generated ID. A collision
+      // rolls back the transaction; it cannot adopt an existing conversation.
+      await tx.margotConversation.create({ data: {
+        id: params.conversationId, userId,
         sourceIp: params.meta?.sourceIp ?? null,
         pagePath: params.meta?.pagePath ?? null,
         courseSlug: params.meta?.courseSlug ?? null,
         lessonId: params.meta?.lessonId ?? null,
-      },
-      update: {
-        updatedAt: new Date(),
-        userId: params.meta?.userId ?? undefined,
-        pagePath: params.meta?.pagePath ?? undefined,
-        courseSlug: params.meta?.courseSlug ?? undefined,
-        lessonId: params.meta?.lessonId ?? undefined,
-      },
-    });
-
+      } });
+    } else {
+      // updateMany respects the owner predicate and holds the row lock until
+      // messages commit. Prisma upsert's update branch does not enforce it.
+      const result = await tx.margotConversation.updateMany({
+        where: { id: params.conversationId, userId },
+        data: {
+          updatedAt: new Date(),
+          pagePath: params.meta?.pagePath ?? undefined,
+          courseSlug: params.meta?.courseSlug ?? undefined,
+          lessonId: params.meta?.lessonId ?? undefined,
+        },
+      });
+      if (result.count !== 1) throw new Error('Conversation access denied');
+    }
     await tx.margotMessage.createMany({
-      data: [
-        {
-          conversationId: params.conversationId,
-          role: 'user',
-          content: userContent,
-        },
-        {
-          conversationId: params.conversationId,
-          role: 'assistant',
-          content: assistantContent,
-          model: params.model ?? null,
-        },
-      ],
+      data: messages.map((message) => ({ ...message, conversationId: params.conversationId })),
     });
   });
 }
 
-export async function margotConversationExists(conversationId: string): Promise<boolean> {
+export async function margotConversationExists(conversationId: string, access: ConversationAccess): Promise<boolean> {
+  const userId = await conversationOwner(conversationId, access);
   if (!dbEnabled()) return false;
   const row = await prisma.margotConversation.findUnique({
-    where: { id: conversationId },
+    where: { id: conversationId, userId },
     select: { id: true },
   });
   return Boolean(row);
