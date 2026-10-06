@@ -51,7 +51,7 @@ type MargotWriteParams = {
 export async function appendMargotUserTurn(params: MargotWriteParams & { userMessage: string }): Promise<void> {
   const content = cleanContent(params.userMessage);
   if (!content) throw new Error('Empty user message');
-  await persistMargotMessages(params, [{ role: 'user', content }]);
+  await persistMargotMessages(params, [{ role: 'user', content }], true);
 }
 
 export async function appendMargotTurn(params: MargotWriteParams & {
@@ -72,26 +72,35 @@ export async function appendMargotTurn(params: MargotWriteParams & {
 async function persistMargotMessages(
   params: MargotWriteParams,
   messages: Array<{ role: string; content: string; model?: string | null }>,
+  createNew = false,
 ): Promise<void> {
   const userId = await conversationOwner(params.conversationId, params.access);
   if (!dbEnabled()) return;
   await prisma.$transaction(async (tx) => {
-    await tx.margotConversation.upsert({
-      where: { id: params.conversationId, userId },
-      create: {
+    if (createNew) {
+      // A first request may only create its new server-generated ID. A collision
+      // rolls back the transaction; it cannot adopt an existing conversation.
+      await tx.margotConversation.create({ data: {
         id: params.conversationId, userId,
         sourceIp: params.meta?.sourceIp ?? null,
         pagePath: params.meta?.pagePath ?? null,
         courseSlug: params.meta?.courseSlug ?? null,
         lessonId: params.meta?.lessonId ?? null,
-      },
-      update: {
-        updatedAt: new Date(),
-        pagePath: params.meta?.pagePath ?? undefined,
-        courseSlug: params.meta?.courseSlug ?? undefined,
-        lessonId: params.meta?.lessonId ?? undefined,
-      },
-    });
+      } });
+    } else {
+      // updateMany respects the owner predicate and holds the row lock until
+      // messages commit. Prisma upsert's update branch does not enforce it.
+      const result = await tx.margotConversation.updateMany({
+        where: { id: params.conversationId, userId },
+        data: {
+          updatedAt: new Date(),
+          pagePath: params.meta?.pagePath ?? undefined,
+          courseSlug: params.meta?.courseSlug ?? undefined,
+          lessonId: params.meta?.lessonId ?? undefined,
+        },
+      });
+      if (result.count !== 1) throw new Error('Conversation access denied');
+    }
     await tx.margotMessage.createMany({
       data: messages.map((message) => ({ ...message, conversationId: params.conversationId })),
     });

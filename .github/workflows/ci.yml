@@ -344,6 +344,12 @@ jobs:
       - name: Verify the yearly-membership grant guard against the database
         run: npm run verify:membership-guard
 
+      - name: Verify Margot conversation ownership against migrated Postgres
+        run: node --import tsx --test scripts/test-margot-conversation-ownership.ts
+        env:
+          CARSI_MARGOT_DB_TEST: '1'
+          NODE_ENV: test
+
       # Seed the course catalogue so the data-dependent journeys in
       # e2e/carsi-journeys.spec.ts (course list, WRT filter, "Carpet" search,
       # course detail by slug) run against real data instead of an empty DB.
