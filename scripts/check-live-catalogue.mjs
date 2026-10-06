@@ -27,6 +27,7 @@
  * (network/sitemap failure) — deliberately NOT 0, because "I could not look" must never read
  * as "nothing is wrong".
  */
+import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 
 const SITE = (process.env.CARSI_SITE || 'https://www.carsi.com.au').replace(/\/$/, '');
@@ -53,6 +54,17 @@ export const BANNED_ACRONYMS = ['WRT', 'ASD', 'AMRT', 'FSRT', 'CCT', 'TCST', 'OC
  * This set is a deliberate licence-risk trade-off: keep it as small as the evidence demands,
  * and record why each member is here.
  */
+/**
+ * IICRC-approved CEC classes, slug -> lowercased title, from the registry that gates every CEC
+ * claim (data/seed/cec-approvals.json). Used ONLY to exempt the IICRC's own class wording from
+ * the designation-NAME rule; it exempts nothing from the acronym or "-aligned" rules.
+ */
+const APPROVED_CLASS_TITLES = new Map(
+  JSON.parse(readFileSync(new URL('../data/seed/cec-approvals.json', import.meta.url), 'utf8'))
+    .approvals.filter((a) => typeof a.slug === 'string' && typeof a.title === 'string')
+    .map((a) => [a.slug.toLowerCase(), a.title.toLowerCase().replace(/\s*[&/+]\s*/g, ' and ')]),
+);
+
 export const AMBIGUOUS_ACRONYMS = new Set(['OCT']);
 
 /**
@@ -67,8 +79,12 @@ export const AMBIGUOUS_ACRONYMS = new Set(['OCT']);
  */
 export const DESIGNATION_PHRASES = {
   WRT: ['water damage restoration technician', 'water restoration technician'],
-  ASD: ['applied structural drying technician'],
-  AMRT: ['applied microbial remediation technician'],
+  // The discipline name alone is the designation for these two: "Applied Structural Drying —
+  // Core Concepts" was a live title (06/10/2026) that no phrase here could see, because every
+  // entry required the trailing "technician". Exact IICRC-approved CEC class titles that use the
+  // name (cec-approvals.json) are exempted by value in scanCourse, never by shape.
+  ASD: ['applied structural drying technician', 'applied structural drying'],
+  AMRT: ['applied microbial remediation technician', 'applied microbial remediation'],
   FSRT: ['fire and smoke restoration technician'],
   CCT: ['carpet cleaning technician'],
   // TCST is Trauma and Crime Scene Technician. An earlier revision of this map guessed
@@ -308,10 +324,19 @@ export function scanCourse({ slug, title }) {
   // spaced form fired — a designation is the designation however its author punctuated it, and
   // a licence guard that a hyphen defeats is not one. Scoped to separators sitting between two
   // letters, so hyphenated ordinary words are untouched.
-  const lowerTitle = fTitle
+  let lowerTitle = fTitle
     .toLowerCase()
     .replace(/\s*[&/+]\s*/g, ' and ')
     .replace(/(?<=[a-z])[-_](?=[a-z])/g, ' ');
+  // An exact IICRC-approved CEC class (registry slug AND registry title, both) carries the
+  // IICRC's own wording, so its title and slug are blanked for the phrase rules only. A
+  // registry slug under any other title, or a registry title under any other slug, is not exempt.
+  let phraseSlug = fSlug;
+  const approved = APPROVED_CLASS_TITLES.get(fSlug);
+  if (approved && lowerTitle.replace(/\s*\|.*$/, '').trim() === approved) {
+    lowerTitle = lowerTitle.replace(approved, ' ');
+    phraseSlug = '';
+  }
   for (const phrases of Object.values(DESIGNATION_PHRASES)) {
     // NO benign-expansion skip here. The whitelist exists because an ACRONYM's letters collide
     // with an industry term (CCT / correlated colour temperature, RRT / rapid response team).
@@ -324,12 +349,13 @@ export function scanCourse({ slug, title }) {
       // trauma-and-crime-scene-technician are the same branding.
       const slugPhNoAnd = ph.replace(/ and /g, ' ').replace(/[ &]+/g, '-');
       const ti = lowerTitle.indexOf(ph);
-      const si = fSlug.indexOf(slugPh) !== -1 ? fSlug.indexOf(slugPh) : fSlug.indexOf(slugPhNoAnd);
+      const si =
+        phraseSlug.indexOf(slugPh) !== -1 ? phraseSlug.indexOf(slugPh) : phraseSlug.indexOf(slugPhNoAnd);
       if (ti === -1 && si === -1) continue;
       const titleAudience = ti === -1 || isAudienceUsage(lowerTitle, ph, ti);
       const slugAudience =
         si === -1 ||
-        isAudienceUsage(fSlug, fSlug.slice(si).startsWith(slugPh) ? slugPh : slugPhNoAnd, si);
+        isAudienceUsage(phraseSlug, phraseSlug.slice(si).startsWith(slugPh) ? slugPh : slugPhNoAnd, si);
       // Branding on EITHER surface is a violation. Audience on BOTH is a note, never silence.
       hits.push({
         rule: titleAudience && slugAudience ? 'designation-phrase-audience' : 'designation-phrase',

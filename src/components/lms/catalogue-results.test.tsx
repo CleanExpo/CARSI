@@ -44,7 +44,7 @@ const realCourses = [WATER_COURSE, NON_WATER_COURSE, CARPET_COURSE];
 
 describe('catalogue results with real cards and published CI seed fixtures', () => {
   it('rejects the draft carpet course that cannot appear in public CI results', () => {
-    expect(() => publishedCourseFixture('carpet-cleaning-technician-fundamentals')).toThrow(
+    expect(() => publishedCourseFixture('carpet-cleaning-fundamentals')).toThrow(
       'must be published'
     );
     expect(() => publishedCourseFixture('missing-course')).toThrow('must be published');

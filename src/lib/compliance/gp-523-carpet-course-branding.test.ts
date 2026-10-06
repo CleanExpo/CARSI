@@ -32,48 +32,9 @@ const ACRONYM_RE = /\b(WRT|CRT|ASD|OCT|CCT|FSRT|AMRT|TCST)\b/i;
 const ACRONYM_RE_G = /\b(WRT|CRT|ASD|OCT|CCT|FSRT|AMRT|TCST)\b/gi;
 const ALIGNED_RE = /\b[A-Za-z]{2,6}-aligned\b/i;
 
-/**
- * Deferred by DECISIONS.md GP-523-D1: the course URL slugs still carry a lowercase discipline
- * prefix (`cct-commercial-carpet-core`). Renaming them breaks live URLs, sitemap entries and
- * indexed SEO, so it is deferred to a follow-up that ships redirects with the rename.
- *
- * Keyed to the five REAL slugs by literal VALUE, never by slug SHAPE.
- *
- * The original shape-keyed form — /\b(wrt|crt|asd|oct|cct|fsrt|amrt|tcst)-[a-z0-9-]+/g — was a
- * content amnesty, not a path exemption: it erased ANY lowercase acronym-hyphen-word token from
- * ANY string literal before the acronym check ran. Mutation on 2026-08-18 put
- * `cct-certified` in a real `title:` field — rendered copy, not a URL — and this guard stayed
- * green, with no other check catching it (check-iicrc-terminology's acronym rules both return
- * false on a bare single acronym in a title). Value-keying closes that.
- *
- * The boundary is `(?<![\w-]) … (?![\w-])`, not `\b`. With `\b`, the enumeration matched a
- * PREFIX of a longer token, so `cct-commercial-carpet-core-advanced` still stripped silently —
- * a narrower recurrence of the same over-claim, caught on re-review the same day. Excluding the
- * hyphen from the boundary makes it an exact-token match.
- *
- * Scope, stated precisely so this comment cannot drift from behaviour again: a token escapes iff
- * it IS one of the five slugs exactly. It escapes anywhere in the file, not only in a `slug:`
- * field — the same string in prose is exempt too. That residue is accepted: it is the identical
- * exposure to the live URL that DECISIONS #15 already defers, and it disappears entirely when the
- * rename ships. Add an entry here only when the slug genuinely exists.
- */
-const DEFERRED_SLUGS = [
-  'wrt-water-damage-essentials',
-  'asd-structural-drying-core',
-  'amrt-microbial-remediation-core',
-  'fsrt-fire-smoke-restoration-core',
-  'cct-commercial-carpet-core',
-] as const;
-
-const DEFERRED_SLUG_RE = new RegExp(
-  `(?<![\\w-])(?:${DEFERRED_SLUGS.join('|')})(?![\\w-])`,
-  'g'
-);
-
-/** Strip only the five deferred URL slugs, so the guard still fires on everything else. */
-function withoutDeferredSlugs(value: string): string {
-  return value.replace(DEFERRED_SLUG_RE, '');
-}
+// The five designation-prefixed URL slugs GP-523-D1 deferred (DECISIONS #15) were renamed on
+// 06/10/2026 with database-gated redirects (src/lib/seo/renamed-course-slugs.ts), so the slug
+// exemption this file carried is gone: every string literal is now held to the acronym rule.
 
 function read(relative: string): string {
   return readFileSync(join(REPO_ROOT, relative), 'utf8');
@@ -127,59 +88,6 @@ describe('positive control — the checks below can fail', () => {
     expect(ACRONYM_RE.test('wrt-water-damage-essentials')).toBe(true);
     // Mixed case must not slip through either.
     expect(ACRONYM_RE.test('Cct-commercial')).toBe(true);
-  });
-
-  it('exempts ONLY deferred URL slugs, never rendered copy', () => {
-    // In scope of the deferral: the slug disappears, so the guard stays quiet.
-    expect(ACRONYM_RE.test(withoutDeferredSlugs('cct-commercial-carpet-core'))).toBe(false);
-    // Out of scope: a bare lowercase acronym is not a slug and must still fail.
-    expect(ACRONYM_RE.test(withoutDeferredSlugs('cct'))).toBe(true);
-    // Out of scope: uppercase branding in a title must still fail.
-    expect(ACRONYM_RE.test(withoutDeferredSlugs(`Carpet Care (${'CCT'})`))).toBe(true);
-    // Out of scope: an "-aligned" claim is untouched by the slug exemption.
-    expect(ALIGNED_RE.test(withoutDeferredSlugs(aligned('CCT')))).toBe(true);
-  });
-
-  it('exempts by slug VALUE, not by slug SHAPE — the amnesty this guard shipped with', () => {
-    // Regression for the 2026-08-18 review. The shape-keyed exemption erased any lowercase
-    // acronym-hyphen-word token, so a banned acronym in RENDERED copy read clean. Each case
-    // below is slug-SHAPED but is not a deferred slug, so each must still fail.
-    //
-    // Asserted lowercase deliberately: the shape-keyed regex carried no `i` flag, so the
-    // pre-existing uppercase assertions above passed against a branch it never matched. They
-    // could not fail, and so proved nothing about the case that actually leaked.
-    expect(ACRONYM_RE.test(withoutDeferredSlugs('cct-certified'))).toBe(true);
-    expect(ACRONYM_RE.test(withoutDeferredSlugs('cct-certified Commercial Carpet Care'))).toBe(
-      true
-    );
-    expect(ALIGNED_RE.test(withoutDeferredSlugs(aligned('cct')))).toBe(true);
-    expect(ACRONYM_RE.test(withoutDeferredSlugs('wrt-restoration-training'))).toBe(true);
-
-    // ...while every genuinely deferred slug still passes, including inside a URL path.
-    for (const slug of DEFERRED_SLUGS) {
-      expect(ACRONYM_RE.test(withoutDeferredSlugs(slug))).toBe(false);
-      expect(ACRONYM_RE.test(withoutDeferredSlugs(`/courses/${slug}`))).toBe(false);
-    }
-  });
-
-  it('matches a deferred slug as a whole token, never as the prefix of a longer one', () => {
-    // Second-round regression. The first fix used `\b`, which matches before a trailing hyphen,
-    // so the enumeration still matched a PREFIX: `cct-commercial-carpet-core-advanced` stripped
-    // to `-advanced` and read clean. A future slug variant would have re-opened the amnesty.
-    for (const suffix of ['-advanced', '-2026', '-part-2']) {
-      expect(ACRONYM_RE.test(withoutDeferredSlugs(`cct-commercial-carpet-core${suffix}`))).toBe(
-        true
-      );
-      expect(ACRONYM_RE.test(withoutDeferredSlugs(`wrt-water-damage-essentials${suffix}`))).toBe(
-        true
-      );
-    }
-    // A leading token must not be swallowed either.
-    expect(ACRONYM_RE.test(withoutDeferredSlugs('legacy-cct-commercial-carpet-core'))).toBe(true);
-    // The exact slug is still exempt at a real boundary — trailing punctuation is not a token char.
-    expect(ACRONYM_RE.test(withoutDeferredSlugs('/courses/cct-commercial-carpet-core.'))).toBe(
-      false
-    );
   });
 
   it('stringLiterals ignores comments but still catches a real string literal', () => {
@@ -239,7 +147,7 @@ describe('/courses — the catalogue page named in GP-523', () => {
   });
 });
 
-describe('src/lib/lms-seed-catalog.ts — source of /courses/cct-commercial-carpet-core', () => {
+describe('src/lib/lms-seed-catalog.ts — source of /courses/commercial-carpet-core', () => {
   const source = read('src/lib/lms-seed-catalog.ts');
 
   it('sets every seeded iicrc_discipline to null', () => {
@@ -250,19 +158,9 @@ describe('src/lib/lms-seed-catalog.ts — source of /courses/cct-commercial-carp
     }
   });
 
-  it('uses no discipline acronym in any course, module or lesson string', () => {
-    // URL slugs are exempt per DECISIONS.md GP-523-D1 (rename needs redirects). Rendered copy
-    // is not exempt: strip only the deferred slugs, then the acronym check applies in full.
-    const offenders = stringLiterals(source)
-      .map(withoutDeferredSlugs)
-      .filter((s) => ACRONYM_RE.test(s));
+  it('uses no discipline acronym in any course, module or lesson string, slugs included', () => {
+    const offenders = stringLiterals(source).filter((s) => ACRONYM_RE.test(s));
     expect(offenders).toEqual([]);
-  });
-
-  it('still fails on an acronym in rendered copy, slug deferral notwithstanding', () => {
-    // The deferral must not become a blanket amnesty. A title is not a slug.
-    const rendered = `'Commercial Carpet Care (${'CCT'})'`;
-    expect(ACRONYM_RE.test(withoutDeferredSlugs(rendered))).toBe(true);
   });
 
   it('brands no seeded course "[discipline]-aligned"', () => {

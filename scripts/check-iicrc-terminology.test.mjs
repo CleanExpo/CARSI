@@ -86,6 +86,13 @@ const MUST_BLOCK = [
     'a third-person school mention does not exempt the claim beside it',
     'CARSI is an IICRC Approved School — certification is obtained through an IICRC approved school.',
   ],
+  // Designation NAME rule (06/10/2026). The live title that shipped with no acronym in it:
+  // the designation spelled out is still the designation.
+  ['designation name in a course title (live 06/10/2026)', "title: 'Applied Structural Drying — Core Concepts',"],
+  ['designation name in a JSON title', '"title": "Introduction to Advanced Applied Structural Drying | CARSI",'],
+  ['designation name + course noun', 'Welcome to Carpet Cleaning Technician Fundamentals.'],
+  ['designation name + course noun, ampersand form', 'Fire & Smoke Restoration Technician course for crews'],
+  ['microbial designation name in a quiz title', '"title": "Applied Microbial Remediation: Mould Fundamentals — Knowledge Check",'],
 ];
 
 const MUST_PASS = [
@@ -170,6 +177,13 @@ const MUST_PASS = [
   // Plain CARSI framing with no IICRC branding at all.
   ['CARSI own designation', 'Earns the CARSI Water Restoration Practitioner designation'],
   ['plain topic wording', 'CARSI water damage restoration training for Australian technicians'],
+  // Designation NAME rule: the exact IICRC-approved CEC class titles (cec-approvals.json),
+  // audience usage, and slugs are not course branding.
+  ['IICRC-approved registry title', '"title": "Introduction to Applied Structural Drying",'],
+  ['IICRC-approved registry title + course', 'What does the Introduction to Applied Microbial Remediation course cover?'],
+  ['audience usage of a designation name', 'This course is for water damage restoration technicians in Australia.'],
+  ['the renamed course title', "title: 'Structural Drying — Core Concepts',"],
+  ['a hyphenated slug is the URL, audited live', '"courseSlug": "applied-structural-drying-core",'],
 ];
 
 let failed = 0;

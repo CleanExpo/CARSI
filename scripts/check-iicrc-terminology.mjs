@@ -38,6 +38,40 @@ import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 
+/**
+ * IICRC discipline designations spelled out, as a regex alternation (spaces between words).
+ * "Applied Structural Drying" and "Applied Microbial Remediation" carry no trailing
+ * "Technician" because the discipline name alone is the designation; the rest are only the
+ * designation WITH "Technician", since "water damage restoration" alone is ordinary topic wording.
+ */
+function designationNames() {
+  const and = '(?:and|&)';
+  return (
+    '(?:applied\\s+structural\\s+drying|applied\\s+microbial\\s+remediation' +
+    '|water(?:\\s+damage)?\\s+restoration\\s+technicians?' +
+    `|fire\\s+${and}\\s+smoke\\s+restoration\\s+technicians?` +
+    '|(?:commercial\\s+)?carpet\\s+cleaning\\s+technicians?' +
+    '|odou?r\\s+control\\s+technicians?' +
+    `|trauma\\s+${and}\\s+crime\\s+scene\\s+technicians?` +
+    `|carpet\\s+repair\\s+${and}\\s+reinstallation\\s+technicians?` +
+    `|upholstery\\s+${and}\\s+fabric\\s+cleaning\\s+technicians?)`
+  );
+}
+
+/** Exact registry titles that contain a designation name, as a global neutralise regex. */
+function registryTitlesCarryingDesignations() {
+  const registry = JSON.parse(
+    readFileSync(new URL('../data/seed/cec-approvals.json', import.meta.url), 'utf8')
+  );
+  const designation = new RegExp(designationNames(), 'i');
+  const titles = registry.approvals
+    .map((a) => a.title)
+    .filter((t) => typeof t === 'string' && designation.test(t));
+  if (titles.length === 0) return null;
+  const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`\\b(?:${titles.map(esc).join('|')})\\b`, 'gi');
+}
+
 // Banned selling/descriptive phrasings. Each must be something that implies
 // CARSI itself delivers IICRC courses or IICRC certification.
 const BANNED = [
@@ -270,6 +304,29 @@ const BANNED = [
     seedOnly: true,
     message:
       'iicrcDiscipline must be null — a CARSI course does not carry an IICRC discipline designation. Set the CARSI designation in meta.designation instead.',
+  },
+  {
+    // The IICRC discipline designation written out IN FULL, used to name a course. Every rule
+    // above keys on the ACRONYM, so "Applied Structural Drying — Core Concepts" shipped as a
+    // live course title (06/10/2026) with no guard able to see it: the designation name with
+    // the acronym removed is still the designation. Two shapes count as naming a course:
+    //  - the phrase inside a `title` value (TS `title: '…'` or JSON `"title": "…"`);
+    //  - the phrase directly followed by a course noun ("… Fundamentals", "… — Core", "… course").
+    // Spaces only between words, deliberately: a hyphenated slug is the URL, which the live
+    // catalogue guard audits, and a slug in a JSON key is not rendered copy.
+    // Audience usage ("for water damage restoration technicians") matches neither shape and
+    // stays allowed, as does a third-person reference to the IICRC certification itself.
+    re: new RegExp(
+      `\\btitle["']?\\s*[:=]\\s*["'\`][^"'\`\\n]*\\b${designationNames()}|\\b${designationNames()}\\b\\s*(?:[—–:-]\\s*)?(?:core|essentials|fundamentals|basics|course|courses|training|class|classes|module|modules|program|programme|workshop|masterclass)\\b`,
+      'i'
+    ),
+    allow: null,
+    // The IICRC itself titled some approved CEC classes with a discipline name ("Introduction to
+    // Applied Structural Drying"). Those exact registry titles are the IICRC's own wording, so
+    // they are neutralised by VALUE, read from data/seed/cec-approvals.json — never by shape.
+    neutralise: registryTitlesCarryingDesignations(),
+    message:
+      'Do not name a CARSI course with an IICRC discipline designation written out in full (e.g. "Applied Structural Drying", "Carpet Cleaning Technician") — name the topic, or use the CARSI "…Practitioner" designation. Exact IICRC-approved CEC class titles in data/seed/cec-approvals.json are exempt.',
   },
   {
     // Founder brand-exclusion rule (2026-07-09): COACH8 must never appear in any CARSI

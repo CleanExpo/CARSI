@@ -82,7 +82,7 @@
       "disciplineTopic": "carpet cleaning",
       "summary": "The Southern Hemisphere credential for professional carpet cleaning — carpet fibres and soil, hot-water extraction and encapsulation, method selection, stain treatment and correct drying.",
       "pathwaySteps": [
-        { "courseSlug": "carpet-cleaning-technician-fundamentals", "order": 1, "required": true, "role": "credential" }
+        { "courseSlug": "carpet-cleaning-fundamentals", "order": 1, "required": true, "role": "credential" }
       ],
       "completionRule": "all-required",
       "alsoEarnsCec": true

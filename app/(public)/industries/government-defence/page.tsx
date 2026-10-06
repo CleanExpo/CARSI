@@ -58,7 +58,7 @@ const faqs = [
   {
     question: 'How do you restore heritage-listed government buildings after water damage?',
     answer:
-      'Heritage-listed buildings require specialised structural drying techniques that avoid damaging original materials. CARSI applied structural drying training trains government maintenance teams in low-impact drying methods, moisture monitoring, and documentation protocols that satisfy both heritage conservation requirements and WHS compliance.',
+      'Heritage-listed buildings require specialised structural drying techniques that avoid damaging original materials. CARSI structural drying training trains government maintenance teams in low-impact drying methods, moisture monitoring, and documentation protocols that satisfy both heritage conservation requirements and WHS compliance.',
   },
   {
     question: 'Can government facility staff complete IICRC CEC training online?',

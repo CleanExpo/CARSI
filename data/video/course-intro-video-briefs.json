@@ -341,7 +341,7 @@
       "authorNote": "Grounded: intro to AFDs/air scrubbers (M1), components and mechanics (M2), filter types (M3), recirculation vs negative pressure (M4), setup and placement (M5), air changes per hour (M6), maintenance (M7), safety and compliance (M8), monitoring effectiveness (M9), client communication and documentation (M10)."
     },
     {
-      "courseSlug": "wrt-water-damage-essentials",
+      "courseSlug": "water-damage-essentials",
       "lessonId": "d3f4a5b6-7c8d-4e9f-a012-34b5c6d7e8f9",
       "lessonTitle": "Water Damage Fundamentals",
       "moduleTitle": "Water Damage Fundamentals",
@@ -565,7 +565,7 @@
       "authorNote": "Grounded in the course's own modules. en-AU. No IICRC acronym branding."
     },
     {
-      "courseSlug": "carpet-cleaning-technician-fundamentals",
+      "courseSlug": "carpet-cleaning-fundamentals",
       "lessonId": "ff1e3578-251e-487e-afaa-add4624e2110",
       "lessonTitle": "What this course covers and who it is for",
       "moduleTitle": "Module 1: Course Objectives & How This Training Works",

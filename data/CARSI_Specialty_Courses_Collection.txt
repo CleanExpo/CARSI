@@ -178,7 +178,7 @@ On completion of this course, you will be able to assess the moisture condition 
 
 ================================================================================
 COURSE 3
-Introduction to Advanced Applied Structural Drying
+Introduction to Advanced Structural Drying
 Price: Free | IICRC: ASD | 6 Modules
 Role: Senior Restoration Technician / Drying Project Manager
 ================================================================================
@@ -188,7 +188,7 @@ COURSE OVERVIEW
 This course is designed for experienced technicians moving into advanced structural drying practice and project management. It covers psychrometric analysis as a practical drying management tool, how to develop comprehensive drying strategies for complex losses, advanced moisture removal techniques, systematic progress monitoring, and the formal completion verification process required for complex and large loss restoration projects. Aligned with the IICRC S500 standard and Australian commercial restoration requirements.
 
 
-MODULE 1: Introduction to Advanced Applied Structural Drying
+MODULE 1: Introduction to Advanced Structural Drying
 
 Advanced applied structural drying goes beyond deploying standard equipment in a standard configuration. It requires the ability to analyse complex moisture conditions, develop site-specific drying strategies, manage drying projects over extended periods and across multiple trades, and produce documentation that satisfies the requirements of insurers, engineers, and regulatory bodies.
 

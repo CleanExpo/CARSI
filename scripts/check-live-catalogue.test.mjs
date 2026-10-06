@@ -565,6 +565,48 @@ check('fires on the full WRT designation name', () => {
   assert.ok(hits.some((h) => h.rule === 'designation-phrase'));
 });
 
+// 06/10/2026: the live title "Applied Structural Drying — Core Concepts" passed every rule,
+// because each designation phrase required a trailing "technician".
+check('fires on the ASD discipline name with no "technician" (the live 06/10 title)', () => {
+  const hits = scanCourse({ slug: 'structural-drying-core', title: 'Applied Structural Drying — Core Concepts | CARSI' });
+  assert.ok(hits.some((h) => h.rule === 'designation-phrase'));
+});
+
+check('fires on the AMRT discipline name in a slug', () => {
+  const hits = scanCourse({ slug: 'applied-microbial-remediation-basics', title: 'Mould Basics | CARSI' });
+  assert.ok(hits.some((h) => h.rule === 'designation-phrase'));
+});
+
+check('stays silent on the renamed title', () => {
+  assert.deepEqual(scanCourse({ slug: 'structural-drying-core', title: 'Structural Drying — Core Concepts | CARSI' }), []);
+});
+
+check('exempts an exact IICRC-approved CEC class (registry slug AND title)', () => {
+  assert.deepEqual(
+    scanCourse({
+      slug: 'introduction-to-applied-structural-drying',
+      title: 'Introduction to Applied Structural Drying | CARSI | CARSI',
+    }),
+    [],
+  );
+});
+
+check('a registry SLUG does not exempt a different title', () => {
+  const hits = scanCourse({
+    slug: 'introduction-to-applied-structural-drying',
+    title: 'Applied Structural Drying Masterclass | CARSI',
+  });
+  assert.ok(hits.some((h) => h.rule === 'designation-phrase'));
+});
+
+check('a registry TITLE does not exempt a different slug', () => {
+  const hits = scanCourse({
+    slug: 'introduction-to-advanced-applied-structural-drying',
+    title: 'Introduction to Advanced Applied Structural Drying | CARSI',
+  });
+  assert.ok(hits.some((h) => h.rule === 'designation-phrase'));
+});
+
 check('fires on "Odour Control Technician" spelled out', () => {
   const hits = scanCourse({ slug: 'o', title: 'Odour Control Technician Training | CARSI' });
   assert.ok(hits.some((h) => h.rule === 'designation-phrase'));

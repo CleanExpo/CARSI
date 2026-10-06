@@ -5,7 +5,7 @@
  *
  * These courses were historically resurrected by getOrCreateCourseBySlug() on
  * routine traffic. That path is now gated behind LMS_SEED_AUTOCREATE=1, so a
- * deletion finally sticks. Note `wrt-water-damage-essentials` is also present in
+ * deletion finally sticks. Note `water-damage-essentials` is also present in
  * data/seed/courses-catalog.json — an explicit `npm run db:seed-courses` run
  * would recreate that one course.
  *
@@ -18,11 +18,11 @@ import 'dotenv/config';
 import { prisma } from '../src/lib/prisma';
 
 const PLACEHOLDER_SLUGS = [
-  'wrt-water-damage-essentials',
-  'asd-structural-drying-core',
-  'amrt-microbial-remediation-core',
-  'fsrt-fire-smoke-restoration-core',
-  'cct-commercial-carpet-core',
+  'water-damage-essentials',
+  'structural-drying-core',
+  'microbial-remediation-core',
+  'fire-smoke-restoration-core',
+  'commercial-carpet-core',
   'restoration-project-management-premium',
 ];
 

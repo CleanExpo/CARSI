@@ -64,7 +64,7 @@ const faqs = [
   {
     question: 'What is moisture mapping and why does it matter for real estate?',
     answer:
-      'Moisture mapping is a systematic process of recording moisture readings across a property using calibrated meters and thermal imaging — producing a documented baseline of moisture conditions. In real estate, moisture maps are used to verify that remediation has been completed to IICRC standard before settlement, to resolve building inspection disputes, and to support insurance claims for storm or flood damage. CARSI water damage restoration and applied structural drying training includes moisture mapping methodology, making trained agents significantly more effective in complex property transactions.',
+      'Moisture mapping is a systematic process of recording moisture readings across a property using calibrated meters and thermal imaging — producing a documented baseline of moisture conditions. In real estate, moisture maps are used to verify that remediation has been completed to IICRC standard before settlement, to resolve building inspection disputes, and to support insurance claims for storm or flood damage. CARSI water damage restoration and structural drying training includes moisture mapping methodology, making trained agents significantly more effective in complex property transactions.',
   },
 ];
 
