@@ -327,7 +327,9 @@ export function scanCourse({ slug, title }) {
   let lowerTitle = fTitle
     .toLowerCase()
     .replace(/\s*[&/+]\s*/g, ' and ')
-    .replace(/(?<=[a-z])[-_](?=[a-z])/g, ' ');
+    // Any dash between two letters, not just ASCII: "Applied–Structural–Drying" (en dash) passed
+    // independent review on 06/10/2026 while the hyphenated form was caught.
+    .replace(/(?<=[a-z])[-_\u2010-\u2015\u2212](?=[a-z])/g, ' ');
   // An exact IICRC-approved CEC class (registry slug AND registry title, both) carries the
   // IICRC's own wording, so its title and slug are blanked for the phrase rules only. A
   // registry slug under any other title, or a registry title under any other slug, is not exempt.

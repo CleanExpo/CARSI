@@ -45,9 +45,12 @@ import { pathToFileURL } from 'node:url';
  * designation WITH "Technician", since "water damage restoration" alone is ordinary topic wording.
  *
  * `sep` is what may sit between the words. Spaces only by default; the course-title shape passes
- * `[\\s_-]+` because "Applied-Structural-Drying — Core Concepts" is the same title (independent
- * review, 06/10/2026, reproduced the hyphen bypass).
+ * TITLE_WORD_SEP because "Applied-Structural-Drying — Core Concepts" and the en-dash form
+ * "Applied–Structural–Drying" are the same title (independent review, 06/10/2026, reproduced
+ * both bypasses). \s already covers the no-break space.
  */
+const TITLE_WORD_SEP = '[\\s_\\-\\u2010-\\u2015\\u2212]+';
+
 function designationNames(sep = '\\s+') {
   const and = `(?:and|&)`;
   const w = (...words) => words.join(sep);
@@ -63,7 +66,14 @@ function designationNames(sep = '\\s+') {
   );
 }
 
-/** Exact registry titles that contain a designation name, as a global neutralise regex. */
+/**
+ * Exact registry titles that contain a designation name, as a global neutralise regex.
+ *
+ * Only the approved title AS A WHOLE is exempt: it must open a quoted value (or follow "the ")
+ * and end the value, or be followed only by " | CARSI" or " course". Independent review
+ * (06/10/2026) showed an unanchored match erased the approved prefix of a different title —
+ * "Introduction to Applied Structural Drying Masterclass" passed.
+ */
 function registryTitlesCarryingDesignations() {
   const registry = JSON.parse(
     readFileSync(new URL('../data/seed/cec-approvals.json', import.meta.url), 'utf8')
@@ -74,7 +84,10 @@ function registryTitlesCarryingDesignations() {
     .filter((t) => typeof t === 'string' && designation.test(t));
   if (titles.length === 0) return null;
   const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  return new RegExp(`\\b(?:${titles.map(esc).join('|')})\\b`, 'gi');
+  return new RegExp(
+    `(?<=["'\`]|\\bthe\\s)(?:${titles.map(esc).join('|')})(?=["'\`]|\\s*\\|\\s*CARSI\\b|\\s+course\\b)`,
+    'gi'
+  );
 }
 
 // Banned selling/descriptive phrasings. Each must be something that implies
@@ -322,7 +335,7 @@ const BANNED = [
     // Audience usage ("for water damage restoration technicians") matches neither shape and
     // stays allowed, as does a third-person reference to the IICRC certification itself.
     re: new RegExp(
-      `\\btitle["']?\\s*[:=]\\s*["'\`][^"'\`\\n]*\\b${designationNames('[\\s_-]+')}|\\b${designationNames('[\\s_-]+')}\\b(?:\\s*[—–:]\\s*|\\s+-\\s*|\\s+)(?:core|essentials|fundamentals|basics|course|courses|training|class|classes|module|modules|program|programme|workshop|masterclass)\\b`,
+      `\\btitle["']?\\s*[:=]\\s*["'\`][^"'\`\\n]*\\b${designationNames(TITLE_WORD_SEP)}|\\b${designationNames(TITLE_WORD_SEP)}\\b(?:\\s*[—–:]\\s*|\\s+-\\s*|\\s+)(?:core|essentials|fundamentals|basics|course|courses|training|class|classes|module|modules|program|programme|workshop|masterclass)\\b`,
       'i'
     ),
     allow: null,

@@ -96,6 +96,9 @@ const MUST_BLOCK = [
   ['hyphenated designation name in a title (review P1)', 'export const probe = { title: "Applied-Structural-Drying — Core Concepts" };'],
   ['underscored designation name + course noun', 'Carpet_Cleaning_Technician Fundamentals for new starters'],
   ['spaced dash before the course noun', 'Applied Structural Drying - Core Concepts'],
+  ['en-dash designation name in a title (review P1, round 2)', 'export const probe = { title: "Applied\u2013Structural\u2013Drying \u2014 Core Concepts" };'],
+  ['registry title as the PREFIX of another title (review P1, round 2)', 'export const probe = { title: "Introduction to Applied Structural Drying Masterclass" };'],
+  ['registry title + suffix copy (review P1, round 2)', '"title": "Introduction to Applied Structural Drying \u2014 Core Concepts",'],
   ['microbial designation name in a quiz title', '"title": "Applied Microbial Remediation: Mould Fundamentals — Knowledge Check",'],
 ];
 
@@ -185,6 +188,7 @@ const MUST_PASS = [
   // audience usage, and slugs are not course branding.
   ['IICRC-approved registry title', '"title": "Introduction to Applied Structural Drying",'],
   ['IICRC-approved registry title + course', 'What does the Introduction to Applied Microbial Remediation course cover?'],
+  ['IICRC-approved registry title + CARSI suffix', '"title": "Introduction to Applied Structural Drying | CARSI",'],
   ['audience usage of a designation name', 'This course is for water damage restoration technicians in Australia.'],
   ['the renamed course title', "title: 'Structural Drying — Core Concepts',"],
   ['a hyphenated slug is the URL, audited live', '"courseSlug": "applied-structural-drying-core",'],

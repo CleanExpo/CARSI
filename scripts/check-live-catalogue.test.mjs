@@ -572,6 +572,11 @@ check('fires on the ASD discipline name with no "technician" (the live 06/10 tit
   assert.ok(hits.some((h) => h.rule === 'designation-phrase'));
 });
 
+check('fires on an en-dash-joined designation name (review round 2)', () => {
+  const hits = scanCourse({ slug: 'structural-drying-core', title: 'Applied\u2013Structural\u2013Drying \u2014 Core Concepts | CARSI' });
+  assert.ok(hits.some((h) => h.rule === 'designation-phrase'));
+});
+
 check('fires on the AMRT discipline name in a slug', () => {
   const hits = scanCourse({ slug: 'applied-microbial-remediation-basics', title: 'Mould Basics | CARSI' });
   assert.ok(hits.some((h) => h.rule === 'designation-phrase'));
