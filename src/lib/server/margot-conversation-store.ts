@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { conversationOwner, type ConversationAccess } from './margot-conversation-access';
 
 export type MargotTurn = { role: 'user' | 'assistant'; content: string };
 
@@ -21,11 +22,12 @@ function cleanContent(content: string): string {
   return content.trim().slice(0, MAX_STORED_MESSAGE_LEN);
 }
 
-export async function loadMargotHistory(conversationId: string): Promise<MargotTurn[]> {
+export async function loadMargotHistory(conversationId: string, access: ConversationAccess): Promise<MargotTurn[]> {
+  const userId = await conversationOwner(conversationId, access);
   if (!dbEnabled()) return [];
 
   const rows = await prisma.margotMessage.findMany({
-    where: { conversationId },
+    where: { conversationId, conversation: { userId } },
     orderBy: { createdAt: 'asc' },
     take: MAX_HISTORY_LOAD,
     select: { role: true, content: true },
@@ -41,11 +43,13 @@ export async function loadMargotHistory(conversationId: string): Promise<MargotT
 
 export async function appendMargotTurn(params: {
   conversationId: string;
+  access: ConversationAccess;
   userMessage: string;
   assistantMessage: string;
   model?: string | null;
   meta?: MargotConversationMeta;
 }): Promise<void> {
+  const userId = await conversationOwner(params.conversationId, params.access);
   if (!dbEnabled()) return;
 
   const userContent = cleanContent(params.userMessage);
@@ -54,10 +58,10 @@ export async function appendMargotTurn(params: {
 
   await prisma.$transaction(async (tx) => {
     await tx.margotConversation.upsert({
-      where: { id: params.conversationId },
+      where: { id: params.conversationId, userId },
       create: {
         id: params.conversationId,
-        userId: params.meta?.userId ?? null,
+        userId,
         sourceIp: params.meta?.sourceIp ?? null,
         pagePath: params.meta?.pagePath ?? null,
         courseSlug: params.meta?.courseSlug ?? null,
@@ -65,7 +69,6 @@ export async function appendMargotTurn(params: {
       },
       update: {
         updatedAt: new Date(),
-        userId: params.meta?.userId ?? undefined,
         pagePath: params.meta?.pagePath ?? undefined,
         courseSlug: params.meta?.courseSlug ?? undefined,
         lessonId: params.meta?.lessonId ?? undefined,
@@ -90,10 +93,11 @@ export async function appendMargotTurn(params: {
   });
 }
 
-export async function margotConversationExists(conversationId: string): Promise<boolean> {
+export async function margotConversationExists(conversationId: string, access: ConversationAccess): Promise<boolean> {
+  const userId = await conversationOwner(conversationId, access);
   if (!dbEnabled()) return false;
   const row = await prisma.margotConversation.findUnique({
-    where: { id: conversationId },
+    where: { id: conversationId, userId },
     select: { id: true },
   });
   return Boolean(row);

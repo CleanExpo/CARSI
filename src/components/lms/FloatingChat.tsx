@@ -349,7 +349,13 @@ export default function FloatingChat() {
         const res = await fetch(
           `/api/margot/chat/history?conversation_id=${encodeURIComponent(conversationId)}`
         );
-        if (!res.ok || cancelled) return;
+        if (cancelled) return;
+        if (res.status === 403) {
+          persistConversationId(null);
+          setMessages([{ id: 'welcome', role: 'assistant', text: WELCOME_MESSAGE }]);
+          return;
+        }
+        if (!res.ok) return;
         const data = (await res.json()) as {
           messages?: Array<{ role: string; content: string }>;
         };
@@ -370,7 +376,7 @@ export default function FloatingChat() {
     return () => {
       cancelled = true;
     };
-  }, [conversationId, historyLoaded]);
+  }, [conversationId, historyLoaded, persistConversationId]);
 
   async function fetchSpeechBlob(text: string, attempt = 1): Promise<Blob> {
     const res = await fetch('/api/margot/chat/speech', {
@@ -495,6 +501,10 @@ export default function FloatingChat() {
       });
 
       if (!res.ok) {
+        if (res.status === 403) {
+          persistConversationId(null);
+          setMessages([{ id: 'welcome', role: 'assistant', text: WELCOME_MESSAGE }]);
+        }
         const errText = await res.text();
         let detail = 'Something went wrong. Please try again.';
         try {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { randomUUID } from 'node:crypto';
+import { newConversationAccess, requestConversationAccess, withConversationCookie } from '@/lib/server/margot-conversation-access';
 
 import {
   getAssistantCourseContextText,
@@ -15,7 +15,6 @@ import {
   margotConversationExists,
 } from '@/lib/server/margot-conversation-store';
 import { getMargotKnowledgeBaseContext } from '@/lib/server/margot-knowledge-base';
-import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { applyRateLimit, clientIpFrom } from '@/lib/rate-limit';
 import { OpenRouterAPIError, OpenRouterClient } from '@/lib/openrouter/client';
 import { resolveOpenRouterConfig } from '@/lib/openrouter/provider';
@@ -140,15 +139,23 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ detail: 'Message is too long.' }, { status: 400 });
   }
 
-  const conversationId = incomingConversationId || randomUUID();
-  const claims = await getSessionClaimsFromRequest(request);
-
-  let history: ChatTurn[];
-  if (incomingConversationId && (await margotConversationExists(conversationId))) {
-    history = await loadMargotHistory(conversationId);
+  let context;
+  if (incomingConversationId) {
+    const access = await requestConversationAccess(request, incomingConversationId);
+    if (!access || (process.env.DATABASE_URL?.trim() &&
+      !(await margotConversationExists(incomingConversationId, access)))) {
+      return NextResponse.json({ detail: 'Please start a new conversation.' }, { status: 403 });
+    }
+    context = { id: incomingConversationId, access, token: undefined };
   } else {
-    history = trimHistory(body.history);
+    try { context = await newConversationAccess(request); } catch {
+      return NextResponse.json({ detail: 'Chat is temporarily unavailable.' }, { status: 503 });
+    }
   }
+  const conversationId = context.id;
+  const access = context.access;
+  const history = incomingConversationId && process.env.DATABASE_URL?.trim()
+    ? await loadMargotHistory(conversationId, access) : trimHistory(body.history);
 
   let courseContext: string;
   try {
@@ -207,11 +214,12 @@ When CURRENT PAGE FOCUS is present, prioritise it for questions about "this cour
   const persistTurn = (finalText: string) =>
     appendMargotTurn({
       conversationId,
+      access,
       userMessage: message,
       assistantMessage: finalText,
       model: MODEL,
       meta: {
-        userId: claims?.sub ?? null,
+        userId: access.userId,
         sourceIp: ip,
         pagePath,
         courseSlug: courseSlug || null,
@@ -284,7 +292,7 @@ When CURRENT PAGE FOCUS is present, prioritise it for questions about "this cour
       },
     });
 
-    return new Response(stream, {
+    return withConversationCookie(new Response(stream, {
       headers: {
         'Content-Type': 'text/plain; charset=utf-8',
         'Cache-Control': 'no-store',
@@ -292,7 +300,7 @@ When CURRENT PAGE FOCUS is present, prioritise it for questions about "this cour
         'X-Assistant-Name': name,
         'X-Accel-Buffering': 'no',
       },
-    });
+    }), context.token);
   }
 
   try {
@@ -315,11 +323,12 @@ When CURRENT PAGE FOCUS is present, prioritise it for questions about "this cour
 
     void appendMargotTurn({
       conversationId,
+      access,
       userMessage: message,
       assistantMessage: reply,
       model: MODEL,
       meta: {
-        userId: claims?.sub ?? null,
+        userId: access.userId,
         sourceIp: ip,
         pagePath,
         courseSlug: courseSlug || null,
@@ -329,11 +338,11 @@ When CURRENT PAGE FOCUS is present, prioritise it for questions about "this cour
       console.error('[margot/chat] failed to persist conversation:', e);
     });
 
-    return NextResponse.json({
+    return withConversationCookie(NextResponse.json({
       reply,
       conversation_id: conversationId,
       assistant_name: name,
-    });
+    }), context.token);
   } catch (error) {
     return openRouterErrorResponse(error);
   }

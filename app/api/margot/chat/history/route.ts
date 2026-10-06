@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requestConversationAccess } from '@/lib/server/margot-conversation-access';
 
 import {
   loadMargotHistory,
@@ -30,15 +31,18 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  const access = await requestConversationAccess(request, conversationId);
+  if (!access) return NextResponse.json({ detail: 'Please start a new conversation.' }, { status: 403 });
+
   if (!process.env.DATABASE_URL?.trim()) {
     return NextResponse.json({ conversation_id: conversationId, messages: [] });
   }
 
-  const exists = await margotConversationExists(conversationId);
+  const exists = await margotConversationExists(conversationId, access);
   if (!exists) {
-    return NextResponse.json({ conversation_id: conversationId, messages: [] });
+    return NextResponse.json({ detail: 'Please start a new conversation.' }, { status: 403 });
   }
 
-  const messages = await loadMargotHistory(conversationId);
+  const messages = await loadMargotHistory(conversationId, access);
   return NextResponse.json({ conversation_id: conversationId, messages });
 }
