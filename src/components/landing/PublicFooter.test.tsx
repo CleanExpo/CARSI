@@ -24,33 +24,42 @@ import { PublicFooter } from './PublicFooter';
 const RESTOREASSIST_HOME = 'https://restoreassist.app';
 const RESTOREASSIST_EXPLAINER = 'https://restoreassist.app/#overview';
 
+// Same per-tone shape as src/lib/marketing/legal-pages.test.tsx, which records
+// that an independent review once deleted the light strip's two links while
+// that suite still passed. Every current caller passes tone="light"
+// (app/page.tsx, app/(public)/layout.tsx), so a test that renders only the
+// default would prove nothing about the footer anyone actually sees.
+const TONES = ['chrome', 'light'] as const;
+
 describe('PublicFooter — RestoreAssist cross-sell', () => {
-  for (const tone of ['chrome', 'light'] as const) {
-    describe(`${tone} tone`, () => {
+  it.each(TONES)('the %s footer links to RestoreAssist', (tone) => {
+    const html = renderToStaticMarkup(<PublicFooter tone={tone} />);
+    expect(html).toContain(`href="${RESTOREASSIST_HOME}"`);
+  });
+
+  it.each(TONES)(
+    'the %s footer links straight to the explainer video, not the page top',
+    (tone) => {
       const html = renderToStaticMarkup(<PublicFooter tone={tone} />);
+      expect(html).toContain(`href="${RESTOREASSIST_EXPLAINER}"`);
+    }
+  );
 
-      it('links to RestoreAssist', () => {
-        expect(html).toContain(`href="${RESTOREASSIST_HOME}"`);
-      });
+  it.each(TONES)('the %s footer labels the explainer link in words, not icon-only', (tone) => {
+    const html = renderToStaticMarkup(<PublicFooter tone={tone} />);
+    expect(html).toContain('Explainer videos');
+  });
 
-      it('links straight to the explainer video, not the page top', () => {
-        expect(html).toContain(`href="${RESTOREASSIST_EXPLAINER}"`);
-      });
-
-      it('labels the explainer link in words, not icon-only', () => {
-        expect(html).toContain('Explainer videos');
-      });
-
-      it('opens both RestoreAssist links in a new tab, safely', () => {
-        // Every anchor pointing at restoreassist.app must carry both tokens.
-        const anchors =
-          html.match(/<a\b[^>]*href="https:\/\/restoreassist\.app[^"]*"[^>]*>/g) ?? [];
-        expect(anchors.length).toBeGreaterThanOrEqual(2);
-        for (const anchor of anchors) {
-          expect(anchor).toContain('target="_blank"');
-          expect(anchor).toContain('rel="noopener noreferrer"');
-        }
-      });
-    });
-  }
+  it.each(TONES)('the %s footer opens both RestoreAssist links in a new tab, safely', (tone) => {
+    const html = renderToStaticMarkup(<PublicFooter tone={tone} />);
+    // Every anchor pointing at restoreassist.app must carry both tokens: a bare
+    // target="_blank" hands the opened page a live window.opener back into
+    // carsi.com.au.
+    const anchors = html.match(/<a\b[^>]*href="https:\/\/restoreassist\.app[^"]*"[^>]*>/g) ?? [];
+    expect(anchors.length).toBeGreaterThanOrEqual(2);
+    for (const anchor of anchors) {
+      expect(anchor).toContain('target="_blank"');
+      expect(anchor).toContain('rel="noopener noreferrer"');
+    }
+  });
 });
