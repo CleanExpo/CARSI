@@ -1,10 +1,10 @@
 import { NextRequest } from 'next/server';
 
 import { updateSession } from '@/lib/api/middleware';
-import { courseSlugExistsInDatabase, renamedCourseRedirect } from '@/lib/seo/renamed-course-slugs';
+import { lookupCourseSlugInDatabase, renamedCourseRedirect } from '@/lib/seo/renamed-course-slugs';
 
 export async function proxy(request: NextRequest) {
-  const renamed = await renamedCourseRedirect(request, courseSlugExistsInDatabase);
+  const renamed = await renamedCourseRedirect(request, lookupCourseSlugInDatabase);
   if (renamed) return renamed;
   return updateSession(request);
 }

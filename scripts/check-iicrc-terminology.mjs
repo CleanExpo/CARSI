@@ -346,6 +346,9 @@ const BANNED = [
     // Applied Structural Drying"). Those exact registry titles are the IICRC's own wording, so
     // they are neutralised by VALUE, read from data/seed/cec-approvals.json — never by shape.
     neutralise: registryTitlesCarryingDesignations(),
+    // An inline block comment inside a joined title is not part of the value:
+    // 'Introduction to Applied Structural Drying' /* x */ + ' Masterclass' (review round 5).
+    prepare: (line) => line.replace(/\/\*.*?\*\//g, ''),
     message:
       'Do not name a CARSI course with an IICRC discipline designation written out in full (e.g. "Applied Structural Drying", "Carpet Cleaning Technician") — name the topic, or use the CARSI "…Practitioner" designation. Exact IICRC-approved CEC class titles in data/seed/cec-approvals.json are exempt.',
   },
@@ -446,7 +449,9 @@ function scanLine(file, lineNo, content, findings) {
     // token escapes — `title: "IICRC WRT course", slug: "x-iicrc-wrt"` passed on the slug
     // alone. `neutralise` is the stricter form: it deletes the permitted spans and re-tests
     // what is LEFT, so a legitimate token can no longer shelter branding beside it.
-    const probe = rule.neutralise ? content.replace(rule.neutralise, ' ') : content;
+    // `prepare` normalises the line for one rule before anything else runs (see the rule).
+    const base = rule.prepare ? rule.prepare(content) : content;
+    const probe = rule.neutralise ? base.replace(rule.neutralise, ' ') : base;
     if (rule.re.test(probe) && !(rule.allow && rule.allow.test(content))) {
       findings.push(`  ${file}:${lineNo}: ${rule.message}\n    → ${content.trim().slice(0, 140)}`);
     }
