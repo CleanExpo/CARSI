@@ -11,7 +11,7 @@ vi.mock('@/lib/prisma', () => ({ prisma: {
   }),
 } }));
 import { signAnonymousConversation } from './margot-conversation-access';
-import { loadMargotHistory, appendMargotTurn } from './margot-conversation-store';
+import { loadMargotHistory, appendMargotTurn, appendMargotUserTurn } from './margot-conversation-store';
 
 describe('Margot conversation ownership', () => {
   afterEach(() => { vi.unstubAllEnvs(); });
@@ -46,6 +46,13 @@ describe('Margot conversation ownership', () => {
     await expect(appendMargotTurn({ conversationId: 'conversation', access: { userId: 'other-user' },
       userMessage: 'x', assistantMessage: 'y' })).rejects.toThrow();
     expect(db.createMany).not.toHaveBeenCalled();
+  });
+  it('reserves a first user message and does not duplicate it in the assistant turn', async () => {
+    const params = { conversationId: 'conversation', access: { userId: 'owner' }, userMessage: 'Hello' };
+    await appendMargotUserTurn(params);
+    expect(db.createMany.mock.calls[0][0].data).toEqual([{ conversationId: 'conversation', role: 'user', content: 'Hello' }]);
+    await appendMargotTurn({ ...params, assistantMessage: 'Hi', userMessageAlreadyStored: true });
+    expect(db.createMany.mock.calls[1][0].data).toEqual([{ conversationId: 'conversation', role: 'assistant', content: 'Hi', model: null }]);
   });
   it('never changes the owner when appending a turn', async () => {
     await appendMargotTurn({ conversationId: 'conversation', userMessage: 'Hello', assistantMessage: 'Hi',

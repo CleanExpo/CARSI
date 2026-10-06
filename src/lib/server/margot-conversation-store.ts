@@ -41,27 +41,45 @@ export async function loadMargotHistory(conversationId: string, access: Conversa
     }));
 }
 
-export async function appendMargotTurn(params: {
+type MargotWriteParams = {
   conversationId: string;
   access: ConversationAccess;
+  meta?: MargotConversationMeta;
+};
+
+/** Reserve the first user entry and immutable ownership before exposing its ID. */
+export async function appendMargotUserTurn(params: MargotWriteParams & { userMessage: string }): Promise<void> {
+  const content = cleanContent(params.userMessage);
+  if (!content) throw new Error('Empty user message');
+  await persistMargotMessages(params, [{ role: 'user', content }]);
+}
+
+export async function appendMargotTurn(params: MargotWriteParams & {
   userMessage: string;
   assistantMessage: string;
   model?: string | null;
-  meta?: MargotConversationMeta;
+  userMessageAlreadyStored?: boolean;
 }): Promise<void> {
-  const userId = await conversationOwner(params.conversationId, params.access);
-  if (!dbEnabled()) return;
-
   const userContent = cleanContent(params.userMessage);
   const assistantContent = cleanContent(params.assistantMessage);
   if (!userContent || !assistantContent) return;
+  const messages = params.userMessageAlreadyStored ? [] : [{ role: 'user', content: userContent }];
+  await persistMargotMessages(params, [...messages, {
+    role: 'assistant', content: assistantContent, model: params.model ?? null,
+  }]);
+}
 
+async function persistMargotMessages(
+  params: MargotWriteParams,
+  messages: Array<{ role: string; content: string; model?: string | null }>,
+): Promise<void> {
+  const userId = await conversationOwner(params.conversationId, params.access);
+  if (!dbEnabled()) return;
   await prisma.$transaction(async (tx) => {
     await tx.margotConversation.upsert({
       where: { id: params.conversationId, userId },
       create: {
-        id: params.conversationId,
-        userId,
+        id: params.conversationId, userId,
         sourceIp: params.meta?.sourceIp ?? null,
         pagePath: params.meta?.pagePath ?? null,
         courseSlug: params.meta?.courseSlug ?? null,
@@ -74,21 +92,8 @@ export async function appendMargotTurn(params: {
         lessonId: params.meta?.lessonId ?? undefined,
       },
     });
-
     await tx.margotMessage.createMany({
-      data: [
-        {
-          conversationId: params.conversationId,
-          role: 'user',
-          content: userContent,
-        },
-        {
-          conversationId: params.conversationId,
-          role: 'assistant',
-          content: assistantContent,
-          model: params.model ?? null,
-        },
-      ],
+      data: messages.map((message) => ({ ...message, conversationId: params.conversationId })),
     });
   });
 }

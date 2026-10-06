@@ -11,6 +11,7 @@ import {
 import { buildAssistantSystemPrompt } from '@/lib/server/assistant-prompt';
 import {
   appendMargotTurn,
+  appendMargotUserTurn,
   loadMargotHistory,
   margotConversationExists,
 } from '@/lib/server/margot-conversation-store';
@@ -154,6 +155,14 @@ export async function POST(request: NextRequest) {
   }
   const conversationId = context.id;
   const access = context.access;
+  if (!incomingConversationId) {
+    try {
+      await appendMargotUserTurn({ conversationId, access, userMessage: message,
+        meta: { sourceIp: ip } });
+    } catch {
+      return NextResponse.json({ detail: 'Chat is temporarily unavailable.' }, { status: 503 });
+    }
+  }
   const history = incomingConversationId && process.env.DATABASE_URL?.trim()
     ? await loadMargotHistory(conversationId, access) : trimHistory(body.history);
 
@@ -217,6 +226,7 @@ When CURRENT PAGE FOCUS is present, prioritise it for questions about "this cour
       access,
       userMessage: message,
       assistantMessage: finalText,
+      userMessageAlreadyStored: !incomingConversationId,
       model: MODEL,
       meta: {
         userId: access.userId,
@@ -321,22 +331,25 @@ When CURRENT PAGE FOCUS is present, prioritise it for questions about "this cour
       OpenRouterClient.extractText(response).trim() ||
       "I'm not sure how to answer that right now. Please try rephrasing your question.";
 
-    void appendMargotTurn({
-      conversationId,
-      access,
-      userMessage: message,
-      assistantMessage: reply,
-      model: MODEL,
-      meta: {
-        userId: access.userId,
-        sourceIp: ip,
-        pagePath,
-        courseSlug: courseSlug || null,
-        lessonId: lessonId || null,
-      },
-    }).catch((e) => {
-      console.error('[margot/chat] failed to persist conversation:', e);
-    });
+    try {
+      await appendMargotTurn({
+        conversationId,
+        access,
+        userMessage: message,
+        assistantMessage: reply,
+        userMessageAlreadyStored: !incomingConversationId,
+        model: MODEL,
+        meta: {
+          userId: access.userId,
+          sourceIp: ip,
+          pagePath,
+          courseSlug: courseSlug || null,
+          lessonId: lessonId || null,
+        },
+      });
+    } catch {
+      return NextResponse.json({ detail: 'Chat is temporarily unavailable.' }, { status: 503 });
+    }
 
     return withConversationCookie(NextResponse.json({
       reply,
