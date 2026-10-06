@@ -69,10 +69,10 @@ function designationNames(sep = '\\s+') {
 /**
  * Exact registry titles that contain a designation name, as a global neutralise regex.
  *
- * Only the approved title AS A WHOLE is exempt: it must open a quoted value (or follow "the ")
- * and end the value, or be followed only by " | CARSI" or " course". Independent review
- * (06/10/2026) showed an unanchored match erased the approved prefix of a different title —
- * "Introduction to Applied Structural Drying Masterclass" passed.
+ * Only the approved title AS THE WHOLE QUOTED VALUE is exempt, optionally followed by " | CARSI"
+ * suffixes that also end the value. Independent review (06/10/2026, two rounds) showed that any
+ * looser anchoring erased the approved title inside a different one — "… Drying Masterclass",
+ * "… Drying course Masterclass" and "… Drying | CARSI Masterclass" all passed.
  */
 function registryTitlesCarryingDesignations() {
   const registry = JSON.parse(
@@ -85,7 +85,7 @@ function registryTitlesCarryingDesignations() {
   if (titles.length === 0) return null;
   const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   return new RegExp(
-    `(?<=["'\`]|\\bthe\\s)(?:${titles.map(esc).join('|')})(?=["'\`]|\\s*\\|\\s*CARSI\\b|\\s+course\\b)`,
+    `(?<=["'\`])(?:${titles.map(esc).join('|')})(?=(?:\\s*\\|\\s*CARSI)*["'\`])`,
     'gi'
   );
 }

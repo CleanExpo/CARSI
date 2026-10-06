@@ -604,6 +604,14 @@ check('a registry SLUG does not exempt a different title', () => {
   assert.ok(hits.some((h) => h.rule === 'designation-phrase'));
 });
 
+check('a registry title with extra text after the CARSI suffix is not exempt (review round 3)', () => {
+  const hits = scanCourse({
+    slug: 'introduction-to-applied-structural-drying',
+    title: 'Introduction to Applied Structural Drying | CARSI Masterclass',
+  });
+  assert.ok(hits.some((h) => h.rule === 'designation-phrase'));
+});
+
 check('a registry TITLE does not exempt a different slug', () => {
   const hits = scanCourse({
     slug: 'introduction-to-advanced-applied-structural-drying',

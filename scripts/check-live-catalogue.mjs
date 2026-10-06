@@ -335,7 +335,9 @@ export function scanCourse({ slug, title }) {
   // registry slug under any other title, or a registry title under any other slug, is not exempt.
   let phraseSlug = fSlug;
   const approved = APPROVED_CLASS_TITLES.get(fSlug);
-  if (approved && lowerTitle.replace(/\s*\|.*$/, '').trim() === approved) {
+  // Only " | CARSI" suffixes may follow; any other trailing text is a different title
+  // (independent review, 06/10/2026: "… | CARSI Masterclass" was exempted).
+  if (approved && lowerTitle.replace(/(?:\s*\|\s*carsi)+\s*$/, '').trim() === approved) {
     lowerTitle = lowerTitle.replace(approved, ' ');
     phraseSlug = '';
   }
