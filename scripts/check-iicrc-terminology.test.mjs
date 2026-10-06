@@ -92,6 +92,10 @@ const MUST_BLOCK = [
   ['designation name in a JSON title', '"title": "Introduction to Advanced Applied Structural Drying | CARSI",'],
   ['designation name + course noun', 'Welcome to Carpet Cleaning Technician Fundamentals.'],
   ['designation name + course noun, ampersand form', 'Fire & Smoke Restoration Technician course for crews'],
+  // Independent review 06/10/2026: hyphens between the designation words bypassed the rule.
+  ['hyphenated designation name in a title (review P1)', 'export const probe = { title: "Applied-Structural-Drying — Core Concepts" };'],
+  ['underscored designation name + course noun', 'Carpet_Cleaning_Technician Fundamentals for new starters'],
+  ['spaced dash before the course noun', 'Applied Structural Drying - Core Concepts'],
   ['microbial designation name in a quiz title', '"title": "Applied Microbial Remediation: Mould Fundamentals — Knowledge Check",'],
 ];
 
@@ -184,6 +188,7 @@ const MUST_PASS = [
   ['audience usage of a designation name', 'This course is for water damage restoration technicians in Australia.'],
   ['the renamed course title', "title: 'Structural Drying — Core Concepts',"],
   ['a hyphenated slug is the URL, audited live', '"courseSlug": "applied-structural-drying-core",'],
+  ['a hyphenated slug + course noun is still a slug', 'href="/courses/carpet-cleaning-technician-fundamentals"'],
 ];
 
 let failed = 0;

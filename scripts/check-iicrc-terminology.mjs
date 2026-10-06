@@ -39,22 +39,27 @@ import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 
 /**
- * IICRC discipline designations spelled out, as a regex alternation (spaces between words).
+ * IICRC discipline designations spelled out, as a regex alternation.
  * "Applied Structural Drying" and "Applied Microbial Remediation" carry no trailing
  * "Technician" because the discipline name alone is the designation; the rest are only the
  * designation WITH "Technician", since "water damage restoration" alone is ordinary topic wording.
+ *
+ * `sep` is what may sit between the words. Spaces only by default; the course-title shape passes
+ * `[\\s_-]+` because "Applied-Structural-Drying — Core Concepts" is the same title (independent
+ * review, 06/10/2026, reproduced the hyphen bypass).
  */
-function designationNames() {
-  const and = '(?:and|&)';
+function designationNames(sep = '\\s+') {
+  const and = `(?:and|&)`;
+  const w = (...words) => words.join(sep);
   return (
-    '(?:applied\\s+structural\\s+drying|applied\\s+microbial\\s+remediation' +
-    '|water(?:\\s+damage)?\\s+restoration\\s+technicians?' +
-    `|fire\\s+${and}\\s+smoke\\s+restoration\\s+technicians?` +
-    '|(?:commercial\\s+)?carpet\\s+cleaning\\s+technicians?' +
-    '|odou?r\\s+control\\s+technicians?' +
-    `|trauma\\s+${and}\\s+crime\\s+scene\\s+technicians?` +
-    `|carpet\\s+repair\\s+${and}\\s+reinstallation\\s+technicians?` +
-    `|upholstery\\s+${and}\\s+fabric\\s+cleaning\\s+technicians?)`
+    `(?:${w('applied', 'structural', 'drying')}|${w('applied', 'microbial', 'remediation')}` +
+    `|water(?:${sep}damage)?${sep}${w('restoration', 'technicians?')}` +
+    `|${w('fire', and, 'smoke', 'restoration', 'technicians?')}` +
+    `|(?:commercial${sep})?${w('carpet', 'cleaning', 'technicians?')}` +
+    `|${w('odou?r', 'control', 'technicians?')}` +
+    `|${w('trauma', and, 'crime', 'scene', 'technicians?')}` +
+    `|${w('carpet', 'repair', and, 'reinstallation', 'technicians?')}` +
+    `|${w('upholstery', and, 'fabric', 'cleaning', 'technicians?')})`
   );
 }
 
@@ -317,7 +322,7 @@ const BANNED = [
     // Audience usage ("for water damage restoration technicians") matches neither shape and
     // stays allowed, as does a third-person reference to the IICRC certification itself.
     re: new RegExp(
-      `\\btitle["']?\\s*[:=]\\s*["'\`][^"'\`\\n]*\\b${designationNames()}|\\b${designationNames()}\\b\\s*(?:[—–:-]\\s*)?(?:core|essentials|fundamentals|basics|course|courses|training|class|classes|module|modules|program|programme|workshop|masterclass)\\b`,
+      `\\btitle["']?\\s*[:=]\\s*["'\`][^"'\`\\n]*\\b${designationNames('[\\s_-]+')}|\\b${designationNames('[\\s_-]+')}\\b(?:\\s*[—–:]\\s*|\\s+-\\s*|\\s+)(?:core|essentials|fundamentals|basics|course|courses|training|class|classes|module|modules|program|programme|workshop|masterclass)\\b`,
       'i'
     ),
     allow: null,
