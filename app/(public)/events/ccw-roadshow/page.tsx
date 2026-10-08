@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 import { CcwRoadshowContent } from '@/components/marketing/CcwRoadshowPage';
 import { getPublicSiteUrl } from '@/lib/env/public-url';
-import { ccwRoadshowPath } from '@/lib/marketing/ccw-roadshow';
+import { ccwRoadshowPath, getCcwRoadshowEvent } from '@/lib/marketing/ccw-roadshow';
 
 const siteUrl = getPublicSiteUrl();
 const canonical = `${siteUrl}${ccwRoadshowPath}`;
@@ -34,6 +34,12 @@ export const metadata: Metadata = {
 
 export { CcwRoadshowContent };
 
-export default function CcwRoadshowPage() {
-  return <CcwRoadshowContent />;
+export default async function CcwRoadshowPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ event?: string | string[] }>;
+}) {
+  const query = await searchParams;
+  const event = typeof query.event === 'string' ? getCcwRoadshowEvent(query.event) : null;
+  return <CcwRoadshowContent focusSlug={event?.slug} />;
 }

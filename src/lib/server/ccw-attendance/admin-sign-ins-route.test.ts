@@ -28,13 +28,13 @@ vi.mock('@/lib/server/ccw-attendance/admin-ops', () => ({
 
 const { POST } = await import('../../../../app/api/admin/ccw-roadshow/sign-ins/route');
 
-function assistedRequest(dayIndex: 1 | 2): NextRequest {
+function assistedRequest(dayIndex: 1 | 2, eventSlug = 'melbourne'): NextRequest {
   return new NextRequest('https://carsi.example.test/api/admin/ccw-roadshow/sign-ins', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({
       action: 'admin_checkin',
-      eventSlug: 'melbourne',
+      eventSlug,
       dayIndex,
       fullName: 'Synthetic Attendee',
       email: 'attendee@example.test',
@@ -62,6 +62,26 @@ afterEach(() => {
 });
 
 describe('admin assisted attendance event-day boundary', () => {
+  it('uses canonical October Brisbane time rather than Sydney DST', async () => {
+    vi.setSystemTime(new Date('2026-10-09T13:30:00Z'));
+    const response = await POST(assistedRequest(1, 'brisbane-2026-10-09'));
+    expect(response.status).toBe(200);
+    expect(mocks.recordAdminCheckIn).toHaveBeenCalledWith(
+      expect.objectContaining({ eventSlug: 'brisbane-2026-10-09', dayIndex: 1 })
+    );
+  });
+
+  it.each([1, 2] as const)(
+    'rejects October Day %s on the wrong configured venue day before writes',
+    async (dayIndex) => {
+      vi.setSystemTime(new Date(dayIndex === 1 ? '2026-10-09T14:00:00Z' : '2026-10-09T13:30:00Z'));
+      const response = await POST(assistedRequest(dayIndex, 'brisbane-2026-10-09'));
+      expect(response.status).toBe(409);
+      expect(mocks.findAdmin).not.toHaveBeenCalled();
+      expect(mocks.recordAdminCheckIn).not.toHaveBeenCalled();
+    }
+  );
+
   it.each([
     ['before Day 1 opens', '2026-07-21T13:59:59.999Z', 1],
     ['wrong configured day', '2026-07-21T14:00:00.000Z', 2],
