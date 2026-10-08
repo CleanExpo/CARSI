@@ -191,7 +191,7 @@ export const ccwRoadshowEvents: CcwRoadshowEvent[] = [
     registration: 'external',
     // Verified against CCW's product page on 8 October 2026. Calendar guest-add
     // remains unavailable until a real Google event ID is configured for this sitting.
-    bookingUrl: 'https://ccwonline.com.au/collections/new-collection/products/carsi-2-day-carpet-upholstery-training-course',
+    bookingUrl: 'https://ccwonline.com.au/collections/training-marketing',
     unitAmountCents: 49500,
     giftCardAmountCents: 20000,
     maxRegistrationsPerCustomer: 5,

@@ -82,7 +82,7 @@ describe('separate Brisbane October occurrence', () => {
       endDateIso: '2026-10-10T15:00:00+10:00', timeZone: 'Australia/Brisbane',
       streetAddress: '194D Zillmere Road', capacity: 15, registration: 'external',
       unitAmountCents: 49500, giftCardAmountCents: 20000, maxRegistrationsPerCustomer: 5,
-      bookingUrl: 'https://ccwonline.com.au/collections/new-collection/products/carsi-2-day-carpet-upholstery-training-course',
+      bookingUrl: 'https://ccwonline.com.au/collections/training-marketing',
     });
     expect(october?.calendarEventId).toBeUndefined();
     expect(ccwRoadshowEvents.map((event) => event.slug).filter((slug) => slug === 'brisbane')).toHaveLength(1);

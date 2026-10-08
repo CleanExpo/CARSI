@@ -34,10 +34,14 @@ describe('October occurrence calendar', () => {
     expect(ics).toContain('AUD495');
     expect(ics).toContain('One AUD200 CCW gift card per registration');
     expect(ics).toContain('redeemable after the course.');
+    expect(ics).toContain('https://ccwonline.com.au/collections/training-marketing');
+    expect(ics).not.toContain('carsi-2-day-carpet-upholstery-training-course');
+    expect(ics).not.toContain('srsltid=');
     const google = new URL(buildGoogleCalendarLink(october));
     expect(google.searchParams.get('ctz')).toBe('Australia/Brisbane');
     expect(google.searchParams.get('details')).toContain('8.30am-3pm');
     expect(google.searchParams.get('details')).toContain(october.bookingUrl);
+    expect(google.searchParams.get('details')).not.toContain('srsltid=');
     expect(google.searchParams.get('details')).toContain('One AUD200 CCW gift card per registration, redeemable after the course.');
   });
 
