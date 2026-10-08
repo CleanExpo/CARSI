@@ -18,6 +18,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
+import { getAppOrigin, getCheckoutReturnUrl } from '@/lib/server/app-url';
+
 import { createPortalSession } from '@/lib/api/stripe';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
@@ -75,11 +77,8 @@ export async function POST(request: NextRequest) {
     return_url?: string;
   };
 
-  const origin = request.nextUrl.origin;
-  const return_url =
-    typeof body.return_url === 'string' && body.return_url.startsWith('http')
-      ? body.return_url
-      : `${origin}/dashboard/courses`;
+  const origin = getAppOrigin(request);
+  const return_url = getCheckoutReturnUrl(body.return_url, `${origin}/dashboard/courses`);
 
   try {
     const session = await createPortalSession({

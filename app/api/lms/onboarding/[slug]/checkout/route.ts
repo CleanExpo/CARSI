@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { getAppOrigin, getCheckoutReturnUrl } from '@/lib/server/app-url';
+
 import { getStripeClient } from '@/lib/api/stripe';
 import { parseOnboardingMeta } from '@/lib/onboarding/enterprise';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
@@ -59,15 +61,9 @@ export async function POST(request: NextRequest, ctx: Ctx) {
     organisation_name?: string;
   };
 
-  const defaults = buildOnboardingCheckoutUrls(request.nextUrl.origin, slug);
-  const successUrl =
-    typeof body.success_url === 'string' && body.success_url.startsWith('http')
-      ? body.success_url
-      : defaults.success_url;
-  const cancelUrl =
-    typeof body.cancel_url === 'string' && body.cancel_url.startsWith('http')
-      ? body.cancel_url
-      : defaults.cancel_url;
+  const defaults = buildOnboardingCheckoutUrls(getAppOrigin(request), slug);
+  const successUrl = getCheckoutReturnUrl(body.success_url, defaults.success_url);
+  const cancelUrl = getCheckoutReturnUrl(body.cancel_url, defaults.cancel_url);
 
   const meta = parseOnboardingMeta(course.meta);
   const organisationName = (

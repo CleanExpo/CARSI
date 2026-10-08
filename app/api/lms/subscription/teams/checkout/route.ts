@@ -22,6 +22,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
+import { getAppOrigin, getCheckoutReturnUrl } from '@/lib/server/app-url';
+
 import { getStripeClient } from '@/lib/api/stripe';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { teamTierById, type TeamBundleTierId } from '@/lib/lms/pricing-tiers';
@@ -116,15 +118,12 @@ export async function POST(request: NextRequest) {
   }
 
   const seats = tier.seatsIncluded;
-  const origin = request.nextUrl.origin;
-  const success_url =
-    typeof body.success_url === 'string' && body.success_url.startsWith('http')
-      ? body.success_url
-      : `${origin}/dashboard/team?membership=active`;
-  const cancel_url =
-    typeof body.cancel_url === 'string' && body.cancel_url.startsWith('http')
-      ? body.cancel_url
-      : `${origin}/pricing?checkout=cancelled`;
+  const origin = getAppOrigin(request);
+  const success_url = getCheckoutReturnUrl(
+    body.success_url,
+    `${origin}/dashboard/team?membership=active`,
+  );
+  const cancel_url = getCheckoutReturnUrl(body.cancel_url, `${origin}/pricing?checkout=cancelled`);
 
   try {
     const session = await getStripeClient().checkout.sessions.create(
