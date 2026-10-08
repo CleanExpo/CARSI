@@ -446,7 +446,7 @@ export function AdminCcwSignInsClient() {
         </p>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <label htmlFor="ccw-event-select" className="text-sm text-white/70">
           Event
         </label>
@@ -460,7 +460,7 @@ export function AdminCcwSignInsClient() {
             setCheckInLink(null);
             setEventSlug(e.target.value);
           }}
-          className="rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-sm"
+          className="w-full min-w-0 max-w-full rounded-lg border border-white/15 bg-white/10 px-3 py-2 text-sm sm:w-auto"
         >
           {ccwRoadshowEvents.map((ev) => (
             <option key={ev.slug} value={ev.slug} className="bg-[#09111f]">

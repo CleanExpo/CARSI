@@ -127,6 +127,19 @@ afterEach(async () => {
 });
 
 describe('AdminCcwSignInsClient occurrence picker', () => {
+  it('keeps the dated picker and both actions in a wrapping, width-bounded row', () => {
+    const picker = container.querySelector<HTMLSelectElement>('#ccw-event-select');
+    expect(picker).not.toBeNull();
+    const row = picker!.parentElement!;
+    expect(row.classList.contains('flex-wrap')).toBe(true);
+    expect(picker!.classList.contains('min-w-0')).toBe(true);
+    expect(picker!.classList.contains('max-w-full')).toBe(true);
+    expect(picker!.classList.contains('w-full')).toBe(true);
+    expect(picker!.classList.contains('sm:w-auto')).toBe(true);
+    expect(buttonByText(container, 'Run provision + offers').parentElement).toBe(row);
+    expect(buttonByText(container, 'Resend offer pack only').parentElement).toBe(row);
+  });
+
   it('distinguishes the two Brisbane sittings while retaining their immutable option values', () => {
     const picker = container.querySelector<HTMLSelectElement>('#ccw-event-select');
     expect(picker).not.toBeNull();
