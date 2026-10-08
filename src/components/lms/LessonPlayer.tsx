@@ -169,6 +169,44 @@ export function LessonPlayer({
   );
 }
 
+export function bindReadingPosition(element: HTMLElement, initialValue: number, onPosition: (value: number) => void) {
+  let scrollRoot = element.parentElement;
+  while (scrollRoot && scrollRoot !== element.ownerDocument.body && scrollRoot !== element.ownerDocument.documentElement) {
+    if (/^(auto|scroll|overlay)$/.test(window.getComputedStyle(scrollRoot).overflowY) && scrollRoot.clientHeight > 0) break;
+    scrollRoot = scrollRoot.parentElement;
+  }
+  if (scrollRoot === element.ownerDocument.body || scrollRoot === element.ownerDocument.documentElement) scrollRoot = null;
+  const target = scrollRoot ?? window;
+  const geometry = () => {
+    const viewportTop = scrollRoot ? scrollRoot.getBoundingClientRect().top + scrollRoot.clientTop : 0;
+    return {
+      top: element.getBoundingClientRect().top - viewportTop,
+      range: Math.max(0, element.offsetHeight - (scrollRoot?.clientHeight ?? window.innerHeight)),
+      offset: scrollRoot?.scrollTop ?? window.scrollY,
+    };
+  };
+  let restoring = true;
+  let releaseFrame: number | null = null;
+  const frame = requestAnimationFrame(() => {
+    if (initialValue > 0) {
+      const { top, range, offset } = geometry();
+      target.scrollTo({ top: offset + top + (initialValue / 10000) * range, behavior: 'instant' });
+    }
+    releaseFrame = requestAnimationFrame(() => { restoring = false; });
+  });
+  const scroll = () => {
+    if (restoring) return;
+    const { top, range } = geometry();
+    onPosition(Math.round(Math.max(0, Math.min(1, range > 0 ? -top / range : 0)) * 10000));
+  };
+  target.addEventListener('scroll', scroll, { passive: true });
+  return () => {
+    cancelAnimationFrame(frame);
+    if (releaseFrame !== null) cancelAnimationFrame(releaseFrame);
+    target.removeEventListener('scroll', scroll);
+  };
+}
+
 function PositionedContent({ lesson, enterprise, initialPosition, onPositionChange }: {
   lesson: Lesson; enterprise?: boolean; initialPosition?: LessonPosition;
   onPositionChange?: (position: LessonPosition) => void;
@@ -180,23 +218,8 @@ function PositionedContent({ lesson, enterprise, initialPosition, onPositionChan
   useEffect(() => { update.current = onPositionChange; }, [onPositionChange]);
   useEffect(() => {
     if (lesson.content_type !== 'text' || !body.current) return;
-    const element = body.current;
-    let restoring = true;
-    const frame = requestAnimationFrame(() => {
-      if (initial.current?.kind === 'reading' && initial.current.value > 0) {
-        const top = window.scrollY + element.getBoundingClientRect().top;
-        window.scrollTo({ top: top + (initial.current.value / 10000) * Math.max(0, element.offsetHeight - window.innerHeight), behavior: 'instant' });
-      }
-      requestAnimationFrame(() => { restoring = false; });
-    });
-    const scroll = () => {
-      if (restoring) return;
-      const range = element.offsetHeight - window.innerHeight;
-      const proportion = range > 0 ? -element.getBoundingClientRect().top / range : 0;
-      update.current?.({ kind: 'reading', value: Math.round(Math.max(0, Math.min(1, proportion)) * 10000) });
-    };
-    window.addEventListener('scroll', scroll, { passive: true });
-    return () => { cancelAnimationFrame(frame); window.removeEventListener('scroll', scroll); };
+    return bindReadingPosition(body.current, initial.current?.kind === 'reading' ? initial.current.value : 0,
+      (value) => update.current?.({ kind: 'reading', value }));
   }, [lesson.id, lesson.content_type]);
   const embedded = /(?:youtube(?:-nocookie)?\.com|youtu\.be|vimeo\.com)/i.test(lesson.content_body ?? '');
   if (lesson.content_type === 'video' && !embedded) return (
