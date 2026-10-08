@@ -389,7 +389,7 @@ export function SubmissionForm({
 
         {/* Submit */}
         <div className="mt-8">
-          <TurnstileWidget onVerify={setTurnstileToken} />
+          <TurnstileWidget onVerify={setTurnstileToken} surface="dark" />
           <button
             type="submit"
             disabled={submitting}
