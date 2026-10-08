@@ -1,50 +1,81 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { getAppOrigin } from './app-url';
+import { getAppOrigin, getCheckoutReturnUrl } from './app-url';
 
 function requestWithOrigin(origin: string) {
-  return { nextUrl: { origin } } as Parameters<typeof getAppOrigin>[0];
+  return { nextUrl: { origin } };
 }
 
+beforeEach(() => {
+  vi.stubEnv('NODE_ENV', 'production');
+  vi.stubEnv('NEXT_PUBLIC_APP_URL', '');
+  vi.stubEnv('NEXT_PUBLIC_FRONTEND_URL', '');
+});
+afterEach(() => vi.unstubAllEnvs());
+
 describe('getAppOrigin', () => {
-  const originalEnv = process.env.NODE_ENV;
-  const originalAppUrl = process.env.NEXT_PUBLIC_APP_URL;
-  const originalFrontendUrl = process.env.NEXT_PUBLIC_FRONTEND_URL;
-
-  afterEach(() => {
-    process.env.NODE_ENV = originalEnv;
-    if (originalAppUrl === undefined) {
-      delete process.env.NEXT_PUBLIC_APP_URL;
-    } else {
-      process.env.NEXT_PUBLIC_APP_URL = originalAppUrl;
-    }
-    if (originalFrontendUrl === undefined) {
-      delete process.env.NEXT_PUBLIC_FRONTEND_URL;
-    } else {
-      process.env.NEXT_PUBLIC_FRONTEND_URL = originalFrontendUrl;
-    }
-  });
-
-  it('uses public app URL env before request origin', () => {
-    process.env.NEXT_PUBLIC_APP_URL = 'https://example.com/';
-
+  it('uses public app URL env before request origin and frontend URL', () => {
+    vi.stubEnv('NEXT_PUBLIC_APP_URL', ' https://example.com/ ');
+    vi.stubEnv('NEXT_PUBLIC_FRONTEND_URL', 'https://frontend.example.com');
     expect(getAppOrigin(requestWithOrigin('https://localhost:8080'))).toBe('https://example.com');
   });
 
-  it('does not leak localhost origins into production links', () => {
-    delete process.env.NEXT_PUBLIC_APP_URL;
-    delete process.env.NEXT_PUBLIC_FRONTEND_URL;
-    process.env.NODE_ENV = 'production';
+  it.each([
+    'http://localhost:8080',
+    'https://LOCALHOST:8080',
+    'http://localhost.:8080',
+    'http://preview.localhost:8080',
+    'http://0.0.0.0:8080',
+    'http://127.0.0.1:8080',
+    'http://[::1]:8080',
+    'http://[::]:8080',
+  ])('does not leak local origin %s into production links from requests or env', (origin) => {
+    expect(getAppOrigin(requestWithOrigin(origin))).toBe('https://carsi.com.au');
+    vi.stubEnv('NEXT_PUBLIC_APP_URL', origin);
+    vi.stubEnv('NEXT_PUBLIC_FRONTEND_URL', origin);
+    expect(getAppOrigin()).toBe('https://carsi.com.au');
+  });
 
-    expect(getAppOrigin(requestWithOrigin('https://localhost:8080'))).toBe('https://carsi.com.au');
+  it('uses frontend URL when app URL is absent or invalid', () => {
+    vi.stubEnv('NEXT_PUBLIC_FRONTEND_URL', 'https://frontend.example.com/');
+    expect(getAppOrigin()).toBe('https://frontend.example.com');
+    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'http://localhost:8080');
+    expect(getAppOrigin()).toBe('https://frontend.example.com');
+    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'not a URL');
+    expect(getAppOrigin()).toBe('https://frontend.example.com');
   });
 
   it('uses non-local request origin when no env URL is set', () => {
-    delete process.env.NEXT_PUBLIC_APP_URL;
-    delete process.env.NEXT_PUBLIC_FRONTEND_URL;
-
     expect(getAppOrigin(requestWithOrigin('https://preview.example.com'))).toBe(
-      'https://preview.example.com',
+      'https://preview.example.com'
     );
+  });
+
+  it('still supports a configured localhost URL in development', () => {
+    vi.stubEnv('NODE_ENV', 'development');
+    vi.stubEnv('NEXT_PUBLIC_APP_URL', 'http://localhost:8080/');
+    expect(getAppOrigin()).toBe('http://localhost:8080');
+    vi.stubEnv('NEXT_PUBLIC_APP_URL', '');
+    expect(getAppOrigin()).toBe('http://localhost:3000');
+  });
+});
+
+describe('getCheckoutReturnUrl', () => {
+  const fallback = 'https://carsi.com.au/dashboard/courses';
+  it.each([
+    undefined,
+    '',
+    'not a URL',
+    'https-invalid',
+    'javascript:alert(1)',
+    'ftp://example.com',
+  ])('falls back for invalid URL %s', (value) => {
+    expect(getCheckoutReturnUrl(value, fallback)).toBe(fallback);
+  });
+
+  it('allows local return URLs during development', () => {
+    vi.stubEnv('NODE_ENV', 'development');
+    const value = 'http://localhost:3000/success?session_id={CHECKOUT_SESSION_ID}';
+    expect(getCheckoutReturnUrl(value, fallback)).toBe(value);
   });
 });
