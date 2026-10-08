@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from 'react';
 
+import type { FormSurface } from '@/components/ui/form-surface';
+
 /**
  * Cloudflare Turnstile widget (issue #118). Renders only when
  * NEXT_PUBLIC_TURNSTILE_SITE_KEY is configured; otherwise renders nothing and the
@@ -18,6 +20,7 @@ declare global {
         el: HTMLElement,
         opts: {
           sitekey: string;
+          theme: FormSurface;
           callback: (token: string) => void;
           'expired-callback'?: () => void;
           'error-callback'?: () => void;
@@ -50,7 +53,13 @@ function loadTurnstileScript(): Promise<void> {
   return scriptPromise;
 }
 
-export function TurnstileWidget({ onVerify }: { onVerify: (token: string) => void }) {
+export function TurnstileWidget({
+  onVerify,
+  surface = 'light',
+}: {
+  onVerify: (token: string) => void;
+  surface?: FormSurface;
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -62,6 +71,7 @@ export function TurnstileWidget({ onVerify }: { onVerify: (token: string) => voi
         if (cancelled || !containerRef.current || !window.turnstile) return;
         window.turnstile.render(containerRef.current, {
           sitekey: SITE_KEY,
+          theme: surface,
           callback: (token) => onVerify(token),
           'expired-callback': () => onVerify(''),
           'error-callback': () => onVerify(''),
@@ -74,7 +84,7 @@ export function TurnstileWidget({ onVerify }: { onVerify: (token: string) => voi
     return () => {
       cancelled = true;
     };
-  }, [onVerify]);
+  }, [onVerify, surface]);
 
   if (!SITE_KEY) return null;
   return <div ref={containerRef} className="cf-turnstile" />;

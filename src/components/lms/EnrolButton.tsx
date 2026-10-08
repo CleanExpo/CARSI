@@ -255,7 +255,7 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
       <button
         type="button"
         onClick={() => setMode('guest')}
-        className="mb-2 text-xs text-white/45 hover:text-[#2490ed]"
+        className="mb-2 text-xs text-[#4b5563] hover:text-[#146fc2]"
       >
         Quick enrol with a different email
       </button>
