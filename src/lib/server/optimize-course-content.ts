@@ -8,6 +8,7 @@ import {
   courseToAdminDto,
 } from '@/lib/admin/admin-courses-service';
 import type { OptimizedCourseDraft, OptimizedModuleDraft } from '@/lib/admin/optimize-course-draft';
+import { hasCurriculumPersistence } from '@/lib/admin/admin-course-curriculum-readback';
 import {
   CourseBuilderInputError,
   assertNoStandardText,
@@ -449,7 +450,20 @@ export async function discardOptimizeDraft(courseId: string, existingMeta: unkno
   });
 }
 
-function foundationFromCourse(dto: ReturnType<typeof courseToAdminDto>): string {
+function legacyCourseDto(course: NonNullable<Awaited<ReturnType<typeof adminGetCourse>>>) {
+  if (hasCurriculumPersistence(course)) {
+    throw new OptimizeCourseError('Structured curriculum optimisation is not supported', 409);
+  }
+  const dto = courseToAdminDto(course);
+  return { ...dto, description: dto.description ?? '', modules: dto.modules.map((module) => {
+    if (!('textContent' in module)) {
+      throw new OptimizeCourseError('Structured curriculum optimisation is not supported', 409);
+    }
+    return module;
+  }) };
+}
+
+function foundationFromCourse(dto: ReturnType<typeof legacyCourseDto>): string {
   const parts: string[] = [];
   parts.push(`Title: ${dto.title}`);
   if (dto.description)
@@ -491,7 +505,7 @@ export async function generateOptimizedCourseDraft(
 
   const course = await adminGetCourse(courseId);
   if (!course) throw new OptimizeCourseError('Not found', 404);
-  const dto = courseToAdminDto(course);
+  const dto = legacyCourseDto(course);
 
   onProgress?.({ step: 'scan', message: 'Preparing existing content…', percent: 10 });
 
@@ -650,7 +664,7 @@ export async function applyOptimizedCourseDraft(
     throw new OptimizeCourseError('No matching optimisation draft to apply', 409);
   }
 
-  const dto = courseToAdminDto(course);
+  const dto = legacyCourseDto(course);
   const modules = draft.modules.map((m, i) => {
     const prev = dto.modules[i];
     return {
@@ -702,7 +716,7 @@ export async function optimizeAndApplyCourse(
 }> {
   const existing = await adminGetCourse(courseId);
   if (!existing) throw new OptimizeCourseError('Not found', 404);
-  const dto = courseToAdminDto(existing);
+  const dto = legacyCourseDto(existing);
   if (dto.isFree && !opts?.allowFree) {
     throw new OptimizeCourseError('Free courses are not optimised by the paid cron', 400);
   }

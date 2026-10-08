@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { projectLearnerCourseMeta } from '@/lib/lms/learner-course-meta';
 
 import {
   computeProgressFromModules,
@@ -53,7 +54,7 @@ export async function GET(request: NextRequest, ctx: Ctx) {
   }));
 
   const stats = computeProgressFromModules(modules);
-  const meta = parseOnboardingMeta(course.meta);
+  const meta = parseOnboardingMeta(projectLearnerCourseMeta(course.meta));
 
   return NextResponse.json({
     program: {

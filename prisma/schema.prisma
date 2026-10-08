@@ -260,6 +260,7 @@ model LmsLessonProgress {
   studentId      String    @map("student_id") @db.Uuid
   lessonId       String    @map("lesson_id") @db.Uuid
   completed      Boolean   @default(false)
+  checkpoint     Json?
   completedAt    DateTime? @map("completed_at") @db.Timestamptz(6)
   lastAccessedAt DateTime  @default(now()) @map("last_accessed_at") @db.Timestamptz(6)
   updatedAt      DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
@@ -494,6 +495,7 @@ model LmsQuizAttempt {
   scorePercent Int      @map("score_percent")
   passed       Boolean
   answers      Json
+  contentVersion String? @map("content_version") @db.VarChar(64)
   createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
   quiz    LmsQuiz @relation(fields: [quizId], references: [id], onDelete: Cascade)

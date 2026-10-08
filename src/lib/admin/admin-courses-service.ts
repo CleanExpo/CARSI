@@ -3,7 +3,13 @@ import { randomUUID } from 'node:crypto';
 import { Prisma } from '@/generated/prisma/client';
 
 import { prisma } from '@/lib/prisma';
+import {
+  CURRICULUM_FORMAT, CURRICULUM_MARKER, hasCurriculumPersistence, hasStructuredModules,
+  readAdminCourseCurriculum, validateStructuredCourse, type CurriculumPersistence,
+} from '@/lib/admin/admin-course-curriculum-readback';
+import type { CurriculumModule } from '@/lib/server/ai-course-curriculum';
 import { isCecExcludedSlug } from '@/lib/seed/cec-professional-assignments';
+import { getCecApproval } from '@/lib/seed/cec-approvals';
 import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
 import { formatLmsCourseDurationHoursLabel } from '@/lib/server/course-duration-hours';
 import {
@@ -45,11 +51,13 @@ export type AdminModuleInput = {
    * toward the course completion gate (`allCourseQuizzesPassed`). Omit for no quiz.
    */
   quiz?: AdminModuleQuizInput;
+  description?: string | null;
+  lessons?: CurriculumModule['lessons'];
 };
 
 export type AdminCourseWriteInput = {
   title: string;
-  description?: string;
+  description?: string | null;
   thumbnailUrl?: string;
   introVideoUrl?: string;
   introThumbnailUrl?: string;
@@ -123,6 +131,14 @@ export function parseModuleQuiz(raw: unknown): AdminModuleQuizInput | undefined 
 }
 
 export function parseAdminCourseWriteBody(body: unknown): AdminCourseWriteInput | null {
+  if (hasStructuredModules(body)) {
+    try {
+      const structured = validateStructuredCourse(body);
+      return { ...(body as AdminCourseWriteInput), ...structured };
+    } catch {
+      return null;
+    }
+  }
   if (!body || typeof body !== 'object') return null;
   const o = body as Record<string, unknown>;
   const title = typeof o.title === 'string' ? o.title.trim() : '';
@@ -451,6 +467,7 @@ function quizOptionsToStrings(options: unknown): string[] {
 }
 
 export function courseToAdminDto(course: CourseWithCurriculum) {
+  const structured = hasCurriculumPersistence(course) ? readAdminCourseCurriculum(course) : null;
   const { introVideoUrl, introThumbnailUrl } = readIntroVideoFromMeta(course.meta);
   const status = (course.status ?? '').toLowerCase();
   const resolved = resolveLmsCourseCecHours({
@@ -472,7 +489,7 @@ export function courseToAdminDto(course: CourseWithCurriculum) {
     id: course.id,
     slug: course.slug,
     title: course.title,
-    description: course.description ?? '',
+    description: structured ? course.description : course.description ?? '',
     thumbnailUrl: course.thumbnailUrl ?? '',
     introVideoUrl,
     introThumbnailUrl,
@@ -490,7 +507,18 @@ export function courseToAdminDto(course: CourseWithCurriculum) {
     cecExcluded: isCecExcludedSlug(course.slug),
     resolvedDurationHours: resolvedDuration,
     durationMissing: resolvedDuration == null,
-    modules: course.modules.map((mod) => {
+    modules: (structured ? [...course.modules].sort((a, b) => a.orderIndex - b.orderIndex) : course.modules).map((mod) => {
+      if (structured) {
+        const curriculumModule = structured.modules[mod.orderIndex];
+        return {
+          id: mod.id, ...curriculumModule, orderIndex: mod.orderIndex,
+          lessons: curriculumModule.lessons.map((lesson, index) => {
+            const native = mod.lessons.find((row) => row.orderIndex === index)!;
+            return { ...lesson, id: native.id, orderIndex: index,
+              ...(lesson.kind === 'assessment' ? { quiz: { ...lesson.quiz, id: native.contentBody! } } : {}) };
+          }),
+        };
+      }
       const lessons = [...mod.lessons].sort((a, b) => a.orderIndex - b.orderIndex);
       const text = lessons.find((l) => l.contentType === 'text');
       const video = lessons.find((l) => l.contentType === 'video');
@@ -536,6 +564,13 @@ const publishedWhere: Prisma.LmsCourseWhereInput = {
 };
 
 export type CourseWorkflowStatus = 'draft' | 'in_review' | 'published';
+
+/** Profile configuration requires both exact draft status and no legacy publication flag. */
+export function isUnpublishedCourseDraft(course: {
+  status?: unknown; isPublished?: unknown;
+}): boolean {
+  return course.status === 'draft' && course.isPublished === false;
+}
 
 export function resolveCourseWorkflowStatus(
   status: string | null | undefined,
@@ -713,26 +748,31 @@ export async function lmsCreateCourseDraft(input: LmsCourseDraftInput) {
 export async function adminCreateCourse(
   input: AdminCourseWriteInput
 ): Promise<CourseWithCurriculum> {
-  const modules = normalizeModules(input.modules);
+  const structured = hasStructuredModules(input) ? validateStructuredCourse(input) : null;
+  const modules = structured ? structured.modules : normalizeModules(input.modules);
   if (modules.length === 0) {
     throw new Error('MODULES_REQUIRED');
   }
 
-  await ensureCatalogInstructor();
+  const preferredSlug = slugify(input.slug?.trim() || input.title);
+  if (structured && getCecApproval(preferredSlug)) throw new Error('INVALID_STRUCTURED_CURRICULUM');
+  if (!structured) await ensureCatalogInstructor();
 
-  const slug = await uniqueSlug(slugify(input.slug?.trim() || input.title));
+  const slug = await uniqueSlug(preferredSlug);
+  if (structured && getCecApproval(slug)) throw new Error('INVALID_STRUCTURED_CURRICULUM');
   const courseId = randomUUID();
   const priceAud = new Prisma.Decimal(Number.isFinite(input.priceAud) ? input.priceAud : 0);
   const published = Boolean(input.published);
 
   await prisma.$transaction(
     async (tx) => {
+      if (structured) await ensureCatalogInstructor(tx);
       await tx.lmsCourse.create({
         data: {
           id: courseId,
           slug,
-          title: input.title.trim(),
-          description: input.description?.trim() || null,
+          title: structured?.title ?? input.title.trim(),
+          description: structured ? structured.description : input.description?.trim() || null,
           shortDescription: null,
           thumbnailUrl: input.thumbnailUrl?.trim() || null,
           meta:
@@ -753,9 +793,58 @@ export async function adminCreateCourse(
         },
       });
 
+      if (structured) {
+        const mapping: CurriculumPersistence = {
+          format: CURRICULUM_FORMAT, mappingVersion: 1, courseId, modules: [],
+        };
+        for (let moduleIndex = 0; moduleIndex < structured.modules.length; moduleIndex++) {
+          const curriculumModule = structured.modules[moduleIndex];
+          const moduleId = randomUUID();
+          await tx.lmsModule.create({ data: { id: moduleId, courseId, title: curriculumModule.title, orderIndex: moduleIndex } });
+          const persistedModule: CurriculumPersistence['modules'][number] = {
+            moduleId, description: curriculumModule.description, lessonBindings: [],
+          };
+          for (let lessonIndex = 0; lessonIndex < curriculumModule.lessons.length; lessonIndex++) {
+            const lesson = curriculumModule.lessons[lessonIndex];
+            const lessonId = randomUUID();
+            const quizId = lesson.kind === 'assessment' ? randomUUID() : undefined;
+            if (lesson.kind === 'assessment' && quizId) {
+              await tx.lmsQuiz.create({ data: { id: quizId, courseId, title: lesson.title,
+                passPercentage: lesson.quiz.passPercentage, attemptsAllowed: lesson.quiz.attemptsAllowed } });
+              for (let questionIndex = 0; questionIndex < lesson.quiz.questions.length; questionIndex++) {
+                const question = lesson.quiz.questions[questionIndex];
+                await tx.lmsQuizQuestion.create({ data: {
+                  quizId, ...question, options: question.options.map((text) => ({ text })), orderIndex: questionIndex,
+                } });
+              }
+            }
+            const binding = { lessonId, kind: lesson.kind, sourceLessonIndex: lesson.sourceLessonIndex,
+              ...(quizId ? { quizId } : {}) };
+            persistedModule.lessonBindings.push(binding);
+            await tx.lmsLesson.create({ data: {
+              id: lessonId, moduleId, title: lesson.title, contentType: lesson.kind === 'reading' ? 'text' : 'quiz',
+              contentBody: lesson.kind === 'reading' ? lesson.textContent : quizId!, orderIndex: lessonIndex,
+              isPreview: false,
+              resources: [{ kind: CURRICULUM_MARKER, mappingVersion: 1, courseId, moduleId,
+                lessonId, lessonKind: lesson.kind, sourceLessonIndex: lesson.sourceLessonIndex,
+                ...(quizId ? { quizId } : {}) }],
+            } });
+          }
+          mapping.modules.push(persistedModule);
+        }
+        const introMeta = upsertIntroVideoInMeta(null, {
+          introVideoUrl: input.introVideoUrl, introThumbnailUrl: input.introThumbnailUrl,
+        });
+        await tx.lmsCourse.update({ where: { id: courseId }, data: {
+          meta: { ...(introMeta as Record<string, Prisma.InputJsonValue> | null),
+            curriculumPersistence: mapping as unknown as Prisma.InputJsonValue },
+        } });
+        return;
+      }
+      const legacyModules = modules as AdminModuleInput[];
       const usedQuizIds: string[] = [];
       for (let i = 0; i < modules.length; i += 1) {
-        const m = modules[i];
+        const m = legacyModules[i];
         const moduleId = randomUUID();
         await tx.lmsModule.create({
           data: {
@@ -793,6 +882,7 @@ export async function adminUpdateCourse(
   id: string,
   input: AdminCourseWriteInput
 ): Promise<CourseWithCurriculum> {
+  if (hasStructuredModules(input)) throw new Error('STRUCTURED_CURRICULUM_EDIT_BLOCKED');
   const existing = await prisma.lmsCourse.findUnique({
     where: { id },
     include: courseWithCurriculum,
@@ -800,6 +890,8 @@ export async function adminUpdateCourse(
   if (!existing) {
     throw new Error('NOT_FOUND');
   }
+
+  if (hasCurriculumPersistence(existing)) throw new Error('STRUCTURED_CURRICULUM_EDIT_BLOCKED');
 
   const modules = normalizeModules(input.modules);
   if (modules.length === 0) {

@@ -1,9 +1,12 @@
 'use client';
 
-import { ChevronRight, Loader2 } from 'lucide-react';
+import { AlertCircle, Check, ChevronRight, Cloud, Loader2, Save } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useAuth } from '@/components/auth/auth-provider';
+import { useLessonCheckpoint } from '@/hooks/use-lesson-checkpoint';
+import { singleLearnerRequest } from '@/lib/lms/checkpoint-controller';
 
 import { CampusTopBar } from '@/components/layout/CampusTopBar';
 import { CourseCompletionBanner } from '@/components/lms/CourseCompletionBanner';
@@ -57,9 +60,11 @@ interface CurriculumResponse {
     category?: string | null;
     is_onboarding?: boolean;
     meta?: ReturnType<typeof parseOnboardingMeta>;
+    delivery_profile?: { profileId: string; totalMinutes: number; sessions: Array<{ sessionId: string; objective: string; plannedMinutes: number; readingLessonId: string; assessmentLessonId: string }> } | null;
   };
   enrollment_id: string;
   modules: CurriculumModule[];
+  resume_lesson_id?: string | null;
 }
 
 interface LessonApiLesson {
@@ -89,27 +94,17 @@ interface LessonNoteOut {
 
 type ViewMode = 'lesson' | 'module';
 
-const RELIABILITY_TIP_KEY = 'carsi_learn_reliability_tip_dismissed';
-
 export function LearnCourseShell({ slug }: { slug: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const online = useOnlineStatus();
-  const [reliabilityTipDismissed, setReliabilityTipDismissed] = useState(false);
-
-  useEffect(() => {
-    try {
-      if (
-        typeof sessionStorage !== 'undefined' &&
-        sessionStorage.getItem(RELIABILITY_TIP_KEY) === '1'
-      ) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing RA-4192 rule promotion; behaviour-preserving suppression, real fix tracked separately
-        setReliabilityTipDismissed(true);
-      }
-    } catch {
-      /* private mode */
-    }
-  }, []);
+  const { user, loading: loadingIdentity, refreshUser } = useAuth();
+  const [submittingQuiz, setSubmittingQuiz] = useState(false);
+  const submissionLock = useRef(false);
+  const completionLock = useRef(false);
+  const resetLock = useRef(false);
+  const [resettingDraft, setResettingDraft] = useState(false);
+  const [unknownResultKey, setUnknownResultKey] = useState<string | null>(null);
   const lessonFromQuery = searchParams.get('lesson');
   const moduleFromQuery = searchParams.get('module');
 
@@ -121,7 +116,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
   const [activeModuleId, setActiveModuleId] = useState<string | null>(null);
 
-  const [lessonDetail, setLessonDetail] = useState<LessonDetailResponse | null>(null);
+  const [legacyLessonDetail, setLessonDetail] = useState<(LessonDetailResponse & { learner_id: string }) | null>(null);
   const [loadingLesson, setLoadingLesson] = useState(false);
   const [lessonError, setLessonError] = useState<string | null>(null);
   const [savingComplete, setSavingComplete] = useState(false);
@@ -134,7 +129,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
   const noteEditorRef = useRef<HTMLTextAreaElement | null>(null);
   const [shareDraft, setShareDraft] = useState<ProgressShareDraft | null>(null);
   const shownShareKeysRef = useRef(new Set<string>());
-  const [quizData, setQuizData] = useState<{
+  const [legacyQuizData, setQuizData] = useState<{
     id: string;
     title: string;
     pass_percentage: number;
@@ -157,6 +152,9 @@ export function LearnCourseShell({ slug }: { slug: string }) {
     correct_count?: number;
     question_count?: number;
     attempts_remaining?: number;
+    userId: string;
+    lessonId: string;
+    contentVersion?: string;
   } | null>(null);
   const [loadingQuiz, setLoadingQuiz] = useState(false);
 
@@ -168,6 +166,37 @@ export function LearnCourseShell({ slug }: { slug: string }) {
     }
     return list;
   }, [curriculum]);
+
+  const selectedLesson = flatLessons.find((lesson) => lesson.id === activeLessonId);
+  const matchingLegacyDetail = legacyLessonDetail?.lesson.id === activeLessonId && legacyLessonDetail?.learner_id === user?.id ? legacyLessonDetail : null;
+  const associatedQuiz = matchingLegacyDetail ? extractQuizIdFromLesson(matchingLegacyDetail.lesson.content_type,
+    matchingLegacyDetail.lesson.content_body, matchingLegacyDetail.resources) : null;
+  const supportedCheckpoint = view === 'lesson' && (['text', 'video', 'quiz'].includes(selectedLesson?.content_type ?? '') || Boolean(associatedQuiz));
+  const checkpoint = useLessonCheckpoint(loadingIdentity ? null : user?.id ?? null,
+    supportedCheckpoint ? activeLessonId : null,
+    selectedLesson?.content_type === 'quiz' || associatedQuiz ? 'quiz' : selectedLesson?.content_type === 'video' ? 'video' : 'reading');
+  const checkpointReady = Boolean(user && checkpoint.state.draft && checkpoint.state.response &&
+    checkpoint.state.response.content.lesson.id === activeLessonId &&
+    !['loading', 'conflict'].includes(checkpoint.state.status));
+  const lessonDetail = useMemo(() => supportedCheckpoint ? checkpointReady && checkpoint.state.response ?
+    { ...checkpoint.state.response.content, enrollment_id: curriculum?.enrollment_id ?? '' } : null : matchingLegacyDetail,
+    [supportedCheckpoint, checkpointReady, checkpoint.state.response, curriculum?.enrollment_id, matchingLegacyDetail]);
+  const quizData = supportedCheckpoint ? checkpointReady ? checkpoint.state.response?.content.quiz ?? null : null : legacyQuizData;
+  const currentPass = supportedCheckpoint && checkpoint.state.response?.passedAttempt?.versionVerified ? checkpoint.state.response.passedAttempt : null;
+  const learnerScope = `${user?.id ?? ''}:${activeLessonId ?? ''}:${checkpoint.state.response?.contentVersion ?? 'legacy'}`;
+  const currentScope = useRef(learnerScope);
+  useLayoutEffect(() => { currentScope.current = learnerScope; }, [learnerScope]);
+  const unknownQuizResult = unknownResultKey === learnerScope;
+  const scopedQuizResult = quizResult?.userId === user?.id && quizResult?.lessonId === activeLessonId &&
+    (!supportedCheckpoint || quizResult.contentVersion === checkpoint.state.response?.contentVersion) ? quizResult : null;
+  const displayedQuizResult: Omit<NonNullable<typeof quizResult>, 'userId' | 'lessonId' | 'contentVersion'> | null = scopedQuizResult ??
+    (currentPass ? { score_percent: currentPass.scorePercent, passed: true } : null);
+
+  useEffect(() => {
+    const refresh = () => { if (document.visibilityState === 'visible') void refreshUser(); };
+    window.addEventListener('focus', refresh); document.addEventListener('visibilitychange', refresh);
+    return () => { window.removeEventListener('focus', refresh); document.removeEventListener('visibilitychange', refresh); };
+  }, [refreshUser]);
 
   const allLessonsComplete = useMemo(() => {
     if (flatLessons.length === 0) return false;
@@ -247,18 +276,21 @@ export function LearnCourseShell({ slug }: { slug: string }) {
       return;
     }
     setView('lesson');
-    setActiveLessonId(flatLessons[0].id);
+    setActiveLessonId(flatLessons.some((lesson) => lesson.id === curriculum.resume_lesson_id) ? curriculum.resume_lesson_id! : flatLessons[0].id);
     setActiveModuleId(null);
   }, [curriculum, lessonFromQuery, moduleFromQuery, flatLessons]);
 
   const loadLesson = useCallback(async (lessonId: string) => {
+    if (!user) return;
+    const learnerId = user.id;
     setLoadingLesson(true);
     setLessonError(null);
     try {
       const data = await apiClient.get<LessonDetailResponse>(
         `/api/lms/lessons/${encodeURIComponent(lessonId)}`
       );
-      setLessonDetail(data);
+      if (!currentScope.current.startsWith(`${learnerId}:${lessonId}:`)) return;
+      setLessonDetail({ ...data, learner_id: learnerId });
       setQuizData(null);
       setQuizResult(null);
     } catch (e) {
@@ -273,15 +305,16 @@ export function LearnCourseShell({ slug }: { slug: string }) {
     } finally {
       setLoadingLesson(false);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
-    if (view !== 'lesson' || !activeLessonId) return;
+    if (view !== 'lesson' || !activeLessonId || supportedCheckpoint) return;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing RA-4192 rule promotion; behaviour-preserving suppression, real fix tracked separately
     void loadLesson(activeLessonId);
-  }, [view, activeLessonId, loadLesson]);
+  }, [view, activeLessonId, loadLesson, supportedCheckpoint]);
 
   useEffect(() => {
+    if (supportedCheckpoint) return;
     if (!lessonDetail) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- pre-existing RA-4192 rule promotion; behaviour-preserving suppression, real fix tracked separately
       setQuizData(null);
@@ -298,38 +331,42 @@ export function LearnCourseShell({ slug }: { slug: string }) {
     }
     setLoadingQuiz(true);
     apiClient
-      .get<NonNullable<typeof quizData>>(`/api/lms/quizzes/${encodeURIComponent(quizId)}`)
+      .get<NonNullable<typeof legacyQuizData>>(`/api/lms/quizzes/${encodeURIComponent(quizId)}`)
       .then((data) => setQuizData(data))
       .catch(() => setQuizData(null))
       .finally(() => setLoadingQuiz(false));
-  }, [lessonDetail]);
+  }, [lessonDetail, supportedCheckpoint]);
 
   const submitQuiz = useCallback(
     async (answers: Record<string, number>) => {
-      if (!quizData) return;
+      if (!quizData || !user || !activeLessonId || !supportedCheckpoint || !checkpointReady || submissionLock.current || resetLock.current || unknownQuizResult) return;
+      submissionLock.current = true; setSubmittingQuiz(true);
+      const scope = learnerScope;
       try {
-        const res = await apiClient.post<{
+        if (supportedCheckpoint && !await checkpoint.controller?.flush()) return;
+        if (currentScope.current !== scope) return;
+        const res = await singleLearnerRequest<{
           score_percent: number;
           passed: boolean;
           pass_percentage?: number;
           correct_count?: number;
           question_count?: number;
           attempts_remaining?: number;
-        }>(`/api/lms/quizzes/${encodeURIComponent(quizData.id)}/attempt`, { answers });
-        setQuizResult({
-          score_percent: res.score_percent,
-          passed: res.passed,
-          pass_percentage: res.pass_percentage,
-          correct_count: res.correct_count,
-          question_count: res.question_count,
-          attempts_remaining: res.attempts_remaining,
-        });
-      } catch (e) {
-        const msg = e instanceof ApiClientError ? e.message : 'Could not submit quiz';
-        setLessonError(msg);
+        }>(`/api/lms/quizzes/${encodeURIComponent(quizData.id)}/attempt`, user.id, 'POST',
+          { answers, lessonId: activeLessonId, contentVersion: checkpoint.state.response?.contentVersion });
+        if (currentScope.current !== scope) return;
+        setQuizResult({ ...res, score_percent: res.score_percent, passed: res.passed, userId: user.id,
+          lessonId: activeLessonId, contentVersion: checkpoint.state.response?.contentVersion });
+      } catch {
+        if (currentScope.current !== scope) return;
+        setUnknownResultKey(scope);
+        setCompleteError('Assessment result is not confirmed. Check for a saved pass; do not submit again.');
+        await checkpoint.controller?.load();
+      } finally {
+        submissionLock.current = false; setSubmittingQuiz(false);
       }
     },
-    [quizData]
+    [quizData, user, activeLessonId, supportedCheckpoint, checkpointReady, checkpoint.controller, checkpoint.state.response, unknownQuizResult, learnerScope]
   );
 
   const loadLessonNote = useCallback(async (lessonId: string) => {
@@ -371,14 +408,38 @@ export function LearnCourseShell({ slug }: { slug: string }) {
     });
   }
 
-  function selectLesson(lessonId: string) {
+  async function canNavigate() {
+    if (submissionLock.current || completionLock.current || resetLock.current) return false;
+    const scope = learnerScope;
+    const success = !supportedCheckpoint || Boolean(await checkpoint.controller?.flush());
+    return success && currentScope.current === scope;
+  }
+
+  async function resetDraft() {
+    const controller = checkpoint.controller;
+    if (!controller || !user || !activeLessonId || resetLock.current || submissionLock.current || completionLock.current) return;
+    if (!window.confirm('Discard your local and latest saved draft, and reset this lesson to its current content?')) return;
+    resetLock.current = true; setResettingDraft(true);
+    const identity = `${user.id}:${activeLessonId}:`;
+    try {
+      const hydration = controller.getSnapshot().hydration;
+      await controller.load(true);
+      if (currentScope.current.startsWith(identity) && controller.getSnapshot().hydration > hydration) await controller.reset();
+    } finally { resetLock.current = false; setResettingDraft(false); }
+  }
+
+  async function selectLesson(lessonId: string) {
+    if (!await canNavigate()) return;
+    setQuizResult(null); setUnknownResultKey(null); setCompleteError(null);
     setView('lesson');
     setActiveLessonId(lessonId);
     setActiveModuleId(null);
     replaceLessonQuery(lessonId);
   }
 
-  function selectModuleOverview(moduleId: string) {
+  async function selectModuleOverview(moduleId: string) {
+    if (!await canNavigate()) return;
+    setQuizResult(null); setUnknownResultKey(null);
     setView('module');
     setActiveModuleId(moduleId);
     setActiveLessonId(null);
@@ -396,14 +457,18 @@ export function LearnCourseShell({ slug }: { slug: string }) {
     activeIndex >= 0 && activeIndex < flatLessons.length - 1 ? flatLessons[activeIndex + 1] : null;
 
   async function toggleComplete(completed: boolean) {
-    if (!activeLessonId) return;
+    if (!activeLessonId || !user || completionLock.current || submissionLock.current || resetLock.current) return;
+    completionLock.current = true;
+    const scope = learnerScope;
+    if ((supportedCheckpoint && !await checkpoint.controller?.flush()) || currentScope.current !== scope) { completionLock.current = false; return; }
     const lessonToAdvance = completed ? nextLesson : null;
     setCompleteError(null);
     setSavingComplete(true);
     try {
-      await apiClient.patch(`/api/lms/lessons/${encodeURIComponent(activeLessonId)}/progress`, {
+      await singleLearnerRequest(`/api/lms/lessons/${encodeURIComponent(activeLessonId)}/progress`, user.id, 'PATCH', {
         completed,
       });
+      if (currentScope.current !== scope) return;
       let nextShare: ProgressShareDraft | null = null;
       let nextShareKey: string | null = null;
       let certificateEnrollmentId: string | null = null;
@@ -485,16 +550,21 @@ export function LearnCourseShell({ slug }: { slug: string }) {
           if (nextShareKey) shownShareKeysRef.current.add(nextShareKey);
         }
         if (lessonToAdvance) {
-          selectLesson(lessonToAdvance.id);
+          completionLock.current = false;
+          void selectLesson(lessonToAdvance.id);
         }
       }
     } catch (e) {
+      if (currentScope.current !== scope) return;
       setCompleteError(
         e instanceof ApiClientError
           ? e.message
           : 'Could not save your progress. Please check your connection and try again.'
       );
+      // A lost acknowledgement must not replay completion. Refresh read-only state instead.
+      void loadCurriculum();
     } finally {
+      completionLock.current = false;
       setSavingComplete(false);
     }
   }
@@ -504,7 +574,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
   // this is the ONLY path that records progress for a quiz lesson, so without it
   // a passed quiz never advances. A failed quiz re-opens for another attempt.
   function handleQuizContinue() {
-    if (quizResult?.passed) {
+    if (displayedQuizResult?.passed) {
       void toggleComplete(true);
     } else {
       setQuizResult(null);
@@ -651,7 +721,14 @@ export function LearnCourseShell({ slug }: { slug: string }) {
   }
 
   return (
-    <div className="learner-home flex w-full max-w-none min-w-0 flex-col gap-6">
+    <div className="learner-home flex w-full max-w-none min-w-0 flex-col gap-6"
+      onClickCapture={(event) => {
+        const anchor = (event.target as HTMLElement).closest('a');
+        const href = anchor?.getAttribute('href');
+        if (!supportedCheckpoint || !href?.startsWith('/') || anchor?.target === '_blank') return;
+        event.preventDefault();
+        void (async () => { if (await canNavigate()) router.push(href); })();
+      }}>
       {isOnboardingProgram ? (
         <CampusTopBar
           section="Onboarding · Learn"
@@ -716,34 +793,30 @@ export function LearnCourseShell({ slug }: { slug: string }) {
         >
           <span className="font-semibold text-amber-800">You&apos;re offline.</span>{' '}
           <span className="text-amber-800/90">
-            Lessons you opened while online may load from your browser cache (PWA). Progress sync
-            needs a connection — reconnect when you can.
+            Checkpoint saves and lesson access need a connection. Unsaved changes stay in this open page only.
           </span>
         </div>
       ) : null}
 
-      {online && !reliabilityTipDismissed ? (
-        <div className="learner-home-surface flex items-start justify-between gap-3 rounded-xl px-4 py-3 text-xs leading-relaxed text-slate-300">
-          <p>
-            <span className="font-medium text-white">Reliability tip · </span>
-            Open each lesson once while you have signal so your installed PWA can cache lesson API
-            responses and static assets — helpful for patchy field coverage. PDFs and videos cache
-            when your browser fetches them.
-          </p>
-          <button
-            type="button"
-            onClick={() => {
-              try {
-                sessionStorage.setItem(RELIABILITY_TIP_KEY, '1');
-              } catch {
-                /* ignore */
-              }
-              setReliabilityTipDismissed(true);
-            }}
-            className="shrink-0 rounded-md border border-white/15 px-2 py-1 text-[10px] font-medium tracking-wide text-slate-300 uppercase hover:border-sky-200/40 hover:text-white"
-          >
-            Dismiss
-          </button>
+      {supportedCheckpoint ? (
+        <div className="flex flex-wrap items-center gap-3 border-y border-slate-200 py-3 text-sm text-slate-800" data-testid="checkpoint-controls">
+          <span role="status" aria-live="polite" className="inline-flex items-center gap-2">
+            {resettingDraft || checkpoint.state.status === 'saving' || checkpoint.state.status === 'loading' ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> :
+              ['error', 'conflict'].includes(checkpoint.state.status) ? <AlertCircle className="h-4 w-4 text-amber-700" aria-hidden /> :
+                checkpoint.state.status === 'saved' ? <Check className="h-4 w-4 text-emerald-700" aria-hidden /> : <Cloud className="h-4 w-4" aria-hidden />}
+            {resettingDraft ? 'Resetting draft' : checkpoint.state.status === 'loading' ? 'Loading checkpoint' : checkpoint.state.status === 'saved' ? 'Saved' : checkpoint.state.status === 'pending' ? 'Pending save' : checkpoint.state.status === 'saving' ? 'Saving' : checkpoint.state.status === 'conflict' ? 'Checkpoint conflict' : 'Save not confirmed'}
+          </span>
+          <Button type="button" variant="outline" disabled={!checkpointReady || submittingQuiz || savingComplete || resettingDraft}
+            onClick={() => { void (async () => { if (await checkpoint.controller?.flush()) router.push('/dashboard/student'); })(); }} className="gap-2">
+            <Save className="h-4 w-4" aria-hidden />Save and pause
+          </Button>
+          {checkpoint.state.status === 'error' ? <Button variant="outline" onClick={() => { void (checkpoint.state.response ? checkpoint.controller?.flush() : checkpoint.controller?.load()); }}>{checkpoint.state.response ? 'Save again' : 'Retry checkpoint'}</Button> : null}
+          {checkpoint.state.response?.content.lesson.content_type === 'video' && /(?:youtube(?:-nocookie)?\.com|youtu\.be|vimeo\.com)/i.test(checkpoint.state.response.content.lesson.content_body ?? '') ? <p className="w-full text-sm text-slate-700">Playback position is not saved for embedded video.</p> : null}
+          {checkpoint.state.status === 'conflict' ? <>
+            <Button variant="outline" onClick={() => { if (window.confirm('Discard your unsaved draft and load the saved checkpoint?')) void checkpoint.controller?.load(true); }}>Discard and reload</Button>
+          </> : null}
+          {checkpoint.state.response && !['loading', 'saving'].includes(checkpoint.state.status) ? <Button variant="outline" disabled={resettingDraft || submittingQuiz || savingComplete} onClick={() => { void resetDraft(); }}>Reset draft</Button> : null}
+          {checkpoint.state.error ? <p role="alert" className="w-full text-sm text-red-700">{checkpoint.state.error}</p> : null}
         </div>
       ) : null}
 
@@ -780,6 +853,11 @@ export function LearnCourseShell({ slug }: { slug: string }) {
         </aside>
 
         <div className="min-w-0 flex-1">
+          {curriculum.course.delivery_profile && activeLessonId ? (() => {
+            const profile = curriculum.course.delivery_profile;
+            const index = profile.sessions.findIndex((session) => session.readingLessonId === activeLessonId || session.assessmentLessonId === activeLessonId);
+            return index >= 0 ? <p className="mb-4 text-sm font-medium text-slate-700">Session {index + 1} of {profile.sessions.length} · {profile.sessions[index].plannedMinutes} min · Course {profile.totalMinutes} min</p> : null;
+          })() : null}
           {view === 'module' && activeModuleId && !activeModule ? (
             <p className="learner-home-surface rounded-[1.25rem] px-6 py-8 text-center text-slate-300">
               This module is not part of this course, or the link is out of date.
@@ -820,7 +898,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                 </div>
               ) : null}
 
-              {loadingLesson && !lessonDetail ? (
+              {(supportedCheckpoint ? checkpoint.state.status === 'loading' : loadingLesson) && !lessonDetail ? (
                 <div className="flex items-center gap-2 text-slate-500">
                   <Loader2 className="h-5 w-5 animate-spin" />
                   Loading lesson…
@@ -844,9 +922,15 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                     ) : null}
                     {quizData ? (
                       <>
-                        {!quizResult ? (
+                        {checkpoint.state.response?.passedAttempt && !checkpoint.state.response.passedAttempt.versionVerified ? <p role="status" className="mb-4 text-sm text-slate-700">Historical assessment pass ({checkpoint.state.response.passedAttempt.scorePercent}%). Not verified against this lesson version.</p> : null}
+                        {unknownQuizResult && !currentPass ? <div role="alert" className="mb-4 text-sm text-amber-800">Assessment result unknown. An attempt may have been consumed. <Button variant="outline" onClick={() => { void checkpoint.controller?.revalidate(); }}>Check saved result</Button></div> : null}
+                        {!displayedQuizResult ? (
                           <QuizPlayer
+                            key={`${learnerScope}:${checkpoint.state.hydration}`}
                             quiz={quizData}
+                            initialDraft={checkpoint.state.draft ? { answers: checkpoint.state.draft.answers, activeIndex: checkpoint.state.draft.position.value } : undefined}
+                            onDraftChange={(draft) => checkpoint.controller?.update({ answers: draft.answers, position: { kind: 'quiz', value: draft.activeIndex } })}
+                            disabled={submittingQuiz || unknownQuizResult || savingComplete || resettingDraft || (supportedCheckpoint && !checkpointReady)}
                             variant={isOnboardingProgram ? 'enterprise' : 'default'}
                             // Return the promise, do NOT `void` it. `void submitQuiz(a)` discards
                             // the promise, so QuizPlayer's `await onSubmit(...)` resolved instantly
@@ -856,15 +940,16 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                             onSubmit={(a) => submitQuiz(a)}
                           />
                         ) : null}
-                        {quizResult ? (
+                        {displayedQuizResult ? (
                           isOnboardingProgram ? (
                             // WS1 fix 5 (GP-544): every completion action clears Margot; see LessonFooterNav.
                             <div className="lesson-footer-nav mt-6 pb-24">
                               <EnterpriseQuizResult
-                                passed={quizResult.passed}
-                                scorePercent={quizResult.score_percent}
+                                passed={displayedQuizResult.passed}
+                                scorePercent={displayedQuizResult.score_percent}
                                 passPercentage={quizData.pass_percentage}
                                 onContinue={handleQuizContinue}
+                                loading={savingComplete}
                               />
                               {completeError ? (
                                 <p role="alert" className="mt-2 text-sm text-red-600">
@@ -876,16 +961,16 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                             // WS1 fix 5 (GP-544): every completion action clears Margot; see LessonFooterNav.
                             <div className="lesson-footer-nav mt-6 space-y-3 pb-24">
                               <LearnerQuizResult
-                                passed={quizResult.passed}
-                                scorePercent={quizResult.score_percent}
+                                passed={displayedQuizResult.passed}
+                                scorePercent={displayedQuizResult.score_percent}
                                 passPercentage={
-                                  quizResult.pass_percentage ?? quizData.pass_percentage
+                                  displayedQuizResult.pass_percentage ?? quizData.pass_percentage
                                 }
-                                correctCount={quizResult.correct_count}
+                                correctCount={displayedQuizResult.correct_count}
                                 questionCount={
-                                  quizResult.question_count ?? quizData.questions.length
+                                  displayedQuizResult.question_count ?? quizData.questions.length
                                 }
-                                attemptsRemaining={quizResult.attempts_remaining}
+                                attemptsRemaining={displayedQuizResult.attempts_remaining}
                                 saving={savingComplete}
                                 onContinue={handleQuizContinue}
                                 onReview={
@@ -903,6 +988,9 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                       </>
                     ) : (
                       <LessonPlayer
+                        key={`${learnerScope}:${checkpoint.state.hydration}`}
+                        initialPosition={checkpoint.state.draft?.position}
+                        onPositionChange={(position) => { if (checkpoint.state.draft) checkpoint.controller?.update({ position, answers: checkpoint.state.draft.answers }); }}
                         lesson={lessonDetail.lesson}
                         resources={lessonDetail.resources}
                         variant={isOnboardingProgram ? 'enterprise' : 'default'}

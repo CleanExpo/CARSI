@@ -15,10 +15,7 @@ import {
 } from '@/lib/server/onboarding-pathway';
 import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
 
-/**
- * POST onboarding answers. Sets an httpOnly cookie so GET /api/lms/auth/me can
- * return onboarding_completed without a database (local / headless dev).
- */
+/** POST onboarding answers; acknowledge completion only after successful persistence. */
 export async function POST(request: NextRequest) {
   const claims = await getSessionClaimsFromRequest(request);
   if (!claims) {
@@ -31,33 +28,47 @@ export async function POST(request: NextRequest) {
   if (upstream) {
     const auth = getBearerAuthorizationFromRequest(request);
     const url = `${upstream.replace(/\/$/, '')}/api/lms/auth/onboarding`;
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: {
-        authorization: auth ?? '',
-        'content-type': request.headers.get('content-type') || 'application/json',
-      },
-      body: bodyText || undefined,
-      cache: 'no-store',
-    });
-    const contentType = res.headers.get('content-type') || 'application/json';
-    const buf = await res.arrayBuffer();
-    const response = new NextResponse(buf, {
-      status: res.status,
-      headers: { 'content-type': contentType },
-    });
-    if (res.ok) {
-      setOnboardingCompletedCookie(response, claims.sub);
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          authorization: auth ?? '',
+          'content-type': request.headers.get('content-type') || 'application/json',
+        },
+        body: bodyText || undefined,
+        cache: 'no-store',
+      });
+      const contentType = res.headers.get('content-type') || 'application/json';
+      const buf = await res.arrayBuffer();
+      const response = new NextResponse(buf, {
+        status: res.status,
+        headers: { 'content-type': contentType },
+      });
+      if (res.ok) {
+        setOnboardingCompletedCookie(response, claims.sub);
+      }
+      return response;
+    } catch {
+      console.error('[onboarding] upstream request failed');
+      return NextResponse.json({ detail: 'Onboarding unavailable' }, { status: 503 });
     }
-    return response;
   }
 
-  let raw: Record<string, unknown> = {};
+  let parsed: unknown;
   try {
-    raw = bodyText ? (JSON.parse(bodyText) as Record<string, unknown>) : {};
+    parsed = JSON.parse(bodyText);
   } catch {
-    raw = {};
+    return NextResponse.json({ detail: 'Invalid onboarding answers' }, { status: 400 });
   }
+  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    return NextResponse.json({ detail: 'Invalid onboarding answers' }, { status: 400 });
+  }
+  const raw = parsed as Record<string, unknown>;
+
+  if (!process.env.DATABASE_URL?.trim()) {
+    return NextResponse.json({ detail: 'Onboarding unavailable' }, { status: 503 });
+  }
+
   const disciplinesHeld = Array.isArray(raw.disciplines_held)
     ? (raw.disciplines_held as unknown[]).map((x) => String(x).trim()).filter(Boolean)
     : [];
@@ -79,35 +90,34 @@ export async function POST(request: NextRequest) {
     disciplines: disciplinesHeld.map((d) => d.toUpperCase()),
   });
 
-  if (process.env.DATABASE_URL?.trim()) {
-    const reminder =
-      answers.resume_reminder_opt_in === 'email'
-        ? 'email'
-        : answers.resume_reminder_opt_in === 'sms'
-          ? 'sms'
-          : 'none';
+  const reminder =
+    answers.resume_reminder_opt_in === 'email'
+      ? 'email'
+      : answers.resume_reminder_opt_in === 'sms'
+        ? 'sms'
+        : 'none';
 
-    const data: Prisma.LmsUserUpdateInput = {
-      onboardingCompletedAt: new Date(),
-      onboarding: answers as Prisma.InputJsonValue,
-      resumeReminderOptIn: reminder,
-    };
+  const data: Prisma.LmsUserUpdateInput = {
+    onboardingCompletedAt: new Date(),
+    onboarding: answers as Prisma.InputJsonValue,
+    resumeReminderOptIn: reminder,
+  };
 
-    if (typeof answers.renewal_date === 'string' && answers.renewal_date.length >= 8) {
-      const d = new Date(`${answers.renewal_date}T12:00:00.000Z`);
-      if (!Number.isNaN(d.getTime())) {
-        data.iicrcExpiryDate = d;
-      }
+  if (typeof answers.renewal_date === 'string' && answers.renewal_date.length >= 8) {
+    const d = new Date(`${answers.renewal_date}T12:00:00.000Z`);
+    if (!Number.isNaN(d.getTime())) {
+      data.iicrcExpiryDate = d;
     }
+  }
 
-    try {
-      await prisma.lmsUser.update({
-        where: { id: claims.sub },
-        data,
-      });
-    } catch (e) {
-      console.error('[onboarding] persist failed', e);
-    }
+  try {
+    await prisma.lmsUser.update({
+      where: { id: claims.sub },
+      data,
+    });
+  } catch {
+    console.error('[onboarding] persist failed');
+    return NextResponse.json({ detail: 'Onboarding unavailable' }, { status: 503 });
   }
 
   const response = NextResponse.json({

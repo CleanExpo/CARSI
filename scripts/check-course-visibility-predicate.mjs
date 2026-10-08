@@ -65,7 +65,7 @@ const WINDOW = 220;
  * known shape without needing those shapes to exist in the repository.
  */
 export function evaluateFile(file, text) {
-  if (ALLOW_FILES.some((r) => r.test(file))) return [];
+  if (ALLOW_FILES.some((r) => r.test(file.replaceAll('\\', '/')))) return [];
   const findings = [];
   const lines = text.split('\n');
 
@@ -162,7 +162,7 @@ function walk(dir, out = []) {
   try { entries = readdirSync(dir); } catch { return out; }
   for (const e of entries) {
     const p = join(dir, e);
-    if (SKIP.some((r) => r.test(p))) continue;
+    if (SKIP.some((r) => r.test(p.replaceAll('\\', '/')))) continue;
     const st = statSync(p);
     if (st.isDirectory()) walk(p, out);
     else if (['.ts', '.tsx'].includes(extname(p))) out.push(p);

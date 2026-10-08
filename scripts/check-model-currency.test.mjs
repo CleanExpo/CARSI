@@ -189,6 +189,9 @@ check('and says the result would be unsound', matches(holed, 'holes'), holed.joi
 console.log('\nexemption scope:');
 check('the guard exempts its own source', isExempt('scripts/check-model-currency.mjs'));
 check('the guard exempts the registry module', isExempt('src/ai/model-registry/providers/gemini.ts'));
+check('Windows registry paths use the same exemption', isExempt('src\\ai\\model-registry\\providers\\gemini.ts'));
+check('Windows self-test paths use the same exemption', isExempt('scripts\\check-model-currency.test.mjs'));
+check('Windows consumer paths are not exempt', !isExempt('src\\lib\\model-consumer.ts'));
 check('an ordinary consumer is NOT exempt', !isExempt('packages/shared/src/types/models.ts'));
 check('an ordinary app file is NOT exempt', !isExempt('src/lib/tools/index.ts'));
 
