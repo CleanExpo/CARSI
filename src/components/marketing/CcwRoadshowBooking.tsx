@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowRight, Loader2, Plus, X } from 'lucide-react';
+import { ArrowRight, CalendarPlus, Download, Loader2, Plus, X } from 'lucide-react';
 
 import { TurnstileWidget } from '@/components/security/TurnstileWidget';
 import type { CcwRoadshowEvent } from '@/lib/marketing/ccw-roadshow';
@@ -11,8 +11,10 @@ import {
   ccwRoadshowFreeEntryOffer,
   ccwRoadshowTicketPackages,
   resolveInitialEventSlug,
+  formatAudFromCents,
   type CcwRoadshowTicketPackage,
 } from '@/lib/marketing/ccw-roadshow';
+import { buildGoogleCalendarLink, buildIcsDataUri } from '@/lib/marketing/ccw-roadshow-calendar-links';
 import {
   marketingBodySm,
   marketingBtnPrimary,
@@ -86,7 +88,7 @@ export function CcwRoadshowBooking({
 
   useEffect(() => {
     let active = true;
-    if (!form.eventSlug) return;
+    if (!selectedEvent || !allowsFreeEntryRegistration(selectedEvent)) return;
     fetch(`/api/events/ccw-roadshow/availability?event=${form.eventSlug}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
@@ -96,7 +98,7 @@ export function CcwRoadshowBooking({
     return () => {
       active = false;
     };
-  }, [form.eventSlug]);
+  }, [form.eventSlug, selectedEvent]);
 
   if (!selectedEvent || !selectedPackage) {
     return null;
@@ -211,8 +213,8 @@ export function CcwRoadshowBooking({
 
   // Events off the free-entry rail must not render a free-token form at all. The API
   // refuses them too, but a form that always fails is a worse answer than telling the
-  // visitor where the seat is actually sold. No price is shown: this page cannot take
-  // payment, so quoting a figure here would be a promise it cannot keep.
+  // visitor where the seat is actually sold. Commercial details belong to the
+  // occurrence; historical sittings without verified details retain their copy.
   if (!allowsFreeEntryRegistration(selectedEvent)) {
     return (
       <div className={`p-5 sm:p-6 ${marketingStatCard}`}>
@@ -224,8 +226,46 @@ export function CcwRoadshowBooking({
           <p className={`mt-2 ${marketingBodySm}`}>
             {selectedEvent.city} - {selectedEvent.dates}, {selectedEvent.timeLabel}, at{' '}
             {selectedEvent.venueName}. This event is not part of the free CCW entry offer.
-            Contact Carpet Cleaners Warehouse to book a place.
+            {' '}Book directly with Carpet Cleaners Warehouse.
           </p>
+          {selectedEvent.unitAmountCents !== undefined && (
+            <p className={`mt-4 text-lg font-semibold ${marketingTextStrong}`}>
+              {formatAudFromCents(selectedEvent.unitAmountCents)} including GST per person
+            </p>
+          )}
+          {selectedEvent.giftCardAmountCents !== undefined && (
+            <p className={`mt-2 ${marketingBodySm}`}>
+              One {formatAudFromCents(selectedEvent.giftCardAmountCents)} CCW gift card per registration, redeemable after the course.
+            </p>
+          )}
+          {selectedEvent.maxRegistrationsPerCustomer !== undefined && (
+            <p className={`mt-2 ${marketingBodySm}`}>
+              {selectedEvent.capacity} seats. Maximum {selectedEvent.maxRegistrationsPerCustomer} registrations per customer.
+            </p>
+          )}
+          {selectedEvent.bookingUrl && (
+            <>
+              <a href={selectedEvent.bookingUrl} className={`mt-5 min-h-12 ${marketingBtnPrimary}`}>
+                Book with CCW <ArrowRight className="h-4 w-4" aria-hidden />
+              </a>
+              <div className="mt-4 flex gap-2">
+                <a
+                  href={buildGoogleCalendarLink(selectedEvent)} target="_blank" rel="noopener noreferrer"
+                  title="Add to Google Calendar" aria-label="Add to Google Calendar"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 dark:border-white/20 dark:text-white"
+                >
+                  <CalendarPlus className="h-5 w-5" aria-hidden />
+                </a>
+                <a
+                  href={buildIcsDataUri(selectedEvent)} download={`ccw-roadshow-${selectedEvent.slug}.ics`}
+                  title="Download calendar event" aria-label="Download calendar event"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 dark:border-white/20 dark:text-white"
+                >
+                  <Download className="h-5 w-5" aria-hidden />
+                </a>
+              </div>
+            </>
+          )}
         </div>
       </div>
     );

@@ -4,6 +4,7 @@ export const CCW_EVENT_NAV = [
   { href: '/events/ccw-roadshow', label: 'CCW Roadshow' },
   { href: '/ccw-melbourne', label: 'Melbourne' },
   { href: '/ccw-sydney', label: 'Sydney' },
+  { href: '/ccw-brisbane', label: 'Brisbane' },
   { href: '/ccw-materials', label: 'Materials' },
 ] as const;
 

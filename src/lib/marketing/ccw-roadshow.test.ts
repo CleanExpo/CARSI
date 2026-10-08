@@ -6,6 +6,7 @@ import {
   ccwRoadshowEvents,
   getCcwRoadshowEvent,
   resolveInitialEventSlug,
+  getCcwRoadshowEventPath,
 } from './ccw-roadshow';
 
 describe('resolveInitialEventSlug (QR/vanity-URL preselect)', () => {
@@ -38,9 +39,9 @@ describe('event capacity config', () => {
     expect(getCcwRoadshowEvent('brisbane')?.capacity).toBe(10);
   });
 
-  it('maps every event to a calendar event id', () => {
-    for (const event of ccwRoadshowEvents) {
-      expect(event.calendarEventId.length).toBeGreaterThan(0);
+  it('preserves the historical calendar event ids', () => {
+    for (const slug of ['melbourne', 'sydney', 'brisbane']) {
+      expect(getCcwRoadshowEvent(slug)?.calendarEventId?.length).toBeGreaterThan(0);
     }
   });
 
@@ -52,6 +53,46 @@ describe('event capacity config', () => {
     expect(getCcwRoadshowEvent('melbourne')?.calendarEventId).toBe('1d1uqjm6an36n1kgc6s4s3ln7s');
     expect(getCcwRoadshowEvent('sydney')?.calendarEventId).toBe('h6qm8t3muuv44ht9gqann5dhuk');
     expect(getCcwRoadshowEvent('brisbane')?.calendarEventId).toBe('1nnfc9hv164f4882q09krd1ies');
+  });
+});
+
+describe('separate Brisbane October occurrence', () => {
+  it('preserves the entire September configuration and identity', () => {
+    expect(getCcwRoadshowEvent('brisbane')).toEqual({
+      slug: 'brisbane', city: 'Brisbane',
+      title: 'CARSI x CCW Business Growth Days - Brisbane',
+      dates: '11-12 September 2026',
+      dateRangeLabel: 'Friday 11 September - Saturday 12 September 2026',
+      startDateIso: '2026-09-11T08:30:00+10:00',
+      endDateIso: '2026-09-12T16:30:00+10:00',
+      timeLabel: '8.30am-4.30pm both days',
+      venueName: 'Carpet Cleaners Warehouse Boondall',
+      streetAddress: 'D1-3/194 Zillmere Road',
+      suburb: 'Boondall', suburbStatePostcode: 'Boondall QLD 4034', state: 'QLD',
+      description: 'Two practical days with Phill McGurk and the CCW team, connecting training, equipment, service design, chemistry, quoting confidence and business growth for carpet, rug, stain and tile cleaning operators.',
+      capacity: 10, calendarEventId: '1nnfc9hv164f4882q09krd1ies', registration: 'external',
+    });
+  });
+
+  it('adds a paid, independently identified October sitting with verified CCW details', () => {
+    const october = getCcwRoadshowEvent('brisbane-2026-10-09');
+    expect(october).toMatchObject({
+      slug: 'brisbane-2026-10-09', dates: '9-10 October 2026',
+      startDateIso: '2026-10-09T08:30:00+10:00',
+      endDateIso: '2026-10-10T15:00:00+10:00', timeZone: 'Australia/Brisbane',
+      streetAddress: '194D Zillmere Road', capacity: 15, registration: 'external',
+      unitAmountCents: 49500, giftCardAmountCents: 20000, maxRegistrationsPerCustomer: 5,
+      bookingUrl: 'https://ccwonline.com.au/collections/new-collection/products/carsi-2-day-carpet-upholstery-training-course',
+    });
+    expect(october?.calendarEventId).toBeUndefined();
+    expect(ccwRoadshowEvents.map((event) => event.slug).filter((slug) => slug === 'brisbane')).toHaveLength(1);
+  });
+
+  it('routes October to the stable Brisbane page and September to its occurrence view', () => {
+    expect(getCcwRoadshowEventPath(getCcwRoadshowEvent('brisbane')!)).toBe('/events/ccw-roadshow?event=brisbane');
+    expect(getCcwRoadshowEventPath(getCcwRoadshowEvent('brisbane-2026-10-09')!)).toBe('/ccw-brisbane');
+    expect(getCcwRoadshowEventPath(getCcwRoadshowEvent('melbourne')!)).toBe('/ccw-melbourne');
+    expect(getCcwRoadshowEventPath(getCcwRoadshowEvent('sydney')!)).toBe('/ccw-sydney');
   });
 });
 
