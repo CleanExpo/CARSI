@@ -53,8 +53,10 @@ export const EXEMPT_FILES = new Set([
  */
 export const EXEMPT_PREFIXES = ['src/ai/model-registry/'];
 
-export const isExempt = (file) =>
-  EXEMPT_FILES.has(file) || EXEMPT_PREFIXES.some((p) => file.startsWith(p));
+export const isExempt = (file) => {
+  const path = file.replaceAll('\\', '/');
+  return EXEMPT_FILES.has(path) || EXEMPT_PREFIXES.some((p) => path.startsWith(p));
+};
 
 const SKIP_DIRS = new Set(['node_modules', '.next', 'dist', 'build', 'coverage', '.git']);
 const CODE_EXT = /\.(ts|tsx|js|jsx|mjs|cjs)$/;

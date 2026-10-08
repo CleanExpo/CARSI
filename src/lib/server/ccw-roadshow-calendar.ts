@@ -53,9 +53,10 @@ async function getAccessToken(creds: {
 type CalendarAttendee = { email?: string };
 
 export async function addRegistrationToCalendar(params: {
-  calendarEventId: string;
+  calendarEventId?: string;
   attendeeEmail: string;
 }): Promise<boolean> {
+  if (!params.calendarEventId?.trim()) return false;
   const creds = getCredentials();
   if (!creds) {
     console.warn('[ccw-roadshow-calendar] Google Calendar credentials absent — skipping sync.');

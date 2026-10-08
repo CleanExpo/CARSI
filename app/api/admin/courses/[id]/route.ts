@@ -65,6 +65,12 @@ export async function PATCH(request: NextRequest, ctx: Ctx) {
     return NextResponse.json({ course: courseToAdminDto(course) });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
+    if (msg === 'STRUCTURED_CURRICULUM_EDIT_BLOCKED') {
+      return NextResponse.json({ detail: 'Structured curriculum editing is not supported' }, { status: 409 });
+    }
+    if (msg === 'INVALID_STRUCTURED_CURRICULUM') {
+      return NextResponse.json({ detail: 'Invalid structured curriculum' }, { status: 400 });
+    }
     if (msg === 'NOT_FOUND') {
       return NextResponse.json({ detail: 'Not found' }, { status: 404 });
     }

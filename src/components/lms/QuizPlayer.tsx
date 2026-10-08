@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { CheckCircle2, Circle, Loader2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -38,6 +38,9 @@ interface QuizPlayerProps {
    */
   onSubmit: (answers: Record<string, number>) => void | Promise<void>;
   variant?: 'default' | 'enterprise';
+  initialDraft?: { answers: Record<string, number>; activeIndex: number };
+  onDraftChange?: (draft: { answers: Record<string, number>; activeIndex: number }) => void;
+  disabled?: boolean;
 }
 
 /**
@@ -71,28 +74,42 @@ export async function runGuardedSubmit(
   }
 }
 
-export function QuizPlayer({ quiz, onSubmit, variant = 'default' }: QuizPlayerProps) {
-  const [answers, setAnswers] = useState<Record<string, number>>({});
-  const [activeIndex, setActiveIndex] = useState(0);
+export function QuizPlayer({ quiz, onSubmit, variant = 'default', initialDraft, onDraftChange, disabled = false }: QuizPlayerProps) {
+  const [answers, setAnswers] = useState<Record<string, number>>(() => ({ ...initialDraft?.answers }));
+  const [activeIndex, setActiveIndex] = useState(() => Math.min(initialDraft?.activeIndex ?? 0, quiz.questions.length - 1));
   // A quiz attempt is DESTRUCTIVE and strictly limited: the schema allows 3, and the API returns
   // 409 once they are gone. There is no learner-visible reset, and a quiz lesson has no
   // completion path except passing — so a student who runs out is locked out of finishing the
   // course permanently. Before this guard, `handleSubmit` called `onSubmit` with nothing to stop
   // a second call, so one impatient double-click on a slow connection spent two of the three.
   const [submitting, setSubmitting] = useState(false);
-  const [started, setStarted] = useState(false);
+  const [started, setStarted] = useState(() => Boolean(initialDraft && (Object.keys(initialDraft.answers).length || initialDraft.activeIndex > 0)));
   const enterprise = variant === 'enterprise';
+  const noAttempts = (quiz.attempts_used ?? 0) >= quiz.attempts_allowed;
 
   const answeredCount = Object.keys(answers).length;
   const progressPct = Math.round((answeredCount / quiz.questions.length) * 100);
   const current = quiz.questions[activeIndex];
+  const initialQuestion = useRef(initialDraft?.activeIndex ? quiz.questions[initialDraft.activeIndex]?.id : null);
+  useEffect(() => {
+    if (enterprise || !initialQuestion.current) return;
+    document.getElementById(`question-${initialQuestion.current}`)?.scrollIntoView({ block: 'center' });
+  }, [enterprise]);
 
   function handleSelect(questionId: string, optionIdx: number) {
-    setAnswers((prev) => ({ ...prev, [questionId]: optionIdx }));
+    const next = { ...answers, [questionId]: optionIdx };
+    setAnswers(next);
+    onDraftChange?.({ answers: next, activeIndex });
+  }
+
+  function selectQuestion(index: number) {
+    setActiveIndex(index);
+    onDraftChange?.({ answers, activeIndex: index });
+    requestAnimationFrame(() => document.getElementById(`question-${quiz.questions[index].id}`)?.focus());
   }
 
   async function handleSubmit() {
-    if (submitting) return;
+    if (submitting || disabled || noAttempts) return;
     setSubmitting(true);
     await runGuardedSubmit(submitting, setSubmitting, () => onSubmit(answers));
   }
@@ -111,7 +128,7 @@ export function QuizPlayer({ quiz, onSubmit, variant = 'default' }: QuizPlayerPr
             {remaining} attempt{remaining === 1 ? '' : 's'} remaining
           </li>
         </ul>
-        <Button type="button" className="mt-6" onClick={() => setStarted(true)} disabled={remaining === 0}>
+        <Button type="button" className="mt-6" onClick={() => setStarted(true)} disabled={disabled || remaining === 0}>
           Begin assessment
         </Button>
         {remaining === 0 ? (
@@ -157,33 +174,25 @@ export function QuizPlayer({ quiz, onSubmit, variant = 'default' }: QuizPlayerPr
           <p className="mb-2 text-xs font-semibold tracking-wide text-slate-600 uppercase">
             Question {activeIndex + 1} of {quiz.questions.length}
           </p>
-          <h3 className="text-lg font-medium text-slate-900">{current.question_text}</h3>
+          <h3 id={`question-${current.id}`} tabIndex={-1} className="text-lg font-medium text-slate-900">{current.question_text}</h3>
 
           <div className="mt-6 grid gap-3">
             {current.options.map((opt, idx) => {
               const selected = answers[current.id] === idx;
               return (
-                <button
+                <label
                   key={idx}
-                  type="button"
-                  onClick={() => handleSelect(current.id, idx)}
                   className={cn(
-                    'flex items-start gap-3 rounded-xl border px-4 py-4 text-left text-sm transition',
+                    'flex cursor-pointer items-start gap-3 rounded-lg border px-4 py-4 text-left text-sm transition focus-within:ring-2 focus-within:ring-[#2490ed]',
                     selected
                       ? 'border-[#2490ed] bg-[#eef7ff] shadow-sm ring-2 ring-[#2490ed]/20'
                       : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
                   )}
                 >
-                  <span
-                    className={cn(
-                      'mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border',
-                      selected ? 'border-[#146fc2] bg-[#146fc2] text-white' : 'border-slate-300'
-                    )}
-                  >
-                    {selected ? <CheckCircle2 className="h-3.5 w-3.5" /> : null}
-                  </span>
+                  <input type="radio" name={current.id} value={idx} checked={selected} disabled={disabled || submitting}
+                    onChange={() => handleSelect(current.id, idx)} className="mt-0.5 h-5 w-5 shrink-0 accent-[#146fc2]" />
                   <span className="text-slate-800">{opt.text}</span>
-                </button>
+                </label>
               );
             })}
           </div>
@@ -192,21 +201,21 @@ export function QuizPlayer({ quiz, onSubmit, variant = 'default' }: QuizPlayerPr
             <Button
               type="button"
               variant="outline"
-              disabled={activeIndex === 0}
-              onClick={() => setActiveIndex((i) => Math.max(0, i - 1))}
+              disabled={disabled || submitting || activeIndex === 0}
+              onClick={() => selectQuestion(Math.max(0, activeIndex - 1))}
             >
               Previous
             </Button>
             {activeIndex < quiz.questions.length - 1 ? (
               <Button
                 type="button"
-                onClick={() => setActiveIndex((i) => Math.min(quiz.questions.length - 1, i + 1))}
-                disabled={answers[current.id] == null}
+                onClick={() => selectQuestion(Math.min(quiz.questions.length - 1, activeIndex + 1))}
+                disabled={disabled || submitting || answers[current.id] == null}
               >
                 Next question
               </Button>
             ) : (
-              <Button type="button" onClick={handleSubmit} disabled={!allAnswered || submitting}>
+              <Button type="button" onClick={handleSubmit} disabled={disabled || !allAnswered || submitting || noAttempts}>
                 Submit assessment
               </Button>
             )}
@@ -219,7 +228,9 @@ export function QuizPlayer({ quiz, onSubmit, variant = 'default' }: QuizPlayerPr
           <li key={q.id}>
             <button
               type="button"
-              onClick={() => setActiveIndex(i)}
+              onClick={() => selectQuestion(i)}
+              disabled={disabled || submitting}
+              aria-current={i === activeIndex ? 'step' : undefined}
               className={cn(
                 'flex h-9 w-9 items-center justify-center rounded-lg border text-xs font-semibold transition',
                 i === activeIndex && 'border-[#2490ed] bg-[#eef7ff] text-[#146fc2]',
@@ -260,7 +271,7 @@ export function LearnerQuizResult({
 }) {
   return (
     <section className="rounded-xl border border-slate-200 bg-white px-5 py-8 text-center sm:px-8" role="status">
-      <p className={dash.eyebrow}>{passed ? 'Assessment complete' : 'Assessment not passed'}</p>
+      <p className={dash.eyebrow}>{passed ? 'Assessment passed' : 'Assessment not passed'}</p>
       {correctCount != null && questionCount != null ? (
         <p className="mt-3 text-lg font-semibold tabular-nums text-slate-900">
           {correctCount} / {questionCount} correct
@@ -347,7 +358,7 @@ export function EnterpriseQuizResult({
         {passPercentage}%)
       </p>
       {onContinue ? (
-        <Button className="mt-6" onClick={onContinue}>
+        <Button className="mt-6" onClick={onContinue} disabled={loading}>
           {passed ? 'Continue training' : 'Try again'}
         </Button>
       ) : null}

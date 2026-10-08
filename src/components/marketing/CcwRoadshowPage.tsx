@@ -28,6 +28,7 @@ import {
   ccwRoadshowTopics,
   formatAudFromCents,
   getCcwRoadshowEvent,
+  getCcwRoadshowEventPath,
 } from '@/lib/marketing/ccw-roadshow';
 
 const siteUrl = getPublicSiteUrl();
@@ -62,7 +63,7 @@ const faqs = [
   },
 ];
 
-export type CcwFocusCity = 'melbourne' | 'sydney' | 'brisbane';
+export type CcwFocusCity = string;
 
 function stopIndex(slug: string): string {
   const i = ccwRoadshowEvents.findIndex((e) => e.slug === slug);
@@ -71,12 +72,19 @@ function stopIndex(slug: string): string {
 
 export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) {
   const focusEvent = focusSlug ? getCcwRoadshowEvent(focusSlug) : null;
-  const currentHref = focusSlug ? `/ccw-${focusSlug}` : ccwRoadshowPath;
+  const currentHref = focusEvent ? getCcwRoadshowEventPath(focusEvent) : ccwRoadshowPath;
+  const schemaEvents = focusEvent ? [focusEvent] : ccwRoadshowEvents;
+  const pageFaqs = focusEvent?.bookingUrl ? [
+    faqs[0],
+    { question: 'How much does it cost?', answer: `Seats are booked through Carpet Cleaners Warehouse.${focusEvent.unitAmountCents !== undefined ? ` ${formatAudFromCents(focusEvent.unitAmountCents)} including GST per person.` : ''}${focusEvent.giftCardAmountCents !== undefined ? ` One ${formatAudFromCents(focusEvent.giftCardAmountCents)} CCW gift card per registration, redeemable after the course.` : ''}${focusEvent.maxRegistrationsPerCustomer !== undefined ? ` Maximum ${focusEvent.maxRegistrationsPerCustomer} registrations per customer.` : ''}` },
+    { question: 'Where and when is the Brisbane training?', answer: `${focusEvent.dateRangeLabel}. ${focusEvent.timeLabel}, at ${focusEvent.venueName}, ${focusEvent.streetAddress}, ${focusEvent.suburbStatePostcode}.` },
+    faqs[3],
+  ] : faqs;
 
   return (
     <>
       <BreadcrumbSchema items={breadcrumbs} />
-      <FAQSchema questions={faqs} />
+      <FAQSchema questions={pageFaqs} />
       <ItemListSchema
         name="CARSI x CCW Business Growth Days event dates"
         description="Melbourne, Sydney and Brisbane CARSI x CCW roadshow events for cleaners who want better jobs, stronger quoting confidence and practical business growth."
@@ -86,7 +94,7 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
           url: `${canonical}?event=${event.slug}`,
         }))}
       />
-      {ccwRoadshowEvents.map((event) => (
+      {schemaEvents.map((event) => (
         <EventSchema
           key={event.slug}
           name={event.title}
@@ -100,7 +108,7 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
           locationState={event.state}
           organiserName="CARSI and Carpet Cleaners Warehouse"
           organiserUrl="https://www.carsi.com.au"
-          ticketUrl={canonical}
+          ticketUrl={event.bookingUrl ?? canonical}
           isFree={allowsFreeEntryRegistration(event)}
           image={`${siteUrl}/og-image.png`}
           eventType="BusinessEvent"
@@ -121,15 +129,14 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
                   : 'CARSI × CCW roadshow'}
               </p>
               <h1 className="mt-3 max-w-3xl font-[family-name:var(--font-display)] text-[2.15rem] leading-[1.1] font-semibold tracking-[-0.02em] text-slate-950 md:text-[3.1rem] md:leading-[1.06]">
-                {focusEvent ? `${focusEvent.city} growth days` : ccwRoadshowHeroHeadline}
+                {focusEvent?.bookingUrl ? focusEvent.title : focusEvent ? `${focusEvent.city} growth days` : ccwRoadshowHeroHeadline}
               </h1>
               <p className="mt-3 text-sm font-semibold text-[#a85500]">
                 Two days with {ccwRoadshowPresenter.name}
                 {focusEvent ? ` · ${focusEvent.dates}` : ''}
               </p>
               <p className={`mt-5 max-w-xl text-pretty ${LANDING_LEAD_CLASS}`}>
-                Practical business-growth training inside Carpet Cleaners Warehouse locations. Connect
-                training, equipment, chemistry, quoting and services that can grow profitably.
+                {focusEvent?.bookingUrl ? focusEvent.description : 'Practical business-growth training inside Carpet Cleaners Warehouse locations. Connect training, equipment, chemistry, quoting and services that can grow profitably.'}
               </p>
               <div className="mt-6 flex flex-wrap gap-2">
                 {ccwRoadshowTopics.map((topic) => (
@@ -173,7 +180,7 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
               : 'Varies',
             label: 'Entry',
           },
-          { value: '2 days', label: '8.30am–4.30pm' },
+          { value: '2 days', label: focusEvent?.timeLabel ?? 'Times vary by event' },
           { value: String(focusEvent?.capacity ?? 20), label: 'Room size' },
         ]}
       />
@@ -181,9 +188,9 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
       <section className="border-t border-slate-200/70 bg-[#fafbfc] py-16 md:py-24">
         <div className={PUBLIC_SHELL_INNER_CLASS}>
           <p className={LANDING_EYEBROW_CLASS}>The itinerary</p>
-          <h2 className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>Three warehouse stops</h2>
+          <h2 className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>Roadshow dates</h2>
           <p className={`mt-4 max-w-xl ${LANDING_LEAD_CLASS}`}>
-            Both days run 8.30am to 4.30pm. Rooms stay small so the work stays practical.
+            Check the times for each sitting. Rooms stay small so the work stays practical.
           </p>
           <ol className="relative mt-12 space-y-4">
             <div
@@ -196,7 +203,7 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
               return (
                 <li key={event.slug}>
                   <Link
-                    href={`/ccw-${event.slug}`}
+                    href={getCcwRoadshowEventPath(event)}
                     className={`group relative grid gap-4 rounded-2xl border bg-white p-5 shadow-sm transition sm:grid-cols-[5.5rem_1fr] sm:gap-8 sm:p-6 ${
                       active
                         ? 'border-[#146fc2] shadow-[0_18px_40px_-24px_rgba(20,111,194,0.4)]'
@@ -363,7 +370,7 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
         </div>
       </section>
 
-      <HomeFaqSection faqs={faqs} />
+      <HomeFaqSection faqs={pageFaqs} />
       <HomeFinalCtaSection />
     </>
   );

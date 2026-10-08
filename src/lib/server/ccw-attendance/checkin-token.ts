@@ -18,6 +18,7 @@ import { createHash, timingSafeEqual } from 'node:crypto';
 import { SignJWT, jwtVerify } from 'jose';
 
 import { getSessionSecretBytes } from '@/lib/auth/jwt-secret';
+import { getCcwRoadshowEvent } from '@/lib/marketing/ccw-roadshow';
 
 const CHECKIN_AUDIENCE = 'ccw-roadshow-checkin';
 const CHECKIN_PURPOSE = 'ccw_checkin';
@@ -32,6 +33,7 @@ export const CHECKIN_TOKEN_TTL_SECONDS = 14 * 60 * 60; // 14 hours
 
 /** IANA zone the CCW event days are anchored to (AEST/AEDT). */
 const EVENT_TIME_ZONE = 'Australia/Sydney';
+type EventTimeZone = 'Australia/Sydney' | 'Australia/Brisbane';
 
 export type CheckInDayIndex = 1 | 2;
 
@@ -46,10 +48,13 @@ export type CheckInTokenResult =
   { ok: true; scope: CheckInTokenScope } | { ok: false; reason: 'invalid' | 'wrong_day' };
 
 /** Event-local (AU eastern) YYYY-MM-DD stamp for a given instant. */
-export function eventDayStamp(date: Date = new Date()): string {
+export function eventDayStamp(
+  date: Date = new Date(),
+  timeZone: EventTimeZone = EVENT_TIME_ZONE
+): string {
   // `en-CA` formats as YYYY-MM-DD; the timeZone anchors it to the venue's day.
   return new Intl.DateTimeFormat('en-CA', {
-    timeZone: EVENT_TIME_ZONE,
+    timeZone,
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -57,12 +62,16 @@ export function eventDayStamp(date: Date = new Date()): string {
 }
 
 /** Expected AU-eastern calendar date for one day of a configured two-day event. */
-export function configuredEventDayStamp(startDateIso: string, dayIndex: CheckInDayIndex): string {
+export function configuredEventDayStamp(
+  startDateIso: string,
+  dayIndex: CheckInDayIndex,
+  timeZone: EventTimeZone = EVENT_TIME_ZONE
+): string {
   const start = new Date(startDateIso);
   if (Number.isNaN(start.getTime())) {
     throw new Error('Invalid event start date.');
   }
-  return eventDayStamp(new Date(start.getTime() + (dayIndex - 1) * 24 * 60 * 60 * 1000));
+  return eventDayStamp(new Date(start.getTime() + (dayIndex - 1) * 24 * 60 * 60 * 1000), timeZone);
 }
 
 /**
@@ -72,10 +81,11 @@ export function configuredEventDayStamp(startDateIso: string, dayIndex: CheckInD
 export function configuredEventDayGuard(
   startDateIso: string,
   dayIndex: CheckInDayIndex,
-  now: Date = new Date()
+  now: Date = new Date(),
+  timeZone: EventTimeZone = EVENT_TIME_ZONE
 ): { ok: boolean; dateStamp: string; expectedDateStamp: string } {
-  const dateStamp = eventDayStamp(now);
-  const expectedDateStamp = configuredEventDayStamp(startDateIso, dayIndex);
+  const dateStamp = eventDayStamp(now, timeZone);
+  const expectedDateStamp = configuredEventDayStamp(startDateIso, dayIndex, timeZone);
   return { ok: dateStamp === expectedDateStamp, dateStamp, expectedDateStamp };
 }
 
@@ -93,7 +103,8 @@ export async function mintCheckInToken(
   input: { eventSlug: string; dayIndex: CheckInDayIndex; dateStamp?: string; now?: Date },
   ttlSeconds: number = CHECKIN_TOKEN_TTL_SECONDS
 ): Promise<string> {
-  const dateStamp = input.dateStamp ?? eventDayStamp(input.now ?? new Date());
+  const event = getCcwRoadshowEvent(input.eventSlug);
+  const dateStamp = input.dateStamp ?? eventDayStamp(input.now ?? new Date(), event?.timeZone);
   const iat = Math.floor((input.now?.getTime() ?? Date.now()) / 1000);
   return new SignJWT({ purpose: CHECKIN_PURPOSE, dayIndex: input.dayIndex, dateStamp })
     .setProtectedHeader({ alg: 'HS256' })
@@ -127,7 +138,10 @@ export async function verifyCheckInToken(
     const dateStamp = typeof payload.dateStamp === 'string' ? payload.dateStamp : '';
     if (!eventSlug || dayIndex == null || !dateStamp) return { ok: false, reason: 'invalid' };
 
-    const today = eventDayStamp(opts?.now ?? new Date());
+    // Only the authenticated subject selects the canonical venue zone; the JWT
+    // payload and caller cannot override it. Historical events keep Sydney.
+    const event = getCcwRoadshowEvent(eventSlug);
+    const today = eventDayStamp(opts?.now ?? new Date(), event?.timeZone);
     if (!constantTimeEqual(dateStamp, today)) return { ok: false, reason: 'wrong_day' };
 
     return { ok: true, scope: { eventSlug, dayIndex, dateStamp } };

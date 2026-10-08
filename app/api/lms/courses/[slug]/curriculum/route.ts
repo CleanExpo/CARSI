@@ -2,11 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
 import { parseOnboardingMeta, isOnboardingCourse } from '@/lib/onboarding/enterprise';
+import { projectLearnerCourseMeta } from '@/lib/lms/learner-course-meta';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { ensureAdminEnrollmentForCourse } from '@/lib/server/enrollment-service';
 import { isEnrolmentAccessAllowed } from '@/lib/server/enrollment-access';
 import { prisma } from '@/lib/prisma';
 import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
+import { projectShortCourseDelivery } from '@/lib/server/short-course-profile';
 
 type Ctx = { params: Promise<{ slug: string }> };
 
@@ -50,6 +52,7 @@ export async function GET(request: NextRequest, ctx: Ctx) {
           lessons: { orderBy: { orderIndex: 'asc' } },
         },
       },
+      quizzes: { include: { questions: { orderBy: { orderIndex: 'asc' } } } },
     },
   });
 
@@ -99,9 +102,12 @@ export async function GET(request: NextRequest, ctx: Ctx) {
         category: course.category,
         meta: course.meta,
       }),
-      meta: parseOnboardingMeta(course.meta),
+      meta: parseOnboardingMeta(projectLearnerCourseMeta(course.meta)),
+      delivery_profile: projectShortCourseDelivery(course),
     },
     enrollment_id: enrollment.id,
+    resume_lesson_id: enrollment.lastAccessedLessonId && lessonIds.includes(enrollment.lastAccessedLessonId)
+      ? enrollment.lastAccessedLessonId : null,
     modules: course.modules.map((mod) => ({
       id: mod.id,
       title: mod.title,

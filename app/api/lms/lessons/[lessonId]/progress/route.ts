@@ -13,7 +13,15 @@ import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
 type Ctx = { params: Promise<{ lessonId: string }> };
 
 export async function PATCH(request: NextRequest, ctx: Ctx) {
+  const identityPresent = request.headers.has('x-carsi-learner-id');
+  const boundClaims = identityPresent ? await getSessionClaimsFromRequest(request) : null;
+  if (identityPresent && (!boundClaims || request.headers.get('x-carsi-learner-id') !== boundClaims.sub)) {
+    return NextResponse.json({ detail: 'Unauthorized' }, { status: 401, headers: { 'Cache-Control': 'no-store' } });
+  }
   const upstream = getUpstreamBaseUrl();
+  if (upstream && identityPresent) {
+    return NextResponse.json({ detail: 'Progress unavailable' }, { status: 503, headers: { 'Cache-Control': 'no-store' } });
+  }
   if (upstream) {
     const { lessonId } = await ctx.params;
     const url = `${upstream.replace(/\/$/, '')}/api/lms/lessons/${encodeURIComponent(lessonId)}/progress`;
@@ -35,7 +43,7 @@ export async function PATCH(request: NextRequest, ctx: Ctx) {
     });
   }
 
-  const claims = await getSessionClaimsFromRequest(request);
+  const claims = boundClaims ?? await getSessionClaimsFromRequest(request);
   if (!claims) {
     return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 });
   }

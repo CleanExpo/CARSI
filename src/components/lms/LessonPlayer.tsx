@@ -2,7 +2,8 @@
 
 import { Download } from 'lucide-react';
 import Link from 'next/link';
-import type { ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
+import type { LessonPosition } from '@/lib/lms/lesson-checkpoint';
 
 import { CourseFormattedBody } from '@/components/lms/CourseFormattedBody';
 import { DriveFileViewer } from '@/components/lms/DriveFileViewer';
@@ -44,6 +45,8 @@ interface LessonPlayerProps {
   moduleLessonNumber?: number | null;
   moduleLessonTotal?: number | null;
   courseProgressPercent?: number | null;
+  initialPosition?: LessonPosition;
+  onPositionChange?: (position: LessonPosition) => void;
 }
 
 export function LessonPlayer({
@@ -58,6 +61,8 @@ export function LessonPlayer({
   moduleLessonNumber,
   moduleLessonTotal,
   courseProgressPercent,
+  initialPosition,
+  onPositionChange,
 }: LessonPlayerProps) {
   const flashcardDecks = resources.filter(isFlashcardResource);
   const slideResources = resources.filter(isSlidesResource);
@@ -92,7 +97,7 @@ export function LessonPlayer({
                 lesson.content_type === 'video' ? 'p-2 sm:p-3' : 'p-6 sm:p-8 lg:p-10'
               )}
             >
-              <EnterpriseLessonContent lesson={lesson} />
+              <PositionedContent lesson={lesson} enterprise initialPosition={initialPosition} onPositionChange={onPositionChange} />
             </div>
             {slideResources.map((slidesResource, i) => (
               <SlideDeckViewer
@@ -146,7 +151,7 @@ export function LessonPlayer({
         </div>
       </div>
 
-      <div className="rounded-lg">{renderDefaultContent(lesson)}</div>
+      <PositionedContent lesson={lesson} initialPosition={initialPosition} onPositionChange={onPositionChange} />
 
       {slideResources.map((slidesResource, i) => (
         <SlideDeckViewer
@@ -162,6 +167,74 @@ export function LessonPlayer({
       {footer}
     </div>
   );
+}
+
+export function bindReadingPosition(element: HTMLElement, initialValue: number, onPosition: (value: number) => void) {
+  let scrollRoot = element.parentElement;
+  while (scrollRoot && scrollRoot !== element.ownerDocument.body && scrollRoot !== element.ownerDocument.documentElement) {
+    if (/^(auto|scroll|overlay)$/.test(window.getComputedStyle(scrollRoot).overflowY) && scrollRoot.clientHeight > 0) break;
+    scrollRoot = scrollRoot.parentElement;
+  }
+  if (scrollRoot === element.ownerDocument.body || scrollRoot === element.ownerDocument.documentElement) scrollRoot = null;
+  const target = scrollRoot ?? window;
+  const geometry = () => {
+    const viewportTop = scrollRoot ? scrollRoot.getBoundingClientRect().top + scrollRoot.clientTop : 0;
+    return {
+      top: element.getBoundingClientRect().top - viewportTop,
+      range: Math.max(0, element.offsetHeight - (scrollRoot?.clientHeight ?? window.innerHeight)),
+      offset: scrollRoot?.scrollTop ?? window.scrollY,
+    };
+  };
+  let restoring = true;
+  let releaseFrame: number | null = null;
+  const frame = requestAnimationFrame(() => {
+    if (initialValue > 0) {
+      const { top, range, offset } = geometry();
+      target.scrollTo({ top: offset + top + (initialValue / 10000) * range, behavior: 'instant' });
+    }
+    releaseFrame = requestAnimationFrame(() => { restoring = false; });
+  });
+  const scroll = () => {
+    if (restoring) return;
+    const { top, range } = geometry();
+    onPosition(Math.round(Math.max(0, Math.min(1, range > 0 ? -top / range : 0)) * 10000));
+  };
+  target.addEventListener('scroll', scroll, { passive: true });
+  return () => {
+    cancelAnimationFrame(frame);
+    if (releaseFrame !== null) cancelAnimationFrame(releaseFrame);
+    target.removeEventListener('scroll', scroll);
+  };
+}
+
+function PositionedContent({ lesson, enterprise, initialPosition, onPositionChange }: {
+  lesson: Lesson; enterprise?: boolean; initialPosition?: LessonPosition;
+  onPositionChange?: (position: LessonPosition) => void;
+}) {
+  const body = useRef<HTMLDivElement>(null);
+  const initial = useRef(initialPosition);
+  const videoRestored = useRef(false);
+  const update = useRef(onPositionChange);
+  useEffect(() => { update.current = onPositionChange; }, [onPositionChange]);
+  useEffect(() => {
+    if (lesson.content_type !== 'text' || !body.current) return;
+    return bindReadingPosition(body.current, initial.current?.kind === 'reading' ? initial.current.value : 0,
+      (value) => update.current?.({ kind: 'reading', value }));
+  }, [lesson.id, lesson.content_type]);
+  const embedded = /(?:youtube(?:-nocookie)?\.com|youtu\.be|vimeo\.com)/i.test(lesson.content_body ?? '');
+  if (lesson.content_type === 'video' && !embedded) return (
+    <div className="aspect-video w-full overflow-hidden rounded-lg bg-black">
+      <video controls className="h-full w-full" src={lesson.content_body ?? undefined}
+        onLoadedMetadata={(event) => {
+          if (initial.current?.kind === 'video') event.currentTarget.currentTime = Math.min(event.currentTarget.duration || 0, initial.current.value / 1000);
+          videoRestored.current = true;
+        }}
+        onTimeUpdate={(event) => { if (videoRestored.current) update.current?.({ kind: 'video', value: Math.min(86400000, Math.round(event.currentTarget.currentTime * 1000)) }); }}>
+        Your browser does not support video playback.
+      </video>
+    </div>
+  );
+  return <div ref={body} data-testid="lesson-content" className="rounded-lg">{enterprise ? <EnterpriseLessonContent lesson={lesson} /> : renderDefaultContent(lesson)}</div>;
 }
 
 function renderDefaultContent(lesson: Lesson) {

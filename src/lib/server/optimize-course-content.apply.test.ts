@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   courseToAdminDto: vi.fn(),
   findUnique: vi.fn(),
   update: vi.fn(),
+  complete: vi.fn(),
 }));
 
 vi.mock('@/lib/admin/admin-courses-service', () => ({
@@ -16,8 +17,12 @@ vi.mock('@/lib/admin/admin-courses-service', () => ({
 vi.mock('@/lib/prisma', () => ({
   prisma: { lmsCourse: { findUnique: mocks.findUnique, update: mocks.update } },
 }));
+vi.mock('./anthropic-client', () => ({
+  resolveAnthropicConfig: () => ({ configured: true }), anthropicComplete: mocks.complete,
+  AnthropicAPIError: class extends Error {},
+}));
 
-import { applyOptimizedCourseDraft } from './optimize-course-content';
+import { applyOptimizedCourseDraft, generateOptimizedCourseDraft, optimizeAndApplyCourse } from './optimize-course-content';
 
 const draft = {
   token: 'reviewed-draft',
@@ -29,13 +34,24 @@ const draft = {
 
 beforeEach(() => {
   vi.resetAllMocks();
-  mocks.adminGetCourse.mockResolvedValue({ meta: { optimizeDraft: draft } });
+  mocks.adminGetCourse.mockResolvedValue({ meta: { optimizeDraft: draft }, modules: [] });
   mocks.adminUpdateCourse.mockResolvedValue({ id: 'course-id' });
   mocks.findUnique.mockResolvedValue({ meta: { optimizeDraft: draft, retained: 'yes' } });
   mocks.update.mockResolvedValue({ id: 'course-id' });
 });
 
 describe('applying an optimised draft preserves CEC ownership', () => {
+  it.each(['generate', 'apply', 'cron'])('rejects structured curriculum before provider or mutation in %s', async (mode) => {
+    mocks.adminGetCourse.mockResolvedValue({ meta: { optimizeDraft: draft, curriculumPersistence: null }, modules: [] });
+    const operation = mode === 'generate' ? generateOptimizedCourseDraft('course-id')
+      : mode === 'apply' ? applyOptimizedCourseDraft('course-id', draft.token)
+      : optimizeAndApplyCourse('course-id');
+    await expect(operation).rejects.toMatchObject({ status: 409 });
+    expect(mocks.complete).not.toHaveBeenCalled();
+    expect(mocks.adminUpdateCourse).not.toHaveBeenCalled();
+    expect(mocks.update).not.toHaveBeenCalled();
+    expect(mocks.courseToAdminDto).not.toHaveBeenCalled();
+  });
   it.each([
     { label: 'stale imported hours', cecHours: '99', resolvedCecHours: null },
     { label: 'registry-approved hours', cecHours: '99', resolvedCecHours: '1' },
@@ -59,6 +75,7 @@ describe('applying an optimised draft preserves CEC ownership', () => {
         {
           id: 'module-id',
           title: 'Original module title',
+          textContent: '',
           videoUrl: 'https://example.test/module.mp4',
           quiz: { title: 'Retained quiz' },
         },

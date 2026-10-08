@@ -12,11 +12,12 @@ export const DEFAULT_INSTRUCTOR_ID =
 
 const SYSTEM_INSTRUCTOR_EMAIL = 'system.instructor@carsi.internal';
 
-export async function ensureCatalogInstructor(): Promise<void> {
-  const existing = await prisma.lmsUser.findUnique({ where: { id: DEFAULT_INSTRUCTOR_ID } });
+export async function ensureCatalogInstructor(tx?: Prisma.TransactionClient): Promise<void> {
+  const client = tx ?? prisma;
+  const existing = await client.lmsUser.findUnique({ where: { id: DEFAULT_INSTRUCTOR_ID } });
   if (existing) return;
 
-  await prisma.lmsUser.upsert({
+  await client.lmsUser.upsert({
     where: { id: DEFAULT_INSTRUCTOR_ID },
     create: {
       id: DEFAULT_INSTRUCTOR_ID,

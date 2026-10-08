@@ -14,7 +14,12 @@ export type CcwRoadshowEvent = {
   state: 'VIC' | 'NSW' | 'QLD';
   description: string;
   capacity: number;
-  calendarEventId: string;
+  calendarEventId?: string;
+  timeZone?: 'Australia/Sydney' | 'Australia/Brisbane';
+  bookingUrl?: string;
+  unitAmountCents?: number;
+  giftCardAmountCents?: number;
+  maxRegistrationsPerCustomer?: number;
   /**
    * How a seat is claimed for this event.
    *
@@ -165,6 +170,32 @@ export const ccwRoadshowEvents: CcwRoadshowEvent[] = [
     // take payment for.
     registration: 'external',
   },
+  {
+    slug: 'brisbane-2026-10-09',
+    city: 'Brisbane',
+    title: 'CARSI x CCW Carpet and Upholstery Training - Brisbane',
+    dates: '9-10 October 2026',
+    dateRangeLabel: 'Friday 9 October - Saturday 10 October 2026',
+    startDateIso: '2026-10-09T08:30:00+10:00',
+    endDateIso: '2026-10-10T15:00:00+10:00',
+    timeLabel: 'Friday 8.30am-4.30pm; Saturday 8.30am-3pm (AEST)',
+    timeZone: 'Australia/Brisbane',
+    venueName: 'Carpet Cleaners Warehouse Boondall',
+    streetAddress: '194D Zillmere Road',
+    suburb: 'Boondall',
+    suburbStatePostcode: 'Boondall QLD 4034',
+    state: 'QLD',
+    description:
+      'Two practical days of carpet and upholstery training with Phill McGurk and the CCW team at Carpet Cleaners Warehouse Boondall.',
+    capacity: 15,
+    registration: 'external',
+    // Verified against CCW's product page on 8 October 2026. Calendar guest-add
+    // remains unavailable until a real Google event ID is configured for this sitting.
+    bookingUrl: 'https://ccwonline.com.au/collections/training-marketing',
+    unitAmountCents: 49500,
+    giftCardAmountCents: 20000,
+    maxRegistrationsPerCustomer: 5,
+  },
 ];
 
 export const ccwRoadshowTicketPackages: CcwRoadshowTicketPackage[] = [
@@ -232,6 +263,12 @@ export const ccwRoadshowCampaignPillars = {
 export function getCcwRoadshowEvent(slug: string | null | undefined) {
   const normalized = slug?.trim().toLowerCase();
   return ccwRoadshowEvents.find((event) => event.slug === normalized) ?? null;
+}
+
+export function getCcwRoadshowEventPath(event: CcwRoadshowEvent): string {
+  if (event.slug === 'brisbane-2026-10-09') return '/ccw-brisbane';
+  if (event.slug === 'melbourne' || event.slug === 'sydney') return `/ccw-${event.slug}`;
+  return `${ccwRoadshowPath}?event=${encodeURIComponent(event.slug)}`;
 }
 
 /**
