@@ -464,7 +464,7 @@ export function AdminCcwSignInsClient() {
         >
           {ccwRoadshowEvents.map((ev) => (
             <option key={ev.slug} value={ev.slug} className="bg-[#09111f]">
-              {ev.city}
+              {ev.city} - {ev.dates}
             </option>
           ))}
         </select>
