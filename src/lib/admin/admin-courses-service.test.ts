@@ -1,6 +1,30 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
-import { parseModuleQuiz } from './admin-courses-service';
+vi.mock('@/lib/prisma', () => ({ prisma: {} }));
+
+import { isUnpublishedCourseDraft, parseModuleQuiz } from './admin-courses-service';
+import { hasUncredentialledStoredCecIdentity } from '@/lib/server/course-cec-hours';
+
+describe('deny-only native curriculum admission', () => {
+  it('accepts only the exact unpublished, uncredentialled draft identity', () => {
+    expect(isUnpublishedCourseDraft({ status: 'draft', isPublished: false })).toBe(true);
+    expect(hasUncredentialledStoredCecIdentity({ cecHours: 0, iicrcDiscipline: null })).toBe(true);
+  });
+  it.each([
+    {}, { status: 'draft' }, { status: 'published', isPublished: false },
+    { status: 'DRAFT', isPublished: false }, { status: ' draft ', isPublished: false },
+    { status: 'draft', isPublished: true }, { status: 'draft', isPublished: null },
+  ])('rejects ambiguous draft admission %j', (course) => {
+    expect(isUnpublishedCourseDraft(course)).toBe(false);
+  });
+  it.each([
+    {}, { cecHours: 0 }, { cecHours: null, iicrcDiscipline: null },
+    { cecHours: '0', iicrcDiscipline: null }, { cecHours: 1, iicrcDiscipline: null },
+    { cecHours: 0, iicrcDiscipline: '' }, { cecHours: 0, iicrcDiscipline: 'WRT' },
+  ])('rejects ambiguous stored credential identity %j', (course) => {
+    expect(hasUncredentialledStoredCecIdentity(course)).toBe(false);
+  });
+});
 
 describe('parseModuleQuiz', () => {
   const validQuestion = {

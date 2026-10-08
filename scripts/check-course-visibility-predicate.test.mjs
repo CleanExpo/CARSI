@@ -154,6 +154,16 @@ if (evaluateFile('src/lib/admin/admin-courses-service.ts', adminSrc).length > 0)
   console.error('✖ admin-courses-service should be allowlisted but was flagged');
   failed++;
 }
+if (evaluateFile('src\\lib\\admin\\admin-courses-service.ts', adminSrc).length > 0) {
+  console.error('Windows admin paths must retain the same explicit allowlist');
+  failed++;
+}
+for (const [name, src] of MUST_BLOCK) {
+  if (evaluateFile('app\\api\\fixture\\route.ts', src).length === 0) {
+    console.error(`Windows consumer must still be blocked: ${name}`);
+    failed++;
+  }
+}
 
 if (failed > 0) {
   console.error(`\n✖ Course-visibility guard self-test failed — ${failed} case(s).`);

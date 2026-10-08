@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { normalizePublicAssetUrl } from '@/lib/remote-image';
 import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
 import { getCecSubmissionsByEnrollmentIds } from '@/lib/server/iicrc-cec-submission';
+import { ACCESS_GRANTING_STATUS_LIST, isEnrolmentAccessAllowed } from '@/lib/server/enrollment-access';
 
 /** Client / API shape for `EnrolledCourseList` and enrollments/me. */
 export interface EnrollmentDto {
@@ -115,7 +116,7 @@ function mapEnrollmentRow(
         : 0
       : Math.min(100, Math.round((completed / total) * 100));
 
-  const lastId = e.lastAccessedLessonId;
+  const lastId = e.lastAccessedLessonId && lessonTitleById.has(e.lastAccessedLessonId) ? e.lastAccessedLessonId : null;
   const lastTitle = lastId ? (lessonTitleById.get(lastId) ?? null) : null;
 
   let lastActivity: Date | null = null;
@@ -163,7 +164,8 @@ export async function getLearnerDashboardSummary(
 
   try {
     const rows = await prisma.lmsEnrollment.findMany({
-      where: { studentId: userId },
+      where: { studentId: userId, status: { in: [...ACCESS_GRANTING_STATUS_LIST] } },
+      take: 200,
       include: {
         course: {
           select: {
@@ -267,7 +269,8 @@ export async function getResumeSnapshotForStudent(userId: string): Promise<Resum
 
   try {
     const rows = await prisma.lmsEnrollment.findMany({
-      where: { studentId: userId },
+      where: { studentId: userId, status: { in: [...ACCESS_GRANTING_STATUS_LIST] } },
+      take: 200,
       include: {
         course: {
           select: {
@@ -287,6 +290,7 @@ export async function getResumeSnapshotForStudent(userId: string): Promise<Resum
       orderBy: { enrolledAt: 'desc' },
     });
 
+    const accessibleRows = rows.filter((row) => isEnrolmentAccessAllowed(row.status));
     const lessonMeta = new Map<
       string,
       {
@@ -299,7 +303,7 @@ export async function getResumeSnapshotForStudent(userId: string): Promise<Resum
       }
     >();
     const allLessonIds: string[] = [];
-    for (const e of rows) {
+    for (const e of accessibleRows) {
       const slug = e.course.slug;
       const title = e.course.title;
       const desc = e.course.shortDescription?.trim() || e.course.description?.trim() || null;
@@ -328,7 +332,7 @@ export async function getResumeSnapshotForStudent(userId: string): Promise<Resum
     type Best = { lessonId: string; at: Date };
     let global: Best | null = null;
 
-    for (const e of rows) {
+    for (const e of accessibleRows) {
       const lessonIds = e.course.modules.flatMap((m) => m.lessons.map((l) => l.id));
       if (lessonIds.length === 0) continue;
 

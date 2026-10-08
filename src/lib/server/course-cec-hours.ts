@@ -13,6 +13,13 @@ export type LmsCourseCecSource = {
   iicrcDiscipline?: string | null;
 };
 
+/** Deny-only admission for new uncredentialled curriculum; zero is not CEC approval. */
+export function hasUncredentialledStoredCecIdentity(course: {
+  cecHours?: unknown; iicrcDiscipline?: unknown;
+}): boolean {
+  return course.cecHours === 0 && course.iicrcDiscipline === null;
+}
+
 /**
  * CEC hours for a course on public listings, certificates and credentials.
  *

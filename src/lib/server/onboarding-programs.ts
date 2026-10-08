@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { projectLearnerCourseMeta } from '@/lib/lms/learner-course-meta';
 import {
   computeProgressFromModules,
   isOnboardingCourse,
@@ -100,7 +101,7 @@ export async function listOnboardingProgramsForUser(
         category: course.category,
         level: course.level,
         durationHours: course.durationHours != null ? Number(course.durationHours) : null,
-        meta: parseOnboardingMeta(course.meta),
+        meta: parseOnboardingMeta(projectLearnerCourseMeta(course.meta)),
         enrolled: Boolean(enrollment),
         enrollmentId: enrollment?.id ?? null,
         progressPercent,
