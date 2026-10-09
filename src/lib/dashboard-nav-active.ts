@@ -21,6 +21,9 @@ export function isDashboardNavActive(pathname: string, href: string): boolean {
   if (h === '/dashboard/student/profile') {
     return p === '/dashboard/student/profile' || p.startsWith('/dashboard/student/profile/');
   }
+  if (h === '/dashboard/student/business-coaching') {
+    return p.startsWith('/dashboard/student/business-coaching');
+  }
   if (h === '/dashboard/student/credentials') {
     return (
       p.startsWith('/dashboard/student/credentials') || /^\/dashboard\/credentials\//.test(p)
@@ -34,6 +37,7 @@ export function isDashboardNavActive(pathname: string, href: string): boolean {
   }
   if (h === '/dashboard/student') {
     if (p.startsWith('/dashboard/student/profile')) return false;
+    if (p.startsWith('/dashboard/student/business-coaching')) return false;
     if (p.startsWith('/dashboard/student/credentials')) return false;
     if (p.startsWith('/dashboard/student/leaderboard')) return false;
     if (p.startsWith('/dashboard/student/notes')) return false;
@@ -56,6 +60,7 @@ export function getDashboardSectionLabel(pathname: string): string {
   if (p.startsWith('/dashboard/onboarding')) return 'Onboarding';
   if (p.startsWith('/dashboard/courses')) return 'Course Catalogue';
   if (p.startsWith('/dashboard/learn')) return 'Learning';
+  if (p.startsWith('/dashboard/student/business-coaching')) return 'Business Coaching';
   if (p.startsWith('/dashboard/student/credentials') || p.startsWith('/dashboard/credentials/')) {
     return 'Certificates';
   }

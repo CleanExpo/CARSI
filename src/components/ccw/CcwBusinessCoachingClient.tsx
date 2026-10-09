@@ -14,6 +14,11 @@ import {
 import Link from 'next/link';
 
 import { BusinessCoachingMonthlySubscribe } from '@/components/ccw/BusinessCoachingMonthlySubscribe';
+import {
+  BusinessCoachingAddOnsSection,
+  BusinessCoachingInclusionsSection,
+  BusinessCoachingPortalSection,
+} from '@/components/ccw/BusinessCoachingProgramSections';
 import { HomeFaqSection } from '@/components/landing/HomeFaqSection';
 import { HomeFinalCtaSection } from '@/components/landing/HomeFinalCtaSection';
 import { HomeTrustStrip } from '@/components/landing/HomeTrustStrip';
@@ -33,6 +38,7 @@ import {
   carsiCoachingProductName,
   carsiCoachingWorkshopPath,
 } from '@/lib/marketing/carsi-coaching-monthly';
+import { carsiCoachingAddOnsAndPortalComingSoon } from '@/lib/marketing/carsi-coaching-program';
 import { ccwRoadshowPath } from '@/lib/marketing/ccw-roadshow';
 
 const horizontalPillars = [
@@ -95,7 +101,17 @@ const faqs = [
   {
     question: 'What does $495/month include?',
     answer:
-      'Your living business plan in CARSI, weekly step-by-step actions in the LMS, relevant CARSI training paths, AI integration guidance, and a minimum of one live planning session with Phill per month.',
+      'Strategy (horizontal + direction, living business plan), marketing (website, GBP, social, SEO/AI visibility), operations (quoting and cash flow), curated CARSI modules, AI workflows, the Business Coaching Portal, and at least one live monthly session with Phill. See the full inclusion list on this page.',
+  },
+  {
+    question: 'What is the Business Coaching Portal?',
+    answer:
+      'A subscriber dashboard for your plan, monthly actions, session prep, and resources. It is coming soon; until then onboarding and sessions are handled by email after you subscribe.',
+  },
+  {
+    question: 'Are add-ons included in $495/month?',
+    answer:
+      'No. Optional extras (partner seats, extra 1:1s, implementation sprints, etc.) are listed with planned pricing for transparency. Add-on booking is coming soon — email support@carsi.com.au if you need something urgently.',
   },
   {
     question: 'Do I need to be on-site?',
@@ -133,6 +149,26 @@ export function CcwBusinessCoachingClient({ checkoutEnabled }: { checkoutEnabled
               <div className="w-full max-w-md">
                 <BusinessCoachingMonthlySubscribe checkoutEnabled={checkoutEnabled} />
               </div>
+              <p className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm text-slate-600">
+                <Link
+                  href="#coaching-inclusions"
+                  className="font-medium text-[#146fc2] hover:underline"
+                >
+                  What&apos;s included
+                </Link>
+                <Link
+                  href="#coaching-addons"
+                  className="font-medium text-[#146fc2] hover:underline"
+                >
+                  Add-ons {carsiCoachingAddOnsAndPortalComingSoon ? '(soon)' : '& prices'}
+                </Link>
+                <Link
+                  href="#coaching-portal"
+                  className="font-medium text-[#146fc2] hover:underline"
+                >
+                  Portal {carsiCoachingAddOnsAndPortalComingSoon ? '(soon)' : ''}
+                </Link>
+              </p>
               <PlatformNav current={carsiCoachingMonthlyPath} />
             </div>
           </div>
@@ -216,6 +252,16 @@ export function CcwBusinessCoachingClient({ checkoutEnabled }: { checkoutEnabled
           </div>
         </div>
       </section>
+
+      <div id="coaching-inclusions">
+        <BusinessCoachingInclusionsSection />
+      </div>
+      <div id="coaching-addons">
+        <BusinessCoachingAddOnsSection checkoutEnabled={checkoutEnabled} />
+      </div>
+      <div id="coaching-portal">
+        <BusinessCoachingPortalSection />
+      </div>
 
       <section className="border-t border-slate-200/70 bg-white py-16 md:py-24">
         <div className={PUBLIC_SHELL_INNER_CLASS}>
