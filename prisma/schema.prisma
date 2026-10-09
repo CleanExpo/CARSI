@@ -1125,3 +1125,35 @@ model YearlyMembershipGrantClaim {
 
   @@map("yearly_membership_grant_claims")
 }
+
+/// Owner Circle ($22/seat) monthly live session bookings via Stripe Checkout.
+model BusinessCoachingRegistration {
+  id               String   @id @default(uuid()) @db.Uuid
+  sessionSlug      String   @map("session_slug") @db.VarChar(32)
+  stripeSessionId  String?  @unique @map("stripe_session_id") @db.VarChar(128)
+  companyName      String?  @map("company_name")
+  contactEmail     String   @map("contact_email") @db.VarChar(320)
+  contactPhone     String?  @map("contact_phone") @db.VarChar(80)
+  seatCount        Int      @map("seat_count")
+  packageId        String   @map("package_id") @db.VarChar(32)
+  status           String   @default("confirmed") @db.VarChar(20)
+  amountTotalCents Int?     @map("amount_total_cents")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  attendees BusinessCoachingAttendee[]
+
+  @@index([sessionSlug, status])
+  @@map("business_coaching_registrations")
+}
+
+model BusinessCoachingAttendee {
+  id             String   @id @default(uuid()) @db.Uuid
+  registrationId String   @map("registration_id") @db.Uuid
+  fullName       String   @map("full_name")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  registration BusinessCoachingRegistration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+
+  @@index([registrationId])
+  @@map("business_coaching_attendees")
+}

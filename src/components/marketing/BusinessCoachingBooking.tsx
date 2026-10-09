@@ -297,7 +297,7 @@ export function BusinessCoachingBooking({
       </label>
 
       <div className="mt-4">
-        <TurnstileWidget onSuccess={setTurnstileToken} onExpire={() => setTurnstileToken('')} />
+        <TurnstileWidget onVerify={setTurnstileToken} />
       </div>
 
       {message ? <p className="mt-3 text-sm text-amber-300">{message}</p> : null}

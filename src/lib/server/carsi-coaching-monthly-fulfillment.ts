@@ -48,7 +48,10 @@ export async function processCarsiCoachingMonthlyCheckoutCompleted(
     return { fulfilled: false, skipped: 'not_coaching_monthly' };
   }
 
-  if (session.payment_status && session.payment_status !== 'paid') {
+  const paid =
+    session.payment_status === 'paid' ||
+    (session.status === 'complete' && session.mode === 'subscription');
+  if (!paid) {
     return { fulfilled: false, skipped: 'not_paid' };
   }
 
