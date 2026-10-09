@@ -17,17 +17,13 @@ export function isDashboardNavActive(pathname: string, href: string): boolean {
   if (h === '/dashboard/onboarding') {
     return p === '/dashboard/onboarding' || p.startsWith('/dashboard/onboarding/');
   }
-  if (h === '/dashboard/courses') return p === '/dashboard/courses' || p.startsWith('/dashboard/courses/');
+  if (h === '/dashboard/courses')
+    return p === '/dashboard/courses' || p.startsWith('/dashboard/courses/');
   if (h === '/dashboard/student/profile') {
     return p === '/dashboard/student/profile' || p.startsWith('/dashboard/student/profile/');
   }
-  if (h === '/dashboard/student/business-coaching') {
-    return p.startsWith('/dashboard/student/business-coaching');
-  }
   if (h === '/dashboard/student/credentials') {
-    return (
-      p.startsWith('/dashboard/student/credentials') || /^\/dashboard\/credentials\//.test(p)
-    );
+    return p.startsWith('/dashboard/student/credentials') || /^\/dashboard\/credentials\//.test(p);
   }
   if (h === '/dashboard/student/leaderboard') {
     return p.startsWith('/dashboard/student/leaderboard');

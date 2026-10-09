@@ -233,7 +233,7 @@ function skip(
 export async function sendUpcomingRenewalReminder(params: {
   invoice: Stripe.Invoice;
   subscription: Stripe.Subscription;
-  kind: 'individual' | 'team' | 'org' | 'unknown';
+  kind: 'individual' | 'team' | 'org' | 'coaching' | 'unknown';
 }): Promise<RenewalReminderOutcome> {
   const { invoice, subscription, kind } = params;
   const subscriptionId = subscription.id;

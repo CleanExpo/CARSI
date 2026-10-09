@@ -24,7 +24,6 @@ export const LEARNER_NAV_PRIMARY: LearnerNavItem[] = [
 ];
 
 export const LEARNER_NAV_RECORDS: LearnerNavItem[] = [
-  { href: '/dashboard/student/credentials', label: 'Certificates', icon: Award },
   { href: '/dashboard/student/leaderboard', label: 'Achievements', icon: ListOrdered },
 ];
 

@@ -6,10 +6,13 @@ import {
 } from '@/lib/marketing/carsi-coaching-monthly';
 import { ccwRoadshowPath } from '@/lib/marketing/ccw-roadshow';
 
-export const carsiCoachingPortalPath = '/dashboard/student/business-coaching';
+export const carsiCoachingPortalPath = '/coaching';
 
-/** When true, add-on checkout/enquiry and the subscriber portal UI stay preview-only. */
-export const carsiCoachingAddOnsAndPortalComingSoon = true;
+/** When true, add-on booking stays preview-only (portal is live at {@link carsiCoachingPortalPath}). */
+export const carsiCoachingAddOnsComingSoon = true;
+
+/** @deprecated Use {@link carsiCoachingAddOnsComingSoon} — portal is no longer gated by this flag. */
+export const carsiCoachingAddOnsAndPortalComingSoon = carsiCoachingAddOnsComingSoon;
 
 export type CoachingInclusion = {
   category: string;

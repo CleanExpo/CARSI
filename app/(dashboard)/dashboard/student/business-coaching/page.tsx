@@ -1,13 +1,7 @@
-import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 
-import { BusinessCoachingPortalClient } from '@/components/dashboard/BusinessCoachingPortalClient';
-import { carsiCoachingProductName } from '@/lib/marketing/carsi-coaching-monthly';
+import { carsiCoachingPortalPath } from '@/lib/marketing/carsi-coaching-program';
 
-export const metadata: Metadata = {
-  title: `${carsiCoachingProductName} Portal`,
-  robots: { index: false, follow: false },
-};
-
-export default function BusinessCoachingPortalPage() {
-  return <BusinessCoachingPortalClient />;
+export default function LegacyBusinessCoachingPortalRedirect() {
+  redirect(carsiCoachingPortalPath);
 }

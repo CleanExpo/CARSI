@@ -4,6 +4,7 @@ import {
   carsiCoachingAddOns,
   carsiCoachingMonthlyInclusions,
   carsiCoachingPortalFeatures,
+  carsiCoachingPortalPath,
 } from './carsi-coaching-program';
 import { carsiCoachingMonthlyPriceLabel } from './carsi-coaching-monthly';
 
@@ -20,5 +21,9 @@ describe('CARSI coaching program content', () => {
 
   it('lists portal features for subscribers', () => {
     expect(carsiCoachingPortalFeatures.length).toBeGreaterThanOrEqual(5);
+  });
+
+  it('uses a dedicated coaching portal path outside the LMS dashboard', () => {
+    expect(carsiCoachingPortalPath).toBe('/coaching');
   });
 });

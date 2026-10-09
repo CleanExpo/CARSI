@@ -6,6 +6,7 @@ import {
   PUBLIC_SHELL_INNER_CLASS,
 } from '@/components/landing/public-shell-width';
 import { getCheckoutSession } from '@/lib/api/stripe';
+import { carsiCoachingPortalPath } from '@/lib/marketing/carsi-coaching-program';
 import {
   carsiCoachingMonthlyPath,
   carsiCoachingProductName,
@@ -46,10 +47,10 @@ export default async function CarsiCoachingMonthlySuccessPage({
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Link
-            href="/dashboard/student"
+            href={carsiCoachingPortalPath}
             className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#146fc2] px-6 text-sm font-semibold text-white"
           >
-            Open your dashboard
+            Open coaching portal
           </Link>
           <Link
             href={carsiCoachingMonthlyPath}

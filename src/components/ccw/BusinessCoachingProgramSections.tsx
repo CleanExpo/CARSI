@@ -1,6 +1,7 @@
 'use client';
 
 import { Check, Plus } from 'lucide-react';
+import Link from 'next/link';
 
 import { BusinessCoachingMonthlySubscribe } from '@/components/ccw/BusinessCoachingMonthlySubscribe';
 import { CoachingComingSoonBanner } from '@/components/ccw/CoachingComingSoonBanner';
@@ -16,7 +17,8 @@ import {
 } from '@/lib/marketing/carsi-coaching-monthly';
 import {
   carsiCoachingAddOns,
-  carsiCoachingAddOnsAndPortalComingSoon,
+  carsiCoachingAddOnsComingSoon,
+  carsiCoachingPortalPath,
   carsiCoachingMonthlyInclusions,
   carsiCoachingPortalFeatures,
 } from '@/lib/marketing/carsi-coaching-program';
@@ -98,7 +100,7 @@ export function BusinessCoachingAddOnsSection({ checkoutEnabled }: { checkoutEna
           are below for transparency.
         </p>
 
-        {carsiCoachingAddOnsAndPortalComingSoon ? (
+        {carsiCoachingAddOnsComingSoon ? (
           <div className="mt-6">
             <CoachingComingSoonBanner label="Add-on booking — coming soon" />
           </div>
@@ -156,7 +158,7 @@ export function BusinessCoachingAddOnsSection({ checkoutEnabled }: { checkoutEna
                       {addOn.description}
                     </td>
                     <td className="px-4 py-4 text-right sm:px-6">
-                      {carsiCoachingAddOnsAndPortalComingSoon ? (
+                      {carsiCoachingAddOnsComingSoon ? (
                         <span className="text-xs font-semibold tracking-wide text-slate-400 uppercase">
                           Coming soon
                         </span>
@@ -196,14 +198,15 @@ export function BusinessCoachingPortalSection() {
               Business Coaching Portal
             </h2>
             <p className={`mt-4 ${LANDING_LEAD_CLASS}`}>
-              Subscribers will get a dedicated area in your CARSI dashboard for your plan, monthly
-              actions, and session prep between calls with Phill.
+              Subscribers get a dedicated coaching portal (separate from My Learning) for your plan,
+              monthly actions, and session prep between calls with Phill.
             </p>
-            {carsiCoachingAddOnsAndPortalComingSoon ? (
-              <div className="mt-6">
-                <CoachingComingSoonBanner label="Business Coaching Portal — coming soon" />
-              </div>
-            ) : null}
+            <Link
+              href={carsiCoachingPortalPath}
+              className="mt-6 inline-flex rounded-full bg-[#146fc2] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#125da8]"
+            >
+              Open coaching portal
+            </Link>
           </div>
 
           <div className="rounded-2xl border border-slate-200/80 bg-[#fafbfc] p-6 shadow-sm md:p-8">

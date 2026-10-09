@@ -1018,7 +1018,10 @@ export function renderOwnerCircleBookingConfirmationEmail(params: {
     { label: 'Session', value: params.sessionTitle },
     { label: 'When', value: `${params.dateLabel} · ${params.timeLabel}` },
     { label: 'Venue', value: `${params.venueName}, ${params.venueAddress}` },
-    { label: 'Package', value: `${params.packageLabel} (${params.seatCount} seat${params.seatCount === 1 ? '' : 's'})` },
+    {
+      label: 'Package',
+      value: `${params.packageLabel} (${params.seatCount} seat${params.seatCount === 1 ? '' : 's'})`,
+    },
     { label: 'Paid', value: params.amountLabel },
     ...(params.businessName ? [{ label: 'Business', value: params.businessName }] : []),
   ];
@@ -1028,7 +1031,11 @@ export function renderOwnerCircleBookingConfirmationEmail(params: {
       preheader: 'Your Owner Circle booking is confirmed',
       eyebrow: 'Owner Circle',
       title: 'Booking received',
-      paragraphs: [`Hi ${name},`, statusLine, 'Bring your questions — this is a practical owner conversation with Phill McGurk.'],
+      paragraphs: [
+        `Hi ${name},`,
+        statusLine,
+        'Bring your questions — this is a practical owner conversation with Phill McGurk.',
+      ],
       details,
       ...(params.discussionTopic
         ? { messageHtml: formatPlainMessageAsHtml(`Topic you raised:\n${params.discussionTopic}`) }
@@ -1056,13 +1063,13 @@ export function renderCarsiCoachingMonthlyWelcomeEmail(params: {
       paragraphs: [
         `Hi ${name},`,
         'Thank you — your monthly Business Coaching subscription is confirmed. Phill and the CARSI team will email you within one business day with onboarding, your LMS roadmap, and the date for your first monthly planning session.',
-        'Between sessions, work through the steps in your dashboard so each month builds on the last.',
+        'Between sessions, work through the steps in your coaching portal so each month builds on the last.',
       ],
       details: [
         { label: 'Plan', value: 'CARSI Business Coaching' },
         { label: 'Billing', value: `${params.amountLabel} (monthly, via Stripe)` },
       ],
-      cta: { label: 'Open your dashboard', href: params.dashboardUrl },
+      cta: { label: 'Open your coaching portal', href: params.dashboardUrl },
       noteHtml: `Program details: ${brandLink(params.coachingPageUrl, 'carsi.com.au/ccw-training')}.`,
     },
     `Hi ${name},\n\nYour CARSI Business Coaching subscription is confirmed (${params.amountLabel}/month).\n\nWe will email you within one business day with onboarding and your first monthly session with Phill.\n\nDashboard: ${params.dashboardUrl}\nProgram: ${params.coachingPageUrl}\n`

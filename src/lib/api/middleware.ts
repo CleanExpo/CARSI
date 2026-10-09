@@ -149,7 +149,7 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
-  const protectedPaths = ['/dashboard', '/student', '/instructor'];
+  const protectedPaths = ['/dashboard', '/student', '/instructor', '/coaching'];
   const isProtectedPath =
     protectedPaths.some((path) => pathname.startsWith(path)) ||
     (isAdminPath && !adminSessionValid && !user);

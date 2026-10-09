@@ -3,8 +3,8 @@ import { writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@/generated/prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient | undefined };
 
@@ -81,27 +81,47 @@ function createClient() {
 function clientHasTeamCoursePurchases(client: PrismaClient): boolean {
   return Boolean(
     (client as PrismaClient & { lmsTeamCoursePurchase?: { findMany?: unknown } })
-      .lmsTeamCoursePurchase?.findMany,
+      .lmsTeamCoursePurchase?.findMany
   );
 }
 
 function clientHasRenewalCommunications(client: PrismaClient): boolean {
   return Boolean(
     (client as PrismaClient & { lmsIicrcCecCommunication?: { groupBy?: unknown } })
-      .lmsIicrcCecCommunication?.groupBy,
+      .lmsIicrcCecCommunication?.groupBy
   );
 }
 
 function clientHasNotifications(client: PrismaClient): boolean {
   return Boolean(
-    (client as PrismaClient & { lmsNotification?: { findMany?: unknown } })
-      .lmsNotification?.findMany,
+    (client as PrismaClient & { lmsNotification?: { findMany?: unknown } }).lmsNotification
+      ?.findMany
   );
 }
 
 function clientHasHubSubmissions(client: PrismaClient): boolean {
   return Boolean(
-    (client as PrismaClient & { hubSubmission?: { create?: unknown } }).hubSubmission?.create,
+    (client as PrismaClient & { hubSubmission?: { create?: unknown } }).hubSubmission?.create
+  );
+}
+
+function clientHasCoachingMonthlySubscription(client: PrismaClient): boolean {
+  return Boolean(
+    (
+      client as PrismaClient & {
+        carsiCoachingMonthlySubscription?: { findUnique?: unknown };
+      }
+    ).carsiCoachingMonthlySubscription?.findUnique
+  );
+}
+
+function clientHasCoachingWorkspace(client: PrismaClient): boolean {
+  return Boolean(
+    (
+      client as PrismaClient & {
+        carsiCoachingBusinessProfile?: { findUnique?: unknown };
+      }
+    ).carsiCoachingBusinessProfile?.findUnique
   );
 }
 
@@ -112,7 +132,9 @@ export function getPrismaClient(): PrismaClient {
     !clientHasTeamCoursePurchases(client) ||
     !clientHasRenewalCommunications(client) ||
     !clientHasNotifications(client) ||
-    !clientHasHubSubmissions(client)
+    !clientHasHubSubmissions(client) ||
+    !clientHasCoachingMonthlySubscription(client) ||
+    !clientHasCoachingWorkspace(client)
   ) {
     client = createClient();
   }

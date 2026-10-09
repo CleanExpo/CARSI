@@ -1,6 +1,7 @@
 import type Stripe from 'stripe';
 
 import { getStripeClient } from '@/lib/api/stripe';
+import { carsiCoachingPortalPath } from '@/lib/marketing/carsi-coaching-program';
 import {
   carsiCoachingMonthlyPath,
   carsiCoachingMonthlyPriceCents,

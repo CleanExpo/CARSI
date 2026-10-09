@@ -38,7 +38,10 @@ import {
   carsiCoachingProductName,
   carsiCoachingWorkshopPath,
 } from '@/lib/marketing/carsi-coaching-monthly';
-import { carsiCoachingAddOnsAndPortalComingSoon } from '@/lib/marketing/carsi-coaching-program';
+import {
+  carsiCoachingAddOnsComingSoon,
+  carsiCoachingPortalPath,
+} from '@/lib/marketing/carsi-coaching-program';
 import { ccwRoadshowPath } from '@/lib/marketing/ccw-roadshow';
 
 const horizontalPillars = [
@@ -106,7 +109,7 @@ const faqs = [
   {
     question: 'What is the Business Coaching Portal?',
     answer:
-      'A subscriber dashboard for your plan, monthly actions, session prep, and resources. It is coming soon; until then onboarding and sessions are handled by email after you subscribe.',
+      'A dedicated coaching area (separate from My Learning) for your plan, monthly actions, session prep, and resources. Sign in after subscribing to open it at /coaching.',
   },
   {
     question: 'Are add-ons included in $495/month?',
@@ -160,13 +163,13 @@ export function CcwBusinessCoachingClient({ checkoutEnabled }: { checkoutEnabled
                   href="#coaching-addons"
                   className="font-medium text-[#146fc2] hover:underline"
                 >
-                  Add-ons {carsiCoachingAddOnsAndPortalComingSoon ? '(soon)' : '& prices'}
+                  Add-ons {carsiCoachingAddOnsComingSoon ? '(soon)' : '& prices'}
                 </Link>
                 <Link
-                  href="#coaching-portal"
+                  href={carsiCoachingPortalPath}
                   className="font-medium text-[#146fc2] hover:underline"
                 >
-                  Portal {carsiCoachingAddOnsAndPortalComingSoon ? '(soon)' : ''}
+                  Coaching portal
                 </Link>
               </p>
               <PlatformNav current={carsiCoachingMonthlyPath} />

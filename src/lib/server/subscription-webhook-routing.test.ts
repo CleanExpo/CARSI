@@ -30,6 +30,12 @@ const org = vi.hoisted(() => ({
   markOrgSubscriptionStatusBySubscriptionId: vi.fn(async () => {}),
   resolveTeamIdForOrgSubscription: vi.fn(async () => 'team-org-1'),
 }));
+const coaching = vi.hoisted(() => ({
+  upsertCoachingMonthlySubscription: vi.fn(async () => {}),
+  markCoachingSubscriptionStatusBySubscriptionId: vi.fn(async () => {}),
+  upsertTerminalCoachingSubscriptionStatus: vi.fn(async () => {}),
+  resolveUserIdForCoachingSubscription: vi.fn(async () => 'user-coach-1'),
+}));
 
 vi.mock('./subscription-store', () => ({
   upsertSubscription: (...a: unknown[]) => indiv.upsertSubscription(...(a as [])),
@@ -62,6 +68,16 @@ vi.mock('./org-subscription-store', () => ({
   resolveTeamIdForOrgSubscription: (...a: unknown[]) =>
     org.resolveTeamIdForOrgSubscription(...(a as [])),
 }));
+vi.mock('./carsi-coaching-subscription-store', () => ({
+  upsertCoachingMonthlySubscription: (...a: unknown[]) =>
+    coaching.upsertCoachingMonthlySubscription(...(a as [])),
+  markCoachingSubscriptionStatusBySubscriptionId: (...a: unknown[]) =>
+    coaching.markCoachingSubscriptionStatusBySubscriptionId(...(a as [])),
+  upsertTerminalCoachingSubscriptionStatus: (...a: unknown[]) =>
+    coaching.upsertTerminalCoachingSubscriptionStatus(...(a as [])),
+  resolveUserIdForCoachingSubscription: (...a: unknown[]) =>
+    coaching.resolveUserIdForCoachingSubscription(...(a as [])),
+}));
 vi.mock('@/lib/api/stripe', () => ({
   getStripeClient: () => ({
     customers: { retrieve: vi.fn(async () => ({ email: 'x@example.com' })) },
@@ -90,7 +106,10 @@ function subEvent(type: string, metadata: Record<string, string>): Stripe.Event 
   } as unknown as Stripe.Event;
 }
 
-beforeEach(() => vi.clearAllMocks());
+beforeEach(() => {
+  vi.clearAllMocks();
+  coaching.resolveUserIdForCoachingSubscription.mockResolvedValue('user-coach-1');
+});
 
 describe('subscriptionKindFromPlan (pure)', () => {
   it('maps plans to the right kind', () => {
@@ -149,6 +168,18 @@ describe('handleSubscriptionEvent — plan routing (created/updated)', () => {
     expect(indiv.upsertSubscription).not.toHaveBeenCalled();
     expect(team.upsertTeamSubscription).not.toHaveBeenCalled();
     expect(org.updateOrgSubscriptionFromStripe).not.toHaveBeenCalled();
+    expect(coaching.upsertCoachingMonthlySubscription).not.toHaveBeenCalled();
+  });
+
+  it('routes carsi-coaching-monthly → coaching store only (not annual membership)', async () => {
+    await handleSubscriptionEvent(
+      subEvent('customer.subscription.created', {
+        source: 'carsi-coaching-monthly',
+        carsi_user_id: 'user-1',
+      }),
+    );
+    expect(coaching.upsertCoachingMonthlySubscription).toHaveBeenCalledTimes(1);
+    expect(indiv.upsertSubscription).not.toHaveBeenCalled();
   });
 });
 

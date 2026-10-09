@@ -64,8 +64,14 @@ model LmsUser {
   notifications         LmsNotification[]
   courseReviews         LmsCourseReview[]         @relation("ReviewStudent")
   reviewReplies         LmsCourseReview[]         @relation("ReviewReplyAuthor")
-  subscription          LmsSubscription?
-  margotConversations   MargotConversation[]
+  subscription                  LmsSubscription?
+  coachingMonthlySubscription   CarsiCoachingMonthlySubscription?
+  coachingBusinessProfile       CarsiCoachingBusinessProfile?
+  coachingGrowthPlan            CarsiCoachingGrowthPlan?
+  coachingAssessments           CarsiCoachingAssessment[]
+  coachingSessions              CarsiCoachingSession[]
+  coachingActions               CarsiCoachingAction[]
+  margotConversations           MargotConversation[]
   ccwRoadshowSignIns    CcwRoadshowSignIn[]       @relation("SignInStudent")
 
   @@map("lms_users")
@@ -1156,4 +1162,139 @@ model BusinessCoachingAttendee {
 
   @@index([registrationId])
   @@map("business_coaching_attendees")
+}
+
+/// CARSI Business Coaching ($495/mo) — separate from the annual LMS membership.
+model CarsiCoachingMonthlySubscription {
+  id                   String    @id @default(uuid()) @db.Uuid
+  userId               String    @unique @map("user_id") @db.Uuid
+  stripeCustomerId     String?   @map("stripe_customer_id") @db.VarChar(255)
+  stripeSubscriptionId String?   @unique @map("stripe_subscription_id") @db.VarChar(255)
+  status               String    @db.VarChar(32)
+  currentPeriodEnd     DateTime? @map("current_period_end") @db.Timestamptz(6)
+  cancelAtPeriodEnd    Boolean   @default(false) @map("cancel_at_period_end")
+  statusEventAt        DateTime? @map("status_event_at") @db.Timestamptz(6)
+  horizontalSummary    String?   @map("horizontal_summary") @db.Text
+  directionSummary     String?   @map("direction_summary") @db.Text
+  sessionPrepNotes     String?   @map("session_prep_notes") @db.Text
+  monthlyActionsJson   String?   @map("monthly_actions_json") @db.Text
+  createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user LmsUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([stripeCustomerId], map: "idx_carsi_coaching_monthly_subscriptions_customer")
+  @@map("carsi_coaching_monthly_subscriptions")
+}
+
+model CarsiCoachingBusinessProfile {
+  id                  String    @id @default(uuid()) @db.Uuid
+  userId              String    @unique @map("user_id") @db.Uuid
+  businessName        String?   @map("business_name") @db.VarChar(255)
+  industry            String?   @db.VarChar(120)
+  location            String?   @db.VarChar(255)
+  serviceAreas        String?   @map("service_areas") @db.Text
+  yearsInBusiness     String?   @map("years_in_business") @db.VarChar(64)
+  businessSize        String?   @map("business_size") @db.VarChar(64)
+  employeeCount       String?   @map("employee_count") @db.VarChar(64)
+  mainServices        String?   @map("main_services") @db.Text
+  website             String?   @db.VarChar(500)
+  googleBusinessUrl   String?   @map("google_business_url") @db.VarChar(500)
+  facebookUrl         String?   @map("facebook_url") @db.VarChar(500)
+  instagramUrl        String?   @map("instagram_url") @db.VarChar(500)
+  linkedinUrl         String?   @map("linkedin_url") @db.VarChar(500)
+  tiktokUrl           String?   @map("tiktok_url") @db.VarChar(500)
+  youtubeUrl          String?   @map("youtube_url") @db.VarChar(500)
+  xUrl                String?   @map("x_url") @db.VarChar(500)
+  socialNotes         String?   @map("social_notes") @db.Text
+  challenges          String?   @db.Text
+  shortTermGoals      String?   @map("short_term_goals") @db.Text
+  longTermVision      String?   @map("long_term_vision") @db.Text
+  completedAt         DateTime? @map("completed_at") @db.Timestamptz(6)
+  createdAt           DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user LmsUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("carsi_coaching_business_profiles")
+}
+
+model CarsiCoachingAssessment {
+  id                      String    @id @default(uuid()) @db.Uuid
+  userId                  String    @map("user_id") @db.Uuid
+  status                  String    @db.VarChar(32)
+  responsesJson           String    @map("responses_json") @db.Text
+  submittedAt             DateTime? @map("submitted_at") @db.Timestamptz(6)
+  reviewedAt              DateTime? @map("reviewed_at") @db.Timestamptz(6)
+  customerVisibleFeedback String?   @map("customer_visible_feedback") @db.Text
+  createdAt               DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt               DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user LmsUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@map("carsi_coaching_assessments")
+}
+
+model CarsiCoachingGrowthPlan {
+  id                String    @id @default(uuid()) @db.Uuid
+  userId            String    @unique @map("user_id") @db.Uuid
+  status            String    @default("draft") @db.VarChar(32)
+  focusTitle        String?   @map("focus_title") @db.VarChar(500)
+  focusDescription  String?   @map("focus_description") @db.Text
+  focusTargetDate   DateTime? @map("focus_target_date") @db.Timestamptz(6)
+  businessDirection String?   @map("business_direction") @db.Text
+  goalsJson         String?   @map("goals_json") @db.Text
+  latestGuidance    String?   @map("latest_guidance") @db.Text
+  approvedAt        DateTime? @map("approved_at") @db.Timestamptz(6)
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user LmsUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("carsi_coaching_growth_plans")
+}
+
+model CarsiCoachingSession {
+  id                String    @id @default(uuid()) @db.Uuid
+  userId            String    @map("user_id") @db.Uuid
+  scheduledAt       DateTime  @map("scheduled_at") @db.Timestamptz(6)
+  durationMinutes   Int       @default(60) @map("duration_minutes")
+  coachName         String    @default("Phill McGurk") @map("coach_name") @db.VarChar(120)
+  meetingUrl        String?   @map("meeting_url") @db.VarChar(500)
+  status            String    @default("scheduled") @db.VarChar(32)
+  prepResponsesJson String?   @map("prep_responses_json") @db.Text
+  customerSummary   String?   @map("customer_summary") @db.Text
+  decisionsJson     String?   @map("decisions_json") @db.Text
+  followUpAt        DateTime? @map("follow_up_at") @db.Timestamptz(6)
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user LmsUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, scheduledAt])
+  @@map("carsi_coaching_sessions")
+}
+
+model CarsiCoachingAction {
+  id            String    @id @default(uuid()) @db.Uuid
+  userId        String    @map("user_id") @db.Uuid
+  title         String    @db.VarChar(500)
+  description   String?   @db.Text
+  status        String    @default("todo") @db.VarChar(32)
+  dueDate       DateTime? @map("due_date") @db.Timestamptz(6)
+  priority      String?   @db.VarChar(32)
+  assignedTo    String    @default("customer") @map("assigned_to") @db.VarChar(64)
+  goalId        String?   @map("goal_id") @db.VarChar(64)
+  progressNote  String?   @map("progress_note") @db.Text
+  coachFeedback String?   @map("coach_feedback") @db.Text
+  sortOrder     Int       @default(0) @map("sort_order")
+  completedAt   DateTime? @map("completed_at") @db.Timestamptz(6)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user LmsUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@map("carsi_coaching_actions")
 }

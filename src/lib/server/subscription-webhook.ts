@@ -32,6 +32,13 @@ import {
   readCustomerId,
   readInvoiceSubscriptionId,
 } from '@/lib/server/stripe-subscription-map';
+import { CARSI_COACHING_MONTHLY_CHECKOUT_SOURCE } from '@/lib/server/carsi-coaching-monthly-checkout';
+import {
+  markCoachingSubscriptionStatusBySubscriptionId,
+  resolveUserIdForCoachingSubscription,
+  upsertCoachingMonthlySubscription,
+  upsertTerminalCoachingSubscriptionStatus,
+} from '@/lib/server/carsi-coaching-subscription-store';
 import {
   markSubscriptionStatusBySubscriptionId,
   resolveUserIdForStripeSubscription,
@@ -120,6 +127,14 @@ export function subscriptionKindFromPlan(plan: string | null | undefined): Subsc
 }
 
 function subscriptionKind(subscription: Stripe.Subscription): SubscriptionKind {
+  const source =
+    typeof subscription.metadata?.source === 'string'
+      ? subscription.metadata.source.trim()
+      : '';
+  if (source === CARSI_COACHING_MONTHLY_CHECKOUT_SOURCE) {
+    return 'coaching';
+  }
+
   const plan =
     typeof subscription.metadata?.plan === 'string' ? subscription.metadata.plan : null;
   const kind = subscriptionKindFromPlan(plan);
@@ -223,6 +238,27 @@ async function applySubscriptionSnapshot(
     return;
   }
 
+  if (kind === 'coaching') {
+    const email = await emailForSubscriptionCustomer(subscription);
+    const userId = await resolveUserIdForCoachingSubscription(subscription, email);
+    if (!userId) {
+      console.warn('[subscription-webhook] coaching: could not resolve CARSI user; skipping', {
+        subscriptionId: subscription.id,
+      });
+      return;
+    }
+    await upsertCoachingMonthlySubscription({
+      userId,
+      stripeCustomerId: readCustomerId(subscription),
+      stripeSubscriptionId: subscription.id,
+      status: subscription.status,
+      currentPeriodEnd: readCurrentPeriodEnd(subscription),
+      cancelAtPeriodEnd: readCancelAtPeriodEnd(subscription),
+      eventTimestamp,
+    });
+    return;
+  }
+
   if (kind === 'unknown') {
     console.warn('[subscription-webhook] unknown subscription plan; skipping', {
       subscriptionId: subscription.id,
@@ -318,6 +354,23 @@ export async function handleSubscriptionEvent(event: Stripe.Event): Promise<void
           });
         } else {
           await markOrgSubscriptionStatusBySubscriptionId(subscription.id, status);
+        }
+        return;
+      }
+
+      if (kind === 'coaching') {
+        const email = await emailForSubscriptionCustomer(subscription);
+        const userId = await resolveUserIdForCoachingSubscription(subscription, email);
+        if (userId && eventTimestamp) {
+          await upsertTerminalCoachingSubscriptionStatus({
+            userId,
+            stripeCustomerId: readCustomerId(subscription),
+            stripeSubscriptionId: subscription.id,
+            status,
+            eventTimestamp,
+          });
+        } else {
+          await markCoachingSubscriptionStatusBySubscriptionId(subscription.id, status);
         }
         return;
       }
