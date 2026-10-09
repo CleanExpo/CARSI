@@ -17,6 +17,8 @@ import {
 } from '@/lib/api/stripe';
 import { prisma } from '@/lib/prisma';
 import { getAppOrigin } from '@/lib/server/app-url';
+import { processBusinessCoachingCheckoutCompleted } from '@/lib/server/business-coaching-fulfillment';
+import { processCarsiCoachingMonthlyCheckoutCompleted } from '@/lib/server/carsi-coaching-monthly-fulfillment';
 import { processCcwRoadshowBookingConfirmation } from '@/lib/server/ccw-roadshow-booking-email';
 import { notifyCrmEnrollmentCreated } from '@/lib/server/crm-enrollment-notify';
 import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
@@ -286,7 +288,7 @@ export async function POST(request: NextRequest) {
   } catch {
     return NextResponse.json(
       { error: 'Stripe webhook not configured (STRIPE_WEBHOOK_SECRET).' },
-      { status: 503 },
+      { status: 503 }
     );
   }
 
@@ -324,7 +326,7 @@ export async function POST(request: NextRequest) {
     console.warn('[stripe webhook] rejected delivery', { reason: 'mode_mismatch' });
     return NextResponse.json(
       { error: 'Stripe webhook not configured (mode mismatch).' },
-      { status: 503 },
+      { status: 503 }
     );
   }
 
@@ -391,6 +393,28 @@ export async function POST(request: NextRequest) {
         });
       } catch {
         // Errors logged in sendCcwRoadshowBookingConfirmationEmail
+      }
+      return await acknowledge();
+    }
+
+    if (session.metadata?.source === 'carsi-business-coaching') {
+      try {
+        await processBusinessCoachingCheckoutCompleted(session, {
+          appOrigin: getAppOrigin(),
+        });
+      } catch (err) {
+        console.error('[stripe webhook] carsi-business-coaching fulfillment', err);
+      }
+      return await acknowledge();
+    }
+
+    if (session.metadata?.source === 'carsi-coaching-monthly') {
+      try {
+        await processCarsiCoachingMonthlyCheckoutCompleted(session, {
+          appOrigin: getAppOrigin(),
+        });
+      } catch (err) {
+        console.error('[stripe webhook] carsi-coaching-monthly fulfillment', err);
       }
       return await acknowledge();
     }

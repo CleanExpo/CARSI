@@ -67,6 +67,16 @@ const nextConfig: NextConfig = {
       // (/ccw-melbourne and /ccw-sydney are real dedicated pages, not redirects.)
       { source: '/ccw-roadshow', destination: '/events/ccw-roadshow', permanent: false },
       { source: '/roadshow', destination: '/events/ccw-roadshow', permanent: false },
+      {
+        source: '/programs/business-coaching',
+        destination: '/ccw-training',
+        permanent: true,
+      },
+      {
+        source: '/programs/business-coaching/success',
+        destination: '/ccw-training/success',
+        permanent: false,
+      },
     ];
   },
   typescript: {
@@ -75,8 +85,7 @@ const nextConfig: NextConfig = {
   transpilePackages: ['@shared'],
   webpack: (config) => webpackReactAliases(config),
   turbopack: { root: projectRoot },
-  experimental: {
-  },
+  experimental: {},
   images: {
     unoptimized: true,
   },

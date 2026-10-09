@@ -1,6 +1,6 @@
 import { permanentRedirect } from 'next/navigation';
 
-/** Legacy path: single landing lives at /ccw-training (materials anchor). */
+/** Legacy path: workshop materials live under /ccw-training/workshop. */
 export default function CcwMaterialsRedirectPage() {
-  permanentRedirect('/ccw-training?section=materials');
+  permanentRedirect('/ccw-training/workshop?section=materials');
 }

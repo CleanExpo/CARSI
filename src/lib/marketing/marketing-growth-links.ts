@@ -1,11 +1,14 @@
 import type { LucideIcon } from 'lucide-react';
-import { BookOpen, Compass, GraduationCap, Ticket } from 'lucide-react';
+import { BookOpen, Compass, GraduationCap, Ticket, Users } from 'lucide-react';
 
 import { authorityPath } from '@/lib/marketing/authority';
+import { businessCoachingPath } from '@/lib/marketing/business-coaching';
 import { ccwRoadshowPath } from '@/lib/marketing/ccw-roadshow';
 import { startSmartBasePath } from '@/lib/marketing/start-smart';
 
-export const ccwWorkshopPath = '/ccw-training';
+import { carsiCoachingMonthlyPath, carsiCoachingWorkshopPath } from '@/lib/marketing/carsi-coaching-monthly';
+
+export const ccwWorkshopPath = carsiCoachingWorkshopPath;
 
 export type MarketingGrowthLink = {
   href: string;
@@ -30,6 +33,20 @@ export const marketingGrowthLinks: MarketingGrowthLink[] = [
     title: 'Business Growth Days',
     detail: 'Melbourne & Sydney — practical in-person growth with CCW',
     icon: Ticket,
+  },
+  {
+    href: carsiCoachingMonthlyPath,
+    label: 'Business Coaching',
+    title: 'CARSI Business Coaching',
+    detail: '$495/month — LMS roadmap, AI, and monthly owner sessions with Phill',
+    icon: Users,
+  },
+  {
+    href: businessCoachingPath,
+    label: 'Owner Circle',
+    title: 'Monthly meetup',
+    detail: '$22/seat after-hours group sessions for small business owners',
+    icon: Users,
   },
   {
     href: ccwWorkshopPath,

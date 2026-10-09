@@ -126,9 +126,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           />
           <NavButton
             href="/ccw-training"
-            label="CCW Training"
+            label="Business Coaching"
             icon={GraduationCap}
-            // The Carpet Cleaning Workshop is a public page, not an /admin route,
+            // Public marketing page, not an /admin route,
             // so it never lights an active state and opens in a new tab.
             active={false}
             newTab

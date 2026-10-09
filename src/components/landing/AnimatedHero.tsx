@@ -3,7 +3,8 @@
 import { HeroTrainingInfographic } from '@/components/landing/HeroTrainingInfographic';
 import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
-import { ArrowRight, BadgeCheck, Check, GraduationCap } from 'lucide-react';
+import { ArrowRight, BadgeCheck, Check, GraduationCap, TrendingUp } from 'lucide-react';
+import { carsiCoachingMonthlyPath } from '@/lib/marketing/carsi-coaching-monthly';
 import Link from 'next/link';
 import { useRef, type ReactNode } from 'react';
 
@@ -60,11 +61,7 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
   const panoramaRotate = useTransform(scrollYProgress, [0, 0.6], reduceMotion ? [0, 0] : [8, 0]);
   const panoramaLift = useTransform(scrollYProgress, [0, 0.6], reduceMotion ? [0, 0] : [0, -20]);
   const contentDrift = useTransform(scrollYProgress, [0, 0.5], reduceMotion ? [0, 0] : [0, -36]);
-  const contentFade = useTransform(
-    scrollYProgress,
-    [0, 0.45],
-    reduceMotion ? [1, 1] : [1, 0.35],
-  );
+  const contentFade = useTransform(scrollYProgress, [0, 0.45], reduceMotion ? [1, 1] : [1, 0.35]);
 
   return (
     <section
@@ -128,7 +125,7 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
         {/* Fine film grain for a physical, printed feel */}
         <div
           className="absolute inset-0 opacity-[0.05] mix-blend-multiply"
-        style={{
+          style={{
             backgroundImage:
               "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E\")",
           }}
@@ -211,7 +208,7 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
             </span>
           </h1>
 
-            <motion.p
+          <motion.p
             className="mt-7 max-w-2xl text-[16px] leading-relaxed text-slate-500 sm:text-lg"
             initial={reduceMotion ? false : { opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
@@ -222,7 +219,7 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
             </span>{' '}
             Study around the roster, earn CARSI designations, and hold credentials any client,
             employer, or insurer can verify in seconds.
-            </motion.p>
+          </motion.p>
 
           <motion.div
             className="mt-10 flex flex-wrap items-center justify-center gap-3"
@@ -230,20 +227,30 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ ...springSoft, delay: 0.74 }}
           >
-              <Link
-                href="/courses"
+            <Link
+              href="/courses"
               className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#146fc2] px-8 text-sm font-semibold text-white shadow-[0_18px_45px_-18px_rgba(20,111,194,0.75),inset_0_1px_0_rgba(255,255,255,0.18)] transition hover:bg-[#0f5fa8] hover:shadow-[0_22px_50px_-18px_rgba(20,111,194,0.85),inset_0_1px_0_rgba(255,255,255,0.18)] focus-visible:ring-2 focus-visible:ring-[#2490ed]/45 focus-visible:outline-none motion-safe:hover:-translate-y-0.5"
-              >
+            >
               Start learning free
               <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" aria-hidden />
-              </Link>
-              <Link
+            </Link>
+            <Link
+              href={carsiCoachingMonthlyPath}
+              className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-[#146fc2]/35 bg-white/90 px-7 text-sm font-semibold text-[#0f5fa8] shadow-[0_12px_32px_-20px_rgba(20,111,194,0.55)] backdrop-blur-sm transition hover:border-[#2490ed]/55 hover:bg-white focus-visible:ring-2 focus-visible:ring-[#2490ed]/35 focus-visible:outline-none motion-safe:hover:-translate-y-0.5"
+            >
+              <TrendingUp className="h-4 w-4 text-[#2490ed]" aria-hidden />
+              Business coaching
+              <span className="rounded-full bg-[#eef5fb] px-2 py-0.5 text-[11px] font-bold text-[#146fc2]">
+                $495/mo
+              </span>
+            </Link>
+            <Link
               href="/pricing"
               className="inline-flex min-h-12 items-center justify-center rounded-full border border-slate-200 bg-white/80 px-7 text-sm font-semibold text-slate-700 backdrop-blur-sm transition hover:border-[#2490ed]/50 hover:text-[#146fc2] focus-visible:ring-2 focus-visible:ring-[#2490ed]/35 focus-visible:outline-none motion-safe:hover:-translate-y-0.5"
-              >
+            >
               View pricing
-              </Link>
-            </motion.div>
+            </Link>
+          </motion.div>
 
           <motion.p
             className="mt-4 text-xs text-slate-400"
@@ -251,7 +258,7 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.9 }}
           >
-            Free courses included. No card needed to start.
+            Free courses included. Business coaching is a separate monthly program.
           </motion.p>
 
           <motion.ul
@@ -265,9 +272,9 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
                 <Check className="h-3.5 w-3.5 text-[#146fc2]" aria-hidden />
                 {item}
               </li>
-              ))}
-            </motion.ul>
-          </motion.div>
+            ))}
+          </motion.ul>
+        </motion.div>
 
         {/* Product panorama: the wow moment */}
         <motion.div
@@ -371,7 +378,7 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
                   +2.0 CEC hours added
                 </p>
                 <p className="text-[10px] text-slate-400">Logged to your record automatically</p>
-        </div>
+              </div>
             </motion.div>
           </motion.div>
         </motion.div>
@@ -469,8 +476,8 @@ export function AnimatedSection({
                   : 'max-w-3xl font-[family-name:var(--font-display)] text-2xl font-semibold tracking-[-0.02em] text-slate-950 md:text-3xl'
               }
             >
-                {title}
-              </h2>
+              {title}
+            </h2>
           </div>
           {rightContent ? <div className="shrink-0">{rightContent}</div> : null}
         </motion.div>

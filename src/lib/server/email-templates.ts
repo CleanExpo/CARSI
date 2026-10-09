@@ -972,15 +972,13 @@ export function renderCcwRoadshowOfferPackEmail(params: {
       paragraphs: [
         `You completed both days of the CARSI x CCW Business Growth Days (${params.eventDates}). Here are your exclusive follow-up offers.`,
         ...(shopifyUrl
-          ? [`Shopify — CCW/CARSI 2 Day In-house Training: open the training product via the button below.`]
+          ? [
+              `Shopify — CCW/CARSI 2 Day In-house Training: open the training product via the button below.`,
+            ]
           : []),
       ],
-      details: [
-        { label: 'Event', value: `${params.eventCity} — ${params.eventDates}` },
-      ],
-      ...(shopifyUrl
-        ? { cta: { label: 'View Shopify training product', href: shopifyUrl } }
-        : {}),
+      details: [{ label: 'Event', value: `${params.eventCity} — ${params.eventDates}` }],
+      ...(shopifyUrl ? { cta: { label: 'View Shopify training product', href: shopifyUrl } } : {}),
       messageHtml: `
         <p style="margin: 20px 0 8px; font-family: ${BRAND.font}; font-size: 14px; font-weight: 600; color: ${BRAND.silverHi};">Stay connected with CCW</p>
         <ul style="margin: 0; padding-left: 18px; font-family: ${BRAND.font}; font-size: 14px; line-height: 1.5; color: ${BRAND.text};">
@@ -992,5 +990,128 @@ export function renderCcwRoadshowOfferPackEmail(params: {
     `Hi ${name},\n\nThanks for completing both days in ${params.eventCity} (${params.eventDates}).\n${
       shopifyUrl ? `\nShopify training product:\n${shopifyUrl}\n` : ''
     }\nStay connected with CCW:\n${socialText}\n`
+  );
+}
+
+export function renderOwnerCircleBookingConfirmationEmail(params: {
+  appOrigin: string;
+  name: string;
+  sessionTitle: string;
+  dateLabel: string;
+  timeLabel: string;
+  venueName: string;
+  venueAddress: string;
+  packageLabel: string;
+  seatCount: number;
+  amountLabel: string;
+  registrationStatus: 'confirmed' | 'waitlisted';
+  businessName?: string;
+  discussionTopic?: string;
+  programUrl: string;
+}): RenderedEmail {
+  const name = params.name.trim() || 'there';
+  const statusLine =
+    params.registrationStatus === 'confirmed'
+      ? 'Your seat is confirmed.'
+      : 'You are on the waitlist — we will email you if a seat opens.';
+  const details = [
+    { label: 'Session', value: params.sessionTitle },
+    { label: 'When', value: `${params.dateLabel} · ${params.timeLabel}` },
+    { label: 'Venue', value: `${params.venueName}, ${params.venueAddress}` },
+    { label: 'Package', value: `${params.packageLabel} (${params.seatCount} seat${params.seatCount === 1 ? '' : 's'})` },
+    { label: 'Paid', value: params.amountLabel },
+    ...(params.businessName ? [{ label: 'Business', value: params.businessName }] : []),
+  ];
+  return render(
+    {
+      appOrigin: params.appOrigin,
+      preheader: 'Your Owner Circle booking is confirmed',
+      eyebrow: 'Owner Circle',
+      title: 'Booking received',
+      paragraphs: [`Hi ${name},`, statusLine, 'Bring your questions — this is a practical owner conversation with Phill McGurk.'],
+      details,
+      ...(params.discussionTopic
+        ? { messageHtml: formatPlainMessageAsHtml(`Topic you raised:\n${params.discussionTopic}`) }
+        : {}),
+      cta: { label: 'View Owner Circle', href: params.programUrl },
+    },
+    `Hi ${name},\n\n${statusLine}\n\n${params.sessionTitle}\n${params.dateLabel} · ${params.timeLabel}\n${params.venueName}, ${params.venueAddress}\n\n${params.programUrl}\n`
+  );
+}
+
+export function renderCarsiCoachingMonthlyWelcomeEmail(params: {
+  appOrigin: string;
+  name: string;
+  amountLabel: string;
+  dashboardUrl: string;
+  coachingPageUrl: string;
+}): RenderedEmail {
+  const name = params.name.trim() || 'there';
+  return render(
+    {
+      appOrigin: params.appOrigin,
+      preheader: 'Your CARSI Business Coaching subscription is active',
+      eyebrow: 'Business Coaching',
+      title: 'Welcome to CARSI Business Coaching',
+      paragraphs: [
+        `Hi ${name},`,
+        'Thank you — your monthly Business Coaching subscription is confirmed. Phill and the CARSI team will email you within one business day with onboarding, your LMS roadmap, and the date for your first monthly planning session.',
+        'Between sessions, work through the steps in your dashboard so each month builds on the last.',
+      ],
+      details: [
+        { label: 'Plan', value: 'CARSI Business Coaching' },
+        { label: 'Billing', value: `${params.amountLabel} (monthly, via Stripe)` },
+      ],
+      cta: { label: 'Open your dashboard', href: params.dashboardUrl },
+      noteHtml: `Program details: ${brandLink(params.coachingPageUrl, 'carsi.com.au/ccw-training')}.`,
+    },
+    `Hi ${name},\n\nYour CARSI Business Coaching subscription is confirmed (${params.amountLabel}/month).\n\nWe will email you within one business day with onboarding and your first monthly session with Phill.\n\nDashboard: ${params.dashboardUrl}\nProgram: ${params.coachingPageUrl}\n`
+  );
+}
+
+export function renderCarsiCoachingMonthlyFounderNotificationEmail(params: {
+  appOrigin: string;
+  contactName: string;
+  contactEmail: string;
+  contactPhone?: string;
+  carsiUserId: string;
+  amountLabel: string;
+  stripeCheckoutSessionId: string;
+  stripeSubscriptionId?: string;
+}): RenderedEmail {
+  const details = [
+    { label: 'Name', value: params.contactName || '—' },
+    { label: 'Email', value: params.contactEmail },
+    ...(params.contactPhone ? [{ label: 'Phone', value: params.contactPhone }] : []),
+    { label: 'CARSI user id', value: params.carsiUserId },
+    { label: 'Amount (checkout)', value: params.amountLabel },
+    { label: 'Stripe Checkout session', value: params.stripeCheckoutSessionId },
+    ...(params.stripeSubscriptionId
+      ? [{ label: 'Stripe subscription', value: params.stripeSubscriptionId }]
+      : []),
+  ];
+
+  return render(
+    {
+      appOrigin: params.appOrigin,
+      preheader: 'New CARSI Business Coaching subscription',
+      eyebrow: 'Founder alert',
+      title: 'New Business Coaching booking',
+      paragraphs: [
+        'A customer completed Stripe checkout for CARSI Business Coaching ($495/month). Full booking details are below.',
+      ],
+      details,
+      cta: {
+        label: 'View coaching page',
+        href: `${params.appOrigin.replace(/\/$/, '')}/ccw-training`,
+      },
+    },
+    [
+      'New CARSI Business Coaching subscription',
+      '',
+      ...details.map((d) => `${d.label}: ${d.value}`),
+      '',
+      `Coaching page: ${params.appOrigin}/ccw-training`,
+    ].join('\n')
   );
 }

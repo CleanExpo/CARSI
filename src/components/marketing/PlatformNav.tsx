@@ -2,7 +2,8 @@ import Link from 'next/link';
 
 export const PLATFORM_NAV = [
   { href: '/restoration-training-cost-australia', label: 'Training costs' },
-  { href: '/ccw-training', label: 'CCW Workshop' },
+  { href: '/ccw-training', label: 'Business Coaching' },
+  { href: '/ccw-training/workshop', label: 'CCW Workshop' },
   { href: '/start-carpet-cleaning-business', label: 'Start Smart' },
   { href: '/authority', label: 'Authority Hub' },
   { href: '/testimonials', label: 'Testimonials' },

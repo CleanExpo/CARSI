@@ -1,6 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 import { Compass, Sparkles, Ticket } from 'lucide-react';
 
+import { carsiCoachingWorkshopPath } from '@/lib/marketing/carsi-coaching-monthly';
 import { ccwRoadshowPath } from '@/lib/marketing/ccw-roadshow';
 import { startSmartBasePath } from '@/lib/marketing/start-smart';
 
@@ -48,4 +49,4 @@ export const homePathwayItems: HomePathwayItem[] = [
   },
 ];
 
-export const ccwWorkshopHref = '/ccw-training';
+export const ccwWorkshopHref = carsiCoachingWorkshopPath;

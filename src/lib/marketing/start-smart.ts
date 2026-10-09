@@ -151,7 +151,7 @@ export const startSmartLeadPaths: StartSmartLeadPath[] = [
     id: 'ccw-workshop',
     title: 'Ask about CCW hands-on workshop support',
     body: 'For learners who need practical equipment, service, chemical and operator decision support connected to CCW training.',
-    href: '/ccw-training?utm_source=start-smart&utm_medium=organic&utm_campaign=ccw_hands_on_workshop',
+    href: '/ccw-training/workshop?utm_source=start-smart&utm_medium=organic&utm_campaign=ccw_hands_on_workshop',
     label: 'View CCW workshop',
     topic: 'CCW hands-on carpet cleaning workshop',
     intent: 'ccw-workshop',
@@ -193,216 +193,280 @@ export const startSmartLeadPathIdsBySlug: Record<string, string[]> = {
   'service-models': ['equipment-service', 'team-buyer', 'courses'],
 };
 
-export const startSmartOperatingConnectionsBySlug: Record<string, StartSmartOperatingConnection[]> = {
-  'no-experience': [
-    {
-      pillar: 'Professional Equipment',
-      impact: 'First-time operators should choose starter equipment only after they know their first job types and access limits.',
-      decision: 'Delay major purchases until the learner can explain method, drying, maintenance and which jobs the machine should not be used on.',
-      evidence: 'A written job profile, supplier questions and a practice record before paid customer work.',
-    },
-    {
-      pillar: 'Service',
-      impact: 'The first service promise should be narrow, low-risk and easy to explain before the operator expands.',
-      decision: 'Define inclusions, exclusions, aftercare and escalation before publishing prices.',
-      evidence: 'A simple service menu with clear boundaries for stains, odour, rugs, upholstery and restoration-adjacent work.',
-    },
-    {
-      pillar: 'Chemicals',
-      impact: 'Beginners need product logic before product volume, because the wrong chemical can damage fibres or trust.',
-      decision: 'Select chemicals only after fibre, soil, stain history, pH, dwell, agitation and rinse have been considered.',
-      evidence: 'A basic product decision tree and notes from practice on sample materials.',
-    },
-    {
-      pillar: 'Training',
-      impact: 'Training is the control layer that turns interest into safer judgement.',
-      decision: 'Complete structured learning before taking paid jobs that involve customer property, difficult stains or unclear risks.',
-      evidence: 'CARSI course progress, practice notes and a list of situations that require help from a senior technician.',
-    },
-  ],
-  'cleaners-adding-carpet-cleaning': [
-    {
-      pillar: 'Professional Equipment',
-      impact: 'Existing cleaners should not assume general cleaning tools translate to carpet results.',
-      decision: 'Choose equipment that matches the add-on service, staff transport, commercial access and drying expectations.',
-      evidence: 'A pilot equipment list matched to residential, bond or commercial maintenance work.',
-    },
-    {
-      pillar: 'Service',
-      impact: 'Carpet cleaning should be sold as a defined add-on, not a vague extra on a general cleaning invoice.',
-      decision: 'Create a pilot offer with intake questions, exclusions and referral rules before rolling it to every customer.',
-      evidence: 'A documented add-on workflow that staff can follow without improvising.',
-    },
-    {
-      pillar: 'Chemicals',
-      impact: 'Carpet chemistry is different from hard-surface cleaning and needs its own product logic.',
-      decision: 'Train staff on fibre, spotting, residue, rinse and safety before they use chemicals in customer homes or facilities.',
-      evidence: 'Product notes, SDS awareness and before-after job records from supervised work.',
-    },
-    {
-      pillar: 'Training',
-      impact: 'Training lets an existing cleaning team add revenue without weakening trust.',
-      decision: 'Nominate a lead operator first, then scale the service after method and quality checks are stable.',
-      evidence: 'Lead operator completion records, team checklist adoption and callback tracking.',
-    },
-  ],
-  'buying-a-cleaning-business': [
-    {
-      pillar: 'Professional Equipment',
-      impact: 'Equipment value only matters if it suits the revenue being purchased and is maintained well enough to keep earning.',
-      decision: 'Audit condition, service history, consumables and fit for the claimed service mix before valuation.',
-      evidence: 'A due diligence equipment register with maintenance notes and replacement risk.',
-    },
-    {
-      pillar: 'Service',
-      impact: 'A buyer needs to know whether revenue comes from repeatable services or from seller-dependent know-how.',
-      decision: 'Map every service line to staff capability, margin, contracts, complaint history and handover risk.',
-      evidence: 'A service capability matrix tied to revenue, staff names or roles, and customer expectations.',
-    },
-    {
-      pillar: 'Chemicals',
-      impact: 'Chemical practices can reveal hidden quality, safety or documentation risk in an acquisition.',
-      decision: 'Review product range, SDS access, dilution habits, stain promises and how technicians document method choice.',
-      evidence: 'Chemical inventory, SDS folder, job notes and callback evidence.',
-    },
-    {
-      pillar: 'Training',
-      impact: 'Training records show whether the business has transferable capability after the seller leaves.',
-      decision: 'Treat missing training evidence as an operational risk and build a 90-day upskill plan into the acquisition.',
-      evidence: 'Certificates, CARSI/IICRC records, staff interviews and post-acquisition training milestones.',
-    },
-  ],
-  'equipment-before-you-buy': [
-    {
-      pillar: 'Professional Equipment',
-      impact: 'This page is the equipment gate: the machine has to fit the service, not the other way around.',
-      decision: 'Buy only after target jobs, access, power, water, transport, drying and maintenance are understood.',
-      evidence: 'A written equipment brief comparing must-have tools, later upgrades and jobs to avoid.',
-    },
-    {
-      pillar: 'Service',
-      impact: 'The service model decides whether a portable, truckmount, spotter, agitation tool or encapsulation setup makes sense.',
-      decision: 'Define the first three services before speaking to suppliers or accepting bundle recommendations.',
-      evidence: 'A service-to-method map for residential, commercial, upholstery, odour or restoration-adjacent work.',
-    },
-    {
-      pillar: 'Chemicals',
-      impact: 'Equipment performance depends on compatible chemistry, dwell, agitation, extraction and rinse.',
-      decision: 'Check chemical compatibility and residue controls before choosing the machine and accessories.',
-      evidence: 'Supplier questions covering chemical range, training needs and method limits.',
-    },
-    {
-      pillar: 'Training',
-      impact: 'Training helps the buyer understand what sales brochures leave out.',
-      decision: 'Use CARSI learning to separate genuine operating needs from marketing claims.',
-      evidence: 'Course notes that explain method choice, maintenance, risk and customer communication.',
-    },
-  ],
-  'chemistry-for-beginners': [
-    {
-      pillar: 'Professional Equipment',
-      impact: 'Chemistry changes how equipment is used, rinsed and maintained.',
-      decision: 'Choose tools and processes that support the products, fibres and rinse standards required by the job.',
-      evidence: 'Method notes linking product, dilution, dwell, agitation, rinse and drying.',
-    },
-    {
-      pillar: 'Service',
-      impact: 'The service promise must match what chemistry can safely achieve.',
-      decision: 'Qualify stain, odour and restoration promises before the customer hears a guarantee.',
-      evidence: 'Customer intake and limitation wording for common stains, fibres and sensitivities.',
-    },
-    {
-      pillar: 'Chemicals',
-      impact: 'This page is the chemical decision gate: product choice follows inspection, not habit.',
-      decision: 'Assess fibre, soil, stain history, pH, dwell, agitation, rinse, safety and sensitivity before applying product.',
-      evidence: 'A chemical decision tree, SDS access and documented product choices.',
-    },
-    {
-      pillar: 'Training',
-      impact: 'Training keeps chemical selection from becoming trial and error on customer property.',
-      decision: 'Practise and learn the logic before using stronger products or promising difficult outcomes.',
-      evidence: 'CARSI learning records and supervised practice on sample materials.',
-    },
-  ],
-  'quoting-and-pricing': [
-    {
-      pillar: 'Professional Equipment',
-      impact: 'Pricing must recover the real cost of equipment ownership, transport, setup, consumables and maintenance.',
-      decision: 'Include equipment time and limitations in the quote instead of pricing only by room count.',
-      evidence: 'A quote checklist that includes setup, pack-down, drying and access constraints.',
-    },
-    {
-      pillar: 'Service',
-      impact: 'The quote is the written version of the service promise.',
-      decision: 'Separate base service, add-ons, exclusions and escalation before the customer approves work.',
-      evidence: 'Quote templates with inclusions, exclusions, aftercare and limitation language.',
-    },
-    {
-      pillar: 'Chemicals',
-      impact: 'Chemical complexity changes cost, risk and customer expectations.',
-      decision: 'Price spotting, odour, residue, sensitivity and special product requirements separately when needed.',
-      evidence: 'Job notes showing product choice, dilution, dwell and extra risk factors.',
-    },
-    {
-      pillar: 'Training',
-      impact: 'Training supports confident explanations that justify professional pricing.',
-      decision: 'Use technical understanding to compete on trust and process, not only cheap prices.',
-      evidence: 'Credentials, clear inspection language and tracked margins from early jobs.',
-    },
-  ],
-  'certification-and-trust': [
-    {
-      pillar: 'Professional Equipment',
-      impact: 'Customers trust equipment more when the operator can explain why it is suitable.',
-      decision: 'Avoid using machine ownership as a substitute for competence.',
-      evidence: 'Visible training records and plain-English method explanations.',
-    },
-    {
-      pillar: 'Service',
-      impact: 'Trust is earned when the service promise is honest about limits, credentials and local requirements.',
-      decision: 'Present CARSI, CECs and IICRC CEC Accredited learning accurately without overstating legal status.',
-      evidence: 'Website, quote and credential wording that avoids licence or RTO confusion.',
-    },
-    {
-      pillar: 'Chemicals',
-      impact: 'Chemical safety and limitation language is a trust signal, especially for homes, facilities and sensitive occupants.',
-      decision: 'Explain product choices and safety controls without making unsupported stain or health claims.',
-      evidence: 'SDS awareness, customer notes and documented limitations.',
-    },
-    {
-      pillar: 'Training',
-      impact: 'This page is the trust gate: education must be visible, accurate and applied.',
-      decision: 'Keep certificates, continuing education and credential records available for customers, employers and buyers.',
-      evidence: 'CARSI records, IICRC CEC references and public credential verification where applicable.',
-    },
-  ],
-  'service-models': [
-    {
-      pillar: 'Professional Equipment',
-      impact: 'Each service model needs a different equipment profile.',
-      decision: 'Match tools to residential, commercial, upholstery, rug, odour or restoration-adjacent work before expanding.',
-      evidence: 'A service-to-equipment matrix with must-have tools and deferred upgrades.',
-    },
-    {
-      pillar: 'Service',
-      impact: 'This page is the service gate: the niche defines the promise and risk.',
-      decision: 'Choose one primary model and one add-on before trying to sell every service at once.',
-      evidence: 'A 90-day service menu with boundaries, aftercare and referral rules.',
-    },
-    {
-      pillar: 'Chemicals',
-      impact: 'Different service models change chemical range, safety controls and documentation.',
-      decision: 'Select products for the chosen niche instead of carrying a broad range with unclear use cases.',
-      evidence: 'Product notes linked to each service model and job type.',
-    },
-    {
-      pillar: 'Training',
-      impact: 'Training decides when a service model is ready to sell and when it needs escalation.',
-      decision: 'Close knowledge gaps before adding rugs, upholstery, odour, commercial maintenance or restoration-adjacent work.',
-      evidence: 'A staged learning plan tied to each service expansion.',
-    },
-  ],
-};
+export const startSmartOperatingConnectionsBySlug: Record<string, StartSmartOperatingConnection[]> =
+  {
+    'no-experience': [
+      {
+        pillar: 'Professional Equipment',
+        impact:
+          'First-time operators should choose starter equipment only after they know their first job types and access limits.',
+        decision:
+          'Delay major purchases until the learner can explain method, drying, maintenance and which jobs the machine should not be used on.',
+        evidence:
+          'A written job profile, supplier questions and a practice record before paid customer work.',
+      },
+      {
+        pillar: 'Service',
+        impact:
+          'The first service promise should be narrow, low-risk and easy to explain before the operator expands.',
+        decision:
+          'Define inclusions, exclusions, aftercare and escalation before publishing prices.',
+        evidence:
+          'A simple service menu with clear boundaries for stains, odour, rugs, upholstery and restoration-adjacent work.',
+      },
+      {
+        pillar: 'Chemicals',
+        impact:
+          'Beginners need product logic before product volume, because the wrong chemical can damage fibres or trust.',
+        decision:
+          'Select chemicals only after fibre, soil, stain history, pH, dwell, agitation and rinse have been considered.',
+        evidence: 'A basic product decision tree and notes from practice on sample materials.',
+      },
+      {
+        pillar: 'Training',
+        impact: 'Training is the control layer that turns interest into safer judgement.',
+        decision:
+          'Complete structured learning before taking paid jobs that involve customer property, difficult stains or unclear risks.',
+        evidence:
+          'CARSI course progress, practice notes and a list of situations that require help from a senior technician.',
+      },
+    ],
+    'cleaners-adding-carpet-cleaning': [
+      {
+        pillar: 'Professional Equipment',
+        impact:
+          'Existing cleaners should not assume general cleaning tools translate to carpet results.',
+        decision:
+          'Choose equipment that matches the add-on service, staff transport, commercial access and drying expectations.',
+        evidence:
+          'A pilot equipment list matched to residential, bond or commercial maintenance work.',
+      },
+      {
+        pillar: 'Service',
+        impact:
+          'Carpet cleaning should be sold as a defined add-on, not a vague extra on a general cleaning invoice.',
+        decision:
+          'Create a pilot offer with intake questions, exclusions and referral rules before rolling it to every customer.',
+        evidence: 'A documented add-on workflow that staff can follow without improvising.',
+      },
+      {
+        pillar: 'Chemicals',
+        impact:
+          'Carpet chemistry is different from hard-surface cleaning and needs its own product logic.',
+        decision:
+          'Train staff on fibre, spotting, residue, rinse and safety before they use chemicals in customer homes or facilities.',
+        evidence: 'Product notes, SDS awareness and before-after job records from supervised work.',
+      },
+      {
+        pillar: 'Training',
+        impact: 'Training lets an existing cleaning team add revenue without weakening trust.',
+        decision:
+          'Nominate a lead operator first, then scale the service after method and quality checks are stable.',
+        evidence:
+          'Lead operator completion records, team checklist adoption and callback tracking.',
+      },
+    ],
+    'buying-a-cleaning-business': [
+      {
+        pillar: 'Professional Equipment',
+        impact:
+          'Equipment value only matters if it suits the revenue being purchased and is maintained well enough to keep earning.',
+        decision:
+          'Audit condition, service history, consumables and fit for the claimed service mix before valuation.',
+        evidence: 'A due diligence equipment register with maintenance notes and replacement risk.',
+      },
+      {
+        pillar: 'Service',
+        impact:
+          'A buyer needs to know whether revenue comes from repeatable services or from seller-dependent know-how.',
+        decision:
+          'Map every service line to staff capability, margin, contracts, complaint history and handover risk.',
+        evidence:
+          'A service capability matrix tied to revenue, staff names or roles, and customer expectations.',
+      },
+      {
+        pillar: 'Chemicals',
+        impact:
+          'Chemical practices can reveal hidden quality, safety or documentation risk in an acquisition.',
+        decision:
+          'Review product range, SDS access, dilution habits, stain promises and how technicians document method choice.',
+        evidence: 'Chemical inventory, SDS folder, job notes and callback evidence.',
+      },
+      {
+        pillar: 'Training',
+        impact:
+          'Training records show whether the business has transferable capability after the seller leaves.',
+        decision:
+          'Treat missing training evidence as an operational risk and build a 90-day upskill plan into the acquisition.',
+        evidence:
+          'Certificates, CARSI/IICRC records, staff interviews and post-acquisition training milestones.',
+      },
+    ],
+    'equipment-before-you-buy': [
+      {
+        pillar: 'Professional Equipment',
+        impact:
+          'This page is the equipment gate: the machine has to fit the service, not the other way around.',
+        decision:
+          'Buy only after target jobs, access, power, water, transport, drying and maintenance are understood.',
+        evidence:
+          'A written equipment brief comparing must-have tools, later upgrades and jobs to avoid.',
+      },
+      {
+        pillar: 'Service',
+        impact:
+          'The service model decides whether a portable, truckmount, spotter, agitation tool or encapsulation setup makes sense.',
+        decision:
+          'Define the first three services before speaking to suppliers or accepting bundle recommendations.',
+        evidence:
+          'A service-to-method map for residential, commercial, upholstery, odour or restoration-adjacent work.',
+      },
+      {
+        pillar: 'Chemicals',
+        impact:
+          'Equipment performance depends on compatible chemistry, dwell, agitation, extraction and rinse.',
+        decision:
+          'Check chemical compatibility and residue controls before choosing the machine and accessories.',
+        evidence: 'Supplier questions covering chemical range, training needs and method limits.',
+      },
+      {
+        pillar: 'Training',
+        impact: 'Training helps the buyer understand what sales brochures leave out.',
+        decision: 'Use CARSI learning to separate genuine operating needs from marketing claims.',
+        evidence:
+          'Course notes that explain method choice, maintenance, risk and customer communication.',
+      },
+    ],
+    'chemistry-for-beginners': [
+      {
+        pillar: 'Professional Equipment',
+        impact: 'Chemistry changes how equipment is used, rinsed and maintained.',
+        decision:
+          'Choose tools and processes that support the products, fibres and rinse standards required by the job.',
+        evidence: 'Method notes linking product, dilution, dwell, agitation, rinse and drying.',
+      },
+      {
+        pillar: 'Service',
+        impact: 'The service promise must match what chemistry can safely achieve.',
+        decision:
+          'Qualify stain, odour and restoration promises before the customer hears a guarantee.',
+        evidence:
+          'Customer intake and limitation wording for common stains, fibres and sensitivities.',
+      },
+      {
+        pillar: 'Chemicals',
+        impact:
+          'This page is the chemical decision gate: product choice follows inspection, not habit.',
+        decision:
+          'Assess fibre, soil, stain history, pH, dwell, agitation, rinse, safety and sensitivity before applying product.',
+        evidence: 'A chemical decision tree, SDS access and documented product choices.',
+      },
+      {
+        pillar: 'Training',
+        impact:
+          'Training keeps chemical selection from becoming trial and error on customer property.',
+        decision:
+          'Practise and learn the logic before using stronger products or promising difficult outcomes.',
+        evidence: 'CARSI learning records and supervised practice on sample materials.',
+      },
+    ],
+    'quoting-and-pricing': [
+      {
+        pillar: 'Professional Equipment',
+        impact:
+          'Pricing must recover the real cost of equipment ownership, transport, setup, consumables and maintenance.',
+        decision:
+          'Include equipment time and limitations in the quote instead of pricing only by room count.',
+        evidence:
+          'A quote checklist that includes setup, pack-down, drying and access constraints.',
+      },
+      {
+        pillar: 'Service',
+        impact: 'The quote is the written version of the service promise.',
+        decision:
+          'Separate base service, add-ons, exclusions and escalation before the customer approves work.',
+        evidence: 'Quote templates with inclusions, exclusions, aftercare and limitation language.',
+      },
+      {
+        pillar: 'Chemicals',
+        impact: 'Chemical complexity changes cost, risk and customer expectations.',
+        decision:
+          'Price spotting, odour, residue, sensitivity and special product requirements separately when needed.',
+        evidence: 'Job notes showing product choice, dilution, dwell and extra risk factors.',
+      },
+      {
+        pillar: 'Training',
+        impact: 'Training supports confident explanations that justify professional pricing.',
+        decision:
+          'Use technical understanding to compete on trust and process, not only cheap prices.',
+        evidence: 'Credentials, clear inspection language and tracked margins from early jobs.',
+      },
+    ],
+    'certification-and-trust': [
+      {
+        pillar: 'Professional Equipment',
+        impact: 'Customers trust equipment more when the operator can explain why it is suitable.',
+        decision: 'Avoid using machine ownership as a substitute for competence.',
+        evidence: 'Visible training records and plain-English method explanations.',
+      },
+      {
+        pillar: 'Service',
+        impact:
+          'Trust is earned when the service promise is honest about limits, credentials and local requirements.',
+        decision:
+          'Present CARSI, CECs and IICRC CEC Accredited learning accurately without overstating legal status.',
+        evidence: 'Website, quote and credential wording that avoids licence or RTO confusion.',
+      },
+      {
+        pillar: 'Chemicals',
+        impact:
+          'Chemical safety and limitation language is a trust signal, especially for homes, facilities and sensitive occupants.',
+        decision:
+          'Explain product choices and safety controls without making unsupported stain or health claims.',
+        evidence: 'SDS awareness, customer notes and documented limitations.',
+      },
+      {
+        pillar: 'Training',
+        impact: 'This page is the trust gate: education must be visible, accurate and applied.',
+        decision:
+          'Keep certificates, continuing education and credential records available for customers, employers and buyers.',
+        evidence:
+          'CARSI records, IICRC CEC references and public credential verification where applicable.',
+      },
+    ],
+    'service-models': [
+      {
+        pillar: 'Professional Equipment',
+        impact: 'Each service model needs a different equipment profile.',
+        decision:
+          'Match tools to residential, commercial, upholstery, rug, odour or restoration-adjacent work before expanding.',
+        evidence: 'A service-to-equipment matrix with must-have tools and deferred upgrades.',
+      },
+      {
+        pillar: 'Service',
+        impact: 'This page is the service gate: the niche defines the promise and risk.',
+        decision:
+          'Choose one primary model and one add-on before trying to sell every service at once.',
+        evidence: 'A 90-day service menu with boundaries, aftercare and referral rules.',
+      },
+      {
+        pillar: 'Chemicals',
+        impact:
+          'Different service models change chemical range, safety controls and documentation.',
+        decision:
+          'Select products for the chosen niche instead of carrying a broad range with unclear use cases.',
+        evidence: 'Product notes linked to each service model and job type.',
+      },
+      {
+        pillar: 'Training',
+        impact:
+          'Training decides when a service model is ready to sell and when it needs escalation.',
+        decision:
+          'Close knowledge gaps before adding rugs, upholstery, odour, commercial maintenance or restoration-adjacent work.',
+        evidence: 'A staged learning plan tied to each service expansion.',
+      },
+    ],
+  };
 
 export const startSmartSources = {
   iicrcCct: {
@@ -452,9 +516,12 @@ export const startSmartPages: StartSmartPage[] = [
       'A practical CARSI pathway for people exploring carpet cleaning as a low-barrier service business before they buy equipment or take paid jobs.',
     directAnswer:
       'You can start learning carpet cleaning without prior experience, but you should understand fibres, soil, chemistry, equipment limits, quoting and safety before taking customer work.',
-    audience: 'New starters, career changers, side-hustle operators and people researching low-cost service businesses.',
-    intent: 'Help beginners move from interest to informed action without selling them a get-rich-quick promise.',
-    outcome: 'Know what to learn first, what to practise, what equipment questions to ask and when to seek hands-on mentoring.',
+    audience:
+      'New starters, career changers, side-hustle operators and people researching low-cost service businesses.',
+    intent:
+      'Help beginners move from interest to informed action without selling them a get-rich-quick promise.',
+    outcome:
+      'Know what to learn first, what to practise, what equipment questions to ask and when to seek hands-on mentoring.',
     risks: [
       'Buying a machine before understanding job types, fibre risks or chemical limits.',
       'Underquoting jobs because setup, drying, travel, spotting and callbacks are not priced.',
@@ -519,9 +586,11 @@ export const startSmartPages: StartSmartPage[] = [
       'A CARSI guide for house cleaners, bond cleaners, commercial cleaners and facility teams who want to add carpet cleaning safely.',
     directAnswer:
       'Existing cleaners have a strong advantage because they already have customers, but carpet cleaning adds fibre, chemistry, equipment and liability decisions that general cleaning does not cover.',
-    audience: 'Residential cleaners, bond cleaners, commercial cleaners, janitorial operators and facility teams.',
+    audience:
+      'Residential cleaners, bond cleaners, commercial cleaners, janitorial operators and facility teams.',
     intent: 'Convert existing cleaning audiences into educated carpet cleaning upskill leads.',
-    outcome: 'Add carpet cleaning as a service without guessing at chemistry, pricing, equipment or job boundaries.',
+    outcome:
+      'Add carpet cleaning as a service without guessing at chemistry, pricing, equipment or job boundaries.',
     risks: [
       'Treating carpet like a general surface and using the wrong product or method.',
       'Adding a service before staff know inspection, pre-test and customer disclosure steps.',
@@ -586,8 +655,10 @@ export const startSmartPages: StartSmartPage[] = [
       'A due diligence guide for buyers assessing a carpet cleaning, commercial cleaning or restoration business before purchase.',
     directAnswer:
       'Before buying a cleaning or carpet cleaning business, assess not only revenue and equipment, but also staff skill, repeat work, training records, methods, liabilities and whether the owner is the real operating system.',
-    audience: 'Business buyers, investors, operators acquiring a local cleaning company and family buyers considering a small service business.',
-    intent: 'Insert CARSI as a trusted education checkpoint in the business sales and acquisition journey.',
+    audience:
+      'Business buyers, investors, operators acquiring a local cleaning company and family buyers considering a small service business.',
+    intent:
+      'Insert CARSI as a trusted education checkpoint in the business sales and acquisition journey.',
     outcome: 'Know which operational and training questions to ask before signing a deal.',
     risks: [
       'Buying revenue that depends entirely on the seller or one technician.',
@@ -631,7 +702,11 @@ export const startSmartPages: StartSmartPage[] = [
           'CARSI can support post-acquisition upskilling by giving staff a common education baseline in cleaning and restoration topics.',
       },
     ],
-    sources: [startSmartSources.aspireBuying, startSmartSources.serviceMonsterProfit, startSmartSources.iicrcCct],
+    sources: [
+      startSmartSources.aspireBuying,
+      startSmartSources.serviceMonsterProfit,
+      startSmartSources.iicrcCct,
+    ],
     keywords: [
       'buy carpet cleaning business due diligence',
       'buy cleaning business training',
@@ -648,9 +723,12 @@ export const startSmartPages: StartSmartPage[] = [
       'A beginner equipment guide that helps new operators understand job type, method, chemistry and training before purchasing machinery.',
     directAnswer:
       'The best carpet cleaning equipment depends on the work you plan to do. Beginners should learn methods, job types, fibre risks, chemistry and maintenance before buying extractors, spotters, rotary machines or truckmounts.',
-    audience: 'Prospective operators comparing machines, chemicals, accessories and startup packages.',
-    intent: 'Capture equipment research traffic and route it toward education before purchase decisions.',
-    outcome: 'Ask better equipment questions and avoid buying machinery that does not fit your first market.',
+    audience:
+      'Prospective operators comparing machines, chemicals, accessories and startup packages.',
+    intent:
+      'Capture equipment research traffic and route it toward education before purchase decisions.',
+    outcome:
+      'Ask better equipment questions and avoid buying machinery that does not fit your first market.',
     risks: [
       'Buying for power or price instead of target job type.',
       'Ignoring maintenance, transport, electrical, water access and drying constraints.',
@@ -673,7 +751,7 @@ export const startSmartPages: StartSmartPage[] = [
     cta: {
       title: 'Learn the work before the machine',
       body: 'A machine is only useful when the operator understands why, when and how to use it.',
-      href: '/ccw-training',
+      href: '/ccw-training/workshop',
       label: 'View CCW-linked training',
     },
     faqs: [
@@ -715,9 +793,11 @@ export const startSmartPages: StartSmartPage[] = [
       'A beginner-friendly guide to why carpet cleaning chemistry matters before paid work, equipment purchases or chemical selection.',
     directAnswer:
       'Carpet cleaning chemistry matters because soil, fibre, stain type, pH, dwell time, agitation and rinsing all affect whether a job is safe, effective and profitable.',
-    audience: 'New operators, cleaners adding carpet cleaning and staff who need a practical language for chemical decisions.',
+    audience:
+      'New operators, cleaners adding carpet cleaning and staff who need a practical language for chemical decisions.',
     intent: 'Own beginner chemistry searches with a clear, safe, non-hype CARSI resource.',
-    outcome: 'Understand why products are not interchangeable and why inspection comes before chemical choice.',
+    outcome:
+      'Understand why products are not interchangeable and why inspection comes before chemical choice.',
     risks: [
       'Using a strong product because it worked on a different surface or stain.',
       'Leaving residue that attracts soil or creates customer complaints.',
@@ -760,7 +840,11 @@ export const startSmartPages: StartSmartPage[] = [
           'No. Job conditions vary. Fibre, soil, stain history, odour, customer sensitivity and method all influence product selection.',
       },
     ],
-    sources: [startSmartSources.iicrcCct, startSmartSources.issaTraining, startSmartSources.ccwOnline],
+    sources: [
+      startSmartSources.iicrcCct,
+      startSmartSources.issaTraining,
+      startSmartSources.ccwOnline,
+    ],
     keywords: [
       'carpet cleaning chemistry for beginners',
       'carpet cleaning pH training',
@@ -777,9 +861,11 @@ export const startSmartPages: StartSmartPage[] = [
       'A practical quoting guide for new carpet cleaners who need to price time, risk, setup, travel, drying, spotting and customer expectations.',
     directAnswer:
       'A good carpet cleaning quote prices the job scope, access, soil level, spotting risk, travel, setup, drying expectations, chemicals and aftercare - not just the number of rooms.',
-    audience: 'New owners, side-hustle operators, cleaners adding carpet services and business buyers reviewing service menus.',
+    audience:
+      'New owners, side-hustle operators, cleaners adding carpet services and business buyers reviewing service menus.',
     intent: 'Capture commercial intent around pricing and route it into CARSI business training.',
-    outcome: 'Build a quote that protects margin and sets customer expectations before work begins.',
+    outcome:
+      'Build a quote that protects margin and sets customer expectations before work begins.',
     risks: [
       'Charging per room without accounting for soil, access, stains, furniture or travel.',
       'Promising stain or odour outcomes that should have been qualified.',
@@ -839,9 +925,12 @@ export const startSmartPages: StartSmartPage[] = [
       'A practical explanation of carpet cleaning certification, continuing education and customer trust for new or growing operators.',
     directAnswer:
       'Many places do not require a formal licence just to clean carpets, but training and recognised education help build customer trust, improve decisions and support commercial or insurer-facing work.',
-    audience: 'Beginners, cleaners, employers, property managers and buyers comparing training options.',
-    intent: 'Answer certification questions without overstating CARSI as an RTO or licence provider.',
-    outcome: 'Understand the difference between legal permission, professional education, CECs and customer trust.',
+    audience:
+      'Beginners, cleaners, employers, property managers and buyers comparing training options.',
+    intent:
+      'Answer certification questions without overstating CARSI as an RTO or licence provider.',
+    outcome:
+      'Understand the difference between legal permission, professional education, CECs and customer trust.',
     risks: [
       'Assuming no licence means no training is needed.',
       'Overclaiming credentials or confusing CECs with nationally accredited VET qualifications.',
@@ -901,9 +990,11 @@ export const startSmartPages: StartSmartPage[] = [
       'A guide to carpet cleaning service models and the training questions behind residential, commercial, upholstery, rug, odour and restoration-adjacent work.',
     directAnswer:
       'Carpet cleaning is not one business model. Residential rooms, commercial maintenance, upholstery, rugs, odour, pet issues and restoration-adjacent jobs each need different training, equipment, quoting and risk controls.',
-    audience: 'Starters choosing a niche, cleaners expanding services and business buyers reviewing growth options.',
+    audience:
+      'Starters choosing a niche, cleaners expanding services and business buyers reviewing growth options.',
     intent: 'Help CARSI appear for broad business-model and niche-selection queries.',
-    outcome: 'Choose a first service model based on skill, market, equipment, risk and repeatability.',
+    outcome:
+      'Choose a first service model based on skill, market, equipment, risk and repeatability.',
     risks: [
       'Trying every service too early and becoming average at all of them.',
       'Taking restoration-adjacent work without moisture, drying or microbial knowledge.',
@@ -946,7 +1037,11 @@ export const startSmartPages: StartSmartPage[] = [
           'A focused niche helps you buy suitable equipment, train properly, quote consistently and market with clearer promises.',
       },
     ],
-    sources: [startSmartSources.serviceMonsterProfit, startSmartSources.iicrcCct, startSmartSources.issaTraining],
+    sources: [
+      startSmartSources.serviceMonsterProfit,
+      startSmartSources.iicrcCct,
+      startSmartSources.issaTraining,
+    ],
     keywords: [
       'carpet cleaning business models',
       'residential carpet cleaning business',

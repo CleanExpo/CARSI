@@ -36,7 +36,7 @@
 import { pathToFileURL } from 'node:url';
 
 /** Sessions carrying this metadata source are booked through a different flow, not enrolments. */
-const NON_ENROLMENT_SOURCES = new Set(['carsi-ccw-roadshow']);
+const NON_ENROLMENT_SOURCES = new Set(['carsi-ccw-roadshow', 'carsi-business-coaching']);
 
 /**
  * Enrolment statuses that actually grant access. Mirrors ACCESS_GRANTING_STATUS_LIST in

@@ -15,7 +15,6 @@ import {
   type RoadshowEmailKind,
 } from '@/lib/server/ccw-roadshow-registration-email';
 import { isEmailConfigured, sendEmail, type SendEmailResult } from '@/lib/server/email';
-import { isProvisionalPasswordHash } from '@/lib/server/lms-auth';
 import { buildUnsubscribeUrl } from '@/lib/server/email-preferences';
 import {
   renderAdminPasswordResetEmail,
@@ -30,9 +29,13 @@ import {
   renderRegistrationWelcomeEmail,
   renderTeamMemberAddedEmail,
   renderToolboxTalkEmail,
+  renderOwnerCircleBookingConfirmationEmail,
   renderYearlyMembershipEmail,
 } from '@/lib/server/email-templates';
+import type { BusinessCoachingSession } from '@/lib/marketing/business-coaching';
+import { businessCoachingPath } from '@/lib/marketing/business-coaching';
 import { getFirstLessonLearnPath } from '@/lib/server/first-lesson';
+import { isProvisionalPasswordHash } from '@/lib/server/lms-auth';
 
 export { isEmailConfigured };
 export type { SendEmailResult };
@@ -605,6 +608,45 @@ export async function sendContactReplyEmail(params: {
       process.env.ADMIN_EMAIL?.trim() ||
       'support@carsi.com.au',
     subject: ref ? `Re: your enquiry to CARSI [#${ref}]` : 'Re: your enquiry to CARSI',
+    html,
+    text,
+  });
+}
+
+export async function sendBusinessCoachingConfirmationEmail(params: {
+  to: string;
+  attendeeName: string;
+  session: BusinessCoachingSession;
+  packageLabel: string;
+  seatCount: number;
+  amountLabel: string;
+  registrationStatus: 'confirmed' | 'waitlisted';
+  businessName?: string;
+  phone?: string;
+  discussionTopic?: string;
+  appOrigin: string;
+}): Promise<SendEmailResult> {
+  const base = params.appOrigin.replace(/\/$/, '');
+  const { html, text } = renderOwnerCircleBookingConfirmationEmail({
+    appOrigin: base,
+    name: params.attendeeName,
+    sessionTitle: params.session.title,
+    dateLabel: params.session.dateLabel,
+    timeLabel: params.session.timeLabel,
+    venueName: params.session.venueName,
+    venueAddress: params.session.venueAddress,
+    packageLabel: params.packageLabel,
+    seatCount: params.seatCount,
+    amountLabel: params.amountLabel,
+    registrationStatus: params.registrationStatus,
+    businessName: params.businessName,
+    discussionTopic: params.discussionTopic,
+    programUrl: `${base}${businessCoachingPath}`,
+  });
+
+  return sendEmail({
+    to: params.to,
+    subject: `Owner Circle booking — ${params.session.monthLabel}`,
     html,
     text,
   });

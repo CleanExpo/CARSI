@@ -26,7 +26,8 @@ const staticPages = [
   { path: '/avian-influenza-readiness', priority: 0.92, changeFreq: 'daily' as const },
   { path: '/pathways', priority: 0.8, changeFreq: 'weekly' as const },
   { path: '/industries', priority: 0.8, changeFreq: 'monthly' as const },
-  { path: '/ccw-training', priority: 0.78, changeFreq: 'weekly' as const },
+  { path: '/ccw-training', priority: 0.82, changeFreq: 'weekly' as const },
+  { path: '/ccw-training/workshop', priority: 0.72, changeFreq: 'monthly' as const },
   { path: '/ccw-truckmount-operations', priority: 0.78, changeFreq: 'weekly' as const },
   { path: '/ccw-materials', priority: 0.72, changeFreq: 'monthly' as const },
   { path: '/calendar', priority: 0.7, changeFreq: 'weekly' as const },
@@ -141,9 +142,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const courseEntries: MetadataRoute.Sitemap = courses.map((course) => ({
     url: `${baseUrl}/courses/${course.slug}`,
     lastModified:
-      'updated_at' in course && course.updated_at
-        ? new Date(course.updated_at)
-        : STATIC_LASTMOD,
+      'updated_at' in course && course.updated_at ? new Date(course.updated_at) : STATIC_LASTMOD,
     changeFrequency: 'weekly' as const,
     priority: 0.8,
   }));
