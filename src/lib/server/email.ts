@@ -31,8 +31,22 @@ export type SendEmailResult = {
 
 const MAILTRAP_SEND_URL = 'https://send.api.mailtrap.io/api/send';
 
+/** Mailtrap Sending API credential — use `MAILTRAP_API_KEY` in `.env` (not `MAILTRAP_API_TOKEN`). */
+export function getMailtrapApiKey(): string | undefined {
+  const key = process.env.MAILTRAP_API_KEY?.trim();
+  if (key) return key;
+  const legacy = process.env.MAILTRAP_API_TOKEN?.trim();
+  if (legacy) {
+    console.warn(
+      '[email] MAILTRAP_API_TOKEN is deprecated — rename to MAILTRAP_API_KEY in your .env'
+    );
+    return legacy;
+  }
+  return undefined;
+}
+
 export function isEmailConfigured(): boolean {
-  return Boolean(process.env.MAILTRAP_API_KEY?.trim());
+  return Boolean(getMailtrapApiKey());
 }
 
 function devConsoleEnabled(): boolean {
@@ -110,7 +124,7 @@ function guessMimeType(filename: string): string | undefined {
 }
 
 export async function sendEmail(params: SendEmailParams): Promise<SendEmailResult> {
-  const apiKey = process.env.MAILTRAP_API_KEY?.trim();
+  const apiKey = getMailtrapApiKey();
   const from = resolveFromAddress();
   const to = Array.isArray(params.to) ? params.to : [params.to];
 
@@ -119,12 +133,7 @@ export async function sendEmail(params: SendEmailParams): Promise<SendEmailResul
       logDevConsoleEmail(params);
       return { sent: true, reason: 'dev_console' };
     }
-    console.warn(
-      '[email] MAILTRAP_API_KEY not set — skipped:',
-      params.subject,
-      '→',
-      to.join(', ')
-    );
+    console.warn('[email] MAILTRAP_API_KEY not set — skipped:', params.subject, '→', to.join(', '));
     return { sent: false, reason: 'not_configured' };
   }
 
@@ -147,9 +156,7 @@ export async function sendEmail(params: SendEmailParams): Promise<SendEmailResul
   if (params.attachments?.length) {
     payload.attachments = params.attachments.map((a) => {
       const content =
-        typeof a.content === 'string'
-          ? a.content
-          : Buffer.from(a.content).toString('base64');
+        typeof a.content === 'string' ? a.content : Buffer.from(a.content).toString('base64');
       const mimeType = guessMimeType(a.filename);
       return {
         filename: a.filename,
@@ -180,8 +187,7 @@ export async function sendEmail(params: SendEmailParams): Promise<SendEmailResul
     }
 
     if (!res.ok || parsed.success === false) {
-      const errDetail =
-        parsed.errors?.join('; ') || bodyText || `HTTP ${res.status}`;
+      const errDetail = parsed.errors?.join('; ') || bodyText || `HTTP ${res.status}`;
       console.error('[email] Mailtrap API error', res.status, errDetail);
       if (devConsoleEnabled()) {
         logDevConsoleEmail(params);
@@ -193,7 +199,14 @@ export async function sendEmail(params: SendEmailParams): Promise<SendEmailResul
     const messageId = parsed.message_ids?.[0];
     if (messageId) {
       // WS6: do not write recipient email addresses (PII) to prod logs.
-      console.info('[email] sent', params.subject, '→', `${to.length} recipient(s)`, 'id=', messageId);
+      console.info(
+        '[email] sent',
+        params.subject,
+        '→',
+        `${to.length} recipient(s)`,
+        'id=',
+        messageId
+      );
       return { sent: true, messageId };
     }
 

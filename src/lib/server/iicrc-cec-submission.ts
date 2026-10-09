@@ -1,21 +1,18 @@
 import { randomUUID } from 'node:crypto';
 
 import { prisma } from '@/lib/prisma';
-import { isRevokedStatus } from '@/lib/server/enrollment-access';
+import { canIssueCertificate, certificateHolderDisplayName } from '@/lib/server/certificate-name';
 import {
   buildCompletionCertificatePdf,
   completionCertificateDataFromEnrollment,
 } from '@/lib/server/certificate-pdf';
-import { sendEmail } from '@/lib/server/email';
 import {
   isCloudinaryConfigured,
   uploadCertificatePdfToCloudinary,
 } from '@/lib/server/cloudinary-upload';
-import {
-  canIssueCertificate,
-  certificateHolderDisplayName,
-} from '@/lib/server/certificate-name';
 import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
+import { sendEmail } from '@/lib/server/email';
+import { isRevokedStatus } from '@/lib/server/enrollment-access';
 import {
   courseEligibleForIicrcCecSubmission,
   getIicrcCecSubmissionEmail,
@@ -349,7 +346,11 @@ export async function processIicrcCecSubmissionForEnrollment(
 
   const recipient = getIicrcCecSubmissionEmail();
   const ccList = [enrollment.student.email];
-  const baseContent = emailContentFromEnrollment(enrollment, completedAt, options?.cecHoursOverride);
+  const baseContent = emailContentFromEnrollment(
+    enrollment,
+    completedAt,
+    options?.cecHoursOverride
+  );
   const subject = buildIicrcCecSubmissionSubject(baseContent);
 
   const submission =
@@ -675,7 +676,7 @@ export function iicrcSubmissionFailureMessage(reason: string | null | undefined)
       return 'Email delivery failed. Check server logs and network access to send.api.mailtrap.io.';
     case 'provider_error':
     case 'resend_error':
-      return 'Mailtrap rejected the email. Verify your API token and verified sending domain.';
+      return 'Mailtrap rejected the email. Verify MAILTRAP_API_KEY and your verified sending domain.';
     case 'course_not_cec_eligible':
       return 'This course is not eligible for IICRC CEC submission.';
     case 'auto_submit_disabled':

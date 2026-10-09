@@ -5,8 +5,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { adminGlassCard } from '@/components/admin/admin-learner-ui';
 import {
-  MarketingComposeEditor,
-  type MarketingComposeValue,
+    MarketingComposeEditor,
+    type MarketingComposeValue,
 } from '@/components/admin/MarketingComposeEditor';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -190,6 +190,12 @@ export function AdminMarketingEmailClient() {
   const rangeStart = list ? (list.page - 1) * list.pageSize + 1 : 0;
   const rangeEnd = list ? Math.min(list.total, list.page * list.pageSize) : 0;
 
+  const sendLabel = sending
+    ? 'Sending…'
+    : selectedList.length > 0
+      ? `Send to ${selectedList.length}`
+      : 'Send';
+
   return (
     <div className="px-5 py-8 pb-20 sm:px-8 sm:py-10">
       <header className="mb-8 max-w-4xl space-y-2">
@@ -201,7 +207,7 @@ export function AdminMarketingEmailClient() {
       </header>
 
       <div className="grid max-w-6xl gap-6 xl:grid-cols-[minmax(320px,1fr)_minmax(380px,1.2fr)]">
-        <section className={cn(adminGlassCard, 'flex flex-col p-5')}>
+        <section className={cn(adminGlassCard, 'order-2 flex flex-col p-5 xl:order-1')}>
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <h2 className="text-sm font-semibold text-white">Customers</h2>
             {list ? (
@@ -340,8 +346,35 @@ export function AdminMarketingEmailClient() {
           </p>
         </section>
 
-        <section className={cn(adminGlassCard, 'space-y-4 p-5')}>
-          <h2 className="text-sm font-semibold text-white">Compose</h2>
+        <section
+          className={cn(
+            adminGlassCard,
+            'order-1 flex flex-col overflow-hidden p-0 xl:order-2 xl:sticky xl:top-0 xl:max-h-[calc(100dvh-2rem)] xl:self-start'
+          )}
+        >
+          <div className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-[rgba(10,14,28,0.96)] px-5 py-4 backdrop-blur-sm">
+            <div>
+              <h2 className="text-sm font-semibold text-white">Compose</h2>
+              <p className="mt-0.5 text-xs text-white/45">
+                {selectedList.length > 0
+                  ? `${selectedList.length} recipient${selectedList.length === 1 ? '' : 's'} selected`
+                  : 'Select customers in the list below or on the left'}
+              </p>
+            </div>
+            <Button
+              type="button"
+              variant="gradient"
+              size="lg"
+              className="shrink-0 shadow-lg"
+              onClick={() => void send()}
+              disabled={sending}
+            >
+              <Send className="h-4 w-4" />
+              {sendLabel}
+            </Button>
+          </div>
+
+          <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-5 py-4">
           <label className="block text-sm text-white/70">
             Subject
             <input
@@ -381,10 +414,7 @@ export function AdminMarketingEmailClient() {
           </div>
           {error ? <p className="text-sm text-amber-300">{error}</p> : null}
           {success ? <p className="text-sm text-emerald-300">{success}</p> : null}
-          <Button type="button" onClick={() => void send()} disabled={sending}>
-            <Send className="mr-2 h-4 w-4" />
-            {sending ? 'Sending…' : `Send to ${selectedList.length || 0}`}
-          </Button>
+          </div>
         </section>
       </div>
     </div>
