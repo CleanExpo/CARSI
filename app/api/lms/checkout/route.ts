@@ -8,6 +8,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
+import { getAppOrigin, getCheckoutReturnUrl } from '@/lib/server/app-url';
+
 import { verifySessionToken } from '@/lib/auth/session-jwt';
 import { buildCourseCheckoutUrls } from '@/lib/checkout-urls';
 import {
@@ -62,19 +64,13 @@ export async function POST(request: NextRequest) {
     const purchaseMode = parsePurchaseMode(body.purchase_mode);
     const teamSeatCount = parseTeamSeatCount(body.team_seat_count);
 
-    const origin = request.nextUrl.origin;
+    const origin = getAppOrigin(request);
     const learnNext = await getFirstLessonLearnPath(normalized);
     const defaults = buildCourseCheckoutUrls(origin, slug, learnNext, {
       teamSeats: purchaseMode === 'team' ? teamSeatCount ?? undefined : undefined,
     });
-    const success_url =
-      typeof body.success_url === 'string' && body.success_url.startsWith('http')
-        ? body.success_url
-        : defaults.success_url;
-    const cancel_url =
-      typeof body.cancel_url === 'string' && body.cancel_url.startsWith('http')
-        ? body.cancel_url
-        : defaults.cancel_url;
+    const success_url = getCheckoutReturnUrl(body.success_url, defaults.success_url);
+    const cancel_url = getCheckoutReturnUrl(body.cancel_url, defaults.cancel_url);
 
     const authHeader = request.headers.get('authorization') ?? '';
     const authTokenCookie = request.cookies.get('auth_token')?.value;

@@ -189,7 +189,12 @@ export async function POST(request: NextRequest) {
             { status: 400 }
           );
         }
-        const dayGuard = configuredEventDayGuard(event.startDateIso, dayIndex);
+        const dayGuard = configuredEventDayGuard(
+          event.startDateIso,
+          dayIndex,
+          new Date(),
+          event.timeZone
+        );
         if (!dayGuard.ok) {
           return NextResponse.json(
             {

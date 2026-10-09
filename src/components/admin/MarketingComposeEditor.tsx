@@ -17,6 +17,16 @@ function run(command: string, value?: string) {
 
 export type MarketingComposeValue = { html: string; text: string };
 
+const tools = [
+  { icon: Bold, label: 'Bold', action: 'bold' },
+  { icon: Italic, label: 'Italic', action: 'italic' },
+  { icon: Underline, label: 'Underline', action: 'underline' },
+  { icon: Link2, label: 'Insert link', action: 'link' },
+  { icon: List, label: 'Bullet list', action: 'insertUnorderedList' },
+  { icon: ListOrdered, label: 'Numbered list', action: 'insertOrderedList' },
+  { icon: RemoveFormatting, label: 'Remove formatting', action: 'removeFormat' },
+];
+
 export function MarketingComposeEditor({
   value,
   onChange,
@@ -84,67 +94,15 @@ export function MarketingComposeEditor({
     emit();
   }
 
-  const tools = [
-    {
-      icon: Bold,
-      label: 'Bold',
-      onClick: () => {
-        focusEditor();
-        run('bold');
-        emit();
-      },
-    },
-    {
-      icon: Italic,
-      label: 'Italic',
-      onClick: () => {
-        focusEditor();
-        run('italic');
-        emit();
-      },
-    },
-    {
-      icon: Underline,
-      label: 'Underline',
-      onClick: () => {
-        focusEditor();
-        run('underline');
-        emit();
-      },
-    },
-    {
-      icon: Link2,
-      label: 'Insert link',
-      onClick: openLinkDialog,
-    },
-    {
-      icon: List,
-      label: 'Bullet list',
-      onClick: () => {
-        focusEditor();
-        run('insertUnorderedList');
-        emit();
-      },
-    },
-    {
-      icon: ListOrdered,
-      label: 'Numbered list',
-      onClick: () => {
-        focusEditor();
-        run('insertOrderedList');
-        emit();
-      },
-    },
-    {
-      icon: RemoveFormatting,
-      label: 'Remove formatting',
-      onClick: () => {
-        focusEditor();
-        run('removeFormat');
-        emit();
-      },
-    },
-  ];
+  function handleTool(action: string) {
+    if (action === 'link') {
+      openLinkDialog();
+      return;
+    }
+    focusEditor();
+    run(action);
+    emit();
+  }
 
   return (
     <div className="overflow-hidden rounded-xl border border-white/15 bg-white shadow-lg">
@@ -156,7 +114,7 @@ export function MarketingComposeEditor({
             title={t.label}
             disabled={disabled}
             onMouseDown={(e) => e.preventDefault()}
-            onClick={t.onClick}
+            onClick={() => handleTool(t.action)}
             className="rounded-md p-2 text-slate-600 transition-colors hover:bg-slate-200/80 hover:text-slate-900 disabled:opacity-30"
           >
             <t.icon className="h-4 w-4" />

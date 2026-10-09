@@ -1,7 +1,7 @@
 'use client';
 
 import { ChevronLeft, ChevronRight, ImagePlus, Search, Send, X } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { adminGlassCard } from '@/components/admin/admin-learner-ui';
 import {
@@ -27,7 +27,12 @@ const MAX_SEND = 80;
 
 export function AdminMarketingEmailClient() {
   const [query, setQuery] = useState('');
-  const [list, setList] = useState<ListResponse | null>(null);
+  const [customerResult, setCustomerResult] = useState<{
+    key: string;
+    list: ListResponse | null;
+    error: string;
+  } | null>(null);
+  const [reload, setReload] = useState(0);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState<(typeof PAGE_SIZES)[number]>(25);
   const [selected, setSelected] = useState<Record<string, Customer>>({});
@@ -36,36 +41,47 @@ export function AdminMarketingEmailClient() {
   const [imageUrl, setImageUrl] = useState('');
   const [uploading, setUploading] = useState(false);
   const [sending, setSending] = useState(false);
-  const [loadingList, setLoadingList] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const loadCustomers = useCallback(async (opts: { q: string; page: number; pageSize: number }) => {
-    setLoadingList(true);
-    const params = new URLSearchParams({
-      page: String(opts.page),
-      pageSize: String(opts.pageSize),
-    });
-    if (opts.q.trim().length >= 3) params.set('q', opts.q.trim());
-    const res = await fetch(`/api/admin/marketing-email?${params}`);
-    const data = (await res.json().catch(() => ({}))) as ListResponse & { detail?: string };
-    setLoadingList(false);
-    if (!res.ok) {
-      setError(data.detail || 'Could not load customers');
-      return;
-    }
-    setList(data);
-  }, []);
+  const requestKey = JSON.stringify([query, page, pageSize, reload]);
+  const loadingList = customerResult?.key !== requestKey;
+  const list = customerResult?.list;
+  const listError = loadingList ? '' : customerResult?.error;
 
   useEffect(() => {
-    void loadCustomers({ q: query, page, pageSize });
-  }, [loadCustomers, query, page, pageSize]);
+    const controller = new AbortController();
+    async function loadCustomers() {
+      const params = new URLSearchParams({ page: String(page), pageSize: String(pageSize) });
+      if (query.trim().length >= 3) params.set('q', query.trim());
+      try {
+        const res = await fetch(`/api/admin/marketing-email?${params}`, {
+          signal: controller.signal,
+        });
+        const data = (await res.json().catch(() => ({}))) as ListResponse & { detail?: string };
+        if (!res.ok) throw new Error(data.detail || 'Could not load customers');
+        if (!controller.signal.aborted) {
+          setCustomerResult({ key: requestKey, list: data, error: '' });
+        }
+      } catch (e) {
+        if (!controller.signal.aborted) {
+          setCustomerResult({
+            key: requestKey,
+            list: null,
+            error: e instanceof Error ? e.message : 'Could not load customers',
+          });
+        }
+      }
+    }
+    void loadCustomers();
+    return () => controller.abort();
+  }, [query, page, pageSize, requestKey]);
 
-  async function search(e: React.FormEvent) {
+  function search(e: React.FormEvent) {
     e.preventDefault();
     setError('');
     setPage(1);
-    await loadCustomers({ q: query, page: 1, pageSize });
+    setReload((previous) => previous + 1);
   }
 
   function toggle(user: Customer) {
@@ -233,6 +249,7 @@ export function AdminMarketingEmailClient() {
             <button
               type="button"
               onClick={selectAllOnPage}
+              disabled={loadingList}
               className="rounded-lg border border-white/15 bg-white/5 px-2.5 py-1 text-xs font-medium text-white/85 hover:bg-white/10"
             >
               Select page
@@ -240,6 +257,7 @@ export function AdminMarketingEmailClient() {
             <button
               type="button"
               onClick={() => void selectAllMatching()}
+              disabled={loadingList}
               className="rounded-lg border border-[#2490ed]/40 bg-[#2490ed]/15 px-2.5 py-1 text-xs font-medium text-sky-100 hover:bg-[#2490ed]/25"
             >
               Select all matching (max {MAX_SEND})
@@ -275,7 +293,9 @@ export function AdminMarketingEmailClient() {
 
           <ul className="mt-3 min-h-[200px] flex-1 space-y-0.5 overflow-y-auto rounded-lg border border-white/8 bg-black/20 p-1">
             {loadingList ? (
-              <li className="px-3 py-6 text-center text-sm text-white/40">Loading…</li>
+              <li role="status" className="px-3 py-6 text-center text-sm text-white/40">
+                {list ? 'Updating recipients… Previous results are temporarily read-only.' : 'Loading…'}
+              </li>
             ) : null}
             {!loadingList && list?.users.length === 0 ? (
               <li className="px-3 py-6 text-center text-sm text-white/40">No customers found.</li>
@@ -287,6 +307,7 @@ export function AdminMarketingEmailClient() {
                     type="checkbox"
                     className="mt-1 size-4 rounded border-white/20"
                     checked={Boolean(selected[u.id])}
+                    disabled={loadingList}
                     onChange={() => toggle(u)}
                   />
                   <span className="min-w-0 flex-1">
@@ -302,7 +323,7 @@ export function AdminMarketingEmailClient() {
             <div className="mt-3 flex items-center justify-between gap-2">
               <button
                 type="button"
-                disabled={page <= 1}
+                disabled={loadingList || page <= 1}
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 className="inline-flex items-center gap-1 rounded-lg border border-white/10 px-2 py-1 text-xs text-white/70 disabled:opacity-30"
               >
@@ -314,7 +335,7 @@ export function AdminMarketingEmailClient() {
               </span>
               <button
                 type="button"
-                disabled={page >= list.totalPages}
+                disabled={loadingList || page >= list.totalPages}
                 onClick={() => setPage((p) => p + 1)}
                 className="inline-flex items-center gap-1 rounded-lg border border-white/10 px-2 py-1 text-xs text-white/70 disabled:opacity-30"
               >
@@ -412,7 +433,7 @@ export function AdminMarketingEmailClient() {
               />
             ) : null}
           </div>
-          {error ? <p className="text-sm text-amber-300">{error}</p> : null}
+          {error || listError ? <p className="text-sm text-amber-300">{error || listError}</p> : null}
           {success ? <p className="text-sm text-emerald-300">{success}</p> : null}
           </div>
         </section>

@@ -1,11 +1,11 @@
 {
   "version": 1,
-  "courseSlug": "carpet-cleaning-technician-fundamentals",
+  "courseSlug": "carpet-cleaning-fundamentals",
   "quizzes": [
     {
       "quizId": "9e586bc9-f573-4fa8-b5e7-d1ab58378c88",
       "lessonTitle": "Drying failures, secondary damage and the mould rule",
-      "title": "Carpet Cleaning Technician Fundamentals — Knowledge Check",
+      "title": "Carpet Cleaning Fundamentals — Knowledge Check",
       "passPercentage": 80,
       "attemptsAllowed": 3,
       "questions": [

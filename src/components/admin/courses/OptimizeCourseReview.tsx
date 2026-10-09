@@ -3,7 +3,7 @@
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useToast } from '@/hooks/use-toast';
 import type { OptimizedCourseDraft } from '@/lib/admin/optimize-course-draft';
@@ -14,6 +14,10 @@ type Props = { courseId: string };
 const panelClass = 'rounded-2xl border border-white/10 bg-white/[0.03]';
 
 export function OptimizeCourseReview({ courseId }: Props) {
+  return <OptimizeCourseReviewContent key={courseId} courseId={courseId} />;
+}
+
+function OptimizeCourseReviewContent({ courseId }: Props) {
   const router = useRouter();
   const { toast } = useToast();
   const [courseTitle, setCourseTitle] = useState('Course');
@@ -23,29 +27,34 @@ export function OptimizeCourseReview({ courseId }: Props) {
   const [applying, setApplying] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch(`/api/admin/courses/${courseId}/optimize`, { cache: 'no-store' });
-      const data = (await res.json()) as {
-        courseTitle?: string;
-        draft?: OptimizedCourseDraft | null;
-        detail?: string;
-      };
-      if (!res.ok) throw new Error(data.detail || 'Could not load course');
-      setCourseTitle(data.courseTitle || 'Course');
-      setDraft(data.draft ?? null);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not load course');
-    } finally {
-      setLoading(false);
-    }
-  }, [courseId]);
-
   useEffect(() => {
+    const controller = new AbortController();
+    async function load() {
+      try {
+        const res = await fetch(`/api/admin/courses/${courseId}/optimize`, {
+          cache: 'no-store',
+          signal: controller.signal,
+        });
+        const data = (await res.json()) as {
+          courseTitle?: string;
+          draft?: OptimizedCourseDraft | null;
+          detail?: string;
+        };
+        if (!res.ok) throw new Error(data.detail || 'Could not load course');
+        if (controller.signal.aborted) return;
+        setCourseTitle(data.courseTitle || 'Course');
+        setDraft(data.draft ?? null);
+      } catch (e) {
+        if (!controller.signal.aborted) {
+          setError(e instanceof Error ? e.message : 'Could not load course');
+        }
+      } finally {
+        if (!controller.signal.aborted) setLoading(false);
+      }
+    }
     void load();
-  }, [load]);
+    return () => controller.abort();
+  }, [courseId]);
 
   async function generate() {
     setRunning(true);

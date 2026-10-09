@@ -1,5 +1,6 @@
 'use client';
 
+import { formSurfaceStyles, type FormSurface } from '@/components/ui/form-surface';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import {
@@ -15,6 +16,7 @@ type Props = {
   onTeamSeatsChange: (seats: number) => void;
   unitPriceAud: number;
   disabled?: boolean;
+  surface?: FormSurface;
 };
 
 export function CoursePurchaseOptions({
@@ -24,13 +26,15 @@ export function CoursePurchaseOptions({
   onTeamSeatsChange,
   unitPriceAud,
   disabled,
+  surface = 'light',
 }: Props) {
+  const styles = formSurfaceStyles[surface];
   const totalAud = mode === 'team' ? unitPriceAud * teamSeats : unitPriceAud;
 
   return (
-    <fieldset className="space-y-3 rounded-lg border border-white/10 bg-white/[0.03] p-3" disabled={disabled}>
-      <legend className="px-1 text-xs font-medium text-white/60">Who is this for?</legend>
-      <label className="flex cursor-pointer items-start gap-2.5 text-sm text-white/80">
+    <fieldset className={`space-y-3 rounded-lg border p-3 ${styles.card}`} disabled={disabled}>
+      <legend className={`px-1 text-xs font-medium ${styles.label}`}>Who is this for?</legend>
+      <label className={`flex cursor-pointer items-start gap-2.5 text-sm ${styles.label}`}>
         <input
           type="radio"
           name="purchase-mode"
@@ -39,11 +43,13 @@ export function CoursePurchaseOptions({
           onChange={() => onModeChange('self')}
         />
         <span>
-          <span className="font-medium text-white">Just me</span>
-          <span className="mt-0.5 block text-xs text-white/45">One learner — you get course access.</span>
+          <span className={`font-medium ${styles.label}`}>Just me</span>
+          <span className={`mt-0.5 block text-xs ${styles.help}`}>
+            One learner — you get course access.
+          </span>
         </span>
       </label>
-      <label className="flex cursor-pointer items-start gap-2.5 text-sm text-white/80">
+      <label className={`flex cursor-pointer items-start gap-2.5 text-sm ${styles.label}`}>
         <input
           type="radio"
           name="purchase-mode"
@@ -52,15 +58,15 @@ export function CoursePurchaseOptions({
           onChange={() => onModeChange('team')}
         />
         <span className="min-w-0 flex-1">
-          <span className="font-medium text-white">My team</span>
-          <span className="mt-0.5 block text-xs text-white/45">
+          <span className={`font-medium ${styles.label}`}>My team</span>
+          <span className={`mt-0.5 block text-xs ${styles.help}`}>
             Pay for multiple seats — you&apos;ll invite teammates after checkout.
           </span>
         </span>
       </label>
       {mode === 'team' ? (
-        <div className="space-y-1.5 border-t border-white/8 pt-3">
-          <Label htmlFor="team-seat-count" className="text-white/70">
+        <div className={`space-y-1.5 border-t pt-3 ${styles.divider}`}>
+          <Label htmlFor="team-seat-count" className={styles.label}>
             Number of learners (including you)
           </Label>
           <Input
@@ -73,11 +79,11 @@ export function CoursePurchaseOptions({
               const v = Number.parseInt(e.target.value, 10);
               onTeamSeatsChange(Number.isFinite(v) ? v : MIN_TEAM_SEATS);
             }}
-            className="border-white/15 bg-white/5 text-white"
+            className={styles.input}
           />
-          <p className="text-xs text-white/45">
-            Total: <strong className="text-white/75">${totalAud.toFixed(0)} AUD</strong> (
-            {teamSeats} × ${unitPriceAud.toFixed(0)})
+          <p className={`text-xs ${styles.help}`}>
+            Total: <strong className={styles.label}>${totalAud.toFixed(0)} AUD</strong> ({teamSeats}{' '}
+            × ${unitPriceAud.toFixed(0)})
           </p>
         </div>
       ) : null}

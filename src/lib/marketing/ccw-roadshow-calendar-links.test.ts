@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { ccwRoadshowEvents } from './ccw-roadshow';
+import { ccwRoadshowEvents, getCcwRoadshowEvent } from './ccw-roadshow';
 import {
   buildGoogleCalendarLink,
   buildIcsContent,
@@ -18,6 +18,47 @@ describe('toCalendarUtcStamp', () => {
 
   it('throws on an invalid timestamp', () => {
     expect(() => toCalendarUtcStamp('not-a-date')).toThrow();
+  });
+});
+
+describe('October occurrence calendar', () => {
+  it('uses distinct identity, Brisbane offsets and paid booking copy', () => {
+    const october = getCcwRoadshowEvent('brisbane-2026-10-09');
+    expect(october).not.toBeNull();
+    if (!october) return;
+    const ics = buildIcsContent(october).replace(/\r\n /g, '');
+    expect(ics).toContain('UID:ccw-roadshow-brisbane-2026-10-09@carsi.com.au');
+    expect(ics).toContain('DTSTART:20261008T223000Z');
+    expect(ics).toContain('DTEND:20261010T050000Z');
+    expect(ics).not.toContain('Free entry');
+    expect(ics).toContain('AUD495');
+    expect(ics).toContain('One AUD200 CCW gift card per registration');
+    expect(ics).toContain('redeemable after the course.');
+    expect(ics).toContain('https://ccwonline.com.au/collections/training-marketing');
+    expect(ics).not.toContain('carsi-2-day-carpet-upholstery-training-course');
+    expect(ics).not.toContain('srsltid=');
+    const google = new URL(buildGoogleCalendarLink(october));
+    expect(google.searchParams.get('ctz')).toBe('Australia/Brisbane');
+    expect(google.searchParams.get('details')).toContain('8.30am-3pm');
+    expect(google.searchParams.get('details')).toContain(october.bookingUrl);
+    expect(google.searchParams.get('details')).not.toContain('srsltid=');
+    expect(google.searchParams.get('details')).toContain('One AUD200 CCW gift card per registration, redeemable after the course.');
+  });
+
+  it('does not call a historical paid September sitting free', () => {
+    const september = getCcwRoadshowEvent('brisbane')!;
+    expect(buildIcsContent(september)).toContain('UID:ccw-roadshow-brisbane@carsi.com.au');
+    expect(buildIcsContent(september)).not.toContain('Free entry');
+    expect(buildIcsContent(september)).not.toContain('AUD200');
+  });
+
+  it('folds long calendar lines at 75 UTF-8 octets without corrupting text', () => {
+    const event = { ...melbourne, description: 'Training for T\u0101mati '.repeat(15) };
+    const ics = buildIcsContent(event);
+    for (const line of ics.split('\r\n')) {
+      expect(Buffer.byteLength(line, 'utf8')).toBeLessThanOrEqual(75);
+    }
+    expect(ics.replace(/\r\n /g, '')).toContain(event.description);
   });
 });
 

@@ -38,6 +38,60 @@ import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 
+/**
+ * IICRC discipline designations spelled out, as a regex alternation.
+ * "Applied Structural Drying" and "Applied Microbial Remediation" carry no trailing
+ * "Technician" because the discipline name alone is the designation; the rest are only the
+ * designation WITH "Technician", since "water damage restoration" alone is ordinary topic wording.
+ *
+ * `sep` is what may sit between the words. Spaces only by default; the course-title shape passes
+ * TITLE_WORD_SEP because "Applied-Structural-Drying — Core Concepts" and the en-dash form
+ * "Applied–Structural–Drying" are the same title (independent review, 06/10/2026, reproduced
+ * both bypasses). \s already covers the no-break space.
+ */
+// A string join (`'Applied ' + 'Structural Drying'`) separates words as well as whitespace does.
+const TITLE_WORD_SEP = '(?:[\\s_\\-\\u2010-\\u2015\\u2212]|["\'`]\\s*\\+\\s*["\'`])+';
+
+function designationNames(sep = '\\s+') {
+  const and = `(?:and|&)`;
+  const w = (...words) => words.join(sep);
+  return (
+    `(?:${w('applied', 'structural', 'drying')}|${w('applied', 'microbial', 'remediation')}` +
+    `|water(?:${sep}damage)?${sep}${w('restoration', 'technicians?')}` +
+    `|${w('fire', and, 'smoke', 'restoration', 'technicians?')}` +
+    `|(?:commercial${sep})?${w('carpet', 'cleaning', 'technicians?')}` +
+    `|${w('odou?r', 'control', 'technicians?')}` +
+    `|${w('trauma', and, 'crime', 'scene', 'technicians?')}` +
+    `|${w('carpet', 'repair', and, 'reinstallation', 'technicians?')}` +
+    `|${w('upholstery', and, 'fabric', 'cleaning', 'technicians?')})`
+  );
+}
+
+/**
+ * Exact registry titles that contain a designation name, as a global neutralise regex.
+ *
+ * Only the approved title AS THE WHOLE QUOTED VALUE is exempt, optionally followed by " | CARSI"
+ * suffixes that also end the value. Independent review (06/10/2026, two rounds) showed that any
+ * looser anchoring erased the approved title inside a different one — "… Drying Masterclass",
+ * "… Drying course Masterclass" and "… Drying | CARSI Masterclass" all passed. A value joined to
+ * another string with `+` is not a whole value either (round 4: 'Introduction to …' + ' Masterclass').
+ */
+function registryTitlesCarryingDesignations() {
+  const registry = JSON.parse(
+    readFileSync(new URL('../data/seed/cec-approvals.json', import.meta.url), 'utf8')
+  );
+  const designation = new RegExp(designationNames(), 'i');
+  const titles = registry.approvals
+    .map((a) => a.title)
+    .filter((t) => typeof t === 'string' && designation.test(t));
+  if (titles.length === 0) return null;
+  const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(
+    `(?<!\\+\\s*["'\`])(?<=["'\`])(?:${titles.map(esc).join('|')})(?=(?:\\s*\\|\\s*CARSI)*["'\`](?!\\s*\\+))`,
+    'gi'
+  );
+}
+
 // Banned selling/descriptive phrasings. Each must be something that implies
 // CARSI itself delivers IICRC courses or IICRC certification.
 const BANNED = [
@@ -272,6 +326,33 @@ const BANNED = [
       'iicrcDiscipline must be null — a CARSI course does not carry an IICRC discipline designation. Set the CARSI designation in meta.designation instead.',
   },
   {
+    // The IICRC discipline designation written out IN FULL, used to name a course. Every rule
+    // above keys on the ACRONYM, so "Applied Structural Drying — Core Concepts" shipped as a
+    // live course title (06/10/2026) with no guard able to see it: the designation name with
+    // the acronym removed is still the designation. Two shapes count as naming a course:
+    //  - the phrase inside a `title` value (TS `title: '…'` or JSON `"title": "…"`), including a
+    //    value built from quoted pieces joined with `+` (review round 4);
+    //  - the phrase directly followed by a course noun ("… Fundamentals", "… — Core", "… course").
+    // Spaces only between words, deliberately: a hyphenated slug is the URL, which the live
+    // catalogue guard audits, and a slug in a JSON key is not rendered copy.
+    // Audience usage ("for water damage restoration technicians") matches neither shape and
+    // stays allowed, as does a third-person reference to the IICRC certification itself.
+    re: new RegExp(
+      `\\btitle["']?\\s*[:=]\\s*(?:["'\`][^"'\`\\n]*["'\`]\\s*\\+\\s*)*["'\`][^"'\`\\n]*\\b${designationNames(TITLE_WORD_SEP)}|\\b${designationNames(TITLE_WORD_SEP)}\\b(?:\\s*[—–:]\\s*|\\s+-\\s*|\\s+)(?:core|essentials|fundamentals|basics|course|courses|training|class|classes|module|modules|program|programme|workshop|masterclass)\\b`,
+      'i'
+    ),
+    allow: null,
+    // The IICRC itself titled some approved CEC classes with a discipline name ("Introduction to
+    // Applied Structural Drying"). Those exact registry titles are the IICRC's own wording, so
+    // they are neutralised by VALUE, read from data/seed/cec-approvals.json — never by shape.
+    neutralise: registryTitlesCarryingDesignations(),
+    // An inline block comment inside a joined title is not part of the value:
+    // 'Introduction to Applied Structural Drying' /* x */ + ' Masterclass' (review round 5).
+    prepare: (line) => line.replace(/\/\*.*?\*\//g, ''),
+    message:
+      'Do not name a CARSI course with an IICRC discipline designation written out in full (e.g. "Applied Structural Drying", "Carpet Cleaning Technician") — name the topic, or use the CARSI "…Practitioner" designation. Exact IICRC-approved CEC class titles in data/seed/cec-approvals.json are exempt.',
+  },
+  {
     // Founder brand-exclusion rule (2026-07-09): COACH8 must never appear in any CARSI
     // copy or content surface (see src/lib/calendar/event-exclusions.ts for the calendar
     // enforcement of the same rule).
@@ -368,7 +449,9 @@ function scanLine(file, lineNo, content, findings) {
     // token escapes — `title: "IICRC WRT course", slug: "x-iicrc-wrt"` passed on the slug
     // alone. `neutralise` is the stricter form: it deletes the permitted spans and re-tests
     // what is LEFT, so a legitimate token can no longer shelter branding beside it.
-    const probe = rule.neutralise ? content.replace(rule.neutralise, ' ') : content;
+    // `prepare` normalises the line for one rule before anything else runs (see the rule).
+    const base = rule.prepare ? rule.prepare(content) : content;
+    const probe = rule.neutralise ? base.replace(rule.neutralise, ' ') : base;
     if (rule.re.test(probe) && !(rule.allow && rule.allow.test(content))) {
       findings.push(`  ${file}:${lineNo}: ${rule.message}\n    → ${content.trim().slice(0, 140)}`);
     }

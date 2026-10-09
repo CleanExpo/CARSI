@@ -40,6 +40,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!event.calendarEventId?.trim()) {
+      return NextResponse.json(
+        { detail: 'Google Calendar is not configured for this event.' },
+        { status: 409 }
+      );
+    }
+
     const synced = await addRegistrationToCalendar({
       calendarEventId: event.calendarEventId,
       attendeeEmail: registration.contactEmail,

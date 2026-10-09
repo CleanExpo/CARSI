@@ -163,10 +163,10 @@ export function AdminCcwRoadshowClient() {
     await load();
   }
 
-  if (loading) return <div className="p-6 text-white">Loading registry…</div>;
-
   const paging = useAdminListPaging(rows);
   const { page: safePage, pageCount, pageRows, setPage } = paging;
+
+  if (loading) return <div className="p-6 text-white">Loading registry…</div>;
 
   return (
     <div className="space-y-6 p-6 text-white">

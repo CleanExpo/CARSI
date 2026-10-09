@@ -19,9 +19,9 @@ import { getBackendOrigin } from '@/lib/env/public-url';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'IICRC CEC Learning Pathways — Which Restoration Course Path Is Right for You?',
+  title: 'CARSI Learning Pathways — Which Restoration Course Path Is Right for You?',
   description:
-    'Explore structured IICRC CEC pathways for water restoration, mould remediation, carpet cleaning and more. Find the right learning path for your career stage and earn CECs in the correct order.',
+    'Explore structured CARSI pathways for water restoration, mould remediation, carpet cleaning and more. Find the right learning path for your career stage and build skills in a practical order.',
   alternates: { canonical: '/pathways' },
 };
 
@@ -52,17 +52,17 @@ const faqs = [
   {
     question: 'What is a learning pathway?',
     answer:
-      'A learning pathway is a structured sequence of courses designed to build expertise in a specific area of restoration or cleaning. CARSI pathways guide you through prerequisite knowledge, core competencies, and advanced techniques in a logical order. They help you earn IICRC Continuing Education Credits (CECs) in a useful sequence toward maintaining an existing IICRC certification. IICRC certification itself is obtained through schools and examinations approved by the IICRC. Each pathway is a CARSI journey — CARSI-issued designations, not IICRC certification courses.',
+      'A learning pathway is a structured sequence of courses designed to build expertise in a specific area of restoration or cleaning. CARSI pathways guide you through prerequisite knowledge, core competencies, and advanced techniques in a logical order. CEC approval is course-specific. Check individual course pages for current approval details before planning certification renewal. IICRC certification itself is obtained through schools and examinations approved by the IICRC. Each pathway is a CARSI journey with CARSI-issued designations, not IICRC certifications.',
   },
   {
     question: 'Which CARSI pathway is right for me?',
     answer:
-      'Your ideal pathway depends on your current experience and career objectives. New technicians usually start with water restoration fundamentals. Experienced professionals looking to expand their offering should consider a multi-discipline path. If you already hold IICRC certifications and need to maintain them, approved CARSI courses let you accumulate CECs inside a structured pathway. Specialist contractors in carpet care, commercial cleaning, or facility maintenance will find dedicated journeys for those sectors.',
+      'Your ideal pathway depends on your current experience and career objectives. New technicians usually start with water restoration fundamentals. Experienced professionals looking to expand their offering should consider a multi-discipline path. If you already hold IICRC certifications, check the approval details for each course before including it in your renewal plan. Specialist contractors in carpet care, commercial cleaning, or facility maintenance will find dedicated journeys for those sectors.',
   },
   {
     question: 'How do pathways help with career progression?',
     answer:
-      'Structured pathways show systematic professional development to employers, clients, and industry bodies. Completing a CARSI pathway shows you have mastered an integrated body of knowledge, not isolated topics. Many insurance panels and government tenders in Australia now require evidence of ongoing professional development. Pathways also make CEC accumulation toward certification renewal easier to track. For business owners, enrolling a team in pathways keeps training standards consistent across technicians.',
+      'Structured pathways show systematic professional development to employers, clients, and industry bodies. Completing a CARSI pathway shows you have mastered an integrated body of knowledge, not isolated topics. Many insurance panels and government tenders in Australia now require evidence of ongoing professional development. Pathways help you organise your next learning steps. For business owners, enrolling a team in pathways keeps training standards consistent across technicians.',
   },
 ];
 
@@ -82,7 +82,8 @@ export default async function PathwaysPage() {
             A structured path, not a pile of courses
           </h1>
           <p className={`mt-5 max-w-2xl text-pretty ${LANDING_LEAD_CLASS}`}>
-            Guided journeys for IICRC CEC renewal, team readiness, and practical trade confidence.
+            Guided journeys for professional development, team readiness, and practical trade
+            confidence.
             {total > 0 ? ` ${total} pathway${total !== 1 ? 's' : ''} available.` : ''}
           </p>
         </div>
@@ -91,7 +92,7 @@ export default async function PathwaysPage() {
       <HomeTrustStrip
         stats={[
           { value: total > 0 ? String(total) : 'Advisor', label: 'Pathways' },
-          { value: 'CEC', label: 'Renewal order' },
+          { value: 'Skills', label: 'Learning order' },
           { value: 'Team', label: 'Ready crews' },
           { value: '24/7', label: 'Study anytime' },
         ]}

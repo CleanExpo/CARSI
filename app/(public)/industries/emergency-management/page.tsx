@@ -107,7 +107,7 @@ export default async function EmergencyManagementIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Train Before"
         headlineAccent="Disaster Strikes"
-        description="Australia's 40,000+ SES volunteers and council emergency teams respond to thousands of flood and fire events every year. CARSI water damage restoration, fire and smoke restoration and applied structural drying training gives responders the restoration science knowledge to protect communities more effectively."
+        description="Australia's 40,000+ SES volunteers and council emergency teams respond to thousands of flood and fire events every year. CARSI water damage restoration, fire and smoke restoration and structural drying training gives responders the restoration science knowledge to protect communities more effectively."
         disciplines={disciplines}
         stats={stats}
       />

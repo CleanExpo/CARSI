@@ -201,6 +201,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ course: courseToAdminDto(course) });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
+    if (msg === 'INVALID_STRUCTURED_CURRICULUM') {
+      return NextResponse.json({ detail: 'Invalid structured curriculum' }, { status: 400 });
+    }
     if (msg === 'MODULES_REQUIRED') {
       return NextResponse.json({ detail: 'At least one module is required' }, { status: 400 });
     }

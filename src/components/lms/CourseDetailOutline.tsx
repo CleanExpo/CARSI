@@ -11,6 +11,28 @@ type SyllabusModule = { id: string; title: string; lessons: SyllabusLesson[] };
 type LiveLesson = { id: string; title: string; completed: boolean };
 type LiveModule = { id: string; title: string; lessons: LiveLesson[] };
 
+export function prepareCourseOutline(rows: readonly SyllabusModule[], hasProgress: boolean) {
+  const firstIncomplete = hasProgress
+    ? rows
+        .flatMap((mod) => mod.lessons)
+        .findIndex((lesson) => !('completed' in lesson && lesson.completed))
+    : -1;
+  let offset = 0;
+  return rows.map((mod) => {
+    const moduleOffset = offset;
+    offset += mod.lessons.length;
+    return {
+      ...mod,
+      lessons: mod.lessons.map((lesson, index) => {
+        const ordinal = moduleOffset + index;
+        const completed = 'completed' in lesson && lesson.completed === true;
+        const mark = completed ? 'done' : ordinal === firstIncomplete ? 'current' : 'upcoming';
+        return { ...lesson, number: ordinal + 1, mark };
+      }),
+    };
+  });
+}
+
 export function CourseDetailOutline({
   slug,
   syllabus,
@@ -38,27 +60,18 @@ export function CourseDetailOutline({
   const rows = modules ?? syllabus;
   if (rows.length === 0) return null;
 
-  let lessonNumber = 0;
-  let foundCurrent = false;
+  const outline = prepareCourseOutline(rows, modules !== null);
 
   return (
     <section>
       <h2 className={dash.h2}>Course content</h2>
       <ol className="mt-4 space-y-4">
-        {rows.map((mod) => (
+        {outline.map((mod) => (
           <li key={mod.id}>
             <p className="text-sm font-medium text-slate-900">{mod.title}</p>
             <ol className="mt-2 space-y-1.5">
               {mod.lessons.map((lesson) => {
-                lessonNumber += 1;
-                const live = 'completed' in lesson ? lesson : null;
-                const completed = live?.completed === true;
-                let mark: 'done' | 'current' | 'upcoming' = 'upcoming';
-                if (completed) mark = 'done';
-                else if (modules && !foundCurrent) {
-                  mark = 'current';
-                  foundCurrent = true;
-                }
+                const { mark, number: lessonNumber } = lesson;
                 return (
                   <li key={lesson.id} className="flex items-start gap-2 text-sm text-slate-600">
                     <span className="w-5 shrink-0 text-center tabular-nums text-slate-400" aria-hidden>

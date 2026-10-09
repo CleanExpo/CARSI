@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 
+import { formSurfaceStyles, type FormSurface } from '@/components/ui/form-surface';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -48,9 +50,17 @@ type Props = {
   priceAud: number;
   isFree: boolean;
   showTeamOption?: boolean;
+  surface?: FormSurface;
 };
 
-export function GuestEnrolForm({ slug, priceAud, isFree, showTeamOption = false }: Props) {
+export function GuestEnrolForm({
+  slug,
+  priceAud,
+  isFree,
+  showTeamOption = false,
+  surface = 'light',
+}: Props) {
+  const styles = formSurfaceStyles[surface];
   const [email, setEmail] = useState('');
   const [fullName, setFullName] = useState('');
   const [password, setPassword] = useState('');
@@ -172,22 +182,22 @@ export function GuestEnrolForm({ slug, priceAud, isFree, showTeamOption = false 
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3 rounded-lg border border-white/10 bg-white/[0.03] p-4">
-      <p className="text-xs text-white/55">
+    <form onSubmit={handleSubmit} className={`space-y-3 rounded-lg border p-4 ${styles.card}`}>
+      <p className={`text-xs ${styles.help}`}>
         {freePath
           ? 'Quick enrol — create your account and start learning in one step.'
           : 'Quick enrol — pay securely now. After payment you set up your account on the confirmation page, or sign in there if you already have one.'}
       </p>
       <div className="space-y-1.5">
-        <Label htmlFor="guest-full-name" className="text-white/70">
+        <Label htmlFor="guest-full-name" className={styles.label}>
           Full name
         </Label>
         {/* A free course asking for a real name reads as data collection unless you say why.
             It is on the credential, so it cannot be dropped — state the reason instead of
             leaving the buyer to assume the worst. */}
-        <p id="guest-full-name-help" className="text-xs text-white/45">
-          Printed on your credential — enter it as you want it to appear. You can change it later
-          in your account.
+        <p id="guest-full-name-help" className={`text-xs ${styles.help}`}>
+          Printed on your credential — enter it as you want it to appear. You can change it later in
+          your account.
         </p>
         <Input
           id="guest-full-name"
@@ -195,11 +205,11 @@ export function GuestEnrolForm({ slug, priceAud, isFree, showTeamOption = false 
           onChange={(e) => setFullName(e.target.value)}
           required
           aria-describedby="guest-full-name-help"
-          className="border-white/15 bg-white/5 text-white"
+          className={styles.input}
         />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="guest-email" className="text-white/70">
+        <Label htmlFor="guest-email" className={styles.label}>
           Email
         </Label>
         <Input
@@ -208,12 +218,12 @@ export function GuestEnrolForm({ slug, priceAud, isFree, showTeamOption = false 
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="border-white/15 bg-white/5 text-white"
+          className={styles.input}
         />
       </div>
       {freePath ? (
         <div className="space-y-1.5">
-          <Label htmlFor="guest-password" className="text-white/70">
+          <Label htmlFor="guest-password" className={styles.label}>
             Password (min 8 characters)
           </Label>
           <Input
@@ -223,7 +233,7 @@ export function GuestEnrolForm({ slug, priceAud, isFree, showTeamOption = false 
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="border-white/15 bg-white/5 text-white"
+            className={styles.input}
           />
         </div>
       ) : null}
@@ -235,10 +245,11 @@ export function GuestEnrolForm({ slug, priceAud, isFree, showTeamOption = false 
           onTeamSeatsChange={setTeamSeats}
           unitPriceAud={priceAud}
           disabled={loading}
+          surface={surface}
         />
       ) : null}
-      <TurnstileWidget onVerify={setTurnstileToken} />
-      {error ? <p className="text-sm text-red-300">{error}</p> : null}
+      <TurnstileWidget onVerify={setTurnstileToken} surface={surface} />
+      {error ? <p className={`text-sm ${styles.error}`}>{error}</p> : null}
       <Button
         type="submit"
         disabled={loading}
@@ -253,9 +264,12 @@ export function GuestEnrolForm({ slug, priceAud, isFree, showTeamOption = false 
               ? `Continue to pay — $${(priceAud * teamSeats).toFixed(0)} AUD (${teamSeats} seats)`
               : `Continue to pay — $${priceAud.toFixed(0)} AUD`}
       </Button>
-      <p className="text-center text-xs text-white/40">
+      <p className={`text-center text-xs ${styles.help}`}>
         Already have an account?{' '}
-        <a href={`/login?next=${encodeURIComponent(`/courses/${slug}`)}`} className="text-[#2490ed] hover:underline">
+        <a
+          href={`/login?next=${encodeURIComponent(`/courses/${slug}`)}`}
+          className={`underline underline-offset-2 hover:no-underline ${styles.link}`}
+        >
           Sign in
         </a>
       </p>

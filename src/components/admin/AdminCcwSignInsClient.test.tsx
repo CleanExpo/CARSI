@@ -11,9 +11,6 @@ import { AdminCcwSignInsClient } from './AdminCcwSignInsClient';
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
 vi.mock('uqr', () => ({ renderSVG: vi.fn().mockReturnValue('<svg />') }));
-vi.mock('@/lib/marketing/ccw-roadshow', () => ({
-  ccwRoadshowEvents: [{ slug: 'melbourne', city: 'Melbourne' }],
-}));
 
 const roster = {
   eventSlug: 'melbourne',
@@ -127,6 +124,45 @@ afterEach(async () => {
   container.remove();
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
+});
+
+describe('AdminCcwSignInsClient occurrence picker', () => {
+  it('keeps the dated picker and both actions in a wrapping, width-bounded row', () => {
+    const picker = container.querySelector<HTMLSelectElement>('#ccw-event-select');
+    expect(picker).not.toBeNull();
+    const row = picker!.parentElement!;
+    expect(row.classList.contains('flex-wrap')).toBe(true);
+    expect(picker!.classList.contains('min-w-0')).toBe(true);
+    expect(picker!.classList.contains('max-w-full')).toBe(true);
+    expect(picker!.classList.contains('w-full')).toBe(true);
+    expect(picker!.classList.contains('sm:w-auto')).toBe(true);
+    expect(buttonByText(container, 'Run provision + offers').parentElement).toBe(row);
+    expect(buttonByText(container, 'Resend offer pack only').parentElement).toBe(row);
+  });
+
+  it('distinguishes the two Brisbane sittings while retaining their immutable option values', () => {
+    const picker = container.querySelector<HTMLSelectElement>('#ccw-event-select');
+    expect(picker).not.toBeNull();
+    const options = Array.from(picker!.options).map((option) => ({ value: option.value, label: option.textContent }));
+    expect(options).toContainEqual({ value: 'brisbane', label: 'Brisbane - 11-12 September 2026' });
+    expect(options).toContainEqual({ value: 'brisbane-2026-10-09', label: 'Brisbane - 9-10 October 2026' });
+    expect(new Set(options.map((option) => option.label)).size).toBe(options.length);
+  });
+
+  it('loads the selected October identity rather than the historical September roster', async () => {
+    const picker = container.querySelector<HTMLSelectElement>('#ccw-event-select');
+    expect(picker).not.toBeNull();
+    vi.mocked(fetch).mockClear().mockResolvedValue(jsonResponse({
+      roster: { eventSlug: 'brisbane-2026-10-09', courseSlug: roster.courseSlug, rows: [] },
+    }));
+    await act(async () => {
+      picker!.value = 'brisbane-2026-10-09';
+      picker!.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    expect(fetch).toHaveBeenCalledWith('/api/admin/ccw-roadshow/sign-ins?eventSlug=brisbane-2026-10-09');
+    expect(fetch).not.toHaveBeenCalledWith('/api/admin/ccw-roadshow/sign-ins?eventSlug=brisbane');
+    expect(picker!.value).toBe('brisbane-2026-10-09');
+  });
 });
 
 describe('AdminCcwSignInsClient mutation pending contract', () => {

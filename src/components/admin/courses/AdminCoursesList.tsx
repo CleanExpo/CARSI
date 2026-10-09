@@ -236,7 +236,7 @@ export function AdminCoursesList() {
     replaceFilters(DEFAULT_ADMIN_COURSE_LIST_FILTERS);
   }
 
-  const catalogue = allRows ?? [];
+  const catalogue = useMemo(() => allRows ?? [], [allRows]);
   const summary = useMemo(() => summariseAdminCourses(catalogue), [catalogue]);
   const categories = useMemo(() => uniqueSortedLabels(catalogue, 'category'), [catalogue]);
   const levels = useMemo(() => uniqueSortedLabels(catalogue, 'level'), [catalogue]);

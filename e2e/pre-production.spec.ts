@@ -305,7 +305,7 @@ test.describe('2. Course catalogue', () => {
     // copy in the HTML is the RSC flight payload inside a <script>, which no locator matches.
     const heading = page.getByRole('heading', {
       level: 1,
-      name: /Restoration Training Courses/i,
+      name: /Restoration training you can start tonight/i,
     });
     await expect(heading).toHaveCount(1, { timeout: 15_000 });
     await expect(heading).toBeVisible({ timeout: 15_000 });

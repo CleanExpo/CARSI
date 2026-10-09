@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { getAppOrigin } from '@/lib/server/app-url';
+
 import { ONBOARDING_COOKIE } from '@/lib/auth/onboarding-cookie';
 import { SESSION_SENTINEL_COOKIE } from '@/lib/auth/session-sentinel';
 
@@ -20,13 +22,15 @@ function clearSessionCookies(response: NextResponse) {
 }
 
 export async function GET(request: NextRequest) {
-  return clearSessionCookies(NextResponse.redirect(new URL('/login', request.url), { status: 303 }));
+  return clearSessionCookies(
+    NextResponse.redirect(new URL('/login', getAppOrigin(request)), { status: 303 }),
+  );
 }
 
 export async function POST(request: NextRequest) {
   const acceptsHtml = request.headers.get('accept')?.includes('text/html') ?? false;
   const response = acceptsHtml
-    ? NextResponse.redirect(new URL('/login', request.url), { status: 303 })
+    ? NextResponse.redirect(new URL('/login', getAppOrigin(request)), { status: 303 })
     : NextResponse.json({ success: true });
 
   return clearSessionCookies(response);

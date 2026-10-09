@@ -11,7 +11,7 @@
  * start to day-two end; the description clarifies it runs each day.
  */
 
-import type { CcwRoadshowEvent } from './ccw-roadshow';
+import { allowsFreeEntryRegistration, type CcwRoadshowEvent } from './ccw-roadshow';
 
 /** Convert an ISO-8601 timestamp (with offset) to UTC calendar basic format: YYYYMMDDTHHMMSSZ. */
 export function toCalendarUtcStamp(iso: string): string {
@@ -27,7 +27,16 @@ function eventLocation(event: CcwRoadshowEvent): string {
 }
 
 function eventDetails(event: CcwRoadshowEvent): string {
-  return `${event.description} Runs ${event.timeLabel} (${event.dateRangeLabel}). Free entry for past and current Carpet Cleaners Warehouse customers.`;
+  const booking = allowsFreeEntryRegistration(event)
+    ? 'Free entry for past and current Carpet Cleaners Warehouse customers.'
+    : [
+      'Seats are booked through Carpet Cleaners Warehouse.',
+      event.unitAmountCents !== undefined ? `AUD${event.unitAmountCents / 100} including GST per person.` : '',
+      event.giftCardAmountCents !== undefined ? `One AUD${event.giftCardAmountCents / 100} CCW gift card per registration, redeemable after the course.` : '',
+      event.maxRegistrationsPerCustomer !== undefined ? `Maximum ${event.maxRegistrationsPerCustomer} registrations per customer.` : '',
+      event.bookingUrl ? `Book: ${event.bookingUrl}` : '',
+    ].filter(Boolean).join(' ');
+  return `${event.description} Runs ${event.timeLabel} (${event.dateRangeLabel}). ${booking}`;
 }
 
 /** Build a Google Calendar "render template" URL that pre-fills a new event. */
@@ -39,6 +48,7 @@ export function buildGoogleCalendarLink(event: CcwRoadshowEvent): string {
     location: eventLocation(event),
     details: eventDetails(event),
   });
+  if (event.timeZone) params.set('ctz', event.timeZone);
   return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
 
@@ -49,6 +59,22 @@ function escapeIcsText(value: string): string {
     .replace(/;/g, '\\;')
     .replace(/,/g, '\\,')
     .replace(/\r?\n/g, '\\n');
+}
+
+function foldIcsLine(line: string): string {
+  const encoder = new TextEncoder();
+  let folded = '';
+  let octets = 0;
+  for (const character of line) {
+    const size = encoder.encode(character).length;
+    if (octets + size > 75) {
+      folded += '\r\n ';
+      octets = 1;
+    }
+    folded += character;
+    octets += size;
+  }
+  return folded;
 }
 
 /** Build a standards-compliant .ics document for the event. */
@@ -73,7 +99,7 @@ export function buildIcsContent(event: CcwRoadshowEvent): string {
     'END:VEVENT',
     'END:VCALENDAR',
   ];
-  return lines.join('\r\n');
+  return lines.map(foldIcsLine).join('\r\n');
 }
 
 /** Build a data: URI for a download-able .ics (works without client JS). */

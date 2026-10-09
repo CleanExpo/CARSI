@@ -8,6 +8,7 @@ import {
   courseToAdminDto,
 } from '@/lib/admin/admin-courses-service';
 import type { OptimizedCourseDraft, OptimizedModuleDraft } from '@/lib/admin/optimize-course-draft';
+import { hasCurriculumPersistence } from '@/lib/admin/admin-course-curriculum-readback';
 import {
   CourseBuilderInputError,
   assertNoStandardText,
@@ -79,8 +80,8 @@ Rules you must follow:
 - Keep existing module titles. Expand to the asked module count. The last module is always the recap.
 - Paying customers need usable training, not a wall of theory. Each module must include: a realistic job-site scenario, at least one short quotation of what a customer, assessor or tech would actually say, and a practical example of how to handle it. Do not invent named people, certifications, statistics or standards. Typical dialogue is fine if it is clearly an example.
 - Never paste IICRC standard sections, tables, or procedures. Nominative mention only (e.g. "aligned to ANSI/IICRC S500") if the source already does that.
-- Never imply CARSI delivers IICRC certification or IICRC courses. If CEC is not in the source, do not add CEC hours.
-- Do not brand the course with IICRC discipline acronyms (WRT, ASD, AMRT, FSRT, CCT, TCST).
+- Never imply CARSI delivers certification or courses on behalf of the IICRC. If CEC is not in the source, do not add CEC hours.
+- Never brand the course with IICRC discipline acronyms (WRT, ASD, AMRT, FSRT, CCT, TCST).
 - Do not use em dashes or en dashes. Use a comma, a full stop, or a hyphen.
 - Avoid filler, stacked headings, and these phrases: "in today's world", "it is important to note", "in conclusion", "comprehensive", "delve into", "leverage", "robust", "cutting-edge", "unlock your potential", "when it comes to", "play a crucial role".
 - When asked for a single module body, return the instructional text only. Do not wrap it in JSON or markdown fences.`;
@@ -449,7 +450,20 @@ export async function discardOptimizeDraft(courseId: string, existingMeta: unkno
   });
 }
 
-function foundationFromCourse(dto: ReturnType<typeof courseToAdminDto>): string {
+function legacyCourseDto(course: NonNullable<Awaited<ReturnType<typeof adminGetCourse>>>) {
+  if (hasCurriculumPersistence(course)) {
+    throw new OptimizeCourseError('Structured curriculum optimisation is not supported', 409);
+  }
+  const dto = courseToAdminDto(course);
+  return { ...dto, description: dto.description ?? '', modules: dto.modules.map((module) => {
+    if (!('textContent' in module)) {
+      throw new OptimizeCourseError('Structured curriculum optimisation is not supported', 409);
+    }
+    return module;
+  }) };
+}
+
+function foundationFromCourse(dto: ReturnType<typeof legacyCourseDto>): string {
   const parts: string[] = [];
   parts.push(`Title: ${dto.title}`);
   if (dto.description)
@@ -491,7 +505,7 @@ export async function generateOptimizedCourseDraft(
 
   const course = await adminGetCourse(courseId);
   if (!course) throw new OptimizeCourseError('Not found', 404);
-  const dto = courseToAdminDto(course);
+  const dto = legacyCourseDto(course);
 
   onProgress?.({ step: 'scan', message: 'Preparing existing content…', percent: 10 });
 
@@ -650,7 +664,7 @@ export async function applyOptimizedCourseDraft(
     throw new OptimizeCourseError('No matching optimisation draft to apply', 409);
   }
 
-  const dto = courseToAdminDto(course);
+  const dto = legacyCourseDto(course);
   const modules = draft.modules.map((m, i) => {
     const prev = dto.modules[i];
     return {
@@ -671,7 +685,7 @@ export async function applyOptimizedCourseDraft(
     isFree: dto.isFree,
     priceAud: dto.priceAud,
     published: dto.published,
-    cecHours: dto.cecHours != null ? Number(dto.cecHours) : undefined,
+    // Text optimisation must not rewrite founder-controlled CEC data.
     durationHours: dto.durationHours != null ? Number(dto.durationHours) : undefined,
     iicrcDiscipline: dto.iicrcDiscipline,
     level: dto.level,
@@ -702,7 +716,7 @@ export async function optimizeAndApplyCourse(
 }> {
   const existing = await adminGetCourse(courseId);
   if (!existing) throw new OptimizeCourseError('Not found', 404);
-  const dto = courseToAdminDto(existing);
+  const dto = legacyCourseDto(existing);
   if (dto.isFree && !opts?.allowFree) {
     throw new OptimizeCourseError('Free courses are not optimised by the paid cron', 400);
   }

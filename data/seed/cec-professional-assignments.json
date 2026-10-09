@@ -32,8 +32,8 @@
   "slugAliases": {
     "introduction-to-advanced-structural-drying-concepts": "advancedstructural",
     "introduction-to-advanced-structural-drying-concepts-aud-29-iicrc-asd-5-modules": "advancedstructural",
-    "introduction-to-advanced-applied-structural-drying": "advanced-applied",
-    "introduction-to-advanced-applied-structural-drying-free-iicrc-asd-6-modules": "advanced-applied",
+    "introduction-to-advanced-structural-drying": "advanced-applied",
+    "introduction-to-advanced-structural-drying-free-iicrc-asd-6-modules": "advanced-applied",
     "introduction-to-advanced-drying-equipment-and-methods-aud-29-iicrc-asd-5-modules": "introduction-to-advanced-drying-equipment-and-methods",
     "introduction-to-applied-microbial-remediation": "applied-microbial",
     "introduction-to-applied-structural-drying": "structural-drying-2",
@@ -104,7 +104,7 @@
     "carpet-cleaning-basics": 3,
     "glass-cleaning-course-ccw": 1,
     "level-2-mould-remediation": 4,
-    "wrt-water-damage-essentials": 4,
+    "water-damage-essentials": 4,
     "air-movers-for-professional-restoration-specs-selection-on-site-assessment": 1,
     "tile-cleaning-for-carpet-cleaners": 1
   },

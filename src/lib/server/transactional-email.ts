@@ -161,7 +161,7 @@ export async function sendEnrollmentWelcomeEmail(params: {
     return { sent: false, reason: 'send_failed' };
   }
 
-  const base = appOrigin.replace(/\/$/, '');
+  const base = resolveAppOrigin(appOrigin);
   const learnPath = (await getFirstLessonLearnPath(courseSlug)) ?? '/dashboard/student';
   const startUrl = `${base}${learnPath}`;
   const dashboardUrl = `${base}/dashboard/student`;
@@ -685,10 +685,10 @@ export function resolveAppOrigin(
   originOrRequest?: { nextUrl?: { origin: string } } | string | null
 ): string {
   if (typeof originOrRequest === 'string' && originOrRequest.trim()) {
-    return originOrRequest.replace(/\/$/, '');
+    return getAppOrigin({ nextUrl: { origin: originOrRequest } });
   }
   if (originOrRequest && typeof originOrRequest === 'object' && 'nextUrl' in originOrRequest) {
-    return getAppOrigin(originOrRequest as Parameters<typeof getAppOrigin>[0]);
+    return getAppOrigin(originOrRequest);
   }
   return getAppOrigin();
 }

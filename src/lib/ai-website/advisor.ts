@@ -48,9 +48,9 @@ const PATHS: Record<string, Path> = {
     ],
   },
   carpet: {
-    label: 'Carpet & upholstery', designation: 'CARSI Cleaning Technician', earnsCec: true,
+    label: 'Carpet & upholstery', designation: 'CARSI Carpet Cleaning Practitioner', earnsCec: true,
     courses: [
-      { course: 'Carpet Cleaning Technician Fundamentals', tier: '$99' },
+      { course: 'Carpet Cleaning Fundamentals', tier: '$99' },
       { course: 'Pet Urine & Odour Decontamination', tier: '$29' },
       { course: 'Truckmount Operations', tier: '$99' },
     ],

@@ -48,6 +48,21 @@ export const REGISTRY_REVIEWED = '2026-09-06';
  */
 export const APPROVED_MODELS: ModelConfig[] = [
   {
+    id: 'claude-sonnet-4-6',
+    provider: 'anthropic',
+    taskTypes: ['reasoning'],
+    approvedDefault: false,
+    status: 'review-needed',
+    notes:
+      'IN USE by the direct admin course optimiser, not an approved default. ' +
+      'Anthropic lists this API model as Active on 2026-09-30, with retirement ' +
+      'not sooner than 2027-02-17: ' +
+      'https://platform.claude.com/docs/en/about-claude/model-deprecations. ' +
+      'Recorded to expose routing drift without silently changing model behaviour ' +
+      'or treating provider availability as CARSI approval. Review the optimiser ' +
+      'against the approved reasoning route before promoting it.',
+  },
+  {
     id: 'claude-sonnet-5',
     provider: 'anthropic',
     taskTypes: ['reasoning', 'orchestration'],
