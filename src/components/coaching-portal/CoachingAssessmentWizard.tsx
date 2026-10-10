@@ -183,7 +183,7 @@ export function CoachingAssessmentWizard() {
 
   return (
     <div className={coachingPage}>
-      <Link href="/coaching" className="text-sm text-sky-400 transition-colors hover:text-sky-300">
+      <Link href="/dashboard/coaching" className="text-sm text-sky-400 transition-colors hover:text-sky-300">
         ← Home
       </Link>
 
@@ -220,10 +220,10 @@ export function CoachingAssessmentWizard() {
             Phill will review your answers and follow up by email.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <Link href="/coaching/onboarding/submit" className={coachingPrimaryBtn}>
+            <Link href="/dashboard/coaching/onboarding/submit" className={coachingPrimaryBtn}>
               Next: Send to Phill
             </Link>
-            <Link href="/coaching" className={coachingSecondaryBtn}>
+            <Link href="/dashboard/coaching" className={coachingSecondaryBtn}>
               Back to Home
             </Link>
           </div>

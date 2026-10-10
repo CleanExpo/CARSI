@@ -83,6 +83,16 @@ const nextConfig: NextConfig = {
         destination: '/ccw-training/success',
         permanent: false,
       },
+      {
+        source: '/coaching',
+        destination: '/dashboard/coaching',
+        permanent: true,
+      },
+      {
+        source: '/coaching/:path*',
+        destination: '/dashboard/coaching/:path*',
+        permanent: true,
+      },
     ];
   },
   typescript: {

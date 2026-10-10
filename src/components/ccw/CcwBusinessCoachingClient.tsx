@@ -109,7 +109,7 @@ const faqs = [
   {
     question: 'What is the Business Coaching Portal?',
     answer:
-      'A dedicated coaching area (separate from My Learning) for your plan, monthly actions, session prep, and resources. Sign in after subscribing to open it at /coaching.',
+      'A dedicated coaching area (separate from My Learning) for your plan, monthly actions, session prep, and resources. Sign in after subscribing to open it at /dashboard/coaching.',
   },
   {
     question: 'Are add-ons included in $495/month?',

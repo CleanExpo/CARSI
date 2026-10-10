@@ -37,7 +37,7 @@ export function CoachingOnboardingStatusBar() {
         </div>
         {onboardingSubmit.complete ? (
           <Link
-            href="/coaching/onboarding/packet"
+            href="/dashboard/coaching/onboarding/packet"
             className="text-xs font-semibold text-sky-300 hover:text-sky-200"
           >
             View what we sent Phill →

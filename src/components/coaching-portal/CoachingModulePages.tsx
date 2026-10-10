@@ -491,7 +491,7 @@ export function CoachingBillingPage() {
         <h2 className={coachingCardTitle}>Growth services</h2>
         <p className={`mt-2 ${coachingMuted}`}>
           Website, SEO, and implementation work are invoiced separately. Request quotes from{' '}
-          <Link href="/coaching/services" className="text-sky-400 hover:underline">
+          <Link href="/dashboard/coaching/services" className="text-sky-400 hover:underline">
             Growth services
           </Link>
           .

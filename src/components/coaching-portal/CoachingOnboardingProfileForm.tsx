@@ -95,7 +95,7 @@ export function CoachingOnboardingProfileForm() {
 
   return (
     <div className={coachingPage}>
-      <Link href="/coaching" className="text-sm text-sky-400 transition-colors hover:text-sky-300">
+      <Link href="/dashboard/coaching" className="text-sm text-sky-400 transition-colors hover:text-sky-300">
         ← Home
       </Link>
 
@@ -301,7 +301,7 @@ export function CoachingOnboardingProfileForm() {
             {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
             Save & mark complete
           </button>
-          <Link href="/coaching/onboarding/assessment" className={coachingSecondaryBtn}>
+          <Link href="/dashboard/coaching/onboarding/assessment" className={coachingSecondaryBtn}>
             Next: Assessment
           </Link>
         </div>

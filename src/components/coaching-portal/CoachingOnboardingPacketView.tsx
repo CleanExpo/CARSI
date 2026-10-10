@@ -70,7 +70,7 @@ export function CoachingOnboardingPacketView() {
       <div className={coachingPage}>
         <p className={coachingMuted}>No onboarding submission on file yet.</p>
         <Link
-          href="/coaching/onboarding/submit"
+          href="/dashboard/coaching/onboarding/submit"
           className={`mt-4 inline-flex ${coachingSecondaryBtn}`}
         >
           Send to Phill
@@ -89,7 +89,7 @@ export function CoachingOnboardingPacketView() {
 
   return (
     <div className={coachingPage}>
-      <Link href="/coaching" className="text-sm text-sky-400 hover:text-sky-300">
+      <Link href="/dashboard/coaching" className="text-sm text-sky-400 hover:text-sky-300">
         ← Home
       </Link>
       <header className="mt-5 mb-6">

@@ -6,6 +6,7 @@ import {
   listCoachingActionsForUser,
 } from '@/lib/server/carsi-coaching-actions-store';
 import { getCoachingPortalAccess } from '@/lib/server/carsi-coaching-portal-access';
+import { coachingPortalPath } from '@/lib/coaching-portal/coaching-portal-paths';
 import { getCoachingPortalRowForUser } from '@/lib/server/carsi-coaching-subscription-store';
 
 export type CoachingHomeState = 'locked' | 'onboarding' | 'assessment_pending' | 'active';
@@ -214,14 +215,14 @@ export async function loadCoachingPortalDashboard(
       title: 'Complete your business profile',
       description: 'Tell us about your business, your experience, and what you want to achieve.',
       complete: profileComplete,
-      href: '/coaching/onboarding/profile',
+      href: coachingPortalPath('/onboarding/profile'),
     },
     {
       id: 'assessment' as const,
       title: 'Complete your business assessment',
       description: 'Help Phill understand your biggest challenges and opportunities.',
       complete: assessmentSubmitted,
-      href: '/coaching/onboarding/assessment',
+      href: coachingPortalPath('/onboarding/assessment'),
     },
     {
       id: 'submit' as const,
@@ -229,14 +230,14 @@ export async function loadCoachingPortalDashboard(
       description:
         'Confirm your problem, your goal, and we will email Phill your full profile and assessment.',
       complete: onboardingSubmitComplete,
-      href: '/coaching/onboarding/submit',
+      href: coachingPortalPath('/onboarding/submit'),
     },
     {
       id: 'session' as const,
       title: 'Book your first coaching session',
       description: 'Choose a suitable time for your first 60-minute consultation.',
       complete: hasBookedAny,
-      href: '/coaching/sessions',
+      href: coachingPortalPath('/sessions'),
     },
   ];
 

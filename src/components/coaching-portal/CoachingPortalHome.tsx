@@ -146,13 +146,13 @@ function AssessmentPendingHome() {
           </div>
         ) : null}
         <div className="mt-6 flex flex-wrap gap-3">
-          <Link href="/coaching/onboarding/packet" className={coachingSecondaryBtn}>
+          <Link href="/dashboard/coaching/onboarding/packet" className={coachingSecondaryBtn}>
             What we sent Phill
           </Link>
-          <Link href="/coaching/onboarding/assessment" className={coachingSecondaryBtn}>
+          <Link href="/dashboard/coaching/onboarding/assessment" className={coachingSecondaryBtn}>
             View your answers
           </Link>
-          <Link href="/coaching/sessions" className={coachingPrimaryBtn}>
+          <Link href="/dashboard/coaching/sessions" className={coachingPrimaryBtn}>
             Sessions
           </Link>
         </div>
@@ -184,7 +184,7 @@ function ActiveHome() {
             {plan.focusDescription ? (
               <p className={`mt-2 ${coachingMuted}`}>{plan.focusDescription}</p>
             ) : null}
-            <Link href="/coaching/plan" className={`mt-4 inline-flex ${coachingPrimaryBtn}`}>
+            <Link href="/dashboard/coaching/plan" className={`mt-4 inline-flex ${coachingPrimaryBtn}`}>
               View my plan
             </Link>
           </section>
@@ -195,7 +195,7 @@ function ActiveHome() {
               No approved growth plan yet. Phill will publish your plan after reviewing your
               assessment.
             </p>
-            <Link href="/coaching/plan" className={`mt-4 inline-flex ${coachingSecondaryBtn}`}>
+            <Link href="/dashboard/coaching/plan" className={`mt-4 inline-flex ${coachingSecondaryBtn}`}>
               View plan
             </Link>
           </section>
@@ -215,14 +215,14 @@ function ActiveHome() {
                   })}
                 </p>
               ) : null}
-              <Link href="/coaching/actions" className={`mt-4 inline-flex ${coachingPrimaryBtn}`}>
+              <Link href="/dashboard/coaching/actions" className={`mt-4 inline-flex ${coachingPrimaryBtn}`}>
                 View action
               </Link>
             </>
           ) : (
             <>
               <p className={`mt-2 ${coachingMuted}`}>No actions assigned yet.</p>
-              <Link href="/coaching/actions" className={`mt-4 inline-flex ${coachingSecondaryBtn}`}>
+              <Link href="/dashboard/coaching/actions" className={`mt-4 inline-flex ${coachingSecondaryBtn}`}>
                 Action board
               </Link>
             </>
@@ -247,7 +247,7 @@ function ActiveHome() {
                 {sessions.upcoming.durationMinutes} min with {sessions.upcoming.coachName}
               </p>
               <div className="mt-4 flex flex-wrap gap-2">
-                <Link href="/coaching/sessions" className={coachingPrimaryBtn}>
+                <Link href="/dashboard/coaching/sessions" className={coachingPrimaryBtn}>
                   View session
                 </Link>
                 {sessions.upcoming.meetingUrl ? (
@@ -266,7 +266,7 @@ function ActiveHome() {
             <>
               <p className={`mt-2 ${coachingMuted}`}>You have no upcoming sessions scheduled.</p>
               <Link
-                href="/coaching/sessions"
+                href="/dashboard/coaching/sessions"
                 className={`mt-4 inline-flex ${coachingSecondaryBtn}`}
               >
                 Book or view sessions

@@ -24,6 +24,6 @@ describe('CARSI coaching program content', () => {
   });
 
   it('uses a dedicated coaching portal path outside the LMS dashboard', () => {
-    expect(carsiCoachingPortalPath).toBe('/coaching');
+    expect(carsiCoachingPortalPath).toBe('/dashboard/coaching');
   });
 });

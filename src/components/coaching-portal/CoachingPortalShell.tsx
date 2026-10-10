@@ -18,11 +18,12 @@ import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/components/auth/auth-provider';
 import { CoachingPortalProvider } from '@/components/coaching-portal/CoachingPortalContext';
 import { COACHING_PORTAL_NAV_MAIN } from '@/components/coaching-portal/coaching-portal-nav';
+import { coachingPortalBasePath } from '@/lib/coaching-portal/coaching-portal-paths';
 import { openCoachingSupportEmail } from '@/lib/coaching-portal/support-contact';
 import type { CoachingPortalDashboard } from '@/lib/server/carsi-coaching-portal-dashboard';
 
 function navActive(pathname: string, href: string): boolean {
-  if (href === '/coaching') return pathname === '/coaching';
+  if (href === coachingPortalBasePath) return pathname === coachingPortalBasePath;
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
@@ -155,7 +156,7 @@ export function CoachingPortalShell({
     <div className="flex h-full min-h-0 flex-col">
       <div className="shrink-0 border-b border-white/[0.06] px-4 pt-5 pb-4">
         <Link
-          href="/coaching"
+          href={coachingPortalBasePath}
           className="flex items-center gap-3 rounded-lg ring-[#2490ed]/0 transition-shadow outline-none focus-visible:ring-2"
           onClick={closeDrawer}
         >

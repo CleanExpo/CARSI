@@ -6,7 +6,7 @@ import {
 } from '@/lib/marketing/carsi-coaching-monthly';
 import { ccwRoadshowPath } from '@/lib/marketing/ccw-roadshow';
 
-export const carsiCoachingPortalPath = '/coaching';
+export const carsiCoachingPortalPath = '/dashboard/coaching';
 
 /** When true, add-on booking stays preview-only (portal is live at {@link carsiCoachingPortalPath}). */
 export const carsiCoachingAddOnsComingSoon = true;

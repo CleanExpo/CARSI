@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 export default async function CoachingPortalLayout({ children }: { children: React.ReactNode }) {
   const claims = await getServerSessionClaims();
   if (!claims) {
-    redirect('/login?next=/coaching');
+    redirect('/login?next=/dashboard/coaching');
   }
 
   const dashboard = await loadCoachingPortalDashboard(claims);

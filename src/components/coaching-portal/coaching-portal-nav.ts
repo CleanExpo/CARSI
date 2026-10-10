@@ -9,6 +9,8 @@ import {
   Video,
 } from 'lucide-react';
 
+import { coachingPortalPath } from '@/lib/coaching-portal/coaching-portal-paths';
+
 export type CoachingPortalNavItem = {
   href: string;
   label: string;
@@ -16,11 +18,11 @@ export type CoachingPortalNavItem = {
 };
 
 export const COACHING_PORTAL_NAV_MAIN: CoachingPortalNavItem[] = [
-  { href: '/coaching', label: 'Home', icon: Home },
-  { href: '/coaching/plan', label: 'My Plan', icon: Compass },
-  { href: '/coaching/actions', label: 'Actions', icon: ClipboardList },
-  { href: '/coaching/sessions', label: 'Sessions', icon: Video },
-  { href: '/coaching/resources', label: 'Resources', icon: Library },
-  { href: '/coaching/billing', label: 'Billing', icon: CircleDollarSign },
-  { href: '/coaching/services', label: 'Growth services', icon: Sparkles },
+  { href: coachingPortalPath(), label: 'Home', icon: Home },
+  { href: coachingPortalPath('/plan'), label: 'My Plan', icon: Compass },
+  { href: coachingPortalPath('/actions'), label: 'Actions', icon: ClipboardList },
+  { href: coachingPortalPath('/sessions'), label: 'Sessions', icon: Video },
+  { href: coachingPortalPath('/resources'), label: 'Resources', icon: Library },
+  { href: coachingPortalPath('/billing'), label: 'Billing', icon: CircleDollarSign },
+  { href: coachingPortalPath('/services'), label: 'Growth services', icon: Sparkles },
 ];

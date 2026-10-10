@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
 
 export default function LegacySessionRedirect() {
-  redirect('/coaching/sessions');
+  redirect('/dashboard/coaching/sessions');
 }

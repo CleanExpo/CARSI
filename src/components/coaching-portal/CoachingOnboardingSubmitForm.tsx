@@ -108,7 +108,7 @@ export function CoachingOnboardingSubmitForm() {
       <div className={coachingPage}>
         <p className={coachingMuted}>Complete your business profile first.</p>
         <Link
-          href="/coaching/onboarding/profile"
+          href="/dashboard/coaching/onboarding/profile"
           className={`mt-4 inline-flex ${coachingPrimaryBtn}`}
         >
           Business profile
@@ -122,7 +122,7 @@ export function CoachingOnboardingSubmitForm() {
       <div className={coachingPage}>
         <p className={coachingMuted}>Submit your business assessment before sending to Phill.</p>
         <Link
-          href="/coaching/onboarding/assessment"
+          href="/dashboard/coaching/onboarding/assessment"
           className={`mt-4 inline-flex ${coachingPrimaryBtn}`}
         >
           Business assessment
@@ -156,13 +156,13 @@ export function CoachingOnboardingSubmitForm() {
                 updating.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
-                <Link href="/coaching/onboarding/packet" className={coachingPrimaryBtn}>
+                <Link href="/dashboard/coaching/onboarding/packet" className={coachingPrimaryBtn}>
                   View what we sent Phill
                 </Link>
-                <Link href="/coaching/sessions" className={coachingSecondaryBtn}>
+                <Link href="/dashboard/coaching/sessions" className={coachingSecondaryBtn}>
                   Book your first session
                 </Link>
-                <Link href="/coaching" className={coachingSecondaryBtn}>
+                <Link href="/dashboard/coaching" className={coachingSecondaryBtn}>
                   Home
                 </Link>
               </div>
@@ -175,7 +175,7 @@ export function CoachingOnboardingSubmitForm() {
 
   return (
     <div className={coachingPage}>
-      <Link href="/coaching" className="text-sm text-sky-400 transition-colors hover:text-sky-300">
+      <Link href="/dashboard/coaching" className="text-sm text-sky-400 transition-colors hover:text-sky-300">
         ← Home
       </Link>
 
@@ -252,7 +252,7 @@ export function CoachingOnboardingSubmitForm() {
             {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
             Submit to Phill
           </button>
-          <Link href="/coaching/onboarding/assessment" className={coachingSecondaryBtn}>
+          <Link href="/dashboard/coaching/onboarding/assessment" className={coachingSecondaryBtn}>
             Review assessment
           </Link>
         </div>

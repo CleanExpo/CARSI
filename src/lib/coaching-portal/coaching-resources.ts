@@ -1,3 +1,5 @@
+import { coachingPortalPath } from '@/lib/coaching-portal/coaching-portal-paths';
+
 export type CoachingResourceItem = {
   id: string;
   title: string;
@@ -69,14 +71,14 @@ export const COACHING_RESOURCE_SECTIONS: CoachingResourceSection[] = [
         id: 'session-prep',
         title: 'Session prep (portal)',
         description: 'Tell Phill what you want to cover before each monthly call.',
-        href: '/coaching/sessions',
+        href: coachingPortalPath('/sessions'),
         tag: 'Workspace',
       },
       {
         id: 'actions',
         title: 'Monthly actions',
         description: 'Track commitments from your coaching plan.',
-        href: '/coaching/actions',
+        href: coachingPortalPath('/actions'),
         tag: 'Workspace',
       },
     ],
@@ -90,14 +92,14 @@ export const COACHING_RESOURCE_SECTIONS: CoachingResourceSection[] = [
         id: 'growth-services',
         title: 'Growth services',
         description: 'Website, SEO, ads, and automation — request a written quote in the portal.',
-        href: '/coaching/services',
+        href: coachingPortalPath('/services'),
         tag: 'Add-ons',
       },
       {
         id: 'billing',
         title: 'Billing & subscription',
         description: 'Update payment method or view invoices via Stripe.',
-        href: '/coaching/billing',
+        href: coachingPortalPath('/billing'),
         tag: 'Account',
       },
     ],
