@@ -6,6 +6,10 @@ import {
   buildOnboardingReportPlainText,
   type OnboardingSubmitStatements,
 } from '@/lib/coaching-portal/onboarding-report';
+import {
+  serializeOnboardingSnapshot,
+  type CoachingOnboardingSnapshot,
+} from '@/lib/coaching-portal/onboarding-snapshot';
 import { carsiCoachingPortalPath } from '@/lib/marketing/carsi-coaching-program';
 import { prisma } from '@/lib/prisma';
 import { getAppOrigin } from '@/lib/server/app-url';
@@ -146,6 +150,23 @@ export async function submitCoachingOnboardingToCoach(
     extraNotes,
   };
 
+  const profile = profileFromApiRow(profileRow as unknown as Record<string, string | null>);
+  const assessmentResponses = parseAssessmentResponsesJson(assessment.responsesJson);
+  const member = {
+    fullName: claims.full_name?.trim() || claims.email,
+    email: claims.email,
+  };
+  const submittedAtIso = submittedAt.toISOString();
+
+  const snapshot: CoachingOnboardingSnapshot = {
+    version: 1,
+    submittedAtIso,
+    member,
+    profile,
+    assessmentResponses,
+    statements,
+  };
+
   await prisma.carsiCoachingBusinessProfile.update({
     where: { userId },
     data: {
@@ -154,16 +175,9 @@ export async function submitCoachingOnboardingToCoach(
       onboardingExtraNotes: extraNotes || null,
       onboardingSubmittedAt: submittedAt,
       onboardingEmailsSentAt: submittedAt,
+      onboardingSnapshotJson: serializeOnboardingSnapshot(snapshot),
     },
   });
-
-  const profile = profileFromApiRow(profileRow as unknown as Record<string, string | null>);
-  const assessmentResponses = parseAssessmentResponsesJson(assessment.responsesJson);
-  const member = {
-    fullName: claims.full_name?.trim() || claims.email,
-    email: claims.email,
-  };
-  const submittedAtIso = submittedAt.toISOString();
   const appOrigin = getAppOrigin();
   const portalUrl = `${appOrigin.replace(/\/$/, '')}${carsiCoachingPortalPath}`;
 
