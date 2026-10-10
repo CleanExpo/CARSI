@@ -1215,6 +1215,7 @@ model CarsiCoachingBusinessProfile {
   onboardingExtraNotes       String? @map("onboarding_extra_notes") @db.Text
   onboardingSubmittedAt        DateTime? @map("onboarding_submitted_at") @db.Timestamptz(6)
   onboardingEmailsSentAt       DateTime? @map("onboarding_emails_sent_at") @db.Timestamptz(6)
+  onboardingSnapshotJson       String?   @map("onboarding_snapshot_json") @db.Text
   completedAt         DateTime? @map("completed_at") @db.Timestamptz(6)
   createdAt           DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt           DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
