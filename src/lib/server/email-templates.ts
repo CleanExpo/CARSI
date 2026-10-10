@@ -1203,3 +1203,112 @@ export function renderCoachingOnboardingSubmittedMemberEmail(params: {
     ].join('\n')
   );
 }
+
+export function renderCoachingSessionPrepCoachEmail(params: {
+  appOrigin: string;
+  businessName: string;
+  memberName: string;
+  memberEmail: string;
+  prepNotes: string;
+  portalUrl: string;
+}): RenderedEmail {
+  const details = [
+    { label: 'Business', value: params.businessName },
+    { label: 'Member', value: params.memberName },
+    { label: 'Email', value: params.memberEmail },
+  ];
+
+  return render(
+    {
+      appOrigin: params.appOrigin,
+      preheader: `Session prep from ${params.businessName}`,
+      eyebrow: 'Business Coaching',
+      title: 'Session prep notes',
+      paragraphs: ['A member updated what they want to cover on the next coaching call.'],
+      details,
+      messageHtml: formatPlainMessageAsHtml(params.prepNotes),
+      cta: { label: 'Coaching portal', href: params.portalUrl },
+    },
+    [
+      'Session prep',
+      '',
+      ...details.map((d) => `${d.label}: ${d.value}`),
+      '',
+      params.prepNotes,
+    ].join('\n')
+  );
+}
+
+export function renderCoachingGrowthQuoteCoachEmail(params: {
+  appOrigin: string;
+  businessName: string;
+  memberName: string;
+  memberEmail: string;
+  categoryTitle: string;
+  serviceTitle: string;
+  rateLabel: string;
+  message: string;
+  portalUrl: string;
+}): RenderedEmail {
+  const details = [
+    { label: 'Business', value: params.businessName },
+    { label: 'Member', value: params.memberName },
+    { label: 'Email', value: params.memberEmail },
+    { label: 'Category', value: params.categoryTitle },
+    { label: 'Service', value: params.serviceTitle },
+    { label: 'Indicative rate', value: params.rateLabel },
+  ];
+
+  return render(
+    {
+      appOrigin: params.appOrigin,
+      preheader: `Growth services quote — ${params.serviceTitle}`,
+      eyebrow: 'Growth services',
+      title: 'Quote request',
+      paragraphs: ['A coaching member requested a written quote for implementation work.'],
+      details,
+      messageHtml: formatPlainMessageAsHtml(params.message),
+      cta: { label: 'Growth services', href: params.portalUrl },
+    },
+    [
+      'Growth quote request',
+      '',
+      ...details.map((d) => `${d.label}: ${d.value}`),
+      '',
+      params.message,
+    ].join('\n')
+  );
+}
+
+export function renderCoachingGrowthQuoteMemberEmail(params: {
+  appOrigin: string;
+  name: string;
+  serviceTitle: string;
+  rateLabel: string;
+  portalUrl: string;
+}): RenderedEmail {
+  const name = params.name.trim() || 'there';
+  return render(
+    {
+      appOrigin: params.appOrigin,
+      preheader: 'We received your Growth services quote request',
+      eyebrow: 'Growth services',
+      title: 'Quote request received',
+      paragraphs: [
+        `Hi ${name},`,
+        `Thanks for your interest in ${params.serviceTitle} (indicative ${params.rateLabel}).`,
+        'Phill or the CARSI team will reply with a written quote — final pricing is confirmed before any work starts.',
+        'Your coaching membership covers strategy and accountability; implementation is quoted separately.',
+      ],
+      details: [{ label: 'Service', value: params.serviceTitle }],
+      cta: { label: 'View Growth services', href: params.portalUrl },
+    },
+    [
+      `Hi ${name},`,
+      '',
+      `Quote request: ${params.serviceTitle} (${params.rateLabel})`,
+      '',
+      params.portalUrl,
+    ].join('\n')
+  );
+}
