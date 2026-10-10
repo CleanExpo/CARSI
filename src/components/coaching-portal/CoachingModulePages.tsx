@@ -12,15 +12,19 @@ import {
   coachingPrimaryBtn,
   coachingSecondaryBtn,
 } from '@/components/coaching-portal/coaching-ui';
+import { CoachingGrowthQuoteDialog } from '@/components/coaching-portal/CoachingGrowthQuoteDialog';
 import { useCoachingPortal } from '@/components/coaching-portal/CoachingPortalContext';
-import { COACHING_GROWTH_SERVICE_CATEGORIES } from '@/lib/coaching-portal/growth-services';
+import { CoachingSessionPrepCard } from '@/components/coaching-portal/CoachingSessionPrepCard';
+import { COACHING_RESOURCE_SECTIONS } from '@/lib/coaching-portal/coaching-resources';
+import {
+  COACHING_GROWTH_SERVICE_CATEGORIES,
+  type GrowthServiceItem,
+} from '@/lib/coaching-portal/growth-services';
 import { openCoachingSupportEmail } from '@/lib/coaching-portal/support-contact';
 import type { CoachingActionStatus } from '@/lib/coaching-portal/types';
 import { carsiCoachingMonthlyPriceLabel } from '@/lib/marketing/carsi-coaching-monthly';
-import {
-  carsiCoachingAddOnContactEmail,
-  carsiCoachingAddOnsComingSoon,
-} from '@/lib/marketing/carsi-coaching-program';
+import { carsiCoachingAddOnContactEmail } from '@/lib/marketing/carsi-coaching-program';
+import { ExternalLink } from 'lucide-react';
 
 type ActionItem = {
   id: string;
@@ -244,7 +248,9 @@ export function CoachingSessionsPage() {
         Your consultations with Phill — prep, join, and follow-up.
       </p>
 
-      <section className={`${coachingCard} mt-6`}>
+      <CoachingSessionPrepCard />
+
+      <section className={`${coachingCard} mt-4`}>
         <h2 className={coachingCardTitle}>Upcoming session</h2>
         {upcoming ? (
           <>
@@ -310,33 +316,57 @@ export function CoachingSessionsPage() {
 export function CoachingResourcesPage() {
   return (
     <div className={coachingPage}>
-      <h1 className="text-2xl font-semibold text-white">Resources</h1>
-      <p className={`mt-2 ${coachingMuted}`}>
-        CARSI learning and templates tied to your coaching plan.
+      <h1 className="text-2xl font-semibold tracking-tight text-white">Resources</h1>
+      <p className={`mt-2 max-w-2xl ${coachingMuted}`}>
+        Learning, checklists, and workspace links curated for coaching members. Strategy stays in
+        your plan; hands-on implementation is quoted under Growth services.
       </p>
-      <section className={`${coachingCard} mt-6`}>
-        <Link href="/dashboard/courses" className="font-semibold text-sky-400 hover:underline">
-          Open course catalogue
-        </Link>
-        <p className={`mt-2 ${coachingMuted}`}>
-          Complete modules Phill assigns in My Learning. Enrolment rules still apply to paid
-          courses.
-        </p>
-        <p className={`mt-4 ${coachingMuted}`}>
-          Templates and checklists: email{' '}
-          <a
-            href={`mailto:${carsiCoachingAddOnContactEmail}`}
-            className="text-sky-400 hover:underline"
-          >
-            {carsiCoachingAddOnContactEmail}
-          </a>
-        </p>
-        {carsiCoachingAddOnsComingSoon ? (
-          <p className="mt-4 text-sm text-amber-100/90">
-            Add-on booking in the portal is coming soon.
-          </p>
-        ) : null}
-      </section>
+      <div className="mt-8 space-y-6">
+        {COACHING_RESOURCE_SECTIONS.map((section) => (
+          <section key={section.id} className={coachingCard}>
+            <h2 className={coachingCardTitle}>{section.title}</h2>
+            <p className={`mt-1 ${coachingMuted}`}>{section.description}</p>
+            <ul className="mt-5 divide-y divide-white/[0.06]">
+              {section.items.map((item) => (
+                <li
+                  key={item.id}
+                  className="flex flex-col gap-2 py-4 first:pt-0 last:pb-0 sm:flex-row sm:items-start sm:justify-between"
+                >
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="text-sm font-semibold text-white">{item.title}</p>
+                      {item.tag ? (
+                        <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-[10px] font-semibold tracking-wide text-slate-400 uppercase">
+                          {item.tag}
+                        </span>
+                      ) : null}
+                    </div>
+                    <p className={`mt-1 ${coachingMuted}`}>{item.description}</p>
+                  </div>
+                  <Link
+                    href={item.href}
+                    target={item.external ? '_blank' : undefined}
+                    rel={item.external ? 'noopener noreferrer' : undefined}
+                    className={`inline-flex shrink-0 items-center gap-1.5 text-sm font-semibold text-sky-300 hover:text-sky-200 ${coachingSecondaryBtn} !min-h-9 !px-3`}
+                  >
+                    Open
+                    {item.external ? <ExternalLink className="h-3.5 w-3.5" aria-hidden /> : null}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))}
+      </div>
+      <p className={`mt-8 text-sm ${coachingMuted}`}>
+        Questions?{' '}
+        <a
+          href={`mailto:${carsiCoachingAddOnContactEmail}`}
+          className="text-sky-400 hover:underline"
+        >
+          {carsiCoachingAddOnContactEmail}
+        </a>
+      </p>
     </div>
   );
 }
@@ -355,11 +385,18 @@ export function CoachingBillingPage() {
       })
     : null;
 
+  const statusLabel = subscription?.status?.replace(/_/g, ' ') ?? '—';
+  const isActive = subscription?.status === 'active' || subscription?.status === 'trialing';
+
   async function openBilling() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/coaching/portal/billing', { method: 'POST', body: '{}' });
+      const res = await fetch('/api/coaching/portal/billing', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: '{}',
+      });
       const data = (await res.json()) as { url?: string; detail?: string };
       if (!res.ok || !data.url) {
         setError(data.detail ?? 'Could not open billing.');
@@ -375,27 +412,65 @@ export function CoachingBillingPage() {
 
   return (
     <div className={coachingPage}>
-      <h1 className="text-2xl font-semibold text-white">Billing</h1>
-      <p className={`mt-2 ${coachingMuted}`}>
-        Coaching membership billing is separate from annual CARSI membership or course purchases.
+      <h1 className="text-2xl font-semibold tracking-tight text-white">Billing</h1>
+      <p className={`mt-2 max-w-2xl ${coachingMuted}`}>
+        CARSI Business Coaching is billed monthly through Stripe. This is separate from annual LMS
+        membership and one-off course purchases.
       </p>
-      <section className={`${coachingCard} mt-6`}>
-        <dl className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <dt className="text-xs text-slate-500 uppercase">Plan</dt>
-            <dd className="font-medium text-white">{carsiCoachingMonthlyPriceLabel} / month</dd>
+
+      <section className={`${coachingCard} mt-8`}>
+        <h2 className={coachingCardTitle}>Your membership</h2>
+        <dl className="mt-5 grid gap-5 sm:grid-cols-2">
+          <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-4">
+            <dt className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">
+              Plan
+            </dt>
+            <dd className="mt-1 text-lg font-semibold text-white">
+              {carsiCoachingMonthlyPriceLabel}
+              <span className="text-sm font-normal text-slate-400"> / month</span>
+            </dd>
           </div>
-          <div>
-            <dt className="text-xs text-slate-500 uppercase">Status</dt>
-            <dd className="font-medium text-white capitalize">{subscription?.status ?? '—'}</dd>
+          <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-4">
+            <dt className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">
+              Status
+            </dt>
+            <dd className="mt-1 flex flex-wrap items-center gap-2">
+              <span className="text-lg font-semibold text-white capitalize">{statusLabel}</span>
+              {isActive ? (
+                <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-semibold text-emerald-300 uppercase">
+                  Active
+                </span>
+              ) : null}
+            </dd>
           </div>
           {periodEnd ? (
-            <div className="sm:col-span-2">
-              <dt className="text-xs text-slate-500 uppercase">Current period ends</dt>
-              <dd className="text-white">{periodEnd}</dd>
+            <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-4 sm:col-span-2">
+              <dt className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">
+                {subscription?.cancelAtPeriodEnd ? 'Access until' : 'Next renewal'}
+              </dt>
+              <dd className="mt-1 text-white">{periodEnd}</dd>
+              {subscription?.cancelAtPeriodEnd ? (
+                <p className="mt-2 text-sm text-amber-200/90">
+                  Cancellation scheduled — you keep access until this date. You can reactivate in
+                  Stripe if needed.
+                </p>
+              ) : null}
             </div>
           ) : null}
         </dl>
+      </section>
+
+      <section className={`${coachingCard} mt-4`}>
+        <h2 className={coachingCardTitle}>Payment & invoices</h2>
+        <p className={`mt-2 ${coachingMuted}`}>
+          Update your card, download invoices, or cancel your coaching subscription in the secure
+          Stripe customer portal.
+        </p>
+        <ul className={`mt-4 list-inside list-disc text-sm ${coachingMuted}`}>
+          <li>Payment method and billing email</li>
+          <li>Invoice history (PDF)</li>
+          <li>Cancel or resume subscription</li>
+        </ul>
         {access.canEdit ? (
           <button
             type="button"
@@ -403,19 +478,32 @@ export function CoachingBillingPage() {
             disabled={loading}
             onClick={() => void openBilling()}
           >
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-            Manage subscription in Stripe
+            {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+            Open Stripe billing portal
           </button>
         ) : (
           <p className={`mt-4 ${coachingMuted}`}>Subscribe to manage billing.</p>
         )}
         {error ? <p className="mt-3 text-sm text-red-300">{error}</p> : null}
       </section>
+
+      <section className={`${coachingCard} mt-4`}>
+        <h2 className={coachingCardTitle}>Growth services</h2>
+        <p className={`mt-2 ${coachingMuted}`}>
+          Website, SEO, and implementation work are invoiced separately. Request quotes from{' '}
+          <Link href="/coaching/services" className="text-sky-400 hover:underline">
+            Growth services
+          </Link>
+          .
+        </p>
+      </section>
     </div>
   );
 }
 
 export function CoachingServicesPage() {
+  const [quoteService, setQuoteService] = useState<GrowthServiceItem | null>(null);
+
   return (
     <div className={coachingPage}>
       <h1 className="text-2xl font-semibold text-white">Growth services</h1>
@@ -454,6 +542,13 @@ export function CoachingServicesPage() {
                     <p className="text-sm font-semibold text-sky-300 tabular-nums">
                       {item.rateLabel}
                     </p>
+                    <button
+                      type="button"
+                      className={`mt-3 w-full sm:mt-0 sm:w-auto ${coachingSecondaryBtn} !min-h-9 !px-3 !text-xs`}
+                      onClick={() => setQuoteService(item)}
+                    >
+                      Request quote
+                    </button>
                   </div>
                 </li>
               ))}
@@ -464,19 +559,17 @@ export function CoachingServicesPage() {
       <div className="mt-6 flex flex-wrap gap-3">
         <button
           type="button"
-          className={coachingPrimaryBtn}
-          onClick={() => openCoachingSupportEmail('Growth services quote request')}
-        >
-          Request a quote
-        </button>
-        <button
-          type="button"
           className={coachingSecondaryBtn}
           onClick={() => openCoachingSupportEmail('Business Coaching support')}
         >
           Contact support
         </button>
       </div>
+      <CoachingGrowthQuoteDialog
+        open={Boolean(quoteService)}
+        service={quoteService}
+        onClose={() => setQuoteService(null)}
+      />
     </div>
   );
 }
