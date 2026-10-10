@@ -1,0 +1,38 @@
+import { NextRequest, NextResponse } from 'next/server';
+
+import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
+import { decideCoachingPortalEntitlement } from '@/lib/server/carsi-coaching-entitlement';
+import { submitCoachingGrowthQuoteRequest } from '@/lib/server/carsi-coaching-growth-quote';
+import { getCoachingPortalRowForUser } from '@/lib/server/carsi-coaching-subscription-store';
+
+export async function POST(request: NextRequest) {
+  const claims = await getSessionClaimsFromRequest(request);
+  if (!claims) return NextResponse.json({ detail: 'Sign in required.' }, { status: 401 });
+
+  const sub = await getCoachingPortalRowForUser(claims.sub);
+  const entitlement = decideCoachingPortalEntitlement(
+    sub ? { status: sub.status, currentPeriodEnd: sub.currentPeriodEnd } : null
+  );
+  if (!entitlement.entitled) {
+    return NextResponse.json({ detail: 'Active coaching subscription required.' }, { status: 403 });
+  }
+
+  const body = (await request.json().catch(() => null)) as {
+    serviceId?: string;
+    message?: string;
+  } | null;
+  if (!body?.serviceId?.trim()) {
+    return NextResponse.json({ detail: 'Select a service.' }, { status: 400 });
+  }
+
+  const result = await submitCoachingGrowthQuoteRequest(claims, {
+    serviceId: body.serviceId,
+    message: typeof body.message === 'string' ? body.message : '',
+  });
+
+  if (!result.ok) {
+    return NextResponse.json({ detail: result.detail }, { status: 400 });
+  }
+
+  return NextResponse.json({ ok: true });
+}
