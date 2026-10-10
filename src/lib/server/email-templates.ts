@@ -1122,3 +1122,84 @@ export function renderCarsiCoachingMonthlyFounderNotificationEmail(params: {
     ].join('\n')
   );
 }
+
+export function renderCoachingOnboardingSubmittedCoachEmail(params: {
+  appOrigin: string;
+  businessName: string;
+  memberName: string;
+  memberEmail: string;
+  reportHtml: string;
+  reportPlain: string;
+  portalUrl: string;
+}): RenderedEmail {
+  const details = [
+    { label: 'Business', value: params.businessName },
+    { label: 'Member', value: params.memberName },
+    { label: 'Email', value: params.memberEmail },
+  ];
+
+  return render(
+    {
+      appOrigin: params.appOrigin,
+      preheader: `Onboarding submission from ${params.businessName}`,
+      eyebrow: 'Business Coaching',
+      title: 'Member onboarding — full details',
+      paragraphs: [
+        'A coaching member completed their profile and assessment and sent the summary below. Reply directly to this email to reach them.',
+      ],
+      details,
+      messageHtml: params.reportHtml,
+      messageHtmlBare: true,
+      cta: { label: 'Coaching portal', href: params.portalUrl },
+    },
+    params.reportPlain
+  );
+}
+
+export function renderCoachingOnboardingSubmittedMemberEmail(params: {
+  appOrigin: string;
+  name: string;
+  businessName: string;
+  problemStatement: string;
+  goalStatement: string;
+  portalUrl: string;
+}): RenderedEmail {
+  const name = params.name.trim() || 'there';
+  const summaryHtml = `
+    <p style="margin: 0 0 12px; font-size: 14px; color: rgba(255,255,255,0.55);">What you told us</p>
+    <p style="margin: 0 0 8px; font-size: 13px; font-weight: 600; color: #2490ed;">Your biggest problem</p>
+    <div style="margin: 0 0 16px;">${formatPlainMessageAsHtml(params.problemStatement)}</div>
+    <p style="margin: 0 0 8px; font-size: 13px; font-weight: 600; color: #2490ed;">What success looks like to you</p>
+    <div style="margin: 0;">${formatPlainMessageAsHtml(params.goalStatement)}</div>`;
+
+  return render(
+    {
+      appOrigin: params.appOrigin,
+      preheader: 'Phill has received your business profile and assessment',
+      eyebrow: 'Business Coaching',
+      title: 'You’re all set — we’re on it',
+      paragraphs: [
+        `Hi ${name},`,
+        `Thank you for completing onboarding for ${params.businessName}. Your full business profile, assessment answers, and web/social links have been sent to Phill and the CARSI coaching team.`,
+        'Phill will review everything and follow up within one business day to confirm your first monthly planning session.',
+      ],
+      messageHtml: summaryHtml,
+      cta: { label: 'Open coaching portal', href: params.portalUrl },
+      noteHtml:
+        'Your submission is saved in CARSI. If you need to correct something urgent, email support@carsi.com.au.',
+    },
+    [
+      `Hi ${name},`,
+      '',
+      'Thank you — we received your onboarding for CARSI Business Coaching.',
+      '',
+      'Your problem:',
+      params.problemStatement,
+      '',
+      'Your goal:',
+      params.goalStatement,
+      '',
+      `Portal: ${params.portalUrl}`,
+    ].join('\n')
+  );
+}

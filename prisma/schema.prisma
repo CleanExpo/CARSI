@@ -1210,6 +1210,11 @@ model CarsiCoachingBusinessProfile {
   challenges          String?   @db.Text
   shortTermGoals      String?   @map("short_term_goals") @db.Text
   longTermVision      String?   @map("long_term_vision") @db.Text
+  onboardingProblemStatement String? @map("onboarding_problem_statement") @db.Text
+  onboardingGoalStatement    String? @map("onboarding_goal_statement") @db.Text
+  onboardingExtraNotes       String? @map("onboarding_extra_notes") @db.Text
+  onboardingSubmittedAt        DateTime? @map("onboarding_submitted_at") @db.Timestamptz(6)
+  onboardingEmailsSentAt       DateTime? @map("onboarding_emails_sent_at") @db.Timestamptz(6)
   completedAt         DateTime? @map("completed_at") @db.Timestamptz(6)
   createdAt           DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt           DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)

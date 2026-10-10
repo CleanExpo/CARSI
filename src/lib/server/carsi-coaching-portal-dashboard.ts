@@ -10,7 +10,7 @@ import { getCoachingPortalRowForUser } from '@/lib/server/carsi-coaching-subscri
 
 export type CoachingHomeState = 'locked' | 'onboarding' | 'assessment_pending' | 'active';
 
-export type CoachingOnboardingStepId = 'profile' | 'assessment' | 'session';
+export type CoachingOnboardingStepId = 'profile' | 'assessment' | 'submit' | 'session';
 
 export type CoachingPortalUser = {
   firstName: string;
@@ -38,6 +38,10 @@ export type CoachingPortalDashboard = {
   profile: {
     complete: boolean;
     businessName: string | null;
+  };
+  onboardingSubmit: {
+    complete: boolean;
+    submittedAt: string | null;
   };
   assessment: {
     status: 'none' | 'draft' | 'submitted' | 'reviewed';
@@ -147,6 +151,7 @@ export async function loadCoachingPortalDashboard(
     ]);
 
   const profileComplete = isProfileComplete(profile);
+  const onboardingSubmitComplete = Boolean(profile?.onboardingSubmittedAt);
   const assessmentStatus =
     latestSubmitted?.status === 'reviewed'
       ? 'reviewed'
@@ -172,7 +177,12 @@ export async function loadCoachingPortalDashboard(
   let homeState: CoachingHomeState = 'locked';
   if (access.mode === 'locked') {
     homeState = 'locked';
-  } else if (!profileComplete || !assessmentSubmitted || !hasBookedAny) {
+  } else if (
+    !profileComplete ||
+    !assessmentSubmitted ||
+    !onboardingSubmitComplete ||
+    !hasBookedAny
+  ) {
     homeState = 'onboarding';
   } else if (assessmentSubmitted && !hasApprovedPlan) {
     homeState = 'assessment_pending';
@@ -212,6 +222,14 @@ export async function loadCoachingPortalDashboard(
       description: 'Help Phill understand your biggest challenges and opportunities.',
       complete: assessmentSubmitted,
       href: '/coaching/onboarding/assessment',
+    },
+    {
+      id: 'submit' as const,
+      title: 'Send your details to Phill',
+      description:
+        'Confirm your problem, your goal, and we will email Phill your full profile and assessment.',
+      complete: onboardingSubmitComplete,
+      href: '/coaching/onboarding/submit',
     },
     {
       id: 'session' as const,
@@ -254,6 +272,10 @@ export async function loadCoachingPortalDashboard(
     profile: {
       complete: profileComplete,
       businessName: profile?.businessName ?? null,
+    },
+    onboardingSubmit: {
+      complete: onboardingSubmitComplete,
+      submittedAt: profile?.onboardingSubmittedAt?.toISOString() ?? null,
     },
     assessment: {
       status: assessmentStatus,

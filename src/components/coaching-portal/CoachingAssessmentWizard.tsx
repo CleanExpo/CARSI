@@ -219,9 +219,14 @@ export function CoachingAssessmentWizard() {
           <p className={`mt-2 ${coachingMuted}`}>
             Phill will review your answers and follow up by email.
           </p>
-          <Link href="/coaching" className={`mt-6 inline-flex ${coachingPrimaryBtn}`}>
-            Back to Home
-          </Link>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link href="/coaching/onboarding/submit" className={coachingPrimaryBtn}>
+              Next: Send to Phill
+            </Link>
+            <Link href="/coaching" className={coachingSecondaryBtn}>
+              Back to Home
+            </Link>
+          </div>
         </div>
       ) : (
         <div className={coachingCard}>

@@ -144,7 +144,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         detail: 'Please answer all questions before submitting.',
-        missingFieldIds: missing.map(([k]) => k),
+        missingFieldIds: missing,
       },
       { status: 400 }
     );
