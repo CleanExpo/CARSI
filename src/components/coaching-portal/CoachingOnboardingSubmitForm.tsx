@@ -156,7 +156,10 @@ export function CoachingOnboardingSubmitForm() {
                 updating.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
-                <Link href="/coaching/sessions" className={coachingPrimaryBtn}>
+                <Link href="/coaching/onboarding/packet" className={coachingPrimaryBtn}>
+                  View what we sent Phill
+                </Link>
+                <Link href="/coaching/sessions" className={coachingSecondaryBtn}>
                   Book your first session
                 </Link>
                 <Link href="/coaching" className={coachingSecondaryBtn}>
