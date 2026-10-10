@@ -3,7 +3,6 @@
 import Link from 'next/link';
 
 import { BusinessCoachingMonthlySubscribe } from '@/components/ccw/BusinessCoachingMonthlySubscribe';
-import { useCoachingPortal } from '@/components/coaching-portal/CoachingPortalContext';
 import {
   coachingCard,
   coachingCardTitle,
@@ -13,6 +12,8 @@ import {
   coachingPrimaryBtn,
   coachingSecondaryBtn,
 } from '@/components/coaching-portal/coaching-ui';
+import { CoachingOnboardingStatusBar } from '@/components/coaching-portal/CoachingOnboardingStatusBar';
+import { useCoachingPortal } from '@/components/coaching-portal/CoachingPortalContext';
 import { CheckCircle2, Circle } from 'lucide-react';
 
 function LockedHome() {
@@ -49,6 +50,8 @@ function OnboardingChecklist() {
         </h1>
         <p className={`mt-2 max-w-2xl ${coachingMuted}`}>{welcomeMessage}</p>
       </header>
+
+      <CoachingOnboardingStatusBar />
 
       <section className={coachingCard}>
         <div className="flex flex-wrap items-end justify-between gap-4">
@@ -129,6 +132,7 @@ function AssessmentPendingHome() {
         </h1>
         <p className={`mt-2 ${coachingMuted}`}>{welcomeMessage}</p>
       </header>
+      <CoachingOnboardingStatusBar />
       <section className={coachingCard}>
         <h2 className={coachingCardTitle}>Assessment submitted</h2>
         <p className={`mt-2 ${coachingMuted}`}>
@@ -142,6 +146,9 @@ function AssessmentPendingHome() {
           </div>
         ) : null}
         <div className="mt-6 flex flex-wrap gap-3">
+          <Link href="/coaching/onboarding/packet" className={coachingSecondaryBtn}>
+            What we sent Phill
+          </Link>
           <Link href="/coaching/onboarding/assessment" className={coachingSecondaryBtn}>
             View your answers
           </Link>
@@ -166,6 +173,8 @@ function ActiveHome() {
         </h1>
         <p className={`mt-2 ${coachingMuted}`}>{welcomeMessage}</p>
       </header>
+
+      <CoachingOnboardingStatusBar />
 
       <div className="grid gap-4 lg:grid-cols-2">
         {plan.focusTitle ? (
