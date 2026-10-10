@@ -15,4 +15,12 @@ describe('decideCoachingPortalEntitlement', () => {
     const result = decideCoachingPortalEntitlement(null);
     expect(result.entitled).toBe(false);
   });
+
+  it('grants access when canceled but still inside paid period', () => {
+    const result = decideCoachingPortalEntitlement(
+      { status: 'canceled', currentPeriodEnd: new Date('2099-01-01') },
+      new Date('2026-01-01'),
+    );
+    expect(result.entitled).toBe(true);
+  });
 });

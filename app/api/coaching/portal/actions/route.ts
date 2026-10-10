@@ -7,8 +7,7 @@ import {
   listCoachingActionsForUser,
   upsertCoachingActionForUser,
 } from '@/lib/server/carsi-coaching-actions-store';
-import { decideCoachingPortalEntitlement } from '@/lib/server/carsi-coaching-entitlement';
-import { getCoachingPortalRowForUser } from '@/lib/server/carsi-coaching-subscription-store';
+import { requireCoachingPortalEditor } from '@/lib/server/carsi-coaching-portal-gate';
 
 function parseStatus(raw: unknown): CoachingActionStatus {
   if (raw === 'todo' || raw === 'in_progress' || raw === 'done' || raw === 'blocked') return raw;
@@ -23,16 +22,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const claims = await getSessionClaimsFromRequest(request);
-  if (!claims) return NextResponse.json({ detail: 'Sign in required.' }, { status: 401 });
-
-  const sub = await getCoachingPortalRowForUser(claims.sub);
-  const entitlement = decideCoachingPortalEntitlement(
-    sub ? { status: sub.status, currentPeriodEnd: sub.currentPeriodEnd } : null
-  );
-  if (!entitlement.entitled) {
-    return NextResponse.json({ detail: 'Active coaching subscription required.' }, { status: 403 });
-  }
+  const gate = await requireCoachingPortalEditor(request);
+  if ('error' in gate) return gate.error;
+  const claims = gate.claims;
 
   const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
   if (!body || typeof body.title !== 'string' || !body.title.trim()) {
@@ -54,16 +46,9 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  const claims = await getSessionClaimsFromRequest(request);
-  if (!claims) return NextResponse.json({ detail: 'Sign in required.' }, { status: 401 });
-
-  const sub = await getCoachingPortalRowForUser(claims.sub);
-  const entitlement = decideCoachingPortalEntitlement(
-    sub ? { status: sub.status, currentPeriodEnd: sub.currentPeriodEnd } : null
-  );
-  if (!entitlement.entitled) {
-    return NextResponse.json({ detail: 'Active coaching subscription required.' }, { status: 403 });
-  }
+  const gate = await requireCoachingPortalEditor(request);
+  if ('error' in gate) return gate.error;
+  const claims = gate.claims;
 
   const id = request.nextUrl.searchParams.get('id');
   if (!id) return NextResponse.json({ detail: 'Missing id.' }, { status: 400 });

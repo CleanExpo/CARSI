@@ -1,7 +1,8 @@
-import type { SessionClaims } from '@/lib/auth/session-jwt';
 import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
+import type { SessionClaims } from '@/lib/auth/session-jwt';
 import { carsiCoachingMonthlyPath } from '@/lib/marketing/carsi-coaching-monthly';
 import { decideCoachingPortalEntitlement } from '@/lib/server/carsi-coaching-entitlement';
+import { coachingPortalCanEdit } from '@/lib/server/carsi-coaching-portal-edit';
 import {
   getCoachingPortalRowForUser,
   workspaceFromRow,
@@ -23,13 +24,11 @@ export type CoachingPortalAccess = {
 };
 
 export async function getCoachingPortalAccess(
-  claims: SessionClaims,
+  claims: SessionClaims
 ): Promise<CoachingPortalAccess> {
   const row = await getCoachingPortalRowForUser(claims.sub);
   const entitlement = decideCoachingPortalEntitlement(
-    row
-      ? { status: row.status, currentPeriodEnd: row.currentPeriodEnd }
-      : null,
+    row ? { status: row.status, currentPeriodEnd: row.currentPeriodEnd } : null
   );
 
   const staffPreview = isLmsClaimsAllowedAdminPanel(claims);
@@ -43,7 +42,7 @@ export async function getCoachingPortalAccess(
   return {
     mode,
     entitled,
-    canEdit: entitled,
+    canEdit: coachingPortalCanEdit(claims, entitled),
     subscribeUrl: carsiCoachingMonthlyPath,
     subscription: row
       ? {

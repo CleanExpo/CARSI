@@ -1,7 +1,6 @@
 import type Stripe from 'stripe';
 
 import { getStripeClient } from '@/lib/api/stripe';
-import { carsiCoachingPortalPath } from '@/lib/marketing/carsi-coaching-program';
 import {
   carsiCoachingMonthlyPath,
   carsiCoachingMonthlyPriceCents,
@@ -12,8 +11,14 @@ import { prisma } from '@/lib/prisma';
 import { getAppOrigin } from '@/lib/server/app-url';
 import { CARSI_COACHING_MONTHLY_CHECKOUT_SOURCE } from '@/lib/server/carsi-coaching-monthly-checkout';
 import { sendCarsiCoachingMonthlyFounderNotificationEmail } from '@/lib/server/carsi-coaching-monthly-notify';
+import { upsertCoachingMonthlySubscription } from '@/lib/server/carsi-coaching-subscription-store';
 import { sendEmail } from '@/lib/server/email';
 import { renderCarsiCoachingMonthlyWelcomeEmail } from '@/lib/server/email-templates';
+import {
+  readCancelAtPeriodEnd,
+  readCurrentPeriodEnd,
+  readCustomerId,
+} from '@/lib/server/stripe-subscription-map';
 
 const CONFIRMATION_SENT_META = 'coaching_monthly_emails_sent';
 
@@ -41,6 +46,36 @@ function subscriptionIdFromSession(session: Stripe.Checkout.Session): string | u
   return typeof raw === 'string' ? raw : raw.id;
 }
 
+/** Writes the coaching subscription row when checkout completes (webhook may lag or be absent locally). */
+export async function syncCoachingMonthlySubscriptionFromCheckoutSession(
+  session: Stripe.Checkout.Session
+): Promise<void> {
+  if (!isCarsiCoachingMonthlyCheckoutSession(session)) return;
+
+  const userId =
+    session.metadata?.carsi_user_id?.trim() ?? session.client_reference_id?.trim() ?? '';
+  const subscriptionId = subscriptionIdFromSession(session);
+  if (!userId || !subscriptionId) return;
+
+  if (!process.env.STRIPE_SECRET_KEY?.trim()) return;
+
+  try {
+    const stripe = getStripeClient();
+    const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+    await upsertCoachingMonthlySubscription({
+      userId,
+      stripeCustomerId: readCustomerId(subscription),
+      stripeSubscriptionId: subscription.id,
+      status: subscription.status,
+      currentPeriodEnd: readCurrentPeriodEnd(subscription),
+      cancelAtPeriodEnd: readCancelAtPeriodEnd(subscription),
+      eventTimestamp: new Date(),
+    });
+  } catch (err) {
+    console.error('[coaching-monthly] subscription sync from checkout failed:', err);
+  }
+}
+
 export async function processCarsiCoachingMonthlyCheckoutCompleted(
   session: Stripe.Checkout.Session,
   options?: { appOrigin?: string }
@@ -55,6 +90,8 @@ export async function processCarsiCoachingMonthlyCheckoutCompleted(
   if (!paid) {
     return { fulfilled: false, skipped: 'not_paid' };
   }
+
+  await syncCoachingMonthlySubscriptionFromCheckoutSession(session);
 
   const email = (
     session.customer_details?.email ??

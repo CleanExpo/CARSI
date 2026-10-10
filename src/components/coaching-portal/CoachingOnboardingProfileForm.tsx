@@ -91,11 +91,15 @@ export function CoachingOnboardingProfileForm() {
     }
   }
 
-  const disabled = !access.canEdit || loading;
+  const inputsDisabled = loading;
+  const saveDisabled = !access.canEdit || loading || saving;
 
   return (
     <div className={coachingPage}>
-      <Link href="/dashboard/coaching" className="text-sm text-sky-400 transition-colors hover:text-sky-300">
+      <Link
+        href="/dashboard/coaching"
+        className="text-sm text-sky-400 transition-colors hover:text-sky-300"
+      >
         ← Home
       </Link>
 
@@ -143,14 +147,14 @@ export function CoachingOnboardingProfileForm() {
                 label="Business name"
                 required
                 value={form.businessName}
-                disabled={disabled}
+                disabled={inputsDisabled}
                 onChange={(v) => patch('businessName', v)}
               />
               <CoachingSelectField
                 label="Industry"
                 required
                 value={form.industry}
-                disabled={disabled}
+                disabled={inputsDisabled}
                 options={COACHING_INDUSTRY_OPTIONS}
                 onChange={(v) => patch('industry', v)}
               />
@@ -158,34 +162,34 @@ export function CoachingOnboardingProfileForm() {
                 label="Location (city / region)"
                 required
                 value={form.location}
-                disabled={disabled}
+                disabled={inputsDisabled}
                 onChange={(v) => patch('location', v)}
               />
               <CoachingTextField
                 label="Service areas"
                 value={form.serviceAreas}
-                disabled={disabled}
+                disabled={inputsDisabled}
                 placeholder="e.g. Northern suburbs, 50km radius"
                 onChange={(v) => patch('serviceAreas', v)}
               />
               <CoachingSelectField
                 label="Years in business"
                 value={form.yearsInBusiness}
-                disabled={disabled}
+                disabled={inputsDisabled}
                 options={COACHING_YEARS_OPTIONS}
                 onChange={(v) => patch('yearsInBusiness', v)}
               />
               <CoachingSelectField
                 label="Business size"
                 value={form.businessSize}
-                disabled={disabled}
+                disabled={inputsDisabled}
                 options={COACHING_BUSINESS_SIZE_OPTIONS}
                 onChange={(v) => patch('businessSize', v)}
               />
               <CoachingTextField
                 label="Number of employees"
                 value={form.employeeCount}
-                disabled={disabled}
+                disabled={inputsDisabled}
                 onChange={(v) => patch('employeeCount', v)}
               />
             </div>
@@ -194,7 +198,7 @@ export function CoachingOnboardingProfileForm() {
               required
               rows={4}
               value={form.mainServices}
-              disabled={disabled}
+              disabled={inputsDisabled}
               placeholder="What you sell, who you serve, and what makes you different."
               onChange={(v) => patch('mainServices', v)}
             />
@@ -214,7 +218,7 @@ export function CoachingOnboardingProfileForm() {
               label="Website"
               type="url"
               value={form.website}
-              disabled={disabled}
+              disabled={inputsDisabled}
               placeholder="https://yourbusiness.com.au"
               onChange={(v) => patch('website', v)}
             />
@@ -225,7 +229,7 @@ export function CoachingOnboardingProfileForm() {
                   label={label}
                   type="url"
                   value={form[key]}
-                  disabled={disabled}
+                  disabled={inputsDisabled}
                   placeholder={placeholder}
                   onChange={(v) => patch(key, v)}
                 />
@@ -235,7 +239,7 @@ export function CoachingOnboardingProfileForm() {
               label="Other listings or notes"
               rows={3}
               value={form.socialNotes}
-              disabled={disabled}
+              disabled={inputsDisabled}
               placeholder="Yelp, Houzz, directories, or anything else we should know."
               onChange={(v) => patch('socialNotes', v)}
             />
@@ -252,7 +256,7 @@ export function CoachingOnboardingProfileForm() {
               required
               rows={4}
               value={form.challenges}
-              disabled={disabled}
+              disabled={inputsDisabled}
               onChange={(v) => patch('challenges', v)}
             />
             <CoachingTextArea
@@ -260,22 +264,24 @@ export function CoachingOnboardingProfileForm() {
               required
               rows={4}
               value={form.shortTermGoals}
-              disabled={disabled}
+              disabled={inputsDisabled}
               onChange={(v) => patch('shortTermGoals', v)}
             />
             <CoachingTextArea
               label="Long-term vision"
               rows={4}
               value={form.longTermVision}
-              disabled={disabled}
+              disabled={inputsDisabled}
               onChange={(v) => patch('longTermVision', v)}
             />
           </CoachingFormSection>
         </div>
 
-        {!access.canEdit ? (
+        {!access.canEdit && !loading ? (
           <p className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-100/90">
-            Staff preview — saving is disabled.
+            {access.mode === 'staff_preview'
+              ? 'Staff preview — you can fill this form, but saving requires an active coaching subscription on this account (or set CARSI_COACHING_PORTAL_DEV_UNLOCK=true locally).'
+              : 'Subscribe to Business Coaching to save your profile. You can still draft answers here, then subscribe from Home to persist them.'}
           </p>
         ) : null}
 
@@ -290,14 +296,14 @@ export function CoachingOnboardingProfileForm() {
         <div className="flex flex-wrap items-center gap-3 pb-8">
           <button
             type="button"
-            disabled={saving || disabled}
+            disabled={saveDisabled}
             className={coachingSecondaryBtn}
             onClick={() => void save(false)}
           >
             {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
             Save draft
           </button>
-          <button type="submit" disabled={saving || disabled} className={coachingPrimaryBtn}>
+          <button type="submit" disabled={saveDisabled} className={coachingPrimaryBtn}>
             {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
             Save & mark complete
           </button>

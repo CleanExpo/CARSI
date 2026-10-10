@@ -4,12 +4,9 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import type { CoachingPortalWorkspace } from '@/lib/coaching-portal/types';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
-import { decideCoachingPortalEntitlement } from '@/lib/server/carsi-coaching-entitlement';
 import { getCoachingPortalAccess } from '@/lib/server/carsi-coaching-portal-access';
-import {
-  getCoachingPortalRowForUser,
-  updateCoachingPortalWorkspace,
-} from '@/lib/server/carsi-coaching-subscription-store';
+import { requireCoachingPortalEditor } from '@/lib/server/carsi-coaching-portal-gate';
+import { updateCoachingPortalWorkspace } from '@/lib/server/carsi-coaching-subscription-store';
 
 export async function GET(request: NextRequest) {
   const claims = await getSessionClaimsFromRequest(request);
@@ -22,21 +19,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
-  const claims = await getSessionClaimsFromRequest(request);
-  if (!claims) {
-    return NextResponse.json({ detail: 'Sign in to save your plan.' }, { status: 401 });
-  }
-
-  const row = await getCoachingPortalRowForUser(claims.sub);
-  const entitlement = decideCoachingPortalEntitlement(
-    row ? { status: row.status, currentPeriodEnd: row.currentPeriodEnd } : null
-  );
-  if (!entitlement.entitled) {
-    return NextResponse.json(
-      { detail: 'An active Business Coaching subscription is required to edit the portal.' },
-      { status: 403 }
-    );
-  }
+  const gate = await requireCoachingPortalEditor(request);
+  if ('error' in gate) return gate.error;
+  const claims = gate.claims;
 
   const body = (await request.json().catch(() => null)) as Partial<CoachingPortalWorkspace> | null;
   if (!body || typeof body !== 'object') {
