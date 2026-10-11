@@ -122,7 +122,7 @@ const faqs = [
       'Most of the work is self-paced online. The monthly session is live (video or in-person when scheduled). You move through the LMS between sessions.',
   },
   {
-    question: 'Is this IICRC technical training?',
+    question: 'Is this an IICRC CEC course?',
     answer:
       'No. This is business development and marketing systems for owners. Technical accreditation remains on the CARSI course catalogue.',
   },

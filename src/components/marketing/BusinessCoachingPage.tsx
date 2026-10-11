@@ -1,5 +1,6 @@
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { Suspense } from 'react';
 
 import { BusinessCoachingBooking } from '@/components/marketing/BusinessCoachingBooking';
 import { MarketingPageShell } from '@/components/marketing/MarketingPageShell';
@@ -91,7 +92,9 @@ export function BusinessCoachingContent() {
             </div>
           </div>
 
-          <BusinessCoachingBooking sessions={sessions} checkoutEnabled={checkoutEnabled} />
+          <Suspense fallback={<p className={marketingTextMuted}>Loading booking form…</p>}>
+            <BusinessCoachingBooking sessions={sessions} checkoutEnabled={checkoutEnabled} />
+          </Suspense>
         </div>
       </div>
     </MarketingPageShell>

@@ -134,9 +134,11 @@ export function CoachingPortalShell({
 
   const closeDrawer = useCallback(() => setDrawerOpen(false), []);
 
-  useEffect(() => {
-    closeDrawer();
-  }, [pathname, closeDrawer]);
+  const [drawerPathname, setDrawerPathname] = useState(pathname);
+  if (drawerPathname !== pathname) {
+    setDrawerPathname(pathname);
+    setDrawerOpen(false);
+  }
 
   useEffect(() => {
     if (!drawerOpen) return;

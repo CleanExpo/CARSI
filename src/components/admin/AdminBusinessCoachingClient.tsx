@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type SessionSummary = {
   slug: string;
@@ -35,25 +35,23 @@ export function AdminBusinessCoachingClient() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await fetch('/api/admin/business-coaching');
-      if (!res.ok) throw new Error('Failed to load');
-      const data = (await res.json()) as { sessions: SessionSummary[]; rows: RegistryRow[] };
-      setSessions(data.sessions);
-      setRows(data.rows);
-      setError('');
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to load');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
+    async function load() {
+      try {
+        const res = await fetch('/api/admin/business-coaching');
+        if (!res.ok) throw new Error('Failed to load');
+        const data = (await res.json()) as { sessions: SessionSummary[]; rows: RegistryRow[] };
+        setSessions(data.sessions);
+        setRows(data.rows);
+        setError('');
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Failed to load');
+      } finally {
+        setLoading(false);
+      }
+    }
     void load();
-  }, [load]);
+  }, []);
 
   return (
     <div className="px-5 py-8 sm:px-8">

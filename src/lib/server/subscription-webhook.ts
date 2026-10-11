@@ -75,14 +75,15 @@ export function isSubscriptionEvent(type: string): boolean {
 }
 
 /**
- * Which product a Stripe subscription belongs to, read from its metadata `plan`.
+ * Which product a Stripe subscription belongs to, read from its metadata.
  *  - individual `pro_annual`               → E1 `LmsSubscription`
  *  - Teams tiers (starter|growth|full_…)   → E2 `LmsTeamSubscription`
  *  - `org_monthly`                          → E3 `LmsOrgSubscription`
+ *  - source `carsi-coaching-monthly`        → `CarsiCoachingMonthlySubscription`
  * Fails closed to `individual` only for the historical individual metadata; any
  * unknown plan is `unknown` and skipped (never mis-attached to a wrong table).
  */
-export type SubscriptionKind = 'individual' | 'team' | 'org' | 'unknown';
+export type SubscriptionKind = 'individual' | 'team' | 'org' | 'coaching' | 'unknown';
 
 const TEAM_PLANS = new Set(['starter', 'growth', 'full_library', 'teams']);
 
@@ -174,7 +175,7 @@ function eventCreatedToDate(event: Stripe.Event): Date | null {
 
 /**
  * Upsert the correct subscription record from a full subscription object,
- * dispatching by the subscription's `plan` metadata (individual / team / org).
+ * dispatching by `source` for coaching, otherwise `plan` (individual / team / org).
  * `eventTimestamp` is the source event's `event.created`; it drives the
  * out-of-order guard in each store so a late (stale) snapshot cannot overwrite
  * newer state. Unknown/unresolvable → log-and-skip (never a wrong grant).

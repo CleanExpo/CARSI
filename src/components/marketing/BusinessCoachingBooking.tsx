@@ -1,6 +1,7 @@
 'use client';
 
 import { ArrowRight, Loader2, Plus, X } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 
 import { TurnstileWidget } from '@/components/security/TurnstileWidget';
@@ -46,8 +47,9 @@ export function BusinessCoachingBooking({
   initialSlug?: string;
   checkoutEnabled: boolean;
 }) {
+  const searchParams = useSearchParams();
   const [form, setForm] = useState<FormState>({
-    sessionSlug: resolveInitialSessionSlug(initialSlug, sessions),
+    sessionSlug: resolveInitialSessionSlug(initialSlug || searchParams.get('session'), sessions),
     packageId: 'owner',
     companyName: '',
     contactEmail: '',
@@ -66,13 +68,6 @@ export function BusinessCoachingBooking({
   );
   const selectedPackage =
     businessCoachingPackages.find((p) => p.id === form.packageId) ?? businessCoachingPackages[0];
-
-  useEffect(() => {
-    if (initialSlug) return;
-    const param = new URLSearchParams(window.location.search).get('session');
-    const slug = resolveInitialSessionSlug(param, sessions);
-    setForm((prev) => (slug && slug !== prev.sessionSlug ? { ...prev, sessionSlug: slug } : prev));
-  }, [sessions, initialSlug]);
 
   useEffect(() => {
     let active = true;
@@ -98,7 +93,6 @@ export function BusinessCoachingBooking({
 
   const maxSeats = selectedPackage.attendeeCount;
   const priceLabel = formatAudFromCents(businessCoachingSeatPriceCents * maxSeats);
-  const isFull = availability?.isFull ?? false;
 
   function selectPackage(pkg: BusinessCoachingPackage) {
     setForm((current) => {

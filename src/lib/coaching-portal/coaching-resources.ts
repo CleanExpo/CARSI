@@ -26,7 +26,7 @@ export const COACHING_RESOURCE_SECTIONS: CoachingResourceSection[] = [
       {
         id: 'catalogue',
         title: 'Course catalogue',
-        description: 'Browse IICRC-aligned restoration and cleaning training.',
+        description: 'Browse restoration and cleaning courses, including IICRC CEC courses.',
         href: '/dashboard/courses',
         tag: 'LMS',
       },
