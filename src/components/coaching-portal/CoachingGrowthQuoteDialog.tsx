@@ -1,7 +1,7 @@
 'use client';
 
 import { Loader2, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { CoachingTextArea } from '@/components/coaching-portal/coaching-form-primitives';
 import { coachingPrimaryBtn, coachingSecondaryBtn } from '@/components/coaching-portal/coaching-ui';
@@ -20,14 +20,6 @@ export function CoachingGrowthQuoteDialog({
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!open) {
-      setMessage('');
-      setDone(false);
-      setError(null);
-    }
-  }, [open]);
 
   if (!open || !service) return null;
 

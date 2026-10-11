@@ -2,7 +2,7 @@
 
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { coachingFieldClass } from '@/components/coaching-portal/coaching-form-primitives';
 import {
@@ -111,24 +111,23 @@ export function CoachingAssessmentWizard() {
     [section.id, responses]
   );
 
-  const load = useCallback(async () => {
-    const res = await fetch('/api/coaching/portal/assessment');
-    const data = (await res.json()) as {
-      draft?: { responses: AssessmentResponses };
-      submitted?: { responses: AssessmentResponses; status: string };
-    };
-    if (data.submitted) {
-      setResponses(data.submitted.responses);
-      setSubmitted(true);
-    } else if (data.draft) {
-      setResponses({ ...emptyAssessmentResponses(), ...data.draft.responses });
-    }
-    setLoading(false);
-  }, []);
-
   useEffect(() => {
+    async function load() {
+      const res = await fetch('/api/coaching/portal/assessment');
+      const data = (await res.json()) as {
+        draft?: { responses: AssessmentResponses };
+        submitted?: { responses: AssessmentResponses; status: string };
+      };
+      if (data.submitted) {
+        setResponses(data.submitted.responses);
+        setSubmitted(true);
+      } else if (data.draft) {
+        setResponses({ ...emptyAssessmentResponses(), ...data.draft.responses });
+      }
+      setLoading(false);
+    }
     void load();
-  }, [load]);
+  }, []);
 
   async function persistResponses(next: AssessmentResponses) {
     if (readOnly) return;

@@ -138,8 +138,13 @@ export function CoachingActionsPage() {
   }, []);
 
   useEffect(() => {
-    void load();
-  }, [load]);
+    void fetch('/api/coaching/portal/actions')
+      .then((res) => res.json())
+      .then((data: { items?: ActionItem[] }) => {
+        setItems(data.items ?? []);
+        setLoading(false);
+      });
+  }, []);
 
   const visible = useMemo(
     () => (filter === 'all' ? items : items.filter((a) => a.status === filter)),
@@ -565,11 +570,14 @@ export function CoachingServicesPage() {
           Contact support
         </button>
       </div>
-      <CoachingGrowthQuoteDialog
-        open={Boolean(quoteService)}
-        service={quoteService}
-        onClose={() => setQuoteService(null)}
-      />
+      {quoteService ? (
+        <CoachingGrowthQuoteDialog
+          key={quoteService.id}
+          open={Boolean(quoteService)}
+          service={quoteService}
+          onClose={() => setQuoteService(null)}
+        />
+      ) : null}
     </div>
   );
 }
