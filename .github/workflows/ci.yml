@@ -5,6 +5,9 @@ on:
     branches: [main, codex/margot-conversation-ownership]
   pull_request:
     branches: [main]
+  # Lets the PR release gate get a GitHub run on a branch head before the PR exists
+  # (declared in .github/pr-release-gate-dispatch). Same jobs, local CI database only.
+  workflow_dispatch:
 
 env:
   NODE_VERSION: '22'

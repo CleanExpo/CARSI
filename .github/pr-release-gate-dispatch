@@ -1,0 +1,3 @@
+# Workflows the PR release gate may start by hand on a branch head (one file name per line).
+# ci.yml: checks only; its database is a postgres service container inside the job, no deploy.
+ci.yml
