@@ -14,7 +14,7 @@ import {
 } from '@/lib/marketing/marketing-ui';
 
 export const metadata: Metadata = {
-  title: 'Recommended Tools | CARSI',
+  title: 'Recommended Tools',
   description:
     'Tools Phill McGurk and the CARSI team use and recommend for cleaning and restoration businesses — from AI video production to the software that runs the day-to-day.',
 };

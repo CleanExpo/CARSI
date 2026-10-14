@@ -68,7 +68,7 @@ export async function generateMetadata({
 
   if (source === 'professional-directory' && intent === 'directory-notify') {
     return {
-      title: 'Notify Me — Professional Directory | CARSI',
+      title: 'Notify Me — Professional Directory',
       description:
         'Join the CARSI professional directory launch list. We will email you when verified NRPG listings go live.',
     };

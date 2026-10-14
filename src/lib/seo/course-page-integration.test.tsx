@@ -59,7 +59,8 @@ describe('course page SEO truth integration', () => {
   it('executes generateMetadata with canonical and Twitter/OpenGraph parity after truth resolution', async () => {
     const metadata = await generateMetadata({ params: Promise.resolve({ slug }) });
 
-    expect(metadata.title).toBe('Odour Identification & Deodorisation Course | CARSI');
+    // The root template appends " | CARSI"; the card's own suffix is stripped so it renders once.
+    expect(metadata.title).toBe('Odour Identification & Deodorisation Course');
     expect(metadata.description).toBe(paidCourse.short_description);
     expect(metadata.alternates?.canonical).toBe(`https://carsi.com.au/courses/${slug}`);
     expect(metadata.openGraph?.url).toBe(metadata.alternates?.canonical);

@@ -14,6 +14,7 @@ import {
   buildCourseFallbackKeywords,
   getCourseMarketing,
   resolveCourseMarketingTruth,
+  withoutSiteTitleSuffix,
 } from '@/lib/seo/course-marketing';
 import { OG_IMAGES, OG_IMAGE_URLS } from '@/lib/seo/og-image';
 import { getAggregateRating } from '@/lib/server/course-reviews';
@@ -189,7 +190,7 @@ export async function generateMetadata({
   const imageAlt = card?.imageAlt ?? course.title;
 
   return {
-    title: metaTitle,
+    title: withoutSiteTitleSuffix(metaTitle),
     description: metaDescription,
     keywords: metaKeywords,
     openGraph: {

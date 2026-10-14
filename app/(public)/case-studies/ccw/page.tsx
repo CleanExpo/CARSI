@@ -29,7 +29,7 @@ import {
 const PAGE_URL = `${getPublicSiteUrl()}/case-studies/ccw`;
 
 export const metadata: Metadata = {
-  title: 'Case Study: Carpet Cleaners Warehouse | CARSI',
+  title: 'Case Study: Carpet Cleaners Warehouse',
   description:
     'How Carpet Cleaners Warehouse became the first paying client of CCW-CRM — a $33,000/year SaaS contract unifying e-commerce and field-service customer relationships for an Australian cleaning-industry supplier.',
   alternates: { canonical: PAGE_URL },

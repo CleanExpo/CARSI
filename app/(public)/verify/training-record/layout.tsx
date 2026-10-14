@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
 export const metadata: Metadata = {
-  title: 'Training record | CARSI',
+  title: 'Training record',
   description: 'CARSI learner training and IICRC CEC summary (shared link).',
   robots: { index: false, follow: false },
 };

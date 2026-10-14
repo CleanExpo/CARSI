@@ -30,7 +30,7 @@ export default async function PublicCredentialVerifyPage({
 export async function generateMetadata({ params }: { params: Promise<{ credentialId: string }> }) {
   const { credentialId } = await params;
   return {
-    title: `Verify credential ${credentialId.slice(0, 8)}… | CARSI`,
+    title: `Verify credential ${credentialId.slice(0, 8)}…`,
     description: 'Employer verification for CARSI IICRC CEC Accredited courses credentials',
     robots: 'index, follow',
   };
