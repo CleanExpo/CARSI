@@ -87,13 +87,17 @@ export function RegisterForm() {
           const checkoutUrl = checkout.url ?? checkout.checkout_url;
           if (checkoutUrl) {
             toast({ title: 'Redirecting to checkout…' });
-            window.location.href = checkoutUrl;
+            window.setTimeout(() => {
+              window.location.href = checkoutUrl;
+            }, 200);
             return;
           }
         } catch {
           // Fall through to /subscribe.
         }
-        window.location.href = MEMBERSHIP_PATH;
+        window.setTimeout(() => {
+          window.location.href = MEMBERSHIP_PATH;
+        }, 200);
         return;
       }
 
