@@ -32,6 +32,11 @@ export interface FreeResource {
   format: ResourceFormat;
   /** Short licence label shown on the card, e.g. "CC BY 4.0". */
   licence: string;
+  /**
+   * The publisher's own notice the licence was read from on readDate: the document itself where
+   * it carries one, otherwise the dataset page or the site's copyright page.
+   */
+  licenceSource: string;
   /** ISO date (YYYY-MM-DD) the item and its licence were last checked. */
   readDate: string;
   attribution: string;
@@ -42,6 +47,20 @@ export interface FreeResource {
 }
 
 export type ResourceStatus = 'draft-proposal';
+
+/**
+ * True for building-code material: anything naming the NCC (in id, title, note or URL) or
+ * published by the ABCB. The hub shows the building-code caution in every group holding one.
+ */
+export function isBuildingCodeResource(
+  r: Pick<FreeResource, 'id' | 'title' | 'note' | 'url' | 'publisher'>
+): boolean {
+  return (
+    /\bNCC\b|National Construction Code|Building Code of Australia|\bBCA\b|ncc/i.test(
+      [r.id, r.title, r.note, r.url].join(' ')
+    ) || r.publisher === 'Australian Building Codes Board'
+  );
+}
 
 export const RESOURCE_STATUS_LABEL: Record<ResourceStatus, string> = {
   'draft-proposal': 'Draft proposal — not in force',
@@ -60,6 +79,22 @@ export const RESOURCE_STATUS_LABEL: Record<ResourceStatus, string> = {
 //   https://ncc.abcb.gov.au/editions/ncc-2025/adopted/housing-provisions/front-matter/copyright-licence-notice-and-acknowledgment-country
 // - PCD 2025 papers are Public Comment Draft material, not adopted provisions:
 //   https://www.abcb.gov.au/pcd/pcd-2025-improving-waterproofing-and-water-shedding-provisions
+// Licences were re-read on 14/10/2026 from each publisher's own notice (each card's licenceSource):
+// the document itself where it states one (every ABCB PDF, NCC 2025 notice pages, CTIQ books,
+// QRA cyclone and storm-tide guides, MBIE tolerances guide, AIDR handbook, SWA exposure
+// standards), otherwise the dataset page or site copyright page:
+// - https://www.yourhome.gov.au/copyright (CC BY 4.0)
+// - https://www.qbcc.qld.gov.au/copyright (CC BY 4.0 unless otherwise noted)
+// - https://www.qld.gov.au/legal/copyright (CC BY 4.0 unless otherwise noted)
+// - https://www.qra.qld.gov.au/access-information/copyright (CC BY 4.0 unless otherwise noted)
+// - https://www.publications.qld.gov.au/dataset/53ac3a6d-ae93-4a4d-9461-a629ab60f797 (CC BY 4.0)
+// - https://www.longpaddock.qld.gov.au/silo/ (SILO data CC BY 4.0)
+// - https://www.act.gov.au/copyright, https://www.health.nsw.gov.au/pages/copyright.aspx,
+//   https://www.healthnz.govt.nz/copyright, https://www.epa.vic.gov.au/copyright (CC BY 4.0)
+// - https://www.legislation.govt.nz/copyright/ (no copyright in NZ legislation, s27 Copyright
+//   Act 1994)
+// Removed: SWA guidance on interpreting the exposure standards (July 2025), because no fetched
+// notice confirmed its licence and the SWA site licence excludes publications with their own terms.
 export const FREE_RESOURCES: readonly FreeResource[] = [
   {
     id: 'abcb-condensation-handbook-ncc2025',
@@ -70,6 +105,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.abcb.gov.au/sites/default/files/resources/2026/NCC%202025%20Condensation%20in%20building%20handbook.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource:
+      'https://www.abcb.gov.au/sites/default/files/resources/2026/NCC%202025%20Condensation%20in%20building%20handbook.pdf',
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
@@ -84,6 +121,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.abcb.gov.au/sites/default/files/resources/2023/Condensation-in-buildings-handbook.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource:
+      'https://www.abcb.gov.au/sites/default/files/resources/2023/Condensation-in-buildings-handbook.pdf',
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
@@ -98,6 +137,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.abcb.gov.au/sites/default/files/resources/2022/Handbook-condensation-in-buildings-2019.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource:
+      'https://www.abcb.gov.au/sites/default/files/resources/2022/Handbook-condensation-in-buildings-2019.pdf',
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
@@ -112,6 +153,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.abcb.gov.au/sites/default/files/resources/2024/ABCB-Condensation-mitigation-placemat.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource:
+      'https://www.abcb.gov.au/sites/default/files/resources/2024/ABCB-Condensation-mitigation-placemat.pdf',
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
@@ -127,6 +170,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.abcb.gov.au/sites/default/files/resources/2024/PCD-2025-Condensation-mitigation.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource:
+      'https://www.abcb.gov.au/sites/default/files/resources/2024/PCD-2025-Condensation-mitigation.pdf',
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
@@ -142,6 +187,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.abcb.gov.au/sites/default/files/resources/2024/PCD-2025-Housing-energy-efficiency-thermal-breaks.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource:
+      'https://www.abcb.gov.au/sites/default/files/resources/2024/PCD-2025-Housing-energy-efficiency-thermal-breaks.pdf',
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
@@ -157,6 +204,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.abcb.gov.au/sites/default/files/resources/2024/PCD-2025-Waterproofing-and-water-shedding.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource:
+      'https://www.abcb.gov.au/sites/default/files/resources/2024/PCD-2025-Waterproofing-and-water-shedding.pdf',
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
@@ -173,6 +222,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.yourhome.gov.au/passive-design/condensation',
     format: 'web',
     licence: 'CC BY 4.0',
+    licenceSource: 'https://www.yourhome.gov.au/copyright',
     readDate: '2026-10-14',
     attribution: '© Commonwealth of Australia (YourHome, DCCEEW), CC BY 4.0',
     note: 'A plain-language explanation of where condensation forms in a home and how design and airflow change it. A good first read before you talk to an owner about repeat damp.',
@@ -187,6 +237,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.yourhome.gov.au/passive-design/glazing',
     format: 'web',
     licence: 'CC BY 4.0',
+    licenceSource: 'https://www.yourhome.gov.au/copyright',
     readDate: '2026-10-14',
     attribution: '© Commonwealth of Australia (YourHome, DCCEEW), CC BY 4.0',
     note: 'Explains window and glazing choices and how they affect cold surfaces. Useful when moisture keeps showing up at windows.',
@@ -201,6 +252,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.yourhome.gov.au/materials/cladding-systems',
     format: 'web',
     licence: 'CC BY 4.0',
+    licenceSource: 'https://www.yourhome.gov.au/copyright',
     readDate: '2026-10-14',
     attribution: '© Commonwealth of Australia (YourHome, DCCEEW), CC BY 4.0',
     note: 'Describes common cladding systems and how each deals with weather. It helps you picture what sits behind a wall before you open it.',
@@ -215,6 +267,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.yourhome.gov.au/materials/concrete-slab-floors',
     format: 'web',
     licence: 'CC BY 4.0',
+    licenceSource: 'https://www.yourhome.gov.au/copyright',
     readDate: '2026-10-14',
     attribution: '© Commonwealth of Australia (YourHome, DCCEEW), CC BY 4.0',
     note: 'Covers how concrete slab floors are built in houses. Relevant when moisture rises from the ground or gets trapped under floor coverings.',
@@ -229,6 +282,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.yourhome.gov.au/passive-design/insulation',
     format: 'web',
     licence: 'CC BY 4.0',
+    licenceSource: 'https://www.yourhome.gov.au/copyright',
     readDate: '2026-10-14',
     attribution: '© Commonwealth of Australia (YourHome, DCCEEW), CC BY 4.0',
     note: 'Explains insulation types and where they go. Useful for seeing how insulation changes surface temperatures and moisture behaviour.',
@@ -243,6 +297,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.yourhome.gov.au/passive-design/design-climate',
     format: 'web',
     licence: 'CC BY 4.0',
+    licenceSource: 'https://www.yourhome.gov.au/copyright',
     readDate: '2026-10-14',
     attribution: '© Commonwealth of Australia (YourHome, DCCEEW), CC BY 4.0',
     note: 'Shows how climate zones shape home design. Gives context for why drying conditions and mould risk differ between regions.',
@@ -256,6 +311,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.longpaddock.qld.gov.au/silo/',
     format: 'web',
     licence: 'CC BY 4.0',
+    licenceSource: 'https://www.longpaddock.qld.gov.au/silo/',
     readDate: '2026-10-14',
     attribution: 'Queensland Government (Long Paddock SILO), CC BY 4.0',
     note: 'Free historical climate data for Australian locations. Handy for checking what the weather did around a loss, bearing in mind the accuracy notes on the site.',
@@ -269,6 +325,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.qbcc.qld.gov.au/sites/default/files/2021-10/guide-preventing-structural-damage.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource: 'https://www.qbcc.qld.gov.au/copyright',
     readDate: '2026-10-14',
     attribution: 'Queensland Building and Construction Commission, licensed CC BY 4.0 Australia',
     note: 'A guide for owners on foundations and clay soils. It helps you separate soil movement and drainage problems from other causes of cracking and damp.',
@@ -282,6 +339,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.qbcc.qld.gov.au/sites/default/files/documents/guide-ncbp-vinyl-planks-tles-used-wet-areas.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource: 'https://www.qbcc.qld.gov.au/copyright',
     readDate: '2026-10-14',
     attribution: 'Queensland Building and Construction Commission, licensed CC BY 4.0 Australia',
     note: 'A 2023 QBCC fact sheet on these floor coverings in wet areas. Useful when you assess a floor after a bathroom or laundry leak.',
@@ -295,6 +353,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.abcb.gov.au/sites/default/files/resources/2023/Handbook-Indoor-Air-Quality-Verification-Methods-NCC-2022.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource:
+      'https://www.abcb.gov.au/sites/default/files/resources/2023/Handbook-Indoor-Air-Quality-Verification-Methods-NCC-2022.pdf',
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
@@ -310,6 +370,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.yourhome.gov.au/passive-design/ventilation-airtightness',
     format: 'web',
     licence: 'CC BY 4.0',
+    licenceSource: 'https://www.yourhome.gov.au/copyright',
     readDate: '2026-10-14',
     attribution: '© Commonwealth of Australia (YourHome, DCCEEW), CC BY 4.0',
     note: 'Covers natural and mechanical ventilation and how airtight a house is. Helps you decide how far to open up or seal a building during and after drying.',
@@ -324,6 +385,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.yourhome.gov.au/energy/heating-and-cooling',
     format: 'web',
     licence: 'CC BY 4.0',
+    licenceSource: 'https://www.yourhome.gov.au/copyright',
     readDate: '2026-10-14',
     attribution: '© Commonwealth of Australia (YourHome, DCCEEW), CC BY 4.0',
     note: 'Explains heating and cooling systems for homes. Useful context when you plan air movement and humidity control.',
@@ -337,6 +399,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.abcb.gov.au/sites/default/files/resources/2022/Handbook-warm-water-systems.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource:
+      'https://www.abcb.gov.au/sites/default/files/resources/2022/Handbook-warm-water-systems.pdf',
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
@@ -351,6 +415,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.abcb.gov.au/sites/default/files/resources/2022/Advisory-note-protection-of-openable-windows.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource:
+      'https://www.abcb.gov.au/sites/default/files/resources/2022/Advisory-note-protection-of-openable-windows.pdf',
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
@@ -365,6 +431,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.abcb.gov.au/sites/default/files/resources/2024/Housing%20energy%20efficiency%20handbook.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource:
+      'https://www.abcb.gov.au/sites/default/files/resources/2024/Housing%20energy%20efficiency%20handbook.pdf',
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
@@ -379,6 +447,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.abcb.gov.au/sites/default/files/resources/2022/Handbook-energy-efficiency-NCC-Volume-Two-2019.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource:
+      'https://www.abcb.gov.au/sites/default/files/resources/2022/Handbook-energy-efficiency-NCC-Volume-Two-2019.pdf',
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
@@ -393,6 +463,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.abcb.gov.au/sites/default/files/resources/2022/NCC-2022-Residential-Energy-Efficiency-Overview-of-Provisions.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource:
+      'https://www.abcb.gov.au/sites/default/files/resources/2022/NCC-2022-Residential-Energy-Efficiency-Overview-of-Provisions.pdf',
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
@@ -407,6 +479,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.business.qld.gov.au/industries/farms-fishing-forestry/forests-wood/properties-timbers',
     format: 'web',
     licence: 'CC BY 4.0',
+    licenceSource: 'https://www.qld.gov.au/legal/copyright',
     readDate: '2026-10-14',
     attribution: '© State of Queensland (Department of Agriculture and Fisheries), CC BY 4.0',
     note: 'Eighty Business Queensland pages on the properties and uses of Australian timbers, linked through their index. Helps you identify a floor or frame species and think through how it will react to moisture.',
@@ -420,6 +493,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.publications.qld.gov.au/dataset/34cb31ba-7ae9-48ea-a7c9-228525e4c638/resource/df7ad4be-167f-4099-8280-102437f7bd70/download/about-ctiq-2018.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource:
+      'https://www.publications.qld.gov.au/dataset/34cb31ba-7ae9-48ea-a7c9-228525e4c638/resource/df7ad4be-167f-4099-8280-102437f7bd70/download/about-ctiq-2018.pdf',
     readDate: '2026-10-14',
     attribution: '© State of Queensland (Department of Agriculture and Fisheries), CC BY 4.0',
     note: 'An introduction to the Construction timbers in Queensland reference books. Read it first to see how the two books and their tables are laid out.',
@@ -433,6 +508,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.publications.qld.gov.au/dataset/34cb31ba-7ae9-48ea-a7c9-228525e4c638/resource/5eac9f00-f12d-4cc4-9fa4-554e2ba79aec/download/ctiq-amendments-2020.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource:
+      'https://www.publications.qld.gov.au/dataset/34cb31ba-7ae9-48ea-a7c9-228525e4c638/resource/5eac9f00-f12d-4cc4-9fa4-554e2ba79aec/download/ctiq-amendments-2020.pdf',
     readDate: '2026-10-14',
     attribution: '© State of Queensland (Department of Agriculture and Fisheries), CC BY 4.0',
     note: 'Lists the 2020 changes to the timber reference books. Check it so you do not quote a superseded figure.',
@@ -446,6 +523,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.publications.qld.gov.au/dataset/34cb31ba-7ae9-48ea-a7c9-228525e4c638/resource/976103a3-9ea1-44e7-a950-78ba1bd952e8/download/ctiq-book-1-definitions-jan-2020.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource:
+      'https://www.publications.qld.gov.au/dataset/34cb31ba-7ae9-48ea-a7c9-228525e4c638/resource/976103a3-9ea1-44e7-a950-78ba1bd952e8/download/ctiq-book-1-definitions-jan-2020.pdf',
     readDate: '2026-10-14',
     attribution: '© State of Queensland (Department of Agriculture and Fisheries), CC BY 4.0',
     note: 'Defines the terms used for timber grades, durability and use. Handy when a report or a client uses a term you need to pin down.',
@@ -459,6 +538,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.publications.qld.gov.au/dataset/34cb31ba-7ae9-48ea-a7c9-228525e4c638/resource/9393cc58-6f73-467a-8900-5b688888fbdb/download/ctiq-book-2-specifications-jan-2020.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource:
+      'https://www.publications.qld.gov.au/dataset/34cb31ba-7ae9-48ea-a7c9-228525e4c638/resource/9393cc58-6f73-467a-8900-5b688888fbdb/download/ctiq-book-2-specifications-jan-2020.pdf',
     readDate: '2026-10-14',
     attribution: '© State of Queensland (Department of Agriculture and Fisheries), CC BY 4.0',
     note: 'Sets out species properties, durability classes and uses. A strong reference when you need to know what a damaged floor or frame is made of.',
@@ -472,6 +553,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.qbcc.qld.gov.au/sites/default/files/2021-11/guide-timber-deck-balcony-construction.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource: 'https://www.qbcc.qld.gov.au/copyright',
     readDate: '2026-10-14',
     attribution: 'Queensland Building and Construction Commission, licensed CC BY 4.0 Australia',
     note: 'A QBCC guide to timber deck and balcony construction. It helps you spot construction faults that let water in before you blame the weather.',
@@ -485,6 +567,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.qbcc.qld.gov.au/sites/default/files/documents/non-completion-technical-procedures-manual.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource: 'https://www.qbcc.qld.gov.au/copyright',
     readDate: '2026-10-14',
     attribution: 'Queensland Building and Construction Commission, licensed CC BY 4.0 Australia',
     note: 'A QBCC technical manual on unfinished building work, including particleboard and timber flooring exposed to weather. Useful when a floor was rained on during construction.',
@@ -498,6 +581,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.abcb.gov.au/sites/default/files/resources/2022/Advisory-Note-timber-framing-concessions.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource:
+      'https://www.abcb.gov.au/sites/default/files/resources/2022/Advisory-Note-timber-framing-concessions.pdf',
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
@@ -513,6 +598,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.yourhome.gov.au/materials/lightweight-framing',
     format: 'web',
     licence: 'CC BY 4.0',
+    licenceSource: 'https://www.yourhome.gov.au/copyright',
     readDate: '2026-10-14',
     attribution: '© Commonwealth of Australia (YourHome, DCCEEW), CC BY 4.0',
     note: 'A plain explanation of lightweight and timber framing. It gives you a picture of how walls are built before you cut one open.',
@@ -527,6 +613,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.yourhome.gov.au/materials/construction-systems',
     format: 'web',
     licence: 'CC BY 4.0',
+    licenceSource: 'https://www.yourhome.gov.au/copyright',
     readDate: '2026-10-14',
     attribution: '© Commonwealth of Australia (YourHome, DCCEEW), CC BY 4.0',
     note: 'An overview of the construction systems used in houses. Useful for explaining to a client why a floor or wall is built the way it is.',
@@ -540,6 +627,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.publications.qld.gov.au/dataset/53ac3a6d-ae93-4a4d-9461-a629ab60f797/resource/34a952d1-dc8e-4755-beca-96f9ae0fdfdf/download/subterranean-termites-in-queensland_2019.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource:
+      'https://www.publications.qld.gov.au/dataset/53ac3a6d-ae93-4a4d-9461-a629ab60f797',
     readDate: '2026-10-14',
     attribution: '© State of Queensland (Department of Agriculture and Fisheries), CC BY 4.0',
     note: 'A Queensland fact sheet on subterranean termites. Helps you tell termite damage from moisture damage in timber.',
@@ -553,6 +642,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.publications.qld.gov.au/dataset/53ac3a6d-ae93-4a4d-9461-a629ab60f797/resource/47706fd6-a8ec-429d-acda-761b4b6e8c80/download/subterranean-termite-baiting-systems_2019.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource:
+      'https://www.publications.qld.gov.au/dataset/53ac3a6d-ae93-4a4d-9461-a629ab60f797',
     readDate: '2026-10-14',
     attribution: '© State of Queensland (Department of Agriculture and Fisheries), CC BY 4.0',
     note: 'A Queensland fact sheet on baiting systems. Useful background when a client asks what treatment is already on site.',
@@ -566,6 +657,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.publications.qld.gov.au/dataset/53ac3a6d-ae93-4a4d-9461-a629ab60f797/resource/77f1d06c-eac0-4501-9b10-fccf96040ad5/download/subterranean-termite-infestation-in-buildings_2019.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource:
+      'https://www.publications.qld.gov.au/dataset/53ac3a6d-ae93-4a4d-9461-a629ab60f797',
     readDate: '2026-10-14',
     attribution: '© State of Queensland (Department of Agriculture and Fisheries), CC BY 4.0',
     note: 'A Queensland fact sheet on termite infestation in buildings. Helps you recognise signs while you inspect wet or damaged timber.',
@@ -579,6 +672,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.building.govt.nz/assets/Uploads/projects-and-consents/guide-to-tolerances/guide-to-tolerances.pdf',
     format: 'PDF',
     licence: 'CC BY 3.0',
+    licenceSource:
+      'https://www.building.govt.nz/assets/Uploads/projects-and-consents/guide-to-tolerances/guide-to-tolerances.pdf',
     readDate: '2026-10-14',
     attribution:
       '© Crown Copyright 2015, Ministry of Business, Innovation and Employment, CC BY 3.0',
@@ -593,6 +688,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.business.qld.gov.au/industries/building-property-development/building-construction/natural-disasters/repairing-after-flood',
     format: 'web',
     licence: 'CC BY 4.0',
+    licenceSource: 'https://www.qld.gov.au/legal/copyright',
     readDate: '2026-10-14',
     attribution: '© State of Queensland (Department of Housing and Public Works), CC BY 4.0',
     note: 'Business Queensland guidance on repairing a house after a flood. A practical reference when you scope flood repairs with an owner.',
@@ -606,6 +702,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.qbcc.qld.gov.au/sites/default/files/2022-01/guide-contractor-rebuilding-after-flood.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource: 'https://www.qbcc.qld.gov.au/copyright',
     readDate: '2026-10-14',
     attribution: 'Queensland Building and Construction Commission, licensed CC BY 4.0 Australia',
     note: "A QBCC guide written for builders rebuilding after a flood. It shows what the rebuild trades expect from a restorer's handover.",
@@ -619,6 +716,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.getready.qld.gov.au/sites/default/files/2026-06/Design%20Guidance%20for%20Flood%20Resilient%20Homes_final%20digital.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource: 'https://www.qld.gov.au/legal/copyright',
     readDate: '2026-10-14',
     attribution: '© State of Queensland (Department of Housing and Public Works), CC BY 4.0',
     note: 'The June 2026 Queensland design guidance for flood resilient homes. A current reference for material and layout choices when a flooded house is rebuilt. It is a very large file.',
@@ -632,6 +730,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.qld.gov.au/__data/assets/pdf_file/0026/335780/rhf-industry-guidance-flood-resilient-home-a3.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource: 'https://www.qld.gov.au/legal/copyright',
     readDate: '2026-10-14',
     attribution: '© State of Queensland (Department of Energy and Public Works), CC BY 4.0',
     note: 'A one-sheet industry guide from the Queensland Resilient Homes Fund. Quick to scan when you talk through rebuild options.',
@@ -645,6 +744,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.qra.qld.gov.au/sites/default/files/2024-02/0879_Flood%20Resilient%20Building%20Guidance%20for%20Queensland%20Homes.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource: 'https://www.qra.qld.gov.au/access-information/copyright',
     readDate: '2026-10-14',
     attribution: '© State of Queensland (Queensland Reconstruction Authority), CC BY 4.0',
     note: 'QRA guidance on materials and details for flood resilient homes. Helpful when advising what to reinstate after a flood.',
@@ -658,6 +758,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.qra.qld.gov.au/sites/default/files/2019-12/0321%20Cyclone%20Resilient%20Building%20Guidance%20for%20Qld%20Homes%20FINAL.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource:
+      'https://www.qra.qld.gov.au/sites/default/files/2019-12/0321%20Cyclone%20Resilient%20Building%20Guidance%20for%20Qld%20Homes%20FINAL.pdf',
     readDate: '2026-10-14',
     attribution: '© State of Queensland (Queensland Reconstruction Authority), CC BY 4.0',
     note: 'QRA guidance on building for cyclones. Background on wind and water entry when storm damage is the loss.',
@@ -671,6 +773,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.qra.qld.gov.au/sites/default/files/2019-12/0320%20Storm%20Tide%20Resilient%20Building%20Guidance%20for%20Qld%20Homes%20FINAL.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource:
+      'https://www.qra.qld.gov.au/sites/default/files/2019-12/0320%20Storm%20Tide%20Resilient%20Building%20Guidance%20for%20Qld%20Homes%20FINAL.pdf',
     readDate: '2026-10-14',
     attribution: '© State of Queensland (Queensland Reconstruction Authority), CC BY 4.0',
     note: 'QRA guidance on building for storm tide. Relevant for coastal salt-water losses.',
@@ -684,6 +788,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://knowledge.aidr.org.au/media/5634/community-recovery-handbook.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource: 'https://knowledge.aidr.org.au/media/5634/community-recovery-handbook.pdf',
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia (Australian Institute for Disaster Resilience), CC BY 4.0',
@@ -698,6 +803,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.act.gov.au/housing-planning-and-property/staying-healthy-in-your-home/mould',
     format: 'web',
     licence: 'CC BY 4.0',
+    licenceSource: 'https://www.act.gov.au/copyright',
     readDate: '2026-10-14',
     attribution: '© Australian Capital Territory, CC BY 4.0',
     note: 'ACT Government guidance on mould in the home. A plain-language page to point owners and tenants to when you explain causes and prevention.',
@@ -711,6 +817,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.health.nsw.gov.au/environment/factsheets/Pages/mould.aspx',
     format: 'web',
     licence: 'CC BY 4.0',
+    licenceSource: 'https://www.health.nsw.gov.au/pages/copyright.aspx',
     readDate: '2026-10-14',
     attribution: '© State of New South Wales (NSW Ministry of Health), CC BY 4.0',
     note: 'A NSW Health fact sheet on mould. A health agency source you can cite when owners ask whether mould matters.',
@@ -724,6 +831,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.health.nsw.gov.au/emergency_preparedness/weather/Pages/household-cleanup.aspx',
     format: 'web',
     licence: 'CC BY 4.0',
+    licenceSource: 'https://www.health.nsw.gov.au/pages/copyright.aspx',
     readDate: '2026-10-14',
     attribution: '© State of New South Wales (NSW Ministry of Health), CC BY 4.0',
     note: 'NSW Health advice on cleaning a household after a flood or storm. Useful for explaining safe clean-up to clients before your crew arrives.',
@@ -737,6 +845,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://info.health.nz/keeping-healthy/in-emergencies/floods-and-health',
     format: 'web',
     licence: 'CC BY 4.0',
+    licenceSource: 'https://www.healthnz.govt.nz/copyright',
     readDate: '2026-10-14',
     attribution: '© Health New Zealand, CC BY 4.0 (photographs, illustrations and logos excluded)',
     note: 'Health NZ advice on floods and health, including mould and contents. A useful reference for New Zealand jobs.',
@@ -750,6 +859,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://info.health.nz/keeping-healthy/healthy-homes-environments/healthy-homes',
     format: 'web',
     licence: 'CC BY 4.0',
+    licenceSource: 'https://www.healthnz.govt.nz/copyright',
     readDate: '2026-10-14',
     attribution: '© Health New Zealand, CC BY 4.0 (photographs, illustrations and logos excluded)',
     note: 'Health NZ advice on keeping a home dry and healthy. Written for households, so it suits client conversations about damp and mould.',
@@ -764,6 +874,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.legislation.govt.nz/secondary-legislation/pco-drafted/2019/88/en/2025-09-25.pdf',
     format: 'PDF',
     licence: 'No copyright (NZ legislation)',
+    licenceSource: 'https://www.legislation.govt.nz/copyright/',
     readDate: '2026-10-14',
     attribution:
       'New Zealand legislation: no copyright under section 27 of the Copyright Act 1994. Source: Parliamentary Counsel Office',
@@ -778,6 +889,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://ncc.abcb.gov.au/editions/ncc-2025/adopted/housing-provisions/front-matter/copyright-licence-notice-and-acknowledgment-country',
     format: 'web',
     licence: 'CC BY 4.0',
+    licenceSource:
+      'https://ncc.abcb.gov.au/editions/ncc-2025/adopted/housing-provisions/front-matter/copyright-licence-notice-and-acknowledgment-country',
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
@@ -792,6 +905,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://ncc.abcb.gov.au/editions/ncc-2025/adopted/volume-two/preface/copyright-licence-notice-and-acknowledgment-country',
     format: 'web',
     licence: 'CC BY 4.0',
+    licenceSource:
+      'https://ncc.abcb.gov.au/editions/ncc-2025/adopted/volume-two/preface/copyright-licence-notice-and-acknowledgment-country',
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
@@ -806,6 +921,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.abcb.gov.au/sites/default/files/resources/2022/Handbook-upgrading-existing-buildings.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource:
+      'https://www.abcb.gov.au/sites/default/files/resources/2022/Handbook-upgrading-existing-buildings.pdf',
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
@@ -820,6 +937,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.abcb.gov.au/sites/default/files/resources/2026/Embodied-carbon-handbook.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource:
+      'https://www.abcb.gov.au/sites/default/files/resources/2026/Embodied-carbon-handbook.pdf',
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
@@ -834,6 +953,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.abcb.gov.au/sites/default/files/resources/2024/Prefabricated%2C%20modular%20and%20offsite%20construction%20handbook%20NCC%202022%20Final.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource:
+      'https://www.abcb.gov.au/sites/default/files/resources/2024/Prefabricated%2C%20modular%20and%20offsite%20construction%20handbook%20NCC%202022%20Final.pdf',
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
@@ -848,6 +969,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.abcb.gov.au/sites/default/files/resources/2024/Sound-transmission-handbook-2022-final.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource:
+      'https://www.abcb.gov.au/sites/default/files/resources/2024/Sound-transmission-handbook-2022-final.pdf',
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
@@ -862,6 +985,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.abcb.gov.au/sites/default/files/resources/2023/NCC-2022-Bushfire-Verification-Methods-Handbook-FA.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource:
+      'https://www.abcb.gov.au/sites/default/files/resources/2023/NCC-2022-Bushfire-Verification-Methods-Handbook-FA.pdf',
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
@@ -877,6 +1002,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.legislation.govt.nz/secondary-legislation/pco-drafted/1992/150/en/2026-01-15.pdf',
     format: 'PDF',
     licence: 'No copyright (NZ legislation)',
+    licenceSource: 'https://www.legislation.govt.nz/copyright/',
     readDate: '2026-10-14',
     attribution:
       'New Zealand legislation: no copyright under section 27 of the Copyright Act 1994. Source: Parliamentary Counsel Office',
@@ -891,6 +1017,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.epa.vic.gov.au/sites/default/files/epa/publications/1719-after-fire-asbestos-hazards-version-3.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource: 'https://www.epa.vic.gov.au/copyright',
     readDate: '2026-10-14',
     attribution: '© State of Victoria (EPA Victoria), CC BY 4.0',
     note: 'An EPA Victoria publication on asbestos hazards after a fire. Useful context before you disturb fire-damaged materials in older buildings.',
@@ -904,22 +1031,11 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     url: 'https://www.safeworkaustralia.gov.au/sites/default/files/2025-11/workplace-exposure-standards-amended-november2025.pdf',
     format: 'PDF',
     licence: 'CC BY 4.0',
+    licenceSource:
+      'https://www.safeworkaustralia.gov.au/sites/default/files/2025-11/workplace-exposure-standards-amended-november2025.pdf',
     readDate: '2026-10-14',
     attribution: 'Safe Work Australia, licensed CC BY 4.0 (logo excluded)',
     note: "Safe Work Australia's list of workplace exposure standards for airborne contaminants. The reference behind many air-quality and respiratory protection decisions on site.",
-  },
-  {
-    id: 'swa-guidance-wes-jul2025',
-    title: 'Guidance on the interpretation of workplace exposure standards (July 2025)',
-    publisher: 'Safe Work Australia',
-    jurisdiction: 'AU',
-    category: 'asbestos-and-worker-safety',
-    url: 'https://www.safeworkaustralia.gov.au/sites/default/files/2025-07/guidance-interpretation-wes-airborne-contaminants-REVISED_July2025.pdf',
-    format: 'PDF',
-    licence: 'CC BY 4.0',
-    readDate: '2026-10-14',
-    attribution: 'Safe Work Australia, licensed CC BY 4.0 (logo excluded)',
-    note: 'Safe Work Australia guidance on reading the exposure standards. Read it alongside the standards so the numbers are applied properly.',
   },
 ];
 

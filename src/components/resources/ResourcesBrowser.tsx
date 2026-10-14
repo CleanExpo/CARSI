@@ -7,6 +7,7 @@ import {
   FREE_RESOURCES,
   FREE_RESOURCE_JURISDICTIONS,
   RESOURCE_STATUS_LABEL,
+  isBuildingCodeResource,
   groupResourcesByCategory,
   type FreeResource,
   type ResourceJurisdiction,
@@ -50,7 +51,10 @@ function categoryFromHash(hash: string): ResourceCategoryId | null {
   return CATEGORY_IDS.has(id) ? (id as ResourceCategoryId) : null;
 }
 
-/** Shown once above the building-code group, in place of per-card applicability claims. */
+/**
+ * Shown once above every group that holds an NCC or ABCB card, in place of per-card
+ * applicability claims.
+ */
 export const BUILDING_CODE_NOTE =
   'Building code rules differ by state and territory, and editions are amended. Before relying on any document here, confirm with your building surveyor or state building regulator which edition and amendments apply to your project.';
 
@@ -231,7 +235,7 @@ export function ResourcesBrowser() {
             <h2 id={`${group.category}-heading`} className="text-xl font-semibold text-slate-900">
               {resourceCategoryLabel(group.category)}
             </h2>
-            {group.category === 'building-codes' ? (
+            {group.items.some(isBuildingCodeResource) ? (
               <p
                 data-testid="building-code-note"
                 className="mt-3 max-w-3xl rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm leading-relaxed text-amber-950"

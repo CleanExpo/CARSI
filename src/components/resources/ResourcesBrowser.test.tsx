@@ -5,7 +5,8 @@ import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { PUBLIC_RESOURCES_MENU } from '@/lib/navigation/public-nav';
-import { FREE_RESOURCES } from '@/lib/resources/free-resources';
+import { FREE_RESOURCES, isBuildingCodeResource } from '@/lib/resources/free-resources';
+import { RESOURCE_CATEGORIES } from '@/lib/resources/categories';
 
 import { BUILDING_CODE_NOTE, ResourcesBrowser } from './ResourcesBrowser';
 
@@ -85,16 +86,27 @@ describe('ResourcesBrowser category anchors under active filters', () => {
 });
 
 describe('ResourcesBrowser building-code caution and draft labels', () => {
-  it('renders the building-code note once, above the building-code group', () => {
-    const section = document.getElementById('building-codes');
-    expect(section).not.toBeNull();
-    const note = section?.querySelector('[data-testid="building-code-note"]');
-    expect(note?.textContent).toBe(BUILDING_CODE_NOTE);
-    // It sits before the cards, not among them.
-    expect(note?.compareDocumentPosition(section!.querySelector('li')!)).toBe(
-      Node.DOCUMENT_POSITION_FOLLOWING
+  it('renders the building-code note once in every group that has an NCC or ABCB card, above its cards', () => {
+    const groups = Array.from(document.querySelectorAll<HTMLElement>('section[id]')).filter((el) =>
+      RESOURCE_CATEGORIES.some((c) => c.id === el.id)
     );
-    expect(document.querySelectorAll('[data-testid="building-code-note"]').length).toBe(1);
+    expect(groups.length).toBe(RESOURCE_CATEGORIES.length);
+    let withNote = 0;
+    for (const group of groups) {
+      const expected = FREE_RESOURCES.some(
+        (r) => r.category === group.id && isBuildingCodeResource(r)
+      );
+      const notes = group.querySelectorAll('[data-testid="building-code-note"]');
+      expect(notes.length, group.id).toBe(expected ? 1 : 0);
+      if (!expected) continue;
+      withNote += 1;
+      expect(notes[0].textContent).toBe(BUILDING_CODE_NOTE);
+      expect(notes[0].compareDocumentPosition(group.querySelector('li')!)).toBe(
+        Node.DOCUMENT_POSITION_FOLLOWING
+      );
+    }
+    // Building-code documents sit in several categories, not only "Building codes".
+    expect(withNote).toBeGreaterThanOrEqual(3);
   });
 
   it('labels every draft proposal card "Draft proposal — not in force"', () => {

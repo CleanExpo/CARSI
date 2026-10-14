@@ -5,6 +5,7 @@ import {
   RESOURCE_STATUS_LABEL,
   FREE_RESOURCES,
   FREE_RESOURCE_JURISDICTIONS,
+  isBuildingCodeResource,
 } from './free-resources';
 
 /** The publishers' own hosts. A new host is a deliberate addition, reviewed against its licence. */
@@ -30,6 +31,12 @@ const OFFICIAL_HOSTS = new Set([
 ]);
 
 /**
+ * Hosts a licence notice may live on: the publishers' own hosts plus publisher copyright pages on
+ * a sibling domain (Health NZ's notice is on healthnz.govt.nz, its pages on info.health.nz).
+ */
+const LICENCE_HOSTS = new Set([...OFFICIAL_HOSTS, 'www.healthnz.govt.nz']);
+
+/**
  * Open set: CC BY (any version), CC0, or no copyright / public domain. Anchored at both ends so
  * a restricted suffix or mixed terms (CC BY 4.0-NC, "CC0 except photographs") cannot pass.
  */
@@ -44,21 +51,6 @@ const OPEN_LICENCE =
  */
 const APPLICABILITY_WORDING =
   /\b(use[sd]?|using|apply|applies|applied|applying|current|latest|in force|new|recent|still|non-house|commercial|class(?:es)?|renovations?|existing buildings?|built under|designed under|start here|starting point|jobs?|when|for [a-z ,-]{0,40}\bwork)\b/i;
-
-/** A card is in scope if it names the NCC anywhere or is published by the ABCB. */
-function isBuildingCodeCard(r: {
-  id: string;
-  title: string;
-  note: string;
-  url: string;
-  publisher: string;
-}) {
-  return (
-    /\bNCC\b|National Construction Code|Building Code of Australia|\bBCA\b|ncc/i.test(
-      [r.id, r.title, r.note, r.url].join(' ')
-    ) || r.publisher === 'Australian Building Codes Board'
-  );
-}
 
 /** Public Comment Drafts and other proposals, which are never in force. */
 function isDraftProposal(r: { title: string; note: string; url: string }) {
@@ -101,6 +93,17 @@ describe('free-resources data', () => {
     }
   });
 
+  it('records, for every card, the publisher notice its licence was read from', () => {
+    for (const r of FREE_RESOURCES) {
+      expect(r.licence, r.id).toMatch(OPEN_LICENCE);
+      expect(typeof r.licenceSource, r.id).toBe('string');
+      const src = new URL(r.licenceSource);
+      expect(src.protocol, r.id).toBe('https:');
+      // The notice must come from the publisher itself, not a third party.
+      expect(LICENCE_HOSTS.has(src.hostname), `${r.id} licence host ${src.hostname}`).toBe(true);
+    }
+  });
+
   it('uses only open licences and carries the licence in the attribution line', () => {
     for (const r of FREE_RESOURCES) {
       expect(r.licence, r.id).toMatch(OPEN_LICENCE);
@@ -140,7 +143,7 @@ describe('free-resources data', () => {
   it('keeps every NCC and ABCB card note free of applicability wording', () => {
     let inScope = 0;
     for (const r of FREE_RESOURCES) {
-      if (!isBuildingCodeCard(r)) continue;
+      if (!isBuildingCodeResource(r)) continue;
       inScope += 1;
       expect(r.note, r.id).not.toMatch(APPLICABILITY_WORDING);
     }
