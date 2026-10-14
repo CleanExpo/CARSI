@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { PUBLIC_RESOURCES_MENU } from '@/lib/navigation/public-nav';
 import { FREE_RESOURCES } from '@/lib/resources/free-resources';
 
-import { ResourcesBrowser } from './ResourcesBrowser';
+import { BUILDING_CODE_NOTE, ResourcesBrowser } from './ResourcesBrowser';
 
 (
   globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }
@@ -81,5 +81,35 @@ describe('ResourcesBrowser category anchors under active filters', () => {
     });
 
     expect(floodCards()).toBeGreaterThan(0);
+  });
+});
+
+describe('ResourcesBrowser building-code caution and draft labels', () => {
+  it('renders the building-code note once, above the building-code group', () => {
+    const section = document.getElementById('building-codes');
+    expect(section).not.toBeNull();
+    const note = section?.querySelector('[data-testid="building-code-note"]');
+    expect(note?.textContent).toBe(BUILDING_CODE_NOTE);
+    // It sits before the cards, not among them.
+    expect(note?.compareDocumentPosition(section!.querySelector('li')!)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING
+    );
+    expect(document.querySelectorAll('[data-testid="building-code-note"]').length).toBe(1);
+  });
+
+  it('labels every draft proposal card "Draft proposal — not in force"', () => {
+    const drafts = FREE_RESOURCES.filter((r) => r.status === 'draft-proposal');
+    expect(drafts.length).toBeGreaterThan(0);
+    for (const r of drafts) {
+      const link = Array.from(document.querySelectorAll('a')).find(
+        (a) => a.getAttribute('href') === r.url
+      );
+      const card = link?.closest('li');
+      expect(card?.textContent, r.id).toContain('Draft proposal — not in force');
+    }
+    const labelled = Array.from(document.querySelectorAll('li')).filter((li) =>
+      li.textContent?.includes('Draft proposal — not in force')
+    );
+    expect(labelled.length).toBe(drafts.length);
   });
 });

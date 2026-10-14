@@ -35,7 +35,7 @@ const SELECTION_NOTES = [
   },
   {
     heading: 'Linked to the official source',
-    body: 'Every card goes to the publisher’s own site. CARSI does not copy or host the files, so you always get the publisher’s current version.',
+    body: 'Every card goes to the publisher’s own site. CARSI does not copy or host the files. Some links are to a particular edition, so check the publisher’s site for later versions and amendments.',
   },
   {
     heading: 'Checked on the read date',

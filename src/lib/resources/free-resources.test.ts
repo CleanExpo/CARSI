@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
 import { RESOURCE_CATEGORIES } from './categories';
-import { FREE_RESOURCES, FREE_RESOURCE_JURISDICTIONS } from './free-resources';
+import {
+  RESOURCE_STATUS_LABEL,
+  FREE_RESOURCES,
+  FREE_RESOURCE_JURISDICTIONS,
+} from './free-resources';
 
 /** The publishers' own hosts. A new host is a deliberate addition, reviewed against its licence. */
 const OFFICIAL_HOSTS = new Set([
@@ -33,15 +37,13 @@ const OPEN_LICENCE =
   /^(?:CC BY \d\.\d|CC0(?: 1\.0)?|No copyright \(NZ legislation\)|Public domain)$/;
 
 /**
- * Wording that says or implies which work a building-code document applies to. Deliberately
- * broad: a false positive costs one qualifier sentence, a miss sends a job to the wrong code.
+ * Wording that says or implies which work, job, state, date or building a document applies to.
+ * Building-code cards describe only what the document is; applicability is handled once, by
+ * the section note above the building-code group. Deliberately broad: a false positive costs a
+ * rewrite, a miss sends a job to the wrong code.
  */
-const EDITION_DIRECTIVE =
-  /\b(use[sd]?|using|apply|applies|applied|applying|current|latest|in force|new|recent|non-house|commercial|class(?:es)?|renovations?|existing buildings?|built under|designed under|start here|starting point|for [a-z ,-]{0,40}\bwork)\b/i;
-const NCC_ADOPTION_QUALIFIER =
-  "check which NCC edition your state or territory has adopted for your project's approval date";
-/** Accepted instead of the qualifier only for a purely historical note. */
-const NCC_HISTORICAL_MARKER = 'the edition that applied at the time';
+const APPLICABILITY_WORDING =
+  /\b(use[sd]?|using|apply|applies|applied|applying|current|latest|in force|new|recent|still|non-house|commercial|class(?:es)?|renovations?|existing buildings?|built under|designed under|start here|starting point|jobs?|when|for [a-z ,-]{0,40}\bwork)\b/i;
 
 /** A card is in scope if it names the NCC anywhere or is published by the ABCB. */
 function isBuildingCodeCard(r: {
@@ -58,8 +60,11 @@ function isBuildingCodeCard(r: {
   );
 }
 
-function isQualified(note: string) {
-  return note.includes(NCC_ADOPTION_QUALIFIER) || note.includes(NCC_HISTORICAL_MARKER);
+/** Public Comment Drafts and other proposals, which are never in force. */
+function isDraftProposal(r: { title: string; note: string; url: string }) {
+  return /\bPCD\b|Public Comment Draft|consultation (?:paper|draft)|\bproposal\b/i.test(
+    [r.title, r.url].join(' ')
+  );
 }
 
 /** Sources the founder excluded, whatever their licence verdict. */
@@ -130,34 +135,60 @@ describe('free-resources data', () => {
     );
   });
 
-  // NCC 2025 commences on different dates by state and territory (ABCB adoption table,
-  // https://ncc.abcb.gov.au/ncc-2025-state-and-territory-adoption-information, accessed
-  // 14/10/2026: NSW and Qld 1 May 2027, NT not adopted). No card may tell readers an edition is
-  // "current" or is the one for new work without sending them to their state's adoption.
-  it('never points readers to an NCC edition without the state-adoption qualifier', () => {
-    let directiveCards = 0;
+  // NCC editions commence and are amended on different dates and triggers in each state and
+  // territory, so cards say only what a document is. The section note carries the caution.
+  it('keeps every NCC and ABCB card note free of applicability wording', () => {
+    let inScope = 0;
     for (const r of FREE_RESOURCES) {
-      if (!isBuildingCodeCard(r) || !EDITION_DIRECTIVE.test(r.note)) continue;
-      directiveCards += 1;
-      expect(isQualified(r.note), `${r.id}: ${r.note}`).toBe(true);
+      if (!isBuildingCodeCard(r)) continue;
+      inScope += 1;
+      expect(r.note, r.id).not.toMatch(APPLICABILITY_WORDING);
     }
-    // Positive control: the scope must actually reach the code cards.
-    expect(directiveCards).toBeGreaterThanOrEqual(5);
+    // Positive control: the scope must reach the building-code cards.
+    expect(inScope).toBeGreaterThanOrEqual(15);
   });
 
-  it('flags an unqualified edition directive in the check above', () => {
+  it('flags applicability wording in the check above', () => {
     for (const bad of [
       'The current housing provisions, for NCC 2025. Use it for recent builds and new work.',
-      'The current edition of Volume Two for houses.',
-      'The latest NCC. Start here for new work.',
       'NCC 2022 Volume One covers apartments and commercial buildings. Use it when the job is not a standalone house.',
-      'Use it for every new Victorian apartment and commercial job, regardless of approval date.',
-      'The older handbook for NCC Volume Two. Use it for homes built under that edition.',
+      'NCC 2022 still applies in some states and territories but not others.',
+      'Read it when you need to judge a leak against how the building was meant to shed water.',
       'A starting point for building-regulation questions on residential jobs.',
       'Applies to Class 2 renovations and existing buildings.',
+      'The 2019 edition, written for homes built under that version of the NCC.',
     ]) {
-      expect(bad).toMatch(EDITION_DIRECTIVE);
-      expect(isQualified(bad)).toBe(false);
+      expect(bad).toMatch(APPLICABILITY_WORDING);
+    }
+  });
+
+  it('marks every draft or proposal as a draft proposal and as background reading only', () => {
+    const drafts = FREE_RESOURCES.filter(isDraftProposal);
+    expect(drafts.length).toBeGreaterThanOrEqual(1);
+    for (const r of drafts) {
+      expect(r.status, r.id).toBe('draft-proposal');
+      expect(r.note, r.id).toMatch(/^Background reading only/);
+    }
+    for (const r of FREE_RESOURCES.filter((x) => !isDraftProposal(x))) {
+      expect(r.status, r.id).toBeUndefined();
+    }
+    expect(RESOURCE_STATUS_LABEL['draft-proposal']).toBe('Draft proposal — not in force');
+  });
+
+  it('links NCC editions through their ABCB landing page, never a bare edition PDF', () => {
+    for (const r of FREE_RESOURCES) {
+      expect(r.url, r.id).not.toMatch(/^https:\/\/ncc\.abcb\.gov\.au\/system\/files\/ncc\//);
+    }
+  });
+
+  // NCC 2022 volumes and housing provisions are CC BY-ND 4.0 (ABCB copyright notices, e.g.
+  // https://ncc.abcb.gov.au/editions/ncc-2022/adopted/volume-one/preface/copyright-and-licence-notice,
+  // accessed 14/10/2026), which the open-licence rule excludes.
+  it('does not list the NCC 2022 edition text, which is no-derivatives licensed', () => {
+    for (const r of FREE_RESOURCES) {
+      expect(`${r.id} ${r.title} ${r.url}`, r.id).not.toMatch(
+        /ncc2022-(?:volume|housing)|NCC 2022 (?:Volume|ABCB Housing)|editions\/ncc-2022/i
+      );
     }
   });
 

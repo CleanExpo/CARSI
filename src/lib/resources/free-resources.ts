@@ -37,16 +37,29 @@ export interface FreeResource {
   attribution: string;
   /** Plain-English reason the item helps restorers. */
   note: string;
+  /** Set only for drafts and proposals, which are never in force. */
+  status?: ResourceStatus;
 }
 
-// NCC 2025 commencement differs by state and territory, so no card names a single edition as
-// current. Sources, accessed 14/10/2026:
+export type ResourceStatus = 'draft-proposal';
+
+export const RESOURCE_STATUS_LABEL: Record<ResourceStatus, string> = {
+  'draft-proposal': 'Draft proposal — not in force',
+};
+
+// Building-code cards (NCC editions and ABCB publications) say only what each document is.
+// Which edition and amendments apply depends on the state or territory and on project triggers
+// that differ between them, so the hub shows one caution above the building-code group instead.
+// Sources, accessed 14/10/2026:
 // - ABCB adoption table: https://ncc.abcb.gov.au/ncc-2025-state-and-territory-adoption-information
-//   (ACT, Vic and WA 1 May 2026; NSW, Qld and Tas 1 May 2027; SA BCA 1 May 2027; NT not adopted)
-// - Queensland: https://www.business.qld.gov.au/industries/building-property-development/building-construction/laws-codes-standards/delayed-adoption-ncc
-//   (NCC 2022 continues to apply until 1 May 2027)
-// - NSW: https://www.nsw.gov.au/housing-and-construction/compliance-and-regulation/how-to-comply-national-construction-code
-//   (current edition NCC 2022 Amendment 2; NCC 2025 adopted 1 May 2027)
+// - ABCB editions page (NCC 2022 superseded by Amendments 1 and 2, read with a corrigendum):
+//   https://ncc.abcb.gov.au/editions-national-construction-code
+// - NCC 2022 volumes and housing provisions are CC BY-ND 4.0, so they are not listed:
+//   https://ncc.abcb.gov.au/editions/ncc-2022/adopted/volume-one/preface/copyright-and-licence-notice
+// - NCC 2025 is CC BY 4.0:
+//   https://ncc.abcb.gov.au/editions/ncc-2025/adopted/housing-provisions/front-matter/copyright-licence-notice-and-acknowledgment-country
+// - PCD 2025 papers are Public Comment Draft material, not adopted provisions:
+//   https://www.abcb.gov.au/pcd/pcd-2025-improving-waterproofing-and-water-shedding-provisions
 export const FREE_RESOURCES: readonly FreeResource[] = [
   {
     id: 'abcb-condensation-handbook-ncc2025',
@@ -60,7 +73,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: "The ABCB condensation handbook written for NCC 2025, which states and territories adopt on different dates. Before you rely on it, check which NCC edition your state or territory has adopted for your project's approval date, then compare with the older editions for earlier buildings.",
+    note: 'The ABCB Condensation in Buildings Handbook written for NCC 2025. It explains how condensation forms in buildings and how design manages it.',
   },
   {
     id: 'abcb-condensation-handbook-2023',
@@ -74,7 +87,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: "An earlier edition of the handbook, for buildings designed while earlier NCC rules applied. It sets out how moisture forms and travels in walls, roofs and subfloors. Before you rely on it, check which NCC edition your state or territory has adopted for your project's approval date.",
+    note: 'The 2023 edition of the ABCB Condensation in Buildings Handbook, since followed by an NCC 2025 edition. It explains how moisture forms and travels in walls, roofs and subfloors.',
   },
   {
     id: 'abcb-condensation-handbook-2019',
@@ -88,7 +101,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: "The 2019 edition, written for homes built under that version of the NCC. Check the build date, and check which NCC edition your state or territory has adopted for your project's approval date, before you quote any edition to a client.",
+    note: 'The 2019 edition of the ABCB Condensation in Buildings Handbook, since followed by later editions. It explains how condensation forms in buildings.',
   },
   {
     id: 'abcb-condensation-placemat',
@@ -102,7 +115,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: 'A one-page summary of condensation mitigation. Handy to keep on file and point to when an owner asks why damp keeps returning after a dry-out.',
+    note: 'Background reading only: a one-page condensation mitigation summary the ABCB released with the NCC 2025 Public Comment Draft. It describes proposals put out for comment, not the adopted code.',
+    status: 'draft-proposal',
   },
   {
     id: 'abcb-pcd2025-condensation-mitigation',
@@ -116,7 +130,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: 'An ABCB paper from 2025 on how condensation is managed in buildings. Useful background when you explain causes to an insurer or owner.',
+    note: 'Background reading only: an ABCB paper supporting the NCC 2025 Public Comment Draft on condensation mitigation. It describes proposals put out for comment, not the adopted code.',
+    status: 'draft-proposal',
   },
   {
     id: 'abcb-pcd2025-thermal-breaks',
@@ -130,7 +145,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: 'An ABCB paper on thermal breaks in housing. Helps you understand why cold spots form at framing and slab edges, and why mould can appear there.',
+    note: 'Background reading only: an ABCB paper supporting the NCC 2025 Public Comment Draft on thermal breaks in housing. It describes proposals put out for comment, not the adopted code.',
+    status: 'draft-proposal',
   },
   {
     id: 'abcb-pcd2025-waterproofing-water-shedding',
@@ -144,7 +160,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: 'An ABCB paper on waterproofing and water shedding. Read it when you need to judge a leak against how the building was meant to shed water.',
+    note: 'Background reading only: an ABCB paper supporting the NCC 2025 Public Comment Draft on waterproofing and water shedding. It describes proposals put out for comment, not the adopted code, and is not a benchmark for assessing a leak.',
+    status: 'draft-proposal',
   },
   {
     id: 'yourhome-condensation',
@@ -281,7 +298,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: 'An ABCB handbook on verifying indoor air quality. Background for conversations about ventilation and airborne pollutants on drying and remediation jobs.',
+    note: 'An ABCB handbook on the NCC 2022 indoor air quality verification methods. It explains how those methods assess indoor air quality.',
   },
   {
     id: 'yourhome-ventilation-airtightness',
@@ -323,7 +340,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: 'An ABCB handbook on warm water systems. Relevant when a job involves plumbing, humidity or bacteria risk in building water systems.',
+    note: 'An ABCB handbook on warm water systems in buildings, covering plumbing design and bacteria risk.',
   },
   {
     id: 'abcb-adv-openable-windows',
@@ -337,7 +354,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: 'An ABCB advisory note on openable windows. Worth knowing when your ventilation plan means opening windows on upper floors.',
+    note: 'An ABCB advisory note on the protection of openable windows, covering the risk of falls from upper floors.',
   },
   {
     id: 'abcb-housing-energy-efficiency-handbook',
@@ -351,7 +368,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: 'Explains insulation, sealing and ventilation choices in houses. It shows how those choices change the way a home holds moisture.',
+    note: 'An ABCB handbook on the NCC 2022 housing energy efficiency provisions, covering insulation, sealing and ventilation in houses.',
   },
   {
     id: 'abcb-energy-efficiency-vol2-handbook-2019',
@@ -365,7 +382,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: "The older energy efficiency handbook for NCC Volume Two, written for homes built under that edition. For any current job, check which NCC edition your state or territory has adopted for your project's approval date.",
+    note: 'The 2019 edition of the ABCB energy efficiency handbook for NCC Volume Two, an earlier edition of this guidance.',
   },
   {
     id: 'abcb-residential-ee-overview-2022',
@@ -379,7 +396,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: 'A slide deck summarising the 2022 residential energy efficiency changes. A quick overview before you open the full handbook.',
+    note: 'An ABCB slide deck summarising the NCC 2022 residential energy efficiency changes.',
   },
   {
     id: 'business-qld-timber-species-pages',
@@ -484,7 +501,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: "An ABCB advisory note on timber framing in Class 2 and 3 buildings. Regulatory background for multi-unit buildings with timber frames. Before you rely on it, check which NCC edition your state or territory has adopted for your project's approval date.",
+    note: 'An ABCB advisory note on concessions for timber framing in apartment and other multi-unit residential buildings.',
   },
   {
     id: 'yourhome-lightweight-framing',
@@ -753,60 +770,18 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     note: 'The legal text of the Healthy Homes Standards for New Zealand rentals. A primary source for landlord and tenant jobs involving heating, insulation, ventilation and moisture. This link is a dated consolidation, so check for a newer version.',
   },
   {
-    id: 'ncc2022-housing-provisions',
-    title: 'NCC 2022 ABCB Housing Provisions Standard',
-    publisher: 'Australian Building Codes Board',
-    jurisdiction: 'AU',
-    category: 'building-codes',
-    url: 'https://ncc.abcb.gov.au/system/files/ncc/ncc2022-abcb-housing-provisions.pdf',
-    format: 'PDF',
-    licence: 'CC BY 4.0',
-    readDate: '2026-10-14',
-    attribution:
-      '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: "The housing provisions for NCC 2022, including framing, subfloor ventilation and damp-proofing parts. A primary source for what a house built under that edition was meant to include. For any current job, check which NCC edition your state or territory has adopted for your project's approval date.",
-  },
-  {
-    id: 'ncc2022-volume-one',
-    title: 'NCC 2022 Volume One (Class 2 to 9)',
-    publisher: 'Australian Building Codes Board',
-    jurisdiction: 'AU',
-    category: 'building-codes',
-    url: 'https://ncc.abcb.gov.au/system/files/ncc/ncc2022-volume-one.pdf',
-    format: 'PDF',
-    licence: 'CC BY 4.0',
-    readDate: '2026-10-14',
-    attribution:
-      '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: "NCC 2022 Volume One covers apartments and commercial buildings (Class 2 to 9). NCC 2022 still applies in some states and territories but not others, so check which NCC edition your state or territory has adopted for your project's approval date.",
-  },
-  {
-    id: 'ncc2022-volume-two',
-    title: 'NCC 2022 Volume Two (Class 1 and 10)',
-    publisher: 'Australian Building Codes Board',
-    jurisdiction: 'AU',
-    category: 'building-codes',
-    url: 'https://ncc.abcb.gov.au/system/files/ncc/ncc2022-volume-two.pdf',
-    format: 'PDF',
-    licence: 'CC BY 4.0',
-    readDate: '2026-10-14',
-    attribution:
-      '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: "NCC 2022 Volume Two covers houses and small outbuildings. NCC 2022 still applies in some states and territories but not others, so check which NCC edition your state or territory has adopted for your project's approval date.",
-  },
-  {
     id: 'ncc2025-housing-provisions',
     title: 'NCC 2025 ABCB Housing Provisions Standard',
     publisher: 'Australian Building Codes Board',
     jurisdiction: 'AU',
     category: 'building-codes',
-    url: 'https://ncc.abcb.gov.au/system/files/ncc/NCC-2025-Housing-Provisions.pdf',
-    format: 'PDF',
+    url: 'https://ncc.abcb.gov.au/editions/ncc-2025/adopted/housing-provisions/front-matter/copyright-licence-notice-and-acknowledgment-country',
+    format: 'web',
     licence: 'CC BY 4.0',
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: "The housing provisions for NCC 2025, which commences on different dates by state and territory. Before using it on a job, check which NCC edition your state or territory has adopted for your project's approval date. It is a very large file, so allow time to open it.",
+    note: 'The online edition of the NCC 2025 ABCB Housing Provisions Standard, published by the ABCB on its NCC site with a link to the PDF.',
   },
   {
     id: 'ncc2025-volume-two',
@@ -814,13 +789,13 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     publisher: 'Australian Building Codes Board',
     jurisdiction: 'AU',
     category: 'building-codes',
-    url: 'https://ncc.abcb.gov.au/system/files/ncc/NCC-2025-Volume-Two.pdf',
-    format: 'PDF',
+    url: 'https://ncc.abcb.gov.au/editions/ncc-2025/adopted/volume-two/preface/copyright-licence-notice-and-acknowledgment-country',
+    format: 'web',
     licence: 'CC BY 4.0',
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: "NCC 2025 Volume Two for houses and small outbuildings, to pair with the housing provisions. Before using it on a job, check which NCC edition your state or territory has adopted for your project's approval date.",
+    note: 'The online edition of NCC 2025 Volume Two, covering houses and small outbuildings, published by the ABCB on its NCC site with a link to the PDF.',
   },
   {
     id: 'abcb-upgrading-existing-buildings',
@@ -834,7 +809,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: "An ABCB handbook on upgrading existing buildings. Helps when repairs raise questions about how far older work needs to be brought up. Before you rely on it, check which NCC edition your state or territory has adopted for your project's approval date.",
+    note: 'An ABCB handbook on upgrading buildings that were constructed to earlier requirements.',
   },
   {
     id: 'abcb-embodied-carbon-handbook',
@@ -848,7 +823,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: 'An ABCB handbook on embodied carbon. Context for material choices when a rebuild or replacement is on the table.',
+    note: 'An ABCB handbook on embodied carbon in building materials and construction.',
   },
   {
     id: 'abcb-prefab-modular-handbook',
@@ -862,7 +837,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: 'An ABCB handbook on prefabricated and modular building. Background for jobs on modular homes and offsite-built units.',
+    note: 'An ABCB handbook on prefabricated, modular and offsite construction, written for NCC 2022.',
   },
   {
     id: 'abcb-sound-transmission-handbook',
@@ -876,7 +851,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: 'An ABCB handbook on sound transmission. Useful context for floors and walls where a repair could affect acoustic performance.',
+    note: 'An ABCB handbook on sound transmission and insulation in floors and walls.',
   },
   {
     id: 'abcb-bushfire-vm-handbook-2023',
@@ -890,7 +865,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: 'An ABCB handbook on bushfire verification methods. Background for fire recovery jobs in bushfire-prone areas.',
+    note: 'An ABCB handbook on the NCC 2022 bushfire verification methods.',
   },
   {
     id: 'nz-building-regs-1992-150',
