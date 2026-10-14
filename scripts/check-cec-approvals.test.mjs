@@ -4,7 +4,11 @@
  * catalogue ↔ registry consistency that closes the resolveCatalogCecHours concern: a positive
  * (or coercible-to-positive) catalogue cecHours without an approved registry entry MUST fail.
  */
-import { validateCecApprovals } from './check-cec-approvals.mjs';
+import {
+  findExpiringCecApprovals,
+  formatExpiryWarning,
+  validateCecApprovals,
+} from './check-cec-approvals.mjs';
 
 const approvedRegistry = {
   version: 1,
@@ -48,6 +52,49 @@ for (const [name, registry, catalog, shouldFail] of cases) {
     failed++;
   }
 }
+
+// Expiry warning (non-blocking): an approval inside the 90-day window MUST be reported, one
+// outside it must not, and neither may turn the validator red.
+const NOW = new Date('2026-11-01T00:00:00Z');
+const expiryRegistry = {
+  version: 1,
+  approvals: [
+    { ...approvedRegistry.approvals[0], expiresAt: '2027-01-18' },
+    { ...approvedRegistry.approvals[0], slug: 'far-off', expiresAt: '2028-05-15' },
+    { ...approvedRegistry.approvals[0], slug: 'lapsed', expiresAt: '2026-10-01' },
+    { slug: 'pending', status: 'submitted', expiresAt: '2026-11-01' },
+  ],
+};
+const expiring = findExpiringCecApprovals(expiryRegistry, NOW, 90);
+const expect = (name, ok, detail) => {
+  if (!ok) {
+    console.error(`✖ ${name}${detail ? `: ${detail}` : ''}`);
+    failed++;
+  }
+};
+expect(
+  'expiring + lapsed approvals are reported, soonest first; far-off and non-approved are not',
+  JSON.stringify(expiring.map((e) => e.slug)) === JSON.stringify(['lapsed', 'water-damage-restoration']),
+  JSON.stringify(expiring)
+);
+expect('days left is counted (2026-11-01 → 2027-01-18 = 78)', expiring[1]?.daysLeft === 78, JSON.stringify(expiring[1]));
+expect(
+  'warning is a GitHub annotation naming the slug',
+  formatExpiryWarning(expiring[1]).startsWith('::warning') &&
+    formatExpiryWarning(expiring[1]).includes('water-damage-restoration'),
+);
+expect(
+  '96 days out is outside the 90-day window',
+  findExpiringCecApprovals(expiryRegistry, new Date('2026-10-14T00:00:00Z'), 90).every(
+    (e) => e.slug !== 'water-damage-restoration'
+  )
+);
+expect('a lapsed approval says EXPIRED', formatExpiryWarning(expiring[0]).includes('EXPIRED'));
+expect(
+  'an expiring approval does not fail validation',
+  validateCecApprovals({ version: 1, approvals: [expiryRegistry.approvals[0]] }, courses(2)).errors
+    .length === 0
+);
 
 if (failed > 0) {
   console.error(`\n✖ CEC approvals validator self-test failed — ${failed} case(s).`);
