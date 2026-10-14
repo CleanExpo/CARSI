@@ -41,7 +41,7 @@ function setValue(name: string, value: string) {
   input!.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
-async function registerFromSubscribe() {
+function renderAndSubmit() {
   mocks.params = new URLSearchParams('next=%2Fsubscribe');
   act(() => root.render(createElement(RegisterForm)));
   act(() => {
@@ -50,11 +50,15 @@ async function registerFromSubscribe() {
     setValue('password', 'correct-horse-9');
     setValue('confirmPassword', 'correct-horse-9');
   });
-  await act(async () => {
+  return act(async () => {
     container.querySelector('form')!.dispatchEvent(
       new Event('submit', { bubbles: true, cancelable: true })
     );
   });
+}
+
+async function registerFromSubscribe() {
+  await renderAndSubmit();
   // The form navigates after a 200 ms toast delay.
   await act(async () => {
     await new Promise((resolve) => setTimeout(resolve, 300));
@@ -82,6 +86,33 @@ afterEach(() => {
 });
 
 describe('RegisterForm — resume membership checkout after registering', () => {
+  it('does not start checkout until registration has COMPLETED', async () => {
+    let finishRegistration!: () => void;
+    mocks.register.mockReset().mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          finishRegistration = () => resolve({});
+        })
+    );
+    mocks.post.mockResolvedValue({ url: 'https://checkout.stripe.test/cs_member' });
+
+    await renderAndSubmit();
+    // Let any un-awaited work run: with registration still pending, no checkout may start.
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 300));
+    });
+    expect(mocks.register).toHaveBeenCalledTimes(1);
+    expect(mocks.post).not.toHaveBeenCalled();
+    expect(nav.href).toBe('');
+
+    await act(async () => {
+      finishRegistration();
+      await new Promise((resolve) => setTimeout(resolve, 300));
+    });
+    expect(mocks.post).toHaveBeenCalledWith('/api/lms/subscription/checkout', {});
+    expect(nav.href).toBe('https://checkout.stripe.test/cs_member');
+  });
+
   it('registers, then opens the membership checkout and goes to the Stripe URL', async () => {
     mocks.post.mockImplementation(async (path: string) => {
       mocks.calls.push(`post ${path}`);
