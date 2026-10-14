@@ -46,7 +46,8 @@ const catalogue = JSON.parse(readFileSync(join(seedDir, 'courses-catalog.json'),
   courses: Course[];
 };
 const quizFile = JSON.parse(readFileSync(join(seedDir, `${SLUG}-quiz.json`), 'utf8')) as QuizFile;
-const course = catalogue.courses.find((c) => c.slug === SLUG);
+const entries = catalogue.courses.filter((c) => c.slug === SLUG);
+const course = entries[0];
 const lessons = course?.modules.flatMap((m) => m.lessons) ?? [];
 const quiz = quizFile.quizzes[0];
 
@@ -88,7 +89,7 @@ const { syncEnrollmentCompletion } = await import('@/lib/server/enrollment-servi
 
 describe('free ozone/hydroxyl course: the knowledge check is reachable', () => {
   it('has exactly one catalogue entry and one eight-question quiz for it', () => {
-    expect(course).toBeDefined();
+    expect(entries).toHaveLength(1);
     expect(quizFile.courseSlug).toBe(SLUG);
     expect(quizFile.quizzes).toHaveLength(1);
     expect(quiz.questions).toHaveLength(8);
