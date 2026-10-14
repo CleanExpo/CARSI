@@ -1,7 +1,6 @@
 import type { CheckoutCourse } from '@/lib/course-list-item';
 import { getStripeClient } from '@/lib/api/stripe';
 import { verifySessionToken } from '@/lib/auth/session-jwt';
-import { checkoutRecoveryParamsForVerifiedUser } from '@/lib/server/checkout-recovery';
 
 /**
  * Resolve payer email: local HS256 session cookie, backend /me when upstream + Bearer cookie,
@@ -85,18 +84,11 @@ export async function createStripeCheckoutForCourse(params: {
     ? `${course.title || slug} — team (${seatQty} seats)`
     : course.title || slug;
 
-  // Recovery only for a verified signed-in buyer: a guest's email comes from the request body.
-  const recovery = await checkoutRecoveryParamsForVerifiedUser({
-    userId: student_id,
-    email: customer_email,
-  });
-
   const session = await stripe.checkout.sessions.create({
     mode: 'payment',
     customer_email,
     success_url,
     cancel_url,
-    ...recovery,
     metadata: {
       course_slug: slug,
       source: 'carsi-next-local-checkout',

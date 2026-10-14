@@ -441,34 +441,6 @@ export function renderPasswordResetEmail(params: {
   );
 }
 
-/**
- * Abandoned-checkout recovery (sent only when CHECKOUT_RECOVERY_ENABLED is on). Plain and
- * factual: names what they were buying and links back to Stripe's recovery session. No
- * discount, urgency or claim is made.
- */
-export function renderCheckoutRecoveryEmail(params: {
-  appOrigin: string;
-  itemName: string;
-  recoveryUrl: string;
-}): RenderedEmail {
-  return render(
-    {
-      appOrigin: params.appOrigin,
-      preheader: 'Your CARSI checkout expired before payment',
-      eyebrow: 'Checkout',
-      title: 'Your checkout expired',
-      greeting: 'Hi,',
-      paragraphs: [
-        `Your checkout for ${params.itemName} expired before payment went through, so you have not been charged.`,
-        'If you still want it, the button below reopens the same checkout.',
-      ],
-      cta: { label: 'Return to checkout', href: params.recoveryUrl },
-      noteHtml: 'If you have already bought this, or changed your mind, you can ignore this email.',
-    },
-    `Hi,\n\nYour checkout for ${params.itemName} expired before payment went through, so you have not been charged.\n\nReturn to checkout:\n${params.recoveryUrl}\n\nIf you have already bought this, or changed your mind, you can ignore this email.`
-  );
-}
-
 export function renderRegistrationWelcomeEmail(params: {
   appOrigin: string;
   name: string;

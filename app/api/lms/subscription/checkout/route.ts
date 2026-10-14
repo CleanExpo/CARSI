@@ -26,7 +26,6 @@ import { getAppOrigin, getCheckoutReturnUrl } from '@/lib/server/app-url';
 
 import { getStripeClient } from '@/lib/api/stripe';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
-import { checkoutRecoveryParamsForVerifiedUser } from '@/lib/server/checkout-recovery';
 import { membershipCheckoutDecisionFor } from '@/lib/server/membership-checkout-guard';
 import {
   checkoutSessionIdempotencyKey,
@@ -120,10 +119,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ detail: UNAVAILABLE }, { status: 503 });
     }
 
-    const recovery = await checkoutRecoveryParamsForVerifiedUser({
-      userId: claims.sub,
-      email: claims.email,
-    });
     const session = await getStripeClient().checkout.sessions.create(
       {
         mode: 'subscription',
@@ -133,7 +128,6 @@ export async function POST(request: NextRequest) {
         customer_email: claims.email,
         success_url,
         cancel_url,
-        ...recovery,
         metadata: {
           carsi_user_id: claims.sub,
           plan: 'pro_annual',
