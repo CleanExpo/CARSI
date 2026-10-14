@@ -20,6 +20,11 @@ import { PasswordInput } from '@/components/ui/password-input';
 import { authApi } from '@/lib/api/auth';
 import { apiClient, ApiClientError } from '@/lib/api/client';
 import { buildCourseCheckoutUrls } from '@/lib/checkout-urls';
+import {
+  isMembershipCheckoutResume,
+  loginPathWithNext,
+  MEMBERSHIP_PATH,
+} from '@/lib/membership-signup-path';
 import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z
@@ -69,6 +74,28 @@ export function RegisterForm() {
 
       const next = searchParams.get('next') ?? searchParams.get('redirect') ?? '/dashboard';
       const safePath = next.startsWith('/') && !next.startsWith('//') ? next : '/dashboard';
+
+      // Came from "Start membership": open the membership checkout as the account just
+      // created (the session cookie is now set). Any failure lands on /subscribe, where the
+      // button shows the real reason, rather than stranding the buyer.
+      if (isMembershipCheckoutResume(safePath)) {
+        try {
+          const checkout = await apiClient.post<{ url?: string; checkout_url?: string }>(
+            '/api/lms/subscription/checkout',
+            {}
+          );
+          const checkoutUrl = checkout.url ?? checkout.checkout_url;
+          if (checkoutUrl) {
+            toast({ title: 'Redirecting to checkout…' });
+            window.location.href = checkoutUrl;
+            return;
+          }
+        } catch {
+          // Fall through to /subscribe.
+        }
+        window.location.href = MEMBERSHIP_PATH;
+        return;
+      }
 
       // If registration came from a specific course page, immediately start checkout.
       const courseMatch = safePath.match(/^\/courses\/([^/?#]+)/);
@@ -219,7 +246,10 @@ export function RegisterForm() {
             {error.includes('already exists') && (
               <>
                 {' '}
-                <a href="/login" className="underline underline-offset-2">
+                <a
+                  href={loginPathWithNext(searchParams.get('next'))}
+                  className="underline underline-offset-2"
+                >
                   Sign in
                 </a>
                 {' · '}

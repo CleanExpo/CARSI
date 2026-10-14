@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 
 import { apiClient, ApiClientError } from '@/lib/api/client';
+import { membershipSignupPath } from '@/lib/membership-signup-path';
 import type { MembershipDecisionReason } from '@/lib/server/entitlements';
 
 interface CheckoutResponse {
@@ -66,7 +67,9 @@ export function SubscribeCta({
       setError('Membership checkout is not available yet. Please try again later.');
     } catch (err) {
       if (err instanceof ApiClientError && err.status === 401) {
-        window.location.href = `/login?next=${encodeURIComponent('/subscribe')}`;
+        // Most buyers here have no account yet: register in-flow, then the register form
+        // resumes this checkout as the new user (see membership-signup-path).
+        window.location.href = membershipSignupPath();
         return;
       }
       const msg =
