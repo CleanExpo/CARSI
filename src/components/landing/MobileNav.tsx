@@ -44,7 +44,9 @@ export default function MobileNav({
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setIsOpen(false);
+      // A nested disclosure (Free Resources) claims the first Escape by preventing its
+      // default; only an unclaimed Escape closes the whole menu.
+      if (e.key === 'Escape' && !e.defaultPrevented) setIsOpen(false);
     };
 
     if (isOpen) {
@@ -124,7 +126,7 @@ export default function MobileNav({
               initial="closed"
               animate="open"
               exit="closed"
-              className="fixed top-[76px] right-0 left-0 z-40 mx-3 overflow-hidden rounded-xl"
+              className="fixed top-[76px] right-0 left-0 z-40 mx-3 max-h-[calc(100dvh-88px)] overflow-x-hidden overflow-y-auto overscroll-contain rounded-xl"
               style={{
                 background: 'rgba(255,255,255,0.98)',
                 border: '1px solid rgba(15,23,42,0.12)',

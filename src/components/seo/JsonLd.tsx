@@ -4,6 +4,7 @@
 // Content is server-generated from controlled objects, not user input.
 
 import { buildFounderPersonSchema } from '@/lib/schema/founder';
+import { serializeJsonLd } from '@/lib/seo/json-ld';
 
 interface OrganizationSchemaProps {
   name?: string;
@@ -437,7 +438,7 @@ export function ItemListSchema({
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      dangerouslySetInnerHTML={{ __html: serializeJsonLd(schema) }}
     />
   );
 }

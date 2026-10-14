@@ -35,8 +35,12 @@ export function ResourcesMenu({
   useEffect(() => {
     if (!open) return;
 
+    // Capture phase so this runs before an enclosing menu's document listener (MobileNav);
+    // preventDefault tells that listener the Escape was handled, so only the submenu closes
+    // and focus lands on a trigger that is still mounted.
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
+        e.preventDefault();
         setOpen(false);
         buttonRef.current?.focus();
       }
@@ -45,10 +49,10 @@ export function ResourcesMenu({
       if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false);
     };
 
-    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener('keydown', onKeyDown, true);
     document.addEventListener('mousedown', onPointerDown);
     return () => {
-      document.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener('keydown', onKeyDown, true);
       document.removeEventListener('mousedown', onPointerDown);
     };
   }, [open]);

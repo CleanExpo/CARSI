@@ -1,7 +1,7 @@
 'use client';
 
 import { ExternalLink } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import {
   FREE_RESOURCES,
@@ -35,6 +35,18 @@ const MONTHS = [
 export function formatReadDate(iso: string): string {
   const [y, m, d] = iso.split('-').map(Number);
   return `${d} ${MONTHS[m - 1]} ${y}`;
+}
+
+const CATEGORY_IDS = new Set<string>(RESOURCE_CATEGORIES.map((c) => c.id));
+
+function categoryFromHash(hash: string): ResourceCategoryId | null {
+  let id: string;
+  try {
+    id = decodeURIComponent(hash.replace(/^#/, ''));
+  } catch {
+    return null;
+  }
+  return CATEGORY_IDS.has(id) ? (id as ResourceCategoryId) : null;
 }
 
 const SELECT_CLASS =
@@ -89,6 +101,47 @@ export function ResourcesBrowser() {
     [category, jurisdiction]
   );
 
+  const scrollTarget = useRef<ResourceCategoryId | null>(null);
+  const shownCategories = useRef<ReadonlySet<ResourceCategoryId>>(new Set());
+
+  // The header's category links point at /resources#<category>. A filter can remove that
+  // section, so following the link would change the hash and land nowhere. When a category
+  // anchor is followed, relax only the filters that hide it, then scroll to it. Next's Link
+  // navigates with pushState (no hashchange), hence the capture-phase click listener as well.
+  useEffect(() => {
+    const reveal = (id: ResourceCategoryId) => {
+      if (shownCategories.current.has(id)) return;
+      setCategory((c) => (c === 'all' || c === id ? c : 'all'));
+      setJurisdiction((j) =>
+        j === 'all' || FREE_RESOURCES.some((i) => i.category === id && i.jurisdiction === j)
+          ? j
+          : 'all'
+      );
+      scrollTarget.current = id;
+    };
+    const onClick = (e: MouseEvent) => {
+      if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const anchor = (e.target as Element | null)?.closest?.('a[href]');
+      if (!(anchor instanceof HTMLAnchorElement)) return;
+      const url = new URL(anchor.href, window.location.href);
+      if (url.origin !== window.location.origin || url.pathname !== window.location.pathname) {
+        return;
+      }
+      const id = categoryFromHash(url.hash);
+      if (id) reveal(id);
+    };
+    const onHashChange = () => {
+      const id = categoryFromHash(window.location.hash);
+      if (id) reveal(id);
+    };
+    document.addEventListener('click', onClick, true);
+    window.addEventListener('hashchange', onHashChange);
+    return () => {
+      document.removeEventListener('click', onClick, true);
+      window.removeEventListener('hashchange', onHashChange);
+    };
+  }, []);
+
   const groups = useMemo(
     () =>
       groupResourcesByCategory(
@@ -97,6 +150,16 @@ export function ResourcesBrowser() {
       ),
     [visible]
   );
+
+  // Runs after the relaxed filters have re-rendered the section. When nothing was hidden the
+  // groups do not change and the browser's own anchor scroll already applies.
+  useEffect(() => {
+    shownCategories.current = new Set(groups.map((g) => g.category));
+    const id = scrollTarget.current;
+    if (!id) return;
+    scrollTarget.current = null;
+    document.getElementById(id)?.scrollIntoView?.({ block: 'start' });
+  }, [groups]);
 
   return (
     <div>
