@@ -8702,6 +8702,22 @@
        "resources": null
       }
      ]
+    },
+    {
+     "id": "7bd927d9-11ab-41b7-a43e-b05b2d283326",
+     "title": "Module 5: Knowledge check",
+     "orderIndex": 4,
+     "lessons": [
+      {
+       "id": "4a176d4d-3477-4352-b1f9-7eed4ba77efc",
+       "title": "Knowledge check",
+       "contentType": "quiz",
+       "contentBody": "45d510cb-7160-471b-828a-cf440eadba73",
+       "orderIndex": 0,
+       "isPreview": false,
+       "resources": null
+      }
+     ]
     }
    ]
   }
