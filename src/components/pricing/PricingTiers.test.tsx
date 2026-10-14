@@ -29,28 +29,40 @@ function render(props: Parameters<typeof PricingTiers>[0]): string {
 const has = (html: string, id: string) => html.includes(`data-testid="${id}"`);
 
 describe('PricingTiers — switches', () => {
-  it('both off: yearly and Teams are coming soon, nothing is buyable', () => {
+  it('both off: yearly is coming soon; Teams sells per-course seats, not the plans', () => {
     const html = render({});
     expect(has(html, 'pricing-pro_annual-coming-soon')).toBe(true);
     expect(has(html, 'pricing-pro_annual-buy')).toBe(false);
     for (const id of ['starter', 'growth', 'full_library']) {
-      expect(has(html, `pricing-${id}-coming-soon`)).toBe(true);
+      expect(has(html, `pricing-${id}-coming-soon`)).toBe(false);
       expect(has(html, `pricing-${id}-buy`)).toBe(false);
     }
+    expect(has(html, 'pricing-team_seats-buy')).toBe(true);
     expect(html).not.toContain('Start membership');
     expect(html).not.toContain('Start Teams plan');
   });
 
-  it('yearly on, Teams off: only the yearly card is on sale', () => {
+  it('yearly on, Teams off: yearly is on sale and Teams sells per-course seats', () => {
     const html = render({ subscriptionsEnabled: true, teamsEnabled: false });
     expect(has(html, 'pricing-pro_annual-buy')).toBe(true);
     expect(has(html, 'pricing-pro_annual-coming-soon')).toBe(false);
     expect(html).toContain('Start membership');
     for (const id of ['starter', 'growth', 'full_library']) {
-      expect(has(html, `pricing-${id}-coming-soon`)).toBe(true);
+      expect(has(html, `pricing-${id}-coming-soon`)).toBe(false);
       expect(has(html, `pricing-${id}-buy`)).toBe(false);
     }
+    expect(has(html, 'pricing-team_seats-buy')).toBe(true);
     expect(html).not.toContain('Start Teams plan');
+  });
+
+  it('Teams off: the team CTA is a live "Buy seats" link to the course catalogue, with no team price', () => {
+    const html = render({});
+    const teams = html.slice(html.indexOf('aria-label="Teams pricing"'));
+    const link = teams.match(/<a[^>]*data-testid="pricing-team_seats-buy"[^>]*>([^<]*)<\/a>/);
+    expect(link?.[1]).toBe('Buy seats');
+    expect(link?.[0]).toContain('href="/courses"');
+    expect(teams).not.toMatch(/coming soon/i);
+    expect(teams).not.toMatch(/\$\d/);
   });
 
   it('both on: yearly and Teams are on sale', () => {
@@ -60,6 +72,7 @@ describe('PricingTiers — switches', () => {
       expect(has(html, `pricing-${id}-buy`)).toBe(true);
       expect(has(html, `pricing-${id}-coming-soon`)).toBe(false);
     }
+    expect(has(html, 'pricing-team_seats-buy')).toBe(false);
   });
 
   it('the coming-soon CTA is marked disabled and says "Coming soon"', () => {
