@@ -74,7 +74,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: 'An earlier edition of the handbook, useful for buildings designed under the previous rules. It sets out how moisture forms and travels in walls, roofs and subfloors.',
+    note: "An earlier edition of the handbook, for buildings designed while earlier NCC rules applied. It sets out how moisture forms and travels in walls, roofs and subfloors. Before you rely on it, check which NCC edition your state or territory has adopted for your project's approval date.",
   },
   {
     id: 'abcb-condensation-handbook-2019',
@@ -88,7 +88,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: 'The 2019 edition, which matches homes built under that version of the NCC. Check the build date before you quote any edition to a client.',
+    note: "The 2019 edition, written for homes built under that version of the NCC. Check the build date, and check which NCC edition your state or territory has adopted for your project's approval date, before you quote any edition to a client.",
   },
   {
     id: 'abcb-condensation-placemat',
@@ -365,7 +365,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: 'The older energy efficiency handbook for NCC Volume Two. Use it for homes built under that edition.',
+    note: "The older energy efficiency handbook for NCC Volume Two, written for homes built under that edition. For any current job, check which NCC edition your state or territory has adopted for your project's approval date.",
   },
   {
     id: 'abcb-residential-ee-overview-2022',
@@ -484,7 +484,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: 'An ABCB advisory note on timber framing in Class 2 and 3 buildings. Regulatory background for multi-unit buildings with timber frames.',
+    note: "An ABCB advisory note on timber framing in Class 2 and 3 buildings. Regulatory background for multi-unit buildings with timber frames. Before you rely on it, check which NCC edition your state or territory has adopted for your project's approval date.",
   },
   {
     id: 'yourhome-lightweight-framing',
@@ -764,7 +764,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: 'The housing provisions for NCC 2022, including framing, subfloor ventilation and damp-proofing parts. A primary source for what a house built under that edition was meant to include.',
+    note: "The housing provisions for NCC 2022, including framing, subfloor ventilation and damp-proofing parts. A primary source for what a house built under that edition was meant to include. For any current job, check which NCC edition your state or territory has adopted for your project's approval date.",
   },
   {
     id: 'ncc2022-volume-one',
@@ -778,7 +778,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: 'NCC 2022 Volume One covers apartments and commercial buildings. Use it when the job is not a standalone house.',
+    note: "NCC 2022 Volume One covers apartments and commercial buildings (Class 2 to 9). NCC 2022 still applies in some states and territories but not others, so check which NCC edition your state or territory has adopted for your project's approval date.",
   },
   {
     id: 'ncc2022-volume-two',
@@ -792,7 +792,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: 'NCC 2022 Volume Two covers houses and small outbuildings. A starting point for building-regulation questions on residential jobs.',
+    note: "NCC 2022 Volume Two covers houses and small outbuildings. NCC 2022 still applies in some states and territories but not others, so check which NCC edition your state or territory has adopted for your project's approval date.",
   },
   {
     id: 'ncc2025-housing-provisions',
@@ -834,7 +834,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: 'An ABCB handbook on upgrading existing buildings. Helps when repairs raise questions about how far older work needs to be brought up.',
+    note: "An ABCB handbook on upgrading existing buildings. Helps when repairs raise questions about how far older work needs to be brought up. Before you rely on it, check which NCC edition your state or territory has adopted for your project's approval date.",
   },
   {
     id: 'abcb-embodied-carbon-handbook',

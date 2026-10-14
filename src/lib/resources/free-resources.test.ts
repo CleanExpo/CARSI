@@ -32,10 +32,35 @@ const OFFICIAL_HOSTS = new Set([
 const OPEN_LICENCE =
   /^(?:CC BY \d\.\d|CC0(?: 1\.0)?|No copyright \(NZ legislation\)|Public domain)$/;
 
-/** Words that tell a reader which edition applies to their job. */
-const EDITION_DIRECTIVE = /\b(current|latest|in force|new work|recent builds?|applies)\b/i;
+/**
+ * Wording that says or implies which work a building-code document applies to. Deliberately
+ * broad: a false positive costs one qualifier sentence, a miss sends a job to the wrong code.
+ */
+const EDITION_DIRECTIVE =
+  /\b(use[sd]?|using|apply|applies|applied|applying|current|latest|in force|new|recent|non-house|commercial|class(?:es)?|renovations?|existing buildings?|built under|designed under|start here|starting point|for [a-z ,-]{0,40}\bwork)\b/i;
 const NCC_ADOPTION_QUALIFIER =
   "check which NCC edition your state or territory has adopted for your project's approval date";
+/** Accepted instead of the qualifier only for a purely historical note. */
+const NCC_HISTORICAL_MARKER = 'the edition that applied at the time';
+
+/** A card is in scope if it names the NCC anywhere or is published by the ABCB. */
+function isBuildingCodeCard(r: {
+  id: string;
+  title: string;
+  note: string;
+  url: string;
+  publisher: string;
+}) {
+  return (
+    /\bNCC\b|National Construction Code|Building Code of Australia|\bBCA\b|ncc/i.test(
+      [r.id, r.title, r.note, r.url].join(' ')
+    ) || r.publisher === 'Australian Building Codes Board'
+  );
+}
+
+function isQualified(note: string) {
+  return note.includes(NCC_ADOPTION_QUALIFIER) || note.includes(NCC_HISTORICAL_MARKER);
+}
 
 /** Sources the founder excluded, whatever their licence verdict. */
 const EXCLUDED =
@@ -110,15 +135,14 @@ describe('free-resources data', () => {
   // 14/10/2026: NSW and Qld 1 May 2027, NT not adopted). No card may tell readers an edition is
   // "current" or is the one for new work without sending them to their state's adoption.
   it('never points readers to an NCC edition without the state-adoption qualifier', () => {
+    let directiveCards = 0;
     for (const r of FREE_RESOURCES) {
-      const mentionsNcc = /\bNCC\b|National Construction Code/i.test(
-        [r.id, r.title, r.note].join(' ')
-      );
-      if (!mentionsNcc) continue;
-      if (EDITION_DIRECTIVE.test(r.note)) {
-        expect(r.note, r.id).toContain(NCC_ADOPTION_QUALIFIER);
-      }
+      if (!isBuildingCodeCard(r) || !EDITION_DIRECTIVE.test(r.note)) continue;
+      directiveCards += 1;
+      expect(isQualified(r.note), `${r.id}: ${r.note}`).toBe(true);
     }
+    // Positive control: the scope must actually reach the code cards.
+    expect(directiveCards).toBeGreaterThanOrEqual(5);
   });
 
   it('flags an unqualified edition directive in the check above', () => {
@@ -126,9 +150,14 @@ describe('free-resources data', () => {
       'The current housing provisions, for NCC 2025. Use it for recent builds and new work.',
       'The current edition of Volume Two for houses.',
       'The latest NCC. Start here for new work.',
+      'NCC 2022 Volume One covers apartments and commercial buildings. Use it when the job is not a standalone house.',
+      'Use it for every new Victorian apartment and commercial job, regardless of approval date.',
+      'The older handbook for NCC Volume Two. Use it for homes built under that edition.',
+      'A starting point for building-regulation questions on residential jobs.',
+      'Applies to Class 2 renovations and existing buildings.',
     ]) {
       expect(bad).toMatch(EDITION_DIRECTIVE);
-      expect(bad).not.toContain(NCC_ADOPTION_QUALIFIER);
+      expect(isQualified(bad)).toBe(false);
     }
   });
 
