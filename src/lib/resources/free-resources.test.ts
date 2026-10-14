@@ -20,7 +20,6 @@ const OFFICIAL_HOSTS = new Set([
   'www.qbcc.qld.gov.au',
   'www.qra.qld.gov.au',
   'www.publications.qld.gov.au',
-  'www.getready.qld.gov.au',
   'www.qld.gov.au',
   'www.act.gov.au',
   'www.epa.vic.gov.au',
@@ -30,10 +29,25 @@ const OFFICIAL_HOSTS = new Set([
 ]);
 
 /**
- * Hosts a licence notice may live on: the publishers' own hosts plus publisher copyright pages on
- * a sibling domain (Health NZ's notice is on healthnz.govt.nz, its pages on info.health.nz).
+ * A card's licence notice must come from its own publisher: the same host as the card's url,
+ * or a host this map names for that publisher, each with the evidence for the mapping. A notice
+ * from any other government site does not count, however official.
  */
-const LICENCE_HOSTS = new Set([...OFFICIAL_HOSTS, 'www.healthnz.govt.nz']);
+const PUBLISHER_NOTICE_HOSTS: Record<string, readonly string[]> = {
+  // info.health.nz pages are Health New Zealand's; their copyright link resolves to
+  // healthnz.govt.nz/copyright (checked 14/10/2026).
+  'info.health.nz': ['www.healthnz.govt.nz'],
+  // business.qld.gov.au pages are (c) The State of Queensland and their footer "Copyright" link is
+  // qld.gov.au/legal/copyright; business.qld.gov.au has no copyright page of its own (checked
+  // 14/10/2026: /about/copyright returns 404).
+  'www.business.qld.gov.au': ['www.qld.gov.au'],
+};
+
+function licenceSourceMatchesPublisher(r: { url: string; licenceSource: string }): boolean {
+  const cardHost = new URL(r.url).hostname;
+  const noticeHost = new URL(r.licenceSource).hostname;
+  return noticeHost === cardHost || (PUBLISHER_NOTICE_HOSTS[cardHost] ?? []).includes(noticeHost);
+}
 
 /**
  * Open set: CC BY (any version), CC0, or no copyright / public domain. Anchored at both ends so
@@ -98,8 +112,23 @@ describe('free-resources data', () => {
       expect(typeof r.licenceSource, r.id).toBe('string');
       const src = new URL(r.licenceSource);
       expect(src.protocol, r.id).toBe('https:');
-      // The notice must come from the publisher itself, not a third party.
-      expect(LICENCE_HOSTS.has(src.hostname), `${r.id} licence host ${src.hostname}`).toBe(true);
+      // The notice must come from the card's own publisher, not another government body.
+      expect(licenceSourceMatchesPublisher(r), `${r.id} licence notice ${r.licenceSource}`).toBe(
+        true
+      );
+    }
+  });
+
+  it("rejects another publisher's official notice as a card's licence source", () => {
+    const abcb = FREE_RESOURCES.find((r) => new URL(r.url).hostname === 'www.abcb.gov.au');
+    if (!abcb) throw new Error('positive control: no ABCB card');
+    expect(licenceSourceMatchesPublisher(abcb)).toBe(true);
+    for (const other of [
+      'https://www.qld.gov.au/legal/copyright',
+      'https://www.yourhome.gov.au/copyright',
+      'https://www.healthnz.govt.nz/copyright',
+    ]) {
+      expect(licenceSourceMatchesPublisher({ ...abcb, licenceSource: other }), other).toBe(false);
     }
   });
 

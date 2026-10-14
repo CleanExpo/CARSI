@@ -98,6 +98,10 @@ export const RESOURCE_STATUS_LABEL: Record<ResourceStatus, string> = {
 // Removed: the two NSW Health pages, because https://www.health.nsw.gov.au/pages/copyright.aspx
 // grants CC BY 4.0 but also requires a permission form for use other than personal, in-house or
 // non-commercial use, which are conflicting terms under the hub's unclear-terms rule.
+// Removed: Get Ready Queensland's Design Guidance for Flood Resilient Homes (June 2026).
+// getready.qld.gov.au has no copyright notice of its own (its footer links to
+// https://www.qld.gov.au/legal/copyright, which covers qld.gov.au), and the PDF's own notice could
+// not be read here (over the fetch size limit), so no fetched notice confirmed its licence.
 export const FREE_RESOURCES: readonly FreeResource[] = [
   {
     id: 'abcb-condensation-handbook-ncc2025',
@@ -709,20 +713,6 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     readDate: '2026-10-14',
     attribution: 'Queensland Building and Construction Commission, licensed CC BY 4.0 Australia',
     note: "A QBCC guide written for builders rebuilding after a flood. It shows what the rebuild trades expect from a restorer's handover.",
-  },
-  {
-    id: 'qld-design-guidance-flood-resilient-homes-2026',
-    title: 'Design Guidance for Flood Resilient Homes (June 2026)',
-    publisher: 'Queensland Department of Housing and Public Works',
-    jurisdiction: 'Qld',
-    category: 'flood-and-storm-resilience',
-    url: 'https://www.getready.qld.gov.au/sites/default/files/2026-06/Design%20Guidance%20for%20Flood%20Resilient%20Homes_final%20digital.pdf',
-    format: 'PDF',
-    licence: 'CC BY 4.0',
-    licenceSource: 'https://www.qld.gov.au/legal/copyright',
-    readDate: '2026-10-14',
-    attribution: '© State of Queensland (Department of Housing and Public Works), CC BY 4.0',
-    note: 'The June 2026 Queensland design guidance for flood resilient homes. A current reference for material and layout choices when a flooded house is rebuilt. It is a very large file.',
   },
   {
     id: 'qld-rhf-industry-guidance-flood-resilient-a3',
