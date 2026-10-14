@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 import { AuthNavLinks } from '@/components/landing/AuthNavLinks';
+import { ResourcesMenu } from '@/components/landing/ResourcesMenu';
 import { PUBLIC_PRIMARY_NAV } from '@/lib/navigation/public-nav';
 
 const smoothEase: [number, number, number, number] = [0.4, 0, 0.2, 1];
@@ -149,6 +150,9 @@ export default function MobileNav({
                       </Link>
                     </motion.li>
                   ))}
+                  <li>
+                    <ResourcesMenu variant="mobile" onNavigate={() => setIsOpen(false)} />
+                  </li>
                 </ul>
 
                 <AuthNavLinks variant="mobile" onNavigate={() => setIsOpen(false)} />
