@@ -20,7 +20,10 @@ import { getPublishedCourseListItemsFromDatabase } from '@/lib/server/public-cou
  * requirement (how many CECs a certification needs), because that figure is unverified.
  */
 
-export const revalidate = 300;
+// Rendered per request, never ISR-cached: a cached page could keep listing a course after its
+// IICRC approval lapses (stale-while-revalidate serves the old HTML). Each request re-reads the
+// clock against `expiresAt`, so no response can outlive an approval.
+export const dynamic = 'force-dynamic';
 
 const PAGE_PATH = '/iicrc-cec-courses';
 
@@ -42,7 +45,7 @@ async function getPublishedCourses(): Promise<CourseListItem[]> {
   }
   try {
     const res = await fetch(`${getBackendOrigin()}/api/lms/courses`, {
-      next: { revalidate: 60 },
+      cache: 'no-store',
       signal: AbortSignal.timeout(5000),
     });
     if (!res.ok) return [];
