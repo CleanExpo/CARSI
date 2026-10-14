@@ -25,8 +25,12 @@ const OFFICIAL_HOSTS = new Set([
   'www.building.govt.nz',
 ]);
 
-/** Open set: CC BY (any version), CC0, or no copyright / public domain. */
-const OPEN_LICENCE = /^(CC BY \d\.\d|CC0|No copyright|Public domain)/;
+/**
+ * Open set: CC BY (any version), CC0, or no copyright / public domain. Anchored at both ends so
+ * a restricted suffix or mixed terms (CC BY 4.0-NC, "CC0 except photographs") cannot pass.
+ */
+const OPEN_LICENCE =
+  /^(?:CC BY \d\.\d|CC0(?: 1\.0)?|No copyright \(NZ legislation\)|Public domain)$/;
 
 /** Sources the founder excluded, whatever their licence verdict. */
 const EXCLUDED =
@@ -98,6 +102,22 @@ describe('free-resources data', () => {
 
   it('rejects a non-open licence and an excluded source in the checks above', () => {
     expect('CC BY-NC 4.0').not.toMatch(OPEN_LICENCE);
+    // Restricted suffixes and mixed terms after an accepted prefix must not pass.
+    for (const restricted of [
+      'CC BY 4.0-NC',
+      'CC BY 4.0-ND',
+      'CC BY 4.0 NC',
+      'CC BY 4.0-NC-ND',
+      'CC BY 3.0 (non-commercial use only)',
+      'CC BY-SA 4.0',
+      'CC0 except photographs',
+      'No copyright (NZ legislation); images all rights reserved',
+    ]) {
+      expect(restricted).not.toMatch(OPEN_LICENCE);
+    }
+    for (const open of ['CC BY 4.0', 'CC BY 3.0', 'No copyright (NZ legislation)']) {
+      expect(open).toMatch(OPEN_LICENCE);
+    }
     expect('All rights reserved').not.toMatch(OPEN_LICENCE);
     expect('WoodSolutions TDG 09').toMatch(EXCLUDED);
     expect('BRANZ Bulletin').toMatch(EXCLUDED);

@@ -65,7 +65,7 @@ afterEach(() => {
 });
 
 describe('MobileNav with the Free Resources disclosure', () => {
-  it('first Escape closes only the disclosure and returns focus to its trigger; a second closes the menu', () => {
+  it('first Escape closes only the disclosure and returns focus to its trigger; a second closes the menu and focuses the toggle', async () => {
     const trigger = openBoth();
     const panel = document.getElementById(trigger.getAttribute('aria-controls') ?? '');
     const link = panel?.querySelector('a');
@@ -83,6 +83,14 @@ describe('MobileNav with the Free Resources disclosure', () => {
 
     pressEscape(survivingTrigger as Element);
     expect(toggle().getAttribute('aria-expanded')).toBe('false');
+
+    // The panel unmounts after its exit animation; focus must land on the surviving toggle,
+    // not fall back to <body>.
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 600));
+    });
+    expect(document.querySelector('nav[aria-label="Mobile navigation"]')).toBeNull();
+    expect(document.activeElement).toBe(toggle());
   });
 
   it('caps the fixed panel to the viewport and scrolls it vertically so every link stays reachable', () => {
