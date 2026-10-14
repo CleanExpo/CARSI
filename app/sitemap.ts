@@ -5,6 +5,7 @@ import { ccwRoadshowPath } from '@/lib/marketing/ccw-roadshow';
 import { startSmartBasePath, startSmartPages } from '@/lib/marketing/start-smart';
 import { getPublishedCourseSlugsFromDatabase } from '@/lib/server/public-courses-list';
 import { isBuildPhase } from '@/lib/server/build-phase';
+import { isProfessionalDirectoryLive } from '@/lib/server/professional-directory';
 
 // ISR: regenerate every 5 minutes instead of on every crawl (issue #129). Build-safe
 // because getCourses/getPathways short-circuit during the build phase.
@@ -23,6 +24,7 @@ const STATIC_LASTMOD = new Date();
 const staticPages = [
   { path: '/', priority: 1.0, changeFreq: 'weekly' as const },
   { path: '/courses', priority: 0.9, changeFreq: 'daily' as const },
+  { path: '/iicrc-cec-courses', priority: 0.85, changeFreq: 'weekly' as const },
   { path: '/avian-influenza-readiness', priority: 0.92, changeFreq: 'daily' as const },
   { path: '/pathways', priority: 0.8, changeFreq: 'weekly' as const },
   { path: '/industries', priority: 0.8, changeFreq: 'monthly' as const },
@@ -31,7 +33,10 @@ const staticPages = [
   { path: '/ccw-truckmount-operations', priority: 0.78, changeFreq: 'weekly' as const },
   { path: '/ccw-materials', priority: 0.72, changeFreq: 'monthly' as const },
   { path: '/calendar', priority: 0.7, changeFreq: 'weekly' as const },
-  { path: '/professional-directory', priority: 0.72, changeFreq: 'weekly' as const },
+  // Only while the directory is live: until then the page is a noindex "coming soon" gate.
+  ...(isProfessionalDirectoryLive()
+    ? [{ path: '/professional-directory', priority: 0.72, changeFreq: 'weekly' as const }]
+    : []),
   { path: '/research', priority: 0.72, changeFreq: 'weekly' as const },
   { path: '/news', priority: 0.68, changeFreq: 'weekly' as const },
   { path: '/jobs', priority: 0.66, changeFreq: 'weekly' as const },

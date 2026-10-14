@@ -15,7 +15,7 @@ import {
  * returns registry-backed data with PROFESSIONAL_DIRECTORY_LIVE=true.
  */
 
-export const metadata: Metadata = {
+const BASE_METADATA: Metadata = {
   title: 'Professional Directory — Coming Soon | CARSI Industry Hub',
   description:
     'The CARSI professional directory is in development. Verified NRPG member profiles will appear here once registry integration is complete — no placeholder listings.',
@@ -34,6 +34,12 @@ export const metadata: Metadata = {
   },
   alternates: { canonical: 'https://carsi.com.au/professional-directory' },
 };
+
+/** The coming-soon gate is kept out of search indexes until verified listings are live. */
+export async function generateMetadata(): Promise<Metadata> {
+  const status = await getProfessionalDirectoryStatus();
+  return status.live ? BASE_METADATA : { ...BASE_METADATA, robots: { index: false, follow: true } };
+}
 
 export default async function ProfessionalDirectoryPage() {
   const professionals = await getVerifiedProfessionals();
