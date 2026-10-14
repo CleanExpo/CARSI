@@ -13,7 +13,7 @@ import { FREE_RESOURCES } from '@/lib/resources/free-resources';
 const pageUrl = 'https://carsi.com.au/resources';
 
 export const metadata: Metadata = {
-  title: 'Free Resources for Restoration and Cleaning Professionals | CARSI',
+  title: 'Free Resources for Restoration and Cleaning Professionals',
   description:
     'Free guides, handbooks and fact sheets from Australian and New Zealand government bodies on moisture, ventilation, timber floors, flooding and mould. Open licences only, linked to the official source.',
   alternates: { canonical: pageUrl },
