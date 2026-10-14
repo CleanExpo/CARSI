@@ -42,6 +42,7 @@ Lesson 1 retells the July near miss without saying what the standard does or doe
 | Peak limitation = max over shortest time possible, not exceeding 15 min; never exceeded | S1, S2 | S1 section 3.1 (Types of exposure limits), "Peak limitation"; S2 "Exposure Standard" |
 | WES apply until 30/11/2026; WEL from 01/12/2026; ozone unchanged at 0.1 ppm peak in the WEL list | S1, S2 | S1 section 1 (transitional period) and Appendix A; S2 gives the current value |
 | Health effects (eye/nose/throat/airway irritation, reduced lung function, worse asthma/COPD, infection susceptibility, continuing lung damage) | S2 | "Health effects" list |
+| Relatively low amounts of ozone can cause chest pain, coughing, shortness of breath and throat irritation; people vary widely in their susceptibility | S3 | "How is Ozone Harmful?" |
 | Controls: alarms and auto shut-off, monitoring and alerts, maintenance, training | S2 | "Recommended ways to control risks" |
 | The peak limitation is the maximum concentration a worker can be exposed to | S2 | "Exposure Standard" |
 | Exposure limits are the maximum level most (but not all) people can be exposed to without harm; the risk must be eliminated or kept as low as reasonably practicable regardless of whether a limit exists | S11 | "What are workplace exposure standards (WES) or workplace exposure limits (WEL)?" |
