@@ -23,9 +23,7 @@ const OFFICIAL_HOSTS = new Set([
   'www.publications.qld.gov.au',
   'www.qld.gov.au',
   'www.getready.qld.gov.au',
-  'www.act.gov.au',
   'www.epa.vic.gov.au',
-  'info.health.nz',
   'www.legislation.govt.nz',
   'www.building.govt.nz',
 ]);
@@ -60,10 +58,6 @@ const PUBLISHER_HOSTS: Record<string, readonly string[]> = {
   'Queensland Reconstruction Authority': ['www.qra.qld.gov.au'],
   'Ministry of Business, Innovation and Employment (NZ)': ['www.building.govt.nz'],
   'Australian Institute for Disaster Resilience': ['knowledge.aidr.org.au'],
-  'ACT Government': ['www.act.gov.au'],
-  // info.health.nz pages are Health New Zealand's; their copyright link resolves to
-  // healthnz.govt.nz/copyright (checked 14/10/2026).
-  'Health New Zealand': ['info.health.nz', 'www.healthnz.govt.nz'],
   'New Zealand Parliamentary Counsel Office': ['www.legislation.govt.nz'],
   'EPA Victoria': ['www.epa.vic.gov.au'],
   'Safe Work Australia': ['www.safeworkaustralia.gov.au'],
@@ -76,8 +70,6 @@ const PUBLISHER_HOSTS: Record<string, readonly string[]> = {
 const DESIGNATED_NOTICE_HOSTS: Record<string, readonly string[]> = {
   // business.qld.gov.au: footer "Copyright" link is qld.gov.au/legal/copyright; no page of its own.
   'www.business.qld.gov.au': ['www.qld.gov.au'],
-  // info.health.nz: its copyright link resolves to healthnz.govt.nz/copyright.
-  'info.health.nz': ['www.healthnz.govt.nz'],
 };
 
 function hostsBelongToPublisher(r: {

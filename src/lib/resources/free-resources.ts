@@ -87,28 +87,22 @@ export const RESOURCE_STATUS_LABEL: Record<ResourceStatus, string> = {
 //   https://ncc.abcb.gov.au/editions/ncc-2025/adopted/housing-provisions/front-matter/copyright-licence-notice-and-acknowledgment-country
 // - PCD 2025 papers are Public Comment Draft material, not adopted provisions:
 //   https://www.abcb.gov.au/pcd/pcd-2025-improving-waterproofing-and-water-shedding-provisions
-// Licences were re-read on 14/10/2026 from each publisher's own notice (each card's licenceEvidence):
-// the document itself where it states one (every ABCB PDF, NCC 2025 notice pages, CTIQ books,
-// QRA cyclone and storm-tide guides, MBIE tolerances guide, AIDR handbook, SWA exposure
-// standards), otherwise the dataset page or site copyright page:
-// - https://www.yourhome.gov.au/copyright (CC BY 4.0)
-// - https://www.qbcc.qld.gov.au/copyright (CC BY 4.0 unless otherwise noted)
-// - https://www.qld.gov.au/legal/copyright (CC BY 4.0 unless otherwise noted)
-// - https://www.qra.qld.gov.au/access-information/copyright (CC BY 4.0 unless otherwise noted)
-// - https://www.publications.qld.gov.au/dataset/53ac3a6d-ae93-4a4d-9461-a629ab60f797 (CC BY 4.0)
-// - https://www.longpaddock.qld.gov.au/silo/ (SILO data CC BY 4.0)
-// - https://www.act.gov.au/copyright, https://www.healthnz.govt.nz/copyright,
-//   https://www.epa.vic.gov.au/copyright (CC BY 4.0)
-// - https://www.legislation.govt.nz/copyright/ (no copyright in NZ legislation, s27 Copyright
-//   Act 1994)
-// Removed: SWA guidance on interpreting the exposure standards (July 2025), because no fetched
-// notice confirmed its licence and the SWA site licence excludes publications with their own terms.
-// Removed: the two NSW Health pages, because https://www.health.nsw.gov.au/pages/copyright.aspx
-// grants CC BY 4.0 but also requires a permission form for use other than personal, in-house or
-// non-commercial use, which are conflicting terms under the hub's unclear-terms rule.
-// - Get Ready Queensland's Design Guidance for Flood Resilient Homes (June 2026): CC BY 4.0 per the
-//   notice on p.73 of the document, read 14/10/2026 (getready.qld.gov.au has no site notice of its
-//   own, so the document itself is the licence source).
+// Licences were re-read on 14/10/2026 from each publisher's own notice; every card's
+// licenceEvidence records the notice url, where the licence sits in it and the licence sentence,
+// copied by script from the saved notice text (scratchpad notices/, checked by
+// check_quotes.py). Notices are the documents themselves where they state one (ABCB PDFs, NCC
+// 2025 Housing Provisions and Volume Two PDFs p.2, CTIQ books, QRA cyclone and storm-tide
+// guides, Get Ready flood guidance p.73, MBIE tolerances guide, AIDR handbook, SWA exposure
+// standards), the publications.qld.gov.au resource page License field (termite fact sheets), or
+// the site's copyright page (YourHome, QBCC, qld.gov.au, QRA, EPA Victoria, NZ legislation, SILO).
+// Removed under the unclear-terms rule:
+// - SWA guidance on interpreting the exposure standards (July 2025): no fetched notice confirmed
+//   its licence, and the SWA site licence excludes publications with their own terms.
+// - NSW Health pages: their copyright page grants CC BY 4.0 but also requires a permission form
+//   for use other than personal, in-house or non-commercial use (conflicting terms).
+// - ACT Government mould page and both Health New Zealand pages: the licence grant sentence on
+//   act.gov.au/copyright and healthnz.govt.nz/copyright could not be captured verbatim, so no
+//   fetched notice text confirms the licence.
 export const FREE_RESOURCES: readonly FreeResource[] = [
   {
     id: 'abcb-condensation-handbook-ncc2025',
@@ -121,7 +115,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licence: 'CC BY 4.0',
     licenceEvidence: {
       url: 'https://www.abcb.gov.au/sites/default/files/resources/2026/NCC%202025%20Condensation%20in%20building%20handbook.pdf',
-      locator: 'p.2 copyright notice',
+      locator: 'Copyright notice, front matter',
       quote:
         'This work is licensed under the Creative Commons Attribution 4.0 International License.',
       readOn: '2026-10-14',
@@ -142,7 +136,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licence: 'CC BY 4.0',
     licenceEvidence: {
       url: 'https://www.abcb.gov.au/sites/default/files/resources/2023/Condensation-in-buildings-handbook.pdf',
-      locator: 'p.2 copyright notice',
+      locator: 'Copyright notice, front matter',
       quote:
         'This work is licensed under the Creative Commons Attribution 4.0 International License.',
       readOn: '2026-10-14',
@@ -163,7 +157,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licence: 'CC BY 4.0',
     licenceEvidence: {
       url: 'https://www.abcb.gov.au/sites/default/files/resources/2022/Handbook-condensation-in-buildings-2019.pdf',
-      locator: 'p.i copyright notice',
+      locator: 'Copyright notice, p.i',
       quote:
         'The material in this publication is licensed under a Creative Commons Attribution-4.0 International licence',
       readOn: '2026-10-14',
@@ -184,9 +178,9 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licence: 'CC BY 4.0',
     licenceEvidence: {
       url: 'https://www.abcb.gov.au/sites/default/files/resources/2024/ABCB-Condensation-mitigation-placemat.pdf',
-      locator: 'p.1 copyright notice',
+      locator: 'Copyright notice, p.1',
       quote:
-        'licensed under a Creative Commons Attribution-4.0 International licence, with the exception of third party materials',
+        'The material in this publication is licensed under a Creative Commons Attribution-4.0 International licence',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -206,9 +200,9 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licence: 'CC BY 4.0',
     licenceEvidence: {
       url: 'https://www.abcb.gov.au/sites/default/files/resources/2024/PCD-2025-Condensation-mitigation.pdf',
-      locator: 'p.1 copyright notice',
+      locator: 'Copyright notice, p.1',
       quote:
-        'licensed under a Creative Commons Attribution -4.0 International licence, with the exception of third party materials',
+        'The material in this publication is licensed under a Creative Commons Attribution-4.0 International licence',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -228,9 +222,9 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licence: 'CC BY 4.0',
     licenceEvidence: {
       url: 'https://www.abcb.gov.au/sites/default/files/resources/2024/PCD-2025-Housing-energy-efficiency-thermal-breaks.pdf',
-      locator: 'p.1 copyright notice',
+      locator: 'Copyright notice, p.1',
       quote:
-        'licensed under a Creative Commons Attribution -4.0 International licence, with the exception of third party materials',
+        'The material in this publication is licensed under a Creative Commons Attribution-4.0 International licence',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -250,9 +244,9 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licence: 'CC BY 4.0',
     licenceEvidence: {
       url: 'https://www.abcb.gov.au/sites/default/files/resources/2024/PCD-2025-Waterproofing-and-water-shedding.pdf',
-      locator: 'p.1 copyright notice',
+      locator: 'Copyright notice, p.1',
       quote:
-        'licensed under a Creative Commons Attribution -4.0 International licence, with the exception of third party materials',
+        'The material in this publication is licensed under a Creative Commons Attribution-4.0 International licence',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -275,7 +269,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
       url: 'https://www.yourhome.gov.au/copyright',
       locator: 'Copyright page',
       quote:
-        'All material is presented in this publication under a Creative Commons Attribution 4.0 International Public License(CC BY 4.0)',
+        'All material is presented in this publication under a Creative Commons Attribution 4.0 International Public License',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -296,7 +290,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
       url: 'https://www.yourhome.gov.au/copyright',
       locator: 'Copyright page',
       quote:
-        'All material is presented in this publication under a Creative Commons Attribution 4.0 International Public License(CC BY 4.0)',
+        'All material is presented in this publication under a Creative Commons Attribution 4.0 International Public License',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -317,7 +311,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
       url: 'https://www.yourhome.gov.au/copyright',
       locator: 'Copyright page',
       quote:
-        'All material is presented in this publication under a Creative Commons Attribution 4.0 International Public License(CC BY 4.0)',
+        'All material is presented in this publication under a Creative Commons Attribution 4.0 International Public License',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -338,7 +332,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
       url: 'https://www.yourhome.gov.au/copyright',
       locator: 'Copyright page',
       quote:
-        'All material is presented in this publication under a Creative Commons Attribution 4.0 International Public License(CC BY 4.0)',
+        'All material is presented in this publication under a Creative Commons Attribution 4.0 International Public License',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -359,7 +353,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
       url: 'https://www.yourhome.gov.au/copyright',
       locator: 'Copyright page',
       quote:
-        'All material is presented in this publication under a Creative Commons Attribution 4.0 International Public License(CC BY 4.0)',
+        'All material is presented in this publication under a Creative Commons Attribution 4.0 International Public License',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -380,7 +374,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
       url: 'https://www.yourhome.gov.au/copyright',
       locator: 'Copyright page',
       quote:
-        'All material is presented in this publication under a Creative Commons Attribution 4.0 International Public License(CC BY 4.0)',
+        'All material is presented in this publication under a Creative Commons Attribution 4.0 International Public License',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -400,7 +394,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
       url: 'https://www.longpaddock.qld.gov.au/silo/',
       locator: 'SILO page text',
       quote:
-        'SILO climate data are freely available under the Creative Commons Attribution 4.0 International (CC BY 4.0) licence.',
+        'SILO climate data are freely available under the [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/) licence.',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -419,7 +413,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licenceEvidence: {
       url: 'https://www.qbcc.qld.gov.au/copyright',
       locator: 'Copyright page (the PDF carries no notice of its own)',
-      quote: 'licensed under a Creative Commons Attribution 4.0 Australia (CC BY) licence',
+      quote:
+        'all copyright material available on or through this website is licensed under a Creative Commons Attribution 4.0 Australia (CC BY) licence.',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -438,7 +433,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licenceEvidence: {
       url: 'https://www.qbcc.qld.gov.au/copyright',
       locator: 'Copyright page (the PDF carries no notice of its own)',
-      quote: 'licensed under a Creative Commons Attribution 4.0 Australia (CC BY) licence',
+      quote:
+        'all copyright material available on or through this website is licensed under a Creative Commons Attribution 4.0 Australia (CC BY) licence.',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -456,7 +452,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licence: 'CC BY 4.0',
     licenceEvidence: {
       url: 'https://www.abcb.gov.au/sites/default/files/resources/2023/Handbook-Indoor-Air-Quality-Verification-Methods-NCC-2022.pdf',
-      locator: 'p.2 copyright notice',
+      locator: 'Copyright notice, front matter',
       quote:
         'This work is licensed under the Creative Commons Attribution 4.0 International License.',
       readOn: '2026-10-14',
@@ -480,7 +476,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
       url: 'https://www.yourhome.gov.au/copyright',
       locator: 'Copyright page',
       quote:
-        'All material is presented in this publication under a Creative Commons Attribution 4.0 International Public License(CC BY 4.0)',
+        'All material is presented in this publication under a Creative Commons Attribution 4.0 International Public License',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -501,7 +497,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
       url: 'https://www.yourhome.gov.au/copyright',
       locator: 'Copyright page',
       quote:
-        'All material is presented in this publication under a Creative Commons Attribution 4.0 International Public License(CC BY 4.0)',
+        'All material is presented in this publication under a Creative Commons Attribution 4.0 International Public License',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -519,9 +515,9 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licence: 'CC BY 4.0',
     licenceEvidence: {
       url: 'https://www.abcb.gov.au/sites/default/files/resources/2022/Handbook-warm-water-systems.pdf',
-      locator: 'p.2 copyright notice',
+      locator: 'Copyright notice, front matter',
       quote:
-        'licensed under a Creative Commons Attribution-4.0 International licence, with the exception of',
+        'The material in this publication is licensed under a Creative Commons Attribution-4.0 International licence',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -540,9 +536,9 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licence: 'CC BY 4.0',
     licenceEvidence: {
       url: 'https://www.abcb.gov.au/sites/default/files/resources/2022/Advisory-note-protection-of-openable-windows.pdf',
-      locator: 'p.2 copyright notice',
+      locator: 'Copyright notice, front matter',
       quote:
-        'licensed under a Creative Commons Attribution-4.0 International licence, with the exception of',
+        'The material in this publication is licensed under a Creative Commons Attribution-4.0 International licence',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -561,7 +557,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licence: 'CC BY 4.0',
     licenceEvidence: {
       url: 'https://www.abcb.gov.au/sites/default/files/resources/2024/Housing%20energy%20efficiency%20handbook.pdf',
-      locator: 'p.2 copyright notice',
+      locator: 'Copyright notice, front matter',
       quote:
         'This work is licensed under the Creative Commons Attribution 4.0 International License.',
       readOn: '2026-10-14',
@@ -582,9 +578,9 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licence: 'CC BY 4.0',
     licenceEvidence: {
       url: 'https://www.abcb.gov.au/sites/default/files/resources/2022/Handbook-energy-efficiency-NCC-Volume-Two-2019.pdf',
-      locator: 'p.2 copyright notice',
+      locator: 'Copyright notice, front matter',
       quote:
-        'licensed under a Creative Commons Attribution-4.0 International licence, with the exception of',
+        'The material in this publication is licensed under a Creative Commons Attribution-4.0 International licence',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -603,9 +599,9 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licence: 'CC BY 4.0',
     licenceEvidence: {
       url: 'https://www.abcb.gov.au/sites/default/files/resources/2022/NCC-2022-Residential-Energy-Efficiency-Overview-of-Provisions.pdf',
-      locator: 'p.1 copyright notice',
+      locator: 'Copyright notice, p.1',
       quote:
-        'licensed under a Creative Commons Attribution—4.0 International licence, with the exception of third party materials',
+        'The material in this publication is licensed under a Creative Commons Attribution—4.0 International licence',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -626,7 +622,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
       url: 'https://www.qld.gov.au/legal/copyright',
       locator: 'Copyright page linked from the page footer',
       quote:
-        'Unless otherwise noted, all copyright material available on or through this website is licensed under a Creative Commons Attribution 4.0 International licence (CC BY 4.0).',
+        'all copyright material available on or through this website is licensed under a Creative Commons Attribution 4.0 International licence (CC BY 4.0).',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -644,9 +640,9 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licence: 'CC BY 4.0',
     licenceEvidence: {
       url: 'https://www.publications.qld.gov.au/dataset/34cb31ba-7ae9-48ea-a7c9-228525e4c638/resource/df7ad4be-167f-4099-8280-102437f7bd70/download/about-ctiq-2018.pdf',
-      locator: 'p.2 copyright notice',
+      locator: 'Copyright notice, p.2',
       quote:
-        'this publication is licensed under a Creative Commons Attribution 4.0 International (CC BY 4.0) licence.',
+        'The copyright in this publication is licensed under a Creative Commons Attribution 4.0 International (CC BY 4.0) licence.',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -664,9 +660,9 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licence: 'CC BY 4.0',
     licenceEvidence: {
       url: 'https://www.publications.qld.gov.au/dataset/34cb31ba-7ae9-48ea-a7c9-228525e4c638/resource/5eac9f00-f12d-4cc4-9fa4-554e2ba79aec/download/ctiq-amendments-2020.pdf',
-      locator: 'p.2 copyright notice',
+      locator: 'Copyright notice, p.2',
       quote:
-        'this publication is licensed under a Creative Commons Attribution 4.0 International (CC BY 4.0) licence.',
+        'The copyright in this publication is licensed under a Creative Commons Attribution 4.0 International (CC BY 4.0) licence.',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -684,9 +680,9 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licence: 'CC BY 4.0',
     licenceEvidence: {
       url: 'https://www.publications.qld.gov.au/dataset/34cb31ba-7ae9-48ea-a7c9-228525e4c638/resource/976103a3-9ea1-44e7-a950-78ba1bd952e8/download/ctiq-book-1-definitions-jan-2020.pdf',
-      locator: 'p.2 copyright notice',
+      locator: 'Copyright notice, p.2',
       quote:
-        'this publication is licensed under a Creative Commons Attribution 4.0 International (CC BY 4.0) licence.',
+        'The copyright in this publication is licensed under a Creative Commons Attribution 4.0 International (CC BY 4.0) licence.',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -704,9 +700,9 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licence: 'CC BY 4.0',
     licenceEvidence: {
       url: 'https://www.publications.qld.gov.au/dataset/34cb31ba-7ae9-48ea-a7c9-228525e4c638/resource/9393cc58-6f73-467a-8900-5b688888fbdb/download/ctiq-book-2-specifications-jan-2020.pdf',
-      locator: 'p.2 copyright notice',
+      locator: 'Copyright notice, p.2',
       quote:
-        'this publication is licensed under a Creative Commons Attribution 4.0 International (CC BY 4.0) licence.',
+        'The copyright in this publication is licensed under a Creative Commons Attribution 4.0 International (CC BY 4.0) licence.',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -725,7 +721,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licenceEvidence: {
       url: 'https://www.qbcc.qld.gov.au/copyright',
       locator: 'Copyright page (the PDF carries no notice of its own)',
-      quote: 'licensed under a Creative Commons Attribution 4.0 Australia (CC BY) licence',
+      quote:
+        'all copyright material available on or through this website is licensed under a Creative Commons Attribution 4.0 Australia (CC BY) licence.',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -744,7 +741,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licenceEvidence: {
       url: 'https://www.qbcc.qld.gov.au/copyright',
       locator: 'Copyright page (the PDF carries no notice of its own)',
-      quote: 'licensed under a Creative Commons Attribution 4.0 Australia (CC BY) licence',
+      quote:
+        'all copyright material available on or through this website is licensed under a Creative Commons Attribution 4.0 Australia (CC BY) licence.',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -762,9 +760,9 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licence: 'CC BY 4.0',
     licenceEvidence: {
       url: 'https://www.abcb.gov.au/sites/default/files/resources/2022/Advisory-Note-timber-framing-concessions.pdf',
-      locator: 'p.2 copyright notice',
+      locator: 'Copyright notice, front matter',
       quote:
-        'licensed under a Creative Commons Attribution-4.0 International licence, with the exception of',
+        'The material in this publication is licensed under a Creative Commons Attribution-4.0 International licence',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -786,7 +784,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
       url: 'https://www.yourhome.gov.au/copyright',
       locator: 'Copyright page',
       quote:
-        'All material is presented in this publication under a Creative Commons Attribution 4.0 International Public License(CC BY 4.0)',
+        'All material is presented in this publication under a Creative Commons Attribution 4.0 International Public License',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -807,7 +805,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
       url: 'https://www.yourhome.gov.au/copyright',
       locator: 'Copyright page',
       quote:
-        'All material is presented in this publication under a Creative Commons Attribution 4.0 International Public License(CC BY 4.0)',
+        'All material is presented in this publication under a Creative Commons Attribution 4.0 International Public License',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -824,9 +822,9 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     format: 'PDF',
     licence: 'CC BY 4.0',
     licenceEvidence: {
-      url: 'https://www.publications.qld.gov.au/dataset/53ac3a6d-ae93-4a4d-9461-a629ab60f797',
-      locator: 'Dataset page, Licence field',
-      quote: 'Licence: Creative Commons Attribution 4.0',
+      url: 'https://www.publications.qld.gov.au/dataset/53ac3a6d-ae93-4a4d-9461-a629ab60f797/resource/34a952d1-dc8e-4755-beca-96f9ae0fdfdf',
+      locator: 'Resource page, License field',
+      quote: 'Creative Commons Attribution 4.0',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -843,9 +841,9 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     format: 'PDF',
     licence: 'CC BY 4.0',
     licenceEvidence: {
-      url: 'https://www.publications.qld.gov.au/dataset/53ac3a6d-ae93-4a4d-9461-a629ab60f797',
-      locator: 'Dataset page, Licence field',
-      quote: 'Licence: Creative Commons Attribution 4.0',
+      url: 'https://www.publications.qld.gov.au/dataset/53ac3a6d-ae93-4a4d-9461-a629ab60f797/resource/47706fd6-a8ec-429d-acda-761b4b6e8c80',
+      locator: 'Resource page, License field',
+      quote: 'Creative Commons Attribution 4.0',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -862,9 +860,9 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     format: 'PDF',
     licence: 'CC BY 4.0',
     licenceEvidence: {
-      url: 'https://www.publications.qld.gov.au/dataset/53ac3a6d-ae93-4a4d-9461-a629ab60f797',
-      locator: 'Dataset page, Licence field',
-      quote: 'Licence: Creative Commons Attribution 4.0',
+      url: 'https://www.publications.qld.gov.au/dataset/53ac3a6d-ae93-4a4d-9461-a629ab60f797/resource/77f1d06c-eac0-4501-9b10-fccf96040ad5',
+      locator: 'Resource page, License field',
+      quote: 'Creative Commons Attribution 4.0',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -882,7 +880,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licence: 'CC BY 3.0',
     licenceEvidence: {
       url: 'https://www.building.govt.nz/assets/Uploads/projects-and-consents/guide-to-tolerances/guide-to-tolerances.pdf',
-      locator: 'Front-matter copyright notice',
+      locator: 'Copyright notice, front matter',
       quote: 'This work is licensed under the Creative Commons Attribution 3.0 Unported License.',
       readOn: '2026-10-14',
     },
@@ -904,7 +902,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
       url: 'https://www.qld.gov.au/legal/copyright',
       locator: 'Copyright page linked from the page footer',
       quote:
-        'Unless otherwise noted, all copyright material available on or through this website is licensed under a Creative Commons Attribution 4.0 International licence (CC BY 4.0).',
+        'all copyright material available on or through this website is licensed under a Creative Commons Attribution 4.0 International licence (CC BY 4.0).',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -923,7 +921,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licenceEvidence: {
       url: 'https://www.qbcc.qld.gov.au/copyright',
       locator: 'Copyright page (the PDF carries no notice of its own)',
-      quote: 'licensed under a Creative Commons Attribution 4.0 Australia (CC BY) licence',
+      quote:
+        'all copyright material available on or through this website is licensed under a Creative Commons Attribution 4.0 Australia (CC BY) licence.',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -941,9 +940,9 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licence: 'CC BY 4.0',
     licenceEvidence: {
       url: 'https://www.getready.qld.gov.au/sites/default/files/2026-06/Design%20Guidance%20for%20Flood%20Resilient%20Homes_final%20digital.pdf',
-      locator: 'p.73 copyright notice',
+      locator: 'Copyright notice, p.73',
       quote:
-        'licensed by the State of Queensland (Department of Housing and Public Works) under a Creative Commons Attribution (CC BY) 4.0 International licence',
+        'This guidance document is licensed by the State of Queensland (Department of Housing and Public Works) under a Creative Commons Attribution (CC BY) 4.0',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -963,7 +962,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
       url: 'https://www.qld.gov.au/legal/copyright',
       locator: 'Copyright page for qld.gov.au',
       quote:
-        'Unless otherwise noted, all copyright material available on or through this website is licensed under a Creative Commons Attribution 4.0 International licence (CC BY 4.0).',
+        'all copyright material available on or through this website is licensed under a Creative Commons Attribution 4.0 International licence (CC BY 4.0).',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -983,7 +982,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
       url: 'https://www.qra.qld.gov.au/access-information/copyright',
       locator: 'Copyright page',
       quote:
-        'Unless otherwise noted, all copyright material available on or through this website is licensed under a Creative Commons Attribution 4.0 International licence (CC BY 4.0).',
+        'all copyright material available on or through this website is licensed under a Creative Commons Attribution 4.0 International licence (CC BY 4.0).',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -1001,7 +1000,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licence: 'CC BY 4.0',
     licenceEvidence: {
       url: 'https://www.qra.qld.gov.au/sites/default/files/2019-12/0321%20Cyclone%20Resilient%20Building%20Guidance%20for%20Qld%20Homes%20FINAL.pdf',
-      locator: 'p.2 copyright notice',
+      locator: 'Licence notice, p.2',
       quote:
         'This material is licensed by the State of Queensland under a Creative Commons Attribution (CC BY) 4.0 International licence.',
       readOn: '2026-10-14',
@@ -1021,7 +1020,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licence: 'CC BY 4.0',
     licenceEvidence: {
       url: 'https://www.qra.qld.gov.au/sites/default/files/2019-12/0320%20Storm%20Tide%20Resilient%20Building%20Guidance%20for%20Qld%20Homes%20FINAL.pdf',
-      locator: 'p.2 copyright notice',
+      locator: 'Licence notice, p.2',
       quote:
         'This material is licensed by the State of Queensland under a Creative Commons Attribution (CC BY) 4.0 International licence.',
       readOn: '2026-10-14',
@@ -1041,72 +1040,15 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licence: 'CC BY 4.0',
     licenceEvidence: {
       url: 'https://knowledge.aidr.org.au/media/5634/community-recovery-handbook.pdf',
-      locator: 'Front-matter copyright notice',
+      locator: 'Copyright notice, front matter',
       quote:
-        'provided under a Creative Commons Attribution 4.0 International Public License, with the exception of',
+        'All material presented in this publication is provided under a Creative Commons Attribution 4.0 International Public License',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia (Australian Institute for Disaster Resilience), CC BY 4.0',
     note: 'A handbook on community recovery after disasters. Helps you understand the wider recovery process your clients are going through.',
-  },
-  {
-    id: 'act-mould',
-    title: 'Mould (ACT Government)',
-    publisher: 'ACT Government',
-    jurisdiction: 'ACT',
-    category: 'mould-and-health',
-    url: 'https://www.act.gov.au/housing-planning-and-property/staying-healthy-in-your-home/mould',
-    format: 'web',
-    licence: 'CC BY 4.0',
-    licenceEvidence: {
-      url: 'https://www.act.gov.au/copyright',
-      locator: 'Copyright page',
-      quote: 'licensed under a Creative Commons Attribution 4.0 licence',
-      readOn: '2026-10-14',
-    },
-    readDate: '2026-10-14',
-    attribution: '© Australian Capital Territory, CC BY 4.0',
-    note: 'ACT Government guidance on mould in the home. A plain-language page to point owners and tenants to when you explain causes and prevention.',
-  },
-  {
-    id: 'healthnz-floods-and-health',
-    title: 'Floods and health (Health NZ)',
-    publisher: 'Health New Zealand',
-    jurisdiction: 'NZ',
-    category: 'mould-and-health',
-    url: 'https://info.health.nz/keeping-healthy/in-emergencies/floods-and-health',
-    format: 'web',
-    licence: 'CC BY 4.0',
-    licenceEvidence: {
-      url: 'https://www.healthnz.govt.nz/copyright',
-      locator: 'Copyright page',
-      quote: 'licensed for re-use under a Creative Commons Attribution 4.0 International Licence',
-      readOn: '2026-10-14',
-    },
-    readDate: '2026-10-14',
-    attribution: '© Health New Zealand, CC BY 4.0 (photographs, illustrations and logos excluded)',
-    note: 'Health NZ advice on floods and health, including mould and contents. A useful reference for New Zealand jobs.',
-  },
-  {
-    id: 'healthnz-healthy-homes',
-    title: 'Keeping your home healthy: damp, condensation and mould (Health NZ)',
-    publisher: 'Health New Zealand',
-    jurisdiction: 'NZ',
-    category: 'healthy-homes-nz',
-    url: 'https://info.health.nz/keeping-healthy/healthy-homes-environments/healthy-homes',
-    format: 'web',
-    licence: 'CC BY 4.0',
-    licenceEvidence: {
-      url: 'https://www.healthnz.govt.nz/copyright',
-      locator: 'Copyright page',
-      quote: 'licensed for re-use under a Creative Commons Attribution 4.0 International Licence',
-      readOn: '2026-10-14',
-    },
-    readDate: '2026-10-14',
-    attribution: '© Health New Zealand, CC BY 4.0 (photographs, illustrations and logos excluded)',
-    note: 'Health NZ advice on keeping a home dry and healthy. Written for households, so it suits client conversations about damp and mould.',
   },
   {
     id: 'nz-healthy-homes-regs-2019-88',
@@ -1140,8 +1082,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     format: 'web',
     licence: 'CC BY 4.0',
     licenceEvidence: {
-      url: 'https://ncc.abcb.gov.au/editions/ncc-2025/adopted/housing-provisions/front-matter/copyright-licence-notice-and-acknowledgment-country',
-      locator: 'Front matter: Copyright, Licence Notice and Acknowledgment of Country',
+      url: 'https://ncc.abcb.gov.au/system/files/ncc/NCC-2025-Housing-Provisions.pdf',
+      locator: 'Copyright, Licence Notice and Acknowledgment of Country, p.2',
       quote:
         'The material in this publication is licensed under a Creative Commons Attribution 4.0 International licence',
       readOn: '2026-10-14',
@@ -1161,8 +1103,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     format: 'web',
     licence: 'CC BY 4.0',
     licenceEvidence: {
-      url: 'https://ncc.abcb.gov.au/editions/ncc-2025/adopted/volume-two/preface/copyright-licence-notice-and-acknowledgment-country',
-      locator: 'Preface: Copyright, Licence Notice and Acknowledgment of Country',
+      url: 'https://ncc.abcb.gov.au/system/files/ncc/NCC-2025-Volume-Two.pdf',
+      locator: 'Copyright, Licence Notice and Acknowledgment of Country, p.2',
       quote:
         'The material in this publication is licensed under a Creative Commons Attribution 4.0 International licence',
       readOn: '2026-10-14',
@@ -1183,9 +1125,9 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licence: 'CC BY 4.0',
     licenceEvidence: {
       url: 'https://www.abcb.gov.au/sites/default/files/resources/2022/Handbook-upgrading-existing-buildings.pdf',
-      locator: 'p.2 copyright notice',
+      locator: 'Copyright notice, front matter',
       quote:
-        'licensed under a Creative Commons Attribution-4.0 International licence, with the exception of',
+        'The material in this publication is licensed under a Creative Commons Attribution-4.0 International licence',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -1204,7 +1146,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licence: 'CC BY 4.0',
     licenceEvidence: {
       url: 'https://www.abcb.gov.au/sites/default/files/resources/2026/Embodied-carbon-handbook.pdf',
-      locator: 'p.2 copyright notice',
+      locator: 'Copyright notice, front matter',
       quote:
         'This work is licensed under the Creative Commons Attribution 4.0 International License.',
       readOn: '2026-10-14',
@@ -1225,7 +1167,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licence: 'CC BY 4.0',
     licenceEvidence: {
       url: 'https://www.abcb.gov.au/sites/default/files/resources/2024/Prefabricated%2C%20modular%20and%20offsite%20construction%20handbook%20NCC%202022%20Final.pdf',
-      locator: 'p.2 copyright notice',
+      locator: 'Copyright notice, front matter',
       quote:
         'This work is licensed under the Creative Commons Attribution 4.0 International License.',
       readOn: '2026-10-14',
@@ -1246,7 +1188,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licence: 'CC BY 4.0',
     licenceEvidence: {
       url: 'https://www.abcb.gov.au/sites/default/files/resources/2024/Sound-transmission-handbook-2022-final.pdf',
-      locator: 'p.2 copyright notice',
+      locator: 'Copyright notice, front matter',
       quote:
         'This work is licensed under the Creative Commons Attribution 4.0 International License.',
       readOn: '2026-10-14',
@@ -1267,7 +1209,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licence: 'CC BY 4.0',
     licenceEvidence: {
       url: 'https://www.abcb.gov.au/sites/default/files/resources/2023/NCC-2022-Bushfire-Verification-Methods-Handbook-FA.pdf',
-      locator: 'p.2 copyright notice',
+      locator: 'Copyright notice, front matter',
       quote:
         'This work is licensed under the Creative Commons Attribution 4.0 International License.',
       readOn: '2026-10-14',
@@ -1311,7 +1253,8 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licenceEvidence: {
       url: 'https://www.epa.vic.gov.au/copyright',
       locator: 'Copyright page',
-      quote: 'provided under a Creative Commons Attribution 4.0 International licence, except:',
+      quote:
+        'All material provided on this website is provided under a Creative Commons Attribution 4.0 International licence',
       readOn: '2026-10-14',
     },
     readDate: '2026-10-14',
@@ -1329,7 +1272,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     licence: 'CC BY 4.0',
     licenceEvidence: {
       url: 'https://www.safeworkaustralia.gov.au/sites/default/files/2025-11/workplace-exposure-standards-amended-november2025.pdf',
-      locator: 'Front-matter Creative Commons notice',
+      locator: 'Creative Commons notice, front matter',
       quote:
         'With the exception of the Safe Work Australia logo, this copyright work is licensed under a Creative Commons Attribution 4.0 International licence.',
       readOn: '2026-10-14',

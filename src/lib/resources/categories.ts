@@ -8,7 +8,6 @@ export const RESOURCE_CATEGORIES = [
   { id: 'ventilation-and-indoor-air', label: 'Ventilation and indoor air' },
   { id: 'timber-floors-and-framing', label: 'Timber, floors and framing' },
   { id: 'flood-and-storm-resilience', label: 'Flood and storm resilience' },
-  { id: 'mould-and-health', label: 'Mould and health' },
   { id: 'healthy-homes-nz', label: 'Healthy Homes (NZ)' },
   { id: 'building-codes', label: 'Building codes' },
   { id: 'asbestos-and-worker-safety', label: 'Asbestos and worker safety' },

@@ -15,7 +15,7 @@ import { BUILDING_CODE_NOTE, ResourcesBrowser } from './ResourcesBrowser';
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
 const FLOOD = 'flood-and-storm-resilience';
-const MOULD = 'mould-and-health';
+const OTHER = 'building-codes';
 
 let container: HTMLDivElement;
 let headerLink: HTMLAnchorElement;
@@ -64,7 +64,7 @@ describe('ResourcesBrowser category anchors under active filters', () => {
     expect(expected).toBeGreaterThan(0);
     expect(floodCards()).toBe(expected);
 
-    selectCategory(MOULD);
+    selectCategory(OTHER);
     expect(document.getElementById(FLOOD)).toBeNull();
 
     act(() => headerLink.click());
@@ -73,7 +73,7 @@ describe('ResourcesBrowser category anchors under active filters', () => {
   });
 
   it('a hash change to a category reveals its section when a filter had removed it', () => {
-    selectCategory(MOULD);
+    selectCategory(OTHER);
     expect(document.getElementById(FLOOD)).toBeNull();
 
     act(() => {
