@@ -8,7 +8,39 @@ import {
   checkoutRecoveryEnabled,
   checkoutRecoveryParams,
   handleCheckoutSessionExpired,
+  isTransientRecoveryOutcome,
+  recoverySendLedger,
+  recoverySendRowId,
 } from './checkout-recovery';
+import { STALE_CLAIM_MS } from './stripe-webhook-idempotency';
+
+/** In-memory stand-in for the `stripe_webhook_events` delegate (unique id, P2002 on clash). */
+function memoryClaimTable() {
+  const rows = new Map<string, { processedAt: Date | null; createdAt: Date }>();
+  return {
+    rows,
+    delegate: {
+      async create({ data }: { data: { id: string; type: string } }) {
+        if (rows.has(data.id)) throw Object.assign(new Error('Unique constraint'), { code: 'P2002' });
+        rows.set(data.id, { processedAt: null, createdAt: new Date() });
+        return {};
+      },
+      async findUnique({ where }: { where: { id: string } }) {
+        return rows.get(where.id) ?? null;
+      },
+      async update({ where, data }: { where: { id: string }; data: { processedAt: Date } }) {
+        const row = rows.get(where.id);
+        if (!row) throw Object.assign(new Error('Not found'), { code: 'P2025' });
+        row.processedAt = data.processedAt;
+        return {};
+      },
+      async delete({ where }: { where: { id: string } }) {
+        if (!rows.delete(where.id)) throw Object.assign(new Error('Not found'), { code: 'P2025' });
+        return {};
+      },
+    },
+  };
+}
 
 const ON = { CHECKOUT_RECOVERY_ENABLED: 'true' } as NodeJS.ProcessEnv;
 const OFF = {} as NodeJS.ProcessEnv;
@@ -35,9 +67,12 @@ function expiredSession(overrides: Partial<Stripe.Checkout.Session> = {}): Strip
 
 function deps(env: NodeJS.ProcessEnv, optedOut = false) {
   const send = vi.fn().mockResolvedValue({ sent: true });
+  const table = memoryClaimTable();
   return {
     send,
+    table,
     deps: {
+      ledger: recoverySendLedger(table.delegate),
       env,
       appOrigin: 'https://carsi.example',
       isOptedOut: vi.fn().mockResolvedValue(optedOut),
@@ -129,9 +164,54 @@ describe('handleCheckoutSessionExpired', () => {
     expect(b.send).not.toHaveBeenCalled();
   });
 
-  it('reports a failed send', async () => {
-    const { deps: d } = deps(ON);
-    d.send.mockResolvedValueOnce({ sent: false, reason: 'not_configured' });
+  it('a provider failure is transient, releases the send record, and the retry sends', async () => {
+    const { deps: d, send, table } = deps(ON);
+    send.mockResolvedValueOnce({ sent: false, reason: 'provider_error' });
+    const first = await handleCheckoutSessionExpired(expiredSession(), d);
+    expect(first).toBe('send_failed');
+    expect(isTransientRecoveryOutcome(first)).toBe(true);
+    expect(table.rows.size).toBe(0);
+    expect(await handleCheckoutSessionExpired(expiredSession(), d)).toBe('sent');
+    expect(send).toHaveBeenCalledTimes(2);
+  });
+
+  it('a thrown send is treated like a failed one', async () => {
+    const { deps: d, send, table } = deps(ON);
+    send.mockRejectedValueOnce(new Error('socket hang up'));
     expect(await handleCheckoutSessionExpired(expiredSession(), d)).toBe('send_failed');
+    expect(table.rows.size).toBe(0);
+  });
+
+  it('unconfigured email is a permanent no-op, not a retry loop', async () => {
+    const { deps: d, send } = deps(ON);
+    send.mockResolvedValueOnce({ sent: false, reason: 'not_configured' });
+    const outcome = await handleCheckoutSessionExpired(expiredSession(), d);
+    expect(outcome).toBe('not_configured');
+    expect(isTransientRecoveryOutcome(outcome)).toBe(false);
+  });
+
+  it('sends at most once per Checkout Session, whatever event carries it', async () => {
+    const { deps: d, send, table } = deps(ON);
+    expect(await handleCheckoutSessionExpired(expiredSession(), d)).toBe('sent');
+    expect(await handleCheckoutSessionExpired(expiredSession(), d)).toBe('already_sent');
+    expect(send).toHaveBeenCalledTimes(1);
+    expect(table.rows.get(recoverySendRowId('cs_test_1'))?.processedAt).toBeInstanceOf(Date);
+  });
+
+  it('a recent unmarked claim is in flight (retry); a stale one is possibly sent (never resent)', async () => {
+    const { deps: d, send, table } = deps(ON);
+    table.rows.set(recoverySendRowId('cs_test_1'), { processedAt: null, createdAt: new Date() });
+    const inFlight = await handleCheckoutSessionExpired(expiredSession(), d);
+    expect(inFlight).toBe('in_flight');
+    expect(isTransientRecoveryOutcome(inFlight)).toBe(true);
+
+    table.rows.set(recoverySendRowId('cs_test_1'), {
+      processedAt: null,
+      createdAt: new Date(Date.now() - STALE_CLAIM_MS - 1000),
+    });
+    const stale = await handleCheckoutSessionExpired(expiredSession(), d);
+    expect(stale).toBe('possibly_sent');
+    expect(isTransientRecoveryOutcome(stale)).toBe(false);
+    expect(send).not.toHaveBeenCalled();
   });
 });
