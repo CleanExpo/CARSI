@@ -36,6 +36,7 @@ as owner-attested rather than independently verified.
 | S8 | Weschler CJ, Nazaroff WW, Environ Sci Atmos 2026;6(9):1328-1355, doi:10.1039/d6ea00074f | https://pubmed.ncbi.nlm.nih.gov/42631256/ | 14/10/2026 |
 | S9 | TGA, *Regulation of borderline disinfectant and related products with antiviral claims including COVID-19*, v1.0, August 2021 | https://www.tga.gov.au/sites/default/files/regulation-borderline-disinfectant-related-products-with-antiviral-claims-including-covid-19.pdf | 14/10/2026 |
 | S10 | Australian Energy Regulator, *Consumer Benefits of Improved Voltage Management: accompanying paper*, April 2025 | https://aer.gov.au/system/files/2025-04/AER%20accompanying%20paper%20-%20consumer%20benefits%20of%20improved%20voltage%20management-%20April%202025.pdf | 14/10/2026 |
+| S11 | Safe Work Australia, *Workplace exposure standards/limits* (information for PCBUs) | https://www.safeworkaustralia.gov.au/safety-topic/managing-health-and-safety/airborne-contaminants/pcbus/wes-wel | 14/10/2026 |
 
 ## Substantiation ledger (claim in course or marketing → source → where)
 
@@ -46,6 +47,9 @@ as owner-attested rather than independently verified.
 | WES apply until 30/11/2026; WEL from 01/12/2026; ozone unchanged at 0.1 ppm peak in the WEL list | S1, S2 | S1 section 1 (transitional period) and Appendix A; S2 gives the current value |
 | Health effects (eye/nose/throat/airway irritation, reduced lung function, worse asthma/COPD, infection susceptibility, continuing lung damage) | S2 | "Health effects" list |
 | Controls: alarms and auto shut-off, monitoring and alerts, maintenance, training | S2 | "Recommended ways to control risks" |
+| The peak limitation is the maximum concentration a worker can be exposed to | S2 | "Exposure Standard" |
+| Exposure limits are the maximum level most (but not all) people can be exposed to without harm; the risk must be eliminated or kept as low as reasonably practicable regardless of whether a limit exists | S11 | "What are workplace exposure standards (WES) or workplace exposure limits (WEL)?" |
+| Employers must, so far as is reasonably practicable, ensure persons other than employees are not exposed to health and safety risks from the undertaking | S2 | "Legal duties" |
 | Some devices sold as air purifiers purposely emit large amounts of ozone; CARB recommends not used except approved industrial purposes where harmful exposure is prevented; strongly advises against in occupied spaces | S4 | opening paragraph; "What does CARB recommend?" |
 | At concentrations not exceeding public health standards ozone does not effectively remove viruses, bacteria, mould or other biological pollutants; would need 5-10 times higher; may not affect contaminants in porous material (duct lining, ceiling tiles) | S3 | "Are Ozone Generators Effective in Controlling Indoor Air Pollution?", biological pollutants paragraph |
 | Few studies support odour removal; some odour chemicals react (new carpet, acrolein); no effect on formaldehyde; body odour masked, not removed | S3 | odour paragraph |
@@ -64,9 +68,20 @@ as owner-attested rather than independently verified.
 | Australian supply nominally 230 V | S10 | section 2 "Background" |
 | Current ANSI/IICRC S520 names ozone and other antimicrobial devices | CARSI licensed-copy verification (internal, CLAUDE.md 15/07/2026) | no section cited (not in committed title index) |
 
-CARSI-recommended practice in Lesson 4 (clear the space, protect susceptible items, meter-controlled
-re-entry below the 0.1 ppm peak limit, RCD-protected GPO, test-and-tag, job records) is labelled in
-the lesson as CARSI's recommendation, built from S1-S3 and S10, not as a legal requirement.
+CARSI-recommended practice in Lesson 4 (clear the space, protect susceptible items, measure with a
+calibrated meter, RCD-protected GPO, test-and-tag, job records, and "if you cannot show why the space
+is ready, treat it as not ready") is labelled in the lesson as CARSI's recommendation, built from S1-S3,
+S10 and S11, not as a legal requirement.
+
+Occupant re-entry: the course gives **no** numeric re-entry threshold. The 0.1 ppm peak limit is taught
+as a workplace exposure limit for workers (S1, S2) that protects most but not all people (S11). When
+occupants return is taught as a site-specific decision that follows the manufacturer's instructions and
+any applicable state or territory guidance and rests on measured readings, with the EPA's cautions that
+levels above health standards are possible even when manufacturers' instructions are followed and that
+little is known about treatment by-products (S3). No primary source read for this course states a
+general occupant re-entry concentration, so none is stated. (Corrected 14/10/2026 after Codex review
+codex-carsi-b7077ba9-20261014 finding P1-UNSUPPORTED-REENTRY-CLEARANCE: the earlier draft treated a
+reading under the worker peak limit as re-entry clearance for anyone.)
 
 ## Claims dropped for lack of evidence
 

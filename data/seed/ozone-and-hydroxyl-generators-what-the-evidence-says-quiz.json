@@ -76,12 +76,12 @@
      "points": 1
     },
     {
-     "questionText": "When can someone go back into a room after an ozone treatment?",
+     "questionText": "After an ozone treatment, a calibrated meter shows a reading below the 0.1 ppm peak limit. What does that reading tell you on its own?",
      "options": [
-      "As soon as the machine is switched off",
-      "After a calibrated meter shows the reading is below the 0.1 ppm peak limit, after ventilating",
-      "When the smell of ozone has faded",
-      "After 10 minutes, whatever the reading"
+      "The room is cleared for everyone, including the family, to go back in",
+      "The air is under a workers' limit that protects most but not all people; when occupants return is still a site-specific decision",
+      "Any by-products of the treatment have gone as well",
+      "Nothing, because ozone cannot be measured on site"
      ],
      "correctIndex": 1,
      "points": 1
