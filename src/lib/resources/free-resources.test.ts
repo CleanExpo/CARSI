@@ -157,6 +157,16 @@ describe('free-resources data', () => {
     }
   });
 
+  it('offers only jurisdictions that have at least one resource', () => {
+    expect(FREE_RESOURCE_JURISDICTIONS.length).toBeGreaterThan(0);
+    for (const j of FREE_RESOURCE_JURISDICTIONS) {
+      expect(
+        FREE_RESOURCES.some((r) => r.jurisdiction === j),
+        `${j} has no resource`
+      ).toBe(true);
+    }
+  });
+
   it('links each item to an https URL on the publisher official host', () => {
     for (const r of FREE_RESOURCES) {
       const url = new URL(r.url);

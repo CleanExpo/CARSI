@@ -1283,7 +1283,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
   },
 ];
 
-export const FREE_RESOURCE_JURISDICTIONS: readonly ResourceJurisdiction[] = [
+const JURISDICTION_ORDER: readonly ResourceJurisdiction[] = [
   'AU',
   'Qld',
   'NSW',
@@ -1291,6 +1291,10 @@ export const FREE_RESOURCE_JURISDICTIONS: readonly ResourceJurisdiction[] = [
   'Vic',
   'NZ',
 ];
+
+// Offer only jurisdictions that have at least one resource, so no filter option leads to an empty list.
+export const FREE_RESOURCE_JURISDICTIONS: readonly ResourceJurisdiction[] =
+  JURISDICTION_ORDER.filter((j) => FREE_RESOURCES.some((r) => r.jurisdiction === j));
 
 export function groupResourcesByCategory(
   items: readonly FreeResource[],
