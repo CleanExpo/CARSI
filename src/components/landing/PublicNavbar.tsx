@@ -2,6 +2,7 @@ import Link from 'next/link';
 
 import { AuthNavLinks } from '@/components/landing/AuthNavLinks';
 import { PublicLogo } from '@/components/landing/PublicLogo';
+import { ResourcesMenu } from '@/components/landing/ResourcesMenu';
 import {
   PUBLIC_CHROME_LINK_CLASS,
   PUBLIC_CHROME_NAV_CLASS,
@@ -52,6 +53,7 @@ export function PublicNavbar({ tone = 'chrome' }: { tone?: 'chrome' | 'light' })
                 {item.label}
               </Link>
             ))}
+            <ResourcesMenu variant="desktop" tone={isLight ? 'light' : 'chrome'} />
           </div>
 
           <div className="hidden items-center gap-3 lg:flex">

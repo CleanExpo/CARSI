@@ -3,9 +3,10 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { AuthNavLinks } from '@/components/landing/AuthNavLinks';
+import { ResourcesMenu } from '@/components/landing/ResourcesMenu';
 import { PUBLIC_PRIMARY_NAV } from '@/lib/navigation/public-nav';
 
 const smoothEase: [number, number, number, number] = [0.4, 0, 0.2, 1];
@@ -40,10 +41,18 @@ export default function MobileNav({
   tone?: 'chrome' | 'light';
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const toggleRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setIsOpen(false);
+      // A nested disclosure (Free Resources) claims the first Escape by preventing its
+      // default; only an unclaimed Escape closes the whole menu.
+      if (e.key === 'Escape' && !e.defaultPrevented) {
+        setIsOpen(false);
+        // The toggle stays mounted, so focus returns there rather than dropping to <body>
+        // when the panel unmounts.
+        toggleRef.current?.focus();
+      }
     };
 
     if (isOpen) {
@@ -64,6 +73,7 @@ export default function MobileNav({
   return (
     <div className="lg:hidden">
       <button
+        ref={toggleRef}
         onClick={() => setIsOpen(!isOpen)}
         className={
           isLight
@@ -123,7 +133,7 @@ export default function MobileNav({
               initial="closed"
               animate="open"
               exit="closed"
-              className="fixed top-[76px] right-0 left-0 z-40 mx-3 overflow-hidden rounded-xl"
+              className="fixed top-[76px] right-0 left-0 z-40 mx-3 max-h-[calc(100dvh-88px)] overflow-x-hidden overflow-y-auto overscroll-contain rounded-xl"
               style={{
                 background: 'rgba(255,255,255,0.98)',
                 border: '1px solid rgba(15,23,42,0.12)',
@@ -149,6 +159,9 @@ export default function MobileNav({
                       </Link>
                     </motion.li>
                   ))}
+                  <li>
+                    <ResourcesMenu variant="mobile" onNavigate={() => setIsOpen(false)} />
+                  </li>
                 </ul>
 
                 <AuthNavLinks variant="mobile" onNavigate={() => setIsOpen(false)} />
