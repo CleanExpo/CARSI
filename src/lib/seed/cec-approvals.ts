@@ -29,6 +29,8 @@ export interface CecApprovalEntry {
   iicrcReference?: string | null;
   /** Where the evidence lives (email, letter, directory listing). */
   evidence?: string | null;
+  /** ISO date the IICRC approval lapses (three years after approval per the founder's list). */
+  expiresAt?: string | null;
 }
 
 interface CecApprovalsFile {
@@ -79,4 +81,69 @@ export function getApprovedCecSlugs(): string[] {
   return getCecApprovalEntries()
     .filter((e) => e.status === 'approved')
     .map((e) => e.slug);
+}
+
+/**
+ * True when an approval is in force at `now`: status approved, positive hours, and an
+ * `expiresAt` date that has not been reached. FAIL-CLOSED: a missing or unparseable
+ * `expiresAt` is not current, because "we do not know when it lapses" must not advertise a
+ * CEC claim. An approval lapses at 00:00 UTC on its `expiresAt` date.
+ */
+export function isCecApprovalCurrent(entry: CecApprovalEntry, now: Date = new Date()): boolean {
+  if (entry.status !== 'approved') return false;
+  const hours = entry.approvedHours;
+  if (!(typeof hours === 'number' && Number.isFinite(hours) && hours > 0)) return false;
+  const expires = entry.expiresAt ? Date.parse(entry.expiresAt) : Number.NaN;
+  return Number.isFinite(expires) && now.getTime() < expires;
+}
+
+/** The in-force approval for a slug, or null (none, not approved, or expired). */
+export function getCurrentCecApproval(
+  slug: string | null | undefined,
+  now: Date = new Date(),
+  entries: readonly CecApprovalEntry[] = getCecApprovalEntries()
+): CecApprovalEntry | null {
+  if (!slug?.trim()) return null;
+  const key = slug.trim().toLowerCase();
+  const entry = entries.find((e) => e.slug.trim().toLowerCase() === key);
+  return entry && isCecApprovalCurrent(entry, now) ? entry : null;
+}
+
+/**
+ * Public selling surfaces (course page, CEC hub): only advertise CEC hours for an approval
+ * that is in force today. Returns the course unchanged when its approval is current, and with
+ * `cec_hours` cleared otherwise, so every downstream CEC line disappears together.
+ */
+export function withCurrentCecHoursOnly<T extends { slug: string; cec_hours?: string | null }>(
+  course: T,
+  now: Date = new Date(),
+  entries: readonly CecApprovalEntry[] = getCecApprovalEntries()
+): T {
+  if (!course.cec_hours) return course;
+  return getCurrentCecApproval(course.slug, now, entries) ? course : { ...course, cec_hours: null };
+}
+
+/** A published course with an in-force CEC approval, for the `/iicrc-cec-courses` hub. */
+export type CurrentCecCourse<T> = { course: T; approvedHours: number; expiresAt: string };
+
+/**
+ * Published courses that carry an in-force CEC approval, in the order given. Only courses in
+ * `published` are listed, so a registry entry for an unpublished course never appears.
+ */
+export function selectCurrentCecCourses<T extends { slug: string }>(
+  published: readonly T[],
+  now: Date = new Date(),
+  entries: readonly CecApprovalEntry[] = getCecApprovalEntries()
+): CurrentCecCourse<T>[] {
+  const out: CurrentCecCourse<T>[] = [];
+  const seen = new Set<string>();
+  for (const course of published) {
+    const key = course.slug.trim().toLowerCase();
+    if (seen.has(key)) continue;
+    const entry = getCurrentCecApproval(course.slug, now, entries);
+    if (!entry) continue;
+    seen.add(key);
+    out.push({ course, approvedHours: entry.approvedHours as number, expiresAt: entry.expiresAt as string });
+  }
+  return out;
 }

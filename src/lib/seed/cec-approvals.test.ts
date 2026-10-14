@@ -6,6 +6,10 @@ import {
   getApprovedCecSlugs,
   getCecApproval,
   getCecApprovalEntries,
+  getCurrentCecApproval,
+  isCecApprovalCurrent,
+  selectCurrentCecCourses,
+  withCurrentCecHoursOnly,
   type CecApprovalEntry,
 } from './cec-approvals';
 
@@ -76,5 +80,58 @@ describe('shipped registry (data/seed/cec-approvals.json)', () => {
     // Near-miss course NOT on the class list — no entry, no hours (fail-closed).
     expect(getApprovedCecHours('wrt-water-damage-essentials')).toBeNull();
     expect(getCecApproval('wrt-water-damage-essentials')).toBeNull();
+  });
+});
+
+describe('current (in-force) CEC approvals', () => {
+  const NOW = new Date('2026-10-14T00:00:00Z');
+  const entries: CecApprovalEntry[] = [
+    { slug: 'current-course', status: 'approved', approvedHours: 1, approvedAt: '2024-01-18', expiresAt: '2027-01-18' },
+    { slug: 'expired-course', status: 'approved', approvedHours: 1, approvedAt: '2023-01-01', expiresAt: '2026-01-01' },
+    { slug: 'undated-course', status: 'approved', approvedHours: 1, approvedAt: '2024-01-18' },
+    { slug: 'bad-date-course', status: 'approved', approvedHours: 1, expiresAt: 'soon' },
+    { slug: 'submitted-course', status: 'submitted', expiresAt: '2030-01-01' },
+  ];
+
+  it('is current only while approved, with hours, before expiresAt', () => {
+    const by = (slug: string) => entries.find((e) => e.slug === slug)!;
+    expect(isCecApprovalCurrent(by('current-course'), NOW)).toBe(true);
+    expect(isCecApprovalCurrent(by('expired-course'), NOW)).toBe(false);
+    expect(isCecApprovalCurrent(by('submitted-course'), NOW)).toBe(false);
+  });
+
+  it('fails closed on a missing or unparseable expiry', () => {
+    expect(getCurrentCecApproval('undated-course', NOW, entries)).toBeNull();
+    expect(getCurrentCecApproval('bad-date-course', NOW, entries)).toBeNull();
+  });
+
+  it('lapses at 00:00 UTC on the expiry date', () => {
+    expect(getCurrentCecApproval('current-course', new Date('2027-01-17T23:59:59Z'), entries)).not.toBeNull();
+    expect(getCurrentCecApproval('current-course', new Date('2027-01-18T00:00:00Z'), entries)).toBeNull();
+  });
+
+  it('withCurrentCecHoursOnly clears cec_hours for an expired or unknown approval', () => {
+    expect(withCurrentCecHoursOnly({ slug: 'current-course', cec_hours: '1' }, NOW, entries).cec_hours).toBe('1');
+    expect(withCurrentCecHoursOnly({ slug: 'expired-course', cec_hours: '1' }, NOW, entries).cec_hours).toBeNull();
+    expect(withCurrentCecHoursOnly({ slug: 'no-entry', cec_hours: '1' }, NOW, entries).cec_hours).toBeNull();
+  });
+
+  it('selectCurrentCecCourses lists only published courses with an in-force approval', () => {
+    const published = [
+      { slug: 'expired-course' },
+      { slug: 'current-course' },
+      { slug: 'CURRENT-COURSE' },
+      { slug: 'undated-course' },
+      { slug: 'not-in-registry' },
+    ];
+    const picked = selectCurrentCecCourses(published, NOW, entries);
+    expect(picked).toEqual([
+      { course: { slug: 'current-course' }, approvedHours: 1, expiresAt: '2027-01-18' },
+    ]);
+  });
+
+  it('the shipped registry has an expiry on every approved entry', () => {
+    const undated = getCecApprovalEntries().filter((e) => e.status === 'approved' && !e.expiresAt);
+    expect(undated).toEqual([]);
   });
 });

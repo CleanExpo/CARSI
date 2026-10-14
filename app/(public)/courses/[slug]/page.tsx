@@ -17,6 +17,8 @@ import {
 } from '@/lib/seo/course-marketing';
 import { OG_IMAGES, OG_IMAGE_URLS } from '@/lib/seo/og-image';
 import { getAggregateRating } from '@/lib/server/course-reviews';
+import { getCourseAudienceItems } from '@/lib/lms/course-audience';
+import { withCurrentCecHoursOnly } from '@/lib/seed/cec-approvals';
 import { getPublishedCourseDetailBySlugFromDatabase } from '@/lib/server/public-courses-list';
 import { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
@@ -31,9 +33,14 @@ export const revalidate = 300;
  * (issue #126) from a loaded course so it leaks into neither the rendered hero nor the SEO
  * metadata / JSON-LD schema (which read `description` directly, bypassing CourseFormattedBody).
  */
-function sanitizeCourseDetail<T extends { description?: string | null }>(course: T): T {
-  if (!course.description) return course;
-  return { ...course, description: stripLegacyPurchaseCta(course.description) };
+function sanitizeCourseDetail<
+  T extends { slug: string; description?: string | null; cec_hours?: string | null },
+>(course: T): T {
+  // CEC hours are sold only while the IICRC approval is in force: an expired (or undated)
+  // approval clears cec_hours here, so the stat, pill, outcome, audience line and schema all drop.
+  const current = withCurrentCecHoursOnly(course);
+  if (!current.description) return current;
+  return { ...current, description: stripLegacyPurchaseCta(current.description) };
 }
 
 interface CourseDetail {
@@ -243,26 +250,6 @@ function getLearningOutcomes(
   return outcomes;
 }
 
-function getAudienceItems(
-  course: CourseDetail,
-  designation: DesignationDefinition | null
-): string[] {
-  if (designation) {
-    return [
-      `Restoration professionals working in ${designation.disciplineTopic}`,
-      'Technicians earning IICRC Continuing Education Credits (CECs)',
-      `Practitioners pursuing the ${designation.name} designation`,
-      'Australian and New Zealand trade professionals expanding their qualifications',
-    ];
-  }
-  return [
-    'Restoration and cleaning industry professionals',
-    'Technicians earning IICRC Continuing Education Credits (CECs)',
-    'Trade professionals expanding their qualifications',
-    'Business owners investing in team development',
-  ];
-}
-
 export default async function CourseDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const course = await getCourse(slug);
@@ -284,7 +271,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
   const previewLesson = course.syllabus
     ?.flatMap((m) => m.lessons)
     .find((l) => l.is_preview && l.preview_body);
-  const audienceItems = getAudienceItems(course, designation);
+  const audienceItems = getCourseAudienceItems(course, designation);
 
   const breadcrumbs = [
     { name: 'Home', url: siteUrl },
