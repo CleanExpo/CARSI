@@ -13,7 +13,7 @@ import { selectCurrentCecCourses } from '@/lib/seed/cec-approvals';
 import { getPublishedCourseListItemsFromDatabase } from '@/lib/server/public-courses-list';
 
 /**
- * `/iicrc-cec-courses` — every published course that carries an IICRC CEC approval in force
+ * `/iicrc-cec-courses` — every published course with an IICRC CEC approval in force
  * today, read from the approvals registry (`data/seed/cec-approvals.json`) and the live
  * catalogue. Nothing here is hand-listed: an approval that lapses or a course that is
  * unpublished drops off on the next revalidation. Deliberately states no IICRC renewal

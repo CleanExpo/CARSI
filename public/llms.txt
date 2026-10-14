@@ -5,7 +5,7 @@
 
 ## What is CARSI?
 
-CARSI is an Australian online training platform for cleaning, restoration and indoor-air-quality professionals, including technicians maintaining an IICRC certification they already hold. Industry pages cover sectors such as healthcare, hospitality, government, mining, commercial cleaning and restoration. Courses are Australian-produced and span water and fire restoration, structural drying, mould and IAQ, odour control, carpet and textile cleaning, biosecurity awareness (including the H5 avian-influenza course for restoration and facility professionals) and business operations. CARSI is an IICRC CEC Accredited provider: only courses the IICRC has approved carry CEC hours, and the current list is at /iicrc-cec-courses.
+CARSI is an Australian online training platform for cleaning, restoration and indoor-air-quality professionals, including technicians maintaining an IICRC certification they already hold. Industry pages cover sectors such as healthcare, hospitality, government, mining, commercial cleaning and restoration. Courses are Australian-produced and span water and fire restoration, structural drying, mould and IAQ, odour control, carpet and textile cleaning, biosecurity awareness (including the H5 avian-influenza course for restoration and facility professionals) and business operations. CARSI is an IICRC CEC Accredited provider. CEC hours are shown only where the IICRC has approved a specific course; the current list is at /iicrc-cec-courses.
 
 CARSI is one of the four core pillars of the National Restoration Professionals Group (NRPG) onboarding pathway.
 

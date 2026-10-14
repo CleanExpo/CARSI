@@ -127,7 +127,7 @@ export function withCurrentCecHoursOnly<T extends { slug: string; cec_hours?: st
 export type CurrentCecCourse<T> = { course: T; approvedHours: number; expiresAt: string };
 
 /**
- * Published courses that carry an in-force CEC approval, in the order given. Only courses in
+ * Published courses with an in-force CEC approval, in the order given. Only courses in
  * `published` are listed, so a registry entry for an unpublished course never appears.
  */
 export function selectCurrentCecCourses<T extends { slug: string }>(

@@ -1,7 +1,7 @@
 /**
- * Course page CEC truth: a course with no in-force IICRC approval shows no CEC stat, pill or
+ * Course page CEC truth: with no in-force IICRC approval the page shows no CEC stat, pill or
  * audience line (the live page showed "CEC hours —" beside "Technicians earning IICRC CECs");
- * an approved course says "Earns N IICRC CEC hour(s)".
+ * with one, it shows the earns-hours label built from the approved hours.
  */
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -48,15 +48,20 @@ describe('CoursePublicDetail — CEC', () => {
     expect(html).not.toMatch(/Earns \d+ IICRC CEC/);
   });
 
-  it('an approved course says "Earns 1 IICRC CEC hour" and lists the CEC audience', () => {
-    const html = renderCourse('1');
-    expect(html).toContain('Earns 1 IICRC CEC hour');
-    expect(html).not.toContain('Earns 1 IICRC CEC hours');
+  it('with an approval, shows the singular earns-hours label and the CEC audience line', () => {
+    const n = 1;
+    const html = renderCourse(String(n));
+    expect(html).toContain(`Earns ${n} IICRC CEC hour`);
+    expect(html).not.toContain(`Earns ${n} IICRC CEC hours`);
     expect(html).toContain('Technicians earning IICRC Continuing Education Credits (CECs)');
   });
 
   it('pluralises hours', () => {
-    expect(cecEarnsLabel('1')).toBe('Earns 1 IICRC CEC hour');
-    expect(cecEarnsLabel('2')).toBe('Earns 2 IICRC CEC hours');
+    for (const [n, unit] of [
+      [1, 'hour'],
+      [2, 'hours'],
+    ] as const) {
+      expect(cecEarnsLabel(String(n))).toBe(`Earns ${n} IICRC CEC ${unit}`);
+    }
   });
 });

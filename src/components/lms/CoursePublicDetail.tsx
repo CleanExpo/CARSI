@@ -14,7 +14,7 @@ import { CourseThumbnail } from '@/components/lms/CourseThumbnail';
 import { EnrolButton } from '@/components/lms/EnrolButton';
 import type { DesignationDefinition } from '@/lib/designations/registry';
 
-/** "Earns 1 IICRC CEC hour" / "Earns 2 IICRC CEC hours", from the resolved approval hours. */
+/** The "Earns N IICRC CEC hour(s)" label, pluralised, from the resolved approval hours. */
 export function cecEarnsLabel(cecHours: string): string {
   return `Earns ${cecHours} IICRC CEC ${Number(cecHours) === 1 ? 'hour' : 'hours'}`;
 }
