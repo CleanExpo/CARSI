@@ -72,6 +72,34 @@ describe('ResourcesBrowser category anchors under active filters', () => {
     expect(floodCards()).toBe(expected);
   });
 
+  it('the "All free resources" menu link clears both filters on the same route', () => {
+    const hubHref = PUBLIC_RESOURCES_MENU.items.find((i) => i.label === 'All free resources')?.href;
+    if (!hubHref) throw new Error('header menu has no "All free resources" link');
+    const hubLink = document.createElement('a');
+    hubLink.href = hubHref;
+    document.body.appendChild(hubLink);
+    try {
+      const all = () => container.querySelectorAll('li').length;
+      expect(all()).toBe(FREE_RESOURCES.length);
+
+      selectCategory(OTHER);
+      const jurisdiction = document.getElementById('resource-jurisdiction') as HTMLSelectElement;
+      act(() => {
+        jurisdiction.value = 'AU';
+        jurisdiction.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+      expect(all()).toBeLessThan(FREE_RESOURCES.length);
+
+      act(() => hubLink.click());
+
+      expect(all()).toBe(FREE_RESOURCES.length);
+      expect((document.getElementById('resource-category') as HTMLSelectElement).value).toBe('all');
+      expect(jurisdiction.value).toBe('all');
+    } finally {
+      hubLink.remove();
+    }
+  });
+
   it('a hash change to a category reveals its section when a filter had removed it', () => {
     selectCategory(OTHER);
     expect(document.getElementById(FLOOD)).toBeNull();

@@ -141,6 +141,13 @@ export function ResourcesBrowser() {
       if (url.origin !== window.location.origin || url.pathname !== window.location.pathname) {
         return;
       }
+      // The hub link ("All free resources") is this same route with no hash. Next's Link does
+      // not remount the page, so clear the filters here or the list stays filtered.
+      if (!url.hash) {
+        setCategory('all');
+        setJurisdiction('all');
+        return;
+      }
       const id = categoryFromHash(url.hash);
       if (id) reveal(id);
     };
