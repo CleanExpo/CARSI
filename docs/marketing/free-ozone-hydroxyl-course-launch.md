@@ -3,7 +3,7 @@
 **Status: DRAFT. Phill approval required before anything is posted or published. No agent posts this.**
 
 Course slug: `ozone-and-hydroxyl-generators-what-the-evidence-says` (seeded as `draft`, `isFree: true`,
-`priceAud: "0"`, `cecHours: 0`, `iicrcDiscipline: null`). The course link is not live until Phill publishes
+`priceAud: "0"`). The course link is not live until Phill publishes
 the course, so the post below carries a placeholder for it.
 
 Fact-check basis: every factual line maps to a numbered citation in the appendix, each read on

@@ -609,8 +609,8 @@
       "voiceId": "Hywjw1pu9qLxpN2CqxU1",
       "locale": "en-AU",
       "captions": true,
-      "visualDirection": "Presenter to camera, CARSI slate background; lower-third with course title on the opening line. No standards names, section numbers, exposure values, IICRC marks or product names on screen.",
-      "authorNote": "Hook from M1 (near miss, show me the page); exposure limit M2; evidence and by-products M2-M3; TGA position and controls M4. No standards-content claims and no IICRC reference in voice or on screen. en-AU. Free course, no CEC."
+      "visualDirection": "Presenter to camera, CARSI slate background; lower-third with course title on the opening line. No standards names, section numbers, exposure values, certification-body marks or product names on screen.",
+      "authorNote": "Hook from M1 (near miss, show me the page); exposure limit M2; evidence and by-products M2-M3; TGA position and controls M4. No standards-content claims and no certification-body reference in voice or on screen. en-AU. Free course."
     }
   ]
 }

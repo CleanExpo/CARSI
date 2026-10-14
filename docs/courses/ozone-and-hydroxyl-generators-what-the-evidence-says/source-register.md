@@ -2,8 +2,8 @@
 
 **Course slug:** `ozone-and-hydroxyl-generators-what-the-evidence-says`
 **Built:** 14/10/2026 · **Status:** DRAFT, unpublished (`status: draft`, `isPublished: false`), pending founder review
-**Pricing:** free (`isFree: true`, `priceAud: "0"`) · **CEC:** none (`cecHours: 0`, not submitted) · `iicrcDiscipline: null`
-**Standard applied:** `carsi-course-production` (Australian-produced), CARSI CLAUDE.md standards-claims and IICRC IP rules
+**Pricing:** free (`isFree: true`, `priceAud: "0"`) · `cecHours: 0` · `iicrcDiscipline: null` · no designation
+**Standard applied:** `carsi-course-production` (Australian-produced), CARSI CLAUDE.md standards-claims and standards-IP rules
 **Human sign-off:** PENDING (only Phill or a nominated reviewer changes this)
 
 ## Research method
@@ -14,7 +14,7 @@ exact passage; peer-reviewed papers were read as their PubMed records (citation 
 NCBI E-utilities). No trade-press article, supplier blog or web-scraped copy of any standard was used
 as a basis for a claim. Where only an abstract was read, the course claims nothing beyond the abstract.
 
-IICRC standards: no standard text was fetched, read or entered into any AI tool. The course, quiz and
+Industry standards: no standard text was fetched, read or entered into any AI tool. The course, quiz and
 launch copy name no standard and make no claim, positive or absent, about what any standard contains.
 Lesson 1 retells the July near miss without saying what the standard does or does not contain.
 
@@ -100,6 +100,6 @@ reading under the worker peak limit as re-entry clearance for anyone.)
 ## Australian-production checklist
 
 Australian English, metric (ppm, mg/m³), 230 V, AU regulators (Safe Work Australia, WorkSafe Victoria,
-TGA, ACCC, AER), no US product or voltage presented as local, no IICRC discipline acronym or
-"-aligned" branding, no CEC claim, IICRC terminology guard clean. Overseas sources (US EPA, CARB) are
+TGA, ACCC, AER), no US product or voltage presented as local, no discipline acronym or
+"-aligned" branding, no credential claim, licence-terminology guards clean. Overseas sources (US EPA, CARB) are
 labelled as overseas and used for the science and context, not for Australian law.

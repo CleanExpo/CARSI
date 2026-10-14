@@ -685,7 +685,7 @@
       "style": "photoreal",
       "composition": "keep the upper-left third calm, darker and uncluttered so a white course title can be overlaid; place the machine and meter toward the lower-right with shallow depth of field, clean negative space, and a soft dark vertical gradient that does not bury the subject",
       "negativePrompt": "no text, no words, no letters, no numbers, no logos, no watermarks, no signage, no UI, no readable displays, no human faces, no warning symbols, no brand names",
-      "authorNote": "Free evidence-literacy course (ozone and hydroxyl generators). No IICRC discipline code. No people shown, so no PPE claims; no readable meter values, so no on-screen numbers or standards claims."
+      "authorNote": "Free evidence-literacy course (ozone and hydroxyl generators). No discipline code. No people shown, so no PPE claims; no readable meter values, so no on-screen numbers or standards claims."
     }
   ]
 }
