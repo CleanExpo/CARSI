@@ -3,6 +3,7 @@ import { resolveAnthropicConfig } from '@/lib/server/anthropic-client';
 import { isEmailConfigured, sendEmail } from '@/lib/server/email';
 import {
   freeCourseNeedsOptimize,
+  isAiRewriteLocked,
   optimizeAndApplyCourse,
   OptimizeCourseError,
   paidCourseNeedsOptimize,
@@ -102,6 +103,30 @@ function escapeHtml(s: string): string {
     .replace(/"/g, '&quot;');
 }
 
+type OptimizeCandidate = {
+  slug: string | null;
+  isFree: boolean;
+  updatedAt: Date;
+  meta: unknown;
+};
+
+/** Pure course selection for the cron: scope filter, AI-rewrite lock, needs-optimise, limit. */
+export function selectOptimizeBatch<T extends OptimizeCandidate>(
+  courses: T[],
+  scope: OptimizeCronScope,
+  limit?: number
+): { pending: T[]; batch: T[] } {
+  const pending = courses
+    .filter((c) => (scope === 'free' ? c.isFree : !c.isFree))
+    .filter((c) => !isAiRewriteLocked({ slug: c.slug, meta: c.meta }))
+    .filter((c) =>
+      scope === 'free'
+        ? freeCourseNeedsOptimize({ isFree: c.isFree, updatedAt: c.updatedAt, meta: c.meta })
+        : paidCourseNeedsOptimize({ isFree: c.isFree, updatedAt: c.updatedAt, meta: c.meta })
+    );
+  return { pending, batch: limit != null ? pending.slice(0, limit) : pending };
+}
+
 export async function runOptimizeCoursesCron(opts?: {
   limit?: number;
   scope?: OptimizeCronScope;
@@ -113,16 +138,10 @@ export async function runOptimizeCoursesCron(opts?: {
   const scope: OptimizeCronScope = opts?.scope === 'free' ? 'free' : 'paid';
   const courses = await prisma.lmsCourse.findMany({
     orderBy: { updatedAt: 'asc' },
-    select: { id: true, title: true, meta: true, isFree: true, updatedAt: true },
+    select: { id: true, slug: true, title: true, meta: true, isFree: true, updatedAt: true },
   });
 
-  const pool = courses.filter((c) => (scope === 'free' ? c.isFree : !c.isFree));
-  const pending = pool.filter((c) =>
-    scope === 'free'
-      ? freeCourseNeedsOptimize({ isFree: c.isFree, updatedAt: c.updatedAt, meta: c.meta })
-      : paidCourseNeedsOptimize({ isFree: c.isFree, updatedAt: c.updatedAt, meta: c.meta })
-  );
-  const batch = opts?.limit != null ? pending.slice(0, opts.limit) : pending;
+  const { pending, batch } = selectOptimizeBatch(courses, scope, opts?.limit);
   const results: OptimizeCronRow[] = [];
   const allowFree = scope === 'free';
 

@@ -381,6 +381,27 @@ function appliedAtNeedsOptimize(updatedAt: Date, meta: unknown): boolean {
   return updatedAt.getTime() > appliedMs + 3_000;
 }
 
+/**
+ * Courses the AI optimise cron must never rewrite. Their lessons are cited and fact-checked
+ * against primary sources (see each course's source register), so an AI rewrite would break
+ * the claim-to-source mapping. Held in code so a reseed or a lost DB marker cannot re-enable
+ * the rewrite. A course can also opt out per-row with `meta.noAiRewrite: true`.
+ */
+export const AI_REWRITE_DENYLIST_SLUGS: ReadonlySet<string> = new Set([
+  'ozone-and-hydroxyl-generators-what-the-evidence-says',
+]);
+
+export function isAiRewriteLocked(input: { slug?: string | null; meta: unknown }): boolean {
+  if (input.slug && AI_REWRITE_DENYLIST_SLUGS.has(input.slug)) return true;
+  const meta = input.meta;
+  return (
+    !!meta &&
+    typeof meta === 'object' &&
+    !Array.isArray(meta) &&
+    (meta as Record<string, unknown>).noAiRewrite === true
+  );
+}
+
 /** Paid courses only. Re-run only when never applied, or the course was edited after apply. */
 export function paidCourseNeedsOptimize(input: {
   isFree: boolean;
@@ -717,6 +738,9 @@ export async function optimizeAndApplyCourse(
   const existing = await adminGetCourse(courseId);
   if (!existing) throw new OptimizeCourseError('Not found', 404);
   const dto = legacyCourseDto(existing);
+  if (isAiRewriteLocked({ slug: existing.slug, meta: existing.meta })) {
+    throw new OptimizeCourseError('This course is locked against AI rewrites', 409);
+  }
   if (dto.isFree && !opts?.allowFree) {
     throw new OptimizeCourseError('Free courses are not optimised by the paid cron', 400);
   }

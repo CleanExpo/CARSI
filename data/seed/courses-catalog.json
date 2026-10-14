@@ -8634,7 +8634,8 @@
     "cecApproval": "none - not submitted; cecHours 0 is the explicit opt-out",
     "designationProgram": null,
     "designation": null,
-    "humanSignOff": "PENDING"
+    "humanSignOff": "PENDING",
+    "noAiRewrite": true
    },
    "isPublished": false,
    "modules": [
