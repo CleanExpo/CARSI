@@ -29,7 +29,7 @@ What the sources say:
 - Australia's workplace exposure limit for ozone is a peak of 0.1 ppm (0.2 mg/m³), not to be exceeded at any time. The figure is unchanged in the new Workplace Exposure Limits that start on 1 December 2026. [1] [2]
 - The US EPA says that at levels that do not exceed public health standards, ozone does not effectively remove viruses, bacteria or mould. [3]
 - A 2021 Georgia Tech study of a hydroxyl generator running in an office measured rises in organic acids and in particles while it ran. [4]
-- The TGA treats ozone air sanitisers and deodorisers as excluded goods it does not assess, but only while their claims relate to the air and not to an effect in or on the human body. Consumer law applies to whatever you claim about them either way. [5]
+- TGA guidance lists air sanitisers and deodorisers (e.g. ozone) among the excluded environmental equipment the TGA does not regulate, but an air sanitiser designed to have an effect in the human body is a medical device instead. Consumer law applies to whatever you claim about them. [5]
 
 The habit the course teaches is the one that saved us in July: show me the page, not the vibe.
 

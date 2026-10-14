@@ -65,11 +65,11 @@
      "points": 1
     },
     {
-     "questionText": "The TGA guidance lists air sanitisers and deodorisers (e.g. ozone) as examples of excluded goods while their claims relate to the air, not the human body. What does that mean for you?",
+     "questionText": "TGA guidance lists air sanitisers and deodorisers (e.g. ozone) among its examples of excluded sanitation and environmental control equipment. What does that mean for you?",
      "options": [
       "The TGA has approved them as safe and effective",
       "They cannot be sold in Australia",
-      "While those conditions hold the TGA does not assess them; a claim about an effect in or on the human body can change that, and consumer law applies to any claims you make",
+      "The TGA does not regulate them as excluded equipment, but an air sanitiser designed to have an effect in the human body is a medical device, and consumer law applies to any claims you make",
       "You can advertise them as killing all viruses"
      ],
      "correctIndex": 2,
