@@ -6,7 +6,7 @@ import {
   LANDING_LEAD_CLASS,
   PUBLIC_SHELL_INNER_CLASS,
 } from '@/components/landing/public-shell-width';
-import { ResourcesBrowser } from '@/components/resources/ResourcesBrowser';
+import { RESOURCES_HEADING_ID, ResourcesBrowser } from '@/components/resources/ResourcesBrowser';
 import { ItemListSchema } from '@/components/seo/JsonLd';
 import { FREE_RESOURCES } from '@/lib/resources/free-resources';
 
@@ -63,7 +63,11 @@ export default function FreeResourcesPage() {
       <section className="relative overflow-hidden border-b border-slate-200/70 bg-white">
         <div className={`relative ${PUBLIC_SHELL_INNER_CLASS} py-14 md:py-20`}>
           <p className={LANDING_EYEBROW_CLASS}>Free Resources</p>
-          <h1 className={`${LANDING_DISPLAY_H2_CLASS} mt-4 max-w-3xl`}>
+          <h1
+            id={RESOURCES_HEADING_ID}
+            tabIndex={-1}
+            className={`${LANDING_DISPLAY_H2_CLASS} mt-4 max-w-3xl focus:outline-none`}
+          >
             Free guides for restoration and cleaning professionals
           </h1>
           <p className={`${LANDING_LEAD_CLASS} mt-5 max-w-3xl`}>

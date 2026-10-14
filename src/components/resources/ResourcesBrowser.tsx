@@ -39,6 +39,9 @@ export function formatReadDate(iso: string): string {
   return `${d} ${MONTHS[m - 1]} ${y}`;
 }
 
+/** Id of the /resources page heading; the hub menu link moves keyboard focus here. */
+export const RESOURCES_HEADING_ID = 'resources-heading';
+
 const CATEGORY_IDS = new Set<string>(RESOURCE_CATEGORIES.map((c) => c.id));
 
 function categoryFromHash(hash: string): ResourceCategoryId | null {
@@ -122,9 +125,18 @@ export function ResourcesBrowser() {
   // section, so following the link would change the hash and land nowhere. When a category
   // anchor is followed, relax only the filters that hide it, then scroll to it. Next's Link
   // navigates with pushState (no hashchange), hence the capture-phase click listener as well.
+  //
+  // Those links sit in a disclosure that closes (and so hides the focused link) on click, which
+  // drops keyboard focus to <body>. A same-route link therefore moves focus to the heading it
+  // points at: the page heading for the hub link, the category heading otherwise. This runs in
+  // the capture phase, before the menu's own click handler hides the link.
   useEffect(() => {
+    const focusHeading = (id: string) => document.getElementById(id)?.focus();
     const reveal = (id: ResourceCategoryId) => {
-      if (shownCategories.current.has(id)) return;
+      if (shownCategories.current.has(id)) {
+        focusHeading(`${id}-heading`);
+        return;
+      }
       setCategory((c) => (c === 'all' || c === id ? c : 'all'));
       setJurisdiction((j) =>
         j === 'all' || FREE_RESOURCES.some((i) => i.category === id && i.jurisdiction === j)
@@ -146,6 +158,7 @@ export function ResourcesBrowser() {
       if (!url.hash) {
         setCategory('all');
         setJurisdiction('all');
+        focusHeading(RESOURCES_HEADING_ID);
         return;
       }
       const id = categoryFromHash(url.hash);
@@ -180,6 +193,7 @@ export function ResourcesBrowser() {
     if (!id) return;
     scrollTarget.current = null;
     document.getElementById(id)?.scrollIntoView?.({ block: 'start' });
+    document.getElementById(`${id}-heading`)?.focus({ preventScroll: true });
   }, [groups]);
 
   return (
@@ -239,7 +253,11 @@ export function ResourcesBrowser() {
             aria-labelledby={`${group.category}-heading`}
             className="mt-10 scroll-mt-24"
           >
-            <h2 id={`${group.category}-heading`} className="text-xl font-semibold text-slate-900">
+            <h2
+              id={`${group.category}-heading`}
+              tabIndex={-1}
+              className="text-xl font-semibold text-slate-900 focus:outline-none"
+            >
               {resourceCategoryLabel(group.category)}
             </h2>
             {group.items.some(isBuildingCodeResource) ? (

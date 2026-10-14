@@ -1,11 +1,13 @@
 // @vitest-environment jsdom
 
-import { act, createElement } from 'react';
+import { Fragment, act, createElement } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { PUBLIC_PRIMARY_NAV, PUBLIC_RESOURCES_MENU } from '@/lib/navigation/public-nav';
 import { RESOURCE_CATEGORIES } from '@/lib/resources/categories';
+
+import { RESOURCES_HEADING_ID, ResourcesBrowser } from '@/components/resources/ResourcesBrowser';
 
 import { ResourcesMenu } from './ResourcesMenu';
 
@@ -27,6 +29,21 @@ function button(): HTMLButtonElement {
   const el = container.querySelector('button');
   if (!el) throw new Error('no button rendered');
   return el;
+}
+
+/**
+ * Keyboard activation of a link: the browser focuses it, and Enter dispatches a click with
+ * detail 0. jsdom does not synthesise that click from the keydown, so dispatch both.
+ */
+function pressEnter(link: HTMLAnchorElement) {
+  act(() => link.focus());
+  expect(document.activeElement).toBe(link);
+  act(() => {
+    link.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true })
+    );
+    link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 0 }));
+  });
 }
 
 beforeEach(() => {
@@ -107,5 +124,88 @@ describe('free-resources nav header wiring', () => {
     const mobile = readFileSync('src/components/landing/MobileNav.tsx', 'utf8');
     expect(navbar).toMatch(/<ResourcesMenu variant="desktop"/);
     expect(mobile).toMatch(/<ResourcesMenu variant="mobile"/);
+  });
+
+  it('gives the /resources page heading the focus-target id and tabIndex -1', async () => {
+    const { readFileSync } = await import('node:fs');
+    const page = readFileSync('app/(public)/resources/page.tsx', 'utf8');
+    expect(page).toMatch(/<h1\s+id=\{RESOURCES_HEADING_ID\}\s+tabIndex=\{-1\}/);
+  });
+});
+
+describe('free-resources nav same-route focus', () => {
+  const FLOOD = 'flood-and-storm-resilience';
+
+  function mountOnResourcesPage() {
+    window.history.replaceState(null, '', '/resources');
+    act(() => {
+      root = createRoot(container);
+      root.render(
+        createElement(
+          Fragment,
+          null,
+          createElement('h1', { id: RESOURCES_HEADING_ID, tabIndex: -1 }, 'Free guides'),
+          createElement(ResourcesMenu, { variant: 'desktop', tone: 'light' }),
+          createElement(ResourcesBrowser)
+        )
+      );
+    });
+  }
+
+  function selectCategory(value: string) {
+    const select = document.getElementById('resource-category') as HTMLSelectElement;
+    act(() => {
+      select.value = value;
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+  }
+
+  function menuLink(href: string): HTMLAnchorElement {
+    act(() => button().click());
+    const panel = document.getElementById(button().getAttribute('aria-controls') ?? '');
+    const link = Array.from(panel?.querySelectorAll('a') ?? []).find(
+      (a) => a.getAttribute('href') === href
+    );
+    if (!link) throw new Error(`no menu link for ${href}`);
+    return link;
+  }
+
+  afterEach(() => {
+    window.history.replaceState(null, '', '/');
+  });
+
+  it('Enter on "All free resources" resets the filters and focuses the page heading, not <body>', () => {
+    mountOnResourcesPage();
+    selectCategory('building-codes');
+    const link = menuLink('/resources');
+
+    pressEnter(link);
+
+    expect((document.getElementById('resource-category') as HTMLSelectElement).value).toBe('all');
+    expect(button().getAttribute('aria-expanded')).toBe('false');
+    expect(document.activeElement).not.toBe(document.body);
+    expect(document.activeElement).toBe(document.getElementById(RESOURCES_HEADING_ID));
+  });
+
+  it('Enter on a category link focuses that category heading', () => {
+    mountOnResourcesPage();
+    const link = menuLink(`/resources#${FLOOD}`);
+
+    pressEnter(link);
+
+    expect(document.activeElement).not.toBe(document.body);
+    expect(document.activeElement).toBe(document.getElementById(`${FLOOD}-heading`));
+  });
+
+  it('Enter on a category link a filter had hidden reveals and focuses its heading', () => {
+    mountOnResourcesPage();
+    selectCategory('building-codes');
+    expect(document.getElementById(FLOOD)).toBeNull();
+    const link = menuLink(`/resources#${FLOOD}`);
+
+    pressEnter(link);
+
+    expect(document.activeElement).not.toBe(document.body);
+    expect(document.activeElement).toBe(document.getElementById(`${FLOOD}-heading`));
   });
 });
