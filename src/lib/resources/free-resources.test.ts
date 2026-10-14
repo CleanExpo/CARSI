@@ -21,6 +21,7 @@ const OFFICIAL_HOSTS = new Set([
   'www.qra.qld.gov.au',
   'www.publications.qld.gov.au',
   'www.qld.gov.au',
+  'www.getready.qld.gov.au',
   'www.act.gov.au',
   'www.epa.vic.gov.au',
   'info.health.nz',
@@ -29,24 +30,50 @@ const OFFICIAL_HOSTS = new Set([
 ]);
 
 /**
- * A card's licence notice must come from its own publisher: the same host as the card's url,
- * or a host this map names for that publisher, each with the evidence for the mapping. A notice
- * from any other government site does not count, however official.
+ * Each publisher, as named on its cards, and the only hosts its cards may link to or take a
+ * licence notice from. Both a card's url and its licenceSource must sit on its own publisher's
+ * hosts, so swapping both to another government body's site fails, and an unknown publisher
+ * fails until it is added here deliberately.
  */
-const PUBLISHER_NOTICE_HOSTS: Record<string, readonly string[]> = {
+const PUBLISHER_HOSTS: Record<string, readonly string[]> = {
+  'Australian Building Codes Board': ['www.abcb.gov.au', 'ncc.abcb.gov.au'],
+  'Australian Government Department of Climate Change, Energy, the Environment and Water (YourHome)':
+    ['www.yourhome.gov.au'],
+  'Queensland Government (Long Paddock)': ['www.longpaddock.qld.gov.au'],
+  'Queensland Building and Construction Commission': ['www.qbcc.qld.gov.au'],
+  // Queensland departments publish on the shared business.qld.gov.au and publications.qld.gov.au
+  // sites. business.qld.gov.au pages are (c) The State of Queensland and their footer "Copyright"
+  // link is qld.gov.au/legal/copyright; the site has no copyright page of its own (checked
+  // 14/10/2026: /about/copyright returns 404).
+  'Queensland Department of Agriculture and Fisheries': [
+    'www.business.qld.gov.au',
+    'www.publications.qld.gov.au',
+    'www.qld.gov.au',
+  ],
+  'Queensland Department of Housing and Public Works': [
+    'www.business.qld.gov.au',
+    'www.getready.qld.gov.au',
+    'www.qld.gov.au',
+  ],
+  'Queensland Department of Energy and Public Works': ['www.qld.gov.au'],
+  'Queensland Reconstruction Authority': ['www.qra.qld.gov.au'],
+  'Ministry of Business, Innovation and Employment (NZ)': ['www.building.govt.nz'],
+  'Australian Institute for Disaster Resilience': ['knowledge.aidr.org.au'],
+  'ACT Government': ['www.act.gov.au'],
   // info.health.nz pages are Health New Zealand's; their copyright link resolves to
   // healthnz.govt.nz/copyright (checked 14/10/2026).
-  'info.health.nz': ['www.healthnz.govt.nz'],
-  // business.qld.gov.au pages are (c) The State of Queensland and their footer "Copyright" link is
-  // qld.gov.au/legal/copyright; business.qld.gov.au has no copyright page of its own (checked
-  // 14/10/2026: /about/copyright returns 404).
-  'www.business.qld.gov.au': ['www.qld.gov.au'],
+  'Health New Zealand': ['info.health.nz', 'www.healthnz.govt.nz'],
+  'New Zealand Parliamentary Counsel Office': ['www.legislation.govt.nz'],
+  'EPA Victoria': ['www.epa.vic.gov.au'],
+  'Safe Work Australia': ['www.safeworkaustralia.gov.au'],
 };
 
-function licenceSourceMatchesPublisher(r: { url: string; licenceSource: string }): boolean {
-  const cardHost = new URL(r.url).hostname;
-  const noticeHost = new URL(r.licenceSource).hostname;
-  return noticeHost === cardHost || (PUBLISHER_NOTICE_HOSTS[cardHost] ?? []).includes(noticeHost);
+function hostsBelongToPublisher(r: { publisher: string; url: string; licenceSource: string }) {
+  const allowed = PUBLISHER_HOSTS[r.publisher];
+  if (!allowed) return false;
+  return (
+    allowed.includes(new URL(r.url).hostname) && allowed.includes(new URL(r.licenceSource).hostname)
+  );
 }
 
 /**
@@ -113,23 +140,26 @@ describe('free-resources data', () => {
       const src = new URL(r.licenceSource);
       expect(src.protocol, r.id).toBe('https:');
       // The notice must come from the card's own publisher, not another government body.
-      expect(licenceSourceMatchesPublisher(r), `${r.id} licence notice ${r.licenceSource}`).toBe(
-        true
-      );
+      expect(
+        hostsBelongToPublisher(r),
+        `${r.id} ${r.publisher}: ${r.url} / ${r.licenceSource}`
+      ).toBe(true);
     }
   });
 
-  it("rejects another publisher's official notice as a card's licence source", () => {
-    const abcb = FREE_RESOURCES.find((r) => new URL(r.url).hostname === 'www.abcb.gov.au');
+  it("rejects another publisher's hosts and unknown publishers", () => {
+    const abcb = FREE_RESOURCES.find((r) => r.publisher === 'Australian Building Codes Board');
     if (!abcb) throw new Error('positive control: no ABCB card');
-    expect(licenceSourceMatchesPublisher(abcb)).toBe(true);
-    for (const other of [
-      'https://www.qld.gov.au/legal/copyright',
-      'https://www.yourhome.gov.au/copyright',
-      'https://www.healthnz.govt.nz/copyright',
-    ]) {
-      expect(licenceSourceMatchesPublisher({ ...abcb, licenceSource: other }), other).toBe(false);
-    }
+    expect(hostsBelongToPublisher(abcb)).toBe(true);
+    const qld = 'https://www.qld.gov.au/legal/copyright';
+    // Notice alone, url alone, and both together moved to another government publisher.
+    expect(hostsBelongToPublisher({ ...abcb, licenceSource: qld })).toBe(false);
+    expect(hostsBelongToPublisher({ ...abcb, url: qld })).toBe(false);
+    expect(hostsBelongToPublisher({ ...abcb, url: qld, licenceSource: qld })).toBe(false);
+    expect(
+      hostsBelongToPublisher({ ...abcb, licenceSource: 'https://www.yourhome.gov.au/copyright' })
+    ).toBe(false);
+    expect(hostsBelongToPublisher({ ...abcb, publisher: 'Unlisted Publisher' })).toBe(false);
   });
 
   it('uses only open licences and carries the licence in the attribution line', () => {
