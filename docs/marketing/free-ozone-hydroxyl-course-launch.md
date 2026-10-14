@@ -1,0 +1,65 @@
+# Free course launch copy: Ozone and Hydroxyl Generators on Restoration Jobs
+
+**Status: DRAFT. Phill approval required before anything is posted or published. No agent posts this.**
+
+Course slug: `ozone-and-hydroxyl-generators-what-the-evidence-says` (seeded as `draft`, `isFree: true`,
+`priceAud: "0"`, `cecHours: 0`, `iicrcDiscipline: null`). The course link is not live until Phill publishes
+the course, so the post below carries a placeholder for it.
+
+Fact-check basis: every factual line maps to a numbered citation in the appendix, each read on
+14/10/2026. Full claim-by-claim ledger: `docs/courses/ozone-and-hydroxyl-generators-what-the-evidence-says/source-register.md`.
+Standards line checked with `npm run verify:standards-claim` (exit 0). A standards claim in brand copy
+also needs human sign-off before it publishes on any surface.
+
+---
+
+## LinkedIn post (DRAFT, not for posting until Phill approves)
+
+In July we nearly published something wrong.
+
+An AI-drafted CARSI post said one of our industry's best-known restoration standards was silent on ozone and hydroxyl generators. It sounded certain. Our pre-publish checks caught it.
+
+Checked against CARSI's licensed copy, the current ANSI/IICRC S520 names ozone and other antimicrobial devices. The claim had come from a web scrape.
+
+So we went back, did the research again with primary sources only, and turned it into a free course for Australian restorers.
+
+What the sources say:
+
+- Australia's workplace exposure limit for ozone is a peak of 0.1 ppm (0.2 mg/m³), not to be exceeded at any time. The figure is unchanged in the new Workplace Exposure Limits that start on 1 December 2026. [1] [2]
+- The US EPA says that at levels that do not exceed public health standards, ozone does not effectively remove viruses, bacteria or mould. [3]
+- An independent study of a hydroxyl generator running in an office measured new organic acids and fine particles forming while it ran. [4]
+- The TGA lists ozone air sanitisers and deodorisers as excluded goods. It does not assess them, and consumer law still applies to whatever you claim about them. [5]
+
+The habit the course teaches is the one that saved us in July: show me the page, not the vibe.
+
+Free, about an hour, Australian-produced. [COURSE LINK: add when Phill publishes]
+
+---
+
+## Course-card blurb (DRAFT)
+
+Free. The Australian ozone exposure limit, what the evidence says about ozone and hydroxyl generators,
+what the TGA does and does not assess, and how to check a claim before you repeat it. Every claim cited
+to a primary source.
+
+---
+
+## Appendix: citations (each read 14/10/2026)
+
+1. Safe Work Australia, *Workplace exposure limits for airborne contaminants*, July 2025 (ozone entry in Appendix A; WES apply until 30 November 2026, WEL from 1 December 2026). https://www.safeworkaustralia.gov.au/sites/default/files/2025-07/workplace-exposure-limits-amended-july_2025_2.docx (read 14/10/2026)
+2. WorkSafe Victoria, *Ozone exposure* safety alert, published 3 February 2025 (peak limit 0.1 ppm, 0.2 mg/m³). https://www.worksafe.vic.gov.au/safety-alerts/ozone-exposure (read 14/10/2026)
+3. US EPA, *Ozone Generators that are Sold as Air Cleaners*, last updated 19 February 2026. https://www.epa.gov/indoor-air-quality-iaq/ozone-generators-are-sold-air-cleaners (read 14/10/2026)
+4. Joo T, Rivera-Rios JC, Alvarado-Velez D, Westgate S, Ng NL. Formation of Oxidized Gases and Secondary Organic Aerosol from a Commercial Oxidant-Generating Electronic Air Cleaner. *Environ Sci Technol Lett* 2021;8(8):691-698. doi:10.1021/acs.estlett.1c00416. https://pubmed.ncbi.nlm.nih.gov/37566381/ (read 14/10/2026)
+5. Therapeutic Goods Administration, *Regulation of borderline disinfectant and related products with antiviral claims including COVID-19*, Version 1.0, August 2021, pages 9-11. https://www.tga.gov.au/sites/default/files/regulation-borderline-disinfectant-related-products-with-antiviral-claims-including-covid-19.pdf (read 14/10/2026)
+
+S520 line: attributed to CARSI's licensed-copy verification (recorded in CARSI's CLAUDE.md after the
+15/07/2026 incident). No section number is cited, because the committed S520 section-title index
+(RestoreAssist `lib/standards/s520-sections.ts` on `origin/main`) has no entry for these devices.
+
+## Claims considered and left out
+
+- Any product name, model or price: no Australian 240 V manufacturer spec sheet could be verified on
+  14/10/2026, so no product is named.
+- "Hydroxyl generators are safe with people present" and "hydroxyl removes smoke odour": no primary
+  source used here establishes either. The course says so instead.
+- Any APVMA position: none was found that addresses these devices specifically, so none is stated.
