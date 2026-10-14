@@ -7,6 +7,7 @@ import {
   FREE_RESOURCE_JURISDICTIONS,
   isBuildingCodeResource,
 } from './free-resources';
+import { BUILDING_CODE_NOTE } from '@/components/resources/ResourcesBrowser';
 
 /** The publishers' own hosts. A new host is a deliberate addition, reviewed against its licence. */
 const OFFICIAL_HOSTS = new Set([
@@ -31,7 +32,7 @@ const OFFICIAL_HOSTS = new Set([
 
 /**
  * Each publisher, as named on its cards, and the only hosts its cards may link to or take a
- * licence notice from. Both a card's url and its licenceSource must sit on its own publisher's
+ * licence notice from. Both a card's url and its licence notice must sit on its own publisher's
  * hosts, so swapping both to another government body's site fails, and an unknown publisher
  * fails until it is added here deliberately.
  */
@@ -68,12 +69,44 @@ const PUBLISHER_HOSTS: Record<string, readonly string[]> = {
   'Safe Work Australia': ['www.safeworkaustralia.gov.au'],
 };
 
-function hostsBelongToPublisher(r: { publisher: string; url: string; licenceSource: string }) {
+/**
+ * A licence notice must sit on the same host as the card's own page, unless that page's site has
+ * no notice of its own and designates another one. Evidence for each designation is in the comment.
+ */
+const DESIGNATED_NOTICE_HOSTS: Record<string, readonly string[]> = {
+  // business.qld.gov.au: footer "Copyright" link is qld.gov.au/legal/copyright; no page of its own.
+  'www.business.qld.gov.au': ['www.qld.gov.au'],
+  // info.health.nz: its copyright link resolves to healthnz.govt.nz/copyright.
+  'info.health.nz': ['www.healthnz.govt.nz'],
+};
+
+function hostsBelongToPublisher(r: {
+  publisher: string;
+  url: string;
+  licenceEvidence: { url: string };
+}) {
   const allowed = PUBLISHER_HOSTS[r.publisher];
   if (!allowed) return false;
-  return (
-    allowed.includes(new URL(r.url).hostname) && allowed.includes(new URL(r.licenceSource).hostname)
-  );
+  const pageHost = new URL(r.url).hostname;
+  const noticeHost = new URL(r.licenceEvidence.url).hostname;
+  if (!allowed.includes(pageHost) || !allowed.includes(noticeHost)) return false;
+  return noticeHost === pageHost || (DESIGNATED_NOTICE_HOSTS[pageHost] ?? []).includes(noticeHost);
+}
+
+/** True when the quoted notice names the same open licence as the card's label, and no restriction. */
+function quoteNamesLicence(label: string, quote: string): boolean {
+  if (/non-?commercial|no ?deriv|\b(?:NC|ND)\b|all rights reserved|permission/i.test(quote))
+    return false;
+  if (label === 'No copyright (NZ legislation)') {
+    return /no copyright in New Zealand legislation/i.test(quote);
+  }
+  const m = /^CC BY (\d\.\d)$/.exec(label);
+  if (!m) return false;
+  const v = m[1].replace('.', '\\.');
+  return new RegExp(
+    `Creative Commons Attribution[\\s\\-\u2013\u2014]*(?:\\(CC BY\\)\\s*)?${v}\\b|\\bCC BY ${v}\\b`,
+    'i'
+  ).test(quote);
 }
 
 /**
@@ -92,10 +125,17 @@ const OPEN_LICENCE =
 const APPLICABILITY_WORDING =
   /\b(use[sd]?|using|apply|applies|applied|applying|current|latest|in force|new|recent|still|non-house|commercial|class(?:es)?|renovations?|existing buildings?|built under|designed under|start here|starting point|jobs?|when|for [a-z ,-]{0,40}\bwork)\b/i;
 
-/** Public Comment Drafts and other proposals, which are never in force. */
+/**
+ * Nationwide or absolute claims about building rules. Adoption is decided by each state and
+ * territory, so no card note and not the section note may assert one.
+ */
+const ABSOLUTE_WORDING =
+  /\b(national(?:ly|wide)?|across Australia|all (?:Australian|states|territories|jurisdictions|buildings)|every (?:state|territory|jurisdiction|building)|everywhere|always|mandatory|compulsory|must|required|requires|universal(?:ly)?|in force|binding)\b/i;
+
+/** Drafts, proposals and consultation material, wherever the card says so. */
 function isDraftProposal(r: { title: string; note: string; url: string }) {
-  return /\bPCD\b|Public Comment Draft|consultation (?:paper|draft)|\bproposal\b/i.test(
-    [r.title, r.url].join(' ')
+  return /\b(?:drafts?|proposals?|proposed|consultation|public comment|PCD)\b/i.test(
+    [r.title, r.note, r.url].join(' ')
   );
 }
 
@@ -136,30 +176,69 @@ describe('free-resources data', () => {
   it('records, for every card, the publisher notice its licence was read from', () => {
     for (const r of FREE_RESOURCES) {
       expect(r.licence, r.id).toMatch(OPEN_LICENCE);
-      expect(typeof r.licenceSource, r.id).toBe('string');
-      const src = new URL(r.licenceSource);
-      expect(src.protocol, r.id).toBe('https:');
-      // The notice must come from the card's own publisher, not another government body.
-      expect(
-        hostsBelongToPublisher(r),
-        `${r.id} ${r.publisher}: ${r.url} / ${r.licenceSource}`
-      ).toBe(true);
+      const ev = r.licenceEvidence;
+      expect(ev, r.id).toBeDefined();
+      expect(new URL(ev.url).protocol, r.id).toBe('https:');
+      expect(ev.locator.trim().length, `${r.id} locator`).toBeGreaterThan(0);
+      const words = ev.quote.trim().split(/\s+/).filter(Boolean).length;
+      expect(words, `${r.id} quote length`).toBeGreaterThan(0);
+      expect(words, `${r.id} quote length`).toBeLessThanOrEqual(25);
+      expect(ev.readOn, `${r.id} readOn`).toBe('2026-10-14');
+      // The notice must come from the card's own publisher and site, not another body.
+      expect(hostsBelongToPublisher(r), `${r.id} ${r.publisher}: ${r.url} / ${ev.url}`).toBe(true);
+      // The quoted sentence must name the licence shown on the card.
+      expect(quoteNamesLicence(r.licence, ev.quote), `${r.id}: ${ev.quote}`).toBe(true);
     }
   });
 
-  it("rejects another publisher's hosts and unknown publishers", () => {
+  it("rejects another publisher's hosts, undesignated notices and unknown publishers", () => {
     const abcb = FREE_RESOURCES.find((r) => r.publisher === 'Australian Building Codes Board');
     if (!abcb) throw new Error('positive control: no ABCB card');
     expect(hostsBelongToPublisher(abcb)).toBe(true);
     const qld = 'https://www.qld.gov.au/legal/copyright';
+    const qldEv = { ...abcb.licenceEvidence, url: qld };
     // Notice alone, url alone, and both together moved to another government publisher.
-    expect(hostsBelongToPublisher({ ...abcb, licenceSource: qld })).toBe(false);
+    expect(hostsBelongToPublisher({ ...abcb, licenceEvidence: qldEv })).toBe(false);
     expect(hostsBelongToPublisher({ ...abcb, url: qld })).toBe(false);
-    expect(hostsBelongToPublisher({ ...abcb, url: qld, licenceSource: qld })).toBe(false);
-    expect(
-      hostsBelongToPublisher({ ...abcb, licenceSource: 'https://www.yourhome.gov.au/copyright' })
-    ).toBe(false);
+    expect(hostsBelongToPublisher({ ...abcb, url: qld, licenceEvidence: qldEv })).toBe(false);
     expect(hostsBelongToPublisher({ ...abcb, publisher: 'Unlisted Publisher' })).toBe(false);
+    // Get Ready has no designated notice elsewhere: the qld.gov.au page cannot license its PDF.
+    const getReady = FREE_RESOURCES.find(
+      (r) => r.id === 'qld-design-guidance-flood-resilient-homes-2026'
+    );
+    if (!getReady) throw new Error('positive control: no Get Ready card');
+    expect(hostsBelongToPublisher(getReady)).toBe(true);
+    expect(
+      hostsBelongToPublisher({
+        ...getReady,
+        licenceEvidence: { ...getReady.licenceEvidence, url: qld },
+      })
+    ).toBe(false);
+  });
+
+  it('rejects a quote that names a different or restricted licence', () => {
+    expect(
+      quoteNamesLicence(
+        'CC BY 4.0',
+        'licensed under a Creative Commons Attribution 4.0 International licence'
+      )
+    ).toBe(true);
+    expect(
+      quoteNamesLicence('CC BY 4.0', 'licensed under a Creative Commons Attribution 3.0 licence')
+    ).toBe(false);
+    expect(
+      quoteNamesLicence(
+        'CC BY 4.0',
+        'Creative Commons Attribution-NoDerivatives 4.0 International licence'
+      )
+    ).toBe(false);
+    expect(
+      quoteNamesLicence('CC BY 4.0', 'Creative Commons Attribution-NonCommercial 4.0 licence')
+    ).toBe(false);
+    expect(quoteNamesLicence('CC BY 4.0', 'All rights reserved')).toBe(false);
+    expect(quoteNamesLicence('No copyright (NZ legislation)', 'Crown copyright applies')).toBe(
+      false
+    );
   });
 
   it('uses only open licences and carries the licence in the attribution line', () => {
@@ -204,9 +283,26 @@ describe('free-resources data', () => {
       if (!isBuildingCodeResource(r)) continue;
       inScope += 1;
       expect(r.note, r.id).not.toMatch(APPLICABILITY_WORDING);
+      expect(r.note, r.id).not.toMatch(ABSOLUTE_WORDING);
     }
     // Positive control: the scope must reach the building-code cards.
     expect(inScope).toBeGreaterThanOrEqual(15);
+  });
+
+  it('keeps the building-code section note free of nationwide or absolute claims', () => {
+    expect(BUILDING_CODE_NOTE).not.toMatch(ABSOLUTE_WORDING);
+  });
+
+  it('flags nationwide and absolute claims in the checks above', () => {
+    for (const bad of [
+      'NCC 2025 is mandatory for all Australian buildings.',
+      'The NCC applies nationally.',
+      'These provisions are in force across Australia.',
+      'This edition always applies, everywhere.',
+      'Every state has adopted it.',
+    ]) {
+      expect(bad).toMatch(ABSOLUTE_WORDING);
+    }
   });
 
   it('flags applicability wording in the check above', () => {
@@ -226,6 +322,14 @@ describe('free-resources data', () => {
   it('marks every draft or proposal as a draft proposal and as background reading only', () => {
     const drafts = FREE_RESOURCES.filter(isDraftProposal);
     expect(drafts.length).toBeGreaterThanOrEqual(1);
+    // A draft described only in its note is still a draft.
+    expect(
+      isDraftProposal({
+        title: 'Condensation guidance',
+        url: 'https://www.abcb.gov.au/x.pdf',
+        note: 'Public Comment Draft guidance on condensation in buildings.',
+      })
+    ).toBe(true);
     for (const r of drafts) {
       expect(r.status, r.id).toBe('draft-proposal');
       expect(r.note, r.id).toMatch(/^Background reading only/);
