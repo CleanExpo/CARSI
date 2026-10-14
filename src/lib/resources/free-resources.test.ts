@@ -22,7 +22,6 @@ const OFFICIAL_HOSTS = new Set([
   'www.publications.qld.gov.au',
   'www.getready.qld.gov.au',
   'www.qld.gov.au',
-  'www.health.nsw.gov.au',
   'www.act.gov.au',
   'www.epa.vic.gov.au',
   'info.health.nz',

@@ -89,12 +89,15 @@ export const RESOURCE_STATUS_LABEL: Record<ResourceStatus, string> = {
 // - https://www.qra.qld.gov.au/access-information/copyright (CC BY 4.0 unless otherwise noted)
 // - https://www.publications.qld.gov.au/dataset/53ac3a6d-ae93-4a4d-9461-a629ab60f797 (CC BY 4.0)
 // - https://www.longpaddock.qld.gov.au/silo/ (SILO data CC BY 4.0)
-// - https://www.act.gov.au/copyright, https://www.health.nsw.gov.au/pages/copyright.aspx,
-//   https://www.healthnz.govt.nz/copyright, https://www.epa.vic.gov.au/copyright (CC BY 4.0)
+// - https://www.act.gov.au/copyright, https://www.healthnz.govt.nz/copyright,
+//   https://www.epa.vic.gov.au/copyright (CC BY 4.0)
 // - https://www.legislation.govt.nz/copyright/ (no copyright in NZ legislation, s27 Copyright
 //   Act 1994)
 // Removed: SWA guidance on interpreting the exposure standards (July 2025), because no fetched
 // notice confirmed its licence and the SWA site licence excludes publications with their own terms.
+// Removed: the two NSW Health pages, because https://www.health.nsw.gov.au/pages/copyright.aspx
+// grants CC BY 4.0 but also requires a permission form for use other than personal, in-house or
+// non-commercial use, which are conflicting terms under the hub's unclear-terms rule.
 export const FREE_RESOURCES: readonly FreeResource[] = [
   {
     id: 'abcb-condensation-handbook-ncc2025',
@@ -807,34 +810,6 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     readDate: '2026-10-14',
     attribution: '© Australian Capital Territory, CC BY 4.0',
     note: 'ACT Government guidance on mould in the home. A plain-language page to point owners and tenants to when you explain causes and prevention.',
-  },
-  {
-    id: 'nsw-health-mould-factsheet',
-    title: 'Mould (NSW Health fact sheet)',
-    publisher: 'NSW Health',
-    jurisdiction: 'NSW',
-    category: 'mould-and-health',
-    url: 'https://www.health.nsw.gov.au/environment/factsheets/Pages/mould.aspx',
-    format: 'web',
-    licence: 'CC BY 4.0',
-    licenceSource: 'https://www.health.nsw.gov.au/pages/copyright.aspx',
-    readDate: '2026-10-14',
-    attribution: '© State of New South Wales (NSW Ministry of Health), CC BY 4.0',
-    note: 'A NSW Health fact sheet on mould. A health agency source you can cite when owners ask whether mould matters.',
-  },
-  {
-    id: 'nsw-health-household-cleanup',
-    title: 'Household clean-up for after a flood or storm (NSW Health)',
-    publisher: 'NSW Health',
-    jurisdiction: 'NSW',
-    category: 'mould-and-health',
-    url: 'https://www.health.nsw.gov.au/emergency_preparedness/weather/Pages/household-cleanup.aspx',
-    format: 'web',
-    licence: 'CC BY 4.0',
-    licenceSource: 'https://www.health.nsw.gov.au/pages/copyright.aspx',
-    readDate: '2026-10-14',
-    attribution: '© State of New South Wales (NSW Ministry of Health), CC BY 4.0',
-    note: 'NSW Health advice on cleaning a household after a flood or storm. Useful for explaining safe clean-up to clients before your crew arrives.',
   },
   {
     id: 'healthnz-floods-and-health',
