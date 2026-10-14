@@ -16,7 +16,7 @@ import {
  */
 
 const BASE_METADATA: Metadata = {
-  title: 'Professional Directory — Coming Soon | CARSI Industry Hub',
+  title: 'Professional Directory — Coming Soon',
   description:
     'The CARSI professional directory is in development. Verified NRPG member profiles will appear here once registry integration is complete — no placeholder listings.',
   keywords: [
