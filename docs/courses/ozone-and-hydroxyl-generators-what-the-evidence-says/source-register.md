@@ -14,13 +14,9 @@ exact passage; peer-reviewed papers were read as their PubMed records (citation 
 NCBI E-utilities). No trade-press article, supplier blog or web-scraped copy of any standard was used
 as a basis for a claim. Where only an abstract was read, the course claims nothing beyond the abstract.
 
-IICRC standards: no standard text was fetched, read or entered into any AI tool. ANSI/IICRC S520 is
-named nominatively. The single statement about its content ("the current ANSI/IICRC S520 names ozone
-and other antimicrobial devices") is attributed to CARSI's licensed-copy verification, recorded in
-CARSI's CLAUDE.md after the 15/07/2026 incident. No section number is cited: the committed section-title
-index (`lib/standards/s520-sections.ts` on RestoreAssist `origin/main`, last changed 31/08/2026) was
-searched for titles only and has no entry for these devices, and that file itself records its numbers
-as owner-attested rather than independently verified.
+IICRC standards: no standard text was fetched, read or entered into any AI tool. The course, quiz and
+launch copy name no standard and make no claim, positive or absent, about what any standard contains.
+Lesson 1 retells the July near miss without saying what the standard does or does not contain.
 
 ## Sources (all read 14/10/2026)
 
@@ -66,7 +62,6 @@ as owner-attested rather than independently verified.
 | Excluded products remain subject to the Competition and Consumer Act 2010 (ACCC); advertising must not mislead or deceive | S9 | pages 11 and 13 |
 | Liquid disinfectants with specific claims dispensed through automated airborne/fogging systems are not excluded goods and must be in the ARTG | S9 | page 10 |
 | Australian supply nominally 230 V | S10 | section 2 "Background" |
-| Current ANSI/IICRC S520 names ozone and other antimicrobial devices | CARSI licensed-copy verification (internal, CLAUDE.md 15/07/2026) | no section cited (not in committed title index) |
 
 CARSI-recommended practice in Lesson 4 (clear the space, protect susceptible items, measure with a
 calibrated meter, RCD-protected GPO, test-and-tag, job records, and "if you cannot show why the space
@@ -96,6 +91,10 @@ reading under the worker peak limit as re-entry clearance for anyone.)
 - NSW Health ozone generator factsheet: the address cited by a supplier page returns 404; not used.
 - APVMA position on these devices: none specific was found on apvma.gov.au; nothing is stated.
 - "5-10 times" is used only as the EPA's summary of earlier studies, not as an independent finding.
+- Any statement about what an industry standard contains, positive or absent. CARSI policy requires a
+  positive claim about a standard to cite a section that exists in the licensed index, and none was
+  available, so the course and launch copy make none. (Removed 14/10/2026 after Codex review
+  codex-carsi-b7077ba9-20261014 finding P1-STANDARDS-SECTION-POLICY.)
 
 ## Australian-production checklist
 

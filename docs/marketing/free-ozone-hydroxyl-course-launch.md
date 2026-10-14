@@ -8,8 +8,9 @@ the course, so the post below carries a placeholder for it.
 
 Fact-check basis: every factual line maps to a numbered citation in the appendix, each read on
 14/10/2026. Full claim-by-claim ledger: `docs/courses/ozone-and-hydroxyl-generators-what-the-evidence-says/source-register.md`.
-Standards line checked with `npm run verify:standards-claim` (exit 0). A standards claim in brand copy
-also needs human sign-off before it publishes on any surface.
+The post makes no claim about what any standard contains. The near-miss lines that mention a standard
+were checked with `npm run verify:standards-claim` (exit 0); brand copy that names a standard still
+needs human sign-off before it publishes on any surface.
 
 ---
 
@@ -17,9 +18,9 @@ also needs human sign-off before it publishes on any surface.
 
 In July we nearly published something wrong.
 
-An AI-drafted CARSI post said one of our industry's best-known restoration standards was silent on ozone and hydroxyl generators. It sounded certain. Our pre-publish checks caught it.
+An AI-drafted CARSI post made a confident claim about what an industry standard did not contain. It sounded certain. Our pre-publish checks caught it.
 
-Checked against CARSI's licensed copy, the current ANSI/IICRC S520 names ozone and other antimicrobial devices. The claim had come from a web scrape.
+That kind of absence claim can't be proven from a web copy, which is where it had come from. It could not be backed by our licensed copy, so it never went out.
 
 So we went back, did the research again with primary sources only, and turned it into a free course for Australian restorers.
 
@@ -52,10 +53,6 @@ to a primary source.
 4. Joo T, Rivera-Rios JC, Alvarado-Velez D, Westgate S, Ng NL. Formation of Oxidized Gases and Secondary Organic Aerosol from a Commercial Oxidant-Generating Electronic Air Cleaner. *Environ Sci Technol Lett* 2021;8(8):691-698. doi:10.1021/acs.estlett.1c00416. https://pubmed.ncbi.nlm.nih.gov/37566381/ (read 14/10/2026)
 5. Therapeutic Goods Administration, *Regulation of borderline disinfectant and related products with antiviral claims including COVID-19*, Version 1.0, August 2021, pages 9-11. https://www.tga.gov.au/sites/default/files/regulation-borderline-disinfectant-related-products-with-antiviral-claims-including-covid-19.pdf (read 14/10/2026)
 
-S520 line: attributed to CARSI's licensed-copy verification (recorded in CARSI's CLAUDE.md after the
-15/07/2026 incident). No section number is cited, because the committed S520 section-title index
-(RestoreAssist `lib/standards/s520-sections.ts` on `origin/main`) has no entry for these devices.
-
 ## Claims considered and left out
 
 - Any product name, model or price: no Australian 240 V manufacturer spec sheet could be verified on
@@ -63,3 +60,6 @@ S520 line: attributed to CARSI's licensed-copy verification (recorded in CARSI's
 - "Hydroxyl generators are safe with people present" and "hydroxyl removes smoke odour": no primary
   source used here establishes either. The course says so instead.
 - Any APVMA position: none was found that addresses these devices specifically, so none is stated.
+- Any statement about what an industry standard contains, positive or absent: CARSI policy requires a
+  positive standards claim to cite a section that exists in the licensed index, none was available,
+  so none is made.
