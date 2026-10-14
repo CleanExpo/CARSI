@@ -59,7 +59,7 @@ Lesson 1 retells the July near miss without saying what the standard does or doe
 | Hydroxyl radical generator in an office: rises in OVOCs, especially low-molecular-weight organic acids; rapid particle increase; highly oxidised SOA; call to measure by-products | S6 | abstract |
 | Reactive air cleaning can release reactive intermediates/by-products; air cleaners often run continuously; exposure may be a significant risk; further study before broader adoption | S7 | abstract |
 | OH is the dominant outdoor oxidant; indoors secondary to ozone; mainly formed by ozone reacting with monoterpenes/alkenes such as limonene | S8 | abstract |
-| "Air sanitisers and deodorisers (e.g. ozone)" listed as sanitation/environmental control equipment = excluded goods, not TGA-regulated, unless claiming effect in or on the human body | S9 | pages 9-10 |
+| "Air sanitisers and deodorisers (e.g. ozone)" listed as sanitation/environmental control equipment = excluded goods, not TGA-regulated, while their claims relate to air or environmental sanitation and not to treating a person or a direct influence in or on the human body; an air sanitiser designed to have an effect in the human body is a medical device requiring ARTG inclusion | S9 | pages 9-10 (Example 3 on page 10) |
 | Excluded products remain subject to the Competition and Consumer Act 2010 (ACCC); advertising must not mislead or deceive | S9 | pages 11 and 13 |
 | Liquid disinfectants with specific claims dispensed through automated airborne/fogging systems are not excluded goods and must be in the ARTG | S9 | page 10 |
 | Australian supply nominally 230 V | S10 | section 2 "Background" |
