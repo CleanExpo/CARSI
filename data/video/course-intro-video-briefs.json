@@ -595,6 +595,22 @@
       "captions": true,
       "visualDirection": "Presenter to camera, CARSI slate background; lower-third with course title on the opening line.",
       "authorNote": "Grounded in the course's own modules. en-AU. No IICRC acronym branding."
+    },
+    {
+      "courseSlug": "ozone-and-hydroxyl-generators-what-the-evidence-says",
+      "lessonId": "d6c6ca78-78e7-4fd4-9aa7-57369bd2f44a",
+      "lessonTitle": "Module 1: Show me the page, not the vibe",
+      "moduleTitle": "Module 1: Show me the page, not the vibe",
+      "title": "Welcome: Ozone and Hydroxyl Generators, What the Evidence Says",
+      "script": "This is CARSI's free course on ozone and hydroxyl generators. It starts with a near miss in our own marketing: a confident claim, drafted with an AI tool, that turned out to be wrong. Our checks caught it before it went out, and the lesson stuck. Show me the page, not the vibe. Over four short lessons you'll learn Australia's workplace exposure limit for ozone, what independent research says about whether these machines work and what by-products they make, what the TGA does and doesn't assess, and the controls and job records that keep your crew and your clients safe. Every claim in the course is cited to a primary source. This is awareness training, not medical advice.",
+      "format": "course-intro",
+      "durationSeconds": 45,
+      "avatarId": null,
+      "voiceId": "Hywjw1pu9qLxpN2CqxU1",
+      "locale": "en-AU",
+      "captions": true,
+      "visualDirection": "Presenter to camera, CARSI slate background; lower-third with course title on the opening line. No standards names, section numbers, exposure values, IICRC marks or product names on screen.",
+      "authorNote": "Hook from M1 (near miss, show me the page); exposure limit M2; evidence and by-products M2-M3; TGA position and controls M4. No standards-content claims and no IICRC reference in voice or on screen. en-AU. Free course, no CEC."
     }
   ]
 }
