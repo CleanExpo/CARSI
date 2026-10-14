@@ -20,6 +20,7 @@ import { getAppOrigin } from '@/lib/server/app-url';
 import { processBusinessCoachingCheckoutCompleted } from '@/lib/server/business-coaching-fulfillment';
 import { processCarsiCoachingMonthlyCheckoutCompleted } from '@/lib/server/carsi-coaching-monthly-fulfillment';
 import { processCcwRoadshowBookingConfirmation } from '@/lib/server/ccw-roadshow-booking-email';
+import { handleCheckoutSessionExpired } from '@/lib/server/checkout-recovery';
 import { notifyCrmEnrollmentCreated } from '@/lib/server/crm-enrollment-notify';
 import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
 import {
@@ -373,6 +374,19 @@ export async function POST(request: NextRequest) {
     // guaranteed by the upsert keyed on the unique subscription id).
     if (isSubscriptionEvent(event.type)) {
       await handleSubscriptionEvent(event);
+      return await acknowledge();
+    }
+
+    // Abandoned-checkout recovery. A no-op unless CHECKOUT_RECOVERY_ENABLED is on; a failed
+    // send is logged and acknowledged (a retry could not make a recovery email more correct).
+    if (event.type === 'checkout.session.expired') {
+      const outcome = await handleCheckoutSessionExpired(
+        event.data.object as Stripe.Checkout.Session,
+        { appOrigin: getAppOrigin() }
+      );
+      if (outcome !== 'disabled' && outcome !== 'not_recoverable') {
+        console.info('[stripe webhook] checkout.session.expired', { id: event.id, outcome });
+      }
       return await acknowledge();
     }
 

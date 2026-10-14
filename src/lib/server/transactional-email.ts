@@ -19,6 +19,7 @@ import { buildUnsubscribeUrl } from '@/lib/server/email-preferences';
 import {
   renderAdminPasswordResetEmail,
   renderCcwRoadshowBookingConfirmationEmail,
+  renderCheckoutRecoveryEmail,
   renderCcwRoadshowOfferPackEmail,
   renderContactNotificationEmail,
   renderContactReplyEmail,
@@ -59,6 +60,20 @@ export async function sendPasswordResetEmail(params: {
     html,
     text,
   });
+}
+
+export async function sendCheckoutRecoveryEmail(params: {
+  to: string;
+  itemName: string;
+  recoveryUrl: string;
+  appOrigin: string;
+}): Promise<SendEmailResult> {
+  const { html, text } = renderCheckoutRecoveryEmail({
+    appOrigin: params.appOrigin,
+    itemName: params.itemName,
+    recoveryUrl: params.recoveryUrl,
+  });
+  return sendEmail({ to: params.to, subject: 'Your CARSI checkout expired', html, text });
 }
 
 export async function sendRegistrationWelcomeEmail(params: {

@@ -26,6 +26,7 @@ import { getAppOrigin, getCheckoutReturnUrl } from '@/lib/server/app-url';
 
 import { getStripeClient } from '@/lib/api/stripe';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
+import { checkoutRecoveryParams } from '@/lib/server/checkout-recovery';
 import { membershipCheckoutDecisionFor } from '@/lib/server/membership-checkout-guard';
 import {
   checkoutSessionIdempotencyKey,
@@ -128,6 +129,7 @@ export async function POST(request: NextRequest) {
         customer_email: claims.email,
         success_url,
         cancel_url,
+        ...checkoutRecoveryParams(),
         metadata: {
           carsi_user_id: claims.sub,
           plan: 'pro_annual',

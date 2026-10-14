@@ -1,6 +1,7 @@
 import type { CheckoutCourse } from '@/lib/course-list-item';
 import { getStripeClient } from '@/lib/api/stripe';
 import { verifySessionToken } from '@/lib/auth/session-jwt';
+import { checkoutRecoveryParams } from '@/lib/server/checkout-recovery';
 
 /**
  * Resolve payer email: local HS256 session cookie, backend /me when upstream + Bearer cookie,
@@ -89,6 +90,7 @@ export async function createStripeCheckoutForCourse(params: {
     customer_email,
     success_url,
     cancel_url,
+    ...checkoutRecoveryParams(),
     metadata: {
       course_slug: slug,
       source: 'carsi-next-local-checkout',
