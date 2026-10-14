@@ -46,7 +46,10 @@ describe('PricingTiers — switches', () => {
     const html = render({ subscriptionsEnabled: true, teamsEnabled: false });
     expect(has(html, 'pricing-pro_annual-buy')).toBe(true);
     expect(has(html, 'pricing-pro_annual-coming-soon')).toBe(false);
-    expect(html).toContain('Start membership');
+    // The live CTA must lead to the membership checkout page, not merely exist.
+    const yearly = html.match(/<a[^>]*data-testid="pricing-pro_annual-buy"[^>]*>([^<]*)<\/a>/);
+    expect(yearly?.[1]).toBe('Start membership');
+    expect(yearly?.[0]).toContain('href="/subscribe"');
     for (const id of ['starter', 'growth', 'full_library']) {
       expect(has(html, `pricing-${id}-coming-soon`)).toBe(false);
       expect(has(html, `pricing-${id}-buy`)).toBe(false);

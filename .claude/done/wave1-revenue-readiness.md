@@ -63,3 +63,22 @@ Every item is proved by a test that fails on the old behaviour. Shared gate for 
 - `npm run check:cec` prints a `::warning::` line per approval expiring within 90 days (or expired)
   and still exits 0 when the registry is otherwise valid.
 - Proof: `npm run test:cec` (cases include an expiring entry that must warn and not fail).
+
+## Revision 2026-10-15 (append-only; the criteria above are unchanged except as stated here)
+
+- **Item 2 — Abandoned-checkout recovery: DESCOPED from Wave 1** (orchestrator decision within
+  the founder-approved scope, after independent review rounds 1–3). Reason: the feature is
+  flag-off by default, and it cannot reach new buyers safely until CARSI has a real
+  inbox-challenge email verification. `LmsUser.isVerified` is not proof that the buyer controls
+  the recipient address (a paid guest can claim an account under a third-party email), and new
+  registrations are unverified, so the register-then-membership path could never receive it.
+  All recovery code, the `CHECKOUT_RECOVERY_ENABLED` flag and its tests are removed from the
+  branch (commit `07028f97`); `base...head` carries no recovery code.
+  **Founder follow-up:** build inbox-challenge email verification first (a distinct
+  email-verified-at proof), then re-propose recovery gated on it, with server-side abuse
+  throttles on guest checkout.
+- **Item 1 — proof strengthened, criterion unchanged:** besides
+  `src/lib/membership-signup-path.test.ts`, `src/components/pricing/SubscribeCta.test.tsx` drives
+  the rendered CTA (401 → `/register?next=%2Fsubscribe`; signed in → Stripe URL), and
+  `src/components/pricing/PricingTiers.test.tsx` asserts the live yearly CTA has
+  `href="/subscribe"`.
