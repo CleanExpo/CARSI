@@ -39,6 +39,14 @@ export interface FreeResource {
   note: string;
 }
 
+// NCC 2025 commencement differs by state and territory, so no card names a single edition as
+// current. Sources, accessed 14/10/2026:
+// - ABCB adoption table: https://ncc.abcb.gov.au/ncc-2025-state-and-territory-adoption-information
+//   (ACT, Vic and WA 1 May 2026; NSW, Qld and Tas 1 May 2027; SA BCA 1 May 2027; NT not adopted)
+// - Queensland: https://www.business.qld.gov.au/industries/building-property-development/building-construction/laws-codes-standards/delayed-adoption-ncc
+//   (NCC 2022 continues to apply until 1 May 2027)
+// - NSW: https://www.nsw.gov.au/housing-and-construction/compliance-and-regulation/how-to-comply-national-construction-code
+//   (current edition NCC 2022 Amendment 2; NCC 2025 adopted 1 May 2027)
 export const FREE_RESOURCES: readonly FreeResource[] = [
   {
     id: 'abcb-condensation-handbook-ncc2025',
@@ -52,7 +60,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: 'The current edition of the ABCB condensation handbook. Start here when a job involves a recent build or new work, then compare with the older editions if the building pre-dates 2025.',
+    note: "The ABCB condensation handbook written for NCC 2025, which states and territories adopt on different dates. Before you rely on it, check which NCC edition your state or territory has adopted for your project's approval date, then compare with the older editions for earlier buildings.",
   },
   {
     id: 'abcb-condensation-handbook-2023',
@@ -798,7 +806,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: 'The current housing provisions, for NCC 2025. Use it for recent builds and new work. It is a very large file, so allow time to open it.',
+    note: "The housing provisions for NCC 2025, which commences on different dates by state and territory. Before using it on a job, check which NCC edition your state or territory has adopted for your project's approval date. It is a very large file, so allow time to open it.",
   },
   {
     id: 'ncc2025-volume-two',
@@ -812,7 +820,7 @@ export const FREE_RESOURCES: readonly FreeResource[] = [
     readDate: '2026-10-14',
     attribution:
       '© Commonwealth of Australia and the States and Territories of Australia (ABCB), CC BY 4.0',
-    note: 'The current edition of Volume Two for houses and small outbuildings. Pair it with the housing provisions.',
+    note: "NCC 2025 Volume Two for houses and small outbuildings, to pair with the housing provisions. Before using it on a job, check which NCC edition your state or territory has adopted for your project's approval date.",
   },
   {
     id: 'abcb-upgrading-existing-buildings',

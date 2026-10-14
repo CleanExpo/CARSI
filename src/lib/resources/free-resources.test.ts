@@ -32,6 +32,11 @@ const OFFICIAL_HOSTS = new Set([
 const OPEN_LICENCE =
   /^(?:CC BY \d\.\d|CC0(?: 1\.0)?|No copyright \(NZ legislation\)|Public domain)$/;
 
+/** Words that tell a reader which edition applies to their job. */
+const EDITION_DIRECTIVE = /\b(current|latest|in force|new work|recent builds?|applies)\b/i;
+const NCC_ADOPTION_QUALIFIER =
+  "check which NCC edition your state or territory has adopted for your project's approval date";
+
 /** Sources the founder excluded, whatever their licence verdict. */
 const EXCLUDED =
   /iicrc|standards australia|standards\.org\.au|branz|fwpa|woodsolutions|timber queensland|timberqueensland|codehub/i;
@@ -98,6 +103,33 @@ describe('free-resources data', () => {
     expect(FREE_RESOURCES.some((r) => new URL(r.url).hostname.endsWith('carsi.com.au'))).toBe(
       false
     );
+  });
+
+  // NCC 2025 commences on different dates by state and territory (ABCB adoption table,
+  // https://ncc.abcb.gov.au/ncc-2025-state-and-territory-adoption-information, accessed
+  // 14/10/2026: NSW and Qld 1 May 2027, NT not adopted). No card may tell readers an edition is
+  // "current" or is the one for new work without sending them to their state's adoption.
+  it('never points readers to an NCC edition without the state-adoption qualifier', () => {
+    for (const r of FREE_RESOURCES) {
+      const mentionsNcc = /\bNCC\b|National Construction Code/i.test(
+        [r.id, r.title, r.note].join(' ')
+      );
+      if (!mentionsNcc) continue;
+      if (EDITION_DIRECTIVE.test(r.note)) {
+        expect(r.note, r.id).toContain(NCC_ADOPTION_QUALIFIER);
+      }
+    }
+  });
+
+  it('flags an unqualified edition directive in the check above', () => {
+    for (const bad of [
+      'The current housing provisions, for NCC 2025. Use it for recent builds and new work.',
+      'The current edition of Volume Two for houses.',
+      'The latest NCC. Start here for new work.',
+    ]) {
+      expect(bad).toMatch(EDITION_DIRECTIVE);
+      expect(bad).not.toContain(NCC_ADOPTION_QUALIFIER);
+    }
   });
 
   it('rejects a non-open licence and an excluded source in the checks above', () => {
