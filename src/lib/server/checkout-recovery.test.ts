@@ -98,12 +98,15 @@ describe('checkout recovery flag', () => {
     });
   });
 
-  it('both checkout creators spread the recovery params into the session', () => {
+  it('both checkout creators gate recovery on a verified signed-in identity', () => {
     for (const file of [
       'src/lib/server/local-course-checkout.ts',
       'app/api/lms/subscription/checkout/route.ts',
     ]) {
-      expect(readFileSync(join(process.cwd(), file), 'utf8')).toContain('...checkoutRecoveryParams()');
+      const src = readFileSync(join(process.cwd(), file), 'utf8');
+      expect(src).toContain('checkoutRecoveryParamsForVerifiedUser(');
+      expect(src).toContain('...recovery,');
+      expect(src).not.toContain('...checkoutRecoveryParams()');
     }
   });
 

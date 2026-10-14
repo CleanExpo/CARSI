@@ -46,6 +46,37 @@ export function checkoutRecoveryParams(
   return { after_expiration: { recovery: { enabled: true, allow_promotion_codes: false } } };
 }
 
+/**
+ * Recovery params for a session, but ONLY when the checkout email belongs to a verified,
+ * signed-in account: `userId` from the server session, that user's row marked `isVerified`,
+ * and its stored email equal to the checkout email. A guest or body-supplied email never gets
+ * recovery: `/api/lms/checkout` accepts `customer_email` from unauthenticated callers, so
+ * enabling recovery there would let anyone make CARSI email recovery links to any address.
+ * Fails closed: a lookup error returns no recovery.
+ */
+export async function checkoutRecoveryParamsForVerifiedUser(
+  identity: { userId?: string | null; email: string },
+  deps: {
+    env?: NodeJS.ProcessEnv;
+    findUser?: (id: string) => Promise<{ email: string; isVerified: boolean } | null>;
+  } = {}
+): Promise<Pick<Stripe.Checkout.SessionCreateParams, 'after_expiration'>> {
+  const params = checkoutRecoveryParams(deps.env);
+  if (!params.after_expiration || !identity.userId) return {};
+  try {
+    const findUser =
+      deps.findUser ??
+      ((id: string) =>
+        prisma.lmsUser.findUnique({ where: { id }, select: { email: true, isVerified: true } }));
+    const user = await findUser(identity.userId);
+    const sameEmail =
+      user?.email.trim().toLowerCase() === identity.email.trim().toLowerCase();
+    return user?.isVerified === true && sameEmail ? params : {};
+  } catch {
+    return {};
+  }
+}
+
 /** Metadata `source` values of the sessions this module recovers. */
 export const RECOVERABLE_CHECKOUT_SOURCES = {
   course: 'carsi-next-local-checkout',
