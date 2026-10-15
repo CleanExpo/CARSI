@@ -8634,7 +8634,9 @@
     "designationProgram": null,
     "designation": null,
     "humanSignOff": "PENDING",
-    "noAiRewrite": true
+    "noAiRewrite": true,
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1792008825/carsi/course-intro/f965eece-dad9-407f-a10d-171a7d46308d.mp4",
+    "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_fa3031777dc3b757c9618e65f3a881f3.srt?Expires=1792613623&Signature=buBl5laj04TR7LSOTKcu2wkNTZByrV7lrC-jUZkGsBUcZR76wGGRrbt3UgjpzF3pJQmtMJJnxe5OaH1~Hr6ciqFpl~yVtiCnMDBXAjPLG6ajcPdgrMs7G0KNv5RVZNHzqC4qP755ad3ILJ-6SMA1DLPtclk8C3U9yb3oW0B6Ch1etlVu6dxOd-19tLj9MbFZMkscYDSlXKsNapK5Fn7C1NAOrRny34Ia1xgTO-H4sTjSAPcXAc9Sam9bcfAtyvCeajPuNemXDs340eIe4O4DZfsCU0avM5nQZryZ7nviLSGXl4OR3uDEgxi-ssMGv1UzoikuISeYqiBM80M6wv-yBw__&Key-Pair-Id=K38HBHX5LX3X2H"
    },
    "isPublished": false,
    "modules": [
@@ -8718,7 +8720,8 @@
       }
      ]
     }
-   ]
+   ],
+   "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1792008825/carsi/course-intro/f965eece-dad9-407f-a10d-171a7d46308d.mp4"
   }
  ]
 }
