@@ -43,6 +43,7 @@ const QUIZ_FILES = [
   'carpet-cleaning-fundamentals-quiz.json',
   'timber-floor-assessment-restoration-quiz.json',
   'assessing-indoor-environment-conditions-quiz.json',
+  'ozone-and-hydroxyl-generators-what-the-evidence-says-quiz.json',
 ];
 
 type QuizQuestion = {

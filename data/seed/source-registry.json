@@ -97,6 +97,46 @@
       "inUse": true
     },
     {
+      "domain": "tga.gov.au",
+      "tier": 1,
+      "name": "Therapeutic Goods Administration",
+      "jurisdiction": "AU national",
+      "covers": "Regulation of disinfectants, sterilants and excluded goods (including sanitation and environmental control equipment) and what claims trigger ARTG inclusion",
+      "inUse": true
+    },
+    {
+      "domain": "aer.gov.au",
+      "tier": 1,
+      "name": "Australian Energy Regulator",
+      "jurisdiction": "AU national",
+      "covers": "Electricity network regulation, including the 230 V nominal low-voltage supply",
+      "inUse": true
+    },
+    {
+      "domain": "epa.gov",
+      "tier": 2,
+      "name": "US Environmental Protection Agency",
+      "jurisdiction": "international (US federal)",
+      "covers": "Public-health evidence summaries on indoor air quality, including ozone generators sold as air cleaners. Overseas agency: authority for the science, not for Australian law.",
+      "inUse": true
+    },
+    {
+      "domain": "arb.ca.gov",
+      "tier": 2,
+      "name": "California Air Resources Board",
+      "jurisdiction": "international (US state)",
+      "covers": "Indoor air cleaner regulation and consumer guidance on ozone-generating air purifiers. Overseas regulator: context only, not Australian law.",
+      "inUse": true
+    },
+    {
+      "domain": "pubmed.ncbi.nlm.nih.gov",
+      "tier": 2,
+      "name": "PubMed (US National Library of Medicine)",
+      "jurisdiction": "international",
+      "covers": "Index of peer-reviewed research; cite the PubMed record of the peer-reviewed paper",
+      "inUse": true
+    },
+    {
       "domain": "iicrc.org",
       "name": "IICRC",
       "tier": 3,

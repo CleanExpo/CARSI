@@ -66,6 +66,12 @@ export async function POST(request: NextRequest) {
   let isFree = false;
   try {
     const db = await getOrCreateCourseBySlug(slug);
+    // Public, unauthenticated account creation: only a published course may be
+    // enrolled here. A draft (or anything not live) gets the same 404 as a missing
+    // course, before any account, enrolment or email is created.
+    if (db.status !== 'published' || db.isPublished !== true) {
+      return NextResponse.json({ detail: 'Course not found' }, { status: 404 });
+    }
     const listAud = Number(db.priceAud);
     isFree = db.isFree || !Number.isFinite(listAud) || listAud <= 0;
   } catch {

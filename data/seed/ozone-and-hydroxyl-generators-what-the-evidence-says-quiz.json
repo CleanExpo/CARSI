@@ -1,0 +1,103 @@
+{
+ "version": 1,
+ "courseSlug": "ozone-and-hydroxyl-generators-what-the-evidence-says",
+ "quizzes": [
+  {
+   "quizId": "45d510cb-7160-471b-828a-cf440eadba73",
+   "lessonTitle": "Knowledge check",
+   "title": "Ozone and Hydroxyl Generators: What the Evidence Says \u2014 Knowledge Check",
+   "passPercentage": 80,
+   "attemptsAllowed": 3,
+   "questions": [
+    {
+     "questionText": "What is the Australian workplace exposure limit for ozone?",
+     "options": [
+      "An 8-hour average of 1 ppm",
+      "A peak limitation of 0.1 ppm (0.2 mg/m\u00b3), not to be exceeded at any time",
+      "There is no Australian limit for ozone",
+      "5 ppm for up to 15 minutes, four times a day"
+     ],
+     "correctIndex": 1,
+     "points": 1
+    },
+    {
+     "questionText": "What happens to the ozone limit when the Workplace Exposure Limits (WEL) replace the WES on 1 December 2026?",
+     "options": [
+      "It is removed",
+      "It doubles",
+      "The July 2025 WEL list keeps ozone at a peak limit of 0.1 ppm (0.2 mg/m\u00b3)",
+      "It becomes advisory only"
+     ],
+     "correctIndex": 2,
+     "points": 1
+    },
+    {
+     "questionText": "According to the US EPA, what does ozone do to biological pollutants at concentrations that do not exceed public health standards?",
+     "options": [
+      "It removes them completely within an hour",
+      "It does not effectively remove viruses, bacteria, mould or other biological pollutants",
+      "It removes mould from inside plasterboard",
+      "It is only effective against bacteria"
+     ],
+     "correctIndex": 1,
+     "points": 1
+    },
+    {
+     "questionText": "A client wants you to run an ozone machine for a musty smell. What should you do first?",
+     "options": [
+      "Run the machine overnight with the family at home",
+      "Spray fragrance to cover it",
+      "Find and fix the moisture or mould source, then ventilate",
+      "Tell them ozone is TGA approved"
+     ],
+     "correctIndex": 2,
+     "points": 1
+    },
+    {
+     "questionText": "What did the 2021 Georgia Tech study measure while a hydroxyl radical generator ran in an office?",
+     "options": [
+      "Nothing changed",
+      "Rises in oxygenated organic compounds, especially organic acids, and new secondary organic aerosol particles",
+      "A complete removal of all odours",
+      "A fall in particle levels to zero"
+     ],
+     "correctIndex": 1,
+     "points": 1
+    },
+    {
+     "questionText": "TGA guidance lists air sanitisers and deodorisers (e.g. ozone) among its examples of excluded sanitation and environmental control equipment. What does that mean for you?",
+     "options": [
+      "The TGA has approved them as safe and effective",
+      "They cannot be sold in Australia",
+      "The TGA does not regulate them as excluded equipment, but an air sanitiser designed to have an effect in the human body is a medical device, and consumer law applies to any claims you make",
+      "You can advertise them as killing all viruses"
+     ],
+     "correctIndex": 2,
+     "points": 1
+    },
+    {
+     "questionText": "After an ozone treatment, a calibrated meter shows a reading below the 0.1 ppm peak limit. What does that reading tell you on its own?",
+     "options": [
+      "The room is cleared for everyone, including the family, to go back in",
+      "The air is under a workers' limit that protects most but not all people; when occupants return is still a site-specific decision",
+      "Any by-products of the treatment have gone as well",
+      "Nothing, because ozone cannot be measured on site"
+     ],
+     "correctIndex": 1,
+     "points": 1
+    },
+    {
+     "questionText": "A sales rep tells you a hydroxyl unit is safe to run with people at home. What is the right response?",
+     "options": [
+      "Accept it, they know the product",
+      "Ask for the independent test report, including measured ozone output and by-products",
+      "Run it and see if anyone complains",
+      "Repeat the claim to your client"
+     ],
+     "correctIndex": 1,
+     "points": 1
+    }
+   ]
+  }
+ ]
+}

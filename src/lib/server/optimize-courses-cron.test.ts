@@ -7,7 +7,11 @@ import {
   RECAP_MODULE_TITLE,
   targetModuleCount,
 } from './optimize-course-content';
-import { buildOptimizeCronEmail, parseOptimizeCronSearch } from './optimize-courses-cron';
+import {
+  buildOptimizeCronEmail,
+  parseOptimizeCronSearch,
+  selectOptimizeBatch,
+} from './optimize-courses-cron';
 
 describe('optimize courses cron helpers', () => {
   it('defaults to one course per tick', () => {
@@ -93,5 +97,51 @@ describe('optimize courses cron helpers', () => {
     expect(long.length).toBe(17);
     expect(long[0]).toBe('Topic 1');
     expect(long[long.length - 1]).toBe(RECAP_MODULE_TITLE);
+  });
+});
+
+describe('AI rewrite exclusion (cited, fact-checked courses)', () => {
+  const now = new Date();
+  const row = (slug: string, isFree: boolean, meta: unknown = null) => ({
+    id: slug,
+    slug,
+    title: slug,
+    isFree,
+    updatedAt: now,
+    meta,
+  });
+
+  it('never selects the cited ozone/hydroxyl course, even when free and never optimised', () => {
+    const courses = [
+      row('ozone-and-hydroxyl-generators-what-the-evidence-says', true),
+      row('some-other-free-course', true),
+    ];
+    const { pending } = selectOptimizeBatch(courses, 'free');
+    expect(pending.map((c) => c.slug)).toEqual(['some-other-free-course']);
+  });
+
+  it('skips the denylisted slug in the paid scope too, in case it is ever priced', () => {
+    const { pending } = selectOptimizeBatch(
+      [row('ozone-and-hydroxyl-generators-what-the-evidence-says', false)],
+      'paid'
+    );
+    expect(pending).toEqual([]);
+  });
+
+  it('honours a per-course meta.noAiRewrite flag', () => {
+    const courses = [row('flagged', true, { noAiRewrite: true }), row('unflagged', true)];
+    const { pending } = selectOptimizeBatch(courses, 'free');
+    expect(pending.map((c) => c.slug)).toEqual(['unflagged']);
+  });
+
+  it('applies the limit after the exclusion', () => {
+    const courses = [
+      row('ozone-and-hydroxyl-generators-what-the-evidence-says', true),
+      row('a', true),
+      row('b', true),
+    ];
+    const { batch, pending } = selectOptimizeBatch(courses, 'free', 1);
+    expect(batch.map((c) => c.slug)).toEqual(['a']);
+    expect(pending).toHaveLength(2);
   });
 });

@@ -196,7 +196,8 @@ describe('buildCourseFallbackKeywords', () => {
 
 describe('current repository truth', () => {
   it('freezes catalogue, surface, card, price, and CEC truth', () => {
-    expect(catalogue).toHaveLength(71);
+    // 72 = 71 + the free ozone/hydroxyl evidence course (draft, isFree, priceAud 0), 14/10/2026.
+    expect(catalogue).toHaveLength(72);
     expect(surfaceSlugs).toHaveLength(24);
     expect(new Set(surfaceSlugs).size).toBe(24);
     expect(readdirSync(cardsDirectory).filter((name) => name.endsWith('.json'))).toHaveLength(80);
