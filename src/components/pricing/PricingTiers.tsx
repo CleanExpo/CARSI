@@ -116,6 +116,7 @@ export function PricingTiers({
           Seat-based bundles for restoration businesses — owner dashboard, invites, and progress
           across your crew.
         </p>
+        {teamsEnabled ? (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           {resolveTeamTiers(teamsEnabled).map((tier) => (
             <div
@@ -171,7 +172,36 @@ export function PricingTiers({
             </div>
           ))}
         </div>
+        ) : (
+          <TeamSeatsCard />
+        )}
       </section>
     </>
+  );
+}
+
+/**
+ * Teams subscriptions off: instead of three "Coming soon" plan cards, one card that sells what
+ * already works today, team seats on any single course through the per-course checkout
+ * (`purchase_mode: 'team'`, quantity = seats). No team price is shown: a seat costs the
+ * course's own price, which the buyer sees on the course page.
+ */
+function TeamSeatsCard() {
+  return (
+    <div className="mx-auto flex max-w-xl flex-col rounded-lg border border-[rgba(15,95,168,0.35)] bg-[#eef7ff] p-6 shadow-sm">
+      <h3 className="mb-1 text-lg font-bold text-slate-950">Team seats, per course</h3>
+      <p className="mt-3 text-sm text-slate-600">
+        Open any course, choose &ldquo;My team&rdquo; at checkout and set the number of learners.
+        Each seat is the course price. You invite your teammates from the team dashboard after
+        checkout.
+      </p>
+      <Link
+        data-testid={tierCtaTestId('team_seats', false)}
+        href="/courses"
+        className="mt-6 flex min-h-11 w-full items-center justify-center rounded-lg bg-[#0f5fa8] px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+      >
+        Buy seats
+      </Link>
+    </div>
   );
 }

@@ -14,6 +14,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import {
   checkPricingCard,
+  checkTeamsPricingCard,
   checkTeamsCheckout,
   checkYearlyPriceEnv,
   classifyResponse,
@@ -109,6 +110,38 @@ describe('Teams checkout check', () => {
   it('a Checkout URL in the body always fails', () => {
     const res = { status: 401, json: { url: 'https://checkout.stripe.com/x' } };
     expect(checkTeamsCheckout({ res, expectOnSale: true }).result).toBe('FAIL');
+  });
+});
+
+describe('Teams pricing card check', () => {
+  const planSoon = `<span data-testid="${tierCtaTestId('starter', true)}">Coming soon</span>`;
+  const planBuy = `<a data-testid="${tierCtaTestId('starter', false)}">Start Teams plan</a>`;
+  const seats = `<a data-testid="${tierCtaTestId('team_seats', false)}">Buy seats</a>`;
+  const run = (text: string, expectOnSale: boolean) =>
+    checkTeamsPricingCard({ name: 'teams', res: { status: 200, text }, expectOnSale }).result;
+
+  it('Teams off: per-course seats card with no plan card passes, as does the old coming-soon card', () => {
+    expect(run(seats, false)).toBe('OK');
+    expect(run(planSoon, false)).toBe('OK');
+  });
+
+  it('Teams off: fails when a plan is buyable or when neither card is present', () => {
+    expect(run(planBuy, false)).toBe('FAIL');
+    expect(run(planBuy + seats, false)).toBe('FAIL');
+    expect(run('<p>changed markup</p>', false)).toBe('FAIL');
+  });
+
+  it('Teams on: only a buyable plan card passes', () => {
+    expect(run(planBuy, true)).toBe('OK');
+    expect(run(seats, true)).toBe('FAIL');
+    expect(run(planSoon, true)).toBe('FAIL');
+  });
+
+  it('a gateway error is INFRA, not a verdict', () => {
+    expect(
+      checkTeamsPricingCard({ name: 'teams', res: { status: 502, text: '' }, expectOnSale: false })
+        .result
+    ).toBe('INFRA');
   });
 });
 

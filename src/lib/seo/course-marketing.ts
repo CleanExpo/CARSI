@@ -173,6 +173,15 @@ export function courseImageAlt(slug: string, fallbackTitle: string): string {
   return getCourseMarketing(slug)?.imageAlt ?? fallbackTitle;
 }
 
+/**
+ * Page `<title>` without a trailing "| CARSI". The root layout's title template appends
+ * " | CARSI" to every page title, so a title that already ends with it rendered
+ * "… | CARSI | CARSI". Open Graph / Twitter titles are not templated and keep the suffix.
+ */
+export function withoutSiteTitleSuffix(title: string): string {
+  return title.replace(/\s*\|\s*CARSI\s*$/i, '').trim() || title;
+}
+
 /** Next.js Metadata (title/description/keywords/Open Graph) for a course page. */
 export function courseMetadata(opts: {
   slug: string;
@@ -184,7 +193,7 @@ export function courseMetadata(opts: {
   const title = m?.seoTitle ?? opts.fallbackTitle;
   const description = m?.metaDescription ?? '';
   return {
-    title,
+    title: withoutSiteTitleSuffix(title),
     description,
     keywords: m?.keywords,
     alternates: { canonical: opts.url },

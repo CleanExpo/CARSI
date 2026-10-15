@@ -14,7 +14,7 @@ import { getNextCourseRecommendationsForStudent } from '@/lib/server/renewal-sum
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Course Catalogue | CARSI',
+  title: 'Course Catalogue',
   description: 'Find training that fits your professional goals.',
 };
 

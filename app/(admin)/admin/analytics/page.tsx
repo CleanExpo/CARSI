@@ -6,7 +6,7 @@ import { adminGlassCard } from '@/components/admin/admin-learner-ui';
 import { cn } from '@/lib/utils';
 
 export const metadata = {
-  title: 'Analytics | Admin | CARSI',
+  title: 'Analytics | Admin',
 };
 
 export default function AdminAnalyticsPage() {

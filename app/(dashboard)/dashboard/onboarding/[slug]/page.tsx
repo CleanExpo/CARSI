@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import { OnboardingProgramClient } from '@/components/onboarding/OnboardingProgramClient';
 
 export const metadata = {
-  title: 'Onboarding Program | CARSI',
+  title: 'Onboarding Program',
   description: 'Enterprise maintenance workforce onboarding — operational readiness and professional standards.',
 };
 

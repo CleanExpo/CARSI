@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { PROFESSIONAL_DIRECTORY_STUB } from './professional-directory.stub';
 import {
@@ -34,5 +34,44 @@ describe('professional-directory', () => {
   it('keeps stub fixtures out of the runtime module', () => {
     expect(PROFESSIONAL_DIRECTORY_STUB[0]?.name).toBeTruthy();
     expect(PROFESSIONAL_DIRECTORY_STUB.some((p) => 'nrpg_member_id' in p)).toBe(false);
+  });
+});
+
+describe('professional-directory search indexing while it is a coming-soon gate', () => {
+  async function loadSitemapUrls(env: Record<string, string | undefined>): Promise<string[]> {
+    const saved = { ...process.env };
+    try {
+      for (const [k, v] of Object.entries(env)) {
+        if (v === undefined) delete process.env[k];
+        else process.env[k] = v;
+      }
+      delete process.env.DATABASE_URL;
+      vi.resetModules();
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, json: async () => ({}) }));
+      const { default: sitemap } = await import('../../../app/sitemap');
+      return (await sitemap()).map((entry) => entry.url);
+    } finally {
+      vi.unstubAllGlobals();
+      process.env = saved;
+    }
+  }
+
+  it('the sitemap omits /professional-directory unless the directory is live, and lists the CEC hub', async () => {
+    const off = await loadSitemapUrls({ PROFESSIONAL_DIRECTORY_LIVE: undefined });
+    expect(off.some((u) => u.endsWith('/professional-directory'))).toBe(false);
+    expect(off.some((u) => u.endsWith('/iicrc-cec-courses'))).toBe(true);
+    expect(off.some((u) => u.endsWith('/courses'))).toBe(true);
+
+    const on = await loadSitemapUrls({ PROFESSIONAL_DIRECTORY_LIVE: 'true' });
+    expect(on.some((u) => u.endsWith('/professional-directory'))).toBe(true);
+  });
+
+  it('the coming-soon page is noindex; nothing else changes', async () => {
+    delete process.env.PROFESSIONAL_DIRECTORY_LIVE;
+    vi.resetModules();
+    const { generateMetadata } = await import('../../../app/(public)/professional-directory/page');
+    const meta = await generateMetadata();
+    expect(meta.robots).toEqual({ index: false, follow: true });
+    expect(meta.alternates?.canonical).toBe('https://carsi.com.au/professional-directory');
   });
 });

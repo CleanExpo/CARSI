@@ -142,6 +142,33 @@ export function validateCecApprovals(registry, catalog) {
   return { errors, approvedCount };
 }
 
+/**
+ * Approved entries whose IICRC approval lapses within `days` of `now`, or has already lapsed.
+ * NON-BLOCKING: the caller prints these as warnings and does not fail. An expired approval is
+ * still a valid registry record (public surfaces already stop showing its CEC hours via
+ * `isCecApprovalCurrent`); the warning exists so renewal is submitted before the date.
+ * Returns `{ slug, expiresAt, daysLeft }` sorted soonest first.
+ */
+export function findExpiringCecApprovals(registry, now = new Date(), days = 90) {
+  const approvals = Array.isArray(registry?.approvals) ? registry.approvals : [];
+  const horizon = now.getTime() + days * 24 * 60 * 60 * 1000;
+  const out = [];
+  for (const entry of approvals) {
+    if (!entry || entry.status !== 'approved' || typeof entry.expiresAt !== 'string') continue;
+    const expires = Date.parse(entry.expiresAt);
+    if (!Number.isFinite(expires) || expires > horizon) continue;
+    const daysLeft = Math.ceil((expires - now.getTime()) / (24 * 60 * 60 * 1000));
+    out.push({ slug: entry.slug, expiresAt: entry.expiresAt, daysLeft });
+  }
+  return out.sort((a, b) => a.daysLeft - b.daysLeft);
+}
+
+/** One warning line per expiring approval; GitHub Actions renders `::warning::` as an annotation. */
+export function formatExpiryWarning({ slug, expiresAt, daysLeft }) {
+  const when = daysLeft <= 0 ? `EXPIRED on ${expiresAt}` : `expires ${expiresAt} (${daysLeft} days)`;
+  return `::warning title=CEC approval expiring::${slug} — IICRC CEC approval ${when}. Submit the renewal (npx tsx scripts/generate-cec-submission.ts ${slug}).`;
+}
+
 // Run the validator only when invoked directly (not when imported by the self-test).
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -175,6 +202,13 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
         '\nadds approvals, after per-course IICRC confirmation (see scripts/generate-cec-submission.ts).\n'
     );
     process.exit(1);
+  }
+
+  // Non-blocking: approvals lapsing within 90 days are warned about, never failed on.
+  const expiring = findExpiringCecApprovals(registry);
+  for (const item of expiring) console.log(formatExpiryWarning(item));
+  if (expiring.length > 0) {
+    console.log(`⚠ ${expiring.length} CEC approval(s) expire within 90 days or have expired (warning only).`);
   }
 
   const total = registry.approvals.length;

@@ -10,27 +10,28 @@ import {
   PUBLIC_SHELL_INNER_CLASS,
 } from '@/components/landing/public-shell-width';
 
-const FEATURED = {
-  quote:
-    'CARSI lets me finish CEC hours between jobs instead of taking a day off site. The certificates hold up when a client or an insurer asks for proof.',
-  role: 'Restoration technician',
-  region: 'Queensland',
+/**
+ * A homepage review must be real and attributed: a named person, with their consent, quoting
+ * what they actually said. The previous quotes were composites "representative of" learners,
+ * which is misleading under the Australian Consumer Law, so they were removed. The section
+ * renders nothing until attributed reviews are added here (founder input).
+ */
+export type HomeTestimonial = {
+  quote: string;
+  /** The reviewer's real name, as they consented to be named. Required. */
+  name: string;
+  role: string;
+  region: string;
 };
 
-const SECONDARY = [
-  {
-    quote:
-      'Onboarding new technicians is faster now. Everyone works through the same modules, and I can see progress without chasing anyone for paperwork.',
-    role: 'Operations manager',
-    region: 'New South Wales',
-  },
-  {
-    quote:
-      'Training used to eat a full day away from clients. Now the crew studies around the roster, and the work still gets done on time.',
-    role: 'Business owner',
-    region: 'Victoria',
-  },
-];
+export const HOME_TESTIMONIALS: readonly HomeTestimonial[] = [];
+
+/** Only attributed reviews are shown; an entry without a name or quote is dropped. */
+export function attributedTestimonials(
+  items: readonly HomeTestimonial[]
+): HomeTestimonial[] {
+  return items.filter((t) => t.name.trim() !== '' && t.quote.trim() !== '');
+}
 
 const spring = { type: 'spring' as const, stiffness: 120, damping: 22 };
 
@@ -38,8 +39,14 @@ const spring = { type: 'spring' as const, stiffness: 120, damping: 22 };
  * Light editorial social proof. One large featured quote, two smaller quotes
  * stacked beside it. Content-object cards are acceptable here.
  */
-export function HomeTestimonialsSection() {
+export function HomeTestimonialsSection({
+  testimonials = HOME_TESTIMONIALS,
+}: {
+  testimonials?: readonly HomeTestimonial[];
+} = {}) {
   const reduceMotion = useReducedMotion();
+  const [featured, ...secondary] = attributedTestimonials(testimonials);
+  if (!featured) return null;
 
   return (
     <section
@@ -53,8 +60,7 @@ export function HomeTestimonialsSection() {
             Training that holds up on real jobs
           </h2>
           <p className={`mt-4 ${LANDING_LEAD_CLASS}`}>
-            Voices from the field, representative of the technicians, managers, and owners who study
-            with CARSI.
+            Technicians, managers and owners who study with CARSI, in their own words.
           </p>
         </div>
 
@@ -68,18 +74,20 @@ export function HomeTestimonialsSection() {
           >
             <Quote className="h-10 w-10 text-[#2490ed]/25" aria-hidden />
             <blockquote className="mt-6 font-[family-name:var(--font-display)] text-2xl leading-snug font-medium text-balance text-slate-900 sm:text-[1.7rem]">
-              &ldquo;{FEATURED.quote}&rdquo;
+              &ldquo;{featured.quote}&rdquo;
             </blockquote>
             <figcaption className="mt-8 text-sm">
-              <span className="block font-semibold text-slate-900">{FEATURED.role}</span>
-              <span className="text-slate-500">{FEATURED.region}</span>
+              <span className="block font-semibold text-slate-900">{featured.name}</span>
+              <span className="text-slate-500">
+                {featured.role}, {featured.region}
+              </span>
             </figcaption>
           </motion.figure>
 
           <div className="flex flex-col gap-6">
-            {SECONDARY.map((testimonial, i) => (
+            {secondary.map((testimonial, i) => (
               <motion.figure
-                key={testimonial.role}
+                key={testimonial.name}
                 className="rounded-2xl border border-slate-200/80 bg-white p-6 transition-colors duration-300 hover:border-[#2490ed]/30 sm:p-7"
                 initial={reduceMotion ? false : { opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -91,8 +99,10 @@ export function HomeTestimonialsSection() {
                   &ldquo;{testimonial.quote}&rdquo;
                 </blockquote>
                 <figcaption className="mt-4 text-sm">
-                  <span className="block font-semibold text-slate-900">{testimonial.role}</span>
-                  <span className="text-slate-500">{testimonial.region}</span>
+                  <span className="block font-semibold text-slate-900">{testimonial.name}</span>
+                  <span className="text-slate-500">
+                    {testimonial.role}, {testimonial.region}
+                  </span>
                 </figcaption>
               </motion.figure>
             ))}

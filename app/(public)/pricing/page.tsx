@@ -24,8 +24,8 @@ export async function generateMetadata(): Promise<Metadata> {
     description: teamsLive
       ? 'Buy any CARSI course individually or choose yearly membership and Teams plans. Free Library available to everyone, no card required.'
       : live
-        ? 'Buy any CARSI course individually or choose yearly membership. Free Library available to everyone, no card required. Teams plans are coming soon.'
-        : 'Buy any CARSI course individually — with IICRC CEC tracking and verified certificates. Free Library available to everyone, no card required. Yearly membership and Teams plans are coming soon.',
+        ? 'Buy any CARSI course individually or choose yearly membership. Free Library available to everyone, no card required. Team seats are sold per course.'
+        : 'Buy any CARSI course individually — with IICRC CEC tracking and verified certificates. Free Library available to everyone, no card required. Team seats are sold per course. Yearly membership is coming soon.',
     keywords: [
       'CARSI pricing',
       'restoration training membership',
@@ -40,8 +40,8 @@ export async function generateMetadata(): Promise<Metadata> {
       description: teamsLive
         ? 'Free Library, per-course enrolment, yearly membership, and Teams seat plans.'
         : live
-          ? 'Free Library, per-course enrolment and yearly membership. Teams plans are coming soon.'
-          : 'Free Library for everyone and per-course enrolment, available today. Yearly membership and Teams plans are coming soon.',
+          ? 'Free Library, per-course enrolment and yearly membership. Team seats are sold per course.'
+          : 'Free Library for everyone and per-course enrolment, available today. Team seats are sold per course. Yearly membership is coming soon.',
       type: 'website',
       url: 'https://carsi.com.au/pricing',
     },
@@ -114,8 +114,8 @@ export default async function PricingPage() {
               {teamsLive
                 ? 'Buy any course individually, unlock 100% access with yearly membership, or choose Teams seat plans for your crew.'
                 : live
-                  ? 'Buy any course individually or unlock 100% access with yearly membership. Teams plans are coming soon.'
-                  : 'Buy any course individually. Free Library for everyone — no card required. Yearly membership and Teams plans are coming soon.'}
+                  ? 'Buy any course individually or unlock 100% access with yearly membership. Team seats are sold per course.'
+                  : 'Buy any course individually. Free Library for everyone — no card required. Team seats are sold per course. Yearly membership is coming soon.'}
             </p>
             <p className="mx-auto mt-4 max-w-2xl rounded-lg border border-[#f2cf8f] bg-[#fff8ed] px-4 py-3 text-sm leading-relaxed text-[#7a3500]">
               CARSI courses carry CARSI Southern Hemisphere Restoration Designations. CARSI does not
@@ -167,11 +167,9 @@ export default async function PricingPage() {
                 Hospital, aged-care and hotel crews
               </h2>
               <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
-                Published team prices are below. The facility-management page maps those seats to
-                the live site pathways and the employer proof-pack.{' '}
                 {teamsLive
-                  ? 'Start a Teams plan below, or contact CARSI to plan a larger crew.'
-                  : 'Team checkout is coming soon — contact CARSI to start a crew.'}
+                  ? 'Published team prices are below. The facility-management page maps those seats to the live site pathways and the employer proof-pack. Start a Teams plan below, or contact CARSI to plan a larger crew.'
+                  : 'Buy team seats on any course: see Teams below. The facility-management page maps courses to the live site pathways and the employer proof-pack, or contact CARSI to plan a larger crew.'}
               </p>
             </div>
             <Link

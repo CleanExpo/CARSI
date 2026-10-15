@@ -42,7 +42,7 @@ export default async function DashboardCredentialPage({
 export async function generateMetadata({ params }: { params: Promise<{ credentialId: string }> }) {
   const { credentialId } = await params;
   return {
-    title: `Credential Verification — ${credentialId} | CARSI`,
+    title: `Credential Verification — ${credentialId}`,
     description: 'Verify an IICRC CEC credential issued by CARSI',
     robots: 'index, follow',
   };

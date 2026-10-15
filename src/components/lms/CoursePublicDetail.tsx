@@ -14,6 +14,11 @@ import { CourseThumbnail } from '@/components/lms/CourseThumbnail';
 import { EnrolButton } from '@/components/lms/EnrolButton';
 import type { DesignationDefinition } from '@/lib/designations/registry';
 
+/** The "Earns N IICRC CEC hour(s)" label, pluralised, from the resolved approval hours. */
+export function cecEarnsLabel(cecHours: string): string {
+  return `Earns ${cecHours} IICRC CEC ${Number(cecHours) === 1 ? 'hour' : 'hours'}`;
+}
+
 export type CoursePublicDetailModel = {
   slug: string;
   title: string;
@@ -88,10 +93,9 @@ export function CoursePublicDetail({
       value: course.duration_hours ? `${course.duration_hours}h` : 'Own pace',
       label: 'Duration',
     },
-    {
-      value: course.cec_hours ?? '—',
-      label: course.cec_hours ? 'Approved CECs' : 'CEC hours',
-    },
+    // A course without an in-force IICRC approval shows no CEC stat at all: "CEC hours —"
+    // beside a CEC audience line read as a contradiction.
+    ...(course.cec_hours ? [{ value: course.cec_hours, label: 'IICRC CEC hours' }] : []),
     { value: '24/7', label: 'Online access' },
   ];
 
@@ -135,7 +139,7 @@ export function CoursePublicDetail({
               <div className="mt-5 flex flex-wrap gap-2">
                 {course.level ? <Pill>{course.level}</Pill> : null}
                 {course.category ? <Pill>{course.category}</Pill> : null}
-                {course.cec_hours ? <Pill>{`${course.cec_hours} CECs`}</Pill> : null}
+                {course.cec_hours ? <Pill>{cecEarnsLabel(course.cec_hours)}</Pill> : null}
               </div>
 
               {aggregateRating ? (
@@ -386,7 +390,7 @@ export function CoursePublicDetail({
           <h2 className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>Start this course when the roster allows</h2>
           <p className={`mx-auto mt-5 max-w-lg ${LANDING_LEAD_CLASS}`}>
             {course.cec_hours
-              ? `Earn ${course.cec_hours} IICRC CECs and a verifiable digital credential on completion.`
+              ? `${cecEarnsLabel(course.cec_hours)} and a verifiable digital credential on completion.`
               : 'Complete the course and receive a verifiable digital credential for your portfolio.'}
           </p>
           <div className="mx-auto mt-10 max-w-sm">

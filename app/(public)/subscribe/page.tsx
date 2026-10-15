@@ -16,7 +16,7 @@ import { SubscribeCta } from './SubscribeCta';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Yearly Membership | CARSI',
+  title: 'Yearly Membership',
   description:
     'CARSI yearly membership — 100% access to all published courses for one learner for 12 months. GST included.',
 };

@@ -121,6 +121,33 @@ export function checkPricingCard({ name, res, tierId, expectOnSale }) {
 }
 
 /**
+ * Check: the Teams plan cards on /pricing match the Teams switch. With Teams off, /pricing
+ * sells per-course team seats instead of showing plan cards, so "not on sale" is either the
+ * plan card in its coming-soon state (older markup) or no plan card at all PLUS the
+ * per-course seats card. A page with neither is 'missing' and fails: the check must not go
+ * blind when markup changes.
+ */
+export function checkTeamsPricingCard({ name, res, expectOnSale }) {
+  if (classifyResponse(res) === 'infrastructure') return infra(name, res);
+  if (classifyResponse(res) !== 'ok') {
+    return { name, result: 'FAIL', detail: describeStatus(res) };
+  }
+  const html = res.text ?? '';
+  const state = pricingCardState(html, 'starter');
+  const seatsCard = html.includes(`data-testid="${tierCtaTestId('team_seats', false)}"`);
+  const ok = expectOnSale
+    ? state === 'buy'
+    : state === 'coming-soon' || (state === 'missing' && seatsCard);
+  return {
+    name,
+    result: ok ? 'OK' : 'FAIL',
+    detail: `plan card is "${state}", per-course seats card ${seatsCard ? 'present' : 'absent'}, expected ${
+      expectOnSale ? '"buy"' : 'no plan on sale'
+    }`,
+  };
+}
+
+/**
  * Check: the Teams checkout answers an unauthenticated POST the way the Teams switch says.
  * The route reads the flag before the session, so off = the app's 503 and on = 401.
  */
@@ -258,10 +285,9 @@ export async function runChecks({ base, env }) {
       tierId: 'pro_annual',
       expectOnSale: expectYearly,
     }),
-    checkPricingCard({
-      name: `Pricing page: Teams card is ${expectTeams ? 'on sale' : 'coming soon'}`,
+    checkTeamsPricingCard({
+      name: `Pricing page: Teams plans are ${expectTeams ? 'on sale' : 'not on sale'}`,
       res: pricing,
-      tierId: 'starter',
       expectOnSale: expectTeams,
     }),
     checkYearlyPriceEnv(env),
