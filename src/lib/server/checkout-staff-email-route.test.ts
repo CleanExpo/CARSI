@@ -23,8 +23,8 @@ vi.mock('@/lib/prisma', () => ({
   prisma: {
     lmsUser: {
       findUnique: vi.fn(
-        async ({ where }: { where: { email: string } }) =>
-          db.users.find((u) => u.email === where.email) ?? null
+        async ({ where }: { where: { email?: string; id?: string } }) =>
+          db.users.find((u) => (where.id ? u.id === where.id : u.email === where.email)) ?? null
       ),
     },
   },
@@ -35,6 +35,15 @@ vi.mock('@/lib/server/local-course-checkout', () => ({
     async ({ bodyEmail }: { bodyEmail?: string }) => bodyEmail?.trim().toLowerCase() || null
   ),
   createStripeCheckoutForCourse: stripe.create,
+}));
+
+// A cookie token "valid:<id>" verifies as that learner, whatever the database now says.
+vi.mock('@/lib/auth/session-jwt', () => ({
+  verifySessionToken: vi.fn(async (token: string) =>
+    token.startsWith('valid:')
+      ? { sub: token.slice(6), email: 'x@example.com', full_name: 'X', role: 'student' }
+      : null
+  ),
 }));
 
 vi.mock('@/lib/server/first-lesson', () => ({ getFirstLessonLearnPath: vi.fn(async () => null) }));
@@ -52,12 +61,12 @@ const ORIG = {
   ADMIN_PANEL_EMAILS: process.env.ADMIN_PANEL_EMAILS,
 };
 
-function post(body: Record<string, unknown>): Promise<Response> {
+function post(body: Record<string, unknown>, cookie?: string): Promise<Response> {
   return POST(
     new NextRequest('https://carsi.com.au/api/lms/checkout', {
       method: 'POST',
       body: JSON.stringify(body),
-      headers: { 'content-type': 'application/json' },
+      headers: { 'content-type': 'application/json', ...(cookie ? { cookie } : {}) },
     })
   );
 }
@@ -108,5 +117,35 @@ describe('POST /api/lms/checkout — unclaimed staff email', () => {
       });
       expect(res.status).toBe(404);
     }
+  });
+
+  it.each([
+    ['self', {}],
+    ['team', { purchase_mode: 'team', team_seat_count: 5 }],
+  ])(
+    'refuses a still-valid cookie for a deactivated learner (%s) before Stripe',
+    async (_l, extra) => {
+      db.users.push({ id: 'staff-3', email: 'ops@carsi.com.au', isActive: false });
+      const res = await post(
+        { slug: 'water-damage-essentials', ...extra },
+        'auth_token=valid:staff-3'
+      );
+      expect(res.status).toBe(401);
+      expect((await res.json()).code).toBe('inactive_account');
+      expect(stripe.create).not.toHaveBeenCalled();
+    }
+  );
+
+  it('refuses a cookie whose learner row is gone, and lets an active one through', async () => {
+    const gone = await post({ slug: 'water-damage-essentials' }, 'auth_token=valid:deleted-1');
+    expect(gone.status).toBe(401);
+    expect((await gone.json()).code).toBe('inactive_account');
+    db.users.push({ id: 'learner-9', email: 'learner9@example.com', isActive: true });
+    const ok = await post(
+      { slug: 'water-damage-essentials', customer_email: 'learner9@example.com' },
+      'auth_token=valid:learner-9'
+    );
+    expect(ok.status).toBe(404);
+    expect(stripe.create).not.toHaveBeenCalled();
   });
 });

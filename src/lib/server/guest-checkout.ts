@@ -122,6 +122,12 @@ export async function isReservedGuestCheckoutEmail(email: string): Promise<boole
   return !existing?.isActive;
 }
 
+/** True when a session's learner row still exists and is active (the webhook can fulfil for it). */
+export async function isActiveLearnerId(id: string): Promise<boolean> {
+  const user = await prisma.lmsUser.findUnique({ where: { id } });
+  return user?.isActive === true;
+}
+
 export async function ensureGuestUserFromStripeEmail(
   email: string,
   fullName?: string,

@@ -28,7 +28,7 @@ import {
   STRIPE_MIN_UNIT_AMOUNT_CENTS,
 } from '@/lib/server/user-discounts';
 import { getOrCreateCourseBySlug } from '@/lib/server/course-catalog-sync';
-import { isReservedGuestCheckoutEmail } from '@/lib/server/guest-checkout';
+import { isActiveLearnerId, isReservedGuestCheckoutEmail } from '@/lib/server/guest-checkout';
 import { getEntitlements } from '@/lib/server/entitlements';
 import { getFirstLessonLearnPath } from '@/lib/server/first-lesson';
 import {
@@ -86,6 +86,14 @@ export async function POST(request: NextRequest) {
     if (authTokenCookie) {
       const c = await verifySessionToken(authTokenCookie);
       if (c?.sub) studentId = c.sub;
+    }
+    // A still-valid token for a deactivated or deleted learner can't be fulfilled by the webhook,
+    // so refuse before charging.
+    if (studentId && !(await isActiveLearnerId(studentId))) {
+      return NextResponse.json(
+        { detail: 'Your session is no longer valid. Please sign in again.', code: 'inactive_account' },
+        { status: 401 },
+      );
     }
 
     const guestCheckout = body.guest_checkout === true;
