@@ -137,9 +137,8 @@ describe('admin quiz save', () => {
     );
     expect(kept).toBe('quiz-legacy');
     expect(lessons.some((l) => l.op === 'delete')).toBe(false);
-    expect(lessons.some((l) => l.contentType === 'quiz' && l.contentBody === 'quiz-legacy')).toBe(
-      true
-    );
+    expect(tx.lmsLesson.update).toHaveBeenCalledTimes(1);
+    expect(tx.lmsLesson.update.mock.calls[0][0].where.id).toBe('l1');
     expect(tx.lmsQuizQuestion.deleteMany).not.toHaveBeenCalled();
   });
 
@@ -149,12 +148,10 @@ describe('admin quiz save', () => {
     const ops: string[] = [];
     const tx = {
       lmsLesson: {
-        update: vi.fn(
-          async ({ where, data }: { where: { id: string }; data: { contentType: string } }) => {
-            ops.push(`update:${where.id}:${data.contentType}`);
-            return {};
-          }
-        ),
+        update: vi.fn(async ({ where }: { where: { id: string } }) => {
+          ops.push(`update:${where.id}`);
+          return {};
+        }),
         create: vi.fn(async ({ data }: { data: { contentType: string } }) => {
           ops.push(`create:${data.contentType}`);
           return {};
@@ -186,9 +183,7 @@ describe('admin quiz save', () => {
       ],
       true
     );
-    expect(ops).toContain('update:l2:quiz');
-    expect(ops).toContain('create:video');
-    expect(ops.filter((o) => o.startsWith('delete'))).toEqual([]);
+    expect(ops).toEqual(['update:l1', 'create:video']);
   });
 
   it('removing the reading before a quiz keeps the quiz lesson id and deletes only the reading', async () => {
@@ -208,9 +203,30 @@ describe('admin quiz save', () => {
       ],
       true
     );
-    expect(ops).toContain('update:l2:video');
-    expect(ops).toContain('update:l3:quiz');
-    expect(ops.filter((o) => o.startsWith('delete'))).toEqual(['delete:l1']);
-    expect(ops.some((o) => o.startsWith('create'))).toBe(false);
+    expect(ops).toEqual(['delete:l1', 'update:l2']);
+  });
+
+  // Review round 6: the editor shows one reading, so a course-level save deleted a module's second
+  // reading (and its learner progress) and renamed and reordered the kept quiz lesson, which
+  // changed its content version and staled saved quiz attempts.
+  it('a course-level save leaves a second reading and a custom-titled quiz exactly as they are', async () => {
+    const { tx, ops } = lessonTx();
+    await syncModuleLessons(
+      tx as never,
+      'c1',
+      'm1',
+      'Module 1: Introduction',
+      'First reading',
+      undefined,
+      undefined,
+      [
+        { id: 'l1', orderIndex: 0, contentType: 'text', contentBody: 'First reading' },
+        { id: 'l2', orderIndex: 1, contentType: 'text', contentBody: 'Second reading' },
+        { id: 'l3', orderIndex: 2, contentType: 'quiz', contentBody: 'quiz-custom' },
+      ],
+      true
+    );
+    expect(ops).toEqual(['update:l1']);
+    expect(tx.lmsLesson.update.mock.calls[0][0].data).not.toHaveProperty('orderIndex');
   });
 });

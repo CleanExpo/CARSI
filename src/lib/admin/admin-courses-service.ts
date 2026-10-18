@@ -422,39 +422,30 @@ export async function syncModuleLessons(
     quizId = existingQuizLesson.contentBody;
   }
 
+  // The course editor represents one reading, one video and one quiz per module. Only those
+  // lessons are written: every other lesson (a second reading, an omitted quiz) is left exactly
+  // as it is, and a kept lesson keeps its id and position, so learner progress survives and a
+  // quiz lesson's content version only changes when its quiz is saved.
   const desired = buildDesiredLessons(moduleTitle, textContent, videoUrl, quizId ?? undefined);
   const sortedExisting = [...existingLessons].sort((a, b) => a.orderIndex - b.orderIndex);
-
-  // Match each desired lesson to an existing lesson of the same kind (a quiz to the lesson that
-  // already holds that quiz) so lesson ids, and the learner progress and checkpoints bound to
-  // them, survive when a reading or video is added or removed around them. Matching by
-  // position used to move the quiz onto another lesson id and delete the original.
-  const used = new Set<string>();
-  const take = (pred: (ex: (typeof sortedExisting)[number]) => boolean) => {
-    const hit = sortedExisting.find((ex) => !used.has(ex.id) && pred(ex));
-    if (hit) used.add(hit.id);
-    return hit;
-  };
-  for (let i = 0; i < desired.length; i += 1) {
-    const d = desired[i];
+  let nextOrder = sortedExisting.length
+    ? sortedExisting[sortedExisting.length - 1].orderIndex + 1
+    : 0;
+  let created = 0;
+  for (const kind of ['text', 'video', 'quiz'] as const) {
+    if (kind === 'quiz' && !quiz) continue;
+    const d = desired.find((l) => l.contentType === kind);
     const ex =
-      d.contentType === 'quiz'
-        ? (take((e) => e.contentType === 'quiz' && e.contentBody === d.contentBody) ??
-          take((e) => e.contentType === 'quiz'))
-        : take((e) => e.contentType === d.contentType);
-    const isPreview = firstModule && i === 0;
-    if (ex) {
+      kind === 'quiz'
+        ? (sortedExisting.find((e) => e.contentType === 'quiz' && e.contentBody === quizId) ??
+          sortedExisting.find((e) => e.contentType === 'quiz'))
+        : sortedExisting.find((e) => e.contentType === kind);
+    if (d && ex) {
       await tx.lmsLesson.update({
         where: { id: ex.id },
-        data: {
-          title: d.title,
-          contentType: d.contentType,
-          contentBody: d.contentBody,
-          orderIndex: i,
-          isPreview,
-        },
+        data: { title: d.title, contentBody: d.contentBody },
       });
-    } else {
+    } else if (d) {
       await tx.lmsLesson.create({
         data: {
           id: randomUUID(),
@@ -462,14 +453,15 @@ export async function syncModuleLessons(
           title: d.title,
           contentType: d.contentType,
           contentBody: d.contentBody,
-          orderIndex: i,
-          isPreview,
+          orderIndex: nextOrder++,
+          isPreview: firstModule && sortedExisting.length === 0 && created === 0,
         },
       });
+      created += 1;
+    } else if (ex) {
+      // The editor removed this module's reading or video.
+      await tx.lmsLesson.delete({ where: { id: ex.id } });
     }
-  }
-  for (const ex of sortedExisting) {
-    if (!used.has(ex.id)) await tx.lmsLesson.delete({ where: { id: ex.id } });
   }
 
   return quizId;
