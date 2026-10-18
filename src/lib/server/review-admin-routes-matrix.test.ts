@@ -145,15 +145,17 @@ vi.mock('@/lib/prisma', () => {
     lmsEnrollment: { findUnique: async () => null },
     lmsUser: { findUnique: async () => null },
     lmsCourseReview: {
-      findFirst: async () => {
+      // Like Prisma, returns ONLY the selected fields (a lookup that forgets `isPublished` gets none).
+      findFirst: async ({ select }: { select: Record<string, boolean> }) => {
         m.reviewReads += 1;
-        return {
+        const row: Record<string, unknown> = {
           id: 'rev-1',
           rating: 1,
           title: 'Too basic',
           body: m.reviewHidden ? 'private phone number' : 'x',
           isPublished: !m.reviewHidden,
         };
+        return Object.fromEntries(Object.entries(row).filter(([k]) => select[k]));
       },
       findMany: async ({ where }: { where: { isPublished?: boolean } }) =>
         where.isPublished === true
