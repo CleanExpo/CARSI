@@ -1,0 +1,145 @@
+/**
+ * Quiz-loop review round 2: an admin course save must never erase a module's quiz or its authored
+ * explanations, and an explanation-only edit must keep question ids (and so the lesson's content
+ * version) unchanged, so no learner's in-progress quiz goes stale.
+ */
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('@/lib/prisma', () => ({ prisma: {} }));
+
+import { syncModuleLessons, writeModuleQuiz } from './admin-courses-service';
+
+const WHY = 'A reading above the dry standard for that material means it is still wet.';
+const saved = [
+  {
+    id: 'q-1',
+    questionText: 'Which reading shows wet timber?',
+    options: [{ text: 'A' }, { text: 'B' }],
+    correctIndex: 1,
+    points: 1,
+    explanation: null as string | null,
+  },
+  {
+    id: 'q-2',
+    questionText: 'When does drying stop?',
+    options: [{ text: 'A' }, { text: 'B' }],
+    correctIndex: 0,
+    points: 1,
+    explanation: WHY as string | null,
+  },
+];
+
+function quizTx(rows: typeof saved) {
+  const calls: string[] = [];
+  const tx = {
+    lmsQuiz: { upsert: vi.fn(async () => ({})) },
+    lmsQuizQuestion: {
+      findMany: vi.fn(async () => {
+        calls.push('read');
+        return rows.map((r) => ({ ...r }));
+      }),
+      update: vi.fn(
+        async ({
+          where,
+          data,
+        }: {
+          where: { id: string };
+          data: { explanation: string | null };
+        }) => {
+          calls.push(`update:${where.id}:${data.explanation}`);
+          return {};
+        }
+      ),
+      deleteMany: vi.fn(async () => {
+        calls.push('delete');
+        return { count: rows.length };
+      }),
+      create: vi.fn(async ({ data }: { data: { explanation: string | null } }) => {
+        calls.push(`create:${data.explanation}`);
+        return data;
+      }),
+    },
+  };
+  return { tx, calls };
+}
+
+const sameQuestions = saved.map((r) => ({
+  questionText: r.questionText,
+  options: ['A', 'B'],
+  correctIndex: r.correctIndex,
+}));
+
+describe('admin quiz save', () => {
+  it('an explanation-only edit updates rows in place: no delete, no new question ids', async () => {
+    const { tx, calls } = quizTx(saved);
+    await writeModuleQuiz(tx as never, 'c1', 'Module', {
+      id: 'quiz-1',
+      questions: [{ ...sameQuestions[0], explanation: 'New why.' }, sameQuestions[1]],
+    });
+    expect(calls).toEqual(['read', 'update:q-1:New why.']);
+  });
+
+  it('an unchanged save touches nothing and keeps every saved explanation', async () => {
+    const { tx, calls } = quizTx(saved);
+    await writeModuleQuiz(tx as never, 'c1', 'Module', { id: 'quiz-1', questions: sameQuestions });
+    expect(calls).toEqual(['read']);
+  });
+
+  it('a changed question set is rewritten, carrying explanations to questions with the same text', async () => {
+    const { tx, calls } = quizTx(saved);
+    await writeModuleQuiz(tx as never, 'c1', 'Module', {
+      id: 'quiz-1',
+      questions: [
+        sameQuestions[1],
+        { questionText: 'A brand-new question', options: ['A', 'B'], correctIndex: 0 },
+      ],
+    });
+    expect(calls).toEqual(['read', 'delete', `create:${WHY}`, 'create:null']);
+  });
+
+  it('an editor save that omits quiz data keeps the module quiz lesson (it used to delete it)', async () => {
+    const lessons: { op: string; contentType?: string; contentBody?: string | null }[] = [];
+    const tx = {
+      lmsLesson: {
+        update: vi.fn(
+          async ({ data }: { data: { contentType: string; contentBody: string | null } }) => {
+            lessons.push({ op: 'update', ...data });
+            return {};
+          }
+        ),
+        create: vi.fn(
+          async ({ data }: { data: { contentType: string; contentBody: string | null } }) => {
+            lessons.push({ op: 'create', ...data });
+            return {};
+          }
+        ),
+        delete: vi.fn(async () => {
+          lessons.push({ op: 'delete' });
+          return {};
+        }),
+      },
+      lmsQuizQuestion: { findMany: vi.fn(), deleteMany: vi.fn(), create: vi.fn() },
+      lmsQuiz: { upsert: vi.fn() },
+    };
+    const kept = await syncModuleLessons(
+      tx as never,
+      'c1',
+      'm1',
+      'Module',
+      'Reading',
+      undefined,
+      undefined,
+      [
+        { id: 'l1', orderIndex: 0, contentType: 'text', contentBody: 'Reading' },
+        { id: 'l2', orderIndex: 1, contentType: 'quiz', contentBody: 'quiz-legacy' },
+      ],
+      true
+    );
+    expect(kept).toBe('quiz-legacy');
+    expect(lessons.some((l) => l.op === 'delete')).toBe(false);
+    expect(lessons.some((l) => l.contentType === 'quiz' && l.contentBody === 'quiz-legacy')).toBe(
+      true
+    );
+    expect(tx.lmsQuizQuestion.deleteMany).not.toHaveBeenCalled();
+  });
+});
