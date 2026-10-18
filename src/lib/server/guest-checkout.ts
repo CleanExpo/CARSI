@@ -109,6 +109,18 @@ export async function findOrCreateGuestUser(params: {
   throw new Error('REGISTER_FAILED');
 }
 
+/**
+ * True when an unauthenticated guest checkout must be refused before payment: the email is
+ * admin-allowlisted and has no account yet. Fulfilment would never provision that address
+ * (ensureGuestUserFromStripeEmail returns null), so taking the payment would leave it unfulfilled.
+ */
+export async function isReservedGuestCheckoutEmail(email: string): Promise<boolean> {
+  const normalized = email.trim().toLowerCase();
+  if (!normalized || !isAdminAllowlistedEmail(normalized)) return false;
+  const existing = await prisma.lmsUser.findUnique({ where: { email: normalized } });
+  return !existing;
+}
+
 export async function ensureGuestUserFromStripeEmail(
   email: string,
   fullName?: string,

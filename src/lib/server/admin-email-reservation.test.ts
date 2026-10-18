@@ -76,7 +76,14 @@ vi.mock('@/lib/prisma', () => ({
   },
 }));
 
-import { ensureGuestUserFromStripeEmail, findOrCreateGuestUser } from '@/lib/server/guest-checkout';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+
+import {
+  ensureGuestUserFromStripeEmail,
+  findOrCreateGuestUser,
+  isReservedGuestCheckoutEmail,
+} from '@/lib/server/guest-checkout';
 import { provisionalPasswordHash, registerUserWithPassword } from '@/lib/server/lms-auth';
 
 const ORIG = {
@@ -183,5 +190,30 @@ describe('unverified account paths refuse admin-allowlisted emails', () => {
     const guest = await findOrCreateGuestUser({ email: 'guest@example.com', fullName: 'G' });
     expect(guest.status).toBe('created');
     expect(await ensureGuestUserFromStripeEmail('payer@example.com')).not.toBeNull();
+  });
+});
+
+describe('guest checkout refuses payment it could never fulfil', () => {
+  it('flags an unclaimed staff email, any case or spacing', async () => {
+    expect(await isReservedGuestCheckoutEmail('  Support@CARSI.com.au ')).toBe(true);
+    expect(await isReservedGuestCheckoutEmail('ops@carsi.com.au')).toBe(true);
+  });
+
+  it('lets an existing staff account and ordinary emails pay', async () => {
+    pushUser('adm-2', 'ops@carsi.com.au', '$2a$12$real', 'admin');
+    expect(await isReservedGuestCheckoutEmail('ops@carsi.com.au')).toBe(false);
+    expect(await isReservedGuestCheckoutEmail('learner@example.com')).toBe(false);
+    expect(await isReservedGuestCheckoutEmail('')).toBe(false);
+  });
+
+  it('the checkout route refuses a reserved guest email before any Stripe session is created', () => {
+    const src = readFileSync(path.join(process.cwd(), 'app/api/lms/checkout/route.ts'), 'utf8');
+    const guard = src.indexOf(
+      'if (guestCheckout && !studentId && (await isReservedGuestCheckoutEmail(customerEmail)))'
+    );
+    const firstStripe = src.indexOf('createStripeCheckoutForCourse(');
+    expect(guard).toBeGreaterThan(-1);
+    expect(firstStripe).toBeGreaterThan(guard);
+    expect(src.slice(guard, guard + 600)).toMatch(/status: 409/);
   });
 });

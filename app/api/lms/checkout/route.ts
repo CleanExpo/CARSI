@@ -28,6 +28,7 @@ import {
   STRIPE_MIN_UNIT_AMOUNT_CENTS,
 } from '@/lib/server/user-discounts';
 import { getOrCreateCourseBySlug } from '@/lib/server/course-catalog-sync';
+import { isReservedGuestCheckoutEmail } from '@/lib/server/guest-checkout';
 import { getEntitlements } from '@/lib/server/entitlements';
 import { getFirstLessonLearnPath } from '@/lib/server/first-lesson';
 import {
@@ -107,6 +108,19 @@ export async function POST(request: NextRequest) {
             'Sign in required, or provide your email for quick checkout.',
         },
         { status: 401 },
+      );
+    }
+
+    // A staff (admin-allowlisted) email with no account can't be provisioned by a guest payment,
+    // so refuse before charging rather than take money that can never be fulfilled.
+    if (guestCheckout && !studentId && (await isReservedGuestCheckoutEmail(customerEmail))) {
+      return NextResponse.json(
+        {
+          detail:
+            'This email belongs to a CARSI staff account. Sign in to that account, or contact CARSI support to set it up.',
+          code: 'reserved_staff_email',
+        },
+        { status: 409 },
       );
     }
 
