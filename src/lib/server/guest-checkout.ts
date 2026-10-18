@@ -110,15 +110,16 @@ export async function findOrCreateGuestUser(params: {
 }
 
 /**
- * True when an unauthenticated guest checkout must be refused before payment: the email is
- * admin-allowlisted and has no account yet. Fulfilment would never provision that address
- * (ensureGuestUserFromStripeEmail returns null), so taking the payment would leave it unfulfilled.
+ * True when an unauthenticated checkout must be refused before payment: the email is
+ * admin-allowlisted and has no active account. Fulfilment would never provision or authenticate
+ * that address (ensureGuestUserFromStripeEmail returns null; sessionClaimsForUserId rejects an
+ * inactive row), so taking the payment would leave it unfulfilled.
  */
 export async function isReservedGuestCheckoutEmail(email: string): Promise<boolean> {
   const normalized = email.trim().toLowerCase();
   if (!normalized || !isAdminAllowlistedEmail(normalized)) return false;
   const existing = await prisma.lmsUser.findUnique({ where: { email: normalized } });
-  return !existing;
+  return !existing?.isActive;
 }
 
 export async function ensureGuestUserFromStripeEmail(

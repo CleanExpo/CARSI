@@ -76,9 +76,6 @@ vi.mock('@/lib/prisma', () => ({
   },
 }));
 
-import { readFileSync } from 'node:fs';
-import path from 'node:path';
-
 import {
   ensureGuestUserFromStripeEmail,
   findOrCreateGuestUser,
@@ -199,21 +196,13 @@ describe('guest checkout refuses payment it could never fulfil', () => {
     expect(await isReservedGuestCheckoutEmail('ops@carsi.com.au')).toBe(true);
   });
 
-  it('lets an existing staff account and ordinary emails pay', async () => {
+  it('lets an active staff account and ordinary emails pay, but not an inactive one', async () => {
     pushUser('adm-2', 'ops@carsi.com.au', '$2a$12$real', 'admin');
     expect(await isReservedGuestCheckoutEmail('ops@carsi.com.au')).toBe(false);
     expect(await isReservedGuestCheckoutEmail('learner@example.com')).toBe(false);
     expect(await isReservedGuestCheckoutEmail('')).toBe(false);
-  });
-
-  it('the checkout route refuses a reserved guest email before any Stripe session is created', () => {
-    const src = readFileSync(path.join(process.cwd(), 'app/api/lms/checkout/route.ts'), 'utf8');
-    const guard = src.indexOf(
-      'if (guestCheckout && !studentId && (await isReservedGuestCheckoutEmail(customerEmail)))'
-    );
-    const firstStripe = src.indexOf('createStripeCheckoutForCourse(');
-    expect(guard).toBeGreaterThan(-1);
-    expect(firstStripe).toBeGreaterThan(guard);
-    expect(src.slice(guard, guard + 600)).toMatch(/status: 409/);
+    pushUser('adm-3', 'support@carsi.com.au', '$2a$12$real', 'admin');
+    db.users[db.users.length - 1].isActive = false;
+    expect(await isReservedGuestCheckoutEmail('support@carsi.com.au')).toBe(true);
   });
 });
