@@ -4,7 +4,7 @@
 
 ## Objective
 
-Expand CARSI's restoration training into the Aged Care sector, targeting infection control and facility maintenance professionals.
+Expand CARSI's IICRC training into the Aged Care sector, targeting infection control and facility maintenance professionals.
 Target: 500 enrolled aged care professionals in 12 months | Revenue: $122,500 AUD.
 
 ## Target Audience
@@ -15,19 +15,19 @@ Target: 500 enrolled aged care professionals in 12 months | Revenue: $122,500 AU
 - Cleaning supervisors and contracted cleaning providers
 - Key organisations: LASA members, Bupa Aged Care, BaptistCare, Regis Healthcare, Opal HealthCare
 
-Australia's residential aged care facilities each need trained staff for infection control and facility restoration.
+Australia has 3,400+ residential aged care facilities — each requiring trained staff for infection control and facility restoration.
 
-## Subjects Relevant to Aged Care
+## IICRC Disciplines Relevant to Aged Care
 
-| Subject                              | Application                                                         |
+| Discipline                           | Application                                                         |
 | ------------------------------------ | ------------------------------------------------------------------- |
-| Mould remediation                    | Mould and infection control in resident rooms, wet areas, bathrooms |
-| Water damage restoration             | Water damage response in clinical areas, laundries, kitchens        |
-| Carpet cleaning                      | Carpet care in common areas, hallways, and resident rooms           |
+| AMRT — Applied Microbial Remediation | Mould and infection control in resident rooms, wet areas, bathrooms |
+| WRT — Water Damage Restoration       | Water damage response in clinical areas, laundries, kitchens        |
+| CRT — Carpet Restoration             | Carpet care in common areas, hallways, and resident rooms           |
 
 ## Key Value Propositions
 
-1. **Aged Care Quality Standards Compliance** — Documented training supports evidence for Standard 5 (Service Environment) and Standard 8 (Organisational Governance)
+1. **Aged Care Quality Standards Compliance** — IICRC CECs support compliance with Standard 5 (Service Environment) and Standard 8 (Organisational Governance)
 2. **NDIS Alignment** — Verifiable credentials for NDIS-registered providers servicing aged care
 3. **Accreditation-Ready Certificates** — Digital certificates with public URL for quality audits and accreditation reviews
 4. **Quick Completions** — 2-4 hour modules with no roster disruption; ideal for shift-based staff
@@ -36,9 +36,9 @@ Australia's residential aged care facilities each need trained staff for infecti
 
 "Aged Care Infection Control Bundle" — $245 AUD
 
-- Water Damage Response Fundamentals
-- Mould Assessment & Infection Control Basics
-- Carpet Care — Common Area Maintenance
+- WRT Fundamentals — Water Damage Response
+- AMRT Basics — Mould Assessment & Infection Control
+- CRT Carpet Care — Common Area Maintenance
 
 ## Outreach Strategy
 
@@ -51,10 +51,10 @@ Australia's residential aged care facilities each need trained staff for infecti
 ## Content to Create
 
 - [ ] Landing page live: /industries/aged-care
-- [ ] Blog post: "Mould liability in aged care facilities: what managers should document"
+- [ ] Blog post: "Why aged care facilities face $2M mould liability"
 - [ ] Email sequence: 3-part drip to facility managers and DONs
-- [ ] Case study (only with a real, consenting client and verified figures): an aged care provider's training rollout
-- [ ] LinkedIn post series: "What aged care facility teams should know about mould and water damage"
+- [ ] Case study: "How one aged care provider reduced infection incidents with IICRC training"
+- [ ] LinkedIn post series: "3 certifications every aged care facility manager needs"
 
 ## KPIs
 

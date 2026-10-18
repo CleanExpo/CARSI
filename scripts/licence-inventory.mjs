@@ -5,12 +5,12 @@
  * One exhaustive pass for every IICRC discipline code (official list, any case), "certif" /
  * "certs" / "IICRC credentials", "CEC", "accredit", "board-approved", IICRC-branded offerings
  * ("IICRC … training/course/credential"), the unsold subjects (repair, colour, upholstery,
- * reinstall) and, in campaign assets, marketing statistics.
+ * reinstall) and counted claims about the world ("537 councils").
  *
- * SCOPE IS DISCOVERED, not hand-listed: every file under app/, src/ and public/, and every
- * directory under docs/. Each docs/ directory must be classified in DOCS_SCOPE as publishable
- * copy (scanned) or an internal record (not scanned, with its reason); a new directory is an
- * `unclassified-scope` hit and fails the gate until someone classifies it.
+ * SCOPE: every file under app/, src/ and public/ — the surfaces carsi.com.au serves — including
+ * the TEXT of every PDF (extracted by scripts/pdf-text.mjs), so a stale document cannot keep a
+ * retracted claim. docs/ is out of scope here: marketing and campaign plans are reviewed on
+ * fix/marketing-docs-licence and stay covered by check:iicrc-compliance.
  *
  * Every hit is classified:
  *   not-public       a test, generated code, a staff-only surface, tooling, a model prompt, or a
@@ -32,51 +32,9 @@ import { fileURLToPath } from 'node:url';
 
 import ts from 'typescript';
 
-export const SCAN_ROOTS = ['app', 'src', 'public', 'docs'];
+import { pdfText } from './pdf-text.mjs';
 
-/**
- * Every top-level docs/ directory. `publishable`: copy that goes out under CARSI's name (ads,
- * campaigns, course and onboarding material) — scanned. `internal`: engineering and process
- * records — not scanned, with the reason. Files directly in docs/ are internal records.
- */
-export const DOCS_SCOPE = {
-  campaigns: ['publishable', 'campaign plans, ad copy and campaign course material'],
-  marketing: [
-    'publishable',
-    'marketing campaigns, ads, lead magnets and partner letters (all subfolders)',
-  ],
-  content: ['publishable', 'course and social content drafts'],
-  'course-updates': ['publishable', 'course content updates published to the LMS'],
-  'course-content': ['publishable', 'course and workshop material delivered to learners'],
-  courses: ['publishable', 'course source packs and registers'],
-  onboarding: ['publishable', 'enterprise onboarding programme material delivered to learners'],
-  'agent-framework': ['internal', 'engineering process for agents'],
-  'session-handoffs': ['internal', 'engineering session handoffs'],
-  plans: ['internal', 'engineering and product plans'],
-  specs: ['internal', 'engineering specifications'],
-  'cec-submissions': ['internal', 'submission packs sent to the IICRC, not published copy'],
-  runbooks: ['internal', 'operations runbooks'],
-  internal: ['internal', 'internal technology notes'],
-  guides: ['internal', 'engineering guides (CI, deployment, testing)'],
-  audit: ['internal', 'audit records'],
-  audits: ['internal', 'audit records'],
-  security: ['internal', 'security records'],
-  qa: ['internal', 'QA records'],
-  superpowers: ['internal', 'agent tooling notes'],
-  stability: ['internal', 'stability records'],
-  rollback: ['internal', 'rollback procedures'],
-  reports: ['internal', 'internal reports'],
-  reference: ['internal', 'API and engineering reference'],
-  features: ['internal', 'feature engineering notes'],
-  compliance: ['internal', "this inventory's own output: it quotes the banned strings as evidence"],
-  releases: ['internal', 'release records'],
-  phases: ['internal', 'project phase records'],
-  migrations: ['internal', 'database migration records'],
-  evidence: ['internal', 'verification evidence'],
-  architecture: ['internal', 'architecture records'],
-  analytics: ['internal', 'analytics setup notes'],
-  'ai-website': ['internal', 'operations runbook'],
-};
+export const SCAN_ROOTS = ['app', 'src', 'public'];
 
 /** Official IICRC certification / designation codes (iicrc.org certification list). */
 export const IICRC_CODES = (
@@ -103,10 +61,11 @@ export const TERMS = [
   ['reinstall', /\bre-?install\w*/gi],
 ];
 
-/** Marketing statistics, checked in campaign assets only (docs/campaigns, docs/marketing). */
-export const STATISTIC =
-  /\b\d[\d,]*\+(?!\d)|\$\d[\d,.]*\s?[KMB]\b\+?|\b\d+(?:\.\d+)?\s?%|\b\d+(?:\.\d+)?x\b/g;
-const CAMPAIGN_ASSET = /^docs\/(?:campaigns|marketing)\//;
+/** A counted claim about the world ("537 councils", "2,800+ caravan parks"), on every surface. */
+export const COUNT_CLAIM = new RegExp(
+  '(?<![\\d/.,])\\b\\d[\\d,]*\\+?\\s+(?:[A-Za-z-]+\\s+){0,2}?(?:councils|agencies|businesses|companies|facilities|centres|centers|hospitals|schools|technicians|plumbers|operators|members|learners|students|professionals|contractors|parks|homes|properties|sites|organisations|industries|clients|customers|users|enrolments|graduates|volunteers|agents)\\b',
+  'g'
+);
 
 const TEXT_EXT = new Set([
   '.md',
@@ -118,6 +77,7 @@ const TEXT_EXT = new Set([
   '.csv',
   '.svg',
   '.webmanifest',
+  '.pdf',
 ]);
 const CODE_EXT = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs']);
 
@@ -177,6 +137,22 @@ export const BLOCK_RULES = [
     ),
   },
   {
+    name: 'CARSI course offer named with an IICRC code and "certification"',
+    terms: ['iicrc-code', 'iicrc-offer', 'certif'],
+    unless:
+      /\bschool|approved by the IICRC|IICRC-approved|examination|third-person|does not|do not|not an?\b/i,
+    re: new RegExp(
+      `\\b(?:${CODE_ALT})\\b[\\s-]+certification[\\s-]+(?:courses?|training|programs?|programmes?|classes)\\b`
+    ),
+  },
+  {
+    name: 'unsold carpet- or colour-repair training offered',
+    terms: ['repair', 'colour', 'reinstall'],
+    unless:
+      /Technician|CARSI sells no|does not (?:sell|offer|cover)|removed|or refer|IICRC CRT|refer it/i,
+    re: /\b(?:carpet|colou?r|rug|fabric) repair(?: and re-?installation)?\b[^.!?]{0,40}\b(?:training|courses?|programs?|modules?|lessons?|class(?:es)?)\b|\b(?:training|courses?|programs?|modules?) (?:in|on|for) (?:carpet|colou?r) repair\b/i,
+  },
+  {
     name: 'promises CECs with no approval condition in the same sentence',
     terms: ['CEC'],
     fn: (sentence, code) =>
@@ -207,12 +183,6 @@ export const LEGIT_RULES = [
     terms: ['CEC', 'iicrc-code', 'iicrc-offer', 'certif', 'accredit'],
     re: /\bnon-(?:IICRC-)?CEC\b|\bno IICRC\b|\bNo\*\* IICRC|\bno\*\* IICRC|not (?:used )?to (?:brand|name)|do not brand|\bno (?:[A-Z]{2,5}\/)*[A-Z]{2,5}(?:\/[\w"-]+)*(?:\/etc\.)? (?:used|acronym|branding)|\(no (?:[A-Z]{2,5}\/)*[A-Z]{2,5}|third-person (?:only|reference)|nominative|CARSI designation rule|rejected|clear of IICRC framing|nothing in-image implies|IICRC CEC terminology|absence of any IICRC|absence\*\* of any IICRC|IICRC \/ CEC terminology compliance|in the course title|violates the|no overclaiming|do not claim accreditation|without an `iicrc_discipline`|not an IICRC designation|recognised industry methods/i,
   },
-  {
-    name: 'prospect search keyword or pain point (third-person research data)',
-    terms: ['certif'],
-    path: /^docs\/marketing\/industry-icp-database\.json$/,
-    re: /^"?[\w ]*certification[\w ]*"?,?$|lack of certifications|require certified contractors|Is IICRC recognised/,
-  },
   // --- discipline codes
   {
     name: 'month abbreviation "Oct"',
@@ -225,6 +195,13 @@ export const LEGIT_RULES = [
     re: /CDS xDrive|HydraMaster|Boxxer|Sapphire/,
   },
   { name: 'code list constant (data)', terms: ['iicrc-code'], re: /(?:[A-Z]{2,5}\|){5,}/ },
+  {
+    name: 'PDF table row: the IICRC designation name ("… Technician") in the cell before its code',
+    terms: ['iicrc-code'],
+    code: true,
+    path: /\.pdf$/,
+    re: /\bTechnician (?:WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|UFT|RCT|LCT|TCST|HST)\b/,
+  },
   {
     name: 'third-person IICRC certification named with its code',
     terms: ['iicrc-code'],
@@ -239,7 +216,7 @@ export const LEGIT_RULES = [
   {
     name: 'third-person IICRC certification: obtained through IICRC schools, held, renewed or required by others',
     terms: ['certif', 'iicrc-offer'],
-    re: /IICRC[- ]approved schools|approved by the IICRC|schools? (?:and|&) exam|not (?:an? )?IICRC certifications?|does not (?:deliver|award|issue|provide|sell|make you)|does not sell IICRC|IICRC certification (?:is|itself|evidence|numbers?)|no CARSI course is IICRC certification|(?:your|an existing|existing|already hold|hold(?:s|ing)?|maintain\w*|keep\w*|renew\w*|recertif\w*|expir\w*|lapse\w*)\b[^.]{0,30}certif|certif\w*[^.]{0,30}(?:you (?:already )?hold|renewal|expir|number|on file|history|emails?|status|cockpit|cycle|date)|Already IICRC certified|No (?:Current )?Certifications?|certifications yet|IICRC-certified (?:restoration practitioner|technicians|firms|contractors|restorer)|certified technicians who already|Certification \(IICRC\)|Institute of Inspection,? Cleaning and Restoration Certification|IICRC certification disciplines|IICRC certifications? (?:help|align|required|is|are|reference|it expects|procurement|government|tender)|(?:Do|Does) [^?]{0,40}need[^?]{0,20}certification|certification to clean carpets|'carpet cleaning certification(?: Australia)?'|legally required to hold IICRC|Does CARSI deliver IICRC certification|Does a CARSI course make me IICRC certified|certification[- ](?:course|training)|bought once|One IICRC certification|A certification is|certification is held|Current Certification|certification this cycle|'IICRC certifications',|IICRC certifications, and|disciplines, IICRC certifications|standards and certification body|panel sets its own certification|certifications it requires|certification requirements?|certifications procurement officers|The certifications procurement|requirements, certifications|procurement, certifications|IICRC certification is increasingly listed|IICRC provides technician-level certifications|maintain certification status|Certified Flooring|Certified Building|Certification and Trust|certification, continuing education|Using certification as a badge|Answer certification questions|certification, CEC, and trust|IICRC certifications for|holding any IICRC certification|certified staff maintain certification|certification affect pay|CARSI certifies|certify the numbers|certifies the gas|certified under the relevant|licensed practitioner|Sign-off|engineer-rated|VSB14|Load Restraint|modification code|certification \(amortised\)|Training\/certification|IICRC\/CARSI courses|recommended: IICRC|IICRC [A-Z]{2,5} certification|certification number|certification documents|holds IICRC certification|IICRC-certified restorer|Restoration Certification$|Certified Restoration Contractors|Audit current certifications|certification table|IICRC certification evidence|their IICRC certifications|active IICRC certifications|Confined Space Entry certification|Assess your team's certifications|certifications are the entry ticket|Required IICRC Certifications|Essential Certifications by Service Type|\| Certification +\||ongoing education to maintain|CECs per certification|Current certification status|implication CARSI certifies|imply safety certification|overclaiming certification|overstating certification|certification status changes|Guide to IICRC Certification|IICRC Certification Guide|IICRC Certification explained|certification versus continuing education|may already hold|Panels Ask for IICRC Certification|list industry certifications|do not grant IICRC certification|your IICRC credentials|^Certification$|through a school (?:and examination )?approved by the IICRC|CECs contribute to the maintenance|verified with the IICRC|disclaims responsibility|^carpet cleaning certification(?: Australia)?$|IICRC(?:&rsquo;|['’])s own|does not award|certified technicians continue|list IICRC certification|Once certified, the IICRC requires|Master and Inspector certifications|an IICRC certification; CARSI sells no colour-repair course|One-off (?:·|&middot;) certification|cert example|what does it cost you every year to keep it|^IICRC certifications$|they (?:already )?hold|verify a candidate's CARSI credential|^- 20\d\d-\d\d-\d\d:|skills and certifications valued|training and certification costs|fire services certification|IICRC [A-Z]{2,5} certification|[A-Z]{2,5} certification is recommended|Lists IICRC certification|Certified Firms|logo rights attach to Certified|maintenance of IICRC certifications|Certification mix|certified staff maintain|certification queries|pricing, certification|certification is not legally required|certifications: \[/i,
+    re: /IICRC[- ]approved schools|approved by the IICRC|schools? (?:and|&) exam|not (?:an? )?IICRC certifications?|does not (?:deliver|award|issue|provide|sell|make you)|does not sell IICRC|IICRC certification (?:is|itself|evidence|numbers?)|no CARSI course is IICRC certification|(?:your|an existing|existing|already hold|hold(?:s|ing)?|maintain\w*|keep\w*|renew\w*|recertif\w*|expir\w*|lapse\w*)\b[^.]{0,30}certif|certif\w*[^.]{0,30}(?:you (?:already )?hold|renewal|expir|number|on file|history|emails?|status|cockpit|cycle|date)|Already IICRC certified|No (?:Current )?Certifications?|certifications yet|IICRC-certified (?:restoration practitioner|technicians|firms|contractors|restorer)|certified technicians who already|Certification \(IICRC\)|Institute of Inspection,? Cleaning and Restoration Certification|IICRC certification disciplines|IICRC certifications? (?:help|align|required|is|are|reference|it expects|procurement|government|tender)|(?:Do|Does) [^?]{0,40}need[^?]{0,20}certification|certification to clean carpets|'carpet cleaning certification(?: Australia)?'|legally required to hold IICRC|Does CARSI deliver IICRC certification|Does a CARSI course make me IICRC certified|certification[- ](?:course|training)|bought once|One IICRC certification|A certification is|certification is held|Current Certification|certification this cycle|'IICRC certifications',|IICRC certifications, and|disciplines, IICRC certifications|standards and certification body|panel sets its own certification|certifications it requires|certification requirements?|certifications procurement officers|The certifications procurement|requirements, certifications|procurement, certifications|IICRC certification is increasingly listed|IICRC provides technician-level certifications|maintain certification status|Certified Flooring|Certified Building|Certification and Trust|certification, continuing education|Using certification as a badge|Answer certification questions|certification, CEC, and trust|IICRC certifications for|holding any IICRC certification|certified staff maintain certification|certification affect pay|CARSI certifies|certify the numbers|certifies the gas|certified under the relevant|licensed practitioner|Sign-off|engineer-rated|VSB14|Load Restraint|modification code|certification \(amortised\)|Training\/certification|IICRC\/CARSI courses|recommended: IICRC|IICRC [A-Z]{2,5} certification|certification number|certification documents|holds IICRC certification|IICRC-certified restorer|Restoration Certification$|Certified Restoration Contractors|Audit current certifications|certification table|IICRC certification evidence|their IICRC certifications|active IICRC certifications|Confined Space Entry certification|Assess your team's certifications|certifications are the entry ticket|Required IICRC Certifications|Essential Certifications by Service Type|\| Certification +\||Certification Code Why It.?s Required|ongoing education to maintain|CECs per certification|Current certification status|implication CARSI certifies|imply safety certification|overclaiming certification|overstating certification|certification status changes|Guide to IICRC Certification|IICRC Certification Guide|IICRC Certification explained|certification versus continuing education|may already hold|Panels Ask for IICRC Certification|list industry certifications|do not grant IICRC certification|your IICRC credentials|^Certification$|through a school (?:and examination )?approved by the IICRC|CECs contribute to the maintenance|verified with the IICRC|disclaims responsibility|^carpet cleaning certification(?: Australia)?$|IICRC(?:&rsquo;|['’])s own|does not award|certified technicians continue|list IICRC certification|Once certified, the IICRC requires|Master and Inspector certifications|an IICRC certification; CARSI sells no colour-repair course|One-off (?:·|&middot;) certification|cert example|what does it cost you every year to keep it|^IICRC certifications$|they (?:already )?hold|verify a candidate's CARSI credential|^- 20\d\d-\d\d-\d\d:|skills and certifications valued|training and certification costs|fire services certification|IICRC [A-Z]{2,5} certification|[A-Z]{2,5} certification is recommended|Lists IICRC certification|Certified Firms|logo rights attach to Certified|maintenance of IICRC certifications|Certification mix|certified staff maintain|certification queries|pricing, certification|certification is not legally required|certifications: \[/i,
   },
   {
     name: 'other bodies’ certification (ISO, HACCP, gas, vehicle, Cert IV)',
@@ -295,7 +272,8 @@ export const LEGIT_RULES = [
   {
     name: 'repair of a building, leak or machine (not a course offer)',
     terms: ['repair'],
-    re: /(?:leak|pipe|plumb|roof|burst|structur|building|equipment|machine|regulator|pump|float|defect|wall|house|flood)\w*[^.]{0,60}\brepair|\brepair\w*[^.]{0,60}(?:leak|pipe|roof|trade|building|equipment|machine|house|flood|owner|replace|reseal|scope)|insurer-funded repair|as well as the repair|after the repair|repair networks|^repair work\.|repair cost|old repairs|repairs?, retouching|a repair you didn|good repair|repair the truncation|truncat\w*|inpainting|conservation|removal\/repair|repair, minor modification|quote it as a repair|does not cover interior fabric repair/i,
+    local: true,
+    re: /(?:leak|pipe|plumb|roof|burst|structur|building|equipment|machine|regulator|pump|float|defect|wall|house|flood)\w*[^.]{0,60}\brepair|\brepair\w*[^.]{0,60}(?:leak|pipe|roof|trade|building|equipment|machine|house|flood|owner|replace|reseal|scope)|insurer-funded repair|as well as the repair|after the repair|repair networks|^repair work\.|repair cost|old repairs|repairs?, retouching|a repair you didn|good repair|repair the truncation|truncat\w*|inpainting|conservation|removal\/repair|repair, minor modification|quote it as a repair|does not cover interior fabric repair|Maintenance and Repair Services/i,
   },
   {
     name: 'IICRC designation name quoted third-person (Color Repair / Carpet Repair and Reinstallation Technician)',
@@ -328,17 +306,13 @@ export const LEGIT_RULES = [
     terms: ['iicrc-offer'],
     re: /IICRC[- ]approved schools?|IICRC['’]s own|IICRC certification (?:course|training|class)s?[^.]*\b(?:school|exam|approved|in person)|not (?:an? )?IICRC|does not (?:deliver|award|sell|offer)|IICRC (?:Water Damage Restoration|Applied Structural Drying|Applied Microbial Remediation|Carpet Cleaning|Odor Control|Fire and Smoke Damage Restoration) Technician/i,
   },
-  // --- campaign statistics
+  // --- counted claims
   {
-    name: 'internal campaign planning figure (budget, KPI, target, bid, discount, commercial term), not a published claim',
-    terms: ['statistic'],
-    code: true,
-    re: /\b(?:CTR|CPC|CPA|ROAS|ROI|conversion|budget|Bid adjustments?|tCPA|impressions|discount|off all|% off|Revenue share|revenue share|Month \d|Phase \d|Net Promoter|Partnerships|pass mark|score of at least|at least \d+%|Team Size|Company Size|Allocate|retargeting|Video viewers|enrolled|enrolments sourced|accounts|seats|Tier \d|lead-to-enrolment|Re-engagement|technician headcount|panel work share|Leads → Enrolment|Target|seat|member code|ISSA15|CLEANPLUS15|Revenue|Establish CARSI|teams of \d+\+|group licensing|YoY|Employees|Spend|Allocation|Bid|Metric|Month|KPI|Partner|employees|dropdown|Audience|Retarget|concession|pricing decision|Founder to confirm|group-licensing|net revenue)/i,
-  },
-  {
-    name: 'format fact, not a statistic ("100% online")',
-    terms: ['statistic'],
-    re: /100% (?:online|access)/i,
+    name: 'headcount of the guide’s illustrative example business (labelled indicative), not a claim about the world',
+    terms: ['count-claim'],
+    path: /^public\/downloads\/carsi-government-contractor-guide\.pdf$/,
+    local: true,
+    re: /^Staff: \d+ \(\d+ technicians, \d+ project managers, \d+ admin\)$/,
   },
 ];
 
@@ -529,7 +503,7 @@ export function sentenceAt(text, start, end) {
 
 let lastSentence = '';
 
-export function classifyCopy(file, term, rawSentence, code = rawSentence) {
+export function classifyCopy(file, term, rawSentence, code = rawSentence, local = '') {
   const sentence = rawSentence.replace(/^[\s`'"|]+|[\s`'",|]+$/g, '');
   lastSentence = sentence;
   for (const r of BLOCK_RULES) {
@@ -544,55 +518,24 @@ export function classifyCopy(file, term, rawSentence, code = rawSentence) {
     if (!r.terms.includes(term)) continue;
     if (r.path && !r.path.test(file)) continue;
     if (r.notPath && r.notPath.test(file)) continue;
-    if (r.fn ? r.fn(sentence, code) : r.re.test(r.code ? code : sentence))
-      return ['legitimate', r.name];
+    const subject = r.code ? code : r.local && local ? local : sentence;
+    if (r.fn ? r.fn(sentence, code) : r.re.test(subject)) return ['legitimate', r.name];
   }
   return ['exposure', 'no rule matches'];
 }
 
-/** Every directory under docs/, classified (or `unclassified`). */
-export function docsScope(root = process.cwd()) {
-  const dirs = readdirSync(join(root, 'docs')).filter((n) =>
-    statSync(join(root, 'docs', n)).isDirectory()
-  );
-  return dirs.sort().map((name) => {
-    const [kind, reason] = DOCS_SCOPE[name] ?? ['unclassified', 'not classified in DOCS_SCOPE'];
-    return { dir: `docs/${name}`, kind, reason, files: walk(join(root, 'docs', name)).length };
-  });
-}
-
-function scannable(file) {
-  if (!file.startsWith('docs/')) return true;
-  const parts = file.split('/');
-  if (parts.length === 2) return false; // docs/ root: internal records
-  return DOCS_SCOPE[parts[1]]?.[0] === 'publishable';
-}
-
-export function inventory(root = process.cwd()) {
+export async function inventory(root = process.cwd()) {
   const hits = [];
-  for (const { dir, kind } of docsScope(root)) {
-    if (kind === 'unclassified')
-      hits.push({
-        file: dir,
-        line: 0,
-        term: 'scope',
-        match: '',
-        cls: 'exposure',
-        reason: 'unclassified docs directory',
-        text: dir,
-      });
-  }
   for (const surface of SCAN_ROOTS) {
     for (const full of walk(join(root, surface))) {
       const file = relative(root, full).split('\\').join('/');
-      if (!scannable(file)) continue;
       const ext = extname(file).toLowerCase();
       if (!CODE_EXT.has(ext) && !TEXT_EXT.has(ext) && !/\.(?:css|scss)$/.test(ext)) continue;
-      const text = readFileSync(full, 'utf8');
+      const text = ext === '.pdf' ? await pdfText(full) : readFileSync(full, 'utf8');
       const lines = text.split('\n');
       const pathRule = NOT_PUBLIC_PATHS.find(([, re]) => re.test(file));
       const ranges = CODE_EXT.has(ext) && !pathRule ? copyRanges(file, text) : null;
-      const terms = CAMPAIGN_ASSET.test(file) ? [...TERMS, ['statistic', STATISTIC]] : TERMS;
+      const terms = [...TERMS, ['count-claim', COUNT_CLAIM]];
       for (const [term, re] of terms) {
         re.lastIndex = 0;
         for (const m of text.matchAll(re)) {
@@ -600,12 +543,8 @@ export function inventory(root = process.cwd()) {
           const line = lineOf(text, at);
           const lineText = lines[line - 1];
           const col = at - (text.lastIndexOf('\n', at - 1) + 1);
-          let code = `${(lines[line - 2] ?? '').trim()} ${lineText}`;
-          if (term === 'statistic' && /^\s*\|/.test(lineText)) {
-            let h = line - 1;
-            while (h > 0 && /^\s*\|/.test(lines[h - 1])) h--;
-            code = `${lines[h]} ${code}`;
-          }
+          const code = `${(lines[line - 2] ?? '').trim()} ${lineText}`;
+          const local = lineText.slice(Math.max(0, col - 40), col + m[0].length + 40);
           let cls;
           let reason;
           lastSentence = '';
@@ -635,7 +574,8 @@ export function inventory(root = process.cwd()) {
                 file,
                 term,
                 sentenceAt(src, off, off + m[0].length),
-                code
+                code,
+                local
               );
             }
           } else if (/\.(?:html|svg|xml)$/.test(ext) && insideTag(text, at)) {
@@ -657,7 +597,7 @@ export function inventory(root = process.cwd()) {
           } else {
             const src = /\.(?:html|svg|xml)$/.test(ext) ? maskMarkup(text) : text;
             const sentence = ext === '.json' ? lineText : sentenceAt(src, at, at + m[0].length);
-            [cls, reason] = classifyCopy(file, term, sentence, code);
+            [cls, reason] = classifyCopy(file, term, sentence, code, local);
           }
           hits.push({
             file,
@@ -676,11 +616,11 @@ export function inventory(root = process.cwd()) {
   return hits.sort((a, b) => (a.file === b.file ? a.line - b.line : a.file < b.file ? -1 : 1));
 }
 
-function main() {
+async function main() {
   const args = process.argv.slice(2);
   const rootArg = args.indexOf('--root');
   const root = rootArg >= 0 ? args[rootArg + 1] : process.cwd();
-  const hits = inventory(root);
+  const hits = await inventory(root);
   if (args.includes('--json')) {
     process.stdout.write(JSON.stringify(hits));
     return;

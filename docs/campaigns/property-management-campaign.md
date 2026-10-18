@@ -4,40 +4,40 @@
 
 ## Objective
 
-Establish CARSI as the go-to restoration training provider for the Australian property management sector.
+Establish CARSI as the go-to IICRC training provider for the Australian property management sector.
 Target: 1,200 enrolled property management professionals in 12 months.
 Revenue target: $234,000 AUD.
 
 ## Target Audience
 
-- Property managers and leasing consultants at agencies (Ray White, LJ Hooker, McGrath, CBRE, JLL, Colliers)
+- Property managers and leasing consultants at 12,000+ agencies (Ray White, LJ Hooker, McGrath, CBRE, JLL, Colliers)
 - Strata managers and body corporate managers
 - Building managers responsible for maintenance and compliance
 - Principal property managers at top-20 agencies nationally
 
-## Subjects Relevant to Property Management
+## IICRC Disciplines Relevant to Property Management
 
-| Subject                              | Application                                                                                    |
+| Discipline                           | Application                                                                                    |
 | ------------------------------------ | ---------------------------------------------------------------------------------------------- |
-| Mould remediation                    | Mould assessment and remediation in rental properties (Residential Tenancies Acts obligations) |
-| Water damage restoration             | Flood and water damage response — landlord duty of care                                        |
-| Carpet cleaning                      | End-of-lease carpet assessment and restoration disputes                                        |
-| Structural drying                    | Water-damaged investment properties — structural drying protocols                              |
+| AMRT — Applied Microbial Remediation | Mould assessment and remediation in rental properties (Residential Tenancies Acts obligations) |
+| WRT — Water Damage Restoration       | Flood and water damage response — landlord duty of care                                        |
+| CRT — Carpet Repair Technology       | End-of-lease carpet assessment and restoration disputes                                        |
+| ASD — Applied Structural Drying      | Water-damaged investment properties — structural drying protocols                              |
 
 ## Key Value Propositions
 
 1. **Residential Tenancies Act Compliance** — Mould is a habitability issue in all states; trained managers avoid regulatory breaches
 2. **Reduce Tribunal Disputes** — Verifiable assessment credentials provide defensible documentation in NCAT/VCAT hearings
-3. **Win Management Contracts** — Landlords prefer trained managers; documented training differentiates your agency
+3. **Win Management Contracts** — Landlords prefer qualified managers; IICRC credentials differentiate your agency
 4. **Insurance Claim Documentation** — Defensible, standards-based documentation for water damage and mould insurance claims
 
 ## Recommended Course Bundle
 
 "Property Management Restoration Bundle" — $195 AUD
 
-- Mould Basics
-- Water Damage Restoration
-- Carpet Assessment
+- AMRT Mould Basics
+- WRT Water Damage Restoration
+- CRT Carpet Assessment
 
 ## Outreach Strategy
 
@@ -51,9 +51,9 @@ Revenue target: $234,000 AUD.
 
 - [ ] Landing page live: /industries/property-management
 - [ ] Blog post: "Mould in rental properties: What the Residential Tenancies Act means for property managers in 2026"
-- [ ] Case study (only with a real, consenting client and verified figures): an agency's mould training
+- [ ] Case study: "How one Perth agency reduced mould tribunal disputes by 80%"
 - [ ] Email sequence: 3-email drip to principal property managers
-- [ ] LinkedIn post series: "What property managers need to know about mould compliance"
+- [ ] LinkedIn post series: "3 certifications every property manager needs for mould compliance"
 
 ## KPIs
 

@@ -153,6 +153,9 @@ const BANNED = [
     re: /\b(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)(?:['’]s)?\b(?:\s*\([^)\n]{0,60}\))?[\s\-\u2013\u2014]+(?:courses?|training|program(?:me)?s?|pathways?|modules?|class(?:es)?)\b/i,
     allow: null,
     crossLine: true,
+    // Public surfaces only (app/, src/, public/, data/): docs/ marketing and campaign plans are
+    // reviewed on fix/marketing-docs-licence and stay covered by check:iicrc-compliance as on main.
+    skipDocs: true,
     // Lines that exist to FORBID the construction ("never call it a WRT course") are exempt only
     // up to the end of THAT sentence, so "Never call it a WRT course. Book ASD training today."
     // still fires on the second sentence. Also exempt: the IICRC's own course in the possessive,
@@ -173,7 +176,8 @@ const BANNED = [
     // `neutralise`, not `allow`. As a whole-line allow this let
     // "IICRC training through CARSI — CARSI is IICRC CEC Accredited" pass on the strength of
     // the compliant half; the exempt span must be deleted and the remainder still tested.
-    neutralise: /\bIICRC[^.!?]{0,40}?training\s+at\s+(?:IICRC[\s-]+)?approved\s+schools?|\bIICRC[\s-]+Registered-Training-School\b|\bIICRC[\s-]+(?:CEC|Continuing[\s-]+Education[\s-]+Credit)\w*(?:[\s-]+\w+){0,3}[\s-]+training\b|\bIICRC[\s-]+(?:CEC|Continuing[\s-]+Education[\s-]+Credit)/gi,
+    neutralise:
+      /\bIICRC[^.!?]{0,40}?training\s+at\s+(?:IICRC[\s-]+)?approved\s+schools?|\bIICRC[\s-]+Registered-Training-School\b|\bIICRC[\s-]+(?:CEC|Continuing[\s-]+Education[\s-]+Credit)\w*(?:[\s-]+\w+){0,3}[\s-]+training\b|\bIICRC[\s-]+(?:CEC|Continuing[\s-]+Education[\s-]+Credit)/gi,
     message:
       'CARSI does not deliver "IICRC training" — say "IICRC CEC course(s)". IICRC training comes from an IICRC-approved school.',
   },
@@ -205,7 +209,7 @@ const BANNED = [
     neutralise:
       /[^.!?]*\b(?:not|never|cannot|isn't|doesn't|does\s+not)\b\s*(?:\w+\s+){0,2}?\b(?:earns?|earning|awards?|awarding|carr(?:y|ies|ying)|counts?|counting|confers?|accredit\w*|eligible|approved|grants?|toward)\b[^.!?]{0,40}?(?:CECs?\b|continuing[\s-]+education[\s-]+credits?)[^.!?]*[.!?]?|[^.!?]*\bno\s+(?:IICRC\s+)?(?:CECs?\b|continuing[\s-]+education[\s-]+credits?)[^.!?]*[.!?]?|[^.!?]*\w\?|[^.!?]*\b(?:assert\w*|exclude|refuses?|gate|gated|only\s+wh(?:en|ere)|filed)\b[^.!?]*?(?:CECs?\b|continuing[\s-]+education[\s-]+credits?)[^.!?]*|\b1\s+CEC\s*=[^.!?]*/gi,
     message:
-      'Do not claim a CARSI course earns/awards IICRC CECs — that requires per-course IICRC approval recorded in data/seed/cec-approvals.json (currently the SSOT gates every claim). State CARSI\'s provider standing instead.',
+      "Do not claim a CARSI course earns/awards IICRC CECs — that requires per-course IICRC approval recorded in data/seed/cec-approvals.json (currently the SSOT gates every claim). State CARSI's provider standing instead.",
   },
   {
     // "IICRC course" / "IICRC courses" — must be "IICRC CEC course(s)".
@@ -216,7 +220,8 @@ const BANNED = [
     // Accredited" passed on the strength of its compliant half. Deleting only the compliant
     // span and re-testing the remainder leaves the bare "IICRC courses" visible.
     allow: null,
-    neutralise: /\bIICRC[\s-]+(?:CEC|Continuing[\s-]+Education[\s-]+Credit)\w*(?:[\s-]+(?:Accredited|courses?))?/gi,
+    neutralise:
+      /\bIICRC[\s-]+(?:CEC|Continuing[\s-]+Education[\s-]+Credit)\w*(?:[\s-]+(?:Accredited|courses?))?/gi,
     message: 'Use "IICRC CEC course(s)", not "IICRC course(s)".',
   },
   {
@@ -243,7 +248,8 @@ const BANNED = [
     // itself, since "CEC" breaks the [\s-]* adjacency between IICRC and Accredited.
     re: /\bIICRC[\s-]*Accredited\b/i,
     allow: null,
-    message: 'Say "IICRC CEC Accredited", never bare "IICRC Accredited" — CARSI is accredited as a CEC provider, not accredited by IICRC generally.',
+    message:
+      'Say "IICRC CEC Accredited", never bare "IICRC Accredited" — CARSI is accredited as a CEC provider, not accredited by IICRC generally.',
   },
   {
     // "IICRC-accredited course(s)" / "IICRC accredited course(s)" (no CEC) —
@@ -256,7 +262,8 @@ const BANNED = [
     // "IICRC course(s) accredited/accreditation" (reversed word order).
     re: /\bIICRC[\s-]+courses?[\s-]+accredit\w*\b/i,
     allow: null,
-    message: 'Do not imply IICRC accredits CARSI\'s courses — say "IICRC CEC Accredited course(s)".',
+    message:
+      'Do not imply IICRC accredits CARSI\'s courses — say "IICRC CEC Accredited course(s)".',
   },
   {
     // "IICRC Approved School" / "IICRC Approved Instructor" as a positive claim about
@@ -269,7 +276,8 @@ const BANNED = [
     // IICRC approved school" passed: the true second clause laundered the false first one.
     allow: null,
     neutralise: /\b(?:through|via|from|at)\s+(?:an?\s+)?IICRC[\s-]+approved\s+schools?\b/gi,
-    message: 'CARSI is not an IICRC Approved School or Instructor — never claim that status (it is a separate IICRC licence class).',
+    message:
+      'CARSI is not an IICRC Approved School or Instructor — never claim that status (it is a separate IICRC licence class).',
   },
   {
     // Discipline-acronym branding. CLAUDE.md § "CARSI designation rule" (founder, 2026-07-10):
@@ -328,12 +336,14 @@ const BANNED = [
   {
     re: /IICRC[\s-]+partner(ship)?/i,
     allow: null,
-    message: 'CARSI is an approved CEC provider, not an IICRC partner — never claim an IICRC partnership.',
+    message:
+      'CARSI is an approved CEC provider, not an IICRC partner — never claim an IICRC partnership.',
   },
   {
     re: /promoted[\s-]+by[\s-]+(the[\s-]+)?IICRC/i,
     allow: null,
-    message: 'The IICRC does not promote any particular educational provider — never claim IICRC promotion.',
+    message:
+      'The IICRC does not promote any particular educational provider — never claim IICRC promotion.',
   },
   {
     // CARSI designation rule (founder 2026-07-10): IICRC discipline designations are
@@ -387,7 +397,8 @@ const BANNED = [
     // enforcement of the same rule).
     re: /\bCOACH[\s-]?8\b/i,
     allow: null,
-    message: 'COACH8 is excluded from all CARSI surfaces (founder brand-exclusion rule) — remove it.',
+    message:
+      'COACH8 is excluded from all CARSI surfaces (founder brand-exclusion rule) — remove it.',
   },
 ];
 
@@ -432,7 +443,8 @@ function inScope(file) {
   const norm = file.replace(/\\/g, '/');
   if (COPY_EXT.test(norm) && SCANNED_DIRS.some((d) => norm.startsWith(d))) return true;
   if (norm.endsWith('.json') && JSON_SCANNED_DIRS.some((d) => norm.startsWith(d))) return true;
-  if (PUBLIC_COPY_EXT.test(norm) && PUBLIC_SCANNED_DIRS.some((d) => norm.startsWith(d))) return true;
+  if (PUBLIC_COPY_EXT.test(norm) && PUBLIC_SCANNED_DIRS.some((d) => norm.startsWith(d)))
+    return true;
   return false;
 }
 
@@ -485,11 +497,14 @@ export function scanFile(file, text) {
   const findings = [];
   const lines = text.split('\n');
   for (let i = 0; i < lines.length; i++) scanLine(file, i + 1, lines[i], findings);
-  for (const rule of BANNED.filter((r) => r.crossLine)) {
+  const docs = file.replace(/\\/g, '/').startsWith('docs/');
+  for (const rule of BANNED.filter((r) => r.crossLine && !(r.skipDocs && docs))) {
     for (let i = 0; i + 1 < lines.length; i++) {
       const joined = `${lines[i].trimEnd()} ${lines[i + 1].trimStart()}`;
       if (ruleHits(rule, joined) && !ruleHits(rule, lines[i]) && !ruleHits(rule, lines[i + 1])) {
-        findings.push(`  ${file}:${i + 1}-${i + 2}: ${rule.message}\n    → ${joined.trim().slice(0, 140)}`);
+        findings.push(
+          `  ${file}:${i + 1}-${i + 2}: ${rule.message}\n    → ${joined.trim().slice(0, 140)}`
+        );
       }
     }
   }
@@ -500,6 +515,7 @@ function scanLine(file, lineNo, content, findings) {
   const norm = file.replace(/\\/g, '/');
   for (const rule of BANNED) {
     if (rule.seedOnly && !norm.startsWith('data/seed/')) continue;
+    if (rule.skipDocs && norm.startsWith('docs/')) continue;
     // `allow` exempts the whole LINE, so any line carrying both a violation and an allow
     // token escapes — `title: "IICRC WRT course", slug: "x-iicrc-wrt"` passed on the slug
     // alone. `neutralise` is the stricter form: it deletes the permitted spans and re-tests
@@ -554,7 +570,10 @@ if (staged) {
   // CI / manual: scan all tracked source-copy files.
   let list = '';
   try {
-    list = execSync('git ls-files --cached --others --exclude-standard', { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+    list = execSync('git ls-files --cached --others --exclude-standard', {
+      encoding: 'utf8',
+      maxBuffer: 64 * 1024 * 1024,
+    });
   } catch (err) {
     console.error('check-iicrc-terminology: failed to list tracked files:', err.message);
     process.exit(1);

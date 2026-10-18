@@ -97,7 +97,7 @@ a franchise network that is not just a training cost, it is downtime across ever
 sends someone away.
 
 CARSI is online and self-paced. There are 80 published courses covering water damage restoration,
-structural drying, mould, fire and smoke, odour control and carpet cleaning.
+structural drying, mould, fire and smoke, odour control, carpet cleaning and carpet repair.
 Everything is written for Australian conditions — 230 volt plant, metric units, AS/NZS and Safe
 Work Australia, and products a technician can actually buy here.
 

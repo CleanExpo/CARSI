@@ -63,13 +63,6 @@
     "reason": "the IICRC's own discipline map: what the IICRC CRT certification covers (third-person)"
   },
   {
-    "file": "docs/course-content/ccw-workshop/14-add-on-services.md",
-    "line": 112,
-    "contains": "Colour/bleach-spot repair",
-    "class": "legitimate",
-    "reason": "add-on service a cleaning business may refer out or offer under the IICRC CRT certification (third-person; the module teaches recognising it, not a CARSI course)"
-  },
-  {
     "file": "app/(public)/designations/[slug]/page.tsx",
     "line": 48,
     "contains": "Completing this pathway also earns IICRC Continuing Education Credits",

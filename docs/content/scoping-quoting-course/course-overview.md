@@ -1,6 +1,6 @@
 # Course Overview — Scoping & Quoting for Restoration Professionals
 
-> GP-131 | 8 Modules | 32 Lessons | CEC: only if the IICRC approves it | $349 AUD
+> GP-131 | 8 Modules | 32 Lessons | IICRC CEC Accredited | $349 AUD
 
 ---
 

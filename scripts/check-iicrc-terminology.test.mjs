@@ -282,6 +282,17 @@ for (const [name, src] of MUST_PASS_FILE) {
   }
 }
 
+// The acronym-training rule covers public surfaces; docs/ plans are reviewed on their own branch.
+const DOCS_LINE = 'Retarget warm leads from Start Smart and CCT course enquiries if consent allows.';
+if (scanText(F, DOCS_LINE).length === 0) {
+  console.error(`✖ MUST BLOCK on a public surface but passed:\n    ${DOCS_LINE}`);
+  failed++;
+}
+if (scanFile('docs/marketing/x.md', DOCS_LINE).length > 0) {
+  console.error(`✖ MUST PASS in docs/ but blocked:\n    ${DOCS_LINE}`);
+  failed++;
+}
+
 if (failed > 0) {
   console.error(`\n✖ IICRC terminology guard self-test failed — ${failed} case(s).`);
   process.exit(1);

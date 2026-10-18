@@ -1,48 +1,81 @@
 /**
- * Licence inventory gate (reviews of fix/industry-faq-licence, 18/10/2026). Scope is discovered:
- * every file under app/, src/ and public/, and every classified docs/ directory. Every hit is
- * classified on the SENTENCE that contains it; an unclassified copy hit is an exposure and fails
- * here. Exemptions are per line (scripts/licence-inventory-reviewed.json). Table:
- * docs/compliance/licence-inventory.md.
+ * Licence inventory gate (reviews of fix/industry-faq-licence, 18–19/10/2026). Scope: every file
+ * under app/, src/ and public/ — including the extracted TEXT of every public PDF — so a stale
+ * download cannot keep a retracted claim. docs/ is reviewed on fix/marketing-docs-licence and stays
+ * covered by check:iicrc-compliance. Every hit is classified on the SENTENCE that contains it; an
+ * unclassified copy hit is an exposure and fails here. Exemptions are per line
+ * (scripts/licence-inventory-reviewed.json). Table: docs/compliance/licence-inventory.md.
  */
-import { mkdirSync, mkdtempSync, readFileSync, readdirSync, existsSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 
-import { describe, expect, it } from 'vitest';
+import { PDFDocument, StandardFonts } from 'pdf-lib';
+import { beforeAll, describe, expect, it } from 'vitest';
 
 import {
   classifyCopy,
-  docsScope,
   inventory,
   REVIEWED,
   sentenceAt,
 } from '../../../scripts/licence-inventory.mjs';
+import { pdfText } from '../../../scripts/pdf-text.mjs';
 
 type Hit = { file: string; line: number; term: string; cls: string; reason: string; text: string };
 
 const INDUSTRY = 'app/(public)/industries/x/page.tsx';
-const DOC = 'docs/marketing/x.md';
-const CAMPAIGN = 'docs/campaigns/x.md';
+const PUBLIC = 'src/components/x.tsx';
+const GUIDE_PDF = 'public/downloads/carsi-government-contractor-guide.pdf';
+const GUIDE_MD = 'docs/marketing/lead-magnets/government-contractor-guide.md';
 const CODE = 'W' + 'RT'; // assembled so this file never spells the banned construction
 
-describe('licence inventory', () => {
-  const hits = inventory() as Hit[];
+/** A throwaway repo root holding the given files. */
+function rootWith(files: Record<string, string | Uint8Array>): string {
+  const root = mkdtempSync(join(tmpdir(), 'licence-inv-'));
+  for (const [file, body] of Object.entries(files)) {
+    mkdirSync(dirname(join(root, file)), { recursive: true });
+    writeFileSync(join(root, file), body);
+  }
+  return root;
+}
 
-  it('inventory: covers every public surface (the pass is not vacuous)', () => {
-    for (const s of [
-      'app/',
-      'src/',
-      'public/',
-      'docs/marketing/',
-      'docs/campaigns/',
-      'docs/course-updates/',
-    ])
+async function pdfWith(lines: string[]): Promise<Uint8Array> {
+  const doc = await PDFDocument.create();
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+  const page = doc.addPage();
+  lines.forEach((text, i) => page.drawText(text, { x: 50, y: 760 - 20 * i, size: 11, font }));
+  return doc.save();
+}
+
+const exposuresIn = (hits: Hit[], file: string) =>
+  hits.filter((h) => h.file === file && h.cls === 'exposure');
+
+describe('licence inventory', () => {
+  let hits: Hit[] = [];
+  beforeAll(async () => {
+    hits = (await inventory()) as Hit[];
+  }, 120_000);
+
+  it('inventory: covers every public surface, PDF text included (the pass is not vacuous)', () => {
+    for (const s of ['app/', 'src/', 'public/'])
       expect(
         hits.some((h) => h.file.startsWith(s)),
         s
       ).toBe(true);
+    expect(hits.some((h) => h.file.startsWith('docs/'))).toBe(false);
     expect(hits.length).toBeGreaterThan(3000);
+    // the extractor reads both public PDFs: an extractor that returns nothing fails here
+    expect(hits.filter((h) => h.file === GUIDE_PDF).length).toBeGreaterThan(30);
+    expect(hits.some((h) => h.file.startsWith('public/courses/') && h.file.endsWith('.pdf'))).toBe(
+      true
+    );
   });
 
   it('inventory: no copy hit is an unclassified exposure', () => {
@@ -52,16 +85,25 @@ describe('licence inventory', () => {
     expect(exposures).toEqual([]);
   });
 
-  it('scope: every docs/ directory is classified (discovery, not a hand list)', () => {
-    expect(docsScope().filter((d: { kind: string }) => d.kind === 'unclassified')).toEqual([]);
+  it('PDF text: a retracted claim inside a public PDF is an exposure (control)', async () => {
+    const file = 'public/downloads/x.pdf';
+    const root = rootWith({
+      [file]: await pdfWith([
+        'CARSI courses are IICRC ' + 'Accredited.', // assembled: the guards read literals as copy
+        '537 councils across Australia trust CARSI.',
+      ]),
+    });
+    const terms = exposuresIn((await inventory(root)) as Hit[], file).map((h) => h.term);
+    expect(terms).toEqual(expect.arrayContaining(['accredit', 'count-claim']));
   });
 
-  it('scope: a new, unclassified docs/ directory fails the gate (control)', () => {
-    const root = mkdtempSync(join(tmpdir(), 'licence-scope-'));
-    mkdirSync(join(root, 'docs', 'brand-new-campaigns'), { recursive: true });
-    const unclassified = docsScope(root).filter((d: { kind: string }) => d.kind === 'unclassified');
-    expect(unclassified.map((d: { dir: string }) => d.dir)).toEqual(['docs/brand-new-campaigns']);
-    expect((inventory(root) as Hit[]).some((h) => h.cls === 'exposure')).toBe(true);
+  it('count claims: a bare count on page copy is an exposure (P1-BARE-COUNT-BLINDSPOT control)', async () => {
+    const file = 'src/lib/marketing/industry-page-data.ts';
+    const root = rootWith({
+      [file]: "export const stat = { value: '537 councils across Australia' };\n",
+    });
+    const found = exposuresIn((await inventory(root)) as Hit[], file);
+    expect(found.map((h) => h.term)).toEqual(['count-claim']);
   });
 
   it('exemptions: every reviewed entry names a reason, a file and the exact line it covers', () => {
@@ -82,6 +124,12 @@ describe('licence inventory', () => {
   });
 
   it.each([
+    // review of 6fc2bba2 (public surfaces)
+    ['iicrc-code', INDUSTRY, `CARSI offers IICRC ${CODE} certification courses online.`],
+    ['repair', INDUSTRY, 'CARSI offers carpet repair training for building repair teams.'],
+    ['count-claim', INDUSTRY, '537 councils across Australia'],
+    ['count-claim', PUBLIC, 'Trusted by 500+ Australian technicians'],
+    ['iicrc-code', INDUSTRY, 'Odor Control Technician OCT Specialist skill for fire damage.'],
     // review of ea205ee5 — the reviewer's strings
     [
       'iicrc-offer',
@@ -93,41 +141,30 @@ describe('licence inventory', () => {
       'app/(public)/subscribe/success/page.tsx',
       'Start a lesson and earn IICRC CECs toward renewal as you complete training.',
     ],
-    ['certif', DOC, 'Earn verifiable IICRC credentials your HSE team can audit.'],
-    ['statistic', DOC, '| Headline 5 | Trusted by 500+ Australian Technicians |'],
-    ['statistic', DOC, '| Headline 2 | Avoid $500K+ Mould Liability Costs |'],
+    ['certif', PUBLIC, 'Earn verifiable IICRC credentials your HSE team can audit.'],
     ['iicrc-code', 'src/components/tools/CECCalculator.tsx', `Browse CARSI ${CODE} online course`],
     [
       'CEC',
       'src/components/tools/CECCalculator.tsx',
       'Every CARSI module grants IICRC CECs on completion',
     ],
-    ['repair', CAMPAIGN, 'CARSI offers carpet repair and reinstallation training.'],
-    ['iicrc-code', CAMPAIGN, `- ${CODE} Water Damage Restoration Fundamentals`],
-    [
-      'statistic',
-      CAMPAIGN,
-      'Mould remediation in new builds (30%+ of new QLD homes have mould within 2 years)',
-    ],
+    ['repair', PUBLIC, 'CARSI offers carpet repair and reinstallation training.'],
+    ['iicrc-code', PUBLIC, `- ${CODE} Water Damage Restoration Fundamentals`],
     // earlier rounds
-    ['CEC', DOC, '> **Hook:** 40+ IICRC CEC courses. Zero classroom time.'],
+    ['CEC', PUBLIC, '40+ IICRC CEC courses. Zero classroom time.'],
     [
       'board-approved',
-      DOC,
+      PUBLIC,
       "CARSI's courses are IICRC board-approved — the same credential standard.",
     ],
-    ['certif', DOC, '| 7   | The 3 IICRC certs that unlock restoration revenue |'],
+    ['certif', PUBLIC, 'The 3 IICRC certs that unlock restoration revenue'],
     ['CEC', INDUSTRY, "title: 'Childcare IICRC CEC Training',"],
     [
       'CEC',
-      DOC,
+      PUBLIC,
       'CARSI offers IICRC CEC Accredited courses in mould assessment, remediation and indoor air quality.',
     ],
-    [
-      'certif',
-      DOC,
-      '"💧 The 3 water categories every restorer must know. Get certified → carsi.com.au"',
-    ],
+    ['certif', PUBLIC, 'The 3 water categories every restorer must know. Get certified.'],
   ])('controls: %s fires in %s: %s', (term, file, text) => {
     expect(classifyCopy(file, term, text)[0]).toBe('exposure');
   });
@@ -138,7 +175,7 @@ describe('licence inventory', () => {
     const at = line.indexOf('IICRC credentials');
     const sentence = sentenceAt(line, at, at + 'IICRC credentials'.length);
     expect(sentence).not.toContain('Digital certificates');
-    expect(classifyCopy(DOC, 'certif', sentence)[0]).toBe('exposure');
+    expect(classifyCopy(PUBLIC, 'certif', sentence)[0]).toBe('exposure');
   });
 
   it.each([
@@ -152,16 +189,82 @@ describe('licence inventory', () => {
       INDUSTRY,
       'IICRC certification is obtained only through IICRC-approved schools and examinations.',
     ],
-    ['iicrc-code', DOC, 'Oct-Nov'],
-    ['certif', 'src/components/x.tsx', 'This is to certify that'],
+    ['iicrc-code', PUBLIC, 'Oct-Nov'],
+    ['certif', PUBLIC, 'This is to certify that'],
     [
       'CEC',
       'app/layout.tsx',
       'IICRC CEC Accredited courses for cleaning and restoration professionals in Australia.',
     ],
-    ['statistic', DOC, '| CTR | 5.0% | 5.5% |'],
+    ['repair', PUBLIC, 'Burst pipe repair costs are covered by the insurer.'],
+    ['iicrc-code', GUIDE_PDF, 'Odor Control Technician OCT Specialist skill for fire damage.'],
+    ['count-claim', GUIDE_PDF, 'Staff: 14 (8 technicians, 3 project managers, 3 admin)'],
   ])('negative controls: %s stays legitimate in %s: %s', (term, file, text) => {
     expect(classifyCopy(file, term, text)[0]).toBe('legitimate');
+  });
+});
+
+/**
+ * Review of 7a2d510c (finding 2): the public guide PDF still carried retracted claims after its
+ * markdown source was corrected. The PDF is generated by scripts/generate-lead-magnet-pdf.mjs; these
+ * checks fail when the source changes and the committed PDF is not regenerated.
+ */
+describe('public guide PDF matches its corrected source', () => {
+  /** Text with markup, list markers, checkboxes and whitespace removed, for containment. */
+  const squash = (s: string) =>
+    s
+      .normalize('NFKC')
+      .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+      .replace(/^\s*(?:#+\s+)?(?:[-–]\s+)?(?:\[[ xX]\]\s+)?(?:\d+\.\s+)?/, '')
+      .replace(/[*_`|#>]/g, '')
+      .replace(/\s+/g, '')
+      .toLowerCase();
+  const INTERNAL = /^\*\*GP-\d+ \| Lead Magnet/; // dropped by the generator
+  const LICENCE_LINE = /CEC|certif|accredit|IICRC|\b[A-Z]{2,5}\b/;
+
+  let pdf = '';
+  beforeAll(async () => {
+    pdf = squash(
+      (await pdfText(GUIDE_PDF))
+        .split('\n')
+        .map((l) => l.replace(/^\s*\d+\.\s+/, ''))
+        .join('')
+    );
+  });
+
+  const missing = (source: string) =>
+    source
+      .split('\n')
+      .filter((l) => LICENCE_LINE.test(l) && !INTERNAL.test(l) && !/^\s*\|?\s*:?-{3}/.test(l))
+      .filter((l) => !pdf.includes(squash(l)));
+
+  it('freshness: every licence-relevant line of the markdown source is in the PDF text', () => {
+    const source = readFileSync(GUIDE_MD, 'utf8');
+    expect(source.split('\n').filter((l) => LICENCE_LINE.test(l)).length).toBeGreaterThan(60);
+    expect(missing(source)).toEqual([]);
+  });
+
+  it('freshness: a corrected source line the PDF lacks is caught (control)', () => {
+    expect(missing('- **14 CECs every three years** for a certification')).toHaveLength(1);
+  });
+
+  it('content: the PDF carries the corrected facts and none of the retracted ones', () => {
+    for (const s of [
+      'RRT',
+      'CCMT',
+      '14 CECs every four years',
+      'Master and Inspector certifications need 14 CECs every two years',
+      'courses the IICRC has approved',
+      'Set by each panel',
+    ])
+      expect(pdf, s).toContain(squash(s));
+    for (const s of [
+      '$20M',
+      '14 CECs per certification',
+      'self-paced IICRC CEC Accredited courses',
+      'Keep existing credentials current with CARSI IICRC CEC Accredited courses',
+    ])
+      expect(pdf, s).not.toContain(squash(s));
   });
 });
 

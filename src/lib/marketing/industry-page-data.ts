@@ -156,7 +156,7 @@ const governmentPanels: IndustryAddonPanel[] = [
   { name: 'NSW Construct NSW', requirement: 'Building remediation contracts' },
   { name: 'VIC Category C Panel', requirement: 'Required for restoration tenders' },
   { name: 'QLD QBuild', requirement: 'Government facility maintenance panels' },
-  { name: 'Local council panels', requirement: '537 councils across Australia' },
+  { name: 'Local council panels', requirement: 'Councils across Australia' },
 ];
 
 const commercialPanels: IndustryAddonPanel[] = [

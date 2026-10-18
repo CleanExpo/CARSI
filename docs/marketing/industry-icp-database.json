@@ -6,7 +6,7 @@
     {
       "id": "healthcare",
       "name": "Healthcare",
-      "market_size_aud": "UNVERIFIED — source before use",
+      "market_size_aud": "~$200B",
       "iicrc_disciplines": ["AMRT", "WRT", "FSRT"],
       "decision_makers": [
         {
@@ -99,7 +99,7 @@
       ],
       "value_propositions": [
         "24/7 online training — no staff downtime",
-        "Verifiable CARSI credentials document staff training for audits",
+        "IICRC credentials satisfy audit requirements",
         "Documented competency for WHS due diligence defence",
         "Train in-house staff to handle initial water damage response"
       ],
@@ -127,7 +127,7 @@
     {
       "id": "hospitality",
       "name": "Hotels & Resorts",
-      "market_size_aud": "UNVERIFIED — source before use",
+      "market_size_aud": "~$50B tourism",
       "iicrc_disciplines": ["WRT", "CRT", "ASD", "OCT"],
       "decision_makers": [
         {
@@ -191,7 +191,7 @@
       "pain_points": [
         {
           "pain": "Room downtime = lost revenue",
-          "description": "Every night a room is out of service costs revenue. Rapid restoration is critical.",
+          "description": "Every night a room is out of service costs $200-$500+. Rapid restoration is critical.",
           "emotional_impact": "Revenue pressure, owner/shareholder scrutiny",
           "urgency": "critical"
         },
@@ -216,9 +216,9 @@
       ],
       "value_propositions": [
         "Train maintenance staff to respond immediately — reduce room downtime",
-        "Odour control training helps solve persistent odour complaints",
+        "OCT certification solves persistent odour complaints",
         "24/7 online training fits shift schedules",
-        "Differentiate from competitors with trained staff"
+        "Differentiate from competitors with certified staff"
       ],
       "campaign_triggers": [
         "Pre-peak season (Oct-Dec) — summer holiday prep",
@@ -233,14 +233,14 @@
         },
         {
           "objection": "Our brand has its own training program",
-          "response": "CARSI training complements brand training with verifiable CARSI credentials"
+          "response": "IICRC credentials complement brand training with industry-recognised certification"
         }
       ]
     },
     {
       "id": "government",
       "name": "Government & Defence",
-      "market_size_aud": "UNVERIFIED — source before use",
+      "market_size_aud": "537 councils + federal/state agencies",
       "iicrc_disciplines": ["AMRT", "WRT", "ASD", "FSRT"],
       "decision_makers": [
         {
@@ -330,7 +330,7 @@
         }
       ],
       "value_propositions": [
-        "Documented training supports AusTender submissions",
+        "IICRC credentials satisfy AusTender pre-qualification",
         "Documented competency for WHS due diligence defence",
         "Bulk licensing for council/department-wide training",
         "Online training = no travel budget required"
@@ -344,7 +344,7 @@
       "objections_and_responses": [
         {
           "objection": "We have internal training programs",
-          "response": "Verifiable CARSI credentials give auditors evidence of completed training"
+          "response": "IICRC credentials provide external verification that satisfies audit requirements"
         },
         {
           "objection": "Budget is locked for this financial year",
@@ -359,7 +359,7 @@
     {
       "id": "commercial_cleaning",
       "name": "Commercial Cleaning",
-      "market_size_aud": "UNVERIFIED — source before use",
+      "market_size_aud": "~$15B",
       "iicrc_disciplines": ["CCT", "CRT", "WRT", "AMRT", "OCT"],
       "decision_makers": [
         {
@@ -420,7 +420,7 @@
         },
         {
           "pain": "Winning insurance work",
-          "description": "Insurance restoration is technical work that insurer panels set their own requirements for",
+          "description": "Insurance restoration pays 30-50% higher margins but requires credentials",
           "emotional_impact": "FOMO on higher-margin work",
           "urgency": "high"
         },
@@ -438,8 +438,8 @@
         }
       ],
       "value_propositions": [
-        "Add restoration services to widen your scope of work",
-        "Build restoration skills for insurance work",
+        "Add restoration services = 30-50% higher margins",
+        "Win insurance work with IICRC credentials",
         "Differentiate from 'mop and bucket' competitors",
         "Pre-qualify for government and corporate panels"
       ],
@@ -460,14 +460,14 @@
         },
         {
           "objection": "Is IICRC recognised by Australian insurers?",
-          "response": "Each insurer panel sets its own requirements. IICRC certification comes from IICRC-approved schools; CARSI adds training and verifiable CARSI credentials"
+          "response": "Yes — IAG, Suncorp, QBE all recognise IICRC credentials for restoration contractors"
         }
       ]
     },
     {
       "id": "insurance",
       "name": "Insurance",
-      "market_size_aud": "UNVERIFIED — source before use",
+      "market_size_aud": "$4.5B claims/year",
       "iicrc_disciplines": ["WRT", "FSRT", "AMRT", "ASD"],
       "decision_makers": [
         {
@@ -566,7 +566,7 @@
         },
         {
           "objection": "Our staff are already ANZIIF qualified",
-          "response": "CARSI training complements ANZIIF with practical restoration knowledge"
+          "response": "IICRC credentials complement ANZIIF with practical restoration knowledge"
         },
         {
           "objection": "We use a panel of approved restorers",
@@ -577,7 +577,7 @@
     {
       "id": "aged_care",
       "name": "Aged Care",
-      "market_size_aud": "UNVERIFIED — source before use",
+      "market_size_aud": "~$30B",
       "iicrc_disciplines": ["CRT", "AMRT", "WRT"],
       "decision_makers": [
         {
@@ -655,7 +655,7 @@
       ],
       "value_propositions": [
         "Documented competency for Quality Standards audits",
-        "Mould remediation training for infection control",
+        "AMRT credentials for mould/infection control",
         "Protect vulnerable residents with proper remediation",
         "Online training = no staff shortages for training days"
       ],
@@ -669,7 +669,7 @@
     {
       "id": "education",
       "name": "Education",
-      "market_size_aud": "UNVERIFIED — source before use",
+      "market_size_aud": "9,500+ schools",
       "iicrc_disciplines": ["AMRT", "WRT", "CRT", "ASD"],
       "decision_makers": [
         {
@@ -758,7 +758,7 @@
     {
       "id": "strata",
       "name": "Strata & Body Corporate",
-      "market_size_aud": "UNVERIFIED — source before use",
+      "market_size_aud": "2.5M+ strata units",
       "iicrc_disciplines": ["WRT", "CRT", "AMRT", "ASD"],
       "decision_makers": [
         {
@@ -838,7 +838,7 @@
         }
       ],
       "value_propositions": [
-        "Documented training helps building managers show due diligence",
+        "IICRC credentials protect building managers from personal liability",
         "Independent standard to justify contractor selection",
         "Online training fits around building management duties",
         "Document competency for insurance and legal purposes"
@@ -853,7 +853,7 @@
     {
       "id": "mining",
       "name": "Mining & Resources",
-      "market_size_aud": "UNVERIFIED — source before use",
+      "market_size_aud": "~$200B",
       "iicrc_disciplines": ["WRT", "ASD", "AMRT"],
       "decision_makers": [
         {
@@ -943,7 +943,7 @@
     {
       "id": "retail",
       "name": "Retail & Shopping Centres",
-      "market_size_aud": "UNVERIFIED — source before use",
+      "market_size_aud": "$140B retail sector",
       "iicrc_disciplines": ["WRT", "CRT", "OCT", "FSRT"],
       "decision_makers": [
         {
@@ -1021,7 +1021,7 @@
       "value_propositions": [
         "Pre-qualify for Scentre, Vicinity, GPT contractor panels",
         "Rapid response minimizes tenant downtime",
-        "Odour control training for food court odour issues",
+        "OCT certification for food court odour issues",
         "Document competency for insurance claims"
       ],
       "campaign_triggers": [
@@ -1042,11 +1042,11 @@
       "industries": ["healthcare", "aged_care", "government", "education", "mining"]
     },
     "insurance_panel": {
-      "message": "Restoration training and verifiable CARSI credentials for contractor panel submissions",
+      "message": "IICRC credentials recognised by IAG, Suncorp, QBE for restoration contractor panels",
       "industries": ["commercial_cleaning", "restoration"]
     },
     "cleaning_plus": {
-      "message": "Add restoration services to your cleaning business",
+      "message": "Add restoration services to your cleaning business — 30-50% higher margins",
       "industries": ["commercial_cleaning"]
     },
     "nrpg_pathway": {

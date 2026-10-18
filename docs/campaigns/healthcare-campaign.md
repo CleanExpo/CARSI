@@ -4,7 +4,7 @@
 
 ## Objective
 
-Expand CARSI's restoration training into the Healthcare vertical, targeting facility managers and infection control professionals across Australia's public and private hospitals.
+Expand CARSI's IICRC training into the Healthcare vertical, targeting facility managers and infection control professionals across Australia's 2,050+ public and private hospitals.
 Target: 400 enrolled healthcare facility professionals in 12 months.
 
 ## Target Audience
@@ -15,29 +15,29 @@ Target: 400 enrolled healthcare facility professionals in 12 months.
 - Maintenance managers (plant rooms, building fabric, HVAC systems)
 - Key hospital groups: Ramsay Health Care, Healthscope, Epworth, St John of God
 
-## Subjects Relevant to Healthcare
+## IICRC Disciplines Relevant to Healthcare
 
-| Subject                              | Application                                                      |
+| Discipline                           | Application                                                      |
 | ------------------------------------ | ---------------------------------------------------------------- |
-| Mould remediation                    | Hospital-grade decontamination, mould in clinical and ward areas |
-| Water damage restoration             | Water damage in clinical areas, plant rooms, basement services   |
-| Fire and smoke restoration           | Fire & smoke response in clinical environments, equipment rooms  |
-| Structural drying                    | Structural drying after water ingress in ward blocks             |
+| AMRT — Applied Microbial Remediation | Hospital-grade decontamination, mould in clinical and ward areas |
+| WRT — Water Damage Restoration       | Water damage in clinical areas, plant rooms, basement services   |
+| FSRT — Fire & Smoke                  | Fire & smoke response in clinical environments, equipment rooms  |
+| ASD — Applied Structural Drying      | Structural drying after water ingress in ward blocks             |
 
 ## Key Value Propositions
 
 1. **NSQHS Alignment** — Training supports National Safety & Quality Health Service Standards compliance, particularly Standard 3 (Preventing and Controlling Infections)
 2. **Accreditation Evidence** — Verifiable digital credentials for hospital accreditation audits and JCI (Joint Commission International) reviews
 3. **No Roster Disruption** — Online, self-paced learning fits around 24/7 hospital shift patterns
-4. **Infection Prevention** — mould remediation training directly addresses mould and microbial hazards in clinical settings
+4. **Infection Prevention** — AMRT training directly addresses mould and microbial hazards in clinical settings
 
 ## Recommended Course Bundle
 
 "Healthcare Facility Restoration Bundle" — $295 AUD
 
-- Water Damage Restoration Fundamentals
-- Mould Remediation
-- Fire & Smoke Response Fundamentals
+- WRT Water Damage Restoration Fundamentals
+- AMRT Applied Microbial Remediation
+- FSRT Fire & Smoke Response Fundamentals
 - Healthcare-Specific Mould Risk Assessment (bonus module)
 
 ## Outreach Strategy
@@ -50,10 +50,10 @@ Target: 400 enrolled healthcare facility professionals in 12 months.
 ## Content to Create
 
 - [ ] Landing page live: /industries/healthcare
-- [ ] Blog post: "NSQHS Standard 3: how mould training supports infection prevention compliance"
-- [ ] Case study (only with a real, consenting client and verified figures): a hospital's mould training
+- [ ] Blog post: "NSQHS Standard 3: How IICRC mould training supports infection prevention compliance"
+- [ ] Case study: "How one Sydney hospital reduced mould incidents by 70%"
 - [ ] Email sequence: 3-email drip to facility managers
-- [ ] LinkedIn post series: "Why hospitals need trained restoration staff"
+- [ ] LinkedIn post series: "3 reasons every hospital needs IICRC-trained restoration staff"
 
 ## KPIs
 

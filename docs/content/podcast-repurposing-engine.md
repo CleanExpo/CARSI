@@ -17,7 +17,7 @@ Episode (audio + show notes)
   └─ NEWSLETTER / SOCIAL POST → cross-promote (Synthex)
 ```
 
-One episode → 5+ indexed/citable/teachable assets. The standards episodes (S500/S520/S540) are the highest-value because they're evergreen + map to CARSI courses aligned to those standards.
+One episode → 5+ indexed/citable/teachable assets. The standards episodes (S500/S520/S540) are the highest-value because they're evergreen + map 1:1 to IICRC CEC training.
 
 ---
 
@@ -33,16 +33,16 @@ Source idea: S500 = mandatory "shall" vs suggested "should"; **three water categ
   - "**Category 1** — clean, sanitary. **Category 2** — significant contamination. **Category 3** — grossly contaminated: sewage, rising flood water." *[icons per category]*
   - "The category decides everything — PPE, what you can dry vs discard, occupant safety." *[checklist tick animation]*
   - "And S500 separates **'shall'** (mandatory) from **'should'** (recommended) — knowing which is which is the difference between compliant and liable." *[stamp: SHALL vs SHOULD]*
-- **CTA (45–60s):** "Learn water damage restoration aligned to ANSI/IICRC S500 — CARSI's water restoration course. Link in bio." *[CARSI logo + URL]*
-- **Caption/CTA copy:** "💧 The 3 water categories every restorer must know (IICRC S500). Learn more → carsi.com.au #waterdamage #IICRC #restoration"
+- **CTA (45–60s):** "Master S500 the right way — CARSI's IICRC CEC Accredited water restoration course. Link in bio." *[CARSI logo + URL]*
+- **Caption/CTA copy:** "💧 The 3 water categories every restorer must know (IICRC S500). Get certified → carsi.com.au #waterdamage #IICRC #restoration"
 - **AEO stat to surface on the page:** "IICRC S500 defines 3 water categories (1 sanitary, 2 significant, 3 grossly contaminated)."
 
-**Course outline — "Water Damage Categories & Classes (aligned to ANSI/IICRC S500)" (micro-course; CEC only if the IICRC approves it)**
+**Course outline — "IICRC S500: Water Damage Categories & Classes" (micro-course / CEC)**
 1. Why S500 exists — standard of care, "shall" vs "should".
 2. The 3 water **categories** (sources, risks, deterioration over time).
 3. The 4 water **classes** (evaporation load).
 4. Category → response matrix (PPE, restore vs discard, occupant safety).
-5. Knowledge check (required to issue the completion certificate — ties into the #301 quiz-gating gap).
+5. Knowledge check (required to issue the CEC certificate — ties into the #301 quiz-gating gap).
 
 ### B. "IICRC S520 — Core Principle of Mould Remediation" (15:07)
 Source idea: S520 (2024) — restore to **Condition 1** (normal fungal ecology) by **physical removal**, *not* killing with chemicals; roles of the IEP vs remediator.
@@ -58,19 +58,19 @@ Source idea: S520 (2024) — restore to **Condition 1** (normal fungal ecology) 
 - **Caption:** "🦠 Killing mould ≠ remediating mould. What IICRC S520 really requires. #mould #S520 #IICRC #remediation"
 - **AEO stat:** "IICRC S520 (2024) requires physical removal to restore Condition 1 — not chemical killing."
 
-**Course outline — "Mould Remediation Principles (aligned to ANSI/IICRC S520)" (CEC only if the IICRC approves it)**
+**Course outline — "IICRC S520: Mould Remediation Principles" (CEC)**
 1. Fungal ecology & Condition 1/2/3 explained.
 2. Why physical removal beats biocides.
 3. IEP vs remediator — roles & independence.
 4. Containment, PPE, verification of clearance.
-5. Knowledge check → completion certificate.
+5. Knowledge check → CEC certificate.
 
 ---
 
 ## Candidate backlog (next evergreen episodes — same template)
 | Episode | Marketing-video angle | Course fit |
 |---|---|---|
-| IICRC **S540** Trauma & Crime Scene | "The standard behind biohazard cleanup" | Biohazard/trauma module |
+| IICRC **S540** Trauma & Crime Scene | "The standard behind biohazard cleanup" | Biohazard/trauma CEC module |
 | **Psychrometry** for AU Water Damage | "Why drying is about *air*, not visible water — the HAT mnemonic" | Drying-science lesson |
 | "**Toxic Mould** tests sending pros down the wrong path" (ASBB) | "Why one mycotoxin test misleads" — myth-buster | Mould health/testing lesson |
 | **Steel Studs & Thermal Bridging** (AS 1684 / AS-NZS 4600) | "Timber vs steel framing & moisture" | Building-science lesson |

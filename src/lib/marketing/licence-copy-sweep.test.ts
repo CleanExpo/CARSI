@@ -34,7 +34,10 @@ function walk(dir: string, keep: (f: string) => boolean, out: string[] = []): st
 
 const notTest = (f: string) => !/\.test\.[tj]sx?$/.test(f);
 
-/** Every surface whose text reaches a customer: rendered pages, shared copy, outbound docs. */
+/**
+ * Every public surface whose text reaches a customer: rendered pages and shared copy. docs/ plans
+ * are reviewed on fix/marketing-docs-licence and stay covered by check:iicrc-compliance.
+ */
 export function copySurfaces(): string[] {
   return [
     ...walk(join(ROOT, 'app', '(public)', 'industries'), (f) => f.endsWith('.tsx') && notTest(f)),
@@ -49,7 +52,6 @@ export function copySurfaces(): string[] {
       join(ROOT, 'public'),
       (f) => /\.(md|txt)$/.test(f) || f.endsWith('start-smart-readiness.json')
     ),
-    ...walk(join(ROOT, 'docs', 'marketing'), (f) => f.endsWith('.md')),
   ].filter((f) => existsSync(f));
 }
 
@@ -125,10 +127,10 @@ describe('licence copy sweep', () => {
       'src/lib/customer-journey-loop.ts',
       'src/lib/marketing/start-smart.ts',
       'public/start-smart-readiness.json',
-      'docs/marketing/franchise-pilot-offer.md',
       'src/lib/server/public-catalogue-facts.ts',
     ])
       expect(surfaces).toContain(f);
+    expect(surfaces.some((f) => f.startsWith('docs/'))).toBe(false);
   });
 
   it('sweep: each check fires on the copy it was written for', () => {
