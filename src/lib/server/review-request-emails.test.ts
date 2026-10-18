@@ -16,61 +16,135 @@ type Enrolment = {
   completedAt: Date | null;
   course: { slug: string; title: string; category: string | null };
 };
-type Ledger = { status: string; attempts: number; failureReason: string | null; providerMessageId: string | null; sentAt: Date | null };
+type Ledger = {
+  status: string;
+  attempts: number;
+  claimToken: string | null;
+  sendAttemptedAt: Date | null;
+  updatedAt: Date;
+  failureReason: string | null;
+  providerMessageId: string | null;
+  sentAt: Date | null;
+};
+type LedgerWhere = {
+  enrollmentId: string;
+  status?: string;
+  attempts?: { lt: number };
+  claimToken?: string | null;
+  sendAttemptedAt?: null;
+  updatedAt?: { lt: Date };
+};
 
 const db = vi.hoisted(() => ({
   enrolments: [] as Enrolment[],
   users: new Map<string, { email: string; fullName: string | null; emailOptOut: boolean; isActive: boolean }>(),
   reviews: new Set<string>(),
   ledger: new Map<string, Ledger>(),
+  /** Wall-clock the fake stamps on writes (Prisma's @updatedAt). */
+  clock: new Date('2026-10-18T00:00:00.000Z'),
+  failUserReadOnce: false,
 }));
 const mail = vi.hoisted(() => ({ send: vi.fn(), configured: vi.fn(() => true) }));
+const unsub = vi.hoisted(() => ({ setOptOut: vi.fn(async (_id: string, optedOut: boolean) => ({ email_opt_out: optedOut })) }));
 
 vi.mock('@/lib/server/email', () => ({ sendEmail: mail.send, isEmailConfigured: mail.configured }));
-vi.mock('@/lib/auth/session-jwt', () => ({ signEmailUnsubscribeToken: async (id: string) => `tok-${id}` }));
+vi.mock('@/lib/auth/session-jwt', () => ({
+  signEmailUnsubscribeToken: async (id: string) => `tok-${id}`,
+  verifyEmailUnsubscribeToken: async (token: string) => (token.startsWith('tok-') ? token.slice(4) : null),
+}));
+vi.mock('@/lib/server/email-preferences', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/server/email-preferences')>()),
+  setEmailOptOut: unsub.setOptOut,
+}));
 vi.mock('@/lib/server/app-url', () => ({ getAppOrigin: () => 'https://carsi.com.au' }));
+
+function ledgerMatches(l: Ledger | undefined, where: LedgerWhere): l is Ledger {
+  if (!l) return false;
+  if (where.status !== undefined && l.status !== where.status) return false;
+  if (where.attempts && !(l.attempts < where.attempts.lt)) return false;
+  if ('claimToken' in where && l.claimToken !== where.claimToken) return false;
+  if ('sendAttemptedAt' in where && l.sendAttemptedAt !== null) return false;
+  if (where.updatedAt && !(l.updatedAt < where.updatedAt.lt)) return false;
+  return true;
+}
+
+type FindWhere = {
+  status: string;
+  completedAt: { gte: Date; lte: Date };
+  OR: Array<{ reviewRequestEmail: { is: null | { status: string; attempts?: { lt: number }; updatedAt?: { lt: Date } } } }>;
+  AND?: Array<{ OR: [{ completedAt: { gt: Date } }, { completedAt: Date; id: { gt: string } }] }>;
+};
+
 vi.mock('@/lib/prisma', () => ({
   prisma: {
     lmsEnrollment: {
-      findMany: async ({ where, take }: { where: { status: string; completedAt: { gte: Date; lte: Date } }; take: number }) =>
-        db.enrolments
-          .filter(
-            (e) =>
-              e.status === where.status &&
-              e.completedAt !== null &&
-              e.completedAt >= where.completedAt.gte &&
-              e.completedAt <= where.completedAt.lte
-          )
-          .sort((a, b) => a.completedAt!.getTime() - b.completedAt!.getTime())
+      findMany: async ({ where, take }: { where: FindWhere; take: number }) => {
+        const after = where.AND?.[0]?.OR;
+        return db.enrolments
+          .filter((e) => {
+            if (e.status !== where.status || e.completedAt === null) return false;
+            if (e.completedAt < where.completedAt.gte || e.completedAt > where.completedAt.lte) return false;
+            const l = db.ledger.get(e.id);
+            const ledgerOk = where.OR.some(({ reviewRequestEmail: { is } }) =>
+              is === null
+                ? !l
+                : ledgerMatches(l, { enrollmentId: e.id, status: is.status, attempts: is.attempts, updatedAt: is.updatedAt })
+            );
+            if (!ledgerOk) return false;
+            if (after) {
+              const t = e.completedAt.getTime();
+              const gt = after[0].completedAt.gt.getTime();
+              if (!(t > gt || (t === after[1].completedAt.getTime() && e.id > after[1].id.gt))) return false;
+            }
+            return true;
+          })
+          .sort((a, b) => a.completedAt!.getTime() - b.completedAt!.getTime() || a.id.localeCompare(b.id))
           .slice(0, take)
           // Snapshot at read time, like a real query result.
           .map((e) => {
             const l = db.ledger.get(e.id);
-            return { ...e, reviewRequestEmail: l ? { status: l.status, attempts: l.attempts } : null };
-          }),
+            return {
+              ...e,
+              reviewRequestEmail: l
+                ? { status: l.status, attempts: l.attempts, claimToken: l.claimToken, sendAttemptedAt: l.sendAttemptedAt, updatedAt: l.updatedAt }
+                : null,
+            };
+          });
+      },
     },
     lmsReviewRequestEmail: {
-      create: async ({ data }: { data: { enrollmentId: string; status: string } }) => {
+      create: async ({ data }: { data: { enrollmentId: string; status: string; claimToken?: string; failureReason?: string } }) => {
         if (db.ledger.has(data.enrollmentId)) throw Object.assign(new Error('Unique constraint failed'), { code: 'P2002' });
-        db.ledger.set(data.enrollmentId, { status: data.status, attempts: 0, failureReason: null, providerMessageId: null, sentAt: null });
+        db.ledger.set(data.enrollmentId, {
+          status: data.status,
+          attempts: 0,
+          claimToken: data.claimToken ?? null,
+          sendAttemptedAt: null,
+          updatedAt: db.clock,
+          failureReason: data.failureReason ?? null,
+          providerMessageId: null,
+          sentAt: null,
+        });
         return {};
       },
-      updateMany: async ({ where, data }: { where: { enrollmentId: string; status: string; attempts: { lt: number } }; data: { status: string } }) => {
+      updateMany: async ({ where, data }: { where: LedgerWhere; data: Partial<Ledger> & { attempts?: { increment: number } } }) => {
         const l = db.ledger.get(where.enrollmentId);
-        if (!l || l.status !== where.status || !(l.attempts < where.attempts.lt)) return { count: 0 };
-        l.status = data.status;
+        if (!ledgerMatches(l, where)) return { count: 0 };
+        const { attempts, ...rest } = data;
+        Object.assign(l, rest, { updatedAt: db.clock });
+        if (attempts) l.attempts += attempts.increment;
         return { count: 1 };
       },
-      update: async ({ where, data }: { where: { enrollmentId: string }; data: Partial<Ledger> & { attempts?: { increment: number } } }) => {
-        const l = db.ledger.get(where.enrollmentId);
-        if (!l) throw new Error('no ledger row');
-        const { attempts, ...rest } = data;
-        Object.assign(l, rest);
-        if (attempts) l.attempts += attempts.increment;
-        return {};
+    },
+    lmsUser: {
+      findUnique: async ({ where }: { where: { id: string } }) => {
+        if (db.failUserReadOnce) {
+          db.failUserReadOnce = false;
+          throw new Error('connection reset');
+        }
+        return db.users.get(where.id) ?? null;
       },
     },
-    lmsUser: { findUnique: async ({ where }: { where: { id: string } }) => db.users.get(where.id) ?? null },
     lmsCourseReview: {
       findUnique: async ({ where }: { where: { courseId_studentId: { courseId: string; studentId: string } } }) =>
         db.reviews.has(`${where.courseId_studentId.courseId}:${where.courseId_studentId.studentId}`) ? { id: 'r' } : null,
@@ -113,6 +187,8 @@ beforeEach(() => {
   db.users.clear();
   db.reviews.clear();
   db.ledger.clear();
+  db.failUserReadOnce = false;
+  unsub.setOptOut.mockClear();
   mail.send.mockReset().mockResolvedValue({ sent: true, messageId: 'm-1' });
   mail.configured.mockReset().mockReturnValue(true);
 });
@@ -190,7 +266,8 @@ describe('at most once per enrolment (D9)', () => {
     expect((await run()).sent).toBe(1);
     const again = await run();
     expect(again.sent).toBe(0);
-    expect(again.skipped.already_handled).toBe(1);
+    // A sent row is terminal: the query no longer returns it at all.
+    expect(again.candidates).toBe(0);
     expect(mail.send).toHaveBeenCalledTimes(1);
     expect(db.ledger.get('e1')).toMatchObject({ status: 'sent', attempts: 1, providerMessageId: 'm-1' });
   });
@@ -225,10 +302,23 @@ describe('a failed send is retried, never silently used up (D9)', () => {
     expect(wasReallySent({ sent: true, reason: 'dev_console' })).toBe(false);
   });
 
-  it('a thrown send is recorded as failed', async () => {
+  it('a thrown send is ambiguous: counted as a failure, never resent', async () => {
     addCompleter('e1', 5 * D);
     mail.send.mockRejectedValueOnce(new Error('network'));
-    expect((await run()).failed).toBe(1);
+    const first = await run();
+    expect(first).toMatchObject({ ok: false, failed: 1, ambiguous: 1 });
+    expect(db.ledger.get('e1')?.status).toBe('ambiguous');
+    await run();
+    expect(mail.send).toHaveBeenCalledTimes(1);
+  });
+
+  it('send_failed (network error or timeout: Mailtrap may have accepted it) is never retried', async () => {
+    addCompleter('e1', 5 * D);
+    mail.send.mockResolvedValueOnce({ sent: false, reason: 'send_failed' });
+    expect(await run()).toMatchObject({ failed: 1, ambiguous: 1 });
+    expect(db.ledger.get('e1')).toMatchObject({ status: 'ambiguous', failureReason: 'send_failed' });
+    expect((await run()).candidates).toBe(0);
+    expect(mail.send).toHaveBeenCalledTimes(1);
   });
 
   it('stops after 3 attempts', async () => {
@@ -236,8 +326,126 @@ describe('a failed send is retried, never silently used up (D9)', () => {
     mail.send.mockResolvedValue({ sent: false, reason: 'provider_error' });
     for (let i = 0; i < 3; i++) await run();
     const fourth = await run();
-    expect(fourth.skipped.attempts_exhausted).toBe(1);
+    expect(fourth.candidates).toBe(0);
     expect(mail.send).toHaveBeenCalledTimes(3);
+    expect(db.ledger.get('e1')).toMatchObject({ status: 'failed', attempts: 3 });
+  });
+});
+
+describe('interrupted claims are recovered safely (independent review findings 2-3)', () => {
+  function seedPending(id: string, opts: { minutesAgo: number; sendAttempted: boolean }) {
+    db.ledger.set(id, {
+      status: 'pending',
+      attempts: 0,
+      claimToken: 'old-run',
+      sendAttemptedAt: opts.sendAttempted ? new Date(NOW.getTime() - opts.minutesAgo * 60_000) : null,
+      updatedAt: new Date(NOW.getTime() - opts.minutesAgo * 60_000),
+      failureReason: null,
+      providerMessageId: null,
+      sentAt: null,
+    });
+  }
+
+  it('a claim abandoned before any send attempt is recovered after the lease and sent once', async () => {
+    addCompleter('e1', 5 * D);
+    seedPending('e1', { minutesAgo: 120, sendAttempted: false });
+    const res = await run();
+    expect(res.sent).toBe(1);
+    expect(db.ledger.get('e1')).toMatchObject({ status: 'sent', claimToken: null });
+  });
+
+  it('a fresh claim (another run is still working) is left alone', async () => {
+    addCompleter('e1', 5 * D);
+    seedPending('e1', { minutesAgo: 5, sendAttempted: false });
+    expect((await run()).sent).toBe(0);
+    expect(mail.send).not.toHaveBeenCalled();
+    expect(db.ledger.get('e1')?.claimToken).toBe('old-run');
+  });
+
+  it('a claim interrupted AFTER the send attempt becomes ambiguous and is never resent', async () => {
+    addCompleter('e1', 5 * D);
+    seedPending('e1', { minutesAgo: 120, sendAttempted: true });
+    const res = await run();
+    expect(res).toMatchObject({ sent: 0, ambiguous: 1, ok: false });
+    expect(db.ledger.get('e1')).toMatchObject({ status: 'ambiguous', failureReason: 'interrupted_after_send_attempt' });
+    await run();
+    expect(mail.send).not.toHaveBeenCalled();
+  });
+
+  it('a read error after claiming releases the slot (no attempt used) and the next run sends', async () => {
+    addCompleter('e1', 5 * D);
+    db.failUserReadOnce = true;
+    const first = await run();
+    expect(first).toMatchObject({ ok: false, failed: 1, sent: 0 });
+    expect(db.ledger.get('e1')).toMatchObject({ status: 'failed', attempts: 0, failureReason: 'pre_send_error', claimToken: null });
+    expect((await run()).sent).toBe(1);
+  });
+
+  it('the send attempt is marked before the provider is called', async () => {
+    addCompleter('e1', 5 * D);
+    mail.send.mockImplementationOnce(async () => {
+      expect(db.ledger.get('e1')?.sendAttemptedAt).toEqual(NOW);
+      return { sent: true, messageId: 'm-2' };
+    });
+    expect((await run()).sent).toBe(1);
+  });
+});
+
+describe('handled rows never crowd out later learners (independent review finding 4)', () => {
+  it('600 already-sent older completions do not hide one newer eligible completion', async () => {
+    for (let i = 0; i < 600; i++) {
+      const id = `old${String(i).padStart(3, '0')}`;
+      addCompleter(id, 13 * D - i * 1000);
+      db.ledger.set(id, {
+        status: 'sent', attempts: 1, claimToken: null, sendAttemptedAt: null, updatedAt: NOW,
+        failureReason: null, providerMessageId: 'x', sentAt: NOW,
+      });
+    }
+    addCompleter('new1', 4 * D);
+    const res = await run();
+    expect(res.sent).toBe(1);
+    expect(db.ledger.get('new1')?.status).toBe('sent');
+  });
+
+  it('pages past more than one page of same-learner deferrals to reach other learners', async () => {
+    for (let i = 0; i < 250; i++) addCompleter(`sam${String(i).padStart(3, '0')}`, 10 * D - i * 1000, { studentId: 'sam' });
+    addCompleter('jo1', 4 * D, { studentId: 'jo' });
+    const res = await run();
+    expect(res.sent).toBe(2); // one for sam, one for jo
+    expect(db.ledger.get('jo1')?.status).toBe('sent');
+  });
+
+  it('onboarding enrolments are recorded as skipped so they leave the queue', async () => {
+    addCompleter('ob1', 5 * D, { course: { slug: 'floor-care-onboarding-operational-readiness', title: 'Onboarding', category: null } });
+    await run();
+    expect(db.ledger.get('ob1')).toMatchObject({ status: 'skipped', failureReason: 'onboarding_course' });
+  });
+});
+
+describe('one-click unsubscribe really unsubscribes (independent review finding 1)', () => {
+  it('the List-Unsubscribe URL accepts an RFC 8058 one-click POST and opts the learner out', async () => {
+    addCompleter('e1', 5 * D);
+    await run();
+    const header: string = mail.send.mock.calls[0]![0].headers['List-Unsubscribe'];
+    const url = header.slice(1, -1);
+    const { POST } = await import('../../../app/api/unsubscribe/route');
+    const { NextRequest } = await import('next/server');
+    const prev = process.env.DATABASE_URL;
+    process.env.DATABASE_URL = 'postgres://test';
+    try {
+      const res = await POST(
+        new NextRequest(url, {
+          method: 'POST',
+          headers: { 'content-type': 'application/x-www-form-urlencoded' },
+          body: 'List-Unsubscribe=One-Click',
+        })
+      );
+      expect(res.status).toBe(200);
+    } finally {
+      if (prev === undefined) delete process.env.DATABASE_URL;
+      else process.env.DATABASE_URL = prev;
+    }
+    expect(unsub.setOptOut).toHaveBeenCalledWith('student-e1', true);
   });
 });
 
@@ -264,8 +472,9 @@ describe('consent and ask-once are re-checked right before sending (D11)', () =>
     await run();
     const params = mail.send.mock.calls[0]![0];
     expect(params.to).toBe('student-e1@example.com');
+    // The header points at the POST handler mail clients call; the footer at the browser page.
     expect(params.headers).toEqual({
-      'List-Unsubscribe': '<https://carsi.com.au/unsubscribe?token=tok-student-e1>',
+      'List-Unsubscribe': '<https://carsi.com.au/api/unsubscribe?token=tok-student-e1>',
       'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
     });
     expect(params.html).toContain('https://carsi.com.au/unsubscribe?token=tok-student-e1');
@@ -297,11 +506,16 @@ describe('volume limits (D10, D17)', () => {
     expect((await run()).sent).toBe(1);
   });
 
-  it('dry run counts without writing or sending', async () => {
+  it('dry run counts only real recipients, without writing or sending', async () => {
     addCompleter('e1', 5 * D);
     addCompleter('e2', 6 * D);
+    addCompleter('e3', 6 * D); // opted out
+    db.users.get('student-e3')!.emailOptOut = true;
+    addCompleter('e4', 6 * D); // already reviewed
+    db.reviews.add('course-e4:student-e4');
     const res = await run(ON, { dryRun: true });
     expect(res.would_send).toBe(2);
+    expect(res.skipped).toMatchObject({ opted_out: 1, already_reviewed: 1 });
     expect(mail.send).not.toHaveBeenCalled();
     expect(db.ledger.size).toBe(0);
   });

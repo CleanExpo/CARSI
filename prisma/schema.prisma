@@ -229,9 +229,13 @@ model LmsCourseReviewModerationEvent {
 model LmsReviewRequestEmail {
   id                String    @id @default(uuid()) @db.Uuid
   enrollmentId      String    @unique @map("enrollment_id") @db.Uuid
-  /// pending | sent | failed | skipped
+  /// pending | sent | failed | skipped | ambiguous (provider outcome unknown — never resent)
   status            String    @db.VarChar(16)
   attempts          Int       @default(0)
+  /// Owner of a `pending` claim; a claim older than the lease may be recovered by another run.
+  claimToken        String?   @map("claim_token") @db.Uuid
+  /// Set immediately before the provider is called, so an interrupted claim is never resent blindly.
+  sendAttemptedAt   DateTime? @map("send_attempted_at") @db.Timestamptz(6)
   /// SendEmailResult.reason, or a skip reason (opted_out | already_reviewed | not_eligible)
   failureReason     String?   @map("failure_reason") @db.Text
   providerMessageId String?   @map("provider_message_id") @db.VarChar(128)

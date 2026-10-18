@@ -50,6 +50,8 @@ CREATE TABLE "lms_review_request_emails" (
     "enrollment_id" UUID NOT NULL,
     "status" VARCHAR(16) NOT NULL,
     "attempts" INTEGER NOT NULL DEFAULT 0,
+    "claim_token" UUID,
+    "send_attempted_at" TIMESTAMPTZ(6),
     "failure_reason" TEXT,
     "provider_message_id" VARCHAR(128),
     "sent_at" TIMESTAMPTZ(6),
@@ -57,7 +59,7 @@ CREATE TABLE "lms_review_request_emails" (
     "updated_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "lms_review_request_emails_pkey" PRIMARY KEY ("id"),
-    CONSTRAINT "ck_lms_review_request_emails_status" CHECK ("status" IN ('pending', 'sent', 'failed', 'skipped'))
+    CONSTRAINT "ck_lms_review_request_emails_status" CHECK ("status" IN ('pending', 'sent', 'failed', 'skipped', 'ambiguous'))
 );
 
 -- "At most one review-request email per enrolment" is enforced here, not in application code.

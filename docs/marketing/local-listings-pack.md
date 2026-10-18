@@ -20,7 +20,7 @@ The same page lists these as **ineligible**:
 So:
 
 - **If CARSI is online-only, it is not eligible.** That means learners study online, nobody visits a CARSI premises, and CARSI staff do not travel to learners. Do not create a profile. A profile created anyway can be suspended, and any reviews on it are lost with it.
-- **Workshops at a venue CARSI does not own do not make it eligible.** CCW roadshows and hired training rooms are "an ongoing service, class, or meeting at a location that you don't own".
+- **Workshops at a venue CARSI neither owns nor has authority to represent do not make it eligible.** A CCW roadshow at a hotel, or a training room hired for a day, is "an ongoing service, class, or meeting at a location that you don't own or have the authority to represent". A location CARSI leases or is authorised to represent can qualify if it is staffed and open to learners at its stated hours. The test is the staffed location, not ownership.
 - **A rented mailing address does not count.** Google's [representation guidelines](https://support.google.com/business/answer/3038177) say a virtual office "isn't eligible for a Business Profile".
 
 **Phill, the question only you can answer:**

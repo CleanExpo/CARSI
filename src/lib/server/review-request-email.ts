@@ -12,10 +12,19 @@
  * back catalogue. No scheduler ships with this code: sending stays Phill's decision (D12).
  *
  * "At most once per enrolment" is enforced by the UNIQUE `enrollment_id` on
- * lms_review_request_emails. A run claims the row (INSERT pending) before sending; a row becomes
- * `sent` only when the provider actually accepted the message. A failed send is retried on a
- * later run (max 3 attempts) instead of silently using up the learner's only ask.
+ * lms_review_request_emails. A run claims the row (pending + claim token) before sending; a row
+ * becomes `sent` only when the provider actually accepted the message.
+ *
+ * Failures are split by what we know (independent review, 18/10/2026):
+ * - DEFINITE (provider answered with an error, not configured, dev console): nothing was
+ *   delivered, so the row is `failed` and a later run retries it (max 3 attempts).
+ * - AMBIGUOUS (network error or timeout after the request left, a throw, or a claim interrupted
+ *   after `send_attempted_at` was set): the provider may have delivered it. The row becomes
+ *   `ambiguous` and is NEVER resent automatically, because a duplicate breaks "at most once".
+ * A claim interrupted before any send attempt is recovered by a later run once its lease expires.
  */
+
+import { randomUUID } from 'node:crypto';
 
 import { getAppOrigin } from '@/lib/server/app-url';
 import { buildCarsiEmailHtml, brandLink, type RenderedEmail } from '@/lib/server/email-templates';
@@ -34,8 +43,11 @@ export const REVIEW_REQUEST_MAX_AGE_DAYS = 14;
 export const REVIEW_REQUEST_MAX_SENDS_PER_RUN = 50;
 /** A failed send is retried on later runs up to this many attempts in total. */
 export const REVIEW_REQUEST_MAX_ATTEMPTS = 3;
-/** Candidate rows read per run (sends are capped separately). */
-const CANDIDATE_LIMIT = 500;
+/** A pending claim older than this was interrupted and may be recovered (a full run takes under 15 min). */
+export const REVIEW_REQUEST_CLAIM_LEASE_MINUTES = 30;
+/** Candidate rows read per page; pages continue until the send cap or the window is exhausted. */
+const PAGE_SIZE = 200;
+const MAX_PAGES = 25;
 
 export type ReviewRequestConfig =
   | { enabled: true; since: Date }
@@ -66,6 +78,19 @@ export function reviewRequestWindow(since: Date, now: Date): { from: Date; to: D
 /** Pure: did the provider really accept the message? `dev_console` only printed it. */
 export function wasReallySent(result: SendEmailResult): boolean {
   return result.sent === true && result.reason !== 'dev_console';
+}
+
+/**
+ * Pure: a failure we KNOW delivered nothing, so a retry cannot duplicate the email.
+ * `provider_error` = Mailtrap answered with an error; `not_configured` = never called;
+ * `dev_console` = printed locally. Anything else (`send_failed` = network error or timeout,
+ * where Mailtrap may have accepted it) is ambiguous.
+ */
+export function isDefiniteNonDelivery(result: SendEmailResult): boolean {
+  return (
+    !wasReallySent(result) &&
+    (result.reason === 'provider_error' || result.reason === 'not_configured' || result.reason === 'dev_console')
+  );
 }
 
 /** Pure: the review-request email. The same words for every learner; no reward, no rating. */
@@ -115,7 +140,11 @@ export async function sendReviewRequestEmail(params: {
   courseSlug: string;
 }): Promise<SendEmailResult> {
   const appOrigin = getAppOrigin();
-  const unsubscribeUrl = buildUnsubscribeUrl(appOrigin, await signEmailUnsubscribeToken(params.userId));
+  const token = await signEmailUnsubscribeToken(params.userId);
+  // Footer link: the browser confirmation page. Header: the RFC 8058 endpoint mail clients POST
+  // to. `/unsubscribe` is a page, not a POST handler (independent review, 18/10/2026).
+  const unsubscribeUrl = buildUnsubscribeUrl(appOrigin, token);
+  const oneClickUrl = `${appOrigin.replace(/\/$/, '')}/api/unsubscribe?token=${encodeURIComponent(token)}`;
   const reviewUrl = `${appOrigin.replace(/\/$/, '')}/dashboard/courses/${encodeURIComponent(params.courseSlug)}#reviews`;
   const { subject, html, text } = renderReviewRequestEmail({
     appOrigin,
@@ -130,7 +159,7 @@ export async function sendReviewRequestEmail(params: {
     html,
     text,
     headers: {
-      'List-Unsubscribe': `<${unsubscribeUrl}>`,
+      'List-Unsubscribe': `<${oneClickUrl}>`,
       'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
     },
   });
@@ -138,9 +167,6 @@ export async function sendReviewRequestEmail(params: {
 
 export type ReviewRequestSkipReason =
   | 'onboarding_course'
-  | 'already_handled'
-  | 'in_flight'
-  | 'attempts_exhausted'
   | 'claimed_elsewhere'
   | 'same_learner_this_run'
   | 'already_reviewed'
@@ -157,9 +183,12 @@ export type ReviewRequestRunResult = {
   candidates: number;
   would_send: number;
   sent: number;
+  /** Definite failures (retryable), ambiguous outcomes and pre-send errors. Any > 0 means not ok. */
   failed: number;
+  /** Outcome unknown (may have been delivered): never resent; a human reconciles it. */
+  ambiguous: number;
   skipped: Partial<Record<ReviewRequestSkipReason, number>>;
-  /** Enrolment ids whose send failed this run (never email addresses — PII stays out of logs). */
+  /** Enrolment ids whose send failed or was ambiguous (never email addresses — PII stays out of logs). */
   failed_enrollment_ids: string[];
 };
 
@@ -167,8 +196,26 @@ function isUniqueViolation(e: unknown): boolean {
   return typeof e === 'object' && e !== null && (e as { code?: string }).code === 'P2002';
 }
 
+type LedgerSnapshot = {
+  status: string;
+  attempts: number;
+  claimToken: string | null;
+  sendAttemptedAt: Date | null;
+  updatedAt: Date;
+} | null;
+
+type Candidate = {
+  id: string;
+  studentId: string;
+  courseId: string;
+  completedAt: Date | null;
+  course: { slug: string; title: string; category: string | null };
+  reviewRequestEmail: LedgerSnapshot;
+};
+
 /**
- * One run of the review-request job. `dryRun` reads and counts but writes and sends nothing.
+ * One run of the review-request job. `dryRun` performs the same eligibility reads but writes
+ * and sends nothing, so its `would_send` matches what a real run would attempt.
  */
 export async function runReviewRequestEmails(options: {
   now?: Date;
@@ -185,6 +232,7 @@ export async function runReviewRequestEmails(options: {
     would_send: 0,
     sent: 0,
     failed: 0,
+    ambiguous: 0,
     skipped: {},
     failed_enrollment_ids: [],
   };
@@ -192,6 +240,7 @@ export async function runReviewRequestEmails(options: {
   if (!dryRun && !isEmailConfigured()) return { ...base, ok: false, reason: 'email_not_configured' };
 
   const window = reviewRequestWindow(config.since, now);
+  const leaseCutoff = new Date(now.getTime() - REVIEW_REQUEST_CLAIM_LEASE_MINUTES * 60_000);
   const result: ReviewRequestRunResult = {
     ...base,
     window: { from: window.from.toISOString(), to: window.to.toISOString() },
@@ -199,107 +248,115 @@ export async function runReviewRequestEmails(options: {
   const skip = (r: ReviewRequestSkipReason) => {
     result.skipped[r] = (result.skipped[r] ?? 0) + 1;
   };
-
-  const candidates = await prisma.lmsEnrollment.findMany({
-    where: { status: 'completed', completedAt: { gte: window.from, lte: window.to } },
-    orderBy: { completedAt: 'asc' },
-    take: CANDIDATE_LIMIT,
-    select: {
-      id: true,
-      studentId: true,
-      courseId: true,
-      course: { select: { slug: true, title: true, category: true } },
-      reviewRequestEmail: { select: { status: true, attempts: true } },
-    },
-  });
-  result.candidates = candidates.length;
-
+  const capReached = () => result.sent + result.failed + result.would_send >= REVIEW_REQUEST_MAX_SENDS_PER_RUN;
   const learnersThisRun = new Set<string>();
-  for (const enrolment of candidates) {
-    if (result.sent + result.failed + result.would_send >= REVIEW_REQUEST_MAX_SENDS_PER_RUN) break;
+
+  async function processCandidate(enrolment: Candidate): Promise<void> {
+    const ledger = enrolment.reviewRequestEmail;
 
     if (isOnboardingCourse({ slug: enrolment.course.slug, category: enrolment.course.category })) {
       skip('onboarding_course');
-      continue;
-    }
-    const ledger = enrolment.reviewRequestEmail;
-    if (ledger?.status === 'sent' || ledger?.status === 'skipped') {
-      skip('already_handled');
-      continue;
-    }
-    if (ledger?.status === 'pending') {
-      skip('in_flight');
-      continue;
-    }
-    if (ledger?.status === 'failed' && ledger.attempts >= REVIEW_REQUEST_MAX_ATTEMPTS) {
-      skip('attempts_exhausted');
-      continue;
+      if (!dryRun && !ledger) {
+        // Record it so the row stops occupying later pages.
+        await prisma.lmsReviewRequestEmail
+          .create({ data: { enrollmentId: enrolment.id, status: 'skipped', failureReason: 'onboarding_course' } })
+          .catch((e: unknown) => {
+            if (!isUniqueViolation(e)) throw e;
+          });
+      }
+      return;
     }
     if (learnersThisRun.has(enrolment.studentId)) {
       skip('same_learner_this_run');
-      continue;
+      return;
     }
 
-    if (dryRun) {
-      learnersThisRun.add(enrolment.studentId);
-      result.would_send += 1;
-      continue;
+    // An interrupted claim that may already have reached the provider is never resent.
+    if (ledger?.status === 'pending' && ledger.sendAttemptedAt) {
+      if (dryRun) return;
+      const marked = await prisma.lmsReviewRequestEmail.updateMany({
+        where: { enrollmentId: enrolment.id, status: 'pending', claimToken: ledger.claimToken, updatedAt: { lt: leaseCutoff } },
+        data: { status: 'ambiguous', failureReason: 'interrupted_after_send_attempt', claimToken: null },
+      });
+      if (marked.count > 0) {
+        result.ambiguous += 1;
+        result.failed += 1;
+        result.failed_enrollment_ids.push(enrolment.id);
+      }
+      return;
     }
 
-    // Claim the enrolment. The UNIQUE key makes a concurrent run's INSERT fail (P2002), and the
-    // conditional retry claim can be won by only one run.
-    try {
-      if (!ledger) {
-        await prisma.lmsReviewRequestEmail.create({ data: { enrollmentId: enrolment.id, status: 'pending' } });
-      } else {
-        const claimed = await prisma.lmsReviewRequestEmail.updateMany({
-          where: { enrollmentId: enrolment.id, status: 'failed', attempts: { lt: REVIEW_REQUEST_MAX_ATTEMPTS } },
-          data: { status: 'pending' },
-        });
-        if (claimed.count === 0) {
-          skip('claimed_elsewhere');
-          continue;
+    let token: string | null = null;
+    if (!dryRun) {
+      // Claim. The UNIQUE key stops a concurrent first claim (P2002); the conditional updates let
+      // exactly one run win a retry or a lease recovery.
+      token = randomUUID();
+      try {
+        if (!ledger) {
+          await prisma.lmsReviewRequestEmail.create({
+            data: { enrollmentId: enrolment.id, status: 'pending', claimToken: token },
+          });
+        } else {
+          const claimed = await prisma.lmsReviewRequestEmail.updateMany({
+            where:
+              ledger.status === 'failed'
+                ? { enrollmentId: enrolment.id, status: 'failed', attempts: { lt: REVIEW_REQUEST_MAX_ATTEMPTS } }
+                : {
+                    enrollmentId: enrolment.id,
+                    status: 'pending',
+                    claimToken: ledger.claimToken,
+                    sendAttemptedAt: null,
+                    updatedAt: { lt: leaseCutoff },
+                  },
+            data: { status: 'pending', claimToken: token, sendAttemptedAt: null },
+          });
+          if (claimed.count === 0) {
+            skip('claimed_elsewhere');
+            return;
+          }
         }
+      } catch (e) {
+        if (isUniqueViolation(e)) {
+          skip('claimed_elsewhere');
+          return;
+        }
+        throw e;
       }
-    } catch (e) {
-      if (isUniqueViolation(e)) {
-        skip('claimed_elsewhere');
-        continue;
-      }
-      throw e;
     }
     learnersThisRun.add(enrolment.studentId);
 
-    const finish = (data: {
-      status: 'sent' | 'failed' | 'skipped';
-      failureReason?: string | null;
-      providerMessageId?: string | null;
-      sentAt?: Date | null;
-      countAttempt: boolean;
-    }) =>
-      prisma.lmsReviewRequestEmail.update({
-        where: { enrollmentId: enrolment.id },
-        data: {
-          status: data.status,
-          failureReason: data.failureReason ?? null,
-          providerMessageId: data.providerMessageId ?? null,
-          sentAt: data.sentAt ?? null,
-          ...(data.countAttempt ? { attempts: { increment: 1 } } : {}),
-        },
+    // Only the owner of the claim may finish it.
+    const finish = (data: Record<string, unknown>) =>
+      prisma.lmsReviewRequestEmail.updateMany({
+        where: { enrollmentId: enrolment.id, claimToken: token },
+        data: { ...data, claimToken: null },
       });
 
     // Re-read consent and review state immediately before sending (Spam Act; ask once).
-    const [learner, review] = await Promise.all([
-      prisma.lmsUser.findUnique({
-        where: { id: enrolment.studentId },
-        select: { email: true, fullName: true, emailOptOut: true, isActive: true },
-      }),
-      prisma.lmsCourseReview.findUnique({
-        where: { courseId_studentId: { courseId: enrolment.courseId, studentId: enrolment.studentId } },
-        select: { id: true },
-      }),
-    ]);
-    const terminalSkip: ReviewRequestSkipReason | null = review
+    let learner: { email: string; fullName: string | null; emailOptOut: boolean; isActive: boolean } | null;
+    let reviewed: boolean;
+    try {
+      const [user, review] = await Promise.all([
+        prisma.lmsUser.findUnique({
+          where: { id: enrolment.studentId },
+          select: { email: true, fullName: true, emailOptOut: true, isActive: true },
+        }),
+        prisma.lmsCourseReview.findUnique({
+          where: { courseId_studentId: { courseId: enrolment.courseId, studentId: enrolment.studentId } },
+          select: { id: true },
+        }),
+      ]);
+      learner = user;
+      reviewed = review !== null;
+    } catch {
+      // Nothing was sent: release the claim as a retryable failure without using an attempt.
+      if (!dryRun) await finish({ status: 'failed', failureReason: 'pre_send_error' });
+      result.failed += 1;
+      result.failed_enrollment_ids.push(enrolment.id);
+      return;
+    }
+
+    const terminalSkip: ReviewRequestSkipReason | null = reviewed
       ? 'already_reviewed'
       : !learner || !learner.isActive
         ? 'inactive_account'
@@ -309,9 +366,26 @@ export async function runReviewRequestEmails(options: {
             ? 'no_email'
             : null;
     if (terminalSkip || !learner) {
-      await finish({ status: 'skipped', failureReason: terminalSkip ?? 'inactive_account', countAttempt: false });
-      skip(terminalSkip ?? 'inactive_account');
-      continue;
+      const why = terminalSkip ?? 'inactive_account';
+      if (!dryRun) await finish({ status: 'skipped', failureReason: why });
+      skip(why);
+      return;
+    }
+
+    if (dryRun) {
+      result.would_send += 1;
+      return;
+    }
+
+    // Mark the attempt BEFORE calling the provider: if this process dies mid-send, a later run
+    // sees send_attempted_at and records the outcome as ambiguous instead of sending again.
+    const started = await prisma.lmsReviewRequestEmail.updateMany({
+      where: { enrollmentId: enrolment.id, claimToken: token },
+      data: { sendAttemptedAt: now },
+    });
+    if (started.count === 0) {
+      skip('claimed_elsewhere');
+      return;
     }
 
     let sendResult: SendEmailResult;
@@ -330,16 +404,77 @@ export async function runReviewRequestEmails(options: {
     if (wasReallySent(sendResult)) {
       await finish({
         status: 'sent',
+        failureReason: null,
         providerMessageId: sendResult.messageId ?? null,
         sentAt: now,
-        countAttempt: true,
+        attempts: { increment: 1 },
       });
       result.sent += 1;
-    } else {
-      await finish({ status: 'failed', failureReason: sendResult.reason ?? 'unknown', countAttempt: true });
+    } else if (isDefiniteNonDelivery(sendResult)) {
+      await finish({
+        status: 'failed',
+        failureReason: sendResult.reason ?? 'unknown',
+        sendAttemptedAt: null,
+        attempts: { increment: 1 },
+      });
       result.failed += 1;
       result.failed_enrollment_ids.push(enrolment.id);
+    } else {
+      await finish({ status: 'ambiguous', failureReason: sendResult.reason ?? 'unknown', attempts: { increment: 1 } });
+      result.failed += 1;
+      result.ambiguous += 1;
+      result.failed_enrollment_ids.push(enrolment.id);
     }
+  }
+
+  let after: { completedAt: Date; id: string } | null = null;
+  for (let page = 0; page < MAX_PAGES && !capReached(); page += 1) {
+    // Only rows that still need work: no ledger row, a retryable definite failure, or a pending
+    // claim whose lease expired. Terminal rows never crowd later learners out of a page.
+    const candidates: Candidate[] = await prisma.lmsEnrollment.findMany({
+      where: {
+        status: 'completed',
+        completedAt: { gte: window.from, lte: window.to },
+        OR: [
+          { reviewRequestEmail: { is: null } },
+          { reviewRequestEmail: { is: { status: 'failed', attempts: { lt: REVIEW_REQUEST_MAX_ATTEMPTS } } } },
+          { reviewRequestEmail: { is: { status: 'pending', updatedAt: { lt: leaseCutoff } } } },
+        ],
+        ...(after
+          ? {
+              AND: [
+                {
+                  OR: [
+                    { completedAt: { gt: after.completedAt } },
+                    { completedAt: after.completedAt, id: { gt: after.id } },
+                  ],
+                },
+              ],
+            }
+          : {}),
+      },
+      orderBy: [{ completedAt: 'asc' }, { id: 'asc' }],
+      take: PAGE_SIZE,
+      select: {
+        id: true,
+        studentId: true,
+        courseId: true,
+        completedAt: true,
+        course: { select: { slug: true, title: true, category: true } },
+        reviewRequestEmail: {
+          select: { status: true, attempts: true, claimToken: true, sendAttemptedAt: true, updatedAt: true },
+        },
+      },
+    });
+    if (candidates.length === 0) break;
+    result.candidates += candidates.length;
+    const last = candidates[candidates.length - 1]!;
+    after = { completedAt: last.completedAt!, id: last.id };
+    for (const enrolment of candidates) {
+      if (capReached()) break;
+      await processCandidate(enrolment);
+    }
+    if (candidates.length < PAGE_SIZE) break;
   }
 
   result.ok = result.failed === 0;
