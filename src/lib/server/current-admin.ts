@@ -20,7 +20,7 @@
  * removal of a role row either commits first (and is seen here) or waits until the action has
  * committed.
  */
-import { getAdminEmail, getAdminPanelAllowedEmails } from '@/lib/admin/admin-panel-access';
+import { getAdminEmail, isAdminAllowlistedEmail } from '@/lib/admin/admin-panel-access';
 import { pickSessionRole } from '@/lib/server/lms-auth';
 
 export type CurrentAdmin = {
@@ -62,7 +62,9 @@ export function isFounderAdminEmail(email: string): boolean {
     const p = part.trim().toLowerCase();
     if (p) configured.add(p);
   }
-  return getAdminPanelAllowedEmails().has(e) && !configured.has(e);
+  // Same matcher as #907's reservation (isAdminAllowlistedEmail), so every founder address this
+  // rule trusts is one that self-registration, guest signup and Stripe provisioning refuse to create.
+  return isAdminAllowlistedEmail(e) && !configured.has(e);
 }
 
 export async function resolveCurrentAdmin(

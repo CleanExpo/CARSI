@@ -93,4 +93,21 @@ describe('isFounderAdminEmail — the always-allowed founder accounts only, neve
     expect(isFounderAdminEmail('someone@example.com')).toBe(false);
     expect(isFounderAdminEmail('')).toBe(false);
   });
+  it('#907 consistency: every founder address it trusts is one #907 reserves against unverified registration', async () => {
+    const { isAdminAllowlistedEmail } = await import('@/lib/admin/admin-panel-access');
+    process.env.ADMIN_PANEL_EMAILS = 'ops@carsi.com.au';
+    for (const e of [
+      'phill.m@carsi.com.au',
+      ' PHILL.M@carsi.com.au ',
+      'support@carsi.com.au',
+      'ops@carsi.com.au',
+      'x@example.com',
+    ]) {
+      if (isFounderAdminEmail(e)) expect(isAdminAllowlistedEmail(e)).toBe(true);
+    }
+    // The founder is both trusted here and reserved there; configured addresses are reserved there but never trusted here.
+    expect(isFounderAdminEmail(' PHILL.M@carsi.com.au ')).toBe(true);
+    expect(isAdminAllowlistedEmail('support@carsi.com.au')).toBe(true);
+    expect(isFounderAdminEmail('support@carsi.com.au')).toBe(false);
+  });
 });
