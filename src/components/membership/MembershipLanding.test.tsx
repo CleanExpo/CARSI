@@ -14,9 +14,11 @@ vi.mock('next/image', () => ({
     createElement('img', { src: props.src, alt: props.alt }),
 }));
 
+import { matchesDiscipline } from '@/components/lms/CourseGrid';
 import { CATALOGUE_TOPIC_TABS, resolveDisciplineParam } from '@/lib/catalogue/discipline-param';
 
 import { INSPECTED_IMAGES } from './hex-geometry';
+import snapshot from './membership-catalogue-snapshot.json';
 
 import {
   MEMBERSHIP_STEPS,
@@ -27,6 +29,39 @@ import {
 } from './MembershipLanding';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+
+/** Each card line, phrase by phrase (lower case), with the course title/category that backs it. */
+const CARD_CLAIMS: Record<string, readonly (readonly [string, RegExp])[]> = {
+  'Water Damage': [
+    ['extraction', /\bextraction\b/i],
+    ['drying', /\bdrying\b/i],
+    ['moisture mapping', /\bmoisture mapping\b/i],
+    ['water-loss projects', /\bwater loss/i],
+  ],
+  Mould: [
+    ['mould remediation', /\bmould remediation\b/i],
+    ['indoor air quality', /\bindoor air quality\b/i],
+    ['infection control', /\binfection control\b/i],
+  ],
+  'Fire & Smoke': [
+    ['fire and smoke restoration', /\bfire (?:&|and) smoke restoration\b/i],
+    ['soot', /\bsoot\b/i],
+    ['odour control', /\bodour control\b/i],
+  ],
+  HVAC: [
+    ['hvac systems', /\bhvac systems\b/i],
+    ['indoor air', /\bindoor air\b/i],
+    ['refrigerant dehumidifiers', /\brefrigerant dehumidifiers\b/i],
+  ],
+  Cleaning: [
+    ['truck-mount operations', /\btruck-?mount operations\b/i],
+    ['duct cleaning', /\bduct cleaning\b/i],
+    ['carpet', /\bcarpet\b/i],
+    ['tile', /\btile\b/i],
+    ['glass', /\bglass\b/i],
+  ],
+  Free: [['try a free carsi course before you join', /./]],
+};
 
 let container: HTMLDivElement;
 let root: Root;
@@ -58,9 +93,23 @@ describe('membership library cards', () => {
   });
 
   it('do not promise subjects their tab does not hold', () => {
-    // Landing review r2: the live Cleaning tab has no upholstery course (checked 18/10/2026).
-    const cleaning = MEMBERSHIP_TOPICS.find((t) => t.tab === 'Cleaning')!;
-    expect(cleaning.line).not.toMatch(/upholster/i);
+    // Landing v2 review r1: every word of every card line must be a claim listed here, and each
+    // claim must be backed by a course the catalogue grid files under that card's tab.
+    const courses = snapshot.courses.map((c) => ({ ...c, id: c.slug }));
+    expect(courses.length).toBeGreaterThan(0);
+    expect(Object.keys(CARD_CLAIMS).sort()).toEqual(MEMBERSHIP_TOPICS.map((t) => t.tab).sort());
+    for (const topic of MEMBERSHIP_TOPICS) {
+      const inTab = courses.filter((c) => matchesDiscipline(c, topic.tab, new Set()));
+      expect(inTab.length, `${topic.tab} tab is empty`).toBeGreaterThan(0);
+      let rest = topic.line.toLowerCase();
+      for (const [phrase, evidence] of CARD_CLAIMS[topic.tab]) {
+        expect(rest, `${topic.tab}: "${phrase}"`).toContain(phrase);
+        rest = rest.replace(phrase, ' ');
+        const backing = inTab.filter((c) => evidence.test(`${c.title} ${c.category ?? ''}`));
+        expect(backing.length, `${topic.tab}: no course backs "${phrase}"`).toBeGreaterThan(0);
+      }
+      expect(rest, `${topic.tab}: unclaimed words`).toMatch(/^(?:[\s,.]|\band\b)*$/);
+    }
   });
 
   it('use only the inspected, text-free hero-tile crops, or no photo at all', () => {

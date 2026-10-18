@@ -154,7 +154,7 @@ const TAB_KEYWORDS: Partial<Record<DisciplineTab, readonly string[]>> = {
   HVAC: ['HVAC', 'AIR CONDITION', 'HEATING', 'VENTILAT', 'REFRIGERANT'],
 };
 
-function matchesDiscipline(
+export function matchesDiscipline(
   course: Course,
   tab: DisciplineTab,
   recommendedSlugs: ReadonlySet<string>
