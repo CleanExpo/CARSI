@@ -6,6 +6,7 @@ import { Suspense } from 'react';
 import { verifySessionToken } from '@/lib/auth/session-jwt';
 import { getEntitlements, type Entitlements } from '@/lib/server/entitlements';
 import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
+import { MembershipHexHero } from '@/components/membership/MembershipHexHero';
 import { SubscribeCta } from './SubscribeCta';
 
 // `subscriptionsEnabled()` reads process.env at render time. Without this the
@@ -81,99 +82,105 @@ export default async function SubscribePage() {
   const status = membership?.reason ?? null;
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-[#f6f8fb] px-4 py-16 text-slate-900">
-      <div className="flex w-full max-w-lg flex-col gap-8">
-        {/* Header */}
-        <div className="text-center">
-          <span className="inline-block rounded-full border border-[#b8dbfb] bg-white px-3 py-1 text-xs font-semibold text-[#146fc2] shadow-sm">
-            Membership
-          </span>
-          <h1 className="mt-4 text-3xl font-bold text-slate-950">{PLAN.name}</h1>
-          <p className="mt-2 text-slate-600">
-            Yearly membership unlocks 100% access to all published courses.
-          </p>
-        </div>
+    <>
+      <MembershipHexHero price={PLAN.price} />
+      <div
+        id="membership-plan"
+        className="flex scroll-mt-24 flex-col items-center bg-[#f6f8fb] px-4 pt-4 pb-16 text-slate-900"
+      >
+        <div className="flex w-full max-w-lg flex-col gap-8">
+          {/* Header */}
+          <div className="text-center">
+            <span className="inline-block rounded-full border border-[#b8dbfb] bg-white px-3 py-1 text-xs font-semibold text-[#146fc2] shadow-sm">
+              Membership
+            </span>
+            <h2 className="mt-4 text-3xl font-bold text-slate-950">{PLAN.name}</h2>
+            <p className="mt-2 text-slate-600">
+              Yearly membership unlocks 100% access to all published courses.
+            </p>
+          </div>
 
-        {/* Pricing card */}
-        <div className="flex flex-col gap-6 rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
-          <div>
-            <div className="flex items-baseline gap-2">
-              <span className="text-5xl font-bold text-slate-950">${PLAN.price}</span>
-              <span className="text-slate-600">{PLAN.suffix}</span>
+          {/* Pricing card */}
+          <div className="flex flex-col gap-6 rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
+            <div>
+              <div className="flex items-baseline gap-2">
+                <span className="text-5xl font-bold text-slate-950">${PLAN.price}</span>
+                <span className="text-slate-600">{PLAN.suffix}</span>
+              </div>
+              <p className="mt-2 text-sm text-slate-600">{PLAN.helper}</p>
+
+              {status === 'active' ? (
+                <p className="mt-3 rounded-lg border border-[#9fdab8] bg-[#f1fbf5] px-3 py-2 text-sm font-medium text-[#1b5e37]">
+                  Your membership is active — every published course is included, no extra payment.
+                </p>
+              ) : status === 'grace' ? (
+                <div className="mt-3">
+                  <GraceBanner periodEnd={membership?.currentPeriodEnd ?? null} />
+                </div>
+              ) : status === 'lapsed' ? (
+                <div className="mt-3">
+                  <LapsedBanner />
+                </div>
+              ) : (
+                <p className="mt-3 rounded-lg border border-[#f2cf8f] bg-[#fff8ed] px-3 py-2 text-sm font-medium text-[#7a3500]">
+                  Membership is best for clients planning multiple courses, refreshing knowledge
+                  across levels, or maintaining CECs over time.
+                </p>
+              )}
             </div>
-            <p className="mt-2 text-sm text-slate-600">{PLAN.helper}</p>
 
-            {status === 'active' ? (
-              <p className="mt-3 rounded-lg border border-[#9fdab8] bg-[#f1fbf5] px-3 py-2 text-sm font-medium text-[#1b5e37]">
-                Your membership is active — every published course is included, no extra payment.
-              </p>
-            ) : status === 'grace' ? (
-              <div className="mt-3">
-                <GraceBanner periodEnd={membership?.currentPeriodEnd ?? null} />
-              </div>
-            ) : status === 'lapsed' ? (
-              <div className="mt-3">
-                <LapsedBanner />
-              </div>
-            ) : (
-              <p className="mt-3 rounded-lg border border-[#f2cf8f] bg-[#fff8ed] px-3 py-2 text-sm font-medium text-[#7a3500]">
-                Membership is best for clients planning multiple courses, refreshing knowledge
-                across levels, or maintaining CECs over time.
-              </p>
-            )}
+            <ul className="flex flex-col gap-3 text-sm text-slate-700">
+              {PRO_FEATURES.map((feature) => (
+                <li key={feature} className="flex items-start gap-2">
+                  <span className="mt-0.5 flex-shrink-0 text-[#146fc2]">✓</span>
+                  {feature}
+                </li>
+              ))}
+            </ul>
+
+            <div className="flex flex-col gap-3">
+              <Suspense
+                fallback={
+                  <span className="flex w-full items-center justify-center rounded-lg border border-slate-200 bg-slate-50 py-3 text-sm font-semibold text-slate-500">
+                    Loading…
+                  </span>
+                }
+              >
+                <SubscribeCta enabled={enabled} reason={status} />
+              </Suspense>
+            </div>
           </div>
 
-          <ul className="flex flex-col gap-3 text-sm text-slate-700">
-            {PRO_FEATURES.map((feature) => (
-              <li key={feature} className="flex items-start gap-2">
-                <span className="mt-0.5 flex-shrink-0 text-[#146fc2]">✓</span>
-                {feature}
-              </li>
-            ))}
-          </ul>
-
-          <div className="flex flex-col gap-3">
-            <Suspense
-              fallback={
-                <span className="flex w-full items-center justify-center rounded-lg border border-slate-200 bg-slate-50 py-3 text-sm font-semibold text-slate-500">
-                  Loading…
-                </span>
-              }
+          {/* Value proposition */}
+          <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p className="text-center text-sm text-slate-600">
+              <span className="font-semibold text-slate-900">Available today:</span> buy any course
+              individually — no membership required.
+            </p>
+            <Link
+              href="/courses"
+              className="mt-4 flex min-h-11 w-full items-center justify-center rounded-lg bg-[#0f5fa8] px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
             >
-              <SubscribeCta enabled={enabled} reason={status} />
-            </Suspense>
+              Browse courses
+            </Link>
           </div>
-        </div>
 
-        {/* Value proposition */}
-        <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          <p className="text-center text-sm text-slate-600">
-            <span className="font-semibold text-slate-900">Available today:</span> buy any course
-            individually — no membership required.
+          {/* Legal links */}
+          <p className="text-center text-xs leading-relaxed text-slate-600">
+            Read our{' '}
+            <Link href="/terms" className="font-medium text-[#146fc2] underline">
+              Terms of Service
+            </Link>{' '}
+            and{' '}
+            <Link href="/privacy" className="font-medium text-[#146fc2] underline">
+              Privacy Policy
+            </Link>
+            .
+            <br />
+            Prices in AUD. GST included.
           </p>
-          <Link
-            href="/courses"
-            className="mt-4 flex min-h-11 w-full items-center justify-center rounded-lg bg-[#0f5fa8] px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-          >
-            Browse courses
-          </Link>
         </div>
-
-        {/* Legal links */}
-        <p className="text-center text-xs leading-relaxed text-slate-600">
-          Read our{' '}
-          <Link href="/terms" className="font-medium text-[#146fc2] underline">
-            Terms of Service
-          </Link>{' '}
-          and{' '}
-          <Link href="/privacy" className="font-medium text-[#146fc2] underline">
-            Privacy Policy
-          </Link>
-          .
-          <br />
-          Prices in AUD. GST included.
-        </p>
       </div>
-    </main>
+    </>
   );
 }
