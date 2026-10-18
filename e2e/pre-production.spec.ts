@@ -76,31 +76,6 @@ const MOCK_COURSES = [
   },
 ];
 
-const MOCK_LESSON = {
-  id: 'l1',
-  title: 'Introduction to Water Damage',
-  content: '<p>Welcome to the first lesson on water damage restoration.</p>',
-  order: 1,
-  module_id: 'm1',
-  course_id: 'c1',
-  drive_file_id: null,
-};
-
-const MOCK_QUIZ = {
-  id: 'q1',
-  title: 'WRT Fundamentals Quiz',
-  lesson_id: 'l1',
-  questions: [
-    {
-      id: 'qq1',
-      text: 'What is the primary source of water damage in residential buildings?',
-      type: 'multiple_choice',
-      options: ['Plumbing failures', 'Roof leaks', 'Foundation cracks', 'All of the above'],
-      correct_answer: 'All of the above',
-    },
-  ],
-};
-
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -161,84 +136,6 @@ async function mockLoginAPI(page: Page) {
         contentType: 'application/json',
         body: JSON.stringify({ error: 'Invalid email or password' }),
       });
-    }
-  });
-}
-
-/** Mock student dashboard APIs. */
-async function mockStudentAPIs(page: Page) {
-  // Enrollments
-  await page.route('**/api/lms/enrollments/me**', async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify([
-        {
-          id: 'e1',
-          course_id: 'c1',
-          status: 'active',
-          progress_pct: 45,
-          course: MOCK_COURSES[0],
-        },
-      ]),
-    });
-  });
-
-  // Gamification level
-  await page.route('**/api/lms/gamification/me/level**', async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({
-        total_xp: 250,
-        current_level: 3,
-        level_title: 'Apprentice',
-        current_streak: 5,
-        longest_streak: 12,
-        xp_to_next_level: 150,
-      }),
-    });
-  });
-
-  // Subscription status
-  await page.route('**/api/lms/subscription/status**', async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({
-        has_subscription: false,
-        status: null,
-        plan: null,
-        current_period_end: null,
-        trial_end: null,
-      }),
-    });
-  });
-
-  // CEC summary
-  await page.route('**/api/lms/gamification/me/cec-summary**', async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({ total_cecs: 14, disciplines: { WRT: 14 } }),
-    });
-  });
-
-  // Profile
-  await page.route('**/api/lms/auth/me**', async (route) => {
-    if (route.request().method() === 'GET') {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          full_name: TEST_STUDENT.fullName,
-          email: TEST_STUDENT.email,
-          iicrc_id: null,
-          theme_preference: 'dark',
-        }),
-      });
-    } else {
-      await route.fulfill({ status: 200, contentType: 'application/json', body: '{}' });
     }
   });
 }
@@ -466,90 +363,25 @@ test.describe('6. Lesson player', { tag: '@authenticated' }, () => {
   // (getLessonContextForStudent) requires before it returns lesson content.
   test.use({ storageState: STUDENT_STORAGE_STATE });
 
-  test('lesson page loads content', async ({ page }) => {
-    // Real, protected lesson-player route. A guest would be 308/redirected to
-    // /login by middleware before reaching it; arriving here (no /login bounce,
-    // no 404) proves the real session authenticates the protected lesson tree.
+  test('legacy lesson link opens that lesson in the course player', async ({ page }) => {
+    // The old lesson page is now a server redirect into the course player at that lesson
+    // (its "Take Quiz" button pointed at a 404). A guest would be bounced to /login first;
+    // landing on the player proves the real session reached the protected lesson tree.
     await page.goto(`/dashboard/courses/${ENROLLED_COURSE_SLUG}/lessons/${ENROLLED_LESSON_ID}`);
-    await page.waitForLoadState('domcontentloaded');
-
-    // Stayed inside the authenticated lesson route (not bounced to /login).
-    await expect(page).toHaveURL(new RegExp(`/dashboard/courses/.*/lessons/${ENROLLED_LESSON_ID}`));
-
-    // The lesson page shell renders its "Back to course" control regardless of
-    // the fetch outcome; it is the stable real-DOM signal that the protected
-    // client page mounted under a real session.
-    await expect(page.getByRole('button', { name: /back to course/i })).toBeVisible({
-      timeout: 10_000,
-    });
+    await expect(page).toHaveURL(
+      new RegExp(`/dashboard/learn/${ENROLLED_COURSE_SLUG}\\?lesson=${ENROLLED_LESSON_ID}$`),
+      { timeout: 20_000 }
+    );
+    await expect(page.locator('#main-content').first()).toBeVisible({ timeout: 15_000 });
   });
 });
 
 // =========================================================================
 // Journey 7: Quiz
 // =========================================================================
-
-test.describe('7. Quiz', () => {
-  test('quiz page loads with question', async ({ page }) => {
-    // Mock quiz endpoint
-    await page.route('**/api/lms/quizzes/**', async (route) => {
-      if (route.request().method() === 'GET') {
-        await route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify(MOCK_QUIZ),
-        });
-      } else {
-        // POST submission
-        await route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify({
-            score: 100,
-            passed: true,
-            correct_answers: 1,
-            total_questions: 1,
-          }),
-        });
-      }
-    });
-
-    await mockCourseAPI(page);
-    await mockStudentAPIs(page);
-
-    await page.context().addCookies([
-      {
-        name: 'carsi_token',
-        value: 'test-jwt-token-james-wilson',
-        domain: 'localhost',
-        path: '/',
-      },
-    ]);
-
-    // Navigate to a quiz page — the quiz is usually linked from a lesson
-    // For testing, we directly mock the lesson page quiz section
-    await page.route('**/api/lms/lessons/**', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ ...MOCK_LESSON, quiz_id: MOCK_QUIZ.id }),
-      });
-    });
-
-    await page.goto(`/courses/${MOCK_COURSES[0].slug}/lessons/${MOCK_LESSON.id}`);
-    await page.waitForLoadState('domcontentloaded');
-
-    // The quiz question text or quiz title should appear
-    const quizText = page.locator(`text=${MOCK_QUIZ.title}`);
-    const questionText = page.locator('text=primary source of water damage');
-    const _found =
-      (await quizText.isVisible({ timeout: 5_000 }).catch(() => false)) ||
-      (await questionText.isVisible({ timeout: 3_000 }).catch(() => false));
-
-    // Quiz may render in a separate tab/section — just verify no crash
-    expect(page.url()).toContain('/lessons/');
-  });
-});
+// The quiz renders inside the course player (journey 6 proves the route). Its question rendering
+// is covered by src/components/lms/QuizPlayerRender.test.tsx; the e2e check that used to sit here
+// visited a 404 lesson route and asserted only the URL, so it could never fail.
 
 // =========================================================================
 // Journey 8: Student dashboard

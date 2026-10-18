@@ -135,7 +135,7 @@ describe('admin quiz save', () => {
       ],
       true
     );
-    expect(kept).toBe('quiz-legacy');
+    expect(kept).toEqual(['quiz-legacy']);
     expect(lessons.some((l) => l.op === 'delete')).toBe(false);
     expect(tx.lmsLesson.update).toHaveBeenCalledTimes(1);
     expect(tx.lmsLesson.update.mock.calls[0][0].where.id).toBe('l1');
@@ -228,5 +228,51 @@ describe('admin quiz save', () => {
     );
     expect(ops).toEqual(['update:l1']);
     expect(tx.lmsLesson.update.mock.calls[0][0].data).not.toHaveProperty('orderIndex');
+  });
+
+  // Review round 7: saving only a new explanation renamed a custom-titled quiz lesson, changing
+  // its content version and staling saved attempts.
+  it('an explanation-only save leaves the kept quiz lesson (and its title) untouched', async () => {
+    const { tx, ops } = lessonTx();
+    const { tx: qtx } = quizTx(saved);
+    Object.assign(tx, qtx, { lmsLesson: tx.lmsLesson });
+    await syncModuleLessons(
+      tx as never,
+      'c1',
+      'm1',
+      'Module 1: Introduction',
+      'Reading',
+      undefined,
+      {
+        id: 'quiz-1',
+        questions: [{ ...sameQuestions[0], explanation: 'New why.' }, sameQuestions[1]],
+      },
+      [
+        { id: 'l1', orderIndex: 0, contentType: 'text', contentBody: 'Reading' },
+        { id: 'l2', orderIndex: 1, contentType: 'quiz', contentBody: 'quiz-1' },
+      ],
+      true
+    );
+    expect(ops).toEqual(['update:l1']);
+  });
+
+  it('reports every quiz the module still references, a second quiz lesson included', async () => {
+    const { tx } = lessonTx();
+    const kept = await syncModuleLessons(
+      tx as never,
+      'c1',
+      'm1',
+      'Module',
+      'Reading',
+      undefined,
+      undefined,
+      [
+        { id: 'l1', orderIndex: 0, contentType: 'text', contentBody: 'Reading' },
+        { id: 'l2', orderIndex: 1, contentType: 'quiz', contentBody: 'quiz-one' },
+        { id: 'l3', orderIndex: 2, contentType: 'quiz', contentBody: 'quiz-two' },
+      ],
+      true
+    );
+    expect([...kept].sort()).toEqual(['quiz-one', 'quiz-two']);
   });
 });

@@ -405,7 +405,7 @@ export async function syncModuleLessons(
     contentBody: string | null;
   }[],
   firstModule: boolean
-): Promise<string | null> {
+): Promise<string[]> {
   let quizId: string | null = null;
   const existingQuizLesson = existingLessons.find((l) => l.contentType === 'quiz');
   if (quiz) {
@@ -432,6 +432,7 @@ export async function syncModuleLessons(
     ? sortedExisting[sortedExisting.length - 1].orderIndex + 1
     : 0;
   let created = 0;
+  const repointed = new Set<string>();
   for (const kind of ['text', 'video', 'quiz'] as const) {
     if (kind === 'quiz' && !quiz) continue;
     const d = desired.find((l) => l.contentType === kind);
@@ -440,7 +441,14 @@ export async function syncModuleLessons(
         ? (sortedExisting.find((e) => e.contentType === 'quiz' && e.contentBody === quizId) ??
           sortedExisting.find((e) => e.contentType === 'quiz'))
         : sortedExisting.find((e) => e.contentType === kind);
-    if (d && ex) {
+    if (d && ex && kind === 'quiz') {
+      // A kept quiz lesson keeps its title (part of its content version); it is only re-pointed
+      // when the saved quiz is a different one.
+      if (ex.contentBody !== d.contentBody) {
+        await tx.lmsLesson.update({ where: { id: ex.id }, data: { contentBody: d.contentBody } });
+        repointed.add(ex.id);
+      }
+    } else if (d && ex) {
       await tx.lmsLesson.update({
         where: { id: ex.id },
         data: { title: d.title, contentBody: d.contentBody },
@@ -464,7 +472,15 @@ export async function syncModuleLessons(
     }
   }
 
-  return quizId;
+  // Every quiz the module's lessons still reference (a second quiz lesson the editor does not
+  // show included), so pruning never deletes a quiz a kept lesson points to.
+  const quizIds = new Set(
+    sortedExisting
+      .filter((e) => e.contentType === 'quiz' && e.contentBody && !repointed.has(e.id))
+      .map((e) => e.contentBody as string)
+  );
+  if (quizId) quizIds.add(quizId);
+  return [...quizIds];
 }
 
 /** LmsQuizQuestion.options is stored as `{ text }[]` JSON; normalise back to plain strings. */
@@ -867,7 +883,7 @@ export async function adminCreateCourse(
             orderIndex: i,
           },
         });
-        const qid = await syncModuleLessons(
+        const qids = await syncModuleLessons(
           tx,
           courseId,
           moduleId,
@@ -878,7 +894,7 @@ export async function adminCreateCourse(
           [],
           i === 0
         );
-        if (qid) usedQuizIds.push(qid);
+        usedQuizIds.push(...qids);
       }
       await pruneOrphanQuizzes(tx, courseId, usedQuizIds);
     },
@@ -949,7 +965,7 @@ export async function adminUpdateCourse(
         const m = modules[i];
         let moduleId: string;
         const prev = m.id && existingById.get(m.id);
-        let qid: string | null;
+        let qids: string[];
 
         if (prev) {
           moduleId = prev.id;
@@ -959,7 +975,7 @@ export async function adminUpdateCourse(
             data: { title: m.title, orderIndex: i },
           });
           const lessons = await tx.lmsLesson.findMany({ where: { moduleId } });
-          qid = await syncModuleLessons(
+          qids = await syncModuleLessons(
             tx,
             id,
             moduleId,
@@ -985,7 +1001,7 @@ export async function adminUpdateCourse(
               orderIndex: i,
             },
           });
-          qid = await syncModuleLessons(
+          qids = await syncModuleLessons(
             tx,
             id,
             moduleId,
@@ -997,7 +1013,7 @@ export async function adminUpdateCourse(
             i === 0
           );
         }
-        if (qid) usedQuizIds.push(qid);
+        usedQuizIds.push(...qids);
       }
 
       for (const mod of existing.modules) {

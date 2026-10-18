@@ -13,7 +13,7 @@ const mocks = vi.hoisted(() => ({
   ensure: vi.fn(), find: vi.fn(), read: vi.fn(), transaction: vi.fn(),
   courseCreate: vi.fn(), courseUpdate: vi.fn(), moduleCreate: vi.fn(), lessonCreate: vi.fn(),
   quizCreate: vi.fn(), questionCreate: vi.fn(), quizPrune: vi.fn(), quizUpsert: vi.fn(), questionDelete: vi.fn(),
-  session: vi.fn(),
+  session: vi.fn(), lessonFind: vi.fn(),
   approvals: [] as { slug: string; status: 'approved' | 'submitted' | 'not_submitted'; approvedHours?: number }[],
 }));
 vi.mock('node:crypto', async (importOriginal) => {
@@ -60,6 +60,7 @@ beforeEach(() => {
   native = { modules: [], quizzes: [], updatedAt: new Date(), durationHours: null,
     shortDescription: null, thumbnailUrl: null, level: null } as unknown as CourseWithCurriculum;
   mocks.find.mockResolvedValue(null);
+  mocks.lessonFind.mockResolvedValue([]);
   mocks.read.mockImplementation(async () => native);
   mocks.courseCreate.mockImplementation(async ({ data }) => Object.assign(native, data));
   mocks.courseUpdate.mockImplementation(async ({ data }) => Object.assign(native, data));
@@ -70,7 +71,8 @@ beforeEach(() => {
   mocks.questionCreate.mockImplementation(async ({ data }) => native.quizzes.find((q) => q.id === data.quizId)!.questions.push({ id: randomUUID(), ...data }));
   mocks.transaction.mockImplementation(async (run) => run({
     lmsCourse: { create: mocks.courseCreate, update: mocks.courseUpdate },
-    lmsModule: { create: mocks.moduleCreate }, lmsLesson: { create: mocks.lessonCreate },
+    lmsModule: { create: mocks.moduleCreate, update: vi.fn() },
+    lmsLesson: { create: mocks.lessonCreate, findMany: mocks.lessonFind, update: vi.fn(), delete: vi.fn() },
     lmsQuiz: { create: mocks.quizCreate, deleteMany: mocks.quizPrune, upsert: mocks.quizUpsert },
     lmsQuizQuestion: { create: mocks.questionCreate, deleteMany: mocks.questionDelete,
       findMany: async ({ where }: { where: { quizId: string } }) => native.quizzes.find((q) => q.id === where.quizId)?.questions ?? [] },
@@ -293,6 +295,21 @@ describe('create-only structured native curriculum', () => {
     expect(mocks.courseUpdate).toHaveBeenCalledTimes(1);
     expect(mocks.quizPrune).toHaveBeenCalledTimes(1);
     expect(mocks.lessonCreate.mock.calls[0][0].data.contentBody).toBe('<p>Existing path</p>');
+  });
+
+  // Quiz-loop review round 7: a module's second quiz lesson (not shown in the editor) kept its
+  // lesson but lost its quiz, questions and attempts to the orphan-quiz prune.
+  it('a legacy update keeps every quiz a surviving lesson points to', async () => {
+    mocks.find.mockResolvedValue({ ...native, id: 'legacy', meta: null,
+      modules: [{ id: 'm1', title: 'Module', orderIndex: 0, lessons: [] }] });
+    mocks.lessonFind.mockResolvedValue([
+      { id: 'l1', orderIndex: 0, contentType: 'text', contentBody: '<p>Reading</p>' },
+      { id: 'l2', orderIndex: 1, contentType: 'quiz', contentBody: 'quiz-one' },
+      { id: 'l3', orderIndex: 2, contentType: 'quiz', contentBody: 'quiz-two' },
+    ]);
+    await adminUpdateCourse('legacy', { ...input(), modules: [{ id: 'm1', title: 'Module', textContent: 'Reading' }] });
+    expect(mocks.quizPrune).toHaveBeenCalledTimes(1);
+    expect([...mocks.quizPrune.mock.calls[0][0].where.id.notIn].sort()).toEqual(['quiz-one', 'quiz-two']);
   });
 });
 
