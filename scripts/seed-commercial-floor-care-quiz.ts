@@ -23,7 +23,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { prisma } from '../src/lib/prisma';
-import { existingExplanations, explanationFor } from '../src/lib/lms/quiz-explanation-carry';
+import { writeQuizQuestions } from '../src/lib/lms/quiz-explanation-carry';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const QUIZZES_PATH = join(__dirname, '..', 'data', 'seed', 'commercial-floor-care-quiz.json');
@@ -102,25 +102,8 @@ async function main() {
       },
     });
 
-    // Keep authored explanations: the JSON's own wins, else the saved one carries forward.
-
-    const priorExplanations = await existingExplanations(prisma, quiz.quizId);
-
-    await prisma.lmsQuizQuestion.deleteMany({ where: { quizId: quiz.quizId } });
-    for (let i = 0; i < quiz.questions.length; i += 1) {
-      const q = quiz.questions[i];
-      await prisma.lmsQuizQuestion.create({
-        data: {
-          quizId: quiz.quizId,
-          questionText: q.questionText,
-          options: q.options.map((text) => ({ text })),
-          correctIndex: q.correctIndex,
-          orderIndex: i,
-          points: q.points ?? 1,
-          explanation: explanationFor(q.questionText, q.explanation, priorExplanations),
-        },
-      });
-    }
+    // Unchanged questions keep their ids; authored explanations are never erased.
+    await writeQuizQuestions(prisma, quiz.quizId, quiz.questions);
     seeded += 1;
   }
 

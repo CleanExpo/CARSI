@@ -18,7 +18,7 @@ import {
   ensureCatalogInstructor,
   type CourseWithCurriculum,
 } from '@/lib/server/course-catalog-sync';
-import { explanationFor } from '@/lib/lms/quiz-explanation-carry';
+import { writeQuizQuestions } from '@/lib/lms/quiz-explanation-carry';
 
 /** Interactive tx default is 5s; remote Postgres + many modules/lessons exceeds that (P2028). */
 const ADMIN_COURSE_WRITE_TX_OPTIONS = {
@@ -356,57 +356,7 @@ export async function writeModuleQuiz(
     create: { id: quizId, courseId, title, passPercentage, attemptsAllowed },
     update: { courseId, title, passPercentage, attemptsAllowed },
   });
-  // When the questions themselves are unchanged (same text, options, answer and points in the
-  // same order), only explanations can differ: update those rows in place so question ids and
-  // the lesson's content version stay the same and no learner's in-progress quiz goes stale.
-  const current = await tx.lmsQuizQuestion.findMany({
-    where: { quizId },
-    orderBy: { orderIndex: 'asc' },
-    select: { id: true, questionText: true, options: true, correctIndex: true, points: true, explanation: true },
-  });
-  const unchanged =
-    current.length === quiz.questions.length &&
-    current.every((row, i) => {
-      const q = quiz.questions[i];
-      return (
-        row.questionText === q.questionText &&
-        JSON.stringify(row.options) === JSON.stringify(q.options.map((text) => ({ text }))) &&
-        row.correctIndex === q.correctIndex &&
-        row.points === (q.points ?? 1)
-      );
-    });
-  if (unchanged) {
-    for (let i = 0; i < current.length; i += 1) {
-      // An authored explanation in the input wins; otherwise the saved one is kept.
-      const next = quiz.questions[i].explanation?.trim() || current[i].explanation?.trim() || null;
-      if (next !== (current[i].explanation ?? null)) {
-        await tx.lmsQuizQuestion.update({ where: { id: current[i].id }, data: { explanation: next } });
-      }
-    }
-    return quizId;
-  }
-  // Otherwise replace the questions so re-writes stay in sync with the input, carrying each
-  // authored explanation to the question with the same text so an ordinary save never erases it.
-  const priorExplanations = new Map(
-    current
-      .filter((row) => row.explanation?.trim())
-      .map((row) => [row.questionText.trim(), row.explanation!.trim()] as const)
-  );
-  await tx.lmsQuizQuestion.deleteMany({ where: { quizId } });
-  for (let i = 0; i < quiz.questions.length; i += 1) {
-    const q = quiz.questions[i];
-    await tx.lmsQuizQuestion.create({
-      data: {
-        quizId,
-        questionText: q.questionText,
-        options: q.options.map((text) => ({ text })),
-        correctIndex: q.correctIndex,
-        orderIndex: i,
-        points: q.points ?? 1,
-        explanation: explanationFor(q.questionText, q.explanation, priorExplanations),
-      },
-    });
-  }
+  await writeQuizQuestions(tx, quizId, quiz.questions);
   return quizId;
 }
 
