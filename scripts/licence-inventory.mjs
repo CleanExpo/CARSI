@@ -150,7 +150,7 @@ export const BLOCK_RULES = [
     terms: ['repair', 'colour', 'reinstall'],
     unless:
       /Technician|CARSI sells no|does not (?:sell|offer|cover)|removed|or refer|IICRC CRT|refer it/i,
-    re: /\b(?:carpet|colou?r|rug|fabric) repair(?: and re-?installation)?\b[^.!?]{0,40}\b(?:training|courses?|programs?|modules?|lessons?|class(?:es)?)\b|\b(?:training|courses?|programs?|modules?) (?:in|on|for) (?:carpet|colou?r) repair\b/i,
+    re: /\b(?:carpet|colou?r|rug|fabric) repair(?: and re-?installation)?\b[^.!?]{0,40}\b(?:training|courses?|programs?|modules?|lessons?|class(?:es)?)\b|\b(?:training|courses?|programs?|modules?) (?:in|on|for) (?:carpet|colou?r) repair\b|\b(?:learn|teach(?:es)?|master|train(?:s|ed)? (?:in|on)|study|enrol (?:in|for))\s+(?:\w+\s+){0,2}?(?:carpet|colou?r|rug|fabric) repair\b/i,
   },
   {
     name: 'promises CECs with no approval condition in the same sentence',
@@ -272,7 +272,6 @@ export const LEGIT_RULES = [
   {
     name: 'repair of a building, leak or machine (not a course offer)',
     terms: ['repair'],
-    local: true,
     re: /(?:leak|pipe|plumb|roof|burst|structur|building|equipment|machine|regulator|pump|float|defect|wall|house|flood)\w*[^.]{0,60}\brepair|\brepair\w*[^.]{0,60}(?:leak|pipe|roof|trade|building|equipment|machine|house|flood|owner|replace|reseal|scope)|insurer-funded repair|as well as the repair|after the repair|repair networks|^repair work\.|repair cost|old repairs|repairs?, retouching|a repair you didn|good repair|repair the truncation|truncat\w*|inpainting|conservation|removal\/repair|repair, minor modification|quote it as a repair|does not cover interior fabric repair|Maintenance and Repair Services/i,
   },
   {

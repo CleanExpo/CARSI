@@ -127,6 +127,7 @@ describe('licence inventory', () => {
     // review of 6fc2bba2 (public surfaces)
     ['iicrc-code', INDUSTRY, `CARSI offers IICRC ${CODE} certification courses online.`],
     ['repair', INDUSTRY, 'CARSI offers carpet repair training for building repair teams.'],
+    ['repair', INDUSTRY, 'Learn carpet repair alongside building repair skills.'],
     ['count-claim', INDUSTRY, '537 councils across Australia'],
     ['count-claim', PUBLIC, 'Trusted by 500+ Australian technicians'],
     ['iicrc-code', INDUSTRY, 'Odor Control Technician OCT Specialist skill for fire damage.'],
