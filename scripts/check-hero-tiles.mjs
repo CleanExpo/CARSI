@@ -17,17 +17,26 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const TILES_SOURCE = path.join(ROOT, 'src/components/membership/hex-geometry.ts');
 const LIVE_URL = 'https://carsi.com.au/api/lms/courses';
 
-/** Course slugs the floor's tiles declare, read from the source of truth. */
+/**
+ * Course slugs the floor's tiles declare, read from the source of truth. Throws when a tile's slug
+ * cannot be read (any quote style is accepted), so an unread tile can never pass unchecked.
+ */
 export function tileCourseSlugs(source) {
   const block = source.slice(source.indexOf('export const HEX_COURSE_TILES'));
-  const end = block.indexOf('] as const;');
-  return [...block.slice(0, end).matchAll(/course:\s*'([^']+)'/g)].map((m) => m[1]);
+  const body = block.slice(0, block.indexOf('] as const;'));
+  const slugs = [...body.matchAll(/course:\s*(['"`])([^'"`]+)\1/g)].map((m) => m[2]);
+  const tiles = (body.match(/\bimage:/g) ?? []).length;
+  if (slugs.length !== tiles) {
+    throw new Error(`read ${slugs.length} course slug(s) for ${tiles} tile(s)`);
+  }
+  return slugs;
 }
 
 /** Published slugs from a /api/lms/courses response body. */
 export function publishedSlugs(body) {
-  const items = Array.isArray(body) ? body : body?.items ?? body?.courses ?? body?.data;
-  if (!Array.isArray(items) || items.length === 0) throw new Error('catalogue response has no courses');
+  const items = Array.isArray(body) ? body : (body?.items ?? body?.courses ?? body?.data);
+  if (!Array.isArray(items) || items.length === 0)
+    throw new Error('catalogue response has no courses');
   return new Set(items.map((c) => c?.slug).filter((s) => typeof s === 'string'));
 }
 
@@ -37,7 +46,13 @@ export function unbackedTiles(tiles, published) {
 }
 
 async function main(argv) {
-  const tiles = tileCourseSlugs(readFileSync(TILES_SOURCE, 'utf8'));
+  let tiles;
+  try {
+    tiles = tileCourseSlugs(readFileSync(TILES_SOURCE, 'utf8'));
+  } catch (error) {
+    console.error(`check-hero-tiles: hex-geometry.ts unreadable (${error.message}); no verdict`);
+    return 2;
+  }
   if (tiles.length === 0) {
     console.error('check-hero-tiles: no tiles found in hex-geometry.ts');
     return 2;
@@ -62,7 +77,9 @@ async function main(argv) {
   }
   const missing = unbackedTiles(tiles, published);
   if (missing.length) {
-    console.error(`check-hero-tiles: ${missing.length} tile(s) name an unpublished course: ${missing.join(', ')}`);
+    console.error(
+      `check-hero-tiles: ${missing.length} tile(s) name an unpublished course: ${missing.join(', ')}`
+    );
     return 1;
   }
   console.log(`check-hero-tiles: all ${new Set(tiles).size} tile courses are published`);

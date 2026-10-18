@@ -5,86 +5,49 @@
  */
 
 /**
- * The floor's tiles. Each image shows work taught by the published course named beside it
- * (every slug resolved on carsi.com.au/api/lms/courses, 18/10/2026). Tiles are illustrations of
- * that work, so copy still never calls a tile "a course". Every image must exist under /public.
- *
- * Every image was inspected at full size (18/10/2026). Excluded, and never to be re-added here:
- * images showing an IICRC discipline acronym or biohazard work CARSI does not
- * teach, a stray colour code, or legible misspelt signage. See BANNED_TILE_IMAGES.
+ * The floor's tiles. Each image is a square crop, cut by scripts/build-hero-tiles.mjs, that frames
+ * work taught by the published course named beside it (every slug resolved on
+ * carsi.com.au/api/lms/courses, 18/10/2026). Tiles are illustrations of that work, so copy still
+ * never calls a tile "a course". Every image must exist under /public.
  */
 export const HEX_COURSE_TILES = [
   {
-    image: '/images/courses/intro-water-damage-restoration.webp',
+    image: '/images/hero-tiles/water-moisture-check.webp',
     course: 'introduction-to-water-damage-restoration',
   },
   {
-    image: '/images/courses/intro-infrared-thermography.webp',
+    image: '/images/hero-tiles/carpet-extraction.webp',
+    course: 'introduction-to-basic-carpet-cleaning-and-drying',
+  },
+  { image: '/images/hero-tiles/mould-sampling.webp', course: 'level-1-mould-remediation-2cc96b85' },
+  {
+    image: '/images/hero-tiles/soot-ceiling-cleaning.webp',
+    course: 'introduction-to-smoke-and-soot-damage-restoration',
+  },
+  {
+    image: '/images/hero-tiles/structural-drying-airflow.webp',
+    course: 'introduction-to-structural-drying-concepts',
+  },
+  {
+    image: '/images/hero-tiles/infrared-moisture-image.webp',
     course: 'introduction-to-infrared-thermography-for-drying',
-  },
-  {
-    image: '/images/courses/mould-remediation-level-1.webp',
-    course: 'level-1-mould-remediation-2cc96b85',
-  },
-  {
-    image: '/images/courses/mould-remediation-level-2.webp',
-    course: 'level-2-mould-remediation-30ee3492',
-  },
-  { image: '/images/courses/fire-damage-assessment.webp', course: 'fire-smoke-restoration-core' },
-  {
-    image: '/images/courses/intro-smoke-soot-restoration.webp',
-    course: 'introduction-to-smoke-and-soot-damage-restoration',
-  },
-  {
-    image: '/images/courses/soot-removal.webp',
-    course: 'introduction-to-smoke-and-soot-damage-restoration',
-  },
-  {
-    image: '/images/courses/intro-odour-control.webp',
-    course: 'introduction-to-odour-control-and-removal-techniques',
-  },
-  {
-    image: '/images/courses/hard-floor-cleaning.webp',
-    course: 'tile-cleaning-for-carpet-cleaners',
-  },
-  {
-    image: '/images/courses/infection-control-childcare.webp',
-    course: 'infection-control-in-child-care',
   },
 ] as const;
 
 export const HEX_COURSE_IMAGES = HEX_COURSE_TILES.map((t) => t.image);
 
 /**
- * Images inspected at full size (18/10/2026) and cleared: no IICRC discipline acronym or mark, no
- * stray or misspelt text, and the scene shows work the named course teaches. Hero tiles and the
- * landing cards may use only these; a new image needs the same inspection before it is added.
+ * Hero-tile crops inspected at full size (18/10/2026): no text, lettering, logo or mark anywhere in
+ * the frame, and the scene shows work the named course teaches. Written out by hand on purpose: a
+ * tile with any other image fails the tests until that image is inspected and listed here.
  */
 export const INSPECTED_IMAGES = [
-  ...HEX_COURSE_TILES.map((t) => t.image),
-  '/images/courses/intro-hvac-drying.webp',
-] as const;
-
-/** Images that failed the full-size inspection; the tests keep them off the page. */
-export const BANNED_TILE_IMAGES = [
-  '/images/courses/flood-restoration.webp', // an IICRC discipline acronym printed on the bin
-  '/images/courses/containment-barriers.webp', // "BIOHAZARD" tape and an IICRC discipline acronym on the machine
-  '/images/courses/donning-doffing-ppe.webp', // "#2490ec" colour code baked into the scene
-  '/images/courses/insurance-documentation.webp', // legible misspelt document headings
-  '/images/courses/contents-restoration.webp', // legible misspelt "SAVVAGE" box
-  '/images/courses/rug-cleaning.webp', // no published course
-  '/images/courses/biohazard-remediation.webp', // no published course
-  '/images/courses/healthcare-cleaning.webp', // no published course
-  '/images/courses/intro-applied-structural-drying.webp', // small illegible machine labels
-  '/images/courses/dehumidification.webp', // garbled display text
-  '/images/courses/moisture-meter-training.webp', // garbled brand text on the meter
-  '/images/courses/carpet-cleaning-basics.webp', // garbled text on the machine
-  '/images/courses/glass-cleaning.webp', // rope-access work the course does not teach
-  '/images/courses/intro-water-extraction.webp', // garbled lettering on the truck
-  '/images/courses/intro-asbestos-awareness.webp', // removal work an awareness course does not teach
-  '/images/courses/risk-assessment.webp', // misspelt clipboard heading
-  '/images/courses/air-filtration-equipment.webp', // garbled machine labels
-  '/images/courses/intro-safety-procedures.webp', // misspelt confined-space sign
+  '/images/hero-tiles/water-moisture-check.webp',
+  '/images/hero-tiles/carpet-extraction.webp',
+  '/images/hero-tiles/mould-sampling.webp',
+  '/images/hero-tiles/soot-ceiling-cleaning.webp',
+  '/images/hero-tiles/structural-drying-airflow.webp',
+  '/images/hero-tiles/infrared-moisture-image.webp',
 ] as const;
 
 /** Pixel size of one square slot in the course atlas texture. */
