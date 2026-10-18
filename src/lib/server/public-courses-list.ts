@@ -211,7 +211,21 @@ export async function getDashboardCourseListItemsFromDatabase(options: {
 const publicListInclude = {
   _count: { select: { modules: true } },
   instructor: { select: { fullName: true } },
+  // Lesson totals for the catalogue card: one count per module, no lesson rows fetched.
+  modules: { select: { _count: { select: { lessons: true } } } },
 } as const;
+
+/**
+ * Lessons in a course, summed from per-module counts. The public list used to return null, so
+ * catalogue cards showed no lesson count while course pages listed 5 to 24 (measured 18/10/2026).
+ * Null when the modules were not loaded, so a missing figure never reads as zero lessons.
+ */
+export function sumLessonCounts(
+  modules: ReadonlyArray<{ _count: { lessons: number } }> | null | undefined
+): number | null {
+  if (!modules) return null;
+  return modules.reduce((n, m) => n + m._count.lessons, 0);
+}
 
 type LmsCoursePublicListRow = {
   id: string;
@@ -230,6 +244,7 @@ type LmsCoursePublicListRow = {
   updatedAt: Date;
   instructor: { fullName: string | null } | null;
   _count: { modules: number };
+  modules?: { _count: { lessons: number } }[];
 };
 
 function mapLmsCourseToPublicListItem(c: LmsCoursePublicListRow): CourseListItem {
@@ -245,7 +260,7 @@ function mapLmsCourseToPublicListItem(c: LmsCoursePublicListRow): CourseListItem
     level: c.level,
     category: c.category,
     tags: normalizeCourseTags(c.tags),
-    lesson_count: null,
+    lesson_count: sumLessonCounts(c.modules),
     module_count: c._count.modules,
     updated_at: c.updatedAt.toISOString(),
     instructor: c.instructor?.fullName ? { full_name: c.instructor.fullName } : null,

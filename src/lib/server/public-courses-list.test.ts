@@ -16,6 +16,7 @@ import {
   getPublishedCourseListItemsFromDatabase,
   getPublishedCourseSlugsFromDatabase,
   lmsPublishedCourseWhere,
+  sumLessonCounts,
   type DashboardCourseStatusFilter,
 } from './public-courses-list';
 
@@ -122,5 +123,32 @@ describe('the dashboard catalogue query (mocked Prisma)', () => {
     process.env.NEXT_PHASE = 'phase-production-build';
     expect(await getDashboardCourseListItemsFromDatabase({ status: 'all', role: 'admin' })).toEqual([]);
     expect(findMany).not.toHaveBeenCalled();
+  });
+});
+
+describe('catalogue lesson counts (18/10/2026: every live card showed no lesson count)', () => {
+  it('sums lessons across modules', () => {
+    expect(sumLessonCounts([{ _count: { lessons: 5 } }, { _count: { lessons: 7 } }])).toBe(12);
+  });
+
+  it('a course with no modules has zero lessons; modules not loaded stays null, never zero', () => {
+    expect(sumLessonCounts([])).toBe(0);
+    expect(sumLessonCounts(undefined)).toBeNull();
+  });
+
+  it('the public list query loads per-module lesson counts and maps them onto lesson_count', async () => {
+    findMany.mockResolvedValueOnce([
+      {
+        id: 'c1', slug: 'water-damage', title: 'Water damage', shortDescription: null,
+        priceAud: { toString: () => '29' }, isFree: false, iicrcDiscipline: null, thumbnailUrl: null,
+        level: null, category: null, tags: [], cecHours: null, durationHours: null,
+        updatedAt: new Date('2026-10-18T00:00:00Z'), instructor: null, _count: { modules: 2 },
+        modules: [{ _count: { lessons: 4 } }, { _count: { lessons: 3 } }],
+      },
+    ]);
+    const items = await getPublishedCourseListItemsFromDatabase();
+    const call = findMany.mock.calls.at(-1) as unknown as [{ include?: { modules?: unknown } }];
+    expect(call[0].include?.modules).toEqual({ select: { _count: { select: { lessons: true } } } });
+    expect(items[0].lesson_count).toBe(7);
   });
 });

@@ -6,6 +6,7 @@ import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { runSerializable } from '@/lib/server/db-tx';
 import { ACCESS_GRANTING_STATUS_LIST } from '@/lib/server/enrollment-access';
 import { computeQuizResult } from '@/lib/server/lms-completion';
+import { buildQuizFeedback } from '@/lib/lms/quiz-feedback';
 import { CHECKPOINT_UUID, CheckpointError } from '@/lib/lms/lesson-checkpoint';
 import { getVersionBoundQuizForAttempt, readCheckpointJsonBody } from '@/lib/server/lesson-checkpoint';
 import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
@@ -61,11 +62,18 @@ async function submitBound(studentId: string, quizId: string, body: unknown) {
         VALUES (${randomUUID()}::uuid, ${quizId}::uuid, ${studentId}::uuid, ${scorePercent}, ${passed},
           ${JSON.stringify(input.answers)}::jsonb, ${graph.contentVersion}, NOW()) RETURNING id`;
       if (attempts.length !== 1) throw new CheckpointError(503);
+      // Read after grading and outside the version-bound graph: an authored explanation must not
+      // change the lesson's content version (which would mark in-progress attempts stale).
+      const explained = await tx.$queryRaw<{ id: string; explanation: string | null }[]>`SELECT id, explanation
+        FROM lms_quiz_questions WHERE quiz_id = ${quizId}::uuid AND explanation IS NOT NULL`;
+      const feedback = buildQuizFeedback(graph.questions, input.answers,
+        new Map(explained.map((row) => [row.id, row.explanation])));
       return { attempt_id: attempts[0].id, score_percent: scorePercent, passed,
         pass_percentage: graph.quiz.passPercentage,
         correct_count: correctCount,
         question_count: graph.questions.length,
-        attempts_remaining: Math.max(0, graph.quiz.attemptsAllowed - attemptsUsed - 1) };
+        attempts_remaining: Math.max(0, graph.quiz.attemptsAllowed - attemptsUsed - 1),
+        feedback };
     });
     return boundJson(result);
   } catch (error) {
@@ -187,6 +195,8 @@ export async function POST(request: NextRequest, ctx: Ctx) {
       correct_count: correctCount,
       question_count: quiz.questions.length,
       attempts_remaining: Math.max(0, quiz.attemptsAllowed - result.attemptsUsed - 1),
+      feedback: buildQuizFeedback(quiz.questions, answers,
+        new Map(quiz.questions.map((q) => [q.id, q.explanation]))),
     });
   } catch (e) {
     console.error('[quizzes/attempt]', e);

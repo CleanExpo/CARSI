@@ -3,6 +3,7 @@
 import { LessonPlayer } from '@/components/lms/LessonPlayer';
 import { Button } from '@/components/ui/button';
 import { apiClient } from '@/lib/api/client';
+import { lessonQuizHref } from '@/lib/lms/quiz-links';
 import { ArrowLeft, ClipboardList } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -64,7 +65,7 @@ export default function LessonPage() {
                   </p>
                 </div>
                 <Button
-                  onClick={() => router.push(`/courses/${params.slug}/quiz/${lesson.quiz_id}`)}
+                  onClick={() => router.push(lessonQuizHref(params.slug, lesson.id))}
                   className="shrink-0 gap-2 rounded-sm"
                   style={{ background: '#2490ed', color: '#fff' }}
                 >
