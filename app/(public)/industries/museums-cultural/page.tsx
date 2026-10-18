@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     'museum IICRC CEC training Australia',
     'heritage preservation restoration',
     'artifact protection water damage',
-    'AMRT mould remediation museum',
+    'mould remediation museum',
     'cultural institution restoration training',
   ],
 };
@@ -33,14 +33,14 @@ export const metadata: Metadata = {
 const ACCENT_COLOR = '#8B6914';
 
 const disciplines = [
-  { code: 'AMRT', label: 'Applied Microbial Remediation', color: '#8B6914' },
-  { code: 'WRT', label: 'Water Damage Restoration', color: '#7A5C12' },
-  { code: 'ASD', label: 'Applied Structural Drying', color: '#6B5010' },
+  { code: 'AMRT', label: 'Mould remediation', color: '#8B6914' },
+  { code: 'WRT', label: 'Water damage', color: '#7A5C12' },
+  { code: 'ASD', label: 'Structural drying', color: '#6B5010' },
 ];
 
 const stats = [
-  { value: '1,200+', label: 'Museums & Galleries' },
-  { value: 'ISO', label: '11799 Aligned' },
+  { value: 'Online', label: 'Self-paced study' },
+  { value: 'CARSI', label: 'Verifiable credentials' },
   { value: 'IICRC', label: 'CEC Accredited' },
 ];
 
@@ -79,7 +79,7 @@ const whyCards = [
     icon: Droplets,
     title: 'Water Damage Response',
     description:
-      'Roof leaks, pipe bursts, and flooding near collection storage demand immediate, trained response. WRT certification ensures your team can triage and protect high-value items.',
+      'Roof leaks, pipe bursts, and flooding near collection storage demand immediate, trained response. Water damage training helps your team triage and protect high-value items.',
     color: '#7A5C12',
   },
   {
@@ -105,7 +105,7 @@ export default async function MuseumsCulturalIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Museum & Gallery"
         headlineAccent="Preservation Training"
-        description="Heritage preservation training for Australia's 1,200+ museums, galleries, and cultural institutions. IICRC credentials for artefact protection, mould prevention, and climate-controlled environment recovery."
+        description="Restoration training for museum, gallery and cultural institution teams: mould prevention, water damage response and drying in climate-controlled spaces."
         disciplines={disciplines}
         stats={stats}
       />

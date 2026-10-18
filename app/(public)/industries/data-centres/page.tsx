@@ -20,9 +20,9 @@ export const metadata: Metadata = {
   keywords: [
     'data centre IICRC CEC training Australia',
     'water damage prevention data centre',
-    'WRT restoration data centre',
-    'ASD structural drying server room',
-    'FSRT fire suppression data centre',
+    'data centre water damage restoration',
+    'server room structural drying',
+    'data centre fire suppression clean-up',
   ],
 };
 
@@ -33,14 +33,14 @@ export const metadata: Metadata = {
 const ACCENT_COLOR = '#6A1B9A';
 
 const disciplines = [
-  { code: 'WRT', label: 'Water Damage Restoration', color: '#6A1B9A' },
-  { code: 'ASD', label: 'Applied Structural Drying', color: '#4A148C' },
-  { code: 'FSRT', label: 'Fire & Smoke Restoration', color: '#7B1FA2' },
+  { code: 'WRT', label: 'Water damage', color: '#6A1B9A' },
+  { code: 'ASD', label: 'Structural drying', color: '#4A148C' },
+  { code: 'FSRT', label: 'Fire and smoke', color: '#7B1FA2' },
 ];
 
 const stats = [
-  { value: '300+', label: 'Data Centres' },
-  { value: 'Uptime', label: 'Institute Tier III+' },
+  { value: 'Online', label: 'Self-paced study' },
+  { value: 'CARSI', label: 'Verifiable credentials' },
   { value: 'IICRC', label: 'CEC Accredited' },
 ];
 
@@ -48,7 +48,7 @@ const faqs = [
   {
     question: 'What restoration training suits Australian data centres?',
     answer:
-      'Water damage response for cooling-unit leaks and pipe bursts, structural drying for fast moisture removal, and smoke and residue clean-up after a suppression event. Relevant CARSI courses include Introduction to Water Damage in Commercial Buildings, Introduction to Applied Structural Drying and Introduction to Smoke and Soot Damage Restoration, all IICRC CEC Accredited, each with its CEC hours shown on the course page.',
+      'Water damage response for cooling-unit leaks and pipe bursts, structural drying for fast moisture removal, and smoke and residue clean-up after a suppression event. Relevant CARSI courses include Introduction to Water Damage in Commercial Buildings, Introduction to Applied Structural Drying and Introduction to Smoke and Soot Damage Restoration. Where the IICRC has approved a course, its CEC hours are shown on the course page.',
   },
   {
     question: 'How does water damage training protect data centre infrastructure?',
@@ -105,7 +105,7 @@ export default async function DataCentresIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Data Centre"
         headlineAccent="Protection Training"
-        description="IICRC CEC Accredited restoration courses for Australia's 300+ data centres. Credentials for water damage prevention, climate control recovery, and fire suppression system response — protecting uptime SLAs and infrastructure investment."
+        description="Restoration courses for data centre facility teams: water damage response, drying after cooling failures, and clean-up after a fire suppression event."
         disciplines={disciplines}
         stats={stats}
       />

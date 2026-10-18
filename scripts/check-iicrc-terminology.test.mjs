@@ -12,7 +12,7 @@
  * The allow-cases matter as much as the block-cases: every one is a phrasing CLAUDE.md
  * explicitly permits, and a guard that blocks them would be turned off within a week.
  */
-import { scanText } from './check-iicrc-terminology.mjs';
+import { scanFile, scanText } from './check-iicrc-terminology.mjs';
 
 const F = 'app/(public)/fixture/page.tsx';
 
@@ -124,6 +124,14 @@ const MUST_BLOCK = [
   ['acronym + module', 'Finish the OCT module before the site visit.'],
   ['acronym + hyphen + training', 'FSRT-training for bushfire crews'],
   ['a nearby sentence does not launder it', 'We rarely use acronyms. WRT training for plumbers.'],
+  // Review of fix/industry-faq-licence (18/10/2026): forms the first version missed.
+  ['title-case acronym', 'Enrol in our Wrt training today.'],
+  ['lower-case acronym', 'Enrol in our wrt training today.'],
+  ['en dash', 'Book WRT\u2013training today.'],
+  ['em dash', 'Book ASD\u2014courses this month.'],
+  ['possessive', "Explore CARSI WRT's training."],
+  ['curly possessive', 'Explore CARSI WRT\u2019s training.'],
+  ['"never" exempts only its own sentence', 'Never call it a WRT course — use CARSI. Book ASD training today.'],
 ];
 
 const MUST_PASS = [
@@ -171,6 +179,9 @@ const MUST_PASS = [
   ['prompt forbidding the construction', 'Never call it a WRT course — use the CARSI designation.'],
   ['the IICRC naming its own course', "The IICRC's WRT course is taught only by IICRC-approved schools."],
   ['plain-English subject', 'Water damage restoration training for plumbers.'],
+  ['month abbreviation, title case', 'Book the Oct training session early.'],
+  ['month abbreviation, lower case', 'oct training calendar'],
+  ['forbidding sentence on its own', 'Never call it a WRT course; use the CARSI designation instead.'],
   ['denial that a course carries CECs', 'This course carries no IICRC CECs (pending IICRC approval).'],
   ['the FAQ question itself', 'Is this course IICRC CEC accredited or does it award CECs?'],
   ['code describing the gate', '{/* assert this course earns CECs only when it has registry-approved hours */}'],
@@ -247,11 +258,35 @@ for (const [name, src] of MUST_PASS) {
   }
 }
 
+// The CLI scans files line by line; scanFile also joins adjacent lines for cross-line rules.
+const F_MULTI = 'app/(public)/fixture/page.tsx';
+const MUST_BLOCK_FILE = [
+  ['line break between acronym and training', 'Explore CARSI WRT\n            training today.'],
+  ['line break before a hyphenated noun', 'Book the FSRT\n  -training cohort'],
+];
+const MUST_PASS_FILE = [
+  ['a code on one line, an unrelated word on the next', "disciplines={['WRT']}\ntraining: true,"],
+  ['plain subject across a break', 'Water damage restoration\ntraining for plumbers.'],
+];
+for (const [name, src] of MUST_BLOCK_FILE) {
+  if (scanFile(F_MULTI, src).length === 0) {
+    console.error(`✖ MUST BLOCK (file) but passed: ${name}\n    ${JSON.stringify(src)}`);
+    failed++;
+  }
+}
+for (const [name, src] of MUST_PASS_FILE) {
+  const f = scanFile(F_MULTI, src);
+  if (f.length > 0) {
+    console.error(`✖ MUST PASS (file) but blocked: ${name}\n    ${f.join('\n    ')}`);
+    failed++;
+  }
+}
+
 if (failed > 0) {
   console.error(`\n✖ IICRC terminology guard self-test failed — ${failed} case(s).`);
   process.exit(1);
 }
 console.log(
-  `✓ IICRC terminology guard self-test passed (${MUST_BLOCK.length} block, ${MUST_PASS.length} pass).`
+  `✓ IICRC terminology guard self-test passed (${MUST_BLOCK.length + MUST_BLOCK_FILE.length} block, ${MUST_PASS.length + MUST_PASS_FILE.length} pass).`
 );
 process.exit(0);

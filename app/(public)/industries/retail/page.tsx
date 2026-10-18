@@ -31,16 +31,16 @@ export const metadata: Metadata = {
 const ACCENT_COLOR = '#dc2626';
 
 const disciplines = [
-  { code: 'WRT', label: 'Water Damage Restoration', color: '#dc2626' },
-  { code: 'CRT', label: 'Carpet Cleaning', color: '#b91c1c' },
-  { code: 'OCT', label: 'Odour Control', color: '#991b1b' },
-  { code: 'FSRT', label: 'Fire & Smoke Restoration', color: '#7f1d1d' },
+  { code: 'WRT', label: 'Water damage', color: '#dc2626' },
+  { code: 'CRT', label: 'Carpet cleaning', color: '#b91c1c' },
+  { code: 'OCT', label: 'Odour control', color: '#991b1b' },
+  { code: 'FSRT', label: 'Fire and smoke', color: '#7f1d1d' },
 ];
 
 const stats = [
-  { value: '2,000+', label: 'Shopping Centres' },
-  { value: '$140B', label: 'Retail Sector' },
-  { value: 'IICRC', label: 'Approved' },
+  { value: 'Online', label: 'Self-paced study' },
+  { value: 'CARSI', label: 'Verifiable credentials' },
+  { value: 'IICRC CEC', label: 'On approved courses' },
 ];
 
 const whyCards = [
@@ -62,7 +62,7 @@ const whyCards = [
     icon: Wind,
     title: 'Food Court Compliance',
     description:
-      'OCT certification for odour control in food service areas. Maintain indoor air quality standards across food courts, ensuring compliance with centre management requirements.',
+      'Odour control training for food service areas. Maintain indoor air quality standards across food courts, ensuring compliance with centre management requirements.',
     color: '#ed9d24',
   },
 ];
@@ -80,7 +80,7 @@ export default async function RetailIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Shopping Centre"
         headlineAccent="Restoration Training"
-        description="IICRC CEC Accredited training for retail property maintenance teams. Pre-qualify for major landlord panels and deliver rapid-response restoration across shopping centre portfolios."
+        description="Restoration training for retail property maintenance teams, for rapid-response restoration across shopping centre portfolios."
         disciplines={disciplines}
         stats={stats}
       />

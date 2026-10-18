@@ -31,13 +31,13 @@ export const metadata: Metadata = {
 const ACCENT_COLOR = '#e91e63';
 
 const disciplines = [
-  { code: 'AMRT', label: 'Applied Microbial Remediation', color: '#e91e63' },
-  { code: 'CRT', label: 'Carpet Restoration', color: '#9c27b0' },
-  { code: 'WRT', label: 'Water Damage Restoration', color: '#673ab7' },
+  { code: 'AMRT', label: 'Mould remediation', color: '#e91e63' },
+  { code: 'CRT', label: 'Carpet cleaning', color: '#9c27b0' },
+  { code: 'WRT', label: 'Water damage', color: '#673ab7' },
 ];
 
 const stats = [
-  { value: '16,000+', label: 'Approved Centres' },
+  { value: 'Online', label: 'Self-paced study' },
   { value: 'NQF', label: 'Quality Framework' },
   { value: 'IICRC', label: 'CEC Accredited' },
 ];
@@ -61,7 +61,7 @@ const whyCards = [
     icon: Droplets,
     title: 'Water Play Response',
     description:
-      'Water damage from bathrooms, wet rooms, and water play areas is common. IICRC-certified staff respond correctly the first time.',
+      'Water damage from bathrooms, wet rooms, and water play areas is common. Trained staff know the first steps to take.',
     color: '#ed9d24',
   },
 ];
@@ -79,7 +79,7 @@ export default async function ChildcareIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Childcare Hygiene &"
         headlineAccent="Infection Control"
-        description="NQF-compliant training for childcare centres across Australia. Equip your cleaning and maintenance staff with IICRC-recognised credentials in carpet restoration, microbial remediation, and water damage response."
+        description="Training for childcare centre cleaning and maintenance staff across Australia in carpet cleaning, microbial remediation and water damage response. Every completed course issues a verifiable CARSI credential."
         disciplines={disciplines}
         stats={stats}
       />
@@ -103,7 +103,7 @@ export default async function ChildcareIndustryPage() {
         subtitle="Childcare Compliance Training"
         title="Childcare Compliance Bundle"
         price={industryBundlePriceLabel('childcare')}
-        description="AMRT Infection Control + CRT Carpet Basics + WRT Fundamentals. Minimal roster disruption — 2-4 hour self-paced modules."
+        description="Mould and microbial remediation, carpet cleaning and water damage restoration. Online and self-paced, so training fits around rosters."
         ctaText="Get Started"
         accentColor={ACCENT_COLOR}
       />

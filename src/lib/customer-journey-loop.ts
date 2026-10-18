@@ -139,9 +139,9 @@ export const pathwayAdvisorOptions: PathwayAdvisorOption[] = [
     bestFor: ['Restoration technicians', 'Property maintenance teams', 'Insurance repair networks'],
     recommendedDisciplines: ['WRT', 'ASD', 'AMRT'],
     firstAction:
-      'Start with WRT fundamentals, then add structural drying and microbial risk awareness.',
+      'Start with water damage fundamentals, then add structural drying and microbial risk awareness.',
     retentionCue:
-      'Recommend ASD or microbial remediation content immediately after WRT completion.',
+      'Recommend structural drying or microbial remediation content once the water damage fundamentals are complete.',
     primaryHref: '/courses?discipline=WRT',
     primaryLabel: 'Browse water damage courses',
     secondaryHref: '/courses?discipline=ASD',
@@ -182,7 +182,7 @@ export const pathwayAdvisorOptions: PathwayAdvisorOption[] = [
     primaryHref: '/industries',
     primaryLabel: 'Explore industries',
     secondaryHref: '/courses?discipline=WRT',
-    secondaryLabel: 'Start with WRT',
+    secondaryLabel: 'Start with water damage',
     icon: Building2,
   },
 ];

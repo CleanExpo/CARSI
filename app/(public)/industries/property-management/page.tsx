@@ -31,14 +31,14 @@ export const metadata: Metadata = {
 const ACCENT_COLOR = '#673ab7';
 
 const disciplines = [
-  { code: 'AMRT', label: 'Applied Microbial Remediation', color: '#673ab7' },
-  { code: 'WRT', label: 'Water Damage Restoration', color: '#512da8' },
-  { code: 'CRT', label: 'Carpet Cleaning', color: '#4527a0' },
-  { code: 'ASD', label: 'Applied Structural Drying', color: '#311b92' },
+  { code: 'AMRT', label: 'Mould remediation', color: '#673ab7' },
+  { code: 'WRT', label: 'Water damage', color: '#512da8' },
+  { code: 'CRT', label: 'Carpet cleaning', color: '#4527a0' },
+  { code: 'ASD', label: 'Structural drying', color: '#311b92' },
 ];
 
 const stats = [
-  { value: '12,000+', label: 'Property Agencies' },
+  { value: 'Online', label: 'Self-paced study' },
   { value: 'RTA', label: 'Compliance' },
   { value: 'IICRC', label: 'CEC Accredited' },
 ];
@@ -80,7 +80,7 @@ export default async function PropertyManagementIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Property Management"
         headlineAccent="Restoration Training"
-        description="Residential Tenancies Act compliance training for property managers and strata managers. IICRC credentials reduce tribunal disputes and differentiate your agency in competitive markets."
+        description="Mould and water damage training for property and strata managers. Every completed course issues a verifiable CARSI credential."
         disciplines={disciplines}
         stats={stats}
       />
@@ -104,7 +104,7 @@ export default async function PropertyManagementIndustryPage() {
         subtitle="Property Management Training"
         title="Property Bundle"
         price={industryBundlePriceLabel('property-management')}
-        description="AMRT Mould Basics + WRT Water Damage + CRT Carpet Assessment. Agency bulk pricing available for 10+ property managers."
+        description="Mould remediation, water damage restoration and carpet cleaning for property managers. Paid courses can be bought as team seats at checkout."
         ctaText="Get Certified"
         accentColor={ACCENT_COLOR}
       />

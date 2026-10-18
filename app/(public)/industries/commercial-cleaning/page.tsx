@@ -23,23 +23,23 @@ export const metadata: Metadata = buildIndustryMetadata(
   [
     'commercial cleaning IICRC CEC training',
     'cleaning contractor training Australia',
-    'CRT certification',
-    'CCT commercial carpet',
-    'OCT odour control training',
+    'carpet cleaning training',
+    'commercial carpet care',
+    'odour control training',
   ]
 );
 
 const ACCENT_COLOR = '#2490ed';
 
 const disciplines = [
-  { code: 'CRT', label: 'Carpet Restoration', color: '#2490ed' },
-  { code: 'CCT', label: 'Commercial Carpet', color: '#1976d2' },
-  { code: 'OCT', label: 'Odour Control', color: '#1565c0' },
+  { code: 'CRT', label: 'Carpet cleaning', color: '#2490ed' },
+  { code: 'CCT', label: 'Commercial carpet care', color: '#1976d2' },
+  { code: 'OCT', label: 'Odour control', color: '#1565c0' },
 ];
 
 const stats = [
-  { value: '8,000+', label: 'Cleaning Companies' },
-  { value: 'IICRC', label: 'Certification' },
+  { value: 'Online', label: 'Self-paced study' },
+  { value: 'IICRC CEC', label: 'On approved courses' },
   { value: 'CECs', label: 'Continuous Education' },
 ];
 
@@ -83,7 +83,7 @@ const whyCards = [
     icon: Shield,
     title: 'Insurance Recognition',
     description:
-      'IICRC credentials are recognised by major insurers. Trained technicians can work on insurance restoration jobs with confidence.',
+      'Restoration training helps technicians take on insurance restoration jobs with confidence. Each insurer panel sets its own certification requirements.',
     color: '#1976d2',
   },
   {
@@ -105,7 +105,7 @@ export default async function CommercialCleaningIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Commercial Cleaning"
         headlineAccent="Professional CEC Training"
-        description="IICRC CEC Accredited courses for commercial cleaning contractors. Build CARSI credentials in carpet restoration, commercial carpet care, and odour control."
+        description="IICRC CEC Accredited courses for commercial cleaning contractors. Build CARSI credentials in carpet cleaning, commercial carpet care and odour control."
         disciplines={disciplines}
         stats={stats}
       />
@@ -120,7 +120,7 @@ export default async function CommercialCleaningIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Commercial Cleaning"
-        disciplineList="Carpet cleaning, water damage restoration and odour control"
+        disciplineList="Carpet cleaning and odour control"
         disciplines={['CRT', 'CCT', 'OCT']}
       />
 
@@ -132,7 +132,7 @@ export default async function CommercialCleaningIndustryPage() {
         subtitle="Cleaning professional training"
         title="Pro Cleaning Bundle"
         price={industryBundlePriceLabel('commercial-cleaning')}
-        description="CRT Carpet Restoration + CCT Commercial Carpet + OCT Odour Control. Perfect for cleaning contractors seeking IICRC credentials."
+        description="Carpet cleaning, commercial carpet care and odour control for cleaning contractors. Every completed course issues a verifiable CARSI credential."
         ctaText="View pricing"
         ctaHref="/pricing"
         secondaryHref="/courses"

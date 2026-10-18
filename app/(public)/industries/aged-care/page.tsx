@@ -1,3 +1,4 @@
+import { PER_COURSE_PRICE_FALLBACK_LABEL } from '@/lib/lms/pricing-tiers';
 import type { Metadata } from 'next';
 import { Bug, HeartPulse, Shield } from 'lucide-react';
 import {
@@ -175,7 +176,7 @@ export default async function AgedCareIndustryPage() {
       <IndustryCTA
         subtitle="Aged care training"
         title="Train the crew the home lets through the door"
-        price="From $29"
+        price={PER_COURSE_PRICE_FALLBACK_LABEL}
         description="Mould, air quality and carpet courses for technicians servicing aged care. Ask about team seats if a contractor or provider is training more than one person."
         ctaText="Talk to CARSI"
         ctaHref="/contact"

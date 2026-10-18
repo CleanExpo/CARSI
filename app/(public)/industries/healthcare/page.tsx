@@ -86,7 +86,7 @@ const faqs = [
   {
     question: 'What mould training applies to healthcare facilities in Australia?',
     answer:
-      'Start with Introduction to IAQ and Mould: Understanding Airborne Spread and Containment, then Introduction to Applied Microbial Remediation. Both are IICRC CEC Accredited. Hours are shown on each course page.',
+      'Start with Introduction to IAQ and Mould: Understanding Airborne Spread and Containment, then Introduction to Applied Microbial Remediation. Where the IICRC has approved a course, its CEC hours are shown on the course page.',
   },
   {
     question: 'How does this training sit next to NSQHS Standard 3?',
@@ -101,7 +101,7 @@ const faqs = [
   {
     question: 'Which courses should a crew open first for a hospital water loss?',
     answer:
-      'Open Introduction to Water Damage in Commercial Buildings, then Introduction to Safety Procedures for Water Damage Work and Introduction to Improving Indoor Air Quality After Water Damage. CEC hours appear only on IICRC CEC Accredited titles.',
+      'Open Introduction to Water Damage in Commercial Buildings, then Introduction to Safety Procedures for Water Damage Work and Introduction to Improving Indoor Air Quality After Water Damage. CEC hours appear only on courses the IICRC has approved.',
   },
 ];
 

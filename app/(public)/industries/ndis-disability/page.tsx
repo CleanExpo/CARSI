@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   keywords: [
     'NDIS IICRC CEC training',
     'disability services mould training Australia',
-    'AMRT NDIS provider',
+    'mould remediation NDIS provider',
     'NDIS Practice Standards infection control',
     'mould remediation disability accommodation',
   ],
@@ -33,13 +33,13 @@ export const metadata: Metadata = {
 const ACCENT_COLOR = '#5c6bc0';
 
 const disciplines = [
-  { code: 'AMRT', label: 'Applied Microbial Remediation', color: '#5c6bc0' },
-  { code: 'WRT', label: 'Water Damage Restoration', color: '#4a5aa8' },
-  { code: 'CRT', label: 'Carpet Cleaning Technician', color: '#3949ab' },
+  { code: 'AMRT', label: 'Mould remediation', color: '#5c6bc0' },
+  { code: 'WRT', label: 'Water damage', color: '#4a5aa8' },
+  { code: 'CRT', label: 'Carpet cleaning', color: '#3949ab' },
 ];
 
 const stats = [
-  { value: '600,000+', label: 'NDIS Participants (AUS)' },
+  { value: 'Online', label: 'Self-paced study' },
   { value: 'NDIS', label: 'Practice Standards' },
   { value: 'IICRC', label: 'CEC Accredited' },
 ];
@@ -58,7 +58,7 @@ const faqs = [
   {
     question: 'Does IICRC certification help NDIS providers during audits?',
     answer:
-      'Yes. NDIS registration audits assess whether providers have documented policies and demonstrable staff competency for maintaining safe environments. IICRC certifications are nationally and internationally recognised credentials that provide verifiable evidence of staff training. During a Module 3 audit, presenting IICRC-certified maintenance staff and documented remediation procedures significantly strengthens the compliance record compared to internal training alone.',
+      'Yes. NDIS registration audits assess whether providers have documented policies and demonstrable staff competency for maintaining safe environments. Verifiable CARSI credentials and documented remediation procedures give auditors evidence of staff training. IICRC certification itself is obtained only through IICRC-approved schools and examinations.',
   },
   {
     question: 'Can support coordinators benefit from CARSI restoration awareness courses?',
@@ -105,7 +105,7 @@ export default async function NDISDisabilityIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Meet NDIS Quality"
         headlineAccent="Safeguards"
-        description="600,000+ Australians rely on NDIS providers to maintain safe accommodation. CARSI mould remediation and water damage restoration CEC courses build staff competency for NDIS Practice Standards audits — protecting participants and provider registration. CARSI courses carry CARSI Southern Hemisphere Restoration Designations, not IICRC certification."
+        description="NDIS participants rely on providers to maintain safe accommodation. CARSI mould remediation and water damage restoration courses build staff competency for NDIS Practice Standards audits — protecting participants and provider registration. CARSI courses carry CARSI Southern Hemisphere Restoration Designations, not IICRC certification."
         disciplines={disciplines}
         stats={stats}
       />
@@ -129,7 +129,7 @@ export default async function NDISDisabilityIndustryPage() {
         subtitle="NDIS Provider Training"
         title="NDIS Compliance Bundle"
         price={industryBundlePriceLabel('ndis-disability')}
-        description="mould remediation and water damage restoration training for NDIS maintenance and facilities staff. Verifiable IICRC credentials for NDIS Quality and Safeguards Commission audits."
+        description="mould remediation and water damage restoration training for NDIS maintenance and facilities staff. Every completed course issues a verifiable CARSI credential."
         ctaText="Train Your Maintenance Team"
         accentColor={ACCENT_COLOR}
       />

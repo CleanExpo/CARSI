@@ -20,7 +20,7 @@ export type OnboardingAnswersInput = {
 const PATHWAY_LABELS: Record<string, string> = {
   WRT: 'Water damage restoration',
   ASD: 'Applied structural drying',
-  CRT: 'Carpet repair and reinstallation',
+  CRT: 'Colour repair',
   AMRT: 'Microbial remediation',
   FSRT: 'Fire and smoke restoration',
   OCT: 'Odour control',

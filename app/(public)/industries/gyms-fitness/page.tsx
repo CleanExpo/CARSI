@@ -20,8 +20,8 @@ export const metadata: Metadata = {
   keywords: [
     'gym mould training Australia',
     'fitness centre IICRC CEC course',
-    'AMRT gym remediation',
-    'OCT odour control gym',
+    'gym mould remediation',
+    'odour control gym',
     'mould liability fitness centre',
   ],
 };
@@ -33,14 +33,14 @@ export const metadata: Metadata = {
 const ACCENT_COLOR = '#43a047';
 
 const disciplines = [
-  { code: 'AMRT', label: 'Applied Microbial Remediation', color: '#43a047' },
-  { code: 'OCT', label: 'Odour Control Technician', color: '#388e3c' },
-  { code: 'CRT', label: 'Carpet Cleaning Technician', color: '#2e7d32' },
+  { code: 'AMRT', label: 'Mould remediation', color: '#43a047' },
+  { code: 'OCT', label: 'Odour control', color: '#388e3c' },
+  { code: 'CRT', label: 'Carpet cleaning', color: '#2e7d32' },
 ];
 
 const stats = [
-  { value: '6,000+', label: 'Fitness Facilities (AUS)' },
-  { value: '5M+', label: 'Active Members' },
+  { value: 'Online', label: 'Self-paced study' },
+  { value: 'CARSI', label: 'Verifiable credentials' },
   { value: 'IICRC', label: 'CEC Accredited' },
 ];
 
@@ -58,12 +58,12 @@ const faqs = [
   {
     question: 'How does IICRC CEC training reduce liability for gym operators?',
     answer:
-      "Gym operators have a duty of care to members under Australian Consumer Law and WHS legislation. Documented IICRC CEC training demonstrates that maintenance staff were competent to identify and respond to mould and moisture hazards. In the event of a member health complaint or personal injury claim linked to indoor air quality, evidence of IICRC-certified staff and documented inspection protocols significantly strengthens the operator's defence and can reduce insurance premiums for premises liability coverage.",
+      "Gym operators have a duty of care to members under Australian Consumer Law and WHS legislation. Documented training shows that maintenance staff were trained to identify and respond to mould and moisture hazards, and documented inspection protocols support the operator if a member raises an indoor air quality complaint.",
   },
   {
     question: 'How does odour control training help fitness facilities?',
     answer:
-      'Introduction to Odour Control and Removal Techniques covers identifying odour sources and removing them, which suits persistent locker-room odours, musty smells after water damage and mat odours. It is IICRC CEC Accredited, with its CEC hours shown on the course page. Removing the source resolves the complaint instead of masking it.',
+      'Introduction to Odour Control and Removal Techniques covers identifying odour sources and removing them, which suits persistent locker-room odours, musty smells after water damage and mat odours. Where the IICRC has approved a course, its CEC hours are shown on the course page. Removing the source resolves the complaint instead of masking it.',
   },
 ];
 
@@ -77,7 +77,7 @@ const whyCards = [
   },
   {
     icon: Wind,
-    title: 'Odour Control (OCT)',
+    title: 'Odour Control',
     description:
       "Persistent gym odours damage reviews and drive churn. CARSI's odour control CEC training covers source-based odour elimination — not just masking — for locker rooms, wet areas, and equipment zones.",
     color: '#388e3c',
@@ -105,7 +105,7 @@ export default async function GymsFitnessIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Protect Your Members"
         headlineAccent="and Your Reputation"
-        description="Australian gyms face constant mould and odour risk from high-humidity environments. CARSI mould remediation and odour control CEC courses give your maintenance team the protocols to keep facilities clean, compliant, and member-ready. CARSI courses carry CARSI Southern Hemisphere Restoration Designations, not IICRC certification."
+        description="Australian gyms face constant mould and odour risk from high-humidity environments. CARSI mould remediation and odour control courses give your maintenance team the protocols to keep facilities clean, compliant, and member-ready. CARSI courses carry CARSI Southern Hemisphere Restoration Designations, not IICRC certification."
         disciplines={disciplines}
         stats={stats}
       />

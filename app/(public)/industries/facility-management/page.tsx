@@ -54,7 +54,7 @@ const stats = [
     label: 'Seats in the published Starter team price',
   },
   { value: 'IICRC CEC', label: 'Hours only on approved courses' },
-  { value: '3', label: 'Track 1 site pathways linked below' },
+  { value: 'Online', label: 'Self-paced study' },
 ];
 
 const evidenceLinks = [
@@ -152,7 +152,7 @@ export default async function FacilityManagementIndustryPage() {
       <IndustryCTA
         subtitle="Facility management training"
         title="Start the crew from published team prices"
-        price={starter?.priceLabel ?? '$299 / year'}
+        price={starter?.priceLabel ?? 'See pricing'}
         description="Starter, Growth and Full library prices are on the pricing page. Contact CARSI to start seats. Technicians can still buy a single IICRC CEC Accredited course."
         ctaText="Talk to CARSI"
         ctaHref={facilityManagementContactHref}

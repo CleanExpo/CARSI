@@ -32,14 +32,14 @@ export const metadata: Metadata = buildIndustryMetadata(
 const ACCENT_COLOR = '#2196f3';
 
 const disciplines = [
-  { code: 'AMRT', label: 'Applied Microbial Remediation', color: '#2196f3' },
-  { code: 'WRT', label: 'Water Damage Restoration', color: '#1976d2' },
-  { code: 'ASD', label: 'Applied Structural Drying', color: '#1565c0' },
-  { code: 'FSRT', label: 'Fire & Smoke Restoration', color: '#0d47a1' },
+  { code: 'AMRT', label: 'Mould remediation', color: '#2196f3' },
+  { code: 'WRT', label: 'Water damage', color: '#1976d2' },
+  { code: 'ASD', label: 'Structural drying', color: '#1565c0' },
+  { code: 'FSRT', label: 'Fire and smoke', color: '#0d47a1' },
 ];
 
 const stats = [
-  { value: '537', label: 'Local Councils' },
+  { value: 'Online', label: 'Self-paced study' },
   { value: 'WHS', label: 'Act Compliance' },
   { value: 'IICRC', label: 'CEC Accredited' },
 ];
@@ -48,7 +48,7 @@ const faqs = [
   {
     question: 'Is IICRC certification required for AusTender procurement panels?',
     answer:
-      'While not universally mandated, many Commonwealth and state government procurement panels list IICRC certification as a pre-qualification criterion for restoration and remediation contracts. Verifiable IICRC credentials satisfy audit requirements and demonstrate technical competency in tender submissions through AusTender and state equivalents.',
+      'While not universally mandated, many Commonwealth and state government procurement panels list IICRC certification as a pre-qualification criterion for restoration and remediation contracts. IICRC certification is obtained only through IICRC-approved schools and examinations; CARSI courses add verifiable CARSI credentials to a tender submission.',
   },
   {
     question: 'What WHS obligations apply to mould in government buildings?',
@@ -101,7 +101,7 @@ export default async function GovernmentDefenceIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Government Facility"
         headlineAccent="Restoration Training"
-        description="WHS-compliant training for councils, state agencies, and defence facilities. IICRC credentials satisfy AusTender pre-qualification and Commonwealth audit requirements."
+        description="Restoration training for council, state agency and defence facility teams. Every completed course issues a verifiable CARSI credential."
         disciplines={disciplines}
         stats={stats}
       />
@@ -128,7 +128,7 @@ export default async function GovernmentDefenceIndustryPage() {
         subtitle="Government facility training"
         title="Facility Restoration Bundle"
         price={industryBundlePriceLabel('government-defence')}
-        description="water damage restoration, mould remediation and structural drying training for government facility teams. Bulk 10+ seat licensing available for councils and departments."
+        description="water damage restoration, mould remediation and structural drying training for government facility teams. Paid courses can be bought as team seats at checkout."
         ctaText="Request bulk pricing"
         ctaHref="/contact"
         accentColor={ACCENT_COLOR}

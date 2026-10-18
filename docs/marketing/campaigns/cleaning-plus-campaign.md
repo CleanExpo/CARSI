@@ -78,7 +78,7 @@ Convert commercial cleaning business owners into restoration-trained contractors
 | -------------------------------------- | --------------------------------------------- |
 | "Can't take staff off-site for a week" | 24/7 online, self-paced, 30-minute modules    |
 | "Training costs are too high"          | From $20/course or $795/year unlimited        |
-| "Don't know where to start"            | Guided IICRC pathways (WRT → CRT → OCT)       |
+| "Don't know where to start"            | Guided CARSI pathways (water damage → carpet → odour) |
 | "Need proof for tenders"               | Instant verifiable credentials + CEC tracking |
 | "Staff turnover means retraining"      | Annual subscription covers unlimited staff    |
 
@@ -177,7 +177,7 @@ CTA: See the restoration pathway →
 | --- | ------------------------------------------------- | --------------------------------------------------- |
 | 0   | Welcome: Your path from cleaning to restoration   | Revenue gap overview, pathway introduction          |
 | 3   | "I wish I'd done this 5 years ago"                | Case study: cleaning company that added restoration |
-| 7   | The 3 IICRC certs that unlock restoration revenue | water damage restoration, carpet repair and odour control overview with CEC details             |
+| 7   | The 3 IICRC certs that unlock restoration revenue | water damage restoration, carpet cleaning and odour control overview with CEC details             |
 | 14  | How [Company Name] can win insurance panel work   | Insurance requirements, IICRC credential value      |
 | 21  | Your team can start today — no downtime needed    | Subscription offer, 7-day free trial CTA            |
 | 30  | Last chance: 15% off annual subscription          | Urgency + discount code (CLEANPLUS15)               |

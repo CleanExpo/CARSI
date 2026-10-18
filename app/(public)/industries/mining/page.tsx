@@ -19,9 +19,9 @@ export const metadata: Metadata = {
   keywords: [
     'mining IICRC CEC training Australia',
     'WHS compliance restoration',
-    'WRT water damage mining',
-    'AMRT mould remediation mining',
-    'ASD structural drying',
+    'water damage mining',
+    'mould remediation mining',
+    'structural drying mine sites',
   ],
 };
 
@@ -32,13 +32,13 @@ export const metadata: Metadata = {
 const ACCENT_COLOR = '#ed9d24';
 
 const disciplines = [
-  { code: 'WRT', label: 'Water Damage Restoration', color: '#ed9d24' },
-  { code: 'AMRT', label: 'Applied Microbial Remediation', color: '#d4891e' },
-  { code: 'ASD', label: 'Applied Structural Drying', color: '#c77b1a' },
+  { code: 'WRT', label: 'Water damage', color: '#ed9d24' },
+  { code: 'AMRT', label: 'Mould remediation', color: '#d4891e' },
+  { code: 'ASD', label: 'Structural drying', color: '#c77b1a' },
 ];
 
 const stats = [
-  { value: '400+', label: 'Mining Operations' },
+  { value: 'Online', label: 'Self-paced study' },
   { value: 'WHS', label: 'Act Compliance' },
   { value: 'IICRC', label: 'CEC Accredited' },
 ];
@@ -80,7 +80,7 @@ export default async function MiningIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Mining Site"
         headlineAccent="Restoration Training"
-        description="WHS-compliant restoration training for mining operations. IICRC credentials for water damage, mould remediation, and structural drying in remote site environments."
+        description="Restoration training for mining site teams: water damage, mould remediation and structural drying in remote site environments."
         disciplines={disciplines}
         stats={stats}
       />
@@ -104,7 +104,7 @@ export default async function MiningIndustryPage() {
         subtitle="Mining Site Training"
         title="Mining Restoration Bundle"
         price={industryBundlePriceLabel('mining')}
-        description="water damage restoration, mould remediation and structural drying training for mining site teams. Bulk licensing available for camp accommodation managers."
+        description="water damage restoration, mould remediation and structural drying training for mining site teams. Paid courses can be bought as team seats at checkout."
         ctaText="Train Your Site Team"
         accentColor={ACCENT_COLOR}
       />

@@ -20,9 +20,9 @@ export const metadata: Metadata = {
   keywords: [
     'food processing IICRC CEC training Australia',
     'HACCP compliance restoration',
-    'AMRT mould remediation food facility',
-    'OCT odour control food processing',
-    'CCT carpet cleaning food factory',
+    'mould remediation food facility',
+    'odour control food processing',
+    'carpet cleaning food factory',
   ],
 };
 
@@ -33,13 +33,13 @@ export const metadata: Metadata = {
 const ACCENT_COLOR = '#2E7D32';
 
 const disciplines = [
-  { code: 'AMRT', label: 'Applied Microbial Remediation', color: '#2E7D32' },
-  { code: 'OCT', label: 'Odour Control', color: '#1B5E20' },
-  { code: 'CCT', label: 'Carpet Cleaning', color: '#388E3C' },
+  { code: 'AMRT', label: 'Mould remediation', color: '#2E7D32' },
+  { code: 'OCT', label: 'Odour control', color: '#1B5E20' },
+  { code: 'CCT', label: 'Carpet cleaning', color: '#388E3C' },
 ];
 
 const stats = [
-  { value: '6,000+', label: 'Food Facilities' },
+  { value: 'Online', label: 'Self-paced study' },
   { value: 'HACCP', label: 'Aligned' },
   { value: 'IICRC', label: 'CEC Accredited' },
 ];
@@ -105,7 +105,7 @@ export default async function FoodProcessingIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Food Processing"
         headlineAccent="Hygiene Training"
-        description="HACCP-aligned restoration training for Australia's 6,000+ food processing facilities. IICRC credentials for microbial remediation, odour control, and hygiene compliance in production environments."
+        description="Restoration training for food processing maintenance teams: microbial remediation, odour control and cleaning in production environments. It supports, and does not replace, the facility's HACCP plan."
         disciplines={disciplines}
         stats={stats}
       />

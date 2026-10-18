@@ -178,7 +178,7 @@ export function formatCourseCountForCopy(n: number): string {
  * stored on course rows.
  */
 const PUBLIC_TOPIC_LIST =
-  'water damage restoration, carpet repair, structural drying, mould remediation, fire & smoke restoration, odour control and carpet cleaning';
+  'water damage restoration, structural drying, mould remediation, fire & smoke restoration, odour control and carpet cleaning';
 
 /**
  * Provider standing, not a course-level CEC claim. A CARSI course may only assert that it

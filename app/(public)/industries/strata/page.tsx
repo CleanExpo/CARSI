@@ -31,16 +31,16 @@ export const metadata: Metadata = {
 const ACCENT_COLOR = '#7c3aed';
 
 const disciplines = [
-  { code: 'WRT', label: 'Water Damage Restoration', color: '#7c3aed' },
-  { code: 'CRT', label: 'Carpet Cleaning', color: '#6d28d9' },
-  { code: 'AMRT', label: 'Applied Microbial Remediation', color: '#5b21b6' },
-  { code: 'ASD', label: 'Applied Structural Drying', color: '#4c1d95' },
+  { code: 'WRT', label: 'Water damage', color: '#7c3aed' },
+  { code: 'CRT', label: 'Carpet cleaning', color: '#6d28d9' },
+  { code: 'AMRT', label: 'Mould remediation', color: '#5b21b6' },
+  { code: 'ASD', label: 'Structural drying', color: '#4c1d95' },
 ];
 
 const stats = [
-  { value: '2.5M+', label: 'Strata Units' },
-  { value: '537', label: 'Councils' },
-  { value: 'IICRC', label: 'Certified' },
+  { value: 'Online', label: 'Self-paced study' },
+  { value: 'CARSI', label: 'Verifiable credentials' },
+  { value: 'IICRC CEC', label: 'On approved courses' },
 ];
 
 const whyCards = [
@@ -55,14 +55,14 @@ const whyCards = [
     icon: ShieldCheck,
     title: 'Personal Liability',
     description:
-      'IICRC credentials protect building managers under the Strata Schemes Management Act. Demonstrate due diligence with verifiable restoration qualifications.',
+      'Verifiable CARSI credentials document completed restoration training, which helps building managers show due diligence for common property.',
     color: '#6d28d9',
   },
   {
     icon: Layers,
     title: 'Multi-Storey Expertise',
     description:
-      'Specialised structural drying for high-rise residential and commercial buildings. Multi-level water migration requires advanced ASD techniques unique to strata environments.',
+      'Specialised structural drying for high-rise residential and commercial buildings. Multi-level water migration calls for advanced structural drying techniques suited to strata buildings.',
     color: '#5b21b6',
   },
 ];
@@ -80,7 +80,7 @@ export default async function StrataIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Strata & Body Corporate"
         headlineAccent="Restoration Training"
-        description="Certified restoration training for strata managers, building managers, and body corporate committees. Protect common property assets with IICRC CEC Accredited credentials."
+        description="Restoration training for strata managers, building managers and body corporate committees. Every completed course issues a verifiable CARSI credential."
         disciplines={disciplines}
         stats={stats}
       />
@@ -104,7 +104,7 @@ export default async function StrataIndustryPage() {
         subtitle="Strata & Body Corporate Training"
         title="Building Manager Bundle"
         price={industryBundlePriceLabel('strata')}
-        description="water damage restoration and mould remediation training for strata maintenance teams. Equip your building managers with the credentials to handle water damage and mould remediation across common property."
+        description="water damage restoration and mould remediation training for strata maintenance teams. Equip your building managers to handle water damage and mould across common property."
         ctaText="Enquire Now"
         accentColor={ACCENT_COLOR}
       />

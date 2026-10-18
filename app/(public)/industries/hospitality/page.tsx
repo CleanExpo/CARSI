@@ -74,17 +74,17 @@ const faqs = [
   {
     question: 'How do hotels handle water damage in guest rooms?',
     answer:
-      'Speed and documentation matter more than a long classroom course. Introduction to Water Damage Restoration is IICRC CEC Accredited. It covers assessment, extraction thinking and records you can hand the duty manager and the insurer.',
+      'Speed and documentation matter more than a long classroom course. Introduction to Water Damage Restoration covers assessment, extraction thinking and records you can hand the duty manager and the insurer.',
   },
   {
     question: 'What carpet training helps in lobbies and corridors?',
     answer:
-      'Introduction to Basic Carpet Cleaning and Drying covers residential, commercial and institutional settings. It is IICRC CEC Accredited and provides a foundation for planning work around a hotel access schedule.',
+      'Introduction to Basic Carpet Cleaning and Drying covers residential, commercial and institutional settings. It provides a foundation for planning work around a hotel access schedule.',
   },
   {
     question: 'How do you train for odours in Australian hotel rooms?',
     answer:
-      'Open Introduction to Odour Control and Removal Techniques. It is IICRC CEC Accredited and covers source identification and removal methods. CARSI does not sell IICRC certification; CECs apply only where the IICRC has approved the course.',
+      'Open Introduction to Odour Control and Removal Techniques. It covers source identification and removal methods. CARSI does not sell IICRC certification; CECs apply only where the IICRC has approved the course.',
   },
   {
     question: 'Can hospitality crews complete IICRC CEC training online?',

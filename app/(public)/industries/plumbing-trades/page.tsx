@@ -19,9 +19,9 @@ export const metadata: Metadata = {
     'Turn water damage call-outs into drying contracts. CARSI water damage restoration and applied structural drying CEC courses for Australian plumbers and trade contractors — online, self-paced, CEC Accredited. These are continuing education (CEC) courses, not IICRC certification.',
   keywords: [
     'IICRC CEC training plumbers Australia',
-    'WRT CEC course plumbing',
+    'water damage course for plumbers',
     'water damage restoration plumber',
-    'ASD structural drying trade',
+    'structural drying for trades',
     'IICRC CEC courses for plumbers online',
   ],
 };
@@ -33,13 +33,13 @@ export const metadata: Metadata = {
 const ACCENT_COLOR = '#0097a7';
 
 const disciplines = [
-  { code: 'WRT', label: 'Water Damage Restoration', color: '#0097a7' },
-  { code: 'ASD', label: 'Applied Structural Drying', color: '#00838f' },
-  { code: 'AMRT', label: 'Applied Microbial Remediation', color: '#006978' },
+  { code: 'WRT', label: 'Water damage', color: '#0097a7' },
+  { code: 'ASD', label: 'Structural drying', color: '#00838f' },
+  { code: 'AMRT', label: 'Mould remediation', color: '#006978' },
 ];
 
 const stats = [
-  { value: '85,000+', label: 'Licensed Plumbers (AUS)' },
+  { value: 'Online', label: 'Self-paced study' },
   { value: 'WHS', label: 'Act Compliant' },
   { value: 'IICRC', label: 'CEC Accredited' },
 ];
@@ -72,21 +72,21 @@ const whyCards = [
     icon: DollarSign,
     title: 'Turn Call-Outs Into Contracts',
     description:
-      'Every burst pipe, flexi-hose failure, or roof leak leaves wet structure behind. IICRC certification lets you legally perform and invoice for the full drying scope — not just the repair.',
+      'Every burst pipe, flexi-hose failure, or roof leak leaves wet structure behind. Drying training lets you scope the drying as well as the repair; check each insurer panel for the certifications it requires.',
     color: '#0097a7',
   },
   {
     icon: Shield,
     title: 'WHS & Insurer Credibility',
     description:
-      'Water damage is a notifiable hazard under Australian WHS legislation. IICRC credentials demonstrate due diligence and are specified by leading insurers for remediation scopes.',
+      'Water damage is a workplace hazard under Australian WHS legislation. Documented training shows due diligence; each insurer panel sets its own certification requirements.',
     color: '#00838f',
   },
   {
     icon: TrendingUp,
     title: 'Revenue Per Job',
     description:
-      'Australian water damage restoration averages $2,500–$15,000 per job. Certified plumbers capture this revenue directly rather than referring out.',
+      'Drying the structure is usually a separate scope from fixing the leak. Trained plumbers can quote both instead of referring the drying out.',
     color: '#2490ed',
   },
 ];
@@ -105,7 +105,7 @@ export default async function PlumbingTradesIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Turn Call-Outs Into"
         headlineAccent="Drying Contracts"
-        description="85,000+ licensed Australian plumbers leave water damage behind every day. CARSI water damage restoration and applied structural drying CEC courses give your trade business the continuing-education grounding to capture the full remediation scope — and the revenue that comes with it. CARSI courses carry CARSI Southern Hemisphere Restoration Designations, not IICRC certification."
+        description="Burst pipes and leaks often leave wet structure behind after the repair. CARSI water damage restoration and structural drying courses give your trade business the continuing-education grounding to capture the full remediation scope. CARSI courses carry CARSI Southern Hemisphere Restoration Designations, not IICRC certification."
         disciplines={disciplines}
         stats={stats}
       />
@@ -129,7 +129,7 @@ export default async function PlumbingTradesIndustryPage() {
         subtitle="Plumbing & Trades Training"
         title="Trades Restoration Bundle"
         price={industryBundlePriceLabel('plumbing-trades')}
-        description="water damage restoration and structural drying training for licensed plumbers and trade contractors. Complete online between jobs. IICRC CEC Accredited."
+        description="water damage restoration and structural drying training for licensed plumbers and trade contractors. Complete online between jobs. CEC hours apply only to courses the IICRC has approved."
         ctaText="Add Restoration to Your Business"
         accentColor={ACCENT_COLOR}
       />

@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   keywords: [
     'caravan park mould training Australia',
     'holiday park IICRC CEC course',
-    'AMRT caravan park remediation',
+    'caravan park mould remediation',
     'cabin mould restoration training',
     'holiday accommodation hygiene compliance',
   ],
@@ -33,14 +33,14 @@ export const metadata: Metadata = {
 const ACCENT_COLOR = '#26a69a';
 
 const disciplines = [
-  { code: 'AMRT', label: 'Applied Microbial Remediation', color: '#26a69a' },
-  { code: 'CRT', label: 'Carpet Cleaning Technician', color: '#00897b' },
-  { code: 'WRT', label: 'Water Damage Restoration', color: '#00796b' },
+  { code: 'AMRT', label: 'Mould remediation', color: '#26a69a' },
+  { code: 'CRT', label: 'Carpet cleaning', color: '#00897b' },
+  { code: 'WRT', label: 'Water damage', color: '#00796b' },
 ];
 
 const stats = [
-  { value: '2,800+', label: 'Caravan Parks (AUS)' },
-  { value: '$8.6B', label: 'Industry Revenue' },
+  { value: 'Online', label: 'Self-paced study' },
+  { value: 'CARSI', label: 'Verifiable credentials' },
   { value: 'IICRC', label: 'CEC Accredited' },
 ];
 
@@ -63,7 +63,7 @@ const faqs = [
   {
     question: 'What carpet training helps holiday accommodation?',
     answer:
-      'Introduction to Basic Carpet Cleaning and Drying covers carpet cleaning and drying in residential, commercial and institutional settings, which suits cabins and common areas. It is IICRC CEC Accredited, with its CEC hours shown on the course page. For carpet that gets wet in a storm or plumbing failure, Introduction to Water Damage Restoration covers the drying side.',
+      'Introduction to Basic Carpet Cleaning and Drying covers carpet cleaning and drying in residential, commercial and institutional settings, which suits cabins and common areas. Where the IICRC has approved a course, its CEC hours are shown on the course page. For carpet that gets wet in a storm or plumbing failure, Introduction to Water Damage Restoration covers the drying side.',
   },
 ];
 
@@ -86,7 +86,7 @@ const whyCards = [
     icon: Shield,
     title: 'Guest Duty of Care',
     description:
-      'Australian Consumer Law and state tourism accommodation legislation requires operators to provide habitable, hygienic accommodation. IICRC-certified staff demonstrate compliance and reduce Fair Trading liability.',
+      'Australian Consumer Law and state tourism accommodation legislation requires operators to provide habitable, hygienic accommodation. Trained staff help operators meet that obligation and keep a documented record.',
     color: '#2490ed',
   },
 ];
@@ -105,7 +105,7 @@ export default async function CaravanParksIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Protect Guest Accommodation"
         headlineAccent="All Season Long"
-        description="Australia's 2,800+ caravan parks face persistent mould, moisture, and storm damage risk. CARSI mould remediation, carpet cleaning and water damage restoration courses give park maintenance teams the protocols to inspect, remediate, and document — protecting guests, reputation, and revenue. CARSI courses carry CARSI Southern Hemisphere Restoration Designations, not IICRC certification."
+        description="Caravan parks face persistent mould, moisture, and storm damage risk. CARSI mould remediation, carpet cleaning and water damage restoration courses give park maintenance teams the protocols to inspect, remediate, and document — protecting guests, reputation, and revenue. CARSI courses carry CARSI Southern Hemisphere Restoration Designations, not IICRC certification."
         disciplines={disciplines}
         stats={stats}
       />

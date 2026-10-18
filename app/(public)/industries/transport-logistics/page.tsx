@@ -16,13 +16,13 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Transport & Logistics IICRC CEC Training',
   description:
-    'IICRC CEC Accredited restoration courses for Australian transport and logistics operations. Water damage restoration, vehicle drying and odour control courses for fleets, warehouses and loading dock maintenance.',
+    'Water damage restoration, carpet cleaning and odour control courses for Australian transport and logistics teams, plus a vehicle drying course. CEC hours are shown only on courses the IICRC has approved.',
   keywords: [
     'transport IICRC CEC training Australia',
     'logistics warehouse restoration',
-    'WRT water damage warehouse',
-    'CRT carpet cleaning vehicle interiors',
-    'OCT odour control transport',
+    'warehouse water damage',
+    'carpet cleaning training',
+    'odour control transport',
   ],
 };
 
@@ -33,13 +33,13 @@ export const metadata: Metadata = {
 const ACCENT_COLOR = '#1565C0';
 
 const disciplines = [
-  { code: 'WRT', label: 'Water Damage Restoration', color: '#1565C0' },
-  { code: 'CRT', label: 'Vehicle Drying', color: '#0D47A1' },
-  { code: 'OCT', label: 'Odour Control', color: '#1976D2' },
+  { code: 'WRT', label: 'Water damage', color: '#1565C0' },
+  { code: 'CRT', label: 'Carpet cleaning', color: '#0D47A1' },
+  { code: 'OCT', label: 'Odour control', color: '#1976D2' },
 ];
 
 const stats = [
-  { value: '50,000+', label: 'Transport Operators' },
+  { value: 'Online', label: 'Self-paced study' },
   { value: 'Chain of', label: 'Responsibility' },
   { value: 'IICRC', label: 'CEC Accredited' },
 ];
@@ -105,7 +105,7 @@ export default async function TransportLogisticsIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Transport & Logistics"
         headlineAccent="Restoration Training"
-        description="IICRC CEC Accredited restoration courses for Australia's transport and logistics sector. Credentials for warehouse flood response, vehicle interior maintenance, and loading dock contamination control."
+        description="Restoration courses for transport and logistics teams: warehouse flood response, vehicle drying and loading dock contamination control."
         disciplines={disciplines}
         stats={stats}
       />
@@ -119,7 +119,7 @@ export default async function TransportLogisticsIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Transport & Logistics"
-        disciplineList="Water damage restoration, vehicle drying and odour control"
+        disciplineList="Water damage restoration, carpet cleaning and odour control"
         disciplines={['WRT', 'CRT', 'OCT']}
       />
 

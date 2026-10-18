@@ -143,14 +143,22 @@ const BANNED = [
     // CARSI designation rule), so an acronym directly naming a course, training, program,
     // pathway, module or class is branding. A third-person fact about the certification itself
     // ("FSRT is an IICRC certification covering…") names no training and stays allowed.
-    // The acronyms are matched CASE-SENSITIVELY: "OCT" is also how October is abbreviated, and
-    // "Oct training day" is a date, not a designation.
-    re: /\b(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\b(?:\s*\([^)\n]{0,60}\))?[\s-]+(?:[Cc]ourses?|COURSES?|[Tt]raining|TRAINING|[Pp]rogram(?:me)?s?|[Pp]athways?|[Mm]odules?|[Cc]lass(?:es)?)\b/,
+    // Case-insensitive ("Wrt training", "wrt training"), across hyphen, en and em dashes, with a
+    // possessive ("WRT's training"), and — via `crossLine` in scanFile — across a line break
+    // inside a file (review 18/10/2026). OCT stays upper-case only: "Oct" is October, and
+    // "Oct training day" is a date, so mixed/lower-case "oct" is neutralised first.
+    // Out of scope here, by design: JSX text split across elements, string concatenation, HTML
+    // entities and zero-width characters — the rendered-text scan on feat/designations-live
+    // covers those, rather than more source regex.
+    re: /\b(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)(?:['’]s)?\b(?:\s*\([^)\n]{0,60}\))?[\s\-\u2013\u2014]+(?:courses?|training|program(?:me)?s?|pathways?|modules?|class(?:es)?)\b/i,
     allow: null,
-    // Same bounded exemption as the list rule for lines that exist to FORBID the construction
-    // ("never call it a WRT course"), plus the IICRC's own course named in the possessive.
+    crossLine: true,
+    // Lines that exist to FORBID the construction ("never call it a WRT course") are exempt only
+    // up to the end of THAT sentence, so "Never call it a WRT course. Book ASD training today."
+    // still fires on the second sentence. Also exempt: the IICRC's own course in the possessive,
+    // and a non-upper-case "oct" (the month).
     neutralise:
-      /[^\n]{0,120}\bnever\s+(?:call|brand|use|say|name)\b[^\n]{0,120}|\bIICRC['’]s\s+(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\b/gi,
+      /[^.!?\n]{0,120}\b[Nn][Ee][Vv][Ee][Rr]\s+(?:call|brand|use|say|name)\b[^.!?\n]{0,120}|\bIICRC['’]s\s+[A-Za-z]{3,4}\b|\b(?!OCT\b)[Oo][Cc][Tt]\b/g,
     message:
       'Do not name a course, training, program or pathway with an IICRC discipline acronym ("WRT training", "CCT courses") — CARSI courses carry CARSI Southern Hemisphere designations. Name the subject in plain English instead.',
   },
@@ -462,6 +470,32 @@ export function scanText(file, content) {
   return findings;
 }
 
+function ruleHits(rule, content) {
+  const base = rule.prepare ? rule.prepare(content) : content;
+  const probe = rule.neutralise ? base.replace(rule.neutralise, ' ') : base;
+  return rule.re.test(probe) && !(rule.allow && rule.allow.test(content));
+}
+
+/**
+ * A whole file, as the CLI scans it: each line, plus — for `crossLine` rules — each pair of
+ * adjacent lines joined with a space, so "Explore CARSI WRT" / "training today" across a line
+ * break is still seen. A join is reported only when neither line fires alone.
+ */
+export function scanFile(file, text) {
+  const findings = [];
+  const lines = text.split('\n');
+  for (let i = 0; i < lines.length; i++) scanLine(file, i + 1, lines[i], findings);
+  for (const rule of BANNED.filter((r) => r.crossLine)) {
+    for (let i = 0; i + 1 < lines.length; i++) {
+      const joined = `${lines[i].trimEnd()} ${lines[i + 1].trimStart()}`;
+      if (ruleHits(rule, joined) && !ruleHits(rule, lines[i]) && !ruleHits(rule, lines[i + 1])) {
+        findings.push(`  ${file}:${i + 1}-${i + 2}: ${rule.message}\n    → ${joined.trim().slice(0, 140)}`);
+      }
+    }
+  }
+  return findings;
+}
+
 function scanLine(file, lineNo, content, findings) {
   const norm = file.replace(/\\/g, '/');
   for (const rule of BANNED) {
@@ -536,10 +570,7 @@ if (staged) {
     } catch {
       continue;
     }
-    const lines = text.split('\n');
-    for (let i = 0; i < lines.length; i++) {
-      scanLine(file, i + 1, lines[i], findings);
-    }
+    findings.push(...scanFile(file, text));
   }
 }
 

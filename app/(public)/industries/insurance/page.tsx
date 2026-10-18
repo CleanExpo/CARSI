@@ -31,16 +31,16 @@ export const metadata: Metadata = {
 const ACCENT_COLOR = '#1976d2';
 
 const disciplines = [
-  { code: 'WRT', label: 'Water Damage Restoration', color: '#1976d2' },
-  { code: 'FSRT', label: 'Fire & Smoke Restoration', color: '#1565c0' },
-  { code: 'AMRT', label: 'Applied Microbial Remediation', color: '#0d47a1' },
-  { code: 'ASD', label: 'Applied Structural Drying', color: '#0b3d91' },
+  { code: 'WRT', label: 'Water damage', color: '#1976d2' },
+  { code: 'FSRT', label: 'Fire and smoke', color: '#1565c0' },
+  { code: 'AMRT', label: 'Mould remediation', color: '#0d47a1' },
+  { code: 'ASD', label: 'Structural drying', color: '#0b3d91' },
 ];
 
 const stats = [
-  { value: '$4.5B', label: 'Claims/year' },
-  { value: 'IICRC', label: 'Standards' },
-  { value: '24/7', label: 'Online' },
+  { value: 'Online', label: 'Self-paced study' },
+  { value: 'IICRC CEC', label: 'On approved courses' },
+  { value: 'CARSI', label: 'Verifiable credentials' },
 ];
 
 const whyCards = [

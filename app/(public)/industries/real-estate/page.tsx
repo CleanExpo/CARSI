@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     'real estate IICRC CEC training Australia',
     'water damage disclosure property',
     'mould training real estate agent',
-    'WRT property sales CEC course',
+    'water damage training for real estate',
     'pre-sale remediation training',
   ],
 };
@@ -33,13 +33,13 @@ export const metadata: Metadata = {
 const ACCENT_COLOR = '#ff7043';
 
 const disciplines = [
-  { code: 'WRT', label: 'Water Damage Restoration', color: '#ff7043' },
-  { code: 'ASD', label: 'Applied Structural Drying', color: '#f4511e' },
-  { code: 'AMRT', label: 'Applied Microbial Remediation', color: '#e64a19' },
+  { code: 'WRT', label: 'Water damage', color: '#ff7043' },
+  { code: 'ASD', label: 'Structural drying', color: '#f4511e' },
+  { code: 'AMRT', label: 'Mould remediation', color: '#e64a19' },
 ];
 
 const stats = [
-  { value: '1.1M+', label: 'Annual Transactions (AUS)' },
+  { value: 'Online', label: 'Self-paced study' },
   { value: 'ACL', label: 'Disclosure Required' },
   { value: 'IICRC', label: 'CEC Accredited' },
 ];
@@ -80,7 +80,7 @@ const whyCards = [
     icon: TrendingUp,
     title: 'Pre-Sale Remediation Value',
     description:
-      'IICRC-certified remediation before listing commands a higher sale price and reduces building inspection failures. Trained agents can brief vendors on required work and verify completion to standard.',
+      'Remediation completed and documented before listing can reduce building inspection surprises. Trained agents can brief vendors on required work and check that it was documented.',
     color: '#f4511e',
   },
   {
@@ -106,7 +106,7 @@ export default async function RealEstateIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Pre-Sale Remediation"
         headlineAccent="& Disclosure Compliance"
-        description="1.1 million Australian property transactions per year carry water damage and mould disclosure obligations. CARSI water damage restoration and mould remediation training gives real estate professionals the knowledge to identify, document, and advise on remediation — protecting vendors, buyers, and agents."
+        description="Property sales can carry water damage and mould disclosure obligations. CARSI water damage restoration and mould remediation training gives real estate professionals the knowledge to identify, document, and advise on remediation — protecting vendors, buyers, and agents."
         disciplines={disciplines}
         stats={stats}
       />
@@ -130,7 +130,7 @@ export default async function RealEstateIndustryPage() {
         subtitle="Real Estate Training"
         title="Property Professional Bundle"
         price={industryBundlePriceLabel('real-estate')}
-        description="water damage restoration and mould remediation awareness training for real estate agents, conveyancers, and property managers. Identify water damage and mould during inspections with IICRC-recognised credentials."
+        description="water damage restoration and mould remediation awareness training for real estate agents, conveyancers, and property managers. Learn to identify water damage and mould during inspections."
         ctaText="Protect Your Practice"
         accentColor={ACCENT_COLOR}
       />

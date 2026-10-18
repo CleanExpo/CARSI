@@ -54,7 +54,7 @@ export const featuredIndustryLinks: FeaturedIndustryLink[] = [
     label: 'Commercial Cleaning',
     title: 'Contractor growth & panels',
     detail:
-      'carpet repair, carpet cleaning and odour control credentials for insurance work and tender differentiation',
+      'carpet cleaning, water damage and odour control training for insurance work and tender differentiation',
     icon: Sparkles,
   },
 ];
@@ -235,22 +235,22 @@ export const industryAddonContent: Record<
 export const cleanerUpgrades: IndustryUpgradeRow[] = [
   {
     base: 'General cleaning',
-    addon: 'WRT',
+    addon: 'Water damage restoration',
     benefit: 'Offer emergency flood response services',
   },
   {
     base: 'Carpet cleaning',
-    addon: 'CRT',
-    benefit: 'Insurance restoration work with higher margins',
+    addon: 'Water damage and carpet drying',
+    benefit: 'Insurance restoration work',
   },
   {
     base: 'Commercial cleaning',
-    addon: 'AMRT',
+    addon: 'Mould remediation',
     benefit: 'Mould inspection and remediation services',
   },
   {
     base: 'Facility maintenance',
-    addon: 'ASD',
+    addon: 'Structural drying',
     benefit: 'Structural drying for building managers',
   },
   {

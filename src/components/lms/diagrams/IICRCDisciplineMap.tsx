@@ -13,9 +13,9 @@ const DISCIPLINES = [
   {
     id: 'CRT',
     label: 'CRT',
-    fullName: 'Carpet Repair & Reinstallation',
+    fullName: 'Colour Repair',
     color: '#047857',
-    blurb: 'Repair, re-stretch & installation standards.',
+    blurb: 'Carpet colour correction & dye repair.',
   },
   {
     id: 'ASD',

@@ -20,8 +20,8 @@ export const metadata: Metadata = {
   keywords: [
     'SES IICRC CEC training Australia',
     'emergency management restoration training',
-    'WRT flood response training',
-    'FSRT fire damage certification',
+    'flood response training',
+    'fire and smoke restoration training',
     'council emergency response training',
   ],
 };
@@ -33,15 +33,15 @@ export const metadata: Metadata = {
 const ACCENT_COLOR = '#ef5350';
 
 const disciplines = [
-  { code: 'WRT', label: 'Water Damage Restoration', color: '#ef5350' },
-  { code: 'FSRT', label: 'Fire & Smoke Restoration', color: '#e53935' },
-  { code: 'ASD', label: 'Applied Structural Drying', color: '#c62828' },
-  { code: 'AMRT', label: 'Applied Microbial Remediation', color: '#b71c1c' },
+  { code: 'WRT', label: 'Water damage', color: '#ef5350' },
+  { code: 'FSRT', label: 'Fire and smoke', color: '#e53935' },
+  { code: 'ASD', label: 'Structural drying', color: '#c62828' },
+  { code: 'AMRT', label: 'Mould remediation', color: '#b71c1c' },
 ];
 
 const stats = [
-  { value: '40,000+', label: 'SES Volunteers (AUS)' },
-  { value: '2,000+', label: 'Call-Outs Per Major Flood' },
+  { value: 'Online', label: 'Self-paced study' },
+  { value: 'CARSI', label: 'Verifiable credentials' },
   { value: 'IICRC', label: 'CEC Accredited' },
 ];
 
@@ -64,7 +64,7 @@ const faqs = [
   {
     question: 'What does fire and smoke restoration training cover for bushfire response?',
     answer:
-      'It covers how smoke and soot behave and penetrate materials, odour removal and the cleaning of fire-affected buildings. For emergency management teams it supports triage that separates cosmetic smoke damage from structural compromise. Start with Introduction to Smoke and Soot Damage Restoration, which is IICRC CEC Accredited, with its CEC hours shown on the course page.',
+      'It covers how smoke and soot behave and penetrate materials, odour removal and the cleaning of fire-affected buildings. For emergency management teams it supports triage that separates cosmetic smoke damage from structural compromise. Start with Introduction to Smoke and Soot Damage Restoration. Where the IICRC has approved a course, its CEC hours are shown on the course page.',
   },
 ];
 
@@ -87,7 +87,7 @@ const whyCards = [
     icon: Users,
     title: 'Community Preparedness',
     description:
-      'Nationally recognised IICRC credentials validate emergency management training for grant applications, council capability reporting, and volunteer retention through professional development.',
+      'Verifiable CARSI credentials document completed training for grant applications, council capability reporting and volunteer professional development.',
     color: '#2490ed',
   },
 ];
@@ -106,7 +106,7 @@ export default async function EmergencyManagementIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Train Before"
         headlineAccent="Disaster Strikes"
-        description="Australia's 40,000+ SES volunteers and council emergency teams respond to thousands of flood and fire events every year. CARSI water damage restoration, fire and smoke restoration and structural drying training gives responders the restoration science knowledge to protect communities more effectively."
+        description="SES volunteers and council emergency teams respond to flood and fire events every year. CARSI water damage restoration, fire and smoke restoration and structural drying training gives responders the restoration science knowledge to protect communities more effectively."
         disciplines={disciplines}
         stats={stats}
       />
@@ -130,7 +130,7 @@ export default async function EmergencyManagementIndustryPage() {
         subtitle="Emergency Management Training"
         title="Emergency Response Bundle"
         price={industryBundlePriceLabel('emergency-management')}
-        description="water damage restoration, fire & smoke restoration and structural drying training for SES volunteers, council emergency managers, and community resilience teams. Bulk licensing available for units and councils."
+        description="water damage restoration, fire & smoke restoration and structural drying training for SES volunteers, council emergency managers, and community resilience teams. Paid courses can be bought as team seats at checkout."
         ctaText="Train Your Response Team"
         accentColor={ACCENT_COLOR}
       />
