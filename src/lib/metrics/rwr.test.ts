@@ -234,8 +234,18 @@ describe('collectRwrInputs — Stripe shaping', () => {
 
   // Review r2 P1-RWR-SUB-CURRENCY-TEST-ESCAPES: only the subscription-level check can refuse this.
   it('refuses a USD subscription even when its item price is AUD', async () => {
-    await refuses([sub('sub_m_mixed', 'pro_annual', [MEMBERSHIP_ITEM], { currency: 'usd' })]);
-    await refuses([sub('sub_t_mixed', 'growth', [{ unit: 30_000, qty: 5 }], { currency: 'usd' })]);
+    // Item prices set to AUD explicitly: the fixture would otherwise inherit the USD currency
+    // and be refused by the item guard instead (the first version of this test did exactly that).
+    await refuses([
+      sub('sub_m_mixed', 'pro_annual', [{ ...MEMBERSHIP_ITEM, currency: 'aud' }], {
+        currency: 'usd',
+      }),
+    ]);
+    await refuses([
+      sub('sub_t_mixed', 'growth', [{ unit: 30_000, qty: 5, currency: 'aud' }], {
+        currency: 'usd',
+      }),
+    ]);
   });
 
   // Review r2 P1-RWR-INDIVIDUAL-ITEM-SHAPE
