@@ -1,10 +1,13 @@
 /**
- * AC-4 (spec 2026-10-18 D9-D11, D17): the review-request email is off by default, sent at most
- * once per enrolment, retried after a failed send, never sent to opted-out learners, bounded to
- * 3-14 day old completions with a per-run cap, and carries unsubscribe headers.
+ * AC-4 (spec 2026-10-18 D9-D11, D17; header amendment 6): the review-request email is off by
+ * default, goes only to enrolments the database marked eligible AT COMPLETION while the switch was
+ * on, is sent at most once per enrolment, is retried only after a definite non-delivery, never goes
+ * to opted-out learners, is bounded to 3-14 day old completions with a per-run cap, and carries
+ * unsubscribe headers. The completion-time trigger itself is proven against real PostgreSQL in
+ * review-audit-retention.test.ts; here `addCompleter` stands in for it.
  *
- * The ledger fake ENFORCES the UNIQUE enrollment_id (throws P2002 like Postgres), because a
- * mocked `create` that always succeeds cannot prove "a re-run sends no second email".
+ * The ledger fake models the conditional claims exactly (a claim is an updateMany that one run
+ * wins), because a mocked update that always succeeds cannot prove "no second email".
  */
 import { beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest';
 
@@ -14,7 +17,7 @@ type Enrolment = {
   courseId: string;
   status: string;
   completedAt: Date | null;
-  course: { slug: string; title: string; category: string | null };
+  course: { slug: string; title: string; category: string | null; meta?: unknown };
 };
 type Ledger = {
   status: string;
@@ -40,13 +43,14 @@ const db = vi.hoisted(() => ({
   users: new Map<string, { email: string; fullName: string | null; emailOptOut: boolean; isActive: boolean }>(),
   reviews: new Set<string>(),
   ledger: new Map<string, Ledger>(),
-  /** Wall-clock the fake stamps on writes (Prisma's @updatedAt). */
+  /** lms_review_request_settings row; null = row missing. */
+  settings: { enabled: true } as { enabled: boolean } | null,
   clock: new Date('2026-10-18T00:00:00.000Z'),
   failUserReadOnce: false,
-  /** lms_review_request_activations rows (append-only); empty = never switched on. */
-  activations: [] as Array<{ id: string; activatedAt: Date; lastRunAt: Date; pausedAt: Date | null }>,
-  /** Simulates a write that is acknowledged but not durable (read-back finds nothing). */
-  activationWriteLost: false,
+  /** When set, the first `parties` candidate queries wait for each other, so concurrent runs hold the same snapshot. */
+  barrier: null as null | { parties: number; arrived: number; release: () => void; ready: Promise<void> },
+  /** When set, the SECOND candidate query (its snapshot already taken) waits for this before returning. */
+  holdSecondQuery: null as null | { calls: number; until: Promise<void> },
 }));
 const mail = vi.hoisted(() => ({ send: vi.fn(), configured: vi.fn(() => true) }));
 const unsub = vi.hoisted(() => ({ setOptOut: vi.fn(async (_id: string, optedOut: boolean) => ({ email_opt_out: optedOut })) }));
@@ -75,36 +79,33 @@ function ledgerMatches(l: Ledger | undefined, where: LedgerWhere): l is Ledger {
 type FindWhere = {
   status: string;
   completedAt: { gte: Date; lte: Date };
-  OR: Array<{ reviewRequestEmail: { is: null | { status: string; attempts?: { lt: number }; updatedAt?: { lt: Date } } } }>;
+  OR: Array<{ reviewRequestEmail: { is: { status: string; attempts?: { lt: number }; updatedAt?: { lt: Date } } } }>;
   AND?: Array<{ OR: [{ completedAt: { gt: Date } }, { completedAt: Date; id: { gt: string } }] }>;
 };
 
 vi.mock('@/lib/prisma', () => ({
   prisma: {
+    lmsReviewRequestSettings: {
+      findUnique: async () => (db.settings ? { enabled: db.settings.enabled } : null),
+    },
     lmsEnrollment: {
       findMany: async ({ where, take }: { where: FindWhere; take: number }) => {
         const after = where.AND?.[0]?.OR;
-        return db.enrolments
+        // Build the whole result first: a real query returns a snapshot taken when it ran.
+        const rows = db.enrolments
           .filter((e) => {
             if (e.status !== where.status || e.completedAt === null) return false;
             if (e.completedAt < where.completedAt.gte || e.completedAt > where.completedAt.lte) return false;
             const l = db.ledger.get(e.id);
-            const ledgerOk = where.OR.some(({ reviewRequestEmail: { is } }) =>
-              is === null
-                ? !l
-                : ledgerMatches(l, { enrollmentId: e.id, status: is.status, attempts: is.attempts, updatedAt: is.updatedAt })
-            );
-            if (!ledgerOk) return false;
+            if (!where.OR.some(({ reviewRequestEmail: { is } }) => ledgerMatches(l, { enrollmentId: e.id, ...is }))) return false;
             if (after) {
               const t = e.completedAt.getTime();
-              const gt = after[0].completedAt.gt.getTime();
-              if (!(t > gt || (t === after[1].completedAt.getTime() && e.id > after[1].id.gt))) return false;
+              if (!(t > after[0].completedAt.gt.getTime() || (t === after[1].completedAt.getTime() && e.id > after[1].id.gt))) return false;
             }
             return true;
           })
           .sort((a, b) => a.completedAt!.getTime() - b.completedAt!.getTime() || a.id.localeCompare(b.id))
           .slice(0, take)
-          // Snapshot at read time, like a real query result.
           .map((e) => {
             const l = db.ledger.get(e.id);
             return {
@@ -114,23 +115,21 @@ vi.mock('@/lib/prisma', () => ({
                 : null,
             };
           });
+        const hold = db.holdSecondQuery;
+        if (hold) {
+          hold.calls += 1;
+          if (hold.calls === 2) await hold.until;
+        }
+        const b = db.barrier;
+        if (b && b.arrived < b.parties) {
+          b.arrived += 1;
+          if (b.arrived === b.parties) b.release();
+          await b.ready;
+        }
+        return rows;
       },
     },
     lmsReviewRequestEmail: {
-      create: async ({ data }: { data: { enrollmentId: string; status: string; claimToken?: string; failureReason?: string } }) => {
-        if (db.ledger.has(data.enrollmentId)) throw Object.assign(new Error('Unique constraint failed'), { code: 'P2002' });
-        db.ledger.set(data.enrollmentId, {
-          status: data.status,
-          attempts: 0,
-          claimToken: data.claimToken ?? null,
-          sendAttemptedAt: null,
-          updatedAt: db.clock,
-          failureReason: data.failureReason ?? null,
-          providerMessageId: null,
-          sentAt: null,
-        });
-        return {};
-      },
       updateMany: async ({ where, data }: { where: LedgerWhere; data: Partial<Ledger> & { attempts?: { increment: number } } }) => {
         const l = db.ledger.get(where.enrollmentId);
         if (!ledgerMatches(l, where)) return { count: 0 };
@@ -138,34 +137,6 @@ vi.mock('@/lib/prisma', () => ({
         Object.assign(l, rest, { updatedAt: db.clock });
         if (attempts) l.attempts += attempts.increment;
         return { count: 1 };
-      },
-    },
-    lmsReviewRequestActivation: {
-      findFirst: async () => {
-        const latest = [...db.activations].sort((a, b) => b.activatedAt.getTime() - a.activatedAt.getTime())[0];
-        return latest ? { ...latest } : null;
-      },
-      create: async ({ data }: { data: { activatedAt: Date; lastRunAt: Date } }) => {
-        if (!db.activationWriteLost) {
-          db.activations.push({ id: `act-${db.activations.length + 1}`, activatedAt: data.activatedAt, lastRunAt: data.lastRunAt, pausedAt: null });
-        }
-        return {};
-      },
-      update: async ({ where, data }: { where: { id: string }; data: { lastRunAt: Date } }) => {
-        const row = db.activations.find((a) => a.id === where.id);
-        if (!row) throw new Error('no activation row');
-        row.lastRunAt = data.lastRunAt;
-        return {};
-      },
-      updateMany: async ({ where, data }: { where: { pausedAt: null }; data: { pausedAt: Date } }) => {
-        let count = 0;
-        for (const a of db.activations) {
-          if (where.pausedAt === null && a.pausedAt === null) {
-            a.pausedAt = data.pausedAt;
-            count += 1;
-          }
-        }
-        return { count };
       },
     },
     lmsUser: {
@@ -186,8 +157,6 @@ vi.mock('@/lib/prisma', () => ({
 
 const {
   isDefiniteNonDelivery,
-  parseStrictSince,
-  readReviewRequestConfig,
   renderReviewRequestEmail,
   REVIEW_REQUEST_MAX_SENDS_PER_RUN,
   reviewRequestWindow,
@@ -198,9 +167,20 @@ const {
 const NOW = new Date('2026-10-18T00:00:00.000Z');
 const H = 3_600_000;
 const D = 24 * H;
-const ON = { REVIEW_REQUEST_EMAILS_ENABLED: 'true', REVIEW_REQUEST_EMAILS_SINCE: '2026-09-01' };
 
-function addCompleter(id: string, completedAgoMs: number, opts: Partial<Enrolment> & { studentId?: string } = {}) {
+function eligibleRow(): Ledger {
+  return { status: 'eligible', attempts: 0, claimToken: null, sendAttemptedAt: null, updatedAt: NOW, failureReason: null, providerMessageId: null, sentAt: null };
+}
+
+/**
+ * A completion `completedAgoMs` before NOW. By default the switch was on at completion, so the
+ * database marked it eligible (what the trigger does); `markedEligible: false` = switched off then.
+ */
+function addCompleter(
+  id: string,
+  completedAgoMs: number,
+  opts: Partial<Enrolment> & { studentId?: string; markedEligible?: boolean } = {}
+) {
   const studentId = opts.studentId ?? `student-${id}`;
   db.enrolments.push({
     id,
@@ -210,242 +190,68 @@ function addCompleter(id: string, completedAgoMs: number, opts: Partial<Enrolmen
     completedAt: new Date(NOW.getTime() - completedAgoMs),
     course: opts.course ?? { slug: 'water-damage', title: 'Water Damage Restoration', category: 'restoration' },
   });
+  if (opts.markedEligible !== false) db.ledger.set(id, eligibleRow());
   if (!db.users.has(studentId)) {
     db.users.set(studentId, { email: `${studentId}@example.com`, fullName: 'Sam Rivers', emailOptOut: false, isActive: true });
   }
 }
-const run = (env: Record<string, string | undefined> = ON, extra: { dryRun?: boolean; now?: Date } = {}) =>
-  runReviewRequestEmails({ now: extra.now ?? NOW, env, dryRun: extra.dryRun });
+const run = (extra: { dryRun?: boolean; now?: Date } = {}) => runReviewRequestEmails({ now: extra.now ?? NOW, dryRun: extra.dryRun });
 
 beforeEach(() => {
   db.enrolments.length = 0;
   db.users.clear();
   db.reviews.clear();
   db.ledger.clear();
+  db.settings = { enabled: true };
   db.failUserReadOnce = false;
-  // Most tests describe steady state: sending was switched on long ago. The no-backfill tests
-  // below clear this to exercise the first run.
-  db.activations = [
-    { id: 'act-steady', activatedAt: new Date('2026-01-01T00:00:00.000Z'), lastRunAt: new Date(NOW.getTime() - H), pausedAt: null },
-  ];
-  db.activationWriteLost = false;
+  db.barrier = null;
+  db.holdSecondQuery = null;
   unsub.setOptOut.mockClear();
   mail.send.mockReset().mockResolvedValue({ sent: true, messageId: 'm-1' });
   mail.configured.mockReset().mockReturnValue(true);
 });
 
-describe('off by default (D10)', () => {
-  it.each([
-    ['unset', {}],
-    ['empty', { REVIEW_REQUEST_EMAILS_ENABLED: '' }],
-    ['"false"', { REVIEW_REQUEST_EMAILS_ENABLED: 'false' }],
-    ['"0"', { REVIEW_REQUEST_EMAILS_ENABLED: '0' }],
-    ['"1"', { REVIEW_REQUEST_EMAILS_ENABLED: '1' }],
-    ['"TRUE"', { REVIEW_REQUEST_EMAILS_ENABLED: 'TRUE' }],
-    ['" true"', { REVIEW_REQUEST_EMAILS_ENABLED: ' true' }],
-  ])('flag %s → disabled, nothing sent', async (_label, env) => {
-    addCompleter('e1', 4 * D);
-    const res = await run({ ...env, REVIEW_REQUEST_EMAILS_SINCE: '2026-09-01' });
-    expect(res.reason).toBe('disabled');
+describe('off by default; one switch (D10d)', () => {
+  it('switch off → disabled, nothing sent and nothing claimed, even for rows marked eligible earlier', async () => {
+    db.settings = { enabled: false };
+    addCompleter('e1', 5 * D);
+    const res = await run();
+    expect(res).toMatchObject({ ok: true, reason: 'disabled', sent: 0 });
     expect(mail.send).not.toHaveBeenCalled();
-    expect(db.ledger.size).toBe(0);
+    expect(db.ledger.get('e1')?.status).toBe('eligible');
   });
 
-  it('flag on without a send-from date sends nothing (no back-catalogue mass send)', async () => {
-    addCompleter('e1', 4 * D);
-    expect((await run({ REVIEW_REQUEST_EMAILS_ENABLED: 'true' })).reason).toBe('since_missing');
-    expect((await run({ REVIEW_REQUEST_EMAILS_ENABLED: 'true', REVIEW_REQUEST_EMAILS_SINCE: 'soon' })).reason).toBe('since_invalid');
+  it('a missing settings row fails closed and loudly (never treated as on)', async () => {
+    db.settings = null;
+    addCompleter('e1', 5 * D);
+    expect(await run()).toMatchObject({ ok: false, reason: 'settings_missing', sent: 0 });
     expect(mail.send).not.toHaveBeenCalled();
   });
 
-  it('flag on but email not configured → not ok (the scheduler goes red)', async () => {
+  it('switch on but email not configured → not ok (the scheduler goes red)', async () => {
     mail.configured.mockReturnValue(false);
-    const res = await run();
-    expect(res).toMatchObject({ ok: false, reason: 'email_not_configured' });
-  });
-
-  it('only the exact value "true" enables sending', () => {
-    expect(readReviewRequestConfig(ON)).toEqual({ enabled: true, since: new Date('2026-09-01') });
-  });
-
-  it.each([
-    '2026-02-31', // JavaScript would roll this to 3 March
-    '2026-02-29', // 2026 is not a leap year
-    '2026-04-31',
-    '2026-13-01',
-    '2026-00-10',
-    '2026-09-00',
-    '2026-09-01T24:00Z',
-    '2026-09-01T10:60Z',
-    '2026-09-01T10:00:61Z',
-    '2026-09-01T10:00+15:00',
-    '2026-9-1',
-  ])('an impossible SINCE date (%s) never enables sending', async (since) => {
-    addCompleter('e1', 5 * D);
-    expect(readReviewRequestConfig({ REVIEW_REQUEST_EMAILS_ENABLED: 'true', REVIEW_REQUEST_EMAILS_SINCE: since })).toEqual({
-      enabled: false,
-      reason: 'since_invalid',
-    });
-    expect((await run({ REVIEW_REQUEST_EMAILS_ENABLED: 'true', REVIEW_REQUEST_EMAILS_SINCE: since })).sent).toBe(0);
-    expect(mail.send).not.toHaveBeenCalled();
-  });
-
-  it.each([
-    ['2028-02-29', '2028-02-29T00:00:00.000Z'],
-    ['2026-09-01T10:30Z', '2026-09-01T10:30:00.000Z'],
-    ['2026-09-01T10:30:15.5+10:00', '2026-09-01T00:30:15.500Z'],
-  ])('a real SINCE date (%s) parses exactly', (since, iso) => {
-    expect(parseStrictSince(since)?.toISOString()).toBe(iso);
+    expect(await run()).toMatchObject({ ok: false, reason: 'email_not_configured' });
   });
 });
 
-describe('no backfill: completions from before an activation, or from any off period, are never emailed (D10b, D10c)', () => {
-  function addCompletedAt(id: string, completedAt: Date) {
-    db.enrolments.push({
-      id,
-      studentId: `student-${id}`,
-      courseId: `course-${id}`,
-      status: 'completed',
-      completedAt,
-      course: { slug: 'water-damage', title: 'Water Damage Restoration', category: 'restoration' },
-    });
-    db.users.set(`student-${id}`, { email: `student-${id}@example.com`, fullName: 'Jo', emailOptOut: false, isActive: true });
-  }
-  const day = (d: number) => new Date(Date.UTC(2026, 9, d)); // October 2026
-  /** Run once a day (a healthy daily scheduler) from `from` to `to` inclusive. */
-  async function runDaily(from: number, to: number, env: Record<string, string | undefined> = ON) {
-    const results = [];
-    for (let d = from; d <= to; d++) results.push(await run(env, { now: day(d) }));
-    return results;
-  }
-
-  it('the first enabled run records an activation and emails nobody, even with an older valid SINCE', async () => {
-    db.activations = [];
-    addCompleter('wk-old', 4 * D); // completed before activation, inside SINCE and the 3-14 day window
-    addCompleter('fortnight', 14 * D);
-    const first = await run({ ...ON, REVIEW_REQUEST_EMAILS_SINCE: '2026-09-01' });
-    expect(first).toMatchObject({ ok: true, sent: 0, activated_at: NOW.toISOString() });
-    expect(db.activations.map((a) => a.activatedAt)).toEqual([NOW]);
+describe('eligibility is decided at completion: off periods can never be backfilled (r4)', () => {
+  it('a completion recorded while the switch was off has no eligible row and is never emailed, whatever happens later', async () => {
+    addCompleter('while-off', 5 * D, { markedEligible: false });
+    // Switch on now, run every day for a fortnight: nothing.
+    for (let d = 0; d < 14; d++) await run({ now: new Date(NOW.getTime() + d * D) });
     expect(mail.send).not.toHaveBeenCalled();
   });
 
-  it('daily runs then email only completions on or after activation', async () => {
-    db.activations = [];
-    addCompletedAt('pre', day(16)); // before activation on 18/10
-    addCompletedAt('post', day(19)); // after activation, by any path (online, CCW provisioning, admin)
-    await runDaily(18, 23);
-    expect(mail.send.mock.calls.map((c) => c[0].to)).toEqual(['student-post@example.com']);
-    expect(db.ledger.has('pre')).toBe(false);
-    expect(db.activations).toHaveLength(1);
-  });
-
-  it('reviewer control: switched off (observed), a completion while off, switched back on → never emailed', async () => {
-    db.activations = [{ id: 'act-1', activatedAt: day(1), lastRunAt: day(8), pausedAt: null }];
-    await run({}, { now: day(9) }); // the daily run sees the flag off and records the pause
-    expect(db.activations[0]!.pausedAt).toEqual(day(9));
-    addCompletedAt('while-off', day(10));
-    await runDaily(10, 17, {}); // still off
-    const results = await runDaily(18, 28, { ...ON, REVIEW_REQUEST_EMAILS_SINCE: '2026-09-01' });
-    expect(results.reduce((n, r) => n + r.sent, 0)).toBe(0);
-    expect(mail.send).not.toHaveBeenCalled();
-    // The off -> on transition is its own recorded activation.
-    expect(db.activations.map((a) => a.activatedAt)).toEqual([day(1), day(18)]);
-  });
-
-  it('a short pause (well inside the gap limit) is still a new activation once a run has seen it', async () => {
-    const at = (d: number, h: number) => new Date(Date.UTC(2026, 9, d, h));
-    db.activations = [{ id: 'act-1', activatedAt: day(1), lastRunAt: at(10, 0), pausedAt: null }];
-    await run({}, { now: at(10, 6) }); // a run sees the flag off at 06:00
-    addCompletedAt('short-pause', at(10, 7));
-    await run(ON, { now: at(10, 12) }); // back on at 12:00 — only 12 h after the last enabled run
-    expect(db.activations.map((a) => a.activatedAt)).toEqual([day(1), at(10, 12)]);
-    const later = await runDaily(14, 16);
-    expect(later.reduce((n, r) => n + r.sent, 0)).toBe(0);
-    expect(mail.send).not.toHaveBeenCalled();
-  });
-
-  it('switched off with the scheduler stopped too (nothing observed), then on → the gap is never backfilled', async () => {
-    db.activations = [{ id: 'act-1', activatedAt: day(1), lastRunAt: day(8), pausedAt: null }];
-    addCompletedAt('during-gap', day(10));
-    const res = await run({ ...ON, REVIEW_REQUEST_EMAILS_SINCE: '2026-09-01' }, { now: day(18) });
-    expect(res).toMatchObject({ sent: 0, activated_at: day(18).toISOString() });
-    expect(db.activations).toHaveLength(2);
-    expect(mail.send).not.toHaveBeenCalled();
-  });
-
-  it('a completion after switching back on is emailed as normal', async () => {
-    db.activations = [{ id: 'act-1', activatedAt: day(1), lastRunAt: day(8), pausedAt: day(9) }];
-    addCompletedAt('while-off', day(12));
-    addCompletedAt('after-on', day(19));
-    await runDaily(18, 24);
-    expect(mail.send.mock.calls.map((c) => c[0].to)).toEqual(['student-after-on@example.com']);
-  });
-
-  it('a daily run within the gap limit continues the same activation (no new row, earlier completions still asked)', async () => {
-    db.activations = [{ id: 'act-1', activatedAt: day(1), lastRunAt: day(17), pausedAt: null }];
-    addCompletedAt('steady', day(12));
-    const res = await run(ON, { now: day(18) });
-    expect(res.sent).toBe(1);
-    expect(db.activations).toHaveLength(1);
-    expect(db.activations[0]!.lastRunAt).toEqual(day(18));
-  });
-
-  it('a dry run outside an activation records nothing and counts nobody', async () => {
-    db.activations = [{ id: 'act-1', activatedAt: day(1), lastRunAt: day(8), pausedAt: day(9) }];
-    addCompleter('e1', 5 * D);
-    const res = await run(ON, { dryRun: true });
-    expect(res).toMatchObject({ ok: true, reason: 'not_activated', would_send: 0 });
-    expect(db.activations).toHaveLength(1);
-  });
-
-  it('a dry run never pauses an activation either', async () => {
-    await run({}, { dryRun: true });
-    expect(db.activations[0]!.pausedAt).toBeNull();
-  });
-
-  it('if a new activation cannot be durably stored, the run fails closed and sends nothing', async () => {
-    db.activations = [];
-    db.activationWriteLost = true;
-    addCompleter('e1', 5 * D);
-    const res = await run();
-    expect(res).toMatchObject({ ok: false, reason: 'activation_unrecorded', sent: 0 });
-    expect(mail.send).not.toHaveBeenCalled();
-  });
-
-  it('the window starts at the latest of SINCE, activation and the 14-day limit', () => {
-    const since = new Date('2026-09-01T00:00:00Z');
-    expect(reviewRequestWindow({ since, activatedAt: new Date('2026-10-10T00:00:00Z') }, NOW).from.toISOString()).toBe(
-      '2026-10-10T00:00:00.000Z'
-    );
-    expect(reviewRequestWindow({ since, activatedAt: new Date('2026-01-01T00:00:00Z') }, NOW).from.toISOString()).toBe(
-      '2026-10-04T00:00:00.000Z'
-    );
+  it('r4 reviewer scenario (unobserved off -> on, no cron run while off): only the completion made while on is emailed', async () => {
+    addCompleter('while-on', 5 * D); // marked eligible at completion
+    addCompleter('while-off', 4 * D, { markedEligible: false }); // switched off 1 h, completed, back on 10 h later
+    for (let d = 0; d < 6; d++) await run({ now: new Date(NOW.getTime() + d * D) });
+    expect(mail.send.mock.calls.map((c) => c[0].to)).toEqual(['student-while-on@example.com']);
+    expect(db.ledger.has('while-off')).toBe(false);
   });
 });
 
-describe('Mailtrap stream and copy for every course (release-gate r3)', () => {
-  it('review requests go out on the Bulk Stream', async () => {
-    addCompleter('e1', 5 * D);
-    await run();
-    expect(mail.send.mock.calls[0]![0].stream).toBe('bulk');
-  });
-
-  it('a non-restoration course (truckmount) gets an email with no IICRC or CEC wording at all', () => {
-    const e = renderReviewRequestEmail({
-      appOrigin: 'https://carsi.com.au',
-      name: 'Sam',
-      courseTitle: 'CCW CARSI Truckmount Operations',
-      reviewUrl: 'https://carsi.com.au/dashboard/courses/ccw-truckmount#reviews',
-      unsubscribeUrl: 'https://carsi.com.au/unsubscribe?token=t',
-    });
-    expect(e.html).toContain('CCW CARSI Truckmount Operations');
-    for (const part of [e.subject, e.html, e.text]) {
-      expect(part).not.toMatch(/IICRC|\bCECs?\b|Continuing Education|Accredited/i);
-    }
-  });
-});
-
-describe('window: 3 to 14 days after completion, never before SINCE (D10)', () => {
+describe('window: 3 to 14 days after completion (D10)', () => {
   it.each([
     ['71h59m old', 71 * H + 59 * 60_000, false],
     ['exactly 72h old', 72 * H, true],
@@ -454,13 +260,13 @@ describe('window: 3 to 14 days after completion, never before SINCE (D10)', () =
     ['30 days old', 30 * D, false],
   ])('%s → emailed: %s', async (_label, age, expected) => {
     addCompleter('e1', age as number);
-    const res = await run({ ...ON, REVIEW_REQUEST_EMAILS_SINCE: '2026-01-01' });
-    expect(res.sent).toBe(expected ? 1 : 0);
+    expect((await run()).sent).toBe(expected ? 1 : 0);
   });
 
-  it('completions before SINCE are never emailed', async () => {
-    addCompleter('e1', 10 * D); // 2026-10-08
-    expect((await run({ ...ON, REVIEW_REQUEST_EMAILS_SINCE: '2026-10-10' })).sent).toBe(0);
+  it('the window is exactly 14 to 3 days before the run', () => {
+    const w = reviewRequestWindow(NOW);
+    expect(w.from.toISOString()).toBe('2026-10-04T00:00:00.000Z');
+    expect(w.to.toISOString()).toBe('2026-10-15T00:00:00.000Z');
   });
 
   it('a non-completed or revoked enrolment is never emailed', async () => {
@@ -471,19 +277,17 @@ describe('window: 3 to 14 days after completion, never before SINCE (D10)', () =
 
   it('an onboarding programme flagged only by its meta brand is not asked either', async () => {
     const { ONBOARDING_BRAND } = await import('@/lib/onboarding/enterprise');
-    addCompleter('e1', 5 * D, {
-      course: { slug: 'acme-induction', title: 'Acme induction', category: 'Cleaning', meta: { brand: ONBOARDING_BRAND } } as Enrolment['course'],
-    });
+    addCompleter('e1', 5 * D, { course: { slug: 'acme-induction', title: 'Acme induction', category: 'Cleaning', meta: { brand: ONBOARDING_BRAND } } });
     const res = await run();
     expect(res.sent).toBe(0);
     expect(res.skipped.onboarding_course).toBe(1);
   });
 
-  it('internal onboarding programmes are not asked', async () => {
-    addCompleter('e1', 5 * D, { course: { slug: 'floor-care-onboarding-operational-readiness', title: 'Onboarding', category: null } });
+  it('internal onboarding programmes are skipped and recorded, so they leave the queue', async () => {
+    addCompleter('ob1', 5 * D, { course: { slug: 'floor-care-onboarding-operational-readiness', title: 'Onboarding', category: null } });
     const res = await run();
     expect(res.sent).toBe(0);
-    expect(res.skipped.onboarding_course).toBe(1);
+    expect(db.ledger.get('ob1')).toMatchObject({ status: 'skipped', failureReason: 'onboarding_course' });
   });
 });
 
@@ -492,14 +296,44 @@ describe('at most once per enrolment (D9)', () => {
     addCompleter('e1', 5 * D);
     expect((await run()).sent).toBe(1);
     const again = await run();
-    expect(again.sent).toBe(0);
-    // A sent row is terminal: the query no longer returns it at all.
-    expect(again.candidates).toBe(0);
+    expect(again).toMatchObject({ sent: 0, candidates: 0 });
     expect(mail.send).toHaveBeenCalledTimes(1);
     expect(db.ledger.get('e1')).toMatchObject({ status: 'sent', attempts: 1, providerMessageId: 'm-1' });
   });
 
-  it('two overlapping runs send one email: the UNIQUE key stops the second claim', async () => {
+  it('a run that already reached the provider cannot have its row re-claimed by a run with an older snapshot', async () => {
+    addCompleter('e1', 5 * D);
+    // Run B takes its snapshot ('eligible') before run A claims, but only acts once run A is
+    // inside the provider call. A claim that is not conditional on 'eligible' would win here
+    // and send a second email; the claim-owner token alone cannot stop that.
+    let inSend!: () => void;
+    db.holdSecondQuery = { calls: 0, until: new Promise<void>((r) => (inSend = r)) };
+    mail.send.mockImplementationOnce(() => {
+      inSend();
+      return new Promise((resolve) => setTimeout(() => resolve({ sent: true, messageId: 'slow' }), 30));
+    });
+    const [a, b] = await Promise.all([run(), run()]);
+    db.holdSecondQuery = null;
+    expect(a.candidates + b.candidates).toBe(2); // both really saw it as eligible
+    expect(mail.send).toHaveBeenCalledTimes(1);
+    expect(a.sent + b.sent).toBe(1);
+  });
+
+  it('two runs holding the SAME eligible snapshot send one email: only one conditional claim can win', async () => {
+    addCompleter('e1', 5 * D);
+    let release!: () => void;
+    const ready = new Promise<void>((r) => (release = r));
+    db.barrier = { parties: 2, arrived: 0, release, ready };
+    const [a, b] = await Promise.all([run(), run()]);
+    db.barrier = null;
+    expect(a.candidates).toBe(1);
+    expect(b.candidates).toBe(1); // both really saw it as eligible
+    expect(a.sent + b.sent).toBe(1);
+    expect((a.skipped.claimed_elsewhere ?? 0) + (b.skipped.claimed_elsewhere ?? 0)).toBe(1);
+    expect(mail.send).toHaveBeenCalledTimes(1);
+  });
+
+  it('two overlapping runs send one email: only one run can win the claim', async () => {
     addCompleter('e1', 5 * D);
     const [a, b] = await Promise.all([run(), run()]);
     expect(a.sent + b.sent).toBe(1);
@@ -508,44 +342,22 @@ describe('at most once per enrolment (D9)', () => {
   });
 });
 
-describe('a failed send is retried, never silently used up (D9)', () => {
-  it('a 4xx rejection (definite non-delivery) → failed and the run is not ok; the next run retries and sends', async () => {
+describe('only a definite non-delivery is retried (D9, D9b)', () => {
+  it('a 4xx rejection → failed and not ok; the next run retries and sends', async () => {
     addCompleter('e1', 5 * D);
     mail.send.mockResolvedValueOnce({ sent: false, reason: 'provider_error', httpStatus: 422 });
-    const first = await run();
-    expect(first).toMatchObject({ ok: false, sent: 0, failed: 1, failed_enrollment_ids: ['e1'] });
+    expect(await run()).toMatchObject({ ok: false, sent: 0, failed: 1, failed_enrollment_ids: ['e1'] });
     expect(db.ledger.get('e1')).toMatchObject({ status: 'failed', attempts: 1, failureReason: 'provider_error' });
-    const second = await run();
-    expect(second).toMatchObject({ ok: true, sent: 1, failed: 0 });
+    expect(await run()).toMatchObject({ ok: true, sent: 1, failed: 0 });
     expect(db.ledger.get('e1')).toMatchObject({ status: 'sent', attempts: 2 });
   });
 
   it('dev_console (printed, not sent) counts as a failure', async () => {
     addCompleter('e1', 5 * D);
     mail.send.mockResolvedValueOnce({ sent: true, reason: 'dev_console' });
-    const res = await run();
-    expect(res.failed).toBe(1);
+    expect((await run()).failed).toBe(1);
     expect(db.ledger.get('e1')?.status).toBe('failed');
     expect(wasReallySent({ sent: true, reason: 'dev_console' })).toBe(false);
-  });
-
-  it('a thrown send is ambiguous: counted as a failure, never resent', async () => {
-    addCompleter('e1', 5 * D);
-    mail.send.mockRejectedValueOnce(new Error('network'));
-    const first = await run();
-    expect(first).toMatchObject({ ok: false, failed: 1, ambiguous: 1 });
-    expect(db.ledger.get('e1')?.status).toBe('ambiguous');
-    await run();
-    expect(mail.send).toHaveBeenCalledTimes(1);
-  });
-
-  it('send_failed (network error or timeout: Mailtrap may have accepted it) is never retried', async () => {
-    addCompleter('e1', 5 * D);
-    mail.send.mockResolvedValueOnce({ sent: false, reason: 'send_failed' });
-    expect(await run()).toMatchObject({ failed: 1, ambiguous: 1 });
-    expect(db.ledger.get('e1')).toMatchObject({ status: 'ambiguous', failureReason: 'send_failed' });
-    expect((await run()).candidates).toBe(0);
-    expect(mail.send).toHaveBeenCalledTimes(1);
   });
 
   it.each([
@@ -554,13 +366,21 @@ describe('a failed send is retried, never silently used up (D9)', () => {
     ['provider error with no status', { sent: false, reason: 'provider_error' }],
     ['2xx reply that still reported failure', { sent: false, reason: 'provider_error', httpStatus: 200 }],
     ['dev console after a 5xx', { sent: true, reason: 'dev_console', httpStatus: 502 }],
-  ])('%s is ambiguous (Mailtrap may have delivered it): never resent on a later run', async (_label, outcome) => {
+    ['network error or timeout', { sent: false, reason: 'send_failed' }],
+  ])('%s is ambiguous (may have been delivered): never resent', async (_label, outcome) => {
     addCompleter('e1', 5 * D);
     mail.send.mockResolvedValueOnce(outcome);
     expect(await run()).toMatchObject({ ok: false, failed: 1, ambiguous: 1 });
     expect(db.ledger.get('e1')?.status).toBe('ambiguous');
-    const second = await run();
-    expect(second.candidates).toBe(0);
+    expect((await run()).candidates).toBe(0);
+    expect(mail.send).toHaveBeenCalledTimes(1);
+  });
+
+  it('a thrown send is ambiguous', async () => {
+    addCompleter('e1', 5 * D);
+    mail.send.mockRejectedValueOnce(new Error('network'));
+    expect(await run()).toMatchObject({ ok: false, failed: 1, ambiguous: 1 });
+    await run();
     expect(mail.send).toHaveBeenCalledTimes(1);
   });
 
@@ -578,32 +398,27 @@ describe('a failed send is retried, never silently used up (D9)', () => {
     addCompleter('e1', 5 * D);
     mail.send.mockResolvedValue({ sent: false, reason: 'provider_error', httpStatus: 422 });
     for (let i = 0; i < 3; i++) await run();
-    const fourth = await run();
-    expect(fourth.candidates).toBe(0);
+    expect((await run()).candidates).toBe(0);
     expect(mail.send).toHaveBeenCalledTimes(3);
     expect(db.ledger.get('e1')).toMatchObject({ status: 'failed', attempts: 3 });
   });
 });
 
-describe('interrupted claims are recovered safely (independent review findings 2-3)', () => {
+describe('interrupted claims are recovered safely', () => {
   function seedPending(id: string, opts: { minutesAgo: number; sendAttempted: boolean }) {
     db.ledger.set(id, {
+      ...eligibleRow(),
       status: 'pending',
-      attempts: 0,
       claimToken: 'old-run',
       sendAttemptedAt: opts.sendAttempted ? new Date(NOW.getTime() - opts.minutesAgo * 60_000) : null,
       updatedAt: new Date(NOW.getTime() - opts.minutesAgo * 60_000),
-      failureReason: null,
-      providerMessageId: null,
-      sentAt: null,
     });
   }
 
   it('a claim abandoned before any send attempt is recovered after the lease and sent once', async () => {
     addCompleter('e1', 5 * D);
     seedPending('e1', { minutesAgo: 120, sendAttempted: false });
-    const res = await run();
-    expect(res.sent).toBe(1);
+    expect((await run()).sent).toBe(1);
     expect(db.ledger.get('e1')).toMatchObject({ status: 'sent', claimToken: null });
   });
 
@@ -611,15 +426,13 @@ describe('interrupted claims are recovered safely (independent review findings 2
     addCompleter('e1', 5 * D);
     seedPending('e1', { minutesAgo: 5, sendAttempted: false });
     expect((await run()).sent).toBe(0);
-    expect(mail.send).not.toHaveBeenCalled();
     expect(db.ledger.get('e1')?.claimToken).toBe('old-run');
   });
 
   it('a claim interrupted AFTER the send attempt becomes ambiguous and is never resent', async () => {
     addCompleter('e1', 5 * D);
     seedPending('e1', { minutesAgo: 120, sendAttempted: true });
-    const res = await run();
-    expect(res).toMatchObject({ sent: 0, ambiguous: 1, ok: false });
+    expect(await run()).toMatchObject({ sent: 0, ambiguous: 1, ok: false });
     expect(db.ledger.get('e1')).toMatchObject({ status: 'ambiguous', failureReason: 'interrupted_after_send_attempt' });
     await run();
     expect(mail.send).not.toHaveBeenCalled();
@@ -628,8 +441,7 @@ describe('interrupted claims are recovered safely (independent review findings 2
   it('a read error after claiming releases the slot (no attempt used) and the next run sends', async () => {
     addCompleter('e1', 5 * D);
     db.failUserReadOnce = true;
-    const first = await run();
-    expect(first).toMatchObject({ ok: false, failed: 1, sent: 0 });
+    expect(await run()).toMatchObject({ ok: false, failed: 1, sent: 0 });
     expect(db.ledger.get('e1')).toMatchObject({ status: 'failed', attempts: 0, failureReason: 'pre_send_error', claimToken: null });
     expect((await run()).sent).toBe(1);
   });
@@ -644,64 +456,28 @@ describe('interrupted claims are recovered safely (independent review findings 2
   });
 });
 
-describe('handled rows never crowd out later learners (independent review finding 4)', () => {
+describe('handled rows never crowd out later learners', () => {
   it('600 already-sent older completions do not hide one newer eligible completion', async () => {
     for (let i = 0; i < 600; i++) {
       const id = `old${String(i).padStart(3, '0')}`;
       addCompleter(id, 13 * D - i * 1000);
-      db.ledger.set(id, {
-        status: 'sent', attempts: 1, claimToken: null, sendAttemptedAt: null, updatedAt: NOW,
-        failureReason: null, providerMessageId: 'x', sentAt: NOW,
-      });
+      db.ledger.set(id, { ...eligibleRow(), status: 'sent', attempts: 1, providerMessageId: 'x', sentAt: NOW });
     }
     addCompleter('new1', 4 * D);
-    const res = await run();
-    expect(res.sent).toBe(1);
+    expect((await run()).sent).toBe(1);
     expect(db.ledger.get('new1')?.status).toBe('sent');
   });
 
   it('pages past more than one page of same-learner deferrals to reach other learners', async () => {
     for (let i = 0; i < 250; i++) addCompleter(`sam${String(i).padStart(3, '0')}`, 10 * D - i * 1000, { studentId: 'sam' });
     addCompleter('jo1', 4 * D, { studentId: 'jo' });
-    const res = await run();
-    expect(res.sent).toBe(2); // one for sam, one for jo
+    expect((await run()).sent).toBe(2); // one for sam, one for jo
     expect(db.ledger.get('jo1')?.status).toBe('sent');
-  });
-
-  it('onboarding enrolments are recorded as skipped so they leave the queue', async () => {
-    addCompleter('ob1', 5 * D, { course: { slug: 'floor-care-onboarding-operational-readiness', title: 'Onboarding', category: null } });
-    await run();
-    expect(db.ledger.get('ob1')).toMatchObject({ status: 'skipped', failureReason: 'onboarding_course' });
   });
 });
 
-describe('one-click unsubscribe really unsubscribes (independent review finding 1)', () => {
-  it('the List-Unsubscribe URL accepts an RFC 8058 one-click POST and opts the learner out', async () => {
-    addCompleter('e1', 5 * D);
-    await run();
-    const header: string = mail.send.mock.calls[0]![0].headers['List-Unsubscribe'];
-    const url = header.slice(1, -1);
-    const { POST } = await import('../../../app/api/unsubscribe/route');
-    const { NextRequest } = await import('next/server');
-    const prev = process.env.DATABASE_URL;
-    process.env.DATABASE_URL = 'postgres://test';
-    try {
-      const res = await POST(
-        new NextRequest(url, {
-          method: 'POST',
-          headers: { 'content-type': 'application/x-www-form-urlencoded' },
-          body: 'List-Unsubscribe=One-Click',
-        })
-      );
-      expect(res.status).toBe(200);
-    } finally {
-      if (prev === undefined) delete process.env.DATABASE_URL;
-      else process.env.DATABASE_URL = prev;
-    }
-    expect(unsub.setOptOut).toHaveBeenCalledWith('student-e1', true);
-  });
-
-  async function oneClickPost(databaseUrl: string | undefined) {
+describe('one-click unsubscribe really unsubscribes', () => {
+  async function oneClickPost(url: string, databaseUrl: string | undefined) {
     const { POST } = await import('../../../app/api/unsubscribe/route');
     const { NextRequest } = await import('next/server');
     const prev = process.env.DATABASE_URL;
@@ -709,7 +485,7 @@ describe('one-click unsubscribe really unsubscribes (independent review finding 
     else process.env.DATABASE_URL = databaseUrl;
     try {
       const res = await POST(
-        new NextRequest('https://carsi.com.au/api/unsubscribe?token=tok-student-e1', {
+        new NextRequest(url, {
           method: 'POST',
           headers: { 'content-type': 'application/x-www-form-urlencoded' },
           body: 'List-Unsubscribe=One-Click',
@@ -722,8 +498,17 @@ describe('one-click unsubscribe really unsubscribes (independent review finding 
     }
   }
 
+  it('the List-Unsubscribe URL accepts an RFC 8058 one-click POST and opts the learner out', async () => {
+    addCompleter('e1', 5 * D);
+    await run();
+    const header: string = mail.send.mock.calls[0]![0].headers['List-Unsubscribe'];
+    const r = await oneClickPost(header.slice(1, -1), 'postgres://test');
+    expect(r.status).toBe(200);
+    expect(unsub.setOptOut).toHaveBeenCalledWith('student-e1', true);
+  });
+
   it('with no database it fails visibly (503) and never claims the opt-out worked', async () => {
-    const r = await oneClickPost(undefined);
+    const r = await oneClickPost('https://carsi.com.au/api/unsubscribe?token=tok-student-e1', undefined);
     expect(r.status).toBe(503);
     expect(r.body).not.toHaveProperty('ok');
     expect(r.body).not.toHaveProperty('email_opt_out');
@@ -732,7 +517,7 @@ describe('one-click unsubscribe really unsubscribes (independent review finding 
 
   it('confirms only when the stored preference matches the request', async () => {
     unsub.setOptOut.mockResolvedValueOnce({ email_opt_out: false }); // write did not stick
-    const r = await oneClickPost('postgres://test');
+    const r = await oneClickPost('https://carsi.com.au/api/unsubscribe?token=tok-student-e1', 'postgres://test');
     expect(r.status).toBe(500);
     expect(r.body).not.toHaveProperty('ok');
   });
@@ -751,16 +536,16 @@ describe('consent and ask-once are re-checked right before sending (D11)', () =>
   it('a learner who already reviewed (published or hidden) gets no email', async () => {
     addCompleter('e1', 5 * D);
     db.reviews.add('course-e1:student-e1');
-    const res = await run();
+    expect((await run()).skipped.already_reviewed).toBe(1);
     expect(mail.send).not.toHaveBeenCalled();
-    expect(res.skipped.already_reviewed).toBe(1);
   });
 
-  it('every send carries one-click unsubscribe headers and a visible unsubscribe link', async () => {
+  it('every send carries one-click unsubscribe headers, a visible unsubscribe link and the Bulk Stream', async () => {
     addCompleter('e1', 5 * D);
     await run();
     const params = mail.send.mock.calls[0]![0];
     expect(params.to).toBe('student-e1@example.com');
+    expect(params.stream).toBe('bulk');
     // The header points at the POST handler mail clients call; the footer at the browser page.
     expect(params.headers).toEqual({
       'List-Unsubscribe': '<https://carsi.com.au/api/unsubscribe?token=tok-student-e1>',
@@ -776,13 +561,10 @@ describe('consent and ask-once are re-checked right before sending (D11)', () =>
 describe('volume limits (D10, D17)', () => {
   it(`sends at most ${REVIEW_REQUEST_MAX_SENDS_PER_RUN} per run, oldest first; the next run continues`, async () => {
     for (let i = 0; i < 150; i++) addCompleter(`e${String(i).padStart(3, '0')}`, 4 * D + i * 60_000);
-    const first = await run();
-    expect(first.sent).toBe(REVIEW_REQUEST_MAX_SENDS_PER_RUN);
-    // Oldest first: the largest ages (highest i) went first.
-    expect(db.ledger.has('e149')).toBe(true);
-    expect(db.ledger.has('e000')).toBe(false);
-    const second = await run();
-    expect(second.sent).toBe(REVIEW_REQUEST_MAX_SENDS_PER_RUN);
+    expect((await run()).sent).toBe(REVIEW_REQUEST_MAX_SENDS_PER_RUN);
+    expect(db.ledger.get('e149')?.status).toBe('sent'); // oldest went first
+    expect(db.ledger.get('e000')?.status).toBe('eligible');
+    expect((await run()).sent).toBe(REVIEW_REQUEST_MAX_SENDS_PER_RUN);
     expect(mail.send).toHaveBeenCalledTimes(100);
   });
 
@@ -798,15 +580,16 @@ describe('volume limits (D10, D17)', () => {
   it('dry run counts only real recipients, without writing or sending', async () => {
     addCompleter('e1', 5 * D);
     addCompleter('e2', 6 * D);
-    addCompleter('e3', 6 * D); // opted out
+    addCompleter('e3', 6 * D);
     db.users.get('student-e3')!.emailOptOut = true;
-    addCompleter('e4', 6 * D); // already reviewed
+    addCompleter('e4', 6 * D);
     db.reviews.add('course-e4:student-e4');
-    const res = await run(ON, { dryRun: true });
+    const before = JSON.stringify([...db.ledger]);
+    const res = await run({ dryRun: true });
     expect(res.would_send).toBe(2);
     expect(res.skipped).toMatchObject({ opted_out: 1, already_reviewed: 1 });
     expect(mail.send).not.toHaveBeenCalled();
-    expect(db.ledger.size).toBe(0);
+    expect(JSON.stringify([...db.ledger])).toBe(before);
   });
 });
 
@@ -825,20 +608,33 @@ describe('the email asks everyone the same way (D11)', () => {
     expect(e.text).toContain('in your own words');
     expect(e.text).toContain('We ask everyone who completes a course, once.');
   });
+
+  it('a non-restoration course (truckmount) gets an email with no IICRC or CEC wording at all', () => {
+    const e = renderReviewRequestEmail({
+      appOrigin: 'https://carsi.com.au',
+      name: 'Sam',
+      courseTitle: 'CCW CARSI Truckmount Operations',
+      reviewUrl: 'https://carsi.com.au/dashboard/courses/ccw-truckmount#reviews',
+      unsubscribeUrl: 'https://carsi.com.au/unsubscribe?token=t',
+    });
+    expect(e.html).toContain('CCW CARSI Truckmount Operations');
+    for (const part of [e.subject, e.html, e.text]) {
+      expect(part).not.toMatch(/IICRC|\bCECs?\b|Continuing Education|Accredited/i);
+    }
+  });
 });
 
 describe('cron route makes failures visible to the scheduler (D9, D13)', () => {
-  const ENV_KEYS = ['CRON_SECRET', 'DATABASE_URL', 'REVIEW_REQUEST_EMAILS_ENABLED', 'REVIEW_REQUEST_EMAILS_SINCE'] as const;
-  async function callRoute(env: Partial<Record<(typeof ENV_KEYS)[number], string>>, query = '') {
+  const ENV_KEYS = ['CRON_SECRET', 'DATABASE_URL'] as const;
+  async function callRoute(opts: { database?: boolean; query?: string } = {}) {
     const saved = Object.fromEntries(ENV_KEYS.map((k) => [k, process.env[k]]));
-    for (const k of ENV_KEYS) delete process.env[k];
-    Object.assign(process.env, { CRON_SECRET: 'test-cron-value', DATABASE_URL: 'postgres://test' }, env);
-    // An empty DATABASE_URL in `env` means "no database configured".
-    if (env.DATABASE_URL === '') delete process.env.DATABASE_URL;
+    process.env.CRON_SECRET = 'test-cron-value';
+    if (opts.database === false) delete process.env.DATABASE_URL;
+    else process.env.DATABASE_URL = 'postgres://test';
     try {
       const { GET } = await import('../../../app/api/cron/review-requests/route');
       const res = await GET(
-        new Request(`https://carsi.com.au/api/cron/review-requests${query}`, {
+        new Request(`https://carsi.com.au/api/cron/review-requests${opts.query ?? ''}`, {
           headers: { authorization: 'Bearer test-cron-value' },
         })
       );
@@ -851,29 +647,24 @@ describe('cron route makes failures visible to the scheduler (D9, D13)', () => {
     }
   }
 
-  it('flag off → 200 with reason "disabled" (distinct from nobody eligible)', async () => {
+  it('switch off → 200 with reason "disabled" (distinct from nobody eligible)', async () => {
+    db.settings = { enabled: false };
     addCompleter('e1', 5 * D);
-    const r = await callRoute({});
+    const r = await callRoute();
     expect(r.status).toBe(200);
     expect(r.body).toMatchObject({ reason: 'disabled', sent: 0 });
   });
 
-  it('flag on but no database → 503, never a silent success', async () => {
-    const r = await callRoute({ DATABASE_URL: '', REVIEW_REQUEST_EMAILS_ENABLED: 'true', REVIEW_REQUEST_EMAILS_SINCE: '2026-09-01' });
+  it('no database → 503, never a silent success (the switch cannot even be read)', async () => {
+    const r = await callRoute({ database: false });
     expect(r.status).toBe(503);
     expect(r.body).toMatchObject({ ok: false, reason: 'no_database' });
   });
 
-  it('flag off and no database → 200 with reason "disabled"', async () => {
-    const r = await callRoute({ DATABASE_URL: '' });
-    expect(r.status).toBe(200);
-    expect(r.body).toMatchObject({ ok: true, reason: 'disabled' });
-  });
-
   it('a failed send → 500, so `curl -fsS` fails the scheduled job', async () => {
     addCompleter('e1', 5 * D);
-    mail.send.mockResolvedValueOnce({ sent: false, reason: 'provider_error' });
-    const r = await callRoute({ REVIEW_REQUEST_EMAILS_ENABLED: 'true', REVIEW_REQUEST_EMAILS_SINCE: '2026-09-01' });
+    mail.send.mockResolvedValueOnce({ sent: false, reason: 'provider_error', httpStatus: 422 });
+    const r = await callRoute();
     expect(r.status).toBe(500);
     expect(r.body).toMatchObject({ failed: 1, failed_enrollment_ids: ['e1'] });
     expect(JSON.stringify(r.body)).not.toContain('@example.com');
@@ -881,7 +672,7 @@ describe('cron route makes failures visible to the scheduler (D9, D13)', () => {
 
   it('dry_run=1 → counts only', async () => {
     addCompleter('e1', 5 * D);
-    const r = await callRoute({ REVIEW_REQUEST_EMAILS_ENABLED: 'true', REVIEW_REQUEST_EMAILS_SINCE: '2026-09-01' }, '?dry_run=1');
+    const r = await callRoute({ query: '?dry_run=1' });
     expect(r.status).toBe(200);
     expect(r.body).toMatchObject({ dry_run: true, would_send: 1, sent: 0 });
     expect(mail.send).not.toHaveBeenCalled();

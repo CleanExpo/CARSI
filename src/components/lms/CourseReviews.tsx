@@ -4,6 +4,7 @@ import { Star } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 
 import { ReviewForm } from '@/components/lms/ReviewForm';
+import { ReviewPolicyDisclosure } from '@/components/lms/ReviewPolicy';
 import { ApiClientError, apiClient } from '@/lib/api/client';
 import { REVIEW_ASK_COPY, REVIEW_HIDE_REASONS, type ReviewHideReason } from '@/lib/reviews/review-ask';
 
@@ -376,6 +377,8 @@ export function CourseReviews({ slug }: { slug: string }) {
       ) : (
         <p className="mt-2 text-sm text-slate-500">No reviews yet.</p>
       )}
+      {/* The moderation policy sits beside the rating it explains (ACCC online-review guidance). */}
+      <ReviewPolicyDisclosure />
 
       {can_review && (
         <div className="mt-6">

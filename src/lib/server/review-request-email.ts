@@ -1,5 +1,5 @@
 /**
- * Review-request email (spec 2026-10-18 D9, D10, D11, D12, D16, D17). DORMANT BY DEFAULT.
+ * Review-request email (spec 2026-10-18 D9-D11, D16, D17; header amendment 6). DORMANT BY DEFAULT.
  *
  * One email, a few days after a learner completes a course, asking every completer the same
  * thing: tell other technicians what the course was like, in your own words. No reward, no
@@ -7,20 +7,24 @@
  * message under the Spam Act 2003, so opt-out is re-read right before each send and every
  * message carries one-click unsubscribe headers plus a visible unsubscribe link.
  *
- * Sends nothing unless REVIEW_REQUEST_EMAILS_ENABLED is exactly "true" AND
- * REVIEW_REQUEST_EMAILS_SINCE is a valid date — so turning the flag on can never mail the whole
- * back catalogue. No scheduler ships with this code: sending stays Phill's decision (D12).
+ * ELIGIBILITY IS DECIDED AT COMPLETION, IN THE DATABASE (release-gate review r4). The trigger
+ * `trg_lms_enrollments_review_request_eligibility` marks an enrolment's ledger row 'eligible' the
+ * moment completed_at is first set, and only if lms_review_request_settings.enabled is true at that
+ * instant. That covers every completion path (online, CCW provisioning, admin, scripts, SQL). This
+ * job sends only rows marked eligible, and only while the same switch is on. A completion while
+ * the switch is off has no row, so no cron cadence and no off/on sequence can ever backfill it.
+ * The switch is created OFF; no scheduler ships with this code (sending stays Phill's decision).
  *
  * "At most once per enrolment" is enforced by the UNIQUE `enrollment_id` on
  * lms_review_request_emails. A run claims the row (pending + claim token) before sending; a row
  * becomes `sent` only when the provider actually accepted the message.
  *
- * Failures are split by what we know (independent review, 18/10/2026):
- * - DEFINITE (provider answered with an error, not configured, dev console): nothing was
+ * Failures are split by what we know:
+ * - DEFINITE (provider 4xx, not configured, dev console with no provider reply): nothing was
  *   delivered, so the row is `failed` and a later run retries it (max 3 attempts).
- * - AMBIGUOUS (network error or timeout after the request left, a throw, or a claim interrupted
- *   after `send_attempted_at` was set): the provider may have delivered it. The row becomes
- *   `ambiguous` and is NEVER resent automatically, because a duplicate breaks "at most once".
+ * - AMBIGUOUS (5xx, network error or timeout, a throw, or a claim interrupted after
+ *   `send_attempted_at` was set): the provider may have delivered it. The row becomes `ambiguous`
+ *   and is NEVER resent automatically, because a duplicate breaks "at most once".
  * A claim interrupted before any send attempt is recovered by a later run once its lease expires.
  */
 
@@ -37,7 +41,7 @@ import { prisma } from '@/lib/prisma';
 const DAY_MS = 86_400_000;
 /** Ask a few days after completion, once the learner has had time to use what they learnt. */
 export const REVIEW_REQUEST_MIN_AGE_DAYS = 3;
-/** Completions older than this are never emailed, so a missed daily run loses nobody but the window stays bounded. */
+/** Eligible completions older than this are never emailed; a missed daily run loses nobody. */
 export const REVIEW_REQUEST_MAX_AGE_DAYS = 14;
 /** Upper bound on sends per run; the next daily run continues from the oldest unsent. */
 export const REVIEW_REQUEST_MAX_SENDS_PER_RUN = 50;
@@ -49,105 +53,33 @@ export const REVIEW_REQUEST_CLAIM_LEASE_MINUTES = 30;
 const PAGE_SIZE = 200;
 const MAX_PAGES = 25;
 
-export type ReviewRequestConfig =
-  | { enabled: true; since: Date }
-  | { enabled: false; reason: 'disabled' | 'since_missing' | 'since_invalid' };
-
-/** Pure: parse the two env vars. Only the exact string "true" enables sending. */
-export function readReviewRequestConfig(env: Record<string, string | undefined>): ReviewRequestConfig {
-  if (env.REVIEW_REQUEST_EMAILS_ENABLED !== 'true') return { enabled: false, reason: 'disabled' };
-  const raw = env.REVIEW_REQUEST_EMAILS_SINCE?.trim();
-  if (!raw) return { enabled: false, reason: 'since_missing' };
-  const since = parseStrictSince(raw);
-  return since ? { enabled: true, since } : { enabled: false, reason: 'since_invalid' };
-}
-
-const SINCE_FORMAT = /^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2})(?::(\d{2})(?:\.\d{1,3})?)?(Z|[+-]\d{2}:?\d{2})?)?$/;
-
 /**
- * Pure: parse REVIEW_REQUEST_EMAILS_SINCE strictly. JavaScript's Date silently rolls impossible
- * dates forward (`2026-02-31` becomes 3 March), so every field is range-checked against the real
- * calendar before the date may enable sending.
+ * The review-request switch, read from the same row the completion trigger reads. A missing row
+ * (a broken migration) reads as OFF and is reported, never treated as on.
  */
-export function parseStrictSince(raw: string): Date | null {
-  const m = SINCE_FORMAT.exec(raw);
-  if (!m) return null;
-  const [year, month, day] = [Number(m[1]), Number(m[2]), Number(m[3])];
-  const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
-  if (month < 1 || month > 12 || day < 1 || day > daysInMonth) return null;
-  if (m[4] !== undefined && (Number(m[4]) > 23 || Number(m[5]) > 59 || (m[6] !== undefined && Number(m[6]) > 59))) {
-    return null;
-  }
-  if (m[7] && m[7] !== 'Z') {
-    const [oh, om] = [Number(m[7].slice(1, 3)), Number(m[7].slice(-2))];
-    if (oh > 14 || om > 59) return null;
-  }
-  const since = new Date(raw);
-  return Number.isNaN(since.getTime()) ? null : since;
+export async function readReviewRequestSettings(): Promise<{ enabled: boolean; missing: boolean }> {
+  const row = await prisma.lmsReviewRequestSettings.findUnique({ where: { id: 1 }, select: { enabled: true } });
+  return { enabled: row?.enabled === true, missing: row === null };
 }
 
 /**
- * Pure: the completed_at window a run considers (D10, D10b). It starts at the LATEST of SINCE,
- * the stored activation instant, and the 14-day age limit. So a completion from before sending
- * was switched on is never mailed, whatever path set its completed_at, and it ends 3 days ago.
+ * Switch review-request emails on or off (admin only; spec D10d). Switching on affects only
+ * completions recorded from this moment: earlier completions were never marked eligible.
  */
-export function reviewRequestWindow(
-  bounds: { since: Date; activatedAt: Date },
-  now: Date
-): { from: Date; to: Date } {
-  const oldest = now.getTime() - REVIEW_REQUEST_MAX_AGE_DAYS * DAY_MS;
-  return {
-    from: new Date(Math.max(bounds.since.getTime(), bounds.activatedAt.getTime(), oldest)),
-    to: new Date(now.getTime() - REVIEW_REQUEST_MIN_AGE_DAYS * DAY_MS),
-  };
-}
-
-/**
- * An enabled run more than this long after the previous one means the job was off (flag or
- * scheduler). That counts as switching on again, and nothing from the gap is backfilled. The
- * scheduler runs daily, so 36 hours tolerates one late run but not a missed day.
- */
-export const REVIEW_REQUEST_REACTIVATION_GAP_HOURS = 36;
-
-type ActivationRow = { id: string; activatedAt: Date; lastRunAt: Date; pausedAt: Date | null };
-
-/** Pure: does this run continue the latest activation, or is it an off -> on transition? */
-export function continuesActivation(latest: ActivationRow | null, now: Date): latest is ActivationRow {
-  if (!latest || latest.pausedAt) return false;
-  return now.getTime() - latest.lastRunAt.getTime() <= REVIEW_REQUEST_REACTIVATION_GAP_HOURS * 3_600_000;
-}
-
-async function latestActivation(): Promise<ActivationRow | null> {
-  return prisma.lmsReviewRequestActivation.findFirst({
-    orderBy: { activatedAt: 'desc' },
-    select: { id: true, activatedAt: true, lastRunAt: true, pausedAt: true },
+export async function setReviewRequestEmailsEnabled(enabled: boolean, actorId: string | null, now: Date = new Date()) {
+  return prisma.lmsReviewRequestSettings.update({
+    where: { id: 1 },
+    data: { enabled, changedAt: now, changedById: actorId },
+    select: { enabled: true, changedAt: true },
   });
 }
 
-/**
- * The no-backfill boundary (D10b, D10c). Every off -> on transition gets a NEW activation row whose
- * activated_at is "now": the first enabled run ever, the first after a run saw the flag off
- * (paused), or the first after a gap longer than REVIEW_REQUEST_REACTIVATION_GAP_HOURS. So a
- * completion during any off period is never emailed. Dry runs never write; outside an active
- * activation they return null. A boundary that cannot be durably read back fails closed.
- */
-async function resolveActivationBoundary(now: Date, dryRun: boolean): Promise<Date | null> {
-  const latest = await latestActivation();
-  if (continuesActivation(latest, now)) {
-    if (!dryRun) {
-      await prisma.lmsReviewRequestActivation.update({ where: { id: latest.id }, data: { lastRunAt: now } });
-    }
-    return latest.activatedAt;
-  }
-  if (dryRun) return null;
-  await prisma.lmsReviewRequestActivation.create({ data: { activatedAt: now, lastRunAt: now } });
-  const stored = await latestActivation();
-  return stored && stored.activatedAt.getTime() >= now.getTime() ? stored.activatedAt : null;
-}
-
-/** Record that a run saw sending switched off, so the next enabled run starts a new activation. */
-export async function pauseReviewRequestActivation(now: Date): Promise<void> {
-  await prisma.lmsReviewRequestActivation.updateMany({ where: { pausedAt: null }, data: { pausedAt: now } });
+/** Pure: the completed_at window a run considers — 3 to 14 days old. */
+export function reviewRequestWindow(now: Date): { from: Date; to: Date } {
+  return {
+    from: new Date(now.getTime() - REVIEW_REQUEST_MAX_AGE_DAYS * DAY_MS),
+    to: new Date(now.getTime() - REVIEW_REQUEST_MIN_AGE_DAYS * DAY_MS),
+  };
 }
 
 /** Pure: did the provider really accept the message? `dev_console` only printed it. */
@@ -268,16 +200,8 @@ export type ReviewRequestSkipReason =
 export type ReviewRequestRunResult = {
   ok: boolean;
   /** Why nothing was attempted, when nothing was (never conflated with "nobody eligible"). */
-  reason?:
-    | 'disabled'
-    | 'since_missing'
-    | 'since_invalid'
-    | 'email_not_configured'
-    | 'not_activated'
-    | 'activation_unrecorded';
+  reason?: 'disabled' | 'settings_missing' | 'email_not_configured';
   dry_run: boolean;
-  /** Stored first-activation instant; completions before it are never emailed (D10b). */
-  activated_at?: string;
   window?: { from: string; to: string };
   candidates: number;
   would_send: number;
@@ -291,17 +215,13 @@ export type ReviewRequestRunResult = {
   failed_enrollment_ids: string[];
 };
 
-function isUniqueViolation(e: unknown): boolean {
-  return typeof e === 'object' && e !== null && (e as { code?: string }).code === 'P2002';
-}
-
 type LedgerSnapshot = {
   status: string;
   attempts: number;
   claimToken: string | null;
   sendAttemptedAt: Date | null;
   updatedAt: Date;
-} | null;
+};
 
 type Candidate = {
   id: string;
@@ -309,21 +229,16 @@ type Candidate = {
   courseId: string;
   completedAt: Date | null;
   course: { slug: string; title: string; category: string | null; meta?: unknown };
-  reviewRequestEmail: LedgerSnapshot;
+  reviewRequestEmail: LedgerSnapshot | null;
 };
 
 /**
  * One run of the review-request job. `dryRun` performs the same eligibility reads but writes
  * and sends nothing, so its `would_send` matches what a real run would attempt.
  */
-export async function runReviewRequestEmails(options: {
-  now?: Date;
-  dryRun?: boolean;
-  env?: Record<string, string | undefined>;
-}): Promise<ReviewRequestRunResult> {
+export async function runReviewRequestEmails(options: { now?: Date; dryRun?: boolean }): Promise<ReviewRequestRunResult> {
   const now = options.now ?? new Date();
   const dryRun = options.dryRun === true;
-  const config = readReviewRequestConfig(options.env ?? process.env);
   const base: ReviewRequestRunResult = {
     ok: true,
     dry_run: dryRun,
@@ -335,29 +250,17 @@ export async function runReviewRequestEmails(options: {
     skipped: {},
     failed_enrollment_ids: [],
   };
-  if (!config.enabled) {
-    // Off (flag unset, or SINCE missing or invalid): record the pause so switching back on can
-    // never backfill completions from this off period (D10c).
-    if (!dryRun) await pauseReviewRequestActivation(now);
-    return { ...base, reason: config.reason };
-  }
+  const settings = await readReviewRequestSettings();
+  if (settings.missing) return { ...base, ok: false, reason: 'settings_missing' };
+  if (!settings.enabled) return { ...base, reason: 'disabled' };
   if (!dryRun && !isEmailConfigured()) return { ...base, ok: false, reason: 'email_not_configured' };
 
-  const activatedAt = await resolveActivationBoundary(now, dryRun);
-  if (!activatedAt) {
-    // Dry run before the first real run: nobody is eligible yet, by design (no backfill).
-    // Real run that could not durably record the boundary: fail closed and loudly.
-    return dryRun ? { ...base, reason: 'not_activated' } : { ...base, ok: false, reason: 'activation_unrecorded' };
-  }
-
-  const window = reviewRequestWindow({ since: config.since, activatedAt }, now);
+  const window = reviewRequestWindow(now);
   const leaseCutoff = new Date(now.getTime() - REVIEW_REQUEST_CLAIM_LEASE_MINUTES * 60_000);
   const result: ReviewRequestRunResult = {
     ...base,
-    activated_at: activatedAt.toISOString(),
     window: { from: window.from.toISOString(), to: window.to.toISOString() },
   };
-  if (window.from.getTime() > window.to.getTime()) return result;
   const skip = (r: ReviewRequestSkipReason) => {
     result.skipped[r] = (result.skipped[r] ?? 0) + 1;
   };
@@ -366,16 +269,16 @@ export async function runReviewRequestEmails(options: {
 
   async function processCandidate(enrolment: Candidate): Promise<void> {
     const ledger = enrolment.reviewRequestEmail;
+    if (!ledger) return; // never eligible: the query excludes these; belt and braces
 
     if (isOnboardingCourse({ slug: enrolment.course.slug, category: enrolment.course.category, meta: enrolment.course.meta })) {
       skip('onboarding_course');
-      if (!dryRun && !ledger) {
+      if (!dryRun && ledger.status === 'eligible') {
         // Record it so the row stops occupying later pages.
-        await prisma.lmsReviewRequestEmail
-          .create({ data: { enrollmentId: enrolment.id, status: 'skipped', failureReason: 'onboarding_course' } })
-          .catch((e: unknown) => {
-            if (!isUniqueViolation(e)) throw e;
-          });
+        await prisma.lmsReviewRequestEmail.updateMany({
+          where: { enrollmentId: enrolment.id, status: 'eligible' },
+          data: { status: 'skipped', failureReason: 'onboarding_course' },
+        });
       }
       return;
     }
@@ -385,7 +288,7 @@ export async function runReviewRequestEmails(options: {
     }
 
     // An interrupted claim that may already have reached the provider is never resent.
-    if (ledger?.status === 'pending' && ledger.sendAttemptedAt) {
+    if (ledger.status === 'pending' && ledger.sendAttemptedAt) {
       if (dryRun) return;
       const marked = await prisma.lmsReviewRequestEmail.updateMany({
         where: { enrollmentId: enrolment.id, status: 'pending', claimToken: ledger.claimToken, updatedAt: { lt: leaseCutoff } },
@@ -401,39 +304,28 @@ export async function runReviewRequestEmails(options: {
 
     let token: string | null = null;
     if (!dryRun) {
-      // Claim. The UNIQUE key stops a concurrent first claim (P2002); the conditional updates let
-      // exactly one run win a retry or a lease recovery.
+      // Claim. Each conditional update can be won by exactly one run: an eligible row, a
+      // retryable definite failure, or a pending claim whose lease expired before any send.
       token = randomUUID();
-      try {
-        if (!ledger) {
-          await prisma.lmsReviewRequestEmail.create({
-            data: { enrollmentId: enrolment.id, status: 'pending', claimToken: token },
-          });
-        } else {
-          const claimed = await prisma.lmsReviewRequestEmail.updateMany({
-            where:
-              ledger.status === 'failed'
-                ? { enrollmentId: enrolment.id, status: 'failed', attempts: { lt: REVIEW_REQUEST_MAX_ATTEMPTS } }
-                : {
-                    enrollmentId: enrolment.id,
-                    status: 'pending',
-                    claimToken: ledger.claimToken,
-                    sendAttemptedAt: null,
-                    updatedAt: { lt: leaseCutoff },
-                  },
-            data: { status: 'pending', claimToken: token, sendAttemptedAt: null },
-          });
-          if (claimed.count === 0) {
-            skip('claimed_elsewhere');
-            return;
-          }
-        }
-      } catch (e) {
-        if (isUniqueViolation(e)) {
-          skip('claimed_elsewhere');
-          return;
-        }
-        throw e;
+      const where =
+        ledger.status === 'eligible'
+          ? { enrollmentId: enrolment.id, status: 'eligible' }
+          : ledger.status === 'failed'
+            ? { enrollmentId: enrolment.id, status: 'failed', attempts: { lt: REVIEW_REQUEST_MAX_ATTEMPTS } }
+            : {
+                enrollmentId: enrolment.id,
+                status: 'pending',
+                claimToken: ledger.claimToken,
+                sendAttemptedAt: null,
+                updatedAt: { lt: leaseCutoff },
+              };
+      const claimed = await prisma.lmsReviewRequestEmail.updateMany({
+        where,
+        data: { status: 'pending', claimToken: token, sendAttemptedAt: null },
+      });
+      if (claimed.count === 0) {
+        skip('claimed_elsewhere');
+        return;
       }
     }
     learnersThisRun.add(enrolment.studentId);
@@ -542,14 +434,14 @@ export async function runReviewRequestEmails(options: {
 
   let after: { completedAt: Date; id: string } | null = null;
   for (let page = 0; page < MAX_PAGES && !capReached(); page += 1) {
-    // Only rows that still need work: no ledger row, a retryable definite failure, or a pending
-    // claim whose lease expired. Terminal rows never crowd later learners out of a page.
+    // Only enrolments the trigger marked eligible at completion (or their retryable / recoverable
+    // follow-ups). A completion with no ledger row is never selected, so it is never emailed.
     const candidates: Candidate[] = await prisma.lmsEnrollment.findMany({
       where: {
         status: 'completed',
         completedAt: { gte: window.from, lte: window.to },
         OR: [
-          { reviewRequestEmail: { is: null } },
+          { reviewRequestEmail: { is: { status: 'eligible' } } },
           { reviewRequestEmail: { is: { status: 'failed', attempts: { lt: REVIEW_REQUEST_MAX_ATTEMPTS } } } },
           { reviewRequestEmail: { is: { status: 'pending', updatedAt: { lt: leaseCutoff } } } },
         ],

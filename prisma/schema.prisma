@@ -66,6 +66,7 @@ model LmsUser {
   reviewReplies         LmsCourseReview[]         @relation("ReviewReplyAuthor")
   /// Moderation decisions this admin made (append-only audit; actor nulled if the admin is deleted).
   reviewModerationEvents LmsCourseReviewModerationEvent[] @relation("ReviewModerationActor")
+  reviewRequestSettingsChanges LmsReviewRequestSettings[] @relation("ReviewRequestSettingsChangedBy")
   subscription                  LmsSubscription?
   coachingMonthlySubscription   CarsiCoachingMonthlySubscription?
   coachingBusinessProfile       CarsiCoachingBusinessProfile?
@@ -186,6 +187,8 @@ model LmsCourseReview {
   reply       String?   @db.Text
   repliedAt   DateTime? @map("replied_at") @db.Timestamptz(6)
   repliedById String?   @map("replied_by_id") @db.Uuid
+  /// Incremented by every hide/unhide in the same transaction; the event stores it as `sequence`.
+  moderationVersion Int @default(0) @map("moderation_version")
   createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
@@ -213,6 +216,8 @@ model LmsCourseReviewModerationEvent {
   courseRef      String   @map("course_ref") @db.Uuid
   courseSlug     String   @map("course_slug")
   courseTitle    String   @map("course_title")
+  /// Decision order for this review (its moderation_version after this decision). Never timestamps.
+  sequence       Int
   /// hide | unhide
   action         String   @db.VarChar(8)
   /// offensive | personal_information | not_about_course | spam_or_fake (required for hide; DB CHECK)
@@ -227,8 +232,8 @@ model LmsCourseReviewModerationEvent {
   review LmsCourseReview? @relation(fields: [reviewId], references: [id], onDelete: SetNull)
   actor  LmsUser?         @relation("ReviewModerationActor", fields: [actorId], references: [id], onDelete: SetNull)
 
-  @@index([reviewId, createdAt], map: "ix_lms_review_moderation_review_created")
-  @@index([reviewRef, createdAt], map: "ix_lms_review_moderation_review_ref_created")
+  @@unique([reviewRef, sequence], map: "uq_lms_review_moderation_review_ref_sequence")
+  @@index([reviewId, sequence], map: "ix_lms_review_moderation_review_sequence")
   @@map("lms_course_review_moderation_events")
 }
 
@@ -237,7 +242,7 @@ model LmsCourseReviewModerationEvent {
 model LmsReviewRequestEmail {
   id                String    @id @default(uuid()) @db.Uuid
   enrollmentId      String    @unique @map("enrollment_id") @db.Uuid
-  /// pending | sent | failed | skipped | ambiguous (provider outcome unknown — never resent)
+  /// eligible (marked at completion by the DB trigger) | pending | sent | failed | skipped | ambiguous (never resent)
   status            String    @db.VarChar(16)
   attempts          Int       @default(0)
   /// Owner of a `pending` claim; a claim older than the lease may be recovered by another run.
@@ -257,20 +262,18 @@ model LmsReviewRequestEmail {
   @@map("lms_review_request_emails")
 }
 
-/// Each time review-request emails were switched on (spec D10b/D10c). Append-only: a new row is
-/// written on the first enabled run after an off period (an explicit pause, or no enabled run for
-/// longer than the gap limit). The latest row's activated_at is the no-backfill boundary.
-model LmsReviewRequestActivation {
-  id          String    @id @default(uuid()) @db.Uuid
-  activatedAt DateTime  @map("activated_at") @db.Timestamptz(6)
-  /// Heartbeat: last enabled run in this activation. A long gap means the job was off.
-  lastRunAt   DateTime  @map("last_run_at") @db.Timestamptz(6)
-  /// Set when a run observes the flag switched off; the next enabled run starts a new activation.
-  pausedAt    DateTime? @map("paused_at") @db.Timestamptz(6)
-  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+/// Review-request email switch (spec D10d). Exactly one row (id = 1, DB CHECK), created OFF.
+/// The completion trigger and the cron both read it: a completion is marked eligible only if this
+/// is on at that instant, and the cron sends only while it is on.
+model LmsReviewRequestSettings {
+  id          Int       @id @default(1)
+  enabled     Boolean   @default(false)
+  changedAt   DateTime? @map("changed_at") @db.Timestamptz(6)
+  changedById String?   @map("changed_by_id") @db.Uuid
 
-  @@index([activatedAt], map: "ix_lms_review_request_activations_activated_at")
-  @@map("lms_review_request_activations")
+  changedBy LmsUser? @relation("ReviewRequestSettingsChangedBy", fields: [changedById], references: [id], onDelete: SetNull)
+
+  @@map("lms_review_request_settings")
 }
 
 enum DiscountType {

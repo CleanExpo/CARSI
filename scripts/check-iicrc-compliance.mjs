@@ -185,7 +185,11 @@ const EXEMPT = [
 // (truckmount, floor care, facilities). Fail-closed: they may carry no IICRC or CEC wording at all,
 // not even in comments, because a single shared line would reach a non-IICRC course's learners.
 // Added for the review-request email (release-gate review r3, 18/10/2026).
-const IICRC_FREE_FILES = ['src/lib/server/review-request-email.ts'];
+const IICRC_FREE_FILES = [
+  'src/lib/server/review-request-email.ts',
+  'src/lib/reviews/review-policy.ts',
+  'src/components/lms/ReviewPolicy.tsx',
+];
 const IICRC_FREE_RE = /\bIICRC\b|\bCECs?\b|Continuing Education Credit/i;
 
 /** Findings for an IICRC-free file: one per line that mentions IICRC or CEC. */

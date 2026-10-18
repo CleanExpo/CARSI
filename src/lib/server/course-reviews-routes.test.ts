@@ -81,6 +81,7 @@ beforeEach(() => {
     rating: 1,
     title: 'Too basic',
     body: 'Not what I needed.',
+    moderationVersion: 7,
     course: { id: 'course-1', slug: 'water-damage', title: 'Water Damage Restoration' },
   });
   mocks.eventCreate.mockResolvedValue({});
@@ -125,7 +126,10 @@ describe('POST /reviews/:id/publish — a hide needs a recorded reason (AC-3, D2
     }
     expect(mocks.transaction).toHaveBeenCalledTimes(1);
     expect(mocks.reviewUpdate).toHaveBeenCalledTimes(1);
-    expect(mocks.reviewUpdate.mock.calls[0]![0]).toMatchObject({ where: { id: 'rev-1' }, data: { isPublished: false } });
+    expect(mocks.reviewUpdate.mock.calls[0]![0]).toMatchObject({
+      where: { id: 'rev-1' },
+      data: { isPublished: false, moderationVersion: { increment: 1 } },
+    });
     expect(mocks.eventCreate).toHaveBeenCalledTimes(1);
     expect(mocks.eventCreate.mock.calls[0]![0]).toEqual({
       data: {
@@ -135,6 +139,8 @@ describe('POST /reviews/:id/publish — a hide needs a recorded reason (AC-3, D2
         courseRef: 'course-1',
         courseSlug: 'water-damage',
         courseTitle: 'Water Damage Restoration',
+        // Decision order = the review's version after the locked increment, never a timestamp.
+        sequence: 7,
         action: 'hide',
         reason: 'spam_or_fake',
         // The actor is the session user, never the body's `actor_id`.
@@ -246,6 +252,10 @@ describe('GET /reviews — ask and Google link are rating-independent, moderatio
     });
     // D3: a legacy hidden row gets no invented reason.
     expect(body.reviews[1].moderation).toMatchObject({ hidden_reason: null, hidden_before_reasons_recorded: true });
+    // The latest decision is read by decision sequence, never by timestamp (release-gate r4).
+    const select = mocks.reviewFindMany.mock.calls[0]![0].select;
+    expect(select.moderationEvents.orderBy).toEqual({ sequence: 'desc' });
+    expect(select.moderationEvents.take).toBe(1);
   });
 });
 

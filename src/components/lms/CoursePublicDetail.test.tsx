@@ -65,3 +65,40 @@ describe('CoursePublicDetail — CEC', () => {
     }
   });
 });
+
+describe('CoursePublicDetail — review policy beside the public rating (release-gate r4)', () => {
+  function renderWithRating(aggregateRating: { ratingValue: number; reviewCount: number } | null) {
+    const course = {
+      slug: 'water-damage-essentials',
+      title: 'Water Damage Restoration — Essentials',
+      price_aud: '29',
+      is_free: false,
+      cec_hours: null,
+      thumbnailUrl: null,
+    };
+    return renderToStaticMarkup(
+      createElement(CoursePublicDetail, {
+        course,
+        designation: null,
+        priceLabel: '$29',
+        priceNum: 29,
+        learningOutcomes: [],
+        audienceItems: getCourseAudienceItems(course, null),
+        aggregateRating,
+      })
+    );
+  }
+
+  it('links "How we moderate reviews" right beside the rating', () => {
+    const html = renderWithRating({ ratingValue: 5, reviewCount: 1 });
+    const at = html.indexOf('>5.0</span>');
+    expect(at).toBeGreaterThan(-1);
+    // Inside the same short rating line, not somewhere else on the page.
+    expect(html.slice(at, at + 400)).toMatch(/<a [^>]*href="\/review-policy"[^>]*>How we moderate reviews<\/a>/);
+  });
+
+  it('no rating, no rating line', () => {
+    const html = renderWithRating(null);
+    expect(html).not.toContain('>5.0</span>');
+  });
+});

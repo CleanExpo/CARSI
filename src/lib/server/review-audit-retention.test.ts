@@ -59,8 +59,8 @@ beforeEach(async () => {
   ]);
   await db.query(
     `INSERT INTO lms_course_review_moderation_events
-       (id, review_id, review_ref, course_ref, course_slug, course_title, action, reason, actor_id, rating_at_action, content_sha256)
-     VALUES ($1, $2, $2, $3, $4, 'Water Damage Restoration', 'hide', 'spam_or_fake', $5, 1, $6)`,
+       (id, review_id, review_ref, course_ref, course_slug, course_title, sequence, action, reason, actor_id, rating_at_action, content_sha256)
+     VALUES ($1, $2, $2, $3, $4, 'Water Damage Restoration', 1, 'hide', 'spam_or_fake', $5, 1, $6)`,
     [randomUUID(), ids.review, ids.course, `water-damage-${ids.course}`, ids.admin, 'a'.repeat(64)]
   );
 });
@@ -114,8 +114,8 @@ describe('the moderation audit outlives what it judged (real PostgreSQL FKs)', (
     await expect(
       db.query(
         `INSERT INTO lms_course_review_moderation_events
-           (id, review_id, review_ref, course_ref, course_slug, course_title, action, reason, rating_at_action, content_sha256)
-         VALUES ($1, $2, $2, $3, 's', 't', 'hide', NULL, 1, $4)`,
+           (id, review_id, review_ref, course_ref, course_slug, course_title, sequence, action, reason, rating_at_action, content_sha256)
+         VALUES ($1, $2, $2, $3, 's', 't', 2, 'hide', NULL, 1, $4)`,
         [randomUUID(), ids.review, ids.course, 'b'.repeat(64)]
       )
     ).rejects.toThrow(/ck_lms_review_moderation_hide_has_reason/);
@@ -132,5 +132,154 @@ describe('the moderation audit outlives what it judged (real PostgreSQL FKs)', (
     await expect(
       db.query("INSERT INTO lms_review_request_emails (id, enrollment_id, status) VALUES ($1, $2, 'pending')", [randomUUID(), enrolment])
     ).rejects.toThrow(/lms_review_request_emails_enrollment_id_key/);
+  });
+});
+
+describe('moderation order is the decision sequence, never a timestamp (release-gate r4)', () => {
+  /** Exactly what setReviewVisibility does: bump the version on the locked review row, store it. */
+  async function decide(action: 'hide' | 'unhide', reason: string | null, createdAt: string) {
+    await db.exec('BEGIN');
+    try {
+      const v = await db.query<{ moderation_version: number }>(
+        'UPDATE lms_course_reviews SET is_published = $2, moderation_version = moderation_version + 1 WHERE id = $1 RETURNING moderation_version',
+        [ids.review, action === 'unhide']
+      );
+      await db.query(
+        `INSERT INTO lms_course_review_moderation_events
+           (id, review_id, review_ref, course_ref, course_slug, course_title, sequence, action, reason, rating_at_action, content_sha256, created_at)
+         VALUES ($1, $2, $2, $3, 's', 't', $4, $5, $6, 1, $7, $8)`,
+        [randomUUID(), ids.review, ids.course, v.rows[0]!.moderation_version, action, reason, 'c'.repeat(64), createdAt]
+      );
+      await db.exec('COMMIT');
+    } catch (e) {
+      await db.exec('ROLLBACK');
+      throw e;
+    }
+  }
+  async function latest() {
+    const r = await db.query<{ action: string; reason: string | null; sequence: number }>(
+      'SELECT action, reason, sequence FROM lms_course_review_moderation_events WHERE review_ref = $1 ORDER BY sequence DESC LIMIT 1',
+      [ids.review]
+    );
+    return r.rows[0];
+  }
+
+  beforeEach(async () => {
+    // Start each case from a clean history for this review (the outer beforeEach seeds one hide).
+    await db.query('DELETE FROM lms_course_review_moderation_events WHERE review_ref = $1', [ids.review]);
+  });
+
+  it('equal timestamps: unhide then hide resolves to the hide, with its reason', async () => {
+    const same = '2026-10-18T09:00:00.000Z';
+    await decide('unhide', null, same);
+    await decide('hide', 'offensive', same);
+    expect(await latest()).toEqual({ action: 'hide', reason: 'offensive', sequence: 2 });
+  });
+
+  it('a later decision with an EARLIER timestamp (transactions that started in the other order) still wins', async () => {
+    await decide('hide', 'spam_or_fake', '2026-10-18T09:00:05.000Z');
+    await decide('unhide', null, '2026-10-18T09:00:01.000Z');
+    expect(await latest()).toMatchObject({ action: 'unhide', sequence: 2 });
+    const row = await db.query<{ is_published: boolean; moderation_version: number }>(
+      'SELECT is_published, moderation_version FROM lms_course_reviews WHERE id = $1',
+      [ids.review]
+    );
+    expect(row.rows[0]).toEqual({ is_published: true, moderation_version: 2 });
+  });
+
+  it('two decisions can never share a place in one review\'s order', async () => {
+    await decide('hide', 'offensive', '2026-10-18T09:00:00.000Z');
+    await expect(
+      db.query(
+        `INSERT INTO lms_course_review_moderation_events
+           (id, review_id, review_ref, course_ref, course_slug, course_title, sequence, action, reason, rating_at_action, content_sha256)
+         VALUES ($1, $2, $2, $3, 's', 't', 1, 'unhide', NULL, 1, $4)`,
+        [randomUUID(), ids.review, ids.course, 'd'.repeat(64)]
+      )
+    ).rejects.toThrow(/uq_lms_review_moderation_review_ref_sequence/);
+  });
+});
+
+describe('review-request eligibility is decided at completion, in the database (release-gate r4)', () => {
+  const setSwitch = (on: boolean) => db.query('UPDATE lms_review_request_settings SET enabled = $1 WHERE id = 1', [on]);
+  async function newEnrolment(status = 'active', completedAt: string | null = null) {
+    const id = randomUUID();
+    const course = randomUUID();
+    await db.query(
+      "INSERT INTO lms_courses (id, slug, title, instructor_id, status, price_aud) VALUES ($1, $2, 'C', $3, 'published', 0)",
+      [course, `c-${course}`, ids.instructor]
+    );
+    await db.query('INSERT INTO lms_enrollments (id, student_id, course_id, status, completed_at) VALUES ($1, $2, $3, $4, $5)', [
+      id,
+      ids.learner,
+      course,
+      status,
+      completedAt,
+    ]);
+    return id;
+  }
+  const complete = (id: string) => db.query("UPDATE lms_enrollments SET status = 'completed', completed_at = now() WHERE id = $1", [id]);
+  async function ledger(id: string) {
+    return (await db.query<{ status: string }>('SELECT status FROM lms_review_request_emails WHERE enrollment_id = $1', [id])).rows;
+  }
+
+  beforeEach(async () => {
+    await setSwitch(false);
+  });
+
+  it('the switch is created OFF by the migration', async () => {
+    const r = await db.query<{ enabled: boolean }>('SELECT enabled FROM lms_review_request_settings WHERE id = 1');
+    expect(r.rows).toEqual([{ enabled: false }]);
+  });
+
+  it('a completion while the switch is off is never marked eligible', async () => {
+    const e = await newEnrolment();
+    await complete(e);
+    expect(await ledger(e)).toEqual([]);
+  });
+
+  it('a completion while the switch is on is marked eligible (update path)', async () => {
+    await setSwitch(true);
+    const e = await newEnrolment();
+    await complete(e);
+    expect(await ledger(e)).toEqual([{ status: 'eligible' }]);
+  });
+
+  it('a completion inserted already completed (CCW provisioning, admin, scripts) is marked too', async () => {
+    await setSwitch(true);
+    const e = await newEnrolment('completed', '2026-10-18T02:00:00Z');
+    expect(await ledger(e)).toEqual([{ status: 'eligible' }]);
+  });
+
+  it('r4 reviewer scenario: on, off (1 h), completion while off, back on — never eligible, whatever the cron does', async () => {
+    await setSwitch(true);
+    const before = await newEnrolment();
+    await complete(before); // completed while on → eligible
+    await setSwitch(false);
+    const whileOff = await newEnrolment();
+    await complete(whileOff); // completed during the off hour
+    await setSwitch(true);
+    expect(await ledger(before)).toEqual([{ status: 'eligible' }]);
+    expect(await ledger(whileOff)).toEqual([]);
+  });
+
+  it('later changes to a completed enrolment never mark it (only the moment completed_at is first set counts)', async () => {
+    const e = await newEnrolment();
+    await complete(e); // off
+    await setSwitch(true);
+    await db.query("UPDATE lms_enrollments SET certificate_issued_at = now(), last_accessed_lesson_id = NULL WHERE id = $1", [e]);
+    await db.query('UPDATE lms_enrollments SET completed_at = completed_at + interval \'1 minute\' WHERE id = $1', [e]);
+    expect(await ledger(e)).toEqual([]);
+  });
+
+  it('a revoked then re-completed enrolment, re-completed while on, is a new completion and is marked once', async () => {
+    const e = await newEnrolment();
+    await complete(e); // off
+    await db.query("UPDATE lms_enrollments SET status = 'revoked', completed_at = NULL WHERE id = $1", [e]);
+    await setSwitch(true);
+    await complete(e);
+    await db.query("UPDATE lms_enrollments SET status = 'revoked', completed_at = NULL WHERE id = $1", [e]);
+    await complete(e);
+    expect(await ledger(e)).toEqual([{ status: 'eligible' }]);
   });
 });

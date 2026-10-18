@@ -1,7 +1,8 @@
--- Course review moderation audit + review-request email ledger (spec 2026-10-18 D1, D3, D9).
+-- Course review moderation audit + review-request email eligibility (spec 2026-10-18 D1-D11).
 --
--- Additive only: creates two new tables. No existing table or column is altered and no
--- existing row is read or written, so there is no backfill and no long lock.
+-- Additive: creates new tables, one trigger, and one new column with a constant default on
+-- lms_course_reviews (metadata-only on PostgreSQL 11+). No existing row is updated or deleted,
+-- so there is no backfill and no long lock. The settings row is created switched OFF.
 --
 -- Why an event table, not columns on lms_course_reviews: columns keep only the latest
 -- decision, so hide -> unhide -> hide destroys the record of the first hide. Under the ACCC's
@@ -9,11 +10,19 @@
 -- Reviews hidden BEFORE this migration get no invented reason: they simply have no event row.
 -- Retention: deleting a review, its course, its learner or the acting admin never deletes an
 -- event (review_id / actor_id are SET NULL; course and review snapshots are kept).
+-- Order: each decision increments lms_course_reviews.moderation_version in the same
+-- transaction (the UPDATE takes the row lock), and the event stores that number as `sequence`.
+-- The latest decision is the highest sequence, never the latest timestamp.
 --
--- Down path (run only after REVIEW_REQUEST_EMAILS_ENABLED is unset):
---   DROP TABLE "lms_review_request_activations";
+-- Down path (only with review-request emails switched off):
+--   DROP TRIGGER "trg_lms_enrollments_review_request_eligibility" ON "lms_enrollments";
+--   DROP FUNCTION "lms_review_request_mark_eligible"();
+--   DROP TABLE "lms_review_request_settings";
 --   DROP TABLE "lms_review_request_emails";
 --   DROP TABLE "lms_course_review_moderation_events";
+--   ALTER TABLE "lms_course_reviews" DROP COLUMN "moderation_version";
+
+ALTER TABLE "lms_course_reviews" ADD COLUMN "moderation_version" INTEGER NOT NULL DEFAULT 0;
 
 CREATE TABLE "lms_course_review_moderation_events" (
     "id" UUID NOT NULL,
@@ -24,6 +33,8 @@ CREATE TABLE "lms_course_review_moderation_events" (
     "course_ref" UUID NOT NULL,
     "course_slug" TEXT NOT NULL,
     "course_title" TEXT NOT NULL,
+    -- Decision order for this review: the review's moderation_version after this decision.
+    "sequence" INTEGER NOT NULL,
     "action" VARCHAR(8) NOT NULL,
     "reason" VARCHAR(32),
     "actor_id" UUID,
@@ -38,13 +49,15 @@ CREATE TABLE "lms_course_review_moderation_events" (
         OR "reason" IN ('offensive', 'personal_information', 'not_about_course', 'spam_or_fake')
     ),
     -- A hide without a reason must fail in the database, not only in the route.
-    CONSTRAINT "ck_lms_review_moderation_hide_has_reason" CHECK ("action" <> 'hide' OR "reason" IS NOT NULL)
+    CONSTRAINT "ck_lms_review_moderation_hide_has_reason" CHECK ("action" <> 'hide' OR "reason" IS NOT NULL),
+    CONSTRAINT "ck_lms_review_moderation_sequence_positive" CHECK ("sequence" > 0)
 );
 
-CREATE INDEX "ix_lms_review_moderation_review_created"
-    ON "lms_course_review_moderation_events"("review_id", "created_at");
-CREATE INDEX "ix_lms_review_moderation_review_ref_created"
-    ON "lms_course_review_moderation_events"("review_ref", "created_at");
+-- Two decisions can never share a place in a review's order.
+CREATE UNIQUE INDEX "uq_lms_review_moderation_review_ref_sequence"
+    ON "lms_course_review_moderation_events"("review_ref", "sequence");
+CREATE INDEX "ix_lms_review_moderation_review_sequence"
+    ON "lms_course_review_moderation_events"("review_id", "sequence");
 
 ALTER TABLE "lms_course_review_moderation_events"
     ADD CONSTRAINT "lms_course_review_moderation_events_review_id_fkey"
@@ -55,6 +68,25 @@ ALTER TABLE "lms_course_review_moderation_events"
     ADD CONSTRAINT "lms_course_review_moderation_events_actor_id_fkey"
     FOREIGN KEY ("actor_id") REFERENCES "lms_users"("id")
     ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- Review-request email switch. Exactly one row, created OFF. Read by the completion trigger
+-- below AND by the cron, so eligibility and sending use the same switch.
+CREATE TABLE "lms_review_request_settings" (
+    "id" INTEGER NOT NULL DEFAULT 1,
+    "enabled" BOOLEAN NOT NULL DEFAULT false,
+    "changed_at" TIMESTAMPTZ(6),
+    "changed_by_id" UUID,
+
+    CONSTRAINT "lms_review_request_settings_pkey" PRIMARY KEY ("id"),
+    CONSTRAINT "ck_lms_review_request_settings_singleton" CHECK ("id" = 1)
+);
+
+ALTER TABLE "lms_review_request_settings"
+    ADD CONSTRAINT "lms_review_request_settings_changed_by_id_fkey"
+    FOREIGN KEY ("changed_by_id") REFERENCES "lms_users"("id")
+    ON DELETE SET NULL ON UPDATE CASCADE;
+
+INSERT INTO "lms_review_request_settings" ("id", "enabled") VALUES (1, false);
 
 CREATE TABLE "lms_review_request_emails" (
     "id" UUID NOT NULL,
@@ -70,7 +102,9 @@ CREATE TABLE "lms_review_request_emails" (
     "updated_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "lms_review_request_emails_pkey" PRIMARY KEY ("id"),
-    CONSTRAINT "ck_lms_review_request_emails_status" CHECK ("status" IN ('pending', 'sent', 'failed', 'skipped', 'ambiguous'))
+    CONSTRAINT "ck_lms_review_request_emails_status" CHECK (
+        "status" IN ('eligible', 'pending', 'sent', 'failed', 'skipped', 'ambiguous')
+    )
 );
 
 -- "At most one review-request email per enrolment" is enforced here, not in application code.
@@ -83,17 +117,26 @@ ALTER TABLE "lms_review_request_emails"
     FOREIGN KEY ("enrollment_id") REFERENCES "lms_enrollments"("id")
     ON DELETE CASCADE ON UPDATE CASCADE;
 
--- Review-request activations (no backfill). Append-only: one row per off -> on transition. The
--- latest row's activated_at is the boundary; completions before it are never emailed.
-CREATE TABLE "lms_review_request_activations" (
-    "id" UUID NOT NULL,
-    "activated_at" TIMESTAMPTZ(6) NOT NULL,
-    "last_run_at" TIMESTAMPTZ(6) NOT NULL,
-    "paused_at" TIMESTAMPTZ(6),
-    "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+-- Eligibility is decided AT COMPLETION, inside the database, for every completion path (online
+-- progress, CCW provisioning, admin actions, scripts, raw SQL): the moment completed_at is first
+-- set, the enrolment is marked 'eligible' only if review-request emails are switched on at that
+-- instant. A completion while the switch is off gets no row, so it can never be emailed later,
+-- whatever the cron cadence. The cron sends only rows marked here.
+CREATE FUNCTION "lms_review_request_mark_eligible"() RETURNS trigger
+LANGUAGE plpgsql AS $$
+BEGIN
+    IF NEW."completed_at" IS NOT NULL
+       AND (TG_OP = 'INSERT' OR OLD."completed_at" IS NULL)
+       AND EXISTS (SELECT 1 FROM "lms_review_request_settings" WHERE "id" = 1 AND "enabled")
+    THEN
+        INSERT INTO "lms_review_request_emails" ("id", "enrollment_id", "status")
+        VALUES (gen_random_uuid(), NEW."id", 'eligible')
+        ON CONFLICT ("enrollment_id") DO NOTHING;
+    END IF;
+    RETURN NEW;
+END;
+$$;
 
-    CONSTRAINT "lms_review_request_activations_pkey" PRIMARY KEY ("id")
-);
-
-CREATE INDEX "ix_lms_review_request_activations_activated_at"
-    ON "lms_review_request_activations"("activated_at");
+CREATE TRIGGER "trg_lms_enrollments_review_request_eligibility"
+    AFTER INSERT OR UPDATE OF "completed_at" ON "lms_enrollments"
+    FOR EACH ROW EXECUTE FUNCTION "lms_review_request_mark_eligible"();

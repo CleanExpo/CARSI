@@ -24,6 +24,7 @@ vi.mock('@/lib/prisma', () => ({
     lmsCourseReview: { count: m.reviewCount },
     lmsReviewRequestEmail: { groupBy: m.emailGroupBy },
     lmsCourseReviewModerationEvent: { groupBy: m.eventGroupBy },
+    lmsReviewRequestSettings: { findUnique: async () => ({ enabled: false }) },
   },
 }));
 

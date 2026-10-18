@@ -27,7 +27,10 @@ describe('moderation event table (D1, D3)', () => {
 
   it('the migration is additive: it never alters, updates or deletes existing data', () => {
     const statements = MIGRATION.split('\n').filter((l) => !l.trim().startsWith('--')).join('\n');
-    expect(statements).not.toMatch(/\bALTER TABLE "lms_course_reviews"/);
+    // The only change to an existing table: one new column with a constant default (metadata-only).
+    const reviewAlters = statements.match(/ALTER TABLE "lms_course_reviews"[^;]*;/g) ?? [];
+    expect(reviewAlters).toEqual(['ALTER TABLE "lms_course_reviews" ADD COLUMN "moderation_version" INTEGER NOT NULL DEFAULT 0;']);
+    expect(statements).not.toMatch(/ALTER TABLE "lms_(users|courses|enrollments)"\s+(ADD|ALTER|DROP) COLUMN/);
     expect(statements).not.toMatch(/^\s*(UPDATE|DELETE FROM|DROP|TRUNCATE)\b/im);
   });
 

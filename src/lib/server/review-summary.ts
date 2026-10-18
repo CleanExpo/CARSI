@@ -7,7 +7,7 @@
 import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
 import { prisma } from '@/lib/prisma';
 import { getGoogleReviewLink } from '@/lib/server/course-reviews';
-import { readReviewRequestConfig } from '@/lib/server/review-request-email';
+import { readReviewRequestSettings } from '@/lib/server/review-request-email';
 
 export type ReviewFunnelSummary = {
   completions: number;
@@ -53,14 +53,14 @@ export async function getReviewFunnelSummary(): Promise<ReviewFunnelSummary> {
   const asked = new Set(courses.filter((c) => !isOnboardingCourse(c)).map((c) => c.id));
   const openAsks = openAsksByCourse.reduce((sum, r) => sum + (asked.has(r.course_id) ? r.count : 0), 0);
 
-  const config = readReviewRequestConfig(process.env);
+  const settings = await readReviewRequestSettings();
   return {
     completions,
     open_asks: openAsks,
     reviews: { total, published, hidden: total - published },
     review_request_emails: {
-      enabled: config.enabled,
-      disabled_reason: config.enabled ? null : config.reason,
+      enabled: settings.enabled,
+      disabled_reason: settings.missing ? 'settings_missing' : settings.enabled ? null : 'disabled',
       by_status: Object.fromEntries(emailGroups.map((g) => [g.status, g._count._all])),
     },
     hides_by_reason_and_rating: hideGroups

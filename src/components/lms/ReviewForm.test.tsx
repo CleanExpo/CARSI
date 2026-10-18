@@ -177,3 +177,31 @@ describe('the ask is driven by server state, identically on every surface (AC-1,
     expect(container.textContent).not.toContain('No reviews yet');
   });
 });
+
+describe('the moderation policy sits beside the rating (release-gate r4, ACCC guidance)', () => {
+  it.each([
+    ['with published reviews', { count: 2, average: 4.5 }],
+    ['with no reviews yet', { count: 0, average: 0 }],
+  ])('%s: the learner review section discloses how reviews are moderated', async (_label, summary) => {
+    mocks.get.mockResolvedValue({
+      ...askPayload,
+      review_ask: false,
+      summary: { ...summary, distribution: { '1': 0, '2': 0, '3': 0, '4': 1, '5': 1 } },
+      reviews: summary.count
+        ? [{ id: 'r1', rating: 5, title: null, body: 'Good', reply: null, replied_at: null, is_published: true, author: 'Sam', created_at: '2026-10-01T00:00:00.000Z' }]
+        : [],
+    });
+    act(() => root.render(<CourseReviews slug="water-damage" />));
+    await flush();
+    const policy = container.querySelector('[data-testid="review-policy"]');
+    expect(policy).not.toBeNull();
+    const text = policy!.textContent ?? '';
+    expect(text).toContain('How we moderate reviews');
+    expect(text).toContain('We never hide a review because it is negative or has a low rating.');
+    for (const reason of ['offensive or abusive', "someone's personal information", 'not about this course', 'spam or fake']) {
+      expect(text).toContain(reason);
+    }
+    expect(text).toContain('The average rating counts published reviews only.');
+    expect(policy!.querySelector('a[href="/review-policy"]')).not.toBeNull();
+  });
+});

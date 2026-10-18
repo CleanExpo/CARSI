@@ -248,7 +248,8 @@ export async function getCourseReviews(
       ...(includeHidden
         ? {
             moderationEvents: {
-              orderBy: { createdAt: 'desc' as const },
+              // Decision order, never timestamps (created_at is transaction-start time).
+              orderBy: { sequence: 'desc' as const },
               take: 1,
               select: { action: true, reason: true, contentSha256: true, ratingAtAction: true, createdAt: true },
             },
@@ -313,14 +314,23 @@ export async function setReviewVisibility(
   await prisma.$transaction(async (tx) => {
     const review = await tx.lmsCourseReview.update({
       where: { id: params.reviewId },
-      data: { isPublished: params.isPublished },
-      select: { rating: true, title: true, body: true, course: { select: { id: true, slug: true, title: true } } },
+      // The UPDATE takes the review-row lock and bumps the version atomically, so concurrent
+      // decisions on one review are numbered in the order they actually apply.
+      data: { isPublished: params.isPublished, moderationVersion: { increment: 1 } },
+      select: {
+        rating: true,
+        title: true,
+        body: true,
+        moderationVersion: true,
+        course: { select: { id: true, slug: true, title: true } },
+      },
     });
     await tx.lmsCourseReviewModerationEvent.create({
       data: {
         reviewId: params.reviewId,
         // Snapshots keep the audit meaningful after the review or course is deleted.
         reviewRef: params.reviewId,
+        sequence: review.moderationVersion,
         courseRef: review.course.id,
         courseSlug: review.course.slug,
         courseTitle: review.course.title,

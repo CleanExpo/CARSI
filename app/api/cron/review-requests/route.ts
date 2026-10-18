@@ -2,29 +2,30 @@ import { NextResponse } from 'next/server';
 
 import { requireCron } from '@/lib/server/cron-auth';
 import { databaseUnavailableResponse, isDatabaseConfigured } from '@/lib/server/database-unavailable';
-import { readReviewRequestConfig, runReviewRequestEmails } from '@/lib/server/review-request-email';
+import { runReviewRequestEmails } from '@/lib/server/review-request-email';
 
 /**
- * Review-request emails (spec 2026-10-18 D9-D12). DORMANT: sends nothing unless
- * REVIEW_REQUEST_EMAILS_ENABLED=true and REVIEW_REQUEST_EMAILS_SINCE is set. No workflow
- * schedules this route yet — that is added only once Phill approves sending.
+ * Review-request emails (spec 2026-10-18 D9-D12; header amendment 6). DORMANT: the switch
+ * (lms_review_request_settings.enabled) is created OFF, and this route only sends to enrolments
+ * the database marked eligible at completion while the switch was on. No workflow schedules this
+ * route yet — that is added only once Phill approves sending.
  *
  * `?dry_run=1` counts who would be emailed without writing or sending anything.
  * Returns 500 when any send failed or email is not configured, so a scheduler's `curl -fsS`
  * goes red instead of reporting success. `reason: 'disabled'` is distinct from "nobody eligible".
+ * Without a database the switch cannot even be read, so the route fails closed (503).
  *
- * Stop sequence: unset REVIEW_REQUEST_EMAILS_ENABLED, then disable the scheduling workflow.
+ * Stop sequence: switch off via POST /api/admin/reviews/email-settings, then disable the workflow.
  */
 export async function GET(request: Request) {
   const denied = requireCron(request);
   if (denied) return denied;
   if (!isDatabaseConfigured()) {
-    // Off: an explicit, successful no-op. On but no database: nobody can be evaluated or emailed,
-    // so fail loudly (503) instead of letting a scheduler's `curl -fsS` record a success.
-    const config = readReviewRequestConfig(process.env);
-    return config.enabled
-      ? databaseUnavailableResponse('Review-request emails are on but no database is configured.', { ok: false, sent: 0, reason: 'no_database' })
-      : NextResponse.json({ ok: true, sent: 0, reason: config.reason });
+    return databaseUnavailableResponse('Review-request emails cannot run without a database.', {
+      ok: false,
+      sent: 0,
+      reason: 'no_database',
+    });
   }
 
   const now = new Date();
