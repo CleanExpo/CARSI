@@ -12,7 +12,9 @@
  *
  * Inspected and not used (18/10/2026): fire-damage-assessment (garbled sleeve lettering in the
  * work area), mould-remediation-level-2 (labelled box behind the worker), stone-tile-cleaning,
- * intro-applied-microbial-remediation and intro-smoke-soot-restoration (logos on the worker).
+ * intro-applied-microbial-remediation and intro-smoke-soot-restoration (logos on the worker),
+ * intro-infrared-thermography (lettering on the camera screen; the wall heatmap alone is not
+ * how the course teaches thermography).
  */
 import { createRequire } from 'node:module';
 import { mkdirSync } from 'node:fs';
@@ -46,13 +48,6 @@ export const HERO_TILE_CROPS = [
     left: 400,
     top: 230,
     size: 600,
-  },
-  {
-    name: 'infrared-moisture-image',
-    source: 'intro-infrared-thermography',
-    left: 80,
-    top: 160,
-    size: 480,
   },
 ];
 

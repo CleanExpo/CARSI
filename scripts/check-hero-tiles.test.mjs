@@ -23,7 +23,7 @@ function cliExit(catalogue) {
 }
 
 test('reads every tile slug from the source of truth', () => {
-  assert.ok(tiles.length >= 6, `expected the floor's tiles, got ${tiles.length}`);
+  assert.ok(tiles.length >= 5, `expected the floor's tiles, got ${tiles.length}`);
   assert.ok(tiles.includes('introduction-to-water-damage-restoration'));
 });
 

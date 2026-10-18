@@ -28,10 +28,6 @@ export const HEX_COURSE_TILES = [
     image: '/images/hero-tiles/structural-drying-airflow.webp',
     course: 'introduction-to-structural-drying-concepts',
   },
-  {
-    image: '/images/hero-tiles/infrared-moisture-image.webp',
-    course: 'introduction-to-infrared-thermography-for-drying',
-  },
 ] as const;
 
 export const HEX_COURSE_IMAGES = HEX_COURSE_TILES.map((t) => t.image);
@@ -47,7 +43,6 @@ export const INSPECTED_IMAGES = [
   '/images/hero-tiles/mould-patch.webp',
   '/images/hero-tiles/soot-ceiling-cleaning.webp',
   '/images/hero-tiles/structural-drying-airflow.webp',
-  '/images/hero-tiles/infrared-moisture-image.webp',
 ] as const;
 
 /** Pixel size of one square slot in the course atlas texture. */
