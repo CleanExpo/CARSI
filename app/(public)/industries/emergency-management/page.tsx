@@ -47,25 +47,24 @@ const stats = [
 
 const faqs = [
   {
-    question: 'What IICRC CEC training is relevant for SES volunteers and emergency responders?',
+    question: 'What CARSI training suits SES volunteers and emergency responders?',
     answer:
-      'State Emergency Service (SES) volunteers performing damage assessment and initial response after flooding benefit significantly from CARSI water damage restoration training. WRT covers moisture behaviour in building materials, structural damage assessment, and documentation — enabling volunteers to triage flood-affected properties more accurately, advise homeowners on immediate protective actions, and produce assessment records that support insurance claims. FSRT (Fire & Smoke Restoration) certification is similarly valuable for volunteers supporting post-bushfire triage.',
+      'Volunteers doing damage assessment after floods benefit from water damage restoration training: how moisture moves through building materials, how to assess structural damage and how to document it. Introduction to Water Damage Restoration and Introduction to Digital Moisture Mapping cover these. For bushfire-affected areas, Introduction to Smoke and Soot Damage Restoration covers smoke and soot behaviour.',
   },
   {
-    question: 'How does WRT training help with flood response in Australian communities?',
+    question: 'How does water damage training help with flood response in Australian communities?',
     answer:
-      'CEC-accredited water restoration training equips emergency responders to move beyond surface-level water removal to understand the moisture migration patterns within wall cavities, subfloors, and roof spaces that determine long-term structural damage and mould risk. CARSI-trained volunteers can advise homeowners on which materials require immediate removal to prevent mould, which can be dried in place, and what documentation is needed for insurance claims — transforming the immediate flood response from a basic clean-up into a structured damage mitigation process.',
+      'It helps responders look past surface water to the moisture in wall cavities, subfloors and roof spaces that drives long-term structural damage and mould. Trained volunteers can advise homeowners on which materials need removal, which can be dried in place and what records insurers need, turning a basic clean-up into a structured response.',
   },
   {
     question: 'Can council emergency management teams complete IICRC CEC training?',
     answer:
-      'Yes. Council emergency management coordinators, building surveyors, and flood response teams benefit from CARSI awareness-level courses in water damage restoration and structural drying. Online, self-paced delivery means staff can complete training between deployments without disrupting rostering. Councils that invest in IICRC CEC training for emergency response staff report improved property triage accuracy, stronger documentation for DRFA (Disaster Recovery Funding Arrangements) claims, and better community outcomes in the weeks following a major weather event.',
+      'Yes. Council emergency management coordinators, building surveyors and flood response teams can take CARSI awareness-level courses in water damage restoration and structural drying. Online, self-paced delivery means staff can complete training between deployments without disrupting rosters.',
   },
   {
-    question:
-      'What is FSRT certification and how does it apply to bushfire and fire damage response?',
+    question: 'What does fire and smoke restoration training cover for bushfire response?',
     answer:
-      "FSRT (Fire & Smoke Restoration Technician) is an IICRC certification covering the chemistry of smoke, soot types and their penetration behaviour, odour neutralisation, and structural cleaning methods for fire-affected buildings. For emergency management teams operating in bushfire-affected areas, CARSI's CEC-accredited fire and smoke restoration training supports accurate building triage — distinguishing between cosmetic smoke damage and structural compromise — and enables trained responders to provide homeowners with evidence-based advice on salvageability versus demolition.",
+      'It covers how smoke and soot behave and penetrate materials, odour removal and the cleaning of fire-affected buildings. For emergency management teams it supports triage that separates cosmetic smoke damage from structural compromise. Start with Introduction to Smoke and Soot Damage Restoration, which is IICRC CEC Accredited, with its CEC hours shown on the course page.',
   },
 ];
 

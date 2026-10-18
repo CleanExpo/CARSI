@@ -46,19 +46,19 @@ const stats = [
 
 const faqs = [
   {
-    question: 'What IICRC certifications do Australian food processing facilities need?',
+    question: 'What restoration training suits Australian food processing facilities?',
     answer:
-      'Australian food processing facilities benefit from AMRT (Applied Microbial Remediation) for mould and bacterial contamination control in cold stores and processing areas, OCT (Odour Control) for managing organic odours in production environments, and CCT (Carpet Cleaning) for maintaining hygiene in administrative and visitor areas. These certifications complement HACCP and FSANZ food safety requirements.',
+      'Microbial remediation for mould and bacterial contamination in cold stores and processing areas, odour control for organic odours, and carpet cleaning for office and visitor areas. Relevant CARSI courses include Introduction to Applied Microbial Remediation, Introduction to Odour Control and Removal Techniques and Introduction to Basic Carpet Cleaning and Drying. This training sits alongside, and does not replace, HACCP and FSANZ food safety requirements.',
   },
   {
-    question: 'How does IICRC CEC training support HACCP compliance in food facilities?',
+    question: 'How does mould training support HACCP programs in food facilities?',
     answer:
-      "HACCP plans require demonstrated competency in contamination prevention. CARSI's CEC-accredited mould remediation training provides verifiable evidence that maintenance teams can identify and remediate microbial hazards including mould, bacteria, and biofilms in cold storage rooms, processing lines, and drainage systems — all critical control points in a HACCP plan.",
+      'HACCP plans depend on staff who can prevent contamination. Mould remediation training gives maintenance teams documented training in identifying and remediating mould, bacteria and biofilms in cold rooms, processing lines and drains. It supports, and does not replace, the facility\'s own HACCP plan and verification.',
   },
   {
     question: 'What is mould remediation training for cold storage facilities?',
     answer:
-      'CEC-accredited mould remediation training covers identification and remediation of mould and microbial growth in temperature-controlled environments. For Australian food facilities, this is critical in cold rooms, blast chillers, loading docks, and drainage channels where condensation creates ideal conditions for microbial contamination that can affect product safety.',
+      'It covers identifying and remediating mould and microbial growth in temperature-controlled areas such as cold rooms, blast chillers, loading docks and drainage channels, where condensation creates conditions for contamination. CARSI covers this in Introduction to Applied Microbial Remediation and the Level 1 to Level 3 Mould Remediation courses.',
   },
   {
     question: 'Can food processing staff complete IICRC CEC training while maintaining shift patterns?',
@@ -79,7 +79,7 @@ const whyCards = [
     icon: Droplets,
     title: 'Cold Storage Hygiene',
     description:
-      'Condensation, drainage issues, and temperature fluctuations in cold rooms create ideal conditions for mould. AMRT training equips teams to prevent and remediate contamination.',
+      'Condensation, drainage issues, and temperature fluctuations in cold rooms create ideal conditions for mould. Microbial remediation training equips teams to prevent and remediate contamination.',
     color: '#1B5E20',
   },
   {

@@ -46,14 +46,14 @@ const stats = [
 
 const faqs = [
   {
-    question: 'What IICRC CEC training do Australian museums need for heritage preservation?',
+    question: 'What restoration training suits Australian museums and cultural institutions?',
     answer:
-      'Australian museums and cultural institutions benefit most from AMRT (Applied Microbial Remediation) for mould prevention in collection storage, WRT (Water Damage Restoration) for emergency response to leaks or flooding near artefacts, and ASD (Applied Structural Drying) for controlling moisture in climate-sensitive exhibition spaces. These certifications support ISO 11799 and AICCM guidelines for collection care.',
+      'Microbial remediation for mould prevention in collection storage, water damage response for leaks or flooding near collections, and structural drying for moisture control in climate-sensitive spaces. Relevant CARSI courses include Introduction to Applied Microbial Remediation, Introduction to Water Damage Restoration, Introduction to Applied Structural Drying and Introduction to Restoration of Antiques and Fine Furnishings.',
   },
   {
-    question: 'How does mould affect museum collections and how does IICRC CEC training help?',
+    question: 'How does mould affect museum collections, and how does training help?',
     answer:
-      'Mould poses a critical threat to paper, textile, and organic artefacts in museum storage. CEC-accredited mould remediation training teaches staff to identify microbial growth early, implement containment protocols, and remediate without damaging collection items. For Australian institutions in humid coastal climates, this training is essential for preventive conservation programs.',
+      'Mould is a serious threat to paper, textile and organic items in storage. Mould remediation training teaches staff to spot microbial growth early, set up containment and remediate without damaging collection items. For institutions in humid coastal climates, it supports preventive conservation.',
   },
   {
     question: 'Can gallery and museum staff complete IICRC CEC training online?',
@@ -63,7 +63,7 @@ const faqs = [
   {
     question: 'What is the emergency response protocol for water damage in a museum?',
     answer:
-      'CEC-accredited water restoration training covers triage-based water damage response: isolate the source, protect high-value items, extract standing water, and deploy drying equipment. For museums, this includes specific protocols for waterlogged documents, textiles, and framed works. ASD training complements this with structural moisture monitoring to prevent secondary mould growth.',
+      'Water damage training covers triage: isolate the source, protect high-value items, extract standing water and set up drying equipment. Introduction to Recovery of Submerged Items and Contents covers waterlogged contents, and structural drying training adds moisture monitoring to prevent secondary mould growth.',
   },
 ];
 
@@ -86,7 +86,7 @@ const whyCards = [
     icon: Thermometer,
     title: 'Climate Control Recovery',
     description:
-      'HVAC failures in climate-controlled galleries and archives risk mould outbreaks. ASD training provides the moisture management expertise to stabilise environments quickly.',
+      'HVAC failures in climate-controlled galleries and archives risk mould outbreaks. Structural drying training provides the moisture management expertise to stabilise environments quickly.',
     color: '#2490ed',
   },
 ];

@@ -48,22 +48,22 @@ const faqs = [
   {
     question: 'Do plumbers need IICRC certification in Australia?',
     answer:
-      'IICRC certification is not a legal requirement for plumbers in Australia, but it provides a significant commercial advantage. WRT (Water Damage Restoration Technician) certification allows licensed plumbers to legally and credibly perform — and invoice for — structural drying services after fixing the source of water damage. Many insurers specify IICRC-certified contractors for remediation scopes, making certification essential for accessing insurance-funded work.',
+      'No. IICRC certification is not a legal requirement for plumbers in Australia. Insurer panels set their own requirements, so check each panel; the certification itself is obtained only through IICRC-approved schools and examinations. CARSI courses train plumbers in water damage restoration and drying, and where the IICRC has approved a course, its CEC hours are shown on the course page.',
   },
   {
-    question: 'What is WRT training and how does it help a plumbing business?',
+    question: 'What water damage training helps a plumbing business?',
     answer:
-      'WRT (Water Damage Restoration Technician) is the IICRC foundation course covering moisture behaviour in building materials, psychrometrics, drying equipment placement, and documentation requirements. For a plumbing contractor, WRT training means you can identify hidden moisture damage behind walls, set up drying equipment, and submit a compliant drying report to the insurer — turning a standard repair call-out into a multi-day drying contract that significantly increases per-job revenue.',
+      'Training in moisture behaviour, psychrometry, drying-equipment placement and documentation lets a plumbing contractor find hidden moisture behind walls, set up drying and give the insurer a clear drying record. Start with Introduction to Water Damage Restoration, then Introduction to Psychrometry Science and Calculations and Introduction to Applied Structural Drying.',
   },
   {
-    question: 'How does IICRC CEC training increase plumbing revenue per call-out?',
+    question: 'How does restoration training add work to a plumbing call-out?',
     answer:
-      'Most plumbing call-outs involving burst pipes, flexi-hose failures, or roof leaks leave wet structural materials behind. Without restoration certification, plumbers fix the source and leave — the customer engages a separate remediation contractor. IICRC-certified plumbers can perform the full scope: fix the source, extract water, place drying equipment, and document the process. Average Australian water damage restoration jobs range from $2,500 to $15,000, representing significant additional revenue per call-out.',
+      'Burst pipes, flexi-hose failures and roof leaks often leave wet structural materials behind. With drying training, a plumber can scope the drying as well as fix the source, instead of handing the rest of the job to a separate restoration contractor.',
   },
   {
-    question: 'Can I complete IICRC CEC training online while running a plumbing business?',
+    question: 'Can I complete CARSI training online while running a plumbing business?',
     answer:
-      'Yes. CARSI offers IICRC CEC Accredited courses online and fully self-paced. There are no fixed class times — modules are completed between jobs, in the evening, or on weekends. Most WRT courses take 8–12 hours of study, which plumbers typically spread over two weeks. On completion, you receive a verifiable digital credential and IICRC Continuing Education Credits (CECs) towards your professional standing.',
+      'Yes. CARSI offers IICRC CEC Accredited courses online and fully self-paced. There are no fixed class times, so modules fit between jobs, in the evening or on weekends. Every completed course issues a verifiable CARSI credential, and CEC hours are recorded only for courses the IICRC has approved.',
   },
 ];
 

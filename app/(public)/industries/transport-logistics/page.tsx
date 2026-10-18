@@ -46,19 +46,19 @@ const stats = [
 
 const faqs = [
   {
-    question: 'What IICRC CEC training do Australian transport companies need?',
+    question: 'What restoration training suits Australian transport and logistics operators?',
     answer:
-      'Australian transport and logistics operators benefit from WRT (Water Damage Restoration) for warehouse flooding and roof leak response, CRT (Carpet & Upholstery Cleaning) for vehicle interior maintenance across fleets, and OCT (Odour Control) for managing contamination odours in enclosed cargo areas and passenger vehicles. These certifications support Chain of Responsibility compliance and fleet asset protection.',
+      'Water damage response for warehouse flooding and roof leaks, drying for vehicles, and odour control in enclosed cargo areas and passenger vehicles. Relevant CARSI courses include Introduction to Water Damage in Commercial Buildings, Introduction to Drying Transportation and Vehicles and Introduction to Odour Control and Removal Techniques.',
   },
   {
     question: 'How does water damage training help warehouse operations?',
     answer:
-      'Australian warehouses face water damage from storm events, roof failures, and sprinkler activations. CEC-accredited water restoration training equips logistics teams to respond immediately — extracting water, protecting inventory, and deploying drying equipment to minimise stock loss and downtime. Early response can reduce insurance claims and prevent secondary mould damage.',
+      'Australian warehouses face water damage from storms, roof failures and sprinkler activations. Water damage training equips logistics teams to respond immediately: extract water, protect inventory and set up drying equipment to reduce stock loss and downtime. Early response can also prevent secondary mould damage.',
   },
   {
-    question: 'What is vehicle interior restoration training?',
+    question: 'What vehicle training does CARSI offer?',
     answer:
-      'CARSI carpet repair and reinstallation training covers fabric and surface restoration techniques for vehicle interiors including buses, coaches, trucks, and fleet cars. For transport operators, this means extending asset life, maintaining hygiene standards for passenger vehicles, and reducing outsourced detailing costs across large fleets.',
+      "Introduction to Drying Transportation and Vehicles covers drying vehicles and transport assets after water damage. CARSI's vehicle training is about drying; it does not cover interior fabric repair.",
   },
   {
     question: 'Can transport and logistics staff train online around shift schedules?',
@@ -79,7 +79,7 @@ const whyCards = [
     icon: Droplets,
     title: 'Warehouse Flood Response',
     description:
-      'Storm damage, sprinkler activations, and roof leaks can destroy warehoused inventory. WRT training equips your team to extract, dry, and restore — minimising stock loss.',
+      'Storm damage, sprinkler activations, and roof leaks can destroy warehoused inventory. Water damage training equips your team to extract, dry, and restore — minimising stock loss.',
     color: '#0D47A1',
   },
   {

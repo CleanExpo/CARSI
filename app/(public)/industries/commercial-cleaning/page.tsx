@@ -47,12 +47,12 @@ const faqs = [
   {
     question: 'How do cleaning companies add restoration services in Australia?',
     answer:
-      'Commercial cleaning businesses expand into restoration by upskilling existing staff with IICRC CEC courses in the core disciplines. CRT (Carpet Restoration), WRT (Water Damage Restoration), and OCT (Odour Control) are the most common entry points. This continuing-education grounding helps cleaners offer restoration work alongside routine cleaning contracts, increasing revenue per client. CARSI delivers CEC courses, not IICRC certification — certification is obtained through schools approved by the IICRC.',
+      'Most start by upskilling existing staff in water damage restoration, carpet cleaning and odour control, then add structural drying and mould remediation. CARSI courses in those subjects are online and self-paced, and every completed course issues a verifiable CARSI credential. CARSI is an IICRC CEC Accredited provider: where the IICRC has approved a course, its CEC hours are shown on the course page. CARSI does not deliver IICRC certification, which is obtained only through IICRC-approved schools and examinations.',
   },
   {
     question: 'What IICRC certifications help win insurance restoration panels?',
     answer:
-      'Major Australian insurers and loss adjusters require contractors on their restoration panels to hold current IICRC certifications. WRT (Water Damage Restoration) and FSRT (Fire & Smoke Restoration) are the most commonly requested. Maintaining current CECs (Continuing Education Credits) is essential to remain on approved contractor lists.',
+      'Insurers and loss adjusters set their own panel requirements, so ask each panel which IICRC certifications it expects. IICRC certification is obtained only through IICRC-approved schools and examinations, and holders keep it current with Continuing Education Credits (CECs). Where the IICRC has approved a CARSI course, its CEC hours are shown on the course page.',
   },
   {
     question: 'How does IICRC certification align with ISSA standards?',
@@ -60,14 +60,14 @@ const faqs = [
       'IICRC and ISSA (International Sanitary Supply Association) are complementary industry bodies. IICRC provides technician-level certifications in specific restoration disciplines, while ISSA focuses on cleaning management standards. Australian cleaning companies often hold credentials from both organisations to demonstrate comprehensive capability in tenders.',
   },
   {
-    question: 'What is the cost of IICRC CEC training for cleaning staff in Australia?',
+    question: 'What does CARSI training cost for cleaning staff?',
     answer:
-      'CARSI offers IICRC CEC Accredited courses from $795 AUD per year per seat, which includes access to courses, verifiable CARSI digital credentials, and CEC tracking. Bulk team pricing is available for cleaning companies training multiple technicians. Courses are online and self-paced, eliminating travel and downtime costs.',
+      'Each course is priced in AUD on its own page, and paid courses can be bought as team seats at checkout. Some courses are free. Yearly membership and team plans are listed on the pricing page.',
   },
   {
-    question: 'How do cleaning contractors track IICRC CEC credits for their team?',
+    question: 'How do cleaning contractors track training for their team?',
     answer:
-      "CARSI provides a team dashboard where business owners and managers can monitor each technician's CEC progress, certification status, and expiry dates. Verifiable digital transcripts are issued for each completed course, suitable for tender submissions, insurance panel applications, and client proposals.",
+      'Every completed course issues a verifiable CARSI credential, and each learner can download or share their training record from the CARSI dashboard for tenders, insurance panel applications and client proposals. CEC hours are recorded only for courses the IICRC has approved.',
   },
 ];
 

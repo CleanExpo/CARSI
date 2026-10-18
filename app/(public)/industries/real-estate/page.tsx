@@ -54,12 +54,12 @@ const faqs = [
     question:
       'What are vendor disclosure obligations for water damage in Australian property sales?',
     answer:
-      "Each state has specific vendor disclosure requirements. In most jurisdictions, sellers must disclose material defects that would affect a reasonable buyer's decision, which includes known water penetration, mould contamination, and structural drying history. IICRC-trained real estate agents can identify these defects during pre-listing inspections, document them accurately in vendor disclosure statements, and advise on IICRC-compliant remediation to maximise sale price and minimise post-settlement disputes.",
+      "Each state has its own vendor disclosure requirements. In most jurisdictions, sellers must disclose material defects that would affect a reasonable buyer's decision, which can include known water penetration, mould and drying history. Trained agents can recognise these defects during pre-listing inspections, record them accurately in disclosure statements and refer vendors to qualified remediation contractors.",
   },
   {
-    question: 'How does IICRC certification help during property sales transactions?',
+    question: 'How does water damage and mould training help during property sales?',
     answer:
-      'IICRC-certified agents can accurately assess water damage severity, distinguish between active and historic moisture intrusion, and interpret moisture meter readings and thermal imaging results — skills that are increasingly expected as buyers become more sophisticated. An agent who can credibly discuss IICRC remediation standards builds vendor and buyer confidence, reduces the risk of sale collapse from building inspections, and supports faster settlement by providing documented remediation evidence when required.',
+      'Agents trained in water damage and mould can better judge how serious water damage is, tell active from historic moisture, and understand moisture meter readings and thermal images. That helps them discuss remediation credibly, lowers the risk of a sale collapsing after a building inspection, and lets them point to documented remediation when it exists.',
   },
   {
     question: 'What is moisture mapping and why does it matter for real estate?',

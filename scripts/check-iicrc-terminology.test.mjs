@@ -109,6 +109,21 @@ const MUST_BLOCK = [
   ['commented join inside a designation (review P1, round 5)', "t = { title: 'Applied '/* x */ + 'Structural Drying — Core Concepts' };"],
   ['prefix concatenated onto a registry title', "export const probe = { title: 'Advanced ' + 'Introduction to Applied Structural Drying' };"],
   ['microbial designation name in a quiz title', '"title": "Applied Microbial Remediation: Mould Fundamentals — Knowledge Check",'],
+  // Single acronym naming training (18/10/2026). Every case below was live — in industry FAQ
+  // JSON-LD or a CTA — while the guard reported green: the list rule needs two acronyms and
+  // the designation rule needs an adjacent "IICRC" or "-aligned".
+  ['acronym + courses (plumbing FAQ)', 'Most WRT courses take 8–12 hours of study.'],
+  ['acronym + training (question form)', "question: 'What is WRT training and how does it help a plumbing business?',"],
+  ['acronym + parenthetical + training', 'CRT (Carpet Cleaning Technician) training enables in-house staff.'],
+  ['acronym + training, mid-sentence', 'ASD training complements this with structural moisture monitoring.'],
+  ['CARSI + acronym + courses (CTA)', 'Explore CARSI CCT courses'],
+  ['acronym + course pathway', "topic: 'CARSI CCT course pathway',"],
+  ['acronym + pathway', "label: 'Start the CCT pathway',"],
+  ['acronym + capitalised Course', "title: 'IICRC-free WRT Course for crews'"],
+  ['acronym + program', 'Our AMRT program for food facilities'],
+  ['acronym + module', 'Finish the OCT module before the site visit.'],
+  ['acronym + hyphen + training', 'FSRT-training for bushfire crews'],
+  ['a nearby sentence does not launder it', 'We rarely use acronyms. WRT training for plumbers.'],
 ];
 
 const MUST_PASS = [
@@ -146,6 +161,16 @@ const MUST_PASS = [
   ['prerequisite naming the learner\'s own cert', '- Basic understanding (recommended: IICRC WRT certification or equivalent).'],
   ['parenthesised scope note', '**colour repair / re-dyeing** (IICRC CRT), or refer.'],
   // Fail-closed copy and the code that enforces it must never be flagged.
+  // Negative controls for the single-acronym naming rule (18/10/2026): the certification
+  // named as a certification, a date abbreviation, the rule's own enforcement text, and
+  // the IICRC's own course in the possessive.
+  ['acronym named as a certification', 'FSRT is an IICRC certification covering smoke and soot.'],
+  ['learner recertification', 'Your WRT recertification is due in March.'],
+  ['date abbreviation is not the designation', 'Oct training day at the Bayswater warehouse.'],
+  ['lowercase slug fragment', "href: '/courses/oct-training-2026'"],
+  ['prompt forbidding the construction', 'Never call it a WRT course — use the CARSI designation.'],
+  ['the IICRC naming its own course', "The IICRC's WRT course is taught only by IICRC-approved schools."],
+  ['plain-English subject', 'Water damage restoration training for plumbers.'],
   ['denial that a course carries CECs', 'This course carries no IICRC CECs (pending IICRC approval).'],
   ['the FAQ question itself', 'Is this course IICRC CEC accredited or does it award CECs?'],
   ['code describing the gate', '{/* assert this course earns CECs only when it has registry-approved hours */}'],

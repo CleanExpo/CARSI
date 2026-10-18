@@ -161,7 +161,7 @@ Why register now:
 
 - 3 posts per week from CARSI and CCW.
 - Weekly email reminder.
-- Retarget warm leads from Start Smart and CCT course enquiries if consent allows.
+- Retarget warm leads from Start Smart and carpet cleaning course enquiries if consent allows.
 - DM/respond to comments with the registration link.
 
 ### Final Push

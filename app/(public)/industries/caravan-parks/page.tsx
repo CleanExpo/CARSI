@@ -61,9 +61,9 @@ const faqs = [
       'Caravan park operators owe guests a duty of care under Australian Consumer Law and state-specific tourism accommodation legislation. Providing accommodation with hidden mould or water damage exposes operators to Fair Trading complaints, negative TripAdvisor reviews, and potential personal injury claims if guests suffer health impacts. CARSI mould remediation training demonstrates that maintenance staff are competent to identify and remediate mould — providing a defensible record that standards-based inspections and remediation were performed, which is increasingly expected by park accreditation bodies.',
   },
   {
-    question: 'What is CRT training and how does it help holiday accommodation?',
+    question: 'What carpet training helps holiday accommodation?',
     answer:
-      'CRT (Carpet Cleaning Technician) is an IICRC certification covering hot water extraction methodology, pre-treatment chemistry, soil removal, and moisture management in carpet systems. For caravan parks and holiday accommodation, CRT training enables in-house staff to maintain carpet in cabins and common areas to a standard that extends asset life and prevents odour complaints — avoiding the cost of outsourcing routine carpet maintenance to contractors. CRT certification also covers water damage response in carpeted areas, which is directly applicable to flood and plumbing failure events.',
+      'Introduction to Basic Carpet Cleaning and Drying covers carpet cleaning and drying in residential, commercial and institutional settings, which suits cabins and common areas. It is IICRC CEC Accredited, with its CEC hours shown on the course page. For carpet that gets wet in a storm or plumbing failure, Introduction to Water Damage Restoration covers the drying side.',
   },
 ];
 
@@ -79,7 +79,7 @@ const whyCards = [
     icon: Wind,
     title: 'Storm & Flood Response',
     description:
-      'Coastal and riverside parks face cyclone, storm surge, and flooding events. WRT training equips park staff to respond immediately, reducing uninhabitable site periods and expediting insurance claims.',
+      'Coastal and riverside parks face cyclone, storm surge, and flooding events. Water damage training equips park staff to respond immediately, reducing uninhabitable site periods and expediting insurance claims.',
     color: '#00897b',
   },
   {

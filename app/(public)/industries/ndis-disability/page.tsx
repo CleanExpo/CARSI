@@ -46,14 +46,14 @@ const stats = [
 
 const faqs = [
   {
-    question: 'What IICRC CEC training do NDIS service providers need?',
+    question: 'What CARSI training suits NDIS service providers?',
     answer:
-      'NDIS providers supporting participants in supported independent living (SIL) or specialist disability accommodation (SDA) have a duty of care to maintain safe, hygienic environments. CARSI mould remediation training covers mould identification, containment, and remediation — skills directly relevant to Module 3 of the NDIS Practice Standards (Supports Provision Environment). WRT training supports water damage response in participant homes and shared accommodation facilities.',
+      'Providers supporting participants in supported independent living (SIL) or specialist disability accommodation (SDA) have a duty of care to keep homes safe and hygienic. CARSI mould remediation training covers identifying, containing and remediating mould, and water damage restoration training covers response to leaks and flooding in participant homes and shared accommodation.',
   },
   {
     question: 'How does mould affect NDIS participants and their accommodation?',
     answer:
-      'Many NDIS participants have compromised immune systems, respiratory conditions, or sensitivities that make mould exposure significantly more dangerous than for the general population. Under NDIS Practice Standards, providers must ensure accommodation is safe and hygienic. Unaddressed mould in SIL or SDA properties can result in NDIS Quality and Safeguards Commission investigations, worker banning orders, and loss of registration. CEC-accredited mould remediation training ensures maintenance staff can identify and remediate mould before it becomes a compliance issue.',
+      'Many NDIS participants have compromised immune systems, respiratory conditions or sensitivities that make mould exposure more dangerous than for the general population. Under the NDIS Practice Standards, providers must keep accommodation safe and hygienic. Mould remediation training helps maintenance staff identify and remediate mould before it becomes a compliance issue.',
   },
   {
     question: 'Does IICRC certification help NDIS providers during audits?',
@@ -63,7 +63,7 @@ const faqs = [
   {
     question: 'Can support coordinators benefit from CARSI restoration awareness courses?',
     answer:
-      'Support coordinators who understand the signs of water damage and mould can better advocate for participants and initiate remediation before conditions deteriorate. While support coordinators do not perform remediation themselves, CARSI awareness-level courses helps them identify hazards during home visits, document concerns accurately, and brief maintenance contractors on required standards — all of which support better participant outcomes and stronger audit documentation.',
+      'Support coordinators who recognise the signs of water damage and mould can advocate for participants and start remediation before conditions get worse. They do not do the remediation themselves, but CARSI awareness-level courses help them spot hazards during home visits, document concerns accurately and brief maintenance contractors, which supports better outcomes and stronger audit records.',
   },
 ];
 

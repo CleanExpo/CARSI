@@ -214,7 +214,7 @@ export default async function CcwRoadshowSuccessPage({
               Back to event page
             </Link>
             <Link href="/courses?discipline=CCT" className={marketingBtnSecondary}>
-              Explore CARSI CCT courses
+              Explore CARSI carpet cleaning courses
             </Link>
           </div>
         </div>

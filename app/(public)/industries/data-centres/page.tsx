@@ -46,19 +46,19 @@ const stats = [
 
 const faqs = [
   {
-    question: 'What IICRC certifications do Australian data centres need?',
+    question: 'What restoration training suits Australian data centres?',
     answer:
-      'Australian data centres benefit from WRT (Water Damage Restoration) for CRAC unit leaks, pipe bursts, and cooling system failures, ASD (Applied Structural Drying) for rapid moisture removal to protect server infrastructure, and FSRT (Fire & Smoke Restoration) for post-suppression system cleanup. These certifications support Uptime Institute tier compliance and business continuity planning.',
+      'Water damage response for cooling-unit leaks and pipe bursts, structural drying for fast moisture removal, and smoke and residue clean-up after a suppression event. Relevant CARSI courses include Introduction to Water Damage in Commercial Buildings, Introduction to Applied Structural Drying and Introduction to Smoke and Soot Damage Restoration, all IICRC CEC Accredited, each with its CEC hours shown on the course page.',
   },
   {
     question: 'How does water damage training protect data centre infrastructure?',
     answer:
-      'Water is the leading cause of unplanned data centre outages after power failures. CEC-accredited water restoration training equips facility teams to respond within minutes to CRAC unit leaks, overhead pipe bursts, or cooling system failures — containing water spread, protecting rack infrastructure, and deploying extraction equipment before corrosion or short circuits occur.',
+      'Training helps facility teams respond quickly to cooling-unit leaks, overhead pipe bursts or cooling-system failures: contain the water, protect rack infrastructure and start extraction before corrosion or short circuits occur. Introduction to Water Extraction Methods and Introduction to Safety Procedures for Water Damage Work cover those first steps.',
   },
   {
     question: 'What happens after a fire suppression system activates in a data centre?',
     answer:
-      'After clean agent or water mist suppression activation, residue and moisture must be professionally removed to prevent corrosion and equipment failure. CEC-accredited fire and smoke restoration training covers post-suppression assessment, residue cleanup, and air quality restoration. Combined with ASD for moisture management, this ensures rapid return to operational status.',
+      'After a clean-agent or water-mist discharge, residue and moisture have to be removed to prevent corrosion and equipment failure. Introduction to Smoke and Soot Damage Restoration covers residue assessment and clean-up, and Introduction to Applied Structural Drying covers moisture control.',
   },
   {
     question: 'Can data centre operations staff complete IICRC CEC training without downtime?',

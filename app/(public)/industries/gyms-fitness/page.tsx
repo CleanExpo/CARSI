@@ -53,7 +53,7 @@ const faqs = [
   {
     question: 'What causes mould in Australian fitness centres and how can it be prevented?',
     answer:
-      'The primary mould drivers in Australian gyms are inadequate ventilation in wet areas, condensation on cold surfaces in air-conditioned spaces, water ingress around pool surrounds and wet decks, and porous materials (grout, carpet, ceiling tiles) that retain moisture. CEC-accredited mould remediation training covers moisture mapping, relative humidity monitoring, and containment procedures that allow maintenance staff to identify and address these conditions systematically before mould becomes visible — preventing the costly remediation and member complaints that follow.',
+      'The main drivers in Australian gyms are poor ventilation in wet areas, condensation on cold surfaces in air-conditioned spaces, water getting in around pool surrounds and wet decks, and porous materials (grout, carpet, ceiling tiles) that hold moisture. Mould remediation training covers moisture mapping, relative humidity monitoring and containment, so maintenance staff can find and fix these conditions before mould becomes visible.',
   },
   {
     question: 'How does IICRC CEC training reduce liability for gym operators?',
@@ -61,9 +61,9 @@ const faqs = [
       "Gym operators have a duty of care to members under Australian Consumer Law and WHS legislation. Documented IICRC CEC training demonstrates that maintenance staff were competent to identify and respond to mould and moisture hazards. In the event of a member health complaint or personal injury claim linked to indoor air quality, evidence of IICRC-certified staff and documented inspection protocols significantly strengthens the operator's defence and can reduce insurance premiums for premises liability coverage.",
   },
   {
-    question: 'What is OCT certification and how does it help fitness facilities?',
+    question: 'How does odour control training help fitness facilities?',
     answer:
-      "OCT (Odour Control Technician) is an IICRC certification covering the science of odour identification, source elimination, and odour counteractant application. For gyms and fitness centres, CARSI's odour control CEC training is particularly valuable for persistent locker room odours, post-flooding musty smells, and gym mat odour management. Unlike masking agents, odour control protocols address the biological and chemical source of odours — resolving complaints that damage member retention and online reputation.",
+      'Introduction to Odour Control and Removal Techniques covers identifying odour sources and removing them, which suits persistent locker-room odours, musty smells after water damage and mat odours. It is IICRC CEC Accredited, with its CEC hours shown on the course page. Removing the source resolves the complaint instead of masking it.',
   },
 ];
 

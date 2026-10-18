@@ -143,8 +143,8 @@ export const startSmartLeadPaths: StartSmartLeadPath[] = [
     title: 'Choose the right CARSI learning path',
     body: 'For people ready to learn carpet cleaning fundamentals, chemistry, quoting or trust-building before taking paid work.',
     href: '/courses?discipline=CCT&utm_source=start-smart&utm_medium=organic&utm_campaign=carsi_cct_conversion',
-    label: 'Explore CCT courses',
-    topic: 'CARSI CCT course pathway',
+    label: 'Explore carpet cleaning courses',
+    topic: 'CARSI carpet cleaning course pathway',
     intent: 'course-enquiry',
   },
   {
@@ -614,7 +614,7 @@ export const startSmartPages: StartSmartPage[] = [
       title: 'Turn existing customers into better opportunities',
       body: 'CARSI can help your cleaning team add carpet cleaning with more discipline and less guesswork.',
       href: '/courses?discipline=CCT',
-      label: 'Start the CCT pathway',
+      label: 'Start the carpet cleaning pathway',
     },
     faqs: [
       {

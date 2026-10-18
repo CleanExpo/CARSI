@@ -143,7 +143,7 @@ export const pathwayAdvisorOptions: PathwayAdvisorOption[] = [
     retentionCue:
       'Recommend ASD or microbial remediation content immediately after WRT completion.',
     primaryHref: '/courses?discipline=WRT',
-    primaryLabel: 'Browse WRT courses',
+    primaryLabel: 'Browse water damage courses',
     secondaryHref: '/courses?discipline=ASD',
     secondaryLabel: 'Add drying courses',
     icon: ShieldCheck,

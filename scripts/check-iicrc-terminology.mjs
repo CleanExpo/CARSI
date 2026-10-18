@@ -134,6 +134,27 @@ const BANNED = [
       'Do not list IICRC discipline acronyms — a CARSI course carries its CARSI Southern Hemisphere designation. Reference at most one IICRC certification, third-person.',
   },
   {
+    // A SINGLE IICRC discipline acronym naming training: "WRT training", "Most WRT courses take
+    // 8–12 hours", "Explore CARSI CCT courses", "the CCT pathway", "CRT (Carpet Restoration)
+    // training". Found live 18/10/2026 in industry FAQ JSON-LD (plumbing-trades, caravan-parks,
+    // museums, NDIS, emergency-management) and on start-smart / customer-journey CTAs. None was
+    // caught: the list rule above needs two acronyms, and the designation rule below needs an
+    // adjacent "IICRC" or "-aligned". CARSI courses carry CARSI designations (CLAUDE.md §
+    // CARSI designation rule), so an acronym directly naming a course, training, program,
+    // pathway, module or class is branding. A third-person fact about the certification itself
+    // ("FSRT is an IICRC certification covering…") names no training and stays allowed.
+    // The acronyms are matched CASE-SENSITIVELY: "OCT" is also how October is abbreviated, and
+    // "Oct training day" is a date, not a designation.
+    re: /\b(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\b(?:\s*\([^)\n]{0,60}\))?[\s-]+(?:[Cc]ourses?|COURSES?|[Tt]raining|TRAINING|[Pp]rogram(?:me)?s?|[Pp]athways?|[Mm]odules?|[Cc]lass(?:es)?)\b/,
+    allow: null,
+    // Same bounded exemption as the list rule for lines that exist to FORBID the construction
+    // ("never call it a WRT course"), plus the IICRC's own course named in the possessive.
+    neutralise:
+      /[^\n]{0,120}\bnever\s+(?:call|brand|use|say|name)\b[^\n]{0,120}|\bIICRC['’]s\s+(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)\b/gi,
+    message:
+      'Do not name a course, training, program or pathway with an IICRC discipline acronym ("WRT training", "CCT courses") — CARSI courses carry CARSI Southern Hemisphere designations. Name the subject in plain English instead.',
+  },
+  {
     // "IICRC training" as something CARSI supplies. CARSI supplies IICRC CEC courses;
     // it does not supply IICRC training. Found live as "IICRC training through CARSI".
     // Adjacency was not enough: "IICRC restoration training" slipped past a rule that only
