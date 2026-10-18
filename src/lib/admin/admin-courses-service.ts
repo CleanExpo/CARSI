@@ -464,9 +464,23 @@ export async function syncModuleLessons(
   const desired = buildDesiredLessons(moduleTitle, textContent, videoUrl, quizId ?? undefined);
   const sortedExisting = [...existingLessons].sort((a, b) => a.orderIndex - b.orderIndex);
 
+  // Match each desired lesson to an existing lesson of the same kind (a quiz to the lesson that
+  // already holds that quiz) so lesson ids, and the learner progress and checkpoints bound to
+  // them, survive when a reading or video is added or removed around them. Matching by
+  // position used to move the quiz onto another lesson id and delete the original.
+  const used = new Set<string>();
+  const take = (pred: (ex: (typeof sortedExisting)[number]) => boolean) => {
+    const hit = sortedExisting.find((ex) => !used.has(ex.id) && pred(ex));
+    if (hit) used.add(hit.id);
+    return hit;
+  };
   for (let i = 0; i < desired.length; i += 1) {
     const d = desired[i];
-    const ex = sortedExisting[i];
+    const ex =
+      d.contentType === 'quiz'
+        ? (take((e) => e.contentType === 'quiz' && e.contentBody === d.contentBody) ??
+          take((e) => e.contentType === 'quiz'))
+        : take((e) => e.contentType === d.contentType);
     const isPreview = firstModule && i === 0;
     if (ex) {
       await tx.lmsLesson.update({
@@ -493,8 +507,8 @@ export async function syncModuleLessons(
       });
     }
   }
-  for (let j = desired.length; j < sortedExisting.length; j += 1) {
-    await tx.lmsLesson.delete({ where: { id: sortedExisting[j].id } });
+  for (const ex of sortedExisting) {
+    if (!used.has(ex.id)) await tx.lmsLesson.delete({ where: { id: ex.id } });
   }
 
   return quizId;

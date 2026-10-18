@@ -72,7 +72,8 @@ beforeEach(() => {
     lmsCourse: { create: mocks.courseCreate, update: mocks.courseUpdate },
     lmsModule: { create: mocks.moduleCreate }, lmsLesson: { create: mocks.lessonCreate },
     lmsQuiz: { create: mocks.quizCreate, deleteMany: mocks.quizPrune, upsert: mocks.quizUpsert },
-    lmsQuizQuestion: { create: mocks.questionCreate, deleteMany: mocks.questionDelete },
+    lmsQuizQuestion: { create: mocks.questionCreate, deleteMany: mocks.questionDelete,
+      findMany: async ({ where }: { where: { quizId: string } }) => native.quizzes.find((q) => q.id === where.quizId)?.questions ?? [] },
   }));
 });
 

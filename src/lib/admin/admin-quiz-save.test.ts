@@ -142,4 +142,75 @@ describe('admin quiz save', () => {
     );
     expect(tx.lmsQuizQuestion.deleteMany).not.toHaveBeenCalled();
   });
+
+  // Quiz-loop review round 3: a lesson keeps its id when a reading or video is added or removed
+  // around it, so learner progress and quiz checkpoints bound to that id survive the save.
+  function lessonTx() {
+    const ops: string[] = [];
+    const tx = {
+      lmsLesson: {
+        update: vi.fn(
+          async ({ where, data }: { where: { id: string }; data: { contentType: string } }) => {
+            ops.push(`update:${where.id}:${data.contentType}`);
+            return {};
+          }
+        ),
+        create: vi.fn(async ({ data }: { data: { contentType: string } }) => {
+          ops.push(`create:${data.contentType}`);
+          return {};
+        }),
+        delete: vi.fn(async ({ where }: { where: { id: string } }) => {
+          ops.push(`delete:${where.id}`);
+          return {};
+        }),
+      },
+      lmsQuizQuestion: { findMany: vi.fn(), deleteMany: vi.fn(), create: vi.fn() },
+      lmsQuiz: { upsert: vi.fn() },
+    };
+    return { tx, ops };
+  }
+
+  it('adding a video before an omitted quiz keeps the original quiz lesson id', async () => {
+    const { tx, ops } = lessonTx();
+    await syncModuleLessons(
+      tx as never,
+      'c1',
+      'm1',
+      'Module',
+      'Reading',
+      'https://video.example/v1',
+      undefined,
+      [
+        { id: 'l1', orderIndex: 0, contentType: 'text', contentBody: 'Reading' },
+        { id: 'l2', orderIndex: 1, contentType: 'quiz', contentBody: 'quiz-legacy' },
+      ],
+      true
+    );
+    expect(ops).toContain('update:l2:quiz');
+    expect(ops).toContain('create:video');
+    expect(ops.filter((o) => o.startsWith('delete'))).toEqual([]);
+  });
+
+  it('removing the reading before a quiz keeps the quiz lesson id and deletes only the reading', async () => {
+    const { tx, ops } = lessonTx();
+    await syncModuleLessons(
+      tx as never,
+      'c1',
+      'm1',
+      'Module',
+      undefined,
+      'https://video.example/v1',
+      undefined,
+      [
+        { id: 'l1', orderIndex: 0, contentType: 'text', contentBody: 'Reading' },
+        { id: 'l2', orderIndex: 1, contentType: 'video', contentBody: 'https://video.example/v1' },
+        { id: 'l3', orderIndex: 2, contentType: 'quiz', contentBody: 'quiz-legacy' },
+      ],
+      true
+    );
+    expect(ops).toContain('update:l2:video');
+    expect(ops).toContain('update:l3:quiz');
+    expect(ops.filter((o) => o.startsWith('delete'))).toEqual(['delete:l1']);
+    expect(ops.some((o) => o.startsWith('create'))).toBe(false);
+  });
 });
