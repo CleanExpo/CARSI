@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'IICRC CEC Mould & Odour Training for Gyms & Fitness Centres',
   description:
-    'Protect your members and your reputation. CARSI mould remediation, odour control and carpet repair and reinstallation training for Australian gyms, pools, and fitness facilities. Online, self-paced, CEC Accredited.',
+    'Protect your members and your reputation. CARSI mould remediation, odour control and carpet cleaning training for Australian gyms, pools, and fitness facilities. Online, self-paced, CEC Accredited.',
   keywords: [
     'gym mould training Australia',
     'fitness centre IICRC CEC course',
@@ -119,7 +119,7 @@ export default async function GymsFitnessIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Gyms & Fitness Centres"
-        disciplineList="Mould remediation, odour control and carpet repair"
+        disciplineList="Mould remediation, odour control and carpet cleaning"
         disciplines={['AMRT', 'OCT', 'CRT']}
       />
 

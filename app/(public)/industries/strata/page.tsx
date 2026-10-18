@@ -32,7 +32,7 @@ const ACCENT_COLOR = '#7c3aed';
 
 const disciplines = [
   { code: 'WRT', label: 'Water Damage Restoration', color: '#7c3aed' },
-  { code: 'CRT', label: 'Carpet Repair & Reinstallation', color: '#6d28d9' },
+  { code: 'CRT', label: 'Carpet Cleaning', color: '#6d28d9' },
   { code: 'AMRT', label: 'Applied Microbial Remediation', color: '#5b21b6' },
   { code: 'ASD', label: 'Applied Structural Drying', color: '#4c1d95' },
 ];
@@ -94,7 +94,7 @@ export default async function StrataIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Strata & Body Corporate"
-        disciplineList="Water damage restoration, carpet repair, mould remediation and structural drying"
+        disciplineList="Water damage restoration, carpet cleaning, mould remediation and structural drying"
         disciplines={['WRT', 'CRT', 'AMRT', 'ASD']}
       />
 

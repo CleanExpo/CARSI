@@ -124,12 +124,12 @@ function buildCatalogueFaqs(publishedCourseCount: number) {
   return [
     {
       question: 'What courses does CARSI offer?',
-      answer: `CARSI is an IICRC CEC Accredited provider, and its courses carry CARSI Southern Hemisphere Restoration Designations — CARSI-issued credentials, not IICRC certifications. The catalogue covers water damage restoration, carpet repair, structural drying, mould remediation, fire and smoke restoration, odour control and carpet cleaning, all produced for Australian and New Zealand conditions. ${countPhrase} beginner modules for people just starting, through intermediate refreshers and advanced practice modules for experienced professionals. Courses are delivered online so technicians can study at their own pace. Eligible courses show their CEC value so learners can track continuing education without implying IICRC delivery status.`,
+      answer: `CARSI is an IICRC CEC Accredited provider, and its courses carry CARSI Southern Hemisphere Restoration Designations — CARSI-issued credentials, not IICRC certifications. The catalogue covers water damage restoration, structural drying, mould remediation, fire and smoke restoration, odour control and carpet cleaning, all produced for Australian and New Zealand conditions. ${countPhrase} beginner modules for people just starting, through intermediate refreshers and advanced practice modules for experienced professionals. Courses are delivered online so technicians can study at their own pace. Eligible courses show their CEC value so learners can track continuing education without implying IICRC delivery status.`,
     },
     {
       question: 'How do I choose the right course?',
       answer:
-        'Your choice depends on your current role and career goals. Water damage restoration is the most common starting point. Carpet repair suits flooring and soft-furnishing work. Structural drying builds moisture control for structure. Mould remediation covers assessment and remediation. Fire and smoke restoration addresses post-fire cleanup. Odour control focuses on identifying and neutralising sources. Carpet cleaning targets commercial contract cleaners. Each pathway leads to a CARSI Southern Hemisphere Restoration Designation.',
+        'Your choice depends on your current role and career goals. Water damage restoration is the most common starting point. Structural drying builds moisture control for structure. Mould remediation covers assessment and remediation. Fire and smoke restoration addresses post-fire cleanup. Odour control focuses on identifying and neutralising sources. Carpet cleaning targets commercial contract cleaners. Each pathway leads to a CARSI Southern Hemisphere Restoration Designation.',
     },
     {
       question: 'What are IICRC Continuing Education Credits (CECs)?',

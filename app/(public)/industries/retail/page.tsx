@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Retail & Shopping Centre IICRC CEC Training',
   description:
-    'IICRC CEC training for shopping centre maintenance teams. Pre-qualify for major landlord panels with water damage restoration, carpet repair and odour control credentials.',
+    'IICRC CEC training for shopping centre maintenance teams. Pre-qualify for major landlord panels with water damage restoration, carpet cleaning and odour control training.',
   keywords: [
     'retail IICRC CEC training',
     'shopping centre restoration',
@@ -32,7 +32,7 @@ const ACCENT_COLOR = '#dc2626';
 
 const disciplines = [
   { code: 'WRT', label: 'Water Damage Restoration', color: '#dc2626' },
-  { code: 'CRT', label: 'Carpet Repair & Reinstallation', color: '#b91c1c' },
+  { code: 'CRT', label: 'Carpet Cleaning', color: '#b91c1c' },
   { code: 'OCT', label: 'Odour Control', color: '#991b1b' },
   { code: 'FSRT', label: 'Fire & Smoke Restoration', color: '#7f1d1d' },
 ];
@@ -94,7 +94,7 @@ export default async function RetailIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Retail & Shopping Centres"
-        disciplineList="Water damage restoration, carpet repair, odour control and fire & smoke restoration"
+        disciplineList="Water damage restoration, carpet cleaning, odour control and fire & smoke restoration"
         disciplines={['WRT', 'CRT', 'OCT', 'FSRT']}
       />
 
@@ -104,7 +104,7 @@ export default async function RetailIndustryPage() {
         subtitle="Shopping Centre Training"
         title="Retail Contractor Bundle"
         price={industryBundlePriceLabel('retail')}
-        description="water damage restoration, carpet repair and odour control training for shopping centre maintenance teams. Equip your crew for rapid tenant restoration and food court compliance."
+        description="water damage restoration, carpet cleaning and odour control training for shopping centre maintenance teams. Equip your crew for rapid tenant restoration and food court compliance."
         ctaText="Get Started"
         accentColor={ACCENT_COLOR}
       />

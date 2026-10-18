@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'IICRC CEC Training for NDIS & Disability Services | CARSI Australia',
   description:
-    'Meet NDIS Practice Standards with IICRC mould and water damage CEC courses. Mould remediation, water damage restoration and carpet repair continuing-education training for disability support providers. Online, CEC Accredited — not IICRC certification.',
+    'Meet NDIS Practice Standards with IICRC mould and water damage CEC courses. Mould remediation, water damage restoration and carpet cleaning continuing-education training for disability support providers. Online, CEC Accredited — not IICRC certification.',
   keywords: [
     'NDIS IICRC CEC training',
     'disability services mould training Australia',
@@ -119,7 +119,7 @@ export default async function NDISDisabilityIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="NDIS & Disability Services"
-        disciplineList="Mould remediation, water damage restoration and carpet repair"
+        disciplineList="Mould remediation, water damage restoration and carpet cleaning"
         disciplines={['AMRT', 'WRT', 'CRT']}
       />
 

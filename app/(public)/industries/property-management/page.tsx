@@ -33,7 +33,7 @@ const ACCENT_COLOR = '#673ab7';
 const disciplines = [
   { code: 'AMRT', label: 'Applied Microbial Remediation', color: '#673ab7' },
   { code: 'WRT', label: 'Water Damage Restoration', color: '#512da8' },
-  { code: 'CRT', label: 'Carpet Repair Technology', color: '#4527a0' },
+  { code: 'CRT', label: 'Carpet Cleaning', color: '#4527a0' },
   { code: 'ASD', label: 'Applied Structural Drying', color: '#311b92' },
 ];
 
@@ -94,7 +94,7 @@ export default async function PropertyManagementIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Property Management"
-        disciplineList="Mould remediation, water damage restoration, carpet repair and structural drying"
+        disciplineList="Mould remediation, water damage restoration, carpet cleaning and structural drying"
         disciplines={['AMRT', 'WRT', 'CRT', 'ASD']}
       />
 

@@ -160,6 +160,25 @@ describe('industry FAQ licence sweep', () => {
     ).toEqual([]);
   });
 
+  /**
+   * Same class beyond the FAQ arrays (18/10/2026): nine industry pages offered "carpet repair"
+   * or "carpet repair and reinstallation" training in their metadata, discipline lists, cards and
+   * CTAs, and the /courses FAQ listed carpet repair among the catalogue's subjects.
+   */
+  it.each(
+    readdirSync(INDUSTRIES)
+      .filter((slug) => existsSync(join(INDUSTRIES, slug, 'page.tsx')))
+      .map((slug) => [`industries/${slug}`, join(INDUSTRIES, slug, 'page.tsx')])
+      .concat([
+        ['courses (catalogue FAQ)', join(process.cwd(), 'app', '(public)', 'courses', 'page.tsx')],
+      ])
+  )('unsold: %s offers no training CARSI does not sell', (_name, file) => {
+    const offers = readFileSync(file, 'utf8')
+      .split('\n')
+      .filter((line) => NOT_SOLD.test(line) && !/^\s*(\/\/|\*)/.test(line));
+    expect(offers).toEqual([]);
+  });
+
   it.each(allIndustryFaqs())(
     '%s has no acronym, untied CEC promise or unsold training',
     (_name, faqs) => {

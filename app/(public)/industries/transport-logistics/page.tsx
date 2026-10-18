@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Transport & Logistics IICRC CEC Training',
   description:
-    'IICRC CEC Accredited restoration courses for Australian transport and logistics operations. Water damage restoration, carpet repair and odour control courses for vehicle interiors, warehouses, and loading dock maintenance.',
+    'IICRC CEC Accredited restoration courses for Australian transport and logistics operations. Water damage restoration, vehicle drying and odour control courses for fleets, warehouses and loading dock maintenance.',
   keywords: [
     'transport IICRC CEC training Australia',
     'logistics warehouse restoration',
@@ -34,7 +34,7 @@ const ACCENT_COLOR = '#1565C0';
 
 const disciplines = [
   { code: 'WRT', label: 'Water Damage Restoration', color: '#1565C0' },
-  { code: 'CRT', label: 'Carpet & Upholstery Cleaning', color: '#0D47A1' },
+  { code: 'CRT', label: 'Vehicle Drying', color: '#0D47A1' },
   { code: 'OCT', label: 'Odour Control', color: '#1976D2' },
 ];
 
@@ -86,7 +86,7 @@ const whyCards = [
     icon: Wind,
     title: 'Fleet Interior Maintenance',
     description:
-      'Vehicle interiors across bus, coach, and truck fleets require specialist cleaning. Carpet repair and odour control certifications reduce outsourced costs and extend asset life.',
+      'Bus, coach and truck fleets get wet interiors and lingering odours. Vehicle drying and odour control training helps in-house teams deal with both and extend asset life.',
     color: '#ed9d24',
   },
 ];
@@ -119,7 +119,7 @@ export default async function TransportLogisticsIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Transport & Logistics"
-        disciplineList="Water damage restoration, carpet repair and odour control"
+        disciplineList="Water damage restoration, vehicle drying and odour control"
         disciplines={['WRT', 'CRT', 'OCT']}
       />
 
@@ -129,7 +129,7 @@ export default async function TransportLogisticsIndustryPage() {
         subtitle="Transport & Logistics Training"
         title="Logistics Restoration Bundle"
         price={industryBundlePriceLabel('transport-logistics')}
-        description="water damage restoration, carpet repair and odour control training for transport and warehouse teams. Includes fleet maintenance and warehouse flood response protocols. Online, self-paced — fits around shift schedules."
+        description="water damage restoration, vehicle drying and odour control training for transport and warehouse teams. Includes fleet maintenance and warehouse flood response protocols. Online, self-paced — fits around shift schedules."
         ctaText="Train Your Operations Team"
         accentColor={ACCENT_COLOR}
       />

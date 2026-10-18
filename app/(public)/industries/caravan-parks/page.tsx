@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'IICRC CEC Mould & Restoration Training for Caravan Parks | CARSI Australia',
   description:
-    'Protect guests and comply with state Fair Trading obligations. CARSI mould remediation, carpet repair and reinstallation and water damage restoration training for Australian caravan parks and holiday accommodation. Online, CEC Accredited.',
+    'Protect guests and comply with state Fair Trading obligations. CARSI mould remediation, carpet cleaning and water damage restoration training for Australian caravan parks and holiday accommodation. Online, CEC Accredited.',
   keywords: [
     'caravan park mould training Australia',
     'holiday park IICRC CEC course',
@@ -105,7 +105,7 @@ export default async function CaravanParksIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Protect Guest Accommodation"
         headlineAccent="All Season Long"
-        description="Australia's 2,800+ caravan parks face persistent mould, moisture, and storm damage risk. CARSI mould remediation, carpet repair and reinstallation and water damage restoration CEC courses give park maintenance teams the protocols to inspect, remediate, and document — protecting guests, reputation, and revenue. CARSI courses carry CARSI Southern Hemisphere Restoration Designations, not IICRC certification."
+        description="Australia's 2,800+ caravan parks face persistent mould, moisture, and storm damage risk. CARSI mould remediation, carpet cleaning and water damage restoration courses give park maintenance teams the protocols to inspect, remediate, and document — protecting guests, reputation, and revenue. CARSI courses carry CARSI Southern Hemisphere Restoration Designations, not IICRC certification."
         disciplines={disciplines}
         stats={stats}
       />
@@ -119,7 +119,7 @@ export default async function CaravanParksIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Caravan Parks & Holiday Accommodation"
-        disciplineList="Mould remediation, carpet repair and water damage restoration"
+        disciplineList="Mould remediation, carpet cleaning and water damage restoration"
         disciplines={['AMRT', 'CRT', 'WRT']}
       />
 
@@ -129,7 +129,7 @@ export default async function CaravanParksIndustryPage() {
         subtitle="Holiday Park Training"
         title="Holiday Park Bundle"
         price={industryBundlePriceLabel('caravan-parks')}
-        description="mould remediation, carpet repair and water damage restoration training for caravan park and holiday accommodation maintenance staff. Seasonal inspection protocols included. Online, self-paced."
+        description="mould remediation, carpet cleaning and water damage restoration training for caravan park and holiday accommodation maintenance staff. Seasonal inspection protocols included. Online, self-paced."
         ctaText="Train Your Park Team"
         accentColor={ACCENT_COLOR}
       />

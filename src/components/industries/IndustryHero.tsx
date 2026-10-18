@@ -81,7 +81,8 @@ export function IndustryHero({
                 key={d.label}
                 className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-medium text-slate-600"
               >
-                {d.code ? `${d.code} · ${d.label}` : d.label}
+                {/* Subject only: an IICRC discipline acronym never names what CARSI teaches. */}
+                {d.label}
               </span>
             ))}
           </div>

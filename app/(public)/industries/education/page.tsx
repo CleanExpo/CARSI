@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Education Sector IICRC CEC Training',
   description:
-    'IICRC CEC training for school and university maintenance teams. Water damage restoration, carpet repair, mould remediation and structural drying training for Australian education facilities.',
+    'IICRC CEC training for school and university maintenance teams. Water damage restoration, carpet cleaning, mould remediation and structural drying training for Australian education facilities.',
   keywords: [
     'education IICRC CEC training',
     'school restoration certification',
@@ -33,7 +33,7 @@ const ACCENT_COLOR = '#2196f3';
 const disciplines = [
   { code: 'AMRT', label: 'Applied Microbial Remediation', color: '#2196f3' },
   { code: 'WRT', label: 'Water Damage Restoration', color: '#1976d2' },
-  { code: 'CRT', label: 'Carpet Repair & Reinstallation', color: '#1565c0' },
+  { code: 'CRT', label: 'Carpet Cleaning', color: '#1565c0' },
   { code: 'ASD', label: 'Applied Structural Drying', color: '#0d47a1' },
 ];
 
@@ -94,7 +94,7 @@ export default async function EducationIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Education"
-        disciplineList="Mould remediation, water damage restoration, carpet repair and structural drying"
+        disciplineList="Mould remediation, water damage restoration, carpet cleaning and structural drying"
         disciplines={['AMRT', 'WRT', 'CRT', 'ASD']}
       />
 
