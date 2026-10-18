@@ -140,7 +140,19 @@ test.describe('membership checkout events (membership switched on)', () => {
         await expect(page.locator(`input[name="${name}"]`)).toHaveValue(value, { timeout: 500 });
       }
     }).toPass({ timeout: 15_000 });
+    const registered = page.waitForResponse(
+      (r) => r.url().endsWith('/api/auth/register') && r.request().method() === 'POST'
+    );
     await page.getByRole('button', { name: 'Create account' }).click();
+    // /api/auth/register allows 10 attempts per IP per 15 minutes. Repeated local runs can hit
+    // that throttle; name it plainly instead of failing later on a URL wait.
+    const registerStatus = (await registered).status();
+    expect(
+      registerStatus,
+      registerStatus === 429
+        ? 'registration throttled (10 per IP per 15 min) by repeated runs: environment, not a funnel defect'
+        : 'guest registration'
+    ).toBe(200);
 
     await expect(page).toHaveURL(STRIPE_URL, { timeout: 20_000 });
     expect(statuses).toEqual([401, 200]);
