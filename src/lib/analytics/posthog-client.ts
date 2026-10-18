@@ -73,13 +73,11 @@ export function trackCheckoutStarted(payload: CheckoutStartedPayload): void {
 export function trackMembershipView(payload: MembershipViewPayload): void {
   capture('membership_view', {
     checkout_enabled: payload.checkout_enabled,
-    membership_status: payload.membership_status,
   });
 }
 
 export function trackMembershipCheckoutStarted(payload: MembershipCheckoutStartedPayload): void {
   capture('membership_checkout_started', {
-    is_renewal: payload.is_renewal,
     ...(typeof payload.value_aud === 'number' ? { value: payload.value_aud, currency: 'AUD' } : {}),
   });
 }

@@ -21,46 +21,56 @@ declare global {
 }
 
 /**
- * Events fired before GA4 has bootstrapped. `GoogleAnalytics.tsx` loads `/ga-init.js`
- * afterInteractive, so an event fired on mount (membership_view, course_view) can arrive before
- * `window.gtag` exists; it used to be dropped. It now waits here and is delivered exactly once
- * when gtag appears, through gtag itself, so whatever GA4 is configured to honour (consent mode,
- * opt-out) still applies. If gtag never arrives (no measurement id, blocked, opted out) the queue
- * is dropped after the wait: nothing is sent by any other route.
+ * Events wait here until GA4 has a configured destination. `GoogleAnalytics.tsx` loads
+ * `/ga-init.js` afterInteractive and issues `gtag('config', id)` only after its own readiness
+ * poll, while an event fired on mount (membership_view, course_view) can arrive first. Under
+ * Google's routing rule an event sent before any `config` has no default destination
+ * (https://developers.google.com/tag-platform/gtagjs/routing), so the event used to be lost.
+ *
+ * Now nothing is sent until `markGa4Configured()` is called straight after the config command;
+ * then every queued event goes out once, in order, through gtag itself, so whatever GA4 is
+ * configured to honour (consent mode, opt-out) still applies. If GA4 never configures (no
+ * measurement id, script blocked) the queue is dropped after the wait: nothing is sent another way.
  */
-export const GA4_QUEUE_POLL_MS = 250;
-export const GA4_QUEUE_MAX_POLLS = 40; // ~10 s, longer than GoogleAnalytics' own 5 s readiness wait
+export const GA4_QUEUE_WAIT_MS = 10_000; // longer than GoogleAnalytics' own 5 s readiness wait
 const GA4_QUEUE_CAP = 20;
 
+let configured = false;
 let pending: Array<[string, Record<string, unknown>]> = [];
-let flushTimer: ReturnType<typeof setInterval> | null = null;
+let dropTimer: ReturnType<typeof setTimeout> | null = null;
 
-function flushPending(): boolean {
-  if (typeof window.gtag !== 'function') return false;
+function canSend(): boolean {
+  return configured && typeof window.gtag === 'function';
+}
+
+function flushPending(): void {
+  if (!canSend()) return;
+  if (dropTimer) clearTimeout(dropTimer);
+  dropTimer = null;
   const batch = pending;
   pending = [];
-  for (const [name, params] of batch) window.gtag('event', name, params);
-  return true;
+  for (const [name, params] of batch) window.gtag!('event', name, params);
+}
+
+/** Called by GoogleAnalytics.tsx immediately after it sends `gtag('config', measurementId)`. */
+export function markGa4Configured(): void {
+  configured = true;
+  flushPending();
 }
 
 function sendGa4Event(name: string, params: Record<string, unknown>): void {
   if (typeof window === 'undefined') return;
-  if (typeof window.gtag === 'function' && pending.length === 0) {
-    window.gtag('event', name, params);
+  if (canSend() && pending.length === 0) {
+    window.gtag!('event', name, params);
     return;
   }
   if (pending.length < GA4_QUEUE_CAP) pending.push([name, params]);
-  if (flushPending() || flushTimer) return;
-  let polls = 0;
-  flushTimer = setInterval(() => {
-    polls += 1;
-    const delivered = flushPending();
-    if (delivered || polls >= GA4_QUEUE_MAX_POLLS) {
-      if (!delivered) pending = [];
-      if (flushTimer) clearInterval(flushTimer);
-      flushTimer = null;
-    }
-  }, GA4_QUEUE_POLL_MS);
+  flushPending();
+  if (pending.length === 0 || dropTimer) return;
+  dropTimer = setTimeout(() => {
+    pending = [];
+    dropTimer = null;
+  }, GA4_QUEUE_WAIT_MS);
 }
 
 export function trackCourseView(payload: CourseViewPayload): void {
@@ -89,13 +99,11 @@ export function trackCheckoutStarted(payload: CheckoutStartedPayload): void {
 export function trackMembershipView(payload: MembershipViewPayload): void {
   sendGa4Event('membership_view', {
     checkout_enabled: payload.checkout_enabled,
-    membership_status: payload.membership_status,
   });
 }
 
 export function trackMembershipCheckoutStarted(payload: MembershipCheckoutStartedPayload): void {
   sendGa4Event('membership_checkout_started', {
-    is_renewal: payload.is_renewal,
     ...(typeof payload.value_aud === 'number' ? { value: payload.value_aud, currency: 'AUD' } : {}),
   });
 }

@@ -52,7 +52,7 @@ export function SubscribeCta({
     setError(null);
     try {
       // The shared boundary fires membership_checkout_started once, on a real Stripe URL.
-      const url = await createMembershipCheckout({ isRenewal: reason === 'lapsed' });
+      const url = await createMembershipCheckout();
       if (url) {
         window.location.href = url;
         return;

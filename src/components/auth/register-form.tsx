@@ -83,7 +83,7 @@ export function RegisterForm() {
         try {
           // Same boundary as the /subscribe CTA, so the guest's resumed checkout is the one
           // that fires membership_checkout_started (their first click got a 401 and fired none).
-          const checkoutUrl = await createMembershipCheckout({ isRenewal: false });
+          const checkoutUrl = await createMembershipCheckout();
           if (checkoutUrl) {
             toast({ title: 'Redirecting to checkout…' });
             window.setTimeout(() => {

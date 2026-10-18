@@ -93,7 +93,7 @@ export default async function SubscribePage() {
 
   return (
     <>
-      <MembershipViewTracker checkoutEnabled={enabled} status={status ?? 'none'} />
+      <MembershipViewTracker checkoutEnabled={enabled} />
       <MembershipHexHero price={PLAN.price} />
       <div
         id="membership-plan"

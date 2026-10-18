@@ -35,18 +35,18 @@ export interface CheckoutStartedPayload {
   value_aud?: number;
 }
 
-/** The learner's membership state as /subscribe resolved it ('none' = signed out or no plan). */
-export type MembershipFunnelStatus = 'active' | 'grace' | 'lapsed' | 'none' | 'unknown';
-
+/*
+ * The membership payloads deliberately carry NO account state: no membership status, no
+ * renewal flag, nothing that says a person is active, lapsed or in a payment grace period.
+ * These events go to third parties (GA4, PostHog) without a consent layer, and "grace" would
+ * disclose payment trouble. A failed entitlement read therefore cannot be mislabelled either.
+ */
 export interface MembershipViewPayload {
-  /** False while the membership is still "coming soon" (feature flag off). */
+  /** False while the membership is still "coming soon" (feature flag off). Site state, not account state. */
   checkout_enabled: boolean;
-  membership_status: MembershipFunnelStatus;
 }
 
 export interface MembershipCheckoutStartedPayload {
-  /** True when a lapsed member is renewing rather than joining. */
-  is_renewal: boolean;
   value_aud?: number;
 }
 

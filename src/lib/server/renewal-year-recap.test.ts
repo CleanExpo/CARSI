@@ -132,7 +132,7 @@ vi.mock('@/lib/server/team-subscription-store', () => ({
   resolveTeamIdForStripeSubscription: vi.fn(async () => null),
 }));
 
-import { sendUpcomingRenewalReminder, YEAR_RECAP_TIMEOUT_MS } from './renewal-reminder';
+import { sendUpcomingRenewalReminder } from './renewal-reminder';
 
 function invoiceFor(billingEmail: string) {
   return {
@@ -243,10 +243,18 @@ describe('renewal reminder — your year with CARSI', () => {
       subscription,
       kind: 'individual',
     });
-    await vi.advanceTimersByTimeAsync(YEAR_RECAP_TIMEOUT_MS + 50);
+    // Review r2 P1-V7-DEADLINE-TEST-ESCAPES: an independent bound, not the production constant.
+    // The reminder must be out within 3 seconds of a stalled recap read, whatever the constant says.
+    const REQUIRED_MAX_DELAY_MS = 3_050;
+    let settled = false;
+    void pending.then(() => {
+      settled = true;
+    });
+    await vi.advanceTimersByTimeAsync(REQUIRED_MAX_DELAY_MS);
+    expect(settled, 'reminder still pending 3,050 ms after a stalled recap read').toBe(true);
+    expect(h.sendEmail).toHaveBeenCalledTimes(1);
     const outcome = await pending;
     expect(outcome.sent).toBe(true);
-    expect(h.sendEmail).toHaveBeenCalledTimes(1);
     const { text } = h.sendEmail.mock.calls[0][0];
     expect(text).toContain('renews automatically');
     expect(text).not.toContain('Your year with CARSI');

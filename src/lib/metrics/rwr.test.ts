@@ -231,6 +231,36 @@ describe('collectRwrInputs — Stripe shaping', () => {
     await refuses([sub('sub_o_test', 'org_monthly', [], { livemode: false })]);
     await refuses([], [session('cs_test', 2_900, { livemode: false })]);
   });
+
+  // Review r2 P1-RWR-SUB-CURRENCY-TEST-ESCAPES: only the subscription-level check can refuse this.
+  it('refuses a USD subscription even when its item price is AUD', async () => {
+    await refuses([sub('sub_m_mixed', 'pro_annual', [MEMBERSHIP_ITEM], { currency: 'usd' })]);
+    await refuses([sub('sub_t_mixed', 'growth', [{ unit: 30_000, qty: 5 }], { currency: 'usd' })]);
+  });
+
+  // Review r2 P1-RWR-INDIVIDUAL-ITEM-SHAPE
+  it('counts a membership only as one AUD yearly item, quantity 1, at the membership price', async () => {
+    await refuses([
+      sub('sub_m_monthly', 'pro_annual', [{ ...MEMBERSHIP_ITEM, interval: 'month' }]),
+    ]);
+    await refuses([sub('sub_m_qty2', 'pro_annual', [{ ...MEMBERSHIP_ITEM, qty: 2 }])]);
+    await refuses([sub('sub_m_price', 'pro_annual', [{ ...MEMBERSHIP_ITEM, unit: 49_500 }])]);
+    await refuses([sub('sub_m_two', 'pro_annual', [MEMBERSHIP_ITEM, MEMBERSHIP_ITEM])]);
+    const ok = await collectRwrInputs(fakeStripe([sub('sub_m_ok', 'pro_annual')], []).reader, NOW);
+    expect(ok.inputs.memberships).toBe(1);
+  });
+
+  // Review r2 P1-RWR-UNKNOWN-ACTIVE-PLAN
+  it('refuses an active subscription whose plan it cannot classify', async () => {
+    await refuses([sub('sub_mystery', 'mystery_plan', [{ unit: 10_000, qty: 1 }])]);
+    // Known out-of-formula plans are still counted as excluded, not refused.
+    const got = await collectRwrInputs(
+      fakeStripe([sub('sub_o', 'org_monthly', [{ unit: 99_900, qty: 1, interval: 'month' }])], [])
+        .reader,
+      NOW
+    );
+    expect(got.excludedSubscriptions).toBe(1);
+  });
 });
 
 // ---------------------------------------------------------------- the report
@@ -283,12 +313,33 @@ describe('runRwrReport — fails closed', () => {
   // Review r1 P1-RWR-TEST-MODE-LOOKS-LIVE (key level)
   it('with a test-mode key: exits 2 before reading Stripe and prints no figure', async () => {
     const { reader } = fakeStripe([sub('sub_m1', 'pro_annual')], [session('cs_1', 4_000)]);
-    for (const key of ['sk_test_fixture', 'rk_test_fixture']) {
+    for (const key of ['sk_test_FAKE_FIXTURE_000', 'rk_test_FAKE_FIXTURE_000']) {
       const r = await report({ STRIPE_SECRET_KEY: key }, reader);
       expect(r.code).toBe(2);
       expect(r.all).toContain('test-mode key');
       expect(r.all).not.toMatch(DOLLAR_FIGURE);
     }
+  });
+
+  it('with an unclassifiable active subscription and no sales: exits 2, never $0.00', async () => {
+    const { reader } = fakeStripe(
+      [sub('sub_mystery', 'mystery_plan', [{ unit: 10_000, qty: 1 }])],
+      []
+    );
+    const r = await report({ STRIPE_SECRET_KEY: FIXTURE_KEY }, reader);
+    expect(r.code).toBe(2);
+    expect(r.all).toContain('unrecognised plan');
+    expect(r.all).not.toMatch(DOLLAR_FIGURE);
+  });
+
+  it('with a monthly-billed membership item: exits 2 and prints no figure', async () => {
+    const { reader } = fakeStripe(
+      [sub('sub_m_monthly', 'pro_annual', [{ ...MEMBERSHIP_ITEM, interval: 'month' }])],
+      []
+    );
+    const r = await report({ STRIPE_SECRET_KEY: FIXTURE_KEY }, reader);
+    expect(r.code).toBe(2);
+    expect(r.all).not.toMatch(DOLLAR_FIGURE);
   });
 
   it('with test-mode objects behind any key: exits 2 and prints no figure', async () => {

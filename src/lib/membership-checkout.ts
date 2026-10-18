@@ -15,21 +15,18 @@ export const MEMBERSHIP_PRICE_AUD = 795;
  * Stripe Checkout URL. A refused call (401 for a guest, 503 while the flag is off) throws to the
  * caller and fires nothing, so a guest's first click does not count; their resumed checkout does.
  *
+ * The event carries the price only, never whether this buyer is new or renewing: renewal state
+ * is account state and stays out of third-party analytics (see funnel-events.ts).
+ *
  * Returns the Stripe URL, or null when the server answered without one. The caller navigates.
  */
-export async function createMembershipCheckout(opts: {
-  isRenewal: boolean;
-}): Promise<string | null> {
+export async function createMembershipCheckout(): Promise<string | null> {
   const data = await apiClient.post<{ url?: string; checkout_url?: string }>(
     '/api/lms/subscription/checkout',
     {}
   );
   const url = data.url ?? data.checkout_url;
   if (!url) return null;
-  trackFunnelEvent({
-    name: 'membership_checkout_started',
-    is_renewal: opts.isRenewal,
-    value_aud: MEMBERSHIP_PRICE_AUD,
-  });
+  trackFunnelEvent({ name: 'membership_checkout_started', value_aud: MEMBERSHIP_PRICE_AUD });
   return url;
 }

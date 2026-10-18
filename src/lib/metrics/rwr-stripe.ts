@@ -6,6 +6,9 @@
  *  - pagination that does not finish within the page cap (a partial total would understate
  *    revenue and read as a downturn);
  *  - test-mode data (any subscription or checkout session with livemode !== true);
+ *  - an active subscription with an unrecognised plan (org and coaching are the only known
+ *    plans left out of the formula; anything else might be uncounted revenue);
+ *  - a membership that is not one AUD yearly item, quantity 1, at the membership price;
  *  - a counted subscription (membership or Teams) that is not AUD, has an unreadable price, an
  *    interval this module cannot annualise, or an item list with more pages (subscription items
  *    paginate separately from the subscription list);
@@ -18,6 +21,7 @@ import { subscriptionKind } from '@/lib/server/subscription-webhook';
 import {
   annualiseUnitAmount,
   COURSE_SALES_WINDOW_DAYS,
+  RWR_MEMBERSHIP_ANNUAL_CENTS,
   type RwrInputs,
   type SeatLine,
 } from './rwr';
@@ -111,6 +115,30 @@ function readSubscriptionItems(sub: Stripe.Subscription, what: string): SeatLine
   });
 }
 
+/**
+ * A membership is counted at the fixed GOAL.md term, so Stripe must show exactly that product:
+ * one AUD item, quantity 1, billed yearly (interval_count 1) at the membership price. A monthly
+ * item, extra seats, extra items or another price is a configuration the formula does not
+ * describe, so the report refuses rather than counting it as a $795 year.
+ */
+function requireYearlyMembershipItem(sub: Stripe.Subscription): void {
+  readSubscriptionItems(sub, 'membership subscription'); // currency, readability, pagination
+  const items = sub.items.data;
+  const item = items[0];
+  const recurring = item?.price?.recurring;
+  const isYearlyMembership =
+    items.length === 1 &&
+    item.quantity === 1 &&
+    recurring?.interval === 'year' &&
+    (recurring.interval_count ?? 1) === 1 &&
+    item.price.unit_amount === RWR_MEMBERSHIP_ANNUAL_CENTS;
+  if (!isYearlyMembership) {
+    throw new RwrUnreadableError(
+      `membership subscription ${sub.id} is not a single yearly item at the GOAL.md membership price`
+    );
+  }
+}
+
 export type RwrCollection = {
   inputs: RwrInputs;
   /** Active subscriptions the GOAL.md formula does not count (org, coaching, unknown plans). */
@@ -136,12 +164,18 @@ export async function collectRwrInputs(
     if (sub.status !== 'active') continue;
     const kind = subscriptionKind(sub);
     if (kind === 'individual') {
-      // Counted at the GOAL.md $795, but only once its own prices prove to be readable AUD.
-      readSubscriptionItems(sub, 'membership subscription');
+      // Counted at the GOAL.md $795, but only once Stripe proves it is that product.
+      requireYearlyMembershipItem(sub);
       memberships += 1;
     } else if (kind === 'team') {
       seatLines.push(...readSubscriptionItems(sub, 'Teams subscription'));
-    } else excludedSubscriptions += 1;
+    } else if (kind === 'org' || kind === 'coaching') {
+      // Known plans the GOAL.md formula deliberately leaves out; reported as a count.
+      excludedSubscriptions += 1;
+    } else {
+      // An active subscription nobody can classify might be revenue the formula should count.
+      throw new RwrUnreadableError(`active subscription ${sub.id} has an unrecognised plan`);
+    }
   }
 
   const since = Math.floor(now.getTime() / 1000) - COURSE_SALES_WINDOW_DAYS * 86_400;

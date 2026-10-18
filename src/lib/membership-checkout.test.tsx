@@ -26,6 +26,7 @@ vi.mock('@/lib/api/client', async (orig) => ({
 }));
 
 import { RegisterForm } from '@/components/auth/register-form';
+import { markGa4Configured } from '@/lib/analytics/ga4-client';
 import { ApiClientError } from '@/lib/api/client';
 
 import { SubscribeCta } from '../../app/(public)/subscribe/SubscribeCta';
@@ -46,6 +47,8 @@ beforeEach(() => {
   mocks.post.mockReset();
   mocks.register.mockClear();
   gtagCalls = [];
+  // GA4 is configured on the page (GoogleAnalytics.tsx does this after its config command).
+  markGa4Configured();
   (window as unknown as { gtag: (...a: unknown[]) => void }).gtag = (...a: unknown[]) => {
     gtagCalls.push(a);
   };
@@ -105,15 +108,28 @@ describe('membership_checkout_started — the shared checkout boundary', () => {
     mocks.post.mockResolvedValue({ url: STRIPE_URL });
     await clickStart();
     expect(checkoutEvents()).toHaveLength(1);
-    expect(checkoutEvents()[0][2]).toEqual({ is_renewal: false, value: 795, currency: 'AUD' });
+    expect(checkoutEvents()[0][2]).toEqual({ value: 795, currency: 'AUD' });
     expect(nav.href).toBe(STRIPE_URL);
   });
 
-  it('a lapsed member renewing: fires once, marked as a renewal', async () => {
+  // Review r2 P1-V6-ANALYTICS-STATUS: account state never reaches third-party analytics.
+  it('a lapsed member renewing: fires once with the price only, no account state', async () => {
     mocks.post.mockResolvedValue({ url: STRIPE_URL });
     await clickStart('lapsed');
     expect(checkoutEvents()).toHaveLength(1);
-    expect(checkoutEvents()[0][2]).toMatchObject({ is_renewal: true });
+    expect(checkoutEvents()[0][2]).toEqual({ value: 795, currency: 'AUD' });
+  });
+
+  it('membership_view carries site state only, whatever the visitor’s membership', async () => {
+    const { MembershipViewTracker } = await import('@/components/analytics/MembershipViewTracker');
+    act(() => root.render(createElement(MembershipViewTracker, { checkoutEnabled: true })));
+    const views = gtagCalls.filter((c) => c[0] === 'event' && c[1] === 'membership_view');
+    expect(views).toHaveLength(1);
+    expect(views[0][2]).toEqual({ checkout_enabled: true });
+    const sent = JSON.stringify(gtagCalls);
+    for (const leaked of ['membership_status', 'is_renewal', 'grace', 'lapsed', 'active']) {
+      expect(sent).not.toContain(leaked);
+    }
   });
 
   it('a refused or empty checkout fires nothing', async () => {
@@ -141,7 +157,7 @@ describe('membership_checkout_started — the shared checkout boundary', () => {
     expect(mocks.post).toHaveBeenLastCalledWith('/api/lms/subscription/checkout', {});
     expect(nav.href).toBe(STRIPE_URL);
     expect(checkoutEvents()).toHaveLength(1);
-    expect(checkoutEvents()[0][2]).toEqual({ is_renewal: false, value: 795, currency: 'AUD' });
+    expect(checkoutEvents()[0][2]).toEqual({ value: 795, currency: 'AUD' });
   });
 
   it('a guest whose resumed checkout fails fires nothing and lands on /subscribe', async () => {
