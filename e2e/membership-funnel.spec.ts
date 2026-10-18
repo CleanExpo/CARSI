@@ -32,44 +32,119 @@ async function recordGtagEvents(page: Page): Promise<RecordedEvent[]> {
 
 const names = (events: RecordedEvent[]) => events.map((e) => e.name);
 
+const count = (events: RecordedEvent[], name: string) =>
+  events.filter((e) => e.name === name).length;
+
+const STRIPE_URL = 'https://checkout.stripe.com/c/pay/e2e-membership';
+
+async function stubStripe(page: Page) {
+  await page.route('https://checkout.stripe.com/**', (route) =>
+    route.fulfill({ contentType: 'text/html', body: '<title>stripe stub</title>' })
+  );
+}
+
 test.describe('membership funnel events', () => {
-  test('membership_view is dispatched when /subscribe loads', async ({ page }) => {
+  test('membership_view is dispatched once when /subscribe loads', async ({ page }) => {
     const events = await recordGtagEvents(page);
     await page.goto('/subscribe');
     await expect.poll(() => names(events)).toContain('membership_view');
     const view = events.find((e) => e.name === 'membership_view');
     expect(view?.params).toMatchObject({ membership_status: 'none' });
     expect(typeof view?.params.checkout_enabled).toBe('boolean');
+    await page.waitForTimeout(500);
+    expect(count(events, 'membership_view')).toBe(1);
     expect(names(events)).not.toContain('membership_checkout_started');
   });
+});
 
-  test('membership_checkout_started is dispatched when the CTA starts checkout', async ({
+/**
+ * The checkout journeys need the membership switched on (SUBSCRIPTIONS_ENABLED) on the server
+ * under test, which the shared CI E2E job does not set. They are opted in with
+ * E2E_MEMBERSHIP_CHECKOUT=1, and when opted in a missing "Start membership" button is a FAILURE,
+ * never a skip. CI coverage of the same events comes from the flag-independent component tests in
+ * src/lib/membership-checkout.test.tsx.
+ */
+test.describe('membership checkout events (membership switched on)', () => {
+  test.skip(
+    process.env.E2E_MEMBERSHIP_CHECKOUT !== '1',
+    'set E2E_MEMBERSHIP_CHECKOUT=1 against a server with SUBSCRIPTIONS_ENABLED=true'
+  );
+
+  test('a signed-in style CTA checkout dispatches membership_checkout_started once', async ({
     page,
   }) => {
     const events = await recordGtagEvents(page);
-    const stripeUrl = 'https://checkout.stripe.com/c/pay/e2e-membership';
     let checkoutCalls = 0;
     await page.route('**/api/lms/subscription/checkout', async (route) => {
       checkoutCalls += 1;
-      await route.fulfill({ json: { url: stripeUrl } });
+      await route.fulfill({ json: { url: STRIPE_URL } });
     });
-    await page.route('https://checkout.stripe.com/**', (route) =>
-      route.fulfill({ contentType: 'text/html', body: '<title>stripe stub</title>' })
-    );
+    await stubStripe(page);
 
     await page.goto('/subscribe');
     const cta = page.getByRole('button', { name: /Start membership/ });
-    test.skip(
-      (await cta.count()) === 0,
-      'SUBSCRIPTIONS_ENABLED is off: the CTA is "Coming soon" and no checkout can start'
-    );
-
+    await expect(cta).toBeVisible();
     await expect.poll(() => names(events)).toContain('membership_view');
     expect(names(events)).not.toContain('membership_checkout_started');
 
     await cta.click();
-    await expect(page).toHaveURL(stripeUrl);
+    await expect(page).toHaveURL(STRIPE_URL);
     expect(checkoutCalls).toBe(1);
+    expect(count(events, 'membership_checkout_started')).toBe(1);
+    const started = events.find((e) => e.name === 'membership_checkout_started');
+    expect(started?.params).toMatchObject({ is_renewal: false, value: 795, currency: 'AUD' });
+  });
+
+  // Review r1 P1-V6-GUEST-CHECKOUT-UNTRACKED: the real guest path, through /register.
+  test('a guest who registers in-flow dispatches membership_checkout_started once', async ({
+    page,
+  }) => {
+    const events = await recordGtagEvents(page);
+    const statuses: number[] = [];
+    await page.route('**/api/lms/subscription/checkout', async (route) => {
+      if (statuses.length === 0) {
+        // The guest's first click reaches the real server: no session, so 401.
+        const res = await route.fetch();
+        statuses.push(res.status());
+        await route.fulfill({ response: res });
+        return;
+      }
+      // After registering, the new session's checkout is answered locally (no Stripe call).
+      statuses.push(200);
+      await route.fulfill({ json: { url: STRIPE_URL } });
+    });
+    await stubStripe(page);
+
+    await page.goto('/subscribe');
+    const cta = page.getByRole('button', { name: /Start membership/ });
+    await expect(cta).toBeVisible();
+    await cta.click();
+    await expect(page).toHaveURL(/\/register\?next=%2Fsubscribe$/);
+    expect(statuses).toEqual([401]);
+    expect(count(events, 'membership_checkout_started')).toBe(0);
+
+    const email = `e2e-guest-${Date.now()}@example.com`;
+    const fields: Array<[string, string]> = [
+      ['fullName', 'E2E Guest Buyer'],
+      ['email', email],
+      ['password', 'correct-horse-9'],
+      ['confirmPassword', 'correct-horse-9'],
+    ];
+    // Hydration can reset values typed into the server-rendered form; refill until they stick.
+    await expect(async () => {
+      for (const [name, value] of fields) {
+        await page.locator(`input[name="${name}"]`).fill(value);
+      }
+      await page.waitForTimeout(200);
+      for (const [name, value] of fields) {
+        await expect(page.locator(`input[name="${name}"]`)).toHaveValue(value, { timeout: 500 });
+      }
+    }).toPass({ timeout: 15_000 });
+    await page.getByRole('button', { name: 'Create account' }).click();
+
+    await expect(page).toHaveURL(STRIPE_URL, { timeout: 20_000 });
+    expect(statuses).toEqual([401, 200]);
+    expect(count(events, 'membership_checkout_started')).toBe(1);
     const started = events.find((e) => e.name === 'membership_checkout_started');
     expect(started?.params).toMatchObject({ is_renewal: false, value: 795, currency: 'AUD' });
   });

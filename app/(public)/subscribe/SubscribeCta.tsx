@@ -3,17 +3,10 @@
 import Link from 'next/link';
 import { useState } from 'react';
 
-import { trackFunnelEvent } from '@/lib/analytics/track-funnel-event';
 import { apiClient, ApiClientError } from '@/lib/api/client';
+import { createMembershipCheckout, MEMBERSHIP_PRICE_AUD } from '@/lib/membership-checkout';
 import { membershipSignupPath } from '@/lib/membership-signup-path';
 import type { MembershipDecisionReason } from '@/lib/server/entitlements';
-
-const MEMBERSHIP_PRICE_AUD = 795;
-
-interface CheckoutResponse {
-  url?: string;
-  checkout_url?: string;
-}
 
 /**
  * Membership CTA. When the feature flag is off it renders the exact WS0
@@ -58,17 +51,9 @@ export function SubscribeCta({
     setLoading(true);
     setError(null);
     try {
-      const data = await apiClient.post<CheckoutResponse>(
-        '/api/lms/subscription/checkout',
-        {}
-      );
-      const url = data.url ?? data.checkout_url;
+      // The shared boundary fires membership_checkout_started once, on a real Stripe URL.
+      const url = await createMembershipCheckout({ isRenewal: reason === 'lapsed' });
       if (url) {
-        trackFunnelEvent({
-          name: 'membership_checkout_started',
-          is_renewal: reason === 'lapsed',
-          value_aud: MEMBERSHIP_PRICE_AUD,
-        });
         window.location.href = url;
         return;
       }

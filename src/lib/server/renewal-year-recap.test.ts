@@ -269,8 +269,10 @@ describe('renewal reminder — your year with CARSI', () => {
       {
         lessonId: `l-${APPROVED_A}`,
         completed: true,
-        completedAt: daysAgo(400),
-        lastAccessedAt: daysAgo(2), // revisited this week
+        // A legacy row with no lesson completion time: the old summary fell back to the last
+        // access, which a revisit this week moves into the year.
+        completedAt: null,
+        lastAccessedAt: daysAgo(2),
       },
     ];
     const { text } = await sentEmail([

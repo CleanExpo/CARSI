@@ -20,10 +20,47 @@ declare global {
   }
 }
 
+/**
+ * Events fired before GA4 has bootstrapped. `GoogleAnalytics.tsx` loads `/ga-init.js`
+ * afterInteractive, so an event fired on mount (membership_view, course_view) can arrive before
+ * `window.gtag` exists; it used to be dropped. It now waits here and is delivered exactly once
+ * when gtag appears, through gtag itself, so whatever GA4 is configured to honour (consent mode,
+ * opt-out) still applies. If gtag never arrives (no measurement id, blocked, opted out) the queue
+ * is dropped after the wait: nothing is sent by any other route.
+ */
+export const GA4_QUEUE_POLL_MS = 250;
+export const GA4_QUEUE_MAX_POLLS = 40; // ~10 s, longer than GoogleAnalytics' own 5 s readiness wait
+const GA4_QUEUE_CAP = 20;
+
+let pending: Array<[string, Record<string, unknown>]> = [];
+let flushTimer: ReturnType<typeof setInterval> | null = null;
+
+function flushPending(): boolean {
+  if (typeof window.gtag !== 'function') return false;
+  const batch = pending;
+  pending = [];
+  for (const [name, params] of batch) window.gtag('event', name, params);
+  return true;
+}
+
 function sendGa4Event(name: string, params: Record<string, unknown>): void {
   if (typeof window === 'undefined') return;
-  if (typeof window.gtag !== 'function') return;
-  window.gtag('event', name, params);
+  if (typeof window.gtag === 'function' && pending.length === 0) {
+    window.gtag('event', name, params);
+    return;
+  }
+  if (pending.length < GA4_QUEUE_CAP) pending.push([name, params]);
+  if (flushPending() || flushTimer) return;
+  let polls = 0;
+  flushTimer = setInterval(() => {
+    polls += 1;
+    const delivered = flushPending();
+    if (delivered || polls >= GA4_QUEUE_MAX_POLLS) {
+      if (!delivered) pending = [];
+      if (flushTimer) clearInterval(flushTimer);
+      flushTimer = null;
+    }
+  }, GA4_QUEUE_POLL_MS);
 }
 
 export function trackCourseView(payload: CourseViewPayload): void {

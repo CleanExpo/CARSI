@@ -7,7 +7,7 @@ import type Stripe from 'stripe';
 import { describe, expect, it } from 'vitest';
 
 import { annualiseUnitAmount, computeRwr, formatAud } from './rwr';
-import { runRwrReport } from './rwr-report';
+import { runRwrReport, withoutAmounts } from './rwr-report';
 import {
   collectRwrInputs,
   RWR_MAX_PAGES,
@@ -261,6 +261,16 @@ const DOLLAR_FIGURE = /\$ ?\d/;
 const ANY_AMOUNT = /[$€£]\s?\d|\b(?:AUD|USD)\s?\d|\d\s?(?:AUD|USD)\b/i;
 /** Not test-prefixed: the report only proceeds when the objects themselves say livemode. */
 const FIXTURE_KEY = 'fixture-key-not-a-real-key';
+
+describe('withoutAmounts — the last line of defence on every exit-2 message', () => {
+  it('removes money-shaped text in any common form and keeps the rest', () => {
+    const out = withoutAmounts(
+      'after $123.45, A$5, US$1,000.00, USD 99, 10 AUD and €7 — subscription sub_123 failed'
+    );
+    expect(out).not.toMatch(/[$€£]\s?\d|\b(?:AUD|USD)\s?\d|\d\s?(?:AUD|USD)\b/i);
+    expect(out).toContain('subscription sub_123 failed');
+  });
+});
 
 describe('runRwrReport — fails closed', () => {
   it('with no key: exits 2, names the blocker and prints no dollar figure', async () => {
