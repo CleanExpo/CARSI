@@ -1,9 +1,20 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
 import { prisma } from '@/lib/prisma';
-import { NotCurrentReviewManagerError, resolveCurrentReviewManager } from '@/lib/server/current-admin';
-import { databaseUnavailableResponse, isDatabaseConfigured } from '@/lib/server/database-unavailable';
-import { getCourseIdBySlug, getReviewForCourse, setReviewReply } from '@/lib/server/course-reviews';
+import {
+  NotCurrentReviewManagerError,
+  resolveCurrentReviewManager,
+} from '@/lib/server/current-admin';
+import {
+  databaseUnavailableResponse,
+  isDatabaseConfigured,
+} from '@/lib/server/database-unavailable';
+import {
+  getCourseIdBySlug,
+  ReviewNotFoundError,
+  ReviewReplyForbiddenError,
+  setReviewReply,
+} from '@/lib/server/course-reviews';
 import { readReviewAdminSession } from '@/lib/server/review-admin-session';
 
 /**
@@ -20,7 +31,8 @@ export async function POST(
   if (!session) {
     return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 });
   }
-  const forbidden = () => NextResponse.json({ detail: 'Only instructors or admins can reply' }, { status: 403 });
+  const forbidden = () =>
+    NextResponse.json({ detail: 'Only instructors or admins can reply' }, { status: 403 });
 
   const { slug, id } = await ctx.params;
 
@@ -35,7 +47,8 @@ export async function POST(
   }
   const reply = (payload.reply as string | null) ?? null;
 
-  if (!isDatabaseConfigured()) return databaseUnavailableResponse('Replies are temporarily unavailable.');
+  if (!isDatabaseConfigured())
+    return databaseUnavailableResponse('Replies are temporarily unavailable.');
 
   try {
     if (!(await resolveCurrentReviewManager(prisma, session))) return forbidden();
@@ -43,14 +56,15 @@ export async function POST(
     if (!course) {
       return NextResponse.json({ detail: 'Course not found' }, { status: 404 });
     }
-    const review = await getReviewForCourse(id, course.id);
-    if (!review) {
-      return NextResponse.json({ detail: 'Review not found' }, { status: 404 });
-    }
-    await setReviewReply({ reviewId: id, reply, session });
+    // Visibility and course are checked inside the write's transaction, against the rule table;
+    // no review text is read here (release-gate r12).
+    await setReviewReply({ reviewId: id, courseId: course.id, reply, session });
     return NextResponse.json({ ok: true });
   } catch (e) {
-    if (e instanceof NotCurrentReviewManagerError) return forbidden();
+    if (e instanceof NotCurrentReviewManagerError || e instanceof ReviewReplyForbiddenError)
+      return forbidden();
+    if (e instanceof ReviewNotFoundError)
+      return NextResponse.json({ detail: 'Review not found' }, { status: 404 });
     console.error('[courses/:slug/reviews/:id/reply POST]', e);
     return NextResponse.json({ detail: 'Failed to save reply' }, { status: 500 });
   }

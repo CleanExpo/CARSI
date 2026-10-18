@@ -1,10 +1,13 @@
 /**
- * ONE route-level table for every review-admin route (release-gate r10): who is allowed is decided
- * only by the database (resolveCurrentAdmin, plus current instructors for replies), never the
- * token's role. For each route: the founder and a database admin are allowed; a demoted admin
- * holding a stale admin JWT, a student and no session are denied — and a denial writes nothing.
- * Extra rows: the admin-cookie principals (bootstrap ADMIN_EMAIL, an admin_users admin) are
- * allowed everywhere; an instructor may reply but not moderate or read hidden reviews.
+ * The route matrix for every course-review route (release-gate r10-r12), GENERATED from the one
+ * rule table (review-access-rules.ts), so a route cannot drift from it.
+ *
+ * Each persona is a fixture with a token (what the JWT or cookie SAYS) and a database row (what is
+ * TRUE now); its principal in the table is what the database makes it. Each route action names the
+ * capability it needs on a published or a hidden review. For every persona x action the expected
+ * outcome is read from the table: allowed → 200 (and the write or model call happens); denied → 401
+ * without a session, 403 otherwise, with NO write, NO read of a review's private text and NO model
+ * call. A separate test pins the table itself, so changing the policy is a deliberate, visible act.
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
@@ -12,87 +15,106 @@ import { join } from 'node:path';
 import { NextRequest } from 'next/server';
 import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-type Persona =
-  | 'founder'
-  | 'dbAdmin'
-  | 'demotedStaleJwt'
-  | 'student'
-  | 'noSession'
-  | 'bootstrapCookie'
-  | 'adminUsersCookie'
-  | 'instructor';
+import { REVIEW_ACCESS, type ReviewCapability, type ReviewPrincipal } from './review-access-rules';
 
 const m = vi.hoisted(() => ({
   persona: 'noSession' as string,
   writes: [] as string[],
   /** The moderation events created, so the recorded actor can be checked per admin kind. */
   events: [] as Array<Record<string, unknown>>,
-  /** Every text sent to the AI model (draftReviewReply), and every single-review read by id. */
+  /** Every text sent to the AI model (draftReviewReply). */
   modelCalls: [] as Array<Record<string, unknown>>,
-  reviewReads: 0,
-  /** Whether the review the routes act on is currently hidden. */
+  /** Reads of a single review's PRIVATE text (title/body) by id. */
+  bodyReads: 0,
+  /** Whether the review the action targets is hidden. */
   reviewHidden: false,
+  /** Set to true to hide the review AFTER the visibility check, before the conditional write. */
+  hiddenAtWrite: null as boolean | null,
 }));
 
-// Each persona's token (what the JWT or cookie SAYS) and database row (what is TRUE now).
-const LMS: Record<
-  string,
-  { sub: string; email: string; tokenRole: string; dbRole: string | null }
-> = {
+type Fixture = {
+  principal: ReviewPrincipal;
+  lms?: { sub: string; email: string; tokenRole: string; dbRole: string; active?: boolean };
+  cookie?: string;
+};
+// What the DATABASE makes each persona — the fixture's truth, independent of the code under test.
+const PERSONAS: Record<string, Fixture> = {
   founder: {
-    sub: 'u-founder',
-    email: 'phill.m@carsi.com.au',
-    tokenRole: 'student',
-    dbRole: 'student',
+    principal: 'admin',
+    lms: {
+      sub: 'u-founder',
+      email: 'phill.m@carsi.com.au',
+      tokenRole: 'student',
+      dbRole: 'student',
+    },
   },
-  dbAdmin: { sub: 'u-admin', email: 'admin@carsi.com.au', tokenRole: 'admin', dbRole: 'admin' },
-  demotedStaleJwt: {
-    sub: 'u-demoted',
-    email: 'was.admin@carsi.com.au',
-    tokenRole: 'admin',
-    dbRole: 'student',
+  dbAdmin: {
+    principal: 'admin',
+    lms: { sub: 'u-admin', email: 'admin@carsi.com.au', tokenRole: 'admin', dbRole: 'admin' },
   },
-  student: {
-    sub: 'u-student',
-    email: 'learner@example.com',
-    tokenRole: 'student',
-    dbRole: 'student',
-  },
+  bootstrapCookie: { principal: 'admin', cookie: 'support@carsi.com.au' },
+  adminUsersCookie: { principal: 'admin', cookie: 'ops@carsi.com.au' },
   instructor: {
-    sub: 'u-inst',
-    email: 'inst@carsi.com.au',
-    tokenRole: 'instructor',
-    dbRole: 'instructor',
+    principal: 'instructor',
+    lms: {
+      sub: 'u-inst',
+      email: 'inst@carsi.com.au',
+      tokenRole: 'instructor',
+      dbRole: 'instructor',
+    },
+  },
+  demotedStaleJwt: {
+    principal: 'anyone',
+    lms: {
+      sub: 'u-demoted',
+      email: 'was.admin@carsi.com.au',
+      tokenRole: 'admin',
+      dbRole: 'student',
+    },
   },
   demotedInstructorStaleJwt: {
-    sub: 'u-was-inst',
-    email: 'was.inst@carsi.com.au',
-    tokenRole: 'instructor',
-    dbRole: 'student',
+    principal: 'anyone',
+    lms: {
+      sub: 'u-was-inst',
+      email: 'was.inst@carsi.com.au',
+      tokenRole: 'instructor',
+      dbRole: 'student',
+    },
   },
   deactivatedInstructor: {
-    sub: 'u-gone',
-    email: 'gone@carsi.com.au',
-    tokenRole: 'instructor',
-    dbRole: 'instructor',
+    principal: 'anyone',
+    lms: {
+      sub: 'u-gone',
+      email: 'gone@carsi.com.au',
+      tokenRole: 'instructor',
+      dbRole: 'instructor',
+      active: false,
+    },
   },
-};
-const INACTIVE = new Set(['u-gone']);
-const COOKIE: Record<string, string> = {
-  bootstrapCookie: 'support@carsi.com.au',
-  adminUsersCookie: 'ops@carsi.com.au',
+  student: {
+    principal: 'anyone',
+    lms: {
+      sub: 'u-student',
+      email: 'learner@example.com',
+      tokenRole: 'student',
+      dbRole: 'student',
+    },
+  },
+  noSession: { principal: 'anyone' },
 };
 
 vi.mock('@/lib/server/auth-from-request', () => ({
   getSessionClaimsFromRequest: async () => {
-    const p = LMS[m.persona];
-    return p ? { sub: p.sub, email: p.email, role: p.tokenRole, full_name: 'X' } : null;
+    const lms = PERSONAS[m.persona]?.lms;
+    return lms ? { sub: lms.sub, email: lms.email, role: lms.tokenRole, full_name: 'X' } : null;
   },
 }));
 vi.mock('@/lib/admin/admin-auth', () => ({
   ADMIN_COOKIE_NAME: 'admin_session',
-  verifyAdminSessionToken: async (t: string) =>
-    t === 'valid' && COOKIE[m.persona] ? { email: COOKIE[m.persona] } : null,
+  verifyAdminSessionToken: async (t: string) => {
+    const cookie = PERSONAS[m.persona]?.cookie;
+    return t === 'valid' && cookie ? { email: cookie } : null;
+  },
 }));
 vi.mock('@/lib/server/review-summary', () => ({
   getReviewFunnelSummary: async () => ({ hides_by_reason_and_rating: [] }),
@@ -105,16 +127,26 @@ vi.mock('@/lib/server/review-reply-draft', () => ({
   },
 }));
 
-const REVIEW = {
-  id: 'rev-1',
-  rating: 1,
-  title: 'Too basic',
-  body: 'x',
+const PUBLISHED = {
+  id: 'rev-pub',
+  rating: 5,
+  title: 'Great',
+  body: 'public text',
   reply: null,
   repliedAt: null,
   createdAt: new Date('2026-10-02'),
+  isPublished: true,
+};
+const HIDDEN = {
+  ...PUBLISHED,
+  id: 'rev-hidden',
+  rating: 1,
+  title: 'Hidden',
+  body: 'private phone number',
+  isPublished: false,
 };
 vi.mock('@/lib/prisma', () => {
+  const target = () => (m.reviewHidden ? HIDDEN : PUBLISHED);
   const client = {
     $queryRaw: async (strings: TemplateStringsArray, ...values: unknown[]) => {
       const sql = strings.join('?');
@@ -125,9 +157,9 @@ vi.mock('@/lib/prisma', () => {
       }
       if (sql.includes('"lms_user_roles"')) return [];
       if (sql.includes('"lms_users"')) {
-        const p = Object.values(LMS).find((x) => x.sub === String(values[0]));
-        return p
-          ? [{ id: p.sub, email: p.email, is_active: !INACTIVE.has(p.sub), role: p.dbRole }]
+        const lms = Object.values(PERSONAS).find((p) => p.lms?.sub === String(values[0]))?.lms;
+        return lms
+          ? [{ id: lms.sub, email: lms.email, is_active: lms.active !== false, role: lms.dbRole }]
           : [];
       }
       throw new Error(`unexpected SQL ${sql}`);
@@ -145,36 +177,36 @@ vi.mock('@/lib/prisma', () => {
     lmsEnrollment: { findUnique: async () => null },
     lmsUser: { findUnique: async () => null },
     lmsCourseReview: {
-      // Like Prisma, returns ONLY the selected fields (a lookup that forgets `isPublished` gets none).
+      // Like Prisma, returns ONLY the selected fields; a read of private text is counted.
       findFirst: async ({ select }: { select: Record<string, boolean> }) => {
-        m.reviewReads += 1;
-        const row: Record<string, unknown> = {
-          id: 'rev-1',
-          rating: 1,
-          title: 'Too basic',
-          body: m.reviewHidden ? 'private phone number' : 'x',
-          isPublished: !m.reviewHidden,
-        };
+        if (select.body || select.title) m.bodyReads += 1;
+        const row = target() as Record<string, unknown>;
         return Object.fromEntries(Object.entries(row).filter(([k]) => select[k]));
       },
       findMany: async ({ where }: { where: { isPublished?: boolean } }) =>
-        where.isPublished === true
-          ? []
-          : [
-              {
-                ...REVIEW,
-                isPublished: false,
-                student: { fullName: 'Sam Rivers', email: 's@example.com' },
-                moderationEvents: [],
-              },
-            ],
+        (where.isPublished === true ? [PUBLISHED] : [PUBLISHED, HIDDEN]).map((r) => ({
+          ...r,
+          student: { fullName: 'Sam Rivers', email: 's@example.com' },
+          moderationEvents: [],
+        })),
       update: async (args: { data: Record<string, unknown> }) => {
         m.writes.push(`review.update:${Object.keys(args.data).sort().join(',')}`);
         return {
-          ...REVIEW,
+          ...target(),
           moderationVersion: 3,
           course: { id: 'course-1', slug: 'water-damage', title: 'Water Damage Restoration' },
         };
+      },
+      // The conditional reply write: matches only if every WHERE condition holds for the row.
+      updateMany: async (args: {
+        where: { isPublished?: boolean };
+        data: Record<string, unknown>;
+      }) => {
+        const publishedNow = m.hiddenAtWrite === null ? target().isPublished : !m.hiddenAtWrite;
+        if (args.where.isPublished !== undefined && args.where.isPublished !== publishedNow)
+          return { count: 0 };
+        m.writes.push(`review.updateMany:${Object.keys(args.data).sort().join(',')}`);
+        return { count: 1 };
       },
     },
     lmsCourseReviewModerationEvent: {
@@ -192,9 +224,9 @@ const { POST: publishPOST } =
   await import('../../../app/api/lms/courses/[slug]/reviews/[id]/publish/route');
 const { POST: replyPOST } =
   await import('../../../app/api/lms/courses/[slug]/reviews/[id]/reply/route');
-const { GET: reviewsGET } = await import('../../../app/api/lms/courses/[slug]/reviews/route');
 const { POST: draftPOST } =
   await import('../../../app/api/lms/courses/[slug]/reviews/[id]/reply/draft/route');
+const { GET: reviewsGET } = await import('../../../app/api/lms/courses/[slug]/reviews/route');
 const { GET: summaryGET } = await import('../../../app/api/admin/reviews/summary/route');
 const SAVED = {
   db: process.env.DATABASE_URL,
@@ -204,81 +236,122 @@ const SAVED = {
 
 function request(url: string, body?: unknown): NextRequest {
   const headers: Record<string, string> = {};
-  if (COOKIE[m.persona]) headers.cookie = 'admin_session=valid';
+  if (PERSONAS[m.persona]?.cookie) headers.cookie = 'admin_session=valid';
   return new NextRequest(
     url,
     body === undefined ? { headers } : { method: 'POST', body: JSON.stringify(body), headers }
   );
 }
-const params = { params: Promise.resolve({ slug: 'water-damage', id: 'rev-1' }) };
+const ctx = () => ({
+  params: Promise.resolve({ slug: 'water-damage', id: m.reviewHidden ? HIDDEN.id : PUBLISHED.id }),
+});
+const base = 'http://localhost/api/lms/courses/water-damage/reviews';
 
-type Outcome = { status: number; allowed: boolean };
-const ROUTES: Record<string, () => Promise<Outcome>> = {
-  'moderation: hide': async () => {
-    const res = await publishPOST(
-      request('http://localhost/api/lms/courses/water-damage/reviews/rev-1/publish', {
-        is_published: false,
-        reason: 'offensive',
-      }),
-      params
-    );
-    return { status: res.status, allowed: res.status === 200 };
+type Action = {
+  /** Every capability the action needs, as named in the rule table. */
+  needs: ReviewCapability[];
+  hidden: boolean;
+  /** 'write' and 'model' actions must leave a trace when allowed; 'read' actions are GET views. */
+  effect: 'write' | 'model' | 'read';
+  run: () => Promise<{ status: number; allowed: boolean }>;
+};
+const status = (res: Response) => ({ status: res.status, allowed: res.status === 200 });
+const ACTIONS: Record<string, Action> = {
+  'moderate: hide a published review': {
+    needs: ['moderate'],
+    hidden: false,
+    effect: 'write',
+    run: async () =>
+      status(
+        await publishPOST(
+          request(`${base}/x/publish`, { is_published: false, reason: 'offensive' }),
+          ctx()
+        )
+      ),
   },
-  'moderation: unhide': async () => {
-    const res = await publishPOST(
-      request('http://localhost/api/lms/courses/water-damage/reviews/rev-1/publish', {
-        is_published: true,
-      }),
-      params
-    );
-    return { status: res.status, allowed: res.status === 200 };
+  'moderate: unhide a hidden review': {
+    needs: ['moderate'],
+    hidden: true,
+    effect: 'write',
+    run: async () =>
+      status(await publishPOST(request(`${base}/x/publish`, { is_published: true }), ctx())),
   },
-  'reply: publish': async () => {
-    const res = await replyPOST(
-      request('http://localhost/api/lms/courses/water-damage/reviews/rev-1/reply', {
-        reply: 'Official response',
-      }),
-      params
-    );
-    return { status: res.status, allowed: res.status === 200 };
+  'reply: publish on a published review': {
+    needs: ['replyPublished'],
+    hidden: false,
+    effect: 'write',
+    run: async () =>
+      status(await replyPOST(request(`${base}/x/reply`, { reply: 'Official response' }), ctx())),
   },
-  'reply: clear': async () => {
-    const res = await replyPOST(
-      request('http://localhost/api/lms/courses/water-damage/reviews/rev-1/reply', { reply: null }),
-      params
-    );
-    return { status: res.status, allowed: res.status === 200 };
+  'reply: clear on a published review': {
+    needs: ['replyPublished'],
+    hidden: false,
+    effect: 'write',
+    run: async () => status(await replyPOST(request(`${base}/x/reply`, { reply: null }), ctx())),
   },
-  'reply: AI draft': async () => {
-    const res = await draftPOST(
-      request('http://localhost/api/lms/courses/water-damage/reviews/rev-1/reply/draft', {}),
-      params
-    );
-    return { status: res.status, allowed: res.status === 200 };
+  'reply: publish on a hidden review': {
+    needs: ['replyHidden'],
+    hidden: true,
+    effect: 'write',
+    run: async () =>
+      status(await replyPOST(request(`${base}/x/reply`, { reply: 'Official response' }), ctx())),
   },
-  'private read: hidden reviews on GET': async () => {
-    const res = await reviewsGET(request('http://localhost/api/lms/courses/water-damage/reviews'), {
-      params: Promise.resolve({ slug: 'water-damage' }),
-    });
-    const body = await res.json();
-    const sawHidden = body.reviews.some((r: { id: string }) => r.id === 'rev-1');
-    expect(sawHidden).toBe(body.can_moderate); // hidden data and the moderation controls always agree
-    return { status: res.status, allowed: body.can_moderate === true };
+  'reply: clear on a hidden review': {
+    needs: ['replyHidden'],
+    hidden: true,
+    effect: 'write',
+    run: async () => status(await replyPOST(request(`${base}/x/reply`, { reply: null }), ctx())),
   },
-  'moderation summary': async () => {
-    const res = await summaryGET(request('http://localhost/api/admin/reviews/summary'));
-    return { status: res.status, allowed: res.status === 200 };
+  'AI draft for a published review': {
+    needs: ['replyPublished', 'readPublished'],
+    hidden: false,
+    effect: 'model',
+    run: async () => status(await draftPOST(request(`${base}/x/reply/draft`, {}), ctx())),
+  },
+  'AI draft for a hidden review': {
+    needs: ['replyHidden', 'readHidden'],
+    hidden: true,
+    effect: 'model',
+    run: async () => status(await draftPOST(request(`${base}/x/reply/draft`, {}), ctx())),
+  },
+  'read hidden reviews (GET)': {
+    needs: ['readHidden'],
+    hidden: true,
+    effect: 'read',
+    run: async () => {
+      const res = await reviewsGET(request(base), {
+        params: Promise.resolve({ slug: 'water-damage' }),
+      });
+      const body = await res.json();
+      return {
+        status: res.status,
+        allowed: body.reviews.some((r: { id: string }) => r.id === HIDDEN.id),
+      };
+    },
+  },
+  'read published reviews (GET)': {
+    needs: ['readPublished'],
+    hidden: false,
+    effect: 'read',
+    run: async () => {
+      const res = await reviewsGET(request(base), {
+        params: Promise.resolve({ slug: 'water-damage' }),
+      });
+      const body = await res.json();
+      return {
+        status: res.status,
+        allowed: body.reviews.some((r: { id: string }) => r.id === PUBLISHED.id),
+      };
+    },
+  },
+  'moderation summary (GET)': {
+    needs: ['moderate'],
+    hidden: false,
+    effect: 'read',
+    run: async () =>
+      status(await summaryGET(request('http://localhost/api/admin/reviews/summary'))),
   },
 };
-
-const ALLOW: Persona[] = ['founder', 'dbAdmin', 'bootstrapCookie', 'adminUsersCookie'];
-const DENY: Persona[] = ['demotedStaleJwt', 'student', 'noSession'];
-const WRITES = new Set([
-  'moderation: hide',
-  'moderation: unhide',
-  'reply: publish',
-  'reply: clear',
-]);
 
 beforeEach(() => {
   process.env.DATABASE_URL = 'postgres://test';
@@ -287,8 +360,9 @@ beforeEach(() => {
   m.writes = [];
   m.events = [];
   m.modelCalls = [];
-  m.reviewReads = 0;
+  m.bodyReads = 0;
   m.reviewHidden = false;
+  m.hiddenAtWrite = null;
 });
 afterAll(() => {
   for (const [k, v] of [
@@ -301,50 +375,99 @@ afterAll(() => {
   }
 });
 
-describe.each(Object.keys(ROUTES))('%s', (route) => {
-  it.each(ALLOW)('allows %s', async (persona) => {
-    m.persona = persona;
-    const out = await ROUTES[route]!();
-    expect(out).toEqual({ status: 200, allowed: true });
-    if (WRITES.has(route)) expect(m.writes.length).toBeGreaterThan(0);
-  });
-
-  it.each(DENY)('denies %s, and writes nothing', async (persona) => {
-    m.persona = persona;
-    const out = await ROUTES[route]!();
-    expect(out.allowed).toBe(false);
-    if (route === 'private read: hidden reviews on GET')
-      expect(out.status).toBe(200); // public view only
-    else expect(out.status).toBe(persona === 'noSession' ? 401 : 403);
-    expect(m.writes).toEqual([]);
-    expect(m.modelCalls).toEqual([]); // nothing is ever sent to the model on a denial
-    if (route !== 'private read: hidden reviews on GET') expect(m.reviewReads).toBe(0); // nor read
+describe('the rule table is the policy (changing it must be deliberate)', () => {
+  it('admin may do everything; an instructor reads and replies to published reviews only; anyone reads published only', () => {
+    expect(REVIEW_ACCESS).toEqual({
+      admin: {
+        readPublished: true,
+        readHidden: true,
+        replyPublished: true,
+        replyHidden: true,
+        moderate: true,
+      },
+      instructor: {
+        readPublished: true,
+        readHidden: false,
+        replyPublished: true,
+        replyHidden: false,
+        moderate: false,
+      },
+      anyone: {
+        readPublished: true,
+        readHidden: false,
+        replyPublished: false,
+        replyHidden: false,
+        moderate: false,
+      },
+    });
   });
 });
 
-describe('an instructor may reply but not moderate or read hidden reviews', () => {
-  it.each([
-    ['moderation: hide', false],
-    ['moderation: unhide', false],
-    ['reply: publish', true],
-    ['reply: clear', true],
-    ['reply: AI draft', true],
-    ['private read: hidden reviews on GET', false],
-    ['moderation summary', false],
-  ] as const)('%s → allowed: %s', async (route, allowed) => {
+// Generated: every persona x every action, the expected outcome read from REVIEW_ACCESS.
+const CASES = Object.entries(PERSONAS).flatMap(([persona, fx]) =>
+  Object.entries(ACTIONS).map(([action, a]) => ({
+    persona,
+    action,
+    expected: a.needs.every((cap) => REVIEW_ACCESS[fx.principal][cap]),
+  }))
+);
+
+describe.each(CASES)('$persona → $action (allowed: $expected)', ({ persona, action, expected }) => {
+  it('matches the rule table', async () => {
+    const a = ACTIONS[action]!;
+    m.persona = persona;
+    m.reviewHidden = a.hidden;
+    const out = await a.run();
+    expect(out.allowed).toBe(expected);
+    if (a.effect === 'read' && action !== 'moderation summary (GET)') {
+      expect(out.status).toBe(200); // GET always answers; denial means the data is absent
+    } else if (expected) {
+      expect(out.status).toBe(200);
+    } else {
+      expect(out.status).toBe(persona === 'noSession' ? 401 : 403);
+    }
+    if (expected && a.effect === 'write') expect(m.writes.length).toBeGreaterThan(0);
+    if (expected && a.effect === 'model') expect(m.modelCalls).toHaveLength(1);
+    if (!expected) {
+      expect(m.writes).toEqual([]);
+      expect(m.modelCalls).toEqual([]);
+      expect(m.bodyReads).toBe(0); // no private text read on any denial
+    }
+  });
+});
+
+describe('what an allowed AI draft sends is exactly the review it was allowed to read', () => {
+  it('a current instructor drafting for a published review sends that review only', async () => {
     m.persona = 'instructor';
-    const out = await ROUTES[route]!();
-    expect(out.allowed).toBe(allowed);
-    if (!allowed && WRITES.has(route)) expect(m.writes).toEqual([]);
+    expect((await ACTIONS['AI draft for a published review']!.run()).status).toBe(200);
+    expect(m.modelCalls).toEqual([
+      { courseTitle: 'Water Damage Restoration', rating: 5, title: 'Great', body: 'public text' },
+    ]);
+  });
+  it('an admin drafting for a hidden review sends it (admins may read hidden reviews)', async () => {
+    m.persona = 'founder';
+    m.reviewHidden = true;
+    expect((await ACTIONS['AI draft for a hidden review']!.run()).status).toBe(200);
+    expect(m.modelCalls[0]).toMatchObject({ body: 'private phone number' });
   });
 });
 
-describe('a deactivated instructor can no longer reply (current state, not the token)', () => {
-  it.each(['reply: publish', 'reply: clear'] as const)('%s → 403, no write', async (route) => {
-    m.persona = 'deactivatedInstructor';
-    const out = await ROUTES[route]!();
-    expect(out).toEqual({ status: 403, allowed: false });
-    expect(m.writes).toEqual([]);
+describe('r12: a review hidden between the visibility check and the write is never replied to by an instructor', () => {
+  it.each(['reply: publish on a published review', 'reply: clear on a published review'] as const)(
+    '%s, hidden mid-transaction → 403, no write',
+    async (action) => {
+      m.persona = 'instructor';
+      m.reviewHidden = false; // the visibility check sees it published...
+      m.hiddenAtWrite = true; // ...and it is hidden before the conditional write
+      expect((await ACTIONS[action]!.run()).status).toBe(403);
+      expect(m.writes).toEqual([]);
+    }
+  );
+  it('an admin may still reply to it (admins may reply to hidden reviews)', async () => {
+    m.persona = 'dbAdmin';
+    m.hiddenAtWrite = true;
+    expect((await ACTIONS['reply: publish on a published review']!.run()).status).toBe(200);
+    expect(m.writes).toHaveLength(1);
   });
 });
 
@@ -383,64 +506,13 @@ describe('the moderation audit records the verified admin, by kind', () => {
     ],
   ] as const)('%s', async (persona, actor) => {
     m.persona = persona;
-    expect((await ROUTES['moderation: hide']!()).status).toBe(200);
+    expect((await ACTIONS['moderate: hide a published review']!.run()).status).toBe(200);
     expect(m.events).toHaveLength(1);
     expect(m.events[0]).toMatchObject(actor);
   });
 });
 
-describe('r11 reviewer case: the AI draft never sends a hidden review to the model for someone who may not read it', () => {
-  it.each(['instructor'] as const)(
-    'a hidden review is refused outright for an %s (403, nothing sent)',
-    async (persona) => {
-      m.persona = persona;
-      m.reviewHidden = true;
-      const out = await ROUTES['reply: AI draft']!();
-      expect(out).toEqual({ status: 403, allowed: false });
-      expect(m.modelCalls).toEqual([]);
-    }
-  );
-
-  it.each(['demotedInstructorStaleJwt', 'demotedStaleJwt', 'student', 'noSession'] as const)(
-    'a hidden review with a %s token: refused, nothing read or sent',
-    async (persona) => {
-      m.persona = persona;
-      m.reviewHidden = true;
-      const out = await ROUTES['reply: AI draft']!();
-      expect(out.allowed).toBe(false);
-      expect(m.reviewReads).toBe(0);
-      expect(m.modelCalls).toEqual([]);
-    }
-  );
-
-  it.each(['founder', 'dbAdmin', 'bootstrapCookie', 'adminUsersCookie'] as const)(
-    'an admin who may read hidden reviews (%s) can draft for one',
-    async (persona) => {
-      m.persona = persona;
-      m.reviewHidden = true;
-      expect((await ROUTES['reply: AI draft']!()).status).toBe(200);
-      expect(m.modelCalls).toHaveLength(1);
-      expect(m.modelCalls[0]).toMatchObject({ body: 'private phone number' });
-    }
-  );
-
-  it('a published review is drafted for a current instructor, with its text', async () => {
-    m.persona = 'instructor';
-    expect((await ROUTES['reply: AI draft']!()).status).toBe(200);
-    expect(m.modelCalls).toEqual([
-      { courseTitle: 'Water Damage Restoration', rating: 1, title: 'Too basic', body: 'x' },
-    ]);
-  });
-
-  it('a deactivated instructor cannot draft (nothing read or sent)', async () => {
-    m.persona = 'deactivatedInstructor';
-    expect((await ROUTES['reply: AI draft']!()).status).toBe(403);
-    expect(m.reviewReads).toBe(0);
-    expect(m.modelCalls).toEqual([]);
-  });
-});
-
-describe('r11 sweep: every review route decides admin access from the database, none from the token role', () => {
+describe('r11/r12 sweep: every review route decides access from the database and the rule table, none from the token role', () => {
   const ROOT = join(process.cwd(), 'app/api/lms/courses/[slug]/reviews');
   const routes = (dir: string): string[] =>
     readdirSync(dir).flatMap((name) => {
@@ -448,7 +520,6 @@ describe('r11 sweep: every review route decides admin access from the database, 
       if (statSync(full).isDirectory()) return routes(full);
       return name === 'route.ts' ? [full] : [];
     });
-  // Every review-admin route, plus the learner route (GET/POST reviews) whose admin parts use the same rule.
   const ADMIN_ROUTES = [
     '[id]/publish/route.ts',
     '[id]/reply/route.ts',
@@ -472,6 +543,17 @@ describe('r11 sweep: every review route decides admin access from the database, 
     expect(src).toMatch(/resolveCurrentAdmin\(|resolveCurrentReviewManager\(/);
     expect(src).not.toMatch(/getSessionClaimsFromRequest/);
     expect(src).not.toMatch(/claims\??\.role|canManageReviews|canModerateReviews/);
+  });
+
+  it('the draft and learner routes take their visibility decisions from the rule table', () => {
+    for (const r of ['[id]/reply/draft/route.ts', LEARNER_ROUTE]) {
+      expect(readFileSync(join(ROOT, r), 'utf8')).toContain(
+        "from '@/lib/server/review-access-rules'"
+      );
+    }
+    expect(readFileSync(join(process.cwd(), 'src/lib/server/course-reviews.ts'), 'utf8')).toContain(
+      "from '@/lib/server/review-access-rules'"
+    );
   });
 
   it('the learner route reads admin access only through the database rule (never claims.role)', () => {

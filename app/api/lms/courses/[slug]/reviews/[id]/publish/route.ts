@@ -6,7 +6,7 @@ import { databaseUnavailableResponse, isDatabaseConfigured } from '@/lib/server/
 import { readReviewAdminSession } from '@/lib/server/review-admin-session';
 import {
   getCourseIdBySlug,
-  getReviewForCourse,
+  getReviewVisibility,
   isHideReason,
   REVIEW_HIDE_REASONS,
   setReviewVisibility,
@@ -64,7 +64,7 @@ export async function POST(
     if (!course) {
       return NextResponse.json({ detail: 'Course not found' }, { status: 404 });
     }
-    const review = await getReviewForCourse(id, course.id);
+    const review = await getReviewVisibility(id, course.id);
     if (!review) {
       return NextResponse.json({ detail: 'Review not found' }, { status: 404 });
     }

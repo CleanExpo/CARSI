@@ -2,7 +2,12 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 import { prisma } from '@/lib/prisma';
 import { resolveCurrentReviewManager } from '@/lib/server/current-admin';
-import { getCourseIdBySlug, getReviewForCourse } from '@/lib/server/course-reviews';
+import {
+  getCourseIdBySlug,
+  getReviewForCourse,
+  getReviewVisibility,
+} from '@/lib/server/course-reviews';
+import { mayReplyToReview, reviewPrincipal } from '@/lib/server/review-access-rules';
 import { readReviewAdminSession } from '@/lib/server/review-admin-session';
 import { draftReviewReply } from '@/lib/server/review-reply-draft';
 
@@ -40,10 +45,13 @@ export async function POST(
     const access = await prisma.$transaction(async (tx) => {
       const manager = await resolveCurrentReviewManager(tx, session);
       if (!manager) return { kind: 'forbidden' as const };
+      // Visibility first (no private field), against the rule table; the text only if allowed.
+      const target = await getReviewVisibility(id, course.id, tx);
+      if (!target) return { kind: 'missing' as const };
+      if (!mayReplyToReview(reviewPrincipal(manager), target.isPublished))
+        return { kind: 'hidden' as const };
       const review = await getReviewForCourse(id, course.id, tx);
       if (!review) return { kind: 'missing' as const };
-      if (!review.isPublished && manager.kind === 'lms_instructor')
-        return { kind: 'hidden' as const };
       return { kind: 'ok' as const, review };
     });
     if (access.kind === 'forbidden') {

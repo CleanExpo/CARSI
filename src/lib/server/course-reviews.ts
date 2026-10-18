@@ -11,6 +11,7 @@ import { createHash } from 'node:crypto';
 
 import { prisma } from '@/lib/prisma';
 import { requireCurrentAdmin, requireCurrentReviewManager, type AdminSessionProvenance } from '@/lib/server/current-admin';
+import { mayReplyToReview, REVIEW_ACCESS, reviewPrincipal } from '@/lib/server/review-access-rules';
 import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
 import {
   ANONYMOUS_REVIEWER_LABEL,
@@ -401,7 +402,39 @@ export async function setReviewVisibility(
   });
 }
 
-/** Minimal review lookup for reply validation (confirms it belongs to the course). */
+/**
+ * Does this review belong to the course, and is it published? Reads NO private field (release-gate
+ * r12): it is the visibility check every route runs, inside its authorised transaction, BEFORE any
+ * read of a review's title or body.
+ */
+export async function getReviewVisibility(
+  reviewId: string,
+  courseId: string,
+  db: ReviewReadClient = prisma
+): Promise<{ id: string; isPublished: boolean } | null> {
+  return db.lmsCourseReview.findFirst({
+    where: { id: reviewId, courseId },
+    select: { id: true, isPublished: true },
+  });
+}
+
+/** Thrown when the review does not exist in this course. */
+export class ReviewNotFoundError extends Error {
+  constructor() {
+    super('Review not found');
+    this.name = 'ReviewNotFoundError';
+  }
+}
+
+/** Thrown when the caller may not reply to this review (e.g. an instructor and a hidden review). */
+export class ReviewReplyForbiddenError extends Error {
+  constructor() {
+    super('You cannot reply to this review');
+    this.name = 'ReviewReplyForbiddenError';
+  }
+}
+
+/** The review's private text, for a caller ALREADY authorised to read it (see review-access-rules). */
 export async function getReviewForCourse(
   reviewId: string,
   courseId: string,
@@ -413,25 +446,39 @@ export async function getReviewForCourse(
   });
 }
 
-/** Publish (or clear) an instructor/admin response to a review. */
+/**
+ * Publish (or clear) an instructor/admin response to a review. In ONE transaction (release-gate
+ * r10, r12): re-validate the caller from the database, check the review's course and visibility
+ * against the rule table (no private field is read), then write ONLY WHERE the review is still in
+ * this course and — unless the caller may reply to hidden reviews — still published, so a review
+ * hidden in the meantime is never replied to.
+ */
 export async function setReviewReply(params: {
   reviewId: string;
+  courseId: string;
   reply: string | null;
   session: AdminSessionProvenance;
 }): Promise<void> {
   const reply = params.reply?.trim() || null;
   await prisma.$transaction(async (tx) => {
-    // Re-validated from the database in the same transaction as the write (release-gate r10): a
-    // current admin or a current instructor, never the token's role claim.
     const manager = await requireCurrentReviewManager(tx, params.session);
-    await tx.lmsCourseReview.update({
-      where: { id: params.reviewId },
+    const principal = reviewPrincipal(manager);
+    const target = await getReviewVisibility(params.reviewId, params.courseId, tx);
+    if (!target) throw new ReviewNotFoundError();
+    if (!mayReplyToReview(principal, target.isPublished)) throw new ReviewReplyForbiddenError();
+    const written = await tx.lmsCourseReview.updateMany({
+      where: {
+        id: params.reviewId,
+        courseId: params.courseId,
+        ...(REVIEW_ACCESS[principal].replyHidden ? {} : { isPublished: true }),
+      },
       data: {
         reply,
         repliedAt: reply ? new Date() : null,
         repliedById: reply ? manager.lmsUserId : null,
       },
     });
+    if (written.count !== 1) throw new ReviewReplyForbiddenError();
   });
 }
 

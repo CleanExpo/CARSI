@@ -16,6 +16,12 @@ import {
   ReviewNotAllowedError,
   upsertReview,
 } from '@/lib/server/course-reviews';
+import {
+  mayManageReplies,
+  mayModerate,
+  REVIEW_ACCESS,
+  reviewPrincipal,
+} from '@/lib/server/review-access-rules';
 import { readReviewAdminSession } from '@/lib/server/review-admin-session';
 
 /**
@@ -67,14 +73,13 @@ export async function GET(request: NextRequest, ctx: { params: Promise<{ slug: s
     const adminSession = await readReviewAdminSession(request);
     if (adminSession) {
       const access = await prisma.$transaction(async (tx) => {
-        const manager = await resolveCurrentReviewManager(tx, adminSession);
-        if (!manager) return null;
-        const isAdmin = manager.kind !== 'lms_instructor';
-        return { isAdmin, hidden: isAdmin ? await getCourseReviews(course.id, true, tx) : null };
+        const principal = reviewPrincipal(await resolveCurrentReviewManager(tx, adminSession));
+        const readsHidden = REVIEW_ACCESS[principal].readHidden;
+        return { principal, hidden: readsHidden ? await getCourseReviews(course.id, true, tx) : null };
       });
-      canManage = access !== null;
-      canModerate = access?.isAdmin === true;
-      moderated = access?.hidden ?? null;
+      canManage = mayManageReplies(access.principal);
+      canModerate = mayModerate(access.principal);
+      moderated = access.hidden;
     }
     if (claims) {
       canReview = await isEnrolledInCourse(claims.sub, course.id);
