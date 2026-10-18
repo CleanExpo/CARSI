@@ -121,8 +121,14 @@ export function isCompleteEnrollment(args: {
 /** One completed course, as the renewal summary counted it. */
 export type CourseCompletionRecord = {
   slug: string;
-  /** When the course was completed (certificate, enrolment completion, or last lesson), if known. */
+  /**
+   * The enrolment's own completion time (`LmsEnrollment.completedAt`, set once and preserved on
+   * later syncs). Deliberately NOT the certificate date, which is re-stamped every time a
+   * certificate is generated, and NOT a lesson's last-access time, which moves on a revisit:
+   * either would pull an old course (and its CEC hours) into this year.
+   */
   completedAt: Date | null;
+  /** Whether a certificate exists. Its timestamp is a re-stampable mint time, so it never dates the course. */
   certificateIssuedAt: Date | null;
 };
 
@@ -139,6 +145,8 @@ export type RenewalYearRecap = {
  * Pure: count what the learner completed since `since`. CEC hours come ONLY from the approvals
  * registry (`resolveCecHoursFromCourse`), never from the stored course column (GP-498). A
  * completion with no known date is not counted, because it cannot be placed inside the year.
+ * Certificates are counted for courses completed in the year, so re-generating an old
+ * certificate (which re-stamps its date) does not add one.
  */
 export function buildYearRecap(args: {
   completions: CourseCompletionRecord[];
@@ -149,9 +157,9 @@ export function buildYearRecap(args: {
   let certificatesIssued = 0;
   let approvedCecHours = 0;
   for (const c of args.completions) {
-    if (c.certificateIssuedAt && c.certificateIssuedAt >= args.since) certificatesIssued += 1;
     if (!c.completedAt || c.completedAt < args.since) continue;
     coursesCompleted += 1;
+    if (c.certificateIssuedAt) certificatesIssued += 1;
     approvedCecHours += resolveCecHoursFromCourse({ slug: c.slug }).hours;
   }
   return {
@@ -301,9 +309,11 @@ async function loadRenewalSummary(
         lessonIds,
         progress: progressByLesson,
       });
+      // The year recap dates a course by the enrolment's own completion time only (see
+      // CourseCompletionRecord); `ts` above can be a re-stamped certificate or a lesson revisit.
       completions.push({
         slug: e.course.slug,
-        completedAt: ts,
+        completedAt: e.completedAt,
         certificateIssuedAt: e.certificateIssuedAt,
       });
 

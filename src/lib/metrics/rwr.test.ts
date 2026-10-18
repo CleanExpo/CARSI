@@ -74,22 +74,27 @@ describe('computeRwr — the GOAL.md formula', () => {
 
 // ---------------------------------------------------------------- fake Stripe (read-only)
 
-function sub(
-  id: string,
-  plan: string,
-  items: Array<{ unit: number; qty: number; interval?: string; currency?: string }> = []
-) {
+type ItemSpec = { unit: number | null; qty: number; interval?: string; currency?: string };
+type SubOpts = { currency?: string; livemode?: boolean; itemsHasMore?: boolean };
+
+const MEMBERSHIP_ITEM: ItemSpec = { unit: 79_500, qty: 1, interval: 'year' };
+
+function sub(id: string, plan: string, items?: ItemSpec[], opts: SubOpts = {}) {
+  const specs = items ?? (plan === 'pro_annual' ? [MEMBERSHIP_ITEM] : []);
   return {
     id,
     status: 'active',
+    livemode: opts.livemode ?? true,
+    currency: opts.currency ?? 'aud',
     metadata: { plan },
     items: {
-      data: items.map((i, n) => ({
+      has_more: opts.itemsHasMore ?? false,
+      data: specs.map((i, n) => ({
         id: `${id}_i${n}`,
         quantity: i.qty,
         price: {
           unit_amount: i.unit,
-          currency: i.currency ?? 'aud',
+          currency: i.currency ?? opts.currency ?? 'aud',
           recurring: { interval: i.interval ?? 'year', interval_count: 1 },
         },
       })),
@@ -100,10 +105,11 @@ function sub(
 function session(
   id: string,
   cents: number,
-  opts: { slug?: string | null; currency?: string; paid?: boolean } = {}
+  opts: { slug?: string | null; currency?: string; paid?: boolean; livemode?: boolean } = {}
 ) {
   return {
     id,
+    livemode: opts.livemode ?? true,
     mode: 'payment',
     payment_status: opts.paid === false ? 'unpaid' : 'paid',
     currency: opts.currency ?? 'aud',
@@ -143,6 +149,12 @@ function fakeStripe(
 
 const NOW = new Date('2026-10-18T00:00:00Z');
 
+async function refuses(subs: Stripe.Subscription[], sessions: Stripe.Checkout.Session[] = []) {
+  await expect(collectRwrInputs(fakeStripe(subs, sessions).reader, NOW)).rejects.toBeInstanceOf(
+    RwrUnreadableError
+  );
+}
+
 describe('collectRwrInputs — Stripe shaping', () => {
   it('counts memberships, Teams seats and paid course checkouts across pages', async () => {
     const { reader, sessionCalls } = fakeStripe(
@@ -180,24 +192,44 @@ describe('collectRwrInputs — Stripe shaping', () => {
     const { reader, subCalls } = fakeStripe(
       [sub('sub_1', 'pro_annual'), sub('sub_2', 'pro_annual')],
       [],
-      {
-        endlessSubs: true,
-      }
+      { endlessSubs: true }
     );
     await expect(collectRwrInputs(reader, NOW)).rejects.toBeInstanceOf(RwrUnreadableError);
     expect(subCalls.length).toBe(RWR_MAX_PAGES);
   });
 
   it('refuses non-AUD course sales and seat prices', async () => {
-    await expect(
-      collectRwrInputs(fakeStripe([], [session('cs_1', 100, { currency: 'usd' })]).reader, NOW)
-    ).rejects.toBeInstanceOf(RwrUnreadableError);
-    await expect(
-      collectRwrInputs(
-        fakeStripe([sub('sub_t', 'starter', [{ unit: 100, qty: 1, currency: 'usd' }])], []).reader,
-        NOW
-      )
-    ).rejects.toBeInstanceOf(RwrUnreadableError);
+    await refuses([], [session('cs_1', 100, { currency: 'usd' })]);
+    await refuses([sub('sub_t', 'starter', [{ unit: 100, qty: 1, currency: 'usd' }])]);
+  });
+
+  // Review r1 P1-RWR-USD-INDIVIDUAL
+  it('refuses a USD membership (subscription or price currency) and an unreadable one', async () => {
+    await refuses([
+      sub('sub_m_usd', 'pro_annual', [{ ...MEMBERSHIP_ITEM, currency: 'usd' }], {
+        currency: 'usd',
+      }),
+    ]);
+    await refuses([
+      sub('sub_m_usd_price', 'pro_annual', [{ ...MEMBERSHIP_ITEM, currency: 'usd' }]),
+    ]);
+    await refuses([sub('sub_m_unreadable', 'pro_annual', [{ ...MEMBERSHIP_ITEM, unit: null }])]);
+    await refuses([sub('sub_m_noitems', 'pro_annual', [])]);
+  });
+
+  // Review r1 P1-RWR-NESTED-PAGINATION
+  it('refuses a subscription whose item list has more pages', async () => {
+    await refuses([
+      sub('sub_t_partial', 'growth', [{ unit: 30_000, qty: 5 }], { itemsHasMore: true }),
+    ]);
+    await refuses([sub('sub_m_partial', 'pro_annual', undefined, { itemsHasMore: true })]);
+  });
+
+  // Review r1 P1-RWR-TEST-MODE-LOOKS-LIVE (object level)
+  it('refuses test-mode subscriptions and checkout sessions', async () => {
+    await refuses([sub('sub_m_test', 'pro_annual', undefined, { livemode: false })]);
+    await refuses([sub('sub_o_test', 'org_monthly', [], { livemode: false })]);
+    await refuses([], [session('cs_test', 2_900, { livemode: false })]);
   });
 });
 
@@ -205,13 +237,14 @@ describe('collectRwrInputs — Stripe shaping', () => {
 
 async function report(
   env: Record<string, string | undefined>,
-  reader?: RwrStripeReader | (() => never)
+  reader?: RwrStripeReader | (() => never),
+  json = false
 ) {
   const out: string[] = [];
   const err: string[] = [];
   const code = await runRwrReport({
     env,
-    json: false,
+    json,
     now: NOW,
     createStripe: () => {
       if (typeof reader === 'function') return reader();
@@ -225,6 +258,9 @@ async function report(
 }
 
 const DOLLAR_FIGURE = /\$ ?\d/;
+const ANY_AMOUNT = /[$€£]\s?\d|\b(?:AUD|USD)\s?\d|\d\s?(?:AUD|USD)\b/i;
+/** Not test-prefixed: the report only proceeds when the objects themselves say livemode. */
+const FIXTURE_KEY = 'fixture-key-not-a-real-key';
 
 describe('runRwrReport — fails closed', () => {
   it('with no key: exits 2, names the blocker and prints no dollar figure', async () => {
@@ -234,27 +270,75 @@ describe('runRwrReport — fails closed', () => {
     expect(r.all).not.toMatch(DOLLAR_FIGURE);
   });
 
+  // Review r1 P1-RWR-TEST-MODE-LOOKS-LIVE (key level)
+  it('with a test-mode key: exits 2 before reading Stripe and prints no figure', async () => {
+    const { reader } = fakeStripe([sub('sub_m1', 'pro_annual')], [session('cs_1', 4_000)]);
+    for (const key of ['sk_test_fixture', 'rk_test_fixture']) {
+      const r = await report({ STRIPE_SECRET_KEY: key }, reader);
+      expect(r.code).toBe(2);
+      expect(r.all).toContain('test-mode key');
+      expect(r.all).not.toMatch(DOLLAR_FIGURE);
+    }
+  });
+
+  it('with test-mode objects behind any key: exits 2 and prints no figure', async () => {
+    const { reader } = fakeStripe(
+      [sub('sub_m1', 'pro_annual', undefined, { livemode: false })],
+      []
+    );
+    const r = await report({ STRIPE_SECRET_KEY: FIXTURE_KEY }, reader);
+    expect(r.code).toBe(2);
+    expect(r.all).not.toMatch(DOLLAR_FIGURE);
+  });
+
   it('when Stripe errors: exits 2, prints no figure and never echoes the key', async () => {
-    const r = await report({ STRIPE_SECRET_KEY: 'sk_test_fixture' }, () => {
-      throw new Error('Invalid API Key provided: sk_test_fixture');
+    const r = await report({ STRIPE_SECRET_KEY: FIXTURE_KEY }, () => {
+      throw new Error(`Invalid API Key provided: ${FIXTURE_KEY}`);
     });
     expect(r.code).toBe(2);
     expect(r.all).not.toMatch(DOLLAR_FIGURE);
-    expect(r.all).not.toContain('sk_test_fixture');
+    expect(r.all).not.toContain(FIXTURE_KEY);
+  });
+
+  // Review r1 P1-RWR-ERROR-DOLLARS
+  it('when the Stripe error text carries an amount: exits 2 and prints no amount', async () => {
+    for (const json of [false, true]) {
+      const thrower = () => {
+        throw new Error('Stripe request failed after amount $123.45 (USD 99, 10 AUD, A$5)');
+      };
+      const r = await report({ STRIPE_SECRET_KEY: FIXTURE_KEY }, thrower, json);
+      expect(r.code).toBe(2);
+      expect(r.all).not.toMatch(ANY_AMOUNT);
+      const listFails = {
+        subscriptions: {
+          list: async () => {
+            throw Object.assign(new Error('declined: $795.00 owing'), {
+              type: 'StripeCardError',
+              statusCode: 402,
+            });
+          },
+        },
+        checkout: { sessions: { list: async () => ({ data: [], has_more: false }) } },
+      } as unknown as RwrStripeReader;
+      const r2 = await report({ STRIPE_SECRET_KEY: FIXTURE_KEY }, listFails, json);
+      expect(r2.code).toBe(2);
+      expect(r2.all).toContain('StripeCardError');
+      expect(r2.all).not.toMatch(ANY_AMOUNT);
+    }
   });
 
   it('when pagination is incomplete: exits 2 and prints no figure', async () => {
     const { reader } = fakeStripe([sub('sub_1', 'pro_annual'), sub('sub_2', 'pro_annual')], [], {
       endlessSubs: true,
     });
-    const r = await report({ STRIPE_SECRET_KEY: 'sk_test_fixture' }, reader);
+    const r = await report({ STRIPE_SECRET_KEY: FIXTURE_KEY }, reader);
     expect(r.code).toBe(2);
     expect(r.all).not.toMatch(DOLLAR_FIGURE);
   });
 
-  it('with readable Stripe data: exits 0 and prints the weekly figure', async () => {
+  it('with readable live Stripe data: exits 0 and prints the weekly figure', async () => {
     const { reader } = fakeStripe([sub('sub_m1', 'pro_annual')], [session('cs_1', 4_000)]);
-    const r = await report({ STRIPE_SECRET_KEY: 'sk_test_fixture' }, reader);
+    const r = await report({ STRIPE_SECRET_KEY: FIXTURE_KEY }, reader);
     expect(r.code).toBe(0);
     // 79,500 / 52 + 4,000 / 4 = 1,528.85 + 1,000 → $25.29
     expect(r.all).toContain('RWR: $25.29 per week');

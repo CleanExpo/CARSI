@@ -19,9 +19,8 @@ runRwrReport({
     process.exitCode = code;
   })
   .catch((error: unknown) => {
-    console.error(
-      'RWR not reported: the report crashed.',
-      error instanceof Error ? error.message : ''
-    );
+    // Stable text only: an error message could carry an amount, and exit 2 never prints one.
+    const kind = error instanceof Error ? error.name.replace(/[^A-Za-z]/g, '') : 'Error';
+    console.error(`RWR not reported: the report crashed (${kind}).`);
     process.exitCode = 2;
   });

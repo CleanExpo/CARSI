@@ -28,7 +28,10 @@ import type Stripe from 'stripe';
 import { prisma } from '@/lib/prisma';
 import { getAppOrigin } from '@/lib/server/app-url';
 import { sendEmail } from '@/lib/server/email';
-import { renderRenewalReminderEmail, type RenewalYearRecapView } from '@/lib/server/email-templates';
+import {
+  renderRenewalReminderEmail,
+  type RenewalYearRecapView,
+} from '@/lib/server/email-templates';
 import { getRenewalYearRecapForStudent } from '@/lib/server/renewal-summary';
 import { captureServerError } from '@/lib/server/sentry';
 import { readInvoiceEmail } from '@/lib/server/stripe-subscription-map';
@@ -51,14 +54,13 @@ export type RenewalReminderSkipReason =
   | 'already_sent';
 
 export type RenewalReminderOutcome =
-  | { sent: true; dedupeKey: string }
-  | { sent: false; reason: RenewalReminderSkipReason };
+  { sent: true; dedupeKey: string } | { sent: false; reason: RenewalReminderSkipReason };
 
 type RenewalFacts = { amountCents: number; renewalAt: Date };
 
 /** Pure: read amount + renewal date from an upcoming invoice, or say what is missing. */
 export function readRenewalFacts(
-  invoice: Stripe.Invoice,
+  invoice: Stripe.Invoice
 ): { ok: true; facts: RenewalFacts } | { ok: false; reason: RenewalReminderSkipReason } {
   const raw = invoice as unknown as {
     amount_due?: unknown;
@@ -129,13 +131,19 @@ type Recipient = {
   teamName?: string;
   manageUrl: string;
   cancelInstruction: string;
+  /**
+   * True only when the email goes to the learner's own verified CARSI account address. The
+   * billing email on the invoice can be someone else (an employer, a bookkeeper), and the
+   * year recap is the learner's course history.
+   */
+  deliversToVerifiedAccountEmail: boolean;
 };
 
 async function resolveRecipient(
   invoice: Stripe.Invoice,
   subscription: Stripe.Subscription,
   kind: 'individual' | 'team',
-  origin: string,
+  origin: string
 ): Promise<Recipient | null> {
   // The invoice's customer email is the person Stripe bills; the CARSI account
   // email is the fallback.
@@ -160,10 +168,13 @@ async function resolveRecipient(
 
   const user = await prisma.lmsUser.findUnique({
     where: { id: userId },
-    select: { email: true, fullName: true },
+    select: { email: true, fullName: true, isVerified: true },
   });
-  const to = billingEmail ?? user?.email?.trim().toLowerCase() ?? null;
+  const accountEmail = user?.email?.trim().toLowerCase() || null;
+  const to = billingEmail ?? accountEmail;
   if (!to) return null;
+  const deliversToVerifiedAccountEmail =
+    user?.isVerified === true && accountEmail !== null && to === accountEmail;
 
   const name = user?.fullName?.trim() || to.split('@')[0];
   if (kind === 'team') {
@@ -177,6 +188,7 @@ async function resolveRecipient(
       teamName,
       manageUrl: `${origin}/dashboard/team`,
       cancelInstruction: `To cancel, reply to this email or write to ${SUPPORT_EMAIL} and we will set your plan to end at the close of the current period.`,
+      deliversToVerifiedAccountEmail,
     };
   }
   return {
@@ -187,16 +199,29 @@ async function resolveRecipient(
     manageUrl: `${origin}/subscribe`,
     cancelInstruction:
       'To cancel, sign in, open your membership page and choose "Manage billing & payment method".',
+    deliversToVerifiedAccountEmail,
   };
 }
 
+/** Longest the optional recap may hold up the required renewal notice. */
+export const YEAR_RECAP_TIMEOUT_MS = 3_000;
+
 /**
- * The member's "your year with CARSI" recap. Best-effort: a failed read sends the reminder
- * without it, because the reminder is the legally expected notice and the recap is not.
+ * The member's "your year with CARSI" recap. Best-effort: a failed or slow read sends the
+ * reminder without it, because the reminder is the legally expected notice and the recap is
+ * not. The read is raced against a hard deadline so a stalled query can never stall the send.
  */
 async function loadYearRecap(userId: string, origin: string): Promise<RenewalYearRecapView | null> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
   try {
-    const recap = await getRenewalYearRecapForStudent(userId);
+    const deadline = new Promise<'timeout'>((resolve) => {
+      timer = setTimeout(() => resolve('timeout'), YEAR_RECAP_TIMEOUT_MS);
+    });
+    const recap = await Promise.race([getRenewalYearRecapForStudent(userId), deadline]);
+    if (recap === 'timeout') {
+      console.warn('[renewal-reminder] year recap timed out; sending without it', { userId });
+      return null;
+    }
     if (!recap) return null;
     return {
       coursesCompleted: recap.coursesCompleted,
@@ -208,14 +233,19 @@ async function loadYearRecap(userId: string, origin: string): Promise<RenewalYea
       })),
     };
   } catch (error) {
-    console.warn('[renewal-reminder] year recap unavailable; sending without it', { userId, error });
+    console.warn('[renewal-reminder] year recap unavailable; sending without it', {
+      userId,
+      error,
+    });
     return null;
+  } finally {
+    if (timer) clearTimeout(timer);
   }
 }
 
 function isUniqueViolation(error: unknown): boolean {
   return Boolean(
-    error && typeof error === 'object' && (error as { code?: unknown }).code === 'P2002',
+    error && typeof error === 'object' && (error as { code?: unknown }).code === 'P2002'
   );
 }
 
@@ -229,10 +259,13 @@ async function releaseClaim(subscriptionId: string, dedupeKey: string): Promise<
     await prisma.lmsNotification.delete({ where: { dedupeKey } });
   } catch (error) {
     if ((error as { code?: unknown } | null)?.code === 'P2025') return; // already gone
-    console.error('[renewal-reminder] could not release claim after failed send; reminder is blocked', {
-      subscriptionId,
-      dedupeKey,
-    });
+    console.error(
+      '[renewal-reminder] could not release claim after failed send; reminder is blocked',
+      {
+        subscriptionId,
+        dedupeKey,
+      }
+    );
     void captureServerError(error, {
       route: '/api/lms/webhooks/stripe',
       tags: { eventType: 'invoice.upcoming', stage: 'release_renewal_reminder_claim' },
@@ -241,10 +274,7 @@ async function releaseClaim(subscriptionId: string, dedupeKey: string): Promise<
   }
 }
 
-function skip(
-  subscriptionId: string,
-  reason: RenewalReminderSkipReason,
-): RenewalReminderOutcome {
+function skip(subscriptionId: string, reason: RenewalReminderSkipReason): RenewalReminderOutcome {
   console.warn('[renewal-reminder] not sent', { subscriptionId, reason });
   return { sent: false, reason };
 }
@@ -269,7 +299,7 @@ export async function sendUpcomingRenewalReminder(params: {
   if (kind !== 'individual' && kind !== 'team') return skip(subscriptionId, 'unsupported_plan');
 
   const cancelAtPeriodEnd = Boolean(
-    (subscription as unknown as { cancel_at_period_end?: boolean }).cancel_at_period_end,
+    (subscription as unknown as { cancel_at_period_end?: boolean }).cancel_at_period_end
   );
   if (
     cancelAtPeriodEnd ||
@@ -293,7 +323,9 @@ export async function sendUpcomingRenewalReminder(params: {
   const renewalDateLabel = formatRenewalDate(renewalAt);
   const amountLabel = formatRenewalAmount(amountCents);
   const yearRecap =
-    kind === 'individual' ? await loadYearRecap(recipient.userId, origin) : null;
+    kind === 'individual' && recipient.deliversToVerifiedAccountEmail
+      ? await loadYearRecap(recipient.userId, origin)
+      : null;
   const { html, text } = renderRenewalReminderEmail({
     appOrigin: origin,
     name: recipient.name,
@@ -349,6 +381,10 @@ export async function sendUpcomingRenewalReminder(params: {
     throw new Error(`renewal reminder email not sent (${result.reason ?? 'unknown'})`);
   }
 
-  console.info('[renewal-reminder] sent', { subscriptionId, dedupeKey, messageId: result.messageId });
+  console.info('[renewal-reminder] sent', {
+    subscriptionId,
+    dedupeKey,
+    messageId: result.messageId,
+  });
   return { sent: true, dedupeKey };
 }

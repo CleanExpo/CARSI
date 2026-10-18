@@ -67,8 +67,21 @@ const FULL_YEAR: Enrolment[] = [
   enrolment('introduction-to-drying-techniques-and-equipment', { status: 'active' }),
 ];
 
+const VERIFIED_MEMBER = {
+  email: 'member@example.com',
+  fullName: 'Casey Member',
+  isVerified: true,
+  iicrcMemberNumber: null,
+  iicrcExpiryDate: null,
+  onboarding: null,
+};
+
 const h = vi.hoisted(() => ({
   enrolments: [] as unknown[],
+  /** When set, the enrolment read never settles (a stalled query). */
+  stallEnrolments: false,
+  user: null as null | Record<string, unknown>,
+  progress: [] as unknown[],
   sendEmail: vi.fn(async (_p: { html: string; text: string }) => ({
     sent: true as boolean,
     messageId: 'msg_1',
@@ -82,17 +95,13 @@ vi.mock('@/lib/prisma', () => ({
       create: vi.fn(async () => ({ id: 'n-1' })),
       delete: vi.fn(async () => ({})),
     },
-    lmsUser: {
-      findUnique: vi.fn(async () => ({
-        email: 'member@example.com',
-        fullName: 'Casey Member',
-        iicrcMemberNumber: null,
-        iicrcExpiryDate: null,
-        onboarding: null,
-      })),
+    lmsUser: { findUnique: vi.fn(async () => h.user) },
+    lmsEnrollment: {
+      findMany: vi.fn(() =>
+        h.stallEnrolments ? new Promise(() => {}) : Promise.resolve(h.enrolments)
+      ),
     },
-    lmsEnrollment: { findMany: vi.fn(async () => h.enrolments) },
-    lmsLessonProgress: { findMany: vi.fn(async () => []) },
+    lmsLessonProgress: { findMany: vi.fn(async () => h.progress) },
     lmsCourse: {
       findMany: vi.fn(async () => [
         {
@@ -123,23 +132,33 @@ vi.mock('@/lib/server/team-subscription-store', () => ({
   resolveTeamIdForStripeSubscription: vi.fn(async () => null),
 }));
 
-import { sendUpcomingRenewalReminder } from './renewal-reminder';
+import { sendUpcomingRenewalReminder, YEAR_RECAP_TIMEOUT_MS } from './renewal-reminder';
 
-const invoice = {
-  amount_due: 79500,
-  currency: 'aud',
-  next_payment_attempt: Math.floor(new Date('2026-11-01T00:00:00Z').getTime() / 1000),
-  customer_email: 'member@example.com',
-} as unknown as Stripe.Invoice;
-const subscription = { id: 'sub_1', status: 'active', metadata: {} } as unknown as Stripe.Subscription;
+function invoiceFor(billingEmail: string) {
+  return {
+    amount_due: 79500,
+    currency: 'aud',
+    next_payment_attempt: Math.floor(new Date('2026-11-01T00:00:00Z').getTime() / 1000),
+    customer_email: billingEmail,
+  } as unknown as Stripe.Invoice;
+}
+const subscription = {
+  id: 'sub_1',
+  status: 'active',
+  metadata: {},
+} as unknown as Stripe.Subscription;
 
-async function sentEmail(enrolments: Enrolment[]) {
+async function sentEmail(enrolments: Enrolment[], billingEmail = 'member@example.com') {
   h.enrolments = enrolments;
   h.sendEmail.mockClear();
-  const outcome = await sendUpcomingRenewalReminder({ invoice, subscription, kind: 'individual' });
+  const outcome = await sendUpcomingRenewalReminder({
+    invoice: invoiceFor(billingEmail),
+    subscription,
+    kind: 'individual',
+  });
   expect(outcome.sent).toBe(true);
   expect(h.sendEmail).toHaveBeenCalledTimes(1);
-  return h.sendEmail.mock.calls[0][0];
+  return h.sendEmail.mock.calls[0][0] as { html: string; text: string; to?: string };
 }
 
 describe('renewal reminder — your year with CARSI', () => {
@@ -147,9 +166,13 @@ describe('renewal reminder — your year with CARSI', () => {
 
   beforeEach(() => {
     process.env.DATABASE_URL = 'postgresql://test';
+    h.user = { ...VERIFIED_MEMBER };
+    h.stallEnrolments = false;
+    h.progress = [];
     vi.useFakeTimers({ toFake: ['Date'] });
     vi.setSystemTime(NOW);
     vi.spyOn(console, 'info').mockImplementation(() => {});
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
   afterEach(() => {
@@ -190,5 +213,72 @@ describe('renewal reminder — your year with CARSI', () => {
     const { text } = await sentEmail(FULL_YEAR);
     expect(text).toContain('renews automatically');
     expect(text).not.toContain('Your year with CARSI');
+  });
+
+  // Review r1 P1-V7-RECAP-DISCLOSES-LEARNER-HISTORY
+  it('sends no recap when the billing email is not the learner’s account email', async () => {
+    const sent = await sentEmail(FULL_YEAR, 'accounts@employer.example.com');
+    expect(sent.text).toContain('renews automatically');
+    expect(sent.text).not.toContain('Your year with CARSI');
+    expect(sent.html).not.toContain('Your year with CARSI');
+    expect(sent.text).not.toContain('Completed:');
+  });
+
+  it('sends no recap when the learner’s account email is not verified', async () => {
+    h.user = { ...VERIFIED_MEMBER, isVerified: false };
+    const { text } = await sentEmail(FULL_YEAR);
+    expect(text).toContain('renews automatically');
+    expect(text).not.toContain('Your year with CARSI');
+  });
+
+  // Review r1 P1-V7-OPTIONAL-READ-BLOCKS-REMINDER
+  it('sends the reminder without a recap when the recap read never settles', async () => {
+    vi.useFakeTimers({ toFake: ['Date', 'setTimeout', 'clearTimeout'] });
+    vi.setSystemTime(NOW);
+    h.stallEnrolments = true;
+    h.enrolments = FULL_YEAR;
+    h.sendEmail.mockClear();
+    const pending = sendUpcomingRenewalReminder({
+      invoice: invoiceFor('member@example.com'),
+      subscription,
+      kind: 'individual',
+    });
+    await vi.advanceTimersByTimeAsync(YEAR_RECAP_TIMEOUT_MS + 50);
+    const outcome = await pending;
+    expect(outcome.sent).toBe(true);
+    expect(h.sendEmail).toHaveBeenCalledTimes(1);
+    const { text } = h.sendEmail.mock.calls[0][0];
+    expect(text).toContain('renews automatically');
+    expect(text).not.toContain('Your year with CARSI');
+  });
+
+  // Review r1 P1-V7-RECAP-USES-NONCOMPLETION-DATE
+  it('does not move an old course into the year when its certificate is re-generated', async () => {
+    const { text } = await sentEmail([
+      // Completed two years ago; certificate re-generated (re-stamped) last week.
+      enrolment(APPROVED_OLD, { done: daysAgo(730), cert: daysAgo(7) }),
+      enrolment(UNAPPROVED, { done: daysAgo(30) }),
+    ]);
+    expect(text).toContain('- Completed: 1 course');
+    expect(text).toContain('- Certificates: 0 certificates');
+    expect(text).not.toMatch(/CEC/);
+  });
+
+  it('does not date a course by a lesson revisit', async () => {
+    h.progress = [
+      {
+        lessonId: `l-${APPROVED_A}`,
+        completed: true,
+        completedAt: daysAgo(400),
+        lastAccessedAt: daysAgo(2), // revisited this week
+      },
+    ];
+    const { text } = await sentEmail([
+      // Complete by lessons, but the enrolment carries no completion date of its own.
+      enrolment(APPROVED_A, { done: null, status: 'active' }),
+      enrolment(UNAPPROVED, { done: daysAgo(30) }),
+    ]);
+    expect(text).toContain('- Completed: 1 course');
+    expect(text).not.toMatch(/CEC/);
   });
 });

@@ -5,7 +5,10 @@
  * Fails closed. Every refusal throws `RwrUnreadableError` and the report prints no figure:
  *  - pagination that does not finish within the page cap (a partial total would understate
  *    revenue and read as a downturn);
- *  - a Teams price that is not AUD or has an interval this module cannot annualise;
+ *  - test-mode data (any subscription or checkout session with livemode !== true);
+ *  - a counted subscription (membership or Teams) that is not AUD, has an unreadable price, an
+ *    interval this module cannot annualise, or an item list with more pages (subscription items
+ *    paginate separately from the subscription list);
  *  - a paid course checkout in another currency or with no readable amount.
  */
 import type Stripe from 'stripe';
@@ -67,22 +70,42 @@ async function listAll<T extends { id: string }, P extends object>(
   );
 }
 
-function seatLinesFor(sub: Stripe.Subscription): SeatLine[] {
-  return sub.items.data.map((item) => {
+/** Live-mode data only: a test-mode object must never be read as the live GOAL.md metric. */
+function requireLive(obj: { id: string; livemode?: boolean }, what: string): void {
+  if (obj.livemode !== true) {
+    throw new RwrUnreadableError(`${what} ${obj.id} is test-mode data; RWR reports live data only`);
+  }
+}
+
+/**
+ * Validate every price on a counted subscription and return its seat lines. Refuses a partial
+ * item list (subscription items paginate separately from the subscription list), a non-AUD
+ * subscription or price, an unreadable unit price and an interval that cannot be annualised.
+ */
+function readSubscriptionItems(sub: Stripe.Subscription, what: string): SeatLine[] {
+  if ((sub.currency ?? '').toLowerCase() !== 'aud') {
+    throw new RwrUnreadableError(`${what} ${sub.id} is not priced in AUD`);
+  }
+  const items = sub.items;
+  if (!items || !Array.isArray(items.data) || items.data.length === 0) {
+    throw new RwrUnreadableError(`${what} ${sub.id} has no readable items`);
+  }
+  if (items.has_more) {
+    throw new RwrUnreadableError(`${what} ${sub.id} has more items than one page returned`);
+  }
+  return items.data.map((item) => {
     const price = item.price;
     const unit = price?.unit_amount;
     const recurring = price?.recurring;
     if (typeof unit !== 'number' || !recurring) {
-      throw new RwrUnreadableError(`Teams subscription ${sub.id} has an unreadable seat price`);
+      throw new RwrUnreadableError(`${what} ${sub.id} has an unreadable price`);
     }
     if ((price.currency ?? '').toLowerCase() !== 'aud') {
-      throw new RwrUnreadableError(`Teams subscription ${sub.id} is not priced in AUD`);
+      throw new RwrUnreadableError(`${what} ${sub.id} is not priced in AUD`);
     }
     const annual = annualiseUnitAmount(unit, recurring.interval, recurring.interval_count ?? 1);
     if (annual === null) {
-      throw new RwrUnreadableError(
-        `Teams subscription ${sub.id} has an unsupported billing interval`
-      );
+      throw new RwrUnreadableError(`${what} ${sub.id} has an unsupported billing interval`);
     }
     return { seats: item.quantity ?? 1, annualSeatPriceCents: annual };
   });
@@ -109,11 +132,16 @@ export async function collectRwrInputs(
   let excludedSubscriptions = 0;
   const seatLines: SeatLine[] = [];
   for (const sub of subs) {
+    requireLive(sub, 'subscription');
     if (sub.status !== 'active') continue;
     const kind = subscriptionKind(sub);
-    if (kind === 'individual') memberships += 1;
-    else if (kind === 'team') seatLines.push(...seatLinesFor(sub));
-    else excludedSubscriptions += 1;
+    if (kind === 'individual') {
+      // Counted at the GOAL.md $795, but only once its own prices prove to be readable AUD.
+      readSubscriptionItems(sub, 'membership subscription');
+      memberships += 1;
+    } else if (kind === 'team') {
+      seatLines.push(...readSubscriptionItems(sub, 'Teams subscription'));
+    } else excludedSubscriptions += 1;
   }
 
   const since = Math.floor(now.getTime() / 1000) - COURSE_SALES_WINDOW_DAYS * 86_400;
@@ -126,6 +154,7 @@ export async function collectRwrInputs(
   let courseSalesCents28d = 0;
   let courseSales28d = 0;
   for (const s of sessions) {
+    requireLive(s, 'checkout session');
     if (s.mode !== 'payment' || s.payment_status !== 'paid') continue;
     const slug = s.metadata?.course_slug;
     if (typeof slug !== 'string' || !slug.trim()) continue;

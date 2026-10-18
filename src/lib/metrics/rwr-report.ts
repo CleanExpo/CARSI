@@ -2,14 +2,15 @@
  * `npm run report:rwr` (V5). Phill runs it with STRIPE_SECRET_KEY in his own shell; agents never
  * handle the key.
  *
- * Exit codes: 0 = figure printed; 2 = no figure, with the blocker named. It never prints "$0"
+ * Exit codes: 0 = figure printed (the only path that prints an amount); 2 = no figure, with the
+ * blocker named. Live mode only: a test-mode key or test-mode object is refused. It never prints "$0"
  * when it could not look: "$0 per week" says nothing sold, which is a different and much worse
  * statement than "I could not read Stripe".
  */
 import { normalizeStripeSecretKey } from '@/lib/api/stripe';
 
 import { computeRwr, formatAud } from './rwr';
-import { collectRwrInputs, type RwrStripeReader } from './rwr-stripe';
+import { collectRwrInputs, RwrUnreadableError, type RwrStripeReader } from './rwr-stripe';
 
 export type RwrReportDeps = {
   env: Record<string, string | undefined>;
@@ -21,22 +22,53 @@ export type RwrReportDeps = {
   err: (line: string) => void;
 };
 
+/**
+ * Every exit-2 message passes through here, so no failure path can print an amount, whatever
+ * text an upstream error carried. Anything money-shaped (a currency sign or code next to a
+ * number) is removed before it is printed.
+ */
+const MONEY_SHAPED =
+  /(?:[A-Z]{0,3}[$€£¥]\s?\d[\d,]*(?:\.\d+)?)|(?:\b(?:AUD|USD|NZD|GBP|EUR)\s?\d[\d,]*(?:\.\d+)?)|(?:\d[\d,]*(?:\.\d+)?\s?(?:AUD|USD|NZD|GBP|EUR)\b)/gi;
+
+export function withoutAmounts(text: string): string {
+  return text.replace(MONEY_SHAPED, '[amount removed]');
+}
+
 function blocked(deps: RwrReportDeps, reason: string): number {
-  if (deps.json) deps.out(JSON.stringify({ status: 'blocked', reason }));
-  else deps.err(`RWR not reported: ${reason}`);
+  const safe = withoutAmounts(reason);
+  if (deps.json) deps.out(JSON.stringify({ status: 'blocked', reason: safe }));
+  else deps.err(`RWR not reported: ${safe}`);
   return 2;
 }
 
-/** Keep a Stripe error readable without echoing anything key-shaped back. */
+/**
+ * A stable, non-monetary reason. Our own refusals (`RwrUnreadableError`) are worded here and
+ * carry no amounts; anything else (a Stripe SDK or network error) is reduced to its type and
+ * HTTP status, never its free-text message.
+ */
 function describe(error: unknown): string {
-  const raw = error instanceof Error ? error.message : String(error);
-  return raw.replace(/\b(sk|rk)_[A-Za-z0-9_]+/g, '[redacted]').slice(0, 300);
+  if (error instanceof RwrUnreadableError) return error.message;
+  const e = (error ?? {}) as { type?: unknown; statusCode?: unknown; name?: unknown };
+  const type = typeof e.type === 'string' ? e.type : typeof e.name === 'string' ? e.name : 'Error';
+  const status = typeof e.statusCode === 'number' ? `, HTTP ${e.statusCode}` : '';
+  return `Stripe request failed: ${type.replace(/[^A-Za-z]/g, '')}${status}`;
+}
+
+/** Restricted or secret key issued for Stripe test mode. */
+function isTestModeKey(key: string): boolean {
+  return /^(sk|rk)_test_/.test(key);
 }
 
 export async function runRwrReport(deps: RwrReportDeps): Promise<number> {
   const key = normalizeStripeSecretKey(deps.env.STRIPE_SECRET_KEY ?? '');
   if (!key) {
     return blocked(deps, 'STRIPE_SECRET_KEY is not set, so Stripe cannot be read.');
+  }
+  if (isTestModeKey(key)) {
+    return blocked(
+      deps,
+      'STRIPE_SECRET_KEY is a test-mode key; RWR reports live Stripe data only.'
+    );
   }
 
   let collected;
