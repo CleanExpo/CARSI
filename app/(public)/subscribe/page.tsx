@@ -3,8 +3,10 @@ import { cookies } from 'next/headers';
 import Link from 'next/link';
 import { Suspense } from 'react';
 
+import { MembershipViewTracker } from '@/components/analytics/MembershipViewTracker';
 import { verifySessionToken } from '@/lib/auth/session-jwt';
 import { getEntitlements, type Entitlements } from '@/lib/server/entitlements';
+import { formatAnchorAud, getPaidCatalogueValue } from '@/lib/server/membership-value-anchor';
 import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 import { MembershipHexHero } from '@/components/membership/MembershipHexHero';
 import {
@@ -83,11 +85,15 @@ function LapsedBanner() {
 
 export default async function SubscribePage() {
   const enabled = subscriptionsEnabled();
-  const membership = await loadMembership();
+  const [membership, paidCatalogue] = await Promise.all([
+    loadMembership(),
+    getPaidCatalogueValue(),
+  ]);
   const status = membership?.reason ?? null;
 
   return (
     <>
+      <MembershipViewTracker checkoutEnabled={enabled} status={status ?? 'none'} />
       <MembershipHexHero price={PLAN.price} />
       <div
         id="membership-plan"
@@ -113,6 +119,15 @@ export default async function SubscribePage() {
                 <span className="text-slate-600">{PLAN.suffix}</span>
               </div>
               <p className="mt-2 text-sm text-slate-600">{PLAN.helper}</p>
+              {paidCatalogue ? (
+                <p data-membership-value-anchor className="mt-2 text-sm text-slate-700">
+                  Bought separately:{' '}
+                  <span data-anchor-total className="font-semibold text-slate-950">
+                    {formatAnchorAud(paidCatalogue.totalCents)}
+                  </span>{' '}
+                  for the {paidCatalogue.paidCourseCount} paid courses the membership includes.
+                </p>
+              ) : null}
 
               {status === 'active' ? (
                 <p className="mt-3 rounded-lg border border-[#9fdab8] bg-[#f1fbf5] px-3 py-2 text-sm font-medium text-[#1b5e37]">

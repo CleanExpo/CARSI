@@ -3,9 +3,12 @@
 import Link from 'next/link';
 import { useState } from 'react';
 
+import { trackFunnelEvent } from '@/lib/analytics/track-funnel-event';
 import { apiClient, ApiClientError } from '@/lib/api/client';
 import { membershipSignupPath } from '@/lib/membership-signup-path';
 import type { MembershipDecisionReason } from '@/lib/server/entitlements';
+
+const MEMBERSHIP_PRICE_AUD = 795;
 
 interface CheckoutResponse {
   url?: string;
@@ -61,6 +64,11 @@ export function SubscribeCta({
       );
       const url = data.url ?? data.checkout_url;
       if (url) {
+        trackFunnelEvent({
+          name: 'membership_checkout_started',
+          is_renewal: reason === 'lapsed',
+          value_aud: MEMBERSHIP_PRICE_AUD,
+        });
         window.location.href = url;
         return;
       }
@@ -83,7 +91,7 @@ export function SubscribeCta({
   }
 
   const label = reason === 'lapsed' ? 'Renew membership' : 'Start membership';
-  const priceLabel = '$795 / year';
+  const priceLabel = `$${MEMBERSHIP_PRICE_AUD} / year`;
 
   return (
     <>

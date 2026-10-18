@@ -7,8 +7,16 @@
  * Stripe checkout. Kept framework-agnostic so both `ga4-client.ts` and
  * `posthog-client.ts` can consume the same payload without duplicating shape
  * definitions.
+ *
+ * The two membership events instrument the yearly membership funnel the same
+ * way: viewing /subscribe, then starting its Stripe subscription checkout.
  */
-export type FunnelEventName = 'course_view' | 'enrol_click' | 'checkout_started';
+export type FunnelEventName =
+  | 'course_view'
+  | 'enrol_click'
+  | 'checkout_started'
+  | 'membership_view'
+  | 'membership_checkout_started';
 
 export interface CourseViewPayload {
   course_slug: string;
@@ -27,7 +35,24 @@ export interface CheckoutStartedPayload {
   value_aud?: number;
 }
 
+/** The learner's membership state as /subscribe resolved it ('none' = signed out or no plan). */
+export type MembershipFunnelStatus = 'active' | 'grace' | 'lapsed' | 'none' | 'unknown';
+
+export interface MembershipViewPayload {
+  /** False while the membership is still "coming soon" (feature flag off). */
+  checkout_enabled: boolean;
+  membership_status: MembershipFunnelStatus;
+}
+
+export interface MembershipCheckoutStartedPayload {
+  /** True when a lapsed member is renewing rather than joining. */
+  is_renewal: boolean;
+  value_aud?: number;
+}
+
 export type FunnelEventPayload =
   | ({ name: 'course_view' } & CourseViewPayload)
   | ({ name: 'enrol_click' } & EnrolClickPayload)
-  | ({ name: 'checkout_started' } & CheckoutStartedPayload);
+  | ({ name: 'checkout_started' } & CheckoutStartedPayload)
+  | ({ name: 'membership_view' } & MembershipViewPayload)
+  | ({ name: 'membership_checkout_started' } & MembershipCheckoutStartedPayload);

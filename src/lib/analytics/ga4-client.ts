@@ -5,7 +5,13 @@
  * has not loaded yet (e.g. blocked by an ad blocker, or fired before the
  * bootstrap script finishes).
  */
-import type { CheckoutStartedPayload, CourseViewPayload, EnrolClickPayload } from './funnel-events';
+import type {
+  CheckoutStartedPayload,
+  CourseViewPayload,
+  EnrolClickPayload,
+  MembershipCheckoutStartedPayload,
+  MembershipViewPayload,
+} from './funnel-events';
 
 declare global {
   interface Window {
@@ -39,6 +45,20 @@ export function trackCheckoutStarted(payload: CheckoutStartedPayload): void {
   sendGa4Event('checkout_started', {
     course_slug: payload.course_slug,
     purchase_mode: payload.purchase_mode ?? 'self',
+    ...(typeof payload.value_aud === 'number' ? { value: payload.value_aud, currency: 'AUD' } : {}),
+  });
+}
+
+export function trackMembershipView(payload: MembershipViewPayload): void {
+  sendGa4Event('membership_view', {
+    checkout_enabled: payload.checkout_enabled,
+    membership_status: payload.membership_status,
+  });
+}
+
+export function trackMembershipCheckoutStarted(payload: MembershipCheckoutStartedPayload): void {
+  sendGa4Event('membership_checkout_started', {
+    is_renewal: payload.is_renewal,
     ...(typeof payload.value_aud === 'number' ? { value: payload.value_aud, currency: 'AUD' } : {}),
   });
 }
