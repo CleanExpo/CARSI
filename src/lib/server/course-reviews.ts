@@ -10,7 +10,7 @@
 import { createHash } from 'node:crypto';
 
 import { prisma } from '@/lib/prisma';
-import { requireCurrentAdmin } from '@/lib/server/current-admin';
+import { requireCurrentAdmin, type AdminSessionProvenance } from '@/lib/server/current-admin';
 import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
 import {
   ANONYMOUS_REVIEWER_LABEL,
@@ -92,15 +92,34 @@ export function isValidRating(rating: unknown): rating is number {
   return typeof rating === 'number' && Number.isInteger(rating) && rating >= MIN_RATING && rating <= MAX_RATING;
 }
 
+/** Letters and digits only, lower-cased: `John.Smith_88` and `johnsmith88` compare equal. */
+function nameKey(value: string): string {
+  return value.normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
+}
+
 /**
- * First name only — never leak a reviewer's identity publicly (D8). With no name on file the
- * label is a fixed neutral one; it is never derived from the email (an address local-part such
- * as `john.smith.waterdamage` is personal information the learner never agreed to publish).
+ * Pure: is this stored name really the learner's email address or its local part? Several
+ * sign-up paths store `email.split('@')[0]` as the name when none was given (release-gate r8), so
+ * a non-blank fullName is NOT evidence the learner chose it.
  */
-export function displayAuthor(student: { fullName: string | null } | null): string {
+export function isEmailDerivedName(name: string, email: string | null | undefined): boolean {
+  if (name.includes('@')) return true;
+  const local = email?.split('@')[0] ?? '';
+  if (!local) return false;
+  const key = nameKey(name);
+  return key.length > 0 && key === nameKey(local);
+}
+
+/**
+ * First name only — never leak a reviewer's identity publicly (D8). With no independently
+ * supplied name on file the label is a fixed neutral one; it is never derived from the email (an
+ * address local-part such as `john.smith.waterdamage` is personal information the learner never
+ * agreed to publish), including when a sign-up path stored that local part as the name.
+ */
+export function displayAuthor(student: { fullName: string | null; email?: string | null } | null): string {
   const name = student?.fullName?.trim();
-  if (name) return name.split(/\s+/)[0]!;
-  return ANONYMOUS_REVIEWER_LABEL;
+  if (!name || isEmailDerivedName(name, student?.email)) return ANONYMOUS_REVIEWER_LABEL;
+  return name.split(/\s+/)[0]!;
 }
 
 /** Pure: map a persisted review row to the public DTO. */
@@ -221,7 +240,7 @@ export async function getReviewModerationRecordingStart(): Promise<Date | null> 
 export async function getReviewerDisplayName(studentId: string): Promise<string> {
   const user = await prisma.lmsUser.findUnique({
     where: { id: studentId },
-    select: { fullName: true },
+    select: { fullName: true, email: true },
   });
   return displayAuthor(user);
 }
@@ -265,7 +284,7 @@ export async function getCourseReviews(
       repliedAt: true,
       isPublished: true,
       createdAt: true,
-      student: { select: { fullName: true } },
+      student: { select: { fullName: true, email: true } },
       ...(includeHidden
         ? {
             moderationEvents: {
@@ -338,13 +357,13 @@ export function toModerationDto(
  */
 export async function setReviewVisibility(
   params:
-    | { reviewId: string; isPublished: false; reason: ReviewHideReason; actorId: string; sessionEmail: string }
-    | { reviewId: string; isPublished: true; reason?: undefined; actorId: string; sessionEmail: string }
+    | { reviewId: string; isPublished: false; reason: ReviewHideReason; actorId: string; session: AdminSessionProvenance }
+    | { reviewId: string; isPublished: true; reason?: undefined; actorId: string; session: AdminSessionProvenance }
 ): Promise<void> {
   await prisma.$transaction(async (tx) => {
     // The moderator is re-validated from the database inside the decision's transaction (r7), with
     // the same function as the email switch; a demoted or deactivated admin's token is refused.
-    const admin = await requireCurrentAdmin(tx, params.sessionEmail);
+    const admin = await requireCurrentAdmin(tx, params.session);
     const review = await tx.lmsCourseReview.update({
       where: { id: params.reviewId },
       // The UPDATE takes the review-row lock and bumps the version atomically, so concurrent
@@ -437,7 +456,19 @@ export async function getOwnReview(
   });
 }
 
-/** Create or update the student's review. Assumes the enrolment gate was already checked. */
+/** Thrown when the enrolment no longer grants access at the moment the review is written. */
+export class ReviewNotAllowedError extends Error {
+  constructor() {
+    super('You can only review a course you are enrolled in');
+    this.name = 'ReviewNotAllowedError';
+  }
+}
+
+/**
+ * Create or update the student's review. The enrolment's access is re-checked under its row lock
+ * in the same transaction (release-gate r8): a refund or revocation that commits after the route's
+ * own check is seen here, and the review is refused (ReviewNotAllowedError).
+ */
 export async function upsertReview(params: {
   courseId: string;
   studentId: string;
@@ -452,9 +483,10 @@ export async function upsertReview(params: {
     // while it checks "has reviewed?" and calls the provider, so this review either commits before
     // that check (and no email goes) or waits until the send is recorded. NO KEY UPDATE does not
     // block foreign-key checks from other tables.
-    await tx.$queryRaw`
-      SELECT "id" FROM "lms_enrollments"
+    const locked = await tx.$queryRaw<Array<{ status: string }>>`
+      SELECT "status" FROM "lms_enrollments"
        WHERE "student_id" = ${params.studentId}::uuid AND "course_id" = ${params.courseId}::uuid FOR NO KEY UPDATE`;
+    if (!locked[0] || !isEnrolmentAccessAllowed(locked[0].status)) throw new ReviewNotAllowedError();
     await tx.lmsCourseReview.upsert({
       where: { courseId_studentId: { courseId: params.courseId, studentId: params.studentId } },
       create: {

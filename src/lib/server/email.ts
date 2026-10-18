@@ -29,6 +29,12 @@ export type SendEmailParams = {
   stream?: MailtrapStream;
   /** Hard limit for the provider call, in ms (default 15 000). */
   timeoutMs?: number;
+  /**
+   * Called immediately before the HTTP request to the provider is made — the only point after
+   * which a failure may mean the message was delivered (release-gate r8). Not called when the
+   * message is skipped (not configured, dev console) or fails while it is being built.
+   */
+  onRequestStart?: () => void;
 };
 
 export type SendEmailResult = {
@@ -184,6 +190,7 @@ export async function sendEmail(params: SendEmailParams): Promise<SendEmailResul
   }
 
   try {
+    params.onRequestStart?.();
     const res = await fetch(MAILTRAP_SEND_URLS[params.stream ?? 'transactional'], {
       method: 'POST',
       headers: {

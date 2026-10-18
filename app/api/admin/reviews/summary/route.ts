@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 
-import { getAdminSessionOrNull } from '@/lib/admin/admin-session';
 import { prisma } from '@/lib/prisma';
 import { resolveCurrentAdmin } from '@/lib/server/current-admin';
+import { readReviewAdminSession } from '@/lib/server/review-admin-session';
 import { getReviewFunnelSummary } from '@/lib/server/review-summary';
 
 /**
@@ -11,7 +11,7 @@ import { getReviewFunnelSummary } from '@/lib/server/review-summary';
  * hidden 1-2 star reviews is how a curated rating would show), and the Google link status.
  */
 export async function GET() {
-  const session = await getAdminSessionOrNull();
+  const session = await readReviewAdminSession();
   if (!session) {
     return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 });
   }
@@ -20,7 +20,7 @@ export async function GET() {
   }
   try {
     // Includes hidden reviews and moderation reasons: the admin is re-checked in the database.
-    if (!(await resolveCurrentAdmin(prisma, session.email))) {
+    if (!(await resolveCurrentAdmin(prisma, session))) {
       return NextResponse.json({ detail: 'Only current admins can view this.' }, { status: 403 });
     }
     return NextResponse.json(await getReviewFunnelSummary());

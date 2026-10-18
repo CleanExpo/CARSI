@@ -27,6 +27,11 @@ const mocks = vi.hoisted(() => ({
   rawSql: [] as string[],
   /** Order of writes inside the transaction (raw locks and Prisma writes). */
   txOps: [] as string[],
+  /** The enrolment status upsertReview reads under its row lock (a revocation may have committed). */
+  lockedEnrolmentStatus: 'completed' as string | null,
+  /** After this many lms_users lookups, the account reads as demoted to student (a concurrent demotion). */
+  demoteAfterLookups: null as number | null,
+  lmsLookups: 0,
 }));
 
 function rawQuery(inTx: boolean) {
@@ -37,10 +42,13 @@ function rawQuery(inTx: boolean) {
     if (sql.includes('"admin_users"')) return [];
     if (sql.includes('"lms_user_roles"')) return (mocks.roleRows.get(String(values[0])) ?? []).map((name) => ({ name }));
     if (sql.includes('"lms_users"')) {
-      const row = mocks.lmsRows.get(String(values[0]));
-      return row ? [row] : [];
+      // By the session's user id (r8), never by its self-asserted email.
+      const hit = [...mocks.lmsRows].find(([, row]) => row.id === String(values[0]));
+      mocks.lmsLookups += 1;
+      const demoted = mocks.demoteAfterLookups !== null && mocks.lmsLookups > mocks.demoteAfterLookups;
+      return hit ? [{ ...hit[1], ...(demoted ? { role: 'student' } : {}), email: hit[0] }] : [];
     }
-    if (sql.includes('"lms_enrollments"')) return [{ id: 'enr-1' }];
+    if (sql.includes('"lms_enrollments"')) return mocks.lockedEnrolmentStatus === null ? [] : [{ status: mocks.lockedEnrolmentStatus }];
     throw new Error(`unexpected raw SQL ${sql}`);
   };
 }
@@ -122,6 +130,9 @@ beforeEach(() => {
   mocks.rawSql = [];
   mocks.txOps = [];
   mocks.roleRows = new Map();
+  mocks.lockedEnrolmentStatus = 'completed';
+  mocks.demoteAfterLookups = null;
+  mocks.lmsLookups = 0;
 });
 
 afterAll(() => {
@@ -233,13 +244,30 @@ describe('POST /reviews/:id/publish — a hide needs a recorded reason (AC-3, D2
     expect(mocks.courseFind).not.toHaveBeenCalled();
   });
 
+  it.each([
+    ['an LMS account self-registered with the ADMIN_EMAIL address (stale admin token)', 'founder@carsi.com.au', { ADMIN_EMAIL: 'founder@carsi.com.au' }],
+    ['an LMS student whose address is in ADMIN_PANEL_EMAILS', 'support@carsi.com.au', { ADMIN_PANEL_EMAILS: 'support@carsi.com.au' }],
+  ])('r8: refuses %s — 403, zero writes, no hidden reviews', async (_label, email, env) => {
+    const saved = { a: process.env.ADMIN_EMAIL, p: process.env.ADMIN_PANEL_EMAILS };
+    Object.assign(process.env, env);
+    try {
+      mocks.claims.mockResolvedValue({ sub: 'lms-x', role: 'admin', email });
+      mocks.lmsRows = new Map([[email, { id: 'lms-x', is_active: true, role: 'student' }]]);
+      expect((await publish({ is_published: false, reason: 'offensive' })).status).toBe(403);
+      expect(mocks.reviewUpdate).not.toHaveBeenCalled();
+      mocks.enrolmentFind.mockResolvedValue(null);
+      expect((await (await getReviews()).json()).can_moderate).toBe(false);
+    } finally {
+      for (const [k, v] of [['ADMIN_EMAIL', saved.a], ['ADMIN_PANEL_EMAILS', saved.p]] as const) {
+        if (v === undefined) delete process.env[k];
+        else process.env[k] = v;
+      }
+    }
+  });
+
   it('a demotion that lands after the route check is still caught inside the moderation transaction', async () => {
     // The route's early check passes, then the admin is demoted before the decision's transaction.
-    let reads = 0;
-    const original = mocks.lmsRows.get('moderator@carsi.com.au')!;
-    mocks.lmsRows = new Map([['moderator@carsi.com.au', original]]);
-    const get = mocks.lmsRows.get.bind(mocks.lmsRows);
-    mocks.lmsRows.get = (k: string) => (++reads > 1 ? { ...original, role: 'student' } : get(k));
+    mocks.demoteAfterLookups = 1;
     const res = await publish({ is_published: false, reason: 'offensive' });
     expect(res.status).toBe(403);
     expect(mocks.reviewUpdate).not.toHaveBeenCalled();
@@ -248,7 +276,7 @@ describe('POST /reviews/:id/publish — a hide needs a recorded reason (AC-3, D2
 
   it('the moderator is re-read FOR SHARE inside the moderation transaction, with the shared helper', async () => {
     await publish({ is_published: false, reason: 'offensive' });
-    expect(mocks.rawSql.some((q) => /^TX:\s*SELECT "id", "is_active", "role" FROM "lms_users" WHERE lower\("email"\) = \? FOR SHARE/.test(q))).toBe(true);
+    expect(mocks.rawSql.some((q) => /^TX:\s*SELECT "id", "email", "is_active", "role" FROM "lms_users" WHERE "id" = \?::uuid FOR SHARE/.test(q))).toBe(true);
   });
 
   it('an instructor cannot hide, even with a valid reason (role gate unchanged)', async () => {
@@ -318,6 +346,20 @@ describe('GET /reviews — ask and Google link are rating-independent, moderatio
     expect(raw).toContain('CARSI learner');
     // The public query must not even select moderation events.
     expect(mocks.reviewFindMany.mock.calls[0]![0].select).not.toHaveProperty('moderationEvents');
+  });
+
+  it('r8 reviewer case: a name a sign-up path derived from the email is never published', async () => {
+    mocks.claims.mockResolvedValue(null);
+    mocks.reviewFindMany.mockResolvedValue([
+      { id: 'r1', rating: 5, title: null, body: null, reply: null, repliedAt: null, isPublished: true, createdAt: new Date('2026-10-02'),
+        student: { fullName: 'john.smith.waterdamage', email: 'john.smith.waterdamage@gmail.com' } },
+      { id: 'r2', rating: 4, title: null, body: null, reply: null, repliedAt: null, isPublished: true, createdAt: new Date('2026-10-01'),
+        student: { fullName: 'John Smith', email: 'john.smith.waterdamage@gmail.com' } },
+    ]);
+    const body = await (await getReviews()).json();
+    expect(body.reviews.map((r: { author: string }) => r.author)).toEqual(['CARSI learner', 'John']);
+    expect(JSON.stringify(body)).not.toMatch(/waterdamage|gmail/);
+    expect(mocks.reviewFindMany.mock.calls[0]![0].select.student).toEqual({ select: { fullName: true, email: true } });
   });
 
   it('moderators see the latest hide reason and an edit-after-hide flag', async () => {
@@ -391,13 +433,33 @@ describe('POST /reviews — who may review, and the response never varies with t
     expect(bodies[0]).not.toMatch(/google/i);
   });
 
+  it.each(['revoked', 'refunded', 'disputed'])(
+    'r8 reviewer case: the enrolment became %s after the route check → 403 and no review is written',
+    async (status) => {
+      mocks.claims.mockResolvedValue({ sub: 'learner-1', role: 'student' });
+      mocks.enrolmentFind.mockResolvedValue({ status: 'completed', completedAt: new Date('2026-10-01') });
+      mocks.lockedEnrolmentStatus = status; // committed between the route's check and the lock
+      const res = await submit(5);
+      expect(res.status).toBe(403);
+      expect(mocks.reviewUpsert).not.toHaveBeenCalled();
+    }
+  );
+
+  it('r8: an enrolment deleted after the route check → 403 and no review is written', async () => {
+    mocks.claims.mockResolvedValue({ sub: 'learner-1', role: 'student' });
+    mocks.enrolmentFind.mockResolvedValue({ status: 'active', completedAt: null });
+    mocks.lockedEnrolmentStatus = null;
+    expect((await submit(4)).status).toBe(403);
+    expect(mocks.reviewUpsert).not.toHaveBeenCalled();
+  });
+
   it('r7: the review is written in a transaction that first locks the enrolment row (serialised with the email send)', async () => {
     mocks.claims.mockResolvedValue({ sub: 'learner-1', role: 'student' });
     mocks.enrolmentFind.mockResolvedValue({ status: 'completed', completedAt: new Date('2026-10-01') });
     mocks.reviewUpsert.mockResolvedValue({});
     expect((await submit(4)).status).toBe(201);
     expect(mocks.txOps).toEqual(['lock-enrolment', 'upsert-review']);
-    expect(mocks.rawSql.some((q) => /^TX:[\s\S]*FROM "lms_enrollments"[\s\S]*"student_id" = \?::uuid AND "course_id" = \?::uuid FOR NO KEY UPDATE/.test(q))).toBe(true);
+    expect(mocks.rawSql.some((q) => /^TX:\s*SELECT "status" FROM "lms_enrollments"[\s\S]*"student_id" = \?::uuid AND "course_id" = \?::uuid FOR NO KEY UPDATE/.test(q))).toBe(true);
     expect(mocks.reviewUpsert).toHaveBeenCalledTimes(1);
   });
 });

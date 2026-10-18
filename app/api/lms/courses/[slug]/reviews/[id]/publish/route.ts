@@ -59,8 +59,10 @@ export async function POST(
   if (!isDatabaseConfigured()) return databaseUnavailableResponse('Review moderation is temporarily unavailable.');
 
   const forbidden = () => NextResponse.json({ detail: 'Only admins can moderate reviews' }, { status: 403 });
+  // Provenance: an LMS session, identified by its user id (never its self-asserted email alone).
+  const session = { via: 'lms_session' as const, userId: claims.sub, email: claims.email };
   try {
-    if (!(await resolveCurrentAdmin(prisma, claims.email))) return forbidden();
+    if (!(await resolveCurrentAdmin(prisma, session))) return forbidden();
     const course = await getCourseIdBySlug(slug);
     if (!course) {
       return NextResponse.json({ detail: 'Course not found' }, { status: 404 });
@@ -70,10 +72,10 @@ export async function POST(
       return NextResponse.json({ detail: 'Review not found' }, { status: 404 });
     }
     if (payload.is_published === false && isHideReason(reason)) {
-      await setReviewVisibility({ reviewId: id, isPublished: false, reason, actorId: claims.sub, sessionEmail: claims.email });
+      await setReviewVisibility({ reviewId: id, isPublished: false, reason, actorId: claims.sub, session });
       return NextResponse.json({ ok: true, is_published: false, hidden_reason: reason });
     }
-    await setReviewVisibility({ reviewId: id, isPublished: true, actorId: claims.sub, sessionEmail: claims.email });
+    await setReviewVisibility({ reviewId: id, isPublished: true, actorId: claims.sub, session });
     return NextResponse.json({ ok: true, is_published: true, hidden_reason: null });
   } catch (e) {
     if (e instanceof NotCurrentAdminError) return forbidden();

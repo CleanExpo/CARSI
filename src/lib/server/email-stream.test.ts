@@ -65,3 +65,32 @@ describe('Mailtrap stream routing', () => {
     expect(hostOf(0)).toBe('https://send.api.mailtrap.io/api/send');
   });
 });
+
+describe('onRequestStart marks the provider-request boundary (release-gate r8)', () => {
+  it('fires once, immediately before the request; a network failure after it is still reported', async () => {
+    const order: string[] = [];
+    fetchMock.mockImplementationOnce(async () => {
+      order.push('request');
+      throw new Error('socket hang up');
+    });
+    const res = await sendEmail({
+      to: 'a@example.com',
+      subject: 's',
+      html: '<p>h</p>',
+      onRequestStart: () => order.push('start'),
+    });
+    expect(order).toEqual(['start', 'request']);
+    expect(res.sent).toBe(false);
+  });
+
+  it('does not fire when nothing is requested (not configured, dev console)', async () => {
+    const start = vi.fn();
+    delete process.env.MAILTRAP_API_KEY;
+    await sendEmail({ to: 'a@example.com', subject: 's', html: '<p>h</p>', onRequestStart: start });
+    process.env.MAILTRAP_API_KEY = 'test-placeholder-not-a-real-key';
+    process.env.EMAIL_DEV_CONSOLE = 'true';
+    await sendEmail({ to: 'a@example.com', subject: 's', html: '<p>h</p>', onRequestStart: start });
+    expect(start).not.toHaveBeenCalled();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+});

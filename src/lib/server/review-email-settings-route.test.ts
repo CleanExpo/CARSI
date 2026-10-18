@@ -26,8 +26,21 @@ const m = vi.hoisted(() => ({
   lockTimeoutOnce: false,
   /** The options the switch transaction was opened with. */
   txOptions: [] as unknown[],
+  /** Makes the next transaction fail to START (no pool connection within maxWait), as Prisma reports it. */
+  startFailure: null as null | { code: string; message: string },
 }));
-vi.mock('@/lib/admin/admin-session', () => ({ getAdminSessionOrNull: m.session }));
+// The verified session WITH its provenance. A test may return { via, ... } explicitly; a bare
+// { email } means "an LMS session if that email has an LMS account, else the admin cookie" —
+// which is what each pre-r8 case below describes.
+vi.mock('@/lib/server/review-admin-session', () => ({
+  readReviewAdminSession: async () => {
+    const s = (await m.session()) as null | { via?: string; email: string; userId?: string };
+    if (!s) return null;
+    if (s.via) return s;
+    const row = m.lmsRows.get(s.email.toLowerCase());
+    return row ? { via: 'lms_session', userId: row.id, email: s.email } : { via: 'admin_cookie', email: s.email };
+  },
+}));
 vi.mock('@/lib/server/review-summary', () => ({ getReviewFunnelSummary: async () => ({ hidden_by_reason: { spam_or_fake: 1 } }) }));
 vi.mock('@/lib/prisma', () => {
   const client = {
@@ -73,14 +86,25 @@ vi.mock('@/lib/prisma', () => {
         return [{ enabled: m.settings.enabled }];
       }
       if (sql.includes('"lms_user_roles"')) return (m.roleRows.get(String(values[0])) ?? []).map((name) => ({ name }));
-      const email = String(values[0]);
-      if (sql.includes('"admin_users"')) return m.adminRows.has(email) ? [m.adminRows.get(email)] : [];
-      if (sql.includes('"lms_users"')) return m.lmsRows.has(email) ? [m.lmsRows.get(email)] : [];
+      if (sql.includes('"admin_users"')) {
+        const email = String(values[0]);
+        return m.adminRows.has(email) ? [m.adminRows.get(email)] : [];
+      }
+      if (sql.includes('"lms_users"')) {
+        // Looked up by the session's user id (r8), never by its self-asserted email.
+        const hit = [...m.lmsRows].find(([, row]) => row.id === String(values[0]));
+        return hit ? [{ ...hit[1], email: hit[0] }] : [];
+      }
       throw new Error(`unexpected SQL ${sql}`);
     },
     // All-or-nothing, like a real transaction: a failure rolls the switch back.
     $transaction: async (fn: (tx: unknown) => unknown, options?: unknown) => {
       m.txOptions.push(options);
+      if (m.startFailure) {
+        const f = m.startFailure;
+        m.startFailure = null;
+        throw Object.assign(new Error(f.message), { code: f.code });
+      }
       const before = { ...m.settings };
       const eventsBefore = m.events.length;
       m.inTx = true;
@@ -116,6 +140,7 @@ beforeEach(() => {
   m.failEventWrite = false;
   m.lockTimeoutOnce = false;
   m.txOptions = [];
+  m.startFailure = null;
   m.adminRows = new Map([['ops@carsi.com.au', { id: 'adm-7', is_active: true, role: 'admin' }]]);
   m.lmsRows = new Map();
   m.roleRows = new Map();
@@ -204,6 +229,76 @@ describe('review-request email switch', () => {
     expect(await refused.json()).not.toHaveProperty('hidden_by_reason');
     m.session.mockResolvedValue({ email: 'ops@carsi.com.au' });
     expect((await summaryGET()).status).toBe(200);
+  });
+
+  it.each([
+    [
+      'r8 reviewer case: an LMS account self-registered with the ADMIN_EMAIL address',
+      { via: 'lms_session', userId: 'lms-x', email: 'founder@carsi.com.au' },
+      { 'founder@carsi.com.au': { id: 'lms-x', is_active: true, role: 'student' } },
+      {},
+    ],
+    [
+      'an LMS student whose address is in ADMIN_PANEL_EMAILS',
+      { via: 'lms_session', userId: 'lms-y', email: 'support@carsi.com.au' },
+      { 'support@carsi.com.au': { id: 'lms-y', is_active: true, role: 'student' } },
+      { ADMIN_PANEL_EMAILS: 'support@carsi.com.au' },
+    ],
+    [
+      'an LMS student whose address matches an active admin_users admin',
+      { via: 'lms_session', userId: 'lms-z', email: 'ops@carsi.com.au' },
+      { 'ops@carsi.com.au': { id: 'lms-z', is_active: true, role: 'student' } },
+      {},
+    ],
+    ['an admin cookie for an address that is neither ADMIN_EMAIL nor an admin_users admin', { via: 'admin_cookie', email: 'lms.admin@carsi.com.au' }, {}, {}],
+  ])('r8: refuses %s — nothing changes', async (_label, session, users, env) => {
+    Object.assign(process.env, env);
+    m.session.mockResolvedValue(session);
+    for (const [k, v] of Object.entries(users as Record<string, LmsRow>)) m.lmsRows.set(k, v);
+    expect((await post({ enabled: true })).status).toBe(403);
+    expect((await GET()).status).toBe(403);
+    expect(m.settings.enabled).toBe(false);
+    expect(m.events).toHaveLength(0);
+  });
+
+  it('r8: the bootstrap and admin_users kinds come only from the admin cookie', async () => {
+    m.session.mockResolvedValue({ via: 'admin_cookie', email: 'founder@carsi.com.au' });
+    expect((await post({ enabled: true })).status).toBe(200);
+    m.session.mockResolvedValue({ via: 'admin_cookie', email: 'ops@carsi.com.au' });
+    expect((await post({ enabled: false })).status).toBe(200);
+    expect(m.events.map((e) => e.actorKind)).toEqual(['bootstrap_admin', 'admin_user']);
+  });
+
+  it('r8: an LMS session is identified by its user id; the actor email is the account\'s current one', async () => {
+    m.lmsRows.set('lms.admin@carsi.com.au', { id: 'lms-3', is_active: true, role: 'admin' });
+    m.session.mockResolvedValue({ via: 'lms_session', userId: 'lms-3', email: 'old-address@carsi.com.au' });
+    expect((await post({ enabled: true })).status).toBe(200);
+    expect(m.events[0]).toMatchObject({ actorKind: 'lms_admin', actorRef: 'lms-3', actorEmail: 'lms.admin@carsi.com.au' });
+    expect(m.sql.some((q) => /^TX:\s*SELECT "id", "email", "is_active", "role" FROM "lms_users" WHERE "id" = \?::uuid FOR SHARE/.test(q))).toBe(true);
+  });
+
+  it('r8: no pool connection within the wait → 409 busy (retryable), nothing changes; the retry lands', async () => {
+    m.startFailure = { code: 'P2028', message: 'Transaction API error: Unable to start a transaction in the given time.' };
+    const res = await post({ enabled: true });
+    expect(res.status).toBe(409);
+    expect((await res.json()).busy).toBe(true);
+    expect(m.events).toHaveLength(0);
+    m.startFailure = { code: 'P2024', message: 'Timed out fetching a new connection from the connection pool.' };
+    expect((await post({ enabled: true })).status).toBe(409);
+    expect((await post({ enabled: true })).status).toBe(200);
+    expect(m.settings.enabled).toBe(true);
+  });
+
+  it('r8: other transaction errors are NOT reported as busy', async () => {
+    m.startFailure = { code: 'P2028', message: 'Transaction already closed: the transaction was committed.' };
+    expect((await post({ enabled: true })).status).toBe(500);
+  });
+
+  it('r8: the switch waits up to 10 s for a connection (sends hold at most one through a provider call)', async () => {
+    const { REVIEW_REQUEST_SWITCH_CONNECTION_WAIT_MS } = await import('./review-request-email');
+    await post({ enabled: true });
+    expect(REVIEW_REQUEST_SWITCH_CONNECTION_WAIT_MS).toBeGreaterThanOrEqual(10_000);
+    expect((m.txOptions[0] as { maxWait?: number }).maxWait).toBe(REVIEW_REQUEST_SWITCH_CONNECTION_WAIT_MS);
   });
 
   it('identity rows are re-read FOR SHARE inside the switch transaction', async () => {

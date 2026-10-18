@@ -15,6 +15,7 @@ import {
   getReviewerDisplayName,
   isEnrolledInCourse,
   isValidRating,
+  ReviewNotAllowedError,
   upsertReview,
 } from '@/lib/server/course-reviews';
 
@@ -61,7 +62,9 @@ export async function GET(request: NextRequest, ctx: { params: Promise<{ slug: s
     if (claims) {
       canManage = canManageReviews(claims.role);
       // Hidden reviews and their reasons go only to a CURRENT admin, re-checked in the database (r7).
-      canModerate = canModerateReviews(claims.role) && (await resolveCurrentAdmin(prisma, claims.email)) !== null;
+      canModerate =
+        canModerateReviews(claims.role) &&
+        (await resolveCurrentAdmin(prisma, { via: 'lms_session', userId: claims.sub, email: claims.email })) !== null;
       canReview = await isEnrolledInCourse(claims.sub, course.id);
       ownReview = canReview ? await getOwnReview(claims.sub, course.id) : null;
       if (canReview) {
@@ -133,6 +136,7 @@ export async function POST(request: NextRequest, ctx: { params: Promise<{ slug: 
     await upsertReview({ courseId: course.id, studentId: claims.sub, rating: payload.rating, title, body });
     return NextResponse.json({ ok: true }, { status: 201 });
   } catch (e) {
+    if (e instanceof ReviewNotAllowedError) return NextResponse.json({ detail: e.message }, { status: 403 });
     console.error('[courses/:slug/reviews POST]', e);
     return NextResponse.json({ detail: 'Failed to save review' }, { status: 500 });
   }

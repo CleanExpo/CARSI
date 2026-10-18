@@ -13,7 +13,10 @@
  *   - r7: OFF through the REAL Prisma setter lands behind a send held past Prisma's 5 s default,
  *     and a send that starts while OFF is waiting never reaches the provider (fair lock);
  *   - r7: a review submitted during a send waits for it; one committed before the checks stops it;
- *   - r7: a lock wait longer than the send's bound fails before the provider call (retryable).
+ *   - r7: a lock wait longer than the send's bound fails before the provider call (retryable);
+ *   - r8: with ten overlapping runs and one send held at the provider, only ONE send transaction
+ *     exists and OFF through the real setter still gets a connection and lands;
+ *   - r8: a review whose enrolment is revoked between the route check and the lock is refused.
  *
  * Where it runs: CI's E2E job (`npm run test:pg`) against its migrated postgres:16 service, before
  * any seeding. It needs a LOCAL, migrated, EMPTY database (no enrolments) and refuses anything
@@ -56,6 +59,7 @@ describe.runIf(RUNNABLE)('review-request send locks (real PostgreSQL, two sessio
   let runReviewRequestEmails: typeof import('./review-request-email').runReviewRequestEmails;
   let setReviewRequestEmailsEnabled: typeof import('./review-request-email').setReviewRequestEmailsEnabled;
   let upsertReview: typeof import('./course-reviews').upsertReview;
+  let ReviewNotAllowedError: typeof import('./course-reviews').ReviewNotAllowedError;
   let prisma: typeof import('@/lib/prisma').prisma;
   const writer = new pg.Client({ connectionString: DB_URL });
   const writer2 = new pg.Client({ connectionString: DB_URL });
@@ -79,7 +83,7 @@ describe.runIf(RUNNABLE)('review-request send locks (real PostgreSQL, two sessio
       );
     ({ runReviewRequestEmails, setReviewRequestEmailsEnabled } =
       await import('./review-request-email'));
-    ({ upsertReview } = await import('./course-reviews'));
+    ({ upsertReview, ReviewNotAllowedError } = await import('./course-reviews'));
     ({ prisma } = await import('@/lib/prisma'));
   });
 
@@ -134,9 +138,7 @@ describe.runIf(RUNNABLE)('review-request send locks (real PostgreSQL, two sessio
   afterEach(async () => {
     for (const c of [writer, writer2]) await c.query('ROLLBACK').catch(() => {});
     await watcher.query('DELETE FROM lms_enrollments WHERE student_id = $1', [ids.learner]);
-    await watcher.query('DELETE FROM lms_courses WHERE id = ANY($1::uuid[])', [
-      [ids.course, ids.course2],
-    ]);
+    await watcher.query('DELETE FROM lms_courses WHERE instructor_id = $1', [ids.instructor]);
     await watcher.query('DELETE FROM lms_users WHERE id = ANY($1::uuid[])', [
       [ids.learner, ids.instructor, ids.admin],
     ]);
@@ -147,6 +149,11 @@ describe.runIf(RUNNABLE)('review-request send locks (real PostgreSQL, two sessio
   });
 
   const adminEmail = () => `admin-${ids.admin}@lock-test.invalid`;
+  const adminSession = () => ({
+    via: 'lms_session' as const,
+    userId: ids.admin,
+    email: adminEmail(),
+  });
   const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
   async function ledgerRow(enrolment: string) {
@@ -359,7 +366,7 @@ describe.runIf(RUNNABLE)('review-request send locks (real PostgreSQL, two sessio
     })();
     // Session 2: an admin switching off through the real setter (waits for the send's fair lock,
     // then for session 1's shared row lock).
-    const session2 = setReviewRequestEmailsEnabled(false, adminEmail());
+    const session2 = setReviewRequestEmailsEnabled(false, adminSession());
     await waitForLockWaiters(2);
     hold.release();
     const [res] = await Promise.all([run, session1, session2]); // a deadlock would reject with 40P01
@@ -383,7 +390,7 @@ describe.runIf(RUNNABLE)('review-request send locks (real PostgreSQL, two sessio
     const run1 = runReviewRequestEmails({});
     await hold.inSend;
     const heldAt = Date.now();
-    const off = setReviewRequestEmailsEnabled(false, adminEmail());
+    const off = setReviewRequestEmailsEnabled(false, adminSession());
     await waitForLockWaiters(1); // OFF is queued for the switch's fair lock
     const run2 = runReviewRequestEmails({}); // a second run reaches its next send
     await waitForLockWaiters(2); // ...and queues BEHIND the waiting OFF, not beside the send
@@ -481,5 +488,70 @@ describe.runIf(RUNNABLE)('review-request send locks (real PostgreSQL, two sessio
     });
     expect((await runReviewRequestEmails({})).sent).toBe(1); // the next run sends it, once
     expect(mail.send).toHaveBeenCalledTimes(1);
+  });
+
+  it('r8 reviewer case: ten overlapping runs while a send is held — one send transaction, OFF still gets a connection and lands', async () => {
+    const more = [randomUUID(), randomUUID()];
+    for (const [i, id] of more.entries()) {
+      const course = i === 0 ? ids.course2 : randomUUID();
+      if (i === 1) {
+        await watcher.query(
+          "INSERT INTO lms_courses (id, slug, title, instructor_id, status, price_aud) VALUES ($1, $2, 'Lock test 3', $3, 'published', 0)",
+          [course, `lock-test-${course}`, ids.instructor]
+        );
+      }
+      await watcher.query(
+        "INSERT INTO lms_enrollments (id, student_id, course_id, status, completed_at) VALUES ($1, $2, $3, 'completed', now() - interval '4 days')",
+        [id, ids.learner, course]
+      );
+    }
+    const hold = holdTheSend();
+    const run1 = runReviewRequestEmails({});
+    await hold.inSend;
+    const heldAt = Date.now();
+    // Nine more runs overlap the held send. Each finds the global send mutex taken and stops.
+    const others = await Promise.all(Array.from({ length: 9 }, () => runReviewRequestEmails({})));
+    expect(others.every((r) => r.sent === 0 && r.ambiguous === 0)).toBe(true);
+    expect(others.some((r) => r.deferred_to_running_send === true)).toBe(true);
+    // Only the held send keeps a transaction open through the provider call.
+    const open = await watcher.query<{ n: number }>(
+      "SELECT count(*)::int AS n FROM pg_stat_activity WHERE datname = current_database() AND state LIKE 'idle in transaction%' AND pid <> pg_backend_pid()"
+    );
+    expect(open.rows[0]!.n).toBeLessThanOrEqual(1);
+    const off = setReviewRequestEmailsEnabled(false, adminSession());
+    await waitForLockWaiters(1); // OFF has a connection and is queued behind the held send
+    await sleep(Math.max(0, 7_000 - (Date.now() - heldAt)));
+    hold.release();
+    const [r1, saved] = await Promise.all([run1, off]);
+    expect(saved.enabled).toBe(false);
+    expect(r1.sent).toBe(1);
+    expect(mail.send).toHaveBeenCalledTimes(1);
+    for (const id of more) expect(await ledgerStatus(id)).not.toBe('ambiguous');
+  });
+
+  it('r8 reviewer case: a revocation committed between the route check and the lock refuses the review', async () => {
+    await writer.query('BEGIN');
+    await writer.query(
+      "UPDATE lms_enrollments SET status = 'revoked', completed_at = NULL WHERE id = $1",
+      [ids.enrolment]
+    );
+    const submit = upsertReview({
+      courseId: ids.course,
+      studentId: ids.learner,
+      rating: 5,
+      title: 'x',
+      body: 'y',
+    }).then(
+      () => 'saved',
+      (e: unknown) => e
+    );
+    await waitForLockWaiters(1); // the review transaction waits on the enrolment row lock
+    await writer.query('COMMIT');
+    expect(await submit).toBeInstanceOf(ReviewNotAllowedError);
+    const reviews = await watcher.query(
+      'SELECT 1 FROM lms_course_reviews WHERE course_id = $1 AND student_id = $2',
+      [ids.course, ids.learner]
+    );
+    expect(reviews.rows).toHaveLength(0);
   });
 });

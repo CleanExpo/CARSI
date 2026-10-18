@@ -1,8 +1,8 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
-import { getAdminSessionOrNull } from '@/lib/admin/admin-session';
 import { prisma } from '@/lib/prisma';
 import { NotCurrentAdminError, resolveCurrentAdmin } from '@/lib/server/current-admin';
+import { readReviewAdminSession } from '@/lib/server/review-admin-session';
 import { databaseUnavailableResponse, isDatabaseConfigured } from '@/lib/server/database-unavailable';
 import {
   listReviewRequestSwitchEvents,
@@ -22,10 +22,10 @@ import {
  * admin is refused. A change waits for any in-flight send; if one outlasts the bound, 409 (retry).
  */
 export async function GET() {
-  const session = await getAdminSessionOrNull();
+  const session = await readReviewAdminSession();
   if (!session) return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 });
   if (!isDatabaseConfigured()) return databaseUnavailableResponse();
-  if (!(await resolveCurrentAdmin(prisma, session.email))) {
+  if (!(await resolveCurrentAdmin(prisma, session))) {
     return NextResponse.json({ detail: 'Only current admins can view this.' }, { status: 403 });
   }
   const [settings, history] = await Promise.all([readReviewRequestSettings(), listReviewRequestSwitchEvents()]);
@@ -43,7 +43,7 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const session = await getAdminSessionOrNull();
+  const session = await readReviewAdminSession();
   if (!session) return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 });
 
   let payload: { enabled?: unknown };
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
 
   try {
     // The admin is re-validated from the database inside the switch transaction, not from the token.
-    const saved = await setReviewRequestEmailsEnabled(payload.enabled, session.email);
+    const saved = await setReviewRequestEmailsEnabled(payload.enabled, session);
     return NextResponse.json({ enabled: saved.enabled, changed_at: saved.changedAt.toISOString() });
   } catch (e) {
     if (e instanceof NotCurrentAdminError) {

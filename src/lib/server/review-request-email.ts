@@ -33,10 +33,10 @@ import { randomUUID } from 'node:crypto';
 import { getAppOrigin } from '@/lib/server/app-url';
 import { buildCarsiEmailHtml, brandLink, type RenderedEmail } from '@/lib/server/email-templates';
 import { buildUnsubscribeUrl } from '@/lib/server/email-preferences';
-import { isEmailConfigured, sendEmail, type SendEmailResult } from '@/lib/server/email';
+import { isEmailConfigured, sendEmail, type SendEmailParams, type SendEmailResult } from '@/lib/server/email';
 import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
 import { signEmailUnsubscribeToken } from '@/lib/auth/session-jwt';
-import { requireCurrentAdmin, type CurrentAdmin } from '@/lib/server/current-admin';
+import { requireCurrentAdmin, type AdminSessionProvenance, type CurrentAdmin } from '@/lib/server/current-admin';
 import { prisma } from '@/lib/prisma';
 
 const DAY_MS = 86_400_000;
@@ -76,6 +76,13 @@ export type ReviewRequestSwitchActor = CurrentAdmin;
  */
 const SWITCH_LOCK_CLASS = 0x43415253;
 const SWITCH_LOCK_ID = 1;
+/**
+ * The global send mutex (release-gate r8): at most ONE review-request send transaction — the only
+ * kind that holds a connection through a provider call — exists at a time, across every overlapping
+ * cron run. A run that finds it taken stops (the other run is sending) and leaves its row eligible.
+ * So overlapping runs can never fill the connection pool and starve a switch change.
+ */
+const SEND_MUTEX_ID = 2;
 
 /**
  * Each locked statement in a send waits at most this long for a conflicting writer; the send then
@@ -92,6 +99,13 @@ export const REVIEW_REQUEST_SEND_IDLE_TIMEOUT_MS = 15_000;
 export const REVIEW_REQUEST_SWITCH_LOCK_TIMEOUT_MS = 25_000;
 /** The switch change's own transaction limit. Prisma's 5 s default would expire behind one slow send (r7). */
 export const REVIEW_REQUEST_SWITCH_TRANSACTION_TIMEOUT_MS = 30_000;
+
+/**
+ * How long a switch change waits for a database connection (release-gate r8). Sends are serial
+ * (REVIEW_REQUEST_SEND_MUTEX: at most one send transaction holds a connection through a provider
+ * call, everywhere), so the pool always has room; this bounds the wait if other traffic fills it.
+ */
+export const REVIEW_REQUEST_SWITCH_CONNECTION_WAIT_MS = 10_000;
 
 /** A switch change gave up waiting for an in-flight send; nothing changed and it can be retried. */
 export class SwitchBusyError extends Error {
@@ -121,6 +135,15 @@ export function isLockNotAvailableError(e: unknown): boolean {
   return false;
 }
 
+/** True when Prisma could not start the transaction in time (no pool connection) — nothing ran. */
+export function isTransactionStartTimeoutError(e: unknown): boolean {
+  const o = e as { code?: unknown; message?: unknown } | null;
+  if (!o || typeof o !== 'object') return false;
+  const message = typeof o.message === 'string' ? o.message : '';
+  if (o.code === 'P2024') return true; // timed out fetching a connection from the pool
+  return o.code === 'P2028' && /unable to start a transaction/i.test(message);
+}
+
 /**
  * Switch review-request emails on or off (admin only; spec D10d, D10e). In ONE transaction: take
  * the switch's fair lock exclusive (which waits for every in-flight send and stops later ones
@@ -130,7 +153,7 @@ export function isLockNotAvailableError(e: unknown): boolean {
  * whose locked checks have not yet run. The waits are bounded above the longest send, so a change
  * lands; if a send somehow outlasts that bound, SwitchBusyError is thrown and nothing changed.
  */
-export async function setReviewRequestEmailsEnabled(enabled: boolean, sessionEmail: string | null | undefined) {
+export async function setReviewRequestEmailsEnabled(enabled: boolean, session: AdminSessionProvenance | null | undefined) {
   try {
     return await prisma.$transaction(
       async (tx) => {
@@ -139,7 +162,7 @@ export async function setReviewRequestEmailsEnabled(enabled: boolean, sessionEma
         const current = await tx.$queryRaw<Array<{ enabled: boolean }>>`
           SELECT "enabled" FROM "lms_review_request_settings" WHERE "id" = 1 FOR UPDATE`;
         if (current.length !== 1) throw new Error('lms_review_request_settings row is missing');
-        const actor = await requireCurrentAdmin(tx, sessionEmail);
+        const actor = await requireCurrentAdmin(tx, session);
         await tx.lmsReviewRequestSettings.update({ where: { id: 1 }, data: { enabled } });
         const event = await tx.lmsReviewRequestSwitchEvent.create({
           data: {
@@ -153,10 +176,10 @@ export async function setReviewRequestEmailsEnabled(enabled: boolean, sessionEma
         });
         return { enabled, changedAt: event.createdAt, actor };
       },
-      { maxWait: 5_000, timeout: REVIEW_REQUEST_SWITCH_TRANSACTION_TIMEOUT_MS }
+      { maxWait: REVIEW_REQUEST_SWITCH_CONNECTION_WAIT_MS, timeout: REVIEW_REQUEST_SWITCH_TRANSACTION_TIMEOUT_MS }
     );
   } catch (e) {
-    if (isLockNotAvailableError(e)) throw new SwitchBusyError();
+    if (isLockNotAvailableError(e) || isTransactionStartTimeoutError(e)) throw new SwitchBusyError();
     throw e;
   }
 }
@@ -249,13 +272,18 @@ export function renderReviewRequestEmail(params: {
 }
 
 /** Send one review-request email with RFC 8058 one-click unsubscribe headers. */
-export async function sendReviewRequestEmail(params: {
+/**
+ * Build the complete review-request message (signs the unsubscribe token, renders the body). Runs
+ * BEFORE any provider request, so a failure here — e.g. a missing signing secret — means nothing
+ * was sent and the send stays retryable (release-gate r8).
+ */
+export async function prepareReviewRequestEmail(params: {
   to: string;
   userId: string;
   name: string;
   courseTitle: string;
   courseSlug: string;
-}): Promise<SendEmailResult> {
+}): Promise<SendEmailParams> {
   const appOrigin = getAppOrigin();
   const token = await signEmailUnsubscribeToken(params.userId);
   // Footer link: the browser confirmation page. Header: the RFC 8058 endpoint mail clients POST
@@ -270,7 +298,7 @@ export async function sendReviewRequestEmail(params: {
     reviewUrl,
     unsubscribeUrl,
   });
-  return sendEmail({
+  return {
     to: params.to,
     subject,
     html,
@@ -283,7 +311,12 @@ export async function sendReviewRequestEmail(params: {
       'List-Unsubscribe': `<${oneClickUrl}>`,
       'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
     },
-  });
+  };
+}
+
+/** Prepare and send one review-request email (outside the cron runner, e.g. a manual send). */
+export async function sendReviewRequestEmail(params: Parameters<typeof prepareReviewRequestEmail>[0]): Promise<SendEmailResult> {
+  return sendEmail(await prepareReviewRequestEmail(params));
 }
 
 export type ReviewRequestSkipReason =
@@ -302,6 +335,8 @@ export type ReviewRequestRunResult = {
   reason?: 'disabled' | 'settings_missing' | 'email_not_configured';
   /** The switch was turned off during this run; no further send was started. */
   stopped_by_switch?: boolean;
+  /** Another run was sending (global send mutex); this run stopped and left the rest for later. */
+  deferred_to_running_send?: boolean;
   dry_run: boolean;
   window?: { from: string; to: string };
   candidates: number;
@@ -341,7 +376,9 @@ export type SendGateOutcome =
     }
   | { kind: 'sent' }
   | { kind: 'failed' }
-  | { kind: 'ambiguous' };
+  | { kind: 'ambiguous' }
+  /** Another run holds the global send mutex; this run stops and leaves the row as it was. */
+  | { kind: 'busy' };
 
 /**
  * Pure: the final, binding decision made INSIDE the locked send transaction, from rows read under
@@ -504,16 +541,15 @@ export async function runReviewRequestEmails(options: { now?: Date; dryRun?: boo
     let learner: { email: string; fullName: string | null; emailOptOut: boolean; isActive: boolean } | null;
     let reviewed: boolean;
     try {
-      const [user, review] = await Promise.all([
-        prisma.lmsUser.findUnique({
-          where: { id: enrolment.studentId },
-          select: { email: true, fullName: true, emailOptOut: true, isActive: true },
-        }),
-        prisma.lmsCourseReview.findUnique({
-          where: { courseId_studentId: { courseId: enrolment.courseId, studentId: enrolment.studentId } },
-          select: { id: true },
-        }),
-      ]);
+      // One query at a time: a run never holds more than one pool connection (release-gate r8).
+      const user = await prisma.lmsUser.findUnique({
+        where: { id: enrolment.studentId },
+        select: { email: true, fullName: true, emailOptOut: true, isActive: true },
+      });
+      const review = await prisma.lmsCourseReview.findUnique({
+        where: { courseId_studentId: { courseId: enrolment.courseId, studentId: enrolment.studentId } },
+        select: { id: true },
+      });
       learner = user;
       reviewed = review !== null;
     } catch {
@@ -572,6 +608,16 @@ export async function runReviewRequestEmails(options: { now?: Date; dryRun?: boo
           await tx.$executeRawUnsafe(
             `SET LOCAL idle_in_transaction_session_timeout = '${REVIEW_REQUEST_SEND_IDLE_TIMEOUT_MS}ms'`
           );
+          const mutex = await tx.$queryRaw<Array<{ acquired: boolean }>>`
+            SELECT pg_try_advisory_xact_lock(${SWITCH_LOCK_CLASS}::int4, ${SEND_MUTEX_ID}::int4) AS "acquired"`;
+          if (mutex[0]?.acquired !== true) {
+            // Another run is sending right now: give the row back untouched and stop this run.
+            await tx.lmsReviewRequestEmail.updateMany({
+              where: { enrollmentId: enrolment.id, claimToken: token },
+              data: { status: ledger.status === 'failed' ? 'failed' : 'eligible', sendAttemptedAt: null, claimToken: null },
+            });
+            return { kind: 'busy' as const };
+          }
           await tx.$executeRaw`SELECT pg_advisory_xact_lock_shared(${SWITCH_LOCK_CLASS}::int4, ${SWITCH_LOCK_ID}::int4)`;
           const sw = await tx.$queryRaw<Array<{ enabled: boolean }>>`
             SELECT "enabled" FROM "lms_review_request_settings" WHERE "id" = 1 FOR SHARE`;
@@ -610,17 +656,26 @@ export async function runReviewRequestEmails(options: { now?: Date; dryRun?: boo
             return decision;
           }
 
+          // Build the whole message first: a failure here (e.g. token signing) sends nothing and
+          // escapes the transaction as a retryable pre-send failure (release-gate r8).
+          const message = await prepareReviewRequestEmail({
+            to: decision.to,
+            userId: enrolment.studentId,
+            name: decision.name,
+            courseTitle: enrolment.course.title,
+            courseSlug: enrolment.course.slug,
+          });
           let sendResult: SendEmailResult;
-          providerCalled = true;
           try {
-            sendResult = await sendReviewRequestEmail({
-              to: decision.to,
-              userId: enrolment.studentId,
-              name: decision.name,
-              courseTitle: enrolment.course.title,
-              courseSlug: enrolment.course.slug,
+            sendResult = await sendEmail({
+              ...message,
+              // The ONLY point after which a failure may mean the message was delivered.
+              onRequestStart: () => {
+                providerCalled = true;
+              },
             });
-          } catch {
+          } catch (e) {
+            if (!providerCalled) throw e; // failed while building the request: nothing was sent
             sendResult = { sent: false, reason: 'send_failed' };
           }
           if (wasReallySent(sendResult)) {
@@ -649,7 +704,8 @@ export async function runReviewRequestEmails(options: { now?: Date; dryRun?: boo
       );
     } catch {
       if (!providerCalled) {
-        // Failed before the provider was called (e.g. a lock wait timed out): nothing was sent.
+        // Failed before any provider request was made (a lock wait timed out, the message could
+      // not be built, ...): nothing was sent.
         // Release the claim as a retryable failure without using an attempt.
         await finish({ status: 'failed', failureReason: 'pre_send_error', sendAttemptedAt: null }).catch(() => {});
         result.failed += 1;
@@ -677,6 +733,9 @@ export async function runReviewRequestEmails(options: { now?: Date; dryRun?: boo
         return;
       case 'lost_claim':
         skip('claimed_elsewhere');
+        return;
+      case 'busy':
+        result.deferred_to_running_send = true;
         return;
       case 'hold':
         if (outcome.reason === 'switched_off') result.stopped_by_switch = true;
@@ -729,10 +788,10 @@ export async function runReviewRequestEmails(options: { now?: Date; dryRun?: boo
     const last = candidates[candidates.length - 1]!;
     after = { completedAt: last.completedAt!, id: last.id };
     for (const enrolment of candidates) {
-      if (capReached() || result.stopped_by_switch) break;
+      if (capReached() || result.stopped_by_switch || result.deferred_to_running_send) break;
       await processCandidate(enrolment);
     }
-    if (candidates.length < PAGE_SIZE || result.stopped_by_switch) break;
+    if (candidates.length < PAGE_SIZE || result.stopped_by_switch || result.deferred_to_running_send) break;
   }
 
   result.ok = result.failed === 0;

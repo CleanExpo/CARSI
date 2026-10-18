@@ -63,13 +63,52 @@ const db = vi.hoisted(() => ({
   failSendTxAfterProvider: false,
   /** Makes the next locked read of this table time out (SQLSTATE 55P03) inside the send transaction. */
   lockTimeoutOn: null as null | string,
+  /** The global send mutex (pg_try_advisory_xact_lock): held by the open send transaction, if any. */
+  sendMutexHeld: false,
+  /** Makes the next send fail while the request is being BUILT (before any provider request). */
+  failBeforeRequest: false,
+  /** Makes the next unsubscribe-token signing throw (e.g. JWT_SECRET missing in production). */
+  failSigningOnce: false,
+  /** Pre-check reads in flight right now, and the most seen at once (one connection per run). */
+  readsInFlight: 0,
+  maxReadsInFlight: 0,
 }));
+
+/** Count overlapping pre-check reads: a run must hold at most one pool connection at a time. */
+async function overlapCounted<T>(fn: () => T): Promise<T> {
+  db.readsInFlight += 1;
+  db.maxReadsInFlight = Math.max(db.maxReadsInFlight, db.readsInFlight);
+  try {
+    await new Promise((r) => setTimeout(r, 1));
+    return fn();
+  } finally {
+    db.readsInFlight -= 1;
+  }
+}
 const mail = vi.hoisted(() => ({ send: vi.fn(), configured: vi.fn(() => true) }));
 const unsub = vi.hoisted(() => ({ setOptOut: vi.fn(async (_id: string, optedOut: boolean) => ({ email_opt_out: optedOut })) }));
 
-vi.mock('@/lib/server/email', () => ({ sendEmail: mail.send, isEmailConfigured: mail.configured }));
+// The transport: by default the provider request starts (onRequestStart) and `mail.send` decides
+// the reply. `failBeforeRequest` models a throw while the request is still being built.
+vi.mock('@/lib/server/email', () => ({
+  sendEmail: async (params: { onRequestStart?: () => void }) => {
+    if (db.failBeforeRequest) {
+      db.failBeforeRequest = false;
+      throw new Error('invalid recipient address');
+    }
+    params.onRequestStart?.();
+    return mail.send(params);
+  },
+  isEmailConfigured: mail.configured,
+}));
 vi.mock('@/lib/auth/session-jwt', () => ({
-  signEmailUnsubscribeToken: async (id: string) => `tok-${id}`,
+  signEmailUnsubscribeToken: async (id: string) => {
+    if (db.failSigningOnce) {
+      db.failSigningOnce = false;
+      throw new Error('JWT_SECRET is not set');
+    }
+    return `tok-${id}`;
+  },
   verifyEmailUnsubscribeToken: async (token: string) => (token.startsWith('tok-') ? token.slice(4) : null),
 }));
 vi.mock('@/lib/server/email-preferences', async (importOriginal) => ({
@@ -121,6 +160,12 @@ vi.mock('@/lib/prisma', () => ({
         db.lockTimeoutOn = null;
         throw Object.assign(new Error('canceling statement due to lock timeout'), { code: '55P03' });
       }
+      if (sql.includes('pg_try_advisory_xact_lock')) {
+        if (db.sendMutexHeld) return [{ acquired: false }];
+        db.sendMutexHeld = true;
+        db.locks.add('send-mutex');
+        return [{ acquired: true }];
+      }
       if (sql.includes('"lms_course_reviews"')) {
         // Read under the enrolment lock: (course_id, student_id).
         return db.reviews.has(`${values[0]}:${values[1]}`) ? [{ id: 'r' }] : [];
@@ -162,6 +207,7 @@ vi.mock('@/lib/prisma', () => ({
         db.ledger = snapshot;
         throw e;
       } finally {
+        if (db.locks.has('send-mutex')) db.sendMutexHeld = false;
         db.locks.clear();
       }
     },
@@ -217,17 +263,20 @@ vi.mock('@/lib/prisma', () => ({
       },
     },
     lmsUser: {
-      findUnique: async ({ where }: { where: { id: string } }) => {
-        if (db.failUserReadOnce) {
-          db.failUserReadOnce = false;
-          throw new Error('connection reset');
-        }
-        return db.users.get(where.id) ?? null;
-      },
+      findUnique: async ({ where }: { where: { id: string } }) =>
+        overlapCounted(() => {
+          if (db.failUserReadOnce) {
+            db.failUserReadOnce = false;
+            throw new Error('connection reset');
+          }
+          return db.users.get(where.id) ?? null;
+        }),
     },
     lmsCourseReview: {
       findUnique: async ({ where }: { where: { courseId_studentId: { courseId: string; studentId: string } } }) =>
-        db.reviews.has(`${where.courseId_studentId.courseId}:${where.courseId_studentId.studentId}`) ? { id: 'r' } : null,
+        overlapCounted(() =>
+          db.reviews.has(`${where.courseId_studentId.courseId}:${where.courseId_studentId.studentId}`) ? { id: 'r' } : null
+        ),
     },
   },
 }));
@@ -290,6 +339,11 @@ beforeEach(() => {
   db.beforeSendTx = null;
   db.failSendTxAfterProvider = false;
   db.lockTimeoutOn = null;
+  db.sendMutexHeld = false;
+  db.failBeforeRequest = false;
+  db.failSigningOnce = false;
+  db.readsInFlight = 0;
+  db.maxReadsInFlight = 0;
   unsub.setOptOut.mockClear();
   mail.send.mockReset().mockResolvedValue({ sent: true, messageId: 'm-1' });
   mail.configured.mockReset().mockReturnValue(true);
@@ -435,7 +489,7 @@ describe('ONE locked transaction per send (release-gate r6)', () => {
       return { sent: true, messageId: 'm-locked' };
     });
     expect((await run()).sent).toBe(1);
-    expect(heldDuringSend).toEqual(['enrollment:e1', 'ledger:e1', 'settings', 'switch-fair-lock', 'user:student-e1']);
+    expect(heldDuringSend).toEqual(['enrollment:e1', 'ledger:e1', 'send-mutex', 'settings', 'switch-fair-lock', 'user:student-e1']);
     const sql = db.rawSql.join('\n');
     expect(sql).toMatch(/"lms_review_request_settings" WHERE "id" = 1 FOR SHARE/);
     expect(sql).toMatch(/FROM "lms_enrollments" WHERE "id" = \?::uuid FOR SHARE/);
@@ -492,6 +546,59 @@ describe('ONE locked transaction per send (release-gate r6)', () => {
       expect(mail.send).toHaveBeenCalledTimes(1);
     }
   );
+
+  it('r8 reviewer case: unsubscribe-token signing fails before any provider request → retryable, never ambiguous', async () => {
+    addCompleter('e1', 5 * D);
+    db.failSigningOnce = true;
+    const first = await run();
+    expect(mail.send).not.toHaveBeenCalled();
+    expect(first).toMatchObject({ failed: 1, ambiguous: 0 });
+    expect(db.ledger.get('e1')).toMatchObject({ status: 'failed', failureReason: 'pre_send_error', attempts: 0, sendAttemptedAt: null });
+    // Once the secret is fixed, the next run sends it, exactly once.
+    expect((await run()).sent).toBe(1);
+    expect(mail.send).toHaveBeenCalledTimes(1);
+  });
+
+  it('r8: a failure while the request is still being built (no request made) → retryable, never ambiguous', async () => {
+    addCompleter('e1', 5 * D);
+    db.failBeforeRequest = true;
+    const first = await run();
+    expect(first).toMatchObject({ failed: 1, ambiguous: 0 });
+    expect(db.ledger.get('e1')).toMatchObject({ status: 'failed', failureReason: 'pre_send_error', attempts: 0 });
+    expect((await run()).sent).toBe(1);
+  });
+
+  it('r8: a throw AFTER the provider request started stays ambiguous and is never resent', async () => {
+    addCompleter('e1', 5 * D);
+    mail.send.mockRejectedValueOnce(new Error('socket hang up'));
+    expect(await run()).toMatchObject({ ambiguous: 1 });
+    expect(db.ledger.get('e1')?.status).toBe('ambiguous');
+    await run({ now: new Date(NOW.getTime() + 2 * H) });
+    expect(mail.send).toHaveBeenCalledTimes(1);
+  });
+
+  it('r8: while another run is sending (global send mutex), this run sends nothing, stops, and leaves rows as they were', async () => {
+    addCompleter('e1', 5 * D);
+    addCompleter('e2', 4 * D);
+    db.sendMutexHeld = true; // another run's send transaction is with the provider
+    const res = await run();
+    expect(mail.send).not.toHaveBeenCalled();
+    expect(res).toMatchObject({ sent: 0, failed: 0, ambiguous: 0, deferred_to_running_send: true });
+    for (const id of ['e1', 'e2']) {
+      expect(db.ledger.get(id)).toMatchObject({ status: 'eligible', attempts: 0, sendAttemptedAt: null, claimToken: null });
+    }
+    // Only ONE send transaction was attempted: the run stopped instead of trying every row.
+    expect(db.rawSql.filter((q) => q.includes('pg_try_advisory_xact_lock')).length).toBe(1);
+    db.sendMutexHeld = false;
+    expect((await run()).sent).toBe(2);
+  });
+
+  it('r8: a run holds at most one pool connection at a time (pre-check reads are never concurrent)', async () => {
+    addCompleter('e1', 5 * D);
+    addCompleter('e2', 4 * D);
+    await run();
+    expect(db.maxReadsInFlight).toBe(1);
+  });
 
   it('the provider call has a hard 10 s timeout so the locks are held for a bounded time', async () => {
     addCompleter('e1', 5 * D);

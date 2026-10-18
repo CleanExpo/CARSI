@@ -82,6 +82,20 @@ describe('toReviewDto', () => {
     expect(dto.replied_at).toBe('2026-07-03T00:00:00.000Z');
   });
 
+  it.each([
+    ['the stored local part (guest sign-up placeholder)', 'john.smith.waterdamage', 'john.smith.waterdamage@gmail.com'],
+    ['the local part with different punctuation and case', 'John_Smith.WaterDamage', 'john.smith.waterdamage@gmail.com'],
+    ['the whole address', 'john@example.com', 'john@example.com'],
+    ['any address at all', 'contact me at jo@site.com', 'sam@example.com'],
+  ])('r8: a name that is %s is never published', (_label, fullName, email) => {
+    expect(toReviewDto({ ...base, student: { fullName, email } }).author).toBe('CARSI learner');
+  });
+
+  it('r8: an independently supplied name is still shown as its first name', () => {
+    expect(toReviewDto({ ...base, student: { fullName: 'Sam Rivers', email: 'sam@example.com' } }).author).toBe('Sam');
+    expect(toReviewDto({ ...base, student: { fullName: 'Ngaio Marsh', email: 'nm1987@example.com' } }).author).toBe('Ngaio');
+  });
+
   it('falls back to a neutral label — never the email — when no name (spec D8)', () => {
     expect(toReviewDto({ ...base, student: { fullName: null, email: 'jo@example.com' } }).author).toBe('CARSI learner');
     expect(toReviewDto({ ...base, student: null }).author).toBe('CARSI learner');

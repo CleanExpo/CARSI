@@ -1,0 +1,99 @@
+/**
+ * Session provenance for review-admin actions (release-gate r8 P1-BOOTSTRAP-LMS-IMPERSONATION).
+ * The verified mechanism travels with the session, so resolveCurrentAdmin can refuse to treat a
+ * self-registered LMS account as the bootstrap admin just because its email matches ADMIN_EMAIL.
+ */
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
+
+const m = vi.hoisted(() => ({
+  cookies: new Map<string, string>(),
+  adminTokens: new Map<string, { email: string }>(),
+  lmsTokens: new Map<string, { sub: string; email: string; role: string }>(),
+}));
+vi.mock('next/headers', () => ({
+  cookies: async () => ({
+    get: (name: string) => (m.cookies.has(name) ? { value: m.cookies.get(name)! } : undefined),
+  }),
+}));
+vi.mock('@/lib/admin/admin-auth', () => ({
+  ADMIN_COOKIE_NAME: 'carsi_admin',
+  verifyAdminSessionToken: async (t: string) => m.adminTokens.get(t) ?? null,
+}));
+vi.mock('@/lib/auth/session-jwt', () => ({
+  verifySessionToken: async (t: string) => m.lmsTokens.get(t) ?? null,
+}));
+
+const { readReviewAdminSession } = await import('./review-admin-session');
+const { isFounderAdminEmail } = await import('./current-admin');
+const SAVED = { admin: process.env.ADMIN_EMAIL, panel: process.env.ADMIN_PANEL_EMAILS };
+
+beforeEach(() => {
+  m.cookies.clear();
+  m.adminTokens.clear();
+  m.lmsTokens.clear();
+  process.env.ADMIN_EMAIL = 'support@carsi.com.au';
+  delete process.env.ADMIN_PANEL_EMAILS;
+});
+afterAll(() => {
+  for (const [k, v] of [
+    ['ADMIN_EMAIL', SAVED.admin],
+    ['ADMIN_PANEL_EMAILS', SAVED.panel],
+  ] as const) {
+    if (v === undefined) delete process.env[k];
+    else process.env[k] = v;
+  }
+});
+
+describe('readReviewAdminSession keeps the verifying mechanism', () => {
+  it('a valid admin cookie is an admin-cookie session', async () => {
+    m.cookies.set('carsi_admin', 'adm');
+    m.adminTokens.set('adm', { email: 'support@carsi.com.au' });
+    expect(await readReviewAdminSession()).toEqual({
+      via: 'admin_cookie',
+      email: 'support@carsi.com.au',
+    });
+  });
+
+  it('r8 reviewer case: an LMS JWT for the ADMIN_EMAIL address is an LMS session (with its user id), never the admin cookie', async () => {
+    m.cookies.set('auth_token', 'lms');
+    m.lmsTokens.set('lms', { sub: 'u-attacker', email: 'support@carsi.com.au', role: 'student' });
+    expect(await readReviewAdminSession()).toEqual({
+      via: 'lms_session',
+      userId: 'u-attacker',
+      email: 'support@carsi.com.au',
+    });
+  });
+
+  it('an invalid admin cookie falls through to the LMS session, as getAdminSessionOrNull does', async () => {
+    m.cookies.set('carsi_admin', 'forged');
+    m.cookies.set('carsi_token', 'lms');
+    m.lmsTokens.set('lms', { sub: 'u-1', email: 'a@b.com', role: 'admin' });
+    expect(await readReviewAdminSession()).toMatchObject({ via: 'lms_session', userId: 'u-1' });
+  });
+
+  it('no valid token → no session', async () => {
+    m.cookies.set('auth_token', 'garbage');
+    expect(await readReviewAdminSession()).toBeNull();
+  });
+});
+
+describe('isFounderAdminEmail — the always-allowed founder accounts only, never configuration', () => {
+  it('the founder account is a founder', () => {
+    expect(isFounderAdminEmail('Phill.M@carsi.com.au')).toBe(true);
+  });
+  it('ADMIN_EMAIL is not (self-registrable when it has no LMS account)', () => {
+    expect(isFounderAdminEmail('support@carsi.com.au')).toBe(false);
+  });
+  it('an ADMIN_PANEL_EMAILS entry is not', () => {
+    process.env.ADMIN_PANEL_EMAILS = 'ops@carsi.com.au, team@carsi.com.au';
+    expect(isFounderAdminEmail('team@carsi.com.au')).toBe(false);
+  });
+  it('a founder address that is ALSO configured fails closed', () => {
+    process.env.ADMIN_PANEL_EMAILS = 'phill.m@carsi.com.au';
+    expect(isFounderAdminEmail('phill.m@carsi.com.au')).toBe(false);
+  });
+  it('anyone else is not', () => {
+    expect(isFounderAdminEmail('someone@example.com')).toBe(false);
+    expect(isFounderAdminEmail('')).toBe(false);
+  });
+});
