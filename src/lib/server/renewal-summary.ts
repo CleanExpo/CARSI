@@ -1,7 +1,7 @@
 import { normalizeEnrollmentStatus } from '@/lib/server/learner-dashboard-data';
 import { isRevokedStatus } from '@/lib/server/enrollment-access';
 import { normalizePublicAssetUrl } from '@/lib/remote-image';
-import { getApprovedCecHours } from '@/lib/seed/cec-approvals';
+import { getApprovedCecHours, getCurrentCecApproval } from '@/lib/seed/cec-approvals';
 import { prisma } from '@/lib/prisma';
 import type {
   RenewalCourseSuggestion,
@@ -37,19 +37,18 @@ function cycleBoundsFromExpiry(expiry: Date): { start: Date; end: Date } {
 
 function isPublishedRow(c: { status: string; isPublished: boolean | null }): boolean {
   if (c.isPublished === true) return true;
-  return String(c.status ?? '')
-    .toLowerCase()
-    .trim() === 'published';
+  return (
+    String(c.status ?? '')
+      .toLowerCase()
+      .trim() === 'published'
+  );
 }
 
 function completionTimestamp(args: {
   certificateIssuedAt: Date | null;
   completedAt: Date | null;
   lessonIds: string[];
-  progress: Map<
-    string,
-    { completed: boolean; completedAt: Date | null; lastAccessedAt: Date }
-  >;
+  progress: Map<string, { completed: boolean; completedAt: Date | null; lastAccessedAt: Date }>;
 }): Date | null {
   if (args.certificateIssuedAt) return args.certificateIssuedAt;
   if (args.completedAt) return args.completedAt;
@@ -113,9 +112,22 @@ export function isCompleteEnrollment(args: {
   // AC-8). Revocation clears status + completedAt but leaves lesson-progress rows,
   // so `allLessonsComplete` alone would otherwise keep counting a refunded course.
   if (isRevokedStatus(args.status)) return false;
-  return (
-    args.allLessonsComplete || normalizeEnrollmentStatus(args.status) === 'completed'
-  );
+  return args.allLessonsComplete || normalizeEnrollmentStatus(args.status) === 'completed';
+}
+
+/**
+ * Registry CEC hours for a completion, credited only when the approval was IN FORCE at that
+ * moment: status approved, positive hours, approved on or before the completion, and the
+ * completion before the approval lapsed (00:00 UTC on `expiresAt`). A course completed after
+ * its approval expired, or before it was granted, earns no CEC. Fail-closed: an unreadable
+ * `approvedAt` or `expiresAt` credits nothing.
+ */
+export function cecHoursInForceAt(slug: string, completedAt: Date): number {
+  const entry = getCurrentCecApproval(slug, completedAt);
+  if (!entry) return 0;
+  const approvedAt = entry.approvedAt ? Date.parse(entry.approvedAt) : Number.NaN;
+  if (!Number.isFinite(approvedAt) || completedAt.getTime() < approvedAt) return 0;
+  return entry.approvedHours ?? 0;
 }
 
 /** One completed course, as the renewal summary counted it. */
@@ -160,7 +172,7 @@ export function buildYearRecap(args: {
     if (!c.completedAt || c.completedAt < args.since) continue;
     coursesCompleted += 1;
     if (c.certificateIssuedAt) certificatesIssued += 1;
-    approvedCecHours += resolveCecHoursFromCourse({ slug: c.slug }).hours;
+    approvedCecHours += cecHoursInForceAt(c.slug, c.completedAt);
   }
   return {
     coursesCompleted,
@@ -397,7 +409,9 @@ async function pickSuggestedCourses(args: {
   /** From first-session onboarding — boosts matching catalogue rows for “Popular for you”. */
   preferDisciplines?: string[];
 }): Promise<RenewalCourseSuggestion[]> {
-  const prefer = new Set((args.preferDisciplines ?? []).map((d) => d.trim().toUpperCase()).filter(Boolean));
+  const prefer = new Set(
+    (args.preferDisciplines ?? []).map((d) => d.trim().toUpperCase()).filter(Boolean)
+  );
   const exclude = new Set([...args.enrolledSlugs, ...args.completedSlugs]);
   const slugFilter = exclude.size > 0 ? { slug: { notIn: Array.from(exclude) } } : {};
 
@@ -426,21 +440,20 @@ async function pickSuggestedCourses(args: {
   const published = candidates.filter(isPublishedRow);
   if (published.length === 0) return [];
 
-    const scored = published.map((c) => {
-      const disc = c.iicrcDiscipline?.trim() || 'General';
-      const earned = args.byDisciplineEarned[disc] ?? 0;
-      const { hours: rh } = resolveCecHoursFromCourse(c);
-      const hours = rh > 0 ? rh : 0.25;
-      const gapWeight = 1 / (1 + earned);
-      const discUpper = disc.toUpperCase();
-      const onboardingBoost =
-        prefer.size > 0 && prefer.has(discUpper) ? 1.45 : prefer.size > 0 ? 0.92 : 1;
-      const score =
-        gapWeight * (hours + 0.5) * (disc === 'General' ? 0.85 : 1) * onboardingBoost;
-      // GP-498: only claim a CEC benefit when this course has registry-approved CEC hours.
-      const reason = suggestionReason({ disc, earnedCec: earned, approvedHours: rh });
-      return { c, score, reason, disc };
-    });
+  const scored = published.map((c) => {
+    const disc = c.iicrcDiscipline?.trim() || 'General';
+    const earned = args.byDisciplineEarned[disc] ?? 0;
+    const { hours: rh } = resolveCecHoursFromCourse(c);
+    const hours = rh > 0 ? rh : 0.25;
+    const gapWeight = 1 / (1 + earned);
+    const discUpper = disc.toUpperCase();
+    const onboardingBoost =
+      prefer.size > 0 && prefer.has(discUpper) ? 1.45 : prefer.size > 0 ? 0.92 : 1;
+    const score = gapWeight * (hours + 0.5) * (disc === 'General' ? 0.85 : 1) * onboardingBoost;
+    // GP-498: only claim a CEC benefit when this course has registry-approved CEC hours.
+    const reason = suggestionReason({ disc, earnedCec: earned, approvedHours: rh });
+    return { c, score, reason, disc };
+  });
 
   scored.sort((a, b) => b.score - a.score);
 
@@ -497,4 +510,3 @@ export async function getNextCourseRecommendationsForStudent(
   const full = await getRenewalSummaryForStudent(userId);
   return full?.suggested_courses ?? [];
 }
-

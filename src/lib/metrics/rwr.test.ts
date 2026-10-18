@@ -133,31 +133,55 @@ function pager<T extends { id: string }>(items: T[], pageSize = 2, forceMore = f
   return { list, calls };
 }
 
+const NOW = new Date('2026-10-18T00:00:00Z');
+const NOW_S = Math.floor(NOW.getTime() / 1000);
+const CUTOFF_S = NOW_S - 28 * 86_400;
+
+/** The Stripe event that records a checkout payment: `created` is when it was paid. */
+function paidEvent(
+  s: Stripe.Checkout.Session,
+  paidAtS: number,
+  type = 'checkout.session.completed',
+  livemode = true
+) {
+  return { id: `evt_${s.id}_${type}`, type, created: paidAtS, livemode, data: { object: s } };
+}
+
+type Sale = Stripe.Checkout.Session | ReturnType<typeof paidEvent>;
+const asEvent = (x: Sale) =>
+  'data' in x ? x : paidEvent(x as Stripe.Checkout.Session, NOW_S - 86_400); // paid yesterday
+
 function fakeStripe(
   subs: Stripe.Subscription[],
-  sessions: Stripe.Checkout.Session[],
+  sales: Sale[],
   opts: { endlessSubs?: boolean } = {}
 ) {
   const s = pager(subs, 2, opts.endlessSubs);
-  const c = pager(sessions, 2);
+  const all = sales.map(asEvent);
+  const eventCalls: Array<Record<string, unknown>> = [];
+  // Honours `created.gte` the way Stripe does, so a sale paid before the cutoff is not returned.
+  const listEvents = async (params: Record<string, unknown>) => {
+    eventCalls.push(params);
+    const gte = (params.created as { gte?: number } | undefined)?.gte ?? 0;
+    const inWindow = all.filter((e) => e.created >= gte);
+    return pager(inWindow, 2).list(params);
+  };
   const reader = {
     subscriptions: { list: s.list },
-    checkout: { sessions: { list: c.list } },
+    events: { list: listEvents },
   } as unknown as RwrStripeReader;
-  return { reader, subCalls: s.calls, sessionCalls: c.calls };
+  return { reader, subCalls: s.calls, eventCalls };
 }
 
-const NOW = new Date('2026-10-18T00:00:00Z');
-
-async function refuses(subs: Stripe.Subscription[], sessions: Stripe.Checkout.Session[] = []) {
-  await expect(collectRwrInputs(fakeStripe(subs, sessions).reader, NOW)).rejects.toBeInstanceOf(
+async function refuses(subs: Stripe.Subscription[], sales: Sale[] = []) {
+  await expect(collectRwrInputs(fakeStripe(subs, sales).reader, NOW)).rejects.toBeInstanceOf(
     RwrUnreadableError
   );
 }
 
 describe('collectRwrInputs — Stripe shaping', () => {
   it('counts memberships, Teams seats and paid course checkouts across pages', async () => {
-    const { reader, sessionCalls } = fakeStripe(
+    const { reader, eventCalls } = fakeStripe(
       [
         sub('sub_m1', 'pro_annual'),
         sub('sub_m2', 'pro_annual'),
@@ -181,11 +205,68 @@ describe('collectRwrInputs — Stripe shaping', () => {
     });
     expect(got.excludedSubscriptions).toBe(1);
     expect(got.courseSales28d).toBe(3);
-    // Reads the last 28 days of completed checkouts.
-    expect(sessionCalls[0]).toMatchObject({
-      status: 'complete',
-      created: { gte: Math.floor(NOW.getTime() / 1000) - 28 * 86_400 },
+    // Reads the last 28 days of checkout PAYMENT events.
+    expect(eventCalls[0]).toMatchObject({
+      types: ['checkout.session.completed', 'checkout.session.async_payment_succeeded'],
+      created: { gte: CUTOFF_S },
     });
+  });
+
+  // Review r3 P1-RWR-SALE-BOUNDARY: dated by payment, not by when the session was opened.
+  it('counts a checkout opened before the cutoff and paid after it; not one paid before it', async () => {
+    const got = await collectRwrInputs(
+      fakeStripe(
+        [],
+        [
+          // Session created 30 minutes before the cutoff, paid one minute after it.
+          paidEvent(
+            {
+              ...session('cs_cross', 10_000),
+              created: CUTOFF_S - 1_800,
+            } as Stripe.Checkout.Session,
+            CUTOFF_S + 60
+          ),
+          // Paid one minute before the cutoff: outside the window.
+          paidEvent(session('cs_old', 99_900), CUTOFF_S - 60),
+        ]
+      ).reader,
+      NOW
+    );
+    expect(got.inputs.courseSalesCents28d).toBe(10_000);
+    expect(got.courseSales28d).toBe(1);
+  });
+
+  it('counts a delayed-payment course once, when it is paid', async () => {
+    const pending = session('cs_becs', 39_500, { paid: false });
+    const paid = session('cs_becs', 39_500);
+    const got = await collectRwrInputs(
+      fakeStripe(
+        [],
+        [
+          paidEvent(pending, NOW_S - 3 * 86_400, 'checkout.session.completed'),
+          paidEvent(paid, NOW_S - 86_400, 'checkout.session.async_payment_succeeded'),
+          paidEvent(paid, NOW_S - 86_400, 'checkout.session.completed'), // duplicate delivery shape
+        ]
+      ).reader,
+      NOW
+    );
+    expect(got.inputs.courseSalesCents28d).toBe(39_500);
+    expect(got.courseSales28d).toBe(1);
+  });
+
+  it('refuses a test-mode payment event or one without a readable session', async () => {
+    await refuses([], [paidEvent(session('cs_t', 2_900), NOW_S - 86_400, undefined, false)]);
+    await refuses(
+      [],
+      [{ ...paidEvent(session('cs_x', 2_900), NOW_S - 86_400), data: { object: null } } as never]
+    );
+  });
+
+  // Review r3 P1-RWR-UNKNOWN-TEAMS-SEATS
+  it('refuses a Teams item whose seat quantity is missing, fractional or zero', async () => {
+    for (const qty of [null, 2.5, 0]) {
+      await refuses([sub('sub_t_qty', 'growth', [{ unit: 3_900, qty: qty as number }])]);
+    }
   });
 
   it('refuses a partial total when pagination does not finish', async () => {
@@ -352,6 +433,35 @@ describe('runRwrReport — fails closed', () => {
     expect(r.all).not.toMatch(DOLLAR_FIGURE);
   });
 
+  // Review r3 P1-RWR-UNKNOWN-TEAMS-SEATS, the reviewer's reproduction.
+  it('with a Teams item whose quantity is null: exits 2, never "1 seats"', async () => {
+    const { reader } = fakeStripe(
+      [sub('sub_t_null', 'growth', [{ unit: 3_900, qty: null as unknown as number }])],
+      []
+    );
+    const r = await report({ STRIPE_SECRET_KEY: FIXTURE_KEY }, reader);
+    expect(r.code).toBe(2);
+    expect(r.all).toContain('unreadable seat quantity');
+    expect(r.all).not.toMatch(DOLLAR_FIGURE);
+  });
+
+  // Review r3 P1-RWR-SALE-BOUNDARY, the reviewer's reproduction.
+  it('counts a $100 course created before the cutoff and paid after it', async () => {
+    const { reader } = fakeStripe(
+      [],
+      [
+        paidEvent(
+          { ...session('cs_cross', 10_000), created: CUTOFF_S - 1_800 } as Stripe.Checkout.Session,
+          CUTOFF_S + 60
+        ),
+      ]
+    );
+    const r = await report({ STRIPE_SECRET_KEY: FIXTURE_KEY }, reader);
+    expect(r.code).toBe(0);
+    expect(r.all).toContain('Course sales: 1 in the last 28 days = $100.00, ÷ 4 = $25.00');
+    expect(r.all).toContain('RWR: $25.00 per week');
+  });
+
   it('with test-mode objects behind any key: exits 2 and prints no figure', async () => {
     const { reader } = fakeStripe(
       [sub('sub_m1', 'pro_annual', undefined, { livemode: false })],
@@ -389,7 +499,7 @@ describe('runRwrReport — fails closed', () => {
             });
           },
         },
-        checkout: { sessions: { list: async () => ({ data: [], has_more: false }) } },
+        events: { list: async () => ({ data: [], has_more: false }) },
       } as unknown as RwrStripeReader;
       const r2 = await report({ STRIPE_SECRET_KEY: FIXTURE_KEY }, listFails, json);
       expect(r2.code).toBe(2);

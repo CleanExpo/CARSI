@@ -1,11 +1,14 @@
 /**
- * Stripe adapter for the RWR report (V5). Reads active subscriptions and the last 28 days of
- * paid course checkouts and shapes them into `RwrInputs`. Read-only: it only lists.
+ * Stripe adapter for the RWR report (V5). Reads active subscriptions and the course checkouts
+ * PAID in the last 28 days (dated by Stripe's checkout payment events) and shapes them into
+ * `RwrInputs`. Read-only: it only lists.
  *
  * Fails closed. Every refusal throws `RwrUnreadableError` and the report prints no figure:
  *  - pagination that does not finish within the page cap (a partial total would understate
  *    revenue and read as a downturn);
- *  - test-mode data (any subscription or checkout session with livemode !== true);
+ *  - test-mode data (any subscription, payment event or checkout session with livemode !== true);
+ *  - a payment event of an unexpected type, outside the window, or without a readable session;
+ *  - a Teams item whose seat quantity is missing, fractional or not positive;
  *  - an active subscription with an unrecognised plan (org and coaching are the only known
  *    plans left out of the formula; anything else might be uncounted revenue);
  *  - a membership that is not one AUD yearly item, quantity 1, at the membership price;
@@ -35,14 +38,24 @@ export interface RwrStripeReader {
       params: Stripe.SubscriptionListParams
     ): Promise<{ data: Stripe.Subscription[]; has_more: boolean }>;
   };
-  checkout: {
-    sessions: {
-      list(
-        params: Stripe.Checkout.SessionListParams
-      ): Promise<{ data: Stripe.Checkout.Session[]; has_more: boolean }>;
-    };
+  events: {
+    list(params: Stripe.EventListParams): Promise<{ data: Stripe.Event[]; has_more: boolean }>;
   };
 }
+
+/**
+ * A course sale is dated by when it was PAID, not when its Checkout Session was created: a
+ * session opened before the 28-day cutoff and paid after it is a sale inside the window. A
+ * Checkout Session carries no payment timestamp, so the authoritative time is the Stripe event
+ * that records the payment: `checkout.session.completed` (card and other instant methods) or
+ * `checkout.session.async_payment_succeeded` (delayed methods such as BECS Direct Debit). The
+ * event's `created` is the moment of payment; its `data.object` is the session at that moment.
+ * Stripe keeps event history for 30 days, which covers the 28-day window.
+ */
+export const COURSE_PAYMENT_EVENT_TYPES = [
+  'checkout.session.completed',
+  'checkout.session.async_payment_succeeded',
+] as const;
 
 export const RWR_PAGE_SIZE = 100;
 export const RWR_MAX_PAGES = 50;
@@ -111,7 +124,12 @@ function readSubscriptionItems(sub: Stripe.Subscription, what: string): SeatLine
     if (annual === null) {
       throw new RwrUnreadableError(`${what} ${sub.id} has an unsupported billing interval`);
     }
-    return { seats: item.quantity ?? 1, annualSeatPriceCents: annual };
+    // Stripe allows a null quantity; a seat count nobody can read is not "one seat".
+    const seats = item.quantity;
+    if (typeof seats !== 'number' || !Number.isInteger(seats) || seats < 1) {
+      throw new RwrUnreadableError(`${what} ${sub.id} has an unreadable seat quantity`);
+    }
+    return { seats, annualSeatPriceCents: annual };
   });
 }
 
@@ -178,17 +196,34 @@ export async function collectRwrInputs(
     }
   }
 
+  // The window is the last 28 days of PAYMENTS (see COURSE_PAYMENT_EVENT_TYPES).
   const since = Math.floor(now.getTime() / 1000) - COURSE_SALES_WINDOW_DAYS * 86_400;
-  const sessions = await listAll(
-    (p) => stripe.checkout.sessions.list(p),
-    { created: { gte: since }, status: 'complete' } as Stripe.Checkout.SessionListParams,
-    'checkout sessions'
+  const paymentEvents = await listAll(
+    (p) => stripe.events.list(p),
+    { types: [...COURSE_PAYMENT_EVENT_TYPES], created: { gte: since } } as Stripe.EventListParams,
+    'checkout payment events'
   );
 
   let courseSalesCents28d = 0;
   let courseSales28d = 0;
-  for (const s of sessions) {
+  const counted = new Set<string>();
+  for (const event of paymentEvents) {
+    requireLive(event, 'payment event');
+    if (!(COURSE_PAYMENT_EVENT_TYPES as readonly string[]).includes(event.type)) {
+      throw new RwrUnreadableError(`payment event ${event.id} has an unexpected type`);
+    }
+    if (typeof event.created !== 'number' || event.created < since) {
+      throw new RwrUnreadableError(`payment event ${event.id} falls outside the requested window`);
+    }
+    const s = event.data?.object as Stripe.Checkout.Session | undefined;
+    if (!s || typeof s.id !== 'string') {
+      throw new RwrUnreadableError(
+        `payment event ${event.id} carries no readable checkout session`
+      );
+    }
     requireLive(s, 'checkout session');
+    // A delayed-payment session appears twice (completed unpaid, then paid); count it once, paid.
+    if (counted.has(s.id)) continue;
     if (s.mode !== 'payment' || s.payment_status !== 'paid') continue;
     const slug = s.metadata?.course_slug;
     if (typeof slug !== 'string' || !slug.trim()) continue;
@@ -202,6 +237,7 @@ export async function collectRwrInputs(
     ) {
       throw new RwrUnreadableError(`course checkout ${s.id} has no readable amount`);
     }
+    counted.add(s.id);
     courseSalesCents28d += s.amount_total;
     courseSales28d += 1;
   }

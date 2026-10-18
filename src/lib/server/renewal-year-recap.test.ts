@@ -133,6 +133,7 @@ vi.mock('@/lib/server/team-subscription-store', () => ({
 }));
 
 import { sendUpcomingRenewalReminder } from './renewal-reminder';
+import { cecHoursInForceAt } from './renewal-summary';
 
 function invoiceFor(billingEmail: string) {
   return {
@@ -300,5 +301,41 @@ describe('renewal reminder — your year with CARSI', () => {
     ]);
     expect(text).toContain('- Completed: 1 course');
     expect(text).not.toMatch(/CEC/);
+  });
+
+  // Review r3 P1-RECAP-EXPIRED-CEC. These approvals were granted 18/01/2024 and lapse at
+  // 00:00 UTC on 18/01/2027 (data/seed/cec-approvals.json).
+  describe('CEC credited only while the approval was in force', () => {
+    const LATER = new Date('2027-03-01T00:00:00Z');
+
+    beforeEach(() => {
+      vi.setSystemTime(LATER);
+    });
+
+    it('credits a completion before expiry and not one after it', async () => {
+      const { text } = await sentEmail([
+        enrolment(APPROVED_A, { done: new Date('2027-01-10T00:00:00Z') }), // in force
+        enrolment(APPROVED_B, { done: new Date('2027-01-19T00:00:00Z') }), // lapsed the day before
+      ]);
+      expect(text).toContain('- Completed: 2 courses');
+      expect(text).toContain('- CEC hours earned: 1');
+    });
+
+    it('shows no CEC line when the only completion came after the approval lapsed', async () => {
+      const { html, text } = await sentEmail([
+        enrolment(APPROVED_B, { done: new Date('2027-01-19T00:00:00Z') }),
+      ]);
+      expect(text).toContain('- Completed: 1 course');
+      expect(text).not.toMatch(/CEC/);
+      expect(html).not.toMatch(/CEC hours/);
+    });
+  });
+
+  it('credits nothing for a completion before the approval was granted', () => {
+    expect(cecHoursInForceAt(APPROVED_A, new Date('2024-01-17T23:59:59Z'))).toBe(0);
+    expect(cecHoursInForceAt(APPROVED_A, new Date('2024-01-18T00:00:00Z'))).toBe(1);
+    expect(cecHoursInForceAt(APPROVED_A, new Date('2027-01-17T23:59:59Z'))).toBe(1);
+    expect(cecHoursInForceAt(APPROVED_A, new Date('2027-01-18T00:00:00Z'))).toBe(0);
+    expect(cecHoursInForceAt(UNAPPROVED, new Date('2026-06-01T00:00:00Z'))).toBe(0);
   });
 });
