@@ -497,22 +497,22 @@ export async function syncModuleLessons(
     }
   }
 
-  // The first module's free preview is always a reading: the public course page renders the
-  // preview's body as text, so a video (a URL) or a quiz (a quiz id) must never be it. Keep the
-  // current preview reading; otherwise use the earliest remaining reading; otherwise no preview.
-  // Any other lesson still flagged as the preview is cleared.
-  if (firstModule) {
-    const remaining = [...sortedExisting.filter((e) => !deleted.has(e.id)), ...createdLessons].sort(
-      (a, b) => a.orderIndex - b.orderIndex
-    );
-    const preview =
-      remaining.find((l) => l.isPreview && l.contentType === 'text') ??
-      remaining.find((l) => l.contentType === 'text');
-    for (const l of remaining) {
-      const shouldBe = l.id === preview?.id;
-      if (l.isPreview !== shouldBe) {
-        await tx.lmsLesson.update({ where: { id: l.id }, data: { isPreview: shouldBe } });
-      }
+  // Only the first module has a free preview, and it is always a reading: the public course page
+  // renders the preview's body as text, so a video (a URL) or a quiz (a quiz id) must never be it.
+  // Keep the current preview reading; otherwise use the earliest remaining reading; otherwise none.
+  // Every other lesson still flagged as a preview is cleared, including in a module that is no
+  // longer first after a reorder (its paid reading would otherwise stay public).
+  const remaining = [...sortedExisting.filter((e) => !deleted.has(e.id)), ...createdLessons].sort(
+    (a, b) => a.orderIndex - b.orderIndex
+  );
+  const preview = firstModule
+    ? (remaining.find((l) => l.isPreview && l.contentType === 'text') ??
+      remaining.find((l) => l.contentType === 'text'))
+    : undefined;
+  for (const l of remaining) {
+    const shouldBe = l.id === preview?.id;
+    if (l.isPreview !== shouldBe) {
+      await tx.lmsLesson.update({ where: { id: l.id }, data: { isPreview: shouldBe } });
     }
   }
 

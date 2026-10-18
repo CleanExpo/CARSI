@@ -435,4 +435,34 @@ describe('admin quiz save', () => {
     });
     expect(ops.filter((o) => o.startsWith('delete'))).toEqual([]);
   });
+
+  // Review round 12: after a reorder, the module that used to be first kept its preview reading,
+  // so a paid reading stayed public as the "Free lesson".
+  it('a module that is no longer first loses its preview flag', async () => {
+    const { tx, ops } = lessonTx();
+    await syncModuleLessons(
+      tx as never,
+      'c1',
+      'mA',
+      'Module A',
+      'Paid reading',
+      undefined,
+      undefined,
+      [
+        {
+          id: 'a1',
+          orderIndex: 0,
+          contentType: 'text',
+          contentBody: 'Paid reading',
+          isPreview: true,
+        },
+      ],
+      false
+    );
+    expect(ops).toEqual(['update:a1', 'update:a1']);
+    expect(tx.lmsLesson.update.mock.calls[1][0]).toEqual({
+      where: { id: 'a1' },
+      data: { isPreview: false },
+    });
+  });
 });
