@@ -34,6 +34,8 @@ const m = vi.hoisted(() => ({
   reviewHidden: false,
   /** Set to true to hide the review AFTER the visibility check, before the conditional write. */
   hiddenAtWrite: null as boolean | null,
+  /** r13: commit a hide right after the visibility read (before the text read), as a second session would. */
+  hideAfterVisibilityRead: false,
 }));
 
 type Fixture = {
@@ -182,10 +184,24 @@ vi.mock('@/lib/prisma', () => {
     lmsUser: { findUnique: async () => null },
     lmsCourseReview: {
       // Like Prisma, returns ONLY the selected fields; a read of private text is counted.
-      findFirst: async ({ select }: { select: Record<string, boolean> }) => {
-        if (select.body || select.title) m.bodyReads += 1;
+      // Honours a WHERE isPublished condition, as PostgreSQL does at the moment the query runs.
+      findFirst: async ({
+        where,
+        select,
+      }: {
+        where: { isPublished?: boolean };
+        select: Record<string, boolean>;
+      }) => {
         const row = target() as Record<string, unknown>;
-        return Object.fromEntries(Object.entries(row).filter(([k]) => select[k]));
+        const privateRead = Boolean(select.body || select.title);
+        const result =
+          where.isPublished !== undefined && where.isPublished !== row.isPublished
+            ? null
+            : Object.fromEntries(Object.entries(row).filter(([k]) => select[k]));
+        if (privateRead && result) m.bodyReads += 1;
+        // r13 reproduction: an admin's hide commits between the visibility read and the text read.
+        if (!privateRead && m.hideAfterVisibilityRead) m.reviewHidden = true;
+        return result;
       },
       findMany: async ({ where }: { where: { isPublished?: boolean } }) =>
         (where.isPublished === true ? [PUBLISHED] : [PUBLISHED, HIDDEN]).map((r) => ({
@@ -372,6 +388,7 @@ beforeEach(() => {
   m.lastGetFlags = null;
   m.reviewHidden = false;
   m.hiddenAtWrite = null;
+  m.hideAfterVisibilityRead = false;
 });
 afterAll(() => {
   for (const [k, v] of [
@@ -489,6 +506,25 @@ describe('r12: a review hidden between the visibility check and the write is nev
     m.hiddenAtWrite = true;
     expect((await ACTIONS['reply: publish on a published review']!.run()).status).toBe(200);
     expect(m.writes).toHaveLength(1);
+  });
+});
+
+describe('r13 reviewer reproduction: a hide committed between the visibility check and the text read', () => {
+  it("an instructor's AI draft is refused and NOTHING is sent to the model", async () => {
+    m.persona = 'instructor';
+    m.reviewHidden = false; // published at the visibility check...
+    m.hideAfterVisibilityRead = true; // ...an admin hides it before the text is read
+    const out = await ACTIONS['AI draft for a published review']!.run();
+    expect(out).toEqual({ status: 403, allowed: false });
+    expect(m.modelCalls).toEqual([]);
+    expect(m.bodyReads).toBe(0); // the conditional read returned no row: no hidden text read
+  });
+
+  it('an admin, who may read hidden reviews, still gets the draft', async () => {
+    m.persona = 'dbAdmin';
+    m.hideAfterVisibilityRead = true;
+    expect((await ACTIONS['AI draft for a published review']!.run()).status).toBe(200);
+    expect(m.modelCalls).toHaveLength(1);
   });
 });
 

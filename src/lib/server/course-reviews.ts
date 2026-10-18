@@ -11,7 +11,7 @@ import { createHash } from 'node:crypto';
 
 import { prisma } from '@/lib/prisma';
 import { requireCurrentAdmin, requireCurrentReviewManager, type AdminSessionProvenance } from '@/lib/server/current-admin';
-import { mayReplyToReview, REVIEW_ACCESS, reviewPrincipal } from '@/lib/server/review-access-rules';
+import { mayReplyToReview, REVIEW_ACCESS, reviewPrincipal, type ReviewPrincipal } from '@/lib/server/review-access-rules';
 import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
 import {
   ANONYMOUS_REVIEWER_LABEL,
@@ -434,14 +434,20 @@ export class ReviewReplyForbiddenError extends Error {
   }
 }
 
-/** The review's private text, for a caller ALREADY authorised to read it (see review-access-rules). */
-export async function getReviewForCourse(
+/**
+ * The review's private text, read in ONE query that carries the visibility rule itself
+ * (release-gate r13): WHERE id AND course AND (published, unless the caller may read hidden
+ * reviews per the rule table). A review hidden after any earlier check is therefore never returned
+ * to a caller who may not read hidden reviews — the check and the read cannot disagree.
+ */
+export async function getReviewTextForCourse(
   reviewId: string,
   courseId: string,
+  principal: ReviewPrincipal,
   db: ReviewReadClient = prisma
 ): Promise<{ id: string; rating: number; title: string | null; body: string | null } | null> {
   return db.lmsCourseReview.findFirst({
-    where: { id: reviewId, courseId },
+    where: { id: reviewId, courseId, ...(REVIEW_ACCESS[principal].readHidden ? {} : { isPublished: true }) },
     select: { id: true, rating: true, title: true, body: true },
   });
 }

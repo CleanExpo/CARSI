@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { resolveCurrentReviewManager } from '@/lib/server/current-admin';
 import {
   getCourseIdBySlug,
-  getReviewForCourse,
+  getReviewTextForCourse,
   getReviewVisibility,
 } from '@/lib/server/course-reviews';
 import { mayReplyToReview, reviewPrincipal } from '@/lib/server/review-access-rules';
@@ -46,12 +46,14 @@ export async function POST(
       const manager = await resolveCurrentReviewManager(tx, session);
       if (!manager) return { kind: 'forbidden' as const };
       // Visibility first (no private field), against the rule table; the text only if allowed.
+      const principal = reviewPrincipal(manager);
       const target = await getReviewVisibility(id, course.id, tx);
       if (!target) return { kind: 'missing' as const };
-      if (!mayReplyToReview(reviewPrincipal(manager), target.isPublished))
-        return { kind: 'hidden' as const };
-      const review = await getReviewForCourse(id, course.id, tx);
-      if (!review) return { kind: 'missing' as const };
+      if (!mayReplyToReview(principal, target.isPublished)) return { kind: 'hidden' as const };
+      // The text read carries the visibility rule itself (r13): if the review was hidden after the
+      // check above, an instructor's read returns nothing and the draft is refused — never sent.
+      const review = await getReviewTextForCourse(id, course.id, principal, tx);
+      if (!review) return { kind: 'hidden' as const };
       return { kind: 'ok' as const, review };
     });
     if (access.kind === 'forbidden') {
