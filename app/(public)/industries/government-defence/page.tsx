@@ -19,11 +19,11 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = buildIndustryMetadata(
   'government-defence',
   'Government & Defence Restoration Training',
-  'Restoration training for Australian councils, agencies and defence facilities. Mould remediation, water damage restoration, structural drying and fire & smoke restoration courses for AusTender compliance.',
+  'Restoration training for Australian councils, agencies and defence facilities. Mould remediation, water damage restoration, structural drying and fire & smoke restoration courses for council, agency and defence facility teams.',
   [
     'government restoration training',
     'defence facility restoration',
-    'AusTender compliance',
+    'government tender evidence',
     'WHS mould training',
     'heritage building restoration',
   ]
@@ -40,25 +40,25 @@ const disciplines = [
 
 const stats = [
   { value: 'Online', label: 'Self-paced study' },
-  { value: 'WHS', label: 'Act Compliance' },
+  { value: 'WHS', label: 'Hazard training' },
   { value: 'IICRC CEC', label: 'On approved courses' },
 ];
 
 const faqs = [
   {
-    question: 'Is IICRC certification required for AusTender procurement panels?',
+    question: 'Do government procurement panels require IICRC certification?',
     answer:
-      'While not universally mandated, many Commonwealth and state government procurement panels list IICRC certification as a pre-qualification criterion for restoration and remediation contracts. IICRC certification is obtained only through IICRC-approved schools and examinations; CARSI courses add verifiable CARSI credentials to a tender submission.',
+      'It depends on the tender. AusTender is where Commonwealth agencies publish their tenders, and each agency sets its own selection criteria, so read the requirements in each tender. Where a tender asks for IICRC certification, that is obtained only through IICRC-approved schools and examinations; CARSI courses add verifiable CARSI credentials to a tender submission.',
   },
   {
     question: 'What WHS obligations apply to mould in government buildings?',
     answer:
-      'Under Australian WHS legislation, government employers have a duty of care to identify and manage mould and moisture hazards. CARSI mould remediation training provides facility teams with the skills to conduct mould assessments, implement containment protocols, and document remediation — demonstrating WHS due diligence to regulators.',
+      'Under Australian WHS legislation, government employers have a duty of care to identify and manage mould and moisture hazards. CARSI mould remediation training provides facility teams with the skills to conduct mould assessments, implement containment protocols, and document remediation — helping document WHS due diligence.',
   },
   {
     question: 'How do you restore heritage-listed government buildings after water damage?',
     answer:
-      'Heritage-listed buildings require specialised structural drying techniques that avoid damaging original materials. CARSI structural drying training trains government maintenance teams in low-impact drying methods, moisture monitoring, and documentation protocols that satisfy both heritage conservation requirements and WHS compliance.',
+      'Heritage-listed buildings require specialised structural drying techniques that avoid damaging original materials. CARSI structural drying training trains government maintenance teams in low-impact drying methods, moisture monitoring, and documentation that support heritage conservation and WHS obligations.',
   },
   {
     question: 'Can government facility staff complete this training online?',
@@ -72,14 +72,14 @@ const whyCards = [
     icon: Shield,
     title: 'WHS Due Diligence',
     description:
-      'Government employers have strict WHS duties. Restoration training demonstrates due diligence for mould and water hazard identification.',
+      'Government employers have WHS duties for mould and water hazards. Restoration training helps teams identify those hazards and document the response.',
     color: '#2196f3',
   },
   {
     icon: Building2,
-    title: 'AusTender Compliance',
+    title: 'Tender Evidence',
     description:
-      'Some government panels list IICRC certification, which comes only from IICRC-approved schools and examinations. CARSI training adds verifiable CARSI credentials to the evidence.',
+      'Each agency sets its own tender criteria. Where a tender asks for IICRC certification, that comes only from IICRC-approved schools and examinations; CARSI training adds verifiable CARSI credentials to your evidence.',
     color: '#1976d2',
   },
   {

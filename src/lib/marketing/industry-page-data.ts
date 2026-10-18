@@ -150,11 +150,11 @@ const hospitalityPanels: IndustryAddonPanel[] = [
 const governmentPanels: IndustryAddonPanel[] = [
   {
     name: 'AusTender (Commonwealth)',
-    requirement: 'Lists IICRC certification for pre-qualification',
+    requirement: 'Commonwealth tenders; each agency sets its own criteria',
   },
   { name: 'Defence maintenance', requirement: 'Base maintenance and heritage building work' },
   { name: 'NSW Construct NSW', requirement: 'Building remediation contracts' },
-  { name: 'VIC Category C Panel', requirement: 'Required for restoration tenders' },
+  { name: 'VIC Category C Panel', requirement: 'Victorian government restoration work' },
   { name: 'QLD QBuild', requirement: 'Government facility maintenance panels' },
   { name: 'Local council panels', requirement: 'Councils across Australia' },
 ];
@@ -213,7 +213,7 @@ export const industryAddonContent: Record<
     eyebrow: 'Tender pre-qualification',
     title: 'Government panel',
     titleAccent: 'requirements',
-    body: 'IICRC certification is increasingly listed on Commonwealth, state and local procurement panels for restoration and remediation work.',
+    body: 'Each agency and council sets its own panel criteria. Where a tender lists IICRC certification, it comes only from IICRC-approved schools and examinations; CARSI training adds verifiable CARSI credentials to your evidence.',
     panels: governmentPanels,
     showUpgrades: true,
   },
@@ -229,7 +229,7 @@ export const industryAddonContent: Record<
     eyebrow: 'Tender pre-qualification',
     title: 'Government panel',
     titleAccent: 'requirements',
-    body: 'Government restoration contracts often list IICRC certification, which comes only from IICRC-approved schools and examinations. CARSI training adds verifiable training records for Commonwealth, state and local government work.',
+    body: 'Each agency and council sets its own tender criteria. Where a tender lists IICRC certification, it comes only from IICRC-approved schools and examinations; CARSI training adds verifiable training records for Commonwealth, state and local government work.',
     panels: governmentPanels,
     showUpgrades: true,
   },

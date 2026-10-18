@@ -72,14 +72,14 @@ const whyCards = [
     icon: Shield,
     title: 'Uptime Protection',
     description:
-      'Every minute of downtime costs thousands. Restoration training ensures your facility team can respond to water and fire events within minutes, protecting SLA commitments and Uptime Institute tier compliance.',
+      'Downtime is costly for any data centre. Restoration training prepares your facility team to respond to water and fire events in a planned, documented way that supports your own SLA and resilience processes.',
     color: '#6A1B9A',
   },
   {
     icon: Droplets,
     title: 'Water Damage Prevention',
     description:
-      'CRAC unit leaks, overhead pipe bursts, and cooling failures are the leading non-power cause of data centre outages. Water damage restoration and structural drying training equips teams to contain and dry before equipment damage occurs.',
+      'CRAC unit leaks, overhead pipe bursts and cooling failures are common water risks in data centres. Water damage restoration and structural drying training helps teams contain the water and dry affected areas to limit equipment damage.',
     color: '#4A148C',
   },
   {

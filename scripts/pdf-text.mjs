@@ -191,26 +191,6 @@ function formReader(doc, resources, depth) {
   };
 }
 
-/**
- * Drops running headers and footers ("© CARSI · carsi.com.au Page 2 of 9"): a line that, digits
- * aside, appears on every page but at most one. A sentence that wraps over a page break then reads
- * as one sentence, so the inventory sees "CARSI is an IICRC CEC Accredited provider." whole.
- */
-function withoutRunningLines(pages) {
-  if (pages.length < 3) return pages;
-  const key = (line) => line.trim().replace(/\d+/g, '#');
-  const seen = new Map();
-  for (const page of pages)
-    for (const k of new Set(page.split('\n').map(key).filter(Boolean)))
-      seen.set(k, (seen.get(k) ?? 0) + 1);
-  return pages.map((page) =>
-    page
-      .split('\n')
-      .filter((line) => (seen.get(key(line)) ?? 0) < pages.length - 1)
-      .join('\n')
-  );
-}
-
 export async function pdfText(path) {
   const doc = await PDFDocument.load(readFileSync(path), { updateMetadata: false });
   const pages = [];
@@ -225,8 +205,10 @@ export async function pdfText(path) {
         .join('\n')
     );
   }
-  // NFKC folds ligatures (ﬁ → fi) so words match the source copy.
-  return withoutRunningLines(pages).join('\n').normalize('NFKC');
+  // Every page in full, nothing deduplicated or dropped: a claim repeated on every page (a
+  // footer, a running header) is scanned on every page (review of 1f81b12a). NFKC folds
+  // ligatures (ﬁ → fi) so words match the source copy.
+  return pages.join('\n').normalize('NFKC');
 }
 
 // unused-import guard for tree-shaking linters

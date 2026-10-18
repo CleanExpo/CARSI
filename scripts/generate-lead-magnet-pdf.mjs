@@ -209,10 +209,12 @@ function buildDocument(bodyHtml) {
   h2 { font-size: 14.5pt; border-bottom: 2px solid ${ACCENT}; padding-bottom: 5px; margin-top: 26px; }
   h3 { font-size: 12pt; margin-top: 18px; }
   h4 { font-size: 10.5pt; color: ${ACCENT}; text-transform: uppercase; letter-spacing: 0.04em; }
-  p { margin: 7px 0; }
+  /* a paragraph or list item never splits over a page break, so its sentences stay whole in the
+     PDF text the licence inventory scans (the running footer would otherwise land mid-sentence) */
+  p { margin: 7px 0; break-inside: avoid; }
   hr { border: none; border-top: 1px solid #d7e3f0; margin: 18px 0; }
   ul, ol { margin: 7px 0; padding-left: 20px; }
-  li { margin: 3px 0; }
+  li { margin: 3px 0; break-inside: avoid; }
   li.checkbox { list-style: none; position: relative; }
   li.checkbox .box {
     display: inline-block; width: 9px; height: 9px; border: 1.4px solid ${ACCENT};

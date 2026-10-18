@@ -39,7 +39,7 @@ const disciplines = [
 
 const stats = [
   { value: 'Online', label: 'Self-paced study' },
-  { value: 'WHS', label: 'Act Compliance' },
+  { value: 'WHS', label: 'Hazard training' },
   { value: 'IICRC CEC', label: 'On approved courses' },
 ];
 

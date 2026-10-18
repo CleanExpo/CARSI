@@ -54,6 +54,23 @@ async function pdfWith(lines: string[]): Promise<Uint8Array> {
   return doc.save();
 }
 
+/** A PDF of `pages` pages, each carrying the same footer line (page furniture or a claim). */
+async function pdfWithFooter(pages: number, footer: string): Promise<Uint8Array> {
+  const doc = await PDFDocument.create();
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+  for (let i = 1; i <= pages; i++) {
+    const page = doc.addPage();
+    page.drawText(`Section ${i}. Panel requirements vary by agency.`, {
+      x: 50,
+      y: 760,
+      size: 11,
+      font,
+    });
+    page.drawText(footer, { x: 50, y: 30, size: 8, font });
+  }
+  return doc.save();
+}
+
 const exposuresIn = (hits: Hit[], file: string) =>
   hits.filter((h) => h.file === file && h.cls === 'exposure');
 
@@ -95,6 +112,24 @@ describe('licence inventory', () => {
     });
     const terms = exposuresIn((await inventory(root)) as Hit[], file).map((h) => h.term);
     expect(terms).toEqual(expect.arrayContaining(['accredit', 'count-claim']));
+  });
+
+  it('PDF text: a claim repeated on all nine pages is scanned on every page (review of 1f81b12a)', async () => {
+    const file = 'public/downloads/x.pdf';
+    const claim = 'CARSI courses are IICRC ' + 'Accredited.'; // assembled: the guards read literals
+    const bytes = await pdfWithFooter(9, claim);
+    const root = rootWith({ [file]: bytes });
+    expect((await pdfText(join(root, file))).split(claim).length - 1).toBe(9);
+    const found = exposuresIn((await inventory(root)) as Hit[], file).filter(
+      (h) => h.term === 'accredit'
+    );
+    expect(found).toHaveLength(9);
+  });
+
+  it('PDF text: running page furniture is kept too (nothing is dropped)', async () => {
+    const file = 'public/downloads/x.pdf';
+    const root = rootWith({ [file]: await pdfWithFooter(9, '© CARSI · carsi.com.au') });
+    expect((await pdfText(join(root, file))).split('© CARSI · carsi.com.au').length - 1).toBe(9);
   });
 
   it('count claims: a bare count on page copy is an exposure (P1-BARE-COUNT-BLINDSPOT control)', async () => {

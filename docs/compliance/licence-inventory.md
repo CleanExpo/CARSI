@@ -21,8 +21,8 @@ Enforced by `src/lib/marketing/licence-inventory.test.ts`.
 | Class                                                                                           | Hits |
 | ----------------------------------------------------------------------------------------------- | ---: |
 | fixed (exposures on origin/main d49a93de under the final rules, removed by this branch)         |  645 |
-| legitimate (named sentence rule or reviewed line)                                               | 1209 |
-| not public (tests, generated, staff, tooling, prompts, identifiers, routing data, markup, URLs) | 3956 |
+| legitimate (named sentence rule or reviewed line)                                               | 1205 |
+| not public (tests, generated, staff, tooling, prompts, identifiers, routing data, markup, URLs) | 3967 |
 | owned elsewhere (reviewed line; not edited here; listed for Phill)                              |    8 |
 | exposure remaining                                                                              |    0 |
 
@@ -140,7 +140,7 @@ Files with fixed hits:
 
 | Class           | Reason                                                                                                                                                                  | Hits |
 | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---: |
-| legitimate      | third-person IICRC certification: obtained through IICRC schools, held, renewed or required by others                                                                   |  242 |
+| legitimate      | third-person IICRC certification: obtained through IICRC schools, held, renewed or required by others                                                                   |  238 |
 | legitimate      | CARSI-issued certificate (document), not certification                                                                                                                  |  203 |
 | legitimate      | conditional or registry-computed CEC                                                                                                                                    |  153 |
 | legitimate      | provider-level CEC standing                                                                                                                                             |  124 |
@@ -167,7 +167,7 @@ Files with fixed hits:
 | legitimate      | reviewed (line): learner states which IICRC certification they hold (third-person; the question asks about the learner's own certifications)                            |    2 |
 | legitimate      | headcount of the guide’s illustrative example business (labelled indicative), not a claim about the world                                                               |    1 |
 | not-public      | code: identifier, comment or type                                                                                                                                       | 1387 |
-| not-public      | test file                                                                                                                                                               | 1156 |
+| not-public      | test file                                                                                                                                                               | 1167 |
 | not-public      | generated code                                                                                                                                                          |  461 |
 | not-public      | staff-only admin surface                                                                                                                                                |  310 |
 | not-public      | routing data: bare discipline code (render sites audited separately)                                                                                                    |  269 |

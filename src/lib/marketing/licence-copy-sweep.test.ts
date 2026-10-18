@@ -94,6 +94,23 @@ const CLAIMS: Array<[string, RegExp]> = [
     'CEC accreditation covering the unapproved vehicle course',
     /IICRC CEC Accredited.{0,300}(?:vehicle drying|Drying Transportation and Vehicles)|(?:vehicle drying|Drying Transportation and Vehicles).{0,300}IICRC CEC Accredited/i,
   ],
+  // review of 1f81b12a (data-centres, government-defence): unsourced guarantees and requirements
+  ['unsourced cost of downtime', /\bcosts? (?:thousands|millions|hundreds of thousands)\b/i],
+  [
+    'response-time guarantee',
+    /\b(?:respond|response|on site)\b[^.]{0,60}\bwithin (?:minutes|\d+\s*(?:minutes|hours))\b/i,
+  ],
+  ['third-party tier or standard compliance promised', /Uptime Institute|\btier compliance\b/i],
+  [
+    'AusTender presented as a compliance standard or certification requirement',
+    /AusTender compliance|\bfor AusTender\b|AusTender[^.]{0,80}\b(?:lists?|requires?|mandates?)\b/i,
+  ],
+  [
+    'unsourced prevalence or trend claim',
+    /\b(?:the leading|the most common|number one|#1)\b[^.]{0,40}\bcauses?\b|\bincreasingly (?:listed|required)\b|\b(?:many|most|often)\b[^.]{0,80}\blists? IICRC certification\b/i,
+  ],
+  ['statutory compliance as a training outcome', /\bAct Compliance\b/],
+  ['a platform or panel presented as listing IICRC certification', /\bLists IICRC certification\b/],
 ];
 
 function copyLines(file: string): Array<[number, string]> {
@@ -128,6 +145,8 @@ describe('licence copy sweep', () => {
       'src/lib/marketing/start-smart.ts',
       'public/start-smart-readiness.json',
       'src/lib/server/public-catalogue-facts.ts',
+      'app/(public)/industries/data-centres/page.tsx',
+      'app/(public)/industries/government-defence/page.tsx',
     ])
       expect(surfaces).toContain(f);
     expect(surfaces.some((f) => f.startsWith('docs/'))).toBe(false);
@@ -147,6 +166,34 @@ describe('licence copy sweep', () => {
     expect(fx('jobs average $2,500–$15,000 per job')).not.toEqual([]);
     expect(fx('Perfect for cleaning contractors seeking IICRC credentials.')).not.toEqual([]);
     expect(fx('Minimal roster disruption — 2-4 hour self-paced modules.')).not.toEqual([]);
+    // review of 1f81b12a: the live data-centres and government-defence lines
+    expect(
+      fx(
+        "'Every minute of downtime costs thousands. Restoration training ensures your facility team can respond to water and fire events within minutes, protecting SLA commitments and Uptime Institute tier compliance.',"
+      )
+    ).toHaveLength(3);
+    expect(
+      fx(
+        "'Restoration training for Australian councils, agencies and defence facilities. Mould remediation, water damage restoration, structural drying and fire & smoke restoration courses for AusTender compliance.',"
+      )
+    ).not.toEqual([]);
+    expect(fx("requirement: 'Lists IICRC certification for pre-qualification',")).not.toEqual([]);
+    expect(
+      fx(
+        "name: 'AusTender (Commonwealth)', requirement: 'Lists IICRC certification for pre-qualification',"
+      )
+    ).not.toEqual([]);
+    expect(
+      fx(
+        "'CRAC unit leaks, overhead pipe bursts, and cooling failures are the leading non-power cause of data centre outages.'"
+      )
+    ).not.toEqual([]);
+    expect(
+      fx(
+        "body: 'IICRC certification is increasingly listed on Commonwealth, state and local procurement panels.',"
+      )
+    ).not.toEqual([]);
+    expect(fx("{ value: 'WHS', label: 'Act Compliance' },")).not.toEqual([]);
     expect(
       fx(
         "'IICRC CEC Accredited restoration courses: water damage, vehicle drying and odour control.'"
@@ -170,6 +217,9 @@ describe('licence copy sweep', () => {
       fx('| Water Restoration Technician | WRT | Foundation for water damage work. |')
     ).toEqual([]);
     expect(fx("CRT: 'Colour repair',")).toEqual([]);
+    expect(fx("'AusTender restoration panel',")).toEqual([]);
+    expect(fx('an AusTender search strategy.')).toEqual([]);
+    expect(fx('Each agency sets its own tender criteria.')).toEqual([]);
   });
 
   it.each(copySurfaces().map((f) => [relative(ROOT, f), f]))('sweep: %s', (_name, file) => {
