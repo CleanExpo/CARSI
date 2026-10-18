@@ -1,19 +1,17 @@
 // Offline proof that the hero-tile check fails on a tile naming an unpublished course.
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
-import { publishedSlugs, tileCourseSlugs, unbackedTiles } from './check-hero-tiles.mjs';
+import { loadTiles, publishedSlugs, tileCourseSlugs, unbackedTiles } from './check-hero-tiles.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SCRIPT = path.join(ROOT, 'scripts/check-hero-tiles.mjs');
-const tiles = tileCourseSlugs(
-  readFileSync(path.join(ROOT, 'src/components/membership/hex-geometry.ts'), 'utf8')
-);
+const tiles = tileCourseSlugs(await loadTiles());
 
 /** Run the real CLI against a saved catalogue; returns its exit code. */
 function cliExit(catalogue) {
@@ -23,23 +21,34 @@ function cliExit(catalogue) {
 }
 
 test('reads every tile slug from the source of truth', () => {
-  assert.ok(tiles.length >= 5, `expected the floor's tiles, got ${tiles.length}`);
+  assert.ok(tiles.length >= 4, `expected the floor's tiles, got ${tiles.length}`);
   assert.ok(tiles.includes('introduction-to-water-damage-restoration'));
 });
 
-test('reads slugs in any quote style and refuses a tile whose slug it cannot read', () => {
-  const src = (entries) => `export const HEX_COURSE_TILES = [\n${entries}\n] as const;`;
-  assert.deepEqual(
-    tileCourseSlugs(
-      src(
-        `{ image: 'a', course: 'one' },\n{ image: "b", course: "two" },\n{ image: 'c', course: \`three\` },`
-      )
-    ),
-    ['one', 'two', 'three']
+test('refuses a tile whose course is not a slug string', () => {
+  assert.deepEqual(tileCourseSlugs([{ course: 'one' }, { course: 'two' }]), ['one', 'two']);
+  assert.throws(() => tileCourseSlugs([{ course: 'one' }, { image: 'x' }]));
+  assert.throws(() => tileCourseSlugs([{ course: 'Not A Slug' }]));
+  assert.throws(() => tileCourseSlugs([]));
+});
+
+test('checks the real course value, not a comment beside it (review round 5)', () => {
+  const dir = mkdtempSync(path.join(tmpdir(), 'hero-tiles-src-'));
+  const src = path.join(dir, 'tiles.ts');
+  writeFileSync(
+    src,
+    "const UNPUBLISHED: string = 'review-unpublished-course';\n" +
+      'export const HEX_COURSE_TILES = [\n' +
+      "  { image: 'a', course: UNPUBLISHED }, // course: 'introduction-to-water-damage-restoration'\n" +
+      '] as const;\n'
   );
-  assert.throws(() =>
-    tileCourseSlugs(src(`{ image: 'a', course: 'one' },\n{ image: 'b', course: SLUG },`))
-  );
+  const catalogue = path.join(dir, 'catalogue.json');
+  writeFileSync(catalogue, JSON.stringify({ items: tiles.map((slug) => ({ slug })) }));
+  const run = spawnSync(process.execPath, [SCRIPT, '--catalogue', catalogue, '--tiles', src], {
+    encoding: 'utf8',
+  });
+  assert.equal(run.status, 1, run.stderr);
+  assert.match(run.stderr, /review-unpublished-course/);
 });
 
 test('all tiles backed when the catalogue publishes every slug', () => {

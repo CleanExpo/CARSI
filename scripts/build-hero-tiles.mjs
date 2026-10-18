@@ -14,7 +14,8 @@
  * work area), mould-remediation-level-2 (labelled box behind the worker), stone-tile-cleaning,
  * intro-applied-microbial-remediation and intro-smoke-soot-restoration (logos on the worker),
  * intro-infrared-thermography (lettering on the camera screen; the wall heatmap alone is not
- * how the course teaches thermography).
+ * how the course teaches thermography), mould-remediation-level-1 (the swab crop shows sampling
+ * the Level 1 course does not teach; the mould patch alone shows no work).
  */
 import { createRequire } from 'node:module';
 import { mkdirSync } from 'node:fs';
@@ -39,8 +40,6 @@ export const HERO_TILE_CROPS = [
     top: 0,
     size: 675,
   },
-  // The mould patch alone: Level 1 teaches inspecting small mould areas, not swab sampling.
-  { name: 'mould-patch', source: 'mould-remediation-level-1', left: 640, top: 110, size: 400 },
   { name: 'soot-ceiling-cleaning', source: 'soot-removal', left: 380, top: 40, size: 520 },
   {
     name: 'structural-drying-airflow',

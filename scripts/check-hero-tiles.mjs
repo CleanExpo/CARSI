@@ -6,11 +6,12 @@
  *
  *   node scripts/check-hero-tiles.mjs                      # live: https://carsi.com.au/api/lms/courses
  *   node scripts/check-hero-tiles.mjs --catalogue file.json # offline, a saved catalogue response
+ *   --tiles file.ts                                         # check another tile module (tests)
  *
- * Exit 0 all tiles backed · 1 a tile names an unpublished course · 2 catalogue unreadable (fail closed).
+ * Exit 0 all tiles backed · 1 a tile names an unpublished course · 2 tiles or catalogue unreadable (fail closed).
  */
 import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import path from 'node:path';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -18,18 +19,24 @@ const TILES_SOURCE = path.join(ROOT, 'src/components/membership/hex-geometry.ts'
 const LIVE_URL = 'https://carsi.com.au/api/lms/courses';
 
 /**
- * Course slugs the floor's tiles declare, read from the source of truth. Throws when a tile's slug
- * cannot be read (any quote style is accepted), so an unread tile can never pass unchecked.
+ * Course slugs the floor's tiles declare, taken from the evaluated tile data (not the source text),
+ * so a comment or a constant can never stand in for a tile's real course. Throws on any tile whose
+ * course is not a slug string, so an unreadable tile can never pass unchecked.
  */
-export function tileCourseSlugs(source) {
-  const block = source.slice(source.indexOf('export const HEX_COURSE_TILES'));
-  const body = block.slice(0, block.indexOf('] as const;'));
-  const slugs = [...body.matchAll(/course:\s*(['"`])([^'"`]+)\1/g)].map((m) => m[2]);
-  const tiles = (body.match(/\bimage:/g) ?? []).length;
-  if (slugs.length !== tiles) {
-    throw new Error(`read ${slugs.length} course slug(s) for ${tiles} tile(s)`);
-  }
-  return slugs;
+export function tileCourseSlugs(tiles) {
+  if (!Array.isArray(tiles) || tiles.length === 0) throw new Error('no tiles');
+  return tiles.map((tile, i) => {
+    const course = tile?.course;
+    if (typeof course !== 'string' || !/^[a-z0-9-]+$/.test(course)) {
+      throw new Error(`tile ${i} has no readable course slug`);
+    }
+    return course;
+  });
+}
+
+/** The floor's tiles, loaded from the source of truth (Node strips the TypeScript types). */
+export async function loadTiles(source = TILES_SOURCE) {
+  return (await import(pathToFileURL(source).href)).HEX_COURSE_TILES;
 }
 
 /** Published slugs from a /api/lms/courses response body. */
@@ -48,13 +55,10 @@ export function unbackedTiles(tiles, published) {
 async function main(argv) {
   let tiles;
   try {
-    tiles = tileCourseSlugs(readFileSync(TILES_SOURCE, 'utf8'));
+    const i = argv.indexOf('--tiles');
+    tiles = tileCourseSlugs(await loadTiles(i >= 0 ? path.resolve(argv[i + 1]) : TILES_SOURCE));
   } catch (error) {
-    console.error(`check-hero-tiles: hex-geometry.ts unreadable (${error.message}); no verdict`);
-    return 2;
-  }
-  if (tiles.length === 0) {
-    console.error('check-hero-tiles: no tiles found in hex-geometry.ts');
+    console.error(`check-hero-tiles: tiles unreadable (${error.message}); no verdict`);
     return 2;
   }
   let body;
