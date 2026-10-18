@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { apiClient } from '@/lib/api/client';
+import { disciplineTopicLabel } from '@/lib/iicrc-discipline-display';
 
 interface RecommendedCourse {
   id: string;
@@ -86,12 +87,12 @@ function RecommendationCard({ course }: { course: RecommendedCourse }) {
 
       {/* Discipline badge + CEC hours */}
       <div className="flex items-center gap-2">
-        {course.iicrc_discipline && (
+        {disciplineTopicLabel(course.iicrc_discipline) && (
           <span
-            className="rounded-sm px-1.5 py-0.5 font-mono text-[10px] font-semibold tracking-wider uppercase"
+            className="rounded-sm px-1.5 py-0.5 text-[10px] font-semibold"
             style={{ background: 'rgba(36,144,237,0.15)', color: '#2490ed' }}
           >
-            {course.iicrc_discipline}
+            {disciplineTopicLabel(course.iicrc_discipline)}
           </span>
         )}
         {course.cec_hours !== null && (

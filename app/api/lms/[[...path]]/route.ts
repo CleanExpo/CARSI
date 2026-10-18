@@ -31,7 +31,8 @@ const HUB_KEYWORDS: Record<string, string[]> = {
   WRT: ['Water damage technician', 'Restoration technician', 'Flood response'],
   AMRT: ['Mould remediation technician', 'Microbial remediation'],
   FSRT: ['Fire restoration technician', 'Smoke damage specialist'],
-  CRT: ['Carpet repair technician', 'Flooring restoration'],
+  // CARSI sells no colour- or carpet-repair course: a CRT-coded course is a carpet course.
+  CRT: ['Carpet cleaning technician', 'Carpet care'],
   CCT: ['Commercial carpet cleaning', 'Carpet cleaning technician'],
   ASD: ['Structural drying technician', 'Water restoration'],
 };

@@ -14,11 +14,11 @@ import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'IICRC CEC Training for Emergency Management & SES | CARSI Australia',
+  title: 'Restoration Training for Emergency Management & SES | CARSI Australia',
   description:
-    'Train SES volunteers and council emergency teams before disaster strikes. CARSI water damage restoration, fire and smoke restoration, applied structural drying and mould remediation certification for flood and fire response. Online, CEC Accredited.',
+    'Train SES volunteers and council emergency teams before disaster strikes. CARSI water damage restoration, fire and smoke restoration, structural drying and mould remediation training for flood and fire response. Online. CEC hours apply only to courses the IICRC has approved.',
   keywords: [
-    'SES IICRC CEC training Australia',
+    'SES restoration training Australia',
     'emergency management restoration training',
     'flood response training',
     'fire and smoke restoration training',
@@ -42,7 +42,7 @@ const disciplines = [
 const stats = [
   { value: 'Online', label: 'Self-paced study' },
   { value: 'CARSI', label: 'Verifiable credentials' },
-  { value: 'IICRC', label: 'CEC Accredited' },
+  { value: 'IICRC CEC', label: 'On approved courses' },
 ];
 
 const faqs = [
@@ -57,7 +57,7 @@ const faqs = [
       'It helps responders look past surface water to the moisture in wall cavities, subfloors and roof spaces that drives long-term structural damage and mould. Trained volunteers can advise homeowners on which materials need removal, which can be dried in place and what records insurers need, turning a basic clean-up into a structured response.',
   },
   {
-    question: 'Can council emergency management teams complete IICRC CEC training?',
+    question: 'Can council emergency management teams complete this training?',
     answer:
       'Yes. Council emergency management coordinators, building surveyors and flood response teams can take CARSI awareness-level courses in water damage restoration and structural drying. Online, self-paced delivery means staff can complete training between deployments without disrupting rosters.',
   },
@@ -80,7 +80,7 @@ const whyCards = [
     icon: Flame,
     title: 'Fire & Smoke Response',
     description:
-      "CARSI's CEC-accredited fire and smoke restoration training covers post-bushfire building triage — distinguishing cosmetic smoke damage from structural compromise, supporting accurate insurance assessment and recovery advice.",
+      "CARSI's fire and smoke restoration training covers post-bushfire building triage — distinguishing cosmetic smoke damage from structural compromise, supporting accurate insurance assessment and recovery advice.",
     color: '#e53935',
   },
   {

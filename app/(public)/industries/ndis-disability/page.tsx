@@ -14,11 +14,11 @@ import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'IICRC CEC Training for NDIS & Disability Services | CARSI Australia',
+  title: 'Restoration Training for NDIS & Disability Services | CARSI Australia',
   description:
-    'Meet NDIS Practice Standards with IICRC mould and water damage CEC courses. Mould remediation, water damage restoration and carpet cleaning continuing-education training for disability support providers. Online, CEC Accredited — not IICRC certification.',
+    'Meet NDIS Practice Standards with mould and water damage courses. Mould remediation, water damage restoration and carpet cleaning continuing-education training for disability support providers. Online. CEC hours apply only to courses the IICRC has approved; not IICRC certification.',
   keywords: [
-    'NDIS IICRC CEC training',
+    'NDIS restoration training',
     'disability services mould training Australia',
     'mould remediation NDIS provider',
     'NDIS Practice Standards infection control',
@@ -41,7 +41,7 @@ const disciplines = [
 const stats = [
   { value: 'Online', label: 'Self-paced study' },
   { value: 'NDIS', label: 'Practice Standards' },
-  { value: 'IICRC', label: 'CEC Accredited' },
+  { value: 'IICRC CEC', label: 'On approved courses' },
 ];
 
 const faqs = [
@@ -72,14 +72,14 @@ const whyCards = [
     icon: ClipboardCheck,
     title: 'NDIS Practice Standards',
     description:
-      "Module 3 (Supports Provision Environment) requires safe, hygienic accommodation. CARSI's CEC-accredited mould remediation training provides verifiable evidence of mould and remediation competency for audits.",
+      "Module 3 (Supports Provision Environment) requires safe, hygienic accommodation. CARSI's mould remediation training provides verifiable evidence of mould and remediation competency for audits.",
     color: '#5c6bc0',
   },
   {
     icon: Shield,
     title: 'Duty of Care Protection',
     description:
-      'NDIS participants are often immunocompromised. Documented IICRC CEC training demonstrates due diligence, reducing organisational liability under the NDIS Act and WHS legislation.',
+      'NDIS participants are often immunocompromised. Documented training demonstrates due diligence, reducing organisational liability under the NDIS Act and WHS legislation.',
     color: '#4a5aa8',
   },
   {

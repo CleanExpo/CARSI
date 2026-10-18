@@ -143,7 +143,7 @@ export function CcwCarsiTruckmountClient() {
             className="inline-flex w-full items-center justify-center gap-3 rounded-xl border border-white/10 bg-[#146fc2] px-6 py-4 text-sm font-semibold text-white transition hover:bg-[#1769b8] sm:w-auto"
           >
             <Award className="h-5 w-5 shrink-0" aria-hidden />
-            Enrol to get certified
+            Enrol and earn the CARSI credential
           </a>
           <a
             href={TRUCKMOUNT_PACK_HTML_HREF}

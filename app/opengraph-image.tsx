@@ -101,8 +101,8 @@ export default async function Image() {
           lineHeight: 1.4,
         }}
       >
-        IICRC CEC Accredited courses for healthcare, hospitality, government, mining, and restoration
-        professionals across Australia.
+        Restoration courses for healthcare, hospitality, government, mining and restoration
+        professionals across Australia, from an IICRC CEC Accredited provider.
       </p>
 
       {/* Stats row */}

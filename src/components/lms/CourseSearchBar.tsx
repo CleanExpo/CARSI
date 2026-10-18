@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Search, X, Loader2 } from 'lucide-react';
 import { useCourseBrowseBase } from '@/components/lms/CourseBrowseContext';
 import { getBackendOrigin } from '@/lib/env/public-url';
+import { disciplineTopicLabel } from '@/lib/iicrc-discipline-display';
 import { resolveDashboardCourseHref } from '@/lib/onboarding/navigation';
 
 interface SearchResult {
@@ -234,7 +235,7 @@ export function CourseSearchBar({
                             color: '#2490ed',
                           }}
                         >
-                          {result.iicrc_discipline}
+                          {disciplineTopicLabel(result.iicrc_discipline)}
                         </span>
                       )}
                       {result.cec_hours && (

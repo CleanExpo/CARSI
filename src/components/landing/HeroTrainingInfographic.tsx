@@ -39,7 +39,7 @@ const NAV_ICONS = [
 ] as const;
 
 const STATS = [
-  { icon: GraduationCap, value: '14.5', label: 'CEC hours' },
+  { icon: GraduationCap, value: '4', label: 'Certificates' },
   { icon: BookOpen, value: '12', label: 'Courses done' },
   { icon: Flame, value: '6 wks', label: 'Study streak' },
 ] as const;
@@ -56,7 +56,7 @@ export function HeroTrainingInfographic() {
     <div
       className="relative w-full select-none bg-white"
       role="img"
-      aria-label="CARSI learner dashboard showing CEC hours, study activity, course progress, and an earned CARSI designation"
+      aria-label="CARSI learner dashboard showing certificates, study activity, course progress, and an earned CARSI designation"
     >
       {/* Browser chrome */}
       <div className="flex items-center gap-3 border-b border-slate-100 px-4 py-3 sm:px-5">

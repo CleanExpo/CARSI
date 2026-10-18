@@ -13,13 +13,13 @@ import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Retail & Shopping Centre IICRC CEC Training',
+  title: 'Retail & Shopping Centre Restoration Training',
   description:
-    'IICRC CEC training for shopping centre maintenance teams. Pre-qualify for major landlord panels with water damage restoration, carpet cleaning and odour control training.',
+    'Restoration training for shopping centre maintenance teams. Pre-qualify for major landlord panels with water damage restoration, carpet cleaning and odour control training.',
   keywords: [
-    'retail IICRC CEC training',
+    'retail restoration training',
     'shopping centre restoration',
-    'retail property maintenance certification',
+    'retail property maintenance training',
     'shopping centre water damage Australia',
   ],
 };
@@ -48,14 +48,14 @@ const whyCards = [
     icon: Store,
     title: 'Major Landlord Panels',
     description:
-      'Pre-qualify for Scentre Group, Vicinity Centres, and GPT contractor panels. IICRC certification is increasingly required for preferred supplier status on major retail portfolios.',
+      'Prepare evidence for major retail contractor panels. Each panel sets its own requirements; IICRC certification, where a panel asks for it, comes only from IICRC-approved schools and examinations.',
     color: '#dc2626',
   },
   {
     icon: ShoppingCart,
     title: 'Tenant Restoration',
     description:
-      'Rapid response capability for sprinkler activation, roof leaks, and storm damage across tenancies. Minimise trading hour disruption with certified water damage restoration technicians.',
+      'Rapid response capability for sprinkler activation, roof leaks, and storm damage across tenancies. Minimise trading hour disruption with trained water damage restoration technicians.',
     color: '#b91c1c',
   },
   {

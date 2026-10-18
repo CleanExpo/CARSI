@@ -19,13 +19,19 @@ export type OnboardingAnswersInput = {
 
 const PATHWAY_LABELS: Record<string, string> = {
   WRT: 'Water damage restoration',
-  ASD: 'Applied structural drying',
-  CRT: 'Colour repair',
+  ASD: 'Structural drying',
   AMRT: 'Microbial remediation',
   FSRT: 'Fire and smoke restoration',
   OCT: 'Odour control',
   CCT: 'Commercial carpet cleaning',
 };
+
+/**
+ * IICRC codes a learner may hold for which CARSI sells no matching course, mapped to the nearest
+ * subject it does sell. CARSI has no colour-repair course (data/seed/courses-catalog.json), so a
+ * learner holding the IICRC colour repair certification is started on carpet cleaning.
+ */
+export const SOLD_SUBJECT_FOR: Record<string, string> = { CRT: 'CCT' };
 
 /** The discipline-area codes this module knows how to name. Anything else is never rendered. */
 export const KNOWN_PATHWAY_CODES: readonly string[] = Object.keys(PATHWAY_LABELS);
@@ -46,7 +52,8 @@ function normalizeDisciplines(raw: unknown): string[] {
   if (!Array.isArray(raw)) return [];
   const out = new Set<string>();
   for (const x of raw) {
-    const s = String(x).trim().toUpperCase();
+    const raw = String(x).trim().toUpperCase();
+    const s = SOLD_SUBJECT_FOR[raw] ?? raw;
     if (s in PATHWAY_LABELS) out.add(s);
   }
   return [...out];
@@ -58,7 +65,7 @@ function normalizeDisciplines(raw: unknown): string[] {
 export function resolveRecommendedPathwayCode(input: OnboardingAnswersInput): string {
   const held = normalizeDisciplines(input.disciplines_held);
   if (held.length > 0) {
-    const priority = ['WRT', 'AMRT', 'FSRT', 'ASD', 'CRT', 'OCT', 'CCT'];
+    const priority = ['WRT', 'AMRT', 'FSRT', 'ASD', 'OCT', 'CCT'];
     for (const p of priority) {
       if (held.includes(p)) return p;
     }
@@ -86,7 +93,8 @@ export function buildOnboardingDashboardUrls(args: {
   pathwayCode: string;
   disciplines: string[];
 }): { suggested_courses_url: string; pathways_url: string } {
-  const d = args.disciplines.length > 0 ? args.disciplines[0] : args.pathwayCode;
+  const first = args.disciplines.length > 0 ? args.disciplines[0] : args.pathwayCode;
+  const d = SOLD_SUBJECT_FOR[first] ?? first;
   const suggested_courses_url = `/dashboard/courses?discipline=${encodeURIComponent(d)}`;
   return {
     suggested_courses_url,

@@ -133,7 +133,7 @@ const hospitalityPanels: IndustryAddonPanel[] = [
   },
   {
     name: 'High-traffic carpet care',
-    requirement: 'Cleaning and repair for lobbies and conference floors',
+    requirement: 'Cleaning for lobbies and conference floors',
   },
   { name: 'Pool and spa incidents', requirement: 'Structural drying for wet-area overflow events' },
   {
@@ -148,7 +148,10 @@ const hospitalityPanels: IndustryAddonPanel[] = [
 ];
 
 const governmentPanels: IndustryAddonPanel[] = [
-  { name: 'AusTender (Commonwealth)', requirement: 'IICRC credentials for pre-qualification' },
+  {
+    name: 'AusTender (Commonwealth)',
+    requirement: 'Lists IICRC certification for pre-qualification',
+  },
   { name: 'Defence maintenance', requirement: 'Base maintenance and heritage building work' },
   { name: 'NSW Construct NSW', requirement: 'Building remediation contracts' },
   { name: 'VIC Category C Panel', requirement: 'Required for restoration tenders' },
@@ -218,7 +221,7 @@ export const industryAddonContent: Record<
     eyebrow: 'Contractor growth',
     title: 'Win more',
     titleAccent: 'restoration work',
-    body: 'Cleaning companies use IICRC credentials to qualify for insurance panels, expand service lines and charge higher margins on technical work.',
+    body: 'Cleaning companies add restoration training to expand into technical work. Insurance panels set their own certification requirements.',
     panels: commercialPanels,
     showUpgrades: true,
   },
@@ -226,7 +229,7 @@ export const industryAddonContent: Record<
     eyebrow: 'Tender pre-qualification',
     title: 'Government panel',
     titleAccent: 'requirements',
-    body: 'IICRC certification is increasingly required for government restoration contracts. Position your business for Commonwealth, state, and local government work.',
+    body: 'Government restoration contracts often list IICRC certification, which comes only from IICRC-approved schools and examinations. CARSI training adds verifiable training records for Commonwealth, state and local government work.',
     panels: governmentPanels,
     showUpgrades: true,
   },

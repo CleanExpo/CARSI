@@ -41,13 +41,13 @@ export function IndustryCourseSection({
       className="scroll-mt-28 border-t border-slate-200/70 bg-white py-16 md:py-24"
     >
       <div className={PUBLIC_SHELL_INNER_CLASS}>
-        <p className={LANDING_EYEBROW_CLASS}>Approved course pathway</p>
+        <p className={LANDING_EYEBROW_CLASS}>Recommended courses</p>
         <h2 className={`mt-3 max-w-2xl ${LANDING_DISPLAY_H2_CLASS}`}>
           {disciplineList} for {industryName.toLowerCase()}
         </h2>
         <p className={`mt-4 max-w-2xl ${LANDING_LEAD_CLASS}`}>
-          These recommendations are pinned to live IICRC CEC Accredited introductions. Open a course
-          to check its current hour value, outcomes and enrolment details.
+          Open a course to check its outcomes and enrolment details. Where the IICRC has approved a
+          course, its CEC hours are shown on the course page.
         </p>
         <div className="mt-10">
           <CourseGrid courses={courses} initialTab={defaultTab} surface="light" />

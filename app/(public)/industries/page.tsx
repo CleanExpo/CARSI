@@ -6,7 +6,7 @@ import { industryHubCards } from '@/lib/marketing/industry-hub';
 
 export const metadata: Metadata = {
   title: 'Industry Training Solutions',
-  description: `IICRC CEC Accredited training for ${industryHubCards.length} industries across Australia. Sector-specific restoration courses with verifiable credentials for healthcare, hospitality, mining, plumbing, NDIS, real estate, and more.`,
+  description: `Restoration training for ${industryHubCards.length} industries across Australia, from an IICRC CEC Accredited provider. Sector-specific restoration courses with verifiable credentials for healthcare, hospitality, mining, plumbing, NDIS, real estate, and more.`,
   alternates: { canonical: '/industries' },
 };
 
@@ -36,9 +36,9 @@ export default function IndustriesPage() {
             className="max-w-2xl text-lg leading-relaxed"
             style={{ color: 'rgba(255,255,255,0.5)' }}
           >
-            IICRC CEC Accredited training for {industryHubCards.length} industries across Australia.
-            Each pathway uses CARSI course areas, verifiable credentials, and CEC hours only where
-            the IICRC has approved the course.
+            Restoration training for {industryHubCards.length} industries across Australia, from an
+            IICRC CEC Accredited provider. Each pathway uses CARSI course areas, verifiable
+            credentials, and CEC hours only where the IICRC has approved the course.
           </p>
         </section>
 

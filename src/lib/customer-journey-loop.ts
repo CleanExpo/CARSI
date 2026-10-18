@@ -110,7 +110,7 @@ export const pathwayAdvisorOptions: PathwayAdvisorOption[] = [
     id: 'cec-renewal',
     label: 'CEC renewal',
     eyebrow: 'Fastest path',
-    title: 'Earn CECs with the shortest relevant course',
+    title: 'Earn CECs with a course the IICRC has approved',
     summary:
       'For certified technicians who already know the trade and need a clean route to continuing education, proof, and renewal evidence.',
     bestFor: [
@@ -120,11 +120,11 @@ export const pathwayAdvisorOptions: PathwayAdvisorOption[] = [
     ],
     recommendedDisciplines: ['WRT', 'ASD', 'AMRT', 'FSRT', 'OCT', 'CRT', 'CCT'],
     firstAction:
-      'Pick a discipline, enrol, complete the required modules, then download certificate evidence.',
+      'Pick a course with a current IICRC CEC approval, enrol, complete the required modules, then download certificate evidence.',
     retentionCue:
       'Use progress nudges at 25%, 50%, and 80%, then send completion/certificate prompts.',
-    primaryHref: '/courses',
-    primaryLabel: 'Find CEC courses',
+    primaryHref: '/iicrc-cec-courses',
+    primaryLabel: 'See courses with a CEC approval',
     secondaryHref: '/pricing',
     secondaryLabel: 'View access options',
     icon: Award,

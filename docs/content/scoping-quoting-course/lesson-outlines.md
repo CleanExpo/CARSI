@@ -33,7 +33,7 @@
 
 **Key Concepts:** The estimator is the commercial bridge between technical restoration work and the financial outcome of a project. This lesson covers the day-to-day workflow of a restoration estimator — from receiving a job allocation, conducting the site inspection, writing the scope, pricing the estimate, and managing supplements. Students explore how the estimator role differs in small firms (where one person may scope, price and project-manage) versus large organisations with dedicated estimating teams. IICRC WRT certification and experience with Xactimate or SimPRO are highlighted as industry expectations.
 
-**Standards:** IICRC WRT competency framework
+**Standards:** ANSI/IICRC S500 (cited nominatively)
 
 **Practical Takeaway:** Students will map the estimator's touchpoints across a typical insurance claim timeline.
 

@@ -31,7 +31,7 @@ Establish CARSI as a recognised training partner across 7+ Australian industry a
 | Detail                      | Information                                                                                                                                  |
 | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Relevance**               | Global cleaning industry body with strong ANZ presence. Members include commercial cleaning operators, product suppliers, facility managers. |
-| **Proposition**             | Co-branded IICRC CEC course bundle exclusive to ISSA ANZ members. Joint webinar series on mould remediation best practice.                       |
+| **Proposition**             | Co-branded CARSI course bundle for ISSA ANZ members (CEC hours apply only to courses the IICRC has approved). Joint webinar series on mould remediation best practice.                       |
 | **Contact Strategy**        | Attend ISSA Cleaning & Hygiene Expo → introduce CARSI at the education booth → follow up with co-branding proposal.                          |
 | **Partnership Tier Target** | Preferred Training Partner (co-branded bundle + member discount)                                                                             |
 | **URL**                     | issa.com (ANZ chapter via ISSA APAC)                                                                                                         |
@@ -41,7 +41,7 @@ Establish CARSI as a recognised training partner across 7+ Australian industry a
 | Detail                      | Information                                                                                                                   |
 | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
 | **Relevance**               | Peak body for aged care providers. Mould and indoor air quality in aged care facilities is a growing compliance focus.        |
-| **Proposition**             | Member training benefit — discounted IICRC CEC courses relevant to facility maintenance and infection control compliance.         |
+| **Proposition**             | Member training benefit — discounted CARSI courses relevant to facility maintenance and infection control compliance.         |
 | **Contact Strategy**        | Email Membership Director → propose pilot with 3 member organisations → present results to LASA board for formal endorsement. |
 | **Partnership Tier Target** | Endorsed Provider (free listing + co-branded certificate) → upgrade to Preferred after pilot                                  |
 | **URL**                     | lasa.asn.au                                                                                                                   |
@@ -61,7 +61,7 @@ Establish CARSI as a recognised training partner across 7+ Australian industry a
 | Detail                      | Information                                                                                                                            |
 | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | **Relevance**               | Peak body for the building and construction industry. Water damage, structural drying and mould during construction are common issues. |
-| **Proposition**             | Construction safety training partner — IICRC CEC courses in water damage restoration and structural drying and mould assessment as CPD for builder registration renewal.         |
+| **Proposition**             | Construction safety training partner — CARSI courses in water damage restoration, structural drying and mould assessment as CPD for builder registration renewal.         |
 | **Contact Strategy**        | Approach state branches first (MBA VIC, MBA QLD, MBA WA) → local partnership → escalate to national body.                              |
 | **Partnership Tier Target** | Preferred Training Partner (CPD recognition + member discount)                                                                         |
 | **URL**                     | masterbuilders.com.au                                                                                                                  |
@@ -81,7 +81,7 @@ Establish CARSI as a recognised training partner across 7+ Australian industry a
 | Detail                      | Information                                                                                                                                                                                                                                           |
 | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Relevance**               | Local government facility managers oversee community buildings, libraries, pools and public housing — all susceptible to mould and water damage. IPWEA (Institute of Public Works Engineering Australasia) members manage infrastructure maintenance. |
-| **Proposition**             | Government facility manager training — IICRC CEC courses as CPD for council maintenance teams and public works engineers.                                                                                                                                 |
+| **Proposition**             | Government facility manager training — CARSI courses as CPD for council maintenance teams and public works engineers.                                                                                                                                 |
 | **Contact Strategy**        | Email LGAQ (QLD) and IPWEA national → propose group licensing trial for 2–3 councils → publish case study → expand nationally.                                                                                                                        |
 | **Partnership Tier Target** | Endorsed Provider → Preferred (bulk licensing for council teams)                                                                                                                                                                                      |
 | **URLs**                    | lgaq.asn.au, ipwea.org                                                                                                                                                                                                                                |
@@ -129,13 +129,13 @@ Establish CARSI as a recognised training partner across 7+ Australian industry a
 
 ### Version 1: Short (< 150 words)
 
-**Subject:** IICRC CEC Course Partnership — [Association Name] Members
+**Subject:** CARSI Course Partnership — [Association Name] Members
 
 ---
 
 Dear [Name],
 
-I'm Phill from CARSI (carsi.com.au), an Australian-owned online training platform delivering IICRC CEC Accredited courses in restoration, mould remediation and water damage management.
+I'm Phill from CARSI (carsi.com.au), an Australian-owned online training platform and IICRC CEC Accredited provider, delivering courses in restoration, mould remediation and water damage management.
 
 We'd like to explore a training partnership with [Association Name] — offering your members discounted access to 80 published courses, all available online and self-paced.
 
@@ -152,13 +152,13 @@ carsi.com.au | training@carsi.com.au
 
 ### Version 2: Medium (~ 250 words)
 
-**Subject:** Training Partnership Opportunity — IICRC CEC Courses for [Association Name] Members
+**Subject:** Training Partnership Opportunity — CARSI Courses for [Association Name] Members
 
 ---
 
 Dear [Name],
 
-I'm writing to introduce CARSI (carsi.com.au), an Australian-owned platform delivering IICRC CEC Accredited online training in water damage restoration, mould remediation, structural drying and related disciplines.
+I'm writing to introduce CARSI (carsi.com.au), an Australian-owned IICRC CEC Accredited provider delivering online training in water damage restoration, mould remediation, structural drying and related disciplines.
 
 We believe there's a strong alignment between CARSI's course catalogue and the professional development needs of [Association Name] members. Specifically:
 
@@ -193,7 +193,7 @@ carsi.com.au | training@carsi.com.au
 
 Dear [Name],
 
-I'm Phill from CARSI (carsi.com.au) — an Australian-owned online training platform specialising in IICRC CEC Accredited courses for restoration, cleaning and building maintenance professionals.
+I'm Phill from CARSI (carsi.com.au) — an Australian-owned online training platform and IICRC CEC Accredited provider, specialising in courses for restoration, cleaning and building maintenance professionals.
 
 I'm reaching out because I believe [Association Name] members could significantly benefit from access to our training catalogue, and I'd like to explore a formal partnership.
 
@@ -205,7 +205,7 @@ CARSI delivers 80 published online courses. Our platform is purpose-built for wo
 
 [Customise this paragraph per association — examples below]
 
-- _For BSCAA:_ Cleaning contractors increasingly need IICRC credentials to win commercial tenders and insurance-related work. Our courses help your members compete.
+- _For BSCAA:_ Cleaning contractors increasingly need documented restoration training for commercial tenders and insurance-related work. Our courses help your members compete.
 - _For LASA:_ Mould in aged care facilities is a growing compliance concern. Our training equips facility maintenance teams with recognised credentials.
 - _For Master Builders:_ Water damage during construction causes costly defects. Our water damage restoration and structural drying courses train site teams to respond correctly.
 

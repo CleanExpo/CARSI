@@ -11,6 +11,7 @@ import {
 import { ONBOARDING_GOAL_OPTIONS } from '@/lib/onboarding/goal-options';
 
 import {
+  buildOnboardingDashboardUrls,
   FALLBACK_PATHWAY_LABEL,
   KNOWN_PATHWAY_CODES,
   pathwayDescription,
@@ -75,7 +76,7 @@ const OTHER_TITLES =
   '(?:master|journeyman)\\s+(?:water|textile|fire (?:and|&) smoke)\\s+(?:restorer|cleaner)|commercial drying specialist|mou?ld remediation specialist|building moisture (?:inspection|thermography)|building construction identification|(?:senior )?carpet inspector|resilient flooring inspector|wood (?:floor|(?:and|&) laminate flooring) inspector|introduction to substrate (?:and|&) subfloor inspection';
 const DESIGNATION_TITLE = new RegExp(
   `\\b(?:(?:${TECHNICIAN_REFERENTS})\\s+technician|${OTHER_TITLES})\\b`,
-  'i',
+  'i'
 );
 // Nouns IICRC builds its credential titles from. None may appear on any wizard step or in
 // recommendation copy, learner-standing steps included: a title carrying one of these words is
@@ -144,8 +145,8 @@ const noop = () => {};
 function renderWizardAtStep(index: number): string {
   return renderedText(
     renderToStaticMarkup(
-      createElement(OnboardingWizard, { isOpen: true, initialStep: index, onComplete: noop }),
-    ),
+      createElement(OnboardingWizard, { isOpen: true, initialStep: index, onComplete: noop })
+    )
   );
 }
 
@@ -153,8 +154,8 @@ function renderWizardAtStep(index: number): string {
 function renderWizardResult(result: WizardResult): string {
   return renderedText(
     renderToStaticMarkup(
-      createElement(OnboardingWizard, { isOpen: true, initialResult: result, onComplete: noop }),
-    ),
+      createElement(OnboardingWizard, { isOpen: true, initialResult: result, onComplete: noop })
+    )
   );
 }
 
@@ -224,12 +225,15 @@ describe('onboarding pathway copy (licence)', () => {
     // A claim appended beside an allow-listed sentence is still caught (only the exact literal
     // is stripped). The control avoids reproducing a banned selling form in source.
     expect(
-      stripAllowed(`${ALLOWED_SENTENCES[1]} This qualifies you for insurer panels.`, ALLOWED_SENTENCES),
+      stripAllowed(
+        `${ALLOWED_SENTENCES[1]} This qualifies you for insurer panels.`,
+        ALLOWED_SENTENCES
+      )
     ).toMatch(LICENCE_WORDS);
     expect('Based on your selections, tCST is a practical place to start.').toMatch(MANGLED_CASE);
     // The markup reader keeps what a browser shows and drops the rest.
     expect(renderedText('<p class="x">What&#x27;s <b>your</b> &amp; role?</p>')).toBe(
-      "What's your & role?",
+      "What's your & role?"
     );
   });
 
@@ -316,7 +320,7 @@ describe('onboarding pathway copy (licence)', () => {
 describe('onboarding wizard as rendered (licence)', () => {
   it('opens at the first step by default', () => {
     const text = renderedText(
-      renderToStaticMarkup(createElement(OnboardingWizard, { isOpen: true, onComplete: noop })),
+      renderToStaticMarkup(createElement(OnboardingWizard, { isOpen: true, onComplete: noop }))
     );
     expect(text).toContain(ONBOARDING_FLOW[0].question);
   });
@@ -376,5 +380,33 @@ describe('onboarding wizard as rendered (licence)', () => {
       expect(result.pathwayLabel).not.toBe(code);
       assertNoLicenceClaims(renderWizardResult(result));
     }
+  });
+});
+
+/**
+ * Review of fix/industry-faq-licence round 2 (18/10/2026): a learner holding the IICRC colour
+ * repair certification (CRT) was told "We prioritised colour repair courses" and sent to
+ * ?discipline=CRT. CARSI sells no colour-repair course (data/seed/courses-catalog.json), so the
+ * learner is pointed at carpet cleaning, a subject CARSI does sell.
+ */
+describe('onboarding never recommends an unsold subject', () => {
+  const UNSOLD = /colou?r repair|carpet repair|reinstall|upholster/i;
+
+  it('unsold: a CRT holder is routed to carpet cleaning, in the code, label, copy and URL', () => {
+    const code = resolveRecommendedPathwayCode({ disciplines_held: ['CRT'] });
+    expect(code).toBe('CCT');
+    for (const goal of ['cec_renewal', 'career_change', 'new_cert', undefined]) {
+      expect(pathwayDescription(code, goal)).not.toMatch(UNSOLD);
+    }
+    expect(pathwayLabel(code)).not.toMatch(UNSOLD);
+    const { suggested_courses_url } = buildOnboardingDashboardUrls({
+      pathwayCode: code,
+      disciplines: ['CRT'],
+    });
+    expect(suggested_courses_url).toBe('/dashboard/courses?discipline=CCT');
+  });
+
+  it('unsold: no known pathway label names an unsold subject', () => {
+    for (const c of KNOWN_PATHWAY_CODES) expect(pathwayLabel(c), c).not.toMatch(UNSOLD);
   });
 });

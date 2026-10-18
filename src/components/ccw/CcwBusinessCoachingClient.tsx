@@ -124,7 +124,7 @@ const faqs = [
   {
     question: 'Is this an IICRC CEC course?',
     answer:
-      'No. This is business development and marketing systems for owners. Technical accreditation remains on the CARSI course catalogue.',
+      'No. This is business development and marketing systems for owners. Technical training stays in the CARSI course catalogue.',
   },
 ] as const;
 

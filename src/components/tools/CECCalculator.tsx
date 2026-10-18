@@ -12,6 +12,8 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
+import { IICRC_DISCIPLINE_LONG } from '@/lib/iicrc-discipline-display';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -34,6 +36,10 @@ interface DisciplineInfo {
   code: Discipline;
   name: string;
   description: string;
+  /**
+   * IICRC renewal rule (https://iicrc.org/ausfaqs/, checked 18/10/2026): 14 CECs every four
+   * years; Master and Inspector certifications 14 CECs every two years.
+   */
   cecsPerCycle: Record<CertLevel, number>;
   cycleLengthYears: number;
   avgCecsPerCourse: number;
@@ -42,58 +48,59 @@ interface DisciplineInfo {
 const DISCIPLINES: DisciplineInfo[] = [
   {
     code: 'WRT',
-    name: 'Water Restoration Technology',
+    name: IICRC_DISCIPLINE_LONG.WRT,
     description: 'Flood damage, burst pipes, storm recovery',
-    cecsPerCycle: { none: 0, technician: 14, master: 21 },
-    cycleLengthYears: 3,
+    cecsPerCycle: { none: 0, technician: 14, master: 14 },
+    cycleLengthYears: 4,
     avgCecsPerCourse: 3,
   },
   {
     code: 'CRT',
-    name: 'Carpet Repair & Reinstallation Technology',
-    description: 'Flooring and soft furnishing restoration',
-    cecsPerCycle: { none: 0, technician: 14, master: 21 },
-    cycleLengthYears: 3,
+    name: IICRC_DISCIPLINE_LONG.CRT,
+    description:
+      'Carpet colour correction (an IICRC certification; CARSI sells no colour-repair course)',
+    cecsPerCycle: { none: 0, technician: 14, master: 14 },
+    cycleLengthYears: 4,
     avgCecsPerCourse: 3,
   },
   {
     code: 'ASD',
-    name: 'Applied Structural Drying',
+    name: IICRC_DISCIPLINE_LONG.ASD,
     description: 'Advanced moisture control for structural elements',
-    cecsPerCycle: { none: 0, technician: 14, master: 21 },
-    cycleLengthYears: 3,
+    cecsPerCycle: { none: 0, technician: 14, master: 14 },
+    cycleLengthYears: 4,
     avgCecsPerCourse: 3,
   },
   {
     code: 'AMRT',
-    name: 'Applied Microbial Remediation Technology',
+    name: IICRC_DISCIPLINE_LONG.AMRT,
     description: 'Mould assessment and remediation',
-    cecsPerCycle: { none: 0, technician: 14, master: 21 },
-    cycleLengthYears: 3,
+    cecsPerCycle: { none: 0, technician: 14, master: 14 },
+    cycleLengthYears: 4,
     avgCecsPerCourse: 3,
   },
   {
     code: 'FSRT',
-    name: 'Fire & Smoke Restoration Technology',
+    name: IICRC_DISCIPLINE_LONG.FSRT,
     description: 'Post-fire cleanup and deodorisation',
-    cecsPerCycle: { none: 0, technician: 14, master: 21 },
-    cycleLengthYears: 3,
+    cecsPerCycle: { none: 0, technician: 14, master: 14 },
+    cycleLengthYears: 4,
     avgCecsPerCourse: 3,
   },
   {
     code: 'OCT',
-    name: 'Odour Control Technology',
+    name: IICRC_DISCIPLINE_LONG.OCT,
     description: 'Identifying and neutralising odour sources',
-    cecsPerCycle: { none: 0, technician: 14, master: 21 },
-    cycleLengthYears: 3,
+    cecsPerCycle: { none: 0, technician: 14, master: 14 },
+    cycleLengthYears: 4,
     avgCecsPerCourse: 3,
   },
   {
     code: 'CCT',
-    name: 'Commercial Carpet Cleaning Technology',
-    description: 'Contract cleaning in commercial environments',
-    cecsPerCycle: { none: 0, technician: 14, master: 21 },
-    cycleLengthYears: 3,
+    name: IICRC_DISCIPLINE_LONG.CCT,
+    description: 'Carpet cleaning in homes and commercial premises',
+    cecsPerCycle: { none: 0, technician: 14, master: 14 },
+    cycleLengthYears: 4,
     avgCecsPerCourse: 2,
   },
 ];
@@ -104,8 +111,8 @@ const CERT_LEVELS: { value: CertLevel; label: string; description: string }[] = 
     label: 'No Current Certification',
     description: 'Starting fresh — earn your first credential',
   },
-  { value: 'technician', label: 'Technician', description: '14 CECs required per 3-year cycle' },
-  { value: 'master', label: 'Master Technician', description: '21 CECs required per 3-year cycle' },
+  { value: 'technician', label: 'Technician', description: '14 CECs every four years' },
+  { value: 'master', label: 'Master Technician', description: '14 CECs every two years' },
 ];
 
 /* ----------------------------------------
@@ -141,9 +148,7 @@ export function CECCalculator() {
   }, [discipline, certLevel, cecsEarned]);
 
   return (
-    <section
-      className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
-    >
+    <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
       <div className="mb-5 flex items-center gap-3">
         <div
           className="flex h-10 w-10 items-center justify-center rounded-lg"
@@ -183,9 +188,7 @@ export function CECCalculator() {
               {DISCIPLINES.map((d) => (
                 <SelectItem key={d.code} value={d.code} className="text-sm">
                   <span className="font-medium">{d.code}</span>
-                  <span className="ml-1.5 text-slate-600">
-                    — {d.name}
-                  </span>
+                  <span className="ml-1.5 text-slate-600">— {d.name}</span>
                 </SelectItem>
               ))}
             </SelectContent>
@@ -258,20 +261,24 @@ export function CECCalculator() {
                   aria-hidden="true"
                 />
                 <p className="text-sm leading-relaxed text-slate-700">
-                  To earn your{' '}
-                  <strong style={{ color: '#0f5fa8' }}>{result.discipline.code}</strong>{' '}
-                  certification, start with the foundational courses below. Once certified, you will
-                  need <strong style={{ color: '#ed9d24' }}>14 CECs</strong> every 3 years as a
-                  Technician, or <strong style={{ color: '#ed9d24' }}>21 CECs</strong> as a Master
-                  Technician.
+                  IICRC certification is obtained only through IICRC-approved schools and
+                  examinations; CARSI does not deliver it. CARSI courses build the underlying
+                  knowledge. Once certified, the IICRC requires{' '}
+                  <strong style={{ color: '#ed9d24' }}>14 CECs</strong> every four years, or every
+                  two years for Master and Inspector certifications.
                 </p>
               </div>
-              <Button asChild variant="glow" size="sm" className="bg-[#0f5fa8] text-white hover:bg-[#0b4e88]">
+              <Button
+                asChild
+                variant="glow"
+                size="sm"
+                className="bg-[#0f5fa8] text-white hover:bg-[#0b4e88]"
+              >
                 <Link
                   href={`/courses?discipline=${result.discipline.code}`}
-                  aria-label={`Browse ${result.discipline.code} courses — ${result.discipline.name}`}
+                  aria-label={`Browse CARSI courses related to ${result.discipline.name}`}
                 >
-                  Browse {result.discipline.code} Courses
+                  Browse related CARSI courses
                   <ChevronRight className="h-4 w-4" aria-hidden="true" />
                 </Link>
               </Button>
@@ -332,16 +339,11 @@ export function CECCalculator() {
 
               {/* Stats row */}
               <div className="grid grid-cols-3 gap-3">
-                <div
-                  className="rounded-lg p-3 text-center"
-                  style={{ background: '#eef7ff' }}
-                >
+                <div className="rounded-lg p-3 text-center" style={{ background: '#eef7ff' }}>
                   <p className="text-lg font-bold" style={{ color: '#0f5fa8' }}>
                     {result.remaining}
                   </p>
-                  <p className="text-xs text-slate-600">
-                    CECs needed
-                  </p>
+                  <p className="text-xs text-slate-600">CECs needed</p>
                 </div>
                 <div
                   className="rounded-lg p-3 text-center"
@@ -350,36 +352,32 @@ export function CECCalculator() {
                   <p className="text-lg font-bold" style={{ color: '#ed9d24' }}>
                     {result.coursesNeeded}
                   </p>
-                  <p className="text-xs text-slate-600">
-                    courses approx.
-                  </p>
+                  <p className="text-xs text-slate-600">courses approx.</p>
                 </div>
-                <div
-                  className="rounded-lg p-3 text-center"
-                  style={{ background: '#f1f5f9' }}
-                >
+                <div className="rounded-lg p-3 text-center" style={{ background: '#f1f5f9' }}>
                   <div className="flex items-center justify-center gap-1">
                     <Clock
                       className="h-3.5 w-3.5"
                       style={{ color: '#64748b' }}
                       aria-hidden="true"
                     />
-                    <p className="text-lg font-bold text-slate-900">
-                      {result.estimatedHours}h
-                    </p>
+                    <p className="text-lg font-bold text-slate-900">{result.estimatedHours}h</p>
                   </div>
-                  <p className="text-xs text-slate-600">
-                    est. study time
-                  </p>
+                  <p className="text-xs text-slate-600">est. study time</p>
                 </div>
               </div>
 
-              <Button asChild variant="glow" size="sm" className="bg-[#0f5fa8] text-white hover:bg-[#0b4e88]">
+              <Button
+                asChild
+                variant="glow"
+                size="sm"
+                className="bg-[#0f5fa8] text-white hover:bg-[#0b4e88]"
+              >
                 <Link
                   href={`/courses?discipline=${result.discipline.code}`}
-                  aria-label={`Browse ${result.discipline.code} courses to earn ${result.remaining} more CECs`}
+                  aria-label={`Browse CARSI courses; CEC hours apply only to courses the IICRC has approved`}
                 >
-                  Browse {result.discipline.code} Courses
+                  Browse related CARSI courses
                   <ChevronRight className="h-4 w-4" aria-hidden="true" />
                 </Link>
               </Button>

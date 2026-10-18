@@ -14,11 +14,11 @@ import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Transport & Logistics IICRC CEC Training',
+  title: 'Transport & Logistics Restoration Training',
   description:
     'Water damage restoration, carpet cleaning and odour control courses for Australian transport and logistics teams, plus a vehicle drying course. CEC hours are shown only on courses the IICRC has approved.',
   keywords: [
-    'transport IICRC CEC training Australia',
+    'transport restoration training Australia',
     'logistics warehouse restoration',
     'warehouse water damage',
     'carpet cleaning training',
@@ -41,7 +41,7 @@ const disciplines = [
 const stats = [
   { value: 'Online', label: 'Self-paced study' },
   { value: 'Chain of', label: 'Responsibility' },
-  { value: 'IICRC', label: 'CEC Accredited' },
+  { value: 'IICRC CEC', label: 'On approved courses' },
 ];
 
 const faqs = [
@@ -72,7 +72,7 @@ const whyCards = [
     icon: Shield,
     title: 'Asset Protection',
     description:
-      'Warehoused goods, fleet vehicles, and loading infrastructure represent significant capital. IICRC CEC training ensures rapid, standards-based response to water damage and contamination events.',
+      'Warehoused goods, fleet vehicles, and loading infrastructure represent significant capital. Restoration training ensures rapid, standards-based response to water damage and contamination events.',
     color: '#1565C0',
   },
   {

@@ -14,11 +14,11 @@ import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Data Centre IICRC CEC Training',
+  title: 'Data Centre Restoration Training',
   description:
-    'IICRC CEC Accredited restoration courses for Australian data centres. Water damage restoration, structural drying and fire & smoke restoration courses for water damage prevention, climate control recovery, and fire suppression system response.',
+    'Restoration courses for Australian data centres. Water damage restoration, structural drying and fire & smoke restoration courses for water damage prevention, climate control recovery, and fire suppression system response.',
   keywords: [
-    'data centre IICRC CEC training Australia',
+    'data centre restoration training Australia',
     'water damage prevention data centre',
     'data centre water damage restoration',
     'server room structural drying',
@@ -41,7 +41,7 @@ const disciplines = [
 const stats = [
   { value: 'Online', label: 'Self-paced study' },
   { value: 'CARSI', label: 'Verifiable credentials' },
-  { value: 'IICRC', label: 'CEC Accredited' },
+  { value: 'IICRC CEC', label: 'On approved courses' },
 ];
 
 const faqs = [
@@ -61,7 +61,7 @@ const faqs = [
       'After a clean-agent or water-mist discharge, residue and moisture have to be removed to prevent corrosion and equipment failure. Introduction to Smoke and Soot Damage Restoration covers residue assessment and clean-up, and Introduction to Applied Structural Drying covers moisture control.',
   },
   {
-    question: 'Can data centre operations staff complete IICRC CEC training without downtime?',
+    question: 'Can data centre operations staff complete this training without downtime?',
     answer:
       'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced. NOC and facility staff can complete modules during scheduled maintenance windows or between shifts. All courses issue verifiable digital credentials on completion.',
   },
@@ -72,7 +72,7 @@ const whyCards = [
     icon: Shield,
     title: 'Uptime Protection',
     description:
-      'Every minute of downtime costs thousands. IICRC CEC training ensures your facility team can respond to water and fire events within minutes, protecting SLA commitments and Uptime Institute tier compliance.',
+      'Every minute of downtime costs thousands. Restoration training ensures your facility team can respond to water and fire events within minutes, protecting SLA commitments and Uptime Institute tier compliance.',
     color: '#6A1B9A',
   },
   {
@@ -86,7 +86,7 @@ const whyCards = [
     icon: Flame,
     title: 'Fire Suppression Recovery',
     description:
-      "Post-suppression cleanup requires specialist knowledge. CARSI's CEC-accredited fire and smoke restoration training covers residue removal, air quality restoration, and equipment assessment after clean agent or water mist activation.",
+      "Post-suppression cleanup requires specialist knowledge. CARSI's fire and smoke restoration training covers residue removal, air quality restoration, and equipment assessment after clean agent or water mist activation.",
     color: '#ed9d24',
   },
 ];

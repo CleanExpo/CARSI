@@ -18,10 +18,10 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = buildIndustryMetadata(
   'commercial-cleaning',
-  'Commercial Cleaning IICRC CEC Training',
-  'IICRC CEC Accredited courses for commercial cleaning contractors in Australia. Carpet cleaning, water damage and odour control topics for commercial cleaning teams and insurance panel readiness.',
+  'Commercial Cleaning Restoration Training',
+  'Courses for commercial cleaning contractors in Australia. Carpet cleaning, water damage and odour control topics for commercial cleaning teams and insurance panel readiness.',
   [
-    'commercial cleaning IICRC CEC training',
+    'commercial cleaning restoration training',
     'cleaning contractor training Australia',
     'carpet cleaning training',
     'commercial carpet care',
@@ -74,9 +74,9 @@ const faqs = [
 const whyCards = [
   {
     icon: Award,
-    title: 'IICRC CEC Training',
+    title: 'Restoration Training',
     description:
-      'Build IICRC CEC records and CARSI credentials that differentiate your cleaning business. Stand out in tender submissions and client proposals.',
+      'Build CARSI credentials, plus IICRC CEC records on courses the IICRC has approved, that differentiate your cleaning business. Stand out in tender submissions and client proposals.',
     color: '#2490ed',
   },
   {
@@ -104,8 +104,8 @@ export default async function CommercialCleaningIndustryPage() {
         industryName="Commercial Cleaning"
         accentColor={ACCENT_COLOR}
         headline="Commercial Cleaning"
-        headlineAccent="Professional CEC Training"
-        description="IICRC CEC Accredited courses for commercial cleaning contractors. Build CARSI credentials in carpet cleaning, commercial carpet care and odour control."
+        headlineAccent="Professional Restoration Training"
+        description="Courses for commercial cleaning contractors. Build CARSI credentials in carpet cleaning, commercial carpet care and odour control."
         disciplines={disciplines}
         stats={stats}
       />

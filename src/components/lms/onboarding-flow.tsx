@@ -117,7 +117,7 @@ export const ONBOARDING_FLOW: FlowItem[] = [
     key: 'disciplines_held',
     options: [
       { value: 'WRT', label: 'WRT — Water' },
-      { value: 'CRT', label: 'CRT — Carpet' },
+      { value: 'CRT', label: 'CRT — Colour repair' },
       { value: 'ASD', label: 'ASD — Structural drying' },
       { value: 'AMRT', label: 'AMRT — Microbial' },
       { value: 'FSRT', label: 'FSRT — Fire & smoke' },

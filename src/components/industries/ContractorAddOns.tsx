@@ -57,9 +57,9 @@ export function ContractorAddOns({ variant = 'default' }: ContractorAddOnsProps)
               Upgrade your service offering
             </h2>
             <p className={`mt-4 max-w-2xl ${LANDING_LEAD_CLASS}`}>
-              ISSA-aligned cleaning businesses can add IICRC CEC courses to build restoration skills
-              and charge for restoration services. CARSI delivers continuing education credits, not
-              IICRC certification.
+              ISSA-aligned cleaning businesses can add CARSI restoration courses to build
+              restoration skills. CARSI is an IICRC CEC Accredited provider; it does not deliver
+              IICRC certification, and CEC hours apply only to courses the IICRC has approved.
             </p>
 
             <div className="mt-10 space-y-3">
@@ -90,7 +90,7 @@ export function ContractorAddOns({ variant = 'default' }: ContractorAddOnsProps)
                 href="/courses"
                 className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[#146fc2] px-6 text-sm font-semibold text-white hover:bg-[#0f5fa8]"
               >
-                Browse CEC courses
+                Browse courses
                 <ArrowRight className="h-4 w-4" aria-hidden />
               </Link>
               <Link

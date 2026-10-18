@@ -99,7 +99,7 @@
       ],
       "value_propositions": [
         "24/7 online training — no staff downtime",
-        "IICRC credentials satisfy audit requirements",
+        "Verifiable CARSI credentials document staff training for audits",
         "Documented competency for WHS due diligence defence",
         "Train in-house staff to handle initial water damage response"
       ],
@@ -216,9 +216,9 @@
       ],
       "value_propositions": [
         "Train maintenance staff to respond immediately — reduce room downtime",
-        "OCT certification solves persistent odour complaints",
+        "Odour control training helps solve persistent odour complaints",
         "24/7 online training fits shift schedules",
-        "Differentiate from competitors with certified staff"
+        "Differentiate from competitors with trained staff"
       ],
       "campaign_triggers": [
         "Pre-peak season (Oct-Dec) — summer holiday prep",
@@ -233,7 +233,7 @@
         },
         {
           "objection": "Our brand has its own training program",
-          "response": "IICRC credentials complement brand training with industry-recognised certification"
+          "response": "CARSI training complements brand training with verifiable CARSI credentials"
         }
       ]
     },
@@ -330,7 +330,7 @@
         }
       ],
       "value_propositions": [
-        "IICRC credentials satisfy AusTender pre-qualification",
+        "Documented training supports AusTender submissions",
         "Documented competency for WHS due diligence defence",
         "Bulk licensing for council/department-wide training",
         "Online training = no travel budget required"
@@ -344,7 +344,7 @@
       "objections_and_responses": [
         {
           "objection": "We have internal training programs",
-          "response": "IICRC credentials provide external verification that satisfies audit requirements"
+          "response": "Verifiable CARSI credentials give auditors evidence of completed training"
         },
         {
           "objection": "Budget is locked for this financial year",
@@ -439,7 +439,7 @@
       ],
       "value_propositions": [
         "Add restoration services = 30-50% higher margins",
-        "Win insurance work with IICRC credentials",
+        "Build restoration skills for insurance work",
         "Differentiate from 'mop and bucket' competitors",
         "Pre-qualify for government and corporate panels"
       ],
@@ -460,7 +460,7 @@
         },
         {
           "objection": "Is IICRC recognised by Australian insurers?",
-          "response": "Yes — IAG, Suncorp, QBE all recognise IICRC credentials for restoration contractors"
+          "response": "Each insurer panel sets its own requirements. IICRC certification comes from IICRC-approved schools; CARSI adds training and verifiable CARSI credentials"
         }
       ]
     },
@@ -566,7 +566,7 @@
         },
         {
           "objection": "Our staff are already ANZIIF qualified",
-          "response": "IICRC credentials complement ANZIIF with practical restoration knowledge"
+          "response": "CARSI training complements ANZIIF with practical restoration knowledge"
         },
         {
           "objection": "We use a panel of approved restorers",
@@ -655,7 +655,7 @@
       ],
       "value_propositions": [
         "Documented competency for Quality Standards audits",
-        "AMRT credentials for mould/infection control",
+        "Mould remediation training for infection control",
         "Protect vulnerable residents with proper remediation",
         "Online training = no staff shortages for training days"
       ],
@@ -838,7 +838,7 @@
         }
       ],
       "value_propositions": [
-        "IICRC credentials protect building managers from personal liability",
+        "Documented training helps building managers show due diligence",
         "Independent standard to justify contractor selection",
         "Online training fits around building management duties",
         "Document competency for insurance and legal purposes"
@@ -1021,7 +1021,7 @@
       "value_propositions": [
         "Pre-qualify for Scentre, Vicinity, GPT contractor panels",
         "Rapid response minimizes tenant downtime",
-        "OCT certification for food court odour issues",
+        "Odour control training for food court odour issues",
         "Document competency for insurance claims"
       ],
       "campaign_triggers": [
@@ -1042,7 +1042,7 @@
       "industries": ["healthcare", "aged_care", "government", "education", "mining"]
     },
     "insurance_panel": {
-      "message": "IICRC credentials recognised by IAG, Suncorp, QBE for restoration contractor panels",
+      "message": "Restoration training and verifiable CARSI credentials for contractor panel submissions",
       "industries": ["commercial_cleaning", "restoration"]
     },
     "cleaning_plus": {

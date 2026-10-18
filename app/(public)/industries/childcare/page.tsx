@@ -13,11 +13,11 @@ import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Childcare IICRC CEC Training',
+  title: 'Childcare Restoration Training',
   description:
-    'IICRC CEC training for childcare centre maintenance. Mould remediation and carpet cleaning training supporting NQF compliance across Australian early learning centres.',
+    'Restoration training for childcare centre maintenance. Mould remediation and carpet cleaning training supporting NQF compliance across Australian early learning centres.',
   keywords: [
-    'childcare IICRC CEC training',
+    'childcare restoration training',
     'early learning centre cleaning',
     'NQF compliance training',
     'childcare mould remediation Australia',
@@ -39,7 +39,7 @@ const disciplines = [
 const stats = [
   { value: 'Online', label: 'Self-paced study' },
   { value: 'NQF', label: 'Quality Framework' },
-  { value: 'IICRC', label: 'CEC Accredited' },
+  { value: 'IICRC CEC', label: 'On approved courses' },
 ];
 
 const whyCards = [
@@ -47,7 +47,7 @@ const whyCards = [
     icon: Shield,
     title: 'NQF Quality Area 2',
     description:
-      'IICRC CEC training directly supports Health & Safety requirements under the National Quality Standard. Aim for "Exceeding" at your next ACECQA assessment.',
+      'Restoration training directly supports Health & Safety requirements under the National Quality Standard. Aim for "Exceeding" at your next ACECQA assessment.',
     color: '#e91e63',
   },
   {

@@ -13,13 +13,13 @@ import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Strata & Body Corporate IICRC CEC Training',
+  title: 'Strata & Body Corporate Restoration Training',
   description:
-    'IICRC CEC training for strata managers and building managers. Protect common property with water damage restoration, mould remediation and structural drying restoration credentials.',
+    'Restoration training for strata managers and building managers. Protect common property with water damage restoration, mould remediation and structural drying restoration credentials.',
   keywords: [
-    'strata IICRC CEC training',
+    'strata restoration training',
     'body corporate restoration',
-    'building manager certification',
+    'building manager training',
     'strata water damage Australia',
   ],
 };
@@ -48,7 +48,7 @@ const whyCards = [
     icon: Building2,
     title: 'Common Property Protection',
     description:
-      'Basement flooding, roof membrane failures, and lift lobby maintenance demand certified restoration skills. Protect common property assets with IICRC-trained technicians.',
+      'Basement flooding, roof membrane failures, and lift lobby maintenance demand restoration skills. Protect common property assets with trained technicians.',
     color: '#7c3aed',
   },
   {

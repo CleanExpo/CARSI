@@ -375,7 +375,7 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
               </span>
               <div>
                 <p className="text-[12px] font-semibold text-slate-900 tabular-nums">
-                  +2.0 CEC hours added
+                  Certificate issued
                 </p>
                 <p className="text-[10px] text-slate-400">Logged to your record automatically</p>
               </div>

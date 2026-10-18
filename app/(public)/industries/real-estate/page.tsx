@@ -14,11 +14,11 @@ import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'IICRC CEC Training for Real Estate & Property Sales | CARSI Australia',
+  title: 'Restoration Training for Real Estate & Property Sales | CARSI Australia',
   description:
-    'Vendor disclosure compliance and pre-sale remediation. CARSI water damage restoration, applied structural drying and mould remediation CEC courses for real estate agents, property managers, and conveyancers. Online, CEC Accredited — continuing education credits, not IICRC certification.',
+    'Vendor disclosure compliance and pre-sale remediation. CARSI water damage restoration, structural drying and mould remediation courses for real estate agents, property managers, and conveyancers. Online. CEC hours apply only to courses the IICRC has approved; not IICRC certification.',
   keywords: [
-    'real estate IICRC CEC training Australia',
+    'real estate restoration training Australia',
     'water damage disclosure property',
     'mould training real estate agent',
     'water damage training for real estate',
@@ -41,7 +41,7 @@ const disciplines = [
 const stats = [
   { value: 'Online', label: 'Self-paced study' },
   { value: 'ACL', label: 'Disclosure Required' },
-  { value: 'IICRC', label: 'CEC Accredited' },
+  { value: 'IICRC CEC', label: 'On approved courses' },
 ];
 
 const faqs = [
@@ -73,7 +73,7 @@ const whyCards = [
     icon: FileCheck,
     title: 'Vendor Disclosure Compliance',
     description:
-      'Water damage and mould are material defects requiring disclosure under Australian Consumer Law. IICRC CEC training equips agents to identify, document, and disclose these defects accurately — minimising post-settlement liability.',
+      'Water damage and mould are material defects requiring disclosure under Australian Consumer Law. Restoration training equips agents to identify, document, and disclose these defects accurately — minimising post-settlement liability.',
     color: '#ff7043',
   },
   {
@@ -87,7 +87,7 @@ const whyCards = [
     icon: Shield,
     title: 'Professional Indemnity Protection',
     description:
-      'Non-disclosure of known defects is the leading source of real estate professional indemnity claims. IICRC CEC Accredited awareness courses demonstrates due diligence and supports a defensible inspection record.',
+      'Non-disclosure of known defects is the leading source of real estate professional indemnity claims. Documented awareness training demonstrates due diligence and supports a defensible inspection record.',
     color: '#2490ed',
   },
 ];

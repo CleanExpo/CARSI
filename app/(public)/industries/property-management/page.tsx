@@ -13,11 +13,11 @@ import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Property Management IICRC CEC Training',
+  title: 'Property Management Restoration Training',
   description:
-    'IICRC CEC Accredited restoration courses for Australian property and strata managers. Mould, water damage and carpet credentials for RTA compliance.',
+    'Restoration courses for Australian property and strata managers. Mould, water damage and carpet credentials for RTA compliance.',
   keywords: [
-    'property management IICRC CEC training',
+    'property management restoration training',
     'strata manager restoration course',
     'RTA mould compliance',
     'property manager water damage Australia',
@@ -40,7 +40,7 @@ const disciplines = [
 const stats = [
   { value: 'Online', label: 'Self-paced study' },
   { value: 'RTA', label: 'Compliance' },
-  { value: 'IICRC', label: 'CEC Accredited' },
+  { value: 'IICRC CEC', label: 'On approved courses' },
 ];
 
 const whyCards = [
@@ -105,7 +105,7 @@ export default async function PropertyManagementIndustryPage() {
         title="Property Bundle"
         price={industryBundlePriceLabel('property-management')}
         description="Mould remediation, water damage restoration and carpet cleaning for property managers. Paid courses can be bought as team seats at checkout."
-        ctaText="Get Certified"
+        ctaText="Browse courses"
         accentColor={ACCENT_COLOR}
       />
     </IndustryPageLayout>

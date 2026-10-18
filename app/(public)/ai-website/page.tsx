@@ -110,8 +110,8 @@ export default function AiWebsitePage() {
         <div className="aiw-wrap">
           <div className="aiw-sec-head">
             <span className="aiw-eyebrow">What it sells</span>
-            <h2>43 Australian-produced courses. Real designations. One flat ladder.</h2>
-            <p>Water damage, mould, fire &amp; smoke, trauma, structural drying, carpet &amp; upholstery, indoor air quality — plus a new Grow-Your-Business track. Priced by course length, so there’s nothing to work out.</p>
+            <h2>Australian-produced courses. Real designations. One flat ladder.</h2>
+            <p>Water damage, mould, fire &amp; smoke, trauma, structural drying, carpet care, indoor air quality — plus a new Grow-Your-Business track. Priced by course length, so there’s nothing to work out.</p>
           </div>
           <div className="aiw-price-grid">
             {TIERS.map(([lab, amt, note]) => (

@@ -14,12 +14,12 @@ import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'IICRC CEC Mould & Restoration Training for Caravan Parks | CARSI Australia',
+  title: 'Mould & Restoration Training for Caravan Parks | CARSI Australia',
   description:
-    'Protect guests and comply with state Fair Trading obligations. CARSI mould remediation, carpet cleaning and water damage restoration training for Australian caravan parks and holiday accommodation. Online, CEC Accredited.',
+    'Protect guests and comply with state Fair Trading obligations. CARSI mould remediation, carpet cleaning and water damage restoration training for Australian caravan parks and holiday accommodation. Online. CEC hours apply only to courses the IICRC has approved.',
   keywords: [
     'caravan park mould training Australia',
-    'holiday park IICRC CEC course',
+    'holiday park restoration course',
     'caravan park mould remediation',
     'cabin mould restoration training',
     'holiday accommodation hygiene compliance',
@@ -41,7 +41,7 @@ const disciplines = [
 const stats = [
   { value: 'Online', label: 'Self-paced study' },
   { value: 'CARSI', label: 'Verifiable credentials' },
-  { value: 'IICRC', label: 'CEC Accredited' },
+  { value: 'IICRC CEC', label: 'On approved courses' },
 ];
 
 const faqs = [
@@ -56,7 +56,7 @@ const faqs = [
       'Caravan parks and holiday parks face water damage from cyclone and storm events in tropical regions, flooding in low-lying coastal and riverside parks, roof failures in ageing cabin stock, and plumbing failures in shared amenities blocks. CARSI water damage restoration training equips park maintenance staff to respond immediately after these events — extracting water, placing drying equipment, and documenting damage for insurance claims — reducing the period of lost revenue from uninhabitable sites.',
   },
   {
-    question: 'How does IICRC CEC training protect caravan park guests and operators?',
+    question: 'How does restoration training protect caravan park guests and operators?',
     answer:
       'Caravan park operators owe guests a duty of care under Australian Consumer Law and state-specific tourism accommodation legislation. Providing accommodation with hidden mould or water damage exposes operators to Fair Trading complaints, negative TripAdvisor reviews, and potential personal injury claims if guests suffer health impacts. CARSI mould remediation training demonstrates that maintenance staff are competent to identify and remediate mould — providing a defensible record that standards-based inspections and remediation were performed, which is increasingly expected by park accreditation bodies.',
   },
@@ -72,7 +72,7 @@ const whyCards = [
     icon: Droplets,
     title: 'Seasonal Moisture & Mould',
     description:
-      'Cabins left unoccupied during off-season develop mould in walls, subfloors, and ensuite blocks. CEC-accredited mould remediation training gives maintenance staff the protocols to inspect and remediate before peak season.',
+      'Cabins left unoccupied during off-season develop mould in walls, subfloors, and ensuite blocks. Mould remediation training gives maintenance staff the protocols to inspect and remediate before peak season.',
     color: '#26a69a',
   },
   {

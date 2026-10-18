@@ -14,15 +14,15 @@ import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'IICRC CEC Training for Plumbers & Trades | CARSI Australia',
+  title: 'Restoration Training for Plumbers & Trades | CARSI Australia',
   description:
-    'Turn water damage call-outs into drying contracts. CARSI water damage restoration and applied structural drying CEC courses for Australian plumbers and trade contractors — online, self-paced, CEC Accredited. These are continuing education (CEC) courses, not IICRC certification.',
+    'Turn water damage call-outs into drying contracts. CARSI water damage restoration and structural drying courses for Australian plumbers and trade contractors — online and self-paced. CEC hours apply only to courses the IICRC has approved, and no CARSI course is IICRC certification.',
   keywords: [
-    'IICRC CEC training plumbers Australia',
+    'restoration training plumbers Australia',
     'water damage course for plumbers',
     'water damage restoration plumber',
     'structural drying for trades',
-    'IICRC CEC courses for plumbers online',
+    'restoration courses for plumbers online',
   ],
 };
 
@@ -41,7 +41,7 @@ const disciplines = [
 const stats = [
   { value: 'Online', label: 'Self-paced study' },
   { value: 'WHS', label: 'Act Compliant' },
-  { value: 'IICRC', label: 'CEC Accredited' },
+  { value: 'IICRC CEC', label: 'On approved courses' },
 ];
 
 const faqs = [

@@ -14,12 +14,12 @@ import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'IICRC CEC Mould & Odour Training for Gyms & Fitness Centres',
+  title: 'Mould & Odour Training for Gyms & Fitness Centres',
   description:
-    'Protect your members and your reputation. CARSI mould remediation, odour control and carpet cleaning training for Australian gyms, pools, and fitness facilities. Online, self-paced, CEC Accredited.',
+    'Protect your members and your reputation. CARSI mould remediation, odour control and carpet cleaning training for Australian gyms, pools, and fitness facilities. Online and self-paced. CEC hours apply only to courses the IICRC has approved.',
   keywords: [
     'gym mould training Australia',
-    'fitness centre IICRC CEC course',
+    'fitness centre restoration course',
     'gym mould remediation',
     'odour control gym',
     'mould liability fitness centre',
@@ -41,7 +41,7 @@ const disciplines = [
 const stats = [
   { value: 'Online', label: 'Self-paced study' },
   { value: 'CARSI', label: 'Verifiable credentials' },
-  { value: 'IICRC', label: 'CEC Accredited' },
+  { value: 'IICRC CEC', label: 'On approved courses' },
 ];
 
 const faqs = [
@@ -56,7 +56,7 @@ const faqs = [
       'The main drivers in Australian gyms are poor ventilation in wet areas, condensation on cold surfaces in air-conditioned spaces, water getting in around pool surrounds and wet decks, and porous materials (grout, carpet, ceiling tiles) that hold moisture. Mould remediation training covers moisture mapping, relative humidity monitoring and containment, so maintenance staff can find and fix these conditions before mould becomes visible.',
   },
   {
-    question: 'How does IICRC CEC training reduce liability for gym operators?',
+    question: 'How does restoration training reduce liability for gym operators?',
     answer:
       'Gym operators have a duty of care to members under Australian Consumer Law and WHS legislation. Documented training shows that maintenance staff were trained to identify and respond to mould and moisture hazards, and documented inspection protocols support the operator if a member raises an indoor air quality complaint.',
   },
@@ -72,21 +72,21 @@ const whyCards = [
     icon: Activity,
     title: 'High-Humidity Mould Risk',
     description:
-      'Changerooms, pool decks, and wet areas generate constant humidity. CEC-accredited mould remediation training gives maintenance staff the protocols to identify, contain, and remediate mould before it affects members.',
+      'Changerooms, pool decks, and wet areas generate constant humidity. Mould remediation training gives maintenance staff the protocols to identify, contain, and remediate mould before it affects members.',
     color: '#43a047',
   },
   {
     icon: Wind,
     title: 'Odour Control',
     description:
-      "Persistent gym odours damage reviews and drive churn. CARSI's odour control CEC training covers source-based odour elimination — not just masking — for locker rooms, wet areas, and equipment zones.",
+      "Persistent gym odours damage reviews and drive churn. CARSI's odour control training covers source-based odour elimination — not just masking — for locker rooms, wet areas, and equipment zones.",
     color: '#388e3c',
   },
   {
     icon: Users,
     title: 'Member Retention & Reputation',
     description:
-      'Mould complaints and Google reviews mentioning cleanliness are the leading non-price drivers of gym cancellations. Documented IICRC CEC training protects your reputation and your renewal rate.',
+      'Mould complaints and Google reviews mentioning cleanliness are the leading non-price drivers of gym cancellations. Documented training protects your reputation and your renewal rate.',
     color: '#2490ed',
   },
 ];

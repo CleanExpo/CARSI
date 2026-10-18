@@ -14,11 +14,11 @@ import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Museums & Cultural Institutions IICRC CEC Training',
+  title: 'Museums & Cultural Institutions Restoration Training',
   description:
     'Heritage preservation and artifact protection training for Australian museums, galleries, and cultural institutions. Mould remediation, water damage restoration and structural drying courses for climate-controlled environments.',
   keywords: [
-    'museum IICRC CEC training Australia',
+    'museum restoration training Australia',
     'heritage preservation restoration',
     'artifact protection water damage',
     'mould remediation museum',
@@ -41,7 +41,7 @@ const disciplines = [
 const stats = [
   { value: 'Online', label: 'Self-paced study' },
   { value: 'CARSI', label: 'Verifiable credentials' },
-  { value: 'IICRC', label: 'CEC Accredited' },
+  { value: 'IICRC CEC', label: 'On approved courses' },
 ];
 
 const faqs = [
@@ -56,7 +56,7 @@ const faqs = [
       'Mould is a serious threat to paper, textile and organic items in storage. Mould remediation training teaches staff to spot microbial growth early, set up containment and remediate without damaging collection items. For institutions in humid coastal climates, it supports preventive conservation.',
   },
   {
-    question: 'Can gallery and museum staff complete IICRC CEC training online?',
+    question: 'Can gallery and museum staff complete this training online?',
     answer:
       'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced, ideal for museum staff who need to maintain building operations during opening hours. Courses can be completed around exhibition schedules and issue verifiable digital credentials on completion.',
   },
@@ -72,7 +72,7 @@ const whyCards = [
     icon: Shield,
     title: 'Heritage Preservation',
     description:
-      'Protect irreplaceable artefacts and collection items. IICRC CEC training equips staff with standards-based response protocols aligned to AICCM conservation guidelines.',
+      'Protect irreplaceable artefacts and collection items. Restoration training equips staff with standards-based response protocols aligned to AICCM conservation guidelines.',
     color: '#8B6914',
   },
   {

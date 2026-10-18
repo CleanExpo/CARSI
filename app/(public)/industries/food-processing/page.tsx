@@ -14,11 +14,11 @@ import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Food Processing Facility IICRC CEC Training',
+  title: 'Food Processing Facility Restoration Training',
   description:
-    'HACCP-aligned IICRC CEC training for Australian food processing facilities. Mould remediation, odour control and carpet cleaning courses supporting hygiene compliance, cold storage maintenance, and contamination prevention.',
+    'Restoration training for Australian food processing facilities. Mould remediation, odour control and carpet cleaning courses supporting hygiene compliance, cold storage maintenance, and contamination prevention.',
   keywords: [
-    'food processing IICRC CEC training Australia',
+    'food processing restoration training Australia',
     'HACCP compliance restoration',
     'mould remediation food facility',
     'odour control food processing',
@@ -41,7 +41,7 @@ const disciplines = [
 const stats = [
   { value: 'Online', label: 'Self-paced study' },
   { value: 'HACCP', label: 'Aligned' },
-  { value: 'IICRC', label: 'CEC Accredited' },
+  { value: 'IICRC CEC', label: 'On approved courses' },
 ];
 
 const faqs = [
@@ -61,7 +61,7 @@ const faqs = [
       'It covers identifying and remediating mould and microbial growth in temperature-controlled areas such as cold rooms, blast chillers, loading docks and drainage channels, where condensation creates conditions for contamination. CARSI covers this in Introduction to Applied Microbial Remediation and the Level 1 to Level 3 Mould Remediation courses.',
   },
   {
-    question: 'Can food processing staff complete IICRC CEC training while maintaining shift patterns?',
+    question: 'Can food processing staff complete this training while maintaining shift patterns?',
     answer:
       'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced. Staff can complete modules around production schedules and shift rotations. Courses issue verifiable digital credentials on completion.',
   },
@@ -72,7 +72,7 @@ const whyCards = [
     icon: Shield,
     title: 'HACCP Compliance',
     description:
-      'IICRC CEC training supports HACCP critical control points for microbial contamination prevention. Demonstrate staff competency during food safety audits.',
+      'Restoration training supports HACCP critical control points for microbial contamination prevention. Demonstrate staff competency during food safety audits.',
     color: '#2E7D32',
   },
   {
@@ -86,7 +86,7 @@ const whyCards = [
     icon: SprayCan,
     title: 'Odour & Surface Control',
     description:
-      'Organic odours and surface contamination in processing areas require specialist remediation. Odour control and carpet cleaning certifications provide standards-based approaches.',
+      'Organic odours and surface contamination in processing areas require specialist remediation. Odour control and carpet cleaning training provides standards-based approaches.',
     color: '#ed9d24',
   },
 ];

@@ -13,11 +13,11 @@ import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Mining Site IICRC CEC Restoration Training',
+  title: 'Mining Site Restoration Training',
   description:
-    'WHS-compliant IICRC CEC Accredited restoration courses for Australian mining operations. Water damage restoration, mould remediation and structural drying courses for water damage, mould, and structural drying on remote sites.',
+    'Restoration courses for Australian mining operations. Water damage restoration, mould remediation and structural drying courses for water damage, mould, and structural drying on remote sites.',
   keywords: [
-    'mining IICRC CEC training Australia',
+    'mining restoration training Australia',
     'WHS compliance restoration',
     'water damage mining',
     'mould remediation mining',
@@ -40,7 +40,7 @@ const disciplines = [
 const stats = [
   { value: 'Online', label: 'Self-paced study' },
   { value: 'WHS', label: 'Act Compliance' },
-  { value: 'IICRC', label: 'CEC Accredited' },
+  { value: 'IICRC CEC', label: 'On approved courses' },
 ];
 
 const whyCards = [
@@ -48,7 +48,7 @@ const whyCards = [
     icon: Shield,
     title: 'WHS Compliance',
     description:
-      'Mining operations have strict WHS obligations. IICRC CEC training demonstrates due diligence for water damage and mould hazard identification on site.',
+      'Mining operations have strict WHS obligations. Restoration training demonstrates due diligence for water damage and mould hazard identification on site.',
     color: '#ed9d24',
   },
   {

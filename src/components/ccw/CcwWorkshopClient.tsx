@@ -86,7 +86,7 @@ const trainerMeta = [
   },
   {
     term: 'CARSI',
-    text: 'IICRC CEC Accredited courses across 7 disciplines',
+    text: 'Online courses from an IICRC CEC Accredited provider',
   },
   {
     term: 'Focus',

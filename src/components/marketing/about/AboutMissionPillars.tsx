@@ -7,7 +7,7 @@ const pillars = [
   {
     icon: LineChart,
     title: 'Growth',
-    body: 'Structured pathways from first course to certified competency.',
+    body: 'Structured pathways from first course to verified competency.',
     accent: '#2490ed',
   },
   {

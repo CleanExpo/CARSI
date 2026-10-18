@@ -85,7 +85,7 @@ and CARSI issues its own credentials — the CARSI Southern Hemisphere Restorati
 - /start-carpet-cleaning-business/quoting-and-pricing — Quoting and pricing guide for carpet cleaning operators
 - /start-carpet-cleaning-business/certification-and-trust — Honest certification, CEC, and trust-building guidance
 - /start-carpet-cleaning-business/service-models — Residential, commercial, upholstery, odour, rug, and restoration-adjacent service model guidance
-- /pathways — Learning pathways grouped by certification goals
+- /pathways — Learning pathways grouped by subject
 - /industries — Industry-specific training pages (aged care, healthcare, construction, etc.)
 - /subscribe — Subscription signup with Stripe checkout
 - /verify/credential/{id} — Public credential verification pages

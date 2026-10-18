@@ -13,12 +13,12 @@ import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Education Sector IICRC CEC Training',
+  title: 'Education Sector Restoration Training',
   description:
-    'IICRC CEC training for school and university maintenance teams. Water damage restoration, carpet cleaning, mould remediation and structural drying training for Australian education facilities.',
+    'Restoration training for school and university maintenance teams. Water damage restoration, carpet cleaning, mould remediation and structural drying training for Australian education facilities.',
   keywords: [
-    'education IICRC CEC training',
-    'school restoration certification',
+    'education restoration training',
+    'school restoration training',
     'university maintenance IICRC',
     'education mould remediation Australia',
   ],
@@ -40,7 +40,7 @@ const disciplines = [
 const stats = [
   { value: 'Online', label: 'Self-paced study' },
   { value: 'WHS', label: 'Compliance' },
-  { value: 'IICRC', label: 'CEC Accredited' },
+  { value: 'IICRC CEC', label: 'On approved courses' },
 ];
 
 const whyCards = [
@@ -48,7 +48,7 @@ const whyCards = [
     icon: ShieldCheck,
     title: 'Duty of Care',
     description:
-      'Schools must demonstrate competency in mould identification and remediation. IICRC CEC training provides documented evidence of due diligence for student and staff safety.',
+      'Schools must demonstrate competency in mould identification and remediation. Restoration training provides documented evidence of due diligence for student and staff safety.',
     color: '#2196f3',
   },
   {

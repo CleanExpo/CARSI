@@ -68,6 +68,7 @@ const ACRONYM_ALLOWED = new RegExp(
     `(?:return|===)\\s*['"](?:${A})['"]`, // selection logic returning a code
     `\\[\\s*(?:['"](?:${A})['"]\\s*,?\\s*)+\\]`, // an array of codes (course selection data)
     `discipline=(?:${A})\\b`, // legacy URL parameter routed to a topic tab
+    `\\{\\s*(?:${A}):\\s*['"](?:${A})['"]\\s*\\}`, // code-to-code routing map (data)
     'utm_campaign=',
   ].join('|')
 );

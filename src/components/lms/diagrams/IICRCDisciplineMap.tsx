@@ -112,7 +112,7 @@ export function IICRCDisciplineMap() {
           className="relative z-[1] mx-auto w-full max-w-[min(100%,520px)]"
           style={{ aspectRatio: `${VB_W} / ${VB_H}` }}
           role="group"
-          aria-label="Interactive map of seven IICRC CEC disciplines around a central IICRC hub"
+          aria-label="Interactive map of seven IICRC certification disciplines around a central IICRC hub"
         >
           <svg
             viewBox={`0 0 ${VB_W} ${VB_H}`}

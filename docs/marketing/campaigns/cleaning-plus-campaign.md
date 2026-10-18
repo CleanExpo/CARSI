@@ -4,7 +4,7 @@
 
 ## Objective
 
-Convert commercial cleaning business owners into restoration-trained contractors by positioning IICRC credentials as the bridge from cleaning to higher-margin restoration work.
+Convert commercial cleaning business owners into restoration-trained contractors by positioning restoration training and verifiable CARSI credentials as the bridge from cleaning to higher-margin restoration work.
 
 **Targets:**
 
@@ -65,10 +65,10 @@ Convert commercial cleaning business owners into restoration-trained contractors
 
 **Key message:** "Same clients. Same sites. 3–5x the hourly rate."
 
-### Why IICRC Credentials Matter
+### Why Restoration Training Matters
 
-1. **Insurance panel access** — Insurers require IICRC-certified contractors for restoration claims
-2. **Government tender eligibility** — State/federal contracts mandate industry certifications
+1. **Insurance panel access** — Many insurer panels ask for IICRC-certified contractors; that certification comes from IICRC-approved schools, and CARSI training builds the knowledge alongside it
+2. **Government tender eligibility** — Some state and federal contracts list industry certifications; CARSI adds documented training
 3. **Client confidence** — Property managers and facilities teams prefer credentialed providers
 4. **Legal protection** — Documented competency reduces WHS liability exposure
 
@@ -98,7 +98,7 @@ Convert commercial cleaning business owners into restoration-trained contractors
 HEADLINE: Your cleaning crew is leaving $200/hr on the table.
 BODY: Commercial cleaning: $35–55/hr.
 Water damage restoration: $150–250/hr.
-Same clients. Same sites. One IICRC credential apart.
+Same clients. Same sites. One restoration skill set apart.
 
 CARSI's online courses let your team upskill without leaving the job.
 24/7. Self-paced. From $20.
@@ -109,7 +109,7 @@ CTA: See the restoration pathway →
 #### Carousel Ad — "4 Steps to Restoration Revenue"
 
 - Card 1: "You're already on-site" (cleaning crew image)
-- Card 2: "Earn IICRC CECs online" (credential image)
+- Card 2: "Verifiable CARSI credentials" (credential image)
 - Card 3: "Win restoration contracts" (job site image)
 - Card 4: "Charge 3–5x more per job" (revenue comparison)
 
@@ -159,15 +159,15 @@ CTA: See the restoration pathway →
 **Keywords:**
 | Keyword | Match Type | Est. CPC |
 |---------|-----------|----------|
-| "IICRC certification Australia" | Exact | $3.50–5.00 |
+| "IICRC CEC courses Australia" | Exact | $3.50–5.00 |
 | "water damage restoration training" | Phrase | $2.80–4.50 |
 | "cleaning to restoration course" | Broad modified | $2.00–3.50 |
 | "add restoration services" | Phrase | $1.80–3.00 |
 | "water damage restoration course online" | Exact | $4.00–6.00 |
-| "mould remediation certification" | Phrase | $3.00–5.00 |
+| "mould remediation training" | Phrase | $3.00–5.00 |
 
 **Budget:** $1,500–2,500 AUD/month
-**Landing page:** `/pathways/wrt` (Water Restoration Technician pathway)
+**Landing page:** `/pathways` (water restoration pathway)
 
 ### 5. Email Nurture Sequence
 
@@ -177,8 +177,8 @@ CTA: See the restoration pathway →
 | --- | ------------------------------------------------- | --------------------------------------------------- |
 | 0   | Welcome: Your path from cleaning to restoration   | Revenue gap overview, pathway introduction          |
 | 3   | "I wish I'd done this 5 years ago"                | Case study: cleaning company that added restoration |
-| 7   | The 3 IICRC certs that unlock restoration revenue | water damage restoration, carpet cleaning and odour control overview with CEC details             |
-| 14  | How [Company Name] can win insurance panel work   | Insurance requirements, IICRC credential value      |
+| 7   | Three restoration skills that unlock new revenue | water damage restoration, carpet cleaning and odour control overview with CEC details             |
+| 14  | How [Company Name] can win insurance panel work   | Insurance panel requirements and where training fits |
 | 21  | Your team can start today — no downtime needed    | Subscription offer, 7-day free trial CTA            |
 | 30  | Last chance: 15% off annual subscription          | Urgency + discount code (CLEANPLUS15)               |
 
@@ -188,11 +188,11 @@ CTA: See the restoration pathway →
 
 | Objection                                   | Response                                                                                                                                                                                         |
 | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| "We're cleaners, not restorers"             | "Every major restoration company started in cleaning. You already have the clients, the access, and the work ethic. IICRC credentials are the only missing piece."                               |
+| "We're cleaners, not restorers"             | "Every major restoration company started in cleaning. You already have the clients, the access, and the work ethic. Restoration training is the missing piece."                               |
 | "My staff don't have time for training"     | "CARSI courses are 30-minute modules, available 24/7. Your crew can upskill between jobs or after hours — no travel, no classroom bookings."                                                     |
-| "We don't have the equipment"               | "Start with water damage restoration — the core equipment (extractors, dehumidifiers, air movers) is a $15K–25K investment that pays for itself in 2–3 jobs."                                    |
-| "Insurance work is too hard to get into"    | "Insurers are actively looking for credentialed contractors. IICRC certification is the #1 requirement for panel membership. CARSI gets you there faster than any face-to-face course."          |
-| "Online training isn't as good as hands-on" | "CARSI's courses are IICRC board-approved — the same credential standard as any classroom course. Plus, your crew gets hands-on experience on real job sites, which no classroom can replicate." |
+| "We don't have the equipment"               | "Start with water damage restoration — the core equipment (extractors, dehumidifiers, air movers) is the main upfront investment, so price it before you start."                                    |
+| "Insurance work is too hard to get into"    | "Each insurer panel sets its own requirements. IICRC certification comes only from IICRC-approved schools and examinations; CARSI courses build the knowledge and add verifiable CARSI credentials."          |
+| "Online training isn't as good as hands-on" | "CARSI courses are self-paced and practical, and CARSI is an IICRC CEC Accredited provider; CEC hours apply only to courses the IICRC has approved. Your crew still gets hands-on experience on real job sites." |
 | "$795 per year is too expensive"            | "That's $2.18/day for unlimited courses for your entire team. One restoration job covers the annual cost. Compare that to $2,000–5,000 per person for face-to-face IICRC certification training at approved schools."               |
 
 ---
@@ -201,7 +201,7 @@ CTA: See the restoration pathway →
 
 | Stage         | CTA                           | Destination                  |
 | ------------- | ----------------------------- | ---------------------------- |
-| Awareness     | "See the restoration pathway" | `/pathways/wrt`              |
+| Awareness     | "See the restoration pathway" | `/pathways`                  |
 | Interest      | "Download the free guide"     | Lead gen form → PDF download |
 | Consideration | "Start a free course"         | `/courses` (free tier)       |
 | Decision      | "Start your 7-day free trial" | `/subscribe`                 |

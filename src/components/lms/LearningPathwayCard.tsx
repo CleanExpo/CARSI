@@ -1,5 +1,7 @@
 import Link from 'next/link';
 
+import { publicPathwayTarget } from '@/lib/iicrc-discipline-display';
+
 interface LearningPathwayCardProps {
   pathway: {
     id: string;
@@ -44,8 +46,10 @@ export function LearningPathwayCard({ pathway, courseCount }: LearningPathwayCar
           {pathway.description}
         </p>
       ) : null}
-      {pathway.target_certification ? (
-        <p className="mt-auto pt-5 text-xs text-slate-400">{pathway.target_certification}</p>
+      {publicPathwayTarget(pathway.target_certification) ? (
+        <p className="mt-auto pt-5 text-xs text-slate-400">
+          {publicPathwayTarget(pathway.target_certification)}
+        </p>
       ) : null}
     </Link>
   );

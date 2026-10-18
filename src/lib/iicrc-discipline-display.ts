@@ -16,7 +16,8 @@
 /** CARSI's plain-English topic labels. Never IICRC designation names — see the note above. */
 export const IICRC_DISCIPLINE_SHORT: Record<string, string> = {
   WRT: 'Water Restoration',
-  CRT: 'Colour Repair',
+  // CARSI sells no colour-repair course; a legacy CRT-coded course is a carpet course.
+  CRT: 'Carpet Cleaning',
   ASD: 'Structural Drying',
   AMRT: 'Microbial Remediation',
   FSRT: 'Fire & Smoke',
@@ -78,6 +79,31 @@ export function disciplinePillsFromCodes(codes: string[]): { code: string; label
     code,
     label: IICRC_DISCIPLINE_SHORT[code] ?? code,
   }));
+}
+
+/** Every official IICRC certification / designation code (iicrc.org certification list). */
+export const ALL_IICRC_CODES =
+  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
+
+/**
+ * The CARSI topic to print for a course, pathway or idea's discipline code — never the code.
+ * Unknown codes render nothing (fail closed).
+ */
+export function disciplineTopicLabel(code: string | null | undefined): string | null {
+  if (!code) return null;
+  return IICRC_DISCIPLINE_SHORT[code.trim().toUpperCase()] ?? null;
+}
+
+/**
+ * A pathway's free-text target, safe to print on a CARSI surface: null when it names the IICRC,
+ * a certification, or an IICRC code, because a CARSI pathway never builds toward IICRC
+ * certification (CLAUDE.md). The field is database data, so this fails closed.
+ */
+export function publicPathwayTarget(target: string | null | undefined): string | null {
+  const t = target?.trim();
+  if (!t) return null;
+  if (/IICRC|certif/i.test(t) || new RegExp(`\\b(?:${ALL_IICRC_CODES})\\b`, 'i').test(t)) return null;
+  return t;
 }
 
 export function disciplineRowsFromCodes(codes: string[]): { code: string; label: string }[] {
