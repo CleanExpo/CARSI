@@ -528,6 +528,42 @@ describe('r13 reviewer reproduction: a hide committed between the visibility che
   });
 });
 
+describe('r14 reviewer case: a founder address also listed in ADMIN_PANEL_EMAILS / ADMIN_EMAIL is never locked out', () => {
+  it.each([
+    [
+      'ADMIN_PANEL_EMAILS',
+      { ADMIN_EMAIL: 'support@carsi.com.au', ADMIN_PANEL_EMAILS: 'phill.m@carsi.com.au' },
+    ],
+    [
+      'ADMIN_EMAIL',
+      { ADMIN_EMAIL: 'phill.m@carsi.com.au', ADMIN_PANEL_EMAILS: 'ops@carsi.com.au' },
+    ],
+  ] as const)(
+    'founder also in %s (DB role student): moderates, reads hidden reviews and the summary',
+    async (_label, env) => {
+      Object.assign(process.env, env);
+      m.persona = 'founder';
+      for (const [action, hidden] of [
+        ['moderate: hide a published review', false],
+        ['read hidden reviews (GET)', true],
+        ['moderation summary (GET)', false],
+      ] as const) {
+        m.reviewHidden = hidden;
+        const out = await ACTIONS[action]!.run();
+        expect({ action, ...out }).toEqual({ action, status: 200, allowed: true });
+      }
+    }
+  );
+
+  it('a configured address that is NOT a founder stays untrusted (a student listed in ADMIN_PANEL_EMAILS)', async () => {
+    process.env.ADMIN_PANEL_EMAILS = 'learner@example.com,phill.m@carsi.com.au';
+    m.persona = 'student';
+    const out = await ACTIONS['moderate: hide a published review']!.run();
+    expect(out).toEqual({ status: 403, allowed: false });
+    expect(m.writes).toEqual([]);
+  });
+});
+
 describe('the moderation audit records the verified admin, by kind', () => {
   it.each([
     [

@@ -20,7 +20,7 @@
  * removal of a role row either commits first (and is seen here) or waits until the action has
  * committed.
  */
-import { getAdminEmail, isAdminAllowlistedEmail } from '@/lib/admin/admin-panel-access';
+import { FOUNDER_ADMIN_EMAILS, getAdminEmail } from '@/lib/admin/admin-panel-access';
 import { pickSessionRole } from '@/lib/server/lms-auth';
 
 export type CurrentAdmin = {
@@ -48,23 +48,16 @@ export type RawQueryClient = {
 };
 
 /**
- * The founder accounts (FOUNDER_ADMIN_EMAILS in admin-panel-access.ts, which this branch must not
- * edit or widen): the always-allowed set minus everything that comes from configuration. An
- * address that is ALSO configured is not treated as a founder here — that fails closed.
+ * The founder accounts: exactly #907's explicit FOUNDER_ADMIN_EMAILS set (release-gate r14),
+ * independent of configuration. A founder stays a founder when its address is ALSO listed in
+ * ADMIN_EMAIL or ADMIN_PANEL_EMAILS (that overlap must not lock the founder out), and a
+ * configured address that is not a founder never becomes one. Every address in this set is
+ * already an existing account and is reserved by #907 against unverified registration.
  */
 export function isFounderAdminEmail(email: string): boolean {
   const e = email.trim().toLowerCase();
   if (!e) return false;
-  const configured = new Set<string>();
-  const bootstrap = getAdminEmail().toLowerCase();
-  if (bootstrap) configured.add(bootstrap);
-  for (const part of (process.env.ADMIN_PANEL_EMAILS ?? '').split(',')) {
-    const p = part.trim().toLowerCase();
-    if (p) configured.add(p);
-  }
-  // Same matcher as #907's reservation (isAdminAllowlistedEmail), so every founder address this
-  // rule trusts is one that self-registration, guest signup and Stripe provisioning refuse to create.
-  return isAdminAllowlistedEmail(e) && !configured.has(e);
+  return (FOUNDER_ADMIN_EMAILS as readonly string[]).includes(e);
 }
 
 export async function resolveCurrentAdmin(

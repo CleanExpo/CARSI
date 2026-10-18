@@ -85,9 +85,18 @@ describe('isFounderAdminEmail — the always-allowed founder accounts only, neve
     process.env.ADMIN_PANEL_EMAILS = 'ops@carsi.com.au, team@carsi.com.au';
     expect(isFounderAdminEmail('team@carsi.com.au')).toBe(false);
   });
-  it('a founder address that is ALSO configured fails closed', () => {
+  it('r14: a founder address that is ALSO configured stays a founder (overlap never locks the founder out)', () => {
     process.env.ADMIN_PANEL_EMAILS = 'phill.m@carsi.com.au';
-    expect(isFounderAdminEmail('phill.m@carsi.com.au')).toBe(false);
+    expect(isFounderAdminEmail('phill.m@carsi.com.au')).toBe(true);
+    process.env.ADMIN_EMAIL = 'Phill.M@carsi.com.au';
+    expect(isFounderAdminEmail('phill.m@carsi.com.au')).toBe(true);
+  });
+  it("the founder set is exactly #907's explicit list, not the configurable allowlist", async () => {
+    const { FOUNDER_ADMIN_EMAILS, getAdminPanelAllowedEmails } =
+      await import('@/lib/admin/admin-panel-access');
+    process.env.ADMIN_PANEL_EMAILS = 'ops@carsi.com.au';
+    const trusted = [...getAdminPanelAllowedEmails()].filter((e) => isFounderAdminEmail(e)).sort();
+    expect(trusted).toEqual([...FOUNDER_ADMIN_EMAILS].sort());
   });
   it('anyone else is not', () => {
     expect(isFounderAdminEmail('someone@example.com')).toBe(false);
