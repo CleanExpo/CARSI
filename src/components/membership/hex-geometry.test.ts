@@ -11,6 +11,7 @@ import {
   HEX_COURSE_IMAGES,
   HEX_COURSE_TILES,
   BANNED_TILE_IMAGES,
+  INSPECTED_IMAGES,
   TILE_HASH,
   tileCourseIndex,
 } from './hex-geometry';
@@ -90,6 +91,7 @@ describe('hex geometry', () => {
     // Full-branch reviews: rug cleaning, biohazard and healthcare cleaning had no published course.
     // Full-size inspection and full-branch reviews: none of the banned images may return.
     for (const banned of BANNED_TILE_IMAGES) expect(HEX_COURSE_IMAGES).not.toContain(banned);
+    for (const image of HEX_COURSE_IMAGES) expect(INSPECTED_IMAGES).toContain(image);
     for (const tile of HEX_COURSE_TILES) {
       expect(tile.course, tile.image).toMatch(/^[a-z0-9-]+$/);
     }

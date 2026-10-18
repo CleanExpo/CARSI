@@ -19,15 +19,6 @@ export const HEX_COURSE_TILES = [
     course: 'introduction-to-water-damage-restoration',
   },
   {
-    image: '/images/courses/intro-applied-structural-drying.webp',
-    course: 'introduction-to-applied-structural-drying',
-  },
-  {
-    image: '/images/courses/dehumidification.webp',
-    course: 'refrigerant-dehumidifiers-for-water-loss-restoration',
-  },
-  { image: '/images/courses/moisture-meter-training.webp', course: 'moisture-meter-course' },
-  {
     image: '/images/courses/intro-infrared-thermography.webp',
     course: 'introduction-to-infrared-thermography-for-drying',
   },
@@ -53,36 +44,28 @@ export const HEX_COURSE_TILES = [
     course: 'introduction-to-odour-control-and-removal-techniques',
   },
   {
-    image: '/images/courses/carpet-cleaning-basics.webp',
-    course: 'carpet-cleaning-basics-b66757ce',
-  },
-  { image: '/images/courses/glass-cleaning.webp', course: 'glass-cleaning-course' },
-  {
     image: '/images/courses/hard-floor-cleaning.webp',
     course: 'tile-cleaning-for-carpet-cleaners',
-  },
-  {
-    image: '/images/courses/intro-water-extraction.webp',
-    course: 'introduction-to-water-extraction-methods',
-  },
-  {
-    image: '/images/courses/intro-asbestos-awareness.webp',
-    course: 'introduction-to-asbestos-asbestos-awareness',
   },
   {
     image: '/images/courses/infection-control-childcare.webp',
     course: 'infection-control-in-child-care',
   },
-  { image: '/images/courses/risk-assessment.webp', course: 'risk-assessment-course' },
-  {
-    image: '/images/courses/air-filtration-equipment.webp',
-    course: 'using-air-scrubbers-and-afds-to-improve-job-site-air-quality',
-  },
 ] as const;
 
 export const HEX_COURSE_IMAGES = HEX_COURSE_TILES.map((t) => t.image);
 
-/** Images that failed the full-size inspection; the geometry test keeps them out of the floor. */
+/**
+ * Images inspected at full size (18/10/2026) and cleared: no IICRC discipline acronym or mark, no
+ * stray or misspelt text, and the scene shows work the named course teaches. Hero tiles and the
+ * landing cards may use only these; a new image needs the same inspection before it is added.
+ */
+export const INSPECTED_IMAGES = [
+  ...HEX_COURSE_TILES.map((t) => t.image),
+  '/images/courses/intro-hvac-drying.webp',
+] as const;
+
+/** Images that failed the full-size inspection; the tests keep them off the page. */
 export const BANNED_TILE_IMAGES = [
   '/images/courses/flood-restoration.webp', // an IICRC discipline acronym printed on the bin
   '/images/courses/containment-barriers.webp', // "BIOHAZARD" tape and an IICRC discipline acronym on the machine
@@ -92,6 +75,16 @@ export const BANNED_TILE_IMAGES = [
   '/images/courses/rug-cleaning.webp', // no published course
   '/images/courses/biohazard-remediation.webp', // no published course
   '/images/courses/healthcare-cleaning.webp', // no published course
+  '/images/courses/intro-applied-structural-drying.webp', // small illegible machine labels
+  '/images/courses/dehumidification.webp', // garbled display text
+  '/images/courses/moisture-meter-training.webp', // garbled brand text on the meter
+  '/images/courses/carpet-cleaning-basics.webp', // garbled text on the machine
+  '/images/courses/glass-cleaning.webp', // rope-access work the course does not teach
+  '/images/courses/intro-water-extraction.webp', // garbled lettering on the truck
+  '/images/courses/intro-asbestos-awareness.webp', // removal work an awareness course does not teach
+  '/images/courses/risk-assessment.webp', // misspelt clipboard heading
+  '/images/courses/air-filtration-equipment.webp', // garbled machine labels
+  '/images/courses/intro-safety-procedures.webp', // misspelt confined-space sign
 ] as const;
 
 /** Pixel size of one square slot in the course atlas texture. */
