@@ -30,7 +30,7 @@ export function ReviewAsk({ slug }: { slug: string }) {
     try {
       setState(await apiClient.get<AskState>(`/api/lms/courses/${encodeURIComponent(slug)}/reviews`));
     } catch {
-      // Eligibility is unknown, so show nothing here; the course page and email still ask.
+      // Eligibility is unknown, so show nothing here; the course page still asks.
       setState(null);
     }
   }, [slug]);

@@ -52,7 +52,7 @@ export type ReviewAskEnrolment = {
 /**
  * The single "is this learner a completer we ask?" predicate (D5). It uses the certificate
  * truth — DB status `completed` with `completed_at` set — not client lesson progress, so the
- * player, the dashboard, the credential page and the email all agree on who is asked.
+ * player, the dashboard and the credential page all agree on who is asked.
  */
 export function isReviewAskEligible(enrolment: ReviewAskEnrolment): boolean {
   if (enrolment.isOnboardingCourse) return false;

@@ -3,8 +3,8 @@
  *
  * Session tokens carry a role for seven days, so a token alone cannot prove someone is still an
  * admin: a demoted or deactivated admin would keep moderating and switching emails until it
- * expired. Every review-admin action — the review-request email switch, review moderation, and
- * reads of hidden reviews and their reasons — goes through this ONE function.
+ * expired. Every review-admin action — review moderation, and reads of hidden reviews, their
+ * reasons and the moderation summary — goes through this ONE function.
  *
  * WHERE THE SESSION CAME FROM DECIDES WHAT IT MAY BE (release-gate r8). Public self-registration
  * does not verify inbox ownership, so an LMS session's email proves nothing about who holds that

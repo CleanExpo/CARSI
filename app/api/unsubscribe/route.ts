@@ -2,7 +2,6 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 import { verifyEmailUnsubscribeToken } from '@/lib/auth/session-jwt';
 import { setEmailOptOut } from '@/lib/server/email-preferences';
-import { databaseUnavailableResponse, isDatabaseConfigured } from '@/lib/server/database-unavailable';
 
 /**
  * Public, token-authenticated unsubscribe endpoint — no session cookie required.
@@ -41,16 +40,12 @@ export async function POST(request: NextRequest) {
 
   const resubscribe = await resolveResubscribe(request);
 
-  // Confirm only after a durable write. With no database the preference cannot be saved, so say
-  // so (503) — a 200 here would tell the mail client the opt-out worked, and it would not retry.
-  if (!isDatabaseConfigured()) return databaseUnavailableResponse('Unsubscribe is temporarily unavailable. Please try again.');
+  if (!process.env.DATABASE_URL?.trim()) {
+    return NextResponse.json({ ok: true, email_opt_out: !resubscribe });
+  }
 
   try {
     const prefs = await setEmailOptOut(userId, !resubscribe);
-    if (prefs.email_opt_out !== !resubscribe) {
-      console.error('[unsubscribe] POST stored preference does not match the request', { userId });
-      return NextResponse.json({ detail: 'Failed to update subscription' }, { status: 500 });
-    }
     return NextResponse.json({ ok: true, ...prefs });
   } catch (e) {
     console.error('[unsubscribe] POST', e);

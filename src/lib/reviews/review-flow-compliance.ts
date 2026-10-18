@@ -17,7 +17,6 @@ export const REVIEW_FLOW_FILES = [
   'src/components/lms/ReviewAsk.tsx',
   'src/components/lms/CourseReviews.tsx',
   'src/lib/reviews/review-ask.ts',
-  'src/lib/server/review-request-email.ts',
   'src/lib/reviews/review-policy.ts',
   'src/components/lms/ReviewPolicy.tsx',
 ] as const;

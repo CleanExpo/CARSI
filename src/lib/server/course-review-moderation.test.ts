@@ -2,14 +2,14 @@
  * Moderation audit (spec 2026-10-18 D1, D3, D4; AC-3): the event table is append-only, a hide
  * without a reason fails in the database too, and an edit after a hide is detectable.
  */
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-import { displayAuthor, reviewContentSha256, toModerationDto } from './course-reviews';
+import { displayAuthor, REVIEW_MODERATION_AUDIT_MIGRATION, reviewContentSha256, toModerationDto } from './course-reviews';
 
 const MIGRATION = readFileSync(
-  join(process.cwd(), 'prisma/migrations/20261018100000_review_moderation_and_request_ledger/migration.sql'),
+  join(process.cwd(), 'prisma/migrations/20261018100000_review_moderation_audit/migration.sql'),
   'utf8'
 );
 const SERVICE = readFileSync(join(process.cwd(), 'src/lib/server/course-reviews.ts'), 'utf8');
@@ -26,16 +26,10 @@ describe('moderation event table (D1, D3)', () => {
   });
 
   it('the migration is additive: it never alters, updates or deletes existing data', () => {
-    const withoutComments = MIGRATION.split('\n').filter((l) => !l.trim().startsWith('--')).join('\n');
-    // The trigger function body runs later, at completion time, not during the migration; it is
-    // checked separately below. Everything else is what the migration itself executes.
-    const bodies = withoutComments.match(/\$\$[\s\S]*?\$\$/g) ?? [];
-    expect(bodies).toHaveLength(1);
-    const statements = withoutComments.replace(/\$\$[\s\S]*?\$\$/g, '$$ $$');
-    // The trigger only ever writes the review-request ledger.
-    const written = [...bodies[0]!.matchAll(/(?:UPDATE|INSERT INTO|DELETE FROM)\s+"([a-z_]+)"/g)].map((m) => m[1]);
-    expect(new Set(written)).toEqual(new Set(['lms_review_request_emails']));
-    expect(bodies[0]).not.toMatch(/DELETE FROM/);
+    const statements = MIGRATION.split('\n').filter((l) => !l.trim().startsWith('--')).join('\n');
+    // No functions or triggers: nothing in this migration runs later against live data.
+    expect(statements).not.toMatch(/\$\$|CREATE (OR REPLACE )?(FUNCTION|TRIGGER)/i);
+    expect(statements).not.toMatch(/^\s*INSERT INTO\b/im);
     // The only change to an existing table: one new column with a constant default (metadata-only).
     const reviewAlters = statements.match(/ALTER TABLE "lms_course_reviews"[^;]*;/g) ?? [];
     expect(reviewAlters).toEqual(['ALTER TABLE "lms_course_reviews" ADD COLUMN "moderation_version" INTEGER NOT NULL DEFAULT 0;']);
@@ -43,12 +37,16 @@ describe('moderation event table (D1, D3)', () => {
     expect(statements).not.toMatch(/^\s*(UPDATE|DELETE FROM|DROP|TRUNCATE)\b/im);
   });
 
+  it('the public policy date is read from a migration that exists (renaming it must update the constant)', () => {
+    expect(existsSync(join(process.cwd(), 'prisma/migrations', REVIEW_MODERATION_AUDIT_MIGRATION, 'migration.sql'))).toBe(true);
+  });
+
   it('application code never updates or deletes a moderation event', () => {
     expect(SERVICE).not.toMatch(/lmsCourseReviewModerationEvent\.(update|updateMany|upsert|delete|deleteMany)\b/);
   });
 
-  it('review emails are unique per enrolment in the database', () => {
-    expect(MIGRATION).toMatch(/CREATE UNIQUE INDEX "lms_review_request_emails_enrollment_id_key"/);
+  it('two decisions can never share a place in one review\'s order (database unique index)', () => {
+    expect(MIGRATION).toMatch(/CREATE UNIQUE INDEX "uq_lms_review_moderation_review_ref_sequence"\s+ON "lms_course_review_moderation_events"\("review_ref", "sequence"\)/);
   });
 });
 

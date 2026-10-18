@@ -21,37 +21,15 @@ export type SendEmailParams = {
   attachments?: EmailAttachment[];
   /** Extra SMTP headers (e.g. List-Unsubscribe / List-Unsubscribe-Post for RFC 8058). */
   headers?: Record<string, string>;
-  /**
-   * Mailtrap sending stream. Default `transactional`. Use `bulk` for marketing or promotional
-   * mail (e.g. review requests): Mailtrap requires its Bulk Stream for those, and keeping them
-   * apart protects transactional deliverability. Same API token; only the endpoint differs.
-   */
-  stream?: MailtrapStream;
-  /** Hard limit for the provider call, in ms (default 15 000). */
-  timeoutMs?: number;
-  /**
-   * Called immediately before the HTTP request to the provider is made — the only point after
-   * which a failure may mean the message was delivered (release-gate r8). Not called when the
-   * message is skipped (not configured, dev console) or fails while it is being built.
-   */
-  onRequestStart?: () => void;
 };
 
 export type SendEmailResult = {
   sent: boolean;
   messageId?: string;
   reason?: 'not_configured' | 'send_failed' | 'provider_error' | 'dev_console';
-  /** HTTP status of a provider reply that was not a success (lets callers tell a 4xx rejection from a 5xx). */
-  httpStatus?: number;
 };
 
-export type MailtrapStream = 'transactional' | 'bulk';
-
-/** Mailtrap send endpoints per stream (docs.mailtrap.io: Bulk Stream, base URL https://bulk.api.mailtrap.io/api). */
-export const MAILTRAP_SEND_URLS: Record<MailtrapStream, string> = {
-  transactional: 'https://send.api.mailtrap.io/api/send',
-  bulk: 'https://bulk.api.mailtrap.io/api/send',
-};
+const MAILTRAP_SEND_URL = 'https://send.api.mailtrap.io/api/send';
 
 /** Mailtrap Sending API credential — use `MAILTRAP_API_KEY` in `.env` (not `MAILTRAP_API_TOKEN`). */
 export function getMailtrapApiKey(): string | undefined {
@@ -190,15 +168,14 @@ export async function sendEmail(params: SendEmailParams): Promise<SendEmailResul
   }
 
   try {
-    params.onRequestStart?.();
-    const res = await fetch(MAILTRAP_SEND_URLS[params.stream ?? 'transactional'], {
+    const res = await fetch(MAILTRAP_SEND_URL, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload),
-      signal: AbortSignal.timeout(params.timeoutMs ?? 15_000),
+      signal: AbortSignal.timeout(15_000),
     });
 
     const bodyText = await res.text().catch(() => '');
@@ -214,9 +191,9 @@ export async function sendEmail(params: SendEmailParams): Promise<SendEmailResul
       console.error('[email] Mailtrap API error', res.status, errDetail);
       if (devConsoleEnabled()) {
         logDevConsoleEmail(params);
-        return { sent: true, reason: 'dev_console', httpStatus: res.status };
+        return { sent: true, reason: 'dev_console' };
       }
-      return { sent: false, reason: 'provider_error', httpStatus: res.status };
+      return { sent: false, reason: 'provider_error' };
     }
 
     const messageId = parsed.message_ids?.[0];

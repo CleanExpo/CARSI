@@ -98,10 +98,7 @@ export function formatMarketingBodyAsPlainText(message: string): string {
   return message.replace(/\r\n/g, '\n').trim();
 }
 
-/** Default wordmark tagline. Pass `wordmarkTagline: null` for emails that must carry no IICRC/CEC framing. */
-export const DEFAULT_WORDMARK_TAGLINE = 'IICRC CEC Accredited restoration courses';
-
-export function buildCarsiWordmarkHtml(appOrigin: string, tagline: string | null = DEFAULT_WORDMARK_TAGLINE): string {
+export function buildCarsiWordmarkHtml(appOrigin: string): string {
   const home = escapeHtml(appOrigin);
   const letterBase = `font-family: ${BRAND.font}; font-weight: 800; font-size: 42px; line-height: 1; letter-spacing: 0.14em;`;
   const silver = `color: ${BRAND.silverHi}; text-shadow: 0 1px 0 ${BRAND.silver}, 0 2px 8px rgba(0,0,0,0.5);`;
@@ -111,14 +108,10 @@ export function buildCarsiWordmarkHtml(appOrigin: string, tagline: string | null
       <span style="${letterBase} display: inline-block;">
         <span style="${silver}">C</span><span style="color: ${BRAND.accentA}; text-shadow: 0 0 20px rgba(184,230,46,0.55), 0 1px 0 #8fc920;">A</span><span style="${silver}">R</span><span style="${silver}">S</span><span style="${silver}">I</span>
       </span>
-    </a>${
-      tagline
-        ? `
+    </a>
     <p style="margin: 12px 0 0; font-family: ${BRAND.font}; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: ${BRAND.blue};">
-      ${escapeHtml(tagline)}
-    </p>`
-        : ''
-    }`;
+      IICRC CEC Accredited restoration courses
+    </p>`;
 }
 
 export type CarsiEmailDetail = { label: string; value: string; valueHtml?: string };
@@ -136,18 +129,13 @@ export type CarsiEmailContent = {
   messageHtmlBare?: boolean;
   cta?: { label: string; href: string };
   noteHtml?: string;
-  /** Wordmark tagline; omit for the default, `null` for none (emails that must stay accreditation-neutral). */
-  wordmarkTagline?: string | null;
 };
 
 export function buildCarsiEmailHtml(options: CarsiEmailContent): string {
   const preheader = escapeHtml(options.preheader);
   const title = escapeHtml(options.title);
   const eyebrow = escapeHtml(options.eyebrow);
-  const wordmark = buildCarsiWordmarkHtml(
-    options.appOrigin,
-    options.wordmarkTagline === undefined ? DEFAULT_WORDMARK_TAGLINE : options.wordmarkTagline
-  );
+  const wordmark = buildCarsiWordmarkHtml(options.appOrigin);
 
   const greetingBlock = options.greeting
     ? `

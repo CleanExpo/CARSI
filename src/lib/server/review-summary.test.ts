@@ -12,7 +12,6 @@ const m = vi.hoisted(() => ({
   queryRaw: vi.fn(),
   courseFindMany: vi.fn(),
   reviewCount: vi.fn(),
-  emailGroupBy: vi.fn(),
   eventGroupBy: vi.fn(),
 }));
 
@@ -22,9 +21,7 @@ vi.mock('@/lib/prisma', () => ({
     $queryRaw: m.queryRaw,
     lmsCourse: { findMany: m.courseFindMany },
     lmsCourseReview: { count: m.reviewCount },
-    lmsReviewRequestEmail: { groupBy: m.emailGroupBy },
     lmsCourseReviewModerationEvent: { groupBy: m.eventGroupBy },
-    lmsReviewRequestSettings: { findUnique: async () => ({ enabled: false }) },
   },
 }));
 
@@ -34,7 +31,6 @@ beforeEach(() => {
   vi.clearAllMocks();
   m.count.mockResolvedValue(10);
   m.reviewCount.mockResolvedValue(0);
-  m.emailGroupBy.mockResolvedValue([]);
   m.eventGroupBy.mockResolvedValue([
     { reason: 'spam_or_fake', ratingAtAction: 1, _count: { _all: 2 } },
     { reason: 'offensive', ratingAtAction: 5, _count: { _all: 1 } },

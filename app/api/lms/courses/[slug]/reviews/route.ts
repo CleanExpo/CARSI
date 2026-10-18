@@ -56,15 +56,23 @@ export async function GET(request: NextRequest, ctx: { params: Promise<{ slug: s
     let canReview = false;
     let canManage = false;
     let canModerate = false;
+    let moderated: Awaited<ReturnType<typeof getCourseReviews>> | null = null;
     let ownReview = null;
     let reviewAsk = false;
     let reviewerDisplayName: string | null = null;
     if (claims) {
       canManage = canManageReviews(claims.role);
-      // Hidden reviews and their reasons go only to a CURRENT admin, re-checked in the database (r7).
-      canModerate =
-        canModerateReviews(claims.role) &&
-        (await resolveCurrentAdmin(prisma, { via: 'lms_session', userId: claims.sub, email: claims.email })) !== null;
+      // Hidden reviews and their reasons go only to a CURRENT admin (r7), and are read INSIDE the
+      // transaction that re-validated them, while its FOR SHARE locks on the admin's rows are held:
+      // a demotion either commits first (and the private read never happens) or waits until it is
+      // done (release-gate r9).
+      if (canModerateReviews(claims.role)) {
+        const session = { via: 'lms_session' as const, userId: claims.sub, email: claims.email };
+        moderated = await prisma.$transaction(async (tx) =>
+          (await resolveCurrentAdmin(tx, session)) ? getCourseReviews(course.id, true, tx) : null
+        );
+        canModerate = moderated !== null;
+      }
       canReview = await isEnrolledInCourse(claims.sub, course.id);
       ownReview = canReview ? await getOwnReview(claims.sub, course.id) : null;
       if (canReview) {
@@ -75,8 +83,8 @@ export async function GET(request: NextRequest, ctx: { params: Promise<{ slug: s
       }
     }
 
-    // Moderators also see admin-hidden reviews (so they can unhide them).
-    const { reviews, summary } = await getCourseReviews(course.id, canModerate);
+    // Moderators also see admin-hidden reviews (so they can unhide them); everyone else, published only.
+    const { reviews, summary } = moderated ?? (await getCourseReviews(course.id, false));
 
     return NextResponse.json({
       reviews,

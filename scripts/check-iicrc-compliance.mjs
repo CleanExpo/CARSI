@@ -184,9 +184,8 @@ const EXEMPT = [
 // Files whose copy goes to learners of EVERY course, including courses with no IICRC link
 // (truckmount, floor care, facilities). Fail-closed: they may carry no IICRC or CEC wording at all,
 // not even in comments, because a single shared line would reach a non-IICRC course's learners.
-// Added for the review-request email (release-gate review r3, 18/10/2026).
+// Added for the public review policy and moderation note (release-gate reviews r3-r4, 18/10/2026).
 const IICRC_FREE_FILES = [
-  'src/lib/server/review-request-email.ts',
   'src/lib/reviews/review-policy.ts',
   'src/components/lms/ReviewPolicy.tsx',
 ];

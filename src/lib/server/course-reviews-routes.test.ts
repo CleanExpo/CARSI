@@ -63,6 +63,11 @@ vi.mock('@/lib/prisma', () => {
         mocks.txOps.push('upsert-review');
         return mocks.reviewUpsert(...a);
       },
+      // The private (moderator) read: recorded so a test can prove it ran INSIDE the transaction.
+      findMany: (...a: unknown[]) => {
+        mocks.txOps.push('read-reviews');
+        return mocks.reviewFindMany(...a);
+      },
     },
     lmsCourseReviewModerationEvent: { create: mocks.eventCreate },
   };
@@ -401,6 +406,25 @@ describe('hidden reviews and reasons go only to a CURRENT admin (release-gate r7
     const body = await (await getReviews()).json();
     expect(body.can_moderate).toBe(true);
     expect(mocks.reviewFindMany.mock.calls[0]![0].where).toEqual({ courseId: 'course-1' });
+  });
+
+  it('r9: the hidden-review read runs INSIDE the transaction that re-validated the admin, after it', async () => {
+    mocks.enrolmentFind.mockResolvedValue(null);
+    await getReviews();
+    // Re-validation reads (TX:) come first, then the private read on the same transaction client.
+    expect(mocks.txOps).toEqual(['raw', 'raw', 'read-reviews']);
+    expect(mocks.rawSql.every((q) => q.startsWith('TX:'))).toBe(true);
+    expect(mocks.reviewFindMany).toHaveBeenCalledTimes(1);
+  });
+
+  it('r9: a refused re-validation never performs the private read (public read only, outside it)', async () => {
+    mocks.lmsRows.set('moderator@carsi.com.au', { id: 'admin-1', is_active: true, role: 'student' });
+    mocks.enrolmentFind.mockResolvedValue(null);
+    const body = await (await getReviews()).json();
+    expect(body.can_moderate).toBe(false);
+    expect(mocks.txOps).not.toContain('read-reviews');
+    expect(mocks.reviewFindMany.mock.calls).toHaveLength(1);
+    expect(mocks.reviewFindMany.mock.calls[0]![0].where).toEqual({ courseId: 'course-1', isPublished: true });
   });
 });
 

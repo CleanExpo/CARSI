@@ -217,7 +217,7 @@ export async function getCourseSlugForEnrollment(enrollmentId: string): Promise<
 }
 
 /** The migration that started recording moderation decisions (reason, actor, time). */
-export const REVIEW_MODERATION_AUDIT_MIGRATION = '20261018100000_review_moderation_and_request_ledger';
+export const REVIEW_MODERATION_AUDIT_MIGRATION = '20261018100000_review_moderation_audit';
 
 /**
  * When recording moderation decisions began: the time this migration was applied. Null when it
@@ -268,11 +268,15 @@ export function getGoogleReviewLink(): { url: string | null; status: GoogleRevie
  * `includeHidden` (moderators only) also returns admin-hidden reviews; the public
  * summary is always computed from published reviews only, so hidden ones never skew it.
  */
+/** The client a read runs on: the shared client, or the transaction that authorised it. */
+export type ReviewReadClient = Pick<typeof prisma, 'lmsCourseReview'>;
+
 export async function getCourseReviews(
   courseId: string,
-  includeHidden = false
+  includeHidden = false,
+  db: ReviewReadClient = prisma
 ): Promise<{ reviews: Array<ReviewDto | ModeratorReviewDto>; summary: ReviewSummary }> {
-  const rows = await prisma.lmsCourseReview.findMany({
+  const rows = await db.lmsCourseReview.findMany({
     where: includeHidden ? { courseId } : { courseId, isPublished: true },
     orderBy: { createdAt: 'desc' },
     select: {
@@ -479,10 +483,9 @@ export async function upsertReview(params: {
   const title = params.title?.trim() || null;
   const body = params.body?.trim() || null;
   await prisma.$transaction(async (tx) => {
-    // Lock the enrolment row first (release-gate r7). The review-request send holds it FOR SHARE
-    // while it checks "has reviewed?" and calls the provider, so this review either commits before
-    // that check (and no email goes) or waits until the send is recorded. NO KEY UPDATE does not
-    // block foreign-key checks from other tables.
+    // Lock the enrolment row and re-check its access in the same transaction (release-gate r8):
+    // a refund or revocation that commits after the route's check is seen here and the review is
+    // refused. NO KEY UPDATE does not block foreign-key checks from other tables.
     const locked = await tx.$queryRaw<Array<{ status: string }>>`
       SELECT "status" FROM "lms_enrollments"
        WHERE "student_id" = ${params.studentId}::uuid AND "course_id" = ${params.courseId}::uuid FOR NO KEY UPDATE`;

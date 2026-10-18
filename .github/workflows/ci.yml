@@ -333,12 +333,12 @@ jobs:
       - name: Fail on Prisma schema drift (a model/field with no migration)
         run: npx prisma migrate diff --from-config-datasource --to-schema prisma/schema.prisma --exit-code
 
-      # Review-request emails are sent inside one transaction that holds shared locks on the
-      # switch, the enrolment and the learner. Only two real sessions can prove an OFF,
-      # unsubscribe or revoke during a send waits for it, and that a concurrent completion
-      # does not deadlock — the unit fakes cannot. Runs before any seeding: it needs an empty,
-      # freshly migrated database, and it FAILS (never skips) here if DATABASE_URL is missing.
-      - name: Verify review-request send locks against migrated Postgres
+      # Course reviews rely on row locks: a review re-checks the enrolment's access under its row
+      # lock, and a moderator's hidden-review read runs in the transaction that re-validated the
+      # admin, while its FOR SHARE locks are held. Only two real sessions can prove a revocation or
+      # a demotion is ordered correctly — the unit fakes cannot. Runs before any seeding: it needs
+      # an empty, freshly migrated database, and it FAILS (never skips) here if DATABASE_URL is missing.
+      - name: Verify course-review locks against migrated Postgres
         run: npm run test:pg
         env:
           NODE_ENV: test
