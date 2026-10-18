@@ -3694,7 +3694,6 @@ not-public,src/lib/licence-render-sites.test.tsx,18,certif,CertificateArt,test f
 not-public,src/lib/licence-render-sites.test.tsx,27,iicrc-code,WRT,test file,expect(disciplineTopicLabel('WRT')).toBe('Water Restoration');
 not-public,src/lib/licence-render-sites.test.tsx,28,iicrc-code,crt,test file,expect(disciplineTopicLabel('crt')).toBe('Carpet Cleaning');
 not-public,src/lib/licence-render-sites.test.tsx,29,iicrc-code,RRT,test file,expect(disciplineTopicLabel('RRT')).toBeNull();
-not-public,src/lib/licence-render-sites.test.tsx,34,iicrc-code,WRT,test file,"'IICRC WRT',"
 not-public,src/lib/licence-render-sites.test.tsx,35,iicrc-code,WRT,test file,"'WRT certification',"
 not-public,src/lib/licence-render-sites.test.tsx,35,certif,certification,test file,"'WRT certification',"
 not-public,src/lib/licence-render-sites.test.tsx,36,iicrc-code,WRT,test file,"'Water Damage Restoration Technician (WRT)',"

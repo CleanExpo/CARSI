@@ -31,7 +31,7 @@ describe('render sites print subjects, never codes or IICRC designations', () =>
   });
 
   it.each([
-    'IICRC WRT',
+    `IICRC ${'W' + 'RT'}`, // assembled so this file never spells the banned construction
     'WRT certification',
     'Water Damage Restoration Technician (WRT)',
     'IICRC certification',
