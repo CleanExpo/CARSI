@@ -1,5 +1,6 @@
 import { randomBytes, randomUUID } from 'node:crypto';
 
+import { isAdminAllowlistedEmail } from '@/lib/admin/admin-panel-access';
 import type { SessionClaims } from '@/lib/auth/session-jwt';
 import {
   hashPassword,
@@ -81,6 +82,8 @@ export async function findOrCreateGuestUser(params: {
   // and poisons certificates (#302). Empty means "no name on file".
   const fullName = params.fullName.trim();
   const allowClaim = params.allowClaim === true;
+  // An admin-allowlisted address is never created, claimed or authenticated from a guest flow.
+  if (isAdminAllowlistedEmail(email)) return { status: 'exists' };
 
   const existing = await prisma.lmsUser.findUnique({ where: { email } });
   if (existing) {
@@ -106,6 +109,33 @@ export async function findOrCreateGuestUser(params: {
   throw new Error('REGISTER_FAILED');
 }
 
+/**
+ * True when an unauthenticated checkout must be refused before payment: the email is
+ * admin-allowlisted and has no active account. Fulfilment would never provision or authenticate
+ * that address (ensureGuestUserFromStripeEmail returns null; sessionClaimsForUserId rejects an
+ * inactive row), so taking the payment would leave it unfulfilled.
+ */
+export async function isReservedGuestCheckoutEmail(email: string): Promise<boolean> {
+  const normalized = email.trim().toLowerCase();
+  if (!normalized || !isAdminAllowlistedEmail(normalized)) return false;
+  const existing = await prisma.lmsUser.findUnique({ where: { email: normalized } });
+  return existing === null || existing.isActive === false;
+}
+
+/** True when a session's learner row still exists and is active (the webhook can fulfil for it). */
+export async function isActiveLearnerId(id: string): Promise<boolean> {
+  const user = await prisma.lmsUser.findUnique({ where: { id } });
+  return user !== null && user.isActive !== false;
+}
+
+/** True when the email belongs to an existing account that is deactivated (unfulfillable by email). */
+export async function isInactiveAccountEmail(email: string): Promise<boolean> {
+  const normalized = email.trim().toLowerCase();
+  if (!normalized) return false;
+  const user = await prisma.lmsUser.findUnique({ where: { email: normalized } });
+  return user !== null && user.isActive === false;
+}
+
 export async function ensureGuestUserFromStripeEmail(
   email: string,
   fullName?: string,
@@ -117,6 +147,8 @@ export async function ensureGuestUserFromStripeEmail(
   if (existing) {
     return sessionClaimsForUserId(existing.id);
   }
+  // Never provision an admin-allowlisted address from an unverified Stripe email.
+  if (isAdminAllowlistedEmail(normalized)) return null;
 
   const id = randomUUID();
   // Unclaimed provisional marker — never a real bcrypt hash. The account cannot

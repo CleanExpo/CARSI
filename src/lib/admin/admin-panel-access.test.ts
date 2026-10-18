@@ -2,7 +2,11 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import type { SessionClaims } from '@/lib/auth/session-jwt';
 
-import { getAdminPanelAllowedEmails, isLmsClaimsAllowedAdminPanel } from './admin-panel-access';
+import {
+  getAdminPanelAllowedEmails,
+  isAdminAllowlistedEmail,
+  isLmsClaimsAllowedAdminPanel,
+} from './admin-panel-access';
 
 function claims(email: string, role = 'student'): SessionClaims {
   return { sub: 'user-1', email, full_name: 'Test User', role };
@@ -40,6 +44,15 @@ describe('admin-panel-access — founder allowlist is env-independent', () => {
     expect(isLmsClaimsAllowedAdminPanel(claims('support@carsi.com.au'))).toBe(false);
     process.env.ADMIN_EMAIL = 'support@carsi.com.au';
     expect(isLmsClaimsAllowedAdminPanel(claims('support@carsi.com.au'))).toBe(true);
+  });
+
+  it('isAdminAllowlistedEmail matches founder and env addresses whatever their case or spacing', () => {
+    process.env.ADMIN_EMAIL = 'support@carsi.com.au';
+    process.env.ADMIN_PANEL_EMAILS = 'ops@carsi.com.au';
+    expect(isAdminAllowlistedEmail('  PHILL.M@carsi.com.au ')).toBe(true);
+    expect(isAdminAllowlistedEmail('Support@CARSI.com.au')).toBe(true);
+    expect(isAdminAllowlistedEmail(' ops@CARSI.COM.AU')).toBe(true);
+    expect(isAdminAllowlistedEmail('learner@example.com')).toBe(false);
   });
 
   it('denies a non-admin email when no env allowlist is set', () => {
