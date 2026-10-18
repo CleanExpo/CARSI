@@ -474,7 +474,11 @@ export async function syncModuleLessons(
       const lesson = {
         id: randomUUID(),
         orderIndex: nextOrder++,
-        isPreview: firstModule && sortedExisting.length === 0 && createdLessons.length === 0,
+        // Only a reading can be the public preview (the page renders its body as text).
+        isPreview:
+          firstModule &&
+          d.contentType === 'text' &&
+          !sortedExisting.some((e) => e.contentType === 'text'),
       };
       await tx.lmsLesson.create({
         data: {
@@ -493,17 +497,22 @@ export async function syncModuleLessons(
     }
   }
 
-  // The first module keeps a free preview reading for the public course page: when the save
-  // removed the preview lesson, the earliest remaining reading becomes the preview. The public page
-  // renders the preview's body as text, so a quiz (its body is a quiz id) or a video (a URL) is
-  // never promoted; with no reading left the course simply has no free lesson.
+  // The first module's free preview is always a reading: the public course page renders the
+  // preview's body as text, so a video (a URL) or a quiz (a quiz id) must never be it. Keep the
+  // current preview reading; otherwise use the earliest remaining reading; otherwise no preview.
+  // Any other lesson still flagged as the preview is cleared.
   if (firstModule) {
     const remaining = [...sortedExisting.filter((e) => !deleted.has(e.id)), ...createdLessons].sort(
       (a, b) => a.orderIndex - b.orderIndex
     );
-    const reading = remaining.find((l) => l.contentType === 'text');
-    if (reading && !remaining.some((l) => l.isPreview)) {
-      await tx.lmsLesson.update({ where: { id: reading.id }, data: { isPreview: true } });
+    const preview =
+      remaining.find((l) => l.isPreview && l.contentType === 'text') ??
+      remaining.find((l) => l.contentType === 'text');
+    for (const l of remaining) {
+      const shouldBe = l.id === preview?.id;
+      if (l.isPreview !== shouldBe) {
+        await tx.lmsLesson.update({ where: { id: l.id }, data: { isPreview: shouldBe } });
+      }
     }
   }
 

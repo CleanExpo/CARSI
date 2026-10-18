@@ -382,4 +382,57 @@ describe('admin quiz save', () => {
       data: { isPreview: true },
     });
   });
+
+  // Review round 11: a video or quiz could be created as, or stay, the public "Free lesson",
+  // whose body (a URL or a quiz id) the page renders as text.
+  it('a new first module made only of a video or a quiz has no preview lesson', async () => {
+    const { tx } = lessonTx();
+    await syncModuleLessons(
+      tx as never,
+      'c1',
+      'm1',
+      'Module',
+      undefined,
+      'https://v.example/1',
+      undefined,
+      [],
+      true
+    );
+    const created = tx.lmsLesson.create.mock.calls.map(
+      (c) => (c[0] as { data: { isPreview: boolean } }).data
+    );
+    expect(created.map((d) => d.isPreview)).toEqual([false]);
+  });
+
+  it('adding a reading to a module whose preview is a video moves the preview to the reading', async () => {
+    const { tx, ops } = lessonTx();
+    await syncModuleLessons(
+      tx as never,
+      'c1',
+      'm1',
+      'Module',
+      'New reading',
+      'https://v.example/1',
+      undefined,
+      [
+        {
+          id: 'l1',
+          orderIndex: 0,
+          contentType: 'video',
+          contentBody: 'https://v.example/1',
+          isPreview: true,
+        },
+      ],
+      true
+    );
+    const created = tx.lmsLesson.create.mock.calls.map(
+      (c) => (c[0] as { data: { isPreview: boolean; contentType: string } }).data
+    );
+    expect(created).toEqual([expect.objectContaining({ contentType: 'text', isPreview: true })]);
+    expect(tx.lmsLesson.update.mock.calls.map((c) => c[0])).toContainEqual({
+      where: { id: 'l1' },
+      data: { isPreview: false },
+    });
+    expect(ops.filter((o) => o.startsWith('delete'))).toEqual([]);
+  });
 });
