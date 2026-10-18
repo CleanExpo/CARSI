@@ -4,32 +4,43 @@
  * arithmetic) so a tile shows the same course on the CPU and the GPU.
  */
 
-/** Course thumbnails that make up the floor. Every path must exist under /public. */
-export const HEX_COURSE_IMAGES = [
-  '/images/courses/flood-restoration.webp',
-  '/images/courses/intro-water-damage-restoration.webp',
-  '/images/courses/intro-applied-structural-drying.webp',
-  '/images/courses/dehumidification.webp',
-  '/images/courses/moisture-meter-training.webp',
-  '/images/courses/intro-infrared-thermography.webp',
-  '/images/courses/mould-remediation-level-1.webp',
-  '/images/courses/mould-remediation-level-2.webp',
-  '/images/courses/containment-barriers.webp',
-  '/images/courses/fire-damage-assessment.webp',
-  '/images/courses/intro-smoke-soot-restoration.webp',
-  '/images/courses/soot-removal.webp',
-  '/images/courses/intro-odour-control.webp',
-  '/images/courses/carpet-cleaning-basics.webp',
-  '/images/courses/rug-cleaning.webp',
-  '/images/courses/hard-floor-cleaning.webp',
-  '/images/courses/contents-restoration.webp',
-  '/images/courses/document-drying.webp',
-  '/images/courses/biohazard-remediation.webp',
-  '/images/courses/donning-doffing-ppe.webp',
-  '/images/courses/healthcare-cleaning.webp',
-  '/images/courses/risk-assessment.webp',
-  '/images/courses/insurance-documentation.webp',
-  '/images/courses/air-filtration-equipment.webp',
+/**
+ * The floor's tiles. Each image is a square crop, cut by scripts/build-hero-tiles.mjs, that frames
+ * work taught by the published course named beside it (every slug resolved on
+ * carsi.com.au/api/lms/courses, 18/10/2026). Tiles are illustrations of that work, so copy still
+ * never calls a tile "a course". Every image must exist under /public.
+ */
+export const HEX_COURSE_TILES = [
+  {
+    image: '/images/hero-tiles/water-moisture-check.webp',
+    course: 'introduction-to-water-damage-restoration',
+  },
+  {
+    image: '/images/hero-tiles/carpet-extraction.webp',
+    course: 'introduction-to-basic-carpet-cleaning-and-drying',
+  },
+  {
+    image: '/images/hero-tiles/soot-ceiling-cleaning.webp',
+    course: 'introduction-to-smoke-and-soot-damage-restoration',
+  },
+  {
+    image: '/images/hero-tiles/structural-drying-airflow.webp',
+    course: 'introduction-to-structural-drying-concepts',
+  },
+] as const;
+
+export const HEX_COURSE_IMAGES = HEX_COURSE_TILES.map((t) => t.image);
+
+/**
+ * Hero-tile crops inspected at full size (18/10/2026): no text, lettering, logo or mark anywhere in
+ * the frame, and the scene shows work the named course teaches. Written out by hand on purpose: a
+ * tile with any other image fails the tests until that image is inspected and listed here.
+ */
+export const INSPECTED_IMAGES = [
+  '/images/hero-tiles/water-moisture-check.webp',
+  '/images/hero-tiles/carpet-extraction.webp',
+  '/images/hero-tiles/soot-ceiling-cleaning.webp',
+  '/images/hero-tiles/structural-drying-airflow.webp',
 ] as const;
 
 /** Pixel size of one square slot in the course atlas texture. */

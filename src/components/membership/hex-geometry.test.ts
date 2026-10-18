@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
@@ -9,6 +9,8 @@ import {
   cellAt,
   chooseHexMode,
   HEX_COURSE_IMAGES,
+  HEX_COURSE_TILES,
+  INSPECTED_IMAGES,
   TILE_HASH,
   tileCourseIndex,
 } from './hex-geometry';
@@ -82,6 +84,27 @@ describe('hex geometry', () => {
       expect(cols * rows).toBeGreaterThanOrEqual(n);
       expect(cols * (rows - 1)).toBeLessThan(n);
     }
+  });
+
+  it('uses only inspected hero-tile crops, each naming a course (publication is checked live by npm run check:hero-tiles)', () => {
+    // Full-branch reviews: whole course images carried stray lettering (one read like a discipline
+    // acronym) and the list of inspected images used to be derived from the tiles themselves.
+    for (const tile of HEX_COURSE_TILES) {
+      expect(tile.image).toMatch(/^\/images\/hero-tiles\/[a-z0-9-]+\.webp$/);
+      expect(INSPECTED_IMAGES as readonly string[]).toContain(tile.image);
+      expect(tile.course, tile.image).toMatch(/^[a-z0-9-]+$/);
+    }
+    expect(new Set(HEX_COURSE_TILES.map((t) => t.image)).size).toBe(HEX_COURSE_TILES.length);
+  });
+
+  it('lists exactly the crops the build script cuts, and no other file sits in the tile folder', () => {
+    const script = readFileSync(path.join(process.cwd(), 'scripts/build-hero-tiles.mjs'), 'utf8');
+    const built = [...script.matchAll(/name: '([a-z0-9-]+)'/g)].map(
+      (m) => `/images/hero-tiles/${m[1]}.webp`
+    );
+    expect([...INSPECTED_IMAGES].sort()).toEqual(built.sort());
+    const files = readdirSync(path.join(process.cwd(), 'public/images/hero-tiles'));
+    expect(files.map((f) => `/images/hero-tiles/${f}`).sort()).toEqual(built.sort());
   });
 
   it('lists only course images that exist in /public', () => {
