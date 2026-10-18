@@ -45,7 +45,10 @@ export function copySurfaces(): string[] {
     join(ROOT, 'src', 'lib', 'server', 'public-catalogue-facts.ts'),
     join(ROOT, 'src', 'lib', 'server', 'onboarding-pathway.ts'),
     join(ROOT, 'src', 'components', 'lms', 'diagrams', 'IICRCDisciplineMap.tsx'),
-    ...walk(join(ROOT, 'public'), (f) => /\.(md|txt)$/.test(f) || f.endsWith('start-smart-readiness.json')),
+    ...walk(
+      join(ROOT, 'public'),
+      (f) => /\.(md|txt)$/.test(f) || f.endsWith('start-smart-readiness.json')
+    ),
     ...walk(join(ROOT, 'docs', 'marketing'), (f) => f.endsWith('.md')),
   ].filter((f) => existsSync(f));
 }
@@ -70,14 +73,24 @@ const ACRONYM_ALLOWED = new RegExp(
 );
 
 const UNSOLD = /\bcarpet repair\b|\breinstall/i;
-const UNSOLD_ALLOWED = /CARSI sells (?:no|neither)|removed|does not (?:sell|offer|cover)|\|\s*(?:RRT|CRT)\s*\|/i;
+const UNSOLD_ALLOWED =
+  /CARSI sells (?:no|neither)|removed|does not (?:sell|offer|cover)|\|\s*(?:RRT|CRT)\s*\|/i;
 
 const CLAIMS: Array<[string, RegExp]> = [
-  ['certification as a legal licence to perform or invoice', /legally[^.]{0,100}\b(?:perform|invoice)/i],
-  ['unsourced per-job revenue range', /\$\s?\d[\d,]*\s*(?:to|–|-)\s*\$\s?\d[\d,]*[^.]{0,80}\b(?:per (?:job|call-out)|restoration jobs)/i],
+  [
+    'certification as a legal licence to perform or invoice',
+    /legally[^.]{0,100}\b(?:perform|invoice)/i,
+  ],
+  [
+    'unsourced per-job revenue range',
+    /\$\s?\d[\d,]*\s*(?:to|–|-)\s*\$\s?\d[\d,]*[^.]{0,80}\b(?:per (?:job|call-out)|restoration jobs)/i,
+  ],
   ['bundle sold as a route to IICRC credentials', /seeking IICRC credentials/i],
   ['unsourced module duration', /\b\d+\s*[-–]\s*\d+\s*hours?\b[^.]{0,30}\bmodules?\b/i],
-  ['CEC accreditation covering the unapproved vehicle course', /IICRC CEC Accredited.{0,300}(?:vehicle drying|Drying Transportation and Vehicles)|(?:vehicle drying|Drying Transportation and Vehicles).{0,300}IICRC CEC Accredited/i],
+  [
+    'CEC accreditation covering the unapproved vehicle course',
+    /IICRC CEC Accredited.{0,300}(?:vehicle drying|Drying Transportation and Vehicles)|(?:vehicle drying|Drying Transportation and Vehicles).{0,300}IICRC CEC Accredited/i,
+  ],
 ];
 
 function copyLines(file: string): Array<[number, string]> {
@@ -96,7 +109,8 @@ export function sweepProblems(file: string, lines: Array<[number, string]>): str
       problems.push(`${where} acronym in copy: ${line.trim().slice(0, 120)}`);
     if (UNSOLD.test(line) && !UNSOLD_ALLOWED.test(line))
       problems.push(`${where} unsold training: ${line.trim().slice(0, 120)}`);
-    for (const [name, re] of CLAIMS) if (re.test(line)) problems.push(`${where} ${name}: ${line.trim().slice(0, 120)}`);
+    for (const [name, re] of CLAIMS)
+      if (re.test(line)) problems.push(`${where} ${name}: ${line.trim().slice(0, 120)}`);
   }
   return problems;
 }
@@ -118,16 +132,28 @@ describe('licence copy sweep', () => {
 
   it('sweep: each check fires on the copy it was written for', () => {
     const fx = (s: string) => sweepProblems('x.tsx', [[1, s]]);
-    expect(fx('description="CRT Carpet Restoration + CCT Commercial Carpet + OCT Odour Control."')).not.toEqual([]);
+    expect(
+      fx('description="CRT Carpet Restoration + CCT Commercial Carpet + OCT Odour Control."')
+    ).not.toEqual([]);
     expect(fx("'Start with WRT fundamentals, then add structural drying.',")).not.toEqual([]);
     expect(fx("addon: 'WRT',")).not.toEqual([]);
-    expect(fx("'carpet repair, carpet cleaning and odour control credentials for insurance work',")).not.toEqual([]);
+    expect(
+      fx("'carpet repair, carpet cleaning and odour control credentials for insurance work',")
+    ).not.toEqual([]);
     expect(fx('let plumbers legally perform — and invoice for — the full scope')).not.toEqual([]);
     expect(fx('jobs average $2,500–$15,000 per job')).not.toEqual([]);
     expect(fx('Perfect for cleaning contractors seeking IICRC credentials.')).not.toEqual([]);
     expect(fx('Minimal roster disruption — 2-4 hour self-paced modules.')).not.toEqual([]);
-    expect(fx("'IICRC CEC Accredited restoration courses: water damage, vehicle drying and odour control.'")).not.toEqual([]);
-    expect(fx("'IICRC CEC Accredited courses for transport operations. Water damage, vehicle drying and odour control courses.'")).not.toEqual([]);
+    expect(
+      fx(
+        "'IICRC CEC Accredited restoration courses: water damage, vehicle drying and odour control.'"
+      )
+    ).not.toEqual([]);
+    expect(
+      fx(
+        "'IICRC CEC Accredited courses for transport operations. Water damage, vehicle drying and odour control courses.'"
+      )
+    ).not.toEqual([]);
   });
 
   it('sweep: allows third-person references and course-selection data', () => {
@@ -137,7 +163,9 @@ describe('licence copy sweep', () => {
     expect(fx("href: '/courses?discipline=CCT',")).toEqual([]);
     expect(fx('FSRT is an IICRC certification covering fire and smoke.')).toEqual([]);
     expect(fx("requirement: 'WRT and FSRT commonly required by adjusters',")).toEqual([]);
-    expect(fx('| Water Restoration Technician | WRT | Foundation for water damage work. |')).toEqual([]);
+    expect(
+      fx('| Water Restoration Technician | WRT | Foundation for water damage work. |')
+    ).toEqual([]);
     expect(fx("CRT: 'Colour repair',")).toEqual([]);
   });
 
@@ -170,19 +198,24 @@ describe('recommended-course routing matches the copy', () => {
    * drying", but the recommendations still query courses by the CRT code, which can never
    * return the vehicle course. Labels and headings must describe what is selected.
    */
-  it.each(industryPages())('routing: %s chips and heading match the selected codes', (_slug, src) => {
-    const problems: string[] = [];
-    for (const m of src.matchAll(/\{\s*code:\s*'([A-Z]+)',\s*label:\s*'([^']+)'/g)) {
-      const [, code, label] = m;
-      if (CODE_TOPICS[code] && !CODE_TOPICS[code].test(label)) problems.push(`chip ${code} labelled "${label}"`);
+  it.each(industryPages())(
+    'routing: %s chips and heading match the selected codes',
+    (_slug, src) => {
+      const problems: string[] = [];
+      for (const m of src.matchAll(/\{\s*code:\s*'([A-Z]+)',\s*label:\s*'([^']+)'/g)) {
+        const [, code, label] = m;
+        if (CODE_TOPICS[code] && !CODE_TOPICS[code].test(label))
+          problems.push(`chip ${code} labelled "${label}"`);
+      }
+      const codes = src.match(/disciplines=\{\[([^\]]*)\]\}/)?.[1].match(/[A-Z]+/g) ?? [];
+      const heading = codes.length ? (src.match(/disciplineList="([^"]+)"/)?.[1] ?? '') : '';
+      for (const topic of heading.split(/,\s*|\s+and\s+/).filter(Boolean)) {
+        if (!codes.some((c) => CODE_TOPICS[c]?.test(topic)))
+          problems.push(`heading topic "${topic}" not selected by ${codes.join('/')}`);
+      }
+      expect(problems).toEqual([]);
     }
-    const codes = src.match(/disciplines=\{\[([^\]]*)\]\}/)?.[1].match(/[A-Z]+/g) ?? [];
-    const heading = codes.length ? (src.match(/disciplineList="([^"]+)"/)?.[1] ?? '') : '';
-    for (const topic of heading.split(/,\s*|\s+and\s+/).filter(Boolean)) {
-      if (!codes.some((c) => CODE_TOPICS[c]?.test(topic))) problems.push(`heading topic "${topic}" not selected by ${codes.join('/')}`);
-    }
-    expect(problems).toEqual([]);
-  });
+  );
 });
 
 /** IICRC designation names: a chip may name the subject, never the designation. */
@@ -198,14 +231,21 @@ describe('industry chips are plain-English topics', () => {
     expect(DESIGNATION_NAME.test('Mould remediation')).toBe(false);
   });
 
-  it.each(industryPages())('chips: %s discipline labels are topics, not designations', (_slug, src) => {
-    const labels = Array.from(src.matchAll(/\{\s*code:\s*'[A-Z]+',\s*label:\s*'([^']+)'/g), (m) => m[1]);
-    expect(labels.filter((l) => DESIGNATION_NAME.test(l))).toEqual([]);
-  });
+  it.each(industryPages())(
+    'chips: %s discipline labels are topics, not designations',
+    (_slug, src) => {
+      const labels = Array.from(
+        src.matchAll(/\{\s*code:\s*'[A-Z]+',\s*label:\s*'([^']+)'/g),
+        (m) => m[1]
+      );
+      expect(labels.filter((l) => DESIGNATION_NAME.test(l))).toEqual([]);
+    }
+  );
 });
 
 /** Counts, money and percentages. A stat may carry one only with a sourceHref. */
-const NUMBER = /\$\d[\d.,]*\s?[BMK]?\b|\b\d{1,3}(?:,\d{3})+\+?|\b\d+(?:\.\d+)?\s?(?:M|K|million|billion)\b\+?|\b\d+%|\b\d{2,}\+|\bTier [IVX]+\+?|\bISO\s*\d{3,}/;
+const NUMBER =
+  /\$\d[\d.,]*\s?[BMK]?\b|\b\d{1,3}(?:,\d{3})+\+?|\b\d+(?:\.\d+)?\s?(?:M|K|million|billion)\b\+?|\b\d+%|\b\d{2,}\+|\bTier [IVX]+\+?|\bISO\s*\d{3,}/;
 /** Copy implying CARSI awards IICRC credentials or certification. */
 const IICRC_CREDENTIAL =
   /IICRC[- ](?:recognised|recognized|certified)|IICRC credentials?|Certified restoration training|IICRC CEC Accredited credentials|value:\s*'IICRC',\s*label:\s*'(?:Certified|Approved|Certification|Standards)'/i;
@@ -230,32 +270,52 @@ export function numberProblems(src: string): string[] {
     const label = stat.match(/label:\s*'([^']*)'/)?.[1] ?? '';
     if ((NUMBER.test(value) || NUMBER.test(label) || /^\d/.test(value)) && !/sourceHref/.test(stat))
       problems.push(`unsourced stat: ${value} ${label}`);
+    if (IICRC_CREDENTIAL.test(stat.replace(/\s+/g, ' ')))
+      problems.push(`stat implies IICRC credentials: ${value} ${label}`);
   }
   const body = src.replace(/const stats\s*=\s*\[[\s\S]*?\n\];/, '');
   for (const line of body.split('\n')) {
     if (/^\s*(?:\/\/|\*|\/\*)/.test(line) || /color|#[0-9a-f]{3,6}/i.test(line)) continue;
     if (NUMBER.test(line)) problems.push(`unsourced number: ${line.trim().slice(0, 120)}`);
-    if (IICRC_CREDENTIAL.test(line)) problems.push(`implies IICRC credentials: ${line.trim().slice(0, 120)}`);
+    if (IICRC_CREDENTIAL.test(line))
+      problems.push(`implies IICRC credentials: ${line.trim().slice(0, 120)}`);
   }
   return problems;
 }
 
 describe('industry copy carries no unsourced numbers or IICRC-credential claims', () => {
   it('numbers: the checks fire on the live copy they were written for', () => {
-    expect(numberProblems("const stats = [\n  { value: '2,800+', label: 'Caravan Parks (AUS)' },\n];")).not.toEqual([]);
-    expect(numberProblems("const stats = [\n  { value: '$8.6B', label: 'Industry Revenue' },\n];")).not.toEqual([]);
     expect(
-      numberProblems("const stats = [\n  {\n    value: '2,590',\n    label: 'Homes',\n    sourceHref: 'https://x',\n  },\n];")
+      numberProblems("const stats = [\n  { value: '2,800+', label: 'Caravan Parks (AUS)' },\n];")
+    ).not.toEqual([]);
+    expect(
+      numberProblems("const stats = [\n  { value: '$8.6B', label: 'Industry Revenue' },\n];")
+    ).not.toEqual([]);
+    expect(
+      numberProblems(
+        "const stats = [\n  {\n    value: '2,590',\n    label: 'Homes',\n    sourceHref: 'https://x',\n  },\n];"
+      )
     ).toEqual([]);
-    expect(numberProblems('description="Australia\'s 2,800+ caravan parks face mould risk."')).not.toEqual([]);
-    expect(numberProblems('description="IICRC credentials satisfy AusTender pre-qualification."')).not.toEqual([]);
+    expect(
+      numberProblems('description="Australia\'s 2,800+ caravan parks face mould risk."')
+    ).not.toEqual([]);
+    expect(
+      numberProblems('description="IICRC credentials satisfy AusTender pre-qualification."')
+    ).not.toEqual([]);
     expect(numberProblems('description="with IICRC-recognised credentials."')).not.toEqual([]);
     expect(numberProblems("  { value: 'IICRC', label: 'Certified' },")).not.toEqual([]);
-    expect(numberProblems('description="Water damage restoration courses, studied online."')).toEqual([]);
+    expect(
+      numberProblems("const stats = [\n  { value: 'IICRC', label: 'Certification' },\n];")
+    ).not.toEqual([]);
+    expect(
+      numberProblems("const stats = [\n  { value: 'IICRC CEC', label: 'On approved courses' },\n];")
+    ).toEqual([]);
+    expect(
+      numberProblems('description="Water damage restoration courses, studied online."')
+    ).toEqual([]);
   });
 
   it.each(industryPages())('numbers: %s', (_slug, src) => {
     expect(numberProblems(src)).toEqual([]);
   });
 });
-
