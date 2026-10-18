@@ -12,6 +12,8 @@ const m = vi.hoisted(() => ({
   session: vi.fn(),
   lmsRows: new Map<string, LmsRow>(),
   adminRows: new Map<string, { id: string; is_active: boolean; role: string }>(),
+  /** lms_user_roles names by lms_users.id (these win over the column, as at login). */
+  roleRows: new Map<string, string[]>(),
   inTx: false,
   ops: [] as string[],
   summaryDb: [] as unknown[],
@@ -27,7 +29,8 @@ vi.mock('@/lib/prisma', () => {
         const row = m.adminRows.get(String(values[0]));
         return row ? [row] : [];
       }
-      if (sql.includes('"lms_user_roles"')) return [];
+      if (sql.includes('"lms_user_roles"'))
+        return (m.roleRows.get(String(values[0])) ?? []).map((name) => ({ name }));
       if (sql.includes('"lms_users"')) {
         const hit = [...m.lmsRows].find(([, row]) => row.id === String(values[0]));
         return hit ? [{ ...hit[1], email: hit[0] }] : [];
@@ -66,6 +69,7 @@ beforeEach(() => {
   process.env.ADMIN_EMAIL = 'founder@carsi.com.au';
   delete process.env.ADMIN_PANEL_EMAILS;
   m.lmsRows = new Map();
+  m.roleRows = new Map();
   m.adminRows = new Map([['ops@carsi.com.au', { id: 'adm-7', is_active: true, role: 'admin' }]]);
   m.ops = [];
   m.summaryDb = [];
@@ -107,8 +111,14 @@ describe('admin review summary', () => {
       { via: 'lms_session', userId: 'lms-3', email: 'a@carsi.com.au' },
       { 'a@carsi.com.au': { id: 'lms-3', is_active: true, role: 'admin' } },
     ],
+    [
+      'an LMS admin by role row (column says student), as at login',
+      { via: 'lms_session', userId: 'lms-4', email: 'role.admin@carsi.com.au' },
+      { 'role.admin@carsi.com.au': { id: 'lms-4', is_active: true, role: 'student' } },
+    ],
   ])('serves %s', async (_label, session, users) => {
     m.session.mockResolvedValue(session);
+    m.roleRows.set('lms-4', ['admin']);
     for (const [k, v] of Object.entries(users as Record<string, LmsRow>)) m.lmsRows.set(k, v);
     const res = await GET();
     expect(res.status).toBe(200);
@@ -136,8 +146,31 @@ describe('admin review summary', () => {
       { via: 'admin_cookie', email: 'nobody@carsi.com.au' },
       {},
     ],
+    [
+      'an admin cookie for a deactivated admin_users account',
+      { via: 'admin_cookie', email: 'gone@carsi.com.au' },
+      {},
+    ],
+    [
+      'an admin cookie for an admin_users account whose role is not admin',
+      { via: 'admin_cookie', email: 'viewer@carsi.com.au' },
+      {},
+    ],
+    [
+      'an LMS student whose address matches an active admin_users admin',
+      { via: 'lms_session', userId: 'lms-z', email: 'ops@carsi.com.au' },
+      { 'ops@carsi.com.au': { id: 'lms-z', is_active: true, role: 'student' } },
+    ],
+    [
+      'an LMS user demoted by removing the admin role row (column still says admin)',
+      { via: 'lms_session', userId: 'lms-8', email: 'was.admin@carsi.com.au' },
+      { 'was.admin@carsi.com.au': { id: 'lms-8', is_active: true, role: 'admin' } },
+    ],
   ])('refuses %s (403, nothing private read)', async (_label, session, users) => {
     m.session.mockResolvedValue(session);
+    m.adminRows.set('gone@carsi.com.au', { id: 'adm-8', is_active: false, role: 'admin' });
+    m.adminRows.set('viewer@carsi.com.au', { id: 'adm-9', is_active: true, role: 'viewer' });
+    m.roleRows.set('lms-8', ['student']);
     for (const [k, v] of Object.entries(users as Record<string, LmsRow>)) m.lmsRows.set(k, v);
     const res = await GET();
     expect(res.status).toBe(403);
