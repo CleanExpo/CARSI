@@ -130,8 +130,14 @@ describe('admin quiz save', () => {
       undefined,
       undefined,
       [
-        { id: 'l1', orderIndex: 0, contentType: 'text', contentBody: 'Reading' },
-        { id: 'l2', orderIndex: 1, contentType: 'quiz', contentBody: 'quiz-legacy' },
+        { id: 'l1', orderIndex: 0, contentType: 'text', contentBody: 'Reading', isPreview: true },
+        {
+          id: 'l2',
+          orderIndex: 1,
+          contentType: 'quiz',
+          contentBody: 'quiz-legacy',
+          isPreview: false,
+        },
       ],
       true
     );
@@ -178,8 +184,14 @@ describe('admin quiz save', () => {
       'https://video.example/v1',
       undefined,
       [
-        { id: 'l1', orderIndex: 0, contentType: 'text', contentBody: 'Reading' },
-        { id: 'l2', orderIndex: 1, contentType: 'quiz', contentBody: 'quiz-legacy' },
+        { id: 'l1', orderIndex: 0, contentType: 'text', contentBody: 'Reading', isPreview: true },
+        {
+          id: 'l2',
+          orderIndex: 1,
+          contentType: 'quiz',
+          contentBody: 'quiz-legacy',
+          isPreview: false,
+        },
       ],
       true
     );
@@ -197,13 +209,31 @@ describe('admin quiz save', () => {
       'https://video.example/v1',
       undefined,
       [
-        { id: 'l1', orderIndex: 0, contentType: 'text', contentBody: 'Reading' },
-        { id: 'l2', orderIndex: 1, contentType: 'video', contentBody: 'https://video.example/v1' },
-        { id: 'l3', orderIndex: 2, contentType: 'quiz', contentBody: 'quiz-legacy' },
+        { id: 'l1', orderIndex: 0, contentType: 'text', contentBody: 'Reading', isPreview: true },
+        {
+          id: 'l2',
+          orderIndex: 1,
+          contentType: 'video',
+          contentBody: 'https://video.example/v1',
+          isPreview: false,
+        },
+        {
+          id: 'l3',
+          orderIndex: 2,
+          contentType: 'quiz',
+          contentBody: 'quiz-legacy',
+          isPreview: false,
+        },
       ],
       true
     );
-    expect(ops).toEqual(['delete:l1', 'update:l2']);
+    // Review round 9: the removed reading was the first module's free preview, so the next
+    // lesson becomes the preview and the public course page keeps one.
+    expect(ops).toEqual(['delete:l1', 'update:l2', 'update:l2']);
+    expect(tx.lmsLesson.update.mock.calls[1][0]).toEqual({
+      where: { id: 'l2' },
+      data: { isPreview: true },
+    });
   });
 
   // Review round 6: the editor shows one reading, so a course-level save deleted a module's second
@@ -220,9 +250,27 @@ describe('admin quiz save', () => {
       undefined,
       undefined,
       [
-        { id: 'l1', orderIndex: 0, contentType: 'text', contentBody: 'First reading' },
-        { id: 'l2', orderIndex: 1, contentType: 'text', contentBody: 'Second reading' },
-        { id: 'l3', orderIndex: 2, contentType: 'quiz', contentBody: 'quiz-custom' },
+        {
+          id: 'l1',
+          orderIndex: 0,
+          contentType: 'text',
+          contentBody: 'First reading',
+          isPreview: true,
+        },
+        {
+          id: 'l2',
+          orderIndex: 1,
+          contentType: 'text',
+          contentBody: 'Second reading',
+          isPreview: false,
+        },
+        {
+          id: 'l3',
+          orderIndex: 2,
+          contentType: 'quiz',
+          contentBody: 'quiz-custom',
+          isPreview: false,
+        },
       ],
       true
     );
@@ -248,8 +296,8 @@ describe('admin quiz save', () => {
         questions: [{ ...sameQuestions[0], explanation: 'New why.' }, sameQuestions[1]],
       },
       [
-        { id: 'l1', orderIndex: 0, contentType: 'text', contentBody: 'Reading' },
-        { id: 'l2', orderIndex: 1, contentType: 'quiz', contentBody: 'quiz-1' },
+        { id: 'l1', orderIndex: 0, contentType: 'text', contentBody: 'Reading', isPreview: true },
+        { id: 'l2', orderIndex: 1, contentType: 'quiz', contentBody: 'quiz-1', isPreview: false },
       ],
       true
     );
@@ -267,9 +315,9 @@ describe('admin quiz save', () => {
       undefined,
       undefined,
       [
-        { id: 'l1', orderIndex: 0, contentType: 'text', contentBody: 'Reading' },
-        { id: 'l2', orderIndex: 1, contentType: 'quiz', contentBody: 'quiz-one' },
-        { id: 'l3', orderIndex: 2, contentType: 'quiz', contentBody: 'quiz-two' },
+        { id: 'l1', orderIndex: 0, contentType: 'text', contentBody: 'Reading', isPreview: true },
+        { id: 'l2', orderIndex: 1, contentType: 'quiz', contentBody: 'quiz-one', isPreview: false },
+        { id: 'l3', orderIndex: 2, contentType: 'quiz', contentBody: 'quiz-two', isPreview: false },
       ],
       true
     );

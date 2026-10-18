@@ -17,6 +17,18 @@ export type QuizQuestionInput = {
 
 export type QuizQuestionWriter = Pick<Prisma.TransactionClient, 'lmsQuizQuestion'>;
 
+/** Stored options are `{ text }[]`, or plain strings on older rows; compare their text. */
+function optionTexts(options: unknown): string[] | null {
+  if (!Array.isArray(options)) return null;
+  return options.map((o) =>
+    typeof o === 'string'
+      ? o
+      : o && typeof o === 'object' && typeof (o as { text?: unknown }).text === 'string'
+        ? (o as { text: string }).text
+        : JSON.stringify(o)
+  );
+}
+
 export function explanationFor(
   questionText: string,
   authored: string | null | undefined,
@@ -55,7 +67,7 @@ export async function writeQuizQuestions(
       const q = questions[i];
       return (
         row.questionText === q.questionText &&
-        JSON.stringify(row.options) === JSON.stringify(q.options.map((text) => ({ text }))) &&
+        JSON.stringify(optionTexts(row.options)) === JSON.stringify(q.options) &&
         row.correctIndex === q.correctIndex &&
         row.points === (q.points ?? 1)
       );

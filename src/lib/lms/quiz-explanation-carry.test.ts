@@ -87,6 +87,14 @@ describe('explanation carry-forward', () => {
     expect(ops).toEqual(['read', 'update:q-1:New why.']);
   });
 
+  // Review round 9: rows stored with plain-string options were rewritten (new ids) on an
+  // explanation-only save, because only the { text } shape was compared.
+  it('older rows with plain-string options are still updated in place', async () => {
+    const { db, ops } = fakeDb([{ ...row('q-1', 'Q1', null), options: ['A', 'B'] as never }]);
+    await writeQuizQuestions(db as never, 'quiz-1', [input('Q1', 'New why.')]);
+    expect(ops).toEqual(['read', 'update:q-1:New why.']);
+  });
+
   it('a changed question set is replaced, carrying saved explanations by question text', async () => {
     const { db, ops, created } = fakeDb([row('q-1', 'Q1', WHY)]);
     await writeQuizQuestions(db as never, 'quiz-1', [input('Q1'), input('A brand-new question')]);

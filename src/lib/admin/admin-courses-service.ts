@@ -413,6 +413,7 @@ export async function syncModuleLessons(
     orderIndex: number;
     contentType: string;
     contentBody: string | null;
+    isPreview: boolean;
   }[],
   firstModule: boolean
 ): Promise<string[]> {
@@ -441,7 +442,8 @@ export async function syncModuleLessons(
   let nextOrder = sortedExisting.length
     ? sortedExisting[sortedExisting.length - 1].orderIndex + 1
     : 0;
-  let created = 0;
+  const createdLessons: { id: string; orderIndex: number; isPreview: boolean }[] = [];
+  const deleted = new Set<string>();
   const repointed = new Set<string>();
   for (const kind of ['text', 'video', 'quiz'] as const) {
     if (kind === 'quiz' && !quiz) continue;
@@ -464,21 +466,36 @@ export async function syncModuleLessons(
         data: { title: d.title, contentBody: d.contentBody },
       });
     } else if (d) {
+      const lesson = {
+        id: randomUUID(),
+        orderIndex: nextOrder++,
+        isPreview: firstModule && sortedExisting.length === 0 && createdLessons.length === 0,
+      };
       await tx.lmsLesson.create({
         data: {
-          id: randomUUID(),
+          ...lesson,
           moduleId,
           title: d.title,
           contentType: d.contentType,
           contentBody: d.contentBody,
-          orderIndex: nextOrder++,
-          isPreview: firstModule && sortedExisting.length === 0 && created === 0,
         },
       });
-      created += 1;
+      createdLessons.push(lesson);
     } else if (ex) {
       // The editor removed this module's reading or video.
       await tx.lmsLesson.delete({ where: { id: ex.id } });
+      deleted.add(ex.id);
+    }
+  }
+
+  // The first module always keeps one free preview lesson for the public course page: when the
+  // save removed the preview lesson, the earliest remaining lesson becomes the preview.
+  if (firstModule) {
+    const remaining = [...sortedExisting.filter((e) => !deleted.has(e.id)), ...createdLessons].sort(
+      (a, b) => a.orderIndex - b.orderIndex
+    );
+    if (remaining.length > 0 && !remaining.some((l) => l.isPreview)) {
+      await tx.lmsLesson.update({ where: { id: remaining[0].id }, data: { isPreview: true } });
     }
   }
 
@@ -998,6 +1015,7 @@ export async function adminUpdateCourse(
               orderIndex: l.orderIndex,
               contentType: l.contentType,
               contentBody: l.contentBody,
+              isPreview: l.isPreview,
             })),
             i === 0
           );

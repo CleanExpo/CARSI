@@ -303,9 +303,9 @@ describe('create-only structured native curriculum', () => {
     mocks.find.mockResolvedValue({ ...native, id: 'legacy', meta: null,
       modules: [{ id: 'm1', title: 'Module', orderIndex: 0, lessons: [] }] });
     mocks.lessonFind.mockResolvedValue([
-      { id: 'l1', orderIndex: 0, contentType: 'text', contentBody: '<p>Reading</p>' },
-      { id: 'l2', orderIndex: 1, contentType: 'quiz', contentBody: 'quiz-one' },
-      { id: 'l3', orderIndex: 2, contentType: 'quiz', contentBody: 'quiz-two' },
+      { id: 'l1', orderIndex: 0, contentType: 'text', contentBody: '<p>Reading</p>', isPreview: true },
+      { id: 'l2', orderIndex: 1, contentType: 'quiz', contentBody: 'quiz-one', isPreview: false },
+      { id: 'l3', orderIndex: 2, contentType: 'quiz', contentBody: 'quiz-two', isPreview: false },
     ]);
     await adminUpdateCourse('legacy', { ...input(), modules: [{ id: 'm1', title: 'Module', textContent: 'Reading' }] });
     expect(mocks.quizPrune).toHaveBeenCalledTimes(1);
