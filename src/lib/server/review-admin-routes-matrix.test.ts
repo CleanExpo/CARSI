@@ -26,6 +26,10 @@ const m = vi.hoisted(() => ({
   modelCalls: [] as Array<Record<string, unknown>>,
   /** Reads of a single review's PRIVATE text (title/body) by id. */
   bodyReads: 0,
+  /** Every reply write ATTEMPTED (matched or not): a denied caller must not even attempt one. */
+  writeAttempts: 0,
+  /** The flags the last GET advertised (can_manage, can_moderate). */
+  lastGetFlags: null as null | { can_manage: boolean; can_moderate: boolean },
   /** Whether the review the action targets is hidden. */
   reviewHidden: false,
   /** Set to true to hide the review AFTER the visibility check, before the conditional write. */
@@ -202,6 +206,7 @@ vi.mock('@/lib/prisma', () => {
         where: { isPublished?: boolean };
         data: Record<string, unknown>;
       }) => {
+        m.writeAttempts += 1;
         const publishedNow = m.hiddenAtWrite === null ? target().isPublished : !m.hiddenAtWrite;
         if (args.where.isPublished !== undefined && args.where.isPublished !== publishedNow)
           return { count: 0 };
@@ -323,6 +328,7 @@ const ACTIONS: Record<string, Action> = {
         params: Promise.resolve({ slug: 'water-damage' }),
       });
       const body = await res.json();
+      m.lastGetFlags = { can_manage: body.can_manage, can_moderate: body.can_moderate };
       return {
         status: res.status,
         allowed: body.reviews.some((r: { id: string }) => r.id === HIDDEN.id),
@@ -338,6 +344,7 @@ const ACTIONS: Record<string, Action> = {
         params: Promise.resolve({ slug: 'water-damage' }),
       });
       const body = await res.json();
+      m.lastGetFlags = { can_manage: body.can_manage, can_moderate: body.can_moderate };
       return {
         status: res.status,
         allowed: body.reviews.some((r: { id: string }) => r.id === PUBLISHED.id),
@@ -361,6 +368,8 @@ beforeEach(() => {
   m.events = [];
   m.modelCalls = [];
   m.bodyReads = 0;
+  m.writeAttempts = 0;
+  m.lastGetFlags = null;
   m.reviewHidden = false;
   m.hiddenAtWrite = null;
 });
@@ -408,33 +417,45 @@ const CASES = Object.entries(PERSONAS).flatMap(([persona, fx]) =>
   Object.entries(ACTIONS).map(([action, a]) => ({
     persona,
     action,
+    principal: fx.principal,
     expected: a.needs.every((cap) => REVIEW_ACCESS[fx.principal][cap]),
   }))
 );
 
-describe.each(CASES)('$persona → $action (allowed: $expected)', ({ persona, action, expected }) => {
-  it('matches the rule table', async () => {
-    const a = ACTIONS[action]!;
-    m.persona = persona;
-    m.reviewHidden = a.hidden;
-    const out = await a.run();
-    expect(out.allowed).toBe(expected);
-    if (a.effect === 'read' && action !== 'moderation summary (GET)') {
-      expect(out.status).toBe(200); // GET always answers; denial means the data is absent
-    } else if (expected) {
-      expect(out.status).toBe(200);
-    } else {
-      expect(out.status).toBe(persona === 'noSession' ? 401 : 403);
-    }
-    if (expected && a.effect === 'write') expect(m.writes.length).toBeGreaterThan(0);
-    if (expected && a.effect === 'model') expect(m.modelCalls).toHaveLength(1);
-    if (!expected) {
-      expect(m.writes).toEqual([]);
-      expect(m.modelCalls).toEqual([]);
-      expect(m.bodyReads).toBe(0); // no private text read on any denial
-    }
-  });
-});
+describe.each(CASES)(
+  '$persona → $action (allowed: $expected)',
+  ({ persona, action, principal, expected }) => {
+    it('matches the rule table', async () => {
+      const a = ACTIONS[action]!;
+      m.persona = persona;
+      m.reviewHidden = a.hidden;
+      const out = await a.run();
+      expect(out.allowed).toBe(expected);
+      if (a.effect === 'read' && action !== 'moderation summary (GET)') {
+        expect(out.status).toBe(200); // GET always answers; denial means the data is absent
+      } else if (expected) {
+        expect(out.status).toBe(200);
+      } else {
+        expect(out.status).toBe(persona === 'noSession' ? 401 : 403);
+      }
+      if (expected && a.effect === 'write') expect(m.writes.length).toBeGreaterThan(0);
+      if (expected && a.effect === 'model') expect(m.modelCalls).toHaveLength(1);
+      if (m.lastGetFlags) {
+        // The controls a GET advertises come from the same table.
+        expect(m.lastGetFlags).toEqual({
+          can_manage: REVIEW_ACCESS[principal].replyPublished,
+          can_moderate: REVIEW_ACCESS[principal].moderate,
+        });
+      }
+      if (!expected) {
+        expect(m.writes).toEqual([]);
+        expect(m.writeAttempts).toBe(0); // a denied caller never even attempts the write
+        expect(m.modelCalls).toEqual([]);
+        expect(m.bodyReads).toBe(0); // no private text read on any denial
+      }
+    });
+  }
+);
 
 describe('what an allowed AI draft sends is exactly the review it was allowed to read', () => {
   it('a current instructor drafting for a published review sends that review only', async () => {
