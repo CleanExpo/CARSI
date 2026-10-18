@@ -22,6 +22,11 @@ test.describe('membership hex hero', () => {
     await expect(hero).toHaveAttribute('data-hex-state', 'running', { timeout: 20_000 });
     await expect(page.locator('h1')).toHaveCount(1);
     await expect(page.locator('h1')).toHaveText('Every course. One year. One login.');
+    // The tiles are illustrative course-area images, never presented as individual courses.
+    await expect(
+      page.getByText('Each tile shows work the library covers.', { exact: false })
+    ).toBeVisible();
+    expect(await hero.innerText()).not.toMatch(/tile is a course/i);
 
     const canvas = hero.locator('canvas');
     await expect

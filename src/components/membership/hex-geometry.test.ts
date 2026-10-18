@@ -9,6 +9,8 @@ import {
   cellAt,
   chooseHexMode,
   HEX_COURSE_IMAGES,
+  HEX_COURSE_TILES,
+  BANNED_TILE_IMAGES,
   TILE_HASH,
   tileCourseIndex,
 } from './hex-geometry';
@@ -82,6 +84,16 @@ describe('hex geometry', () => {
       expect(cols * rows).toBeGreaterThanOrEqual(n);
       expect(cols * (rows - 1)).toBeLessThan(n);
     }
+  });
+
+  it('declares a course slug for every tile and keeps banned images out (publication is checked live by npm run check:hero-tiles)', () => {
+    // Full-branch reviews: rug cleaning, biohazard and healthcare cleaning had no published course.
+    // Full-size inspection and full-branch reviews: none of the banned images may return.
+    for (const banned of BANNED_TILE_IMAGES) expect(HEX_COURSE_IMAGES).not.toContain(banned);
+    for (const tile of HEX_COURSE_TILES) {
+      expect(tile.course, tile.image).toMatch(/^[a-z0-9-]+$/);
+    }
+    expect(new Set(HEX_COURSE_TILES.map((t) => t.image)).size).toBe(HEX_COURSE_TILES.length);
   });
 
   it('lists only course images that exist in /public', () => {

@@ -9,8 +9,8 @@ import { createHexRenderer, type HexRenderer, type HexState } from './hex-render
 type HeroState = 'pending' | HexState;
 
 /**
- * Entry hero for the yearly membership: a floor of hexagonal tiles, each one a course in the
- * CARSI library, that lifts into full colour wherever the visitor moves. The text stays real
+ * Entry hero for the yearly membership: a floor of hexagonal tiles showing the areas the
+ * CARSI library covers, that lifts into full colour wherever the visitor moves. The text stays real
  * HTML above the canvas so it is always crisp, readable and accessible. Motion can be paused at
  * any time (WCAG 2.2.2) and stops at once when the visitor turns on reduced motion.
  */
@@ -123,7 +123,7 @@ export function MembershipHexHero({ price }: { price: number }) {
         </div>
         {state === 'running' ? (
           <p className="mt-8 text-xs tracking-wide text-slate-400">
-            Every tile is a course in the library. Move across the floor to light them up.
+            Each tile shows work the library covers. Move across the floor to light them up.
           </p>
         ) : null}
       </div>

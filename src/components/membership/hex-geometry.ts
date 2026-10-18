@@ -4,32 +4,94 @@
  * arithmetic) so a tile shows the same course on the CPU and the GPU.
  */
 
-/** Course thumbnails that make up the floor. Every path must exist under /public. */
-export const HEX_COURSE_IMAGES = [
-  '/images/courses/flood-restoration.webp',
-  '/images/courses/intro-water-damage-restoration.webp',
-  '/images/courses/intro-applied-structural-drying.webp',
-  '/images/courses/dehumidification.webp',
-  '/images/courses/moisture-meter-training.webp',
-  '/images/courses/intro-infrared-thermography.webp',
-  '/images/courses/mould-remediation-level-1.webp',
-  '/images/courses/mould-remediation-level-2.webp',
-  '/images/courses/containment-barriers.webp',
-  '/images/courses/fire-damage-assessment.webp',
-  '/images/courses/intro-smoke-soot-restoration.webp',
-  '/images/courses/soot-removal.webp',
-  '/images/courses/intro-odour-control.webp',
-  '/images/courses/carpet-cleaning-basics.webp',
-  '/images/courses/rug-cleaning.webp',
-  '/images/courses/hard-floor-cleaning.webp',
-  '/images/courses/contents-restoration.webp',
-  '/images/courses/document-drying.webp',
-  '/images/courses/biohazard-remediation.webp',
-  '/images/courses/donning-doffing-ppe.webp',
-  '/images/courses/healthcare-cleaning.webp',
-  '/images/courses/risk-assessment.webp',
-  '/images/courses/insurance-documentation.webp',
-  '/images/courses/air-filtration-equipment.webp',
+/**
+ * The floor's tiles. Each image shows work taught by the published course named beside it
+ * (every slug resolved on carsi.com.au/api/lms/courses, 18/10/2026). Tiles are illustrations of
+ * that work, so copy still never calls a tile "a course". Every image must exist under /public.
+ *
+ * Every image was inspected at full size (18/10/2026). Excluded, and never to be re-added here:
+ * images showing an IICRC discipline acronym or biohazard work CARSI does not
+ * teach, a stray colour code, or legible misspelt signage. See BANNED_TILE_IMAGES.
+ */
+export const HEX_COURSE_TILES = [
+  {
+    image: '/images/courses/intro-water-damage-restoration.webp',
+    course: 'introduction-to-water-damage-restoration',
+  },
+  {
+    image: '/images/courses/intro-applied-structural-drying.webp',
+    course: 'introduction-to-applied-structural-drying',
+  },
+  {
+    image: '/images/courses/dehumidification.webp',
+    course: 'refrigerant-dehumidifiers-for-water-loss-restoration',
+  },
+  { image: '/images/courses/moisture-meter-training.webp', course: 'moisture-meter-course' },
+  {
+    image: '/images/courses/intro-infrared-thermography.webp',
+    course: 'introduction-to-infrared-thermography-for-drying',
+  },
+  {
+    image: '/images/courses/mould-remediation-level-1.webp',
+    course: 'level-1-mould-remediation-2cc96b85',
+  },
+  {
+    image: '/images/courses/mould-remediation-level-2.webp',
+    course: 'level-2-mould-remediation-30ee3492',
+  },
+  { image: '/images/courses/fire-damage-assessment.webp', course: 'fire-smoke-restoration-core' },
+  {
+    image: '/images/courses/intro-smoke-soot-restoration.webp',
+    course: 'introduction-to-smoke-and-soot-damage-restoration',
+  },
+  {
+    image: '/images/courses/soot-removal.webp',
+    course: 'introduction-to-smoke-and-soot-damage-restoration',
+  },
+  {
+    image: '/images/courses/intro-odour-control.webp',
+    course: 'introduction-to-odour-control-and-removal-techniques',
+  },
+  {
+    image: '/images/courses/carpet-cleaning-basics.webp',
+    course: 'carpet-cleaning-basics-b66757ce',
+  },
+  { image: '/images/courses/glass-cleaning.webp', course: 'glass-cleaning-course' },
+  {
+    image: '/images/courses/hard-floor-cleaning.webp',
+    course: 'tile-cleaning-for-carpet-cleaners',
+  },
+  {
+    image: '/images/courses/intro-water-extraction.webp',
+    course: 'introduction-to-water-extraction-methods',
+  },
+  {
+    image: '/images/courses/intro-asbestos-awareness.webp',
+    course: 'introduction-to-asbestos-asbestos-awareness',
+  },
+  {
+    image: '/images/courses/infection-control-childcare.webp',
+    course: 'infection-control-in-child-care',
+  },
+  { image: '/images/courses/risk-assessment.webp', course: 'risk-assessment-course' },
+  {
+    image: '/images/courses/air-filtration-equipment.webp',
+    course: 'using-air-scrubbers-and-afds-to-improve-job-site-air-quality',
+  },
+] as const;
+
+export const HEX_COURSE_IMAGES = HEX_COURSE_TILES.map((t) => t.image);
+
+/** Images that failed the full-size inspection; the geometry test keeps them out of the floor. */
+export const BANNED_TILE_IMAGES = [
+  '/images/courses/flood-restoration.webp', // an IICRC discipline acronym printed on the bin
+  '/images/courses/containment-barriers.webp', // "BIOHAZARD" tape and an IICRC discipline acronym on the machine
+  '/images/courses/donning-doffing-ppe.webp', // "#2490ec" colour code baked into the scene
+  '/images/courses/insurance-documentation.webp', // legible misspelt document headings
+  '/images/courses/contents-restoration.webp', // legible misspelt "SAVVAGE" box
+  '/images/courses/rug-cleaning.webp', // no published course
+  '/images/courses/biohazard-remediation.webp', // no published course
+  '/images/courses/healthcare-cleaning.webp', // no published course
 ] as const;
 
 /** Pixel size of one square slot in the course atlas texture. */
