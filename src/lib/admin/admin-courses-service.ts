@@ -18,6 +18,7 @@ import {
   ensureCatalogInstructor,
   type CourseWithCurriculum,
 } from '@/lib/server/course-catalog-sync';
+import { writeQuizQuestions } from '@/lib/lms/quiz-explanation-carry';
 
 /** Interactive tx default is 5s; remote Postgres + many modules/lessons exceeds that (P2028). */
 const ADMIN_COURSE_WRITE_TX_OPTIONS = {
@@ -30,6 +31,8 @@ export type AdminQuizQuestionInput = {
   options: string[];
   correctIndex: number;
   points?: number;
+  /** Practitioner-authored "why" for a wrong answer. Absent: the saved one is kept. */
+  explanation?: string | null;
 };
 
 export type AdminModuleQuizInput = {
@@ -112,7 +115,20 @@ export function parseModuleQuiz(raw: unknown): AdminModuleQuizInput | undefined 
     if (!questionText || options.length < 2) continue;
     if (correctIndex < 0 || correctIndex >= options.length) continue;
     const points = typeof qq.points === 'number' && qq.points > 0 ? qq.points : 1;
-    questions.push({ questionText, options, correctIndex, points });
+    // Absent keeps the saved explanation; null or a blank string removes it.
+    const explanation =
+      typeof qq.explanation === 'string' && qq.explanation.trim()
+        ? qq.explanation.trim()
+        : qq.explanation === null || typeof qq.explanation === 'string'
+          ? null
+          : undefined;
+    questions.push({
+      questionText,
+      options,
+      correctIndex,
+      points,
+      ...(explanation !== undefined ? { explanation } : {}),
+    });
   }
   if (questions.length === 0) return undefined;
   return {
@@ -335,7 +351,7 @@ function buildDesiredLessons(
  * Re-uses an existing quiz id (from the caller or the module's current quiz lesson) so
  * re-writes don't orphan quizzes or lose attempt history.
  */
-async function writeModuleQuiz(
+export async function writeModuleQuiz(
   tx: Prisma.TransactionClient,
   courseId: string,
   moduleTitle: string,
@@ -343,29 +359,25 @@ async function writeModuleQuiz(
   existingQuizId?: string
 ): Promise<string> {
   const quizId = quiz.id ?? existingQuizId ?? randomUUID();
-  const title = quiz.title ?? `${moduleTitle} — Knowledge check`;
-  const passPercentage = quiz.passPercentage ?? 80;
-  const attemptsAllowed = quiz.attemptsAllowed ?? 3;
+  // Defaults apply only to a new quiz. An existing quiz keeps any setting the save leaves out:
+  // its title, pass mark and attempt limit are part of the lesson's content version.
   await tx.lmsQuiz.upsert({
     where: { id: quizId },
-    create: { id: quizId, courseId, title, passPercentage, attemptsAllowed },
-    update: { courseId, title, passPercentage, attemptsAllowed },
+    create: {
+      id: quizId,
+      courseId,
+      title: quiz.title ?? `${moduleTitle} — Knowledge check`,
+      passPercentage: quiz.passPercentage ?? 80,
+      attemptsAllowed: quiz.attemptsAllowed ?? 3,
+    },
+    update: {
+      courseId,
+      ...(quiz.title !== undefined ? { title: quiz.title } : {}),
+      ...(quiz.passPercentage !== undefined ? { passPercentage: quiz.passPercentage } : {}),
+      ...(quiz.attemptsAllowed !== undefined ? { attemptsAllowed: quiz.attemptsAllowed } : {}),
+    },
   });
-  // Replace questions so re-writes stay in sync with the input.
-  await tx.lmsQuizQuestion.deleteMany({ where: { quizId } });
-  for (let i = 0; i < quiz.questions.length; i += 1) {
-    const q = quiz.questions[i];
-    await tx.lmsQuizQuestion.create({
-      data: {
-        quizId,
-        questionText: q.questionText,
-        options: q.options.map((text) => ({ text })),
-        correctIndex: q.correctIndex,
-        orderIndex: i,
-        points: q.points ?? 1,
-      },
-    });
-  }
+  await writeQuizQuestions(tx, quizId, quiz.questions);
   return quizId;
 }
 
@@ -388,7 +400,7 @@ async function pruneOrphanQuizzes(
   });
 }
 
-async function syncModuleLessons(
+export async function syncModuleLessons(
   tx: Prisma.TransactionClient,
   courseId: string,
   moduleId: string,
@@ -401,12 +413,13 @@ async function syncModuleLessons(
     orderIndex: number;
     contentType: string;
     contentBody: string | null;
+    isPreview: boolean;
   }[],
   firstModule: boolean
-): Promise<string | null> {
+): Promise<string[]> {
   let quizId: string | null = null;
+  const existingQuizLesson = existingLessons.find((l) => l.contentType === 'quiz');
   if (quiz) {
-    const existingQuizLesson = existingLessons.find((l) => l.contentType === 'quiz');
     quizId = await writeModuleQuiz(
       tx,
       courseId,
@@ -414,45 +427,104 @@ async function syncModuleLessons(
       quiz,
       existingQuizLesson?.contentBody ?? undefined
     );
+  } else if (existingQuizLesson?.contentBody) {
+    // The course editor sends module text and video but no quiz. Omitted is not removed: keep
+    // the module's existing quiz (and its questions, explanations and attempt history).
+    quizId = existingQuizLesson.contentBody;
   }
 
+  // The course editor represents one reading, one video and one quiz per module. Only those
+  // lessons are written: every other lesson (a second reading, an omitted quiz) is left exactly
+  // as it is, and a kept lesson keeps its id and position, so learner progress survives and a
+  // quiz lesson's content version only changes when its quiz is saved.
   const desired = buildDesiredLessons(moduleTitle, textContent, videoUrl, quizId ?? undefined);
   const sortedExisting = [...existingLessons].sort((a, b) => a.orderIndex - b.orderIndex);
-
-  for (let i = 0; i < desired.length; i += 1) {
-    const d = desired[i];
-    const ex = sortedExisting[i];
-    const isPreview = firstModule && i === 0;
-    if (ex) {
+  let nextOrder = sortedExisting.length
+    ? sortedExisting[sortedExisting.length - 1].orderIndex + 1
+    : 0;
+  const createdLessons: {
+    id: string;
+    orderIndex: number;
+    isPreview: boolean;
+    contentType: string;
+  }[] = [];
+  const deleted = new Set<string>();
+  const repointed = new Set<string>();
+  for (const kind of ['text', 'video', 'quiz'] as const) {
+    if (kind === 'quiz' && !quiz) continue;
+    const d = desired.find((l) => l.contentType === kind);
+    const ex =
+      kind === 'quiz'
+        ? (sortedExisting.find((e) => e.contentType === 'quiz' && e.contentBody === quizId) ??
+          sortedExisting.find((e) => e.contentType === 'quiz'))
+        : sortedExisting.find((e) => e.contentType === kind);
+    if (d && ex && kind === 'quiz') {
+      // A kept quiz lesson keeps its title (part of its content version); it is only re-pointed
+      // when the saved quiz is a different one.
+      if (ex.contentBody !== d.contentBody) {
+        await tx.lmsLesson.update({ where: { id: ex.id }, data: { contentBody: d.contentBody } });
+        repointed.add(ex.id);
+      }
+    } else if (d && ex) {
       await tx.lmsLesson.update({
         where: { id: ex.id },
-        data: {
-          title: d.title,
-          contentType: d.contentType,
-          contentBody: d.contentBody,
-          orderIndex: i,
-          isPreview,
-        },
+        data: { title: d.title, contentBody: d.contentBody },
       });
-    } else {
+    } else if (d) {
+      const lesson = {
+        id: randomUUID(),
+        orderIndex: nextOrder++,
+        // Only a reading can be the public preview (the page renders its body as text).
+        isPreview:
+          firstModule &&
+          d.contentType === 'text' &&
+          !sortedExisting.some((e) => e.contentType === 'text'),
+      };
       await tx.lmsLesson.create({
         data: {
-          id: randomUUID(),
+          ...lesson,
           moduleId,
           title: d.title,
           contentType: d.contentType,
           contentBody: d.contentBody,
-          orderIndex: i,
-          isPreview,
         },
       });
+      createdLessons.push({ ...lesson, contentType: d.contentType });
+    } else if (ex) {
+      // The editor removed this module's reading or video.
+      await tx.lmsLesson.delete({ where: { id: ex.id } });
+      deleted.add(ex.id);
     }
   }
-  for (let j = desired.length; j < sortedExisting.length; j += 1) {
-    await tx.lmsLesson.delete({ where: { id: sortedExisting[j].id } });
+
+  // Only the first module has a free preview, and it is always a reading: the public course page
+  // renders the preview's body as text, so a video (a URL) or a quiz (a quiz id) must never be it.
+  // Keep the current preview reading; otherwise use the earliest remaining reading; otherwise none.
+  // Every other lesson still flagged as a preview is cleared, including in a module that is no
+  // longer first after a reorder (its paid reading would otherwise stay public).
+  const remaining = [...sortedExisting.filter((e) => !deleted.has(e.id)), ...createdLessons].sort(
+    (a, b) => a.orderIndex - b.orderIndex
+  );
+  const preview = firstModule
+    ? (remaining.find((l) => l.isPreview && l.contentType === 'text') ??
+      remaining.find((l) => l.contentType === 'text'))
+    : undefined;
+  for (const l of remaining) {
+    const shouldBe = l.id === preview?.id;
+    if (l.isPreview !== shouldBe) {
+      await tx.lmsLesson.update({ where: { id: l.id }, data: { isPreview: shouldBe } });
+    }
   }
 
-  return quizId;
+  // Every quiz the module's lessons still reference (a second quiz lesson the editor does not
+  // show included), so pruning never deletes a quiz a kept lesson points to.
+  const quizIds = new Set(
+    sortedExisting
+      .filter((e) => e.contentType === 'quiz' && e.contentBody && !repointed.has(e.id))
+      .map((e) => e.contentBody as string)
+  );
+  if (quizId) quizIds.add(quizId);
+  return [...quizIds];
 }
 
 /** LmsQuizQuestion.options is stored as `{ text }[]` JSON; normalise back to plain strings. */
@@ -539,6 +611,7 @@ export function courseToAdminDto(course: CourseWithCurriculum) {
                 options: quizOptionsToStrings(q.options),
                 correctIndex: q.correctIndex,
                 points: q.points,
+                explanation: q.explanation ?? null,
               })),
           }
         : undefined;
@@ -854,7 +927,7 @@ export async function adminCreateCourse(
             orderIndex: i,
           },
         });
-        const qid = await syncModuleLessons(
+        const qids = await syncModuleLessons(
           tx,
           courseId,
           moduleId,
@@ -865,7 +938,7 @@ export async function adminCreateCourse(
           [],
           i === 0
         );
-        if (qid) usedQuizIds.push(qid);
+        usedQuizIds.push(...qids);
       }
       await pruneOrphanQuizzes(tx, courseId, usedQuizIds);
     },
@@ -936,7 +1009,7 @@ export async function adminUpdateCourse(
         const m = modules[i];
         let moduleId: string;
         const prev = m.id && existingById.get(m.id);
-        let qid: string | null;
+        let qids: string[];
 
         if (prev) {
           moduleId = prev.id;
@@ -946,7 +1019,7 @@ export async function adminUpdateCourse(
             data: { title: m.title, orderIndex: i },
           });
           const lessons = await tx.lmsLesson.findMany({ where: { moduleId } });
-          qid = await syncModuleLessons(
+          qids = await syncModuleLessons(
             tx,
             id,
             moduleId,
@@ -959,6 +1032,7 @@ export async function adminUpdateCourse(
               orderIndex: l.orderIndex,
               contentType: l.contentType,
               contentBody: l.contentBody,
+              isPreview: l.isPreview,
             })),
             i === 0
           );
@@ -972,7 +1046,7 @@ export async function adminUpdateCourse(
               orderIndex: i,
             },
           });
-          qid = await syncModuleLessons(
+          qids = await syncModuleLessons(
             tx,
             id,
             moduleId,
@@ -984,7 +1058,7 @@ export async function adminUpdateCourse(
             i === 0
           );
         }
-        if (qid) usedQuizIds.push(qid);
+        usedQuizIds.push(...qids);
       }
 
       for (const mod of existing.modules) {

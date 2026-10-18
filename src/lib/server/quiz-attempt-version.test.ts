@@ -36,8 +36,12 @@ beforeEach(() => {
   mocks.graph.mockResolvedValue({ quiz, questions: quiz.questions, contentVersion: version });
   mocks.quiz.mockResolvedValue(quiz); mocks.enrollment.mockResolvedValue({ id: lessonId });
   mocks.count.mockResolvedValue(0); mocks.create.mockResolvedValue({ id: 'legacy-attempt' });
-  mocks.raw.mockImplementation(async (sql: TemplateStringsArray) => sql.join('?').includes('COUNT(*)')
-    ? [{ count: 0 }] : [{ id: 'bound-attempt' }]);
+  mocks.raw.mockImplementation(async (sql: TemplateStringsArray) => {
+    const text = sql.join('?');
+    if (text.includes('COUNT(*)')) return [{ count: 0 }];
+    if (text.includes('explanation')) return [];
+    return [{ id: 'bound-attempt' }];
+  });
   mocks.transaction.mockImplementation(async (fn, options) => {
     expect(options.isolationLevel).toBe('Serializable');
     return fn({ $queryRaw: mocks.raw, lmsQuizAttempt: { count: mocks.count, create: mocks.create } });
@@ -51,7 +55,7 @@ describe('version-bound quiz attempts', () => {
     expect(result.status).toBe(200);
     expect(result.headers.get('cache-control')).toBe('no-store');
     expect(await result.json()).toEqual({ attempt_id: 'bound-attempt', score_percent: 100, passed: true,
-      pass_percentage: 80, correct_count: 1, question_count: 1, attempts_remaining: 1 });
+      pass_percentage: 80, correct_count: 1, question_count: 1, attempts_remaining: 1, feedback: [] });
     expect(mocks.graph).toHaveBeenCalledExactlyOnceWith(expect.anything(), studentId, lessonId, quizId, version);
     const insert = mocks.raw.mock.calls.find(([sql]) => sql.join('?').includes('INSERT INTO'))!;
     expect(insert[0].join('?')).toContain('content_version');
@@ -155,7 +159,7 @@ describe('headerless legacy attempt compatibility', () => {
     const result = await POST(request({ answers: { [questionId]: 1 } }, null), ctx);
     expect(result.status).toBe(200);
     expect(await result.json()).toEqual({ attempt_id: 'legacy-attempt', score_percent: 100, passed: true,
-      pass_percentage: 80, correct_count: 1, question_count: 1, attempts_remaining: 1 });
+      pass_percentage: 80, correct_count: 1, question_count: 1, attempts_remaining: 1, feedback: [] });
     expect(mocks.create).toHaveBeenCalledWith({ data: { quizId, studentId, scorePercent: 100, passed: true,
       answers: { [questionId]: 1 } } });
     expect(mocks.graph).not.toHaveBeenCalled(); expect(mocks.raw).not.toHaveBeenCalled();

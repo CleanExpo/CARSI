@@ -487,6 +487,8 @@ model LmsQuizQuestion {
   correctIndex Int    @map("correct_index")
   orderIndex   Int    @default(0) @map("order_index")
   points       Int    @default(1)
+  /// Practitioner-authored "why" shown after a wrong answer. Never generated from IICRC standard text.
+  explanation  String? @db.Text
 
   quiz LmsQuiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
 

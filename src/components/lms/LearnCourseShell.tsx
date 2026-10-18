@@ -34,6 +34,7 @@ import {
 } from '@/lib/lms/progress-share-post';
 import { extractQuizIdFromLesson } from '@/lib/lms/quiz-from-lesson';
 import { isOnboardingCourse, parseOnboardingMeta } from '@/lib/onboarding/enterprise';
+import type { QuizFeedbackItem } from '@/lib/lms/quiz-feedback';
 
 interface CurriculumLesson {
   id: string;
@@ -152,6 +153,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
     correct_count?: number;
     question_count?: number;
     attempts_remaining?: number;
+    feedback?: QuizFeedbackItem[];
     userId: string;
     lessonId: string;
     contentVersion?: string;
@@ -352,6 +354,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
           correct_count?: number;
           question_count?: number;
           attempts_remaining?: number;
+          feedback?: QuizFeedbackItem[];
         }>(`/api/lms/quizzes/${encodeURIComponent(quizData.id)}/attempt`, user.id, 'POST',
           { answers, lessonId: activeLessonId, contentVersion: checkpoint.state.response?.contentVersion });
         if (currentScope.current !== scope) return;
@@ -950,6 +953,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                                 passPercentage={quizData.pass_percentage}
                                 onContinue={handleQuizContinue}
                                 loading={savingComplete}
+                                feedback={displayedQuizResult.feedback}
                               />
                               {completeError ? (
                                 <p role="alert" className="mt-2 text-sm text-red-600">
@@ -971,6 +975,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                                   displayedQuizResult.question_count ?? quizData.questions.length
                                 }
                                 attemptsRemaining={displayedQuizResult.attempts_remaining}
+                                feedback={displayedQuizResult.feedback}
                                 saving={savingComplete}
                                 onContinue={handleQuizContinue}
                                 onReview={

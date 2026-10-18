@@ -6,6 +6,7 @@ import { CheckCircle2, Circle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { dash } from '@/lib/dashboard-light-ui';
 import { cn } from '@/lib/utils';
+import type { QuizFeedbackItem } from '@/lib/lms/quiz-feedback';
 
 interface QuizOption {
   text: string;
@@ -248,6 +249,33 @@ export function QuizPlayer({ quiz, onSubmit, variant = 'default', initialDraft, 
   );
 }
 
+/**
+ * Corrective feedback after a submitted attempt: the authored "why" for each question the learner
+ * got wrong. Renders nothing when no explanation exists, so unauthored quizzes look as before.
+ */
+export function QuizFeedbackList({ feedback }: { feedback?: QuizFeedbackItem[] | null }) {
+  if (!feedback?.length) return null;
+  return (
+    <section aria-labelledby="quiz-feedback-title" className="mt-6 text-left">
+      <h4 id="quiz-feedback-title" className="text-sm font-semibold text-slate-900">
+        Why those answers were wrong
+      </h4>
+      <ol className="mt-3 space-y-3">
+        {feedback.map((item) => (
+          <li
+            key={item.question_id}
+            data-quiz-feedback={item.question_id}
+            className="rounded-lg border border-slate-200 bg-slate-50 p-3"
+          >
+            <p className="text-sm font-medium text-slate-900">{item.question_text}</p>
+            <p className="mt-1 text-sm text-slate-700">{item.explanation}</p>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
+
 export function LearnerQuizResult({
   passed,
   scorePercent,
@@ -258,6 +286,7 @@ export function LearnerQuizResult({
   onContinue,
   onReview,
   saving,
+  feedback,
 }: {
   passed: boolean;
   scorePercent: number;
@@ -268,6 +297,7 @@ export function LearnerQuizResult({
   onContinue: () => void;
   onReview?: () => void;
   saving?: boolean;
+  feedback?: QuizFeedbackItem[] | null;
 }) {
   return (
     <section className="rounded-xl border border-slate-200 bg-white px-5 py-8 text-center sm:px-8" role="status">
@@ -288,6 +318,7 @@ export function LearnerQuizResult({
             : 'No attempts remaining. Review the course material before asking support for help.'}
         </p>
       ) : null}
+      <QuizFeedbackList feedback={feedback} />
       <div className="mt-6 flex flex-wrap justify-center gap-2">
         {passed ? (
           <Button type="button" onClick={onContinue} disabled={saving}>
@@ -319,12 +350,14 @@ export function EnterpriseQuizResult({
   passPercentage,
   onContinue,
   loading,
+  feedback,
 }: {
   passed: boolean;
   scorePercent: number;
   passPercentage: number;
   onContinue?: () => void;
   loading?: boolean;
+  feedback?: QuizFeedbackItem[] | null;
 }) {
   return (
     <div
@@ -357,6 +390,7 @@ export function EnterpriseQuizResult({
         Your score: <strong className="text-slate-900">{scorePercent}%</strong> (pass mark{' '}
         {passPercentage}%)
       </p>
+      <QuizFeedbackList feedback={feedback} />
       {onContinue ? (
         <Button className="mt-6" onClick={onContinue} disabled={loading}>
           {passed ? 'Continue training' : 'Try again'}

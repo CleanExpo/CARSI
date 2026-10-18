@@ -1,81 +1,18 @@
-'use client';
+import { redirect } from 'next/navigation';
 
-import { LessonPlayer } from '@/components/lms/LessonPlayer';
-import { Button } from '@/components/ui/button';
-import { apiClient } from '@/lib/api/client';
-import { ArrowLeft, ClipboardList } from 'lucide-react';
-import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { lessonPlayerHref } from '@/lib/lms/quiz-links';
 
-interface Lesson {
-  id: string;
-  title: string;
-  content_type: string | null;
-  content_body: string | null;
-  drive_file_id: string | null;
-  duration_minutes: number | null;
-  is_preview: boolean;
-  order_index: number;
-  course_id: string;
-  quiz_id: string | null;
-}
-
-export default function LessonPage() {
-  const params = useParams<{ slug: string; lessonId: string }>();
-  const router = useRouter();
-  const [lesson, setLesson] = useState<Lesson | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    apiClient
-      .get<Lesson>(`/api/lms/lessons/${params.lessonId}`)
-      .then((data) => setLesson(data))
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, [params.lessonId]);
-
-  return (
-    <div className="space-y-6">
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => router.push(`/courses/${params.slug}`)}
-        className="gap-2"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back to course
-      </Button>
-
-      {loading && <p className="text-muted-foreground">Loading lesson…</p>}
-      {error && <p className="text-destructive">{error}</p>}
-      {lesson && (
-        <>
-          <LessonPlayer lesson={lesson} />
-          {lesson.quiz_id && (
-            <div
-              className="mt-6 rounded-xl border border-[#2490ed]/20 bg-[#eef7ff] p-4"
-            >
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="text-sm font-semibold text-slate-900">Assessment</p>
-                  <p className="mt-0.5 text-xs text-slate-500">
-                    Test your knowledge for this lesson
-                  </p>
-                </div>
-                <Button
-                  onClick={() => router.push(`/courses/${params.slug}/quiz/${lesson.quiz_id}`)}
-                  className="shrink-0 gap-2 rounded-sm"
-                  style={{ background: '#2490ed', color: '#fff' }}
-                >
-                  <ClipboardList className="h-4 w-4" />
-                  Take Quiz
-                </Button>
-              </div>
-            </div>
-          )}
-        </>
-      )}
-    </div>
-  );
+/**
+ * Legacy lesson URL. This page read the lesson API as a flat lesson although the API returns
+ * { lesson, resources, enrollment_id, course }, so it rendered no title, no content and an
+ * unreachable "Take Quiz" button whose target returned 404. The course player renders the
+ * lesson, its resources and its quiz checkpoint, so old links and bookmarks land there.
+ */
+export default async function LegacyLessonRedirectPage({
+  params,
+}: {
+  params: Promise<{ slug: string; lessonId: string }>;
+}) {
+  const { slug, lessonId } = await params;
+  redirect(lessonPlayerHref(decodeURIComponent(slug), decodeURIComponent(lessonId)));
 }
