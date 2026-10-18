@@ -41,7 +41,7 @@ These values come from the live Organization schema on https://carsi.com.au/ (JS
 | Long name | Centre for Australian Restoration and Standards Information | Use only where a field asks for the legal or long name. |
 | Website | https://carsi.com.au | |
 | Email | support@carsi.com.au | |
-| Address | Forest Lake QLD, Australia | The schema has **no street address**. Google needs a real street address to verify. A service-area business hides it from the public. Do not use a PO box. |
+| Address | Forest Lake QLD, Australia | The schema has **no street address**. Google needs a real street address to verify; a service-area business hides it from the public. The site footer shows **PO Box 4309, Forest Lake QLD 4078**: Google does not accept a PO box as a Business Profile address, so do not use it on any listing. |
 | Phone | **none published** | The schema has no telephone. If you add one to a listing, add the same number to the site's Organization schema so the two match. That schema belongs to the GEO thread, so hand it over rather than editing it here. |
 | Hours | only if in person | Publish hours only for times someone is actually available to meet customers in person. |
 | Service area (if a service-area business) | The Australian states and territories you genuinely travel to | The schema says Australia-wide (all 8 states and territories). Pick only the places you really visit. |
