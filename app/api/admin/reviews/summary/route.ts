@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 
 import { getAdminSessionOrNull } from '@/lib/admin/admin-session';
+import { prisma } from '@/lib/prisma';
+import { resolveCurrentAdmin } from '@/lib/server/current-admin';
 import { getReviewFunnelSummary } from '@/lib/server/review-summary';
 
 /**
@@ -17,6 +19,10 @@ export async function GET() {
     return NextResponse.json({ detail: 'Database not configured' }, { status: 503 });
   }
   try {
+    // Includes hidden reviews and moderation reasons: the admin is re-checked in the database.
+    if (!(await resolveCurrentAdmin(prisma, session.email))) {
+      return NextResponse.json({ detail: 'Only current admins can view this.' }, { status: 403 });
+    }
     return NextResponse.json(await getReviewFunnelSummary());
   } catch (e) {
     console.error('[admin/reviews/summary]', e);

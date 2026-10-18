@@ -10,6 +10,7 @@
 import { createHash } from 'node:crypto';
 
 import { prisma } from '@/lib/prisma';
+import { requireCurrentAdmin } from '@/lib/server/current-admin';
 import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
 import {
   ANONYMOUS_REVIEWER_LABEL,
@@ -337,10 +338,13 @@ export function toModerationDto(
  */
 export async function setReviewVisibility(
   params:
-    | { reviewId: string; isPublished: false; reason: ReviewHideReason; actorId: string; actorEmail: string }
-    | { reviewId: string; isPublished: true; reason?: undefined; actorId: string; actorEmail: string }
+    | { reviewId: string; isPublished: false; reason: ReviewHideReason; actorId: string; sessionEmail: string }
+    | { reviewId: string; isPublished: true; reason?: undefined; actorId: string; sessionEmail: string }
 ): Promise<void> {
   await prisma.$transaction(async (tx) => {
+    // The moderator is re-validated from the database inside the decision's transaction (r7), with
+    // the same function as the email switch; a demoted or deactivated admin's token is refused.
+    const admin = await requireCurrentAdmin(tx, params.sessionEmail);
     const review = await tx.lmsCourseReview.update({
       where: { id: params.reviewId },
       // The UPDATE takes the review-row lock and bumps the version atomically, so concurrent
@@ -368,7 +372,7 @@ export async function setReviewVisibility(
         actorId: params.actorId,
         // Durable snapshot: who decided survives deleting the admin's account.
         actorRef: params.actorId,
-        actorEmail: params.actorEmail,
+        actorEmail: admin.email,
         ratingAtAction: review.rating,
         contentSha256: reviewContentSha256(review.title, review.body, review.rating),
       },
@@ -443,15 +447,24 @@ export async function upsertReview(params: {
 }): Promise<void> {
   const title = params.title?.trim() || null;
   const body = params.body?.trim() || null;
-  await prisma.lmsCourseReview.upsert({
-    where: { courseId_studentId: { courseId: params.courseId, studentId: params.studentId } },
-    create: {
-      courseId: params.courseId,
-      studentId: params.studentId,
-      rating: params.rating,
-      title,
-      body,
-    },
-    update: { rating: params.rating, title, body },
+  await prisma.$transaction(async (tx) => {
+    // Lock the enrolment row first (release-gate r7). The review-request send holds it FOR SHARE
+    // while it checks "has reviewed?" and calls the provider, so this review either commits before
+    // that check (and no email goes) or waits until the send is recorded. NO KEY UPDATE does not
+    // block foreign-key checks from other tables.
+    await tx.$queryRaw`
+      SELECT "id" FROM "lms_enrollments"
+       WHERE "student_id" = ${params.studentId}::uuid AND "course_id" = ${params.courseId}::uuid FOR NO KEY UPDATE`;
+    await tx.lmsCourseReview.upsert({
+      where: { courseId_studentId: { courseId: params.courseId, studentId: params.studentId } },
+      create: {
+        courseId: params.courseId,
+        studentId: params.studentId,
+        rating: params.rating,
+        title,
+        body,
+      },
+      update: { rating: params.rating, title, body },
+    });
   });
 }

@@ -61,6 +61,8 @@ const db = vi.hoisted(() => ({
   beforeSendTx: null as null | (() => void),
   /** Makes the next send transaction fail after the provider call (e.g. the commit is lost). */
   failSendTxAfterProvider: false,
+  /** Makes the next locked read of this table time out (SQLSTATE 55P03) inside the send transaction. */
+  lockTimeoutOn: null as null | string,
 }));
 const mail = vi.hoisted(() => ({ send: vi.fn(), configured: vi.fn(() => true) }));
 const unsub = vi.hoisted(() => ({ setOptOut: vi.fn(async (_id: string, optedOut: boolean) => ({ email_opt_out: optedOut })) }));
@@ -101,10 +103,28 @@ vi.mock('@/lib/prisma', () => ({
     },
     // The locked switch read: SELECT "enabled" ... FOR SHARE (the fake records the SQL).
     // The locked reads (FOR SHARE / FOR UPDATE). The fake records the SQL and the locks taken.
+    $executeRawUnsafe: async (sql: string) => {
+      db.rawSql.push(sql);
+      return 0;
+    },
+    $executeRaw: async (strings: TemplateStringsArray) => {
+      const sql = strings.join('?');
+      db.rawSql.push(sql);
+      if (sql.includes('pg_advisory_xact_lock_shared')) db.locks.add('switch-fair-lock');
+      return 1;
+    },
     $queryRaw: async (strings: TemplateStringsArray, ...values: unknown[]) => {
       const sql = strings.join('?');
       db.rawSql.push(sql);
       const id = values[0] as string;
+      if (db.lockTimeoutOn && sql.includes(`"${db.lockTimeoutOn}"`)) {
+        db.lockTimeoutOn = null;
+        throw Object.assign(new Error('canceling statement due to lock timeout'), { code: '55P03' });
+      }
+      if (sql.includes('"lms_course_reviews"')) {
+        // Read under the enrolment lock: (course_id, student_id).
+        return db.reviews.has(`${values[0]}:${values[1]}`) ? [{ id: 'r' }] : [];
+      }
       if (sql.includes('"lms_review_request_settings"')) {
         db.locks.add('settings');
         return db.settings ? [{ enabled: db.settings.enabled }] : [];
@@ -215,6 +235,7 @@ vi.mock('@/lib/prisma', () => ({
 const {
   decideSendGate,
   isDefiniteNonDelivery,
+  isLockNotAvailableError,
   renderReviewRequestEmail,
   REVIEW_REQUEST_MAX_SENDS_PER_RUN,
   reviewRequestWindow,
@@ -268,6 +289,7 @@ beforeEach(() => {
   db.locks.clear();
   db.beforeSendTx = null;
   db.failSendTxAfterProvider = false;
+  db.lockTimeoutOn = null;
   unsub.setOptOut.mockClear();
   mail.send.mockReset().mockResolvedValue({ sent: true, messageId: 'm-1' });
   mail.configured.mockReset().mockReturnValue(true);
@@ -413,13 +435,63 @@ describe('ONE locked transaction per send (release-gate r6)', () => {
       return { sent: true, messageId: 'm-locked' };
     });
     expect((await run()).sent).toBe(1);
-    expect(heldDuringSend).toEqual(['enrollment:e1', 'ledger:e1', 'settings', 'user:student-e1']);
+    expect(heldDuringSend).toEqual(['enrollment:e1', 'ledger:e1', 'settings', 'switch-fair-lock', 'user:student-e1']);
     const sql = db.rawSql.join('\n');
     expect(sql).toMatch(/"lms_review_request_settings" WHERE "id" = 1 FOR SHARE/);
     expect(sql).toMatch(/FROM "lms_enrollments" WHERE "id" = \?::uuid FOR SHARE/);
     expect(sql).toMatch(/FROM "lms_users" WHERE "id" = \?::uuid FOR SHARE/);
     expect(sql).toMatch(/FROM "lms_review_request_emails"\s+WHERE "enrollment_id" = \?::uuid FOR UPDATE/);
   });
+
+  it('r7: every lock wait is bounded and the switch\'s fair lock is taken shared before any row lock', async () => {
+    addCompleter('e1', 5 * D);
+    await run();
+    const i = (re: RegExp) => db.rawSql.findIndex((q) => re.test(q));
+    const lockTimeout = i(/^SET LOCAL lock_timeout = '2000ms'$/);
+    const idle = i(/^SET LOCAL idle_in_transaction_session_timeout = '15000ms'$/);
+    const fair = i(/pg_advisory_xact_lock_shared\(\?::int4, \?::int4\)/);
+    const settingsRow = i(/"lms_review_request_settings" WHERE "id" = 1 FOR SHARE/);
+    expect(lockTimeout).toBeGreaterThanOrEqual(0);
+    expect(idle).toBeGreaterThan(lockTimeout);
+    expect(fair).toBeGreaterThan(idle);
+    expect(settingsRow).toBeGreaterThan(fair);
+  });
+
+  it('r7: "has reviewed?" is re-read inside the send transaction, after the enrolment row lock', async () => {
+    addCompleter('e1', 5 * D);
+    await run();
+    const i = (re: RegExp) => db.rawSql.findIndex((q) => re.test(q));
+    const enrolmentLock = i(/FROM "lms_enrollments" WHERE "id" = \?::uuid FOR SHARE/);
+    const reviewRead = i(/FROM "lms_course_reviews"\s+WHERE "course_id" = \?::uuid AND "student_id" = \?::uuid/);
+    expect(enrolmentLock).toBeGreaterThanOrEqual(0);
+    expect(reviewRead).toBeGreaterThan(enrolmentLock);
+  });
+
+  it('r7 reviewer case: a review committed after the cheap pre-check but before the locked checks → no send', async () => {
+    addCompleter('e1', 5 * D);
+    db.beforeSendTx = () => {
+      db.reviews.add('course-e1:student-e1');
+    };
+    const res = await run();
+    expect(mail.send).not.toHaveBeenCalled();
+    expect(res.skipped.already_reviewed).toBe(1);
+    expect(db.ledger.get('e1')).toMatchObject({ status: 'skipped', failureReason: 'already_reviewed', sendAttemptedAt: null });
+  });
+
+  it.each(['lms_review_request_settings', 'lms_enrollments', 'lms_users', 'lms_review_request_emails'])(
+    'r7: a lock wait on %s that times out before the provider call is a retryable failure, never ambiguous',
+    async (table) => {
+      addCompleter('e1', 5 * D);
+      db.lockTimeoutOn = table;
+      const first = await run();
+      expect(mail.send).not.toHaveBeenCalled();
+      expect(first).toMatchObject({ failed: 1, ambiguous: 0 });
+      expect(db.ledger.get('e1')).toMatchObject({ status: 'failed', failureReason: 'pre_send_error', attempts: 0, sendAttemptedAt: null, claimToken: null });
+      // The next run sends it, exactly once.
+      expect((await run()).sent).toBe(1);
+      expect(mail.send).toHaveBeenCalledTimes(1);
+    }
+  );
 
   it('the provider call has a hard 10 s timeout so the locks are held for a bounded time', async () => {
     addCompleter('e1', 5 * D);
@@ -495,10 +567,29 @@ describe('ONE locked transaction per send (release-gate r6)', () => {
   });
 });
 
+describe('isLockNotAvailableError — a lock_timeout however Prisma wraps it (r7)', () => {
+  it.each([
+    ['pg error code', { code: '55P03', message: 'x' }],
+    ['adapter-pg cause code only', { code: 'P2010', message: 'Raw query failed', meta: { driverAdapterError: { cause: { originalCode: '55P03', originalMessage: 'x' } } } }],
+    ['nested Error cause code only', Object.assign(new Error('outer'), { cause: { originalCode: '55P03' } })],
+    ['message only', new Error('canceling statement due to lock timeout')],
+  ])('%s → true', (_label, e) => {
+    expect(isLockNotAvailableError(e)).toBe(true);
+  });
+  it.each([
+    ['unique violation', { code: 'P2002', meta: { driverAdapterError: { cause: { originalCode: '23505', originalMessage: 'duplicate key' } } } }],
+    ['deadlock', { originalCode: '40P01', originalMessage: 'deadlock detected' }],
+    ['nothing', null],
+  ])('%s → false', (_label, e) => {
+    expect(isLockNotAvailableError(e)).toBe(false);
+  });
+});
+
 describe('decideSendGate — the binding checks, all together (release-gate r6)', () => {
   const ok = {
     switchOn: true,
     enrolment: { status: 'completed', completed_at: new Date('2026-10-10T00:00:00Z') },
+    reviewed: false,
     learner: { email: 'sam@example.com', full_name: 'Sam Rivers', email_opt_out: false, is_active: true },
     ledger: { status: 'pending', claim_token: 'tok', completion_seq: 3 },
     claimToken: 'tok',
@@ -515,6 +606,7 @@ describe('decideSendGate — the binding checks, all together (release-gate r6)'
     ['revoked', { enrolment: { status: 'revoked', completed_at: null } }, 'not_completed'],
     ['status-only revoke', { enrolment: { status: 'active', completed_at: new Date() } }, 'not_completed'],
     ['completed_at cleared', { enrolment: { status: 'completed', completed_at: null } }, 'not_completed'],
+    ['reviewed meanwhile (r7)', { reviewed: true }, 'already_reviewed'],
     ['unsubscribed', { learner: { ...ok.learner, email_opt_out: true } }, 'opted_out'],
     ['deactivated', { learner: { ...ok.learner, is_active: false } }, 'inactive_account'],
     ['no email', { learner: { ...ok.learner, email: ' ' } }, 'no_email'],

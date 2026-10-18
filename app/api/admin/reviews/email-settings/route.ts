@@ -1,12 +1,14 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
 import { getAdminSessionOrNull } from '@/lib/admin/admin-session';
+import { prisma } from '@/lib/prisma';
+import { NotCurrentAdminError, resolveCurrentAdmin } from '@/lib/server/current-admin';
 import { databaseUnavailableResponse, isDatabaseConfigured } from '@/lib/server/database-unavailable';
 import {
   listReviewRequestSwitchEvents,
   readReviewRequestSettings,
   setReviewRequestEmailsEnabled,
-  UnattributableSwitchChangeError,
+  SwitchBusyError,
 } from '@/lib/server/review-request-email';
 
 /**
@@ -15,12 +17,17 @@ import {
  * an enrolment eligible at completion, so nothing completed while the switch was off is ever
  * emailed. Switching OFF stops any send that has not yet started. Every change is appended to an
  * audit history with the old value, the new value and a durable snapshot of the verified admin.
- * The admin's current active flag and role are re-checked in the database on every request, and a
- * change that cannot be attributed to a currently authorised admin is refused.
+ * The admin's current active flag and role are re-checked in the database on every request (the
+ * shared resolveCurrentAdmin), and a change that cannot be attributed to a currently authorised
+ * admin is refused. A change waits for any in-flight send; if one outlasts the bound, 409 (retry).
  */
 export async function GET() {
-  if (!(await getAdminSessionOrNull())) return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 });
+  const session = await getAdminSessionOrNull();
+  if (!session) return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 });
   if (!isDatabaseConfigured()) return databaseUnavailableResponse();
+  if (!(await resolveCurrentAdmin(prisma, session.email))) {
+    return NextResponse.json({ detail: 'Only current admins can view this.' }, { status: 403 });
+  }
   const [settings, history] = await Promise.all([readReviewRequestSettings(), listReviewRequestSwitchEvents()]);
   return NextResponse.json({
     enabled: settings.enabled,
@@ -55,11 +62,14 @@ export async function POST(request: NextRequest) {
     const saved = await setReviewRequestEmailsEnabled(payload.enabled, session.email);
     return NextResponse.json({ enabled: saved.enabled, changed_at: saved.changedAt.toISOString() });
   } catch (e) {
-    if (e instanceof UnattributableSwitchChangeError) {
+    if (e instanceof NotCurrentAdminError) {
       return NextResponse.json(
         { detail: 'This change cannot be attributed to a currently authorised admin, so it was not made.' },
         { status: 403 }
       );
+    }
+    if (e instanceof SwitchBusyError) {
+      return NextResponse.json({ detail: e.message, busy: true }, { status: 409 });
     }
     console.error('[admin/reviews/email-settings POST]', e);
     return NextResponse.json({ detail: 'Failed to update the review-request email switch' }, { status: 500 });

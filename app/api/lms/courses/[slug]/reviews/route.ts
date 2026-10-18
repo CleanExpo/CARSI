@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
+import { prisma } from '@/lib/prisma';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
+import { resolveCurrentAdmin } from '@/lib/server/current-admin';
 import { databaseUnavailableResponse, isDatabaseConfigured } from '@/lib/server/database-unavailable';
 import {
   canManageReviews,
@@ -58,7 +60,8 @@ export async function GET(request: NextRequest, ctx: { params: Promise<{ slug: s
     let reviewerDisplayName: string | null = null;
     if (claims) {
       canManage = canManageReviews(claims.role);
-      canModerate = canModerateReviews(claims.role);
+      // Hidden reviews and their reasons go only to a CURRENT admin, re-checked in the database (r7).
+      canModerate = canModerateReviews(claims.role) && (await resolveCurrentAdmin(prisma, claims.email)) !== null;
       canReview = await isEnrolledInCourse(claims.sub, course.id);
       ownReview = canReview ? await getOwnReview(claims.sub, course.id) : null;
       if (canReview) {

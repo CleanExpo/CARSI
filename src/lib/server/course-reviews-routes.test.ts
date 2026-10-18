@@ -20,12 +20,42 @@ const mocks = vi.hoisted(() => ({
   eventCreate: vi.fn(),
   userFind: vi.fn(),
   transaction: vi.fn(),
+  /** Current database rows the shared resolveCurrentAdmin reads (by lower(email)). */
+  lmsRows: new Map<string, { id: string; is_active: boolean; role: string | null }>(),
+  roleRows: new Map<string, string[]>(),
+  /** Raw SQL in order, prefixed 'TX:' when run inside the interactive transaction. */
+  rawSql: [] as string[],
+  /** Order of writes inside the transaction (raw locks and Prisma writes). */
+  txOps: [] as string[],
 }));
+
+function rawQuery(inTx: boolean) {
+  return async (strings: TemplateStringsArray, ...values: unknown[]) => {
+    const sql = strings.join('?');
+    mocks.rawSql.push(`${inTx ? 'TX:' : ''}${sql}`);
+    if (inTx) mocks.txOps.push(sql.includes('FOR NO KEY UPDATE') ? 'lock-enrolment' : 'raw');
+    if (sql.includes('"admin_users"')) return [];
+    if (sql.includes('"lms_user_roles"')) return (mocks.roleRows.get(String(values[0])) ?? []).map((name) => ({ name }));
+    if (sql.includes('"lms_users"')) {
+      const row = mocks.lmsRows.get(String(values[0]));
+      return row ? [row] : [];
+    }
+    if (sql.includes('"lms_enrollments"')) return [{ id: 'enr-1' }];
+    throw new Error(`unexpected raw SQL ${sql}`);
+  };
+}
 
 vi.mock('@/lib/server/auth-from-request', () => ({ getSessionClaimsFromRequest: mocks.claims }));
 vi.mock('@/lib/prisma', () => {
   const tx = {
-    lmsCourseReview: { update: mocks.reviewUpdate },
+    $queryRaw: rawQuery(true),
+    lmsCourseReview: {
+      update: mocks.reviewUpdate,
+      upsert: (...a: unknown[]) => {
+        mocks.txOps.push('upsert-review');
+        return mocks.reviewUpsert(...a);
+      },
+    },
     lmsCourseReviewModerationEvent: { create: mocks.eventCreate },
   };
   return {
@@ -41,6 +71,7 @@ vi.mock('@/lib/prisma', () => {
       },
       lmsCourseReviewModerationEvent: { create: mocks.eventCreate },
       lmsUser: { findUnique: mocks.userFind },
+      $queryRaw: rawQuery(false),
       $transaction: mocks.transaction.mockImplementation(async (fn: (t: typeof tx) => unknown) => fn(tx)),
     },
   };
@@ -87,6 +118,10 @@ beforeEach(() => {
   mocks.eventCreate.mockResolvedValue({});
   mocks.reviewFindMany.mockResolvedValue([]);
   mocks.userFind.mockResolvedValue({ fullName: 'Sam Rivers' });
+  mocks.lmsRows = new Map([['moderator@carsi.com.au', { id: 'admin-1', is_active: true, role: 'admin' }]]);
+  mocks.rawSql = [];
+  mocks.txOps = [];
+  mocks.roleRows = new Map();
 });
 
 afterAll(() => {
@@ -166,6 +201,54 @@ describe('POST /reviews/:id/publish — a hide needs a recorded reason (AC-3, D2
     const res = await publish({ is_published: true });
     expect(res.status).toBe(200);
     expect(mocks.eventCreate.mock.calls[0]![0].data).toMatchObject({ action: 'unhide', reason: null, actorId: 'admin-1' });
+  });
+
+  it.each([
+    ['r7 reviewer case: demoted to student in the database, still active, old admin token', { id: 'admin-1', is_active: true, role: 'student' }],
+    ['deactivated in the database, old admin token', { id: 'admin-1', is_active: false, role: 'admin' }],
+    ['no current account for the token email', null],
+  ])('%s → 403 and zero writes (the admin is re-checked in the database)', async (_label, row) => {
+    if (row) mocks.lmsRows.set('moderator@carsi.com.au', row);
+    else mocks.lmsRows.clear();
+    for (const body of [{ is_published: false, reason: 'offensive' }, { is_published: true }]) {
+      const res = await publish(body);
+      expect(res.status).toBe(403);
+    }
+    expect(mocks.reviewUpdate).not.toHaveBeenCalled();
+    expect(mocks.eventCreate).not.toHaveBeenCalled();
+  });
+
+  it('r7: demoted by removing the admin role row (column still says admin) → 403 and zero writes', async () => {
+    mocks.roleRows.set('admin-1', ['student']);
+    expect((await publish({ is_published: false, reason: 'offensive' })).status).toBe(403);
+    expect(mocks.reviewUpdate).not.toHaveBeenCalled();
+    mocks.enrolmentFind.mockResolvedValue(null);
+    expect((await (await getReviews()).json()).can_moderate).toBe(false);
+  });
+
+  it('r7: a former admin cannot even probe which reviews exist (403 before any lookup)', async () => {
+    mocks.lmsRows.set('moderator@carsi.com.au', { id: 'admin-1', is_active: true, role: 'student' });
+    mocks.courseFind.mockResolvedValue(null);
+    expect((await publish({ is_published: true })).status).toBe(403);
+    expect(mocks.courseFind).not.toHaveBeenCalled();
+  });
+
+  it('a demotion that lands after the route check is still caught inside the moderation transaction', async () => {
+    // The route's early check passes, then the admin is demoted before the decision's transaction.
+    let reads = 0;
+    const original = mocks.lmsRows.get('moderator@carsi.com.au')!;
+    mocks.lmsRows = new Map([['moderator@carsi.com.au', original]]);
+    const get = mocks.lmsRows.get.bind(mocks.lmsRows);
+    mocks.lmsRows.get = (k: string) => (++reads > 1 ? { ...original, role: 'student' } : get(k));
+    const res = await publish({ is_published: false, reason: 'offensive' });
+    expect(res.status).toBe(403);
+    expect(mocks.reviewUpdate).not.toHaveBeenCalled();
+    expect(mocks.eventCreate).not.toHaveBeenCalled();
+  });
+
+  it('the moderator is re-read FOR SHARE inside the moderation transaction, with the shared helper', async () => {
+    await publish({ is_published: false, reason: 'offensive' });
+    expect(mocks.rawSql.some((q) => /^TX:\s*SELECT "id", "is_active", "role" FROM "lms_users" WHERE lower\("email"\) = \? FOR SHARE/.test(q))).toBe(true);
   });
 
   it('an instructor cannot hide, even with a valid reason (role gate unchanged)', async () => {
@@ -262,6 +345,23 @@ describe('GET /reviews — ask and Google link are rating-independent, moderatio
   });
 });
 
+describe('hidden reviews and reasons go only to a CURRENT admin (release-gate r7)', () => {
+  it('a demoted but still-active user with an old admin token gets the public view only', async () => {
+    mocks.lmsRows.set('moderator@carsi.com.au', { id: 'admin-1', is_active: true, role: 'student' });
+    mocks.enrolmentFind.mockResolvedValue(null);
+    const body = await (await getReviews()).json();
+    expect(body.can_moderate).toBe(false);
+    expect(mocks.reviewFindMany.mock.calls[0]![0].where).toEqual({ courseId: 'course-1', isPublished: true });
+  });
+
+  it('a current admin still sees hidden reviews', async () => {
+    mocks.enrolmentFind.mockResolvedValue(null);
+    const body = await (await getReviews()).json();
+    expect(body.can_moderate).toBe(true);
+    expect(mocks.reviewFindMany.mock.calls[0]![0].where).toEqual({ courseId: 'course-1' });
+  });
+});
+
 describe('POST /reviews — who may review, and the response never varies with the rating (D6, D7)', () => {
   function submit(rating: number) {
     return reviewsPOST(req('http://localhost/api/lms/courses/water-damage/reviews', { rating, title: 'Same', body: 'Same' }), {
@@ -289,6 +389,16 @@ describe('POST /reviews — who may review, and the response never varies with t
     }
     expect(new Set(bodies).size).toBe(1);
     expect(bodies[0]).not.toMatch(/google/i);
+  });
+
+  it('r7: the review is written in a transaction that first locks the enrolment row (serialised with the email send)', async () => {
+    mocks.claims.mockResolvedValue({ sub: 'learner-1', role: 'student' });
+    mocks.enrolmentFind.mockResolvedValue({ status: 'completed', completedAt: new Date('2026-10-01') });
+    mocks.reviewUpsert.mockResolvedValue({});
+    expect((await submit(4)).status).toBe(201);
+    expect(mocks.txOps).toEqual(['lock-enrolment', 'upsert-review']);
+    expect(mocks.rawSql.some((q) => /^TX:[\s\S]*FROM "lms_enrollments"[\s\S]*"student_id" = \?::uuid AND "course_id" = \?::uuid FOR NO KEY UPDATE/.test(q))).toBe(true);
+    expect(mocks.reviewUpsert).toHaveBeenCalledTimes(1);
   });
 });
 

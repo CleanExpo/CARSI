@@ -9,7 +9,11 @@
  * Proves, for the ONE locked transaction per send (spec D10f):
  *   - OFF, unsubscribe and revoke DURING a send wait for it to finish, then take effect;
  *   - OFF, unsubscribe and revoke committed BEFORE the send's checks stop the send;
- *   - a concurrent completion, revoke and switch change during a send finish without deadlock.
+ *   - a concurrent completion, revoke and switch change during a send finish without deadlock;
+ *   - r7: OFF through the REAL Prisma setter lands behind a send held past Prisma's 5 s default,
+ *     and a send that starts while OFF is waiting never reaches the provider (fair lock);
+ *   - r7: a review submitted during a send waits for it; one committed before the checks stops it;
+ *   - r7: a lock wait longer than the send's bound fails before the provider call (retryable).
  *
  * Where it runs: CI's E2E job (`npm run test:pg`) against its migrated postgres:16 service, before
  * any seeding. It needs a LOCAL, migrated, EMPTY database (no enrolments) and refuses anything
@@ -50,6 +54,8 @@ if (!RUNNABLE) {
 
 describe.runIf(RUNNABLE)('review-request send locks (real PostgreSQL, two sessions)', () => {
   let runReviewRequestEmails: typeof import('./review-request-email').runReviewRequestEmails;
+  let setReviewRequestEmailsEnabled: typeof import('./review-request-email').setReviewRequestEmailsEnabled;
+  let upsertReview: typeof import('./course-reviews').upsertReview;
   let prisma: typeof import('@/lib/prisma').prisma;
   const writer = new pg.Client({ connectionString: DB_URL });
   const writer2 = new pg.Client({ connectionString: DB_URL });
@@ -57,6 +63,7 @@ describe.runIf(RUNNABLE)('review-request send locks (real PostgreSQL, two sessio
   let ids: {
     learner: string;
     instructor: string;
+    admin: string;
     course: string;
     course2: string;
     enrolment: string;
@@ -70,7 +77,9 @@ describe.runIf(RUNNABLE)('review-request send locks (real PostgreSQL, two sessio
       throw new Error(
         'review-send-locks.pg.test needs an EMPTY migrated database (no enrolments).'
       );
-    ({ runReviewRequestEmails } = await import('./review-request-email'));
+    ({ runReviewRequestEmails, setReviewRequestEmailsEnabled } =
+      await import('./review-request-email'));
+    ({ upsertReview } = await import('./course-reviews'));
     ({ prisma } = await import('@/lib/prisma'));
   });
 
@@ -87,17 +96,20 @@ describe.runIf(RUNNABLE)('review-request send locks (real PostgreSQL, two sessio
     ids = {
       learner: randomUUID(),
       instructor: randomUUID(),
+      admin: randomUUID(),
       course: randomUUID(),
       course2: randomUUID(),
       enrolment: randomUUID(),
     };
     await watcher.query(
-      "INSERT INTO lms_users (id, email, hashed_password) VALUES ($1, $2, 'x'), ($3, $4, 'x')",
+      "INSERT INTO lms_users (id, email, hashed_password, role) VALUES ($1, $2, 'x', NULL), ($3, $4, 'x', NULL), ($5, $6, 'x', 'admin')",
       [
         ids.learner,
         `learner-${ids.learner}@lock-test.invalid`,
         ids.instructor,
         `inst-${ids.instructor}@lock-test.invalid`,
+        ids.admin,
+        adminEmail(),
       ]
     );
     await watcher.query(
@@ -126,10 +138,28 @@ describe.runIf(RUNNABLE)('review-request send locks (real PostgreSQL, two sessio
       [ids.course, ids.course2],
     ]);
     await watcher.query('DELETE FROM lms_users WHERE id = ANY($1::uuid[])', [
-      [ids.learner, ids.instructor],
+      [ids.learner, ids.instructor, ids.admin],
+    ]);
+    await watcher.query('DELETE FROM lms_review_request_switch_events WHERE actor_email = $1', [
+      adminEmail(),
     ]);
     await watcher.query('UPDATE lms_review_request_settings SET enabled = false WHERE id = 1');
   });
+
+  const adminEmail = () => `admin-${ids.admin}@lock-test.invalid`;
+  const sleep = (ms: number) => new Promise((res) => setTimeout(res, ms));
+
+  async function ledgerRow(enrolment: string) {
+    const r = await watcher.query<{
+      status: string;
+      failure_reason: string | null;
+      send_attempted_at: Date | null;
+    }>(
+      'SELECT status, failure_reason, send_attempted_at FROM lms_review_request_emails WHERE enrollment_id = $1',
+      [enrolment]
+    );
+    return r.rows[0];
+  }
 
   async function ledgerStatus(enrolment: string): Promise<string | undefined> {
     const r = await watcher.query<{ status: string }>(
@@ -327,10 +357,9 @@ describe.runIf(RUNNABLE)('review-request send locks (real PostgreSQL, two sessio
       );
       await writer.query('COMMIT');
     })();
-    // Session 2: an admin switching off (waits for the send and for session 1's shared lock).
-    const session2 = writer2.query(
-      'UPDATE lms_review_request_settings SET enabled = false WHERE id = 1'
-    );
+    // Session 2: an admin switching off through the real setter (waits for the send's fair lock,
+    // then for session 1's shared row lock).
+    const session2 = setReviewRequestEmailsEnabled(false, adminEmail());
     await waitForLockWaiters(2);
     hold.release();
     const [res] = await Promise.all([run, session1, session2]); // a deadlock would reject with 40P01
@@ -341,5 +370,116 @@ describe.runIf(RUNNABLE)('review-request send locks (real PostgreSQL, two sessio
       (await watcher.query('SELECT enabled FROM lms_review_request_settings WHERE id = 1')).rows[0]
         .enabled
     ).toBe(false);
+  });
+
+  it('r7: OFF through the real Prisma setter lands behind a send held 7 s, and a send started while OFF waits never reaches the provider', async () => {
+    const enrolment2 = randomUUID();
+    await watcher.query(
+      "INSERT INTO lms_enrollments (id, student_id, course_id, status, completed_at) VALUES ($1, $2, $3, 'completed', now() - interval '4 days')",
+      [enrolment2, ids.learner, ids.course2]
+    );
+    expect(await ledgerStatus(enrolment2)).toBe('eligible');
+    const hold = holdTheSend();
+    const run1 = runReviewRequestEmails({});
+    await hold.inSend;
+    const heldAt = Date.now();
+    const off = setReviewRequestEmailsEnabled(false, adminEmail());
+    await waitForLockWaiters(1); // OFF is queued for the switch's fair lock
+    const run2 = runReviewRequestEmails({}); // a second run reaches its next send
+    await waitForLockWaiters(2); // ...and queues BEHIND the waiting OFF, not beside the send
+    await sleep(Math.max(0, 7_000 - (Date.now() - heldAt))); // beyond Prisma's 5 s default
+    hold.release();
+    const [r1, r2, saved] = await Promise.all([run1, run2, off]);
+    expect(Date.now() - heldAt).toBeGreaterThanOrEqual(7_000);
+    expect(saved.enabled).toBe(false);
+    expect(mail.send).toHaveBeenCalledTimes(1);
+    expect(r1.sent + r2.sent).toBe(1);
+    expect(await ledgerStatus(ids.enrolment)).toBe('sent');
+    expect(await ledgerStatus(enrolment2)).not.toBe('sent');
+    expect(
+      (await watcher.query('SELECT enabled FROM lms_review_request_settings WHERE id = 1')).rows[0]
+        .enabled
+    ).toBe(false);
+    const events = await watcher.query(
+      'SELECT new_enabled FROM lms_review_request_switch_events WHERE actor_email = $1',
+      [adminEmail()]
+    );
+    expect(events.rows).toEqual([{ new_enabled: false }]);
+  });
+
+  it('r7: a review submitted during a send (real upsertReview) waits for the send to finish', async () => {
+    const hold = holdTheSend();
+    const run = runReviewRequestEmails({});
+    await hold.inSend;
+    expect(
+      await wouldWait(
+        writer,
+        'SELECT "id" FROM "lms_enrollments" WHERE "student_id" = $1 AND "course_id" = $2 FOR NO KEY UPDATE',
+        [ids.learner, ids.course]
+      )
+    ).toBe(true);
+    let saved = false;
+    const submit = upsertReview({
+      courseId: ids.course,
+      studentId: ids.learner,
+      rating: 5,
+      title: 'Good',
+      body: 'Useful',
+    }).then(() => {
+      saved = true;
+    });
+    await waitForLockWaiters(1);
+    expect(saved).toBe(false);
+    hold.release();
+    expect((await run).sent).toBe(1);
+    await submit;
+    const reviews = await watcher.query(
+      'SELECT rating FROM lms_course_reviews WHERE course_id = $1 AND student_id = $2',
+      [ids.course, ids.learner]
+    );
+    expect(reviews.rows).toEqual([{ rating: 5 }]);
+  });
+
+  it("r7 reviewer case: a review committed after the cheap pre-check but before the send's locked checks → no send", async () => {
+    // The same protocol upsertReview follows: lock the enrolment row, then write the review.
+    await writer.query('BEGIN');
+    await writer.query('SELECT "id" FROM "lms_enrollments" WHERE "id" = $1 FOR NO KEY UPDATE', [
+      ids.enrolment,
+    ]);
+    await writer.query(
+      'INSERT INTO lms_course_reviews (id, course_id, student_id, rating, is_published) VALUES ($1, $2, $3, 4, true)',
+      [randomUUID(), ids.course, ids.learner]
+    );
+    const run = runReviewRequestEmails({}); // its pre-check cannot see the uncommitted review
+    await waitForLockWaiters(1); // its send transaction waits on the enrolment row
+    await writer.query('COMMIT');
+    const res = await run;
+    expect(mail.send).not.toHaveBeenCalled();
+    expect(res.skipped.already_reviewed).toBe(1);
+    expect(await ledgerRow(ids.enrolment)).toMatchObject({
+      status: 'skipped',
+      failure_reason: 'already_reviewed',
+      send_attempted_at: null,
+    });
+  });
+
+  it('r7: a lock wait longer than the send bound fails fast before the provider call — retryable, never ambiguous', async () => {
+    await writer.query('BEGIN');
+    await writer.query('UPDATE lms_enrollments SET last_accessed_lesson_id = NULL WHERE id = $1', [
+      ids.enrolment,
+    ]);
+    const started = Date.now();
+    const res = await runReviewRequestEmails({});
+    expect(Date.now() - started).toBeLessThan(5_000); // the 2 s lock_timeout, not the 20 s transaction limit
+    await writer.query('ROLLBACK');
+    expect(mail.send).not.toHaveBeenCalled();
+    expect(res).toMatchObject({ sent: 0, failed: 1, ambiguous: 0 });
+    expect(await ledgerRow(ids.enrolment)).toMatchObject({
+      status: 'failed',
+      failure_reason: 'pre_send_error',
+      send_attempted_at: null,
+    });
+    expect((await runReviewRequestEmails({})).sent).toBe(1); // the next run sends it, once
+    expect(mail.send).toHaveBeenCalledTimes(1);
   });
 });

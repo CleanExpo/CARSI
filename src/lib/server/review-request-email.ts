@@ -36,7 +36,7 @@ import { buildUnsubscribeUrl } from '@/lib/server/email-preferences';
 import { isEmailConfigured, sendEmail, type SendEmailResult } from '@/lib/server/email';
 import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
 import { signEmailUnsubscribeToken } from '@/lib/auth/session-jwt';
-import { getAdminEmail, getAdminPanelAllowedEmails } from '@/lib/admin/admin-panel-access';
+import { requireCurrentAdmin, type CurrentAdmin } from '@/lib/server/current-admin';
 import { prisma } from '@/lib/prisma';
 
 const DAY_MS = 86_400_000;
@@ -63,86 +63,102 @@ export async function readReviewRequestSettings(): Promise<{ enabled: boolean; m
   return { enabled: row?.enabled === true, missing: row === null };
 }
 
-export type ReviewRequestSwitchActor = {
-  kind: 'bootstrap_admin' | 'admin_user' | 'lms_admin';
-  /** admin_users.id or lms_users.id at the time of the change; null for the bootstrap admin. */
-  ref: string | null;
-  email: string;
-};
-
-/** Thrown when a switch change cannot be attributed to a currently authorised admin. */
-export class UnattributableSwitchChangeError extends Error {
-  constructor() {
-    super('This change cannot be attributed to a currently authorised admin.');
-    this.name = 'UnattributableSwitchChangeError';
-  }
-}
-
-type RawTx = { $queryRaw: <T>(strings: TemplateStringsArray, ...values: unknown[]) => Promise<T> };
+/** The admin who changed the switch: the shared current-admin record (current-admin.ts). */
+export type ReviewRequestSwitchActor = CurrentAdmin;
 
 /**
- * Re-validate the admin behind a session from the DATABASE, on every request, inside the switch
- * transaction (release-gate r6) — never from token claims alone. Covers every route
- * getAdminSessionOrNull accepts:
- *   - the bootstrap ADMIN_EMAIL (current env value);
- *   - an admin_users account that is active with role 'admin' now;
- *   - an LMS user that is active now AND has role 'admin' now or is on the current allow-list.
- * Rows are read FOR SHARE, so a concurrent deactivation or demotion either commits first (and is
- * seen here) or waits for this change. Returns null when nobody currently qualifies.
+ * The switch's FAIR lock (release-gate r7). Row locks let later FOR SHARE readers overtake a waiting
+ * FOR UPDATE, so another run's next send could start ahead of an OFF that is waiting for the
+ * current send. PostgreSQL queues heavyweight (advisory) lock requests in order: once a switch
+ * change is waiting for this lock in exclusive mode, every later send waits behind it, so the
+ * change commits before any further send's locked checks run. Sends take it shared (first, before
+ * any row lock); switch changes take it exclusive. Two int4 keys: 'CARS' and 1.
  */
-export async function resolveReviewRequestSwitchActor(
-  tx: RawTx,
-  sessionEmail: string | null | undefined
-): Promise<ReviewRequestSwitchActor | null> {
-  const email = sessionEmail?.trim().toLowerCase();
-  if (!email) return null;
-  const bootstrap = getAdminEmail().trim().toLowerCase();
-  if (bootstrap && email === bootstrap) return { kind: 'bootstrap_admin', ref: null, email };
+const SWITCH_LOCK_CLASS = 0x43415253;
+const SWITCH_LOCK_ID = 1;
 
-  const admins = await tx.$queryRaw<Array<{ id: string; is_active: boolean; role: string }>>`
-    SELECT "id", "is_active", "role" FROM "admin_users" WHERE lower("email") = ${email} FOR SHARE`;
-  const admin = admins[0];
-  if (admin && admin.is_active && admin.role.trim().toLowerCase() === 'admin') {
-    return { kind: 'admin_user', ref: admin.id, email };
-  }
+/**
+ * Each locked statement in a send waits at most this long for a conflicting writer; the send then
+ * fails before the provider call and is retried next run. Worst-case lock hold for one send is
+ * therefore its transaction limit plus one such wait (20 s + 2 s), under the switch's 25 s wait.
+ */
+export const REVIEW_REQUEST_SEND_LOCK_TIMEOUT_MS = 2_000;
+/** PostgreSQL ends a send transaction left idle this long (a frozen or killed runner), releasing its locks. */
+export const REVIEW_REQUEST_SEND_IDLE_TIMEOUT_MS = 15_000;
+/**
+ * How long a switch change waits for in-flight sends. A send holds its locks for at most its
+ * transaction limit (REVIEW_REQUEST_SEND_TRANSACTION_TIMEOUT_MS), so this is that plus margin.
+ */
+export const REVIEW_REQUEST_SWITCH_LOCK_TIMEOUT_MS = 25_000;
+/** The switch change's own transaction limit. Prisma's 5 s default would expire behind one slow send (r7). */
+export const REVIEW_REQUEST_SWITCH_TRANSACTION_TIMEOUT_MS = 30_000;
 
-  const users = await tx.$queryRaw<Array<{ id: string; is_active: boolean; role: string | null }>>`
-    SELECT "id", "is_active", "role" FROM "lms_users" WHERE lower("email") = ${email} FOR SHARE`;
-  const user = users[0];
-  if (user && user.is_active) {
-    const isAdminRole = (user.role ?? '').trim().toLowerCase() === 'admin';
-    if (isAdminRole || getAdminPanelAllowedEmails().has(email)) return { kind: 'lms_admin', ref: user.id, email };
+/** A switch change gave up waiting for an in-flight send; nothing changed and it can be retried. */
+export class SwitchBusyError extends Error {
+  constructor() {
+    super('Waiting for an in-flight review-request send; the switch did not change. Try again.');
+    this.name = 'SwitchBusyError';
   }
-  return null;
+}
+
+/** True when PostgreSQL cancelled a statement on lock_timeout (SQLSTATE 55P03), however Prisma wrapped it. */
+export function isLockNotAvailableError(e: unknown): boolean {
+  const seen = new Set<unknown>();
+  const queue: unknown[] = [e];
+  while (queue.length > 0 && seen.size < 50) {
+    const cur = queue.shift();
+    if (!cur || typeof cur !== 'object' || seen.has(cur)) continue;
+    seen.add(cur);
+    const o = cur as Record<string, unknown>;
+    if (o.code === '55P03' || o.originalCode === '55P03') return true;
+    for (const k of ['message', 'originalMessage']) {
+      const v = o[k];
+      if (typeof v === 'string' && /lock timeout/i.test(v)) return true;
+    }
+    for (const v of Object.values(o)) if (v && typeof v === 'object') queue.push(v);
+    if (o.cause) queue.push(o.cause);
+  }
+  return false;
 }
 
 /**
- * Switch review-request emails on or off (admin only; spec D10d, D10e). In ONE transaction: lock
- * the switch row (FOR UPDATE, which waits for any send holding it FOR SHARE), re-validate the admin
- * from the database, change the switch, and append the change with old value, new value and a
- * durable snapshot of that verified admin. Switching on affects only completions recorded from this
- * moment; switching off stops every send whose locked checks have not yet run.
+ * Switch review-request emails on or off (admin only; spec D10d, D10e). In ONE transaction: take
+ * the switch's fair lock exclusive (which waits for every in-flight send and stops later ones
+ * starting), lock the switch row, re-validate the admin from the database, change the switch, and
+ * append the change with old value, new value and a durable snapshot of that verified admin.
+ * Switching on affects only completions recorded from this moment; switching off stops every send
+ * whose locked checks have not yet run. The waits are bounded above the longest send, so a change
+ * lands; if a send somehow outlasts that bound, SwitchBusyError is thrown and nothing changed.
  */
 export async function setReviewRequestEmailsEnabled(enabled: boolean, sessionEmail: string | null | undefined) {
-  return prisma.$transaction(async (tx) => {
-    const current = await tx.$queryRaw<Array<{ enabled: boolean }>>`
-      SELECT "enabled" FROM "lms_review_request_settings" WHERE "id" = 1 FOR UPDATE`;
-    if (current.length !== 1) throw new Error('lms_review_request_settings row is missing');
-    const actor = await resolveReviewRequestSwitchActor(tx, sessionEmail);
-    if (!actor) throw new UnattributableSwitchChangeError();
-    await tx.lmsReviewRequestSettings.update({ where: { id: 1 }, data: { enabled } });
-    const event = await tx.lmsReviewRequestSwitchEvent.create({
-      data: {
-        oldEnabled: current[0]!.enabled,
-        newEnabled: enabled,
-        actorKind: actor.kind,
-        actorRef: actor.ref,
-        actorEmail: actor.email,
+  try {
+    return await prisma.$transaction(
+      async (tx) => {
+        await tx.$executeRawUnsafe(`SET LOCAL lock_timeout = '${REVIEW_REQUEST_SWITCH_LOCK_TIMEOUT_MS}ms'`);
+        await tx.$executeRaw`SELECT pg_advisory_xact_lock(${SWITCH_LOCK_CLASS}::int4, ${SWITCH_LOCK_ID}::int4)`;
+        const current = await tx.$queryRaw<Array<{ enabled: boolean }>>`
+          SELECT "enabled" FROM "lms_review_request_settings" WHERE "id" = 1 FOR UPDATE`;
+        if (current.length !== 1) throw new Error('lms_review_request_settings row is missing');
+        const actor = await requireCurrentAdmin(tx, sessionEmail);
+        await tx.lmsReviewRequestSettings.update({ where: { id: 1 }, data: { enabled } });
+        const event = await tx.lmsReviewRequestSwitchEvent.create({
+          data: {
+            oldEnabled: current[0]!.enabled,
+            newEnabled: enabled,
+            actorKind: actor.kind,
+            actorRef: actor.ref,
+            actorEmail: actor.email,
+          },
+          select: { createdAt: true },
+        });
+        return { enabled, changedAt: event.createdAt, actor };
       },
-      select: { createdAt: true },
-    });
-    return { enabled, changedAt: event.createdAt, actor };
-  });
+      { maxWait: 5_000, timeout: REVIEW_REQUEST_SWITCH_TRANSACTION_TIMEOUT_MS }
+    );
+  } catch (e) {
+    if (isLockNotAvailableError(e)) throw new SwitchBusyError();
+    throw e;
+  }
 }
 
 /** The switch history, newest first (admin view). */
@@ -313,7 +329,14 @@ export type SendGateOutcome =
       kind: 'hold';
       /** What the ledger row becomes; nothing was sent and no attempt is used. */
       status: 'eligible' | 'ineligible' | 'skipped';
-      reason: 'switched_off' | 'not_completed' | 'completion_changed' | 'opted_out' | 'inactive_account' | 'no_email';
+      reason:
+        | 'switched_off'
+        | 'not_completed'
+        | 'completion_changed'
+        | 'already_reviewed'
+        | 'opted_out'
+        | 'inactive_account'
+        | 'no_email';
       skip: ReviewRequestSkipReason;
     }
   | { kind: 'sent' }
@@ -324,11 +347,14 @@ export type SendGateOutcome =
  * Pure: the final, binding decision made INSIDE the locked send transaction, from rows read under
  * those locks (release-gate r6). All conditions are checked together: this run still owns the
  * claim, the claim is for the same completion, the switch is on, the enrolment is completed now,
- * and the learner is active, has an email and has not unsubscribed.
+ * the learner has not reviewed the course (read under the enrolment lock that review submission
+ * also takes, r7), and the learner is active, has an email and has not unsubscribed.
  */
 export function decideSendGate(input: {
   switchOn: boolean;
   enrolment: { status: string; completed_at: Date | null } | null;
+  /** A review by this learner for this course exists, read after the enrolment row lock was taken. */
+  reviewed: boolean;
   learner: { email: string; full_name: string | null; email_opt_out: boolean; is_active: boolean } | null;
   ledger: { status: string; claim_token: string | null; completion_seq: number } | null;
   claimToken: string;
@@ -343,6 +369,7 @@ export function decideSendGate(input: {
   if (!enrolment || enrolment.status !== 'completed' || enrolment.completed_at === null) {
     return { kind: 'hold', status: 'ineligible', reason: 'not_completed', skip: 'not_completed' };
   }
+  if (input.reviewed) return { kind: 'hold', status: 'skipped', reason: 'already_reviewed', skip: 'already_reviewed' };
   if (!learner || !learner.is_active) return { kind: 'hold', status: 'skipped', reason: 'inactive_account', skip: 'inactive_account' };
   if (learner.email_opt_out) return { kind: 'hold', status: 'skipped', reason: 'opted_out', skip: 'opted_out' };
   if (!learner.email?.trim()) return { kind: 'hold', status: 'skipped', reason: 'no_email', skip: 'no_email' };
@@ -529,20 +556,32 @@ export async function runReviewRequestEmails(options: { now?: Date; dryRun?: boo
       return;
     }
 
-    // Step 2: ONE transaction holds shared locks on the switch row, the enrolment row and the
-    // learner row for the whole provider call (release-gate r6). Switching off (FOR UPDATE),
-    // unsubscribing and revoking (UPDATEs) all conflict with these locks, so each either commits
-    // before the checks below — and this send does not happen — or waits until this send has
-    // finished and been recorded. Lock order matches the completion trigger, so nothing deadlocks.
-    // The provider call has a hard timeout so the locks are held for a bounded time.
+    // Step 2: ONE transaction holds shared locks on the switch (its fair lock and its row), the
+    // enrolment row and the learner row for the whole provider call (release-gate r6, r7).
+    // Switching off, unsubscribing, revoking and submitting a review all conflict with these locks,
+    // so each either commits before the checks below — and this send does not happen — or waits
+    // until this send has finished and been recorded. Lock order matches the completion trigger,
+    // so nothing deadlocks. Every wait and the provider call are bounded, so the locks are held for
+    // a bounded time and a switch change waiting behind them always lands.
     let outcome: SendGateOutcome;
+    let providerCalled = false;
     try {
       outcome = await prisma.$transaction(
         async (tx) => {
+          await tx.$executeRawUnsafe(`SET LOCAL lock_timeout = '${REVIEW_REQUEST_SEND_LOCK_TIMEOUT_MS}ms'`);
+          await tx.$executeRawUnsafe(
+            `SET LOCAL idle_in_transaction_session_timeout = '${REVIEW_REQUEST_SEND_IDLE_TIMEOUT_MS}ms'`
+          );
+          await tx.$executeRaw`SELECT pg_advisory_xact_lock_shared(${SWITCH_LOCK_CLASS}::int4, ${SWITCH_LOCK_ID}::int4)`;
           const sw = await tx.$queryRaw<Array<{ enabled: boolean }>>`
             SELECT "enabled" FROM "lms_review_request_settings" WHERE "id" = 1 FOR SHARE`;
           const enr = await tx.$queryRaw<Array<{ status: string; completed_at: Date | null }>>`
             SELECT "status", "completed_at" FROM "lms_enrollments" WHERE "id" = ${enrolment.id}::uuid FOR SHARE`;
+          // Read AFTER the enrolment lock: review submission locks the same row (FOR NO KEY UPDATE)
+          // before writing, so a review either committed already (seen here) or waits for this send.
+          const rev = await tx.$queryRaw<Array<{ id: string }>>`
+            SELECT "id" FROM "lms_course_reviews"
+             WHERE "course_id" = ${enrolment.courseId}::uuid AND "student_id" = ${enrolment.studentId}::uuid LIMIT 1`;
           const usr = await tx.$queryRaw<
             Array<{ email: string; full_name: string | null; email_opt_out: boolean; is_active: boolean }>
           >`
@@ -554,6 +593,7 @@ export async function runReviewRequestEmails(options: { now?: Date; dryRun?: boo
           const decision = decideSendGate({
             switchOn: sw[0]?.enabled === true,
             enrolment: enr[0] ?? null,
+            reviewed: rev.length > 0,
             learner: usr[0] ?? null,
             ledger: led[0] ?? null,
             claimToken: token!,
@@ -571,6 +611,7 @@ export async function runReviewRequestEmails(options: { now?: Date; dryRun?: boo
           }
 
           let sendResult: SendEmailResult;
+          providerCalled = true;
           try {
             sendResult = await sendReviewRequestEmail({
               to: decision.to,
@@ -607,8 +648,17 @@ export async function runReviewRequestEmails(options: { now?: Date; dryRun?: boo
         { maxWait: 5_000, timeout: REVIEW_REQUEST_SEND_TRANSACTION_TIMEOUT_MS }
       );
     } catch {
-      // The transaction failed or timed out, possibly after the provider accepted the message.
-      // It rolled back, so the committed attempt mark from step 1 remains: ambiguous, never resent.
+      if (!providerCalled) {
+        // Failed before the provider was called (e.g. a lock wait timed out): nothing was sent.
+        // Release the claim as a retryable failure without using an attempt.
+        await finish({ status: 'failed', failureReason: 'pre_send_error', sendAttemptedAt: null }).catch(() => {});
+        result.failed += 1;
+        result.failed_enrollment_ids.push(enrolment.id);
+        return;
+      }
+      // The transaction failed or timed out after the provider call, so the message may have been
+      // accepted. It rolled back, so the committed attempt mark from step 1 remains: ambiguous,
+      // never resent.
       outcome = { kind: 'ambiguous' };
     }
 
