@@ -119,13 +119,21 @@ export async function isReservedGuestCheckoutEmail(email: string): Promise<boole
   const normalized = email.trim().toLowerCase();
   if (!normalized || !isAdminAllowlistedEmail(normalized)) return false;
   const existing = await prisma.lmsUser.findUnique({ where: { email: normalized } });
-  return !existing?.isActive;
+  return existing === null || existing.isActive === false;
 }
 
 /** True when a session's learner row still exists and is active (the webhook can fulfil for it). */
 export async function isActiveLearnerId(id: string): Promise<boolean> {
   const user = await prisma.lmsUser.findUnique({ where: { id } });
-  return user?.isActive === true;
+  return user !== null && user.isActive !== false;
+}
+
+/** True when the email belongs to an existing account that is deactivated (unfulfillable by email). */
+export async function isInactiveAccountEmail(email: string): Promise<boolean> {
+  const normalized = email.trim().toLowerCase();
+  if (!normalized) return false;
+  const user = await prisma.lmsUser.findUnique({ where: { email: normalized } });
+  return user !== null && user.isActive === false;
 }
 
 export async function ensureGuestUserFromStripeEmail(

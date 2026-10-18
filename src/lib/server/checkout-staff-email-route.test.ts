@@ -31,8 +31,18 @@ vi.mock('@/lib/prisma', () => ({
 }));
 
 vi.mock('@/lib/server/local-course-checkout', () => ({
+  // A Bearer "email:<address>" header resolves to that address, as a verified Bearer JWT would.
   resolveCheckoutEmail: vi.fn(
-    async ({ bodyEmail }: { bodyEmail?: string }) => bodyEmail?.trim().toLowerCase() || null
+    async ({
+      bodyEmail,
+      authorizationHeader,
+    }: {
+      bodyEmail?: string;
+      authorizationHeader?: string;
+    }) =>
+      authorizationHeader?.startsWith('Bearer email:')
+        ? authorizationHeader.slice('Bearer email:'.length)
+        : bodyEmail?.trim().toLowerCase() || null
   ),
   createStripeCheckoutForCourse: stripe.create,
 }));
@@ -61,12 +71,20 @@ const ORIG = {
   ADMIN_PANEL_EMAILS: process.env.ADMIN_PANEL_EMAILS,
 };
 
-function post(body: Record<string, unknown>, cookie?: string): Promise<Response> {
+function post(
+  body: Record<string, unknown>,
+  cookie?: string,
+  authorization?: string
+): Promise<Response> {
   return POST(
     new NextRequest('https://carsi.com.au/api/lms/checkout', {
       method: 'POST',
       body: JSON.stringify(body),
-      headers: { 'content-type': 'application/json', ...(cookie ? { cookie } : {}) },
+      headers: {
+        'content-type': 'application/json',
+        ...(cookie ? { cookie } : {}),
+        ...(authorization ? { authorization } : {}),
+      },
     })
   );
 }
@@ -146,6 +164,34 @@ describe('POST /api/lms/checkout — unclaimed staff email', () => {
       'auth_token=valid:learner-9'
     );
     expect(ok.status).toBe(404);
+    expect(stripe.create).not.toHaveBeenCalled();
+  });
+
+  it('answers 503 and opens no Stripe session when the account lookup fails', async () => {
+    const { prisma } = await import('@/lib/prisma');
+    vi.mocked(prisma.lmsUser.findUnique).mockRejectedValueOnce(new Error('connection refused'));
+    const res = await post({
+      slug: 'water-damage-essentials',
+      customer_email: 'support@carsi.com.au',
+    });
+    expect(res.status).toBe(503);
+    expect(stripe.create).not.toHaveBeenCalled();
+  });
+
+  it('refuses a deactivated account reached by Bearer token or typed email, with no cookie', async () => {
+    db.users.push({ id: 'learner-7', email: 'gone@example.com', isActive: false });
+    const bearer = await post(
+      { slug: 'water-damage-essentials', guest_checkout: true },
+      undefined,
+      'Bearer email:gone@example.com'
+    );
+    expect(bearer.status).toBe(401);
+    expect((await bearer.json()).code).toBe('inactive_account');
+    const typed = await post({
+      slug: 'water-damage-essentials',
+      customer_email: 'Gone@Example.com',
+    });
+    expect(typed.status).toBe(401);
     expect(stripe.create).not.toHaveBeenCalled();
   });
 });

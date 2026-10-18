@@ -79,6 +79,7 @@ vi.mock('@/lib/prisma', () => ({
 import {
   ensureGuestUserFromStripeEmail,
   findOrCreateGuestUser,
+  isInactiveAccountEmail,
   isReservedGuestCheckoutEmail,
 } from '@/lib/server/guest-checkout';
 import { provisionalPasswordHash, registerUserWithPassword } from '@/lib/server/lms-auth';
@@ -204,5 +205,15 @@ describe('guest checkout refuses payment it could never fulfil', () => {
     pushUser('adm-3', 'support@carsi.com.au', '$2a$12$real', 'admin');
     db.users[db.users.length - 1].isActive = false;
     expect(await isReservedGuestCheckoutEmail('support@carsi.com.au')).toBe(true);
+  });
+
+  it('flags a deactivated account by email whatever its case or spacing, and nothing else', async () => {
+    pushUser('gone-1', 'gone@example.com', '$2a$12$real');
+    db.users[db.users.length - 1].isActive = false;
+    expect(await isInactiveAccountEmail('  Gone@EXAMPLE.com ')).toBe(true);
+    expect(await isInactiveAccountEmail('nobody@example.com')).toBe(false);
+    pushUser('here-1', 'here@example.com', '$2a$12$real');
+    expect(await isInactiveAccountEmail('here@example.com')).toBe(false);
+    expect(await isInactiveAccountEmail('')).toBe(false);
   });
 });

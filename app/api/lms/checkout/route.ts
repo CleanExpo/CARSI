@@ -28,7 +28,11 @@ import {
   STRIPE_MIN_UNIT_AMOUNT_CENTS,
 } from '@/lib/server/user-discounts';
 import { getOrCreateCourseBySlug } from '@/lib/server/course-catalog-sync';
-import { isActiveLearnerId, isReservedGuestCheckoutEmail } from '@/lib/server/guest-checkout';
+import {
+  isActiveLearnerId,
+  isInactiveAccountEmail,
+  isReservedGuestCheckoutEmail,
+} from '@/lib/server/guest-checkout';
 import { getEntitlements } from '@/lib/server/entitlements';
 import { getFirstLessonLearnPath } from '@/lib/server/first-lesson';
 import {
@@ -41,6 +45,17 @@ import {
   readAttributionJourneyId,
   tryRecordAttributedStage,
 } from '@/lib/server/event-attribution';
+
+class AccountLookupUnavailable extends Error {}
+
+/** Runs an account check; a database failure becomes a 503 rather than a charge on doubt. */
+async function guardLookup<T>(check: () => Promise<T>): Promise<T> {
+  try {
+    return await check();
+  } catch {
+    throw new AccountLookupUnavailable();
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -89,7 +104,7 @@ export async function POST(request: NextRequest) {
     }
     // A still-valid token for a deactivated or deleted learner can't be fulfilled by the webhook,
     // so refuse before charging.
-    if (studentId && !(await isActiveLearnerId(studentId))) {
+    if (studentId && !(await guardLookup(() => isActiveLearnerId(studentId!)))) {
       return NextResponse.json(
         { detail: 'Your session is no longer valid. Please sign in again.', code: 'inactive_account' },
         { status: 401 },
@@ -122,7 +137,7 @@ export async function POST(request: NextRequest) {
     // A staff (admin-allowlisted) email without a usable account can't be provisioned by any
     // unauthenticated payment, whatever the client sends as guest_checkout or purchase mode, so
     // refuse before charging rather than take money that can never be fulfilled.
-    if (!studentId && (await isReservedGuestCheckoutEmail(customerEmail))) {
+    if (!studentId && (await guardLookup(() => isReservedGuestCheckoutEmail(customerEmail)))) {
       return NextResponse.json(
         {
           detail:
@@ -130,6 +145,15 @@ export async function POST(request: NextRequest) {
           code: 'reserved_staff_email',
         },
         { status: 409 },
+      );
+    }
+
+    // Without a cookie session the webhook resolves the learner by email (a Bearer token or a
+    // typed email). An existing deactivated account there can't be fulfilled, so refuse it too.
+    if (!studentId && (await guardLookup(() => isInactiveAccountEmail(customerEmail)))) {
+      return NextResponse.json(
+        { detail: 'This account is not active. Please contact CARSI support.', code: 'inactive_account' },
+        { status: 401 },
       );
     }
 
@@ -348,6 +372,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ detail: 'Failed to start checkout session.' }, { status: 500 });
     }
   } catch (error) {
+    if (error instanceof AccountLookupUnavailable) {
+      return NextResponse.json(
+        { detail: 'Could not verify your account just now. Please try again shortly.' },
+        { status: 503 },
+      );
+    }
     console.error('[checkout] error:', error);
     void captureServerError(error, { route: '/api/lms/checkout' });
     return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 });
