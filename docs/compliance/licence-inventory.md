@@ -15,7 +15,7 @@ Enforced by `src/lib/marketing/licence-inventory.test.ts`.
 | --- | ---: |
 | fixed (copy changed in this round; classed as exposure by the final rules at ea205ee5) | 323 |
 | legitimate (third-person, provider-level, conditional, registry-computed or learner record) | 1316 |
-| not public (tests, generated, staff, tooling, prompts, identifiers, routing data) | 3726 |
+| not public (tests, generated, staff, tooling, prompts, identifiers, routing data) | 3754 |
 | owned elsewhere (not edited here; listed for Phill) | 27 |
 | exposure remaining | 0 |
 
@@ -129,7 +129,7 @@ Files with fixed hits:
 | legitimate | other bodies’ certification (ISO, HACCP, gas, vehicle, Cert IV) | 1 |
 | legitimate | reviewed file: CEC audience line rendered only when the course has cec_hours (an in-force approval) | 1 |
 | not-public | code: identifier, comment or type | 1359 |
-| not-public | test file | 1029 |
+| not-public | test file | 1057 |
 | not-public | generated code | 404 |
 | not-public | staff-only admin surface | 309 |
 | not-public | routing data: bare discipline code (render sites audited separately) | 276 |

@@ -3686,6 +3686,34 @@ legitimate,src/lib/iicrc/disclaimer.ts,22,certif,certification,"reviewed file: t
 legitimate,src/lib/iicrc/disclaimer.ts,22,certif,certification,"reviewed file: third-person IICRC designation and standard names, quoted from the issuer",'certification — they are not IICRC certification. IICRC certification is ' +
 not-public,src/lib/iicrc/standards.ts,5,CEC,CEC,"code: identifier, comment or type",* cite its current edition/year so CARSI's CEC content reads as current. Import
 legitimate,src/lib/iicrc/standards.ts,30,upholstery,Upholstery,"reviewed file: third-person IICRC designation and standard names, quoted from the issuer","S300: { code: 'S300', title: 'Professional Upholstery Cleaning', edition: '2nd', year: 2025 },"
+not-public,src/lib/licence-render-sites.test.tsx,4,certif,certification,test file,"* subject, and a pathway never ""builds toward"" an IICRC certification."
+not-public,src/lib/licence-render-sites.test.tsx,17,CEC,CEC,test file,"import { CERT_LEVELS, DISCIPLINES } from '@/components/tools/CECCalculator';"
+not-public,src/lib/licence-render-sites.test.tsx,18,certif,CertificateArt,test file,import { CertificateArt } from '@/lib/certificate/CertificateArt';
+not-public,src/lib/licence-render-sites.test.tsx,18,certif,certificate,test file,import { CertificateArt } from '@/lib/certificate/CertificateArt';
+not-public,src/lib/licence-render-sites.test.tsx,18,certif,CertificateArt,test file,import { CertificateArt } from '@/lib/certificate/CertificateArt';
+not-public,src/lib/licence-render-sites.test.tsx,27,iicrc-code,WRT,test file,expect(disciplineTopicLabel('WRT')).toBe('Water Restoration');
+not-public,src/lib/licence-render-sites.test.tsx,28,iicrc-code,crt,test file,expect(disciplineTopicLabel('crt')).toBe('Carpet Cleaning');
+not-public,src/lib/licence-render-sites.test.tsx,29,iicrc-code,RRT,test file,expect(disciplineTopicLabel('RRT')).toBeNull();
+not-public,src/lib/licence-render-sites.test.tsx,34,iicrc-code,WRT,test file,"'IICRC WRT',"
+not-public,src/lib/licence-render-sites.test.tsx,35,iicrc-code,WRT,test file,"'WRT certification',"
+not-public,src/lib/licence-render-sites.test.tsx,35,certif,certification,test file,"'WRT certification',"
+not-public,src/lib/licence-render-sites.test.tsx,36,iicrc-code,WRT,test file,"'Water Damage Restoration Technician (WRT)',"
+not-public,src/lib/licence-render-sites.test.tsx,37,certif,certification,test file,"'IICRC certification',"
+not-public,src/lib/licence-render-sites.test.tsx,39,certif,certification,test file,"'render: a pathway target naming the IICRC, a certification or a code is suppressed: %s',"
+not-public,src/lib/licence-render-sites.test.tsx,51,certif,certificate,test file,"it('render: the certificate names the CARSI subject and never calls the programme accredited', () => {"
+not-public,src/lib/licence-render-sites.test.tsx,51,accredit,accredited,test file,"it('render: the certificate names the CARSI subject and never calls the programme accredited', () => {"
+not-public,src/lib/licence-render-sites.test.tsx,53,iicrc-code,WRT,test file,"createElement(CertificateArt, { logoSrc: '/logo.png', discipline: 'WRT', courseName: 'X' })"
+not-public,src/lib/licence-render-sites.test.tsx,53,certif,CertificateArt,test file,"createElement(CertificateArt, { logoSrc: '/logo.png', discipline: 'WRT', courseName: 'X' })"
+not-public,src/lib/licence-render-sites.test.tsx,56,iicrc-code,WRT,test file,expect(html).not.toContain(IICRC_DISCIPLINE_LONG.WRT);
+not-public,src/lib/licence-render-sites.test.tsx,57,accredit,accredited,test file,expect(html).not.toMatch(/accredited\s+programme/);
+not-public,src/lib/licence-render-sites.test.tsx,61,CEC,CEC,test file,"describe('CEC calculator states the IICRC renewal rule correctly', () => {"
+not-public,src/lib/licence-render-sites.test.tsx,62,CEC,CECs,test file,"it('calculator: 14 CECs every four years, or every two for Master (iicrc.org/ausfaqs)', () => {"
+not-public,src/lib/licence-render-sites.test.tsx,64,CEC,cec,test file,"expect(d.cecsPerCycle.technician, d.code).toBe(14);"
+not-public,src/lib/licence-render-sites.test.tsx,65,CEC,cec,test file,"expect(d.cecsPerCycle.master, d.code).toBe(14);"
+not-public,src/lib/licence-render-sites.test.tsx,68,CEC,CECs,test file,'14 CECs every four years'
+not-public,src/lib/licence-render-sites.test.tsx,71,CEC,CECs,test file,'14 CECs every two years'
+not-public,src/lib/licence-render-sites.test.tsx,79,certif,certification,test file,"it('calculator: no CTA brands courses with a code, and no copy says CARSI courses lead to certification', () => {"
+not-public,src/lib/licence-render-sites.test.tsx,80,CEC,CEC,test file,"const src = readFileSync(join(process.cwd(), 'src/components/tools/CECCalculator.tsx'), 'utf8');"
 not-public,src/lib/lms-seed-catalog.ts,57,iicrc-code,WRT,"code: identifier, comment or type",// IICRC discipline acronym (was 'WRT'). The credential is the CARSI
 not-public,src/lib/lms-seed-catalog.ts,199,iicrc-code,ASD,"code: identifier, comment or type",// IICRC discipline acronym (was 'ASD'). The credential is the CARSI
 not-public,src/lib/lms-seed-catalog.ts,263,iicrc-code,AMRT,"code: identifier, comment or type",// IICRC discipline acronym (was 'AMRT'). The credential is the CARSI
@@ -3867,72 +3895,72 @@ not-public,src/lib/marketing/licence-copy-sweep.test.ts,59,certif,certifications
 not-public,src/lib/marketing/licence-copy-sweep.test.ts,60,certif,certification,test file,"'is an IICRC certification',"
 not-public,src/lib/marketing/licence-copy-sweep.test.ts,64,certif,certification,test file,"`\\|\\s*(?:${A})\\s*\\|`, // a markdown table cell naming the IICRC certification"
 not-public,src/lib/marketing/licence-copy-sweep.test.ts,65,iicrc-code,CCT,test file,"`IICRC [A-Z][A-Za-z ]+\\((?:${A})\\)`, // ""IICRC Carpet Cleaning Technician (CCT)"" source label"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,75,repair,repair,test file,const UNSOLD = /\bcarpet repair\b|\breinstall/i;
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,77,iicrc-code,RRT,test file,/CARSI sells (?:no|neither)|removed|does not (?:sell|offer|cover)|\|\s*(?:RRT|CRT)\s*\|/i;
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,77,iicrc-code,CRT,test file,/CARSI sells (?:no|neither)|removed|does not (?:sell|offer|cover)|\|\s*(?:RRT|CRT)\s*\|/i;
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,81,certif,certification,test file,"'certification as a legal licence to perform or invoice',"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,88,certif,IICRC credentials,test file,"['bundle sold as a route to IICRC credentials', /seeking IICRC credentials/i],"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,88,certif,IICRC credentials,test file,"['bundle sold as a route to IICRC credentials', /seeking IICRC credentials/i],"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,91,CEC,CEC,test file,"'CEC accreditation covering the unapproved vehicle course',"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,91,accredit,accreditation,test file,"'CEC accreditation covering the unapproved vehicle course',"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,92,CEC,CEC,test file,"/IICRC CEC Accredited.{0,300}(?:vehicle drying|Drying Transportation and Vehicles)|(?:vehicle drying|Drying Transportation and Vehicles).{0,300}IICRC CEC Accred"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,92,CEC,CEC,test file,"/IICRC CEC Accredited.{0,300}(?:vehicle drying|Drying Transportation and Vehicles)|(?:vehicle drying|Drying Transportation and Vehicles).{0,300}IICRC CEC Accred"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,92,accredit,Accredited,test file,"/IICRC CEC Accredited.{0,300}(?:vehicle drying|Drying Transportation and Vehicles)|(?:vehicle drying|Drying Transportation and Vehicles).{0,300}IICRC CEC Accred"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,92,accredit,Accredited,test file,"/IICRC CEC Accredited.{0,300}(?:vehicle drying|Drying Transportation and Vehicles)|(?:vehicle drying|Drying Transportation and Vehicles).{0,300}IICRC CEC Accred"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,136,iicrc-code,CRT,test file,"fx('description=""CRT Carpet Restoration + CCT Commercial Carpet + OCT Odour Control.""')"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,136,iicrc-code,CCT,test file,"fx('description=""CRT Carpet Restoration + CCT Commercial Carpet + OCT Odour Control.""')"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,136,iicrc-code,OCT,test file,"fx('description=""CRT Carpet Restoration + CCT Commercial Carpet + OCT Odour Control.""')"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,138,iicrc-code,WRT,test file,"expect(fx(""'Start with WRT fundamentals, then add structural drying.',"")).not.toEqual([]);"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,139,iicrc-code,WRT,test file,"expect(fx(""addon: 'WRT',"")).not.toEqual([]);"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,141,repair,repair,test file,"fx(""'carpet repair, carpet cleaning and odour control credentials for insurance work',"")"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,145,certif,IICRC credentials,test file,expect(fx('Perfect for cleaning contractors seeking IICRC credentials.')).not.toEqual([]);
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,149,CEC,CEC,test file,"""'IICRC CEC Accredited restoration courses: water damage, vehicle drying and odour control.'"""
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,149,accredit,Accredited,test file,"""'IICRC CEC Accredited restoration courses: water damage, vehicle drying and odour control.'"""
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,154,CEC,CEC,test file,"""'IICRC CEC Accredited courses for transport operations. Water damage, vehicle drying and odour control courses.'"""
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,154,accredit,Accredited,test file,"""'IICRC CEC Accredited courses for transport operations. Water damage, vehicle drying and odour control courses.'"""
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,161,iicrc-code,WRT,test file,"expect(fx(""disciplines={['WRT', 'CRT', 'OCT']}"")).toEqual([]);"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,161,iicrc-code,CRT,test file,"expect(fx(""disciplines={['WRT', 'CRT', 'OCT']}"")).toEqual([]);"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,161,iicrc-code,OCT,test file,"expect(fx(""disciplines={['WRT', 'CRT', 'OCT']}"")).toEqual([]);"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,162,iicrc-code,WRT,test file,"expect(fx(""{ code: 'WRT', label: 'Water Damage', color: '#000' },"")).toEqual([]);"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,163,iicrc-code,CCT,test file,"expect(fx(""href: '/courses?discipline=CCT',"")).toEqual([]);"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,164,iicrc-code,FSRT,test file,expect(fx('FSRT is an IICRC certification covering fire and smoke.')).toEqual([]);
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,164,certif,certification,test file,expect(fx('FSRT is an IICRC certification covering fire and smoke.')).toEqual([]);
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,165,iicrc-code,WRT,test file,"expect(fx(""requirement: 'WRT and FSRT commonly required by adjusters',"")).toEqual([]);"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,165,iicrc-code,FSRT,test file,"expect(fx(""requirement: 'WRT and FSRT commonly required by adjusters',"")).toEqual([]);"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,167,iicrc-code,WRT,test file,fx('| Water Restoration Technician | WRT | Foundation for water damage work. |')
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,169,iicrc-code,CRT,test file,"expect(fx(""CRT: 'Colour repair',"")).toEqual([]);"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,169,repair,repair,test file,"expect(fx(""CRT: 'Colour repair',"")).toEqual([]);"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,169,colour,Colour repair,test file,"expect(fx(""CRT: 'Colour repair',"")).toEqual([]);"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,179,iicrc-code,WRT,test file,"WRT: /water|flood/i,"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,180,iicrc-code,ASD,test file,"ASD: /dry/i,"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,181,iicrc-code,AMRT,test file,"AMRT: /mould|microbial|infection/i,"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,182,iicrc-code,FSRT,test file,"FSRT: /fire|smoke/i,"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,183,iicrc-code,OCT,test file,"OCT: /odour/i,"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,184,iicrc-code,CCT,test file,"CCT: /carpet|cleaning/i,"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,185,iicrc-code,CRT,test file,"CRT: /carpet|cleaning|colour/i,"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,185,colour,colour,test file,"CRT: /carpet|cleaning|colour/i,"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,197,iicrc-code,CRT,test file,"* Review P1 (18/10/2026): the transport page relabelled its CRT chip and heading ""vehicle"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,198,iicrc-code,CRT,test file,"* drying"", but the recommendations still query courses by the CRT code, which can never"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,223,repair,repair,test file,/technician|applied structural drying|applied microbial remediation|water damage restoration|fire (?:&|and) smoke restoration|carpet (?:restoration|repair)|colo
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,223,repair,repair,test file,/technician|applied structural drying|applied microbial remediation|water damage restoration|fire (?:&|and) smoke restoration|carpet (?:restoration|repair)|colo
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,223,colour,colour repair,test file,/technician|applied structural drying|applied microbial remediation|water damage restoration|fire (?:&|and) smoke restoration|carpet (?:restoration|repair)|colo
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,249,certif,IICRC credentials,test file,/** Copy implying CARSI awards IICRC credentials or certification. */
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,249,certif,certification,test file,/** Copy implying CARSI awards IICRC credentials or certification. */
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,251,certif,certified,test file,"/IICRC[- ](?:recognised|recognized|certified)|IICRC credentials?|Certified restoration training|IICRC CEC Accredited credentials|value:\s*'IICRC',\s*label:\s*'("
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,251,certif,IICRC credentials,test file,"/IICRC[- ](?:recognised|recognized|certified)|IICRC credentials?|Certified restoration training|IICRC CEC Accredited credentials|value:\s*'IICRC',\s*label:\s*'("
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,251,certif,Certified,test file,"/IICRC[- ](?:recognised|recognized|certified)|IICRC credentials?|Certified restoration training|IICRC CEC Accredited credentials|value:\s*'IICRC',\s*label:\s*'("
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,251,certif,Certified,test file,"/IICRC[- ](?:recognised|recognized|certified)|IICRC credentials?|Certified restoration training|IICRC CEC Accredited credentials|value:\s*'IICRC',\s*label:\s*'("
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,251,certif,Certification,test file,"/IICRC[- ](?:recognised|recognized|certified)|IICRC credentials?|Certified restoration training|IICRC CEC Accredited credentials|value:\s*'IICRC',\s*label:\s*'("
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,251,CEC,CEC,test file,"/IICRC[- ](?:recognised|recognized|certified)|IICRC credentials?|Certified restoration training|IICRC CEC Accredited credentials|value:\s*'IICRC',\s*label:\s*'("
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,251,accredit,Accredited,test file,"/IICRC[- ](?:recognised|recognized|certified)|IICRC credentials?|Certified restoration training|IICRC CEC Accredited credentials|value:\s*'IICRC',\s*label:\s*'("
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,274,certif,IICRC credentials,test file,problems.push(`stat implies IICRC credentials: ${value} ${label}`);
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,281,certif,IICRC credentials,test file,"problems.push(`implies IICRC credentials: ${line.trim().slice(0, 120)}`);"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,286,certif,IICRC-credential,test file,"describe('industry copy carries no unsourced numbers or IICRC-credential claims', () => {"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,303,certif,IICRC credentials,test file,"numberProblems('description=""IICRC credentials satisfy AusTender pre-qualification.""')"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,305,certif,IICRC-recognised,test file,"expect(numberProblems('description=""with IICRC-recognised credentials.""')).not.toEqual([]);"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,306,certif,Certified,test file,"expect(numberProblems(""  { value: 'IICRC', label: 'Certified' },"")).not.toEqual([]);"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,308,certif,Certification,test file,"numberProblems(""const stats = [\n  { value: 'IICRC', label: 'Certification' },\n];"")"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,311,CEC,CEC,test file,"numberProblems(""const stats = [\n  { value: 'IICRC CEC', label: 'On approved courses' },\n];"")"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,76,repair,repair,test file,const UNSOLD = /\bcarpet repair\b|\breinstall/i;
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,78,iicrc-code,RRT,test file,/CARSI sells (?:no|neither)|removed|does not (?:sell|offer|cover)|\|\s*(?:RRT|CRT)\s*\|/i;
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,78,iicrc-code,CRT,test file,/CARSI sells (?:no|neither)|removed|does not (?:sell|offer|cover)|\|\s*(?:RRT|CRT)\s*\|/i;
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,82,certif,certification,test file,"'certification as a legal licence to perform or invoice',"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,89,certif,IICRC credentials,test file,"['bundle sold as a route to IICRC credentials', /seeking IICRC credentials/i],"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,89,certif,IICRC credentials,test file,"['bundle sold as a route to IICRC credentials', /seeking IICRC credentials/i],"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,92,CEC,CEC,test file,"'CEC accreditation covering the unapproved vehicle course',"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,92,accredit,accreditation,test file,"'CEC accreditation covering the unapproved vehicle course',"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,93,CEC,CEC,test file,"/IICRC CEC Accredited.{0,300}(?:vehicle drying|Drying Transportation and Vehicles)|(?:vehicle drying|Drying Transportation and Vehicles).{0,300}IICRC CEC Accred"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,93,CEC,CEC,test file,"/IICRC CEC Accredited.{0,300}(?:vehicle drying|Drying Transportation and Vehicles)|(?:vehicle drying|Drying Transportation and Vehicles).{0,300}IICRC CEC Accred"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,93,accredit,Accredited,test file,"/IICRC CEC Accredited.{0,300}(?:vehicle drying|Drying Transportation and Vehicles)|(?:vehicle drying|Drying Transportation and Vehicles).{0,300}IICRC CEC Accred"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,93,accredit,Accredited,test file,"/IICRC CEC Accredited.{0,300}(?:vehicle drying|Drying Transportation and Vehicles)|(?:vehicle drying|Drying Transportation and Vehicles).{0,300}IICRC CEC Accred"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,137,iicrc-code,CRT,test file,"fx('description=""CRT Carpet Restoration + CCT Commercial Carpet + OCT Odour Control.""')"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,137,iicrc-code,CCT,test file,"fx('description=""CRT Carpet Restoration + CCT Commercial Carpet + OCT Odour Control.""')"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,137,iicrc-code,OCT,test file,"fx('description=""CRT Carpet Restoration + CCT Commercial Carpet + OCT Odour Control.""')"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,139,iicrc-code,WRT,test file,"expect(fx(""'Start with WRT fundamentals, then add structural drying.',"")).not.toEqual([]);"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,140,iicrc-code,WRT,test file,"expect(fx(""addon: 'WRT',"")).not.toEqual([]);"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,142,repair,repair,test file,"fx(""'carpet repair, carpet cleaning and odour control credentials for insurance work',"")"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,146,certif,IICRC credentials,test file,expect(fx('Perfect for cleaning contractors seeking IICRC credentials.')).not.toEqual([]);
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,150,CEC,CEC,test file,"""'IICRC CEC Accredited restoration courses: water damage, vehicle drying and odour control.'"""
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,150,accredit,Accredited,test file,"""'IICRC CEC Accredited restoration courses: water damage, vehicle drying and odour control.'"""
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,155,CEC,CEC,test file,"""'IICRC CEC Accredited courses for transport operations. Water damage, vehicle drying and odour control courses.'"""
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,155,accredit,Accredited,test file,"""'IICRC CEC Accredited courses for transport operations. Water damage, vehicle drying and odour control courses.'"""
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,162,iicrc-code,WRT,test file,"expect(fx(""disciplines={['WRT', 'CRT', 'OCT']}"")).toEqual([]);"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,162,iicrc-code,CRT,test file,"expect(fx(""disciplines={['WRT', 'CRT', 'OCT']}"")).toEqual([]);"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,162,iicrc-code,OCT,test file,"expect(fx(""disciplines={['WRT', 'CRT', 'OCT']}"")).toEqual([]);"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,163,iicrc-code,WRT,test file,"expect(fx(""{ code: 'WRT', label: 'Water Damage', color: '#000' },"")).toEqual([]);"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,164,iicrc-code,CCT,test file,"expect(fx(""href: '/courses?discipline=CCT',"")).toEqual([]);"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,165,iicrc-code,FSRT,test file,expect(fx('FSRT is an IICRC certification covering fire and smoke.')).toEqual([]);
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,165,certif,certification,test file,expect(fx('FSRT is an IICRC certification covering fire and smoke.')).toEqual([]);
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,166,iicrc-code,WRT,test file,"expect(fx(""requirement: 'WRT and FSRT commonly required by adjusters',"")).toEqual([]);"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,166,iicrc-code,FSRT,test file,"expect(fx(""requirement: 'WRT and FSRT commonly required by adjusters',"")).toEqual([]);"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,168,iicrc-code,WRT,test file,fx('| Water Restoration Technician | WRT | Foundation for water damage work. |')
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,170,iicrc-code,CRT,test file,"expect(fx(""CRT: 'Colour repair',"")).toEqual([]);"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,170,repair,repair,test file,"expect(fx(""CRT: 'Colour repair',"")).toEqual([]);"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,170,colour,Colour repair,test file,"expect(fx(""CRT: 'Colour repair',"")).toEqual([]);"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,180,iicrc-code,WRT,test file,"WRT: /water|flood/i,"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,181,iicrc-code,ASD,test file,"ASD: /dry/i,"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,182,iicrc-code,AMRT,test file,"AMRT: /mould|microbial|infection/i,"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,183,iicrc-code,FSRT,test file,"FSRT: /fire|smoke/i,"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,184,iicrc-code,OCT,test file,"OCT: /odour/i,"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,185,iicrc-code,CCT,test file,"CCT: /carpet|cleaning/i,"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,186,iicrc-code,CRT,test file,"CRT: /carpet|cleaning|colour/i,"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,186,colour,colour,test file,"CRT: /carpet|cleaning|colour/i,"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,198,iicrc-code,CRT,test file,"* Review P1 (18/10/2026): the transport page relabelled its CRT chip and heading ""vehicle"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,199,iicrc-code,CRT,test file,"* drying"", but the recommendations still query courses by the CRT code, which can never"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,224,repair,repair,test file,/technician|applied structural drying|applied microbial remediation|water damage restoration|fire (?:&|and) smoke restoration|carpet (?:restoration|repair)|colo
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,224,repair,repair,test file,/technician|applied structural drying|applied microbial remediation|water damage restoration|fire (?:&|and) smoke restoration|carpet (?:restoration|repair)|colo
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,224,colour,colour repair,test file,/technician|applied structural drying|applied microbial remediation|water damage restoration|fire (?:&|and) smoke restoration|carpet (?:restoration|repair)|colo
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,250,certif,IICRC credentials,test file,/** Copy implying CARSI awards IICRC credentials or certification. */
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,250,certif,certification,test file,/** Copy implying CARSI awards IICRC credentials or certification. */
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,252,certif,certified,test file,"/IICRC[- ](?:recognised|recognized|certified)|IICRC credentials?|Certified restoration training|IICRC CEC Accredited credentials|value:\s*'IICRC',\s*label:\s*'("
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,252,certif,IICRC credentials,test file,"/IICRC[- ](?:recognised|recognized|certified)|IICRC credentials?|Certified restoration training|IICRC CEC Accredited credentials|value:\s*'IICRC',\s*label:\s*'("
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,252,certif,Certified,test file,"/IICRC[- ](?:recognised|recognized|certified)|IICRC credentials?|Certified restoration training|IICRC CEC Accredited credentials|value:\s*'IICRC',\s*label:\s*'("
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,252,certif,Certified,test file,"/IICRC[- ](?:recognised|recognized|certified)|IICRC credentials?|Certified restoration training|IICRC CEC Accredited credentials|value:\s*'IICRC',\s*label:\s*'("
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,252,certif,Certification,test file,"/IICRC[- ](?:recognised|recognized|certified)|IICRC credentials?|Certified restoration training|IICRC CEC Accredited credentials|value:\s*'IICRC',\s*label:\s*'("
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,252,CEC,CEC,test file,"/IICRC[- ](?:recognised|recognized|certified)|IICRC credentials?|Certified restoration training|IICRC CEC Accredited credentials|value:\s*'IICRC',\s*label:\s*'("
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,252,accredit,Accredited,test file,"/IICRC[- ](?:recognised|recognized|certified)|IICRC credentials?|Certified restoration training|IICRC CEC Accredited credentials|value:\s*'IICRC',\s*label:\s*'("
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,275,certif,IICRC credentials,test file,problems.push(`stat implies IICRC credentials: ${value} ${label}`);
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,282,certif,IICRC credentials,test file,"problems.push(`implies IICRC credentials: ${line.trim().slice(0, 120)}`);"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,287,certif,IICRC-credential,test file,"describe('industry copy carries no unsourced numbers or IICRC-credential claims', () => {"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,304,certif,IICRC credentials,test file,"numberProblems('description=""IICRC credentials satisfy AusTender pre-qualification.""')"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,306,certif,IICRC-recognised,test file,"expect(numberProblems('description=""with IICRC-recognised credentials.""')).not.toEqual([]);"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,307,certif,Certified,test file,"expect(numberProblems(""  { value: 'IICRC', label: 'Certified' },"")).not.toEqual([]);"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,309,certif,Certification,test file,"numberProblems(""const stats = [\n  { value: 'IICRC', label: 'Certification' },\n];"")"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,312,CEC,CEC,test file,"numberProblems(""const stats = [\n  { value: 'IICRC CEC', label: 'On approved courses' },\n];"")"
 not-public,src/lib/marketing/licence-inventory.test.ts,3,certif,certif,test file,"* pass over app/, src/, public/, docs/marketing and docs/content for every IICRC code, ""certif"","
 not-public,src/lib/marketing/licence-inventory.test.ts,4,CEC,CEC,test file,"* ""CEC"", ""accredit"", ""board-approved"" and the unsold subjects. Every hit must be classified;"
 not-public,src/lib/marketing/licence-inventory.test.ts,4,accredit,accredit,test file,"* ""CEC"", ""accredit"", ""board-approved"" and the unsold subjects. Every hit must be classified;"

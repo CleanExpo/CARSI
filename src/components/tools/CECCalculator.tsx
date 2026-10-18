@@ -45,7 +45,7 @@ interface DisciplineInfo {
   avgCecsPerCourse: number;
 }
 
-const DISCIPLINES: DisciplineInfo[] = [
+export const DISCIPLINES: DisciplineInfo[] = [
   {
     code: 'WRT',
     name: IICRC_DISCIPLINE_LONG.WRT,
@@ -105,7 +105,7 @@ const DISCIPLINES: DisciplineInfo[] = [
   },
 ];
 
-const CERT_LEVELS: { value: CertLevel; label: string; description: string }[] = [
+export const CERT_LEVELS: { value: CertLevel; label: string; description: string }[] = [
   {
     value: 'none',
     label: 'No Current Certification',
