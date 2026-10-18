@@ -22,6 +22,8 @@ type Persona =
 const m = vi.hoisted(() => ({
   persona: 'noSession' as string,
   writes: [] as string[],
+  /** The moderation events created, so the recorded actor can be checked per admin kind. */
+  events: [] as Array<Record<string, unknown>>,
 }));
 
 // Each persona's token (what the JWT or cookie SAYS) and database row (what is TRUE now).
@@ -54,7 +56,14 @@ const LMS: Record<
     tokenRole: 'instructor',
     dbRole: 'instructor',
   },
+  deactivatedInstructor: {
+    sub: 'u-gone',
+    email: 'gone@carsi.com.au',
+    tokenRole: 'instructor',
+    dbRole: 'instructor',
+  },
 };
+const INACTIVE = new Set(['u-gone']);
 const COOKIE: Record<string, string> = {
   bootstrapCookie: 'support@carsi.com.au',
   adminUsersCookie: 'ops@carsi.com.au',
@@ -96,7 +105,9 @@ vi.mock('@/lib/prisma', () => {
       if (sql.includes('"lms_user_roles"')) return [];
       if (sql.includes('"lms_users"')) {
         const p = Object.values(LMS).find((x) => x.sub === String(values[0]));
-        return p ? [{ id: p.sub, email: p.email, is_active: true, role: p.dbRole }] : [];
+        return p
+          ? [{ id: p.sub, email: p.email, is_active: !INACTIVE.has(p.sub), role: p.dbRole }]
+          : [];
       }
       throw new Error(`unexpected SQL ${sql}`);
     },
@@ -135,8 +146,9 @@ vi.mock('@/lib/prisma', () => {
       },
     },
     lmsCourseReviewModerationEvent: {
-      create: async () => {
+      create: async (args: { data: Record<string, unknown> }) => {
         m.writes.push('moderation_event.create');
+        m.events.push(args.data);
         return {};
       },
     },
@@ -232,6 +244,7 @@ beforeEach(() => {
   process.env.ADMIN_EMAIL = 'support@carsi.com.au';
   delete process.env.ADMIN_PANEL_EMAILS;
   m.writes = [];
+  m.events = [];
 });
 afterAll(() => {
   for (const [k, v] of [
@@ -276,5 +289,55 @@ describe('an instructor may reply but not moderate or read hidden reviews', () =
     const out = await ROUTES[route]!();
     expect(out.allowed).toBe(allowed);
     if (!allowed && WRITES.has(route)) expect(m.writes).toEqual([]);
+  });
+});
+
+describe('a deactivated instructor can no longer reply (current state, not the token)', () => {
+  it.each(['reply: publish', 'reply: clear'] as const)('%s → 403, no write', async (route) => {
+    m.persona = 'deactivatedInstructor';
+    const out = await ROUTES[route]!();
+    expect(out).toEqual({ status: 403, allowed: false });
+    expect(m.writes).toEqual([]);
+  });
+});
+
+describe('the moderation audit records the verified admin, by kind', () => {
+  it.each([
+    [
+      'founder',
+      {
+        actorKind: 'lms_admin',
+        actorRef: 'u-founder',
+        actorId: 'u-founder',
+        actorEmail: 'phill.m@carsi.com.au',
+      },
+    ],
+    [
+      'dbAdmin',
+      {
+        actorKind: 'lms_admin',
+        actorRef: 'u-admin',
+        actorId: 'u-admin',
+        actorEmail: 'admin@carsi.com.au',
+      },
+    ],
+    [
+      'bootstrapCookie',
+      {
+        actorKind: 'bootstrap_admin',
+        actorRef: null,
+        actorId: null,
+        actorEmail: 'support@carsi.com.au',
+      },
+    ],
+    [
+      'adminUsersCookie',
+      { actorKind: 'admin_user', actorRef: 'adm-7', actorId: null, actorEmail: 'ops@carsi.com.au' },
+    ],
+  ] as const)('%s', async (persona, actor) => {
+    m.persona = persona;
+    expect((await ROUTES['moderation: hide']!()).status).toBe(200);
+    expect(m.events).toHaveLength(1);
+    expect(m.events[0]).toMatchObject(actor);
   });
 });

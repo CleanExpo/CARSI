@@ -280,6 +280,16 @@ describe('POST /reviews/:id/publish — a hide needs a recorded reason (AC-3, D2
     expect(mocks.eventCreate).not.toHaveBeenCalled();
   });
 
+  it('r10: a demotion that lands after the reply route\'s check is still caught inside the reply transaction', async () => {
+    // The route's early check passes (admin), then the account is demoted before the write's transaction.
+    mocks.demoteAfterLookups = 1;
+    const res = await replyPOST(req('http://localhost/api/lms/courses/water-damage/reviews/rev-1/reply', { reply: 'Official response' }), {
+      params: Promise.resolve({ slug: 'water-damage', id: 'rev-1' }),
+    });
+    expect(res.status).toBe(403);
+    expect(mocks.reviewUpdate).not.toHaveBeenCalled();
+  });
+
   it('the moderator is re-read FOR SHARE inside the moderation transaction, with the shared helper', async () => {
     await publish({ is_published: false, reason: 'offensive' });
     expect(mocks.rawSql.some((q) => /^TX:\s*SELECT "id", "email", "is_active", "role" FROM "lms_users" WHERE "id" = \?::uuid FOR SHARE/.test(q))).toBe(true);
