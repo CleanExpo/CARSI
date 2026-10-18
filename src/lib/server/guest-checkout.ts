@@ -1,5 +1,6 @@
 import { randomBytes, randomUUID } from 'node:crypto';
 
+import { isAdminAllowlistedEmail } from '@/lib/admin/admin-panel-access';
 import type { SessionClaims } from '@/lib/auth/session-jwt';
 import {
   hashPassword,
@@ -81,6 +82,8 @@ export async function findOrCreateGuestUser(params: {
   // and poisons certificates (#302). Empty means "no name on file".
   const fullName = params.fullName.trim();
   const allowClaim = params.allowClaim === true;
+  // An admin-allowlisted address is never created, claimed or authenticated from a guest flow.
+  if (isAdminAllowlistedEmail(email)) return { status: 'exists' };
 
   const existing = await prisma.lmsUser.findUnique({ where: { email } });
   if (existing) {
@@ -117,6 +120,8 @@ export async function ensureGuestUserFromStripeEmail(
   if (existing) {
     return sessionClaimsForUserId(existing.id);
   }
+  // Never provision an admin-allowlisted address from an unverified Stripe email.
+  if (isAdminAllowlistedEmail(normalized)) return null;
 
   const id = randomUUID();
   // Unclaimed provisional marker — never a real bcrypt hash. The account cannot

@@ -43,6 +43,15 @@ export function getAdminPanelAllowedEmails(): Set<string> {
   return out;
 }
 
+/**
+ * True for any address that would open the admin panel by email alone. Unverified account
+ * creation (self-registration, guest signup, Stripe-email provisioning, provisional claims)
+ * must refuse these, or anyone could register an unclaimed allowlisted address and become admin.
+ */
+export function isAdminAllowlistedEmail(email: string): boolean {
+  return getAdminPanelAllowedEmails().has(email.trim().toLowerCase());
+}
+
 /** LMS session may access the admin dashboard if role is admin or email is allowlisted. */
 export function isLmsClaimsAllowedAdminPanel(claims: SessionClaims): boolean {
   if (claims.role.trim().toLowerCase() === 'admin') return true;

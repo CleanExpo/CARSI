@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 
 import bcrypt from 'bcryptjs';
 
+import { isAdminAllowlistedEmail } from '@/lib/admin/admin-panel-access';
 import type { SessionClaims } from '@/lib/auth/session-jwt';
 import { prisma } from '@/lib/prisma';
 
@@ -160,6 +161,8 @@ export async function registerUserWithPassword(params: {
 }): Promise<RegisterPrismaResult> {
   const email = params.email.trim().toLowerCase();
   const fullName = params.fullName.trim();
+  // An admin-allowlisted address is never created or claimed by an unverified signup.
+  if (isAdminAllowlistedEmail(email)) return { ok: false, code: 'EMAIL_TAKEN' };
   const hashedPassword = await hashPassword(params.password);
 
   const existing = await prisma.lmsUser.findUnique({ where: { email } });
