@@ -14,6 +14,9 @@ const membershipBaseURL =
   process.env.PLAYWRIGHT_MEMBERSHIP_BASE_URL ??
   (process.env.CI ? `http://localhost:${MEMBERSHIP_CI_PORT}` : undefined);
 const MEMBERSHIP_SPEC = /e2e\/membership-checkout\.spec\.ts$/;
+// A project-level testIgnore REPLACES the top-level one, so every project that sets its own must
+// repeat these (the CI build writes a copy of e2e/ under .next/standalone).
+const BUILD_OUTPUT = ['**/.next/**', '**/node_modules/**'];
 
 export default defineConfig({
   testDir: '.',
@@ -21,7 +24,7 @@ export default defineConfig({
   // `*.spec.ts` glob), so it runs once to mint a real session before the
   // authenticated journeys.
   testMatch: ['e2e/**/*.spec.ts'],
-  testIgnore: ['**/.next/**', '**/node_modules/**'],
+  testIgnore: BUILD_OUTPUT,
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
@@ -44,7 +47,7 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
       grepInvert: /@authenticated/,
       // Flag-on journeys run only in the membership-checkout project below.
-      testIgnore: MEMBERSHIP_SPEC,
+      testIgnore: [...BUILD_OUTPUT, MEMBERSHIP_SPEC],
     },
     {
       // Authenticated desktop journeys: depend on `setup` to mint a real session and
@@ -63,6 +66,7 @@ export default defineConfig({
           {
             name: 'membership-checkout',
             testMatch: MEMBERSHIP_SPEC,
+            testIgnore: BUILD_OUTPUT,
             use: { ...devices['Desktop Chrome'], baseURL: membershipBaseURL },
           },
         ]
