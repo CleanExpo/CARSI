@@ -67,7 +67,7 @@ const FULL_YEAR: Enrolment[] = [
   enrolment('introduction-to-drying-techniques-and-equipment', { status: 'active' }),
 ];
 
-const VERIFIED_MEMBER = {
+const MEMBER = {
   email: 'member@example.com',
   fullName: 'Casey Member',
   isVerified: true,
@@ -166,7 +166,7 @@ describe('renewal reminder — your year with CARSI', () => {
 
   beforeEach(() => {
     process.env.DATABASE_URL = 'postgresql://test';
-    h.user = { ...VERIFIED_MEMBER };
+    h.user = { ...MEMBER };
     h.stallEnrolments = false;
     h.progress = [];
     vi.useFakeTimers({ toFake: ['Date'] });
@@ -224,11 +224,21 @@ describe('renewal reminder — your year with CARSI', () => {
     expect(sent.text).not.toContain('Completed:');
   });
 
-  it('sends no recap when the learner’s account email is not verified', async () => {
-    h.user = { ...VERIFIED_MEMBER, isVerified: false };
+  // Review r2 P1-V7-RECAP-UNREACHABLE-FOR-NEW-MEMBERS (parent decision): verification is not
+  // required. /register creates isVerified:false accounts and no verification flow exists; the
+  // recap goes to the address that owns the account, which is the privacy point.
+  it('sends the recap to an unverified account when the address matches', async () => {
+    h.user = { ...MEMBER, isVerified: false };
     const { text } = await sentEmail(FULL_YEAR);
     expect(text).toContain('renews automatically');
-    expect(text).not.toContain('Your year with CARSI');
+    expect(text).toContain('Your year with CARSI');
+    expect(text).toContain('- Completed: 3 courses');
+  });
+
+  it('matches the account email trimmed and lower-cased', async () => {
+    h.user = { ...MEMBER, isVerified: false, email: '  Member@Example.COM ' };
+    const { text } = await sentEmail(FULL_YEAR, 'member@example.com');
+    expect(text).toContain('Your year with CARSI');
   });
 
   // Review r1 P1-V7-OPTIONAL-READ-BLOCKS-REMINDER

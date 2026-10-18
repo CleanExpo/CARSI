@@ -132,12 +132,17 @@ type Recipient = {
   manageUrl: string;
   cancelInstruction: string;
   /**
-   * True only when the email goes to the learner's own verified CARSI account address. The
-   * billing email on the invoice can be someone else (an employer, a bookkeeper), and the
-   * year recap is the learner's course history.
+   * True only when the email goes to the address that owns the learner's CARSI account
+   * (trimmed, lower-cased, exact match). The billing email on the invoice can be someone else
+   * (an employer, a bookkeeper), and the year recap is the learner's course history.
    */
-  deliversToVerifiedAccountEmail: boolean;
+  deliversToAccountEmail: boolean;
 };
+
+/** Trimmed and lower-cased, so a stored "  Casey@Example.com " still matches its owner. */
+function normaliseEmail(email: string | null | undefined): string | null {
+  return email?.trim().toLowerCase() || null;
+}
 
 async function resolveRecipient(
   invoice: Stripe.Invoice,
@@ -168,13 +173,12 @@ async function resolveRecipient(
 
   const user = await prisma.lmsUser.findUnique({
     where: { id: userId },
-    select: { email: true, fullName: true, isVerified: true },
+    select: { email: true, fullName: true },
   });
-  const accountEmail = user?.email?.trim().toLowerCase() || null;
-  const to = billingEmail ?? accountEmail;
+  const accountEmail = normaliseEmail(user?.email);
+  const to = normaliseEmail(billingEmail) ?? accountEmail;
   if (!to) return null;
-  const deliversToVerifiedAccountEmail =
-    user?.isVerified === true && accountEmail !== null && to === accountEmail;
+  const deliversToAccountEmail = accountEmail !== null && to === accountEmail;
 
   const name = user?.fullName?.trim() || to.split('@')[0];
   if (kind === 'team') {
@@ -188,7 +192,7 @@ async function resolveRecipient(
       teamName,
       manageUrl: `${origin}/dashboard/team`,
       cancelInstruction: `To cancel, reply to this email or write to ${SUPPORT_EMAIL} and we will set your plan to end at the close of the current period.`,
-      deliversToVerifiedAccountEmail,
+      deliversToAccountEmail,
     };
   }
   return {
@@ -199,7 +203,7 @@ async function resolveRecipient(
     manageUrl: `${origin}/subscribe`,
     cancelInstruction:
       'To cancel, sign in, open your membership page and choose "Manage billing & payment method".',
-    deliversToVerifiedAccountEmail,
+    deliversToAccountEmail,
   };
 }
 
@@ -323,7 +327,7 @@ export async function sendUpcomingRenewalReminder(params: {
   const renewalDateLabel = formatRenewalDate(renewalAt);
   const amountLabel = formatRenewalAmount(amountCents);
   const yearRecap =
-    kind === 'individual' && recipient.deliversToVerifiedAccountEmail
+    kind === 'individual' && recipient.deliversToAccountEmail
       ? await loadYearRecap(recipient.userId, origin)
       : null;
   const { html, text } = renderRenewalReminderEmail({
