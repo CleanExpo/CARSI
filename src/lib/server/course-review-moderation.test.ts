@@ -26,7 +26,16 @@ describe('moderation event table (D1, D3)', () => {
   });
 
   it('the migration is additive: it never alters, updates or deletes existing data', () => {
-    const statements = MIGRATION.split('\n').filter((l) => !l.trim().startsWith('--')).join('\n');
+    const withoutComments = MIGRATION.split('\n').filter((l) => !l.trim().startsWith('--')).join('\n');
+    // The trigger function body runs later, at completion time, not during the migration; it is
+    // checked separately below. Everything else is what the migration itself executes.
+    const bodies = withoutComments.match(/\$\$[\s\S]*?\$\$/g) ?? [];
+    expect(bodies).toHaveLength(1);
+    const statements = withoutComments.replace(/\$\$[\s\S]*?\$\$/g, '$$ $$');
+    // The trigger only ever writes the review-request ledger.
+    const written = [...bodies[0]!.matchAll(/(?:UPDATE|INSERT INTO|DELETE FROM)\s+"([a-z_]+)"/g)].map((m) => m[1]);
+    expect(new Set(written)).toEqual(new Set(['lms_review_request_emails']));
+    expect(bodies[0]).not.toMatch(/DELETE FROM/);
     // The only change to an existing table: one new column with a constant default (metadata-only).
     const reviewAlters = statements.match(/ALTER TABLE "lms_course_reviews"[^;]*;/g) ?? [];
     expect(reviewAlters).toEqual(['ALTER TABLE "lms_course_reviews" ADD COLUMN "moderation_version" INTEGER NOT NULL DEFAULT 0;']);
@@ -63,22 +72,49 @@ describe('toModerationDto (D3, D4)', () => {
   });
 
   it('an unchanged hidden review is not flagged as edited', () => {
-    const latest = { action: 'hide', reason: 'offensive', contentSha256: reviewContentSha256('a', 'b'), ratingAtAction: 4, createdAt: at };
+    const latest = { action: 'hide', reason: 'offensive', contentSha256: reviewContentSha256('a', 'b', 4), ratingAtAction: 4, createdAt: at };
     expect(toModerationDto({ isPublished: false, rating: 4, title: 'a', body: 'b' }, latest).edited_after_hide).toBe(false);
   });
 
   it('a hidden review the learner edited afterwards is flagged', () => {
-    const latest = { action: 'hide', reason: 'offensive', contentSha256: reviewContentSha256('a', 'b'), ratingAtAction: 4, createdAt: at };
+    const latest = { action: 'hide', reason: 'offensive', contentSha256: reviewContentSha256('a', 'b', 4), ratingAtAction: 4, createdAt: at };
     expect(toModerationDto({ isPublished: false, rating: 4, title: 'a', body: 'changed' }, latest).edited_after_hide).toBe(true);
   });
 
   it('a rating-only change after the hide (4 stars to 1, same text) is flagged', () => {
-    const latest = { action: 'hide', reason: 'offensive', contentSha256: reviewContentSha256('a', 'b'), ratingAtAction: 4, createdAt: at };
+    const latest = { action: 'hide', reason: 'offensive', contentSha256: reviewContentSha256('a', 'b', 4), ratingAtAction: 4, createdAt: at };
     expect(toModerationDto({ isPublished: false, rating: 1, title: 'a', body: 'b' }, latest).edited_after_hide).toBe(true);
   });
 
   it('the content hash distinguishes a moved newline (title/body boundary)', () => {
-    expect(reviewContentSha256('ab', 'c')).not.toBe(reviewContentSha256('a', 'bc'));
+    expect(reviewContentSha256('ab', 'c', 4)).not.toBe(reviewContentSha256('a', 'bc', 4));
+  });
+
+  it('release-gate r5 collision: ("a\\nb","c") and ("a","b\\nc") no longer hash alike, so the edit is flagged', () => {
+    expect(reviewContentSha256('a\nb', 'c', 4)).not.toBe(reviewContentSha256('a', 'b\nc', 4));
+    const latest = { action: 'hide', reason: 'offensive', contentSha256: reviewContentSha256('a\nb', 'c', 4), ratingAtAction: 4, createdAt: at };
+    expect(toModerationDto({ isPublished: false, rating: 4, title: 'a', body: 'b\nc' }, latest).edited_after_hide).toBe(true);
+  });
+
+  it.each([
+    ['separator characters moved between fields', ['a","b', 'c'], ['a', '","bc']],
+    ['a JSON-looking title', ['["x"]', ''], ['', '["x"]']],
+    ['empty title vs empty body', ['x', ''], ['', 'x']],
+    ['title and body swapped', ['good', 'bad'], ['bad', 'good']],
+  ])('no collision: %s', (_label, [t1, b1], [t2, b2]) => {
+    expect(reviewContentSha256(t1!, b1!, 4)).not.toBe(reviewContentSha256(t2!, b2!, 4));
+  });
+
+  it('the rating is part of the fingerprint', () => {
+    expect(reviewContentSha256('a', 'b', 4)).not.toBe(reviewContentSha256('a', 'b', 1));
+  });
+
+  it.each([
+    ['surrounding whitespace (upsertReview trims)', ['  a ', '\tb\n'], ['a', 'b']],
+    ['null and blank are the same stored value', [null, ''], ['', null]],
+    ['composed and decomposed accents (NFC)', ['Caf\u00e9', 'b'], ['Cafe\u0301', 'b']],
+  ])('canonical equivalence: %s', (_label, [t1, b1], [t2, b2]) => {
+    expect(reviewContentSha256(t1 as string | null, b1 as string | null, 4)).toBe(reviewContentSha256(t2 as string | null, b2 as string | null, 4));
   });
 });
 

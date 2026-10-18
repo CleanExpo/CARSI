@@ -65,10 +65,10 @@ export async function POST(
       return NextResponse.json({ detail: 'Review not found' }, { status: 404 });
     }
     if (payload.is_published === false && isHideReason(reason)) {
-      await setReviewVisibility({ reviewId: id, isPublished: false, reason, actorId: claims.sub });
+      await setReviewVisibility({ reviewId: id, isPublished: false, reason, actorId: claims.sub, actorEmail: claims.email });
       return NextResponse.json({ ok: true, is_published: false, hidden_reason: reason });
     }
-    await setReviewVisibility({ reviewId: id, isPublished: true, actorId: claims.sub });
+    await setReviewVisibility({ reviewId: id, isPublished: true, actorId: claims.sub, actorEmail: claims.email });
     return NextResponse.json({ ok: true, is_published: true, hidden_reason: null });
   } catch (e) {
     console.error('[courses/:slug/reviews/:id/publish POST]', e);

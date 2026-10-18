@@ -36,6 +36,7 @@ import { buildUnsubscribeUrl } from '@/lib/server/email-preferences';
 import { isEmailConfigured, sendEmail, type SendEmailResult } from '@/lib/server/email';
 import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
 import { signEmailUnsubscribeToken } from '@/lib/auth/session-jwt';
+import { getAdminEmail } from '@/lib/admin/admin-panel-access';
 import { prisma } from '@/lib/prisma';
 
 const DAY_MS = 86_400_000;
@@ -62,15 +63,65 @@ export async function readReviewRequestSettings(): Promise<{ enabled: boolean; m
   return { enabled: row?.enabled === true, missing: row === null };
 }
 
+export type ReviewRequestSwitchActor = {
+  kind: 'bootstrap_admin' | 'admin_user' | 'lms_admin';
+  /** admin_users.id or lms_users.id at the time of the change; null for the bootstrap admin. */
+  ref: string | null;
+  email: string;
+};
+
 /**
- * Switch review-request emails on or off (admin only; spec D10d). Switching on affects only
- * completions recorded from this moment: earlier completions were never marked eligible.
+ * Resolve the verified admin identity behind an admin session (release-gate r5), covering every
+ * route getAdminSessionOrNull accepts: the bootstrap ADMIN_EMAIL, an admin_users account, or an
+ * allow-listed / admin-role LMS user. Returns null when the change could not be attributed.
  */
-export async function setReviewRequestEmailsEnabled(enabled: boolean, actorId: string | null, now: Date = new Date()) {
-  return prisma.lmsReviewRequestSettings.update({
-    where: { id: 1 },
-    data: { enabled, changedAt: now, changedById: actorId },
-    select: { enabled: true, changedAt: true },
+export async function resolveReviewRequestSwitchActor(sessionEmail: string | null | undefined): Promise<ReviewRequestSwitchActor | null> {
+  const email = sessionEmail?.trim().toLowerCase();
+  if (!email) return null;
+  const bootstrap = getAdminEmail().trim().toLowerCase();
+  if (bootstrap && email === bootstrap) return { kind: 'bootstrap_admin', ref: null, email };
+  const adminUser = await prisma.adminUser.findUnique({ where: { email }, select: { id: true, isActive: true } });
+  if (adminUser?.isActive) return { kind: 'admin_user', ref: adminUser.id, email };
+  const lmsUser = await prisma.lmsUser.findFirst({
+    where: { email: { equals: email, mode: 'insensitive' } },
+    select: { id: true },
+  });
+  if (lmsUser) return { kind: 'lms_admin', ref: lmsUser.id, email };
+  return null;
+}
+
+/**
+ * Switch review-request emails on or off (admin only; spec D10d, D10e). In ONE transaction: lock
+ * the switch row (FOR UPDATE, which waits for any send holding it FOR SHARE), change it, and append
+ * the change with old value, new value and a durable actor snapshot. Switching on affects only
+ * completions recorded from this moment; switching off stops any send that has not yet started.
+ */
+export async function setReviewRequestEmailsEnabled(enabled: boolean, actor: ReviewRequestSwitchActor) {
+  return prisma.$transaction(async (tx) => {
+    const current = await tx.$queryRaw<Array<{ enabled: boolean }>>`
+      SELECT "enabled" FROM "lms_review_request_settings" WHERE "id" = 1 FOR UPDATE`;
+    if (current.length !== 1) throw new Error('lms_review_request_settings row is missing');
+    await tx.lmsReviewRequestSettings.update({ where: { id: 1 }, data: { enabled } });
+    const event = await tx.lmsReviewRequestSwitchEvent.create({
+      data: {
+        oldEnabled: current[0]!.enabled,
+        newEnabled: enabled,
+        actorKind: actor.kind,
+        actorRef: actor.ref,
+        actorEmail: actor.email,
+      },
+      select: { createdAt: true },
+    });
+    return { enabled, changedAt: event.createdAt };
+  });
+}
+
+/** The switch history, newest first (admin view). */
+export async function listReviewRequestSwitchEvents(limit = 20) {
+  return prisma.lmsReviewRequestSwitchEvent.findMany({
+    orderBy: { createdAt: 'desc' },
+    take: limit,
+    select: { oldEnabled: true, newEnabled: true, actorKind: true, actorEmail: true, createdAt: true },
   });
 }
 
@@ -201,6 +252,8 @@ export type ReviewRequestRunResult = {
   ok: boolean;
   /** Why nothing was attempted, when nothing was (never conflated with "nobody eligible"). */
   reason?: 'disabled' | 'settings_missing' | 'email_not_configured';
+  /** The switch was turned off during this run; no further send was started. */
+  stopped_by_switch?: boolean;
   dry_run: boolean;
   window?: { from: string; to: string };
   candidates: number;
@@ -382,13 +435,28 @@ export async function runReviewRequestEmails(options: { now?: Date; dryRun?: boo
       return;
     }
 
-    // Mark the attempt BEFORE calling the provider: if this process dies mid-send, a later run
-    // sees send_attempted_at and records the outcome as ambiguous instead of sending again.
-    const started = await prisma.lmsReviewRequestEmail.updateMany({
-      where: { enrollmentId: enrolment.id, claimToken: token },
-      data: { sendAttemptedAt: now },
+    // Immediately before THIS send: re-read the switch under a shared row lock and mark the attempt
+    // in the same transaction. An admin switching off takes the row FOR UPDATE, so it either commits
+    // first (and this send sees OFF and does not start) or waits until this mark has committed.
+    // If this process dies mid-send, a later run sees send_attempted_at and records the outcome as
+    // ambiguous instead of sending again.
+    const started = await prisma.$transaction(async (tx) => {
+      const sw = await tx.$queryRaw<Array<{ enabled: boolean }>>`
+        SELECT "enabled" FROM "lms_review_request_settings" WHERE "id" = 1 FOR SHARE`;
+      if (sw[0]?.enabled !== true) return 'switched_off' as const;
+      const marked = await tx.lmsReviewRequestEmail.updateMany({
+        where: { enrollmentId: enrolment.id, claimToken: token },
+        data: { sendAttemptedAt: now },
+      });
+      return marked.count === 1 ? ('ok' as const) : ('lost_claim' as const);
     });
-    if (started.count === 0) {
+    if (started === 'switched_off') {
+      // Nothing was sent: hand the row back as eligible (no attempt used) and stop the run.
+      await finish({ status: 'eligible' });
+      result.stopped_by_switch = true;
+      return;
+    }
+    if (started === 'lost_claim') {
       skip('claimed_elsewhere');
       return;
     }
@@ -476,10 +544,10 @@ export async function runReviewRequestEmails(options: { now?: Date; dryRun?: boo
     const last = candidates[candidates.length - 1]!;
     after = { completedAt: last.completedAt!, id: last.id };
     for (const enrolment of candidates) {
-      if (capReached()) break;
+      if (capReached() || result.stopped_by_switch) break;
       await processCandidate(enrolment);
     }
-    if (candidates.length < PAGE_SIZE) break;
+    if (candidates.length < PAGE_SIZE || result.stopped_by_switch) break;
   }
 
   result.ok = result.failed === 0;

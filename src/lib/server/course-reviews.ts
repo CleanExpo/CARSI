@@ -276,9 +276,19 @@ type LatestModerationEvent = {
   createdAt: Date;
 };
 
-/** sha256 of the reviewed text, so an edit after a hide is detectable (D4). */
-export function reviewContentSha256(title: string | null, body: string | null): string {
-  return createHash('sha256').update(`${title ?? ''}\n${body ?? ''}`).digest('hex');
+/** Canonical form of a review field: NFC, trimmed, and null/blank as "" (what upsertReview stores). */
+function canonicalReviewText(value: string | null | undefined): string {
+  return (value ?? '').normalize('NFC').trim();
+}
+
+/**
+ * Canonical fingerprint of what a learner wrote, so ANY edit after a hide is detectable (D4,
+ * release-gate r5). The fields are encoded as a JSON array, never joined with a separator, so no
+ * split of characters between title and body can collide; the rating is part of the fingerprint.
+ */
+export function reviewContentSha256(title: string | null, body: string | null, rating: number): string {
+  const canonical = JSON.stringify(['carsi-review-content-v1', canonicalReviewText(title), canonicalReviewText(body), rating]);
+  return createHash('sha256').update(canonical, 'utf8').digest('hex');
 }
 
 /** Pure: moderator view of the latest moderation decision for a review (D2/D3/D4). */
@@ -296,8 +306,7 @@ export function toModerationDto(
     hidden_reason: latest.reason as ReviewHideReason,
     hidden_at: latest.createdAt.toISOString(),
     hidden_before_reasons_recorded: false,
-    edited_after_hide:
-      latest.contentSha256 !== reviewContentSha256(row.title, row.body) || latest.ratingAtAction !== row.rating,
+    edited_after_hide: latest.contentSha256 !== reviewContentSha256(row.title, row.body, row.rating),
   };
 }
 
@@ -308,8 +317,8 @@ export function toModerationDto(
  */
 export async function setReviewVisibility(
   params:
-    | { reviewId: string; isPublished: false; reason: ReviewHideReason; actorId: string }
-    | { reviewId: string; isPublished: true; reason?: undefined; actorId: string }
+    | { reviewId: string; isPublished: false; reason: ReviewHideReason; actorId: string; actorEmail: string }
+    | { reviewId: string; isPublished: true; reason?: undefined; actorId: string; actorEmail: string }
 ): Promise<void> {
   await prisma.$transaction(async (tx) => {
     const review = await tx.lmsCourseReview.update({
@@ -337,8 +346,11 @@ export async function setReviewVisibility(
         action: params.isPublished ? 'unhide' : 'hide',
         reason: params.isPublished ? null : params.reason,
         actorId: params.actorId,
+        // Durable snapshot: who decided survives deleting the admin's account.
+        actorRef: params.actorId,
+        actorEmail: params.actorEmail,
         ratingAtAction: review.rating,
-        contentSha256: reviewContentSha256(review.title, review.body),
+        contentSha256: reviewContentSha256(review.title, review.body, review.rating),
       },
     });
   });

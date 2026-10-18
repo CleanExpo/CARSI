@@ -51,6 +51,8 @@ const db = vi.hoisted(() => ({
   barrier: null as null | { parties: number; arrived: number; release: () => void; ready: Promise<void> },
   /** When set, the SECOND candidate query (its snapshot already taken) waits for this before returning. */
   holdSecondQuery: null as null | { calls: number; until: Promise<void> },
+  /** SQL of every raw query (the locked switch reads). */
+  rawSql: [] as string[],
 }));
 const mail = vi.hoisted(() => ({ send: vi.fn(), configured: vi.fn(() => true) }));
 const unsub = vi.hoisted(() => ({ setOptOut: vi.fn(async (_id: string, optedOut: boolean) => ({ email_opt_out: optedOut })) }));
@@ -87,6 +89,15 @@ vi.mock('@/lib/prisma', () => ({
   prisma: {
     lmsReviewRequestSettings: {
       findUnique: async () => (db.settings ? { enabled: db.settings.enabled } : null),
+    },
+    // The locked switch read: SELECT "enabled" ... FOR SHARE (the fake records the SQL).
+    $queryRaw: async (strings: TemplateStringsArray) => {
+      db.rawSql.push(strings.join('?'));
+      return db.settings ? [{ enabled: db.settings.enabled }] : [];
+    },
+    // Interactive transaction: the callback gets the same client (method call binds `this`).
+    $transaction: async function (this: unknown, fn: (tx: unknown) => unknown) {
+      return fn(this);
     },
     lmsEnrollment: {
       findMany: async ({ where, take }: { where: FindWhere; take: number }) => {
@@ -206,6 +217,7 @@ beforeEach(() => {
   db.failUserReadOnce = false;
   db.barrier = null;
   db.holdSecondQuery = null;
+  db.rawSql = [];
   unsub.setOptOut.mockClear();
   mail.send.mockReset().mockResolvedValue({ sent: true, messageId: 'm-1' });
   mail.configured.mockReset().mockReturnValue(true);
@@ -339,6 +351,32 @@ describe('at most once per enrolment (D9)', () => {
     expect(a.sent + b.sent).toBe(1);
     expect((a.skipped.claimed_elsewhere ?? 0) + (b.skipped.claimed_elsewhere ?? 0)).toBe(1);
     expect(mail.send).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('switching OFF stops a run that is already going (release-gate r5)', () => {
+  it('an OFF committed between two sends stops the second send; its row goes back to eligible', async () => {
+    addCompleter('first', 6 * D);
+    addCompleter('second', 5 * D);
+    // The admin switches off while the first email is with the provider.
+    mail.send.mockImplementationOnce(async () => {
+      db.settings = { enabled: false };
+      return { sent: true, messageId: 'm-first' };
+    });
+    const res = await run();
+    expect(res).toMatchObject({ sent: 1, stopped_by_switch: true });
+    expect(mail.send).toHaveBeenCalledTimes(1);
+    expect(db.ledger.get('first')?.status).toBe('sent');
+    expect(db.ledger.get('second')).toMatchObject({ status: 'eligible', attempts: 0, claimToken: null, sendAttemptedAt: null });
+  });
+
+  it('the switch is re-read under a shared row lock immediately before each individual send', async () => {
+    addCompleter('a1', 6 * D);
+    addCompleter('a2', 5 * D);
+    await run();
+    expect(mail.send).toHaveBeenCalledTimes(2);
+    const locked = db.rawSql.filter((q) => /FROM "lms_review_request_settings" WHERE "id" = 1 FOR SHARE/.test(q));
+    expect(locked).toHaveLength(2);
   });
 });
 

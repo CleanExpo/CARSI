@@ -59,8 +59,8 @@ beforeEach(async () => {
   ]);
   await db.query(
     `INSERT INTO lms_course_review_moderation_events
-       (id, review_id, review_ref, course_ref, course_slug, course_title, sequence, action, reason, actor_id, rating_at_action, content_sha256)
-     VALUES ($1, $2, $2, $3, $4, 'Water Damage Restoration', 1, 'hide', 'spam_or_fake', $5, 1, $6)`,
+       (id, review_id, review_ref, course_ref, course_slug, course_title, sequence, action, reason, actor_id, actor_ref, actor_email, rating_at_action, content_sha256)
+     VALUES ($1, $2, $2, $3, $4, 'Water Damage Restoration', 1, 'hide', 'spam_or_fake', $5, $5, 'moderator@carsi.com.au', 1, $6)`,
     [randomUUID(), ids.review, ids.course, `water-damage-${ids.course}`, ids.admin, 'a'.repeat(64)]
   );
 });
@@ -105,17 +105,33 @@ describe('the moderation audit outlives what it judged (real PostgreSQL FKs)', (
     expect(await events()).toMatchObject([{ review_id: null, review_ref: ids.review, course_ref: ids.course }]);
   });
 
-  it('deleting the acting ADMIN keeps the event, with the actor nulled', async () => {
+  it('deleting the acting ADMIN keeps the event AND who made the decision (durable actor snapshot)', async () => {
     await db.query('DELETE FROM lms_users WHERE id = $1', [ids.admin]);
     expect(await events()).toMatchObject([{ review_id: ids.review, actor_id: null, reason: 'spam_or_fake' }]);
+    const who = await db.query<{ actor_ref: string; actor_email: string }>(
+      'SELECT actor_ref, actor_email FROM lms_course_review_moderation_events WHERE review_ref = $1',
+      [ids.review]
+    );
+    expect(who.rows).toEqual([{ actor_ref: ids.admin, actor_email: 'moderator@carsi.com.au' }]);
+  });
+
+  it('the database refuses a moderation event with no actor snapshot', async () => {
+    await expect(
+      db.query(
+        `INSERT INTO lms_course_review_moderation_events
+           (id, review_id, review_ref, course_ref, course_slug, course_title, sequence, action, reason, actor_ref, actor_email, rating_at_action, content_sha256)
+         VALUES ($1, $2, $2, $3, 's', 't', 9, 'unhide', NULL, $3, '  ', 1, $4)`,
+        [randomUUID(), ids.review, ids.course, 'e'.repeat(64)]
+      )
+    ).rejects.toThrow(/ck_lms_review_moderation_actor_email/);
   });
 
   it('the database still refuses a hide without a reason', async () => {
     await expect(
       db.query(
         `INSERT INTO lms_course_review_moderation_events
-           (id, review_id, review_ref, course_ref, course_slug, course_title, sequence, action, reason, rating_at_action, content_sha256)
-         VALUES ($1, $2, $2, $3, 's', 't', 2, 'hide', NULL, 1, $4)`,
+           (id, review_id, review_ref, course_ref, course_slug, course_title, sequence, action, reason, actor_ref, actor_email, rating_at_action, content_sha256)
+         VALUES ($1, $2, $2, $3, 's', 't', 2, 'hide', NULL, $3, 'm@carsi.com.au', 1, $4)`,
         [randomUUID(), ids.review, ids.course, 'b'.repeat(64)]
       )
     ).rejects.toThrow(/ck_lms_review_moderation_hide_has_reason/);
@@ -146,8 +162,8 @@ describe('moderation order is the decision sequence, never a timestamp (release-
       );
       await db.query(
         `INSERT INTO lms_course_review_moderation_events
-           (id, review_id, review_ref, course_ref, course_slug, course_title, sequence, action, reason, rating_at_action, content_sha256, created_at)
-         VALUES ($1, $2, $2, $3, 's', 't', $4, $5, $6, 1, $7, $8)`,
+           (id, review_id, review_ref, course_ref, course_slug, course_title, sequence, action, reason, actor_ref, actor_email, rating_at_action, content_sha256, created_at)
+         VALUES ($1, $2, $2, $3, 's', 't', $4, $5, $6, $3, 'm@carsi.com.au', 1, $7, $8)`,
         [randomUUID(), ids.review, ids.course, v.rows[0]!.moderation_version, action, reason, 'c'.repeat(64), createdAt]
       );
       await db.exec('COMMIT');
@@ -192,8 +208,8 @@ describe('moderation order is the decision sequence, never a timestamp (release-
     await expect(
       db.query(
         `INSERT INTO lms_course_review_moderation_events
-           (id, review_id, review_ref, course_ref, course_slug, course_title, sequence, action, reason, rating_at_action, content_sha256)
-         VALUES ($1, $2, $2, $3, 's', 't', 1, 'unhide', NULL, 1, $4)`,
+           (id, review_id, review_ref, course_ref, course_slug, course_title, sequence, action, reason, actor_ref, actor_email, rating_at_action, content_sha256)
+         VALUES ($1, $2, $2, $3, 's', 't', 1, 'unhide', NULL, $3, 'm@carsi.com.au', 1, $4)`,
         [randomUUID(), ids.review, ids.course, 'd'.repeat(64)]
       )
     ).rejects.toThrow(/uq_lms_review_moderation_review_ref_sequence/);
@@ -281,5 +297,107 @@ describe('review-request eligibility is decided at completion, in the database (
     await db.query("UPDATE lms_enrollments SET status = 'revoked', completed_at = NULL WHERE id = $1", [e]);
     await complete(e);
     expect(await ledger(e)).toEqual([{ status: 'eligible' }]);
+  });
+
+  /** The cron's own selection rule, in SQL: completed, 3-14 days old, row eligible. */
+  async function sendable(id: string) {
+    const r = await db.query<{ n: number }>(
+      `SELECT count(*)::int AS n FROM lms_enrollments e JOIN lms_review_request_emails r ON r.enrollment_id = e.id
+        WHERE e.id = $1 AND e.status = 'completed' AND r.status = 'eligible'
+          AND e.completed_at BETWEEN now() - interval '14 days' AND now() - interval '3 days'`,
+      [id]
+    );
+    return r.rows[0]!.n;
+  }
+
+  it('r5 reviewer sequence: completed while on, revoked, switched off, re-completed (5 days ago), switched on → not sendable', async () => {
+    await setSwitch(true);
+    const e = await newEnrolment();
+    await complete(e);
+    expect(await ledger(e)).toEqual([{ status: 'eligible' }]);
+    await db.query("UPDATE lms_enrollments SET status = 'revoked', completed_at = NULL WHERE id = $1", [e]);
+    expect(await ledger(e)).toEqual([{ status: 'ineligible' }]); // revocation is a transition
+    await setSwitch(false);
+    await db.query("UPDATE lms_enrollments SET status = 'completed', completed_at = now() - interval '5 days' WHERE id = $1", [e]);
+    await setSwitch(true);
+    expect(await ledger(e)).toEqual([{ status: 'ineligible' }]);
+    expect(await sendable(e)).toBe(0);
+  });
+
+  it('re-completion while off makes an earlier eligible row ineligible even without a revoke in between', async () => {
+    await setSwitch(true);
+    const e = await newEnrolment('completed', '2026-10-01T00:00:00Z'); // eligible
+    await setSwitch(false);
+    // completed_at cleared and set again in one statement chain (e.g. an admin "re-complete")
+    await db.query('UPDATE lms_enrollments SET completed_at = NULL WHERE id = $1', [e]);
+    await db.query("UPDATE lms_enrollments SET completed_at = now() - interval '4 days' WHERE id = $1", [e]);
+    expect(await ledger(e)).toEqual([{ status: 'ineligible' }]);
+  });
+
+  it('defence in depth: if completed_at was cleared with the trigger disabled (a data repair), re-completion while off still clears eligibility', async () => {
+    await setSwitch(true);
+    const e = await newEnrolment('completed', '2026-10-01T00:00:00Z'); // eligible
+    await db.exec('ALTER TABLE lms_enrollments DISABLE TRIGGER trg_lms_enrollments_review_request_eligibility');
+    try {
+      await db.query('UPDATE lms_enrollments SET completed_at = NULL WHERE id = $1', [e]);
+    } finally {
+      await db.exec('ALTER TABLE lms_enrollments ENABLE TRIGGER trg_lms_enrollments_review_request_eligibility');
+    }
+    expect(await ledger(e)).toEqual([{ status: 'eligible' }]); // the revocation was not seen
+    await setSwitch(false);
+    await db.query("UPDATE lms_enrollments SET completed_at = now() - interval '4 days' WHERE id = $1", [e]);
+    expect(await ledger(e)).toEqual([{ status: 'ineligible' }]);
+    expect(await sendable(e)).toBe(0);
+  });
+
+  it.each(['sent', 'ambiguous', 'pending'])(
+    'a %s row is evidence: revocation and re-completion never change it',
+    async (terminal) => {
+      await setSwitch(true);
+      const e = await newEnrolment();
+      await complete(e);
+      await db.query('UPDATE lms_review_request_emails SET status = $2 WHERE enrollment_id = $1', [e, terminal]);
+      await db.query("UPDATE lms_enrollments SET status = 'revoked', completed_at = NULL WHERE id = $1", [e]);
+      await setSwitch(false);
+      await complete(e);
+      await setSwitch(true);
+      await db.query("UPDATE lms_enrollments SET completed_at = NULL WHERE id = $1", [e]);
+      await complete(e);
+      expect(await ledger(e)).toEqual([{ status: terminal }]);
+    }
+  );
+
+  it('the trigger reads the switch FOR SHARE (a completion cannot interleave with a switch change)', async () => {
+    const r = await db.query<{ src: string }>(
+      "SELECT prosrc AS src FROM pg_proc WHERE proname = 'lms_review_request_mark_eligible'"
+    );
+    expect(r.rows[0]!.src).toMatch(/FROM "lms_review_request_settings" WHERE "id" = 1 FOR SHARE/);
+  });
+});
+
+describe('review-request switch history (release-gate r5)', () => {
+  const insert = (kind: string, email: string) =>
+    db.query(
+      'INSERT INTO lms_review_request_switch_events (id, old_enabled, new_enabled, actor_kind, actor_ref, actor_email) VALUES ($1, false, true, $2, NULL, $3)',
+      [randomUUID(), kind, email]
+    );
+
+  it.each(['bootstrap_admin', 'admin_user', 'lms_admin'])('accepts a %s actor', async (kind) => {
+    await insert(kind, 'boss@carsi.com.au');
+  });
+
+  it('refuses an unknown actor kind', async () => {
+    await expect(insert('anonymous', 'x@carsi.com.au')).rejects.toThrow(/ck_lms_review_request_switch_actor_kind/);
+  });
+
+  it('refuses an unattributed change (blank email)', async () => {
+    await expect(insert('admin_user', '  ')).rejects.toThrow(/ck_lms_review_request_switch_actor_email/);
+  });
+
+  it('has no foreign key, so deleting any account can never remove history', async () => {
+    const r = await db.query<{ n: number }>(
+      "SELECT count(*)::int AS n FROM pg_constraint WHERE conrelid = 'lms_review_request_switch_events'::regclass AND contype = 'f'"
+    );
+    expect(r.rows[0]!.n).toBe(0);
   });
 });

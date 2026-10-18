@@ -66,7 +66,6 @@ model LmsUser {
   reviewReplies         LmsCourseReview[]         @relation("ReviewReplyAuthor")
   /// Moderation decisions this admin made (append-only audit; actor nulled if the admin is deleted).
   reviewModerationEvents LmsCourseReviewModerationEvent[] @relation("ReviewModerationActor")
-  reviewRequestSettingsChanges LmsReviewRequestSettings[] @relation("ReviewRequestSettingsChangedBy")
   subscription                  LmsSubscription?
   coachingMonthlySubscription   CarsiCoachingMonthlySubscription?
   coachingBusinessProfile       CarsiCoachingBusinessProfile?
@@ -223,6 +222,9 @@ model LmsCourseReviewModerationEvent {
   /// offensive | personal_information | not_about_course | spam_or_fake (required for hide; DB CHECK)
   reason         String?  @db.VarChar(32)
   actorId        String?  @map("actor_id") @db.Uuid
+  /// Durable actor snapshot (no FK): who decided survives deleting the admin's account.
+  actorRef       String   @map("actor_ref") @db.Uuid
+  actorEmail     String   @map("actor_email")
   /// The review's star rating when the decision was made (curation detector: hides by rating).
   ratingAtAction Int      @map("rating_at_action")
   /// sha256 of title + body at decision time, so an edit after a hide is detectable.
@@ -266,14 +268,26 @@ model LmsReviewRequestEmail {
 /// The completion trigger and the cron both read it: a completion is marked eligible only if this
 /// is on at that instant, and the cron sends only while it is on.
 model LmsReviewRequestSettings {
-  id          Int       @id @default(1)
-  enabled     Boolean   @default(false)
-  changedAt   DateTime? @map("changed_at") @db.Timestamptz(6)
-  changedById String?   @map("changed_by_id") @db.Uuid
-
-  changedBy LmsUser? @relation("ReviewRequestSettingsChangedBy", fields: [changedById], references: [id], onDelete: SetNull)
+  id      Int     @id @default(1)
+  enabled Boolean @default(false)
 
   @@map("lms_review_request_settings")
+}
+
+/// Append-only history of every review-request switch change (spec D10e), written in the same
+/// transaction as the change. Durable actor snapshot (no FK): survives deleting the account.
+model LmsReviewRequestSwitchEvent {
+  id         String   @id @default(uuid()) @db.Uuid
+  oldEnabled Boolean  @map("old_enabled")
+  newEnabled Boolean  @map("new_enabled")
+  /// bootstrap_admin | admin_user | lms_admin (DB CHECK)
+  actorKind  String   @map("actor_kind") @db.VarChar(16)
+  actorRef   String?  @map("actor_ref") @db.Uuid
+  actorEmail String   @map("actor_email")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([createdAt], map: "ix_lms_review_request_switch_events_created_at")
+  @@map("lms_review_request_switch_events")
 }
 
 enum DiscountType {

@@ -17,6 +17,7 @@
 -- Down path (only with review-request emails switched off):
 --   DROP TRIGGER "trg_lms_enrollments_review_request_eligibility" ON "lms_enrollments";
 --   DROP FUNCTION "lms_review_request_mark_eligible"();
+--   DROP TABLE "lms_review_request_switch_events";
 --   DROP TABLE "lms_review_request_settings";
 --   DROP TABLE "lms_review_request_emails";
 --   DROP TABLE "lms_course_review_moderation_events";
@@ -37,7 +38,11 @@ CREATE TABLE "lms_course_review_moderation_events" (
     "sequence" INTEGER NOT NULL,
     "action" VARCHAR(8) NOT NULL,
     "reason" VARCHAR(32),
+    -- Live link to the acting LMS user; NULL once that account is deleted.
     "actor_id" UUID,
+    -- Durable actor snapshot (no FK): who made the decision survives deleting the account.
+    "actor_ref" UUID NOT NULL,
+    "actor_email" TEXT NOT NULL,
     "rating_at_action" INTEGER NOT NULL,
     "content_sha256" VARCHAR(64) NOT NULL,
     "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -50,7 +55,8 @@ CREATE TABLE "lms_course_review_moderation_events" (
     ),
     -- A hide without a reason must fail in the database, not only in the route.
     CONSTRAINT "ck_lms_review_moderation_hide_has_reason" CHECK ("action" <> 'hide' OR "reason" IS NOT NULL),
-    CONSTRAINT "ck_lms_review_moderation_sequence_positive" CHECK ("sequence" > 0)
+    CONSTRAINT "ck_lms_review_moderation_sequence_positive" CHECK ("sequence" > 0),
+    CONSTRAINT "ck_lms_review_moderation_actor_email" CHECK (length(btrim("actor_email")) > 0)
 );
 
 -- Two decisions can never share a place in a review's order.
@@ -74,19 +80,32 @@ ALTER TABLE "lms_course_review_moderation_events"
 CREATE TABLE "lms_review_request_settings" (
     "id" INTEGER NOT NULL DEFAULT 1,
     "enabled" BOOLEAN NOT NULL DEFAULT false,
-    "changed_at" TIMESTAMPTZ(6),
-    "changed_by_id" UUID,
 
     CONSTRAINT "lms_review_request_settings_pkey" PRIMARY KEY ("id"),
     CONSTRAINT "ck_lms_review_request_settings_singleton" CHECK ("id" = 1)
 );
 
-ALTER TABLE "lms_review_request_settings"
-    ADD CONSTRAINT "lms_review_request_settings_changed_by_id_fkey"
-    FOREIGN KEY ("changed_by_id") REFERENCES "lms_users"("id")
-    ON DELETE SET NULL ON UPDATE CASCADE;
-
 INSERT INTO "lms_review_request_settings" ("id", "enabled") VALUES (1, false);
+
+-- Append-only history of every switch change, written in the same transaction as the change.
+-- The actor is a durable snapshot of the verified admin identity (no FK, so it outlives the
+-- account): bootstrap admin, admin_users account, or allow-listed / admin-role LMS user.
+CREATE TABLE "lms_review_request_switch_events" (
+    "id" UUID NOT NULL,
+    "old_enabled" BOOLEAN NOT NULL,
+    "new_enabled" BOOLEAN NOT NULL,
+    "actor_kind" VARCHAR(16) NOT NULL,
+    "actor_ref" UUID,
+    "actor_email" TEXT NOT NULL,
+    "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "lms_review_request_switch_events_pkey" PRIMARY KEY ("id"),
+    CONSTRAINT "ck_lms_review_request_switch_actor_kind" CHECK ("actor_kind" IN ('bootstrap_admin', 'admin_user', 'lms_admin')),
+    CONSTRAINT "ck_lms_review_request_switch_actor_email" CHECK (length(btrim("actor_email")) > 0)
+);
+
+CREATE INDEX "ix_lms_review_request_switch_events_created_at"
+    ON "lms_review_request_switch_events"("created_at");
 
 CREATE TABLE "lms_review_request_emails" (
     "id" UUID NOT NULL,
@@ -103,7 +122,7 @@ CREATE TABLE "lms_review_request_emails" (
 
     CONSTRAINT "lms_review_request_emails_pkey" PRIMARY KEY ("id"),
     CONSTRAINT "ck_lms_review_request_emails_status" CHECK (
-        "status" IN ('eligible', 'pending', 'sent', 'failed', 'skipped', 'ambiguous')
+        "status" IN ('eligible', 'ineligible', 'pending', 'sent', 'failed', 'skipped', 'ambiguous')
     )
 );
 
@@ -117,21 +136,40 @@ ALTER TABLE "lms_review_request_emails"
     FOREIGN KEY ("enrollment_id") REFERENCES "lms_enrollments"("id")
     ON DELETE CASCADE ON UPDATE CASCADE;
 
--- Eligibility is decided AT COMPLETION, inside the database, for every completion path (online
--- progress, CCW provisioning, admin actions, scripts, raw SQL): the moment completed_at is first
--- set, the enrolment is marked 'eligible' only if review-request emails are switched on at that
--- instant. A completion while the switch is off gets no row, so it can never be emailed later,
--- whatever the cron cadence. The cron sends only rows marked here.
+-- Eligibility is decided AT EVERY TRANSITION INTO OR OUT OF COMPLETED, inside the database, for
+-- every completion path (online progress, CCW provisioning, admin actions, scripts, raw SQL):
+--   * completed_at goes NULL -> set (a completion or re-completion): the row becomes 'eligible' if
+--     the review-request switch is on at that instant, otherwise 'ineligible'.
+--   * completed_at goes set -> NULL (revocation): the row becomes 'ineligible'.
+-- Rows that are 'sent', 'ambiguous' (may have been delivered) or 'pending' (a send in flight)
+-- are evidence and are never changed. The switch row is read FOR SHARE, so a completion and a
+-- switch change cannot interleave. The cron sends only 'eligible' rows, so a completion made
+-- while the switch is off can never be emailed later, whatever the order of events.
 CREATE FUNCTION "lms_review_request_mark_eligible"() RETURNS trigger
 LANGUAGE plpgsql AS $$
+DECLARE
+    switch_on BOOLEAN;
 BEGIN
-    IF NEW."completed_at" IS NOT NULL
-       AND (TG_OP = 'INSERT' OR OLD."completed_at" IS NULL)
-       AND EXISTS (SELECT 1 FROM "lms_review_request_settings" WHERE "id" = 1 AND "enabled")
-    THEN
-        INSERT INTO "lms_review_request_emails" ("id", "enrollment_id", "status")
-        VALUES (gen_random_uuid(), NEW."id", 'eligible')
-        ON CONFLICT ("enrollment_id") DO NOTHING;
+    IF TG_OP = 'UPDATE' AND OLD."completed_at" IS NOT NULL AND NEW."completed_at" IS NULL THEN
+        UPDATE "lms_review_request_emails"
+           SET "status" = 'ineligible', "updated_at" = now()
+         WHERE "enrollment_id" = NEW."id" AND "status" IN ('eligible', 'failed', 'skipped');
+        RETURN NEW;
+    END IF;
+
+    IF NEW."completed_at" IS NOT NULL AND (TG_OP = 'INSERT' OR OLD."completed_at" IS NULL) THEN
+        SELECT "enabled" INTO switch_on FROM "lms_review_request_settings" WHERE "id" = 1 FOR SHARE;
+        IF switch_on IS TRUE THEN
+            INSERT INTO "lms_review_request_emails" ("id", "enrollment_id", "status")
+            VALUES (gen_random_uuid(), NEW."id", 'eligible')
+            ON CONFLICT ("enrollment_id") DO UPDATE
+               SET "status" = 'eligible', "updated_at" = now()
+             WHERE "lms_review_request_emails"."status" IN ('ineligible', 'eligible', 'failed', 'skipped');
+        ELSE
+            UPDATE "lms_review_request_emails"
+               SET "status" = 'ineligible', "updated_at" = now()
+             WHERE "enrollment_id" = NEW."id" AND "status" IN ('eligible', 'failed', 'skipped');
+        END IF;
     END IF;
     RETURN NEW;
 END;

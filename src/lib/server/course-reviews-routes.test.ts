@@ -74,7 +74,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   process.env.DATABASE_URL = 'postgres://test';
   process.env.GOOGLE_REVIEW_URL = GOOGLE;
-  mocks.claims.mockResolvedValue({ sub: 'admin-1', role: 'admin' });
+  mocks.claims.mockResolvedValue({ sub: 'admin-1', role: 'admin', email: 'moderator@carsi.com.au' });
   mocks.courseFind.mockResolvedValue(COURSE);
   mocks.reviewFindFirst.mockResolvedValue({ id: 'rev-1', rating: 1, title: 't', body: 'b' });
   mocks.reviewUpdate.mockResolvedValue({
@@ -145,8 +145,11 @@ describe('POST /reviews/:id/publish — a hide needs a recorded reason (AC-3, D2
         reason: 'spam_or_fake',
         // The actor is the session user, never the body's `actor_id`.
         actorId: 'admin-1',
+        // Durable actor snapshot: survives deleting the admin's account.
+        actorRef: 'admin-1',
+        actorEmail: 'moderator@carsi.com.au',
         ratingAtAction: 1,
-        contentSha256: reviewContentSha256('Too basic', 'Not what I needed.'),
+        contentSha256: reviewContentSha256('Too basic', 'Not what I needed.', 1),
       },
     });
   });
@@ -238,7 +241,7 @@ describe('GET /reviews — ask and Google link are rating-independent, moderatio
     mocks.reviewFindMany.mockResolvedValue([
       { id: 'r1', rating: 1, title: 'New text', body: 'edited', reply: null, repliedAt: null, isPublished: false,
         createdAt: new Date('2026-10-02'), student: { fullName: 'Jo' },
-        moderationEvents: [{ action: 'hide', reason: 'offensive', contentSha256: reviewContentSha256('Old', 'old'), ratingAtAction: 1,
+        moderationEvents: [{ action: 'hide', reason: 'offensive', contentSha256: reviewContentSha256('Old', 'old', 1), ratingAtAction: 1,
           createdAt: new Date('2026-10-03T00:00:00.000Z') }] },
       { id: 'r2', rating: 2, title: null, body: null, reply: null, repliedAt: null, isPublished: false,
         createdAt: new Date('2026-09-01'), student: { fullName: 'Al' }, moderationEvents: [] },
