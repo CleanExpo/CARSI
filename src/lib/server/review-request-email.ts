@@ -86,13 +86,38 @@ export function parseStrictSince(raw: string): Date | null {
   return Number.isNaN(since.getTime()) ? null : since;
 }
 
-/** Pure: the completed_at window a run considers — on/after SINCE, and 3 to 14 days old. */
-export function reviewRequestWindow(since: Date, now: Date): { from: Date; to: Date } {
-  const oldest = new Date(now.getTime() - REVIEW_REQUEST_MAX_AGE_DAYS * DAY_MS);
+/**
+ * Pure: the completed_at window a run considers (D10, D10b). It starts at the LATEST of SINCE,
+ * the stored activation instant, and the 14-day age limit. So a completion from before sending
+ * was switched on is never mailed, whatever path set its completed_at, and it ends 3 days ago.
+ */
+export function reviewRequestWindow(
+  bounds: { since: Date; activatedAt: Date },
+  now: Date
+): { from: Date; to: Date } {
+  const oldest = now.getTime() - REVIEW_REQUEST_MAX_AGE_DAYS * DAY_MS;
   return {
-    from: since.getTime() > oldest.getTime() ? since : oldest,
+    from: new Date(Math.max(bounds.since.getTime(), bounds.activatedAt.getTime(), oldest)),
     to: new Date(now.getTime() - REVIEW_REQUEST_MIN_AGE_DAYS * DAY_MS),
   };
+}
+
+/**
+ * The stored first-activation instant (D10b). The first REAL enabled run records it once (dry runs
+ * never do), so completions from before sending was switched on are never backfilled. A missing
+ * or unreadable record fails closed: the run sends nothing.
+ */
+async function readOrRecordActivation(now: Date, dryRun: boolean): Promise<Date | null> {
+  const existing = await prisma.lmsReviewRequestActivation.findUnique({ where: { id: 1 } });
+  if (existing) return existing.activatedAt;
+  if (dryRun) return null;
+  try {
+    await prisma.lmsReviewRequestActivation.create({ data: { id: 1, activatedAt: now } });
+  } catch (e) {
+    if (!isUniqueViolation(e)) throw e; // a concurrent first run recorded it first
+  }
+  const stored = await prisma.lmsReviewRequestActivation.findUnique({ where: { id: 1 } });
+  return stored?.activatedAt ?? null;
 }
 
 /** Pure: did the provider really accept the message? `dev_console` only printed it. */
@@ -208,8 +233,16 @@ export type ReviewRequestSkipReason =
 export type ReviewRequestRunResult = {
   ok: boolean;
   /** Why nothing was attempted, when nothing was (never conflated with "nobody eligible"). */
-  reason?: 'disabled' | 'since_missing' | 'since_invalid' | 'email_not_configured';
+  reason?:
+    | 'disabled'
+    | 'since_missing'
+    | 'since_invalid'
+    | 'email_not_configured'
+    | 'not_activated'
+    | 'activation_unrecorded';
   dry_run: boolean;
+  /** Stored first-activation instant; completions before it are never emailed (D10b). */
+  activated_at?: string;
   window?: { from: string; to: string };
   candidates: number;
   would_send: number;
@@ -270,12 +303,21 @@ export async function runReviewRequestEmails(options: {
   if (!config.enabled) return { ...base, reason: config.reason };
   if (!dryRun && !isEmailConfigured()) return { ...base, ok: false, reason: 'email_not_configured' };
 
-  const window = reviewRequestWindow(config.since, now);
+  const activatedAt = await readOrRecordActivation(now, dryRun);
+  if (!activatedAt) {
+    // Dry run before the first real run: nobody is eligible yet, by design (no backfill).
+    // Real run that could not durably record the boundary: fail closed and loudly.
+    return dryRun ? { ...base, reason: 'not_activated' } : { ...base, ok: false, reason: 'activation_unrecorded' };
+  }
+
+  const window = reviewRequestWindow({ since: config.since, activatedAt }, now);
   const leaseCutoff = new Date(now.getTime() - REVIEW_REQUEST_CLAIM_LEASE_MINUTES * 60_000);
   const result: ReviewRequestRunResult = {
     ...base,
+    activated_at: activatedAt.toISOString(),
     window: { from: window.from.toISOString(), to: window.to.toISOString() },
   };
+  if (window.from.getTime() > window.to.getTime()) return result;
   const skip = (r: ReviewRequestSkipReason) => {
     result.skipped[r] = (result.skipped[r] ?? 0) + 1;
   };

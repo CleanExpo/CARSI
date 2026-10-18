@@ -43,6 +43,10 @@ const db = vi.hoisted(() => ({
   /** Wall-clock the fake stamps on writes (Prisma's @updatedAt). */
   clock: new Date('2026-10-18T00:00:00.000Z'),
   failUserReadOnce: false,
+  /** Stored first-activation instant (lms_review_request_activation); null = never switched on. */
+  activation: null as Date | null,
+  /** Simulates a write that is acknowledged but not durable (read-back finds nothing). */
+  activationWriteLost: false,
 }));
 const mail = vi.hoisted(() => ({ send: vi.fn(), configured: vi.fn(() => true) }));
 const unsub = vi.hoisted(() => ({ setOptOut: vi.fn(async (_id: string, optedOut: boolean) => ({ email_opt_out: optedOut })) }));
@@ -136,6 +140,14 @@ vi.mock('@/lib/prisma', () => ({
         return { count: 1 };
       },
     },
+    lmsReviewRequestActivation: {
+      findUnique: async () => (db.activation ? { id: 1, activatedAt: db.activation } : null),
+      create: async ({ data }: { data: { id: number; activatedAt: Date } }) => {
+        if (db.activation) throw Object.assign(new Error('Unique constraint failed'), { code: 'P2002' });
+        if (!db.activationWriteLost) db.activation = data.activatedAt;
+        return {};
+      },
+    },
     lmsUser: {
       findUnique: async ({ where }: { where: { id: string } }) => {
         if (db.failUserReadOnce) {
@@ -158,6 +170,7 @@ const {
   readReviewRequestConfig,
   renderReviewRequestEmail,
   REVIEW_REQUEST_MAX_SENDS_PER_RUN,
+  reviewRequestWindow,
   runReviewRequestEmails,
   wasReallySent,
 } = await import('./review-request-email');
@@ -190,6 +203,10 @@ beforeEach(() => {
   db.reviews.clear();
   db.ledger.clear();
   db.failUserReadOnce = false;
+  // Most tests describe steady state: sending was switched on long ago. The no-backfill tests
+  // below clear this to exercise the first run.
+  db.activation = new Date('2026-01-01T00:00:00.000Z');
+  db.activationWriteLost = false;
   unsub.setOptOut.mockClear();
   mail.send.mockReset().mockResolvedValue({ sent: true, messageId: 'm-1' });
   mail.configured.mockReset().mockReturnValue(true);
@@ -257,6 +274,66 @@ describe('off by default (D10)', () => {
     ['2026-09-01T10:30:15.5+10:00', '2026-09-01T00:30:15.500Z'],
   ])('a real SINCE date (%s) parses exactly', (since, iso) => {
     expect(parseStrictSince(since)?.toISOString()).toBe(iso);
+  });
+});
+
+describe('no backfill: completions before the stored activation instant are never emailed (D10b)', () => {
+  it('the first enabled run records activation and emails nobody, even with an older valid SINCE', async () => {
+    db.activation = null;
+    addCompleter('wk-old', 4 * D); // completed before activation, inside SINCE and the 3-14 day window
+    addCompleter('fortnight', 14 * D);
+    const first = await run({ ...ON, REVIEW_REQUEST_EMAILS_SINCE: '2026-09-01' });
+    expect(first).toMatchObject({ ok: true, sent: 0, activated_at: NOW.toISOString() });
+    expect(db.activation).toEqual(NOW);
+    expect(mail.send).not.toHaveBeenCalled();
+  });
+
+  it('later runs email only completions on or after activation, never the earlier ones', async () => {
+    db.activation = null;
+    addCompleter('pre', 2 * D); // completed 2 days before activation
+    await run(); // first run at NOW records activation
+    const later = new Date(NOW.getTime() + 5 * D);
+    // Completed 1 day after activation, by any path (online, CCW provisioning, admin).
+    db.enrolments.push({
+      id: 'post',
+      studentId: 'student-post',
+      courseId: 'course-post',
+      status: 'completed',
+      completedAt: new Date(NOW.getTime() + D),
+      course: { slug: 'water-damage', title: 'Water Damage Restoration', category: 'restoration' },
+    });
+    db.users.set('student-post', { email: 'student-post@example.com', fullName: 'Jo', emailOptOut: false, isActive: true });
+    const res = await run(ON, { now: later });
+    expect(res.sent).toBe(1);
+    expect(mail.send.mock.calls.map((c) => c[0].to)).toEqual(['student-post@example.com']);
+    expect(db.ledger.has('pre')).toBe(false);
+  });
+
+  it('a dry run before activation records nothing and counts nobody', async () => {
+    db.activation = null;
+    addCompleter('e1', 5 * D);
+    const res = await run(ON, { dryRun: true });
+    expect(res).toMatchObject({ ok: true, reason: 'not_activated', would_send: 0 });
+    expect(db.activation).toBeNull();
+  });
+
+  it('if the activation instant cannot be durably stored, the run fails closed and sends nothing', async () => {
+    db.activation = null;
+    db.activationWriteLost = true;
+    addCompleter('e1', 5 * D);
+    const res = await run();
+    expect(res).toMatchObject({ ok: false, reason: 'activation_unrecorded', sent: 0 });
+    expect(mail.send).not.toHaveBeenCalled();
+  });
+
+  it('the window starts at the latest of SINCE, activation and the 14-day limit', () => {
+    const since = new Date('2026-09-01T00:00:00Z');
+    expect(reviewRequestWindow({ since, activatedAt: new Date('2026-10-10T00:00:00Z') }, NOW).from.toISOString()).toBe(
+      '2026-10-10T00:00:00.000Z'
+    );
+    expect(reviewRequestWindow({ since, activatedAt: new Date('2026-01-01T00:00:00Z') }, NOW).from.toISOString()).toBe(
+      '2026-10-04T00:00:00.000Z'
+    );
   });
 });
 
@@ -514,6 +591,42 @@ describe('one-click unsubscribe really unsubscribes (independent review finding 
       else process.env.DATABASE_URL = prev;
     }
     expect(unsub.setOptOut).toHaveBeenCalledWith('student-e1', true);
+  });
+
+  async function oneClickPost(databaseUrl: string | undefined) {
+    const { POST } = await import('../../../app/api/unsubscribe/route');
+    const { NextRequest } = await import('next/server');
+    const prev = process.env.DATABASE_URL;
+    if (databaseUrl === undefined) delete process.env.DATABASE_URL;
+    else process.env.DATABASE_URL = databaseUrl;
+    try {
+      const res = await POST(
+        new NextRequest('https://carsi.com.au/api/unsubscribe?token=tok-student-e1', {
+          method: 'POST',
+          headers: { 'content-type': 'application/x-www-form-urlencoded' },
+          body: 'List-Unsubscribe=One-Click',
+        })
+      );
+      return { status: res.status, body: await res.json() };
+    } finally {
+      if (prev === undefined) delete process.env.DATABASE_URL;
+      else process.env.DATABASE_URL = prev;
+    }
+  }
+
+  it('with no database it fails visibly (503) and never claims the opt-out worked', async () => {
+    const r = await oneClickPost(undefined);
+    expect(r.status).toBe(503);
+    expect(r.body).not.toHaveProperty('ok');
+    expect(r.body).not.toHaveProperty('email_opt_out');
+    expect(unsub.setOptOut).not.toHaveBeenCalled();
+  });
+
+  it('confirms only when the stored preference matches the request', async () => {
+    unsub.setOptOut.mockResolvedValueOnce({ email_opt_out: false }); // write did not stick
+    const r = await oneClickPost('postgres://test');
+    expect(r.status).toBe(500);
+    expect(r.body).not.toHaveProperty('ok');
   });
 });
 

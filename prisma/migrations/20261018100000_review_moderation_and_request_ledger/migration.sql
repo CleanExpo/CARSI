@@ -9,6 +9,7 @@
 -- Reviews hidden BEFORE this migration get no invented reason: they simply have no event row.
 --
 -- Down path (run only after REVIEW_REQUEST_EMAILS_ENABLED is unset):
+--   DROP TABLE "lms_review_request_activation";
 --   DROP TABLE "lms_review_request_emails";
 --   DROP TABLE "lms_course_review_moderation_events";
 
@@ -71,3 +72,13 @@ ALTER TABLE "lms_review_request_emails"
     ADD CONSTRAINT "lms_review_request_emails_enrollment_id_fkey"
     FOREIGN KEY ("enrollment_id") REFERENCES "lms_enrollments"("id")
     ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- First-activation boundary for review-request emails (no backfill). Exactly one row.
+CREATE TABLE "lms_review_request_activation" (
+    "id" INTEGER NOT NULL DEFAULT 1,
+    "activated_at" TIMESTAMPTZ(6) NOT NULL,
+    "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "lms_review_request_activation_pkey" PRIMARY KEY ("id"),
+    CONSTRAINT "ck_lms_review_request_activation_singleton" CHECK ("id" = 1)
+);

@@ -249,6 +249,16 @@ model LmsReviewRequestEmail {
   @@map("lms_review_request_emails")
 }
 
+/// When review-request emails were first switched on (spec D10b). Exactly one row (id = 1, DB
+/// CHECK), written once by the first real enabled run. Completions before it are never emailed.
+model LmsReviewRequestActivation {
+  id          Int      @id @default(1)
+  activatedAt DateTime @map("activated_at") @db.Timestamptz(6)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("lms_review_request_activation")
+}
+
 enum DiscountType {
   percentage
   flat
