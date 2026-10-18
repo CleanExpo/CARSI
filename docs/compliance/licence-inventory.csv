@@ -1362,15 +1362,15 @@ legitimate,app/(public)/start-carpet-cleaning-business/page.tsx,46,certif,certif
 legitimate,app/(public)/subscribe/layout.tsx,8,certif,certificates,"CARSI-issued certificate (document), not certification","'Start your CARSI membership for access to every published CARSI course, progress tracking and verified completion certificates. CEC hours apply only to courses"
 legitimate,app/(public)/subscribe/layout.tsx,8,CEC,CEC,conditional or registry-computed CEC,"'Start your CARSI membership for access to every published CARSI course, progress tracking and verified completion certificates. CEC hours apply only to courses"
 legitimate,app/(public)/subscribe/layout.tsx,14,CEC,CEC,conditional or registry-computed CEC,"'Become a CARSI member for access to every published CARSI course. CEC hours apply only to courses the IICRC has approved.',"
-legitimate,app/(public)/subscribe/page.tsx,40,CEC,CEC,catalogue-wide CLAUDE.md descriptor (not scoped to a topic or audience),"'IICRC CEC Accredited courses where stated',"
-legitimate,app/(public)/subscribe/page.tsx,40,accredit,Accredited,catalogue-wide CLAUDE.md descriptor (not scoped to a topic or audience),"'IICRC CEC Accredited courses where stated',"
-legitimate,app/(public)/subscribe/page.tsx,40,iicrc-offer,IICRC CEC Accredited courses,catalogue-wide CLAUDE.md descriptor (not scoped to a topic or audience),"'IICRC CEC Accredited courses where stated',"
-legitimate,app/(public)/subscribe/page.tsx,41,CEC,CEC,"learner CEC record, tracking and renewal (the learner’s own IICRC certification)","'CEC tracking for completed eligible courses',"
-legitimate,app/(public)/subscribe/page.tsx,48,certif,certificates,"CARSI-issued certificate (document), not certification","'PDF certificates for every course',"
-legitimate,app/(public)/subscribe/page.tsx,49,CEC,CEC,"learner CEC record, tracking and renewal (the learner’s own IICRC certification)","'CEC tracking dashboard',"
-legitimate,app/(public)/subscribe/page.tsx,70,certif,certificates,"CARSI-issued certificate (document), not certification",payment to avoid interruption — your progress and certificates are always retained.
-legitimate,app/(public)/subscribe/page.tsx,79,certif,certificates,"CARSI-issued certificate (document), not certification","enrolled in, your progress, and your issued certificates remain intact."
-legitimate,app/(public)/subscribe/page.tsx,132,CEC,CECs,"learner CEC record, tracking and renewal (the learner’s own IICRC certification)","across levels, or maintaining CECs over time."
+legitimate,app/(public)/subscribe/page.tsx,42,CEC,CEC,catalogue-wide CLAUDE.md descriptor (not scoped to a topic or audience),"'IICRC CEC Accredited courses where stated',"
+legitimate,app/(public)/subscribe/page.tsx,42,accredit,Accredited,catalogue-wide CLAUDE.md descriptor (not scoped to a topic or audience),"'IICRC CEC Accredited courses where stated',"
+legitimate,app/(public)/subscribe/page.tsx,42,iicrc-offer,IICRC CEC Accredited courses,catalogue-wide CLAUDE.md descriptor (not scoped to a topic or audience),"'IICRC CEC Accredited courses where stated',"
+legitimate,app/(public)/subscribe/page.tsx,43,CEC,CEC,"learner CEC record, tracking and renewal (the learner’s own IICRC certification)","'CEC tracking for completed eligible courses',"
+legitimate,app/(public)/subscribe/page.tsx,50,certif,certificates,"CARSI-issued certificate (document), not certification","'PDF certificates for every course',"
+legitimate,app/(public)/subscribe/page.tsx,51,CEC,CEC,"learner CEC record, tracking and renewal (the learner’s own IICRC certification)","'CEC tracking dashboard',"
+legitimate,app/(public)/subscribe/page.tsx,72,certif,certificates,"CARSI-issued certificate (document), not certification",payment to avoid interruption — your progress and certificates are always retained.
+legitimate,app/(public)/subscribe/page.tsx,81,certif,certificates,"CARSI-issued certificate (document), not certification","enrolled in, your progress, and your issued certificates remain intact."
+legitimate,app/(public)/subscribe/page.tsx,147,CEC,CECs,"learner CEC record, tracking and renewal (the learner’s own IICRC certification)","across levels, or maintaining CECs over time."
 legitimate,app/(public)/subscribe/success/page.tsx,105,CEC,CEC,conditional or registry-computed CEC,<span>Start a lesson. Courses the IICRC has approved record CEC hours toward your renewal when you complete them.</span>
 legitimate,app/(public)/support/page.tsx,79,CEC,CEC,provider-level CEC standing,CARSI is an IICRC CEC Accredited provider and issues its own CARSI Southern Hemisphere
 legitimate,app/(public)/support/page.tsx,79,accredit,Accredited,provider-level CEC standing,CARSI is an IICRC CEC Accredited provider and issues its own CARSI Southern Hemisphere
@@ -2131,7 +2131,7 @@ not-public,src/components/admin/courses/CourseEditorForm.tsx,631,CEC,cec,staff-o
 not-public,src/components/admin/courses/CourseEditorForm.tsx,636,CEC,cec,staff-only admin surface,value={cecHours}
 not-public,src/components/admin/courses/CourseEditorForm.tsx,641,CEC,cec,staff-only admin surface,{!cecExcluded && resolvedCecHours ? (
 not-public,src/components/admin/courses/CourseEditorForm.tsx,643,CEC,CEC,staff-only admin surface,Effective on site: {resolvedCecHours} CEC — resolved from the IICRC approvals
-legitimate,src/components/auth/register-form.tsx,241,CEC,CECs,"learner CEC record, tracking and renewal (the learner’s own IICRC certification)",Link your IICRC membership to track CECs and display your credentials.
+legitimate,src/components/auth/register-form.tsx,240,CEC,CECs,"learner CEC record, tracking and renewal (the learner’s own IICRC certification)",Link your IICRC membership to track CECs and display your credentials.
 legitimate,src/components/ccw/CcwBusinessCoachingClient.tsx,125,CEC,CEC,conditional or registry-computed CEC,"question: 'Is this an IICRC CEC course?',"
 legitimate,src/components/ccw/CcwBusinessCoachingClient.tsx,125,iicrc-offer,IICRC CEC course,conditional or registry-computed CEC,"question: 'Is this an IICRC CEC course?',"
 legitimate,src/components/ccw/CcwCarsiTruckmountClient.tsx,78,certif,Certificate,"CARSI-issued certificate (document), not certification","title: 'Part A — Safety Certificate',"
@@ -5031,6 +5031,14 @@ legitimate,src/lib/server/email-templates.ts,505,accredit,Accredited,provider-le
 legitimate,src/lib/server/email-templates.ts,591,certif,certificate,"CARSI-issued certificate (document), not certification","'The fastest path is simple: start the first lesson, return until the course is complete, generate your certificate, then choose the next course while the knowl"
 legitimate,src/lib/server/email-templates.ts,599,certif,certificates,"CARSI-issued certificate (document), not certification","noteHtml: `${offersHtml}Or open ${brandLink(params.dashboardUrl, 'My Learning')} to resume, track CEC progress, download certificates, and find the next recomme"
 legitimate,src/lib/server/email-templates.ts,599,CEC,CEC,"learner CEC record, tracking and renewal (the learner’s own IICRC certification)","noteHtml: `${offersHtml}Or open ${brandLink(params.dashboardUrl, 'My Learning')} to resume, track CEC progress, download certificates, and find the next recomme"
+not-public,src/lib/server/email-templates.ts,735,certif,certificatesIssued,"code: identifier, comment or type",certificatesIssued: number;
+not-public,src/lib/server/email-templates.ts,736,CEC,CEC,"code: identifier, comment or type",/** Registry-approved CEC hours only. 0 renders no CEC line at all. */
+not-public,src/lib/server/email-templates.ts,736,CEC,CEC,"code: identifier, comment or type",/** Registry-approved CEC hours only. 0 renders no CEC line at all. */
+legitimate,src/lib/server/email-templates.ts,748,certif,Certificates,"CARSI-issued certificate (document), not certification","`Certificates: ${formatCount(recap.certificatesIssued, 'certificate', 'certificates')}`,"
+not-public,src/lib/server/email-templates.ts,748,certif,certificatesIssued,"code: identifier, comment or type","`Certificates: ${formatCount(recap.certificatesIssued, 'certificate', 'certificates')}`,"
+not-public,src/lib/server/email-templates.ts,748,certif,certificate,"code: key, slug, path or URL string","`Certificates: ${formatCount(recap.certificatesIssued, 'certificate', 'certificates')}`,"
+not-public,src/lib/server/email-templates.ts,748,certif,certificates,"code: key, slug, path or URL string","`Certificates: ${formatCount(recap.certificatesIssued, 'certificate', 'certificates')}`,"
+legitimate,src/lib/server/email-templates.ts,751,CEC,CEC,registry-computed CEC value beside the words,lines.push(`CEC hours earned: ${recap.approvedCecHours}`);
 not-public,src/lib/server/enrollment-access.ts,3,certif,certificate,"code: identifier, comment or type","* for ""may this learner read paid content / take a quiz / hold a certificate?""."
 not-public,src/lib/server/enrollment-access.ts,15,certif,certificates,"code: identifier, comment or type",* a lapsed subscriber's EXISTING course access + certificates. Do not collapse the
 not-public,src/lib/server/enrollment-access.ts,22,certif,certificates,"code: identifier, comment or type",/** Statuses that grant access to already-enrolled course content + certificates. */
@@ -5103,7 +5111,7 @@ not-public,src/lib/server/gov-guide-email.test.ts,23,CEC,cec,test file,expect(bl
 not-public,src/lib/server/gov-guide-email.test.ts,23,accredit,accredited,test file,expect(blob).toContain('iicrc cec accredited');
 not-public,src/lib/server/gov-guide-email.test.ts,27,certif,certified,test file,"['get iicrc ', 'certified with carsi'],"
 not-public,src/lib/server/gov-guide-email.test.ts,28,certif,certification,test file,"['iicrc ', 'certification course'],"
-not-public,src/lib/server/guest-checkout.ts,81,certif,certificates,"code: identifier, comment or type","// and poisons certificates (#302). Empty means ""no name on file""."
+not-public,src/lib/server/guest-checkout.ts,82,certif,certificates,"code: identifier, comment or type","// and poisons certificates (#302). Empty means ""no name on file""."
 not-public,src/lib/server/iicrc-cec-config.test.ts,3,CEC,cec,test file,import { isIicrcCecAutoSubmitEnabled } from './iicrc-cec-config';
 not-public,src/lib/server/iicrc-cec-config.test.ts,7,CEC,CEC,test file,* asserts a CEC claim. That claim is valid only after per-course IICRC approval
 not-public,src/lib/server/iicrc-cec-config.ts,1,CEC,cec,"code: identifier, comment or type",import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
@@ -5659,45 +5667,117 @@ legitimate,src/lib/server/recert-reminders.ts,64,CEC,CEC,"learner CEC record, tr
 legitimate,src/lib/server/recert-reminders.ts,68,certif,certification,"third-person IICRC certification: obtained through IICRC schools, held, renewed or required by others","title: `IICRC certification renewal due soon (${dateStr})`,"
 legitimate,src/lib/server/recert-reminders.ts,69,certif,certification,"third-person IICRC certification: obtained through IICRC schools, held, renewed or required by others","body: `Your IICRC certification expires on ${dateStr}. Plan your CEC-eligible courses now so your renewal is ready well ahead of time.`,"
 legitimate,src/lib/server/recert-reminders.ts,69,CEC,CEC,conditional or registry-computed CEC,"body: `Your IICRC certification expires on ${dateStr}. Plan your CEC-eligible courses now so your renewal is ready well ahead of time.`,"
+not-public,src/lib/server/renewal-reminder.ts,232,certif,certificatesIssued,"code: identifier, comment or type","certificatesIssued: recap.certificatesIssued,"
+not-public,src/lib/server/renewal-reminder.ts,232,certif,certificatesIssued,"code: identifier, comment or type","certificatesIssued: recap.certificatesIssued,"
 not-public,src/lib/server/renewal-summary-access.test.ts,9,CEC,CEC,test file,"* WS3 (P0-C, AC-8) review fix — a revoked/refunded course credits NO CEC toward"
 not-public,src/lib/server/renewal-summary-access.test.ts,12,CEC,CEC,test file,"describe('isCompleteEnrollment — CEC crediting excludes revoked', () => {"
-not-public,src/lib/server/renewal-summary.ts,4,CEC,cec,"code: identifier, comment or type",import { getApprovedCecHours } from '@/lib/seed/cec-approvals';
-not-public,src/lib/server/renewal-summary.ts,46,certif,certificateIssuedAt,"code: identifier, comment or type",certificateIssuedAt: Date | null;
-not-public,src/lib/server/renewal-summary.ts,54,certif,certificateIssuedAt,"code: identifier, comment or type",if (args.certificateIssuedAt) return args.certificateIssuedAt;
-not-public,src/lib/server/renewal-summary.ts,54,certif,certificateIssuedAt,"code: identifier, comment or type",if (args.certificateIssuedAt) return args.certificateIssuedAt;
-not-public,src/lib/server/renewal-summary.ts,67,CEC,CEC,"code: identifier, comment or type",* CEC hours a completed course credits toward a learner's IICRC renewal.
-not-public,src/lib/server/renewal-summary.ts,69,CEC,CEC,"code: identifier, comment or type","* REGISTRY-ONLY, FAIL-CLOSED (licence-critical, GP-498). Renewal tracking derives CEC solely"
-not-public,src/lib/server/renewal-summary.ts,70,CEC,cec,"code: identifier, comment or type","* from the founder-confirmed approvals registry (by slug). The stored `cecHours` column, `meta`"
-not-public,src/lib/server/renewal-summary.ts,71,CEC,CEC,"code: identifier, comment or type","* CEC keys, and a bare `iicrcDiscipline` (which previously defaulted to 1 ""estimated"" hour) are"
-not-public,src/lib/server/renewal-summary.ts,72,CEC,CEC,"code: identifier, comment or type",* WordPress-import pollution — never IICRC approval — and crediting them counted CEC toward a
-not-public,src/lib/server/renewal-summary.ts,73,CEC,CEC,"code: identifier, comment or type","* learner's renewal for courses the IICRC never approved. No registry approval → 0 CEC, never a"
-not-public,src/lib/server/renewal-summary.ts,78,CEC,cec,"code: identifier, comment or type",cecHours?: unknown;
-not-public,src/lib/server/renewal-summary.ts,90,CEC,CEC,"code: identifier, comment or type","* ""Adds CEC hours"" / builds CEC when that course has registry-approved CEC hours. A bare"
-not-public,src/lib/server/renewal-summary.ts,90,CEC,CEC,"code: identifier, comment or type","* ""Adds CEC hours"" / builds CEC when that course has registry-approved CEC hours. A bare"
-not-public,src/lib/server/renewal-summary.ts,90,CEC,CEC,"code: identifier, comment or type","* ""Adds CEC hours"" / builds CEC when that course has registry-approved CEC hours. A bare"
-not-public,src/lib/server/renewal-summary.ts,91,CEC,CEC,"code: identifier, comment or type",* `iicrcDiscipline` is NOT approval — asserting an unapproved course earns IICRC CEC toward
-not-public,src/lib/server/renewal-summary.ts,92,CEC,CEC,"code: identifier, comment or type",* renewal is a licence leak (the CEC-hours badge is separately gated to null). With the registry
-not-public,src/lib/server/renewal-summary.ts,93,CEC,CEC,"code: identifier, comment or type","* empty every suggestion falls to the neutral, non-CEC-claiming copy."
-legitimate,src/lib/server/renewal-summary.ts,102,CEC,CEC,"learner CEC record, tracking and renewal (the learner’s own IICRC certification)",? `Adds ${args.disc} CEC hours — priority gap for your renewal mix.`
-legitimate,src/lib/server/renewal-summary.ts,103,CEC,CEC,registry-computed CEC value beside the words,: `Strengthen ${args.disc} — builds on ${args.earnedCec.toFixed(1)} CEC from your current period.`;
-not-public,src/lib/server/renewal-summary.ts,112,CEC,CEC,"code: identifier, comment or type","// A revoked/refunded course credits NO CEC toward IICRC renewal (WS3 / P0-C,"
-not-public,src/lib/server/renewal-summary.ts,151,CEC,cec,"code: identifier, comment or type","cecHours: true,"
-not-public,src/lib/server/renewal-summary.ts,229,certif,certificateIssuedAt,"code: identifier, comment or type","certificateIssuedAt: e.certificateIssuedAt,"
-not-public,src/lib/server/renewal-summary.ts,229,certif,certificateIssuedAt,"code: identifier, comment or type","certificateIssuedAt: e.certificateIssuedAt,"
-not-public,src/lib/server/renewal-summary.ts,242,CEC,cec,"code: identifier, comment or type",let cecInCycle: number;
-not-public,src/lib/server/renewal-summary.ts,245,CEC,cec,"code: identifier, comment or type","cecInCycle = Object.values(byDiscCycle).reduce((a, b) => a + b, 0);"
-not-public,src/lib/server/renewal-summary.ts,248,CEC,cec,"code: identifier, comment or type",cecInCycle = lifetimeCec;
-not-public,src/lib/server/renewal-summary.ts,278,CEC,cec,"code: identifier, comment or type","cec_required: RENEWAL_CEC_REQUIRED,"
-not-public,src/lib/server/renewal-summary.ts,279,CEC,cec,"code: identifier, comment or type","cec_earned_in_cycle: Math.round(cecInCycle * 100) / 100,"
-not-public,src/lib/server/renewal-summary.ts,279,CEC,cec,"code: identifier, comment or type","cec_earned_in_cycle: Math.round(cecInCycle * 100) / 100,"
-not-public,src/lib/server/renewal-summary.ts,280,CEC,cec,"code: identifier, comment or type","cec_earned_lifetime: Math.round(lifetimeCec * 100) / 100,"
-not-public,src/lib/server/renewal-summary.ts,330,CEC,cec,"code: identifier, comment or type","cecHours: true,"
-not-public,src/lib/server/renewal-summary.ts,354,CEC,CEC,"code: identifier, comment or type",// GP-498: only claim a CEC benefit when this course has registry-approved CEC hours.
-not-public,src/lib/server/renewal-summary.ts,354,CEC,CEC,"code: identifier, comment or type",// GP-498: only claim a CEC benefit when this course has registry-approved CEC hours.
-not-public,src/lib/server/renewal-summary.ts,374,CEC,cec,"code: identifier, comment or type",cec_hours: (() => {
-not-public,src/lib/server/renewal-summary.ts,394,CEC,cec,"code: identifier, comment or type",cec_hours: (() => {
-not-public,src/lib/server/renewal-summary.ts,399,CEC,CEC,"code: identifier, comment or type",// GP-498: neutral copy — must not imply IICRC CEC benefit for an unapproved course.
-not-public,src/lib/server/renewal-summary.ts,399,iicrc-offer,IICRC CEC benefit for an unapproved course,"code: identifier, comment or type",// GP-498: neutral copy — must not imply IICRC CEC benefit for an unapproved course.
+not-public,src/lib/server/renewal-summary.ts,4,CEC,cec,"code: identifier, comment or type","import { getApprovedCecHours, getCurrentCecApproval } from '@/lib/seed/cec-approvals';"
+not-public,src/lib/server/renewal-summary.ts,48,certif,certificateIssuedAt,"code: identifier, comment or type",certificateIssuedAt: Date | null;
+not-public,src/lib/server/renewal-summary.ts,53,certif,certificateIssuedAt,"code: identifier, comment or type",if (args.certificateIssuedAt) return args.certificateIssuedAt;
+not-public,src/lib/server/renewal-summary.ts,53,certif,certificateIssuedAt,"code: identifier, comment or type",if (args.certificateIssuedAt) return args.certificateIssuedAt;
+not-public,src/lib/server/renewal-summary.ts,66,CEC,CEC,"code: identifier, comment or type",* CEC hours a completed course credits toward a learner's IICRC renewal.
+not-public,src/lib/server/renewal-summary.ts,68,CEC,CEC,"code: identifier, comment or type","* REGISTRY-ONLY, FAIL-CLOSED (licence-critical, GP-498). Renewal tracking derives CEC solely"
+not-public,src/lib/server/renewal-summary.ts,69,CEC,cec,"code: identifier, comment or type","* from the founder-confirmed approvals registry (by slug). The stored `cecHours` column, `meta`"
+not-public,src/lib/server/renewal-summary.ts,70,CEC,CEC,"code: identifier, comment or type","* CEC keys, and a bare `iicrcDiscipline` (which previously defaulted to 1 ""estimated"" hour) are"
+not-public,src/lib/server/renewal-summary.ts,71,CEC,CEC,"code: identifier, comment or type",* WordPress-import pollution — never IICRC approval — and crediting them counted CEC toward a
+not-public,src/lib/server/renewal-summary.ts,72,CEC,CEC,"code: identifier, comment or type","* learner's renewal for courses the IICRC never approved. No registry approval → 0 CEC, never a"
+not-public,src/lib/server/renewal-summary.ts,77,CEC,cec,"code: identifier, comment or type",cecHours?: unknown;
+not-public,src/lib/server/renewal-summary.ts,89,CEC,CEC,"code: identifier, comment or type","* ""Adds CEC hours"" / builds CEC when that course has registry-approved CEC hours. A bare"
+not-public,src/lib/server/renewal-summary.ts,89,CEC,CEC,"code: identifier, comment or type","* ""Adds CEC hours"" / builds CEC when that course has registry-approved CEC hours. A bare"
+not-public,src/lib/server/renewal-summary.ts,89,CEC,CEC,"code: identifier, comment or type","* ""Adds CEC hours"" / builds CEC when that course has registry-approved CEC hours. A bare"
+not-public,src/lib/server/renewal-summary.ts,90,CEC,CEC,"code: identifier, comment or type",* `iicrcDiscipline` is NOT approval — asserting an unapproved course earns IICRC CEC toward
+not-public,src/lib/server/renewal-summary.ts,91,CEC,CEC,"code: identifier, comment or type",* renewal is a licence leak (the CEC-hours badge is separately gated to null). With the registry
+not-public,src/lib/server/renewal-summary.ts,92,CEC,CEC,"code: identifier, comment or type","* empty every suggestion falls to the neutral, non-CEC-claiming copy."
+legitimate,src/lib/server/renewal-summary.ts,101,CEC,CEC,"learner CEC record, tracking and renewal (the learner’s own IICRC certification)",? `Adds ${args.disc} CEC hours — priority gap for your renewal mix.`
+legitimate,src/lib/server/renewal-summary.ts,102,CEC,CEC,registry-computed CEC value beside the words,: `Strengthen ${args.disc} — builds on ${args.earnedCec.toFixed(1)} CEC from your current period.`;
+not-public,src/lib/server/renewal-summary.ts,111,CEC,CEC,"code: identifier, comment or type","// A revoked/refunded course credits NO CEC toward IICRC renewal (WS3 / P0-C,"
+not-public,src/lib/server/renewal-summary.ts,119,CEC,CEC,"code: identifier, comment or type","* Registry CEC hours for a completion, credited only when the approval was IN FORCE at that"
+not-public,src/lib/server/renewal-summary.ts,122,CEC,CEC,"code: identifier, comment or type","* its approval expired, or before it was granted, earns no CEC. Fail-closed: an unreadable"
+not-public,src/lib/server/renewal-summary.ts,125,CEC,cec,"code: identifier, comment or type","export function cecHoursInForceAt(slug: string, completedAt: Date): number {"
+not-public,src/lib/server/renewal-summary.ts,138,certif,certificate,"code: identifier, comment or type","* later syncs). Deliberately NOT the certificate date, which is re-stamped every time a"
+not-public,src/lib/server/renewal-summary.ts,139,certif,certificate,"code: identifier, comment or type","* certificate is generated, and NOT a lesson's last-access time, which moves on a revisit:"
+not-public,src/lib/server/renewal-summary.ts,140,CEC,CEC,"code: identifier, comment or type",* either would pull an old course (and its CEC hours) into this year.
+not-public,src/lib/server/renewal-summary.ts,143,certif,certificate,"code: identifier, comment or type","/** Whether a certificate exists. Its timestamp is a re-stampable mint time, so it never dates the course. */"
+not-public,src/lib/server/renewal-summary.ts,144,certif,certificateIssuedAt,"code: identifier, comment or type",certificateIssuedAt: Date | null;
+not-public,src/lib/server/renewal-summary.ts,150,certif,certificatesIssued,"code: identifier, comment or type",certificatesIssued: number;
+not-public,src/lib/server/renewal-summary.ts,151,CEC,CEC,"code: identifier, comment or type",/** CEC hours from the approvals registry only. 0 means no CEC line is shown. */
+not-public,src/lib/server/renewal-summary.ts,151,CEC,CEC,"code: identifier, comment or type",/** CEC hours from the approvals registry only. 0 means no CEC line is shown. */
+not-public,src/lib/server/renewal-summary.ts,157,CEC,CEC,"code: identifier, comment or type",* Pure: count what the learner completed since `since`. CEC hours come ONLY from the approvals
+not-public,src/lib/server/renewal-summary.ts,160,certif,Certificates,"code: identifier, comment or type","* Certificates are counted for courses completed in the year, so re-generating an old"
+not-public,src/lib/server/renewal-summary.ts,161,certif,certificate,"code: identifier, comment or type",* certificate (which re-stamps its date) does not add one.
+not-public,src/lib/server/renewal-summary.ts,169,certif,certificatesIssued,"code: identifier, comment or type",let certificatesIssued = 0;
+not-public,src/lib/server/renewal-summary.ts,174,certif,certificateIssuedAt,"code: identifier, comment or type",if (c.certificateIssuedAt) certificatesIssued += 1;
+not-public,src/lib/server/renewal-summary.ts,174,certif,certificatesIssued,"code: identifier, comment or type",if (c.certificateIssuedAt) certificatesIssued += 1;
+not-public,src/lib/server/renewal-summary.ts,175,CEC,cec,"code: identifier, comment or type","approvedCecHours += cecHoursInForceAt(c.slug, c.completedAt);"
+not-public,src/lib/server/renewal-summary.ts,179,certif,certificatesIssued,"code: identifier, comment or type","certificatesIssued,"
+not-public,src/lib/server/renewal-summary.ts,240,CEC,cec,"code: identifier, comment or type","cecHours: true,"
+not-public,src/lib/server/renewal-summary.ts,319,certif,certificateIssuedAt,"code: identifier, comment or type","certificateIssuedAt: e.certificateIssuedAt,"
+not-public,src/lib/server/renewal-summary.ts,319,certif,certificateIssuedAt,"code: identifier, comment or type","certificateIssuedAt: e.certificateIssuedAt,"
+not-public,src/lib/server/renewal-summary.ts,325,certif,certificate,"code: identifier, comment or type",// CourseCompletionRecord); `ts` above can be a re-stamped certificate or a lesson revisit.
+not-public,src/lib/server/renewal-summary.ts,329,certif,certificateIssuedAt,"code: identifier, comment or type","certificateIssuedAt: e.certificateIssuedAt,"
+not-public,src/lib/server/renewal-summary.ts,329,certif,certificateIssuedAt,"code: identifier, comment or type","certificateIssuedAt: e.certificateIssuedAt,"
+not-public,src/lib/server/renewal-summary.ts,339,CEC,cec,"code: identifier, comment or type",let cecInCycle: number;
+not-public,src/lib/server/renewal-summary.ts,342,CEC,cec,"code: identifier, comment or type","cecInCycle = Object.values(byDiscCycle).reduce((a, b) => a + b, 0);"
+not-public,src/lib/server/renewal-summary.ts,345,CEC,cec,"code: identifier, comment or type",cecInCycle = lifetimeCec;
+not-public,src/lib/server/renewal-summary.ts,375,CEC,cec,"code: identifier, comment or type","cec_required: RENEWAL_CEC_REQUIRED,"
+not-public,src/lib/server/renewal-summary.ts,376,CEC,cec,"code: identifier, comment or type","cec_earned_in_cycle: Math.round(cecInCycle * 100) / 100,"
+not-public,src/lib/server/renewal-summary.ts,376,CEC,cec,"code: identifier, comment or type","cec_earned_in_cycle: Math.round(cecInCycle * 100) / 100,"
+not-public,src/lib/server/renewal-summary.ts,377,CEC,cec,"code: identifier, comment or type","cec_earned_lifetime: Math.round(lifetimeCec * 100) / 100,"
+not-public,src/lib/server/renewal-summary.ts,430,CEC,cec,"code: identifier, comment or type","cecHours: true,"
+not-public,src/lib/server/renewal-summary.ts,453,CEC,CEC,"code: identifier, comment or type",// GP-498: only claim a CEC benefit when this course has registry-approved CEC hours.
+not-public,src/lib/server/renewal-summary.ts,453,CEC,CEC,"code: identifier, comment or type",// GP-498: only claim a CEC benefit when this course has registry-approved CEC hours.
+not-public,src/lib/server/renewal-summary.ts,473,CEC,cec,"code: identifier, comment or type",cec_hours: (() => {
+not-public,src/lib/server/renewal-summary.ts,493,CEC,cec,"code: identifier, comment or type",cec_hours: (() => {
+not-public,src/lib/server/renewal-summary.ts,498,CEC,CEC,"code: identifier, comment or type",// GP-498: neutral copy — must not imply IICRC CEC benefit for an unapproved course.
+not-public,src/lib/server/renewal-summary.ts,498,iicrc-offer,IICRC CEC benefit for an unapproved course,"code: identifier, comment or type",// GP-498: neutral copy — must not imply IICRC CEC benefit for an unapproved course.
+not-public,src/lib/server/renewal-year-recap.test.ts,9,CEC,CEC,test file,* Licence-critical: CEC hours come ONLY from the approvals registry. The unapproved course below
+not-public,src/lib/server/renewal-year-recap.test.ts,10,CEC,cec,test file,* carries a polluted stored `cecHours: 4`; it must never surface as a CEC line.
+not-public,src/lib/server/renewal-year-recap.test.ts,10,CEC,CEC,test file,* carries a polluted stored `cecHours: 4`; it must never surface as a CEC line.
+not-public,src/lib/server/renewal-year-recap.test.ts,19,certif,certificateIssuedAt,test file,certificateIssuedAt: Date | null;
+not-public,src/lib/server/renewal-year-recap.test.ts,24,CEC,cec,test file,cecHours: number | null;
+not-public,src/lib/server/renewal-year-recap.test.ts,34,certif,cert,test file,opts: { done?: Date | null; cert?: Date | null; status?: string; storedCec?: number }
+not-public,src/lib/server/renewal-year-recap.test.ts,39,certif,certificateIssuedAt,test file,"certificateIssuedAt: opts.cert ?? null,"
+not-public,src/lib/server/renewal-year-recap.test.ts,39,certif,cert,test file,"certificateIssuedAt: opts.cert ?? null,"
+not-public,src/lib/server/renewal-year-recap.test.ts,44,CEC,cec,test file,"cecHours: opts.storedCec ?? null,"
+not-public,src/lib/server/renewal-year-recap.test.ts,53,CEC,CEC,test file,// Registry-approved (1 CEC hour each in data/seed/cec-approvals.json).
+not-public,src/lib/server/renewal-year-recap.test.ts,53,CEC,cec,test file,// Registry-approved (1 CEC hour each in data/seed/cec-approvals.json).
+not-public,src/lib/server/renewal-year-recap.test.ts,57,CEC,CEC,test file,"// Not in the registry, with a polluted stored CEC value."
+not-public,src/lib/server/renewal-year-recap.test.ts,61,certif,cert,test file,"enrolment(APPROVED_A, { done: daysAgo(60), cert: daysAgo(60) }),"
+not-public,src/lib/server/renewal-year-recap.test.ts,62,certif,cert,test file,"enrolment(APPROVED_B, { done: daysAgo(20), cert: daysAgo(20) }),"
+not-public,src/lib/server/renewal-year-recap.test.ts,65,certif,cert,test file,"enrolment(APPROVED_OLD, { done: daysAgo(730), cert: daysAgo(730) }),"
+not-public,src/lib/server/renewal-year-recap.test.ts,114,CEC,cec,test file,"cecHours: null,"
+not-public,src/lib/server/renewal-year-recap.test.ts,136,CEC,cec,test file,import { cecHoursInForceAt } from './renewal-summary';
+not-public,src/lib/server/renewal-year-recap.test.ts,186,CEC,CEC,test file,"it('shows the courses completed this year and registry-approved CEC hours only', async () => {"
+not-public,src/lib/server/renewal-year-recap.test.ts,191,certif,Certificates,test file,expect(text).toContain('- Certificates: 2 certificates');
+not-public,src/lib/server/renewal-year-recap.test.ts,191,certif,certificates,test file,expect(text).toContain('- Certificates: 2 certificates');
+not-public,src/lib/server/renewal-year-recap.test.ts,193,CEC,CEC,test file,expect(text).toContain('- CEC hours earned: 2');
+not-public,src/lib/server/renewal-year-recap.test.ts,195,CEC,CEC,test file,expect(html).toContain('CEC hours earned: 2');
+not-public,src/lib/server/renewal-year-recap.test.ts,202,CEC,CEC,test file,"it('shows no CEC line when the only completed course is not CEC-approved', async () => {"
+not-public,src/lib/server/renewal-year-recap.test.ts,202,CEC,CEC,test file,"it('shows no CEC line when the only completed course is not CEC-approved', async () => {"
+not-public,src/lib/server/renewal-year-recap.test.ts,204,certif,cert,test file,"enrolment(UNAPPROVED, { done: daysAgo(30), cert: daysAgo(30), storedCec: 4 }),"
+not-public,src/lib/server/renewal-year-recap.test.ts,207,certif,Certificates,test file,expect(text).toContain('- Certificates: 1 certificate');
+not-public,src/lib/server/renewal-year-recap.test.ts,207,certif,certificate,test file,expect(text).toContain('- Certificates: 1 certificate');
+not-public,src/lib/server/renewal-year-recap.test.ts,208,CEC,CEC,test file,expect(text).not.toMatch(/CEC/);
+not-public,src/lib/server/renewal-year-recap.test.ts,209,CEC,CEC,test file,expect(html).not.toMatch(/CEC hours/);
+not-public,src/lib/server/renewal-year-recap.test.ts,275,certif,certificate,test file,"it('does not move an old course into the year when its certificate is re-generated', async () => {"
+not-public,src/lib/server/renewal-year-recap.test.ts,277,certif,certificate,test file,// Completed two years ago; certificate re-generated (re-stamped) last week.
+not-public,src/lib/server/renewal-year-recap.test.ts,278,certif,cert,test file,"enrolment(APPROVED_OLD, { done: daysAgo(730), cert: daysAgo(7) }),"
+not-public,src/lib/server/renewal-year-recap.test.ts,282,certif,Certificates,test file,expect(text).toContain('- Certificates: 0 certificates');
+not-public,src/lib/server/renewal-year-recap.test.ts,282,certif,certificates,test file,expect(text).toContain('- Certificates: 0 certificates');
+not-public,src/lib/server/renewal-year-recap.test.ts,283,CEC,CEC,test file,expect(text).not.toMatch(/CEC/);
+not-public,src/lib/server/renewal-year-recap.test.ts,303,CEC,CEC,test file,expect(text).not.toMatch(/CEC/);
+not-public,src/lib/server/renewal-year-recap.test.ts,306,CEC,CEC,test file,// Review r3 P1-RECAP-EXPIRED-CEC. These approvals were granted 18/01/2024 and lapse at
+not-public,src/lib/server/renewal-year-recap.test.ts,307,CEC,cec,test file,// 00:00 UTC on 18/01/2027 (data/seed/cec-approvals.json).
+not-public,src/lib/server/renewal-year-recap.test.ts,308,CEC,CEC,test file,"describe('CEC credited only while the approval was in force', () => {"
+not-public,src/lib/server/renewal-year-recap.test.ts,321,CEC,CEC,test file,expect(text).toContain('- CEC hours earned: 1');
+not-public,src/lib/server/renewal-year-recap.test.ts,324,CEC,CEC,test file,"it('shows no CEC line when the only completion came after the approval lapsed', async () => {"
+not-public,src/lib/server/renewal-year-recap.test.ts,329,CEC,CEC,test file,expect(text).not.toMatch(/CEC/);
+not-public,src/lib/server/renewal-year-recap.test.ts,330,CEC,CEC,test file,expect(html).not.toMatch(/CEC hours/);
+not-public,src/lib/server/renewal-year-recap.test.ts,335,CEC,cec,test file,"expect(cecHoursInForceAt(APPROVED_A, new Date('2024-01-17T23:59:59Z'))).toBe(0);"
+not-public,src/lib/server/renewal-year-recap.test.ts,336,CEC,cec,test file,"expect(cecHoursInForceAt(APPROVED_A, new Date('2024-01-18T00:00:00Z'))).toBe(1);"
+not-public,src/lib/server/renewal-year-recap.test.ts,337,CEC,cec,test file,"expect(cecHoursInForceAt(APPROVED_A, new Date('2027-01-17T23:59:59Z'))).toBe(1);"
+not-public,src/lib/server/renewal-year-recap.test.ts,338,CEC,cec,test file,"expect(cecHoursInForceAt(APPROVED_A, new Date('2027-01-18T00:00:00Z'))).toBe(0);"
+not-public,src/lib/server/renewal-year-recap.test.ts,339,CEC,cec,test file,"expect(cecHoursInForceAt(UNAPPROVED, new Date('2026-06-01T00:00:00Z'))).toBe(0);"
 not-public,src/lib/server/review-reply-draft.ts,28,CEC,CEC,"model instruction (prompt text, not rendered verbatim)","'CARSI is an Australian IICRC CEC Accredited restoration training provider. Use Australian English spelling.',"
 not-public,src/lib/server/review-reply-draft.ts,28,accredit,Accredited,"model instruction (prompt text, not rendered verbatim)","'CARSI is an Australian IICRC CEC Accredited restoration training provider. Use Australian English spelling.',"
 not-public,src/lib/server/review-reply-draft.ts,28,iicrc-offer,IICRC CEC Accredited restoration training,"model instruction (prompt text, not rendered verbatim)","'CARSI is an Australian IICRC CEC Accredited restoration training provider. Use Australian English spelling.',"

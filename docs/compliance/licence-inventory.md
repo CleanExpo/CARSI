@@ -1,6 +1,6 @@
 # Licence inventory — IICRC codes, certification, CEC, accreditation, unsold subjects, counted claims
 
-Exhaustive pass, 19/10/2026, on `fix/industry-faq-licence-v2` (based on origin/main d49a93de).
+Exhaustive pass, 19/10/2026, on `fix/industry-faq-licence-v2` (based on origin/main 288638ef).
 Generator: `node scripts/licence-inventory.mjs` (exit 1 on any exposure); every row is in `licence-inventory.csv`.
 Enforced by `src/lib/marketing/licence-inventory.test.ts`.
 
@@ -20,9 +20,9 @@ Enforced by `src/lib/marketing/licence-inventory.test.ts`.
 
 | Class                                                                                           | Hits |
 | ----------------------------------------------------------------------------------------------- | ---: |
-| fixed (exposures on origin/main d49a93de under the final rules, removed by this branch)         |  645 |
-| legitimate (named sentence rule or reviewed line)                                               | 1205 |
-| not public (tests, generated, staff, tooling, prompts, identifiers, routing data, markup, URLs) | 3967 |
+| fixed (exposures on origin/main 288638ef under the final rules, removed by this branch)         |  645 |
+| legitimate (named sentence rule or reviewed line)                                               | 1207 |
+| not public (tests, generated, staff, tooling, prompts, identifiers, routing data, markup, URLs) | 4045 |
 | owned elsewhere (reviewed line; not edited here; listed for Phill)                              |    8 |
 | exposure remaining                                                                              |    0 |
 
@@ -141,12 +141,12 @@ Files with fixed hits:
 | Class           | Reason                                                                                                                                                                  | Hits |
 | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---: |
 | legitimate      | third-person IICRC certification: obtained through IICRC schools, held, renewed or required by others                                                                   |  238 |
-| legitimate      | CARSI-issued certificate (document), not certification                                                                                                                  |  203 |
+| legitimate      | CARSI-issued certificate (document), not certification                                                                                                                  |  204 |
 | legitimate      | conditional or registry-computed CEC                                                                                                                                    |  153 |
 | legitimate      | provider-level CEC standing                                                                                                                                             |  124 |
 | legitimate      | catalogue-wide CLAUDE.md descriptor (not scoped to a topic or audience)                                                                                                 |  122 |
 | legitimate      | learner CEC record, tracking and renewal (the learner’s own IICRC certification)                                                                                        |  102 |
-| legitimate      | registry-computed CEC value beside the words                                                                                                                            |   41 |
+| legitimate      | registry-computed CEC value beside the words                                                                                                                            |   42 |
 | legitimate      | upholstery in the real CCW hands-on workshop, a standard title or a business type (not a course offer)                                                                  |   36 |
 | legitimate      | explains how CECs work (third-person IICRC process)                                                                                                                     |   27 |
 | legitimate      | conditional stat chip: the label beside it says CEC hours are on approved courses only                                                                                  |   23 |
@@ -166,12 +166,12 @@ Files with fixed hits:
 | legitimate      | reviewed (line): the IICRC's own discipline map, framed on /courses as a third-person reference, not CARSI courses                                                      |    2 |
 | legitimate      | reviewed (line): learner states which IICRC certification they hold (third-person; the question asks about the learner's own certifications)                            |    2 |
 | legitimate      | headcount of the guide’s illustrative example business (labelled indicative), not a claim about the world                                                               |    1 |
-| not-public      | code: identifier, comment or type                                                                                                                                       | 1387 |
-| not-public      | test file                                                                                                                                                               | 1167 |
+| not-public      | code: identifier, comment or type                                                                                                                                       | 1415 |
+| not-public      | test file                                                                                                                                                               | 1215 |
 | not-public      | generated code                                                                                                                                                          |  461 |
 | not-public      | staff-only admin surface                                                                                                                                                |  310 |
 | not-public      | routing data: bare discipline code (render sites audited separately)                                                                                                    |  269 |
-| not-public      | code: key, slug, path or URL string                                                                                                                                     |  127 |
+| not-public      | code: key, slug, path or URL string                                                                                                                                     |  129 |
 | not-public      | model instruction (prompt text, not rendered verbatim)                                                                                                                  |  105 |
 | not-public      | internal tooling (course production, screencast, audit, video)                                                                                                          |   69 |
 | not-public      | URL or site path                                                                                                                                                        |   15 |
