@@ -15,7 +15,7 @@ Enforced by `src/lib/marketing/licence-inventory.test.ts`.
 | --- | ---: |
 | fixed (copy changed in this round; classed as exposure by the final rules at ea205ee5) | 323 |
 | legitimate (third-person, provider-level, conditional, registry-computed or learner record) | 1316 |
-| not public (tests, generated, staff, tooling, prompts, identifiers, routing data) | 3753 |
+| not public (tests, generated, staff, tooling, prompts, identifiers, routing data) | 3756 |
 | owned elsewhere (not edited here; listed for Phill) | 27 |
 | exposure remaining | 0 |
 
@@ -129,7 +129,7 @@ Files with fixed hits:
 | legitimate | other bodies’ certification (ISO, HACCP, gas, vehicle, Cert IV) | 1 |
 | legitimate | reviewed file: CEC audience line rendered only when the course has cec_hours (an in-force approval) | 1 |
 | not-public | code: identifier, comment or type | 1359 |
-| not-public | test file | 1056 |
+| not-public | test file | 1059 |
 | not-public | generated code | 404 |
 | not-public | staff-only admin surface | 309 |
 | not-public | routing data: bare discipline code (render sites audited separately) | 276 |
@@ -143,9 +143,10 @@ Files with fixed hits:
 | not-public | instructor-only surface | 8 |
 | not-public | instructor course builder | 8 |
 | not-public | code: JSON key | 7 |
-| owned-elsewhere | membership branch owns app/(public)/subscribe/* (brief: do not touch) | 17 |
+| owned-elsewhere | membership branch owns app/(public)/subscribe/* (brief: do not touch) | 16 |
 | owned-elsewhere | reviews thread owns testimonials (brief: do not touch reviews) | 7 |
 | owned-elsewhere | feat/designations-live owns the designations registry and its alsoEarnsCec flag | 3 |
+| owned-elsewhere | membership branch owns src/components/membership/* | 1 |
 
 ## Render audit — where a discipline code reaches the screen
 
@@ -177,6 +178,7 @@ Bare codes (`'WRT'`) are routing data. These are every JSX/server site that rend
 - `app/(public)/subscribe/success/page.tsx` — membership branch owns app/(public)/subscribe/* (brief: do not touch)
 - `app/(public)/testimonials/page.tsx` — reviews thread owns testimonials (brief: do not touch reviews)
 - `src/components/designations/DesignationCard.tsx` — feat/designations-live owns the designations registry and its alsoEarnsCec flag
+- `src/components/membership/MembershipLanding.tsx` — membership branch owns src/components/membership/*
 
 ## Guard bypass forms — out of scope here
 

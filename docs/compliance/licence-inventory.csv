@@ -998,15 +998,14 @@ owned-elsewhere,app/(public)/subscribe/layout.tsx,8,accredit,Accredited,membersh
 owned-elsewhere,app/(public)/subscribe/layout.tsx,14,CEC,CEC,membership branch owns app/(public)/subscribe/* (brief: do not touch),"'Become a CARSI member for full access to IICRC CEC Accredited restoration CEC courses.',"
 owned-elsewhere,app/(public)/subscribe/layout.tsx,14,CEC,CEC,membership branch owns app/(public)/subscribe/* (brief: do not touch),"'Become a CARSI member for full access to IICRC CEC Accredited restoration CEC courses.',"
 owned-elsewhere,app/(public)/subscribe/layout.tsx,14,accredit,Accredited,membership branch owns app/(public)/subscribe/* (brief: do not touch),"'Become a CARSI member for full access to IICRC CEC Accredited restoration CEC courses.',"
-owned-elsewhere,app/(public)/subscribe/page.tsx,35,CEC,CEC,membership branch owns app/(public)/subscribe/* (brief: do not touch),"'IICRC CEC Accredited courses where stated',"
-owned-elsewhere,app/(public)/subscribe/page.tsx,35,accredit,Accredited,membership branch owns app/(public)/subscribe/* (brief: do not touch),"'IICRC CEC Accredited courses where stated',"
-owned-elsewhere,app/(public)/subscribe/page.tsx,36,CEC,CEC,membership branch owns app/(public)/subscribe/* (brief: do not touch),"'CEC tracking for completed eligible courses',"
-owned-elsewhere,app/(public)/subscribe/page.tsx,41,upholstery,upholstery,membership branch owns app/(public)/subscribe/* (brief: do not touch),"'Carpet and upholstery cleaning courses',"
-owned-elsewhere,app/(public)/subscribe/page.tsx,43,certif,certificates,membership branch owns app/(public)/subscribe/* (brief: do not touch),"'PDF certificates for every course',"
-owned-elsewhere,app/(public)/subscribe/page.tsx,44,CEC,CEC,membership branch owns app/(public)/subscribe/* (brief: do not touch),"'CEC tracking dashboard',"
-owned-elsewhere,app/(public)/subscribe/page.tsx,65,certif,certificates,membership branch owns app/(public)/subscribe/* (brief: do not touch),payment to avoid interruption — your progress and certificates are always retained.
-owned-elsewhere,app/(public)/subscribe/page.tsx,74,certif,certificates,membership branch owns app/(public)/subscribe/* (brief: do not touch),"enrolled in, your progress, and your issued certificates remain intact."
-owned-elsewhere,app/(public)/subscribe/page.tsx,127,CEC,CECs,membership branch owns app/(public)/subscribe/* (brief: do not touch),"across levels, or maintaining CECs over time."
+owned-elsewhere,app/(public)/subscribe/page.tsx,40,CEC,CEC,membership branch owns app/(public)/subscribe/* (brief: do not touch),"'IICRC CEC Accredited courses where stated',"
+owned-elsewhere,app/(public)/subscribe/page.tsx,40,accredit,Accredited,membership branch owns app/(public)/subscribe/* (brief: do not touch),"'IICRC CEC Accredited courses where stated',"
+owned-elsewhere,app/(public)/subscribe/page.tsx,41,CEC,CEC,membership branch owns app/(public)/subscribe/* (brief: do not touch),"'CEC tracking for completed eligible courses',"
+owned-elsewhere,app/(public)/subscribe/page.tsx,48,certif,certificates,membership branch owns app/(public)/subscribe/* (brief: do not touch),"'PDF certificates for every course',"
+owned-elsewhere,app/(public)/subscribe/page.tsx,49,CEC,CEC,membership branch owns app/(public)/subscribe/* (brief: do not touch),"'CEC tracking dashboard',"
+owned-elsewhere,app/(public)/subscribe/page.tsx,70,certif,certificates,membership branch owns app/(public)/subscribe/* (brief: do not touch),payment to avoid interruption — your progress and certificates are always retained.
+owned-elsewhere,app/(public)/subscribe/page.tsx,79,certif,certificates,membership branch owns app/(public)/subscribe/* (brief: do not touch),"enrolled in, your progress, and your issued certificates remain intact."
+owned-elsewhere,app/(public)/subscribe/page.tsx,132,CEC,CECs,membership branch owns app/(public)/subscribe/* (brief: do not touch),"across levels, or maintaining CECs over time."
 owned-elsewhere,app/(public)/subscribe/success/page.tsx,105,CEC,CECs,membership branch owns app/(public)/subscribe/* (brief: do not touch),<span>Start a lesson and earn IICRC CECs toward renewal as you complete training.</span>
 legitimate,app/(public)/support/page.tsx,79,CEC,CEC,reviewed file: legal / support process: CEC reporting for a learner’s existing IICRC certification,CARSI is an IICRC CEC Accredited provider and issues its own CARSI Southern Hemisphere
 legitimate,app/(public)/support/page.tsx,79,accredit,Accredited,provider-level CEC standing,CARSI is an IICRC CEC Accredited provider and issues its own CARSI Southern Hemisphere
@@ -2379,10 +2378,10 @@ not-public,src/components/lms/IICRCIdentityCard.tsx,90,certif,cert,"code: identi
 not-public,src/components/lms/IICRCIdentityCard.tsx,93,certif,cert,"code: identifier, comment or type","<span className=""font-mono text-sm font-bold text-cyan-400"">{cert.discipline}</span>"
 not-public,src/components/lms/IICRCIdentityCard.tsx,94,certif,cert,"code: identifier, comment or type","<span className=""text-xs text-white/30"">{_formatDate(cert.certified_at)}</span>"
 not-public,src/components/lms/IICRCIdentityCard.tsx,94,certif,certified_at,"code: identifier, comment or type","<span className=""text-xs text-white/30"">{_formatDate(cert.certified_at)}</span>"
-not-public,src/components/lms/LearnCourseShell.tsx,474,certif,certificateEnrollmentId,"code: identifier, comment or type",let certificateEnrollmentId: string | null = null;
-not-public,src/components/lms/LearnCourseShell.tsx,504,certif,certificateEnrollmentId,"code: identifier, comment or type",certificateEnrollmentId = prev.enrollment_id;
-not-public,src/components/lms/LearnCourseShell.tsx,543,certif,certificateEnrollmentId,"code: identifier, comment or type",if (certificateEnrollmentId) {
-not-public,src/components/lms/LearnCourseShell.tsx,545,certif,certificateEnrollmentId,"code: identifier, comment or type",`/dashboard/credentials/${encodeURIComponent(certificateEnrollmentId)}?completed=1&course=${encodeURIComponent(slug)}`
+not-public,src/components/lms/LearnCourseShell.tsx,477,certif,certificateEnrollmentId,"code: identifier, comment or type",let certificateEnrollmentId: string | null = null;
+not-public,src/components/lms/LearnCourseShell.tsx,507,certif,certificateEnrollmentId,"code: identifier, comment or type",certificateEnrollmentId = prev.enrollment_id;
+not-public,src/components/lms/LearnCourseShell.tsx,546,certif,certificateEnrollmentId,"code: identifier, comment or type",if (certificateEnrollmentId) {
+not-public,src/components/lms/LearnCourseShell.tsx,548,certif,certificateEnrollmentId,"code: identifier, comment or type",`/dashboard/credentials/${encodeURIComponent(certificateEnrollmentId)}?completed=1&course=${encodeURIComponent(slug)}`
 not-public,src/components/lms/LearningMomentumLoop.tsx,16,certif,certificate_issued_at,"code: identifier, comment or type",certificate_issued_at?: string | null;
 not-public,src/components/lms/LearningMomentumLoop.tsx,27,certif,certificateHref,"code: identifier, comment or type",function certificateHref(enrollmentId: string) {
 not-public,src/components/lms/LearningMomentumLoop.tsx,28,certif,certificate,"code: key, slug, path or URL string",return `/api/lms/enrollments/${enrollmentId}/certificate`;
@@ -2543,6 +2542,7 @@ not-public,src/components/marketing/StartSmartContent.tsx,449,iicrc-code,cct,"co
 not-public,src/components/marketing/professional-directory/ProfessionalDirectoryListing.tsx,59,certif,certifications,"code: identifier, comment or type",{professional.certifications.length > 0 ? (
 not-public,src/components/marketing/professional-directory/ProfessionalDirectoryListing.tsx,61,certif,certifications,"code: identifier, comment or type",{professional.certifications.join(' · ')}
 not-public,src/components/membership/MembershipHexHero.tsx,13,colour,colour,"code: identifier, comment or type","* CARSI library covers, that lifts into full colour wherever the visitor moves. The text stays real"
+owned-elsewhere,src/components/membership/MembershipLanding.tsx,66,certif,certificate,membership branch owns src/components/membership/*,"'A PDF certificate for every course you complete, plus a public verification link you can share.',"
 not-public,src/components/membership/hex-renderer.ts,8,colour,colour,"code: identifier, comment or type",* a texture atlas; tiles in the pointer trail lift and switch from a navy duotone to full colour.
 not-public,src/components/onboarding/OnboardingLearnerDashboard.tsx,17,certif,certificateEligible,"code: identifier, comment or type",certificateEligible?: boolean;
 not-public,src/components/onboarding/OnboardingLearnerDashboard.tsx,20,certif,certificateEligible,"code: identifier, comment or type","export function OnboardingLearnerDashboard({ slug, modules, certificateEligible }: Props) {"
@@ -3092,9 +3092,9 @@ not-public,src/generated/prisma/models/LmsUser.ts,6839,certif,Certifications,gen
 not-public,src/lib/admin/admin-course-curriculum-persistence.test.ts,9,CEC,cec,test file,import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
 not-public,src/lib/admin/admin-course-curriculum-persistence.test.ts,23,CEC,cec,test file,"vi.mock('../../../data/seed/cec-approvals.json', () => ({ default: { version: 1, approvals: mocks.approvals } }));"
 not-public,src/lib/admin/admin-course-curriculum-persistence.test.ts,52,CEC,cec,test file,"cecHours: 0, iicrcDiscipline: null, modules: result.modules };"
-not-public,src/lib/admin/admin-course-curriculum-persistence.test.ts,125,CEC,cec,test file,"expect(resolveLmsCourseCecHours({ slug: 'synthetic-approval-identity', cecHours: 0 })).toBe(3);"
-not-public,src/lib/admin/admin-course-curriculum-persistence.test.ts,216,CEC,CEC,test file,"['CEC claim', (body) => { body.cecHours = 1; }],"
-not-public,src/lib/admin/admin-course-curriculum-persistence.test.ts,216,CEC,cec,test file,"['CEC claim', (body) => { body.cecHours = 1; }],"
+not-public,src/lib/admin/admin-course-curriculum-persistence.test.ts,128,CEC,cec,test file,"expect(resolveLmsCourseCecHours({ slug: 'synthetic-approval-identity', cecHours: 0 })).toBe(3);"
+not-public,src/lib/admin/admin-course-curriculum-persistence.test.ts,219,CEC,CEC,test file,"['CEC claim', (body) => { body.cecHours = 1; }],"
+not-public,src/lib/admin/admin-course-curriculum-persistence.test.ts,219,CEC,cec,test file,"['CEC claim', (body) => { body.cecHours = 1; }],"
 not-public,src/lib/admin/admin-course-curriculum-readback.ts,5,CEC,cec,staff-only admin surface,import { hasUncredentialledStoredCecIdentity } from '@/lib/server/course-cec-hours';
 not-public,src/lib/admin/admin-course-curriculum-readback.ts,104,CEC,cec,staff-only admin surface,"'isFree', 'priceAud', 'published', 'cecHours', 'durationHours', 'iicrcDiscipline', 'level', 'category', 'modules']);"
 not-public,src/lib/admin/admin-course-list-filters.test.ts,34,CEC,cec,test file,"cec: 'missing',"
@@ -3162,41 +3162,41 @@ not-public,src/lib/admin/admin-courses-service.test.ts,23,CEC,cec,test file,"{ c
 not-public,src/lib/admin/admin-courses-service.ts,11,CEC,cec,staff-only admin surface,import { isCecExcludedSlug } from '@/lib/seed/cec-professional-assignments';
 not-public,src/lib/admin/admin-courses-service.ts,12,CEC,cec,staff-only admin surface,import { getCecApproval } from '@/lib/seed/cec-approvals';
 not-public,src/lib/admin/admin-courses-service.ts,13,CEC,cec,staff-only admin surface,import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
-not-public,src/lib/admin/admin-courses-service.ts,68,CEC,cec,staff-only admin surface,cecHours?: number | null;
-not-public,src/lib/admin/admin-courses-service.ts,182,CEC,cec,staff-only admin surface,"cecHours: parseOptionalHours(o.cecHours),"
-not-public,src/lib/admin/admin-courses-service.ts,182,CEC,cec,staff-only admin surface,"cecHours: parseOptionalHours(o.cecHours),"
-not-public,src/lib/admin/admin-courses-service.ts,475,CEC,cec,staff-only admin surface,"cecHours: course.cecHours != null ? Number(course.cecHours) : null,"
-not-public,src/lib/admin/admin-courses-service.ts,475,CEC,cec,staff-only admin surface,"cecHours: course.cecHours != null ? Number(course.cecHours) : null,"
-not-public,src/lib/admin/admin-courses-service.ts,475,CEC,cec,staff-only admin surface,"cecHours: course.cecHours != null ? Number(course.cecHours) : null,"
-not-public,src/lib/admin/admin-courses-service.ts,500,CEC,cec,staff-only admin surface,"cecHours: course.cecHours != null ? String(course.cecHours) : null,"
-not-public,src/lib/admin/admin-courses-service.ts,500,CEC,cec,staff-only admin surface,"cecHours: course.cecHours != null ? String(course.cecHours) : null,"
-not-public,src/lib/admin/admin-courses-service.ts,500,CEC,cec,staff-only admin surface,"cecHours: course.cecHours != null ? String(course.cecHours) : null,"
-not-public,src/lib/admin/admin-courses-service.ts,506,CEC,cec,staff-only admin surface,"cecMissing: !isCecExcludedSlug(course.slug) && resolved == null,"
-not-public,src/lib/admin/admin-courses-service.ts,507,CEC,cec,staff-only admin surface,"cecExcluded: isCecExcludedSlug(course.slug),"
-not-public,src/lib/admin/admin-courses-service.ts,590,CEC,CEC,staff-only admin surface,"/** When `missing`, only courses without resolvable CEC (excludes memberships/downloads). */"
-not-public,src/lib/admin/admin-courses-service.ts,591,CEC,cec,staff-only admin surface,cec?: 'all' | 'missing';
-not-public,src/lib/admin/admin-courses-service.ts,653,CEC,cec,staff-only admin surface,"cecHours: c.cecHours != null ? Number(c.cecHours) : null,"
-not-public,src/lib/admin/admin-courses-service.ts,653,CEC,cec,staff-only admin surface,"cecHours: c.cecHours != null ? Number(c.cecHours) : null,"
-not-public,src/lib/admin/admin-courses-service.ts,653,CEC,cec,staff-only admin surface,"cecHours: c.cecHours != null ? Number(c.cecHours) : null,"
-not-public,src/lib/admin/admin-courses-service.ts,681,CEC,cec,staff-only admin surface,"cecHours: c.cecHours != null ? String(c.cecHours) : null,"
-not-public,src/lib/admin/admin-courses-service.ts,681,CEC,cec,staff-only admin surface,"cecHours: c.cecHours != null ? String(c.cecHours) : null,"
-not-public,src/lib/admin/admin-courses-service.ts,681,CEC,cec,staff-only admin surface,"cecHours: c.cecHours != null ? String(c.cecHours) : null,"
-not-public,src/lib/admin/admin-courses-service.ts,684,CEC,cec,staff-only admin surface,"cecMissing: !isCecExcludedSlug(c.slug) && resolved == null,"
-not-public,src/lib/admin/admin-courses-service.ts,685,CEC,cec,staff-only admin surface,"cecExcluded: isCecExcludedSlug(c.slug),"
-not-public,src/lib/admin/admin-courses-service.ts,691,CEC,cec,staff-only admin surface,if (options.cec === 'missing') {
-not-public,src/lib/admin/admin-courses-service.ts,692,CEC,cec,staff-only admin surface,return mapped.filter((c) => c.cecMissing);
-not-public,src/lib/admin/admin-courses-service.ts,714,CEC,cec,staff-only admin surface,cec_hours?: number | null;
-not-public,src/lib/admin/admin-courses-service.ts,741,CEC,cec,staff-only admin surface,"cecHours: parseOptionalHours(input.cec_hours),"
-not-public,src/lib/admin/admin-courses-service.ts,741,CEC,cec,staff-only admin surface,"cecHours: parseOptionalHours(input.cec_hours),"
-not-public,src/lib/admin/admin-courses-service.ts,789,CEC,cec,staff-only admin surface,"cecHours: input.cecHours ?? null,"
-not-public,src/lib/admin/admin-courses-service.ts,789,CEC,cec,staff-only admin surface,"cecHours: input.cecHours ?? null,"
-not-public,src/lib/admin/admin-courses-service.ts,921,CEC,cec,staff-only admin surface,"...(input.cecHours !== undefined ? { cecHours: input.cecHours } : {}),"
-not-public,src/lib/admin/admin-courses-service.ts,921,CEC,cec,staff-only admin surface,"...(input.cecHours !== undefined ? { cecHours: input.cecHours } : {}),"
-not-public,src/lib/admin/admin-courses-service.ts,921,CEC,cec,staff-only admin surface,"...(input.cecHours !== undefined ? { cecHours: input.cecHours } : {}),"
-not-public,src/lib/admin/admin-courses-service.ts,1012,CEC,CEC,staff-only admin surface,// WS6: refuse to hard-delete a course carrying filed IICRC CEC compliance
-not-public,src/lib/admin/admin-courses-service.ts,1015,CEC,cec,staff-only admin surface,const cecCount = await prisma.lmsIicrcCecSubmission.count({ where: { courseId: id } });
-not-public,src/lib/admin/admin-courses-service.ts,1016,CEC,cec,staff-only admin surface,if (cecCount > 0) {
-not-public,src/lib/admin/admin-courses-service.ts,1061,CEC,CEC,staff-only admin surface,// WS6: exclude courses carrying filed IICRC CEC compliance records (now
+not-public,src/lib/admin/admin-courses-service.ts,71,CEC,cec,staff-only admin surface,cecHours?: number | null;
+not-public,src/lib/admin/admin-courses-service.ts,198,CEC,cec,staff-only admin surface,"cecHours: parseOptionalHours(o.cecHours),"
+not-public,src/lib/admin/admin-courses-service.ts,198,CEC,cec,staff-only admin surface,"cecHours: parseOptionalHours(o.cecHours),"
+not-public,src/lib/admin/admin-courses-service.ts,547,CEC,cec,staff-only admin surface,"cecHours: course.cecHours != null ? Number(course.cecHours) : null,"
+not-public,src/lib/admin/admin-courses-service.ts,547,CEC,cec,staff-only admin surface,"cecHours: course.cecHours != null ? Number(course.cecHours) : null,"
+not-public,src/lib/admin/admin-courses-service.ts,547,CEC,cec,staff-only admin surface,"cecHours: course.cecHours != null ? Number(course.cecHours) : null,"
+not-public,src/lib/admin/admin-courses-service.ts,572,CEC,cec,staff-only admin surface,"cecHours: course.cecHours != null ? String(course.cecHours) : null,"
+not-public,src/lib/admin/admin-courses-service.ts,572,CEC,cec,staff-only admin surface,"cecHours: course.cecHours != null ? String(course.cecHours) : null,"
+not-public,src/lib/admin/admin-courses-service.ts,572,CEC,cec,staff-only admin surface,"cecHours: course.cecHours != null ? String(course.cecHours) : null,"
+not-public,src/lib/admin/admin-courses-service.ts,578,CEC,cec,staff-only admin surface,"cecMissing: !isCecExcludedSlug(course.slug) && resolved == null,"
+not-public,src/lib/admin/admin-courses-service.ts,579,CEC,cec,staff-only admin surface,"cecExcluded: isCecExcludedSlug(course.slug),"
+not-public,src/lib/admin/admin-courses-service.ts,663,CEC,CEC,staff-only admin surface,"/** When `missing`, only courses without resolvable CEC (excludes memberships/downloads). */"
+not-public,src/lib/admin/admin-courses-service.ts,664,CEC,cec,staff-only admin surface,cec?: 'all' | 'missing';
+not-public,src/lib/admin/admin-courses-service.ts,726,CEC,cec,staff-only admin surface,"cecHours: c.cecHours != null ? Number(c.cecHours) : null,"
+not-public,src/lib/admin/admin-courses-service.ts,726,CEC,cec,staff-only admin surface,"cecHours: c.cecHours != null ? Number(c.cecHours) : null,"
+not-public,src/lib/admin/admin-courses-service.ts,726,CEC,cec,staff-only admin surface,"cecHours: c.cecHours != null ? Number(c.cecHours) : null,"
+not-public,src/lib/admin/admin-courses-service.ts,754,CEC,cec,staff-only admin surface,"cecHours: c.cecHours != null ? String(c.cecHours) : null,"
+not-public,src/lib/admin/admin-courses-service.ts,754,CEC,cec,staff-only admin surface,"cecHours: c.cecHours != null ? String(c.cecHours) : null,"
+not-public,src/lib/admin/admin-courses-service.ts,754,CEC,cec,staff-only admin surface,"cecHours: c.cecHours != null ? String(c.cecHours) : null,"
+not-public,src/lib/admin/admin-courses-service.ts,757,CEC,cec,staff-only admin surface,"cecMissing: !isCecExcludedSlug(c.slug) && resolved == null,"
+not-public,src/lib/admin/admin-courses-service.ts,758,CEC,cec,staff-only admin surface,"cecExcluded: isCecExcludedSlug(c.slug),"
+not-public,src/lib/admin/admin-courses-service.ts,764,CEC,cec,staff-only admin surface,if (options.cec === 'missing') {
+not-public,src/lib/admin/admin-courses-service.ts,765,CEC,cec,staff-only admin surface,return mapped.filter((c) => c.cecMissing);
+not-public,src/lib/admin/admin-courses-service.ts,787,CEC,cec,staff-only admin surface,cec_hours?: number | null;
+not-public,src/lib/admin/admin-courses-service.ts,814,CEC,cec,staff-only admin surface,"cecHours: parseOptionalHours(input.cec_hours),"
+not-public,src/lib/admin/admin-courses-service.ts,814,CEC,cec,staff-only admin surface,"cecHours: parseOptionalHours(input.cec_hours),"
+not-public,src/lib/admin/admin-courses-service.ts,862,CEC,cec,staff-only admin surface,"cecHours: input.cecHours ?? null,"
+not-public,src/lib/admin/admin-courses-service.ts,862,CEC,cec,staff-only admin surface,"cecHours: input.cecHours ?? null,"
+not-public,src/lib/admin/admin-courses-service.ts,994,CEC,cec,staff-only admin surface,"...(input.cecHours !== undefined ? { cecHours: input.cecHours } : {}),"
+not-public,src/lib/admin/admin-courses-service.ts,994,CEC,cec,staff-only admin surface,"...(input.cecHours !== undefined ? { cecHours: input.cecHours } : {}),"
+not-public,src/lib/admin/admin-courses-service.ts,994,CEC,cec,staff-only admin surface,"...(input.cecHours !== undefined ? { cecHours: input.cecHours } : {}),"
+not-public,src/lib/admin/admin-courses-service.ts,1086,CEC,CEC,staff-only admin surface,// WS6: refuse to hard-delete a course carrying filed IICRC CEC compliance
+not-public,src/lib/admin/admin-courses-service.ts,1089,CEC,cec,staff-only admin surface,const cecCount = await prisma.lmsIicrcCecSubmission.count({ where: { courseId: id } });
+not-public,src/lib/admin/admin-courses-service.ts,1090,CEC,cec,staff-only admin surface,if (cecCount > 0) {
+not-public,src/lib/admin/admin-courses-service.ts,1135,CEC,CEC,staff-only admin surface,// WS6: exclude courses carrying filed IICRC CEC compliance records (now
 not-public,src/lib/admin/admin-dashboard-data.ts,16,CEC,cec,staff-only admin surface,import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
 not-public,src/lib/admin/admin-dashboard-data.ts,34,certif,certificatesIssued,staff-only admin surface,certificatesIssued: number;
 not-public,src/lib/admin/admin-dashboard-data.ts,35,CEC,cec,staff-only admin surface,cecCompletions: number;
@@ -4092,7 +4092,9 @@ not-public,src/lib/marketing/subscribe-copy.test.ts,50,accredit,Accredited,test 
 not-public,src/lib/marketing/subscribe-copy.test.ts,51,CEC,CEC,test file,expect(PRO_FEATURES).toContain('CEC tracking dashboard');
 not-public,src/lib/marketing/subscribe-copy.test.ts,52,CEC,CEC,test file,expect(PRO_FEATURES.join('\n')).not.toMatch(/IICRC CEC courses\b/);
 not-public,src/lib/marketing/subscribe-copy.test.ts,53,CEC,CEC,test file,expect(PRO_FEATURES).not.toContain('IICRC CEC tracking dashboard');
-not-public,src/lib/marketing/subscribe-copy.test.ts,63,upholstery,upholstery,test file,"'Carpet and upholstery cleaning courses',"
+not-public,src/lib/marketing/subscribe-copy.test.ts,58,upholstery,upholstery,test file,"// carsi.com.au/api/lms/courses: no published upholstery course, so the area is carpet only)."
+not-public,src/lib/marketing/subscribe-copy.test.ts,73,upholstery,upholstery,test file,"// upholstery course, so the plan may not advertise either."
+not-public,src/lib/marketing/subscribe-copy.test.ts,76,upholstery,upholster,test file,expect(copy).not.toMatch(/upholster/i);
 not-public,src/lib/onboarding/goal-options.ts,7,certif,certification,"code: identifier, comment or type",* and never implies a CARSI course builds toward an IICRC discipline or certification. Pinned by
 not-public,src/lib/onboarding/goal-options.ts,12,CEC,cec,"code: key, slug, path or URL string",export type OnboardingGoalValue = 'new_cert' | 'cec_renewal' | 'career_change';
 not-public,src/lib/onboarding/goal-options.ts,21,CEC,cec,"code: key, slug, path or URL string","{ value: 'cec_renewal', label: 'Renew my CECs' },"
@@ -5224,6 +5226,7 @@ not-public,src/lib/server/public-catalogue-facts.ts,197,CEC,cec,"code: identifie
 not-public,src/lib/server/public-catalogue-facts.ts,198,CEC,cec,"code: identifier, comment or type","* of 37 catalogue entries have `cecHours > 0`, so that assertion held for none of them."
 not-public,src/lib/server/public-catalogue-facts.ts,200,CEC,CEC,"code: identifier, comment or type",* This is the fail-closed CEC rule applied to marketing copy rather than to a badge: absent by
 not-public,src/lib/server/public-catalogue-facts.ts,219,accredit,accreditation,"code: identifier, comment or type",// The removed accreditation adjective used to supply that capital.
+not-public,src/lib/server/public-courses-list.test.ts,144,CEC,cec,test file,"level: null, category: null, tags: [], cecHours: null, durationHours: null,"
 not-public,src/lib/server/public-courses-list.ts,6,CEC,cec,"code: identifier, comment or type",import { formatLmsCourseCecHoursLabel } from '@/lib/server/course-cec-hours';
 not-public,src/lib/server/public-courses-list.ts,72,CEC,cec,"code: identifier, comment or type",function cecHoursLabelForRow(c: {
 not-public,src/lib/server/public-courses-list.ts,74,CEC,cec,"code: identifier, comment or type",cecHours: number | null;
@@ -5232,14 +5235,14 @@ not-public,src/lib/server/public-courses-list.ts,85,CEC,cec,"code: identifier, c
 not-public,src/lib/server/public-courses-list.ts,123,CEC,cec,"code: identifier, comment or type",cecHours: number | null;
 not-public,src/lib/server/public-courses-list.ts,145,CEC,cec,"code: identifier, comment or type","cec_hours: cecHoursLabelForRow(c),"
 not-public,src/lib/server/public-courses-list.ts,145,CEC,cec,"code: identifier, comment or type","cec_hours: cecHoursLabelForRow(c),"
-not-public,src/lib/server/public-courses-list.ts,228,CEC,cec,"code: identifier, comment or type",cecHours: number | null;
-not-public,src/lib/server/public-courses-list.ts,252,CEC,cec,"code: identifier, comment or type","cec_hours: cecHoursLabelForRow(c),"
-not-public,src/lib/server/public-courses-list.ts,252,CEC,cec,"code: identifier, comment or type","cec_hours: cecHoursLabelForRow(c),"
-not-public,src/lib/server/public-courses-list.ts,306,iicrc-code,AMRT,routing data: bare discipline code (render sites audited separately),"{ iicrcDiscipline: { contains: 'AMRT', mode: 'insensitive' as const } },"
-not-public,src/lib/server/public-courses-list.ts,318,iicrc-code,WRT,routing data: bare discipline code (render sites audited separately),"{ iicrcDiscipline: { contains: 'WRT', mode: 'insensitive' as const } },"
-not-public,src/lib/server/public-courses-list.ts,511,CEC,cec,"code: identifier, comment or type",cec_hours: cecHoursLabelForRow({
-not-public,src/lib/server/public-courses-list.ts,511,CEC,cec,"code: identifier, comment or type",cec_hours: cecHoursLabelForRow({
-not-public,src/lib/server/public-courses-list.ts,513,CEC,cec,"code: identifier, comment or type","cecHours: null,"
+not-public,src/lib/server/public-courses-list.ts,242,CEC,cec,"code: identifier, comment or type",cecHours: number | null;
+not-public,src/lib/server/public-courses-list.ts,267,CEC,cec,"code: identifier, comment or type","cec_hours: cecHoursLabelForRow(c),"
+not-public,src/lib/server/public-courses-list.ts,267,CEC,cec,"code: identifier, comment or type","cec_hours: cecHoursLabelForRow(c),"
+not-public,src/lib/server/public-courses-list.ts,321,iicrc-code,AMRT,routing data: bare discipline code (render sites audited separately),"{ iicrcDiscipline: { contains: 'AMRT', mode: 'insensitive' as const } },"
+not-public,src/lib/server/public-courses-list.ts,333,iicrc-code,WRT,routing data: bare discipline code (render sites audited separately),"{ iicrcDiscipline: { contains: 'WRT', mode: 'insensitive' as const } },"
+not-public,src/lib/server/public-courses-list.ts,526,CEC,cec,"code: identifier, comment or type",cec_hours: cecHoursLabelForRow({
+not-public,src/lib/server/public-courses-list.ts,526,CEC,cec,"code: identifier, comment or type",cec_hours: cecHoursLabelForRow({
+not-public,src/lib/server/public-courses-list.ts,528,CEC,cec,"code: identifier, comment or type","cecHours: null,"
 not-public,src/lib/server/recert-reminders.ts,2,certif,certification,"code: identifier, comment or type",* Phase B — IICRC recertification reminders.
 not-public,src/lib/server/recert-reminders.ts,23,certif,IICRC credentials,"code: identifier, comment or type",/** In-app + email link target — the IICRC credentials/renewal surface. */
 not-public,src/lib/server/recert-reminders.ts,26,certif,certification,"code: identifier, comment or type","// recertification reminder sent to that path landed on a 404, at the exact moment the member"
