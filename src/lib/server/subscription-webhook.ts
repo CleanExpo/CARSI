@@ -127,7 +127,7 @@ export function subscriptionKindFromPlan(plan: string | null | undefined): Subsc
   return 'unknown';
 }
 
-function subscriptionKind(subscription: Stripe.Subscription): SubscriptionKind {
+export function subscriptionKind(subscription: Stripe.Subscription): SubscriptionKind {
   const source =
     typeof subscription.metadata?.source === 'string'
       ? subscription.metadata.source.trim()

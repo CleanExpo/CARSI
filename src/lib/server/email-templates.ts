@@ -729,10 +729,64 @@ export function renderYearlyMembershipEmail(params: {
   );
 }
 
+/** "Your year with CARSI" in the renewal reminder. Built by `buildYearRecap` (renewal-summary). */
+export type RenewalYearRecapView = {
+  coursesCompleted: number;
+  certificatesIssued: number;
+  /** Registry-approved CEC hours only. 0 renders no CEC line at all. */
+  approvedCecHours: number;
+  nextCourses: Array<{ title: string; url: string }>;
+};
+
+function formatCount(n: number, one: string, many: string): string {
+  return `${n} ${n === 1 ? one : many}`;
+}
+
+function renewalRecapLines(recap: RenewalYearRecapView): string[] {
+  const lines = [
+    `Completed: ${formatCount(recap.coursesCompleted, 'course', 'courses')}`,
+    `Certificates: ${formatCount(recap.certificatesIssued, 'certificate', 'certificates')}`,
+  ];
+  if (recap.approvedCecHours > 0) {
+    lines.push(`CEC hours earned: ${recap.approvedCecHours}`);
+  }
+  return lines;
+}
+
+function renewalRecapHtml(recap: RenewalYearRecapView): string {
+  const items = renewalRecapLines(recap)
+    .map((l) => `<li style="margin: 0 0 6px;">${escapeHtml(l)}</li>`)
+    .join('');
+  const next = recap.nextCourses.length
+    ? `<p style="margin: 14px 0 6px; font-family: ${BRAND.font}; font-size: 14px; color: ${BRAND.text};">Next for you:</p>
+          <ul style="margin: 0; padding-left: 18px;">${recap.nextCourses
+            .map((c) => `<li style="margin: 0 0 6px;">${brandLink(c.url, c.title)}</li>`)
+            .join('')}</ul>`
+    : '';
+  return `<div style="font-family: ${BRAND.font}; font-size: 14px; line-height: 1.6; color: ${BRAND.textMuted}; padding: 16px; background-color: rgba(255,255,255,0.03); border: 1px solid ${BRAND.cardBorder}; border-radius: 2px;">
+          <p style="margin: 0 0 8px; font-family: ${BRAND.font}; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: ${BRAND.blue};">Your year with CARSI</p>
+          <p style="margin: 0 0 8px;">In the last 12 months:</p>
+          <ul style="margin: 0; padding-left: 18px;">${items}</ul>${next}
+        </div>`;
+}
+
+function renewalRecapText(recap: RenewalYearRecapView): string[] {
+  return [
+    'Your year with CARSI (last 12 months)',
+    ...renewalRecapLines(recap).map((l) => `- ${l}`),
+    ...(recap.nextCourses.length
+      ? ['Next for you:', ...recap.nextCourses.map((c) => `- ${c.title}: ${c.url}`)]
+      : []),
+  ];
+}
+
 /**
  * Pre-renewal reminder (Australian Consumer Law practice: tell the subscriber
  * before an automatic renewal charges them). Every value comes from the Stripe
  * upcoming invoice; the caller refuses to render when any is missing.
+ *
+ * `yearRecap` (individual members only) adds what the member got from the year.
+ * Absent when it could not be read; the reminder itself never depends on it.
  */
 export function renderRenewalReminderEmail(params: {
   appOrigin: string;
@@ -746,7 +800,9 @@ export function renderRenewalReminderEmail(params: {
   manageUrl: string;
   /** How the subscriber cancels before the renewal date (plain sentence). */
   cancelInstruction: string;
+  yearRecap?: RenewalYearRecapView | null;
 }): RenderedEmail {
+  const recap = params.yearRecap ?? null;
   const planFor = params.teamName ? `${params.planLabel} for ${params.teamName}` : params.planLabel;
   const lead = `Your ${planFor} renews automatically on ${params.renewalDateLabel}. On that date we will charge ${params.amountLabel} to the payment method on file.`;
   const noAction =
@@ -769,6 +825,7 @@ export function renderRenewalReminderEmail(params: {
       greeting: `Hi ${params.name},`,
       paragraphs: [lead, noAction, cancel],
       details,
+      ...(recap ? { messageHtml: renewalRecapHtml(recap), messageHtmlBare: true } : {}),
       cta: { label: 'Manage your plan', href: params.manageUrl },
       noteHtml: `Manage billing, update your card or cancel from ${brandLink(params.manageUrl, 'your plan page')}.`,
     },
@@ -786,6 +843,7 @@ export function renderRenewalReminderEmail(params: {
       `Renewal date: ${params.renewalDateLabel}`,
       `Amount: ${params.amountLabel}`,
       '',
+      ...(recap ? [...renewalRecapText(recap), ''] : []),
       `Manage your plan: ${params.manageUrl}`,
     ].join('\n')
   );

@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Script from 'next/script';
 
+import { markGa4Configured } from '@/lib/analytics/ga4-client';
+
 const configuredMeasurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim();
 const measurementId =
   configuredMeasurementId || (process.env.NODE_ENV === 'production' ? 'G-LF86765F5C' : '');
@@ -41,6 +43,8 @@ export function GoogleAnalytics() {
     window.gtag('config', measurementId, {
       page_path: `${window.location.pathname}${window.location.search}`,
     });
+    // Funnel events queued before this point now have a configured GA4 destination.
+    markGa4Configured();
   }, [isReady, pathname]);
 
   if (!measurementId) return null;

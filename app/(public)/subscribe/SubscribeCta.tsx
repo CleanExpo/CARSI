@@ -4,13 +4,9 @@ import Link from 'next/link';
 import { useState } from 'react';
 
 import { apiClient, ApiClientError } from '@/lib/api/client';
+import { createMembershipCheckout, MEMBERSHIP_PRICE_AUD } from '@/lib/membership-checkout';
 import { membershipSignupPath } from '@/lib/membership-signup-path';
 import type { MembershipDecisionReason } from '@/lib/server/entitlements';
-
-interface CheckoutResponse {
-  url?: string;
-  checkout_url?: string;
-}
 
 /**
  * Membership CTA. When the feature flag is off it renders the exact WS0
@@ -55,11 +51,8 @@ export function SubscribeCta({
     setLoading(true);
     setError(null);
     try {
-      const data = await apiClient.post<CheckoutResponse>(
-        '/api/lms/subscription/checkout',
-        {}
-      );
-      const url = data.url ?? data.checkout_url;
+      // The shared boundary fires membership_checkout_started once, on a real Stripe URL.
+      const url = await createMembershipCheckout();
       if (url) {
         window.location.href = url;
         return;
@@ -83,7 +76,7 @@ export function SubscribeCta({
   }
 
   const label = reason === 'lapsed' ? 'Renew membership' : 'Start membership';
-  const priceLabel = '$795 / year';
+  const priceLabel = `$${MEMBERSHIP_PRICE_AUD} / year`;
 
   return (
     <>

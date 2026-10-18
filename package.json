@@ -41,6 +41,7 @@
     "test:live-cec-route": "vitest run src/lib/server/live-cec-route.test.ts",
     "check:designations": "node scripts/check-designations.mjs",
     "check:model-currency": "node scripts/check-model-currency.mjs",
+    "report:rwr": "tsx scripts/report-rwr.ts",
     "test:model-currency": "node scripts/check-model-currency.test.mjs",
     "dev": "prisma generate && next dev",
     "dev:with-migrate": "prisma generate && prisma migrate deploy && next dev",

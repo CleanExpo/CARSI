@@ -1,5 +1,5 @@
 /**
- * Single call-site entry point for the three client funnel events
+ * Single call-site entry point for the client funnel events
  * (WS3 / GP-447 / GitHub #128): fires GA4 (via the existing gtag bootstrap)
  * and PostHog (no-op if unconfigured) together so callers don't need to
  * import and call both analytics libs individually.
@@ -23,6 +23,14 @@ export function trackFunnelEvent(payload: FunnelEventPayload): void {
     case 'checkout_started':
       ga4.trackCheckoutStarted(payload);
       posthogAnalytics.trackCheckoutStarted(payload);
+      return;
+    case 'membership_view':
+      ga4.trackMembershipView(payload);
+      posthogAnalytics.trackMembershipView(payload);
+      return;
+    case 'membership_checkout_started':
+      ga4.trackMembershipCheckoutStarted(payload);
+      posthogAnalytics.trackMembershipCheckoutStarted(payload);
       return;
   }
 }

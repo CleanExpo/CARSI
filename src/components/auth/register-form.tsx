@@ -20,6 +20,7 @@ import { PasswordInput } from '@/components/ui/password-input';
 import { authApi } from '@/lib/api/auth';
 import { apiClient, ApiClientError } from '@/lib/api/client';
 import { buildCourseCheckoutUrls } from '@/lib/checkout-urls';
+import { createMembershipCheckout } from '@/lib/membership-checkout';
 import {
   isMembershipCheckoutResume,
   loginPathWithNext,
@@ -80,11 +81,9 @@ export function RegisterForm() {
       // button shows the real reason, rather than stranding the buyer.
       if (isMembershipCheckoutResume(safePath)) {
         try {
-          const checkout = await apiClient.post<{ url?: string; checkout_url?: string }>(
-            '/api/lms/subscription/checkout',
-            {}
-          );
-          const checkoutUrl = checkout.url ?? checkout.checkout_url;
+          // Same boundary as the /subscribe CTA, so the guest's resumed checkout is the one
+          // that fires membership_checkout_started (their first click got a 401 and fired none).
+          const checkoutUrl = await createMembershipCheckout();
           if (checkoutUrl) {
             toast({ title: 'Redirecting to checkout…' });
             window.setTimeout(() => {

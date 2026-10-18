@@ -10,7 +10,13 @@
 
 import posthog from 'posthog-js';
 
-import type { CheckoutStartedPayload, CourseViewPayload, EnrolClickPayload } from './funnel-events';
+import type {
+  CheckoutStartedPayload,
+  CourseViewPayload,
+  EnrolClickPayload,
+  MembershipCheckoutStartedPayload,
+  MembershipViewPayload,
+} from './funnel-events';
 
 const posthogKey = process.env.NEXT_PUBLIC_POSTHOG_KEY?.trim();
 const posthogHost = process.env.NEXT_PUBLIC_POSTHOG_HOST?.trim() || 'https://us.i.posthog.com';
@@ -60,6 +66,18 @@ export function trackCheckoutStarted(payload: CheckoutStartedPayload): void {
   capture('checkout_started', {
     course_slug: payload.course_slug,
     purchase_mode: payload.purchase_mode ?? 'self',
+    ...(typeof payload.value_aud === 'number' ? { value: payload.value_aud, currency: 'AUD' } : {}),
+  });
+}
+
+export function trackMembershipView(payload: MembershipViewPayload): void {
+  capture('membership_view', {
+    checkout_enabled: payload.checkout_enabled,
+  });
+}
+
+export function trackMembershipCheckoutStarted(payload: MembershipCheckoutStartedPayload): void {
+  capture('membership_checkout_started', {
     ...(typeof payload.value_aud === 'number' ? { value: payload.value_aud, currency: 'AUD' } : {}),
   });
 }
