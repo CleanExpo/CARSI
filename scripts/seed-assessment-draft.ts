@@ -34,12 +34,15 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { isAbsolute, join } from 'node:path';
 
 import { prisma } from '../src/lib/prisma';
+import { existingExplanations, explanationFor } from '../src/lib/lms/quiz-explanation-carry';
 
 type QuizQuestion = {
   questionText: string;
   options: string[];
   correctIndex: number;
   points?: number;
+  // Practitioner-authored "why" for a wrong answer (never generated from IICRC standard text).
+  explanation?: string | null;
 };
 
 type QuizDef = {
@@ -140,6 +143,8 @@ async function seedFile(path: string): Promise<number> {
     });
 
     // Replace questions so re-runs stay in sync with the JSON.
+    // Keep authored explanations: the JSON's own wins, else the saved one carries forward.
+    const priorExplanations = await existingExplanations(prisma, quiz.quizId);
     await prisma.lmsQuizQuestion.deleteMany({ where: { quizId: quiz.quizId } });
     for (let i = 0; i < quiz.questions.length; i += 1) {
       const q = quiz.questions[i];
@@ -151,6 +156,7 @@ async function seedFile(path: string): Promise<number> {
           correctIndex: q.correctIndex,
           orderIndex: i,
           points: q.points ?? 1,
+          explanation: explanationFor(q.questionText, q.explanation, priorExplanations),
         },
       });
     }

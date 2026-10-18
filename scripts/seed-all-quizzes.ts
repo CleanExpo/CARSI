@@ -23,6 +23,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { prisma } from '../src/lib/prisma';
+import { existingExplanations, explanationFor } from '../src/lib/lms/quiz-explanation-carry';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SEED_DIR = join(__dirname, '..', 'data', 'seed');
@@ -51,6 +52,8 @@ type QuizQuestion = {
   options: string[];
   correctIndex: number;
   points?: number;
+  // Practitioner-authored "why" for a wrong answer (never generated from IICRC standard text).
+  explanation?: string | null;
 };
 
 type QuizDef = {
@@ -116,6 +119,10 @@ async function seedQuizFile(fileName: string): Promise<number> {
       },
     });
 
+    // Keep authored explanations: the JSON's own wins, else the saved one carries forward.
+
+    const priorExplanations = await existingExplanations(prisma, quiz.quizId);
+
     await prisma.lmsQuizQuestion.deleteMany({ where: { quizId: quiz.quizId } });
     for (let i = 0; i < quiz.questions.length; i += 1) {
       const q = quiz.questions[i];
@@ -127,6 +134,7 @@ async function seedQuizFile(fileName: string): Promise<number> {
           correctIndex: q.correctIndex,
           orderIndex: i,
           points: q.points ?? 1,
+          explanation: explanationFor(q.questionText, q.explanation, priorExplanations),
         },
       });
     }

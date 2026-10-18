@@ -18,6 +18,7 @@ import {
   ensureCatalogInstructor,
   type CourseWithCurriculum,
 } from '@/lib/server/course-catalog-sync';
+import { existingExplanations, explanationFor } from '@/lib/lms/quiz-explanation-carry';
 
 /** Interactive tx default is 5s; remote Postgres + many modules/lessons exceeds that (P2028). */
 const ADMIN_COURSE_WRITE_TX_OPTIONS = {
@@ -30,6 +31,8 @@ export type AdminQuizQuestionInput = {
   options: string[];
   correctIndex: number;
   points?: number;
+  /** Practitioner-authored "why" for a wrong answer. Absent: the saved one is kept. */
+  explanation?: string | null;
 };
 
 export type AdminModuleQuizInput = {
@@ -112,7 +115,9 @@ export function parseModuleQuiz(raw: unknown): AdminModuleQuizInput | undefined 
     if (!questionText || options.length < 2) continue;
     if (correctIndex < 0 || correctIndex >= options.length) continue;
     const points = typeof qq.points === 'number' && qq.points > 0 ? qq.points : 1;
-    questions.push({ questionText, options, correctIndex, points });
+    const explanation =
+      typeof qq.explanation === 'string' && qq.explanation.trim() ? qq.explanation.trim() : undefined;
+    questions.push({ questionText, options, correctIndex, points, ...(explanation ? { explanation } : {}) });
   }
   if (questions.length === 0) return undefined;
   return {
@@ -335,7 +340,7 @@ function buildDesiredLessons(
  * Re-uses an existing quiz id (from the caller or the module's current quiz lesson) so
  * re-writes don't orphan quizzes or lose attempt history.
  */
-async function writeModuleQuiz(
+export async function writeModuleQuiz(
   tx: Prisma.TransactionClient,
   courseId: string,
   moduleTitle: string,
@@ -351,7 +356,9 @@ async function writeModuleQuiz(
     create: { id: quizId, courseId, title, passPercentage, attemptsAllowed },
     update: { courseId, title, passPercentage, attemptsAllowed },
   });
-  // Replace questions so re-writes stay in sync with the input.
+  // Replace questions so re-writes stay in sync with the input, carrying each authored
+  // explanation to the question with the same text so an ordinary save never erases it.
+  const priorExplanations = await existingExplanations(tx, quizId);
   await tx.lmsQuizQuestion.deleteMany({ where: { quizId } });
   for (let i = 0; i < quiz.questions.length; i += 1) {
     const q = quiz.questions[i];
@@ -363,6 +370,7 @@ async function writeModuleQuiz(
         correctIndex: q.correctIndex,
         orderIndex: i,
         points: q.points ?? 1,
+        explanation: explanationFor(q.questionText, q.explanation, priorExplanations),
       },
     });
   }
@@ -539,6 +547,7 @@ export function courseToAdminDto(course: CourseWithCurriculum) {
                 options: quizOptionsToStrings(q.options),
                 correctIndex: q.correctIndex,
                 points: q.points,
+                explanation: q.explanation ?? null,
               })),
           }
         : undefined;
