@@ -13,7 +13,9 @@
  *     whitespace-only variant of an allowlisted line still passes (normalisation); planted claim
  *     fires and a clean line is silent.
  */
-import { evaluateContent, normaliseLine } from './check-iicrc-compliance.mjs';
+import { existsSync, readFileSync } from 'node:fs';
+
+import { evaluateContent, evaluateIicrcFree, IICRC_FREE_FILES, normaliseLine } from './check-iicrc-compliance.mjs';
 
 // A non-approved course fixture path (no slug appears in cec-approvals.json → not slug-exempt).
 const NON_APPROVED = 'data/seed/courses-catalog.json';
@@ -140,6 +142,28 @@ if (evaluateContent(NON_APPROVED, spacedVariant, allowG).length > 0) fail('white
 // (6) Plant/clean negative control.
 if (evaluateContent(NON_APPROVED, 'This course awards 4 IICRC CECs.', EMPTY).length === 0) fail('planted "awards 4 IICRC CECs" did not fire.');
 if (evaluateContent(NON_APPROVED, 'This course is Australian-produced. Ten-question knowledge check.', EMPTY).length > 0) fail('clean line fired the guard.');
+
+// (7) IICRC-free files (review-request email): planted IICRC/CEC wording fires, neutral copy is
+// silent, and every listed file exists and is currently clean.
+for (const planted of [
+  "eyebrow: 'IICRC CEC Accredited course review',",
+  '// earns CECs towards your renewal',
+  'Continuing Education Credit reminder',
+  'subject: `Rate your iicrc course`',
+]) {
+  if (evaluateIicrcFree('src/lib/server/review-request-email.ts', planted).length === 0) fail(`IICRC-free rule missed: ${planted}`);
+}
+if (evaluateIicrcFree('x.ts', "title: 'How was your course?', // a precedent for the record").length > 0) {
+  fail('IICRC-free rule fired on neutral copy (CEC must match as a word, not inside "precedent")');
+}
+// Scope floor: the review-request email must stay on the list (an emptied list scans nothing).
+if (!IICRC_FREE_FILES.includes('src/lib/server/review-request-email.ts')) {
+  fail('IICRC_FREE_FILES no longer lists src/lib/server/review-request-email.ts');
+}
+for (const f of IICRC_FREE_FILES) {
+  if (!existsSync(f)) fail(`IICRC-free file missing: ${f}`);
+  else if (evaluateIicrcFree(f, readFileSync(f, 'utf8')).length > 0) fail(`IICRC-free file carries IICRC/CEC wording: ${f}`);
+}
 
 if (failed > 0) {
   console.error(`\n✖ IICRC/CEC compliance guard self-test failed — ${failed} case(s).`);

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { requireCron } from '@/lib/server/cron-auth';
+import { databaseUnavailableResponse, isDatabaseConfigured } from '@/lib/server/database-unavailable';
 import { readReviewRequestConfig, runReviewRequestEmails } from '@/lib/server/review-request-email';
 
 /**
@@ -17,12 +18,12 @@ import { readReviewRequestConfig, runReviewRequestEmails } from '@/lib/server/re
 export async function GET(request: Request) {
   const denied = requireCron(request);
   if (denied) return denied;
-  if (!process.env.DATABASE_URL?.trim()) {
+  if (!isDatabaseConfigured()) {
     // Off: an explicit, successful no-op. On but no database: nobody can be evaluated or emailed,
     // so fail loudly (503) instead of letting a scheduler's `curl -fsS` record a success.
     const config = readReviewRequestConfig(process.env);
     return config.enabled
-      ? NextResponse.json({ ok: false, sent: 0, reason: 'no_database' }, { status: 503 })
+      ? databaseUnavailableResponse('Review-request emails are on but no database is configured.', { ok: false, sent: 0, reason: 'no_database' })
       : NextResponse.json({ ok: true, sent: 0, reason: config.reason });
   }
 

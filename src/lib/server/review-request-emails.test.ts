@@ -43,8 +43,8 @@ const db = vi.hoisted(() => ({
   /** Wall-clock the fake stamps on writes (Prisma's @updatedAt). */
   clock: new Date('2026-10-18T00:00:00.000Z'),
   failUserReadOnce: false,
-  /** Stored first-activation instant (lms_review_request_activation); null = never switched on. */
-  activation: null as Date | null,
+  /** lms_review_request_activations rows (append-only); empty = never switched on. */
+  activations: [] as Array<{ id: string; activatedAt: Date; lastRunAt: Date; pausedAt: Date | null }>,
   /** Simulates a write that is acknowledged but not durable (read-back finds nothing). */
   activationWriteLost: false,
 }));
@@ -141,11 +141,31 @@ vi.mock('@/lib/prisma', () => ({
       },
     },
     lmsReviewRequestActivation: {
-      findUnique: async () => (db.activation ? { id: 1, activatedAt: db.activation } : null),
-      create: async ({ data }: { data: { id: number; activatedAt: Date } }) => {
-        if (db.activation) throw Object.assign(new Error('Unique constraint failed'), { code: 'P2002' });
-        if (!db.activationWriteLost) db.activation = data.activatedAt;
+      findFirst: async () => {
+        const latest = [...db.activations].sort((a, b) => b.activatedAt.getTime() - a.activatedAt.getTime())[0];
+        return latest ? { ...latest } : null;
+      },
+      create: async ({ data }: { data: { activatedAt: Date; lastRunAt: Date } }) => {
+        if (!db.activationWriteLost) {
+          db.activations.push({ id: `act-${db.activations.length + 1}`, activatedAt: data.activatedAt, lastRunAt: data.lastRunAt, pausedAt: null });
+        }
         return {};
+      },
+      update: async ({ where, data }: { where: { id: string }; data: { lastRunAt: Date } }) => {
+        const row = db.activations.find((a) => a.id === where.id);
+        if (!row) throw new Error('no activation row');
+        row.lastRunAt = data.lastRunAt;
+        return {};
+      },
+      updateMany: async ({ where, data }: { where: { pausedAt: null }; data: { pausedAt: Date } }) => {
+        let count = 0;
+        for (const a of db.activations) {
+          if (where.pausedAt === null && a.pausedAt === null) {
+            a.pausedAt = data.pausedAt;
+            count += 1;
+          }
+        }
+        return { count };
       },
     },
     lmsUser: {
@@ -205,7 +225,9 @@ beforeEach(() => {
   db.failUserReadOnce = false;
   // Most tests describe steady state: sending was switched on long ago. The no-backfill tests
   // below clear this to exercise the first run.
-  db.activation = new Date('2026-01-01T00:00:00.000Z');
+  db.activations = [
+    { id: 'act-steady', activatedAt: new Date('2026-01-01T00:00:00.000Z'), lastRunAt: new Date(NOW.getTime() - H), pausedAt: null },
+  ];
   db.activationWriteLost = false;
   unsub.setOptOut.mockClear();
   mail.send.mockReset().mockResolvedValue({ sent: true, messageId: 'm-1' });
@@ -277,48 +299,112 @@ describe('off by default (D10)', () => {
   });
 });
 
-describe('no backfill: completions before the stored activation instant are never emailed (D10b)', () => {
-  it('the first enabled run records activation and emails nobody, even with an older valid SINCE', async () => {
-    db.activation = null;
+describe('no backfill: completions from before an activation, or from any off period, are never emailed (D10b, D10c)', () => {
+  function addCompletedAt(id: string, completedAt: Date) {
+    db.enrolments.push({
+      id,
+      studentId: `student-${id}`,
+      courseId: `course-${id}`,
+      status: 'completed',
+      completedAt,
+      course: { slug: 'water-damage', title: 'Water Damage Restoration', category: 'restoration' },
+    });
+    db.users.set(`student-${id}`, { email: `student-${id}@example.com`, fullName: 'Jo', emailOptOut: false, isActive: true });
+  }
+  const day = (d: number) => new Date(Date.UTC(2026, 9, d)); // October 2026
+  /** Run once a day (a healthy daily scheduler) from `from` to `to` inclusive. */
+  async function runDaily(from: number, to: number, env: Record<string, string | undefined> = ON) {
+    const results = [];
+    for (let d = from; d <= to; d++) results.push(await run(env, { now: day(d) }));
+    return results;
+  }
+
+  it('the first enabled run records an activation and emails nobody, even with an older valid SINCE', async () => {
+    db.activations = [];
     addCompleter('wk-old', 4 * D); // completed before activation, inside SINCE and the 3-14 day window
     addCompleter('fortnight', 14 * D);
     const first = await run({ ...ON, REVIEW_REQUEST_EMAILS_SINCE: '2026-09-01' });
     expect(first).toMatchObject({ ok: true, sent: 0, activated_at: NOW.toISOString() });
-    expect(db.activation).toEqual(NOW);
+    expect(db.activations.map((a) => a.activatedAt)).toEqual([NOW]);
     expect(mail.send).not.toHaveBeenCalled();
   });
 
-  it('later runs email only completions on or after activation, never the earlier ones', async () => {
-    db.activation = null;
-    addCompleter('pre', 2 * D); // completed 2 days before activation
-    await run(); // first run at NOW records activation
-    const later = new Date(NOW.getTime() + 5 * D);
-    // Completed 1 day after activation, by any path (online, CCW provisioning, admin).
-    db.enrolments.push({
-      id: 'post',
-      studentId: 'student-post',
-      courseId: 'course-post',
-      status: 'completed',
-      completedAt: new Date(NOW.getTime() + D),
-      course: { slug: 'water-damage', title: 'Water Damage Restoration', category: 'restoration' },
-    });
-    db.users.set('student-post', { email: 'student-post@example.com', fullName: 'Jo', emailOptOut: false, isActive: true });
-    const res = await run(ON, { now: later });
-    expect(res.sent).toBe(1);
+  it('daily runs then email only completions on or after activation', async () => {
+    db.activations = [];
+    addCompletedAt('pre', day(16)); // before activation on 18/10
+    addCompletedAt('post', day(19)); // after activation, by any path (online, CCW provisioning, admin)
+    await runDaily(18, 23);
     expect(mail.send.mock.calls.map((c) => c[0].to)).toEqual(['student-post@example.com']);
     expect(db.ledger.has('pre')).toBe(false);
+    expect(db.activations).toHaveLength(1);
   });
 
-  it('a dry run before activation records nothing and counts nobody', async () => {
-    db.activation = null;
+  it('reviewer control: switched off (observed), a completion while off, switched back on → never emailed', async () => {
+    db.activations = [{ id: 'act-1', activatedAt: day(1), lastRunAt: day(8), pausedAt: null }];
+    await run({}, { now: day(9) }); // the daily run sees the flag off and records the pause
+    expect(db.activations[0]!.pausedAt).toEqual(day(9));
+    addCompletedAt('while-off', day(10));
+    await runDaily(10, 17, {}); // still off
+    const results = await runDaily(18, 28, { ...ON, REVIEW_REQUEST_EMAILS_SINCE: '2026-09-01' });
+    expect(results.reduce((n, r) => n + r.sent, 0)).toBe(0);
+    expect(mail.send).not.toHaveBeenCalled();
+    // The off -> on transition is its own recorded activation.
+    expect(db.activations.map((a) => a.activatedAt)).toEqual([day(1), day(18)]);
+  });
+
+  it('a short pause (well inside the gap limit) is still a new activation once a run has seen it', async () => {
+    const at = (d: number, h: number) => new Date(Date.UTC(2026, 9, d, h));
+    db.activations = [{ id: 'act-1', activatedAt: day(1), lastRunAt: at(10, 0), pausedAt: null }];
+    await run({}, { now: at(10, 6) }); // a run sees the flag off at 06:00
+    addCompletedAt('short-pause', at(10, 7));
+    await run(ON, { now: at(10, 12) }); // back on at 12:00 — only 12 h after the last enabled run
+    expect(db.activations.map((a) => a.activatedAt)).toEqual([day(1), at(10, 12)]);
+    const later = await runDaily(14, 16);
+    expect(later.reduce((n, r) => n + r.sent, 0)).toBe(0);
+    expect(mail.send).not.toHaveBeenCalled();
+  });
+
+  it('switched off with the scheduler stopped too (nothing observed), then on → the gap is never backfilled', async () => {
+    db.activations = [{ id: 'act-1', activatedAt: day(1), lastRunAt: day(8), pausedAt: null }];
+    addCompletedAt('during-gap', day(10));
+    const res = await run({ ...ON, REVIEW_REQUEST_EMAILS_SINCE: '2026-09-01' }, { now: day(18) });
+    expect(res).toMatchObject({ sent: 0, activated_at: day(18).toISOString() });
+    expect(db.activations).toHaveLength(2);
+    expect(mail.send).not.toHaveBeenCalled();
+  });
+
+  it('a completion after switching back on is emailed as normal', async () => {
+    db.activations = [{ id: 'act-1', activatedAt: day(1), lastRunAt: day(8), pausedAt: day(9) }];
+    addCompletedAt('while-off', day(12));
+    addCompletedAt('after-on', day(19));
+    await runDaily(18, 24);
+    expect(mail.send.mock.calls.map((c) => c[0].to)).toEqual(['student-after-on@example.com']);
+  });
+
+  it('a daily run within the gap limit continues the same activation (no new row, earlier completions still asked)', async () => {
+    db.activations = [{ id: 'act-1', activatedAt: day(1), lastRunAt: day(17), pausedAt: null }];
+    addCompletedAt('steady', day(12));
+    const res = await run(ON, { now: day(18) });
+    expect(res.sent).toBe(1);
+    expect(db.activations).toHaveLength(1);
+    expect(db.activations[0]!.lastRunAt).toEqual(day(18));
+  });
+
+  it('a dry run outside an activation records nothing and counts nobody', async () => {
+    db.activations = [{ id: 'act-1', activatedAt: day(1), lastRunAt: day(8), pausedAt: day(9) }];
     addCompleter('e1', 5 * D);
     const res = await run(ON, { dryRun: true });
     expect(res).toMatchObject({ ok: true, reason: 'not_activated', would_send: 0 });
-    expect(db.activation).toBeNull();
+    expect(db.activations).toHaveLength(1);
   });
 
-  it('if the activation instant cannot be durably stored, the run fails closed and sends nothing', async () => {
-    db.activation = null;
+  it('a dry run never pauses an activation either', async () => {
+    await run({}, { dryRun: true });
+    expect(db.activations[0]!.pausedAt).toBeNull();
+  });
+
+  it('if a new activation cannot be durably stored, the run fails closed and sends nothing', async () => {
+    db.activations = [];
     db.activationWriteLost = true;
     addCompleter('e1', 5 * D);
     const res = await run();
@@ -334,6 +420,28 @@ describe('no backfill: completions before the stored activation instant are neve
     expect(reviewRequestWindow({ since, activatedAt: new Date('2026-01-01T00:00:00Z') }, NOW).from.toISOString()).toBe(
       '2026-10-04T00:00:00.000Z'
     );
+  });
+});
+
+describe('Mailtrap stream and copy for every course (release-gate r3)', () => {
+  it('review requests go out on the Bulk Stream', async () => {
+    addCompleter('e1', 5 * D);
+    await run();
+    expect(mail.send.mock.calls[0]![0].stream).toBe('bulk');
+  });
+
+  it('a non-restoration course (truckmount) gets an email with no IICRC or CEC wording at all', () => {
+    const e = renderReviewRequestEmail({
+      appOrigin: 'https://carsi.com.au',
+      name: 'Sam',
+      courseTitle: 'CCW CARSI Truckmount Operations',
+      reviewUrl: 'https://carsi.com.au/dashboard/courses/ccw-truckmount#reviews',
+      unsubscribeUrl: 'https://carsi.com.au/unsubscribe?token=t',
+    });
+    expect(e.html).toContain('CCW CARSI Truckmount Operations');
+    for (const part of [e.subject, e.html, e.text]) {
+      expect(part).not.toMatch(/IICRC|\bCECs?\b|Continuing Education|Accredited/i);
+    }
   });
 });
 

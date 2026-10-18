@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
+import { databaseUnavailableResponse, isDatabaseConfigured } from '@/lib/server/database-unavailable';
 import {
   canModerateReviews,
   getCourseIdBySlug,
@@ -51,9 +52,8 @@ export async function POST(
     );
   }
 
-  if (!process.env.DATABASE_URL?.trim()) {
-    return NextResponse.json({ ok: true });
-  }
+  // Never report a hide/unhide that was not stored with its audit event.
+  if (!isDatabaseConfigured()) return databaseUnavailableResponse('Review moderation is temporarily unavailable.');
 
   try {
     const course = await getCourseIdBySlug(slug);

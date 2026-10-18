@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
+import { databaseUnavailableResponse, isDatabaseConfigured } from '@/lib/server/database-unavailable';
 import {
   canManageReviews,
   canModerateReviews,
@@ -112,9 +113,8 @@ export async function POST(request: NextRequest, ctx: { params: Promise<{ slug: 
   const title = typeof payload.title === 'string' ? payload.title : null;
   const body = typeof payload.body === 'string' ? payload.body : null;
 
-  if (!process.env.DATABASE_URL?.trim()) {
-    return NextResponse.json({ ok: true });
-  }
+  // A learner must never be told their review was saved when it was not.
+  if (!isDatabaseConfigured()) return databaseUnavailableResponse('Reviews are temporarily unavailable. Please try again.');
 
   try {
     const course = await getCourseIdBySlug(slug);

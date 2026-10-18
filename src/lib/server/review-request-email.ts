@@ -103,21 +103,51 @@ export function reviewRequestWindow(
 }
 
 /**
- * The stored first-activation instant (D10b). The first REAL enabled run records it once (dry runs
- * never do), so completions from before sending was switched on are never backfilled. A missing
- * or unreadable record fails closed: the run sends nothing.
+ * An enabled run more than this long after the previous one means the job was off (flag or
+ * scheduler). That counts as switching on again, and nothing from the gap is backfilled. The
+ * scheduler runs daily, so 36 hours tolerates one late run but not a missed day.
  */
-async function readOrRecordActivation(now: Date, dryRun: boolean): Promise<Date | null> {
-  const existing = await prisma.lmsReviewRequestActivation.findUnique({ where: { id: 1 } });
-  if (existing) return existing.activatedAt;
-  if (dryRun) return null;
-  try {
-    await prisma.lmsReviewRequestActivation.create({ data: { id: 1, activatedAt: now } });
-  } catch (e) {
-    if (!isUniqueViolation(e)) throw e; // a concurrent first run recorded it first
+export const REVIEW_REQUEST_REACTIVATION_GAP_HOURS = 36;
+
+type ActivationRow = { id: string; activatedAt: Date; lastRunAt: Date; pausedAt: Date | null };
+
+/** Pure: does this run continue the latest activation, or is it an off -> on transition? */
+export function continuesActivation(latest: ActivationRow | null, now: Date): latest is ActivationRow {
+  if (!latest || latest.pausedAt) return false;
+  return now.getTime() - latest.lastRunAt.getTime() <= REVIEW_REQUEST_REACTIVATION_GAP_HOURS * 3_600_000;
+}
+
+async function latestActivation(): Promise<ActivationRow | null> {
+  return prisma.lmsReviewRequestActivation.findFirst({
+    orderBy: { activatedAt: 'desc' },
+    select: { id: true, activatedAt: true, lastRunAt: true, pausedAt: true },
+  });
+}
+
+/**
+ * The no-backfill boundary (D10b, D10c). Every off -> on transition gets a NEW activation row whose
+ * activated_at is "now": the first enabled run ever, the first after a run saw the flag off
+ * (paused), or the first after a gap longer than REVIEW_REQUEST_REACTIVATION_GAP_HOURS. So a
+ * completion during any off period is never emailed. Dry runs never write; outside an active
+ * activation they return null. A boundary that cannot be durably read back fails closed.
+ */
+async function resolveActivationBoundary(now: Date, dryRun: boolean): Promise<Date | null> {
+  const latest = await latestActivation();
+  if (continuesActivation(latest, now)) {
+    if (!dryRun) {
+      await prisma.lmsReviewRequestActivation.update({ where: { id: latest.id }, data: { lastRunAt: now } });
+    }
+    return latest.activatedAt;
   }
-  const stored = await prisma.lmsReviewRequestActivation.findUnique({ where: { id: 1 } });
-  return stored?.activatedAt ?? null;
+  if (dryRun) return null;
+  await prisma.lmsReviewRequestActivation.create({ data: { activatedAt: now, lastRunAt: now } });
+  const stored = await latestActivation();
+  return stored && stored.activatedAt.getTime() >= now.getTime() ? stored.activatedAt : null;
+}
+
+/** Record that a run saw sending switched off, so the next enabled run starts a new activation. */
+export async function pauseReviewRequestActivation(now: Date): Promise<void> {
+  await prisma.lmsReviewRequestActivation.updateMany({ where: { pausedAt: null }, data: { pausedAt: now } });
 }
 
 /** Pure: did the provider really accept the message? `dev_console` only printed it. */
@@ -167,6 +197,9 @@ export function renderReviewRequestEmail(params: {
     appOrigin: params.appOrigin,
     preheader: `Tell other technicians what ${params.courseTitle} was like, in your own words.`,
     eyebrow: 'Course review',
+    // No accreditation tagline: the email is identical for every course, and many courses (e.g.
+    // truckmount, floor care) carry no accreditation framing (CLAUDE.md fail-closed rule).
+    wordmarkTagline: null,
     title: 'How was your course?',
     greeting: `Hi ${params.name},`,
     paragraphs,
@@ -214,6 +247,8 @@ export async function sendReviewRequestEmail(params: {
     subject,
     html,
     text,
+    // A review request is solicitation, not a course-service message: Mailtrap's Bulk Stream.
+    stream: 'bulk',
     headers: {
       'List-Unsubscribe': `<${oneClickUrl}>`,
       'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
@@ -300,10 +335,15 @@ export async function runReviewRequestEmails(options: {
     skipped: {},
     failed_enrollment_ids: [],
   };
-  if (!config.enabled) return { ...base, reason: config.reason };
+  if (!config.enabled) {
+    // Off (flag unset, or SINCE missing or invalid): record the pause so switching back on can
+    // never backfill completions from this off period (D10c).
+    if (!dryRun) await pauseReviewRequestActivation(now);
+    return { ...base, reason: config.reason };
+  }
   if (!dryRun && !isEmailConfigured()) return { ...base, ok: false, reason: 'email_not_configured' };
 
-  const activatedAt = await readOrRecordActivation(now, dryRun);
+  const activatedAt = await resolveActivationBoundary(now, dryRun);
   if (!activatedAt) {
     // Dry run before the first real run: nobody is eligible yet, by design (no backfill).
     // Real run that could not durably record the boundary: fail closed and loudly.

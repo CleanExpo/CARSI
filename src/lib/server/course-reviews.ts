@@ -314,11 +314,16 @@ export async function setReviewVisibility(
     const review = await tx.lmsCourseReview.update({
       where: { id: params.reviewId },
       data: { isPublished: params.isPublished },
-      select: { rating: true, title: true, body: true },
+      select: { rating: true, title: true, body: true, course: { select: { id: true, slug: true, title: true } } },
     });
     await tx.lmsCourseReviewModerationEvent.create({
       data: {
         reviewId: params.reviewId,
+        // Snapshots keep the audit meaningful after the review or course is deleted.
+        reviewRef: params.reviewId,
+        courseRef: review.course.id,
+        courseSlug: review.course.slug,
+        courseTitle: review.course.title,
         action: params.isPublished ? 'unhide' : 'hide',
         reason: params.isPublished ? null : params.reason,
         actorId: params.actorId,

@@ -48,6 +48,7 @@ vi.mock('@/lib/prisma', () => {
 
 const { POST: publishPOST } = await import('../../../app/api/lms/courses/[slug]/reviews/[id]/publish/route');
 const { GET: reviewsGET, POST: reviewsPOST } = await import('../../../app/api/lms/courses/[slug]/reviews/route');
+const { POST: replyPOST } = await import('../../../app/api/lms/courses/[slug]/reviews/[id]/reply/route');
 const { REVIEW_HIDE_REASONS, reviewContentSha256 } = await import('./course-reviews');
 
 const COURSE = { id: 'course-1', title: 'Water Damage Restoration', slug: 'water-damage', category: 'restoration' };
@@ -76,7 +77,12 @@ beforeEach(() => {
   mocks.claims.mockResolvedValue({ sub: 'admin-1', role: 'admin' });
   mocks.courseFind.mockResolvedValue(COURSE);
   mocks.reviewFindFirst.mockResolvedValue({ id: 'rev-1', rating: 1, title: 't', body: 'b' });
-  mocks.reviewUpdate.mockResolvedValue({ rating: 1, title: 'Too basic', body: 'Not what I needed.' });
+  mocks.reviewUpdate.mockResolvedValue({
+    rating: 1,
+    title: 'Too basic',
+    body: 'Not what I needed.',
+    course: { id: 'course-1', slug: 'water-damage', title: 'Water Damage Restoration' },
+  });
   mocks.eventCreate.mockResolvedValue({});
   mocks.reviewFindMany.mockResolvedValue([]);
   mocks.userFind.mockResolvedValue({ fullName: 'Sam Rivers' });
@@ -124,6 +130,11 @@ describe('POST /reviews/:id/publish — a hide needs a recorded reason (AC-3, D2
     expect(mocks.eventCreate.mock.calls[0]![0]).toEqual({
       data: {
         reviewId: 'rev-1',
+        // Snapshots so the audit survives deletion of the review or course.
+        reviewRef: 'rev-1',
+        courseRef: 'course-1',
+        courseSlug: 'water-damage',
+        courseTitle: 'Water Damage Restoration',
         action: 'hide',
         reason: 'spam_or_fake',
         // The actor is the session user, never the body's `actor_id`.
@@ -265,5 +276,46 @@ describe('POST /reviews — who may review, and the response never varies with t
     }
     expect(new Set(bodies).size).toBe(1);
     expect(bodies[0]).not.toMatch(/google/i);
+  });
+});
+
+describe('no database → writes fail visibly, never report success (release-gate r3)', () => {
+  beforeEach(() => {
+    delete process.env.DATABASE_URL;
+  });
+
+  async function expectUnavailable(res: Response) {
+    expect(res.status).toBe(503);
+    const body = await res.json();
+    expect(body).not.toHaveProperty('ok');
+    expect(body).not.toHaveProperty('is_published');
+    expect(mocks.reviewUpdate).not.toHaveBeenCalled();
+    expect(mocks.eventCreate).not.toHaveBeenCalled();
+    expect(mocks.reviewUpsert).not.toHaveBeenCalled();
+  }
+
+  it('a valid hide returns 503 and stores nothing', async () => {
+    await expectUnavailable(await publish({ is_published: false, reason: 'offensive' }));
+  });
+
+  it('an unhide returns 503 and stores nothing', async () => {
+    await expectUnavailable(await publish({ is_published: true }));
+  });
+
+  it('submitting a review returns 503 (the learner is never told it was saved)', async () => {
+    mocks.claims.mockResolvedValue({ sub: 'learner-1', role: 'student' });
+    await expectUnavailable(
+      await reviewsPOST(req('http://localhost/api/lms/courses/water-damage/reviews', { rating: 4, body: 'Own words.' }), {
+        params: Promise.resolve({ slug: 'water-damage' }),
+      })
+    );
+  });
+
+  it('publishing a reply returns 503', async () => {
+    await expectUnavailable(
+      await replyPOST(req('http://localhost/api/lms/courses/water-damage/reviews/rev-1/reply', { reply: 'Thanks.' }), {
+        params: Promise.resolve({ slug: 'water-damage', id: 'rev-1' }),
+      })
+    );
   });
 });

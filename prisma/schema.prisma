@@ -205,7 +205,14 @@ model LmsCourseReview {
 /// is the latest event's reason. Legacy rows hidden before this table existed have no event.
 model LmsCourseReviewModerationEvent {
   id             String   @id @default(uuid()) @db.Uuid
-  reviewId       String   @map("review_id") @db.Uuid
+  /// Live link to the review; set to NULL (never deleted) when the review, its course or its learner is deleted.
+  reviewId       String?  @map("review_id") @db.Uuid
+  /// Permanent snapshot of the review id, kept when review_id is nulled, so one review's decisions stay grouped.
+  reviewRef      String   @map("review_ref") @db.Uuid
+  /// Permanent course snapshot (no FK): the audit must outlive the course (release-gate r3).
+  courseRef      String   @map("course_ref") @db.Uuid
+  courseSlug     String   @map("course_slug")
+  courseTitle    String   @map("course_title")
   /// hide | unhide
   action         String   @db.VarChar(8)
   /// offensive | personal_information | not_about_course | spam_or_fake (required for hide; DB CHECK)
@@ -217,10 +224,11 @@ model LmsCourseReviewModerationEvent {
   contentSha256  String   @map("content_sha256") @db.VarChar(64)
   createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
 
-  review LmsCourseReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
-  actor  LmsUser?        @relation("ReviewModerationActor", fields: [actorId], references: [id], onDelete: SetNull)
+  review LmsCourseReview? @relation(fields: [reviewId], references: [id], onDelete: SetNull)
+  actor  LmsUser?         @relation("ReviewModerationActor", fields: [actorId], references: [id], onDelete: SetNull)
 
   @@index([reviewId, createdAt], map: "ix_lms_review_moderation_review_created")
+  @@index([reviewRef, createdAt], map: "ix_lms_review_moderation_review_ref_created")
   @@map("lms_course_review_moderation_events")
 }
 
@@ -249,14 +257,20 @@ model LmsReviewRequestEmail {
   @@map("lms_review_request_emails")
 }
 
-/// When review-request emails were first switched on (spec D10b). Exactly one row (id = 1, DB
-/// CHECK), written once by the first real enabled run. Completions before it are never emailed.
+/// Each time review-request emails were switched on (spec D10b/D10c). Append-only: a new row is
+/// written on the first enabled run after an off period (an explicit pause, or no enabled run for
+/// longer than the gap limit). The latest row's activated_at is the no-backfill boundary.
 model LmsReviewRequestActivation {
-  id          Int      @id @default(1)
-  activatedAt DateTime @map("activated_at") @db.Timestamptz(6)
-  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  id          String    @id @default(uuid()) @db.Uuid
+  activatedAt DateTime  @map("activated_at") @db.Timestamptz(6)
+  /// Heartbeat: last enabled run in this activation. A long gap means the job was off.
+  lastRunAt   DateTime  @map("last_run_at") @db.Timestamptz(6)
+  /// Set when a run observes the flag switched off; the next enabled run starts a new activation.
+  pausedAt    DateTime? @map("paused_at") @db.Timestamptz(6)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
 
-  @@map("lms_review_request_activation")
+  @@index([activatedAt], map: "ix_lms_review_request_activations_activated_at")
+  @@map("lms_review_request_activations")
 }
 
 enum DiscountType {

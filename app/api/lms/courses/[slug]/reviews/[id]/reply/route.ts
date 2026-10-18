@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
+import { databaseUnavailableResponse, isDatabaseConfigured } from '@/lib/server/database-unavailable';
 import {
   canManageReviews,
   getCourseIdBySlug,
@@ -37,9 +38,7 @@ export async function POST(
   }
   const reply = (payload.reply as string | null) ?? null;
 
-  if (!process.env.DATABASE_URL?.trim()) {
-    return NextResponse.json({ ok: true });
-  }
+  if (!isDatabaseConfigured()) return databaseUnavailableResponse('Replies are temporarily unavailable.');
 
   try {
     const course = await getCourseIdBySlug(slug);
