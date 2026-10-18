@@ -37,7 +37,8 @@ export const HERO_TILE_CROPS = [
     top: 0,
     size: 675,
   },
-  { name: 'mould-sampling', source: 'mould-remediation-level-1', left: 620, top: 0, size: 560 },
+  // The mould patch alone: Level 1 teaches inspecting small mould areas, not swab sampling.
+  { name: 'mould-patch', source: 'mould-remediation-level-1', left: 640, top: 110, size: 400 },
   { name: 'soot-ceiling-cleaning', source: 'soot-removal', left: 380, top: 40, size: 520 },
   {
     name: 'structural-drying-airflow',

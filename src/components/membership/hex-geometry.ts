@@ -19,7 +19,7 @@ export const HEX_COURSE_TILES = [
     image: '/images/hero-tiles/carpet-extraction.webp',
     course: 'introduction-to-basic-carpet-cleaning-and-drying',
   },
-  { image: '/images/hero-tiles/mould-sampling.webp', course: 'level-1-mould-remediation-2cc96b85' },
+  { image: '/images/hero-tiles/mould-patch.webp', course: 'level-1-mould-remediation-2cc96b85' },
   {
     image: '/images/hero-tiles/soot-ceiling-cleaning.webp',
     course: 'introduction-to-smoke-and-soot-damage-restoration',
@@ -44,7 +44,7 @@ export const HEX_COURSE_IMAGES = HEX_COURSE_TILES.map((t) => t.image);
 export const INSPECTED_IMAGES = [
   '/images/hero-tiles/water-moisture-check.webp',
   '/images/hero-tiles/carpet-extraction.webp',
-  '/images/hero-tiles/mould-sampling.webp',
+  '/images/hero-tiles/mould-patch.webp',
   '/images/hero-tiles/soot-ceiling-cleaning.webp',
   '/images/hero-tiles/structural-drying-airflow.webp',
   '/images/hero-tiles/infrared-moisture-image.webp',
