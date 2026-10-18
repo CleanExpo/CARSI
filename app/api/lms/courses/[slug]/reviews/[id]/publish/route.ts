@@ -1,11 +1,10 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
 import { prisma } from '@/lib/prisma';
-import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { NotCurrentAdminError, resolveCurrentAdmin } from '@/lib/server/current-admin';
 import { databaseUnavailableResponse, isDatabaseConfigured } from '@/lib/server/database-unavailable';
+import { readReviewAdminSession } from '@/lib/server/review-admin-session';
 import {
-  canModerateReviews,
   getCourseIdBySlug,
   getReviewForCourse,
   isHideReason,
@@ -20,7 +19,7 @@ import {
  *
  * A hide needs a listed policy reason (spec D2) so the public rating cannot be curated. The
  * reason is validated BEFORE the no-database short-circuit, so a reasonless hide is a 400 in
- * every environment. The actor is the session's user — never anything in the body. Every hide
+ * every environment. The actor is the verified current admin — never anything in the body. Every hide
  * and unhide is recorded as an append-only moderation event (D1). The token's role is only a
  * pre-filter: the admin is re-validated from the database on every request (release-gate r7).
  */
@@ -28,12 +27,12 @@ export async function POST(
   request: NextRequest,
   ctx: { params: Promise<{ slug: string; id: string }> }
 ) {
-  const claims = await getSessionClaimsFromRequest(request);
-  if (!claims) {
+  // The one review-admin session reader (admin cookie or LMS session, with provenance). Who may
+  // moderate is decided ONLY by resolveCurrentAdmin against the database (release-gate r10) — no
+  // token-role pre-filter, which disagreed with it (it shut out founder and cookie admins).
+  const session = await readReviewAdminSession(request);
+  if (!session) {
     return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 });
-  }
-  if (!canModerateReviews(claims.role)) {
-    return NextResponse.json({ detail: 'Only admins can moderate reviews' }, { status: 403 });
   }
 
   const { slug, id } = await ctx.params;
@@ -59,8 +58,6 @@ export async function POST(
   if (!isDatabaseConfigured()) return databaseUnavailableResponse('Review moderation is temporarily unavailable.');
 
   const forbidden = () => NextResponse.json({ detail: 'Only admins can moderate reviews' }, { status: 403 });
-  // Provenance: an LMS session, identified by its user id (never its self-asserted email alone).
-  const session = { via: 'lms_session' as const, userId: claims.sub, email: claims.email };
   try {
     if (!(await resolveCurrentAdmin(prisma, session))) return forbidden();
     const course = await getCourseIdBySlug(slug);
@@ -72,10 +69,10 @@ export async function POST(
       return NextResponse.json({ detail: 'Review not found' }, { status: 404 });
     }
     if (payload.is_published === false && isHideReason(reason)) {
-      await setReviewVisibility({ reviewId: id, isPublished: false, reason, actorId: claims.sub, session });
+      await setReviewVisibility({ reviewId: id, isPublished: false, reason, session });
       return NextResponse.json({ ok: true, is_published: false, hidden_reason: reason });
     }
-    await setReviewVisibility({ reviewId: id, isPublished: true, actorId: claims.sub, session });
+    await setReviewVisibility({ reviewId: id, isPublished: true, session });
     return NextResponse.json({ ok: true, is_published: true, hidden_reason: null });
   } catch (e) {
     if (e instanceof NotCurrentAdminError) return forbidden();

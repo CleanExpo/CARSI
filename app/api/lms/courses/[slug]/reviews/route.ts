@@ -2,11 +2,9 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 import { prisma } from '@/lib/prisma';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
-import { resolveCurrentAdmin } from '@/lib/server/current-admin';
+import { resolveCurrentReviewManager } from '@/lib/server/current-admin';
 import { databaseUnavailableResponse, isDatabaseConfigured } from '@/lib/server/database-unavailable';
 import {
-  canManageReviews,
-  canModerateReviews,
   getCourseIdBySlug,
   getCourseReviews,
   getGoogleReviewLink,
@@ -18,6 +16,7 @@ import {
   ReviewNotAllowedError,
   upsertReview,
 } from '@/lib/server/course-reviews';
+import { readReviewAdminSession } from '@/lib/server/review-admin-session';
 
 /**
  * GET /api/lms/courses/:slug/reviews — public: published reviews + aggregate summary.
@@ -60,19 +59,24 @@ export async function GET(request: NextRequest, ctx: { params: Promise<{ slug: s
     let ownReview = null;
     let reviewAsk = false;
     let reviewerDisplayName: string | null = null;
+    // Reply and moderation controls, and hidden reviews with their reasons, are decided ONLY from
+    // the database (release-gate r10): a current admin (resolveCurrentAdmin) moderates, a current
+    // admin or instructor manages replies — never the token's role, which disagreed with it. The
+    // private read runs INSIDE the transaction that re-validated the admin, while its FOR SHARE locks
+    // are held: a demotion either commits first (and nothing private is read) or waits (r9).
+    const adminSession = await readReviewAdminSession(request);
+    if (adminSession) {
+      const access = await prisma.$transaction(async (tx) => {
+        const manager = await resolveCurrentReviewManager(tx, adminSession);
+        if (!manager) return null;
+        const isAdmin = manager.kind !== 'lms_instructor';
+        return { isAdmin, hidden: isAdmin ? await getCourseReviews(course.id, true, tx) : null };
+      });
+      canManage = access !== null;
+      canModerate = access?.isAdmin === true;
+      moderated = access?.hidden ?? null;
+    }
     if (claims) {
-      canManage = canManageReviews(claims.role);
-      // Hidden reviews and their reasons go only to a CURRENT admin (r7), and are read INSIDE the
-      // transaction that re-validated them, while its FOR SHARE locks on the admin's rows are held:
-      // a demotion either commits first (and the private read never happens) or waits until it is
-      // done (release-gate r9).
-      if (canModerateReviews(claims.role)) {
-        const session = { via: 'lms_session' as const, userId: claims.sub, email: claims.email };
-        moderated = await prisma.$transaction(async (tx) =>
-          (await resolveCurrentAdmin(tx, session)) ? getCourseReviews(course.id, true, tx) : null
-        );
-        canModerate = moderated !== null;
-      }
       canReview = await isEnrolledInCourse(claims.sub, course.id);
       ownReview = canReview ? await getOwnReview(claims.sub, course.id) : null;
       if (canReview) {

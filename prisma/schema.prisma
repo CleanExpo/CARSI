@@ -221,9 +221,12 @@ model LmsCourseReviewModerationEvent {
   action         String   @db.VarChar(8)
   /// offensive | personal_information | not_about_course | spam_or_fake (required for hide; DB CHECK)
   reason         String?  @db.VarChar(32)
+  /// Live link to the acting LMS user (LMS admins only).
   actorId        String?  @map("actor_id") @db.Uuid
-  /// Durable actor snapshot (no FK): who decided survives deleting the admin's account.
-  actorRef       String   @map("actor_ref") @db.Uuid
+  /// bootstrap_admin | admin_user | lms_admin (DB CHECK)
+  actorKind      String   @map("actor_kind") @db.VarChar(16)
+  /// Durable actor snapshot (no FK): admin_users.id or lms_users.id; NULL only for the bootstrap admin.
+  actorRef       String?  @map("actor_ref") @db.Uuid
   actorEmail     String   @map("actor_email")
   /// The review's star rating when the decision was made (curation detector: hides by rating).
   ratingAtAction Int      @map("rating_at_action")

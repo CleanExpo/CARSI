@@ -59,8 +59,8 @@ beforeEach(async () => {
   ]);
   await db.query(
     `INSERT INTO lms_course_review_moderation_events
-       (id, review_id, review_ref, course_ref, course_slug, course_title, sequence, action, reason, actor_id, actor_ref, actor_email, rating_at_action, content_sha256)
-     VALUES ($1, $2, $2, $3, $4, 'Water Damage Restoration', 1, 'hide', 'spam_or_fake', $5, $5, 'moderator@carsi.com.au', 1, $6)`,
+       (id, review_id, review_ref, course_ref, course_slug, course_title, sequence, action, reason, actor_id, actor_kind, actor_ref, actor_email, rating_at_action, content_sha256)
+     VALUES ($1, $2, $2, $3, $4, 'Water Damage Restoration', 1, 'hide', 'spam_or_fake', $5, 'lms_admin', $5, 'moderator@carsi.com.au', 1, $6)`,
     [randomUUID(), ids.review, ids.course, `water-damage-${ids.course}`, ids.admin, 'a'.repeat(64)]
   );
 });
@@ -119,19 +119,58 @@ describe('the moderation audit outlives what it judged (real PostgreSQL FKs)', (
     await expect(
       db.query(
         `INSERT INTO lms_course_review_moderation_events
-           (id, review_id, review_ref, course_ref, course_slug, course_title, sequence, action, reason, actor_ref, actor_email, rating_at_action, content_sha256)
-         VALUES ($1, $2, $2, $3, 's', 't', 9, 'unhide', NULL, $3, '  ', 1, $4)`,
+           (id, review_id, review_ref, course_ref, course_slug, course_title, sequence, action, reason, actor_kind, actor_ref, actor_email, rating_at_action, content_sha256)
+         VALUES ($1, $2, $2, $3, 's', 't', 9, 'unhide', NULL, 'admin_user', $3, '  ', 1, $4)`,
         [randomUUID(), ids.review, ids.course, 'e'.repeat(64)]
       )
     ).rejects.toThrow(/ck_lms_review_moderation_actor_email/);
+  });
+
+  it.each([
+    ['a bootstrap admin with an account reference', 'bootstrap_admin', 'ref', null, /ck_lms_review_moderation_actor_ref/],
+    ['an admin_users admin with no reference', 'admin_user', null, null, /ck_lms_review_moderation_actor_ref/],
+    ['an LMS admin with no reference', 'lms_admin', null, null, /ck_lms_review_moderation_actor_ref/],
+    ['a cookie admin with a live LMS link', 'admin_user', 'ref', 'admin', /ck_lms_review_moderation_actor_id_lms_only/],
+    ['an unknown actor kind', 'anyone', 'ref', null, /ck_lms_review_moderation_actor_kind/],
+  ])('r10: the database refuses %s', async (_label, kind, ref, actorId, error) => {
+    await expect(
+      db.query(
+        `INSERT INTO lms_course_review_moderation_events
+           (id, review_id, review_ref, course_ref, course_slug, course_title, sequence, action, reason, actor_id, actor_kind, actor_ref, actor_email, rating_at_action, content_sha256)
+         VALUES ($1, $2, $2, $3, 's', 't', 7, 'unhide', NULL, $4, $5, $6, 'm@carsi.com.au', 1, $7)`,
+        [randomUUID(), ids.review, ids.course, actorId ? ids.admin : null, kind, ref ? randomUUID() : null, 'f'.repeat(64)]
+      )
+    ).rejects.toThrow(error);
+  });
+
+  it('r10: the bootstrap admin (no account row) and an admin_users admin are recorded as who decided', async () => {
+    for (const [seq, kind, ref] of [
+      [7, 'bootstrap_admin', null],
+      [8, 'admin_user', randomUUID()],
+    ] as const) {
+      await db.query(
+        `INSERT INTO lms_course_review_moderation_events
+           (id, review_id, review_ref, course_ref, course_slug, course_title, sequence, action, reason, actor_id, actor_kind, actor_ref, actor_email, rating_at_action, content_sha256)
+         VALUES ($1, $2, $2, $3, 's', 't', $4, 'unhide', NULL, NULL, $5, $6, 'support@carsi.com.au', 1, $7)`,
+        [randomUUID(), ids.review, ids.course, seq, kind, ref, 'f'.repeat(64)]
+      );
+    }
+    const rows = await db.query<{ actor_kind: string; has_ref: boolean }>(
+      'SELECT actor_kind, actor_ref IS NOT NULL AS has_ref FROM lms_course_review_moderation_events WHERE review_ref = $1 AND sequence > 6 ORDER BY sequence',
+      [ids.review]
+    );
+    expect(rows.rows).toEqual([
+      { actor_kind: 'bootstrap_admin', has_ref: false },
+      { actor_kind: 'admin_user', has_ref: true },
+    ]);
   });
 
   it('the database still refuses a hide without a reason', async () => {
     await expect(
       db.query(
         `INSERT INTO lms_course_review_moderation_events
-           (id, review_id, review_ref, course_ref, course_slug, course_title, sequence, action, reason, actor_ref, actor_email, rating_at_action, content_sha256)
-         VALUES ($1, $2, $2, $3, 's', 't', 2, 'hide', NULL, $3, 'm@carsi.com.au', 1, $4)`,
+           (id, review_id, review_ref, course_ref, course_slug, course_title, sequence, action, reason, actor_kind, actor_ref, actor_email, rating_at_action, content_sha256)
+         VALUES ($1, $2, $2, $3, 's', 't', 2, 'hide', NULL, 'admin_user', $3, 'm@carsi.com.au', 1, $4)`,
         [randomUUID(), ids.review, ids.course, 'b'.repeat(64)]
       )
     ).rejects.toThrow(/ck_lms_review_moderation_hide_has_reason/);
@@ -149,8 +188,8 @@ describe('moderation order is the decision sequence, never a timestamp (release-
       );
       await db.query(
         `INSERT INTO lms_course_review_moderation_events
-           (id, review_id, review_ref, course_ref, course_slug, course_title, sequence, action, reason, actor_ref, actor_email, rating_at_action, content_sha256, created_at)
-         VALUES ($1, $2, $2, $3, 's', 't', $4, $5, $6, $3, 'm@carsi.com.au', 1, $7, $8)`,
+           (id, review_id, review_ref, course_ref, course_slug, course_title, sequence, action, reason, actor_kind, actor_ref, actor_email, rating_at_action, content_sha256, created_at)
+         VALUES ($1, $2, $2, $3, 's', 't', $4, $5, $6, 'admin_user', $3, 'm@carsi.com.au', 1, $7, $8)`,
         [randomUUID(), ids.review, ids.course, v.rows[0]!.moderation_version, action, reason, 'c'.repeat(64), createdAt]
       );
       await db.exec('COMMIT');
@@ -195,8 +234,8 @@ describe('moderation order is the decision sequence, never a timestamp (release-
     await expect(
       db.query(
         `INSERT INTO lms_course_review_moderation_events
-           (id, review_id, review_ref, course_ref, course_slug, course_title, sequence, action, reason, actor_ref, actor_email, rating_at_action, content_sha256)
-         VALUES ($1, $2, $2, $3, 's', 't', 1, 'unhide', NULL, $3, 'm@carsi.com.au', 1, $4)`,
+           (id, review_id, review_ref, course_ref, course_slug, course_title, sequence, action, reason, actor_kind, actor_ref, actor_email, rating_at_action, content_sha256)
+         VALUES ($1, $2, $2, $3, 's', 't', 1, 'unhide', NULL, 'admin_user', $3, 'm@carsi.com.au', 1, $4)`,
         [randomUUID(), ids.review, ids.course, 'd'.repeat(64)]
       )
     ).rejects.toThrow(/uq_lms_review_moderation_review_ref_sequence/);

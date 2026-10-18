@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 
 import { prisma } from '@/lib/prisma';
 import { resolveCurrentAdmin } from '@/lib/server/current-admin';
@@ -10,8 +10,8 @@ import { getReviewFunnelSummary } from '@/lib/server/review-summary';
  * Completions, open asks, reviews, hides by reason and star rating (a run of hidden 1-2 star
  * reviews is how a curated rating would show), and the Google link status.
  */
-export async function GET() {
-  const session = await readReviewAdminSession();
+export async function GET(request: NextRequest) {
+  const session = await readReviewAdminSession(request);
   if (!session) {
     return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 });
   }

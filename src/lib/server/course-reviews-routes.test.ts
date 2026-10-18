@@ -194,9 +194,10 @@ describe('POST /reviews/:id/publish — a hide needs a recorded reason (AC-3, D2
         sequence: 7,
         action: 'hide',
         reason: 'spam_or_fake',
-        // The actor is the session user, never the body's `actor_id`.
+        // The actor is the verified current admin, never the body's `actor_id`.
         actorId: 'admin-1',
         // Durable actor snapshot: survives deleting the admin's account.
+        actorKind: 'lms_admin',
         actorRef: 'admin-1',
         actorEmail: 'moderator@carsi.com.au',
         ratingAtAction: 1,

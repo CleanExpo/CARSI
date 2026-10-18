@@ -114,3 +114,61 @@ export async function requireCurrentAdmin(
   if (!admin) throw new NotCurrentAdminError();
   return admin;
 }
+
+/** Someone who may publish or clear a public reply to a review: a current admin, or an instructor now. */
+export type CurrentReviewManager =
+  | (CurrentAdmin & { lmsUserId: string | null })
+  | { kind: 'lms_instructor'; ref: string; email: string; lmsUserId: string };
+
+/** Thrown when a reply cannot be attributed to a current admin or instructor. */
+export class NotCurrentReviewManagerError extends Error {
+  constructor() {
+    super('This reply cannot be attributed to a current instructor or admin.');
+    this.name = 'NotCurrentReviewManagerError';
+  }
+}
+
+/**
+ * Review replies (release-gate r10): a CURRENT admin (resolveCurrentAdmin — the one rule), or an LMS
+ * user who is active now and whose effective database role is 'instructor' now (pickSessionRole, the
+ * same rule as the session token). Never the token's role claim. Rows are read FOR SHARE, so inside
+ * the reply's transaction a concurrent demotion either commits first or waits.
+ */
+export async function resolveCurrentReviewManager(
+  db: RawQueryClient,
+  session: AdminSessionProvenance | null | undefined
+): Promise<CurrentReviewManager | null> {
+  const admin = await resolveCurrentAdmin(db, session);
+  if (admin) return { ...admin, lmsUserId: admin.kind === 'lms_admin' ? admin.ref : null };
+  if (!session || session.via !== 'lms_session' || !session.userId) return null;
+  const users = await db.$queryRaw<
+    Array<{ id: string; email: string; is_active: boolean; role: string | null }>
+  >`
+    SELECT "id", "email", "is_active", "role" FROM "lms_users" WHERE "id" = ${session.userId}::uuid FOR SHARE`;
+  const user = users[0];
+  if (!user || !user.is_active) return null;
+  const roleRows = await db.$queryRaw<Array<{ name: string }>>`
+    SELECT r."name" FROM "lms_user_roles" ur JOIN "lms_roles" r ON r."id" = ur."role_id"
+     WHERE ur."user_id" = ${user.id}::uuid FOR SHARE OF ur`;
+  const effective = pickSessionRole(
+    roleRows.map((r) => r.name),
+    user.role
+  );
+  if (effective !== 'instructor') return null;
+  return {
+    kind: 'lms_instructor',
+    ref: user.id,
+    email: user.email.trim().toLowerCase(),
+    lmsUserId: user.id,
+  };
+}
+
+/** resolveCurrentReviewManager, or throw NotCurrentReviewManagerError (inside the reply's transaction). */
+export async function requireCurrentReviewManager(
+  db: RawQueryClient,
+  session: AdminSessionProvenance | null | undefined
+): Promise<CurrentReviewManager> {
+  const manager = await resolveCurrentReviewManager(db, session);
+  if (!manager) throw new NotCurrentReviewManagerError();
+  return manager;
+}

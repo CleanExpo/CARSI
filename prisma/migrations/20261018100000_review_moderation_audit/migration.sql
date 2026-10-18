@@ -35,10 +35,12 @@ CREATE TABLE "lms_course_review_moderation_events" (
     "sequence" INTEGER NOT NULL,
     "action" VARCHAR(8) NOT NULL,
     "reason" VARCHAR(32),
-    -- Live link to the acting LMS user; NULL once that account is deleted.
+    -- Live link to the acting LMS user (LMS admins only); NULL once that account is deleted.
     "actor_id" UUID,
     -- Durable actor snapshot (no FK): who made the decision survives deleting the account.
-    "actor_ref" UUID NOT NULL,
+    -- bootstrap_admin (no row: actor_ref NULL) | admin_user (admin_users.id) | lms_admin (lms_users.id).
+    "actor_kind" VARCHAR(16) NOT NULL,
+    "actor_ref" UUID,
     "actor_email" TEXT NOT NULL,
     "rating_at_action" INTEGER NOT NULL,
     "content_sha256" VARCHAR(64) NOT NULL,
@@ -53,7 +55,12 @@ CREATE TABLE "lms_course_review_moderation_events" (
     -- A hide without a reason must fail in the database, not only in the route.
     CONSTRAINT "ck_lms_review_moderation_hide_has_reason" CHECK ("action" <> 'hide' OR "reason" IS NOT NULL),
     CONSTRAINT "ck_lms_review_moderation_sequence_positive" CHECK ("sequence" > 0),
-    CONSTRAINT "ck_lms_review_moderation_actor_email" CHECK (length(btrim("actor_email")) > 0)
+    CONSTRAINT "ck_lms_review_moderation_actor_email" CHECK (length(btrim("actor_email")) > 0),
+    CONSTRAINT "ck_lms_review_moderation_actor_kind" CHECK ("actor_kind" IN ('bootstrap_admin', 'admin_user', 'lms_admin')),
+    -- Only the bootstrap admin has no account row to point at; every other actor has a reference.
+    CONSTRAINT "ck_lms_review_moderation_actor_ref" CHECK (("actor_kind" = 'bootstrap_admin') = ("actor_ref" IS NULL)),
+    -- The live LMS link exists only for LMS admins.
+    CONSTRAINT "ck_lms_review_moderation_actor_id_lms_only" CHECK ("actor_kind" = 'lms_admin' OR "actor_id" IS NULL)
 );
 
 -- Two decisions can never share a place in a review's order.
