@@ -2,7 +2,8 @@
  * Quiz questions are written by admin course saves and the quiz seed scripts. Two things must
  * survive an ordinary re-write: authored explanations, and question ids. The lesson's content
  * version hashes the question ids, so a new id on an unchanged question makes every learner's
- * saved quiz go stale. An explanation supplied by the writer (seed JSON or admin input) always wins.
+ * saved quiz go stale. An explanation supplied by the writer (seed JSON or admin input) always wins;
+ * null or a blank string removes it, and only an absent field keeps the saved one.
  */
 import type { Prisma } from '@/generated/prisma/client';
 
@@ -21,9 +22,8 @@ export function explanationFor(
   authored: string | null | undefined,
   prior: ReadonlyMap<string, string>
 ): string | null {
-  const own = typeof authored === 'string' ? authored.trim() : '';
-  if (own) return own;
-  return prior.get(questionText.trim()) ?? null;
+  if (authored === undefined) return prior.get(questionText.trim()) ?? null;
+  return typeof authored === 'string' && authored.trim() ? authored.trim() : null;
 }
 
 /**
@@ -62,7 +62,9 @@ export async function writeQuizQuestions(
     });
   if (unchanged) {
     for (let i = 0; i < current.length; i += 1) {
-      const next = questions[i].explanation?.trim() || current[i].explanation?.trim() || null;
+      const authored = questions[i].explanation;
+      const next =
+        authored === undefined ? current[i].explanation?.trim() || null : authored?.trim() || null;
       if (next !== (current[i].explanation ?? null)) {
         await db.lmsQuizQuestion.update({
           where: { id: current[i].id },

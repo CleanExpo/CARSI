@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/lib/prisma', () => ({ prisma: {} }));
 
-import { writeModuleQuiz } from '@/lib/admin/admin-courses-service';
+import { parseModuleQuiz, writeModuleQuiz } from '@/lib/admin/admin-courses-service';
 
 import { explanationFor, writeQuizQuestions } from './quiz-explanation-carry';
 
@@ -92,6 +92,47 @@ describe('explanation carry-forward', () => {
     await writeQuizQuestions(db as never, 'quiz-1', [input('Q1'), input('A brand-new question')]);
     expect(ops).toEqual(['read', 'delete', 'create', 'create']);
     expect(created.map((c) => c.explanation)).toEqual([WHY, null]);
+  });
+
+  // Review round 5: an explanation could never be removed; null or blank fell back to the saved one.
+  it('null or a blank explanation removes the saved one in place; an absent field keeps it', async () => {
+    const { db, ops } = fakeDb([
+      row('q-1', 'Q1', WHY),
+      row('q-2', 'Q2', WHY),
+      row('q-3', 'Q3', WHY),
+    ]);
+    await writeQuizQuestions(db as never, 'quiz-1', [
+      { ...input('Q1'), explanation: null },
+      { ...input('Q2'), explanation: '   ' },
+      input('Q3'),
+    ]);
+    expect(ops).toEqual(['read', 'update:q-1:null', 'update:q-2:null']);
+  });
+
+  it('a rewritten question set honours a removed explanation too', async () => {
+    const { db, created } = fakeDb([row('q-1', 'Q1', WHY)]);
+    await writeQuizQuestions(db as never, 'quiz-1', [
+      { ...input('Q1'), explanation: null },
+      input('A brand-new question'),
+    ]);
+    expect(created.map((c) => c.explanation)).toEqual([null, null]);
+  });
+
+  it('the admin parser keeps null and blank explanations as a removal, and omits an absent one', () => {
+    const quiz = parseModuleQuiz({
+      questions: [
+        { questionText: 'Q1', options: ['A', 'B'], correctIndex: 1, explanation: null },
+        { questionText: 'Q2', options: ['A', 'B'], correctIndex: 1, explanation: ' ' },
+        { questionText: 'Q3', options: ['A', 'B'], correctIndex: 1 },
+        { questionText: 'Q4', options: ['A', 'B'], correctIndex: 1, explanation: ' Why. ' },
+      ],
+    })!;
+    expect(quiz.questions.map((q) => ('explanation' in q ? q.explanation : 'absent'))).toEqual([
+      null,
+      null,
+      'absent',
+      'Why.',
+    ]);
   });
 
   it('an ordinary admin course save keeps the authored explanation (review: it used to erase it)', async () => {

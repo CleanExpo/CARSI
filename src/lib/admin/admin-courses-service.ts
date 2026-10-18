@@ -115,9 +115,20 @@ export function parseModuleQuiz(raw: unknown): AdminModuleQuizInput | undefined 
     if (!questionText || options.length < 2) continue;
     if (correctIndex < 0 || correctIndex >= options.length) continue;
     const points = typeof qq.points === 'number' && qq.points > 0 ? qq.points : 1;
+    // Absent keeps the saved explanation; null or a blank string removes it.
     const explanation =
-      typeof qq.explanation === 'string' && qq.explanation.trim() ? qq.explanation.trim() : undefined;
-    questions.push({ questionText, options, correctIndex, points, ...(explanation ? { explanation } : {}) });
+      typeof qq.explanation === 'string' && qq.explanation.trim()
+        ? qq.explanation.trim()
+        : qq.explanation === null || typeof qq.explanation === 'string'
+          ? null
+          : undefined;
+    questions.push({
+      questionText,
+      options,
+      correctIndex,
+      points,
+      ...(explanation !== undefined ? { explanation } : {}),
+    });
   }
   if (questions.length === 0) return undefined;
   return {
