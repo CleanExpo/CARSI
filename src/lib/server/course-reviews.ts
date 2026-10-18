@@ -7,7 +7,21 @@
  * they can be unit-tested, matching the repo convention (see `notifications.ts`).
  */
 
+import { createHash } from 'node:crypto';
+
 import { prisma } from '@/lib/prisma';
+import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
+import {
+  ANONYMOUS_REVIEWER_LABEL,
+  isReviewAskEligible,
+  resolveGoogleReviewUrl,
+  shouldShowReviewAsk,
+  type GoogleReviewUrlStatus,
+  type ReviewHideReason,
+} from '@/lib/reviews/review-ask';
+import { isEnrolmentAccessAllowed } from '@/lib/server/enrollment-access';
+
+export { REVIEW_HIDE_REASONS, isHideReason, type ReviewHideReason } from '@/lib/reviews/review-ask';
 
 export const MIN_RATING = 1;
 export const MAX_RATING = 5;
@@ -21,7 +35,8 @@ export type ReviewRow = {
   repliedAt: Date | null;
   isPublished: boolean;
   createdAt: Date;
-  student: { fullName: string | null; email: string } | null;
+  /** `email` is never used for display (D8); it is optional so callers need not select it. */
+  student: { fullName: string | null; email?: string } | null;
 };
 
 export type ReviewDto = {
@@ -37,6 +52,22 @@ export type ReviewDto = {
   author: string;
   created_at: string;
 };
+
+/**
+ * Moderator-only view of a review's moderation state (D2/D3/D4). Never part of the public
+ * DTO: the public GET only ever receives `ReviewDto`.
+ */
+export type ReviewModerationDto = {
+  /** Reason of the latest hide; null when visible, or when hidden before reasons were recorded. */
+  hidden_reason: ReviewHideReason | null;
+  hidden_at: string | null;
+  /** Hidden before the moderation audit existed — no reason was ever recorded (D3). */
+  hidden_before_reasons_recorded: boolean;
+  /** The learner changed the title/body after the latest hide (D4). */
+  edited_after_hide: boolean;
+};
+
+export type ModeratorReviewDto = ReviewDto & { moderation: ReviewModerationDto };
 
 /** Roles allowed to publish a response to a review (mirrors WORKFLOW_ROLES). */
 export function canManageReviews(role: string | null | undefined): boolean {
@@ -60,12 +91,15 @@ export function isValidRating(rating: unknown): rating is number {
   return typeof rating === 'number' && Number.isInteger(rating) && rating >= MIN_RATING && rating <= MAX_RATING;
 }
 
-/** First name (or email local-part) only — never leak a reviewer's full identity publicly. */
-function displayAuthor(student: ReviewRow['student']): string {
+/**
+ * First name only — never leak a reviewer's identity publicly (D8). With no name on file the
+ * label is a fixed neutral one; it is never derived from the email (an address local-part such
+ * as `john.smith.waterdamage` is personal information the learner never agreed to publish).
+ */
+export function displayAuthor(student: { fullName: string | null } | null): string {
   const name = student?.fullName?.trim();
   if (name) return name.split(/\s+/)[0]!;
-  const email = student?.email;
-  return email ? email.split('@')[0]! : 'Student';
+  return ANONYMOUS_REVIEWER_LABEL;
 }
 
 /** Pure: map a persisted review row to the public DTO. */
@@ -101,20 +135,92 @@ export function summarizeReviews(ratings: Array<{ rating: number }>): ReviewSumm
 /** Resolve a course id (+ title) from its public slug. */
 export async function getCourseIdBySlug(
   slug: string
-): Promise<{ id: string; title: string } | null> {
+): Promise<{ id: string; title: string; slug: string; category: string | null } | null> {
   return prisma.lmsCourse.findUnique({
     where: { slug: slug.trim().toLowerCase() },
-    select: { id: true, title: true },
+    select: { id: true, title: true, slug: true, category: true },
   });
 }
 
-/** True if the student has any enrolment in the course (the gate to review it). */
+/**
+ * True only if the student holds an access-granting enrolment (active or completed) — the gate
+ * to review it (D6). A refunded, revoked or disputed enrolment cannot post a review.
+ */
 export async function isEnrolledInCourse(studentId: string, courseId: string): Promise<boolean> {
   const enrolment = await prisma.lmsEnrollment.findUnique({
     where: { studentId_courseId: { studentId, courseId } },
-    select: { id: true },
+    select: { status: true },
   });
-  return enrolment !== null;
+  return enrolment !== null && isEnrolmentAccessAllowed(enrolment.status);
+}
+
+/**
+ * Whether this learner should see the review ask for this course right now (D5): derived from
+ * database state on every load — never from URL flags, client lesson progress or a dismissal.
+ */
+export async function getReviewAskForStudent(
+  studentId: string,
+  course: { id: string; slug: string; category: string | null }
+): Promise<boolean> {
+  const [enrolment, review] = await Promise.all([
+    prisma.lmsEnrollment.findUnique({
+      where: { studentId_courseId: { studentId, courseId: course.id } },
+      select: { status: true, completedAt: true },
+    }),
+    prisma.lmsCourseReview.findUnique({
+      where: { courseId_studentId: { courseId: course.id, studentId } },
+      select: { id: true },
+    }),
+  ]);
+  if (!enrolment) return false;
+  const eligible = isReviewAskEligible({
+    status: enrolment.status,
+    completedAt: enrolment.completedAt,
+    isOnboardingCourse: isOnboardingCourse({ slug: course.slug, category: course.category }),
+  });
+  return shouldShowReviewAsk({ eligible, hasOwnReview: review !== null });
+}
+
+/** Course slug for an enrolment (credential id), used to place the review ask on the credential page. */
+export async function getCourseSlugForEnrollment(enrollmentId: string): Promise<string | null> {
+  if (!process.env.DATABASE_URL?.trim() || !enrollmentId?.trim()) return null;
+  try {
+    const row = await prisma.lmsEnrollment.findUnique({
+      where: { id: enrollmentId },
+      select: { course: { select: { slug: true } } },
+    });
+    return row?.course.slug ?? null;
+  } catch {
+    // Not a valid enrolment id (e.g. a non-uuid credential id): no ask, page still renders.
+    return null;
+  }
+}
+
+/** Public name preview for the review form ("Your review will appear as …"). */
+export async function getReviewerDisplayName(studentId: string): Promise<string> {
+  const user = await prisma.lmsUser.findUnique({
+    where: { id: studentId },
+    select: { fullName: true },
+  });
+  return displayAuthor(user);
+}
+
+let warnedRejectedGoogleUrl = false;
+
+/**
+ * GOOGLE_REVIEW_URL, validated (D7, D13). A rejected value logs one warning per process so a
+ * misconfiguration is visible rather than silently hiding the link from every reviewer.
+ */
+export function getGoogleReviewLink(): { url: string | null; status: GoogleReviewUrlStatus } {
+  const resolved = resolveGoogleReviewUrl(process.env.GOOGLE_REVIEW_URL);
+  if (resolved.status === 'rejected' && !warnedRejectedGoogleUrl) {
+    warnedRejectedGoogleUrl = true;
+    console.warn(
+      '[course-reviews] GOOGLE_REVIEW_URL rejected: it must be https://g.page/r/<id> or ' +
+        'https://search.google.com/local/writereview?placeid=<id>; the Google link is hidden'
+    );
+  }
+  return resolved;
 }
 
 /**
@@ -125,7 +231,7 @@ export async function isEnrolledInCourse(studentId: string, courseId: string): P
 export async function getCourseReviews(
   courseId: string,
   includeHidden = false
-): Promise<{ reviews: ReviewDto[]; summary: ReviewSummary }> {
+): Promise<{ reviews: Array<ReviewDto | ModeratorReviewDto>; summary: ReviewSummary }> {
   const rows = await prisma.lmsCourseReview.findMany({
     where: includeHidden ? { courseId } : { courseId, isPublished: true },
     orderBy: { createdAt: 'desc' },
@@ -138,18 +244,86 @@ export async function getCourseReviews(
       repliedAt: true,
       isPublished: true,
       createdAt: true,
-      student: { select: { fullName: true, email: true } },
+      student: { select: { fullName: true } },
+      ...(includeHidden
+        ? {
+            moderationEvents: {
+              orderBy: { createdAt: 'desc' as const },
+              take: 1,
+              select: { action: true, reason: true, contentSha256: true, createdAt: true },
+            },
+          }
+        : {}),
     },
   });
   const summary = summarizeReviews(rows.filter((r) => r.isPublished));
-  return { reviews: rows.map(toReviewDto), summary };
+  if (!includeHidden) return { reviews: rows.map(toReviewDto), summary };
+  return {
+    reviews: rows.map((row) => ({
+      ...toReviewDto(row),
+      moderation: toModerationDto(row, (row as { moderationEvents?: LatestModerationEvent[] }).moderationEvents?.[0] ?? null),
+    })),
+    summary,
+  };
 }
 
-/** Hide or unhide a review from public listings (admin moderation). */
-export async function setReviewPublished(reviewId: string, isPublished: boolean): Promise<void> {
-  await prisma.lmsCourseReview.update({
-    where: { id: reviewId },
-    data: { isPublished },
+type LatestModerationEvent = {
+  action: string;
+  reason: string | null;
+  contentSha256: string;
+  createdAt: Date;
+};
+
+/** sha256 of the reviewed text, so an edit after a hide is detectable (D4). */
+export function reviewContentSha256(title: string | null, body: string | null): string {
+  return createHash('sha256').update(`${title ?? ''}\n${body ?? ''}`).digest('hex');
+}
+
+/** Pure: moderator view of the latest moderation decision for a review (D2/D3/D4). */
+export function toModerationDto(
+  row: { isPublished: boolean; title: string | null; body: string | null },
+  latest: LatestModerationEvent | null
+): ReviewModerationDto {
+  if (row.isPublished) {
+    return { hidden_reason: null, hidden_at: null, hidden_before_reasons_recorded: false, edited_after_hide: false };
+  }
+  if (!latest || latest.action !== 'hide') {
+    return { hidden_reason: null, hidden_at: null, hidden_before_reasons_recorded: true, edited_after_hide: false };
+  }
+  return {
+    hidden_reason: latest.reason as ReviewHideReason,
+    hidden_at: latest.createdAt.toISOString(),
+    hidden_before_reasons_recorded: false,
+    edited_after_hide: latest.contentSha256 !== reviewContentSha256(row.title, row.body),
+  };
+}
+
+/**
+ * Hide or unhide a review (admin moderation), recording the decision as an append-only
+ * moderation event in the SAME transaction as the flag flip (D1). A hide requires a reason —
+ * enforced by the route, by this signature, and by a database CHECK.
+ */
+export async function setReviewVisibility(
+  params:
+    | { reviewId: string; isPublished: false; reason: ReviewHideReason; actorId: string }
+    | { reviewId: string; isPublished: true; reason?: undefined; actorId: string }
+): Promise<void> {
+  await prisma.$transaction(async (tx) => {
+    const review = await tx.lmsCourseReview.update({
+      where: { id: params.reviewId },
+      data: { isPublished: params.isPublished },
+      select: { rating: true, title: true, body: true },
+    });
+    await tx.lmsCourseReviewModerationEvent.create({
+      data: {
+        reviewId: params.reviewId,
+        action: params.isPublished ? 'unhide' : 'hide',
+        reason: params.isPublished ? null : params.reason,
+        actorId: params.actorId,
+        ratingAtAction: review.rating,
+        contentSha256: reviewContentSha256(review.title, review.body),
+      },
+    });
   });
 }
 

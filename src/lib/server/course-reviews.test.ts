@@ -82,9 +82,9 @@ describe('toReviewDto', () => {
     expect(dto.replied_at).toBe('2026-07-03T00:00:00.000Z');
   });
 
-  it('falls back to the email local-part, then "Student", when no name', () => {
-    expect(toReviewDto({ ...base, student: { fullName: null, email: 'jo@carsi.com.au' } }).author).toBe('jo');
-    expect(toReviewDto({ ...base, student: null }).author).toBe('Student');
+  it('falls back to a neutral label — never the email — when no name (spec D8)', () => {
+    expect(toReviewDto({ ...base, student: { fullName: null, email: 'jo@example.com' } }).author).toBe('CARSI learner');
+    expect(toReviewDto({ ...base, student: null }).author).toBe('CARSI learner');
   });
 });
 

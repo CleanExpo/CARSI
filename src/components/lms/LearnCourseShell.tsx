@@ -17,6 +17,7 @@ import { LearnModuleOverview } from '@/components/lms/LearnModuleOverview';
 import { LessonFooterNav } from '@/components/lms/LessonFooterNav';
 import { LessonPlayer } from '@/components/lms/LessonPlayer';
 import { ProgressSharePrompt } from '@/components/lms/ProgressSharePrompt';
+import { ReviewAsk } from '@/components/lms/ReviewAsk';
 import { EnterpriseQuizResult, LearnerQuizResult, QuizPlayer } from '@/components/lms/QuizPlayer';
 import { EnterpriseLessonFooter } from '@/components/onboarding/EnterpriseLessonFooter';
 import { OnboardingCurriculumNav } from '@/components/onboarding/OnboardingCurriculumNav';
@@ -787,6 +788,9 @@ export function LearnCourseShell({ slug }: { slug: string }) {
           variant={isOnboardingProgram ? 'enterprise' : 'default'}
         />
       ) : null}
+      {/* Review ask (spec D5): a sibling of the banner, outside its live region. It shows only
+          when the server says this learner is a completer who has not reviewed. */}
+      {allLessonsComplete && !isOnboardingProgram ? <ReviewAsk slug={curriculum.course.slug} /> : null}
       <ProgressSharePrompt draft={shareDraft} onClose={() => setShareDraft(null)} />
 
       {!online ? (

@@ -6,7 +6,10 @@ import {
   canModerateReviews,
   getCourseIdBySlug,
   getCourseReviews,
+  getGoogleReviewLink,
   getOwnReview,
+  getReviewAskForStudent,
+  getReviewerDisplayName,
   isEnrolledInCourse,
   isValidRating,
   upsertReview,
@@ -15,9 +18,14 @@ import {
 /**
  * GET /api/lms/courses/:slug/reviews — public: published reviews + aggregate summary.
  * When called with a session, also returns the caller's own review + whether they may review.
+ *
+ * Review ask (spec D5/D7): `review_ask` is true for a completer who has not reviewed yet, derived
+ * from database state on every call. `google_review_url` is the validated Google review link or
+ * null — the same value for every caller, never dependent on any rating.
  */
 export async function GET(request: NextRequest, ctx: { params: Promise<{ slug: string }> }) {
   const { slug } = await ctx.params;
+  const googleReviewUrl = getGoogleReviewLink().url;
 
   if (!process.env.DATABASE_URL?.trim()) {
     return NextResponse.json({
@@ -27,6 +35,9 @@ export async function GET(request: NextRequest, ctx: { params: Promise<{ slug: s
       can_manage: false,
       can_moderate: false,
       own_review: null,
+      review_ask: false,
+      reviewer_display_name: null,
+      google_review_url: googleReviewUrl,
     });
   }
 
@@ -42,11 +53,19 @@ export async function GET(request: NextRequest, ctx: { params: Promise<{ slug: s
     let canManage = false;
     let canModerate = false;
     let ownReview = null;
+    let reviewAsk = false;
+    let reviewerDisplayName: string | null = null;
     if (claims) {
       canManage = canManageReviews(claims.role);
       canModerate = canModerateReviews(claims.role);
       canReview = await isEnrolledInCourse(claims.sub, course.id);
       ownReview = canReview ? await getOwnReview(claims.sub, course.id) : null;
+      if (canReview) {
+        [reviewAsk, reviewerDisplayName] = await Promise.all([
+          getReviewAskForStudent(claims.sub, course),
+          getReviewerDisplayName(claims.sub),
+        ]);
+      }
     }
 
     // Moderators also see admin-hidden reviews (so they can unhide them).
@@ -59,6 +78,9 @@ export async function GET(request: NextRequest, ctx: { params: Promise<{ slug: s
       can_manage: canManage,
       can_moderate: canModerate,
       own_review: ownReview,
+      review_ask: reviewAsk,
+      reviewer_display_name: reviewerDisplayName,
+      google_review_url: googleReviewUrl,
     });
   } catch (e) {
     console.error('[courses/:slug/reviews GET]', e);

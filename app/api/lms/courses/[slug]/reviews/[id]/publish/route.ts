@@ -5,13 +5,20 @@ import {
   canModerateReviews,
   getCourseIdBySlug,
   getReviewForCourse,
-  setReviewPublished,
+  isHideReason,
+  REVIEW_HIDE_REASONS,
+  setReviewVisibility,
 } from '@/lib/server/course-reviews';
 
 /**
  * POST /api/lms/courses/:slug/reviews/:id/publish — hide/unhide a review (admin moderation).
- * Body: { is_published: boolean }. Admin only; hidden reviews drop out of public listings
- * and never count toward the public average.
+ * Body: { is_published: false, reason } to hide, { is_published: true } to unhide. Admin only;
+ * hidden reviews drop out of public listings and never count toward the public average.
+ *
+ * A hide needs a listed policy reason (spec D2) so the public rating cannot be curated. The
+ * reason is validated BEFORE the no-database short-circuit, so a reasonless hide is a 400 in
+ * every environment. The actor is the session's user — never anything in the body. Every hide
+ * and unhide is recorded as an append-only moderation event (D1).
  */
 export async function POST(
   request: NextRequest,
@@ -27,7 +34,7 @@ export async function POST(
 
   const { slug, id } = await ctx.params;
 
-  let payload: { is_published?: unknown };
+  let payload: { is_published?: unknown; reason?: unknown };
   try {
     payload = await request.json();
   } catch {
@@ -35,6 +42,13 @@ export async function POST(
   }
   if (typeof payload.is_published !== 'boolean') {
     return NextResponse.json({ detail: 'is_published must be a boolean' }, { status: 400 });
+  }
+  const reason = payload.reason;
+  if (payload.is_published === false && !isHideReason(reason)) {
+    return NextResponse.json(
+      { detail: `To hide a review, choose a reason: ${REVIEW_HIDE_REASONS.join(', ')}` },
+      { status: 400 }
+    );
   }
 
   if (!process.env.DATABASE_URL?.trim()) {
@@ -50,8 +64,12 @@ export async function POST(
     if (!review) {
       return NextResponse.json({ detail: 'Review not found' }, { status: 404 });
     }
-    await setReviewPublished(id, payload.is_published);
-    return NextResponse.json({ ok: true, is_published: payload.is_published });
+    if (payload.is_published === false && isHideReason(reason)) {
+      await setReviewVisibility({ reviewId: id, isPublished: false, reason, actorId: claims.sub });
+      return NextResponse.json({ ok: true, is_published: false, hidden_reason: reason });
+    }
+    await setReviewVisibility({ reviewId: id, isPublished: true, actorId: claims.sub });
+    return NextResponse.json({ ok: true, is_published: true, hidden_reason: null });
   } catch (e) {
     console.error('[courses/:slug/reviews/:id/publish POST]', e);
     return NextResponse.json({ detail: 'Failed to update review visibility' }, { status: 500 });
