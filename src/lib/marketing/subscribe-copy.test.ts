@@ -54,16 +54,25 @@ describe('yearly membership inclusions copy', () => {
   });
 
   it('the list still describes the catalogue by CARSI course area', () => {
-    // Each area has at least one course on the live catalogue (crawl of 04/09/2026).
+    // Each area has at least one course on the live catalogue (re-checked 18/10/2026 against
+    // carsi.com.au/api/lms/courses: no published upholstery course, so the area is carpet only).
     for (const area of [
       'Water damage restoration courses',
       'Structural drying courses',
       'Mould remediation courses',
       'Fire and smoke restoration courses',
-      'Carpet and upholstery cleaning courses',
+      'Carpet cleaning courses',
       'Odour control courses',
     ]) {
       expect(PRO_FEATURES).toContain(area);
     }
+  });
+
+  it('promises no course level or subject the published catalogue lacks', () => {
+    // Membership landing review r3: the live catalogue (18/10/2026) has no Advanced level and no
+    // upholstery course, so the plan may not advertise either.
+    const copy = PRO_FEATURES.join('\n');
+    expect(copy).not.toMatch(/advanced levels?/i);
+    expect(copy).not.toMatch(/upholster/i);
   });
 });

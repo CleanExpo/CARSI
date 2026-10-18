@@ -7,6 +7,11 @@ import { verifySessionToken } from '@/lib/auth/session-jwt';
 import { getEntitlements, type Entitlements } from '@/lib/server/entitlements';
 import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 import { MembershipHexHero } from '@/components/membership/MembershipHexHero';
+import {
+  MembershipClosingCta,
+  MembershipLibrary,
+  MembershipSteps,
+} from '@/components/membership/MembershipLanding';
 import { SubscribeCta } from './SubscribeCta';
 
 // `subscriptionsEnabled()` reads process.env at render time. Without this the
@@ -31,14 +36,14 @@ const PLAN = {
 
 export const PRO_FEATURES = [
   '100% access to all published CARSI courses',
-  'Beginner, intermediate, and advanced levels',
+  'Introductory and specialist courses',
   'IICRC CEC Accredited courses where stated',
   'CEC tracking for completed eligible courses',
   'Water damage restoration courses',
   'Structural drying courses',
   'Mould remediation courses',
   'Fire and smoke restoration courses',
-  'Carpet and upholstery cleaning courses',
+  'Carpet cleaning courses',
   'Odour control courses',
   'PDF certificates for every course',
   'CEC tracking dashboard',
@@ -181,6 +186,9 @@ export default async function SubscribePage() {
           </p>
         </div>
       </div>
+      <MembershipLibrary />
+      <MembershipSteps price={PLAN.price} />
+      <MembershipClosingCta />
     </>
   );
 }
