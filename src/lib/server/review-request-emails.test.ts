@@ -457,6 +457,26 @@ describe('at most once per enrolment (D9)', () => {
     expect(a.sent + b.sent).toBe(1);
   });
 
+  it('r8: a stale snapshot acted on AFTER the other run has sent and released the send mutex cannot re-claim the row', async () => {
+    addCompleter('e1', 5 * D);
+    // Run B takes its snapshot ('eligible') with run A, but acts only once run A has finished
+    // completely — so the global send mutex is free and cannot mask an unconditional claim.
+    let aDone!: () => void;
+    db.holdSecondQuery = { calls: 0, until: new Promise<void>((r) => (aDone = r)) };
+    const pA = run();
+    const pB = run();
+    const a = await pA;
+    aDone();
+    const b = await pB;
+    db.holdSecondQuery = null;
+    expect(a.sent).toBe(1);
+    expect(b.candidates).toBe(1); // B really saw it as eligible
+    expect(b.sent).toBe(0);
+    expect(b.skipped.claimed_elsewhere).toBe(1);
+    expect(mail.send).toHaveBeenCalledTimes(1);
+    expect(db.ledger.get('e1')?.status).toBe('sent');
+  });
+
   it('two runs holding the SAME eligible snapshot send one email: only one conditional claim can win', async () => {
     addCompleter('e1', 5 * D);
     let release!: () => void;
