@@ -1,0 +1,567 @@
+{
+  "source": "https://carsi.com.au/api/lms/courses",
+  "capturedAt": "2026-10-18",
+  "note": "Public catalogue fields only. Refresh when card copy changes: the membership card test checks every card claim against this snapshot.",
+  "courses": [
+    {
+      "slug": "structural-drying-core",
+      "title": "Structural Drying — Core Concepts",
+      "category": "Structural Drying",
+      "price_aud": 0,
+      "is_free": true
+    },
+    {
+      "slug": "water-damage-essentials",
+      "title": "Water Damage Restoration — Essentials",
+      "category": null,
+      "price_aud": 0,
+      "is_free": true
+    },
+    {
+      "slug": "commercial-carpet-core",
+      "title": "Commercial Carpet Care — Core Methods",
+      "category": "Commercial Carpet",
+      "price_aud": 0,
+      "is_free": true
+    },
+    {
+      "slug": "introduction-to-advanced-structural-drying",
+      "title": "Introduction to Advanced Structural Drying",
+      "category": "CARSI Specialty Courses Collection",
+      "price_aud": 0,
+      "is_free": true
+    },
+    {
+      "slug": "fire-smoke-restoration-core",
+      "title": "Fire & Smoke Restoration — Core Principles",
+      "category": "Fire & Smoke",
+      "price_aud": 0,
+      "is_free": true
+    },
+    {
+      "slug": "floor-care-onboarding-operational-readiness",
+      "title": "CARSI Maintenance Company Onboarding — Professional Floor Care & Operational Readiness",
+      "category": "CARSI Maintenance Company Onboarding",
+      "price_aud": 0,
+      "is_free": true
+    },
+    {
+      "slug": "dust-and-particulates-in-indoor-air-control-and-cleaning-strategies",
+      "title": "Dust and Particulates in Indoor Air: Control and Cleaning Strategies",
+      "category": null,
+      "price_aud": 0,
+      "is_free": true
+    },
+    {
+      "slug": "air-quality-and-odour-identification-and-deodorisation-essentials",
+      "title": "Air Quality and Odour: Identification and Deodorisation Essentials",
+      "category": null,
+      "price_aud": 0,
+      "is_free": true
+    },
+    {
+      "slug": "ccw-carsi-truckmount-operations",
+      "title": "Truckmount Operations Course — HydraMaster & Sapphire Scientific (Australian configuration)",
+      "category": "Truck-Mount Operations",
+      "price_aud": 0,
+      "is_free": true
+    },
+    {
+      "slug": "moisture-mould-and-indoor-air-quality-understanding-the-link",
+      "title": "Moisture, Mould, and Indoor Air Quality: Understanding the Link",
+      "category": null,
+      "price_aud": 0,
+      "is_free": true
+    },
+    {
+      "slug": "introduction-to-recovery-of-submerged-items-and-contents",
+      "title": "Introduction to Recovery of Submerged Items and Contents",
+      "category": null,
+      "price_aud": 0,
+      "is_free": true
+    },
+    {
+      "slug": "using-air-scrubbers-and-afds-to-improve-job-site-air-quality",
+      "title": "Using Air Scrubbers and AFDs to Improve Job Site Air Quality",
+      "category": null,
+      "price_aud": 0,
+      "is_free": true
+    },
+    {
+      "slug": "introduction-to-water-damage-litigation-support",
+      "title": "Introduction to Water Damage Litigation Support",
+      "category": null,
+      "price_aud": 0,
+      "is_free": true
+    },
+    {
+      "slug": "introduction-to-ultraviolet-light-and-fluorescence",
+      "title": "Introduction to Ultraviolet Light and Fluorescence",
+      "category": null,
+      "price_aud": 0,
+      "is_free": true
+    },
+    {
+      "slug": "introduction-to-restoration-of-antiques-and-fine-furnishings",
+      "title": "Introduction to Restoration of Antiques and Fine Furnishings",
+      "category": null,
+      "price_aud": 0,
+      "is_free": true
+    },
+    {
+      "slug": "introduction-to-infrared-thermography-for-drying",
+      "title": "Introduction to Infrared Thermography for Drying",
+      "category": null,
+      "price_aud": 0,
+      "is_free": true
+    },
+    {
+      "slug": "introduction-to-drying-transportation-and-vehicles",
+      "title": "Introduction to Drying Transportation and Vehicles",
+      "category": null,
+      "price_aud": 0,
+      "is_free": true
+    },
+    {
+      "slug": "introduction-to-drying-industrial-and-manufacturing-sites",
+      "title": "Introduction to Drying Industrial and Manufacturing Sites",
+      "category": null,
+      "price_aud": 0,
+      "is_free": true
+    },
+    {
+      "slug": "introduction-to-drying-hospitality-and-lodging-sites",
+      "title": "Introduction to Drying Hospitality and Lodging Sites",
+      "category": null,
+      "price_aud": 0,
+      "is_free": true
+    },
+    {
+      "slug": "introduction-to-drying-health-care-facilities",
+      "title": "Introduction to Drying Health Care Facilities",
+      "category": null,
+      "price_aud": 0,
+      "is_free": true
+    },
+    {
+      "slug": "introduction-to-drying-educational-and-institutional-sites",
+      "title": "Introduction to Drying Educational and Institutional Sites",
+      "category": null,
+      "price_aud": 0,
+      "is_free": true
+    },
+    {
+      "slug": "hvac-systems-and-indoor-air-quality-what-every-technician-should-know",
+      "title": "HVAC Systems and Indoor Air Quality: What Every Technician Should Know",
+      "category": null,
+      "price_aud": 0,
+      "is_free": true
+    },
+    {
+      "slug": "carsi-maintenance-toolbox-talks-monthly-refreshers",
+      "title": "CARSI Maintenance — Toolbox Talks (Monthly Refreshers)",
+      "category": null,
+      "price_aud": 0,
+      "is_free": true
+    },
+    {
+      "slug": "air-movers-for-professional-restoration-specs-selection-on-site-assessment",
+      "title": "Air Movers for Professional Restoration: Specs, Selection & On-Site Assessment",
+      "category": null,
+      "price_aud": 0,
+      "is_free": true
+    },
+    {
+      "slug": "tile-cleaning-for-carpet-cleaners",
+      "title": "Tile Cleaning for Carpet Cleaners",
+      "category": null,
+      "price_aud": 0,
+      "is_free": true
+    },
+    {
+      "slug": "large-loss-mastery-course",
+      "title": "Large Loss Mastery Course",
+      "category": "CARSI Specialty Courses Collection",
+      "price_aud": 0,
+      "is_free": true
+    },
+    {
+      "slug": "refrigerant-dehumidifiers-for-water-loss-restoration",
+      "title": "Refrigerant Dehumidifiers for Water Loss Restoration",
+      "category": "Water Damage Restoration",
+      "price_aud": 0,
+      "is_free": true
+    },
+    {
+      "slug": "introduction-to-residential-duct-cleaning",
+      "title": "Introduction to Residential Duct Cleaning",
+      "category": "Specialty Courses & Resources",
+      "price_aud": 0,
+      "is_free": true
+    },
+    {
+      "slug": "insurance-adjusters-and-their-roles",
+      "title": "Insurance Adjusters and Their Roles",
+      "category": "CARSI Specialty Courses Collection",
+      "price_aud": 0,
+      "is_free": true
+    },
+    {
+      "slug": "introduction-to-structural-drying-concepts",
+      "title": "Introduction to Structural Drying Concepts",
+      "category": "CARSI Specialty Courses Collection",
+      "price_aud": 29,
+      "is_free": false
+    },
+    {
+      "slug": "documenting-and-reporting-air-quality-improvements",
+      "title": "Documenting and Reporting Air Quality Improvements",
+      "category": null,
+      "price_aud": 28.98,
+      "is_free": false
+    },
+    {
+      "slug": "introduction-to-air-quality-fundamentals",
+      "title": "Introduction to Air Quality Fundamentals",
+      "category": null,
+      "price_aud": 29,
+      "is_free": false
+    },
+    {
+      "slug": "introduction-to-improving-indoor-air-quality-after-water-damage",
+      "title": "Introduction to Improving Indoor Air Quality After Water Damage",
+      "category": null,
+      "price_aud": 29,
+      "is_free": false
+    },
+    {
+      "slug": "introduction-to-creating-a-clean-air-environment-best-practices-for-final-cleara",
+      "title": "Introduction to Creating a Clean Air Environment: Best Practices for Final Clearance and Handover",
+      "category": null,
+      "price_aud": 28.97,
+      "is_free": false
+    },
+    {
+      "slug": "collaborative-development-your-personal-ai-assistant",
+      "title": "Collaborative Development — Your Personal AI Assistant",
+      "category": "CARSI Specialty Courses Collection",
+      "price_aud": 49,
+      "is_free": false
+    },
+    {
+      "slug": "introduction-to-iaq-and-mould-understanding-airborne-spread-and-containment",
+      "title": "Introduction to IAQ and Mould: Understanding Airborne Spread and Containment",
+      "category": null,
+      "price_aud": 29,
+      "is_free": false
+    },
+    {
+      "slug": "avian-influenza-awareness-restoration-iaq-facilities",
+      "title": "Australian H5 Bird Flu Awareness for Restoration, IAQ and Facility Professionals",
+      "category": "Biosecurity Readiness",
+      "price_aud": 149,
+      "is_free": false
+    },
+    {
+      "slug": "restoration-project-management-premium",
+      "title": "Restoration Project Management & Client Communication — Premium",
+      "category": "Business & Leadership",
+      "price_aud": 179,
+      "is_free": false
+    },
+    {
+      "slug": "carpet-cleaning-basics-b66757ce",
+      "title": "CARPET CLEANING BASICS",
+      "category": null,
+      "price_aud": 55,
+      "is_free": false
+    },
+    {
+      "slug": "introduction-to-applied-microbial-remediation",
+      "title": "Introduction to Applied Microbial Remediation",
+      "category": "Microbial & Infection Control",
+      "price_aud": 29,
+      "is_free": false
+    },
+    {
+      "slug": "introduction-to-basic-carpet-cleaning-and-drying",
+      "title": "Introduction to Basic Carpet Cleaning and Drying",
+      "category": null,
+      "price_aud": 29,
+      "is_free": false
+    },
+    {
+      "slug": "introduction-to-digital-moisture-mapping",
+      "title": "Introduction to Digital Moisture Mapping",
+      "category": "Technology & Inspection Tools",
+      "price_aud": 29,
+      "is_free": false
+    },
+    {
+      "slug": "introduction-to-iaq-and-mould",
+      "title": "Introduction to IAQ and Mould",
+      "category": "Air Quality",
+      "price_aud": 29,
+      "is_free": false
+    },
+    {
+      "slug": "introduction-to-psychrometry-science-and-calculations",
+      "title": "Introduction to Psychrometry Science and Calculations",
+      "category": "Odour, Smoke, Psychrometry & Drying",
+      "price_aud": 29,
+      "is_free": false
+    },
+    {
+      "slug": "introduction-to-safety-procedures-for-water-damage-work",
+      "title": "Introduction to Safety Procedures for Water Damage Work",
+      "category": "WHS / Compliance",
+      "price_aud": 29,
+      "is_free": false
+    },
+    {
+      "slug": "introduction-to-smoke-and-soot-damage-restoration",
+      "title": "Introduction to Smoke and Soot Damage Restoration",
+      "category": "Odour, Smoke, Psychrometry & Drying",
+      "price_aud": 29,
+      "is_free": false
+    },
+    {
+      "slug": "introduction-to-water-damage-marketing-and-sales",
+      "title": "Introduction to Water Damage Marketing and Sales",
+      "category": "Marketing & Business",
+      "price_aud": 29,
+      "is_free": false
+    },
+    {
+      "slug": "level-1-mould-remediation-2cc96b85",
+      "title": "Level 1 — Mould Remediation",
+      "category": null,
+      "price_aud": 49,
+      "is_free": false
+    },
+    {
+      "slug": "level-2-mould-remediation-30ee3492",
+      "title": "Level 2 — Mould Remediation",
+      "category": null,
+      "price_aud": 49,
+      "is_free": false
+    },
+    {
+      "slug": "level-3-mould-remediation-c5797369",
+      "title": "Level 3 — Mould Remediation",
+      "category": null,
+      "price_aud": 148.95,
+      "is_free": false
+    },
+    {
+      "slug": "moisture-meter-course",
+      "title": "Moisture Meter Course",
+      "category": "Technology & Inspection Tools",
+      "price_aud": 39,
+      "is_free": false
+    },
+    {
+      "slug": "using-atp-to-create-protocols",
+      "title": "Using ATP to Create Protocols",
+      "category": "Microbial & Infection Control",
+      "price_aud": 20,
+      "is_free": false
+    },
+    {
+      "slug": "standard-operating-procedures-sop-course",
+      "title": "Standard Operating Procedures (SOP) Course",
+      "category": "CARSI Specialty Courses Collection",
+      "price_aud": 20,
+      "is_free": false
+    },
+    {
+      "slug": "safety-data-sheet-sds-course",
+      "title": "Safety Data Sheet (SDS) Course",
+      "category": "CARSI Specialty Courses Collection",
+      "price_aud": 20,
+      "is_free": false
+    },
+    {
+      "slug": "safe-work-method-statements-swms-course",
+      "title": "Safe Work Method Statements (SWMS) Course",
+      "category": "CARSI Specialty Courses Collection",
+      "price_aud": 20,
+      "is_free": false
+    },
+    {
+      "slug": "risk-assessment-course",
+      "title": "Risk Assessment Course",
+      "category": "WHS / Compliance",
+      "price_aud": 99,
+      "is_free": false
+    },
+    {
+      "slug": "microbe-clean-basic-understanding-course",
+      "title": "Microbe Clean Basic Understanding Course",
+      "category": "Microbial & Infection Control",
+      "price_aud": 99,
+      "is_free": false
+    },
+    {
+      "slug": "job-safety-and-environmental-analysis-jsea-course",
+      "title": "Job Safety and Environmental Analysis (JSEA) Course",
+      "category": "WHS / Compliance",
+      "price_aud": 20,
+      "is_free": false
+    },
+    {
+      "slug": "introduction-to-water-extraction-methods",
+      "title": "Introduction to Water Extraction Methods",
+      "category": "Water Damage Restoration",
+      "price_aud": 29,
+      "is_free": false
+    },
+    {
+      "slug": "introduction-to-water-damage-restoration",
+      "title": "Introduction to Water Damage Restoration",
+      "category": "Water Damage Restoration",
+      "price_aud": 29,
+      "is_free": false
+    },
+    {
+      "slug": "introduction-to-water-damage-principles",
+      "title": "Introduction to Water Damage Principles",
+      "category": "Water Damage Restoration",
+      "price_aud": 29,
+      "is_free": false
+    },
+    {
+      "slug": "introduction-to-water-damage-in-commercial-buildings",
+      "title": "Introduction to Water Damage in Commercial Buildings",
+      "category": "Water Damage Restoration",
+      "price_aud": 29,
+      "is_free": false
+    },
+    {
+      "slug": "introduction-to-water-damage-estimating",
+      "title": "Introduction to Water Damage Estimating",
+      "category": "Water Damage Restoration",
+      "price_aud": 29,
+      "is_free": false
+    },
+    {
+      "slug": "introduction-to-using-personal-protective-equipment",
+      "title": "Introduction to Using Personal Protective Equipment",
+      "category": "Safety & PPE",
+      "price_aud": 29,
+      "is_free": false
+    },
+    {
+      "slug": "introduction-to-project-management-for-water-losses",
+      "title": "Introduction to Project Management for Water Losses",
+      "category": "Water Damage Restoration",
+      "price_aud": 29,
+      "is_free": false
+    },
+    {
+      "slug": "introduction-to-odour-control-and-removal-techniques",
+      "title": "Introduction to Odour Control and Removal Techniques",
+      "category": "Odour, Smoke, Psychrometry & Drying",
+      "price_aud": 29,
+      "is_free": false
+    },
+    {
+      "slug": "introduction-to-monitoring-air-quality-on-the-job-site",
+      "title": "Introduction to Monitoring Air Quality on the Job Site",
+      "category": "Air Quality",
+      "price_aud": 29,
+      "is_free": false
+    },
+    {
+      "slug": "introduction-to-forensic-investigations-for-water-losses",
+      "title": "Introduction to Forensic Investigations for Water Losses",
+      "category": "Water Damage Restoration",
+      "price_aud": 29,
+      "is_free": false
+    },
+    {
+      "slug": "introduction-to-creating-a-clean-air-environment",
+      "title": "Introduction to Creating a Clean Air Environment",
+      "category": "Air Quality",
+      "price_aud": 29,
+      "is_free": false
+    },
+    {
+      "slug": "introduction-to-controlled-environment-drying-methods",
+      "title": "Introduction to Controlled Environment Drying Methods",
+      "category": "CARSI Specialty Courses Collection",
+      "price_aud": 29,
+      "is_free": false
+    },
+    {
+      "slug": "introduction-to-consulting-for-complex-water-losses",
+      "title": "Introduction to Consulting for Complex Water Losses",
+      "category": "Water Damage Restoration",
+      "price_aud": 29,
+      "is_free": false
+    },
+    {
+      "slug": "introduction-to-asbestos-asbestos-awareness",
+      "title": "Introduction to Asbestos: Asbestos Awareness",
+      "category": "Safety & PPE",
+      "price_aud": 29,
+      "is_free": false
+    },
+    {
+      "slug": "introduction-to-applied-structural-drying",
+      "title": "Introduction to Applied Structural Drying",
+      "category": "CARSI Specialty Courses Collection",
+      "price_aud": 29,
+      "is_free": false
+    },
+    {
+      "slug": "introduction-to-advanced-structural-drying-concepts",
+      "title": "Introduction to Advanced Structural Drying Concepts",
+      "category": "CARSI Specialty Courses Collection",
+      "price_aud": 29,
+      "is_free": false
+    },
+    {
+      "slug": "introduction-to-advanced-drying-equipment-and-methods",
+      "title": "Introduction to Advanced Drying Equipment and Methods",
+      "category": "CARSI Specialty Courses Collection",
+      "price_aud": 29,
+      "is_free": false
+    },
+    {
+      "slug": "infectious-control-for-the-business-owner",
+      "title": "Infectious Control for the Business Owner",
+      "category": "Microbial & Infection Control",
+      "price_aud": 275,
+      "is_free": false
+    },
+    {
+      "slug": "infection-control-in-child-care",
+      "title": "Infection Control in Child Care",
+      "category": "Microbial & Infection Control",
+      "price_aud": 99,
+      "is_free": false
+    },
+    {
+      "slug": "glass-cleaning-course",
+      "title": "Glass Cleaning Course",
+      "category": "Specialty Courses & Resources",
+      "price_aud": 20,
+      "is_free": false
+    },
+    {
+      "slug": "fundamental-business-framework",
+      "title": "Fundamental Business Framework",
+      "category": "Marketing & Business",
+      "price_aud": 770,
+      "is_free": false
+    },
+    {
+      "slug": "donning-and-doffing-ppe",
+      "title": "Donning and Doffing PPE",
+      "category": "Safety & PPE",
+      "price_aud": 39,
+      "is_free": false
+    }
+  ]
+}
