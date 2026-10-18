@@ -118,9 +118,78 @@ export function isCompleteEnrollment(args: {
   );
 }
 
+/** One completed course, as the renewal summary counted it. */
+export type CourseCompletionRecord = {
+  slug: string;
+  /** When the course was completed (certificate, enrolment completion, or last lesson), if known. */
+  completedAt: Date | null;
+  certificateIssuedAt: Date | null;
+};
+
+/** The "your year with CARSI" recap in the renewal reminder (V7). */
+export type RenewalYearRecap = {
+  coursesCompleted: number;
+  certificatesIssued: number;
+  /** CEC hours from the approvals registry only. 0 means no CEC line is shown. */
+  approvedCecHours: number;
+  suggestedCourses: RenewalCourseSuggestion[];
+};
+
+/**
+ * Pure: count what the learner completed since `since`. CEC hours come ONLY from the approvals
+ * registry (`resolveCecHoursFromCourse`), never from the stored course column (GP-498). A
+ * completion with no known date is not counted, because it cannot be placed inside the year.
+ */
+export function buildYearRecap(args: {
+  completions: CourseCompletionRecord[];
+  suggestedCourses: RenewalCourseSuggestion[];
+  since: Date;
+}): RenewalYearRecap {
+  let coursesCompleted = 0;
+  let certificatesIssued = 0;
+  let approvedCecHours = 0;
+  for (const c of args.completions) {
+    if (c.certificateIssuedAt && c.certificateIssuedAt >= args.since) certificatesIssued += 1;
+    if (!c.completedAt || c.completedAt < args.since) continue;
+    coursesCompleted += 1;
+    approvedCecHours += resolveCecHoursFromCourse({ slug: c.slug }).hours;
+  }
+  return {
+    coursesCompleted,
+    certificatesIssued,
+    approvedCecHours: Math.round(approvedCecHours * 100) / 100,
+    suggestedCourses: args.suggestedCourses,
+  };
+}
+
 export async function getRenewalSummaryForStudent(
   userId: string
 ): Promise<RenewalSummaryPayload | null> {
+  return (await loadRenewalSummary(userId))?.summary ?? null;
+}
+
+/**
+ * The learner's last 12 months for the renewal reminder, or null when it cannot be read (the
+ * reminder then goes without a recap; it never blocks the renewal notice).
+ */
+export async function getRenewalYearRecapForStudent(
+  userId: string,
+  now: Date = new Date()
+): Promise<RenewalYearRecap | null> {
+  const loaded = await loadRenewalSummary(userId);
+  if (!loaded) return null;
+  const since = new Date(now);
+  since.setUTCFullYear(since.getUTCFullYear() - 1);
+  return buildYearRecap({
+    completions: loaded.completions,
+    suggestedCourses: loaded.summary.suggested_courses,
+    since,
+  });
+}
+
+async function loadRenewalSummary(
+  userId: string
+): Promise<{ summary: RenewalSummaryPayload; completions: CourseCompletionRecord[] } | null> {
   if (!process.env.DATABASE_URL?.trim()) return null;
 
   try {
@@ -200,6 +269,7 @@ export async function getRenewalSummaryForStudent(
 
     const enrolledSlugs = new Set(rows.map((r) => r.course.slug));
     const completedSlugs = new Set<string>();
+    const completions: CourseCompletionRecord[] = [];
     let someCecsEstimated = false;
 
     for (const e of rows) {
@@ -230,6 +300,11 @@ export async function getRenewalSummaryForStudent(
         completedAt: e.completedAt,
         lessonIds,
         progress: progressByLesson,
+      });
+      completions.push({
+        slug: e.course.slug,
+        completedAt: ts,
+        certificateIssuedAt: e.certificateIssuedAt,
       });
 
       if (cycle && ts) {
@@ -269,7 +344,7 @@ export async function getRenewalSummaryForStudent(
     const cycleStartIso = cycle ? cycle.start.toISOString() : null;
     const cycleEndIso = cycle ? cycle.end.toISOString() : null;
 
-    return {
+    const summary: RenewalSummaryPayload = {
       tracking_mode: trackingMode,
       has_renewal_expiry: hasExpiry,
       renewal_expiry_date: expiry ? (expiry as Date).toISOString().slice(0, 10) : null,
@@ -286,6 +361,7 @@ export async function getRenewalSummaryForStudent(
       some_cecs_estimated: someCecsEstimated,
       suggested_courses: suggested,
     };
+    return { summary, completions };
   } catch (err) {
     console.error('[renewal-summary]', err);
     return null;

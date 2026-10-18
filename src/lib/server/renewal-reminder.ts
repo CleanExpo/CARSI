@@ -28,7 +28,8 @@ import type Stripe from 'stripe';
 import { prisma } from '@/lib/prisma';
 import { getAppOrigin } from '@/lib/server/app-url';
 import { sendEmail } from '@/lib/server/email';
-import { renderRenewalReminderEmail } from '@/lib/server/email-templates';
+import { renderRenewalReminderEmail, type RenewalYearRecapView } from '@/lib/server/email-templates';
+import { getRenewalYearRecapForStudent } from '@/lib/server/renewal-summary';
 import { captureServerError } from '@/lib/server/sentry';
 import { readInvoiceEmail } from '@/lib/server/stripe-subscription-map';
 import { resolveUserIdForStripeSubscription } from '@/lib/server/subscription-store';
@@ -189,6 +190,29 @@ async function resolveRecipient(
   };
 }
 
+/**
+ * The member's "your year with CARSI" recap. Best-effort: a failed read sends the reminder
+ * without it, because the reminder is the legally expected notice and the recap is not.
+ */
+async function loadYearRecap(userId: string, origin: string): Promise<RenewalYearRecapView | null> {
+  try {
+    const recap = await getRenewalYearRecapForStudent(userId);
+    if (!recap) return null;
+    return {
+      coursesCompleted: recap.coursesCompleted,
+      certificatesIssued: recap.certificatesIssued,
+      approvedCecHours: recap.approvedCecHours,
+      nextCourses: recap.suggestedCourses.map((c) => ({
+        title: c.title,
+        url: `${origin}/courses/${encodeURIComponent(c.slug)}`,
+      })),
+    };
+  } catch (error) {
+    console.warn('[renewal-reminder] year recap unavailable; sending without it', { userId, error });
+    return null;
+  }
+}
+
 function isUniqueViolation(error: unknown): boolean {
   return Boolean(
     error && typeof error === 'object' && (error as { code?: unknown }).code === 'P2002',
@@ -268,6 +292,8 @@ export async function sendUpcomingRenewalReminder(params: {
 
   const renewalDateLabel = formatRenewalDate(renewalAt);
   const amountLabel = formatRenewalAmount(amountCents);
+  const yearRecap =
+    kind === 'individual' ? await loadYearRecap(recipient.userId, origin) : null;
   const { html, text } = renderRenewalReminderEmail({
     appOrigin: origin,
     name: recipient.name,
@@ -277,6 +303,7 @@ export async function sendUpcomingRenewalReminder(params: {
     amountLabel,
     manageUrl: recipient.manageUrl,
     cancelInstruction: recipient.cancelInstruction,
+    yearRecap,
   });
   const subject = `Your ${recipient.planLabel} renews on ${renewalDateLabel}`;
 
