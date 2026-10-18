@@ -16,13 +16,25 @@ vi.mock('next/navigation', () => ({
 import { ReviewPolicyBody } from '@/components/lms/ReviewPolicy';
 
 import { REVIEW_HIDE_REASONS } from './review-ask';
-import { REVIEW_HIDE_REASON_PUBLIC_LABELS, REVIEW_POLICY_COPY, REVIEW_POLICY_PATH } from './review-policy';
+import { REVIEW_HIDE_REASON_PUBLIC_LABELS, REVIEW_POLICY_COPY, REVIEW_POLICY_PATH, reviewAuditStartSentence } from './review-policy';
 
 describe('public review policy', () => {
   it('names every hide reason the moderation code accepts, and nothing else', () => {
     expect(REVIEW_POLICY_COPY.reasons).toEqual(REVIEW_HIDE_REASONS.map((r) => REVIEW_HIDE_REASON_PUBLIC_LABELS[r]));
     expect(REVIEW_POLICY_COPY.reasons).toHaveLength(4);
     expect(REVIEW_POLICY_PATH).toBe('/review-policy');
+  });
+
+  it('only promises a recorded reason and actor for decisions made since recording began (release-gate r6)', () => {
+    const all = [...REVIEW_POLICY_COPY.points, ...REVIEW_POLICY_COPY.after].join(' ');
+    expect(all).not.toMatch(/Every hidden review is recorded/);
+    expect(all).toContain('Since we began recording moderation decisions, every review we hide is recorded with its reason, who hid it and when.');
+    expect(all).toContain('Reviews hidden before then have no recorded reason, and we have not added one after the fact.');
+  });
+
+  it('gives the date recording began when it is known, in Australian format, and nothing otherwise', () => {
+    expect(reviewAuditStartSentence(new Date('2026-11-02T03:00:00Z'))).toBe('We began recording moderation decisions on 2 November 2026.');
+    expect(reviewAuditStartSentence(null)).toBeNull();
   });
 
   it('the policy body renders the whole policy', () => {

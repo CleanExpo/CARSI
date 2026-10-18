@@ -27,6 +27,8 @@ export type SendEmailParams = {
    * apart protects transactional deliverability. Same API token; only the endpoint differs.
    */
   stream?: MailtrapStream;
+  /** Hard limit for the provider call, in ms (default 15 000). */
+  timeoutMs?: number;
 };
 
 export type SendEmailResult = {
@@ -189,7 +191,7 @@ export async function sendEmail(params: SendEmailParams): Promise<SendEmailResul
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload),
-      signal: AbortSignal.timeout(15_000),
+      signal: AbortSignal.timeout(params.timeoutMs ?? 15_000),
     });
 
     const bodyText = await res.text().catch(() => '');

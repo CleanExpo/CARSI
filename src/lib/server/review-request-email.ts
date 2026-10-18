@@ -36,7 +36,7 @@ import { buildUnsubscribeUrl } from '@/lib/server/email-preferences';
 import { isEmailConfigured, sendEmail, type SendEmailResult } from '@/lib/server/email';
 import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
 import { signEmailUnsubscribeToken } from '@/lib/auth/session-jwt';
-import { getAdminEmail } from '@/lib/admin/admin-panel-access';
+import { getAdminEmail, getAdminPanelAllowedEmails } from '@/lib/admin/admin-panel-access';
 import { prisma } from '@/lib/prisma';
 
 const DAY_MS = 86_400_000;
@@ -70,37 +70,66 @@ export type ReviewRequestSwitchActor = {
   email: string;
 };
 
+/** Thrown when a switch change cannot be attributed to a currently authorised admin. */
+export class UnattributableSwitchChangeError extends Error {
+  constructor() {
+    super('This change cannot be attributed to a currently authorised admin.');
+    this.name = 'UnattributableSwitchChangeError';
+  }
+}
+
+type RawTx = { $queryRaw: <T>(strings: TemplateStringsArray, ...values: unknown[]) => Promise<T> };
+
 /**
- * Resolve the verified admin identity behind an admin session (release-gate r5), covering every
- * route getAdminSessionOrNull accepts: the bootstrap ADMIN_EMAIL, an admin_users account, or an
- * allow-listed / admin-role LMS user. Returns null when the change could not be attributed.
+ * Re-validate the admin behind a session from the DATABASE, on every request, inside the switch
+ * transaction (release-gate r6) — never from token claims alone. Covers every route
+ * getAdminSessionOrNull accepts:
+ *   - the bootstrap ADMIN_EMAIL (current env value);
+ *   - an admin_users account that is active with role 'admin' now;
+ *   - an LMS user that is active now AND has role 'admin' now or is on the current allow-list.
+ * Rows are read FOR SHARE, so a concurrent deactivation or demotion either commits first (and is
+ * seen here) or waits for this change. Returns null when nobody currently qualifies.
  */
-export async function resolveReviewRequestSwitchActor(sessionEmail: string | null | undefined): Promise<ReviewRequestSwitchActor | null> {
+export async function resolveReviewRequestSwitchActor(
+  tx: RawTx,
+  sessionEmail: string | null | undefined
+): Promise<ReviewRequestSwitchActor | null> {
   const email = sessionEmail?.trim().toLowerCase();
   if (!email) return null;
   const bootstrap = getAdminEmail().trim().toLowerCase();
   if (bootstrap && email === bootstrap) return { kind: 'bootstrap_admin', ref: null, email };
-  const adminUser = await prisma.adminUser.findUnique({ where: { email }, select: { id: true, isActive: true } });
-  if (adminUser?.isActive) return { kind: 'admin_user', ref: adminUser.id, email };
-  const lmsUser = await prisma.lmsUser.findFirst({
-    where: { email: { equals: email, mode: 'insensitive' } },
-    select: { id: true },
-  });
-  if (lmsUser) return { kind: 'lms_admin', ref: lmsUser.id, email };
+
+  const admins = await tx.$queryRaw<Array<{ id: string; is_active: boolean; role: string }>>`
+    SELECT "id", "is_active", "role" FROM "admin_users" WHERE lower("email") = ${email} FOR SHARE`;
+  const admin = admins[0];
+  if (admin && admin.is_active && admin.role.trim().toLowerCase() === 'admin') {
+    return { kind: 'admin_user', ref: admin.id, email };
+  }
+
+  const users = await tx.$queryRaw<Array<{ id: string; is_active: boolean; role: string | null }>>`
+    SELECT "id", "is_active", "role" FROM "lms_users" WHERE lower("email") = ${email} FOR SHARE`;
+  const user = users[0];
+  if (user && user.is_active) {
+    const isAdminRole = (user.role ?? '').trim().toLowerCase() === 'admin';
+    if (isAdminRole || getAdminPanelAllowedEmails().has(email)) return { kind: 'lms_admin', ref: user.id, email };
+  }
   return null;
 }
 
 /**
  * Switch review-request emails on or off (admin only; spec D10d, D10e). In ONE transaction: lock
- * the switch row (FOR UPDATE, which waits for any send holding it FOR SHARE), change it, and append
- * the change with old value, new value and a durable actor snapshot. Switching on affects only
- * completions recorded from this moment; switching off stops any send that has not yet started.
+ * the switch row (FOR UPDATE, which waits for any send holding it FOR SHARE), re-validate the admin
+ * from the database, change the switch, and append the change with old value, new value and a
+ * durable snapshot of that verified admin. Switching on affects only completions recorded from this
+ * moment; switching off stops every send whose locked checks have not yet run.
  */
-export async function setReviewRequestEmailsEnabled(enabled: boolean, actor: ReviewRequestSwitchActor) {
+export async function setReviewRequestEmailsEnabled(enabled: boolean, sessionEmail: string | null | undefined) {
   return prisma.$transaction(async (tx) => {
     const current = await tx.$queryRaw<Array<{ enabled: boolean }>>`
       SELECT "enabled" FROM "lms_review_request_settings" WHERE "id" = 1 FOR UPDATE`;
     if (current.length !== 1) throw new Error('lms_review_request_settings row is missing');
+    const actor = await resolveReviewRequestSwitchActor(tx, sessionEmail);
+    if (!actor) throw new UnattributableSwitchChangeError();
     await tx.lmsReviewRequestSettings.update({ where: { id: 1 }, data: { enabled } });
     const event = await tx.lmsReviewRequestSwitchEvent.create({
       data: {
@@ -112,7 +141,7 @@ export async function setReviewRequestEmailsEnabled(enabled: boolean, actor: Rev
       },
       select: { createdAt: true },
     });
-    return { enabled, changedAt: event.createdAt };
+    return { enabled, changedAt: event.createdAt, actor };
   });
 }
 
@@ -232,6 +261,8 @@ export async function sendReviewRequestEmail(params: {
     text,
     // A review request is solicitation, not a course-service message: Mailtrap's Bulk Stream.
     stream: 'bulk',
+    // Sent inside a transaction that holds row locks: bound how long they are held.
+    timeoutMs: REVIEW_REQUEST_PROVIDER_TIMEOUT_MS,
     headers: {
       'List-Unsubscribe': `<${oneClickUrl}>`,
       'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
@@ -246,7 +277,8 @@ export type ReviewRequestSkipReason =
   | 'already_reviewed'
   | 'opted_out'
   | 'no_email'
-  | 'inactive_account';
+  | 'inactive_account'
+  | 'not_completed';
 
 export type ReviewRequestRunResult = {
   ok: boolean;
@@ -268,9 +300,59 @@ export type ReviewRequestRunResult = {
   failed_enrollment_ids: string[];
 };
 
+
+/** The provider call's hard timeout inside the locked send transaction (release-gate r6). */
+export const REVIEW_REQUEST_PROVIDER_TIMEOUT_MS = 10_000;
+/** The locked send transaction's own limit: provider timeout plus room for the locked reads/writes. */
+export const REVIEW_REQUEST_SEND_TRANSACTION_TIMEOUT_MS = 20_000;
+
+export type SendGateOutcome =
+  | { kind: 'send'; to: string; name: string }
+  | { kind: 'lost_claim' }
+  | {
+      kind: 'hold';
+      /** What the ledger row becomes; nothing was sent and no attempt is used. */
+      status: 'eligible' | 'ineligible' | 'skipped';
+      reason: 'switched_off' | 'not_completed' | 'completion_changed' | 'opted_out' | 'inactive_account' | 'no_email';
+      skip: ReviewRequestSkipReason;
+    }
+  | { kind: 'sent' }
+  | { kind: 'failed' }
+  | { kind: 'ambiguous' };
+
+/**
+ * Pure: the final, binding decision made INSIDE the locked send transaction, from rows read under
+ * those locks (release-gate r6). All conditions are checked together: this run still owns the
+ * claim, the claim is for the same completion, the switch is on, the enrolment is completed now,
+ * and the learner is active, has an email and has not unsubscribed.
+ */
+export function decideSendGate(input: {
+  switchOn: boolean;
+  enrolment: { status: string; completed_at: Date | null } | null;
+  learner: { email: string; full_name: string | null; email_opt_out: boolean; is_active: boolean } | null;
+  ledger: { status: string; claim_token: string | null; completion_seq: number } | null;
+  claimToken: string;
+  claimedCompletionSeq: number;
+}): Extract<SendGateOutcome, { kind: 'send' | 'lost_claim' | 'hold' }> {
+  const { ledger, enrolment, learner } = input;
+  if (!ledger || ledger.status !== 'pending' || ledger.claim_token !== input.claimToken) return { kind: 'lost_claim' };
+  if (ledger.completion_seq !== input.claimedCompletionSeq) {
+    return { kind: 'hold', status: 'ineligible', reason: 'completion_changed', skip: 'not_completed' };
+  }
+  if (!input.switchOn) return { kind: 'hold', status: 'eligible', reason: 'switched_off', skip: 'claimed_elsewhere' };
+  if (!enrolment || enrolment.status !== 'completed' || enrolment.completed_at === null) {
+    return { kind: 'hold', status: 'ineligible', reason: 'not_completed', skip: 'not_completed' };
+  }
+  if (!learner || !learner.is_active) return { kind: 'hold', status: 'skipped', reason: 'inactive_account', skip: 'inactive_account' };
+  if (learner.email_opt_out) return { kind: 'hold', status: 'skipped', reason: 'opted_out', skip: 'opted_out' };
+  if (!learner.email?.trim()) return { kind: 'hold', status: 'skipped', reason: 'no_email', skip: 'no_email' };
+  return { kind: 'send', to: learner.email, name: learner.full_name?.trim().split(/\s+/)[0] || 'there' };
+}
+
 type LedgerSnapshot = {
   status: string;
   attempts: number;
+  completionSeq: number;
   claimToken: string | null;
   sendAttemptedAt: Date | null;
   updatedAt: Date;
@@ -362,7 +444,7 @@ export async function runReviewRequestEmails(options: { now?: Date; dryRun?: boo
       token = randomUUID();
       const where =
         ledger.status === 'eligible'
-          ? { enrollmentId: enrolment.id, status: 'eligible' }
+          ? { enrollmentId: enrolment.id, status: 'eligible', completionSeq: ledger.completionSeq }
           : ledger.status === 'failed'
             ? { enrollmentId: enrolment.id, status: 'failed', attempts: { lt: REVIEW_REQUEST_MAX_ATTEMPTS } }
             : {
@@ -390,7 +472,8 @@ export async function runReviewRequestEmails(options: { now?: Date; dryRun?: boo
         data: { ...data, claimToken: null },
       });
 
-    // Re-read consent and review state immediately before sending (Spam Act; ask once).
+    // Cheap pre-check (not the decision): skip learners already known to be ineligible. The
+    // binding checks run again inside the locked send transaction below.
     let learner: { email: string; fullName: string | null; emailOptOut: boolean; isActive: boolean } | null;
     let reviewed: boolean;
     try {
@@ -435,68 +518,120 @@ export async function runReviewRequestEmails(options: { now?: Date; dryRun?: boo
       return;
     }
 
-    // Immediately before THIS send: re-read the switch under a shared row lock and mark the attempt
-    // in the same transaction. An admin switching off takes the row FOR UPDATE, so it either commits
-    // first (and this send sees OFF and does not start) or waits until this mark has committed.
-    // If this process dies mid-send, a later run sees send_attempted_at and records the outcome as
-    // ambiguous instead of sending again.
-    const started = await prisma.$transaction(async (tx) => {
-      const sw = await tx.$queryRaw<Array<{ enabled: boolean }>>`
-        SELECT "enabled" FROM "lms_review_request_settings" WHERE "id" = 1 FOR SHARE`;
-      if (sw[0]?.enabled !== true) return 'switched_off' as const;
-      const marked = await tx.lmsReviewRequestEmail.updateMany({
-        where: { enrollmentId: enrolment.id, claimToken: token },
-        data: { sendAttemptedAt: now },
-      });
-      return marked.count === 1 ? ('ok' as const) : ('lost_claim' as const);
+    // Step 1 (its own commit): mark the attempt. If this process dies at any point after this,
+    // a later run sees send_attempted_at and records the outcome as ambiguous — never resent.
+    const marked = await prisma.lmsReviewRequestEmail.updateMany({
+      where: { enrollmentId: enrolment.id, claimToken: token, completionSeq: ledger.completionSeq },
+      data: { sendAttemptedAt: now },
     });
-    if (started === 'switched_off') {
-      // Nothing was sent: hand the row back as eligible (no attempt used) and stop the run.
-      await finish({ status: 'eligible' });
-      result.stopped_by_switch = true;
-      return;
-    }
-    if (started === 'lost_claim') {
+    if (marked.count === 0) {
       skip('claimed_elsewhere');
       return;
     }
 
-    let sendResult: SendEmailResult;
+    // Step 2: ONE transaction holds shared locks on the switch row, the enrolment row and the
+    // learner row for the whole provider call (release-gate r6). Switching off (FOR UPDATE),
+    // unsubscribing and revoking (UPDATEs) all conflict with these locks, so each either commits
+    // before the checks below — and this send does not happen — or waits until this send has
+    // finished and been recorded. Lock order matches the completion trigger, so nothing deadlocks.
+    // The provider call has a hard timeout so the locks are held for a bounded time.
+    let outcome: SendGateOutcome;
     try {
-      sendResult = await sendReviewRequestEmail({
-        to: learner.email,
-        userId: enrolment.studentId,
-        name: learner.fullName?.trim().split(/\s+/)[0] || 'there',
-        courseTitle: enrolment.course.title,
-        courseSlug: enrolment.course.slug,
-      });
+      outcome = await prisma.$transaction(
+        async (tx) => {
+          const sw = await tx.$queryRaw<Array<{ enabled: boolean }>>`
+            SELECT "enabled" FROM "lms_review_request_settings" WHERE "id" = 1 FOR SHARE`;
+          const enr = await tx.$queryRaw<Array<{ status: string; completed_at: Date | null }>>`
+            SELECT "status", "completed_at" FROM "lms_enrollments" WHERE "id" = ${enrolment.id}::uuid FOR SHARE`;
+          const usr = await tx.$queryRaw<
+            Array<{ email: string; full_name: string | null; email_opt_out: boolean; is_active: boolean }>
+          >`
+            SELECT "email", "full_name", "email_opt_out", "is_active" FROM "lms_users" WHERE "id" = ${enrolment.studentId}::uuid FOR SHARE`;
+          const led = await tx.$queryRaw<Array<{ status: string; claim_token: string | null; completion_seq: number }>>`
+            SELECT "status", "claim_token", "completion_seq" FROM "lms_review_request_emails"
+             WHERE "enrollment_id" = ${enrolment.id}::uuid FOR UPDATE`;
+
+          const decision = decideSendGate({
+            switchOn: sw[0]?.enabled === true,
+            enrolment: enr[0] ?? null,
+            learner: usr[0] ?? null,
+            ledger: led[0] ?? null,
+            claimToken: token!,
+            claimedCompletionSeq: ledger.completionSeq,
+          });
+          const close = (data: Record<string, unknown>) =>
+            tx.lmsReviewRequestEmail.updateMany({
+              where: { enrollmentId: enrolment.id, claimToken: token },
+              data: { ...data, claimToken: null },
+            });
+          if (decision.kind === 'lost_claim') return decision;
+          if (decision.kind === 'hold') {
+            await close({ status: decision.status, failureReason: decision.reason, sendAttemptedAt: null });
+            return decision;
+          }
+
+          let sendResult: SendEmailResult;
+          try {
+            sendResult = await sendReviewRequestEmail({
+              to: decision.to,
+              userId: enrolment.studentId,
+              name: decision.name,
+              courseTitle: enrolment.course.title,
+              courseSlug: enrolment.course.slug,
+            });
+          } catch {
+            sendResult = { sent: false, reason: 'send_failed' };
+          }
+          if (wasReallySent(sendResult)) {
+            await close({
+              status: 'sent',
+              failureReason: null,
+              providerMessageId: sendResult.messageId ?? null,
+              sentAt: now,
+              attempts: { increment: 1 },
+            });
+            return { kind: 'sent' as const };
+          }
+          if (isDefiniteNonDelivery(sendResult)) {
+            await close({
+              status: 'failed',
+              failureReason: sendResult.reason ?? 'unknown',
+              sendAttemptedAt: null,
+              attempts: { increment: 1 },
+            });
+            return { kind: 'failed' as const };
+          }
+          await close({ status: 'ambiguous', failureReason: sendResult.reason ?? 'unknown', attempts: { increment: 1 } });
+          return { kind: 'ambiguous' as const };
+        },
+        { maxWait: 5_000, timeout: REVIEW_REQUEST_SEND_TRANSACTION_TIMEOUT_MS }
+      );
     } catch {
-      sendResult = { sent: false, reason: 'send_failed' };
+      // The transaction failed or timed out, possibly after the provider accepted the message.
+      // It rolled back, so the committed attempt mark from step 1 remains: ambiguous, never resent.
+      outcome = { kind: 'ambiguous' };
     }
 
-    if (wasReallySent(sendResult)) {
-      await finish({
-        status: 'sent',
-        failureReason: null,
-        providerMessageId: sendResult.messageId ?? null,
-        sentAt: now,
-        attempts: { increment: 1 },
-      });
-      result.sent += 1;
-    } else if (isDefiniteNonDelivery(sendResult)) {
-      await finish({
-        status: 'failed',
-        failureReason: sendResult.reason ?? 'unknown',
-        sendAttemptedAt: null,
-        attempts: { increment: 1 },
-      });
-      result.failed += 1;
-      result.failed_enrollment_ids.push(enrolment.id);
-    } else {
-      await finish({ status: 'ambiguous', failureReason: sendResult.reason ?? 'unknown', attempts: { increment: 1 } });
-      result.failed += 1;
-      result.ambiguous += 1;
-      result.failed_enrollment_ids.push(enrolment.id);
+    switch (outcome.kind) {
+      case 'sent':
+        result.sent += 1;
+        return;
+      case 'failed':
+        result.failed += 1;
+        result.failed_enrollment_ids.push(enrolment.id);
+        return;
+      case 'ambiguous':
+        result.failed += 1;
+        result.ambiguous += 1;
+        result.failed_enrollment_ids.push(enrolment.id);
+        return;
+      case 'lost_claim':
+        skip('claimed_elsewhere');
+        return;
+      case 'hold':
+        if (outcome.reason === 'switched_off') result.stopped_by_switch = true;
+        else skip(outcome.skip);
+        return;
     }
   }
 
@@ -535,7 +670,7 @@ export async function runReviewRequestEmails(options: { now?: Date; dryRun?: boo
         completedAt: true,
         course: { select: { slug: true, title: true, category: true, meta: true } },
         reviewRequestEmail: {
-          select: { status: true, attempts: true, claimToken: true, sendAttemptedAt: true, updatedAt: true },
+          select: { status: true, attempts: true, completionSeq: true, claimToken: true, sendAttemptedAt: true, updatedAt: true },
         },
       },
     });

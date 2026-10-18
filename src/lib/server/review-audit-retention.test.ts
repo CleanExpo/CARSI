@@ -350,8 +350,8 @@ describe('review-request eligibility is decided at completion, in the database (
     expect(await sendable(e)).toBe(0);
   });
 
-  it.each(['sent', 'ambiguous', 'pending'])(
-    'a %s row is evidence: revocation and re-completion never change it',
+  it.each(['sent', 'ambiguous'])(
+    'a %s row is evidence: revocation and re-completion never change its status',
     async (terminal) => {
       await setSwitch(true);
       const e = await newEnrolment();
@@ -366,6 +366,80 @@ describe('review-request eligibility is decided at completion, in the database (
       expect(await ledger(e)).toEqual([{ status: terminal }]);
     }
   );
+
+  it('a claim in flight with a send attempt is made ambiguous by a revocation (never resent), not reset', async () => {
+    await setSwitch(true);
+    const e = await newEnrolment();
+    await complete(e);
+    await db.query(
+      "UPDATE lms_review_request_emails SET status = 'pending', claim_token = $2, send_attempted_at = now() WHERE enrollment_id = $1",
+      [e, randomUUID()]
+    );
+    await db.query("UPDATE lms_enrollments SET status = 'revoked', completed_at = NULL WHERE id = $1", [e]);
+    const r = await db.query<{ status: string; claim_token: string | null; failure_reason: string }>(
+      'SELECT status, claim_token, failure_reason FROM lms_review_request_emails WHERE enrollment_id = $1',
+      [e]
+    );
+    expect(r.rows).toEqual([{ status: 'ambiguous', claim_token: null, failure_reason: 'completion_changed_after_send_attempt' }]);
+  });
+
+  it('a claim in flight with no send attempt yet is cancelled by a revocation (claim cleared, ineligible)', async () => {
+    await setSwitch(true);
+    const e = await newEnrolment();
+    await complete(e);
+    await db.query("UPDATE lms_review_request_emails SET status = 'pending', claim_token = $2 WHERE enrollment_id = $1", [e, randomUUID()]);
+    await db.query("UPDATE lms_enrollments SET status = 'revoked', completed_at = NULL WHERE id = $1", [e]);
+    const r = await db.query<{ status: string; claim_token: string | null }>(
+      'SELECT status, claim_token FROM lms_review_request_emails WHERE enrollment_id = $1',
+      [e]
+    );
+    expect(r.rows).toEqual([{ status: 'ineligible', claim_token: null }]);
+  });
+
+  it('r6 reviewer sequence: status-only revoke and re-complete across an OFF interval is never sendable', async () => {
+    await setSwitch(true);
+    const e = await newEnrolment('completed', new Date(Date.now() - 5 * 86_400_000).toISOString());
+    expect(await ledger(e)).toEqual([{ status: 'eligible' }]);
+    await db.query("UPDATE lms_enrollments SET status = 'active' WHERE id = $1", [e]); // completed_at unchanged
+    expect(await ledger(e)).toEqual([{ status: 'ineligible' }]);
+    await setSwitch(false);
+    await db.query("UPDATE lms_enrollments SET status = 'completed' WHERE id = $1", [e]); // completed_at unchanged
+    await setSwitch(true);
+    expect(await ledger(e)).toEqual([{ status: 'ineligible' }]);
+    expect(await sendable(e)).toBe(0);
+  });
+
+  it('a status-only re-completion while ON is a new completion and is marked eligible', async () => {
+    await setSwitch(true);
+    const e = await newEnrolment('completed', new Date(Date.now() - 5 * 86_400_000).toISOString());
+    await db.query("UPDATE lms_enrollments SET status = 'active' WHERE id = $1", [e]);
+    await db.query("UPDATE lms_enrollments SET status = 'completed' WHERE id = $1", [e]);
+    expect(await ledger(e)).toEqual([{ status: 'eligible' }]);
+    expect(await sendable(e)).toBe(1);
+  });
+
+  it('every transition bumps the completion sequence; updates that are not transitions do not', async () => {
+    await setSwitch(true);
+    const e = await newEnrolment();
+    await complete(e);
+    const seq = async () =>
+      (await db.query<{ s: number }>('SELECT completion_seq AS s FROM lms_review_request_emails WHERE enrollment_id = $1', [e])).rows[0]!.s;
+    expect(await seq()).toBe(1);
+    await db.query('UPDATE lms_enrollments SET certificate_issued_at = now() WHERE id = $1', [e]);
+    await db.query("UPDATE lms_enrollments SET completed_at = completed_at + interval '1 minute' WHERE id = $1", [e]);
+    expect(await seq()).toBe(1);
+    await db.query("UPDATE lms_enrollments SET status = 'active' WHERE id = $1", [e]);
+    expect(await seq()).toBe(2);
+    await db.query("UPDATE lms_enrollments SET status = 'completed' WHERE id = $1", [e]);
+    expect(await seq()).toBe(3);
+  });
+
+  it('the trigger fires on status changes as well as completed_at', async () => {
+    const r = await db.query<{ def: string }>(
+      "SELECT pg_get_triggerdef(oid) AS def FROM pg_trigger WHERE tgname = 'trg_lms_enrollments_review_request_eligibility'"
+    );
+    expect(r.rows[0]!.def).toMatch(/AFTER INSERT OR UPDATE OF completed_at, status ON (public\.)?lms_enrollments/);
+  });
 
   it('the trigger reads the switch FOR SHARE (a completion cannot interleave with a switch change)', async () => {
     const r = await db.query<{ src: string }>(
@@ -399,5 +473,37 @@ describe('review-request switch history (release-gate r5)', () => {
       "SELECT count(*)::int AS n FROM pg_constraint WHERE conrelid = 'lms_review_request_switch_events'::regclass AND contype = 'f'"
     );
     expect(r.rows[0]!.n).toBe(0);
+  });
+});
+
+describe('the locked reads used by the sender and the switch toggle are valid on the real schema (release-gate r6)', () => {
+  it('runs the send transaction\'s locked reads and the admin re-validation reads, in one transaction', async () => {
+    const enrolment = randomUUID();
+    await db.query("INSERT INTO lms_enrollments (id, student_id, course_id, status, completed_at) VALUES ($1, $2, $3, 'completed', now())", [
+      enrolment,
+      ids.learner,
+      ids.course,
+    ]);
+    await db.exec('BEGIN');
+    try {
+      const sw = await db.query('SELECT "enabled" FROM "lms_review_request_settings" WHERE "id" = 1 FOR SHARE');
+      const enr = await db.query('SELECT "status", "completed_at" FROM "lms_enrollments" WHERE "id" = $1::uuid FOR SHARE', [enrolment]);
+      const usr = await db.query(
+        'SELECT "email", "full_name", "email_opt_out", "is_active" FROM "lms_users" WHERE "id" = $1::uuid FOR SHARE',
+        [ids.learner]
+      );
+      await db.query(
+        'SELECT "status", "claim_token", "completion_seq" FROM "lms_review_request_emails" WHERE "enrollment_id" = $1::uuid FOR UPDATE',
+        [enrolment]
+      );
+      await db.query('SELECT "id", "is_active", "role" FROM "admin_users" WHERE lower("email") = $1 FOR SHARE', ['ops@carsi.com.au']);
+      await db.query('SELECT "id", "is_active", "role" FROM "lms_users" WHERE lower("email") = $1 FOR SHARE', ['x@example.com']);
+      await db.query('SELECT "enabled" FROM "lms_review_request_settings" WHERE "id" = 1 FOR UPDATE');
+      expect(sw.rows).toHaveLength(1);
+      expect(enr.rows).toHaveLength(1);
+      expect(usr.rows).toHaveLength(1);
+    } finally {
+      await db.exec('ROLLBACK');
+    }
   });
 });

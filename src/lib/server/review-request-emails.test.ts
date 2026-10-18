@@ -22,6 +22,7 @@ type Enrolment = {
 type Ledger = {
   status: string;
   attempts: number;
+  completionSeq: number;
   claimToken: string | null;
   sendAttemptedAt: Date | null;
   updatedAt: Date;
@@ -33,6 +34,7 @@ type LedgerWhere = {
   enrollmentId: string;
   status?: string;
   attempts?: { lt: number };
+  completionSeq?: number;
   claimToken?: string | null;
   sendAttemptedAt?: null;
   updatedAt?: { lt: Date };
@@ -53,6 +55,12 @@ const db = vi.hoisted(() => ({
   holdSecondQuery: null as null | { calls: number; until: Promise<void> },
   /** SQL of every raw query (the locked switch reads). */
   rawSql: [] as string[],
+  /** Row locks the open send transaction holds ('settings', 'enrollment:<id>', 'user:<id>', 'ledger:<id>'). */
+  locks: new Set<string>(),
+  /** A writer that commits just before the send transaction takes its locks (OFF, unsubscribe, revoke...). */
+  beforeSendTx: null as null | (() => void),
+  /** Makes the next send transaction fail after the provider call (e.g. the commit is lost). */
+  failSendTxAfterProvider: false,
 }));
 const mail = vi.hoisted(() => ({ send: vi.fn(), configured: vi.fn(() => true) }));
 const unsub = vi.hoisted(() => ({ setOptOut: vi.fn(async (_id: string, optedOut: boolean) => ({ email_opt_out: optedOut })) }));
@@ -72,6 +80,7 @@ function ledgerMatches(l: Ledger | undefined, where: LedgerWhere): l is Ledger {
   if (!l) return false;
   if (where.status !== undefined && l.status !== where.status) return false;
   if (where.attempts && !(l.attempts < where.attempts.lt)) return false;
+  if (where.completionSeq !== undefined && l.completionSeq !== where.completionSeq) return false;
   if ('claimToken' in where && l.claimToken !== where.claimToken) return false;
   if ('sendAttemptedAt' in where && l.sendAttemptedAt !== null) return false;
   if (where.updatedAt && !(l.updatedAt < where.updatedAt.lt)) return false;
@@ -91,13 +100,50 @@ vi.mock('@/lib/prisma', () => ({
       findUnique: async () => (db.settings ? { enabled: db.settings.enabled } : null),
     },
     // The locked switch read: SELECT "enabled" ... FOR SHARE (the fake records the SQL).
-    $queryRaw: async (strings: TemplateStringsArray) => {
-      db.rawSql.push(strings.join('?'));
-      return db.settings ? [{ enabled: db.settings.enabled }] : [];
+    // The locked reads (FOR SHARE / FOR UPDATE). The fake records the SQL and the locks taken.
+    $queryRaw: async (strings: TemplateStringsArray, ...values: unknown[]) => {
+      const sql = strings.join('?');
+      db.rawSql.push(sql);
+      const id = values[0] as string;
+      if (sql.includes('"lms_review_request_settings"')) {
+        db.locks.add('settings');
+        return db.settings ? [{ enabled: db.settings.enabled }] : [];
+      }
+      if (sql.includes('"lms_enrollments"')) {
+        db.locks.add(`enrollment:${id}`);
+        const e = db.enrolments.find((x) => x.id === id);
+        return e ? [{ status: e.status, completed_at: e.completedAt }] : [];
+      }
+      if (sql.includes('"lms_users"')) {
+        db.locks.add(`user:${id}`);
+        const u = db.users.get(id);
+        return u ? [{ email: u.email, full_name: u.fullName, email_opt_out: u.emailOptOut, is_active: u.isActive }] : [];
+      }
+      if (sql.includes('"lms_review_request_emails"')) {
+        db.locks.add(`ledger:${id}`);
+        const l = db.ledger.get(id);
+        return l ? [{ status: l.status, claim_token: l.claimToken, completion_seq: l.completionSeq }] : [];
+      }
+      throw new Error(`unexpected raw SQL: ${sql}`);
     },
-    // Interactive transaction: the callback gets the same client (method call binds `this`).
+    // Interactive transaction: all-or-nothing on the ledger; locks are released at the end.
     $transaction: async function (this: unknown, fn: (tx: unknown) => unknown) {
-      return fn(this);
+      db.beforeSendTx?.();
+      db.beforeSendTx = null;
+      const snapshot = new Map([...db.ledger].map(([k, v]) => [k, { ...v }]));
+      try {
+        const out = await fn(this);
+        if (db.failSendTxAfterProvider) {
+          db.failSendTxAfterProvider = false;
+          throw new Error('commit lost');
+        }
+        return out;
+      } catch (e) {
+        db.ledger = snapshot;
+        throw e;
+      } finally {
+        db.locks.clear();
+      }
     },
     lmsEnrollment: {
       findMany: async ({ where, take }: { where: FindWhere; take: number }) => {
@@ -122,7 +168,7 @@ vi.mock('@/lib/prisma', () => ({
             return {
               ...e,
               reviewRequestEmail: l
-                ? { status: l.status, attempts: l.attempts, claimToken: l.claimToken, sendAttemptedAt: l.sendAttemptedAt, updatedAt: l.updatedAt }
+                ? { status: l.status, attempts: l.attempts, completionSeq: l.completionSeq, claimToken: l.claimToken, sendAttemptedAt: l.sendAttemptedAt, updatedAt: l.updatedAt }
                 : null,
             };
           });
@@ -167,6 +213,7 @@ vi.mock('@/lib/prisma', () => ({
 }));
 
 const {
+  decideSendGate,
   isDefiniteNonDelivery,
   renderReviewRequestEmail,
   REVIEW_REQUEST_MAX_SENDS_PER_RUN,
@@ -180,7 +227,7 @@ const H = 3_600_000;
 const D = 24 * H;
 
 function eligibleRow(): Ledger {
-  return { status: 'eligible', attempts: 0, claimToken: null, sendAttemptedAt: null, updatedAt: NOW, failureReason: null, providerMessageId: null, sentAt: null };
+  return { status: 'eligible', attempts: 0, completionSeq: 0, claimToken: null, sendAttemptedAt: null, updatedAt: NOW, failureReason: null, providerMessageId: null, sentAt: null };
 }
 
 /**
@@ -218,6 +265,9 @@ beforeEach(() => {
   db.barrier = null;
   db.holdSecondQuery = null;
   db.rawSql = [];
+  db.locks.clear();
+  db.beforeSendTx = null;
+  db.failSendTxAfterProvider = false;
   unsub.setOptOut.mockClear();
   mail.send.mockReset().mockResolvedValue({ sent: true, messageId: 'm-1' });
   mail.configured.mockReset().mockReturnValue(true);
@@ -351,6 +401,126 @@ describe('at most once per enrolment (D9)', () => {
     expect(a.sent + b.sent).toBe(1);
     expect((a.skipped.claimed_elsewhere ?? 0) + (b.skipped.claimed_elsewhere ?? 0)).toBe(1);
     expect(mail.send).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('ONE locked transaction per send (release-gate r6)', () => {
+  it('the email is handed to the provider while the switch, enrolment, learner and ledger rows are all locked', async () => {
+    addCompleter('e1', 5 * D);
+    let heldDuringSend: string[] = [];
+    mail.send.mockImplementationOnce(async () => {
+      heldDuringSend = [...db.locks].sort();
+      return { sent: true, messageId: 'm-locked' };
+    });
+    expect((await run()).sent).toBe(1);
+    expect(heldDuringSend).toEqual(['enrollment:e1', 'ledger:e1', 'settings', 'user:student-e1']);
+    const sql = db.rawSql.join('\n');
+    expect(sql).toMatch(/"lms_review_request_settings" WHERE "id" = 1 FOR SHARE/);
+    expect(sql).toMatch(/FROM "lms_enrollments" WHERE "id" = \?::uuid FOR SHARE/);
+    expect(sql).toMatch(/FROM "lms_users" WHERE "id" = \?::uuid FOR SHARE/);
+    expect(sql).toMatch(/FROM "lms_review_request_emails"\s+WHERE "enrollment_id" = \?::uuid FOR UPDATE/);
+  });
+
+  it('the provider call has a hard 10 s timeout so the locks are held for a bounded time', async () => {
+    addCompleter('e1', 5 * D);
+    await run();
+    expect(mail.send.mock.calls[0]![0].timeoutMs).toBe(10_000);
+  });
+
+  it('switch OFF committed after the attempt mark but before the send transaction → no send, row back to eligible', async () => {
+    addCompleter('e1', 5 * D);
+    db.beforeSendTx = () => {
+      db.settings = { enabled: false };
+    };
+    const res = await run();
+    expect(mail.send).not.toHaveBeenCalled();
+    expect(res.stopped_by_switch).toBe(true);
+    expect(db.ledger.get('e1')).toMatchObject({ status: 'eligible', attempts: 0, sendAttemptedAt: null, claimToken: null });
+  });
+
+  it('unsubscribe committed in that interval → no send, recorded as opted out', async () => {
+    addCompleter('e1', 5 * D);
+    db.beforeSendTx = () => {
+      db.users.get('student-e1')!.emailOptOut = true;
+    };
+    const res = await run();
+    expect(mail.send).not.toHaveBeenCalled();
+    expect(res.skipped.opted_out).toBe(1);
+    expect(db.ledger.get('e1')).toMatchObject({ status: 'skipped', failureReason: 'opted_out', sendAttemptedAt: null });
+  });
+
+  it('revocation committed in that interval → no send, even if nothing else changed the ledger row', async () => {
+    addCompleter('e1', 5 * D);
+    db.beforeSendTx = () => {
+      const e = db.enrolments.find((x) => x.id === 'e1')!;
+      e.status = 'revoked';
+      e.completedAt = null;
+    };
+    const res = await run();
+    expect(mail.send).not.toHaveBeenCalled();
+    expect(res.skipped.not_completed).toBe(1);
+    expect(db.ledger.get('e1')).toMatchObject({ status: 'ineligible', failureReason: 'not_completed', sendAttemptedAt: null });
+  });
+
+  it('a status-only revocation (completed_at unchanged) in that interval → no send', async () => {
+    addCompleter('e1', 5 * D);
+    db.beforeSendTx = () => {
+      db.enrolments.find((x) => x.id === 'e1')!.status = 'active';
+    };
+    await run();
+    expect(mail.send).not.toHaveBeenCalled();
+    expect(db.ledger.get('e1')?.status).toBe('ineligible');
+  });
+
+  it('a new completion in that interval (completion sequence moved on) → the old claim never sends', async () => {
+    addCompleter('e1', 5 * D);
+    db.beforeSendTx = () => {
+      db.ledger.get('e1')!.completionSeq += 2; // revoked and re-completed meanwhile
+    };
+    await run();
+    expect(mail.send).not.toHaveBeenCalled();
+    expect(db.ledger.get('e1')).toMatchObject({ status: 'ineligible', failureReason: 'completion_changed' });
+  });
+
+  it('if the send transaction fails after the provider call, the earlier attempt mark makes it ambiguous: never resent', async () => {
+    addCompleter('e1', 5 * D);
+    db.failSendTxAfterProvider = true;
+    const first = await run();
+    expect(first).toMatchObject({ ambiguous: 1, ok: false });
+    expect(db.ledger.get('e1')).toMatchObject({ status: 'pending', sendAttemptedAt: NOW });
+    // A later run (after the claim lease) records it as ambiguous instead of sending again.
+    await run({ now: new Date(NOW.getTime() + 2 * H) });
+    expect(db.ledger.get('e1')?.status).toBe('ambiguous');
+    expect(mail.send).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('decideSendGate — the binding checks, all together (release-gate r6)', () => {
+  const ok = {
+    switchOn: true,
+    enrolment: { status: 'completed', completed_at: new Date('2026-10-10T00:00:00Z') },
+    learner: { email: 'sam@example.com', full_name: 'Sam Rivers', email_opt_out: false, is_active: true },
+    ledger: { status: 'pending', claim_token: 'tok', completion_seq: 3 },
+    claimToken: 'tok',
+    claimedCompletionSeq: 3,
+  };
+  it('sends only when every condition holds', () => {
+    expect(decideSendGate(ok)).toEqual({ kind: 'send', to: 'sam@example.com', name: 'Sam' });
+  });
+  it.each([
+    ['claim taken by another run', { ledger: { ...ok.ledger, claim_token: 'other' } }, 'lost_claim'],
+    ['row no longer pending', { ledger: { ...ok.ledger, status: 'ambiguous' } }, 'lost_claim'],
+    ['completion changed', { ledger: { ...ok.ledger, completion_seq: 4 } }, 'completion_changed'],
+    ['switch off', { switchOn: false }, 'switched_off'],
+    ['revoked', { enrolment: { status: 'revoked', completed_at: null } }, 'not_completed'],
+    ['status-only revoke', { enrolment: { status: 'active', completed_at: new Date() } }, 'not_completed'],
+    ['completed_at cleared', { enrolment: { status: 'completed', completed_at: null } }, 'not_completed'],
+    ['unsubscribed', { learner: { ...ok.learner, email_opt_out: true } }, 'opted_out'],
+    ['deactivated', { learner: { ...ok.learner, is_active: false } }, 'inactive_account'],
+    ['no email', { learner: { ...ok.learner, email: ' ' } }, 'no_email'],
+  ])('%s → no send', (_label, change, expected) => {
+    const d = decideSendGate({ ...ok, ...(change as object) });
+    expect(d.kind === 'lost_claim' ? 'lost_claim' : d.kind === 'hold' ? d.reason : 'send').toBe(expected);
   });
 });
 

@@ -5,8 +5,8 @@ import { databaseUnavailableResponse, isDatabaseConfigured } from '@/lib/server/
 import {
   listReviewRequestSwitchEvents,
   readReviewRequestSettings,
-  resolveReviewRequestSwitchActor,
   setReviewRequestEmailsEnabled,
+  UnattributableSwitchChangeError,
 } from '@/lib/server/review-request-email';
 
 /**
@@ -15,7 +15,8 @@ import {
  * an enrolment eligible at completion, so nothing completed while the switch was off is ever
  * emailed. Switching OFF stops any send that has not yet started. Every change is appended to an
  * audit history with the old value, the new value and a durable snapshot of the verified admin.
- * A change that cannot be attributed to an identified admin is refused.
+ * The admin's current active flag and role are re-checked in the database on every request, and a
+ * change that cannot be attributed to a currently authorised admin is refused.
  */
 export async function GET() {
   if (!(await getAdminSessionOrNull())) return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 });
@@ -50,16 +51,16 @@ export async function POST(request: NextRequest) {
   if (!isDatabaseConfigured()) return databaseUnavailableResponse();
 
   try {
-    const actor = await resolveReviewRequestSwitchActor(session.email);
-    if (!actor) {
+    // The admin is re-validated from the database inside the switch transaction, not from the token.
+    const saved = await setReviewRequestEmailsEnabled(payload.enabled, session.email);
+    return NextResponse.json({ enabled: saved.enabled, changed_at: saved.changedAt.toISOString() });
+  } catch (e) {
+    if (e instanceof UnattributableSwitchChangeError) {
       return NextResponse.json(
-        { detail: 'This change cannot be attributed to an identified admin, so it was not made.' },
+        { detail: 'This change cannot be attributed to a currently authorised admin, so it was not made.' },
         { status: 403 }
       );
     }
-    const saved = await setReviewRequestEmailsEnabled(payload.enabled, actor);
-    return NextResponse.json({ enabled: saved.enabled, changed_at: saved.changedAt.toISOString() });
-  } catch (e) {
     console.error('[admin/reviews/email-settings POST]', e);
     return NextResponse.json({ detail: 'Failed to update the review-request email switch' }, { status: 500 });
   }

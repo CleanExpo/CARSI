@@ -113,6 +113,9 @@ CREATE TABLE "lms_review_request_emails" (
     "status" VARCHAR(16) NOT NULL,
     "attempts" INTEGER NOT NULL DEFAULT 0,
     "claim_token" UUID,
+    -- Bumped by the trigger on every transition into or out of completed; a send must still
+    -- match the value it claimed, so a claim can never be used for a later completion.
+    "completion_seq" INTEGER NOT NULL DEFAULT 0,
     "send_attempted_at" TIMESTAMPTZ(6),
     "failure_reason" TEXT,
     "provider_message_id" VARCHAR(128),
@@ -137,44 +140,68 @@ ALTER TABLE "lms_review_request_emails"
     ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- Eligibility is decided AT EVERY TRANSITION INTO OR OUT OF COMPLETED, inside the database, for
--- every completion path (online progress, CCW provisioning, admin actions, scripts, raw SQL):
---   * completed_at goes NULL -> set (a completion or re-completion): the row becomes 'eligible' if
---     the review-request switch is on at that instant, otherwise 'ineligible'.
---   * completed_at goes set -> NULL (revocation): the row becomes 'ineligible'.
--- Rows that are 'sent', 'ambiguous' (may have been delivered) or 'pending' (a send in flight)
--- are evidence and are never changed. The switch row is read FOR SHARE, so a completion and a
--- switch change cannot interleave. The cron sends only 'eligible' rows, so a completion made
--- while the switch is off can never be emailed later, whatever the order of events.
+-- every path (online progress, CCW provisioning, admin actions, scripts, raw SQL), whether the
+-- transition changes completed_at, status, or both. "Completed" means status = 'completed' AND
+-- completed_at IS NOT NULL.
+--   * Into completed (a completion or re-completion): the row becomes 'eligible' if the switch is on
+--     at that instant, otherwise 'ineligible'.
+--   * Out of completed (revocation, status change, completed_at cleared): the row becomes 'ineligible'.
+--   * Every transition bumps completion_seq, so a claim taken for one completion can never be used
+--     for another; a claim in flight is cancelled ('pending' becomes 'ambiguous' if a send was
+--     already attempted, so it is never resent, and otherwise follows the transition).
+--   * 'sent' and 'ambiguous' rows are evidence and keep their status.
+-- Lock order is the same as the sender's (switch row, then enrolment row, then ledger row): the
+-- enrolment row is already locked by the UPDATE that fired this trigger, the switch row is read
+-- FOR SHARE, so a completion, a switch change and a send can never interleave or deadlock.
 CREATE FUNCTION "lms_review_request_mark_eligible"() RETURNS trigger
 LANGUAGE plpgsql AS $$
 DECLARE
+    was_completed BOOLEAN;
+    now_completed BOOLEAN;
     switch_on BOOLEAN;
+    target TEXT;
 BEGIN
-    IF TG_OP = 'UPDATE' AND OLD."completed_at" IS NOT NULL AND NEW."completed_at" IS NULL THEN
-        UPDATE "lms_review_request_emails"
-           SET "status" = 'ineligible', "updated_at" = now()
-         WHERE "enrollment_id" = NEW."id" AND "status" IN ('eligible', 'failed', 'skipped');
-        RETURN NEW;
+    now_completed := NEW."status" = 'completed' AND NEW."completed_at" IS NOT NULL;
+    IF TG_OP = 'INSERT' THEN
+        was_completed := false;
+    ELSE
+        was_completed := OLD."status" = 'completed' AND OLD."completed_at" IS NOT NULL;
     END IF;
 
-    IF NEW."completed_at" IS NOT NULL AND (TG_OP = 'INSERT' OR OLD."completed_at" IS NULL) THEN
-        SELECT "enabled" INTO switch_on FROM "lms_review_request_settings" WHERE "id" = 1 FOR SHARE;
-        IF switch_on IS TRUE THEN
-            INSERT INTO "lms_review_request_emails" ("id", "enrollment_id", "status")
-            VALUES (gen_random_uuid(), NEW."id", 'eligible')
-            ON CONFLICT ("enrollment_id") DO UPDATE
-               SET "status" = 'eligible', "updated_at" = now()
-             WHERE "lms_review_request_emails"."status" IN ('ineligible', 'eligible', 'failed', 'skipped');
-        ELSE
-            UPDATE "lms_review_request_emails"
-               SET "status" = 'ineligible', "updated_at" = now()
-             WHERE "enrollment_id" = NEW."id" AND "status" IN ('eligible', 'failed', 'skipped');
-        END IF;
+    IF was_completed = now_completed THEN
+        RETURN NEW; -- no transition (e.g. a certificate or progress update)
+    END IF;
+
+    SELECT "enabled" INTO switch_on FROM "lms_review_request_settings" WHERE "id" = 1 FOR SHARE;
+    IF now_completed AND switch_on IS TRUE THEN
+        target := 'eligible';
+    ELSE
+        target := 'ineligible';
+    END IF;
+
+    UPDATE "lms_review_request_emails"
+       SET "completion_seq" = "completion_seq" + 1,
+           "status" = CASE
+               WHEN "status" IN ('sent', 'ambiguous') THEN "status"
+               WHEN "status" = 'pending' AND "send_attempted_at" IS NOT NULL THEN 'ambiguous'
+               ELSE target
+           END,
+           "failure_reason" = CASE
+               WHEN "status" = 'pending' AND "send_attempted_at" IS NOT NULL THEN 'completion_changed_after_send_attempt'
+               ELSE "failure_reason"
+           END,
+           "claim_token" = CASE WHEN "status" IN ('sent', 'ambiguous') THEN "claim_token" ELSE NULL END,
+           "updated_at" = now()
+     WHERE "enrollment_id" = NEW."id";
+
+    IF NOT FOUND AND target = 'eligible' THEN
+        INSERT INTO "lms_review_request_emails" ("id", "enrollment_id", "status", "completion_seq")
+        VALUES (gen_random_uuid(), NEW."id", 'eligible', 1);
     END IF;
     RETURN NEW;
 END;
 $$;
 
 CREATE TRIGGER "trg_lms_enrollments_review_request_eligibility"
-    AFTER INSERT OR UPDATE OF "completed_at" ON "lms_enrollments"
+    AFTER INSERT OR UPDATE OF "completed_at", "status" ON "lms_enrollments"
     FOR EACH ROW EXECUTE FUNCTION "lms_review_request_mark_eligible"();

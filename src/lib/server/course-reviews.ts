@@ -196,6 +196,26 @@ export async function getCourseSlugForEnrollment(enrollmentId: string): Promise<
   }
 }
 
+/** The migration that started recording moderation decisions (reason, actor, time). */
+export const REVIEW_MODERATION_AUDIT_MIGRATION = '20261018100000_review_moderation_and_request_ledger';
+
+/**
+ * When recording moderation decisions began: the time this migration was applied. Null when it
+ * cannot be read (no database, or not yet applied); the public policy then gives no date.
+ */
+export async function getReviewModerationRecordingStart(): Promise<Date | null> {
+  if (!process.env.DATABASE_URL?.trim()) return null;
+  try {
+    const rows = await prisma.$queryRaw<Array<{ finished_at: Date | null }>>`
+      SELECT "finished_at" FROM "_prisma_migrations"
+       WHERE "migration_name" = ${REVIEW_MODERATION_AUDIT_MIGRATION} AND "finished_at" IS NOT NULL
+       ORDER BY "finished_at" ASC LIMIT 1`;
+    return rows[0]?.finished_at ?? null;
+  } catch {
+    return null;
+  }
+}
+
 /** Public name preview for the review form ("Your review will appear as …"). */
 export async function getReviewerDisplayName(studentId: string): Promise<string> {
   const user = await prisma.lmsUser.findUnique({
