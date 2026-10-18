@@ -2,6 +2,8 @@
  * AC-1 / AC-2 (spec 2026-10-18 D5, D7, D14): the ask and the Google link are decided without
  * any rating. Rating-blindness is asserted at the type level as well as by behaviour.
  */
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, expectTypeOf, it } from 'vitest';
 
 import {
@@ -9,6 +11,7 @@ import {
   isReviewAskEligible,
   resolveGoogleReviewUrl,
   REVIEW_HIDE_REASONS,
+  shouldMountPlayerReviewAsk,
   shouldShowReviewAsk,
   type ReviewAskEnrolment,
 } from './review-ask';
@@ -37,6 +40,22 @@ describe('isReviewAskEligible — one predicate for every surface (D5)', () => {
     expectTypeOf<keyof Input>().toEqualTypeOf<'status' | 'completedAt' | 'isOnboardingCourse'>();
     type AskInput = Parameters<typeof shouldShowReviewAsk>[0];
     expectTypeOf<keyof AskInput>().toEqualTypeOf<'eligible' | 'hasOwnReview'>();
+  });
+
+  it('the player mounts the ask for every non-onboarding course, whatever the lesson flags say', () => {
+    // A completed enrolment can show an incomplete lesson after the curriculum changes; the
+    // server's review_ask decides, so the mount decision takes no lesson-progress input at all.
+    expectTypeOf<keyof Parameters<typeof shouldMountPlayerReviewAsk>[0]>().toEqualTypeOf<'isOnboardingProgram'>();
+    expect(shouldMountPlayerReviewAsk({ isOnboardingProgram: false })).toBe(true);
+    expect(shouldMountPlayerReviewAsk({ isOnboardingProgram: true })).toBe(false);
+  });
+
+  it('LearnCourseShell mounts ReviewAsk only through that decision, never gated on lesson state (structural)', () => {
+    const shell = readFileSync(join(process.cwd(), 'src/components/lms/LearnCourseShell.tsx'), 'utf8');
+    const mounts = shell.split('\n').filter((line) => line.includes('<ReviewAsk'));
+    expect(mounts).toHaveLength(1);
+    expect(mounts[0]).toContain('shouldMountPlayerReviewAsk({ isOnboardingProgram })');
+    expect(mounts[0]).not.toMatch(/allLessonsComplete|completed|percent|progress/i);
   });
 
   it('asks once: never after a review exists', () => {

@@ -58,12 +58,32 @@ export function readReviewRequestConfig(env: Record<string, string | undefined>)
   if (env.REVIEW_REQUEST_EMAILS_ENABLED !== 'true') return { enabled: false, reason: 'disabled' };
   const raw = env.REVIEW_REQUEST_EMAILS_SINCE?.trim();
   if (!raw) return { enabled: false, reason: 'since_missing' };
-  if (!/^\d{4}-\d{2}-\d{2}(?:T[\d:.]+(?:Z|[+-]\d{2}:?\d{2})?)?$/.test(raw)) {
-    return { enabled: false, reason: 'since_invalid' };
+  const since = parseStrictSince(raw);
+  return since ? { enabled: true, since } : { enabled: false, reason: 'since_invalid' };
+}
+
+const SINCE_FORMAT = /^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2})(?::(\d{2})(?:\.\d{1,3})?)?(Z|[+-]\d{2}:?\d{2})?)?$/;
+
+/**
+ * Pure: parse REVIEW_REQUEST_EMAILS_SINCE strictly. JavaScript's Date silently rolls impossible
+ * dates forward (`2026-02-31` becomes 3 March), so every field is range-checked against the real
+ * calendar before the date may enable sending.
+ */
+export function parseStrictSince(raw: string): Date | null {
+  const m = SINCE_FORMAT.exec(raw);
+  if (!m) return null;
+  const [year, month, day] = [Number(m[1]), Number(m[2]), Number(m[3])];
+  const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  if (month < 1 || month > 12 || day < 1 || day > daysInMonth) return null;
+  if (m[4] !== undefined && (Number(m[4]) > 23 || Number(m[5]) > 59 || (m[6] !== undefined && Number(m[6]) > 59))) {
+    return null;
+  }
+  if (m[7] && m[7] !== 'Z') {
+    const [oh, om] = [Number(m[7].slice(1, 3)), Number(m[7].slice(-2))];
+    if (oh > 14 || om > 59) return null;
   }
   const since = new Date(raw);
-  if (Number.isNaN(since.getTime())) return { enabled: false, reason: 'since_invalid' };
-  return { enabled: true, since };
+  return Number.isNaN(since.getTime()) ? null : since;
 }
 
 /** Pure: the completed_at window a run considers — on/after SINCE, and 3 to 14 days old. */
@@ -80,17 +100,28 @@ export function wasReallySent(result: SendEmailResult): boolean {
   return result.sent === true && result.reason !== 'dev_console';
 }
 
+/** Pure: an HTTP status that is a definite rejection of the request (validation, auth, rate limit). */
+function isDefiniteRejectionStatus(status: number | undefined): boolean {
+  return typeof status === 'number' && status >= 400 && status < 500;
+}
+
 /**
- * Pure: a failure we KNOW delivered nothing, so a retry cannot duplicate the email.
- * `provider_error` = Mailtrap answered with an error; `not_configured` = never called;
- * `dev_console` = printed locally. Anything else (`send_failed` = network error or timeout,
- * where Mailtrap may have accepted it) is ambiguous.
+ * Pure: a failure we KNOW delivered nothing, so a retry cannot duplicate the email (D9b).
+ * - `not_configured`: the provider was never called.
+ * - `provider_error` with a 4xx status: Mailtrap rejected the request.
+ * - `dev_console` with no provider reply, or a 4xx one: printed locally, never sent.
+ * Everything else is ambiguous and never retried: a 5xx (Mailtrap documents 500 as an internal
+ * error with no no-delivery assurance), an error status we did not see, `send_failed` (network
+ * error or timeout), or a 2xx reply that still said it failed.
  */
 export function isDefiniteNonDelivery(result: SendEmailResult): boolean {
-  return (
-    !wasReallySent(result) &&
-    (result.reason === 'provider_error' || result.reason === 'not_configured' || result.reason === 'dev_console')
-  );
+  if (wasReallySent(result)) return false;
+  if (result.reason === 'not_configured') return true;
+  if (result.reason === 'provider_error') return isDefiniteRejectionStatus(result.httpStatus);
+  if (result.reason === 'dev_console') {
+    return result.httpStatus === undefined || isDefiniteRejectionStatus(result.httpStatus);
+  }
+  return false;
 }
 
 /** Pure: the review-request email. The same words for every learner; no reward, no rating. */
@@ -209,7 +240,7 @@ type Candidate = {
   studentId: string;
   courseId: string;
   completedAt: Date | null;
-  course: { slug: string; title: string; category: string | null };
+  course: { slug: string; title: string; category: string | null; meta?: unknown };
   reviewRequestEmail: LedgerSnapshot;
 };
 
@@ -254,7 +285,7 @@ export async function runReviewRequestEmails(options: {
   async function processCandidate(enrolment: Candidate): Promise<void> {
     const ledger = enrolment.reviewRequestEmail;
 
-    if (isOnboardingCourse({ slug: enrolment.course.slug, category: enrolment.course.category })) {
+    if (isOnboardingCourse({ slug: enrolment.course.slug, category: enrolment.course.category, meta: enrolment.course.meta })) {
       skip('onboarding_course');
       if (!dryRun && !ledger) {
         // Record it so the row stops occupying later pages.
@@ -460,7 +491,7 @@ export async function runReviewRequestEmails(options: {
         studentId: true,
         courseId: true,
         completedAt: true,
-        course: { select: { slug: true, title: true, category: true } },
+        course: { select: { slug: true, title: true, category: true, meta: true } },
         reviewRequestEmail: {
           select: { status: true, attempts: true, claimToken: true, sendAttemptedAt: true, updatedAt: true },
         },

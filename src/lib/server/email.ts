@@ -27,6 +27,8 @@ export type SendEmailResult = {
   sent: boolean;
   messageId?: string;
   reason?: 'not_configured' | 'send_failed' | 'provider_error' | 'dev_console';
+  /** HTTP status of a provider reply that was not a success (lets callers tell a 4xx rejection from a 5xx). */
+  httpStatus?: number;
 };
 
 const MAILTRAP_SEND_URL = 'https://send.api.mailtrap.io/api/send';
@@ -191,9 +193,9 @@ export async function sendEmail(params: SendEmailParams): Promise<SendEmailResul
       console.error('[email] Mailtrap API error', res.status, errDetail);
       if (devConsoleEnabled()) {
         logDevConsoleEmail(params);
-        return { sent: true, reason: 'dev_console' };
+        return { sent: true, reason: 'dev_console', httpStatus: res.status };
       }
-      return { sent: false, reason: 'provider_error' };
+      return { sent: false, reason: 'provider_error', httpStatus: res.status };
     }
 
     const messageId = parsed.message_ids?.[0];

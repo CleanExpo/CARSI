@@ -44,7 +44,7 @@ describe('toModerationDto (D3, D4)', () => {
   const at = new Date('2026-10-03T00:00:00.000Z');
 
   it('a visible review reports no hide', () => {
-    expect(toModerationDto({ isPublished: true, title: 'a', body: 'b' }, null)).toEqual({
+    expect(toModerationDto({ isPublished: true, rating: 4, title: 'a', body: 'b' }, null)).toEqual({
       hidden_reason: null,
       hidden_at: null,
       hidden_before_reasons_recorded: false,
@@ -53,20 +53,25 @@ describe('toModerationDto (D3, D4)', () => {
   });
 
   it('a review hidden before reasons were recorded is labelled as such, never given a reason', () => {
-    expect(toModerationDto({ isPublished: false, title: 'a', body: 'b' }, null)).toMatchObject({
+    expect(toModerationDto({ isPublished: false, rating: 4, title: 'a', body: 'b' }, null)).toMatchObject({
       hidden_reason: null,
       hidden_before_reasons_recorded: true,
     });
   });
 
   it('an unchanged hidden review is not flagged as edited', () => {
-    const latest = { action: 'hide', reason: 'offensive', contentSha256: reviewContentSha256('a', 'b'), createdAt: at };
-    expect(toModerationDto({ isPublished: false, title: 'a', body: 'b' }, latest).edited_after_hide).toBe(false);
+    const latest = { action: 'hide', reason: 'offensive', contentSha256: reviewContentSha256('a', 'b'), ratingAtAction: 4, createdAt: at };
+    expect(toModerationDto({ isPublished: false, rating: 4, title: 'a', body: 'b' }, latest).edited_after_hide).toBe(false);
   });
 
   it('a hidden review the learner edited afterwards is flagged', () => {
-    const latest = { action: 'hide', reason: 'offensive', contentSha256: reviewContentSha256('a', 'b'), createdAt: at };
-    expect(toModerationDto({ isPublished: false, title: 'a', body: 'changed' }, latest).edited_after_hide).toBe(true);
+    const latest = { action: 'hide', reason: 'offensive', contentSha256: reviewContentSha256('a', 'b'), ratingAtAction: 4, createdAt: at };
+    expect(toModerationDto({ isPublished: false, rating: 4, title: 'a', body: 'changed' }, latest).edited_after_hide).toBe(true);
+  });
+
+  it('a rating-only change after the hide (4 stars to 1, same text) is flagged', () => {
+    const latest = { action: 'hide', reason: 'offensive', contentSha256: reviewContentSha256('a', 'b'), ratingAtAction: 4, createdAt: at };
+    expect(toModerationDto({ isPublished: false, rating: 1, title: 'a', body: 'b' }, latest).edited_after_hide).toBe(true);
   });
 
   it('the content hash distinguishes a moved newline (title/body boundary)', () => {

@@ -135,10 +135,10 @@ export function summarizeReviews(ratings: Array<{ rating: number }>): ReviewSumm
 /** Resolve a course id (+ title) from its public slug. */
 export async function getCourseIdBySlug(
   slug: string
-): Promise<{ id: string; title: string; slug: string; category: string | null } | null> {
+): Promise<{ id: string; title: string; slug: string; category: string | null; meta: unknown } | null> {
   return prisma.lmsCourse.findUnique({
     where: { slug: slug.trim().toLowerCase() },
-    select: { id: true, title: true, slug: true, category: true },
+    select: { id: true, title: true, slug: true, category: true, meta: true },
   });
 }
 
@@ -160,7 +160,7 @@ export async function isEnrolledInCourse(studentId: string, courseId: string): P
  */
 export async function getReviewAskForStudent(
   studentId: string,
-  course: { id: string; slug: string; category: string | null }
+  course: { id: string; slug: string; category: string | null; meta?: unknown }
 ): Promise<boolean> {
   const [enrolment, review] = await Promise.all([
     prisma.lmsEnrollment.findUnique({
@@ -176,7 +176,7 @@ export async function getReviewAskForStudent(
   const eligible = isReviewAskEligible({
     status: enrolment.status,
     completedAt: enrolment.completedAt,
-    isOnboardingCourse: isOnboardingCourse({ slug: course.slug, category: course.category }),
+    isOnboardingCourse: isOnboardingCourse({ slug: course.slug, category: course.category, meta: course.meta }),
   });
   return shouldShowReviewAsk({ eligible, hasOwnReview: review !== null });
 }
@@ -250,7 +250,7 @@ export async function getCourseReviews(
             moderationEvents: {
               orderBy: { createdAt: 'desc' as const },
               take: 1,
-              select: { action: true, reason: true, contentSha256: true, createdAt: true },
+              select: { action: true, reason: true, contentSha256: true, ratingAtAction: true, createdAt: true },
             },
           }
         : {}),
@@ -271,6 +271,7 @@ type LatestModerationEvent = {
   action: string;
   reason: string | null;
   contentSha256: string;
+  ratingAtAction: number;
   createdAt: Date;
 };
 
@@ -281,7 +282,7 @@ export function reviewContentSha256(title: string | null, body: string | null): 
 
 /** Pure: moderator view of the latest moderation decision for a review (D2/D3/D4). */
 export function toModerationDto(
-  row: { isPublished: boolean; title: string | null; body: string | null },
+  row: { isPublished: boolean; rating: number; title: string | null; body: string | null },
   latest: LatestModerationEvent | null
 ): ReviewModerationDto {
   if (row.isPublished) {
@@ -294,7 +295,8 @@ export function toModerationDto(
     hidden_reason: latest.reason as ReviewHideReason,
     hidden_at: latest.createdAt.toISOString(),
     hidden_before_reasons_recorded: false,
-    edited_after_hide: latest.contentSha256 !== reviewContentSha256(row.title, row.body),
+    edited_after_hide:
+      latest.contentSha256 !== reviewContentSha256(row.title, row.body) || latest.ratingAtAction !== row.rating,
   };
 }
 

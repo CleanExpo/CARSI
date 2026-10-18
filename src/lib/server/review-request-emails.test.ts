@@ -153,6 +153,8 @@ vi.mock('@/lib/prisma', () => ({
 }));
 
 const {
+  isDefiniteNonDelivery,
+  parseStrictSince,
   readReviewRequestConfig,
   renderReviewRequestEmail,
   REVIEW_REQUEST_MAX_SENDS_PER_RUN,
@@ -226,6 +228,36 @@ describe('off by default (D10)', () => {
   it('only the exact value "true" enables sending', () => {
     expect(readReviewRequestConfig(ON)).toEqual({ enabled: true, since: new Date('2026-09-01') });
   });
+
+  it.each([
+    '2026-02-31', // JavaScript would roll this to 3 March
+    '2026-02-29', // 2026 is not a leap year
+    '2026-04-31',
+    '2026-13-01',
+    '2026-00-10',
+    '2026-09-00',
+    '2026-09-01T24:00Z',
+    '2026-09-01T10:60Z',
+    '2026-09-01T10:00:61Z',
+    '2026-09-01T10:00+15:00',
+    '2026-9-1',
+  ])('an impossible SINCE date (%s) never enables sending', async (since) => {
+    addCompleter('e1', 5 * D);
+    expect(readReviewRequestConfig({ REVIEW_REQUEST_EMAILS_ENABLED: 'true', REVIEW_REQUEST_EMAILS_SINCE: since })).toEqual({
+      enabled: false,
+      reason: 'since_invalid',
+    });
+    expect((await run({ REVIEW_REQUEST_EMAILS_ENABLED: 'true', REVIEW_REQUEST_EMAILS_SINCE: since })).sent).toBe(0);
+    expect(mail.send).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['2028-02-29', '2028-02-29T00:00:00.000Z'],
+    ['2026-09-01T10:30Z', '2026-09-01T10:30:00.000Z'],
+    ['2026-09-01T10:30:15.5+10:00', '2026-09-01T00:30:15.500Z'],
+  ])('a real SINCE date (%s) parses exactly', (since, iso) => {
+    expect(parseStrictSince(since)?.toISOString()).toBe(iso);
+  });
 });
 
 describe('window: 3 to 14 days after completion, never before SINCE (D10)', () => {
@@ -250,6 +282,16 @@ describe('window: 3 to 14 days after completion, never before SINCE (D10)', () =
     addCompleter('e1', 5 * D, { status: 'active' });
     addCompleter('e2', 5 * D, { status: 'revoked' });
     expect((await run()).sent).toBe(0);
+  });
+
+  it('an onboarding programme flagged only by its meta brand is not asked either', async () => {
+    const { ONBOARDING_BRAND } = await import('@/lib/onboarding/enterprise');
+    addCompleter('e1', 5 * D, {
+      course: { slug: 'acme-induction', title: 'Acme induction', category: 'Cleaning', meta: { brand: ONBOARDING_BRAND } } as Enrolment['course'],
+    });
+    const res = await run();
+    expect(res.sent).toBe(0);
+    expect(res.skipped.onboarding_course).toBe(1);
   });
 
   it('internal onboarding programmes are not asked', async () => {
@@ -282,9 +324,9 @@ describe('at most once per enrolment (D9)', () => {
 });
 
 describe('a failed send is retried, never silently used up (D9)', () => {
-  it('provider_error → failed and the run is not ok; the next run retries and sends', async () => {
+  it('a 4xx rejection (definite non-delivery) → failed and the run is not ok; the next run retries and sends', async () => {
     addCompleter('e1', 5 * D);
-    mail.send.mockResolvedValueOnce({ sent: false, reason: 'provider_error' });
+    mail.send.mockResolvedValueOnce({ sent: false, reason: 'provider_error', httpStatus: 422 });
     const first = await run();
     expect(first).toMatchObject({ ok: false, sent: 0, failed: 1, failed_enrollment_ids: ['e1'] });
     expect(db.ledger.get('e1')).toMatchObject({ status: 'failed', attempts: 1, failureReason: 'provider_error' });
@@ -321,9 +363,35 @@ describe('a failed send is retried, never silently used up (D9)', () => {
     expect(mail.send).toHaveBeenCalledTimes(1);
   });
 
+  it.each([
+    ['HTTP 500', { sent: false, reason: 'provider_error', httpStatus: 500 }],
+    ['HTTP 503', { sent: false, reason: 'provider_error', httpStatus: 503 }],
+    ['provider error with no status', { sent: false, reason: 'provider_error' }],
+    ['2xx reply that still reported failure', { sent: false, reason: 'provider_error', httpStatus: 200 }],
+    ['dev console after a 5xx', { sent: true, reason: 'dev_console', httpStatus: 502 }],
+  ])('%s is ambiguous (Mailtrap may have delivered it): never resent on a later run', async (_label, outcome) => {
+    addCompleter('e1', 5 * D);
+    mail.send.mockResolvedValueOnce(outcome);
+    expect(await run()).toMatchObject({ ok: false, failed: 1, ambiguous: 1 });
+    expect(db.ledger.get('e1')?.status).toBe('ambiguous');
+    const second = await run();
+    expect(second.candidates).toBe(0);
+    expect(mail.send).toHaveBeenCalledTimes(1);
+  });
+
+  it('classifies only 4xx, not-configured and plain dev-console as definite non-delivery', () => {
+    expect(isDefiniteNonDelivery({ sent: false, reason: 'provider_error', httpStatus: 400 })).toBe(true);
+    expect(isDefiniteNonDelivery({ sent: false, reason: 'provider_error', httpStatus: 429 })).toBe(true);
+    expect(isDefiniteNonDelivery({ sent: false, reason: 'provider_error', httpStatus: 499 })).toBe(true);
+    expect(isDefiniteNonDelivery({ sent: false, reason: 'provider_error', httpStatus: 500 })).toBe(false);
+    expect(isDefiniteNonDelivery({ sent: false, reason: 'not_configured' })).toBe(true);
+    expect(isDefiniteNonDelivery({ sent: true, reason: 'dev_console' })).toBe(true);
+    expect(isDefiniteNonDelivery({ sent: false, reason: 'send_failed' })).toBe(false);
+  });
+
   it('stops after 3 attempts', async () => {
     addCompleter('e1', 5 * D);
-    mail.send.mockResolvedValue({ sent: false, reason: 'provider_error' });
+    mail.send.mockResolvedValue({ sent: false, reason: 'provider_error', httpStatus: 422 });
     for (let i = 0; i < 3; i++) await run();
     const fourth = await run();
     expect(fourth.candidates).toBe(0);
@@ -544,6 +612,8 @@ describe('cron route makes failures visible to the scheduler (D9, D13)', () => {
     const saved = Object.fromEntries(ENV_KEYS.map((k) => [k, process.env[k]]));
     for (const k of ENV_KEYS) delete process.env[k];
     Object.assign(process.env, { CRON_SECRET: 'test-cron-value', DATABASE_URL: 'postgres://test' }, env);
+    // An empty DATABASE_URL in `env` means "no database configured".
+    if (env.DATABASE_URL === '') delete process.env.DATABASE_URL;
     try {
       const { GET } = await import('../../../app/api/cron/review-requests/route');
       const res = await GET(
@@ -565,6 +635,18 @@ describe('cron route makes failures visible to the scheduler (D9, D13)', () => {
     const r = await callRoute({});
     expect(r.status).toBe(200);
     expect(r.body).toMatchObject({ reason: 'disabled', sent: 0 });
+  });
+
+  it('flag on but no database → 503, never a silent success', async () => {
+    const r = await callRoute({ DATABASE_URL: '', REVIEW_REQUEST_EMAILS_ENABLED: 'true', REVIEW_REQUEST_EMAILS_SINCE: '2026-09-01' });
+    expect(r.status).toBe(503);
+    expect(r.body).toMatchObject({ ok: false, reason: 'no_database' });
+  });
+
+  it('flag off and no database → 200 with reason "disabled"', async () => {
+    const r = await callRoute({ DATABASE_URL: '' });
+    expect(r.status).toBe(200);
+    expect(r.body).toMatchObject({ ok: true, reason: 'disabled' });
   });
 
   it('a failed send → 500, so `curl -fsS` fails the scheduled job', async () => {

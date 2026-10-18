@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { requireCron } from '@/lib/server/cron-auth';
-import { runReviewRequestEmails } from '@/lib/server/review-request-email';
+import { readReviewRequestConfig, runReviewRequestEmails } from '@/lib/server/review-request-email';
 
 /**
  * Review-request emails (spec 2026-10-18 D9-D12). DORMANT: sends nothing unless
@@ -18,7 +18,12 @@ export async function GET(request: Request) {
   const denied = requireCron(request);
   if (denied) return denied;
   if (!process.env.DATABASE_URL?.trim()) {
-    return NextResponse.json({ ok: true, sent: 0, reason: 'no_database' });
+    // Off: an explicit, successful no-op. On but no database: nobody can be evaluated or emailed,
+    // so fail loudly (503) instead of letting a scheduler's `curl -fsS` record a success.
+    const config = readReviewRequestConfig(process.env);
+    return config.enabled
+      ? NextResponse.json({ ok: false, sent: 0, reason: 'no_database' }, { status: 503 })
+      : NextResponse.json({ ok: true, sent: 0, reason: config.reason });
   }
 
   const now = new Date();

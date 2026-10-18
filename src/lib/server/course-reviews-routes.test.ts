@@ -169,6 +169,16 @@ describe('GET /reviews — ask and Google link are rating-independent, moderatio
     expect(body.reviewer_display_name).toBe('Sam');
   });
 
+  it('a completer of an onboarding programme flagged only by its meta brand is not asked', async () => {
+    const { ONBOARDING_BRAND } = await import('@/lib/onboarding/enterprise');
+    mocks.courseFind.mockResolvedValue({ ...COURSE, meta: { brand: ONBOARDING_BRAND } });
+    mocks.claims.mockResolvedValue({ sub: 'learner-1', role: 'student' });
+    mocks.enrolmentFind.mockResolvedValue({ status: 'completed', completedAt: new Date('2026-10-01') });
+    mocks.reviewFindUnique.mockResolvedValue(null);
+    const body = await (await getReviews()).json();
+    expect(body.review_ask).toBe(false);
+  });
+
   it('a learner who has reviewed (even if that review is hidden) is not asked again', async () => {
     mocks.claims.mockResolvedValue({ sub: 'learner-1', role: 'student' });
     mocks.enrolmentFind.mockResolvedValue({ status: 'completed', completedAt: new Date('2026-10-01') });
@@ -211,7 +221,7 @@ describe('GET /reviews — ask and Google link are rating-independent, moderatio
     mocks.reviewFindMany.mockResolvedValue([
       { id: 'r1', rating: 1, title: 'New text', body: 'edited', reply: null, repliedAt: null, isPublished: false,
         createdAt: new Date('2026-10-02'), student: { fullName: 'Jo' },
-        moderationEvents: [{ action: 'hide', reason: 'offensive', contentSha256: reviewContentSha256('Old', 'old'),
+        moderationEvents: [{ action: 'hide', reason: 'offensive', contentSha256: reviewContentSha256('Old', 'old'), ratingAtAction: 1,
           createdAt: new Date('2026-10-03T00:00:00.000Z') }] },
       { id: 'r2', rating: 2, title: null, body: null, reply: null, repliedAt: null, isPublished: false,
         createdAt: new Date('2026-09-01'), student: { fullName: 'Al' }, moderationEvents: [] },

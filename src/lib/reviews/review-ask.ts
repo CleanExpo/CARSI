@@ -62,6 +62,16 @@ export function isReviewAskEligible(enrolment: ReviewAskEnrolment): boolean {
   return !Number.isNaN(at.getTime());
 }
 
+/**
+ * Whether the course player mounts the review ask. Deliberately takes no lesson-progress input:
+ * the player's lesson flags can disagree with the enrolment (a completed course whose curriculum
+ * later gained a lesson), and eligibility is the server's `review_ask` (D5). Internal onboarding
+ * programmes are never asked.
+ */
+export function shouldMountPlayerReviewAsk(input: { isOnboardingProgram: boolean }): boolean {
+  return !input.isOnboardingProgram;
+}
+
 /** Ask once: an eligible completer who has not reviewed yet (a hidden review still counts as reviewed). */
 export function shouldShowReviewAsk(input: { eligible: boolean; hasOwnReview: boolean }): boolean {
   return input.eligible && !input.hasOwnReview;
