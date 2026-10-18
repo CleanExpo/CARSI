@@ -48,5 +48,7 @@ describe('MembershipHexHero', () => {
     expect(container.textContent).toContain('$795 AUD a year');
     // The interaction hint only appears when the floor is actually animating.
     expect(container.textContent).not.toContain('Move across the floor');
+    // Nothing moves, so there is no pause control to offer.
+    expect(container.querySelector('button')).toBeNull();
   });
 });

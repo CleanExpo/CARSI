@@ -4,36 +4,55 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 
 import { HEX_COURSE_IMAGES } from './hex-geometry';
-import { createHexRenderer, type HexState } from './hex-renderer';
+import { createHexRenderer, type HexRenderer, type HexState } from './hex-renderer';
 
 type HeroState = 'pending' | HexState;
 
 /**
  * Entry hero for the yearly membership: a floor of hexagonal tiles, each one a course in the
  * CARSI library, that lifts into full colour wherever the visitor moves. The text stays real
- * HTML above the canvas so it is always crisp, readable and accessible.
+ * HTML above the canvas so it is always crisp, readable and accessible. Motion can be paused at
+ * any time (WCAG 2.2.2) and stops at once when the visitor turns on reduced motion.
  */
 export function MembershipHexHero({ price }: { price: number }) {
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const rendererRef = useRef<HexRenderer | null>(null);
+  const motionRef = useRef({ userPaused: false, reducedMotion: false });
   const [state, setState] = useState<HeroState>('pending');
 
   useEffect(() => {
     const section = sectionRef.current;
     const canvas = canvasRef.current;
     if (!section || !canvas) return;
-    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    const query = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+    motionRef.current = { ...motionRef.current, reducedMotion: query?.matches ?? false };
     const renderer = createHexRenderer({
       canvas,
       pointerTarget: section,
       images: HEX_COURSE_IMAGES,
-      reducedMotion,
+      motion: motionRef.current,
       onState: setState,
     });
-    return () => renderer?.destroy();
+    rendererRef.current = renderer;
+    const onPreference = (e: MediaQueryListEvent) => {
+      motionRef.current = { ...motionRef.current, reducedMotion: e.matches };
+      renderer?.setMotion(motionRef.current);
+    };
+    query?.addEventListener?.('change', onPreference);
+    return () => {
+      query?.removeEventListener?.('change', onPreference);
+      rendererRef.current = null;
+      renderer?.destroy();
+    };
   }, []);
 
-  const drawn = state === 'running' || state === 'static';
+  const togglePause = () => {
+    motionRef.current = { ...motionRef.current, userPaused: !motionRef.current.userPaused };
+    rendererRef.current?.setMotion(motionRef.current);
+  };
+
+  const drawn = state === 'running' || state === 'paused' || state === 'static';
 
   return (
     <section
@@ -60,6 +79,17 @@ export function MembershipHexHero({ price }: { price: number }) {
         className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-28 bg-gradient-to-b from-transparent to-[#f6f8fb]"
       />
 
+      {state === 'running' || state === 'paused' ? (
+        <button
+          type="button"
+          onClick={togglePause}
+          className="absolute top-4 right-4 z-10 inline-flex min-h-11 items-center gap-2 rounded-full border border-white/25 bg-[#06101d]/75 px-4 text-xs font-semibold text-white backdrop-blur-sm transition hover:bg-[#0b2240] focus-visible:ring-2 focus-visible:ring-white focus-visible:outline-none"
+        >
+          <span aria-hidden="true">{state === 'paused' ? '▶' : '❚❚'}</span>
+          {state === 'paused' ? 'Play background motion' : 'Pause background motion'}
+        </button>
+      ) : null}
+
       <div className="pointer-events-none mx-auto flex min-h-[86vh] max-w-3xl flex-col items-center justify-center px-6 pt-24 pb-36 text-center">
         <span className="rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs font-semibold tracking-[0.18em] text-[#9ccbff] uppercase backdrop-blur-sm">
           CARSI Yearly Membership
@@ -80,7 +110,7 @@ export function MembershipHexHero({ price }: { price: number }) {
         <div className="pointer-events-auto mt-9 flex flex-col items-center gap-3 sm:flex-row">
           <a
             href="#membership-plan"
-            className="inline-flex min-h-11 items-center justify-center rounded-lg bg-[#2a85ec] px-6 py-3 text-sm font-semibold text-white shadow-[0_8px_30px_rgba(42,133,236,0.45)] transition hover:bg-[#1f74d6] focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#06101d] focus-visible:outline-none"
+            className="inline-flex min-h-11 items-center justify-center rounded-lg bg-[#146fc2] px-6 py-3 text-sm font-semibold text-white shadow-[0_8px_30px_rgba(42,133,236,0.45)] transition hover:bg-[#0f5fa8] focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#06101d] focus-visible:outline-none"
           >
             See the membership
           </a>

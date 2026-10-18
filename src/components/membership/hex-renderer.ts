@@ -1,23 +1,35 @@
 /**
  * WebGL2 renderer for the membership hex-floor hero.
  *
- * Every pixel casts a ray from a tilted camera into a floor of hexagonal prisms and walks the
- * hex grid cell by cell until it hits a tile top, a tile wall or the floor. Each tile top shows
- * a course thumbnail from a texture atlas. A small CPU flow field (pointer trail, fades over
- * about a second) is uploaded every frame; tiles inside it lift towards the viewer and switch
- * from a dim navy duotone to full colour. CARSI's own implementation, written for this page.
+ * The floor is a height field: every hexagonal tile is a solid column whose top height comes
+ * from an idle wave plus the visitor's pointer trail. Each pixel marches its camera ray through
+ * that field in short steps, asking only "is this point inside a tile?", then refines the first
+ * solid sample by bisection (the relief-mapping technique). Tile tops show course thumbnails from
+ * a texture atlas; tiles in the pointer trail lift and switch from a navy duotone to full colour.
+ * CARSI's own implementation, written for this page.
  */
 import { ATLAS_SLOT, atlasLayout, chooseHexMode, TILE_HASH } from './hex-geometry';
 
-export type HexState = 'running' | 'static' | 'fallback';
+/** running: animating · paused: the visitor paused it · static: reduced motion · fallback: no canvas. */
+export type HexState = 'running' | 'paused' | 'static' | 'fallback';
+
+export interface HexMotion {
+  userPaused: boolean;
+  reducedMotion: boolean;
+}
 
 export interface HexRendererOptions {
   canvas: HTMLCanvasElement;
   /** Element that receives pointer events (the hero section, so text and buttons still work). */
   pointerTarget: HTMLElement;
   images: readonly string[];
-  reducedMotion: boolean;
+  motion: HexMotion;
   onState: (state: HexState) => void;
+}
+
+export interface HexRenderer {
+  setMotion(motion: HexMotion): void;
+  destroy(): void;
 }
 
 const VERT = `#version 300 es
@@ -44,8 +56,8 @@ uniform vec2 uGrid;
 uniform float uCount;
 uniform float uAtlasReady;
 
-const float SQ3H = 0.8660254;
-const float APO = 0.465;     // tile apothem; 0.5 would close the seams
+const float ROW = 0.8660254;  // vertical spacing of tile rows (sqrt(3) / 2)
+const float APO = 0.465;      // tile apothem; centres are 1 apart, so 0.5 would close the seams
 const float FLOOR_Z = -0.55;
 const float LIFT = 0.42;
 const float TILT = 0.52;
@@ -53,8 +65,11 @@ const float FOCAL = 1.7;
 const vec3 NAVY = vec3(0.024, 0.063, 0.114);
 const vec3 WALL = vec3(0.055, 0.122, 0.224);
 const vec3 BLUE = vec3(0.165, 0.522, 0.925);
+const vec2 E0 = vec2(1.0, 0.0);
+const vec2 E1 = vec2(0.5, 0.8660254);
+const vec2 E2 = vec2(-0.5, 0.8660254);
 
-vec3 gF; vec3 gU; vec3 gR; vec3 gO; float gAspect;
+vec3 camF; vec3 camU; vec3 camR; vec3 camO; float aspect;
 
 uint tileHash(ivec2 a) {
   uint h = (uint(a.x) * ${TILE_HASH.a}u) ^ (uint(a.y) * ${TILE_HASH.b}u);
@@ -64,167 +79,123 @@ uint tileHash(ivec2 a) {
   return h;
 }
 
-vec2 normal(int k) {
-  return k == 0 ? vec2(1.0, 0.0) : (k == 1 ? vec2(0.5, SQ3H) : vec2(-0.5, SQ3H));
-}
-
-ivec2 axialStep(int k) {
-  return k == 0 ? ivec2(1, 0) : (k == 1 ? ivec2(0, 1) : ivec2(-1, 1));
-}
-
+// Axial cell of a world point, by cube rounding (same maths as hex-geometry.ts cellAt).
 ivec2 cellOf(vec2 p) {
-  float r = p.y / SQ3H;
+  float r = p.y / ROW;
   float q = p.x - 0.5 * r;
-  float s = -q - r;
-  float rq = floor(q + 0.5);
-  float rr = floor(r + 0.5);
-  float rs = floor(s + 0.5);
-  float dq = abs(rq - q);
-  float dr = abs(rr - r);
-  float ds = abs(rs - s);
-  if (dq > dr && dq > ds) rq = -rr - rs;
-  else if (dr > ds) rr = -rq - rs;
-  return ivec2(int(rq), int(rr));
+  vec3 cube = vec3(q, r, -q - r);
+  vec3 rounded = floor(cube + 0.5);
+  vec3 err = abs(rounded - cube);
+  if (err.x > err.y && err.x > err.z) rounded.x = -rounded.y - rounded.z;
+  else if (err.y > err.z) rounded.y = -rounded.x - rounded.z;
+  return ivec2(rounded.xy);
 }
 
 vec2 centreOf(ivec2 a) {
-  return vec2(float(a.x) + 0.5 * float(a.y), float(a.y) * SQ3H);
+  return vec2(float(a.x) + 0.5 * float(a.y), float(a.y) * ROW);
 }
 
-float hexDist(vec2 p) {
-  return max(abs(p.x), max(abs(dot(p, normal(1))), abs(dot(p, normal(2)))));
+// Distance from the tile centre to the hexagon edge along the worst of the three edge axes.
+float hexRadius(vec2 d) {
+  return max(abs(dot(d, E0)), max(abs(dot(d, E1)), abs(dot(d, E2))));
 }
 
-// Screen-space flow under a world point (the pointer trail lives in screen space).
-float flowAt(vec2 c) {
-  vec3 v = vec3(c, 0.0) - gO;
-  float z = dot(v, gF);
-  if (z <= 0.0) return 0.0;
-  vec2 s = vec2(dot(v, gR), dot(v, gU)) * FOCAL / z;
-  vec2 uv = vec2(s.x / gAspect, s.y) * 0.5 + 0.5;
-  if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) return 0.0;
+// The pointer trail lives in screen space: project the tile centre and read the flow there.
+float trailAt(vec2 c) {
+  vec3 v = vec3(c, 0.0) - camO;
+  float depth = dot(v, camF);
+  if (depth <= 0.0) return 0.0;
+  vec2 s = vec2(dot(v, camR), dot(v, camU)) * FOCAL / depth;
+  vec2 uv = vec2(s.x / aspect, s.y) * 0.5 + 0.5;
+  if (any(lessThan(uv, vec2(0.0))) || any(greaterThan(uv, vec2(1.0)))) return 0.0;
   return texture(uFlow, uv).r;
 }
 
-float tileTop(vec2 c, uint h, float lift) {
-  float phase = float(h & 1023u) / 1023.0 * 6.2831853;
-  float idle = 0.045 * sin(uTime * 0.7 + phase) + 0.05 * sin(dot(c, vec2(0.33, 0.21)) - uTime * 0.85);
-  return mix(idle, LIFT, lift);
+struct Tile { ivec2 ax; vec2 centre; uint hash; float lift; float top; };
+
+Tile tileAt(vec2 p) {
+  Tile t;
+  t.ax = cellOf(p);
+  t.centre = centreOf(t.ax);
+  t.hash = tileHash(t.ax);
+  t.lift = smoothstep(0.06, 0.85, trailAt(t.centre));
+  float phase = float(t.hash & 1023u) / 1023.0 * 6.2831853;
+  float idle = 0.045 * sin(uTime * 0.7 + phase)
+             + 0.05 * sin(dot(t.centre, vec2(0.33, 0.21)) - uTime * 0.85);
+  t.top = mix(idle, LIFT, t.lift);
+  return t;
 }
 
-vec3 courseImage(vec2 local, uint h) {
-  vec2 uv = clamp(local / (2.0 * APO / SQ3H) + 0.5, 0.0, 1.0);
+bool solid(vec3 p) {
+  Tile t = tileAt(p.xy);
+  return p.z <= t.top && hexRadius(p.xy - t.centre) <= APO;
+}
+
+vec3 courseImage(vec2 d, uint h) {
+  vec2 uv = clamp(d / (2.0 * APO / ROW) + 0.5, 0.0, 1.0);
   float idx = float(h % uint(uCount));
-  float col = mod(idx, uGrid.x);
-  float row = floor(idx / uGrid.x);
+  vec2 slot = vec2(mod(idx, uGrid.x), floor(idx / uGrid.x));
   vec2 inSlot = 0.03 + 0.94 * vec2(uv.x, 1.0 - uv.y);
-  vec3 img = texture(uAtlas, (vec2(col, row) + inSlot) / uGrid).rgb;
-  vec3 placeholder = mix(WALL, BLUE * 0.6, uv.y);
-  return mix(placeholder, img, uAtlasReady);
+  vec3 img = texture(uAtlas, (slot + inSlot) / uGrid).rgb;
+  return mix(mix(WALL, BLUE * 0.6, uv.y), img, uAtlasReady);
 }
 
 void main() {
-  gAspect = uRes.x / uRes.y;
-  vec2 ndc = vec2((vUv.x * 2.0 - 1.0) * gAspect, vUv.y * 2.0 - 1.0);
-  float halfH = 0.5 * uRes.y / uCell;
-  gF = vec3(0.0, sin(TILT), -cos(TILT));
-  gU = vec3(0.0, cos(TILT), sin(TILT));
-  gR = vec3(1.0, 0.0, 0.0);
-  gO = vec3(uPan, 0.0) - gF * halfH * FOCAL;
-  vec3 rd = normalize(gF * FOCAL + gR * ndc.x + gU * ndc.y);
+  aspect = uRes.x / uRes.y;
+  vec2 ndc = vec2((vUv.x * 2.0 - 1.0) * aspect, vUv.y * 2.0 - 1.0);
+  camF = vec3(0.0, sin(TILT), -cos(TILT));
+  camU = vec3(0.0, cos(TILT), sin(TILT));
+  camR = vec3(1.0, 0.0, 0.0);
+  camO = vec3(uPan, 0.0) - camF * (0.5 * uRes.y / uCell) * FOCAL;
+  vec3 dir = normalize(camF * FOCAL + camR * ndc.x + camU * ndc.y);
 
-  float hMax = LIFT + 0.12;
-  float t0 = (hMax - gO.z) / rd.z;
-  float tFloor = (FLOOR_Z - gO.z) / rd.z;
-  vec3 p0 = gO + rd * t0;
-  ivec2 ax = cellOf(p0.xy);
-  vec2 c = centreOf(ax);
-
-  bool hit = false;
-  bool onTop = false;
-  float tHit = tFloor;
-  vec3 n = vec3(0.0, 0.0, 1.0);
-  float lift = 0.0;
-  float top = 0.0;
-  uint hHit = 0u;
-
-  for (int i = 0; i < 40; i++) {
-    uint h = tileHash(ax);
-    float f = flowAt(c);
-    float l = smoothstep(0.06, 0.85, f);
-    float tz = tileTop(c, h, l);
-
-    float tIn = -1.0e9;
-    float tOut = 1.0e9;
-    vec2 nIn = vec2(0.0);
-    bool miss = false;
-    for (int k = 0; k < 3; k++) {
-      vec2 nk = normal(k);
-      float d = dot(rd.xy, nk);
-      float o = dot(gO.xy - c, nk);
-      if (abs(d) < 1.0e-6) {
-        if (abs(o) > APO) miss = true;
-        continue;
-      }
-      float ta = (-APO - o) / d;
-      float tb = (APO - o) / d;
-      float lo = min(ta, tb);
-      if (lo > tIn) { tIn = lo; nIn = -sign(d) * nk; }
-      tOut = min(tOut, max(ta, tb));
-    }
-    float tTop = (tz - gO.z) / rd.z;
-    float enter = max(tIn, tTop);
-    if (!miss && enter <= min(tOut, tFloor)) {
-      hit = true;
-      onTop = tTop >= tIn;
-      tHit = enter;
-      n = onTop ? vec3(0.0, 0.0, 1.0) : vec3(nIn, 0.0);
-      lift = l;
-      top = tz;
-      hHit = h;
-      break;
-    }
-
-    float tExit = 1.0e9;
-    int kExit = -1;
-    float sExit = 0.0;
-    for (int k = 0; k < 3; k++) {
-      vec2 nk = normal(k);
-      float d = dot(rd.xy, nk);
-      if (abs(d) < 1.0e-6) continue;
-      float te = (0.5 * sign(d) - dot(gO.xy - c, nk)) / d;
-      if (te < tExit) { tExit = te; kExit = k; sExit = sign(d); }
-    }
-    if (kExit < 0 || tExit >= tFloor) break;
-    c += sExit * normal(kExit);
-    ax += int(sExit) * axialStep(kExit);
+  // March from just above the highest possible tile down to the floor.
+  float tStart = (LIFT + 0.12 - camO.z) / dir.z;
+  float tEnd = (FLOOR_Z - camO.z) / dir.z;
+  float stride = min(0.18 / max(length(dir.xy), 1.0e-3), 0.07 / abs(dir.z));
+  float lo = tStart;
+  float hi = tEnd;
+  bool found = false;
+  for (int i = 0; i < 64; i++) {
+    float t = min(lo + stride, tEnd);
+    if (solid(camO + dir * t)) { hi = t; found = true; break; }
+    if (t >= tEnd) break;
+    lo = t;
   }
 
-  vec3 col;
-  vec3 light = normalize(vec3(-0.35, 0.45, 0.82));
-  if (!hit) {
-    col = NAVY * 0.55;
-  } else {
-    vec3 p = gO + rd * tHit;
-    vec2 local = p.xy - centreOf(ax);
-    if (onTop) {
-      vec3 img = courseImage(local, hHit);
+  vec3 col = NAVY * 0.55;
+  if (found) {
+    for (int i = 0; i < 8; i++) {
+      float mid = 0.5 * (lo + hi);
+      if (solid(camO + dir * mid)) hi = mid; else lo = mid;
+    }
+    vec3 p = camO + dir * hi;
+    Tile tile = tileAt(p.xy);
+    vec2 d = p.xy - tile.centre;
+    float belowTop = tile.top - p.z;
+    float insideEdge = APO - hexRadius(d);
+    vec3 light = normalize(vec3(-0.35, 0.45, 0.82));
+    if (belowTop <= insideEdge) {
+      vec3 img = courseImage(d, tile.hash);
       float lum = dot(img, vec3(0.299, 0.587, 0.114));
       vec3 duo = mix(NAVY * 1.4, BLUE * 0.9, lum) * 0.62;
-      col = mix(duo, img * 1.06, lift);
-      col *= 0.9 + 0.22 * clamp(top / LIFT, -0.3, 1.0);
-      float rim = 1.0 - smoothstep(0.0, 0.03, APO - hexDist(local));
-      col += BLUE * rim * (0.22 + 0.55 * lift);
-      vec3 refl = reflect(rd, n);
-      col += vec3(0.85, 0.92, 1.0) * pow(max(dot(refl, light), 0.0), 60.0) * 0.18 * (1.0 - lift);
+      col = mix(duo, img * 1.06, tile.lift);
+      col *= 0.9 + 0.22 * clamp(tile.top / LIFT, -0.3, 1.0);
+      col += BLUE * (1.0 - smoothstep(0.0, 0.03, insideEdge)) * (0.22 + 0.55 * tile.lift);
+      vec3 refl = reflect(dir, vec3(0.0, 0.0, 1.0));
+      col += vec3(0.85, 0.92, 1.0) * pow(max(dot(refl, light), 0.0), 60.0) * 0.18 * (1.0 - tile.lift);
     } else {
-      float diff = max(dot(n, light), 0.0);
-      float ao = clamp((p.z - FLOOR_Z) / max(top - FLOOR_Z, 0.01), 0.0, 1.0);
-      col = WALL * (0.35 + 0.75 * diff) * (0.45 + 0.55 * ao) + BLUE * 0.18 * lift;
+      float a0 = dot(d, E0);
+      float a1 = dot(d, E1);
+      float a2 = dot(d, E2);
+      vec2 side = abs(a0) >= abs(a1) && abs(a0) >= abs(a2) ? E0 * sign(a0)
+                : (abs(a1) >= abs(a2) ? E1 * sign(a1) : E2 * sign(a2));
+      float diff = max(dot(vec3(side, 0.0), light), 0.0);
+      float ao = clamp((p.z - FLOOR_Z) / max(tile.top - FLOOR_Z, 0.01), 0.0, 1.0);
+      col = WALL * (0.35 + 0.75 * diff) * (0.45 + 0.55 * ao) + BLUE * 0.18 * tile.lift;
     }
   }
-  float far = smoothstep(0.15, 1.0, vUv.y);
-  col = mix(col, NAVY * 0.7, far * 0.45);
+  col = mix(col, NAVY * 0.7, smoothstep(0.15, 1.0, vUv.y) * 0.45);
   outColor = vec4(col, 1.0);
 }`;
 
@@ -243,9 +214,15 @@ function compile(gl: WebGL2RenderingContext, type: number, src: string): WebGLSh
   return s;
 }
 
+function stateFor(m: HexMotion): Exclude<HexState, 'fallback'> {
+  if (m.reducedMotion) return 'static';
+  return m.userPaused ? 'paused' : 'running';
+}
+
 /** Start the hero. Returns null (after reporting 'fallback') when WebGL2 or the shader fails. */
-export function createHexRenderer(opts: HexRendererOptions): { destroy(): void } | null {
-  const { canvas, pointerTarget, images, reducedMotion, onState } = opts;
+export function createHexRenderer(opts: HexRendererOptions): HexRenderer | null {
+  const { canvas, pointerTarget, images, onState } = opts;
+  let motion = opts.motion;
   const gl = canvas.getContext?.('webgl2', {
     alpha: false,
     antialias: false,
@@ -259,7 +236,7 @@ export function createHexRenderer(opts: HexRendererOptions): { destroy(): void }
     onState('fallback');
     return null;
   };
-  const mode = chooseHexMode({ webgl2: !!gl, reducedMotion });
+  const mode = chooseHexMode({ webgl2: !!gl, reducedMotion: motion.reducedMotion });
   if (!gl || mode === 'fallback') return fallback('no-webgl2');
 
   const vs = compile(gl, gl.VERTEX_SHADER, VERT);
@@ -303,7 +280,7 @@ export function createHexRenderer(opts: HexRendererOptions): { destroy(): void }
     return t;
   }
 
-  // Flow field: CPU grid, row 0 at the bottom of the screen (matches vUv).
+  // Pointer trail: CPU grid, row 0 at the bottom of the screen (matches vUv).
   const flow = new Float32Array(FLOW_W * FLOW_H);
   const scratch = new Float32Array(FLOW_W * FLOW_H);
   const flowBytes = new Uint8Array(FLOW_W * FLOW_H);
@@ -335,6 +312,8 @@ export function createHexRenderer(opts: HexRendererOptions): { destroy(): void }
   images.forEach((src, i) => {
     const img = new Image();
     img.decoding = 'async';
+    const x = (i % cols) * ATLAS_SLOT;
+    const y = Math.floor(i / cols) * ATLAS_SLOT;
     const done = () => {
       settled += 1;
       if (settled === images.length && !destroyed && actx) {
@@ -342,7 +321,7 @@ export function createHexRenderer(opts: HexRendererOptions): { destroy(): void }
         gl.bindTexture(gl.TEXTURE_2D, atlasTex);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, atlas);
         atlasReady = 1;
-        if (mode === 'static') draw(0);
+        if (stateFor(motion) !== 'running') draw();
       }
     };
     img.onload = () => {
@@ -350,36 +329,21 @@ export function createHexRenderer(opts: HexRendererOptions): { destroy(): void }
         const s = Math.min(img.naturalWidth, img.naturalHeight);
         const sx = (img.naturalWidth - s) / 2;
         const sy = (img.naturalHeight - s) / 2;
-        actx.drawImage(
-          img,
-          sx,
-          sy,
-          s,
-          s,
-          (i % cols) * ATLAS_SLOT,
-          Math.floor(i / cols) * ATLAS_SLOT,
-          ATLAS_SLOT,
-          ATLAS_SLOT
-        );
+        actx.drawImage(img, sx, sy, s, s, x, y, ATLAS_SLOT, ATLAS_SLOT);
       }
       done();
     };
     img.onerror = () => {
       if (actx) {
         actx.fillStyle = '#0e2a4d';
-        actx.fillRect(
-          (i % cols) * ATLAS_SLOT,
-          Math.floor(i / cols) * ATLAS_SLOT,
-          ATLAS_SLOT,
-          ATLAS_SLOT
-        );
+        actx.fillRect(x, y, ATLAS_SLOT, ATLAS_SLOT);
       }
       done();
     };
     img.src = src;
   });
 
-  // Pointer → flow splats (CSS pixels relative to the canvas).
+  // Pointer → trail splats (CSS pixels relative to the canvas).
   let pointer: { x: number; y: number } | null = null;
   let last: { x: number; y: number } | null = null;
   let lastInput = -1e9;
@@ -392,10 +356,8 @@ export function createHexRenderer(opts: HexRendererOptions): { destroy(): void }
     pointer = null;
     last = null;
   };
-  if (mode === 'animate') {
-    pointerTarget.addEventListener('pointermove', onMove, { passive: true });
-    pointerTarget.addEventListener('pointerleave', onLeave);
-  }
+  pointerTarget.addEventListener('pointermove', onMove, { passive: true });
+  pointerTarget.addEventListener('pointerleave', onLeave);
 
   function splat(x: number, y: number, strength: number) {
     const w = canvas.clientWidth || 1;
@@ -462,10 +424,8 @@ export function createHexRenderer(opts: HexRendererOptions): { destroy(): void }
 
   function resize() {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const scale = Math.min(
-      dpr,
-      Math.sqrt(2_400_000 / Math.max(1, canvas.clientWidth * canvas.clientHeight))
-    );
+    const budget = Math.sqrt(2_400_000 / Math.max(1, canvas.clientWidth * canvas.clientHeight));
+    const scale = Math.min(dpr, budget);
     const w = Math.max(1, Math.round(canvas.clientWidth * scale));
     const h = Math.max(1, Math.round(canvas.clientHeight * scale));
     if (canvas.width !== w || canvas.height !== h) {
@@ -475,18 +435,19 @@ export function createHexRenderer(opts: HexRendererOptions): { destroy(): void }
     return scale;
   }
 
+  // Scene clock: advances only while running, so pausing freezes the floor exactly where it is.
+  let clock = 0;
   let frames = 0;
-  const start = performance.now();
-  function draw(now: number) {
+  function draw() {
+    if (destroyed) return;
     const scale = resize();
-    const t = mode === 'static' ? 4 : (now - start) / 1000;
     const cssCell = Math.min(150, Math.max(78, canvas.clientWidth / 10));
     gl!.viewport(0, 0, canvas.width, canvas.height);
     gl!.useProgram(program);
     gl!.uniform2f(uni.res, canvas.width, canvas.height);
-    gl!.uniform1f(uni.time, t);
+    gl!.uniform1f(uni.time, clock);
     gl!.uniform1f(uni.cell, cssCell * scale);
-    gl!.uniform2f(uni.pan, t * 0.11, t * 0.045);
+    gl!.uniform2f(uni.pan, clock * 0.11, clock * 0.045);
     gl!.uniform1i(uni.flow, 0);
     gl!.uniform1i(uni.atlas, 1);
     gl!.uniform2f(uni.grid, cols, rows);
@@ -495,8 +456,8 @@ export function createHexRenderer(opts: HexRendererOptions): { destroy(): void }
     gl!.bindVertexArray(vao);
     gl!.drawArrays(gl!.TRIANGLES, 0, 3);
     frames += 1;
-    if (frames % 10 === 0 || mode === 'static') {
-      canvas.dataset.hexFrames = String(frames);
+    canvas.dataset.hexFrames = String(frames);
+    if (frames % 10 === 0 || stateFor(motion) !== 'running') {
       let sum = 0;
       for (let k = 0; k < flow.length; k++) sum += flow[k];
       canvas.dataset.hexFlow = sum.toFixed(1);
@@ -505,21 +466,21 @@ export function createHexRenderer(opts: HexRendererOptions): { destroy(): void }
 
   let raf = 0;
   let visible = true;
-  let prev = performance.now();
+  let prev = 0;
   function loop(now: number) {
     raf = 0;
-    if (destroyed) return;
+    if (destroyed || stateFor(motion) !== 'running') return;
     const dt = Math.min(0.05, (now - prev) / 1000);
     prev = now;
+    clock += dt;
     stepFlow(dt, now);
-    draw(now);
+    draw();
     schedule();
   }
   function schedule() {
-    if (!raf && visible && !document.hidden && mode === 'animate' && !destroyed) {
-      prev = performance.now();
-      raf = requestAnimationFrame(loop);
-    }
+    if (raf || destroyed || !visible || document.hidden || stateFor(motion) !== 'running') return;
+    prev = performance.now();
+    raf = requestAnimationFrame(loop);
   }
 
   const io = new IntersectionObserver(([entry]) => {
@@ -530,25 +491,34 @@ export function createHexRenderer(opts: HexRendererOptions): { destroy(): void }
   const onVisibility = () => schedule();
   document.addEventListener('visibilitychange', onVisibility);
   const ro = new ResizeObserver(() => {
-    if (mode === 'static') draw(0);
+    if (stateFor(motion) !== 'running') draw();
   });
   ro.observe(canvas);
   const onLost = (e: Event) => {
     e.preventDefault();
     destroyed = true;
-    onState('fallback');
+    fallback('context-lost');
   };
   canvas.addEventListener('webglcontextlost', onLost);
 
-  if (mode === 'static') {
-    draw(0);
-    onState('static');
-  } else {
-    onState('running');
+  function apply() {
+    const state = stateFor(motion);
+    if (state !== 'running') {
+      if (raf) cancelAnimationFrame(raf);
+      raf = 0;
+      draw();
+    }
+    onState(state);
     schedule();
   }
+  apply();
 
   return {
+    setMotion(next) {
+      if (destroyed) return;
+      motion = next;
+      apply();
+    },
     destroy() {
       destroyed = true;
       if (raf) cancelAnimationFrame(raf);
