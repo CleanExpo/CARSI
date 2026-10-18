@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   keywords: [
     'education restoration training',
     'school restoration training',
-    'university maintenance IICRC',
+    'university maintenance restoration training',
     'education mould remediation Australia',
   ],
 };

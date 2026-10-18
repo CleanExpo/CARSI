@@ -1,18 +1,11 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import {
-  Calculator,
-  GraduationCap,
-  Clock,
-  BookOpen,
-  Award,
-  ChevronRight,
-  Info,
-} from 'lucide-react';
+import { Calculator, GraduationCap, BookOpen, Award, ChevronRight, Info } from 'lucide-react';
 import Link from 'next/link';
 
 import { IICRC_DISCIPLINE_LONG } from '@/lib/iicrc-discipline-display';
+import { getCecApprovalEntries, isCecApprovalCurrent } from '@/lib/seed/cec-approvals';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -42,7 +35,6 @@ interface DisciplineInfo {
    */
   cecsPerCycle: Record<CertLevel, number>;
   cycleLengthYears: number;
-  avgCecsPerCourse: number;
 }
 
 export const DISCIPLINES: DisciplineInfo[] = [
@@ -52,7 +44,6 @@ export const DISCIPLINES: DisciplineInfo[] = [
     description: 'Flood damage, burst pipes, storm recovery',
     cecsPerCycle: { none: 0, technician: 14, master: 14 },
     cycleLengthYears: 4,
-    avgCecsPerCourse: 3,
   },
   {
     code: 'CRT',
@@ -61,7 +52,6 @@ export const DISCIPLINES: DisciplineInfo[] = [
       'Carpet colour correction (an IICRC certification; CARSI sells no colour-repair course)',
     cecsPerCycle: { none: 0, technician: 14, master: 14 },
     cycleLengthYears: 4,
-    avgCecsPerCourse: 3,
   },
   {
     code: 'ASD',
@@ -69,7 +59,6 @@ export const DISCIPLINES: DisciplineInfo[] = [
     description: 'Advanced moisture control for structural elements',
     cecsPerCycle: { none: 0, technician: 14, master: 14 },
     cycleLengthYears: 4,
-    avgCecsPerCourse: 3,
   },
   {
     code: 'AMRT',
@@ -77,7 +66,6 @@ export const DISCIPLINES: DisciplineInfo[] = [
     description: 'Mould assessment and remediation',
     cecsPerCycle: { none: 0, technician: 14, master: 14 },
     cycleLengthYears: 4,
-    avgCecsPerCourse: 3,
   },
   {
     code: 'FSRT',
@@ -85,7 +73,6 @@ export const DISCIPLINES: DisciplineInfo[] = [
     description: 'Post-fire cleanup and deodorisation',
     cecsPerCycle: { none: 0, technician: 14, master: 14 },
     cycleLengthYears: 4,
-    avgCecsPerCourse: 3,
   },
   {
     code: 'OCT',
@@ -93,7 +80,6 @@ export const DISCIPLINES: DisciplineInfo[] = [
     description: 'Identifying and neutralising odour sources',
     cecsPerCycle: { none: 0, technician: 14, master: 14 },
     cycleLengthYears: 4,
-    avgCecsPerCourse: 3,
   },
   {
     code: 'CCT',
@@ -101,7 +87,6 @@ export const DISCIPLINES: DisciplineInfo[] = [
     description: 'Carpet cleaning in homes and commercial premises',
     cecsPerCycle: { none: 0, technician: 14, master: 14 },
     cycleLengthYears: 4,
-    avgCecsPerCourse: 2,
   },
 ];
 
@@ -119,6 +104,30 @@ export const CERT_LEVELS: { value: CertLevel; label: string; description: string
    CEC Calculator Component
    ---------------------------------------- */
 
+/**
+ * How many CARSI courses with an IICRC CEC approval in force now it takes to reach `remaining`
+ * CECs, counting the largest approvals first. Read from data/seed/cec-approvals.json each time
+ * the calculator works it out, so a lapsed approval stops counting. `enough` is false when every
+ * current approval together falls short; `approvedCourses` is how many approvals are current.
+ */
+export function approvedCoursesNeeded(
+  remaining: number,
+  now: Date = new Date()
+): { courses: number; enough: boolean; approvedCourses: number } {
+  const hours = getCecApprovalEntries()
+    .filter((e) => isCecApprovalCurrent(e, now))
+    .map((e) => e.approvedHours as number)
+    .sort((a, b) => b - a);
+  let total = 0;
+  let courses = 0;
+  for (const h of hours) {
+    if (total >= remaining) break;
+    total += h;
+    courses += 1;
+  }
+  return { courses, enough: total >= remaining, approvedCourses: hours.length };
+}
+
 export function CECCalculator() {
   const [discipline, setDiscipline] = useState<Discipline | ''>('');
   const [certLevel, setCertLevel] = useState<CertLevel | ''>('');
@@ -132,16 +141,15 @@ export function CECCalculator() {
 
     const required = disc.cecsPerCycle[certLevel];
     const remaining = Math.max(0, required - cecsEarned);
-    const coursesNeeded = remaining > 0 ? Math.ceil(remaining / disc.avgCecsPerCourse) : 0;
-    // Estimate ~2 hours per CEC of course content
-    const estimatedHours = remaining * 2;
+    const approved = approvedCoursesNeeded(remaining);
 
     return {
       discipline: disc,
       required,
       remaining,
-      coursesNeeded,
-      estimatedHours,
+      coursesNeeded: approved.courses,
+      enoughApproved: approved.enough,
+      approvedCourses: approved.approvedCourses,
       isComplete: remaining === 0 && certLevel !== 'none',
       progress: required > 0 ? Math.min(100, Math.round((cecsEarned / required) * 100)) : 0,
     };
@@ -338,7 +346,7 @@ export function CECCalculator() {
               </div>
 
               {/* Stats row */}
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 <div className="rounded-lg p-3 text-center" style={{ background: '#eef7ff' }}>
                   <p className="text-lg font-bold" style={{ color: '#0f5fa8' }}>
                     {result.remaining}
@@ -352,18 +360,11 @@ export function CECCalculator() {
                   <p className="text-lg font-bold" style={{ color: '#ed9d24' }}>
                     {result.coursesNeeded}
                   </p>
-                  <p className="text-xs text-slate-600">courses approx.</p>
-                </div>
-                <div className="rounded-lg p-3 text-center" style={{ background: '#f1f5f9' }}>
-                  <div className="flex items-center justify-center gap-1">
-                    <Clock
-                      className="h-3.5 w-3.5"
-                      style={{ color: '#64748b' }}
-                      aria-hidden="true"
-                    />
-                    <p className="text-lg font-bold text-slate-900">{result.estimatedHours}h</p>
-                  </div>
-                  <p className="text-xs text-slate-600">est. study time</p>
+                  <p className="text-xs text-slate-600">
+                    {result.enoughApproved
+                      ? 'CARSI courses with a current IICRC approval'
+                      : `more than the ${result.approvedCourses} CARSI courses with a current IICRC approval provide`}
+                  </p>
                 </div>
               </div>
 

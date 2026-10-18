@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Construction Restoration Training',
   description:
-    'IICRC water damage and mould management training for Australian construction sites. Water damage restoration, structural drying and mould remediation courses supporting NCC compliance.',
+    'Water damage and mould management training for Australian construction sites. Water damage restoration, structural drying and mould remediation courses supporting NCC compliance.',
   keywords: [
     'construction restoration training',
     'building site mould management',

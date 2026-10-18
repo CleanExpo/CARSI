@@ -98,7 +98,7 @@ space:
 > switch arcs, there is nothing at floor level to ignite. Make it step one of every vehicle job, on the
 > Appendix D sheet, before a hose comes off the van.
 
-## Which Add-On Needs Which CARSI/IICRC Credential
+## Which IICRC Certification Covers Each Add-On (held separately, from IICRC-approved schools)
 
 Add-ons are also your **CE pathway in disguise** (Appendix G). Each credential unlocks a service you can
 charge for on a visit you are already making:

@@ -8,7 +8,7 @@ end-of-module quiz — and to the same standard.
 **Standards this content is held to** (see `.claude/skills/carsi-course-production`):
 - **Australian-produced** — AU English, 230 V / 10 A / 15 A, metric, AU products (via CCW), AS/NZS &
   Safe Work Australia framing.
-- **IICRC CEC terminology** — CARSI is an **IICRC-approved CEC provider**; content is discipline-*aligned*
+- **IICRC CEC terminology** — CARSI is an **IICRC CEC Accredited provider**; content is subject-based
   CE, never "IICRC certification".
 - **Prove-it-or-cut-it** — every factual/marketing claim is sourced or labelled professional judgement.
 
@@ -19,7 +19,7 @@ end-of-module quiz — and to the same standard.
 | `09-machine-maintenance-schedules.md` | Module 9 (Machinery Maintenance) | Machine-specific schedules for the **real CCW range** (Razorback portables; Sapphire & HydraMaster truck-mounts) across **six intervals** — Daily · Weekly · Monthly · Quarterly · Half-Year · End-of-Year — plus hours-based triggers, a machine-log template, new nuggets and a quiz. |
 | `12-advanced-stain-removal.md` | Module 5 (Spot & Stain) | The escalation-ladder chemistry, a problem-stain playbook (red dye, aged urine, rust, turmeric, ink, wax, bleach spots…), the Australian spill profile, tips, nuggets, quiz. |
 | `13-strip-and-seal.md` | Module 8 (Hard Floors) | The strip-and-seal discipline for resilient floors — nine-step sequence, chemistry, asbestos-risk stop rule, safety, pricing, quiz. |
-| `14-add-on-services.md` | Module 10 (Business) | The one-visit margin maths and a full add-on menu mapped to CARSI/IICRC credentials, the honest-offer script, KPIs, quiz. |
+| `14-add-on-services.md` | Module 10 (Business) | The one-visit margin maths and a full add-on menu mapped to CARSI credentials and the IICRC certifications a technician may already hold, the honest-offer script, KPIs, quiz. |
 | `15-marketing-engine.md` | Module 10 (Business) | The **YouTube → Social → Local-discovery** system with **sourced 2026 data**, the connect-your-channels wiring, content playbook, image/asset plan, measurement, ACL compliance, quiz. |
 | `quizzes-answer-key.md` | — | Trainer answer key for all five module quizzes. |
 | `substantiation-ledger.md` | — | Frozen `nexus-copywriter` CITE-OR-CUT record — every checkable claim → source → status (VERIFIED / ATTRIBUTED / CUT). Travels with the asset; re-run before any customer-facing use. |

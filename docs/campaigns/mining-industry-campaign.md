@@ -14,19 +14,19 @@ Target: 500 enrolled mining professionals in 12 months.
 - Health & Safety Managers at tier-1 mining companies (BHP, Rio Tinto, Fortescue, Glencore)
 - Mining contractors across WA, QLD, NT, NSW
 
-## IICRC Disciplines Relevant to Mining
+## Subjects Relevant to Mining
 
-| Discipline                           | Application                                              |
+| Subject                              | Application                                              |
 | ------------------------------------ | -------------------------------------------------------- |
-| ASD — Applied Structural Drying      | Water ingress in tunnels, shafts, surface infrastructure |
-| WRT — Water Damage Restoration       | Pump shed flooding, wet areas, tailings infrastructure   |
-| AMRT — Applied Microbial Remediation | Mould in FIFO accommodation, wet areas                   |
-| FSRT — Fire & Smoke                  | Mine fire response, equipment room fires                 |
+| Structural drying                    | Water ingress in tunnels, shafts, surface infrastructure |
+| Water damage restoration             | Pump shed flooding, wet areas, tailings infrastructure   |
+| Mould remediation                    | Mould in FIFO accommodation, wet areas                   |
+| Fire and smoke restoration           | Mine fire response, equipment room fires                 |
 
 ## Key Value Propositions
 
-1. **WHS Compliance** — IICRC CECs count toward mandatory continuing training requirements
-2. **FIFO Accommodation** — Mould in camp accommodation is a major liability; AMRT training mitigates risk
+1. **WHS Compliance** — Documented training supports WHS training records
+2. **FIFO Accommodation** — Mould in camp accommodation is a major liability; mould remediation training mitigates risk
 3. **Verifiable Credentials** — Digital certificates with public URL for contractor pre-qualification
 4. **Online, Self-Paced** — No roster disruption; FIFO workers complete between shifts
 
@@ -34,9 +34,9 @@ Target: 500 enrolled mining professionals in 12 months.
 
 "Mining Safety Restoration Bundle" — $295 AUD
 
-- WRT Technician Fundamentals
-- ASD Applied Structural Drying
-- AMRT Mould Assessment Basics
+- Water Damage Fundamentals
+- Structural Drying
+- Mould Assessment Basics
 - Scoping & Quoting for Restoration Professionals (bonus)
 
 ## Outreach Strategy
@@ -49,10 +49,10 @@ Target: 500 enrolled mining professionals in 12 months.
 ## Content to Create
 
 - [ ] Landing page live: /industries/mining
-- [ ] Blog post: "Why FIFO accommodation mould is a $500K liability risk"
-- [ ] LinkedIn post series: "5 certifications every mining site supervisor needs"
+- [ ] Blog post: "Why FIFO accommodation mould is a liability risk"
+- [ ] LinkedIn post series: "What mining site supervisors should know about mould and water damage"
 - [ ] Email sequence: 3-email drip to HSE managers
-- [ ] Case study: "How one WA mining contractor reduced mould incidents by 60%"
+- [ ] Case study (only with a real, consenting client and verified figures): a mining contractor's mould training
 
 ## KPIs
 

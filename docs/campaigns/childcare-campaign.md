@@ -4,7 +4,7 @@
 
 ## Objective
 
-Expand CARSI's IICRC training into the Childcare sector, targeting NQF compliance and facility hygiene professionals.
+Expand CARSI's restoration training into the Childcare sector, targeting NQF compliance and facility hygiene professionals.
 Target: 750 enrolled childcare professionals in 12 months | Revenue: $146,250 AUD.
 
 ## Target Audience
@@ -15,19 +15,19 @@ Target: 750 enrolled childcare professionals in 12 months | Revenue: $146,250 AU
 - Cleaning contractors servicing childcare centres
 - Key organisations: Goodstart Early Learning, G8 Education, KU Children's Services, Camp Australia
 
-Australia has 16,000+ approved childcare centres — each assessed against the National Quality Framework.
+Australia's approved childcare centres are each assessed against the National Quality Framework.
 
-## IICRC Disciplines Relevant to Childcare
+## Subjects Relevant to Childcare
 
-| Discipline                           | Application                                                     |
+| Subject                              | Application                                                     |
 | ------------------------------------ | --------------------------------------------------------------- |
-| AMRT — Applied Microbial Remediation | NQF-compliant infection control, mould in play areas, bathrooms |
-| CRT — Carpet Restoration             | Carpet care for indoor play areas, reading corners, nap rooms   |
-| WRT — Water Damage Restoration       | Water damage from water play areas, bathrooms, wet rooms        |
+| Mould remediation                    | NQF-compliant infection control, mould in play areas, bathrooms |
+| Carpet cleaning                      | Carpet care for indoor play areas, reading corners, nap rooms   |
+| Water damage restoration             | Water damage from water play areas, bathrooms, wet rooms        |
 
 ## Key Value Propositions
 
-1. **NQF Quality Area 2 Compliance** — IICRC training directly supports Health & Safety requirements under the National Quality Standard
+1. **NQF Quality Area 2 Compliance** — Restoration training directly supports Health & Safety requirements under the National Quality Standard
 2. **Exceeding NQS Rating** — Demonstrable staff training contributes to achieving "Exceeding" rating at assessment
 3. **Verifiable Certificates** — Digital credentials with public URL for regulatory audits and ACECQA assessments
 4. **Minimal Roster Disruption** — 2-4 hour self-paced modules; staff complete during planning time or after hours
@@ -36,9 +36,9 @@ Australia has 16,000+ approved childcare centres — each assessed against the N
 
 "Childcare Compliance Bundle" — $195 AUD
 
-- AMRT Infection Control — Mould & Microbial Basics
-- CRT Carpet Basics — Play Area Maintenance
-- WRT Fundamentals — Water Damage Response
+- Infection Control — Mould & Microbial Basics
+- Carpet Basics — Play Area Maintenance
+- Water Damage Response Fundamentals
 
 ## Outreach Strategy
 
@@ -51,10 +51,10 @@ Australia has 16,000+ approved childcare centres — each assessed against the N
 ## Content to Create
 
 - [ ] Landing page live: /industries/childcare
-- [ ] Blog post: "NQF Quality Area 2: How IICRC training supports your compliance rating"
+- [ ] Blog post: "NQF Quality Area 2: how documented training supports your compliance evidence"
 - [ ] Email sequence: 3-part drip to centre directors and compliance officers
-- [ ] Case study: "How a childcare network improved their NQS rating with IICRC-certified staff"
-- [ ] LinkedIn post series: "5 ways IICRC training helps childcare centres meet NQF standards"
+- [ ] Case study (only with a real, consenting client and verified figures): a childcare network's training rollout
+- [ ] LinkedIn post series: "How restoration training helps childcare centres meet NQF standards"
 
 ## KPIs
 

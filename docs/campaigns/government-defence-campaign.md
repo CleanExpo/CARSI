@@ -4,7 +4,7 @@
 
 ## Objective
 
-Position CARSI as the preferred IICRC training provider for Australian government and defence facility management teams.
+Position CARSI as the preferred restoration training provider for Australian government and defence facility management teams.
 Target: 300 enrolled government facility professionals in 12 months.
 Revenue target: $88,500 AUD.
 
@@ -16,19 +16,19 @@ Revenue target: $88,500 AUD.
 - ADF base maintenance managers
 - Government procurement officers
 
-## IICRC Disciplines Relevant to Government & Defence
+## Subjects Relevant to Government & Defence
 
-| Discipline                           | Application                                                        |
+| Subject                              | Application                                                        |
 | ------------------------------------ | ------------------------------------------------------------------ |
-| AMRT — Applied Microbial Remediation | Mould in government and heritage buildings, public facilities      |
-| WRT — Water Damage Restoration       | Water damage response in civic infrastructure                      |
-| ASD — Applied Structural Drying      | Applied structural drying for heritage-listed government buildings |
-| FSRT — Fire & Smoke Restoration      | Fire and smoke response training for government emergency teams    |
+| Mould remediation                    | Mould in government and heritage buildings, public facilities      |
+| Water damage restoration             | Water damage response in civic infrastructure                      |
+| Structural drying                    | Structural drying for heritage-listed government buildings |
+| Fire and smoke restoration           | Fire and smoke response training for government emergency teams    |
 
 ## Key Value Propositions
 
-1. **WHS Act Obligations** — Government employers have strict WHS duties; IICRC training demonstrates due diligence
-2. **AusTender / Procurement Compliance** — IICRC certification as a pre-qualification criterion for government panels
+1. **WHS Act Obligations** — Government employers have strict WHS duties; documented training demonstrates due diligence
+2. **AusTender / Procurement Compliance** — Some government panels list IICRC certification (from IICRC-approved schools); CARSI adds documented, verifiable training
 3. **Bulk Licensing** — 10+ seat pricing for councils and departments reduces per-head cost
 4. **Audit-Ready Credentials** — Verifiable digital credentials satisfy Commonwealth audit requirements
 
@@ -36,9 +36,9 @@ Revenue target: $88,500 AUD.
 
 "Government Facility Restoration Bundle" — $295 AUD
 
-- WRT Water Damage Restoration
-- AMRT Mould Assessment Basics
-- ASD Structural Drying
+- Water Damage Restoration
+- Mould Assessment Basics
+- Structural Drying
 
 ## Outreach Strategy
 
@@ -53,7 +53,7 @@ Revenue target: $88,500 AUD.
 
 - [ ] Landing page live: /industries/government-defence
 - [ ] Blog post: "WHS obligations for mould in government buildings: what facility managers need to know in 2026"
-- [ ] Case study: "How a regional council saved $120K in remediation costs with trained facility staff"
+- [ ] Case study (only with a real, consenting client and verified figures): a council's facility-staff training
 - [ ] Government bulk licensing proposal template (PDF)
 - [ ] Email sequence: 3-email drip to council facility managers
 

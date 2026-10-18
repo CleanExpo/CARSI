@@ -14,7 +14,9 @@ vi.mock('next/link', () => ({
     createElement('a', { href }, children),
 }));
 
-import { CERT_LEVELS, DISCIPLINES } from '@/components/tools/CECCalculator';
+import { approvedCoursesNeeded, CERT_LEVELS, DISCIPLINES } from '@/components/tools/CECCalculator';
+import { getCecApprovalEntries, isCecApprovalCurrent } from '@/lib/seed/cec-approvals';
+import { ALL_IICRC_CODES } from '@/lib/iicrc-discipline-display';
 import { CertificateArt } from '@/lib/certificate/CertificateArt';
 import {
   disciplineTopicLabel,
@@ -80,5 +82,47 @@ describe('CEC calculator states the IICRC renewal rule correctly', () => {
     const src = readFileSync(join(process.cwd(), 'src/components/tools/CECCalculator.tsx'), 'utf8');
     expect(src).not.toMatch(/Browse \{result\.discipline\.code\}/);
     expect(src).not.toMatch(/To earn your/);
+  });
+});
+
+/**
+ * Review of fc8d274a (P1-CALCULATOR-COURSE-UNDERCOUNT): the calculator divided the CECs still
+ * needed by an assumed 2–3 CECs per course, so a Technician at 0 CECs was told 7 courses would
+ * do, while every current approval in data/seed/cec-approvals.json is worth 1 CEC. The count now
+ * comes from the approvals in force when the calculator runs.
+ */
+describe('CEC calculator course count comes from the approvals registry', () => {
+  function expectedFromRegistry(remaining: number, now: Date) {
+    const hours = getCecApprovalEntries()
+      .filter((e) => isCecApprovalCurrent(e, now))
+      .map((e) => e.approvedHours as number)
+      .sort((a, b) => b - a);
+    let total = 0;
+    let courses = 0;
+    for (const h of hours) {
+      if (total >= remaining) break;
+      total += h;
+      courses += 1;
+    }
+    return { courses, enough: total >= remaining, approvedCourses: hours.length };
+  }
+
+  it('calculator: a Technician at 0 CECs needs as many approved courses as the registry says', () => {
+    const now = new Date('2026-10-19T00:00:00Z');
+    const result = approvedCoursesNeeded(14, now);
+    expect(result).toEqual(expectedFromRegistry(14, now));
+    // every current approval is worth 1 CEC, so 14 CECs needs 14 courses, not 7
+    expect(result.courses).toBeGreaterThanOrEqual(14);
+  });
+
+  it('calculator: once every approval has lapsed, no course counts', () => {
+    const result = approvedCoursesNeeded(14, new Date('2100-01-01T00:00:00Z'));
+    expect(result).toEqual({ courses: 0, enough: false, approvedCourses: 0 });
+  });
+
+  it('calculator: no CTA names a course with an IICRC code', () => {
+    const src = readFileSync(join(process.cwd(), 'src/components/tools/CECCalculator.tsx'), 'utf8');
+    expect(src).not.toMatch(new RegExp(`Browse[^'"<>{}]*\\b(?:${ALL_IICRC_CODES})\\b`));
+    expect(src).not.toMatch(/avgCecsPerCourse/);
   });
 });

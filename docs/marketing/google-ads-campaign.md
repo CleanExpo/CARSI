@@ -104,7 +104,7 @@ Adjust allocation monthly based on vertical ROAS. Start conservative, scale winn
 **Exact Match**
 
 - [commercial cleaning training Australia]
-- [IICRC cleaning technician course]
+- [cleaning technician course]
 - [carpet cleaning training online]
 - [commercial mould remediation training]
 - [cleaning business training Australia]
@@ -178,8 +178,8 @@ Apply across all campaigns to prevent wasted spend:
 | Headline 2 | Online Training — Study at Your Pace |
 | Headline 3 | CECs Where the IICRC Approves |
 | Headline 4 | Water, Drying and Mould Training |
-| Headline 5 | Trusted by 500+ Australian Technicians |
-| Description 1 | Earn IICRC CECs toward your certification in water damage restoration, mould remediation and structural drying. 100% online, self-paced. Start today. |
+| Headline 5 | Australian-Produced Courses |
+| Description 1 | Water damage restoration, mould remediation and structural drying courses; CEC hours only on courses the IICRC has approved. 100% online, self-paced. Start today. |
 | Description 2 | Earn Continuing Education Credits recognised across Australia. Complete courses between jobs — no roster disruption. Verifiable digital certificates included. |
 
 **Variation B — Urgency**
@@ -211,21 +211,21 @@ Apply across all campaigns to prevent wasted spend:
 |---------|------|
 | Headline 1 | Mining Safety Training — 100% Online |
 | Headline 2 | WHS Mould Compliance Courses |
-| Headline 3 | IICRC Certifications for Mining Sites |
+| Headline 3 | Mould Training for Mining Sites |
 | Headline 4 | FIFO-Friendly — Study Between Shifts |
 | Headline 5 | Reduce Mould Liability on Site |
 | Description 1 | Mould in FIFO accommodation is a costly liability. Train your team in mould assessment and remediation — fully online, no roster disruption. |
-| Description 2 | WHS compliance training designed for mining professionals. Earn verifiable IICRC credentials your HSE team can audit. Digital certificates with public verification URL. |
+| Description 2 | WHS compliance training designed for mining professionals. Earn verifiable CARSI credentials your HSE team can audit. Digital certificates with public verification URL. |
 
 **Variation B — ROI**
 | Element | Copy |
 |---------|------|
 | Headline 1 | FIFO Mould Training — Protect Your Site |
-| Headline 2 | Avoid $500K+ Mould Liability Costs |
+| Headline 2 | Reduce Mould Liability Risk |
 | Headline 3 | Online Mould Courses for Mining Teams |
 | Headline 4 | Group Licensing Available |
 | Headline 5 | Trusted by WA & QLD Mining Sites |
-| Description 1 | One mould incident at a FIFO camp can cost $500K+. Train supervisors in mould assessment for a fraction of the cost. Group rates available. |
+| Description 1 | A mould incident at a FIFO camp is costly. Train supervisors in mould assessment for a fraction of the cost. Group rates available. |
 | Description 2 | Upskill your mining crew in water damage, mould and structural drying. Self-paced courses designed for shift workers. Bulk enrolment discounts for 10+ seats. |
 
 **Variation C — Speed**
@@ -250,7 +250,7 @@ Apply across all campaigns to prevent wasted spend:
 | Headline 4 | Protect Residents & Staff |
 | Headline 5 | Comply with Aged Care Standards |
 | Description 1 | Mould and water damage in aged care facilities put vulnerable residents at risk. Train your team in remediation — fully online, self-paced. |
-| Description 2 | Meet facility compliance requirements with certified mould and infection control training. Digital certificates included. Group licensing for multi-site operators. |
+| Description 2 | Meet facility compliance requirements with documented mould and infection control training. Digital certificates included. Group licensing for multi-site operators. |
 
 **Variation B — Risk**
 | Element | Copy |
@@ -267,7 +267,7 @@ Apply across all campaigns to prevent wasted spend:
 | Element | Copy |
 |---------|------|
 | Headline 1 | Aged Care Staff Training from $79/Course |
-| Headline 2 | IICRC Mould & Remediation Courses |
+| Headline 2 | Mould & Remediation Courses |
 | Headline 3 | Unlimited Access — $795/Year |
 | Headline 4 | Train Your Whole Team Online |
 | Headline 5 | Australian-Owned Training Platform |
@@ -294,11 +294,11 @@ Apply across all campaigns to prevent wasted spend:
 |---------|------|
 | Headline 1 | Cleaning Training — Online |
 | Headline 2 | Upskill Your Cleaning Business |
-| Headline 3 | carpet cleaning and water damage restoration & Mould Courses Available |
-| Headline 4 | Win More Contracts with IICRC Creds |
+| Headline 3 | Carpet, Water Damage & Mould Courses |
+| Headline 4 | Win More Contracts with Training |
 | Headline 5 | Australian-Owned Training Platform |
 | Description 1 | Stand out from competitors with documented training. Carpet cleaning, mould remediation, water damage — all available online. Build recognised skills and grow your business. |
-| Description 2 | Cleaning franchise owners and operators — add IICRC credentials to your business. Online courses and verifiable certificates that prove your expertise. |
+| Description 2 | Cleaning franchise owners and operators — add restoration training to your business. Online courses and verifiable CARSI certificates that prove your expertise. |
 
 ### Campaign 6: Construction
 
@@ -306,7 +306,7 @@ Apply across all campaigns to prevent wasted spend:
 | Element | Copy |
 |---------|------|
 | Headline 1 | Construction Mould Training — Online |
-| Headline 2 | IICRC Water Damage Courses |
+| Headline 2 | Water Damage Courses Online |
 | Headline 3 | Structural Drying Training |
 | Headline 4 | Protect Your Builds from Mould |
 | Headline 5 | Digital Certificate on Completion |

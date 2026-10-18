@@ -17,7 +17,7 @@ Convert commercial cleaning business owners into restoration-trained contractors
 
 ## Campaign Concept: "Cleaning Plus"
 
-**Core Insight:** Commercial cleaning contractors already have the client relationships, equipment familiarity, and on-site access. They're one credential away from offering restoration services — and charging 3–5x more per job.
+**Core Insight:** Commercial cleaning contractors already have the client relationships, equipment familiarity, and on-site access. They're one skill set away from offering restoration services, which are quoted as a separate, technical scope.
 
 **Tagline Options:**
 
@@ -58,12 +58,12 @@ Convert commercial cleaning business owners into restoration-trained contractors
 
 | Service                  | Typical Rate | Annual Revenue (1 crew) |
 | ------------------------ | ------------ | ----------------------- |
-| Commercial cleaning      | $35–55/hr    | $70K–$110K              |
-| Water damage restoration | $150–250/hr  | $200K–$400K             |
-| Mould remediation        | $120–200/hr  | $180K–$350K             |
-| Carpet restoration       | $80–150/hr   | $130K–$250K             |
+| Commercial cleaning      | Quote from your own job data | Source before publishing |
+| Water damage restoration | Quote from your own job data | Source before publishing |
+| Mould remediation        | Quote from your own job data | Source before publishing |
+| Carpet cleaning          | Quote from your own job data | Source before publishing |
 
-**Key message:** "Same clients. Same sites. 3–5x the hourly rate."
+**Key message:** "Same clients. Same sites. A wider scope of work."
 
 ### Why Restoration Training Matters
 
@@ -111,11 +111,11 @@ CTA: See the restoration pathway →
 - Card 1: "You're already on-site" (cleaning crew image)
 - Card 2: "Verifiable CARSI credentials" (credential image)
 - Card 3: "Win restoration contracts" (job site image)
-- Card 4: "Charge 3–5x more per job" (revenue comparison)
+- Card 4: "Quote restoration as its own scope" (service comparison)
 
 #### Lead Gen Form Ad
 
-- Headline: "Free guide: How cleaning companies add $200K in restoration revenue"
+- Headline: "Free guide: How cleaning companies add restoration services"
 - Fields: Name, email, company name, number of staff
 - Follow-up: Email sequence (see below)
 
@@ -244,7 +244,7 @@ CTA: See the restoration pathway →
 | --------------------- | ------------------------ | ------------------------------------------------------------ |
 | LinkedIn single image | 1200 x 627px, < 5MB      | Revenue comparison graphic, IICRC logo prominent             |
 | LinkedIn carousel     | 1080 x 1080px, 4 cards   | Step-by-step pathway visual                                  |
-| Lead magnet PDF       | A4, 8–12 pages           | "How Cleaning Companies Add $200K in Restoration Revenue"    |
+| Lead magnet PDF       | A4, 8–12 pages           | "How Cleaning Companies Add Restoration Services"    |
 | Email header          | 600px wide               | Consistent CARSI branding, blue (#2490ed) + orange (#ed9d24) |
 | Google Display        | 300x250, 728x90, 160x600 | Responsive display ads                                       |
 

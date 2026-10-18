@@ -30,7 +30,7 @@
    - Solution: 24/7 online, self-paced, 30-minute modules
 
 2. **Compliance Burden** — "Need documented evidence of competency"
-   - Solution: IICRC credentials, automatic certificate generation
+   - Solution: verifiable CARSI credentials, automatic certificate generation
 
 3. **Contractor Trust** — "How do I know they're qualified?"
    - Solution: Verifiable CARSI credentials and documented training
@@ -150,7 +150,7 @@ secrets (registered in the SYNTHEX deploy environment — see `docs/PRODUCTION_D
 | **24/7 Online**         | "Learn at 2am or 2pm — we never close"                  |
 | **IICRC CEC Accredited provider** | "CECs on courses the IICRC has approved" |
 | **Self-Paced**          | "30-minute modules. No travel. No downtime."            |
-| **12+ Industries**      | "From hospitals to hotels, we train them all"           |
+| **Industry pages**      | "From hospitals to hotels, we train them all"           |
 | **NRPG Partner**        | "One of the 4 core pillars of NRPG onboarding"          |
 | **Free Courses**        | "Start with free courses. Premium from $20."            |
 | **Instant Credentials** | "Complete a course, get your certificate immediately"   |

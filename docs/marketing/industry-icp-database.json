@@ -6,7 +6,7 @@
     {
       "id": "healthcare",
       "name": "Healthcare",
-      "market_size_aud": "~$200B",
+      "market_size_aud": "UNVERIFIED — source before use",
       "iicrc_disciplines": ["AMRT", "WRT", "FSRT"],
       "decision_makers": [
         {
@@ -127,7 +127,7 @@
     {
       "id": "hospitality",
       "name": "Hotels & Resorts",
-      "market_size_aud": "~$50B tourism",
+      "market_size_aud": "UNVERIFIED — source before use",
       "iicrc_disciplines": ["WRT", "CRT", "ASD", "OCT"],
       "decision_makers": [
         {
@@ -191,7 +191,7 @@
       "pain_points": [
         {
           "pain": "Room downtime = lost revenue",
-          "description": "Every night a room is out of service costs $200-$500+. Rapid restoration is critical.",
+          "description": "Every night a room is out of service costs revenue. Rapid restoration is critical.",
           "emotional_impact": "Revenue pressure, owner/shareholder scrutiny",
           "urgency": "critical"
         },
@@ -240,7 +240,7 @@
     {
       "id": "government",
       "name": "Government & Defence",
-      "market_size_aud": "537 councils + federal/state agencies",
+      "market_size_aud": "UNVERIFIED — source before use",
       "iicrc_disciplines": ["AMRT", "WRT", "ASD", "FSRT"],
       "decision_makers": [
         {
@@ -359,7 +359,7 @@
     {
       "id": "commercial_cleaning",
       "name": "Commercial Cleaning",
-      "market_size_aud": "~$15B",
+      "market_size_aud": "UNVERIFIED — source before use",
       "iicrc_disciplines": ["CCT", "CRT", "WRT", "AMRT", "OCT"],
       "decision_makers": [
         {
@@ -420,7 +420,7 @@
         },
         {
           "pain": "Winning insurance work",
-          "description": "Insurance restoration pays 30-50% higher margins but requires credentials",
+          "description": "Insurance restoration is technical work that insurer panels set their own requirements for",
           "emotional_impact": "FOMO on higher-margin work",
           "urgency": "high"
         },
@@ -438,7 +438,7 @@
         }
       ],
       "value_propositions": [
-        "Add restoration services = 30-50% higher margins",
+        "Add restoration services to widen your scope of work",
         "Build restoration skills for insurance work",
         "Differentiate from 'mop and bucket' competitors",
         "Pre-qualify for government and corporate panels"
@@ -467,7 +467,7 @@
     {
       "id": "insurance",
       "name": "Insurance",
-      "market_size_aud": "$4.5B claims/year",
+      "market_size_aud": "UNVERIFIED — source before use",
       "iicrc_disciplines": ["WRT", "FSRT", "AMRT", "ASD"],
       "decision_makers": [
         {
@@ -577,7 +577,7 @@
     {
       "id": "aged_care",
       "name": "Aged Care",
-      "market_size_aud": "~$30B",
+      "market_size_aud": "UNVERIFIED — source before use",
       "iicrc_disciplines": ["CRT", "AMRT", "WRT"],
       "decision_makers": [
         {
@@ -669,7 +669,7 @@
     {
       "id": "education",
       "name": "Education",
-      "market_size_aud": "9,500+ schools",
+      "market_size_aud": "UNVERIFIED — source before use",
       "iicrc_disciplines": ["AMRT", "WRT", "CRT", "ASD"],
       "decision_makers": [
         {
@@ -758,7 +758,7 @@
     {
       "id": "strata",
       "name": "Strata & Body Corporate",
-      "market_size_aud": "2.5M+ strata units",
+      "market_size_aud": "UNVERIFIED — source before use",
       "iicrc_disciplines": ["WRT", "CRT", "AMRT", "ASD"],
       "decision_makers": [
         {
@@ -853,7 +853,7 @@
     {
       "id": "mining",
       "name": "Mining & Resources",
-      "market_size_aud": "~$200B",
+      "market_size_aud": "UNVERIFIED — source before use",
       "iicrc_disciplines": ["WRT", "ASD", "AMRT"],
       "decision_makers": [
         {
@@ -943,7 +943,7 @@
     {
       "id": "retail",
       "name": "Retail & Shopping Centres",
-      "market_size_aud": "$140B retail sector",
+      "market_size_aud": "UNVERIFIED — source before use",
       "iicrc_disciplines": ["WRT", "CRT", "OCT", "FSRT"],
       "decision_makers": [
         {
@@ -1046,7 +1046,7 @@
       "industries": ["commercial_cleaning", "restoration"]
     },
     "cleaning_plus": {
-      "message": "Add restoration services to your cleaning business — 30-50% higher margins",
+      "message": "Add restoration services to your cleaning business",
       "industries": ["commercial_cleaning"]
     },
     "nrpg_pathway": {

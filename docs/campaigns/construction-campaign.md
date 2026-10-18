@@ -4,7 +4,7 @@
 
 ## Objective
 
-Penetrate the Australian construction sector with IICRC CEC Accredited restoration courses, targeting site managers, project managers, and WHS officers across commercial and residential construction.
+Penetrate the Australian construction sector with restoration courses from an IICRC CEC Accredited provider, targeting site managers, project managers, and WHS officers across commercial and residential construction.
 Target: 600 enrolled construction professionals in 12 months.
 
 ## Target Audience
@@ -13,15 +13,15 @@ Target: 600 enrolled construction professionals in 12 months.
 - Building certifiers and compliance officers
 - WHS (Work Health & Safety) officers
 - Key companies: CIMIC, Lendlease, John Holland, Multiplex, Mirvac
-- 376,000+ residential builders and trades across Australia
+- Residential builders and trades across Australia
 
-## IICRC Disciplines Relevant to Construction
+## Subjects Relevant to Construction
 
-| Discipline                           | Application                                                                       |
+| Subject                              | Application                                                                       |
 | ------------------------------------ | --------------------------------------------------------------------------------- |
-| WRT — Water Damage Restoration       | Water ingress during construction, wet concrete slabs, waterproofing failures     |
-| ASD — Applied Structural Drying      | Structural drying for wall cavities, concrete, timber framing                     |
-| AMRT — Applied Microbial Remediation | Mould remediation in new builds (30%+ of new QLD homes have mould within 2 years) |
+| Water damage restoration             | Water ingress during construction, wet concrete slabs, waterproofing failures     |
+| Structural drying                    | Structural drying for wall cavities, concrete, timber framing                     |
+| Mould remediation                    | Mould remediation in new builds |
 
 ## Key Value Propositions
 
@@ -34,9 +34,9 @@ Target: 600 enrolled construction professionals in 12 months.
 
 "Construction Site Restoration Bundle" — $245 AUD
 
-- WRT Water Damage Restoration Fundamentals
-- ASD Applied Structural Drying
-- AMRT Mould Assessment Basics
+- Water Damage Restoration Fundamentals
+- Structural Drying
+- Mould Assessment Basics
 - Moisture Detection & Measurement for Construction (bonus module)
 
 ## Outreach Strategy
@@ -49,10 +49,10 @@ Target: 600 enrolled construction professionals in 12 months.
 ## Content to Create
 
 - [ ] Landing page live: /industries/construction
-- [ ] Blog post: "The $500K hidden cost of mould in new residential construction"
-- [ ] Case study: "How one Brisbane builder eliminated mould defect claims with IICRC training"
+- [ ] Blog post: "The hidden cost of mould in new residential construction"
+- [ ] Case study (only with a real, consenting client and verified figures): a builder's mould-prevention training
 - [ ] Email sequence: 3-email drip to WHS managers and site supervisors
-- [ ] LinkedIn post series: "Why 30% of new Australian homes have mould — and how to prevent it"
+- [ ] LinkedIn post series: "Why new Australian homes get mould — and how to prevent it"
 
 ## KPIs
 

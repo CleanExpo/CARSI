@@ -94,9 +94,9 @@ export default async function AboutPage() {
           <p className={`mt-5 max-w-3xl text-pretty ${LANDING_LEAD_CLASS}`}>
             CARSI — the Centre for Australian Restoration and Standards Information — is
             Australia&apos;s online training platform for cleaning and restoration professionals.
-            Beginner, intermediate, and advanced <AcronymTooltip term="IICRC" />{' '}
-            <AcronymTooltip term="CEC" /> accredited courses for people starting out, updating their
-            knowledge, or maintaining continuing education without leaving the job site.
+            Beginner, intermediate and advanced courses for people starting out, updating their
+            knowledge, or maintaining continuing education without leaving the job site, from an{' '}
+            <AcronymTooltip term="IICRC" /> <AcronymTooltip term="CEC" /> Accredited provider.
           </p>
         </div>
       </section>
