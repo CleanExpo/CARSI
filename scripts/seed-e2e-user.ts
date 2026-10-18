@@ -11,6 +11,9 @@
  *   - An active LmsEnrollment against the FIRST seeded catalogue course, so the
  *     lesson player (`getLessonContextForStudent` requires an enrollment) and the
  *     student dashboard render real enrolled-course content.
+ *   - A one-question knowledge-check quiz and its quiz lesson at the end of that course's
+ *     first module (the catalogue seed carries no quizzes), so the browser journey can open
+ *     a real quiz in the course player.
  *
  * Idempotent: safe to re-run. Reads the course/lesson IDs from the same
  * `data/seed/courses-catalog.json` snapshot used by `db:seed-courses`, so it must
@@ -45,6 +48,15 @@ const E2E_STUDENT = {
 
 /** Stable enrollment id so re-runs upsert rather than duplicate. */
 const E2E_ENROLLMENT_ID = 'e2e00000-0000-4000-8000-000000000002';
+
+/** Kept in sync with E2E_QUIZ in e2e/pre-production.spec.ts. */
+const E2E_QUIZ = {
+  quizId: 'e2e00000-0000-4000-8000-000000000003',
+  lessonId: 'e2e00000-0000-4000-8000-000000000004',
+  questionId: 'e2e00000-0000-4000-8000-000000000005',
+  questionText: 'Which unit does CARSI use for the volume of a room?',
+  options: ['Cubic metres (m³)', 'Cubic feet'],
+} as const;
 
 function loadCatalog(): CoursesCatalogFile {
   const raw = readFileSync(CATALOG_PATH, 'utf8');
@@ -154,6 +166,47 @@ async function main() {
         status: 'active',
         lastAccessedLessonId: firstLessonId,
       },
+    });
+  }
+
+  const firstModuleId = course.modules[0]?.id;
+  if (firstModuleId) {
+    await prisma.lmsQuiz.upsert({
+      where: { id: E2E_QUIZ.quizId },
+      create: {
+        id: E2E_QUIZ.quizId,
+        courseId: dbCourse.id,
+        title: 'E2E knowledge check',
+        passPercentage: 80,
+        attemptsAllowed: 3,
+      },
+      update: { courseId: dbCourse.id },
+    });
+    await prisma.lmsQuizQuestion.upsert({
+      where: { id: E2E_QUIZ.questionId },
+      create: {
+        id: E2E_QUIZ.questionId,
+        quizId: E2E_QUIZ.quizId,
+        questionText: E2E_QUIZ.questionText,
+        options: E2E_QUIZ.options.map((text) => ({ text })),
+        correctIndex: 0,
+        orderIndex: 0,
+        points: 1,
+      },
+      update: {},
+    });
+    await prisma.lmsLesson.upsert({
+      where: { id: E2E_QUIZ.lessonId },
+      create: {
+        id: E2E_QUIZ.lessonId,
+        moduleId: firstModuleId,
+        title: 'E2E knowledge check',
+        contentType: 'quiz',
+        contentBody: E2E_QUIZ.quizId,
+        orderIndex: 999,
+        isPreview: false,
+      },
+      update: {},
     });
   }
 

@@ -275,4 +275,25 @@ describe('admin quiz save', () => {
     );
     expect([...kept].sort()).toEqual(['quiz-one', 'quiz-two']);
   });
+
+  // Review round 8: an explanation-only save reset a custom quiz title, pass mark and attempt
+  // limit to the defaults, changing the content version and staling saved attempts.
+  it('an existing quiz keeps any title, pass mark or attempt limit the save leaves out', async () => {
+    const { tx } = quizTx(saved);
+    await writeModuleQuiz(tx as never, 'c1', 'Module', {
+      id: 'quiz-1',
+      questions: [{ ...sameQuestions[0], explanation: 'New why.' }, sameQuestions[1]],
+    });
+    const call = (tx.lmsQuiz.upsert as unknown as { mock: { calls: unknown[][] } }).mock
+      .calls[0][0] as {
+      update: Record<string, unknown>;
+      create: Record<string, unknown>;
+    };
+    expect(call.update).toEqual({ courseId: 'c1' });
+    expect(call.create).toMatchObject({
+      title: 'Module — Knowledge check',
+      passPercentage: 80,
+      attemptsAllowed: 3,
+    });
+  });
 });

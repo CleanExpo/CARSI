@@ -26,6 +26,12 @@ const STUDENT_STORAGE_STATE = `${__dirname}/../playwright/.auth/student.json`;
 // first catalogue course, which the seed enrols the test student in).
 const ENROLLED_COURSE_SLUG = 'air-quality-and-odour-identification-and-deodorisation-essentials';
 const ENROLLED_LESSON_ID = '97be523a-bd68-4c94-9458-e0ddd3c7af95';
+/** Seeded by scripts/seed-e2e-user.ts into the enrolled course's first module. */
+const E2E_QUIZ = {
+  lessonId: 'e2e00000-0000-4000-8000-000000000004',
+  questionText: 'Which unit does CARSI use for the volume of a room?',
+  option: 'Cubic metres (m³)',
+} as const;
 
 // ---------------------------------------------------------------------------
 // Test data (mirrors seed data)
@@ -379,9 +385,22 @@ test.describe('6. Lesson player', { tag: '@authenticated' }, () => {
 // =========================================================================
 // Journey 7: Quiz
 // =========================================================================
-// The quiz renders inside the course player (journey 6 proves the route). Its question rendering
-// is covered by src/components/lms/QuizPlayerRender.test.tsx; the e2e check that used to sit here
-// visited a 404 lesson route and asserted only the URL, so it could never fail.
+
+test.describe('7. Quiz', { tag: '@authenticated' }, () => {
+  test.use({ storageState: STUDENT_STORAGE_STATE });
+
+  test('a quiz lesson opens in the course player and shows its question', async ({ page }) => {
+    // The legacy lesson link for a quiz lesson used to offer a "Take Quiz" button to a 404.
+    await page.goto(`/dashboard/courses/${ENROLLED_COURSE_SLUG}/lessons/${E2E_QUIZ.lessonId}`);
+    await expect(page).toHaveURL(
+      new RegExp(`/dashboard/learn/${ENROLLED_COURSE_SLUG}\\?lesson=${E2E_QUIZ.lessonId}$`),
+      { timeout: 20_000 }
+    );
+    await page.getByRole('button', { name: /begin assessment/i }).click({ timeout: 20_000 });
+    await expect(page.getByText(E2E_QUIZ.questionText)).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText(E2E_QUIZ.option)).toBeVisible();
+  });
+});
 
 // =========================================================================
 // Journey 8: Student dashboard

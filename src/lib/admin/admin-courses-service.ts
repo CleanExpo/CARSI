@@ -359,13 +359,23 @@ export async function writeModuleQuiz(
   existingQuizId?: string
 ): Promise<string> {
   const quizId = quiz.id ?? existingQuizId ?? randomUUID();
-  const title = quiz.title ?? `${moduleTitle} — Knowledge check`;
-  const passPercentage = quiz.passPercentage ?? 80;
-  const attemptsAllowed = quiz.attemptsAllowed ?? 3;
+  // Defaults apply only to a new quiz. An existing quiz keeps any setting the save leaves out:
+  // its title, pass mark and attempt limit are part of the lesson's content version.
   await tx.lmsQuiz.upsert({
     where: { id: quizId },
-    create: { id: quizId, courseId, title, passPercentage, attemptsAllowed },
-    update: { courseId, title, passPercentage, attemptsAllowed },
+    create: {
+      id: quizId,
+      courseId,
+      title: quiz.title ?? `${moduleTitle} — Knowledge check`,
+      passPercentage: quiz.passPercentage ?? 80,
+      attemptsAllowed: quiz.attemptsAllowed ?? 3,
+    },
+    update: {
+      courseId,
+      ...(quiz.title !== undefined ? { title: quiz.title } : {}),
+      ...(quiz.passPercentage !== undefined ? { passPercentage: quiz.passPercentage } : {}),
+      ...(quiz.attemptsAllowed !== undefined ? { attemptsAllowed: quiz.attemptsAllowed } : {}),
+    },
   });
   await writeQuizQuestions(tx, quizId, quiz.questions);
   return quizId;
