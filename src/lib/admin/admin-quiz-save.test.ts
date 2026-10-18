@@ -227,13 +227,14 @@ describe('admin quiz save', () => {
       ],
       true
     );
-    // Review round 9: the removed reading was the first module's free preview, so the next
-    // lesson becomes the preview and the public course page keeps one.
-    expect(ops).toEqual(['delete:l1', 'update:l2', 'update:l2']);
-    expect(tx.lmsLesson.update.mock.calls[1][0]).toEqual({
-      where: { id: 'l2' },
-      data: { isPreview: true },
-    });
+    // Review round 10: the removed reading was the free preview, but a video (a URL) or a quiz (a
+    // quiz id) is never promoted to the public text preview; no reading remains, so none is set.
+    expect(ops).toEqual(['delete:l1', 'update:l2']);
+    expect(
+      tx.lmsLesson.update.mock.calls.some((c) =>
+        (c[0] as { data: object }).data.hasOwnProperty('isPreview')
+      )
+    ).toBe(false);
   });
 
   // Review round 6: the editor shows one reading, so a course-level save deleted a module's second
@@ -342,6 +343,43 @@ describe('admin quiz save', () => {
       title: 'Module — Knowledge check',
       passPercentage: 80,
       attemptsAllowed: 3,
+    });
+  });
+
+  it('when the preview reading is removed, the next remaining reading becomes the preview', async () => {
+    const { tx, ops } = lessonTx();
+    await syncModuleLessons(
+      tx as never,
+      'c1',
+      'm1',
+      'Module',
+      undefined,
+      undefined,
+      undefined,
+      [
+        { id: 'l1', orderIndex: 0, contentType: 'text', contentBody: 'Reading', isPreview: true },
+        {
+          id: 'l2',
+          orderIndex: 1,
+          contentType: 'quiz',
+          contentBody: 'quiz-legacy',
+          isPreview: false,
+        },
+        {
+          id: 'l3',
+          orderIndex: 2,
+          contentType: 'text',
+          contentBody: 'Second reading',
+          isPreview: false,
+        },
+      ],
+      true
+    );
+    // The editor sent no reading, so the first reading goes; the quiz is never the preview.
+    expect(ops).toEqual(['delete:l1', 'update:l3']);
+    expect(tx.lmsLesson.update.mock.calls[0][0]).toEqual({
+      where: { id: 'l3' },
+      data: { isPreview: true },
     });
   });
 });

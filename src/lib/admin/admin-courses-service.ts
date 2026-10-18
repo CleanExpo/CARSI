@@ -442,7 +442,12 @@ export async function syncModuleLessons(
   let nextOrder = sortedExisting.length
     ? sortedExisting[sortedExisting.length - 1].orderIndex + 1
     : 0;
-  const createdLessons: { id: string; orderIndex: number; isPreview: boolean }[] = [];
+  const createdLessons: {
+    id: string;
+    orderIndex: number;
+    isPreview: boolean;
+    contentType: string;
+  }[] = [];
   const deleted = new Set<string>();
   const repointed = new Set<string>();
   for (const kind of ['text', 'video', 'quiz'] as const) {
@@ -480,7 +485,7 @@ export async function syncModuleLessons(
           contentBody: d.contentBody,
         },
       });
-      createdLessons.push(lesson);
+      createdLessons.push({ ...lesson, contentType: d.contentType });
     } else if (ex) {
       // The editor removed this module's reading or video.
       await tx.lmsLesson.delete({ where: { id: ex.id } });
@@ -488,14 +493,17 @@ export async function syncModuleLessons(
     }
   }
 
-  // The first module always keeps one free preview lesson for the public course page: when the
-  // save removed the preview lesson, the earliest remaining lesson becomes the preview.
+  // The first module keeps a free preview reading for the public course page: when the save
+  // removed the preview lesson, the earliest remaining reading becomes the preview. The public page
+  // renders the preview's body as text, so a quiz (its body is a quiz id) or a video (a URL) is
+  // never promoted; with no reading left the course simply has no free lesson.
   if (firstModule) {
     const remaining = [...sortedExisting.filter((e) => !deleted.has(e.id)), ...createdLessons].sort(
       (a, b) => a.orderIndex - b.orderIndex
     );
-    if (remaining.length > 0 && !remaining.some((l) => l.isPreview)) {
-      await tx.lmsLesson.update({ where: { id: remaining[0].id }, data: { isPreview: true } });
+    const reading = remaining.find((l) => l.contentType === 'text');
+    if (reading && !remaining.some((l) => l.isPreview)) {
+      await tx.lmsLesson.update({ where: { id: reading.id }, data: { isPreview: true } });
     }
   }
 
