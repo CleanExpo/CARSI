@@ -58,7 +58,7 @@ const faqs = [
   {
     question: 'How does IICRC CEC training reduce liability for gym operators?',
     answer:
-      "Gym operators have a duty of care to members under Australian Consumer Law and WHS legislation. Documented training shows that maintenance staff were trained to identify and respond to mould and moisture hazards, and documented inspection protocols support the operator if a member raises an indoor air quality complaint.",
+      'Gym operators have a duty of care to members under Australian Consumer Law and WHS legislation. Documented training shows that maintenance staff were trained to identify and respond to mould and moisture hazards, and documented inspection protocols support the operator if a member raises an indoor air quality complaint.',
   },
   {
     question: 'How does odour control training help fitness facilities?',

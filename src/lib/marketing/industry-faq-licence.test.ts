@@ -196,25 +196,34 @@ describe('industry FAQ licence sweep', () => {
  * (2027-01-18). Static copy may only use provider-level or conditional CEC wording; any
  * course-specific statement has to be computed at request time from the registry.
  */
-const COURSE_SPECIFIC_CEC = /\b(?:is|are|all)\s+IICRC CEC Accredited\b|IICRC CEC Accredited titles?/i;
+const COURSE_SPECIFIC_CEC =
+  /\b(?:is|are|all)\s+IICRC CEC Accredited\b|IICRC CEC Accredited titles?/i;
 
 describe('static CEC wording', () => {
   it('static CEC: the check fires on the time-sensitive forms', () => {
-    expect(COURSE_SPECIFIC_CEC.test('It is IICRC CEC Accredited, with its CEC hours shown.')).toBe(true);
+    expect(COURSE_SPECIFIC_CEC.test('It is IICRC CEC Accredited, with its CEC hours shown.')).toBe(
+      true
+    );
     expect(COURSE_SPECIFIC_CEC.test('Both are IICRC CEC Accredited.')).toBe(true);
-    expect(COURSE_SPECIFIC_CEC.test('… all IICRC CEC Accredited, each with its hours shown.')).toBe(true);
+    expect(COURSE_SPECIFIC_CEC.test('… all IICRC CEC Accredited, each with its hours shown.')).toBe(
+      true
+    );
     expect(COURSE_SPECIFIC_CEC.test('CARSI is an IICRC CEC Accredited provider.')).toBe(false);
     expect(
-      COURSE_SPECIFIC_CEC.test('Where the IICRC has approved a course, its CEC hours are shown on the course page.')
+      COURSE_SPECIFIC_CEC.test(
+        'Where the IICRC has approved a course, its CEC hours are shown on the course page.'
+      )
     ).toBe(false);
   });
 
-  it.each(allIndustryFaqs())('static CEC: %s names no course as IICRC CEC Accredited', (_name, faqs) => {
-    const hits = faqs
-      .flatMap((f) => [f.question, f.answer])
-      .flatMap((t) => sentences(t))
-      .filter((sentence) => COURSE_SPECIFIC_CEC.test(sentence) && !/\bprovider\b/.test(sentence));
-    expect(hits).toEqual([]);
-  });
+  it.each(allIndustryFaqs())(
+    'static CEC: %s names no course as IICRC CEC Accredited',
+    (_name, faqs) => {
+      const hits = faqs
+        .flatMap((f) => [f.question, f.answer])
+        .flatMap((t) => sentences(t))
+        .filter((sentence) => COURSE_SPECIFIC_CEC.test(sentence) && !/\bprovider\b/.test(sentence));
+      expect(hits).toEqual([]);
+    }
+  );
 });
-
