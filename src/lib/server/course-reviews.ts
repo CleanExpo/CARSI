@@ -439,10 +439,10 @@ export async function getReviewForCourse(
   reviewId: string,
   courseId: string,
   db: ReviewReadClient = prisma
-): Promise<{ id: string; rating: number; title: string | null; body: string | null; isPublished: boolean } | null> {
+): Promise<{ id: string; rating: number; title: string | null; body: string | null } | null> {
   return db.lmsCourseReview.findFirst({
     where: { id: reviewId, courseId },
-    select: { id: true, rating: true, title: true, body: true, isPublished: true },
+    select: { id: true, rating: true, title: true, body: true },
   });
 }
 
