@@ -1,8 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  canManageReviews,
-  canModerateReviews,
   isValidRating,
   summarizeReviews,
   toReviewDto,
@@ -102,21 +100,4 @@ describe('toReviewDto', () => {
   });
 });
 
-describe('canManageReviews', () => {
-  it('allows admin and instructor only', () => {
-    expect(canManageReviews('admin')).toBe(true);
-    expect(canManageReviews('instructor')).toBe(true);
-    expect(canManageReviews('student')).toBe(false);
-    expect(canManageReviews(null)).toBe(false);
-    expect(canManageReviews(undefined)).toBe(false);
-  });
-});
 
-describe('canModerateReviews', () => {
-  it('allows admin only (instructors have a conflict of interest)', () => {
-    expect(canModerateReviews('admin')).toBe(true);
-    expect(canModerateReviews('instructor')).toBe(false);
-    expect(canModerateReviews('student')).toBe(false);
-    expect(canModerateReviews(null)).toBe(false);
-  });
-});

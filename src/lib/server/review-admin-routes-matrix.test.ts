@@ -6,6 +6,9 @@
  * Extra rows: the admin-cookie principals (bootstrap ADMIN_EMAIL, an admin_users admin) are
  * allowed everywhere; an instructor may reply but not moderate or read hidden reviews.
  */
+import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { NextRequest } from 'next/server';
 import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -24,6 +27,11 @@ const m = vi.hoisted(() => ({
   writes: [] as string[],
   /** The moderation events created, so the recorded actor can be checked per admin kind. */
   events: [] as Array<Record<string, unknown>>,
+  /** Every text sent to the AI model (draftReviewReply), and every single-review read by id. */
+  modelCalls: [] as Array<Record<string, unknown>>,
+  reviewReads: 0,
+  /** Whether the review the routes act on is currently hidden. */
+  reviewHidden: false,
 }));
 
 // Each persona's token (what the JWT or cookie SAYS) and database row (what is TRUE now).
@@ -56,6 +64,12 @@ const LMS: Record<
     tokenRole: 'instructor',
     dbRole: 'instructor',
   },
+  demotedInstructorStaleJwt: {
+    sub: 'u-was-inst',
+    email: 'was.inst@carsi.com.au',
+    tokenRole: 'instructor',
+    dbRole: 'student',
+  },
   deactivatedInstructor: {
     sub: 'u-gone',
     email: 'gone@carsi.com.au',
@@ -82,6 +96,13 @@ vi.mock('@/lib/admin/admin-auth', () => ({
 }));
 vi.mock('@/lib/server/review-summary', () => ({
   getReviewFunnelSummary: async () => ({ hides_by_reason_and_rating: [] }),
+}));
+// The AI model boundary: anything passed here would leave CARSI for a third-party model.
+vi.mock('@/lib/server/review-reply-draft', () => ({
+  draftReviewReply: async (input: Record<string, unknown>) => {
+    m.modelCalls.push(input);
+    return 'Thanks for the feedback.';
+  },
 }));
 
 const REVIEW = {
@@ -124,7 +145,16 @@ vi.mock('@/lib/prisma', () => {
     lmsEnrollment: { findUnique: async () => null },
     lmsUser: { findUnique: async () => null },
     lmsCourseReview: {
-      findFirst: async () => ({ id: 'rev-1', rating: 1, title: 'Too basic', body: 'x' }),
+      findFirst: async () => {
+        m.reviewReads += 1;
+        return {
+          id: 'rev-1',
+          rating: 1,
+          title: 'Too basic',
+          body: m.reviewHidden ? 'private phone number' : 'x',
+          isPublished: !m.reviewHidden,
+        };
+      },
       findMany: async ({ where }: { where: { isPublished?: boolean } }) =>
         where.isPublished === true
           ? []
@@ -161,6 +191,8 @@ const { POST: publishPOST } =
 const { POST: replyPOST } =
   await import('../../../app/api/lms/courses/[slug]/reviews/[id]/reply/route');
 const { GET: reviewsGET } = await import('../../../app/api/lms/courses/[slug]/reviews/route');
+const { POST: draftPOST } =
+  await import('../../../app/api/lms/courses/[slug]/reviews/[id]/reply/draft/route');
 const { GET: summaryGET } = await import('../../../app/api/admin/reviews/summary/route');
 const SAVED = {
   db: process.env.DATABASE_URL,
@@ -215,6 +247,13 @@ const ROUTES: Record<string, () => Promise<Outcome>> = {
     );
     return { status: res.status, allowed: res.status === 200 };
   },
+  'reply: AI draft': async () => {
+    const res = await draftPOST(
+      request('http://localhost/api/lms/courses/water-damage/reviews/rev-1/reply/draft', {}),
+      params
+    );
+    return { status: res.status, allowed: res.status === 200 };
+  },
   'private read: hidden reviews on GET': async () => {
     const res = await reviewsGET(request('http://localhost/api/lms/courses/water-damage/reviews'), {
       params: Promise.resolve({ slug: 'water-damage' }),
@@ -245,6 +284,9 @@ beforeEach(() => {
   delete process.env.ADMIN_PANEL_EMAILS;
   m.writes = [];
   m.events = [];
+  m.modelCalls = [];
+  m.reviewReads = 0;
+  m.reviewHidden = false;
 });
 afterAll(() => {
   for (const [k, v] of [
@@ -273,6 +315,8 @@ describe.each(Object.keys(ROUTES))('%s', (route) => {
       expect(out.status).toBe(200); // public view only
     else expect(out.status).toBe(persona === 'noSession' ? 401 : 403);
     expect(m.writes).toEqual([]);
+    expect(m.modelCalls).toEqual([]); // nothing is ever sent to the model on a denial
+    if (route !== 'private read: hidden reviews on GET') expect(m.reviewReads).toBe(0); // nor read
   });
 });
 
@@ -282,6 +326,7 @@ describe('an instructor may reply but not moderate or read hidden reviews', () =
     ['moderation: unhide', false],
     ['reply: publish', true],
     ['reply: clear', true],
+    ['reply: AI draft', true],
     ['private read: hidden reviews on GET', false],
     ['moderation summary', false],
   ] as const)('%s → allowed: %s', async (route, allowed) => {
@@ -339,5 +384,98 @@ describe('the moderation audit records the verified admin, by kind', () => {
     expect((await ROUTES['moderation: hide']!()).status).toBe(200);
     expect(m.events).toHaveLength(1);
     expect(m.events[0]).toMatchObject(actor);
+  });
+});
+
+describe('r11 reviewer case: the AI draft never sends a hidden review to the model for someone who may not read it', () => {
+  it.each(['instructor'] as const)(
+    'a hidden review is refused outright for an %s (403, nothing sent)',
+    async (persona) => {
+      m.persona = persona;
+      m.reviewHidden = true;
+      const out = await ROUTES['reply: AI draft']!();
+      expect(out).toEqual({ status: 403, allowed: false });
+      expect(m.modelCalls).toEqual([]);
+    }
+  );
+
+  it.each(['demotedInstructorStaleJwt', 'demotedStaleJwt', 'student', 'noSession'] as const)(
+    'a hidden review with a %s token: refused, nothing read or sent',
+    async (persona) => {
+      m.persona = persona;
+      m.reviewHidden = true;
+      const out = await ROUTES['reply: AI draft']!();
+      expect(out.allowed).toBe(false);
+      expect(m.reviewReads).toBe(0);
+      expect(m.modelCalls).toEqual([]);
+    }
+  );
+
+  it.each(['founder', 'dbAdmin', 'bootstrapCookie', 'adminUsersCookie'] as const)(
+    'an admin who may read hidden reviews (%s) can draft for one',
+    async (persona) => {
+      m.persona = persona;
+      m.reviewHidden = true;
+      expect((await ROUTES['reply: AI draft']!()).status).toBe(200);
+      expect(m.modelCalls).toHaveLength(1);
+      expect(m.modelCalls[0]).toMatchObject({ body: 'private phone number' });
+    }
+  );
+
+  it('a published review is drafted for a current instructor, with its text', async () => {
+    m.persona = 'instructor';
+    expect((await ROUTES['reply: AI draft']!()).status).toBe(200);
+    expect(m.modelCalls).toEqual([
+      { courseTitle: 'Water Damage Restoration', rating: 1, title: 'Too basic', body: 'x' },
+    ]);
+  });
+
+  it('a deactivated instructor cannot draft (nothing read or sent)', async () => {
+    m.persona = 'deactivatedInstructor';
+    expect((await ROUTES['reply: AI draft']!()).status).toBe(403);
+    expect(m.reviewReads).toBe(0);
+    expect(m.modelCalls).toEqual([]);
+  });
+});
+
+describe('r11 sweep: every review route decides admin access from the database, none from the token role', () => {
+  const ROOT = join(process.cwd(), 'app/api/lms/courses/[slug]/reviews');
+  const routes = (dir: string): string[] =>
+    readdirSync(dir).flatMap((name) => {
+      const full = join(dir, name);
+      if (statSync(full).isDirectory()) return routes(full);
+      return name === 'route.ts' ? [full] : [];
+    });
+  // Every review-admin route, plus the learner route (GET/POST reviews) whose admin parts use the same rule.
+  const ADMIN_ROUTES = [
+    '[id]/publish/route.ts',
+    '[id]/reply/route.ts',
+    '[id]/reply/draft/route.ts',
+  ];
+  const LEARNER_ROUTE = 'route.ts';
+
+  it('the route list is complete (a new sibling route must be added here deliberately)', () => {
+    const found = routes(ROOT)
+      .map((f) => f.slice(ROOT.length + 1))
+      .sort();
+    expect(found).toEqual([...ADMIN_ROUTES, LEARNER_ROUTE].sort());
+  });
+
+  it.each([
+    ...ADMIN_ROUTES.map((r) => join(ROOT, r)),
+    join(process.cwd(), 'app/api/admin/reviews/summary/route.ts'),
+  ])('%s: the one session reader, a database decision, no token role', (file) => {
+    const src = readFileSync(file, 'utf8');
+    expect(src).toContain('readReviewAdminSession(request)');
+    expect(src).toMatch(/resolveCurrentAdmin\(|resolveCurrentReviewManager\(/);
+    expect(src).not.toMatch(/getSessionClaimsFromRequest/);
+    expect(src).not.toMatch(/claims\??\.role|canManageReviews|canModerateReviews/);
+  });
+
+  it('the learner route reads admin access only through the database rule (never claims.role)', () => {
+    const src = readFileSync(join(ROOT, LEARNER_ROUTE), 'utf8');
+    expect(src).toContain('readReviewAdminSession(request)');
+    expect(src).toContain('resolveCurrentReviewManager(tx, adminSession)');
+    expect(src).not.toMatch(/claims\??\.role|canManageReviews|canModerateReviews/);
   });
 });

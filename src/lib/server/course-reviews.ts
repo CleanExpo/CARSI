@@ -70,15 +70,10 @@ export type ReviewModerationDto = {
 
 export type ModeratorReviewDto = ReviewDto & { moderation: ReviewModerationDto };
 
-/** Roles allowed to publish a response to a review (mirrors WORKFLOW_ROLES). */
-export function canManageReviews(role: string | null | undefined): boolean {
-  return role === 'admin' || role === 'instructor';
-}
-
-/** Only admins may hide/unhide (moderate) a review — instructors would have a conflict of interest. */
-export function canModerateReviews(role: string | null | undefined): boolean {
-  return role === 'admin';
-}
+// Who may moderate or reply is decided from the DATABASE by resolveCurrentAdmin /
+// resolveCurrentReviewManager (current-admin.ts), never from a token's role claim (release-gate
+// r10, r11). The old token-role helpers were removed so they cannot be re-imported. Instructors
+// still never moderate (a conflict of interest): resolveCurrentAdmin does not accept them.
 
 export type ReviewSummary = {
   average: number;
@@ -409,11 +404,12 @@ export async function setReviewVisibility(
 /** Minimal review lookup for reply validation (confirms it belongs to the course). */
 export async function getReviewForCourse(
   reviewId: string,
-  courseId: string
-): Promise<{ id: string; rating: number; title: string | null; body: string | null } | null> {
-  return prisma.lmsCourseReview.findFirst({
+  courseId: string,
+  db: ReviewReadClient = prisma
+): Promise<{ id: string; rating: number; title: string | null; body: string | null; isPublished: boolean } | null> {
+  return db.lmsCourseReview.findFirst({
     where: { id: reviewId, courseId },
-    select: { id: true, rating: true, title: true, body: true },
+    select: { id: true, rating: true, title: true, body: true, isPublished: true },
   });
 }
 
