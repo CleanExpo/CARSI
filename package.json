@@ -95,7 +95,7 @@
     "test:smoke": "playwright test e2e/smoke.spec.ts",
     "test:a11y": "playwright test e2e/a11y.spec.ts",
     "test:unit": "vitest run",
-    "test:review-send-locks": "node scripts/check-review-send-locks.mjs",
+    "test:pg": "vitest run --config vitest.pg.config.ts",
     "verify:membership-guard": "npx tsx scripts/verify-membership-claim-guard.ts",
     "voice:plan": "npx tsx scripts/generate-course-voiceover.ts --plan",
     "voice:generate": "npx tsx scripts/generate-course-voiceover.ts --generate",
