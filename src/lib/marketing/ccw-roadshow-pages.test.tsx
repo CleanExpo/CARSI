@@ -9,6 +9,16 @@ import * as brisbaneModule from '../../../app/(public)/ccw-brisbane/page';
 import * as melbourneModule from '../../../app/(public)/ccw-melbourne/page';
 import * as sydneyModule from '../../../app/(public)/ccw-sydney/page';
 import * as hubModule from '../../../app/(public)/events/ccw-roadshow/page';
+import { metadata as successMetadata } from '../../../app/(public)/events/ccw-roadshow/success/page';
+
+vi.mock('@/lib/api/stripe', () => ({ getCheckoutSession: vi.fn() }));
+vi.mock('@/lib/server/ccw-roadshow-booking-email', () => ({ processCcwRoadshowBookingConfirmation: vi.fn() }));
+
+it('uses neutral success metadata for paid bookings and when no free sitting is open', () => {
+  expect(successMetadata.title).toBe('Roadshow Booking Status');
+  expect(successMetadata.description).toBe('Booking status for CARSI x CCW Business Growth Days.');
+  expect(JSON.stringify(successMetadata)).not.toMatch(/\bfree\b/i);
+});
 
 describe('CCW routes render per request', () => {
   // Explicit, not incidental: the hub is dynamic today only because it awaits searchParams.

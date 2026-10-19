@@ -9,6 +9,8 @@ vi.mock('@/components/landing/HomeTrustStrip', () => ({
 }));
 
 import { CcwRoadshowContent } from './CcwRoadshowPage';
+import { CcwRoadshowBooking } from './CcwRoadshowBooking';
+import { ccwRoadshowEvents, getCcwRoadshowEvent } from '@/lib/marketing/ccw-roadshow';
 
 describe('October Brisbane public presentation', () => {
   afterEach(() => {
@@ -242,6 +244,52 @@ describe('CCW free-entry offer only while a free sitting is ahead', () => {
     'Claim your free entry token',
     'at no cost',
   ];
+
+  it.each(['sydney', 'brisbane', 'brisbane-2026-10-09'])(
+    'allows the %s paid comparison while a free sitting is open elsewhere', (focusSlug) => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-07-01T00:00:00Z'));
+      const markup = renderToStaticMarkup(<CcwRoadshowContent focusSlug={focusSlug} />);
+      const event = getCcwRoadshowEvent(focusSlug)!;
+      expect(markup).toContain(`${event.city} is not part of the free CCW entry offer.`);
+      expect(markup).toContain(`Contact Carpet Cleaners Warehouse to book a place for ${event.dates}.`);
+    },
+  );
+
+  it.each(['sydney', 'brisbane', 'brisbane-2026-10-09'])(
+    'uses neutral paid copy for %s after the last free sitting ends', (focusSlug) => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-09-01T00:00:00Z'));
+      const markup = renderToStaticMarkup(<CcwRoadshowContent focusSlug={focusSlug} />);
+      const event = getCcwRoadshowEvent(focusSlug)!;
+      expect(markup).toContain(`Contact Carpet Cleaners Warehouse to book a place for ${event.dates}.`);
+      expect(markup).not.toMatch(/\bfree\b/i);
+    },
+  );
+
+  it.each([
+    ['2026-07-23T06:29:59.999Z', true],
+    ['2026-07-23T06:30:00.000Z', false],
+    ['2026-09-01T00:00:00Z', false],
+  ] as const)('guards the booking comparison at %s (free open: %s)', (clock, freeOpen) => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(clock));
+    const markup = renderToStaticMarkup(<CcwRoadshowBooking events={ccwRoadshowEvents} initialSlug="sydney" />);
+    expect(markup).toContain('Book directly with Carpet Cleaners Warehouse.');
+    expect(/\bfree\b/i.test(markup)).toBe(freeOpen);
+    const page = renderToStaticMarkup(<CcwRoadshowContent focusSlug="sydney" />);
+    expect(page.includes('Sydney is not part of the free CCW entry offer.')).toBe(freeOpen);
+  });
+
+  it('does not show an ended free sitting as bookable even when passed directly to the booking component', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-10-19T00:00:00Z'));
+    const markup = renderToStaticMarkup(<CcwRoadshowBooking events={ccwRoadshowEvents} initialSlug="melbourne" />);
+    expect(markup).not.toMatch(/\bfree\b/i);
+    expect(markup).not.toContain('<form');
+    expect(markup).toContain('Register your interest');
+    expect(markup).toContain('/contact?source=ccw-roadshow&amp;city=melbourne');
+  });
 
   it('shows the free offer on the hub while the free Melbourne sitting is ahead (1/07/2026)', () => {
     vi.useFakeTimers();

@@ -38,6 +38,7 @@ import {
   getCcwRoadshowEventPath,
   getNextCcwCitySitting,
   hasCcwRoadshowSessionEnded,
+  isOpenFreeEntrySitting,
   type CcwRoadshowEvent,
 } from '@/lib/marketing/ccw-roadshow';
 
@@ -144,7 +145,7 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
   // The free-entry offer shows only while a free-token sitting is still ahead.
   const freeEntryCities = getUpcomingFreeEntryCities(now);
   const showFreeOffer = focusEvent
-    ? allowsFreeEntryRegistration(focusEvent)
+    ? isOpenFreeEntrySitting(focusEvent, now)
     : freeEntryCities.length > 0;
   // When the focused sitting has ended but its city has a later one, point at that sitting.
   const nextCitySitting =
@@ -392,7 +393,7 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
                 </h3>
                 <p className={`mt-3 ${LANDING_LEAD_CLASS}`}>
                   {focusEvent
-                    ? `${focusEvent.city} is not part of the free CCW entry offer. Contact Carpet Cleaners Warehouse to book a place for ${focusEvent.dates}.`
+                    ? `${freeEntryCities.length > 0 ? `${focusEvent.city} is not part of the free CCW entry offer. ` : ''}Contact Carpet Cleaners Warehouse to book a place for ${focusEvent.dates}.`
                     : 'Contact Carpet Cleaners Warehouse to book a place at an upcoming sitting.'}
                 </p>
               </>
