@@ -48,7 +48,7 @@ const SECTORS = [
     slug: 'hospitality',
     label: 'Hotels & Resorts',
     icon: Hotel,
-    description: 'Fast turnarounds that protect guest experience and star ratings.',
+    description: 'Training for the crews who dry, clean and deodorise rooms between guests.',
     chips: ['Rapid drying', 'Odour removal', 'Guest-ready finishes'],
   },
   {

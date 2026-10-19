@@ -54,8 +54,8 @@ const CLAIM_PATTERNS: { label: string; pattern: RegExp; unless?: RegExp }[] = [
       /\bleading (online )?(training|platform|provider|trade publications?|insurers?|experts?|brands?|educators?)\b/i,
   },
   {
-    label: 'the leading cause/source/driver',
-    pattern: /\bthe leading (non-[\w-]+ )?(cause|source|drivers?)\b/i,
+    label: 'the/a leading cause/source/driver',
+    pattern: /\b(the|a|one) leading (non-[\w-]+ )?(cause|source|drivers?)\b/i,
   },
   {
     label: 'premier provider',
@@ -103,15 +103,15 @@ const CLAIM_PATTERNS: { label: string; pattern: RegExp; unless?: RegExp }[] = [
     pattern:
       /\b(satisf\w*|meets?|pre-?qualif\w*)\b[^.]{0,40}\bAusTender\b|\bAusTender\s+pre-?qualif/i,
   },
-  { label: 'Protect Your/Guest CTA', pattern: /\bProtect (Your|Guest|Our)\b/ },
+  { label: 'Protect Your/Guest CTA', pattern: /\bProtect (Your|Guest|Our)\b/i },
   {
     // "WRT certification", "ASD certification" ... from the one shared IICRC code list.
     label: '<IICRC code> certification',
     pattern: new RegExp(`\\b(?:${IICRC_CODE_ALT})\\s+certification\\b`),
   },
   {
-    // A process claim with no standard named. The only allowed form is a nominative citation on
-    // the same line, e.g. "aligned to ANSI/IICRC S500".
+    // A process claim with no standard named. The only allowed form is a nominative citation in
+    // the same sentence, e.g. "aligned to ANSI/IICRC S500".
     label: 'standards-based (no named standard)',
     pattern: /\bstandards?[- ]based\b/i,
     unless: /\baligned to ANSI\/IICRC S\d{3}\b/i,
@@ -177,33 +177,52 @@ function publicCopyFiles(): string[] {
 
 /**
  * Exact policy sentences where CARSI states its own obligation, not a training outcome. Each is
- * allowed only in its own file and is stripped from that line before the "ensures" rule runs, so
- * any other "ensure" in the same line, file or legal page is still flagged. Add an entry only for
- * a real sentence that exists; never exempt a whole file or folder.
+ * allowed only in its own file and is stripped from that line before its one rule runs, so any
+ * other hit for that rule in the same line, file or legal page is still flagged. Add an entry only
+ * for a real sentence that exists; never exempt a whole file or folder.
  */
-const ENSURES_POLICY_SENTENCES: { file: string; sentence: string }[] = [
+const POLICY_SENTENCES: { rule: string; file: string; sentence: string }[] = [
   {
+    rule: 'ensures (outcome guarantee)',
     file: 'app/(public)/privacy/page.tsx',
     sentence: 'We ensure appropriate safeguards are in place to protect',
   },
+  {
+    rule: 'Protect Your/Guest CTA',
+    file: 'app/(public)/privacy/page.tsx',
+    sentence: 'We implement appropriate technical and organisational measures to protect your personal',
+  },
+  {
+    rule: 'Protect Your/Guest CTA',
+    file: 'app/(public)/privacy/page.tsx',
+    sentence: 'While we strive to protect your',
+  },
 ];
 
-function withoutPolicySentences(line: string, file: string): string {
-  return ENSURES_POLICY_SENTENCES.filter((entry) => entry.file === file).reduce(
+function withoutPolicySentences(line: string, file: string, rule: string): string {
+  return POLICY_SENTENCES.filter((entry) => entry.rule === rule && entry.file === file).reduce(
     (text, entry) => text.split(entry.sentence).join(''),
     line
   );
+}
+
+/**
+ * An exception (`unless`) applies only to the sentence that carries it, so a citation in one
+ * sentence cannot clear an uncited claim in the next sentence on the same physical line.
+ */
+function sentences(line: string): string[] {
+  return line.split(/(?<=[.!?])\s+/);
 }
 
 function findClaims(text: string, file = ''): { label: string; line: number; excerpt: string }[] {
   const hits: { label: string; line: number; excerpt: string }[] = [];
   text.split('\n').forEach((line, index) => {
     for (const { label, pattern, unless } of CLAIM_PATTERNS) {
-      const scanned =
-        label === 'ensures (outcome guarantee)' ? withoutPolicySentences(line, file) : line;
-      if (unless?.test(scanned)) continue;
-      const match = pattern.exec(scanned);
-      if (match) hits.push({ label, line: index + 1, excerpt: line.trim().slice(0, 160) });
+      const scanned = withoutPolicySentences(line, file, label);
+      const hit = unless
+        ? sentences(scanned).some((sentence) => pattern.test(sentence) && !unless.test(sentence))
+        : pattern.test(scanned);
+      if (hit) hits.push({ label, line: index + 1, excerpt: line.trim().slice(0, 160) });
     }
   });
   return hits;
@@ -260,6 +279,11 @@ describe('public claims guard', () => {
     'Remediate to a standards-based protocol.',
     'Water ingress requires immediate, standards-based response.',
     'Response protocols aligned to AICCM conservation guidelines.',
+    // Review r8: a citation in a separate sentence must not clear the claim, and case and
+    // article variants of removed claims are still caught.
+    'Teams use standards-based cleaning. Separately, records are aligned to ANSI/IICRC S500.',
+    'Protect your members and your reputation.',
+    'Mould complaints and Google reviews mentioning cleanliness are a leading cause of gym cancellations.',
   ])('flags a planted claim: %s', (planted) => {
     expect(findClaims(planted)).not.toHaveLength(0);
   });
@@ -274,10 +298,26 @@ describe('public claims guard', () => {
     expect(findClaims(planted).length).toBeGreaterThan(findClaims(footer).length);
   });
 
+  it.each([
+    [
+      'src/lib/marketing/industry-page-data.ts',
+      'Teams use standards-based cleaning. Separately, records are aligned to ANSI/IICRC S500.',
+    ],
+    ['app/(public)/industries/gyms-fitness/page.tsx', 'Protect your members and your reputation.'],
+    [
+      'app/(public)/industries/gyms-fitness/page.tsx',
+      'Mould complaints and Google reviews mentioning cleanliness are a leading cause of gym cancellations.',
+    ],
+  ])('flags a review r8 claim planted into the real %s', (path, claim) => {
+    const source = readFileSync(join(ROOT, path), 'utf8');
+    const planted = `${source}\nconst planted = '${claim}';\n`;
+    expect(findClaims(planted, path).length).toBeGreaterThan(findClaims(source, path).length);
+  });
+
   it('allows only the exact privacy-policy "we ensure" sentence, in its own file and line', () => {
     const privacy = 'app/(public)/privacy/page.tsx';
     const terms = 'app/(public)/terms/page.tsx';
-    const policy = 'We ensure appropriate safeguards are in place to protect your data.';
+    const policy = 'We ensure appropriate safeguards are in place to protect personal data.';
     const outcome = 'CARSI training ensures compliance with WHS requirements.';
     // The real policy sentence is allowed in the privacy page...
     expect(findClaims(policy, privacy)).toHaveLength(0);
@@ -291,6 +331,19 @@ describe('public claims guard', () => {
     const realPrivacy = readFileSync(join(ROOT, privacy), 'utf8');
     expect(realPrivacy).toContain('We ensure appropriate safeguards are in place to protect');
     expect(findClaims(realPrivacy, privacy)).toHaveLength(0);
+  });
+
+  it('allows the privacy data-security "protect your" sentences only in place, never a CTA', () => {
+    const privacy = 'app/(public)/privacy/page.tsx';
+    const policy = 'While we strive to protect your';
+    expect(findClaims(policy, privacy)).toHaveLength(0);
+    // The same words elsewhere, a CTA on the privacy page, or one rule's exemption clearing
+    // another rule's hit are all still flagged.
+    expect(findClaims(policy, 'app/(public)/industries/gyms-fitness/page.tsx')).not.toHaveLength(0);
+    expect(findClaims('Protect your members and your reputation.', privacy)).not.toHaveLength(0);
+    expect(
+      findClaims('We ensure appropriate safeguards are in place to protect your members.', privacy)
+    ).not.toHaveLength(0);
   });
 
   it('leaves the required IICRC CEC Accredited wording and plain usage alone', () => {
