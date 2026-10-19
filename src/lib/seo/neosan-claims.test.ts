@@ -50,6 +50,13 @@ const CLAIM_PATTERN = new RegExp(
     'control\\w* allergens',
     'guarantee\\w*',
     '100\\s?%',
+    // review r9 additions: third-party equipment-brand performance marketing
+    '\\b\\d+\\s+times\\b',
+    'times\\s+(the force|more|faster|better)',
+    'wraps?\\s+around',
+    'reverses?\\s+course',
+    'hidden surfaces',
+    'coverage[^.]{0,40}\\d+',
     // review r6 additions: toxicology + environmental-fate assertions
     '\\bcancers?\\b',
     '\\bcarcinogens?\\b',
@@ -69,7 +76,8 @@ const CLAIM_PATTERN = new RegExp(
   ].join('|'),
   'i',
 );
-const ATTRIBUTED = /NeoSan Labs states/i;
+const ATTRIBUTED =
+  /NeoSan Labs states|stated by the manufacturer|the manufacturer states/i;
 const SOURCED = /\(?\s*source:\s*https?:\/\//i;
 const DATED = /checked\s+\d{1,2}\/\d{1,2}\/\d{4}/;
 // r6/r7/r8: evaluation is SENTENCE-level. A block-level attribution would let an
@@ -149,6 +157,13 @@ describe('NeoSan Labs course claim compliance (review r2/r3)', () => {
       '<p>Control allergens, such as dust and mould.</p>',
       '<p>We guarantee results.</p>',
       '<p>100% effective against germs.</p>',
+      // review r9 controls: equipment-brand performance marketing
+      '<p>Charged particles have an attraction up to 75 times that of gravity.</p>',
+      '<p>The spray is 3 times faster than wiping.</p>',
+      '<p>Electrostatic droplets wrap around the target surface.</p>',
+      '<p>The charge makes particles reverse course in mid-air.</p>',
+      '<p>It coats hidden surfaces that wiping misses.</p>',
+      '<p>This nozzle improves coverage by 40 percent.</p>',
       // review r6 controls: toxicology + environmental-fate assertions
       '<p>Degradation products are known to cause cancer.</p>',
       '<p>This surfactant contains a carcinogen.</p>',
@@ -187,6 +202,14 @@ describe('NeoSan Labs course claim compliance (review r2/r3)', () => {
         'environmental information.</p>',
     ];
     expect(unattributedClaims(loophole)).toHaveLength(1);
+  });
+
+  it('planted control: manufacturer-stated coverage with a dated source passes (r9)', () => {
+    const ok = [
+      '<p>Approximate coverage stated by the manufacturer: 100 m&sup2; per litre ' +
+        '(source: https://example.com/product, checked 19/10/2026).</p>',
+    ];
+    expect(unattributedClaims(ok)).toEqual([]);
   });
 
   it('planted control: an attributed, dated, sourced claim passes', () => {
