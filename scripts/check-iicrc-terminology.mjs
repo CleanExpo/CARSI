@@ -151,7 +151,10 @@ const BANNED = [
     // Out of scope here, by design: JSX text split across elements, string concatenation, HTML
     // entities and zero-width characters — the rendered-text scan on feat/designations-live
     // covers those, rather than more source regex.
-    re: /\b(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)(?:['’]s)?\b(?:\s*\([^)\n]{0,60}\))?(?:\s*[:/,]\s*|[\s\-\u2013\u2014])+(?:courses?|training|program(?:me)?s?|pathways?|modules?|class(?:es)?)\b/i,
+    // Up to TWO course modifiers from a CLOSED list may sit between the code and the offering
+    // ("Enrol in WRT online training", "ASD practical training module"; review of 47921544). No
+    // open wildcard: "WRT holders completing training" names the certification, not an offering.
+    re: /\b(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)(?:['’]s)?\b(?:\s*\([^)\n]{0,60}\))?(?:\s*[:/,]\s*|[\s\-\u2013\u2014])+(?:(?:online|practical|refresher|intro|introductory|advanced|foundations?|essentials|basics|short|self-paced|accelerated|hands-on|on-site|onsite|CEC|live|virtual|fundamentals)(?:\s*[:/,]\s*|[\s\-\u2013\u2014])+){0,2}(?:courses?|training|program(?:me)?s?|pathways?|modules?|class(?:es)?)\b/i,
     allow: null,
     crossLine: true,
     // Public surfaces only (app/, src/, public/, data/): docs/ marketing and campaign plans are

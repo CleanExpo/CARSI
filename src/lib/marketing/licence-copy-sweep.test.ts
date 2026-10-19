@@ -3,7 +3,7 @@
  * Independent review of fix/industry-faq-licence (18/10/2026) found the same defects live outside
  * the FAQs: acronym-named bundles and add-ons ("CRT Carpet Restoration + CCT Commercial Carpet
  * + OCT Odour Control … seeking IICRC credentials"), customer-journey copy ("Start with WRT"),
- * meta keywords ("WRT CEC course plumbing"), unsold carpet-repair offers in shared industry data,
+ * meta keywords naming a course by its code plus "CEC" (plumbing), unsold carpet-repair offers in shared industry data,
  * the catalogue topic list and outbound marketing docs, plumbing cards claiming certification lets
  * plumbers "legally" perform and invoice the work and a $2,500–$15,000 per-job range, and a CEC
  * statement covering a vehicle course with no IICRC approval.

@@ -17,6 +17,12 @@ import { scanFile, scanText } from './check-iicrc-terminology.mjs';
 const F = 'app/(public)/fixture/page.tsx';
 
 const MUST_BLOCK = [
+  // Closed-list course modifiers between the code and the offering (review of 47921544).
+  ['acronym, one modifier, offering', 'Enrol in WRT online training today'],
+  ['acronym, two modifiers, offering', 'ASD practical training module'],
+  ['acronym, modifier, colon, offering', 'CCT refresher: course for floor-care crews'],
+  ['acronym, two modifiers (hyphenated), offering', 'Book the FSRT self-paced intro course'],
+  ['acronym, CEC modifier, offering', 'Browse AMRT CEC courses'],
   // Punctuation between the acronym and the offering (review of d25ce440): colon, slash, comma.
   ['acronym, colon, offering', 'WRT: training for plumbers'],
   ['acronym, slash, offering', 'WRT/course pathway'],
@@ -141,6 +147,9 @@ const MUST_BLOCK = [
 ];
 
 const MUST_PASS = [
+  // Third-person facts with an open word between code and noun stay allowed (closed list only).
+  ['holders completing training (third-person)', 'WRT holders completing training'],
+  ['technicians who hold the certification attend training', 'technicians who hold WRT attend training'],
   // Punctuation forms that name no CARSI offering stay allowed.
   ['month pair before training (October)', 'Sep/Oct training calendar for regional teams'],
   ['certification fact after a colon', 'FSRT: an IICRC certification covering fire and smoke restoration.'],
