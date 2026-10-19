@@ -4,6 +4,7 @@ import { getPublicSiteUrl } from '@/lib/env/public-url';
 
 import { CcwRoadshowContent } from '@/components/marketing/CcwRoadshowPage';
 import {
+  allowsFreeEntryRegistration,
   getCcwNextDatesDescription,
   getCcwRoadshowEvent,
   hasCcwRoadshowSessionEnded,
@@ -37,7 +38,9 @@ export function generateMetadata(): Metadata {
   return {
     ...page,
     title: `CARSI x CCW Melbourne | Grow Your Cleaning Business — ${melbourneDates}`,
-    description: `Free for CCW past and current customers. Two practical business-growth days with Phill McGurk at ${melbourne.venueName} (${melbourne.suburb}), ${melbourneDates}. Claim your free entry token.`,
+    description: allowsFreeEntryRegistration(melbourne)
+      ? `Free for CCW past and current customers. Two practical business-growth days with Phill McGurk at ${melbourne.venueName} (${melbourne.suburb}), ${melbourneDates}. Claim your free entry token.`
+      : `Two practical business-growth days with Phill McGurk at ${melbourne.venueName} (${melbourne.suburb}), ${melbourneDates}. Seats are booked through Carpet Cleaners Warehouse.`,
     openGraph: {
       ...page.openGraph,
       title: 'CARSI x CCW Melbourne — Grow Your Cleaning Business',

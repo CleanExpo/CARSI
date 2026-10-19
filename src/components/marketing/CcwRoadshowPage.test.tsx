@@ -222,3 +222,55 @@ describe('past sittings are not presented as upcoming', () => {
     expect(markup).not.toContain('Booked through CCW');
   });
 });
+
+describe('CCW free-entry offer only while a free sitting is ahead', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  function costAnswer(markup: string): string {
+    const faq = [...markup.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)]
+      .map((m) => JSON.parse(m[1]) as { '@type'?: string; mainEntity?: { name?: string; acceptedAnswer?: { text?: string } }[] })
+      .find((block) => block['@type'] === 'FAQPage');
+    return faq?.mainEntity?.find((q) => q.name === 'How much does it cost?')?.acceptedAnswer?.text ?? '';
+  }
+
+  const freeCopy = [
+    'free for past and current CCW customers',
+    'Free CCW customer entry',
+    'Free CCW entry',
+    'Claim your free entry token',
+    'at no cost',
+  ];
+
+  it('shows the free offer on the hub while the free Melbourne sitting is ahead (1/07/2026)', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-07-01T00:00:00Z'));
+    const markup = renderToStaticMarkup(<CcwRoadshowContent />);
+    expect(costAnswer(markup)).toContain('free for past and current CCW customers');
+    expect(costAnswer(markup)).toContain('Melbourne');
+    expect(markup).toContain('Free CCW customer entry');
+    expect(markup).toContain('Free CCW entry');
+  });
+
+  it('drops the free offer when only paid sittings are ahead (1/09/2026)', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-09-01T00:00:00Z'));
+    const markup = renderToStaticMarkup(<CcwRoadshowContent />);
+    expect(costAnswer(markup)).toBe(
+      'Seats for the upcoming sittings are booked through Carpet Cleaners Warehouse, not on this page.'
+    );
+    for (const copy of freeCopy) expect(markup).not.toContain(copy);
+    expect(markup).toContain('Booked through CCW');
+  });
+
+  it('gives the neutral pricing answer when nothing is ahead (19/10/2026)', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-10-19T00:00:00Z'));
+    const markup = renderToStaticMarkup(<CcwRoadshowContent />);
+    expect(costAnswer(markup)).toBe(
+      "Pricing is confirmed with each new date. Register your interest and we'll send it with the dates."
+    );
+    for (const copy of freeCopy) expect(markup).not.toContain(copy);
+  });
+});

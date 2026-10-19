@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import BrisbanePage, { generateMetadata as brisbaneMetadata } from '../../../app/(public)/ccw-brisbane/page';
 import { generateMetadata as melbourneMetadata } from '../../../app/(public)/ccw-melbourne/page';
 import { generateMetadata as sydneyMetadata } from '../../../app/(public)/ccw-sydney/page';
-import RoadshowPage from '../../../app/(public)/events/ccw-roadshow/page';
+import RoadshowPage, { generateMetadata as hubMetadata } from '../../../app/(public)/events/ccw-roadshow/page';
 import * as brisbaneModule from '../../../app/(public)/ccw-brisbane/page';
 import * as melbourneModule from '../../../app/(public)/ccw-melbourne/page';
 import * as sydneyModule from '../../../app/(public)/ccw-sydney/page';
@@ -80,5 +80,33 @@ describe('city page metadata after a sitting ends', () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2026-07-01T00:00:00Z'));
     expect(String(melbourneMetadata().title)).toContain('22-23 July 2026');
+  });
+});
+
+describe('roadshow hub metadata follows the free-entry rule', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('mentions free CCW-customer entry only while a free sitting is ahead', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-07-01T00:00:00Z'));
+    expect(String(hubMetadata().description)).toContain('free for past and current CCW customers');
+  });
+
+  it('says seats are booked through CCW when only paid sittings are ahead', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-09-01T00:00:00Z'));
+    const text = JSON.stringify(hubMetadata());
+    expect(text).toContain('booked through Carpet Cleaners Warehouse');
+    expect(text).not.toMatch(/\bfree\b/i);
+  });
+
+  it('gives the neutral pricing line when nothing is ahead', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-10-19T00:00:00Z'));
+    const text = JSON.stringify(hubMetadata());
+    expect(text).toContain('Pricing is confirmed with each new date');
+    expect(text).not.toMatch(/\bfree\b/i);
   });
 });

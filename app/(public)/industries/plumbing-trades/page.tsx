@@ -80,7 +80,7 @@ const whyCards = [
     icon: Shield,
     title: 'WHS & Insurer Credibility',
     description:
-      'Water damage is a workplace hazard under Australian WHS legislation. Documented training shows due diligence; each insurer panel sets its own certification requirements.',
+      'Water damage brings WHS hazards such as slips, electrical risk and mould. Documented IICRC CEC training shows the due diligence behind your remediation work.',
     color: '#00838f',
   },
   {

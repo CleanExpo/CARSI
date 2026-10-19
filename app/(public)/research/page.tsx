@@ -19,7 +19,7 @@ const siteUrl = getPublicSiteUrl();
 export const metadata: Metadata = {
   title: 'Research Articles | CARSI Industry Hub',
   description:
-    'Deep, sourced research articles on water damage restoration, indoor environments, HVAC, flooring, and related Australian industries. Expert content from NRPG-accredited professionals.',
+    'Deep, sourced research articles on water damage restoration, indoor environments, HVAC, flooring, and related Australian industries. Written by NRPG network contractors.',
   keywords: [
     'restoration research',
     'water damage articles',
@@ -166,7 +166,7 @@ export default async function ResearchPage({
       <CommunityHubShell
         eyebrow="Community & resources"
         title="Research Articles"
-        description="Deep, sourced research on water damage restoration, indoor environments, HVAC, flooring, and related Australian industries — authored by NRPG-accredited professionals."
+        description="Deep, sourced research on water damage restoration, indoor environments, HVAC, flooring, and related Australian industries — authored by NRPG network contractors."
         stats={[
           { value: total > 0 ? String(total) : '—', label: 'Articles' },
           { value: 'AU', label: 'Sourced' },

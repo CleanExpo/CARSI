@@ -136,8 +136,8 @@ export default function CcwCaseStudyPage() {
           Carpet Cleaners Warehouse: the first business to bet on CCW-CRM
         </h1>
         <p className={`mt-5 max-w-2xl text-base leading-relaxed sm:text-lg ${marketingTextMuted}`}>
-          Carpet Cleaners Warehouse (CCW) is one of Australia&rsquo;s best-known suppliers to the
-          carpet cleaning industry. When they needed to manage customer relationships across
+          Carpet Cleaners Warehouse (CCW) supplies equipment and chemicals to the carpet cleaning
+          industry, with its own stores in three states. When they needed to manage customer relationships across
           e-commerce and field service, they chose CCW-CRM — becoming the platform&rsquo;s first
           paying client under a $33,000-per-year contract.
         </p>

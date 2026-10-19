@@ -34,7 +34,7 @@ export async function generateMetadata(): Promise<Metadata> {
     d > 0 ? `${d} discipline${d === 1 ? '' : 's'}` : 'multiple IICRC disciplines';
   return {
     title: 'About CARSI | Centre for Australian Restoration and Standards Information',
-    description: `CARSI is Australia's leading online training platform for cleaning and restoration professionals. ${coursePhrase} across ${discPhrase}. 50+ years of combined industry experience.`,
+    description: `CARSI is an Australian online training platform for cleaning and restoration professionals. ${coursePhrase} across ${discPhrase}. 50+ years of combined industry experience.`,
   };
 }
 
@@ -187,8 +187,7 @@ export default async function AboutPage() {
               <Shield className="mb-4 h-5 w-5 text-[#146fc2]" aria-hidden />
               <p className="text-sm leading-relaxed text-slate-600">
                 CARSI is a core pillar of the National Restoration Professionals Group (NRPG)
-                onboarding pathway. Our training is recognised by major Australian insurers as
-                evidence of professional competency.
+                onboarding pathway.
               </p>
             </div>
           </div>

@@ -87,7 +87,7 @@ const whyCards = [
     icon: Users,
     title: 'Member Retention & Reputation',
     description:
-      'Mould complaints and Google reviews mentioning cleanliness are the leading non-price drivers of gym cancellations. Documented training protects your reputation and your renewal rate.',
+      'Mould complaints and Google reviews mentioning cleanliness can cost a gym its members. Documented IICRC CEC training protects your reputation and your renewal rate.',
     color: '#2490ed',
   },
 ];

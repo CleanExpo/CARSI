@@ -165,6 +165,40 @@ export function getCcwCityVenue(city: CcwRoadshowEvent['city'], now: Date): CcwV
   return { venueName, streetAddress, suburb, suburbStatePostcode, state };
 }
 
+/**
+ * Cities whose not-yet-ended sittings use free-token registration. The CCW free-entry offer may
+ * only be advertised while this is non-empty; it is a business fact, not standing copy.
+ */
+export function getUpcomingFreeEntryCities(now: Date): CcwRoadshowEvent['city'][] {
+  const cities = ccwRoadshowEvents
+    .filter((event) => !hasCcwRoadshowSessionEnded(event, now) && allowsFreeEntryRegistration(event))
+    .map((event) => event.city);
+  return [...new Set(cities)];
+}
+
+/** What can truthfully be said about price now: a free sitting ahead, only paid ones, or none. */
+export function getCcwRoadshowPricing(
+  now: Date,
+): { mode: 'free'; freeCities: CcwRoadshowEvent['city'][] } | { mode: 'paid' | 'none' } {
+  const freeCities = getUpcomingFreeEntryCities(now);
+  if (freeCities.length > 0) return { mode: 'free', freeCities };
+  const anyAhead = ccwRoadshowEvents.some((event) => !hasCcwRoadshowSessionEnded(event, now));
+  return { mode: anyAhead ? 'paid' : 'none' };
+}
+
+/** Hub "How much does it cost?" answer: free offer, paid-through-CCW, or neutral pricing. */
+export function getCcwRoadshowCostAnswer(now: Date): string {
+  const pricing = getCcwRoadshowPricing(now);
+  if (pricing.mode === 'free') {
+    const plural = pricing.freeCities.length > 1 ? 's' : '';
+    return `Entry to the ${pricing.freeCities.join(' and ')} sitting${plural} is free for past and current CCW customers - register on the CARSI event page to claim a free entry token for check-in. Other sittings are booked through Carpet Cleaners Warehouse, not on this page.`;
+  }
+  if (pricing.mode === 'paid') {
+    return 'Seats for the upcoming sittings are booked through Carpet Cleaners Warehouse, not on this page.';
+  }
+  return "Pricing is confirmed with each new date. Register your interest and we'll send it with the dates.";
+}
+
 /** City-page meta description once that city's sitting has ended: no past dates or offers. */
 export function getCcwNextDatesDescription(city: CcwRoadshowEvent['city']): string {
   return `Next ${city} dates to be announced. Practical training with Phill McGurk at ${formatCcwVenue(getCcwHomeVenue(city))}. Register your interest.`;

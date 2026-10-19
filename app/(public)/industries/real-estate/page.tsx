@@ -88,7 +88,7 @@ const whyCards = [
     icon: Shield,
     title: 'Professional Indemnity Protection',
     description:
-      'Non-disclosure of known defects is the leading source of real estate professional indemnity claims. Documented awareness training demonstrates due diligence and supports a defensible inspection record.',
+      'Non-disclosure of known defects can lead to real estate professional indemnity claims. IICRC CEC Accredited awareness courses demonstrates due diligence and supports a defensible inspection record.',
     color: '#2490ed',
   },
 ];

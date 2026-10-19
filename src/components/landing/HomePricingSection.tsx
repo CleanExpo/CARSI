@@ -181,7 +181,7 @@ export function HomePricingSection({
                     </p>
                     {isDark ? (
                       <span className="rounded-full bg-white/15 px-2.5 py-1 text-[10px] font-semibold tracking-[0.08em] text-white uppercase ring-1 ring-white/25">
-                        Best value
+                        Every course
                       </span>
                     ) : (
                       <span
