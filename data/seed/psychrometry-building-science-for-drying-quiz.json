@@ -4,119 +4,229 @@
   "quizzes": [
     {
       "quizId": "02f50dfb-f5e3-4b1e-8108-4cdce4e6f4cd",
-      "lessonTitle": "EMC targets by NCC climate zone",
-      "title": "Psychrometry & Building Science for Drying — Knowledge Check",
+      "lessonTitle": "Final knowledge check: mixed practice across all modules",
+      "title": "Building Science for Drying — Final Knowledge Check",
       "passPercentage": 80,
       "attemptsAllowed": 3,
       "questions": [
         {
-          "questionText": "Which four measurements together describe the state of moist air for drying decisions?",
+          "questionText": "Air in a room warms from 18 &deg;C to 26 &deg;C with no water added or removed. What happens?",
           "options": [
-            "Colour, odour, texture and weight",
-            "Temperature, relative humidity, dew point, and specific humidity (g/kg)",
-            "Wind speed, air pressure, rainfall and cloud cover",
-            "Only relative humidity, read at the start and end of the job"
-          ],
-          "correctIndex": 1,
-          "points": 1
-        },
-        {
-          "questionText": "Why can relative humidity (RH) alone be misleading when judging how much water is in the air?",
-          "options": [
-            "RH cannot be measured with a standard hygrometer",
-            "RH depends on temperature, so the same mass of water in the air shows a different RH reading as temperature rises or falls",
-            "RH is only relevant to outdoor air, never indoor air",
-            "RH and dew point always move in opposite directions"
-          ],
-          "correctIndex": 1,
-          "points": 1
-        },
-        {
-          "questionText": "What is dew point?",
-          "options": [
-            "The temperature at which air becomes saturated (100% RH) and begins to condense moisture",
-            "The maximum safe operating temperature for a dehumidifier",
-            "The average daily temperature recorded by the Bureau of Meteorology",
-            "A fixed value that never changes regardless of how much water is in the air"
+            "RH falls, g/kg stays the same",
+            "RH rises, g/kg stays the same",
+            "RH falls, g/kg falls as well",
+            "RH stays, g/kg rises a little"
           ],
           "correctIndex": 0,
           "points": 1
         },
         {
-          "questionText": "In Australian practice, specific humidity (the actual mass of water carried by the air) is expressed in:",
+          "questionText": "What is the dew point of air at 25 &deg;C and 60% RH?",
           "options": [
-            "Relative humidity as a percentage (%)",
-            "Grams of water per kilogram of dry air (g/kg)",
-            "Litres per square metre",
-            "Degrees Celsius (&deg;C)"
+            "About 12.0 &deg;C",
+            "About 16.7 &deg;C",
+            "About 19.0 &deg;C",
+            "About 21.3 &deg;C"
           ],
           "correctIndex": 1,
           "points": 1
         },
         {
-          "questionText": "What does a psychrometric chart or digital psychrometric calculator let a technician do?",
+          "questionText": "Using W = 622 &times; p<sub>w</sub> / (p &minus; p<sub>w</sub>) with p<sub>w</sub> = 1.902 kPa at 101.325 kPa, what is W?",
           "options": [
-            "Replace the need for a hygrometer entirely",
-            "Enter any two known air properties (such as temperature and RH) and read off the related properties, such as dew point and specific humidity",
-            "Predict the exact day the job will finish",
-            "Measure moisture content inside a solid material without a moisture meter"
+            "About 18.77 g/kg",
+            "About 9.06 g/kg",
+            "About 11.90 g/kg",
+            "About 13.10 g/kg"
           ],
-          "correctIndex": 1,
+          "correctIndex": 2,
           "points": 1
         },
         {
-          "questionText": "What causes water vapour to move out of a wet material and into the surrounding air?",
+          "questionText": "Which number should you use to track drying progress from day to day?",
           "options": [
-            "A vapour pressure gradient — vapour pressure at the wet surface is higher than in the surrounding air, so moisture moves from high to low pressure",
-            "Gravity pulling the water molecules downward",
-            "The material&rsquo;s colour absorbing more heat",
-            "Air pressure remaining exactly equal everywhere in the building"
+            "Relative humidity in percent",
+            "Air temperature in degrees",
+            "Equipment run time hours",
+            "Humidity ratio in g/kg"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        },
+        {
+          "questionText": "A wet surface is at 22 &deg;C (p<sub>ws</sub> 2.645 kPa) and the room air is 22 &deg;C, 45% RH. What is the vapour pressure differential?",
+          "options": [
+            "About 1.455 kPa",
+            "About 2.645 kPa",
+            "About 1.190 kPa",
+            "About 0.529 kPa"
           ],
           "correctIndex": 0,
           "points": 1
         },
         {
-          "questionText": "What does equilibrium moisture content (EMC) describe?",
+          "questionText": "A skirting offcut weighs 152.4 g wet and 120.0 g oven-dry. What is its moisture content?",
           "options": [
-            "The moisture content a material settles at once it is in balance with the surrounding temperature and RH",
-            "The moisture content of a material the moment it gets wet",
-            "A single fixed percentage that applies to every material in every building",
-            "The reading taken only on the last day of a drying job"
+            "21.3 percent",
+            "27.0 percent",
+            "32.4 percent",
+            "12.7 percent"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Where should the dry standard for wet skirting come from?",
+          "options": [
+            "A fixed percentage for every job",
+            "The meter maker&rsquo;s printed default value",
+            "Unaffected skirting in the same building",
+            "Any dry material in the room"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "Using the Wood Handbook EMC equation, about what EMC does timber reach at 20 &deg;C and 55% RH?",
+          "options": [
+            "About 14.2 percent",
+            "About 6.5 percent",
+            "About 18.0 percent",
+            "About 10.1 percent"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        },
+        {
+          "questionText": "Indoors 20 &deg;C, outdoors 3 &deg;C, U = 6.9 W/m&sup2;&middot;K, R<sub>si</sub> = 0.13 m&sup2;&middot;K/W. What is the inside surface temperature?",
+          "options": [
+            "About 4.75 &deg;C",
+            "About 13.37 &deg;C",
+            "About 10.72 &deg;C",
+            "About 12.01 &deg;C"
           ],
           "correctIndex": 0,
           "points": 1
         },
         {
-          "questionText": "How should a technician use EMC when setting a dry standard on a real job?",
+          "questionText": "A surface is at 13.4 &deg;C and the room dew point is 14.4 &deg;C. What do you expect?",
           "options": [
-            "Apply a fixed moisture percentage that applies to every building, regardless of material or climate",
-            "Measure the same material type in an unaffected, comparable area of the building and use that reading as the drying target",
-            "Estimate the dry standard from memory without taking any reference reading",
-            "Use the manufacturer&rsquo;s rated output figure for the dehumidifier as the drying target"
+            "No condensation at all",
+            "Condensation on the surface",
+            "Surface drying within hours",
+            "A plumbing leak nearby"
           ],
           "correctIndex": 1,
           "points": 1
         },
         {
-          "questionText": "Which three readings should be logged at the same time each day to prove a drying job is progressing?",
+          "questionText": "A wet ceiling patch reads 18 &deg;C in a room with a 12.6 &deg;C dew point. What is most likely?",
           "options": [
-            "Only the drying space reading, taken once at the start of the job",
-            "The drying space, an unaffected control area, and outside the building",
-            "The dehumidifier&rsquo;s power draw, the air mover speed setting, and the room floor area",
-            "The insurer&rsquo;s claim number, the job address, and the technician&rsquo;s name"
+            "Condensation from room air",
+            "A faulty hygrometer reading",
+            "A leak, not condensation",
+            "Normal seasonal surface damp"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "A 54 m&sup3; room has an air filtration device moving 500 m&sup3;/h. What is the ACH?",
+          "options": [
+            "About 4.0 ACH",
+            "About 2.0 ACH",
+            "About 6.0 ACH",
+            "About 9.3 ACH"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        },
+        {
+          "questionText": "Outdoor CO<sub>2</sub> is 420 ppm; room CO<sub>2</sub> falls from 1400 to 553 ppm in one hour. What is the ACH?",
+          "options": [
+            "About 2.0 ACH",
+            "About 0.9 ACH",
+            "About 4.5 ACH",
+            "About 7.4 ACH"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "Inside is 9.06 g/kg and outside is 12.78 g/kg. Should you ventilate with outside air?",
+          "options": [
+            "Yes, outside air is wetter",
+            "No, outside air is wetter",
+            "Yes, outside RH is higher",
+            "No, outside RH is lower"
           ],
           "correctIndex": 1,
           "points": 1
         },
         {
-          "questionText": "How do Bureau of Meteorology (BoM) climatology and NCC climate zones inform an Australian drying plan?",
+          "questionText": "How many climate zones does the NCC use for its energy efficiency provisions?",
           "options": [
-            "They replace the need to take any readings on site",
-            "They provide regional humidity/dew-point context and typical EMC expectations, which support and explain the on-site dry standard reading — not replace it",
-            "They only apply to new-building design, never to restoration drying",
-            "They set a single national EMC target that applies regardless of location"
+            "Four climate zones",
+            "Three climate zones",
+            "Eight climate zones",
+            "Six climate zones"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "According to the ABCB handbook, what do NCC climate zones indicate about condensation risk?",
+          "options": [
+            "A complete risk assessment",
+            "Nothing about thermal performance",
+            "The exact site humidity",
+            "Only a limited indication"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        },
+        {
+          "questionText": "Which BoM statistics does the ABCB handbook say indicate atmospheric water vapour content?",
+          "options": [
+            "Mean 9am and 3pm dew point temperatures",
+            "Mean daily rainfall totals for each month",
+            "Highest recorded wind gusts in each year",
+            "Mean daily sunshine hours for each season"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "Dehumidifier inlet is 11.20 g/kg and outlet is 6.13 g/kg. What is the grain depression?",
+          "options": [
+            "17.33 g/kg",
+            "5.07 g/kg",
+            "6.13 g/kg",
+            "11.20 g/kg"
           ],
           "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "What does CARSI do with the content of a paid standard such as AS 1668.2:2024?",
+          "options": [
+            "Quote its key ventilation rates directly",
+            "Summarise its main requirements for learners",
+            "Name it and check the edition",
+            "Paste short tables with an attribution"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "Visible mould is on a wet wall. What happens to air movers aimed at it?",
+          "options": [
+            "On at full speed immediately",
+            "On, but only overnight hours",
+            "Off only when RH rises",
+            "Off until assessed and cleaned"
+          ],
+          "correctIndex": 3,
           "points": 1
         }
       ]
