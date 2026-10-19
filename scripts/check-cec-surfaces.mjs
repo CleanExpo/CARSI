@@ -59,6 +59,8 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 
+import { iicrcCodes } from './lib/iicrc-codes-shim.mjs';
+
 const RAW_FIELD = 'cecHours';
 const DISCIPLINE_NAMES = new Set(['iicrcDiscipline', 'iicrc_discipline']);
 
@@ -68,8 +70,11 @@ const RECOGNITION_SURFACE = /leaderboard|gamification|achievement|learner-xp|lin
 const RECOGNITION_EXEMPT = ['app/api/lms/gamification/me/renewal-summary/route.ts'];
 const RECOGNITION_CEC_IDENT = /cec/i;
 const RECOGNITION_CEC_TEXT = /\bCECs?\b|continuing education/i;
-// Acronyms match case-sensitively so a month like "Oct" is not mistaken for a discipline code.
-const RECOGNITION_DISCIPLINE_TEXT = /[iI][iI][cC][rR][cC]_?[dD]iscipline|\b(?:WRT|ASD|AMRT|FSRT|OCT|CRT|CCT|TCST)\b/;
+// Codes come only from the shared list (never a private copy). They match case-sensitively so a
+// month like "Oct" is not mistaken for a discipline code.
+const RECOGNITION_DISCIPLINE_TEXT = new RegExp(
+  `[iI][iI][cC][rR][cC]_?[dD]iscipline|\\b(?:${iicrcCodes().join('|')})\\b`
+);
 
 export function isRecognitionSurface(file) {
   const n = file.replace(/\\/g, '/');

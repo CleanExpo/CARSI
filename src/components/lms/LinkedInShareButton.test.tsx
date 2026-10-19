@@ -4,6 +4,8 @@ import { act, createElement } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { iicrcCodes } from '../../../scripts/lib/iicrc-codes-shim.mjs';
+
 import { LinkedInShareButton } from './LinkedInShareButton';
 
 (
@@ -22,7 +24,7 @@ import { LinkedInShareButton } from './LinkedInShareButton';
  * Python backend.
  */
 const COURSE_TITLE = 'Water Damage Restoration Fundamentals';
-const IICRC_ACRONYM = /\b(?:WRT|ASD|AMRT|FSRT|OCT|CRT|CCT|TCST|HST)\b/;
+const IICRC_ACRONYM = new RegExp(`\\b(?:${iicrcCodes().join('|')})\\b`);
 
 let container: HTMLDivElement;
 let root: Root | null = null;

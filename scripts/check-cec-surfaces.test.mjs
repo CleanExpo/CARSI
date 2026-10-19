@@ -6,7 +6,12 @@
  * selects, non-trivial boolean eligibility) — and stays SILENT on the legitimate resolved
  * reads it must not touch. If someone makes the guard inert, this test goes red.
  */
+import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+
 import { evaluateFile } from './check-cec-surfaces.mjs';
+import { iicrcCodes } from './lib/iicrc-codes-shim.mjs';
 
 // Each MUST_BLOCK case (scanned as its own source) must produce at least one finding.
 const MUST_BLOCK = [
@@ -74,6 +79,13 @@ const RECOGNITION_BLOCK = [
   ['LinkedIn name with discipline code', 'src/components/lms/LinkedInShareButton.tsx', 'const name = `${courseTitle} (${iicrcDiscipline})`;'],
   ['continuing-education wording', 'src/components/lms/AchievementsPanel.tsx', 'const X = () => <p>Earn continuing education credits</p>;'],
   ['IICRC acronym in a new gamification file', 'src/lib/gamification/badges.ts', "export const badge = 'ASD expert';"],
+  // One case per code family (review r1 of fc1dca5c: 'HST certificate' passed a private 8-code list).
+  ['health and safety code (HST)', 'src/lib/gamification/badges.ts', "export const badge = 'HST certificate';"],
+  ['repair code (RRT)', 'src/components/lms/LinkedInShareButton.tsx', 'const name = `${courseTitle} (RRT)`;'],
+  ['maintenance code (CCMT)', PAGE, 'const X = () => <p>CCMT milestone unlocked</p>;'],
+  ['upholstery code (UFT)', 'src/lib/server/leaderboard-xp.ts', "const label = 'UFT leaders';"],
+  ['Master/Journeyman designation (JWR)', PAGE, "const t = 'JWR track';"],
+  ['former code (BMT)', PAGE, "const t = 'BMT badge';"],
 ];
 const RECOGNITION_PASS = [
   ['XP, level and a month name', PAGE, 'const X = () => <p>Oct 2026 · 250 XP · Level 2 · Apprentice</p>;'],
@@ -91,6 +103,41 @@ for (const [name, file, src] of RECOGNITION_BLOCK) {
     failed++;
   }
 }
+// Every code in the shared list is blocked on a recognition surface.
+for (const code of iicrcCodes()) {
+  if (evaluateFile('src/lib/gamification/badges.ts', `export const badge = '${code} badge';`).length === 0) {
+    console.error(`✖ MUST BLOCK but passed: IICRC code ${code} on a recognition surface`);
+    failed++;
+  }
+}
+
+// Rule 4 really reads iicrcCodes(): a guard copy whose shim lacks HST must miss HST and still
+// catch WRT. The copy sits under node_modules/.cache so it resolves the real typescript package.
+{
+  const here = dirname(fileURLToPath(import.meta.url));
+  const tmp = join(here, '..', 'node_modules', '.cache', `cec-surfaces-shim-probe-${process.pid}`);
+  try {
+    mkdirSync(join(tmp, 'lib'), { recursive: true });
+    cpSync(join(here, 'check-cec-surfaces.mjs'), join(tmp, 'check-cec-surfaces.mjs'));
+    const shim = readFileSync(join(here, 'lib', 'iicrc-codes-shim.mjs'), 'utf8');
+    const without = shim.replace("  ['HST', 'Health & Safety Technician'],\n", '');
+    if (without === shim) throw new Error('could not remove HST from the shim copy');
+    writeFileSync(join(tmp, 'lib', 'iicrc-codes-shim.mjs'), without);
+    const probe = await import(pathToFileURL(join(tmp, 'check-cec-surfaces.mjs')).href);
+    const file = 'src/lib/gamification/badges.ts';
+    if (probe.evaluateFile(file, "export const b = 'HST certificate';").length !== 0) {
+      console.error('✖ rule 4 still caught HST after it was removed from the shim: it is not reading iicrcCodes()');
+      failed++;
+    }
+    if (probe.evaluateFile(file, "export const b = 'WRT certificate';").length === 0) {
+      console.error('✖ shim probe is vacuous: the copied guard did not catch WRT either');
+      failed++;
+    }
+  } finally {
+    rmSync(tmp, { recursive: true, force: true });
+  }
+}
+
 for (const [name, file, src] of RECOGNITION_PASS) {
   const findings = evaluateFile(file, src);
   if (findings.length > 0) {
@@ -122,6 +169,6 @@ if (failed > 0) {
   process.exit(1);
 }
 console.log(
-  `✓ CEC surface-leak guard self-test passed (${MUST_BLOCK.length + RECOGNITION_BLOCK.length} block, ${MUST_PASS.length + RECOGNITION_PASS.length} pass).`
+  `✓ CEC surface-leak guard self-test passed (${MUST_BLOCK.length + RECOGNITION_BLOCK.length + iicrcCodes().length} block, ${MUST_PASS.length + RECOGNITION_PASS.length} pass).`
 );
 process.exit(0);
