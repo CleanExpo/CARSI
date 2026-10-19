@@ -207,6 +207,9 @@ describe('licence inventory', () => {
     // as a third-person certification-course comparison. Assembled: never spell it in source.
     ['certif', HERO, 'IICRC ' + 'certification courses (27)'],
     ['certif', HERO, 'IICRC' + '\u00a0certification training'],
+    // review of c9bbbf18: a modifier between "IICRC" and "certification" still passed
+    ['certif', HERO, 'IICRC ' + 'online certification courses (27)'],
+    ['certif', HERO, 'Accredited ' + 'certification training for Australian technicians'],
   ])('controls: %s fires in %s: %s', (term, file, text) => {
     expect(classifyCopy(file, term, text)[0]).toBe('exposure');
   });
@@ -246,6 +249,12 @@ describe('licence inventory', () => {
       'certif',
       COST_PAGE,
       'A certification course and a continuing education course are not competing products.',
+    ],
+    ['certif', COST_PAGE, 'Why is a CARSI course priced differently from a certification course?'],
+    [
+      'certif',
+      COST_PAGE,
+      'One published Australian certification-course fee, checked at source, and what a CARSI course costs.',
     ],
   ])('negative controls: %s stays legitimate in %s: %s', (term, file, text) => {
     expect(classifyCopy(file, term, text)[0]).toBe('legitimate');
