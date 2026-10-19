@@ -18,6 +18,7 @@ interface Course {
   slug: string;
   description?: string | null;
   shortDescription?: string | null;
+  meta?: Record<string, unknown>;
   modules: { lessons: Lesson[] }[];
 }
 
@@ -101,5 +102,23 @@ describe('NeoSan Labs course claim compliance (review r2/r3)', () => {
         'marketing (source: https://neosanlabs.com/, checked 19/10/2026).</p>',
     ];
     expect(unattributedClaims(attributed)).toEqual([]);
+  });
+
+  it('does not read as the product being Australian-made (review r4)', () => {
+    // "…treatment system, Australian-produced…" reads as the PRODUCT (US-made)
+    // being produced in Australia. The COURSE is Australian-produced; the
+    // product is not. Guard the description fields against that phrasing.
+    const fields = [
+      course!.description ?? '',
+      course!.shortDescription ?? '',
+      ...Object.values(course!.meta ?? {}).map(String),
+    ].join('\n');
+    expect(fields).not.toMatch(/system,?\s+Australian-produced/i);
+    expect(fields).not.toMatch(/product\w*,?\s+Australian-produced/i);
+    // planted control: the original offending wording is caught
+    const control =
+      '... the NeoSan Labs two-part (A and B) treatment system, ' +
+      'Australian-produced for professional restoration ...';
+    expect(control).toMatch(/system,?\s+Australian-produced/i);
   });
 });
