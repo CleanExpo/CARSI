@@ -25,7 +25,7 @@
  * DigitalOcean's edge rewrites an app 503 into an HTML 504 and sends the app's real status in
  * `x-do-orig-status`. That header is trusted when present; see classifyResponse().
  */
-import { pathToFileURL } from 'node:url';
+import { isEntryPoint } from './lib/is-entry-point.mjs';
 
 /** Same truthy set as src/lib/server/subscriptions-flag.ts. */
 export function envTrue(value) {
@@ -319,7 +319,7 @@ async function main() {
   process.exit(code);
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (isEntryPoint(import.meta.url)) {
   main().catch((e) => {
     console.error('FAIL:', e instanceof Error ? e.message : e);
     process.exit(1);

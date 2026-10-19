@@ -28,7 +28,7 @@
  * as "nothing is wrong".
  */
 import { readFileSync } from 'node:fs';
-import { pathToFileURL } from 'node:url';
+import { isEntryPoint } from './lib/is-entry-point.mjs';
 
 import { IICRC_CODES, IICRC_ORDINARY_WORD_CODES } from './iicrc-codes.mjs';
 
@@ -664,9 +664,9 @@ async function main() {
   }
 }
 
-// pathToFileURL, never `file://` + the raw path: an unencoded space makes the comparison false
-// and silently disables the whole script. That defect shipped in three guards in this repo.
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+// isEntryPoint compares real paths, so neither a space in the checkout path nor a symlinked
+// invocation can silently disarm the check (scripts/lib/is-entry-point.mjs).
+if (isEntryPoint(import.meta.url)) {
   // Through the SAME emitter as every other failure. Written separately, this handler printed to
   // stderr and left stdout empty, so `--json` promised a parseable object on every exit path and
   // broke that promise on the one path a consumer least expects: the unexpected one.

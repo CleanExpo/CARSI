@@ -50,7 +50,7 @@
  */
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, extname } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { isEntryPoint } from './lib/is-entry-point.mjs';
 
 const SCAN_DIRS = ['app', 'src'];
 const SKIP = [/src\/generated\//, /\.test\.[tj]sx?$/, /node_modules/];
@@ -171,9 +171,9 @@ function walk(dir, out = []) {
 }
 
 // Executed only when run directly, so the self-test can import evaluateFile cheaply.
-// pathToFileURL, never `file://` + the raw path — an unencoded space (or any character needing
-// percent-encoding) in the checkout path makes this false and silently disarms the check.
-if (Boolean(process.argv[1]) && import.meta.url === pathToFileURL(process.argv[1]).href) {
+// isEntryPoint compares real paths, so neither a space in the checkout path nor a symlinked
+// invocation can silently disarm the check (scripts/lib/is-entry-point.mjs).
+if (isEntryPoint(import.meta.url)) {
   const findings = SCAN_DIRS.flatMap((d) => walk(d)).flatMap((f) =>
     evaluateFile(f, readFileSync(f, 'utf8'))
   );

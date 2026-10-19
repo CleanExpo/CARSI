@@ -44,7 +44,7 @@
  * telling the truth about 35 live courses.
  */
 import { readFileSync } from 'node:fs';
-import { pathToFileURL } from 'node:url';
+import { isEntryPoint } from './lib/is-entry-point.mjs';
 
 import { IICRC_CODES, IICRC_ORDINARY_WORD_CODES } from './iicrc-codes.mjs';
 
@@ -215,6 +215,6 @@ async function main() {
   process.exit(verdict.code);
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (isEntryPoint(import.meta.url)) {
   main();
 }

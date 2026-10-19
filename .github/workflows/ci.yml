@@ -118,6 +118,12 @@ jobs:
       - name: IICRC terminology guard self-test
         run: npm run test:iicrc-terminology
 
+      # Shared CLI entry-point helper. Twelve scripts compared import.meta.url with argv[1] raw,
+      # so run through a symlink they skipped their CLI body and exited 0 silently. This runs
+      # the terminology guard through a symlinked path on a planted violation and needs exit 1.
+      - name: Script entry-point helper self-test
+        run: npm run test:entry-point
+
       - name: Source-citation scorecard self-test
         run: npm run test:sources
 
