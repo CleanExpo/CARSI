@@ -12,8 +12,9 @@ import { describe, expect, it } from 'vitest';
  *   - an instruction (starts with an imperative verb, or "If/When ..., <verb>");
  *   - a question;
  *   - course framing ("By the end of this lesson", "This course", ...);
- *   - inside a block labelled as CARSI's own words ("CARSI note:", "CARSI method:",
- *     "CARSI example:", "CARSI answer:", "Scenario:").
+ *   - labelled as CARSI's own words: "CARSI note:" and "CARSI method:" cover only the labelled
+ *     sentence (review r2); "CARSI example:", "CARSI answer:" and "Scenario:" cover their whole
+ *     invented worked-example block.
  * Separately, any clause matching CLAIM_PATTERN must itself be properly cited,
  * unless it is a prohibition ("Never write ...").
  *
@@ -251,7 +252,7 @@ const IMPERATIVE = new Set(
     'triple try turn use ventilate wait wear wipe write ' +
     // course expansion
     'agree attribute convert count divide get handle invoice multiply name prepare price report round schedule scope ' +
-    'adjust calibrate change complete consider dry estimate fit-check include load lay offer point recommend refer secure send soak state talk unload visit update walk warn weigh work'
+    'adjust calibrate change complete consider dry estimate expect fit-check include learn lift load lay notice offer picture point promise recommend refer remember secure see send soak speak split state swap talk thank unload visit wash update walk warn weigh work'
   ).split(' '),
 );
 const CONDITIONAL_LEAD = /^(?:if|when|before|after|once|until|while|unless|on|for|in)\b[^,]*,\s*(\S+)/i;
@@ -323,8 +324,13 @@ function evaluateText(
     cites.push({ prefix, url, date });
     return `⟦C${cites.length - 1}⟧`;
   });
-  const labelled = opts.labelled || LABEL.test(withMarks.trim());
-  for (const sentence of splitSentences(withMarks)) {
+  const label = withMarks.trim().match(LABEL);
+  // Review r2: a note or method label covers only its own sentence; each follow-on sentence must be
+  // cited, an instruction or a question. Example, answer and scenario blocks are invented worked
+  // examples, so their follow-on lines stay CARSI's own (CLAIM_PATTERN still applies to them).
+  const wholeBlock = opts.labelled || (label !== null && !/^CARSI (?:note|method):$/.test(label[0]));
+  for (const [index, sentence] of splitSentences(withMarks).entries()) {
+    const labelled = wholeBlock || (label !== null && index === 0);
     for (const clause of splitClauses(sentence)) {
       if (clause === '[struck example]' || /^\[struck example\][.?!]?$/.test(clause)) continue;
       const marks = [...clause.matchAll(/⟦C(\d+)⟧/g)].map((m) => cites[Number(m[1])]);
@@ -576,6 +582,22 @@ describe('NeoSan Labs course claim guard (review r14, course expansion)', () => 
     );
     const thin = good.map((m) => ({ ...m, lessons: [teach('A', 700), teach('B', 700), teach('C', 700), sheet] }));
     expect(shapeFindings(thin)).toContain('24 teaching lessons, fewer than 30');
+  });
+
+  it('planted controls (review r2): a CARSI note exempts only its labelled sentence', () => {
+    const NOT_OWN = 'statement is not cited, instructional or labelled as CARSI’s own';
+    const charge =
+      'A cationic surfactant carries a positive charge, an anionic surfactant a negative charge and a non-ionic surfactant no charge.';
+    const quaternary =
+      'The word quaternary refers to the nitrogen atom at the centre of the head, which is bonded to four carbon groups and carries the positive charge.';
+    expect(reasons(ok(`<p>CARSI note: Chemists sort surfactants by charge. ${charge}</p>`))).toContain(NOT_OWN);
+    expect(reasons(ok(`<p>CARSI note: In the trade you will hear these called quats. ${quaternary}</p>`))).toContain(NOT_OWN);
+    expect(reasons(ok(`<p>CARSI method: Measure the room first. ${charge}</p>`))).toContain(NOT_OWN);
+    // The labelled sentence itself, instructions and questions after it still pass.
+    expect(ok('<p>CARSI note: Write the time on the label. Measure twice. Why does it matter?</p>')).toEqual([]);
+    // Invented worked-example lines stay CARSI's own.
+    expect(ok('<p>CARSI example: A crew mixes 400 ml. The job takes two hours.</p>')).toEqual([]);
+    expect(ok('<p>Scenario: A client calls. The carpet is stained.</p>')).toEqual([]);
   });
 
   it('planted control: the word counter ignores citations and markup', () => {
