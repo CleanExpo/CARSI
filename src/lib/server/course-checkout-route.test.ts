@@ -225,3 +225,40 @@ describe('the ownership lookup throwing', () => {
     expect(mocks.createStripe).not.toHaveBeenCalled();
   });
 });
+
+describe('campaign attribution', () => {
+  function requestWithCookie(body: Record<string, unknown>, cookie: string): NextRequest {
+    return new NextRequest('https://carsi.example.test/api/lms/checkout', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', cookie },
+      body: JSON.stringify(body),
+    });
+  }
+
+  it('copies the utm cookie into the Stripe session metadata', async () => {
+    mocks.findUser.mockResolvedValue(null);
+    const utm = encodeURIComponent(
+      JSON.stringify({ utm_source: 'synthex', utm_campaign: 'carsi_oct', student_id: 'forged' })
+    );
+
+    const res = await POST(
+      requestWithCookie({ slug: COURSE_SLUG, customer_email: 'new@example.test' }, `carsi_utm=${utm}`)
+    );
+
+    expect(res.status).toBe(200);
+    expect(mocks.createStripe).toHaveBeenCalledTimes(1);
+    expect(mocks.createStripe.mock.calls[0][0].extra_metadata).toEqual({
+      utm_source: 'synthex',
+      utm_campaign: 'carsi_oct',
+    });
+  });
+
+  it('adds no campaign metadata without the cookie', async () => {
+    mocks.findUser.mockResolvedValue(null);
+
+    const res = await POST(request({ slug: COURSE_SLUG, customer_email: 'new@example.test' }));
+
+    expect(res.status).toBe(200);
+    expect(mocks.createStripe.mock.calls[0][0].extra_metadata).toEqual({});
+  });
+});

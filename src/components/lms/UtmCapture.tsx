@@ -3,7 +3,13 @@
 import { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-const UTM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'] as const;
+import {
+  pickUtmValues,
+  serializeUtmCookie,
+  UTM_COOKIE_MAX_AGE_SECONDS,
+  UTM_COOKIE_NAME,
+  UTM_KEYS,
+} from '@/lib/analytics/utm-cookie';
 
 /**
  * Silent UTM capture component — mount in the root layout wrapped in Suspense.
@@ -14,6 +20,9 @@ const UTM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'ut
  *
  * Uses sessionStorage (not localStorage) so UTM data is scoped to the
  * originating browser tab only.
+ *
+ * Also writes the first-party `carsi_utm` cookie, which the course checkout route copies into
+ * the Stripe session metadata so a paid enrolment records its campaign (last touch wins).
  */
 export function UtmCapture() {
   const params = useSearchParams();
@@ -33,6 +42,8 @@ export function UtmCapture() {
           page_path: window.location.pathname,
         })
       );
+      const secure = window.location.protocol === 'https:' ? '; Secure' : '';
+      document.cookie = `${UTM_COOKIE_NAME}=${serializeUtmCookie(pickUtmValues(captured))}; Max-Age=${UTM_COOKIE_MAX_AGE_SECONDS}; Path=/; SameSite=Lax${secure}`;
     }
   }, [params]);
 
