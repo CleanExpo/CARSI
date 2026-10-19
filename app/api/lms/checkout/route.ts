@@ -45,6 +45,7 @@ import {
   readAttributionJourneyId,
   tryRecordAttributedStage,
 } from '@/lib/server/event-attribution';
+import { parseUtmCookie, UTM_COOKIE_NAME } from '@/lib/analytics/utm-cookie';
 
 class AccountLookupUnavailable extends Error {}
 
@@ -70,6 +71,7 @@ export async function POST(request: NextRequest) {
       team_seat_count?: number;
     };
     const attributionJourneyId = readAttributionJourneyId(request);
+    const utmMetadata = parseUtmCookie(request.cookies.get(UTM_COOKIE_NAME)?.value);
 
     const slug = typeof body.slug === 'string' ? body.slug.trim() : '';
     if (!slug) {
@@ -293,7 +295,7 @@ export async function POST(request: NextRequest) {
             customer_email: customerEmail,
             student_id: studentId,
             unit_amount_cents: cents,
-            extra_metadata: { discount_id: disc.id },
+            extra_metadata: { ...utmMetadata, discount_id: disc.id },
             guest_checkout: guestCheckout && !studentId,
             quantity: checkoutQuantity,
             purchase_mode: purchaseMode,
@@ -349,6 +351,7 @@ export async function POST(request: NextRequest) {
         purchase_mode: purchaseMode,
         team_seat_count: teamSeatCount ?? undefined,
         attribution_journey_id: attributionJourneyId ?? undefined,
+        extra_metadata: utmMetadata,
       });
       await tryRecordAttributedStage(attributionJourneyId, 'checkout_started', {
         courseSlug: slug,
