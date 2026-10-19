@@ -69,6 +69,15 @@ const NAMED_ENTITIES = {
 };
 const decodeCodePoint = (n) => (n > 0 && n <= 0x10ffff ? String.fromCodePoint(n) : '');
 
+/** A run of %XX escapes decoded as UTF-8; a malformed run decodes its ASCII bytes only. */
+function decodePercentRun(run) {
+  try {
+    return decodeURIComponent(run);
+  } catch {
+    return run.replace(/%([0-7][0-9a-f])/gi, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
+  }
+}
+
 function decodeOnce(text) {
   return text
     .replace(/\\u([0-9a-f]{4})/gi, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
@@ -78,7 +87,7 @@ function decodeOnce(text) {
     .replace(/&#x([0-9a-f]+);?/gi, (_, hex) => decodeCodePoint(parseInt(hex, 16)))
     .replace(/&#(\d+);?/g, (_, dec) => decodeCodePoint(Number(dec)))
     .replace(/&([a-z]+);/gi, (entity, name) => NAMED_ENTITIES[name] ?? entity)
-    .replace(/%([0-7][0-9a-f])/gi, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
+    .replace(/(?:%[0-9a-f]{2})+/gi, decodePercentRun);
 }
 
 /**
