@@ -1,0 +1,129 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { describe, expect, it } from 'vitest';
+
+/**
+ * Claim-discipline guard (coordinator 19/10/2026) for the four recovered legacy
+ * courses. Two classes:
+ *  - BANNED literals: health-outcome promises and income promises that may
+ *    never appear (no exemption).
+ *  - CLAIM stats: percentage/multiplier assertions that must carry an
+ *    attributed, dated source in the same block.
+ */
+interface Lesson {
+  title: string;
+  contentBody?: string | null;
+}
+interface Course {
+  slug: string;
+  description?: string | null;
+  shortDescription?: string | null;
+  modules: { lessons: Lesson[] }[];
+}
+
+const SLUGS = [
+  'asthma-and-allergy-course',
+  'agi-essentials-small-business',
+  'social-media-marketing',
+  'admin-sole-trader',
+];
+
+const ROOT = join(__dirname, '..', '..', '..');
+const catalogue = (
+  JSON.parse(
+    readFileSync(join(ROOT, 'data', 'seed', 'courses-catalog.json'), 'utf8'),
+  ) as { courses: Course[] }
+).courses;
+const courses = catalogue.filter((entry) => SLUGS.includes(entry.slug));
+
+const BANNED = new RegExp(
+  [
+    'allergy[- ]free',
+    'guaranteed relief',
+    'relieve\\w* (your|their|of) (asthma|allerg)',
+    'cure[ds]? (your |their )?asthma',
+    'guaranteed income',
+    'earn \\$[\\d,]+ (a|per) (week|month|year)',
+    'make \\$[\\d,]+ (a|per) (week|month|year)',
+  ].join('|'),
+  'i',
+);
+
+const STAT_CLAIM = /\b\d+(\.\d+)?\s?%|\b\d+ in \d+\b/;
+const SOURCED =
+  /(allergy\.org\.au|nationalasthma\.org\.au|health\.gov\.au|aihw\.gov\.au|ato\.gov\.au|abr\.gov\.au|asic\.gov\.au|accc\.gov\.au|safeworkaustralia\.gov\.au|animalmedicinesaustralia\.org\.au|health\.govt\.nz|humanesociety\.org|source:\s*https?:\/\/|original (2020|case|course) (material|report))/i;
+const DATED = /checked\s+\d{1,2}\/\d{1,2}\/\d{4}|2020 course material|original case material/i;
+
+function blocks(c: Course): string[] {
+  const out: string[] = [];
+  for (const m of c.modules) {
+    for (const l of m.lessons) {
+      out.push(...(l.contentBody ?? '').split(/<\/(?:p|li|h[1-6]|ul|ol)>/));
+    }
+  }
+  out.push(c.description ?? '', c.shortDescription ?? '');
+  return out;
+}
+
+describe('legacy course claim discipline (four recovered courses)', () => {
+  it('all four courses exist', () => {
+    expect(courses).toHaveLength(4);
+  });
+
+  it('carry no health-outcome or income promises', () => {
+    for (const c of courses) {
+      for (const b of blocks(c)) {
+        expect(BANNED.test(b), `${c.slug}: banned literal in "${b.slice(0, 120)}"`).toBe(false);
+      }
+    }
+  });
+
+  it('percentage/multiplier statistics are attributed and dated in the same block', () => {
+    const bad: string[] = [];
+    for (const c of courses) {
+      for (const b of blocks(c)) {
+        if (!STAT_CLAIM.test(b)) continue;
+        // pricing/rate figures (dollar amounts) are dated indicative examples, exempt
+        if (/\$\d/.test(b)) continue;
+        // dilution ratios and process parameters, exempt
+        if (/\b(10:1|1:0\.\d+|parts water|mL|litre|sqm|micron|°C|&deg;C)/.test(b)) continue;
+        if (!(SOURCED.test(b) && DATED.test(b))) bad.push(`${c.slug} :: ${b.slice(0, 140)}`);
+      }
+    }
+    expect(bad).toEqual([]);
+  });
+
+  it('planted controls: banned literals are all caught', () => {
+    const controls = [
+      'Enjoy an allergy-free home.',
+      'We deliver guaranteed relief.',
+      'Our service will relieve your asthma.',
+      'This treatment cured asthma in trial homes.',
+      'A guaranteed income for operators.',
+      'Earn $2,000 a week from anti-allergen work.',
+      'Make $5,000 per month with this service.',
+    ];
+    for (const b of controls) expect(BANNED.test(b)).toBe(true);
+  });
+
+  it('planted controls: unattributed stats are caught, attributed stats pass', () => {
+    const bad = [
+      '<p>25% of all allergies are caused by dust mites.</p>',
+      '<p>1 in 3 customers will buy the upsell.</p>',
+    ];
+    const good = [
+      '<p>Around 1 in 4 Australians are affected by allergic rhinitis (ASCIA, ' +
+        'allergy.org.au, checked 19/10/2026).</p>',
+    ];
+    const caught = (blocks: string[]) =>
+      blocks.filter(
+        (b) =>
+          STAT_CLAIM.test(b) &&
+          !/\$\d/.test(b) &&
+          !/\b(10:1|1:0\.\d+|parts water|mL|litre|sqm|micron|°C|&deg;C)/.test(b) &&
+          !(SOURCED.test(b) && DATED.test(b)),
+      );
+    expect(caught(bad)).toHaveLength(2);
+    expect(caught(good)).toEqual([]);
+  });
+});
