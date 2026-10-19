@@ -130,6 +130,8 @@ const IICRC_CEC_NON_ACCREDITED_BASELINE: Record<string, number> = {
   'app/(public)/pricing/page.tsx': 1,
   'app/(public)/testimonials/page.tsx': 1,
   'src/components/landing/GrowthPathInfographic.tsx': 1,
+  // Two references to the /iicrc-cec-courses page by name (#916); naming that page is allowed.
+  'src/lib/seo/answer-engine.ts': 2,
 };
 
 function countIicrcCecNonAccredited(text: string): number {
@@ -148,6 +150,7 @@ const SCOPES = [
   'src/components/layout',
   'src/lib/schema',
   'src/lib/marketing',
+  'src/lib/seo',
 ];
 const COPY_EXT = /\.(tsx?|mdx?|txt)$/;
 
@@ -217,6 +220,7 @@ describe('public claims guard', () => {
     expect(rel).toContain('src/components/seo/JsonLd.tsx');
     expect(rel).toContain('app/(public)/about/page.tsx');
     expect(rel).toContain('public/carsi-ai-citation-pack.md');
+    expect(rel).toContain('src/lib/seo/carsi-entity.ts');
   });
 
   it.each([
