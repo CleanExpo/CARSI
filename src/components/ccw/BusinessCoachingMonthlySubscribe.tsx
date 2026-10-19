@@ -9,6 +9,7 @@ import {
   carsiCoachingMonthlyPath,
   carsiCoachingMonthlyPriceLabel,
 } from '@/lib/marketing/carsi-coaching-monthly';
+import { registerPathWithNext } from '@/lib/membership-signup-path';
 
 type CheckoutResponse = { url?: string; checkout_url?: string };
 
@@ -37,7 +38,7 @@ export function BusinessCoachingMonthlySubscribe({
       setError('Checkout is not available yet. Email support@carsi.com.au.');
     } catch (err) {
       if (err instanceof ApiClientError && err.status === 401) {
-        window.location.href = `/login?next=${encodeURIComponent(carsiCoachingMonthlyPath)}`;
+        window.location.href = registerPathWithNext(carsiCoachingMonthlyPath);
         return;
       }
       const msg =

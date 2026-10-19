@@ -1,7 +1,15 @@
 import { LoginForm } from '@/components/auth/login-form';
 import Link from 'next/link';
 
-export default function LoginPage() {
+import { registerPathWithNext } from '@/lib/membership-signup-path';
+
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string | string[] }>;
+}) {
+  const { next } = await searchParams;
+  const registerHref = registerPathWithNext(typeof next === 'string' ? next : null);
   return (
     <div
       className="rounded-xl bg-white p-6 shadow-xl shadow-slate-200/70 ring-1 ring-slate-200 sm:p-8"
@@ -24,7 +32,7 @@ export default function LoginPage() {
       <div className="mt-5 text-center text-sm">
         <span className="text-slate-600">Don&apos;t have an account? </span>
         <Link
-          href="/register"
+          href={registerHref}
           className="font-semibold text-[#146fc2] underline decoration-[#146fc2]/25 underline-offset-4 transition-colors duration-150 hover:text-[#0f5fa8]"
         >
           Sign up
