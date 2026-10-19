@@ -59,7 +59,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 
-import { iicrcCodes } from './lib/iicrc-codes-shim.mjs';
+import { IICRC_CODE_ALT } from './iicrc-codes.mjs';
 
 const RAW_FIELD = 'cecHours';
 const DISCIPLINE_NAMES = new Set(['iicrcDiscipline', 'iicrc_discipline']);
@@ -70,11 +70,12 @@ const RECOGNITION_SURFACE = /leaderboard|gamification|achievement|learner-xp|lin
 const RECOGNITION_EXEMPT = ['app/api/lms/gamification/me/renewal-summary/route.ts'];
 const RECOGNITION_CEC_IDENT = /cec/i;
 const RECOGNITION_CEC_TEXT = /\bCECs?\b|continuing education/i;
-// Codes come only from the shared list (never a private copy). Case-insensitive, so "Wrt" or
+// Codes come only from the shared list, data/iicrc-codes.json via scripts/iicrc-codes.mjs (never a
+// private copy). Case-insensitive, so "Wrt" or
 // "hst" is caught (review r3 of ee2d5120); word boundaries keep "October" or "science" clean. A
 // bare "Oct" on a recognition surface is therefore blocked: write the month in full there.
 const RECOGNITION_DISCIPLINE_TEXT = new RegExp(
-  `iicrc_?discipline|\\b(?:${iicrcCodes().join('|')})\\b`,
+  `iicrc_?discipline|\\b(?:${IICRC_CODE_ALT})\\b`,
   'i'
 );
 

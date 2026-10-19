@@ -9,7 +9,7 @@ vi.mock('@/lib/prisma', () => ({
 
 import { getDesignationDefinition } from '@/lib/designations/registry';
 
-import { iicrcCodes } from '../../../scripts/lib/iicrc-codes-shim.mjs';
+import { IICRC_CODE_ALT } from '@/lib/iicrc-codes';
 
 import { GET } from '../../../app/api/lms/gamification/leaderboard/route';
 
@@ -96,7 +96,7 @@ describe('leaderboard filters by CARSI designation, never an IICRC discipline co
     const res = await GET(req(query));
     expect(res.status).toBe(400);
     const { detail } = await res.json();
-    expect(detail).not.toMatch(new RegExp(`\\b(?:${iicrcCodes().join('|')})\\b`));
+    expect(detail).not.toMatch(new RegExp(`\\b(?:${IICRC_CODE_ALT})\\b`, 'i'));
     expect(captured).toHaveLength(0);
   });
 });
