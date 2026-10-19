@@ -2,8 +2,11 @@ import { describe, expect, it } from 'vitest';
 
 import {
   buildCcwRoadshowEventJsonLd,
+  ccwHomeVenues,
   ccwRoadshowEvents,
+  getCcwHomeVenue,
   getCcwRoadshowEvent,
+  hasCcwRoadshowSessionEnded,
   type CcwRoadshowEvent,
 } from './ccw-roadshow';
 
@@ -28,26 +31,66 @@ function dayBefore(e: CcwRoadshowEvent): Date {
   return new Date(Date.parse(e.startDateIso) - 24 * 60 * 60 * 1000);
 }
 
-describe('CCW roadshow venues are the real CCW stores', () => {
-  it('holds Melbourne at the CCW VIC store, not Club Kilsyth', () => {
+describe('CCW roadshow venues', () => {
+  it('keeps the 22-23 July 2026 Melbourne sitting at Club Kilsyth, where #612 moved it (history)', () => {
     expect(event('melbourne')).toMatchObject({
-      venueName: 'Carpet Cleaners Warehouse Melbourne',
-      streetAddress: 'Unit 1/5 Gatwick Road',
+      startDateIso: '2026-07-22T08:30:00+10:00',
+      venueName: 'Club Kilsyth',
+      streetAddress: '1-15 Canterbury Road',
       suburb: 'Bayswater North',
       suburbStatePostcode: 'Bayswater North VIC 3153',
       state: 'VIC',
     });
-    expect(JSON.stringify(ccwRoadshowEvents)).not.toMatch(/kilsyth|canterbury road/i);
   });
 
-  it('places every session at its state CCW store with a consistent suburb/state/postcode line', () => {
-    for (const e of ccwRoadshowEvents) {
-      const store = CCW_STORES[e.state];
-      expect(e.venueName.startsWith('Carpet Cleaners Warehouse')).toBe(true);
-      expect(e.suburb).toBe(store.suburb);
-      expect(e.suburbStatePostcode).toBe(`${store.suburb} ${e.state} ${store.postcode}`);
-      expect(e.streetAddress).toBe(store.streetAddress);
+  it('sets each city home venue to its CCW store from the contact page', () => {
+    expect(ccwHomeVenues).toEqual({
+      VIC: {
+        venueName: 'Carpet Cleaners Warehouse Melbourne',
+        streetAddress: 'Unit 1/5 Gatwick Road',
+        suburb: 'Bayswater North',
+        suburbStatePostcode: 'Bayswater North VIC 3153',
+        state: 'VIC',
+      },
+      NSW: {
+        venueName: 'Carpet Cleaners Warehouse Sydney',
+        streetAddress: '2/8 Tollis Place',
+        suburb: 'Seven Hills',
+        suburbStatePostcode: 'Seven Hills NSW 2147',
+        state: 'NSW',
+      },
+      QLD: {
+        venueName: 'Carpet Cleaners Warehouse Boondall',
+        streetAddress: 'D1-3/194 Zillmere Road',
+        suburb: 'Boondall',
+        suburbStatePostcode: 'Boondall QLD 4034',
+        state: 'QLD',
+      },
+    });
+    for (const [state, store] of Object.entries(CCW_STORES)) {
+      const home = ccwHomeVenues[state as keyof typeof ccwHomeVenues];
+      expect(home.suburbStatePostcode).toBe(`${store.suburb} ${state} ${store.postcode}`);
     }
+    expect(getCcwHomeVenue('Melbourne')).toBe(ccwHomeVenues.VIC);
+    expect(getCcwHomeVenue('Sydney')).toBe(ccwHomeVenues.NSW);
+    expect(getCcwHomeVenue('Brisbane')).toBe(ccwHomeVenues.QLD);
+  });
+
+  it('records every sitting at its city home venue except the documented Club Kilsyth move', () => {
+    for (const e of ccwRoadshowEvents) {
+      if (e.slug === 'melbourne') continue;
+      expect(e).toMatchObject(getCcwHomeVenue(e.city));
+    }
+  });
+});
+
+describe('hasCcwRoadshowSessionEnded', () => {
+  it('is false until the session end instant and true from then on', () => {
+    const melbourne = event('melbourne');
+    const end = Date.parse(melbourne.endDateIso);
+    expect(hasCcwRoadshowSessionEnded(melbourne, new Date(end - 1))).toBe(false);
+    expect(hasCcwRoadshowSessionEnded(melbourne, new Date(end))).toBe(true);
+    expect(hasCcwRoadshowSessionEnded(melbourne, new Date('2026-10-19T00:00:00Z'))).toBe(true);
   });
 });
 
@@ -70,8 +113,14 @@ describe('buildCcwRoadshowEventJsonLd', () => {
     }
   });
 
-  it('describes a future session with CARSI and CCW as separate organisers and the CCW store as the Place', () => {
-    const melbourne = event('melbourne');
+  it('describes a new session at the home venue with CARSI and CCW as separate organisers', () => {
+    const melbourne: CcwRoadshowEvent = {
+      ...event('melbourne'),
+      slug: 'melbourne-next',
+      startDateIso: '2027-03-10T08:30:00+11:00',
+      endDateIso: '2027-03-11T16:30:00+11:00',
+      ...getCcwHomeVenue('Melbourne'),
+    };
     const schema = buildCcwRoadshowEventJsonLd(melbourne, {
       now: dayBefore(melbourne),
       url,

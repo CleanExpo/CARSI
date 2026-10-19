@@ -3,7 +3,12 @@ import type { Metadata } from 'next';
 import { getPublicSiteUrl } from '@/lib/env/public-url';
 
 import { CcwRoadshowContent } from '../events/ccw-roadshow/page';
-import { formatAudFromCents, getCcwRoadshowEvent } from '@/lib/marketing/ccw-roadshow';
+import {
+  formatAudFromCents,
+  getCcwNextDatesDescription,
+  getCcwRoadshowEvent,
+  hasCcwRoadshowSessionEnded,
+} from '@/lib/marketing/ccw-roadshow';
 
 const siteUrl = getPublicSiteUrl();
 
@@ -12,28 +17,42 @@ const siteUrl = getPublicSiteUrl();
 // corrected — the drift GP-545 was raised for. Reading the event makes that
 // impossible to repeat.
 const brisbane = getCcwRoadshowEvent('brisbane-2026-10-09');
-const brisbaneDates = brisbane?.dates ?? '';
-const brisbanePrice = brisbane?.unitAmountCents !== undefined
-  ? `${formatAudFromCents(brisbane.unitAmountCents)} including GST; `
-  : '';
 
 // Event JSON-LD is emitted only for sessions still to come, so re-render hourly; a static
 // build would otherwise keep a finished session marked EventScheduled until the next deploy.
 export const revalidate = 3600;
 
-export const metadata: Metadata = {
-  title: `CARSI x CCW Brisbane | Carpet and Upholstery Training - ${brisbaneDates}`,
-  description:
-    `Carpet and upholstery training with Phill McGurk at Carpet Cleaners Warehouse Boondall, ${brisbaneDates}. ${brisbanePrice}book through CCW.`,
-  alternates: { canonical: `${siteUrl}/ccw-brisbane` },
-  openGraph: {
-    title: 'CARSI x CCW Brisbane - Carpet and Upholstery Training',
-    description: `Two practical training days with Phill McGurk at Carpet Cleaners Warehouse Boondall, ${brisbaneDates}.`,
-    url: `${siteUrl}/ccw-brisbane`,
-    type: 'website',
-    images: ['/og-image.png'],
-  },
-};
+export function generateMetadata(): Metadata {
+  const page = {
+    alternates: { canonical: `${siteUrl}/ccw-brisbane` },
+    openGraph: { url: `${siteUrl}/ccw-brisbane`, type: 'website' as const, images: ['/og-image.png'] },
+  };
+  // A sitting that has ended is never advertised: no past dates or price, next dates TBA.
+  if (!brisbane || hasCcwRoadshowSessionEnded(brisbane, new Date())) {
+    const description = getCcwNextDatesDescription('Brisbane');
+    return {
+      ...page,
+      title: 'CARSI x CCW Brisbane | Carpet and Upholstery Training - Next dates to be announced',
+      description,
+      openGraph: { ...page.openGraph, title: 'CARSI x CCW Brisbane - Carpet and Upholstery Training', description },
+    };
+  }
+  const brisbaneDates = brisbane.dates;
+  const brisbanePrice = brisbane.unitAmountCents !== undefined
+    ? `${formatAudFromCents(brisbane.unitAmountCents)} including GST; `
+    : '';
+  return {
+    ...page,
+    title: `CARSI x CCW Brisbane | Carpet and Upholstery Training - ${brisbaneDates}`,
+    description:
+      `Carpet and upholstery training with Phill McGurk at Carpet Cleaners Warehouse Boondall, ${brisbaneDates}. ${brisbanePrice}book through CCW.`,
+    openGraph: {
+      ...page.openGraph,
+      title: 'CARSI x CCW Brisbane - Carpet and Upholstery Training',
+      description: `Two practical training days with Phill McGurk at Carpet Cleaners Warehouse Boondall, ${brisbaneDates}.`,
+    },
+  };
+}
 
 export default function CcwBrisbanePage() {
   return <CcwRoadshowContent focusSlug="brisbane-2026-10-09" />;

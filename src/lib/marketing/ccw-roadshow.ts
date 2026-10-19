@@ -88,6 +88,71 @@ export const ccwRoadshowFacilityAdvantages = [
   'Link the course material to service offers, quoting, safety and follow-up.',
 ];
 
+export type CcwVenue = Pick<
+  CcwRoadshowEvent,
+  'venueName' | 'streetAddress' | 'suburb' | 'suburbStatePostcode' | 'state'
+>;
+
+/**
+ * Where CARSI trains in each city: the CCW store (founder 19/10/2026, "Just use the CCW actual
+ * locations please"; addresses from ccwonline.com.au/pages/contact-us, read 19/10/2026).
+ * Use it for everything forward-looking - "where we train" copy, the FAQ, and as the venue of
+ * any NEW session (`...ccwHomeVenues.VIC`). Past sittings keep the venue they actually used.
+ */
+export const ccwHomeVenues: Record<CcwRoadshowEvent['state'], CcwVenue> = {
+  VIC: {
+    venueName: 'Carpet Cleaners Warehouse Melbourne',
+    streetAddress: 'Unit 1/5 Gatwick Road',
+    suburb: 'Bayswater North',
+    suburbStatePostcode: 'Bayswater North VIC 3153',
+    state: 'VIC',
+  },
+  NSW: {
+    venueName: 'Carpet Cleaners Warehouse Sydney',
+    streetAddress: '2/8 Tollis Place',
+    suburb: 'Seven Hills',
+    suburbStatePostcode: 'Seven Hills NSW 2147',
+    state: 'NSW',
+  },
+  QLD: {
+    venueName: 'Carpet Cleaners Warehouse Boondall',
+    streetAddress: 'D1-3/194 Zillmere Road',
+    suburb: 'Boondall',
+    suburbStatePostcode: 'Boondall QLD 4034',
+    state: 'QLD',
+  },
+};
+
+const ccwCityStates: Record<CcwRoadshowEvent['city'], CcwRoadshowEvent['state']> = {
+  Melbourne: 'VIC',
+  Sydney: 'NSW',
+  Brisbane: 'QLD',
+};
+
+export function getCcwHomeVenue(city: CcwRoadshowEvent['city']): CcwVenue {
+  return ccwHomeVenues[ccwCityStates[city]];
+}
+
+export function formatCcwVenue(venue: CcwVenue): string {
+  return `${venue.venueName}, ${venue.streetAddress}, ${venue.suburbStatePostcode}`;
+}
+
+/** True from the session's end instant on; such a sitting must never be shown as upcoming. */
+export function hasCcwRoadshowSessionEnded(event: CcwRoadshowEvent, now: Date): boolean {
+  return Date.parse(event.endDateIso) <= now.getTime();
+}
+
+/** City-page meta description once that city's sitting has ended: no past dates or offers. */
+export function getCcwNextDatesDescription(city: CcwRoadshowEvent['city']): string {
+  return `Next ${city} dates to be announced. Practical training with Phill McGurk at ${formatCcwVenue(getCcwHomeVenue(city))}. Register your interest.`;
+}
+
+/** The existing /contact lead-context path, pre-filled for the next dates in a city. */
+export function getCcwRegisterInterestHref(city?: CcwRoadshowEvent['city']): string {
+  const topic = `the next ${city ? `${city} ` : ''}CARSI x CCW training dates`;
+  return `/contact?source=ccw-roadshow&topic=${encodeURIComponent(topic)}`;
+}
+
 export const ccwRoadshowEvents: CcwRoadshowEvent[] = [
   {
     slug: 'melbourne',
@@ -98,13 +163,11 @@ export const ccwRoadshowEvents: CcwRoadshowEvent[] = [
     startDateIso: '2026-07-22T08:30:00+10:00',
     endDateIso: '2026-07-23T16:30:00+10:00',
     timeLabel: '8.30am-4.30pm both days',
-    // Founder decision 19/10/2026: "Just use the CCW actual locations please". Address
-    // from CCW's contact page (ccwonline.com.au/pages/contact-us, read 19/10/2026). The
-    // 22-23 July 2026 sitting itself was moved to Club Kilsyth, 1-15 Canterbury Road
-    // (#612, 15/07/2026); that history lives in git and in the per-email venue snapshot
-    // stored on each CcwRoadshowEmailLog row, which this change does not touch.
-    venueName: 'Carpet Cleaners Warehouse Melbourne',
-    streetAddress: 'Unit 1/5 Gatwick Road',
+    // HISTORY - do not change. This sitting ran at Club Kilsyth after the CCW Bayswater
+    // North branch proved too small for the numbers (#612, 15/07/2026). Forward-looking
+    // Melbourne copy uses ccwHomeVenues.VIC (the CCW store) instead.
+    venueName: 'Club Kilsyth',
+    streetAddress: '1-15 Canterbury Road',
     suburb: 'Bayswater North',
     suburbStatePostcode: 'Bayswater North VIC 3153',
     state: 'VIC',
