@@ -14,9 +14,9 @@
  *
  * Usage: node scripts/check-quiz-option-balance.mjs [--enforce=<slugs|all>] [--json]
  */
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync, readdirSync, realpathSync } from 'node:fs';
 import { join } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 
 const SEED_DIR = 'data/seed';
 /** Characters may differ by at most this share of the longest option, or by MIN_CHAR_SLACK. */
@@ -74,34 +74,66 @@ export function quizProblems(quiz) {
   } else if (qs.length >= 4) {
     const positions = qs.map((q) => q.correctIndex);
     const p = answerCycle(positions);
-    if (p) out.push(`correct answers repeat in a cycle of ${p}: ${positions.slice(0, p).join(',')}`);
+    if (p)
+      out.push(`correct answers repeat in a cycle of ${p}: ${positions.slice(0, p).join(',')}`);
   }
   return out;
 }
 
 function loadQuizFiles(dir = SEED_DIR) {
-  const files = readdirSync(dir).filter((f) => f.endsWith('-quiz.json') || f.endsWith('.quizzes.json'));
+  const files = readdirSync(dir).filter(
+    (f) => f.endsWith('-quiz.json') || f.endsWith('.quizzes.json')
+  );
   const out = [];
+  const unreadable = [];
   for (const f of files) {
     let data;
     try {
       data = JSON.parse(readFileSync(join(dir, f), 'utf8'));
-    } catch {
+    } catch (e) {
+      unreadable.push(`${f}: ${e.message}`);
       continue;
     }
     const slug = data.courseSlug || f.replace(/(-quiz|\.quizzes)\.json$/, '');
     for (const quiz of data.quizzes || []) out.push({ file: f, slug, quiz });
   }
-  return out;
+  return { quizzes: out, unreadable };
 }
 
-const isCli = Boolean(process.argv[1]) && import.meta.url === pathToFileURL(process.argv[1]).href;
-if (isCli) {
+/**
+ * True when this module is the entry point. Node resolves symlinks for the main module, so
+ * import.meta.url holds the real path while argv[1] may be a symlinked one (/tmp ->
+ * /private/tmp on macOS); comparing them raw skipped the CLI and exited 0 silently.
+ */
+function isEntryPoint() {
+  if (!process.argv[1]) return false;
+  try {
+    return realpathSync(fileURLToPath(import.meta.url)) === realpathSync(process.argv[1]);
+  } catch {
+    return false;
+  }
+}
+
+if (isEntryPoint()) {
   const args = process.argv.slice(2);
-  const enforceArg = (args.find((a) => a.startsWith('--enforce=')) || '').slice('--enforce='.length);
+  const enforceArg = (args.find((a) => a.startsWith('--enforce=')) || '').slice(
+    '--enforce='.length
+  );
   const enforceAll = enforceArg === 'all';
-  const enforceSet = new Set(enforceArg.split(',').map((s) => s.trim()).filter(Boolean));
-  const quizzes = loadQuizFiles();
+  const enforceSet = new Set(
+    enforceArg
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
+  );
+  const { quizzes, unreadable } = loadQuizFiles();
+  if (unreadable.length) {
+    console.error(
+      `check-quiz-option-balance: cannot read ${unreadable.length} quiz file(s) — refusing to report a pass.`
+    );
+    for (const u of unreadable) console.error(`  - ${u}`);
+    process.exit(2);
+  }
   if (quizzes.length === 0) {
     console.error('check-quiz-option-balance: scanned 0 quizzes — refusing to report a pass.');
     process.exit(2);
@@ -109,7 +141,9 @@ if (isCli) {
   const known = new Set(quizzes.map((q) => q.slug));
   const missing = enforceAll ? [] : [...enforceSet].filter((s) => !known.has(s));
   if (missing.length) {
-    console.error(`check-quiz-option-balance: no quiz found for enforced slug(s): ${missing.join(', ')}`);
+    console.error(
+      `check-quiz-option-balance: no quiz found for enforced slug(s): ${missing.join(', ')}`
+    );
     process.exit(2);
   }
   let failing = 0;
@@ -125,7 +159,9 @@ if (isCli) {
   } else {
     for (const r of report) {
       const tag = r.problems.length ? (r.enforced ? 'FAIL' : 'advisory') : 'ok';
-      console.log(`${tag.padEnd(8)} ${r.file} (${r.problems.length} problem${r.problems.length === 1 ? '' : 's'})`);
+      console.log(
+        `${tag.padEnd(8)} ${r.file} (${r.problems.length} problem${r.problems.length === 1 ? '' : 's'})`
+      );
       if (r.enforced) for (const p of r.problems) console.log(`         - ${p}`);
     }
     console.log(`scanned ${report.length} quizzes; ${failing} enforced quiz(zes) failing`);
