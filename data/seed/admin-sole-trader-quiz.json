@@ -35,11 +35,11 @@
      "questionText": "Per ASIC, when must a sole trader register a business name?",
      "options": [
       "When their turnover passes $75,000",
-      "When they hire an employee",
       "When trading under another name",
+      "When they hire an employee",
       "When they register for GST"
      ],
-     "correctIndex": 2,
+     "correctIndex": 1,
      "points": 1
     },
     {
@@ -47,43 +47,43 @@
      "options": [
       "2 years or 5 years",
       "1 year or 10 years",
-      "6 months or 1 year",
-      "1 year or 3 years"
+      "1 year or 3 years",
+      "6 months or 1 year"
      ],
-     "correctIndex": 3,
+     "correctIndex": 2,
      "points": 1
     },
     {
      "questionText": "Per the ATO, by when must you give a requested tax invoice over $82.50?",
      "options": [
-      "Within 28 days",
       "Within 7 days",
+      "Within 28 days",
       "Within 90 days",
       "Within 12 months"
      ],
-     "correctIndex": 0,
+     "correctIndex": 1,
      "points": 1
     },
     {
      "questionText": "Per the ATO, what extra detail does a tax invoice of $1,000 or more need?",
      "options": [
       "The buyer's date of birth",
-      "The buyer's identity or ABN",
       "The seller's current bank balance",
-      "The seller's TFN and address"
+      "The seller's TFN and address",
+      "The buyer's identity or ABN"
      ],
-     "correctIndex": 1,
+     "correctIndex": 3,
      "points": 1
     },
     {
      "questionText": "Per business.gov.au, what does portable equipment insurance cover?",
      "options": [
+      "Loss, damage or theft of tools",
       "Injury you cause to a customer",
       "Part of your lost weekly income",
-      "Loss, damage or theft of tools",
       "Damage to the whole client home"
      ],
-     "correctIndex": 2,
+     "correctIndex": 0,
      "points": 1
     },
     {
@@ -100,23 +100,23 @@
     {
      "questionText": "Per the ATO, what is the super guarantee rate from 1 July 2025?",
      "options": [
-      "12%",
       "10%",
       "11%",
+      "12%",
       "9.5%"
      ],
-     "correctIndex": 0,
+     "correctIndex": 2,
      "points": 1
     },
     {
      "questionText": "In this course, which order is correct for the job admin loop?",
      "options": [
-      "Quote, enquiry, invoice, booking",
       "Enquiry, quote, booking, invoice",
+      "Quote, enquiry, invoice, booking",
       "Booking, invoice, enquiry, quote",
       "Invoice, booking, quote, enquiry"
      ],
-     "correctIndex": 1,
+     "correctIndex": 0,
      "points": 1
     }
    ]

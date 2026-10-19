@@ -12,56 +12,56 @@
     {
      "questionText": "Per ASCIA, can house dust mites be completely removed from a home?",
      "options": [
-      "No, only reduced",
       "Yes, by vacuuming",
       "Yes, by spraying",
-      "Yes, by dry-cleaning"
+      "Yes, by dry-cleaning",
+      "No, only reduced"
      ],
-     "correctIndex": 0,
+     "correctIndex": 3,
      "points": 1
     },
     {
      "questionText": "Per ASCIA, at what water temperature should bedding be washed weekly?",
      "options": [
       "Above 30 °C",
-      "Above 60 °C",
       "Above 40 °C",
+      "Above 60 °C",
       "Cold water only"
-     ],
-     "correctIndex": 1,
-     "points": 1
-    },
-    {
-     "questionText": "Per the AIHW, how many people in Australia were living with asthma in 2022?",
-     "options": [
-      "About 0.8 million",
-      "About 5.8 million",
-      "About 2.8 million",
-      "About 9.8 million"
      ],
      "correctIndex": 2,
      "points": 1
     },
     {
+     "questionText": "Per the AIHW, how many people in Australia were living with asthma in 2022?",
+     "options": [
+      "About 2.8 million",
+      "About 0.8 million",
+      "About 5.8 million",
+      "About 9.8 million"
+     ],
+     "correctIndex": 0,
+     "points": 1
+    },
+    {
      "questionText": "Per the Foundation report in this course, what is the third leading cause of death in New Zealand?",
      "options": [
+      "All respiratory disease",
       "Asthma by itself",
       "Dust mite allergy",
-      "Pet dander allergy",
-      "All respiratory disease"
+      "Pet dander allergy"
      ],
-     "correctIndex": 3,
+     "correctIndex": 0,
      "points": 1
     },
     {
      "questionText": "Per the labelling Code, what must a decanted container carry at minimum?",
      "options": [
-      "The identifier plus pictogram or statement",
       "Brand logo plus the retail price",
       "Expiry date plus the batch number",
+      "The identifier plus pictogram or statement",
       "Supplier name plus a phone number"
      ],
-     "correctIndex": 0,
+     "correctIndex": 2,
      "points": 1
     },
     {
@@ -80,21 +80,21 @@
      "options": [
       "Finish the job quickly",
       "Give them some paracetamol",
-      "Call triple zero (000)",
-      "Drive them home now"
+      "Drive them home now",
+      "Call triple zero (000)"
      ],
-     "correctIndex": 2,
+     "correctIndex": 3,
      "points": 1
     },
     {
      "questionText": "Per business.gov.au, can a store policy override consumer guarantees?",
      "options": [
       "Yes, in writing",
+      "No, it cannot",
       "Yes, for treatments",
-      "Yes, below $100",
-      "No, it cannot"
+      "Yes, below $100"
      ],
-     "correctIndex": 3,
+     "correctIndex": 1,
      "points": 1
     },
     {
