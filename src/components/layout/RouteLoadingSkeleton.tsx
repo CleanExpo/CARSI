@@ -1,3 +1,6 @@
+// Skeleton for the logged-in route groups only. Public pages have no loading boundary: under one,
+// the homepage hero streamed into a hidden segment and only appeared after the JS bundle ran
+// (mobile LCP 16-26 s). Each logged-in group re-exports this as its loading.tsx.
 export default function Loading() {
   return (
     <div
