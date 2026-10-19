@@ -120,7 +120,7 @@ describe('LMS admin is granted by the DB role only', () => {
     // paths; anything else reading it would be making a decision from an email list.
     expect(
       users(
-        /\b(getReservedStaffEmails|isReservedStaffEmail|getAdminPanelAllowedEmails|isAdminAllowlistedEmail|FOUNDER_ADMIN_EMAILS|FOUNDER_EMAILS)\b/
+        /\b(getReservedStaffEmails|isReservedStaffEmail|getAdminPanelAllowedEmails|isAdminAllowlistedEmail|FOUNDER_ADMIN_EMAILS|FOUNDER_EMAILS|isFounderAdminEmail)\b/
       )
     ).toEqual([
       'src/lib/admin/admin-panel-access.ts',
@@ -131,7 +131,8 @@ describe('LMS admin is granted by the DB role only', () => {
 
     // ADMIN_EMAIL is read only as a notification recipient (contact, submit, enquiry,
     // transactional email), by the separate admin-password login (admin cookie: login route,
-    // cookie verification, admin_users bootstrap) and by the reservation list's definition.
+    // cookie verification, admin_users bootstrap, the review-admin cookie check) and by the
+    // reservation list's definition.
     expect(users(/\bADMIN_EMAIL\b|\bgetAdminEmail\b/)).toEqual([
       'app/api/admin/login/route.ts',
       'app/api/contact/route.ts',
@@ -139,6 +140,7 @@ describe('LMS admin is granted by the DB role only', () => {
       'src/lib/admin/admin-auth.ts',
       'src/lib/admin/admin-panel-access.ts',
       'src/lib/admin/admin-store.ts',
+      'src/lib/server/current-admin.ts',
       'src/lib/server/frontdesk/tools/capture-enquiry.ts',
       'src/lib/server/transactional-email.ts',
     ]);

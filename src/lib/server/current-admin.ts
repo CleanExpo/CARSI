@@ -13,14 +13,14 @@
  *     ADMIN_EMAIL, or an admin_users account that is active with role 'admin' now;
  *   - LMS session: ONLY a user (by the token's user id) who is active now AND whose EFFECTIVE role
  *     is 'admin' now — computed exactly as the session token's role is (pickSessionRole:
- *     lms_user_roles first, then the lms_users.role column) — or a founder account
- *     (FOUNDER_ADMIN_EMAILS, which exist already and so cannot be self-registered).
- *     ADMIN_EMAIL and ADMIN_PANEL_EMAILS never make an LMS session an admin here.
+ *     lms_user_roles first, then the lms_users.role column). No email makes an LMS session an
+ *     admin: not a founder address and not a configured staff address (founder decision
+ *     19/10/2026).
  * Rows are read FOR SHARE: inside a transaction, a concurrent deactivation, column change or
  * removal of a role row either commits first (and is seen here) or waits until the action has
  * committed.
  */
-import { FOUNDER_ADMIN_EMAILS, getAdminEmail } from '@/lib/admin/admin-panel-access';
+import { getAdminEmail } from '@/lib/admin/admin-panel-access';
 import { pickSessionRole } from '@/lib/server/lms-auth';
 
 export type CurrentAdmin = {
@@ -46,19 +46,6 @@ export class NotCurrentAdminError extends Error {
 export type RawQueryClient = {
   $queryRaw: <T>(strings: TemplateStringsArray, ...values: unknown[]) => Promise<T>;
 };
-
-/**
- * The founder accounts: exactly #907's explicit FOUNDER_ADMIN_EMAILS set (release-gate r14),
- * independent of configuration. A founder stays a founder when its address is ALSO listed in
- * ADMIN_EMAIL or ADMIN_PANEL_EMAILS (that overlap must not lock the founder out), and a
- * configured address that is not a founder never becomes one. Every address in this set is
- * already an existing account and is reserved by #907 against unverified registration.
- */
-export function isFounderAdminEmail(email: string): boolean {
-  const e = email.trim().toLowerCase();
-  if (!e) return false;
-  return (FOUNDER_ADMIN_EMAILS as readonly string[]).includes(e);
-}
 
 export async function resolveCurrentAdmin(
   db: RawQueryClient,
@@ -96,7 +83,7 @@ export async function resolveCurrentAdmin(
       roleRows.map((r) => r.name),
       user.role
     ) === 'admin';
-  if (isAdminRole || isFounderAdminEmail(email)) return { kind: 'lms_admin', ref: user.id, email };
+  if (isAdminRole) return { kind: 'lms_admin', ref: user.id, email };
   return null;
 }
 
