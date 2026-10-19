@@ -84,6 +84,30 @@ for (const [form, planted] of [
   });
 }
 
+// Evasions from the Gemini review (review-ccwft-r1-gm): JSON-escaped whitespace and HTML entities,
+// plus the same class of trick (zero-width characters, markup, double encoding, fullwidth letters).
+for (const [form, planted] of [
+  ['CCW split by newlines', 'Ask C\nC\nW about the unit.'],
+  ['CCW split by tabs', 'Ask C\tC\tW about the unit.'],
+  ['Carpet Cleaners Warehouse split by a newline and a tab', 'Sold by Carpet\nCleaners\tWarehouse.'],
+  ['a CCW product name split by a newline', 'Pre-treat with Thymox\n5 ltr first.'],
+  ['CCW with a decimal entity', 'Ask &#67;CW about the unit.'],
+  ['CCW with a hex entity', 'Ask C&#x43;W about the unit.'],
+  ['CCW double-encoded', 'Ask &amp;#67;CW about the unit.'],
+  ['a link with named entities', 'Visit ccwonline&period;com&period;au today.'],
+  ['a link with numeric entities', 'Visit ccwonline&#46;com&#46;au today.'],
+  ['a link percent-encoded', '<a href="https://ccwonline%2Ecom%2Eau/x">tool</a>'],
+  ['CCW split by a zero-width space', 'Ask C\u200bCW about the unit.'],
+  ['CCW split by markup', 'Ask C<span>C</span>W about the unit.'],
+  ['CCW in fullwidth letters', 'Ask \uff23\uff23\uff37 about the unit.'],
+]) {
+  test(`flags ${form} planted into an approved course lesson`, () => {
+    const inputs = clone();
+    firstLesson(catalogueCourse(inputs, CARD_SLUG)).contentBody += ` ${planted}`;
+    assert.ok(findingsFor(inputs, CARD_SLUG).length > 0, `${form} was not flagged`);
+  });
+}
+
 test('flags a CCW link in a quiz seed keyed by courseSlug, and in one keyed only by file name', () => {
   for (const file of [
     { path: 'data/seed/assessment-drafts/x.quizzes.json', data: { courseSlug: CARD_SLUG, quizzes: [] } },
@@ -149,6 +173,7 @@ test('flags a CCW logo in a public course file for an approved slug', () => {
 
 test('does not flag plain words that merely contain the letters', () => {
   assert.deepEqual(brandHits('Clockwise accw, ccwide and the Thymox story', real.productNames), []);
+  assert.deepEqual(brandHits('Section C. Clean water, a&b, 50&#37; and C W ratios', real.productNames), []);
 });
 
 test('fails closed when the registry, products or an approved catalogue entry are missing', () => {
