@@ -2,7 +2,7 @@
  * Margot surface config for CARSI — keep in sync with
  * Pi-Dev-Ops packages/brand-config/src/margot-surfaces.ts
  */
-export const MARGOT_AVATAR_PATH = '/margot/avatar.png';
+export const MARGOT_AVATAR_PATH = '/margot/avatar-192.webp';
 export const MARGOT_DISPLAY_NAME = 'Margot';
 export const MARGOT_ROLE_LABEL = 'Your CARSI professional learning guide';
 export const MARGOT_WELCOME =

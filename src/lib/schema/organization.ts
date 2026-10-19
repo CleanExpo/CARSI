@@ -6,6 +6,7 @@
  */
 
 import { CARSI_SOCIAL_PROFILE_URLS } from '@/lib/brand/social-profiles';
+import { CARSI_ENTITY, entityPostalAddress } from '@/lib/seo/carsi-entity';
 
 import type { SchemaObject } from './shared';
 
@@ -18,9 +19,9 @@ export interface OrganizationSchemaInput {
 
 export function buildOrganizationSchema(input: OrganizationSchemaInput = {}): SchemaObject {
   const {
-    name = 'CARSI',
-    url = 'https://carsi.com.au',
-    logo = 'https://carsi.com.au/logo1.png',
+    name = CARSI_ENTITY.name,
+    url = CARSI_ENTITY.url,
+    logo = CARSI_ENTITY.logo,
     sameAs = [...CARSI_SOCIAL_PROFILE_URLS],
   } = input;
 
@@ -32,16 +33,12 @@ export function buildOrganizationSchema(input: OrganizationSchemaInput = {}): Sc
     alternateName: 'Centre for Australian Restoration and Standards Information',
     url,
     logo,
-    description:
-      'Australian online training platform for cleaning and restoration professionals, and an IICRC CEC Accredited provider. CEC hours apply only to courses the IICRC has approved.',
-    email: 'support@carsi.com.au',
+    legalName: CARSI_ENTITY.legalName,
+    // One entity record for schema, footer and /llms.txt (src/lib/seo/carsi-entity.ts).
+    description: CARSI_ENTITY.description,
+    email: CARSI_ENTITY.email,
     // SAB: postal address only — no street address exposed publicly
-    address: {
-      '@type': 'PostalAddress',
-      addressLocality: 'Forest Lake',
-      addressRegion: 'QLD',
-      addressCountry: 'AU',
-    },
+    address: entityPostalAddress(),
     // SAB: explicit state-by-state service area coverage
     areaServed: [
       {

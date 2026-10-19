@@ -2,11 +2,14 @@
 
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 const DEFAULT_ORIGIN = 'https://carsi.com.au';
 const DEFAULT_ENDPOINT = 'https://api.indexnow.org/indexnow';
 const DEFAULT_URL_FILES = ['public/start-smart-urls.txt'];
-const DEFAULT_PATHS = [
+// Indexable pages only: every page path here must be in sitemap.xml
+// (src/lib/seo/sitemap-real-pages.test.ts). Noindex pages are never submitted.
+export const DEFAULT_PATHS = [
   '/',
   '/courses',
   '/pathways',
@@ -14,12 +17,11 @@ const DEFAULT_PATHS = [
   '/contact',
   '/about',
   '/ccw-training',
-  '/ccw-materials',
+  '/ccw-training/workshop',
   '/calendar',
   '/events/ccw-roadshow',
   '/authority',
   '/research',
-  '/professional-directory',
   '/news',
   '/jobs',
   '/podcast',
@@ -175,7 +177,9 @@ async function main() {
   console.log(`Submitted URLs: ${urlList.length}`);
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  });
+}

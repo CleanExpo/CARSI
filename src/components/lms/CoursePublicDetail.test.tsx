@@ -1,9 +1,11 @@
+// @vitest-environment jsdom
 /**
  * Course page CEC truth: with no in-force IICRC approval the page shows no CEC stat, pill or
  * audience line (the live page showed "CEC hours —" beside "Technicians earning IICRC CECs");
  * with one, it shows the earns-hours label built from the approved hours.
  */
-import { createElement } from 'react';
+import { act, createElement } from 'react';
+import { createRoot } from 'react-dom/client';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -63,6 +65,79 @@ describe('CoursePublicDetail — CEC', () => {
     ] as const) {
       expect(cecEarnsLabel(String(n))).toBe(`Earns ${n} IICRC CEC ${unit}`);
     }
+  });
+});
+
+/**
+ * Lighthouse heading-order failed on the live course page (18/10/2026): the sidebar "Career
+ * opportunities" panel, fetched after load, rendered an <h3> straight after the page <h1>.
+ * Mount the page, let that panel load, then walk every heading in document order.
+ */
+describe('CoursePublicDetail — heading order', () => {
+  it('never skips a heading level once the sidebar career panel has loaded', async () => {
+    (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+    const hubBody = {
+      discipline: 'water',
+      job_keywords: ['water damage technician'],
+      related_disciplines: [],
+      pathway_name: 'Water restoration',
+    };
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify(hubBody), { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+    // jsdom has no IntersectionObserver; in-view animations only need a no-op.
+    vi.stubGlobal(
+      'IntersectionObserver',
+      class {
+        observe() {}
+        unobserve() {}
+        disconnect() {}
+        takeRecords() {
+          return [];
+        }
+      }
+    );
+    const course = {
+      slug: 'water-damage-essentials',
+      title: 'Water Damage Restoration — Essentials',
+      price_aud: '29',
+      is_free: false,
+      cec_hours: null,
+      thumbnailUrl: null,
+    };
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const root = createRoot(container);
+    await act(async () => {
+      root.render(
+        createElement(CoursePublicDetail, {
+          course,
+          designation: null,
+          priceLabel: '$29',
+          priceNum: 29,
+          learningOutcomes: [],
+          audienceItems: getCourseAudienceItems(course, null),
+        })
+      );
+    });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    expect(fetchMock).toHaveBeenCalled();
+    expect(container.textContent).toContain('Career opportunities');
+
+    const headings = [...container.querySelectorAll('h1,h2,h3,h4,h5,h6')].map((h) => ({
+      level: Number(h.tagName[1]),
+      text: (h.textContent ?? '').trim().slice(0, 40),
+    }));
+    expect(headings[0]?.level).toBe(1);
+    const skips = headings
+      .filter((h, i) => i > 0 && h.level > headings[i - 1].level + 1)
+      .map((h) => `h${h.level} "${h.text}"`);
+    expect(skips).toEqual([]);
+
+    act(() => root.unmount());
+    container.remove();
+    vi.unstubAllGlobals();
   });
 });
 

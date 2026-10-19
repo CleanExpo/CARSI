@@ -6,6 +6,7 @@ import {
   IndustryWhySection,
   IndustryCTA,
   ContractorAddOns,
+  IndustryFAQSection,
 } from '@/components/industries';
 import { IndustryRecommendedCourses } from '@/components/industries/IndustryRecommendedCourses';
 import { FAQSchema } from '@/components/seo/JsonLd';
@@ -14,7 +15,7 @@ import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Restoration Training for Real Estate & Property Sales | CARSI Australia',
+  title: 'Restoration Training for Real Estate & Property Sales',
   description:
     'Vendor disclosure compliance and pre-sale remediation. CARSI water damage restoration, structural drying and mould remediation courses for real estate agents, property managers, and conveyancers. Online. CEC hours apply only to courses the IICRC has approved; not IICRC certification.',
   keywords: [
@@ -125,6 +126,8 @@ export default async function RealEstateIndustryPage() {
       />
 
       <ContractorAddOns accentColor={ACCENT_COLOR} />
+
+      <IndustryFAQSection industryName="Real estate" faqs={faqs} />
 
       <IndustryCTA
         subtitle="Real Estate Training"

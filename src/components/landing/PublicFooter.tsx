@@ -8,6 +8,7 @@ import {
   PUBLIC_SHELL_INNER_CLASS,
 } from '@/components/landing/public-shell-width';
 import { PublicLogo } from '@/components/landing/PublicLogo';
+import { CARSI_ENTITY, postalAddressLine } from '@/lib/seo/carsi-entity';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
 import { CARSI_SOCIAL_PROFILES } from '@/lib/brand/social-profiles';
 
@@ -51,7 +52,7 @@ const eventLinks = [
   { label: 'CCW Roadshow', href: '/events/ccw-roadshow' },
   { label: 'CCW Melbourne', href: '/ccw-melbourne' },
   { label: 'CCW Sydney', href: '/ccw-sydney' },
-  { label: 'CCW Materials', href: '/ccw-materials' },
+  { label: 'CCW Materials', href: '/ccw-training/workshop?section=materials' },
 ];
 
 /**
@@ -65,6 +66,9 @@ const eventLinks = [
 const RESTOREASSIST_URL = 'https://restoreassist.app';
 const RESTOREASSIST_EXPLAINER_URL = 'https://restoreassist.app/#overview';
 
+// Social links come from the one verified profile list (src/lib/brand/social-profiles.ts);
+// the address and email below come from the entity record (src/lib/seo/carsi-entity.ts)
+// that the Organization schema and /llms.txt also read.
 const socialLinks = CARSI_SOCIAL_PROFILES.map((p) => ({ label: p.label, href: p.url }));
 
 function FooterSectionLabel({ children }: { children: ReactNode }) {
@@ -206,7 +210,7 @@ export function PublicFooter({ tone = 'chrome' }: { tone?: 'chrome' | 'light' } 
             <ul className="space-y-3 text-sm text-white/62">
               <li className="flex gap-3">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#7ec5ff]/70" aria-hidden />
-                <span className="leading-relaxed">PO Box 4309, Forest Lake QLD 4078</span>
+                <span className="leading-relaxed">{postalAddressLine()}</span>
               </li>
               <li>
                 <a
@@ -215,6 +219,14 @@ export function PublicFooter({ tone = 'chrome' }: { tone?: 'chrome' | 'light' } 
                 >
                   <Mail className="h-4 w-4 shrink-0 text-[#7ec5ff]/70" aria-hidden />
                   <span>Contact CARSI support</span>
+                </a>
+              </li>
+              <li className="pl-7">
+                <a
+                  href={`mailto:${CARSI_ENTITY.email}`}
+                  className="text-white/62 transition-colors hover:text-white"
+                >
+                  {CARSI_ENTITY.email}
                 </a>
               </li>
               <li className="flex gap-3">
@@ -499,7 +511,7 @@ function LightFooter() {
             <ul className="space-y-3 text-sm text-slate-600">
               <li className="flex gap-3">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#146fc2]/70" aria-hidden />
-                <span className="leading-relaxed">PO Box 4309, Forest Lake QLD 4078</span>
+                <span className="leading-relaxed">{postalAddressLine()}</span>
               </li>
               <li>
                 <a
@@ -508,6 +520,14 @@ function LightFooter() {
                 >
                   <Mail className="h-4 w-4 shrink-0 text-[#146fc2]/70" aria-hidden />
                   <span>Contact CARSI support</span>
+                </a>
+              </li>
+              <li className="pl-7">
+                <a
+                  href={`mailto:${CARSI_ENTITY.email}`}
+                  className="rounded-sm text-slate-600 transition-colors hover:text-[#146fc2] focus-visible:ring-2 focus-visible:ring-[#2490ed]/35 focus-visible:outline-none"
+                >
+                  {CARSI_ENTITY.email}
                 </a>
               </li>
               <li className="flex gap-3">

@@ -6,6 +6,7 @@ import {
   IndustryWhySection,
   IndustryCTA,
   ContractorAddOns,
+  IndustryFAQSection,
 } from '@/components/industries';
 import { IndustryRecommendedCourses } from '@/components/industries/IndustryRecommendedCourses';
 import { FAQSchema } from '@/components/seo/JsonLd';
@@ -14,7 +15,7 @@ import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Restoration Training for Plumbers & Trades | CARSI Australia',
+  title: 'Restoration Training for Plumbers & Trades',
   description:
     'Turn water damage call-outs into drying contracts. CARSI water damage restoration and structural drying courses for Australian plumbers and trade contractors — online and self-paced. CEC hours apply only to courses the IICRC has approved, and no CARSI course is IICRC certification.',
   keywords: [
@@ -124,6 +125,8 @@ export default async function PlumbingTradesIndustryPage() {
       />
 
       <ContractorAddOns accentColor={ACCENT_COLOR} />
+
+      <IndustryFAQSection industryName="Plumbing and trades" faqs={faqs} />
 
       <IndustryCTA
         subtitle="Plumbing & Trades Training"

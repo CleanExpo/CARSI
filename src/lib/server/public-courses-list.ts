@@ -614,13 +614,13 @@ export async function getPublishedCourseForCheckout(
 
 /** Published course slugs for sitemap generation. */
 export async function getPublishedCourseSlugsFromDatabase(): Promise<
-  Array<{ slug: string; updated_at: string }>
+  Array<{ slug: string; updated_at: string; category: string | null }>
 > {
   if (isBuildPhase() || !process.env.DATABASE_URL?.trim()) return [];
 
   const rows = await prisma.lmsCourse.findMany({
     where: publishedWhere,
-    select: { slug: true, updatedAt: true },
+    select: { slug: true, updatedAt: true, category: true },
     orderBy: { updatedAt: 'desc' },
     take: CATALOGUE_QUERY_CAP,
   });
@@ -628,5 +628,6 @@ export async function getPublishedCourseSlugsFromDatabase(): Promise<
   return rows.map((row) => ({
     slug: row.slug,
     updated_at: row.updatedAt.toISOString(),
+    category: row.category,
   }));
 }

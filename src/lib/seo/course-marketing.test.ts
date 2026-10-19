@@ -35,10 +35,36 @@ const cecApprovals = (
     approvals: unknown[];
   }
 ).approvals;
-const surfaceSlugs = Array.from(
-  readFileSync(join(ROOT, 'public', 'llms.txt'), 'utf8').matchAll(/\]\(\/courses\/([^\)]+)\)/g),
-  (match) => match[1],
-);
+// The 24 paid courses the old hand-maintained public/llms.txt surfaced, frozen here as the
+// fixture set these card-truth checks run over. /llms.txt is now generated from the live
+// catalogue (app/llms.txt/route.ts) and lists every published course, so the list was moved
+// here verbatim (18/10/2026) rather than read from a file that no longer exists.
+const surfaceSlugs = [
+  'air-quality-and-odour-identification-and-deodorisation-essentials',
+  'avian-influenza-awareness-restoration-iaq-facilities',
+  'floor-care-onboarding-operational-readiness',
+  'documenting-and-reporting-air-quality-improvements',
+  'dust-and-particulates-in-indoor-air-control-and-cleaning-strategies',
+  'hvac-systems-and-indoor-air-quality-what-every-technician-should-know',
+  'introduction-to-air-quality-fundamentals',
+  'introduction-to-creating-a-clean-air-environment-best-practices-for-final-cleara',
+  'introduction-to-drying-educational-and-institutional-sites',
+  'introduction-to-drying-health-care-facilities',
+  'introduction-to-drying-hospitality-and-lodging-sites',
+  'introduction-to-drying-industrial-and-manufacturing-sites',
+  'introduction-to-drying-transportation-and-vehicles',
+  'introduction-to-iaq-and-mould-understanding-airborne-spread-and-containment',
+  'introduction-to-improving-indoor-air-quality-after-water-damage',
+  'introduction-to-infrared-thermography-for-drying',
+  'introduction-to-recovery-of-submerged-items-and-contents',
+  'introduction-to-restoration-of-antiques-and-fine-furnishings',
+  'introduction-to-ultraviolet-light-and-fluorescence',
+  'introduction-to-water-damage-litigation-support',
+  'moisture-mould-and-indoor-air-quality-understanding-the-link',
+  'ccw-carsi-truckmount-operations',
+  'using-air-scrubbers-and-afds-to-improve-job-site-air-quality',
+  'water-damage-essentials',
+];
 
 const unsafeCard: CourseMarketing = {
   slug: 'paid-course',

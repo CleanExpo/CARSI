@@ -6,6 +6,7 @@ import {
   IndustryWhySection,
   IndustryCTA,
   ContractorAddOns,
+  IndustryFAQSection,
 } from '@/components/industries';
 import { IndustryRecommendedCourses } from '@/components/industries/IndustryRecommendedCourses';
 import { FAQSchema } from '@/components/seo/JsonLd';
@@ -14,7 +15,7 @@ import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Restoration Training for Emergency Management & SES | CARSI Australia',
+  title: 'Restoration Training for Emergency Management & SES',
   description:
     'Train SES volunteers and council emergency teams before disaster strikes. CARSI water damage restoration, fire and smoke restoration, structural drying and mould remediation training for flood and fire response. Online. CEC hours apply only to courses the IICRC has approved.',
   keywords: [
@@ -125,6 +126,8 @@ export default async function EmergencyManagementIndustryPage() {
       />
 
       <ContractorAddOns accentColor={ACCENT_COLOR} />
+
+      <IndustryFAQSection industryName="Emergency management" faqs={faqs} />
 
       <IndustryCTA
         subtitle="Emergency Management Training"
