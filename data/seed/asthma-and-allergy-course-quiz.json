@@ -1,0 +1,125 @@
+{
+ "version": 1,
+ "courseSlug": "asthma-and-allergy-course",
+ "quizzes": [
+  {
+   "quizId": "e5f0717d-9864-4956-8082-c98f748e2062",
+   "lessonTitle": "Final knowledge check",
+   "title": "Asthma and Allergy: Anti-Allergen Cleaning — Knowledge Check",
+   "passPercentage": 80,
+   "attemptsAllowed": 3,
+   "questions": [
+    {
+     "questionText": "Per ASCIA, can house dust mites be completely removed from a home?",
+     "options": [
+      "Yes, by vacuuming",
+      "Yes, by spraying",
+      "Yes, by dry-cleaning",
+      "No, only reduced"
+     ],
+     "correctIndex": 3,
+     "points": 1
+    },
+    {
+     "questionText": "Per ASCIA, at what water temperature should bedding be washed weekly?",
+     "options": [
+      "Above 30 °C",
+      "Above 40 °C",
+      "Above 60 °C",
+      "Cold water only"
+     ],
+     "correctIndex": 2,
+     "points": 1
+    },
+    {
+     "questionText": "Per the AIHW, how many people in Australia were living with asthma in 2022?",
+     "options": [
+      "About 2.8 million",
+      "About 0.8 million",
+      "About 5.8 million",
+      "About 9.8 million"
+     ],
+     "correctIndex": 0,
+     "points": 1
+    },
+    {
+     "questionText": "Per the Foundation report in this course, what is the third leading cause of death in New Zealand?",
+     "options": [
+      "All respiratory disease",
+      "Asthma by itself",
+      "Dust mite allergy",
+      "Pet dander allergy"
+     ],
+     "correctIndex": 0,
+     "points": 1
+    },
+    {
+     "questionText": "Per the labelling Code, what must a decanted container carry at minimum?",
+     "options": [
+      "Brand logo plus the retail price",
+      "Expiry date plus the batch number",
+      "The identifier plus pictogram or statement",
+      "Supplier name plus a phone number"
+     ],
+     "correctIndex": 2,
+     "points": 1
+    },
+    {
+     "questionText": "Per the model Code, where does PPE sit in the hierarchy of control?",
+     "options": [
+      "First, before other controls",
+      "Last, after higher controls",
+      "Second, after elimination controls",
+      "Third, before administrative ones"
+     ],
+     "correctIndex": 1,
+     "points": 1
+    },
+    {
+     "questionText": "Per NSW Health, what do you do first if you suspect heat stroke?",
+     "options": [
+      "Finish the job quickly",
+      "Give them some paracetamol",
+      "Drive them home now",
+      "Call triple zero (000)"
+     ],
+     "correctIndex": 3,
+     "points": 1
+    },
+    {
+     "questionText": "Per business.gov.au, can a store policy override consumer guarantees?",
+     "options": [
+      "Yes, in writing",
+      "No, it cannot",
+      "Yes, for treatments",
+      "Yes, below $100"
+     ],
+     "correctIndex": 1,
+     "points": 1
+    },
+    {
+     "questionText": "Per this course, how should you describe the result of the service?",
+     "options": [
+      "As an allergen-load reduction",
+      "As full allergy relief",
+      "As total allergen removal",
+      "As certain asthma prevention"
+     ],
+     "correctIndex": 0,
+     "points": 1
+    },
+    {
+     "questionText": "In this course, which order is correct for the service?",
+     "options": [
+      "Treat, extract, dry, pre-vacuum",
+      "Pre-vacuum, extract, treat, dry",
+      "Extract, treat, pre-vacuum, dry",
+      "Dry, treat, pre-vacuum, extract"
+     ],
+     "correctIndex": 1,
+     "points": 1
+    }
+   ]
+  }
+ ]
+}

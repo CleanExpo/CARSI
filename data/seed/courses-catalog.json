@@ -9333,6 +9333,721 @@
      ]
     }
    ]
+  },
+  {
+   "id": "41742002-b8b3-42da-a535-8f1985bc398e",
+   "slug": "asthma-and-allergy-course",
+   "title": "Asthma and Allergy: Anti-Allergen Cleaning and Treatment",
+   "description": "A CARSI course for cleaners and restoration technicians who offer anti-allergen cleaning in Australian homes. This course covers asthma and allergy basics with figures sourced to the AIHW, ASCIA&rsquo;s allergen-minimisation advice, the two-step clean and treat process, product selection by label and SDS, chemical storage and labelling under Safe Work Australia model Codes, PPE, heat illness, documentation, and truthful pricing and marketing.",
+   "shortDescription": "Add anti-allergen cleaning to your services, with sourced health facts, the ASCIA home routine, safe chemical handling, and honest pricing and marketing.",
+   "thumbnailUrl": null,
+   "instructorId": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+   "status": "published",
+   "priceAud": "129",
+   "isFree": false,
+   "durationHours": 6.0,
+   "level": "Specialised",
+   "category": "Health and Safety",
+   "tags": [
+    "asthma",
+    "allergy",
+    "anti-allergen",
+    "dust mite",
+    "indoor air quality",
+    "cleaning services",
+    "WHS",
+    "PPE",
+    "marketing",
+    "restoration"
+   ],
+   "iicrcDiscipline": null,
+   "cecHours": 0,
+   "meta": {
+    "cecHours": "0 — CARSI course only, NOT IICRC CEC-approved. Explicit 0 blocks any duration-to-CEC inference.",
+    "sourceAndRebuild": "Recovered from the original CARSI WordPress course. Review r3 rewrite 19/10/2026: every clause of learner copy is cited in its own clause, an instruction, or labelled practice. Stale 2015 to 2018 figures were replaced with current AIHW figures, a false New Zealand death-ranking line was corrected, and uncited biology and efficacy lines were deleted.",
+    "legacyUrl": "https://carsi.com.au/product/asthmaallergy/",
+    "healthSources": "Health figures in this course are cited in each sentence to their primary source pages, re-checked 19/10/2026.",
+    "importedAt": "2026-10-19",
+    "productGuidance": "Brand-neutral (19/10/2026): no US-only product is named anywhere in this course. Product-specific content was replaced with product-class selection guidance (label and SDS criteria, AU availability, efficacy-claim verification)."
+   },
+   "isPublished": true,
+   "modules": [
+    {
+     "id": "02af3fcf-a061-4384-84f7-d66f548a1fbb",
+     "title": "Understanding Asthma and Allergies",
+     "orderIndex": 0,
+     "lessons": [
+      {
+       "id": "046760ee-c234-469e-b200-9ef8d101aa54",
+       "title": "Asthma and Allergies",
+       "contentType": "text",
+       "contentBody": "<p><em>This course is general education for cleaning technicians, not medical advice. Refer clients with health questions to their GP.</em></p><p>By the end of this lesson you will be able to explain asthma and allergy in plain words and name the indoor allergens this course targets.</p><h3>What asthma is</h3><p>The AIHW describes asthma as a common chronic condition that affects the airways (<a href=\"https://www.aihw.gov.au/reports/chronic-respiratory-conditions/asthma\">Chronic respiratory conditions in Australia, Asthma, AIHW, updated 18 Feb 2026, What is asthma</a>, checked 19/10/2026).</p><p>The AIHW lists wheezing, shortness of breath, coughing, chest tightness and fatigue as the episodes people with asthma experience (<a href=\"https://www.aihw.gov.au/reports/chronic-respiratory-conditions/asthma\">Chronic respiratory conditions in Australia, Asthma, AIHW, updated 18 Feb 2026, What is asthma</a>, checked 19/10/2026).</p><p>The AIHW reports that symptoms are easily controlled in most people with lifestyle changes and medication (<a href=\"https://www.aihw.gov.au/reports/chronic-respiratory-conditions/asthma\">Chronic respiratory conditions in Australia, Asthma, AIHW, updated 18 Feb 2026, Treatment and management of asthma</a>, checked 19/10/2026).</p><h3>What allergy is</h3><p>ASCIA reports that allergies affect around 20% of people in Australia and New Zealand at some time in their lives (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 1</a>, checked 19/10/2026).</p><p>ASCIA names house dust mites, pollen and animal dander as major triggers of allergic rhinitis, eczema and asthma (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 1</a>, checked 19/10/2026).</p><p>ASCIA states that a doctor confirms allergens from the medical history and allergy tests, either skin prick tests or allergen-specific IgE blood tests (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 1</a>, checked 19/10/2026).</p><h3>Where you fit</h3><p>Leave diagnosis and medication to the client&rsquo;s doctor.</p><p>Ask the client which allergens their doctor has confirmed before you plan the job.</p><p>Plan your service around reducing exposure to those allergens in the home.</p><h3>Try it</h3><p>A client says, &ldquo;My son has asthma, will your treatment fix it?&rdquo; Write a one-sentence reply that stays inside your role.</p><details><summary>Check your answer</summary><p>Something like: &ldquo;Our service reduces dust mite and pet allergen in the home, and your doctor manages his asthma, so please keep following their plan.&rdquo;</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 0,
+       "isPreview": true,
+       "resources": null
+      },
+      {
+       "id": "fc555134-ced8-4b67-9c0f-8f49117f18fa",
+       "title": "Asthma and Allergy Facts",
+       "contentType": "text",
+       "contentBody": "<p><em>This course is general education for cleaning technicians, not medical advice. Refer clients with health questions to their GP.</em></p><p>By the end of this lesson you will be able to quote current, sourced figures on asthma in Australia and New Zealand.</p><h3>Australia</h3><p>In 2022, around 2.8 million people in Australia (11%) were estimated to be living with asthma (<a href=\"https://www.aihw.gov.au/reports/chronic-respiratory-conditions/asthma\">Chronic respiratory conditions in Australia, Asthma, AIHW, updated 18 Feb 2026, How common is asthma</a>, checked 19/10/2026).</p><p>Asthma was the underlying cause of 480 deaths in Australia in 2023, or 1.8 deaths per 100,000 population (<a href=\"https://www.aihw.gov.au/reports/chronic-respiratory-conditions/asthma\">Chronic respiratory conditions in Australia, Asthma, AIHW, updated 18 Feb 2026, Deaths due to asthma</a>, checked 19/10/2026).</p><p>In 2023&ndash;24 there were 32,000 hospitalisations with a principal diagnosis of asthma in Australia (<a href=\"https://www.aihw.gov.au/reports/chronic-respiratory-conditions/asthma\">Chronic respiratory conditions in Australia, Asthma, AIHW, updated 18 Feb 2026, Hospitalisations for asthma</a>, checked 19/10/2026).</p><p>In 2023&ndash;24, 43% of those hospitalisations were for children and young people aged 0&ndash;14 (<a href=\"https://www.aihw.gov.au/reports/chronic-respiratory-conditions/asthma\">Chronic respiratory conditions in Australia, Asthma, AIHW, updated 18 Feb 2026, Hospitalisations for asthma</a>, checked 19/10/2026).</p><p>The AIHW estimates that $1.3 billion was spent on asthma in the Australian health system in 2023&ndash;24 (<a href=\"https://www.aihw.gov.au/reports/chronic-respiratory-conditions/asthma\">Chronic respiratory conditions in Australia, Asthma, AIHW, updated 18 Feb 2026, Health system expenditure for asthma</a>, checked 19/10/2026).</p><p>In 2022&ndash;23, around 165,000 First Nations people (17%) were estimated to be living with asthma (<a href=\"https://www.aihw.gov.au/reports/chronic-respiratory-conditions/asthma\">Chronic respiratory conditions in Australia, Asthma, AIHW, updated 18 Feb 2026, First Nations people</a>, checked 19/10/2026).</p><h3>New Zealand</h3><p>The Cardiac and Respiratory Foundation NZ reports that its 2025 Update found 1 in 6 New Zealanders, roughly 950,000 people, are affected by a respiratory condition (<a href=\"https://cardiacandrespiratory.org.nz/our-work/research/respiratory-impact-reports/\">The Impact of Respiratory Disease in NZ, Cardiac and Respiratory Foundation NZ, 2026 Report</a>, checked 19/10/2026).</p><p>The Foundation reports that its 2023 Update found respiratory disease as a whole is the third leading cause of death in New Zealand (<a href=\"https://cardiacandrespiratory.org.nz/our-work/research/respiratory-impact-reports/\">The Impact of Respiratory Disease in NZ, Cardiac and Respiratory Foundation NZ, 2024 Report</a>, checked 19/10/2026).</p><p>Do not say that asthma alone is the third leading cause of death in New Zealand.</p><h3>Using figures</h3><p>Quote a figure only with its source and year.</p><p>Recheck the source page before you reuse a figure in marketing.</p><p>Never use a health figure to imply that your service treats a condition.</p><h3>Try it</h3><p>A flyer draft says &ldquo;Asthma kills thousands of Australians every year.&rdquo; Is it accurate per the AIHW figure in this lesson?</p><details><summary>Check your answer</summary><p>No. The AIHW figure is 480 deaths in 2023, so delete the line or replace it with the cited figure and year.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "4afc9c59-be03-4fc7-a01e-3defee2b9ad8",
+       "title": "The Relationship Between Allergic Diseases",
+       "contentType": "text",
+       "contentBody": "<p><em>This course is general education for cleaning technicians, not medical advice. Refer clients with health questions to their GP.</em></p><p>By the end of this lesson you will be able to separate allergens from irritants and name the indoor air factors you can influence.</p><h3>Allergens and irritants</h3><p>ASCIA names aeroallergens such as house dust mites, pollen and animal dander as major triggers of allergic rhinitis, eczema and asthma (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 1</a>, checked 19/10/2026).</p><p>The AIHW notes that bushfires and thunderstorm asthma epidemics are common events of concern in Australia (<a href=\"https://www.aihw.gov.au/reports/chronic-respiratory-conditions/asthma\">Chronic respiratory conditions in Australia, Asthma, AIHW, updated 18 Feb 2026</a>, checked 19/10/2026).</p><p>The National Asthma Council Australia describes thunderstorm asthma as a potent mix of pollens, weather conditions and rain that can trigger severe asthma symptoms (<a href=\"https://www.nationalasthma.org.au/resources/thunderstorm-asthma\">Thunderstorm asthma, National Asthma Council Australia</a>, checked 19/10/2026).</p><p>ASCIA reports that grass pollen counts in Australia and New Zealand are usually highest between late September and December (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 3</a>, checked 19/10/2026).</p><h3>Indoor air</h3><p>The US EPA reports that its TEAM study, completed in 1985, found about a dozen common organic pollutants at 2 to 5 times higher levels inside homes than outside (<a href=\"https://www.epa.gov/indoor-air-quality-iaq/volatile-organic-compounds-impact-indoor-air-quality\">Volatile Organic Compounds&rsquo; Impact on Indoor Air Quality, US EPA</a>, checked 19/10/2026).</p><p>Treat that US figure as context only, not an Australian measurement.</p><p>The US EPA advises increasing ventilation when using products that emit volatile organic compounds (<a href=\"https://www.epa.gov/indoor-air-quality-iaq/volatile-organic-compounds-impact-indoor-air-quality\">Volatile Organic Compounds&rsquo; Impact on Indoor Air Quality, US EPA, Steps to reduce exposure</a>, checked 19/10/2026).</p><h3>What you can influence</h3><ul><li>Reduce dust and allergen reservoirs in the rooms the client uses most.</li><li>Choose low-fragrance, low-VOC cleaning products for sensitised clients.</li><li>Ventilate during and after any product application.</li></ul><h3>Try it</h3><p>Name one allergen and one irritant from this lesson.</p><details><summary>Check your answer</summary><p>Allergen: house dust mite, pollen or animal dander. Irritant: an example is a strongly fragranced or high-VOC product.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 2,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "dd9c1188-3573-4a88-b9c3-6f9e146ebedd",
+       "title": "Dust Mite Allergies",
+       "contentType": "text",
+       "contentBody": "<p><em>This course is general education for cleaning technicians, not medical advice. Refer clients with health questions to their GP.</em></p><p>By the end of this lesson you will be able to explain where dust mite allergen builds up and what does and does not remove it.</p><h3>Where mites live</h3><p>ASCIA reports that dust mites are commonly found in homes with high humidity and constant warm temperatures (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 1</a>, checked 19/10/2026).</p><p>ASCIA reports that mites are more likely in coastal cities and towns than in drier inland areas (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 1</a>, checked 19/10/2026).</p><p>ASCIA reports that carpets can contain large amounts of house dust mite that vacuuming cannot completely remove (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 2</a>, checked 19/10/2026).</p><h3>What cleaning can and cannot do</h3><p>ASCIA states that house dust mites cannot be completely removed from the home (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 1</a>, checked 19/10/2026).</p><p>ASCIA states that no vacuum cleaner, dust mite spray or dry cleaning process will completely remove house dust mites, whatever the claims (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 1</a>, checked 19/10/2026).</p><p>ASCIA states that it is possible to reduce mite numbers and minimise exposure to their allergen (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 1</a>, checked 19/10/2026).</p><p>ASCIA reports that all vacuuming increases the amount of dust mite allergen in the air (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 2</a>, checked 19/10/2026).</p><h3>On the job</h3><ul><li>Treat the bedroom, mattress and bedding as priority areas.</li><li>Ask the allergic occupant to stay out of the room while you vacuum.</li><li>Wear a mask while vacuuming and dry-extracting dust.</li><li>Describe your result as allergen reduction, never removal.</li></ul><h3>Try it</h3><p>A client asks you to &ldquo;get rid of all the dust mites.&rdquo; What do you promise, per ASCIA?</p><details><summary>Check your answer</summary><p>Promise reduction only, and explain that ASCIA states dust mites cannot be completely removed from a home.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 3,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "6c72be5c-40a0-4f33-b2a4-9932e84e67c8",
+       "title": "Pet Allergies",
+       "contentType": "text",
+       "contentBody": "<p><em>This course is general education for cleaning technicians, not medical advice. Refer clients with health questions to their GP.</em></p><p>By the end of this lesson you will be able to plan cleaning for homes with pet allergen.</p><h3>Pet allergen</h3><p>ASCIA describes animal dander as the animal&rsquo;s skin cells, sweat and/or saliva (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 2</a>, checked 19/10/2026).</p><p>ASCIA reports that dander becomes airborne when animals shed hair, often staying in the air for a long time (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 2</a>, checked 19/10/2026).</p><p>ASCIA states that cats and dogs are a major source of allergens in the home and that no breed of dog or cat is completely allergen free (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 2</a>, checked 19/10/2026).</p><p>ASCIA reports that cat allergen can be found where cats have never lived, carried on clothing to schools and offices (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 2</a>, checked 19/10/2026).</p><h3>What helps</h3><p>ASCIA states that avoiding the animal is the most effective way for a person with animal dander allergy to minimise exposure (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 2</a>, checked 19/10/2026).</p><p>ASCIA suggests that people with mild reactions keep pets out of bedrooms and living areas (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 2</a>, checked 19/10/2026).</p><p>ASCIA reports there is not enough evidence that washing animals frequently or using HEPA air filters when vacuuming reduces allergens (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 2</a>, checked 19/10/2026).</p><h3>On the job</h3><ul><li>Never call any pet &ldquo;hypoallergenic&rdquo; in your advice.</li><li>Clean upholstery, carpet and bedding in the rooms the pet uses.</li><li>Leave rehoming decisions to the client and their doctor.</li></ul><h3>Try it</h3><p>A client with a cat allergy has no cat. Could cat allergen still be in the house, per ASCIA?</p><details><summary>Check your answer</summary><p>Yes. ASCIA reports cat allergen is carried on clothing to places where cats have never lived.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 4,
+       "isPreview": false,
+       "resources": null
+      }
+     ]
+    },
+    {
+     "id": "721baed1-6f89-4e94-817e-ae73179e5fb5",
+     "title": "Control and Prevention",
+     "orderIndex": 1,
+     "lessons": [
+      {
+       "id": "26144e93-3ffd-447a-8f7c-7039f4c0a16d",
+       "title": "Control and Prevention",
+       "contentType": "text",
+       "contentBody": "<p><em>This course is general education for cleaning technicians, not medical advice. Refer clients with health questions to their GP.</em></p><p>By the end of this lesson you will be able to explain where allergen minimisation fits beside medical care.</p><h3>Medical care comes first</h3><p>ASCIA states that knowing which allergens cause symptoms is an important part of managing allergic disease (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 1</a>, checked 19/10/2026).</p><p>ASCIA states that once allergens are confirmed, practical advice on avoiding or minimising exposure can help reduce symptoms (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 1</a>, checked 19/10/2026).</p><p>The AIHW lists keeping symptoms under control among the main aims of asthma treatment (<a href=\"https://www.aihw.gov.au/reports/chronic-respiratory-conditions/asthma\">Chronic respiratory conditions in Australia, Asthma, AIHW, updated 18 Feb 2026, Treatment and management of asthma</a>, checked 19/10/2026).</p><h3>Your role</h3><ul><li>Ask whether a doctor has confirmed the allergens.</li><li>Tailor the job to the confirmed allergens.</li><li>Tell the client to keep following their doctor&rsquo;s plan and medication.</li><li>Never suggest that cleaning replaces medication.</li></ul><h3>Try it</h3><p>A client has not seen a doctor but thinks dust is the problem. What do you recommend before an allergen-minimisation service, per this lesson?</p><details><summary>Check your answer</summary><p>Recommend they see their GP to confirm the allergens, and offer a standard clean in the meantime.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 0,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "2dd6491d-15a1-4f68-a49a-21dab1462a63",
+       "title": "Environmental Control",
+       "contentType": "text",
+       "contentBody": "<p><em>This course is general education for cleaning technicians, not medical advice. Refer clients with health questions to their GP.</em></p><p>By the end of this lesson you will be able to explain why allergen control is ongoing and set honest expectations.</p><h3>Why control is ongoing</h3><p>ASCIA states that house dust mites cannot be completely removed from the home (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 1</a>, checked 19/10/2026).</p><p>ASCIA&rsquo;s bedroom advice is to wash bedding weekly and to wash dust mite resistant covers at least every two months (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 1</a>, checked 19/10/2026).</p><p>ASCIA&rsquo;s advice for any room is to damp dust hard surfaces and vacuum carpets and sofas weekly (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 2</a>, checked 19/10/2026).</p><h3>Setting expectations</h3><ul><li>Explain that your service is one part of an ongoing routine.</li><li>Give the client a written home routine based on the ASCIA advice in the next lesson.</li><li>Book a return visit rather than promising a lasting result.</li><li>Describe products by what their label permits, never as proven to prevent illness.</li></ul><h3>Try it</h3><p>A sales script says your treatment is &ldquo;scientifically proven to prevent allergies.&rdquo; What do you change, per this lesson?</p><details><summary>Check your answer</summary><p>Delete the claim and describe the service as cleaning plus allergen-load reduction, with an ongoing home routine.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "59cd8832-a8c5-441b-9d41-2963287cea9d",
+       "title": "Recommended Environmental Control Procedures",
+       "contentType": "text",
+       "contentBody": "<p><em>This course is general education for cleaning technicians, not medical advice. Refer clients with health questions to their GP.</em></p><p>By the end of this lesson you will be able to give clients the ASCIA allergen-minimisation routine.</p><h3>Bedrooms</h3><p>ASCIA advises washing sheets, pillowcases and other bedding once a week in hot water above 60 &deg;C (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 1</a>, checked 19/10/2026).</p><p>ASCIA advises that if bedding is washed with regular detergent instead, it can be dried outside and then tumble dried on a hot setting for at least ten minutes (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 1</a>, checked 19/10/2026).</p><p>ASCIA advises covering the mattress, pillows and quilts with dust mite resistant covers and washing them at least every two months (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 1</a>, checked 19/10/2026).</p><p>ASCIA advises removing sheepskins and woollen underlays from the bed and bedroom (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 1</a>, checked 19/10/2026).</p><p>ASCIA advises reducing soft toys in the bedroom and washing them in hot water (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 2</a>, checked 19/10/2026).</p><h3>Any room</h3><p>ASCIA suggests considering hard floors in place of carpet where practical and affordable (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 2</a>, checked 19/10/2026).</p><p>ASCIA suggests waiting 20 minutes before re-entering a room after vacuuming (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 2</a>, checked 19/10/2026).</p><p>ASCIA advises avoiding water-cooled air conditioners and unflued gas heaters (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 2</a>, checked 19/10/2026).</p><p>ASCIA suggests blinds, washable curtains or external shutters in place of curtains (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 2</a>, checked 19/10/2026).</p><h3>Mould</h3><p>ASCIA&rsquo;s mould advice includes finding and sealing leaks, clearing gutters and under-floor vents, and drying, removing or replacing wet carpets (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 3</a>, checked 19/10/2026).</p><p>Refer visible mould growth or water damage to a qualified remediation or restoration technician.</p><h3>Pollen</h3><p>ASCIA advises drying bedding and clothing inside when pollen is a trigger (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 3</a>, checked 19/10/2026).</p><h3>Try it</h3><p>Write three bedroom tasks for a client&rsquo;s home routine, per ASCIA.</p><details><summary>Check your answer</summary><p>Any three of: weekly bedding wash above 60 &deg;C, dust mite resistant covers washed every two months, remove sheepskins or woollen underlays, fewer soft toys washed hot.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 2,
+       "isPreview": false,
+       "resources": null
+      }
+     ]
+    },
+    {
+     "id": "e5711baa-c99f-4df2-b7b1-18af0d333ccb",
+     "title": "Anti-Allergen Technology and Products",
+     "orderIndex": 2,
+     "lessons": [
+      {
+       "id": "df90be56-7a12-4958-817b-f9629a1c4b4a",
+       "title": "Anti-Allergen Technology",
+       "contentType": "text",
+       "contentBody": "<p>By the end of this lesson you will be able to explain what an allergen-denaturing treatment is and judge a maker&rsquo;s claims.</p><h3>What the product class is</h3><p>This lesson uses &ldquo;allergen-denaturing treatment&rdquo; for a post-cleaning product whose maker states that it alters allergen proteins on treated surfaces.</p><p>This course names no brand.</p><h3>Judging claims</h3><p>ASCIA states that no vacuum cleaner, dust mite spray or dry cleaning process will completely remove house dust mites, whatever the claims (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 1</a>, checked 19/10/2026).</p><ul><li>Ask the supplier for independent test data on the major dust mite allergen (Der p 1) and cat allergen (Fel d 1).</li><li>Treat any residual-effect period as the maker&rsquo;s claim until you have seen the test method.</li><li>Read the label for the surfaces and fibres it permits.</li><li>Never treat wool or silk unless the label permits it.</li><li>Describe the treatment to clients as allergen-load reduction, never as a medical treatment.</li></ul><h3>Try it</h3><p>A supplier says their spray &ldquo;works for six months.&rdquo; What two things do you ask for, per this lesson?</p><details><summary>Check your answer</summary><p>Independent test data on Der p 1 and Fel d 1, and the test method behind the six-month figure.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 0,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "fbe97e8f-a451-4724-ba5d-cf0b6eddc642",
+       "title": "How It Works",
+       "contentType": "text",
+       "contentBody": "<p>By the end of this lesson you will be able to describe the two-step anti-allergen service.</p><h3>Step 1, clean</h3><ul><li>Pre-vacuum with a HEPA-filtered machine.</li><li>Pre-spray, agitate and hot-water extract.</li><li>Choose cleaning products with no added fragrance or dyes for sensitised occupants.</li></ul><h3>Step 2, treat</h3><ul><li>Apply the allergen-denaturing treatment at the label rate to the surfaces the label permits.</li><li>Itemise the treatment separately from cleaning on the quote.</li></ul><h3>Drying</h3><ul><li>Use air movers to speed drying.</li><li>Ask the allergy sufferer to stay out of the home until cleaning and drying are complete.</li></ul><h3>Try it</h3><p>Put these in order: treat, pre-vacuum, extract, dry.</p><details><summary>Check your answer</summary><p>Pre-vacuum, extract, treat, dry.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "98eeac5e-4beb-4b3a-ade4-36f0aebeeb01",
+       "title": "Selecting Anti-Allergen Products in Australia",
+       "contentType": "text",
+       "contentBody": "<p><em>This lesson summarises Safe Work Australia model Codes of Practice. Check with your state or territory WHS regulator whether a Code has legal effect where you work.</em></p><p>By the end of this lesson you will be able to choose products by label and SDS, not by brand.</p><h3>Product classes this course uses</h3><ul><li><strong>Pre-spray</strong></li><li><strong>Extraction rinse</strong></li><li><strong>Oxidising deodoriser</strong></li><li><strong>Allergen-denaturing treatment</strong></li><li><strong>Filter treatment</strong></li><li><strong>Mattress and pillow encasements</strong></li></ul><h3>Label and SDS checks</h3><p>Safe Work Australia states that if you supply, use or store hazardous chemicals, you must keep copies of the SDS in your workplace (<a href=\"https://www.safeworkaustralia.gov.au/safety-topic/hazards/chemicals/safety-data-sheets\">Safety data sheets, Safe Work Australia</a>, checked 19/10/2026).</p><p>The model Code requires a PCBU to obtain the SDS no later than when the chemical is first supplied, or as soon as practicable after, but before it is used (<a href=\"https://www.safeworkaustralia.gov.au/sites/default/files/2023-06/model_code_of_practice_managing_the_risks_of_hazardous_chemicals_in_the_workplace.pdf\">Model Code of Practice, Managing risks of hazardous chemicals in the workplace, Safe Work Australia, June 2023, p. 16</a>, checked 19/10/2026).</p><ul><li>Buy from Australian suppliers whose label and SDS carry an Australian address and phone number.</li><li>Prefer products with no added fragrance or dyes and low VOC content.</li><li>Check the dilution rate and coverage so you can cost the job.</li><li>Read the exposure controls and PPE information in the SDS before first use.</li><li>Ask your supplier for a local equivalent if an overseas product is not stocked here.</li></ul><h3>Try it</h3><p>A product has no Australian SDS. Can you use it on a job, per this lesson?</p><details><summary>Check your answer</summary><p>No. Obtain the current SDS from the Australian supplier before first use.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 2,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "5b3cf9f7-d044-41a8-b9fa-407ae485b90e",
+       "title": "Handling and Storage",
+       "contentType": "text",
+       "contentBody": "<p><em>This lesson summarises Safe Work Australia model Codes of Practice. Check with your state or territory WHS regulator whether a Code has legal effect where you work.</em></p><p>By the end of this lesson you will be able to store and carry chemicals to the model Code.</p><h3>Duties</h3><p>The model Code requires a PCBU to prepare a register of hazardous chemicals at the workplace and keep it up to date (<a href=\"https://www.safeworkaustralia.gov.au/sites/default/files/2023-06/model_code_of_practice_managing_the_risks_of_hazardous_chemicals_in_the_workplace.pdf\">Model Code of Practice, Managing risks of hazardous chemicals in the workplace, Safe Work Australia, June 2023, p. 13</a>, checked 19/10/2026).</p><p>The model Code requires the current SDS to be readily accessible to workers who use, handle or store the chemical (<a href=\"https://www.safeworkaustralia.gov.au/sites/default/files/2023-06/model_code_of_practice_managing_the_risks_of_hazardous_chemicals_in_the_workplace.pdf\">Model Code of Practice, Managing risks of hazardous chemicals in the workplace, Safe Work Australia, June 2023, p. 18</a>, checked 19/10/2026).</p><p>The model Code sets out the hierarchy of control, from eliminating the hazard first to PPE last (<a href=\"https://www.safeworkaustralia.gov.au/sites/default/files/2023-06/model_code_of_practice_managing_the_risks_of_hazardous_chemicals_in_the_workplace.pdf\">Model Code of Practice, Managing risks of hazardous chemicals in the workplace, Safe Work Australia, June 2023, p. 11</a>, checked 19/10/2026).</p><h3>Transport</h3><p>The model Code on hazardous chemicals does not apply to transporting dangerous goods (<a href=\"https://www.safeworkaustralia.gov.au/sites/default/files/2023-06/model_code_of_practice_managing_the_risks_of_hazardous_chemicals_in_the_workplace.pdf\">Model Code of Practice, Managing risks of hazardous chemicals in the workplace, Safe Work Australia, June 2023, p. 5</a>, checked 19/10/2026).</p><p>The National Transport Commission states that Edition 7.9 of the ADG Code became mandatory from 1 October 2025 (<a href=\"https://www.ntc.gov.au/codes-and-guidelines/australian-dangerous-goods-code\">Australian Dangerous Goods Code, National Transport Commission</a>, checked 19/10/2026).</p><ul><li>Read the handling, storage and transport information in each SDS.</li><li>Keep chemicals away from incompatible materials as the SDS directs.</li><li>Secure containers in the vehicle so they cannot move or fall.</li><li>Keep chemicals separate from food and drinking water.</li><li>Carry the SDS for every product on the vehicle.</li></ul><h3>Try it</h3><p>Which document governs carrying dangerous goods by road, per this lesson?</p><details><summary>Check your answer</summary><p>The Australian Dangerous Goods Code, Edition 7.9.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 3,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "7d3c4209-c05c-47e6-9811-1609e432b596",
+       "title": "Labelling",
+       "contentType": "text",
+       "contentBody": "<p><em>This lesson summarises Safe Work Australia model Codes of Practice. Check with your state or territory WHS regulator whether a Code has legal effect where you work.</em></p><p>By the end of this lesson you will be able to check a supplier label and label a decanted container.</p><h3>A correct supplier label</h3><p>The labelling Code lists what a correctly labelled hazardous chemical carries, including English text, the product identifier and the manufacturer or importer&rsquo;s Australian name, address and phone number (<a href=\"https://www.safeworkaustralia.gov.au/sites/default/files/2023-06/model_code_of_practice_labelling_of_workplace_hazardous_chemicals.pdf\">Model Code of Practice, Labelling of workplace hazardous chemicals, Safe Work Australia, June 2023, p. 11</a>, checked 19/10/2026).</p><p>The same list includes hazard pictograms, hazard statements, a signal word, precautionary statements and an expiry date if applicable (<a href=\"https://www.safeworkaustralia.gov.au/sites/default/files/2023-06/model_code_of_practice_labelling_of_workplace_hazardous_chemicals.pdf\">Model Code of Practice, Labelling of workplace hazardous chemicals, Safe Work Australia, June 2023, p. 11</a>, checked 19/10/2026).</p><p>The labelling Code states that only one signal word should appear on a label, &lsquo;Danger&rsquo; or &lsquo;Warning&rsquo; (<a href=\"https://www.safeworkaustralia.gov.au/sites/default/files/2023-06/model_code_of_practice_labelling_of_workplace_hazardous_chemicals.pdf\">Model Code of Practice, Labelling of workplace hazardous chemicals, Safe Work Australia, June 2023, p. 15</a>, checked 19/10/2026).</p><p>The labelling Code states that the GHS specifies nine hazard pictograms (<a href=\"https://www.safeworkaustralia.gov.au/sites/default/files/2023-06/model_code_of_practice_labelling_of_workplace_hazardous_chemicals.pdf\">Model Code of Practice, Labelling of workplace hazardous chemicals, Safe Work Australia, June 2023, p. 16</a>, checked 19/10/2026).</p><h3>Decanted containers</h3><p>The labelling Code requires a decanted chemical that will not be used immediately to carry, at minimum, English text, the product identifier and a hazard pictogram or hazard statement (<a href=\"https://www.safeworkaustralia.gov.au/sites/default/files/2023-06/model_code_of_practice_labelling_of_workplace_hazardous_chemicals.pdf\">Model Code of Practice, Labelling of workplace hazardous chemicals, Safe Work Australia, June 2023, p. 20</a>, checked 19/10/2026).</p><ul><li>Label every spray bottle you fill before you leave the van.</li><li>Copy the product identifier exactly as it appears on the SDS.</li></ul><h3>Try it</h3><p>You fill a trigger sprayer from a 20 L drum for tomorrow&rsquo;s job. What must its label carry at minimum, per the labelling Code?</p><details><summary>Check your answer</summary><p>English text, the product identifier, and a hazard pictogram or hazard statement.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 4,
+       "isPreview": false,
+       "resources": null
+      }
+     ]
+    },
+    {
+     "id": "f943cbea-9b9c-44c3-a524-0d9605ff1041",
+     "title": "The Anti-Allergen Process and Safety",
+     "orderIndex": 3,
+     "lessons": [
+      {
+       "id": "1bcec902-2859-412a-a4b8-fd4d8b6d4884",
+       "title": "The Anti-Allergen Process",
+       "contentType": "text",
+       "contentBody": "<p>By the end of this lesson you will be able to run the full on-site process.</p><h3>Before you start</h3><ul><li>Confirm the rooms, surfaces and confirmed allergens with the client.</li><li>Ask the allergy sufferer to be out of the home during the work.</li><li>Test every product for colourfastness in an inconspicuous area.</li></ul><h3>Dust and pre-vacuum</h3><p>The US EPA reports that a HEPA filter, as defined by the US Department of Energy, can theoretically remove at least 99.97% of airborne particles 0.3 microns in size (<a href=\"https://www.epa.gov/indoor-air-quality-iaq/what-hepa-filter\">What is a HEPA filter, US EPA</a>, checked 19/10/2026).</p><ul><li>Pre-vacuum every surface you will treat with a HEPA-filtered vacuum.</li><li>Position portable extractors and truckmounts so the exhaust vents outside.</li><li>Wear a mask while vacuuming.</li></ul><h3>Clean</h3><ul><li>Pre-spray at low pressure and avoid misting.</li><li>Agitate and allow the dwell time on the label.</li><li>Extract with the rinse at the label dilution.</li><li>Use low-moisture tools on upholstery and mattresses.</li></ul><h3>Mattresses</h3><ul><li>Vacuum all sides with the HEPA vacuum.</li><li>Clean the top, then turn the mattress only if its maker allows flipping.</li></ul><h3>Treat and dry</h3><ul><li>Apply the treatment at the label rate.</li><li>Dry with air movers before the client returns.</li><li>Leave written aftercare that repeats the ASCIA home routine.</li></ul><h3>Try it</h3><p>Where should a portable extractor&rsquo;s exhaust go, per this lesson?</p><details><summary>Check your answer</summary><p>Outside the building.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 0,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "14f3d445-a77b-493f-ae23-6e521586aa54",
+       "title": "Personal Protective Equipment (PPE)",
+       "contentType": "text",
+       "contentBody": "<p><em>This lesson summarises Safe Work Australia model Codes of Practice. Check with your state or territory WHS regulator whether a Code has legal effect where you work.</em></p><p>By the end of this lesson you will be able to choose PPE from the SDS.</p><h3>PPE in the hierarchy</h3><p>The model Code places PPE last in the hierarchy of control, used to minimise any risk that remains after higher controls (<a href=\"https://www.safeworkaustralia.gov.au/sites/default/files/2023-06/model_code_of_practice_managing_the_risks_of_hazardous_chemicals_in_the_workplace.pdf\">Model Code of Practice, Managing risks of hazardous chemicals in the workplace, Safe Work Australia, June 2023, p. 11</a>, checked 19/10/2026).</p><ul><li>Read the exposure controls and PPE information in each SDS before the job.</li><li>Wear the gloves, eye protection and respirator the SDS specifies.</li><li>Fit-check a respirator each time you put it on.</li><li>Replace filters as the respirator maker directs.</li><li>Wash hands before eating, drinking or smoking.</li></ul><h3>Filters</h3><p>The US EPA reports that a HEPA filter can theoretically remove at least 99.97% of airborne particles 0.3 microns in size (<a href=\"https://www.epa.gov/indoor-air-quality-iaq/what-hepa-filter\">What is a HEPA filter, US EPA</a>, checked 19/10/2026).</p><p>Check the HEPA claim on each vacuum against its maker&rsquo;s specification.</p><h3>Try it</h3><p>Where do you find the respirator type a product needs, per this lesson?</p><details><summary>Check your answer</summary><p>In the exposure controls and PPE information in the product&rsquo;s SDS.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "84842823-3d83-4dfc-abea-2b584aee46dc",
+       "title": "Heat Exhaustion and Heat Stroke",
+       "contentType": "text",
+       "contentBody": "<p><em>This lesson summarises Safe Work Australia model Codes of Practice. Check with your state or territory WHS regulator whether a Code has legal effect where you work.</em></p><p>By the end of this lesson you will be able to recognise and respond to heat illness.</p><h3>Duty</h3><p>Safe Work Australia states that a PCBU has a duty to keep workers and the workplace safe from the risks of working in heat (<a href=\"https://www.safeworkaustralia.gov.au/safety-topic/hazards/working-heat\">Working in heat, Safe Work Australia</a>, checked 19/10/2026).</p><h3>Heat exhaustion</h3><p>NSW Health lists pale skin, headache, nausea, dizziness, weakness, thirst, heavy sweating and muscle cramps among the symptoms of heat exhaustion (<a href=\"https://www.health.nsw.gov.au/environment/beattheheat/Pages/heat-related-illness.aspx\">Heat-related illness, NSW Health, Heat exhaustion</a>, checked 19/10/2026).</p><p>NSW Health advises getting out of the heat, loosening clothing, cooling down and drinking water for heat exhaustion (<a href=\"https://www.health.nsw.gov.au/environment/beattheheat/Pages/heat-related-illness.aspx\">Heat-related illness, NSW Health, Heat exhaustion</a>, checked 19/10/2026).</p><h3>Heat stroke</h3><p>NSW Health describes heat stroke as the most severe heat-related illness (<a href=\"https://www.health.nsw.gov.au/environment/beattheheat/Pages/heat-related-illness.aspx\">Heat-related illness, NSW Health, Heat stroke</a>, checked 19/10/2026).</p><p>NSW Health lists confusion, slurred speech, loss of consciousness and very high body temperature among its symptoms (<a href=\"https://www.health.nsw.gov.au/environment/beattheheat/Pages/heat-related-illness.aspx\">Heat-related illness, NSW Health, Heat stroke</a>, checked 19/10/2026).</p><p>NSW Health advises calling triple zero (000) immediately if you are concerned about heat stroke (<a href=\"https://www.health.nsw.gov.au/environment/beattheheat/Pages/heat-related-illness.aspx\">Heat-related illness, NSW Health, Heat stroke</a>, checked 19/10/2026).</p><ul><li>Plan breaks and water on hot jobs.</li><li>Watch your workmates for the symptoms above.</li></ul><h3>Try it</h3><p>A workmate in a hot roof space becomes confused and slurs their words. What do you do first, per NSW Health?</p><details><summary>Check your answer</summary><p>Call triple zero (000) immediately.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 2,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "5361b799-c5c0-4937-aebb-264c965b10e8",
+       "title": "Documentation",
+       "contentType": "text",
+       "contentBody": "<p>By the end of this lesson you will be able to record each job so you can answer any question about it.</p><h3>Records to keep</h3><ul><li>Record the rooms, surfaces, products, batch numbers and dilution rates used.</li><li>Photograph before and after.</li><li>Record colourfastness test results.</li><li>Keep a signed authorisation and the aftercare sheet you left.</li><li>File the SDS versions you used with the job.</li></ul><h3>Privacy</h3><p>The OAIC states that the Privacy Act 1988 regulates how personal information is handled (<a href=\"https://www.oaic.gov.au/privacy/privacy-legislation/the-privacy-act\">The Privacy Act, OAIC</a>, checked 19/10/2026).</p><ul><li>Record health details only if the client agrees and the job needs them.</li><li>Store client records securely and share them only for the job.</li></ul><h3>Try it</h3><p>List three things your job record must show, per this lesson.</p><details><summary>Check your answer</summary><p>Any three of: rooms and surfaces, products with batch numbers and dilution, photos, colourfastness results, signed authorisation, aftercare sheet, SDS versions.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 3,
+       "isPreview": false,
+       "resources": null
+      }
+     ]
+    },
+    {
+     "id": "c259c12a-2827-447d-9639-9e25dece7a90",
+     "title": "The Business of Anti-Allergen Services",
+     "orderIndex": 4,
+     "lessons": [
+      {
+       "id": "aa58d985-3985-4ecb-b65a-a7ff1c14e240",
+       "title": "Marketing Opportunities",
+       "contentType": "text",
+       "contentBody": "<p>By the end of this lesson you will be able to market the service truthfully.</p><h3>The market</h3><p>In 2022, around 2.8 million people in Australia (11%) were estimated to be living with asthma (<a href=\"https://www.aihw.gov.au/reports/chronic-respiratory-conditions/asthma\">Chronic respiratory conditions in Australia, Asthma, AIHW, updated 18 Feb 2026, How common is asthma</a>, checked 19/10/2026).</p><p>ASCIA reports that allergies affect around 20% of people in Australia and New Zealand at some time in their lives (<a href=\"https://www.allergy.org.au/images/pc/ASCIA_PC_Allergen_Minimisation_2024.pdf\">Allergen Minimisation FAQ, ASCIA, April 2024, p. 1</a>, checked 19/10/2026).</p><h3>The rules</h3><p>business.gov.au states that any branding, statement, quote or other representation you use to promote products or services must not be false or misleading (<a href=\"https://business.gov.au/marketing-and-advertising/advertise-your-business\">Advertise your business, business.gov.au</a>, checked 19/10/2026).</p><p>business.gov.au states that you need to make sure there are no false or misleading claims on your social media (<a href=\"https://business.gov.au/online-and-digital/social-media-for-business\">Social media for business, business.gov.au</a>, checked 19/10/2026).</p><ul><li>Market cleaning plus allergen-load reduction, never a health outcome.</li><li>Offer the service to existing clients who mention asthma or allergy.</li><li>Build referral relationships with property managers and aged-care and childcare operators.</li><li>Use before-and-after photos only with the client&rsquo;s permission.</li></ul><h3>Try it</h3><p>Rewrite &ldquo;Breathe easy, asthma solved!&rdquo; so it is truthful, per this lesson.</p><details><summary>Check your answer</summary><p>Something like: &ldquo;Deep cleaning and allergen-load reduction for homes with allergy sufferers.&rdquo;</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 0,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "495b4079-22ca-4774-8e98-8580ae0b8e12",
+       "title": "Guarantees",
+       "contentType": "text",
+       "contentBody": "<p>By the end of this lesson you will be able to offer a service promise that matches the law.</p><p>business.gov.au states that your business must meet the consumer guarantees when you sell any goods or services (<a href=\"https://business.gov.au/legal/fair-trading/australian-consumer-law-and-your-business\">Australian Consumer Law and your business, business.gov.au, Consumer guarantees</a>, checked 19/10/2026).</p><p>business.gov.au lists that services must be carried out with due care and skill and be fit for the purpose stated (<a href=\"https://business.gov.au/legal/fair-trading/australian-consumer-law-and-your-business\">Australian Consumer Law and your business, business.gov.au, Consumer guarantees</a>, checked 19/10/2026).</p><p>business.gov.au states that a store policy cannot override consumer guarantee rights (<a href=\"https://business.gov.au/legal/fair-trading/australian-consumer-law-and-your-business\">Australian Consumer Law and your business, business.gov.au, Consumer guarantees</a>, checked 19/10/2026).</p><ul><li>Promise workmanship, such as a free re-clean of any missed area within a set time.</li><li>Never promise a health result.</li><li>Put your service promise in writing on the quote.</li></ul><h3>Try it</h3><p>Is &ldquo;No refunds on allergen treatments&rdquo; allowed, per business.gov.au?</p><details><summary>Check your answer</summary><p>No. A store policy cannot override consumer guarantee rights.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "acfc3f65-a709-47bc-a8ab-e72253f8410d",
+       "title": "Return on Investment",
+       "contentType": "text",
+       "contentBody": "<p>By the end of this lesson you will be able to price the service from your own costs.</p><h3>CARSI example: pricing one bedroom treatment</h3><p>Product cost per bedroom is $9.</p><p>Labour is 0.5 hours at $70 per hour, which is $35.</p><p>Cost is $44, and a price of $95 leaves $51 before overheads.</p><p>These are worked numbers for practice, not market rates.</p><ul><li>Calculate product cost per square metre from the label coverage.</li><li>Add your labour rate and travel.</li><li>Add a margin that covers overheads and equipment.</li><li>Quote in AUD and show whether GST is included.</li></ul><h3>Try it</h3><p>Product costs $12 per room and labour is 0.75 hours at $80 per hour. What is the cost per room?</p><details><summary>Check your answer</summary><p>$12 + $60 = $72.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 2,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "8320ca49-dc19-4787-bfa1-5d8128ca81c5",
+       "title": "Unique Selling Points",
+       "contentType": "text",
+       "contentBody": "<p>By the end of this lesson you will be able to state selling points you can prove.</p><ul><li>List only selling points you can show on the job, such as HEPA pre-vacuuming, low-fragrance products and written aftercare.</li><li>Name your CARSI training exactly as issued.</li><li>Keep evidence for every claim you make.</li><li>Never describe a product as scientifically proven unless you hold the published evidence.</li></ul><p>business.gov.au states that any statement or representation you use to promote services must not be false or misleading (<a href=\"https://business.gov.au/marketing-and-advertising/advertise-your-business\">Advertise your business, business.gov.au</a>, checked 19/10/2026).</p><h3>Try it</h3><p>Which is a provable selling point, per this lesson: &ldquo;We use HEPA pre-vacuuming&rdquo; or &ldquo;We end allergies&rdquo;?</p><details><summary>Check your answer</summary><p>&ldquo;We use HEPA pre-vacuuming.&rdquo;</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 3,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "48c46b52-7aaa-4d1d-9e8e-22815f18061e",
+       "title": "Final knowledge check",
+       "contentType": "quiz",
+       "contentBody": "e5f0717d-9864-4956-8082-c98f748e2062",
+       "orderIndex": 4,
+       "isPreview": false,
+       "resources": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "05f02a04-f960-4aa2-a279-63ee14b49312",
+   "slug": "agi-essentials-small-business",
+   "title": "AGI Essentials: A Practical Guide for Small Business Success",
+   "description": "A CARSI course for Australian small-business owners on AGI and the AI tools available today. This course covers what AGI is and is not, the main types of AI tool, everyday admin uses, a safe first trial, privacy and accountability, and a one-page AI policy, with each fact cited to IEEE, business.gov.au, the OAIC or the National AI Centre.",
+   "shortDescription": "This course covers what AGI is and is not, and how a small Australian business can trial today&rsquo;s AI tools safely, with each fact cited.",
+   "thumbnailUrl": null,
+   "instructorId": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+   "status": "published",
+   "priceAud": "0",
+   "isFree": true,
+   "durationHours": 2.5,
+   "level": "Beginner",
+   "category": "Business and Technology",
+   "tags": [
+    "AI",
+    "AGI",
+    "small business",
+    "technology",
+    "productivity",
+    "automation",
+    "free course"
+   ],
+   "iicrcDiscipline": null,
+   "cecHours": 0,
+   "meta": {
+    "cecHours": "0 — CARSI course only, NOT IICRC CEC-approved. Explicit 0 blocks any duration-to-CEC inference.",
+    "sourceAndRebuild": "Recovered from the original CARSI WordPress course; legacy video shortcodes did not survive and were removed. Review r3 rewrite 19/10/2026: every clause is cited in its own clause, an instruction or labelled practice. Unsourced case-study results were deleted and replaced with labelled CARSI practice examples.",
+    "legacyUrl": "https://carsi.com.au/product/agi-smallbusiness/",
+    "importedAt": "2026-10-19"
+   },
+   "isPublished": true,
+   "modules": [
+    {
+     "id": "7ad106b6-1634-4bfb-bd33-e17db9de4429",
+     "title": "Foundations of AGI",
+     "orderIndex": 0,
+     "lessons": [
+      {
+       "id": "d497e77f-a685-4859-b604-c106fa39e8d4",
+       "title": "AGI Essentials",
+       "contentType": "text",
+       "contentBody": "<p>By the end of this lesson you will be able to explain what this course covers and how to use it.</p><p>This course explains what AGI is, how it differs from the AI tools a small business can use today, and how to adopt those tools safely.</p><p>Each lesson cites its sources in the same sentence and ends with a Try it task.</p><p>This course is general information, not legal or privacy advice.</p><h3>Try it</h3><p>Write down one admin task in your business that you would like help with.</p><details><summary>Check your answer</summary><p>Any routine task works, such as drafting quotes or summarising job notes.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 0,
+       "isPreview": true,
+       "resources": null
+      },
+      {
+       "id": "d506daf8-16df-4e10-b800-33b3bc4ae4ee",
+       "title": "Background and Understanding of AGI",
+       "contentType": "text",
+       "contentBody": "<p>By the end of this lesson you will be able to define AGI accurately.</p><p>IEEE Technology Navigator describes AGI as the goal of building a machine whose competence transfers across arbitrary tasks and domains (<a href=\"https://technav.ieee.org/topic/artificial-general-intelligence/\">Artificial general intelligence, IEEE Technology Navigator</a>, checked 19/10/2026).</p><p>IEEE Technology Navigator states that the term became current in the early 2000s (<a href=\"https://technav.ieee.org/topic/artificial-general-intelligence/\">Artificial general intelligence, IEEE Technology Navigator</a>, checked 19/10/2026).</p><p>IEEE Technology Navigator states that AGI is a research objective rather than an existing technology (<a href=\"https://technav.ieee.org/topic/artificial-general-intelligence/\">Artificial general intelligence, IEEE Technology Navigator</a>, checked 19/10/2026).</p><p>IEEE Technology Navigator states there is no agreed test that would settle whether a system had achieved AGI (<a href=\"https://technav.ieee.org/topic/artificial-general-intelligence/\">Artificial general intelligence, IEEE Technology Navigator</a>, checked 19/10/2026).</p><h3>Try it</h3><p>A vendor says its chatbot &ldquo;is AGI.&rdquo; How do you treat that claim, per IEEE Technology Navigator?</p><details><summary>Check your answer</summary><p>As unsupported. AGI is described as a research objective, not an existing technology.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "736c022d-978a-403e-8fe4-9f23bcd9682c",
+       "title": "Module 1: Introduction to AGI",
+       "contentType": "text",
+       "contentBody": "<p>By the end of this lesson you will be able to tell AGI apart from narrow AI.</p><p>IEEE Technology Navigator states that AGI is defined by contrast with narrow AI, where a system trained for one task performs well within it and cannot apply what it learned elsewhere (<a href=\"https://technav.ieee.org/topic/artificial-general-intelligence/\">Artificial general intelligence, IEEE Technology Navigator</a>, checked 19/10/2026).</p><p>IEEE Technology Navigator reports that whether generality needs embodiment or human learning efficiency is actively disputed (<a href=\"https://technav.ieee.org/topic/artificial-general-intelligence/\">Artificial general intelligence, IEEE Technology Navigator, Definitions of Generality</a>, checked 19/10/2026).</p><p>IEEE Technology Navigator reports that measuring progress toward generality is unresolved (<a href=\"https://technav.ieee.org/topic/artificial-general-intelligence/\">Artificial general intelligence, IEEE Technology Navigator, Evaluation and Governance</a>, checked 19/10/2026).</p><h3>Try it</h3><p>Is a tool that only drafts emails narrow AI or AGI, per this lesson?</p><details><summary>Check your answer</summary><p>Narrow AI. It performs one kind of task.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 2,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "56bb537c-13b9-4441-9906-d8af07381e50",
+       "title": "Module 2: Understanding AI Basics",
+       "contentType": "text",
+       "contentBody": "<p>By the end of this lesson you will be able to name the main types of AI tool.</p><p>business.gov.au describes generative AI as AI that creates new content like text, images and computer code (<a href=\"https://business.gov.au/online-and-digital/artificial-intelligence\">Artificial intelligence, business.gov.au</a>, checked 19/10/2026).</p><p>business.gov.au describes machine learning as AI that looks for patterns in data to provide predictions, recommendations or alerts (<a href=\"https://business.gov.au/online-and-digital/artificial-intelligence\">Artificial intelligence, business.gov.au</a>, checked 19/10/2026).</p><p>business.gov.au describes natural language processing as AI that analyses written or spoken human language (<a href=\"https://business.gov.au/online-and-digital/artificial-intelligence\">Artificial intelligence, business.gov.au</a>, checked 19/10/2026).</p><p>business.gov.au describes computer vision as AI that analyses images or video (<a href=\"https://business.gov.au/online-and-digital/artificial-intelligence\">Artificial intelligence, business.gov.au</a>, checked 19/10/2026).</p><h3>Try it</h3><p>Which type of AI analyses before-and-after job photos, per business.gov.au?</p><details><summary>Check your answer</summary><p>Computer vision.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 3,
+       "isPreview": false,
+       "resources": null
+      }
+     ]
+    },
+    {
+     "id": "fb8629cb-0faf-414b-93bb-d0c4cc397bc7",
+     "title": "Applying AGI in Your Business",
+     "orderIndex": 1,
+     "lessons": [
+      {
+       "id": "976ce7fe-43ff-4e9b-bec8-18434727fa53",
+       "title": "Module 3: AGI Applications for Small Business",
+       "contentType": "text",
+       "contentBody": "<p>By the end of this lesson you will be able to match AI tools to real admin tasks.</p><p>business.gov.au lists data entry, generating and sending quotes and invoices, spreadsheet formulas, and task management among everyday things AI can help with (<a href=\"https://business.gov.au/online-and-digital/artificial-intelligence\">Artificial intelligence, business.gov.au</a>, checked 19/10/2026).</p><p>business.gov.au states that generative AI tools can create text from a prompt (<a href=\"https://business.gov.au/online-and-digital/artificial-intelligence\">Artificial intelligence, business.gov.au, Writing and content generation</a>, checked 19/10/2026).</p><p>business.gov.au states that many videoconferencing tools can give a transcription and AI-generated summary of a meeting (<a href=\"https://business.gov.au/online-and-digital/artificial-intelligence\">Artificial intelligence, business.gov.au</a>, checked 19/10/2026).</p><p>business.gov.au states that an AI tool that cannot solve a customer query can refer the customer to a human (<a href=\"https://business.gov.au/online-and-digital/artificial-intelligence\">Artificial intelligence, business.gov.au</a>, checked 19/10/2026).</p><p>business.gov.au advises checking AI-generated information against a trustworthy source before you rely on it (<a href=\"https://business.gov.au/online-and-digital/artificial-intelligence\">Artificial intelligence, business.gov.au</a>, checked 19/10/2026).</p><h3>Try it</h3><p>Pick one task from this lesson that fits your business and name who checks the output.</p><details><summary>Check your answer</summary><p>For example, quote drafts, checked by the owner before sending.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 0,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "b18f8562-c169-4b6a-836a-3dfe702abb45",
+       "title": "Module 4: Implementing AGI in Small Business",
+       "contentType": "text",
+       "contentBody": "<p>By the end of this lesson you will be able to adopt one AI tool safely.</p><h3>Plan</h3><p>business.gov.au advises making a list of the business problems or goals AI could help with (<a href=\"https://business.gov.au/online-and-digital/artificial-intelligence\">Artificial intelligence, business.gov.au, Identify the problems you want AI to solve</a>, checked 19/10/2026).</p><p>business.gov.au suggests starting with the AI features already in the digital tools you use (<a href=\"https://business.gov.au/online-and-digital/artificial-intelligence\">Artificial intelligence, business.gov.au, Choose the right solution</a>, checked 19/10/2026).</p><p>business.gov.au advises trialling AI in 1 or 2 areas of your business first (<a href=\"https://business.gov.au/online-and-digital/artificial-intelligence\">Artificial intelligence, business.gov.au, Start out small and evolve</a>, checked 19/10/2026).</p><h3>Control</h3><p>business.gov.au states that your business is responsible for everything your AI tools do (<a href=\"https://business.gov.au/online-and-digital/artificial-intelligence\">Artificial intelligence, business.gov.au, Decide who is accountable for AI</a>, checked 19/10/2026).</p><p>business.gov.au warns that generative AI tools can hallucinate, presenting false or misleading information as facts (<a href=\"https://business.gov.au/online-and-digital/artificial-intelligence\">Artificial intelligence, business.gov.au, Check your AI output for errors</a>, checked 19/10/2026).</p><p>The OAIC recommends, as best practice, that organisations do not enter personal information, particularly sensitive information, into publicly available generative AI tools (<a href=\"https://www.oaic.gov.au/privacy/privacy-guidance-for-organisations-and-government-agencies/guidance-on-privacy-and-the-use-of-commercially-available-ai-products\">Guidance on privacy and the use of commercially available AI products, OAIC</a>, checked 19/10/2026).</p><ul><li>Name one person accountable for each AI tool.</li><li>Remove names, addresses and phone numbers before you paste text into a public AI tool.</li><li>Check every AI draft before it goes to a customer.</li><li>Keep a register of the AI tools you use.</li></ul><h3>Try it</h3><p>A worker pastes a customer&rsquo;s name and address into a free chatbot to draft a quote. What does the OAIC recommend?</p><details><summary>Check your answer</summary><p>Do not enter personal information into publicly available generative AI tools.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "c6770e9d-62bf-4789-bc0b-257a1ea5b33d",
+       "title": "Module 5: Case Studies and Success Stories",
+       "contentType": "text",
+       "contentBody": "<p>By the end of this lesson you will be able to plan a small AI trial from worked examples.</p><p>CARSI worked examples below are practice scenarios, not reports of real businesses or results.</p><h3>CARSI example: quote drafts</h3><p>A carpet cleaner uses the AI feature in her email software to draft quotes from her job notes.</p><p>She removes customer details first and checks every price before sending.</p><p>After four weeks she compares her quoting time with her old diary.</p><h3>CARSI example: meeting summaries</h3><p>A restoration owner turns on meeting summaries in his videoconferencing tool.</p><p>He reads each summary against his own notes before filing it.</p><h3>Try it</h3><p>Write a four-week trial plan for one task, naming the check you will run.</p><details><summary>Check your answer</summary><p>For example, task, quote drafts; check, owner reviews each price; measure, minutes per quote before and after.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 2,
+       "isPreview": false,
+       "resources": null
+      }
+     ]
+    },
+    {
+     "id": "a6324a98-8497-49b3-a88c-2f8260a8c98c",
+     "title": "Looking Ahead",
+     "orderIndex": 2,
+     "lessons": [
+      {
+       "id": "2e822111-9a6d-4891-b1e6-5a723fc4a62f",
+       "title": "Module 6: Future of AGI and Small Business",
+       "contentType": "text",
+       "contentBody": "<p>By the end of this lesson you will be able to keep your AI use governed as it grows.</p><p>The National AI Centre&rsquo;s guidance sets out 6 essential practices, starting with deciding who is accountable and ending with maintaining human control (<a href=\"https://www.ai.gov.au/staying-safe-and-responsible/essential-ai-practices/guidance-ai-adoption-implementation-guidance\">Guidance for AI adoption, implementation guidance, National AI Centre</a>, checked 19/10/2026).</p><p>The National AI Centre advises starting with the areas that matter most to your current systems and risks (<a href=\"https://www.ai.gov.au/staying-safe-and-responsible/essential-ai-practices/guidance-ai-adoption-implementation-guidance\">Guidance for AI adoption, implementation guidance, National AI Centre, How to use this guidance</a>, checked 19/10/2026).</p><p>business.gov.au suggests telling customers how you use AI (<a href=\"https://business.gov.au/online-and-digital/artificial-intelligence\">Artificial intelligence, business.gov.au, Be transparent with your customers</a>, checked 19/10/2026).</p><p>business.gov.au notes that customers want to know when they are talking to an AI rather than a human for customer support (<a href=\"https://business.gov.au/online-and-digital/artificial-intelligence\">Artificial intelligence, business.gov.au</a>, checked 19/10/2026).</p><h3>Try it</h3><p>Your website chatbot answers enquiries after hours. What should it tell customers, per business.gov.au?</p><details><summary>Check your answer</summary><p>That they are talking to an AI.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 0,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "5b696451-026d-4871-bc75-a34b60f8f5e1",
+       "title": "Module 7: Conclusion and Next Steps",
+       "contentType": "text",
+       "contentBody": "<p>By the end of this lesson you will be able to commit to one next step.</p><ul><li>Pick one task from Module 3.</li><li>Run the four-week trial from Module 5.</li><li>Write a one-page AI policy covering what you use AI for, who is accountable and how you protect personal information.</li><li>Review your AI register every quarter.</li></ul><p>business.gov.au points to a National AI Centre template you can use to create an AI policy (<a href=\"https://business.gov.au/online-and-digital/artificial-intelligence\">Artificial intelligence, business.gov.au, Create processes and guidelines</a>, checked 19/10/2026).</p><h3>Try it</h3><p>Name the three things your one-page AI policy covers, per this lesson.</p><details><summary>Check your answer</summary><p>What you use AI for, who is accountable, and how you protect personal information.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "be67a350-3709-4f3e-bf6d-ed25b1eb0fc0",
+       "title": "Final knowledge check",
+       "contentType": "quiz",
+       "contentBody": "f557960d-daa9-4508-99f5-ed2a18d96427",
+       "orderIndex": 2,
+       "isPreview": false,
+       "resources": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "0773d721-4f8a-4bed-aa05-74385f20c86f",
+   "slug": "social-media-marketing",
+   "title": "Introduction to Social Media Marketing for Service Businesses",
+   "description": "A CARSI course for Australian trades, cleaning and restoration business owners who want enquiries from social media. This course covers choosing a platform, setting up Facebook and Instagram, ad types, local targeting, campaign structure, AUD budgets, cost per booked job, complaints, Australian Consumer Law and a 30-day starter plan.",
+   "shortDescription": "Win local work from Facebook and Instagram with setup, ad types, targeting, AUD budgets, cost per booked job and a 30-day plan.",
+   "thumbnailUrl": null,
+   "instructorId": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+   "status": "published",
+   "priceAud": "79",
+   "isFree": false,
+   "durationHours": 2.0,
+   "level": "Beginner",
+   "category": "Business and Marketing",
+   "tags": [
+    "marketing",
+    "social media",
+    "Facebook ads",
+    "Instagram",
+    "lead generation",
+    "small business",
+    "advertising"
+   ],
+   "iicrcDiscipline": null,
+   "cecHours": 0,
+   "meta": {
+    "cecHours": "0 — CARSI course only, NOT IICRC CEC-approved. Explicit 0 blocks any duration-to-CEC inference.",
+    "sourceAndRebuild": "Recovered from the original CARSI WordPress course, which had short video-companion text. Review r3 rewrite 19/10/2026: every clause is cited in its own clause, an instruction or labelled practice. Third-party video links and uncited performance figures were removed.",
+    "legacyUrl": "https://carsi.com.au/product/social-media-marketing/",
+    "importedAt": "2026-10-19"
+   },
+   "isPublished": true,
+   "modules": [
+    {
+     "id": "3957a5b3-12ad-4ace-8797-648a729d35aa",
+     "title": "Getting Started",
+     "orderIndex": 0,
+     "lessons": [
+      {
+       "id": "c9098624-c81d-4a53-a267-1f01541539e8",
+       "title": "Introduction to Social Media Marketing",
+       "contentType": "text",
+       "contentBody": "<p>By the end of this lesson you will be able to explain what this course covers and set one goal.</p><p>This course covers choosing a platform, setting up a Facebook and Instagram presence, ad types, local targeting, campaign structure, budgets in AUD, measuring results by cost per booked job, and a 30-day starter plan.</p><p>business.gov.au describes social media as an easy, affordable and effective way to promote your business and connect with customers (<a href=\"https://business.gov.au/online-and-digital/social-media-for-business\">Social media for business, business.gov.au</a>, checked 19/10/2026).</p><p>business.gov.au states that you need to make sure there are no false or misleading claims on your social media (<a href=\"https://business.gov.au/online-and-digital/social-media-for-business\">Social media for business, business.gov.au, Managing your social media channels</a>, checked 19/10/2026).</p><h3>Try it</h3><p>Write one goal for your first 30 days of social media.</p><details><summary>Check your answer</summary><p>For example, 10 quote requests from a 25 km radius.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 0,
+       "isPreview": true,
+       "resources": null
+      },
+      {
+       "id": "de30ae42-d233-4c59-b265-f08d8b6e0304",
+       "title": "Module 1 - What, How and Whys",
+       "contentType": "text",
+       "contentBody": "<p>By the end of this lesson you will be able to choose where to start.</p><p>business.gov.au advises that there is no point joining a platform unless your target customers are using it (<a href=\"https://business.gov.au/online-and-digital/social-media-for-business\">Social media for business, business.gov.au, Choosing social media platforms</a>, checked 19/10/2026).</p><p>business.gov.au advises that it is better to use 1 or 2 social media channels well than a lot of platforms badly (<a href=\"https://business.gov.au/online-and-digital/social-media-for-business\">Social media for business, business.gov.au, Choosing social media platforms</a>, checked 19/10/2026).</p><p>business.gov.au describes LinkedIn as a work-focused network that is good for reaching professionals and other business owners (<a href=\"https://business.gov.au/online-and-digital/social-media-for-business\">Social media for business, business.gov.au, Popular social media platforms</a>, checked 19/10/2026).</p><ul><li>Ask your last ten customers where they found you.</li><li>Pick one primary platform from their answers.</li><li>Set up a Facebook Business Page, not a personal profile.</li><li>Claim your Google Business Profile.</li><li>Add your service area, hours, phone and website to every profile.</li></ul><h3>Try it</h3><p>Most of your work comes from property managers. Which platform does business.gov.au describe as good for reaching professionals?</p><details><summary>Check your answer</summary><p>LinkedIn.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": null
+      }
+     ]
+    },
+    {
+     "id": "26538ce0-ac6a-4050-b4fb-13e068a45e75",
+     "title": "Facebook and Instagram Advertising",
+     "orderIndex": 1,
+     "lessons": [
+      {
+       "id": "47cdb8e6-4b04-4d67-bdad-37312b7a81fe",
+       "title": "Module 2 - Setting Up Your Facebook Presence",
+       "contentType": "text",
+       "contentBody": "<p>By the end of this lesson you will be able to set up a business presence that you control.</p><ul><li>Create the Business Page, a Meta Business Suite account and an Ads Manager account with your ABN and Australian billing details.</li><li>Add a second trusted admin to the page.</li><li>Post real job photos with the customer&rsquo;s permission.</li><li>Tell people what you will do with the details they give in a lead form.</li></ul><p>business.gov.au advises never sharing anyone&rsquo;s personal information on your public channels (<a href=\"https://business.gov.au/online-and-digital/social-media-for-business\">Social media for business, business.gov.au</a>, checked 19/10/2026).</p><p>The OAIC states that the Privacy Act 1988 regulates how personal information is handled (<a href=\"https://www.oaic.gov.au/privacy/privacy-legislation/the-privacy-act\">The Privacy Act, OAIC</a>, checked 19/10/2026).</p><h3>Try it</h3><p>Why add a second admin, per this lesson?</p><details><summary>Check your answer</summary><p>Add one so you keep access to the page if your own account is locked.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 0,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "aebfa0cc-596c-40a9-99a4-7917e4f0d42e",
+       "title": "Module 3 - Facebook Ad Types",
+       "contentType": "text",
+       "contentBody": "<p>By the end of this lesson you will be able to pick an ad type for a local service.</p><p>business.gov.au explains that paid content is advertising that shows your post to more users, including people who do not follow you (<a href=\"https://business.gov.au/online-and-digital/social-media-for-business\">Social media for business, business.gov.au, Creating social media content</a>, checked 19/10/2026).</p><ul><li><strong>Lead ads:</strong> Use them for quote requests.</li><li><strong>Traffic ads:</strong> Use them only if your website works well on a phone.</li><li><strong>Boosted posts:</strong> Use them for before-and-after proof to a local radius.</li><li><strong>Video ads:</strong> Use short clips of real job footage.</li></ul><h3>Try it</h3><p>You want quote requests without people leaving the app. Which ad type does this lesson suggest?</p><details><summary>Check your answer</summary><p>Lead ads.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "b99234f9-afc8-409b-9a16-57af00755451",
+       "title": "Module 4 - Targeting Your Facebook Audience",
+       "contentType": "text",
+       "contentBody": "<p>By the end of this lesson you will be able to target locally and lawfully.</p><ul><li>Set a service radius you can actually travel.</li><li>Add homeowner and home-improvement interests for residential work.</li><li>Add property managers and real estate interests for commercial restoration work.</li><li>Upload a customer list only if you hold permission to use it for marketing.</li><li>Exclude recent customers from new-customer ads.</li></ul><p>business.gov.au advises thinking about the age, gender and interests of the people you want to engage (<a href=\"https://business.gov.au/online-and-digital/social-media-for-business\">Social media for business, business.gov.au, Choosing social media platforms</a>, checked 19/10/2026).</p><h3>Try it</h3><p>Who do you exclude from a new-customer ad, per this lesson?</p><details><summary>Check your answer</summary><p>Recent customers.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 2,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "b9f3d4cb-717a-46c3-95f5-5f5628fb1525",
+       "title": "Module 5 - Structuring Your Facebook Ad Campaigns",
+       "contentType": "text",
+       "contentBody": "<p>By the end of this lesson you will be able to structure campaigns you can read.</p><ul><li>Run one campaign per goal.</li><li>Run one ad set per audience.</li><li>Test two to four ads per ad set.</li><li>Name each campaign with the date, goal, radius and audience.</li><li>Turn off a losing ad set after a fair test and move its budget to the winner.</li></ul><h3>CARSI example: a campaign name</h3><p>2026-10, Quote requests, 25 km radius, Homeowners 30-65.</p><h3>Try it</h3><p>Why not stack three audiences in one ad set, per this lesson?</p><details><summary>Check your answer</summary><p>Keep them separate so you can tell which audience worked.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 3,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "c3b4692c-b8d4-4c70-ade3-3cee8b0c58f2",
+       "title": "Module 6 - Bidding and Budgeting",
+       "contentType": "text",
+       "contentBody": "<p>By the end of this lesson you will be able to set a starting budget and judge it.</p><ul><li>Start each ad set on a small daily budget in AUD.</li><li>Use the platform&rsquo;s automatic bidding until you spend enough to test caps.</li><li>Judge campaigns on cost per booked job.</li><li>Review spend weekly, not daily.</li></ul><h3>CARSI example: cost per booked job</h3><p>Ad set A spends $150 for 10 leads, and 2 book.</p><p>Ad set B spends $150 for 5 leads, and 3 book.</p><p>A costs $75 per booked job and B costs $50, so B is the better ad set.</p><h3>Try it</h3><p>Ad set C spends $200 and books 4 jobs. What is its cost per booked job?</p><details><summary>Check your answer</summary><p>$50.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 4,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "79b1f3b5-53d1-4f94-a2da-6a189b1440c3",
+       "title": "Module 7 - Analysing Performance and Optimisation",
+       "contentType": "text",
+       "contentBody": "<p>By the end of this lesson you will be able to measure what pays.</p><p>business.gov.au states that most social platforms have features for analysing post data (<a href=\"https://business.gov.au/online-and-digital/social-media-for-business\">Social media for business, business.gov.au, Managing your social media channels</a>, checked 19/10/2026).</p><ul><li>Track cost per lead, lead-to-booking rate and revenue per booked job.</li><li>Tag every booking with where it came from.</li><li>Refresh your ad images every few weeks with new job photos.</li></ul><h3>Try it</h3><p>Name the three numbers this lesson tells you to track.</p><details><summary>Check your answer</summary><p>Cost per lead, lead-to-booking rate, revenue per booked job.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 5,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "53736a46-e82e-4222-8864-e9abd8a4eff2",
+       "title": "Module 8 - Advanced Facebook Tools and Features",
+       "contentType": "text",
+       "contentBody": "<p>By the end of this lesson you will be able to add tools once the basics pay.</p><ul><li>Install the Meta Pixel or Conversions API on your website once your lead ads pay.</li><li>Set after-hours automated replies that say when you will call back.</li><li>Test a small retargeting ad set for people who visited your site.</li></ul><p>business.gov.au advises checking your channels at least once a day to reply to comments and direct messages (<a href=\"https://business.gov.au/online-and-digital/social-media-for-business\">Social media for business, business.gov.au, Managing your social media channels</a>, checked 19/10/2026).</p><h3>Try it</h3><p>An automated reply says &ldquo;We will call you by 9 am.&rdquo; What must you then do, per this lesson?</p><details><summary>Check your answer</summary><p>Call back by 9 am.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 6,
+       "isPreview": false,
+       "resources": null
+      }
+     ]
+    },
+    {
+     "id": "73ee5978-b082-4619-a79e-cf8a97e48de7",
+     "title": "Beyond Facebook and Next Steps",
+     "orderIndex": 2,
+     "lessons": [
+      {
+       "id": "a07858b3-eb02-4d68-8ded-b38a963e8bb0",
+       "title": "Module 9 - Additional Social Media Platforms to Consider For Advertising",
+       "contentType": "text",
+       "contentBody": "<p>By the end of this lesson you will be able to decide whether to add a second channel.</p><p>business.gov.au describes Instagram as a platform for sharing photos and videos (<a href=\"https://business.gov.au/online-and-digital/social-media-for-business\">Social media for business, business.gov.au, Popular social media platforms</a>, checked 19/10/2026).</p><p>business.gov.au describes TikTok as a platform for sharing short videos, designed for mobile devices (<a href=\"https://business.gov.au/online-and-digital/social-media-for-business\">Social media for business, business.gov.au, Popular social media platforms</a>, checked 19/10/2026).</p><p>business.gov.au suggests posting 3 to 5 times a week for most platforms (<a href=\"https://business.gov.au/online-and-digital/social-media-for-business\">Social media for business, business.gov.au, Managing your social media channels</a>, checked 19/10/2026).</p><ul><li>Master one paid channel and one free channel before adding another.</li><li>Add Instagram as a placement in the same Meta campaign.</li><li>Post job photos to your Google Business Profile monthly.</li></ul><h3>Try it</h3><p>Per business.gov.au, how often should you post on most platforms?</p><details><summary>Check your answer</summary><p>3 to 5 times a week.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 0,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "5be04838-554c-4de5-b695-85cda32d986c",
+       "title": "Additions",
+       "contentType": "text",
+       "contentBody": "<p>By the end of this lesson you will be able to run a 30-day starter plan.</p><ul><li><strong>Week 1:</strong> Set up the Business Page, Meta Business Suite and Ads Manager, and post three real job photos.</li><li><strong>Week 2:</strong> Launch one lead ad to your service radius.</li><li><strong>Week 3:</strong> Check cost per lead and turn off the worst ad.</li><li><strong>Week 4:</strong> Boost your best before-and-after post and review leads, bookings and revenue.</li></ul><h3>Complaints</h3><p>business.gov.au advises not deleting a public complaint or review, and warns that doing so may breach Australian Consumer Law (<a href=\"https://business.gov.au/online-and-digital/social-media-for-business\">Social media for business, business.gov.au, Complaints and negative reviews</a>, checked 19/10/2026).</p><h3>Claims</h3><p>business.gov.au states that you need to make sure there are no false or misleading claims on your social media (<a href=\"https://business.gov.au/online-and-digital/social-media-for-business\">Social media for business, business.gov.au, Managing your social media channels</a>, checked 19/10/2026).</p><ul><li>Use your CARSI training titles exactly as issued.</li><li>Keep evidence for every claim in your ads.</li></ul><h3>Try it</h3><p>A customer posts an unfair review. Do you delete it, per business.gov.au?</p><details><summary>Check your answer</summary><p>No. Respond quickly, acknowledge it, then continue in private.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "bb719b35-5136-4e0b-8b3f-61d4bf59c49e",
+       "title": "Final knowledge check",
+       "contentType": "quiz",
+       "contentBody": "201d893b-204a-4033-8947-bf6fb20c7212",
+       "orderIndex": 2,
+       "isPreview": false,
+       "resources": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "be87a894-5658-40a9-baa6-a588d98262e6",
+   "slug": "admin-sole-trader",
+   "title": "Business Administration for Sole Traders",
+   "description": "A CARSI course for Australian sole traders in cleaning, restoration and trades. This course covers ABN, GST and business name registration, separate business banking and ATO record keeping, quotes and tax invoices, insurance covers, BAS and super, WHS duties as a PCBU, and one admin loop from enquiry to paid invoice, with each rule cited to the ATO, ASIC, ABR, business.gov.au or Safe Work Australia.",
+   "shortDescription": "This course covers admin for Australian sole traders, from ABN, GST, tax invoices, records and insurance to BAS, WHS duties and a weekly routine, each rule cited to its regulator.",
+   "thumbnailUrl": null,
+   "instructorId": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+   "status": "published",
+   "priceAud": "275",
+   "isFree": false,
+   "durationHours": 3.0,
+   "level": "Beginner",
+   "category": "Business and Marketing",
+   "tags": [
+    "admin",
+    "sole trader",
+    "ABN",
+    "GST",
+    "BAS",
+    "invoicing",
+    "insurance",
+    "WHS",
+    "small business",
+    "bookkeeping"
+   ],
+   "iicrcDiscipline": null,
+   "cecHours": 0,
+   "meta": {
+    "cecHours": "0 — CARSI course only, NOT IICRC CEC-approved. Explicit 0 blocks any duration-to-CEC inference.",
+    "sourceAndRebuild": "Re-authored 19/10/2026 as a CARSI course for the legacy WordPress product, which had no surviving lessons. Review r3 rewrite 19/10/2026: every clause is cited in its own clause, an instruction or labelled practice. The tax-invoice rule was corrected to the ATO wording.",
+    "legacyUrl": "https://carsi.com.au/product/admin-sole-trader/",
+    "sources": "Every rule in this course is cited in its own sentence to the ATO, ASIC, ABR, business.gov.au, ASBFEO or Safe Work Australia page that states it, checked 19/10/2026.",
+    "importedAt": "2026-10-19"
+   },
+   "isPublished": true,
+   "modules": [
+    {
+     "id": "2c8908d8-7f30-4891-83a3-ac38ce82a56b",
+     "title": "Setting Up",
+     "orderIndex": 0,
+     "lessons": [
+      {
+       "id": "3958286b-d552-446c-9090-eddee32faf65",
+       "title": "ABN, GST and Business Name Registration",
+       "contentType": "text",
+       "contentBody": "<p><em>This course is general information, not tax, legal or insurance advice. Confirm your situation with your accountant, a registered tax or BAS agent, or a licensed insurance broker.</em></p><p>By the end of this lesson you will be able to set up your ABN, decide on GST and register a trading name.</p><h3>Your ABN</h3><p>The Australian Business Register describes the ABN as a unique 11-digit number that identifies your business to the government and community (<a href=\"https://www.abr.gov.au/business-super-funds-charities/applying-abn\">Applying for an ABN, Australian Business Register</a>, checked 19/10/2026).</p><p>The ABR warns that not everyone is entitled to an ABN (<a href=\"https://www.abr.gov.au/business-super-funds-charities/applying-abn\">Applying for an ABN, Australian Business Register</a>, checked 19/10/2026).</p><p>The ABR states that once your ABN is issued you can immediately apply for other registrations, such as GST (<a href=\"https://www.abr.gov.au/business-super-funds-charities/applying-abn\">Applying for an ABN, Australian Business Register</a>, checked 19/10/2026).</p><h3>GST</h3><p>The ATO states that you must register for GST when your GST turnover is $75,000 or more (<a href=\"https://www.ato.gov.au/businesses-and-organisations/gst-excise-and-indirect-taxes/gst/registering-for-gst\">Registering for GST, ATO</a>, checked 19/10/2026).</p><p>Check the threshold on the ATO page before you decide, and ask your accountant whether registering below it suits your customers.</p><h3>Business name</h3><p>ASIC states that you must register a business name if you run a business in Australia and are not trading under your own name (<a href=\"https://www.asic.gov.au/for-business-and-companies/business-names/register-a-business-name\">Register a business name, ASIC</a>, checked 19/10/2026).</p><p>ASIC states that a sole trader trading under their own name must use their first name and surname and nothing else (<a href=\"https://www.asic.gov.au/for-business-and-companies/business-names/register-a-business-name\">Register a business name, ASIC</a>, checked 19/10/2026).</p><p>ASIC offers registration for 1 year or 3 years (<a href=\"https://www.asic.gov.au/for-business-and-companies/business-names/register-a-business-name\">Register a business name, ASIC, Fees</a>, checked 19/10/2026).</p><p>Check the name is available on the business names register before you print it on a vehicle.</p><h3>Checklist</h3><ul><li>Apply for your ABN through the Australian Business Register.</li><li>Decide on GST with your accountant.</li><li>Register your trading name with ASIC if it differs from your own name.</li><li>Store your ABN, ASIC and myGov logins in a password manager.</li><li>Diarise every renewal and lodgement date.</li></ul><h3>Try it</h3><p>Jane Smith trades as &ldquo;Coastal Carpet Care.&rdquo; Must she register a business name, per ASIC?</p><details><summary>Check your answer</summary><p>Yes. She is not trading under her own first name and surname.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 0,
+       "isPreview": true,
+       "resources": null
+      },
+      {
+       "id": "492918b2-10fd-40fa-9062-6bdc311e9b5e",
+       "title": "Bank Accounts, Bookkeeping and Record Keeping",
+       "contentType": "text",
+       "contentBody": "<p><em>This course is general information, not tax, legal or insurance advice. Confirm your situation with your accountant, a registered tax or BAS agent, or a licensed insurance broker.</em></p><p>By the end of this lesson you will be able to separate business money and keep records the ATO accepts.</p><h3>Money setup</h3><ul><li>Open a dedicated business transaction account.</li><li>Open a second account and move a set share of every payment into it for tax and GST.</li><li>Choose one bookkeeping tool and connect your bank feed.</li><li>Pay yourself a regular transfer instead of dipping into the business account.</li></ul><h3>Record keeping</h3><p>The ATO states that you need to keep most records for 5 years (<a href=\"https://www.ato.gov.au/businesses-and-organisations/preparing-lodging-and-paying/record-keeping-for-business/overview-of-record-keeping-rules-for-business\">Overview of record-keeping rules for business, ATO</a>, checked 19/10/2026).</p><ul><li>Photograph every receipt on the day you get it.</li><li>Attach job sheets, photos, signed authorisations and reports to the invoice or job number.</li></ul><h3>CARSI example: setting aside tax</h3><p>Mia invoices $2,000 this week and moves a set share into her tax account.</p><p>She agreed that share with her accountant, so it reflects her own tax position.</p><h3>Try it</h3><p>How long must you keep most business records, per the ATO?</p><details><summary>Check your answer</summary><p>5 years.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": null
+      }
+     ]
+    },
+    {
+     "id": "f8979010-779d-406c-94ca-28d300114e41",
+     "title": "Money In",
+     "orderIndex": 1,
+     "lessons": [
+      {
+       "id": "66a8ed28-7295-4fd2-be47-503a935fe56f",
+       "title": "Quoting and Invoicing That Gets You Paid",
+       "contentType": "text",
+       "contentBody": "<p><em>This course is general information, not tax, legal or insurance advice. Confirm your situation with your accountant, a registered tax or BAS agent, or a licensed insurance broker.</em></p><p>By the end of this lesson you will be able to write quotes and tax invoices that meet ATO rules.</p><h3>Quoting</h3><ul><li>State the scope, including what is excluded.</li><li>State the price and whether GST is included.</li><li>State how long the price is valid and any access, power or water conditions.</li><li>Send every quote in writing.</li></ul><h3>Tax invoices</h3><p>The ATO states that if a customer asks for a tax invoice you must provide one within 28 days, unless the sale is $82.50 including GST or less (<a href=\"https://www.ato.gov.au/businesses-and-organisations/gst-excise-and-indirect-taxes/gst/tax-invoices\">Tax invoices, ATO</a>, checked 19/10/2026).</p><p>The ATO lists 7 details a tax invoice for a taxable sale under $1,000 must let the reader determine, including the seller&rsquo;s identity and ABN, the date, a description, and the GST amount (<a href=\"https://www.ato.gov.au/businesses-and-organisations/gst-excise-and-indirect-taxes/gst/tax-invoices\">Tax invoices, ATO, Sales under $1,000</a>, checked 19/10/2026).</p><p>The ATO states that tax invoices for sales of $1,000 or more also need to show the buyer&rsquo;s identity or ABN (<a href=\"https://www.ato.gov.au/businesses-and-organisations/gst-excise-and-indirect-taxes/gst/tax-invoices\">Tax invoices, ATO, Sales of $1,000 or more</a>, checked 19/10/2026).</p><h3>Getting paid</h3><ul><li>Invoice residential jobs on the day you finish.</li><li>Print your payment terms on the quote and on the invoice.</li><li>Add bank details and a card payment option.</li><li>Send a reminder the day after the due date, a firmer one at 7 days, and a final notice before you escalate.</li></ul><h3>Try it</h3><p>A customer asks for a tax invoice for a $600 clean. By when must you provide it, per the ATO?</p><details><summary>Check your answer</summary><p>Within 28 days.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 0,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "3f6c0a1c-b759-4f8d-bc04-329efd18e4c4",
+       "title": "Insurance and Protecting Yourself",
+       "contentType": "text",
+       "contentBody": "<p><em>This course is general information, not tax, legal or insurance advice. Confirm your situation with your accountant, a registered tax or BAS agent, or a licensed insurance broker.</em></p><p>By the end of this lesson you will be able to choose the covers a sole trader in cleaning or restoration needs.</p><h3>Covers</h3><p>business.gov.au describes public liability insurance as cover if someone dies, gets injured or has their property damaged because of your negligence (<a href=\"https://business.gov.au/risk-management/insurance/types-of-business-insurance\">Types of business insurance, business.gov.au, Public liability insurance</a>, checked 19/10/2026).</p><p>business.gov.au notes that some states and territories need public liability insurance for certain occupations (<a href=\"https://business.gov.au/risk-management/insurance/types-of-business-insurance\">Types of business insurance, business.gov.au</a>, checked 19/10/2026).</p><p>business.gov.au describes portable equipment insurance as cover for accidental loss, damage or theft of tools and electrical equipment you take on a job (<a href=\"https://business.gov.au/risk-management/insurance/types-of-business-insurance\">Types of business insurance, business.gov.au, Portable equipment insurance</a>, checked 19/10/2026).</p><p>business.gov.au describes income protection as cover for part of your income if sickness or an accident stops you working (<a href=\"https://business.gov.au/risk-management/insurance/types-of-business-insurance\">Types of business insurance, business.gov.au</a>, checked 19/10/2026).</p><ul><li>Tell your vehicle insurer the vehicle is used for business.</li><li>Keep your public liability certificate of currency ready to send.</li><li>List every major tool with its replacement cost.</li></ul><h3>Disputes</h3><p>The ASBFEO responds to requests for assistance from small businesses in dispute with other businesses or Commonwealth agencies (<a href=\"https://www.asbfeo.gov.au/\">Australian Small Business and Family Enterprise Ombudsman</a>, checked 19/10/2026).</p><h3>Try it</h3><p>Your extractor is stolen from the van at a job. Which cover is designed for this, per business.gov.au?</p><details><summary>Check your answer</summary><p>Portable equipment insurance.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": null
+      }
+     ]
+    },
+    {
+     "id": "8e1fc7b2-447b-42b9-8ea5-45d504b7302e",
+     "title": "Tax, Safety and the Weekly Rhythm",
+     "orderIndex": 2,
+     "lessons": [
+      {
+       "id": "6cb1385c-7124-48db-b715-849b00148f3c",
+       "title": "BAS, Tax Time and Deductions",
+       "contentType": "text",
+       "contentBody": "<p><em>This course is general information, not tax, legal or insurance advice. Confirm your situation with your accountant, a registered tax or BAS agent, or a licensed insurance broker.</em></p><p>By the end of this lesson you will be able to plan your BAS, tax return and deductions.</p><h3>BAS</h3><p>The ATO&rsquo;s BAS pages explain how to complete, lodge and pay your business activity statement, which reports taxes including GST and PAYG (<a href=\"https://www.ato.gov.au/businesses-and-organisations/preparing-lodging-and-paying/business-activity-statements-bas\">Business activity statements, ATO</a>, checked 19/10/2026).</p><ul><li>Diarise your BAS due dates from ATO online services.</li><li>Reconcile your books monthly.</li><li>Ask a registered tax or BAS agent which costs you can claim before a big purchase.</li></ul><h3>If you take on staff</h3><p>The ATO lists the super guarantee rate as 12% from 1 July 2025 (<a href=\"https://www.ato.gov.au/tax-rates-and-codes/key-superannuation-rates-and-thresholds/super-guarantee\">Super guarantee, ATO</a>, checked 19/10/2026).</p><p>Get advice before your first employee on super, payroll and workers compensation.</p><h3>Try it</h3><p>Per the ATO page in this lesson, what super guarantee rate applies in 2026&ndash;27?</p><details><summary>Check your answer</summary><p>12%.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 0,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "e0fa48f9-bd57-4183-ba2f-cae17a6c86aa",
+       "title": "WHS Duties for Sole Traders",
+       "contentType": "text",
+       "contentBody": "<p><em>This course is general information, not tax, legal or insurance advice. Confirm your situation with your accountant, a registered tax or BAS agent, or a licensed insurance broker.</em></p><p>By the end of this lesson you will be able to meet your WHS duties as a PCBU.</p><h3>Your duty</h3><p>Safe Work Australia lists a self-employed person operating their own business as an example of a PCBU (<a href=\"https://www.safeworkaustralia.gov.au/law-and-regulation/duties-under-whs-laws\">Duties under WHS laws, Safe Work Australia</a>, checked 19/10/2026).</p><p>Safe Work Australia states that a self-employed person may be both a PCBU and a worker (<a href=\"https://www.safeworkaustralia.gov.au/law-and-regulation/duties-under-whs-laws\">Duties under WHS laws, Safe Work Australia</a>, checked 19/10/2026).</p><p>Safe Work Australia states that a PCBU has a primary duty to ensure the health and safety of workers and others who may be affected by the work (<a href=\"https://www.safeworkaustralia.gov.au/law-and-regulation/duties-under-whs-laws\">Duties under WHS laws, Safe Work Australia, Duties of a PCBU</a>, checked 19/10/2026).</p><p>Safe Work Australia states that if you use or store hazardous chemicals you must keep copies of the SDS in your workplace (<a href=\"https://www.safeworkaustralia.gov.au/safety-topic/hazards/chemicals/safety-data-sheets\">Safety data sheets, Safe Work Australia</a>, checked 19/10/2026).</p><h3>Checklist</h3><ul><li>Identify the hazards of each job before you start.</li><li>Keep the current SDS for every chemical on the vehicle.</li><li>Wear the PPE each SDS specifies.</li><li>Record every incident and near miss on the day.</li><li>Contact your state or territory WHS regulator for the rules where you work.</li></ul><h3>Try it</h3><p>You work alone. Do you still have WHS duties, per Safe Work Australia?</p><details><summary>Check your answer</summary><p>Yes. A self-employed person operating their own business is a PCBU.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "b7dc2292-b50f-45e4-9039-14ee0e06ad79",
+       "title": "The Job Admin Workflow: Enquiry to Paid Invoice",
+       "contentType": "text",
+       "contentBody": "<p>By the end of this lesson you will be able to run one admin loop for every job.</p><h3>The loop</h3><ul><li><strong>Enquiry:</strong> Capture the name, address, job type and photos, and reply the same day.</li><li><strong>Quote:</strong> Send the written quote with scope, price, validity and conditions.</li><li><strong>Booking:</strong> Confirm the date, access, power and water, and send a reminder the day before.</li><li><strong>On site:</strong> Take before photos, get the signed authorisation, do the work and take after photos.</li><li><strong>Invoice:</strong> Invoice on completion with bank and card options.</li><li><strong>Follow-up:</strong> Run your reminder routine and ask happy customers for a review.</li><li><strong>File:</strong> Attach photos, job sheet and invoice together.</li></ul><h3>Rhythm</h3><ul><li><strong>Weekly:</strong> Check money in, chase overdue invoices and plan next week.</li><li><strong>Monthly:</strong> Reconcile the books and check insurance and registrations are current.</li></ul><h3>Try it</h3><p>Put these in order: invoice, quote, booking, enquiry.</p><details><summary>Check your answer</summary><p>Enquiry, quote, booking, invoice.</p></details><p><em>Stuck? Ask your CARSI trainer.</em></p>",
+       "orderIndex": 2,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "0d50d62b-8540-414b-804e-ec2f7ff6b546",
+       "title": "Final knowledge check",
+       "contentType": "quiz",
+       "contentBody": "52712efa-5d5d-4fe0-8dfd-7e0100c2bfa5",
+       "orderIndex": 3,
+       "isPreview": false,
+       "resources": null
+      }
+     ]
+    }
+   ]
   }
  ]
 }

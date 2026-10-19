@@ -45,6 +45,10 @@ const QUIZ_FILES = [
   'timber-floor-assessment-restoration-quiz.json',
   'assessing-indoor-environment-conditions-quiz.json',
   'ozone-and-hydroxyl-generators-what-the-evidence-says-quiz.json',
+  'asthma-and-allergy-course-quiz.json',
+  'agi-essentials-small-business-quiz.json',
+  'social-media-marketing-quiz.json',
+  'admin-sole-trader-quiz.json',
 ];
 
 type QuizQuestion = {

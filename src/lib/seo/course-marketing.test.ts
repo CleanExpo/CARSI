@@ -225,7 +225,12 @@ describe('current repository truth', () => {
     // 73 = 72 + the recovered NeoSan Labs product training course (published, priceAud 99,
     // cecHours 0, iicrcDiscipline null), imported from the legacy WordPress/LearnDash export
     // on 19/10/2026 (feat/import-neosan-course).
-    expect(catalogue).toHaveLength(73);
+    // 76 = 72 + four recovered/rebuilt legacy WordPress courses (asthma-and-allergy-course,
+    // agi-essentials-small-business, social-media-marketing, admin-sole-trader), imported from
+    // the 2026-04-05 LearnDash export or rebuilt where no content survived; all published,
+    // cecHours 0, iicrcDiscipline null, 19/10/2026 (feat/import-legacy-courses).
+    // 77 = 73 on main + 4 from this branch (rebased 19/10/2026).
+    expect(catalogue).toHaveLength(77);
     expect(surfaceSlugs).toHaveLength(24);
     expect(new Set(surfaceSlugs).size).toBe(24);
     expect(readdirSync(cardsDirectory).filter((name) => name.endsWith('.json'))).toHaveLength(80);

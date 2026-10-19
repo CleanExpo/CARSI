@@ -1,0 +1,103 @@
+{
+ "version": 1,
+ "courseSlug": "agi-essentials-small-business",
+ "quizzes": [
+  {
+   "quizId": "f557960d-daa9-4508-99f5-ed2a18d96427",
+   "lessonTitle": "Final knowledge check",
+   "title": "AGI Essentials — Knowledge Check",
+   "passPercentage": 80,
+   "attemptsAllowed": 3,
+   "questions": [
+    {
+     "questionText": "Per IEEE Technology Navigator, is AGI an existing technology?",
+     "options": [
+      "Yes, in most chatbots",
+      "No, a research objective",
+      "Yes, since the 1950s",
+      "Yes, in accounting tools"
+     ],
+     "correctIndex": 1,
+     "points": 1
+    },
+    {
+     "questionText": "Per business.gov.au, which type of AI creates new text and images?",
+     "options": [
+      "Computer vision",
+      "Machine learning",
+      "Generative AI",
+      "Narrow robotics"
+     ],
+     "correctIndex": 2,
+     "points": 1
+    },
+    {
+     "questionText": "Per the OAIC, should you paste personal information into public generative AI tools?",
+     "options": [
+      "No, as best practice",
+      "Yes, when it helps",
+      "Yes, for quotes only",
+      "Yes, on free plans"
+     ],
+     "correctIndex": 0,
+     "points": 1
+    },
+    {
+     "questionText": "Per business.gov.au, who is responsible for what your AI tools do?",
+     "options": [
+      "The tool developer",
+      "The paying customer",
+      "The federal government",
+      "Your own business"
+     ],
+     "correctIndex": 3,
+     "points": 1
+    },
+    {
+     "questionText": "Per business.gov.au, how many areas should a first AI trial cover?",
+     "options": [
+      "5 or 6 areas",
+      "9 or 10 areas",
+      "All of the areas",
+      "1 or 2 areas"
+     ],
+     "correctIndex": 3,
+     "points": 1
+    },
+    {
+     "questionText": "Per business.gov.au, what can generative AI do with facts?",
+     "options": [
+      "Guarantee that every fact holds",
+      "Verify every fact for you",
+      "Present false facts as true",
+      "Replace any trusted source entirely"
+     ],
+     "correctIndex": 2,
+     "points": 1
+    },
+    {
+     "questionText": "Per the National AI Centre, how many essential practices are there?",
+     "options": [
+      "6",
+      "3",
+      "9",
+      "8"
+     ],
+     "correctIndex": 0,
+     "points": 1
+    },
+    {
+     "questionText": "Per this course, what do you do before an AI draft reaches a customer?",
+     "options": [
+      "Send it unread",
+      "Check it yourself",
+      "Ask the chatbot",
+      "Post it online"
+     ],
+     "correctIndex": 1,
+     "points": 1
+    }
+   ]
+  }
+ ]
+}

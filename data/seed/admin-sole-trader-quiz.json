@@ -1,0 +1,125 @@
+{
+ "version": 1,
+ "courseSlug": "admin-sole-trader",
+ "quizzes": [
+  {
+   "quizId": "52712efa-5d5d-4fe0-8dfd-7e0100c2bfa5",
+   "lessonTitle": "Final knowledge check",
+   "title": "Business Administration for Sole Traders — Knowledge Check",
+   "passPercentage": 80,
+   "attemptsAllowed": 3,
+   "questions": [
+    {
+     "questionText": "Per the ATO, at what GST turnover must you register for GST?",
+     "options": [
+      "$75,000 or more",
+      "$50,000 or more",
+      "$25,000 or more",
+      "$95,000 or more"
+     ],
+     "correctIndex": 0,
+     "points": 1
+    },
+    {
+     "questionText": "Per the ATO, how long must you keep most business records?",
+     "options": [
+      "2 years",
+      "5 years",
+      "3 years",
+      "7 years"
+     ],
+     "correctIndex": 1,
+     "points": 1
+    },
+    {
+     "questionText": "Per ASIC, when must a sole trader register a business name?",
+     "options": [
+      "When their turnover passes $75,000",
+      "When trading under another name",
+      "When they hire an employee",
+      "When they register for GST"
+     ],
+     "correctIndex": 1,
+     "points": 1
+    },
+    {
+     "questionText": "Per ASIC, which registration periods are offered for a business name?",
+     "options": [
+      "2 years or 5 years",
+      "1 year or 10 years",
+      "1 year or 3 years",
+      "6 months or 1 year"
+     ],
+     "correctIndex": 2,
+     "points": 1
+    },
+    {
+     "questionText": "Per the ATO, by when must you give a requested tax invoice over $82.50?",
+     "options": [
+      "Within 7 days",
+      "Within 28 days",
+      "Within 90 days",
+      "Within 12 months"
+     ],
+     "correctIndex": 1,
+     "points": 1
+    },
+    {
+     "questionText": "Per the ATO, what extra detail does a tax invoice of $1,000 or more need?",
+     "options": [
+      "The buyer's date of birth",
+      "The seller's current bank balance",
+      "The seller's TFN and address",
+      "The buyer's identity or ABN"
+     ],
+     "correctIndex": 3,
+     "points": 1
+    },
+    {
+     "questionText": "Per business.gov.au, what does portable equipment insurance cover?",
+     "options": [
+      "Loss, damage or theft of tools",
+      "Injury you cause to a customer",
+      "Part of your lost weekly income",
+      "Damage to the whole client home"
+     ],
+     "correctIndex": 0,
+     "points": 1
+    },
+    {
+     "questionText": "Per Safe Work Australia, is a self-employed person running a business a PCBU?",
+     "options": [
+      "No, only employers are PCBUs",
+      "No, only with three workers",
+      "No, only company owners are",
+      "Yes, they are a PCBU"
+     ],
+     "correctIndex": 3,
+     "points": 1
+    },
+    {
+     "questionText": "Per the ATO, what is the super guarantee rate from 1 July 2025?",
+     "options": [
+      "10%",
+      "11%",
+      "12%",
+      "9.5%"
+     ],
+     "correctIndex": 2,
+     "points": 1
+    },
+    {
+     "questionText": "In this course, which order is correct for the job admin loop?",
+     "options": [
+      "Enquiry, quote, booking, invoice",
+      "Quote, enquiry, invoice, booking",
+      "Booking, invoice, enquiry, quote",
+      "Invoice, booking, quote, enquiry"
+     ],
+     "correctIndex": 0,
+     "points": 1
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,103 @@
+{
+ "version": 1,
+ "courseSlug": "social-media-marketing",
+ "quizzes": [
+  {
+   "quizId": "201d893b-204a-4033-8947-bf6fb20c7212",
+   "lessonTitle": "Final knowledge check",
+   "title": "Introduction to Social Media Marketing — Knowledge Check",
+   "passPercentage": 80,
+   "attemptsAllowed": 3,
+   "questions": [
+    {
+     "questionText": "Per business.gov.au, how many social media channels should a small business use well?",
+     "options": [
+      "5 or 6",
+      "7 or 8",
+      "1 or 2",
+      "9 or 10"
+     ],
+     "correctIndex": 2,
+     "points": 1
+    },
+    {
+     "questionText": "Per business.gov.au, which network is good for reaching professionals?",
+     "options": [
+      "TikTok",
+      "LinkedIn",
+      "Snapchat",
+      "Pinterest"
+     ],
+     "correctIndex": 1,
+     "points": 1
+    },
+    {
+     "questionText": "Per business.gov.au, should you delete a fair but negative public review?",
+     "options": [
+      "No, respond to it",
+      "Yes, delete it now",
+      "Yes, after a week",
+      "Yes, if it hurts"
+     ],
+     "correctIndex": 0,
+     "points": 1
+    },
+    {
+     "questionText": "Per business.gov.au, how often should you check your channels for messages?",
+     "options": [
+      "At least once a day",
+      "At least once a fortnight",
+      "At least once a month",
+      "At least once a quarter"
+     ],
+     "correctIndex": 0,
+     "points": 1
+    },
+    {
+     "questionText": "Per this course, what is the cost per booked job for $150 spent and 3 bookings?",
+     "options": [
+      "$30",
+      "$75",
+      "$50",
+      "$15"
+     ],
+     "correctIndex": 2,
+     "points": 1
+    },
+    {
+     "questionText": "Per business.gov.au, how often should you post on most platforms?",
+     "options": [
+      "3 to 5 times a year",
+      "3 to 5 times a day",
+      "1 to 2 times a month",
+      "3 to 5 times a week"
+     ],
+     "correctIndex": 3,
+     "points": 1
+    },
+    {
+     "questionText": "Per this course, which ad type suits quote requests?",
+     "options": [
+      "Reach ads",
+      "Lead ads",
+      "Like ads",
+      "Event ads"
+     ],
+     "correctIndex": 1,
+     "points": 1
+    },
+    {
+     "questionText": "Per business.gov.au, what must you avoid in social media posts?",
+     "options": [
+      "Photos of completed jobs",
+      "Your service area hours",
+      "Replies to customer comments",
+      "False or misleading claims"
+     ],
+     "correctIndex": 3,
+     "points": 1
+    }
+   ]
+  }
+ ]
+}
