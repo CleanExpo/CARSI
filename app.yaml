@@ -72,9 +72,9 @@ services:
 
       - key: ADMIN_EMAIL
         scope: RUN_TIME
-      # Extra admin-panel emails (comma-separated) beyond the hardcoded founder
-      # accounts in src/lib/admin/admin-panel-access.ts. Optional — set here to
-      # grant a new admin the /admin panel without a code change.
+      # Extra staff emails (comma-separated) that unverified signup must refuse,
+      # beyond the founder accounts in src/lib/admin/admin-panel-access.ts. Grants
+      # NO access: LMS admin is the database role only (lms_user_roles 'admin').
       - key: ADMIN_PANEL_EMAILS
         scope: RUN_TIME
       - key: ADMIN_PASSWORD
