@@ -98,8 +98,13 @@ export const ccwRoadshowEvents: CcwRoadshowEvent[] = [
     startDateIso: '2026-07-22T08:30:00+10:00',
     endDateIso: '2026-07-23T16:30:00+10:00',
     timeLabel: '8.30am-4.30pm both days',
-    venueName: 'Club Kilsyth',
-    streetAddress: '1-15 Canterbury Road',
+    // Founder decision 19/10/2026: "Just use the CCW actual locations please". Address
+    // from CCW's contact page (ccwonline.com.au/pages/contact-us, read 19/10/2026). The
+    // 22-23 July 2026 sitting itself was moved to Club Kilsyth, 1-15 Canterbury Road
+    // (#612, 15/07/2026); that history lives in git and in the per-email venue snapshot
+    // stored on each CcwRoadshowEmailLog row, which this change does not touch.
+    venueName: 'Carpet Cleaners Warehouse Melbourne',
+    streetAddress: 'Unit 1/5 Gatwick Road',
     suburb: 'Bayswater North',
     suburbStatePostcode: 'Bayswater North VIC 3153',
     state: 'VIC',
@@ -263,6 +268,66 @@ export const ccwRoadshowCampaignPillars = {
 export function getCcwRoadshowEvent(slug: string | null | undefined) {
   const normalized = slug?.trim().toLowerCase();
   return ccwRoadshowEvents.find((event) => event.slug === normalized) ?? null;
+}
+
+const ccwRoadshowOrganisers = [
+  { '@type': 'Organization', name: 'CARSI', url: 'https://carsi.com.au' },
+  { '@type': 'Organization', name: 'Carpet Cleaners Warehouse', url: 'https://ccwonline.com.au' },
+];
+
+/**
+ * schema.org Event JSON-LD for one roadshow session, or null when it must not be marked up.
+ *
+ * Fails closed: a session that has started (or finished) gets no Event markup, and neither does
+ * one whose address line lacks a postcode. CARSI and CCW are separate organisers (CCW co-presents
+ * and sells the paid seats); the CCW store is the Place. An Offer is emitted only when the session
+ * carries a real price in `unitAmountCents` - never a guessed or free one.
+ * Google requirements: developers.google.com/search/docs/appearance/structured-data/event
+ * (last updated 2026-09-08, read 19/10/2026).
+ */
+export function buildCcwRoadshowEventJsonLd(
+  event: CcwRoadshowEvent,
+  { now, url, image }: { now: Date; url: string; image?: string },
+): Record<string, unknown> | null {
+  if (!(Date.parse(event.startDateIso) > now.getTime())) return null;
+  const postalCode = /\b(\d{4})$/.exec(event.suburbStatePostcode)?.[1];
+  if (!postalCode) return null;
+
+  const schema: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'Event',
+    name: event.title,
+    description: event.description,
+    startDate: event.startDateIso,
+    endDate: event.endDateIso,
+    eventStatus: 'https://schema.org/EventScheduled',
+    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+    inLanguage: 'en-AU',
+    url,
+    organizer: ccwRoadshowOrganisers,
+    location: {
+      '@type': 'Place',
+      name: event.venueName,
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: event.streetAddress,
+        addressLocality: event.suburb,
+        addressRegion: event.state,
+        postalCode,
+        addressCountry: 'AU',
+      },
+    },
+  };
+  if (image) schema.image = image;
+  if (event.unitAmountCents !== undefined && event.unitAmountCents > 0) {
+    schema.offers = {
+      '@type': 'Offer',
+      url: event.bookingUrl ?? url,
+      price: (event.unitAmountCents / 100).toFixed(2),
+      priceCurrency: 'AUD',
+    };
+  }
+  return schema;
 }
 
 export function getCcwRoadshowEventPath(event: CcwRoadshowEvent): string {

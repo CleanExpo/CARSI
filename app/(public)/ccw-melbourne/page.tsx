@@ -11,6 +11,10 @@ const siteUrl = getPublicSiteUrl();
 // Melbourne is still on the free-entry rail, so its free copy stays true.
 const melbourneDates = getCcwRoadshowEvent('melbourne')?.dates ?? '';
 
+// Event JSON-LD is emitted only for sessions still to come, so re-render hourly; a static
+// build would otherwise keep a finished session marked EventScheduled until the next deploy.
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: `CARSI x CCW Melbourne | Grow Your Cleaning Business — ${melbourneDates}`,
   description: `Free for CCW past and current customers. Two practical business-growth days with Phill McGurk at Carpet Cleaners Warehouse Melbourne (Bayswater North), ${melbourneDates}. Claim your free entry token.`,

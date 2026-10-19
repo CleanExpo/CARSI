@@ -12,10 +12,12 @@ import {
 } from '@/components/landing/public-shell-width';
 import { CcwEventNav } from '@/components/marketing/CcwEventNav';
 import { CcwRoadshowBooking } from '@/components/marketing/CcwRoadshowBooking';
-import { BreadcrumbSchema, EventSchema, FAQSchema, ItemListSchema } from '@/components/seo';
+import { BreadcrumbSchema, FAQSchema, ItemListSchema } from '@/components/seo';
 import { getPublicSiteUrl } from '@/lib/env/public-url';
+import { serializeJsonLd } from '@/lib/seo/json-ld';
 import {
   allowsFreeEntryRegistration,
+  buildCcwRoadshowEventJsonLd,
   ccwRoadshowCampaignPillars,
   ccwRoadshowEvents,
   ccwRoadshowFacilityAdvantages,
@@ -74,6 +76,16 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
   const focusEvent = focusSlug ? getCcwRoadshowEvent(focusSlug) : null;
   const currentHref = focusEvent ? getCcwRoadshowEventPath(focusEvent) : ccwRoadshowPath;
   const schemaEvents = focusEvent ? [focusEvent] : ccwRoadshowEvents;
+  // Event markup only for sessions still to come; past sessions carry none.
+  const now = new Date();
+  const eventSchemas = schemaEvents.flatMap((event) => {
+    const schema = buildCcwRoadshowEventJsonLd(event, {
+      now,
+      url: `${siteUrl}${getCcwRoadshowEventPath(event)}`,
+      image: `${siteUrl}/og-image.png`,
+    });
+    return schema ? [schema] : [];
+  });
   const pageFaqs = focusEvent?.bookingUrl ? [
     faqs[0],
     { question: 'How much does it cost?', answer: `Seats are booked through Carpet Cleaners Warehouse.${focusEvent.unitAmountCents !== undefined ? ` ${formatAudFromCents(focusEvent.unitAmountCents)} including GST per person.` : ''}${focusEvent.giftCardAmountCents !== undefined ? ` One ${formatAudFromCents(focusEvent.giftCardAmountCents)} CCW gift card per registration, redeemable after the course.` : ''}${focusEvent.maxRegistrationsPerCustomer !== undefined ? ` Maximum ${focusEvent.maxRegistrationsPerCustomer} registrations per customer.` : ''}` },
@@ -94,24 +106,11 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
           url: `${canonical}?event=${event.slug}`,
         }))}
       />
-      {schemaEvents.map((event) => (
-        <EventSchema
-          key={event.slug}
-          name={event.title}
-          description={event.description}
-          startDate={event.startDateIso}
-          endDate={event.endDateIso}
-          url={`${canonical}?event=${event.slug}`}
-          locationName={event.venueName}
-          locationAddress={event.streetAddress}
-          locationCity={event.suburb}
-          locationState={event.state}
-          organiserName="CARSI and Carpet Cleaners Warehouse"
-          organiserUrl="https://www.carsi.com.au"
-          ticketUrl={event.bookingUrl ?? canonical}
-          isFree={allowsFreeEntryRegistration(event)}
-          image={`${siteUrl}/og-image.png`}
-          eventType="BusinessEvent"
+      {eventSchemas.map((schema) => (
+        <script
+          key={String(schema.url)}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(schema) }}
         />
       ))}
 

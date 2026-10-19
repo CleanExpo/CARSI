@@ -17,6 +17,10 @@ const brisbanePrice = brisbane?.unitAmountCents !== undefined
   ? `${formatAudFromCents(brisbane.unitAmountCents)} including GST; `
   : '';
 
+// Event JSON-LD is emitted only for sessions still to come, so re-render hourly; a static
+// build would otherwise keep a finished session marked EventScheduled until the next deploy.
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: `CARSI x CCW Brisbane | Carpet and Upholstery Training - ${brisbaneDates}`,
   description:

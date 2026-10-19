@@ -1,5 +1,5 @@
 import { renderToStaticMarkup } from 'react-dom/server';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/components/landing/HomeFaqSection', () => ({ HomeFaqSection: () => null }));
 vi.mock('@/components/landing/HomeFinalCtaSection', () => ({ HomeFinalCtaSection: () => null }));
@@ -34,5 +34,39 @@ describe('October Brisbane public presentation', () => {
     expect(markup).toContain('D1-3/194 Zillmere Road');
     expect(markup).not.toContain('$200');
     expect(markup).not.toContain('Claim your free entry token');
+  });
+});
+
+describe('Event structured data on the roadshow pages', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  function eventBlocks(markup: string) {
+    return [...markup.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)]
+      .map((m) => JSON.parse(m[1]) as Record<string, unknown>)
+      .filter((block) => block['@type'] === 'Event');
+  }
+
+  it('emits no Event JSON-LD on any CCW page once every session is in the past', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-10-19T00:00:00Z'));
+    for (const focusSlug of [undefined, 'melbourne', 'sydney', 'brisbane', 'brisbane-2026-10-09']) {
+      const markup = renderToStaticMarkup(<CcwRoadshowContent focusSlug={focusSlug} />);
+      expect(eventBlocks(markup)).toHaveLength(0);
+    }
+  });
+
+  it('marks up an upcoming Melbourne session at the CCW store with separate organisers', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-07-01T00:00:00Z'));
+    const [block, ...rest] = eventBlocks(renderToStaticMarkup(<CcwRoadshowContent focusSlug="melbourne" />));
+    expect(rest).toHaveLength(0);
+    expect(block).toMatchObject({
+      organizer: [{ name: 'CARSI' }, { name: 'Carpet Cleaners Warehouse' }],
+      location: { address: { streetAddress: 'Unit 1/5 Gatwick Road', postalCode: '3153' } },
+    });
+    expect(String(block.url)).toMatch(/\/ccw-melbourne$/);
+    expect(block).not.toHaveProperty('offers');
   });
 });

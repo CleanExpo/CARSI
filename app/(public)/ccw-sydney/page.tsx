@@ -12,6 +12,10 @@ const siteUrl = getPublicSiteUrl();
 // never match a July one. Reading the event removes the whole class.
 const sydneyDates = getCcwRoadshowEvent('sydney')?.dates ?? '';
 
+// Event JSON-LD is emitted only for sessions still to come, so re-render hourly; a static
+// build would otherwise keep a finished session marked EventScheduled until the next deploy.
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: `CARSI x CCW Sydney | Grow Your Cleaning Business — ${sydneyDates}`,
   description: `Two practical business-growth days with Phill McGurk at Carpet Cleaners Warehouse Sydney (Seven Hills), ${sydneyDates}. Seats are booked through Carpet Cleaners Warehouse.`,
