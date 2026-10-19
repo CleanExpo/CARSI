@@ -44,6 +44,12 @@ const CLAIM_PATTERN = new RegExp(
     '\\b(kills?|eliminates?|destroys?|eradicates?)\\b',
     '\\bproven\\b',
     '99[.,]9{2,}\\s*(?:%|per\\s?cent)?',
+    // review r5 additions
+    'prevent\\w* the spread',
+    'stay healthy',
+    'control\\w* allergens',
+    'guarantee\\w*',
+    '100\\s?%',
   ].join('|'),
   'i',
 );
@@ -92,6 +98,12 @@ describe('NeoSan Labs course claim compliance (review r2/r3)', () => {
       '<p>Eliminates 99.99999% of germs.</p>',
       '<p>Destroys mould spores.</p>',
       '<p>Eradicates viruses.</p>',
+      // review r5 controls
+      '<p>They prevent the spread of infectious disease.</p>',
+      '<p>Helping us to stay healthy.</p>',
+      '<p>Control allergens, such as dust and mould.</p>',
+      '<p>We guarantee results.</p>',
+      '<p>100% effective against germs.</p>',
     ];
     expect(unattributedClaims(controls)).toHaveLength(controls.length);
   });
