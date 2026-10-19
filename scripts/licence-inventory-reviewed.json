@@ -103,5 +103,12 @@
     "contains": "IICRC CEC course content",
     "class": "owned-elsewhere",
     "reason": "reviews thread owns testimonials; reported to Phill"
+  },
+  {
+    "file": "src/lib/cec-display.ts",
+    "line": 26,
+    "contains": "return `${label} CEC${label === '1' ? '' : 's'}`;",
+    "class": "legitimate",
+    "reason": "GP-639 count label: renders only the number of CEC hours already resolved from the approvals record, as '1 CEC' or 'N CECs'; it makes no accreditation, offer or certification claim and returns null when hours are missing"
   }
 ]

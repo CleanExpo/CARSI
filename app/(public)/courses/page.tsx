@@ -238,7 +238,7 @@ export default async function CoursesPage({
                 href="/courses?discipline=iicrc-cec#catalogue"
                 className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-[#146fc2]/30 bg-white px-7 text-sm font-semibold text-[#146fc2] transition hover:border-[#146fc2]/60 focus-visible:ring-2 focus-visible:ring-[#2490ed]/35 focus-visible:outline-none"
               >
-                {cecApprovedCount} IICRC CEC Accredited course{cecApprovedCount !== 1 ? 's' : ''}
+                IICRC CEC Accredited courses ({cecApprovedCount})
               </Link>
             ) : null}
             <Link
