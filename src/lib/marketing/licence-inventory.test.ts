@@ -32,6 +32,8 @@ type Hit = { file: string; line: number; term: string; cls: string; reason: stri
 
 const INDUSTRY = 'app/(public)/industries/x/page.tsx';
 const PUBLIC = 'src/components/x.tsx';
+const HERO = 'app/(public)/courses/page.tsx';
+const COST_PAGE = 'app/(public)/restoration-training-cost-australia/page.tsx';
 const GUIDE_PDF = 'public/downloads/carsi-government-contractor-guide.pdf';
 const GUIDE_MD = 'docs/marketing/lead-magnets/government-contractor-guide.md';
 const CODE = 'W' + 'RT'; // assembled so this file never spells the banned construction
@@ -201,6 +203,10 @@ describe('licence inventory', () => {
       'CARSI offers IICRC CEC Accredited courses in mould assessment, remediation and indoor air quality.',
     ],
     ['certif', PUBLIC, 'The 3 water categories every restorer must know. Get certified.'],
+    // review of 82c76152 (GP-639): the /courses hero label with "certification" swapped in passed
+    // as a third-person certification-course comparison. Assembled: never spell it in source.
+    ['certif', HERO, 'IICRC ' + 'certification courses (27)'],
+    ['certif', HERO, 'IICRC' + '\u00a0certification training'],
   ])('controls: %s fires in %s: %s', (term, file, text) => {
     expect(classifyCopy(file, term, text)[0]).toBe('exposure');
   });
@@ -235,6 +241,12 @@ describe('licence inventory', () => {
     ['repair', PUBLIC, 'Burst pipe repair costs are covered by the insurer.'],
     ['iicrc-code', GUIDE_PDF, 'Odor Control Technician OCT Specialist skill for fire damage.'],
     ['count-claim', GUIDE_PDF, 'Staff: 14 (8 technicians, 3 project managers, 3 admin)'],
+    ['CEC', HERO, 'IICRC CEC Accredited courses (27)'],
+    [
+      'certif',
+      COST_PAGE,
+      'A certification course and a continuing education course are not competing products.',
+    ],
   ])('negative controls: %s stays legitimate in %s: %s', (term, file, text) => {
     expect(classifyCopy(file, term, text)[0]).toBe('legitimate');
   });
