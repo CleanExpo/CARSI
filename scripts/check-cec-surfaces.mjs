@@ -136,6 +136,19 @@ function isExempt(f) {
   return ACCESSOR_ALLOWLIST.some((e) => n === e || n.endsWith('/' + e));
 }
 
+/**
+ * Scan `files` the way CI does: keep code files under the scanned dirs, drop exempt ones (tests,
+ * __tests__, fixtures, the accessor cluster), and evaluate the rest. `read(file)` returns its text.
+ * Test fixtures on a recognition path may therefore name CEC; the self-test pins that.
+ */
+export function scanFiles(files, read) {
+  const findings = [];
+  for (const file of files.filter((f) => f && CODE_EXT.test(f) && inScope(f) && !isExempt(f))) {
+    findings.push(...evaluateFile(file, read(file)));
+  }
+  return findings;
+}
+
 function propName(nameNode) {
   if (!nameNode) return undefined;
   if (ts.isIdentifier(nameNode) || ts.isPrivateIdentifier(nameNode)) return nameNode.text;
@@ -490,21 +503,18 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
     console.error('check-cec-surfaces: failed to list tracked files:', err.message);
     process.exit(1);
   }
-  const findings = [];
-  for (const file of list
-    .split('\n')
-    .map((f) => f.trim())
-    .filter((f) => f && CODE_EXT.test(f) && inScope(f) && !isExempt(f))) {
-    let text = '';
-    try {
-      text = readFileSync(file, 'utf8');
-    } catch (err) {
-      // Fail LOUD — a file we cannot read is a blind spot, not a pass.
-      console.error(`✖ CEC surface-leak guard — cannot read ${file}: ${err.message}`);
-      process.exit(1);
+  const findings = scanFiles(
+    list.split('\n').map((f) => f.trim()),
+    (file) => {
+      try {
+        return readFileSync(file, 'utf8');
+      } catch (err) {
+        // Fail LOUD — a file we cannot read is a blind spot, not a pass.
+        console.error(`✖ CEC surface-leak guard — cannot read ${file}: ${err.message}`);
+        process.exit(1);
+      }
     }
-    findings.push(...evaluateFile(file, text));
-  }
+  );
 
   if (findings.length > 0) {
     console.error(`\n✖ CEC surface-leak guard failed — ${findings.length} leaking surface(s)\n`);

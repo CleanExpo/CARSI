@@ -10,7 +10,7 @@ import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-import { evaluateFile } from './check-cec-surfaces.mjs';
+import { evaluateFile, scanFiles } from './check-cec-surfaces.mjs';
 import { IICRC_CODES } from './iicrc-codes.mjs';
 
 // Each MUST_BLOCK case (scanned as its own source) must produce at least one finding.
@@ -145,6 +145,32 @@ for (const code of IICRC_CODES) {
     }
   } finally {
     rmSync(tmp, { recursive: true, force: true });
+  }
+}
+
+// File selection, through the same scanFiles() the CLI runs (review r5 of 4922646f): a test or
+// __tests__ file on a recognition path is NOT scanned, so its fixtures may name CEC; the same
+// text in an ordinary recognition file IS flagged. Pins the exclusion at isExempt().
+{
+  const word = "export const label = 'Approved IICRC CEC hours';\n";
+  const tree = {
+    'src/lib/gamification/badges.test.tsx': word,
+    'src/lib/gamification/badges.spec.ts': word,
+    'src/lib/gamification/__tests__/badges.ts': word,
+    'app/(dashboard)/dashboard/student/leaderboard/page.test.tsx': word,
+    'src/lib/gamification/badges.ts': word,
+  };
+  const findings = scanFiles(Object.keys(tree), (f) => tree[f]);
+  const flagged = new Set(findings.map((l) => l.trim().split(':')[0]));
+  for (const f of Object.keys(tree).filter((x) => x !== 'src/lib/gamification/badges.ts')) {
+    if (flagged.has(f)) {
+      console.error(`✖ MUST NOT SCAN but flagged: test file on a recognition path ${f}`);
+      failed++;
+    }
+  }
+  if (!flagged.has('src/lib/gamification/badges.ts')) {
+    console.error('✖ MUST BLOCK but passed: CEC wording in a non-test recognition file via scanFiles');
+    failed++;
   }
 }
 
