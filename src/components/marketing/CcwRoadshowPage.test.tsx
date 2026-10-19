@@ -106,6 +106,17 @@ describe('past sittings are not presented as upcoming', () => {
     expect(markup).toContain('Past session');
   });
 
+  it('treats the focused sitting as past even while other cities still have sittings ahead', () => {
+    vi.useFakeTimers();
+    // Melbourne (July) has ended; Sydney and Brisbane (October) have not.
+    vi.setSystemTime(new Date('2026-10-01T00:00:00Z'));
+    const markup = renderToStaticMarkup(<CcwRoadshowContent focusSlug="melbourne" />);
+    expect(markup).toContain('Next Melbourne dates: to be announced');
+    expect(markup).toContain(melbourneInterestHref);
+    expect(markup).not.toContain(' · 22-23 July 2026');
+    expect(markup).not.toContain('Claim your free entry token');
+  });
+
   it('still shows the July dates and the free-entry form before the sitting ends', () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2026-07-01T00:00:00Z'));
