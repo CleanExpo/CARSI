@@ -158,7 +158,6 @@ function CredentialCard({ credential }: { credential: CredentialOut }) {
         <div className="mt-6">
           <LinkedInShareButton
             courseTitle={credential.course_title}
-            iicrcDiscipline={credential.iicrc_discipline ?? ''}
             issuedYear={
               Number.isNaN(issuedDate.getTime())
                 ? new Date().getFullYear()

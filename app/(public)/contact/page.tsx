@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import { ContactForm, type ContactLeadContext } from '@/components/contact/ContactForm';
+import { CARSI_SOCIAL_PROFILES } from '@/lib/brand/social-profiles';
 import { resolveCcwInterestPageUrl } from '@/lib/marketing/ccw-roadshow';
 
 type ContactPageProps = {
@@ -180,15 +181,10 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
             <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
               <h2 className="text-sm font-semibold text-slate-950">Connect with us</h2>
               <div className="mt-4 grid gap-2">
-                {[
-                  { label: 'Facebook', href: 'https://www.facebook.com/CARSIaus' },
-                  { label: 'YouTube', href: 'https://www.youtube.com/channel/UC3HpNvGJXivLGoPo4m7Qleg/featured' },
-                  { label: 'LinkedIn', href: 'https://www.linkedin.com/company/carsiaus' },
-                  { label: 'Podcast', href: 'https://open.spotify.com/show/4FVBn8Cfyx2jOx0m4MksuG' },
-                ].map((social) => (
+                {CARSI_SOCIAL_PROFILES.map((social) => (
                   <a
-                    key={social.label}
-                    href={social.href}
+                    key={social.id}
+                    href={social.url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:border-[#2490ed]/35 hover:text-[#146fc2]"

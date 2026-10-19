@@ -22,6 +22,18 @@
  *      serialise it into an output without any property read; or
  *   3. use `iicrcDiscipline` / `iicrc_discipline` as a CEC / eligibility boolean (a non-empty
  *      discipline is NOT IICRC approval — that was the fail-open leak, GP-498).
+ *   4. on a RECOGNITION surface (gamification: XP, levels, leaderboard, achievements; and the
+ *      LinkedIn credential share), mention CEC at all, or carry an IICRC discipline field or
+ *      acronym. Gamification must never award, display or imply CEC hours, and the designation
+ *      rule bans naming a CARSI course or certificate with an IICRC discipline acronym. Found
+ *      19/10/2026: an "Approved IICRC CEC hours" achievement, a leaderboard filtered by WRT/ASD
+ *      codes and a LinkedIn certificate named "Title (WRT)" all passed rules 1-3.
+ *   5. in a NON-test source file, import a test path (.test. / .spec. / __tests__ / __fixtures__)
+ *      by static import, export-from, dynamic import(), require() or import = require(). Test
+ *      files are exempt by name, so a served "Badge.test.tsx" would otherwise carry CEC wording
+ *      past every rule above (review r6 of efa6e0be). __tests__ folders are already unroutable:
+ *      Next.js treats _-prefixed folders as private (node_modules/next/dist/docs/01-app/
+ *      01-getting-started/02-project-structure.md, "Private folders").
  * The resolved display value flows as the snake_case DTO field `cec_hours` (the gate output)
  * or under the distinct name `resolvedCecHours` / `cecHoursLabel`, and is not scanned.
  *
@@ -53,8 +65,31 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
 
+import { IICRC_CODE_ALT } from './iicrc-codes.mjs';
+
 const RAW_FIELD = 'cecHours';
 const DISCIPLINE_NAMES = new Set(['iicrcDiscipline', 'iicrc_discipline']);
+
+/** Rule 4 scope: gamification and credential-share code, found by path so new files join it. */
+const RECOGNITION_SURFACE = /leaderboard|gamification|achievement|learner-xp|linkedin/i;
+/** The renewal summary sits under /gamification/ but is the registry-backed CEC renewal surface. */
+const RECOGNITION_EXEMPT = ['app/api/lms/gamification/me/renewal-summary/route.ts'];
+const RECOGNITION_CEC_IDENT = /cec/i;
+const RECOGNITION_CEC_TEXT = /\bCECs?\b|continuing education/i;
+// Codes come only from the shared list, data/iicrc-codes.json via scripts/iicrc-codes.mjs (never a
+// private copy). Case-insensitive, so "Wrt" or
+// "hst" is caught (review r3 of ee2d5120); word boundaries keep "October" or "science" clean. A
+// bare "Oct" on a recognition surface is therefore blocked: write the month in full there.
+const RECOGNITION_DISCIPLINE_TEXT = new RegExp(
+  `iicrc_?discipline|\\b(?:${IICRC_CODE_ALT})\\b`,
+  'i'
+);
+
+export function isRecognitionSurface(file) {
+  const n = file.replace(/\\/g, '/');
+  if (RECOGNITION_EXEMPT.some((e) => n === e || n.endsWith('/' + e))) return false;
+  return RECOGNITION_SURFACE.test(n);
+}
 
 /** Application code to scan. Components and lib live under src/ in this repo; the extra
  *  top-level dirs are included defensively in case that ever changes. */
@@ -100,11 +135,68 @@ function inScope(f) {
   const n = f.replace(/\\/g, '/');
   return SCANNED_DIRS.some((d) => n.startsWith(d));
 }
+/**
+ * A test file or folder: `.test.` / `.spec.` in the BASENAME (a specifier may omit the extension,
+ * './Badge.test'), or a whole `__tests__` / `__fixtures__` path segment. Never a match anywhere
+ * in the path: app/cec.test.public/page.tsx is a routable page, not a test (review r7 of 1f54c344).
+ * Unit tests exercise the accessors directly, so test files are exempt from rules 1-4.
+ */
+function isTestPath(f) {
+  const segments = f.replace(/\\/g, '/').split('/');
+  const base = segments[segments.length - 1];
+  if (/\.(?:test|spec)(?:\.|$)/.test(base)) return true;
+  return segments.some((s) => s === '__tests__' || s === '__fixtures__');
+}
 function isExempt(f) {
   const n = f.replace(/\\/g, '/');
-  if (/(?:\.test\.|\.spec\.)/.test(n)) return true; // unit tests exercise the accessors directly
-  if (/(?:^|\/)__tests__\//.test(n) || /(?:^|\/)__fixtures__\//.test(n)) return true;
+  if (isTestPath(n)) return true;
   return ACCESSOR_ALLOWLIST.some((e) => n === e || n.endsWith('/' + e));
+}
+
+/** Rule 5: every import of a test path from `file`, as findings. Only literal specifiers are seen. */
+export function testImportFindings(file, text) {
+  const isTsx = /\.(tsx|jsx)$/.test(file);
+  const sf = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true, isTsx ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
+  const out = [];
+  const check = (node, spec) => {
+    if (spec && (ts.isStringLiteral(spec) || ts.isNoSubstitutionTemplateLiteral(spec)) && isTestPath(spec.text)) {
+      const line = sf.getLineAndCharacterOfPosition(node.getStart(sf)).line + 1;
+      out.push(
+        `  ${file}:${line}: imports a test path ('${spec.text}') — test files are exempt by name, so production ` +
+          'code must not import one (move shared code to a non-test module).'
+      );
+    }
+  };
+  (function visit(node) {
+    if ((ts.isImportDeclaration(node) || ts.isExportDeclaration(node)) && node.moduleSpecifier) {
+      check(node, node.moduleSpecifier);
+    } else if (ts.isImportEqualsDeclaration(node) && ts.isExternalModuleReference(node.moduleReference)) {
+      check(node, node.moduleReference.expression);
+    } else if (
+      ts.isCallExpression(node) &&
+      (node.expression.kind === ts.SyntaxKind.ImportKeyword ||
+        (ts.isIdentifier(node.expression) && node.expression.text === 'require'))
+    ) {
+      check(node, node.arguments[0]);
+    }
+    ts.forEachChild(node, visit);
+  })(sf);
+  return out;
+}
+
+/**
+ * Scan `files` the way CI does: keep code files under the scanned dirs, drop exempt ones (tests,
+ * __tests__, fixtures, the accessor cluster), and evaluate the rest. `read(file)` returns its text.
+ * Test fixtures on a recognition path may therefore name CEC; the self-test pins that.
+ */
+export function scanFiles(files, read) {
+  const findings = [];
+  for (const file of files.filter((f) => f && CODE_EXT.test(f) && inScope(f) && !isTestPath(f))) {
+    const text = read(file);
+    findings.push(...testImportFindings(file, text));
+    if (!isExempt(file)) findings.push(...evaluateFile(file, text));
+  }
+  return findings;
 }
 
 function propName(nameNode) {
@@ -257,6 +349,13 @@ export function evaluateFile(file, text) {
   const discMsg =
     'iicrcDiscipline used as a CEC/eligibility signal — eligibility must come from registry-approved ' +
     'hours (courseEligibleForIicrcCecSubmission), not discipline truthiness.';
+  const recognitionCecMsg =
+    'CEC on a gamification/share surface — XP, levels, leaderboards, achievements and LinkedIn shares must ' +
+    'never award, display or imply CEC hours; show CEC only on the registry-backed credentials/renewal surfaces.';
+  const recognitionDiscMsg =
+    'IICRC discipline field or acronym on a gamification/share surface — name and filter by CARSI course or ' +
+    'designation, never an IICRC discipline code (designation rule, CLAUDE.md).';
+  const recognition = isRecognitionSurface(file);
 
   function push(node, msg) {
     findings.push(`  ${file}:${lineOf(node)}: ${msg}\n    → ${snip(node)}`);
@@ -303,6 +402,23 @@ export function evaluateFile(file, text) {
   }
 
   function visit(node) {
+    // 6. recognition surface (rule 4 in the header): no CEC, no IICRC discipline field or acronym.
+    if (recognition) {
+      if (ts.isIdentifier(node) || ts.isPrivateIdentifier(node)) {
+        if (DISCIPLINE_NAMES.has(node.text)) push(node, recognitionDiscMsg);
+        else if (RECOGNITION_CEC_IDENT.test(node.text)) push(node, recognitionCecMsg);
+      } else if (
+        ts.isStringLiteralLike(node) ||
+        ts.isTemplateHead(node) ||
+        ts.isTemplateMiddle(node) ||
+        ts.isTemplateTail(node) ||
+        ts.isJsxText(node)
+      ) {
+        if (RECOGNITION_DISCIPLINE_TEXT.test(node.text)) push(node, recognitionDiscMsg);
+        else if (RECOGNITION_CEC_TEXT.test(node.text)) push(node, recognitionCecMsg);
+      }
+    }
+
     // 1. member read: X.cecHours
     if (ts.isPropertyAccessExpression(node) && node.name.text === RAW_FIELD) {
       push(node, rawMsg);
@@ -437,21 +553,18 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
     console.error('check-cec-surfaces: failed to list tracked files:', err.message);
     process.exit(1);
   }
-  const findings = [];
-  for (const file of list
-    .split('\n')
-    .map((f) => f.trim())
-    .filter((f) => f && CODE_EXT.test(f) && inScope(f) && !isExempt(f))) {
-    let text = '';
-    try {
-      text = readFileSync(file, 'utf8');
-    } catch (err) {
-      // Fail LOUD — a file we cannot read is a blind spot, not a pass.
-      console.error(`✖ CEC surface-leak guard — cannot read ${file}: ${err.message}`);
-      process.exit(1);
+  const findings = scanFiles(
+    list.split('\n').map((f) => f.trim()),
+    (file) => {
+      try {
+        return readFileSync(file, 'utf8');
+      } catch (err) {
+        // Fail LOUD — a file we cannot read is a blind spot, not a pass.
+        console.error(`✖ CEC surface-leak guard — cannot read ${file}: ${err.message}`);
+        process.exit(1);
+      }
     }
-    findings.push(...evaluateFile(file, text));
-  }
+  );
 
   if (findings.length > 0) {
     console.error(`\n✖ CEC surface-leak guard failed — ${findings.length} leaking surface(s)\n`);

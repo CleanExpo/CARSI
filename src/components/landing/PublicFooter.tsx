@@ -9,6 +9,7 @@ import {
 } from '@/components/landing/public-shell-width';
 import { PublicLogo } from '@/components/landing/PublicLogo';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
+import { CARSI_SOCIAL_PROFILES } from '@/lib/brand/social-profiles';
 
 /**
  * Shared public footer. Design-led site closure with full platform navigation.
@@ -64,18 +65,7 @@ const eventLinks = [
 const RESTOREASSIST_URL = 'https://restoreassist.app';
 const RESTOREASSIST_EXPLAINER_URL = 'https://restoreassist.app/#overview';
 
-const socialLinks = [
-  { label: 'Facebook', href: 'https://www.facebook.com/CARSIaus' },
-  {
-    label: 'YouTube',
-    href: 'https://www.youtube.com/channel/UC3HpNvGJXivLGoPo4m7Qleg/featured',
-  },
-  { label: 'LinkedIn', href: 'https://www.linkedin.com/company/carsiaus' },
-  {
-    label: 'Spotify',
-    href: 'https://open.spotify.com/show/4FVBn8Cfyx2jOx0m4MksuG',
-  },
-];
+const socialLinks = CARSI_SOCIAL_PROFILES.map((p) => ({ label: p.label, href: p.url }));
 
 function FooterSectionLabel({ children }: { children: ReactNode }) {
   return (

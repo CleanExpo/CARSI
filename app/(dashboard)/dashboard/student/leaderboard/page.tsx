@@ -6,7 +6,6 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { ErrorBanner } from '@/components/lms/ErrorBanner';
 import { apiClient } from '@/lib/api/client';
-import { formatCecHoursForDisplay } from '@/lib/cec-display';
 
 interface LeaderboardEntry {
   rank: number;
@@ -26,14 +25,12 @@ interface LevelData {
   total_xp: number;
   current_level: number;
   level_title: string;
-  total_cec_lifetime?: number;
 }
 
 interface EnrollmentHint {
   status: string;
   all_lessons_complete?: boolean;
   certificate_issued_at?: string | null;
-  cec_hours?: number | null;
 }
 
 const surface = 'learner-home-surface learner-home-card overflow-hidden rounded-[1.25rem]';
@@ -64,7 +61,6 @@ export default function LeaderboardPage() {
   const [level, setLevel] = useState<LevelData | null>(null);
   const [completedCount, setCompletedCount] = useState(0);
   const [certificateCount, setCertificateCount] = useState(0);
-  const [approvedCec, setApprovedCec] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -95,9 +91,6 @@ export default function LeaderboardPage() {
       const done = enrollments.filter((e) => e.status === 'completed' || e.all_lessons_complete);
       setCompletedCount(done.length);
       setCertificateCount(done.filter((e) => e.certificate_issued_at).length);
-      setApprovedCec(
-        done.reduce((sum, e) => sum + (e.cec_hours != null && e.cec_hours > 0 ? e.cec_hours : 0), 0)
-      );
     } catch {
       setError('Your achievements could not be loaded.');
       setEntries([]);
@@ -111,9 +104,8 @@ export default function LeaderboardPage() {
     load();
   }, [load]);
 
-  const cecFromLevel = level?.total_cec_lifetime ?? 0;
-  const cec = approvedCec > 0 ? approvedCec : cecFromLevel > 0 ? cecFromLevel : 0;
-  const cecLabel = formatCecHoursForDisplay(cec);
+  // Gamification never awards, shows or implies CEC hours: those are on Credentials and the
+  // renewal cockpit, which read the IICRC approvals registry.
   const milestones = [
     {
       id: 'first-course',
@@ -126,12 +118,6 @@ export default function LeaderboardPage() {
       label: 'First certificate',
       detail: 'A completion certificate is on your record.',
       earned: certificateCount >= 1,
-    },
-    {
-      id: 'cec',
-      label: 'Approved IICRC CEC hours',
-      detail: 'Hours appear only after IICRC confirmation.',
-      earned: cec > 0,
     },
     {
       id: 'multi',
@@ -151,8 +137,7 @@ export default function LeaderboardPage() {
           Achievements
         </h1>
         <p className="mt-3 max-w-xl text-[15px] leading-6 text-slate-500">
-          Milestones from completed learning. Approved IICRC CEC hours appear only where the IICRC
-          has confirmed them.
+          Milestones and points from the lessons and courses you complete.
         </p>
       </header>
 
@@ -164,7 +149,7 @@ export default function LeaderboardPage() {
         <section className="grid w-full items-stretch gap-5 lg:grid-cols-2">
           <div className={`${surface} px-7 py-7`}>
             <p className={kicker}>Your record</p>
-            <dl className="mt-7 grid grid-cols-2 gap-3">
+            <dl className="mt-7 grid grid-cols-3 gap-3">
               <div className={`${inset} rounded-xl px-3 py-4`}>
                 <dt className={`text-[11px] ${muted}`}>Level</dt>
                 <dd className={`mt-2 text-[1.85rem] leading-none tabular-nums ${heading}`}>
@@ -184,12 +169,6 @@ export default function LeaderboardPage() {
                 <dt className={`text-[11px] ${muted}`}>Completed</dt>
                 <dd className={`mt-2 text-[1.85rem] leading-none tabular-nums ${heading}`}>
                   {completedCount}
-                </dd>
-              </div>
-              <div className={`${inset} rounded-xl px-3 py-4`}>
-                <dt className={`text-[11px] ${muted}`}>Approved IICRC CEC</dt>
-                <dd className={`mt-2 text-[1.85rem] leading-none tabular-nums ${heading}`}>
-                  {cecLabel ?? '0'}
                 </dd>
               </div>
             </dl>

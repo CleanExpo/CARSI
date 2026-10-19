@@ -88,7 +88,6 @@ export const metadata: Metadata = {
     description:
       'IICRC CEC Accredited courses for cleaning and restoration professionals in Australia.',
     images: [`${siteUrl}/og-image.png`],
-    creator: '@carsi_au',
   },
   alternates: {
     canonical: siteUrl,

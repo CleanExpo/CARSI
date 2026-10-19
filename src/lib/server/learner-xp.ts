@@ -1,5 +1,4 @@
 import { prisma } from '@/lib/prisma';
-import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
 import {
   levelTitleFromLifetimeXp,
   lessonXpGrouped,
@@ -16,7 +15,6 @@ export type LearnerLevelPayload = {
   current_streak: number;
   longest_streak: number;
   xp_to_next_level: number;
-  total_cec_lifetime: number;
 };
 
 const LEVEL_THRESHOLDS = [0, 500, 1500, 3500, 7000, 12000] as const;
@@ -97,17 +95,6 @@ export async function getLearnerLevelPayload(studentId: string): Promise<Learner
   const { current_level, level_title } = levelTitleFromLifetimeXp(total_xp);
   const { current: current_streak, longest: longest_streak } = await computeStreakDays(studentId);
 
-  const cecRows = await prisma.lmsEnrollment.findMany({
-    where: { studentId, status: 'completed', completedAt: { not: null } },
-    include: { course: { select: { slug: true } } },
-  });
-  // REGISTRY-ONLY, FAIL-CLOSED (GP-498). `total_cec_lifetime` is displayed to the learner —
-  // it must never sum the stale WP-import `cecHours`. Registry approval only (by slug); an
-  // unapproved course adds 0.
-  const total_cec_lifetime = Math.round(
-    cecRows.reduce((s, e) => s + (resolveLmsCourseCecHours({ slug: e.course.slug }) ?? 0), 0) * 100,
-  ) / 100;
-
   return {
     total_xp,
     current_level,
@@ -115,7 +102,6 @@ export async function getLearnerLevelPayload(studentId: string): Promise<Learner
     current_streak,
     longest_streak,
     xp_to_next_level: xpToNextLevel(total_xp) || XP_LESSON_COMPLETE,
-    total_cec_lifetime,
   };
 }
 
