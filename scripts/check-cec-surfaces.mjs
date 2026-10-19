@@ -22,6 +22,12 @@
  *      serialise it into an output without any property read; or
  *   3. use `iicrcDiscipline` / `iicrc_discipline` as a CEC / eligibility boolean (a non-empty
  *      discipline is NOT IICRC approval — that was the fail-open leak, GP-498).
+ *   4. on a RECOGNITION surface (gamification: XP, levels, leaderboard, achievements; and the
+ *      LinkedIn credential share), mention CEC at all, or carry an IICRC discipline field or
+ *      acronym. Gamification must never award, display or imply CEC hours, and the designation
+ *      rule bans naming a CARSI course or certificate with an IICRC discipline acronym. Found
+ *      19/10/2026: an "Approved IICRC CEC hours" achievement, a leaderboard filtered by WRT/ASD
+ *      codes and a LinkedIn certificate named "Title (WRT)" all passed rules 1-3.
  * The resolved display value flows as the snake_case DTO field `cec_hours` (the gate output)
  * or under the distinct name `resolvedCecHours` / `cecHoursLabel`, and is not scanned.
  *
@@ -55,6 +61,21 @@ import ts from 'typescript';
 
 const RAW_FIELD = 'cecHours';
 const DISCIPLINE_NAMES = new Set(['iicrcDiscipline', 'iicrc_discipline']);
+
+/** Rule 4 scope: gamification and credential-share code, found by path so new files join it. */
+const RECOGNITION_SURFACE = /leaderboard|gamification|achievement|learner-xp|linkedin/i;
+/** The renewal summary sits under /gamification/ but is the registry-backed CEC renewal surface. */
+const RECOGNITION_EXEMPT = ['app/api/lms/gamification/me/renewal-summary/route.ts'];
+const RECOGNITION_CEC_IDENT = /cec/i;
+const RECOGNITION_CEC_TEXT = /\bCECs?\b|continuing education/i;
+// Acronyms match case-sensitively so a month like "Oct" is not mistaken for a discipline code.
+const RECOGNITION_DISCIPLINE_TEXT = /[iI][iI][cC][rR][cC]_?[dD]iscipline|\b(?:WRT|ASD|AMRT|FSRT|OCT|CRT|CCT|TCST)\b/;
+
+export function isRecognitionSurface(file) {
+  const n = file.replace(/\\/g, '/');
+  if (RECOGNITION_EXEMPT.some((e) => n === e || n.endsWith('/' + e))) return false;
+  return RECOGNITION_SURFACE.test(n);
+}
 
 /** Application code to scan. Components and lib live under src/ in this repo; the extra
  *  top-level dirs are included defensively in case that ever changes. */
@@ -257,6 +278,13 @@ export function evaluateFile(file, text) {
   const discMsg =
     'iicrcDiscipline used as a CEC/eligibility signal — eligibility must come from registry-approved ' +
     'hours (courseEligibleForIicrcCecSubmission), not discipline truthiness.';
+  const recognitionCecMsg =
+    'CEC on a gamification/share surface — XP, levels, leaderboards, achievements and LinkedIn shares must ' +
+    'never award, display or imply CEC hours; show CEC only on the registry-backed credentials/renewal surfaces.';
+  const recognitionDiscMsg =
+    'IICRC discipline field or acronym on a gamification/share surface — name and filter by CARSI course or ' +
+    'designation, never an IICRC discipline code (designation rule, CLAUDE.md).';
+  const recognition = isRecognitionSurface(file);
 
   function push(node, msg) {
     findings.push(`  ${file}:${lineOf(node)}: ${msg}\n    → ${snip(node)}`);
@@ -303,6 +331,23 @@ export function evaluateFile(file, text) {
   }
 
   function visit(node) {
+    // 6. recognition surface (rule 4 in the header): no CEC, no IICRC discipline field or acronym.
+    if (recognition) {
+      if (ts.isIdentifier(node) || ts.isPrivateIdentifier(node)) {
+        if (DISCIPLINE_NAMES.has(node.text)) push(node, recognitionDiscMsg);
+        else if (RECOGNITION_CEC_IDENT.test(node.text)) push(node, recognitionCecMsg);
+      } else if (
+        ts.isStringLiteralLike(node) ||
+        ts.isTemplateHead(node) ||
+        ts.isTemplateMiddle(node) ||
+        ts.isTemplateTail(node) ||
+        ts.isJsxText(node)
+      ) {
+        if (RECOGNITION_DISCIPLINE_TEXT.test(node.text)) push(node, recognitionDiscMsg);
+        else if (RECOGNITION_CEC_TEXT.test(node.text)) push(node, recognitionCecMsg);
+      }
+    }
+
     // 1. member read: X.cecHours
     if (ts.isPropertyAccessExpression(node) && node.name.text === RAW_FIELD) {
       push(node, rawMsg);

@@ -88,10 +88,11 @@ type IdXpRow = { student_id: string; xp: bigint | number };
 export async function lessonXpGrouped(
   start: Date | null,
   end: Date | null,
-  discipline: string | null
+  courseSlugs: readonly string[] | null
 ): Promise<Map<string, number>> {
   const hasPeriod = start != null && end != null;
   const map = new Map<string, number>();
+  if (courseSlugs && courseSlugs.length === 0) return map;
 
   const addRows = (rows: IdXpRow[]) => {
     for (const r of rows) {
@@ -101,7 +102,7 @@ export async function lessonXpGrouped(
     }
   };
 
-  if (hasPeriod && discipline) {
+  if (hasPeriod && courseSlugs) {
     const rows = await prisma.$queryRaw<IdXpRow[]>`
       SELECT lp.student_id::text AS student_id, ${SQL_LESSON_XP_TOTAL} AS xp
       FROM lms_lesson_progress lp
@@ -111,7 +112,7 @@ export async function lessonXpGrouped(
       WHERE lp.completed = true
         AND lp.completed_at >= ${start}
         AND lp.completed_at < ${end}
-        AND c.iicrc_discipline = ${discipline}
+        AND c.slug IN (${Prisma.join(courseSlugs)})
       GROUP BY lp.student_id
     `;
     addRows(rows);
@@ -128,7 +129,7 @@ export async function lessonXpGrouped(
       GROUP BY lp.student_id
     `;
     addRows(rows);
-  } else if (discipline) {
+  } else if (courseSlugs) {
     const rows = await prisma.$queryRaw<IdXpRow[]>`
       SELECT lp.student_id::text AS student_id, ${SQL_LESSON_XP_TOTAL} AS xp
       FROM lms_lesson_progress lp
@@ -136,7 +137,7 @@ export async function lessonXpGrouped(
       INNER JOIN lms_modules m ON m.id = l.module_id
       INNER JOIN lms_courses c ON c.id = m.course_id
       WHERE lp.completed = true
-        AND c.iicrc_discipline = ${discipline}
+        AND c.slug IN (${Prisma.join(courseSlugs)})
       GROUP BY lp.student_id
     `;
     addRows(rows);
@@ -159,10 +160,11 @@ export async function lessonXpGrouped(
 export async function courseXpGrouped(
   start: Date | null,
   end: Date | null,
-  discipline: string | null
+  courseSlugs: readonly string[] | null
 ): Promise<Map<string, number>> {
   const hasPeriod = start != null && end != null;
   const map = new Map<string, number>();
+  if (courseSlugs && courseSlugs.length === 0) return map;
 
   const addRows = (rows: IdXpRow[]) => {
     for (const r of rows) {
@@ -172,7 +174,7 @@ export async function courseXpGrouped(
     }
   };
 
-  if (hasPeriod && discipline) {
+  if (hasPeriod && courseSlugs) {
     const rows = await prisma.$queryRaw<IdXpRow[]>`
       SELECT e.student_id::text AS student_id, ${SQL_COURSE_XP_TOTAL} AS xp
       FROM lms_enrollments e
@@ -180,7 +182,7 @@ export async function courseXpGrouped(
       WHERE e.completed_at IS NOT NULL
         AND e.completed_at >= ${start}
         AND e.completed_at < ${end}
-        AND c.iicrc_discipline = ${discipline}
+        AND c.slug IN (${Prisma.join(courseSlugs)})
       GROUP BY e.student_id
     `;
     addRows(rows);
@@ -195,13 +197,13 @@ export async function courseXpGrouped(
       GROUP BY e.student_id
     `;
     addRows(rows);
-  } else if (discipline) {
+  } else if (courseSlugs) {
     const rows = await prisma.$queryRaw<IdXpRow[]>`
       SELECT e.student_id::text AS student_id, ${SQL_COURSE_XP_TOTAL} AS xp
       FROM lms_enrollments e
       INNER JOIN lms_courses c ON c.id = e.course_id
       WHERE e.completed_at IS NOT NULL
-        AND c.iicrc_discipline = ${discipline}
+        AND c.slug IN (${Prisma.join(courseSlugs)})
       GROUP BY e.student_id
     `;
     addRows(rows);
@@ -236,7 +238,8 @@ export type LeaderboardPeriodRow = {
 };
 
 export async function getMonthlyLeaderboard(params: {
-  discipline: string | null;
+  /** Restrict to these courses (a CARSI designation's pathway), or null for all courses. */
+  courseSlugs: readonly string[] | null;
   limit: number;
 }): Promise<{
   period_label: string;
@@ -257,8 +260,8 @@ export async function getMonthlyLeaderboard(params: {
     year: 'numeric',
   }).format(start);
 
-  const lesson = await lessonXpGrouped(start, end, params.discipline);
-  const course = await courseXpGrouped(start, end, params.discipline);
+  const lesson = await lessonXpGrouped(start, end, params.courseSlugs);
+  const course = await courseXpGrouped(start, end, params.courseSlugs);
   const periodTotals = mergeXpMaps(lesson, course);
 
   const sorted = [...periodTotals.entries()]
@@ -289,7 +292,7 @@ export async function getMonthlyLeaderboard(params: {
 
   const lifetimeLessonAll = await lessonXpGrouped(null, null, null);
   const lifetimeCourseAll = await courseXpGrouped(null, null, null);
-  const lifetimeAllDisciplines = mergeXpMaps(lifetimeLessonAll, lifetimeCourseAll);
+  const lifetimeAllCourses = mergeXpMaps(lifetimeLessonAll, lifetimeCourseAll);
 
   const items: LeaderboardPeriodRow[] = sorted.map(([studentId, periodXp], index) => {
     const u = userMap.get(studentId);
@@ -298,7 +301,7 @@ export async function getMonthlyLeaderboard(params: {
       u?.leaderboardShowDisplayName ?? false,
       u?.leaderboardDisplayName
     );
-    const lifetime = lifetimeAllDisciplines.get(studentId) ?? periodXp;
+    const lifetime = lifetimeAllCourses.get(studentId) ?? periodXp;
     const { current_level, level_title } = levelTitleFromLifetimeXp(lifetime);
     return {
       rank: index + 1,

@@ -3,6 +3,7 @@
 // Note: Using dangerouslySetInnerHTML is the standard pattern for JSON-LD in React.
 // Content is server-generated from controlled objects, not user input.
 
+import { CARSI_SOCIAL_PROFILE_URLS } from '@/lib/brand/social-profiles';
 import { buildFounderPersonSchema } from '@/lib/schema/founder';
 import { serializeJsonLd } from '@/lib/seo/json-ld';
 
@@ -17,12 +18,7 @@ export function OrganizationSchema({
   name = 'CARSI',
   url = 'https://carsi.com.au',
   logo = 'https://carsi.com.au/logo.png',
-  sameAs = [
-    'https://www.facebook.com/CARSIaus',
-    'https://www.linkedin.com/company/carsiaus',
-    'https://www.youtube.com/channel/UC3HpNvGJXivLGoPo4m7Qleg/featured',
-    'https://open.spotify.com/show/4FVBn8Cfyx2jOx0m4MksuG',
-  ],
+  sameAs = [...CARSI_SOCIAL_PROFILE_URLS],
 }: OrganizationSchemaProps) {
   const schema = {
     '@context': 'https://schema.org',

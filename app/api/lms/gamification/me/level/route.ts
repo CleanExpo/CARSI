@@ -18,7 +18,6 @@ export async function GET(request: NextRequest) {
       current_streak: 0,
       longest_streak: 0,
       xp_to_next_level: 100,
-      total_cec_lifetime: 0,
     });
   }
 

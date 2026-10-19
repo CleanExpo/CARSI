@@ -14,6 +14,7 @@ import {
   TestimonialCard,
   type Testimonial,
 } from '@/components/marketing/testimonials/TestimonialCard';
+import { socialProfileUrl } from '@/lib/brand/social-profiles';
 
 export const metadata: Metadata = {
   title: 'Student Testimonials | CARSI — Cleaning and Restoration Training',
@@ -148,7 +149,7 @@ export default function TestimonialsPage() {
               Send feedback
             </Link>
             <a
-              href="https://www.facebook.com/CARSIaus"
+              href={socialProfileUrl('facebook')}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex min-h-12 items-center rounded-full border border-slate-200 bg-white px-7 text-sm font-semibold text-slate-800 hover:border-[#2490ed]/40 hover:text-[#146fc2]"
@@ -156,7 +157,7 @@ export default function TestimonialsPage() {
               Review on Facebook
             </a>
             <a
-              href="https://www.linkedin.com/company/carsiaus"
+              href={socialProfileUrl('linkedin')}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex min-h-12 items-center rounded-full border border-slate-200 bg-white px-7 text-sm font-semibold text-slate-800 hover:border-[#2490ed]/40 hover:text-[#146fc2]"

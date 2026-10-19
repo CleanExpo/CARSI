@@ -62,7 +62,42 @@ const MUST_PASS = [
   ['comment mentioning cecHours', '// the stored cecHours column is WP-import pollution'],
 ];
 
+// Rule 4: recognition surfaces (gamification + LinkedIn share), scanned under their real paths.
+// The first six are the shapes that shipped and passed rules 1-3 until 19/10/2026.
+const PAGE = 'app/(dashboard)/dashboard/student/leaderboard/page.tsx';
+const RECOGNITION_BLOCK = [
+  ['CEC achievement milestone', PAGE, "const m = { id: 'cec', label: 'Approved IICRC CEC hours', earned: cec > 0 };"],
+  ['CEC tile beside XP', PAGE, 'const X = () => <dt className="t">Approved IICRC CEC</dt>;'],
+  ['CEC field in the XP level payload', 'src/lib/server/learner-xp.ts', 'export const p = { total_xp, total_cec_lifetime };'],
+  ['leaderboard filter by IICRC code', 'app/api/lms/gamification/leaderboard/route.ts', "const DISCIPLINES = new Set(['WRT', 'OCT']);"],
+  ['leaderboard SQL on iicrc_discipline', 'src/lib/server/leaderboard-xp.ts', 'const q = prisma.$queryRaw`SELECT 1 FROM lms_courses c WHERE c.iicrc_discipline = ${d}`;'],
+  ['LinkedIn name with discipline code', 'src/components/lms/LinkedInShareButton.tsx', 'const name = `${courseTitle} (${iicrcDiscipline})`;'],
+  ['continuing-education wording', 'src/components/lms/AchievementsPanel.tsx', 'const X = () => <p>Earn continuing education credits</p>;'],
+  ['IICRC acronym in a new gamification file', 'src/lib/gamification/badges.ts', "export const badge = 'ASD expert';"],
+];
+const RECOGNITION_PASS = [
+  ['XP, level and a month name', PAGE, 'const X = () => <p>Oct 2026 · 250 XP · Level 2 · Apprentice</p>;'],
+  ['comment mentioning CEC', PAGE, '// CEC hours live on Credentials and the renewal cockpit\nconst n = 1;'],
+  ['renewal summary route is the CEC surface', 'app/api/lms/gamification/me/renewal-summary/route.ts', 'export const r = { cec_hours: 8, total_cec_lifetime: 8 };'],
+  ['CEC on a non-recognition surface', 'src/components/lms/RenewalCockpit.tsx', 'const X = () => <span>8 CEC</span>;'],
+  ['LinkedIn share by course title', 'src/components/lms/LinkedInShareButton.tsx', "const p = { name: courseTitle, organizationId: '65591140' };"],
+];
+
 let failed = 0;
+
+for (const [name, file, src] of RECOGNITION_BLOCK) {
+  if (evaluateFile(file, src).length === 0) {
+    console.error(`✖ MUST BLOCK but passed: ${name} (${file})\n    ${src}`);
+    failed++;
+  }
+}
+for (const [name, file, src] of RECOGNITION_PASS) {
+  const findings = evaluateFile(file, src);
+  if (findings.length > 0) {
+    console.error(`✖ MUST PASS but blocked: ${name} (${file})\n    ${findings.join('\n    ')}`);
+    failed++;
+  }
+}
 
 for (const [name, src] of MUST_BLOCK) {
   const findings = evaluateFile('fixture.tsx', src);
@@ -86,5 +121,7 @@ if (failed > 0) {
   console.error(`\n✖ CEC surface-leak guard self-test failed — ${failed} case(s).`);
   process.exit(1);
 }
-console.log(`✓ CEC surface-leak guard self-test passed (${MUST_BLOCK.length} block, ${MUST_PASS.length} pass).`);
+console.log(
+  `✓ CEC surface-leak guard self-test passed (${MUST_BLOCK.length + RECOGNITION_BLOCK.length} block, ${MUST_PASS.length + RECOGNITION_PASS.length} pass).`
+);
 process.exit(0);

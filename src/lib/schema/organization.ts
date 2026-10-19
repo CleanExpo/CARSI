@@ -5,6 +5,8 @@
  * Pass the result to <SchemaMarkup schema={...} />.
  */
 
+import { CARSI_SOCIAL_PROFILE_URLS } from '@/lib/brand/social-profiles';
+
 import type { SchemaObject } from './shared';
 
 export interface OrganizationSchemaInput {
@@ -19,12 +21,7 @@ export function buildOrganizationSchema(input: OrganizationSchemaInput = {}): Sc
     name = 'CARSI',
     url = 'https://carsi.com.au',
     logo = 'https://carsi.com.au/logo1.png',
-    sameAs = [
-      'https://www.facebook.com/CARSIaus',
-      'https://www.linkedin.com/company/carsiaus',
-      'https://www.youtube.com/channel/UC3HpNvGJXivLGoPo4m7Qleg/featured',
-      'https://open.spotify.com/show/4FVBn8Cfyx2jOx0m4MksuG',
-    ],
+    sameAs = [...CARSI_SOCIAL_PROFILE_URLS],
   } = input;
 
   return {
