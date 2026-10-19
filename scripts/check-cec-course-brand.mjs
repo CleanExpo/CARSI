@@ -22,6 +22,14 @@
  * any product in data/seed/ccw-products.json. It fails when the registry, the product list or an
  * approved course's catalogue entry cannot be found: a missing input is never an empty pass.
  *
+ * Threat model: the guard catches CCW branding that reaches a CEC course by accident or by an
+ * author's mistake: copy-pasted copy, asset and file names (ccw-logo.svg, ccw_logo.png, ccw2.png),
+ * product names with or without their spaces, links, HTML entities (with or without the closing
+ * semicolon), JSON escapes, percent-encoding and invisible characters picked up in a paste. Each
+ * scanned string is first normalised to what a reader sees (normaliseForScan). Deliberate,
+ * adversarial obfuscation by someone trying to beat the guard is out of scope; human review of
+ * course content is the control for that.
+ *
  * Fix a hit by removing the brand from the course. Never exempt a course here; if a course must
  * carry CCW material, it is not a CEC-approved course.
  */
@@ -33,8 +41,9 @@ import { pathToFileURL } from 'node:url';
 /** Between the words of a brand phrase: any run of non-alphanumerics (space, -, _, /, ., etc). */
 const SEP = '[^\\p{L}\\p{N}]+';
 const FIXED_TERMS = [
-  { label: 'CCW', pattern: /\bccw\b/i },
-  { label: 'CCW (letters split apart)', pattern: /\bc[\s._*-]*c[\s._*-]*w\b/i },
+  // Only letters extend the word: "_" and digits are separators (ccw_logo.png, ccw2.png).
+  { label: 'CCW', pattern: /(?<!\p{L})ccw(?!\p{L})/iu },
+  { label: 'CCW (letters split apart)', pattern: /(?<!\p{L})c[\s._*-]*c[\s._*-]*w(?!\p{L})/iu },
   { label: 'Carpet Cleaners Warehouse', pattern: new RegExp(`carpet(?:${SEP})?cleaners(?:${SEP})?warehouse`, 'iu') },
   { label: 'ccwonline.com.au link', pattern: new RegExp(`ccw(?:${SEP})?online${SEP}com${SEP}au`, 'iu') },
   { label: 'CCW image asset (Shopify store path)', pattern: /cdn\.shopify\.com\/s\/files\/1\/2179\/6391\b/i },
@@ -47,8 +56,9 @@ const MIN_PRODUCTS = 50;
 
 const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
+/** Product names match with or without the separators between their words (Thymox5ltr). */
 function productPattern(name) {
-  const body = name.trim().split(/\s+/).map(escapeRegExp).join(SEP);
+  const body = name.split(/[^\p{L}\p{N}]+/u).filter(Boolean).map(escapeRegExp).join(`(?:${SEP})?`);
   return new RegExp(`(?<![\\w-])${body}(?![\\w-])`, 'iu');
 }
 
@@ -66,8 +76,10 @@ const NAMED_ENTITIES = {
   amp: '&', nbsp: ' ', NonBreakingSpace: ' ', ensp: ' ', emsp: ' ', thinsp: ' ', hairsp: ' ',
   Tab: ' ', NewLine: ' ', period: '.', sol: '/', colon: ':', hyphen: '-', dash: '-', lowbar: '_',
   ast: '*', midast: '*', quot: '"', apos: "'", lt: '<', gt: '>', commat: '@', num: '#', percnt: '%',
-  shy: '', ZeroWidthSpace: '', zwj: '', zwnj: '', NoBreak: '',
+  shy: '', ZeroWidthSpace: '', zwj: '', zwnj: '', NoBreak: '', lrm: '', rlm: '',
 };
+/** Legacy entities a browser decodes even without the closing semicolon (&nbsp, &shy, &amp). */
+const LEGACY_ENTITY = /&(nbsp|shy|amp|lt|gt|quot)/gi;
 const decodeCodePoint = (n) => (n > 0 && n <= 0x10ffff ? String.fromCodePoint(n) : '');
 
 /** A run of %XX escapes decoded as UTF-8; a malformed run decodes its ASCII bytes only. */
@@ -87,14 +99,17 @@ function decodeOnce(text) {
     .replace(/\\([\\/"'])/g, '$1')
     .replace(/&#x([0-9a-f]+);?/gi, (_, hex) => decodeCodePoint(parseInt(hex, 16)))
     .replace(/&#(\d+);?/g, (_, dec) => decodeCodePoint(Number(dec)))
-    .replace(/&([a-z0-9]+);/gi, (entity, name) => NAMED_ENTITIES[name] ?? entity)
+    // An unknown entity renders literally, so it becomes a separator that keeps its own name:
+    // it cannot join or split the letters around it, and "&CCW;" still reads as CCW.
+    .replace(/&([a-z0-9]+);/gi, (_, name) => NAMED_ENTITIES[name] ?? ` ${name} `)
+    .replace(LEGACY_ENTITY, (_, name) => NAMED_ENTITIES[name.toLowerCase()])
     .replace(/(?:%[0-9a-f]{2})+/gi, decodePercentRun);
 }
 
 /**
  * The text as a reader sees it: JSON/JS escapes, HTML entities (also double-encoded) and URL
- * percent-escapes decoded, compatibility forms (fullwidth letters) folded, invisible characters
- * removed and every run of whitespace collapsed to one space. Without this, "C\nC\nW" in a JSON
+ * percent-escapes decoded, compatibility forms (fullwidth letters) folded, invisible format and
+ * control characters removed and every run of whitespace collapsed to one space. Without this, "C\nC\nW" in a JSON
  * surface or "&#67;CW" in a lesson body renders as the brand but evades every pattern.
  */
 export function normaliseForScan(text) {
@@ -105,9 +120,9 @@ export function normaliseForScan(text) {
     out = next;
   }
   return out
-    .replace(/&[a-z0-9]+;/gi, '')
     .normalize('NFKC')
     .replace(/\p{Cf}/gu, '')
+    .replace(/[^\P{Cc}\t\n\r]/gu, '')
     .replace(/[\u3002\uff0e\uff61\u2024\ufe52]/g, '.')
     .replace(/\s+/g, ' ');
 }

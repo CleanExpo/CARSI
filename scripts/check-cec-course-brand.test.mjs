@@ -108,11 +108,22 @@ for (const [form, planted] of [
   ['a link with leader and small full stops', 'Visit ccwonline\u2024com\ufe52au today.'],
   ['CCW split by left-to-right and right-to-left marks', 'Ask C\u200eC\u200fW about the unit.'],
   ['CCW split by &lrm; and &rlm; entities', 'Ask C&lrm;C&rlm;W about the unit.'],
-  ['CCW split by an unknown named entity', 'Ask C&zzfake9;CW about the unit.'],
+  ['CCW written as an unknown entity', 'Ask &CCW; about the unit.'],
   ['Carpet Cleaners Warehouse joined by hyphens', '<img src="/images/carpet-cleaners-warehouse.png">'],
   ['Carpet Cleaners Warehouse joined by underscores and slashes', 'See carpet_cleaners/warehouse for stock.'],
   ['a link with hyphens between the domain parts', 'Visit ccwonline-com-au today.'],
-  ['every r3 evasion combined', 'Ask C&lrm;C\u200fW at ccwonline\u3002com&period;au or carpet-cleaners&zzfake;-warehouse.'],
+  ['every r3 evasion combined', 'Ask C&lrm;C\u200fW at ccwonline\u3002com&period;au or carpet-cleaners&shy-warehouse.'],
+  // Review r4 (threat model: accidental branding): separators, joined product names, legacy
+  // entities and control characters.
+  ['a CCW logo file named with an underscore', '<img src="/images/ccw_logo.png">'],
+  ['a CCW asset named with a digit', '<img src="/images/ccw2.png">'],
+  ['a CCW product name written without spaces', 'Pre-treat with Thymox5ltr first.'],
+  ['a CCW product name with its hyphen dropped', 'Fit the Hydro filter with sock.'],
+  ['CCW with a numeric entity and no semicolon', 'Ask &#67CW about the unit.'],
+  ['CCW split by a legacy entity with no semicolon', 'Ask C&shyCW about the unit.'],
+  ['Carpet Cleaners Warehouse joined by &nbsp with no semicolon', 'Sold by Carpet&nbspCleaners&nbspWarehouse.'],
+  ['CCW split by a null character', 'Ask C\u0000CW about the unit.'],
+  ['CCW split by other C0 control characters', 'Ask C\u0007C\u001fW about the unit.'],
 ]) {
   test(`flags ${form} planted into an approved course lesson`, () => {
     const inputs = clone();
@@ -189,6 +200,7 @@ test('does not flag plain words that merely contain the letters', () => {
   assert.deepEqual(brandHits('Section C. Clean water, a&b, 50&#37; and C W ratios', real.productNames), []);
   assert.deepEqual(brandHits('Mix at 100% concentrate, 5%EF dilution, %E2%82 broken and 50%', real.productNames), []);
   assert.deepEqual(brandHits('Carpet cleaning, cleaners and the warehouse sell online.com.au stock \u3002 &frac12; &zz;', real.productNames), []);
+  assert.deepEqual(brandHits('Use 1ccwide2, accw_x, the Thymox story, a 5 ltr jug and AC&ampDC wiring', real.productNames), []);
 });
 
 test('fails closed when the registry, products or an approved catalogue entry are missing', () => {
