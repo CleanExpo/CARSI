@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 
 import { CcwCarsiTruckmountClient } from '@/components/ccw/CcwCarsiTruckmountClient';
+import { CcwFreeTools } from '@/components/marketing/CcwFreeTools';
 import { getPublicSiteUrl } from '@/lib/env/public-url';
 import { OG_IMAGES } from '@/lib/seo/og-image';
 
@@ -39,8 +40,11 @@ function TruckmountFallback() {
 
 export default function CcwCarsiTruckmountPage() {
   return (
-    <Suspense fallback={<TruckmountFallback />}>
-      <CcwCarsiTruckmountClient />
-    </Suspense>
+    <>
+      <Suspense fallback={<TruckmountFallback />}>
+        <CcwCarsiTruckmountClient />
+      </Suspense>
+      <CcwFreeTools />
+    </>
   );
 }

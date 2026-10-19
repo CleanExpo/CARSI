@@ -160,6 +160,17 @@ jobs:
       - name: IICRC / CEC compliance guard
         run: npm run check:iicrc-compliance
 
+      # Founder rule 19/10/2026: no CCW name, logo, link or product name in any CEC-approved
+      # course (cec-approvals.json), across every surface the course renders or ships. CCW
+      # material belongs in CCW-CARSI training and marketing. Fail-closed on missing inputs.
+      - name: CEC course brand guard
+        run: npm run check:cec-course-brand
+
+      # Proves the brand guard is non-vacuous: planted CCW forms in a real approved course's
+      # lesson, quiz, card, intro brief and public files are flagged; truckmount passes.
+      - name: CEC course brand guard self-test
+        run: npm run test:cec-course-brand
+
       # The seed is the ONE writer that can put `iicrc_discipline` back into lms_courses, and
       # it lives in scripts/, which is outside check:iicrc-compliance's SCANNED_DIRS. Without
       # this step a revert of that pin merges green — the exact "control exists but never runs"

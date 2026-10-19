@@ -11,6 +11,7 @@ import {
   PUBLIC_SHELL_INNER_CLASS,
 } from '@/components/landing/public-shell-width';
 import { CcwEventNav } from '@/components/marketing/CcwEventNav';
+import { CcwFreeTools } from '@/components/marketing/CcwFreeTools';
 import { CcwRoadshowBooking } from '@/components/marketing/CcwRoadshowBooking';
 import { BreadcrumbSchema, FAQSchema, ItemListSchema } from '@/components/seo';
 import { getPublicSiteUrl } from '@/lib/env/public-url';
@@ -460,6 +461,7 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
         </div>
       </section>
 
+      <CcwFreeTools heading="CCW dilution tools" />
       <HomeFaqSection faqs={pageFaqs} />
       <HomeFinalCtaSection />
     </>
