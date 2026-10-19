@@ -78,28 +78,28 @@
   },
   {
     "file": "app/(public)/testimonials/page.tsx",
-    "line": 21,
+    "line": 22,
     "contains": "earning IICRC CECs online",
     "class": "owned-elsewhere",
     "reason": "reviews thread owns testimonials (brief: do not touch reviews); reported to Phill"
   },
   {
     "file": "app/(public)/testimonials/page.tsx",
-    "line": 29,
+    "line": 30,
     "contains": "IICRC CEC knowledge",
     "class": "owned-elsewhere",
     "reason": "reviews thread owns testimonials; reported to Phill"
   },
   {
     "file": "app/(public)/testimonials/page.tsx",
-    "line": 36,
+    "line": 37,
     "contains": "CRT preparation",
     "class": "owned-elsewhere",
     "reason": "reviews thread owns testimonials; reported to Phill"
   },
   {
     "file": "app/(public)/testimonials/page.tsx",
-    "line": 54,
+    "line": 55,
     "contains": "IICRC CEC course content",
     "class": "owned-elsewhere",
     "reason": "reviews thread owns testimonials; reported to Phill"
