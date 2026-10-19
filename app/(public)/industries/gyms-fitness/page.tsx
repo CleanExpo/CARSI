@@ -87,7 +87,7 @@ const whyCards = [
     icon: Users,
     title: 'Member Retention & Reputation',
     description:
-      'Mould complaints and Google reviews mentioning cleanliness can cost a gym its members. Documented IICRC CEC training protects your reputation and your renewal rate.',
+      'Mould complaints and Google reviews mentioning cleanliness can cost a gym its members. Documented CARSI training shows members what your maintenance staff have studied, and when.',
     color: '#2490ed',
   },
 ];

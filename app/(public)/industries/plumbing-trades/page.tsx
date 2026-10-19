@@ -80,7 +80,7 @@ const whyCards = [
     icon: Shield,
     title: 'WHS & Insurer Credibility',
     description:
-      'Water damage brings WHS hazards such as slips, electrical risk and mould. Documented IICRC CEC training shows the due diligence behind your remediation work.',
+      'Water damage brings WHS hazards such as slips, electrical risk and mould. Documented CARSI training shows clients and insurers the due diligence behind your remediation work.',
     color: '#00838f',
   },
   {

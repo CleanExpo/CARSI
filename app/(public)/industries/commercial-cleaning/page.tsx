@@ -83,7 +83,7 @@ const whyCards = [
     icon: Shield,
     title: 'Documented Training',
     description:
-      'Documented IICRC CEC training shows clients and insurers what each technician has studied, and when.',
+      'Documented CARSI training shows clients and insurers what each technician has studied, and when.',
     color: '#1976d2',
   },
   {
