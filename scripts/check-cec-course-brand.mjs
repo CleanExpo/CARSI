@@ -30,11 +30,12 @@ import { readFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-const SPACE = '(?:\\s|&nbsp;|&#160;|\\\\u00a0| )+';
+const SPACE = '\\s+';
 const FIXED_TERMS = [
   { label: 'CCW', pattern: /\bccw\b/i },
+  { label: 'CCW (letters split apart)', pattern: /\bc[\s._*-]*c[\s._*-]*w\b/i },
   { label: 'Carpet Cleaners Warehouse', pattern: new RegExp(`carpet${SPACE}cleaners${SPACE}warehouse`, 'i') },
-  { label: 'ccwonline.com.au link', pattern: /ccwonline\.com\.au/i },
+  { label: 'ccwonline.com.au link', pattern: /ccw\s*online\s*\.\s*com\s*\.\s*au/i },
   { label: 'CCW image asset (Shopify store path)', pattern: /cdn\.shopify\.com\/s\/files\/1\/2179\/6391\b/i },
 ];
 const SLUG_KEYS = ['slug', 'courseSlug', 'course_slug', 'course'];
@@ -59,10 +60,52 @@ function productPatterns(names) {
   return productPatternCache.get(key);
 }
 
-/** Labels of every CCW brand form found in the text. */
+/** Named HTML entities that can spell out a brand term (letters have no named entity). */
+const NAMED_ENTITIES = {
+  amp: '&', nbsp: ' ', NonBreakingSpace: ' ', ensp: ' ', emsp: ' ', thinsp: ' ', hairsp: ' ',
+  Tab: ' ', NewLine: ' ', period: '.', sol: '/', colon: ':', hyphen: '-', dash: '-', lowbar: '_',
+  ast: '*', midast: '*', quot: '"', apos: "'", lt: '<', gt: '>', commat: '@', num: '#', percnt: '%',
+  shy: '', ZeroWidthSpace: '', zwj: '', zwnj: '', NoBreak: '',
+};
+const decodeCodePoint = (n) => (n > 0 && n <= 0x10ffff ? String.fromCodePoint(n) : '');
+
+function decodeOnce(text) {
+  return text
+    .replace(/\\u([0-9a-f]{4})/gi, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
+    .replace(/\\x([0-9a-f]{2})/gi, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
+    .replace(/\\[nrtbfv]/g, ' ')
+    .replace(/\\([\\/"'])/g, '$1')
+    .replace(/&#x([0-9a-f]+);?/gi, (_, hex) => decodeCodePoint(parseInt(hex, 16)))
+    .replace(/&#(\d+);?/g, (_, dec) => decodeCodePoint(Number(dec)))
+    .replace(/&([a-z]+);/gi, (entity, name) => NAMED_ENTITIES[name] ?? entity)
+    .replace(/%([0-7][0-9a-f])/gi, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
+}
+
+/**
+ * The text as a reader sees it: JSON/JS escapes, HTML entities (also double-encoded) and URL
+ * percent-escapes decoded, compatibility forms (fullwidth letters) folded, invisible characters
+ * removed and every run of whitespace collapsed to one space. Without this, "C\nC\nW" in a JSON
+ * surface or "&#67;CW" in a lesson body renders as the brand but evades every pattern.
+ */
+export function normaliseForScan(text) {
+  let out = text;
+  for (let i = 0; i < 5; i += 1) {
+    const next = decodeOnce(out);
+    if (next === out) break;
+    out = next;
+  }
+  return out
+    .normalize('NFKC')
+    .replace(/[­​-‍⁠﻿]/g, '')
+    .replace(/\s+/g, ' ');
+}
+
+/** Labels of every CCW brand form found in the text, as written or as rendered (markup removed). */
 export function brandHits(text, productNames) {
+  const normal = normaliseForScan(text);
+  const views = [normal, normal.replace(/<[^>]*>/g, '')];
   return [...FIXED_TERMS, ...productPatterns(productNames)]
-    .filter(({ pattern }) => pattern.test(text))
+    .filter(({ pattern }) => views.some((view) => pattern.test(view)))
     .map(({ label }) => label);
 }
 
