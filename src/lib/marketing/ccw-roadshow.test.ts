@@ -80,7 +80,7 @@ describe('separate Brisbane October occurrence', () => {
       slug: 'brisbane-2026-10-09', dates: '9-10 October 2026',
       startDateIso: '2026-10-09T08:30:00+10:00',
       endDateIso: '2026-10-10T15:00:00+10:00', timeZone: 'Australia/Brisbane',
-      streetAddress: '194D Zillmere Road', capacity: 15, registration: 'external',
+      streetAddress: 'D1-3/194 Zillmere Road', capacity: 15, registration: 'external',
       unitAmountCents: 49500, giftCardAmountCents: 20000, maxRegistrationsPerCustomer: 5,
       bookingUrl: 'https://ccwonline.com.au/collections/training-marketing',
     });

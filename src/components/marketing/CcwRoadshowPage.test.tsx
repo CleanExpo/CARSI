@@ -17,7 +17,7 @@ describe('October Brisbane public presentation', () => {
     expect(markup).toContain('gift card per registration');
     expect(markup).toContain('after the course');
     expect(markup).toContain('8.30am-3pm');
-    expect(markup).toContain('194D Zillmere Road');
+    expect(markup).toContain('D1-3/194 Zillmere Road');
     expect(markup).toContain('href="https://ccwonline.com.au/collections/training-marketing"');
     expect(markup).not.toContain('carsi-2-day-carpet-upholstery-training-course');
     expect(markup).not.toContain('srsltid=');

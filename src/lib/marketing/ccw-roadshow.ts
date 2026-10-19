@@ -186,7 +186,9 @@ export const ccwRoadshowEvents: CcwRoadshowEvent[] = [
     timeLabel: 'Friday 8.30am-4.30pm; Saturday 8.30am-3pm (AEST)',
     timeZone: 'Australia/Brisbane',
     venueName: 'Carpet Cleaners Warehouse Boondall',
-    streetAddress: '194D Zillmere Road',
+    // Same store as CCW's product page "194D"; normalised 19/10/2026 to the contact-page
+    // form (ccwonline.com.au/pages/contact-us) so the address reads the same everywhere.
+    streetAddress: 'D1-3/194 Zillmere Road',
     suburb: 'Boondall',
     suburbStatePostcode: 'Boondall QLD 4034',
     state: 'QLD',

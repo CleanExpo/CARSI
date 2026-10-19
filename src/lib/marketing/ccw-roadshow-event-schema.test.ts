@@ -11,7 +11,7 @@ import {
 const CCW_STORES = {
   VIC: { streetAddress: 'Unit 1/5 Gatwick Road', suburb: 'Bayswater North', postcode: '3153' },
   NSW: { streetAddress: '2/8 Tollis Place', suburb: 'Seven Hills', postcode: '2147' },
-  QLD: { suburb: 'Boondall', postcode: '4034' },
+  QLD: { streetAddress: 'D1-3/194 Zillmere Road', suburb: 'Boondall', postcode: '4034' },
 } as const;
 
 const url = 'https://carsi.com.au/ccw-melbourne';
@@ -46,7 +46,7 @@ describe('CCW roadshow venues are the real CCW stores', () => {
       expect(e.venueName.startsWith('Carpet Cleaners Warehouse')).toBe(true);
       expect(e.suburb).toBe(store.suburb);
       expect(e.suburbStatePostcode).toBe(`${store.suburb} ${e.state} ${store.postcode}`);
-      if ('streetAddress' in store) expect(e.streetAddress).toBe(store.streetAddress);
+      expect(e.streetAddress).toBe(store.streetAddress);
     }
   });
 });
