@@ -17,27 +17,9 @@ const trustItems = [
   'Certificates anyone can verify',
 ];
 
-function HeroWord({
-  children,
-  delay,
-  reduceMotion,
-  className = '',
-}: {
-  children: ReactNode;
-  delay: number;
-  reduceMotion: boolean | null;
-  className?: string;
-}) {
-  return (
-    <motion.span
-      className={`inline-block ${className}`}
-      initial={reduceMotion ? false : { opacity: 0, y: '0.45em', filter: 'blur(6px)' }}
-      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-      transition={{ duration: 0.7, ease: easeOut, delay }}
-    >
-      {children}
-    </motion.span>
-  );
+// Plain span, visible in the server HTML: hiding the headline until hydration made mobile LCP wait on JS.
+function HeroWord({ children, className = '' }: { children: ReactNode; className?: string }) {
+  return <span className={`inline-block ${className}`}>{children}</span>;
 }
 
 interface AnimatedHeroProps {
@@ -162,31 +144,11 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
 
           <h1 className="mt-8 font-[family-name:var(--font-display)] text-[clamp(2.5rem,6.8vw,5.1rem)] leading-[1.1] font-semibold tracking-[-0.03em] text-slate-950">
             <span className="block">
-              <HeroWord delay={0.1} reduceMotion={reduceMotion}>
-                Become
-              </HeroWord>{' '}
-              <HeroWord delay={0.18} reduceMotion={reduceMotion}>
-                the
-              </HeroWord>{' '}
-              <HeroWord delay={0.26} reduceMotion={reduceMotion}>
-                technician
-              </HeroWord>
+              <HeroWord>Become</HeroWord> <HeroWord>the</HeroWord> <HeroWord>technician</HeroWord>
             </span>
             <span className="mt-[0.06em] block">
-              <HeroWord delay={0.38} reduceMotion={reduceMotion}>
-                every
-              </HeroWord>{' '}
-              <HeroWord delay={0.46} reduceMotion={reduceMotion}>
-                job
-              </HeroWord>{' '}
-              <HeroWord delay={0.54} reduceMotion={reduceMotion}>
-                site
-              </HeroWord>{' '}
-              <HeroWord
-                delay={0.62}
-                reduceMotion={reduceMotion}
-                className="relative bg-gradient-to-r from-[#0f5fa8] via-[#2490ed] to-[#38a2f8] bg-clip-text text-transparent"
-              >
+              <HeroWord>every</HeroWord> <HeroWord>job</HeroWord> <HeroWord>site</HeroWord>{' '}
+              <HeroWord className="relative bg-gradient-to-r from-[#0f5fa8] via-[#2490ed] to-[#38a2f8] bg-clip-text text-transparent">
                 trusts.
                 <motion.svg
                   viewBox="0 0 160 16"
@@ -208,18 +170,13 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
             </span>
           </h1>
 
-          <motion.p
-            className="mt-7 max-w-2xl text-[16px] leading-relaxed text-slate-500 sm:text-lg"
-            initial={reduceMotion ? false : { opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ ...springSoft, delay: 0.66 }}
-          >
+          <p className="mt-7 max-w-2xl text-[16px] leading-relaxed text-slate-500 sm:text-lg">
             <span className="font-medium text-slate-700">
               CARSI trains Australia&apos;s cleaning and restoration professionals online.
             </span>{' '}
             Study around the roster, earn CARSI designations, and hold credentials any client,
             employer, or insurer can verify in seconds.
-          </motion.p>
+          </p>
 
           <motion.div
             className="mt-10 flex flex-wrap items-center justify-center gap-3"
