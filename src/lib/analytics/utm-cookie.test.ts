@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { parseUtmCookie, pickUtmValues, serializeUtmCookie } from './utm-cookie';
+import { parseUtmCookie, pickUtmValues, serializeUtmCookie, utmCookieHeader } from './utm-cookie';
 
 describe('utm cookie', () => {
   it('round-trips the five utm keys', () => {
@@ -38,5 +38,18 @@ describe('utm cookie', () => {
 
   it('accepts a value the cookie store already decoded', () => {
     expect(parseUtmCookie('{"utm_source":"google"}')).toEqual({ utm_source: 'google' });
+  });
+
+  it('writes no cookie when every utm value cleans to empty, so a good campaign survives', () => {
+    expect(utmCookieHeader({ utm_source: '<<>>', utm_medium: '   ' }, true)).toBeNull();
+    expect(utmCookieHeader({}, true)).toBeNull();
+  });
+
+  it('builds the cookie from cleaned values, Secure only on https', () => {
+    const header = utmCookieHeader({ utm_source: 'synthex', gclid: 'x' }, true);
+    expect(header).toBe(
+      `carsi_utm=${serializeUtmCookie({ utm_source: 'synthex' })}; Max-Age=2592000; Path=/; SameSite=Lax; Secure`
+    );
+    expect(utmCookieHeader({ utm_source: 'synthex' }, false)).not.toContain('Secure');
   });
 });

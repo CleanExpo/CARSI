@@ -40,6 +40,16 @@ export function serializeUtmCookie(values: UtmValues): string {
   return encodeURIComponent(JSON.stringify(values));
 }
 
+/**
+ * The `document.cookie` assignment for a set of captured params, or null when no utm value
+ * survives cleaning — so a junk-only URL never overwrites a good campaign already stored.
+ */
+export function utmCookieHeader(captured: Record<string, unknown>, secure: boolean): string | null {
+  const values = pickUtmValues(captured);
+  if (Object.keys(values).length === 0) return null;
+  return `${UTM_COOKIE_NAME}=${serializeUtmCookie(values)}; Max-Age=${UTM_COOKIE_MAX_AGE_SECONDS}; Path=/; SameSite=Lax${secure ? '; Secure' : ''}`;
+}
+
 /** Parses the cookie value; anything malformed yields an empty object, never a throw. */
 export function parseUtmCookie(raw: string | null | undefined): UtmValues {
   if (!raw) return {};

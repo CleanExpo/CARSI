@@ -3,13 +3,7 @@
 import { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-import {
-  pickUtmValues,
-  serializeUtmCookie,
-  UTM_COOKIE_MAX_AGE_SECONDS,
-  UTM_COOKIE_NAME,
-  UTM_KEYS,
-} from '@/lib/analytics/utm-cookie';
+import { UTM_KEYS, utmCookieHeader } from '@/lib/analytics/utm-cookie';
 
 /**
  * Silent UTM capture component — mount in the root layout wrapped in Suspense.
@@ -42,8 +36,8 @@ export function UtmCapture() {
           page_path: window.location.pathname,
         })
       );
-      const secure = window.location.protocol === 'https:' ? '; Secure' : '';
-      document.cookie = `${UTM_COOKIE_NAME}=${serializeUtmCookie(pickUtmValues(captured))}; Max-Age=${UTM_COOKIE_MAX_AGE_SECONDS}; Path=/; SameSite=Lax${secure}`;
+      const cookie = utmCookieHeader(captured, window.location.protocol === 'https:');
+      if (cookie) document.cookie = cookie;
     }
   }, [params]);
 
