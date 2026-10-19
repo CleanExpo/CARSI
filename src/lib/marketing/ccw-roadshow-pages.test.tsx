@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import BrisbanePage, { generateMetadata as brisbaneMetadata } from '../../../app/(public)/ccw-brisbane/page';
 import { generateMetadata as melbourneMetadata } from '../../../app/(public)/ccw-melbourne/page';
@@ -114,6 +116,14 @@ describe('roadshow hub metadata follows the free-entry rule', () => {
 describe('/ccw-melbourne description advertises free entry only for an open free sitting', () => {
   afterEach(() => {
     vi.useRealTimers();
+  });
+
+  // Behaviour alone cannot catch a regression here while the ended branch returns first, so pin
+  // the call site to the shared rule (same approach as ccw-roadshow-mint-guard.test.ts).
+  it('decides the free sentence with the shared isOpenFreeEntrySitting rule', () => {
+    const source = readFileSync(join(__dirname, '../../../app/(public)/ccw-melbourne/page.tsx'), 'utf8');
+    expect(source).toContain('isOpenFreeEntrySitting(melbourne, new Date())');
+    expect(source).not.toMatch(/allowsFreeEntryRegistration|registration \?\? 'free-token'/);
   });
 
   it('carries the free offer while the free July sitting is ahead (1/07/2026)', () => {
