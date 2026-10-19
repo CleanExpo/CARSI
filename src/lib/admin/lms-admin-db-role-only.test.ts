@@ -97,18 +97,34 @@ describe('LMS admin is granted by the DB role only', () => {
 
   it('(c) no consumer reads the email lists for an LMS-admin decision', () => {
     const root = join(__dirname, '..', '..', '..');
+    const isSource = (name: string) =>
+      /\.(ts|tsx|mts|cts|js|jsx|mjs|cjs)$/.test(name) && !/\.test\.tsx?$/.test(name);
     const files: string[] = [];
     const walk = (dir: string) => {
       for (const e of readdirSync(dir, { withFileTypes: true })) {
         const p = join(dir, e.name);
         if (e.isDirectory()) {
           if (p !== join(root, 'src', 'generated')) walk(p); // Prisma client output, not app code
-        } else if (/\.(ts|tsx|mjs|js)$/.test(e.name) && !/\.test\.tsx?$/.test(e.name))
-          files.push(p);
+        } else if (isSource(e.name)) files.push(p);
       }
     };
     walk(join(root, 'src'));
     walk(join(root, 'app'));
+    // Every script at the repository root, which is where the request middleware (proxy.ts in
+    // Next 16, middleware.* before it), instrumentation and next.config live. The entry points
+    // this app runs today must exist: a renamed or moved one fails here instead of going unscanned.
+    const rootScripts = readdirSync(root, { withFileTypes: true })
+      .filter((e) => e.isFile() && isSource(e.name))
+      .map((e) => e.name);
+    expect(rootScripts).toEqual(
+      expect.arrayContaining([
+        'proxy.ts',
+        'instrumentation.ts',
+        'instrumentation-client.ts',
+        'next.config.ts',
+      ])
+    );
+    files.push(...rootScripts.map((name) => join(root, name)));
     const users = (re: RegExp) =>
       files
         .filter((f) => re.test(readFileSync(f, 'utf8')))
