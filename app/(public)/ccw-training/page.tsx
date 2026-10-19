@@ -7,6 +7,7 @@ import {
   carsiCoachingMonthlyTagline,
   carsiCoachingProductName,
 } from '@/lib/marketing/carsi-coaching-monthly';
+import { CcwFreeTools } from '@/components/marketing/CcwFreeTools';
 import { getPublicSiteUrl } from '@/lib/env/public-url';
 import { OG_IMAGES } from '@/lib/seo/og-image';
 import { isCarsiCoachingMonthlyEnabled } from '@/lib/server/carsi-coaching-monthly-flag';
@@ -41,8 +42,11 @@ export default function CcwTrainingPage() {
   const checkoutEnabled = isCarsiCoachingMonthlyEnabled();
 
   return (
-    <Suspense fallback={<CcwCoachingFallback />}>
-      <CcwBusinessCoachingClient checkoutEnabled={checkoutEnabled} />
-    </Suspense>
+    <>
+      <Suspense fallback={<CcwCoachingFallback />}>
+        <CcwBusinessCoachingClient checkoutEnabled={checkoutEnabled} />
+      </Suspense>
+      <CcwFreeTools />
+    </>
   );
 }

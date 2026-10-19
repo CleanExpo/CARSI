@@ -112,6 +112,7 @@ standing fix inverts that to **fail-CLOSED — absent by default, added only by 
   CEC-hour claims). A specific CEC-hour claim only passes once the founder adds the slug to
   `CEC_APPROVED_SLUGS` in `scripts/check-iicrc-compliance.mjs`. Fix a false positive by tightening
   the rule's allow-list, never by disabling the rule.
+- **No CCW brand in a CEC-approved course (founder 19/10/2026).** A course in `cec-approvals.json` carries no CCW name, logo, ccwonline.com.au link or CCW product name on any surface; CCW material belongs in CCW-CARSI training and marketing. Enforced by `npm run check:cec-course-brand`.
 
 ## Standards claims — verify against the licensed source (MUST — 2026-07-15 incident)
 

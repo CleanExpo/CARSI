@@ -4878,6 +4878,14 @@
            "back": "370 SS: pump 1,500 psi max, flow 3.4 GPM max, vacuum relief 14 in Hg, engine 3,000 rpm high / 1,400 rpm idle — but always confirm against the specific unit's manual. Water temperature: the 370 SS manual states only 'adjust the thermostatic control to the desired temperature' and publishes no fixed °C, so do not assume a number — confirm the exact safe temperature against the specific unit manual."
           }
          ]
+        },
+        {
+         "label": "Free CCW tool: Hydro-Force sprayer dilution chart and calculator. Works out how much liquid concentrate or powder to put in a Hydro-Force injection sprayer bottle, using the nominal injection ratio for your incoming pressure and metering tip.",
+         "url": "https://ccwonline.com.au/blogs/news/hydroforce-sprayer-dilutions-made-easy"
+        },
+        {
+         "label": "Free CCW tool: Chemical dilution ratio calculator. Turns the dilution on a chemical label (1:X, 1 in X, a percentage or mL per litre) into millilitres of concentrate for a pump-up sprayer, bucket or bottle.",
+         "url": "https://ccwonline.com.au/blogs/news/chemical-dilution-ratio-calculator"
         }
        ]
       }
