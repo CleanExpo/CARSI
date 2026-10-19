@@ -2898,16 +2898,16 @@ legitimate,src/components/ui/AcronymTooltip.tsx,33,reinstall,Reinstallation,IICR
 not-public,src/components/ui/AcronymTooltip.tsx,35,certif,certifications,"code: identifier, comment or type","// IEP does NOT appear on the IICRC certifications page (checked 2026-09-07, with a positive"
 legitimate,src/components/ui/AcronymTooltip.tsx,41,certif,Certificate,"CARSI-issued certificate (document), not certification","CPP: 'Certificate in Property Services (Cleaning Operations)',"
 not-public,src/components/ui/form-surface.ts,3,colour,colours,"code: identifier, comment or type",/** Explicit surface colours: independent of the page's global dark-mode setting. */
-not-public,src/generated/prisma/browser.ts,87,certif,certificate,generated code,* Auto-submitted IICRC CEC certificate emails (renewals@iicrcnet.org) on course completion.
-not-public,src/generated/prisma/browser.ts,87,CEC,CEC,generated code,* Auto-submitted IICRC CEC certificate emails (renewals@iicrcnet.org) on course completion.
-not-public,src/generated/prisma/browser.ts,283,certif,certificate,generated code,* updates). Both days set → certificate of attendance (no CEC — this course
-not-public,src/generated/prisma/browser.ts,283,CEC,CEC,generated code,* updates). Both days set → certificate of attendance (no CEC — this course
-not-public,src/generated/prisma/browser.ts,284,CEC,CECs,generated code,"* promotes CCW commercial products, so IICRC will not grant CECs)."
-not-public,src/generated/prisma/client.ts,111,certif,certificate,generated code,* Auto-submitted IICRC CEC certificate emails (renewals@iicrcnet.org) on course completion.
-not-public,src/generated/prisma/client.ts,111,CEC,CEC,generated code,* Auto-submitted IICRC CEC certificate emails (renewals@iicrcnet.org) on course completion.
-not-public,src/generated/prisma/client.ts,307,certif,certificate,generated code,* updates). Both days set → certificate of attendance (no CEC — this course
-not-public,src/generated/prisma/client.ts,307,CEC,CEC,generated code,* updates). Both days set → certificate of attendance (no CEC — this course
-not-public,src/generated/prisma/client.ts,308,CEC,CECs,generated code,"* promotes CCW commercial products, so IICRC will not grant CECs)."
+not-public,src/generated/prisma/browser.ts,95,certif,certificate,generated code,* Auto-submitted IICRC CEC certificate emails (renewals@iicrcnet.org) on course completion.
+not-public,src/generated/prisma/browser.ts,95,CEC,CEC,generated code,* Auto-submitted IICRC CEC certificate emails (renewals@iicrcnet.org) on course completion.
+not-public,src/generated/prisma/browser.ts,291,certif,certificate,generated code,* updates). Both days set → certificate of attendance (no CEC — this course
+not-public,src/generated/prisma/browser.ts,291,CEC,CEC,generated code,* updates). Both days set → certificate of attendance (no CEC — this course
+not-public,src/generated/prisma/browser.ts,292,CEC,CECs,generated code,"* promotes CCW commercial products, so IICRC will not grant CECs)."
+not-public,src/generated/prisma/client.ts,119,certif,certificate,generated code,* Auto-submitted IICRC CEC certificate emails (renewals@iicrcnet.org) on course completion.
+not-public,src/generated/prisma/client.ts,119,CEC,CEC,generated code,* Auto-submitted IICRC CEC certificate emails (renewals@iicrcnet.org) on course completion.
+not-public,src/generated/prisma/client.ts,315,certif,certificate,generated code,* updates). Both days set → certificate of attendance (no CEC — this course
+not-public,src/generated/prisma/client.ts,315,CEC,CEC,generated code,* updates). Both days set → certificate of attendance (no CEC — this course
+not-public,src/generated/prisma/client.ts,316,CEC,CECs,generated code,"* promotes CCW commercial products, so IICRC will not grant CECs)."
 not-public,src/generated/prisma/internal/class.ts,23,certif,Certifications,generated code,"""inlineSchema"": ""// LMS tables originally seeded from the one-time WordPress migration (committed exports in data/wordpress-export + SQL loaders). Run `pnpm pri"
 not-public,src/generated/prisma/internal/class.ts,23,certif,certifications,generated code,"""inlineSchema"": ""// LMS tables originally seeded from the one-time WordPress migration (committed exports in data/wordpress-export + SQL loaders). Run `pnpm pri"
 not-public,src/generated/prisma/internal/class.ts,23,certif,certificateIssuedAt,generated code,"""inlineSchema"": ""// LMS tables originally seeded from the one-time WordPress migration (committed exports in data/wordpress-export + SQL loaders). Run `pnpm pri"
@@ -2940,26 +2940,26 @@ not-public,src/generated/prisma/internal/class.ts,37,certif,Certification,genera
 not-public,src/generated/prisma/internal/class.ts,37,certif,certificateIssuedAt,generated code,"strings: JSON.parse(""[\""where\"",\""orderBy\"",\""cursor\"",\""userRoles\"",\""student\"",\""instructor\"",\""course\"",\""module\"",\""lesson\"",\""progressRecords\"",\""_count\"","
 not-public,src/generated/prisma/internal/class.ts,37,certif,Certifications,generated code,"strings: JSON.parse(""[\""where\"",\""orderBy\"",\""cursor\"",\""userRoles\"",\""student\"",\""instructor\"",\""course\"",\""module\"",\""lesson\"",\""progressRecords\"",\""_count\"","
 not-public,src/generated/prisma/internal/class.ts,37,CEC,cec,generated code,"strings: JSON.parse(""[\""where\"",\""orderBy\"",\""cursor\"",\""userRoles\"",\""student\"",\""instructor\"",\""course\"",\""module\"",\""lesson\"",\""progressRecords\"",\""_count\"","
-not-public,src/generated/prisma/internal/prismaNamespace.ts,4754,certif,Certifications,generated code,"iicrcCertifications: 'iicrcCertifications',"
-not-public,src/generated/prisma/internal/prismaNamespace.ts,4754,certif,Certifications,generated code,"iicrcCertifications: 'iicrcCertifications',"
-not-public,src/generated/prisma/internal/prismaNamespace.ts,4823,CEC,cec,generated code,"cecHours: 'cecHours',"
-not-public,src/generated/prisma/internal/prismaNamespace.ts,4823,CEC,cec,generated code,"cecHours: 'cecHours',"
-not-public,src/generated/prisma/internal/prismaNamespace.ts,4916,certif,certificateIssuedAt,generated code,"certificateIssuedAt: 'certificateIssuedAt',"
-not-public,src/generated/prisma/internal/prismaNamespace.ts,4916,certif,certificateIssuedAt,generated code,"certificateIssuedAt: 'certificateIssuedAt',"
-not-public,src/generated/prisma/internal/prismaNamespace.ts,4934,CEC,cec,generated code,"cecHours: 'cecHours',"
-not-public,src/generated/prisma/internal/prismaNamespace.ts,4934,CEC,cec,generated code,"cecHours: 'cecHours',"
-not-public,src/generated/prisma/internal/prismaNamespace.ts,5020,certif,Certification,generated code,"targetCertification: 'targetCertification',"
-not-public,src/generated/prisma/internal/prismaNamespace.ts,5020,certif,Certification,generated code,"targetCertification: 'targetCertification',"
-not-public,src/generated/prisma/internal/prismaNamespaceBrowser.ts,150,certif,Certifications,generated code,"iicrcCertifications: 'iicrcCertifications',"
-not-public,src/generated/prisma/internal/prismaNamespaceBrowser.ts,150,certif,Certifications,generated code,"iicrcCertifications: 'iicrcCertifications',"
-not-public,src/generated/prisma/internal/prismaNamespaceBrowser.ts,219,CEC,cec,generated code,"cecHours: 'cecHours',"
-not-public,src/generated/prisma/internal/prismaNamespaceBrowser.ts,219,CEC,cec,generated code,"cecHours: 'cecHours',"
-not-public,src/generated/prisma/internal/prismaNamespaceBrowser.ts,312,certif,certificateIssuedAt,generated code,"certificateIssuedAt: 'certificateIssuedAt',"
-not-public,src/generated/prisma/internal/prismaNamespaceBrowser.ts,312,certif,certificateIssuedAt,generated code,"certificateIssuedAt: 'certificateIssuedAt',"
-not-public,src/generated/prisma/internal/prismaNamespaceBrowser.ts,330,CEC,cec,generated code,"cecHours: 'cecHours',"
-not-public,src/generated/prisma/internal/prismaNamespaceBrowser.ts,330,CEC,cec,generated code,"cecHours: 'cecHours',"
-not-public,src/generated/prisma/internal/prismaNamespaceBrowser.ts,416,certif,Certification,generated code,"targetCertification: 'targetCertification',"
-not-public,src/generated/prisma/internal/prismaNamespaceBrowser.ts,416,certif,Certification,generated code,"targetCertification: 'targetCertification',"
+not-public,src/generated/prisma/internal/prismaNamespace.ts,4829,certif,Certifications,generated code,"iicrcCertifications: 'iicrcCertifications',"
+not-public,src/generated/prisma/internal/prismaNamespace.ts,4829,certif,Certifications,generated code,"iicrcCertifications: 'iicrcCertifications',"
+not-public,src/generated/prisma/internal/prismaNamespace.ts,4898,CEC,cec,generated code,"cecHours: 'cecHours',"
+not-public,src/generated/prisma/internal/prismaNamespace.ts,4898,CEC,cec,generated code,"cecHours: 'cecHours',"
+not-public,src/generated/prisma/internal/prismaNamespace.ts,5014,certif,certificateIssuedAt,generated code,"certificateIssuedAt: 'certificateIssuedAt',"
+not-public,src/generated/prisma/internal/prismaNamespace.ts,5014,certif,certificateIssuedAt,generated code,"certificateIssuedAt: 'certificateIssuedAt',"
+not-public,src/generated/prisma/internal/prismaNamespace.ts,5032,CEC,cec,generated code,"cecHours: 'cecHours',"
+not-public,src/generated/prisma/internal/prismaNamespace.ts,5032,CEC,cec,generated code,"cecHours: 'cecHours',"
+not-public,src/generated/prisma/internal/prismaNamespace.ts,5118,certif,Certification,generated code,"targetCertification: 'targetCertification',"
+not-public,src/generated/prisma/internal/prismaNamespace.ts,5118,certif,Certification,generated code,"targetCertification: 'targetCertification',"
+not-public,src/generated/prisma/internal/prismaNamespaceBrowser.ts,151,certif,Certifications,generated code,"iicrcCertifications: 'iicrcCertifications',"
+not-public,src/generated/prisma/internal/prismaNamespaceBrowser.ts,151,certif,Certifications,generated code,"iicrcCertifications: 'iicrcCertifications',"
+not-public,src/generated/prisma/internal/prismaNamespaceBrowser.ts,220,CEC,cec,generated code,"cecHours: 'cecHours',"
+not-public,src/generated/prisma/internal/prismaNamespaceBrowser.ts,220,CEC,cec,generated code,"cecHours: 'cecHours',"
+not-public,src/generated/prisma/internal/prismaNamespaceBrowser.ts,336,certif,certificateIssuedAt,generated code,"certificateIssuedAt: 'certificateIssuedAt',"
+not-public,src/generated/prisma/internal/prismaNamespaceBrowser.ts,336,certif,certificateIssuedAt,generated code,"certificateIssuedAt: 'certificateIssuedAt',"
+not-public,src/generated/prisma/internal/prismaNamespaceBrowser.ts,354,CEC,cec,generated code,"cecHours: 'cecHours',"
+not-public,src/generated/prisma/internal/prismaNamespaceBrowser.ts,354,CEC,cec,generated code,"cecHours: 'cecHours',"
+not-public,src/generated/prisma/internal/prismaNamespaceBrowser.ts,440,certif,Certification,generated code,"targetCertification: 'targetCertification',"
+not-public,src/generated/prisma/internal/prismaNamespaceBrowser.ts,440,certif,Certification,generated code,"targetCertification: 'targetCertification',"
 not-public,src/generated/prisma/models/AdminUser.ts,747,count-claim,10 users,generated code,* // Limited to the 10 users
 not-public,src/generated/prisma/models/AiWebsiteEvent.ts,822,count-claim,10 users,generated code,* // Limited to the 10 users
 not-public,src/generated/prisma/models/AiWebsiteLead.ts,964,count-claim,10 users,generated code,* // Limited to the 10 users
@@ -3061,7 +3061,8 @@ not-public,src/generated/prisma/models/LmsCourse.ts,2431,CEC,cec,generated code,
 not-public,src/generated/prisma/models/LmsCourse.ts,2480,CEC,cec,generated code,cecHours: number | null
 not-public,src/generated/prisma/models/LmsCourse.ts,2771,count-claim,10 users,generated code,* // Limited to the 10 users
 not-public,src/generated/prisma/models/LmsCourse.ts,2932,CEC,cec,generated code,"readonly cecHours: Prisma.FieldRef<""LmsCourse"", 'Float'>"
-not-public,src/generated/prisma/models/LmsCourseReview.ts,1401,count-claim,10 users,generated code,* // Limited to the 10 users
+not-public,src/generated/prisma/models/LmsCourseReview.ts,1610,count-claim,10 users,generated code,* // Limited to the 10 users
+not-public,src/generated/prisma/models/LmsCourseReviewModerationEvent.ts,1437,count-claim,10 users,generated code,* // Limited to the 10 users
 not-public,src/generated/prisma/models/LmsEnrollment.ts,36,certif,certificateIssuedAt,generated code,certificateIssuedAt: Date | null
 not-public,src/generated/prisma/models/LmsEnrollment.ts,50,certif,certificateIssuedAt,generated code,certificateIssuedAt: Date | null
 not-public,src/generated/prisma/models/LmsEnrollment.ts,64,certif,certificateIssuedAt,generated code,certificateIssuedAt: number
@@ -3237,122 +3238,126 @@ not-public,src/generated/prisma/models/LmsUser.ts,81,certif,Certifications,gener
 not-public,src/generated/prisma/models/LmsUser.ts,148,certif,Certifications,generated code,iicrcCertifications?: true
 not-public,src/generated/prisma/models/LmsUser.ts,244,certif,Certifications,generated code,iicrcCertifications: runtime.JsonValue | null
 not-public,src/generated/prisma/models/LmsUser.ts,288,certif,Certifications,generated code,"iicrcCertifications?: Prisma.JsonNullableFilter<""LmsUser"">"
-not-public,src/generated/prisma/models/LmsUser.ts,335,certif,Certifications,generated code,iicrcCertifications?: Prisma.SortOrderInput | Prisma.SortOrder
-not-public,src/generated/prisma/models/LmsUser.ts,385,certif,Certifications,generated code,"iicrcCertifications?: Prisma.JsonNullableFilter<""LmsUser"">"
-not-public,src/generated/prisma/models/LmsUser.ts,432,certif,Certifications,generated code,iicrcCertifications?: Prisma.SortOrderInput | Prisma.SortOrder
-not-public,src/generated/prisma/models/LmsUser.ts,461,certif,Certifications,generated code,"iicrcCertifications?: Prisma.JsonNullableWithAggregatesFilter<""LmsUser"">"
-not-public,src/generated/prisma/models/LmsUser.ts,484,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,531,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,578,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,625,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,672,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,695,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,718,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,741,certif,Certifications,generated code,iicrcCertifications?: Prisma.SortOrder
-not-public,src/generated/prisma/models/LmsUser.ts,1172,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,1218,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,1280,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,1326,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,1372,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,1418,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,1480,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,1526,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,1572,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,1618,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,1680,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,1726,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,1772,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,1818,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,1880,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,1926,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,1972,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,2018,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,2069,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,2115,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,2177,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,2223,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,2280,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,2326,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,336,certif,Certifications,generated code,iicrcCertifications?: Prisma.SortOrderInput | Prisma.SortOrder
+not-public,src/generated/prisma/models/LmsUser.ts,387,certif,Certifications,generated code,"iicrcCertifications?: Prisma.JsonNullableFilter<""LmsUser"">"
+not-public,src/generated/prisma/models/LmsUser.ts,435,certif,Certifications,generated code,iicrcCertifications?: Prisma.SortOrderInput | Prisma.SortOrder
+not-public,src/generated/prisma/models/LmsUser.ts,464,certif,Certifications,generated code,"iicrcCertifications?: Prisma.JsonNullableWithAggregatesFilter<""LmsUser"">"
+not-public,src/generated/prisma/models/LmsUser.ts,487,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,535,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,583,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,631,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,679,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,702,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,725,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,748,certif,Certifications,generated code,iicrcCertifications?: Prisma.SortOrder
+not-public,src/generated/prisma/models/LmsUser.ts,1195,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,1242,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,1305,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,1352,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,1399,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,1446,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,1509,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,1556,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,1603,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,1650,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,1713,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,1760,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,1807,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,1854,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,1917,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,1964,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,2011,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,2058,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,2110,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,2157,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,2220,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,2267,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,2325,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 not-public,src/generated/prisma/models/LmsUser.ts,2372,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,2418,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,2480,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,2526,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,2572,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,2618,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,2680,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,2726,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,2772,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,2818,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,2880,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,2926,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,2972,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,3018,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,3080,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,3126,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,3172,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,3218,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,3280,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,3326,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,3372,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,3418,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,3469,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,3515,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,3577,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,3623,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,3680,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,3726,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,3772,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,3818,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,3880,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,3926,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,3972,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,4018,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,4080,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,4126,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,4172,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,4218,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,4280,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,4326,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,4372,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,4418,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,4480,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,4526,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,4572,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,4618,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,4680,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,4726,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,4772,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,4818,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,4880,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,4926,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,4972,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,5018,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,5080,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,5126,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,5172,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,5218,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,5280,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,5326,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,5372,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,5418,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,5480,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,2419,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,2466,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,2529,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,2576,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,2623,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,2670,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,2733,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,2780,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,2827,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,2874,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,2937,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,2984,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,3031,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,3078,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,3141,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,3188,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,3235,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,3282,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,3345,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,3392,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,3439,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,3486,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,3549,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,3596,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,3643,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,3690,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,3742,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,3789,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,3852,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,3899,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,3957,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,4004,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,4051,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,4098,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,4161,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,4208,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,4255,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,4302,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,4365,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,4412,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,4459,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,4506,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,4569,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,4616,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,4663,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,4710,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,4773,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,4820,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,4867,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,4914,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,4977,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,5024,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,5071,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,5118,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,5181,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,5228,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,5275,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,5322,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,5385,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,5432,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,5479,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
 not-public,src/generated/prisma/models/LmsUser.ts,5526,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,5572,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,5618,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,5680,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,5726,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,5772,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,5818,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,5880,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,5926,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-not-public,src/generated/prisma/models/LmsUser.ts,6174,certif,Certifications,generated code,iicrcCertifications?: boolean
-not-public,src/generated/prisma/models/LmsUser.ts,6222,certif,Certifications,generated code,iicrcCertifications?: boolean
-not-public,src/generated/prisma/models/LmsUser.ts,6245,certif,Certifications,generated code,iicrcCertifications?: boolean
-not-public,src/generated/prisma/models/LmsUser.ts,6268,certif,Certifications,generated code,iicrcCertifications?: boolean
-not-public,src/generated/prisma/models/LmsUser.ts,6279,certif,Certifications,generated code,"export type LmsUserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<""id"" | "
-not-public,src/generated/prisma/models/LmsUser.ts,6353,certif,Certifications,generated code,iicrcCertifications: runtime.JsonValue | null
-not-public,src/generated/prisma/models/LmsUser.ts,6667,count-claim,10 users,generated code,* // Limited to the 10 users
-not-public,src/generated/prisma/models/LmsUser.ts,6839,certif,Certifications,generated code,"readonly iicrcCertifications: Prisma.FieldRef<""LmsUser"", 'Json'>"
+not-public,src/generated/prisma/models/LmsUser.ts,5589,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,5636,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,5683,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,5730,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,5793,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,5840,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,5887,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,5934,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,5997,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,6044,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,6091,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,6138,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,6201,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,6248,certif,Certifications,generated code,iicrcCertifications?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+not-public,src/generated/prisma/models/LmsUser.ts,6506,certif,Certifications,generated code,iicrcCertifications?: boolean
+not-public,src/generated/prisma/models/LmsUser.ts,6555,certif,Certifications,generated code,iicrcCertifications?: boolean
+not-public,src/generated/prisma/models/LmsUser.ts,6578,certif,Certifications,generated code,iicrcCertifications?: boolean
+not-public,src/generated/prisma/models/LmsUser.ts,6601,certif,Certifications,generated code,iicrcCertifications?: boolean
+not-public,src/generated/prisma/models/LmsUser.ts,6612,certif,Certifications,generated code,"export type LmsUserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<""id"" | "
+not-public,src/generated/prisma/models/LmsUser.ts,6691,certif,Certifications,generated code,iicrcCertifications: runtime.JsonValue | null
+not-public,src/generated/prisma/models/LmsUser.ts,7005,count-claim,10 users,generated code,* // Limited to the 10 users
+not-public,src/generated/prisma/models/LmsUser.ts,7178,certif,Certifications,generated code,"readonly iicrcCertifications: Prisma.FieldRef<""LmsUser"", 'Json'>"
 not-public,src/generated/prisma/models/LmsUserRole.ts,836,count-claim,10 users,generated code,* // Limited to the 10 users
 not-public,src/generated/prisma/models/MargotConversation.ts,1012,count-claim,10 users,generated code,* // Limited to the 10 users
 not-public,src/generated/prisma/models/MargotMessage.ts,820,count-claim,10 users,generated code,* // Limited to the 10 users
@@ -5360,68 +5365,25 @@ not-public,src/lib/server/onboarding-durability.test.ts,152,CEC,cec,test file,"p
 not-public,src/lib/server/onboarding-durability.test.ts,153,iicrc-code,amrt,test file,"disciplines_held: ['amrt', '7'],"
 not-public,src/lib/server/onboarding-durability.test.ts,163,iicrc-code,AMRT,test file,"recommended_pathway: 'AMRT',"
 not-public,src/lib/server/onboarding-durability.test.ts,166,iicrc-code,AMRT,test file,"suggested_courses_url: '/dashboard/courses?discipline=AMRT',"
-not-public,src/lib/server/onboarding-pathway.test.ts,26,certif,certification,test file,"* copy never carry an IICRC designation title or acronym, and make no IICRC, CEC, certification"
-not-public,src/lib/server/onboarding-pathway.test.ts,26,CEC,CEC,test file,"* copy never carry an IICRC designation title or acronym, and make no IICRC, CEC, certification"
-not-public,src/lib/server/onboarding-pathway.test.ts,27,accredit,accreditation,test file,"* or accreditation claim at all, except for sentences allow-listed verbatim below. Both repo"
-not-public,src/lib/server/onboarding-pathway.test.ts,37,certif,certifications,test file,* The title and acronym lists below follow the IICRC's own certifications page
-not-public,src/lib/server/onboarding-pathway.test.ts,38,certif,certifications,test file,"* (iicrc.org/iicrccertifications, read 2026-09-03) and its Master and Journeyman designations"
-not-public,src/lib/server/onboarding-pathway.test.ts,47,iicrc-code,WRT,test file,const OLD_LABEL = 'Water Damage Restoration Technician (WRT)';
-not-public,src/lib/server/onboarding-pathway.test.ts,49,iicrc-code,WRT,test file,'Starting with Water Damage Restoration Technician (WRT) builds foundational credentials recognised across restoration employers in Australia.';
-not-public,src/lib/server/onboarding-pathway.test.ts,50,CEC,CEC,test file,const OLD_GOAL_LABEL = 'Build toward a new IICRC discipline (CEC courses)';
-not-public,src/lib/server/onboarding-pathway.test.ts,51,certif,certification,test file,const REVIEW_MUTANT_CLAIM = 'These courses prepare you for IICRC certification.';
-not-public,src/lib/server/onboarding-pathway.test.ts,54,iicrc-code,BMI,test file,const REVIEW_MUTANT_CURRENT_ACRONYM = 'Field Technician (BMI)';
-not-public,src/lib/server/onboarding-pathway.test.ts,56,iicrc-code,msr,test file,const REVIEW_MUTANT_LOWERCASE_MASTER_ACRONYM = 'Field Technician msr';
-not-public,src/lib/server/onboarding-pathway.test.ts,58,certif,certification,test file,"// The only sentences that may mention IICRC, CECs or certification in recommendation copy."
-not-public,src/lib/server/onboarding-pathway.test.ts,58,CEC,CECs,test file,"// The only sentences that may mention IICRC, CECs or certification in recommendation copy."
-not-public,src/lib/server/onboarding-pathway.test.ts,60,certif,certification,test file,"'Every CARSI credential is CARSI-issued; it is not an IICRC certification.',"
-not-public,src/lib/server/onboarding-pathway.test.ts,61,CEC,CEC,test file,"'Where the IICRC has approved a course, its CEC hours are shown on the course page.',"
-not-public,src/lib/server/onboarding-pathway.test.ts,61,iicrc-offer,IICRC has approved a course,test file,"'Where the IICRC has approved a course, its CEC hours are shown on the course page.',"
-not-public,src/lib/server/onboarding-pathway.test.ts,63,CEC,CECs,test file,"// The learner's own goal may name their own CECs (a statement about their standing, not ours)."
-not-public,src/lib/server/onboarding-pathway.test.ts,64,CEC,CECs,test file,const ALLOWED_GOAL_LABELS = ['Renew my CECs'];
-not-public,src/lib/server/onboarding-pathway.test.ts,66,certif,certifications,test file,"// Acronyms of the current IICRC certifications (iicrc.org/iicrccertifications), the Master and"
-not-public,src/lib/server/onboarding-pathway.test.ts,66,certif,certifications,test file,"// Acronyms of the current IICRC certifications (iicrc.org/iicrccertifications), the Master and"
-not-public,src/lib/server/onboarding-pathway.test.ts,68,iicrc-code,MTC,test file,"// MTC, MSR, MWR, JTC, JSR, JWR), and the older Building Moisture Thermography name; any case."
-not-public,src/lib/server/onboarding-pathway.test.ts,68,iicrc-code,MSR,test file,"// MTC, MSR, MWR, JTC, JSR, JWR), and the older Building Moisture Thermography name; any case."
-not-public,src/lib/server/onboarding-pathway.test.ts,68,iicrc-code,MWR,test file,"// MTC, MSR, MWR, JTC, JSR, JWR), and the older Building Moisture Thermography name; any case."
-not-public,src/lib/server/onboarding-pathway.test.ts,68,iicrc-code,JTC,test file,"// MTC, MSR, MWR, JTC, JSR, JWR), and the older Building Moisture Thermography name; any case."
-not-public,src/lib/server/onboarding-pathway.test.ts,68,iicrc-code,JSR,test file,"// MTC, MSR, MWR, JTC, JSR, JWR), and the older Building Moisture Thermography name; any case."
-not-public,src/lib/server/onboarding-pathway.test.ts,68,iicrc-code,JWR,test file,"// MTC, MSR, MWR, JTC, JSR, JWR), and the older Building Moisture Thermography name; any case."
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,WRT,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,ASD,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,AMRT,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,FSRT,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,OCT,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,CCT,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,CRT,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,RRT,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,CCMT,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,CPT,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,FCT,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,HCT,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,HST,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,LCT,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,RCT,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,SMT,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,TCST,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,UFT,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,RFMT,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,WFMT,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,BMI,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,BMT,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,BCI,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,CDS,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,MRS,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,ISSI,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,RFI,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,WFI,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,WLFI,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,SCI,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,MWR,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,MTC,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,MSR,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,JWR,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,JTC,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/server/onboarding-pathway.test.ts,70,iicrc-code,JSR,test file,'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
+not-public,src/lib/server/onboarding-pathway.test.ts,28,certif,certification,test file,"* copy never carry an IICRC designation title or acronym, and make no IICRC, CEC, certification"
+not-public,src/lib/server/onboarding-pathway.test.ts,28,CEC,CEC,test file,"* copy never carry an IICRC designation title or acronym, and make no IICRC, CEC, certification"
+not-public,src/lib/server/onboarding-pathway.test.ts,29,accredit,accreditation,test file,"* or accreditation claim at all, except for sentences allow-listed verbatim below. Both repo"
+not-public,src/lib/server/onboarding-pathway.test.ts,39,certif,certifications,test file,* The title and acronym lists below follow the IICRC's own certifications page
+not-public,src/lib/server/onboarding-pathway.test.ts,40,certif,certifications,test file,"* (iicrc.org/iicrccertifications, read 2026-09-03) and its Master and Journeyman designations"
+not-public,src/lib/server/onboarding-pathway.test.ts,49,iicrc-code,WRT,test file,const OLD_LABEL = 'Water Damage Restoration Technician (WRT)';
+not-public,src/lib/server/onboarding-pathway.test.ts,51,iicrc-code,WRT,test file,'Starting with Water Damage Restoration Technician (WRT) builds foundational credentials recognised across restoration employers in Australia.';
+not-public,src/lib/server/onboarding-pathway.test.ts,52,CEC,CEC,test file,const OLD_GOAL_LABEL = 'Build toward a new IICRC discipline (CEC courses)';
+not-public,src/lib/server/onboarding-pathway.test.ts,53,certif,certification,test file,const REVIEW_MUTANT_CLAIM = 'These courses prepare you for IICRC certification.';
+not-public,src/lib/server/onboarding-pathway.test.ts,56,iicrc-code,BMI,test file,const REVIEW_MUTANT_CURRENT_ACRONYM = 'Field Technician (BMI)';
+not-public,src/lib/server/onboarding-pathway.test.ts,58,iicrc-code,msr,test file,const REVIEW_MUTANT_LOWERCASE_MASTER_ACRONYM = 'Field Technician msr';
+not-public,src/lib/server/onboarding-pathway.test.ts,60,certif,certification,test file,"// The only sentences that may mention IICRC, CECs or certification in recommendation copy."
+not-public,src/lib/server/onboarding-pathway.test.ts,60,CEC,CECs,test file,"// The only sentences that may mention IICRC, CECs or certification in recommendation copy."
+not-public,src/lib/server/onboarding-pathway.test.ts,62,certif,certification,test file,"'Every CARSI credential is CARSI-issued; it is not an IICRC certification.',"
+not-public,src/lib/server/onboarding-pathway.test.ts,63,CEC,CEC,test file,"'Where the IICRC has approved a course, its CEC hours are shown on the course page.',"
+not-public,src/lib/server/onboarding-pathway.test.ts,63,iicrc-offer,IICRC has approved a course,test file,"'Where the IICRC has approved a course, its CEC hours are shown on the course page.',"
+not-public,src/lib/server/onboarding-pathway.test.ts,65,CEC,CECs,test file,"// The learner's own goal may name their own CECs (a statement about their standing, not ours)."
+not-public,src/lib/server/onboarding-pathway.test.ts,66,CEC,CECs,test file,const ALLOWED_GOAL_LABELS = ['Renew my CECs'];
+not-public,src/lib/server/onboarding-pathway.test.ts,68,certif,certifications,test file,"// Acronyms of the IICRC certifications and Master/Journeyman designations, plus former names:"
 not-public,src/lib/server/onboarding-pathway.test.ts,73,repair,repair,test file,'water damage restoration|applied structural drying|applied microbial remediation|microbial remediation|fire (?:and|&) smoke (?:damage )?restoration|odou?r cont
 not-public,src/lib/server/onboarding-pathway.test.ts,73,repair,repair,test file,'water damage restoration|applied structural drying|applied microbial remediation|microbial remediation|fire (?:and|&) smoke (?:damage )?restoration|odou?r cont
 not-public,src/lib/server/onboarding-pathway.test.ts,73,upholstery,upholstery,test file,'water damage restoration|applied structural drying|applied microbial remediation|microbial remediation|fire (?:and|&) smoke (?:damage )?restoration|odou?r cont

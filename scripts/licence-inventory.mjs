@@ -32,15 +32,13 @@ import { fileURLToPath } from 'node:url';
 
 import ts from 'typescript';
 
+import { IICRC_CODES } from './iicrc-codes.mjs';
 import { pdfText } from './pdf-text.mjs';
 
 export const SCAN_ROOTS = ['app', 'src', 'public'];
 
-/** Official IICRC certification / designation codes (iicrc.org certification list). */
-export const IICRC_CODES = (
-  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|' +
-  'BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR'
-).split('|');
+/** Official IICRC certification / designation codes: the shared list (scripts/iicrc-codes.mjs). */
+export { IICRC_CODES };
 
 const OFFER_NOUN =
   'training|courses?|programs?|programmes?|pathways?|modules?|classes|bundles?|credentials?|creds?|qualifications?';
@@ -200,7 +198,7 @@ export const LEGIT_RULES = [
     terms: ['iicrc-code'],
     code: true,
     path: /\.pdf$/,
-    re: /\bTechnician (?:WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|UFT|RCT|LCT|TCST|HST)\b/,
+    re: new RegExp(`\\bTechnician (?:${CODE_ALT})\\b`),
   },
   {
     name: 'third-person IICRC certification named with its code',

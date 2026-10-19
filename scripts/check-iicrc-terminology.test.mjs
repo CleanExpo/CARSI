@@ -12,11 +12,20 @@
  * The allow-cases matter as much as the block-cases: every one is a phrasing CLAUDE.md
  * explicitly permits, and a guard that blocks them would be turned off within a week.
  */
-import { scanFile, scanText } from './check-iicrc-terminology.mjs';
+import { bannedRules, scanFile, scanText } from './check-iicrc-terminology.mjs';
+import { IICRC_CODES } from './iicrc-codes.mjs';
 
 const F = 'app/(public)/fixture/page.tsx';
 
 const MUST_BLOCK = [
+  // Codes beyond the original eight, one per family (review of f37d2116): the shared IICRC list.
+  ['repair certification code + training', 'Enrol in RRT training today'],
+  ['commercial carpet maintenance code + courses', 'Browse CCMT courses'],
+  ['upholstery code + modifier + course', 'UFT online course for upholstery crews'],
+  ['health and safety code + module', 'HST training module for site crews'],
+  ['master designation + pathway', 'Book the MWR pathway'],
+  ['drying specialist after IICRC', 'IICRC CDS course for drying crews'],
+  ['new codes in a list', 'RRT, CCMT and UFT courses'],
   // Closed-list course modifiers between the code and the offering (review of 47921544).
   ['acronym, one modifier, offering', 'Enrol in WRT online training today'],
   ['acronym, two modifiers, offering', 'ASD practical training module'],
@@ -147,6 +156,12 @@ const MUST_BLOCK = [
 ];
 
 const MUST_PASS = [
+  // Ordinary words that share a short code stay allowed: no offering noun follows them.
+  ['a technician holding stacked certifications (third-person)', 'A **CCT + UFT + OCT** tech can clean, upholster and deodorise.'],
+  ['BMI as body mass index', 'Gym members can track BMI and body-fat trends.'],
+  ['RFI as a request for information', 'Send an RFI before the tender closes.'],
+  ['CPT as billing codes', 'CPT codes appear on the invoice.'],
+  ['RCT as a randomised controlled trial', 'An RCT found the drying method worked.'],
   // Third-person facts with an open word between code and noun stay allowed (closed list only).
   ['holders completing training (third-person)', 'WRT holders completing training'],
   ['technicians who hold the certification attend training', 'technicians who hold WRT attend training'],
@@ -297,6 +312,27 @@ for (const [name, src] of MUST_PASS_FILE) {
   const f = scanFile(F_MULTI, src);
   if (f.length > 0) {
     console.error(`✖ MUST PASS (file) but blocked: ${name}\n    ${f.join('\n    ')}`);
+    failed++;
+  }
+}
+
+// Every code-bearing rule reads the shared list: built without a code, each fixture is missed;
+// built from the full list, it is caught (review of f37d2116).
+const LIST_FIXTURES = [
+  ['list', F, 'Stack RRT + UFT skills on site', ['RRT', 'UFT']],
+  ['single code + offering', F, 'Enrol in RRT training today', ['RRT']],
+  ['IICRC + code', F, 'IICRC RRT for flooring crews', ['RRT']],
+  ['code-aligned', F, 'An RRT-aligned flooring unit', ['RRT']],
+  ['seed discipline', 'data/seed/x.json', '"iicrcDiscipline": "RRT"', ['RRT']],
+];
+for (const [name, file, src, drop] of LIST_FIXTURES) {
+  const reduced = bannedRules(IICRC_CODES.filter((c) => !drop.includes(c)).join('|'));
+  if (scanText(file, src).length === 0) {
+    console.error(`✖ shared list: full list misses ${name}\n    ${src}`);
+    failed++;
+  }
+  if (scanText(file, src, reduced).length > 0) {
+    console.error(`✖ shared list: rules built without ${drop.join('/')} still catch ${name} (not reading the list)\n    ${src}`);
     failed++;
   }
 }

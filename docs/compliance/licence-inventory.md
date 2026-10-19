@@ -22,7 +22,7 @@ Enforced by `src/lib/marketing/licence-inventory.test.ts`.
 | ----------------------------------------------------------------------------------------------- | ---: |
 | fixed (exposures on origin/main 989d8491 under the final rules, removed by this branch)         |  645 |
 | legitimate (named sentence rule or reviewed line)                                               | 1207 |
-| not public (tests, generated, staff, tooling, prompts, identifiers, routing data, markup, URLs) | 4065 |
+| not public (tests, generated, staff, tooling, prompts, identifiers, routing data, markup, URLs) | 4027 |
 | owned elsewhere (reviewed line; not edited here; listed for Phill)                              |    8 |
 | exposure remaining                                                                              |    0 |
 
@@ -167,8 +167,8 @@ Files with fixed hits:
 | legitimate      | reviewed (line): learner states which IICRC certification they hold (third-person; the question asks about the learner's own certifications)                            |    2 |
 | legitimate      | headcount of the guide’s illustrative example business (labelled indicative), not a claim about the world                                                               |    1 |
 | not-public      | code: identifier, comment or type                                                                                                                                       | 1420 |
-| not-public      | test file                                                                                                                                                               | 1230 |
-| not-public      | generated code                                                                                                                                                          |  461 |
+| not-public      | test file                                                                                                                                                               | 1187 |
+| not-public      | generated code                                                                                                                                                          |  466 |
 | not-public      | staff-only admin surface                                                                                                                                                |  310 |
 | not-public      | routing data: bare discipline code (render sites audited separately)                                                                                                    |  269 |
 | not-public      | code: key, slug, path or URL string                                                                                                                                     |  129 |

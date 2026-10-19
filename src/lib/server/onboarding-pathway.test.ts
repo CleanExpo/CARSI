@@ -19,6 +19,8 @@ import {
   resolveRecommendedPathwayCode,
 } from './onboarding-pathway';
 
+import { IICRC_CODE_ALT } from '../../../scripts/iicrc-codes.mjs';
+
 /**
  * Licence guard for the first-session onboarding wizard (CLAUDE.md "CARSI designation rule").
  *
@@ -63,11 +65,9 @@ const ALLOWED_SENTENCES = [
 // The learner's own goal may name their own CECs (a statement about their standing, not ours).
 const ALLOWED_GOAL_LABELS = ['Renew my CECs'];
 
-// Acronyms of the current IICRC certifications (iicrc.org/iicrccertifications), the Master and
-// Journeyman designations exactly as the Master Track page abbreviates them (iicrc.org/iicrcmaster:
-// MTC, MSR, MWR, JTC, JSR, JWR), and the older Building Moisture Thermography name; any case.
-const ACRONYMS =
-  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
+// Acronyms of the IICRC certifications and Master/Journeyman designations, plus former names:
+// the shared list every licence guard reads (scripts/iicrc-codes.mjs); any case.
+const ACRONYMS = IICRC_CODE_ALT;
 // IICRC designation titles by referent, any case: the technician family...
 const TECHNICIAN_REFERENTS =
   'water damage restoration|applied structural drying|applied microbial remediation|microbial remediation|fire (?:and|&) smoke (?:damage )?restoration|odou?r control|carpet cleaning|commercial carpet(?: cleaning| maintenance)?|carpet repair (?:and|&) reinstallation|colou?r repair|upholstery (?:and|&) fabric cleaning|health (?:and|&) safety|trauma (?:and|&) crime scene|leather cleaning|rug cleaning|stone,? masonry (?:and|&) ceramic tile cleaning|floor care|resilient flooring maintenance|wood floor maintenance|contents? processing|house cleaning';
