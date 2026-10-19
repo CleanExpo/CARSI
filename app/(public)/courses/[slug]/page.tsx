@@ -1,15 +1,15 @@
 import { CourseViewTracker } from '@/components/analytics/CourseViewTracker';
 import { CoursePublicDetail } from '@/components/lms/CoursePublicDetail';
-import { BreadcrumbSchema, CourseSchema, VideoObjectSchema } from '@/components/seo';
+import { HomeFaqSection } from '@/components/landing/HomeFaqSection';
+import { BreadcrumbSchema, CourseSchema, FAQSchema, VideoObjectSchema } from '@/components/seo';
 import {
   getDesignationForCourseSlug,
   type DesignationDefinition,
 } from '@/lib/designations/registry';
 import { getBackendOrigin, getPublicSiteUrl } from '@/lib/env/public-url';
 import { stripLegacyPurchaseCta } from '@/lib/lms/format-course-body';
-import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
+import { hasPublicCoursePage } from '@/lib/seo/public-course-page';
 import { normalizePublicAssetUrl } from '@/lib/remote-image';
-import { SchemaMarkup, buildFaqSchema } from '@/lib/schema';
 import {
   buildCourseFallbackKeywords,
   getCourseMarketing,
@@ -257,7 +257,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
 
   if (!course) notFound();
 
-  if (isOnboardingCourse({ slug: course.slug, category: course.category })) {
+  if (!hasPublicCoursePage({ slug: course.slug, category: course.category })) {
     redirect(`/dashboard/onboarding/${course.slug}`);
   }
 
@@ -283,6 +283,9 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
   // AggregateRating for Course rich results — omit silently if unavailable (build/no reviews).
   const aggregateRating = course.id ? await getAggregateRating(course.id).catch(() => null) : null;
   const resolvedMarketing = getResolvedCourseMarketing(course, designation);
+  // AEO/GEO: the course's questions and answers (data/seo/course-cards). One array feeds both
+  // the visible section and the FAQPage JSON-LD, so the schema never describes hidden Q&A.
+  const courseFaqs = (resolvedMarketing?.faq ?? []).map(({ q, a }) => ({ question: q, answer: a }));
 
   return (
     <>
@@ -310,11 +313,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
         />
       ) : null}
       <BreadcrumbSchema items={breadcrumbs} />
-      {(() => {
-        // AEO/GEO: FAQPage JSON-LD from the course's marketing metadata (data/seo/course-cards).
-        const faqs = resolvedMarketing?.faq;
-        return faqs?.length ? <SchemaMarkup schema={buildFaqSchema({ faqs })} /> : null;
-      })()}
+      {courseFaqs.length > 0 ? <FAQSchema questions={courseFaqs} /> : null}
 
 
       <CoursePublicDetail
@@ -348,6 +347,13 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
         }
         aggregateRating={aggregateRating}
       />
+      {courseFaqs.length > 0 ? (
+        <HomeFaqSection
+          faqs={courseFaqs}
+          title="About this course"
+          lead={`Common questions about ${course.title}. Anything else, message CARSI support.`}
+        />
+      ) : null}
     </>
   );
 }

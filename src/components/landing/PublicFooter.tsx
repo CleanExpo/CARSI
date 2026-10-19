@@ -8,6 +8,7 @@ import {
   PUBLIC_SHELL_INNER_CLASS,
 } from '@/components/landing/public-shell-width';
 import { PublicLogo } from '@/components/landing/PublicLogo';
+import { CARSI_ENTITY, postalAddressLine } from '@/lib/seo/carsi-entity';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
 
 /**
@@ -50,7 +51,7 @@ const eventLinks = [
   { label: 'CCW Roadshow', href: '/events/ccw-roadshow' },
   { label: 'CCW Melbourne', href: '/ccw-melbourne' },
   { label: 'CCW Sydney', href: '/ccw-sydney' },
-  { label: 'CCW Materials', href: '/ccw-materials' },
+  { label: 'CCW Materials', href: '/ccw-training/workshop?section=materials' },
 ];
 
 /**
@@ -64,18 +65,9 @@ const eventLinks = [
 const RESTOREASSIST_URL = 'https://restoreassist.app';
 const RESTOREASSIST_EXPLAINER_URL = 'https://restoreassist.app/#overview';
 
-const socialLinks = [
-  { label: 'Facebook', href: 'https://www.facebook.com/CARSIaus' },
-  {
-    label: 'YouTube',
-    href: 'https://www.youtube.com/channel/UC3HpNvGJXivLGoPo4m7Qleg/featured',
-  },
-  { label: 'LinkedIn', href: 'https://www.linkedin.com/company/carsiaus' },
-  {
-    label: 'Spotify',
-    href: 'https://open.spotify.com/show/4FVBn8Cfyx2jOx0m4MksuG',
-  },
-];
+// Profiles, address and email come from the one entity record the Organization schema and
+// /llms.txt also read (src/lib/seo/carsi-entity.ts).
+const socialLinks = CARSI_ENTITY.sameAs.map((s) => ({ label: s.label, href: s.url }));
 
 function FooterSectionLabel({ children }: { children: ReactNode }) {
   return (
@@ -216,7 +208,7 @@ export function PublicFooter({ tone = 'chrome' }: { tone?: 'chrome' | 'light' } 
             <ul className="space-y-3 text-sm text-white/62">
               <li className="flex gap-3">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#7ec5ff]/70" aria-hidden />
-                <span className="leading-relaxed">PO Box 4309, Forest Lake QLD 4078</span>
+                <span className="leading-relaxed">{postalAddressLine()}</span>
               </li>
               <li>
                 <a
@@ -225,6 +217,14 @@ export function PublicFooter({ tone = 'chrome' }: { tone?: 'chrome' | 'light' } 
                 >
                   <Mail className="h-4 w-4 shrink-0 text-[#7ec5ff]/70" aria-hidden />
                   <span>Contact CARSI support</span>
+                </a>
+              </li>
+              <li className="pl-7">
+                <a
+                  href={`mailto:${CARSI_ENTITY.email}`}
+                  className="text-white/62 transition-colors hover:text-white"
+                >
+                  {CARSI_ENTITY.email}
                 </a>
               </li>
               <li className="flex gap-3">
@@ -509,7 +509,7 @@ function LightFooter() {
             <ul className="space-y-3 text-sm text-slate-600">
               <li className="flex gap-3">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#146fc2]/70" aria-hidden />
-                <span className="leading-relaxed">PO Box 4309, Forest Lake QLD 4078</span>
+                <span className="leading-relaxed">{postalAddressLine()}</span>
               </li>
               <li>
                 <a
@@ -518,6 +518,14 @@ function LightFooter() {
                 >
                   <Mail className="h-4 w-4 shrink-0 text-[#146fc2]/70" aria-hidden />
                   <span>Contact CARSI support</span>
+                </a>
+              </li>
+              <li className="pl-7">
+                <a
+                  href={`mailto:${CARSI_ENTITY.email}`}
+                  className="rounded-sm text-slate-600 transition-colors hover:text-[#146fc2] focus-visible:ring-2 focus-visible:ring-[#2490ed]/35 focus-visible:outline-none"
+                >
+                  {CARSI_ENTITY.email}
                 </a>
               </li>
               <li className="flex gap-3">

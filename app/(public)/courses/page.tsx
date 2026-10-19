@@ -14,7 +14,11 @@ import {
 import { BundlePricingCard } from '@/components/lms/BundlePricingCard';
 import { CourseGrid } from '@/components/lms/CourseGrid';
 import { IICRCDisciplineMap } from '@/components/lms/diagrams/IICRCDisciplineMap';
-import { ItemListSchema } from '@/components/seo';
+import { FAQSchema, ItemListSchema } from '@/components/seo';
+import { INDIVIDUAL_TIERS } from '@/lib/lms/pricing-tiers';
+import { selectCurrentCecCourses } from '@/lib/seed/cec-approvals';
+import { catalogueFaqs } from '@/lib/seo/answer-engine';
+import { hasPublicCoursePage } from '@/lib/seo/public-course-page';
 import { CECCalculator } from '@/components/tools/CECCalculator';
 import { resolveDisciplineParam } from '@/lib/catalogue/discipline-param';
 import type { CourseListItem } from '@/lib/course-list-item';
@@ -25,6 +29,7 @@ import {
   formatCourseCountForCopy,
 } from '@/lib/server/public-catalogue-facts';
 import { getPublishedCourseListItemsFromDatabase } from '@/lib/server/public-courses-list';
+import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
 import { ArrowRight, Compass } from 'lucide-react';
 
 export const revalidate = 300;
@@ -73,11 +78,12 @@ async function getCoursesFromBackend() {
       signal: controller.signal,
     });
     clearTimeout(timeoutId);
-    if (!res.ok) return { items: [], total: 0 };
+    if (!res.ok) return { items: [], total: 0, available: false };
     const data = await res.json();
-    return { items: data.items ?? [], total: data.total ?? 0 };
+    const items: CourseListItem[] = data.items ?? [];
+    return { items, total: data.total ?? 0, available: items.length > 0 };
   } catch {
-    return { items: [], total: 0 };
+    return { items: [], total: 0, available: false };
   }
 }
 
@@ -86,7 +92,7 @@ async function getCourses() {
     try {
       const items = await getPublishedCourseListItemsFromDatabase();
       if (items.length > 0) {
-        return { items, total: items.length };
+        return { items, total: items.length, available: true };
       }
     } catch (e) {
       console.error('[courses] Failed to load published courses from database', e);
@@ -115,30 +121,6 @@ function dedupeCoursesBySlug(items: CourseListItem[]): CourseListItem[] {
   });
 }
 
-function buildCatalogueFaqs(publishedCourseCount: number) {
-  const countPhrase =
-    publishedCourseCount > 0
-      ? `Our ${publishedCourseCount} courses range from`
-      : 'Our courses range from';
-
-  return [
-    {
-      question: 'What courses does CARSI offer?',
-      answer: `CARSI is an IICRC CEC Accredited provider, and its courses carry CARSI Southern Hemisphere Restoration Designations — CARSI-issued credentials, not IICRC certifications. The catalogue covers water damage restoration, structural drying, mould remediation, fire and smoke restoration, odour control and carpet cleaning, all produced for Australian and New Zealand conditions. ${countPhrase} beginner modules for people just starting, through intermediate refreshers and advanced practice modules for experienced professionals. Courses are delivered online so technicians can study at their own pace. Eligible courses show their CEC value so learners can track continuing education without implying IICRC delivery status.`,
-    },
-    {
-      question: 'How do I choose the right course?',
-      answer:
-        'Your choice depends on your current role and career goals. Water damage restoration is the most common starting point. Structural drying builds moisture control for structure. Mould remediation covers assessment and remediation. Fire and smoke restoration addresses post-fire cleanup. Odour control focuses on identifying and neutralising sources. Carpet cleaning targets commercial contract cleaners. Each pathway leads to a CARSI Southern Hemisphere Restoration Designation.',
-    },
-    {
-      question: 'What are IICRC Continuing Education Credits (CECs)?',
-      answer:
-        'IICRC Continuing Education Credits (CECs) are the industry standard for tracking professional development in cleaning and restoration. IICRC members and certified technicians continue their education through CECs within each certification cycle. A CARSI course shows a CEC value only when that course has a recorded IICRC approval. Courses awaiting approval show no CEC value. Upon completing an approved course, CECs are recorded in your CARSI dashboard and can be exported for submission to the IICRC. CARSI also provides verifiable digital credentials with a public URL.',
-    },
-  ];
-}
-
 export default async function CoursesPage({
   searchParams,
 }: {
@@ -147,18 +129,43 @@ export default async function CoursesPage({
   const sp = await searchParams;
   // GP-592: map ?discipline= (topic label or legacy URL code) to a real topic tab.
   const disciplineTab = resolveDisciplineParam(sp.discipline);
-  const [bundles, { items: courses }] = await Promise.all([getBundles(), getCoursesCached()]);
+  const [bundles, { items: courses, available }] = await Promise.all([
+    getBundles(),
+    getCoursesCached(),
+  ]);
   const displayCourses = dedupeCoursesBySlug(courses);
   const displayTotal = displayCourses.length;
   const catalogueFacts = deriveCatalogueFactsFromCourseItems(displayCourses);
+  const yearly = INDIVIDUAL_TIERS.find((t) => t.id === 'pro_annual');
+  // Answers are computed from the same catalogue the page lists, the /pricing membership tier
+  // and the CEC approvals registry (src/lib/seo/answer-engine.ts). One array feeds the visible
+  // FAQ and the FAQPage JSON-LD.
+  // A published catalogue is never legitimately empty: a failed or empty read means the catalogue
+  // is unavailable, and then no part of the page states a count — not the hero, the stats, the
+  // grid, the answers, or the ItemList / FAQPage schema.
+  const catalogueAvailable = available && displayTotal > 0;
+  const catalogueAnswers = catalogueFaqs({
+    catalogueAvailable,
+    publishedCourseCount: displayTotal,
+    freeCourseCount: displayCourses.filter((c) => c.is_free || Number(c.price_aud) === 0).length,
+    minPaidCoursePriceAud: catalogueFacts.minPaidCoursePriceAud,
+    cecApprovedCount: selectCurrentCecCourses(displayCourses.filter(hasPublicCoursePage)).length,
+    membership: {
+      priceAud: (yearly?.priceCents ?? 0) / 100,
+      available: subscriptionsEnabled(),
+      terms: yearly?.description ?? '',
+    },
+  });
   const siteUrl = getPublicSiteUrl();
-  const courseListItems = displayCourses.map((course) => {
+  // Course-list markup names only URLs that render a course page (onboarding courses redirect).
+  const courseListItems = displayCourses.filter(hasPublicCoursePage).map((course) => {
     const price = courseSchemaPrice(course);
 
     return {
       name: course.title,
       url: `${siteUrl}/courses/${course.slug}`,
-      description: course.short_description ?? `${course.title} online restoration training course.`,
+      description:
+        course.short_description ?? `${course.title} online restoration training course.`,
       price,
       duration: course.duration_hours,
       isFree: course.is_free === true || price === 0,
@@ -166,11 +173,9 @@ export default async function CoursesPage({
   });
 
   const stats = [
-    {
-      value:
-        displayTotal > 0 ? formatCourseCountForCopy(displayTotal) : `${displayTotal}`,
-      label: 'Published courses',
-    },
+    catalogueAvailable
+      ? { value: formatCourseCountForCopy(displayTotal), label: 'Published courses' }
+      : { value: 'Online', label: 'Self-paced study' },
     { value: '24/7', label: 'Study anytime' },
     { value: 'AUD', label: 'Priced for Australia' },
     { value: 'CEC', label: 'Hours only when approved' },
@@ -178,12 +183,14 @@ export default async function CoursesPage({
 
   return (
     <>
-      <ItemListSchema
-        name="CARSI restoration training courses"
-        description={coursesIndexMetaDescription(catalogueFacts)}
-        items={courseListItems}
-        itemType="Course"
-      />
+      {catalogueAvailable ? (
+        <ItemListSchema
+          name="CARSI restoration training courses"
+          description={coursesIndexMetaDescription(catalogueFacts)}
+          items={courseListItems}
+          itemType="Course"
+        />
+      ) : null}
 
       <section className="relative overflow-hidden border-b border-slate-200/70 bg-white">
         <div
@@ -198,10 +205,11 @@ export default async function CoursesPage({
             Restoration training you can start tonight
           </h1>
           <p className={`mt-5 max-w-2xl text-pretty ${LANDING_LEAD_CLASS}`}>
-            {displayTotal} beginner, intermediate, and advanced course
-            {displayTotal !== 1 ? 's' : ''} across water damage, carpet, structural drying, mould,
-            fire and smoke, odour control and commercial cleaning — produced for Australian
-            conditions, studied around the roster.
+            {catalogueAvailable
+              ? `${displayTotal} beginner, intermediate, and advanced course${displayTotal !== 1 ? 's' : ''}`
+              : 'Beginner, intermediate, and advanced courses'}{' '}
+            across water damage, carpet, structural drying, mould, fire and smoke, odour control and
+            commercial cleaning — produced for Australian conditions, studied around the roster.
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
@@ -244,13 +252,25 @@ export default async function CoursesPage({
         <div className={PUBLIC_SHELL_INNER_CLASS}>
           <div className="mb-10 max-w-2xl">
             <p className={LANDING_EYEBROW_CLASS}>All published courses</p>
-            <h2 className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>Filter by topic, then open a card</h2>
+            <h2 className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>
+              Filter by topic, then open a card
+            </h2>
             <p className={`mt-4 ${LANDING_LEAD_CLASS}`}>
               Same cards as the homepage — price, duration, and CEC hours only when the IICRC has
               approved that course.
             </p>
           </div>
-          <CourseGrid courses={displayCourses} initialTab={disciplineTab ?? 'All'} surface="light" />
+          {catalogueAvailable ? (
+            <CourseGrid
+              courses={displayCourses}
+              initialTab={disciplineTab ?? 'All'}
+              surface="light"
+            />
+          ) : (
+            <p role="status" className={`py-12 ${LANDING_LEAD_CLASS}`}>
+              The course list could not be loaded right now. Please try again shortly.
+            </p>
+          )}
         </div>
       </section>
 
@@ -297,7 +317,8 @@ export default async function CoursesPage({
         </div>
       </section>
 
-      <HomeFaqSection faqs={buildCatalogueFaqs(catalogueFacts.publishedCourseCount)} />
+      {catalogueAvailable ? <FAQSchema questions={catalogueAnswers} /> : null}
+      <HomeFaqSection faqs={catalogueAnswers} />
       <HomeFinalCtaSection />
     </>
   );

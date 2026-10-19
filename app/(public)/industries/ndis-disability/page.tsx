@@ -6,6 +6,7 @@ import {
   IndustryWhySection,
   IndustryCTA,
   ContractorAddOns,
+  IndustryFAQSection,
 } from '@/components/industries';
 import { IndustryRecommendedCourses } from '@/components/industries/IndustryRecommendedCourses';
 import { FAQSchema } from '@/components/seo/JsonLd';
@@ -14,7 +15,7 @@ import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Restoration Training for NDIS & Disability Services | CARSI Australia',
+  title: 'Restoration Training for NDIS & Disability Services',
   description:
     'Meet NDIS Practice Standards with mould and water damage courses. Mould remediation, water damage restoration and carpet cleaning continuing-education training for disability support providers. Online. CEC hours apply only to courses the IICRC has approved; not IICRC certification.',
   keywords: [
@@ -124,6 +125,8 @@ export default async function NDISDisabilityIndustryPage() {
       />
 
       <ContractorAddOns accentColor={ACCENT_COLOR} />
+
+      <IndustryFAQSection industryName="NDIS and disability services" faqs={faqs} />
 
       <IndustryCTA
         subtitle="NDIS Provider Training"

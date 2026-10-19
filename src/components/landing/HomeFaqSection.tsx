@@ -1,6 +1,6 @@
 'use client';
 
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -90,34 +90,23 @@ function LedgerItem({
         </button>
       </h3>
 
-      <AnimatePresence initial={false}>
-        {isOpen ? (
-          <motion.div
-            id={panelId}
-            role="region"
-            aria-labelledby={buttonId}
-            initial={reduceMotion ? undefined : { height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={reduceMotion ? undefined : { height: 0, opacity: 0 }}
-            transition={{ duration: reduceMotion ? 0 : 0.32, ease: [0.4, 0, 0.2, 1] }}
-            className="overflow-hidden"
+      {/* Every answer stays in the HTML (closed ones `hidden`): search and answer engines read
+          the server markup, and FAQPage answers must be on the page. */}
+      <div id={panelId} role="region" aria-labelledby={buttonId} hidden={!isOpen}>
+        <div className="grid grid-cols-[auto_1fr_auto] gap-4 sm:gap-7">
+          {/* Invisible numeral keeps the answer aligned under the question */}
+          <span
+            className="invisible font-[family-name:var(--font-display)] text-[2.4rem] leading-none font-semibold tracking-[-0.04em] tabular-nums select-none sm:text-[3.2rem]"
+            aria-hidden
           >
-            <div className="grid grid-cols-[auto_1fr_auto] gap-4 sm:gap-7">
-              {/* Invisible numeral keeps the answer aligned under the question */}
-              <span
-                className="invisible font-[family-name:var(--font-display)] text-[2.4rem] leading-none font-semibold tracking-[-0.04em] tabular-nums select-none sm:text-[3.2rem]"
-                aria-hidden
-              >
-                {numeral}
-              </span>
-              <p className="max-w-2xl pb-7 text-[15px] leading-relaxed text-slate-500">
-                {faq.answer}
-              </p>
-              <span className="w-9 sm:w-10" aria-hidden />
-            </div>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
+            {numeral}
+          </span>
+          <p className="max-w-2xl pb-7 text-[15px] leading-relaxed whitespace-pre-line text-slate-500">
+            {faq.answer}
+          </p>
+          <span className="w-9 sm:w-10" aria-hidden />
+        </div>
+      </div>
     </motion.li>
   );
 }
@@ -127,7 +116,15 @@ function LedgerItem({
  * on the right, a typographic ledger of questions with oversized ghost
  * numerals, hairline rules, and a plus-to-minus disclosure control.
  */
-export function HomeFaqSection({ faqs }: { faqs: Faq[] }) {
+export function HomeFaqSection({
+  faqs,
+  title = 'Questions technicians ask before enrolling',
+  lead = 'Straight answers about CECs, pacing, industries, and in-person events. If anything is still unclear, message CARSI support any time.',
+}: {
+  faqs: Faq[];
+  title?: string;
+  lead?: string;
+}) {
   const reduceMotion = useReducedMotion();
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
@@ -155,12 +152,9 @@ export function HomeFaqSection({ faqs }: { faqs: Faq[] }) {
           <div className="lg:sticky lg:top-28 lg:self-start">
             <p className={LANDING_EYEBROW_CLASS}>Frequently asked</p>
             <h2 id="home-faq-heading" className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>
-              Questions technicians ask before enrolling
+              {title}
             </h2>
-            <p className={`mt-4 max-w-sm ${LANDING_LEAD_CLASS}`}>
-              Straight answers about CECs, pacing, industries, and in-person events. If anything is
-              still unclear, message CARSI support any time.
-            </p>
+            <p className={`mt-4 max-w-sm ${LANDING_LEAD_CLASS}`}>{lead}</p>
 
             {/* Support card */}
             <motion.div

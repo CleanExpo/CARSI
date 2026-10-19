@@ -56,14 +56,17 @@ describe('professional-directory search indexing while it is a coming-soon gate'
     }
   }
 
-  it('the sitemap omits /professional-directory unless the directory is live, and lists the CEC hub', async () => {
+  it('the sitemap omits /professional-directory until it has verified listings, and lists the CEC hub', async () => {
     const off = await loadSitemapUrls({ PROFESSIONAL_DIRECTORY_LIVE: undefined });
     expect(off.some((u) => u.endsWith('/professional-directory'))).toBe(false);
     expect(off.some((u) => u.endsWith('/iicrc-cec-courses'))).toBe(true);
     expect(off.some((u) => u.endsWith('/courses'))).toBe(true);
 
-    const on = await loadSitemapUrls({ PROFESSIONAL_DIRECTORY_LIVE: 'true' });
-    expect(on.some((u) => u.endsWith('/professional-directory'))).toBe(true);
+    // The flag alone is not enough (review P1, 18/10/2026): with no verified listings the page is
+    // still the noindex coming-soon gate, so listing it in the sitemap contradicted its robots tag.
+    // The listings-present case is covered in src/lib/seo/sitemap-real-pages.test.ts.
+    const flagOnly = await loadSitemapUrls({ PROFESSIONAL_DIRECTORY_LIVE: 'true' });
+    expect(flagOnly.some((u) => u.endsWith('/professional-directory'))).toBe(false);
   });
 
   it('the coming-soon page is noindex; nothing else changes', async () => {

@@ -5,7 +5,8 @@ import { ccwRoadshowPath } from '@/lib/marketing/ccw-roadshow';
 import { startSmartBasePath, startSmartPages } from '@/lib/marketing/start-smart';
 import { getPublishedCourseSlugsFromDatabase } from '@/lib/server/public-courses-list';
 import { isBuildPhase } from '@/lib/server/build-phase';
-import { isProfessionalDirectoryLive } from '@/lib/server/professional-directory';
+import { getProfessionalDirectoryStatus } from '@/lib/server/professional-directory';
+import { hasPublicCoursePage } from '@/lib/seo/public-course-page';
 
 // ISR: regenerate every 5 minutes instead of on every crawl (issue #129). Build-safe
 // because getCourses/getPathways short-circuit during the build phase.
@@ -31,12 +32,7 @@ const staticPages = [
   { path: '/ccw-training', priority: 0.82, changeFreq: 'weekly' as const },
   { path: '/ccw-training/workshop', priority: 0.72, changeFreq: 'monthly' as const },
   { path: '/ccw-truckmount-operations', priority: 0.78, changeFreq: 'weekly' as const },
-  { path: '/ccw-materials', priority: 0.72, changeFreq: 'monthly' as const },
   { path: '/calendar', priority: 0.7, changeFreq: 'weekly' as const },
-  // Only while the directory is live: until then the page is a noindex "coming soon" gate.
-  ...(isProfessionalDirectoryLive()
-    ? [{ path: '/professional-directory', priority: 0.72, changeFreq: 'weekly' as const }]
-    : []),
   { path: '/research', priority: 0.72, changeFreq: 'weekly' as const },
   { path: '/news', priority: 0.68, changeFreq: 'weekly' as const },
   { path: '/jobs', priority: 0.66, changeFreq: 'weekly' as const },
@@ -102,7 +98,9 @@ const staticPages = [
   { path: '/submit/news_source', priority: 0.45, changeFreq: 'monthly' as const },
 ];
 
-async function getCourses(): Promise<{ slug: string; updated_at?: string }[]> {
+async function getCourses(): Promise<
+  { slug: string; updated_at?: string; category?: string | null }[]
+> {
   if (isBuildPhase()) return [];
   const backendUrl = getBackendOrigin();
   try {
@@ -132,9 +130,20 @@ async function getPathways(): Promise<{ slug: string; updated_at?: string }[]> {
   }
 }
 
+// Listed only when the page is indexable: it serves a noindex "coming soon" gate until the
+// directory is live AND has verified listings (the same status its metadata reads).
+const professionalDirectoryPage = {
+  path: '/professional-directory',
+  priority: 0.72,
+  changeFreq: 'weekly' as const,
+};
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const directory = await getProfessionalDirectoryStatus();
+  const pages = directory.live ? [...staticPages, professionalDirectoryPage] : staticPages;
+
   // Static pages
-  const staticEntries: MetadataRoute.Sitemap = staticPages.map((page) => ({
+  const staticEntries: MetadataRoute.Sitemap = pages.map((page) => ({
     url: `${baseUrl}${page.path}`,
     lastModified: STATIC_LASTMOD,
     changeFrequency: page.changeFreq,
@@ -143,7 +152,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Dynamic course pages — published LMS catalogue, then remote API fallback
   const dbCourses = await getPublishedCourseSlugsFromDatabase();
-  const courses = dbCourses.length > 0 ? dbCourses : await getCourses();
+  // Only courses whose public page renders: onboarding courses redirect to the dashboard.
+  const courses = (dbCourses.length > 0 ? dbCourses : await getCourses()).filter(
+    hasPublicCoursePage
+  );
   const courseEntries: MetadataRoute.Sitemap = courses.map((course) => ({
     url: `${baseUrl}/courses/${course.slug}`,
     lastModified:

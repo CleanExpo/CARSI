@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import type { NextConfig } from 'next';
+import { HTML_LIMITED_BOT_UA_RE_STRING } from 'next/dist/shared/lib/router/utils/is-bot';
 
 import { buildApiCorsHeaders } from './src/lib/security/api-cors';
 
@@ -56,6 +57,11 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   devIndicators: false,
+  // Next 16 streams page metadata (title, description, canonical) into <body>, except for its
+  // HTML-limited bot list, which gets it blocking in <head>. That list leaves out ordinary
+  // Googlebot, so add Googlebot only (review of 7a2d510c). Browsers keep streaming and never wait
+  // on the dynamic metadata reads; an all-agents pattern would hold every browser back.
+  htmlLimitedBots: new RegExp(`${HTML_LIMITED_BOT_UA_RE_STRING}|\\bGooglebot\\b`, 'i'),
   async redirects() {
     return [
       // Existing marketing links use /signup; keep the course return path and
@@ -66,6 +72,13 @@ const nextConfig: NextConfig = {
       { source: '/onboarding', destination: '/pathways', permanent: false },
       { source: '/student', destination: '/dashboard/student', permanent: true },
       { source: '/student/:path*', destination: '/dashboard/student/:path*', permanent: true },
+      // Legacy workshop-materials URL. A page-level permanentRedirect() is served as
+      // 200 + meta refresh once the response streams, so do it here as a real 308.
+      {
+        source: '/ccw-materials',
+        destination: '/ccw-training/workshop?section=materials',
+        permanent: true,
+      },
       // IICRC's public online-CEC listing links to /restoration-courses (404 until
       // 17/09/2026). `:path*` also matches the bare path and any sub-path.
       { source: '/restoration-courses/:path*', destination: '/courses', permanent: true },
@@ -132,6 +145,13 @@ const nextConfig: NextConfig = {
             value: 'public, max-age=86400, stale-while-revalidate=604800',
           },
         ],
+      },
+      {
+        // Post-checkout utility page. Its section layout (app/(public)/subscribe/layout.tsx,
+        // owned elsewhere) hands it the /subscribe canonical and "index, follow"; the header
+        // keeps it out of search without touching that layout (route-canonical.test.ts).
+        source: '/subscribe/success',
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
       },
       {
         source: '/images/og/:path*',

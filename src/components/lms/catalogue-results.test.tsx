@@ -84,12 +84,13 @@ describe('catalogue results with real cards and published CI seed fixtures', () 
     });
     expect(links(region, NON_WATER_COURSE.title)).toHaveLength(1);
     expect(links(container, WATER_COURSE.title)).toHaveLength(2);
-    // A card really has two same-title headings; its labelled CTA is unique.
+    // One heading per card: the text thumbnail repeats the title as plain text, not a second
+    // <h3> (a duplicate heading broke the course page's heading order). Its labelled CTA is unique.
     expect(
       Array.from(region.querySelectorAll('h3')).filter(
         (heading) => heading.textContent === NON_WATER_COURSE.title
       )
-    ).toHaveLength(2);
+    ).toHaveLength(1);
 
     act(() => tab('Water Damage').click());
     expect(tab('Water Damage').getAttribute('aria-selected')).toBe('true');

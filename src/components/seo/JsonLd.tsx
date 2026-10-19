@@ -4,6 +4,7 @@
 // Content is server-generated from controlled objects, not user input.
 
 import { buildFounderPersonSchema } from '@/lib/schema/founder';
+import { CARSI_ENTITY, ENTITY_SAME_AS, entityPostalAddress } from '@/lib/seo/carsi-entity';
 import { serializeJsonLd } from '@/lib/seo/json-ld';
 
 interface OrganizationSchemaProps {
@@ -14,15 +15,10 @@ interface OrganizationSchemaProps {
 }
 
 export function OrganizationSchema({
-  name = 'CARSI',
-  url = 'https://carsi.com.au',
-  logo = 'https://carsi.com.au/logo.png',
-  sameAs = [
-    'https://www.facebook.com/CARSIaus',
-    'https://www.linkedin.com/company/carsiaus',
-    'https://www.youtube.com/channel/UC3HpNvGJXivLGoPo4m7Qleg/featured',
-    'https://open.spotify.com/show/4FVBn8Cfyx2jOx0m4MksuG',
-  ],
+  name = CARSI_ENTITY.name,
+  url = CARSI_ENTITY.url,
+  logo = CARSI_ENTITY.logo,
+  sameAs = ENTITY_SAME_AS,
 }: OrganizationSchemaProps) {
   const schema = {
     '@context': 'https://schema.org',
@@ -33,16 +29,12 @@ export function OrganizationSchema({
     url,
     logo,
     image: `${url}/og-image.png`,
-    description:
-      'Australian online training platform for cleaning and restoration professionals, and an IICRC CEC Accredited provider. CEC hours apply only to courses the IICRC has approved.',
-    email: 'support@carsi.com.au',
+    legalName: CARSI_ENTITY.legalName,
+    // One entity record for schema, footer and /llms.txt (src/lib/seo/carsi-entity.ts).
+    description: CARSI_ENTITY.description,
+    email: CARSI_ENTITY.email,
     // SAB: postal address only — no street address exposed publicly
-    address: {
-      '@type': 'PostalAddress',
-      addressLocality: 'Forest Lake',
-      addressRegion: 'QLD',
-      addressCountry: 'AU',
-    },
+    address: entityPostalAddress(),
     // SAB: explicit state-by-state service area coverage
     areaServed: [
       {

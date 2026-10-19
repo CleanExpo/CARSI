@@ -6,10 +6,13 @@ import {
   LANDING_LEAD_CLASS,
   PUBLIC_SHELL_INNER_CLASS,
 } from '@/components/landing/public-shell-width';
-import { ItemListSchema } from '@/components/seo';
+import { HomeFaqSection } from '@/components/landing/HomeFaqSection';
+import { FAQSchema, ItemListSchema } from '@/components/seo';
 import type { CourseListItem } from '@/lib/course-list-item';
 import { getBackendOrigin, getPublicSiteUrl } from '@/lib/env/public-url';
 import { selectCurrentCecCourses } from '@/lib/seed/cec-approvals';
+import { cecCourseFaqs } from '@/lib/seo/answer-engine';
+import { hasPublicCoursePage } from '@/lib/seo/public-course-page';
 import { getPublishedCourseListItemsFromDatabase } from '@/lib/server/public-courses-list';
 
 /**
@@ -34,11 +37,15 @@ export const metadata: Metadata = {
   alternates: { canonical: PAGE_PATH },
 };
 
-async function getPublishedCourses(): Promise<CourseListItem[]> {
+/**
+ * The published catalogue, or `available: false` when it could not be read. A failed read is
+ * kept distinct from "read fine, nothing approved": only the second may say "None at present".
+ */
+async function getPublishedCourses(): Promise<{ items: CourseListItem[]; available: boolean }> {
   if (process.env.DATABASE_URL?.trim()) {
     try {
       const items = await getPublishedCourseListItemsFromDatabase();
-      if (items.length > 0) return items;
+      if (items.length > 0) return { items, available: true };
     } catch (e) {
       console.error('[iicrc-cec-courses] Failed to load published courses from database', e);
     }
@@ -48,11 +55,13 @@ async function getPublishedCourses(): Promise<CourseListItem[]> {
       cache: 'no-store',
       signal: AbortSignal.timeout(5000),
     });
-    if (!res.ok) return [];
+    if (!res.ok) return { items: [], available: false };
     const data = await res.json();
-    return data.items ?? [];
+    const items: CourseListItem[] = data.items ?? [];
+    // A published catalogue is never legitimately empty.
+    return { items, available: items.length > 0 };
   } catch {
-    return [];
+    return { items: [], available: false };
   }
 }
 
@@ -79,26 +88,40 @@ function formatExpiry(iso: string): string {
 
 export default async function IicrcCecCoursesPage() {
   const siteUrl = getPublicSiteUrl();
-  const rows = selectCurrentCecCourses(await getPublishedCourses());
+  const catalogue = await getPublishedCourses();
+  const rows = selectCurrentCecCourses(catalogue.items.filter(hasPublicCoursePage));
+  // Answers computed from the same rows the table shows (src/lib/seo/answer-engine.ts); one
+  // array feeds the visible Q&A and the FAQPage JSON-LD.
+  const expiries = rows.map((r) => r.expiresAt.slice(0, 10)).sort();
+  const cecAnswers = cecCourseFaqs({
+    available: catalogue.available,
+    approvedCount: rows.length,
+    earliestExpiry: expiries[0] ?? null,
+    latestExpiry: expiries[expiries.length - 1] ?? null,
+  });
 
   return (
     <>
-      <ItemListSchema
-        name="IICRC CEC Accredited courses from CARSI"
-        description="CARSI courses with a current IICRC approval for Continuing Education Credit hours."
-        itemType="Course"
-        items={rows.map(({ course }) => {
-          const price = priceOf(course);
-          return {
-            name: course.title,
-            url: `${siteUrl}/courses/${course.slug}`,
-            description: course.short_description ?? course.title,
-            price,
-            duration: course.duration_hours,
-            isFree: price === 0,
-          };
-        })}
-      />
+      {/* Same outage rule as /courses: a failed read emits no list schema, and an empty list is
+          never emitted at all. */}
+      {catalogue.available && rows.length > 0 ? (
+        <ItemListSchema
+          name="IICRC CEC Accredited courses from CARSI"
+          description="CARSI courses with a current IICRC approval for Continuing Education Credit hours."
+          itemType="Course"
+          items={rows.map(({ course }) => {
+            const price = priceOf(course);
+            return {
+              name: course.title,
+              url: `${siteUrl}/courses/${course.slug}`,
+              description: course.short_description ?? course.title,
+              price,
+              duration: course.duration_hours,
+              isFree: price === 0,
+            };
+          })}
+        />
+      ) : null}
 
       <section className="border-b border-slate-200/70 bg-white">
         <div className={`${PUBLIC_SHELL_INNER_CLASS} py-16 md:py-20`}>
@@ -115,11 +138,16 @@ export default async function IicrcCecCoursesPage() {
         </div>
       </section>
 
-      <section aria-label="Courses with current IICRC CEC approval" className="bg-[#fafbfc] py-12 md:py-16">
+      <section
+        aria-label="Courses with current IICRC CEC approval"
+        className="bg-[#fafbfc] py-12 md:py-16"
+      >
         <div className={PUBLIC_SHELL_INNER_CLASS}>
           {rows.length === 0 ? (
             <p className="text-sm text-slate-600">
-              The list is not available right now.{' '}
+              {catalogue.available
+                ? 'No CARSI course has an IICRC CEC approval in force right now.'
+                : 'The list is not available right now.'}{' '}
               <Link href="/courses" className="font-semibold text-[#146fc2] underline">
                 Browse all courses
               </Link>
@@ -129,14 +157,23 @@ export default async function IicrcCecCoursesPage() {
             <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
               <table className="w-full text-left text-sm">
                 <caption className="sr-only">
-                  Courses with a current IICRC CEC approval, with price, CEC hours and approval expiry
+                  Courses with a current IICRC CEC approval, with price, CEC hours and approval
+                  expiry
                 </caption>
                 <thead className="bg-slate-50 text-xs font-semibold tracking-wide text-slate-600 uppercase">
                   <tr>
-                    <th scope="col" className="px-4 py-3">Course</th>
-                    <th scope="col" className="px-4 py-3">IICRC CEC hours</th>
-                    <th scope="col" className="px-4 py-3">Price</th>
-                    <th scope="col" className="px-4 py-3">Approval valid until</th>
+                    <th scope="col" className="px-4 py-3">
+                      Course
+                    </th>
+                    <th scope="col" className="px-4 py-3">
+                      IICRC CEC hours
+                    </th>
+                    <th scope="col" className="px-4 py-3">
+                      Price
+                    </th>
+                    <th scope="col" className="px-4 py-3">
+                      Approval valid until
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200">
@@ -159,13 +196,23 @@ export default async function IicrcCecCoursesPage() {
               </table>
             </div>
           )}
-          <p className="mt-6 text-xs text-slate-500">
-            Courses not listed here show no CEC hours, because the IICRC has not approved them for
-            CECs or their approval has lapsed. Training a crew? Paid courses can be bought as team
-            seats at checkout.
-          </p>
+          {/* Only a successful read can say why a course is absent; an unreadable catalogue
+              says nothing about approvals. */}
+          {catalogue.available ? (
+            <p className="mt-6 text-xs text-slate-500">
+              Courses not listed here show no CEC hours, because the IICRC has not approved them for
+              CECs or their approval has lapsed. Training a crew? Paid courses can be bought as team
+              seats at checkout.
+            </p>
+          ) : null}
         </div>
       </section>
+      {catalogue.available ? <FAQSchema questions={cecAnswers} /> : null}
+      <HomeFaqSection
+        faqs={cecAnswers}
+        title="About IICRC CEC approvals"
+        lead="What an approval means for a CARSI course, and how long it lasts."
+      />
     </>
   );
 }

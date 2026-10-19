@@ -46,13 +46,17 @@ export const metadata: Metadata = {
   creator: 'CARSI',
   publisher: 'CARSI',
   manifest: '/manifest.json',
+  // iOS 'Add to Home Screen': launch standalone with the short name, not the page title.
+  appleWebApp: { capable: true, title: 'CARSI', statusBarStyle: 'default' },
+  // Declared sizes must be the files' real sizes (site-icons.test.tsx). favicon.ico carries
+  // the 16/32/48 px set; the apple-touch-icon is opaque because iOS paints transparency black.
   icons: {
     icon: [
+      { url: '/favicon.ico' },
       { url: '/logo/favicon.png', type: 'image/png', sizes: '512x512' },
-      { url: '/logo/favicon.png', type: 'image/png', sizes: '32x32' },
     ],
-    shortcut: '/logo/favicon.png',
-    apple: [{ url: '/logo/favicon.png', sizes: '180x180', type: 'image/png' }],
+    shortcut: '/favicon.ico',
+    apple: [{ url: '/icons/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
   },
   robots: {
     index: true,
@@ -68,7 +72,9 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_AU',
-    url: siteUrl,
+    // Relative on purpose: Next resolves './' against the current pathname, so a page that
+    // inherits this gets its own URL rather than the homepage's.
+    url: './',
     siteName: 'CARSI',
     title: 'CARSI | Restoration Training, IICRC CEC Platform',
     description:
@@ -90,8 +96,11 @@ export const metadata: Metadata = {
     images: [`${siteUrl}/og-image.png`],
     creator: '@carsi_au',
   },
+  // Every route without its own canonical inherits this. An absolute site URL here made
+  // inner pages (about, contact, legal, industries …) declare themselves duplicates of the
+  // homepage; './' resolves to each page's own path (see root-canonical.test.tsx).
   alternates: {
-    canonical: siteUrl,
+    canonical: './',
   },
   category: 'Education',
 };
