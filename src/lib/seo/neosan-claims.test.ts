@@ -50,16 +50,36 @@ const CLAIM_PATTERN = new RegExp(
     'control\\w* allergens',
     'guarantee\\w*',
     '100\\s?%',
+    // review r6 additions: toxicology + environmental-fate assertions
+    '\\bcancers?\\b',
+    '\\bcarcinogens?\\b',
+    '\\bmutagens?\\b',
+    '\\breproductive\\b',
+    '\\bendocrine\\b',
+    '\\btoxic(?!ological)(?:ity)?\\b',
+    '\\bpoison\\w*\\b',
+    'allergen-causing',
+    'asthma-causing',
+    '\\bbiodegradab\\w*',
+    '\\bpersistent\\b',
+    '\\bbioaccumulat\\w*',
+    '\\baquatic\\b',
+    'eco-friendly',
+    '\\bgreen\\b',
   ].join('|'),
   'i',
 );
 const ATTRIBUTED = /NeoSan Labs states/i;
 const SOURCED = /\(?\s*source:\s*https?:\/\//i;
 const DATED = /checked\s+\d{1,2}\/\d{1,2}\/\d{4}/;
+// r6: a block that only directs the reader to the SDS hazard/environmental
+// sections makes no assertion of its own and is exempt.
+const SDS_DIRECTION = /check SDS sections 2/i;
 
 function unattributedClaims(blocks: string[]): string[] {
   return blocks.filter((block) => {
     if (!CLAIM_PATTERN.test(block)) return false;
+    if (SDS_DIRECTION.test(block)) return false;
     return !(
       ATTRIBUTED.test(block) &&
       SOURCED.test(block) &&
@@ -104,8 +124,33 @@ describe('NeoSan Labs course claim compliance (review r2/r3)', () => {
       '<p>Control allergens, such as dust and mould.</p>',
       '<p>We guarantee results.</p>',
       '<p>100% effective against germs.</p>',
+      // review r6 controls: toxicology + environmental-fate assertions
+      '<p>Degradation products are known to cause cancer.</p>',
+      '<p>This surfactant contains a carcinogen.</p>',
+      '<p>No mutagens are created when it degrades.</p>',
+      '<p>It causes reproductive problems.</p>',
+      '<p>A known endocrine disruptor.</p>',
+      '<p>The toxicity of cationic surfactants is the biggest.</p>',
+      '<p>Label the container POISON.</p>',
+      '<p>An allergen-causing residue.</p>',
+      '<p>Asthma-causing dust is removed.</p>',
+      '<p>Fully biodegradable surfactants.</p>',
+      '<p>Persistent in the environment.</p>',
+      '<p>Not bioaccumulative.</p>',
+      '<p>Aquatic toxicity is low.</p>',
+      '<p>An eco-friendly formula.</p>',
+      '<p>A green cleaning product.</p>',
     ];
     expect(unattributedClaims(controls)).toHaveLength(controls.length);
+  });
+
+  it('planted control: an SDS-direction block is exempt (r6)', () => {
+    const direction = [
+      '<p>Environmental fate varies by product &mdash; For this product&rsquo;s ' +
+        'hazards and environmental information, check SDS sections 2 (hazard ' +
+        'identification), 11 (toxicological information) and 12 (ecological information).</p>',
+    ];
+    expect(unattributedClaims(direction)).toEqual([]);
   });
 
   it('planted control: an attributed, dated, sourced claim passes', () => {
