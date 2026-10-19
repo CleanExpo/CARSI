@@ -29,6 +29,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, extname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { isEntryPoint } from './lib/is-entry-point.mjs';
 
 import ts from 'typescript';
 
@@ -633,4 +634,4 @@ async function main() {
   process.exitCode = exposures.length ? 1 : 0;
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) main();
+if (isEntryPoint(import.meta.url)) main();

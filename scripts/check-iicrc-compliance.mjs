@@ -22,6 +22,7 @@ import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { isEntryPoint } from './lib/is-entry-point.mjs';
 
 /** Founder-approved IICRC-CEC course slugs — read from the CEC approvals registry
  *  (`data/seed/cec-approvals.json`, the SSOT; validated by `npm run check:cec`).
@@ -281,4 +282,4 @@ function main() {
   process.exit(0);
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) main();
+if (isEntryPoint(import.meta.url)) main();

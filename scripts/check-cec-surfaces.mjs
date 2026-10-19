@@ -62,7 +62,7 @@
  */
 import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { isEntryPoint } from './lib/is-entry-point.mjs';
 import ts from 'typescript';
 
 import { IICRC_CODE_ALT } from './iicrc-codes.mjs';
@@ -545,7 +545,7 @@ function isAssignmentTarget(objLiteral) {
 export { inScope, isExempt, ACCESSOR_ALLOWLIST };
 
 // Run the scanner only when invoked directly (not when imported by the self-test).
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+if (isEntryPoint(import.meta.url)) {
   let list = '';
   try {
     list = execSync('git ls-files --cached --others --exclude-standard', { encoding: 'utf8', maxBuffer: 128 * 1024 * 1024 });

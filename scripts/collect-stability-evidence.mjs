@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { isEntryPoint } from './lib/is-entry-point.mjs';
 
 import { collectStabilityEvidence, writeReceiptAtomic } from './stability-evidence/collector.mjs';
 
@@ -47,8 +47,7 @@ async function main() {
   process.exitCode = receipt.overall.result === 'pass' ? 0 : 1;
 }
 
-const invokedDirectly =
-  process.argv[1] && resolve(process.argv[1]) === resolve(fileURLToPath(import.meta.url));
+const invokedDirectly = isEntryPoint(import.meta.url);
 if (invokedDirectly) {
   main().catch((error) => {
     process.stderr.write(`stability evidence collection failed: ${error.message}\n`);

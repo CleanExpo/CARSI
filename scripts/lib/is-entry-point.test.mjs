@@ -8,8 +8,9 @@
  * is run through a symlink (/tmp -> /private/tmp on macOS, a symlinked checkout or scripts
  * dir), the CLI body never runs, and the guard exits 0 having reported nothing.
  *
- * The planted case runs a representative CI guard (check-iicrc-terminology) through a
- * symlinked scripts directory on a tree that contains a banned phrase, and requires exit 1.
+ * The planted cases run two CI guards, one per broken idiom (check-iicrc-terminology and
+ * check-iicrc-compliance), through a symlinked scripts directory on a tree that contains a
+ * banned phrase, and require exit 1.
  */
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
@@ -54,6 +55,23 @@ try {
     1,
     'check-iicrc-terminology run through a symlinked path must exit 1 on a planted violation'
   );
+
+  // The CEC backstop used the fileURLToPath(import.meta.url) === argv[1] form of the same
+  // defect. From check-iicrc-compliance.test.mjs MUST_BLOCK.
+  writeFileSync(
+    join(dir, 'app/cec-claim.tsx'),
+    'export const copy = "This course awards 4 IICRC CECs.";\n'
+  );
+  assert.equal(
+    run(join(scriptsDir, 'check-iicrc-compliance.mjs')),
+    1,
+    'planted CEC claim must fail via the real path'
+  );
+  assert.equal(
+    run(join(link, 'check-iicrc-compliance.mjs')),
+    1,
+    'check-iicrc-compliance run through a symlinked path must exit 1 on a planted violation'
+  );
 } finally {
   rmSync(dir, { recursive: true, force: true });
 }
@@ -83,5 +101,5 @@ assert.equal(
 );
 
 console.log(
-  'is-entry-point: symlinked guard run failed on the planted violation; helper cases passed'
+  'is-entry-point: both symlinked guard runs failed on their planted violations; helper cases passed'
 );
