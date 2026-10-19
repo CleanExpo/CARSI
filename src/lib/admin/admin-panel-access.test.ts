@@ -3,9 +3,9 @@ import { afterEach, describe, expect, it } from 'vitest';
 import type { SessionClaims } from '@/lib/auth/session-jwt';
 
 import {
-  getAdminPanelAllowedEmails,
-  isAdminAllowlistedEmail,
+  getReservedStaffEmails,
   isLmsClaimsAllowedAdminPanel,
+  isReservedStaffEmail,
 } from './admin-panel-access';
 
 function claims(email: string, role = 'student'): SessionClaims {
@@ -13,11 +13,11 @@ function claims(email: string, role = 'student'): SessionClaims {
 }
 
 /**
- * Regression: the founder admin accounts must reach /admin (and the admin⇄learner
- * view toggle) even when NO admin env vars are configured — the exact env-drift that
- * hid the toggle from phill.m@carsi.com.au (ADMIN_PANEL_EMAILS was never set in DO).
+ * LMS admin is the database role only (founder decision 19/10/2026). The staff-email list
+ * survives solely so unverified account creation can refuse those addresses (PR #907); the
+ * end-to-end grant matrix lives in lms-admin-db-role-only.test.ts.
  */
-describe('admin-panel-access — founder allowlist is env-independent', () => {
+describe('admin-panel-access', () => {
   const ORIG = {
     ADMIN_EMAIL: process.env.ADMIN_EMAIL,
     ADMIN_PANEL_EMAILS: process.env.ADMIN_PANEL_EMAILS,
@@ -27,52 +27,31 @@ describe('admin-panel-access — founder allowlist is env-independent', () => {
     process.env.ADMIN_PANEL_EMAILS = ORIG.ADMIN_PANEL_EMAILS;
   });
 
-  it('allows the founder account with NO admin env set (would have failed pre-fix)', () => {
-    delete process.env.ADMIN_EMAIL;
-    delete process.env.ADMIN_PANEL_EMAILS;
-    expect(isLmsClaimsAllowedAdminPanel(claims('phill.m@carsi.com.au'))).toBe(true);
-    // trimmed + case-insensitive, matching isLmsClaimsAllowedAdminPanel's normalisation
-    expect(isLmsClaimsAllowedAdminPanel(claims('  PHILL.M@CARSI.COM.AU '))).toBe(true);
-  });
-
-  it('does NOT hardcode the ADMIN_EMAIL/support bootstrap as admin (self-registration guard)', () => {
-    // Security: support@ is the legacy admin-password bootstrap, not a hardcoded LMS
-    // admin — it must only gain the panel via the ADMIN_EMAIL/ADMIN_PANEL_EMAILS env,
-    // never by anyone self-registering the address.
-    delete process.env.ADMIN_EMAIL;
-    delete process.env.ADMIN_PANEL_EMAILS;
-    expect(isLmsClaimsAllowedAdminPanel(claims('support@carsi.com.au'))).toBe(false);
-    process.env.ADMIN_EMAIL = 'support@carsi.com.au';
-    expect(isLmsClaimsAllowedAdminPanel(claims('support@carsi.com.au'))).toBe(true);
-  });
-
-  it('isAdminAllowlistedEmail matches founder and env addresses whatever their case or spacing', () => {
-    process.env.ADMIN_EMAIL = 'support@carsi.com.au';
-    process.env.ADMIN_PANEL_EMAILS = 'ops@carsi.com.au';
-    expect(isAdminAllowlistedEmail('  PHILL.M@carsi.com.au ')).toBe(true);
-    expect(isAdminAllowlistedEmail('Support@CARSI.com.au')).toBe(true);
-    expect(isAdminAllowlistedEmail(' ops@CARSI.COM.AU')).toBe(true);
-    expect(isAdminAllowlistedEmail('learner@example.com')).toBe(false);
-  });
-
-  it('denies a non-admin email when no env allowlist is set', () => {
-    delete process.env.ADMIN_EMAIL;
-    delete process.env.ADMIN_PANEL_EMAILS;
-    expect(isLmsClaimsAllowedAdminPanel(claims('stranger@example.com'))).toBe(false);
-  });
-
-  it('honours JWT role `admin` regardless of email', () => {
-    delete process.env.ADMIN_EMAIL;
-    delete process.env.ADMIN_PANEL_EMAILS;
+  it('honours session role `admin` whatever its case or spacing, and nothing else', () => {
     expect(isLmsClaimsAllowedAdminPanel(claims('someone@else.com', 'admin'))).toBe(true);
+    expect(isLmsClaimsAllowedAdminPanel(claims('someone@else.com', ' Admin '))).toBe(true);
+    expect(isLmsClaimsAllowedAdminPanel(claims('someone@else.com', 'instructor'))).toBe(false);
+    expect(isLmsClaimsAllowedAdminPanel(claims('someone@else.com', ''))).toBe(false);
   });
 
-  it('extends the allowlist via ADMIN_PANEL_EMAILS while preserving founders', () => {
+  it('reserves founder accounts with NO admin env set', () => {
     delete process.env.ADMIN_EMAIL;
+    delete process.env.ADMIN_PANEL_EMAILS;
+    expect(isReservedStaffEmail('  PHILL.M@CARSI.COM.AU ')).toBe(true);
+    // The support@ bootstrap is reserved only when configured, never hardcoded.
+    expect(isReservedStaffEmail('support@carsi.com.au')).toBe(false);
+    expect(isReservedStaffEmail('stranger@example.com')).toBe(false);
+  });
+
+  it('reserves founder and env addresses whatever their case or spacing', () => {
+    process.env.ADMIN_EMAIL = 'support@carsi.com.au';
     process.env.ADMIN_PANEL_EMAILS = 'ops@carsi.com.au, extra@carsi.com.au';
-    const set = getAdminPanelAllowedEmails();
-    expect(set.has('phill.m@carsi.com.au')).toBe(true); // founder preserved
-    expect(set.has('ops@carsi.com.au')).toBe(true);
+    expect(isReservedStaffEmail('  PHILL.M@carsi.com.au ')).toBe(true);
+    expect(isReservedStaffEmail('Support@CARSI.com.au')).toBe(true);
+    expect(isReservedStaffEmail(' ops@CARSI.COM.AU')).toBe(true);
+    expect(isReservedStaffEmail('learner@example.com')).toBe(false);
+    const set = getReservedStaffEmails();
+    expect(set.has('phill.m@carsi.com.au')).toBe(true);
     expect(set.has('extra@carsi.com.au')).toBe(true);
   });
 });

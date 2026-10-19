@@ -52,8 +52,8 @@ export async function GET(request: NextRequest) {
     email: claims.email,
     full_name,
     roles: [claims.role],
-    // True when this session may open the admin panel — either JWT role `admin`
-    // or an email on the ADMIN_PANEL_EMAILS allowlist (e.g. support@carsi.com.au).
+    // True when this session may open the admin panel: session role `admin`, minted from
+    // the database at sign-in. No email list grants it.
     // The client uses this to decide whether to show the admin/learner view toggle.
     can_access_admin: isLmsClaimsAllowedAdminPanel(claims),
     theme_preference,

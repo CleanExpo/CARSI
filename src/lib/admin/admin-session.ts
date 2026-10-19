@@ -9,8 +9,8 @@ import {
 import { verifySessionToken } from '@/lib/auth/session-jwt';
 
 /**
- * Admin cookie (`/api/admin/login`) or a valid LMS JWT (`/api/auth/login`) when the user is
- * allowlisted (see `ADMIN_PANEL_EMAILS`, `ADMIN_EMAIL`) or has LMS role `admin`.
+ * Admin cookie (`/api/admin/login`) or a valid LMS JWT (`/api/auth/login`) whose role is
+ * `admin` (the database role minted at sign-in). No email list grants LMS admin.
  */
 export async function getAdminSessionOrNull(): Promise<AdminSessionClaims | null> {
   const cookieStore = await cookies();

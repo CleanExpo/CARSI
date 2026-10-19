@@ -1,6 +1,6 @@
 import { randomBytes, randomUUID } from 'node:crypto';
 
-import { isAdminAllowlistedEmail } from '@/lib/admin/admin-panel-access';
+import { isReservedStaffEmail } from '@/lib/admin/admin-panel-access';
 import type { SessionClaims } from '@/lib/auth/session-jwt';
 import {
   hashPassword,
@@ -82,8 +82,8 @@ export async function findOrCreateGuestUser(params: {
   // and poisons certificates (#302). Empty means "no name on file".
   const fullName = params.fullName.trim();
   const allowClaim = params.allowClaim === true;
-  // An admin-allowlisted address is never created, claimed or authenticated from a guest flow.
-  if (isAdminAllowlistedEmail(email)) return { status: 'exists' };
+  // A reserved staff address is never created, claimed or authenticated from a guest flow.
+  if (isReservedStaffEmail(email)) return { status: 'exists' };
 
   const existing = await prisma.lmsUser.findUnique({ where: { email } });
   if (existing) {
@@ -111,13 +111,13 @@ export async function findOrCreateGuestUser(params: {
 
 /**
  * True when an unauthenticated checkout must be refused before payment: the email is
- * admin-allowlisted and has no active account. Fulfilment would never provision or authenticate
+ * a reserved staff address and has no active account. Fulfilment would never provision or authenticate
  * that address (ensureGuestUserFromStripeEmail returns null; sessionClaimsForUserId rejects an
  * inactive row), so taking the payment would leave it unfulfilled.
  */
 export async function isReservedGuestCheckoutEmail(email: string): Promise<boolean> {
   const normalized = email.trim().toLowerCase();
-  if (!normalized || !isAdminAllowlistedEmail(normalized)) return false;
+  if (!normalized || !isReservedStaffEmail(normalized)) return false;
   const existing = await prisma.lmsUser.findUnique({ where: { email: normalized } });
   return existing === null || existing.isActive === false;
 }
@@ -147,8 +147,8 @@ export async function ensureGuestUserFromStripeEmail(
   if (existing) {
     return sessionClaimsForUserId(existing.id);
   }
-  // Never provision an admin-allowlisted address from an unverified Stripe email.
-  if (isAdminAllowlistedEmail(normalized)) return null;
+  // Never provision a reserved staff address from an unverified Stripe email.
+  if (isReservedStaffEmail(normalized)) return null;
 
   const id = randomUUID();
   // Unclaimed provisional marker — never a real bcrypt hash. The account cannot

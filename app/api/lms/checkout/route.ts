@@ -134,7 +134,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // A staff (admin-allowlisted) email without a usable account can't be provisioned by any
+    // A reserved staff email without a usable account can't be provisioned by any
     // unauthenticated payment, whatever the client sends as guest_checkout or purchase mode, so
     // refuse before charging rather than take money that can never be fulfilled.
     if (!studentId && (await guardLookup(() => isReservedGuestCheckoutEmail(customerEmail)))) {

@@ -45,8 +45,10 @@ type Fixture = {
 };
 // What the DATABASE makes each persona — the fixture's truth, independent of the code under test.
 const PERSONAS: Record<string, Fixture> = {
+  // A founder address whose database role is student: no email makes an account an admin
+  // (founder decision 19/10/2026 — admin is the database role only).
   founder: {
-    principal: 'admin',
+    principal: 'anyone',
     lms: {
       sub: 'u-founder',
       email: 'phill.m@carsi.com.au',
@@ -483,7 +485,7 @@ describe('what an allowed AI draft sends is exactly the review it was allowed to
     ]);
   });
   it('an admin drafting for a hidden review sends it (admins may read hidden reviews)', async () => {
-    m.persona = 'founder';
+    m.persona = 'dbAdmin';
     m.reviewHidden = true;
     expect((await ACTIONS['AI draft for a hidden review']!.run()).status).toBe(200);
     expect(m.modelCalls[0]).toMatchObject({ body: 'private phone number' });
@@ -528,53 +530,35 @@ describe('r13 reviewer reproduction: a hide committed between the visibility che
   });
 });
 
-describe('r14 reviewer case: a founder address also listed in ADMIN_PANEL_EMAILS / ADMIN_EMAIL is never locked out', () => {
+describe('a founder address without the database admin role cannot moderate reviews', () => {
   it.each([
-    [
-      'ADMIN_PANEL_EMAILS',
-      { ADMIN_EMAIL: 'support@carsi.com.au', ADMIN_PANEL_EMAILS: 'phill.m@carsi.com.au' },
-    ],
-    [
-      'ADMIN_EMAIL',
-      { ADMIN_EMAIL: 'phill.m@carsi.com.au', ADMIN_PANEL_EMAILS: 'ops@carsi.com.au' },
-    ],
+    ['no admin env', {}],
+    ['ADMIN_PANEL_EMAILS', { ADMIN_PANEL_EMAILS: 'phill.m@carsi.com.au' }],
+    ['ADMIN_EMAIL', { ADMIN_EMAIL: 'phill.m@carsi.com.au' }],
   ] as const)(
-    'founder also in %s (DB role student): moderates, reads hidden reviews and the summary',
+    'founder email with DB role student (also in: %s): no moderation, hidden reviews or summary',
     async (_label, env) => {
       Object.assign(process.env, env);
       m.persona = 'founder';
-      for (const [action, hidden] of [
-        ['moderate: hide a published review', false],
-        ['read hidden reviews (GET)', true],
-        ['moderation summary (GET)', false],
+      for (const [action, hidden, status] of [
+        ['moderate: hide a published review', false, 403],
+        ['moderate: unhide a hidden review', true, 403],
+        ['read hidden reviews (GET)', true, 200],
+        ['moderation summary (GET)', false, 403],
       ] as const) {
         m.reviewHidden = hidden;
         const out = await ACTIONS[action]!.run();
-        expect({ action, ...out }).toEqual({ action, status: 200, allowed: true });
+        expect({ action, ...out }).toEqual({ action, status, allowed: false });
       }
+      expect(m.writes).toEqual([]);
+      expect(m.events).toEqual([]);
+      expect(m.lastGetFlags).toEqual({ can_manage: false, can_moderate: false });
     }
   );
-
-  it('a configured address that is NOT a founder stays untrusted (a student listed in ADMIN_PANEL_EMAILS)', async () => {
-    process.env.ADMIN_PANEL_EMAILS = 'learner@example.com,phill.m@carsi.com.au';
-    m.persona = 'student';
-    const out = await ACTIONS['moderate: hide a published review']!.run();
-    expect(out).toEqual({ status: 403, allowed: false });
-    expect(m.writes).toEqual([]);
-  });
 });
 
 describe('the moderation audit records the verified admin, by kind', () => {
   it.each([
-    [
-      'founder',
-      {
-        actorKind: 'lms_admin',
-        actorRef: 'u-founder',
-        actorId: 'u-founder',
-        actorEmail: 'phill.m@carsi.com.au',
-      },
-    ],
     [
       'dbAdmin',
       {

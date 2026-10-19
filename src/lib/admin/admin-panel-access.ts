@@ -7,30 +7,18 @@ export function getAdminEmail(): string {
 }
 
 /**
- * Founder admin account(s) that ALWAYS reach the admin panel, independent of env
- * config — an env-drift guard so admin access can't be silently lost when
- * `ADMIN_PANEL_EMAILS` is unset in a deploy (which is exactly what hid the
- * admin⇄learner view toggle from phill.m@carsi.com.au).
- *
- * SECURITY — read before editing this list. `isLmsClaimsAllowedAdminPanel` trusts the
- * self-asserted `claims.email`, and public self-registration (POST /api/auth/register)
- * does NOT verify email ownership. So an address listed here that is NOT already a
- * claimed `LmsUser` could be self-registered by anyone to gain full admin. Only list
- * emails backed by a real, already-registered password account (its row blocks
- * re-registration via EMAIL_TAKEN). `phill.m@carsi.com.au` is such an account.
- * Do NOT add the `ADMIN_EMAIL` / `support@` bootstrap address — that is the separate
- * legacy admin-password login, likely has no LmsUser row, and hardcoding it would open
- * a self-registration account-takeover. Keep lowercase.
+ * Staff addresses that unverified account creation must REFUSE. This list grants nothing:
+ * LMS admin comes only from the database role (founder decision 19/10/2026 — see
+ * `isLmsClaimsAllowedAdminPanel`). Public self-registration, guest signup, Stripe-email
+ * provisioning and provisional claims do not verify inbox ownership, so a stranger could
+ * otherwise create an account under a founder/support address before its owner does
+ * (PR #907). `FOUNDER_EMAILS` covers founder accounts when no env is set; `ADMIN_EMAIL`
+ * and `ADMIN_PANEL_EMAILS` (comma-separated) add to it. Keep lowercase.
  */
-export const FOUNDER_ADMIN_EMAILS = ['phill.m@carsi.com.au'] as const;
+const FOUNDER_EMAILS = ['phill.m@carsi.com.au'] as const;
 
-/**
- * Emails that may open `/admin` after LMS login, in addition to JWT role `admin`.
- * Always includes the founder accounts above; `ADMIN_PANEL_EMAILS` (comma-separated,
- * e.g. `support@carsi.com.au`) and the `ADMIN_EMAIL` bootstrap add to it.
- */
-export function getAdminPanelAllowedEmails(): Set<string> {
-  const out = new Set<string>(FOUNDER_ADMIN_EMAILS);
+export function getReservedStaffEmails(): Set<string> {
+  const out = new Set<string>(FOUNDER_EMAILS);
   const bootstrap = getAdminEmail().toLowerCase();
   if (bootstrap) out.add(bootstrap);
   const raw = process.env.ADMIN_PANEL_EMAILS;
@@ -43,28 +31,26 @@ export function getAdminPanelAllowedEmails(): Set<string> {
   return out;
 }
 
+/** True for a staff address that unverified account creation must refuse. Grants no access. */
+export function isReservedStaffEmail(email: string): boolean {
+  return getReservedStaffEmails().has(email.trim().toLowerCase());
+}
+
 /**
- * True for any address that would open the admin panel by email alone. Unverified account
- * creation (self-registration, guest signup, Stripe-email provisioning, provisional claims)
- * must refuse these, or anyone could register an unclaimed allowlisted address and become admin.
+ * LMS admin: the session role, which `resolveSessionRole` mints from the database
+ * (lms_user_roles, then lms_users.role) at sign-in. Never an email list, env var or constant.
  */
-export function isAdminAllowlistedEmail(email: string): boolean {
-  return getAdminPanelAllowedEmails().has(email.trim().toLowerCase());
-}
-
-/** LMS session may access the admin dashboard if role is admin or email is allowlisted. */
 export function isLmsClaimsAllowedAdminPanel(claims: SessionClaims): boolean {
-  if (claims.role.trim().toLowerCase() === 'admin') return true;
-  return getAdminPanelAllowedEmails().has(claims.email.trim().toLowerCase());
+  return claims.role.trim().toLowerCase() === 'admin';
 }
 
-/** Default landing after sign-in: admin panel for allowlisted emails, student overview otherwise. */
+/** Default landing after sign-in: admin panel for LMS admins, student overview otherwise. */
 export function getDefaultAppPathForClaims(claims: SessionClaims): '/admin' | '/dashboard/student' {
   return isLmsClaimsAllowedAdminPanel(claims) ? '/admin' : '/dashboard/student';
 }
 
 /**
- * Honors `next` when safe; blocks `/admin` for users not on the admin allowlist.
+ * Honors `next` when safe; blocks `/admin` for users who are not LMS admins.
  */
 export function getPostLoginRedirectPath(
   claims: SessionClaims,
