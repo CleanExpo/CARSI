@@ -222,8 +222,10 @@ describe('buildCourseFallbackKeywords', () => {
 
 describe('current repository truth', () => {
   it('freezes catalogue, surface, card, price, and CEC truth', () => {
-    // 72 = 71 + the free ozone/hydroxyl evidence course (draft, isFree, priceAud 0), 14/10/2026.
-    expect(catalogue).toHaveLength(72);
+    // 73 = 72 + the recovered NeoSan Labs product training course (published, priceAud 99,
+    // cecHours 0, iicrcDiscipline null), imported from the legacy WordPress/LearnDash export
+    // on 19/10/2026 (feat/import-neosan-course).
+    expect(catalogue).toHaveLength(73);
     expect(surfaceSlugs).toHaveLength(24);
     expect(new Set(surfaceSlugs).size).toBe(24);
     expect(readdirSync(cardsDirectory).filter((name) => name.endsWith('.json'))).toHaveLength(80);
