@@ -2462,54 +2462,46 @@ not-public,src/components/lms/CourseTextThumbnail.branding.test.tsx,115,iicrc-co
 not-public,src/components/lms/CourseTextThumbnail.branding.test.tsx,120,iicrc-code,HST,test file,expect(markup).not.toContain('HST');
 not-public,src/components/lms/CourseTextThumbnail.branding.test.tsx,128,iicrc-code,CCT,test file,"category=""CCT Commercial Carpet"""
 not-public,src/components/lms/CourseTextThumbnail.branding.test.tsx,129,iicrc-code,CCT,test file,"discipline=""CCT"""
-not-public,src/components/lms/CourseTextThumbnail.tsx,13,iicrc-code,WRT,"code: identifier, comment or type",WRT: {
-not-public,src/components/lms/CourseTextThumbnail.tsx,20,iicrc-code,CRT,"code: identifier, comment or type",CRT: {
-not-public,src/components/lms/CourseTextThumbnail.tsx,27,iicrc-code,ASD,"code: identifier, comment or type",ASD: {
-not-public,src/components/lms/CourseTextThumbnail.tsx,34,iicrc-code,OCT,"code: identifier, comment or type",OCT: {
-not-public,src/components/lms/CourseTextThumbnail.tsx,41,iicrc-code,CCT,"code: identifier, comment or type",CCT: {
-not-public,src/components/lms/CourseTextThumbnail.tsx,48,iicrc-code,FSRT,"code: identifier, comment or type",FSRT: {
-not-public,src/components/lms/CourseTextThumbnail.tsx,55,iicrc-code,AMRT,"code: identifier, comment or type",AMRT: {
-not-public,src/components/lms/CourseTextThumbnail.tsx,67,iicrc-offer,IICRC-discipline courses,"code: identifier, comment or type","* consistent system: IICRC-discipline courses take their discipline accent, everything else"
-not-public,src/components/lms/CourseTextThumbnail.tsx,70,iicrc-code,WRT,routing data: bare discipline code (render sites audited separately),const CARSI_NEUTRAL: (typeof DISCIPLINE_ACCENTS)['WRT'] = {
-not-public,src/components/lms/CourseTextThumbnail.tsx,85,iicrc-code,WRT,"code: identifier, comment or type",const m = cat.match(/^(WRT|CRT|ASD|OCT|CCT|FSRT|AMRT)\b/i);
-not-public,src/components/lms/CourseTextThumbnail.tsx,85,iicrc-code,CRT,"code: identifier, comment or type",const m = cat.match(/^(WRT|CRT|ASD|OCT|CCT|FSRT|AMRT)\b/i);
-not-public,src/components/lms/CourseTextThumbnail.tsx,85,iicrc-code,ASD,"code: identifier, comment or type",const m = cat.match(/^(WRT|CRT|ASD|OCT|CCT|FSRT|AMRT)\b/i);
-not-public,src/components/lms/CourseTextThumbnail.tsx,85,iicrc-code,OCT,"code: identifier, comment or type",const m = cat.match(/^(WRT|CRT|ASD|OCT|CCT|FSRT|AMRT)\b/i);
-not-public,src/components/lms/CourseTextThumbnail.tsx,85,iicrc-code,CCT,"code: identifier, comment or type",const m = cat.match(/^(WRT|CRT|ASD|OCT|CCT|FSRT|AMRT)\b/i);
-not-public,src/components/lms/CourseTextThumbnail.tsx,85,iicrc-code,FSRT,"code: identifier, comment or type",const m = cat.match(/^(WRT|CRT|ASD|OCT|CCT|FSRT|AMRT)\b/i);
-not-public,src/components/lms/CourseTextThumbnail.tsx,85,iicrc-code,AMRT,"code: identifier, comment or type",const m = cat.match(/^(WRT|CRT|ASD|OCT|CCT|FSRT|AMRT)\b/i);
-not-public,src/components/lms/CourseTextThumbnail.tsx,92,iicrc-code,CCT,"code: identifier, comment or type","* sometimes prefixed with an IICRC discipline acronym (""CCT Commercial Carpet""). The"
-not-public,src/components/lms/CourseTextThumbnail.tsx,99,iicrc-code,WRT,"code: identifier, comment or type","const stripped = c.replace(/^(?:WRT|CRT|ASD|OCT|CCT|FSRT|AMRT|TCST)\b[\s\-–—:/]*/i, '').trim();"
-not-public,src/components/lms/CourseTextThumbnail.tsx,99,iicrc-code,CRT,"code: identifier, comment or type","const stripped = c.replace(/^(?:WRT|CRT|ASD|OCT|CCT|FSRT|AMRT|TCST)\b[\s\-–—:/]*/i, '').trim();"
-not-public,src/components/lms/CourseTextThumbnail.tsx,99,iicrc-code,ASD,"code: identifier, comment or type","const stripped = c.replace(/^(?:WRT|CRT|ASD|OCT|CCT|FSRT|AMRT|TCST)\b[\s\-–—:/]*/i, '').trim();"
-not-public,src/components/lms/CourseTextThumbnail.tsx,99,iicrc-code,OCT,"code: identifier, comment or type","const stripped = c.replace(/^(?:WRT|CRT|ASD|OCT|CCT|FSRT|AMRT|TCST)\b[\s\-–—:/]*/i, '').trim();"
-not-public,src/components/lms/CourseTextThumbnail.tsx,99,iicrc-code,CCT,"code: identifier, comment or type","const stripped = c.replace(/^(?:WRT|CRT|ASD|OCT|CCT|FSRT|AMRT|TCST)\b[\s\-–—:/]*/i, '').trim();"
-not-public,src/components/lms/CourseTextThumbnail.tsx,99,iicrc-code,FSRT,"code: identifier, comment or type","const stripped = c.replace(/^(?:WRT|CRT|ASD|OCT|CCT|FSRT|AMRT|TCST)\b[\s\-–—:/]*/i, '').trim();"
-not-public,src/components/lms/CourseTextThumbnail.tsx,99,iicrc-code,AMRT,"code: identifier, comment or type","const stripped = c.replace(/^(?:WRT|CRT|ASD|OCT|CCT|FSRT|AMRT|TCST)\b[\s\-–—:/]*/i, '').trim();"
-not-public,src/components/lms/CourseTextThumbnail.tsx,99,iicrc-code,TCST,"code: identifier, comment or type","const stripped = c.replace(/^(?:WRT|CRT|ASD|OCT|CCT|FSRT|AMRT|TCST)\b[\s\-–—:/]*/i, '').trim();"
-not-public,src/components/lms/CourseTextThumbnail.tsx,115,iicrc-code,WRT,routing data: bare discipline code (render sites audited separately),): (typeof DISCIPLINE_ACCENTS)['WRT'] {
-not-public,src/components/lms/CourseTextThumbnail.tsx,130,CEC,cec,"code: identifier, comment or type",cecHoursLabel?: string | null;
-not-public,src/components/lms/CourseTextThumbnail.tsx,184,CEC,cec,"code: identifier, comment or type","cecHoursLabel,"
-not-public,src/components/lms/CourseTextThumbnail.tsx,285,iicrc-offer,"IICRC discipline
+not-public,src/components/lms/CourseTextThumbnail.tsx,14,iicrc-code,WRT,"code: identifier, comment or type",WRT: {
+not-public,src/components/lms/CourseTextThumbnail.tsx,21,iicrc-code,CRT,"code: identifier, comment or type",CRT: {
+not-public,src/components/lms/CourseTextThumbnail.tsx,28,iicrc-code,ASD,"code: identifier, comment or type",ASD: {
+not-public,src/components/lms/CourseTextThumbnail.tsx,35,iicrc-code,OCT,"code: identifier, comment or type",OCT: {
+not-public,src/components/lms/CourseTextThumbnail.tsx,42,iicrc-code,CCT,"code: identifier, comment or type",CCT: {
+not-public,src/components/lms/CourseTextThumbnail.tsx,49,iicrc-code,FSRT,"code: identifier, comment or type",FSRT: {
+not-public,src/components/lms/CourseTextThumbnail.tsx,56,iicrc-code,AMRT,"code: identifier, comment or type",AMRT: {
+not-public,src/components/lms/CourseTextThumbnail.tsx,68,iicrc-offer,IICRC-discipline courses,"code: identifier, comment or type","* consistent system: IICRC-discipline courses take their discipline accent, everything else"
+not-public,src/components/lms/CourseTextThumbnail.tsx,71,iicrc-code,WRT,routing data: bare discipline code (render sites audited separately),const CARSI_NEUTRAL: (typeof DISCIPLINE_ACCENTS)['WRT'] = {
+not-public,src/components/lms/CourseTextThumbnail.tsx,86,iicrc-code,WRT,"code: identifier, comment or type",const m = cat.match(/^(WRT|CRT|ASD|OCT|CCT|FSRT|AMRT)\b/i);
+not-public,src/components/lms/CourseTextThumbnail.tsx,86,iicrc-code,CRT,"code: identifier, comment or type",const m = cat.match(/^(WRT|CRT|ASD|OCT|CCT|FSRT|AMRT)\b/i);
+not-public,src/components/lms/CourseTextThumbnail.tsx,86,iicrc-code,ASD,"code: identifier, comment or type",const m = cat.match(/^(WRT|CRT|ASD|OCT|CCT|FSRT|AMRT)\b/i);
+not-public,src/components/lms/CourseTextThumbnail.tsx,86,iicrc-code,OCT,"code: identifier, comment or type",const m = cat.match(/^(WRT|CRT|ASD|OCT|CCT|FSRT|AMRT)\b/i);
+not-public,src/components/lms/CourseTextThumbnail.tsx,86,iicrc-code,CCT,"code: identifier, comment or type",const m = cat.match(/^(WRT|CRT|ASD|OCT|CCT|FSRT|AMRT)\b/i);
+not-public,src/components/lms/CourseTextThumbnail.tsx,86,iicrc-code,FSRT,"code: identifier, comment or type",const m = cat.match(/^(WRT|CRT|ASD|OCT|CCT|FSRT|AMRT)\b/i);
+not-public,src/components/lms/CourseTextThumbnail.tsx,86,iicrc-code,AMRT,"code: identifier, comment or type",const m = cat.match(/^(WRT|CRT|ASD|OCT|CCT|FSRT|AMRT)\b/i);
+not-public,src/components/lms/CourseTextThumbnail.tsx,93,iicrc-code,CCT,"code: identifier, comment or type","* sometimes prefixed with an IICRC discipline acronym (""CCT Commercial Carpet""). The"
+not-public,src/components/lms/CourseTextThumbnail.tsx,116,iicrc-code,WRT,routing data: bare discipline code (render sites audited separately),): (typeof DISCIPLINE_ACCENTS)['WRT'] {
+not-public,src/components/lms/CourseTextThumbnail.tsx,131,CEC,cec,"code: identifier, comment or type",cecHoursLabel?: string | null;
+not-public,src/components/lms/CourseTextThumbnail.tsx,185,CEC,cec,"code: identifier, comment or type","cecHoursLabel,"
+not-public,src/components/lms/CourseTextThumbnail.tsx,286,iicrc-offer,"IICRC discipline
             acronym on every CARSI course","code: identifier, comment or type",GP-523: the oversized watermark used to render the raw IICRC discipline
-not-public,src/components/lms/CourseTextThumbnail.tsx,287,iicrc-offer,"IICRC
+not-public,src/components/lms/CourseTextThumbnail.tsx,288,iicrc-offer,"IICRC
             Registered-Training","code: identifier, comment or type",Restoration Designations and may not brand a course with an IICRC
-not-public,src/components/lms/CourseTextThumbnail.tsx,289,colour,colour,"code: identifier, comment or type",the discipline-derived accent colour stays.
-not-public,src/components/lms/CourseTextThumbnail.tsx,303,iicrc-offer,"IICRC discipline acronym on the public
+not-public,src/components/lms/CourseTextThumbnail.tsx,290,colour,colour,"code: identifier, comment or type",the discipline-derived accent colour stays.
+not-public,src/components/lms/CourseTextThumbnail.tsx,304,iicrc-offer,"IICRC discipline acronym on the public
               course","code: identifier, comment or type",GP-523: this badge rendered the IICRC discipline acronym on the public
-not-public,src/components/lms/CourseTextThumbnail.tsx,322,CEC,cec,"code: identifier, comment or type",{(showCategory || cecHoursLabel) && (
-not-public,src/components/lms/CourseTextThumbnail.tsx,324,CEC,cec,"code: identifier, comment or type",{cecHoursLabel ? (
-not-public,src/components/lms/CourseTextThumbnail.tsx,333,CEC,cec,"code: identifier, comment or type",{cecHoursLabel} CEC{cecHoursLabel === '1' ? '' : 's'}
-legitimate,src/components/lms/CourseTextThumbnail.tsx,333,CEC,CEC,registry-computed CEC value beside the words,{cecHoursLabel} CEC{cecHoursLabel === '1' ? '' : 's'}
-not-public,src/components/lms/CourseTextThumbnail.tsx,333,CEC,cec,"code: identifier, comment or type",{cecHoursLabel} CEC{cecHoursLabel === '1' ? '' : 's'}
-not-public,src/components/lms/CourseTextThumbnail.tsx,389,CEC,cec,"code: identifier, comment or type",{cecHoursLabel ? (
-not-public,src/components/lms/CourseTextThumbnail.tsx,398,CEC,cec,"code: identifier, comment or type",{cecHoursLabel} CEC{cecHoursLabel === '1' ? '' : 's'}
-legitimate,src/components/lms/CourseTextThumbnail.tsx,398,CEC,CEC,registry-computed CEC value beside the words,{cecHoursLabel} CEC{cecHoursLabel === '1' ? '' : 's'}
-not-public,src/components/lms/CourseTextThumbnail.tsx,398,CEC,cec,"code: identifier, comment or type",{cecHoursLabel} CEC{cecHoursLabel === '1' ? '' : 's'}
-not-public,src/components/lms/CourseTextThumbnail.tsx,521,CEC,cec,"code: identifier, comment or type",{cecHoursLabel ? (
-not-public,src/components/lms/CourseTextThumbnail.tsx,523,CEC,cec,"code: identifier, comment or type",{cecHoursLabel} IICRC CEC{cecHoursLabel === '1' ? '' : 's'}
-legitimate,src/components/lms/CourseTextThumbnail.tsx,523,CEC,CEC,catalogue-wide CLAUDE.md descriptor (not scoped to a topic or audience),{cecHoursLabel} IICRC CEC{cecHoursLabel === '1' ? '' : 's'}
-not-public,src/components/lms/CourseTextThumbnail.tsx,523,CEC,cec,"code: identifier, comment or type",{cecHoursLabel} IICRC CEC{cecHoursLabel === '1' ? '' : 's'}
+not-public,src/components/lms/CourseTextThumbnail.tsx,323,CEC,cec,"code: identifier, comment or type",{(showCategory || cecHoursLabel) && (
+not-public,src/components/lms/CourseTextThumbnail.tsx,325,CEC,cec,"code: identifier, comment or type",{cecHoursLabel ? (
+not-public,src/components/lms/CourseTextThumbnail.tsx,334,CEC,cec,"code: identifier, comment or type",{cecHoursLabel} CEC{cecHoursLabel === '1' ? '' : 's'}
+legitimate,src/components/lms/CourseTextThumbnail.tsx,334,CEC,CEC,registry-computed CEC value beside the words,{cecHoursLabel} CEC{cecHoursLabel === '1' ? '' : 's'}
+not-public,src/components/lms/CourseTextThumbnail.tsx,334,CEC,cec,"code: identifier, comment or type",{cecHoursLabel} CEC{cecHoursLabel === '1' ? '' : 's'}
+not-public,src/components/lms/CourseTextThumbnail.tsx,390,CEC,cec,"code: identifier, comment or type",{cecHoursLabel ? (
+not-public,src/components/lms/CourseTextThumbnail.tsx,399,CEC,cec,"code: identifier, comment or type",{cecHoursLabel} CEC{cecHoursLabel === '1' ? '' : 's'}
+legitimate,src/components/lms/CourseTextThumbnail.tsx,399,CEC,CEC,registry-computed CEC value beside the words,{cecHoursLabel} CEC{cecHoursLabel === '1' ? '' : 's'}
+not-public,src/components/lms/CourseTextThumbnail.tsx,399,CEC,cec,"code: identifier, comment or type",{cecHoursLabel} CEC{cecHoursLabel === '1' ? '' : 's'}
+not-public,src/components/lms/CourseTextThumbnail.tsx,522,CEC,cec,"code: identifier, comment or type",{cecHoursLabel ? (
+not-public,src/components/lms/CourseTextThumbnail.tsx,524,CEC,cec,"code: identifier, comment or type",{cecHoursLabel} IICRC CEC{cecHoursLabel === '1' ? '' : 's'}
+legitimate,src/components/lms/CourseTextThumbnail.tsx,524,CEC,CEC,catalogue-wide CLAUDE.md descriptor (not scoped to a topic or audience),{cecHoursLabel} IICRC CEC{cecHoursLabel === '1' ? '' : 's'}
+not-public,src/components/lms/CourseTextThumbnail.tsx,524,CEC,cec,"code: identifier, comment or type",{cecHoursLabel} IICRC CEC{cecHoursLabel === '1' ? '' : 's'}
 not-public,src/components/lms/CourseThumbnail.tsx,21,CEC,cec,"code: identifier, comment or type",cecHoursLabel?: string | null;
 not-public,src/components/lms/CourseThumbnail.tsx,39,CEC,cec,"code: identifier, comment or type","cecHoursLabel,"
 not-public,src/components/lms/CourseThumbnail.tsx,85,CEC,cec,"code: identifier, comment or type",cecHoursLabel={cecHoursLabel}
@@ -3826,6 +3818,64 @@ not-public,src/lib/design-tokens.ts,277,colour,colour,"code: identifier, comment
 not-public,src/lib/design-tokens.ts,279,colour,colour,"code: identifier, comment or type","boxShadow: [`0 0 0 ${colour}00`, `0 0 20px ${colour}40`, `0 0 0 ${colour}00`],"
 not-public,src/lib/design-tokens.ts,279,colour,colour,"code: identifier, comment or type","boxShadow: [`0 0 0 ${colour}00`, `0 0 20px ${colour}40`, `0 0 0 ${colour}00`],"
 not-public,src/lib/design-tokens.ts,279,colour,colour,"code: identifier, comment or type","boxShadow: [`0 0 0 ${colour}00`, `0 0 20px ${colour}40`, `0 0 0 ${colour}00`],"
+not-public,src/lib/iicrc-code-lists.test.ts,11,certif,certificate,test file,"* CARSI subject data (a page's recommended disciplines, certificate art), not a copy of the IICRC"
+not-public,src/lib/iicrc-code-lists.test.ts,57,iicrc-code,WRT,test file,"expect(IICRC_CODES).toEqual(expect.arrayContaining(['WRT', 'RRT', 'CCMT', 'MWR']));"
+not-public,src/lib/iicrc-code-lists.test.ts,57,iicrc-code,RRT,test file,"expect(IICRC_CODES).toEqual(expect.arrayContaining(['WRT', 'RRT', 'CCMT', 'MWR']));"
+not-public,src/lib/iicrc-code-lists.test.ts,57,iicrc-code,CCMT,test file,"expect(IICRC_CODES).toEqual(expect.arrayContaining(['WRT', 'RRT', 'CCMT', 'MWR']));"
+not-public,src/lib/iicrc-code-lists.test.ts,57,iicrc-code,MWR,test file,"expect(IICRC_CODES).toEqual(expect.arrayContaining(['WRT', 'RRT', 'CCMT', 'MWR']));"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,WRT,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,ASD,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,AMRT,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,FSRT,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,OCT,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,CCT,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,CRT,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,RRT,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,CCMT,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,CPT,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,FCT,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,HCT,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,HST,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,LCT,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,RCT,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,SMT,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,TCST,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,UFT,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,RFMT,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,WFMT,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,BMI,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,BMT,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,BCI,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,CDS,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,MRS,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,ISSI,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,RFI,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,WFI,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,WLFI,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,SCI,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,MWR,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,MTC,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,MSR,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,JWR,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,JTC,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,62,iicrc-code,JSR,test file,"""export const ALL_IICRC_CODES =\n  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|"
+not-public,src/lib/iicrc-code-lists.test.ts,66,iicrc-code,WRT,test file,"""const BANNED = ['WRT', 'ASD', 'AMRT', 'FSRT', 'CCT', 'TCST', 'OCT', 'RRT'];"""
+not-public,src/lib/iicrc-code-lists.test.ts,66,iicrc-code,ASD,test file,"""const BANNED = ['WRT', 'ASD', 'AMRT', 'FSRT', 'CCT', 'TCST', 'OCT', 'RRT'];"""
+not-public,src/lib/iicrc-code-lists.test.ts,66,iicrc-code,AMRT,test file,"""const BANNED = ['WRT', 'ASD', 'AMRT', 'FSRT', 'CCT', 'TCST', 'OCT', 'RRT'];"""
+not-public,src/lib/iicrc-code-lists.test.ts,66,iicrc-code,FSRT,test file,"""const BANNED = ['WRT', 'ASD', 'AMRT', 'FSRT', 'CCT', 'TCST', 'OCT', 'RRT'];"""
+not-public,src/lib/iicrc-code-lists.test.ts,66,iicrc-code,CCT,test file,"""const BANNED = ['WRT', 'ASD', 'AMRT', 'FSRT', 'CCT', 'TCST', 'OCT', 'RRT'];"""
+not-public,src/lib/iicrc-code-lists.test.ts,66,iicrc-code,TCST,test file,"""const BANNED = ['WRT', 'ASD', 'AMRT', 'FSRT', 'CCT', 'TCST', 'OCT', 'RRT'];"""
+not-public,src/lib/iicrc-code-lists.test.ts,66,iicrc-code,OCT,test file,"""const BANNED = ['WRT', 'ASD', 'AMRT', 'FSRT', 'CCT', 'TCST', 'OCT', 'RRT'];"""
+not-public,src/lib/iicrc-code-lists.test.ts,66,iicrc-code,RRT,test file,"""const BANNED = ['WRT', 'ASD', 'AMRT', 'FSRT', 'CCT', 'TCST', 'OCT', 'RRT'];"""
+not-public,src/lib/iicrc-code-lists.test.ts,69,iicrc-code,AMRT,test file,"expect(codeListLiterals(""disciplines={['AMRT', 'WRT', 'CRT', 'ASD']}"")).toEqual([]);"
+not-public,src/lib/iicrc-code-lists.test.ts,69,iicrc-code,WRT,test file,"expect(codeListLiterals(""disciplines={['AMRT', 'WRT', 'CRT', 'ASD']}"")).toEqual([]);"
+not-public,src/lib/iicrc-code-lists.test.ts,69,iicrc-code,CRT,test file,"expect(codeListLiterals(""disciplines={['AMRT', 'WRT', 'CRT', 'ASD']}"")).toEqual([]);"
+not-public,src/lib/iicrc-code-lists.test.ts,69,iicrc-code,ASD,test file,"expect(codeListLiterals(""disciplines={['AMRT', 'WRT', 'CRT', 'ASD']}"")).toEqual([]);"
+not-public,src/lib/iicrc-code-lists.test.ts,83,iicrc-code,RRT,test file,"it('suppresses a target naming a code from the shared list (RRT)', () => {"
+not-public,src/lib/iicrc-code-lists.test.ts,84,iicrc-code,RRT,test file,expect(publicPathwayTarget('Work toward RRT')).toBeNull();
+not-public,src/lib/iicrc-code-lists.test.ts,91,certif,certification,test file,"it('keeps a target that names no code or certification', () => {"
+not-public,src/lib/iicrc-codes.ts,2,certif,certification,"code: identifier, comment or type","* IICRC certification and designation acronyms for the app, from data/iicrc-codes.json: the same"
+not-public,src/lib/iicrc-codes.ts,11,certif,certifications,"code: identifier, comment or type","...data.certifications,"
 not-public,src/lib/iicrc-discipline-display.test.ts,16,iicrc-code,CRT,test file,* Two of the errors were worse than typos. CRT held RRT's name — CARSI sells neither
 not-public,src/lib/iicrc-discipline-display.test.ts,16,iicrc-code,RRT,test file,* Two of the errors were worse than typos. CRT held RRT's name — CARSI sells neither
 not-public,src/lib/iicrc-discipline-display.test.ts,17,iicrc-code,CRT,test file,"* colour-repair nor carpet-repair courses, so any page badging CRT as ""Carpet Repair and"
@@ -3868,99 +3918,48 @@ not-public,src/lib/iicrc-discipline-display.test.ts,87,iicrc-code,CCT,test file,
 not-public,src/lib/iicrc-discipline-display.test.ts,87,iicrc-code,CRT,test file,"const acronyms = ['WRT', 'ASD', 'AMRT', 'FSRT', 'OCT', 'CCT', 'CRT', 'RRT', 'TCST'];"
 not-public,src/lib/iicrc-discipline-display.test.ts,87,iicrc-code,RRT,test file,"const acronyms = ['WRT', 'ASD', 'AMRT', 'FSRT', 'OCT', 'CCT', 'CRT', 'RRT', 'TCST'];"
 not-public,src/lib/iicrc-discipline-display.test.ts,87,iicrc-code,TCST,test file,"const acronyms = ['WRT', 'ASD', 'AMRT', 'FSRT', 'OCT', 'CCT', 'CRT', 'RRT', 'TCST'];"
-not-public,src/lib/iicrc-discipline-display.ts,5,iicrc-code,WRT,"code: identifier, comment or type","* acronym on a CARSI surface, so a CARSI course shows ""Water Restoration"" and never ""WRT"""
-not-public,src/lib/iicrc-discipline-display.ts,10,iicrc-code,FSRT,"code: identifier, comment or type","* LONG holds the IICRC's OWN designation names, for third-person reference (""FSRT is an IICRC"
-not-public,src/lib/iicrc-discipline-display.ts,11,certif,certification,"code: identifier, comment or type","* certification covering…""), which that same ruling expressly permits. Because these name a"
-not-public,src/lib/iicrc-discipline-display.ts,18,iicrc-code,WRT,"code: identifier, comment or type","WRT: 'Water Restoration',"
-not-public,src/lib/iicrc-discipline-display.ts,19,iicrc-code,CRT,"code: identifier, comment or type",// CARSI sells no colour-repair course; a legacy CRT-coded course is a carpet course.
-not-public,src/lib/iicrc-discipline-display.ts,19,repair,repair,"code: identifier, comment or type",// CARSI sells no colour-repair course; a legacy CRT-coded course is a carpet course.
-not-public,src/lib/iicrc-discipline-display.ts,19,colour,colour-repair,"code: identifier, comment or type",// CARSI sells no colour-repair course; a legacy CRT-coded course is a carpet course.
-not-public,src/lib/iicrc-discipline-display.ts,20,iicrc-code,CRT,"code: identifier, comment or type","CRT: 'Carpet Cleaning',"
-not-public,src/lib/iicrc-discipline-display.ts,21,iicrc-code,ASD,"code: identifier, comment or type","ASD: 'Structural Drying',"
-not-public,src/lib/iicrc-discipline-display.ts,22,iicrc-code,AMRT,"code: identifier, comment or type","AMRT: 'Microbial Remediation',"
-not-public,src/lib/iicrc-discipline-display.ts,23,iicrc-code,FSRT,"code: identifier, comment or type","FSRT: 'Fire & Smoke',"
-not-public,src/lib/iicrc-discipline-display.ts,24,iicrc-code,OCT,"code: identifier, comment or type","OCT: 'Odour Control',"
-not-public,src/lib/iicrc-discipline-display.ts,25,iicrc-code,CCT,"code: identifier, comment or type","CCT: 'Carpet Cleaning',"
-not-public,src/lib/iicrc-discipline-display.ts,29,certif,certifications,"code: identifier, comment or type","* Official IICRC designation names. VERIFIED against the issuer's own certifications page,"
-not-public,src/lib/iicrc-discipline-display.ts,30,certif,certifications,"code: identifier, comment or type","* https://iicrc.org/iicrccertifications/, fetched 2026-09-07. Locked by"
-not-public,src/lib/iicrc-discipline-display.ts,34,iicrc-code,WRT,"code: identifier, comment or type","*   - WRT was missing ""Damage""."
-not-public,src/lib/iicrc-discipline-display.ts,35,iicrc-code,CRT,"code: identifier, comment or type",*   - CRT carried RRT's name. CRT is COLOR Repair Technician; RRT is Carpet Repair and
-not-public,src/lib/iicrc-discipline-display.ts,35,iicrc-code,RRT,"code: identifier, comment or type",*   - CRT carried RRT's name. CRT is COLOR Repair Technician; RRT is Carpet Repair and
-not-public,src/lib/iicrc-discipline-display.ts,35,iicrc-code,CRT,"code: identifier, comment or type",*   - CRT carried RRT's name. CRT is COLOR Repair Technician; RRT is Carpet Repair and
-not-public,src/lib/iicrc-discipline-display.ts,35,iicrc-code,RRT,"code: identifier, comment or type",*   - CRT carried RRT's name. CRT is COLOR Repair Technician; RRT is Carpet Repair and
-not-public,src/lib/iicrc-discipline-display.ts,35,repair,Repair,"code: identifier, comment or type",*   - CRT carried RRT's name. CRT is COLOR Repair Technician; RRT is Carpet Repair and
-not-public,src/lib/iicrc-discipline-display.ts,35,repair,Repair,"code: identifier, comment or type",*   - CRT carried RRT's name. CRT is COLOR Repair Technician; RRT is Carpet Repair and
-not-public,src/lib/iicrc-discipline-display.ts,35,colour,COLOR Repair,"code: identifier, comment or type",*   - CRT carried RRT's name. CRT is COLOR Repair Technician; RRT is Carpet Repair and
-not-public,src/lib/iicrc-discipline-display.ts,36,iicrc-code,CRT,"code: identifier, comment or type","*     Reinstallation Technician. CARSI sells neither, and a page badging CRT as carpet repair"
-not-public,src/lib/iicrc-discipline-display.ts,36,repair,repair,"code: identifier, comment or type","*     Reinstallation Technician. CARSI sells neither, and a page badging CRT as carpet repair"
-not-public,src/lib/iicrc-discipline-display.ts,36,reinstall,Reinstallation,"code: identifier, comment or type","*     Reinstallation Technician. CARSI sells neither, and a page badging CRT as carpet repair"
-not-public,src/lib/iicrc-discipline-display.ts,39,iicrc-code,CCT,"code: identifier, comment or type","*   - CCT was called ""Commercial Carpet Cleaning Technician"", which conflates it with CCMT,"
-not-public,src/lib/iicrc-discipline-display.ts,39,iicrc-code,CCMT,"code: identifier, comment or type","*   - CCT was called ""Commercial Carpet Cleaning Technician"", which conflates it with CCMT,"
-not-public,src/lib/iicrc-discipline-display.ts,43,certif,certification,"code: identifier, comment or type","* this is a proper noun, and re-spelling a third party's certification name to house style"
-not-public,src/lib/iicrc-discipline-display.ts,48,iicrc-code,WRT,"code: identifier, comment or type","WRT: 'Water Damage Restoration Technician',"
-not-public,src/lib/iicrc-discipline-display.ts,49,iicrc-code,CRT,"code: identifier, comment or type","CRT: 'Color Repair Technician',"
-legitimate,src/lib/iicrc-discipline-display.ts,49,repair,Repair,IICRC designation name quoted third-person (Color Repair / Carpet Repair and Reinstallation Technician),"CRT: 'Color Repair Technician',"
-legitimate,src/lib/iicrc-discipline-display.ts,49,colour,Color Repair,IICRC designation name quoted third-person (Color Repair / Carpet Repair and Reinstallation Technician),"CRT: 'Color Repair Technician',"
-not-public,src/lib/iicrc-discipline-display.ts,50,iicrc-code,ASD,"code: identifier, comment or type","ASD: 'Applied Structural Drying Technician',"
-not-public,src/lib/iicrc-discipline-display.ts,51,iicrc-code,AMRT,"code: identifier, comment or type","AMRT: 'Applied Microbial Remediation Technician',"
-not-public,src/lib/iicrc-discipline-display.ts,52,iicrc-code,FSRT,"code: identifier, comment or type","FSRT: 'Fire and Smoke Damage Restoration Technician',"
-not-public,src/lib/iicrc-discipline-display.ts,53,iicrc-code,OCT,"code: identifier, comment or type","OCT: 'Odor Control Technician',"
-not-public,src/lib/iicrc-discipline-display.ts,54,iicrc-code,CCT,"code: identifier, comment or type","CCT: 'Carpet Cleaning Technician',"
-not-public,src/lib/iicrc-discipline-display.ts,57,iicrc-code,WRT,routing data: bare discipline code (render sites audited separately),"const DEFAULT_ORDER = ['WRT', 'CRT', 'ASD', 'AMRT', 'FSRT', 'OCT', 'CCT'] as const;"
-not-public,src/lib/iicrc-discipline-display.ts,57,iicrc-code,CRT,routing data: bare discipline code (render sites audited separately),"const DEFAULT_ORDER = ['WRT', 'CRT', 'ASD', 'AMRT', 'FSRT', 'OCT', 'CCT'] as const;"
-not-public,src/lib/iicrc-discipline-display.ts,57,iicrc-code,ASD,routing data: bare discipline code (render sites audited separately),"const DEFAULT_ORDER = ['WRT', 'CRT', 'ASD', 'AMRT', 'FSRT', 'OCT', 'CCT'] as const;"
-not-public,src/lib/iicrc-discipline-display.ts,57,iicrc-code,AMRT,routing data: bare discipline code (render sites audited separately),"const DEFAULT_ORDER = ['WRT', 'CRT', 'ASD', 'AMRT', 'FSRT', 'OCT', 'CCT'] as const;"
-not-public,src/lib/iicrc-discipline-display.ts,57,iicrc-code,FSRT,routing data: bare discipline code (render sites audited separately),"const DEFAULT_ORDER = ['WRT', 'CRT', 'ASD', 'AMRT', 'FSRT', 'OCT', 'CCT'] as const;"
-not-public,src/lib/iicrc-discipline-display.ts,57,iicrc-code,OCT,routing data: bare discipline code (render sites audited separately),"const DEFAULT_ORDER = ['WRT', 'CRT', 'ASD', 'AMRT', 'FSRT', 'OCT', 'CCT'] as const;"
-not-public,src/lib/iicrc-discipline-display.ts,57,iicrc-code,CCT,routing data: bare discipline code (render sites audited separately),"const DEFAULT_ORDER = ['WRT', 'CRT', 'ASD', 'AMRT', 'FSRT', 'OCT', 'CCT'] as const;"
-not-public,src/lib/iicrc-discipline-display.ts,62,iicrc-code,WRT,"code: identifier, comment or type",const matches = raw.toUpperCase().match(/\b(WRT|CRT|ASD|AMRT|FSRT|OCT|CCT)\b/g);
-not-public,src/lib/iicrc-discipline-display.ts,62,iicrc-code,CRT,"code: identifier, comment or type",const matches = raw.toUpperCase().match(/\b(WRT|CRT|ASD|AMRT|FSRT|OCT|CCT)\b/g);
-not-public,src/lib/iicrc-discipline-display.ts,62,iicrc-code,ASD,"code: identifier, comment or type",const matches = raw.toUpperCase().match(/\b(WRT|CRT|ASD|AMRT|FSRT|OCT|CCT)\b/g);
-not-public,src/lib/iicrc-discipline-display.ts,62,iicrc-code,AMRT,"code: identifier, comment or type",const matches = raw.toUpperCase().match(/\b(WRT|CRT|ASD|AMRT|FSRT|OCT|CCT)\b/g);
-not-public,src/lib/iicrc-discipline-display.ts,62,iicrc-code,FSRT,"code: identifier, comment or type",const matches = raw.toUpperCase().match(/\b(WRT|CRT|ASD|AMRT|FSRT|OCT|CCT)\b/g);
-not-public,src/lib/iicrc-discipline-display.ts,62,iicrc-code,OCT,"code: identifier, comment or type",const matches = raw.toUpperCase().match(/\b(WRT|CRT|ASD|AMRT|FSRT|OCT|CCT)\b/g);
-not-public,src/lib/iicrc-discipline-display.ts,62,iicrc-code,CCT,"code: identifier, comment or type",const matches = raw.toUpperCase().match(/\b(WRT|CRT|ASD|AMRT|FSRT|OCT|CCT)\b/g);
-not-public,src/lib/iicrc-discipline-display.ts,84,certif,certification,"code: identifier, comment or type",/** Every official IICRC certification / designation code (iicrc.org certification list). */
-not-public,src/lib/iicrc-discipline-display.ts,84,certif,certification,"code: identifier, comment or type",/** Every official IICRC certification / designation code (iicrc.org certification list). */
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,WRT,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,ASD,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,AMRT,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,FSRT,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,OCT,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,CCT,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,CRT,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,RRT,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,CCMT,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,CPT,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,FCT,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,HCT,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,HST,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,LCT,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,RCT,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,SMT,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,TCST,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,UFT,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,RFMT,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,WFMT,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,BMI,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,BMT,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,BCI,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,CDS,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,MRS,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,ISSI,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,RFI,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,WFI,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,WLFI,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,SCI,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,MWR,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,MTC,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,MSR,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,JWR,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,JTC,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,86,iicrc-code,JSR,"code: key, slug, path or URL string",'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
-not-public,src/lib/iicrc-discipline-display.ts,99,certif,certification,"code: identifier, comment or type","* a certification, or an IICRC code, because a CARSI pathway never builds toward IICRC"
-not-public,src/lib/iicrc-discipline-display.ts,100,certif,certification,"code: identifier, comment or type","* certification (CLAUDE.md). The field is database data, so this fails closed."
-not-public,src/lib/iicrc-discipline-display.ts,105,certif,certif,"code: identifier, comment or type","if (/IICRC|certif/i.test(t) || new RegExp(`\\b(?:${ALL_IICRC_CODES})\\b`, 'i').test(t)) return null;"
+not-public,src/lib/iicrc-discipline-display.ts,7,iicrc-code,WRT,"code: identifier, comment or type","* acronym on a CARSI surface, so a CARSI course shows ""Water Restoration"" and never ""WRT"""
+not-public,src/lib/iicrc-discipline-display.ts,12,iicrc-code,FSRT,"code: identifier, comment or type","* LONG holds the IICRC's OWN designation names, for third-person reference (""FSRT is an IICRC"
+not-public,src/lib/iicrc-discipline-display.ts,13,certif,certification,"code: identifier, comment or type","* certification covering…""), which that same ruling expressly permits. Because these name a"
+not-public,src/lib/iicrc-discipline-display.ts,20,iicrc-code,WRT,"code: identifier, comment or type","WRT: 'Water Restoration',"
+not-public,src/lib/iicrc-discipline-display.ts,21,iicrc-code,CRT,"code: identifier, comment or type",// CARSI sells no colour-repair course; a legacy CRT-coded course is a carpet course.
+not-public,src/lib/iicrc-discipline-display.ts,21,repair,repair,"code: identifier, comment or type",// CARSI sells no colour-repair course; a legacy CRT-coded course is a carpet course.
+not-public,src/lib/iicrc-discipline-display.ts,21,colour,colour-repair,"code: identifier, comment or type",// CARSI sells no colour-repair course; a legacy CRT-coded course is a carpet course.
+not-public,src/lib/iicrc-discipline-display.ts,22,iicrc-code,CRT,"code: identifier, comment or type","CRT: 'Carpet Cleaning',"
+not-public,src/lib/iicrc-discipline-display.ts,23,iicrc-code,ASD,"code: identifier, comment or type","ASD: 'Structural Drying',"
+not-public,src/lib/iicrc-discipline-display.ts,24,iicrc-code,AMRT,"code: identifier, comment or type","AMRT: 'Microbial Remediation',"
+not-public,src/lib/iicrc-discipline-display.ts,25,iicrc-code,FSRT,"code: identifier, comment or type","FSRT: 'Fire & Smoke',"
+not-public,src/lib/iicrc-discipline-display.ts,26,iicrc-code,OCT,"code: identifier, comment or type","OCT: 'Odour Control',"
+not-public,src/lib/iicrc-discipline-display.ts,27,iicrc-code,CCT,"code: identifier, comment or type","CCT: 'Carpet Cleaning',"
+not-public,src/lib/iicrc-discipline-display.ts,31,certif,certifications,"code: identifier, comment or type","* Official IICRC designation names. VERIFIED against the issuer's own certifications page,"
+not-public,src/lib/iicrc-discipline-display.ts,32,certif,certifications,"code: identifier, comment or type","* https://iicrc.org/iicrccertifications/, fetched 2026-09-07. Locked by"
+not-public,src/lib/iicrc-discipline-display.ts,36,iicrc-code,WRT,"code: identifier, comment or type","*   - WRT was missing ""Damage""."
+not-public,src/lib/iicrc-discipline-display.ts,37,iicrc-code,CRT,"code: identifier, comment or type",*   - CRT carried RRT's name. CRT is COLOR Repair Technician; RRT is Carpet Repair and
+not-public,src/lib/iicrc-discipline-display.ts,37,iicrc-code,RRT,"code: identifier, comment or type",*   - CRT carried RRT's name. CRT is COLOR Repair Technician; RRT is Carpet Repair and
+not-public,src/lib/iicrc-discipline-display.ts,37,iicrc-code,CRT,"code: identifier, comment or type",*   - CRT carried RRT's name. CRT is COLOR Repair Technician; RRT is Carpet Repair and
+not-public,src/lib/iicrc-discipline-display.ts,37,iicrc-code,RRT,"code: identifier, comment or type",*   - CRT carried RRT's name. CRT is COLOR Repair Technician; RRT is Carpet Repair and
+not-public,src/lib/iicrc-discipline-display.ts,37,repair,Repair,"code: identifier, comment or type",*   - CRT carried RRT's name. CRT is COLOR Repair Technician; RRT is Carpet Repair and
+not-public,src/lib/iicrc-discipline-display.ts,37,repair,Repair,"code: identifier, comment or type",*   - CRT carried RRT's name. CRT is COLOR Repair Technician; RRT is Carpet Repair and
+not-public,src/lib/iicrc-discipline-display.ts,37,colour,COLOR Repair,"code: identifier, comment or type",*   - CRT carried RRT's name. CRT is COLOR Repair Technician; RRT is Carpet Repair and
+not-public,src/lib/iicrc-discipline-display.ts,38,iicrc-code,CRT,"code: identifier, comment or type","*     Reinstallation Technician. CARSI sells neither, and a page badging CRT as carpet repair"
+not-public,src/lib/iicrc-discipline-display.ts,38,repair,repair,"code: identifier, comment or type","*     Reinstallation Technician. CARSI sells neither, and a page badging CRT as carpet repair"
+not-public,src/lib/iicrc-discipline-display.ts,38,reinstall,Reinstallation,"code: identifier, comment or type","*     Reinstallation Technician. CARSI sells neither, and a page badging CRT as carpet repair"
+not-public,src/lib/iicrc-discipline-display.ts,41,iicrc-code,CCT,"code: identifier, comment or type","*   - CCT was called ""Commercial Carpet Cleaning Technician"", which conflates it with CCMT,"
+not-public,src/lib/iicrc-discipline-display.ts,41,iicrc-code,CCMT,"code: identifier, comment or type","*   - CCT was called ""Commercial Carpet Cleaning Technician"", which conflates it with CCMT,"
+not-public,src/lib/iicrc-discipline-display.ts,45,certif,certification,"code: identifier, comment or type","* this is a proper noun, and re-spelling a third party's certification name to house style"
+not-public,src/lib/iicrc-discipline-display.ts,50,iicrc-code,WRT,"code: identifier, comment or type","WRT: 'Water Damage Restoration Technician',"
+not-public,src/lib/iicrc-discipline-display.ts,51,iicrc-code,CRT,"code: identifier, comment or type","CRT: 'Color Repair Technician',"
+legitimate,src/lib/iicrc-discipline-display.ts,51,repair,Repair,IICRC designation name quoted third-person (Color Repair / Carpet Repair and Reinstallation Technician),"CRT: 'Color Repair Technician',"
+legitimate,src/lib/iicrc-discipline-display.ts,51,colour,Color Repair,IICRC designation name quoted third-person (Color Repair / Carpet Repair and Reinstallation Technician),"CRT: 'Color Repair Technician',"
+not-public,src/lib/iicrc-discipline-display.ts,52,iicrc-code,ASD,"code: identifier, comment or type","ASD: 'Applied Structural Drying Technician',"
+not-public,src/lib/iicrc-discipline-display.ts,53,iicrc-code,AMRT,"code: identifier, comment or type","AMRT: 'Applied Microbial Remediation Technician',"
+not-public,src/lib/iicrc-discipline-display.ts,54,iicrc-code,FSRT,"code: identifier, comment or type","FSRT: 'Fire and Smoke Damage Restoration Technician',"
+not-public,src/lib/iicrc-discipline-display.ts,55,iicrc-code,OCT,"code: identifier, comment or type","OCT: 'Odor Control Technician',"
+not-public,src/lib/iicrc-discipline-display.ts,56,iicrc-code,CCT,"code: identifier, comment or type","CCT: 'Carpet Cleaning Technician',"
+not-public,src/lib/iicrc-discipline-display.ts,87,certif,certification,"code: identifier, comment or type","* Every IICRC certification / designation code: the shared list (data/iicrc-codes.json), so a code"
+not-public,src/lib/iicrc-discipline-display.ts,103,certif,certification,"code: identifier, comment or type","* a certification, or an IICRC code, because a CARSI pathway never builds toward IICRC"
+not-public,src/lib/iicrc-discipline-display.ts,104,certif,certification,"code: identifier, comment or type","* certification (CLAUDE.md). The field is database data, so this fails closed."
+not-public,src/lib/iicrc-discipline-display.ts,109,certif,certif,"code: identifier, comment or type","if (/IICRC|certif/i.test(t) || new RegExp(`\\b(?:${ALL_IICRC_CODES})\\b`, 'i').test(t))"
 not-public,src/lib/iicrc/disclaimer.ts,2,certif,certification,"code: identifier, comment or type",* Canonical CEC-not-certification disclaimer (single source of truth).
 not-public,src/lib/iicrc/disclaimer.ts,2,CEC,CEC,"code: identifier, comment or type",* Canonical CEC-not-certification disclaimer (single source of truth).
 not-public,src/lib/iicrc/disclaimer.ts,4,CEC,CEC,"code: identifier, comment or type",* Licence-critical: CARSI is accredited as an IICRC CEC (Continuing Education

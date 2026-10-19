@@ -22,7 +22,7 @@ Enforced by `src/lib/marketing/licence-inventory.test.ts`.
 | ----------------------------------------------------------------------------------------------- | ---: |
 | fixed (exposures on origin/main 989d8491 under the final rules, removed by this branch)         |  645 |
 | legitimate (named sentence rule or reviewed line)                                               | 1207 |
-| not public (tests, generated, staff, tooling, prompts, identifiers, routing data, markup, URLs) | 4027 |
+| not public (tests, generated, staff, tooling, prompts, identifiers, routing data, markup, URLs) | 4026 |
 | owned elsewhere (reviewed line; not edited here; listed for Phill)                              |    8 |
 | exposure remaining                                                                              |    0 |
 
@@ -166,13 +166,13 @@ Files with fixed hits:
 | legitimate      | reviewed (line): the IICRC's own discipline map, framed on /courses as a third-person reference, not CARSI courses                                                      |    2 |
 | legitimate      | reviewed (line): learner states which IICRC certification they hold (third-person; the question asks about the learner's own certifications)                            |    2 |
 | legitimate      | headcount of the guide’s illustrative example business (labelled indicative), not a claim about the world                                                               |    1 |
-| not-public      | code: identifier, comment or type                                                                                                                                       | 1420 |
-| not-public      | test file                                                                                                                                                               | 1187 |
+| not-public      | code: identifier, comment or type                                                                                                                                       | 1406 |
+| not-public      | test file                                                                                                                                                               | 1243 |
 | not-public      | generated code                                                                                                                                                          |  466 |
 | not-public      | staff-only admin surface                                                                                                                                                |  310 |
-| not-public      | routing data: bare discipline code (render sites audited separately)                                                                                                    |  269 |
-| not-public      | code: key, slug, path or URL string                                                                                                                                     |  129 |
+| not-public      | routing data: bare discipline code (render sites audited separately)                                                                                                    |  262 |
 | not-public      | model instruction (prompt text, not rendered verbatim)                                                                                                                  |  105 |
+| not-public      | code: key, slug, path or URL string                                                                                                                                     |   93 |
 | not-public      | internal tooling (course production, screencast, audit, video)                                                                                                          |   69 |
 | not-public      | URL or site path                                                                                                                                                        |   15 |
 | not-public      | internal ops check (CEC drift report)                                                                                                                                   |   14 |

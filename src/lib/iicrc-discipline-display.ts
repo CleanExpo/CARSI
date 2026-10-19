@@ -1,3 +1,5 @@
+import { IICRC_CODE_ALT } from './iicrc-codes';
+
 /**
  * THESE TWO MAPS DO DIFFERENT JOBS. Do not make them agree.
  *
@@ -54,12 +56,14 @@ export const IICRC_DISCIPLINE_LONG: Record<string, string> = {
   CCT: 'Carpet Cleaning Technician',
 };
 
-const DEFAULT_ORDER = ['WRT', 'CRT', 'ASD', 'AMRT', 'FSRT', 'OCT', 'CCT'] as const;
+/** CARSI's taught subject codes, in display order: the keys of the topic map above. */
+export const CARSI_SUBJECT_CODES: readonly string[] = Object.keys(IICRC_DISCIPLINE_SHORT);
+const DEFAULT_ORDER = CARSI_SUBJECT_CODES;
 const KNOWN_CODES = new Set<string>(DEFAULT_ORDER);
 
 export function normalizeDisciplineCodes(codes: string[]): string[] {
   return codes.flatMap((raw) => {
-    const matches = raw.toUpperCase().match(/\b(WRT|CRT|ASD|AMRT|FSRT|OCT|CCT)\b/g);
+    const matches = raw.toUpperCase().match(new RegExp(`\\b(${DEFAULT_ORDER.join('|')})\\b`, 'g'));
     return matches ?? [];
   });
 }
@@ -68,9 +72,7 @@ export function normalizeDisciplineCodes(codes: string[]): string[] {
 export function orderDisciplineCodes(codes: string[]): string[] {
   const set = new Set(normalizeDisciplineCodes(codes).map((c) => c.toUpperCase()));
   const primary = DEFAULT_ORDER.filter((c) => set.has(c));
-  const rest = [...set]
-    .filter((c) => !KNOWN_CODES.has(c))
-    .sort();
+  const rest = [...set].filter((c) => !KNOWN_CODES.has(c)).sort();
   return [...primary, ...rest];
 }
 
@@ -81,9 +83,11 @@ export function disciplinePillsFromCodes(codes: string[]): { code: string; label
   }));
 }
 
-/** Every official IICRC certification / designation code (iicrc.org certification list). */
-export const ALL_IICRC_CODES =
-  'WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|CPT|FCT|HCT|HST|LCT|RCT|SMT|TCST|UFT|RFMT|WFMT|BMI|BMT|BCI|CDS|MRS|ISSI|RFI|WFI|WLFI|SCI|MWR|MTC|MSR|JWR|JTC|JSR';
+/**
+ * Every IICRC certification / designation code: the shared list (data/iicrc-codes.json), so a code
+ * added there is suppressed here too (review of 08d15553: this was a literal copy).
+ */
+export const ALL_IICRC_CODES = IICRC_CODE_ALT;
 
 /**
  * The CARSI topic to print for a course, pathway or idea's discipline code — never the code.
@@ -102,7 +106,8 @@ export function disciplineTopicLabel(code: string | null | undefined): string | 
 export function publicPathwayTarget(target: string | null | undefined): string | null {
   const t = target?.trim();
   if (!t) return null;
-  if (/IICRC|certif/i.test(t) || new RegExp(`\\b(?:${ALL_IICRC_CODES})\\b`, 'i').test(t)) return null;
+  if (/IICRC|certif/i.test(t) || new RegExp(`\\b(?:${ALL_IICRC_CODES})\\b`, 'i').test(t))
+    return null;
   return t;
 }
 

@@ -30,6 +30,8 @@
 import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 
+import { IICRC_CODES, IICRC_ORDINARY_WORD_CODES } from './iicrc-codes.mjs';
+
 const SITE = (process.env.CARSI_SITE || 'https://www.carsi.com.au').replace(/\/$/, '');
 
 /**
@@ -38,7 +40,7 @@ const SITE = (process.env.CARSI_SITE || 'https://www.carsi.com.au').replace(/\/$
  * OCT and RRT are included because `public/llms.txt` shipped both while the acronym rule listed
  * neither — the banned set in prose was wider than the set any guard enforced.
  */
-export const BANNED_ACRONYMS = ['WRT', 'ASD', 'AMRT', 'FSRT', 'CCT', 'TCST', 'OCT', 'RRT'];
+export const BANNED_ACRONYMS = IICRC_CODES; // the shared list: data/iicrc-codes.json
 
 /**
  * Acronyms that collide with an ordinary lowercase word or abbreviation. `OCT` is the
@@ -65,7 +67,9 @@ const APPROVED_CLASS_TITLES = new Map(
     .map((a) => [a.slug.toLowerCase(), a.title.toLowerCase().replace(/\s*[&/+]\s*/g, ' and ')]),
 );
 
-export const AMBIGUOUS_ACRONYMS = new Set(['OCT']);
+// The codes data/iicrc-codes.json marks with an "ordinaryWord" (OCT: October; BMI, CPT, RCT, RFI,
+// SCI, MRS: see the file), each with its reason recorded there.
+export const AMBIGUOUS_ACRONYMS = IICRC_ORDINARY_WORD_CODES;
 
 /**
  * The IICRC discipline designations written out in full. Every rule above keys on the ACRONYM,

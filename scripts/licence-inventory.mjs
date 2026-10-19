@@ -203,7 +203,9 @@ export const LEGIT_RULES = [
   {
     name: 'third-person IICRC certification named with its code',
     terms: ['iicrc-code'],
-    re: /IICRC [A-Z][A-Za-z ]+ Technician \([A-Z]{2,5}\)|\b[A-Z]{2,5}(?: and [A-Z]{2,5})? commonly required by|\b[A-Z]{2,5} (?:is|are) (?:an? )?IICRC|certifications: \['IICRC [A-Z]|IICRC [A-Z]{2,5} certification|[A-Z]{2,5} certification is recommended|certifications including [A-Z]{2,5} \(|Environ Sci|Sci Technol|IICRC certifications are most common in your team|\*\*(?:WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|UFT|RCT|LCT|TCST|HST)\*\* — [^|]*Technician|points toward (?:WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|UFT|RCT|LCT|TCST|HST)|\*\*(?:WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|UFT|RCT)(?: \+ (?:WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|UFT|RCT))+\*\* tech|pairs with (?:WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|UFT|RCT|LCT|TCST|HST) skill|(?:WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|UFT|RCT|LCT|TCST|HST)-only tech|IICRC (?:WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|UFT|RCT|LCT|TCST|HST)\b|(?:WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|UFT|RCT|LCT|TCST|HST) → |→ \*\*(?:WRT|ASD|AMRT|FSRT|OCT|CCT|CRT|RRT|CCMT|UFT|RCT|LCT|TCST|HST)\*\*|Forensic\.? ?Sci|IICRC certification itself \(|through a school (?:and examination )?approved by the IICRC|^[A-Z]{2,5}$/,
+    re: new RegExp(
+      String.raw`IICRC [A-Z][A-Za-z ]+ Technician \([A-Z]{2,5}\)|\b[A-Z]{2,5}(?: and [A-Z]{2,5})? commonly required by|\b[A-Z]{2,5} (?:is|are) (?:an? )?IICRC|certifications: \['IICRC [A-Z]|IICRC [A-Z]{2,5} certification|[A-Z]{2,5} certification is recommended|certifications including [A-Z]{2,5} \(|Environ Sci|Sci Technol|IICRC certifications are most common in your team|\*\*(?:${CODE_ALT})\*\* — [^|]*Technician|points toward (?:${CODE_ALT})|\*\*(?:${CODE_ALT})(?: \+ (?:${CODE_ALT}))+\*\* tech|pairs with (?:${CODE_ALT}) skill|(?:${CODE_ALT})-only tech|IICRC (?:${CODE_ALT})\b|(?:${CODE_ALT}) → |→ \*\*(?:${CODE_ALT})\*\*|Forensic\.? ?Sci|IICRC certification itself \(|through a school (?:and examination )?approved by the IICRC|^[A-Z]{2,5}$`
+    ),
   },
   // --- certification
   {
