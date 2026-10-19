@@ -30,12 +30,13 @@ import { readFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-const SPACE = '\\s+';
+/** Between the words of a brand phrase: any run of non-alphanumerics (space, -, _, /, ., etc). */
+const SEP = '[^\\p{L}\\p{N}]+';
 const FIXED_TERMS = [
   { label: 'CCW', pattern: /\bccw\b/i },
   { label: 'CCW (letters split apart)', pattern: /\bc[\s._*-]*c[\s._*-]*w\b/i },
-  { label: 'Carpet Cleaners Warehouse', pattern: new RegExp(`carpet${SPACE}cleaners${SPACE}warehouse`, 'i') },
-  { label: 'ccwonline.com.au link', pattern: /ccw\s*online\s*\.\s*com\s*\.\s*au/i },
+  { label: 'Carpet Cleaners Warehouse', pattern: new RegExp(`carpet(?:${SEP})?cleaners(?:${SEP})?warehouse`, 'iu') },
+  { label: 'ccwonline.com.au link', pattern: new RegExp(`ccw(?:${SEP})?online${SEP}com${SEP}au`, 'iu') },
   { label: 'CCW image asset (Shopify store path)', pattern: /cdn\.shopify\.com\/s\/files\/1\/2179\/6391\b/i },
 ];
 const SLUG_KEYS = ['slug', 'courseSlug', 'course_slug', 'course'];
@@ -47,8 +48,8 @@ const MIN_PRODUCTS = 50;
 const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 function productPattern(name) {
-  const body = name.trim().split(/\s+/).map(escapeRegExp).join(SPACE);
-  return new RegExp(`(?<![\\w-])${body}(?![\\w-])`, 'i');
+  const body = name.trim().split(/\s+/).map(escapeRegExp).join(SEP);
+  return new RegExp(`(?<![\\w-])${body}(?![\\w-])`, 'iu');
 }
 
 const productPatternCache = new Map();
@@ -86,7 +87,7 @@ function decodeOnce(text) {
     .replace(/\\([\\/"'])/g, '$1')
     .replace(/&#x([0-9a-f]+);?/gi, (_, hex) => decodeCodePoint(parseInt(hex, 16)))
     .replace(/&#(\d+);?/g, (_, dec) => decodeCodePoint(Number(dec)))
-    .replace(/&([a-z]+);/gi, (entity, name) => NAMED_ENTITIES[name] ?? entity)
+    .replace(/&([a-z0-9]+);/gi, (entity, name) => NAMED_ENTITIES[name] ?? entity)
     .replace(/(?:%[0-9a-f]{2})+/gi, decodePercentRun);
 }
 
@@ -104,8 +105,10 @@ export function normaliseForScan(text) {
     out = next;
   }
   return out
+    .replace(/&[a-z0-9]+;/gi, '')
     .normalize('NFKC')
-    .replace(/[­​-‍⁠﻿]/g, '')
+    .replace(/\p{Cf}/gu, '')
+    .replace(/[\u3002\uff0e\uff61\u2024\ufe52]/g, '.')
     .replace(/\s+/g, ' ');
 }
 

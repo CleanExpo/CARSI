@@ -102,6 +102,17 @@ for (const [form, planted] of [
   ['CCW in fullwidth letters', 'Ask \uff23\uff23\uff37 about the unit.'],
   ['CCW as percent-encoded UTF-8 fullwidth letters', 'Ask %EF%BC%A3%EF%BC%A3%EF%BC%B7 about the unit.'],
   ['CCW mixing a percent-encoded fullwidth letter and plain letters', 'Ask %EF%BC%A3CW about the unit.'],
+  // Review r3: close the classes (format characters, unknown entities, dot look-alikes, separators).
+  ['a link with ideographic full stops', '<a href="https://ccwonline\u3002com\u3002au">tool</a>'],
+  ['a link with fullwidth and halfwidth full stops', 'Visit ccwonline\uff0ecom\uff61au today.'],
+  ['a link with leader and small full stops', 'Visit ccwonline\u2024com\ufe52au today.'],
+  ['CCW split by left-to-right and right-to-left marks', 'Ask C\u200eC\u200fW about the unit.'],
+  ['CCW split by &lrm; and &rlm; entities', 'Ask C&lrm;C&rlm;W about the unit.'],
+  ['CCW split by an unknown named entity', 'Ask C&zzfake9;CW about the unit.'],
+  ['Carpet Cleaners Warehouse joined by hyphens', '<img src="/images/carpet-cleaners-warehouse.png">'],
+  ['Carpet Cleaners Warehouse joined by underscores and slashes', 'See carpet_cleaners/warehouse for stock.'],
+  ['a link with hyphens between the domain parts', 'Visit ccwonline-com-au today.'],
+  ['every r3 evasion combined', 'Ask C&lrm;C\u200fW at ccwonline\u3002com&period;au or carpet-cleaners&zzfake;-warehouse.'],
 ]) {
   test(`flags ${form} planted into an approved course lesson`, () => {
     const inputs = clone();
@@ -177,6 +188,7 @@ test('does not flag plain words that merely contain the letters', () => {
   assert.deepEqual(brandHits('Clockwise accw, ccwide and the Thymox story', real.productNames), []);
   assert.deepEqual(brandHits('Section C. Clean water, a&b, 50&#37; and C W ratios', real.productNames), []);
   assert.deepEqual(brandHits('Mix at 100% concentrate, 5%EF dilution, %E2%82 broken and 50%', real.productNames), []);
+  assert.deepEqual(brandHits('Carpet cleaning, cleaners and the warehouse sell online.com.au stock \u3002 &frac12; &zz;', real.productNames), []);
 });
 
 test('fails closed when the registry, products or an approved catalogue entry are missing', () => {
