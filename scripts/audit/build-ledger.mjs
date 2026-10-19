@@ -18,6 +18,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { IICRC_CODES } from '../iicrc-codes.mjs';
+
 const ROOT = process.cwd();
 const ACCESS = '2026-09-07';
 const OUT = path.join(ROOT, 'docs/audit/evidence-ledger.jsonl');
@@ -41,7 +43,8 @@ const liveSlugs = [
       .filter(Boolean),
   ),
 ];
-const ACRONYMS = /^(wrt|asd|amrt|cct|ccmt|ccu|osr|fsrt|smt|hst|uft|rrt|wlp)-/i;
+// every IICRC code (data/iicrc-codes.json) plus the legacy non-IICRC slug prefixes ccu, osr, wlp
+const ACRONYMS = new RegExp(`^(${[...IICRC_CODES, ...['CCU', 'OSR', 'WLP']].join('|')})-`, 'i');
 const acronymSlugs = liveSlugs.filter((s) => ACRONYMS.test(s));
 const approvedSlugs = new Set(approvals.map((a) => a.slug));
 

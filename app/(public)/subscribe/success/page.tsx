@@ -102,7 +102,7 @@ export default function SubscribeSuccessPage() {
             </li>
             <li className="flex items-start gap-3">
               <span className="mt-0.5 font-mono tabular-nums text-[#00F5FF]">2.</span>
-              <span>Start a lesson and earn IICRC CECs toward renewal as you complete training.</span>
+              <span>Start a lesson. Courses the IICRC has approved record CEC hours toward your renewal when you complete them.</span>
             </li>
             <li className="flex items-start gap-3">
               <span className="mt-0.5 font-mono tabular-nums text-[#00F5FF]">3.</span>

@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 
 import { MarketingPageShell } from '@/components/marketing/MarketingPageShell';
 import { Badge } from '@/components/ui/badge';
+import { disciplineTopicLabel, publicPathwayTarget } from '@/lib/iicrc-discipline-display';
 import { getBackendOrigin, getPublicSiteUrl } from '@/lib/env/public-url';
 import {
   marketingBodySm,
@@ -68,13 +69,13 @@ export async function generateMetadata({
     };
   }
 
-  const disciplineText = pathway.iicrc_discipline ? `IICRC ${pathway.iicrc_discipline} ` : '';
-  const certText = pathway.target_certification
-    ? ` Builds toward ${pathway.target_certification}.`
-    : '';
+  const topic = disciplineTopicLabel(pathway.iicrc_discipline);
+  const disciplineText = topic ? `${topic.toLowerCase()} ` : '';
+  const target = publicPathwayTarget(pathway.target_certification);
+  const certText = target ? ` Leads to ${target}.` : '';
   const description = (
     pathway.description?.trim() ||
-    `${pathway.title} — a structured ${disciplineText}CEC training pathway for cleaning and restoration professionals.${certText}`
+    `${pathway.title} — a structured ${disciplineText}training pathway for cleaning and restoration professionals.${certText}`
   ).slice(0, 160);
   const canonical = `${siteUrl}/pathways/${slug}`;
 
@@ -121,11 +122,11 @@ export default async function PathwayDetailPage({ params }: { params: Promise<{ 
       </Link>
 
       <div className="mb-4 flex flex-wrap gap-2">
-        {pathway.iicrc_discipline && (
-          <Badge variant="default">IICRC {pathway.iicrc_discipline}</Badge>
+        {disciplineTopicLabel(pathway.iicrc_discipline) && (
+          <Badge variant="default">{disciplineTopicLabel(pathway.iicrc_discipline)}</Badge>
         )}
-        {pathway.target_certification && (
-          <Badge variant="outline">→ {pathway.target_certification}</Badge>
+        {publicPathwayTarget(pathway.target_certification) && (
+          <Badge variant="outline">→ {publicPathwayTarget(pathway.target_certification)}</Badge>
         )}
       </div>
 
@@ -168,9 +169,9 @@ export default async function PathwayDetailPage({ params }: { params: Promise<{ 
                   </span>
                 )}
                 <div className="mt-1 flex gap-2">
-                  {pc.iicrc_discipline && (
+                  {disciplineTopicLabel(pc.iicrc_discipline) && (
                     <Badge variant="outline" className="text-xs">
-                      {pc.iicrc_discipline}
+                      {disciplineTopicLabel(pc.iicrc_discipline)}
                     </Badge>
                   )}
                   {pc.cec_hours && (

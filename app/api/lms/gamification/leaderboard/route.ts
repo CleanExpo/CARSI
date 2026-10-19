@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
   if (requested && requested !== '' && requested.toLowerCase() !== 'all' && !discipline) {
     return NextResponse.json(
       {
-        detail: 'Invalid discipline. Use water damage restoration, odour control, mould remediation, fire & smoke restoration, carpet repair, carpet cleaning and structural drying, or omit for all.',
+        detail: 'Invalid discipline. Use water damage restoration, odour control, mould remediation, fire & smoke restoration, carpet cleaning and structural drying, or omit for all.',
       },
       { status: 400 }
     );

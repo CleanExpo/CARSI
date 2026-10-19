@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 import { apiClient } from '@/lib/api/client';
+import { publicPathwayTarget } from '@/lib/iicrc-discipline-display';
 
 interface PathwayProgress {
   pathway_id: string;
@@ -60,8 +61,10 @@ export function PathwayProgressCard() {
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="font-medium text-white">{p.title}</p>
-                  {p.target_certification ? (
-                    <p className="mt-0.5 text-xs text-slate-300/80">{p.target_certification}</p>
+                  {publicPathwayTarget(p.target_certification) ? (
+                    <p className="mt-0.5 text-xs text-slate-300/80">
+                      {publicPathwayTarget(p.target_certification)}
+                    </p>
                   ) : null}
                 </div>
                 <span className="shrink-0 text-sm font-semibold text-sky-200 tabular-nums">

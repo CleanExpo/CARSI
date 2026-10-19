@@ -13,12 +13,12 @@ import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Insurance Professional IICRC CEC Training',
+  title: 'Insurance Professional Restoration Training',
   description:
-    'IICRC CEC training for loss adjusters and claims assessors. Scope restoration claims accurately with water damage restoration, fire & smoke restoration and mould remediation certification.',
+    'Restoration training for loss adjusters and claims assessors. Scope restoration claims accurately with water damage restoration, fire & smoke restoration and mould remediation training.',
   keywords: [
-    'insurance IICRC CEC training',
-    'loss adjuster certification',
+    'insurance restoration training',
+    'loss adjuster training',
     'claims assessor restoration training',
     'insurance restoration Australia',
   ],
@@ -31,16 +31,16 @@ export const metadata: Metadata = {
 const ACCENT_COLOR = '#1976d2';
 
 const disciplines = [
-  { code: 'WRT', label: 'Water Damage Restoration', color: '#1976d2' },
-  { code: 'FSRT', label: 'Fire & Smoke Restoration', color: '#1565c0' },
-  { code: 'AMRT', label: 'Applied Microbial Remediation', color: '#0d47a1' },
-  { code: 'ASD', label: 'Applied Structural Drying', color: '#0b3d91' },
+  { code: 'WRT', label: 'Water damage', color: '#1976d2' },
+  { code: 'FSRT', label: 'Fire and smoke', color: '#1565c0' },
+  { code: 'AMRT', label: 'Mould remediation', color: '#0d47a1' },
+  { code: 'ASD', label: 'Structural drying', color: '#0b3d91' },
 ];
 
 const stats = [
-  { value: '$4.5B', label: 'Claims/year' },
-  { value: 'IICRC', label: 'Standards' },
-  { value: '24/7', label: 'Online' },
+  { value: 'Online', label: 'Self-paced study' },
+  { value: 'IICRC CEC', label: 'On approved courses' },
+  { value: 'CARSI', label: 'Verifiable credentials' },
 ];
 
 const whyCards = [
@@ -55,7 +55,7 @@ const whyCards = [
     icon: Shield,
     title: 'Fraud Prevention',
     description:
-      'Identify over-scoped or unnecessary remediation work. IICRC CEC training equips adjusters to challenge inflated quotes with technical authority.',
+      'Identify over-scoped or unnecessary remediation work. Restoration training equips adjusters to challenge inflated quotes with technical authority.',
     color: '#1565c0',
   },
   {
@@ -80,7 +80,7 @@ export default async function InsuranceIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Insurance Professional"
         headlineAccent="Restoration Training"
-        description="IICRC CEC training for loss adjusters, claims assessors, building consultants, and forensic accountants. Understand restoration standards to scope claims accurately and reduce fraud."
+        description="Restoration training for loss adjusters, claims assessors, building consultants, and forensic accountants. Understand restoration standards to scope claims accurately and reduce fraud."
         disciplines={disciplines}
         stats={stats}
       />

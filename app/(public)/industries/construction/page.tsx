@@ -13,11 +13,11 @@ import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Construction IICRC CEC Training',
+  title: 'Construction Restoration Training',
   description:
-    'IICRC water damage and mould management training for Australian construction sites. Water damage restoration, structural drying and mould remediation courses supporting NCC compliance.',
+    'Water damage and mould management training for Australian construction sites. Water damage restoration, structural drying and mould remediation courses supporting NCC compliance.',
   keywords: [
-    'construction IICRC CEC training',
+    'construction restoration training',
     'building site mould management',
     'NCC compliance restoration',
     'construction water damage Australia',
@@ -31,15 +31,15 @@ export const metadata: Metadata = {
 const ACCENT_COLOR = '#ff9800';
 
 const disciplines = [
-  { code: 'WRT', label: 'Water Damage Restoration', color: '#ff9800' },
-  { code: 'ASD', label: 'Applied Structural Drying', color: '#f57c00' },
-  { code: 'AMRT', label: 'Applied Microbial Remediation', color: '#e65100' },
+  { code: 'WRT', label: 'Water damage', color: '#ff9800' },
+  { code: 'ASD', label: 'Structural drying', color: '#f57c00' },
+  { code: 'AMRT', label: 'Mould remediation', color: '#e65100' },
 ];
 
 const stats = [
-  { value: '376,000+', label: 'Builders & Trades' },
+  { value: 'Online', label: 'Self-paced study' },
   { value: 'NCC', label: 'Compliance Support' },
-  { value: '30%+', label: 'QLD Homes w/ Mould' },
+  { value: 'CARSI', label: 'Verifiable credentials' },
 ];
 
 const whyCards = [
@@ -54,7 +54,7 @@ const whyCards = [
     icon: Droplets,
     title: 'Defect Liability',
     description:
-      'Trained site staff reduce mould and water damage defect claims during the liability period. 30%+ of new QLD homes have mould within 2 years.',
+      'Trained site staff reduce mould and water damage defect claims during the liability period.',
     color: '#f57c00',
   },
   {
@@ -79,7 +79,7 @@ export default async function ConstructionIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Construction Site"
         headlineAccent="Restoration Training"
-        description="NCC-compliant moisture and mould management training for site managers, project managers, and WHS officers. Reduce defect liability claims with IICRC-certified restoration knowledge."
+        description="Moisture and mould management training for site managers, project managers and WHS officers, to help reduce water and mould defects during the liability period."
         disciplines={disciplines}
         stats={stats}
       />
@@ -103,7 +103,7 @@ export default async function ConstructionIndustryPage() {
         subtitle="Construction Restoration Training"
         title="Site Restoration Bundle"
         price={industryBundlePriceLabel('construction')}
-        description="WRT Water Damage + ASD Structural Drying + AMRT Mould Assessment + Moisture Detection bonus module. Bulk team pricing available."
+        description="Water damage restoration, structural drying and mould remediation for construction crews. Paid courses can be bought as team seats at checkout."
         ctaText="Train Your Site Team"
         accentColor={ACCENT_COLOR}
       />

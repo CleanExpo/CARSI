@@ -14,7 +14,7 @@ import { AboutMissionPillars } from '@/components/marketing/about/AboutMissionPi
 import { MeetTheBoard } from '@/components/marketing/about/MeetTheBoard';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
 import { getBoardMembers } from '@/lib/board-members';
-import { disciplineRowsFromCodes } from '@/lib/iicrc-discipline-display';
+import { disciplinePillsFromCodes } from '@/lib/iicrc-discipline-display';
 import {
   formatCourseCountForCopy,
   getPublicCatalogueFacts,
@@ -28,8 +28,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const d = facts.disciplineCodes.length;
   const coursePhrase =
     n > 0
-      ? `${formatCourseCountForCopy(n)} IICRC CEC Accredited course${n === 1 ? '' : 's'}`
-      : 'IICRC CEC Accredited courses';
+      ? `${formatCourseCountForCopy(n)} published course${n === 1 ? '' : 's'}`
+      : 'Published courses';
   const discPhrase =
     d > 0 ? `${d} discipline${d === 1 ? '' : 's'}` : 'multiple IICRC disciplines';
   return {
@@ -57,10 +57,14 @@ export default async function AboutPage() {
   const facts = await getPublicCatalogueFacts();
   const n = facts.publishedCourseCount;
   const d = facts.disciplineCodes.length;
-  const disciplineRows =
-    d > 0
-      ? disciplineRowsFromCodes(facts.disciplineCodes)
-      : disciplineRowsFromCodes(['WRT', 'CRT', 'ASD', 'AMRT', 'FSRT', 'OCT', 'CCT']);
+  // CARSI's own subject names, deduplicated; never the IICRC designation or its code.
+  const disciplineRows = [
+    ...new Set(
+      disciplinePillsFromCodes(
+        d > 0 ? facts.disciplineCodes : ['WRT', 'ASD', 'AMRT', 'FSRT', 'OCT', 'CCT']
+      ).map((row) => row.label)
+    ),
+  ];
 
   const stats = [
     {
@@ -90,9 +94,9 @@ export default async function AboutPage() {
           <p className={`mt-5 max-w-3xl text-pretty ${LANDING_LEAD_CLASS}`}>
             CARSI — the Centre for Australian Restoration and Standards Information — is
             Australia&apos;s online training platform for cleaning and restoration professionals.
-            Beginner, intermediate, and advanced <AcronymTooltip term="IICRC" />{' '}
-            <AcronymTooltip term="CEC" /> accredited courses for people starting out, updating their
-            knowledge, or maintaining continuing education without leaving the job site.
+            Beginner, intermediate and advanced courses for people starting out, updating their
+            knowledge, or maintaining continuing education without leaving the job site, from an{' '}
+            <AcronymTooltip term="IICRC" /> <AcronymTooltip term="CEC" /> Accredited provider.
           </p>
         </div>
       </section>
@@ -194,22 +198,19 @@ export default async function AboutPage() {
       <section className="border-t border-slate-200/70 bg-white py-16 md:py-24">
         <div className={PUBLIC_SHELL_INNER_CLASS}>
           <p className={LANDING_EYEBROW_CLASS}>Discipline coverage</p>
-          <h2 className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>IICRC CEC Accredited course catalogue</h2>
+          <h2 className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>Course catalogue by subject</h2>
           <p className={`mt-4 max-w-2xl ${LANDING_LEAD_CLASS}`}>
             {d > 0
               ? `Published courses across ${d} restoration discipline${d === 1 ? '' : 's'} — each awarding a CARSI Southern Hemisphere Restoration Designation.`
-              : 'IICRC CEC Accredited courses across all seven core restoration disciplines.'}
+              : 'Courses across the core restoration subjects. CEC hours apply only to courses the IICRC has approved.'}
           </p>
           <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {disciplineRows.map((row) => (
+            {disciplineRows.map((label) => (
               <div
-                key={row.code}
+                key={label}
                 className="flex items-center gap-3 rounded-2xl border border-slate-200/80 bg-[#fafbfc] px-4 py-3"
               >
-                <span className="min-w-[3rem] font-mono text-xs font-bold text-[#146fc2]">
-                  {row.code}
-                </span>
-                <span className="text-sm text-slate-600">{row.label}</span>
+                <span className="text-sm text-slate-600">{label}</span>
               </div>
             ))}
           </div>

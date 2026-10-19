@@ -18,28 +18,28 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = buildIndustryMetadata(
   'commercial-cleaning',
-  'Commercial Cleaning IICRC CEC Training',
-  'IICRC CEC Accredited courses for commercial cleaning contractors in Australia. Carpet repair, carpet cleaning and odour control topics for carpet restoration, odour control, and insurance panel readiness.',
+  'Commercial Cleaning Restoration Training',
+  'Courses for commercial cleaning contractors in Australia. Carpet cleaning, water damage and odour control topics for commercial cleaning teams and insurance panel readiness.',
   [
-    'commercial cleaning IICRC CEC training',
+    'commercial cleaning restoration training',
     'cleaning contractor training Australia',
-    'CRT certification',
-    'CCT commercial carpet',
-    'OCT odour control training',
+    'carpet cleaning training',
+    'commercial carpet care',
+    'odour control training',
   ]
 );
 
 const ACCENT_COLOR = '#2490ed';
 
 const disciplines = [
-  { code: 'CRT', label: 'Carpet Restoration', color: '#2490ed' },
-  { code: 'CCT', label: 'Commercial Carpet', color: '#1976d2' },
-  { code: 'OCT', label: 'Odour Control', color: '#1565c0' },
+  { code: 'CRT', label: 'Carpet cleaning', color: '#2490ed' },
+  { code: 'CCT', label: 'Commercial carpet care', color: '#1976d2' },
+  { code: 'OCT', label: 'Odour control', color: '#1565c0' },
 ];
 
 const stats = [
-  { value: '8,000+', label: 'Cleaning Companies' },
-  { value: 'IICRC', label: 'Certification' },
+  { value: 'Online', label: 'Self-paced study' },
+  { value: 'IICRC CEC', label: 'On approved courses' },
   { value: 'CECs', label: 'Continuous Education' },
 ];
 
@@ -47,12 +47,12 @@ const faqs = [
   {
     question: 'How do cleaning companies add restoration services in Australia?',
     answer:
-      'Commercial cleaning businesses expand into restoration by upskilling existing staff with IICRC CEC courses in the core disciplines. CRT (Carpet Restoration), WRT (Water Damage Restoration), and OCT (Odour Control) are the most common entry points. This continuing-education grounding helps cleaners offer restoration work alongside routine cleaning contracts, increasing revenue per client. CARSI delivers CEC courses, not IICRC certification — certification is obtained through schools approved by the IICRC.',
+      'Most start by upskilling existing staff in water damage restoration, carpet cleaning and odour control, then add structural drying and mould remediation. CARSI courses in those subjects are online and self-paced, and every completed course issues a verifiable CARSI credential. CARSI is an IICRC CEC Accredited provider: where the IICRC has approved a course, its CEC hours are shown on the course page. CARSI does not deliver IICRC certification, which is obtained only through IICRC-approved schools and examinations.',
   },
   {
     question: 'What IICRC certifications help win insurance restoration panels?',
     answer:
-      'Major Australian insurers and loss adjusters require contractors on their restoration panels to hold current IICRC certifications. WRT (Water Damage Restoration) and FSRT (Fire & Smoke Restoration) are the most commonly requested. Maintaining current CECs (Continuing Education Credits) is essential to remain on approved contractor lists.',
+      'Insurers and loss adjusters set their own panel requirements, so ask each panel which IICRC certifications it expects. IICRC certification is obtained only through IICRC-approved schools and examinations, and holders keep it current with Continuing Education Credits (CECs). Where the IICRC has approved a CARSI course, its CEC hours are shown on the course page.',
   },
   {
     question: 'How does IICRC certification align with ISSA standards?',
@@ -60,30 +60,30 @@ const faqs = [
       'IICRC and ISSA (International Sanitary Supply Association) are complementary industry bodies. IICRC provides technician-level certifications in specific restoration disciplines, while ISSA focuses on cleaning management standards. Australian cleaning companies often hold credentials from both organisations to demonstrate comprehensive capability in tenders.',
   },
   {
-    question: 'What is the cost of IICRC CEC training for cleaning staff in Australia?',
+    question: 'What does CARSI training cost for cleaning staff?',
     answer:
-      'CARSI offers IICRC CEC Accredited courses from $795 AUD per year per seat, which includes access to courses, verifiable CARSI digital credentials, and CEC tracking. Bulk team pricing is available for cleaning companies training multiple technicians. Courses are online and self-paced, eliminating travel and downtime costs.',
+      'Each course is priced in AUD on its own page, and paid courses can be bought as team seats at checkout. Some courses are free. Yearly membership and team plans are listed on the pricing page.',
   },
   {
-    question: 'How do cleaning contractors track IICRC CEC credits for their team?',
+    question: 'How do cleaning contractors track training for their team?',
     answer:
-      "CARSI provides a team dashboard where business owners and managers can monitor each technician's CEC progress, certification status, and expiry dates. Verifiable digital transcripts are issued for each completed course, suitable for tender submissions, insurance panel applications, and client proposals.",
+      'Every completed course issues a verifiable CARSI credential, and each learner can download or share their training record from the CARSI dashboard for tenders, insurance panel applications and client proposals. CEC hours are recorded only for courses the IICRC has approved.',
   },
 ];
 
 const whyCards = [
   {
     icon: Award,
-    title: 'IICRC CEC Training',
+    title: 'Restoration Training',
     description:
-      'Build IICRC CEC records and CARSI credentials that differentiate your cleaning business. Stand out in tender submissions and client proposals.',
+      'Build CARSI credentials, plus IICRC CEC records on courses the IICRC has approved, that differentiate your cleaning business. Stand out in tender submissions and client proposals.',
     color: '#2490ed',
   },
   {
     icon: Shield,
     title: 'Insurance Recognition',
     description:
-      'IICRC credentials are recognised by major insurers. Trained technicians can work on insurance restoration jobs with confidence.',
+      'Restoration training helps technicians take on insurance restoration jobs with confidence. Each insurer panel sets its own certification requirements.',
     color: '#1976d2',
   },
   {
@@ -104,8 +104,8 @@ export default async function CommercialCleaningIndustryPage() {
         industryName="Commercial Cleaning"
         accentColor={ACCENT_COLOR}
         headline="Commercial Cleaning"
-        headlineAccent="Professional CEC Training"
-        description="IICRC CEC Accredited courses for commercial cleaning contractors. Build CARSI credentials in carpet restoration, commercial carpet care, and odour control."
+        headlineAccent="Professional Restoration Training"
+        description="Courses for commercial cleaning contractors. Build CARSI credentials in carpet cleaning, commercial carpet care and odour control."
         disciplines={disciplines}
         stats={stats}
       />
@@ -120,7 +120,7 @@ export default async function CommercialCleaningIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Commercial Cleaning"
-        disciplineList="Carpet repair, carpet cleaning and odour control"
+        disciplineList="Carpet cleaning and odour control"
         disciplines={['CRT', 'CCT', 'OCT']}
       />
 
@@ -132,7 +132,7 @@ export default async function CommercialCleaningIndustryPage() {
         subtitle="Cleaning professional training"
         title="Pro Cleaning Bundle"
         price={industryBundlePriceLabel('commercial-cleaning')}
-        description="CRT Carpet Restoration + CCT Commercial Carpet + OCT Odour Control. Perfect for cleaning contractors seeking IICRC credentials."
+        description="Carpet cleaning, commercial carpet care and odour control for cleaning contractors. Every completed course issues a verifiable CARSI credential."
         ctaText="View pricing"
         ctaHref="/pricing"
         secondaryHref="/courses"

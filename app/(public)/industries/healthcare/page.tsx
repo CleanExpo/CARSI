@@ -25,7 +25,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = buildIndustryMetadata(
   'healthcare',
   'Healthcare restoration training for Australian hospital crews',
-  'IICRC CEC Accredited courses for restoration technicians and subcontractors working hospitals and clinics. Mould, indoor air quality and water damage training that fits around call-outs.',
+  'Courses for restoration technicians and subcontractors working hospitals and clinics. Mould, indoor air quality and water damage training that fits around call-outs.',
   [
     'healthcare mould training Australia',
     'hospital restoration technician course',
@@ -86,7 +86,7 @@ const faqs = [
   {
     question: 'What mould training applies to healthcare facilities in Australia?',
     answer:
-      'Start with Introduction to IAQ and Mould: Understanding Airborne Spread and Containment, then Introduction to Applied Microbial Remediation. Both are IICRC CEC Accredited. Hours are shown on each course page.',
+      'Start with Introduction to IAQ and Mould: Understanding Airborne Spread and Containment, then Introduction to Applied Microbial Remediation. Where the IICRC has approved a course, its CEC hours are shown on the course page.',
   },
   {
     question: 'How does this training sit next to NSQHS Standard 3?',
@@ -101,7 +101,7 @@ const faqs = [
   {
     question: 'Which courses should a crew open first for a hospital water loss?',
     answer:
-      'Open Introduction to Water Damage in Commercial Buildings, then Introduction to Safety Procedures for Water Damage Work and Introduction to Improving Indoor Air Quality After Water Damage. CEC hours appear only on IICRC CEC Accredited titles.',
+      'Open Introduction to Water Damage in Commercial Buildings, then Introduction to Safety Procedures for Water Damage Work and Introduction to Improving Indoor Air Quality After Water Damage. CEC hours appear only on courses the IICRC has approved.',
   },
 ];
 
@@ -139,7 +139,7 @@ export default async function HealthcareIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Train for the hospital"
         headlineAccent="jobs you already win"
-        description="For restoration crews and facility teams who work Australian hospitals and clinics. IICRC CEC Accredited courses in mould, indoor air quality and water damage, studied around the roster."
+        description="For restoration crews and facility teams who work Australian hospitals and clinics. Courses in mould, indoor air quality and water damage, studied around the roster."
         disciplines={topics}
         stats={stats}
       />
@@ -155,7 +155,7 @@ export default async function HealthcareIndustryPage() {
       <IndustrySearchTopics
         eyebrow="What crews search"
         title="Four hospital-site problems, four live courses"
-        body="Start with these IICRC CEC Accredited introductions for common hospital-site tasks. They supplement, but do not replace, facility induction, infection-control policy or role-specific competency assessment."
+        body="Start with these introductions for common hospital-site tasks. Where the IICRC has approved a course, its CEC hours are shown on the course page. They supplement, but do not replace, facility induction, infection-control policy or role-specific competency assessment."
         topics={healthcareSearchTopics}
       />
 

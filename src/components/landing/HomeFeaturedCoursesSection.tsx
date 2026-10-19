@@ -86,7 +86,8 @@ export function HomeFeaturedCoursesSection({
         {courses.length > 0 ? (
           <p className="mt-8 flex items-center justify-center gap-2 text-center text-xs text-slate-500">
             <Sparkles className="h-3.5 w-3.5 text-[#a85500]" aria-hidden />
-            Every course tracks progress and CEC hours in your learner dashboard.
+            Every course tracks your progress in the learner dashboard, with CEC hours on courses
+            the IICRC has approved.
           </p>
         ) : null}
       </div>

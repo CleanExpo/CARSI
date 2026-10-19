@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     template: '%s | CARSI',
   },
   description:
-    'IICRC CEC Accredited courses for cleaning and restoration professionals in Australia. Earn continuing education credits, track your progress, and receive CARSI completion certificates.',
+    'IICRC CEC Accredited courses for cleaning and restoration professionals in Australia. Earn CECs on courses the IICRC has approved, track your progress, and receive CARSI completion certificates.',
   keywords: [
     'restoration training',
     'IICRC CECs',
@@ -72,7 +72,7 @@ export const metadata: Metadata = {
     siteName: 'CARSI',
     title: 'CARSI | Restoration Training, IICRC CEC Platform',
     description:
-      'IICRC CEC Accredited courses for cleaning and restoration professionals in Australia. Earn continuing education credits and track your progress.',
+      'IICRC CEC Accredited courses for cleaning and restoration professionals in Australia. Earn CECs on courses the IICRC has approved and track your progress.',
     images: [
       {
         url: `${siteUrl}/og-image.png`,

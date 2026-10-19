@@ -14,15 +14,15 @@ import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Transport & Logistics IICRC CEC Training',
+  title: 'Transport & Logistics Restoration Training',
   description:
-    'IICRC CEC Accredited restoration courses for Australian transport and logistics operations. Water damage restoration, carpet repair and odour control courses for vehicle interiors, warehouses, and loading dock maintenance.',
+    'Water damage restoration, carpet cleaning and odour control courses for Australian transport and logistics teams, plus a vehicle drying course. CEC hours are shown only on courses the IICRC has approved.',
   keywords: [
-    'transport IICRC CEC training Australia',
+    'transport restoration training Australia',
     'logistics warehouse restoration',
-    'WRT water damage warehouse',
-    'CRT carpet cleaning vehicle interiors',
-    'OCT odour control transport',
+    'warehouse water damage',
+    'carpet cleaning training',
+    'odour control transport',
   ],
 };
 
@@ -33,32 +33,32 @@ export const metadata: Metadata = {
 const ACCENT_COLOR = '#1565C0';
 
 const disciplines = [
-  { code: 'WRT', label: 'Water Damage Restoration', color: '#1565C0' },
-  { code: 'CRT', label: 'Carpet & Upholstery Cleaning', color: '#0D47A1' },
-  { code: 'OCT', label: 'Odour Control', color: '#1976D2' },
+  { code: 'WRT', label: 'Water damage', color: '#1565C0' },
+  { code: 'CRT', label: 'Carpet cleaning', color: '#0D47A1' },
+  { code: 'OCT', label: 'Odour control', color: '#1976D2' },
 ];
 
 const stats = [
-  { value: '50,000+', label: 'Transport Operators' },
+  { value: 'Online', label: 'Self-paced study' },
   { value: 'Chain of', label: 'Responsibility' },
-  { value: 'IICRC', label: 'CEC Accredited' },
+  { value: 'IICRC CEC', label: 'On approved courses' },
 ];
 
 const faqs = [
   {
-    question: 'What IICRC CEC training do Australian transport companies need?',
+    question: 'What restoration training suits Australian transport and logistics operators?',
     answer:
-      'Australian transport and logistics operators benefit from WRT (Water Damage Restoration) for warehouse flooding and roof leak response, CRT (Carpet & Upholstery Cleaning) for vehicle interior maintenance across fleets, and OCT (Odour Control) for managing contamination odours in enclosed cargo areas and passenger vehicles. These certifications support Chain of Responsibility compliance and fleet asset protection.',
+      'Water damage response for warehouse flooding and roof leaks, drying for vehicles, and odour control in enclosed cargo areas and passenger vehicles. Relevant CARSI courses include Introduction to Water Damage in Commercial Buildings, Introduction to Drying Transportation and Vehicles and Introduction to Odour Control and Removal Techniques.',
   },
   {
     question: 'How does water damage training help warehouse operations?',
     answer:
-      'Australian warehouses face water damage from storm events, roof failures, and sprinkler activations. CEC-accredited water restoration training equips logistics teams to respond immediately — extracting water, protecting inventory, and deploying drying equipment to minimise stock loss and downtime. Early response can reduce insurance claims and prevent secondary mould damage.',
+      'Australian warehouses face water damage from storms, roof failures and sprinkler activations. Water damage training equips logistics teams to respond immediately: extract water, protect inventory and set up drying equipment to reduce stock loss and downtime. Early response can also prevent secondary mould damage.',
   },
   {
-    question: 'What is vehicle interior restoration training?',
+    question: 'What vehicle training does CARSI offer?',
     answer:
-      'CARSI carpet repair and reinstallation training covers fabric and surface restoration techniques for vehicle interiors including buses, coaches, trucks, and fleet cars. For transport operators, this means extending asset life, maintaining hygiene standards for passenger vehicles, and reducing outsourced detailing costs across large fleets.',
+      "Introduction to Drying Transportation and Vehicles covers drying vehicles and transport assets after water damage. CARSI's vehicle training is about drying; it does not cover interior fabric repair.",
   },
   {
     question: 'Can transport and logistics staff train online around shift schedules?',
@@ -72,21 +72,21 @@ const whyCards = [
     icon: Shield,
     title: 'Asset Protection',
     description:
-      'Warehoused goods, fleet vehicles, and loading infrastructure represent significant capital. IICRC CEC training ensures rapid, standards-based response to water damage and contamination events.',
+      'Warehoused goods, fleet vehicles, and loading infrastructure represent significant capital. Restoration training ensures rapid, standards-based response to water damage and contamination events.',
     color: '#1565C0',
   },
   {
     icon: Droplets,
     title: 'Warehouse Flood Response',
     description:
-      'Storm damage, sprinkler activations, and roof leaks can destroy warehoused inventory. WRT training equips your team to extract, dry, and restore — minimising stock loss.',
+      'Storm damage, sprinkler activations, and roof leaks can destroy warehoused inventory. Water damage training equips your team to extract, dry, and restore — minimising stock loss.',
     color: '#0D47A1',
   },
   {
     icon: Wind,
     title: 'Fleet Interior Maintenance',
     description:
-      'Vehicle interiors across bus, coach, and truck fleets require specialist cleaning. Carpet repair and odour control certifications reduce outsourced costs and extend asset life.',
+      'Bus, coach and truck fleets get wet interiors and lingering odours. Vehicle drying and odour control training helps in-house teams deal with both and extend asset life.',
     color: '#ed9d24',
   },
 ];
@@ -105,7 +105,7 @@ export default async function TransportLogisticsIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Transport & Logistics"
         headlineAccent="Restoration Training"
-        description="IICRC CEC Accredited restoration courses for Australia's transport and logistics sector. Credentials for warehouse flood response, vehicle interior maintenance, and loading dock contamination control."
+        description="Restoration courses for transport and logistics teams: warehouse flood response, vehicle drying and loading dock contamination control."
         disciplines={disciplines}
         stats={stats}
       />
@@ -119,7 +119,7 @@ export default async function TransportLogisticsIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Transport & Logistics"
-        disciplineList="Water damage restoration, carpet repair and odour control"
+        disciplineList="Water damage restoration, carpet cleaning and odour control"
         disciplines={['WRT', 'CRT', 'OCT']}
       />
 
@@ -129,7 +129,7 @@ export default async function TransportLogisticsIndustryPage() {
         subtitle="Transport & Logistics Training"
         title="Logistics Restoration Bundle"
         price={industryBundlePriceLabel('transport-logistics')}
-        description="water damage restoration, carpet repair and odour control training for transport and warehouse teams. Includes fleet maintenance and warehouse flood response protocols. Online, self-paced — fits around shift schedules."
+        description="water damage restoration, vehicle drying and odour control training for transport and warehouse teams. Includes fleet maintenance and warehouse flood response protocols. Online, self-paced — fits around shift schedules."
         ctaText="Train Your Operations Team"
         accentColor={ACCENT_COLOR}
       />

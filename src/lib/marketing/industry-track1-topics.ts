@@ -116,7 +116,7 @@ export const hospitalitySearchTopics: IndustrySearchTopic[] = [
     outcome:
       'Explain the drying plan, monitoring points and escalation triggers to property staff.',
     href: '/courses/introduction-to-applied-structural-drying',
-    cta: 'Open applied structural drying',
+    cta: 'Open structural drying',
   },
 ];
 

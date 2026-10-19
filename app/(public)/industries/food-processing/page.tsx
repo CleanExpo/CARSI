@@ -14,15 +14,15 @@ import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Food Processing Facility IICRC CEC Training',
+  title: 'Food Processing Facility Restoration Training',
   description:
-    'HACCP-aligned IICRC CEC training for Australian food processing facilities. Mould remediation, odour control and carpet cleaning courses supporting hygiene compliance, cold storage maintenance, and contamination prevention.',
+    'Restoration training for Australian food processing facilities. Mould remediation, odour control and carpet cleaning courses supporting hygiene compliance, cold storage maintenance, and contamination prevention.',
   keywords: [
-    'food processing IICRC CEC training Australia',
+    'food processing restoration training Australia',
     'HACCP compliance restoration',
-    'AMRT mould remediation food facility',
-    'OCT odour control food processing',
-    'CCT carpet cleaning food factory',
+    'mould remediation food facility',
+    'odour control food processing',
+    'carpet cleaning food factory',
   ],
 };
 
@@ -33,35 +33,35 @@ export const metadata: Metadata = {
 const ACCENT_COLOR = '#2E7D32';
 
 const disciplines = [
-  { code: 'AMRT', label: 'Applied Microbial Remediation', color: '#2E7D32' },
-  { code: 'OCT', label: 'Odour Control', color: '#1B5E20' },
-  { code: 'CCT', label: 'Carpet Cleaning', color: '#388E3C' },
+  { code: 'AMRT', label: 'Mould remediation', color: '#2E7D32' },
+  { code: 'OCT', label: 'Odour control', color: '#1B5E20' },
+  { code: 'CCT', label: 'Carpet cleaning', color: '#388E3C' },
 ];
 
 const stats = [
-  { value: '6,000+', label: 'Food Facilities' },
+  { value: 'Online', label: 'Self-paced study' },
   { value: 'HACCP', label: 'Aligned' },
-  { value: 'IICRC', label: 'CEC Accredited' },
+  { value: 'IICRC CEC', label: 'On approved courses' },
 ];
 
 const faqs = [
   {
-    question: 'What IICRC certifications do Australian food processing facilities need?',
+    question: 'What restoration training suits Australian food processing facilities?',
     answer:
-      'Australian food processing facilities benefit from AMRT (Applied Microbial Remediation) for mould and bacterial contamination control in cold stores and processing areas, OCT (Odour Control) for managing organic odours in production environments, and CCT (Carpet Cleaning) for maintaining hygiene in administrative and visitor areas. These certifications complement HACCP and FSANZ food safety requirements.',
+      'Microbial remediation for mould and bacterial contamination in cold stores and processing areas, odour control for organic odours, and carpet cleaning for office and visitor areas. Relevant CARSI courses include Introduction to Applied Microbial Remediation, Introduction to Odour Control and Removal Techniques and Introduction to Basic Carpet Cleaning and Drying. This training sits alongside, and does not replace, HACCP and FSANZ food safety requirements.',
   },
   {
-    question: 'How does IICRC CEC training support HACCP compliance in food facilities?',
+    question: 'How does mould training support HACCP programs in food facilities?',
     answer:
-      "HACCP plans require demonstrated competency in contamination prevention. CARSI's CEC-accredited mould remediation training provides verifiable evidence that maintenance teams can identify and remediate microbial hazards including mould, bacteria, and biofilms in cold storage rooms, processing lines, and drainage systems — all critical control points in a HACCP plan.",
+      'HACCP plans depend on staff who can prevent contamination. Mould remediation training gives maintenance teams documented training in identifying and remediating mould, bacteria and biofilms in cold rooms, processing lines and drains. It supports, and does not replace, the facility\'s own HACCP plan and verification.',
   },
   {
     question: 'What is mould remediation training for cold storage facilities?',
     answer:
-      'CEC-accredited mould remediation training covers identification and remediation of mould and microbial growth in temperature-controlled environments. For Australian food facilities, this is critical in cold rooms, blast chillers, loading docks, and drainage channels where condensation creates ideal conditions for microbial contamination that can affect product safety.',
+      'It covers identifying and remediating mould and microbial growth in temperature-controlled areas such as cold rooms, blast chillers, loading docks and drainage channels, where condensation creates conditions for contamination. CARSI covers this in Introduction to Applied Microbial Remediation and the Level 1 to Level 3 Mould Remediation courses.',
   },
   {
-    question: 'Can food processing staff complete IICRC CEC training while maintaining shift patterns?',
+    question: 'Can food processing staff complete this training while maintaining shift patterns?',
     answer:
       'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced. Staff can complete modules around production schedules and shift rotations. Courses issue verifiable digital credentials on completion.',
   },
@@ -72,21 +72,21 @@ const whyCards = [
     icon: Shield,
     title: 'HACCP Compliance',
     description:
-      'IICRC CEC training supports HACCP critical control points for microbial contamination prevention. Demonstrate staff competency during food safety audits.',
+      'Restoration training supports HACCP critical control points for microbial contamination prevention. Demonstrate staff competency during food safety audits.',
     color: '#2E7D32',
   },
   {
     icon: Droplets,
     title: 'Cold Storage Hygiene',
     description:
-      'Condensation, drainage issues, and temperature fluctuations in cold rooms create ideal conditions for mould. AMRT training equips teams to prevent and remediate contamination.',
+      'Condensation, drainage issues, and temperature fluctuations in cold rooms create ideal conditions for mould. Microbial remediation training equips teams to prevent and remediate contamination.',
     color: '#1B5E20',
   },
   {
     icon: SprayCan,
     title: 'Odour & Surface Control',
     description:
-      'Organic odours and surface contamination in processing areas require specialist remediation. Odour control and carpet cleaning certifications provide standards-based approaches.',
+      'Organic odours and surface contamination in processing areas require specialist remediation. Odour control and carpet cleaning training provides standards-based approaches.',
     color: '#ed9d24',
   },
 ];
@@ -105,7 +105,7 @@ export default async function FoodProcessingIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Food Processing"
         headlineAccent="Hygiene Training"
-        description="HACCP-aligned restoration training for Australia's 6,000+ food processing facilities. IICRC credentials for microbial remediation, odour control, and hygiene compliance in production environments."
+        description="Restoration training for food processing maintenance teams: microbial remediation, odour control and cleaning in production environments. It supports, and does not replace, the facility's HACCP plan."
         disciplines={disciplines}
         stats={stats}
       />

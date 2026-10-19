@@ -89,9 +89,10 @@ export default function GovernmentRestorationPanelsPage() {
           </ul>
 
           <p className="mt-8 text-xs leading-5 text-slate-500">
-            CARSI is an IICRC CEC Accredited provider. Our online, self-paced courses earn IICRC
-            Continuing Education Credits (CECs) toward maintaining an existing IICRC certification —
-            so your team keeps its credentials current without losing billable days.
+            CARSI is an IICRC CEC Accredited provider. Its online, self-paced courses that the IICRC
+            has approved count toward the Continuing Education Credits (CECs) an existing IICRC
+            certification needs — so your team keeps its credentials current without losing billable
+            days.
           </p>
         </div>
 

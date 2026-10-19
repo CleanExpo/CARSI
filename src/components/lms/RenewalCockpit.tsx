@@ -166,8 +166,8 @@ export function RenewalCockpit() {
             </p>
             {data.some_cecs_estimated ? (
               <p className="mt-3 max-w-xl text-xs leading-relaxed text-amber-800">
-                Some completed courses have no CEC hours stored in the catalogue — each counts as 1
-                CEC toward this summary until hours are set in admin.
+                Some completed courses have no IICRC CEC approval, so they add no CEC hours to this
+                summary.
               </p>
             ) : null}
           </div>

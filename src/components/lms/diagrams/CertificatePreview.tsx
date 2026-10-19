@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 import { formatCecHoursForCertificate } from '@/lib/cec-display';
 import { formatCredentialRef } from '@/lib/credential-format';
-import { IICRC_DISCIPLINE_LONG } from '@/lib/iicrc-discipline-display';
+import { IICRC_DISCIPLINE_SHORT } from '@/lib/iicrc-discipline-display';
 
 const DISCIPLINE_COLORS: Record<string, string> = {
   WRT: '#2490ed',
@@ -60,7 +60,7 @@ function ProgrammeDetail({
 
 export function CertificatePreview({
   studentName = 'James Wilson',
-  courseName = 'Water Damage Restoration Technician',
+  courseName = 'Introduction to Water Damage Restoration',
   discipline = 'WRT',
   completedDate = new Date().toLocaleDateString('en-AU', {
     day: 'numeric',
@@ -77,7 +77,7 @@ export function CertificatePreview({
   const discLabel =
     discCode === 'GEN'
       ? 'General restoration training'
-      : (IICRC_DISCIPLINE_LONG[discCode] ?? discipline);
+      : (IICRC_DISCIPLINE_SHORT[discCode] ?? 'General restoration training');
   const issued = issuedDate ?? completedDate;
   const credentialRef = credentialId ? formatCredentialRef(credentialId) : 'CARSI-EXAMPLE000';
   const cecValue = formatCecHoursForCertificate(cecHoursLabel);
@@ -159,7 +159,7 @@ export function CertificatePreview({
               {studentName}
             </p>
             <p className="mb-3 max-w-lg text-[11px] leading-relaxed text-slate-500 sm:text-xs">
-              has demonstrated the required competency and successfully completed the accredited
+              has demonstrated the required competency and successfully completed the CARSI
               programme
             </p>
             <p

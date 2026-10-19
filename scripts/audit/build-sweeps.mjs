@@ -12,6 +12,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { IICRC_CODES } from '../iicrc-codes.mjs';
 import { run, runCapture } from './subprocess.mjs';
 
 const ROOT = process.cwd();
@@ -191,7 +192,9 @@ const liveSlugs = [
       .map((u) => u.split('/courses/')[1].replace(/\/$/, '')).filter(Boolean),
   ),
 ];
-const acronymSlugs = liveSlugs.filter((s) => /^(wrt|asd|amrt|cct|ccmt|ccu|osr|fsrt|smt|hst|uft|rrt|wlp)-/i.test(s));
+// every IICRC code (data/iicrc-codes.json) plus the legacy non-IICRC slug prefixes ccu, osr, wlp
+const ACRONYM_SLUG = new RegExp(`^(${[...IICRC_CODES, ...['CCU', 'OSR', 'WLP']].join('|')})-`, 'i');
+const acronymSlugs = liveSlugs.filter((s) => ACRONYM_SLUG.test(s));
 
 const cmp = [];
 cmp.push('# GP-567 D4 — Compliance-language sweep');

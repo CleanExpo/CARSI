@@ -17,7 +17,6 @@ interface LinkedInShareButtonProps {
 
 export function LinkedInShareButton({
   courseTitle,
-  iicrcDiscipline,
   issuedYear,
   issuedMonth,
   credentialId,
@@ -32,7 +31,7 @@ export function LinkedInShareButton({
   const handleShare = () => {
     const params = new URLSearchParams({
       startTask: 'CERTIFICATION_NAME',
-      name: `${courseTitle} (${iicrcDiscipline})`,
+      name: courseTitle,
       organizationName: 'CARSI',
       issueYear: String(issuedYear),
       issueMonth: String(issuedMonth),

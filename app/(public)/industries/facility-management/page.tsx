@@ -28,7 +28,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = buildIndustryMetadata(
   'facility-management',
   'Facility management training for Australian hospital, aged-care and hotel crews',
-  'Team seats, completion records and IICRC CEC Accredited courses for the crews who work healthcare, aged-care and hospitality contracts. For contract managers and technicians, not a named-client list.',
+  'Team seats, completion records and courses for the crews who work healthcare, aged-care and hospitality contracts. For contract managers and technicians, not a named-client list.',
   [
     'facility management restoration training Australia',
     'hospital contractor training records',
@@ -54,7 +54,7 @@ const stats = [
     label: 'Seats in the published Starter team price',
   },
   { value: 'IICRC CEC', label: 'Hours only on approved courses' },
-  { value: '3', label: 'Track 1 site pathways linked below' },
+  { value: 'Online', label: 'Self-paced study' },
 ];
 
 const evidenceLinks = [
@@ -113,7 +113,7 @@ export default async function FacilityManagementIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Train the crew"
         headlineAccent="your contract already uses"
-        description="For operations leads and the technicians who walk onto Australian hospitals, aged-care homes and hotels. IICRC CEC Accredited courses, team records and proof you can file. We do not sell named global facility-management partnerships."
+        description="For operations leads and the technicians who walk onto Australian hospitals, aged-care homes and hotels. Courses, team records and proof you can file. We do not sell named global facility-management partnerships."
         disciplines={topics}
         stats={stats}
       />
@@ -152,8 +152,8 @@ export default async function FacilityManagementIndustryPage() {
       <IndustryCTA
         subtitle="Facility management training"
         title="Start the crew from published team prices"
-        price={starter?.priceLabel ?? '$299 / year'}
-        description="Starter, Growth and Full library prices are on the pricing page. Contact CARSI to start seats. Technicians can still buy a single IICRC CEC Accredited course."
+        price={starter?.priceLabel ?? 'See pricing'}
+        description="Starter, Growth and Full library prices are on the pricing page. Contact CARSI to start seats. Technicians can still buy a single course."
         ctaText="Talk to CARSI"
         ctaHref={facilityManagementContactHref}
         secondaryHref="/pricing"

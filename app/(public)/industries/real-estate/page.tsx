@@ -14,14 +14,14 @@ import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'IICRC CEC Training for Real Estate & Property Sales | CARSI Australia',
+  title: 'Restoration Training for Real Estate & Property Sales | CARSI Australia',
   description:
-    'Vendor disclosure compliance and pre-sale remediation. CARSI water damage restoration, applied structural drying and mould remediation CEC courses for real estate agents, property managers, and conveyancers. Online, CEC Accredited — continuing education credits, not IICRC certification.',
+    'Vendor disclosure compliance and pre-sale remediation. CARSI water damage restoration, structural drying and mould remediation courses for real estate agents, property managers, and conveyancers. Online. CEC hours apply only to courses the IICRC has approved; not IICRC certification.',
   keywords: [
-    'real estate IICRC CEC training Australia',
+    'real estate restoration training Australia',
     'water damage disclosure property',
     'mould training real estate agent',
-    'WRT property sales CEC course',
+    'water damage training for real estate',
     'pre-sale remediation training',
   ],
 };
@@ -33,15 +33,15 @@ export const metadata: Metadata = {
 const ACCENT_COLOR = '#ff7043';
 
 const disciplines = [
-  { code: 'WRT', label: 'Water Damage Restoration', color: '#ff7043' },
-  { code: 'ASD', label: 'Applied Structural Drying', color: '#f4511e' },
-  { code: 'AMRT', label: 'Applied Microbial Remediation', color: '#e64a19' },
+  { code: 'WRT', label: 'Water damage', color: '#ff7043' },
+  { code: 'ASD', label: 'Structural drying', color: '#f4511e' },
+  { code: 'AMRT', label: 'Mould remediation', color: '#e64a19' },
 ];
 
 const stats = [
-  { value: '1.1M+', label: 'Annual Transactions (AUS)' },
+  { value: 'Online', label: 'Self-paced study' },
   { value: 'ACL', label: 'Disclosure Required' },
-  { value: 'IICRC', label: 'CEC Accredited' },
+  { value: 'IICRC CEC', label: 'On approved courses' },
 ];
 
 const faqs = [
@@ -54,12 +54,12 @@ const faqs = [
     question:
       'What are vendor disclosure obligations for water damage in Australian property sales?',
     answer:
-      "Each state has specific vendor disclosure requirements. In most jurisdictions, sellers must disclose material defects that would affect a reasonable buyer's decision, which includes known water penetration, mould contamination, and structural drying history. IICRC-trained real estate agents can identify these defects during pre-listing inspections, document them accurately in vendor disclosure statements, and advise on IICRC-compliant remediation to maximise sale price and minimise post-settlement disputes.",
+      "Each state has its own vendor disclosure requirements. In most jurisdictions, sellers must disclose material defects that would affect a reasonable buyer's decision, which can include known water penetration, mould and drying history. Trained agents can recognise these defects during pre-listing inspections, record them accurately in disclosure statements and refer vendors to qualified remediation contractors.",
   },
   {
-    question: 'How does IICRC certification help during property sales transactions?',
+    question: 'How does water damage and mould training help during property sales?',
     answer:
-      'IICRC-certified agents can accurately assess water damage severity, distinguish between active and historic moisture intrusion, and interpret moisture meter readings and thermal imaging results — skills that are increasingly expected as buyers become more sophisticated. An agent who can credibly discuss IICRC remediation standards builds vendor and buyer confidence, reduces the risk of sale collapse from building inspections, and supports faster settlement by providing documented remediation evidence when required.',
+      'Agents trained in water damage and mould can better judge how serious water damage is, tell active from historic moisture, and understand moisture meter readings and thermal images. That helps them discuss remediation credibly, lowers the risk of a sale collapsing after a building inspection, and lets them point to documented remediation when it exists.',
   },
   {
     question: 'What is moisture mapping and why does it matter for real estate?',
@@ -73,21 +73,21 @@ const whyCards = [
     icon: FileCheck,
     title: 'Vendor Disclosure Compliance',
     description:
-      'Water damage and mould are material defects requiring disclosure under Australian Consumer Law. IICRC CEC training equips agents to identify, document, and disclose these defects accurately — minimising post-settlement liability.',
+      'Water damage and mould are material defects requiring disclosure under Australian Consumer Law. Restoration training equips agents to identify, document, and disclose these defects accurately — minimising post-settlement liability.',
     color: '#ff7043',
   },
   {
     icon: TrendingUp,
     title: 'Pre-Sale Remediation Value',
     description:
-      'IICRC-certified remediation before listing commands a higher sale price and reduces building inspection failures. Trained agents can brief vendors on required work and verify completion to standard.',
+      'Remediation completed and documented before listing can reduce building inspection surprises. Trained agents can brief vendors on required work and check that it was documented.',
     color: '#f4511e',
   },
   {
     icon: Shield,
     title: 'Professional Indemnity Protection',
     description:
-      'Non-disclosure of known defects is the leading source of real estate professional indemnity claims. IICRC CEC Accredited awareness courses demonstrates due diligence and supports a defensible inspection record.',
+      'Non-disclosure of known defects is the leading source of real estate professional indemnity claims. Documented awareness training demonstrates due diligence and supports a defensible inspection record.',
     color: '#2490ed',
   },
 ];
@@ -106,7 +106,7 @@ export default async function RealEstateIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Pre-Sale Remediation"
         headlineAccent="& Disclosure Compliance"
-        description="1.1 million Australian property transactions per year carry water damage and mould disclosure obligations. CARSI water damage restoration and mould remediation training gives real estate professionals the knowledge to identify, document, and advise on remediation — protecting vendors, buyers, and agents."
+        description="Property sales can carry water damage and mould disclosure obligations. CARSI water damage restoration and mould remediation training gives real estate professionals the knowledge to identify, document, and advise on remediation — protecting vendors, buyers, and agents."
         disciplines={disciplines}
         stats={stats}
       />
@@ -130,7 +130,7 @@ export default async function RealEstateIndustryPage() {
         subtitle="Real Estate Training"
         title="Property Professional Bundle"
         price={industryBundlePriceLabel('real-estate')}
-        description="water damage restoration and mould remediation awareness training for real estate agents, conveyancers, and property managers. Identify water damage and mould during inspections with IICRC-recognised credentials."
+        description="water damage restoration and mould remediation awareness training for real estate agents, conveyancers, and property managers. Learn to identify water damage and mould during inspections."
         ctaText="Protect Your Practice"
         accentColor={ACCENT_COLOR}
       />

@@ -25,13 +25,13 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = buildIndustryMetadata(
   'hospitality',
   'Hotel restoration training for Australian technicians',
-  'IICRC CEC Accredited courses for crews servicing hotels and resorts. Water damage, odour control, carpet care and structural drying trained around occupied rooms and tight turnaround.',
+  'Courses for crews servicing hotels and resorts. Water damage, odour control, carpet care and structural drying trained around occupied rooms and tight turnaround.',
   [
     'hotel water damage training Australia',
     'hotel odour control training',
     'hospitality restoration technician course',
     'hotel carpet cleaning training',
-    'IICRC CEC hotel training',
+    'hotel restoration training',
   ]
 );
 
@@ -74,20 +74,20 @@ const faqs = [
   {
     question: 'How do hotels handle water damage in guest rooms?',
     answer:
-      'Speed and documentation matter more than a long classroom course. Introduction to Water Damage Restoration is IICRC CEC Accredited. It covers assessment, extraction thinking and records you can hand the duty manager and the insurer.',
+      'Speed and documentation matter more than a long classroom course. Introduction to Water Damage Restoration covers assessment, extraction thinking and records you can hand the duty manager and the insurer.',
   },
   {
     question: 'What carpet training helps in lobbies and corridors?',
     answer:
-      'Introduction to Basic Carpet Cleaning and Drying covers residential, commercial and institutional settings. It is IICRC CEC Accredited and provides a foundation for planning work around a hotel access schedule.',
+      'Introduction to Basic Carpet Cleaning and Drying covers residential, commercial and institutional settings. It provides a foundation for planning work around a hotel access schedule.',
   },
   {
     question: 'How do you train for odours in Australian hotel rooms?',
     answer:
-      'Open Introduction to Odour Control and Removal Techniques. It is IICRC CEC Accredited and covers source identification and removal methods. CARSI does not sell IICRC certification; CECs apply only where the IICRC has approved the course.',
+      'Open Introduction to Odour Control and Removal Techniques. It covers source identification and removal methods. CARSI does not sell IICRC certification; CECs apply only where the IICRC has approved the course.',
   },
   {
-    question: 'Can hospitality crews complete IICRC CEC training online?',
+    question: 'Can hospitality crews complete this training online?',
     answer:
       'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced, suited to rotating hotel rosters. Staff can complete modules between shifts. Certificates and CEC records sit in the learner dashboard when you pass an approved course.',
   },
@@ -127,7 +127,7 @@ export default async function HospitalityIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Keep occupied hotels"
         headlineAccent="sellable after a loss"
-        description="IICRC CEC Accredited courses for hotel maintenance teams and the restoration crews they subcontract. Water damage, carpet care, structural drying and odour control, studied around rotating rosters."
+        description="Courses for hotel maintenance teams and the restoration crews they subcontract. Water damage, carpet care, structural drying and odour control, studied around rotating rosters."
         disciplines={topics}
         stats={stats}
       />
@@ -143,7 +143,7 @@ export default async function HospitalityIndustryPage() {
       <IndustrySearchTopics
         eyebrow="What crews search"
         title="Four hotel problems, four live courses"
-        body="Start with these IICRC CEC Accredited introductions for common hotel-site tasks. Property procedures, site induction and role-specific competency checks still apply."
+        body="Start with these introductions for common hotel-site tasks. Where the IICRC has approved a course, its CEC hours are shown on the course page. Property procedures, site induction and role-specific competency checks still apply."
         topics={hospitalitySearchTopics}
       />
 

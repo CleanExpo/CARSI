@@ -9,6 +9,7 @@ import {
   pathwayAdvisorOptions,
   type PathwayAdvisorOption,
 } from '@/lib/customer-journey-loop';
+import { IICRC_DISCIPLINE_SHORT } from '@/lib/iicrc-discipline-display';
 import {
   marketingBodySm,
   marketingEyebrow,
@@ -19,10 +20,14 @@ import {
   marketingTextSubtle,
 } from '@/lib/marketing/marketing-ui';
 
-function DisciplinePill({ code }: { code: string }) {
+/**
+ * The codes in recommendedDisciplines are routing data. A pill names the subject in plain
+ * English and never prints the code: CARSI courses are not branded with IICRC acronyms.
+ */
+function DisciplinePill({ label }: { label: string }) {
   return (
-    <span className="rounded border border-[#2490ed]/30 bg-[#eef7ff] px-2 py-1 font-mono text-[11px] font-bold text-[#146fc2] dark:bg-[#2490ed]/10 dark:text-[#8fd0ff]">
-      {code}
+    <span className="rounded border border-[#2490ed]/30 bg-[#eef7ff] px-2 py-1 text-[11px] font-semibold text-[#146fc2] dark:bg-[#2490ed]/10 dark:text-[#8fd0ff]">
+      {label}
     </span>
   );
 }
@@ -151,8 +156,14 @@ export function PathwayAdvisor() {
                 </div>
               </div>
               <div className="flex flex-wrap gap-1.5">
-                {selected.recommendedDisciplines.map((code) => (
-                  <DisciplinePill key={code} code={code} />
+                {[
+                  ...new Set(
+                    selected.recommendedDisciplines
+                      .map((code) => IICRC_DISCIPLINE_SHORT[code])
+                      .filter(Boolean)
+                  ),
+                ].map((label) => (
+                  <DisciplinePill key={label} label={label} />
                 ))}
               </div>
             </div>

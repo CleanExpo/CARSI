@@ -8,6 +8,7 @@
  * blocker. Run: node scripts/check-designations.mjs
  */
 import { readFileSync } from 'node:fs';
+import { IICRC_CODE_ALT } from './iicrc-codes.mjs';
 
 const CATALOG = 'data/seed/courses-catalog.json';
 const REGISTRY = 'data/seed/designations.json';
@@ -47,7 +48,7 @@ if (cat && reg) {
     if (d.completionRule !== 'all-required') err(`${id}: completionRule must be "all-required"`);
 
     // No IICRC discipline acronym may appear in a designation name/summary.
-    const acr = /\b(WRT|ASD|AMRT|FSRT|CCT|TCST)\b|\[?discipline]?-aligned/;
+    const acr = new RegExp(String.raw`\b(${IICRC_CODE_ALT})\b|\[?discipline]?-aligned`);
     if (acr.test(`${d.name} ${d.summary}`)) err(`${id}: contains an IICRC discipline acronym / "-aligned" framing (banned)`);
 
     const steps = d.pathwaySteps || [];

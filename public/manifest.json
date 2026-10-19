@@ -1,7 +1,7 @@
 {
   "name": "CARSI LMS",
   "short_name": "CARSI",
-  "description": "IICRC CEC Training — Cleaning & Restoration",
+  "description": "Cleaning & Restoration Training — CARSI",
   "start_url": "/student",
   "display": "standalone",
   "background_color": "#ffffff",

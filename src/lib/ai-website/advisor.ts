@@ -48,7 +48,7 @@ const PATHS: Record<string, Path> = {
     ],
   },
   carpet: {
-    label: 'Carpet & upholstery', designation: 'CARSI Carpet Cleaning Practitioner', earnsCec: true,
+    label: 'Carpet care', designation: 'CARSI Carpet Cleaning Practitioner', earnsCec: true,
     courses: [
       { course: 'Carpet Cleaning Fundamentals', tier: '$99' },
       { course: 'Pet Urine & Odour Decontamination', tier: '$29' },
@@ -95,7 +95,7 @@ const KEYWORDS: Array<[string, RegExp]> = [
 
 function pathwayReply(key: string): AdvisorReply {
   const p = PATHS[key];
-  const cec = p.earnsCec ? ', which also earns IICRC CECs toward your existing certification' : '';
+  const cec = p.earnsCec ? `; CEC hours apply only to courses the IICRC has approved` : '';
   return {
     text: `For ${p.label}, here's the pathway — it builds toward the ${p.designation}${cec}:`,
     recommendations: p.courses,
@@ -132,7 +132,7 @@ export function answer(message: string): AdvisorReply {
   if (/\b(designation|certificate|qualif|credential)\b/.test(q)) {
     return {
       text:
-        'CARSI issues its own Southern Hemisphere Restoration Designations — like the RIA issuing its own — e.g. CARSI Water Restoration Practitioner or CARSI Mould Remediation Practitioner. They stack CECs onto your existing IICRC certification. Which one are you aiming for?',
+        'CARSI issues its own Southern Hemisphere Restoration Designations — like the RIA issuing its own — e.g. CARSI Water Restoration Practitioner or CARSI Mould Remediation Practitioner. CEC hours apply only to courses the IICRC has approved, and count toward an existing IICRC certification. Which one are you aiming for?',
       recommendations: none, pathway: null,
     };
   }

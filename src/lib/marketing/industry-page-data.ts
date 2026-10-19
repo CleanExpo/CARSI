@@ -54,7 +54,7 @@ export const featuredIndustryLinks: FeaturedIndustryLink[] = [
     label: 'Commercial Cleaning',
     title: 'Contractor growth & panels',
     detail:
-      'carpet repair, carpet cleaning and odour control credentials for insurance work and tender differentiation',
+      'carpet cleaning, water damage and odour control training for insurance work and tender differentiation',
     icon: Sparkles,
   },
 ];
@@ -133,7 +133,7 @@ const hospitalityPanels: IndustryAddonPanel[] = [
   },
   {
     name: 'High-traffic carpet care',
-    requirement: 'Cleaning and repair for lobbies and conference floors',
+    requirement: 'Cleaning for lobbies and conference floors',
   },
   { name: 'Pool and spa incidents', requirement: 'Structural drying for wet-area overflow events' },
   {
@@ -148,12 +148,15 @@ const hospitalityPanels: IndustryAddonPanel[] = [
 ];
 
 const governmentPanels: IndustryAddonPanel[] = [
-  { name: 'AusTender (Commonwealth)', requirement: 'IICRC credentials for pre-qualification' },
+  {
+    name: 'AusTender (Commonwealth)',
+    requirement: 'Commonwealth tenders; each agency sets its own criteria',
+  },
   { name: 'Defence maintenance', requirement: 'Base maintenance and heritage building work' },
   { name: 'NSW Construct NSW', requirement: 'Building remediation contracts' },
-  { name: 'VIC Category C Panel', requirement: 'Required for restoration tenders' },
+  { name: 'VIC Category C Panel', requirement: 'Victorian government restoration work' },
   { name: 'QLD QBuild', requirement: 'Government facility maintenance panels' },
-  { name: 'Local council panels', requirement: '537 councils across Australia' },
+  { name: 'Local council panels', requirement: 'Councils across Australia' },
 ];
 
 const commercialPanels: IndustryAddonPanel[] = [
@@ -210,7 +213,7 @@ export const industryAddonContent: Record<
     eyebrow: 'Tender pre-qualification',
     title: 'Government panel',
     titleAccent: 'requirements',
-    body: 'IICRC certification is increasingly listed on Commonwealth, state and local procurement panels for restoration and remediation work.',
+    body: 'Each agency and council sets its own panel criteria. Where a tender lists IICRC certification, it comes only from IICRC-approved schools and examinations; CARSI training adds verifiable CARSI credentials to your evidence.',
     panels: governmentPanels,
     showUpgrades: true,
   },
@@ -218,7 +221,7 @@ export const industryAddonContent: Record<
     eyebrow: 'Contractor growth',
     title: 'Win more',
     titleAccent: 'restoration work',
-    body: 'Cleaning companies use IICRC credentials to qualify for insurance panels, expand service lines and charge higher margins on technical work.',
+    body: 'Cleaning companies add restoration training to expand into technical work. Insurance panels set their own certification requirements.',
     panels: commercialPanels,
     showUpgrades: true,
   },
@@ -226,7 +229,7 @@ export const industryAddonContent: Record<
     eyebrow: 'Tender pre-qualification',
     title: 'Government panel',
     titleAccent: 'requirements',
-    body: 'IICRC certification is increasingly required for government restoration contracts. Position your business for Commonwealth, state, and local government work.',
+    body: 'Each agency and council sets its own tender criteria. Where a tender lists IICRC certification, it comes only from IICRC-approved schools and examinations; CARSI training adds verifiable training records for Commonwealth, state and local government work.',
     panels: governmentPanels,
     showUpgrades: true,
   },
@@ -235,22 +238,22 @@ export const industryAddonContent: Record<
 export const cleanerUpgrades: IndustryUpgradeRow[] = [
   {
     base: 'General cleaning',
-    addon: 'WRT',
+    addon: 'Water damage restoration',
     benefit: 'Offer emergency flood response services',
   },
   {
     base: 'Carpet cleaning',
-    addon: 'CRT',
-    benefit: 'Insurance restoration work with higher margins',
+    addon: 'Water damage and carpet drying',
+    benefit: 'Insurance restoration work',
   },
   {
     base: 'Commercial cleaning',
-    addon: 'AMRT',
+    addon: 'Mould remediation',
     benefit: 'Mould inspection and remediation services',
   },
   {
     base: 'Facility maintenance',
-    addon: 'ASD',
+    addon: 'Structural drying',
     benefit: 'Structural drying for building managers',
   },
   {

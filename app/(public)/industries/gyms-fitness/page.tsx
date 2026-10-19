@@ -14,14 +14,14 @@ import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'IICRC CEC Mould & Odour Training for Gyms & Fitness Centres',
+  title: 'Mould & Odour Training for Gyms & Fitness Centres',
   description:
-    'Protect your members and your reputation. CARSI mould remediation, odour control and carpet repair and reinstallation training for Australian gyms, pools, and fitness facilities. Online, self-paced, CEC Accredited.',
+    'Protect your members and your reputation. CARSI mould remediation, odour control and carpet cleaning training for Australian gyms, pools, and fitness facilities. Online and self-paced. CEC hours apply only to courses the IICRC has approved.',
   keywords: [
     'gym mould training Australia',
-    'fitness centre IICRC CEC course',
-    'AMRT gym remediation',
-    'OCT odour control gym',
+    'fitness centre restoration course',
+    'gym mould remediation',
+    'odour control gym',
     'mould liability fitness centre',
   ],
 };
@@ -33,15 +33,15 @@ export const metadata: Metadata = {
 const ACCENT_COLOR = '#43a047';
 
 const disciplines = [
-  { code: 'AMRT', label: 'Applied Microbial Remediation', color: '#43a047' },
-  { code: 'OCT', label: 'Odour Control Technician', color: '#388e3c' },
-  { code: 'CRT', label: 'Carpet Cleaning Technician', color: '#2e7d32' },
+  { code: 'AMRT', label: 'Mould remediation', color: '#43a047' },
+  { code: 'OCT', label: 'Odour control', color: '#388e3c' },
+  { code: 'CRT', label: 'Carpet cleaning', color: '#2e7d32' },
 ];
 
 const stats = [
-  { value: '6,000+', label: 'Fitness Facilities (AUS)' },
-  { value: '5M+', label: 'Active Members' },
-  { value: 'IICRC', label: 'CEC Accredited' },
+  { value: 'Online', label: 'Self-paced study' },
+  { value: 'CARSI', label: 'Verifiable credentials' },
+  { value: 'IICRC CEC', label: 'On approved courses' },
 ];
 
 const faqs = [
@@ -53,17 +53,17 @@ const faqs = [
   {
     question: 'What causes mould in Australian fitness centres and how can it be prevented?',
     answer:
-      'The primary mould drivers in Australian gyms are inadequate ventilation in wet areas, condensation on cold surfaces in air-conditioned spaces, water ingress around pool surrounds and wet decks, and porous materials (grout, carpet, ceiling tiles) that retain moisture. CEC-accredited mould remediation training covers moisture mapping, relative humidity monitoring, and containment procedures that allow maintenance staff to identify and address these conditions systematically before mould becomes visible — preventing the costly remediation and member complaints that follow.',
+      'The main drivers in Australian gyms are poor ventilation in wet areas, condensation on cold surfaces in air-conditioned spaces, water getting in around pool surrounds and wet decks, and porous materials (grout, carpet, ceiling tiles) that hold moisture. Mould remediation training covers moisture mapping, relative humidity monitoring and containment, so maintenance staff can find and fix these conditions before mould becomes visible.',
   },
   {
-    question: 'How does IICRC CEC training reduce liability for gym operators?',
+    question: 'How does restoration training reduce liability for gym operators?',
     answer:
-      "Gym operators have a duty of care to members under Australian Consumer Law and WHS legislation. Documented IICRC CEC training demonstrates that maintenance staff were competent to identify and respond to mould and moisture hazards. In the event of a member health complaint or personal injury claim linked to indoor air quality, evidence of IICRC-certified staff and documented inspection protocols significantly strengthens the operator's defence and can reduce insurance premiums for premises liability coverage.",
+      'Gym operators have a duty of care to members under Australian Consumer Law and WHS legislation. Documented training shows that maintenance staff were trained to identify and respond to mould and moisture hazards, and documented inspection protocols support the operator if a member raises an indoor air quality complaint.',
   },
   {
-    question: 'What is OCT certification and how does it help fitness facilities?',
+    question: 'How does odour control training help fitness facilities?',
     answer:
-      "OCT (Odour Control Technician) is an IICRC certification covering the science of odour identification, source elimination, and odour counteractant application. For gyms and fitness centres, CARSI's odour control CEC training is particularly valuable for persistent locker room odours, post-flooding musty smells, and gym mat odour management. Unlike masking agents, odour control protocols address the biological and chemical source of odours — resolving complaints that damage member retention and online reputation.",
+      'Introduction to Odour Control and Removal Techniques covers identifying odour sources and removing them, which suits persistent locker-room odours, musty smells after water damage and mat odours. Where the IICRC has approved a course, its CEC hours are shown on the course page. Removing the source resolves the complaint instead of masking it.',
   },
 ];
 
@@ -72,21 +72,21 @@ const whyCards = [
     icon: Activity,
     title: 'High-Humidity Mould Risk',
     description:
-      'Changerooms, pool decks, and wet areas generate constant humidity. CEC-accredited mould remediation training gives maintenance staff the protocols to identify, contain, and remediate mould before it affects members.',
+      'Changerooms, pool decks, and wet areas generate constant humidity. Mould remediation training gives maintenance staff the protocols to identify, contain, and remediate mould before it affects members.',
     color: '#43a047',
   },
   {
     icon: Wind,
-    title: 'Odour Control (OCT)',
+    title: 'Odour Control',
     description:
-      "Persistent gym odours damage reviews and drive churn. CARSI's odour control CEC training covers source-based odour elimination — not just masking — for locker rooms, wet areas, and equipment zones.",
+      "Persistent gym odours damage reviews and drive churn. CARSI's odour control training covers source-based odour elimination — not just masking — for locker rooms, wet areas, and equipment zones.",
     color: '#388e3c',
   },
   {
     icon: Users,
     title: 'Member Retention & Reputation',
     description:
-      'Mould complaints and Google reviews mentioning cleanliness are the leading non-price drivers of gym cancellations. Documented IICRC CEC training protects your reputation and your renewal rate.',
+      'Mould complaints and Google reviews mentioning cleanliness are the leading non-price drivers of gym cancellations. Documented training protects your reputation and your renewal rate.',
     color: '#2490ed',
   },
 ];
@@ -105,7 +105,7 @@ export default async function GymsFitnessIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Protect Your Members"
         headlineAccent="and Your Reputation"
-        description="Australian gyms face constant mould and odour risk from high-humidity environments. CARSI mould remediation and odour control CEC courses give your maintenance team the protocols to keep facilities clean, compliant, and member-ready. CARSI courses carry CARSI Southern Hemisphere Restoration Designations, not IICRC certification."
+        description="Australian gyms face constant mould and odour risk from high-humidity environments. CARSI mould remediation and odour control courses give your maintenance team the protocols to keep facilities clean, compliant, and member-ready. CARSI courses carry CARSI Southern Hemisphere Restoration Designations, not IICRC certification."
         disciplines={disciplines}
         stats={stats}
       />
@@ -119,7 +119,7 @@ export default async function GymsFitnessIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Gyms & Fitness Centres"
-        disciplineList="Mould remediation, odour control and carpet repair"
+        disciplineList="Mould remediation, odour control and carpet cleaning"
         disciplines={['AMRT', 'OCT', 'CRT']}
       />
 

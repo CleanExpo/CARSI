@@ -57,7 +57,7 @@ export default function AiWebsitePage() {
             <h1 className="aiw-title">A training site that <em>enrols, advises and follows up</em> — while you sleep.</h1>
             <p className="aiw-lede">
               CARSI delivers <b>IICRC CEC Accredited</b> courses, Australian-produced, that earn <b>CARSI Southern
-              Hemisphere Restoration Designations</b> — and also earn IICRC CECs toward your existing certification.
+              Hemisphere Restoration Designations</b>. CEC hours apply only to courses the IICRC has approved.
               This isn’t a brochure that lists them and waits. It <b>advises every visitor</b>, captures the enrolment,
               and starts the follow-up automatically. The site stops being a page and starts being an employee.
             </p>
@@ -110,8 +110,8 @@ export default function AiWebsitePage() {
         <div className="aiw-wrap">
           <div className="aiw-sec-head">
             <span className="aiw-eyebrow">What it sells</span>
-            <h2>43 Australian-produced courses. Real designations. One flat ladder.</h2>
-            <p>Water damage, mould, fire &amp; smoke, trauma, structural drying, carpet &amp; upholstery, indoor air quality — plus a new Grow-Your-Business track. Priced by course length, so there’s nothing to work out.</p>
+            <h2>Australian-produced courses. Real designations. One flat ladder.</h2>
+            <p>Water damage, mould, fire &amp; smoke, trauma, structural drying, carpet care, indoor air quality — plus a new Grow-Your-Business track. Priced by course length, so there’s nothing to work out.</p>
           </div>
           <div className="aiw-price-grid">
             {TIERS.map(([lab, amt, note]) => (
@@ -120,8 +120,8 @@ export default function AiWebsitePage() {
           </div>
           <div className="aiw-subline">
             <b>Subscription</b> — one monthly or yearly plan unlocks <b>every course, every tier</b>, with new courses
-            included the moment they publish. Each CARSI course earns a <b>CARSI designation</b> that also earns{' '}
-            <b>IICRC CECs</b> toward maintaining your existing certification.
+            included the moment they publish. Each CARSI course counts toward a <b>CARSI designation</b>; courses the{' '}
+            <b>IICRC</b> has approved also count toward the CECs an existing certification needs.
           </div>
         </div>
       </section>

@@ -1,0 +1,107 @@
+[
+  {
+    "file": "src/components/lms/onboarding-flow.tsx",
+    "line": 119,
+    "contains": "label: 'WRT — Water'",
+    "class": "legitimate",
+    "reason": "learner states which IICRC certification they hold (third-person; the question asks about the learner's own certifications)"
+  },
+  {
+    "file": "src/components/lms/onboarding-flow.tsx",
+    "line": 120,
+    "contains": "label: 'CRT — Colour repair'",
+    "class": "legitimate",
+    "reason": "learner states which IICRC certification they hold; CRT is the IICRC colour repair certification, and onboarding routes CRT holders to carpet cleaning"
+  },
+  {
+    "file": "src/components/lms/onboarding-flow.tsx",
+    "line": 121,
+    "contains": "label: 'ASD — Structural drying'",
+    "class": "legitimate",
+    "reason": "learner states which IICRC certification they hold (third-person)"
+  },
+  {
+    "file": "src/components/lms/onboarding-flow.tsx",
+    "line": 122,
+    "contains": "label: 'AMRT — Microbial'",
+    "class": "legitimate",
+    "reason": "learner states which IICRC certification they hold (third-person)"
+  },
+  {
+    "file": "src/components/lms/onboarding-flow.tsx",
+    "line": 123,
+    "contains": "label: 'FSRT — Fire & smoke'",
+    "class": "legitimate",
+    "reason": "learner states which IICRC certification they hold (third-person)"
+  },
+  {
+    "file": "src/components/lms/onboarding-flow.tsx",
+    "line": 124,
+    "contains": "label: 'OCT — Odour'",
+    "class": "legitimate",
+    "reason": "learner states which IICRC certification they hold (third-person)"
+  },
+  {
+    "file": "src/components/lms/onboarding-flow.tsx",
+    "line": 125,
+    "contains": "label: 'CCT — Carpet cleaning'",
+    "class": "legitimate",
+    "reason": "learner states which IICRC certification they hold (third-person)"
+  },
+  {
+    "file": "src/components/lms/diagrams/IICRCDisciplineMap.tsx",
+    "line": 16,
+    "contains": "fullName: 'Colour Repair'",
+    "class": "legitimate",
+    "reason": "the IICRC's own discipline map, framed on /courses as a third-person reference, not CARSI courses"
+  },
+  {
+    "file": "src/components/lms/diagrams/IICRCDisciplineMap.tsx",
+    "line": 18,
+    "contains": "blurb: 'Carpet colour correction & dye repair.'",
+    "class": "legitimate",
+    "reason": "the IICRC's own discipline map: what the IICRC CRT certification covers (third-person)"
+  },
+  {
+    "file": "app/(public)/designations/[slug]/page.tsx",
+    "line": 48,
+    "contains": "Completing this pathway also earns IICRC Continuing Education Credits",
+    "class": "owned-elsewhere",
+    "reason": "feat/designations-live owns the designations registry and its alsoEarnsCec flag; reported to Phill"
+  },
+  {
+    "file": "src/components/designations/DesignationCard.tsx",
+    "line": 32,
+    "contains": "Also earns IICRC CECs",
+    "class": "owned-elsewhere",
+    "reason": "feat/designations-live owns the designations registry and its alsoEarnsCec flag; reported to Phill"
+  },
+  {
+    "file": "app/(public)/testimonials/page.tsx",
+    "line": 21,
+    "contains": "earning IICRC CECs online",
+    "class": "owned-elsewhere",
+    "reason": "reviews thread owns testimonials (brief: do not touch reviews); reported to Phill"
+  },
+  {
+    "file": "app/(public)/testimonials/page.tsx",
+    "line": 29,
+    "contains": "IICRC CEC knowledge",
+    "class": "owned-elsewhere",
+    "reason": "reviews thread owns testimonials; reported to Phill"
+  },
+  {
+    "file": "app/(public)/testimonials/page.tsx",
+    "line": 36,
+    "contains": "CRT preparation",
+    "class": "owned-elsewhere",
+    "reason": "reviews thread owns testimonials; reported to Phill"
+  },
+  {
+    "file": "app/(public)/testimonials/page.tsx",
+    "line": 54,
+    "contains": "IICRC CEC course content",
+    "class": "owned-elsewhere",
+    "reason": "reviews thread owns testimonials; reported to Phill"
+  }
+]

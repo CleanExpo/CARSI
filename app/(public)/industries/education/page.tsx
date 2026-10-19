@@ -13,13 +13,13 @@ import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Education Sector IICRC CEC Training',
+  title: 'Education Sector Restoration Training',
   description:
-    'IICRC CEC training for school and university maintenance teams. Water damage restoration, carpet repair, mould remediation and structural drying training for Australian education facilities.',
+    'Restoration training for school and university maintenance teams. Water damage restoration, carpet cleaning, mould remediation and structural drying training for Australian education facilities.',
   keywords: [
-    'education IICRC CEC training',
-    'school restoration certification',
-    'university maintenance IICRC',
+    'education restoration training',
+    'school restoration training',
+    'university maintenance restoration training',
     'education mould remediation Australia',
   ],
 };
@@ -31,16 +31,16 @@ export const metadata: Metadata = {
 const ACCENT_COLOR = '#2196f3';
 
 const disciplines = [
-  { code: 'AMRT', label: 'Applied Microbial Remediation', color: '#2196f3' },
-  { code: 'WRT', label: 'Water Damage Restoration', color: '#1976d2' },
-  { code: 'CRT', label: 'Carpet Repair & Reinstallation', color: '#1565c0' },
-  { code: 'ASD', label: 'Applied Structural Drying', color: '#0d47a1' },
+  { code: 'AMRT', label: 'Mould remediation', color: '#2196f3' },
+  { code: 'WRT', label: 'Water damage', color: '#1976d2' },
+  { code: 'CRT', label: 'Carpet cleaning', color: '#1565c0' },
+  { code: 'ASD', label: 'Structural drying', color: '#0d47a1' },
 ];
 
 const stats = [
-  { value: '9,500+', label: 'Schools' },
+  { value: 'Online', label: 'Self-paced study' },
   { value: 'WHS', label: 'Compliance' },
-  { value: 'IICRC', label: 'CEC Accredited' },
+  { value: 'IICRC CEC', label: 'On approved courses' },
 ];
 
 const whyCards = [
@@ -48,21 +48,21 @@ const whyCards = [
     icon: ShieldCheck,
     title: 'Duty of Care',
     description:
-      'Schools must demonstrate competency in mould identification and remediation. IICRC CEC training provides documented evidence of due diligence for student and staff safety.',
+      'Schools must demonstrate competency in mould identification and remediation. Restoration training provides documented evidence of due diligence for student and staff safety.',
     color: '#2196f3',
   },
   {
     icon: Building,
     title: 'Heritage Buildings',
     description:
-      'Many older school buildings require specialised structural drying techniques. ASD certification ensures heritage fabric is preserved during water damage restoration.',
+      'Many older school buildings require specialised structural drying techniques. Structural drying training helps teams preserve heritage fabric during water damage restoration.',
     color: '#1976d2',
   },
   {
     icon: Users,
     title: 'Parent Council Confidence',
     description:
-      'IICRC credentials provide documented proof of competency that satisfies parent council scrutiny and school board reporting requirements.',
+      'Verifiable CARSI credentials document completed training for school board reporting.',
     color: '#ed9d24',
   },
 ];
@@ -80,7 +80,7 @@ export default async function EducationIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Education Facility"
         headlineAccent="Restoration Training"
-        description="WHS-compliant training for schools, universities, and TAFEs. IICRC credentials demonstrate duty of care for mould remediation and water damage response across education facilities."
+        description="Mould remediation and water damage training for school, university and TAFE maintenance teams. Every completed course issues a verifiable CARSI credential."
         disciplines={disciplines}
         stats={stats}
       />
@@ -94,7 +94,7 @@ export default async function EducationIndustryPage() {
 
       <IndustryRecommendedCourses
         industryName="Education"
-        disciplineList="Mould remediation, water damage restoration, carpet repair and structural drying"
+        disciplineList="Mould remediation, water damage restoration, carpet cleaning and structural drying"
         disciplines={['AMRT', 'WRT', 'CRT', 'ASD']}
       />
 
@@ -104,7 +104,7 @@ export default async function EducationIndustryPage() {
         subtitle="Education Facility Training"
         title="Education Facility Bundle"
         price={industryBundlePriceLabel('education')}
-        description="mould remediation and water damage restoration training for school maintenance teams. Bulk 10+ seat licensing available for education departments and school networks."
+        description="mould remediation and water damage restoration training for school maintenance teams. Paid courses can be bought as team seats at checkout."
         ctaText="Request Education Pricing"
         accentColor={ACCENT_COLOR}
       />

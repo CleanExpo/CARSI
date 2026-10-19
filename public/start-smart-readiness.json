@@ -6,7 +6,7 @@
   "standing_rule": "The operator may research, prepare, and practise, but should not buy major equipment, advertise a service, select chemicals for customer work, or take paid work until the matching service, equipment, chemical, and training gates are clear.",
   "conversion_paths": [
     {
-      "name": "CARSI CCT course pathway",
+      "name": "CARSI carpet cleaning course pathway",
       "route": "https://carsi.com.au/courses?discipline=CCT&utm_source=start-smart&utm_medium=organic&utm_campaign=carsi_cct_conversion",
       "intent": "course-enquiry",
       "use_when": "The visitor is ready to start structured carpet cleaning learning."

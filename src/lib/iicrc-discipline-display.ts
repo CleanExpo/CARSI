@@ -1,3 +1,5 @@
+import { IICRC_CODE_ALT } from './iicrc-codes';
+
 /**
  * THESE TWO MAPS DO DIFFERENT JOBS. Do not make them agree.
  *
@@ -16,7 +18,8 @@
 /** CARSI's plain-English topic labels. Never IICRC designation names — see the note above. */
 export const IICRC_DISCIPLINE_SHORT: Record<string, string> = {
   WRT: 'Water Restoration',
-  CRT: 'Colour Repair',
+  // CARSI sells no colour-repair course; a legacy CRT-coded course is a carpet course.
+  CRT: 'Carpet Cleaning',
   ASD: 'Structural Drying',
   AMRT: 'Microbial Remediation',
   FSRT: 'Fire & Smoke',
@@ -53,12 +56,14 @@ export const IICRC_DISCIPLINE_LONG: Record<string, string> = {
   CCT: 'Carpet Cleaning Technician',
 };
 
-const DEFAULT_ORDER = ['WRT', 'CRT', 'ASD', 'AMRT', 'FSRT', 'OCT', 'CCT'] as const;
+/** CARSI's taught subject codes, in display order: the keys of the topic map above. */
+export const CARSI_SUBJECT_CODES: readonly string[] = Object.keys(IICRC_DISCIPLINE_SHORT);
+const DEFAULT_ORDER = CARSI_SUBJECT_CODES;
 const KNOWN_CODES = new Set<string>(DEFAULT_ORDER);
 
 export function normalizeDisciplineCodes(codes: string[]): string[] {
   return codes.flatMap((raw) => {
-    const matches = raw.toUpperCase().match(/\b(WRT|CRT|ASD|AMRT|FSRT|OCT|CCT)\b/g);
+    const matches = raw.toUpperCase().match(new RegExp(`\\b(${DEFAULT_ORDER.join('|')})\\b`, 'g'));
     return matches ?? [];
   });
 }
@@ -67,9 +72,7 @@ export function normalizeDisciplineCodes(codes: string[]): string[] {
 export function orderDisciplineCodes(codes: string[]): string[] {
   const set = new Set(normalizeDisciplineCodes(codes).map((c) => c.toUpperCase()));
   const primary = DEFAULT_ORDER.filter((c) => set.has(c));
-  const rest = [...set]
-    .filter((c) => !KNOWN_CODES.has(c))
-    .sort();
+  const rest = [...set].filter((c) => !KNOWN_CODES.has(c)).sort();
   return [...primary, ...rest];
 }
 
@@ -78,6 +81,34 @@ export function disciplinePillsFromCodes(codes: string[]): { code: string; label
     code,
     label: IICRC_DISCIPLINE_SHORT[code] ?? code,
   }));
+}
+
+/**
+ * Every IICRC certification / designation code: the shared list (data/iicrc-codes.json), so a code
+ * added there is suppressed here too (review of 08d15553: this was a literal copy).
+ */
+export const ALL_IICRC_CODES = IICRC_CODE_ALT;
+
+/**
+ * The CARSI topic to print for a course, pathway or idea's discipline code — never the code.
+ * Unknown codes render nothing (fail closed).
+ */
+export function disciplineTopicLabel(code: string | null | undefined): string | null {
+  if (!code) return null;
+  return IICRC_DISCIPLINE_SHORT[code.trim().toUpperCase()] ?? null;
+}
+
+/**
+ * A pathway's free-text target, safe to print on a CARSI surface: null when it names the IICRC,
+ * a certification, or an IICRC code, because a CARSI pathway never builds toward IICRC
+ * certification (CLAUDE.md). The field is database data, so this fails closed.
+ */
+export function publicPathwayTarget(target: string | null | undefined): string | null {
+  const t = target?.trim();
+  if (!t) return null;
+  if (/IICRC|certif/i.test(t) || new RegExp(`\\b(?:${ALL_IICRC_CODES})\\b`, 'i').test(t))
+    return null;
+  return t;
 }
 
 export function disciplineRowsFromCodes(codes: string[]): { code: string; label: string }[] {

@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/components/auth/auth-provider';
 import { CommunityHubShell } from '@/components/marketing/hub/CommunityHubShell';
 import { apiClient } from '@/lib/api/client';
+import { disciplineTopicLabel } from '@/lib/iicrc-discipline-display';
 
 interface CourseIdea {
   id: string;
@@ -97,9 +98,9 @@ export default function CourseIdeasPage() {
                 <h2 className="font-[family-name:var(--font-display)] text-base font-semibold text-slate-950">
                   {idea.title}
                 </h2>
-                {idea.iicrc_discipline ? (
+                {disciplineTopicLabel(idea.iicrc_discipline) ? (
                   <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-[11px] font-medium text-slate-600">
-                    {idea.iicrc_discipline}
+                    {disciplineTopicLabel(idea.iicrc_discipline)}
                   </span>
                 ) : null}
                 <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-[11px] text-slate-500">

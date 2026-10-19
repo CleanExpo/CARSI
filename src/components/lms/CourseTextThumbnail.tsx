@@ -5,6 +5,7 @@ import type { ImgHTMLAttributes } from 'react';
 
 import { IICRC_DISCIPLINE_SHORT } from '@/lib/iicrc-discipline-display';
 import { cn } from '@/lib/utils';
+import { IICRC_CODE_ALT } from '@/lib/iicrc-codes';
 
 const DISCIPLINE_ACCENTS: Record<
   string,
@@ -96,7 +97,7 @@ function inferDisciplineCode(
 export function stripDisciplineAcronym(category: string | null | undefined): string {
   const c = category?.trim() ?? '';
   if (!c) return '';
-  const stripped = c.replace(/^(?:WRT|CRT|ASD|OCT|CCT|FSRT|AMRT|TCST)\b[\s\-–—:/]*/i, '').trim();
+  const stripped = c.replace(new RegExp(`^(?:${IICRC_CODE_ALT})\\b[\\s\\-–—:/]*`, 'i'), '').trim();
   return stripped;
 }
 

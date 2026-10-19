@@ -11,6 +11,11 @@
  * Run: node scripts/check-live-course-fields.test.mjs   (exit 0 = all passed)
  */
 import { evaluateCourse, evaluateRun, parseApprovals, BANNED_ACRONYMS, TEXT_FIELDS } from './check-live-course-fields.mjs';
+import { IICRC_ORDINARY_WORD_CODES } from './iicrc-codes.mjs';
+
+// Codes that are also ordinary words (data/iicrc-codes.json) must be written as the designation;
+// OCT keeps its documented case-insensitive match.
+const CASE_SENSITIVE = new Set([...IICRC_ORDINARY_WORD_CODES].filter((a) => a !== 'OCT'));
 
 let passed = 0;
 const failures = [];
@@ -102,9 +107,29 @@ for (const acronym of BANNED_ACRONYMS) {
 // ------------------------------------------------- 3b. LOWER-CASE bypass (regression, P1)
 // An independent reviewer demonstrated on 2026-09-07 that this guard was fail-OPEN: both
 // checks were case-sensitive, so `wrt-aligned` and a bare `wrt` returned ZERO violations.
+// An ordinary-word code in lower or mixed case is the ordinary word ("Mrs", "rfi"), not the code;
+// written as the designation it still fails.
+for (const acronym of CASE_SENSITIVE) {
+  const word = acronym[0] + acronym.slice(1).toLowerCase();
+  check(`ordinary word ${word} in a title is not a violation`, () => {
+    const v = evaluateCourse(
+      { slug: 'x', title: `notes on ${word} for site teams`, iicrc_discipline: null, cec_hours: null },
+      APPROVALS,
+    );
+    assert(!v.some((s) => s.includes(acronym)), `ordinary ${word} flagged: ${JSON.stringify(v)}`);
+  });
+  check(`designation ${acronym} written as the code is a violation`, () => {
+    const v = evaluateCourse(
+      { slug: 'x', title: `notes on ${acronym} for site teams`, iicrc_discipline: null, cec_hours: null },
+      APPROVALS,
+    );
+    assert(v.some((s) => s.includes(acronym)), `${acronym} passed: ${JSON.stringify(v)}`);
+  });
+}
+
 // Course text is authored in the admin UI and is often lower-case or slug-derived, so the
 // lower-case form is the likely shape of the defect. These are the reviewer's exact cases.
-for (const acronym of BANNED_ACRONYMS) {
+for (const acronym of BANNED_ACRONYMS.filter((a) => !CASE_SENSITIVE.has(a))) {
   check(`LOWER-CASE bare acronym ${acronym.toLowerCase()} in title is a violation`, () => {
     const v = evaluateCourse(
       { slug: 'x', title: `introduction to ${acronym.toLowerCase()} methods`, iicrc_discipline: null, cec_hours: null },

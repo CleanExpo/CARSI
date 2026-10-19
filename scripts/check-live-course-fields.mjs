@@ -46,10 +46,12 @@
 import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 
+import { IICRC_CODES, IICRC_ORDINARY_WORD_CODES } from './iicrc-codes.mjs';
+
 const SITE = (process.env.CARSI_SITE || 'https://www.carsi.com.au').replace(/\/$/, '');
 
 /** IICRC Registered-Training-School discipline designations. Mirrors check-live-catalogue.mjs. */
-export const BANNED_ACRONYMS = ['WRT', 'ASD', 'AMRT', 'FSRT', 'CCT', 'TCST', 'OCT', 'RRT'];
+export const BANNED_ACRONYMS = IICRC_CODES; // the shared list: data/iicrc-codes.json
 
 /** Fields whose prose is judged. */
 export const TEXT_FIELDS = ['title', 'description', 'short_description'];
@@ -87,7 +89,10 @@ export function evaluateCourse(course, approvals) {
       // false negative costs the CEC provider standing the business rests on. If this ever
       // fires on a real date, fix it by allow-listing that exact context (per CLAUDE.md),
       // never by dropping the flag or restoring case-sensitivity.
-      if (new RegExp(`\\b${a}\\b`, 'i').test(value)) {
+      // A code that is also an ordinary word (data/iicrc-codes.json "ordinaryWord") must be written
+      // as the designation; OCT keeps its deliberate case-insensitive match described above.
+      const flags = IICRC_ORDINARY_WORD_CODES.has(a) && a !== 'OCT' ? '' : 'i';
+      if (new RegExp(`\\b${a}\\b`, flags).test(value)) {
         v.push(`${field} contains banned discipline acronym ${a}`);
         break;
       }

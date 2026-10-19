@@ -48,7 +48,7 @@ export async function generateMetadata({ params }: { params: Promise<{ credentia
   const { credentialId } = await params;
   return {
     title: `Credential Verification — ${credentialId}`,
-    description: 'Verify an IICRC CEC credential issued by CARSI',
+    description: 'Verify a credential issued by CARSI',
     robots: 'index, follow',
   };
 }

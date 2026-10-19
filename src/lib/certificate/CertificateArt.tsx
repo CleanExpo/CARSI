@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react';
 
 import { formatCecHoursForCertificate } from '@/lib/cec-display';
 import { formatCredentialRef } from '@/lib/credential-format';
-import { IICRC_DISCIPLINE_LONG } from '@/lib/iicrc-discipline-display';
+import { IICRC_DISCIPLINE_SHORT } from '@/lib/iicrc-discipline-display';
 
 export const CERT_ART_WIDTH = 1684;
 export const CERT_ART_HEIGHT = 1190;
@@ -43,13 +43,13 @@ export function CertificateArt({ logoSrc, ...input }: CertificateArtInput & { lo
   const discCode = disciplineCode(input.discipline);
   const accent = DISCIPLINE_COLORS[discCode] ?? '#2490ed';
   const studentName = input.studentName ?? 'James Wilson';
-  const courseName = input.courseName ?? 'Water Damage Restoration Technician';
+  const courseName = input.courseName ?? 'Introduction to Water Damage Restoration';
   const completedDate = input.completedDate ?? '';
   const issuedDate = input.issuedDate ?? completedDate;
   const discLabel =
     discCode === 'GEN'
       ? 'General restoration training'
-      : (IICRC_DISCIPLINE_LONG[discCode] ?? input.discipline ?? 'General restoration training');
+      : (IICRC_DISCIPLINE_SHORT[discCode] ?? 'General restoration training');
   const credentialRef = input.credentialId
     ? formatCredentialRef(input.credentialId)
     : 'CARSI-EXAMPLE000';
@@ -151,8 +151,7 @@ export function CertificateArt({ logoSrc, ...input }: CertificateArtInput & { lo
           </Text>
           <Text style={{ fontSize: 52, color: '#146fc2', marginTop: 4 }}>{studentName}</Text>
           <Text style={{ fontSize: 22, color: '#64748b', marginTop: 12, textAlign: 'center' }}>
-            has demonstrated the required competency and successfully completed the accredited
-            programme
+            has demonstrated the required competency and successfully completed the CARSI programme
           </Text>
           <Text style={{ fontSize: 30, color: '#020617', marginTop: 10, textAlign: 'center' }}>
             {courseName}

@@ -1,3 +1,4 @@
+import { PER_COURSE_PRICE_FALLBACK_LABEL } from '@/lib/lms/pricing-tiers';
 import type { Metadata } from 'next';
 import { Bug, HeartPulse, Shield } from 'lucide-react';
 import {
@@ -24,13 +25,13 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = buildIndustryMetadata(
   'aged-care',
   'Aged care restoration training for Australian technicians',
-  'IICRC CEC Accredited courses for crews servicing residential aged care. Mould, indoor air quality, PPE and carpet hygiene training that fits around occupied wings and shift work.',
+  'Courses for crews servicing residential aged care. Mould, indoor air quality, PPE and carpet hygiene training that fits around occupied wings and shift work.',
   [
     'aged care restoration technician course',
     'aged care mould training Australia',
     'aged care infection control cleaning',
     'carpet hygiene aged care training',
-    'IICRC CEC aged care',
+    'aged care restoration training',
   ]
 );
 
@@ -95,7 +96,7 @@ const faqs = [
   {
     question: 'What should I study first for mould in a care home?',
     answer:
-      'Open Introduction to IAQ and Mould: Understanding Airborne Spread and Containment, then Introduction to Monitoring Air Quality on the Job Site. Work around residents rather than treating the building as vacant. CEC hours are shown on each IICRC CEC Accredited course page.',
+      'Open Introduction to IAQ and Mould: Understanding Airborne Spread and Containment, then Introduction to Monitoring Air Quality on the Job Site. Work around residents rather than treating the building as vacant. CEC hours are shown only on courses the IICRC has approved.',
   },
   {
     question: 'Can staff complete training around 24/7 care rosters?',
@@ -138,7 +139,7 @@ export default async function AgedCareIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Work aged care sites"
         headlineAccent="without guessing the rules"
-        description="IICRC CEC Accredited courses for technicians who service residential aged care. Mould, indoor air quality, PPE and carpet hygiene, studied around occupied wings and shift work."
+        description="Courses for technicians who service residential aged care. Mould, indoor air quality, PPE and carpet hygiene, studied around occupied wings and shift work."
         disciplines={topics}
         stats={stats}
       />
@@ -154,7 +155,7 @@ export default async function AgedCareIndustryPage() {
       <IndustrySearchTopics
         eyebrow="What crews search"
         title="Four aged-care problems, four live courses"
-        body="Start with these IICRC CEC Accredited introductions for common care-site tasks. They supplement, but do not replace, provider induction, role-specific competency checks or infection-control procedures."
+        body="Start with these introductions for common care-site tasks. Where the IICRC has approved a course, its CEC hours are shown on the course page. They supplement, but do not replace, provider induction, role-specific competency checks or infection-control procedures."
         topics={agedCareSearchTopics}
       />
 
@@ -175,7 +176,7 @@ export default async function AgedCareIndustryPage() {
       <IndustryCTA
         subtitle="Aged care training"
         title="Train the crew the home lets through the door"
-        price="From $29"
+        price={PER_COURSE_PRICE_FALLBACK_LABEL}
         description="Mould, air quality and carpet courses for technicians servicing aged care. Ask about team seats if a contractor or provider is training more than one person."
         ctaText="Talk to CARSI"
         ctaHref="/contact"

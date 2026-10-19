@@ -36,7 +36,7 @@ export function buildOrganizationSchema(input: OrganizationSchemaInput = {}): Sc
     url,
     logo,
     description:
-      "Australia's leading online training platform for disaster restoration professionals. IICRC CEC Accredited courses in water, fire, and carpet restoration delivered to students Australia-wide.",
+      'Australian online training platform for cleaning and restoration professionals, and an IICRC CEC Accredited provider. CEC hours apply only to courses the IICRC has approved.',
     email: 'support@carsi.com.au',
     // SAB: postal address only — no street address exposed publicly
     address: {

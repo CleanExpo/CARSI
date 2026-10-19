@@ -1,0 +1,169 @@
+{
+  "description": "IICRC certification and designation acronyms: the ONE list every CARSI licence guard and the runtime public-copy filters read. Public naming only, not standard text.",
+  "sources": [
+    "https://iicrc.org/category/certifications/",
+    "https://iicrc.org/category/certifications/page/2/",
+    "https://iicrc.org/category/certifications/page/3/",
+    "https://www.iicrc.org/IICRCMaster"
+  ],
+  "read": "2026-10-19",
+  "lastVerified": "2026-10-19",
+  "note": "The certification pages also list \"Mold Remediation Specialist\" with no acronym, so it adds none. \"ordinaryWord\" marks a code that is also an ordinary word or abbreviation: guards that match a bare code without context match it case-sensitively (titles) and skip it in slugs.",
+  "certifications": [
+    {
+      "code": "AMRT",
+      "name": "Applied Microbial Remediation Technician"
+    },
+    {
+      "code": "ASD",
+      "name": "Applied Structural Drying Technician"
+    },
+    {
+      "code": "BMI",
+      "name": "Building Moisture Inspection",
+      "ordinaryWord": "body mass index"
+    },
+    {
+      "code": "CCMT",
+      "name": "Commercial Carpet Maintenance Technician"
+    },
+    {
+      "code": "CCT",
+      "name": "Carpet Cleaning Technician"
+    },
+    {
+      "code": "CDS",
+      "name": "Commercial Drying Specialist"
+    },
+    {
+      "code": "CPT",
+      "name": "Contents Processing Technician",
+      "ordinaryWord": "CPT billing codes"
+    },
+    {
+      "code": "CRT",
+      "name": "Color Repair Technician"
+    },
+    {
+      "code": "FCT",
+      "name": "Floor Care Technician"
+    },
+    {
+      "code": "FSRT",
+      "name": "Fire and Smoke Damage Restoration Technician"
+    },
+    {
+      "code": "HCT",
+      "name": "House Cleaning Technician"
+    },
+    {
+      "code": "HST",
+      "name": "Health & Safety Technician"
+    },
+    {
+      "code": "ISSI",
+      "name": "Introduction to Substrate and Subfloor Inspection"
+    },
+    {
+      "code": "LCT",
+      "name": "Leather Cleaning Technician"
+    },
+    {
+      "code": "OCT",
+      "name": "Odor Control Technician",
+      "ordinaryWord": "Oct, the abbreviation for October"
+    },
+    {
+      "code": "RCT",
+      "name": "Rug Cleaning Technician",
+      "ordinaryWord": "randomised controlled trial"
+    },
+    {
+      "code": "RFI",
+      "name": "Resilient Flooring Inspector",
+      "ordinaryWord": "request for information"
+    },
+    {
+      "code": "RFMT",
+      "name": "Resilient Flooring Maintenance Technician"
+    },
+    {
+      "code": "RRT",
+      "name": "Carpet Repair and Reinstallation Technician"
+    },
+    {
+      "code": "SCI",
+      "name": "Senior Carpet Inspector",
+      "ordinaryWord": "sci, as in science or sci-fi"
+    },
+    {
+      "code": "SMT",
+      "name": "Stone, Masonry and Ceramic Tile Cleaning Technician"
+    },
+    {
+      "code": "TCST",
+      "name": "Trauma and Crime Scene Technician"
+    },
+    {
+      "code": "UFT",
+      "name": "Upholstery and Fabric Cleaning Technician"
+    },
+    {
+      "code": "WFMT",
+      "name": "Wood Floor Maintenance Technician"
+    },
+    {
+      "code": "WLFI",
+      "name": "Wood and Laminate Flooring Inspector"
+    },
+    {
+      "code": "WRT",
+      "name": "Water Damage Restoration Technician"
+    }
+  ],
+  "designations": [
+    {
+      "code": "JSR",
+      "name": "Journeyman Fire and Smoke Restorer"
+    },
+    {
+      "code": "JTC",
+      "name": "Journeyman Textile Cleaner"
+    },
+    {
+      "code": "JWR",
+      "name": "Journeyman Water Restorer"
+    },
+    {
+      "code": "MSR",
+      "name": "Master Fire and Smoke Restorer"
+    },
+    {
+      "code": "MTC",
+      "name": "Master Textile Cleaner"
+    },
+    {
+      "code": "MWR",
+      "name": "Master Water Restorer"
+    }
+  ],
+  "former": [
+    {
+      "code": "BMT",
+      "note": "older Building Moisture Thermography name of BMI"
+    },
+    {
+      "code": "BCI",
+      "note": "carried by our lists before 2026-10-19; not on the current IICRC pages"
+    },
+    {
+      "code": "MRS",
+      "note": "carried by our lists before 2026-10-19; not on the current IICRC pages",
+      "ordinaryWord": "Mrs, the title"
+    },
+    {
+      "code": "WFI",
+      "note": "carried by our lists before 2026-10-19; not on the current IICRC pages"
+    }
+  ]
+}

@@ -12,11 +12,32 @@
  * The allow-cases matter as much as the block-cases: every one is a phrasing CLAUDE.md
  * explicitly permits, and a guard that blocks them would be turned off within a week.
  */
-import { scanText } from './check-iicrc-terminology.mjs';
+import { bannedRules, scanFile, scanText } from './check-iicrc-terminology.mjs';
+import { IICRC_CODES } from './iicrc-codes.mjs';
 
 const F = 'app/(public)/fixture/page.tsx';
 
 const MUST_BLOCK = [
+  // Codes beyond the original eight, one per family (review of f37d2116): the shared IICRC list.
+  ['repair certification code + training', 'Enrol in RRT training today'],
+  ['commercial carpet maintenance code + courses', 'Browse CCMT courses'],
+  ['upholstery code + modifier + course', 'UFT online course for upholstery crews'],
+  ['health and safety code + module', 'HST training module for site crews'],
+  ['master designation + pathway', 'Book the MWR pathway'],
+  ['drying specialist after IICRC', 'IICRC CDS course for drying crews'],
+  ['new codes in a list', 'RRT, CCMT and UFT courses'],
+  // Closed-list course modifiers between the code and the offering (review of 47921544).
+  ['acronym, one modifier, offering', 'Enrol in WRT online training today'],
+  ['acronym, two modifiers, offering', 'ASD practical training module'],
+  ['acronym, modifier, colon, offering', 'CCT refresher: course for floor-care crews'],
+  ['acronym, two modifiers (hyphenated), offering', 'Book the FSRT self-paced intro course'],
+  ['acronym, CEC modifier, offering', 'Browse AMRT CEC courses'],
+  // Punctuation between the acronym and the offering (review of d25ce440): colon, slash, comma.
+  ['acronym, colon, offering', 'WRT: training for plumbers'],
+  ['acronym, slash, offering', 'WRT/course pathway'],
+  ['acronym, comma, offering', 'ASD, training module'],
+  ['acronym, spaced slash, offering', 'Book the CCT / courses bundle'],
+  ['acronym, spaced colon, offering', 'FSRT : training for fire crews'],
   // Designation rule — the acronym branding a CARSI course.
   ['IICRC + discipline acronym', 'IICRC WRT training for Australian technicians'],
   ['acronym list form', 'IICRC AMRT, CRT, and WRT CEC courses for park teams'],
@@ -109,9 +130,45 @@ const MUST_BLOCK = [
   ['commented join inside a designation (review P1, round 5)', "t = { title: 'Applied '/* x */ + 'Structural Drying — Core Concepts' };"],
   ['prefix concatenated onto a registry title', "export const probe = { title: 'Advanced ' + 'Introduction to Applied Structural Drying' };"],
   ['microbial designation name in a quiz title', '"title": "Applied Microbial Remediation: Mould Fundamentals — Knowledge Check",'],
+  // Single acronym naming training (18/10/2026). Every case below was live — in industry FAQ
+  // JSON-LD or a CTA — while the guard reported green: the list rule needs two acronyms and
+  // the designation rule needs an adjacent "IICRC" or "-aligned".
+  ['acronym + courses (plumbing FAQ)', 'Most WRT courses take 8–12 hours of study.'],
+  ['acronym + training (question form)', "question: 'What is WRT training and how does it help a plumbing business?',"],
+  ['acronym + parenthetical + training', 'CRT (Carpet Cleaning Technician) training enables in-house staff.'],
+  ['acronym + training, mid-sentence', 'ASD training complements this with structural moisture monitoring.'],
+  ['CARSI + acronym + courses (CTA)', 'Explore CARSI CCT courses'],
+  ['acronym + course pathway', "topic: 'CARSI CCT course pathway',"],
+  ['acronym + pathway', "label: 'Start the CCT pathway',"],
+  ['acronym + capitalised Course', "title: 'IICRC-free WRT Course for crews'"],
+  ['acronym + program', 'Our AMRT program for food facilities'],
+  ['acronym + module', 'Finish the OCT module before the site visit.'],
+  ['acronym + hyphen + training', 'FSRT-training for bushfire crews'],
+  ['a nearby sentence does not launder it', 'We rarely use acronyms. WRT training for plumbers.'],
+  // Review of fix/industry-faq-licence (18/10/2026): forms the first version missed.
+  ['title-case acronym', 'Enrol in our Wrt training today.'],
+  ['lower-case acronym', 'Enrol in our wrt training today.'],
+  ['en dash', 'Book WRT\u2013training today.'],
+  ['em dash', 'Book ASD\u2014courses this month.'],
+  ['possessive', "Explore CARSI WRT's training."],
+  ['curly possessive', 'Explore CARSI WRT\u2019s training.'],
+  ['"never" exempts only its own sentence', 'Never call it a WRT course — use CARSI. Book ASD training today.'],
 ];
 
 const MUST_PASS = [
+  // Ordinary words that share a short code stay allowed: no offering noun follows them.
+  ['a technician holding stacked certifications (third-person)', 'A **CCT + UFT + OCT** tech can clean, upholster and deodorise.'],
+  ['BMI as body mass index', 'Gym members can track BMI and body-fat trends.'],
+  ['RFI as a request for information', 'Send an RFI before the tender closes.'],
+  ['CPT as billing codes', 'CPT codes appear on the invoice.'],
+  ['RCT as a randomised controlled trial', 'An RCT found the drying method worked.'],
+  // Third-person facts with an open word between code and noun stay allowed (closed list only).
+  ['holders completing training (third-person)', 'WRT holders completing training'],
+  ['technicians who hold the certification attend training', 'technicians who hold WRT attend training'],
+  // Punctuation forms that name no CARSI offering stay allowed.
+  ['month pair before training (October)', 'Sep/Oct training calendar for regional teams'],
+  ['certification fact after a colon', 'FSRT: an IICRC certification covering fire and smoke restoration.'],
+  ['code list in data, no offering noun', "certifications: ['WRT', 'ASD'],"],
   // The permitted provider-level phrasing — CARSI's actual standing.
   ['IICRC CEC course', 'Enrol in our IICRC CEC course'],
   ['IICRC CEC Accredited', 'CARSI is an IICRC CEC Accredited provider'],
@@ -146,6 +203,19 @@ const MUST_PASS = [
   ['prerequisite naming the learner\'s own cert', '- Basic understanding (recommended: IICRC WRT certification or equivalent).'],
   ['parenthesised scope note', '**colour repair / re-dyeing** (IICRC CRT), or refer.'],
   // Fail-closed copy and the code that enforces it must never be flagged.
+  // Negative controls for the single-acronym naming rule (18/10/2026): the certification
+  // named as a certification, a date abbreviation, the rule's own enforcement text, and
+  // the IICRC's own course in the possessive.
+  ['acronym named as a certification', 'FSRT is an IICRC certification covering smoke and soot.'],
+  ['learner recertification', 'Your WRT recertification is due in March.'],
+  ['date abbreviation is not the designation', 'Oct training day at the Bayswater warehouse.'],
+  ['lowercase slug fragment', "href: '/courses/oct-training-2026'"],
+  ['prompt forbidding the construction', 'Never call it a WRT course — use the CARSI designation.'],
+  ['the IICRC naming its own course', "The IICRC's WRT course is taught only by IICRC-approved schools."],
+  ['plain-English subject', 'Water damage restoration training for plumbers.'],
+  ['month abbreviation, title case', 'Book the Oct training session early.'],
+  ['month abbreviation, lower case', 'oct training calendar'],
+  ['forbidding sentence on its own', 'Never call it a WRT course; use the CARSI designation instead.'],
   ['denial that a course carries CECs', 'This course carries no IICRC CECs (pending IICRC approval).'],
   ['the FAQ question itself', 'Is this course IICRC CEC accredited or does it award CECs?'],
   ['code describing the gate', '{/* assert this course earns CECs only when it has registry-approved hours */}'],
@@ -222,11 +292,67 @@ for (const [name, src] of MUST_PASS) {
   }
 }
 
+// The CLI scans files line by line; scanFile also joins adjacent lines for cross-line rules.
+const F_MULTI = 'app/(public)/fixture/page.tsx';
+const MUST_BLOCK_FILE = [
+  ['line break between acronym and training', 'Explore CARSI WRT\n            training today.'],
+  ['line break before a hyphenated noun', 'Book the FSRT\n  -training cohort'],
+];
+const MUST_PASS_FILE = [
+  ['a code on one line, an unrelated word on the next', "disciplines={['WRT']}\ntraining: true,"],
+  ['plain subject across a break', 'Water damage restoration\ntraining for plumbers.'],
+];
+for (const [name, src] of MUST_BLOCK_FILE) {
+  if (scanFile(F_MULTI, src).length === 0) {
+    console.error(`✖ MUST BLOCK (file) but passed: ${name}\n    ${JSON.stringify(src)}`);
+    failed++;
+  }
+}
+for (const [name, src] of MUST_PASS_FILE) {
+  const f = scanFile(F_MULTI, src);
+  if (f.length > 0) {
+    console.error(`✖ MUST PASS (file) but blocked: ${name}\n    ${f.join('\n    ')}`);
+    failed++;
+  }
+}
+
+// Every code-bearing rule reads the shared list: built without a code, each fixture is missed;
+// built from the full list, it is caught (review of f37d2116).
+const LIST_FIXTURES = [
+  ['list', F, 'Stack RRT + UFT skills on site', ['RRT', 'UFT']],
+  ['single code + offering', F, 'Enrol in RRT training today', ['RRT']],
+  ['IICRC + code', F, 'IICRC RRT for flooring crews', ['RRT']],
+  ['code-aligned', F, 'An RRT-aligned flooring unit', ['RRT']],
+  ['seed discipline', 'data/seed/x.json', '"iicrcDiscipline": "RRT"', ['RRT']],
+];
+for (const [name, file, src, drop] of LIST_FIXTURES) {
+  const reduced = bannedRules(IICRC_CODES.filter((c) => !drop.includes(c)).join('|'));
+  if (scanText(file, src).length === 0) {
+    console.error(`✖ shared list: full list misses ${name}\n    ${src}`);
+    failed++;
+  }
+  if (scanText(file, src, reduced).length > 0) {
+    console.error(`✖ shared list: rules built without ${drop.join('/')} still catch ${name} (not reading the list)\n    ${src}`);
+    failed++;
+  }
+}
+
+// The acronym-training rule covers public surfaces; docs/ plans are reviewed on their own branch.
+const DOCS_LINE = 'Retarget warm leads from Start Smart and CCT course enquiries if consent allows.';
+if (scanText(F, DOCS_LINE).length === 0) {
+  console.error(`✖ MUST BLOCK on a public surface but passed:\n    ${DOCS_LINE}`);
+  failed++;
+}
+if (scanFile('docs/marketing/x.md', DOCS_LINE).length > 0) {
+  console.error(`✖ MUST PASS in docs/ but blocked:\n    ${DOCS_LINE}`);
+  failed++;
+}
+
 if (failed > 0) {
   console.error(`\n✖ IICRC terminology guard self-test failed — ${failed} case(s).`);
   process.exit(1);
 }
 console.log(
-  `✓ IICRC terminology guard self-test passed (${MUST_BLOCK.length} block, ${MUST_PASS.length} pass).`
+  `✓ IICRC terminology guard self-test passed (${MUST_BLOCK.length + MUST_BLOCK_FILE.length} block, ${MUST_PASS.length + MUST_PASS_FILE.length} pass).`
 );
 process.exit(0);

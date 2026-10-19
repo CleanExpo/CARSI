@@ -60,7 +60,7 @@ When searching for relevant panels, look for these category descriptions:
 
 ## Chapter 2: Required IICRC Certifications
 
-### Why IICRC Credentials Are Non-Negotiable
+### Why Panels Ask for IICRC Certification
 
 Government procurement officers evaluate contractors on documented competency. IICRC (Institute of Inspection Cleaning and Restoration Certification) is a globally recognised standard for restoration qualifications, and many Australian government tender specifications for restoration work reference IICRC standards and certifications.
 
@@ -79,34 +79,34 @@ Government procurement officers evaluate contractors on documented competency. I
 
 | Certification                | Code | Why It's Required                                                                                               |
 | ---------------------------- | ---- | --------------------------------------------------------------------------------------------------------------- |
-| Water Restoration Technician | WRT  | Foundation for all water damage work. Commonly referenced in government restoration panel specifications.        |
-| Applied Structural Drying    | ASD  | Demonstrates advanced drying science knowledge. Required for complex structural drying projects.                |
+| Water Damage Restoration Technician | WRT  | Foundation for all water damage work. Commonly referenced in government restoration panel specifications.        |
+| Applied Structural Drying Technician | ASD | Demonstrates advanced drying science knowledge. Required for complex structural drying projects.                |
 
 #### Tier 2: Specialist (Broadens Panel Eligibility)
 
 | Certification                             | Code | Why It's Required                                                                             |
 | ----------------------------------------- | ---- | --------------------------------------------------------------------------------------------- |
-| Carpet Repair & Reinstallation Technician | CRT  | Required for soft flooring restoration in government buildings (schools, offices, aged care). |
-| Odour Control Technician                  | OCT  | Specialist skill for fire/smoke damage, sewage events, and environmental odour issues.        |
-| Commercial Carpet Maintenance Technician  | CCT  | High-volume commercial maintenance for government office buildings.                           |
+| Carpet Repair & Reinstallation Technician | RRT  | Required for soft flooring restoration in government buildings (schools, offices, aged care). |
+| Odor Control Technician                   | OCT  | Specialist skill for fire/smoke damage, sewage events, and environmental odour issues.        |
+| Commercial Carpet Maintenance Technician  | CCMT | High-volume commercial maintenance for government office buildings.                           |
 
 #### Tier 3: Advanced (Premium Panel Positions)
 
 | Certification                              | Code | Why It's Required                                                                                                        |
 | ------------------------------------------ | ---- | ------------------------------------------------------------------------------------------------------------------------ |
 | Mould Remediation (aligned to IICRC S520)  | —    | Critical for health-sensitive environments (hospitals, schools, aged care). Some states require specific mould licences. |
-| Fire & Smoke Restoration Technician (FSRT) | FSRT | Required for fire damage panels. Often separate from water damage panels.                                                |
+| Fire and Smoke Damage Restoration Technician | FSRT | Required for fire damage panels. Often separate from water damage panels.                                                |
 
 ### CEC (Continuing Education Credit) Requirements
 
 IICRC certifications require ongoing education to maintain active status:
 
-- **14 CECs per certification** over a defined cycle
+- **14 CECs every four years** for a certification; Master and Inspector certifications need 14 CECs every two years (IICRC Australia FAQ, iicrc.org/ausfaqs)
 - CECs must be earned through CE providers approved by the IICRC
 - CARSI is an IICRC CEC Accredited provider
 - Government panels may audit your CEC records — keep them current
 
-**Pro tip:** A CARSI yearly membership ($795 AUD/year, per learner) provides access to all published CARSI courses, and team plans are available for crews and larger businesses — see carsi.com.au/pricing for current options. Online, self-paced CEC training also avoids the travel and downtime costs of face-to-face sessions.
+**Pro tip:** A CARSI yearly membership ($795 AUD/year, per learner) provides access to all published CARSI courses, and team plans are available for crews and larger businesses — see carsi.com.au/pricing for current options. Online, self-paced training also avoids the travel and downtime costs of face-to-face sessions.
 
 ---
 
@@ -144,11 +144,11 @@ You will need SWMS for every high-risk construction work activity. For restorati
 
 | Insurance Type         | Minimum Cover                | Notes                                       |
 | ---------------------- | ---------------------------- | ------------------------------------------- |
-| Public liability       | $20M (government standard)   | Some panels require $50M                    |
-| Professional indemnity | $5M–10M                      | Required for assessment/consulting work     |
+| Public liability       | Set by each panel (check)    | Read the amount in each tender              |
+| Professional indemnity | Set by each panel (check)    | Required for assessment/consulting work     |
 | Workers' compensation  | State statutory requirements | Must be current for all workers             |
 | Motor vehicle          | Comprehensive fleet cover    | Required if vehicles enter government sites |
-| Pollution liability    | $5M–10M                      | Increasingly required for mould/hazmat work |
+| Pollution liability    | Set by each panel (check)    | Increasingly required for mould/hazmat work |
 
 #### 4. Personnel Qualifications
 
@@ -257,11 +257,11 @@ The business has been operating for several years with steady commercial and ins
 
 **What a panel-ready business changes:**
 
-1. **Closes the certification gap** — Technicians who need IICRC certification book it through a school and examination approved by the IICRC. Everyone who already holds a certification keeps it current with IICRC CEC Accredited courses through CARSI, so every credential on the capability statement is active and auditable.
+1. **Closes the certification gap** — Technicians who need IICRC certification book it through a school and examination approved by the IICRC. Everyone who already holds a certification keeps it current with CARSI courses the IICRC has approved for CEC hours, so every credential on the capability statement is active and auditable.
 
 2. **Builds a WHS management system** — Engages a WHS consultant to formalise existing procedures into a documented management system, with SWMS for all high-risk activities.
 
-3. **Upgrades insurance** — Increases public liability to the $20M government standard and adds pollution liability cover for mould and hazmat work.
+3. **Upgrades insurance** — Increases public liability to the amount the panel requires and adds pollution liability cover for mould and hazmat work.
 
 4. **Creates a professional capability statement** — A concise document with an IICRC certification table, equipment inventory, and project case studies with measurable outcomes.
 
@@ -269,7 +269,7 @@ The business has been operating for several years with steady commercial and ins
 
 **Why this works:**
 
-Panel evaluators score documented evidence, not assertions. A certification table where every entry is verifiable, current, and backed by CEC records answers the competency criteria directly — which is precisely where under-documented applications fall down. Businesses that make these changes put themselves in a position to compete credibly for state and council panel positions, and the online, self-paced format of CEC training means the upskilling happens without pulling technicians off billable work.
+Panel evaluators score documented evidence, not assertions. A certification table where every entry is verifiable, current, and backed by CEC records answers the competency criteria directly — which is precisely where under-documented applications fall down. Businesses that make these changes put themselves in a position to compete credibly for state and council panel positions, and the online, self-paced format of CARSI training means the upskilling happens without pulling technicians off billable work.
 
 ---
 
@@ -280,13 +280,13 @@ Panel evaluators score documented evidence, not assertions. A certification tabl
 | Week        | Action                                                                              | Resources                                       |
 | ----------- | ----------------------------------------------------------------------------------- | ----------------------------------------------- |
 | **1–2**     | Audit current certifications. Identify gaps.                                                                    | CARSI pathway tool at carsi.com.au/pathways    |
-| **3–6**     | Book IICRC certification (WRT minimum) through a school approved by the IICRC. Keep existing credentials current with CARSI IICRC CEC Accredited courses. | iicrc.org + carsi.com.au                       |
+| **3–6**     | Book IICRC certification (WRT minimum) through a school approved by the IICRC. Keep existing credentials current with CARSI courses the IICRC has approved. | iicrc.org + carsi.com.au                       |
 | **5–6**     | Review and upgrade insurance policies.                                                                          | Your insurance broker                          |
 | **5–8**     | Build or formalise WHS management system. Complete all SWMS.                                                    | WHS consultant or SafeWork Australia templates |
 | **7–8**     | Prepare capability statement. Gather project case studies and references.                                       | See the structure in Chapter 4                 |
 | **9–10**    | Register on all relevant procurement platforms. Set up keyword alerts.                                          | See Chapter 1 platform list                    |
 | **11–12**   | Submit first panel application.                                                                                 | —                                              |
-| **Ongoing** | Monitor alerts. Apply to every relevant panel. Maintain CEC currency through CARSI.                             | CARSI CEC tracking                             |
+| **Ongoing** | Monitor alerts. Apply to every relevant panel. Maintain CEC currency with CARSI courses the IICRC has approved.                             | CARSI CEC tracking                             |
 
 ---
 
@@ -296,7 +296,7 @@ Panel evaluators score documented evidence, not assertions. A certification tabl
 2. **IICRC certifications are the entry ticket** — Without documented competency, your application is unlikely to succeed regardless of your experience.
 3. **WHS compliance is non-negotiable** — Government agencies audit WHS records. Your system must be documented, current, and evidence-based.
 4. **Start with your state** — Local and state government panels are generally easier to access than federal panels. Build your track record locally first.
-5. **Online CEC training removes a major barrier** — CARSI's 24/7, self-paced IICRC CEC Accredited courses mean your team can keep certifications current without losing billable days.
+5. **Online CEC training removes a major barrier** — CARSI's 24/7, self-paced courses that the IICRC has approved mean your team can keep certifications current without losing billable days.
 
 ---
 
@@ -305,8 +305,8 @@ Panel evaluators score documented evidence, not assertions. A certification tabl
 **Ready to get panel-ready?**
 
 1. **Assess your team's certifications** — Visit carsi.com.au/pathways to see which IICRC credentials your target panels call for
-2. **Start with WRT** — Water Restoration Technician is the foundation credential for government restoration panel work, obtained through a school and examination approved by the IICRC
-3. **Keep your CECs current with CARSI** — Individual and team membership options are at carsi.com.au/pricing
+2. **Start with WRT** — Water Damage Restoration Technician is the foundation credential for government restoration panel work, obtained through a school and examination approved by the IICRC
+3. **Keep your CECs current with CARSI courses the IICRC has approved** — Individual and team membership options are at carsi.com.au/pricing
 
 ---
 
@@ -322,7 +322,7 @@ Panel evaluators score documented evidence, not assertions. A certification tabl
 | SafeWork Australia — SWMS Templates | safeworkaustralia.gov.au |
 | IICRC Standards                     | iicrc.org/standards      |
 | CARSI Courses                       | carsi.com.au             |
-| CARSI IICRC Pathways                | carsi.com.au/pathways    |
+| CARSI Pathways                      | carsi.com.au/pathways    |
 
 ---
 

@@ -14,15 +14,15 @@ import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Data Centre IICRC CEC Training',
+  title: 'Data Centre Restoration Training',
   description:
-    'IICRC CEC Accredited restoration courses for Australian data centres. Water damage restoration, structural drying and fire & smoke restoration courses for water damage prevention, climate control recovery, and fire suppression system response.',
+    'Restoration courses for Australian data centres. Water damage restoration, structural drying and fire & smoke restoration courses for water damage prevention, climate control recovery, and fire suppression system response.',
   keywords: [
-    'data centre IICRC CEC training Australia',
+    'data centre restoration training Australia',
     'water damage prevention data centre',
-    'WRT restoration data centre',
-    'ASD structural drying server room',
-    'FSRT fire suppression data centre',
+    'data centre water damage restoration',
+    'server room structural drying',
+    'data centre fire suppression clean-up',
   ],
 };
 
@@ -33,35 +33,35 @@ export const metadata: Metadata = {
 const ACCENT_COLOR = '#6A1B9A';
 
 const disciplines = [
-  { code: 'WRT', label: 'Water Damage Restoration', color: '#6A1B9A' },
-  { code: 'ASD', label: 'Applied Structural Drying', color: '#4A148C' },
-  { code: 'FSRT', label: 'Fire & Smoke Restoration', color: '#7B1FA2' },
+  { code: 'WRT', label: 'Water damage', color: '#6A1B9A' },
+  { code: 'ASD', label: 'Structural drying', color: '#4A148C' },
+  { code: 'FSRT', label: 'Fire and smoke', color: '#7B1FA2' },
 ];
 
 const stats = [
-  { value: '300+', label: 'Data Centres' },
-  { value: 'Uptime', label: 'Institute Tier III+' },
-  { value: 'IICRC', label: 'CEC Accredited' },
+  { value: 'Online', label: 'Self-paced study' },
+  { value: 'CARSI', label: 'Verifiable credentials' },
+  { value: 'IICRC CEC', label: 'On approved courses' },
 ];
 
 const faqs = [
   {
-    question: 'What IICRC certifications do Australian data centres need?',
+    question: 'What restoration training suits Australian data centres?',
     answer:
-      'Australian data centres benefit from WRT (Water Damage Restoration) for CRAC unit leaks, pipe bursts, and cooling system failures, ASD (Applied Structural Drying) for rapid moisture removal to protect server infrastructure, and FSRT (Fire & Smoke Restoration) for post-suppression system cleanup. These certifications support Uptime Institute tier compliance and business continuity planning.',
+      'Water damage response for cooling-unit leaks and pipe bursts, structural drying for fast moisture removal, and smoke and residue clean-up after a suppression event. Relevant CARSI courses include Introduction to Water Damage in Commercial Buildings, Introduction to Applied Structural Drying and Introduction to Smoke and Soot Damage Restoration. Where the IICRC has approved a course, its CEC hours are shown on the course page.',
   },
   {
     question: 'How does water damage training protect data centre infrastructure?',
     answer:
-      'Water is the leading cause of unplanned data centre outages after power failures. CEC-accredited water restoration training equips facility teams to respond within minutes to CRAC unit leaks, overhead pipe bursts, or cooling system failures — containing water spread, protecting rack infrastructure, and deploying extraction equipment before corrosion or short circuits occur.',
+      'Training helps facility teams respond quickly to cooling-unit leaks, overhead pipe bursts or cooling-system failures: contain the water, protect rack infrastructure and start extraction before corrosion or short circuits occur. Introduction to Water Extraction Methods and Introduction to Safety Procedures for Water Damage Work cover those first steps.',
   },
   {
     question: 'What happens after a fire suppression system activates in a data centre?',
     answer:
-      'After clean agent or water mist suppression activation, residue and moisture must be professionally removed to prevent corrosion and equipment failure. CEC-accredited fire and smoke restoration training covers post-suppression assessment, residue cleanup, and air quality restoration. Combined with ASD for moisture management, this ensures rapid return to operational status.',
+      'After a clean-agent or water-mist discharge, residue and moisture have to be removed to prevent corrosion and equipment failure. Introduction to Smoke and Soot Damage Restoration covers residue assessment and clean-up, and Introduction to Applied Structural Drying covers moisture control.',
   },
   {
-    question: 'Can data centre operations staff complete IICRC CEC training without downtime?',
+    question: 'Can data centre operations staff complete this training without downtime?',
     answer:
       'Yes. CARSI offers IICRC CEC Accredited courses online and self-paced. NOC and facility staff can complete modules during scheduled maintenance windows or between shifts. All courses issue verifiable digital credentials on completion.',
   },
@@ -72,21 +72,21 @@ const whyCards = [
     icon: Shield,
     title: 'Uptime Protection',
     description:
-      'Every minute of downtime costs thousands. IICRC CEC training ensures your facility team can respond to water and fire events within minutes, protecting SLA commitments and Uptime Institute tier compliance.',
+      'Downtime is costly for any data centre. Restoration training prepares your facility team to respond to water and fire events in a planned, documented way that supports your own SLA and resilience processes.',
     color: '#6A1B9A',
   },
   {
     icon: Droplets,
     title: 'Water Damage Prevention',
     description:
-      'CRAC unit leaks, overhead pipe bursts, and cooling failures are the leading non-power cause of data centre outages. Water damage restoration and structural drying training equips teams to contain and dry before equipment damage occurs.',
+      'CRAC unit leaks, overhead pipe bursts and cooling failures are common water risks in data centres. Water damage restoration and structural drying training helps teams contain the water and dry affected areas to limit equipment damage.',
     color: '#4A148C',
   },
   {
     icon: Flame,
     title: 'Fire Suppression Recovery',
     description:
-      "Post-suppression cleanup requires specialist knowledge. CARSI's CEC-accredited fire and smoke restoration training covers residue removal, air quality restoration, and equipment assessment after clean agent or water mist activation.",
+      "Post-suppression cleanup requires specialist knowledge. CARSI's fire and smoke restoration training covers residue removal, air quality restoration, and equipment assessment after clean agent or water mist activation.",
     color: '#ed9d24',
   },
 ];
@@ -105,7 +105,7 @@ export default async function DataCentresIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Data Centre"
         headlineAccent="Protection Training"
-        description="IICRC CEC Accredited restoration courses for Australia's 300+ data centres. Credentials for water damage prevention, climate control recovery, and fire suppression system response — protecting uptime SLAs and infrastructure investment."
+        description="Restoration courses for data centre facility teams: water damage response, drying after cooling failures, and clean-up after a fire suppression event."
         disciplines={disciplines}
         stats={stats}
       />
