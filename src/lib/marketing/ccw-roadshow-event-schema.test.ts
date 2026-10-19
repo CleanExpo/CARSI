@@ -9,6 +9,7 @@ import {
   getCcwRoadshowEvent,
   getNextCcwCitySitting,
   hasCcwRoadshowSessionEnded,
+  isOpenFreeEntrySitting,
   type CcwRoadshowEvent,
 } from './ccw-roadshow';
 
@@ -227,5 +228,19 @@ describe('buildCcwRoadshowEventJsonLd', () => {
       image,
     });
     expect(JSON.parse(JSON.stringify(schema))).toEqual(schema);
+  });
+});
+
+describe('isOpenFreeEntrySitting', () => {
+  it('is true only for a free-token sitting that has not ended', () => {
+    const melbourne = event('melbourne');
+    const end = Date.parse(melbourne.endDateIso);
+    expect(isOpenFreeEntrySitting(melbourne, new Date('2026-07-01T00:00:00Z'))).toBe(true);
+    expect(isOpenFreeEntrySitting(melbourne, new Date(end - 1))).toBe(true);
+    expect(isOpenFreeEntrySitting(melbourne, new Date(end))).toBe(false);
+    expect(isOpenFreeEntrySitting(melbourne, new Date('2026-07-24T00:00:00Z'))).toBe(false);
+    // A paid (external) sitting is never open for free entry, even before it starts.
+    const sydney = event('sydney');
+    expect(isOpenFreeEntrySitting(sydney, new Date('2026-07-01T00:00:00Z'))).toBe(false);
   });
 });

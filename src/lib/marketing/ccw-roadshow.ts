@@ -166,12 +166,20 @@ export function getCcwCityVenue(city: CcwRoadshowEvent['city'], now: Date): CcwV
 }
 
 /**
+ * The one rule for advertising CCW free entry: a free-token sitting that has not ended. Every
+ * surface that mentions the free offer goes through this, so none can advertise an ended sitting.
+ */
+export function isOpenFreeEntrySitting(event: CcwRoadshowEvent, now: Date): boolean {
+  return allowsFreeEntryRegistration(event) && !hasCcwRoadshowSessionEnded(event, now);
+}
+
+/**
  * Cities whose not-yet-ended sittings use free-token registration. The CCW free-entry offer may
  * only be advertised while this is non-empty; it is a business fact, not standing copy.
  */
 export function getUpcomingFreeEntryCities(now: Date): CcwRoadshowEvent['city'][] {
   const cities = ccwRoadshowEvents
-    .filter((event) => !hasCcwRoadshowSessionEnded(event, now) && allowsFreeEntryRegistration(event))
+    .filter((event) => isOpenFreeEntrySitting(event, now))
     .map((event) => event.city);
   return [...new Set(cities)];
 }

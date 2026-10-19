@@ -110,3 +110,23 @@ describe('roadshow hub metadata follows the free-entry rule', () => {
     expect(text).not.toMatch(/\bfree\b/i);
   });
 });
+
+describe('/ccw-melbourne description advertises free entry only for an open free sitting', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('carries the free offer while the free July sitting is ahead (1/07/2026)', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-07-01T00:00:00Z'));
+    expect(String(melbourneMetadata().description)).toContain('Free for CCW past and current customers');
+  });
+
+  it.each(['2026-07-24T00:00:00Z', '2026-10-19T00:00:00Z'])('drops it once that sitting has ended (%s)', (at) => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(at));
+    const text = JSON.stringify(melbourneMetadata());
+    expect(text).not.toMatch(/\bfree\b/i);
+    expect(text).not.toContain('Claim your free entry');
+  });
+});
