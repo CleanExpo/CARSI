@@ -181,6 +181,29 @@ const EXEMPT = [
   'src/lib/seed/cec-hours.test.ts',
 ];
 
+// Files whose copy goes to learners of EVERY course, including courses with no IICRC link
+// (truckmount, floor care, facilities). Fail-closed: they may carry no IICRC or CEC wording at all,
+// not even in comments, because a single shared line would reach a non-IICRC course's learners.
+// Added for the public review policy and moderation note (release-gate reviews r3-r4, 18/10/2026).
+const IICRC_FREE_FILES = [
+  'src/lib/reviews/review-policy.ts',
+  'src/components/lms/ReviewPolicy.tsx',
+];
+const IICRC_FREE_RE = /\bIICRC\b|\bCECs?\b|Continuing Education Credit/i;
+
+/** Findings for an IICRC-free file: one per line that mentions IICRC or CEC. */
+export function evaluateIicrcFree(file, text) {
+  const findings = [];
+  text.split('\n').forEach((line, i) => {
+    if (IICRC_FREE_RE.test(line)) {
+      findings.push(
+        `  ${file}:${i + 1}: this file reaches learners of every course (including non-IICRC ones) and must carry no IICRC/CEC wording\n    → ${line.trim().slice(0, 150)}`
+      );
+    }
+  });
+  return findings;
+}
+
 function inScope(f) { const n = f.replace(/\\/g, '/'); return SCANNED_DIRS.some((d) => n.startsWith(d)); }
 function isExempt(f) { const n = f.replace(/\\/g, '/'); return EXEMPT.some((e) => n === e || n.endsWith('/' + e)); }
 
@@ -218,7 +241,7 @@ export function evaluateContent(file, text, allowlist = ALLOWLIST) {
   return findings;
 }
 
-export { BANNED, CEC_NUMBER, inScope, isExempt, normaliseLine, ALLOWLIST };
+export { BANNED, CEC_NUMBER, inScope, isExempt, normaliseLine, ALLOWLIST, IICRC_FREE_FILES };
 
 function main() {
   let list = '';
@@ -233,6 +256,17 @@ function main() {
     let text = '';
     try { text = readFileSync(file, 'utf8'); } catch { continue; }
     findings.push(...evaluateContent(file, text));
+  }
+  for (const file of IICRC_FREE_FILES) {
+    let text = '';
+    try {
+      text = readFileSync(file, 'utf8');
+    } catch {
+      // Scope floor: a listed file that vanished is a failure, never a silent pass.
+      findings.push(`  ${file}: listed as IICRC-free but could not be read — update IICRC_FREE_FILES deliberately`);
+      continue;
+    }
+    findings.push(...evaluateIicrcFree(file, text));
   }
 
   if (findings.length > 0) {

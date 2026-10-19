@@ -81,6 +81,21 @@ export async function verifyPassword(plain: string, stored: string): Promise<boo
   return false;
 }
 
+/**
+ * Pure: a user's effective LMS role from their lms_user_roles names (which win) and the legacy
+ * lms_users.role column (the fallback). The ONE rule for both the session token and the database
+ * re-validation of admins (current-admin.ts), so the two can never disagree.
+ */
+export function pickSessionRole(roleNames: Iterable<string>, columnRole: string | null): string {
+  const names = new Set([...roleNames].map((n) => n.trim().toLowerCase()));
+  if (names.has('admin')) return 'admin';
+  if (names.has('instructor')) return 'instructor';
+  if (names.has('student')) return 'student';
+  const col = columnRole?.trim().toLowerCase();
+  if (col && ['admin', 'instructor', 'student'].includes(col)) return col;
+  return 'student';
+}
+
 export async function resolveSessionRole(
   userId: string,
   columnRole: string | null
@@ -89,13 +104,10 @@ export async function resolveSessionRole(
     where: { userId },
     include: { role: true },
   });
-  const names = new Set(rows.map((r) => r.role.name.toLowerCase()));
-  if (names.has('admin')) return 'admin';
-  if (names.has('instructor')) return 'instructor';
-  if (names.has('student')) return 'student';
-  const col = columnRole?.trim().toLowerCase();
-  if (col && ['admin', 'instructor', 'student'].includes(col)) return col;
-  return 'student';
+  return pickSessionRole(
+    rows.map((r) => r.role.name),
+    columnRole
+  );
 }
 
 export async function sessionClaimsForUserId(userId: string): Promise<SessionClaims | null> {

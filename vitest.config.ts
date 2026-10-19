@@ -1,4 +1,4 @@
-import { defineConfig } from 'vitest/config';
+import { configDefaults, defineConfig } from 'vitest/config';
 import { fileURLToPath } from 'node:url';
 
 export default defineConfig({
@@ -9,6 +9,9 @@ export default defineConfig({
   },
   test: {
     include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
+    // Real-PostgreSQL tests (*.pg.test.ts) need a database; they run in CI's E2E job via
+    // `npm run test:pg` (vitest.pg.config.ts), never in the database-free unit suite.
+    exclude: [...configDefaults.exclude, '**/*.pg.test.ts'],
     environment: 'node',
     // Vitest's default is 5000ms and it was too tight for THIS suite — not because the
     // tests that failed are slow, but because several hundred suites run in parallel and a

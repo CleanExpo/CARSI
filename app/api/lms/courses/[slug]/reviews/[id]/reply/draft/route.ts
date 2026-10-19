@@ -1,24 +1,34 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
-import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
-import { canManageReviews, getCourseIdBySlug, getReviewForCourse } from '@/lib/server/course-reviews';
+import { prisma } from '@/lib/prisma';
+import { resolveCurrentReviewManager } from '@/lib/server/current-admin';
+import {
+  getCourseIdBySlug,
+  getReviewTextForCourse,
+  getReviewVisibility,
+} from '@/lib/server/course-reviews';
+import { mayReplyToReview, reviewPrincipal } from '@/lib/server/review-access-rules';
+import { readReviewAdminSession } from '@/lib/server/review-admin-session';
 import { draftReviewReply } from '@/lib/server/review-reply-draft';
 
 /**
  * POST /api/lms/courses/:slug/reviews/:id/reply/draft — AI-suggest an instructor reply
- * (GP-118). Instructor/admin only. Returns { draft: string | null }; null when the model
- * is unconfigured or errors, so the UI falls back to writing manually.
+ * (GP-118). Returns { draft: string | null }; null when the model is unconfigured or errors, so
+ * the UI falls back to writing manually.
+ *
+ * The review's text is sent to a third-party model, so this is a private read (release-gate r11).
+ * Who may draft is decided from the DATABASE, never the token's role: a current admin
+ * (resolveCurrentAdmin) or a current instructor, re-checked in a transaction that then reads the
+ * review. An instructor cannot read hidden reviews, so a hidden review is refused outright for
+ * them and its text never reaches the model; nothing is read or sent on any refusal.
  */
 export async function POST(
   request: NextRequest,
   ctx: { params: Promise<{ slug: string; id: string }> }
 ) {
-  const claims = await getSessionClaimsFromRequest(request);
-  if (!claims) {
+  const session = await readReviewAdminSession(request);
+  if (!session) {
     return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 });
-  }
-  if (!canManageReviews(claims.role)) {
-    return NextResponse.json({ detail: 'Only instructors or admins can draft replies' }, { status: 403 });
   }
 
   const { slug, id } = await ctx.params;
@@ -32,15 +42,40 @@ export async function POST(
     if (!course) {
       return NextResponse.json({ detail: 'Course not found' }, { status: 404 });
     }
-    const review = await getReviewForCourse(id, course.id);
-    if (!review) {
+    const access = await prisma.$transaction(async (tx) => {
+      const manager = await resolveCurrentReviewManager(tx, session);
+      if (!manager) return { kind: 'forbidden' as const };
+      // Visibility first (no private field), against the rule table; the text only if allowed.
+      const principal = reviewPrincipal(manager);
+      const target = await getReviewVisibility(id, course.id, tx);
+      if (!target) return { kind: 'missing' as const };
+      if (!mayReplyToReview(principal, target.isPublished)) return { kind: 'hidden' as const };
+      // The text read carries the visibility rule itself (r13): if the review was hidden after the
+      // check above, an instructor's read returns nothing and the draft is refused — never sent.
+      const review = await getReviewTextForCourse(id, course.id, principal, tx);
+      if (!review) return { kind: 'hidden' as const };
+      return { kind: 'ok' as const, review };
+    });
+    if (access.kind === 'forbidden') {
+      return NextResponse.json(
+        { detail: 'Only instructors or admins can draft replies' },
+        { status: 403 }
+      );
+    }
+    if (access.kind === 'hidden') {
+      return NextResponse.json(
+        { detail: 'Hidden reviews cannot be drafted by instructors' },
+        { status: 403 }
+      );
+    }
+    if (access.kind === 'missing') {
       return NextResponse.json({ detail: 'Review not found' }, { status: 404 });
     }
     const draft = await draftReviewReply({
       courseTitle: course.title,
-      rating: review.rating,
-      title: review.title,
-      body: review.body,
+      rating: access.review.rating,
+      title: access.review.title,
+      body: access.review.body,
     });
     return NextResponse.json({ draft });
   } catch (e) {

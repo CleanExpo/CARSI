@@ -12,6 +12,7 @@ import { CourseHubContext } from '@/components/lms/CourseHubContext';
 import { CoursesIndexLink } from '@/components/lms/CoursesIndexLink';
 import { CourseThumbnail } from '@/components/lms/CourseThumbnail';
 import { EnrolButton } from '@/components/lms/EnrolButton';
+import { ReviewPolicyLink } from '@/components/lms/ReviewPolicy';
 import type { DesignationDefinition } from '@/lib/designations/registry';
 
 /** The "Earns N IICRC CEC hour(s)" label, pluralised, from the resolved approval hours. */
@@ -149,6 +150,8 @@ export function CoursePublicDetail({
                   </span>{' '}
                   from {aggregateRating.reviewCount} review
                   {aggregateRating.reviewCount === 1 ? '' : 's'}
+                  {' · '}
+                  <ReviewPolicyLink />
                 </p>
               ) : null}
 

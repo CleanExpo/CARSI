@@ -1,28 +1,38 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
-import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
+import { prisma } from '@/lib/prisma';
 import {
-  canManageReviews,
+  NotCurrentReviewManagerError,
+  resolveCurrentReviewManager,
+} from '@/lib/server/current-admin';
+import {
+  databaseUnavailableResponse,
+  isDatabaseConfigured,
+} from '@/lib/server/database-unavailable';
+import {
   getCourseIdBySlug,
-  getReviewForCourse,
+  ReviewNotFoundError,
+  ReviewReplyForbiddenError,
   setReviewReply,
 } from '@/lib/server/course-reviews';
+import { readReviewAdminSession } from '@/lib/server/review-admin-session';
 
 /**
  * POST /api/lms/courses/:slug/reviews/:id/reply — publish (or clear) an instructor/admin
  * response to a review (GP-118). Body: { reply: string | null }. Clearing = empty/null reply.
+ * Who may reply is decided from the DATABASE, never the token's role (release-gate r10): a current
+ * admin (resolveCurrentAdmin) or a current instructor, re-checked in the same transaction as the write.
  */
 export async function POST(
   request: NextRequest,
   ctx: { params: Promise<{ slug: string; id: string }> }
 ) {
-  const claims = await getSessionClaimsFromRequest(request);
-  if (!claims) {
+  const session = await readReviewAdminSession(request);
+  if (!session) {
     return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 });
   }
-  if (!canManageReviews(claims.role)) {
-    return NextResponse.json({ detail: 'Only instructors or admins can reply' }, { status: 403 });
-  }
+  const forbidden = () =>
+    NextResponse.json({ detail: 'Only instructors or admins can reply' }, { status: 403 });
 
   const { slug, id } = await ctx.params;
 
@@ -37,22 +47,24 @@ export async function POST(
   }
   const reply = (payload.reply as string | null) ?? null;
 
-  if (!process.env.DATABASE_URL?.trim()) {
-    return NextResponse.json({ ok: true });
-  }
+  if (!isDatabaseConfigured())
+    return databaseUnavailableResponse('Replies are temporarily unavailable.');
 
   try {
+    if (!(await resolveCurrentReviewManager(prisma, session))) return forbidden();
     const course = await getCourseIdBySlug(slug);
     if (!course) {
       return NextResponse.json({ detail: 'Course not found' }, { status: 404 });
     }
-    const review = await getReviewForCourse(id, course.id);
-    if (!review) {
-      return NextResponse.json({ detail: 'Review not found' }, { status: 404 });
-    }
-    await setReviewReply({ reviewId: id, reply, repliedById: claims.sub });
+    // Visibility and course are checked inside the write's transaction, against the rule table;
+    // no review text is read here (release-gate r12).
+    await setReviewReply({ reviewId: id, courseId: course.id, reply, session });
     return NextResponse.json({ ok: true });
   } catch (e) {
+    if (e instanceof NotCurrentReviewManagerError || e instanceof ReviewReplyForbiddenError)
+      return forbidden();
+    if (e instanceof ReviewNotFoundError)
+      return NextResponse.json({ detail: 'Review not found' }, { status: 404 });
     console.error('[courses/:slug/reviews/:id/reply POST]', e);
     return NextResponse.json({ detail: 'Failed to save reply' }, { status: 500 });
   }

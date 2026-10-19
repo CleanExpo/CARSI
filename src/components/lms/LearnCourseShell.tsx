@@ -17,6 +17,8 @@ import { LearnModuleOverview } from '@/components/lms/LearnModuleOverview';
 import { LessonFooterNav } from '@/components/lms/LessonFooterNav';
 import { LessonPlayer } from '@/components/lms/LessonPlayer';
 import { ProgressSharePrompt } from '@/components/lms/ProgressSharePrompt';
+import { ReviewAsk } from '@/components/lms/ReviewAsk';
+import { shouldMountPlayerReviewAsk } from '@/lib/reviews/review-ask';
 import { EnterpriseQuizResult, LearnerQuizResult, QuizPlayer } from '@/components/lms/QuizPlayer';
 import { EnterpriseLessonFooter } from '@/components/onboarding/EnterpriseLessonFooter';
 import { OnboardingCurriculumNav } from '@/components/onboarding/OnboardingCurriculumNav';
@@ -787,6 +789,10 @@ export function LearnCourseShell({ slug }: { slug: string }) {
           variant={isOnboardingProgram ? 'enterprise' : 'default'}
         />
       ) : null}
+      {/* Review ask (spec D5): a sibling of the banner, outside its live region. Mounted whatever
+          the lesson flags say — a completed enrolment can show an incomplete lesson after the
+          curriculum changes — and shown only when the server says review_ask. */}
+      {shouldMountPlayerReviewAsk({ isOnboardingProgram }) ? <ReviewAsk slug={curriculum.course.slug} /> : null}
       <ProgressSharePrompt draft={shareDraft} onClose={() => setShareDraft(null)} />
 
       {!online ? (

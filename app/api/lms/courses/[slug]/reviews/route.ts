@@ -1,23 +1,40 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
+import { prisma } from '@/lib/prisma';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
+import { resolveCurrentReviewManager } from '@/lib/server/current-admin';
+import { databaseUnavailableResponse, isDatabaseConfigured } from '@/lib/server/database-unavailable';
 import {
-  canManageReviews,
-  canModerateReviews,
   getCourseIdBySlug,
   getCourseReviews,
+  getGoogleReviewLink,
   getOwnReview,
+  getReviewAskForStudent,
+  getReviewerDisplayName,
   isEnrolledInCourse,
   isValidRating,
+  ReviewNotAllowedError,
   upsertReview,
 } from '@/lib/server/course-reviews';
+import {
+  mayManageReplies,
+  mayModerate,
+  REVIEW_ACCESS,
+  reviewPrincipal,
+} from '@/lib/server/review-access-rules';
+import { readReviewAdminSession } from '@/lib/server/review-admin-session';
 
 /**
  * GET /api/lms/courses/:slug/reviews — public: published reviews + aggregate summary.
  * When called with a session, also returns the caller's own review + whether they may review.
+ *
+ * Review ask (spec D5/D7): `review_ask` is true for a completer who has not reviewed yet, derived
+ * from database state on every call. `google_review_url` is the validated Google review link or
+ * null — the same value for every caller, never dependent on any rating.
  */
 export async function GET(request: NextRequest, ctx: { params: Promise<{ slug: string }> }) {
   const { slug } = await ctx.params;
+  const googleReviewUrl = getGoogleReviewLink().url;
 
   if (!process.env.DATABASE_URL?.trim()) {
     return NextResponse.json({
@@ -27,6 +44,9 @@ export async function GET(request: NextRequest, ctx: { params: Promise<{ slug: s
       can_manage: false,
       can_moderate: false,
       own_review: null,
+      review_ask: false,
+      reviewer_display_name: null,
+      google_review_url: googleReviewUrl,
     });
   }
 
@@ -41,16 +61,39 @@ export async function GET(request: NextRequest, ctx: { params: Promise<{ slug: s
     let canReview = false;
     let canManage = false;
     let canModerate = false;
+    let moderated: Awaited<ReturnType<typeof getCourseReviews>> | null = null;
     let ownReview = null;
+    let reviewAsk = false;
+    let reviewerDisplayName: string | null = null;
+    // Reply and moderation controls, and hidden reviews with their reasons, are decided ONLY from
+    // the database (release-gate r10): a current admin (resolveCurrentAdmin) moderates, a current
+    // admin or instructor manages replies — never the token's role, which disagreed with it. The
+    // private read runs INSIDE the transaction that re-validated the admin, while its FOR SHARE locks
+    // are held: a demotion either commits first (and nothing private is read) or waits (r9).
+    const adminSession = await readReviewAdminSession(request);
+    if (adminSession) {
+      const access = await prisma.$transaction(async (tx) => {
+        const principal = reviewPrincipal(await resolveCurrentReviewManager(tx, adminSession));
+        const readsHidden = REVIEW_ACCESS[principal].readHidden;
+        return { principal, hidden: readsHidden ? await getCourseReviews(course.id, true, tx) : null };
+      });
+      canManage = mayManageReplies(access.principal);
+      canModerate = mayModerate(access.principal);
+      moderated = access.hidden;
+    }
     if (claims) {
-      canManage = canManageReviews(claims.role);
-      canModerate = canModerateReviews(claims.role);
       canReview = await isEnrolledInCourse(claims.sub, course.id);
       ownReview = canReview ? await getOwnReview(claims.sub, course.id) : null;
+      if (canReview) {
+        [reviewAsk, reviewerDisplayName] = await Promise.all([
+          getReviewAskForStudent(claims.sub, course),
+          getReviewerDisplayName(claims.sub),
+        ]);
+      }
     }
 
-    // Moderators also see admin-hidden reviews (so they can unhide them).
-    const { reviews, summary } = await getCourseReviews(course.id, canModerate);
+    // Moderators also see admin-hidden reviews (so they can unhide them); everyone else, published only.
+    const { reviews, summary } = moderated ?? (await getCourseReviews(course.id, false));
 
     return NextResponse.json({
       reviews,
@@ -59,6 +102,9 @@ export async function GET(request: NextRequest, ctx: { params: Promise<{ slug: s
       can_manage: canManage,
       can_moderate: canModerate,
       own_review: ownReview,
+      review_ask: reviewAsk,
+      reviewer_display_name: reviewerDisplayName,
+      google_review_url: googleReviewUrl,
     });
   } catch (e) {
     console.error('[courses/:slug/reviews GET]', e);
@@ -90,9 +136,8 @@ export async function POST(request: NextRequest, ctx: { params: Promise<{ slug: 
   const title = typeof payload.title === 'string' ? payload.title : null;
   const body = typeof payload.body === 'string' ? payload.body : null;
 
-  if (!process.env.DATABASE_URL?.trim()) {
-    return NextResponse.json({ ok: true });
-  }
+  // A learner must never be told their review was saved when it was not.
+  if (!isDatabaseConfigured()) return databaseUnavailableResponse('Reviews are temporarily unavailable. Please try again.');
 
   try {
     const course = await getCourseIdBySlug(slug);
@@ -108,6 +153,7 @@ export async function POST(request: NextRequest, ctx: { params: Promise<{ slug: 
     await upsertReview({ courseId: course.id, studentId: claims.sub, rating: payload.rating, title, body });
     return NextResponse.json({ ok: true }, { status: 201 });
   } catch (e) {
+    if (e instanceof ReviewNotAllowedError) return NextResponse.json({ detail: e.message }, { status: 403 });
     console.error('[courses/:slug/reviews POST]', e);
     return NextResponse.json({ detail: 'Failed to save review' }, { status: 500 });
   }

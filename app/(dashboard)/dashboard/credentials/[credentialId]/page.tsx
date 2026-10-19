@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 
 import { CredentialVerificationPageContent } from '@/components/lms/CredentialVerificationPageContent';
 import { getPublicCredentialJson } from '@/lib/server/credential-public';
+import { getCourseSlugForEnrollment } from '@/lib/server/course-reviews';
 import { getCecSubmissionSummaryForEnrollment } from '@/lib/server/iicrc-cec-submission';
 import { getServerOrigin } from '@/lib/server/request-origin';
 
@@ -20,8 +21,11 @@ export default async function DashboardCredentialPage({
   const credential = await getPublicCredentialJson(credentialId, origin);
   if (!credential) notFound();
 
+  // The course comes from the enrolment itself, not only the `?course=` link, so a learner who
+  // opens their credential later from the wallet sees the same review ask (spec D5).
   const courseSlug =
-    typeof query.course === 'string' && query.course.trim() ? query.course.trim() : null;
+    (await getCourseSlugForEnrollment(credentialId)) ??
+    (typeof query.course === 'string' && query.course.trim() ? query.course.trim() : null);
 
   const cecSubmission = await getCecSubmissionSummaryForEnrollment(credentialId);
 
@@ -32,6 +36,7 @@ export default async function DashboardCredentialPage({
         credentialId={credentialId}
         justCompleted={query.completed === '1'}
         courseSlug={courseSlug}
+        showReviewAsk
         cecSubmissionStatus={cecSubmission?.status ?? null}
         cecSubmittedAt={cecSubmission?.sent_at ?? null}
       />

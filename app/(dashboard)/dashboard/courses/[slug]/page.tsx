@@ -115,7 +115,8 @@ export default async function DashboardCourseDetailPage({
 
           <CourseDetailOutline slug={course.slug} syllabus={syllabus} />
 
-          <section>
+          {/* `#reviews`: a stable deep link to this course's reviews. */}
+          <section id="reviews" className="scroll-mt-24">
             <CourseReviews slug={course.slug} />
           </section>
         </div>

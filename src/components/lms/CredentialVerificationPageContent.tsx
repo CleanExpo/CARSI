@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Award, Building2, CheckCircle2, Download, PartyPopper } from 'lucide-react';
 
 import { CertificatePreview } from '@/components/lms/diagrams/CertificatePreview';
+import { ReviewAsk } from '@/components/lms/ReviewAsk';
 import { CREDENTIAL_DISCLAIMER } from '@/components/seo/JsonLd';
 import { dash } from '@/lib/dashboard-light-ui';
 import { FLOOR_CARE_ONBOARDING_SLUG, isOnboardingCourse, ONBOARDING_BRAND } from '@/lib/onboarding/enterprise';
@@ -13,6 +14,8 @@ type Props = {
   /** Set when redirected immediately after finishing the course. */
   justCompleted?: boolean;
   courseSlug?: string | null;
+  /** Learner's own credential page only: show the review ask (server decides eligibility). */
+  showReviewAsk?: boolean;
   cecSubmissionStatus?: string | null;
   cecSubmittedAt?: string | null;
 };
@@ -22,6 +25,7 @@ export function CredentialVerificationPageContent({
   credentialId,
   justCompleted = false,
   courseSlug,
+  showReviewAsk = false,
   cecSubmissionStatus = null,
   cecSubmittedAt = null,
 }: Props) {
@@ -71,6 +75,8 @@ export function CredentialVerificationPageContent({
           </div>
         </div>
       ) : null}
+
+      {showReviewAsk && courseSlug && !isOnboardingCredential ? <ReviewAsk slug={courseSlug} /> : null}
 
       {cecSubmitted ? (
         <div

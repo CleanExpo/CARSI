@@ -22,7 +22,7 @@ export function getAdminEmail(): string {
  * legacy admin-password login, likely has no LmsUser row, and hardcoding it would open
  * a self-registration account-takeover. Keep lowercase.
  */
-const FOUNDER_ADMIN_EMAILS = ['phill.m@carsi.com.au'] as const;
+export const FOUNDER_ADMIN_EMAILS = ['phill.m@carsi.com.au'] as const;
 
 /**
  * Emails that may open `/admin` after LMS login, in addition to JWT role `admin`.

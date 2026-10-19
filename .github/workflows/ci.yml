@@ -333,6 +333,16 @@ jobs:
       - name: Fail on Prisma schema drift (a model/field with no migration)
         run: npx prisma migrate diff --from-config-datasource --to-schema prisma/schema.prisma --exit-code
 
+      # Course reviews rely on row locks: a review re-checks the enrolment's access under its row
+      # lock, and a moderator's hidden-review read runs in the transaction that re-validated the
+      # admin, while its FOR SHARE locks are held. Only two real sessions can prove a revocation or
+      # a demotion is ordered correctly — the unit fakes cannot. Runs before any seeding: it needs
+      # an empty, freshly migrated database, and it FAILS (never skips) here if DATABASE_URL is missing.
+      - name: Verify course-review locks against migrated Postgres
+        run: npm run test:pg
+        env:
+          NODE_ENV: test
+
       # The yearly-membership grant ROTATES an existing member's password and
       # reveals it only in the welcome email, so a second grant locks the member
       # out of an account that was working. The guard against that is a

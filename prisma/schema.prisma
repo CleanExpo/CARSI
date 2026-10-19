@@ -64,6 +64,8 @@ model LmsUser {
   notifications         LmsNotification[]
   courseReviews         LmsCourseReview[]         @relation("ReviewStudent")
   reviewReplies         LmsCourseReview[]         @relation("ReviewReplyAuthor")
+  /// Moderation decisions this admin made (append-only audit; actor nulled if the admin is deleted).
+  reviewModerationEvents LmsCourseReviewModerationEvent[] @relation("ReviewModerationActor")
   subscription                  LmsSubscription?
   coachingMonthlySubscription   CarsiCoachingMonthlySubscription?
   coachingBusinessProfile       CarsiCoachingBusinessProfile?
@@ -184,16 +186,60 @@ model LmsCourseReview {
   reply       String?   @db.Text
   repliedAt   DateTime? @map("replied_at") @db.Timestamptz(6)
   repliedById String?   @map("replied_by_id") @db.Uuid
+  /// Incremented by every hide/unhide in the same transaction; the event stores it as `sequence`.
+  moderationVersion Int @default(0) @map("moderation_version")
   createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   course    LmsCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
   student   LmsUser   @relation("ReviewStudent", fields: [studentId], references: [id], onDelete: Cascade)
   repliedBy LmsUser?  @relation("ReviewReplyAuthor", fields: [repliedById], references: [id], onDelete: SetNull)
+  moderationEvents LmsCourseReviewModerationEvent[]
 
   @@unique([courseId, studentId], map: "uq_lms_course_review")
   @@index([courseId, isPublished], map: "ix_lms_course_review_course_published")
   @@map("lms_course_reviews")
+}
+
+/// Append-only moderation audit for course reviews (spec D1). One row per hide/unhide,
+/// written in the same transaction as the `is_published` flip. Application code only INSERTs.
+/// `is_published` on the review stays the single truth for visibility; the current hide reason
+/// is the latest event's reason. Legacy rows hidden before this table existed have no event.
+model LmsCourseReviewModerationEvent {
+  id             String   @id @default(uuid()) @db.Uuid
+  /// Live link to the review; set to NULL (never deleted) when the review, its course or its learner is deleted.
+  reviewId       String?  @map("review_id") @db.Uuid
+  /// Permanent snapshot of the review id, kept when review_id is nulled, so one review's decisions stay grouped.
+  reviewRef      String   @map("review_ref") @db.Uuid
+  /// Permanent course snapshot (no FK): the audit must outlive the course (release-gate r3).
+  courseRef      String   @map("course_ref") @db.Uuid
+  courseSlug     String   @map("course_slug")
+  courseTitle    String   @map("course_title")
+  /// Decision order for this review (its moderation_version after this decision). Never timestamps.
+  sequence       Int
+  /// hide | unhide
+  action         String   @db.VarChar(8)
+  /// offensive | personal_information | not_about_course | spam_or_fake (required for hide; DB CHECK)
+  reason         String?  @db.VarChar(32)
+  /// Live link to the acting LMS user (LMS admins only).
+  actorId        String?  @map("actor_id") @db.Uuid
+  /// bootstrap_admin | admin_user | lms_admin (DB CHECK)
+  actorKind      String   @map("actor_kind") @db.VarChar(16)
+  /// Durable actor snapshot (no FK): admin_users.id or lms_users.id; NULL only for the bootstrap admin.
+  actorRef       String?  @map("actor_ref") @db.Uuid
+  actorEmail     String   @map("actor_email")
+  /// The review's star rating when the decision was made (curation detector: hides by rating).
+  ratingAtAction Int      @map("rating_at_action")
+  /// sha256 of title + body at decision time, so an edit after a hide is detectable.
+  contentSha256  String   @map("content_sha256") @db.VarChar(64)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  review LmsCourseReview? @relation(fields: [reviewId], references: [id], onDelete: SetNull)
+  actor  LmsUser?         @relation("ReviewModerationActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@unique([reviewRef, sequence], map: "uq_lms_review_moderation_review_ref_sequence")
+  @@index([reviewId, sequence], map: "ix_lms_review_moderation_review_sequence")
+  @@map("lms_course_review_moderation_events")
 }
 
 enum DiscountType {
