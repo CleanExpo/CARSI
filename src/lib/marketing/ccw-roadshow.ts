@@ -150,7 +150,19 @@ export function getCcwNextDatesDescription(city: CcwRoadshowEvent['city']): stri
 /** The existing /contact lead-context path, pre-filled for the next dates in a city. */
 export function getCcwRegisterInterestHref(city?: CcwRoadshowEvent['city']): string {
   const topic = `the next ${city ? `${city} ` : ''}CARSI x CCW training dates`;
-  return `/contact?source=ccw-roadshow&topic=${encodeURIComponent(topic)}`;
+  const cityParam = city ? `&city=${city.toLowerCase()}` : '';
+  return `/contact?source=ccw-roadshow${cityParam}&topic=${encodeURIComponent(topic)}`;
+}
+
+/**
+ * The page a ccw-roadshow lead came from, from the `city` query param. Whitelisted: anything
+ * other than a known city falls back to the roadshow hub, never a caller-supplied path.
+ */
+export function resolveCcwInterestPageUrl(city: string | undefined): string {
+  const known = (Object.keys(ccwCityStates) as CcwRoadshowEvent['city'][]).find(
+    (name) => name.toLowerCase() === city?.trim().toLowerCase(),
+  );
+  return known ? `/ccw-${known.toLowerCase()}` : ccwRoadshowPath;
 }
 
 export const ccwRoadshowEvents: CcwRoadshowEvent[] = [

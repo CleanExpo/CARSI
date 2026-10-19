@@ -227,17 +227,20 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
             label: focusEvent ? focusEvent.city : 'National stops',
           },
           {
-            value: focusEvent
-              ? nextDatesTba
-                ? 'TBA'
-                : allowsFreeEntryRegistration(focusEvent)
-                ? 'Free'
-                : 'Via CCW'
-              : 'Varies',
+            value: nextDatesTba
+              ? 'TBA'
+              : focusEvent
+                ? allowsFreeEntryRegistration(focusEvent)
+                  ? 'Free'
+                  : 'Via CCW'
+                : 'Varies',
             label: 'Entry',
           },
-          { value: '2 days', label: focusEvent?.timeLabel ?? 'Times vary by event' },
-          { value: String(focusEvent?.capacity ?? 20), label: 'Room size' },
+          // An ended sitting's times and room size say nothing about the next one.
+          nextDatesTba
+            ? { value: 'TBA', label: 'Times' }
+            : { value: '2 days', label: focusEvent?.timeLabel ?? 'Times vary by event' },
+          { value: nextDatesTba ? 'TBA' : String(focusEvent?.capacity ?? 20), label: 'Room size' },
         ]}
       />
 

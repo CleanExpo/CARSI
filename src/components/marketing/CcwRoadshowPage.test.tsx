@@ -3,7 +3,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/components/landing/HomeFaqSection', () => ({ HomeFaqSection: () => null }));
 vi.mock('@/components/landing/HomeFinalCtaSection', () => ({ HomeFinalCtaSection: () => null }));
-vi.mock('@/components/landing/HomeTrustStrip', () => ({ HomeTrustStrip: () => null }));
+vi.mock('@/components/landing/HomeTrustStrip', () => ({
+  HomeTrustStrip: ({ stats }: { stats: { value: string; label: string }[] }) =>
+    stats.map((stat) => `[stat ${stat.value} | ${stat.label}]`).join(''),
+}));
 
 import { CcwRoadshowContent } from './CcwRoadshowPage';
 
@@ -88,7 +91,7 @@ describe('past sittings are not presented as upcoming', () => {
 
   const afterEverySitting = new Date('2026-10-19T00:00:00Z');
   const melbourneInterestHref =
-    'href="/contact?source=ccw-roadshow&amp;topic=the%20next%20Melbourne%20CARSI%20x%20CCW%20training%20dates"';
+    'href="/contact?source=ccw-roadshow&amp;city=melbourne&amp;topic=the%20next%20Melbourne%20CARSI%20x%20CCW%20training%20dates"';
 
   it('shows next Melbourne dates as to be announced at the CCW Melbourne store once July has ended', () => {
     vi.useFakeTimers();
@@ -115,6 +118,31 @@ describe('past sittings are not presented as upcoming', () => {
     expect(markup).toContain(melbourneInterestHref);
     expect(markup).not.toContain(' · 22-23 July 2026');
     expect(markup).not.toContain('Claim your free entry token');
+  });
+
+  it('shows TBA, not the past sitting times or room size, in the stats strip', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(afterEverySitting);
+    for (const [focusSlug, label] of [
+      ['melbourne', 'Melbourne'],
+      [undefined, 'National stops'],
+    ] as const) {
+      const markup = renderToStaticMarkup(<CcwRoadshowContent focusSlug={focusSlug} />);
+      expect(markup).toContain(`[stat Dates TBA | ${label}]`);
+      expect(markup).toContain('[stat TBA | Entry]');
+      expect(markup).toContain('[stat TBA | Times]');
+      expect(markup).toContain('[stat TBA | Room size]');
+      expect(markup).not.toMatch(/\[stat \d+ \| Room size\]/);
+      expect(markup).not.toMatch(/\[stat [^\]]*\| [^\]]*(am|pm)[^\]]*\]/);
+    }
+  });
+
+  it('keeps the real times and room size in the stats strip before the sitting ends', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-07-01T00:00:00Z'));
+    const markup = renderToStaticMarkup(<CcwRoadshowContent focusSlug="melbourne" />);
+    expect(markup).toContain('[stat 2 days | 8.30am-4.30pm both days]');
+    expect(markup).toContain('[stat 20 | Room size]');
   });
 
   it('still shows the July dates and the free-entry form before the sitting ends', () => {

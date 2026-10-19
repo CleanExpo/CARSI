@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import { ContactForm, type ContactLeadContext } from '@/components/contact/ContactForm';
+import { resolveCcwInterestPageUrl } from '@/lib/marketing/ccw-roadshow';
 
 type ContactPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -31,6 +32,16 @@ function buildLeadContext(params: Awaited<ContactPageProps['searchParams']>): Co
       pageUrl: '/industries/facility-management',
       initialMessage:
         'Hi CARSI, I would like to start team seats for crews who work hospital, aged-care or hotel sites. Please use the published team prices on the pricing page.',
+    };
+  }
+
+  if (source === 'ccw-roadshow') {
+    const city = cleanParam(firstParam(params.city), 24);
+    return {
+      source,
+      topic,
+      pageUrl: resolveCcwInterestPageUrl(city),
+      initialMessage: `Hi CARSI, please let me know when ${topic ?? 'the next CARSI x CCW training dates'} are confirmed.`,
     };
   }
 
@@ -113,7 +124,9 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
                     ? 'Directory enquiry'
                     : leadContext.source === 'facility-management'
                       ? 'Team seats enquiry'
-                      : 'Start Smart enquiry'}
+                      : leadContext.source === 'ccw-roadshow'
+                        ? 'CCW training enquiry'
+                        : 'Start Smart enquiry'}
                 </p>
                 <h2 className="mt-2 text-sm font-semibold text-slate-950">
                   Routed to the right conversation
@@ -123,7 +136,9 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
                     ? 'This enquiry is tagged for the professional directory launch list.'
                     : leadContext.source === 'facility-management'
                       ? 'This enquiry is tagged for team seats on hospital, aged-care or hotel contracts.'
-                      : 'This enquiry includes the source, topic and pathway so CARSI can quickly see what guidance you need.'}
+                      : leadContext.source === 'ccw-roadshow'
+                        ? 'This enquiry is tagged for the next CARSI x CCW training dates.'
+                        : 'This enquiry includes the source, topic and pathway so CARSI can quickly see what guidance you need.'}
                 </p>
               </div>
             ) : null}
