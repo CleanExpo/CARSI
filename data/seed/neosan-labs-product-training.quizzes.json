@@ -1,159 +1,275 @@
 {
-  "version": 1,
+  "version": 2,
   "status": "DRAFT — NOT SEEDED — founder sign-off required before seeding",
   "courseSlug": "neosan-labs-product-training",
-  "note": "Knowledge check for the r14 NeoSan Labs rewrite. Every option for a question has the same number of words; enforced by src/lib/seo/neosan-claims.test.ts. Each question maps to the lesson unit that teaches it.",
+  "note": "Knowledge check for the expanded NeoSan Labs course. Every option for a question has the same number of words, correct positions are balanced and irregular, and each question has an explanation; enforced by src/lib/seo/neosan-claims.test.ts. Each question maps to the lesson unit that teaches it.",
   "quizzes": [
     {
-      "quizId": "67924db9-ef96-5c11-aac9-6243956c8386",
+      "quizId": "ed238a9b-38ad-5c22-9811-b4f5428e13ac",
       "lessonTitle": "Knowledge check",
       "title": "NeoSan Labs Product Training — Knowledge Check",
       "passPercentage": 80,
       "attemptsAllowed": 3,
       "questions": [
         {
-          "questionText": "According to the CCW listings, how long does mixed NeoSan Labs Part A and Part B stay usable?",
+          "questionText": "What kind of registration is the US EPA number on the NeoSan Labs listings?",
+          "options": [
+            "An Australian ARTG listing number",
+            "A Safe Work Australia code",
+            "A United States registration only",
+            "An AICIS industrial chemical permit"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "unit": "1.2",
+          "explanation": "Lesson 1.2: CCW states that US EPA Reg. No. 93672 is a United States registration and not an Australian listing."
+        },
+        {
+          "questionText": "How does CCW describe what it sells 02 Air Detox for in Australia?",
+          "options": [
+            "As an odour treatment only",
+            "As a listed air sanitiser",
+            "As a carpet extraction cleaner",
+            "As a mould removal product"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "unit": "4.2",
+          "explanation": "Lesson 4.2: CCW states that it sells 02 as an odour treatment only, because it is not on the ARTG."
+        },
+        {
+          "questionText": "What does Part A of each NeoSan Labs product contain?",
+          "options": [
+            "Dilute hydrogen peroxide solution",
+            "An alkaline degreasing agent",
+            "A solvent based spotter",
+            "A quaternary ammonium compound"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "unit": "2.2",
+          "explanation": "Lesson 2.2: the SDS names the Part A substance as a quaternary ammonium compound, CAS 68424-85-1."
+        },
+        {
+          "questionText": "Which CAS number does the SDS give for the Part B substance?",
+          "options": [
+            "68424-85-1",
+            "7722-84-1",
+            "7647-14-5",
+            "64-17-5"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "unit": "2.3",
+          "explanation": "Lesson 2.3: the SDS names Part B as hydrogen peroxide, CAS 7722-84-1."
+        },
+        {
+          "questionText": "How long does CCW say a mixed batch stays usable?",
           "options": [
             "12 hours after mixing",
             "24 hours after mixing",
-            "48 hours after mixing",
-            "72 hours after mixing"
+            "Seven days after mixing",
+            "Until the container empties"
           ],
           "correctIndex": 0,
           "points": 1,
-          "unit": "3.2"
+          "unit": "2.4",
+          "explanation": "Lesson 2.4: after a 10-minute rest, the mixed solution stays usable for 12 hours, so mix only what you will use."
         },
         {
-          "questionText": "What application rate does CCW give for fogging or spraying NeoSan Labs 01?",
+          "questionText": "What does Queensland Health recommend for rooms used by patients with an MRO?",
           "options": [
-            "20 ml per square metre",
-            "6.8 ml per square metre",
-            "68 ml per square metre",
-            "0.68 ml per square metre"
-          ],
-          "correctIndex": 1,
-          "points": 1,
-          "unit": "3.2"
-        },
-        {
-          "questionText": "How much Part A and Part B do you mix for a 27 m² office at that rate?",
-          "options": [
-            "184 ml of each part",
-            "27 ml of each part",
-            "92 ml of each part",
-            "46 ml of each part"
+            "Any fragrance-free odour treatment product",
+            "Products with US EPA registration",
+            "ARTG-entered products with MRO claims",
+            "Whatever the contractor normally uses"
           ],
           "correctIndex": 2,
           "points": 1,
-          "unit": "3.2"
+          "unit": "7.1",
+          "explanation": "Lesson 7.1: Queensland Health recommends products with specific MRO claims that are entered on the ARTG."
         },
         {
-          "questionText": "How does CCW give the regular-cleaning dilution for NeoSan Labs 03 Carpet?",
+          "questionText": "What date of document appears on each NeoSan Labs SDS?",
           "options": [
-            "1:4 with water after mixing",
-            "1:20 with water after mixing",
-            "Undiluted for every regular clean",
-            "1:9 with water after mixing"
+            "October 2026",
+            "March 2021",
+            "June 2019",
+            "January 2024"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "unit": "3.1",
+          "explanation": "Lesson 3.1: each SDS is dated March 2021 and headed 2021/USA, so record that date in your register."
+        },
+        {
+          "questionText": "For how long does the 01 SDS say to flush an eye?",
+          "options": [
+            "2 to 5 minutes",
+            "30 to 45 minutes",
+            "Under one full minute",
+            "15 to 20 minutes"
           ],
           "correctIndex": 3,
           "points": 1,
-          "unit": "3.3"
+          "unit": "3.2",
+          "explanation": "Lesson 3.2: section 4 of the SDS says to flush with running water for between 15 and 20 minutes."
         },
         {
-          "questionText": "Which SDS section gives the PPE and the respirator condition?",
+          "questionText": "How many times does the 01 SDS say to rinse an empty container?",
           "options": [
-            "Section 8, exposure controls",
-            "Section 2, hazard identification",
-            "Section 14, transport information",
-            "Section 16, other information"
+            "Three times",
+            "Once only",
+            "Twice only",
+            "Five times"
           ],
           "correctIndex": 0,
           "points": 1,
-          "unit": "2.2"
+          "unit": "3.3",
+          "explanation": "Lesson 3.3: section 13 describes a triple rinse, each with the container a quarter full of water."
         },
         {
-          "questionText": "Under the 02 SDS, when do you add an approved full-face air-purifying respirator?",
+          "questionText": "What dilution do the 03 directions give for regular cleaning?",
           "options": [
-            "Never, since gloves give full protection",
-            "If ventilation cannot stop aerosol build-up",
-            "Whenever the client asks for one",
-            "For any job over sixty minutes"
-          ],
-          "correctIndex": 1,
-          "points": 1,
-          "unit": "2.2"
-        },
-        {
-          "questionText": "Which control does Safe Work Australia rank as the best?",
-          "options": [
-            "Posting warning signs everywhere",
-            "Training workers in procedures",
-            "Eliminating the risk altogether",
-            "Wearing a full-face respirator"
-          ],
-          "correctIndex": 2,
-          "points": 1,
-          "unit": "5.1"
-        },
-        {
-          "questionText": "How can you describe NeoSan Labs 02 to an Australian client?",
-          "options": [
-            "As a registered hospital disinfectant",
-            "As an approved surface sanitiser",
-            "As a germ-killing room fog",
-            "As an odour treatment only"
+            "1:32 with water",
+            "1:2 with water",
+            "Full strength only",
+            "1:9 with water"
           ],
           "correctIndex": 3,
           "points": 1,
-          "unit": "1.2"
+          "unit": "4.3",
+          "explanation": "Lesson 4.3: mix A and B in equal parts, then dilute the mix 1:9 with water, or use it full strength on stains."
         },
         {
-          "questionText": "What does the 01 SDS say about waste and drains?",
+          "questionText": "What minimum dwell do the 03 directions give before extraction?",
           "options": [
-            "Do not discharge into drains",
-            "Flush small amounts down drains",
-            "Dilute first, then use drains",
-            "Drains are fine after treatment"
+            "At least 20 minutes",
+            "At least 1 hour",
+            "At least 2 minutes",
+            "No dwell is needed"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "unit": "4.3",
+          "explanation": "Lesson 4.3: pre-spray, allow at least 2 minutes, then rinse with warm water using an extractor."
+        },
+        {
+          "questionText": "In Australia, what clears a meth-affected property for use?",
+          "options": [
+            "One 04 fogging treatment",
+            "Testing to state guidelines",
+            "A supplier sales receipt",
+            "The manufacturer cleaning procedure"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "unit": "4.4",
+          "explanation": "Lesson 4.4: CCW states that the property is cleared by post-remediation testing, which the chemistry cannot replace."
+        },
+        {
+          "questionText": "A 25 m² room is dosed at 6.8 ml per square metre. How much mixed product is that?",
+          "options": [
+            "340 ml",
+            "85 ml",
+            "680 ml",
+            "170 ml"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "unit": "5.1",
+          "explanation": "Lesson 5.1: 25 × 6.8 = 170 ml of mixed product, which is 85 ml of Part A and 85 ml of Part B."
+        },
+        {
+          "questionText": "How much mixed 03 goes into an 11 L sprayer at 1:9?",
+          "options": [
+            "1.1 L",
+            "0.33 L",
+            "2.2 L",
+            "5.5 L"
           ],
           "correctIndex": 0,
           "points": 1,
-          "unit": "5.2"
+          "unit": "5.2",
+          "explanation": "Lesson 5.2: at 1:9 the mixed 03 is one tenth of the finished volume, so 11 L needs 1.1 L."
         },
         {
-          "questionText": "The SDS lists a US poison centre number. What do you do?",
+          "questionText": "Which equipment does CCW say 02 Air Detox needs?",
           "options": [
-            "Leave the job sheet exactly unchanged",
-            "Write the Australian Poisons Information number",
-            "Use the printed US number instead",
-            "Ring NeoSan Labs head office instead"
+            "A standard 12 L pump-up sprayer",
+            "A cold fogger or ULV unit",
+            "A truck mounted hot water extractor",
+            "A compressed air foam system only"
           ],
           "correctIndex": 1,
           "points": 1,
-          "unit": "2.1"
+          "unit": "6.1",
+          "explanation": "Lesson 6.1: CCW states that a pump-up sprayer will not give the fine, even mist that 02 is designed for."
         },
         {
-          "questionText": "What does CCW say to do first on a mould job with 04?",
+          "questionText": "Below about how many microns does CCW say a fog behaves like a gas?",
           "options": [
-            "Spray 04 straight onto growth",
-            "Keep the room sealed overnight",
-            "Remove the growth physically first",
-            "Treat the growth with fogging"
+            "About 50 microns",
+            "About 100 microns",
+            "About 20 microns",
+            "About 5 microns"
           ],
           "correctIndex": 2,
           "points": 1,
-          "unit": "3.1"
+          "unit": "6.2",
+          "explanation": "Lesson 6.2: below about 20 microns the fog follows air movement, and above about 50 microns it wets what it lands on."
         },
         {
-          "questionText": "Who must stay out of the room while 02 is fogged?",
+          "questionText": "Your fogger puts out 35 ml per minute. How long does a 136 ml dose take?",
           "options": [
-            "Only the pets",
-            "Only young children",
-            "Nobody at all",
-            "People and animals"
+            "About 3.9 minutes",
+            "About 1.4 minutes",
+            "About 6.8 minutes",
+            "About 9.5 minutes"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "unit": "6.3",
+          "explanation": "Lesson 6.3: divide the dose by the output, so 136 ÷ 35 = 3.9 minutes."
+        },
+        {
+          "questionText": "What does an ATP test measure, according to the national IPC guidelines?",
+          "options": [
+            "Which specific organism is present",
+            "Organic residue on a surface",
+            "How long the product dwelled",
+            "The surface moisture content level"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "unit": "7.4",
+          "explanation": "Lesson 7.4: ATP testing measures organic residue, gives rapid results, and cannot identify the source of the ATP."
+        },
+        {
+          "questionText": "In the hierarchy of controls, where does PPE sit?",
+          "options": [
+            "First, before any other",
+            "Somewhere in the middle",
+            "It replaces the others",
+            "Last, after other controls"
           ],
           "correctIndex": 3,
           "points": 1,
-          "unit": "4.1"
+          "unit": "8.2",
+          "explanation": "Lesson 8.2: work down the hierarchy from removing the hazard, with PPE as the last line of protection."
+        },
+        {
+          "questionText": "What does business.gov.au say an accepted quote becomes?",
+          "options": [
+            "A non-binding price estimate",
+            "A tax invoice document",
+            "A legally binding contract",
+            "An insurance certificate only"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "unit": "9.1",
+          "explanation": "Lesson 9.1: an accepted quote becomes a legally binding contract, so describe the work accurately."
         }
       ]
     }

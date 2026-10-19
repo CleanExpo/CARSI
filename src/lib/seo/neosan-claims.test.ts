@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 /**
- * NeoSan Labs course claim guard (review r14, 19/10/2026).
+ * NeoSan Labs course claim guard (review r14, extended for the course expansion, 19/10/2026).
  *
  * Fail-closed. Every clause of every lesson block must be one of:
  *   - cited: ends with "(source: <verified URL>, checked dd/mm/yyyy)", names the
@@ -46,7 +46,7 @@ interface QuizFile {
   courseSlug: string;
   quizzes: {
     title: string;
-    questions: { questionText: string; options: string[]; correctIndex: number }[];
+    questions: { questionText: string; options: string[]; correctIndex: number; explanation?: string }[];
   }[];
 }
 
@@ -65,7 +65,22 @@ const quizFile = JSON.parse(
 const CCW = 'https://ccwonline.com.au/products/';
 const CDN = 'https://cdn.shopify.com/s/files/1/2179/6391/files/';
 const SWA = 'https://www.safeworkaustralia.gov.au';
-type Publisher = 'CCW' | 'SDS' | 'SWA' | 'WSNZ' | 'TGA';
+type Publisher =
+  | 'CCW'
+  | 'SDS'
+  | 'SWA'
+  | 'WSNZ'
+  | 'TGA'
+  | 'NEOSAN'
+  | 'IPC'
+  | 'AGED'
+  | 'NSWH'
+  | 'QLDH'
+  | 'AICIS'
+  | 'PUBCHEM'
+  | 'NTC'
+  | 'BGA'
+  | 'PIC';
 /** URLs opened and checked against the cited facts on 19/10/2026. Nothing else may be cited or linked. */
 const VERIFIED: Record<string, { publisher: Publisher; product?: string }> = {
   [`${CCW}neosan-labs-01-disinfectant-2-x-a-b`]: { publisher: 'CCW', product: '01' },
@@ -101,6 +116,25 @@ const VERIFIED: Record<string, { publisher: Publisher; product?: string }> = {
   'https://www.tga.gov.au/resources/artg': { publisher: 'TGA' },
   'https://ccwonline.com.au/blogs/news/chemical-dilution-ratio-calculator': { publisher: 'CCW' },
   'https://ccwonline.com.au/blogs/news/hydroforce-sprayer-dilutions-made-easy': { publisher: 'CCW' },
+  // Course expansion sources, opened and checked 19/10/2026.
+  'https://www.safeworkaustralia.gov.au/system/files/documents/1902/managing-risks-of-storing-chemicals-in-the-workplace_0.pdf': { publisher: 'SWA' },
+  'https://www.tga.gov.au/resources/resource/guidance/regulation-cleaners-and-disinfectants-information-sponsors-and-manufacturers': { publisher: 'TGA' },
+  'https://ccwonline.com.au/products/air-care-max-ulv-fogger-230v-50hz': { publisher: 'CCW' },
+  'https://ccwonline.com.au/products/b-g-flex-a-lite-2600-ulv-fogger-230volt': { publisher: 'CCW' },
+  'https://ccwonline.com.au/products/budget-commercial-sprayer-12ltr': { publisher: 'CCW' },
+  'https://ccwonline.com.au/products/tcbs-the-countries-best-sprayer-12-ltr': { publisher: 'CCW' },
+  'https://neosanlabs.com/about/': { publisher: 'NEOSAN' },
+  'https://www.safetyandquality.gov.au/sites/default/files/2026-05/australian-guidelines-for-the-prevention-and-control-of-infection-in-healthcare.pdf': { publisher: 'IPC' },
+  'https://www.safetyandquality.gov.au/sites/default/files/2024-08/the_aged_care_ipc_guide_-_chapter_6.pdf': { publisher: 'AGED' },
+  'https://www1.health.nsw.gov.au/pds/ActivePDSDocuments/PD2023_018.pdf': { publisher: 'NSWH' },
+  'https://www.health.qld.gov.au/publications/clinical-practice/guidelines-procedures/diseases-infection/governance/multi-resistant-organisms.pdf': { publisher: 'QLDH' },
+  'https://www.industrialchemicals.gov.au/sites/default/files/Cationic%20surfactants_Human%20health%20tier%20II%20assessment.pdf': { publisher: 'AICIS' },
+  'https://www.industrialchemicals.gov.au/sites/default/files/2022-06/EVA00071%20-%20Evaluation%20Statement%20-%2030%20June%202022.pdf': { publisher: 'AICIS' },
+  'https://pubchem.ncbi.nlm.nih.gov/compound/784': { publisher: 'PUBCHEM' },
+  'https://pubchem.ncbi.nlm.nih.gov/compound/3014024': { publisher: 'PUBCHEM' },
+  'https://www.ntc.gov.au/codes-and-guidelines/australian-dangerous-goods-code': { publisher: 'NTC' },
+  'https://business.gov.au/people/contractors/prepare-quotes': { publisher: 'BGA' },
+  'https://www.poisonsinfo.nsw.gov.au/about': { publisher: 'PIC' },
 };
 const ATTRIBUTION: Record<Publisher, RegExp> = {
   CCW: /\bCCW\b|\bthe (?:0[1-4] )?(?:directions|listing)\b|\bNeoSan Labs (?:states?|position)\b/i,
@@ -108,6 +142,16 @@ const ATTRIBUTION: Record<Publisher, RegExp> = {
   SWA: /\bSafe Work Australia\b/,
   WSNZ: /\bWorkSafe\b/,
   TGA: /\bTGA\b|\bARTG\b/,
+  NEOSAN: /\bNeoSan Labs\b/,
+  IPC: /\bnational IPC guidelines\b|\bNHMRC\b/,
+  AGED: /\bAged Care IPC Guide\b/,
+  NSWH: /\bNSW Health\b/,
+  QLDH: /\bQueensland Health\b/,
+  AICIS: /\bAICIS\b/,
+  PUBCHEM: /\bPubChem\b/,
+  NTC: /\bNTC\b|\bADG Code\b/,
+  BGA: /\bbusiness\.gov\.au\b/,
+  PIC: /\bPoisons Information Centre\b/,
 };
 
 const CLAIM_PATTERN = new RegExp(
@@ -198,13 +242,16 @@ const SELF_ATTEST = /compliance pass|\bcompliant\b|passed (?:independent )?revie
 
 const IMPERATIVE = new Set(
   (
-    'add allow always answer apply ask attach avoid book bring brief calculate call carry check choose clean ' +
+    'add allow always answer apply ask attach avoid bag block book bring brief calculate call carry check choose clean ' +
     'clear close collect combine compare confirm consult contain copy cover decide describe dilute do dispose ' +
     "don't drain empty enter extract file fill find fit flush fog follow give go identify inspect keep label " +
-    'leave let list lock look make mark match measure mix move never note notify open photograph pick plan ' +
+    'leave let list lock look make mark match measure mix move never note notify open photograph pick pack pass plan ' +
     'plug post pour practise pre-spray print put quote read recall record release remove repeat replace review rewrite ' +
     'rinse ring run say search seal set show shut sign spray start stop store switch take tell test time treat ' +
-    'triple try turn use ventilate wait wear wipe write'
+    'triple try turn use ventilate wait wear wipe write ' +
+    // course expansion
+    'agree attribute convert count divide get handle invoice multiply name prepare price report round schedule scope ' +
+    'adjust calibrate change complete consider dry estimate fit-check include load lay offer point recommend refer secure send soak state talk unload visit update walk warn weigh work'
   ).split(' '),
 );
 const CONDITIONAL_LEAD = /^(?:if|when|before|after|once|until|while|unless|on|for|in)\b[^,]*,\s*(\S+)/i;
@@ -397,6 +444,55 @@ function evaluateCourse(c: Course): Finding[] {
   return out;
 }
 
+/** Shortest period p (2 <= p <= n/2) with which answer positions repeat; 0 when none (as in
+ * scripts/check-quiz-option-balance.mjs on feat/building-science-full-course). */
+function answerCycle(positions: number[]): number {
+  for (let p = 2; p <= Math.floor(positions.length / 2); p++) {
+    if (positions.every((v, i) => i < p || v === positions[i - p])) return p;
+  }
+  return 0;
+}
+
+/** Teaching words: tags and "(… source: …)" citations stripped; punctuation-only tokens are not words. */
+function teachingWords(html: string): number {
+  return html
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\([^()]*?source: [^)]*\)/g, ' ')
+    .split(/\s+/)
+    .filter((w) => /[\p{L}\p{N}]/u.test(w)).length;
+}
+
+const TEACH_PARTS = ['Worked example', 'Try it', 'Recall from earlier', 'Takeaway'];
+
+/** Course-expansion teach layout: 8+ modules, each ending in a cheat sheet; 30+ teaching lessons of
+ * 700-1,100 teaching words with the full layout; exactly one primary source per lesson. */
+function shapeFindings(
+  modules: { title: string; lessons: { title: string; contentBody?: string | null }[] }[],
+): string[] {
+  const out: string[] = [];
+  if (modules.length < 8) out.push('fewer than 8 modules');
+  let teaching = 0;
+  for (const m of modules) {
+    const last = m.lessons[m.lessons.length - 1];
+    if (!/cheat sheet/i.test(last?.title ?? '')) out.push(`${m.title}: last lesson is not a cheat sheet`);
+    for (const l of m.lessons) {
+      const body = l.contentBody ?? '';
+      if (!body.includes('<h2>Your win</h2>')) out.push(`${l.title}: no Your win`);
+      if (body.split('<h2>Primary source</h2>').length - 1 !== 1) out.push(`${l.title}: not exactly one Primary source`);
+      if (/cheat sheet/i.test(l.title)) {
+        if (!body.includes('<h2>Cheat sheet</h2>')) out.push(`${l.title}: no Cheat sheet`);
+        continue;
+      }
+      teaching += 1;
+      for (const part of TEACH_PARTS) if (!body.includes(`<h2>${part}</h2>`)) out.push(`${l.title}: no ${part}`);
+      const words = teachingWords(body);
+      if (words < 700 || words > 1100) out.push(`${l.title}: ${words} teaching words`);
+    }
+  }
+  if (teaching < 30) out.push(`${teaching} teaching lessons, fewer than 30`);
+  return out;
+}
+
 function evaluateQuiz(q: QuizFile): Finding[] {
   const out: Finding[] = [];
   for (const quiz of q.quizzes) {
@@ -415,6 +511,18 @@ function evaluateQuiz(q: QuizFile): Finding[] {
       if (question.options.some((o) => /[*_<>]/.test(o))) {
         out.push({ where, reason: 'formatting in an option', text: '' });
       }
+      if (!question.explanation?.trim()) out.push({ where, reason: 'missing explanation', text: '' });
+      else out.push(...evaluateText(question.explanation, `${where} :: explanation`, { claimsOnly: true }));
+    }
+    const positions = quiz.questions.map((x) => x.correctIndex);
+    const width = Math.max(...quiz.questions.map((x) => x.options.length));
+    const counts = Array.from({ length: width }, (_, i) => positions.filter((v) => v === i).length);
+    if (positions.length >= 4 && Math.max(...counts) - Math.min(...counts) > 1) {
+      out.push({ where: 'quiz', reason: `correct positions unbalanced ${counts}`, text: '' });
+    }
+    const cycle = answerCycle(positions);
+    if (positions.length >= 4 && (new Set(positions).size === 1 || cycle)) {
+      out.push({ where: 'quiz', reason: `correct positions repeat in a cycle of ${cycle || 1}`, text: '' });
     }
     if (JSON.stringify(quiz).match(IICRC_CEC)) out.push({ where: 'quiz', reason: 'IICRC/CEC framing', text: '' });
   }
@@ -424,32 +532,54 @@ function evaluateQuiz(q: QuizFile): Finding[] {
 const reasons = (f: Finding[]) => f.map((x) => x.reason);
 const ok = (html: string, title = 'Some lesson') => evaluateHtml(html, `${title} :: body`);
 
-describe('NeoSan Labs course claim guard (review r14)', () => {
+describe('NeoSan Labs course claim guard (review r14, course expansion)', () => {
   it('the course and its quiz file exist', () => {
     expect(course).toBeDefined();
     expect(quizFile.courseSlug).toBe(SLUG);
-    expect(quizFile.quizzes[0].questions.length).toBeGreaterThanOrEqual(10);
+    expect(quizFile.quizzes[0].questions.length).toBeGreaterThanOrEqual(20);
   });
 
   it('the live course passes: every clause cited, instructional, a question, framing or labelled', () => {
     expect(evaluateCourse(course!)).toEqual([]);
   });
 
-  it('the live quiz passes: no claims in correct answers, equal-length options', () => {
+  it('the live quiz passes: no claims in correct answers or explanations, equal options, irregular positions', () => {
     expect(evaluateQuiz(quizFile)).toEqual([]);
   });
 
-  it('teach-method shape: short lessons, a win, a primary source, practice, and a cheat sheet per module', () => {
-    for (const m of course!.modules) {
-      expect(m.lessons.some((l) => /cheat sheet/i.test(l.title)), m.title).toBe(true);
-      for (const l of m.lessons) {
-        const body = l.contentBody ?? '';
-        expect(body, l.title).toContain('<h2>Your win</h2>');
-        expect(body, l.title).toContain('<h2>Primary source</h2>');
-        expect(body, l.title).toMatch(/<h2>(?:Practice|Recall from earlier)<\/h2>/);
-        expect(body.replace(/<[^>]+>/g, ' ').split(/\s+/).length, l.title).toBeLessThan(900);
-      }
-    }
+  it('teach-method shape: 8+ modules, 30+ teaching lessons of 700-1,100 words, the full lesson layout', () => {
+    expect(shapeFindings(course!.modules)).toEqual([]);
+  });
+
+  it('planted controls (shape): short, long, incomplete and missing lessons are each caught', () => {
+    // `words` is the total teaching-word count, headings included.
+    const teach = (title: string, words: number, parts = TEACH_PARTS) => {
+      const heads = ['Your win', 'Primary source', ...parts].map((x) => `<h2>${x}</h2>`).join('');
+      return { title, contentBody: heads + `<p>${'word '.repeat(words - teachingWords(heads))}</p>` };
+    };
+    const sheet = { title: 'Module cheat sheet', contentBody: '<h2>Your win</h2><h2>Cheat sheet</h2><h2>Primary source</h2>' };
+    const four = () => [teach('A', 700), teach('B', 700), teach('C', 700), teach('D', 700), sheet];
+    const good = Array.from({ length: 8 }, (_, i) => ({ title: `M${i}`, lessons: four() }));
+    expect(shapeFindings(good)).toEqual([]);
+    expect(shapeFindings(good.slice(0, 7))).toContain('fewer than 8 modules');
+    const swap = (lesson: { title: string; contentBody: string }) => [
+      { ...good[0], lessons: [lesson, ...good[0].lessons.slice(1)] },
+      ...good.slice(1),
+    ];
+    expect(shapeFindings(swap(teach('Short', 699)))).toContain('Short: 699 teaching words');
+    expect(shapeFindings(swap(teach('Long', 1101)))).toContain('Long: 1101 teaching words');
+    expect(shapeFindings(swap(teach('Gap', 800, ['Worked example', 'Try it', 'Takeaway'])))).toContain(
+      'Gap: no Recall from earlier',
+    );
+    expect(shapeFindings([{ title: 'M', lessons: [teach('A', 700)] }, ...good.slice(1)])).toContain(
+      'M: last lesson is not a cheat sheet',
+    );
+    const thin = good.map((m) => ({ ...m, lessons: [teach('A', 700), teach('B', 700), teach('C', 700), sheet] }));
+    expect(shapeFindings(thin)).toContain('24 teaching lessons, fewer than 30');
+  });
+
+  it('planted control: the word counter ignores citations and markup', () => {
+    expect(teachingWords('<p>Mix it (source: https://x.example, checked 19/10/2026).</p>')).toBe(2);
   });
 
   it('planted controls: every r2-r9 banned pattern is still flagged as a claim', () => {
@@ -608,7 +738,27 @@ describe('NeoSan Labs course claim guard (review r14)', () => {
       .toContain('option lengths differ too much 5,17');
     expect(reasons(evaluateQuiz(quiz(['It kills germs', 'It cleans carpet']))))
       .toContain('claim without a valid claim-level citation');
-    expect(evaluateQuiz(quiz(['It cleans carpet', 'It kills germs']))).toEqual([]);
+    expect(reasons(evaluateQuiz(quiz(['It cleans carpet', 'It kills germs'])))).toEqual(['missing explanation']);
+  });
+
+  it('planted controls (teach rule): explanations are scanned and answer positions must be balanced and irregular', () => {
+    const q = (correctIndex: number, explanation = 'Lesson 4.1 gives the rate.') => ({
+      questionText: 'Which one?',
+      options: ['Alpha one', 'Bravo two', 'Charlie three', 'Delta four'],
+      correctIndex,
+      explanation,
+    });
+    const file = (questions: ReturnType<typeof q>[]): QuizFile => ({ courseSlug: SLUG, quizzes: [{ title: 'Q', questions }] });
+    const irregular = [2, 0, 3, 0, 1, 3, 2, 1, 0, 2, 3, 1].map((i) => q(i));
+    expect(evaluateQuiz(file(irregular))).toEqual([]);
+    expect(reasons(evaluateQuiz(file([0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3].map((i) => q(i))))))
+      .toContain('correct positions repeat in a cycle of 4');
+    expect(reasons(evaluateQuiz(file([0, 0, 0, 0, 0, 0].map((i) => q(i))))))
+      .toContain('correct positions unbalanced 6,0,0,0');
+    expect(reasons(evaluateQuiz(file([2, 0, 3, 1, 2, 0, 3, 1].map((i) => q(i))))))
+      .toContain('correct positions repeat in a cycle of 4');
+    expect(reasons(evaluateQuiz(file([q(0, 'It kills germs.'), ...irregular.slice(1)]))))
+      .toContain('claim without a valid claim-level citation');
   });
 
   it('does not read as the product being Australian-made (review r4)', () => {
