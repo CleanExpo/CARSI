@@ -100,6 +100,8 @@ for (const [form, planted] of [
   ['CCW split by a zero-width space', 'Ask C\u200bCW about the unit.'],
   ['CCW split by markup', 'Ask C<span>C</span>W about the unit.'],
   ['CCW in fullwidth letters', 'Ask \uff23\uff23\uff37 about the unit.'],
+  ['CCW as percent-encoded UTF-8 fullwidth letters', 'Ask %EF%BC%A3%EF%BC%A3%EF%BC%B7 about the unit.'],
+  ['CCW mixing a percent-encoded fullwidth letter and plain letters', 'Ask %EF%BC%A3CW about the unit.'],
 ]) {
   test(`flags ${form} planted into an approved course lesson`, () => {
     const inputs = clone();
@@ -174,6 +176,7 @@ test('flags a CCW logo in a public course file for an approved slug', () => {
 test('does not flag plain words that merely contain the letters', () => {
   assert.deepEqual(brandHits('Clockwise accw, ccwide and the Thymox story', real.productNames), []);
   assert.deepEqual(brandHits('Section C. Clean water, a&b, 50&#37; and C W ratios', real.productNames), []);
+  assert.deepEqual(brandHits('Mix at 100% concentrate, 5%EF dilution, %E2%82 broken and 50%', real.productNames), []);
 });
 
 test('fails closed when the registry, products or an approved catalogue entry are missing', () => {
