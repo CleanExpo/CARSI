@@ -43,6 +43,8 @@ describe('research page claims', () => {
     const html = await renderWith(() => Promise.resolve(new Response(body, { status: 200 })));
     expect(html).toContain('Keeping drying records on residential jobs');
     expect(html).not.toMatch(/on their way/i);
+    // Article data backs neither a sourcing nor a practitioner-voice claim, even when articles exist.
+    expect(html).not.toMatch(UNBACKED);
   });
 
   it('keeps the static metadata free of claims the empty state cannot back', () => {

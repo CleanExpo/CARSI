@@ -177,8 +177,6 @@ export default async function ResearchPage({
           hasArticles
             ? [
                 { value: String(total), label: 'Articles' },
-                { value: 'AU', label: 'Sourced' },
-                { value: 'NRPG', label: 'Practitioner voice' },
                 { value: 'Free', label: 'To read' },
               ]
             : [{ value: '—', label: 'Articles' }]
