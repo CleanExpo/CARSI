@@ -49,7 +49,10 @@ const BANNED = new RegExp(
   'i',
 );
 
-const STAT_CLAIM = /\b\d+(\.\d+)?\s?%|\b\d+ in \d+\b/;
+// r1: percentages, "N in N" fractions, "N out of N", numeric multipliers and
+// verbal multipliers all state a quantitative fact and need a dated source.
+const STAT_CLAIM =
+  /\b\d+(\.\d+)?\s?%|\b\d+ in \d+\b|\b\d+\s+out of\s+\d+\b|\b\d+(\.\d+)?\s?(?:times|x)\s+(?:more|higher|greater|larger|faster|as)\b|\b(?:twice|three times)\s+as\s+(?:likely|many|much)\b|\b(?:double|triple|halve|half)\s+(?:the|your|their|as)\b/i;
 const SOURCED =
   /(allergy\.org\.au|nationalasthma\.org\.au|health\.gov\.au|aihw\.gov\.au|ato\.gov\.au|abr\.gov\.au|asic\.gov\.au|accc\.gov\.au|safeworkaustralia\.gov\.au|animalmedicinesaustralia\.org\.au|health\.govt\.nz|humanesociety\.org|source:\s*https?:\/\/|original (2020|case|course) (material|report))/i;
 const DATED = /checked\s+\d{1,2}\/\d{1,2}\/\d{4}|2020 course material|original case material/i;
@@ -110,6 +113,11 @@ describe('legacy course claim discipline (four recovered courses)', () => {
     const bad = [
       '<p>25% of all allergies are caused by dust mites.</p>',
       '<p>1 in 3 customers will buy the upsell.</p>',
+      '<p>3 out of 4 homes have dust mites.</p>',
+      '<p>Indoor air can be 2.3 times more polluted than outdoor air.</p>',
+      '<p>This method is 3x faster.</p>',
+      '<p>Sensitised children are twice as likely to develop asthma.</p>',
+      '<p>Double the coverage of a standard treatment.</p>',
     ];
     const good = [
       '<p>Around 1 in 4 Australians are affected by allergic rhinitis (ASCIA, ' +
@@ -123,7 +131,7 @@ describe('legacy course claim discipline (four recovered courses)', () => {
           !/\b(10:1|1:0\.\d+|parts water|mL|litre|sqm|micron|°C|&deg;C)/.test(b) &&
           !(SOURCED.test(b) && DATED.test(b)),
       );
-    expect(caught(bad)).toHaveLength(2);
+    expect(caught(bad)).toHaveLength(7);
     expect(caught(good)).toEqual([]);
   });
 });

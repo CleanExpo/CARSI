@@ -10,12 +10,12 @@
    "attemptsAllowed": 3,
    "questions": [
     {
-     "questionText": "What does an allergen-denaturing treatment actually do?",
+     "questionText": "Denaturing treatments are designed to alter allergen proteins. What must you check before relying on one?",
      "options": [
-      "Kills dust mites with pesticide",
-      "Changes the allergen protein structure so the immune system no longer recognises it",
-      "Seals allergens under a plastic coating",
-      "Removes all humidity from the home"
+      "Nothing — the product class works the same way regardless of brand",
+      "The manufacturer's independent test evidence (for example Der p 1 or Fel d 1 data) and the current label — never assume efficacy from marketing",
+      "Only the price per litre",
+      "Whether the supplier offers a discount for bulk purchase"
      ],
      "correctIndex": 1,
      "points": 1
@@ -43,12 +43,12 @@
      "points": 1
     },
     {
-     "questionText": "The residual allergen relief commonly stated by manufacturers of allergen-denaturing treatments is up to:",
+     "questionText": "If a manufacturer states a residual effect period for an allergen-denaturing treatment (for example \"up to six months\"), how should you treat that claim?",
      "options": [
-      "Two weeks",
-      "Six months",
-      "Five years",
-      "Permanent"
+      "Quote it to the customer as a guaranteed relief period",
+      "As the manufacturer's own claim — verify it on their current label and technical data, and never present it to customers as a guarantee",
+      "Ignore it — residual effects do not exist",
+      "Double it when quoting, to be safe"
      ],
      "correctIndex": 1,
      "points": 1
