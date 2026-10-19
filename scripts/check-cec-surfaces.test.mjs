@@ -86,9 +86,14 @@ const RECOGNITION_BLOCK = [
   ['upholstery code (UFT)', 'src/lib/server/leaderboard-xp.ts', "const label = 'UFT leaders';"],
   ['Master/Journeyman designation (JWR)', PAGE, "const t = 'JWR track';"],
   ['former code (BMT)', PAGE, "const t = 'BMT badge';"],
+  // Review r3 of ee2d5120: the acronym match was case-sensitive, so these passed.
+  ['mixed-case code (Wrt)', 'src/lib/gamification/badges.ts', "export const badge = 'Wrt certificate';"],
+  ['lower-case code (hst)', PAGE, 'const X = () => <p>hst badge</p>;'],
 ];
 const RECOGNITION_PASS = [
-  ['XP, level and a month name', PAGE, 'const X = () => <p>Oct 2026 · 250 XP · Level 2 · Apprentice</p>;'],
+  ['XP, level and a long month name', PAGE, 'const X = () => <p>October 2026 · 250 XP · Level 2 · Apprentice</p>;'],
+  // Word boundaries stay: a code inside an ordinary word is not a code.
+  ['code as a substring of ordinary words', PAGE, "const t = 'Science basics: a description of hosting, uncrtain octal';"],
   ['comment mentioning CEC', PAGE, '// CEC hours live on Credentials and the renewal cockpit\nconst n = 1;'],
   ['renewal summary route is the CEC surface', 'app/api/lms/gamification/me/renewal-summary/route.ts', 'export const r = { cec_hours: 8, total_cec_lifetime: 8 };'],
   ['CEC on a non-recognition surface', 'src/components/lms/RenewalCockpit.tsx', 'const X = () => <span>8 CEC</span>;'],

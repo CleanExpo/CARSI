@@ -70,10 +70,12 @@ const RECOGNITION_SURFACE = /leaderboard|gamification|achievement|learner-xp|lin
 const RECOGNITION_EXEMPT = ['app/api/lms/gamification/me/renewal-summary/route.ts'];
 const RECOGNITION_CEC_IDENT = /cec/i;
 const RECOGNITION_CEC_TEXT = /\bCECs?\b|continuing education/i;
-// Codes come only from the shared list (never a private copy). They match case-sensitively so a
-// month like "Oct" is not mistaken for a discipline code.
+// Codes come only from the shared list (never a private copy). Case-insensitive, so "Wrt" or
+// "hst" is caught (review r3 of ee2d5120); word boundaries keep "October" or "science" clean. A
+// bare "Oct" on a recognition surface is therefore blocked: write the month in full there.
 const RECOGNITION_DISCIPLINE_TEXT = new RegExp(
-  `[iI][iI][cC][rR][cC]_?[dD]iscipline|\\b(?:${iicrcCodes().join('|')})\\b`
+  `iicrc_?discipline|\\b(?:${iicrcCodes().join('|')})\\b`,
+  'i'
 );
 
 export function isRecognitionSurface(file) {
