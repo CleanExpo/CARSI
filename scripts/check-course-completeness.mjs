@@ -26,7 +26,7 @@
  */
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { isEntryPoint } from './lib/is-entry-point.mjs';
 
 const CATALOG = 'data/seed/courses-catalog.json';
 const DRAFTS_DIR = 'data/seed/assessment-drafts';
@@ -115,9 +115,9 @@ export function scoreCourse(course) {
 // CLI only. Importing this module for the self-test must not run the scan or exit the
 // process — without this, `import` prints the whole scorecard and calls process.exit(),
 // so a self-test can never observe scoreCourse at all.
-// pathToFileURL, never `file://` + the raw path — an unencoded space (or any character needing
-// percent-encoding) in the checkout path makes this false and silently disarms the check.
-const isCli = Boolean(process.argv[1]) && import.meta.url === pathToFileURL(process.argv[1]).href;
+// isEntryPoint compares real paths, so neither a space in the checkout path nor a symlinked
+// invocation can silently disarm the check (scripts/lib/is-entry-point.mjs).
+const isCli = isEntryPoint(import.meta.url);
 if (!isCli) {
   // Nothing below runs on import.
 } else {

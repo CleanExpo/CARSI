@@ -18,7 +18,8 @@
  */
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
+import { isEntryPoint } from './lib/is-entry-point.mjs';
 
 const VALID_STATUSES = ['approved', 'submitted', 'not_submitted'];
 
@@ -170,7 +171,7 @@ export function formatExpiryWarning({ slug, expiresAt, daysLeft }) {
 }
 
 // Run the validator only when invoked directly (not when imported by the self-test).
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (isEntryPoint(import.meta.url)) {
   const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
   const REGISTRY_PATH = join(ROOT, 'data', 'seed', 'cec-approvals.json');
   const CATALOG_PATH = join(ROOT, 'data', 'seed', 'courses-catalog.json');

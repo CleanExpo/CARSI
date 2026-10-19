@@ -1,5 +1,5 @@
 import { appendFileSync } from 'node:fs';
-import { pathToFileURL } from 'node:url';
+import { isEntryPoint } from './lib/is-entry-point.mjs';
 
 /** Report actual required-job outcomes; skipped or missing evidence is not a pass. */
 export function securityScanSummary(npmAudit, trivy) {
@@ -18,7 +18,7 @@ export function securityScanSummary(npmAudit, trivy) {
   return { markdown, exitCode: passed ? 0 : 1 };
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (isEntryPoint(import.meta.url)) {
   const summary = securityScanSummary(process.env.NPM_AUDIT_RESULT, process.env.TRIVY_RESULT);
   if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary.markdown);
   process.stdout.write(summary.markdown);

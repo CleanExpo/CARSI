@@ -13,7 +13,7 @@
  * Usage: node scripts/live-catalogue-ci-summary.mjs <audit.json> <exit-code>
  */
 import { readFileSync } from 'node:fs';
-import { pathToFileURL } from 'node:url';
+import { isEntryPoint } from './lib/is-entry-point.mjs';
 
 /**
  * Live courses known to be in breach, tracked in BACKLOG #31. Their course data is edited
@@ -278,9 +278,9 @@ function violationLines(course) {
   ];
 }
 
-// pathToFileURL, never `file://` + the raw path: an unencoded space makes the comparison
-// false and silently disables the script. That defect shipped in three guards in this repo.
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+// isEntryPoint compares real paths, so neither a space in the checkout path nor a symlinked
+// invocation can silently disarm the check (scripts/lib/is-entry-point.mjs).
+if (isEntryPoint(import.meta.url)) {
   const [file, exitCode] = process.argv.slice(2);
   let raw;
   try {

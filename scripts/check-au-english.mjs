@@ -19,7 +19,7 @@
  */
 import { readFileSync } from 'node:fs';
 import { execSync } from 'node:child_process';
-import { pathToFileURL } from 'node:url';
+import { isEntryPoint } from './lib/is-entry-point.mjs';
 
 // Course-content data files (AU-produced copy lives here).
 const COURSE_DATA = [
@@ -121,4 +121,4 @@ console.log('✓ Australian-English course-content guard passed.');
 process.exit(0);
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) main();
+if (isEntryPoint(import.meta.url)) main();

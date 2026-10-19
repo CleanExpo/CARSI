@@ -125,9 +125,9 @@ for (const code of IICRC_CODES) {
   const here = dirname(fileURLToPath(import.meta.url));
   const tmp = join(here, '..', 'node_modules', '.cache', `cec-surfaces-codes-probe-${process.pid}`);
   try {
-    mkdirSync(join(tmp, 'scripts'), { recursive: true });
+    mkdirSync(join(tmp, 'scripts', 'lib'), { recursive: true });
     mkdirSync(join(tmp, 'data'), { recursive: true });
-    for (const f of ['check-cec-surfaces.mjs', 'iicrc-codes.mjs']) {
+    for (const f of ['check-cec-surfaces.mjs', 'iicrc-codes.mjs', 'lib/is-entry-point.mjs']) {
       cpSync(join(here, f), join(tmp, 'scripts', f));
     }
     const data = JSON.parse(readFileSync(join(here, '..', 'data', 'iicrc-codes.json'), 'utf8'));

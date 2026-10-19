@@ -2,7 +2,7 @@
 
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { isEntryPoint } from './lib/is-entry-point.mjs';
 
 const DEFAULT_ORIGIN = 'https://carsi.com.au';
 const DEFAULT_ENDPOINT = 'https://api.indexnow.org/indexnow';
@@ -177,7 +177,7 @@ async function main() {
   console.log(`Submitted URLs: ${urlList.length}`);
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (isEntryPoint(import.meta.url)) {
   main().catch((error) => {
     console.error(error);
     process.exitCode = 1;

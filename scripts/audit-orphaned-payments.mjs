@@ -33,7 +33,7 @@
  * Exit 2 = could not audit. Exit 2 is NOT "nothing wrong" — a run that reached nothing must
  * never read as a clean bill of health, which is the failure mode this repo has shipped before.
  */
-import { pathToFileURL } from 'node:url';
+import { isEntryPoint } from './lib/is-entry-point.mjs';
 
 /** Sessions carrying this metadata source are booked through a different flow, not enrolments. */
 const NON_ENROLMENT_SOURCES = new Set(['carsi-ccw-roadshow', 'carsi-business-coaching']);
@@ -462,6 +462,6 @@ async function main() {
   process.exit(verdict.code);
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (isEntryPoint(import.meta.url)) {
   main();
 }
