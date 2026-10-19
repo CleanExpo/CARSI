@@ -17,6 +17,12 @@ import { scanFile, scanText } from './check-iicrc-terminology.mjs';
 const F = 'app/(public)/fixture/page.tsx';
 
 const MUST_BLOCK = [
+  // Punctuation between the acronym and the offering (review of d25ce440): colon, slash, comma.
+  ['acronym, colon, offering', 'WRT: training for plumbers'],
+  ['acronym, slash, offering', 'WRT/course pathway'],
+  ['acronym, comma, offering', 'ASD, training module'],
+  ['acronym, spaced slash, offering', 'Book the CCT / courses bundle'],
+  ['acronym, spaced colon, offering', 'FSRT : training for fire crews'],
   // Designation rule — the acronym branding a CARSI course.
   ['IICRC + discipline acronym', 'IICRC WRT training for Australian technicians'],
   ['acronym list form', 'IICRC AMRT, CRT, and WRT CEC courses for park teams'],
@@ -135,6 +141,10 @@ const MUST_BLOCK = [
 ];
 
 const MUST_PASS = [
+  // Punctuation forms that name no CARSI offering stay allowed.
+  ['month pair before training (October)', 'Sep/Oct training calendar for regional teams'],
+  ['certification fact after a colon', 'FSRT: an IICRC certification covering fire and smoke restoration.'],
+  ['code list in data, no offering noun', "certifications: ['WRT', 'ASD'],"],
   // The permitted provider-level phrasing — CARSI's actual standing.
   ['IICRC CEC course', 'Enrol in our IICRC CEC course'],
   ['IICRC CEC Accredited', 'CARSI is an IICRC CEC Accredited provider'],

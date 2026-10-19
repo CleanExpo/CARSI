@@ -143,14 +143,15 @@ const BANNED = [
     // CARSI designation rule), so an acronym directly naming a course, training, program,
     // pathway, module or class is branding. A third-person fact about the certification itself
     // ("FSRT is an IICRC certification covering…") names no training and stays allowed.
-    // Case-insensitive ("Wrt training", "wrt training"), across hyphen, en and em dashes, with a
+    // Case-insensitive ("Wrt training", "wrt training"), across hyphen, en and em dashes, colon,
+    // slash and comma ("WRT: training", "WRT/course", "ASD, training"; review of d25ce440), with a
     // possessive ("WRT's training"), and — via `crossLine` in scanFile — across a line break
     // inside a file (review 18/10/2026). OCT stays upper-case only: "Oct" is October, and
     // "Oct training day" is a date, so mixed/lower-case "oct" is neutralised first.
     // Out of scope here, by design: JSX text split across elements, string concatenation, HTML
     // entities and zero-width characters — the rendered-text scan on feat/designations-live
     // covers those, rather than more source regex.
-    re: /\b(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)(?:['’]s)?\b(?:\s*\([^)\n]{0,60}\))?[\s\-\u2013\u2014]+(?:courses?|training|program(?:me)?s?|pathways?|modules?|class(?:es)?)\b/i,
+    re: /\b(?:WRT|ASD|AMRT|FSRT|CCT|CRT|OCT|TCST)(?:['’]s)?\b(?:\s*\([^)\n]{0,60}\))?(?:\s*[:/,]\s*|[\s\-\u2013\u2014])+(?:courses?|training|program(?:me)?s?|pathways?|modules?|class(?:es)?)\b/i,
     allow: null,
     crossLine: true,
     // Public surfaces only (app/, src/, public/, data/): docs/ marketing and campaign plans are
