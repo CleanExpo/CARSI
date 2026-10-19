@@ -401,14 +401,14 @@ export function CourseTextThumbnail({
               ) : null}
             </div>
 
-            <h3
+            <p
               className={cn(
                 'mt-2 line-clamp-3 text-base leading-snug font-bold sm:text-lg',
                 hasBackdrop ? 'text-white' : 'text-slate-950'
               )}
             >
               {title}
-            </h3>
+            </p>
             {shortDescription?.trim() ? (
               <p
                 className={cn(

@@ -3,7 +3,12 @@ import Link from 'next/link';
 
 import { PricingTiers } from '@/components/pricing/PricingTiers';
 import { BreadcrumbSchema, FAQSchema } from '@/components/seo';
-import { PER_COURSE_PRICE_FALLBACK_LABEL, perCoursePriceLabel } from '@/lib/lms/pricing-tiers';
+import {
+  INDIVIDUAL_TIERS,
+  PER_COURSE_PRICE_FALLBACK_LABEL,
+  perCoursePriceLabel,
+} from '@/lib/lms/pricing-tiers';
+import { pricingFaqs } from '@/lib/seo/answer-engine';
 import { OG_IMAGES } from '@/lib/seo/og-image';
 import { getPublicCatalogueFacts } from '@/lib/server/public-catalogue-facts';
 import { subscriptionsEnabled, teamSubscriptionsEnabled } from '@/lib/server/subscriptions-flag';
@@ -49,27 +54,6 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-function buildFaqItems(live: boolean) {
-  return [
-    {
-      question: 'Do I have to buy anything to start?',
-      answer:
-        'No. Every learner gets the Free Library at no cost and no card required. When you are ready, buy any individual course outright — a yearly membership is an optional path for 100% access.',
-    },
-    {
-      question: "What's included in a yearly membership?",
-      answer: live
-        ? 'Yearly membership gives 100% access to all published CARSI courses for one learner for 12 months, plus the IICRC CEC tracking dashboard and certificate wallet.'
-        : 'Yearly membership is coming soon and is not available to purchase yet. When it launches, it will give 100% access to all published CARSI courses for one learner for 12 months, plus the IICRC CEC tracking dashboard and certificate wallet. Buy any course individually today.',
-    },
-    {
-      question: 'Do CARSI courses count toward IICRC CECs?',
-      answer:
-        "CARSI's catalogue includes IICRC CEC Accredited courses where stated. Your dashboard includes a CEC tracking dashboard that logs completed credits, broken down by restoration discipline.",
-    },
-  ];
-}
-
 const breadcrumbs = [
   { name: 'Home', url: 'https://carsi.com.au' },
   { name: 'Pricing', url: 'https://carsi.com.au/pricing' },
@@ -91,8 +75,18 @@ const FREE_FEATURES = [
 export default async function PricingPage() {
   const live = subscriptionsEnabled();
   const teamsLive = teamSubscriptionsEnabled();
-  const faqItems = buildFaqItems(live);
   const facts = await getPublicCatalogueFacts();
+  const yearly = INDIVIDUAL_TIERS.find((t) => t.id === 'pro_annual');
+  // Sourced answers (src/lib/seo/answer-engine.ts): one array for the visible FAQ and the
+  // FAQPage JSON-LD; the per-course floor comes from the live catalogue.
+  const faqItems = pricingFaqs({
+    minPaidCoursePriceAud: facts.minPaidCoursePriceAud,
+    membership: {
+      priceAud: (yearly?.priceCents ?? 0) / 100,
+      available: live,
+      terms: yearly?.description ?? '',
+    },
+  });
   const perCourseLabel =
     perCoursePriceLabel(facts.minPaidCoursePriceAud) ?? PER_COURSE_PRICE_FALLBACK_LABEL;
 

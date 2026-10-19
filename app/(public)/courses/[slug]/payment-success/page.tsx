@@ -1,5 +1,12 @@
+import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { PaymentSuccessClient } from './PaymentSuccessClient';
+
+// Post-checkout utility page: never a search result (route-canonical.test.ts).
+export const metadata: Metadata = {
+  title: 'Payment received',
+  robots: { index: false, follow: false },
+};
 
 export default function PaymentSuccessPage() {
   return (

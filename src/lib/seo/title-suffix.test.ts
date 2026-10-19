@@ -29,7 +29,7 @@ export function templatedTitlesWithSuffix(source: string): string[] {
   const lines = source.split('\n');
   const hits: string[] = [];
   lines.forEach((line, i) => {
-    if (!/^\s*title:\s*['`"].*\|\s*CARSI['`"],?\s*$/.test(line)) return;
+    if (!/^\s*title:\s*['`"].*\|\s*CARSI(\s+Australia)?['`"],?\s*$/.test(line)) return;
     const indent = line.search(/\S/);
     for (let j = i - 1; j >= 0; j--) {
       const prev = lines[j];
@@ -60,7 +60,18 @@ describe('page titles carry the CARSI suffix once', () => {
     expect(templatedTitlesWithSuffix(planted)).toEqual(["title: 'Yearly Membership | CARSI',"]);
   });
 
-  it('no page or layout sets a templated title ending in "| CARSI"', () => {
+  it('also detects a "| CARSI Australia" suffix (rendered "… | CARSI Australia | CARSI")', () => {
+    const planted = [
+      'export const metadata = {',
+      "  title: 'IICRC CEC Training for Plumbers | CARSI Australia',",
+      '};',
+    ].join('\n');
+    expect(templatedTitlesWithSuffix(planted)).toEqual([
+      "title: 'IICRC CEC Training for Plumbers | CARSI Australia',",
+    ]);
+  });
+
+  it('no page or layout sets a templated title ending in "| CARSI" or "| CARSI Australia"', () => {
     const offenders = walk(join(ROOT, 'app')).flatMap((file) =>
       templatedTitlesWithSuffix(readFileSync(file, 'utf8')).map(
         (hit) => `${relative(ROOT, file)}: ${hit}`

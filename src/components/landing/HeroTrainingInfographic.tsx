@@ -54,7 +54,7 @@ export function HeroTrainingInfographic() {
 
   return (
     <div
-      className="relative w-full select-none bg-white"
+      className="relative w-full bg-white select-none"
       role="img"
       aria-label="CARSI learner dashboard showing certificates, study activity, course progress, and an earned CARSI designation"
     >
@@ -65,11 +65,11 @@ export function HeroTrainingInfographic() {
           <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
           <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
         </div>
-        <div className="mx-auto flex min-w-0 items-center gap-2 rounded-full border border-slate-200/70 bg-[#f6f8fb] px-3.5 py-1 text-[11px] font-medium text-slate-400">
+        <div className="mx-auto flex min-w-0 items-center gap-2 rounded-full border border-slate-200/70 bg-[#f6f8fb] px-3.5 py-1 text-[11px] font-medium text-slate-600">
           <span className="h-2.5 w-2.5 rounded-sm bg-[#2490ed]/80" aria-hidden />
           carsi.au/dashboard
         </div>
-        <span className="hidden items-center gap-1.5 text-[10px] font-semibold text-emerald-600 sm:inline-flex">
+        <span className="hidden items-center gap-1.5 text-[10px] font-semibold text-emerald-700 sm:inline-flex">
           <span className="relative flex h-1.5 w-1.5" aria-hidden>
             <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-50 motion-safe:animate-ping" />
             <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
@@ -107,7 +107,7 @@ export function HeroTrainingInfographic() {
           {/* Header row */}
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="text-[10px] font-semibold tracking-[0.14em] text-slate-400 uppercase">
+              <p className="text-[10px] font-semibold tracking-[0.14em] text-slate-500 uppercase">
                 Monday, 7:12 pm
               </p>
               <p className="mt-0.5 font-[family-name:var(--font-display)] text-[15px] font-semibold text-slate-900 sm:text-base">
@@ -116,14 +116,14 @@ export function HeroTrainingInfographic() {
             </div>
             <div className="flex items-center gap-2.5">
               <span
-                className="hidden items-center gap-2 rounded-full border border-slate-200/70 bg-[#f6f8fb] px-3 py-1.5 text-[11px] text-slate-400 md:inline-flex"
+                className="hidden items-center gap-2 rounded-full border border-slate-200/70 bg-[#f6f8fb] px-3 py-1.5 text-[11px] text-slate-600 md:inline-flex"
                 aria-hidden
               >
                 <Search className="h-3 w-3" />
                 Search courses
               </span>
               <span
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[#146fc2] to-[#2490ed] text-[11px] font-semibold text-white"
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[#146fc2] to-[#0f5fa8] text-[11px] font-semibold text-white"
                 aria-hidden
               >
                 S
@@ -147,7 +147,7 @@ export function HeroTrainingInfographic() {
                     {value}
                   </span>
                 </div>
-                <p className="mt-0.5 text-[9px] font-semibold tracking-[0.1em] text-slate-400 uppercase sm:text-[10px]">
+                <p className="mt-0.5 text-[9px] font-semibold tracking-[0.1em] text-slate-500 uppercase sm:text-[10px]">
                   {label}
                 </p>
               </motion.div>
@@ -202,7 +202,7 @@ export function HeroTrainingInfographic() {
                   />
                 </svg>
               </div>
-              <div className="mt-1 flex justify-between text-[8px] font-medium tracking-wide text-slate-300 uppercase">
+              <div className="mt-1 flex justify-between text-[8px] font-medium tracking-wide text-slate-500 uppercase">
                 <span>Jun</span>
                 <span>Jul</span>
                 <span>Aug</span>
@@ -222,7 +222,7 @@ export function HeroTrainingInfographic() {
               </p>
               <div className="mt-2.5">
                 <div className="mb-1.5 flex items-center justify-between text-[10px]">
-                  <span className="text-slate-400">Module 5 of 7</span>
+                  <span className="text-slate-500">Module 5 of 7</span>
                   <span className="font-semibold text-[#146fc2] tabular-nums">68%</span>
                 </div>
                 <div className="h-1.5 overflow-hidden rounded-full bg-slate-200/70">
@@ -249,7 +249,7 @@ export function HeroTrainingInfographic() {
                   <p className="truncate text-[11px] font-medium text-slate-900">
                     Documentation for insurers
                   </p>
-                  <p className="text-[10px] text-slate-400">Next lesson, 12 min</p>
+                  <p className="text-[10px] text-slate-500">Next lesson, 12 min</p>
                 </div>
               </div>
             </div>
@@ -262,7 +262,7 @@ export function HeroTrainingInfographic() {
                 <Award className="h-4 w-4" aria-hidden />
               </span>
               <div>
-                <p className="text-[9px] font-semibold tracking-[0.14em] text-slate-400 uppercase">
+                <p className="text-[9px] font-semibold tracking-[0.14em] text-slate-600 uppercase">
                   Designation earned
                 </p>
                 <p className="text-[12px] font-semibold text-slate-900">

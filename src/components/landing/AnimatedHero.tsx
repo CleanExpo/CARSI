@@ -31,8 +31,10 @@ function HeroWord({
   return (
     <motion.span
       className={`inline-block ${className}`}
-      initial={reduceMotion ? false : { opacity: 0, y: '0.45em', filter: 'blur(6px)' }}
-      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+      // Transform only: an opacity/blur entrance kept the LCP headline invisible until
+      // hydration (26.5 s on a throttled phone). See AnimatedHero.ssr.test.tsx.
+      initial={reduceMotion ? false : { y: '0.45em' }}
+      animate={{ y: 0 }}
       transition={{ duration: 0.7, ease: easeOut, delay }}
     >
       {children}
@@ -185,7 +187,7 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
               <HeroWord
                 delay={0.62}
                 reduceMotion={reduceMotion}
-                className="relative bg-gradient-to-r from-[#0f5fa8] via-[#2490ed] to-[#38a2f8] bg-clip-text text-transparent"
+                className="relative bg-gradient-to-r from-[#0f5fa8] via-[#146fc2] to-[#10609f] bg-clip-text text-transparent"
               >
                 trusts.
                 <motion.svg
@@ -209,12 +211,12 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
           </h1>
 
           <motion.p
-            className="mt-7 max-w-2xl text-[16px] leading-relaxed text-slate-500 sm:text-lg"
-            initial={reduceMotion ? false : { opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
+            className="mt-7 max-w-2xl text-[16px] leading-relaxed text-slate-700 sm:text-lg"
+            initial={reduceMotion ? false : { y: 14 }}
+            animate={{ y: 0 }}
             transition={{ ...springSoft, delay: 0.66 }}
           >
-            <span className="font-medium text-slate-700">
+            <span className="font-medium text-slate-900">
               CARSI trains Australia&apos;s cleaning and restoration professionals online.
             </span>{' '}
             Study around the roster, earn CARSI designations, and hold credentials any client,
@@ -253,7 +255,7 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
           </motion.div>
 
           <motion.p
-            className="mt-4 text-xs text-slate-400"
+            className="mt-4 text-xs text-slate-700"
             initial={reduceMotion ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.9 }}
@@ -262,7 +264,7 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
           </motion.p>
 
           <motion.ul
-            className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[13px] font-medium text-slate-500"
+            className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[13px] font-medium text-slate-700"
             initial={reduceMotion ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 1.0 }}
@@ -337,7 +339,7 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
                   <BadgeCheck className="h-4 w-4" aria-hidden />
                 </span>
                 <div>
-                  <p className="text-[10px] font-semibold tracking-[0.12em] text-slate-400 uppercase">
+                  <p className="text-[10px] font-semibold tracking-[0.12em] text-slate-600 uppercase">
                     Certificate verified
                   </p>
                   <p className="text-[12px] font-semibold text-slate-900">
@@ -346,10 +348,10 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
                 </div>
               </div>
               <div className="mt-3 flex items-center justify-between rounded-lg bg-[#f6f9fc] px-2.5 py-1.5">
-                <span className="text-[10px] font-medium text-slate-400 tabular-nums">
+                <span className="text-[10px] font-medium text-slate-500 tabular-nums">
                   ID CRD-2481
                 </span>
-                <span className="text-[10px] font-semibold text-emerald-600">Valid</span>
+                <span className="text-[10px] font-semibold text-emerald-700">Valid</span>
               </div>
             </motion.div>
           </motion.div>
@@ -377,7 +379,7 @@ export function AnimatedHero({ benefits: _benefits }: AnimatedHeroProps) {
                 <p className="text-[12px] font-semibold text-slate-900 tabular-nums">
                   Certificate issued
                 </p>
-                <p className="text-[10px] text-slate-400">Logged to your record automatically</p>
+                <p className="text-[10px] text-slate-600">Logged to your record automatically</p>
               </div>
             </motion.div>
           </motion.div>

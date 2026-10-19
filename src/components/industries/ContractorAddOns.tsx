@@ -34,7 +34,7 @@ export function ContractorAddOns({ variant = 'default' }: ContractorAddOnsProps)
           <ol className="mt-12 divide-y divide-slate-200/80 border-y border-slate-200/80">
             {content.panels.map((panel, index) => (
               <li key={panel.name} className="grid gap-3 py-7 sm:grid-cols-[4.5rem_1fr] sm:gap-8">
-                <p className="font-[family-name:var(--font-display)] text-[2rem] leading-none font-semibold text-slate-300 tabular-nums">
+                <p className="font-[family-name:var(--font-display)] text-[2rem] leading-none font-semibold text-[#0f5fa8] tabular-nums">
                   {String(index + 1).padStart(2, '0')}
                 </p>
                 <div>
@@ -72,7 +72,7 @@ export function ContractorAddOns({ variant = 'default' }: ContractorAddOnsProps)
                     <Briefcase className="h-4 w-4 shrink-0 text-slate-400" aria-hidden />
                     <span className="text-sm font-medium text-slate-950">{upgrade.base}</span>
                   </div>
-                  <span className="text-xs text-slate-400">+</span>
+                  <span className="text-xs text-slate-600">+</span>
                   <span className="rounded-full border border-slate-200 bg-white px-2.5 py-0.5 font-mono text-xs font-semibold text-[#146fc2]">
                     {upgrade.addon}
                   </span>

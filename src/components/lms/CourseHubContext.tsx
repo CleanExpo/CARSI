@@ -41,9 +41,9 @@ export function CourseHubContext({ slug }: CourseHubContextProps) {
       className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm"
       aria-label="Career opportunities for this discipline"
     >
-      <h3 className="mb-3 text-[11px] font-medium tracking-[0.24em] text-[#146fc2] uppercase">
+      <h2 className="mb-3 text-[11px] font-medium tracking-[0.24em] text-[#146fc2] uppercase">
         Career opportunities
-      </h3>
+      </h2>
 
       {data.pathway_name && (
         <p className="mb-3 text-sm font-semibold text-slate-950">{data.pathway_name}</p>

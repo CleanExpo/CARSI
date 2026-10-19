@@ -6,6 +6,7 @@ import {
   IndustryWhySection,
   IndustryCTA,
   ContractorAddOns,
+  IndustryFAQSection,
 } from '@/components/industries';
 import { IndustryRecommendedCourses } from '@/components/industries/IndustryRecommendedCourses';
 import { FAQSchema } from '@/components/seo/JsonLd';
@@ -124,6 +125,8 @@ export default async function MuseumsCulturalIndustryPage() {
       />
 
       <ContractorAddOns accentColor={ACCENT_COLOR} />
+
+      <IndustryFAQSection industryName="Museums and cultural institutions" faqs={faqs} />
 
       <IndustryCTA
         subtitle="Cultural Institution Training"

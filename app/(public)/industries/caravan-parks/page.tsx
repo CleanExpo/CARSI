@@ -6,6 +6,7 @@ import {
   IndustryWhySection,
   IndustryCTA,
   ContractorAddOns,
+  IndustryFAQSection,
 } from '@/components/industries';
 import { IndustryRecommendedCourses } from '@/components/industries/IndustryRecommendedCourses';
 import { FAQSchema } from '@/components/seo/JsonLd';
@@ -14,7 +15,7 @@ import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Mould & Restoration Training for Caravan Parks | CARSI Australia',
+  title: 'Mould & Restoration Training for Caravan Parks',
   description:
     'Protect guests and comply with state Fair Trading obligations. CARSI mould remediation, carpet cleaning and water damage restoration training for Australian caravan parks and holiday accommodation. Online. CEC hours apply only to courses the IICRC has approved.',
   keywords: [
@@ -124,6 +125,8 @@ export default async function CaravanParksIndustryPage() {
       />
 
       <ContractorAddOns accentColor={ACCENT_COLOR} />
+
+      <IndustryFAQSection industryName="Caravan parks" faqs={faqs} />
 
       <IndustryCTA
         subtitle="Holiday Park Training"

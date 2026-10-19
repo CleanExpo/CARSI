@@ -45,7 +45,7 @@ export function IndustryWhySection({
               key={card.title}
               className="md:border-l md:border-slate-200/70 md:pl-8 md:first:border-l-0 md:first:pl-0"
             >
-              <p className="font-[family-name:var(--font-display)] text-[2rem] leading-none font-semibold text-slate-300 tabular-nums">
+              <p className="font-[family-name:var(--font-display)] text-[2rem] leading-none font-semibold text-[#0f5fa8] tabular-nums">
                 {String(i + 1).padStart(2, '0')}
               </p>
               <card.icon className="mt-5 h-5 w-5 text-[#146fc2]" aria-hidden />

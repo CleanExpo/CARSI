@@ -19,6 +19,7 @@
  */
 import { readFileSync } from 'node:fs';
 import { execSync } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
 
 // Course-content data files (AU-produced copy lives here).
 const COURSE_DATA = [
@@ -28,7 +29,7 @@ const COURSE_DATA = [
 ];
 
 // allowBefore: if the ~8 chars before a match satisfy it, the match is exempt.
-const RULES = [
+export const RULES = [
   { re: /\bcolors?\b/i, msg: 'US spelling — use "colour".' },
   { re: /\bodors?\b/i, msg: 'US spelling — use "odour".' },
   { re: /\bbehaviors?\b/i, msg: 'US spelling — use "behaviour".' },
@@ -54,19 +55,27 @@ function normalize(s) {
     .replace(/\s+/g, ' ');
 }
 
+/** US forms in one piece of copy: [{ match, msg, evidence }]. Exported for tests. */
+export function findUsForms(raw) {
+  const text = normalize(raw);
+  const out = [];
+  for (const rule of RULES) {
+    const m = text.match(rule.re);
+    if (!m) continue;
+    const i = m.index ?? 0;
+    if (rule.allowBefore && rule.allowBefore.test(text.slice(Math.max(0, i - 8), i))) continue;
+    if (rule.allowAfter && rule.allowAfter.test(text.slice(i + m[0].length, i + m[0].length + 30))) continue;
+    out.push({ match: m[0], msg: rule.msg, evidence: text.slice(Math.max(0, i - 30), i + m[0].length + 30).trim() });
+  }
+  return out;
+}
+
 const findings = [];
 function walk(node, file, path) {
   if (node == null) return;
   if (typeof node === 'string') {
-    const text = normalize(node);
-    for (const rule of RULES) {
-      const m = text.match(rule.re);
-      if (!m) continue;
-      const i = m.index ?? 0;
-      if (rule.allowBefore && rule.allowBefore.test(text.slice(Math.max(0, i - 8), i))) continue;
-      if (rule.allowAfter && rule.allowAfter.test(text.slice(i + m[0].length, i + m[0].length + 30))) continue;
-      const ev = text.slice(Math.max(0, i - 30), i + m[0].length + 30).trim();
-      findings.push(`  ${file} → ${path}: matched "${m[0]}" — ${rule.msg}\n    → …${ev}…`);
+    for (const f of findUsForms(node)) {
+      findings.push(`  ${file} → ${path}: matched "${f.match}" — ${f.msg}\n    → …${f.evidence}…`);
     }
     return;
   }
@@ -74,6 +83,12 @@ function walk(node, file, path) {
   if (typeof node === 'object') { for (const [k, v] of Object.entries(node)) walk(v, file, path ? `${path}.${k}` : k); }
 }
 
+// Published copy kept in TypeScript modules rather than JSON: the answer-engine Q&A rendered on
+// /courses, /pricing and /iicrc-cec-courses, and the /llms.txt prose. Each module holds copy
+// only (no CSS), so the whole file is scanned as text. Added 18/10/2026.
+export const COPY_MODULES = ['src/lib/seo/answer-engine.ts', 'src/lib/seo/llms-txt.ts'];
+
+function main() {
 const tracked = new Set(execSync('git ls-files --cached --others --exclude-standard', { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }).split('\n'));
 // Assessment/quiz drafts are AU-produced course copy too — scan them all.
 const draftFiles = [...tracked].filter((f) => f.startsWith('data/seed/assessment-drafts/') && f.endsWith('.json'));
@@ -81,6 +96,13 @@ const draftFiles = [...tracked].filter((f) => f.startsWith('data/seed/assessment
 // og and FAQ straight into <head> and FAQPage JSON-LD, so a US spelling here reaches
 // search results. They were out of scope until 2026-09-08.
 const cardFiles = [...tracked].filter((f) => f.startsWith('data/seo/course-cards') && f.endsWith('.json'));
+for (const file of COPY_MODULES) {
+  if (!tracked.has(file)) {
+    console.error(`check-au-english: copy module ${file} is missing — fix COPY_MODULES`);
+    process.exit(1);
+  }
+  walk(readFileSync(file, 'utf8'), file, '');
+}
 for (const file of [...COURSE_DATA, ...draftFiles, ...cardFiles]) {
   if (!tracked.has(file)) continue;
   let json;
@@ -97,3 +119,6 @@ if (findings.length > 0) {
 }
 console.log('✓ Australian-English course-content guard passed.');
 process.exit(0);
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) main();
