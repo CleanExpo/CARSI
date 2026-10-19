@@ -290,7 +290,6 @@ async function loadRenewalSummary(
     const enrolledSlugs = new Set(rows.map((r) => r.course.slug));
     const completedSlugs = new Set<string>();
     const completions: CourseCompletionRecord[] = [];
-    let someCecsEstimated = false;
 
     for (const e of rows) {
       const lessonIds = e.course.modules.flatMap((m) => m.lessons.map((l) => l.id));
@@ -307,8 +306,9 @@ async function loadRenewalSummary(
 
       completedSlugs.add(e.course.slug);
 
-      const { hours, estimated } = resolveCecHoursFromCourse(e.course);
-      if (estimated) someCecsEstimated = true;
+      // Credit only while the approval was in force at completion. Dated by the enrolment's own
+      // completion time (see CourseCompletionRecord); no known date credits nothing.
+      const hours = e.completedAt ? cecHoursInForceAt(e.course.slug, e.completedAt) : 0;
       const discRaw = e.course.iicrcDiscipline?.trim() || 'General';
       const disc = discRaw.length > 0 ? discRaw : 'General';
 
@@ -361,6 +361,7 @@ async function loadRenewalSummary(
       completedSlugs,
       byDisciplineEarned: byDiscCycle,
       preferDisciplines,
+      now,
     });
 
     const cycleStartIso = cycle ? cycle.start.toISOString() : null;
@@ -380,7 +381,7 @@ async function loadRenewalSummary(
       days_until_expiry: daysUntil,
       renewal_urgent: urgent,
       iicrc_member_number: user?.iicrcMemberNumber ?? null,
-      some_cecs_estimated: someCecsEstimated,
+      some_cecs_estimated: false,
       suggested_courses: suggested,
     };
     return { summary, completions };
@@ -408,6 +409,8 @@ async function pickSuggestedCourses(args: {
   byDisciplineEarned: Record<string, number>;
   /** From first-session onboarding — boosts matching catalogue rows for “Popular for you”. */
   preferDisciplines?: string[];
+  /** A suggestion claims CEC only for an approval in force at this moment. */
+  now: Date;
 }): Promise<RenewalCourseSuggestion[]> {
   const prefer = new Set(
     (args.preferDisciplines ?? []).map((d) => d.trim().toUpperCase()).filter(Boolean)
@@ -443,7 +446,7 @@ async function pickSuggestedCourses(args: {
   const scored = published.map((c) => {
     const disc = c.iicrcDiscipline?.trim() || 'General';
     const earned = args.byDisciplineEarned[disc] ?? 0;
-    const { hours: rh } = resolveCecHoursFromCourse(c);
+    const rh = cecHoursInForceAt(c.slug, args.now);
     const hours = rh > 0 ? rh : 0.25;
     const gapWeight = 1 / (1 + earned);
     const discUpper = disc.toUpperCase();
@@ -452,7 +455,7 @@ async function pickSuggestedCourses(args: {
     const score = gapWeight * (hours + 0.5) * (disc === 'General' ? 0.85 : 1) * onboardingBoost;
     // GP-498: only claim a CEC benefit when this course has registry-approved CEC hours.
     const reason = suggestionReason({ disc, earnedCec: earned, approvedHours: rh });
-    return { c, score, reason, disc };
+    return { c, score, reason, disc, rh };
   });
 
   scored.sort((a, b) => b.score - a.score);
@@ -470,10 +473,7 @@ async function pickSuggestedCourses(args: {
       slug: s.c.slug,
       description: s.c.shortDescription ?? s.c.description,
       iicrc_discipline: s.c.iicrcDiscipline,
-      cec_hours: (() => {
-        const r = resolveCecHoursFromCourse(s.c);
-        return r.hours > 0 ? r.hours : null;
-      })(),
+      cec_hours: s.rh > 0 ? s.rh : null,
       thumbnail_url: normalizePublicAssetUrl(s.c.thumbnailUrl),
       reason: s.reason,
     });
@@ -491,8 +491,8 @@ async function pickSuggestedCourses(args: {
         description: c.shortDescription ?? c.description,
         iicrc_discipline: c.iicrcDiscipline,
         cec_hours: (() => {
-          const r = resolveCecHoursFromCourse(c);
-          return r.hours > 0 ? r.hours : null;
+          const h = cecHoursInForceAt(c.slug, args.now);
+          return h > 0 ? h : null;
         })(),
         thumbnail_url: normalizePublicAssetUrl(c.thumbnailUrl),
         // GP-498: neutral copy — must not imply IICRC CEC benefit for an unapproved course.
