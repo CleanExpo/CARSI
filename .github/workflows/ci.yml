@@ -133,6 +133,18 @@ jobs:
       - name: Course completeness scorecard self-test
         run: npm run test:course-completeness
 
+      # Quiz option balance: equal-length options and no constant or cyclic correct-answer
+      # position, so a learner cannot game a quiz by its shape. Advisory for older quizzes;
+      # --enforce lists every course quiz that passes today, and a course joins the list once
+      # its quiz is fixed (an enforced slug with no quiz file exits 2, so add slugs as they land).
+      # Excluded: the NeoSan Labs product-training quiz (neosan-labs-product-training), which is
+      # being rebuilt; enforce it once the rebuild ships.
+      - name: Quiz option balance guard self-test
+        run: npm run test:quiz-balance
+
+      - name: Quiz option balance guard
+        run: npm run check:quiz-balance -- --enforce=psychrometry-building-science-for-drying
+
       # Licence-critical backstop: scans all course-content + marketing surfaces
       # (data/seed, public/courses, docs/marketing, docs/content) for stray IICRC
       # placements, banned "IICRC-approved"/"certified with CARSI" phrasing, and
