@@ -144,12 +144,18 @@ export default async function CoursesPage({
   // is unavailable, and then no part of the page states a count — not the hero, the stats, the
   // grid, the answers, or the ItemList / FAQPage schema.
   const catalogueAvailable = available && displayTotal > 0;
+  // GP-639: the logged-out first screen sorts free courses first, so the hero gives buyers a
+  // direct door to the approved CEC classes. The number is a public claim, so it comes from the
+  // CEC approvals registry (the same count the FAQ states), never from a course's own hours field.
+  const cecApprovedCount = selectCurrentCecCourses(
+    displayCourses.filter(hasPublicCoursePage)
+  ).length;
   const catalogueAnswers = catalogueFaqs({
     catalogueAvailable,
     publishedCourseCount: displayTotal,
     freeCourseCount: displayCourses.filter((c) => c.is_free || Number(c.price_aud) === 0).length,
     minPaidCoursePriceAud: catalogueFacts.minPaidCoursePriceAud,
-    cecApprovedCount: selectCurrentCecCourses(displayCourses.filter(hasPublicCoursePage)).length,
+    cecApprovedCount,
     membership: {
       priceAud: (yearly?.priceCents ?? 0) / 100,
       available: subscriptionsEnabled(),
@@ -227,6 +233,14 @@ export default async function CoursesPage({
               <Compass className="h-4 w-4" aria-hidden />
               Guided pathway advisor
             </Link>
+            {catalogueAvailable && cecApprovedCount > 0 ? (
+              <Link
+                href="/courses?discipline=iicrc-cec#catalogue"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-[#146fc2]/30 bg-white px-7 text-sm font-semibold text-[#146fc2] transition hover:border-[#146fc2]/60 focus-visible:ring-2 focus-visible:ring-[#2490ed]/35 focus-visible:outline-none"
+              >
+                {cecApprovedCount} IICRC CEC Accredited course{cecApprovedCount !== 1 ? 's' : ''}
+              </Link>
+            ) : null}
             <Link
               href="/pricing"
               className="inline-flex min-h-12 items-center justify-center text-sm font-semibold text-[#146fc2] underline-offset-4 hover:underline"
@@ -262,9 +276,11 @@ export default async function CoursesPage({
           </div>
           {catalogueAvailable ? (
             <CourseGrid
+              key={disciplineTab ?? 'All'}
               courses={displayCourses}
               initialTab={disciplineTab ?? 'All'}
               surface="light"
+              syncTabToUrl
             />
           ) : (
             <p role="status" className={`py-12 ${LANDING_LEAD_CLASS}`}>

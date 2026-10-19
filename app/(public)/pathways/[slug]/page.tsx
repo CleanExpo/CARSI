@@ -14,6 +14,7 @@ import {
   marketingTextStrong,
 } from '@/lib/marketing/marketing-ui';
 import { OG_IMAGES, OG_IMAGE_URLS } from '@/lib/seo/og-image';
+import { formatCecCountLabel } from '@/lib/cec-display';
 
 export const dynamic = 'force-dynamic';
 
@@ -174,8 +175,10 @@ export default async function PathwayDetailPage({ params }: { params: Promise<{ 
                       {disciplineTopicLabel(pc.iicrc_discipline)}
                     </Badge>
                   )}
-                  {pc.cec_hours && (
-                    <span className={`text-xs ${marketingTextMuted}`}>{pc.cec_hours} CECs</span>
+                  {formatCecCountLabel(pc.cec_hours) && (
+                    <span className={`text-xs ${marketingTextMuted}`}>
+                      {formatCecCountLabel(pc.cec_hours)}
+                    </span>
                   )}
                   {!pc.is_required && (
                     <span className={`text-xs italic ${marketingTextMuted}`}>optional</span>

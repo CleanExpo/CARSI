@@ -65,3 +65,11 @@ export function resolveDisciplineParam(
   const wanted = normalise(value);
   return CATALOGUE_TOPIC_TABS.find((tab) => normalise(tab) === wanted);
 }
+
+/**
+ * GP-639: URL value for a topic tab, the inverse of `resolveDisciplineParam`.
+ * "IICRC CEC" -> "iicrc-cec", "Fire & Smoke" -> "fire-and-smoke".
+ */
+export function disciplineTabToParam(tab: string): string {
+  return tab.trim().toLowerCase().replace(/&/g, 'and').replace(/\s+/g, '-');
+}

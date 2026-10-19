@@ -14,6 +14,7 @@ import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
 import { CataloguePagination } from './CataloguePagination';
 import { CourseCard } from './CourseCard';
 import { CourseGridSkeleton } from './CourseCardSkeleton';
+import { disciplineTabToParam } from '@/lib/catalogue/discipline-param';
 
 const smoothEase: [number, number, number, number] = [0.4, 0, 0.2, 1];
 
@@ -83,6 +84,12 @@ interface Course {
 interface CourseGridProps {
   courses: Course[];
   initialTab?: string;
+  /**
+   * GP-639: when true, a tab click writes `?discipline=<tab>` to the address
+   * (replaceState, no navigation) so a copied or shared link keeps the filter.
+   * Only the public catalogue opts in.
+   */
+  syncTabToUrl?: boolean;
   loading?: boolean;
   /** When true, adds “Most modules” sort (dashboard DB catalogue). */
   showModulesSort?: boolean;
@@ -240,6 +247,7 @@ export function CourseGrid({
   surface = 'auto',
   cardVariant = 'catalog',
   recommendedSlugs = [],
+  syncTabToUrl = false,
 }: CourseGridProps) {
   const { theme } = useTheme();
   const isDark = surface === 'auto' ? theme === 'dark' : surface === 'dark';
@@ -256,6 +264,14 @@ export function CourseGrid({
     : 'All';
 
   const [activeTab, setActiveTab] = useState<DisciplineTab>(validInitial);
+  const selectTab = (tab: DisciplineTab) => {
+    setActiveTab(tab);
+    if (!syncTabToUrl || typeof window === 'undefined') return;
+    const url = new URL(window.location.href);
+    if (tab === 'All') url.searchParams.delete('discipline');
+    else url.searchParams.set('discipline', disciplineTabToParam(tab));
+    window.history.replaceState(null, '', url.toString());
+  };
   const [searchQuery, setSearchQuery] = useState('');
   const [levelFilter, setLevelFilter] = useState('all');
   const [priceFilter, setPriceFilter] = useState<PriceFilter>('all');
@@ -383,7 +399,7 @@ export function CourseGrid({
               key={tab}
               role="tab"
               aria-selected={isActive}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => selectTab(tab)}
               className="relative min-h-[44px] rounded-md px-4 py-2.5 text-sm font-semibold whitespace-nowrap transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2490ed]/40"
               style={
                 isActive

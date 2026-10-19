@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   CATALOGUE_TOPIC_TABS,
+  disciplineTabToParam,
   LEGACY_URL_CODES,
   resolveDisciplineParam,
 } from './discipline-param';
@@ -54,5 +55,18 @@ describe('resolveDisciplineParam (GP-592)', () => {
     expect(block).not.toBeNull();
     const tabs = [...block![1].matchAll(/'([^']+)'/g)].map((m) => m[1]);
     expect(tabs).toEqual([...CATALOGUE_TOPIC_TABS]);
+  });
+});
+
+describe('disciplineTabToParam (GP-639)', () => {
+  it('round-trips every topic tab through resolveDisciplineParam', () => {
+    for (const tab of CATALOGUE_TOPIC_TABS) {
+      expect(resolveDisciplineParam(disciplineTabToParam(tab))).toBe(tab);
+    }
+  });
+
+  it('produces the link used in the CEC promotion', () => {
+    expect(disciplineTabToParam('IICRC CEC')).toBe('iicrc-cec');
+    expect(disciplineTabToParam('Fire & Smoke')).toBe('fire-and-smoke');
   });
 });

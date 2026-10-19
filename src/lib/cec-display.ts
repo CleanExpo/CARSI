@@ -1,7 +1,5 @@
 /** User-facing CEC label: whole numbers without decimals, halves as one decimal. */
-export function formatCecHoursForDisplay(
-  value: number | string | null | undefined
-): string | null {
+export function formatCecHoursForDisplay(value: number | string | null | undefined): string | null {
   if (value == null || value === '') return null;
   const n = typeof value === 'number' ? value : parseFloat(String(value));
   if (!Number.isFinite(n) || n <= 0) return null;
@@ -16,4 +14,14 @@ export function formatCecHoursForCertificate(
   if (!label) return null;
   const n = parseFloat(label);
   return `${label} IICRC CEC hour${n === 1 ? '' : 's'}`;
+}
+
+/**
+ * Short count label with correct plural: "1 CEC", "2 CECs", "1.5 CECs".
+ * Returns null when hours are missing or not positive (GP-639: badge read "1 CECs").
+ */
+export function formatCecCountLabel(value: number | string | null | undefined): string | null {
+  const label = formatCecHoursForDisplay(value);
+  if (!label) return null;
+  return `${label} CEC${label === '1' ? '' : 's'}`;
 }
