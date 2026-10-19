@@ -13,7 +13,7 @@
      "questionText": "When must an Australian sole trader register for GST?",
      "options": [
       "Immediately when they get an ABN",
-      "Once GST turnover reaches the current threshold ($75,000 at time of writing) — optional below it",
+      "Once GST turnover reaches the current threshold ($75,000 — ato.gov.au, checked 19/10/2026) — optional below it",
       "Only if they employ staff",
       "Never — GST is for companies"
      ],
@@ -25,7 +25,7 @@
      "options": [
       "One year",
       "Two years",
-      "Five years",
+      "Five years (ato.gov.au record-keeping guidance, checked 19/10/2026)",
       "Forever"
      ],
      "correctIndex": 2,
@@ -43,12 +43,12 @@
      "points": 1
     },
     {
-     "questionText": "As a sole trader working in customers’ homes, the insurance you should never operate without is:",
+     "questionText": "As a sole trader working in customers' homes, which cover is commonly required by customers, contracts and some licences?",
      "options": [
-      "Public liability insurance",
-      "Travel insurance",
-      "Pet insurance",
-      "Private health insurance"
+      "Public liability insurance — commonly required by customers, contracts and some licences (business.gov.au insurance guidance, checked 19/10/2026)",
+      "Comprehensive car insurance",
+      "Home and contents insurance",
+      "Income protection is legally compulsory for all sole traders"
      ],
      "correctIndex": 0,
      "points": 1
@@ -57,7 +57,7 @@
      "questionText": "Under Australian WHS laws a sole trader is:",
      "options": [
       "Exempt because they work alone",
-      "A PCBU with a duty to work safely, including for anyone who helps them",
+      "A PCBU with a duty to work safely, including for anyone who helps them (model WHS Act — Safe Work Australia, checked 19/10/2026)",
       "Only responsible if someone is injured",
       "Covered by the customer’s insurance"
      ],
