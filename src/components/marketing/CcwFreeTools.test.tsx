@@ -28,6 +28,15 @@ const catalogue = JSON.parse(
   readFileSync(join(ROOT, 'data/seed/courses-catalog.json'), 'utf8')
 ) as { courses: Course[] };
 const toolUrls = ccwFreeTools.map((tool) => tool.url);
+const cecApproved = new Set(
+  (
+    JSON.parse(readFileSync(join(ROOT, 'data/seed/cec-approvals.json'), 'utf8')) as {
+      approvals: { slug: string; status: string }[];
+    }
+  ).approvals
+    .filter((a) => a.status === 'approved')
+    .map((a) => a.slug)
+);
 
 describe('Free CCW tools', () => {
   it('links both tools in a new tab with rel noopener and a one-line description', () => {
@@ -45,10 +54,11 @@ describe('Free CCW tools', () => {
   });
 
   it.each(['melbourne', 'sydney', 'brisbane', undefined])(
-    'appears on the CCW roadshow page (focus %s)',
+    'appears on the CCW roadshow page under a neutral heading (focus %s)',
     (focusSlug) => {
       const html = renderToStaticMarkup(<CcwRoadshowContent focusSlug={focusSlug} />);
-      expect(html).toContain('Free CCW tools');
+      expect(html).toContain('CCW dilution tools');
+      expect(html).not.toContain('Free CCW tools');
       for (const url of toolUrls) expect(html).toContain(url);
     }
   );
@@ -58,7 +68,7 @@ describe('Free CCW tools', () => {
     expect(elementTypes(CcwTrainingPage())).toContain(CcwFreeTools);
   });
 
-  it('is a link resource on the truckmount Unit 3.2 lesson, and on no other course', () => {
+  it('is a link resource on the truckmount Unit 3.2 lesson, and in no CEC-approved course', () => {
     const truckmount = catalogue.courses.find((c) => c.slug === 'ccw-carsi-truckmount-operations');
     const lesson = truckmount?.modules
       .flatMap((m) => m.lessons)
@@ -67,10 +77,12 @@ describe('Free CCW tools', () => {
       const resource = lesson?.resources?.find((r) => r.url === tool.url);
       expect(resource?.label).toBe(`Free CCW tool: ${tool.title}. ${tool.description}`);
     }
-    const elsewhere = catalogue.courses
-      .filter((c) => c.slug !== 'ccw-carsi-truckmount-operations')
+    const carrying = catalogue.courses
       .filter((c) => toolUrls.some((url) => JSON.stringify(c).includes(url)))
       .map((c) => c.slug);
-    expect(elsewhere).toEqual([]);
+    // CCW-CARSI product training cites the tools by design (NeoSan's dilution lesson).
+    expect(carrying).toEqual(['ccw-carsi-truckmount-operations', 'neosan-labs-product-training']);
+    expect(cecApproved.size).toBe(38);
+    expect(carrying.filter((slug) => cecApproved.has(slug))).toEqual([]);
   });
 });

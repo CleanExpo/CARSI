@@ -461,7 +461,7 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
         </div>
       </section>
 
-      <CcwFreeTools />
+      <CcwFreeTools heading="CCW dilution tools" />
       <HomeFaqSection faqs={pageFaqs} />
       <HomeFinalCtaSection />
     </>

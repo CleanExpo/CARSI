@@ -52,7 +52,8 @@ test('reads the real registry and every approved course (scope floor)', () => {
   assert.ok(real.productNames.length >= 200);
   const { surfaces } = evaluate(real);
   const kinds = (pattern) => surfaces.filter((s) => pattern.test(s.where)).length;
-  assert.equal(kinds(/courses-catalog\.json/), 38);
+  // Distinct courses, not surfaces: another course may link an approved one (pathway nextSteps).
+  assert.equal(new Set(surfaces.filter((s) => /courses-catalog\.json/.test(s.where)).map((s) => s.slug)).size, 38);
   assert.ok(kinds(/data\/seo\/course-cards\//) >= 20);
   assert.ok(kinds(/course-intro-video-briefs\.json/) >= 1);
   assert.ok(kinds(/course-thumbnail-briefs\.json/) >= 1);
