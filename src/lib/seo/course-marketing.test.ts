@@ -230,7 +230,8 @@ describe('current repository truth', () => {
     // the 2026-04-05 LearnDash export or rebuilt where no content survived; all published,
     // cecHours 0, iicrcDiscipline null, 19/10/2026 (feat/import-legacy-courses).
     // 77 = 73 on main + 4 from this branch (rebased 19/10/2026).
-    expect(catalogue).toHaveLength(77);
+    // 78 = 77 + CARSI Professional Moisture Meters (moisture-meters-readings-and-dry-standards), 19/10/2026.
+    expect(catalogue).toHaveLength(78);
     expect(surfaceSlugs).toHaveLength(24);
     expect(new Set(surfaceSlugs).size).toBe(24);
     expect(readdirSync(cardsDirectory).filter((name) => name.endsWith('.json'))).toHaveLength(80);

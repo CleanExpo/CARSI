@@ -1,0 +1,255 @@
+{
+  "version": 1,
+  "courseSlug": "moisture-meters-readings-and-dry-standards",
+  "quizzes": [
+    {
+      "quizId": "f3a7c2e1-5b8d-4c6a-9e1f-2d7b8a4c6e90",
+      "lessonTitle": "Final knowledge check: mixed practice across all modules",
+      "title": "CARSI Professional Moisture Meters — Final Knowledge Check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "A sample weighs 412.6 g wet and 356.0 g oven-dry. What is its moisture content?",
+          "options": [
+            "About 13.7 percent",
+            "About 18.8 percent",
+            "About 15.9 percent",
+            "About 11.6 percent"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "(412.6 − 356.0) ÷ 356.0 × 100 = 15.9%. The divisor is the oven-dry mass."
+        },
+        {
+          "questionText": "What do uninsulated pins on a resistance meter report?",
+          "options": [
+            "The wettest layer that they touch",
+            "The average of the whole piece",
+            "Only the wood at the tips",
+            "Only the moisture in the coating"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Uninsulated pins sense the lowest resistance along their length, so they report the wettest layer they touch (Wood Handbook ch. 13)."
+        },
+        {
+          "questionText": "Which part of the material dominates a pinless (dielectric) reading?",
+          "options": [
+            "The core layers",
+            "The far face",
+            "The end grain",
+            "The surface layers"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "The field weakens rapidly with depth, so the surface layers dominate (Wood Handbook ch. 13)."
+        },
+        {
+          "questionText": "To read the average moisture of a 45 mm stud that is wetter inside, set insulated pins to about:",
+          "options": [
+            "2 to 4 mm",
+            "9 to 11 mm",
+            "20 to 23 mm",
+            "30 to 35 mm"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "One-fifth to one-quarter of 45 mm is 9 to 11.25 mm (Wood Handbook ch. 13)."
+        },
+        {
+          "questionText": "How should a plasterboard reading of 64 on a reference scale be reported?",
+          "options": [
+            "64 percent moisture content as read",
+            "64 points versus the unaffected board",
+            "64 percent minus the species offset",
+            "64 grams per kilogram of board"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Reference-scale readings are qualitative: report points against the same material unaffected."
+        },
+        {
+          "questionText": "Above what timber reading does the Wood Handbook treat meter readings as qualitative only?",
+          "options": [
+            "16 percent",
+            "20 percent",
+            "45 percent",
+            "30 percent"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Readings greater than 30% must be considered only qualitative (Wood Handbook ch. 13)."
+        },
+        {
+          "questionText": "What in-service moisture content range does the QBCC flood guide give for timber in houses?",
+          "options": [
+            "9 to 13 percent",
+            "4 to 8 percent",
+            "16 to 20 percent",
+            "20 to 25 percent"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "QBCC says timber in houses normally has an in-service moisture content of between 9% and 13%."
+        },
+        {
+          "questionText": "A stud at 9 °C reads 18.0% on a resistance meter calibrated at 20 °C. What is the corrected reading?",
+          "options": [
+            "About 17.0 percent",
+            "About 20.5 percent",
+            "About 19.0 percent",
+            "About 15.5 percent"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "11 °C colder: 11 ÷ 5.6 × 0.5 = 0.98, added because the wood is cold: 19.0%."
+        },
+        {
+          "questionText": "A rafter at 35 °C reads 14.0% on a meter calibrated at 20 °C. Which way does the correction go?",
+          "options": [
+            "Add about 1.3 percent",
+            "Subtract about 3.0 percent",
+            "No correction is needed",
+            "Subtract about 1.3 percent"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Warm wood reads high on a resistance meter, so subtract: 15 ÷ 5.6 × 0.5 = 1.34; 12.7%."
+        },
+        {
+          "questionText": "Where should a species correction for your meter come from?",
+          "options": [
+            "Another meter maker's species table",
+            "A general internet density list",
+            "Your meter maker's species table",
+            "The timber merchant’s price list"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Species tables are specific to each meter design; use the one supplied with your instrument."
+        },
+        {
+          "questionText": "Which of these can raise a pin reading above the true moisture content?",
+          "options": [
+            "Preservative salts in treated timber",
+            "Cold wood with no correction",
+            "Insulated pins at correct depth",
+            "A freshly checked new battery"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Salts and treatments raise conductivity (Wood Handbook ch. 4). Cold wood reads low, not high."
+        },
+        {
+          "questionText": "Framing must be below which moisture content before relining, under the QBCC guide?",
+          "options": [
+            "Below 16 percent",
+            "Below 25 percent",
+            "Below 30 percent",
+            "Below 9 percent"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Relining should wait until timber wall framing is below 16% and the framing is sound (QBCC)."
+        },
+        {
+          "questionText": "What does the QBCC guide call the most reliable test for dryness of a concrete floor?",
+          "options": [
+            "A pinless meter surface scan",
+            "A flooring hygrometer slab test",
+            "A thermal camera image scan",
+            "A pin meter timber reading"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "“For concrete floors, the most reliable test for dryness is a flooring hygrometer.” (QBCC, p. 5)"
+        },
+        {
+          "questionText": "A pinless scan shows vertical stripes of high readings every 450 mm on a dry wall. Most likely cause?",
+          "options": [
+            "Rising damp from footings",
+            "A leaking roof gutter",
+            "Condensation on the paint",
+            "Studs or fixings behind"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Regular spacing matching stud centres points to fixings or studs; confirm with pins beside a stripe."
+        },
+        {
+          "questionText": "Which daily calibration check is the weakest on its own?",
+          "options": [
+            "Maker's check device reading",
+            "Maker's reference block reading",
+            "Comparing two moisture meters",
+            "Built-in meter self check"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Two meters can be wrong in the same direction, so a meter-to-meter comparison is only a back-up."
+        },
+        {
+          "questionText": "Which of these is one of the six common meter mistakes?",
+          "options": [
+            "Reading the control area first",
+            "Leaving pins in wet material",
+            "Recording the pin depth used",
+            "Logging the morning check result"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Pins left in wet material carry moisture and contamination to the next reading."
+        },
+        {
+          "questionText": "What is the dry standard for a wet plasterboard wall?",
+          "options": [
+            "Same board unaffected, read same way",
+            "Any timber reading below 16 percent",
+            "The meter maker’s published dry value",
+            "The highest reading on day one"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "The dry standard is the same material, unaffected, in the same building, read the same way on the same visit."
+        },
+        {
+          "questionText": "The hallway is 23 °C and 68% RH. Which EMC should dry timber there approach?",
+          "options": [
+            "About 8.5 percent",
+            "About 16.0 percent",
+            "About 20.0 percent",
+            "About 12.5 percent"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Wood Handbook eq. 4-5 gives 12.5% for 23 °C, 68% RH."
+        },
+        {
+          "questionText": "A laundry slab is at 16.5 °C and the room dew point is 16.8 °C. What does that mean for surface readings?",
+          "options": [
+            "They prove the slab is dry",
+            "They may include some surface condensation",
+            "They prove moisture deep in slab",
+            "They need a species correction applied"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "A surface below the dew point can collect condensation, so surface readings cannot separate it from slab moisture."
+        },
+        {
+          "questionText": "Boards arrive at 13.5% for a room whose EMC is 12.0%. Under the CTIQ guidance, is acclimatisation indicated?",
+          "options": [
+            "Yes, outside the 2 percent",
+            "Yes, always for any timber",
+            "No, within the 2 percent",
+            "No, never for any timber"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "The difference is 1.5%, inside the 2% figure in Construction timbers in Queensland; the installer still decides."
+        }
+      ]
+    }
+  ]
+}

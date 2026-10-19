@@ -41,6 +41,7 @@ export const RULES = [
   { re: /\bdefenses?\b/i, msg: 'US spelling — use "defence".' },
   { re: /\baluminum\b/i, msg: 'US spelling — use "aluminium".' },
   { re: /\bliters?\b/i, msg: 'US spelling — use "litre".' },
+  { re: /\blumber\b/i, msg: 'US term — use "timber".' },
   { re: /\b1(?:10|15|20)\s?V(?:olts?)?\b/i, allowBefore: /US[\s-]?$/i, msg: 'US mains voltage — CARSI is 230 V / 50 Hz (label US specs "US-…" if contrasting).' },
   { re: /\bNEMA\b/, msg: 'US plug standard — use AS/NZS 3112 / 10 A GPO.' },
   { re: /\b(?:15|20)\s?A(?:mp)?\s+circuit\b/i, msg: 'US circuit framing — redo at 230 V (10 A / 16 A / 20 A AU circuits).' },
@@ -88,6 +89,25 @@ function walk(node, file, path) {
 // only (no CSS), so the whole file is scanned as text. Added 18/10/2026.
 export const COPY_MODULES = ['src/lib/seo/answer-engine.ts', 'src/lib/seo/llms-txt.ts'];
 
+// Quiz files with a hit that predates quiz scanning (19/10/2026). Each needs an owner decision
+// before its copy changes, so they are skipped BY NAME until fixed; every other quiz is scanned.
+//   ccw-truckmount: "converts 120 V to 240 V" (unlabelled US voltage in a contrast).
+//   water-damage-restoration-fundamentals: "dedicated 20 A circuit" (circuit-framing rule).
+export const QUIZ_PENDING_FIX = new Set([
+  'data/seed/ccw-truckmount.quizzes.json',
+  'data/seed/water-damage-restoration-fundamentals-quiz.json',
+]);
+
+/**
+ * Seeded final quizzes to scan: every top-level data/seed JSON file with "quiz" in its name, so
+ * all naming forms are covered (-quiz.json, -quizzes.json, .quizzes.json). The first pattern
+ * matched only -quiz.json and .quizzes.json and silently skipped floor-care-quizzes.json
+ * (PR #931 review). check-au-english.test.mjs fails if a real seed quiz file is left out.
+ */
+export function quizFilesToScan(paths) {
+  return [...paths].filter((f) => /^data\/seed\/[^/]*quiz[^/]*\.json$/i.test(f) && !QUIZ_PENDING_FIX.has(f));
+}
+
 function main() {
 const tracked = new Set(execSync('git ls-files --cached --others --exclude-standard', { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }).split('\n'));
 // Assessment/quiz drafts are AU-produced course copy too — scan them all.
@@ -96,6 +116,9 @@ const draftFiles = [...tracked].filter((f) => f.startsWith('data/seed/assessment
 // og and FAQ straight into <head> and FAQPage JSON-LD, so a US spelling here reaches
 // search results. They were out of scope until 2026-09-08.
 const cardFiles = [...tracked].filter((f) => f.startsWith('data/seo/course-cards') && f.endsWith('.json'));
+// Seeded final quizzes are learner-facing course copy (questions, options, explanations). They
+// were out of scope until 19/10/2026, when a review found US "lumber" in course copy.
+const quizFiles = quizFilesToScan(tracked);
 for (const file of COPY_MODULES) {
   if (!tracked.has(file)) {
     console.error(`check-au-english: copy module ${file} is missing — fix COPY_MODULES`);
@@ -103,7 +126,7 @@ for (const file of COPY_MODULES) {
   }
   walk(readFileSync(file, 'utf8'), file, '');
 }
-for (const file of [...COURSE_DATA, ...draftFiles, ...cardFiles]) {
+for (const file of [...COURSE_DATA, ...draftFiles, ...cardFiles, ...quizFiles]) {
   if (!tracked.has(file)) continue;
   let json;
   try { json = JSON.parse(readFileSync(file, 'utf8')); } catch (e) { console.error(`check-au-english: cannot parse ${file}: ${e.message}`); process.exit(1); }

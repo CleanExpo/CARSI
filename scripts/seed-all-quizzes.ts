@@ -39,6 +39,7 @@ const QUIZ_FILES = [
   'category-3-sewage-black-water-remediation-quiz.json',
   'asbestos-awareness-for-restoration-technicians-quiz.json',
   'psychrometry-building-science-for-drying-quiz.json',
+  'moisture-meters-readings-and-dry-standards-quiz.json',
   'fire-smoke-damage-restoration-fundamentals-quiz.json',
   'trauma-crime-scene-decontamination-fundamentals-quiz.json',
   'carpet-cleaning-fundamentals-quiz.json',
