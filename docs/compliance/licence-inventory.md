@@ -1,6 +1,6 @@
 # Licence inventory — IICRC codes, certification, CEC, accreditation, unsold subjects, counted claims
 
-Exhaustive pass, 19/10/2026, on `feat/seo-app-ready-v2` (based on origin/main 989d8491; licence commits cherry-picked from `fix/industry-faq-licence-v2`).
+Exhaustive pass, 19/10/2026, on `feat/seo-app-ready-v2` (based on origin/main 539d034b; the industry licence work is already in main via #913, and #914 (social profiles) is in the base).
 Generator: `node scripts/licence-inventory.mjs` (exit 1 on any exposure); every row is in `licence-inventory.csv`.
 Enforced by `src/lib/marketing/licence-inventory.test.ts`.
 
@@ -20,9 +20,9 @@ Enforced by `src/lib/marketing/licence-inventory.test.ts`.
 
 | Class                                                                                           | Hits |
 | ----------------------------------------------------------------------------------------------- | ---: |
-| fixed (exposures on origin/main 989d8491 under the final rules, removed by this branch)         |  645 |
-| legitimate (named sentence rule or reviewed line)                                               | 1194 |
-| not public (tests, generated, staff, tooling, prompts, identifiers, routing data, markup, URLs) | 4174 |
+| fixed (exposures on origin/main 539d034b under the final rules, removed by this branch)         |    0 |
+| legitimate (named sentence rule or reviewed line)                                               | 1193 |
+| not public (tests, generated, staff, tooling, prompts, identifiers, routing data, markup, URLs) | 4177 |
 | owned elsewhere (reviewed line; not edited here; listed for Phill)                              |    8 |
 | exposure remaining                                                                              |    0 |
 
@@ -55,86 +55,10 @@ Enforced by `src/lib/marketing/licence-inventory.test.ts`.
 
 ## Fixed, by what the final rules called them on main
 
-| Rule                                                                            | Hits |
-| ------------------------------------------------------------------------------- | ---: |
-| no rule matches                                                                 |  515 |
-| CEC descriptor scoped to a topic or audience (implies those courses carry CECs) |   78 |
-| CARSI offering named with an IICRC code (any modifiers in between)              |   22 |
-| unsold carpet- or colour-repair training offered                                |   14 |
-| promises CECs with no approval condition in the same sentence                   |   10 |
-| static CEC course count                                                         |    3 |
-| sells certification                                                             |    2 |
-| every course or module promised CECs                                            |    1 |
+| Rule | Hits |
+| ---- | ---: |
 
 Files with fixed hits:
-
-- `app/(dashboard)/dashboard/credentials/[credentialId]/page.tsx` — 2
-- `app/(dashboard)/dashboard/pathways/page.tsx` — 5
-- `app/(public)/about/page.tsx` — 7
-- `app/(public)/ai-website/page.tsx` — 3
-- `app/(public)/courses/page.tsx` — 2
-- `app/(public)/events/ccw-roadshow/success/page.tsx` — 1
-- `app/(public)/industries/aged-care/page.tsx` — 11
-- `app/(public)/industries/caravan-parks/page.tsx` — 29
-- `app/(public)/industries/childcare/page.tsx` — 18
-- `app/(public)/industries/commercial-cleaning/page.tsx` — 37
-- `app/(public)/industries/construction/page.tsx` — 9
-- `app/(public)/industries/data-centres/page.tsx` — 32
-- `app/(public)/industries/education/page.tsx` — 20
-- `app/(public)/industries/emergency-management/page.tsx` — 35
-- `app/(public)/industries/facility-management/page.tsx` — 9
-- `app/(public)/industries/food-processing/page.tsx` — 30
-- `app/(public)/industries/government-defence/page.tsx` — 18
-- `app/(public)/industries/gyms-fitness/page.tsx` — 32
-- `app/(public)/industries/healthcare/page.tsx` — 11
-- `app/(public)/industries/hospitality/page.tsx` — 18
-- `app/(public)/industries/insurance/page.tsx` — 12
-- `app/(public)/industries/mining/page.tsx` — 16
-- `app/(public)/industries/museums-cultural/page.tsx` — 28
-- `app/(public)/industries/ndis-disability/page.tsx` — 26
-- `app/(public)/industries/page.tsx` — 6
-- `app/(public)/industries/plumbing-trades/page.tsx` — 37
-- `app/(public)/industries/property-management/page.tsx` — 17
-- `app/(public)/industries/real-estate/page.tsx` — 20
-- `app/(public)/industries/retail/page.tsx` — 18
-- `app/(public)/industries/strata/page.tsx` — 18
-- `app/(public)/industries/transport-logistics/page.tsx` — 33
-- `app/(public)/pathways/[slug]/page.tsx` — 1
-- `app/(public)/resources/government-restoration-panels/page.tsx` — 1
-- `app/(public)/subscribe/layout.tsx` — 1
-- `app/(public)/subscribe/success/page.tsx` — 1
-- `app/api/lms/[[...path]]/route.ts` — 1
-- `app/api/lms/gamification/leaderboard/route.ts` — 1
-- `app/opengraph-image.tsx` — 3
-- `public/downloads/carsi-government-contractor-guide.pdf` — 12
-- `public/images/manifest.json` — 1
-- `public/llms.txt` — 1
-- `public/manifest.json` — 2
-- `public/start-smart-readiness.json` — 1
-- `src/components/ccw/CcwBusinessCoachingClient.tsx` — 1
-- `src/components/ccw/CcwCarsiTruckmountClient.tsx` — 1
-- `src/components/ccw/CcwWorkshopClient.tsx` — 3
-- `src/components/industries/ContractorAddOns.tsx` — 1
-- `src/components/industries/IndustryCourseSection.tsx` — 2
-- `src/components/landing/AnimatedHero.tsx` — 1
-- `src/components/landing/HomeFeaturedCoursesSection.tsx` — 1
-- `src/components/lms/RenewalCockpit.tsx` — 2
-- `src/components/lms/diagrams/CertificatePreview.tsx` — 1
-- `src/components/lms/diagrams/IICRCDisciplineMap.tsx` — 4
-- `src/components/lms/onboarding-flow.tsx` — 1
-- `src/components/marketing/about/AboutMissionPillars.tsx` — 1
-- `src/components/seo/JsonLd.tsx` — 3
-- `src/components/tools/CECCalculator.tsx` — 5
-- `src/lib/ai-website/advisor.ts` — 2
-- `src/lib/certificate/CertificateArt.tsx` — 1
-- `src/lib/customer-journey-loop.ts` — 7
-- `src/lib/iicrc-discipline-display.ts` — 2
-- `src/lib/marketing/industry-page-data.ts` — 7
-- `src/lib/marketing/start-smart.ts` — 4
-- `src/lib/schema/organization.ts` — 3
-- `src/lib/server/onboarding-pathway.ts` — 2
-- `src/lib/server/proof-pack-pdf.ts` — 3
-- `src/lib/server/public-catalogue-facts.ts` — 1
 
 ## Current hits by class and reason
 
@@ -147,7 +71,7 @@ Files with fixed hits:
 | legitimate      | catalogue-wide CLAUDE.md descriptor (not scoped to a topic or audience)                                                                                                 |  117 |
 | legitimate      | learner CEC record, tracking and renewal (the learner’s own IICRC certification)                                                                                        |   98 |
 | legitimate      | registry-computed CEC value beside the words                                                                                                                            |   43 |
-| legitimate      | upholstery in the real CCW hands-on workshop, a standard title or a business type (not a course offer)                                                                  |   35 |
+| legitimate      | upholstery in the real CCW hands-on workshop, a standard title or a business type (not a course offer)                                                                  |   37 |
 | legitimate      | explains how CECs work (third-person IICRC process)                                                                                                                     |   25 |
 | legitimate      | conditional stat chip: the label beside it says CEC hours are on approved courses only                                                                                  |   23 |
 | legitimate      | other bodies’ certification (ISO, HACCP, gas, vehicle, Cert IV)                                                                                                         |   23 |
