@@ -20,7 +20,7 @@ const PATHS: Record<string, Path> = {
     courses: [
       { course: 'Water Damage Restoration Fundamentals', tier: '$99' },
       { course: 'Structural Drying Fundamentals', tier: '$99' },
-      { course: 'Psychrometry: Building Science for Drying', tier: '$99' },
+      { course: 'Building Science Foundations: Psychrometry, Moisture and Condensation', tier: '$99' },
       { course: 'Category 3 — Sewage & Black Water', tier: '$99' },
     ],
   },
