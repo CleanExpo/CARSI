@@ -224,24 +224,25 @@ describe('public claims guard', () => {
     expect(countIicrcCecNonAccredited('IICRC CEC Accredited courses')).toBe(0);
   });
 
-  it('keeps the value sentences this branch rewrote free of any IICRC mention', () => {
+  it('keeps the value sentences this branch rewrote to a study record, with no IICRC mention', () => {
+    // Training can show what a technician studied and when; it cannot show job-specific due
+    // diligence, outcomes or reputation.
+    const studyRecord =
+      'Documented CARSI training shows clients and insurers what each technician has studied, and when.';
     const lines = [
+      ['app/(public)/industries/commercial-cleaning/page.tsx', studyRecord],
+      ['app/(public)/industries/plumbing-trades/page.tsx', studyRecord],
       [
-        'app/(public)/industries/commercial-cleaning/page.tsx',
-        'Documented CARSI training shows clients and insurers',
+        'app/(public)/industries/gyms-fitness/page.tsx',
+        'Documented CARSI training shows members what your maintenance staff have studied, and when.',
       ],
-      [
-        'app/(public)/industries/plumbing-trades/page.tsx',
-        'Documented CARSI training shows clients and insurers',
-      ],
-      ['app/(public)/industries/gyms-fitness/page.tsx', 'Documented CARSI training shows members'],
     ] as const;
-    for (const [path, opening] of lines) {
+    for (const [path, sentence] of lines) {
       const line = readFileSync(join(ROOT, path), 'utf8')
         .split('\n')
-        .find((l) => l.includes(opening));
-      expect(line, `${path} should contain "${opening}"`).toBeDefined();
-      expect(line).not.toMatch(/IICRC/);
+        .find((l) => l.includes(sentence));
+      expect(line, `${path} should contain "${sentence}"`).toBeDefined();
+      expect(line).not.toMatch(/IICRC|due diligence behind|protects your/i);
     }
   });
 
