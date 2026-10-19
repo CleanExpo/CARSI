@@ -59,7 +59,7 @@ const faqs = [
   {
     question: 'How does training help caravan park operators deal with mould and water damage?',
     answer:
-      'Hidden mould or water damage in guest accommodation can lead to Fair Trading complaints, poor reviews or injury claims if guests suffer health effects. CARSI mould remediation training teaches maintenance staff to identify mould and follow standards-based remediation steps. Documented CARSI training shows what each staff member has studied, and when.',
+      'Hidden mould or water damage in guest accommodation can lead to Fair Trading complaints, poor reviews or injury claims if guests suffer health effects. CARSI training covers mould identification and remediation. Documented CARSI training shows what each staff member has studied, and when.',
   },
   {
     question: 'What carpet training helps holiday accommodation?',

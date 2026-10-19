@@ -49,7 +49,7 @@ const faqs = [
   {
     question: 'Why do gyms and fitness centres need mould remediation training?',
     answer:
-      'Australian gyms generate consistently high humidity from sweat, showers, pools, and air conditioning — creating ideal conditions for mould growth in changerooms, wet decks, locker areas, and ceiling cavities. CARSI mould remediation training covers how to recognise mould, find the moisture source and remediate to a standards-based protocol. Recurring mould complaints can hurt Google reviews and lead to council inspections.',
+      'Australian gyms generate consistently high humidity from sweat, showers, pools, and air conditioning — creating ideal conditions for mould growth in changerooms, wet decks, locker areas, and ceiling cavities. CARSI training covers mould remediation and moisture control, including how to find the moisture source. Recurring mould complaints can hurt Google reviews and lead to council inspections.',
   },
   {
     question: 'What causes mould in Australian fitness centres and how can it be prevented?',

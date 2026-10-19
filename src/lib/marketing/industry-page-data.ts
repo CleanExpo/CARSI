@@ -205,7 +205,7 @@ export const industryAddonContent: Record<
     eyebrow: 'Property operations',
     title: 'Built for',
     titleAccent: 'guest-ready teams',
-    body: 'Hotel and resort maintenance crews need fast, standards-based response across guest rooms, public areas, pool zones and high-traffic carpet assets.',
+    body: 'Hotel and resort maintenance crews need a fast response across guest rooms, public areas, pool zones and high-traffic carpet assets.',
     panels: hospitalityPanels,
     showUpgrades: false,
   },

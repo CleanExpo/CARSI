@@ -73,7 +73,7 @@ const whyCards = [
     icon: Shield,
     title: 'Heritage Preservation',
     description:
-      'Protect irreplaceable artefacts and collection items. Restoration training equips staff with standards-based response protocols aligned to AICCM conservation guidelines.',
+      'Water and fire can damage irreplaceable artefacts and collection items. Restoration training covers how staff respond to water and fire events.',
     color: '#8B6914',
   },
   {

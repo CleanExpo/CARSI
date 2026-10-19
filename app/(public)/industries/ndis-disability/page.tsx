@@ -87,7 +87,7 @@ const whyCards = [
     icon: Droplets,
     title: 'Moisture & Mould Response',
     description:
-      'Water damage in shared accommodation, wet areas, and specialist housing requires immediate standards-based response to protect vulnerable residents.',
+      'Water damage in shared accommodation, wet areas, and specialist housing needs a prompt response, especially where residents are vulnerable.',
     color: '#2490ed',
   },
 ];

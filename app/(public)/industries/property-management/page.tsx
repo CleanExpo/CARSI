@@ -48,7 +48,7 @@ const whyCards = [
     icon: Scale,
     title: 'Documented Training',
     description:
-      'Documented CARSI training shows what each property manager has studied, and when. Use standards-based language when you record mould and carpet condition.',
+      'Documented CARSI training shows what each property manager has studied, and when.',
     color: '#673ab7',
   },
   {
@@ -62,7 +62,7 @@ const whyCards = [
     icon: Droplets,
     title: 'Insurance Claims',
     description:
-      'Training in standards-based documentation for water damage and mould insurance claims.',
+      'Training covers how to document water damage and mould for insurance claims.',
     color: '#ed9d24',
   },
 ];

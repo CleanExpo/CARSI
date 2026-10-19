@@ -13,7 +13,7 @@ import { IICRC_CODE_ALT } from '../iicrc-codes';
 const ROOT = join(__dirname, '..', '..', '..');
 const APOS = "(?:'|’|&apos;|&rsquo;|&#39;)";
 
-const CLAIM_PATTERNS: { label: string; pattern: RegExp }[] = [
+const CLAIM_PATTERNS: { label: string; pattern: RegExp; unless?: RegExp }[] = [
   {
     label: "Australia's leading/best/premier",
     pattern: new RegExp(
@@ -109,6 +109,14 @@ const CLAIM_PATTERNS: { label: string; pattern: RegExp }[] = [
     label: '<IICRC code> certification',
     pattern: new RegExp(`\\b(?:${IICRC_CODE_ALT})\\s+certification\\b`),
   },
+  {
+    // A process claim with no standard named. The only allowed form is a nominative citation on
+    // the same line, e.g. "aligned to ANSI/IICRC S500".
+    label: 'standards-based (no named standard)',
+    pattern: /\bstandards?[- ]based\b/i,
+    unless: /\baligned to ANSI\/IICRC S\d{3}\b/i,
+  },
+  { label: 'aligned to AICCM guidelines', pattern: /\baligned (to|with) (the )?AICCM\b/i },
 ];
 
 /**
@@ -187,9 +195,10 @@ function withoutPolicySentences(line: string, file: string): string {
 function findClaims(text: string, file = ''): { label: string; line: number; excerpt: string }[] {
   const hits: { label: string; line: number; excerpt: string }[] = [];
   text.split('\n').forEach((line, index) => {
-    for (const { label, pattern } of CLAIM_PATTERNS) {
+    for (const { label, pattern, unless } of CLAIM_PATTERNS) {
       const scanned =
         label === 'ensures (outcome guarantee)' ? withoutPolicySentences(line, file) : line;
+      if (unless?.test(scanned)) continue;
       const match = pattern.exec(scanned);
       if (match) hits.push({ label, line: index + 1, excerpt: line.trim().slice(0, 160) });
     }
@@ -243,6 +252,10 @@ describe('public claims guard', () => {
     'Protect Your Infrastructure',
     'WRT certification ensures your team can triage and protect high-value items.',
     'ASD certification for every technician',
+    'Staff identify mould and follow standards-based remediation steps.',
+    'Remediate to a standards-based protocol.',
+    'Water ingress requires immediate, standards-based response.',
+    'Response protocols aligned to AICCM conservation guidelines.',
   ])('flags a planted claim: %s', (planted) => {
     expect(findClaims(planted)).not.toHaveLength(0);
   });
@@ -283,7 +296,8 @@ describe('public claims guard', () => {
           'CARSI is not affiliated with, endorsed by or partnered with any publisher. ' +
           'Buying a Carpet Cleaning Business: Training Due Diligence. Team training or business buyer due diligence. ' +
           'AusTender is where Commonwealth agencies publish their tenders. Tender pre-qualification. ' +
-          'FSRT is an IICRC certification covering fire and smoke restoration.'
+          'FSRT is an IICRC certification covering fire and smoke restoration. ' +
+          'Standards-based drying records, aligned to ANSI/IICRC S500.'
       )
     ).toHaveLength(0);
   });

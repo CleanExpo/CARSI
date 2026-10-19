@@ -55,7 +55,7 @@ const whyCards = [
     icon: Droplets,
     title: 'Wet Area Response',
     description:
-      'Water ingress in accommodation blocks, wet mess areas, and underground operations requires immediate, standards-based response.',
+      'Water ingress in accommodation blocks, wet mess areas, and underground operations needs a prompt response.',
     color: '#d4891e',
   },
   {

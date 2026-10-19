@@ -87,7 +87,7 @@ const whyCards = [
     icon: SprayCan,
     title: 'Odour & Surface Control',
     description:
-      'Organic odours and surface contamination in processing areas require specialist remediation. Odour control and carpet cleaning training provides standards-based approaches.',
+      'Organic odours and surface contamination in processing areas require specialist remediation. CARSI training covers odour control and carpet cleaning.',
     color: '#ed9d24',
   },
 ];
