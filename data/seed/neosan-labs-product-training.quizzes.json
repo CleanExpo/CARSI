@@ -1,0 +1,161 @@
+{
+  "version": 1,
+  "status": "DRAFT — NOT SEEDED — founder sign-off required before seeding",
+  "courseSlug": "neosan-labs-product-training",
+  "note": "Knowledge check for the r14 NeoSan Labs rewrite. Every option for a question has the same number of words; enforced by src/lib/seo/neosan-claims.test.ts. Each question maps to the lesson unit that teaches it.",
+  "quizzes": [
+    {
+      "quizId": "67924db9-ef96-5c11-aac9-6243956c8386",
+      "lessonTitle": "Knowledge check",
+      "title": "NeoSan Labs Product Training — Knowledge Check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "According to the CCW listings, how long does mixed NeoSan Labs Part A and Part B stay usable?",
+          "options": [
+            "12 hours after mixing",
+            "24 hours after mixing",
+            "48 hours after mixing",
+            "72 hours after mixing"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "unit": "3.2"
+        },
+        {
+          "questionText": "What application rate does CCW give for fogging or spraying NeoSan Labs 01?",
+          "options": [
+            "20 ml per square metre",
+            "6.8 ml per square metre",
+            "68 ml per square metre",
+            "0.68 ml per square metre"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "unit": "3.2"
+        },
+        {
+          "questionText": "How much Part A and Part B do you mix for a 27 m² office at that rate?",
+          "options": [
+            "184 ml of each part",
+            "27 ml of each part",
+            "92 ml of each part",
+            "46 ml of each part"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "unit": "3.2"
+        },
+        {
+          "questionText": "How does CCW give the regular-cleaning dilution for NeoSan Labs 03 Carpet?",
+          "options": [
+            "1:4 with water after mixing",
+            "1:20 with water after mixing",
+            "Undiluted for every regular clean",
+            "1:9 with water after mixing"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "unit": "3.3"
+        },
+        {
+          "questionText": "Which SDS section gives the PPE and the respirator condition?",
+          "options": [
+            "Section 8, exposure controls",
+            "Section 2, hazard identification",
+            "Section 14, transport information",
+            "Section 16, other information"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "unit": "2.2"
+        },
+        {
+          "questionText": "Under the 02 SDS, when do you add an approved full-face air-purifying respirator?",
+          "options": [
+            "Never, since gloves give full protection",
+            "If ventilation cannot stop aerosol build-up",
+            "Whenever the client asks for one",
+            "For any job over sixty minutes"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "unit": "2.2"
+        },
+        {
+          "questionText": "Which control does Safe Work Australia rank as the best?",
+          "options": [
+            "Posting warning signs everywhere",
+            "Training workers in procedures",
+            "Eliminating the risk altogether",
+            "Wearing a full-face respirator"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "unit": "5.1"
+        },
+        {
+          "questionText": "How can you describe NeoSan Labs 02 to an Australian client?",
+          "options": [
+            "As a registered hospital disinfectant",
+            "As an approved surface sanitiser",
+            "As a germ-killing room fog",
+            "As an odour treatment only"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "unit": "1.2"
+        },
+        {
+          "questionText": "What does the 01 SDS say about waste and drains?",
+          "options": [
+            "Do not discharge into drains",
+            "Flush small amounts down drains",
+            "Dilute first, then use drains",
+            "Drains are fine after treatment"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "unit": "5.2"
+        },
+        {
+          "questionText": "The SDS lists a US poison centre number. What do you do?",
+          "options": [
+            "Leave the job sheet exactly unchanged",
+            "Write the Australian Poisons Information number",
+            "Use the printed US number instead",
+            "Ring NeoSan Labs head office instead"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "unit": "2.1"
+        },
+        {
+          "questionText": "What does CCW say to do first on a mould job with 04?",
+          "options": [
+            "Spray 04 straight onto growth",
+            "Keep the room sealed overnight",
+            "Remove the growth physically first",
+            "Treat the growth with fogging"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "unit": "3.1"
+        },
+        {
+          "questionText": "Who must stay out of the room while 02 is fogged?",
+          "options": [
+            "Only the pets",
+            "Only young children",
+            "Nobody at all",
+            "People and animals"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "unit": "4.1"
+        }
+      ]
+    }
+  ]
+}
