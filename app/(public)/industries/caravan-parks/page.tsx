@@ -104,7 +104,7 @@ export default async function CaravanParksIndustryPage() {
         icon={Tent}
         industryName="Caravan Parks & Holiday Accommodation"
         accentColor={ACCENT_COLOR}
-        headline="Protect Guest Accommodation"
+        headline="Training for Guest Accommodation"
         headlineAccent="All Season Long"
         description="Caravan parks face persistent mould, moisture, and storm damage risk. CARSI mould remediation, carpet cleaning and water damage restoration courses give park maintenance teams the protocols to inspect, remediate, and document — protecting guests, reputation, and revenue. CARSI courses carry CARSI Southern Hemisphere Restoration Designations, not IICRC certification."
         disciplines={disciplines}

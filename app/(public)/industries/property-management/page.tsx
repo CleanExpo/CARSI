@@ -55,7 +55,7 @@ const whyCards = [
     icon: Shield,
     title: 'RTA Compliance',
     description:
-      'Mould is a habitability issue under all state Residential Tenancies Acts. Trained managers avoid regulatory breaches and landlord liability.',
+      'Mould can affect whether a rental property is fit to live in under state tenancy laws. CARSI training covers how to identify and record mould and water damage.',
     color: '#512da8',
   },
   {

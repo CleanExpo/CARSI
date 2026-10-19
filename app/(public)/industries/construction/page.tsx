@@ -52,16 +52,16 @@ const whyCards = [
   },
   {
     icon: Droplets,
-    title: 'Defect Liability',
+    title: 'Moisture and Mould Control',
     description:
-      'Trained site staff reduce mould and water damage defect claims during the liability period.',
+      'Training covers moisture management and mould control during construction.',
     color: '#f57c00',
   },
   {
     icon: HardHat,
-    title: 'Pre-Qualification',
+    title: 'Verifiable Records',
     description:
-      'Verifiable digital credentials for pre-qualification panels at tier-1 builders like CIMIC, Lendlease, John Holland, and Multiplex.',
+      'Every completed course issues a verifiable CARSI credential. Builders set their own panel requirements, so check what each one asks for.',
     color: '#ed9d24',
   },
 ];

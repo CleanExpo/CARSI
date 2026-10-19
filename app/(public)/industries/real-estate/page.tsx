@@ -49,7 +49,7 @@ const faqs = [
   {
     question: 'Do real estate agents need water damage and mould training in Australia?',
     answer:
-      'Real estate agents in Australia are not legally required to hold IICRC certification, but they have a statutory obligation under Australian Consumer Law and state-specific property acts to disclose known material defects — including water damage and mould — to prospective buyers. CARSI water damage restoration and mould remediation training equips agents to identify moisture damage and mould during property inspections, protecting them from non-disclosure liability and enabling them to advise vendors on required remediation before listing.',
+      'Real estate agents in Australia are not legally required to hold IICRC certification, but they have a statutory obligation under Australian Consumer Law and state-specific property acts to disclose known material defects — including water damage and mould — to prospective buyers. CARSI water damage restoration and mould remediation training covers how to recognise moisture damage and mould during property inspections, so agents can raise it with vendors before listing.',
   },
   {
     question:
@@ -74,7 +74,7 @@ const whyCards = [
     icon: FileCheck,
     title: 'Vendor Disclosure Compliance',
     description:
-      'Water damage and mould are material defects requiring disclosure under Australian Consumer Law. Restoration training equips agents to identify, document, and disclose these defects accurately — minimising post-settlement liability.',
+      'Known water damage and mould can be material facts that need to be disclosed. Restoration training covers how to identify and document these defects.',
     color: '#ff7043',
   },
   {
@@ -134,7 +134,7 @@ export default async function RealEstateIndustryPage() {
         title="Property Professional Bundle"
         price={industryBundlePriceLabel('real-estate')}
         description="water damage restoration and mould remediation awareness training for real estate agents, conveyancers, and property managers. Learn to identify water damage and mould during inspections."
-        ctaText="Protect Your Practice"
+        ctaText="Explore the training"
         accentColor={ACCENT_COLOR}
       />
     </IndustryPageLayout>

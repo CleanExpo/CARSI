@@ -17,7 +17,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Mould & Odour Training for Gyms & Fitness Centres',
   description:
-    'Protect your members and your reputation. CARSI mould remediation, odour control and carpet cleaning training for Australian gyms, pools, and fitness facilities. Online and self-paced. CEC hours apply only to courses the IICRC has approved.',
+    'CARSI mould remediation, odour control and carpet cleaning training for Australian gyms, pools, and fitness facilities. Online and self-paced. CEC hours apply only to courses the IICRC has approved.',
   keywords: [
     'gym mould training Australia',
     'fitness centre restoration course',
@@ -49,7 +49,7 @@ const faqs = [
   {
     question: 'Why do gyms and fitness centres need mould remediation training?',
     answer:
-      'Australian gyms generate consistently high humidity from sweat, showers, pools, and air conditioning — creating ideal conditions for mould growth in changerooms, wet decks, locker areas, and ceiling cavities. CARSI mould remediation training teaches maintenance staff to identify mould species, assess moisture sources, and remediate using protocols that eliminate regrowth. Without trained staff, gyms typically experience recurring mould complaints that damage Google reviews, trigger council inspections, and expose operators to liability under Australian Consumer Law.',
+      'Australian gyms generate consistently high humidity from sweat, showers, pools, and air conditioning — creating ideal conditions for mould growth in changerooms, wet decks, locker areas, and ceiling cavities. CARSI mould remediation training covers how to recognise mould, find the moisture source and remediate to a standards-based protocol. Recurring mould complaints can hurt Google reviews and lead to council inspections.',
   },
   {
     question: 'What causes mould in Australian fitness centres and how can it be prevented?',
@@ -104,7 +104,7 @@ export default async function GymsFitnessIndustryPage() {
         icon={Activity}
         industryName="Gyms & Fitness Centres"
         accentColor={ACCENT_COLOR}
-        headline="Protect Your Members"
+        headline="Mould and Hygiene Training"
         headlineAccent="and Your Reputation"
         description="Australian gyms face constant mould and odour risk from high-humidity environments. CARSI mould remediation and odour control courses give your maintenance team the protocols to keep facilities clean, compliant, and member-ready. CARSI courses carry CARSI Southern Hemisphere Restoration Designations, not IICRC certification."
         disciplines={disciplines}

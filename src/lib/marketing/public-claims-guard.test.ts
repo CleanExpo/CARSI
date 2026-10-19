@@ -8,6 +8,8 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
+import { IICRC_CODE_ALT } from '../iicrc-codes';
+
 const ROOT = join(__dirname, '..', '..', '..');
 const APOS = "(?:'|’|&apos;|&rsquo;|&#39;)";
 
@@ -78,6 +80,35 @@ const CLAIM_PATTERNS: { label: string; pattern: RegExp }[] = [
     label: 'reduces liability/premiums',
     pattern: /\b(reduc\w*|lower\w*|cut\w*)\s+(\w+\s+){0,2}(liability|premiums?)\b/i,
   },
+  {
+    label: 'protects from / minimises / avoids liability',
+    pattern: /\b(protect\w*|minimi[sz]\w*|avoid\w*|shield\w*)\b[^.]{0,40}\bliability\b/i,
+  },
+  // Outcome guarantees and pre-qualification claims: training records what was studied; it does
+  // not ensure an outcome, satisfy a tender or pre-qualify anyone for a panel.
+  { label: 'ensures (outcome guarantee)', pattern: /\bensur(e|es|ing)\b/i },
+  {
+    label: 'satisfies/meets pre-qualification',
+    pattern: /\b(satisf\w*|meets?|meeting)\b[^.]{0,60}\bpre-?qualif/i,
+  },
+  { label: 'pre-qualify (verb)', pattern: /\bpre-?qualif(y|ies|ied|ying)\b/i },
+  {
+    // Named third parties as panels or builders CARSI training would get someone onto.
+    label: 'named panel or builder',
+    pattern:
+      /\b(Scentre|Vicinity Centres|GPT (Group|contractor)|CIMIC|Lendlease|John Holland|Multiplex)\b/,
+  },
+  {
+    label: 'AusTender pre-qualification claim',
+    pattern:
+      /\b(satisf\w*|meets?|pre-?qualif\w*)\b[^.]{0,40}\bAusTender\b|\bAusTender\s+pre-?qualif/i,
+  },
+  { label: 'Protect Your/Guest CTA', pattern: /\bProtect (Your|Guest|Our)\b/ },
+  {
+    // "WRT certification", "ASD certification" ... from the one shared IICRC code list.
+    label: '<IICRC code> certification',
+    pattern: new RegExp(`\\b(?:${IICRC_CODE_ALT})\\s+certification\\b`),
+  },
 ];
 
 /**
@@ -88,27 +119,6 @@ const CLAIM_PATTERNS: { label: string; pattern: RegExp }[] = [
 const IICRC_CEC_NON_ACCREDITED =
   /IICRC\s+CEC\s+(?!Accredited)(training|courses?|programs?|learning)\b/gi;
 const IICRC_CEC_NON_ACCREDITED_BASELINE: Record<string, number> = {
-  'app/(public)/industries/caravan-parks/page.tsx': 1,
-  'app/(public)/industries/childcare/page.tsx': 4,
-  'app/(public)/industries/commercial-cleaning/page.tsx': 5,
-  'app/(public)/industries/construction/page.tsx': 2,
-  'app/(public)/industries/data-centres/page.tsx': 4,
-  'app/(public)/industries/education/page.tsx': 3,
-  'app/(public)/industries/emergency-management/page.tsx': 5,
-  'app/(public)/industries/food-processing/page.tsx': 6,
-  'app/(public)/industries/government-defence/page.tsx': 4,
-  'app/(public)/industries/gyms-fitness/page.tsx': 1,
-  'app/(public)/industries/hospitality/page.tsx': 1,
-  'app/(public)/industries/insurance/page.tsx': 5,
-  'app/(public)/industries/mining/page.tsx': 1,
-  'app/(public)/industries/museums-cultural/page.tsx': 6,
-  'app/(public)/industries/ndis-disability/page.tsx': 3,
-  'app/(public)/industries/plumbing-trades/page.tsx': 5,
-  'app/(public)/industries/property-management/page.tsx': 2,
-  'app/(public)/industries/real-estate/page.tsx': 3,
-  'app/(public)/industries/retail/page.tsx': 3,
-  'app/(public)/industries/strata/page.tsx': 3,
-  'app/(public)/industries/transport-logistics/page.tsx': 4,
   'app/(public)/pricing/page.tsx': 1,
   'app/(public)/testimonials/page.tsx': 1,
   'src/components/landing/GrowthPathInfographic.tsx': 1,
@@ -154,10 +164,17 @@ function publicCopyFiles(): string[] {
   );
 }
 
-function findClaims(text: string): { label: string; line: number; excerpt: string }[] {
+/**
+ * Legal pages state CARSI's own obligations ("We ensure appropriate safeguards are in place"). That
+ * is a policy commitment, not a training-outcome claim, so the "ensures" rule skips them.
+ */
+const ENSURES_EXEMPT = /^app\/\(public\)\/(privacy|terms)\//;
+
+function findClaims(text: string, file = ''): { label: string; line: number; excerpt: string }[] {
   const hits: { label: string; line: number; excerpt: string }[] = [];
   text.split('\n').forEach((line, index) => {
     for (const { label, pattern } of CLAIM_PATTERNS) {
+      if (label === 'ensures (outcome guarantee)' && ENSURES_EXEMPT.test(file)) continue;
       const match = pattern.exec(line);
       if (match) hits.push({ label, line: index + 1, excerpt: line.trim().slice(0, 160) });
     }
@@ -201,6 +218,16 @@ describe('public claims guard', () => {
     'Defensible, standards-based documentation for insurance claims.',
     'Reducing organisational liability under the NDIS Act.',
     'Can reduce insurance premiums for premises liability coverage.',
+    'protecting them from non-disclosure liability',
+    'Trained managers avoid regulatory breaches and landlord liability.',
+    'Restoration training ensures rapid, standards-based response.',
+    'IICRC credentials satisfy AusTender pre-qualification and Commonwealth audit requirements.',
+    'Pre-qualify for major landlord panels.',
+    'Pre-qualify for Scentre Group, Vicinity Centres, and GPT contractor panels.',
+    'Verifiable credentials for panels at tier-1 builders like CIMIC, Lendlease, John Holland, and Multiplex.',
+    'Protect Your Infrastructure',
+    'WRT certification ensures your team can triage and protect high-value items.',
+    'ASD certification for every technician',
   ])('flags a planted claim: %s', (planted) => {
     expect(findClaims(planted)).not.toHaveLength(0);
   });
@@ -215,12 +242,20 @@ describe('public claims guard', () => {
     expect(findClaims(planted).length).toBeGreaterThan(findClaims(footer).length);
   });
 
+  it('lets a legal page state its own "we ensure" commitment, but not other copy', () => {
+    const commitment = 'We ensure appropriate safeguards are in place to protect your data.';
+    expect(findClaims(commitment, 'app/(public)/privacy/page.tsx')).toHaveLength(0);
+    expect(findClaims(commitment, 'app/(public)/industries/retail/page.tsx')).not.toHaveLength(0);
+  });
+
   it('leaves the required IICRC CEC Accredited wording and plain usage alone', () => {
     expect(
       findClaims(
         'IICRC CEC Accredited courses. Moisture leading to mould. Best for small teams. Client #1. ' +
           'CARSI is not affiliated with, endorsed by or partnered with any publisher. ' +
-          'Buying a Carpet Cleaning Business: Training Due Diligence. Team training or business buyer due diligence.'
+          'Buying a Carpet Cleaning Business: Training Due Diligence. Team training or business buyer due diligence. ' +
+          'AusTender is where Commonwealth agencies publish their tenders. Tender pre-qualification. ' +
+          'FSRT is an IICRC certification covering fire and smoke restoration.'
       )
     ).toHaveLength(0);
   });
@@ -241,7 +276,9 @@ describe('public claims guard', () => {
     const path = 'app/(public)/industries/commercial-cleaning/page.tsx';
     const source = readFileSync(join(ROOT, path), 'utf8');
     const planted = `${source}\nconst planted = 'Documented IICRC CEC training shows clients what was studied.';\n`;
-    expect(countIicrcCecNonAccredited(planted)).toBe(IICRC_CEC_NON_ACCREDITED_BASELINE[path] + 1);
+    expect(countIicrcCecNonAccredited(planted)).toBe(
+      (IICRC_CEC_NON_ACCREDITED_BASELINE[path] ?? 0) + 1
+    );
     expect(countIicrcCecNonAccredited('IICRC CEC Accredited courses')).toBe(0);
   });
 
@@ -278,7 +315,7 @@ describe('public claims guard', () => {
 
   it('finds no unbacked claim in any public copy file', () => {
     const hits = files.flatMap((file) =>
-      findClaims(readFileSync(file, 'utf8')).map(
+      findClaims(readFileSync(file, 'utf8'), relative(ROOT, file)).map(
         (hit) => `${relative(ROOT, file)}:${hit.line} [${hit.label}] ${hit.excerpt}`
       )
     );

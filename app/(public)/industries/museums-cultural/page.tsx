@@ -133,7 +133,7 @@ export default async function MuseumsCulturalIndustryPage() {
         title="Heritage Preservation Bundle"
         price={industryBundlePriceLabel('museums-cultural')}
         description="mould remediation, water damage restoration and structural drying training for museum and gallery teams. Includes collection-specific emergency response protocols. Online, self-paced — fits around exhibition schedules."
-        ctaText="Protect Your Collection"
+        ctaText="Explore the training"
         accentColor={ACCENT_COLOR}
       />
     </IndustryPageLayout>

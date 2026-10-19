@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Retail & Shopping Centre Restoration Training',
   description:
-    'Restoration training for shopping centre maintenance teams. Pre-qualify for major landlord panels with water damage restoration, carpet cleaning and odour control training.',
+    'Water damage restoration, carpet cleaning and odour control training for shopping centre maintenance teams.',
   keywords: [
     'retail restoration training',
     'shopping centre restoration',
@@ -46,9 +46,9 @@ const stats = [
 const whyCards = [
   {
     icon: Store,
-    title: 'Major Landlord Panels',
+    title: 'Contractor Panels',
     description:
-      'Prepare evidence for major retail contractor panels. Each panel sets its own requirements; IICRC certification, where a panel asks for it, comes only from IICRC-approved schools and examinations.',
+      'Contractor panels set their own requirements, so check what each one asks for; IICRC certification, where a panel asks for it, comes only from IICRC-approved schools and examinations.',
     color: '#dc2626',
   },
   {
@@ -62,7 +62,7 @@ const whyCards = [
     icon: Wind,
     title: 'Food Court Compliance',
     description:
-      'Odour control training for food service areas. Maintain indoor air quality standards across food courts, ensuring compliance with centre management requirements.',
+      'Odour control training for food service areas, covering indoor air quality in food courts.',
     color: '#ed9d24',
   },
 ];
