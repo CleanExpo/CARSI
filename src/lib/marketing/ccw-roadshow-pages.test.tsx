@@ -6,13 +6,16 @@ import RoadshowPage from '../../../app/(public)/events/ccw-roadshow/page';
 import * as brisbaneModule from '../../../app/(public)/ccw-brisbane/page';
 import * as melbourneModule from '../../../app/(public)/ccw-melbourne/page';
 import * as sydneyModule from '../../../app/(public)/ccw-sydney/page';
+import * as hubModule from '../../../app/(public)/events/ccw-roadshow/page';
 
-describe('CCW city pages render per request', () => {
+describe('CCW routes render per request', () => {
+  // Explicit, not incidental: the hub is dynamic today only because it awaits searchParams.
   it.each([
-    ['melbourne', melbourneModule],
-    ['sydney', sydneyModule],
-    ['brisbane', brisbaneModule],
-  ])('/ccw-%s is force-dynamic with no ISR window', (_city, mod) => {
+    ['/ccw-melbourne', melbourneModule],
+    ['/ccw-sydney', sydneyModule],
+    ['/ccw-brisbane', brisbaneModule],
+    ['/events/ccw-roadshow', hubModule],
+  ])('%s is force-dynamic with no ISR window', (_route, mod) => {
     const config = mod as { dynamic?: string; revalidate?: number };
     expect(config.dynamic).toBe('force-dynamic');
     expect(config.revalidate).toBeUndefined();
