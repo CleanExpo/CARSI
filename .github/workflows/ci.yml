@@ -150,7 +150,7 @@ jobs:
         run: npm run test:quiz-balance
 
       - name: Quiz option balance guard
-        run: npm run check:quiz-balance -- --enforce=psychrometry-building-science-for-drying
+        run: npm run check:quiz-balance -- --enforce=psychrometry-building-science-for-drying,moisture-meters-readings-and-dry-standards
 
       # Licence-critical backstop: scans all course-content + marketing surfaces
       # (data/seed, public/courses, docs/marketing, docs/content) for stray IICRC
