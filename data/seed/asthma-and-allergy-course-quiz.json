@@ -5,61 +5,116 @@
   {
    "quizId": "e5f0717d-9864-4956-8082-c98f748e2062",
    "lessonTitle": "Final knowledge check",
-   "title": "Asthma and Allergy: Anti-Allergen Cleaning and Treatment — Knowledge Check",
+   "title": "Asthma and Allergy: Anti-Allergen Cleaning — Knowledge Check",
    "passPercentage": 80,
    "attemptsAllowed": 3,
    "questions": [
     {
-     "questionText": "Denaturing treatments are designed to alter allergen proteins. What must you check before relying on one?",
+     "questionText": "Per ASCIA, can house dust mites be completely removed from a home?",
      "options": [
-      "Nothing — the product class works the same way regardless of brand",
-      "The manufacturer's independent test evidence (for example Der p 1 or Fel d 1 data) and the current label — never assume efficacy from marketing",
-      "Only the price per litre",
-      "Whether the supplier offers a discount for bulk purchase"
+      "No, only reduced",
+      "Yes, by vacuuming",
+      "Yes, by spraying",
+      "Yes, by dry-cleaning"
+     ],
+     "correctIndex": 0,
+     "points": 1
+    },
+    {
+     "questionText": "Per ASCIA, at what water temperature should bedding be washed weekly?",
+     "options": [
+      "Above 30 °C",
+      "Above 60 °C",
+      "Above 40 °C",
+      "Cold water only"
      ],
      "correctIndex": 1,
      "points": 1
     },
     {
-     "questionText": "Before applying an anti-allergen treatment to carpet you must always:",
+     "questionText": "Per the AIHW, how many people in Australia were living with asthma in 2022?",
      "options": [
-      "Spray the whole room immediately",
-      "Test for colourfastness in an inconspicuous area",
-      "Raise the room temperature above 30 °C",
-      "Remove all furniture from the house"
+      "About 0.8 million",
+      "About 5.8 million",
+      "About 2.8 million",
+      "About 9.8 million"
+     ],
+     "correctIndex": 2,
+     "points": 1
+    },
+    {
+     "questionText": "Per the Foundation report in this course, what is the third leading cause of death in New Zealand?",
+     "options": [
+      "Asthma by itself",
+      "Dust mite allergy",
+      "Pet dander allergy",
+      "All respiratory disease"
+     ],
+     "correctIndex": 3,
+     "points": 1
+    },
+    {
+     "questionText": "Per the labelling Code, what must a decanted container carry at minimum?",
+     "options": [
+      "The identifier plus pictogram or statement",
+      "Brand logo plus the retail price",
+      "Expiry date plus the batch number",
+      "Supplier name plus a phone number"
+     ],
+     "correctIndex": 0,
+     "points": 1
+    },
+    {
+     "questionText": "Per the model Code, where does PPE sit in the hierarchy of control?",
+     "options": [
+      "First, before other controls",
+      "Last, after higher controls",
+      "Second, after elimination controls",
+      "Third, before administrative ones"
      ],
      "correctIndex": 1,
      "points": 1
     },
     {
-     "questionText": "Which of these is a key Australian WHS control when applying treatment products?",
+     "questionText": "Per NSW Health, what do you do first if you suspect heat stroke?",
      "options": [
-      "Working alone to save time",
-      "Wearing the PPE specified by the product label and SDS",
-      "Skipping documentation for small jobs",
-      "Mixing products to boost strength"
+      "Finish the job quickly",
+      "Give them some paracetamol",
+      "Call triple zero (000)",
+      "Drive them home now"
      ],
-     "correctIndex": 1,
+     "correctIndex": 2,
      "points": 1
     },
     {
-     "questionText": "If a manufacturer states a residual effect period for an allergen-denaturing treatment (for example \"up to six months\"), how should you treat that claim?",
+     "questionText": "Per business.gov.au, can a store policy override consumer guarantees?",
      "options": [
-      "Tell the customer their symptoms will stay away for that whole period",
-      "As the manufacturer's own claim — verify it on their current label and technical data, and never present it to customers as a guarantee",
-      "Ignore it — residual effects do not exist",
-      "Double it when quoting, to be safe"
+      "Yes, in writing",
+      "Yes, for treatments",
+      "Yes, below $100",
+      "No, it cannot"
      ],
-     "correctIndex": 1,
+     "correctIndex": 3,
      "points": 1
     },
     {
-     "questionText": "When quoting an anti-allergen service in Australia you should:",
+     "questionText": "Per this course, how should you describe the result of the service?",
      "options": [
-      "Copy US pricing from the manufacturer",
-      "Quote in AUD from your own chemical cost per square metre and labour rate",
-      "Always match the cheapest competitor",
-      "Quote only after the job is done"
+      "As an allergen-load reduction",
+      "As full allergy relief",
+      "As total allergen removal",
+      "As certain asthma prevention"
+     ],
+     "correctIndex": 0,
+     "points": 1
+    },
+    {
+     "questionText": "In this course, which order is correct for the service?",
+     "options": [
+      "Treat, extract, dry, pre-vacuum",
+      "Pre-vacuum, extract, treat, dry",
+      "Extract, treat, pre-vacuum, dry",
+      "Dry, treat, pre-vacuum, extract"
      ],
      "correctIndex": 1,
      "points": 1

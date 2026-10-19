@@ -10,56 +10,111 @@
    "attemptsAllowed": 3,
    "questions": [
     {
-     "questionText": "When must an Australian sole trader register for GST?",
+     "questionText": "Per the ATO, at what GST turnover must you register for GST?",
      "options": [
-      "Immediately when they get an ABN",
-      "Once GST turnover reaches the current threshold ($75,000 — ato.gov.au, checked 19/10/2026) — optional below it",
-      "Only if they employ staff",
-      "Never — GST is for companies"
-     ],
-     "correctIndex": 1,
-     "points": 1
-    },
-    {
-     "questionText": "How long must you keep business records for the ATO?",
-     "options": [
-      "One year",
-      "Two years",
-      "Five years (ato.gov.au record-keeping guidance, checked 19/10/2026)",
-      "Forever"
-     ],
-     "correctIndex": 2,
-     "points": 1
-    },
-    {
-     "questionText": "The safest way to handle money for tax and GST is to:",
-     "options": [
-      "Leave it all in one account and hope",
-      "Move a set percentage of every payment into a separate account as it arrives",
-      "Pay tax only when asked",
-      "Keep it as cash"
-     ],
-     "correctIndex": 1,
-     "points": 1
-    },
-    {
-     "questionText": "As a sole trader working in customers' homes, which cover is commonly required by customers, contracts and some licences?",
-     "options": [
-      "Public liability insurance — commonly required by customers, contracts and some licences (business.gov.au insurance guidance, checked 19/10/2026)",
-      "Comprehensive car insurance",
-      "Home and contents insurance",
-      "Income protection is legally compulsory for all sole traders"
+      "$75,000 or more",
+      "$50,000 or more",
+      "$25,000 or more",
+      "$95,000 or more"
      ],
      "correctIndex": 0,
      "points": 1
     },
     {
-     "questionText": "Under Australian WHS laws a sole trader is:",
+     "questionText": "Per the ATO, how long must you keep most business records?",
      "options": [
-      "Exempt because they work alone",
-      "A PCBU with a duty to work safely, including for anyone who helps them (model WHS Act — Safe Work Australia, checked 19/10/2026)",
-      "Only responsible if someone is injured",
-      "Covered by the customer’s insurance"
+      "2 years",
+      "5 years",
+      "3 years",
+      "7 years"
+     ],
+     "correctIndex": 1,
+     "points": 1
+    },
+    {
+     "questionText": "Per ASIC, when must a sole trader register a business name?",
+     "options": [
+      "When their turnover passes $75,000",
+      "When they hire an employee",
+      "When trading under another name",
+      "When they register for GST"
+     ],
+     "correctIndex": 2,
+     "points": 1
+    },
+    {
+     "questionText": "Per ASIC, which registration periods are offered for a business name?",
+     "options": [
+      "2 years or 5 years",
+      "1 year or 10 years",
+      "6 months or 1 year",
+      "1 year or 3 years"
+     ],
+     "correctIndex": 3,
+     "points": 1
+    },
+    {
+     "questionText": "Per the ATO, by when must you give a requested tax invoice over $82.50?",
+     "options": [
+      "Within 28 days",
+      "Within 7 days",
+      "Within 90 days",
+      "Within 12 months"
+     ],
+     "correctIndex": 0,
+     "points": 1
+    },
+    {
+     "questionText": "Per the ATO, what extra detail does a tax invoice of $1,000 or more need?",
+     "options": [
+      "The buyer's date of birth",
+      "The buyer's identity or ABN",
+      "The seller's current bank balance",
+      "The seller's TFN and address"
+     ],
+     "correctIndex": 1,
+     "points": 1
+    },
+    {
+     "questionText": "Per business.gov.au, what does portable equipment insurance cover?",
+     "options": [
+      "Injury you cause to a customer",
+      "Part of your lost weekly income",
+      "Loss, damage or theft of tools",
+      "Damage to the whole client home"
+     ],
+     "correctIndex": 2,
+     "points": 1
+    },
+    {
+     "questionText": "Per Safe Work Australia, is a self-employed person running a business a PCBU?",
+     "options": [
+      "No, only employers are PCBUs",
+      "No, only with three workers",
+      "No, only company owners are",
+      "Yes, they are a PCBU"
+     ],
+     "correctIndex": 3,
+     "points": 1
+    },
+    {
+     "questionText": "Per the ATO, what is the super guarantee rate from 1 July 2025?",
+     "options": [
+      "12%",
+      "10%",
+      "11%",
+      "9.5%"
+     ],
+     "correctIndex": 0,
+     "points": 1
+    },
+    {
+     "questionText": "In this course, which order is correct for the job admin loop?",
+     "options": [
+      "Quote, enquiry, invoice, booking",
+      "Enquiry, quote, booking, invoice",
+      "Booking, invoice, enquiry, quote",
+      "Invoice, booking, quote, enquiry"
      ],
      "correctIndex": 1,
      "points": 1
