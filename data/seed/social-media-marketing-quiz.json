@@ -1,0 +1,59 @@
+{
+ "version": 1,
+ "courseSlug": "social-media-marketing",
+ "quizzes": [
+  {
+   "quizId": "201d893b-204a-4033-8947-bf6fb20c7212",
+   "lessonTitle": "Final knowledge check",
+   "title": "Social Media Marketing — Knowledge Check",
+   "passPercentage": 80,
+   "attemptsAllowed": 3,
+   "questions": [
+    {
+     "questionText": "For a local Australian service business starting out, the best approach is:",
+     "options": [
+      "Be on every platform at once",
+      "One primary platform done properly, with consistent posting and a small targeted budget",
+      "Pay for brand-awareness ads first",
+      "Only use TikTok"
+     ],
+     "correctIndex": 1,
+     "points": 1
+    },
+    {
+     "questionText": "The most honest measure of whether your ads work is:",
+     "options": [
+      "Likes and reach",
+      "Cost per booked job",
+      "Number of ads running",
+      "Follower count"
+     ],
+     "correctIndex": 1,
+     "points": 1
+    },
+    {
+     "questionText": "A sensible starting budget for a first lead ad set is:",
+     "options": [
+      "$10–$20 AUD per day",
+      "$500 AUD per day",
+      "Nothing — ads are free",
+      "$1,000 per week minimum"
+     ],
+     "correctIndex": 0,
+     "points": 1
+    },
+    {
+     "questionText": "Advertising claims like \"certified\" or \"guaranteed\" in Australia must be:",
+     "options": [
+      "Written in capitals",
+      "Truthful and able to be substantiated under the Australian Consumer Law",
+      "Copied from competitors",
+      "Approved by Facebook"
+     ],
+     "correctIndex": 1,
+     "points": 1
+    }
+   ]
+  }
+ ]
+}

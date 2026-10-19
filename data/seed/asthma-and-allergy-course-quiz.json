@@ -1,0 +1,70 @@
+{
+ "version": 1,
+ "courseSlug": "asthma-and-allergy-course",
+ "quizzes": [
+  {
+   "quizId": "e5f0717d-9864-4956-8082-c98f748e2062",
+   "lessonTitle": "Final knowledge check",
+   "title": "Asthma and Allergy: Anti-Allergen Cleaning and Treatment — Knowledge Check",
+   "passPercentage": 80,
+   "attemptsAllowed": 3,
+   "questions": [
+    {
+     "questionText": "What does an allergen-denaturing treatment actually do?",
+     "options": [
+      "Kills dust mites with pesticide",
+      "Changes the allergen protein structure so the immune system no longer recognises it",
+      "Seals allergens under a plastic coating",
+      "Removes all humidity from the home"
+     ],
+     "correctIndex": 1,
+     "points": 1
+    },
+    {
+     "questionText": "Before applying an anti-allergen treatment to carpet you must always:",
+     "options": [
+      "Spray the whole room immediately",
+      "Test for colourfastness in an inconspicuous area",
+      "Raise the room temperature above 30 °C",
+      "Remove all furniture from the house"
+     ],
+     "correctIndex": 1,
+     "points": 1
+    },
+    {
+     "questionText": "Which of these is a key Australian WHS control when applying treatment products?",
+     "options": [
+      "Working alone to save time",
+      "Wearing the PPE specified by the product label and SDS",
+      "Skipping documentation for small jobs",
+      "Mixing products to boost strength"
+     ],
+     "correctIndex": 1,
+     "points": 1
+    },
+    {
+     "questionText": "The residual allergen relief quoted by the referenced manufacturer is up to:",
+     "options": [
+      "Two weeks",
+      "Six months",
+      "Five years",
+      "Permanent"
+     ],
+     "correctIndex": 1,
+     "points": 1
+    },
+    {
+     "questionText": "When quoting an anti-allergen service in Australia you should:",
+     "options": [
+      "Copy US pricing from the manufacturer",
+      "Quote in AUD from your own chemical cost per square metre and labour rate",
+      "Always match the cheapest competitor",
+      "Quote only after the job is done"
+     ],
+     "correctIndex": 1,
+     "points": 1
+    }
+   ]
+  }
+ ]
+}
