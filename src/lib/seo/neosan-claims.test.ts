@@ -3,11 +3,12 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 /**
- * Review r2 guard (19/10/2026): the recovered NeoSan Labs legacy lessons carried
- * US efficacy marketing CARSI cannot substantiate in Australia. A "hospital-grade",
- * "non-toxic" or bare "99.9" kill-rate may only appear in this course as an
- * attributed manufacturer statement with a claim-level, dated source in the same
- * content block ("NeoSan Labs states ... (source: <url>, checked dd/mm/yyyy)").
+ * Review r2/r3 guard (19/10/2026): the recovered NeoSan Labs legacy lessons carried
+ * US efficacy marketing CARSI cannot substantiate in Australia. Any product safety,
+ * health, toxicity, environmental, disposal, efficacy, speed, residue or regulatory
+ * claim may only appear in this course as an attributed manufacturer statement with
+ * a claim-level, dated source in the same content block
+ * ("NeoSan Labs states ... (source: <url>, checked dd/mm/yyyy)").
  */
 interface Lesson {
   title: string;
@@ -30,18 +31,42 @@ const course = catalogue.find(
   (entry) => entry.slug === 'neosan-labs-product-training',
 );
 
-const CLAIM_PATTERN =
-  /hospital[- ]grade|non[- ]?toxic|nontoxic|99[.,]9{2,}\s*(?:%|per\s?cent)?/i;
+const CLAIM_PATTERN = new RegExp(
+  [
+    'hospital[- ]grade',
+    'non[- ]?toxic|nontoxic',
+    'non[- ]?mutagenic',
+    'non[- ]?carcinogenic',
+    'safe for (humans|animals|plants|pets|children)',
+    'no harmful residue',
+    '(landfill|sewer)[- ]safe',
+    '\\b(kills?|eliminates?|destroys?|eradicates?)\\b',
+    '\\bproven\\b',
+    '99[.,]9{2,}\\s*(?:%|per\\s?cent)?',
+  ].join('|'),
+  'i',
+);
 const ATTRIBUTED = /NeoSan Labs states/i;
 const SOURCED = /\(?\s*source:\s*https?:\/\//i;
 const DATED = /checked\s+\d{1,2}\/\d{1,2}\/\d{4}/;
 
-describe('NeoSan Labs course claim compliance (review r2)', () => {
+function unattributedClaims(blocks: string[]): string[] {
+  return blocks.filter((block) => {
+    if (!CLAIM_PATTERN.test(block)) return false;
+    return !(
+      ATTRIBUTED.test(block) &&
+      SOURCED.test(block) &&
+      DATED.test(block)
+    );
+  });
+}
+
+describe('NeoSan Labs course claim compliance (review r2/r3)', () => {
   it('the course exists in the catalogue', () => {
     expect(course).toBeDefined();
   });
 
-  it('carries no efficacy claim without an attributed, dated citation in the same block', () => {
+  it('carries no efficacy, safety, residue or disposal claim without an attributed, dated citation in the same block', () => {
     const blocks: string[] = [];
     for (const module of course!.modules) {
       for (const lesson of module.lessons) {
@@ -51,15 +76,30 @@ describe('NeoSan Labs course claim compliance (review r2)', () => {
       }
     }
     blocks.push(course!.description ?? '', course!.shortDescription ?? '');
+    expect(unattributedClaims(blocks)).toEqual([]);
+  });
 
-    const offenders = blocks.filter((block) => {
-      if (!CLAIM_PATTERN.test(block)) return false;
-      return !(
-        ATTRIBUTED.test(block) &&
-        SOURCED.test(block) &&
-        DATED.test(block)
-      );
-    });
-    expect(offenders).toEqual([]);
+  it('planted controls: every banned pattern is caught when unattributed', () => {
+    const controls = [
+      '<p>Hospital-grade sterilisation.</p>',
+      '<p>This product is non-toxic.</p>',
+      '<p>Proven to be non-mutagenic and non-carcinogenic.</p>',
+      '<p>Safe for humans, animals, and plants.</p>',
+      '<p>Leaves no harmful residue behind.</p>',
+      '<p>Renders everything landfill and sewer safe.</p>',
+      '<p>Kills bacteria on contact.</p>',
+      '<p>Eliminates 99.99999% of germs.</p>',
+      '<p>Destroys mould spores.</p>',
+      '<p>Eradicates viruses.</p>',
+    ];
+    expect(unattributedClaims(controls)).toHaveLength(controls.length);
+  });
+
+  it('planted control: an attributed, dated, sourced claim passes', () => {
+    const attributed = [
+      '<p>NeoSan Labs states a 7-log (99.99999%) kill rate in its United States ' +
+        'marketing (source: https://neosanlabs.com/, checked 19/10/2026).</p>',
+    ];
+    expect(unattributedClaims(attributed)).toEqual([]);
   });
 });
