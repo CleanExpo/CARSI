@@ -81,6 +81,12 @@ jobs:
       - name: Australian-English course-content guard
         run: npm run check:au-english
 
+      # Non-vacuity proof: planted "lumber" in every seed quiz naming form must fail, and every
+      # real data/seed quiz file must be scanned or skipped by name (floor-care-quizzes.json was
+      # silently out of scope until PR #931 review).
+      - name: Australian-English guard self-test
+        run: npm run test:au-english
+
       # CARSI designation registry validity. This script existed but was run by NO workflow
       # (audited 2026-08-07) — a guard nothing invokes is not a guard. It validates that every
       # designation resolves to a real catalogue course, so a renamed or removed course cannot

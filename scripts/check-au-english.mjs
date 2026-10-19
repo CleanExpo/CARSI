@@ -93,10 +93,20 @@ export const COPY_MODULES = ['src/lib/seo/answer-engine.ts', 'src/lib/seo/llms-t
 // before its copy changes, so they are skipped BY NAME until fixed; every other quiz is scanned.
 //   ccw-truckmount: "converts 120 V to 240 V" (unlabelled US voltage in a contrast).
 //   water-damage-restoration-fundamentals: "dedicated 20 A circuit" (circuit-framing rule).
-const QUIZ_PENDING_FIX = new Set([
+export const QUIZ_PENDING_FIX = new Set([
   'data/seed/ccw-truckmount.quizzes.json',
   'data/seed/water-damage-restoration-fundamentals-quiz.json',
 ]);
+
+/**
+ * Seeded final quizzes to scan: every top-level data/seed JSON file with "quiz" in its name, so
+ * all naming forms are covered (-quiz.json, -quizzes.json, .quizzes.json). The first pattern
+ * matched only -quiz.json and .quizzes.json and silently skipped floor-care-quizzes.json
+ * (PR #931 review). check-au-english.test.mjs fails if a real seed quiz file is left out.
+ */
+export function quizFilesToScan(paths) {
+  return [...paths].filter((f) => /^data\/seed\/[^/]*quiz[^/]*\.json$/i.test(f) && !QUIZ_PENDING_FIX.has(f));
+}
 
 function main() {
 const tracked = new Set(execSync('git ls-files --cached --others --exclude-standard', { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }).split('\n'));
@@ -108,9 +118,7 @@ const draftFiles = [...tracked].filter((f) => f.startsWith('data/seed/assessment
 const cardFiles = [...tracked].filter((f) => f.startsWith('data/seo/course-cards') && f.endsWith('.json'));
 // Seeded final quizzes are learner-facing course copy (questions, options, explanations). They
 // were out of scope until 19/10/2026, when a review found US "lumber" in course copy.
-const quizFiles = [...tracked].filter(
-  (f) => /^data\/seed\/[^/]+(?:-quiz|\.quizzes)\.json$/.test(f) && !QUIZ_PENDING_FIX.has(f)
-);
+const quizFiles = quizFilesToScan(tracked);
 for (const file of COPY_MODULES) {
   if (!tracked.has(file)) {
     console.error(`check-au-english: copy module ${file} is missing — fix COPY_MODULES`);
