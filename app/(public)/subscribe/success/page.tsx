@@ -1,11 +1,20 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
+// useSearchParams needs its own Suspense boundary; there is no app-level loading boundary.
 export default function SubscribeSuccessPage() {
+  return (
+    <Suspense fallback={null}>
+      <SubscribeSuccess />
+    </Suspense>
+  );
+}
+
+function SubscribeSuccess() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
   const [showConfetti, setShowConfetti] = useState(true);

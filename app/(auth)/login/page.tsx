@@ -1,5 +1,6 @@
 import { LoginForm } from '@/components/auth/login-form';
 import Link from 'next/link';
+import { Suspense } from 'react';
 
 export default function LoginPage() {
   return (
@@ -19,7 +20,10 @@ export default function LoginPage() {
         </p>
       </div>
 
-      <LoginForm />
+      {/* LoginForm reads useSearchParams, which needs its own Suspense boundary. */}
+      <Suspense fallback={null}>
+        <LoginForm />
+      </Suspense>
 
       <div className="mt-5 text-center text-sm">
         <span className="text-slate-600">Don&apos;t have an account? </span>
