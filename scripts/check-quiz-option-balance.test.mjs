@@ -8,7 +8,7 @@ import { execFileSync } from 'node:child_process';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
-import { questionProblems, quizProblems, wordCount } from './check-quiz-option-balance.mjs';
+import { answerCycle, questionProblems, quizProblems, wordCount } from './check-quiz-option-balance.mjs';
 
 // Planted control 1: the classic giveaway, one long qualified correct answer.
 assert.ok(
@@ -25,6 +25,17 @@ assert.ok(
 // Planted control 3: the answer is always in the same position.
 const samePos = { questions: Array.from({ length: 5 }, () => ({ options: ['One a', 'Two b', 'Six c', 'Ten d'], correctIndex: 2 })) };
 assert.ok(quizProblems(samePos).some((p) => p.includes('every correct answer')), 'constant answer position must fail');
+// Planted control 4: the answer cycles 0,1,2,3 (the mm-r1 P1 pattern), and a 2-cycle.
+const quizAt = (positions) => ({
+  questions: positions.map((correctIndex) => ({ options: ['One a', 'Two b', 'Six c', 'Ten d'], correctIndex })),
+});
+const cycle4 = Array.from({ length: 20 }, (_, i) => i % 4);
+assert.ok(quizProblems(quizAt(cycle4)).some((p) => p.includes('cycle of 4')), '0,1,2,3 answer cycle must fail');
+assert.ok(quizProblems(quizAt([1, 3, 1, 3, 1, 3, 1, 3])).some((p) => p.includes('cycle of 2')), '2-cycle must fail');
+assert.equal(answerCycle(cycle4), 4);
+// Positive control: balanced but irregular positions pass.
+assert.equal(answerCycle([2, 0, 3, 1, 1, 3, 0, 2, 3, 2, 0, 0, 1, 3, 2, 1, 0, 3, 1, 2]), 0);
+assert.deepEqual(quizProblems(quizAt([2, 0, 3, 1, 1, 3, 0, 2, 3, 2, 0, 0, 1, 3, 2, 1, 0, 3, 1, 2])), []);
 
 // Formatting must not hide or add words: tags and entities are not words.
 assert.equal(wordCount('About 16.7 &deg;C'), 3);

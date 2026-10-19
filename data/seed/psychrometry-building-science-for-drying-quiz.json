@@ -12,34 +12,34 @@
         {
           "questionText": "Air in a room warms from 18 &deg;C to 26 &deg;C with no water added or removed. What happens?",
           "options": [
-            "RH falls, g/kg stays the same",
             "RH rises, g/kg stays the same",
+            "RH falls, g/kg stays the same",
             "RH falls, g/kg falls as well",
             "RH stays, g/kg rises a little"
           ],
-          "correctIndex": 0,
+          "correctIndex": 1,
           "points": 1
         },
         {
           "questionText": "What is the dew point of air at 25 &deg;C and 60% RH?",
           "options": [
             "About 12.0 &deg;C",
-            "About 16.7 &deg;C",
             "About 19.0 &deg;C",
-            "About 21.3 &deg;C"
+            "About 21.3 &deg;C",
+            "About 16.7 &deg;C"
           ],
-          "correctIndex": 1,
+          "correctIndex": 3,
           "points": 1
         },
         {
           "questionText": "Using W = 622 &times; p<sub>w</sub> / (p &minus; p<sub>w</sub>) with p<sub>w</sub> = 1.902 kPa at 101.325 kPa, what is W?",
           "options": [
+            "About 11.90 g/kg",
             "About 18.77 g/kg",
             "About 9.06 g/kg",
-            "About 11.90 g/kg",
             "About 13.10 g/kg"
           ],
-          "correctIndex": 2,
+          "correctIndex": 0,
           "points": 1
         },
         {
@@ -47,10 +47,10 @@
           "options": [
             "Relative humidity in percent",
             "Air temperature in degrees",
-            "Equipment run time hours",
-            "Humidity ratio in g/kg"
+            "Humidity ratio in g/kg",
+            "Equipment run time hours"
           ],
-          "correctIndex": 3,
+          "correctIndex": 2,
           "points": 1
         },
         {
@@ -68,11 +68,11 @@
           "questionText": "A skirting offcut weighs 152.4 g wet and 120.0 g oven-dry. What is its moisture content?",
           "options": [
             "21.3 percent",
-            "27.0 percent",
             "32.4 percent",
+            "27.0 percent",
             "12.7 percent"
           ],
-          "correctIndex": 1,
+          "correctIndex": 2,
           "points": 1
         },
         {
@@ -80,32 +80,32 @@
           "options": [
             "A fixed percentage for every job",
             "The meter maker&rsquo;s printed default value",
-            "Unaffected skirting in the same building",
-            "Any dry material in the room"
+            "Any dry material in the room",
+            "Unaffected skirting in the same building"
           ],
-          "correctIndex": 2,
+          "correctIndex": 3,
           "points": 1
         },
         {
           "questionText": "Using the Wood Handbook EMC equation, about what EMC does timber reach at 20 &deg;C and 55% RH?",
           "options": [
             "About 14.2 percent",
+            "About 10.1 percent",
             "About 6.5 percent",
-            "About 18.0 percent",
-            "About 10.1 percent"
+            "About 18.0 percent"
           ],
-          "correctIndex": 3,
+          "correctIndex": 1,
           "points": 1
         },
         {
           "questionText": "Indoors 20 &deg;C, outdoors 3 &deg;C, U = 6.9 W/m&sup2;&middot;K, R<sub>si</sub> = 0.13 m&sup2;&middot;K/W. What is the inside surface temperature?",
           "options": [
-            "About 4.75 &deg;C",
             "About 13.37 &deg;C",
             "About 10.72 &deg;C",
+            "About 4.75 &deg;C",
             "About 12.01 &deg;C"
           ],
-          "correctIndex": 0,
+          "correctIndex": 2,
           "points": 1
         },
         {
@@ -124,10 +124,10 @@
           "options": [
             "Condensation from room air",
             "A faulty hygrometer reading",
-            "A leak, not condensation",
-            "Normal seasonal surface damp"
+            "Normal seasonal surface damp",
+            "A leak, not condensation"
           ],
-          "correctIndex": 2,
+          "correctIndex": 3,
           "points": 1
         },
         {
@@ -156,66 +156,66 @@
           "questionText": "Inside is 9.06 g/kg and outside is 12.78 g/kg. Should you ventilate with outside air?",
           "options": [
             "Yes, outside air is wetter",
-            "No, outside air is wetter",
             "Yes, outside RH is higher",
+            "No, outside air is wetter",
             "No, outside RH is lower"
           ],
-          "correctIndex": 1,
+          "correctIndex": 2,
           "points": 1
         },
         {
           "questionText": "How many climate zones does the NCC use for its energy efficiency provisions?",
           "options": [
             "Four climate zones",
-            "Three climate zones",
             "Eight climate zones",
+            "Three climate zones",
             "Six climate zones"
           ],
-          "correctIndex": 2,
+          "correctIndex": 1,
           "points": 1
         },
         {
           "questionText": "According to the ABCB handbook, what do NCC climate zones indicate about condensation risk?",
           "options": [
+            "Only a limited indication",
             "A complete risk assessment",
             "Nothing about thermal performance",
-            "The exact site humidity",
-            "Only a limited indication"
-          ],
-          "correctIndex": 3,
-          "points": 1
-        },
-        {
-          "questionText": "Which BoM statistics does the ABCB handbook say indicate atmospheric water vapour content?",
-          "options": [
-            "Mean 9am and 3pm dew point temperatures",
-            "Mean daily rainfall totals for each month",
-            "Highest recorded wind gusts in each year",
-            "Mean daily sunshine hours for each season"
+            "The exact site humidity"
           ],
           "correctIndex": 0,
           "points": 1
         },
         {
+          "questionText": "Which BoM statistics does the ABCB handbook say indicate atmospheric water vapour content?",
+          "options": [
+            "Mean daily rainfall totals for each month",
+            "Highest recorded wind gusts in each year",
+            "Mean daily sunshine hours for each season",
+            "Mean 9am and 3pm dew point temperatures"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        },
+        {
           "questionText": "Dehumidifier inlet is 11.20 g/kg and outlet is 6.13 g/kg. What is the grain depression?",
           "options": [
-            "17.33 g/kg",
             "5.07 g/kg",
+            "17.33 g/kg",
             "6.13 g/kg",
             "11.20 g/kg"
           ],
-          "correctIndex": 1,
+          "correctIndex": 0,
           "points": 1
         },
         {
           "questionText": "What does CARSI do with the content of a paid standard such as AS 1668.2:2024?",
           "options": [
             "Quote its key ventilation rates directly",
-            "Summarise its main requirements for learners",
             "Name it and check the edition",
+            "Summarise its main requirements for learners",
             "Paste short tables with an attribution"
           ],
-          "correctIndex": 2,
+          "correctIndex": 1,
           "points": 1
         },
         {
@@ -223,10 +223,10 @@
           "options": [
             "On at full speed immediately",
             "On, but only overnight hours",
-            "Off only when RH rises",
-            "Off until assessed and cleaned"
+            "Off until assessed and cleaned",
+            "Off only when RH rises"
           ],
-          "correctIndex": 3,
+          "correctIndex": 2,
           "points": 1
         }
       ]

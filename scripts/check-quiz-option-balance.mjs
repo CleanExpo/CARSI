@@ -5,7 +5,8 @@
  * Rule (teach method, founder directive 19/10/2026): every option in a question has the SAME
  * number of words, and close to the same number of characters, so a learner cannot pick the
  * longest or most qualified option and be right. Also flags a correct answer that sits in the
- * same position for every question in a quiz.
+ * same position for every question in a quiz, or whose positions repeat in a fixed cycle
+ * (e.g. 0,1,2,3,0,1,2,3…), because a learner can game either pattern.
  *
  * Scans every data/seed/*-quiz.json and *.quizzes.json file. Advisory by default (exit 0, like
  * check-course-completeness) because older quizzes predate the rule. Pass
@@ -48,7 +49,20 @@ export function questionProblems(options) {
   return out;
 }
 
-/** Problems with one quiz: per-question shape plus a constant answer position. */
+/**
+ * Shortest period p (2 <= p <= n/2) with which the answer positions repeat strictly, i.e. every
+ * position equals the one p questions earlier; 0 when there is none. A constant sequence
+ * (period 1) is reported separately.
+ */
+export function answerCycle(positions) {
+  const n = positions.length;
+  for (let p = 2; p <= Math.floor(n / 2); p++) {
+    if (positions.every((v, i) => i < p || v === positions[i - p])) return p;
+  }
+  return 0;
+}
+
+/** Problems with one quiz: per-question shape plus a constant or cyclic answer position. */
 export function quizProblems(quiz) {
   const out = [];
   const qs = quiz.questions || [];
@@ -57,6 +71,10 @@ export function quizProblems(quiz) {
   });
   if (qs.length >= 4 && new Set(qs.map((q) => q.correctIndex)).size === 1) {
     out.push(`every correct answer is option ${qs[0].correctIndex}`);
+  } else if (qs.length >= 4) {
+    const positions = qs.map((q) => q.correctIndex);
+    const p = answerCycle(positions);
+    if (p) out.push(`correct answers repeat in a cycle of ${p}: ${positions.slice(0, p).join(',')}`);
   }
   return out;
 }
