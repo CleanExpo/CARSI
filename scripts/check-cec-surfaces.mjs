@@ -135,10 +135,17 @@ function inScope(f) {
   const n = f.replace(/\\/g, '/');
   return SCANNED_DIRS.some((d) => n.startsWith(d));
 }
+/**
+ * A test file or folder: `.test.` / `.spec.` in the BASENAME (a specifier may omit the extension,
+ * './Badge.test'), or a whole `__tests__` / `__fixtures__` path segment. Never a match anywhere
+ * in the path: app/cec.test.public/page.tsx is a routable page, not a test (review r7 of 1f54c344).
+ * Unit tests exercise the accessors directly, so test files are exempt from rules 1-4.
+ */
 function isTestPath(f) {
-  const n = f.replace(/\\/g, '/');
-  if (/(?:\.test\.|\.spec\.)/.test(n)) return true; // unit tests exercise the accessors directly
-  return /(?:^|\/)__tests__\//.test(n) || /(?:^|\/)__fixtures__\//.test(n);
+  const segments = f.replace(/\\/g, '/').split('/');
+  const base = segments[segments.length - 1];
+  if (/\.(?:test|spec)(?:\.|$)/.test(base)) return true;
+  return segments.some((s) => s === '__tests__' || s === '__fixtures__');
 }
 function isExempt(f) {
   const n = f.replace(/\\/g, '/');
@@ -146,16 +153,13 @@ function isExempt(f) {
   return ACCESSOR_ALLOWLIST.some((e) => n === e || n.endsWith('/' + e));
 }
 
-/** A module specifier that names a test file or test folder (rule 5). */
-const TEST_SPECIFIER = /\.(?:test|spec)(?:\.[cm]?[jt]sx?)?$|\.(?:test|spec)\.|(?:^|\/)__(?:tests|fixtures)__(?:\/|$)/;
-
 /** Rule 5: every import of a test path from `file`, as findings. Only literal specifiers are seen. */
 export function testImportFindings(file, text) {
   const isTsx = /\.(tsx|jsx)$/.test(file);
   const sf = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true, isTsx ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
   const out = [];
   const check = (node, spec) => {
-    if (spec && (ts.isStringLiteral(spec) || ts.isNoSubstitutionTemplateLiteral(spec)) && TEST_SPECIFIER.test(spec.text)) {
+    if (spec && (ts.isStringLiteral(spec) || ts.isNoSubstitutionTemplateLiteral(spec)) && isTestPath(spec.text)) {
       const line = sf.getLineAndCharacterOfPosition(node.getStart(sf)).line + 1;
       out.push(
         `  ${file}:${line}: imports a test path ('${spec.text}') — test files are exempt by name, so production ` +

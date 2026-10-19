@@ -176,6 +176,44 @@ for (const code of IICRC_CODES) {
   }
 }
 
+// Exemption is by BASENAME (.test. / .spec.) and whole segment (__tests__ / __fixtures__) only
+// (review r7 of 1f54c344): a routable App Router folder such as app/cec.test.public/ must still be
+// scanned. Rule 4 covers recognition paths, so the bare CEC phrase is checked on those; the
+// review's own paths, which are not recognition paths, are checked with a rule-1 raw read.
+{
+  const phrase = "export default function P() { return <p>Approved IICRC CEC hours</p>; }\n";
+  const rawRead = 'export default function P({ course }) { return <p>{course.cecHours}</p>; }\n';
+  const MUST_SCAN = [
+    ['app/cec.test.public/page.tsx', rawRead],
+    ['app/x.spec.y/page.tsx', rawRead],
+    ['app/leaderboard/cec.test.public/page.tsx', phrase],
+    ['app/(dashboard)/dashboard/student/leaderboard/x.spec.y/page.tsx', phrase],
+    ['src/lib/gamification/my__tests__dir/badge.ts', phrase],
+    ['src/lib/gamification/__testsx__/badge.ts', phrase],
+  ];
+  const STILL_EXEMPT = [
+    ['src/lib/gamification/Badge.test.tsx', phrase],
+    ['src/lib/gamification/badge.spec.ts', phrase],
+    ['src/lib/gamification/__tests__/a.ts', phrase],
+    ['src/lib/gamification/__fixtures__/a.ts', phrase],
+    ['app/leaderboard/__tests__/deep/a.tsx', phrase],
+  ];
+  for (const [file, src] of MUST_SCAN) {
+    if (scanFiles([file], () => src).length === 0) {
+      console.error(`✖ MUST BLOCK but passed (wrongly exempt): ${file}`);
+      failed++;
+    }
+  }
+  for (const [file, src] of STILL_EXEMPT) {
+    if (scanFiles([file], () => src).length > 0) {
+      console.error(`✖ MUST NOT SCAN but flagged: ${file}`);
+      failed++;
+    }
+  }
+  RECOGNITION_BLOCK_EXTRA += MUST_SCAN.length;
+  RECOGNITION_PASS_EXTRA += STILL_EXEMPT.length;
+}
+
 // Rule 5 (review r6 of efa6e0be): test files are exempt by name, so production code must never
 // import one, or "Badge.test.tsx" could ship CEC wording unscanned. Through scanFiles(), like CI.
 {
@@ -197,6 +235,7 @@ for (const code of IICRC_CODES) {
     ['a __tests__ module importing a fixture', 'src/lib/__tests__/x.ts', "import d from '../__fixtures__/data';"],
     ['ordinary names that contain test/spec', PROD, "import { t } from './testimonials'; import { s } from './latest-specs'; import { c } from './contest';"],
     ['test runner package', 'src/lib/server/leaderboard-xp.ts', "import { describe } from 'vitest';"],
+    ['folder name containing .test.', PROD, "import { P } from '@/app/cec.test.public/parts';"],
   ];
   for (const [name, file, src] of MUST_FLAG) {
     const hits = scanFiles([file], () => src).filter((l) => /imports a test/.test(l));
@@ -212,8 +251,8 @@ for (const code of IICRC_CODES) {
       failed++;
     }
   }
-  RECOGNITION_BLOCK_EXTRA = MUST_FLAG.length;
-  RECOGNITION_PASS_EXTRA = MUST_ALLOW.length;
+  RECOGNITION_BLOCK_EXTRA += MUST_FLAG.length;
+  RECOGNITION_PASS_EXTRA += MUST_ALLOW.length;
 }
 
 for (const [name, file, src] of RECOGNITION_PASS) {
