@@ -14,9 +14,9 @@ const siteUrl = getPublicSiteUrl();
 // Derived, not restated - same drift class as the Sydney and Brisbane vanity pages.
 const melbourne = getCcwRoadshowEvent('melbourne');
 
-// Event JSON-LD is emitted only for sessions still to come, so re-render hourly; a static
-// build would otherwise keep a finished session marked EventScheduled until the next deploy.
-export const revalidate = 3600;
+// Rendered per request: the Event JSON-LD, dates, venue and metadata all turn on whether a
+// sitting has ended, so no cached copy may outlive a session boundary.
+export const dynamic = 'force-dynamic';
 
 export function generateMetadata(): Metadata {
   const page = {

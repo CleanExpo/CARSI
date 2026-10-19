@@ -18,7 +18,6 @@ import { serializeJsonLd } from '@/lib/seo/json-ld';
 import {
   allowsFreeEntryRegistration,
   buildCcwRoadshowEventJsonLd,
-  ccwHomeVenues,
   ccwRoadshowCampaignPillars,
   ccwRoadshowEvents,
   ccwRoadshowFacilityAdvantages,
@@ -31,10 +30,11 @@ import {
   ccwRoadshowTopics,
   formatAudFromCents,
   formatCcwVenue,
-  getCcwHomeVenue,
+  getCcwCityVenue,
   getCcwRegisterInterestHref,
   getCcwRoadshowEvent,
   getCcwRoadshowEventPath,
+  getNextCcwCitySitting,
   hasCcwRoadshowSessionEnded,
   type CcwRoadshowEvent,
 } from '@/lib/marketing/ccw-roadshow';
@@ -48,7 +48,9 @@ const breadcrumbs = [
   { name: ccwRoadshowTitle, url: canonical },
 ];
 
-const faqs = [
+/** The venue answer follows each city's next sitting, so the FAQ is built per render. */
+function buildFaqs(now: Date) {
+  return [
   {
     question: 'Who should attend the CARSI x CCW Business Growth Days?',
     answer:
@@ -61,40 +63,52 @@ const faqs = [
   },
   {
     question: 'Where are the Melbourne, Sydney and Brisbane events held?',
-    answer: `Melbourne is held at ${formatCcwVenue(ccwHomeVenues.VIC)}. Sydney is held at ${formatCcwVenue(ccwHomeVenues.NSW)}. Brisbane is held at ${formatCcwVenue(ccwHomeVenues.QLD)}.`,
+    answer: (['Melbourne', 'Sydney', 'Brisbane'] as const)
+      .map((city) => `${city} is held at ${formatCcwVenue(getCcwCityVenue(city, now))}.`)
+      .join(' '),
   },
   {
     question: 'What topics are covered?',
     answer:
       'The program connects carpet cleaning, rug cleaning, stain removal, tile cleaning, professional equipment, chemistry, service design, quoting confidence, profitable service growth and practical CCW facility demonstrations.',
   },
-];
+  ];
+}
 
 export type CcwFocusCity = string;
 
-function nextDatesAnnouncement(city?: CcwRoadshowEvent['city']): string {
-  return `${city ? `Next ${city} dates` : 'Next roadshow dates'}: to be announced`;
+function nextDatesAnnouncement(
+  city?: CcwRoadshowEvent['city'],
+  next?: CcwRoadshowEvent | null,
+): string {
+  return `${city ? `Next ${city} dates` : 'Next roadshow dates'}: ${next ? next.dates : 'to be announced'}`;
 }
 
-/** Shown instead of any booking once the sitting a page is about has ended. */
-function CcwRegisterInterest({ city }: { city?: CcwRoadshowEvent['city'] }) {
+/**
+ * Shown instead of any booking once the sitting a page is about has ended: points at the city's
+ * next sitting when one is ahead, otherwise invites interest in dates not yet set.
+ */
+function CcwRegisterInterest({ city, now }: { city?: CcwRoadshowEvent['city']; now: Date }) {
+  const next = city ? getNextCcwCitySitting(city, now) : null;
   return (
     <>
-      <p className={LANDING_EYEBROW_CLASS}>Register your interest</p>
+      <p className={LANDING_EYEBROW_CLASS}>{next ? 'Next sitting' : 'Register your interest'}</p>
       <h3 className="mt-3 font-[family-name:var(--font-display)] text-2xl font-semibold text-slate-950">
-        {nextDatesAnnouncement(city)}
+        {nextDatesAnnouncement(city, next)}
       </h3>
       <p className={`mt-3 ${LANDING_LEAD_CLASS}`}>
         {city
-          ? `${city} training is held at ${formatCcwVenue(getCcwHomeVenue(city))}.`
+          ? `${city} training is held at ${formatCcwVenue(getCcwCityVenue(city, now))}.`
           : 'Training is held at Carpet Cleaners Warehouse stores in Melbourne, Sydney and Brisbane.'}{' '}
-        Leave your details and CARSI will contact you when the next dates are confirmed.
+        {next
+          ? 'See the next sitting for times and booking.'
+          : 'Leave your details and CARSI will contact you when the next dates are confirmed.'}
       </p>
       <Link
-        href={getCcwRegisterInterestHref(city)}
+        href={next ? getCcwRoadshowEventPath(next) : getCcwRegisterInterestHref(city)}
         className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-full bg-[#146fc2] px-6 text-sm font-semibold text-white hover:bg-[#0f5fa8]"
       >
-        Register your interest
+        {next ? `View the next ${city} sitting` : 'Register your interest'}
         <ArrowRight className="h-4 w-4" aria-hidden />
       </Link>
     </>
@@ -110,8 +124,9 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
   const focusEvent = focusSlug ? getCcwRoadshowEvent(focusSlug) : null;
   const currentHref = focusEvent ? getCcwRoadshowEventPath(focusEvent) : ccwRoadshowPath;
   const schemaEvents = focusEvent ? [focusEvent] : ccwRoadshowEvents;
-  // Event markup only for sessions still to come; past sessions carry none.
+  // Event markup only while a session has not ended; finished sessions carry none.
   const now = new Date();
+  const faqs = buildFaqs(now);
   const eventSchemas = schemaEvents.flatMap((event) => {
     const schema = buildCcwRoadshowEventJsonLd(event, {
       now,
@@ -125,6 +140,9 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
   const nextDatesTba = focusEvent
     ? hasCcwRoadshowSessionEnded(focusEvent, now)
     : upcomingEvents.length === 0;
+  // When the focused sitting has ended but its city has a later one, point at that sitting.
+  const nextCitySitting =
+    focusEvent && nextDatesTba ? getNextCcwCitySitting(focusEvent.city, now) : null;
   const pageFaqs = focusEvent?.bookingUrl && !nextDatesTba ? [
     faqs[0],
     { question: 'How much does it cost?', answer: `Seats are booked through Carpet Cleaners Warehouse.${focusEvent.unitAmountCents !== undefined ? ` ${formatAudFromCents(focusEvent.unitAmountCents)} including GST per person.` : ''}${focusEvent.giftCardAmountCents !== undefined ? ` One ${formatAudFromCents(focusEvent.giftCardAmountCents)} CCW gift card per registration, redeemable after the course.` : ''}${focusEvent.maxRegistrationsPerCustomer !== undefined ? ` Maximum ${focusEvent.maxRegistrationsPerCustomer} registrations per customer.` : ''}` },
@@ -172,7 +190,7 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
               <p className="mt-3 text-sm font-semibold text-[#a85500]">
                 Two days with {ccwRoadshowPresenter.name}
                 {nextDatesTba
-                  ? ` · ${nextDatesAnnouncement(focusEvent?.city)}`
+                  ? ` · ${nextDatesAnnouncement(focusEvent?.city, nextCitySitting)}`
                   : focusEvent
                     ? ` · ${focusEvent.dates}`
                     : ''}
@@ -180,7 +198,7 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
               {focusEvent && nextDatesTba ? (
                 <p className="mt-3 flex items-start gap-2 text-sm text-slate-600">
                   <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#146fc2]" aria-hidden />
-                  Where we train: {formatCcwVenue(getCcwHomeVenue(focusEvent.city))}
+                  Where we train: {formatCcwVenue(getCcwCityVenue(focusEvent.city, now))}
                 </p>
               ) : null}
               <p className={`mt-5 max-w-xl text-pretty ${LANDING_LEAD_CLASS}`}>
@@ -210,7 +228,7 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
             <div id="booking" className="lg:sticky lg:top-28">
               {nextDatesTba ? (
                 <div className="rounded-2xl border border-slate-200/80 bg-white p-7 shadow-sm">
-                  <CcwRegisterInterest city={focusEvent?.city} />
+                  <CcwRegisterInterest city={focusEvent?.city} now={now} />
                 </div>
               ) : (
                 <CcwRoadshowBooking events={upcomingEvents} initialSlug={focusSlug} />
@@ -223,7 +241,9 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
       <HomeTrustStrip
         stats={[
           {
-            value: nextDatesTba ? 'Dates TBA' : (focusEvent?.dates ?? '3 cities'),
+            value: nextDatesTba
+              ? (nextCitySitting?.dates ?? 'Dates TBA')
+              : (focusEvent?.dates ?? '3 cities'),
             label: focusEvent ? focusEvent.city : 'National stops',
           },
           {
@@ -357,7 +377,7 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
           </div>
           <div className="rounded-2xl border border-slate-200/80 bg-white p-7 shadow-sm">
             {nextDatesTba ? (
-              <CcwRegisterInterest city={focusEvent?.city} />
+              <CcwRegisterInterest city={focusEvent?.city} now={now} />
             ) : focusEvent && !allowsFreeEntryRegistration(focusEvent) ? (
               <>
                 <p className={LANDING_EYEBROW_CLASS}>Booked through CCW</p>

@@ -3,6 +3,21 @@ import BrisbanePage, { generateMetadata as brisbaneMetadata } from '../../../app
 import { generateMetadata as melbourneMetadata } from '../../../app/(public)/ccw-melbourne/page';
 import { generateMetadata as sydneyMetadata } from '../../../app/(public)/ccw-sydney/page';
 import RoadshowPage from '../../../app/(public)/events/ccw-roadshow/page';
+import * as brisbaneModule from '../../../app/(public)/ccw-brisbane/page';
+import * as melbourneModule from '../../../app/(public)/ccw-melbourne/page';
+import * as sydneyModule from '../../../app/(public)/ccw-sydney/page';
+
+describe('CCW city pages render per request', () => {
+  it.each([
+    ['melbourne', melbourneModule],
+    ['sydney', sydneyModule],
+    ['brisbane', brisbaneModule],
+  ])('/ccw-%s is force-dynamic with no ISR window', (_city, mod) => {
+    const config = mod as { dynamic?: string; revalidate?: number };
+    expect(config.dynamic).toBe('force-dynamic');
+    expect(config.revalidate).toBeUndefined();
+  });
+});
 
 describe('Brisbane occurrence routing and metadata', () => {
   afterEach(() => {

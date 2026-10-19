@@ -142,6 +142,29 @@ export function hasCcwRoadshowSessionEnded(event: CcwRoadshowEvent, now: Date): 
   return Date.parse(event.endDateIso) <= now.getTime();
 }
 
+/** The city's earliest sitting that has not ended, or null when nothing is ahead. */
+export function getNextCcwCitySitting(
+  city: CcwRoadshowEvent['city'],
+  now: Date,
+): CcwRoadshowEvent | null {
+  return (
+    ccwRoadshowEvents
+      .filter((event) => event.city === city && !hasCcwRoadshowSessionEnded(event, now))
+      .sort((a, b) => Date.parse(a.startDateIso) - Date.parse(b.startDateIso))[0] ?? null
+  );
+}
+
+/**
+ * Where a city's training is held right now: the venue of its next sitting when one is ahead
+ * (e.g. Club Kilsyth before 23 July 2026), otherwise the CCW home venue.
+ */
+export function getCcwCityVenue(city: CcwRoadshowEvent['city'], now: Date): CcwVenue {
+  const next = getNextCcwCitySitting(city, now);
+  if (!next) return getCcwHomeVenue(city);
+  const { venueName, streetAddress, suburb, suburbStatePostcode, state } = next;
+  return { venueName, streetAddress, suburb, suburbStatePostcode, state };
+}
+
 /** City-page meta description once that city's sitting has ended: no past dates or offers. */
 export function getCcwNextDatesDescription(city: CcwRoadshowEvent['city']): string {
   return `Next ${city} dates to be announced. Practical training with Phill McGurk at ${formatCcwVenue(getCcwHomeVenue(city))}. Register your interest.`;
@@ -355,8 +378,9 @@ const ccwRoadshowOrganisers = [
 /**
  * schema.org Event JSON-LD for one roadshow session, or null when it must not be marked up.
  *
- * Fails closed: a session that has started (or finished) gets no Event markup, and neither does
- * one whose address line lacks a postcode. CARSI and CCW are separate organisers (CCW co-presents
+ * Fails closed: a session that has ENDED gets no Event markup (a running multi-day session keeps
+ * it), and neither does one whose address line lacks a postcode. Google's Event docs do not
+ * address ongoing events either way; they ask multi-day events to give both start and end. CARSI and CCW are separate organisers (CCW co-presents
  * and sells the paid seats); the CCW store is the Place. An Offer is emitted only when the session
  * carries a real price in `unitAmountCents` - never a guessed or free one.
  * Google requirements: developers.google.com/search/docs/appearance/structured-data/event
@@ -366,7 +390,7 @@ export function buildCcwRoadshowEventJsonLd(
   event: CcwRoadshowEvent,
   { now, url, image }: { now: Date; url: string; image?: string },
 ): Record<string, unknown> | null {
-  if (!(Date.parse(event.startDateIso) > now.getTime())) return null;
+  if (hasCcwRoadshowSessionEnded(event, now)) return null;
   const postalCode = /\b(\d{4})$/.exec(event.suburbStatePostcode)?.[1];
   if (!postalCode) return null;
 

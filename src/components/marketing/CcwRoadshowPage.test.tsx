@@ -84,6 +84,55 @@ describe('Event structured data on the roadshow pages', () => {
   });
 });
 
+describe('venue named for where training is held', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  function faqAnswers(markup: string): string {
+    return [...markup.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)]
+      .map((m) => JSON.parse(m[1]) as { '@type'?: string; mainEntity?: { acceptedAnswer?: { text?: string } }[] })
+      .filter((block) => block['@type'] === 'FAQPage')
+      .flatMap((block) => block.mainEntity ?? [])
+      .map((q) => q.acceptedAnswer?.text ?? '')
+      .join('\n');
+  }
+
+  it.each([undefined, 'melbourne'])('names Club Kilsyth while the July sitting is ahead (%s)', (focusSlug) => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-07-01T00:00:00Z'));
+    const answers = faqAnswers(renderToStaticMarkup(<CcwRoadshowContent focusSlug={focusSlug} />));
+    expect(answers).toContain('Melbourne is held at Club Kilsyth, 1-15 Canterbury Road, Bayswater North VIC 3153.');
+    expect(answers).not.toContain('Gatwick Road');
+  });
+
+  it.each([undefined, 'melbourne'])('names the CCW Melbourne store once nothing is ahead (%s)', (focusSlug) => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-10-19T00:00:00Z'));
+    const answers = faqAnswers(renderToStaticMarkup(<CcwRoadshowContent focusSlug={focusSlug} />));
+    expect(answers).toContain(
+      'Melbourne is held at Carpet Cleaners Warehouse Melbourne, Unit 1/5 Gatwick Road, Bayswater North VIC 3153.'
+    );
+    expect(answers).not.toContain('Kilsyth');
+  });
+
+  it('points an ended sitting at the same city next sitting instead of announcing TBA', () => {
+    vi.useFakeTimers();
+    // September Brisbane has ended; the October Brisbane sitting has not.
+    vi.setSystemTime(new Date('2026-10-01T00:00:00Z'));
+    const markup = renderToStaticMarkup(<CcwRoadshowContent focusSlug="brisbane" />);
+    expect(markup).toContain('Next Brisbane dates: 9-10 October 2026');
+    expect(markup).not.toContain('Next Brisbane dates: to be announced');
+    expect(markup).toMatch(
+      /Where we train: (<!-- -->)?Carpet Cleaners Warehouse Boondall, D1-3\/194 Zillmere Road, Boondall QLD 4034/
+    );
+    expect(markup).toContain('View the next Brisbane sitting');
+    expect(markup).toContain('href="/ccw-brisbane"');
+    expect(markup).toContain('[stat 9-10 October 2026 | Brisbane]');
+    expect(markup).not.toContain('<input');
+  });
+});
+
 describe('past sittings are not presented as upcoming', () => {
   afterEach(() => {
     vi.useRealTimers();

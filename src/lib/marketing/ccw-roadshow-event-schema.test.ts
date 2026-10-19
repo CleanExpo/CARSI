@@ -4,8 +4,10 @@ import {
   buildCcwRoadshowEventJsonLd,
   ccwHomeVenues,
   ccwRoadshowEvents,
+  getCcwCityVenue,
   getCcwHomeVenue,
   getCcwRoadshowEvent,
+  getNextCcwCitySitting,
   hasCcwRoadshowSessionEnded,
   type CcwRoadshowEvent,
 } from './ccw-roadshow';
@@ -84,6 +86,34 @@ describe('CCW roadshow venues', () => {
   });
 });
 
+describe('next sitting and city venue', () => {
+  it('names the next not-yet-ended sitting for a city, earliest first', () => {
+    expect(getNextCcwCitySitting('Brisbane', new Date('2026-07-01T00:00:00Z'))?.slug).toBe(
+      'brisbane'
+    );
+    expect(getNextCcwCitySitting('Brisbane', new Date('2026-10-01T00:00:00Z'))?.slug).toBe(
+      'brisbane-2026-10-09'
+    );
+    expect(getNextCcwCitySitting('Melbourne', new Date('2026-07-23T06:29:59.999Z'))?.slug).toBe(
+      'melbourne'
+    );
+    expect(getNextCcwCitySitting('Melbourne', new Date('2026-10-19T00:00:00Z'))).toBeNull();
+  });
+
+  it('uses the next sitting venue when one exists, else the CCW home venue', () => {
+    expect(getCcwCityVenue('Melbourne', new Date('2026-07-01T00:00:00Z'))).toEqual({
+      venueName: 'Club Kilsyth',
+      streetAddress: '1-15 Canterbury Road',
+      suburb: 'Bayswater North',
+      suburbStatePostcode: 'Bayswater North VIC 3153',
+      state: 'VIC',
+    });
+    expect(getCcwCityVenue('Melbourne', new Date('2026-10-19T00:00:00Z'))).toEqual(
+      ccwHomeVenues.VIC
+    );
+  });
+});
+
 describe('hasCcwRoadshowSessionEnded', () => {
   it('is false until the session end instant and true from then on', () => {
     const melbourne = event('melbourne');
@@ -95,15 +125,15 @@ describe('hasCcwRoadshowSessionEnded', () => {
 });
 
 describe('buildCcwRoadshowEventJsonLd', () => {
-  it('emits no Event markup once a session has started or finished', () => {
+  it('keeps Event markup while a session is running and drops it from the end instant', () => {
     const melbourne = event('melbourne');
-    expect(
-      buildCcwRoadshowEventJsonLd(melbourne, { now: new Date('2026-10-19T00:00:00Z'), url, image })
-    ).toBeNull();
-    // The exact start instant counts as started.
-    expect(
-      buildCcwRoadshowEventJsonLd(melbourne, { now: new Date(melbourne.startDateIso), url, image })
-    ).toBeNull();
+    const end = Date.parse(melbourne.endDateIso);
+    const at = (ms: number) =>
+      buildCcwRoadshowEventJsonLd(melbourne, { now: new Date(ms), url, image });
+    expect(at(Date.parse(melbourne.startDateIso))).not.toBeNull();
+    expect(at(end - 1)).not.toBeNull();
+    expect(at(end)).toBeNull();
+    expect(at(Date.parse('2026-10-19T00:00:00Z'))).toBeNull();
   });
 
   it('emits no Event markup for any current session on 19/10/2026 (all are past)', () => {
