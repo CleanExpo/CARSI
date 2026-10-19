@@ -1,6 +1,6 @@
 # Licence inventory — IICRC codes, certification, CEC, accreditation, unsold subjects, counted claims
 
-Exhaustive pass, 19/10/2026, on `fix/industry-faq-licence-v2` (based on origin/main 288638ef).
+Exhaustive pass, 19/10/2026, on `fix/industry-faq-licence-v2` (based on origin/main 989d8491).
 Generator: `node scripts/licence-inventory.mjs` (exit 1 on any exposure); every row is in `licence-inventory.csv`.
 Enforced by `src/lib/marketing/licence-inventory.test.ts`.
 
@@ -20,9 +20,9 @@ Enforced by `src/lib/marketing/licence-inventory.test.ts`.
 
 | Class                                                                                           | Hits |
 | ----------------------------------------------------------------------------------------------- | ---: |
-| fixed (exposures on origin/main 288638ef under the final rules, removed by this branch)         |  645 |
+| fixed (exposures on origin/main 989d8491 under the final rules, removed by this branch)         |  645 |
 | legitimate (named sentence rule or reviewed line)                                               | 1207 |
-| not public (tests, generated, staff, tooling, prompts, identifiers, routing data, markup, URLs) | 4045 |
+| not public (tests, generated, staff, tooling, prompts, identifiers, routing data, markup, URLs) | 4065 |
 | owned elsewhere (reviewed line; not edited here; listed for Phill)                              |    8 |
 | exposure remaining                                                                              |    0 |
 
@@ -166,8 +166,8 @@ Files with fixed hits:
 | legitimate      | reviewed (line): the IICRC's own discipline map, framed on /courses as a third-person reference, not CARSI courses                                                      |    2 |
 | legitimate      | reviewed (line): learner states which IICRC certification they hold (third-person; the question asks about the learner's own certifications)                            |    2 |
 | legitimate      | headcount of the guide’s illustrative example business (labelled indicative), not a claim about the world                                                               |    1 |
-| not-public      | code: identifier, comment or type                                                                                                                                       | 1415 |
-| not-public      | test file                                                                                                                                                               | 1215 |
+| not-public      | code: identifier, comment or type                                                                                                                                       | 1420 |
+| not-public      | test file                                                                                                                                                               | 1230 |
 | not-public      | generated code                                                                                                                                                          |  461 |
 | not-public      | staff-only admin surface                                                                                                                                                |  310 |
 | not-public      | routing data: bare discipline code (render sites audited separately)                                                                                                    |  269 |

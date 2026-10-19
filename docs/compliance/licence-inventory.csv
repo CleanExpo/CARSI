@@ -1,6 +1,6 @@
 class,file,line,term,match,reason,text
-fixed,app/(dashboard)/dashboard/credentials/[credentialId]/page.tsx,46,CEC,CEC,was: no rule matches,"description: 'Verify an IICRC CEC credential issued by CARSI',"
-fixed,app/(dashboard)/dashboard/credentials/[credentialId]/page.tsx,46,iicrc-offer,IICRC CEC credential,was: no rule matches,"description: 'Verify an IICRC CEC credential issued by CARSI',"
+fixed,app/(dashboard)/dashboard/credentials/[credentialId]/page.tsx,51,CEC,CEC,was: no rule matches,"description: 'Verify an IICRC CEC credential issued by CARSI',"
+fixed,app/(dashboard)/dashboard/credentials/[credentialId]/page.tsx,51,iicrc-offer,IICRC CEC credential,was: no rule matches,"description: 'Verify an IICRC CEC credential issued by CARSI',"
 fixed,app/(dashboard)/dashboard/pathways/page.tsx,6,CEC,CEC,was: no rule matches,"title: 'IICRC CEC Learning Pathways — Which Restoration Course Path Is Right for You?',"
 fixed,app/(dashboard)/dashboard/pathways/page.tsx,6,iicrc-offer,IICRC CEC Learning Pathways,was: no rule matches,"title: 'IICRC CEC Learning Pathways — Which Restoration Course Path Is Right for You?',"
 fixed,app/(dashboard)/dashboard/pathways/page.tsx,8,CEC,CEC,was: no rule matches,"'Explore structured IICRC CEC pathways for water restoration, mould remediation, carpet cleaning and more. Find the right learning path for your career stage an"
@@ -664,12 +664,12 @@ not-public,app/(dashboard)/dashboard/courses/page.tsx,106,CEC,cec,"code: identif
 not-public,app/(dashboard)/dashboard/courses/page.tsx,106,CEC,cec,"code: identifier, comment or type","[cecInView, cecInView === 1 ? 'With approved CEC' : 'With approved CEC'],"
 legitimate,app/(dashboard)/dashboard/courses/page.tsx,106,CEC,CEC,conditional or registry-computed CEC,"[cecInView, cecInView === 1 ? 'With approved CEC' : 'With approved CEC'],"
 legitimate,app/(dashboard)/dashboard/courses/page.tsx,106,CEC,CEC,conditional or registry-computed CEC,"[cecInView, cecInView === 1 ? 'With approved CEC' : 'With approved CEC'],"
-not-public,app/(dashboard)/dashboard/credentials/[credentialId]/page.tsx,5,CEC,cec,"code: identifier, comment or type",import { getCecSubmissionSummaryForEnrollment } from '@/lib/server/iicrc-cec-submission';
-not-public,app/(dashboard)/dashboard/credentials/[credentialId]/page.tsx,26,CEC,cec,"code: identifier, comment or type",const cecSubmission = await getCecSubmissionSummaryForEnrollment(credentialId);
-not-public,app/(dashboard)/dashboard/credentials/[credentialId]/page.tsx,35,CEC,cec,"code: identifier, comment or type",cecSubmissionStatus={cecSubmission?.status ?? null}
-not-public,app/(dashboard)/dashboard/credentials/[credentialId]/page.tsx,35,CEC,cec,"code: identifier, comment or type",cecSubmissionStatus={cecSubmission?.status ?? null}
-not-public,app/(dashboard)/dashboard/credentials/[credentialId]/page.tsx,36,CEC,cec,"code: identifier, comment or type",cecSubmittedAt={cecSubmission?.sent_at ?? null}
-not-public,app/(dashboard)/dashboard/credentials/[credentialId]/page.tsx,36,CEC,cec,"code: identifier, comment or type",cecSubmittedAt={cecSubmission?.sent_at ?? null}
+not-public,app/(dashboard)/dashboard/credentials/[credentialId]/page.tsx,6,CEC,cec,"code: identifier, comment or type",import { getCecSubmissionSummaryForEnrollment } from '@/lib/server/iicrc-cec-submission';
+not-public,app/(dashboard)/dashboard/credentials/[credentialId]/page.tsx,30,CEC,cec,"code: identifier, comment or type",const cecSubmission = await getCecSubmissionSummaryForEnrollment(credentialId);
+not-public,app/(dashboard)/dashboard/credentials/[credentialId]/page.tsx,40,CEC,cec,"code: identifier, comment or type",cecSubmissionStatus={cecSubmission?.status ?? null}
+not-public,app/(dashboard)/dashboard/credentials/[credentialId]/page.tsx,40,CEC,cec,"code: identifier, comment or type",cecSubmissionStatus={cecSubmission?.status ?? null}
+not-public,app/(dashboard)/dashboard/credentials/[credentialId]/page.tsx,41,CEC,cec,"code: identifier, comment or type",cecSubmittedAt={cecSubmission?.sent_at ?? null}
+not-public,app/(dashboard)/dashboard/credentials/[credentialId]/page.tsx,41,CEC,cec,"code: identifier, comment or type",cecSubmittedAt={cecSubmission?.sent_at ?? null}
 not-public,app/(dashboard)/dashboard/help/HelpTopics.test.ts,5,certif,certificate,test file,"'Where is my certificate?',"
 not-public,app/(dashboard)/dashboard/help/HelpTopics.test.ts,6,CEC,CECs,test file,"'How many CECs do I have?',"
 not-public,app/(dashboard)/dashboard/help/HelpTopics.test.ts,13,certif,certificate,test file,"expect.arrayContaining(['Where did I stop?', 'Where is my certificate?'])"
@@ -2395,31 +2395,32 @@ not-public,src/components/lms/CoursePublicDetail.test.tsx,55,CEC,CEC,test file,e
 not-public,src/components/lms/CoursePublicDetail.test.tsx,56,CEC,CECs,test file,expect(html).toContain('Technicians earning IICRC Continuing Education Credits (CECs)');
 not-public,src/components/lms/CoursePublicDetail.test.tsx,64,CEC,cec,test file,expect(cecEarnsLabel(String(n))).toBe(`Earns ${n} IICRC CEC ${unit}`);
 not-public,src/components/lms/CoursePublicDetail.test.tsx,64,CEC,CEC,test file,expect(cecEarnsLabel(String(n))).toBe(`Earns ${n} IICRC CEC ${unit}`);
-not-public,src/components/lms/CoursePublicDetail.tsx,17,CEC,CEC,"code: identifier, comment or type","/** The ""Earns N IICRC CEC hour(s)"" label, pluralised, from the resolved approval hours. */"
-not-public,src/components/lms/CoursePublicDetail.tsx,18,CEC,cec,"code: identifier, comment or type",export function cecEarnsLabel(cecHours: string): string {
-not-public,src/components/lms/CoursePublicDetail.tsx,18,CEC,cec,"code: identifier, comment or type",export function cecEarnsLabel(cecHours: string): string {
-not-public,src/components/lms/CoursePublicDetail.tsx,19,CEC,cec,"code: identifier, comment or type",return `Earns ${cecHours} IICRC CEC ${Number(cecHours) === 1 ? 'hour' : 'hours'}`;
-legitimate,src/components/lms/CoursePublicDetail.tsx,19,CEC,CEC,registry-computed CEC value beside the words,return `Earns ${cecHours} IICRC CEC ${Number(cecHours) === 1 ? 'hour' : 'hours'}`;
-not-public,src/components/lms/CoursePublicDetail.tsx,19,CEC,cec,"code: identifier, comment or type",return `Earns ${cecHours} IICRC CEC ${Number(cecHours) === 1 ? 'hour' : 'hours'}`;
-not-public,src/components/lms/CoursePublicDetail.tsx,31,CEC,cec,"code: identifier, comment or type",cec_hours?: string | null;
-not-public,src/components/lms/CoursePublicDetail.tsx,96,CEC,CEC,"code: identifier, comment or type","// A course without an in-force IICRC approval shows no CEC stat at all: ""CEC hours —"""
-not-public,src/components/lms/CoursePublicDetail.tsx,96,CEC,CEC,"code: identifier, comment or type","// A course without an in-force IICRC approval shows no CEC stat at all: ""CEC hours —"""
-not-public,src/components/lms/CoursePublicDetail.tsx,97,CEC,CEC,"code: identifier, comment or type",// beside a CEC audience line read as a contradiction.
-not-public,src/components/lms/CoursePublicDetail.tsx,98,CEC,cec,"code: identifier, comment or type","...(course.cec_hours ? [{ value: course.cec_hours, label: 'IICRC CEC hours' }] : []),"
-not-public,src/components/lms/CoursePublicDetail.tsx,98,CEC,cec,"code: identifier, comment or type","...(course.cec_hours ? [{ value: course.cec_hours, label: 'IICRC CEC hours' }] : []),"
-legitimate,src/components/lms/CoursePublicDetail.tsx,98,CEC,CEC,registry-computed CEC value beside the words,"...(course.cec_hours ? [{ value: course.cec_hours, label: 'IICRC CEC hours' }] : []),"
-not-public,src/components/lms/CoursePublicDetail.tsx,142,CEC,cec,"code: identifier, comment or type",{course.cec_hours ? <Pill>{cecEarnsLabel(course.cec_hours)}</Pill> : null}
-not-public,src/components/lms/CoursePublicDetail.tsx,142,CEC,cec,"code: identifier, comment or type",{course.cec_hours ? <Pill>{cecEarnsLabel(course.cec_hours)}</Pill> : null}
-not-public,src/components/lms/CoursePublicDetail.tsx,142,CEC,cec,"code: identifier, comment or type",{course.cec_hours ? <Pill>{cecEarnsLabel(course.cec_hours)}</Pill> : null}
-legitimate,src/components/lms/CoursePublicDetail.tsx,157,certif,certification,"third-person IICRC certification: obtained through IICRC schools, held, renewed or required by others",A CARSI-issued credential — not an IICRC certification.
-legitimate,src/components/lms/CoursePublicDetail.tsx,159,certif,certification,"third-person IICRC certification: obtained through IICRC schools, held, renewed or required by others",CARSI is an IICRC CEC Accredited provider. IICRC certification is obtained through a
-legitimate,src/components/lms/CoursePublicDetail.tsx,159,CEC,CEC,provider-level CEC standing,CARSI is an IICRC CEC Accredited provider. IICRC certification is obtained through a
-legitimate,src/components/lms/CoursePublicDetail.tsx,159,accredit,Accredited,provider-level CEC standing,CARSI is an IICRC CEC Accredited provider. IICRC certification is obtained through a
-not-public,src/components/lms/CoursePublicDetail.tsx,225,CEC,cec,"code: identifier, comment or type",cecHoursLabel={course.cec_hours}
-not-public,src/components/lms/CoursePublicDetail.tsx,225,CEC,cec,"code: identifier, comment or type",cecHoursLabel={course.cec_hours}
-not-public,src/components/lms/CoursePublicDetail.tsx,392,CEC,cec,"code: identifier, comment or type",{course.cec_hours
-not-public,src/components/lms/CoursePublicDetail.tsx,393,CEC,cec,"code: identifier, comment or type",? `${cecEarnsLabel(course.cec_hours)} and a verifiable digital credential on completion.`
-not-public,src/components/lms/CoursePublicDetail.tsx,393,CEC,cec,"code: identifier, comment or type",? `${cecEarnsLabel(course.cec_hours)} and a verifiable digital credential on completion.`
+not-public,src/components/lms/CoursePublicDetail.test.tsx,76,CEC,cec,test file,"cec_hours: null,"
+not-public,src/components/lms/CoursePublicDetail.tsx,18,CEC,CEC,"code: identifier, comment or type","/** The ""Earns N IICRC CEC hour(s)"" label, pluralised, from the resolved approval hours. */"
+not-public,src/components/lms/CoursePublicDetail.tsx,19,CEC,cec,"code: identifier, comment or type",export function cecEarnsLabel(cecHours: string): string {
+not-public,src/components/lms/CoursePublicDetail.tsx,19,CEC,cec,"code: identifier, comment or type",export function cecEarnsLabel(cecHours: string): string {
+not-public,src/components/lms/CoursePublicDetail.tsx,20,CEC,cec,"code: identifier, comment or type",return `Earns ${cecHours} IICRC CEC ${Number(cecHours) === 1 ? 'hour' : 'hours'}`;
+legitimate,src/components/lms/CoursePublicDetail.tsx,20,CEC,CEC,registry-computed CEC value beside the words,return `Earns ${cecHours} IICRC CEC ${Number(cecHours) === 1 ? 'hour' : 'hours'}`;
+not-public,src/components/lms/CoursePublicDetail.tsx,20,CEC,cec,"code: identifier, comment or type",return `Earns ${cecHours} IICRC CEC ${Number(cecHours) === 1 ? 'hour' : 'hours'}`;
+not-public,src/components/lms/CoursePublicDetail.tsx,32,CEC,cec,"code: identifier, comment or type",cec_hours?: string | null;
+not-public,src/components/lms/CoursePublicDetail.tsx,97,CEC,CEC,"code: identifier, comment or type","// A course without an in-force IICRC approval shows no CEC stat at all: ""CEC hours —"""
+not-public,src/components/lms/CoursePublicDetail.tsx,97,CEC,CEC,"code: identifier, comment or type","// A course without an in-force IICRC approval shows no CEC stat at all: ""CEC hours —"""
+not-public,src/components/lms/CoursePublicDetail.tsx,98,CEC,CEC,"code: identifier, comment or type",// beside a CEC audience line read as a contradiction.
+not-public,src/components/lms/CoursePublicDetail.tsx,99,CEC,cec,"code: identifier, comment or type","...(course.cec_hours ? [{ value: course.cec_hours, label: 'IICRC CEC hours' }] : []),"
+not-public,src/components/lms/CoursePublicDetail.tsx,99,CEC,cec,"code: identifier, comment or type","...(course.cec_hours ? [{ value: course.cec_hours, label: 'IICRC CEC hours' }] : []),"
+legitimate,src/components/lms/CoursePublicDetail.tsx,99,CEC,CEC,registry-computed CEC value beside the words,"...(course.cec_hours ? [{ value: course.cec_hours, label: 'IICRC CEC hours' }] : []),"
+not-public,src/components/lms/CoursePublicDetail.tsx,143,CEC,cec,"code: identifier, comment or type",{course.cec_hours ? <Pill>{cecEarnsLabel(course.cec_hours)}</Pill> : null}
+not-public,src/components/lms/CoursePublicDetail.tsx,143,CEC,cec,"code: identifier, comment or type",{course.cec_hours ? <Pill>{cecEarnsLabel(course.cec_hours)}</Pill> : null}
+not-public,src/components/lms/CoursePublicDetail.tsx,143,CEC,cec,"code: identifier, comment or type",{course.cec_hours ? <Pill>{cecEarnsLabel(course.cec_hours)}</Pill> : null}
+legitimate,src/components/lms/CoursePublicDetail.tsx,160,certif,certification,"third-person IICRC certification: obtained through IICRC schools, held, renewed or required by others",A CARSI-issued credential — not an IICRC certification.
+legitimate,src/components/lms/CoursePublicDetail.tsx,162,certif,certification,"third-person IICRC certification: obtained through IICRC schools, held, renewed or required by others",CARSI is an IICRC CEC Accredited provider. IICRC certification is obtained through a
+legitimate,src/components/lms/CoursePublicDetail.tsx,162,CEC,CEC,provider-level CEC standing,CARSI is an IICRC CEC Accredited provider. IICRC certification is obtained through a
+legitimate,src/components/lms/CoursePublicDetail.tsx,162,accredit,Accredited,provider-level CEC standing,CARSI is an IICRC CEC Accredited provider. IICRC certification is obtained through a
+not-public,src/components/lms/CoursePublicDetail.tsx,228,CEC,cec,"code: identifier, comment or type",cecHoursLabel={course.cec_hours}
+not-public,src/components/lms/CoursePublicDetail.tsx,228,CEC,cec,"code: identifier, comment or type",cecHoursLabel={course.cec_hours}
+not-public,src/components/lms/CoursePublicDetail.tsx,395,CEC,cec,"code: identifier, comment or type",{course.cec_hours
+not-public,src/components/lms/CoursePublicDetail.tsx,396,CEC,cec,"code: identifier, comment or type",? `${cecEarnsLabel(course.cec_hours)} and a verifiable digital credential on completion.`
+not-public,src/components/lms/CoursePublicDetail.tsx,396,CEC,cec,"code: identifier, comment or type",? `${cecEarnsLabel(course.cec_hours)} and a verifiable digital credential on completion.`
 not-public,src/components/lms/CourseSearchBar.tsx,16,CEC,cec,"code: identifier, comment or type",cec_hours?: string | null;
 not-public,src/components/lms/CourseSearchBar.tsx,241,CEC,cec,"code: identifier, comment or type",{result.cec_hours && (
 not-public,src/components/lms/CourseSearchBar.tsx,243,CEC,cec,"code: identifier, comment or type",{result.cec_hours} CECs
@@ -2515,27 +2516,27 @@ not-public,src/components/lms/CourseThumbnail.tsx,85,CEC,cec,"code: identifier, 
 not-public,src/components/lms/CourseThumbnail.tsx,85,CEC,cec,"code: identifier, comment or type",cecHoursLabel={cecHoursLabel}
 not-public,src/components/lms/CredentialVerificationPageContent.tsx,4,certif,CertificatePreview,"code: identifier, comment or type",import { CertificatePreview } from '@/components/lms/diagrams/CertificatePreview';
 not-public,src/components/lms/CredentialVerificationPageContent.tsx,4,certif,CertificatePreview,"code: identifier, comment or type",import { CertificatePreview } from '@/components/lms/diagrams/CertificatePreview';
-not-public,src/components/lms/CredentialVerificationPageContent.tsx,16,CEC,cec,"code: identifier, comment or type",cecSubmissionStatus?: string | null;
-not-public,src/components/lms/CredentialVerificationPageContent.tsx,17,CEC,cec,"code: identifier, comment or type",cecSubmittedAt?: string | null;
-not-public,src/components/lms/CredentialVerificationPageContent.tsx,25,CEC,cec,"code: identifier, comment or type","cecSubmissionStatus = null,"
-not-public,src/components/lms/CredentialVerificationPageContent.tsx,26,CEC,cec,"code: identifier, comment or type","cecSubmittedAt = null,"
-not-public,src/components/lms/CredentialVerificationPageContent.tsx,29,CEC,cec,"code: identifier, comment or type",const cecSubmitted = cecSubmissionStatus === 'sent';
-not-public,src/components/lms/CredentialVerificationPageContent.tsx,29,CEC,cec,"code: identifier, comment or type",const cecSubmitted = cecSubmissionStatus === 'sent';
-not-public,src/components/lms/CredentialVerificationPageContent.tsx,37,CEC,cec,"code: identifier, comment or type",const cecSubmittedLabel = cecSubmittedAt
-not-public,src/components/lms/CredentialVerificationPageContent.tsx,37,CEC,cec,"code: identifier, comment or type",const cecSubmittedLabel = cecSubmittedAt
-not-public,src/components/lms/CredentialVerificationPageContent.tsx,38,CEC,cec,"code: identifier, comment or type","? new Date(cecSubmittedAt).toLocaleString(undefined, {"
-legitimate,src/components/lms/CredentialVerificationPageContent.tsx,58,certif,certificate,"CARSI-issued certificate (document), not certification",. View your certificate below.
-not-public,src/components/lms/CredentialVerificationPageContent.tsx,75,CEC,cec,"code: identifier, comment or type",{cecSubmitted ? (
-legitimate,src/components/lms/CredentialVerificationPageContent.tsx,82,CEC,CEC,"learner CEC record, tracking and renewal (the learner’s own IICRC certification)","<p className=""font-medium text-sky-100"">CEC submitted to IICRC</p>"
-legitimate,src/components/lms/CredentialVerificationPageContent.tsx,84,certif,certificate,"CARSI-issued certificate (document), not certification",Your certificate was emailed to IICRC Renewals
-not-public,src/components/lms/CredentialVerificationPageContent.tsx,85,CEC,cec,"code: identifier, comment or type",{cecSubmittedLabel ? ` on ${cecSubmittedLabel}` : ''}. Keep this page as your
-not-public,src/components/lms/CredentialVerificationPageContent.tsx,85,CEC,cec,"code: identifier, comment or type",{cecSubmittedLabel ? ` on ${cecSubmittedLabel}` : ''}. Keep this page as your
-not-public,src/components/lms/CredentialVerificationPageContent.tsx,94,certif,Certificate,"code: key, slug, path or URL string",{isOnboardingCredential ? 'Program credential' : 'Certificate'}
-not-public,src/components/lms/CredentialVerificationPageContent.tsx,101,certif,CertificatePreview,"code: identifier, comment or type",<CertificatePreview
-not-public,src/components/lms/CredentialVerificationPageContent.tsx,106,CEC,cec,"code: identifier, comment or type",cecHoursLabel={credential.cec_hours}
-not-public,src/components/lms/CredentialVerificationPageContent.tsx,106,CEC,cec,"code: identifier, comment or type",cecHoursLabel={credential.cec_hours}
-not-public,src/components/lms/CredentialVerificationPageContent.tsx,133,certif,certification,"code: identifier, comment or type","a trade certification, so without this the product is disclaimed and the artifact is not,"
-legitimate,src/components/lms/CredentialVerificationPageContent.tsx,154,certif,certificate,"CARSI-issued certificate (document), not certification",Download certificate (PDF)
+not-public,src/components/lms/CredentialVerificationPageContent.tsx,19,CEC,cec,"code: identifier, comment or type",cecSubmissionStatus?: string | null;
+not-public,src/components/lms/CredentialVerificationPageContent.tsx,20,CEC,cec,"code: identifier, comment or type",cecSubmittedAt?: string | null;
+not-public,src/components/lms/CredentialVerificationPageContent.tsx,29,CEC,cec,"code: identifier, comment or type","cecSubmissionStatus = null,"
+not-public,src/components/lms/CredentialVerificationPageContent.tsx,30,CEC,cec,"code: identifier, comment or type","cecSubmittedAt = null,"
+not-public,src/components/lms/CredentialVerificationPageContent.tsx,33,CEC,cec,"code: identifier, comment or type",const cecSubmitted = cecSubmissionStatus === 'sent';
+not-public,src/components/lms/CredentialVerificationPageContent.tsx,33,CEC,cec,"code: identifier, comment or type",const cecSubmitted = cecSubmissionStatus === 'sent';
+not-public,src/components/lms/CredentialVerificationPageContent.tsx,41,CEC,cec,"code: identifier, comment or type",const cecSubmittedLabel = cecSubmittedAt
+not-public,src/components/lms/CredentialVerificationPageContent.tsx,41,CEC,cec,"code: identifier, comment or type",const cecSubmittedLabel = cecSubmittedAt
+not-public,src/components/lms/CredentialVerificationPageContent.tsx,42,CEC,cec,"code: identifier, comment or type","? new Date(cecSubmittedAt).toLocaleString(undefined, {"
+legitimate,src/components/lms/CredentialVerificationPageContent.tsx,62,certif,certificate,"CARSI-issued certificate (document), not certification",. View your certificate below.
+not-public,src/components/lms/CredentialVerificationPageContent.tsx,81,CEC,cec,"code: identifier, comment or type",{cecSubmitted ? (
+legitimate,src/components/lms/CredentialVerificationPageContent.tsx,88,CEC,CEC,"learner CEC record, tracking and renewal (the learner’s own IICRC certification)","<p className=""font-medium text-sky-100"">CEC submitted to IICRC</p>"
+legitimate,src/components/lms/CredentialVerificationPageContent.tsx,90,certif,certificate,"CARSI-issued certificate (document), not certification",Your certificate was emailed to IICRC Renewals
+not-public,src/components/lms/CredentialVerificationPageContent.tsx,91,CEC,cec,"code: identifier, comment or type",{cecSubmittedLabel ? ` on ${cecSubmittedLabel}` : ''}. Keep this page as your
+not-public,src/components/lms/CredentialVerificationPageContent.tsx,91,CEC,cec,"code: identifier, comment or type",{cecSubmittedLabel ? ` on ${cecSubmittedLabel}` : ''}. Keep this page as your
+not-public,src/components/lms/CredentialVerificationPageContent.tsx,100,certif,Certificate,"code: key, slug, path or URL string",{isOnboardingCredential ? 'Program credential' : 'Certificate'}
+not-public,src/components/lms/CredentialVerificationPageContent.tsx,107,certif,CertificatePreview,"code: identifier, comment or type",<CertificatePreview
+not-public,src/components/lms/CredentialVerificationPageContent.tsx,112,CEC,cec,"code: identifier, comment or type",cecHoursLabel={credential.cec_hours}
+not-public,src/components/lms/CredentialVerificationPageContent.tsx,112,CEC,cec,"code: identifier, comment or type",cecHoursLabel={credential.cec_hours}
+not-public,src/components/lms/CredentialVerificationPageContent.tsx,139,certif,certification,"code: identifier, comment or type","a trade certification, so without this the product is disclaimed and the artifact is not,"
+legitimate,src/components/lms/CredentialVerificationPageContent.tsx,160,certif,certificate,"CARSI-issued certificate (document), not certification",Download certificate (PDF)
 not-public,src/components/lms/EnrolledCourseList.tsx,4,CEC,cec,"code: identifier, comment or type",import { formatCecHoursForDisplay } from '@/lib/cec-display';
 not-public,src/components/lms/EnrolledCourseList.tsx,36,certif,certificate_issued_at,"code: identifier, comment or type",certificate_issued_at?: string | null;
 not-public,src/components/lms/EnrolledCourseList.tsx,37,CEC,cec,"code: identifier, comment or type",cec_submission_status?: string | null;
@@ -2584,10 +2585,10 @@ not-public,src/components/lms/IICRCIdentityCard.tsx,90,certif,cert,"code: identi
 not-public,src/components/lms/IICRCIdentityCard.tsx,93,certif,cert,"code: identifier, comment or type","<span className=""font-mono text-sm font-bold text-cyan-400"">{cert.discipline}</span>"
 not-public,src/components/lms/IICRCIdentityCard.tsx,94,certif,cert,"code: identifier, comment or type","<span className=""text-xs text-white/30"">{_formatDate(cert.certified_at)}</span>"
 not-public,src/components/lms/IICRCIdentityCard.tsx,94,certif,certified_at,"code: identifier, comment or type","<span className=""text-xs text-white/30"">{_formatDate(cert.certified_at)}</span>"
-not-public,src/components/lms/LearnCourseShell.tsx,477,certif,certificateEnrollmentId,"code: identifier, comment or type",let certificateEnrollmentId: string | null = null;
-not-public,src/components/lms/LearnCourseShell.tsx,507,certif,certificateEnrollmentId,"code: identifier, comment or type",certificateEnrollmentId = prev.enrollment_id;
-not-public,src/components/lms/LearnCourseShell.tsx,546,certif,certificateEnrollmentId,"code: identifier, comment or type",if (certificateEnrollmentId) {
-not-public,src/components/lms/LearnCourseShell.tsx,548,certif,certificateEnrollmentId,"code: identifier, comment or type",`/dashboard/credentials/${encodeURIComponent(certificateEnrollmentId)}?completed=1&course=${encodeURIComponent(slug)}`
+not-public,src/components/lms/LearnCourseShell.tsx,479,certif,certificateEnrollmentId,"code: identifier, comment or type",let certificateEnrollmentId: string | null = null;
+not-public,src/components/lms/LearnCourseShell.tsx,509,certif,certificateEnrollmentId,"code: identifier, comment or type",certificateEnrollmentId = prev.enrollment_id;
+not-public,src/components/lms/LearnCourseShell.tsx,548,certif,certificateEnrollmentId,"code: identifier, comment or type",if (certificateEnrollmentId) {
+not-public,src/components/lms/LearnCourseShell.tsx,550,certif,certificateEnrollmentId,"code: identifier, comment or type",`/dashboard/credentials/${encodeURIComponent(certificateEnrollmentId)}?completed=1&course=${encodeURIComponent(slug)}`
 not-public,src/components/lms/LearningMomentumLoop.tsx,16,certif,certificate_issued_at,"code: identifier, comment or type",certificate_issued_at?: string | null;
 not-public,src/components/lms/LearningMomentumLoop.tsx,27,certif,certificateHref,"code: identifier, comment or type",function certificateHref(enrollmentId: string) {
 not-public,src/components/lms/LearningMomentumLoop.tsx,28,certif,certificate,"code: key, slug, path or URL string",return `/api/lms/enrollments/${enrollmentId}/certificate`;
@@ -4182,9 +4183,8 @@ not-public,src/lib/marketing/licence-copy-sweep.test.ts,5,iicrc-code,OCT,test fi
 not-public,src/lib/marketing/licence-copy-sweep.test.ts,5,iicrc-code,WRT,test file,"* + OCT Odour Control … seeking IICRC credentials""), customer-journey copy (""Start with WRT""),"
 not-public,src/lib/marketing/licence-copy-sweep.test.ts,5,certif,IICRC credentials,test file,"* + OCT Odour Control … seeking IICRC credentials""), customer-journey copy (""Start with WRT""),"
 not-public,src/lib/marketing/licence-copy-sweep.test.ts,5,iicrc-offer,IICRC credentials,test file,"* + OCT Odour Control … seeking IICRC credentials""), customer-journey copy (""Start with WRT""),"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,6,iicrc-code,WRT,test file,"* meta keywords (""WRT CEC course plumbing""), unsold carpet-repair offers in shared industry data,"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,6,CEC,CEC,test file,"* meta keywords (""WRT CEC course plumbing""), unsold carpet-repair offers in shared industry data,"
-not-public,src/lib/marketing/licence-copy-sweep.test.ts,6,repair,repair,test file,"* meta keywords (""WRT CEC course plumbing""), unsold carpet-repair offers in shared industry data,"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,6,CEC,CEC,test file,"* meta keywords naming a course by its code plus ""CEC"" (plumbing), unsold carpet-repair offers in shared industry data,"
+not-public,src/lib/marketing/licence-copy-sweep.test.ts,6,repair,repair,test file,"* meta keywords naming a course by its code plus ""CEC"" (plumbing), unsold carpet-repair offers in shared industry data,"
 not-public,src/lib/marketing/licence-copy-sweep.test.ts,7,certif,certification,test file,"* the catalogue topic list and outbound marketing docs, plumbing cards claiming certification lets"
 not-public,src/lib/marketing/licence-copy-sweep.test.ts,8,CEC,CEC,test file,"* plumbers ""legally"" perform and invoice the work and a $2,500–$15,000 per-job range, and a CEC"
 not-public,src/lib/marketing/licence-copy-sweep.test.ts,21,iicrc-code,WRT,test file,const ACRONYMS = 'WRT ASD AMRT FSRT CCT CRT OCT TCST RRT'.split(' ');
@@ -4487,6 +4487,7 @@ legitimate,src/lib/resources/free-resources.ts,894,repair,Repairing,"repair of a
 not-public,src/lib/resources/free-resources.ts,898,repair,repairing,"code: key, slug, path or URL string","url: 'https://www.business.qld.gov.au/industries/building-property-development/building-construction/natural-disasters/repairing-after-flood',"
 legitimate,src/lib/resources/free-resources.ts,910,repair,repairing,"repair of a building, leak or machine (not a course offer)","note: 'Business Queensland guidance on repairing a house after a flood. A practical reference when you scope flood repairs with an owner.',"
 legitimate,src/lib/resources/free-resources.ts,910,repair,repairs,"repair of a building, leak or machine (not a course offer)","note: 'Business Queensland guidance on repairing a house after a flood. A practical reference when you scope flood repairs with an owner.',"
+not-public,src/lib/reviews/review-ask.ts,53,certif,certificate,"code: identifier, comment or type","* The single ""is this learner a completer we ask?"" predicate (D5). It uses the certificate"
 not-public,src/lib/routing/legacy-redirects.test.ts,31,CEC,CEC,test file,"* IICRC's public online-CEC listing links learners to carsi.com.au/restoration-courses,"
 not-public,src/lib/schema/course.ts,6,CEC,CEC,"code: identifier, comment or type","* Only emits fields we can substantiate — no fabricated duration, CEC hours,"
 not-public,src/lib/schema/course.ts,7,CEC,CEC,"code: identifier, comment or type",* ratings or credentials. IICRC CEC terminology: a credential should only be
@@ -5671,6 +5672,21 @@ not-public,src/lib/server/renewal-reminder.ts,232,certif,certificatesIssued,"cod
 not-public,src/lib/server/renewal-reminder.ts,232,certif,certificatesIssued,"code: identifier, comment or type","certificatesIssued: recap.certificatesIssued,"
 not-public,src/lib/server/renewal-summary-access.test.ts,9,CEC,CEC,test file,"* WS3 (P0-C, AC-8) review fix — a revoked/refunded course credits NO CEC toward"
 not-public,src/lib/server/renewal-summary-access.test.ts,12,CEC,CEC,test file,"describe('isCompleteEnrollment — CEC crediting excludes revoked', () => {"
+not-public,src/lib/server/renewal-summary-cec-window.test.ts,5,CEC,CEC,test file,* CEC for a completed course only while its IICRC approval was in force at completion — on or
+not-public,src/lib/server/renewal-summary-cec-window.test.ts,6,CEC,cec,test file,* after `approvedAt` and before 00:00 UTC on `expiresAt` (data/seed/cec-approvals.json). A
+not-public,src/lib/server/renewal-summary-cec-window.test.ts,7,CEC,CEC,test file,* suggested course may claim CEC only when its approval is in force now.
+not-public,src/lib/server/renewal-summary-cec-window.test.ts,25,certif,certificateIssuedAt,test file,"certificateIssuedAt: null,"
+not-public,src/lib/server/renewal-summary-cec-window.test.ts,35,CEC,cec,test file,"cecHours: null,"
+not-public,src/lib/server/renewal-summary-cec-window.test.ts,65,CEC,CEC,test file,"describe('renewal summary credits CEC only inside the approval window', () => {"
+not-public,src/lib/server/renewal-summary-cec-window.test.ts,90,CEC,cec,test file,expect(s!.cec_earned_lifetime).toBe(1);
+not-public,src/lib/server/renewal-summary-cec-window.test.ts,91,CEC,cec,test file,expect(s!.cec_earned_in_cycle).toBe(1);
+not-public,src/lib/server/renewal-summary-cec-window.test.ts,100,CEC,cec,test file,expect(s!.cec_earned_in_cycle).toBe(1);
+not-public,src/lib/server/renewal-summary-cec-window.test.ts,102,CEC,cec,test file,expect(s!.cec_earned_lifetime).toBe(1);
+not-public,src/lib/server/renewal-summary-cec-window.test.ts,105,CEC,CEC,test file,"it('a suggestion claims CEC only when its approval is in force now', async () => {"
+not-public,src/lib/server/renewal-summary-cec-window.test.ts,110,CEC,cec,test file,expect(bySlug.get(CURRENT_SUGGESTION)?.cec_hours).toBe(1);
+not-public,src/lib/server/renewal-summary-cec-window.test.ts,111,CEC,CEC,test file,expect(bySlug.get(CURRENT_SUGGESTION)?.reason).toMatch(/CEC/);
+not-public,src/lib/server/renewal-summary-cec-window.test.ts,112,CEC,cec,test file,expect(bySlug.get(LAPSED_SUGGESTION)?.cec_hours).toBeNull();
+not-public,src/lib/server/renewal-summary-cec-window.test.ts,113,CEC,CEC,test file,expect(bySlug.get(LAPSED_SUGGESTION)?.reason).not.toMatch(/CEC/);
 not-public,src/lib/server/renewal-summary.ts,4,CEC,cec,"code: identifier, comment or type","import { getApprovedCecHours, getCurrentCecApproval } from '@/lib/seed/cec-approvals';"
 not-public,src/lib/server/renewal-summary.ts,48,certif,certificateIssuedAt,"code: identifier, comment or type",certificateIssuedAt: Date | null;
 not-public,src/lib/server/renewal-summary.ts,53,certif,certificateIssuedAt,"code: identifier, comment or type",if (args.certificateIssuedAt) return args.certificateIssuedAt;
@@ -5711,6 +5727,7 @@ not-public,src/lib/server/renewal-summary.ts,174,certif,certificatesIssued,"code
 not-public,src/lib/server/renewal-summary.ts,175,CEC,cec,"code: identifier, comment or type","approvedCecHours += cecHoursInForceAt(c.slug, c.completedAt);"
 not-public,src/lib/server/renewal-summary.ts,179,certif,certificatesIssued,"code: identifier, comment or type","certificatesIssued,"
 not-public,src/lib/server/renewal-summary.ts,240,CEC,cec,"code: identifier, comment or type","cecHours: true,"
+not-public,src/lib/server/renewal-summary.ts,311,CEC,cec,"code: identifier, comment or type","const hours = e.completedAt ? cecHoursInForceAt(e.course.slug, e.completedAt) : 0;"
 not-public,src/lib/server/renewal-summary.ts,319,certif,certificateIssuedAt,"code: identifier, comment or type","certificateIssuedAt: e.certificateIssuedAt,"
 not-public,src/lib/server/renewal-summary.ts,319,certif,certificateIssuedAt,"code: identifier, comment or type","certificateIssuedAt: e.certificateIssuedAt,"
 not-public,src/lib/server/renewal-summary.ts,325,certif,certificate,"code: identifier, comment or type",// CourseCompletionRecord); `ts` above can be a re-stamped certificate or a lesson revisit.
@@ -5719,15 +5736,18 @@ not-public,src/lib/server/renewal-summary.ts,329,certif,certificateIssuedAt,"cod
 not-public,src/lib/server/renewal-summary.ts,339,CEC,cec,"code: identifier, comment or type",let cecInCycle: number;
 not-public,src/lib/server/renewal-summary.ts,342,CEC,cec,"code: identifier, comment or type","cecInCycle = Object.values(byDiscCycle).reduce((a, b) => a + b, 0);"
 not-public,src/lib/server/renewal-summary.ts,345,CEC,cec,"code: identifier, comment or type",cecInCycle = lifetimeCec;
-not-public,src/lib/server/renewal-summary.ts,375,CEC,cec,"code: identifier, comment or type","cec_required: RENEWAL_CEC_REQUIRED,"
-not-public,src/lib/server/renewal-summary.ts,376,CEC,cec,"code: identifier, comment or type","cec_earned_in_cycle: Math.round(cecInCycle * 100) / 100,"
-not-public,src/lib/server/renewal-summary.ts,376,CEC,cec,"code: identifier, comment or type","cec_earned_in_cycle: Math.round(cecInCycle * 100) / 100,"
-not-public,src/lib/server/renewal-summary.ts,377,CEC,cec,"code: identifier, comment or type","cec_earned_lifetime: Math.round(lifetimeCec * 100) / 100,"
-not-public,src/lib/server/renewal-summary.ts,430,CEC,cec,"code: identifier, comment or type","cecHours: true,"
-not-public,src/lib/server/renewal-summary.ts,453,CEC,CEC,"code: identifier, comment or type",// GP-498: only claim a CEC benefit when this course has registry-approved CEC hours.
-not-public,src/lib/server/renewal-summary.ts,453,CEC,CEC,"code: identifier, comment or type",// GP-498: only claim a CEC benefit when this course has registry-approved CEC hours.
-not-public,src/lib/server/renewal-summary.ts,473,CEC,cec,"code: identifier, comment or type",cec_hours: (() => {
+not-public,src/lib/server/renewal-summary.ts,376,CEC,cec,"code: identifier, comment or type","cec_required: RENEWAL_CEC_REQUIRED,"
+not-public,src/lib/server/renewal-summary.ts,377,CEC,cec,"code: identifier, comment or type","cec_earned_in_cycle: Math.round(cecInCycle * 100) / 100,"
+not-public,src/lib/server/renewal-summary.ts,377,CEC,cec,"code: identifier, comment or type","cec_earned_in_cycle: Math.round(cecInCycle * 100) / 100,"
+not-public,src/lib/server/renewal-summary.ts,378,CEC,cec,"code: identifier, comment or type","cec_earned_lifetime: Math.round(lifetimeCec * 100) / 100,"
+not-public,src/lib/server/renewal-summary.ts,412,CEC,CEC,"code: identifier, comment or type",/** A suggestion claims CEC only for an approval in force at this moment. */
+not-public,src/lib/server/renewal-summary.ts,433,CEC,cec,"code: identifier, comment or type","cecHours: true,"
+not-public,src/lib/server/renewal-summary.ts,449,CEC,cec,"code: identifier, comment or type","const rh = cecHoursInForceAt(c.slug, args.now);"
+not-public,src/lib/server/renewal-summary.ts,456,CEC,CEC,"code: identifier, comment or type",// GP-498: only claim a CEC benefit when this course has registry-approved CEC hours.
+not-public,src/lib/server/renewal-summary.ts,456,CEC,CEC,"code: identifier, comment or type",// GP-498: only claim a CEC benefit when this course has registry-approved CEC hours.
+not-public,src/lib/server/renewal-summary.ts,476,CEC,cec,"code: identifier, comment or type","cec_hours: s.rh > 0 ? s.rh : null,"
 not-public,src/lib/server/renewal-summary.ts,493,CEC,cec,"code: identifier, comment or type",cec_hours: (() => {
+not-public,src/lib/server/renewal-summary.ts,494,CEC,cec,"code: identifier, comment or type","const h = cecHoursInForceAt(c.slug, args.now);"
 not-public,src/lib/server/renewal-summary.ts,498,CEC,CEC,"code: identifier, comment or type",// GP-498: neutral copy — must not imply IICRC CEC benefit for an unapproved course.
 not-public,src/lib/server/renewal-summary.ts,498,iicrc-offer,IICRC CEC benefit for an unapproved course,"code: identifier, comment or type",// GP-498: neutral copy — must not imply IICRC CEC benefit for an unapproved course.
 not-public,src/lib/server/renewal-year-recap.test.ts,9,CEC,CEC,test file,* Licence-critical: CEC hours come ONLY from the approvals registry. The unapproved course below
