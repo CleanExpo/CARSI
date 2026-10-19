@@ -7,6 +7,7 @@ import {
   isMembershipCheckoutResume,
   loginPathWithNext,
   membershipSignupPath,
+  registerPathWithNext,
   safeNextPath,
 } from './membership-signup-path';
 
@@ -30,7 +31,13 @@ describe('membership signup path', () => {
       expect(safeNextPath(bad)).toBeNull();
       expect(isMembershipCheckoutResume(bad)).toBe(false);
       expect(loginPathWithNext(bad)).toBe('/login');
+      expect(registerPathWithNext(bad)).toBe('/register');
     }
+  });
+
+  it('keeps next on the sign-up link so a new coaching buyer returns to checkout', () => {
+    expect(registerPathWithNext('/ccw-training')).toBe('/register?next=%2Fccw-training');
+    expect(registerPathWithNext(null)).toBe('/register');
   });
 
   it('keeps next on the sign-in link so an existing customer returns to /subscribe', () => {

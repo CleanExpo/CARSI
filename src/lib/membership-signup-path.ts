@@ -19,6 +19,12 @@ export function loginPathWithNext(next: string | null | undefined): string {
   return safe ? `/login?next=${encodeURIComponent(safe)}` : '/login';
 }
 
+/** Sign-up link for the login page, preserving a safe same-origin `next`. */
+export function registerPathWithNext(next: string | null | undefined): string {
+  const safe = safeNextPath(next);
+  return safe ? `/register?next=${encodeURIComponent(safe)}` : '/register';
+}
+
 /** A same-origin path, or null. Rejects absolute and protocol-relative URLs. */
 export function safeNextPath(next: string | null | undefined): string | null {
   if (!next || !next.startsWith('/') || next.startsWith('//') || next.startsWith('/\\')) {
