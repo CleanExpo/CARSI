@@ -165,17 +165,32 @@ function publicCopyFiles(): string[] {
 }
 
 /**
- * Legal pages state CARSI's own obligations ("We ensure appropriate safeguards are in place"). That
- * is a policy commitment, not a training-outcome claim, so the "ensures" rule skips them.
+ * Exact policy sentences where CARSI states its own obligation, not a training outcome. Each is
+ * allowed only in its own file and is stripped from that line before the "ensures" rule runs, so
+ * any other "ensure" in the same line, file or legal page is still flagged. Add an entry only for
+ * a real sentence that exists; never exempt a whole file or folder.
  */
-const ENSURES_EXEMPT = /^app\/\(public\)\/(privacy|terms)\//;
+const ENSURES_POLICY_SENTENCES: { file: string; sentence: string }[] = [
+  {
+    file: 'app/(public)/privacy/page.tsx',
+    sentence: 'We ensure appropriate safeguards are in place to protect',
+  },
+];
+
+function withoutPolicySentences(line: string, file: string): string {
+  return ENSURES_POLICY_SENTENCES.filter((entry) => entry.file === file).reduce(
+    (text, entry) => text.split(entry.sentence).join(''),
+    line
+  );
+}
 
 function findClaims(text: string, file = ''): { label: string; line: number; excerpt: string }[] {
   const hits: { label: string; line: number; excerpt: string }[] = [];
   text.split('\n').forEach((line, index) => {
     for (const { label, pattern } of CLAIM_PATTERNS) {
-      if (label === 'ensures (outcome guarantee)' && ENSURES_EXEMPT.test(file)) continue;
-      const match = pattern.exec(line);
+      const scanned =
+        label === 'ensures (outcome guarantee)' ? withoutPolicySentences(line, file) : line;
+      const match = pattern.exec(scanned);
       if (match) hits.push({ label, line: index + 1, excerpt: line.trim().slice(0, 160) });
     }
   });
@@ -242,10 +257,23 @@ describe('public claims guard', () => {
     expect(findClaims(planted).length).toBeGreaterThan(findClaims(footer).length);
   });
 
-  it('lets a legal page state its own "we ensure" commitment, but not other copy', () => {
-    const commitment = 'We ensure appropriate safeguards are in place to protect your data.';
-    expect(findClaims(commitment, 'app/(public)/privacy/page.tsx')).toHaveLength(0);
-    expect(findClaims(commitment, 'app/(public)/industries/retail/page.tsx')).not.toHaveLength(0);
+  it('allows only the exact privacy-policy "we ensure" sentence, in its own file and line', () => {
+    const privacy = 'app/(public)/privacy/page.tsx';
+    const terms = 'app/(public)/terms/page.tsx';
+    const policy = 'We ensure appropriate safeguards are in place to protect your data.';
+    const outcome = 'CARSI training ensures compliance with WHS requirements.';
+    // The real policy sentence is allowed in the privacy page...
+    expect(findClaims(policy, privacy)).toHaveLength(0);
+    // ...but nowhere else, and a training-outcome "ensures" is flagged in legal pages too.
+    expect(findClaims(policy, 'app/(public)/industries/retail/page.tsx')).not.toHaveLength(0);
+    expect(findClaims(outcome, terms)).not.toHaveLength(0);
+    expect(findClaims(outcome, privacy)).not.toHaveLength(0);
+    // Another "ensure" on the same privacy line is still caught.
+    expect(findClaims(`${policy} Our courses ensure you pass.`, privacy)).not.toHaveLength(0);
+    // And the real privacy page, which holds that sentence today, scans clean.
+    const realPrivacy = readFileSync(join(ROOT, privacy), 'utf8');
+    expect(realPrivacy).toContain('We ensure appropriate safeguards are in place to protect');
+    expect(findClaims(realPrivacy, privacy)).toHaveLength(0);
   });
 
   it('leaves the required IICRC CEC Accredited wording and plain usage alone', () => {
