@@ -101,6 +101,8 @@ const RECOGNITION_PASS = [
 ];
 
 let failed = 0;
+let RECOGNITION_BLOCK_EXTRA = 0;
+let RECOGNITION_PASS_EXTRA = 0;
 
 for (const [name, file, src] of RECOGNITION_BLOCK) {
   if (evaluateFile(file, src).length === 0) {
@@ -174,6 +176,46 @@ for (const code of IICRC_CODES) {
   }
 }
 
+// Rule 5 (review r6 of efa6e0be): test files are exempt by name, so production code must never
+// import one, or "Badge.test.tsx" could ship CEC wording unscanned. Through scanFiles(), like CI.
+{
+  const PROD = 'app/(dashboard)/dashboard/student/leaderboard/page.tsx';
+  const MUST_FLAG = [
+    ['static import of a .test module', PROD, "import { Badge } from './Badge.test';"],
+    ['static import with extension', PROD, "import Badge from './Badge.test.tsx';"],
+    ['side-effect import', 'src/components/lms/LinkedInShareButton.tsx', "import './share.spec';"],
+    ['export-from a __tests__ module', 'src/lib/server/leaderboard-xp.ts', "export { badge } from '../__tests__/badge';"],
+    ['dynamic import()', PROD, "const m = await import('./Badge.spec');"],
+    ['dynamic import() of a template literal', PROD, 'const m = await import(`./Badge.test`);'],
+    ['require() of a fixture', 'src/lib/server/learner-xp.ts', "const f = require('../__fixtures__/cec.json');"],
+    ['import = require', 'src/lib/server/learner-xp.ts', "import x = require('./x.test');"],
+    ['alias path into __tests__', 'src/components/lms/CourseCard.tsx', "import { B } from '@/components/__tests__/B';"],
+    ['accessor-cluster file is not exempt from this rule', 'src/lib/cec-display.ts', "import { f } from './fmt.test';"],
+  ];
+  const MUST_ALLOW = [
+    ['a test importing another test helper', 'src/lib/server/a.test.ts', "import { h } from './b.test';"],
+    ['a __tests__ module importing a fixture', 'src/lib/__tests__/x.ts', "import d from '../__fixtures__/data';"],
+    ['ordinary names that contain test/spec', PROD, "import { t } from './testimonials'; import { s } from './latest-specs'; import { c } from './contest';"],
+    ['test runner package', 'src/lib/server/leaderboard-xp.ts', "import { describe } from 'vitest';"],
+  ];
+  for (const [name, file, src] of MUST_FLAG) {
+    const hits = scanFiles([file], () => src).filter((l) => /imports a test/.test(l));
+    if (hits.length === 0) {
+      console.error(`✖ MUST BLOCK but passed: ${name} (${file})\n    ${src}`);
+      failed++;
+    }
+  }
+  for (const [name, file, src] of MUST_ALLOW) {
+    const hits = scanFiles([file], () => src).filter((l) => /imports a test/.test(l));
+    if (hits.length > 0) {
+      console.error(`✖ MUST PASS but blocked: ${name} (${file})\n    ${hits.join('\n    ')}`);
+      failed++;
+    }
+  }
+  RECOGNITION_BLOCK_EXTRA = MUST_FLAG.length;
+  RECOGNITION_PASS_EXTRA = MUST_ALLOW.length;
+}
+
 for (const [name, file, src] of RECOGNITION_PASS) {
   const findings = evaluateFile(file, src);
   if (findings.length > 0) {
@@ -205,6 +247,6 @@ if (failed > 0) {
   process.exit(1);
 }
 console.log(
-  `✓ CEC surface-leak guard self-test passed (${MUST_BLOCK.length + RECOGNITION_BLOCK.length + IICRC_CODES.length} block, ${MUST_PASS.length + RECOGNITION_PASS.length} pass).`
+  `✓ CEC surface-leak guard self-test passed (${MUST_BLOCK.length + RECOGNITION_BLOCK.length + IICRC_CODES.length + RECOGNITION_BLOCK_EXTRA} block, ${MUST_PASS.length + RECOGNITION_PASS.length + RECOGNITION_PASS_EXTRA} pass).`
 );
 process.exit(0);

@@ -28,6 +28,12 @@
  *      rule bans naming a CARSI course or certificate with an IICRC discipline acronym. Found
  *      19/10/2026: an "Approved IICRC CEC hours" achievement, a leaderboard filtered by WRT/ASD
  *      codes and a LinkedIn certificate named "Title (WRT)" all passed rules 1-3.
+ *   5. in a NON-test source file, import a test path (.test. / .spec. / __tests__ / __fixtures__)
+ *      by static import, export-from, dynamic import(), require() or import = require(). Test
+ *      files are exempt by name, so a served "Badge.test.tsx" would otherwise carry CEC wording
+ *      past every rule above (review r6 of efa6e0be). __tests__ folders are already unroutable:
+ *      Next.js treats _-prefixed folders as private (node_modules/next/dist/docs/01-app/
+ *      01-getting-started/02-project-structure.md, "Private folders").
  * The resolved display value flows as the snake_case DTO field `cec_hours` (the gate output)
  * or under the distinct name `resolvedCecHours` / `cecHoursLabel`, and is not scanned.
  *
@@ -129,11 +135,49 @@ function inScope(f) {
   const n = f.replace(/\\/g, '/');
   return SCANNED_DIRS.some((d) => n.startsWith(d));
 }
-function isExempt(f) {
+function isTestPath(f) {
   const n = f.replace(/\\/g, '/');
   if (/(?:\.test\.|\.spec\.)/.test(n)) return true; // unit tests exercise the accessors directly
-  if (/(?:^|\/)__tests__\//.test(n) || /(?:^|\/)__fixtures__\//.test(n)) return true;
+  return /(?:^|\/)__tests__\//.test(n) || /(?:^|\/)__fixtures__\//.test(n);
+}
+function isExempt(f) {
+  const n = f.replace(/\\/g, '/');
+  if (isTestPath(n)) return true;
   return ACCESSOR_ALLOWLIST.some((e) => n === e || n.endsWith('/' + e));
+}
+
+/** A module specifier that names a test file or test folder (rule 5). */
+const TEST_SPECIFIER = /\.(?:test|spec)(?:\.[cm]?[jt]sx?)?$|\.(?:test|spec)\.|(?:^|\/)__(?:tests|fixtures)__(?:\/|$)/;
+
+/** Rule 5: every import of a test path from `file`, as findings. Only literal specifiers are seen. */
+export function testImportFindings(file, text) {
+  const isTsx = /\.(tsx|jsx)$/.test(file);
+  const sf = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true, isTsx ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
+  const out = [];
+  const check = (node, spec) => {
+    if (spec && (ts.isStringLiteral(spec) || ts.isNoSubstitutionTemplateLiteral(spec)) && TEST_SPECIFIER.test(spec.text)) {
+      const line = sf.getLineAndCharacterOfPosition(node.getStart(sf)).line + 1;
+      out.push(
+        `  ${file}:${line}: imports a test path ('${spec.text}') — test files are exempt by name, so production ` +
+          'code must not import one (move shared code to a non-test module).'
+      );
+    }
+  };
+  (function visit(node) {
+    if ((ts.isImportDeclaration(node) || ts.isExportDeclaration(node)) && node.moduleSpecifier) {
+      check(node, node.moduleSpecifier);
+    } else if (ts.isImportEqualsDeclaration(node) && ts.isExternalModuleReference(node.moduleReference)) {
+      check(node, node.moduleReference.expression);
+    } else if (
+      ts.isCallExpression(node) &&
+      (node.expression.kind === ts.SyntaxKind.ImportKeyword ||
+        (ts.isIdentifier(node.expression) && node.expression.text === 'require'))
+    ) {
+      check(node, node.arguments[0]);
+    }
+    ts.forEachChild(node, visit);
+  })(sf);
+  return out;
 }
 
 /**
@@ -143,8 +187,10 @@ function isExempt(f) {
  */
 export function scanFiles(files, read) {
   const findings = [];
-  for (const file of files.filter((f) => f && CODE_EXT.test(f) && inScope(f) && !isExempt(f))) {
-    findings.push(...evaluateFile(file, read(file)));
+  for (const file of files.filter((f) => f && CODE_EXT.test(f) && inScope(f) && !isTestPath(f))) {
+    const text = read(file);
+    findings.push(...testImportFindings(file, text));
+    if (!isExempt(file)) findings.push(...evaluateFile(file, text));
   }
   return findings;
 }
