@@ -78,9 +78,9 @@ const whyCards = [
   },
   {
     icon: Shield,
-    title: 'Duty of Care Protection',
+    title: 'Documented Training',
     description:
-      'NDIS participants are often immunocompromised. Documented training demonstrates due diligence, reducing organisational liability under the NDIS Act and WHS legislation.',
+      'Some NDIS participants are more vulnerable to mould and poor air quality. Documented CARSI training shows what each support worker has studied, and when.',
     color: '#4a5aa8',
   },
   {

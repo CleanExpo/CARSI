@@ -46,9 +46,9 @@ const stats = [
 const whyCards = [
   {
     icon: Scale,
-    title: 'Tribunal Defence',
+    title: 'Documented Training',
     description:
-      'Verifiable assessment credentials provide defensible documentation in NCAT/VCAT hearings. Reduce mould and carpet disputes with standards-based evidence.',
+      'Documented CARSI training shows what each property manager has studied, and when. Use standards-based language when you record mould and carpet condition.',
     color: '#673ab7',
   },
   {
@@ -62,7 +62,7 @@ const whyCards = [
     icon: Droplets,
     title: 'Insurance Claims',
     description:
-      'Defensible, standards-based documentation for water damage and mould insurance claims. Win management contracts with qualified credentials.',
+      'Training in standards-based documentation for water damage and mould insurance claims.',
     color: '#ed9d24',
   },
 ];

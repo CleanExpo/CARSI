@@ -135,9 +135,12 @@ export default function CcwCaseStudyPage() {
         <h1 className={`max-w-3xl ${marketingHeading}`}>
           Carpet Cleaners Warehouse: the first business to bet on CCW-CRM
         </h1>
+        {/* Source: https://ccwonline.com.au/pages/contact-us (read 19/10/2026) lists Carpet Cleaners
+            Warehouse stores at Bayswater North VIC, Seven Hills NSW and Boondall QLD. It does not show
+            ownership, and its SA/WA/TAS entries trade under other names. */}
         <p className={`mt-5 max-w-2xl text-base leading-relaxed sm:text-lg ${marketingTextMuted}`}>
           Carpet Cleaners Warehouse (CCW) supplies equipment and chemicals to the carpet cleaning
-          industry, with its own stores in three states. When they needed to manage customer relationships across
+          industry, with stores in Victoria, New South Wales and Queensland. When they needed to manage customer relationships across
           e-commerce and field service, they chose CCW-CRM — becoming the platform&rsquo;s first
           paying client under a $33,000-per-year contract.
         </p>

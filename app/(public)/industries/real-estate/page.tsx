@@ -86,9 +86,9 @@ const whyCards = [
   },
   {
     icon: Shield,
-    title: 'Professional Indemnity Protection',
+    title: 'Documented Training',
     description:
-      'Non-disclosure of known defects can lead to real estate professional indemnity claims. IICRC CEC Accredited awareness courses demonstrates due diligence and supports a defensible inspection record.',
+      'Non-disclosure of known defects can lead to real estate professional indemnity claims. Documented CARSI training shows what each agent has studied, and when.',
     color: '#2490ed',
   },
 ];

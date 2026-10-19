@@ -57,9 +57,9 @@ const faqs = [
       'The main drivers in Australian gyms are poor ventilation in wet areas, condensation on cold surfaces in air-conditioned spaces, water getting in around pool surrounds and wet decks, and porous materials (grout, carpet, ceiling tiles) that hold moisture. Mould remediation training covers moisture mapping, relative humidity monitoring and containment, so maintenance staff can find and fix these conditions before mould becomes visible.',
   },
   {
-    question: 'How does restoration training reduce liability for gym operators?',
+    question: 'What does documented training show for gym operators?',
     answer:
-      'Gym operators have a duty of care to members under Australian Consumer Law and WHS legislation. Documented training shows that maintenance staff were trained to identify and respond to mould and moisture hazards, and documented inspection protocols support the operator if a member raises an indoor air quality complaint.',
+      'Mould and moisture in change rooms and wet areas can lead to member complaints or injury claims. Documented CARSI training shows what your maintenance staff have studied, and when. Keep your own inspection records alongside it to show what was checked on site.',
   },
   {
     question: 'How does odour control training help fitness facilities?',

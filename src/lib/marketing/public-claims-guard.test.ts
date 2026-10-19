@@ -65,6 +65,19 @@ const CLAIM_PATTERNS: { label: string; pattern: RegExp }[] = [
     pattern:
       /\b(written|authored)\s+by\s+(the\s+)?(NRPG|IICRC|industry|accredited|certified|expert|qualified|professional|leading)\b/i,
   },
+  // Outcome claims training cannot show: it records what someone studied and when, not that a
+  // business met a legal duty, won a dispute or cut its premiums. "Due diligence" as a buyer's
+  // activity (Start Smart) is fine; claiming training demonstrates or evidences it is not.
+  {
+    label: 'demonstrates due diligence/compliance',
+    pattern: /\bdemonstrat\w*\s+(\w+\s+){0,2}(due[- ]diligence|compliance)\b/i,
+  },
+  { label: 'evidence of due diligence', pattern: /\bevidence of (\w+\s+)?due[- ]diligence\b/i },
+  { label: 'defensible record/documentation', pattern: /\bdefensib(le|ility)\b/i },
+  {
+    label: 'reduces liability/premiums',
+    pattern: /\b(reduc\w*|lower\w*|cut\w*)\s+(\w+\s+){0,2}(liability|premiums?)\b/i,
+  },
 ];
 
 /**
@@ -75,21 +88,21 @@ const CLAIM_PATTERNS: { label: string; pattern: RegExp }[] = [
 const IICRC_CEC_NON_ACCREDITED =
   /IICRC\s+CEC\s+(?!Accredited)(training|courses?|programs?|learning)\b/gi;
 const IICRC_CEC_NON_ACCREDITED_BASELINE: Record<string, number> = {
-  'app/(public)/industries/caravan-parks/page.tsx': 2,
+  'app/(public)/industries/caravan-parks/page.tsx': 1,
   'app/(public)/industries/childcare/page.tsx': 4,
   'app/(public)/industries/commercial-cleaning/page.tsx': 5,
   'app/(public)/industries/construction/page.tsx': 2,
   'app/(public)/industries/data-centres/page.tsx': 4,
-  'app/(public)/industries/education/page.tsx': 4,
+  'app/(public)/industries/education/page.tsx': 3,
   'app/(public)/industries/emergency-management/page.tsx': 5,
   'app/(public)/industries/food-processing/page.tsx': 6,
-  'app/(public)/industries/government-defence/page.tsx': 5,
-  'app/(public)/industries/gyms-fitness/page.tsx': 3,
+  'app/(public)/industries/government-defence/page.tsx': 4,
+  'app/(public)/industries/gyms-fitness/page.tsx': 1,
   'app/(public)/industries/hospitality/page.tsx': 1,
   'app/(public)/industries/insurance/page.tsx': 5,
-  'app/(public)/industries/mining/page.tsx': 2,
+  'app/(public)/industries/mining/page.tsx': 1,
   'app/(public)/industries/museums-cultural/page.tsx': 6,
-  'app/(public)/industries/ndis-disability/page.tsx': 4,
+  'app/(public)/industries/ndis-disability/page.tsx': 3,
   'app/(public)/industries/plumbing-trades/page.tsx': 5,
   'app/(public)/industries/property-management/page.tsx': 2,
   'app/(public)/industries/real-estate/page.tsx': 3,
@@ -181,6 +194,13 @@ describe('public claims guard', () => {
     'industry-leading pressure capability',
     'Written by NRPG network contractors.',
     'authored by IICRC-certified technicians',
+    'Documented training demonstrates due diligence for hazard identification.',
+    'IICRC-certified staff demonstrate compliance with the Act.',
+    'Training provides documented evidence of due diligence for staff safety.',
+    'Supports a defensible inspection record.',
+    'Defensible, standards-based documentation for insurance claims.',
+    'Reducing organisational liability under the NDIS Act.',
+    'Can reduce insurance premiums for premises liability coverage.',
   ])('flags a planted claim: %s', (planted) => {
     expect(findClaims(planted)).not.toHaveLength(0);
   });
@@ -199,7 +219,8 @@ describe('public claims guard', () => {
     expect(
       findClaims(
         'IICRC CEC Accredited courses. Moisture leading to mould. Best for small teams. Client #1. ' +
-          'CARSI is not affiliated with, endorsed by or partnered with any publisher.'
+          'CARSI is not affiliated with, endorsed by or partnered with any publisher. ' +
+          'Buying a Carpet Cleaning Business: Training Due Diligence. Team training or business buyer due diligence.'
       )
     ).toHaveLength(0);
   });
@@ -244,6 +265,15 @@ describe('public claims guard', () => {
       expect(line, `${path} should contain "${sentence}"`).toBeDefined();
       expect(line).not.toMatch(/IICRC|due diligence behind|protects your/i);
     }
+  });
+
+  it('states only what the CCW contact page shows, with the source beside it', () => {
+    const source = readFileSync(join(ROOT, 'app/(public)/case-studies/ccw/page.tsx'), 'utf8');
+    expect(source).toContain('with stores in Victoria, New South Wales and Queensland');
+    expect(source).toMatch(
+      /Source: https:\/\/ccwonline\.com\.au\/pages\/contact-us \(read 19\/10\/2026\)/
+    );
+    expect(source).not.toMatch(/its own stores|stores in three states/);
   });
 
   it('finds no unbacked claim in any public copy file', () => {

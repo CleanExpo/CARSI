@@ -79,7 +79,7 @@ export default async function ConstructionIndustryPage() {
         accentColor={ACCENT_COLOR}
         headline="Construction Site"
         headlineAccent="Restoration Training"
-        description="Moisture and mould management training for site managers, project managers and WHS officers, to help reduce water and mould defects during the liability period."
+        description="Moisture and mould management training for site managers, project managers and WHS officers. Documented CARSI training shows what each team member has studied, and when."
         disciplines={disciplines}
         stats={stats}
       />
