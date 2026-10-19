@@ -15,6 +15,7 @@ import {
   allowsFreeEntryRegistration,
   getCcwRoadshowEvent,
   getCcwRoadshowTicketPackage,
+  isOpenFreeEntrySitting,
   isValidExperienceBand,
 } from '@/lib/marketing/ccw-roadshow';
 import { emitCrmEvent } from '@/lib/server/crm-sync';
@@ -115,6 +116,14 @@ export async function POST(request: NextRequest) {
           detail:
             'Seats for this event are booked through Carpet Cleaners Warehouse, not on this page.',
         },
+        { status: 409 },
+      );
+    }
+    // A free sitting that has ended must not mint a token either: a tab left open or a
+    // direct POST would otherwise confirm free entry to dates that have already passed.
+    if (!isOpenFreeEntrySitting(event, new Date())) {
+      return NextResponse.json(
+        { detail: 'This sitting has ended. Register your interest for the next dates.' },
         { status: 409 },
       );
     }

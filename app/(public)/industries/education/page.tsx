@@ -46,9 +46,9 @@ const stats = [
 const whyCards = [
   {
     icon: ShieldCheck,
-    title: 'Duty of Care',
+    title: 'Documented Training',
     description:
-      'Schools must demonstrate competency in mould identification and remediation. Restoration training provides documented evidence of due diligence for student and staff safety.',
+      'Mould in classrooms and staff areas needs prompt identification and correct remediation. Documented CARSI training shows what each maintenance team member has studied, and when.',
     color: '#2196f3',
   },
   {

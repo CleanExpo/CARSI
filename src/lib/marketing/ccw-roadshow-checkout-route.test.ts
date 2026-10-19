@@ -102,10 +102,18 @@ describe('ccw roadshow checkout route refuses to mint for paid cities', () => {
     // Without this, a route that refused everything - or rejected every payload at
     // 400 - would satisfy the assertions above while proving nothing. Asserting the
     // registry was reached is the strong form: a mere "not 409" passes on a 400.
-    const response = await POST(checkoutRequest('melbourne'));
-    expect(response.status).not.toBe(409);
-    expect(response.status).not.toBe(400);
-    expect(createRoadshowRegistration).toHaveBeenCalled();
+    // Pinned to a date the Melbourne sitting was still open; after it ends the route
+    // refuses it too (ccw-roadshow-ended-free-refusal.test.ts).
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-07-01T00:00:00.000Z'));
+    try {
+      const response = await POST(checkoutRequest('melbourne'));
+      expect(response.status).not.toBe(409);
+      expect(response.status).not.toBe(400);
+      expect(createRoadshowRegistration).toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('positive control: the mocks are actually wired in', async () => {

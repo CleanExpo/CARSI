@@ -27,7 +27,7 @@ const siteUrl = getPublicSiteUrl();
 export const metadata: Metadata = {
   title: 'Podcast Directory | CARSI Industry Hub',
   description:
-    'Discover the best podcasts for Australian restoration, HVAC, mould remediation, indoor air quality, flooring, and pest control professionals. Curated by CARSI — including our own The Science of Property Restoration podcast.',
+    'Discover podcasts for Australian restoration, HVAC, mould remediation, indoor air quality, flooring, and pest control professionals. Curated by CARSI — including our own The Science of Property Restoration podcast.',
   keywords: [
     'restoration podcasts Australia',
     'HVAC podcast',
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     images: OG_IMAGES,
     title: 'Podcast Directory | CARSI Industry Hub',
     description:
-      'The best podcasts for Australian restoration, HVAC, flooring, and indoor environment professionals — curated by CARSI.',
+      'Podcasts for Australian restoration, HVAC, flooring, and indoor environment professionals — curated by CARSI.',
     type: 'website',
     url: `${siteUrl}/podcast`,
   },
@@ -155,7 +155,7 @@ export default async function PodcastPage({
             Podcast directory
           </h1>
           <p className={`mt-5 max-w-2xl text-pretty ${LANDING_LEAD_CLASS}`}>
-            The best podcasts for Australian restoration, HVAC, flooring, and indoor environment
+            Podcasts for Australian restoration, HVAC, flooring, and indoor environment
             professionals — curated by CARSI.
           </p>
           <PlatformNav current="/podcast" />

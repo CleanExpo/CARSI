@@ -81,9 +81,9 @@ const whyCards = [
   },
   {
     icon: Shield,
-    title: 'Insurance Recognition',
+    title: 'Documented Training',
     description:
-      'Restoration training helps technicians take on insurance restoration jobs with confidence. Each insurer panel sets its own certification requirements.',
+      'Documented CARSI training shows clients and insurers what each technician has studied, and when.',
     color: '#1976d2',
   },
   {

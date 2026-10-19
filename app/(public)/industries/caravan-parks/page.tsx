@@ -57,9 +57,9 @@ const faqs = [
       'Caravan parks and holiday parks face water damage from cyclone and storm events in tropical regions, flooding in low-lying coastal and riverside parks, roof failures in ageing cabin stock, and plumbing failures in shared amenities blocks. CARSI water damage restoration training equips park maintenance staff to respond immediately after these events — extracting water, placing drying equipment, and documenting damage for insurance claims — reducing the period of lost revenue from uninhabitable sites.',
   },
   {
-    question: 'How does restoration training protect caravan park guests and operators?',
+    question: 'How does training help caravan park operators deal with mould and water damage?',
     answer:
-      'Caravan park operators owe guests a duty of care under Australian Consumer Law and state-specific tourism accommodation legislation. Providing accommodation with hidden mould or water damage exposes operators to Fair Trading complaints, negative TripAdvisor reviews, and potential personal injury claims if guests suffer health impacts. CARSI mould remediation training demonstrates that maintenance staff are competent to identify and remediate mould — providing a defensible record that standards-based inspections and remediation were performed, which is increasingly expected by park accreditation bodies.',
+      'Hidden mould or water damage in guest accommodation can lead to Fair Trading complaints, poor reviews or injury claims if guests suffer health effects. CARSI training covers mould identification and remediation. Documented CARSI training shows what each staff member has studied, and when.',
   },
   {
     question: 'What carpet training helps holiday accommodation?',
@@ -85,9 +85,9 @@ const whyCards = [
   },
   {
     icon: Shield,
-    title: 'Guest Duty of Care',
+    title: 'Documented Training',
     description:
-      'Australian Consumer Law and state tourism accommodation legislation requires operators to provide habitable, hygienic accommodation. Trained staff help operators meet that obligation and keep a documented record.',
+      'Hidden mould or water damage can leave a cabin unfit for guests. Documented CARSI training shows what each staff member has studied, and when.',
     color: '#2490ed',
   },
 ];
@@ -104,7 +104,7 @@ export default async function CaravanParksIndustryPage() {
         icon={Tent}
         industryName="Caravan Parks & Holiday Accommodation"
         accentColor={ACCENT_COLOR}
-        headline="Protect Guest Accommodation"
+        headline="Training for Guest Accommodation"
         headlineAccent="All Season Long"
         description="Caravan parks face persistent mould, moisture, and storm damage risk. CARSI mould remediation, carpet cleaning and water damage restoration courses give park maintenance teams the protocols to inspect, remediate, and document — protecting guests, reputation, and revenue. CARSI courses carry CARSI Southern Hemisphere Restoration Designations, not IICRC certification."
         disciplines={disciplines}

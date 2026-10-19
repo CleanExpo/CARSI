@@ -133,7 +133,7 @@ export default async function DataCentresIndustryPage() {
         title="Data Centre Protection Bundle"
         price={industryBundlePriceLabel('data-centres')}
         description="water damage restoration, structural drying and fire & smoke restoration training for data centre facility teams. Includes cooling system failure response and post-suppression cleanup protocols. Online, self-paced — fits around maintenance windows."
-        ctaText="Protect Your Infrastructure"
+        ctaText="Explore the training"
         accentColor={ACCENT_COLOR}
       />
     </IndustryPageLayout>

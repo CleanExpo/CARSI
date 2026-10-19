@@ -17,7 +17,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'YouTube Channel Directory | CARSI Industry Hub',
   description:
-    'Discover the best YouTube channels covering Australian disaster restoration, HVAC, flooring, mould remediation, indoor air quality, and pest control. Curated by CARSI.',
+    'Discover YouTube channels covering Australian disaster restoration, HVAC, flooring, mould remediation, indoor air quality, and pest control. Curated by CARSI.',
   keywords: [
     'restoration YouTube channels',
     'HVAC training YouTube',
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     images: OG_IMAGES,
     title: 'YouTube Channel Directory | CARSI Industry Hub',
     description:
-      'The best YouTube channels for Australian restoration, HVAC, flooring, and indoor environment professionals — curated by CARSI.',
+      'YouTube channels for Australian restoration, HVAC, flooring, and indoor environment professionals — curated by CARSI.',
     type: 'website',
     url: 'https://carsi.com.au/youtube',
   },
@@ -260,7 +260,7 @@ export default async function YouTubePage({
       <CommunityHubShell
         eyebrow="Community & resources"
         title="Industry YouTube Channels"
-        description="The best YouTube channels for Australian restoration, HVAC, flooring, indoor air quality, and environmental professionals — curated and updated weekly by CARSI."
+        description="YouTube channels for Australian restoration, HVAC, flooring, indoor air quality, and environmental professionals — curated and updated weekly by CARSI."
         stats={[
           { value: total > 0 ? String(total) : '—', label: 'Channels' },
           {

@@ -80,7 +80,7 @@ const whyCards = [
     icon: Shield,
     title: 'WHS & Insurer Credibility',
     description:
-      'Water damage is a workplace hazard under Australian WHS legislation. Documented training shows due diligence; each insurer panel sets its own certification requirements.',
+      'Water damage brings WHS hazards such as slips, electrical risk and mould. Documented CARSI training shows clients and insurers what each technician has studied, and when.',
     color: '#00838f',
   },
   {

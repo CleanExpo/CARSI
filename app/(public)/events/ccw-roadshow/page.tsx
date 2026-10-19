@@ -2,7 +2,11 @@ import type { Metadata } from 'next';
 
 import { CcwRoadshowContent } from '@/components/marketing/CcwRoadshowPage';
 import { getPublicSiteUrl } from '@/lib/env/public-url';
-import { ccwRoadshowPath, getCcwRoadshowEvent } from '@/lib/marketing/ccw-roadshow';
+import {
+  ccwRoadshowPath,
+  getCcwRoadshowEvent,
+  getCcwRoadshowPricing,
+} from '@/lib/marketing/ccw-roadshow';
 
 const siteUrl = getPublicSiteUrl();
 const canonical = `${siteUrl}${ccwRoadshowPath}`;
@@ -12,10 +16,18 @@ const canonical = `${siteUrl}${ccwRoadshowPath}`;
 // that is incidental - dropping it must not silently make the hub static.
 export const dynamic = 'force-dynamic';
 
-export const metadata: Metadata = {
+/** The free-entry line appears only while a free-token sitting is still ahead. */
+function pricingLine(now: Date): string {
+  const pricing = getCcwRoadshowPricing(now);
+  if (pricing.mode === 'free') {
+    return `Entry to the ${pricing.freeCities.join(' and ')} sitting is free for past and current CCW customers; other seats are booked through Carpet Cleaners Warehouse.`;
+  }
+  if (pricing.mode === 'paid') return 'Seats for the upcoming sittings are booked through Carpet Cleaners Warehouse.';
+  return 'Pricing is confirmed with each new date.';
+}
+
+const baseMetadata: Metadata = {
   title: 'Grow Your Cleaning Business | CARSI x CCW Roadshow 2026',
-  description:
-    'Spend two practical days with Phill McGurk at CCW Melbourne, Sydney or Brisbane. Melbourne is free for past and current CCW customers; Sydney and Brisbane seats are booked through Carpet Cleaners Warehouse.',
   alternates: { canonical },
   keywords: [
     'carpet cleaning training Melbourne',
@@ -36,6 +48,13 @@ export const metadata: Metadata = {
     images: ['/og-image.png'],
   },
 };
+
+export function generateMetadata(): Metadata {
+  return {
+    ...baseMetadata,
+    description: `Spend two practical days with Phill McGurk at CCW Melbourne, Sydney or Brisbane. ${pricingLine(new Date())}`,
+  };
+}
 
 export { CcwRoadshowContent };
 

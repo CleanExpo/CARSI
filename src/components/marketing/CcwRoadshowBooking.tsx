@@ -10,6 +10,10 @@ import {
   ccwRoadshowExperienceBands,
   ccwRoadshowFreeEntryOffer,
   ccwRoadshowTicketPackages,
+  getCcwRegisterInterestHref,
+  getUpcomingFreeEntryCities,
+  hasCcwRoadshowSessionEnded,
+  isOpenFreeEntrySitting,
   resolveInitialEventSlug,
   formatAudFromCents,
   type CcwRoadshowTicketPackage,
@@ -88,7 +92,7 @@ export function CcwRoadshowBooking({
 
   useEffect(() => {
     let active = true;
-    if (!selectedEvent || !allowsFreeEntryRegistration(selectedEvent)) return;
+    if (!selectedEvent || !isOpenFreeEntrySitting(selectedEvent, new Date())) return;
     fetch(`/api/events/ccw-roadshow/availability?event=${form.eventSlug}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
@@ -211,6 +215,18 @@ export function CcwRoadshowBooking({
     }
   }
 
+  const now = new Date();
+  if (hasCcwRoadshowSessionEnded(selectedEvent, now)) {
+    return (
+      <div className={`p-5 sm:p-6 ${marketingStatCard}`}>
+        <p className={marketingBodySm}>This {selectedEvent.city} sitting has ended.</p>
+        <a href={getCcwRegisterInterestHref(selectedEvent.city)} className={`mt-5 min-h-12 ${marketingBtnPrimary}`}>
+          Register your interest
+        </a>
+      </div>
+    );
+  }
+
   // Events off the free-entry rail must not render a free-token form at all. The API
   // refuses them too, but a form that always fails is a worse answer than telling the
   // visitor where the seat is actually sold. Commercial details belong to the
@@ -225,7 +241,10 @@ export function CcwRoadshowBooking({
           </h2>
           <p className={`mt-2 ${marketingBodySm}`}>
             {selectedEvent.city} - {selectedEvent.dates}, {selectedEvent.timeLabel}, at{' '}
-            {selectedEvent.venueName}. This event is not part of the free CCW entry offer.
+            {selectedEvent.venueName}.
+            {getUpcomingFreeEntryCities(now).length > 0
+              ? ' This event is not part of the free CCW entry offer.'
+              : ''}
             {' '}Book directly with Carpet Cleaners Warehouse.
           </p>
           {selectedEvent.unitAmountCents !== undefined && (

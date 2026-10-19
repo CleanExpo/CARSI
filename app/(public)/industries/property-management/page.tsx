@@ -46,23 +46,23 @@ const stats = [
 const whyCards = [
   {
     icon: Scale,
-    title: 'Tribunal Defence',
+    title: 'Documented Training',
     description:
-      'Verifiable assessment credentials provide defensible documentation in NCAT/VCAT hearings. Reduce mould and carpet disputes with standards-based evidence.',
+      'Documented CARSI training shows what each property manager has studied, and when.',
     color: '#673ab7',
   },
   {
     icon: Shield,
     title: 'RTA Compliance',
     description:
-      'Mould is a habitability issue under all state Residential Tenancies Acts. Trained managers avoid regulatory breaches and landlord liability.',
+      'Mould can affect whether a rental property is fit to live in under state tenancy laws. CARSI training covers how to identify and record mould and water damage.',
     color: '#512da8',
   },
   {
     icon: Droplets,
     title: 'Insurance Claims',
     description:
-      'Defensible, standards-based documentation for water damage and mould insurance claims. Win management contracts with qualified credentials.',
+      'Training covers how to document water damage and mould for insurance claims.',
     color: '#ed9d24',
   },
 ];

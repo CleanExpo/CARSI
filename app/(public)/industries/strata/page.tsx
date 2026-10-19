@@ -53,9 +53,9 @@ const whyCards = [
   },
   {
     icon: ShieldCheck,
-    title: 'Personal Liability',
+    title: 'Documented Training',
     description:
-      'Verifiable CARSI credentials document completed restoration training, which helps building managers show due diligence for common property.',
+      'Documented CARSI training shows what each building manager has studied, and when.',
     color: '#6d28d9',
   },
   {

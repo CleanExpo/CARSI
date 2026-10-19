@@ -73,7 +73,7 @@ const whyCards = [
     icon: Shield,
     title: 'Heritage Preservation',
     description:
-      'Protect irreplaceable artefacts and collection items. Restoration training equips staff with standards-based response protocols aligned to AICCM conservation guidelines.',
+      'Water and fire can damage irreplaceable artefacts and collection items. Restoration training covers how staff respond to water and fire events.',
     color: '#8B6914',
   },
   {
@@ -133,7 +133,7 @@ export default async function MuseumsCulturalIndustryPage() {
         title="Heritage Preservation Bundle"
         price={industryBundlePriceLabel('museums-cultural')}
         description="mould remediation, water damage restoration and structural drying training for museum and gallery teams. Includes collection-specific emergency response protocols. Online, self-paced — fits around exhibition schedules."
-        ctaText="Protect Your Collection"
+        ctaText="Explore the training"
         accentColor={ACCENT_COLOR}
       />
     </IndustryPageLayout>

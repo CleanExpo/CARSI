@@ -19,7 +19,7 @@ const siteUrl = getPublicSiteUrl();
 export const metadata: Metadata = {
   title: 'Industry News | CARSI Hub',
   description:
-    'AI-curated news and updates from the Australian restoration, HVAC, flooring, and indoor environment industries. Sourced from leading trade publications.',
+    'AI-curated news and updates from the Australian restoration, HVAC, flooring, and indoor environment industries. Sourced from trade publications.',
   keywords: [
     'restoration industry news',
     'HVAC news Australia',
@@ -230,7 +230,7 @@ export default async function NewsPage({
       <CommunityHubShell
         eyebrow="Community & resources"
         title="Industry News"
-        description="AI-curated news from leading trade publications — restoration, HVAC, flooring, indoor air quality, and the broader Australian construction industry."
+        description="AI-curated news from trade publications — restoration, HVAC, flooring, indoor air quality, and the broader Australian construction industry."
         stats={[
           { value: total > 0 ? String(total) : 'Live', label: 'Articles' },
           {

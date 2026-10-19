@@ -73,7 +73,7 @@ const whyCards = [
     icon: Shield,
     title: 'Asset Protection',
     description:
-      'Warehoused goods, fleet vehicles, and loading infrastructure represent significant capital. Restoration training ensures rapid, standards-based response to water damage and contamination events.',
+      'Warehoused goods, fleet vehicles, and loading infrastructure represent significant capital. Restoration training covers response to water damage and contamination events.',
     color: '#1565C0',
   },
   {

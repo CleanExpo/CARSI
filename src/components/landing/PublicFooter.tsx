@@ -150,7 +150,7 @@ export function PublicFooter({ tone = 'chrome' }: { tone?: 'chrome' | 'light' } 
               <PublicLogo variant="footer" />
             </Link>
             <p className="mt-5 max-w-md text-sm leading-relaxed text-white/58">
-              Australia&apos;s industry training leader.
+              Cleaning and restoration training for Australian technicians.
               <br />
               24/7 online. <AcronymTooltip term="IICRC" />
               <span> CEC Accredited courses.</span>
@@ -421,7 +421,7 @@ function LightFooter() {
               <PublicLogo variant="footer" surface="light" />
             </Link>
             <p className="mt-5 max-w-md text-sm leading-relaxed text-slate-500">
-              Australia&apos;s industry training leader.
+              Cleaning and restoration training for Australian technicians.
               <br />
               24/7 online. <AcronymTooltip term="IICRC" />
               <span> CEC Accredited courses.</span>

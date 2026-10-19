@@ -46,16 +46,16 @@ const stats = [
 const whyCards = [
   {
     icon: Shield,
-    title: 'WHS Compliance',
+    title: 'Documented Training',
     description:
-      'Mining operations have strict WHS obligations. Restoration training demonstrates due diligence for water damage and mould hazard identification on site.',
+      'Mining operations have strict WHS obligations. Documented CARSI training shows what each site team member has studied, and when.',
     color: '#ed9d24',
   },
   {
     icon: Droplets,
     title: 'Wet Area Response',
     description:
-      'Water ingress in accommodation blocks, wet mess areas, and underground operations requires immediate, standards-based response.',
+      'Water ingress in accommodation blocks, wet mess areas, and underground operations needs a prompt response.',
     color: '#d4891e',
   },
   {

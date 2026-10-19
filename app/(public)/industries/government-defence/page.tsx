@@ -53,7 +53,7 @@ const faqs = [
   {
     question: 'What WHS obligations apply to mould in government buildings?',
     answer:
-      'Under Australian WHS legislation, government employers have a duty of care to identify and manage mould and moisture hazards. CARSI mould remediation training provides facility teams with the skills to conduct mould assessments, implement containment protocols, and document remediation — helping document WHS due diligence.',
+      'Under Australian WHS legislation, government employers have a duty of care to identify and manage mould and moisture hazards. CARSI mould remediation training covers mould assessment, containment and remediation records. Documented CARSI training shows what each team member has studied, and when.',
   },
   {
     question: 'How do you restore heritage-listed government buildings after water damage?',
@@ -70,9 +70,9 @@ const faqs = [
 const whyCards = [
   {
     icon: Shield,
-    title: 'WHS Due Diligence',
+    title: 'Documented Training',
     description:
-      'Government employers have WHS duties for mould and water hazards. Restoration training helps teams identify those hazards and document the response.',
+      'Government employers have strict WHS duties. Documented CARSI training shows what each facility team member has studied, and when.',
     color: '#2196f3',
   },
   {

@@ -19,7 +19,7 @@ const siteUrl = getPublicSiteUrl();
 export const metadata: Metadata = {
   title: 'Research Articles | CARSI Industry Hub',
   description:
-    'Deep, sourced research articles on water damage restoration, indoor environments, HVAC, flooring, and related Australian industries. Expert content from NRPG-accredited professionals.',
+    'Research articles on water damage restoration, indoor environments, HVAC, flooring, and related Australian industries.',
   keywords: [
     'restoration research',
     'water damage articles',
@@ -27,13 +27,12 @@ export const metadata: Metadata = {
     'HVAC industry',
     'flooring industry Australia',
     'CARSI research hub',
-    'NRPG articles',
   ],
   openGraph: {
     images: OG_IMAGES,
     title: 'Research Articles | CARSI Industry Hub',
     description:
-      'Expert research and analysis on the Australian restoration, indoor environment, and HVAC industries.',
+      'Research articles on the Australian restoration, indoor environment, and HVAC industries.',
     type: 'website',
     url: `${siteUrl}/research`,
   },
@@ -153,6 +152,9 @@ export default async function ResearchPage({
   const { data: articles, total } = await getArticles(category);
 
   const placeholderCount = Math.max(0, 10 - articles.length);
+  // An empty list (no articles yet, or the API was down or timed out) backs no claim about
+  // sourcing or authorship, so the hero says only what is coming.
+  const hasArticles = articles.length > 0;
 
   const breadcrumbs = [
     { name: 'Home', url: siteUrl },
@@ -166,13 +168,19 @@ export default async function ResearchPage({
       <CommunityHubShell
         eyebrow="Community & resources"
         title="Research Articles"
-        description="Deep, sourced research on water damage restoration, indoor environments, HVAC, flooring, and related Australian industries — authored by NRPG-accredited professionals."
-        stats={[
-          { value: total > 0 ? String(total) : '—', label: 'Articles' },
-          { value: 'AU', label: 'Sourced' },
-          { value: 'NRPG', label: 'Practitioner voice' },
-          { value: 'Free', label: 'To read' },
-        ]}
+        description={
+          hasArticles
+            ? 'Research articles on water damage restoration, indoor environments, HVAC, flooring, and related Australian industries.'
+            : 'Research articles on water damage restoration, indoor environments, HVAC, flooring, and related Australian industries are on their way.'
+        }
+        stats={
+          hasArticles
+            ? [
+                { value: String(total), label: 'Articles' },
+                { value: 'Free', label: 'To read' },
+              ]
+            : [{ value: '—', label: 'Articles' }]
+        }
       >
         <div className="mb-10">
           <HubCategoryPills basePath="/research" categories={CATEGORIES} activeCategory={category} />

@@ -32,10 +32,13 @@ import {
   formatCcwVenue,
   getCcwCityVenue,
   getCcwRegisterInterestHref,
+  getCcwRoadshowCostAnswer,
+  getUpcomingFreeEntryCities,
   getCcwRoadshowEvent,
   getCcwRoadshowEventPath,
   getNextCcwCitySitting,
   hasCcwRoadshowSessionEnded,
+  isOpenFreeEntrySitting,
   type CcwRoadshowEvent,
 } from '@/lib/marketing/ccw-roadshow';
 
@@ -58,8 +61,7 @@ function buildFaqs(now: Date) {
   },
   {
     question: 'How much does it cost?',
-    answer:
-      'Melbourne is free for past and current CCW customers - register on the CARSI event page to claim a free entry token for check-in. Sydney and Brisbane seats are booked through Carpet Cleaners Warehouse, not on this page.',
+    answer: getCcwRoadshowCostAnswer(now),
   },
   {
     question: 'Where are the Melbourne, Sydney and Brisbane events held?',
@@ -140,6 +142,11 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
   const nextDatesTba = focusEvent
     ? hasCcwRoadshowSessionEnded(focusEvent, now)
     : upcomingEvents.length === 0;
+  // The free-entry offer shows only while a free-token sitting is still ahead.
+  const freeEntryCities = getUpcomingFreeEntryCities(now);
+  const showFreeOffer = focusEvent
+    ? isOpenFreeEntrySitting(focusEvent, now)
+    : freeEntryCities.length > 0;
   // When the focused sitting has ended but its city has a later one, point at that sitting.
   const nextCitySitting =
     focusEvent && nextDatesTba ? getNextCcwCitySitting(focusEvent.city, now) : null;
@@ -378,15 +385,16 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
           <div className="rounded-2xl border border-slate-200/80 bg-white p-7 shadow-sm">
             {nextDatesTba ? (
               <CcwRegisterInterest city={focusEvent?.city} now={now} />
-            ) : focusEvent && !allowsFreeEntryRegistration(focusEvent) ? (
+            ) : !showFreeOffer ? (
               <>
                 <p className={LANDING_EYEBROW_CLASS}>Booked through CCW</p>
                 <h3 className="mt-3 font-[family-name:var(--font-display)] text-2xl font-semibold text-slate-950">
-                  {focusEvent.city} seats are sold by Carpet Cleaners Warehouse
+                  {focusEvent ? `${focusEvent.city} seats` : 'Seats'} are sold by Carpet Cleaners Warehouse
                 </h3>
                 <p className={`mt-3 ${LANDING_LEAD_CLASS}`}>
-                  {focusEvent.city} is not part of the free CCW entry offer. Contact Carpet Cleaners
-                  Warehouse to book a place for {focusEvent.dates}.
+                  {focusEvent
+                    ? `${freeEntryCities.length > 0 ? `${focusEvent.city} is not part of the free CCW entry offer. ` : ''}Contact Carpet Cleaners Warehouse to book a place for ${focusEvent.dates}.`
+                    : 'Contact Carpet Cleaners Warehouse to book a place at an upcoming sitting.'}
                 </p>
               </>
             ) : (
@@ -399,7 +407,7 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
                   {ccwRoadshowFreeEntryOffer.detail}
                   {focusEvent
                     ? ''
-                    : ' This applies to Melbourne only — Sydney and Brisbane are paid seats booked through Carpet Cleaners Warehouse.'}
+                    : ` This applies to ${freeEntryCities.join(' and ')} only — other sittings are booked through Carpet Cleaners Warehouse.`}
                 </p>
                 <div className="mt-6 space-y-3">
                   {ccwRoadshowTicketPackages.map((pkg) => (
