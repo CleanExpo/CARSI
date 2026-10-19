@@ -1,0 +1,59 @@
+{
+ "version": 1,
+ "courseSlug": "agi-essentials-small-business",
+ "quizzes": [
+  {
+   "quizId": "f557960d-daa9-4508-99f5-ed2a18d96427",
+   "lessonTitle": "Final knowledge check",
+   "title": "AGI Essentials — Knowledge Check",
+   "passPercentage": 80,
+   "attemptsAllowed": 3,
+   "questions": [
+    {
+     "questionText": "How does AGI differ from the AI tools available today?",
+     "options": [
+      "It is just a faster chatbot",
+      "AGI aims at broad, human-like general capability across tasks; today’s tools are narrow systems trained for particular tasks",
+      "It only works offline",
+      "There is no difference"
+     ],
+     "correctIndex": 1,
+     "points": 1
+    },
+    {
+     "questionText": "The safest first step when adopting AI in a small business is to:",
+     "options": [
+      "Automate your entire operation at once",
+      "Pick one repetitive, low-risk task (like drafting quotes or summarising notes) and trial it with human review",
+      "Give the AI your banking passwords",
+      "Wait until AGI fully arrives"
+     ],
+     "correctIndex": 1,
+     "points": 1
+    },
+    {
+     "questionText": "Before putting customer information into an AI tool you should:",
+     "options": [
+      "Nothing — AI tools are always private",
+      "Check the tool’s data handling and your privacy obligations, and remove identifying details where possible",
+      "Post it publicly first",
+      "Ask the customer to do it"
+     ],
+     "correctIndex": 1,
+     "points": 1
+    },
+    {
+     "questionText": "AI-generated quotes, emails or content should be:",
+     "options": [
+      "Sent immediately without reading",
+      "Reviewed by a person for accuracy and tone before they go out",
+      "Written in US spelling",
+      "Never used at all"
+     ],
+     "correctIndex": 1,
+     "points": 1
+    }
+   ]
+  }
+ ]
+}

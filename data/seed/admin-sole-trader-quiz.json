@@ -1,0 +1,70 @@
+{
+ "version": 1,
+ "courseSlug": "admin-sole-trader",
+ "quizzes": [
+  {
+   "quizId": "52712efa-5d5d-4fe0-8dfd-7e0100c2bfa5",
+   "lessonTitle": "Final knowledge check",
+   "title": "Business Administration for Sole Traders — Knowledge Check",
+   "passPercentage": 80,
+   "attemptsAllowed": 3,
+   "questions": [
+    {
+     "questionText": "When must an Australian sole trader register for GST?",
+     "options": [
+      "Immediately when they get an ABN",
+      "Once GST turnover reaches the current threshold ($75,000 at time of writing) — optional below it",
+      "Only if they employ staff",
+      "Never — GST is for companies"
+     ],
+     "correctIndex": 1,
+     "points": 1
+    },
+    {
+     "questionText": "How long must you keep business records for the ATO?",
+     "options": [
+      "One year",
+      "Two years",
+      "Five years",
+      "Forever"
+     ],
+     "correctIndex": 2,
+     "points": 1
+    },
+    {
+     "questionText": "The safest way to handle money for tax and GST is to:",
+     "options": [
+      "Leave it all in one account and hope",
+      "Move a set percentage of every payment into a separate account as it arrives",
+      "Pay tax only when asked",
+      "Keep it as cash"
+     ],
+     "correctIndex": 1,
+     "points": 1
+    },
+    {
+     "questionText": "As a sole trader working in customers’ homes, the insurance you should never operate without is:",
+     "options": [
+      "Public liability insurance",
+      "Travel insurance",
+      "Pet insurance",
+      "Private health insurance"
+     ],
+     "correctIndex": 0,
+     "points": 1
+    },
+    {
+     "questionText": "Under Australian WHS laws a sole trader is:",
+     "options": [
+      "Exempt because they work alone",
+      "A PCBU with a duty to work safely, including for anyone who helps them",
+      "Only responsible if someone is injured",
+      "Covered by the customer’s insurance"
+     ],
+     "correctIndex": 1,
+     "points": 1
+    }
+   ]
+  }
+ ]
+}
