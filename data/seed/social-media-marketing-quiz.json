@@ -5,52 +5,96 @@
   {
    "quizId": "201d893b-204a-4033-8947-bf6fb20c7212",
    "lessonTitle": "Final knowledge check",
-   "title": "Social Media Marketing — Knowledge Check",
+   "title": "Introduction to Social Media Marketing — Knowledge Check",
    "passPercentage": 80,
    "attemptsAllowed": 3,
    "questions": [
     {
-     "questionText": "For a local Australian service business starting out, the best approach is:",
+     "questionText": "Per business.gov.au, how many social media channels should a small business use well?",
      "options": [
-      "Be on every platform at once",
-      "One primary platform done properly, with consistent posting and a small targeted budget",
-      "Pay for brand-awareness ads first",
-      "Only use TikTok"
-     ],
-     "correctIndex": 1,
-     "points": 1
-    },
-    {
-     "questionText": "The most honest measure of whether your ads work is:",
-     "options": [
-      "Likes and reach",
-      "Cost per booked job",
-      "Number of ads running",
-      "Follower count"
-     ],
-     "correctIndex": 1,
-     "points": 1
-    },
-    {
-     "questionText": "A sensible starting budget for a first lead ad set is:",
-     "options": [
-      "$10–$20 AUD per day",
-      "$500 AUD per day",
-      "Nothing — ads are free",
-      "$1,000 per week minimum"
+      "1 or 2",
+      "5 or 6",
+      "7 or 8",
+      "9 or 10"
      ],
      "correctIndex": 0,
      "points": 1
     },
     {
-     "questionText": "Advertising claims like \"certified\" or \"guaranteed\" in Australia must be:",
+     "questionText": "Per business.gov.au, which network is good for reaching professionals?",
      "options": [
-      "Written in capitals",
-      "Truthful and able to be substantiated under the Australian Consumer Law",
-      "Copied from competitors",
-      "Approved by Facebook"
+      "TikTok",
+      "LinkedIn",
+      "Snapchat",
+      "Pinterest"
      ],
      "correctIndex": 1,
+     "points": 1
+    },
+    {
+     "questionText": "Per business.gov.au, should you delete a fair but negative public review?",
+     "options": [
+      "Yes, delete it now",
+      "Yes, after a week",
+      "No, respond to it",
+      "Yes, if it hurts"
+     ],
+     "correctIndex": 2,
+     "points": 1
+    },
+    {
+     "questionText": "Per business.gov.au, how often should you check your channels for messages?",
+     "options": [
+      "At least once a fortnight",
+      "At least once a month",
+      "At least once a quarter",
+      "At least once a day"
+     ],
+     "correctIndex": 3,
+     "points": 1
+    },
+    {
+     "questionText": "Per this course, what is the cost per booked job for $150 spent and 3 bookings?",
+     "options": [
+      "$50",
+      "$30",
+      "$75",
+      "$15"
+     ],
+     "correctIndex": 0,
+     "points": 1
+    },
+    {
+     "questionText": "Per business.gov.au, how often should you post on most platforms?",
+     "options": [
+      "3 to 5 times a year",
+      "3 to 5 times a week",
+      "3 to 5 times a day",
+      "1 to 2 times a month"
+     ],
+     "correctIndex": 1,
+     "points": 1
+    },
+    {
+     "questionText": "Per this course, which ad type suits quote requests?",
+     "options": [
+      "Reach ads",
+      "Like ads",
+      "Lead ads",
+      "Event ads"
+     ],
+     "correctIndex": 2,
+     "points": 1
+    },
+    {
+     "questionText": "Per business.gov.au, what must you avoid in social media posts?",
+     "options": [
+      "Photos of completed jobs",
+      "Your service area hours",
+      "Replies to customer comments",
+      "False or misleading claims"
+     ],
+     "correctIndex": 3,
      "points": 1
     }
    ]

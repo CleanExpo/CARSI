@@ -10,47 +10,91 @@
    "attemptsAllowed": 3,
    "questions": [
     {
-     "questionText": "How does AGI differ from the AI tools available today?",
+     "questionText": "Per IEEE Technology Navigator, is AGI an existing technology?",
      "options": [
-      "It is just a faster chatbot",
-      "AGI aims at broad, human-like general capability across tasks; today’s tools are narrow systems trained for particular tasks",
-      "It only works offline",
-      "There is no difference"
+      "No, a research objective",
+      "Yes, in most chatbots",
+      "Yes, since the 1950s",
+      "Yes, in accounting tools"
+     ],
+     "correctIndex": 0,
+     "points": 1
+    },
+    {
+     "questionText": "Per business.gov.au, which type of AI creates new text and images?",
+     "options": [
+      "Computer vision",
+      "Generative AI",
+      "Machine learning",
+      "Narrow robotics"
      ],
      "correctIndex": 1,
      "points": 1
     },
     {
-     "questionText": "The safest first step when adopting AI in a small business is to:",
+     "questionText": "Per the OAIC, should you paste personal information into public generative AI tools?",
      "options": [
-      "Automate your entire operation at once",
-      "Pick one repetitive, low-risk task (like drafting quotes or summarising notes) and trial it with human review",
-      "Give the AI your banking passwords",
-      "Wait until AGI fully arrives"
+      "Yes, when it helps",
+      "Yes, for quotes only",
+      "No, as best practice",
+      "Yes, on free plans"
+     ],
+     "correctIndex": 2,
+     "points": 1
+    },
+    {
+     "questionText": "Per business.gov.au, who is responsible for what your AI tools do?",
+     "options": [
+      "The tool developer",
+      "The paying customer",
+      "The federal government",
+      "Your own business"
+     ],
+     "correctIndex": 3,
+     "points": 1
+    },
+    {
+     "questionText": "Per business.gov.au, how many areas should a first AI trial cover?",
+     "options": [
+      "1 or 2 areas",
+      "5 or 6 areas",
+      "9 or 10 areas",
+      "All of the areas"
+     ],
+     "correctIndex": 0,
+     "points": 1
+    },
+    {
+     "questionText": "Per business.gov.au, what can generative AI do with facts?",
+     "options": [
+      "Guarantee that every fact holds",
+      "Present false facts as true",
+      "Verify every fact for you",
+      "Replace any trusted source entirely"
      ],
      "correctIndex": 1,
      "points": 1
     },
     {
-     "questionText": "Before putting customer information into an AI tool you should:",
+     "questionText": "Per the National AI Centre, how many essential practices are there?",
      "options": [
-      "Nothing — AI tools are always private",
-      "Check the tool’s data handling and your privacy obligations, and remove identifying details where possible",
-      "Post it publicly first",
-      "Ask the customer to do it"
+      "3",
+      "9",
+      "6",
+      "8"
      ],
-     "correctIndex": 1,
+     "correctIndex": 2,
      "points": 1
     },
     {
-     "questionText": "AI-generated quotes, emails or content should be:",
+     "questionText": "Per this course, what do you do before an AI draft reaches a customer?",
      "options": [
-      "Sent immediately without reading",
-      "Reviewed by a person for accuracy and tone before they go out",
-      "Written in US spelling",
-      "Never used at all"
+      "Send it unread",
+      "Ask the chatbot",
+      "Post it online",
+      "Check it yourself"
      ],
-     "correctIndex": 1,
+     "correctIndex": 3,
      "points": 1
     }
    ]
