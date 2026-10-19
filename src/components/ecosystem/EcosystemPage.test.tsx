@@ -47,10 +47,16 @@ describe('/ecosystem page markup', () => {
     expect(titles).toEqual(ECOSYSTEM_PRODUCTS.map((p) => p.name));
   });
 
-  it('shows each card’s "How CARSI connects" line', () => {
-    const text = visibleText(html);
-    for (const p of ECOSYSTEM_PRODUCTS) expect(text).toContain(p.connection);
-    expect(text.split(ECOSYSTEM_PAGE_COPY.connectionLabel).length - 1).toBe(5);
+  it('shows each card’s own "How CARSI connects" line, inside that card, under the label', () => {
+    const cards = html.split('data-testid="ecosystem-card"').slice(1);
+    expect(cards.length).toBe(ECOSYSTEM_PRODUCTS.length);
+    ECOSYSTEM_PRODUCTS.forEach((p, i) => {
+      const text = visibleText(cards[i].split('</article>')[0]);
+      expect(p.connection.trim().length, p.name).toBeGreaterThanOrEqual(40);
+      const label = text.indexOf(ECOSYSTEM_PAGE_COPY.connectionLabel);
+      expect(label, p.name).toBeGreaterThan(-1);
+      expect(text.indexOf(p.connection), p.name).toBeGreaterThan(label);
+    });
   });
 
   it('tags every outbound link so the browser sends the UTM, and opens it safely', () => {

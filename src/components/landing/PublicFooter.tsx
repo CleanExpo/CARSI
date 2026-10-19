@@ -9,6 +9,7 @@ import {
 } from '@/components/landing/public-shell-width';
 import { PublicLogo } from '@/components/landing/PublicLogo';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
+import { ECOSYSTEM_PAGE_COPY } from '@/lib/ecosystem/products';
 
 /**
  * Shared public footer. Design-led site closure with full platform navigation.
@@ -254,6 +255,12 @@ export function PublicFooter({ tone = 'chrome' }: { tone?: 'chrome' | 'light' } 
               </p>
               <div className="flex flex-wrap gap-2">
                 <FooterExternalLink href={RESTOREASSIST_URL}>RestoreAssist</FooterExternalLink>
+                <Link
+                  href="/ecosystem"
+                  className="inline-flex min-h-8 items-center rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[11px] font-medium text-white/65 transition-all duration-200 hover:border-[#2490ed]/35 hover:bg-[#2490ed]/10 hover:text-white"
+                >
+                  {ECOSYSTEM_PAGE_COPY.footerLinkLabel}
+                </Link>
                 <a
                   href={RESTOREASSIST_EXPLAINER_URL}
                   target="_blank"
@@ -549,6 +556,12 @@ function LightFooter() {
                 <FooterExternalLinkLight href={RESTOREASSIST_URL}>
                   RestoreAssist
                 </FooterExternalLinkLight>
+                <Link
+                  href="/ecosystem"
+                  className="inline-flex min-h-8 items-center rounded-full border border-slate-300/70 bg-white px-3 py-1.5 text-[11px] font-medium text-slate-600 transition-all duration-200 hover:border-[#146fc2]/40 hover:bg-[#146fc2]/[0.06] hover:text-slate-900"
+                >
+                  {ECOSYSTEM_PAGE_COPY.footerLinkLabel}
+                </Link>
                 <a
                   href={RESTOREASSIST_EXPLAINER_URL}
                   target="_blank"

@@ -1,7 +1,9 @@
+import { getPathMatch } from 'next/dist/shared/lib/router/utils/path-match';
 import { describe, expect, it } from 'vitest';
 
 import nextConfig from '../../../next.config';
-import { LEGACY_WORDPRESS_REDIRECTS } from './legacy-wordpress-redirects';
+import { LEGACY_WORDPRESS_REDIRECTS, findRedirectChains } from './legacy-wordpress-redirects';
+import { RENAMED_COURSE_SLUGS } from './renamed-course-slugs';
 
 /**
  * Sister sites still link to carsi.com.au's old WordPress URLs. Each one 404'd on 19/10/2026
@@ -9,6 +11,11 @@ import { LEGACY_WORDPRESS_REDIRECTS } from './legacy-wordpress-redirects';
  * and its contractor onboarding links /membership/. These tests pin the evidenced mapping:
  * each WordPress product's title (data/wordpress-export/courses.json) equals the live course
  * page title at the destination. An unmatched /product/ goes to the catalogue, never a guess.
+ *
+ * Routing is checked with Next's own matcher, walking the FULL redirects() list in order, the
+ * way the router does (server/lib/router-utils/filesystem.js buildCustomRoute: strict,
+ * removeUnnamedParams, case-insensitive). Whether a destination exists live is not a unit
+ * question; scripts/check-ecosystem-links.ts --redirect-destinations checks that.
  */
 const EXPECTED: Record<string, string> = {
   '/product/safety-procedures': '/courses/introduction-to-safety-procedures-for-water-damage-work',
@@ -21,33 +28,86 @@ const EXPECTED: Record<string, string> = {
   '/product/:slug*': '/courses',
 };
 
+type Rule = { source: string; destination: string; statusCode?: number; permanent?: boolean };
+
+async function configRules(): Promise<Rule[]> {
+  return ((await nextConfig.redirects?.()) ?? []) as Rule[];
+}
+
+function matcher(source: string) {
+  return getPathMatch(source, { strict: true, removeUnnamedParams: true, sensitive: false });
+}
+
+/** The first redirect rule Next would apply to `path` (already slashless), or null. */
+function firstMatch(rules: Rule[], path: string): Rule | null {
+  return rules.find((r) => matcher(r.source)(path) !== false) ?? null;
+}
+
 describe('LEGACY_WORDPRESS_REDIRECTS', () => {
-  it('maps exactly the evidenced legacy paths, each as a 301', () => {
+  it('maps exactly the evidenced legacy paths, each as a 301 and never as permanent', () => {
     const table = Object.fromEntries(LEGACY_WORDPRESS_REDIRECTS.map((r) => [r.source, r.destination]));
     expect(table).toEqual(EXPECTED);
-    for (const r of LEGACY_WORDPRESS_REDIRECTS) expect(r.statusCode).toBe(301);
-  });
-
-  it('lists every specific /product/ rule before the catalogue catch-all', () => {
-    const sources = LEGACY_WORDPRESS_REDIRECTS.map((r) => r.source);
-    const catchAll = sources.indexOf('/product/:slug*');
-    expect(catchAll).toBe(sources.length - 1);
-  });
-
-  it('never points a redirect at another redirect source (no chains or loops)', () => {
-    const sources = new Set(LEGACY_WORDPRESS_REDIRECTS.map((r) => r.source));
     for (const r of LEGACY_WORDPRESS_REDIRECTS) {
-      expect(sources.has(r.destination)).toBe(false);
-      expect(r.destination.startsWith('/product')).toBe(false);
+      expect(r.statusCode).toBe(301);
+      expect('permanent' in r).toBe(false);
     }
   });
 
-  it('is wired into next.config redirects() ahead of nothing that could shadow it', async () => {
-    const rules = (await nextConfig.redirects?.()) ?? [];
+  it('sends each real legacy URL to its mapped page — the first rule Next matches', async () => {
+    const rules = await configRules();
+    const cases: Record<string, string> = {
+      '/product/safety-procedures': EXPECTED['/product/safety-procedures'],
+      '/product/risk-assessment-course': EXPECTED['/product/risk-assessment-course'],
+      '/product/safe-work-method-statements-swms-course':
+        EXPECTED['/product/safe-work-method-statements-swms-course'],
+      '/product/safety-data-sheet-sds-course': EXPECTED['/product/safety-data-sheet-sds-course'],
+      '/product/standard-operating-procedures-sop-course':
+        EXPECTED['/product/standard-operating-procedures-sop-course'],
+      '/product/asbestos': EXPECTED['/product/asbestos'],
+      '/product/ASBESTOS': EXPECTED['/product/asbestos'],
+      '/membership': '/subscribe',
+      '/product/unknown-course': '/courses',
+      '/product/asbestos/extra': '/courses',
+      '/product': '/courses',
+    };
+    for (const [path, destination] of Object.entries(cases)) {
+      const hit = firstMatch(rules, path);
+      expect(hit, path).not.toBeNull();
+      expect({ path, destination: hit!.destination, statusCode: hit!.statusCode }).toEqual({
+        path,
+        destination,
+        statusCode: 301,
+      });
+    }
+  });
+
+  it('leaves current pages alone', async () => {
+    const rules = await configRules();
+    for (const path of ['/courses', '/subscribe', '/products', '/membership-plans', '/ecosystem']) {
+      expect(firstMatch(rules, path), path).toBeNull();
+    }
+  });
+
+  it('never points at something that redirects again (config rule, renamed course, trailing slash)', async () => {
+    const rules = await configRules();
+    const matchesConfig = (path: string) => firstMatch(rules, path) !== null;
+    expect(findRedirectChains(LEGACY_WORDPRESS_REDIRECTS, matchesConfig, RENAMED_COURSE_SLUGS)).toEqual([]);
+  });
+
+  it('catches a chain when one is planted (positive control for the check above)', async () => {
+    const rules = await configRules();
+    const matchesConfig = (path: string) => firstMatch(rules, path) !== null;
+    const planted = [
+      { destination: '/courses/wrt-water-damage-essentials' },
+      { destination: '/membership' },
+      { destination: '/courses/' },
+    ];
+    expect(findRedirectChains(planted, matchesConfig, RENAMED_COURSE_SLUGS)).toHaveLength(3);
+  });
+
+  it('keeps every destination on the catalogue, a course page or the membership page', () => {
     for (const r of LEGACY_WORDPRESS_REDIRECTS) {
-      const hit = rules.find((x) => x.source === r.source);
-      expect(hit, r.source).toBeDefined();
-      expect(hit).toMatchObject({ destination: r.destination, statusCode: 301 });
+      expect(r.destination).toMatch(/^(?:\/courses(?:\/[a-z0-9-]+)?|\/subscribe)$/);
     }
   });
 });

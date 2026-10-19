@@ -16,6 +16,7 @@ import { ecosystemCopyText } from './products';
 const PLANTED: string[] = [
   'Every contractor is IICRC certified.',
   'Earn CEC hours here.',
+  'CARSI CEC points count toward NRPG membership.',
   'Includes certification for staff.',
   'An accredited network.',
   'An approved supplier.',

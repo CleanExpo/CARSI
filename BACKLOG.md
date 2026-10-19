@@ -802,3 +802,29 @@ sign-in. Checkout opened Stripe with no enrolment check, so a retry charged twic
 (Brighttouch, 30 Aug). #810 already fixed the welcome-email CTA. This session adds the
 enrolment-before-Stripe guard and the login recovery copy. Founder emails (#808) and
 the single Brighttouch refund (#809) stay out of agent scope.
+
+## Discoveries — 2026-10-19 ecosystem page (`feat/ecosystem-coming-soon`)
+
+Found while grounding /ecosystem in the sister repos' code. None is worked here.
+
+- **Sister-repo licence copy (not CARSI's repo, flag to Phill):** TradeHall `index.html:446`
+  "CARSI · IICRC exam prep" and `:806` "ACCREDITED TRAINING" (no "CEC"); Disaster Recovery
+  `app/operational-excellence/page.tsx:52` "industry-leading" + "affiliated with IICRC, CARSI";
+  DR-NRPG `apps/web/app/nz/page.tsx:59` "CARSI Training & Certification".
+- **Sister-repo stale links:** Disaster Recovery links six `carsi.com.au/product/…` URLs and
+  `/membership/` (all 404 on 19/10). This branch adds CARSI-side 301s; the source links should
+  still be updated to `/courses/<slug>` and `/subscribe` in those repos.
+- **NRPG identity conflict:** nrpg.business says "National Recovery Platform Group" and
+  "Disaster Recovery Pty Ltd"; disasterrecovery.com.au says "National Restoration Professionals
+  Group Pty Ltd"; ABN 85 151 794 142 is registered to DISASTER RECOVERY PTY LTD (ABR, 19/10).
+- **`check:au-english` scope gap:** it scans course JSON only (`scripts/check-au-english.mjs:24-28`),
+  never `src/` or `app/` copy. The ecosystem page carries its own AU-spelling rules; the guard
+  should widen.
+- **`src/lib/schema/founder.ts:24`** lists `https://restoreassist.com.au/authors/phill-mcgurk` in
+  the founder's `sameAs`; restoreassist.com.au did not resolve on 19/10 (curl 000).
+- **Existing unsubstantiated claims:** `app/(public)/about/page.tsx:186` "recognised by major
+  Australian insurers"; `app/(public)/research/page.tsx:22,169` "NRPG-accredited professionals".
+- **Homepage band** for the ecosystem was deferred (slot 12 of 13); revisit after Phill signs
+  the /ecosystem copy.
+- **GOAL.md:7** points at `2nd Brain/Plans/carsi-ecosystem-blueprint-2026-08-16.md`, which is not
+  in `~/2nd Brain/Plans` (19/10).
