@@ -72,20 +72,29 @@ const CLAIM_PATTERN = new RegExp(
 const ATTRIBUTED = /NeoSan Labs states/i;
 const SOURCED = /\(?\s*source:\s*https?:\/\//i;
 const DATED = /checked\s+\d{1,2}\/\d{1,2}\/\d{4}/;
-// r6: a block that only directs the reader to the SDS hazard/environmental
-// sections makes no assertion of its own and is exempt.
-const SDS_DIRECTION = /check SDS sections 2/i;
+// r6/r7: an SDS-direction phrase makes no assertion of its own. Strip ONLY the
+// direction phrase from the block, then evaluate the remainder normally — a
+// whole-block exemption would let "non-toxic …; check SDS sections 2…" through.
+// Non-global const for test(); the strip uses a fresh global literal per call —
+// a shared /g regex makes .test() stateful via lastIndex and can hide misses.
+const SDS_DIRECTION_PHRASE =
+  /(check|see)\s+(the\s+)?SDS\s+sections?\s+2[^.]*\.?/i;
+
+function evaluateBlock(block: string): boolean {
+  const stripped = block.replace(
+    /(check|see)\s+(the\s+)?SDS\s+sections?\s+2[^.]*\.?/gi,
+    ' ',
+  );
+  if (!CLAIM_PATTERN.test(stripped)) return false;
+  return !(
+    ATTRIBUTED.test(stripped) &&
+    SOURCED.test(stripped) &&
+    DATED.test(stripped)
+  );
+}
 
 function unattributedClaims(blocks: string[]): string[] {
-  return blocks.filter((block) => {
-    if (!CLAIM_PATTERN.test(block)) return false;
-    if (SDS_DIRECTION.test(block)) return false;
-    return !(
-      ATTRIBUTED.test(block) &&
-      SOURCED.test(block) &&
-      DATED.test(block)
-    );
-  });
+  return blocks.filter(evaluateBlock);
 }
 
 describe('NeoSan Labs course claim compliance (review r2/r3)', () => {
@@ -144,13 +153,24 @@ describe('NeoSan Labs course claim compliance (review r2/r3)', () => {
     expect(unattributedClaims(controls)).toHaveLength(controls.length);
   });
 
-  it('planted control: an SDS-direction block is exempt (r6)', () => {
+  it('planted control: a block that is only the SDS direction passes (r6)', () => {
     const direction = [
-      '<p>Environmental fate varies by product &mdash; For this product&rsquo;s ' +
-        'hazards and environmental information, check SDS sections 2 (hazard ' +
-        'identification), 11 (toxicological information) and 12 (ecological information).</p>',
+      '<p>For this product&rsquo;s hazards and environmental information, check ' +
+        'SDS sections 2 (hazard identification), 11 (toxicological information) ' +
+        'and 12 (ecological information).</p>',
     ];
     expect(unattributedClaims(direction)).toEqual([]);
+  });
+
+  it('planted control: claims riding on an SDS-direction phrase are still flagged (r7)', () => {
+    // The exact loophole sentence from review r7: stripping must remove only
+    // the direction phrase, not exempt the whole block.
+    const loophole = [
+      '<p>This product is non-toxic, biodegradable and safe for pets; check ' +
+        'SDS sections 2, 11 and 12 for this product&rsquo;s hazards and ' +
+        'environmental information.</p>',
+    ];
+    expect(unattributedClaims(loophole)).toHaveLength(1);
   });
 
   it('planted control: an attributed, dated, sourced claim passes', () => {
