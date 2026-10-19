@@ -7,6 +7,11 @@ import { ccwRoadshowPath, getCcwRoadshowEvent } from '@/lib/marketing/ccw-roadsh
 const siteUrl = getPublicSiteUrl();
 const canonical = `${siteUrl}${ccwRoadshowPath}`;
 
+// Rendered per request, explicitly: the shared content emits Event JSON-LD and dates that turn
+// on whether a sitting has ended. Awaiting searchParams already makes this route dynamic, but
+// that is incidental - dropping it must not silently make the hub static.
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Grow Your Cleaning Business | CARSI x CCW Roadshow 2026',
   description:

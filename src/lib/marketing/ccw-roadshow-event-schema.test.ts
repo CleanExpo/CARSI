@@ -1,0 +1,231 @@
+import { describe, expect, it } from 'vitest';
+
+import {
+  buildCcwRoadshowEventJsonLd,
+  ccwHomeVenues,
+  ccwRoadshowEvents,
+  getCcwCityVenue,
+  getCcwHomeVenue,
+  getCcwRoadshowEvent,
+  getNextCcwCitySitting,
+  hasCcwRoadshowSessionEnded,
+  type CcwRoadshowEvent,
+} from './ccw-roadshow';
+
+// CCW's own store addresses, read from https://ccwonline.com.au/pages/contact-us on 19/10/2026.
+const CCW_STORES = {
+  VIC: { streetAddress: 'Unit 1/5 Gatwick Road', suburb: 'Bayswater North', postcode: '3153' },
+  NSW: { streetAddress: '2/8 Tollis Place', suburb: 'Seven Hills', postcode: '2147' },
+  QLD: { streetAddress: 'D1-3/194 Zillmere Road', suburb: 'Boondall', postcode: '4034' },
+} as const;
+
+const url = 'https://carsi.com.au/ccw-melbourne';
+const image = 'https://carsi.com.au/og-image.png';
+
+function event(slug: string): CcwRoadshowEvent {
+  const found = getCcwRoadshowEvent(slug);
+  if (!found) throw new Error(`missing fixture event ${slug}`);
+  return found;
+}
+
+/** A clock one day before the event starts, so the session is in the future. */
+function dayBefore(e: CcwRoadshowEvent): Date {
+  return new Date(Date.parse(e.startDateIso) - 24 * 60 * 60 * 1000);
+}
+
+describe('CCW roadshow venues', () => {
+  it('keeps the 22-23 July 2026 Melbourne sitting at Club Kilsyth, where #612 moved it (history)', () => {
+    expect(event('melbourne')).toMatchObject({
+      startDateIso: '2026-07-22T08:30:00+10:00',
+      venueName: 'Club Kilsyth',
+      streetAddress: '1-15 Canterbury Road',
+      suburb: 'Bayswater North',
+      suburbStatePostcode: 'Bayswater North VIC 3153',
+      state: 'VIC',
+    });
+  });
+
+  it('sets each city home venue to its CCW store from the contact page', () => {
+    expect(ccwHomeVenues).toEqual({
+      VIC: {
+        venueName: 'Carpet Cleaners Warehouse Melbourne',
+        streetAddress: 'Unit 1/5 Gatwick Road',
+        suburb: 'Bayswater North',
+        suburbStatePostcode: 'Bayswater North VIC 3153',
+        state: 'VIC',
+      },
+      NSW: {
+        venueName: 'Carpet Cleaners Warehouse Sydney',
+        streetAddress: '2/8 Tollis Place',
+        suburb: 'Seven Hills',
+        suburbStatePostcode: 'Seven Hills NSW 2147',
+        state: 'NSW',
+      },
+      QLD: {
+        venueName: 'Carpet Cleaners Warehouse Boondall',
+        streetAddress: 'D1-3/194 Zillmere Road',
+        suburb: 'Boondall',
+        suburbStatePostcode: 'Boondall QLD 4034',
+        state: 'QLD',
+      },
+    });
+    for (const [state, store] of Object.entries(CCW_STORES)) {
+      const home = ccwHomeVenues[state as keyof typeof ccwHomeVenues];
+      expect(home.suburbStatePostcode).toBe(`${store.suburb} ${state} ${store.postcode}`);
+    }
+    expect(getCcwHomeVenue('Melbourne')).toBe(ccwHomeVenues.VIC);
+    expect(getCcwHomeVenue('Sydney')).toBe(ccwHomeVenues.NSW);
+    expect(getCcwHomeVenue('Brisbane')).toBe(ccwHomeVenues.QLD);
+  });
+
+  it('records every sitting at its city home venue except the documented Club Kilsyth move', () => {
+    for (const e of ccwRoadshowEvents) {
+      if (e.slug === 'melbourne') continue;
+      expect(e).toMatchObject(getCcwHomeVenue(e.city));
+    }
+  });
+});
+
+describe('next sitting and city venue', () => {
+  it('names the next not-yet-ended sitting for a city, earliest first', () => {
+    expect(getNextCcwCitySitting('Brisbane', new Date('2026-07-01T00:00:00Z'))?.slug).toBe(
+      'brisbane'
+    );
+    expect(getNextCcwCitySitting('Brisbane', new Date('2026-10-01T00:00:00Z'))?.slug).toBe(
+      'brisbane-2026-10-09'
+    );
+    expect(getNextCcwCitySitting('Melbourne', new Date('2026-07-23T06:29:59.999Z'))?.slug).toBe(
+      'melbourne'
+    );
+    expect(getNextCcwCitySitting('Melbourne', new Date('2026-10-19T00:00:00Z'))).toBeNull();
+  });
+
+  it('uses the next sitting venue when one exists, else the CCW home venue', () => {
+    expect(getCcwCityVenue('Melbourne', new Date('2026-07-01T00:00:00Z'))).toEqual({
+      venueName: 'Club Kilsyth',
+      streetAddress: '1-15 Canterbury Road',
+      suburb: 'Bayswater North',
+      suburbStatePostcode: 'Bayswater North VIC 3153',
+      state: 'VIC',
+    });
+    expect(getCcwCityVenue('Melbourne', new Date('2026-10-19T00:00:00Z'))).toEqual(
+      ccwHomeVenues.VIC
+    );
+  });
+});
+
+describe('hasCcwRoadshowSessionEnded', () => {
+  it('is false until the session end instant and true from then on', () => {
+    const melbourne = event('melbourne');
+    const end = Date.parse(melbourne.endDateIso);
+    expect(hasCcwRoadshowSessionEnded(melbourne, new Date(end - 1))).toBe(false);
+    expect(hasCcwRoadshowSessionEnded(melbourne, new Date(end))).toBe(true);
+    expect(hasCcwRoadshowSessionEnded(melbourne, new Date('2026-10-19T00:00:00Z'))).toBe(true);
+  });
+});
+
+describe('buildCcwRoadshowEventJsonLd', () => {
+  it('keeps Event markup while a session is running and drops it from the end instant', () => {
+    const melbourne = event('melbourne');
+    const end = Date.parse(melbourne.endDateIso);
+    const at = (ms: number) =>
+      buildCcwRoadshowEventJsonLd(melbourne, { now: new Date(ms), url, image });
+    expect(at(Date.parse(melbourne.startDateIso))).not.toBeNull();
+    expect(at(end - 1)).not.toBeNull();
+    expect(at(end)).toBeNull();
+    expect(at(Date.parse('2026-10-19T00:00:00Z'))).toBeNull();
+  });
+
+  it('emits no Event markup for any current session on 19/10/2026 (all are past)', () => {
+    const now = new Date('2026-10-19T00:00:00Z');
+    for (const e of ccwRoadshowEvents) {
+      expect(buildCcwRoadshowEventJsonLd(e, { now, url, image })).toBeNull();
+    }
+  });
+
+  it('describes a new session at the home venue with CARSI and CCW as separate organisers', () => {
+    const melbourne: CcwRoadshowEvent = {
+      ...event('melbourne'),
+      slug: 'melbourne-next',
+      startDateIso: '2027-03-10T08:30:00+11:00',
+      endDateIso: '2027-03-11T16:30:00+11:00',
+      ...getCcwHomeVenue('Melbourne'),
+    };
+    const schema = buildCcwRoadshowEventJsonLd(melbourne, {
+      now: dayBefore(melbourne),
+      url,
+      image,
+    });
+
+    expect(schema).toMatchObject({
+      '@context': 'https://schema.org',
+      '@type': 'Event',
+      name: melbourne.title,
+      startDate: melbourne.startDateIso,
+      endDate: melbourne.endDateIso,
+      eventStatus: 'https://schema.org/EventScheduled',
+      eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+      url,
+      image,
+      organizer: [
+        { '@type': 'Organization', name: 'CARSI', url: 'https://carsi.com.au' },
+        {
+          '@type': 'Organization',
+          name: 'Carpet Cleaners Warehouse',
+          url: 'https://ccwonline.com.au',
+        },
+      ],
+      location: {
+        '@type': 'Place',
+        name: 'Carpet Cleaners Warehouse Melbourne',
+        address: {
+          '@type': 'PostalAddress',
+          streetAddress: 'Unit 1/5 Gatwick Road',
+          addressLocality: 'Bayswater North',
+          addressRegion: 'VIC',
+          postalCode: '3153',
+          addressCountry: 'AU',
+        },
+      },
+    });
+    // No merged "CARSI + CCW" organiser entity.
+    const organisers = (schema?.organizer ?? []) as Array<{ name: string }>;
+    expect(organisers.some((o) => /\band\b|\+|&/.test(o.name))).toBe(false);
+  });
+
+  it('omits offers when the repo holds no real price for the session', () => {
+    for (const slug of ['melbourne', 'sydney', 'brisbane']) {
+      const e = event(slug);
+      expect(e.unitAmountCents).toBeUndefined();
+      const schema = buildCcwRoadshowEventJsonLd(e, { now: dayBefore(e), url, image });
+      expect(schema).not.toBeNull();
+      expect(schema).not.toHaveProperty('offers');
+    }
+  });
+
+  it('adds an AUD offer with the real price when one is recorded', () => {
+    const october = event('brisbane-2026-10-09');
+    const schema = buildCcwRoadshowEventJsonLd(october, { now: dayBefore(october), url, image });
+    expect(schema?.offers).toEqual({
+      '@type': 'Offer',
+      url: 'https://ccwonline.com.au/collections/training-marketing',
+      price: '495.00',
+      priceCurrency: 'AUD',
+    });
+  });
+
+  it('fails closed (no markup) when the address line has no postcode', () => {
+    const broken = { ...event('melbourne'), suburbStatePostcode: 'Bayswater North VIC' };
+    expect(buildCcwRoadshowEventJsonLd(broken, { now: dayBefore(broken), url, image })).toBeNull();
+  });
+
+  it('serialises to valid JSON that round-trips unchanged', () => {
+    const melbourne = event('melbourne');
+    const schema = buildCcwRoadshowEventJsonLd(melbourne, {
+      now: dayBefore(melbourne),
+      url,
+      image,
+    });
+    expect(JSON.parse(JSON.stringify(schema))).toEqual(schema);
+  });
+});

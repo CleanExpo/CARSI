@@ -88,6 +88,106 @@ export const ccwRoadshowFacilityAdvantages = [
   'Link the course material to service offers, quoting, safety and follow-up.',
 ];
 
+export type CcwVenue = Pick<
+  CcwRoadshowEvent,
+  'venueName' | 'streetAddress' | 'suburb' | 'suburbStatePostcode' | 'state'
+>;
+
+/**
+ * Where CARSI trains in each city: the CCW store (founder 19/10/2026, "Just use the CCW actual
+ * locations please"; addresses from ccwonline.com.au/pages/contact-us, read 19/10/2026).
+ * Use it for everything forward-looking - "where we train" copy, the FAQ, and as the venue of
+ * any NEW session (`...ccwHomeVenues.VIC`). Past sittings keep the venue they actually used.
+ */
+export const ccwHomeVenues: Record<CcwRoadshowEvent['state'], CcwVenue> = {
+  VIC: {
+    venueName: 'Carpet Cleaners Warehouse Melbourne',
+    streetAddress: 'Unit 1/5 Gatwick Road',
+    suburb: 'Bayswater North',
+    suburbStatePostcode: 'Bayswater North VIC 3153',
+    state: 'VIC',
+  },
+  NSW: {
+    venueName: 'Carpet Cleaners Warehouse Sydney',
+    streetAddress: '2/8 Tollis Place',
+    suburb: 'Seven Hills',
+    suburbStatePostcode: 'Seven Hills NSW 2147',
+    state: 'NSW',
+  },
+  QLD: {
+    venueName: 'Carpet Cleaners Warehouse Boondall',
+    streetAddress: 'D1-3/194 Zillmere Road',
+    suburb: 'Boondall',
+    suburbStatePostcode: 'Boondall QLD 4034',
+    state: 'QLD',
+  },
+};
+
+const ccwCityStates: Record<CcwRoadshowEvent['city'], CcwRoadshowEvent['state']> = {
+  Melbourne: 'VIC',
+  Sydney: 'NSW',
+  Brisbane: 'QLD',
+};
+
+export function getCcwHomeVenue(city: CcwRoadshowEvent['city']): CcwVenue {
+  return ccwHomeVenues[ccwCityStates[city]];
+}
+
+export function formatCcwVenue(venue: CcwVenue): string {
+  return `${venue.venueName}, ${venue.streetAddress}, ${venue.suburbStatePostcode}`;
+}
+
+/** True from the session's end instant on; such a sitting must never be shown as upcoming. */
+export function hasCcwRoadshowSessionEnded(event: CcwRoadshowEvent, now: Date): boolean {
+  return Date.parse(event.endDateIso) <= now.getTime();
+}
+
+/** The city's earliest sitting that has not ended, or null when nothing is ahead. */
+export function getNextCcwCitySitting(
+  city: CcwRoadshowEvent['city'],
+  now: Date,
+): CcwRoadshowEvent | null {
+  return (
+    ccwRoadshowEvents
+      .filter((event) => event.city === city && !hasCcwRoadshowSessionEnded(event, now))
+      .sort((a, b) => Date.parse(a.startDateIso) - Date.parse(b.startDateIso))[0] ?? null
+  );
+}
+
+/**
+ * Where a city's training is held right now: the venue of its next sitting when one is ahead
+ * (e.g. Club Kilsyth before 23 July 2026), otherwise the CCW home venue.
+ */
+export function getCcwCityVenue(city: CcwRoadshowEvent['city'], now: Date): CcwVenue {
+  const next = getNextCcwCitySitting(city, now);
+  if (!next) return getCcwHomeVenue(city);
+  const { venueName, streetAddress, suburb, suburbStatePostcode, state } = next;
+  return { venueName, streetAddress, suburb, suburbStatePostcode, state };
+}
+
+/** City-page meta description once that city's sitting has ended: no past dates or offers. */
+export function getCcwNextDatesDescription(city: CcwRoadshowEvent['city']): string {
+  return `Next ${city} dates to be announced. Practical training with Phill McGurk at ${formatCcwVenue(getCcwHomeVenue(city))}. Register your interest.`;
+}
+
+/** The existing /contact lead-context path, pre-filled for the next dates in a city. */
+export function getCcwRegisterInterestHref(city?: CcwRoadshowEvent['city']): string {
+  const topic = `the next ${city ? `${city} ` : ''}CARSI x CCW training dates`;
+  const cityParam = city ? `&city=${city.toLowerCase()}` : '';
+  return `/contact?source=ccw-roadshow${cityParam}&topic=${encodeURIComponent(topic)}`;
+}
+
+/**
+ * The page a ccw-roadshow lead came from, from the `city` query param. Whitelisted: anything
+ * other than a known city falls back to the roadshow hub, never a caller-supplied path.
+ */
+export function resolveCcwInterestPageUrl(city: string | undefined): string {
+  const known = (Object.keys(ccwCityStates) as CcwRoadshowEvent['city'][]).find(
+    (name) => name.toLowerCase() === city?.trim().toLowerCase(),
+  );
+  return known ? `/ccw-${known.toLowerCase()}` : ccwRoadshowPath;
+}
+
 export const ccwRoadshowEvents: CcwRoadshowEvent[] = [
   {
     slug: 'melbourne',
@@ -98,6 +198,9 @@ export const ccwRoadshowEvents: CcwRoadshowEvent[] = [
     startDateIso: '2026-07-22T08:30:00+10:00',
     endDateIso: '2026-07-23T16:30:00+10:00',
     timeLabel: '8.30am-4.30pm both days',
+    // HISTORY - do not change. This sitting ran at Club Kilsyth after the CCW Bayswater
+    // North branch proved too small for the numbers (#612, 15/07/2026). Forward-looking
+    // Melbourne copy uses ccwHomeVenues.VIC (the CCW store) instead.
     venueName: 'Club Kilsyth',
     streetAddress: '1-15 Canterbury Road',
     suburb: 'Bayswater North',
@@ -181,7 +284,9 @@ export const ccwRoadshowEvents: CcwRoadshowEvent[] = [
     timeLabel: 'Friday 8.30am-4.30pm; Saturday 8.30am-3pm (AEST)',
     timeZone: 'Australia/Brisbane',
     venueName: 'Carpet Cleaners Warehouse Boondall',
-    streetAddress: '194D Zillmere Road',
+    // Same store as CCW's product page "194D"; normalised 19/10/2026 to the contact-page
+    // form (ccwonline.com.au/pages/contact-us) so the address reads the same everywhere.
+    streetAddress: 'D1-3/194 Zillmere Road',
     suburb: 'Boondall',
     suburbStatePostcode: 'Boondall QLD 4034',
     state: 'QLD',
@@ -263,6 +368,67 @@ export const ccwRoadshowCampaignPillars = {
 export function getCcwRoadshowEvent(slug: string | null | undefined) {
   const normalized = slug?.trim().toLowerCase();
   return ccwRoadshowEvents.find((event) => event.slug === normalized) ?? null;
+}
+
+const ccwRoadshowOrganisers = [
+  { '@type': 'Organization', name: 'CARSI', url: 'https://carsi.com.au' },
+  { '@type': 'Organization', name: 'Carpet Cleaners Warehouse', url: 'https://ccwonline.com.au' },
+];
+
+/**
+ * schema.org Event JSON-LD for one roadshow session, or null when it must not be marked up.
+ *
+ * Fails closed: a session that has ENDED gets no Event markup (a running multi-day session keeps
+ * it), and neither does one whose address line lacks a postcode. Google's Event docs do not
+ * address ongoing events either way; they ask multi-day events to give both start and end. CARSI and CCW are separate organisers (CCW co-presents
+ * and sells the paid seats); the CCW store is the Place. An Offer is emitted only when the session
+ * carries a real price in `unitAmountCents` - never a guessed or free one.
+ * Google requirements: developers.google.com/search/docs/appearance/structured-data/event
+ * (last updated 2026-09-08, read 19/10/2026).
+ */
+export function buildCcwRoadshowEventJsonLd(
+  event: CcwRoadshowEvent,
+  { now, url, image }: { now: Date; url: string; image?: string },
+): Record<string, unknown> | null {
+  if (hasCcwRoadshowSessionEnded(event, now)) return null;
+  const postalCode = /\b(\d{4})$/.exec(event.suburbStatePostcode)?.[1];
+  if (!postalCode) return null;
+
+  const schema: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'Event',
+    name: event.title,
+    description: event.description,
+    startDate: event.startDateIso,
+    endDate: event.endDateIso,
+    eventStatus: 'https://schema.org/EventScheduled',
+    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+    inLanguage: 'en-AU',
+    url,
+    organizer: ccwRoadshowOrganisers,
+    location: {
+      '@type': 'Place',
+      name: event.venueName,
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: event.streetAddress,
+        addressLocality: event.suburb,
+        addressRegion: event.state,
+        postalCode,
+        addressCountry: 'AU',
+      },
+    },
+  };
+  if (image) schema.image = image;
+  if (event.unitAmountCents !== undefined && event.unitAmountCents > 0) {
+    schema.offers = {
+      '@type': 'Offer',
+      url: event.bookingUrl ?? url,
+      price: (event.unitAmountCents / 100).toFixed(2),
+      priceCurrency: 'AUD',
+    };
+  }
+  return schema;
 }
 
 export function getCcwRoadshowEventPath(event: CcwRoadshowEvent): string {

@@ -12,10 +12,12 @@ import {
 } from '@/components/landing/public-shell-width';
 import { CcwEventNav } from '@/components/marketing/CcwEventNav';
 import { CcwRoadshowBooking } from '@/components/marketing/CcwRoadshowBooking';
-import { BreadcrumbSchema, EventSchema, FAQSchema, ItemListSchema } from '@/components/seo';
+import { BreadcrumbSchema, FAQSchema, ItemListSchema } from '@/components/seo';
 import { getPublicSiteUrl } from '@/lib/env/public-url';
+import { serializeJsonLd } from '@/lib/seo/json-ld';
 import {
   allowsFreeEntryRegistration,
+  buildCcwRoadshowEventJsonLd,
   ccwRoadshowCampaignPillars,
   ccwRoadshowEvents,
   ccwRoadshowFacilityAdvantages,
@@ -27,8 +29,14 @@ import {
   ccwRoadshowTitle,
   ccwRoadshowTopics,
   formatAudFromCents,
+  formatCcwVenue,
+  getCcwCityVenue,
+  getCcwRegisterInterestHref,
   getCcwRoadshowEvent,
   getCcwRoadshowEventPath,
+  getNextCcwCitySitting,
+  hasCcwRoadshowSessionEnded,
+  type CcwRoadshowEvent,
 } from '@/lib/marketing/ccw-roadshow';
 
 const siteUrl = getPublicSiteUrl();
@@ -40,7 +48,9 @@ const breadcrumbs = [
   { name: ccwRoadshowTitle, url: canonical },
 ];
 
-const faqs = [
+/** The venue answer follows each city's next sitting, so the FAQ is built per render. */
+function buildFaqs(now: Date) {
+  return [
   {
     question: 'Who should attend the CARSI x CCW Business Growth Days?',
     answer:
@@ -53,17 +63,57 @@ const faqs = [
   },
   {
     question: 'Where are the Melbourne, Sydney and Brisbane events held?',
-    answer:
-      'Melbourne is held at Carpet Cleaners Warehouse, Unit 1/5 Gatwick Road, Bayswater North VIC 3153. Sydney is held at Carpet Cleaners Warehouse, 2/8 Tollis Place, Seven Hills NSW 2147. Brisbane is held at Carpet Cleaners Warehouse, D1-3/194 Zillmere Road, Boondall QLD 4034.',
+    answer: (['Melbourne', 'Sydney', 'Brisbane'] as const)
+      .map((city) => `${city} is held at ${formatCcwVenue(getCcwCityVenue(city, now))}.`)
+      .join(' '),
   },
   {
     question: 'What topics are covered?',
     answer:
       'The program connects carpet cleaning, rug cleaning, stain removal, tile cleaning, professional equipment, chemistry, service design, quoting confidence, profitable service growth and practical CCW facility demonstrations.',
   },
-];
+  ];
+}
 
 export type CcwFocusCity = string;
+
+function nextDatesAnnouncement(
+  city?: CcwRoadshowEvent['city'],
+  next?: CcwRoadshowEvent | null,
+): string {
+  return `${city ? `Next ${city} dates` : 'Next roadshow dates'}: ${next ? next.dates : 'to be announced'}`;
+}
+
+/**
+ * Shown instead of any booking once the sitting a page is about has ended: points at the city's
+ * next sitting when one is ahead, otherwise invites interest in dates not yet set.
+ */
+function CcwRegisterInterest({ city, now }: { city?: CcwRoadshowEvent['city']; now: Date }) {
+  const next = city ? getNextCcwCitySitting(city, now) : null;
+  return (
+    <>
+      <p className={LANDING_EYEBROW_CLASS}>{next ? 'Next sitting' : 'Register your interest'}</p>
+      <h3 className="mt-3 font-[family-name:var(--font-display)] text-2xl font-semibold text-slate-950">
+        {nextDatesAnnouncement(city, next)}
+      </h3>
+      <p className={`mt-3 ${LANDING_LEAD_CLASS}`}>
+        {city
+          ? `${city} training is held at ${formatCcwVenue(getCcwCityVenue(city, now))}.`
+          : 'Training is held at Carpet Cleaners Warehouse stores in Melbourne, Sydney and Brisbane.'}{' '}
+        {next
+          ? 'See the next sitting for times and booking.'
+          : 'Leave your details and CARSI will contact you when the next dates are confirmed.'}
+      </p>
+      <Link
+        href={next ? getCcwRoadshowEventPath(next) : getCcwRegisterInterestHref(city)}
+        className="mt-6 inline-flex min-h-11 items-center gap-2 rounded-full bg-[#146fc2] px-6 text-sm font-semibold text-white hover:bg-[#0f5fa8]"
+      >
+        {next ? `View the next ${city} sitting` : 'Register your interest'}
+        <ArrowRight className="h-4 w-4" aria-hidden />
+      </Link>
+    </>
+  );
+}
 
 function stopIndex(slug: string): string {
   const i = ccwRoadshowEvents.findIndex((e) => e.slug === slug);
@@ -74,7 +124,26 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
   const focusEvent = focusSlug ? getCcwRoadshowEvent(focusSlug) : null;
   const currentHref = focusEvent ? getCcwRoadshowEventPath(focusEvent) : ccwRoadshowPath;
   const schemaEvents = focusEvent ? [focusEvent] : ccwRoadshowEvents;
-  const pageFaqs = focusEvent?.bookingUrl ? [
+  // Event markup only while a session has not ended; finished sessions carry none.
+  const now = new Date();
+  const faqs = buildFaqs(now);
+  const eventSchemas = schemaEvents.flatMap((event) => {
+    const schema = buildCcwRoadshowEventJsonLd(event, {
+      now,
+      url: `${siteUrl}${getCcwRoadshowEventPath(event)}`,
+      image: `${siteUrl}/og-image.png`,
+    });
+    return schema ? [schema] : [];
+  });
+  // A sitting that has ended is never presented as upcoming: no dates, no booking, no offer.
+  const upcomingEvents = ccwRoadshowEvents.filter((event) => !hasCcwRoadshowSessionEnded(event, now));
+  const nextDatesTba = focusEvent
+    ? hasCcwRoadshowSessionEnded(focusEvent, now)
+    : upcomingEvents.length === 0;
+  // When the focused sitting has ended but its city has a later one, point at that sitting.
+  const nextCitySitting =
+    focusEvent && nextDatesTba ? getNextCcwCitySitting(focusEvent.city, now) : null;
+  const pageFaqs = focusEvent?.bookingUrl && !nextDatesTba ? [
     faqs[0],
     { question: 'How much does it cost?', answer: `Seats are booked through Carpet Cleaners Warehouse.${focusEvent.unitAmountCents !== undefined ? ` ${formatAudFromCents(focusEvent.unitAmountCents)} including GST per person.` : ''}${focusEvent.giftCardAmountCents !== undefined ? ` One ${formatAudFromCents(focusEvent.giftCardAmountCents)} CCW gift card per registration, redeemable after the course.` : ''}${focusEvent.maxRegistrationsPerCustomer !== undefined ? ` Maximum ${focusEvent.maxRegistrationsPerCustomer} registrations per customer.` : ''}` },
     { question: 'Where and when is the Brisbane training?', answer: `${focusEvent.dateRangeLabel}. ${focusEvent.timeLabel}, at ${focusEvent.venueName}, ${focusEvent.streetAddress}, ${focusEvent.suburbStatePostcode}.` },
@@ -94,24 +163,11 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
           url: `${canonical}?event=${event.slug}`,
         }))}
       />
-      {schemaEvents.map((event) => (
-        <EventSchema
-          key={event.slug}
-          name={event.title}
-          description={event.description}
-          startDate={event.startDateIso}
-          endDate={event.endDateIso}
-          url={`${canonical}?event=${event.slug}`}
-          locationName={event.venueName}
-          locationAddress={event.streetAddress}
-          locationCity={event.suburb}
-          locationState={event.state}
-          organiserName="CARSI and Carpet Cleaners Warehouse"
-          organiserUrl="https://www.carsi.com.au"
-          ticketUrl={event.bookingUrl ?? canonical}
-          isFree={allowsFreeEntryRegistration(event)}
-          image={`${siteUrl}/og-image.png`}
-          eventType="BusinessEvent"
+      {eventSchemas.map((schema) => (
+        <script
+          key={String(schema.url)}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(schema) }}
         />
       ))}
 
@@ -129,14 +185,24 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
                   : 'CARSI × CCW roadshow'}
               </p>
               <h1 className="mt-3 max-w-3xl font-[family-name:var(--font-display)] text-[2.15rem] leading-[1.1] font-semibold tracking-[-0.02em] text-slate-950 md:text-[3.1rem] md:leading-[1.06]">
-                {focusEvent?.bookingUrl ? focusEvent.title : focusEvent ? `${focusEvent.city} growth days` : ccwRoadshowHeroHeadline}
+                {focusEvent?.bookingUrl && !nextDatesTba ? focusEvent.title : focusEvent ? `${focusEvent.city} growth days` : ccwRoadshowHeroHeadline}
               </h1>
               <p className="mt-3 text-sm font-semibold text-[#a85500]">
                 Two days with {ccwRoadshowPresenter.name}
-                {focusEvent ? ` · ${focusEvent.dates}` : ''}
+                {nextDatesTba
+                  ? ` · ${nextDatesAnnouncement(focusEvent?.city, nextCitySitting)}`
+                  : focusEvent
+                    ? ` · ${focusEvent.dates}`
+                    : ''}
               </p>
+              {focusEvent && nextDatesTba ? (
+                <p className="mt-3 flex items-start gap-2 text-sm text-slate-600">
+                  <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#146fc2]" aria-hidden />
+                  Where we train: {formatCcwVenue(getCcwCityVenue(focusEvent.city, now))}
+                </p>
+              ) : null}
               <p className={`mt-5 max-w-xl text-pretty ${LANDING_LEAD_CLASS}`}>
-                {focusEvent?.bookingUrl ? focusEvent.description : 'Practical business-growth training inside Carpet Cleaners Warehouse locations. Connect training, equipment, chemistry, quoting and services that can grow profitably.'}
+                {focusEvent?.bookingUrl && !nextDatesTba ? focusEvent.description : 'Practical business-growth training inside Carpet Cleaners Warehouse locations. Connect training, equipment, chemistry, quoting and services that can grow profitably.'}
               </p>
               <div className="mt-6 flex flex-wrap gap-2">
                 {ccwRoadshowTopics.map((topic) => (
@@ -160,7 +226,13 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
               </div>
             </div>
             <div id="booking" className="lg:sticky lg:top-28">
-              <CcwRoadshowBooking events={ccwRoadshowEvents} initialSlug={focusSlug} />
+              {nextDatesTba ? (
+                <div className="rounded-2xl border border-slate-200/80 bg-white p-7 shadow-sm">
+                  <CcwRegisterInterest city={focusEvent?.city} now={now} />
+                </div>
+              ) : (
+                <CcwRoadshowBooking events={upcomingEvents} initialSlug={focusSlug} />
+              )}
             </div>
           </div>
         </div>
@@ -169,19 +241,26 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
       <HomeTrustStrip
         stats={[
           {
-            value: focusEvent?.dates ?? '3 cities',
+            value: nextDatesTba
+              ? (nextCitySitting?.dates ?? 'Dates TBA')
+              : (focusEvent?.dates ?? '3 cities'),
             label: focusEvent ? focusEvent.city : 'National stops',
           },
           {
-            value: focusEvent
-              ? allowsFreeEntryRegistration(focusEvent)
-                ? 'Free'
-                : 'Via CCW'
-              : 'Varies',
+            value: nextDatesTba
+              ? 'TBA'
+              : focusEvent
+                ? allowsFreeEntryRegistration(focusEvent)
+                  ? 'Free'
+                  : 'Via CCW'
+                : 'Varies',
             label: 'Entry',
           },
-          { value: '2 days', label: focusEvent?.timeLabel ?? 'Times vary by event' },
-          { value: String(focusEvent?.capacity ?? 20), label: 'Room size' },
+          // An ended sitting's times and room size say nothing about the next one.
+          nextDatesTba
+            ? { value: 'TBA', label: 'Times' }
+            : { value: '2 days', label: focusEvent?.timeLabel ?? 'Times vary by event' },
+          { value: nextDatesTba ? 'TBA' : String(focusEvent?.capacity ?? 20), label: 'Room size' },
         ]}
       />
 
@@ -200,6 +279,7 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
             {ccwRoadshowEvents.map((event) => {
               const active = focusSlug === event.slug;
               const free = allowsFreeEntryRegistration(event);
+              const ended = hasCcwRoadshowSessionEnded(event, now);
               return (
                 <li key={event.slug}>
                   <Link
@@ -224,7 +304,7 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
                           {event.city}
                         </p>
                         <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-0.5 text-[11px] text-slate-600">
-                          {free ? 'Free CCW entry' : 'Booked through CCW'}
+                          {ended ? 'Past session' : free ? 'Free CCW entry' : 'Booked through CCW'}
                         </span>
                       </div>
                       <h3 className="mt-2 font-[family-name:var(--font-display)] text-xl font-semibold text-slate-950 group-hover:text-[#146fc2]">
@@ -296,7 +376,9 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
             </ul>
           </div>
           <div className="rounded-2xl border border-slate-200/80 bg-white p-7 shadow-sm">
-            {focusEvent && !allowsFreeEntryRegistration(focusEvent) ? (
+            {nextDatesTba ? (
+              <CcwRegisterInterest city={focusEvent?.city} now={now} />
+            ) : focusEvent && !allowsFreeEntryRegistration(focusEvent) ? (
               <>
                 <p className={LANDING_EYEBROW_CLASS}>Booked through CCW</p>
                 <h3 className="mt-3 font-[family-name:var(--font-display)] text-2xl font-semibold text-slate-950">
