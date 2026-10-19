@@ -22,14 +22,29 @@ import { pathToFileURL } from 'node:url';
 const scriptsDir = resolve('scripts');
 const dir = mkdtempSync(join(tmpdir(), 'entry-point-'));
 
-/** Exit status of `node <script>` run from the planted tree. */
+/** Exit status and combined stdout+stderr of `node <script>` run from the planted tree. */
 function run(script) {
   try {
-    execFileSync(process.execPath, [script], { cwd: dir, stdio: 'pipe' });
-    return 0;
+    const out = execFileSync(process.execPath, [script], {
+      cwd: dir,
+      encoding: 'utf8',
+      stdio: 'pipe',
+    });
+    return { status: 0, out };
   } catch (e) {
-    return e.status;
+    return { status: e.status, out: `${e.stdout ?? ''}${e.stderr ?? ''}` };
   }
+}
+
+/**
+ * Exit 1 alone is not proof: in this minimal tree a guard can fail for an unrelated reason (the
+ * compliance guard reports every IICRC_FREE_FILES entry it cannot read). The run must exit 1 AND
+ * name the planted file.
+ */
+function assertCaught(script, planted, how) {
+  const { status, out } = run(script);
+  assert.equal(status, 1, `${how}: must exit 1 on the planted violation`);
+  assert.ok(out.includes(planted), `${how}: output must name the planted ${planted}\n${out}`);
 }
 
 try {
@@ -43,17 +58,17 @@ try {
   const link = join(dir, 'linked-scripts');
   symlinkSync(scriptsDir, link);
 
-  // Positive control: through the real path the planted phrase is caught, so a 0 below can
+  // Positive control: through the real path the planted phrase is caught, so a miss below can
   // only mean the CLI body was skipped.
-  assert.equal(
-    run(join(scriptsDir, 'check-iicrc-terminology.mjs')),
-    1,
-    'planted violation must fail via the real path'
+  assertCaught(
+    join(scriptsDir, 'check-iicrc-terminology.mjs'),
+    'app/page.tsx',
+    'terminology, real path'
   );
-  assert.equal(
-    run(join(link, 'check-iicrc-terminology.mjs')),
-    1,
-    'check-iicrc-terminology run through a symlinked path must exit 1 on a planted violation'
+  assertCaught(
+    join(link, 'check-iicrc-terminology.mjs'),
+    'app/page.tsx',
+    'terminology, symlinked path'
   );
 
   // The CEC backstop used the fileURLToPath(import.meta.url) === argv[1] form of the same
@@ -62,15 +77,15 @@ try {
     join(dir, 'app/cec-claim.tsx'),
     'export const copy = "This course awards 4 IICRC CECs.";\n'
   );
-  assert.equal(
-    run(join(scriptsDir, 'check-iicrc-compliance.mjs')),
-    1,
-    'planted CEC claim must fail via the real path'
+  assertCaught(
+    join(scriptsDir, 'check-iicrc-compliance.mjs'),
+    'app/cec-claim.tsx',
+    'compliance, real path'
   );
-  assert.equal(
-    run(join(link, 'check-iicrc-compliance.mjs')),
-    1,
-    'check-iicrc-compliance run through a symlinked path must exit 1 on a planted violation'
+  assertCaught(
+    join(link, 'check-iicrc-compliance.mjs'),
+    'app/cec-claim.tsx',
+    'compliance, symlinked path'
   );
 } finally {
   rmSync(dir, { recursive: true, force: true });
