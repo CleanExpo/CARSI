@@ -87,9 +87,6 @@ const DATED = /checked\s+\d{1,2}\/\d{1,2}\/\d{4}/;
 // each sentence, and require any claim sentence to carry its own attribution,
 // source and date. The strip uses a fresh global literal per call — a shared /g
 // regex makes .test() stateful via lastIndex and can hide misses.
-const SDS_DIRECTION_PHRASE =
-  /(check|see)\s+(the\s+)?SDS\s+sections?\s+2[^.]*\.?/i;
-
 function splitSentences(block: string): string[] {
   return block
     .replace(/&nbsp;/g, ' ')
@@ -128,8 +125,8 @@ describe('NeoSan Labs course claim compliance (review r2/r3)', () => {
 
   it('carries no efficacy, safety, residue or disposal claim without an attributed, dated citation in the same block', () => {
     const blocks: string[] = [];
-    for (const module of course!.modules) {
-      for (const lesson of module.lessons) {
+    for (const mod of course!.modules) {
+      for (const lesson of mod.lessons) {
         blocks.push(
           ...(lesson.contentBody ?? '').split(/<\/(?:p|li|h[1-6]|ul|ol)>/),
         );
