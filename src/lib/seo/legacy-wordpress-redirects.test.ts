@@ -105,6 +105,19 @@ describe('LEGACY_WORDPRESS_REDIRECTS', () => {
     expect(findRedirectChains(planted, matchesConfig, RENAMED_COURSE_SLUGS)).toHaveLength(3);
   });
 
+  it('uses sources Next can match and that cannot redirect away an app route', async () => {
+    const appRules = (await configRules()).filter(
+      (r) => !LEGACY_WORDPRESS_REDIRECTS.some((l) => l === (r as unknown))
+    );
+    const appSources = new Set(appRules.map((r) => r.source));
+    for (const r of LEGACY_WORDPRESS_REDIRECTS) {
+      // Next 308s a trailing slash away before any config rule, so a slash source never matches.
+      expect(r.source.endsWith('/'), r.source).toBe(false);
+      expect(r.source, r.source).not.toMatch(/^\/(?:api|_next|dashboard|admin)(?:\/|$)/);
+      expect(appSources.has(r.source), `${r.source} duplicates an existing redirect`).toBe(false);
+    }
+  });
+
   it('keeps every destination on the catalogue, a course page or the membership page', () => {
     for (const r of LEGACY_WORDPRESS_REDIRECTS) {
       expect(r.destination).toMatch(/^(?:\/courses(?:\/[a-z0-9-]+)?|\/subscribe)$/);
