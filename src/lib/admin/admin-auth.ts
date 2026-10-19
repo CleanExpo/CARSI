@@ -5,7 +5,6 @@ import { getAdminSecretBytes } from '@/lib/auth/jwt-secret';
 export { ADMIN_COOKIE_NAME } from '@/lib/admin/admin-constants';
 export {
   getAdminEmail,
-  getAdminPanelAllowedEmails,
   getDefaultAppPathForClaims,
   getPostLoginRedirectPath,
   isLmsClaimsAllowedAdminPanel,
