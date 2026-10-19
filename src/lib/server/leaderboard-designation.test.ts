@@ -84,6 +84,12 @@ describe('leaderboard filters by CARSI designation, never an IICRC discipline co
 
   it.each([
     ['legacy IICRC code as discipline', '?discipline=WRT'],
+    // Review r2 of 6ebd8e85: get('discipline') is falsy for these, so they were served unfiltered.
+    ['an empty legacy discipline', '?discipline='],
+    ['a bare legacy discipline key', '?discipline'],
+    ['an empty legacy discipline beside a valid designation', `?designation=${SLUG}&discipline=`],
+    ['an empty designation', '?designation='],
+    ['a bare designation key', '?designation'],
     ['IICRC code as designation', '?designation=WRT'],
     ['unknown designation', '?designation=not-a-designation'],
   ])('rejects %s with 400 and no IICRC acronym in the message', async (_label, query) => {

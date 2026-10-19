@@ -11,10 +11,14 @@ import { getMonthlyLeaderboard, leaderboardPeriodLabelNow } from '@/lib/server/l
  */
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const requested = searchParams.get('designation')?.trim() || null;
+  // A filter key that is present always counts, whatever its value: an empty or bare key must
+  // not fall through to the unfiltered board.
+  const requested = searchParams.has('designation')
+    ? (searchParams.get('designation') ?? '').trim()
+    : null;
   const designation = requested ? getDesignationDefinition(requested) : null;
 
-  if (searchParams.get('discipline') || (requested && !designation)) {
+  if (searchParams.has('discipline') || (requested !== null && !designation)) {
     return NextResponse.json(
       {
         detail:
