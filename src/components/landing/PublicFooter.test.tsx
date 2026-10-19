@@ -63,3 +63,14 @@ describe('PublicFooter — RestoreAssist cross-sell', () => {
     }
   });
 });
+
+describe('PublicFooter — ecosystem entry link', () => {
+  it.each(TONES)('the %s footer links to /ecosystem as an internal page', (tone) => {
+    const html = renderToStaticMarkup(<PublicFooter tone={tone} />);
+    const anchors = html.match(/<a\b[^>]*href="\/ecosystem"[^>]*>[\s\S]*?<\/a>/g) ?? [];
+    expect(anchors.length).toBe(1);
+    expect(anchors[0]).not.toContain('target=');
+    expect(anchors[0]).not.toContain('utm_');
+    expect(anchors[0]).toContain('See the ecosystem');
+  });
+});
