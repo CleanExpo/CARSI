@@ -621,6 +621,45 @@ const MUST_BLOCK_FILE = [
     'GP-654 explicit JSX space over five lines',
     '<p>\n  CARSI covers 7\n  <b>IICRC</b>\n  {" "}\n  disciplines.\n</p>',
   ],
+  // Review of 0bb32ada: conditional copy renders one of its branches, and JSX passed as a prop
+  // renders wherever the component puts it.
+  [
+    'GP-654 ternary string branch',
+    "export const Copy = ({ expanded }) => <p>CARSI covers 7 IICRC {expanded ? 'disciplines' : 'topics'}.</p>;",
+  ],
+  [
+    'GP-654 && element branch',
+    'export const Copy = ({ open }) => <p>CARSI covers 7 IICRC {open && <strong>disciplines</strong>}.</p>;',
+  ],
+  [
+    'GP-654 nested ternary element branch',
+    "<p>CARSI covers 7 IICRC {a ? 'topics' : b ? <em>disciplines</em> : null}.</p>",
+  ],
+  ['GP-654 ?? fallback branch', "<p>CARSI covers 7 IICRC {label ?? 'disciplines'}.</p>"],
+  [
+    'GP-654 word split across two conditionals',
+    "<p>CARSI covers 7 IICRC {a ? 'disci' : ''}{b ? 'plines' : ''}.</p>",
+  ],
+  [
+    'GP-654 conditional inside a string join',
+    "const lead = 'CARSI covers 7 IICRC ' + (wide ? 'disciplines.' : 'topics.');",
+  ],
+  [
+    'GP-654 JSX fragment prop with a quoted >',
+    'export const Copy = () => <Card title={<>CARSI covers 7 IICRC <span title="topics > details">disciplines</span>.</>} />;',
+  ],
+  [
+    'GP-654 conditional JSX prop',
+    "<Card title={wide ? <>CARSI covers 7 IICRC disciplines.</> : 'Restoration'} />",
+  ],
+  [
+    'GP-654 phrase before many conditionals',
+    `<p>CARSI covers 7 IICRC disciplines.${"{a ? 'x' : 'y'}".repeat(12)}</p>`,
+  ],
+  [
+    'GP-654 too many adjacent conditional variants fails closed',
+    `<p>Restoration disciplines${"{a ? 'x' : 'y'}".repeat(12)}</p>`,
+  ],
 ];
 const MUST_PASS_FILE = [
   // Review of fd1890a8 (P2): a learner question wrapped over two lines.
@@ -630,6 +669,19 @@ const MUST_PASS_FILE = [
   ],
   ['a code on one line, an unrelated word on the next', "disciplines={['WRT']}\ntraining: true,"],
   ['plain subject across a break', 'Water damage restoration\ntraining for plumbers.'],
+  // Review of 0bb32ada: the branches that render are checked, and only those.
+  [
+    'conditional whose branches render neither phrase',
+    "<p>CARSI covers 7 restoration {wide ? 'disciplines' : 'topics'}.</p>",
+  ],
+  [
+    'a long page with conditionals spread through its copy',
+    `<main>\n  <h1>Restoration disciplines</h1>\n${Array.from(
+      { length: 20 },
+      (_, i) =>
+        `  <section>{show${i} && <Icon />}<h2>Module ${i}</h2>{open${i} ? 'Hands-on drying practice for site crews.' : 'Summary.'} <p>${'Extraction, drying and documentation for water-damaged homes. '.repeat(4)}</p></section>`
+    ).join('\n')}\n</main>`,
+  ],
 ];
 for (const [name, src] of MUST_BLOCK_FILE) {
   if (scanFile(F_MULTI, src).length === 0) {
@@ -659,6 +711,24 @@ for (const [name, src] of MUST_PASS_FILE) {
   const f = scanFile(F_MULTI, src);
   if (f.length > 0) {
     console.error(`✖ MUST PASS (file) but blocked: ${name}\n    ${f.join('\n    ')}`);
+    failed++;
+  }
+}
+// A learner question in a branch or a JSX prop renders as the whole question, so the rendered
+// pass leaves it alone (the line joins judge these sources separately).
+for (const [name, src] of [
+  [
+    'learner question in a conditional',
+    "<p>{asked ? 'Which IICRC disciplines do you hold?' : 'Tell us about your work.'}</p>",
+  ],
+  [
+    'learner question passed as a JSX prop',
+    '<Field label={<>Which IICRC disciplines do you hold?</>} />',
+  ],
+]) {
+  const f = scanFile(F_MULTI, src).filter((x) => x.includes('(rendered)'));
+  if (f.length > 0) {
+    console.error(`✖ MUST PASS (rendered) but blocked: ${name}\n    ${f.join('\n    ')}`);
     failed++;
   }
 }
