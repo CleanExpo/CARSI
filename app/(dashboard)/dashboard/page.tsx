@@ -7,7 +7,7 @@ import {
 } from '@/lib/server/learner-dashboard-data';
 import { getLearnerLevelPayload } from '@/lib/server/learner-xp';
 import { listOnboardingProgramsForUser } from '@/lib/server/onboarding-programs';
-import { getNextCourseRecommendationsForStudent } from '@/lib/server/renewal-summary';
+import { getRenewalSummaryForStudent } from '@/lib/server/renewal-summary';
 import { getServerSessionClaims } from '@/lib/server/session-server';
 
 export const dynamic = 'force-dynamic';
@@ -26,8 +26,10 @@ export default async function DashboardPage() {
   const onboardingPrograms =
     userId && dbConfigured ? await listOnboardingProgramsForUser(userId) : [];
   const resume = userId && dbConfigured ? await getResumeSnapshotForStudent(userId) : null;
-  const recommendations =
-    userId && dbConfigured ? await getNextCourseRecommendationsForStudent(userId) : [];
+  // One renewal summary feeds both the CEC card (cycle-aware, GP-655) and the suggestions, which
+  // getNextCourseRecommendationsForStudent read from this same summary.
+  const renewal = userId && dbConfigured ? await getRenewalSummaryForStudent(userId) : null;
+  const recommendations = renewal?.suggested_courses ?? [];
   let streakDays = 0;
   if (userId && dbConfigured) {
     try {
@@ -47,6 +49,7 @@ export default async function DashboardPage() {
       dbConfigured={dbConfigured}
       enrolmentQueryFailed={enrolmentQueryFailed}
       streakDays={streakDays}
+      renewal={renewal}
     />
   );
 }

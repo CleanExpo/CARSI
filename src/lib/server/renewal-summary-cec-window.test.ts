@@ -60,8 +60,6 @@ vi.mock('@/lib/prisma', () => ({
   },
 }));
 
-import { readFileSync } from 'node:fs';
-
 import { RENEWAL_RULE_NOTE } from '@/types/renewal';
 import { getRenewalSummaryForStudent } from './renewal-summary';
 
@@ -107,17 +105,12 @@ describe('renewal summary credits CEC only inside the approval window', () => {
     expect(s!.cec_earned_in_cycle).toBe(1);
   });
 
-  it('every live renewal-target surface states the rule, including Master/Inspector (GP-655)', () => {
+  it('states the rule, including Master/Inspector (GP-655)', () => {
+    // The rendered cards are covered in DashboardLearningSection.renewal.test.tsx; the two client
+    // pages mount the same render-tested CecRenewalStatus (checked there).
     expect(RENEWAL_RULE_NOTE).toBe(
       'IICRC rule: 14 CECs every 4 years. Master and Inspector certifications need 14 every 2 years.'
     );
-    for (const file of [
-      'src/components/dashboard/DashboardLearningSection.tsx',
-      'app/(dashboard)/dashboard/student/page.tsx',
-      'app/(dashboard)/dashboard/student/credentials/page.tsx',
-    ]) {
-      expect(readFileSync(file, 'utf8'), file).toContain('{RENEWAL_RULE_NOTE}');
-    }
   });
 
   it('cycle total excludes in-cycle completions outside the approval window', async () => {

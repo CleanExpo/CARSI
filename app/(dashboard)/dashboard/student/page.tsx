@@ -15,7 +15,9 @@ import {
 } from '@/components/onboarding/OnboardingProgramsStrip';
 import { apiClient } from '@/lib/api/client';
 import { formatCecHoursForDisplay } from '@/lib/cec-display';
-import { RENEWAL_CEC_REQUIRED, RENEWAL_RULE_NOTE } from '@/types/renewal';
+import { CecRenewalFigure, CecRenewalStatus } from '@/components/lms/CecRenewalStatus';
+import { useRenewalSummary } from '@/hooks/use-renewal-summary';
+import { renewalProgress } from '@/lib/renewal-progress';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -202,10 +204,10 @@ export default function StudentDashboardPage() {
     (sum, e) => sum + (e.cec_hours != null && e.cec_hours > 0 ? e.cec_hours : 0),
     0
   );
-  const cecTarget = RENEWAL_CEC_REQUIRED;
-  const cecPct = Math.min(100, (approvedCec / cecTarget) * 100);
-  const cecRemaining = Math.max(0, cecTarget - approvedCec);
-  const cecLabel = formatCecHoursForDisplay(approvedCec);
+  // GP-655: the card counts the renewal period, not every course ever completed.
+  const renewal = useRenewalSummary(Boolean(user));
+  const cecProgress = renewalProgress(renewal, approvedCec);
+  const cecLabel = formatCecHoursForDisplay(cecProgress.earned);
   const resumeEnrollment = resume
     ? enrollments.find((e) => e.course_slug === resume.course_slug)
     : undefined;
@@ -251,21 +253,20 @@ export default function StudentDashboardPage() {
           <div className={`${surface} flex flex-col px-7 py-7`}>
             <p className={kicker}>IICRC CEC progress</p>
             <div className="mt-6 flex items-center gap-5">
-              <BrandRing percent={cecPct} size={84} stroke={7} id="learning-cec-ring" />
+              <BrandRing
+                percent={cecProgress.percent}
+                size={84}
+                stroke={7}
+                id="learning-cec-ring"
+              />
               <p className={`text-[2.1rem] leading-none tabular-nums ${heading}`}>
-                {cecLabel ?? '0'}
-                <span className="text-[1.05rem] font-medium text-slate-400">/{cecTarget}</span>
+                <CecRenewalFigure progress={cecProgress} earnedLabel={cecLabel ?? '0'} />
               </p>
             </div>
             <div className="mt-6">
-              <ProgressTrack percent={cecPct} />
+              <ProgressTrack percent={cecProgress.percent} />
             </div>
-            <p className={`mt-3 text-[13px] ${muted}`}>
-              {approvedCec >= cecTarget
-                ? 'Renewal target reached'
-                : `${formatCecHoursForDisplay(cecRemaining) ?? cecRemaining} CECs remaining toward the ${cecTarget}-hour renewal target. Unapproved courses add none.`}
-            </p>
-            <p className={`mt-2 text-[12px] ${muted}`}>{RENEWAL_RULE_NOTE}</p>
+            <CecRenewalStatus progress={cecProgress} textClassName={muted} />
             <Link
               href="/dashboard/student/credentials"
               className={`${btnGhost} mt-auto self-start pt-6`}
