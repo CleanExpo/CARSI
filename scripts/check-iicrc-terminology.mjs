@@ -139,9 +139,29 @@ const ZERO_WIDTH = /[​-‍⁠﻿­]|&(?:shy|ZeroWidthSpace|#0*(?:173|8203)|#x0
 const LETTER_ENTITY = /&#(?:x0*([0-9a-f]{1,4})|0*(\d{1,5}));/gi;
 /** A quoted literal in a JSX expression (`IICRC{' disciplines'}`) renders as its text. */
 const JSX_LITERAL = /\{\s*(['"`])([^'"`{}\n$\\]{0,80})\1\s*\}/g;
-/** Quoted pieces joined with `+` (`'7 IICRC ' + 'disciplines'`) render as one string. */
-const STRING_JOIN = /(['"`])\s*\+\s*(['"`])/g;
-const MARKUP = /<\/?[A-Za-z][^<>\n]{0,80}>/g;
+/**
+ * Quoted pieces joined with `+` (`'7 IICRC ' + 'disciplines'`) render as one string, with or
+ * without a comment beside the `+` (review of d42d3e99).
+ */
+const JOIN_COMMENT =
+  String.raw`(?:\/\*[^*]{0,120}\*\/|\/\/[^\n'"` + '`' + String.raw`]{0,120})?\s*`;
+const STRING_JOIN = new RegExp(
+  String.raw`(['"` +
+    '`' +
+    String.raw`])\s*` +
+    JOIN_COMMENT +
+    String.raw`\+\s*` +
+    JOIN_COMMENT +
+    String.raw`(['"` +
+    '`' +
+    '])',
+  'g'
+);
+/**
+ * An element tag with its attributes (a long Tailwind className included), or a fragment
+ * `<>` / `</>` (review of d42d3e99). `[^<>]` keeps it linear.
+ */
+const MARKUP = /<\/?(?:[A-Za-z][^<>]{0,600})?>/g;
 
 /**
  * The text a line renders, as two views: markup read as a break, and markup read as nothing

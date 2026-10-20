@@ -394,6 +394,14 @@ const MUST_BLOCK_FILE = [
   ['GP-654 letter entity', '<p>CARSI covers 7 IICR&#67; disciplines.</p>'],
   ['GP-654 hex letter entity', '<p>CARSI covers 7 IICRC &#x64;isciplines.</p>'],
   ['GP-654 word split by an element', '<p>CARSI covers 7 IICRC disci<span>plines</span>.</p>'],
+  // Review of d42d3e99: routine markup and a commented join.
+  [
+    'GP-654 element with a long className',
+    '<p>CARSI covers 7 IICRC <span className="font-semibold tracking-tight text-slate-900 dark:text-white sm:text-lg md:text-xl">disciplines</span>.</p>',
+  ],
+  ['GP-654 JSX fragment', '<p>CARSI covers 7 IICRC <>disciplines</>.</p>'],
+  ['GP-654 join with a block comment', "const lead = 'CARSI covers 7 IICRC ' /* stat */ + 'disciplines.';"],
+  ['GP-654 join with a line comment', "const lead = 'CARSI covers 7 IICRC ' + // stat\n  'disciplines.';"],
   ['GP-654 explicit JSX space over five lines', '<p>\n  CARSI covers 7\n  <b>IICRC</b>\n  {" "}\n  disciplines.\n</p>'],
 ];
 const MUST_PASS_FILE = [
@@ -461,6 +469,10 @@ for (const [name, file, src, drop] of LIST_FIXTURES) {
     `IICRC${'&nbsp;'.repeat(1500)}x disciplines`,
     `{"${'\\u0020'.repeat(1500)}x"} IICRC disciplines`,
     `${'Which of your '.repeat(700)}IICRC disciplines need renewal x`,
+    // Review of d42d3e99: the wider tag and commented-join normalisers.
+    `<a${'x'.repeat(20000)} IICRC disciplines`,
+    `${'<a '.repeat(6000)}IICRC x`,
+    `${"'a' /* ".repeat(2500)}+ 'IICRC x'`,
   ];
   for (const line of adversarial) {
     const t0 = performance.now();
