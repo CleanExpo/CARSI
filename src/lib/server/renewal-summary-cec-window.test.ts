@@ -49,13 +49,23 @@ const h = vi.hoisted(() => ({
   user: null as null | Record<string, unknown>,
   enrolments: [] as unknown[],
   candidates: [] as unknown[],
+  // Lesson completion dates by lesson id; a lesson not listed was completed with its enrolment.
+  lessonDone: {} as Record<string, Date | null>,
 }));
+
+function progressFor(rows: unknown[]) {
+  return (rows as ReturnType<typeof enrolment>[]).map((e) => {
+    const lessonId = e.course.modules[0].lessons[0].id;
+    const at = lessonId in h.lessonDone ? h.lessonDone[lessonId] : e.completedAt;
+    return { lessonId, completed: true, completedAt: at, lastAccessedAt: at ?? NOW };
+  });
+}
 
 vi.mock('@/lib/prisma', () => ({
   prisma: {
     lmsUser: { findUnique: vi.fn(async () => h.user) },
     lmsEnrollment: { findMany: vi.fn(async () => h.enrolments) },
-    lmsLessonProgress: { findMany: vi.fn(async () => []) },
+    lmsLessonProgress: { findMany: vi.fn(async () => progressFor(h.enrolments)) },
     lmsCourse: { findMany: vi.fn(async () => h.candidates) },
   },
 }));
@@ -79,6 +89,7 @@ describe('renewal summary credits CEC only inside the approval window', () => {
       enrolment(IN_WINDOW, new Date('2025-06-01T00:00:00Z')),
     ];
     h.candidates = [];
+    h.lessonDone = {};
   });
 
   afterEach(() => {
@@ -123,6 +134,29 @@ describe('renewal summary credits CEC only inside the approval window', () => {
     expect(s!.cec_earned_lifetime).toBe(1);
     expect(s!.cec_earned_in_cycle).toBe(0);
     expect(renewalProgress(s, 1).reached).toBe(false);
+  });
+
+  it('a revoked then reactivated course does not bring old learning into the period (GP-655)', async () => {
+    // Independent review of 5b47a9a1: revocation clears completedAt but keeps lesson progress;
+    // after a dispute is won (or the course is re-bought) the next sync stamps completedAt now.
+    // IN_WINDOW's lesson was completed 01/06/2025; the enrolment now reads completed 01/01/2027.
+    h.user = { ...h.user, iicrcExpiryDate: new Date('2030-12-31T00:00:00Z') };
+    h.enrolments = [enrolment(IN_WINDOW, new Date('2027-01-01T00:00:00Z'))];
+    h.lessonDone = { [`l-${IN_WINDOW}`]: new Date('2025-06-01T00:00:00Z') };
+    const s = await getRenewalSummaryForStudent('user-1');
+    expect(s!.cycle_start).toBe('2026-12-31T00:00:00.000Z');
+    expect(s!.cec_earned_in_cycle).toBe(0);
+    expect(renewalProgress(s, 1).reached).toBe(false);
+
+    // Control: the same course learned inside the period counts.
+    h.lessonDone = { [`l-${IN_WINDOW}`]: new Date('2027-01-01T00:00:00Z') };
+    const learned = await getRenewalSummaryForStudent('user-1');
+    expect(learned!.cec_earned_in_cycle).toBe(1);
+
+    // An undated lesson completion fails closed.
+    h.lessonDone = { [`l-${IN_WINDOW}`]: null };
+    const undated = await getRenewalSummaryForStudent('user-1');
+    expect(undated!.cec_earned_in_cycle).toBe(0);
   });
 
   it('states the rule, including Master/Inspector (GP-655)', () => {
