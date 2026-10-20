@@ -388,6 +388,13 @@ const MUST_BLOCK_FILE = [
   ['GP-654 count, IICRC and disciplines on three lines', '7\n<span>IICRC</span>\ndisciplines'],
   ['GP-654 JSX space expression on its own line', 'CARSI covers 7 IICRC\n{" "}\ndisciplines.'],
   ['GP-654 learner benefit across lines', '<p>\n  Explore seven IICRC disciplines\n  at your pace.\n</p>'],
+  // Review of d28bbcc0: five spellings React renders as "CARSI covers 7 IICRC disciplines."
+  ['GP-654 quoted JSX literal', "<p>CARSI covers 7 IICRC{' disciplines'}.</p>"],
+  ['GP-654 string join', "const lead = 'CARSI covers 7 IICRC ' + 'disciplines.';"],
+  ['GP-654 letter entity', '<p>CARSI covers 7 IICR&#67; disciplines.</p>'],
+  ['GP-654 hex letter entity', '<p>CARSI covers 7 IICRC &#x64;isciplines.</p>'],
+  ['GP-654 word split by an element', '<p>CARSI covers 7 IICRC disci<span>plines</span>.</p>'],
+  ['GP-654 explicit JSX space over five lines', '<p>\n  CARSI covers 7\n  <b>IICRC</b>\n  {" "}\n  disciplines.\n</p>'],
 ];
 const MUST_PASS_FILE = [
   // Review of fd1890a8 (P2): a learner question wrapped over two lines.
