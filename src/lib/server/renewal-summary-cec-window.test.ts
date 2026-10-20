@@ -188,6 +188,35 @@ describe('renewal summary credits CEC only inside the approval window', () => {
     expect(renewalProgress(s, 1).reached).toBe(false);
   });
 
+  it('the first completion dates the period even after old lessons are deleted (GP-659)', async () => {
+    // Codex review of 05b8074e: completed 01/06/2025, revoked, dispute won, re-completed
+    // 01/01/2027; the learner re-marked one lesson in 2027 and an admin deleted the other (its
+    // progress cascaded away). firstCompletedAt keeps 01/06/2025, before the period from
+    // 31/12/2026, so nothing counts in the period; the lifetime total still credits it.
+    h.user = { ...h.user, iicrcExpiryDate: new Date('2030-12-31T00:00:00Z') };
+    h.enrolments = [
+      {
+        ...enrolment(IN_WINDOW, new Date('2027-01-01T00:00:00Z')),
+        firstCompletedAt: new Date('2025-06-01T00:00:00Z'),
+      },
+    ];
+    h.lessonDone = { [`l-${IN_WINDOW}`]: new Date('2027-01-01T00:00:00Z') };
+    const s = await getRenewalSummaryForStudent('user-1');
+    expect(s!.cec_earned_lifetime).toBe(1);
+    expect(s!.cec_earned_in_cycle).toBe(0);
+    expect(renewalProgress(s, 1).reached).toBe(false);
+
+    // Control: a first completion inside the period counts.
+    h.enrolments = [
+      {
+        ...enrolment(IN_WINDOW, new Date('2027-01-01T00:00:00Z')),
+        firstCompletedAt: new Date('2027-01-01T00:00:00Z'),
+      },
+    ];
+    const inPeriod = await getRenewalSummaryForStudent('user-1');
+    expect(inPeriod!.cec_earned_in_cycle).toBe(1);
+  });
+
   it('a lesson added after the learner finished does not remove period credit (GP-655)', async () => {
     h.user = { ...h.user, iicrcExpiryDate: new Date('2030-12-31T00:00:00Z') };
     const e = enrolment(IN_WINDOW, new Date('2027-01-01T00:00:00Z'));

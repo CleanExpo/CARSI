@@ -297,8 +297,10 @@ describe('the migration is additive and its documented down path is exact (relea
     const fresh = new PGlite();
     try {
       const all = readdirSync(MIGRATIONS).filter((d) => /^\d/.test(d)).sort();
-      expect(all.at(-1)).toBe(NAME); // it sorts after every existing migration
-      for (const m of all.filter((d) => d !== NAME)) {
+      expect(all).toContain(NAME);
+      // The schema before it is every migration that sorts before it; later migrations
+      // (e.g. GP-659) are not part of this round trip.
+      for (const m of all.filter((d) => d < NAME)) {
         const sql = readFileSync(join(MIGRATIONS, m, 'migration.sql'), 'utf8');
         await before.exec(sql);
         await fresh.exec(sql);

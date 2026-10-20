@@ -48,6 +48,13 @@ vi.mock('@/lib/prisma', () => ({
         state.enrollment = { ...(state.enrollment as EnrollmentRow), ...args.data };
         return state.enrollment;
       }),
+      // recordFirstCompletion: writes only while firstCompletedAt is still null.
+      updateMany: vi.fn(async (args: { data: Record<string, unknown> }) => {
+        const row = state.enrollment as (EnrollmentRow & { firstCompletedAt?: Date | null }) | null;
+        if (!row || row.firstCompletedAt) return { count: 0 };
+        state.enrollment = { ...row, ...args.data } as EnrollmentRow;
+        return { count: 1 };
+      }),
     },
     lmsLessonProgress: {
       count: vi.fn(async () => state.completedLessonCount),

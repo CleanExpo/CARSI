@@ -71,6 +71,8 @@ vi.mock('@/lib/prisma', () => ({
         state.enrollment = { ...(state.enrollment as NonNullable<typeof state.enrollment>), ...args.data };
         return state.enrollment;
       }),
+      // recordFirstCompletion (GP-659).
+      updateMany: vi.fn(async () => ({ count: 1 })),
     },
     // Every lesson marked complete by the learner.
     lmsLessonProgress: { count: vi.fn(async () => state.lessonIds.length) },

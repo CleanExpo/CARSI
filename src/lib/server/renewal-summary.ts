@@ -290,7 +290,10 @@ async function loadRenewalSummary(
 
       // Credit only while the approval was in force at completion. Dated by the enrolment's own
       // completion time (see CourseCompletionRecord); no known date credits nothing.
-      const hours = e.completedAt ? cecHoursInForceAt(e.course.slug, e.completedAt) : 0;
+      // The first completion, which revocation, re-purchase and curriculum edits never move
+      // (GP-659); completedAt only for rows that predate it.
+      const doneAt = e.firstCompletedAt ?? e.completedAt;
+      const hours = doneAt ? cecHoursInForceAt(e.course.slug, doneAt) : 0;
       const discRaw = e.course.iicrcDiscipline?.trim() || 'General';
       const disc = discRaw.length > 0 ? discRaw : 'General';
 
@@ -301,7 +304,7 @@ async function loadRenewalSummary(
       // completion time (see CourseCompletionRecord), the same date that credits the approval.
       // A certificate is re-stamped when regenerated and a lesson revisit moves its timestamp, so
       // neither may move an old completion into the current period (GP-655 review of 0974e6ae).
-      const ts = e.completedAt;
+      const ts = doneAt;
       completions.push({
         slug: e.course.slug,
         completedAt: e.completedAt,

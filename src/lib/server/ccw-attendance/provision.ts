@@ -44,7 +44,7 @@ import {
 import { selectActiveOffersForNow } from '@/lib/marketing/ccw-roadshow-offers';
 import { isCcwAttendeeOffersEnabled } from '@/lib/server/ccw-offers-flag';
 import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
-import { enrollStudentInCourse } from '@/lib/server/enrollment-service';
+import { enrollStudentInCourse, recordFirstCompletion } from '@/lib/server/enrollment-service';
 import { findOrCreateGuestUser } from '@/lib/server/guest-checkout';
 import { sessionClaimsForUserId } from '@/lib/server/lms-auth';
 
@@ -337,6 +337,7 @@ export async function finalizeAttendanceForSignIn(
     where: { id: enrollmentId, status: 'active' },
     data: { status: 'completed', completedAt: now, certificateIssuedAt: now },
   });
+  if (promoted.count > 0) await recordFirstCompletion(enrollmentId, now);
 
   if (promoted.count === 0 && enrollment.status !== 'completed') {
     // Not active and not completed → terminal/revoked; never resurrect.

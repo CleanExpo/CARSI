@@ -197,6 +197,18 @@ export async function forceCompleteEnrollment(
   return { lessonsMarked: total };
 }
 
+/**
+ * Records the learner's first completion of the course, once. Never overwritten or cleared, so a
+ * revocation, re-purchase or curriculum edit cannot move old learning into a later IICRC renewal
+ * period (GP-659). Every writer that marks an enrolment completed calls this.
+ */
+export async function recordFirstCompletion(enrollmentId: string, at: Date): Promise<void> {
+  await prisma.lmsEnrollment.updateMany({
+    where: { id: enrollmentId, firstCompletedAt: null },
+    data: { firstCompletedAt: at },
+  });
+}
+
 export async function syncEnrollmentCompletion(
   enrollmentId: string,
   studentId: string,
@@ -256,13 +268,15 @@ export async function syncEnrollmentCompletion(
   // fully-gated completion — not on a lesson-count-only or downgrade-protected one.
   const newlyGatedCompletion = allLessonsDone && quizGateSatisfied && !wasAlreadyCompleted;
 
+  const completedAt = isCompleted ? (prior?.completedAt ?? new Date()) : null;
   await prisma.lmsEnrollment.update({
     where: { id: enrollmentId },
     data: {
       status: isCompleted ? 'completed' : 'active',
-      completedAt: isCompleted ? (prior?.completedAt ?? new Date()) : null,
+      completedAt,
     },
   });
+  if (completedAt) await recordFirstCompletion(enrollmentId, completedAt);
 
   if (newlyGatedCompletion && !options?.skipIicrcAutoSubmit) {
     const { processIicrcCecSubmissionForEnrollment } = await import(

@@ -25,7 +25,8 @@ const sendEnrollmentWelcomeEmail = vi.hoisted(() => vi.fn(async () => {}));
 const sessionClaimsForUserId = vi.hoisted(() => vi.fn(async (id: string) => ({ sub: id, email: 'e@x.com', role: 'student' })));
 
 vi.mock('@/lib/server/guest-checkout', () => ({ findOrCreateGuestUser }));
-vi.mock('@/lib/server/enrollment-service', () => ({ enrollStudentInCourse }));
+const recordFirstCompletion = vi.hoisted(() => vi.fn(async () => {}));
+vi.mock('@/lib/server/enrollment-service', () => ({ enrollStudentInCourse, recordFirstCompletion }));
 vi.mock('@/lib/server/enrollment-email', () => ({ sendEnrollmentWelcomeEmail }));
 vi.mock('@/lib/server/lms-auth', () => ({ sessionClaimsForUserId }));
 vi.mock('@/lib/server/app-url', () => ({ getAppOrigin: () => 'https://carsi.test' }));
@@ -149,6 +150,8 @@ describe('finalizeAttendanceForSignIn — certificate of attendance (no CEC)', (
     // The enrolment was completed and the certificate of attendance stamped.
     expect(state.enrollment?.status).toBe('completed');
     expect(state.enrollment?.certificateIssuedAt).not.toBeNull();
+    // GP-659: the first completion is recorded with the same time.
+    expect(recordFirstCompletion).toHaveBeenCalledWith('enr-1', state.enrollment?.certificateIssuedAt);
   });
 
   it('only one day (or no enrolment) → not_ready, no certificate written', async () => {
