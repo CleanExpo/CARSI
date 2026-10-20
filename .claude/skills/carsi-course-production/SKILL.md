@@ -91,6 +91,28 @@ edit is saved.
 - Trailers are branded Remotion renders **with audio** (voiced via the sanctioned Synthex ElevenLabs
   config, single voice) — a silent trailer is a defect.
 
+## Course diagrams — fit, clear, branded (MUST)
+Founder-approved 20/10/2026 on the Level 2 Mould Remediation diagrams; every course from now on.
+Diagrams are hand-written SVG in `public/courses/<slug>/diagrams/`, embedded in lessons as `<img>`.
+- **Nothing cut off.** Every element sits inside the viewBox (`0 0 800 H`, width 800). Grow `H`
+  rather than crowd; never let a card, label or footer run past an edge.
+- **Nothing collides.** No text over other text, no line or arrow through a label, no label
+  straddling or touching a shape (keep 4px clear; 3px inside a box). Card rows use the course card
+  grid (4 per row, or 3 for longer text) instead of one row that overflows.
+- **Arrows connect.** Every arrowhead lands on, or passes through, the shape it points at. Arrow
+  direction and its label agree.
+- **CARSI logo on every diagram.** The header wordmark `public/logo/logo1.png` (dark lettering; never
+  `dark-logo.png`, which vanishes on white) — trimmed, 240×62, flattened on white, 256 colours —
+  embedded as a base64 `<image x="656" y="14" width="120" height="31">` top-right, level with the
+  title. Embedded because an SVG loaded through `<img>` cannot fetch external files. Copy the
+  exact tag from any Level 2 mould diagram. It must stay 4px clear of everything.
+- Footer stays `CARSI · <course> · schematic, not to scale`. Teaching content does not change
+  when fixing layout.
+- **Check:** `npm run check:course-diagrams` (headless Chromium measures every element; exit 1
+  on any finding, including a missing logo). Pass `--chromium <path>` if Playwright's browser is
+  not installed. Then look at each diagram rendered — the check measures, the eye confirms.
+- Known limit: on a phone a diagram scales to about 43%, so 11px labels read small.
+
 ## Verification (before publish / before saving an edit)
 Scan the content and reject on any hit:
 - US spellings (color/odor/meter/mold/fiber/center/license-noun).
@@ -99,6 +121,8 @@ Scan the content and reject on any hit:
 - IICRC terminology: "IICRC course(s)" / "IICRC certification course" / "IICRC-certified course" /
   "get IICRC certified with CARSI" in selling copy — must be "IICRC CEC course(s)".
 - Silent trailer (no audio stream).
+- Any course diagram finding from `npm run check:course-diagrams` (cut off, collision, dangling
+  arrow, missing CARSI logo).
 Fix all before the course goes live. Prod publish/unpublish remains founder-gated.
 
 ## Governance

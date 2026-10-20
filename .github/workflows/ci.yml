@@ -238,6 +238,15 @@ jobs:
       - name: Standards-claim guard self-test
         run: npm run test:standards-claims
 
+      # Course Standard v1 (docs/content/COURSE_STANDARD.md). Report-only for courses that have
+      # not opted in; a course with meta.standard "v1" that drops below any floor fails here.
+      # The self-test proves the audit still fails a below-floor v1 course and ignores the rest.
+      - name: Course Standard depth audit
+        run: npm run check:course-standard
+
+      - name: Course Standard depth audit self-test
+        run: npm run test:course-depth
+
       - name: Lint
         run: npm run lint
 
@@ -439,6 +448,11 @@ jobs:
       - name: Install Playwright system dependencies
         if: steps.playwright-cache.outputs.cache-hit == 'true'
         run: npx playwright install-deps chromium
+
+      # Every course diagram fits its canvas, keeps text clear and carries the CARSI logo
+      # (carsi-course-production, "Course diagrams"). Needs the Chromium installed above.
+      - name: Course diagram check
+        run: npm run check:course-diagrams
 
       - name: Run E2E tests
         run: npm run test:e2e

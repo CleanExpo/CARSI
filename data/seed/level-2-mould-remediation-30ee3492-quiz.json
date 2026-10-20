@@ -1,0 +1,785 @@
+{
+  "version": 1,
+  "courseSlug": "level-2-mould-remediation-30ee3492",
+  "status": "draft",
+  "note": "Module checks and final check for the Level 2 Mould Remediation pilot (GP-658). Original CARSI questions; no standard text. SME review required before seeding.",
+  "quizzes": [
+    {
+      "quizId": "de882a83-fd90-4120-9c4b-9f0f95ca8379",
+      "lessonTitle": "Module 1 check",
+      "title": "Level 2 Mould Remediation — Module 1 check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "You find staining on the back of a plasterboard sheet behind a vanity. What does that tell you?",
+          "options": [
+            "The stain will wipe off",
+            "The leak has already stopped",
+            "It only needs fresh paint",
+            "Growth is inside the material"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Staining on the back of the board means growth has colonised the material itself. Cleaning the face leaves it behind, so the board is removed under control. It says nothing about whether the leak has stopped."
+        },
+        {
+          "questionText": "Roughly what affected area does this course treat as a Level 2 job?",
+          "options": [
+            "Any size at all, always",
+            "Under 0.1 m² in total",
+            "About 1 to 10 m²",
+            "Only areas over 50 m²"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "This course's scope is roughly 1–10 m² in a home or small building. The band sets what the course covers; the remediation response is set by the contamination Condition. Jobs well beyond the band are escalated and scoped as large-loss work."
+        },
+        {
+          "questionText": "Which material is most likely to be colonised right through when it stays wet?",
+          "options": [
+            "Glazed ceramic tile",
+            "Powder-coated aluminium frame",
+            "Paper-faced gypsum plasterboard",
+            "Toughened shower glass"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Paper-faced plasterboard holds water and feeds mould, so growth goes through it. Tile and glass are non-porous: growth stays on the surface and can be cleaned."
+        },
+        {
+          "questionText": "Under the WHS laws, who must eliminate or minimise the risks on a mould job?",
+          "options": [
+            "The tenant living there now",
+            "The PCBU running the job",
+            "The insurer paying the claim",
+            "The client who owns it"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "The person conducting a business or undertaking (PCBU) running the job holds the primary duty to eliminate risks so far as is reasonably practicable, or minimise them."
+        },
+        {
+          "questionText": "Which control sits highest on the hierarchy of controls for a mould job?",
+          "options": [
+            "Removing the colonised material",
+            "Putting up warning signs",
+            "Wearing a P2 respirator",
+            "Writing a safe method"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Fixing the water and removing the colonised material eliminates the hazard, the top of the hierarchy. Signs and a SWMS are administrative controls and a respirator is PPE, the last line."
+        },
+        {
+          "questionText": "The model biological-hazards code was published by Safe Work Australia. When is it enforceable?",
+          "options": [
+            "Only where a state or territory approves",
+            "Only on commercial buildings over 1000 m²",
+            "Everywhere from the day it was published",
+            "Never, because all codes are only suggestions"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A model code becomes enforceable in a jurisdiction only when that jurisdiction approves it. Check your own regulator, and treat the code as good practice everywhere."
+        },
+        {
+          "questionText": "A wardrobe lining in a house renovated in the 1980s looks like flat fibre sheet. What do you do?",
+          "options": [
+            "Stop work and arrange asbestos sampling first",
+            "Paint over it and leave it alone",
+            "Spray it with water and then remove",
+            "Cut it carefully with a shrouded saw"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Asbestos was banned from 31 December 2003, so assume any home built or renovated before 2003 contains it. Do not cut, drill or break a suspect sheet: stop and have it identified by a competent or licensed person."
+        },
+        {
+          "questionText": "An occupant asks whether the mould caused her child's cough. What is the right response?",
+          "options": [
+            "Suggest a medicine to try",
+            "Tell her it definitely did",
+            "Recommend she sees her GP",
+            "Tell her mould is harmless"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "You are not a doctor and you do not diagnose. Say what you found and recommend the occupant talks to their GP about any health concerns."
+        },
+        {
+          "questionText": "Which finding is an escalation trigger rather than normal Level 2 work?",
+          "options": [
+            "Growth on the plasterboard back",
+            "Staining around a bathroom window",
+            "Growth inside the air-conditioning ducts",
+            "Wet bottom plate behind vanity"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Growth in the air-conditioning system or ducts is an escalation trigger: isolate the system and escalate. The other findings are typical Level 2 scope items."
+        },
+        {
+          "questionText": "You find black, slimy growth on wet plasterboard paper behind a vanity. What goes in your report?",
+          "options": [
+            "Toxic mould, confirmed by its colour",
+            "Dark growth; genus needs lab analysis",
+            "Stachybotrys, identified by eye on site",
+            "Nothing, unless the client asks you"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Colour and texture overlap between moulds, and one patch can hold several. Describe what you saw (colour, texture, area, material, moisture reading) and leave the genus to an accredited lab analysing a tape lift, swab or air sample. \"Toxic\" is a health claim you cannot make."
+        },
+        {
+          "questionText": "A lab confirms Stachybotrys on the back of the plasterboard. What does that tell you about the job?",
+          "options": [
+            "The occupants have a proven mould illness",
+            "The air holds a measured toxin dose",
+            "The growth can be sprayed and left",
+            "The board has been wet for weeks"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Stachybotrys needs water activity above about 0.90 to 0.94, so finding it means cellulose stayed wet for a long time. Find the water source and check the material next to it. A genus result is not a toxin measurement or a diagnosis, and colonised board is removed, not sprayed."
+        },
+        {
+          "questionText": "A wall cavity smells musty but you can see no growth. What is the sensible next step?",
+          "options": [
+            "Trace the moisture and inspect the cavity",
+            "Mask the smell with an odour spray",
+            "Name the genus from the smell alone",
+            "Ignore it because no growth is visible"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A musty smell comes from gases (MVOCs) given off by growing mould, so something is probably growing out of sight. The gases are shared between species, so the smell cannot name the mould. Find the moisture and open up under dust controls to look."
+        },
+        {
+          "questionText": "Which surface is the most likely place to find Stachybotrys?",
+          "options": [
+            "Window frame with light morning condensation",
+            "Dry skirting in a sunny lounge",
+            "Painted ceiling in a well-aired bathroom",
+            "Plasterboard paper soaked for three weeks"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Stachybotrys is a tertiary coloniser: it needs very wet cellulose, such as the paper face of plasterboard after a leak or flood. Light condensation on a window frame suits low-water moulds such as Cladosporium instead."
+        }
+      ]
+    },
+    {
+      "quizId": "5597a15c-eb94-4237-a0e6-4bfff52cd6b7",
+      "lessonTitle": "Module 2 check",
+      "title": "Level 2 Mould Remediation — Module 2 check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "A thermal camera shows a cold patch on a ceiling. What should you do next?",
+          "options": [
+            "Confirm with a moisture meter",
+            "Start the removal straight away",
+            "Ignore it until next visit",
+            "Record it as a leak"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A thermal camera shows temperature differences, not water. Treat a cold patch as a question and confirm with a moisture meter before drawing any conclusion."
+        },
+        {
+          "questionText": "Spotting is spread across cold ceilings near external walls in winter. What is the likely cause?",
+          "options": [
+            "A pipe burst inside walls",
+            "Rising damp through the slab",
+            "A blocked sewer drain outside",
+            "Condensation from poor room ventilation"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Spotting spread across cold surfaces, worst in winter and in poorly ventilated rooms, is the condensation pattern. A leak usually gives one area spreading from a point."
+        },
+        {
+          "questionText": "Room air is 13 °C and 85% RH. A ceiling reads 11 °C. What does that suggest?",
+          "options": [
+            "The ceiling is too warm",
+            "The room air is dry",
+            "The meter must be faulty",
+            "Condensation on it is likely"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "At 13 °C and 85% RH the dew point is about 10.5 °C. A surface at 11 °C is only 0.5 °C above it, so condensation is likely on colder nights."
+        },
+        {
+          "questionText": "What is a dry reference reading?",
+          "options": [
+            "Same material read in an unaffected area",
+            "A reading taken after the job ends",
+            "A reading taken on the hottest day",
+            "The number printed on the meter box"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A dry reference is the same material, read with the same meter and mode, in a part of the building that was not affected. It becomes the drying goal for that material."
+        },
+        {
+          "questionText": "Inside the drying area the g/kg is falling and is lower than the rest of the house. What does that show?",
+          "options": [
+            "A new leak has started nearby",
+            "The dehumidifier is removing the water",
+            "The air movers need switching off",
+            "The readings are not worth recording"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Falling g/kg inside the drying area, lower than the rest of the house, shows water vapour is being removed. If it does not fall, look for an open door, a fresh leak or too little equipment."
+        },
+        {
+          "questionText": "Why read the same numbered points on every visit?",
+          "options": [
+            "It makes the job file much shorter",
+            "It means you take fewer readings overall",
+            "It shows the trend at each spot",
+            "It keeps the client out of rooms"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Reading the same points each visit shows how each spot is drying over time. That trend, against the dry reference, is the evidence that the area reached the goal."
+        },
+        {
+          "questionText": "You have not opened the wall yet. How should the scope describe the affected area?",
+          "options": [
+            "As whatever the client says",
+            "As final and fixed numbers",
+            "Estimated, confirmed after opening up",
+            "As unknown, with no number"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Give your best measured estimate and say it will be confirmed after opening up. That keeps the scope honest and lets the assessor see why the area may change."
+        },
+        {
+          "questionText": "In what order should a Level 2 scope be written?",
+          "options": [
+            "The order the client asks",
+            "The order the work happens",
+            "The most expensive item first",
+            "Alphabetical order by each trade"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Writing the scope in work order (area, containment, air, removal, cleaning, drying, verification, waste) lets another technician do the job from it and an assessor check it."
+        },
+        {
+          "questionText": "Plasterboard at 10 mm weighs about 7 kg per m². Roughly how much does 2.43 m² weigh?",
+          "options": [
+            "About 170 kg",
+            "About 17 kg",
+            "About 7 kg",
+            "About 1.7 kg"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "2.43 m² × 7 kg/m² = 17.0 kg. Estimating weight in the scope lets you plan bag numbers and safe lifting."
+        }
+      ]
+    },
+    {
+      "quizId": "434d4042-3841-4ffc-9399-b1bcb26e9a1f",
+      "lessonTitle": "Module 3 check",
+      "title": "Level 2 Mould Remediation — Module 3 check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Before building containment, what should you do with the air-conditioning in the area?",
+          "options": [
+            "Leave it running on fan only",
+            "Turn it off, seal the vents",
+            "Turn it to maximum cooling mode",
+            "Remove the indoor unit completely first"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Turn off and isolate the air-conditioning and seal supply and return vents first. A running system can carry spores from the work area through the house."
+        },
+        {
+          "questionText": "Under negative air, how should the film walls of a good containment behave?",
+          "options": [
+            "Draw gently into the work area",
+            "Flap loudly in the moving air",
+            "Stay perfectly flat and completely still",
+            "Bulge outwards into the next room"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Under negative air the walls draw gently inwards. Walls bulging outwards or flapping mean a problem with the seal, the exhaust or the airflow."
+        },
+        {
+          "questionText": "What is the airlock used for on a Level 2 job?",
+          "options": [
+            "Storing new building materials safely",
+            "Removing outer PPE before leaving",
+            "Mixing cleaning products before use",
+            "Charging batteries for power tools"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Workers remove outer PPE in the airlock before stepping into clean areas, and waste bags are cleaned there. It keeps contamination inside."
+        },
+        {
+          "questionText": "A containment is 17.28 m³ and the plan sets 6 air changes per hour. How much air is needed?",
+          "options": [
+            "About 500 m³/h",
+            "About 1037 m³/h",
+            "About 29 m³/h",
+            "About 104 m³/h"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "17.28 m³ × 6 air changes per hour = 103.7, about 104 m³/h. The method is volume × air changes."
+        },
+        {
+          "questionText": "Why plan on less airflow than the number on the scrubber plate?",
+          "options": [
+            "Plates always show double the airflow",
+            "The plate shows the machine price",
+            "Loaded filters and ducting cut airflow",
+            "Australian power runs machines more slowly"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Plate ratings use a clean filter and no ducting. A loaded filter, long ducts and bends cut real airflow, sometimes by half, so plan on the real figure."
+        },
+        {
+          "questionText": "Smoke from a smoke pencil drifts out of the containment at the door flap. What do you do first?",
+          "options": [
+            "Keep cutting and check it later",
+            "Stop work, then find the breach",
+            "Open the window for more air",
+            "Spray the film with some water"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Smoke drifting out means the containment has lost negative pressure. Stop work first. Then check in order: gaps in the film, a kinked or disconnected exhaust duct, a loaded pre-filter, and a door opened elsewhere. Restart only when the manometer shows the pressure is back, and log and report the breach."
+        },
+        {
+          "questionText": "Which respirator does WA Health recommend for mould removal above about 1 m²?",
+          "options": [
+            "No respirator if the room's ventilated",
+            "A paper nuisance-dust mask from hardware",
+            "PAPR, or P3 full-face or hood",
+            "A loose cloth face mask only"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "WA Health's February 2024 indoor mould guidance recommends a powered air-purifying respirator (PAPR) for mould removal above about 1 m², or a P3 respirator with a full face or hood where a PAPR is not available. A tight-fitting P2 is the minimum only for small work, and every tight-fitting respirator needs a fit test."
+        },
+        {
+          "questionText": "A technician has a beard and is issued a tight-fitting half-face respirator. What is the problem?",
+          "options": [
+            "Facial hair stops the mask sealing",
+            "Beards make respirators far too warm",
+            "The cartridges will expire much sooner",
+            "There is no problem with this"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A tight-fitting respirator only works if it seals to the face. Facial hair under the seal stops it sealing, so the wearer needs a clean shave or a loose-fitting powered respirator."
+        },
+        {
+          "questionText": "When leaving the work area, which item of PPE comes off last, after leaving the airlock?",
+          "options": [
+            "Outer gloves",
+            "The overshoes",
+            "The respirator",
+            "The coveralls"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Outer gloves, coveralls and overshoes come off in the airlock. The respirator comes off last, after leaving the airlock, so you are not breathing contaminated air while removing dirty layers."
+        },
+        {
+          "questionText": "An air scrubber draws 2.5 A, a dehumidifier 4.5 A and two air movers 1.2 A each. What is the total?",
+          "options": [
+            "4.9 A",
+            "9.4 A",
+            "7.0 A",
+            "8.2 A"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "2.5 + 4.5 + 1.2 + 1.2 = 9.4 A. That is too close to a 10 A circuit once motors start, so split the load across two circuits."
+        },
+        {
+          "questionText": "A worker in containment on a hot day becomes dizzy and confused. What do you do?",
+          "options": [
+            "Turn the air scrubber up higher",
+            "Give them an energy drink now",
+            "Stop work, cool them, call 000",
+            "Finish the task first, then rest"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Dizziness and confusion are warning signs of heat illness. Stop work, cool the person and call 000 if symptoms are severe."
+        },
+        {
+          "questionText": "A worker is seriously injured on a mould job. Under the WHS laws, what must happen?",
+          "options": [
+            "Record it in the diary only",
+            "Notify the regulator, preserve the site",
+            "Clean up and carry on working",
+            "Tell the insurer next week sometime"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "A serious injury is a notifiable incident. Notify the regulator immediately and keep the site undisturbed, except to help someone or make it safe, until the regulator says otherwise."
+        }
+      ]
+    },
+    {
+      "quizId": "d49d5ac0-5694-4c9d-8050-abeee4cd5a4e",
+      "lessonTitle": "Module 4 check",
+      "title": "Level 2 Mould Remediation — Module 4 check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Colonised paper-faced plasterboard behind a kitchen cabinet should be:",
+          "options": [
+            "Sprayed and left",
+            "Painted and sealed",
+            "Removed and bagged",
+            "Cleaned and kept"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Paper-faced plasterboard is porous. When it is colonised, growth is inside it, so it is removed and bagged inside the containment."
+        },
+        {
+          "questionText": "How is mould on sound structural timber framing usually dealt with?",
+          "options": [
+            "The frame is always replaced completely",
+            "Painted with sealer straight away instead",
+            "HEPA vacuum, brush or sand, wipe",
+            "Left alone because timber is safe"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Mould on framing is mostly on and near the surface. HEPA vacuum, then wire brush or HEPA-shrouded sand, then damp wipe. Soft or rotten timber goes to a builder, and a load-bearing member that has to come out needs a structural engineer."
+        },
+        {
+          "questionText": "Why should you not break plasterboard over your knee or drop it on the floor?",
+          "options": [
+            "It damages the cutting tools",
+            "It wastes the client's board",
+            "It voids the insurance claim",
+            "Each impact releases more spores"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Every impact releases spores and fragments. Cut slowly along scored lines and lower pieces straight into a bag inside the containment."
+        },
+        {
+          "questionText": "What is the cleaning sequence for surfaces that stay?",
+          "options": [
+            "HEPA vacuum, damp wipe, dry, HEPA vacuum",
+            "Air mover, then HEPA vacuum, then fog",
+            "Bleach, then rinse, then the air mover",
+            "Damp wipe, then bleach, then paint it"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "HEPA vacuum first, then damp wipe with detergent, let it dry, then HEPA vacuum again, then check with a raking torch."
+        },
+        {
+          "questionText": "Why is bleach not the answer for mouldy porous materials?",
+          "options": [
+            "It smells much too strongly indoors",
+            "It does not reach growth inside",
+            "It costs far too much money",
+            "It is banned everywhere in Australia"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Bleach does not reach growth inside porous materials and does not remove dead mould, which can still cause reactions. That is why porous material is removed and surfaces are physically cleaned."
+        },
+        {
+          "questionText": "In which direction do you clean a work area?",
+          "options": [
+            "Top to bottom, clean to dirty",
+            "Exit first, then the far wall",
+            "Bottom to top, dirty to clean",
+            "Left to right, in any order"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Clean from top to bottom so falling dust lands on surfaces not yet cleaned, and from the cleanest part towards the dirtiest, finishing near the exit."
+        },
+        {
+          "questionText": "What stops mould coming back after remediation?",
+          "options": [
+            "Painting with an anti-mould sealer",
+            "Fogging the whole house thoroughly",
+            "Spraying a much stronger product",
+            "Fixing the water and drying"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Mould returns when moisture returns. Removal and cleaning take away the growth; fixing the water and drying the structure stop it returning. No product replaces those steps."
+        },
+        {
+          "questionText": "When may a coating or sealer go on cleaned framing?",
+          "options": [
+            "Before any of the removal starts",
+            "After clean, dry framing is verified",
+            "Instead of doing the HEPA vacuuming",
+            "While the timber is still wet"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Coatings go on only once the structure is clean and dry and verification has passed. Over growth or on wet timber they hide the problem and trap moisture."
+        },
+        {
+          "questionText": "A label says 20 mL per litre. How much concentrate makes 250 mL of solution?",
+          "options": [
+            "50 mL",
+            "2 mL",
+            "20 mL",
+            "5 mL"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "0.25 L × 20 mL per litre = 5 mL of concentrate. Always take the dilution from the label."
+        },
+        {
+          "questionText": "When should air movers be switched on in a mould work area?",
+          "options": [
+            "Only while cutting out the plasterboard",
+            "Before any of the removal starts",
+            "Never at all on mould jobs",
+            "After removal and cleaning are done"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "While visible growth is present, air movers blow spores around. They stay off until the colonised material is out and surfaces are cleaned, then drying starts inside containment."
+        },
+        {
+          "questionText": "A dehumidifier plate says 50 L/day. In a 21 °C kitchen it removes 9 L on day 1. Why?",
+          "options": [
+            "Plate ratings use warmer, wetter conditions",
+            "Australian power is far too weak",
+            "The machine must be broken now",
+            "The tank was never emptied overnight"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Plate ratings are measured at warm, humid test conditions such as 30 °C and 80% RH. In a cooler room a dehumidifier removes less, so track what it actually removes."
+        },
+        {
+          "questionText": "When is the structure ready to release to verification?",
+          "options": [
+            "After exactly three days of drying time",
+            "When the room smells a bit better",
+            "When every point holds at the goal",
+            "When the builder says they are available"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Drying is finished when every moisture point reaches the goal and stays there on the next reading. Then verification, and only after verification the builder."
+        }
+      ]
+    },
+    {
+      "quizId": "d1c6a822-b062-4b8b-912a-5e59520aa564",
+      "lessonTitle": "Final check: Level 2 Mould Remediation",
+      "title": "Level 2 Mould Remediation — Final check: Level 2 Mould Remediation",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "What is a goose-neck seal?",
+          "options": [
+            "Fold the top once and leave it",
+            "Tie a loose knot in the top",
+            "Twist the neck, fold it, tape it",
+            "Staple the top of the bag shut"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Twist the neck of the bag, fold it over and tape it. It gives a seal that will not open when the bag is carried."
+        },
+        {
+          "questionText": "Where is the outside of a waste bag cleaned before it leaves?",
+          "options": [
+            "In the van",
+            "In the airlock",
+            "In the kitchen",
+            "At the tip"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "In the airlock, HEPA vacuum and damp wipe the outside of the bag, then put it in a second clean bag and seal it. Nothing leaves the containment dirty on the outside."
+        },
+        {
+          "questionText": "You paused work because of suspect asbestos. Can that material go in the mould waste bags?",
+          "options": [
+            "Only the small pieces",
+            "No, asbestos rules apply",
+            "Yes, if double-bagged first",
+            "Yes, if wetted first"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Asbestos waste is never mixed with mould waste. It is handled under asbestos rules by people licensed or competent to do so."
+        },
+        {
+          "questionText": "Your crew says the room looks clean. Is that the clearance?",
+          "options": [
+            "Yes, a visual check is enough",
+            "Yes, if the client agrees too",
+            "Yes, if photos are taken too",
+            "No, it is your check only"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Looking clean is one part of your crew's own post-remediation evaluation (PRE), with the cloth wipe, odour and dryness checks. Where an independent post-remediation verification (PRV) is needed, the assessor confirms the area is back to Condition 1, and the clearance is the written result."
+        },
+        {
+          "questionText": "Who should verify a job with a newborn returning to the room?",
+          "options": [
+            "The client's neighbour or friend",
+            "The insurer's call centre staff",
+            "The remediation crew's own supervisor",
+            "An independent indoor environmental professional"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "With a vulnerable occupant, verification should be done by an independent indoor environmental professional who was not involved in the remediation."
+        },
+        {
+          "questionText": "Verification fails. What happens to the containment?",
+          "options": [
+            "It is replaced with new film",
+            "It moves into the next room",
+            "It stays up while you re-clean",
+            "It comes down straight away, today"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Keep the containment and air scrubber in place until verification passes. If it fails, clean again and re-verify."
+        },
+        {
+          "questionText": "Which job-file note is most useful months later?",
+          "options": [
+            "\"Client was happy at the end\"",
+            "\"Bad mould, cleaned it all up\"",
+            "\"Board back 1.44 m², photo 07\"",
+            "\"Big job, took quite a while\""
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Measured facts with photo references answer questions months later. Vague notes do not."
+        },
+        {
+          "questionText": "The cause is a shower seal outside your scope. What do you do at handover?",
+          "options": [
+            "Fix it without asking anyone",
+            "Say nothing about it, ever",
+            "Tell the client in writing",
+            "Mention it to the neighbour"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "If the cause is a maintenance or building issue outside your work, say so plainly and in writing at handover, and keep the note in the file."
+        },
+        {
+          "questionText": "When should the job file be built?",
+          "options": [
+            "While the work is happening",
+            "After the invoice is paid",
+            "Only when someone asks later",
+            "At the end of year"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Build the job file as you go. Records made at the time are accurate and are the evidence if the job is questioned."
+        },
+        {
+          "questionText": "What is the main difference between Level 1 and Level 2 mould work?",
+          "options": [
+            "Level 2 growth is inside material",
+            "Level 2 never needs any containment",
+            "Level 2 jobs are always commercial",
+            "Level 2 uses only chemical products"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Level 2 starts when growth has colonised the material itself, which changes the scope and the controls."
+        },
+        {
+          "questionText": "Put these in order: drying, removal, verification, containment.",
+          "options": [
+            "Drying, containment, removal, verification",
+            "Containment, removal, drying, verification",
+            "Removal, containment, verification, drying",
+            "Verification, drying, removal, containment"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Containment goes up first, then removal and cleaning, then drying to the goal, then verification. Containment stays until verification passes."
+        },
+        {
+          "questionText": "Which is the best evidence that drying is working?",
+          "options": [
+            "Litres, g/kg and readings all falling",
+            "The client says it feels drier",
+            "The air movers are running loudly",
+            "The room smells of cleaning product"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Falling daily litres removed, falling g/kg in the work area and readings moving towards the goal together show drying is working."
+        },
+        {
+          "questionText": "A tight-fitting respirator has not been fit tested on the wearer. What does that mean?",
+          "options": [
+            "It only works outdoors from now",
+            "Its protection cannot be relied on",
+            "It still protects them fully anyway",
+            "It must be worn upside down"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Without a fit test for that wearer on that respirator, you cannot rely on the seal, so you cannot rely on the protection."
+        },
+        {
+          "questionText": "A homeowner asks you to fog the whole house instead of removing a mouldy wall. Your answer?",
+          "options": [
+            "Agree, but charge extra for it",
+            "Explain removal and drying solve it",
+            "Refuse to do any work there",
+            "Agree, because fogging replaces the removal"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Fogging does not remove growth inside materials and adds a chemical exposure. Explain that removal, cleaning, fixing the water and drying do the work."
+        },
+        {
+          "questionText": "Where does the air scrubber exhaust ideally go on a residential job?",
+          "options": [
+            "Back into the containment area",
+            "Outside through a sealed window",
+            "Up into the roof void",
+            "Into the next bedroom along"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "The best exhaust point is outside the building through a window sealed around the ducting. Exhausting into the house risks moving contaminated air into occupied areas."
+        }
+      ]
+    }
+  ]
+}
