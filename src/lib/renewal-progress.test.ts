@@ -58,6 +58,16 @@ describe('renewalProgress (GP-655)', () => {
     expect(p.status).toMatch(/^Lifetime total\./);
   });
 
+  it('cycle mode without a renewal date is still a lifetime total, never reached', () => {
+    // Review of 0974e6ae (P2): both conditions are needed; tracking_mode alone must not count.
+    const p = renewalProgress(
+      summary({ renewal_expiry_date: null, cec_earned_in_cycle: 40, cec_earned_lifetime: 40 }),
+      40
+    );
+    expect(p).toMatchObject({ earned: 40, inPeriod: false, reached: false, percent: 0 });
+    expect(p.status).toMatch(/^Lifetime total\./);
+  });
+
   it('with no summary (failed load) uses the caller lifetime figure and never says reached', () => {
     const p = renewalProgress(null, 30);
     expect(p).toMatchObject({ earned: 30, target: 14, inPeriod: false, reached: false });

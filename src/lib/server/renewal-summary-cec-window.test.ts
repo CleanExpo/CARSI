@@ -60,6 +60,7 @@ vi.mock('@/lib/prisma', () => ({
   },
 }));
 
+import { renewalProgress } from '@/lib/renewal-progress';
 import { RENEWAL_RULE_NOTE } from '@/types/renewal';
 import { getRenewalSummaryForStudent } from './renewal-summary';
 
@@ -103,6 +104,25 @@ describe('renewal summary credits CEC only inside the approval window', () => {
     expect(s!.cycle_start).toBe('2024-12-31T00:00:00.000Z');
     expect(s!.cycle_end).toBe('2028-12-31T23:59:59.999Z');
     expect(s!.cec_earned_in_cycle).toBe(1);
+  });
+
+  it('a certificate re-issued inside the period does not move an older completion into it (GP-655)', async () => {
+    // Independent review of 0974e6ae: the period used certificateIssuedAt before completedAt, and
+    // regenerating a certificate re-stamps it, so old completions could read as "target reached".
+    // Renewal 31/12/2030 → period from 31/12/2026. IN_WINDOW completed 01/06/2025 (credited, in
+    // force), certificate re-issued 01/02/2027.
+    h.user = { ...h.user, iicrcExpiryDate: new Date('2030-12-31T00:00:00Z') };
+    h.enrolments = [
+      {
+        ...enrolment(IN_WINDOW, new Date('2025-06-01T00:00:00Z')),
+        certificateIssuedAt: new Date('2027-02-01T00:00:00Z'),
+      },
+    ];
+    const s = await getRenewalSummaryForStudent('user-1');
+    expect(s!.cycle_start).toBe('2026-12-31T00:00:00.000Z');
+    expect(s!.cec_earned_lifetime).toBe(1);
+    expect(s!.cec_earned_in_cycle).toBe(0);
+    expect(renewalProgress(s, 1).reached).toBe(false);
   });
 
   it('states the rule, including Master/Inspector (GP-655)', () => {

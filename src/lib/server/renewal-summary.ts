@@ -44,24 +44,6 @@ function isPublishedRow(c: { status: string; isPublished: boolean | null }): boo
   );
 }
 
-function completionTimestamp(args: {
-  certificateIssuedAt: Date | null;
-  completedAt: Date | null;
-  lessonIds: string[];
-  progress: Map<string, { completed: boolean; completedAt: Date | null; lastAccessedAt: Date }>;
-}): Date | null {
-  if (args.certificateIssuedAt) return args.certificateIssuedAt;
-  if (args.completedAt) return args.completedAt;
-  let max: Date | null = null;
-  for (const id of args.lessonIds) {
-    const p = args.progress.get(id);
-    if (!p?.completed) continue;
-    const cand = p.completedAt ?? p.lastAccessedAt;
-    if (cand && (!max || cand > max)) max = cand;
-  }
-  return max;
-}
-
 /**
  * CEC hours a completed course credits toward a learner's IICRC renewal.
  *
@@ -315,14 +297,11 @@ async function loadRenewalSummary(
       lifetimeCec += hours;
       byDiscLifetime[disc] = (byDiscLifetime[disc] ?? 0) + hours;
 
-      const ts = completionTimestamp({
-        certificateIssuedAt: e.certificateIssuedAt,
-        completedAt: e.completedAt,
-        lessonIds,
-        progress: progressByLesson,
-      });
-      // The year recap dates a course by the enrolment's own completion time only (see
-      // CourseCompletionRecord); `ts` above can be a re-stamped certificate or a lesson revisit.
+      // The renewal period and the year recap both date a course by the enrolment's own
+      // completion time (see CourseCompletionRecord), the same date that credits the approval.
+      // A certificate is re-stamped when regenerated and a lesson revisit moves its timestamp, so
+      // neither may move an old completion into the current period (GP-655 review of 0974e6ae).
+      const ts = e.completedAt;
       completions.push({
         slug: e.course.slug,
         completedAt: e.completedAt,
