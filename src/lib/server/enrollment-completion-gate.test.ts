@@ -48,6 +48,13 @@ vi.mock('@/lib/prisma', () => ({
         state.enrollment = { ...(state.enrollment as EnrollmentRow), ...args.data };
         return state.enrollment;
       }),
+      // recordFirstCompletion: writes only while firstCompletedAt is still null.
+      updateMany: vi.fn(async (args: { data: Record<string, unknown> }) => {
+        const row = state.enrollment as (EnrollmentRow & { firstCompletedAt?: Date | null }) | null;
+        if (!row || row.firstCompletedAt) return { count: 0 };
+        state.enrollment = { ...row, ...args.data } as EnrollmentRow;
+        return { count: 1 };
+      }),
     },
     lmsLessonProgress: {
       count: vi.fn(async () => state.completedLessonCount),
@@ -59,6 +66,16 @@ vi.mock('@/lib/prisma', () => ({
       findMany: vi.fn(async () =>
         state.passedQuizIds.map((quizId) => ({ quizId })),
       ),
+    },
+    // Runs the callback on this client; a throw restores the row, as a rollback would.
+    async $transaction(fn: (tx: unknown) => Promise<unknown>) {
+      const before = state.enrollment && { ...state.enrollment };
+      try {
+        return await fn(this);
+      } catch (e) {
+        state.enrollment = before;
+        throw e;
+      }
     },
   },
 }));
@@ -107,6 +124,37 @@ describe('syncEnrollmentCompletion — zero-quiz course cert gate (GP-446 baseli
 
     expect(state.enrollment?.status).toBe('completed');
     expect(state.enrollment?.completedAt).not.toBeNull();
+  });
+
+  it('a failed first-completion write rolls the completion back, so the retry still auto-submits (GP-659)', async () => {
+    const { prisma } = await import('@/lib/prisma');
+    const { processIicrcCecSubmissionForEnrollment } = await import('@/lib/server/iicrc-cec-submission');
+    resetState({
+      enrollment: {
+        id: 'enr-3',
+        studentId: 'student-1',
+        courseId: 'course-no-quiz',
+        status: 'active',
+        completedAt: null,
+        certificateIssuedAt: null,
+      },
+      lessonIds: ['l1'],
+      completedLessonCount: 1,
+    });
+    vi.mocked(prisma.lmsEnrollment.updateMany).mockRejectedValueOnce(new Error('transient-db-failure'));
+
+    await expect(syncEnrollmentCompletion('enr-3', 'student-1', 'course-no-quiz')).rejects.toThrow(
+      'transient-db-failure',
+    );
+    expect(state.enrollment?.status).toBe('active');
+    expect(state.enrollment?.completedAt).toBeNull();
+    expect(processIicrcCecSubmissionForEnrollment).not.toHaveBeenCalled();
+
+    await syncEnrollmentCompletion('enr-3', 'student-1', 'course-no-quiz');
+    const row = state.enrollment as EnrollmentRow & { firstCompletedAt?: Date | null };
+    expect(row.status).toBe('completed');
+    expect(row.firstCompletedAt).toEqual(row.completedAt);
+    expect(processIicrcCecSubmissionForEnrollment).toHaveBeenCalledTimes(1);
   });
 
   it('a course WITH quizzes does NOT complete until every quiz has a passing attempt', async () => {

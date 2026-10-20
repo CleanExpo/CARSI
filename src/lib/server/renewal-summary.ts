@@ -8,12 +8,12 @@ import type {
   RenewalSummaryPayload,
   RenewalTrackingMode,
 } from '@/types/renewal';
-import { RENEWAL_CEC_REQUIRED } from '@/types/renewal';
+import { RENEWAL_CEC_REQUIRED, RENEWAL_CYCLE_YEARS } from '@/types/renewal';
 
 export type { RenewalCourseSuggestion, RenewalSummaryPayload, RenewalTrackingMode };
 export { RENEWAL_CEC_REQUIRED };
 
-const CYCLE_YEARS = 3;
+const CYCLE_YEARS = RENEWAL_CYCLE_YEARS;
 const URGENCY_DAYS = 90;
 
 function endOfUtcDay(d: Date): Date {
@@ -42,24 +42,6 @@ function isPublishedRow(c: { status: string; isPublished: boolean | null }): boo
       .toLowerCase()
       .trim() === 'published'
   );
-}
-
-function completionTimestamp(args: {
-  certificateIssuedAt: Date | null;
-  completedAt: Date | null;
-  lessonIds: string[];
-  progress: Map<string, { completed: boolean; completedAt: Date | null; lastAccessedAt: Date }>;
-}): Date | null {
-  if (args.certificateIssuedAt) return args.certificateIssuedAt;
-  if (args.completedAt) return args.completedAt;
-  let max: Date | null = null;
-  for (const id of args.lessonIds) {
-    const p = args.progress.get(id);
-    if (!p?.completed) continue;
-    const cand = p.completedAt ?? p.lastAccessedAt;
-    if (cand && (!max || cand > max)) max = cand;
-  }
-  return max;
 }
 
 /**
@@ -308,21 +290,21 @@ async function loadRenewalSummary(
 
       // Credit only while the approval was in force at completion. Dated by the enrolment's own
       // completion time (see CourseCompletionRecord); no known date credits nothing.
-      const hours = e.completedAt ? cecHoursInForceAt(e.course.slug, e.completedAt) : 0;
+      // The first completion, which revocation, re-purchase and curriculum edits never move
+      // (GP-659); completedAt only for rows that predate it.
+      const doneAt = e.firstCompletedAt ?? e.completedAt;
+      const hours = doneAt ? cecHoursInForceAt(e.course.slug, doneAt) : 0;
       const discRaw = e.course.iicrcDiscipline?.trim() || 'General';
       const disc = discRaw.length > 0 ? discRaw : 'General';
 
       lifetimeCec += hours;
       byDiscLifetime[disc] = (byDiscLifetime[disc] ?? 0) + hours;
 
-      const ts = completionTimestamp({
-        certificateIssuedAt: e.certificateIssuedAt,
-        completedAt: e.completedAt,
-        lessonIds,
-        progress: progressByLesson,
-      });
-      // The year recap dates a course by the enrolment's own completion time only (see
-      // CourseCompletionRecord); `ts` above can be a re-stamped certificate or a lesson revisit.
+      // The renewal period and the year recap both date a course by the enrolment's own
+      // completion time (see CourseCompletionRecord), the same date that credits the approval.
+      // A certificate is re-stamped when regenerated and a lesson revisit moves its timestamp, so
+      // neither may move an old completion into the current period (GP-655 review of 0974e6ae).
+      const ts = doneAt;
       completions.push({
         slug: e.course.slug,
         completedAt: e.completedAt,
@@ -330,7 +312,21 @@ async function loadRenewalSummary(
       });
 
       if (cycle && ts) {
-        if (ts >= cycle.start && ts <= cycle.end) {
+        // A revocation or re-purchase clears completedAt but keeps lesson progress, so the next
+        // sync re-dates old learning to now. Count it in the period only when every lesson the
+        // learner completed was also completed inside the period; an undated, earlier or later
+        // lesson fails closed (GP-655 reviews of 5b47a9a1 and c4f3d3a7). A lesson marked
+        // incomplete also fails closed: un-marking old lessons must not clear the evidence
+        // (review of 5284d027). Only a lesson with no progress at all, such as one added to the
+        // course after the learner finished, is not evidence either way.
+        const done = lessonIds.flatMap((id) => {
+          const p = progressByLesson.get(id);
+          if (!p) return [];
+          return [p.completed === true ? p.completedAt : null];
+        });
+        const learnedInPeriod =
+          done.length > 0 && done.every((at) => at != null && at >= cycle.start && at <= cycle.end);
+        if (learnedInPeriod && ts >= cycle.start && ts <= cycle.end) {
           byDiscCycle[disc] = (byDiscCycle[disc] ?? 0) + hours;
         }
       }

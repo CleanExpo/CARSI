@@ -44,7 +44,7 @@ import {
 import { selectActiveOffersForNow } from '@/lib/marketing/ccw-roadshow-offers';
 import { isCcwAttendeeOffersEnabled } from '@/lib/server/ccw-offers-flag';
 import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
-import { enrollStudentInCourse } from '@/lib/server/enrollment-service';
+import { enrollStudentInCourse, recordFirstCompletion } from '@/lib/server/enrollment-service';
 import { findOrCreateGuestUser } from '@/lib/server/guest-checkout';
 import { sessionClaimsForUserId } from '@/lib/server/lms-auth';
 
@@ -333,9 +333,13 @@ export async function finalizeAttendanceForSignIn(
   }
 
   const now = new Date();
-  const promoted = await prisma.lmsEnrollment.updateMany({
-    where: { id: enrollmentId, status: 'active' },
-    data: { status: 'completed', completedAt: now, certificateIssuedAt: now },
+  const promoted = await prisma.$transaction(async (tx) => {
+    const res = await tx.lmsEnrollment.updateMany({
+      where: { id: enrollmentId, status: 'active' },
+      data: { status: 'completed', completedAt: now, certificateIssuedAt: now },
+    });
+    if (res.count > 0) await recordFirstCompletion(enrollmentId, now, tx);
+    return res;
   });
 
   if (promoted.count === 0 && enrollment.status !== 'completed') {

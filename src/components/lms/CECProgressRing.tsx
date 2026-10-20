@@ -2,13 +2,14 @@
 
 import Image from 'next/image';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
+import { RENEWAL_CEC_REQUIRED, RENEWAL_CYCLE_YEARS } from '@/types/renewal';
 
 interface CECProgressRingProps {
   cecEarned: number;
   cecRequired?: number;
   discipline?: string;
   totalCecLifetime?: number;
-  /** Shown under the ring as "{percentage}% {cycleLabel}" — default references the 3-year cycle. */
+  /** Shown under the ring as "{percentage}% {cycleLabel}" — default references the 4-year cycle. */
   cycleLabel?: string;
 }
 
@@ -41,10 +42,10 @@ const DISCIPLINE_BADGES: Record<string, string> = {
 
 export function CECProgressRing({
   cecEarned,
-  cecRequired = 8,
+  cecRequired = RENEWAL_CEC_REQUIRED,
   discipline,
   totalCecLifetime,
-  cycleLabel = 'of 3-year cycle',
+  cycleLabel = `of ${RENEWAL_CYCLE_YEARS}-year cycle`,
 }: CECProgressRingProps) {
   const radius = 40;
   const stroke = 6;

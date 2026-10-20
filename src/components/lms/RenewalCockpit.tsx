@@ -5,7 +5,7 @@ import { ErrorBanner } from '@/components/lms/ErrorBanner';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
 import { apiClient } from '@/lib/api/client';
 import type { RenewalSummaryPayload } from '@/types/renewal';
-import { RENEWAL_CEC_REQUIRED } from '@/types/renewal';
+import { RENEWAL_CEC_REQUIRED, RENEWAL_RULE_NOTE } from '@/types/renewal';
 import { AlertTriangle, ArrowRight, Calendar } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
@@ -163,6 +163,9 @@ export function RenewalCockpit() {
             <p className="mt-2 max-w-xl text-sm text-slate-600">
               <AcronymTooltip term="CEC" /> progress toward your renewal target, discipline mix, and
               the next courses that close your gaps.
+            </p>
+            <p className="mt-2 max-w-xl text-xs leading-relaxed text-slate-500">
+              {RENEWAL_RULE_NOTE}
             </p>
             {data.some_cecs_estimated ? (
               <p className="mt-3 max-w-xl text-xs leading-relaxed text-amber-800">

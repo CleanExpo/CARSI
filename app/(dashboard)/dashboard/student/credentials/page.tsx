@@ -6,7 +6,9 @@ import { LinkedInShareButton } from '@/components/lms/LinkedInShareButton';
 import { useToast } from '@/hooks/use-toast';
 import { apiClient } from '@/lib/api/client';
 import { formatCecHoursForDisplay } from '@/lib/cec-display';
-import { RENEWAL_CEC_REQUIRED } from '@/types/renewal';
+import { CecRenewalFigure, CecRenewalStatus } from '@/components/lms/CecRenewalStatus';
+import { useRenewalSummary } from '@/hooks/use-renewal-summary';
+import { renewalProgress } from '@/lib/renewal-progress';
 import { ArrowRight, Award, Download, FileText, Link2, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -287,10 +289,12 @@ export default function StudentCredentialsPage() {
     () => credentials.reduce((sum, c) => sum + (c.cec_hours > 0 ? c.cec_hours : 0), 0),
     [credentials]
   );
-  const cecTarget = RENEWAL_CEC_REQUIRED;
-  const cecPct = Math.min(100, (approvedCec / cecTarget) * 100);
-  const cecRemaining = Math.max(0, cecTarget - approvedCec);
-  const cecLabel = formatCecHoursForDisplay(approvedCec);
+  // GP-655: the card counts the renewal period, not every course ever completed.
+  const renewal = useRenewalSummary(Boolean(user));
+  const cecProgress = renewalProgress(renewal, approvedCec);
+  const cecLabel = formatCecHoursForDisplay(cecProgress.earned);
+  // The record shows every approved CEC; only the renewal card is limited to the period (GP-655).
+  const lifetimeCecLabel = formatCecHoursForDisplay(approvedCec);
 
   return (
     <div className="learner-home -mx-4 w-[calc(100%+2rem)] min-w-0 space-y-10 px-4 pb-16 sm:-mx-6 sm:w-[calc(100%+3rem)] sm:px-6 lg:-mx-10 lg:w-[calc(100%+5rem)] lg:px-10">
@@ -321,7 +325,7 @@ export default function StudentCredentialsPage() {
               <div className={`${inset} rounded-xl px-4 py-5`}>
                 <dt className={`text-[11px] ${muted}`}>Approved IICRC CEC hours</dt>
                 <dd className={`mt-2 text-[2.2rem] leading-none tabular-nums ${heading}`}>
-                  {cecLabel ?? '0'}
+                  {lifetimeCecLabel ?? '0'}
                 </dd>
               </div>
             </dl>
@@ -329,20 +333,15 @@ export default function StudentCredentialsPage() {
           <div className={`${surface} flex flex-col px-7 py-7`}>
             <p className={kicker}>IICRC CEC progress</p>
             <div className="mt-6 flex items-center gap-5">
-              <BrandRing percent={cecPct} size={84} stroke={7} id="cred-cec-ring" />
+              <BrandRing percent={cecProgress.percent} size={84} stroke={7} id="cred-cec-ring" />
               <p className={`text-[2.1rem] leading-none tabular-nums ${heading}`}>
-                {cecLabel ?? '0'}
-                <span className="text-[1.05rem] font-medium text-slate-400">/{cecTarget}</span>
+                <CecRenewalFigure progress={cecProgress} earnedLabel={cecLabel ?? '0'} />
               </p>
             </div>
             <div className="mt-6">
-              <ProgressTrack percent={cecPct} />
+              <ProgressTrack percent={cecProgress.percent} />
             </div>
-            <p className={`mt-3 text-[13px] ${muted}`}>
-              {approvedCec >= cecTarget
-                ? 'Renewal target reached'
-                : `${formatCecHoursForDisplay(cecRemaining) ?? cecRemaining} CECs remaining toward the ${cecTarget}-hour renewal target. Unapproved courses add none.`}
-            </p>
+            <CecRenewalStatus progress={cecProgress} textClassName={muted} />
           </div>
         </section>
       ) : null}

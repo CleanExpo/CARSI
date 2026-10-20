@@ -20,6 +20,7 @@ type Enr = {
   courseId: string;
   status: string;
   completedAt: Date | null;
+  firstCompletedAt?: Date | null;
   certificateIssuedAt: Date | null;
   student?: { email: string; fullName: string | null };
   course?: Record<string, unknown>;
@@ -48,8 +49,9 @@ vi.mock('@/lib/prisma', () => ({
         state.enrollment = { ...(state.enrollment as Enr), ...args.data };
         return state.enrollment;
       }),
-      updateMany: vi.fn(async (args: { where: { status?: string }; data: Partial<Enr> }) => {
-        if (state.enrollment && (!args.where.status || state.enrollment.status === args.where.status)) {
+      updateMany: vi.fn(async (args: { where: { status?: string; firstCompletedAt?: null }; data: Partial<Enr> }) => {
+        const firstGuard = 'firstCompletedAt' in args.where && state.enrollment?.firstCompletedAt != null;
+        if (state.enrollment && !firstGuard && (!args.where.status || state.enrollment.status === args.where.status)) {
           state.enrollment = { ...state.enrollment, ...args.data };
           return { count: 1 };
         }
@@ -61,6 +63,9 @@ vi.mock('@/lib/prisma', () => ({
     lmsQuiz: { findMany: vi.fn(async () => state.quizzes) },
     lmsQuizAttempt: {
       findMany: vi.fn(async () => state.passedQuizIds.map((quizId) => ({ quizId }))),
+    },
+    async $transaction(fn: (tx: unknown) => Promise<unknown>) {
+      return fn(this);
     },
   },
 }));
@@ -194,5 +199,23 @@ describe('WS3 legit states still pass (no false-deny)', () => {
     seedEnrollment('active', null);
     await syncEnrollmentCompletion('enr-r', 'stu', 'crs');
     expect(state.enrollment?.status).toBe('completed');
+    // GP-659: the first completion is recorded with the completion time.
+    expect(state.enrollment?.firstCompletedAt).toEqual(state.enrollment?.completedAt);
+  });
+});
+
+describe('GP-659 first completion survives revocation and reactivation', () => {
+  it('a re-completion after reactivation re-stamps completedAt but never firstCompletedAt', async () => {
+    // Completed 01/06/2025; revoked (completedAt cleared, as stripe-revocation does); the dispute
+    // is won (status back to active); the next sync re-completes the course now.
+    const first = new Date('2025-06-01T00:00:00Z');
+    seedEnrollment('completed', first);
+    state.enrollment!.firstCompletedAt = first;
+    state.enrollment = { ...state.enrollment!, status: 'revoked', completedAt: null };
+    state.enrollment = { ...state.enrollment, status: 'active' };
+    await syncEnrollmentCompletion('enr-r', 'stu', 'crs');
+    expect(state.enrollment?.status).toBe('completed');
+    expect(state.enrollment?.completedAt?.getTime()).toBeGreaterThan(first.getTime());
+    expect(state.enrollment?.firstCompletedAt).toEqual(first);
   });
 });

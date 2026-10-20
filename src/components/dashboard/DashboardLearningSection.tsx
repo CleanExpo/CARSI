@@ -6,7 +6,9 @@ import type { SessionClaims } from '@/lib/auth/session-jwt';
 import { resolveHomeContinueState } from '@/lib/learner-home-state';
 import type { EnrollmentDto, LearnerDashboardSummary } from '@/lib/server/learner-dashboard-data';
 import type { OnboardingProgramRow } from '@/lib/server/onboarding-programs';
-import { RENEWAL_CEC_REQUIRED, type RenewalCourseSuggestion } from '@/types/renewal';
+import { CecRenewalFigure, CecRenewalStatus } from '@/components/lms/CecRenewalStatus';
+import { renewalProgress } from '@/lib/renewal-progress';
+import type { RenewalCourseSuggestion, RenewalSummaryPayload } from '@/types/renewal';
 
 function greetingForHour(hour: number): string {
   if (hour < 12) return 'Good morning';
@@ -249,6 +251,7 @@ export function DashboardLearningSection({
   dbConfigured,
   enrolmentQueryFailed,
   streakDays = 0,
+  renewal = null,
 }: {
   claims: SessionClaims | null;
   summary: LearnerDashboardSummary | null;
@@ -264,6 +267,8 @@ export function DashboardLearningSection({
   dbConfigured: boolean;
   enrolmentQueryFailed: boolean;
   streakDays?: number;
+  /** Cycle-aware renewal summary (GP-655); without it the card shows a labelled lifetime total. */
+  renewal?: RenewalSummaryPayload | null;
 }) {
   const firstName = claims?.full_name?.trim().split(/\s+/)[0] || 'Learner';
   const enrollments = summary?.enrollments ?? [];
@@ -274,8 +279,9 @@ export function DashboardLearningSection({
     (e) => e.status !== 'completed' && e.all_lessons_complete !== true
   );
   const certificates = completed.filter((e) => e.certificate_issued_at);
+  // Lifetime CECs for the "CECs earned" stat; the renewal card uses the renewal period (GP-655).
   const cec = summary?.cecHoursFromCompleted ?? 0;
-  const cecTarget = RENEWAL_CEC_REQUIRED;
+  const cecProgress = renewalProgress(renewal, cec);
   const previewCourses = (inProgress.length > 0 ? inProgress : enrollments).slice(0, 2);
   const hour = new Date().getHours();
   const continueState = resolveHomeContinueState({
@@ -288,8 +294,6 @@ export function DashboardLearningSection({
     ? enrollments.find((e) => e.course_slug === resume.course_slug)
     : undefined;
   const recommended = recommendations.slice(0, 3);
-  const cecRemaining = Math.max(0, cecTarget - cec);
-  const cecPct = Math.min(100, (cec / cecTarget) * 100);
 
   return (
     <div className="learner-home -mx-4 w-[calc(100%+2rem)] min-w-0 space-y-12 px-4 pb-8 sm:-mx-6 sm:w-[calc(100%+3rem)] sm:px-6 lg:-mx-10 lg:w-[calc(100%+5rem)] lg:px-10">
@@ -466,23 +470,18 @@ export function DashboardLearningSection({
         <div className={`${surface} flex flex-col px-7 py-7`}>
           <p className={kicker}>IICRC CEC progress</p>
           <div className="mt-6 flex items-center gap-5">
-            <BrandRing percent={cecPct} size={80} stroke={7} id="home-cec-ring" />
+            <BrandRing percent={cecProgress.percent} size={80} stroke={7} id="home-cec-ring" />
             <p className={`text-[2.1rem] leading-none tabular-nums ${heading}`}>
-              {formatCec(cec)}
-              <span className="text-[1.05rem] font-medium text-slate-400">/{cecTarget}</span>
+              <CecRenewalFigure
+                progress={cecProgress}
+                earnedLabel={formatCec(cecProgress.earned)}
+              />
             </p>
           </div>
           <div className="mt-6">
-            <ProgressTrack percent={cecPct} />
+            <ProgressTrack percent={cecProgress.percent} />
           </div>
-          <div className={`mt-3 flex items-center justify-between text-[13px] ${muted}`}>
-            <span>General</span>
-            <span>
-              {cec >= cecTarget
-                ? 'Renewal target reached'
-                : `${formatCec(cecRemaining)} CECs remaining`}
-            </span>
-          </div>
+          <CecRenewalStatus progress={cecProgress} textClassName={muted} />
           <Link href="/dashboard/student/credentials" className={`${cta} mt-auto pt-7`}>
             View CEC details
             <ArrowRight className="h-4 w-4" aria-hidden />
