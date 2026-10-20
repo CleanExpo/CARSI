@@ -143,7 +143,7 @@ describe('licence inventory', () => {
     expect(found.map((h) => h.term)).toEqual(['count-claim']);
   });
 
-  it('exemptions: every reviewed entry names a reason, a file and the exact line it covers', () => {
+  it('exemptions: every reviewed entry names a reason, a file and the exact line it covers', async () => {
     for (const e of REVIEWED as Array<{
       file: string;
       line: number;
@@ -154,9 +154,9 @@ describe('licence inventory', () => {
       expect(e.reason.length, `${e.file}:${e.line}`).toBeGreaterThan(20);
       expect(['legitimate', 'owned-elsewhere']).toContain(e.class);
       expect(existsSync(e.file), e.file).toBe(true);
-      expect(readFileSync(e.file, 'utf8').split('\n')[e.line - 1], `${e.file}:${e.line}`).toContain(
-        e.contains
-      );
+      // a PDF entry pins a line of its extracted text, the same text the inventory scans
+      const text = e.file.endsWith('.pdf') ? await pdfText(e.file) : readFileSync(e.file, 'utf8');
+      expect(text.split('\n')[e.line - 1], `${e.file}:${e.line}`).toContain(e.contains);
     }
   });
 
@@ -210,6 +210,12 @@ describe('licence inventory', () => {
     // review of c9bbbf18: a modifier between "IICRC" and "certification" still passed
     ['certif', HERO, 'IICRC ' + 'online certification courses (27)'],
     ['certif', HERO, 'Accredited ' + 'certification training for Australian technicians'],
+    // review of 4f4eaaa4: other third-person exemptions accepted these, so one block rule now
+    // refuses any IICRC certification offer however it is worded
+    ['certif', HERO, 'Your IICRC ' + 'online certification courses'],
+    ['certif', HERO, 'IICRC ' + 'certifications for Australian technicians'],
+    ['certif', HERO, 'IICRC ' + 'online certification courses — bought once'],
+    ['certif', HERO, 'Certification ' + 'training from the IICRC, online'],
   ])('controls: %s fires in %s: %s', (term, file, text) => {
     expect(classifyCopy(file, term, text)[0]).toBe('exposure');
   });
@@ -245,6 +251,7 @@ describe('licence inventory', () => {
     ['iicrc-code', GUIDE_PDF, 'Odor Control Technician OCT Specialist skill for fire damage.'],
     ['count-claim', GUIDE_PDF, 'Staff: 14 (8 technicians, 3 project managers, 3 admin)'],
     ['CEC', HERO, 'IICRC CEC Accredited courses (27)'],
+    ['certif', HERO, 'CARSI does not sell IICRC ' + 'certification courses.'],
     [
       'certif',
       COST_PAGE,

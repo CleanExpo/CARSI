@@ -103,6 +103,13 @@ const NOT_PUBLIC_PATHS = [
 ];
 
 const INDUSTRY = /^app\/\(public\)\/industries\//;
+const IICRC_CERT_OFFER = new RegExp(
+  `\\bIICRC\\b(?:[\\s-]+[\\w&’'/]+){0,4}?[\\s-]+certif\\w*(?:[\\s-]+[\\w&’'/]+){0,3}?[\\s-]+(?:${OFFER_NOUN})\\b` +
+    `|\\bIICRC\\b(?:[\\s-]+[\\w&’'/]+){0,4}?[\\s-]+certifications?[\\s-]+for\\b` +
+    `|\\bcertif\\w*[\\s-]+(?:${OFFER_NOUN})\\b(?:[\\s-]+[\\w&’'/]+){0,3}?[\\s-]+(?:from|by|with|through|in)[\\s-]+(?:the[\\s-]+)?IICRC\\b`,
+  'i'
+);
+const CERT_OFFER_NEGATED = /\b(?:no|not|never|nor|unlike|instead of)\b|n['’]t\b/i;
 const CODE_ALT = IICRC_CODES.join('|');
 
 /**
@@ -143,6 +150,18 @@ export const BLOCK_RULES = [
     re: new RegExp(
       `\\b(?:${CODE_ALT})\\b[\\s-]+certification[\\s-]+(?:courses?|training|programs?|programmes?|classes)\\b`
     ),
+  },
+  {
+    // GP-639 reviews: four rounds each found another wording ("IICRC online certification
+    // courses", "IICRC certifications for ...") that a third-person exemption accepted. This
+    // runs before every exemption, so any IICRC certification offer is an exposure however it
+    // is worded, unless the sentence first negates it.
+    name: 'CARSI offer of IICRC certification (any modifiers in between)',
+    terms: ['certif', 'iicrc-offer'],
+    fn: (sentence) => {
+      const m = IICRC_CERT_OFFER.exec(sentence);
+      return Boolean(m) && !CERT_OFFER_NEGATED.test(sentence.slice(0, m.index));
+    },
   },
   {
     name: 'unsold carpet- or colour-repair training offered',
