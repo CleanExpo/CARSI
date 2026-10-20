@@ -114,7 +114,7 @@ export default async function Image() {
       >
         {[
           { value: '91+', label: 'Courses' },
-          { value: '7', label: 'IICRC Disciplines' },
+          { value: '7', label: 'Restoration Disciplines' },
           { value: '12+', label: 'Industries' },
           { value: '24/7', label: 'Online Access' },
         ].map((stat) => (
