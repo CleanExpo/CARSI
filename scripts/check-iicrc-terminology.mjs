@@ -36,6 +36,7 @@
  */
 import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
+import ts from 'typescript';
 import { isEntryPoint } from './lib/is-entry-point.mjs';
 
 import { IICRC_CODE_ALT } from './iicrc-codes.mjs';
@@ -113,7 +114,8 @@ const LEAD =
   String.raw`\n]){0,40}['"` +
   '`' +
   String.raw`]\s*,\s*)?){0,3}[^A-Za-z]*`;
-const TAIL = String.raw`\s*[?.!]?[^A-Za-z]*$`;
+// Spaces and ?.! are themselves non-letters; one quantifier keeps the anchored tail linear.
+const TAIL = String.raw`[^A-Za-z]*$`;
 const HOLD = String.raw`(?:hold|have|currently\s+hold|maintain|renew)(?:\s+or\s+plan\s+to\s+work\s+in)?`;
 const LEARNER_DATA_SENTENCE = [
   String.raw`(?:which|what)\s+IICRC\s+disciplines\s+do\s+you\s+${HOLD}`,
@@ -170,6 +172,8 @@ const MARKUP = /<\/?(?:[A-Za-z][^<>]{0,600})?>/g;
  */
 function renderedViews(line) {
   const text = line
+    // Markdown emphasis renders as nothing (`Which **IICRC disciplines** do you hold?`).
+    .replace(/\*{1,3}/g, '')
     .replace(ZERO_WIDTH, '')
     .replace(RENDERED_SPACE, ' ')
     .replace(LETTER_ENTITY, (m, hex, dec) => {
@@ -327,12 +331,18 @@ export function bannedRules(CODES = IICRC_CODE_ALT) {
       // Six lines: a JSX text run with a `{" "}` and inline elements spreads one phrase over
       // five (review of d28bbcc0).
       crossLine: 6,
+      // Also checked against the text each JSX tree, string join and Markdown paragraph renders
+      // (renderedRuns): markup, attributes, comments and emphasis are gone there by construction
+      // (review of 723bdce5).
+      rendered: true,
       prepare: (line) =>
         renderedViews(line)
           .map((view) =>
             view
               .split(/(?<=[.!?])\s+/)
-              .filter((s) => !LEARNER_DATA_SENTENCE.some((shape) => shape.test(s)))
+              // trimEnd: the shapes end in an anchored tail that is quadratic on trailing
+              // whitespace (review of 723bdce5, P2).
+              .filter((s) => !LEARNER_DATA_SENTENCE.some((shape) => shape.test(s.trimEnd())))
               .join(' ')
           )
           .join(' \u0000 '),
@@ -646,6 +656,93 @@ export function scanText(file, content, rules = BANNED) {
   return findings;
 }
 
+/** Files the rendered-text pass parses. */
+const RENDERED_PREFILTER = /scip|disci/i;
+const SCRIPT_KIND = { '.tsx': 'TSX', '.jsx': 'JSX', '.ts': 'TS', '.js': 'JS', '.mjs': 'JS' };
+
+/**
+ * The text a file renders, as runs with their line numbers, built from the parsed source rather
+ * than from lines (review of 723bdce5: a regex over source lines kept losing to ordinary
+ * attributes, comments and emphasis):
+ *  - each outermost JSX element or fragment: its text children, string-literal expressions and
+ *    nested elements' text, in order. Attributes and comments are never part of it. Any other
+ *    expression reads as `{x}`, so "{count} IICRC disciplines" is still a count.
+ *  - each outermost `+` join of quoted strings, with comments gone.
+ *  - in Markdown, each paragraph with emphasis, code ticks and link targets removed.
+ */
+export function renderedRuns(file, text) {
+  if (!RENDERED_PREFILTER.test(text)) return [];
+  const ext = (file.match(/\.[a-z]+$/i)?.[0] ?? '').toLowerCase();
+  if (ext === '.md' || ext === '.mdx') {
+    const runs = [];
+    let start = 0;
+    const lines = text.split('\n');
+    for (let i = 0; i <= lines.length; i++) {
+      if (i === lines.length || lines[i].trim() === '') {
+        const para = lines.slice(start, i).join(' ');
+        if (para.trim()) {
+          runs.push({
+            line: start + 1,
+            text: para
+              .replace(/\[([^\]\n]{0,200})\]\([^)\n]{0,400}\)/g, '$1')
+              .replace(/[*_`~]+/g, ''),
+          });
+        }
+        start = i + 1;
+      }
+    }
+    return runs;
+  }
+  const kind = SCRIPT_KIND[ext];
+  if (!kind) return [];
+  const sf = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true, ts.ScriptKind[kind]);
+  const runs = [];
+  const lineOf = (node) => sf.getLineAndCharacterOfPosition(node.getStart(sf)).line + 1;
+  const isJsx = (n) => ts.isJsxElement(n) || ts.isJsxFragment(n) || ts.isJsxSelfClosingElement(n);
+  const isPlus = (n) =>
+    ts.isBinaryExpression(n) && n.operatorToken.kind === ts.SyntaxKind.PlusToken;
+
+  const stringValue = (expr) => {
+    if (ts.isParenthesizedExpression(expr)) return stringValue(expr.expression);
+    if (ts.isStringLiteral(expr) || ts.isNoSubstitutionTemplateLiteral(expr)) return expr.text;
+    if (ts.isTemplateExpression(expr)) {
+      return expr.head.text + expr.templateSpans.map((s) => '${x}' + s.literal.text).join('');
+    }
+    if (isPlus(expr)) {
+      const l = stringValue(expr.left);
+      const r = stringValue(expr.right);
+      return l === null && r === null ? null : (l ?? '{x}') + (r ?? '{x}');
+    }
+    return null;
+  };
+
+  const flatten = (node) => {
+    if (ts.isJsxText(node)) return node.getText(sf);
+    if (ts.isJsxExpression(node)) {
+      if (!node.expression) return '';
+      if (isJsx(node.expression)) return flatten(node.expression);
+      return stringValue(node.expression) ?? '{x}';
+    }
+    if (ts.isJsxSelfClosingElement(node)) return ' ';
+    if (ts.isJsxElement(node) || ts.isJsxFragment(node)) {
+      return node.children.map(flatten).join('');
+    }
+    return '';
+  };
+
+  const visit = (node) => {
+    if (isJsx(node) && !isJsx(node.parent) && !ts.isJsxExpression(node.parent)) {
+      runs.push({ line: lineOf(node), text: flatten(node) });
+    } else if (isPlus(node) && !isPlus(node.parent)) {
+      const v = stringValue(node);
+      if (v !== null) runs.push({ line: lineOf(node), text: v });
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(sf);
+  return runs;
+}
+
 function ruleHits(rule, content) {
   const base = rule.prepare ? rule.prepare(content) : content;
   const probe = rule.neutralise ? base.replace(rule.neutralise, ' ') : base;
@@ -679,6 +776,18 @@ export function scanFile(file, text, rules = BANNED) {
         if (hits(i, n) && !hits(i, n - 1) && !hits(i + 1, n - 1)) {
           findings.push(
             `  ${file}:${i + 1}-${i + n}: ${rule.message}\n    → ${join(i, n).slice(0, 140)}`
+          );
+        }
+      }
+    }
+  }
+  const renderedRules = rules.filter((r) => r.rendered && !(r.skipDocs && docs));
+  if (renderedRules.length > 0) {
+    for (const run of renderedRuns(file, text)) {
+      for (const rule of renderedRules) {
+        if (ruleHits(rule, run.text)) {
+          findings.push(
+            `  ${file}:${run.line} (rendered): ${rule.message}\n    → ${run.text.replace(/\s+/g, ' ').trim().slice(0, 140)}`
           );
         }
       }

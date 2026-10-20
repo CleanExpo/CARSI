@@ -290,7 +290,7 @@ export function IICRCDisciplineMap() {
                 fontWeight={600}
                 fontFamily="system-ui, sans-serif"
               >
-                Disciplines
+                Certifications
               </text>
             </g>
           </svg>
