@@ -1,6 +1,6 @@
 import { formatCecHoursForDisplay } from '@/lib/cec-display';
 import { isCecExcludedSlug } from '@/lib/seed/cec-professional-assignments';
-import { getApprovedCecHours } from '@/lib/seed/cec-approvals';
+import { getApprovedCecHours, getCurrentCecApproval } from '@/lib/seed/cec-approvals';
 
 /** Course fields used to resolve IICRC CEC hours for certificates and credentials. */
 export type LmsCourseCecSource = {
@@ -43,4 +43,18 @@ export function resolveLmsCourseCecHours(course: LmsCourseCecSource): number | n
 /** Formatted CEC label for listings and certificates (`"4"`, `"2.5"`, or null). */
 export function formatLmsCourseCecHoursLabel(course: LmsCourseCecSource): string | null {
   return formatCecHoursForDisplay(resolveLmsCourseCecHours(course));
+}
+
+/**
+ * CEC label for public selling listings (catalogue, homepage cards, search): as
+ * `formatLmsCourseCecHoursLabel`, but only while the approval is in force at `now` (GP-653).
+ * A lapsed approval must not keep advertising CEC hours or a place under the IICRC CEC tab.
+ * Certificates and credentials keep `formatLmsCourseCecHoursLabel`: hours earned while the
+ * approval was in force stay earned.
+ */
+export function formatCurrentCecHoursLabel(
+  course: LmsCourseCecSource,
+  now: Date = new Date()
+): string | null {
+  return getCurrentCecApproval(course.slug, now) ? formatLmsCourseCecHoursLabel(course) : null;
 }

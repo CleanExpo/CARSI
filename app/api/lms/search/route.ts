@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { isOnboardingCourse, parseOnboardingMeta } from '@/lib/onboarding/enterprise';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
-import { formatLmsCourseCecHoursLabel } from '@/lib/server/course-cec-hours';
+import { formatCurrentCecHoursLabel } from '@/lib/server/course-cec-hours';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
@@ -56,7 +56,8 @@ export async function GET(request: NextRequest) {
         // REGISTRY-ONLY, FAIL-CLOSED (GP-498). The stored `cecHours` column is WP-import
         // pollution — never IICRC approval — so it is never surfaced. CEC hours come solely
         // from the approvals registry via the gate; no approval → null (no CEC in search).
-        cec_hours: formatLmsCourseCecHoursLabel({
+        // GP-653: a lapsed approval is no approval here either.
+        cec_hours: formatCurrentCecHoursLabel({
           slug: course.slug,
           // Registry-only (GP-498): the label resolves solely from the approvals registry by
           // slug; the stored `cecHours` column is WP-import pollution and is not read.

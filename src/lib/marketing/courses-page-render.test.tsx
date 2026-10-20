@@ -217,15 +217,25 @@ const REVIEWED_SOURCE_SHA256: Record<string, string> = {
 
 const mentions = (text: string) => (text.match(new RegExp(NAMES_IICRC, 'gi')) ?? []).length;
 
+// Hash LF-normalised text: a Windows checkout with core.autocrlf=true holds the same source
+// with CRLF bytes and must not read as an unreviewed edit (GP-653).
+const sourceHash = (text: string) =>
+  createHash('sha256').update(text.replace(/\r\n/g, '\n'), 'utf8').digest('hex');
+
 describe('rendered /courses: every IICRC sentence is a reviewed one (GP-639)', () => {
   it('source: every public-rendering file of this diff is the reviewed version', () => {
     const now = Object.fromEntries(
-      Object.keys(REVIEWED_SOURCE_SHA256).map((f) => [
-        f,
-        createHash('sha256').update(readFileSync(f)).digest('hex'),
-      ])
+      Object.keys(REVIEWED_SOURCE_SHA256).map((f) => [f, sourceHash(readFileSync(f, 'utf8'))])
     );
     expect(now).toEqual(REVIEWED_SOURCE_SHA256);
+  });
+
+  it('source: a CRLF checkout of a pinned file matches its pin; an edited one does not', () => {
+    for (const f of Object.keys(REVIEWED_SOURCE_SHA256)) {
+      const text = readFileSync(f, 'utf8');
+      expect(sourceHash(text.replace(/\n/g, '\r\n')), f).toBe(REVIEWED_SOURCE_SHA256[f]);
+      expect(sourceHash(`${text}\n// edit`), f).not.toBe(REVIEWED_SOURCE_SHA256[f]);
+    }
   });
 
   it('rendered: every catalogue state and tab names the IICRC only in reviewed sentences', async () => {
