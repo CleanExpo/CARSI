@@ -152,6 +152,17 @@ const COUNT_WORDS = [
   'numerous',
   'various',
   'both',
+  // Quantity nouns ("a range of IICRC discipline areas", "a variety of IICRC discipline topics";
+  // review of e5bc372d). "of" is one of the modifier words allowed before "IICRC".
+  'range',
+  'variety',
+  'number',
+  'host',
+  'array',
+  'selection',
+  'handful',
+  'plenty',
+  'lots?',
 ].join('|');
 
 /** Something other than plain whitespace between "IICRC" and "disciplines": `{…}` or `&…;`. */
@@ -357,6 +368,9 @@ export function bannedRules(CODES = IICRC_CODE_ALT) {
           // A count or coverage word in front of the singular ("CARSI offers one IICRC discipline",
           // "a single IICRC discipline", "every IICRC discipline"; review of 3dee1845).
           String.raw`|\b(?:${COUNT_WORDS})(?:(?:\s|${SEP}){1,8}[A-Za-z][\w-]{0,30}){0,3}(?:\s|${SEP}){1,8}IICRC\s+discipline\b` +
+          // The singular before a plural coverage noun measures the catalogue whatever comes
+          // first ("CARSI spans a range of IICRC discipline areas"; review of e5bc372d).
+          String.raw`|\bIICRC\s+discipline\s+(?:areas|topics|categories|streams|tracks|fields|domains)\b` +
           String.raw`|\blabel\s*:\s*['"` +
           '`' +
           String.raw`]IICRC\s+disciplines?['"` +
