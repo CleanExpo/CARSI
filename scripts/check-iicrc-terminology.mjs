@@ -341,9 +341,13 @@ export function bannedRules(CODES = IICRC_CODE_ALT) {
             view
               // With markup read as nothing, every mix of block, inline and CSS-block tags
               // (`<span className="block">…IICRC</span><span>disci<wbr />plines</span>`, review
-              // of bcd9b725) leaves "IICRCdisciplines". Upper-case IICRC only, so the field
-              // `iicrcDiscipline` and `IICRCDisciplineMap` stay out.
-              .replace(/\bIICRC(?=(?:[Dd]iscipline|DISCIPLINE)[Ss]?\b)/g, 'IICRC ')
+              // of bcd9b725) leaves "IICRCdisciplines", in any case (`iicrc` shown upper-case by
+              // CSS, review of 6cff84c2). A camelCase join (`iicrcDiscipline`) and a following word
+              // (`IICRCDisciplineMap`) are identifiers and stay out.
+              .replace(
+                /\b(?:IICRC(?=(?:[Dd]iscipline|DISCIPLINE)[Ss]?\b)|[Ii][Ii][Cc][Rr][Cc](?=disciplines?\b))/g,
+                '$& '
+              )
               .split(/(?<=[.!?])\s+/)
               // trimEnd: the shapes end in an anchored tail that is quadratic on trailing
               // whitespace (review of 723bdce5, P2).
