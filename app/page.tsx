@@ -21,6 +21,7 @@ import {
   catalogueMetaDescription,
   formatCourseCountForCopy,
   getPublicCatalogueFacts,
+  PUBLIC_TOPIC_LIST,
 } from '@/lib/server/public-catalogue-facts';
 import { getHomepageFeaturedCourses } from '@/lib/server/public-courses-list';
 import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
@@ -56,18 +57,16 @@ const benefits = [
   'No travel, no downtime, no waiting',
 ];
 
-function buildHomeFaqs(facts: { publishedCourseCount: number; disciplineCodes: string[] }) {
+function buildHomeFaqs(facts: { publishedCourseCount: number }) {
   const n = facts.publishedCourseCount;
-  const d = facts.disciplineCodes.length;
   const coursePhrase =
     n > 0 ? `${n} published course${n === 1 ? '' : 's'}` : 'IICRC CEC Accredited courses';
-  const disciplinePhrase =
-    d > 0 ? `${d} IICRC discipline${d === 1 ? '' : 's'}` : 'the core IICRC disciplines';
 
   return [
     {
       question: 'What is CARSI?',
-      answer: `CARSI is an Australian online training platform offering ${coursePhrase} across ${disciplinePhrase}, built for new starters, working technicians, and experienced professionals maintaining CECs.`,
+      // GP-654: the plain-English topics, never a count of IICRC disciplines (GP-523 rule).
+      answer: `CARSI is an Australian online training platform offering ${coursePhrase} across ${PUBLIC_TOPIC_LIST}, built for new starters, working technicians, and experienced professionals maintaining CECs.`,
     },
     {
       question: 'Can I complete training at my own pace?',
@@ -115,7 +114,7 @@ export default async function Home() {
         catalogueFacts.disciplineCodes.length > 0
           ? formatCourseCountForCopy(catalogueFacts.disciplineCodes.length)
           : '7',
-      label: 'IICRC Disciplines',
+      label: 'Restoration disciplines',
     },
   ];
 

@@ -26,7 +26,7 @@ Key ANSI/IICRC standards:
 - S540 — Standard for Trauma and Crime Scene Cleanup
 Full current list: iicrc.org/iicrcstandards
 
-Core IICRC discipline certifications (acronyms used across CARSI's catalogue):
+The IICRC's own technician certifications (third-person reference only; CARSI courses carry CARSI designations and are never named with these acronyms):
 - WRT — Water Damage Restoration Technician
 - ASD — Applied Structural Drying Technician
 - AMRT — Applied Microbial Remediation Technician (mould)

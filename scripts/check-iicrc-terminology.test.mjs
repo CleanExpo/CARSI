@@ -153,6 +153,14 @@ const MUST_BLOCK = [
   ['possessive', "Explore CARSI WRT's training."],
   ['curly possessive', 'Explore CARSI WRT\u2019s training.'],
   ['"never" exempts only its own sentence', 'Never call it a WRT course — use CARSI. Book ASD training today.'],
+  // GP-654: the catalogue measured in IICRC disciplines. Each is the exact live string, 20/10/2026.
+  ['counted disciplines in a template', "d > 0 ? `${d} IICRC discipline${d === 1 ? '' : 's'}` : 'x'"],
+  ['the core IICRC disciplines', "'the core IICRC disciplines';"],
+  ['multiple IICRC disciplines', "d > 0 ? `${d} discipline${d === 1 ? '' : 's'}` : 'multiple IICRC disciplines';"],
+  ['stats label', "      label: 'IICRC Disciplines',"],
+  ['share-image stat', "{ value: '7', label: 'IICRC Disciplines' },"],
+  ['a literal count', 'Courses across 7 IICRC disciplines.'],
+  ['coverage verb', 'Training that spans the IICRC disciplines.'],
 ];
 
 const MUST_PASS = [
@@ -273,6 +281,13 @@ const MUST_PASS = [
   ['the renamed course title', "title: 'Structural Drying — Core Concepts',"],
   ['a hyphenated slug is the URL, audited live', '"courseSlug": "applied-structural-drying-core",'],
   ['a hyphenated slug + course noun is still a slug', 'href="/courses/carpet-cleaning-technician-fundamentals"'],
+  // GP-654 negative controls: the learner's own disciplines and admin/instructor data labels.
+  ['onboarding asks the learner', "question: 'Which IICRC disciplines do you hold or plan to work in? Select all that apply.',"],
+  ['contact form asks the learner', 'Mention your IICRC discipline if applicable.'],
+  ['instructor form option', '<option value="">IICRC Discipline (optional)</option>'],
+  ['admin analytics heading', 'title="By IICRC discipline"'],
+  ['code comment naming the data', ' * an IICRC discipline code. Display names are anonymous.'],
+  ['plain restoration disciplines', 'Courses across 7 restoration disciplines.'],
 ];
 
 let failed = 0;
@@ -297,6 +312,10 @@ const F_MULTI = 'app/(public)/fixture/page.tsx';
 const MUST_BLOCK_FILE = [
   ['line break between acronym and training', 'Explore CARSI WRT\n            training today.'],
   ['line break before a hyphenated noun', 'Book the FSRT\n  -training cohort'],
+  [
+    'GP-654 JSX count split across a line break',
+    'Earn a CARSI designation, with training that spans {disciplineCountLabel} IICRC\n            disciplines. Every certificate is issued with a verification record.',
+  ],
 ];
 const MUST_PASS_FILE = [
   ['a code on one line, an unrelated word on the next', "disciplines={['WRT']}\ntraining: true,"],

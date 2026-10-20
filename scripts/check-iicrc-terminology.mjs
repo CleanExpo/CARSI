@@ -199,6 +199,20 @@ export function bannedRules(CODES = IICRC_CODE_ALT) {
         'CARSI does not deliver "IICRC training" — say "IICRC CEC course(s)". IICRC training comes from an IICRC-approved school.',
     },
     {
+      // The CARSI catalogue measured in IICRC disciplines (GP-654). Found live 20/10/2026 on the
+      // homepage FAQ and FAQPage schema ("80 published courses across 7 IICRC disciplines"), the
+      // certifications lead ("training that spans 7 IICRC disciplines"), the homepage and about
+      // stats ("IICRC Disciplines") and the share image. None was caught: no rule above keys on
+      // the words "IICRC discipline". A count, a quantity word or a coverage verb in front of it,
+      // or a stat label made of it, describes what CARSI teaches. The learner's own disciplines
+      // ("Which IICRC disciplines do you hold?") and admin data labels carry none of those.
+      re: /(?:\d+\+?|\$\{[^}\n]{1,40}\}|\{[^}\n]{1,40}\}|\b(?:core|all|multiple|several|many|key|six|seven|eight|nine)|\b(?:across|spans?|spanning|covers?|covering|over)(?:\s+the)?)\s+(?:core\s+)?IICRC\s+disciplines?\b|\blabel\s*:\s*['"`]IICRC\s+disciplines?['"`]/i,
+      allow: null,
+      crossLine: true,
+      message:
+        'Do not measure the CARSI catalogue in IICRC disciplines ("across 7 IICRC disciplines", "IICRC Disciplines" stat) — say "restoration disciplines" or name the topics. A learner\'s own IICRC disciplines may still be referenced.',
+    },
+    {
       // A course-level claim that CARSI courses EARN CECs. Licence-critical and
       // fail-closed: data/seed/cec-approvals.json is the SSOT and a course may only claim
       // CECs after per-course IICRC approval. At the time this rule was added the registry

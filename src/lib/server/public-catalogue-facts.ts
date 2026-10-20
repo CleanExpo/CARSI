@@ -177,7 +177,7 @@ export function formatCourseCountForCopy(n: number): string {
  * constant, so the copy no longer changes with whatever discipline codes happen to be
  * stored on course rows.
  */
-const PUBLIC_TOPIC_LIST =
+export const PUBLIC_TOPIC_LIST =
   'water damage restoration, structural drying, mould remediation, fire & smoke restoration, odour control and carpet cleaning';
 
 /**

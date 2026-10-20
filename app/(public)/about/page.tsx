@@ -31,7 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
       ? `${formatCourseCountForCopy(n)} published course${n === 1 ? '' : 's'}`
       : 'Published courses';
   const discPhrase =
-    d > 0 ? `${d} discipline${d === 1 ? '' : 's'}` : 'multiple IICRC disciplines';
+    d > 0 ? `${d} discipline${d === 1 ? '' : 's'}` : 'multiple restoration disciplines';
   return {
     title: 'About CARSI | Centre for Australian Restoration and Standards Information',
     description: `CARSI is an Australian online training platform for cleaning and restoration professionals. ${coursePhrase} across ${discPhrase}. 50+ years of combined industry experience.`,
@@ -73,7 +73,7 @@ export default async function AboutPage() {
     },
     {
       value: d > 0 ? formatCourseCountForCopy(d) : '7',
-      label: 'IICRC disciplines',
+      label: 'Restoration disciplines',
     },
     { value: '12+', label: 'Industries served' },
     { value: '24/7', label: 'Study anytime' },
