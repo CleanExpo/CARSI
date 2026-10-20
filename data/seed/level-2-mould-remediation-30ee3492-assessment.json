@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "courseSlug": "level-2-mould-remediation-30ee3492",
+  "status": "draft",
+  "note": "Practical task for the Level 2 Mould Remediation pilot (GP-658). Instructor-graded against the rubric. SME review required before it is published.",
+  "assessment": {
+    "id": "69a31d72-fe92-40de-aea3-3d7a77be517c",
+    "title": "Level 2 Mould Remediation — Practical task: plan and evidence a bathroom job",
+    "passThreshold": 70,
+    "isPublished": false,
+    "instructions": "## Practical task\n\nPlan a Level 2 mould remediation for a real bathroom or laundry job you have worked on, or use the supplied job: a 2.4 m × 1.8 m bathroom in Hobart with growth on the back of the plasterboard behind the vanity (estimated 1.4 m²) after a slow leak from the shower recess, now fixed. The home was built in 1996. A 70-year-old occupant with a lung condition lives there.\n\nSubmit one PDF or a set of photos and documents containing:\n\n1. **First look and moisture map.** A sketch of the room with numbered reading points, readings, a dry reference and the drying goal. Photos with a tape measure in shot if you use a real job.\n2. **Stop-and-escalate check.** Each trigger from the card, answered yes or no, with a reason.\n3. **Scope.** Area in m², containment type and size in m³, air scrubber choice with the air-change calculation, removal and cut lines, cleaning method, drying goal and equipment, verification and waste, in work order.\n4. **SWMS summary.** Hazards and controls from the top of the hierarchy down, including respiratory protection and fit testing.\n5. **Occupant plan.** How the occupant is protected during the work, and what you will say to them, in plain English.\n6. **Handover note.** What was found, what will be removed and why, how it will be verified, and what the occupant must do to keep it dry.\n\nUse Australian English, metric units and 230 V equipment throughout. Do not copy text from any standard.",
+    "criteria": [
+      {
+        "label": "Moisture map and dry reference",
+        "description": "Numbered points, readings against a stated dry reference on the same material, and a drying goal set from it.",
+        "maxPoints": 15
+      },
+      {
+        "label": "Stop-and-escalate checks",
+        "description": "Every trigger answered with a reason; the vulnerable occupant is recognised and changes the plan.",
+        "maxPoints": 10
+      },
+      {
+        "label": "Scope in work order and metric",
+        "description": "Area in m², containment in m³, removal, cleaning, drying, verification and waste, in the order the work happens.",
+        "maxPoints": 20
+      },
+      {
+        "label": "Negative air calculation",
+        "description": "Volume × air changes ÷ real (derated) airflow, with the exhaust point and a smoke-test plan.",
+        "maxPoints": 15
+      },
+      {
+        "label": "Controls and respiratory protection",
+        "description": "Hierarchy of controls applied from the top down; respirator type stated with fit testing and the doffing order.",
+        "maxPoints": 15
+      },
+      {
+        "label": "Occupant communication and handover",
+        "description": "Plain-English explanation, GP referral for health questions, and clear steps for the occupant to keep the area dry.",
+        "maxPoints": 15
+      },
+      {
+        "label": "Australian production and licence",
+        "description": "Australian English, metric units and 230 V equipment; standards named only, no copied standard text.",
+        "maxPoints": 10
+      }
+    ]
+  }
+}

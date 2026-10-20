@@ -10712,6 +10712,491 @@
      ]
     }
    ]
+  },
+  {
+   "id": "e52da273-96de-4b5d-a97d-0fba8a069262",
+   "slug": "level-2-mould-remediation-30ee3492",
+   "title": "Level 2 — Mould Remediation",
+   "description": "<p>Level 2 builds on Level 1 and takes you into jobs where mould has grown into the material: roughly 1 to 10 square metres of materials such as plasterboard and timber framing in Australian homes and small buildings.</p><p>The five modules follow a real job. Module 1 covers your duties under Australian WHS law and when to stop. Module 2 covers the inspection and the scope. Module 3 covers containment, negative air and respirators, plus site safety at 230 V. Module 4 covers removing material and drying the structure. Module 5 covers waste and verification, then the job file. Every lesson starts on a real Australian job, works a metric example and gives you a field tool to take to site. Each module ends with a check, and the course ends with a practical task.</p><p>This course does not carry IICRC Continuing Education Credits.</p>",
+   "shortDescription": "Contain, remove, clean, dry and verify a 1–10 m² mould job in an Australian home, with a field tool for every step.",
+   "thumbnailUrl": null,
+   "instructorId": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+   "status": "published",
+   "priceAud": "49",
+   "isFree": false,
+   "durationHours": 4,
+   "level": null,
+   "category": null,
+   "tags": [
+    "mould remediation",
+    "level 2",
+    "containment",
+    "negative air",
+    "australian whs"
+   ],
+   "iicrcDiscipline": null,
+   "cecHours": 0,
+   "meta": {
+    "standard": "v1",
+    "standardLevel": "L2-practitioner",
+    "rolePaths": [
+     "mould-and-indoor-air"
+    ],
+    "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782955324/carsi/course-trailers/f2f8ed36-d549-4f97-967d-20c5f20206fe.mp4",
+    "linearIssue": "GP-658",
+    "buildStage": "pilot-rebuild-pending-sme-review",
+    "rebuiltAt": "2026-10-20",
+    "rebuildNote": "Course Standard v1 pilot. Rebuilt from 24 single-lesson modules (live syllabus 20/10/2026) into 5 modules of 3–4 lessons plus a module check. Repeated general WHS modules merged into lesson 3.4.",
+    "australianProduced": true,
+    "standardsReferenced": "Nominative only (IICRC S520, AS/NZS 1715, AS/NZS 1716, AS/NZS 3760); no standard text reproduced or paraphrased.",
+    "cecStatus": "No IICRC CEC. Live cec_hours is null on 20/10/2026; seed records the explicit no-CEC value 0. Not in data/seed/cec-approvals.json.",
+    "humanReview": "REQUIRED before seeding: subject-matter expert review of every lesson, question, field tool and the practical task.",
+    "seedWarning": "Do NOT run db:seed-courses for this slug until the SME review and founder sign-off are recorded. Seeding replaces the live modules and lessons for this course and deletes learner lesson-progress rows for its current lessons.",
+    "quizFile": "data/seed/level-2-mould-remediation-30ee3492-quiz.json",
+    "practicalAssessment": "data/seed/level-2-mould-remediation-30ee3492-assessment.json",
+    "mediaBriefs": {
+     "l2-1-1": "Replace with a field photo pair: the face of a vanity wall, then the same wall with the sheet cut out, showing staining on the back of the board and the stud.",
+     "l2-1-2": "Keep this diagram. Add a 60-second talking-head clip of a supervisor walking through the five levels on a real job.",
+     "l2-1-3": "Add field photos of three common suspect materials: a flat fibre-cement wardrobe lining, eaves sheeting and vinyl sheet floor backing.",
+     "l2-2-1": "Film a 3-minute walk-through of this route on a real house, with the thermal camera and the meter shown at each stop.",
+     "l2-2-2": "Add a photo of a technician pressing a non-invasive meter against a numbered tape mark, with the display visible.",
+     "l2-2-3": "Add a screen recording of a completed scope in the job management software, scrolling section by section.",
+     "l2-3-1": "Film a time-lapse of a two-person crew building this containment, then a close-up of the zip door and airlock.",
+     "l2-3-2": "Film the 3-minute set-up: lay-flat ducting through a sealed window, then a smoke-pencil test at the door flap.",
+     "l2-3-3": "Reuse footage from CARSI's PPE course: a full donning and doffing sequence, filmed from the front.",
+     "l2-3-4": "Add a photo of a rating plate on a dehumidifier, with the 230 V and amps figures circled.",
+     "l2-4-1": "Add three field photos: a cut-out plasterboard section, a cleaned stud, and a cleaned tiled splashback.",
+     "l2-4-2": "Film a 2-minute close-up of HEPA vacuuming and an eight-face damp wipe on a stud, then the raking torch check.",
+     "l2-4-3": "Add a short clip of a supervisor reading a product label and SDS aloud and pointing out the dilution, contact time and PPE.",
+     "l2-4-4": "Add a photo of a dehumidifier pump hose running to a measuring bucket, and a screen shot of a logging hygrometer graph.",
+     "l2-5-1": "Film a 90-second close-up of a goose-neck seal and the double-bagging step in an airlock.",
+     "l2-5-2": "Interview clip: an independent indoor environmental professional explains in two minutes what they check and why.",
+     "l2-5-3": "Add a screen recording of a complete digital job file opened section by section."
+    }
+   },
+   "isPublished": true,
+   "modules": [
+    {
+     "id": "89adb87e-aaf3-464a-9508-f7378a60726d",
+     "title": "Module 1 — Before you start: the job, the law and the risk",
+     "orderIndex": 0,
+     "lessons": [
+      {
+       "id": "1faddf81-7a1d-4f77-91dc-ba31f809909b",
+       "title": "1.1 When mould is in the material, not on it",
+       "contentType": "text",
+       "contentBody": "<h2>On the job</h2><p>A rental unit in Glenorchy, Hobart. The tenant reports a musty smell in the bathroom and a dark patch where the vanity meets the wall. The property manager asks for \"a clean and a spray\". You pull the kickboard and see staining running up the back of the plasterboard. The shower recess on the other side of the wall has been leaking through a failed grout line for months.</p><h2>The idea</h2><p>Level 1 work deals with growth that sits on a surface you can clean: a window frame, a tiled wall, the face of a painted ceiling. Level 2 work starts when mould has grown into the material itself. Mould spreads thread-like structures (hyphae) into anything it can feed on. Paper-faced plasterboard, timber framing, particleboard cabinets, carpet underlay and insulation all give it food and somewhere to hold water. Once growth is inside, wiping the surface removes what you can see and leaves the colony behind.</p><p>This changes three decisions. First, scope: what you see is the front edge of the problem, so you open up and measure before you quote. Second, method: porous material that is colonised is removed, not treated in place. Third, control: removing material releases spores and fragments, so the work needs containment, negative air and respiratory protection before anything is cut.</p><p>In this course, Level 2 means roughly 1 to 10 m² of affected material in a home or small building, with the moisture source found and fixable. Bigger areas, a contaminated air-conditioning system, sewage, suspected asbestos or a vulnerable occupant who cannot leave are escalation triggers. You will see them again in Lesson 1.3.</p><p>The professional reference for this work is the IICRC S520 standard for professional mould remediation. CARSI cites it by name only. The way you apply it in Australia sits inside our WHS laws, which you will meet in Lesson 1.2. The habit to build now is simple: before you touch anything, ask how deep it has gone, how big it is, and who could be exposed.</p><h2>See it</h2><figure><img src=\"/courses/level-2-mould-remediation-30ee3492/diagrams/l2-1-1-surface-vs-colonised.svg\" alt=\"Cross-section of a plasterboard wall comparing surface growth with growth that has grown into the board and the timber stud behind it\" width=\"800\" loading=\"lazy\" /><figcaption>Surface growth (left) can be cleaned. Growth inside the board and on the stud (right) is Level 2 work.</figcaption></figure><h2>Do it in metric</h2><p>You open the wall and find staining on the back of the board from the floor to 0.9 m high, across 1.6 m of wall. Affected area = 1.6 m × 0.9 m = <strong>1.44 m²</strong>. The stud bay next to it reads wet to 1.2 m, so you allow for the next bay too: 2 bays × 0.45 m wide × 1.2 m high = <strong>1.08 m²</strong> of possible extra. Working total for the scope: 1.44 + 1.08 = <strong>2.52 m²</strong>. That sits inside the 1–10 m² Level 2 range, so you plan containment and negative air for a Level 2 job and note that the final area is confirmed after opening up.</p><h2>Field download: First look checklist (before you touch anything)</h2><p>Use this on site and file it with the job record.</p><ul><li>Where is the visible growth? Measure length × height in metres and record m².</li><li>What is the material: paper-faced plasterboard, timber, particleboard, carpet, insulation, tile, glass or metal?</li><li>Does staining continue behind skirting, kickboards or cabinets? Look before you quote.</li><li>Where is the water coming from, and is it still active?</li><li>How long has it been wet? Ask the occupant, and note what they say.</li><li>Who lives or works here? Note infants, older people, anyone with a lung condition or weakened immune system.</li><li>Is the building likely to contain asbestos (built or renovated before 1990) or lead paint (before 1970)?</li><li>Is the air-conditioning system in or near the affected area?</li><li>Photograph each item above with a scale (tape measure) in shot.</li></ul><p><a href=\"/courses/level-2-mould-remediation-30ee3492/field-tools/l2-1-1-first-look-checklist.md\">Download the first look checklist (before you touch anything)</a></p><h2>Check yourself</h2><p>The Module 1 check asks these three questions about this lesson. Answer them in your head now, then test your reasoning in the check. Each answer comes with an explanation.</p><ol><li>You find staining on the back of a plasterboard sheet behind a vanity. What does that tell you?</li><li>Roughly what affected area does this course treat as a Level 2 job?</li><li>Which material is most likely to be colonised right through when it stays wet?</li></ol><h2>Takeaway</h2><p>If it has grown into the material, it comes out under control. Measure it, find the water and note who is exposed before you quote. Next: your duties under Australian WHS law.</p>",
+       "orderIndex": 0,
+       "isPreview": true,
+       "resources": [
+        {
+         "label": "First look checklist (before you touch anything) (field download)",
+         "url": "/courses/level-2-mould-remediation-30ee3492/field-tools/l2-1-1-first-look-checklist.md",
+         "kind": "checklist"
+        },
+        {
+         "label": "Diagram: Surface growth (left) can be cleaned. Growth inside the board and on the stud (right) is Level 2 work.",
+         "url": "/courses/level-2-mould-remediation-30ee3492/diagrams/l2-1-1-surface-vs-colonised.svg",
+         "kind": "image"
+        }
+       ]
+      },
+      {
+       "id": "ac109b41-f93b-453f-bce7-9d23e3dffde6",
+       "title": "1.2 Your WHS duties on a mould job",
+       "contentType": "text",
+       "contentBody": "<h2>On the job</h2><p>A small restoration business in Newcastle, NSW, takes on a mould job in a childcare centre kitchen over a weekend. The owner asks the two technicians to \"just get it done\" before Monday. Nobody has written a safe work method, and the respirators in the van have not been fit tested.</p><h2>The idea</h2><p>Mould work in Australia sits under the model work health and safety laws: the WHS Act, the WHS Regulations and the codes of practice approved in each jurisdiction. Victoria runs its own OHS Act with similar duties. The business that runs the job is a person conducting a business or undertaking (PCBU). It must eliminate risks so far as is reasonably practicable and, where it cannot, minimise them using the hierarchy of controls.</p><p>For mould, the hierarchy looks like this. Elimination: fix the leak and remove the colonised material so the hazard is gone. Substitution: choose a quieter or less dusty method, such as cutting along lines with a hand saw rather than a dusty power tool where practical. Isolation and engineering: containment, negative air and HEPA vacuums. Administration: a safe work method statement, limited entry, signage, training and supervision. Personal protective equipment comes last, and it is still needed.</p><p>In March 2026 Safe Work Australia published the model Code of Practice: Managing the risks of biological hazards at work. It names mould in water-damaged buildings as a biological hazard and says a PCBU must give workers the information, training, instruction and supervision they need. A model code only becomes enforceable when a state or territory approves it. Reports indicate Tasmania and New South Wales did so in 2026. Check your own regulator's website before you rely on it, and treat its approach as good practice everywhere.</p><p>Workers have duties too: take reasonable care, follow reasonable instructions and use the PPE provided. If you are asked to start without the controls in place, you can and should raise it. A weekend deadline does not change the law.</p><h2>See it</h2><figure><img src=\"/courses/level-2-mould-remediation-30ee3492/diagrams/l2-1-2-hierarchy-of-controls.svg\" alt=\"Hierarchy of controls applied to a mould job, from elimination at the top to PPE at the bottom, with a mould example on each level\" width=\"800\" loading=\"lazy\" /><figcaption>The hierarchy of controls with a mould example on each level. Work from the top down.</figcaption></figure><h2>Do it in metric</h2><p>The kitchen wall has 3.0 m² of affected plasterboard. The centre has 40 children enrolled and the kitchen opens onto the main play room. You plan the job so that no child or staff member is within the work area or the 2.0 m clear zone outside the containment door during work. The containment, at 2.4 m long × 1.5 m deep × 2.4 m high, encloses <strong>8.64 m³</strong>. Your SWMS records the work area, the clear zone in metres, the times of work and who may enter. Numbers like these turn \"we will be careful\" into a plan someone can check.</p><h2>Field download: SWMS prompts for a Level 2 mould job</h2><p>Use this on site and file it with the job record.</p><ul><li>Job address, PCBU name, supervisor name and phone number.</li><li>Task steps in order: set up, contain, remove, clean, dry, verify, pack up.</li><li>Hazards for each step: spores and dust, sharp edges, manual handling, electrical, heat, chemicals, falls.</li><li>Controls for each hazard, written from the top of the hierarchy down.</li><li>Respiratory protection type and the date each wearer was last fit tested.</li><li>Who may enter the work area, and the clear zone in metres outside it.</li><li>Emergency plan: nearest exit, first aid kit, nearest hospital, how to call 000.</li><li>Sign-on: each worker signs to say they have read and understood the SWMS.</li></ul><p><a href=\"/courses/level-2-mould-remediation-30ee3492/field-tools/l2-1-2-swms-prompts.md\">Download the swms prompts for a level 2 mould job</a></p><h2>Check yourself</h2><p>The Module 1 check asks these three questions about this lesson. Answer them in your head now, then test your reasoning in the check. Each answer comes with an explanation.</p><ol><li>Under the WHS laws, who must eliminate or minimise the risks on a mould job?</li><li>Which control sits highest on the hierarchy of controls for a mould job?</li><li>The model biological-hazards code was published by Safe Work Australia. When is it enforceable?</li></ol><h2>Takeaway</h2><p>The PCBU must eliminate or minimise the risk, top of the hierarchy first. Write it down before you start. Next: health risks and when to stop.</p>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": [
+        {
+         "label": "SWMS prompts for a Level 2 mould job (field download)",
+         "url": "/courses/level-2-mould-remediation-30ee3492/field-tools/l2-1-2-swms-prompts.md",
+         "kind": "checklist"
+        },
+        {
+         "label": "Diagram: The hierarchy of controls with a mould example on each level. Work from the top down.",
+         "url": "/courses/level-2-mould-remediation-30ee3492/diagrams/l2-1-2-hierarchy-of-controls.svg",
+         "kind": "image"
+        }
+       ]
+      },
+      {
+       "id": "c76447fa-9c50-4ebf-ad9d-544093e7d267",
+       "title": "1.3 Health risks and when to stop",
+       "contentType": "text",
+       "contentBody": "<h2>On the job</h2><p>A family in Toowoomba, QLD, has mould in the main bedroom wardrobe after a roof leak. The mother tells you the youngest child has asthma and has been unwell. She also mentions the house was renovated \"in the 80s\" and the wardrobe lining looks like an old fibre sheet.</p><h2>The idea</h2><p>Mould exposure affects people differently. Common effects are irritation of the eyes, nose and throat, coughing and worsening asthma. People with lung conditions, weakened immune systems, infants and older people are more at risk. You are not a doctor and you do not diagnose. You say what you saw, recommend the occupant talk to their GP about health concerns, and plan the job so nobody is exposed to the work.</p><p>Some findings mean you stop and escalate before you start. Suspected asbestos is the big one. Homes built or renovated before 1990 may contain asbestos in wall and wardrobe linings, eaves and vinyl floor backing, and asbestos was not fully banned in Australia until 31 December 2003. Do not cut, drill or break a suspect sheet. Arrange for a licensed assessor or a competent person to sample it first.</p><p>Other stop-and-escalate triggers: lead paint in a pre-1970 home that you would need to sand or cut; water from a sewage source; growth in the air-conditioning system or its ducts; an affected area much larger than 10 m²; structural damage; and an occupant who is very unwell and cannot leave the home during works. Each one needs a different plan, a different competence or both.</p><p>Escalating is not failing. It protects the occupant, protects you and protects the business. The words you use matter. Calm and clear works best: what you found, why it changes the plan, and what happens next.</p><h2>See it</h2><figure><img src=\"/courses/level-2-mould-remediation-30ee3492/diagrams/l2-1-3-stop-escalate.svg\" alt=\"Decision flow: check for asbestos, lead, sewage, HVAC growth, area over 10 square metres and vulnerable occupants; any yes means stop and escalate\" width=\"800\" loading=\"lazy\" /><figcaption>Run the stop-and-escalate checks before any cutting. One \"yes\" changes the plan.</figcaption></figure><h2>Do it in metric</h2><p>The roof leak has wet the wardrobe back wall, 1.8 m wide × 2.1 m high = <strong>3.78 m²</strong>, and the ceiling above it, 1.8 m × 0.6 m = <strong>1.08 m²</strong>. Total 4.86 m². On area alone this is a Level 2 job. But the house was renovated in the 1980s and the lining is a flat fibre sheet, so the asbestos trigger applies. You stop, take no sample yourself, and record: \"Suspect material, 3.78 m² wardrobe lining, renovation date 1980s per owner. Work paused pending asbestos assessment.\"</p><h2>Field download: Stop-and-escalate card</h2><p>Use this on site and file it with the job record.</p><ul><li>Suspect asbestos (built or renovated before 1990)? Stop. Arrange sampling by a competent person.</li><li>Lead paint likely (before 1970) and you need to sand or cut it? Stop. Plan lead controls.</li><li>Water from a sewage source? Stop. Switch to the contaminated water procedure.</li><li>Growth in the air-conditioning unit or ducts? Stop. Isolate the system and escalate.</li><li>Affected area well over 10 m²? Stop. Re-scope as a large-loss job.</li><li>Structural damage (sagging ceiling, rotten bearers)? Stop. Call a builder or engineer.</li><li>Occupant very unwell or unable to leave? Stop. Talk to the client about relocation.</li><li>Record what you found, the time, and who you told.</li></ul><p><a href=\"/courses/level-2-mould-remediation-30ee3492/field-tools/l2-1-3-stop-escalate-card.md\">Download the stop-and-escalate card</a></p><h2>Check yourself</h2><p>The Module 1 check asks these three questions about this lesson. Answer them in your head now, then test your reasoning in the check. Each answer comes with an explanation.</p><ol><li>A wardrobe lining in a house renovated in the 1980s looks like flat fibre sheet. What do you do?</li><li>An occupant asks whether the mould caused her child's cough. What is the right response?</li><li>Which finding is an escalation trigger rather than normal Level 2 work?</li></ol><h2>Takeaway</h2><p>You refer health questions to a GP and you stop at any escalation trigger. Pausing a job is a professional decision. Next: Module 1 check, then the inspection.</p>",
+       "orderIndex": 2,
+       "isPreview": false,
+       "resources": [
+        {
+         "label": "Stop-and-escalate card (field download)",
+         "url": "/courses/level-2-mould-remediation-30ee3492/field-tools/l2-1-3-stop-escalate-card.md",
+         "kind": "checklist"
+        },
+        {
+         "label": "Diagram: Run the stop-and-escalate checks before any cutting. One \"yes\" changes the plan.",
+         "url": "/courses/level-2-mould-remediation-30ee3492/diagrams/l2-1-3-stop-escalate.svg",
+         "kind": "image"
+        }
+       ]
+      },
+      {
+       "id": "9365b724-0343-42a4-bfe0-aa411143a96b",
+       "title": "Module 1 check",
+       "contentType": "quiz",
+       "contentBody": "de882a83-fd90-4120-9c4b-9f0f95ca8379",
+       "orderIndex": 3,
+       "isPreview": false,
+       "resources": null
+      }
+     ]
+    },
+    {
+     "id": "663683ce-9828-4fc9-832d-fc54c1384317",
+     "title": "Module 2 — Inspecting and scoping",
+     "orderIndex": 1,
+     "lessons": [
+      {
+       "id": "b7806a40-bb11-4fb4-aa38-c98449ab707c",
+       "title": "2.1 The inspection route and finding the water",
+       "contentType": "text",
+       "contentBody": "<h2>On the job</h2><p>A brick-veneer house in Belconnen, ACT, in July. The owner sees black spots on the ceiling of the back bedroom and on the curtains. It has been a cold, wet winter, the room is used for drying washing, and nobody opens the window.</p><h2>The idea</h2><p>Mould is a moisture problem first. Remove the mould without finding and fixing the water and it will be back. Your inspection has one job: find every source of water, measure how far it has spread and decide what is wet now and what was wet before.</p><p>Use the same route on every house so nothing is missed. Start outside: gutters, downpipes, roof, flashing, ground levels against the walls and subfloor vents. Move to the roof void if it is safe to enter: look for daylight, staining on sarking and wet insulation. Then go room by room, wet areas first: bathroom, laundry, kitchen. Finish in the subfloor if there is one.</p><p>Use your tools in a fixed order. Eyes and nose first. A thermal camera shows temperature differences, not water, so treat a cold patch as a question, not an answer. Confirm every suspect area with a moisture meter, then record a dry reference reading on the same material in an unaffected room. Measure the air too: temperature and relative humidity in the room and outside.</p><p>Learn to read the pattern. A leak usually gives one wet area that spreads from a point and stays wet. Condensation gives spotting spread across cold surfaces such as the ceiling near external walls, behind furniture and around windows, often worst in winter in rooms with poor ventilation. Many homes have both. Getting this right decides who fixes the cause: a plumber, a roofer or a change in how the room is used.</p><h2>See it</h2><figure><img src=\"/courses/level-2-mould-remediation-30ee3492/diagrams/l2-2-1-inspection-route.svg\" alt=\"Inspection route: outside, roof void, wet areas, other rooms, subfloor, with the tool used at each stop\" width=\"800\" loading=\"lazy\" /><figcaption>One route, every house: outside, roof void, wet areas, other rooms, subfloor.</figcaption></figure><h2>Do it in metric</h2><p>In the bedroom you read 13 °C and 85% relative humidity. Outside reads 9 °C and 80%. The ceiling near the external wall reads 11 °C on a surface thermometer. Using a dew point chart or app, air at 13 °C and 85% RH has a dew point of about <strong>10.5 °C</strong>. The ceiling is 11 °C, only 0.5 °C warmer than the dew point, so condensation on that ceiling is likely on colder nights. That points to a ventilation and heating problem, not a roof leak. Your moisture meter confirms it: no wet patch in the ceiling lining, just surface moisture.</p><h2>Field download: Inspection route sheet</h2><p>Use this on site and file it with the job record.</p><ul><li>Outside: gutters, downpipes, roof, flashings, ground level against walls, subfloor vents. Note defects with photos.</li><li>Roof void (only if safe): daylight, sarking stains, wet insulation, bathroom exhaust ducting ending in the void.</li><li>Wet areas: shower recess grout and seals, vanity, toilet, laundry tub, kitchen sink and dishwasher.</li><li>Other rooms: ceilings near external walls, behind furniture, wardrobes, window reveals.</li><li>Subfloor (if present): standing water, damp soil, leaking pipes, blocked vents.</li><li>Air: room °C and %RH, outside °C and %RH, time of reading.</li><li>For every wet reading: material, meter used, mode, reading and a dry reference on the same material.</li><li>Your call: leak, condensation or both, and who should fix the cause.</li></ul><p><a href=\"/courses/level-2-mould-remediation-30ee3492/field-tools/l2-2-1-inspection-sheet.md\">Download the inspection route sheet</a></p><h2>Check yourself</h2><p>The Module 2 check asks these three questions about this lesson. Answer them in your head now, then test your reasoning in the check. Each answer comes with an explanation.</p><ol><li>A thermal camera shows a cold patch on a ceiling. What should you do next?</li><li>Spotting is spread across cold ceilings near external walls in winter. What is the likely cause?</li><li>Room air is 13 °C and 85% RH. A ceiling reads 11 °C. What does that suggest?</li></ol><h2>Takeaway</h2><p>Find the water before you plan the removal. Confirm thermal images with a meter and record a dry reference. Next: readings, dry references and the drying goal.</p>",
+       "orderIndex": 0,
+       "isPreview": false,
+       "resources": [
+        {
+         "label": "Inspection route sheet (field download)",
+         "url": "/courses/level-2-mould-remediation-30ee3492/field-tools/l2-2-1-inspection-sheet.md",
+         "kind": "checklist"
+        },
+        {
+         "label": "Diagram: One route, every house: outside, roof void, wet areas, other rooms, subfloor.",
+         "url": "/courses/level-2-mould-remediation-30ee3492/diagrams/l2-2-1-inspection-route.svg",
+         "kind": "image"
+        }
+       ]
+      },
+      {
+       "id": "f0484b9e-f95f-4ea3-9bce-c23f5ff4b903",
+       "title": "2.2 Moisture readings, dry references and the drying goal",
+       "contentType": "text",
+       "contentBody": "<h2>On the job</h2><p>A laundry in Mandurah, WA, after a washing machine hose failed behind the cabinet. The plasterboard and the timber bottom plate behind it are wet. The insurer's assessor asks you, \"How will you know when it is dry?\"</p><h2>The idea</h2><p>Moisture meters give numbers, but those numbers only mean something when you compare them with something. A pin meter reads electrical resistance between two pins and is calibrated for timber. A non-invasive meter reads a few centimetres into the material and gives a relative scale. Neither gives you a true moisture content for plasterboard. Both tell you clearly whether one spot is wetter than another.</p><p>That is why you take a dry reference. Find the same material, in a part of the building that was not affected, and read it with the same meter in the same mode. That reading is your drying goal for that material. The wet area is dry when it reads within the range you set against that reference, and stays there over consecutive visits.</p><p>Record readings on a moisture map: a sketch of the room with numbered points, each reading against its point, and the date and time. Read the same points each visit. Photograph the meter display in place. A moisture map is evidence. It shows what was wet, what you removed, what you dried and when it reached the goal.</p><p>Measure the air as well. Temperature and relative humidity give you the dew point and the amount of water vapour in each kilogram of dry air, written as grams per kilogram (g/kg). If the g/kg inside the drying area is falling over time and is lower than in the rest of the house, your dehumidifier is removing water. If it is not falling, something is wrong: a door left open, a fresh leak or not enough equipment.</p><h2>See it</h2><figure><img src=\"/courses/level-2-mould-remediation-30ee3492/diagrams/l2-2-2-moisture-map.svg\" alt=\"Moisture map of a laundry wall with six numbered reading points, a dry reference point and readings for three visits\" width=\"800\" loading=\"lazy\" /><figcaption>A moisture map: numbered points, a dry reference, and the same points read every visit.</figcaption></figure><h2>Do it in metric</h2><p>Day 1, inside the laundry: 22 °C and 65% RH. Water vapour pressure is 0.65 × 2.64 kPa = 1.72 kPa, which gives a humidity ratio of about <strong>10.7 g/kg</strong> and a dew point of about <strong>15.1 °C</strong>. The hallway reads 21 °C and 55% RH, about 8.5 g/kg. Day 3, laundry: 23 °C and 40% RH, about <strong>7.0 g/kg</strong>. The laundry air is now drier than the hallway, so your dehumidifier is doing its job. The dry reference on undamaged plasterboard reads 12 on the meter's relative scale. Point 3 read 98 on Day 1 and 14 on Day 3. You set the goal at the reference plus 5, which is 17, so point 3 now meets the goal. Read it again on Day 4 to confirm it holds.</p><h2>Field download: Moisture log template</h2><p>Use this on site and file it with the job record.</p><ul><li>Job, room and wall. Sketch with numbered reading points and north arrow.</li><li>Meter make, model and mode (pin, timber scale, non-invasive, relative scale).</li><li>Dry reference: material, location, reading. Drying goal for each material.</li><li>Visit table: date, time, room °C, room %RH, room g/kg, outside °C, outside %RH.</li><li>Reading table: point number, material, reading on each visit, goal met yes or no.</li><li>Equipment in place on each visit: dehumidifiers, air movers, air scrubbers, with their numbers.</li><li>Photos: meter display at each point, with the point number visible.</li><li>Signed by the technician on each visit.</li></ul><p><a href=\"/courses/level-2-mould-remediation-30ee3492/field-tools/l2-2-2-moisture-log.md\">Download the moisture log template</a></p><h2>Check yourself</h2><p>The Module 2 check asks these three questions about this lesson. Answer them in your head now, then test your reasoning in the check. Each answer comes with an explanation.</p><ol><li>What is a dry reference reading?</li><li>Inside the drying area the g/kg is falling and is lower than the rest of the house. What does that show?</li><li>Why read the same numbered points on every visit?</li></ol><h2>Takeaway</h2><p>A reading means something only against a dry reference. Map the points, read the same points every visit, and track g/kg. Next: turning the findings into a scope.</p>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": [
+        {
+         "label": "Moisture log template (field download)",
+         "url": "/courses/level-2-mould-remediation-30ee3492/field-tools/l2-2-2-moisture-log.md",
+         "kind": "checklist"
+        },
+        {
+         "label": "Diagram: A moisture map: numbered points, a dry reference, and the same points read every visit.",
+         "url": "/courses/level-2-mould-remediation-30ee3492/diagrams/l2-2-2-moisture-map.svg",
+         "kind": "image"
+        }
+       ]
+      },
+      {
+       "id": "1bbf8ade-6236-4027-b033-174b83c8bd4c",
+       "title": "2.3 Writing the scope and work plan",
+       "contentType": "text",
+       "contentBody": "<h2>On the job</h2><p>An ensuite in Geelong, VIC. Growth behind the vanity and on the lower 600 mm of the wall next to the shower. The plumber has fixed the leak. The insurer wants your scope and quote by tomorrow, and the owner wants to know how long they will be out of the room.</p><h2>The idea</h2><p>The scope is the contract between what you found and what you will do. It must be specific enough that another technician could do the job from it, and that an assessor can check it against your photos and moisture map.</p><p>Build it in the order the work happens. Area: each wall or surface, its material and its size in m². Containment: type, size and where the entry is. Air: the air scrubber, its rated airflow and where it exhausts. Removal: what comes out, cut lines, and what happens to fixtures such as the vanity. Cleaning: what stays and how it is cleaned. Drying: the drying goal and the equipment. Verification: who checks the work and how. Waste: bag count and disposal. Reinstatement is usually a separate scope for a builder.</p><p>Write down your assumptions. If you have not opened the wall, say the area is estimated and will be confirmed after opening up. If you will need a second visit to read moisture, include it. Say what is excluded, such as the shower recess itself or a vanity that may not survive removal.</p><p>Then talk it through with the client. Keep to plain language: what you found, why material has to come out, how long each stage takes, and what the room will look like when you leave. Write their questions and your answers in the job notes.</p><h2>See it</h2><figure><img src=\"/courses/level-2-mould-remediation-30ee3492/diagrams/l2-2-3-scope-sequence.svg\" alt=\"Scope built in work order: area, containment, air, removal, cleaning, drying, verification, waste\" width=\"800\" loading=\"lazy\" /><figcaption>Write the scope in the order the work happens.</figcaption></figure><h2>Do it in metric</h2><p>Wall A (behind vanity): 1.5 m wide × 0.6 m high = 0.90 m² of plasterboard to remove, cut at 0.9 m to allow a clean margin above the stain = <strong>1.35 m²</strong>. Wall B (next to shower): 1.2 m × 0.6 m, cut at 0.9 m = <strong>1.08 m²</strong>. Total removal 2.43 m². Plasterboard at 10 mm weighs about 7 kg per m², so expect about <strong>17 kg</strong> of board plus the vanity. Containment: 2.0 m × 1.8 m × 2.4 m = 8.64 m³. Time: half a day to set up and remove, one day cleaning and HEPA, two to three days drying, then verification.</p><h2>Field download: Level 2 scope template</h2><p>Use this on site and file it with the job record.</p><ul><li>Areas: surface, material, length × height, m² (measured or estimated).</li><li>Containment: type, dimensions in metres, volume in m³, entry and airlock.</li><li>Air: air scrubber model, rated airflow in m³/h, exhaust point, target air changes per hour.</li><li>Removal: materials, cut lines in mm or m, fixtures removed or protected.</li><li>Cleaning: surfaces that stay, method (HEPA then damp wipe), any product with its SDS.</li><li>Drying: goal per material, dehumidifiers and air movers, expected days.</li><li>Verification: who verifies, what is checked, how the result is recorded.</li><li>Waste: bag count, weight estimate in kg, disposal point.</li><li>Assumptions and exclusions, written plainly.</li><li>Client sign-off: name, date, questions asked and answers given.</li></ul><p><a href=\"/courses/level-2-mould-remediation-30ee3492/field-tools/l2-2-3-scope-template.md\">Download the level 2 scope template</a></p><h2>Check yourself</h2><p>The Module 2 check asks these three questions about this lesson. Answer them in your head now, then test your reasoning in the check. Each answer comes with an explanation.</p><ol><li>You have not opened the wall yet. How should the scope describe the affected area?</li><li>In what order should a Level 2 scope be written?</li><li>Plasterboard at 10 mm weighs about 7 kg per m². Roughly how much does 2.43 m² weigh?</li></ol><h2>Takeaway</h2><p>A good scope lists area, containment, air, removal, cleaning, drying, verification and waste, in that order, in metric. Next: Module 2 check, then containment.</p>",
+       "orderIndex": 2,
+       "isPreview": false,
+       "resources": [
+        {
+         "label": "Level 2 scope template (field download)",
+         "url": "/courses/level-2-mould-remediation-30ee3492/field-tools/l2-2-3-scope-template.md",
+         "kind": "checklist"
+        },
+        {
+         "label": "Diagram: Write the scope in the order the work happens.",
+         "url": "/courses/level-2-mould-remediation-30ee3492/diagrams/l2-2-3-scope-sequence.svg",
+         "kind": "image"
+        }
+       ]
+      },
+      {
+       "id": "3a59051a-92f2-49b0-8e99-eefa68774eae",
+       "title": "Module 2 check",
+       "contentType": "quiz",
+       "contentBody": "5597a15c-eb94-4237-a0e6-4bfff52cd6b7",
+       "orderIndex": 3,
+       "isPreview": false,
+       "resources": null
+      }
+     ]
+    },
+    {
+     "id": "d76beca7-fdbf-42b5-b409-42bc70ff5294",
+     "title": "Module 3 — Contain and protect",
+     "orderIndex": 2,
+     "lessons": [
+      {
+       "id": "517a53be-9277-4d27-ac61-2009fed839e2",
+       "title": "3.1 Choosing and building containment",
+       "contentType": "text",
+       "contentBody": "<h2>On the job</h2><p>A single-storey weatherboard home in Lismore, NSW, three weeks after minor flooding through the back laundry. Growth covers the lower 1 m of two laundry walls. The laundry door opens onto the kitchen, where the family is still cooking every night.</p><h2>The idea</h2><p>Containment keeps what you disturb inside the work area. At Level 2 you will mostly use two kinds. Source containment covers a small area directly, for example a sheet of film taped over a patch of wall with a HEPA vacuum nozzle pulling from inside it, and suits small, low-disturbance tasks. Full containment encloses the whole work area with a frame, film walls and a ceiling if needed, an entry flap or zip door and, for most Level 2 removal, an airlock where workers remove outer PPE before leaving.</p><p>Choose by asking three questions. How much material will be disturbed? How close are occupied spaces and how sensitive are the people in them? Can the room itself be the containment, with its doors and vents sealed? A laundry with one door is often easiest to contain as a whole room.</p><p>Build it in order. Turn off and seal the air-conditioning in the area. Seal supply and return vents, gaps under doors and penetrations with film and tape. Erect the frame and walls using heavy-duty polyethylene film (0.2 mm builder's film is common), taped at every edge. Fit the entry, then the airlock. Lay protective film on floors outside the work area along the path to the exit.</p><p>A containment you cannot check is a hope. Watch the walls: under negative air they draw gently inwards. Check every seam and corner at the start of each shift and after anyone enters or leaves.</p><h2>See it</h2><figure><img src=\"/courses/level-2-mould-remediation-30ee3492/diagrams/l2-3-1-containment-plan.svg\" alt=\"Floor plan of a laundry used as full containment, with sealed vents, an airlock at the kitchen door, an air scrubber exhausting through a window and the clean path marked\" width=\"800\" loading=\"lazy\" /><figcaption>The laundry as containment: seal, airlock at the door, exhaust outside, clean path beyond.</figcaption></figure><h2>Do it in metric</h2><p>The laundry is 2.6 m × 1.9 m with a 2.4 m ceiling. Room volume = 2.6 × 1.9 × 2.4 = <strong>11.86 m³</strong>. The airlock outside the door is 1.2 m × 1.0 m × 2.1 m = <strong>2.52 m³</strong>. Film needed for the airlock: two side walls of 1.0 m × 2.1 m, one end of 1.2 m × 2.1 m and a ceiling of 1.2 m × 1.0 m = 2.1 + 2.1 + 2.52 + 1.2 = <strong>7.92 m²</strong>. Add 30% for overlaps and taping: about 10.3 m². Floor protection along the 6 m path to the back door at 1.0 m wide: 6 m².</p><h2>Field download: Containment set-up and daily check</h2><p>Use this on site and file it with the job record.</p><ul><li>Air-conditioning in the area turned off and isolated. Supply and return vents sealed.</li><li>Gaps under doors, around pipes and power points sealed with film and tape.</li><li>Frame stable, film walls taped at floor, walls and ceiling with no gaps.</li><li>Entry flap or zip door working. Airlock built where workers remove outer PPE.</li><li>Floor protection laid along the clean path to the exit.</li><li>Signage at the entry: authorised entry only, respiratory protection required.</li><li>Start of each shift: walls draw inwards, all seams intact, airlock clean.</li><li>Record each check with the time and your initials.</li></ul><p><a href=\"/courses/level-2-mould-remediation-30ee3492/field-tools/l2-3-1-containment-checklist.md\">Download the containment set-up and daily check</a></p><h2>Check yourself</h2><p>The Module 3 check asks these three questions about this lesson. Answer them in your head now, then test your reasoning in the check. Each answer comes with an explanation.</p><ol><li>Before building containment, what should you do with the air-conditioning in the area?</li><li>Under negative air, how should the film walls of a good containment behave?</li><li>What is the airlock used for on a Level 2 job?</li></ol><h2>Takeaway</h2><p>Pick the containment for the area, the occupants and the room. Seal the air-conditioning first and check the seams every shift. Next: negative air and how many air scrubbers you need.</p>",
+       "orderIndex": 0,
+       "isPreview": false,
+       "resources": [
+        {
+         "label": "Containment set-up and daily check (field download)",
+         "url": "/courses/level-2-mould-remediation-30ee3492/field-tools/l2-3-1-containment-checklist.md",
+         "kind": "checklist"
+        },
+        {
+         "label": "Diagram: The laundry as containment: seal, airlock at the door, exhaust outside, clean path beyond.",
+         "url": "/courses/level-2-mould-remediation-30ee3492/diagrams/l2-3-1-containment-plan.svg",
+         "kind": "image"
+        }
+       ]
+      },
+      {
+       "id": "07226428-dbe2-4140-abae-6118774cc738",
+       "title": "3.2 Negative air: how many air scrubbers?",
+       "contentType": "text",
+       "contentBody": "<h2>On the job</h2><p>A 3.0 m × 2.4 m bedroom in Cairns, QLD, with growth behind the built-in robe. Ceiling height 2.4 m. The client's toddler sleeps in the next room. You have one air scrubber in the van with a plate rating of 500 m³/h.</p><h2>The idea</h2><p>An air scrubber pulls air through a HEPA filter. Inside a containment it does two jobs. It cleans the air in the work area, and when you duct its outlet outside the containment it pulls more air out than leaks in, so the work area sits at a slightly lower pressure than the rest of the house. Air then leaks into the work area through gaps, not out of it. That is negative air.</p><p>Where to exhaust matters. The best place is outside the building through a window, with the window sealed around the lay-flat ducting. If you must exhaust inside, exhaust to an unoccupied area well away from people, and only through a HEPA filter you have checked.</p><p>Plate ratings are measured with a clean filter and no ducting. A loaded filter, a long duct and bends all cut real airflow, sometimes by half. Plan on the real airflow, not the plate. The air-change target is set in your company procedure and the job plan. CARSI teaches the method; the number comes from your plan.</p><p>Prove it works. A smoke pencil puffed at the entry flap should draw smoke into the work area. If you have a manometer, record the pressure difference between the work area and the next room in pascals at the start of each shift. If the smoke drifts out, check in this order: a gap in the film, the exhaust duct kinked or disconnected, a loaded pre-filter, and a door opened somewhere else in the house.</p><h2>See it</h2><figure><img src=\"/courses/level-2-mould-remediation-30ee3492/diagrams/l2-3-2-negative-air.svg\" alt=\"Containment with an air scrubber inside, ducted out of a window; arrows show air leaking into the containment at the door\" width=\"800\" loading=\"lazy\" /><figcaption>Negative air: the scrubber exhausts outside, so leaks flow into the work area.</figcaption></figure><h2>Do it in metric</h2><p>Room volume = 3.0 × 2.4 × 2.4 = <strong>17.28 m³</strong>. Suppose your plan sets 6 air changes per hour. Air needed = 17.28 × 6 = <strong>104 m³/h</strong>. Your scrubber is rated 500 m³/h. Allow half for a loaded filter and ducting: 500 × 0.5 = <strong>250 m³/h</strong> real airflow. 250 ÷ 104 = 2.4, so one scrubber covers the room with margin. The step to remember: <strong>volume × air changes ÷ real airflow</strong> = number of scrubbers, rounded up.</p><h2>Field download: Negative air set-up card</h2><p>Use this on site and file it with the job record.</p><ul><li>Containment volume: length × width × height = ______ m³.</li><li>Air changes per hour from the plan: ______. Air needed = volume × changes = ______ m³/h.</li><li>Scrubber plate rating ______ m³/h × 0.5 = real airflow ______ m³/h.</li><li>Scrubbers needed = air needed ÷ real airflow, rounded up: ______.</li><li>Exhaust point: outside through a sealed window, or HEPA-filtered to an unoccupied area.</li><li>Pre-filter and HEPA filter checked, seated and sealed. Filter change log started.</li><li>Smoke-pencil test at the entry: smoke drawn in? Yes / No. Time:</li><li>Manometer reading (if used): ______ Pa. Time:</li></ul><p><a href=\"/courses/level-2-mould-remediation-30ee3492/field-tools/l2-3-2-negative-air-card.md\">Download the negative air set-up card</a></p><h2>Check yourself</h2><p>The Module 3 check asks these three questions about this lesson. Answer them in your head now, then test your reasoning in the check. Each answer comes with an explanation.</p><ol><li>A containment is 17.28 m³ and the plan sets 6 air changes per hour. How much air is needed?</li><li>Why plan on less airflow than the number on the scrubber plate?</li><li>Smoke from a smoke pencil drifts out of the containment at the door flap. What do you check first?</li></ol><h2>Takeaway</h2><p>Volume × air changes ÷ real airflow, then prove it with smoke. Next: respiratory protection and PPE.</p>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": [
+        {
+         "label": "Negative air set-up card (field download)",
+         "url": "/courses/level-2-mould-remediation-30ee3492/field-tools/l2-3-2-negative-air-card.md",
+         "kind": "checklist"
+        },
+        {
+         "label": "Diagram: Negative air: the scrubber exhausts outside, so leaks flow into the work area.",
+         "url": "/courses/level-2-mould-remediation-30ee3492/diagrams/l2-3-2-negative-air.svg",
+         "kind": "image"
+        }
+       ]
+      },
+      {
+       "id": "017cc3c5-ea43-4e76-97d9-f59f0fab5bbb",
+       "title": "3.3 Respirators and PPE",
+       "contentType": "text",
+       "contentBody": "<h2>On the job</h2><p>A Level 2 job in a Ballarat, VIC, rental. The new technician arrives with a beard and a box of disposable dust masks from the hardware store. The removal starts at 8 am.</p><h2>The idea</h2><p>PPE is the last line of the hierarchy, and on a Level 2 job it is still essential. Respiratory protection matters most, because removing colonised material releases spores and fragments into the air.</p><p>In Australia, respirators are made to AS/NZS 1716 and selected, used and maintained under AS/NZS 1715. For most Level 2 removal, the minimum is a tight-fitting respirator with a P2 filter: a P2 disposable or a half-face respirator with P2 cartridges. Heavier contamination, a long shift or the need to protect the eyes may call for a full-face respirator with P3 filters, or a powered air-purifying respirator. Your SWMS and company procedure set the level for each job.</p><p>A tight-fitting respirator only works if it seals to the face. That means a fit test for each wearer with that exact respirator model and size, and a fit check each time it is put on. Facial hair under the seal stops it sealing, so a wearer with a beard needs a clean shave or a loose-fitting powered respirator. Keep the fit test records.</p><p>The rest of the kit: disposable coveralls with a hood, nitrile gloves, eye protection if not using a full-face respirator, and disposable overshoes or washable boots. Put on (don) in a clean area. Take off (doff) in the airlock in an order that keeps the outside of the PPE away from your face and skin: outer gloves, coveralls rolled inside out, overshoes, then leave the airlock, then remove the respirator, then inner gloves, then wash hands.</p><h2>See it</h2><figure><img src=\"/courses/level-2-mould-remediation-30ee3492/diagrams/l2-3-3-donning-doffing.svg\" alt=\"Donning order in the clean area and doffing order in the airlock, step by step\" width=\"800\" loading=\"lazy\" /><figcaption>Don in the clean area. Doff in the airlock, respirator last, then wash.</figcaption></figure><h2>Do it in metric</h2><p>The job runs for 2 days with 2 technicians. Each person goes through the airlock about 4 times a day (start, morning break, lunch, finish). Disposable coveralls: 2 people × 4 exits × 2 days = <strong>16 coveralls</strong>, plus 4 spare = 20. Nitrile gloves, two pairs per entry: 2 × 4 × 2 × 2 = <strong>32 pairs</strong>. P2 cartridges: change per the manufacturer and whenever breathing becomes harder; plan for at least one pair per person per day = <strong>4 pairs</strong>. Used PPE is waste too: at about 0.2 kg per set of coveralls, gloves and overshoes, 20 sets is about <strong>4 kg</strong>, which fits in one waste bag kept under 10 kg. Pack these quantities before you leave the depot.</p><h2>Field download: PPE and respirator checklist</h2><p>Use this on site and file it with the job record.</p><ul><li>Respirator type set in the SWMS for this job: P2 disposable, half-face P2, full-face P3 or powered.</li><li>Each wearer fit tested on this exact respirator model and size. Date of test recorded.</li><li>Clean-shaven where the respirator seals, or a loose-fitting powered respirator issued.</li><li>Fit check done each time the respirator is put on.</li><li>Coveralls with hood, nitrile gloves, eye protection, overshoes: quantities packed.</li><li>Don in the clean area. Doff in the airlock, outer layers first, respirator last.</li><li>Wash hands and face after doffing. Used PPE bagged as mould waste.</li><li>Cartridges changed per the manufacturer and when breathing becomes harder.</li></ul><p><a href=\"/courses/level-2-mould-remediation-30ee3492/field-tools/l2-3-3-ppe-checklist.md\">Download the ppe and respirator checklist</a></p><h2>Check yourself</h2><p>The Module 3 check asks these three questions about this lesson. Answer them in your head now, then test your reasoning in the check. Each answer comes with an explanation.</p><ol><li>What is the minimum respiratory protection for most Level 2 removal?</li><li>A technician has a beard and is issued a tight-fitting half-face respirator. What is the problem?</li><li>When leaving the work area, which item of PPE comes off last, after leaving the airlock?</li></ol><h2>Takeaway</h2><p>P2 is the floor, the fit test makes it work, and the respirator comes off last. Next: the rest of site safety.</p>",
+       "orderIndex": 2,
+       "isPreview": false,
+       "resources": [
+        {
+         "label": "PPE and respirator checklist (field download)",
+         "url": "/courses/level-2-mould-remediation-30ee3492/field-tools/l2-3-3-ppe-checklist.md",
+         "kind": "checklist"
+        },
+        {
+         "label": "Diagram: Don in the clean area. Doff in the airlock, respirator last, then wash.",
+         "url": "/courses/level-2-mould-remediation-30ee3492/diagrams/l2-3-3-donning-doffing.svg",
+         "kind": "image"
+        }
+       ]
+      },
+      {
+       "id": "afc43d4d-bde8-4111-8909-50e964446d82",
+       "title": "3.4 Site safety on a mould job",
+       "contentType": "text",
+       "contentBody": "<h2>On the job</h2><p>A mould job in a Darwin unit in November. The containment is inside a bedroom with the air-conditioning sealed off. By midday the room reads 34 °C. The technician has three machines running off one power board, and the cleaning product in the van has no label.</p><h2>The idea</h2><p>Mould jobs share the hazards of every restoration site, and earlier versions of this course spread them across many separate modules. Here they are in one place. CARSI's Work Health and Safety Fundamentals course covers them in more depth.</p><p>Power. Australian mains is 230 V at 50 Hz, and most homes have 10 A general power outlets. Plug machines into outlets protected by an RCD (safety switch), or use a portable RCD. Leads and machines must be tested and tagged under AS/NZS 3760. Keep leads off wet floors and out of walkways. Add up the current each machine draws from its rating plate and keep each circuit under its rating.</p><p>Heat. Containment traps heat, and full PPE stops sweat cooling you. Plan work and rest breaks, schedule removal for the coolest part of the day, have cool water on site and watch each other. Headache, dizziness, nausea and confusion are warning signs. Stop work, cool the person and call 000 if symptoms are severe.</p><p>Chemicals. Use only products with a label and a current safety data sheet (SDS). Read the SDS before use for PPE, ventilation, first aid and storage. Never mix products. Keep the Poisons Information Centre number, 13 11 26, with the SDS folder.</p><p>Emergencies. Know the exit, the first aid kit and the nearest hospital. Under the WHS laws, a death, a serious injury or illness, or a dangerous incident is notifiable: tell the regulator immediately and keep the site undisturbed, except to help someone or make it safe, until the regulator says otherwise.</p><h2>See it</h2><figure><img src=\"/courses/level-2-mould-remediation-30ee3492/diagrams/l2-3-4-power-load.svg\" alt=\"Two 10 A circuits with machines shared between them so that each circuit stays below 10 amps\" width=\"800\" loading=\"lazy\" /><figcaption>Spread the load: add up the amps on each circuit and keep it under the rating.</figcaption></figure><h2>Do it in metric</h2><p>Rating plates: air scrubber 2.5 A, dehumidifier 4.5 A, two air movers at 1.2 A each. All on one 10 A circuit = 2.5 + 4.5 + 1.2 + 1.2 = <strong>9.4 A</strong>. That is too close to 10 A once motors start, so split it. Circuit 1: scrubber + dehumidifier = <strong>7.0 A</strong>. Circuit 2: two air movers = <strong>2.4 A</strong>. Check which outlets share a circuit at the switchboard before you plug in. At 230 V, 9.4 A is about 2.2 kW (230 × 9.4 = 2,162 W).</p><h2>Field download: Daily site safety check</h2><p>Use this on site and file it with the job record.</p><ul><li>Every outlet used is RCD protected, or a portable RCD is fitted.</li><li>All leads and machines tested and tagged; tags in date.</li><li>Amps per circuit added up from rating plates and below the circuit rating.</li><li>Leads off wet floors and out of walkways.</li><li>Work and rest schedule set for the day's temperature; cool water on site.</li><li>Every chemical labelled, with a current SDS on site. 13 11 26 written on the SDS folder.</li><li>Exit, first aid kit and nearest hospital known to every worker.</li><li>Notifiable incident procedure known: notify the regulator, preserve the site.</li></ul><p><a href=\"/courses/level-2-mould-remediation-30ee3492/field-tools/l2-3-4-site-safety-check.md\">Download the daily site safety check</a></p><h2>Check yourself</h2><p>The Module 3 check asks these three questions about this lesson. Answer them in your head now, then test your reasoning in the check. Each answer comes with an explanation.</p><ol><li>An air scrubber draws 2.5 A, a dehumidifier 4.5 A and two air movers 1.2 A each. What is the total?</li><li>A worker in containment on a hot day becomes dizzy and confused. What do you do?</li><li>A worker is seriously injured on a mould job. Under the WHS laws, what must happen?</li></ol><h2>Takeaway</h2><p>RCD, test and tag, amps under the rating, rest in the heat, an SDS for every product, and know what is notifiable. Next: Module 3 check, then removal.</p>",
+       "orderIndex": 3,
+       "isPreview": false,
+       "resources": [
+        {
+         "label": "Daily site safety check (field download)",
+         "url": "/courses/level-2-mould-remediation-30ee3492/field-tools/l2-3-4-site-safety-check.md",
+         "kind": "checklist"
+        },
+        {
+         "label": "Diagram: Spread the load: add up the amps on each circuit and keep it under the rating.",
+         "url": "/courses/level-2-mould-remediation-30ee3492/diagrams/l2-3-4-power-load.svg",
+         "kind": "image"
+        }
+       ]
+      },
+      {
+       "id": "b587c240-26c4-4c4e-b644-2522772c53fb",
+       "title": "Module 3 check",
+       "contentType": "quiz",
+       "contentBody": "434d4042-3841-4ffc-9399-b1bcb26e9a1f",
+       "orderIndex": 4,
+       "isPreview": false,
+       "resources": null
+      }
+     ]
+    },
+    {
+     "id": "867d7543-cd74-42df-b974-a9edc48b2bf4",
+     "title": "Module 4 — Removing material and drying the structure",
+     "orderIndex": 3,
+     "lessons": [
+      {
+       "id": "b388943e-4b5d-423c-863d-ed08fad2524c",
+       "title": "4.1 Remove or clean? Deciding by material",
+       "contentType": "text",
+       "contentBody": "<h2>On the job</h2><p>A kitchen in Penrith, NSW, after a slow dishwasher leak. Under the bench you find growth on the particleboard cabinet base, the back of the plasterboard wall, the timber studs and the tiled splashback above.</p><h2>The idea</h2><p>The decision depends on the material, not on how bad the growth looks. Porous materials hold water and let mould grow right through them. Paper-faced plasterboard, ceiling tiles, insulation, carpet and underlay, and particleboard or MDF that has swelled are removed when they are colonised. Cleaning them leaves growth inside.</p><p>Semi-porous materials such as structural timber framing are usually kept. Mould on framing is mostly on and near the surface. Remove it by HEPA vacuuming, then mechanical cleaning such as wire brushing or sanding with a HEPA-shrouded sander, then damp wiping. Timber that is soft, rotten or structurally damaged is a builder's call.</p><p>Non-porous materials such as tiles, glass, metal and sealed benchtops are cleaned and kept. Silicone and grout that have growth inside them are cut out and replaced.</p><p>Cut cleanly. Score the plasterboard along your cut lines, cut slowly with a hand saw or a shrouded tool, and lower pieces straight into a bag inside the containment. Cut back to sound, dry material and confirm with your moisture meter and your eyes. Your scope sets the margin. Do not break boards over your knee or drop them on the floor, because every impact releases spores.</p><h2>See it</h2><figure><img src=\"/courses/level-2-mould-remediation-30ee3492/diagrams/l2-4-1-remove-or-clean.svg\" alt=\"Three columns: porous materials removed, semi-porous framing cleaned, non-porous surfaces cleaned, with examples in each\" width=\"800\" loading=\"lazy\" /><figcaption>Decide by material: porous out, framing cleaned, non-porous cleaned.</figcaption></figure><h2>Do it in metric</h2><p>The cabinet back wall is 2.4 m long. Growth on the back of the board reaches 0.7 m high. You cut at 1.0 m to reach dry board confirmed by the meter. Plasterboard to remove = 2.4 × 1.0 = <strong>2.4 m²</strong>. Standard sheets are 1.2 m × 2.4 m (2.88 m²), so the patch is just under one sheet for reinstatement. The particleboard cabinet base, 2.4 m × 0.6 m = <strong>1.44 m²</strong>, is swollen and colonised: remove. Studs: 5 studs at 600 mm centres, each cleaned on 3 faces over 1.0 m.</p><h2>Field download: Remove-or-clean decision card</h2><p>Use this on site and file it with the job record.</p><ul><li>Paper-faced plasterboard with growth on either face: remove.</li><li>Insulation, carpet, underlay, ceiling tiles that are wet or colonised: remove.</li><li>Particleboard or MDF that is swollen or colonised: remove.</li><li>Structural timber framing: HEPA vacuum, wire brush or HEPA-shrouded sand, damp wipe. Soft or rotten: refer to a builder.</li><li>Tiles, glass, metal, sealed benchtops: HEPA vacuum and damp wipe, keep.</li><li>Silicone and grout with growth inside: cut out and replace.</li><li>Cut lines: back to sound, dry material, confirmed by meter. Record in metres.</li><li>Bag each piece inside the containment as it comes out.</li></ul><p><a href=\"/courses/level-2-mould-remediation-30ee3492/field-tools/l2-4-1-material-decision-card.md\">Download the remove-or-clean decision card</a></p><h2>Check yourself</h2><p>The Module 4 check asks these three questions about this lesson. Answer them in your head now, then test your reasoning in the check. Each answer comes with an explanation.</p><ol><li>Colonised paper-faced plasterboard behind a kitchen cabinet should be:</li><li>How is mould on sound structural timber framing usually dealt with?</li><li>Why should you not break plasterboard over your knee or drop it on the floor?</li></ol><h2>Takeaway</h2><p>Porous and colonised comes out, framing is cleaned, non-porous is cleaned. Cut slowly and bag as you go. Next: HEPA vacuuming and damp wiping.</p>",
+       "orderIndex": 0,
+       "isPreview": false,
+       "resources": [
+        {
+         "label": "Remove-or-clean decision card (field download)",
+         "url": "/courses/level-2-mould-remediation-30ee3492/field-tools/l2-4-1-material-decision-card.md",
+         "kind": "checklist"
+        },
+        {
+         "label": "Diagram: Decide by material: porous out, framing cleaned, non-porous cleaned.",
+         "url": "/courses/level-2-mould-remediation-30ee3492/diagrams/l2-4-1-remove-or-clean.svg",
+         "kind": "image"
+        }
+       ]
+      },
+      {
+       "id": "61a7fd7c-83d1-4640-8cb9-73c6ef64e155",
+       "title": "4.2 HEPA vacuuming and damp wiping",
+       "contentType": "text",
+       "contentBody": "<h2>On the job</h2><p>The same Penrith kitchen. The board and cabinet base are out. Five studs, the bottom plate and the back of the tiled splashback have visible growth and dust from the removal. The client asks if you will \"bleach it all\".</p><h2>The idea</h2><p>After removal, the work is cleaning what stays. The method is HEPA vacuum, then damp wipe, then HEPA vacuum again once dry. Work from top to bottom and from the cleanest part of the work area towards the dirtiest, finishing near the exit.</p><p>HEPA vacuuming picks up spores and fragments without blowing them back into the air. Use a vacuum with a true HEPA filter that is sealed in its housing. Use a brush attachment on framing and move slowly. Empty and change bags inside the containment.</p><p>Damp wiping removes what the vacuum leaves. Use a detergent solution and microfibre cloths. Fold the cloth into eight faces, wipe once with each face, then use a fresh cloth. Change the solution often. Wring cloths well: you are wiping, not wetting the structure you are about to dry.</p><p>On bleach: it does not remove dead mould, which can still cause reactions, and it does not reach growth inside porous materials. That is why porous material is removed and surfaces are physically cleaned. Lesson 4.3 covers where chemical products do have a limited role.</p><p>Check your work in good light with a torch held flat to the surface. Visible growth or dust means clean again.</p><h2>See it</h2><figure><img src=\"/courses/level-2-mould-remediation-30ee3492/diagrams/l2-4-2-cleaning-sequence.svg\" alt=\"Cleaning sequence: HEPA vacuum, damp wipe with eight cloth faces, dry, HEPA vacuum again, torch check; top to bottom and clean to dirty\" width=\"800\" loading=\"lazy\" /><figcaption>HEPA, damp wipe, dry, HEPA, torch check. Top to bottom, clean to dirty.</figcaption></figure><h2>Do it in metric</h2><p>Five studs cleaned on 3 faces over 1.0 m: each face is about 0.09 m wide (a 90 mm stud), so 5 × 3 × 0.09 × 1.0 = <strong>1.35 m²</strong>. Bottom plate: 2.4 m × 0.09 m = 0.22 m². Back of splashback: 2.4 m × 0.6 m = 1.44 m². Total about <strong>3.0 m²</strong>. At one cloth face per 0.25 m², you need 12 faces, so 2 cloths at 8 faces each. The product label says 20 mL per litre, so a 5 L bucket takes <strong>100 mL</strong>. Change the solution after each 1.5 m², so mix two buckets.</p><h2>Field download: HEPA and damp wipe checklist</h2><p>Use this on site and file it with the job record.</p><ul><li>HEPA vacuum filter sealed in its housing; bag or canister emptied inside containment.</li><li>Order: top to bottom, cleanest area first, finishing near the exit.</li><li>Pass 1: HEPA vacuum all remaining surfaces with a brush attachment, slowly.</li><li>Pass 2: damp wipe with detergent at the label dilution; one wipe per cloth face, eight faces per cloth.</li><li>Solution changed after every 1.5 m², or sooner if dirty.</li><li>Allow surfaces to dry. Pass 3: HEPA vacuum again.</li><li>Torch held flat to each surface: no visible growth or dust. If any, clean again.</li><li>Record the areas cleaned in m², the product used and its dilution.</li></ul><p><a href=\"/courses/level-2-mould-remediation-30ee3492/field-tools/l2-4-2-cleaning-checklist.md\">Download the hepa and damp wipe checklist</a></p><h2>Check yourself</h2><p>The Module 4 check asks these three questions about this lesson. Answer them in your head now, then test your reasoning in the check. Each answer comes with an explanation.</p><ol><li>What is the cleaning sequence for surfaces that stay?</li><li>Why is bleach not the answer for mouldy porous materials?</li><li>In which direction do you clean a work area?</li></ol><h2>Takeaway</h2><p>HEPA, damp wipe, dry, HEPA, then the torch check. Physical cleaning does the work. Next: where antimicrobials and coatings fit, and where they do not.</p>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": [
+        {
+         "label": "HEPA and damp wipe checklist (field download)",
+         "url": "/courses/level-2-mould-remediation-30ee3492/field-tools/l2-4-2-cleaning-checklist.md",
+         "kind": "checklist"
+        },
+        {
+         "label": "Diagram: HEPA, damp wipe, dry, HEPA, torch check. Top to bottom, clean to dirty.",
+         "url": "/courses/level-2-mould-remediation-30ee3492/diagrams/l2-4-2-cleaning-sequence.svg",
+         "kind": "image"
+        }
+       ]
+      },
+      {
+       "id": "c7e7cddb-ed0c-43ff-b447-d0e0f3997be2",
+       "title": "4.3 Antimicrobials and coatings: a limited role",
+       "contentType": "text",
+       "contentBody": "<h2>On the job</h2><p>A Bunbury, WA, homeowner has watched a video online. She asks you to fog the whole house with a mould killer and paint the framing with an anti-mould sealer \"so it never comes back\". Her house has 2.5 m² of affected wall in one bathroom.</p><h2>The idea</h2><p>Chemical products are a small part of mould remediation, not the core of it. Mould comes back when the moisture comes back. Removal and physical cleaning take away the growth; fixing the water and drying the structure stop it returning. No product replaces those steps.</p><p>Where a product is used, use it on purpose. Your plan should say why it is used, where, which product, and how. Read the label and the SDS first. Use only products whose label supports the use you intend, and follow the label for dilution, contact time, PPE and ventilation. Tell the client what you are using and give them the SDS if they ask. Anyone in the home with asthma or chemical sensitivity changes the decision.</p><p>Fogging a whole house treats the air and surfaces you have not cleaned and adds a chemical exposure for the occupants. It does not remove growth inside materials. It is not a substitute for containment and removal, and it is rarely justified on a Level 2 job.</p><p>Coatings and sealers can have a place once the structure is clean and dry, for example to lock down staining on framing that has been cleaned and verified. Applied over growth or to wet timber, they hide the problem and trap moisture. They go on after verification, never before.</p><h2>See it</h2><figure><img src=\"/courses/level-2-mould-remediation-30ee3492/diagrams/l2-4-3-where-products-fit.svg\" alt=\"Process line from fix water to verify, with a small optional product step after cleaning and an optional coating step after verification\" width=\"800\" loading=\"lazy\" /><figcaption>Products are optional, small steps. Fixing the water and removing the growth do the work.</figcaption></figure><h2>Do it in metric</h2><p>The bathroom wall is 2.5 m². The label of the product in your plan says to apply 20 mL per litre of water at 100 mL of mixed solution per m². Mixed solution needed = 2.5 × 100 = <strong>250 mL</strong>. Concentrate needed = 0.25 L × 20 mL = <strong>5 mL</strong>. Compare that with the whole-house fogging request: a 120 m² house with 2.4 m ceilings is 288 m³ of air, treated to deal with 2.5 m² of wall. The numbers show why the plan targets the wall.</p><h2>Field download: Product use record</h2><p>Use this on site and file it with the job record.</p><ul><li>Why is a product being used, and what would happen without it?</li><li>Product name and batch number.</li><li>Label supports this use on this surface: yes / no. If no, do not use it.</li><li>SDS read: PPE, ventilation, first aid, storage. SDS on site.</li><li>Dilution from the label (mL per litre), area treated (m²) and amount used (mL).</li><li>Contact time from the label, and how it was achieved.</li><li>Occupants told; anyone with asthma or chemical sensitivity considered.</li><li>Coatings only after verification. Date verified: ______.</li></ul><p><a href=\"/courses/level-2-mould-remediation-30ee3492/field-tools/l2-4-3-product-use-record.md\">Download the product use record</a></p><h2>Check yourself</h2><p>The Module 4 check asks these three questions about this lesson. Answer them in your head now, then test your reasoning in the check. Each answer comes with an explanation.</p><ol><li>What stops mould coming back after remediation?</li><li>When may a coating or sealer go on cleaned framing?</li><li>A label says 20 mL per litre. How much concentrate makes 250 mL of solution?</li></ol><h2>Takeaway</h2><p>Products are a small, deliberate step backed by the label and the SDS. Coatings go on after verification. Next: drying the structure so it stays dry.</p>",
+       "orderIndex": 2,
+       "isPreview": false,
+       "resources": [
+        {
+         "label": "Product use record (field download)",
+         "url": "/courses/level-2-mould-remediation-30ee3492/field-tools/l2-4-3-product-use-record.md",
+         "kind": "checklist"
+        },
+        {
+         "label": "Diagram: Products are optional, small steps. Fixing the water and removing the growth do the work.",
+         "url": "/courses/level-2-mould-remediation-30ee3492/diagrams/l2-4-3-where-products-fit.svg",
+         "kind": "image"
+        }
+       ]
+      },
+      {
+       "id": "bbc9ed0e-accf-4885-ab9d-4fc410e022ba",
+       "title": "4.4 Drying the structure so it does not come back",
+       "contentType": "text",
+       "contentBody": "<h2>On the job</h2><p>Back in the Penrith kitchen. The board and cabinet base are out, the framing is cleaned, and the leak is fixed. The studs still read wet on your pin meter. The builder wants to reinstate the wall on Thursday.</p><h2>The idea</h2><p>The last step of removal is the first step of prevention. Wet framing behind a new wall will grow mould again. Drying must reach the goal you set against the dry reference before anything is closed up.</p><p>Sequence matters. Air movers blow air across surfaces and speed drying. While visible growth is still present they also blow spores around, so they stay off until the colonised material is out and the surfaces are cleaned. Once that is done, drying can start inside the containment with the air scrubber running.</p><p>Dehumidifiers remove water vapour from the air so the materials keep giving up water. Their rating in litres per day is measured at warm, humid test conditions shown on the plate. In a cool room they remove less. Track what the dehumidifier actually removes: the tank volume or the pump output each day. A falling daily volume, falling g/kg in the work area and pin readings moving towards the goal tell you the drying is working.</p><p>Read the same moisture points every day and write them on your log. Drying is finished when every point reaches the goal and stays there on the next reading. Then you can hand the area to verification, and only after verification to the builder.</p><h2>See it</h2><figure><img src=\"/courses/level-2-mould-remediation-30ee3492/diagrams/l2-4-4-drying-trend.svg\" alt=\"Line chart of four days: daily litres removed falling, work area g/kg falling, and stud readings falling to the drying goal line\" width=\"800\" loading=\"lazy\" /><figcaption>Three trends that should fall together: litres removed per day, g/kg in the work area, and the readings.</figcaption></figure><h2>Do it in metric</h2><p>Dehumidifier plate: 50 L/day at 30 °C and 80% RH. The kitchen runs at about 21 °C, so expect less. Daily water removed: Day 1 <strong>9.0 L</strong>, Day 2 <strong>5.5 L</strong>, Day 3 <strong>2.5 L</strong>, Day 4 <strong>1.0 L</strong>. Work area: 10.5 g/kg on Day 1, 6.0 g/kg on Day 4. Stud readings on the timber scale: 28% on Day 1, 19% on Day 3, 14% on Day 4, against a dry reference of 12% and a goal of 15%. Day 4: goal met. Read again on Day 5 before releasing to verification. Thursday is Day 4, so the builder waits one more day.</p><h2>Field download: Daily drying log</h2><p>Use this on site and file it with the job record.</p><ul><li>Date and time. Leak confirmed fixed: yes / no.</li><li>Air movers on? Only after removal and cleaning are complete.</li><li>Dehumidifier: litres removed since last visit (tank or pump bucket).</li><li>Work area °C, %RH and g/kg. Rest of house °C, %RH and g/kg.</li><li>Readings at each numbered point, against the drying goal.</li><li>Air scrubber running, filter condition, smoke test result.</li><li>Goal met at every point? Yes / no. If yes, confirm on the next visit.</li><li>Released to verification on (date). Released to builder on (date).</li></ul><p><a href=\"/courses/level-2-mould-remediation-30ee3492/field-tools/l2-4-4-drying-log.md\">Download the daily drying log</a></p><h2>Check yourself</h2><p>The Module 4 check asks these three questions about this lesson. Answer them in your head now, then test your reasoning in the check. Each answer comes with an explanation.</p><ol><li>When should air movers be switched on in a mould work area?</li><li>A dehumidifier plate says 50 L/day. In a 21 °C kitchen it removes 9 L on day 1. Why?</li><li>When is the structure ready to release to verification?</li></ol><h2>Takeaway</h2><p>Air movers after removal, track litres, g/kg and readings, and close nothing up until the goal holds. Next: Module 4 check, then finishing the job.</p>",
+       "orderIndex": 3,
+       "isPreview": false,
+       "resources": [
+        {
+         "label": "Daily drying log (field download)",
+         "url": "/courses/level-2-mould-remediation-30ee3492/field-tools/l2-4-4-drying-log.md",
+         "kind": "checklist"
+        },
+        {
+         "label": "Diagram: Three trends that should fall together: litres removed per day, g/kg in the work area, and the readings.",
+         "url": "/courses/level-2-mould-remediation-30ee3492/diagrams/l2-4-4-drying-trend.svg",
+         "kind": "image"
+        }
+       ]
+      },
+      {
+       "id": "31bb24c2-3c13-4802-9b8a-75df819116b2",
+       "title": "Module 4 check",
+       "contentType": "quiz",
+       "contentBody": "d49d5ac0-5694-4c9d-8050-abeee4cd5a4e",
+       "orderIndex": 4,
+       "isPreview": false,
+       "resources": null
+      }
+     ]
+    },
+    {
+     "id": "90c2f8fc-8817-4af1-80b4-1fb3075d938e",
+     "title": "Module 5 — Finishing the job",
+     "orderIndex": 4,
+     "lessons": [
+      {
+       "id": "70825bd2-4826-4675-b47b-4f0e63d85bf5",
+       "title": "5.1 Bagging and removing waste",
+       "contentType": "text",
+       "contentBody": "<h2>On the job</h2><p>An apartment on the fourth floor in Southport, QLD. You have plasterboard, a vanity and used PPE to take out through a shared lobby and a lift used by residents all day.</p><h2>The idea</h2><p>Waste is where a careful job can still spread mould through a building. The rule is simple: everything that leaves the containment is sealed and clean on the outside.</p><p>Bag inside the work area. Use heavy-duty plastic bags. Fill them to a weight one person can lift safely, twist the neck, fold it over and tape it (a goose-neck seal). In the airlock, HEPA vacuum and damp wipe the outside of the bag, then place it inside a second clean bag and seal that too. Larger items such as a vanity are wrapped in film and taped before they leave.</p><p>Plan the route. Lay floor protection, move waste at quiet times, tell the building manager, and use a lift protection blanket if one is available. Never carry open waste through occupied areas.</p><p>Mould waste from homes usually goes to general waste in most council areas, but rules vary. Check the local council or waste facility before the job. Asbestos waste is completely different and must never be mixed with mould waste. If you have stopped work because of suspect asbestos, that material is handled under asbestos rules by people licensed or competent to do so.</p><p>Used PPE and cloths are mould waste too. They are bagged in the airlock with the rest.</p><h2>See it</h2><figure><img src=\"/courses/level-2-mould-remediation-30ee3492/diagrams/l2-5-1-double-bagging.svg\" alt=\"Waste steps: bag inside containment, goose-neck seal, clean the outside in the airlock, place in a second bag, seal, carry out along the protected route\" width=\"800\" loading=\"lazy\" /><figcaption>Bag, seal, clean, double-bag, seal, then out along the protected route.</figcaption></figure><h2>Do it in metric</h2><p>Waste: 2.43 m² of 10 mm plasterboard at about 7 kg/m² = <strong>17 kg</strong>. Vanity: about 25 kg, wrapped. Used PPE and cloths: about 3 kg. Safe bag weight for one person on stairs and lifts: plan on no more than <strong>10 kg</strong> per bag. Plasterboard bags: 17 ÷ 10 = 1.7, so <strong>2 bags</strong>, double-bagged = 4 bags. PPE: 1 bag, double = 2 bags. Pack 10 bags to allow spares. Two people carry the wrapped vanity.</p><h2>Field download: Waste handling checklist</h2><p>Use this on site and file it with the job record.</p><ul><li>Council or waste facility rules checked for mould waste. Date checked: ______.</li><li>Asbestos waste kept completely separate (if any suspect material was found, work is paused).</li><li>Bags filled inside the containment to no more than 10 kg each.</li><li>Goose-neck seal: twist, fold, tape.</li><li>Outside of each bag HEPA vacuumed and damp wiped in the airlock; second bag added and sealed.</li><li>Large items wrapped in film and taped.</li><li>Route protected; building manager told; moved at quiet times.</li><li>Bag count and estimated weight recorded.</li></ul><p><a href=\"/courses/level-2-mould-remediation-30ee3492/field-tools/l2-5-1-waste-checklist.md\">Download the waste handling checklist</a></p><h2>Check yourself</h2><p>The Module 5 check asks these three questions about this lesson. Answer them in your head now, then test your reasoning in the check. Each answer comes with an explanation.</p><ol><li>What is a goose-neck seal?</li><li>Where is the outside of a waste bag cleaned before it leaves?</li><li>You paused work because of suspect asbestos. Can that material go in the mould waste bags?</li></ol><h2>Takeaway</h2><p>Everything that leaves is sealed and clean on the outside, and asbestos is never mixed in. Next: proving the job is finished.</p>",
+       "orderIndex": 0,
+       "isPreview": false,
+       "resources": [
+        {
+         "label": "Waste handling checklist (field download)",
+         "url": "/courses/level-2-mould-remediation-30ee3492/field-tools/l2-5-1-waste-checklist.md",
+         "kind": "checklist"
+        },
+        {
+         "label": "Diagram: Bag, seal, clean, double-bag, seal, then out along the protected route.",
+         "url": "/courses/level-2-mould-remediation-30ee3492/diagrams/l2-5-1-double-bagging.svg",
+         "kind": "image"
+        }
+       ]
+      },
+      {
+       "id": "55e72819-92dd-4a2d-ba6a-47209d352e54",
+       "title": "5.2 Verification and clearance",
+       "contentType": "text",
+       "contentBody": "<h2>On the job</h2><p>A Launceston, TAS, family wants to move their newborn back into the nursery where you removed 4 m² of mouldy plasterboard. The insurer asks for \"the clearance\". Your crew says it looks clean.</p><h2>The idea</h2><p>Looking clean is your check, not the clearance. Before anyone else is invited in, your crew completes its own post-remediation checks. Then the work is verified, ideally by someone independent.</p><p>Your checks: no visible growth or dust on any surface, using a raking torch; no mouldy or musty odour; every moisture point at the drying goal and holding; the moisture source fixed; the containment still intact. Photograph each check.</p><p>Verification confirms that the remediated area is back to normal for that building. On many residential jobs, and on any job with a vulnerable occupant, an insurance claim or a dispute, verification is done by an independent indoor environmental professional (IEP) who was not involved in the remediation. They may combine a visual inspection with air or surface sampling. Sampling results need interpretation by a qualified person and a laboratory. You do not take samples and interpret them yourself to sign off your own work.</p><p>If verification fails, the containment stays up and you clean again, then re-verify. That is why you keep the containment and the air scrubber in place until the result is in.</p><p>Clearance is the written result. It goes in the job file, a copy goes to the client, and only then is the containment taken down and the room released for reinstatement.</p><h2>See it</h2><figure><img src=\"/courses/level-2-mould-remediation-30ee3492/diagrams/l2-5-2-verification-flow.svg\" alt=\"Flow: crew checks, then independent verification; pass leads to clearance and containment removal, fail loops back to cleaning\" width=\"800\" loading=\"lazy\" /><figcaption>Your checks first, then independent verification. A fail loops back to cleaning with the containment still up.</figcaption></figure><h2>Do it in metric</h2><p>Your log for the nursery shows the drying goal of 15 on the meter's timber scale for the framing. Final readings at the eight points: 13, 14, 12, 14, 13, 15, 14, 13. Highest reading <strong>15</strong>, which meets the goal. Room 20 °C and 50% RH, about <strong>7.3 g/kg</strong>, the same as the hallway. The torch check covered all 4.0 m² of opened wall and 1.2 m² of ceiling, with 12 photos. You book the independent verifier and keep the 500 m³/h scrubber running until the result is in.</p><h2>Field download: Post-remediation checklist (before verification)</h2><p>Use this on site and file it with the job record.</p><ul><li>Raking torch check of every surface in the work area: no visible growth or dust.</li><li>No mouldy or musty odour in the work area.</li><li>Every moisture point at the drying goal, and holding on a second reading.</li><li>Moisture source fixed, and how it was confirmed.</li><li>Containment intact and air scrubber still running.</li><li>Photos of each check, with location.</li><li>Verifier booked: name, company, independence confirmed, date.</li><li>Result received in writing. Pass: release. Fail: clean again and re-verify.</li></ul><p><a href=\"/courses/level-2-mould-remediation-30ee3492/field-tools/l2-5-2-post-remediation-checklist.md\">Download the post-remediation checklist (before verification)</a></p><h2>Check yourself</h2><p>The Module 5 check asks these three questions about this lesson. Answer them in your head now, then test your reasoning in the check. Each answer comes with an explanation.</p><ol><li>Your crew says the room looks clean. Is that the clearance?</li><li>Who should verify a job with a newborn returning to the room?</li><li>Verification fails. What happens to the containment?</li></ol><h2>Takeaway</h2><p>Your crew checks, someone independent verifies, and the containment stays up until the written result arrives. Next: the job file and the handover.</p>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": [
+        {
+         "label": "Post-remediation checklist (before verification) (field download)",
+         "url": "/courses/level-2-mould-remediation-30ee3492/field-tools/l2-5-2-post-remediation-checklist.md",
+         "kind": "checklist"
+        },
+        {
+         "label": "Diagram: Your checks first, then independent verification. A fail loops back to cleaning with the containment still up.",
+         "url": "/courses/level-2-mould-remediation-30ee3492/diagrams/l2-5-2-verification-flow.svg",
+         "kind": "image"
+        }
+       ]
+      },
+      {
+       "id": "b1f7c0f5-4bb2-4317-a18b-f275d3d540a9",
+       "title": "5.3 The job file, the client and the assessor",
+       "contentType": "text",
+       "contentBody": "<h2>On the job</h2><p>Six months after a job in Adelaide, SA, the client lodges a complaint that the mould has come back. The insurer's assessor asks for your records: what you found, what you did and how you knew it was finished.</p><h2>The idea</h2><p>The job file is your proof. When something is questioned months later, the file answers, not your memory. Build it as you go, not at the end.</p><p>A complete Level 2 job file holds: the first-look record and photos with a scale; the inspection sheet and the cause of the water; the scope and any changes to it, with reasons and who approved them; the SWMS and sign-on; containment and negative air records, including smoke tests; PPE and fit test records; the moisture map and daily drying log; product use records and SDSs; the waste record; your post-remediation checks; the verification result; and the handover note.</p><p>Write in facts. \"Growth on back of plasterboard, 1.44 m², photo 07\" is useful. \"Bad mould\" is not. Record times in 24-hour format and the name of anyone you spoke to.</p><p>Handover is a conversation and a document. Tell the client what was found, what was removed and why, how it was verified, and what they need to do to keep it dry, such as using the exhaust fan, keeping the gutters clear or getting the shower re-sealed. Give them a copy of the clearance. With an insurance assessor, keep to the scope, the evidence and the cause. If the cause is a maintenance or building issue outside your work, say so plainly and in writing.</p><h2>See it</h2><figure><img src=\"/courses/level-2-mould-remediation-30ee3492/diagrams/l2-5-3-job-file.svg\" alt=\"Job file contents in work order, from first look to handover note\" width=\"800\" loading=\"lazy\" /><figcaption>Build the job file as you go, in work order.</figcaption></figure><h2>Do it in metric</h2><p>The Adelaide file shows: the first look at 08:40 on day 1, the wall area of <strong>2.1 m²</strong> removed, smoke tests at 07:30 on days 2 and 3, and the daily drying log falling from 9.0 L to 1.0 L removed per day. The final readings met the goal on day 4 and held on day 5. Verification passed on day 6. The handover note recorded that the shower screen seal needed replacing, which the owner accepted in writing. The new growth is on the opposite wall, 0.3 m² next to the screen. The file shows that the original 2.1 m² was dried and verified, and that the cause of the new growth was flagged at handover.</p><h2>Field download: Job file and handover checklist</h2><p>Use this on site and file it with the job record.</p><ul><li>First look and photos with scale. Inspection sheet and cause of the water.</li><li>Scope, changes with reasons, and who approved each change.</li><li>SWMS and sign-on. PPE and fit test records.</li><li>Containment checks, negative air and smoke tests, with times.</li><li>Moisture map and daily drying log. Product use records and SDSs.</li><li>Waste record. Post-remediation checks. Verification result in writing.</li><li>Handover note: what was found, removed and verified; what the client must do to keep it dry.</li><li>Client signature and date. Copy of clearance given.</li></ul><p><a href=\"/courses/level-2-mould-remediation-30ee3492/field-tools/l2-5-3-job-file-checklist.md\">Download the job file and handover checklist</a></p><h2>Check yourself</h2><p>The Module 5 check asks these three questions about this lesson. Answer them in your head now, then test your reasoning in the check. Each answer comes with an explanation.</p><ol><li>Which job-file note is most useful months later?</li><li>The cause is a shower seal outside your scope. What do you do at handover?</li><li>When should the job file be built?</li></ol><h2>Takeaway</h2><p>Facts and photos with times, built as you go, end with a signed handover. Next: the final check, then the practical task.</p>",
+       "orderIndex": 2,
+       "isPreview": false,
+       "resources": [
+        {
+         "label": "Job file and handover checklist (field download)",
+         "url": "/courses/level-2-mould-remediation-30ee3492/field-tools/l2-5-3-job-file-checklist.md",
+         "kind": "checklist"
+        },
+        {
+         "label": "Diagram: Build the job file as you go, in work order.",
+         "url": "/courses/level-2-mould-remediation-30ee3492/diagrams/l2-5-3-job-file.svg",
+         "kind": "image"
+        }
+       ]
+      },
+      {
+       "id": "de3680b7-34b3-4b0e-9ea2-f68d45517fb8",
+       "title": "Final check: Level 2 Mould Remediation",
+       "contentType": "quiz",
+       "contentBody": "d1c6a822-b062-4b8b-912a-5e59520aa564",
+       "orderIndex": 3,
+       "isPreview": false,
+       "resources": null
+      }
+     ]
+    }
+   ]
   }
  ]
 }
