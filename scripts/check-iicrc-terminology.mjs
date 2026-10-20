@@ -94,6 +94,12 @@ function registryTitlesCarryingDesignations() {
   );
 }
 
+/** GP-654: a sentence about the learner's own IICRC disciplines… */
+const LEARNER_OWNED = /\b(?:you|your|yours|learner|learners|student|students)\b|\bheld\s+by\b/i;
+/** …unless it also talks about what CARSI offers. */
+const CATALOGUE_WORD =
+  /\b(?:CARSI|our|we|catalogue|catalog|courses?|training|programs?|programmes?|pathways?|modules?|across|spans?|spanning|cover\w*|offer\w*|teach\w*|taught|includ\w*)\b/i;
+
 // Banned selling/descriptive phrasings. Each must be something that implies
 // CARSI itself delivers IICRC courses or IICRC certification.
 /** Every rule; code-bearing rules are built from `codes` (the shared list by default). */
@@ -206,14 +212,18 @@ export function bannedRules(CODES = IICRC_CODE_ALT) {
       // the words "IICRC discipline". A count, a quantity word or a coverage verb in front of it,
       // or a stat label made of it, describes what CARSI teaches. The learner's own disciplines
       // ("Which IICRC disciplines do you hold?") and admin data labels carry none of those.
-      // Independent review of 6edff7f0 added: the reversed order ("IICRC disciplines covered by
-      // CARSI"), a count or "IICRC" wrapped in its own JSX element (tags are stripped first), up
-      // to three words between a coverage verb and the phrase ("covers ten IICRC disciplines"),
-      // and a bounded digit run with a left boundary (10,000 digits took ~257ms unbounded).
+      //
+      // Fail-closed by design. Two review rounds (6edff7f0, 3aec1af2) each found new spellings
+      // of a coverage claim — reversed order, markup between the words, "all of your", three
+      // lines of JSX — so this rule does not try to recognise claims. The plural phrase is
+      // banned outright on every scanned surface. The one exemption is a SENTENCE about the
+      // learner's own disciplines ("you", "your", "held by") that carries no CARSI, catalogue,
+      // course or coverage word; anything else, rephrase as "restoration disciplines".
+      // A count in front of the singular ("7 IICRC discipline${s}") and a stat label are also
+      // banned. Markup is stripped first and up to three lines are read as one.
       re: new RegExp(
-        String.raw`(?<![\w.])(?:\d{1,3}\+?|\$\{[^}\n]{1,40}\}|\{[^}\n]{1,40}\}|core|all|multiple|several|many|key|six|seven|eight|nine|ten)\s+(?:core\s+)?IICRC\s+disciplines?\b` +
-          String.raw`|\b(?:across|spans?|spanning|covers?|covering|over|offers?|offering|teach(?:es|ing)?)\s+(?:[^\s.!?]{1,40}\s+){0,3}?IICRC\s+disciplines?\b` +
-          String.raw`|\bIICRC\s+disciplines?\s+(?:(?:are|is)\s+)?(?:covered|offered|taught|spanned|included)\b` +
+        String.raw`\bIICRC\s+disciplines\b` +
+          String.raw`|(?<![\w.])(?:\d{1,3}\+?|\$\{[^}\n]{1,40}\}|\{[^}\n]{1,40}\})\s+IICRC\s+discipline\b` +
           String.raw`|\blabel\s*:\s*['"` +
           '`' +
           String.raw`]IICRC\s+disciplines?['"` +
@@ -222,14 +232,13 @@ export function bannedRules(CODES = IICRC_CODE_ALT) {
         'i'
       ),
       allow: null,
-      crossLine: true,
-      // Markup between the words is not part of the sentence a reader sees.
-      prepare: (line) => line.replace(/<\/?[A-Za-z][^<>\n]{0,80}>/g, ' '),
-      // The learner's own disciplines stay allowed, including with a quantity ("your seven IICRC
-      // disciplines", "all IICRC disciplines you hold", "held by the learner") — but not after a
-      // coverage verb, so "CARSI covers your IICRC disciplines" is still a catalogue claim.
-      neutralise:
-        /(?<!\b(?:across|spans?|spanning|covers?|covering|over|offers?|offering|teach(?:es|ing)?)\s+)\b(?:your|my|their|his|her)\s+(?:own\s+)?(?:[\w-]+\s+){0,2}?IICRC\s+disciplines?\b|\bIICRC\s+disciplines?\s+(?:you|they|the\s+(?:learner|student|technician))\s+(?:hold|have|held|work|plan)\w*|\bIICRC\s+disciplines?\s+held\s+by\b/gi,
+      crossLine: 3,
+      prepare: (line) =>
+        line
+          .replace(/<\/?[A-Za-z][^<>\n]{0,80}>/g, ' ')
+          .split(/(?<=[.!?])\s+/)
+          .filter((s) => !(LEARNER_OWNED.test(s) && !CATALOGUE_WORD.test(s)))
+          .join(' '),
       message:
         'Do not measure the CARSI catalogue in IICRC disciplines ("across 7 IICRC disciplines", "IICRC Disciplines" stat) — say "restoration disciplines" or name the topics. A learner\'s own IICRC disciplines may still be referenced.',
     },
@@ -557,12 +566,24 @@ export function scanFile(file, text, rules = BANNED) {
   for (let i = 0; i < lines.length; i++) scanLine(file, i + 1, lines[i], findings, rules);
   const docs = file.replace(/\\/g, '/').startsWith('docs/');
   for (const rule of rules.filter((r) => r.crossLine && !(r.skipDocs && docs))) {
-    for (let i = 0; i + 1 < lines.length; i++) {
-      const joined = `${lines[i].trimEnd()} ${lines[i + 1].trimStart()}`;
-      if (ruleHits(rule, joined) && !ruleHits(rule, lines[i]) && !ruleHits(rule, lines[i + 1])) {
-        findings.push(
-          `  ${file}:${i + 1}-${i + 2}: ${rule.message}\n    → ${joined.trim().slice(0, 140)}`
-        );
+    // `crossLine: true` joins pairs of lines; a number joins up to that many (GP-654: a count,
+    // "<span>IICRC</span>" and "disciplines" on three lines render as one phrase). A window is
+    // reported only when neither of its one-line-shorter windows already fires.
+    const width = rule.crossLine === true ? 2 : rule.crossLine;
+    const join = (from, n) =>
+      lines
+        .slice(from, from + n)
+        .map((l) => l.trim())
+        .join(' ');
+    const hits = (from, n) =>
+      n === 1 ? ruleHits(rule, lines[from]) : ruleHits(rule, join(from, n));
+    for (let n = 2; n <= width; n++) {
+      for (let i = 0; i + n <= lines.length; i++) {
+        if (hits(i, n) && !hits(i, n - 1) && !hits(i + 1, n - 1)) {
+          findings.push(
+            `  ${file}:${i + 1}-${i + n}: ${rule.message}\n    → ${join(i, n).slice(0, 140)}`
+          );
+        }
       }
     }
   }

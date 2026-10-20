@@ -169,7 +169,7 @@ export function formatCourseCountForCopy(n: number): string {
  *
  * This deliberately does NOT interpolate `facts.disciplineCodes`. Those are IICRC
  * Registered-Training-School discipline acronyms, and joining them into a sentence about
- * what CARSI offers brands the CARSI catalogue with IICRC disciplines — banned by the
+ * what CARSI offers brands the CARSI catalogue with IICRC discipline codes — banned by the
  * CARSI designation rule (CLAUDE.md, founder 2026-07-10). It was also the live defect on
  * `/courses`: the meta description and the FAQPage schema both rendered a bare
  * comma-separated run of stored discipline codes as the list of what CARSI teaches.
