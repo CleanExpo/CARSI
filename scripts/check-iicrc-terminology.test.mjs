@@ -739,6 +739,15 @@ const MUST_BLOCK_FILE = [
     'GP-654 HTML comment inside a string',
     "const body = '<h2>CARSI covers 7 IICRC <!-- topic list --> disciplines.</h2>';",
   ],
+  // Review of 4cd99e20: block elements start a new line; `<br>` written as a pair.
+  [
+    'GP-654 word across two divs with a wbr',
+    'export const Copy = () => <div><div>CARSI covers 7 IICRC</div><div>disci<wbr />plines</div></div>;',
+  ],
+  [
+    'GP-654 paired br beside a wbr',
+    'export const Copy = () => <h2>CARSI covers 7 IICRC<br></br>disci<wbr />plines</h2>;',
+  ],
   [
     'GP-654 too many adjacent conditional variants fails closed',
     `<p>Restoration disciplines${"{a ? 'x' : 'y'}".repeat(12)}</p>`,
@@ -798,6 +807,11 @@ for (const [name, src, block] of [
   ['GP-654 HTML comment in Markdown', 'CARSI covers 7 IICRC <!-- note --> disciplines.', true],
   ['GP-654 br and wbr in Markdown HTML', '<h2>CARSI covers 7 IICRC<br>disci<wbr>plines</h2>', true],
   [
+    'GP-654 divs and wbr in Markdown HTML',
+    '<div>CARSI covers 7 IICRC</div><div>disci<wbr>plines</div>',
+    true,
+  ],
+  [
     'GP-654 HTML span with a quoted > in Markdown',
     'CARSI covers 7 IICRC <span title="a > b">disciplines</span>.',
     true,
@@ -839,6 +853,11 @@ for (const [name, src, block] of [
     true,
   ],
   [
+    'GP-654 divs and wbr in seed contentBody',
+    '{"contentBody": "<div>CARSI covers 7 IICRC</div><div>disci<wbr>plines</div>"}',
+    true,
+  ],
+  [
     'GP-654 br and wbr in seed contentBody',
     '{"contentBody": "<h2>CARSI covers 7 IICRC<br>disci<wbr>plines</h2>"}',
     true,
@@ -869,6 +888,11 @@ for (const [name, src] of MUST_PASS_FILE) {
 // A learner question in a branch or a JSX prop renders as the whole question, so the rendered
 // pass leaves it alone (the line joins judge these sources separately).
 for (const [name, src] of [
+  [
+    'a form label after a conditional that renders null',
+    // The admin course editor's shape (src/components/admin/courses/CourseEditorForm.tsx).
+    '<div>\n  <div>\n    {shown ? <p>Hours set here.</p> : null}\n  </div>\n  <div>\n    <label>\n      IICRC discipline\n    </label>\n  </div>\n</div>',
+  ],
   [
     'learner question in a conditional',
     "<p>{asked ? 'Which IICRC disciplines do you hold?' : 'Tell us about your work.'}</p>",

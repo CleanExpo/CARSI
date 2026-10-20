@@ -685,18 +685,26 @@ const SCRIPT_KIND = {
 // HTML written inside copy (seed contentBody, Markdown) renders without its comments and tags
 // (`<h2>… IICRC <!-- note --> disciplines</h2>`, `<span title="a > b">`; review of 58e106ae).
 // Quoted attribute values may hold `>`. A tag reads as nothing and as a break, as JSX does, and
-// once as a browser renders it: `<br>` a break, every other tag nothing
-// (`IICRC<br>disci<wbr>plines`, review of 4882b769).
+// once as a browser lays it out: a block element or `<br>` starts a new line, an inline element
+// or `<wbr>` adds nothing (`<div>…IICRC</div><div>disci<wbr>plines</div>`, reviews of 4882b769
+// and 4cd99e20).
 const HTML_COMMENT = /<!--[\s\S]*?-->/g;
 const HTML_TAG = /<\/?[A-Za-z][^>"']*(?:(?:"[^"]*"|'[^']*')[^>"']*)*>/g;
-const HTML_BR = /^<br\b/i;
+const BLOCK_TAGS = new Set(
+  (
+    'address article aside blockquote br dd details dialog div dl dt fieldset figcaption figure ' +
+    'footer form h1 h2 h3 h4 h5 h6 header hgroup hr li main nav ol p pre section summary table ' +
+    'tbody td tfoot th thead tr ul'
+  ).split(' ')
+);
+const tagName = (tag) => (tag.match(/^<\/?([A-Za-z][\w-]*)/)?.[1] ?? '').toLowerCase();
 function htmlViews(t) {
   if (!t.includes('<')) return [];
   const c = t.replace(HTML_COMMENT, '');
   return [
     c.replace(HTML_TAG, ''),
     c.replace(HTML_TAG, ' '),
-    c.replace(HTML_TAG, (tag) => (HTML_BR.test(tag) ? ' ' : '')),
+    c.replace(HTML_TAG, (tag) => (BLOCK_TAGS.has(tagName(tag)) ? ' ' : '')),
   ];
 }
 
@@ -776,6 +784,16 @@ export function renderedRuns(file, text) {
   // null: not authored text at all (an identifier, a call), which the caller reads as `{x}`.
   const alts = (expr, inJsx) => {
     if (isWrap(expr)) return alts(expr.expression, inJsx);
+    // React renders null, undefined and booleans as nothing (`cond ? <p>…</p> : null`), so in JSX
+    // they are the empty text, not an unknown `{x}` that reads like a count before the next block.
+    if (
+      inJsx &&
+      (expr.kind === ts.SyntaxKind.NullKeyword ||
+        expr.kind === ts.SyntaxKind.TrueKeyword ||
+        expr.kind === ts.SyntaxKind.FalseKeyword ||
+        (ts.isIdentifier(expr) && expr.text === 'undefined'))
+    )
+      return [''];
     if (ts.isStringLiteral(expr) || ts.isNoSubstitutionTemplateLiteral(expr)) return [expr.text];
     if (ts.isTemplateExpression(expr)) {
       // A substitution renders its own branches (review of 818f619e); anything else is `${x}`.
@@ -863,12 +881,17 @@ export function renderedRuns(file, text) {
     // As React renders it, an empty element adds no text (`dis<wbr />ciplines`, review of
     // c6c5a064); the loose view keeps reading it as a break.
     // `<br />` is a line break in both views (`IICRC<br />disci<wbr />plines`, review of 58e106ae).
+    // A block element or `<br>` starts a new line in both views, written self-closing or paired
+    // (`<br></br>`, `<div>…</div><div>disci<wbr />plines</div>`, review of 4cd99e20).
     if (ts.isJsxSelfClosingElement(node)) {
-      if (node.tagName.getText(sf).toLowerCase() === 'br') return [' '];
+      if (BLOCK_TAGS.has(node.tagName.getText(sf))) return [' '];
       return [reactMode ? '' : ' '];
     }
     if (ts.isJsxElement(node) || ts.isJsxFragment(node)) {
-      return node.children.reduce((acc, child) => cross(acc, flatten(child)), ['']);
+      const inner = node.children.reduce((acc, child) => cross(acc, flatten(child)), ['']);
+      const block =
+        ts.isJsxElement(node) && BLOCK_TAGS.has(node.openingElement.tagName.getText(sf));
+      return block ? cross(cross([' '], inner), [' ']) : inner;
     }
     return [''];
   };
