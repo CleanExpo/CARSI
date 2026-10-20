@@ -341,10 +341,12 @@ export function bannedRules(CODES = IICRC_CODE_ALT) {
           String.raw`|\bIICRC\s*(?:${SEP}\s*)+disciplines?\b` +
           // The singular with a computed ending ("discipline{s}", "discipline${s}").
           String.raw`|\bIICRC\s+discipline(?:\{|\$\{)` +
-          String.raw`|(?<![\w.])(?:\d{1,3}\+?|\$\{[^}\n]{1,40}\}|\{[^}\n]{1,40}\})(?:\s|${SEP}){1,8}IICRC\s+discipline\b` +
+          // Up to three ordinary words may sit between the count and "IICRC" ("one core IICRC
+          // discipline", "7 core IICRC discipline areas"; review of 4f59d7fa).
+          String.raw`|(?<![\w.])(?:\d{1,3}\+?|\$\{[^}\n]{1,40}\}|\{[^}\n]{1,40}\})(?:(?:\s|${SEP}){1,8}[A-Za-z][\w-]{0,30}){0,3}(?:\s|${SEP}){1,8}IICRC\s+discipline\b` +
           // A count or coverage word in front of the singular ("CARSI offers one IICRC discipline",
           // "a single IICRC discipline", "every IICRC discipline"; review of 3dee1845).
-          String.raw`|\b(?:${COUNT_WORDS})(?:\s|${SEP}){1,8}IICRC\s+discipline\b` +
+          String.raw`|\b(?:${COUNT_WORDS})(?:(?:\s|${SEP}){1,8}[A-Za-z][\w-]{0,30}){0,3}(?:\s|${SEP}){1,8}IICRC\s+discipline\b` +
           String.raw`|\blabel\s*:\s*['"` +
           '`' +
           String.raw`]IICRC\s+disciplines?['"` +
