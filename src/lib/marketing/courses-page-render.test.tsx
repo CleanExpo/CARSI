@@ -232,9 +232,14 @@ describe('rendered /courses: every IICRC sentence is a reviewed one (GP-639)', (
 
   it('source: a CRLF checkout of a pinned file matches its pin; an edited one does not', () => {
     for (const f of Object.keys(REVIEWED_SOURCE_SHA256)) {
-      const text = readFileSync(f, 'utf8');
-      expect(sourceHash(text.replace(/\n/g, '\r\n')), f).toBe(REVIEWED_SOURCE_SHA256[f]);
-      expect(sourceHash(`${text}\n// edit`), f).not.toBe(REVIEWED_SOURCE_SHA256[f]);
+      // Build both checkouts from the file as it is on disk, whichever line endings it has.
+      const lf = readFileSync(f, 'utf8').replace(/\r\n/g, '\n');
+      const crlf = lf.replace(/\n/g, '\r\n');
+      expect(sourceHash(lf), f).toBe(REVIEWED_SOURCE_SHA256[f]);
+      expect(sourceHash(crlf), f).toBe(REVIEWED_SOURCE_SHA256[f]);
+      expect(sourceHash(`${lf}\n// edit`), f).not.toBe(REVIEWED_SOURCE_SHA256[f]);
+      // A lone carriage return is a real edit, not a line ending.
+      expect(sourceHash(`${lf}\r`), f).not.toBe(REVIEWED_SOURCE_SHA256[f]);
     }
   });
 
