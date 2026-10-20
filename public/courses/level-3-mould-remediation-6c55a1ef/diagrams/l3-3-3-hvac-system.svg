@@ -1,0 +1,135 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" width="800" height="520" role="img" aria-labelledby="t d" font-family="Arial, Helvetica, sans-serif">
+<title id="t">Look at the whole HVAC system</title>
+<desc id="d">Isometric cutaway of a ceiling void showing a fan coil unit with a blocked condensate tray, the supply duct, the return plenum, flexible duct runs to grilles, and six numbered inspection points.</desc>
+<rect width="800" height="520" fill="#ffffff"/>
+<text x="24" y="36" font-size="20" font-weight="700" fill="#1f2933">Look at the whole HVAC system</text>
+<image x="656" y="14" width="120" height="31" href="data:image/png;base64,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"/>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#52606d"/></marker>
+<marker id="arrowG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0b6e4f"/></marker>
+<marker id="arrowW" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b54708"/></marker>
+<marker id="arrowB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f5f8b"/></marker>
+<linearGradient id="gCard" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e9eef3"/></linearGradient>
+<linearGradient id="gWarn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffaf3"/><stop offset="1" stop-color="#fde6c8"/></linearGradient>
+<linearGradient id="gGreen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3fbf7"/><stop offset="1" stop-color="#d3eee2"/></linearGradient>
+<linearGradient id="gBlue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f8fc"/><stop offset="1" stop-color="#d6e5f2"/></linearGradient>
+<linearGradient id="gRed" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff6f5"/><stop offset="1" stop-color="#f9d7d3"/></linearGradient>
+<linearGradient id="gDark" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#16875f"/><stop offset="1" stop-color="#0a5c42"/></linearGradient>
+<radialGradient id="gDot" cx="0.5" cy="0.5" r="0.6" fx="0.35" fy="0.3"><stop offset="0" stop-color="#2fa77c"/><stop offset="1" stop-color="#0a5c42"/></radialGradient>
+<radialGradient id="gDotW" cx="0.5" cy="0.5" r="0.6" fx="0.35" fy="0.3"><stop offset="0" stop-color="#e07a2c"/><stop offset="1" stop-color="#8f3806"/></radialGradient>
+<radialGradient id="gDotB" cx="0.5" cy="0.5" r="0.6" fx="0.35" fy="0.3"><stop offset="0" stop-color="#4b8cc0"/><stop offset="1" stop-color="#174a6e"/></radialGradient>
+<filter id="sh" x="-10%" y="-10%" width="125%" height="135%"><feGaussianBlur in="SourceAlpha" stdDeviation="2.5"/><feOffset dx="0" dy="3" result="o"/><feComponentTransfer><feFuncA type="linear" slope="0.22"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<filter id="shS" x="-20%" y="-20%" width="150%" height="150%"><feGaussianBlur in="SourceAlpha" stdDeviation="1.4"/><feOffset dx="1" dy="1.6" result="o"/><feComponentTransfer><feFuncA type="linear" slope="0.3"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<linearGradient id="gZA" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d9f0e5"/><stop offset="1" stop-color="#a9d9c2"/></linearGradient><linearGradient id="gZB" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#dce9f5"/><stop offset="1" stop-color="#aac8e3"/></linearGradient><linearGradient id="gZC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fdebd3"/><stop offset="1" stop-color="#f6c995"/></linearGradient><linearGradient id="gZD" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef1f4"/><stop offset="1" stop-color="#c7d0d8"/></linearGradient><linearGradient id="gMach" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6b7785"/><stop offset="1" stop-color="#2d3640"/></linearGradient><linearGradient id="gDuct" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e3e8ec"/><stop offset="1" stop-color="#b3bec8"/></linearGradient><linearGradient id="gFace" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f3f5f7"/><stop offset="1" stop-color="#d9e0e6"/></linearGradient><linearGradient id="gEnd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b9c3cc"/><stop offset="1" stop-color="#9aa5b1"/></linearGradient><linearGradient id="gTop" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e9edf1"/><stop offset="1" stop-color="#cfd7de"/></linearGradient><radialGradient id="gCool" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#2f6fb0" stop-opacity="0.75"/><stop offset="0.6" stop-color="#5b9bd5" stop-opacity="0.45"/><stop offset="1" stop-color="#9cc3e6" stop-opacity="0"/></radialGradient><linearGradient id="gCavity" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a6a58"/><stop offset="1" stop-color="#4e4338"/></linearGradient><linearGradient id="gStud" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e2c48f"/><stop offset="1" stop-color="#b8945a"/></linearGradient><linearGradient id="gBody" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4b5563"/><stop offset="1" stop-color="#1f2933"/></linearGradient><filter id="soft" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="4"/></filter><linearGradient id="gWarmAir" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#fff4e6"/><stop offset="1" stop-color="#fde0bd"/></linearGradient><linearGradient id="gRoofSp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e7ecf1"/><stop offset="1" stop-color="#d5dde4"/></linearGradient><pattern id="pBatt" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="#f6dc8a"/><path d="M0,10 Q5,0 10,10" stroke="#d9b54a" stroke-width="1.2" fill="none"/></pattern><linearGradient id="gWallT" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f1e3cf"/><stop offset="1" stop-color="#c9d9e8"/></linearGradient><linearGradient id="gBrick" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#b8735a"/><stop offset="1" stop-color="#8a4c38"/></linearGradient><linearGradient id="gCold" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#d6e6f5"/><stop offset="1" stop-color="#a9c8e6"/></linearGradient><linearGradient id="gScale" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2f6fb0"/><stop offset="0.45" stop-color="#9cc3e6"/><stop offset="1" stop-color="#e08a3c"/></linearGradient><linearGradient id="gBinR" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e2786d"/><stop offset="1" stop-color="#a3271d"/></linearGradient><linearGradient id="gBinG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a7b2bd"/><stop offset="1" stop-color="#5f6b78"/></linearGradient><linearGradient id="gBinN" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4fae88"/><stop offset="1" stop-color="#0b6e4f"/></linearGradient>
+</defs>
+<polygon points="164.4,204.8 392.6,336.6 267.5,408.8 39.3,277.1" fill="#e3e8ed" filter="url(#soft)"/>
+<polygon points="42.2,272 263.1,399.5 263.1,394.4 42.2,266.9" fill="#d9e0e6" stroke="#7b8794" stroke-width="0.8"/>
+<polygon points="380.8,331.5 263.1,399.5 263.1,394.4 380.8,326.4" fill="#c3ccd5" stroke="#7b8794" stroke-width="0.8"/>
+<polygon points="160,198.9 380.8,326.4 263.1,394.4 42.2,266.9" fill="#f3f5f7" stroke="#7b8794" stroke-width="0.8"/>
+<polygon points="176.2,308.1 190.9,316.6 176.2,325.1 161.5,316.6" fill="#9aa5b1" stroke="#52606d" stroke-width="0.8"/>
+<polygon points="216.7,331.5 231.4,340 216.7,348.5 202,340" fill="#9aa5b1" stroke="#52606d" stroke-width="0.8"/>
+<polygon points="257.2,354.9 271.9,363.4 257.2,371.9 242.4,363.4" fill="#9aa5b1" stroke="#52606d" stroke-width="0.8"/>
+<polygon points="93.7,262.2 115.8,275 96.7,286 74.6,273.3" fill="#9aa5b1" stroke="#52606d" stroke-width="0.8"/>
+<polygon points="71.7,270.3 96.7,284.8 96.7,242.2 71.7,227.8" fill="url(#gDuct)" stroke="#52606d" stroke-width="0.8"/>
+<polygon points="118.8,272 96.7,284.8 96.7,242.2 118.8,229.5" fill="#b3bec8" stroke="#52606d" stroke-width="0.8"/>
+<polygon points="93.7,215 118.8,229.5 96.7,242.2 71.7,227.8" fill="#dfe5ea" stroke="#52606d" stroke-width="0.8"/>
+<polygon points="96.7,243.9 157.1,278.8 157.1,272 96.7,237.1" fill="#8fa3b3" stroke="#2d3640" stroke-width="0.8"/>
+<polygon points="220.4,242.2 157.1,278.8 157.1,272 220.4,235.4" fill="#6f8597" stroke="#2d3640" stroke-width="0.8"/>
+<polygon points="160,200.6 220.4,235.4 157.1,272 96.7,237.1" fill="#3e5566" stroke="#2d3640" stroke-width="0.8"/>
+<polygon points="160,208.7 205.6,235 154.1,264.8 108.5,238.4" fill="#5b7a8f" fill-opacity="0.85"/>
+<circle cx="128.5" cy="244.9" r="1.4" fill="#2d2c26" fill-opacity="0.80"/>
+<circle cx="121.2" cy="245.7" r="2.6" fill="#2d2c26" fill-opacity="0.48"/>
+<circle cx="130" cy="246.3" r="1.3" fill="#2d2c26" fill-opacity="0.60"/>
+<circle cx="132.3" cy="245.4" r="2.4" fill="#2d2c26" fill-opacity="0.51"/>
+<circle cx="124.9" cy="243.3" r="2.0" fill="#2d2c26" fill-opacity="0.82"/>
+<circle cx="130.5" cy="247.3" r="1.8" fill="#2d2c26" fill-opacity="0.75"/>
+<circle cx="122.7" cy="244.4" r="2.3" fill="#2d2c26" fill-opacity="0.74"/>
+<circle cx="127.8" cy="243.2" r="1.6" fill="#2d2c26" fill-opacity="0.53"/>
+<circle cx="125.6" cy="247.5" r="1.5" fill="#2d2c26" fill-opacity="0.80"/>
+<circle cx="135.2" cy="243" r="1.8" fill="#2d2c26" fill-opacity="0.65"/>
+<circle cx="145" cy="257.1" r="2.7" fill="#2d2c26" fill-opacity="0.49"/>
+<circle cx="154.2" cy="255.3" r="2.1" fill="#2d2c26" fill-opacity="0.81"/>
+<circle cx="147.9" cy="254.6" r="1.3" fill="#2d2c26" fill-opacity="0.67"/>
+<circle cx="144.9" cy="255.1" r="2.0" fill="#2d2c26" fill-opacity="0.82"/>
+<circle cx="151.4" cy="256.9" r="2.2" fill="#2d2c26" fill-opacity="0.49"/>
+<circle cx="153.9" cy="255.6" r="2.2" fill="#2d2c26" fill-opacity="0.83"/>
+<circle cx="145.5" cy="257.9" r="2.2" fill="#2d2c26" fill-opacity="0.51"/>
+<circle cx="148.9" cy="260.5" r="2.8" fill="#2d2c26" fill-opacity="0.50"/>
+<circle cx="155.9" cy="260.3" r="1.6" fill="#2d2c26" fill-opacity="0.69"/>
+<circle cx="145.3" cy="256.7" r="2.3" fill="#2d2c26" fill-opacity="0.69"/>
+<polygon points="115.8,227.8 167.4,257.6 167.4,225.2 115.8,195.5" fill="#c7d0d8" stroke="#52606d" stroke-width="0.9"/>
+<polygon points="211.5,232.1 167.4,257.6 167.4,225.2 211.5,199.8" fill="#aab6c1" stroke="#52606d" stroke-width="0.9"/>
+<polygon points="160,170 211.5,199.8 167.4,225.2 115.8,195.5" fill="#e3e8ec" stroke="#52606d" stroke-width="0.9"/>
+<polygon points="115.8,222.7 139.4,236.3 139.4,214.2 115.8,200.6" fill="#f2f2e6" stroke="#7b8794" stroke-width="0.8"/>
+<line x1="120.5" y1="224.6" x2="120.5" y2="204.2" stroke="#b8b8a0" stroke-width="0.8"/>
+<line x1="125.3" y1="227.3" x2="125.3" y2="206.9" stroke="#b8b8a0" stroke-width="0.8"/>
+<line x1="130" y1="230" x2="130" y2="209.6" stroke="#b8b8a0" stroke-width="0.8"/>
+<line x1="134.7" y1="232.7" x2="134.7" y2="212.3" stroke="#b8b8a0" stroke-width="0.8"/>
+<polygon points="143.8,238.8 164.4,250.7 164.4,228.6 143.8,216.7" fill="#b87333" stroke="#7a4a1f" stroke-width="0.8"/>
+<polygon points="178.4,244.4 310.9,320.9 310.9,300.5 178.4,224" fill="url(#gDuct)" stroke="#52606d" stroke-width="0.9"/>
+<polygon points="333,308.1 310.9,320.9 310.9,300.5 333,287.7" fill="#b3bec8" stroke="#52606d" stroke-width="0.9"/>
+<polygon points="200.5,211.2 333,287.7 310.9,300.5 178.4,224" fill="#eef1f4" stroke="#52606d" stroke-width="0.9"/>
+<path d="M207.8,256.3 C187.8,276.3 190.2,282.2 176.2,316.2" stroke="#c9d2da" stroke-width="8" fill="none" stroke-linecap="round"/>
+<path d="M207.8,256.3 C187.8,276.3 190.2,282.2 176.2,316.2" stroke="#8a97a4" stroke-width="1" fill="none" stroke-dasharray="2 3"/>
+<path d="M248.3,279.6 C228.3,299.6 230.7,305.6 216.7,339.6" stroke="#c9d2da" stroke-width="8" fill="none" stroke-linecap="round"/>
+<path d="M248.3,279.6 C228.3,299.6 230.7,305.6 216.7,339.6" stroke="#8a97a4" stroke-width="1" fill="none" stroke-dasharray="2 3"/>
+<path d="M288.8,303 C268.8,323 271.2,328.9 257.2,362.9" stroke="#c9d2da" stroke-width="8" fill="none" stroke-linecap="round"/>
+<path d="M288.8,303 C268.8,323 271.2,328.9 257.2,362.9" stroke="#8a97a4" stroke-width="1" fill="none" stroke-dasharray="2 3"/>
+<line x1="39.9" y1="294.9" x2="136.4" y2="253.3" stroke="#b54708" stroke-width="1.2"/>
+<circle cx="136.4" cy="253.3" r="3" fill="#b54708"/>
+<circle cx="28" cy="300" r="11" fill="url(#gDotW)" stroke="#ffffff" stroke-width="1.5"/>
+<text x="28" y="304.5" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">1</text>
+<line x1="67.4" y1="130.7" x2="127.6" y2="218.4" stroke="#b54708" stroke-width="1.2"/>
+<circle cx="127.6" cy="218.4" r="3" fill="#b54708"/>
+<circle cx="60" cy="120" r="11" fill="url(#gDotW)" stroke="#ffffff" stroke-width="1.5"/>
+<text x="60" y="124.5" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">2</text>
+<line x1="114" y1="108.4" x2="154.1" y2="233.7" stroke="#b54708" stroke-width="1.2"/>
+<circle cx="154.1" cy="233.7" r="3" fill="#b54708"/>
+<circle cx="110" cy="96" r="11" fill="url(#gDotW)" stroke="#ffffff" stroke-width="1.5"/>
+<text x="110" y="100.5" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">3</text>
+<line x1="324.5" y1="107.8" x2="255.7" y2="255.8" stroke="#b54708" stroke-width="1.2"/>
+<circle cx="255.7" cy="255.8" r="3" fill="#b54708"/>
+<circle cx="330" cy="96" r="11" fill="url(#gDotW)" stroke="#ffffff" stroke-width="1.5"/>
+<text x="330" y="100.5" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">4</text>
+<line x1="409.1" y1="197" x2="234.3" y2="309.8" stroke="#b54708" stroke-width="1.2"/>
+<circle cx="234.3" cy="309.8" r="3" fill="#b54708"/>
+<circle cx="420" cy="190" r="11" fill="url(#gDotW)" stroke="#ffffff" stroke-width="1.5"/>
+<text x="420" y="194.5" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">5</text>
+<line x1="34.4" y1="344.7" x2="84.2" y2="256.3" stroke="#b54708" stroke-width="1.2"/>
+<circle cx="84.2" cy="256.3" r="3" fill="#b54708"/>
+<circle cx="28" cy="356" r="11" fill="url(#gDotW)" stroke="#ffffff" stroke-width="1.5"/>
+<text x="28" y="360.5" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">6</text>
+<rect x="486" y="64" width="290" height="50" rx="10" fill="url(#gCard)" stroke="#9aa5b1" stroke-width="2"/>
+<circle cx="506" cy="89" r="11" fill="url(#gDotW)"/>
+<text x="506" y="93.5" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">1</text>
+<text x="526" y="85" font-size="13" font-weight="700" fill="#1f2933">Condensate tray</text>
+<text x="526" y="103" font-size="12" fill="#52606d">blocked drain, growth</text>
+<rect x="486" y="122" width="290" height="50" rx="10" fill="url(#gCard)" stroke="#9aa5b1" stroke-width="2"/>
+<circle cx="506" cy="147" r="11" fill="url(#gDotW)"/>
+<text x="506" y="151.5" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">2</text>
+<text x="526" y="143" font-size="13" font-weight="700" fill="#1f2933">Filters</text>
+<text x="526" y="161" font-size="12" fill="#52606d">condition and fit</text>
+<rect x="486" y="180" width="290" height="50" rx="10" fill="url(#gCard)" stroke="#9aa5b1" stroke-width="2"/>
+<circle cx="506" cy="205" r="11" fill="url(#gDotW)"/>
+<text x="506" y="209.5" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">3</text>
+<text x="526" y="201" font-size="13" font-weight="700" fill="#1f2933">Coil</text>
+<text x="526" y="219" font-size="12" fill="#52606d">growth on the fins</text>
+<rect x="486" y="238" width="290" height="50" rx="10" fill="url(#gCard)" stroke="#9aa5b1" stroke-width="2"/>
+<circle cx="506" cy="263" r="11" fill="url(#gDotW)"/>
+<text x="506" y="267.5" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">4</text>
+<text x="526" y="259" font-size="13" font-weight="700" fill="#1f2933">Supply duct</text>
+<text x="526" y="277" font-size="12" fill="#52606d">600 × 400, 18 m = 36 m²</text>
+<rect x="486" y="296" width="290" height="50" rx="10" fill="url(#gCard)" stroke="#9aa5b1" stroke-width="2"/>
+<circle cx="506" cy="321" r="11" fill="url(#gDotW)"/>
+<text x="506" y="325.5" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">5</text>
+<text x="526" y="317" font-size="13" font-weight="700" fill="#1f2933">Flexible runs</text>
+<text x="526" y="335" font-size="12" fill="#52606d">6 × 3.14 = 18.8 m²: replace</text>
+<rect x="486" y="354" width="290" height="50" rx="10" fill="url(#gCard)" stroke="#9aa5b1" stroke-width="2"/>
+<circle cx="506" cy="379" r="11" fill="url(#gDotW)"/>
+<text x="506" y="383.5" font-size="12" font-weight="700" fill="#ffffff" text-anchor="middle">6</text>
+<text x="526" y="375" font-size="13" font-weight="700" fill="#1f2933">Return plenum</text>
+<text x="526" y="393" font-size="12" fill="#52606d">13.9 m² of metal to clean</text>
+<rect x="24" y="424" width="752" height="50" rx="10" fill="url(#gWarn)" stroke="#b54708" stroke-width="2"/>
+<text x="40" y="454" font-size="12" font-weight="700" fill="#1f2933">Isolate, protect, refer: system off and tagged, grilles sealed. Restart only after a qualified sign-off.</text>
+<text x="776" y="508" font-size="11" fill="#52606d" text-anchor="end">CARSI · Level 3 Mould Remediation · schematic, not to scale</text>
+</svg>

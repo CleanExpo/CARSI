@@ -233,7 +233,8 @@ describe('current repository truth', () => {
     // 78 = 77 + CARSI Professional Moisture Meters (moisture-meters-readings-and-dry-standards), 19/10/2026.
     // 79 = 78 + Level 2 Mould Remediation (level-2-mould-remediation-30ee3492), draft and
     // unpublished, Course Standard v1 pilot, 20/10/2026 (feat/gp-658-course-standard).
-    expect(catalogue).toHaveLength(79);
+    // 80 = 79 + Level 3 Mould Remediation (level-3-mould-remediation-6c55a1ef), draft, 20/10/2026.
+    expect(catalogue).toHaveLength(80);
     expect(surfaceSlugs).toHaveLength(24);
     expect(new Set(surfaceSlugs).size).toBe(24);
     expect(readdirSync(cardsDirectory).filter((name) => name.endsWith('.json'))).toHaveLength(80);
