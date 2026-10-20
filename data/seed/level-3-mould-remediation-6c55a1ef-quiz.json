@@ -1,0 +1,953 @@
+{
+  "version": 1,
+  "courseSlug": "level-3-mould-remediation-6c55a1ef",
+  "status": "draft",
+  "note": "Module checks and final check for the Level 3 Mould Remediation draft (GP-658). Original CARSI questions; no standard text. SME review required before seeding.",
+  "quizzes": [
+    {
+      "quizId": "0495f69a-2ddd-5274-91fa-7c9c35765730",
+      "lessonTitle": "Module 1 check",
+      "title": "Level 3 Mould Remediation — Module 1 check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "What sets the remediation method on a mould job?",
+          "options": [
+            "The Condition of each area",
+            "The total visible area only",
+            "The number of rooms affected",
+            "The age of the building"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "The method follows the Condition of each area and how far hidden growth may reach. Area is a warning sign that the job needs Level 3 planning, not the thing that sets the method."
+        },
+        {
+          "questionText": "A 6 m² job is in an aged care home. Is it Level 3?",
+          "options": [
+            "No, because it is small",
+            "Only if the HVAC runs",
+            "Only if insurers approve it",
+            "Yes, because of the occupants"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "One trigger is enough. Vulnerable occupants make even a small job a Level 3 job, because the planning and controls step up, and so does coordination."
+        },
+        {
+          "questionText": "Visible growth of 14.4 m², 7.8 m² and 9.6 m² is found on two floors. What is the total?",
+          "options": [
+            "31.8 m²",
+            "24.0 m²",
+            "22.2 m²",
+            "17.4 m²"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "14.4 + 7.8 + 9.6 = 31.8 m². That is more than three times the Level 2 band before any wall is opened."
+        },
+        {
+          "questionText": "In Geelong the ducted air-conditioning still runs. What is the first decision?",
+          "options": [
+            "Turn it up to dry",
+            "Leave it for the tenants",
+            "Spray the return grilles now",
+            "Switch it off and isolate"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "A running system can carry spores to every room it serves. Switch it off and isolate it before scoping further."
+        },
+        {
+          "questionText": "Several businesses share a duty on one site. What must each one do?",
+          "options": [
+            "Defer to the principal",
+            "Consult, cooperate and coordinate",
+            "Wait for the regulator",
+            "Work on separate weekdays"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Under section 46 of the model WHS Act, each duty holder must, so far as is reasonably practicable, consult with the others, and cooperate and coordinate with them."
+        },
+        {
+          "questionText": "Does consulting the builder move your duty for your crew's work to them?",
+          "options": [
+            "No, you keep your duty",
+            "Yes, once they sign off",
+            "Yes, if they are principal",
+            "Only for the shared corridors"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Consulting and coordinating does not transfer a duty. Your company still owns the risks of its own work."
+        },
+        {
+          "questionText": "From what cost of construction work does a project need a principal contractor?",
+          "options": [
+            "$50,000 or more",
+            "$250,000 or more",
+            "$100,000 or more",
+            "$500,000 or more"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Under the model WHS Regulations a construction project is construction work costing $250,000 or more. It has a principal contractor, who prepares a WHS management plan."
+        },
+        {
+          "questionText": "What does the remediation work plan set out that the SWMS does not?",
+          "options": [
+            "What work will be done",
+            "Which hazards need a control",
+            "Who will review the controls",
+            "How falls will be prevented"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "The work plan sets out what will be done, in work order. The SWMS sets out how the high risk construction work is done safely."
+        },
+        {
+          "questionText": "Scaffold work has its deck at 4.6 m. Is it high risk construction work?",
+          "options": [
+            "No, scaffold work is always safe",
+            "Yes, a fall exceeds 2 m",
+            "Only above a 6 m height",
+            "Only when powered plant is used"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Work with a risk of a person falling more than 2 metres is high risk construction work, so a SWMS must be prepared before it starts."
+        },
+        {
+          "questionText": "The crew is not following the SWMS. What must happen?",
+          "options": [
+            "The SWMS is rewritten later",
+            "The work stops until fixed",
+            "The client is told afterwards",
+            "The work finishes, then review"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Work must be done in line with the SWMS. If it is not, it is stopped immediately or as soon as it is safe, and does not restart until it is."
+        },
+        {
+          "questionText": "A technician's fit test is 14 months old. Can they enter in that respirator?",
+          "options": [
+            "Yes, it feels fine",
+            "No, retest them first",
+            "Yes, with P2 filters",
+            "Only for short entries"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Safe Work Australia guidance is to fit test at least once a year and with each new make or model. An out-of-date fit test means no entry in that respirator."
+        },
+        {
+          "questionText": "A worker in a coverall becomes confused near shift end. What do you do?",
+          "options": [
+            "Remove, cool, get first aid",
+            "Give them a short break",
+            "Finish the task with them",
+            "Send them home to rest"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Confusion in the heat is a medical emergency. Get them out of the work area at once, cool them and get first aid."
+        },
+        {
+          "questionText": "With 45-minute work periods each hour, how much hands-on work is in a 10-hour shift?",
+          "options": [
+            "7.5 hours",
+            "10.0 hours",
+            "8.5 hours",
+            "6.0 hours"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "10 × 45 minutes = 450 minutes = 7.5 hours. Plan the job duration on hands-on time, not shift length."
+        },
+        {
+          "questionText": "Which record shows who was inside a zone, and for how long?",
+          "options": [
+            "The daily moisture map",
+            "The zone entry log",
+            "The waste disposal docket",
+            "The scope variation record"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "An entry and exit log for each zone records who went in, when, when they came out and the respirator worn. It also shows who has been in the heat longest."
+        }
+      ]
+    },
+    {
+      "quizId": "1dd1a9cb-36f9-5a0d-8ab2-148fca9b7506",
+      "lessonTitle": "Module 2 check",
+      "title": "Level 3 Mould Remediation — Module 2 check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Why confirm a thermal-camera suspect with a moisture meter?",
+          "options": [
+            "Cold is not always water",
+            "The camera stores no photos",
+            "Meters are cheaper to use",
+            "Insurers always ask for both"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A thermal camera shows temperature. A cool patch can be a draught or missing insulation, so confirm each suspect with a meter."
+        },
+        {
+          "questionText": "What goes in place before drilling a 25 mm inspection hole into a cavity?",
+          "options": [
+            "Full containment and an airlock",
+            "HEPA capture and a barrier",
+            "A fan clearing the dust",
+            "Nothing for such small holes"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Opening up for inspection should use source control: a HEPA nozzle at the cut and a small film barrier. Full containment comes before full opening."
+        },
+        {
+          "questionText": "A bearer under the wall may be rotten. Who decides what happens to it?",
+          "options": [
+            "The lead technician",
+            "A structural engineer",
+            "The insurer's assessor",
+            "The building owner"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Load-bearing members go to a structural engineer. You record what you saw; the engineer decides what it means and what support is needed."
+        },
+        {
+          "questionText": "Twenty 25 mm holes replace opening 28.8 m² of wall. What do they give you?",
+          "options": [
+            "Proof the job is finished",
+            "A pass for final clearance",
+            "Evidence to size the scope",
+            "Permission to skip the containment"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Small controlled openings show which bays are affected, so the containment and removal are sized on evidence rather than guesswork."
+        },
+        {
+          "questionText": "Air has a dew point of 14.4 °C. A ceiling corner is 12.5 °C. What happens?",
+          "options": [
+            "Ceiling stays dry",
+            "Condensation forms there",
+            "Mould cannot grow",
+            "Air gets drier"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "The surface is below the dew point of the room air, so water condenses on it. Repeated nightly, that feeds mould."
+        },
+        {
+          "questionText": "A ten-year-old exhaust fan discharges into the roof space. How do you report it?",
+          "options": [
+            "As a builder defect",
+            "As a compliance breach",
+            "As the tenant's fault",
+            "As an observed fact"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Write what you observed, against the NCC benchmark. Compliance and defect findings belong to building surveyors and certifiers, or tribunals."
+        },
+        {
+          "questionText": "Why log indoor and outdoor conditions over several days?",
+          "options": [
+            "To see the real pattern",
+            "To fill the job file",
+            "To satisfy the insurer only",
+            "To calibrate the moisture meter"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Condensation depends on cold nights and moisture load, which change day to day. A single reading can miss the pattern."
+        },
+        {
+          "questionText": "Is the 10 m² asbestos threshold permission for a mould crew to remove asbestos?",
+          "options": [
+            "No, it is a licensing rule",
+            "Yes, anything up to 10 m²",
+            "Yes, if it is wetted down",
+            "Yes, if the crew wear P2"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "The 10 m² figure decides when a removal licence is needed. It is not permission for a mould crew to remove asbestos; refer it."
+        },
+        {
+          "questionText": "Asbestos-cement eaves of 11.7 m² must come out. Who removes them?",
+          "options": [
+            "A licensed asbestos removalist",
+            "Your crew under containment",
+            "The building owner first",
+            "Any builder on site"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "More than 10 m² of non-friable asbestos needs a Class B (or Class A) licensed removalist, then a clearance certificate."
+        },
+        {
+          "questionText": "Paint tests at 2.3% lead. What changes before anyone machine sands it?",
+          "options": [
+            "Nothing changes below 5% lead",
+            "Only a P2 mask needed",
+            "It becomes a lead process",
+            "It goes to general waste"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Machine sanding paint with more than 1% lead is a lead process under the model WHS Regulations. Plan lead controls or avoid sanding."
+        },
+        {
+          "questionText": "On a sewage job, why start drying only after soaked porous materials are out?",
+          "options": [
+            "Dehumidifiers need space",
+            "Drying takes longer",
+            "Airflow spreads contamination",
+            "Insurers require it"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Air movers blowing across contaminated material spread it. Remove soaked porous materials and clean first, then dry."
+        },
+        {
+          "questionText": "What does the Immunisation Handbook recommend for sewage workers?",
+          "options": [
+            "Hepatitis A vaccination",
+            "Annual flu vaccination",
+            "Tetanus every year",
+            "No vaccine needed"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "The Australian Immunisation Handbook recommends hepatitis A vaccine for plumbers and sewage workers."
+        },
+        {
+          "questionText": "Plasterboard comes out to 1.8 m on 96 m of wall, both faces. About how much?",
+          "options": [
+            "172.8 m²",
+            "115.2 m²",
+            "518.4 m²",
+            "345.6 m²"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "96 × 1.8 = 172.8 m² per face. Both faces = 345.6 m²."
+        },
+        {
+          "questionText": "Who must give written consent before contents from a flooded building are thrown out?",
+          "options": [
+            "The lead technician on site",
+            "The waste contractor on site",
+            "The owner of the contents",
+            "The local council health officer"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Contents decisions need the owner's written consent before disposal, with an inventory of each item and its condition."
+        }
+      ]
+    },
+    {
+      "quizId": "42c0000f-03ae-595a-a0de-8af2982b31d9",
+      "lessonTitle": "Module 3 check",
+      "title": "Level 3 Mould Remediation — Module 3 check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Why split a large loss into zones?",
+          "options": [
+            "It uses less plastic sheeting",
+            "Each can be sealed alone",
+            "It needs fewer workers overall",
+            "Insurers pay for each zone"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Zones can each be sealed and checked on their own. A breach affects one zone, and finished areas stay clean."
+        },
+        {
+          "questionText": "A 181.4 m³ zone needs 6 air changes per hour. Each scrubber gives 500 m³/h. How many?",
+          "options": [
+            "2",
+            "3",
+            "4",
+            "1"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "181.4 × 6 = 1,088 m³/h. 1,088 ÷ 500 = 2.2, rounded up to 3."
+        },
+        {
+          "questionText": "Before sealing over a smoke detector in a zone, who do you talk to?",
+          "options": [
+            "The insurer's assessor",
+            "Your own crew",
+            "The building manager",
+            "The waste contractor"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Detectors and sprinklers, as well as exits, are part of the building's fire safety system. Agree any change with the building manager first."
+        },
+        {
+          "questionText": "Where does a two-stage decontamination chamber help most?",
+          "options": [
+            "Small surface cleaning",
+            "Moisture mapping only",
+            "Final handover visits",
+            "Heavy removal work"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "A dirty room and a clean room keep heavy dust and spores out of clean areas when large amounts of material are being removed."
+        },
+        {
+          "questionText": "What minimum pressure difference does S520 recommend for a containment?",
+          "options": [
+            "−1 Pa",
+            "−5 Pa",
+            "−50 Pa",
+            "+5 Pa"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "S520 section 9.3.3 recommends a minimum of −5 Pa. Confirm the figure against AS-IICRC S520:2025."
+        },
+        {
+          "questionText": "Where does a zone manometer's reference tube go?",
+          "options": [
+            "Inside another work zone",
+            "Next to the scrubber",
+            "The clean area protected",
+            "Outside the whole building"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "The reference sits in the clean area the zone protects, so the reading shows whether air flows from clean to dirty."
+        },
+        {
+          "questionText": "Eight readings at 5-minute intervals are above the limit. How long was it out?",
+          "options": [
+            "8 minutes",
+            "13 minutes",
+            "60 minutes",
+            "40 minutes"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "8 × 5 = 40 minutes. Record the event, the cause, the fix and who you told."
+        },
+        {
+          "questionText": "A zone alarm trips. What comes first?",
+          "options": [
+            "Raise the alarm limit higher",
+            "Finish the current task first",
+            "Turn off the zone logger",
+            "Stop work in that zone"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Stop work in the zone, find the cause and fix it, wait for recovery, then record and report the event."
+        },
+        {
+          "questionText": "Why must the HVAC stay off while the work area is contaminated?",
+          "options": [
+            "It wastes the client's power",
+            "It makes too much noise",
+            "It spreads spores through ducts",
+            "It upsets the zone manometer"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "A running system carries spores to every room it serves and can draw contamination into the ducts."
+        },
+        {
+          "questionText": "Porous-lined flexible duct is spotted with growth inside. Clean or replace?",
+          "options": [
+            "Replace it",
+            "Clean it",
+            "Coat it",
+            "Fog it"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Flexible and internally lined ducts have porous linings. Growth in them usually means replacement."
+        },
+        {
+          "questionText": "A 600 mm × 400 mm duct is 18 m long. What is its internal surface area?",
+          "options": [
+            "4.3 m²",
+            "18 m²",
+            "36 m²",
+            "43 m²"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Perimeter = 2 × (0.6 + 0.4) = 2.0 m. Area = 2.0 × 18 = 36 m²."
+        },
+        {
+          "questionText": "Who connects a temporary board to a three-phase switchboard?",
+          "options": [
+            "The lead technician",
+            "The site handyman",
+            "The building owner",
+            "A licensed electrician"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Connecting temporary supply or a generator is electrical installation work and must be done by a licensed electrician."
+        },
+        {
+          "questionText": "14 × 6.5 A, 8 × 4.5 A and 20 × 1.2 A. What is the total current?",
+          "options": [
+            "121 A",
+            "187 A",
+            "151 A",
+            "98 A"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "91 + 36 + 24 = 151 A, about 50 A per phase when balanced."
+        },
+        {
+          "questionText": "Why stagger switching on 14 compressor dehumidifiers?",
+          "options": [
+            "They dry air faster",
+            "It saves hire costs",
+            "It quietens the site",
+            "Start-up current is higher"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Compressor dehumidifiers draw more current for a moment when they start. Starting them together can trip the supply."
+        }
+      ]
+    },
+    {
+      "quizId": "0ea21907-53c4-5aac-a791-3fabab480d32",
+      "lessonTitle": "Module 4 check",
+      "title": "Level 3 Mould Remediation — Module 4 check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Why does dust matter more in an aged care home than an empty office?",
+          "options": [
+            "Offices have better ventilation",
+            "Aged care uses carpet",
+            "Residents may be immunocompromised",
+            "Dust settles more slowly"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "People with weakened immune systems can develop serious fungal infections, such as aspergillosis, from airborne spores."
+        },
+        {
+          "questionText": "Who do you plan healthcare work with before starting?",
+          "options": [
+            "The infection control lead",
+            "The residents' own families",
+            "The local council officer",
+            "The building cleaning contractor"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "The national healthcare infection control guidelines expect infection prevention and control staff on the team for construction and renovation work."
+        },
+        {
+          "questionText": "208.7 m³ at 8 air changes per hour. How much air is needed?",
+          "options": [
+            "835 m³/h",
+            "1,670 m³/h",
+            "1,044 m³/h",
+            "2,087 m³/h"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "208.7 × 8 = 1,670 m³/h, so four scrubbers at 500 m³/h real airflow, plus a spare."
+        },
+        {
+          "questionText": "Residents in a memory support wing may try to enter. What control helps most?",
+          "options": [
+            "A barrier they cannot open",
+            "More warning signs on doors",
+            "A louder air scrubber running",
+            "Brighter lights in the corridor"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Residents may not understand signs. Use a physical barrier they cannot open and supervise the entry."
+        },
+        {
+          "questionText": "Who tells families about the work and any health questions?",
+          "options": [
+            "Your own lead technician",
+            "The insurer's appointed builder",
+            "The hygienist on site",
+            "The service or school"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Give the service the facts in writing and let it communicate. Do not discuss health risks with parents yourself."
+        },
+        {
+          "questionText": "What is the strongest control in a childcare centre or school?",
+          "options": [
+            "Extra signs on the doors",
+            "Using quieter power tools only",
+            "Working when children are away",
+            "A longer final clean down"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "The safest children are the ones not in the building. Time dusty work for holidays, weekends or closure days."
+        },
+        {
+          "questionText": "A 14-day closure needs 13 days of work. What do you agree in advance?",
+          "options": [
+            "What happens if it runs late",
+            "A higher price for more speed",
+            "Skipping the verification step if late",
+            "Removing the drying goal from scope"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "With no buffer, agree in writing what happens if results are late, for example the rooms stay closed, not the centre."
+        },
+        {
+          "questionText": "Who maintains and repairs common property in a strata scheme?",
+          "options": [
+            "Each lot's tenant",
+            "The strata manager",
+            "The remediation contractor",
+            "The owners corporation"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Strata laws, such as section 106 of the NSW Act, make the owners corporation responsible for common property."
+        },
+        {
+          "questionText": "Do you decide whether a waterproofing membrane is common property?",
+          "options": [
+            "Yes, from the inspection",
+            "Yes, when asked to",
+            "No, the plan decides",
+            "Only for shared risers"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Boundaries depend on the strata plan and the state's rules. The strata manager confirms them; you report the facts."
+        },
+        {
+          "questionText": "Why report areas of 6.3 m², 8.3 m² and 27.0 m² separately by location?",
+          "options": [
+            "It makes the report longer",
+            "Insurers prefer the small numbers",
+            "Each party sees its share",
+            "It hides the total area"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Reporting by lot and common area lets the owners corporation, the owners and the insurer see the scope in each part of the building."
+        },
+        {
+          "questionText": "Work must happen while children are present. Which set-up is right?",
+          "options": [
+            "Separate entry, sealed, negative pressure",
+            "Shared entry with warning signs",
+            "Open room with fans running",
+            "Film curtain across the room"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "With children present the work area must be completely separate: its own outside entry, solid barriers, negative pressure and no shared air-conditioning."
+        },
+        {
+          "questionText": "A shared riser in a strata building has growth inside. What kind of issue is it?",
+          "options": [
+            "A single lot issue",
+            "A common property issue",
+            "A tenant's own issue",
+            "A council's own issue"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "A shared riser serves several units. Growth in it is a common property matter that affects every unit it serves."
+        }
+      ]
+    },
+    {
+      "quizId": "3f9dba5c-69c3-5ab3-b525-2c2375aa67ce",
+      "lessonTitle": "Final check: Level 3 Mould Remediation",
+      "title": "Level 3 Mould Remediation — Final check: Level 3 Mould Remediation",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Which single trigger makes a 6 m² job Level 3?",
+          "options": [
+            "A painted ceiling",
+            "A tiled bathroom",
+            "Aged care occupants",
+            "A timber floor"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Vulnerable occupants are a Level 3 trigger on their own, whatever the area."
+        },
+        {
+          "questionText": "Under the model WHS Act, which section requires duty holders to consult, cooperate and coordinate?",
+          "options": [
+            "Section 19",
+            "Section 46",
+            "Section 20",
+            "Section 35"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Section 46 covers the duty to consult with other duty holders. Section 19 is the primary duty of care."
+        },
+        {
+          "questionText": "When must a SWMS for high risk construction work be prepared?",
+          "options": [
+            "After the first day",
+            "Only if inspected later",
+            "Before the work starts",
+            "When the job finishes"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Under the model WHS Regulations a SWMS must be prepared before high risk construction work starts."
+        },
+        {
+          "questionText": "What should you use to confirm a cool patch on a thermal image?",
+          "options": [
+            "A second thermal image",
+            "A moisture meter reading",
+            "A smell test nearby",
+            "The client's own memory"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "A thermal camera shows temperature, not water. Confirm every suspect with a moisture meter."
+        },
+        {
+          "questionText": "Which date does Queensland use in its asbestos register rules?",
+          "options": [
+            "31 December 2003",
+            "1 January 1990",
+            "31 December 1989",
+            "31 December 1999"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "The model laws use 31 December 2003, but Queensland's regulation uses 31 December 1989. Whatever the date, test before cutting if unsure."
+        },
+        {
+          "questionText": "What must be issued before an asbestos removal area is reoccupied?",
+          "options": [
+            "A mould report",
+            "A SWMS sign-off",
+            "A waste docket",
+            "A clearance certificate"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "After licensed removal, an independent person inspects and issues a clearance certificate before the area is reoccupied."
+        },
+        {
+          "questionText": "What is the safe order on a sewage-affected mould job?",
+          "options": [
+            "Dry, clean, then remove",
+            "Fog, dry, then remove",
+            "Remove, clean, then dry",
+            "Dry, remove, then clean"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Remove soaked porous materials, then clean and sanitise, then dry. Drying first spreads contamination."
+        },
+        {
+          "questionText": "What does S520 section 9.3.5 give as the minimum air changes per hour?",
+          "options": [
+            "4 per hour",
+            "1 per hour",
+            "2 per hour",
+            "12 per hour"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Section 9.3.5 gives at least 4 air changes per hour. Confirm against AS-IICRC S520:2025."
+        },
+        {
+          "questionText": "What should a data-logging manometer do when a zone loses pressure?",
+          "options": [
+            "Switch off power",
+            "Reset its limit",
+            "Raise an alarm",
+            "Delete the reading"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Set the logger to alarm when the reading rises above the plan limit, and test the alarm on day one."
+        },
+        {
+          "questionText": "Which Australian standards series covers microbial control in building air-handling systems?",
+          "options": [
+            "AS/NZS 3012 series",
+            "AS/NZS 1715 series",
+            "AS/NZS 3666 series",
+            "AS/NZS 4361 series"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "AS/NZS 3666 covers microbial control of air-handling and water systems. AS/NZS 3012 is construction site electrics."
+        },
+        {
+          "questionText": "Who must handle refrigerant or work on air-conditioning equipment?",
+          "options": [
+            "A refrigerant licence holder",
+            "Any trained remediation technician",
+            "The building's facility manager",
+            "The insurer's nominated builder"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Anyone who handles refrigerant or works on refrigeration and air-conditioning equipment must hold a refrigerant handling licence."
+        },
+        {
+          "questionText": "Where must a generator run on a large job?",
+          "options": [
+            "In the doorway",
+            "Inside the containment",
+            "Outdoors, exhaust away",
+            "Inside the airlock"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Engines produce carbon monoxide. Run generators outdoors with the exhaust away from any opening."
+        },
+        {
+          "questionText": "In a healthcare facility, who decides with the verification when an area is reoccupied?",
+          "options": [
+            "Infection prevention lead",
+            "The lead technician",
+            "The waste contractor",
+            "The insurer's builder"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "The facility's infection prevention and control lead decides reoccupation together with the independent verification."
+        },
+        {
+          "questionText": "In strata, who confirms common property boundaries?",
+          "options": [
+            "The strata manager, from the plan",
+            "The remediator, from the site inspection",
+            "The tenant, from the lease terms",
+            "The insurer, from the claim form"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Boundaries come from the strata plan and the state's rules. The strata manager confirms them."
+        },
+        {
+          "questionText": "Why should clearance be confirmed by a party independent of the remediator?",
+          "options": [
+            "The remediator has an interest",
+            "Hygienists work much faster overall",
+            "It costs the client less",
+            "Remediators cannot use the meters"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "The company that did the work has an interest in it passing. Independent verification is what others can rely on."
+        },
+        {
+          "questionText": "A spore trap sampled 0.075 m³ and counted 96 spores. What is the concentration?",
+          "options": [
+            "720 spores/m³",
+            "96 spores/m³",
+            "7,200 spores/m³",
+            "1,280 spores/m³"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "96 ÷ 0.075 = 1,280 spores per cubic metre."
+        },
+        {
+          "questionText": "How is an indoor air result usually interpreted?",
+          "options": [
+            "Against national limits",
+            "By total alone",
+            "Compared with outdoors",
+            "By remediators only"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "There is no numerical health-based limit for airborne mould, so hygienists compare indoor with outdoor and affected with unaffected areas."
+        },
+        {
+          "questionText": "You find growth beyond the agreed scope. What comes before carrying on?",
+          "options": [
+            "Written approval of change",
+            "A verbal site okay",
+            "An invoice for extras",
+            "A photo on file"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Make safe and record it, notify, then agree the change in writing before working on the new scope."
+        },
+        {
+          "questionText": "Under the Insurance Code, how fast must a declined claimant get relied-on expert reports?",
+          "options": [
+            "30 business days",
+            "5 calendar days",
+            "10 business days",
+            "90 calendar days"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Paragraphs 81–82 of the General Insurance Code of Practice give 10 business days. Write every report expecting the owner to read it."
+        },
+        {
+          "questionText": "Which belongs in your remediation report?",
+          "options": [
+            "Who is legally liable",
+            "Whether the policy covers",
+            "The occupant's medical diagnosis",
+            "Likely cause with evidence"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Report the likely cause and the evidence. Liability and cover, like health, are for others to decide."
+        },
+        {
+          "questionText": "Which sample shows whether growth is inside a piece of plasterboard?",
+          "options": [
+            "A bulk sample",
+            "An outdoor sample",
+            "A dust sample",
+            "A spore trap"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A bulk sample is a piece of the material itself, so the lab can see whether growth is inside it. Air and dust samples show what is in the air or has settled."
+        }
+      ]
+    }
+  ]
+}

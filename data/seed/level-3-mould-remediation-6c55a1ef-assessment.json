@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "courseSlug": "level-3-mould-remediation-6c55a1ef",
+  "status": "draft",
+  "note": "Practical task for the Level 3 Mould Remediation draft (GP-658). Instructor-graded against the rubric. SME review required before it is published.",
+  "assessment": {
+    "id": "5c6d1344-0bc3-4e07-a151-a7d5064a5f8c",
+    "title": "Level 3 Mould Remediation — Practical task: plan and evidence a complex job",
+    "passThreshold": 70,
+    "isPublished": false,
+    "instructions": "## Practical task\n\nPlan and evidence a Level 3 mould job you have supervised, or use the supplied job: a two-level community health centre in Albany, WA, built in 1981. A roof leak over winter has caused growth on plasterboard in five rooms across both levels (estimated 38 m² visible). Ducted air-conditioning serves the upper level. The asbestos register lists fibre-cement eaves linings (12.6 m² on the work side) and vinyl floor tiles in one room. Two consulting rooms on the ground floor must stay open for clinics, including a wound-care clinic for diabetic patients. The insurer has appointed a builder. On day three, removal shows the growth runs a further 7 m along the external wall on the upper level.\n\nSubmit one PDF or a set of documents containing:\n\n1. Triage and investigation plan. The Level 3 triggers present, a staged plan for the hidden cavities, and how you will prove the cause.\n2. Interface register. Every duty holder on site and how you will consult and work with each.\n3. Work plan. Zones, volumes in m³, air changes and scrubber numbers, the decontamination chamber, the pressure logging plan, waste routes and the sequence.\n4. SWMS summary. The high risk construction work categories present, and the controls.\n5. HVAC and hazardous materials. The HVAC isolation and referral plan, and the hold points for the asbestos-containing materials, with who removes them and when your work resumes.\n6. Sensitive occupants. How the open clinics and their patients are protected, planned with the centre's infection control lead.\n7. Hygienist brief. A written brief, including the pass criteria to agree and the independence statement.\n8. Variation record. For the extra 7 m of wall found on day three, with the recalculated containment and air.\n9. Report extract. One page giving the cause, the timeline and the evidence chain, written for the insurer and the building owner to read.\n\nUse Australian English, metric units and 230 V equipment throughout. Name standards only; do not copy text from any standard.",
+    "criteria": [
+      {
+        "label": "Triage, investigation, cause",
+        "description": "Triggers identified (size, two levels, HVAC, healthcare occupants, pre-2004 building, insurer). Staged investigation with source control for openings. Cause proved with readings, not assumed.",
+        "maxPoints": 10
+      },
+      {
+        "label": "Duty holders and interfaces",
+        "description": "Every PCBU and the person controlling the building identified; the shared duty to consult shown for shared routes and fire systems, plus power and occupied areas.",
+        "maxPoints": 10
+      },
+      {
+        "label": "Zones, air, pressure",
+        "description": "Zones sized in m³, at least 4 air changes per hour with derated airflow, a decontamination chamber, continuous pressure logging against −5 Pa with alarms and a stop-work rule.",
+        "maxPoints": 20
+      },
+      {
+        "label": "SWMS and hazardous materials",
+        "description": "High risk construction work categories correctly identified. Asbestos in the register treated as a hold point: the 12.6 m² of eaves (over 10 m²) removed by a licensed Class B or Class A removalist, a clearance certificate before mould work resumes there, and no cutting of the vinyl tiles until identified. HVAC isolated and referred to licensed trades.",
+        "maxPoints": 15
+      },
+      {
+        "label": "Sensitive occupants",
+        "description": "Risk assessment with the infection control lead; solid barriers, negative pressure, waste routes and timing that protect clinic patients; reoccupation decided with the facility and the verification.",
+        "maxPoints": 15
+      },
+      {
+        "label": "Hygienist brief and change control",
+        "description": "An independent hygienist brief with pass criteria agreed in writing before work and independence disclosed. A variation record with make-safe steps, recalculated containment and air, and written approval before the extra work.",
+        "maxPoints": 15
+      },
+      {
+        "label": "Report and Australian production",
+        "description": "Cause, timeline, evidence chain: stated, opinions marked as opinions, no legal, cover or medical opinions. Australian English, metric units, 230 V equipment, and standards named only.",
+        "maxPoints": 15
+      }
+    ]
+  }
+}
