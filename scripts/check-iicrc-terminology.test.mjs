@@ -730,6 +730,15 @@ const MUST_BLOCK_FILE = [
     'GP-654 satisfies and non-null wrappers',
     "const a = `CARSI covers 7 IICRC ${('disciplines' satisfies string)}.`;\nconst b = `CARSI covers 7 IICRC ${label ? 'disciplines'! : 'topics'}.`;",
   ],
+  // Review of 58e106ae: a line break beside an empty element; HTML inside a string.
+  [
+    'GP-654 br and wbr in one heading',
+    'export const Hero = () => <h1>CARSI covers IICRC<br />disci<wbr />plines</h1>;',
+  ],
+  [
+    'GP-654 HTML comment inside a string',
+    "const body = '<h2>CARSI covers 7 IICRC <!-- topic list --> disciplines.</h2>';",
+  ],
   [
     'GP-654 too many adjacent conditional variants fails closed',
     `<p>Restoration disciplines${"{a ? 'x' : 'y'}".repeat(12)}</p>`,
@@ -786,6 +795,12 @@ for (const [name, src, block] of [
   ],
   ['learner question in Markdown', 'Which **IICRC disciplines** do you hold?', false],
   ['GP-654 Markdown word split by emphasis', 'CARSI covers 7 IICRC dis**ci**plines.', true],
+  ['GP-654 HTML comment in Markdown', 'CARSI covers 7 IICRC <!-- note --> disciplines.', true],
+  [
+    'GP-654 HTML span with a quoted > in Markdown',
+    'CARSI covers 7 IICRC <span title="a > b">disciplines</span>.',
+    true,
+  ],
 ]) {
   if (scanFile(F_MD, src).length > 0 !== block) {
     console.error(
@@ -805,6 +820,21 @@ for (const [name, src, block] of [
   [
     'GP-654 escaped tab in SEO JSON',
     '{"description": "CARSI covers 7 IICRC\\tdisciplines."}',
+    true,
+  ],
+  [
+    'GP-654 HTML comment in seed contentBody',
+    '{"contentBody": "<h2>CARSI covers 7 IICRC <!-- topic list --> disciplines.</h2>"}',
+    true,
+  ],
+  [
+    'GP-654 quoted > in an attribute in seed contentBody',
+    '{"contentBody": "<p>CARSI covers 7 IICRC <span title=\\"topics > details\\">disciplines</span>.</p>"}',
+    true,
+  ],
+  [
+    'GP-654 split word across HTML tags in seed contentBody',
+    '{"contentBody": "<p>CARSI covers 7 IICRC dis<b>ci</b>plines.</p>"}',
     true,
   ],
   [
