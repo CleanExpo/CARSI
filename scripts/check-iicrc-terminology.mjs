@@ -664,10 +664,11 @@ const SCRIPT_KIND = { '.tsx': 'TSX', '.jsx': 'JSX', '.ts': 'TS', '.js': 'JS', '.
  * The text a file renders, as runs with their line numbers, built from the parsed source rather
  * than from lines (review of 723bdce5: a regex over source lines kept losing to ordinary
  * attributes, comments and emphasis):
- *  - each outermost JSX element or fragment: its text children, string-literal expressions and
- *    nested elements' text, in order. Attributes and comments are never part of it. Any other
+ *  - each outermost JSX element or fragment, and each one passed as a prop: its text children,
+ *    string-literal expressions and nested elements' text, in order, once per way its
+ *    conditionals can render. String attributes and comments are never part of it. Any other
  *    expression reads as `{x}`, so "{count} IICRC disciplines" is still a count.
- *  - each outermost `+` join of quoted strings, with comments gone.
+ *  - each outermost `+` join of quoted strings, with comments gone, once per conditional branch.
  *  - in Markdown, each paragraph with emphasis, code ticks and link targets removed.
  */
 export function renderedRuns(file, text) {
@@ -702,40 +703,122 @@ export function renderedRuns(file, text) {
   const isPlus = (n) =>
     ts.isBinaryExpression(n) && n.operatorToken.kind === ts.SyntaxKind.PlusToken;
 
-  const stringValue = (expr) => {
-    if (ts.isParenthesizedExpression(expr)) return stringValue(expr.expression);
-    if (ts.isStringLiteral(expr) || ts.isNoSubstitutionTemplateLiteral(expr)) return expr.text;
-    if (ts.isTemplateExpression(expr)) {
-      return expr.head.text + expr.templateSpans.map((s) => '${x}' + s.literal.text).join('');
+  const opOf = (n) => (ts.isBinaryExpression(n) ? n.operatorToken.kind : null);
+  const isChoice = (n) =>
+    ts.isConditionalExpression(n) ||
+    [
+      ts.SyntaxKind.AmpersandAmpersandToken,
+      ts.SyntaxKind.BarBarToken,
+      ts.SyntaxKind.QuestionQuestionToken,
+    ].includes(opOf(n));
+
+  // A piece of copy is the set of texts it can render (review of 0bb32ada: `{open ? 'disciplines'
+  // : 'topics'}` read as one opaque `{x}`). Each branch of `?:`, `||` and `??` is one
+  // alternative, `&&` adds the empty render, and a branch that is not authored text reads as
+  // `{x}`. The source-line rules still see the raw `{…}`, so nothing they caught is lost.
+  // Sets are joined pairwise and capped at ALT_CAP: past it, every full text is checked as its
+  // own run first, then each keeps only its two ends (400, 200, then 100 characters; a match
+  // across the cut already fired), and a set still over the cap fails closed (`overflow`).
+  const ALT_CAP = 256;
+  let root = null;
+  // Every rule reads a whitespace run as one space, so texts that differ only in whitespace (an
+  // empty `&&` beside an `<Icon />`) are one alternative.
+  const cross = (a, b) => {
+    const out = [...new Set(a.flatMap((x) => b.map((y) => (x + y).replace(/\s+/g, ' '))))];
+    if (out.length <= ALT_CAP) return out;
+    for (const t of out) runs.push({ line: root.line, text: t });
+    for (const keep of [400, 200, 100]) {
+      const ends = [
+        ...new Set(
+          out.map((t) => (t.length > 2 * keep ? `${t.slice(0, keep)}\u0000${t.slice(-keep)}` : t))
+        ),
+      ];
+      if (ends.length <= ALT_CAP) return ends;
     }
+    root.overflow = true;
+    return out.slice(0, ALT_CAP);
+  };
+
+  // null: not authored text at all (an identifier, a call), which the caller reads as `{x}`.
+  const alts = (expr, inJsx) => {
+    if (ts.isParenthesizedExpression(expr)) return alts(expr.expression, inJsx);
+    if (ts.isStringLiteral(expr) || ts.isNoSubstitutionTemplateLiteral(expr)) return [expr.text];
+    if (ts.isTemplateExpression(expr)) {
+      return [expr.head.text + expr.templateSpans.map((s) => '${x}' + s.literal.text).join('')];
+    }
+    if (inJsx && isJsx(expr)) return flatten(expr);
     if (isPlus(expr)) {
-      const l = stringValue(expr.left);
-      const r = stringValue(expr.right);
-      return l === null && r === null ? null : (l ?? '{x}') + (r ?? '{x}');
+      const l = alts(expr.left, false);
+      const r = alts(expr.right, false);
+      return l === null && r === null ? null : cross(l ?? ['{x}'], r ?? ['{x}']);
+    }
+    if (isChoice(expr)) {
+      const and = opOf(expr) === ts.SyntaxKind.AmpersandAmpersandToken;
+      const branches = ts.isConditionalExpression(expr)
+        ? [expr.whenTrue, expr.whenFalse]
+        : and
+          ? [expr.right]
+          : [expr.left, expr.right];
+      const found = branches.map((b) => alts(b, inJsx));
+      if (found.every((f) => f === null)) return null;
+      return [...new Set([...(and ? [''] : []), ...found.flatMap((f) => f ?? ['{x}'])])];
     }
     return null;
   };
 
   const flatten = (node) => {
-    if (ts.isJsxText(node)) return node.getText(sf);
+    if (ts.isJsxText(node)) return [node.getText(sf)];
     if (ts.isJsxExpression(node)) {
-      if (!node.expression) return '';
-      if (isJsx(node.expression)) return flatten(node.expression);
-      return stringValue(node.expression) ?? '{x}';
+      if (!node.expression) return [''];
+      return alts(node.expression, true) ?? ['{x}'];
     }
-    if (ts.isJsxSelfClosingElement(node)) return ' ';
+    if (ts.isJsxSelfClosingElement(node)) return [' '];
     if (ts.isJsxElement(node) || ts.isJsxFragment(node)) {
-      return node.children.map(flatten).join('');
+      return node.children.reduce((acc, child) => cross(acc, flatten(child)), ['']);
     }
-    return '';
+    return [''];
+  };
+
+  // Already part of an enclosing tree's text: a child element, or a branch of a child `{…}`.
+  // JSX in an attribute (`title={<>…</>}`) is not, so it is a run of its own (review of 0bb32ada).
+  const inParentText = (node) => {
+    let p = node.parent;
+    if (isJsx(p)) return true;
+    while (ts.isParenthesizedExpression(p) || isChoice(p)) p = p.parent;
+    return ts.isJsxExpression(p) && isJsx(p.parent);
+  };
+
+  const emit = (texts) => {
+    for (const text of texts) runs.push({ line: root.line, text });
+    if (root.overflow) runs.push({ line: root.line, text: '', overflow: true });
+  };
+
+  // The authored text in a tree: JSX text and string literals. Comments and identifiers
+  // (`discipline={discipline}`) render nothing, so a tree whose authored text cannot spell the
+  // phrase is not expanded.
+  const authoredText = (node) => {
+    const parts = [];
+    const walk = (n) => {
+      if (ts.isJsxText(n)) parts.push(n.getText(sf));
+      else if (ts.isStringLiteral(n) || ts.isNoSubstitutionTemplateLiteral(n)) parts.push(n.text);
+      else if (ts.isTemplateExpression(n)) {
+        parts.push(n.head.text, ...n.templateSpans.map((s) => s.literal.text));
+      }
+      ts.forEachChild(n, walk);
+    };
+    walk(node);
+    return parts.join(' ');
   };
 
   const visit = (node) => {
-    if (isJsx(node) && !isJsx(node.parent) && !ts.isJsxExpression(node.parent)) {
-      runs.push({ line: lineOf(node), text: flatten(node) });
+    if (isJsx(node) && !inParentText(node)) {
+      if (!RENDERED_PREFILTER.test(authoredText(node))) return;
+      root = { line: lineOf(node) };
+      emit(flatten(node));
     } else if (isPlus(node) && !isPlus(node.parent)) {
-      const v = stringValue(node);
-      if (v !== null) runs.push({ line: lineOf(node), text: v });
+      root = { line: lineOf(node) };
+      const v = alts(node, false);
+      if (v !== null) emit(v);
     }
     ts.forEachChild(node, visit);
   };
@@ -784,6 +867,12 @@ export function scanFile(file, text, rules = BANNED) {
   const renderedRules = rules.filter((r) => r.rendered && !(r.skipDocs && docs));
   if (renderedRules.length > 0) {
     for (const run of renderedRuns(file, text)) {
+      if (run.overflow) {
+        findings.push(
+          `  ${file}:${run.line} (rendered): this copy has too many conditional variants to check (over 256); split it into smaller pieces`
+        );
+        continue;
+      }
       for (const rule of renderedRules) {
         if (ruleHits(rule, run.text)) {
           findings.push(
