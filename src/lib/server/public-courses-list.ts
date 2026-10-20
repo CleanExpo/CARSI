@@ -3,7 +3,7 @@ import { normalizeCourseTags, type CheckoutCourse, type CourseListItem } from '@
 import { prisma } from '@/lib/prisma';
 import { normalizePublicAssetUrl } from '@/lib/remote-image';
 import { isBuildPhase } from '@/lib/server/build-phase';
-import { formatLmsCourseCecHoursLabel } from '@/lib/server/course-cec-hours';
+import { formatCurrentCecHoursLabel } from '@/lib/server/course-cec-hours';
 import { formatLmsCourseDurationHoursLabel } from '@/lib/server/course-duration-hours';
 
 /**
@@ -78,7 +78,8 @@ function cecHoursLabelForRow(c: {
   durationHours?: number | null;
   iicrcDiscipline?: string | null;
 }): string | null {
-  return formatLmsCourseCecHoursLabel({
+  // GP-653: only an approval in force today labels a public listing.
+  return formatCurrentCecHoursLabel({
     slug: c.slug,
     // Registry-only (GP-498): stored `cecHours` is WP-import pollution; the label resolves
     // solely from the approvals registry by slug, so the raw column is not read here.
