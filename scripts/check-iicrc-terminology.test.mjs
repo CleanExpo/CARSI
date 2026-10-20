@@ -741,6 +741,18 @@ const MUST_BLOCK_FILE = [
   ],
   // Review of 1c70746b: title-case Disciplines after a CSS-upper-cased iicrc.
   [
+    'GP-654 a modifier between a spelled-out count and the singular',
+    'export const metadata = { description: "CARSI covers one core IICRC discipline." };',
+  ],
+  [
+    'GP-654 a hyphenated modifier after a single',
+    'export const metadata = { description: "CARSI offers a single restoration-focused IICRC discipline." };',
+  ],
+  [
+    'GP-654 a modifier between a digit count and the singular',
+    'export const metadata = { description: "CARSI covers 7 core IICRC discipline areas." };',
+  ],
+  [
     'GP-654 a spelled-out count before the singular',
     'export const metadata = { description: "CARSI offers one IICRC discipline." };',
   ],
