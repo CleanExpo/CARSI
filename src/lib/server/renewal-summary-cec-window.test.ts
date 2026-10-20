@@ -129,6 +129,9 @@ describe('renewal summary credits CEC only inside the approval window', () => {
         certificateIssuedAt: new Date('2027-02-01T00:00:00Z'),
       },
     ];
+    // The lesson revisit inside the period isolates the date choice: only the enrolment's own
+    // completion time may decide (review of c4f3d3a7).
+    h.lessonDone = { [`l-${IN_WINDOW}`]: new Date('2027-01-15T00:00:00Z') };
     const s = await getRenewalSummaryForStudent('user-1');
     expect(s!.cycle_start).toBe('2026-12-31T00:00:00.000Z');
     expect(s!.cec_earned_lifetime).toBe(1);
@@ -157,6 +160,21 @@ describe('renewal summary credits CEC only inside the approval window', () => {
     h.lessonDone = { [`l-${IN_WINDOW}`]: null };
     const undated = await getRenewalSummaryForStudent('user-1');
     expect(undated!.cec_earned_in_cycle).toBe(0);
+
+    // Review of c4f3d3a7: a lesson re-marked after the period ends does not credit the period.
+    h.lessonDone = { [`l-${IN_WINDOW}`]: new Date('2031-01-01T00:00:00Z') };
+    const afterEnd = await getRenewalSummaryForStudent('user-1');
+    expect(afterEnd!.cycle_end).toBe('2030-12-31T23:59:59.999Z');
+    expect(afterEnd!.cec_earned_in_cycle).toBe(0);
+  });
+
+  it('a lesson added after the learner finished does not remove period credit (GP-655)', async () => {
+    h.user = { ...h.user, iicrcExpiryDate: new Date('2030-12-31T00:00:00Z') };
+    const e = enrolment(IN_WINDOW, new Date('2027-01-01T00:00:00Z'));
+    e.course.modules[0].lessons.push({ id: 'l-added-later' });
+    h.enrolments = [e];
+    const s = await getRenewalSummaryForStudent('user-1');
+    expect(s!.cec_earned_in_cycle).toBe(1);
   });
 
   it('states the rule, including Master/Inspector (GP-655)', () => {

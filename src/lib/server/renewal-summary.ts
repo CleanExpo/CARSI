@@ -310,13 +310,16 @@ async function loadRenewalSummary(
 
       if (cycle && ts) {
         // A revocation or re-purchase clears completedAt but keeps lesson progress, so the next
-        // sync re-dates old learning to now. Count it in the period only when every lesson was
-        // also completed in the period; an undated or earlier lesson fails closed (GP-655 review
-        // of 5b47a9a1).
-        const learnedInPeriod = lessonIds.every((id) => {
-          const at = progressByLesson.get(id)?.completedAt;
-          return at != null && at >= cycle.start;
+        // sync re-dates old learning to now. Count it in the period only when every lesson the
+        // learner completed was also completed inside the period; an undated, earlier or later
+        // lesson fails closed (GP-655 reviews of 5b47a9a1 and c4f3d3a7). A lesson added to the
+        // course after the learner finished has no completion and is not evidence either way.
+        const done = lessonIds.flatMap((id) => {
+          const p = progressByLesson.get(id);
+          return p?.completed === true ? [p.completedAt] : [];
         });
+        const learnedInPeriod =
+          done.length > 0 && done.every((at) => at != null && at >= cycle.start && at <= cycle.end);
         if (learnedInPeriod && ts >= cycle.start && ts <= cycle.end) {
           byDiscCycle[disc] = (byDiscCycle[disc] ?? 0) + hours;
         }
