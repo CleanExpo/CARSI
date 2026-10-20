@@ -219,6 +219,12 @@ describe('licence inventory', () => {
     // review of b4af1171: an unrelated "No" earlier in the sentence negated the offer
     ['certif', HERO, 'No waiting for your IICRC ' + 'online certification courses (27)'],
     ['certif', HERO, 'Not sure? Browse IICRC ' + 'certification courses (27)'],
+    // review of 6a1046e8: long modifiers in sibling copy on /courses
+    [
+      'certif',
+      HERO,
+      'IICRC fully flexible online self paced ' + 'certification courses — bought once (27)',
+    ],
   ])('controls: %s fires in %s: %s', (term, file, text) => {
     expect(classifyCopy(file, term, text)[0]).toBe('exposure');
   });
@@ -378,8 +384,13 @@ describe('industry metadata never brands CARSI training with the IICRC name', ()
  * the CEC catalogue fails here, however it is worded.
  */
 describe('the /courses hero CEC link is pinned to the permitted label', () => {
+  const HERO_CLASS =
+    'inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-[#146fc2]/30 bg-white px-7 text-sm font-semibold text-[#146fc2] transition hover:border-[#146fc2]/60 focus-visible:ring-2 focus-visible:ring-[#2490ed]/35 focus-visible:outline-none';
   const PINNED =
-    '{catalogueAvailable && cecApprovedCount > 0 ? ( <Link href="/courses?discipline=iicrc-cec#catalogue" > IICRC CEC Accredited courses ({cecApprovedCount}) </Link> ) : null}';
+    '{catalogueAvailable && cecApprovedCount > 0 ? ( <Link href="/courses?discipline=iicrc-cec#catalogue" className="' +
+    HERO_CLASS +
+    '" > IICRC CEC Accredited courses ({cecApprovedCount}) </Link> ) : null}';
+  // className is pinned too: a Tailwind content utility renders text (review of 6a1046e8)
 
   function heroCecLinks(src: string): string[] {
     return [
@@ -389,18 +400,19 @@ describe('the /courses hero CEC link is pinned to the permitted label', () => {
     ]
       .map((m) => m[0])
       .filter((el) => el.includes('discipline=iicrc-cec'))
-      .map((el) =>
-        el
-          .replace(/\sclassName="[^"]*"/g, '')
-          .replace(/\s+/g, ' ')
-          .trim()
-      );
+      .map((el) => el.replace(/\s+/g, ' ').trim());
   }
 
   it('hero: the live page carries exactly the pinned element, once', () => {
     const src = readFileSync(HERO, 'utf8');
     expect(src.split('discipline=iicrc-cec').length - 1).toBe(1);
     expect(heroCecLinks(src)).toEqual([PINNED]);
+  });
+
+  // CSS can render text the copy scan never sees; /courses uses none (review of 6a1046e8)
+  const CSS_TEXT = /\bcontent-\[|\bcontent\s*:/;
+  it('hero: the /courses page renders no CSS-generated text', () => {
+    expect(readFileSync(HERO, 'utf8')).not.toMatch(CSS_TEXT);
   });
 
   it.each([
@@ -415,6 +427,12 @@ describe('the /courses hero CEC link is pinned to the permitted label', () => {
       'title="IICRC ' + 'certification courses" href="/courses?discipline=iicrc-cec#catalogue"',
     ],
     [
+      'CSS-generated text in className',
+      'className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-[#146fc2]/30',
+      'className="before:content-[\'IICRC_' +
+        "certification_courses'] inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-[#146fc2]/30",
+    ],
+    [
       'a dropped gate',
       '{catalogueAvailable && cecApprovedCount > 0 ? (',
       '{cecApprovedCount > 0 ? (',
@@ -424,5 +442,13 @@ describe('the /courses hero CEC link is pinned to the permitted label', () => {
     const planted = src.replace(from, to);
     expect(planted).not.toBe(src);
     expect(heroCecLinks(planted)).not.toEqual([PINNED]);
+  });
+
+  it('hero: CSS-generated text anywhere on /courses fails (control)', () => {
+    const planted = readFileSync(HERO, 'utf8').replace(
+      'className="',
+      'className="after:content-[\'IICRC_' + "certification_courses'] "
+    );
+    expect(planted).toMatch(CSS_TEXT);
   });
 });

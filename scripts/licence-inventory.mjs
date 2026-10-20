@@ -112,6 +112,12 @@ const IICRC_CERT_OFFER = new RegExp(
     `|\\bcertif\\w*[\\s-]+(?:${OFFER_NOUN})\\b(?:[\\s-]+[\\w&’'/]+){0,3}?[\\s-]+(?:from|by|with|through|in)[\\s-]+(?:the[\\s-]+)?IICRC\\b`,
   'i'
 );
+const IICRC_CERT_OFFER_ANY_DISTANCE = new RegExp(
+  `\\bIICRC\\b[\\s\\S]*?\\bcertif\\w*[\\s\\S]*?\\b(?:${OFFER_NOUN})\\b` +
+    `|\\bIICRC\\b[\\s\\S]*?\\bcertifications?[\\s-]+for\\b` +
+    `|\\bcertif\\w*[\\s\\S]*?\\b(?:${OFFER_NOUN})\\b[\\s\\S]*?\\b(?:from|by|with|through|in)[\\s-]+(?:the[\\s-]+)?IICRC\\b`,
+  'i'
+);
 // Only CARSI denying the offer, immediately before it, negates it; a stray "no" or "not"
 // earlier in the sentence does not (review of b4af1171: "No waiting for your IICRC ...").
 const CERT_OFFER_DENIED =
@@ -166,6 +172,17 @@ export const BLOCK_RULES = [
     terms: ['certif', 'iicrc-offer'],
     fn: (sentence) => {
       const m = IICRC_CERT_OFFER.exec(sentence);
+      return Boolean(m) && !CERT_OFFER_DENIED.test(sentence.slice(0, m.index));
+    },
+  },
+  {
+    // The /courses page carries the GP-639 hero; on it no word limit applies, so a long run of
+    // modifiers cannot reach a third-person exemption (review of 6a1046e8).
+    name: 'CARSI offer of IICRC certification on /courses (no word limit)',
+    terms: ['certif', 'iicrc-offer'],
+    path: /^app\/\(public\)\/courses\/page\.tsx$/,
+    fn: (sentence) => {
+      const m = IICRC_CERT_OFFER_ANY_DISTANCE.exec(sentence);
       return Boolean(m) && !CERT_OFFER_DENIED.test(sentence.slice(0, m.index));
     },
   },
@@ -534,6 +551,7 @@ export function classifyCopy(file, term, rawSentence, code = rawSentence, local 
   for (const r of BLOCK_RULES) {
     if (
       r.terms.includes(term) &&
+      (!r.path || r.path.test(file)) &&
       (r.fn ? r.fn(sentence, code) : r.re.test(sentence)) &&
       !(r.unless && r.unless.test(sentence))
     )
