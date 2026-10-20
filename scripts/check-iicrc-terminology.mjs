@@ -264,8 +264,12 @@ export function bannedRules(CODES = IICRC_CODE_ALT) {
       // banned without trying to work out what it renders.
       re: new RegExp(
         String.raw`\bIICRC\s+disciplines\b` +
-          String.raw`|\bIICRC(?:\s|${SEP})*${SEP}(?:\s|${SEP})*disciplines\b` +
-          String.raw`|(?<![\w.])(?:\d{1,3}\+?|\$\{[^}\n]{1,40}\}|\{[^}\n]{1,40}\})\s+IICRC\s+discipline\b` +
+          // Any separator other than plain whitespace, singular or plural; one way to parse it,
+          // so it stays linear (review of 17342ea9: the counted singular took `{x}` and `{"s"}`).
+          String.raw`|\bIICRC\s*(?:${SEP}\s*)+disciplines?\b` +
+          // The singular with a computed ending ("discipline{s}", "discipline${s}").
+          String.raw`|\bIICRC\s+discipline(?:\{|\$\{)` +
+          String.raw`|(?<![\w.])(?:\d{1,3}\+?|\$\{[^}\n]{1,40}\}|\{[^}\n]{1,40}\})(?:\s|${SEP}){1,8}IICRC\s+discipline\b` +
           String.raw`|\blabel\s*:\s*['"` +
           '`' +
           String.raw`]IICRC\s+disciplines?['"` +

@@ -215,6 +215,16 @@ const MUST_BLOCK = [
   ['String.fromCharCode', '<p>CARSI covers 7 IICRC{String.fromCharCode(32)}disciplines.</p>'],
   ['template interpolation', '`CARSI covers 7 IICRC${sp}disciplines.`'],
   ['two expressions', '<p>CARSI covers 7 IICRC{""}{" "}disciplines.</p>'],
+  // Independent review of 17342ea9: a count, a separator and a computed plural ending.
+  ['counted, fromCharCode, computed "s"', '<p>CARSI covers {7} IICRC{String.fromCharCode(32)}discipline{"s"}.</p>'],
+  ['counted, space variable, computed "s"', '<p>CARSI covers {count} IICRC{sp}discipline{plural}.</p>'],
+  ['counted, entity, computed "s"', '<p>CARSI covers 7 IICRC&#8199;discipline{"s"}.</p>'],
+  ['counted, escaped em space', '<p>CARSI covers 7 IICRC{"\\u2003"}discipline{"s"}.</p>'],
+  ['counted, figure-space entity', '<p>CARSI covers 7 IICRC&numsp;disciplines.</p>'],
+  ['template: count, separator, computed ending', '`${n} IICRC${sp}discipline${n === 1 ? "" : "s"}`'],
+  ['plain space, computed ending', '<p>CARSI covers {n} IICRC discipline{n === 1 ? "" : "s"}.</p>'],
+  ['count, separator before IICRC', '<p>CARSI covers {n}{sp}IICRC discipline.</p>'],
+  ['count inside an element, separator after', 'CARSI covers <b>7</b> IICRC{sp}discipline<span>s</span>'],
 ];
 
 const MUST_PASS = [
@@ -437,6 +447,10 @@ for (const [name, file, src, drop] of LIST_FIXTURES) {
     longLine,
     `${"__a: 'b', ".repeat(1000)}Which IICRC disciplines do you hold x`,
     `${'IICRC{x}'.repeat(1200)} disciplines`,
+    // Review of 17342ea9 (P2): repeated separators after one IICRC, and after counts.
+    `IICRC${'{}'.repeat(10000)}x`,
+    `7 ${'{}'.repeat(10000)}x`,
+    `${'{1}'.repeat(5000)} IICRC x`,
     `IICRC${'&nbsp;'.repeat(1500)}x disciplines`,
     `{"${'\\u0020'.repeat(1500)}x"} IICRC disciplines`,
     `${'Which of your '.repeat(700)}IICRC disciplines need renewal x`,
