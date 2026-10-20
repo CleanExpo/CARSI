@@ -13,6 +13,7 @@ Job address: ______________________   Date: ____/____/______   Technician: _____
 - [ ] Coveralls with hood, nitrile gloves, eye protection, overshoes: quantities packed.
 - [ ] Don in the clean area. Doff in the airlock, outer layers first, respirator last.
 - [ ] Wash hands and face after doffing. Used PPE bagged as mould waste.
+- [ ] Before leaving site, your work clothes go in a sealed bag or container (SWA biological hazards Code, March 2026).
 - [ ] Cartridges changed per the manufacturer and when breathing becomes harder.
 
 Notes:

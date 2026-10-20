@@ -16,6 +16,7 @@ Job address: ______________________   Date: ____/____/______   Technician: _____
 - [ ] Waste: bag count, weight estimate in kg, disposal point.
 - [ ] Assumptions and exclusions, written plainly.
 - [ ] Wetting timeline: when the water started, how long the material stayed wet, and the evidence for both.
+- [ ] Reinstatement: separate builder scope. It is building work under the NCC edition in force in that state.
 - [ ] Client sign-off: name, date, questions asked and answers given.
 
 Notes:
