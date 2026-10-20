@@ -739,6 +739,15 @@ const MUST_BLOCK_FILE = [
     'GP-654 HTML comment inside a string',
     "const body = '<h2>CARSI covers 7 IICRC <!-- topic list --> disciplines.</h2>';",
   ],
+  // Review of 1c70746b: title-case Disciplines after a CSS-upper-cased iicrc.
+  [
+    'GP-654 lower-case iicrc then title-case Disciplines across a wbr',
+    'export const Copy = () => <h2 className="uppercase"><span className="block">CARSI covers 7 iicrc</span><span>Disci<wbr title="word > break" />plines.</span></h2>;',
+  ],
+  [
+    'GP-654 a camelCase plural identifier is caught (fail-closed)',
+    'export const F = ({ course }) => <p>{course.iicrcDisciplines}</p>;',
+  ],
   // Review of 6cff84c2: lower-case iicrc shown upper-case by CSS, glued by the markup.
   [
     'GP-654 lower-case iicrc in a block-styled span beside a wbr',
@@ -794,7 +803,11 @@ const MUST_PASS_FILE = [
   ],
   [
     'a field and component named after IICRC disciplines',
-    'export const F = ({ course }) => <div><p>{course.iicrcDisciplines}</p><IICRCDisciplineMap /></div>;',
+    'export const F = ({ course }) => <div><p>{course.iicrcDiscipline}</p><IICRCDisciplineMap /></div>;',
+  ],
+  [
+    'an admin row passing the singular iicrcDiscipline field after a count prop',
+    'export const R = ({ c }) => <Row level={c.level} iicrcDiscipline={c.iicrcDiscipline} />;',
   ],
   [
     'a word that only starts like the banned one, split across an element',
