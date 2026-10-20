@@ -13,7 +13,7 @@ Job address: ______________________   Date: ____/____/______   Supervisor: _____
 - [ ] If children are present: separate outside entry, solid barriers, negative pressure, no shared air-conditioning.
 - [ ] Waste route children never use, at times they are not moving through.
 - [ ] Cleaning of rooms and play areas used by the waste route, including toys and soft furnishings if requested.
-- [ ] School: asbestos register read; contractor requirements and working with children checks met.
+- [ ] School: asbestos register read; contractor requirements met; need for working with children checks confirmed with the school before starting.
 - [ ] Families informed by the service, not by the crew.
 
 Notes:

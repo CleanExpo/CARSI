@@ -9,7 +9,7 @@ Job address: ______________________   Date: ____/____/______   Supervisor: _____
 - [ ] Pre-start held: time, work today, zones, SWMS controls, changes, weather, attendees signed.
 - [ ] Crew register checked: training, inductions, plant tickets, respirator fit test in date for the respirator worn.
 - [ ] Heat plan: hottest work timed for the cool part of the day, a work-rest rotation, chilled water, cool rest area.
-- [ ] Heat warning signs briefed: dizziness, confusion, headache, nausea, sweating that stops. Confusion = emergency.
+- [ ] Heat warning signs briefed: dizziness, confusion, headache, nausea, sweating that stops. Confusion = emergency: call 000.
 - [ ] Entry and exit log running at every zone.
 - [ ] Hold-point checks done today (containment, removal, cleaning, drying) with raking torch and cloth wipe. Faults fixed.
 - [ ] Incidents, near misses and breaches recorded and reported.

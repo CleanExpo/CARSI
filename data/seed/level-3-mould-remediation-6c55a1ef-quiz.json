@@ -146,14 +146,14 @@
         {
           "questionText": "A worker in a coverall becomes confused near shift end. What do you do?",
           "options": [
-            "Remove, cool, get first aid",
+            "Call 000, remove and cool them",
             "Give them a short break",
             "Finish the task with them",
             "Send them home to rest"
           ],
           "correctIndex": 0,
           "points": 1,
-          "explanation": "Confusion in the heat is a medical emergency. Get them out of the work area at once, cool them and get first aid."
+          "explanation": "Confusion in the heat is a medical emergency. Call 000, get them out of the work area at once, cool them and give first aid."
         },
         {
           "questionText": "With 45-minute work periods each hour, how much hands-on work is in a 10-hour shift?",
@@ -306,7 +306,7 @@
           ],
           "correctIndex": 2,
           "points": 1,
-          "explanation": "Machine sanding paint with more than 1% lead is a lead process under the model WHS Regulations. Plan lead controls or avoid sanding."
+          "explanation": "Machine sanding paint with more than 1% lead by dry weight is a lead process under the model WHS Regulations. Plan lead controls or avoid sanding."
         },
         {
           "questionText": "On a sewage job, why start drying only after soaked porous materials are out?",
@@ -390,16 +390,16 @@
           "explanation": "181.4 × 6 = 1,088 m³/h. 1,088 ÷ 500 = 2.2, rounded up to 3."
         },
         {
-          "questionText": "Before sealing over a smoke detector in a zone, who do you talk to?",
+          "questionText": "Who arranges the isolation of a smoke detector in a zone?",
           "options": [
             "The insurer's assessor",
             "Your own crew",
-            "The building manager",
+            "The fire services contractor",
             "The waste contractor"
           ],
           "correctIndex": 2,
           "points": 1,
-          "explanation": "Detectors and sprinklers, as well as exits, are part of the building's fire safety system. Agree any change with the building manager first."
+          "explanation": "Detectors and sprinklers are part of the building's fire safety system. The building manager's agreement is not enough: the fire services contractor isolates them under a written impairment plan, and the system is restored and tested before you leave each day."
         },
         {
           "questionText": "Where does a two-stage decontamination chamber help most?",
@@ -744,7 +744,7 @@
           "explanation": "A thermal camera shows temperature, not water. Confirm every suspect with a moisture meter."
         },
         {
-          "questionText": "Which date does Queensland use in its asbestos register rules?",
+          "questionText": "Which date does Queensland use for buildings in its asbestos rules?",
           "options": [
             "31 December 2003",
             "1 January 1990",
@@ -753,7 +753,7 @@
           ],
           "correctIndex": 2,
           "points": 1,
-          "explanation": "The model laws use 31 December 2003, but Queensland's regulation uses 31 December 1989. Whatever the date, test before cutting if unsure."
+          "explanation": "The model laws use 31 December 2003, but Queensland's regulation uses 31 December 1989 for buildings (31 December 2003 for other structures and plant). Whatever the date, test before cutting if unsure."
         },
         {
           "questionText": "What must be issued before an asbestos removal area is reoccupied?",
@@ -816,16 +816,16 @@
           "explanation": "AS/NZS 3666 covers microbial control of air-handling and water systems. AS/NZS 3012 is construction site electrics."
         },
         {
-          "questionText": "Who must handle refrigerant or work on air-conditioning equipment?",
+          "questionText": "Who may work on the refrigerant circuit of an air-conditioning unit?",
           "options": [
-            "A refrigerant licence holder",
+            "A technician with an ARC refrigerant handling licence",
             "Any trained remediation technician",
             "The building's facility manager",
             "The insurer's nominated builder"
           ],
           "correctIndex": 0,
           "points": 1,
-          "explanation": "Anyone who handles refrigerant or works on refrigeration and air-conditioning equipment must hold a refrigerant handling licence."
+          "explanation": "Work that could release fluorocarbon refrigerant needs an ARC refrigerant handling licence. Cleaning coils, ducts or filters doesn't, but the refrigerant circuit is for a licensed technician."
         },
         {
           "questionText": "Where must a generator run on a large job?",
@@ -912,7 +912,7 @@
           "explanation": "Make safe and record it, notify, then agree the change in writing before working on the new scope."
         },
         {
-          "questionText": "Under the Insurance Code, how fast must a declined claimant get relied-on expert reports?",
+          "questionText": "A claim is declined or not paid in full. How fast must relied-on expert reports be given?",
           "options": [
             "30 business days",
             "5 calendar days",
@@ -921,7 +921,7 @@
           ],
           "correctIndex": 2,
           "points": 1,
-          "explanation": "Paragraphs 81–82 of the General Insurance Code of Practice give 10 business days. Write every report expecting the owner to read it."
+          "explanation": "Paragraphs 81–82 of the General Insurance Code of Practice give 10 business days when a claim is declined or not paid in full. Write every report expecting the owner to read it."
         },
         {
           "questionText": "Which belongs in your remediation report?",

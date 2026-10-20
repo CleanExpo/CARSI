@@ -6,8 +6,8 @@ Australian-produced. Metric units. Use on site, then file it in the job record.
 
 Job address: ______________________   Date: ____/____/______   Supervisor: ______________________
 
-- [ ] Building date checked against your state's asbestos date (model laws: before 31 Dec 2003; Qld: before 31 Dec 1989).
-- [ ] Asbestos register read: date, who holds it, materials listed in the work area. No register: inspection and identification arranged.
+- [ ] Building date checked against your state's asbestos date (model laws: before 31 Dec 2003; Qld: buildings before 31 Dec 1989, other structures and plant before 31 Dec 2003).
+- [ ] Asbestos register: copy obtained from the person who manages or controls the workplace, date read, materials listed in the work area. No register: a competent person inspects before work starts.
 - [ ] Suspect materials sampled and results received before any cutting.
 - [ ] Asbestos in the work area: licensed removalist (class, licence number), dates, enclosure location.
 - [ ] Clearance certificate received for each asbestos removal area before mould work resumes there.

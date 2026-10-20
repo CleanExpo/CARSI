@@ -14,7 +14,7 @@ Job address: ______________________   Date: ____/____/______   Supervisor: _____
 - [ ] Duct behind the nearest grilles inspected: sheet metal, internally lined or flexible.
 - [ ] Findings sent to the building manager and the HVAC contractor (and hygienist, if engaged).
 - [ ] Duct and unit cleaning or replacement scoped in writing by the specialist contractor.
-- [ ] Refrigerant and electrical work only by licensed trades.
+- [ ] Anything on the refrigerant circuit only by an ARC-licensed refrigerant technician. Electrical work only by a licensed electrician.
 - [ ] Restart only after sign-off by a qualified person. Name, date, time: recorded.
 
 Notes:

@@ -33,7 +33,7 @@
 <text x="24" y="318" font-size="13" font-weight="700" fill="#1f2933">Temporary board</text>
 <text x="24" y="336" font-size="12" fill="#52606d">400 V between phases,</text>
 <text x="24" y="352" font-size="12" fill="#52606d">230 V phase to neutral,</text>
-<text x="24" y="368" font-size="12" fill="#52606d">50 Hz; RCD on every outlet</text>
+<text x="24" y="368" font-size="12" fill="#52606d">50 Hz; RCD on every circuit</text>
 <path d="M63.6,180 L164,180 L194,112 L220,112" stroke="#b42318" stroke-width="2" fill="none"/>
 <text x="226" y="106" font-size="13" font-weight="700" fill="#1f2933">L1</text>
 <polygon points="250,92 258,86 453,86 445,92" fill="url(#gZA)" stroke="#0b6e4f" stroke-width="1"/>
@@ -83,6 +83,6 @@
 <rect x="602" y="406" width="14" height="12" fill="url(#gZC)" stroke="#b54708" stroke-width="1"/>
 <text x="622" y="416" font-size="12" fill="#52606d">air mover 1.2 A</text>
 <rect x="24" y="432" width="752" height="46" rx="10" fill="url(#gBlue)" stroke="#1f5f8b" stroke-width="2"/>
-<text x="40" y="460" font-size="12" font-weight="700" fill="#1f2933">91 + 36 + 24 = 151 A, about 50 A a phase, about 34.7 kW. Stagger the dehumidifier start-up.</text>
+<text x="40" y="460" font-size="12" font-weight="700" fill="#1f2933">91 + 36 + 24 = 151 A, about 50 A a phase, about 34.7 kVA. Stagger the dehumidifier start-up.</text>
 <text x="776" y="500" font-size="11" fill="#52606d" text-anchor="end">CARSI · Level 3 Mould Remediation · schematic, not to scale</text>
 </svg>
