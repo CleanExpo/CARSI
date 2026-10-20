@@ -341,11 +341,15 @@ export function bannedRules(CODES = IICRC_CODE_ALT) {
             view
               // With markup read as nothing, every mix of block, inline and CSS-block tags
               // (`<span className="block">…IICRC</span><span>disci<wbr />plines</span>`, review
-              // of bcd9b725) leaves "IICRCdisciplines", in any case (`iicrc` shown upper-case by
-              // CSS, review of 6cff84c2). A camelCase join (`iicrcDiscipline`) and a following word
-              // (`IICRCDisciplineMap`) are identifiers and stay out.
+              // of bcd9b725) leaves "IICRCdisciplines", in any letter case, because CSS can set
+              // the case shown (reviews of 6cff84c2 and 1c70746b). The plural in any case,
+              // fail-closed: a camelCase plural identifier (`iicrcDisciplines`) is caught too and
+              // must be renamed. The singular only where it cannot be the `iicrcDiscipline` field
+              // (`level={c.level} iicrcDiscipline={…}` in the admin course list) or
+              // `IICRCDisciplineMap`: upper-case IICRC, or a lower-case discipline after it.
+              .replace(/\b(iicrc)(?=disciplines\b)/gi, '$1 ')
               .replace(
-                /\b(?:IICRC(?=(?:[Dd]iscipline|DISCIPLINE)[Ss]?\b)|[Ii][Ii][Cc][Rr][Cc](?=disciplines?\b))/g,
+                /\b(?:IICRC(?=[Dd]iscipline\b|DISCIPLINE\b)|[Ii][Ii][Cc][Rr][Cc](?=discipline\b))/g,
                 '$& '
               )
               .split(/(?<=[.!?])\s+/)
