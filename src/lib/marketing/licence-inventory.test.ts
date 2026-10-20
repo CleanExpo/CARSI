@@ -429,6 +429,50 @@ describe('the /courses hero CEC link is pinned to the permitted label', () => {
     expect(readFileSync(HERO, 'utf8')).not.toMatch(CSS_TEXT);
   });
 
+  // No regex refuses every offer wording (review of 5542ae92: "CARSI offers your IICRC
+  // certification online." beside the link), so every copy sentence on /courses that names the
+  // IICRC is pinned, and so is the count of the word itself: new IICRC copy there fails here
+  // until it is reviewed and added.
+  const HERO_IICRC_SENTENCES = [
+    'IICRC CEC Accredited courses ( )',
+    'These are CARSI-issued credentials, not IICRC certifications.',
+    'IICRC certification is obtained through schools and examinations approved by the IICRC.',
+    'Same cards as the homepage — price, duration, and CEC hours only when the IICRC has approved that course.',
+    'How IICRC certification disciplines fit together',
+    'A reference map of the IICRC&rsquo;s own certification disciplines.',
+    'These are certifications awarded by schools and examinations approved by the IICRC, not CARSI courses — CARSI courses carry CARSI Southern Hemisphere Restoration Designations.',
+  ];
+  async function heroIicrcSentences(src: string): Promise<string[]> {
+    const found = (await inventory(rootWith({ [HERO]: src }))) as Array<Hit & { sentence: string }>;
+    return [
+      ...new Set(
+        found.filter((h) => h.file === HERO && /\bIICRC\b/i.test(h.sentence)).map((h) => h.sentence)
+      ),
+    ];
+  }
+  const iicrcCount = (src: string) => (src.match(/iicrc/gi) ?? []).length;
+
+  it('hero: every IICRC sentence on /courses is a reviewed one', async () => {
+    const src = readFileSync(HERO, 'utf8');
+    expect(await heroIicrcSentences(src)).toEqual(HERO_IICRC_SENTENCES);
+    expect(iicrcCount(src)).toBe(13);
+  });
+
+  it.each([
+    'CARSI offers your IICRC ' + 'certification online.',
+    'Get IICRC qualified with CARSI.',
+    'Learn the IICRC way.',
+  ])('hero: a new IICRC sentence beside the link fails (control): %s', async (copy) => {
+    const src = readFileSync(HERO, 'utf8');
+    const anchor = '{catalogueAvailable && cecApprovedCount > 0 ? (';
+    const planted = src.replace(anchor, `<p>${copy}</p>\n${anchor}`);
+    expect(planted).not.toBe(src);
+    const pinned =
+      JSON.stringify(await heroIicrcSentences(planted)) === JSON.stringify(HERO_IICRC_SENTENCES) &&
+      iicrcCount(planted) === 13;
+    expect(pinned).toBe(false);
+  });
+
   it.each([
     [
       'a reworded label',
