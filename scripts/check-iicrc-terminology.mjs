@@ -682,6 +682,17 @@ const SCRIPT_KIND = {
  * Every file is parsed: a substring prefilter missed a word split across elements (review of
  * 818f619e), and parsing the whole repository takes under a second.
  */
+// HTML written inside copy (seed contentBody, Markdown) renders without its comments and tags
+// (`<h2>… IICRC <!-- note --> disciplines</h2>`, `<span title="a > b">`; review of 58e106ae).
+// Quoted attribute values may hold `>`. A tag reads as nothing and as a break, as JSX does.
+const HTML_COMMENT = /<!--[\s\S]*?-->/g;
+const HTML_TAG = /<\/?[A-Za-z][^>"']*(?:(?:"[^"]*"|'[^']*')[^>"']*)*>/g;
+function htmlViews(t) {
+  if (!t.includes('<')) return [];
+  const c = t.replace(HTML_COMMENT, '');
+  return [c.replace(HTML_TAG, ''), c.replace(HTML_TAG, ' ')];
+}
+
 export function renderedRuns(file, text) {
   const ext = (file.match(/\.[a-z]+$/i)?.[0] ?? '').toLowerCase();
   if (ext === '.md' || ext === '.mdx') {
@@ -692,12 +703,10 @@ export function renderedRuns(file, text) {
       if (i === lines.length || lines[i].trim() === '') {
         const para = lines.slice(start, i).join(' ');
         if (para.trim()) {
-          runs.push({
-            line: start + 1,
-            text: para
-              .replace(/\[([^\]\n]{0,200})\]\([^)\n]{0,400}\)/g, '$1')
-              .replace(/[*_`~]+/g, ''),
-          });
+          const md = para
+            .replace(/\[([^\]\n]{0,200})\]\([^)\n]{0,400}\)/g, '$1')
+            .replace(/[*_`~]+/g, '');
+          for (const view of [md, ...htmlViews(md)]) runs.push({ line: start + 1, text: view });
         }
         start = i + 1;
       }
@@ -846,7 +855,11 @@ export function renderedRuns(file, text) {
     }
     // As React renders it, an empty element adds no text (`dis<wbr />ciplines`, review of
     // c6c5a064); the loose view keeps reading it as a break.
-    if (ts.isJsxSelfClosingElement(node)) return [reactMode ? '' : ' '];
+    // `<br />` is a line break in both views (`IICRC<br />disci<wbr />plines`, review of 58e106ae).
+    if (ts.isJsxSelfClosingElement(node)) {
+      if (node.tagName.getText(sf).toLowerCase() === 'br') return [' '];
+      return [reactMode ? '' : ' '];
+    }
     if (ts.isJsxElement(node) || ts.isJsxFragment(node)) {
       return node.children.reduce((acc, child) => cross(acc, flatten(child)), ['']);
     }
@@ -942,7 +955,10 @@ export function renderedRuns(file, text) {
       // invisible characters, as JSX text is.
       root = { line: lineOf(node) };
       const v = alts(node, false);
-      if (v !== null) emit([...new Set([...v, ...v.map(visible)])]);
+      if (v !== null) {
+        const html = v.flatMap(htmlViews).map((h) => visible(decodeRefs(h)));
+        emit([...new Set([...v, ...v.map(visible), ...html])]);
+      }
     }
     ts.forEachChild(node, visit);
   };
