@@ -103,5 +103,52 @@
     "contains": "IICRC CEC course content",
     "class": "owned-elsewhere",
     "reason": "reviews thread owns testimonials; reported to Phill"
+  },
+  {
+    "file": "src/lib/cec-display.ts",
+    "line": 26,
+    "contains": "return `${label} CEC${label === '1' ? '' : 's'}`;",
+    "class": "legitimate",
+    "reason": "GP-639 count label: renders only the number of CEC hours already resolved from the approvals record, as '1 CEC' or 'N CECs'; it makes no accreditation, offer or certification claim and returns null when hours are missing"
+  },
+  {
+    "file": "app/(public)/industries/healthcare/page.tsx",
+    "line": 82,
+    "contains": "question: 'Does CARSI deliver IICRC certification for hospital work?'",
+    "terms": ["certif"],
+    "class": "legitimate",
+    "reason": "FAQ question whose answer opens 'No.' and says IICRC certification is obtained only through IICRC-approved schools and examinations (third-person, a denial, not an offer)"
+  },
+  {
+    "file": "src/lib/marketing/industry-track2.ts",
+    "line": 55,
+    "contains": "question: 'Does CARSI deliver IICRC certification for those contracts?'",
+    "terms": ["certif"],
+    "class": "legitimate",
+    "reason": "FAQ question whose answer opens 'No.' and says IICRC certification is obtained only through IICRC-approved schools and examinations (third-person, a denial, not an offer)"
+  },
+  {
+    "file": "public/downloads/carsi-government-contractor-guide.pdf",
+    "line": 154,
+    "contains": "IICRC certifications for all technicians (not just the business owner)",
+    "terms": ["certif"],
+    "class": "legitimate",
+    "reason": "government-contractor guide checklist of what a contractor's own staff must hold; IICRC certification is listed as a third-party requirement, not a CARSI offer"
+  },
+  {
+    "file": "public/downloads/carsi-government-contractor-guide.pdf",
+    "line": 158,
+    "contains": "First Aid Certificate (current, within 3 years)",
+    "terms": ["certif"],
+    "class": "legitimate",
+    "reason": "government-contractor guide checklist of what a contractor's own staff must hold; IICRC certification is listed as a third-party requirement, not a CARSI offer (this line joins the IICRC item into one sentence)"
+  },
+  {
+    "file": "public/downloads/carsi-government-contractor-guide.pdf",
+    "line": 160,
+    "contains": "Confined Space Entry certification (where applicable)",
+    "terms": ["certif"],
+    "class": "legitimate",
+    "reason": "government-contractor guide checklist of what a contractor's own staff must hold; IICRC certification is listed as a third-party requirement, not a CARSI offer (this line joins the IICRC item into one sentence)"
   }
 ]

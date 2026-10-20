@@ -103,6 +103,30 @@ const NOT_PUBLIC_PATHS = [
 ];
 
 const INDUSTRY = /^app\/\(public\)\/industries\//;
+// Word limits keep third-person sentences that mention IICRC certification and a course far
+// apart out of scope; the /courses hero label, the copy this rule was written for, is also
+// pinned exactly by licence-inventory.test.ts (review of b4af1171).
+const IICRC_CERT_OFFER = new RegExp(
+  `\\bIICRC\\b(?:[\\s-]+[\\w&’'/]+){0,4}?[\\s-]+certif\\w*(?:[\\s-]+[\\w&’'/]+){0,3}?[\\s-]+(?:${OFFER_NOUN})\\b` +
+    `|\\bIICRC\\b(?:[\\s-]+[\\w&’'/]+){0,4}?[\\s-]+certifications?[\\s-]+for\\b` +
+    `|\\bcertif\\w*[\\s-]+(?:${OFFER_NOUN})\\b(?:[\\s-]+[\\w&’'/]+){0,3}?[\\s-]+(?:from|by|with|through|in)[\\s-]+(?:the[\\s-]+)?IICRC\\b`,
+  'i'
+);
+const IICRC_CERT_OFFER_ANY_DISTANCE = new RegExp(
+  `\\bIICRC\\b[\\s\\S]*?\\bcertif\\w*[\\s\\S]*?\\b(?:${OFFER_NOUN})\\b` +
+    `|\\bIICRC\\b[\\s\\S]*?\\bcertifications?[\\s-]+for\\b` +
+    `|\\bcertif\\w*[\\s\\S]*?\\b(?:${OFFER_NOUN})\\b[\\s\\S]*?\\b(?:from|by|with|through|in)[\\s-]+(?:the[\\s-]+)?IICRC\\b`,
+  'i'
+);
+// Only CARSI denying the offer, immediately before it, negates it; a stray "no" or "not"
+// earlier in the sentence does not (review of b4af1171: "No waiting for your IICRC ...").
+// "does not sell only ..." is a not-only offer, not a denial (review of c4f98bcc).
+const CERT_OFFER_DENIED =
+  /\b(?:does|do|did|will|can)(?:\s+not|n['’]t)\s+(?:sell|offer|deliver|provide|award|issue|teach|run)(?:\s+(?!(?:only|just|merely|solely|exclusively|simply)\b)[\w’'-]+){0,2}\s*$/i;
+const CERT_OFFER_NOT_ONLY = /\b(?:also|as well|too|plus|but)\b/i;
+const certOfferDenied = (sentence, m) =>
+  CERT_OFFER_DENIED.test(sentence.slice(0, m.index)) &&
+  !CERT_OFFER_NOT_ONLY.test(sentence.slice(m.index + m[0].length));
 const CODE_ALT = IICRC_CODES.join('|');
 
 /**
@@ -143,6 +167,30 @@ export const BLOCK_RULES = [
     re: new RegExp(
       `\\b(?:${CODE_ALT})\\b[\\s-]+certification[\\s-]+(?:courses?|training|programs?|programmes?|classes)\\b`
     ),
+  },
+  {
+    // GP-639 reviews: four rounds each found another wording ("IICRC online certification
+    // courses", "IICRC certifications for ...") that a third-person exemption accepted. This
+    // runs before every exemption, so any IICRC certification offer is an exposure however it
+    // is worded, unless CARSI denies it straight before the offer.
+    name: 'CARSI offer of IICRC certification (any modifiers in between)',
+    terms: ['certif', 'iicrc-offer'],
+    fn: (sentence) => {
+      const m = IICRC_CERT_OFFER.exec(sentence);
+      return Boolean(m) && !certOfferDenied(sentence, m);
+    },
+  },
+  {
+    // The /courses page carries the GP-639 hero; on it no word limit applies, so a long run of
+    // modifiers cannot reach a third-person exemption (review of 6a1046e8), and no denial
+    // wording exempts the sentence (review of c4f98bcc).
+    name: 'CARSI offer of IICRC certification on /courses (no word limit)',
+    terms: ['certif', 'iicrc-offer'],
+    path: /^app\/\(public\)\/courses\/page\.tsx$/,
+    fn: (sentence) => {
+      // no denial escape on the hero page: it has no reason to name the offer at all
+      return IICRC_CERT_OFFER_ANY_DISTANCE.test(sentence);
+    },
   },
   {
     name: 'unsold carpet- or colour-repair training offered',
@@ -217,7 +265,7 @@ export const LEGIT_RULES = [
   {
     name: 'third-person IICRC certification: obtained through IICRC schools, held, renewed or required by others',
     terms: ['certif', 'iicrc-offer'],
-    re: /IICRC[- ]approved schools|approved by the IICRC|schools? (?:and|&) exam|not (?:an? )?IICRC certifications?|does not (?:deliver|award|issue|provide|sell|make you)|does not sell IICRC|IICRC certification (?:is|itself|evidence|numbers?)|no CARSI course is IICRC certification|(?:your|an existing|existing|already hold|hold(?:s|ing)?|maintain\w*|keep\w*|renew\w*|recertif\w*|expir\w*|lapse\w*)\b[^.]{0,30}certif|certif\w*[^.]{0,30}(?:you (?:already )?hold|renewal|expir|number|on file|history|emails?|status|cockpit|cycle|date)|Already IICRC certified|No (?:Current )?Certifications?|certifications yet|IICRC-certified (?:restoration practitioner|technicians|firms|contractors|restorer)|certified technicians who already|Certification \(IICRC\)|Institute of Inspection,? Cleaning and Restoration Certification|IICRC certification disciplines|IICRC certifications? (?:help|align|required|is|are|reference|it expects|procurement|government|tender)|(?:Do|Does) [^?]{0,40}need[^?]{0,20}certification|(?:Do|Does) [^?]{0,60}require IICRC certification\?|certification to clean carpets|'carpet cleaning certification(?: Australia)?'|legally required to hold IICRC|Does CARSI deliver IICRC certification|Does a CARSI course make me IICRC certified|certification[- ](?:course|training)|bought once|One IICRC certification|A certification is|certification is held|Current Certification|certification this cycle|'IICRC certifications',|IICRC certifications, and|disciplines, IICRC certifications|standards and certification body|panel sets its own certification|certifications it requires|certification requirements?|certifications procurement officers|The certifications procurement|requirements, certifications|procurement, certifications|IICRC certification is increasingly listed|IICRC provides technician-level certifications|maintain certification status|Certified Flooring|Certified Building|Certification and Trust|certification, continuing education|Using certification as a badge|Answer certification questions|certification, CEC, and trust|IICRC certifications for|holding any IICRC certification|certified staff maintain certification|certification affect pay|CARSI certifies|certify the numbers|certifies the gas|certified under the relevant|licensed practitioner|Sign-off|engineer-rated|VSB14|Load Restraint|modification code|certification \(amortised\)|Training\/certification|IICRC\/CARSI courses|recommended: IICRC|IICRC [A-Z]{2,5} certification|certification number|certification documents|holds IICRC certification|IICRC-certified restorer|Restoration Certification$|Certified Restoration Contractors|Audit current certifications|certification table|IICRC certification evidence|their IICRC certifications|active IICRC certifications|Confined Space Entry certification|Assess your team's certifications|certifications are the entry ticket|Required IICRC Certifications|Essential Certifications by Service Type|\| Certification +\||Certification Code Why It.?s Required|ongoing education to maintain|CECs per certification|Current certification status|implication CARSI certifies|imply safety certification|overclaiming certification|overstating certification|certification status changes|Guide to IICRC Certification|IICRC Certification Guide|IICRC Certification explained|certification versus continuing education|CARSI course make me IICRC certified\?|Do not describe CARSI as|may already hold|Panels Ask for IICRC Certification|list industry certifications|do not grant IICRC certification|your IICRC credentials|^Certification$|through a school (?:and examination )?approved by the IICRC|CECs contribute to the maintenance|verified with the IICRC|disclaims responsibility|^carpet cleaning certification(?: Australia)?$|IICRC(?:&rsquo;|['’])s own|does not award|certified technicians continue|list IICRC certification|Once certified, the IICRC requires|Master and Inspector certifications|an IICRC certification; CARSI sells no colour-repair course|One-off (?:·|&middot;) certification|cert example|what does it cost you every year to keep it|^IICRC certifications$|they (?:already )?hold|verify a candidate's CARSI credential|^- 20\d\d-\d\d-\d\d:|skills and certifications valued|training and certification costs|fire services certification|IICRC [A-Z]{2,5} certification|[A-Z]{2,5} certification is recommended|Lists IICRC certification|Certified Firms|logo rights attach to Certified|maintenance of IICRC certifications|Certification mix|certified staff maintain|certification queries|pricing, certification|certification is not legally required|certifications: \[/i,
+    re: /IICRC[- ]approved schools|approved by the IICRC|schools? (?:and|&) exam|not (?:an? )?IICRC certifications?|does not (?:deliver|award|issue|provide|sell|make you)|does not sell IICRC|IICRC certification (?:is|itself|evidence|numbers?)|no CARSI course is IICRC certification|(?:your|an existing|existing|already hold|hold(?:s|ing)?|maintain\w*|keep\w*|renew\w*|recertif\w*|expir\w*|lapse\w*)\b[^.]{0,30}certif|certif\w*[^.]{0,30}(?:you (?:already )?hold|renewal|expir|number|on file|history|emails?|status|cockpit|cycle|date)|Already IICRC certified|No (?:Current )?Certifications?|certifications yet|IICRC-certified (?:restoration practitioner|technicians|firms|contractors|restorer)|certified technicians who already|Certification \(IICRC\)|Institute of Inspection,? Cleaning and Restoration Certification|IICRC certification disciplines|IICRC certifications? (?:help|align|required|is|are|reference|it expects|procurement|government|tender)|(?:Do|Does) [^?]{0,40}need[^?]{0,20}certification|(?:Do|Does) [^?]{0,60}require IICRC certification\?|certification to clean carpets|'carpet cleaning certification(?: Australia)?'|legally required to hold IICRC|Does CARSI deliver IICRC certification|Does a CARSI course make me IICRC certified|priced differently from a certification course\?|certification-course fee, checked at source|A certification course and a continuing education course are not competing products|hands-on certification training is worth doing properly|bought once|One IICRC certification|A certification is|certification is held|Current Certification|certification this cycle|'IICRC certifications',|IICRC certifications, and|disciplines, IICRC certifications|standards and certification body|panel sets its own certification|certifications it requires|certification requirements?|certifications procurement officers|The certifications procurement|requirements, certifications|procurement, certifications|IICRC certification is increasingly listed|IICRC provides technician-level certifications|maintain certification status|Certified Flooring|Certified Building|Certification and Trust|certification, continuing education|Using certification as a badge|Answer certification questions|certification, CEC, and trust|IICRC certifications for|holding any IICRC certification|certified staff maintain certification|certification affect pay|CARSI certifies|certify the numbers|certifies the gas|certified under the relevant|licensed practitioner|Sign-off|engineer-rated|VSB14|Load Restraint|modification code|certification \(amortised\)|Training\/certification|IICRC\/CARSI courses|recommended: IICRC|IICRC [A-Z]{2,5} certification|certification number|certification documents|holds IICRC certification|IICRC-certified restorer|Restoration Certification$|Certified Restoration Contractors|Audit current certifications|certification table|IICRC certification evidence|their IICRC certifications|active IICRC certifications|Confined Space Entry certification|Assess your team's certifications|certifications are the entry ticket|Required IICRC Certifications|Essential Certifications by Service Type|\| Certification +\||Certification Code Why It.?s Required|ongoing education to maintain|CECs per certification|Current certification status|implication CARSI certifies|imply safety certification|overclaiming certification|overstating certification|certification status changes|Guide to IICRC Certification|IICRC Certification Guide|IICRC Certification explained|certification versus continuing education|CARSI course make me IICRC certified\?|Do not describe CARSI as|may already hold|Panels Ask for IICRC Certification|list industry certifications|do not grant IICRC certification|your IICRC credentials|^Certification$|through a school (?:and examination )?approved by the IICRC|CECs contribute to the maintenance|verified with the IICRC|disclaims responsibility|^carpet cleaning certification(?: Australia)?$|IICRC(?:&rsquo;|['’])s own|does not award|certified technicians continue|list IICRC certification|Once certified, the IICRC requires|Master and Inspector certifications|an IICRC certification; CARSI sells no colour-repair course|One-off (?:·|&middot;) certification|cert example|what does it cost you every year to keep it|^IICRC certifications$|they (?:already )?hold|verify a candidate's CARSI credential|^- 20\d\d-\d\d-\d\d:|skills and certifications valued|training and certification costs|fire services certification|IICRC [A-Z]{2,5} certification|[A-Z]{2,5} certification is recommended|Lists IICRC certification|Certified Firms|logo rights attach to Certified|maintenance of IICRC certifications|Certification mix|certified staff maintain|certification queries|pricing, certification|certification is not legally required|certifications: \[/i,
   },
   {
     name: 'other bodies’ certification (ISO, HACCP, gas, vehicle, Cert IV)',
@@ -509,6 +557,7 @@ export function classifyCopy(file, term, rawSentence, code = rawSentence, local 
   for (const r of BLOCK_RULES) {
     if (
       r.terms.includes(term) &&
+      (!r.path || r.path.test(file)) &&
       (r.fn ? r.fn(sentence, code) : r.re.test(sentence)) &&
       !(r.unless && r.unless.test(sentence))
     )

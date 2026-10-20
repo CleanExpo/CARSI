@@ -32,6 +32,8 @@ type Hit = { file: string; line: number; term: string; cls: string; reason: stri
 
 const INDUSTRY = 'app/(public)/industries/x/page.tsx';
 const PUBLIC = 'src/components/x.tsx';
+const HERO = 'app/(public)/courses/page.tsx';
+const COST_PAGE = 'app/(public)/restoration-training-cost-australia/page.tsx';
 const GUIDE_PDF = 'public/downloads/carsi-government-contractor-guide.pdf';
 const GUIDE_MD = 'docs/marketing/lead-magnets/government-contractor-guide.md';
 const CODE = 'W' + 'RT'; // assembled so this file never spells the banned construction
@@ -141,7 +143,7 @@ describe('licence inventory', () => {
     expect(found.map((h) => h.term)).toEqual(['count-claim']);
   });
 
-  it('exemptions: every reviewed entry names a reason, a file and the exact line it covers', () => {
+  it('exemptions: every reviewed entry names a reason, a file and the exact line it covers', async () => {
     for (const e of REVIEWED as Array<{
       file: string;
       line: number;
@@ -152,9 +154,9 @@ describe('licence inventory', () => {
       expect(e.reason.length, `${e.file}:${e.line}`).toBeGreaterThan(20);
       expect(['legitimate', 'owned-elsewhere']).toContain(e.class);
       expect(existsSync(e.file), e.file).toBe(true);
-      expect(readFileSync(e.file, 'utf8').split('\n')[e.line - 1], `${e.file}:${e.line}`).toContain(
-        e.contains
-      );
+      // a PDF entry pins a line of its extracted text, the same text the inventory scans
+      const text = e.file.endsWith('.pdf') ? await pdfText(e.file) : readFileSync(e.file, 'utf8');
+      expect(text.split('\n')[e.line - 1], `${e.file}:${e.line}`).toContain(e.contains);
     }
   });
 
@@ -201,6 +203,42 @@ describe('licence inventory', () => {
       'CARSI offers IICRC CEC Accredited courses in mould assessment, remediation and indoor air quality.',
     ],
     ['certif', PUBLIC, 'The 3 water categories every restorer must know. Get certified.'],
+    // review of 82c76152 (GP-639): the /courses hero label with "certification" swapped in passed
+    // as a third-person certification-course comparison. Assembled: never spell it in source.
+    ['certif', HERO, 'IICRC ' + 'certification courses (27)'],
+    ['certif', HERO, 'IICRC' + '\u00a0certification training'],
+    // review of c9bbbf18: a modifier between "IICRC" and "certification" still passed
+    ['certif', HERO, 'IICRC ' + 'online certification courses (27)'],
+    ['certif', HERO, 'Accredited ' + 'certification training for Australian technicians'],
+    // review of 4f4eaaa4: other third-person exemptions accepted these, so one block rule now
+    // refuses any IICRC certification offer however it is worded
+    ['certif', HERO, 'Your IICRC ' + 'online certification courses'],
+    ['certif', HERO, 'IICRC ' + 'certifications for Australian technicians'],
+    ['certif', HERO, 'IICRC ' + 'online certification courses — bought once'],
+    ['certif', HERO, 'Certification ' + 'training from the IICRC, online'],
+    // review of b4af1171: an unrelated "No" earlier in the sentence negated the offer
+    ['certif', HERO, 'No waiting for your IICRC ' + 'online certification courses (27)'],
+    ['certif', HERO, 'Not sure? Browse IICRC ' + 'certification courses (27)'],
+    // review of c4f98bcc: a not-only construction read as a denial
+    [
+      'certif',
+      HERO,
+      'CARSI does not sell only IICRC ' + 'online certification courses — we also offer more.',
+    ],
+    [
+      'certif',
+      PUBLIC,
+      'CARSI does not sell only IICRC ' + 'online certification courses — we also offer more.',
+    ],
+    ['certif', PUBLIC, 'We do not offer just IICRC ' + 'certification courses.'],
+    // on /courses no denial wording exempts the sentence
+    ['certif', HERO, 'CARSI does not sell IICRC ' + 'certification courses.'],
+    // review of 6a1046e8: long modifiers in sibling copy on /courses
+    [
+      'certif',
+      HERO,
+      'IICRC fully flexible online self paced ' + 'certification courses — bought once (27)',
+    ],
   ])('controls: %s fires in %s: %s', (term, file, text) => {
     expect(classifyCopy(file, term, text)[0]).toBe('exposure');
   });
@@ -235,6 +273,19 @@ describe('licence inventory', () => {
     ['repair', PUBLIC, 'Burst pipe repair costs are covered by the insurer.'],
     ['iicrc-code', GUIDE_PDF, 'Odor Control Technician OCT Specialist skill for fire damage.'],
     ['count-claim', GUIDE_PDF, 'Staff: 14 (8 technicians, 3 project managers, 3 admin)'],
+    ['CEC', HERO, 'IICRC CEC Accredited courses (27)'],
+    ['certif', PUBLIC, 'CARSI does not sell IICRC ' + 'certification courses.'],
+    [
+      'certif',
+      COST_PAGE,
+      'A certification course and a continuing education course are not competing products.',
+    ],
+    ['certif', COST_PAGE, 'Why is a CARSI course priced differently from a certification course?'],
+    [
+      'certif',
+      COST_PAGE,
+      'One published Australian certification-course fee, checked at source, and what a CARSI course costs.',
+    ],
   ])('negative controls: %s stays legitimate in %s: %s', (term, file, text) => {
     expect(classifyCopy(file, term, text)[0]).toBe('legitimate');
   });
@@ -337,5 +388,125 @@ describe('industry metadata never brands CARSI training with the IICRC name', ()
 
   it.each(pages)('metadata: %s', (_slug, src) => {
     expect(iicrcMentions(metadataBlock(src))).toEqual([]);
+  });
+});
+
+/**
+ * Review of b4af1171 (GP-639): a word-limited regex cannot refuse every wording, and an
+ * unlimited one flags 24 third-person lines across the site. The /courses hero link is the one
+ * new public line, so its whole element is pinned: any other label, attribute or second link to
+ * the CEC catalogue fails here, however it is worded.
+ */
+describe('the /courses hero CEC link is pinned to the permitted label', () => {
+  const HERO_CLASS =
+    'inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-[#146fc2]/30 bg-white px-7 text-sm font-semibold text-[#146fc2] transition hover:border-[#146fc2]/60 focus-visible:ring-2 focus-visible:ring-[#2490ed]/35 focus-visible:outline-none';
+  const PINNED =
+    '{catalogueAvailable && cecApprovedCount > 0 ? ( <Link href="/courses?discipline=iicrc-cec#catalogue" className="' +
+    HERO_CLASS +
+    '" > IICRC CEC Accredited courses ({cecApprovedCount}) </Link> ) : null}';
+  // className is pinned too: a Tailwind content utility renders text (review of 6a1046e8)
+
+  function heroCecLinks(src: string): string[] {
+    return [
+      ...src.matchAll(
+        /\{[^{}]*\?\s*\(\s*<Link\b[\s\S]*?<\/Link>\s*\)\s*:\s*null\}|<Link\b[\s\S]*?<\/Link>/g
+      ),
+    ]
+      .map((m) => m[0])
+      .filter((el) => el.includes('discipline=iicrc-cec'))
+      .map((el) => el.replace(/\s+/g, ' ').trim());
+  }
+
+  it('hero: the live page carries exactly the pinned element, once', () => {
+    const src = readFileSync(HERO, 'utf8');
+    expect(src.split('discipline=iicrc-cec').length - 1).toBe(1);
+    expect(heroCecLinks(src)).toEqual([PINNED]);
+  });
+
+  // CSS can render text the copy scan never sees; /courses uses none (review of 6a1046e8)
+  const CSS_TEXT = /\bcontent-\[|\bcontent\s*:/;
+  it('hero: the /courses page renders no CSS-generated text', () => {
+    expect(readFileSync(HERO, 'utf8')).not.toMatch(CSS_TEXT);
+  });
+
+  // No regex refuses every offer wording (review of 5542ae92: "CARSI offers your IICRC
+  // certification online." beside the link), so every copy sentence on /courses that names the
+  // IICRC is pinned, and so is the count of the word itself: new IICRC copy there fails here
+  // until it is reviewed and added.
+  const HERO_IICRC_SENTENCES = [
+    'IICRC CEC Accredited courses ( )',
+    'These are CARSI-issued credentials, not IICRC certifications.',
+    'IICRC certification is obtained through schools and examinations approved by the IICRC.',
+    'Same cards as the homepage — price, duration, and CEC hours only when the IICRC has approved that course.',
+    'How IICRC certification disciplines fit together',
+    'A reference map of the IICRC&rsquo;s own certification disciplines.',
+    'These are certifications awarded by schools and examinations approved by the IICRC, not CARSI courses — CARSI courses carry CARSI Southern Hemisphere Restoration Designations.',
+  ];
+  async function heroIicrcSentences(src: string): Promise<string[]> {
+    const found = (await inventory(rootWith({ [HERO]: src }))) as Array<Hit & { sentence: string }>;
+    return [
+      ...new Set(
+        found.filter((h) => h.file === HERO && /\bIICRC\b/i.test(h.sentence)).map((h) => h.sentence)
+      ),
+    ];
+  }
+  const iicrcCount = (src: string) => (src.match(/iicrc/gi) ?? []).length;
+
+  it('hero: every IICRC sentence on /courses is a reviewed one', async () => {
+    const src = readFileSync(HERO, 'utf8');
+    expect(await heroIicrcSentences(src)).toEqual(HERO_IICRC_SENTENCES);
+    expect(iicrcCount(src)).toBe(13);
+  });
+
+  it.each([
+    'CARSI offers your IICRC ' + 'certification online.',
+    'Get IICRC qualified with CARSI.',
+    'Learn the IICRC way.',
+  ])('hero: a new IICRC sentence beside the link fails (control): %s', async (copy) => {
+    const src = readFileSync(HERO, 'utf8');
+    const anchor = '{catalogueAvailable && cecApprovedCount > 0 ? (';
+    const planted = src.replace(anchor, `<p>${copy}</p>\n${anchor}`);
+    expect(planted).not.toBe(src);
+    const pinned =
+      JSON.stringify(await heroIicrcSentences(planted)) === JSON.stringify(HERO_IICRC_SENTENCES) &&
+      iicrcCount(planted) === 13;
+    expect(pinned).toBe(false);
+  });
+
+  it.each([
+    [
+      'a reworded label',
+      'IICRC CEC Accredited courses ({cecApprovedCount})',
+      'No waiting for your IICRC ' + 'online certification courses ({cecApprovedCount})',
+    ],
+    [
+      'an added attribute',
+      'href="/courses?discipline=iicrc-cec#catalogue"',
+      'title="IICRC ' + 'certification courses" href="/courses?discipline=iicrc-cec#catalogue"',
+    ],
+    [
+      'CSS-generated text in className',
+      'className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-[#146fc2]/30',
+      'className="before:content-[\'IICRC_' +
+        "certification_courses'] inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-[#146fc2]/30",
+    ],
+    [
+      'a dropped gate',
+      '{catalogueAvailable && cecApprovedCount > 0 ? (',
+      '{cecApprovedCount > 0 ? (',
+    ],
+  ])('hero: %s fails the pin (control)', (_name, from, to) => {
+    const src = readFileSync(HERO, 'utf8');
+    const planted = src.replace(from, to);
+    expect(planted).not.toBe(src);
+    expect(heroCecLinks(planted)).not.toEqual([PINNED]);
+  });
+
+  it('hero: CSS-generated text anywhere on /courses fails (control)', () => {
+    const planted = readFileSync(HERO, 'utf8').replace(
+      'className="',
+      'className="after:content-[\'IICRC_' + "certification_courses'] "
+    );
+    expect(planted).toMatch(CSS_TEXT);
   });
 });

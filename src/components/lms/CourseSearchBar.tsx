@@ -7,6 +7,7 @@ import { useCourseBrowseBase } from '@/components/lms/CourseBrowseContext';
 import { getBackendOrigin } from '@/lib/env/public-url';
 import { disciplineTopicLabel } from '@/lib/iicrc-discipline-display';
 import { resolveDashboardCourseHref } from '@/lib/onboarding/navigation';
+import { formatCecCountLabel } from '@/lib/cec-display';
 
 interface SearchResult {
   id: string;
@@ -202,14 +203,18 @@ export function CourseSearchBar({
                     }
                     onClick={() => handleSelect(result)}
                   >
-                    <span
-                      className="flex min-w-0 flex-1 flex-col gap-0.5 truncate text-left"
-                    >
-                      <span className="truncate text-sm" style={{ color: 'rgba(255,255,255,0.85)' }}>
+                    <span className="flex min-w-0 flex-1 flex-col gap-0.5 truncate text-left">
+                      <span
+                        className="truncate text-sm"
+                        style={{ color: 'rgba(255,255,255,0.85)' }}
+                      >
                         {result.title}
                       </span>
                       {result.is_onboarding && result.program_label ? (
-                        <span className="truncate text-[10px]" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                        <span
+                          className="truncate text-[10px]"
+                          style={{ color: 'rgba(255,255,255,0.45)' }}
+                        >
                           {result.program_label}
                         </span>
                       ) : null}
@@ -238,9 +243,9 @@ export function CourseSearchBar({
                           {disciplineTopicLabel(result.iicrc_discipline)}
                         </span>
                       )}
-                      {result.cec_hours && (
+                      {formatCecCountLabel(result.cec_hours) && (
                         <span className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                          {result.cec_hours} CECs
+                          {formatCecCountLabel(result.cec_hours)}
                         </span>
                       )}
                     </div>

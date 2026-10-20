@@ -23,6 +23,7 @@ import { withCurrentCecHoursOnly } from '@/lib/seed/cec-approvals';
 import { getPublishedCourseDetailBySlugFromDatabase } from '@/lib/server/public-courses-list';
 import { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
+import { formatCecHoursForDisplay } from '@/lib/cec-display';
 
 // ISR: render each course detail on demand and cache for 5 minutes (issue #129).
 // Build-safe via the build-phase guard in getCourse's DB reader; publish busts the
@@ -232,9 +233,11 @@ function getLearningOutcomes(
     );
   }
 
-  if (course.cec_hours) {
+  const cecHoursLabel = formatCecHoursForDisplay(course.cec_hours);
+  if (cecHoursLabel) {
+    const plural = cecHoursLabel === '1' ? '' : 's';
     outcomes.push(
-      `Earn ${course.cec_hours} IICRC Continuing Education Credits (CECs) toward maintaining an existing IICRC certification`
+      `Earn ${cecHoursLabel} IICRC Continuing Education Credit${plural} (CEC${plural}) toward maintaining an existing IICRC certification`
     );
   }
 
@@ -314,7 +317,6 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
       ) : null}
       <BreadcrumbSchema items={breadcrumbs} />
       {courseFaqs.length > 0 ? <FAQSchema questions={courseFaqs} /> : null}
-
 
       <CoursePublicDetail
         course={{
