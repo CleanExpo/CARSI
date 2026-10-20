@@ -339,6 +339,11 @@ export function bannedRules(CODES = IICRC_CODE_ALT) {
         renderedViews(line)
           .map((view) =>
             view
+              // With markup read as nothing, every mix of block, inline and CSS-block tags
+              // (`<span className="block">…IICRC</span><span>disci<wbr />plines</span>`, review
+              // of bcd9b725) leaves "IICRCdisciplines". Upper-case IICRC only, so the field
+              // `iicrcDiscipline` and `IICRCDisciplineMap` stay out.
+              .replace(/\bIICRC(?=(?:[Dd]iscipline|DISCIPLINE)[Ss]?\b)/g, 'IICRC ')
               .split(/(?<=[.!?])\s+/)
               // trimEnd: the shapes end in an anchored tail that is quadratic on trailing
               // whitespace (review of 723bdce5, P2).
