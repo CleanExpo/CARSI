@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 490" width="800" height="490" role="img" aria-labelledby="t d" font-family="Arial, Helvetica, sans-serif">
+<title id="t">Four kinds of sample</title>
+<desc id="d">Four shaded panels showing an air sampling pump with a spore trap cassette, a tape lift on a surface, a bulk sample cut from plasterboard and a dust sample, each with what it shows.</desc>
+<rect width="800" height="490" fill="#ffffff"/>
+<text x="24" y="36" font-size="20" font-weight="700" fill="#1f2933">Four kinds of sample</text>
+<image x="656" y="14" width="120" height="31" href="data:image/png;base64,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"/>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#52606d"/></marker>
+<marker id="arrowG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0b6e4f"/></marker>
+<marker id="arrowW" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b54708"/></marker>
+<marker id="arrowB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f5f8b"/></marker>
+<linearGradient id="gCard" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e9eef3"/></linearGradient>
+<linearGradient id="gWarn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffaf3"/><stop offset="1" stop-color="#fde6c8"/></linearGradient>
+<linearGradient id="gGreen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3fbf7"/><stop offset="1" stop-color="#d3eee2"/></linearGradient>
+<linearGradient id="gBlue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f8fc"/><stop offset="1" stop-color="#d6e5f2"/></linearGradient>
+<linearGradient id="gRed" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff6f5"/><stop offset="1" stop-color="#f9d7d3"/></linearGradient>
+<linearGradient id="gDark" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#16875f"/><stop offset="1" stop-color="#0a5c42"/></linearGradient>
+<radialGradient id="gDot" cx="0.5" cy="0.5" r="0.6" fx="0.35" fy="0.3"><stop offset="0" stop-color="#2fa77c"/><stop offset="1" stop-color="#0a5c42"/></radialGradient>
+<radialGradient id="gDotW" cx="0.5" cy="0.5" r="0.6" fx="0.35" fy="0.3"><stop offset="0" stop-color="#e07a2c"/><stop offset="1" stop-color="#8f3806"/></radialGradient>
+<radialGradient id="gDotB" cx="0.5" cy="0.5" r="0.6" fx="0.35" fy="0.3"><stop offset="0" stop-color="#4b8cc0"/><stop offset="1" stop-color="#174a6e"/></radialGradient>
+<filter id="sh" x="-10%" y="-10%" width="125%" height="135%"><feGaussianBlur in="SourceAlpha" stdDeviation="2.5"/><feOffset dx="0" dy="3" result="o"/><feComponentTransfer><feFuncA type="linear" slope="0.22"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<filter id="shS" x="-20%" y="-20%" width="150%" height="150%"><feGaussianBlur in="SourceAlpha" stdDeviation="1.4"/><feOffset dx="1" dy="1.6" result="o"/><feComponentTransfer><feFuncA type="linear" slope="0.3"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<linearGradient id="gSlabTopG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#bfe3d3"/><stop offset="1" stop-color="#9fd2bc"/></linearGradient><linearGradient id="gSlabSideG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5aa585"/><stop offset="1" stop-color="#2f7d5d"/></linearGradient><linearGradient id="gSlabTopW" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f9d9b0"/><stop offset="1" stop-color="#f2c48b"/></linearGradient><linearGradient id="gSlabSideW" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d98a43"/><stop offset="1" stop-color="#a95b17"/></linearGradient><linearGradient id="gSlabTopB" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#cfe0ef"/><stop offset="1" stop-color="#b3cde3"/></linearGradient><linearGradient id="gSlabSideB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5b8db5"/><stop offset="1" stop-color="#2d5f86"/></linearGradient><linearGradient id="gSlabTopC" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e4e9ee"/><stop offset="1" stop-color="#d0d8df"/></linearGradient><linearGradient id="gSlabSideC" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9aa5b1"/><stop offset="1" stop-color="#6b7785"/></linearGradient><linearGradient id="gSlabTopR" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f6c9c3"/><stop offset="1" stop-color="#eeaaa1"/></linearGradient><linearGradient id="gSlabSideR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d0564a"/><stop offset="1" stop-color="#912018"/></linearGradient><linearGradient id="gFace" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f3f5f7"/><stop offset="1" stop-color="#d9e0e6"/></linearGradient><linearGradient id="gEnd" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b9c3cc"/><stop offset="1" stop-color="#9aa5b1"/></linearGradient><linearGradient id="gTop" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e9edf1"/><stop offset="1" stop-color="#cfd7de"/></linearGradient><radialGradient id="gCool" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#2f6fb0" stop-opacity="0.75"/><stop offset="0.6" stop-color="#5b9bd5" stop-opacity="0.45"/><stop offset="1" stop-color="#9cc3e6" stop-opacity="0"/></radialGradient><linearGradient id="gCavity" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a6a58"/><stop offset="1" stop-color="#4e4338"/></linearGradient><linearGradient id="gStud" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e2c48f"/><stop offset="1" stop-color="#b8945a"/></linearGradient><linearGradient id="gBody" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4b5563"/><stop offset="1" stop-color="#1f2933"/></linearGradient><filter id="soft" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="4"/></filter><linearGradient id="gWarmAir" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#fff4e6"/><stop offset="1" stop-color="#fde0bd"/></linearGradient><linearGradient id="gRoofSp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e7ecf1"/><stop offset="1" stop-color="#d5dde4"/></linearGradient><pattern id="pBatt" width="10" height="10" patternUnits="userSpaceOnUse"><rect width="10" height="10" fill="#f6dc8a"/><path d="M0,10 Q5,0 10,10" stroke="#d9b54a" stroke-width="1.2" fill="none"/></pattern><linearGradient id="gWallT" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f1e3cf"/><stop offset="1" stop-color="#c9d9e8"/></linearGradient><linearGradient id="gBrick" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#b8735a"/><stop offset="1" stop-color="#8a4c38"/></linearGradient><linearGradient id="gCold" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#d6e6f5"/><stop offset="1" stop-color="#a9c8e6"/></linearGradient><linearGradient id="gScale" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2f6fb0"/><stop offset="0.45" stop-color="#9cc3e6"/><stop offset="1" stop-color="#e08a3c"/></linearGradient><linearGradient id="gBinR" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e2786d"/><stop offset="1" stop-color="#a3271d"/></linearGradient><linearGradient id="gBinG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a7b2bd"/><stop offset="1" stop-color="#5f6b78"/></linearGradient><linearGradient id="gBinN" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4fae88"/><stop offset="1" stop-color="#0b6e4f"/></linearGradient><linearGradient id="gZA" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d9f0e5"/><stop offset="1" stop-color="#a9d9c2"/></linearGradient><linearGradient id="gZB" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#dce9f5"/><stop offset="1" stop-color="#aac8e3"/></linearGradient><linearGradient id="gZC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fdebd3"/><stop offset="1" stop-color="#f6c995"/></linearGradient><linearGradient id="gZD" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef1f4"/><stop offset="1" stop-color="#c7d0d8"/></linearGradient><linearGradient id="gMach" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6b7785"/><stop offset="1" stop-color="#2d3640"/></linearGradient><linearGradient id="gDuct" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e3e8ec"/><stop offset="1" stop-color="#b3bec8"/></linearGradient>
+</defs>
+<polygon points="30,70 40,62 206,62 196,70" fill="url(#gSlabTopB)" stroke="#52606d" stroke-width="1"/>
+<polygon points="196,76 206,68 206,338 196,346" fill="url(#gSlabSideB)" stroke="#52606d" stroke-width="1"/>
+<rect x="24" y="70" width="172" height="280" rx="8" fill="url(#gBlue)" stroke="#1f5f8b" stroke-width="2" filter="url(#sh)"/>
+<rect x="36" y="84" width="148" height="126" rx="8" fill="#ffffff" stroke="#9aa5b1" stroke-width="1"/>
+<text x="38" y="236" font-size="13" font-weight="700" fill="#1f2933">Air: spore trap</text>
+<text x="38" y="258" font-size="12" font-weight="700" fill="#1f2933">Shows:</text>
+<text x="38" y="276" font-size="12" fill="#52606d">spores in that air,</text>
+<text x="38" y="293" font-size="12" fill="#52606d">at that moment.</text>
+<text x="38" y="310" font-size="12" fill="#52606d">Counts dead and</text>
+<text x="38" y="327" font-size="12" fill="#52606d">living spores.</text>
+<polygon points="220,70 230,62 396,62 386,70" fill="url(#gSlabTopC)" stroke="#52606d" stroke-width="1"/>
+<polygon points="386,76 396,68 396,338 386,346" fill="url(#gSlabSideC)" stroke="#52606d" stroke-width="1"/>
+<rect x="214" y="70" width="172" height="280" rx="8" fill="url(#gCard)" stroke="#9aa5b1" stroke-width="2" filter="url(#sh)"/>
+<rect x="226" y="84" width="148" height="126" rx="8" fill="#ffffff" stroke="#9aa5b1" stroke-width="1"/>
+<text x="228" y="236" font-size="13" font-weight="700" fill="#1f2933">Surface: tape lift</text>
+<text x="228" y="258" font-size="12" font-weight="700" fill="#1f2933">Shows:</text>
+<text x="228" y="276" font-size="12" fill="#52606d">what is on one</text>
+<text x="228" y="293" font-size="12" fill="#52606d">surface: growth or</text>
+<text x="228" y="310" font-size="12" fill="#52606d">settled spores.</text>
+<polygon points="410,70 420,62 586,62 576,70" fill="url(#gSlabTopW)" stroke="#52606d" stroke-width="1"/>
+<polygon points="576,76 586,68 586,338 576,346" fill="url(#gSlabSideW)" stroke="#52606d" stroke-width="1"/>
+<rect x="404" y="70" width="172" height="280" rx="8" fill="url(#gWarn)" stroke="#b54708" stroke-width="2" filter="url(#sh)"/>
+<rect x="416" y="84" width="148" height="126" rx="8" fill="#ffffff" stroke="#9aa5b1" stroke-width="1"/>
+<text x="418" y="236" font-size="13" font-weight="700" fill="#1f2933">Bulk</text>
+<text x="418" y="258" font-size="12" font-weight="700" fill="#1f2933">Shows:</text>
+<text x="418" y="276" font-size="12" fill="#52606d">whether growth is</text>
+<text x="418" y="293" font-size="12" fill="#52606d">inside the material</text>
+<text x="418" y="310" font-size="12" fill="#52606d">itself.</text>
+<polygon points="600,70 610,62 776,62 766,70" fill="url(#gSlabTopG)" stroke="#52606d" stroke-width="1"/>
+<polygon points="766,76 776,68 776,338 766,346" fill="url(#gSlabSideG)" stroke="#52606d" stroke-width="1"/>
+<rect x="594" y="70" width="172" height="280" rx="8" fill="url(#gGreen)" stroke="#0b6e4f" stroke-width="2" filter="url(#sh)"/>
+<rect x="606" y="84" width="148" height="126" rx="8" fill="#ffffff" stroke="#9aa5b1" stroke-width="1"/>
+<text x="608" y="236" font-size="13" font-weight="700" fill="#1f2933">Dust</text>
+<text x="608" y="258" font-size="12" font-weight="700" fill="#1f2933">Shows:</text>
+<text x="608" y="276" font-size="12" fill="#52606d">what has settled</text>
+<text x="608" y="293" font-size="12" fill="#52606d">over time.</text>
+<rect x="66" y="150" width="56" height="34" rx="6" fill="url(#gMach)"/>
+<circle cx="80" cy="167" r="6" fill="#9cc3e6"/>
+<rect x="132" y="110" width="16" height="22" rx="3" fill="#f2c94c" stroke="#8a6d1a" stroke-width="1"/>
+<path d="M122,164 C140,164 140,146 140,134" stroke="#52606d" stroke-width="3" fill="none"/>
+<path d="M128,98 L136,108" stroke="#9aa5b1" stroke-width="1.5"/>
+<path d="M136,98 L140,108" stroke="#9aa5b1" stroke-width="1.5"/>
+<path d="M144,98 L144,108" stroke="#9aa5b1" stroke-width="1.5"/>
+<rect x="58" y="190" width="104" height="6" rx="3" fill="#cbd2d9"/>
+<rect x="232" y="104" width="136" height="86" rx="4" fill="url(#gFace)" stroke="#9aa5b1" stroke-width="1"/>
+<circle cx="269.7" cy="133.7" r="1.8" fill="#2d2c26" fill-opacity="0.51"/>
+<circle cx="265.6" cy="138.4" r="2.7" fill="#2d2c26" fill-opacity="0.77"/>
+<circle cx="282.4" cy="135.6" r="2.1" fill="#2d2c26" fill-opacity="0.56"/>
+<circle cx="268.1" cy="133.7" r="1.5" fill="#2d2c26" fill-opacity="0.82"/>
+<circle cx="283.9" cy="144.9" r="2.5" fill="#2d2c26" fill-opacity="0.53"/>
+<circle cx="271.4" cy="142" r="2.4" fill="#2d2c26" fill-opacity="0.79"/>
+<circle cx="285.1" cy="133.4" r="2.2" fill="#2d2c26" fill-opacity="0.72"/>
+<circle cx="276.1" cy="134.8" r="2.0" fill="#2d2c26" fill-opacity="0.49"/>
+<circle cx="286.4" cy="145.8" r="2.1" fill="#2d2c26" fill-opacity="0.57"/>
+<circle cx="285.8" cy="141.2" r="2.6" fill="#2d2c26" fill-opacity="0.79"/>
+<circle cx="316.2" cy="154.6" r="2.2" fill="#2d2c26" fill-opacity="0.62"/>
+<circle cx="307.9" cy="152.9" r="2.5" fill="#2d2c26" fill-opacity="0.47"/>
+<circle cx="305.1" cy="158" r="1.6" fill="#2d2c26" fill-opacity="0.66"/>
+<circle cx="315.3" cy="153.5" r="2.8" fill="#2d2c26" fill-opacity="0.53"/>
+<circle cx="313.9" cy="151.2" r="2.2" fill="#2d2c26" fill-opacity="0.56"/>
+<circle cx="312.5" cy="160" r="1.7" fill="#2d2c26" fill-opacity="0.67"/>
+<circle cx="325.7" cy="149.6" r="1.3" fill="#2d2c26" fill-opacity="0.54"/>
+<circle cx="322.4" cy="157.8" r="1.6" fill="#2d2c26" fill-opacity="0.58"/>
+<circle cx="308.3" cy="155.3" r="1.3" fill="#2d2c26" fill-opacity="0.73"/>
+<circle cx="325.5" cy="163.3" r="2.4" fill="#2d2c26" fill-opacity="0.83"/>
+<rect x="262" y="128" width="80" height="26" rx="2" fill="#cfe7ff" fill-opacity="0.65" stroke="#1f5f8b" stroke-width="1" transform="rotate(-12 302 141)"/>
+<polygon points="419.6,171 482,207 482,201 419.6,165" fill="#d9e0e6" stroke="#7b8794" stroke-width="0.8"/>
+<polygon points="518.4,186 482,207 482,201 518.4,180" fill="#c3ccd5" stroke="#7b8794" stroke-width="0.8"/>
+<polygon points="456,144 518.4,180 482,201 419.6,165" fill="#eef1f4" stroke="#7b8794" stroke-width="0.8"/>
+<polygon points="461.2,159 476.8,168 463.3,175.8 447.7,166.8" fill="url(#gCavity)"/>
+<circle cx="456.5" cy="166.7" r="2.7" fill="#2d2c26" fill-opacity="0.76"/>
+<circle cx="461.2" cy="170.7" r="2.2" fill="#2d2c26" fill-opacity="0.78"/>
+<circle cx="459.8" cy="166.1" r="1.9" fill="#2d2c26" fill-opacity="0.50"/>
+<circle cx="460.8" cy="170.8" r="1.7" fill="#2d2c26" fill-opacity="0.45"/>
+<circle cx="456.8" cy="166" r="2.5" fill="#2d2c26" fill-opacity="0.60"/>
+<circle cx="459.7" cy="165.6" r="2.8" fill="#2d2c26" fill-opacity="0.62"/>
+<circle cx="458.7" cy="165.4" r="1.3" fill="#2d2c26" fill-opacity="0.52"/>
+<rect x="528" y="96" width="34" height="44" rx="4" fill="#ffffff" fill-opacity="0.8" stroke="#52606d" stroke-width="1.2"/>
+<rect x="534" y="112" width="22" height="16" fill="#e5d3b3" stroke="#8a7b5c" stroke-width="0.8"/>
+<rect x="612" y="160" width="136" height="20" rx="3" fill="#d9e0e6" stroke="#9aa5b1" stroke-width="1"/>
+<circle cx="702.6" cy="155.6" r="0.8" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="678.8" cy="156" r="1.8" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="631.7" cy="157.1" r="1.6" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="668.4" cy="159" r="1.3" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="647" cy="156.6" r="0.8" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="669.9" cy="156" r="1.7" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="722.4" cy="157" r="0.8" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="648.6" cy="156" r="1.0" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="645.6" cy="158.5" r="0.9" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="622.6" cy="158.7" r="1.4" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="742.8" cy="156.6" r="1.7" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="699.7" cy="158.2" r="1.5" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="679.3" cy="155.4" r="1.0" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="727.8" cy="158.6" r="1.7" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="659.1" cy="157.6" r="1.6" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="698.2" cy="158.3" r="1.3" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="699.8" cy="157.7" r="1.1" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="734.1" cy="158.8" r="0.9" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="740.3" cy="158.8" r="1.5" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="621.7" cy="158.6" r="0.9" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="740" cy="157.7" r="0.9" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="637.4" cy="157.5" r="1.4" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="711.6" cy="158.7" r="1.0" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="616.4" cy="158.7" r="0.8" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="728.2" cy="155.5" r="1.6" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="716.2" cy="158.5" r="1.4" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="728.5" cy="155.8" r="1.5" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="658.3" cy="158.6" r="1.6" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="676.4" cy="157.1" r="0.8" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="620.4" cy="157.4" r="1.3" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="726.7" cy="157.4" r="0.9" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="662.4" cy="158.1" r="1.3" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="617.4" cy="158.4" r="1.6" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="626.9" cy="157.2" r="1.2" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="716.8" cy="156.2" r="1.0" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="678.3" cy="158.9" r="0.9" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="630.6" cy="157.5" r="1.7" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="681.6" cy="156.7" r="1.7" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="715.4" cy="155.3" r="1.7" fill="#8a7b5c" fill-opacity="0.7"/>
+<circle cx="641.1" cy="156.2" r="1.6" fill="#8a7b5c" fill-opacity="0.7"/>
+<rect x="666" y="106" width="22" height="30" rx="4" fill="#f2c94c" stroke="#8a6d1a" stroke-width="1"/>
+<path d="M677,136 L677,150" stroke="#52606d" stroke-width="4"/>
+<path d="M688,116 C716,116 726,100 734,96" stroke="#52606d" stroke-width="3" fill="none"/>
+<rect x="24" y="368" width="752" height="66" rx="10" fill="url(#gBlue)" stroke="#1f5f8b" stroke-width="2"/>
+<text x="40" y="392" font-size="12" fill="#1f2933">15 L/min × 5 min = 75 L = 0.075 m³. 96 spores ÷ 0.075 = 1,280 spores/m³ indoors, against 320 outdoors:</text>
+<text x="40" y="410" font-size="12" fill="#1f2933">4 times higher. Check the fraction of the trace counted, and compare room by room.</text>
+<text x="400" y="458" font-size="13" font-weight="700" fill="#1f2933" text-anchor="middle">None of them replaces inspection and moisture readings.</text>
+<text x="776" y="478" font-size="11" fill="#52606d" text-anchor="end">CARSI · Level 3 Mould Remediation · schematic, not to scale</text>
+</svg>

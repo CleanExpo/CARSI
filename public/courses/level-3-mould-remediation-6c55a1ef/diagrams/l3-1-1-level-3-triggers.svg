@@ -1,0 +1,185 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500" role="img" aria-labelledby="t d" font-family="Arial, Helvetica, sans-serif">
+<title id="t">What makes a mould job Level 3</title>
+<desc id="d">An isometric three-storey building with growth on more than one level, beside eight trigger cards: size, levels, HVAC, sensitive occupants, Category 3 water, old hazardous materials, structure and outside parties. Any one trigger calls for a Level 3 plan.</desc>
+<rect width="800" height="500" fill="#ffffff"/>
+<text x="24" y="36" font-size="20" font-weight="700" fill="#1f2933">What makes a mould job Level 3</text>
+<image x="656" y="14" width="120" height="31" href="data:image/png;base64,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"/>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#52606d"/></marker>
+<marker id="arrowG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0b6e4f"/></marker>
+<marker id="arrowW" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b54708"/></marker>
+<marker id="arrowB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f5f8b"/></marker>
+<linearGradient id="gCard" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e9eef3"/></linearGradient>
+<linearGradient id="gWarn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffaf3"/><stop offset="1" stop-color="#fde6c8"/></linearGradient>
+<linearGradient id="gGreen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3fbf7"/><stop offset="1" stop-color="#d3eee2"/></linearGradient>
+<linearGradient id="gBlue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f8fc"/><stop offset="1" stop-color="#d6e5f2"/></linearGradient>
+<linearGradient id="gRed" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff6f5"/><stop offset="1" stop-color="#f9d7d3"/></linearGradient>
+<linearGradient id="gDark" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#16875f"/><stop offset="1" stop-color="#0a5c42"/></linearGradient>
+<radialGradient id="gDot" cx="0.5" cy="0.5" r="0.6" fx="0.35" fy="0.3"><stop offset="0" stop-color="#2fa77c"/><stop offset="1" stop-color="#0a5c42"/></radialGradient>
+<radialGradient id="gDotW" cx="0.5" cy="0.5" r="0.6" fx="0.35" fy="0.3"><stop offset="0" stop-color="#e07a2c"/><stop offset="1" stop-color="#8f3806"/></radialGradient>
+<radialGradient id="gDotB" cx="0.5" cy="0.5" r="0.6" fx="0.35" fy="0.3"><stop offset="0" stop-color="#4b8cc0"/><stop offset="1" stop-color="#174a6e"/></radialGradient>
+<filter id="sh" x="-10%" y="-10%" width="125%" height="135%"><feGaussianBlur in="SourceAlpha" stdDeviation="2.5"/><feOffset dx="0" dy="3" result="o"/><feComponentTransfer><feFuncA type="linear" slope="0.22"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<filter id="shS" x="-20%" y="-20%" width="150%" height="150%"><feGaussianBlur in="SourceAlpha" stdDeviation="1.4"/><feOffset dx="1" dy="1.6" result="o"/><feComponentTransfer><feFuncA type="linear" slope="0.3"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<linearGradient id="gWallL" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e6ebf0"/><stop offset="1" stop-color="#cbd4dc"/></linearGradient><linearGradient id="gWallR" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c9d2da"/><stop offset="1" stop-color="#aeb9c4"/></linearGradient><linearGradient id="gRoof" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f7f9fa"/><stop offset="1" stop-color="#dfe5ea"/></linearGradient><filter id="soft" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="4"/></filter><linearGradient id="gGlass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c8d8e8"/><stop offset="0.5" stop-color="#9fb6cc"/><stop offset="1" stop-color="#7f9bb6"/></linearGradient>
+</defs>
+<polygon points="172,276.9 306,354.2 202.9,413.8 68.9,336.4" fill="#e3e8ed" filter="url(#soft)"/>
+<polygon points="91,328.8 201.4,392.5 201.4,326.2 91,262.4" fill="url(#gWallL)" stroke="#7b8794" stroke-width="1"/>
+<polygon points="282.4,345.8 201.4,392.5 201.4,326.2 282.4,279.4" fill="url(#gWallR)" stroke="#7b8794" stroke-width="1"/>
+<polygon points="172,215.7 282.4,279.4 201.4,326.2 91,262.4" fill="url(#gRoof)" stroke="#7b8794" stroke-width="1"/>
+<polygon points="273.6,332.1 257.4,341.5 257.4,310.9 273.6,301.5" fill="url(#gGlass)" stroke="#52606d" stroke-width="1"/>
+<polygon points="249.3,346.2 233.1,355.5 233.1,324.9 249.3,315.6" fill="url(#gGlass)" stroke="#52606d" stroke-width="1"/>
+<polygon points="225,360.2 208.8,369.6 208.8,338.9 225,329.6" fill="url(#gGlass)" stroke="#52606d" stroke-width="1"/>
+<polygon points="98.4,314.3 116.1,324.5 116.1,293.9 98.4,283.7" fill="url(#gGlass)" stroke="#52606d" stroke-width="1"/>
+<polygon points="124.2,329.2 141.8,339.4 141.8,308.8 124.2,298.6" fill="url(#gGlass)" stroke="#52606d" stroke-width="1"/>
+<polygon points="149.9,344.1 167.6,354.2 167.6,323.6 149.9,313.4" fill="url(#gGlass)" stroke="#52606d" stroke-width="1"/>
+<polygon points="175.7,358.9 193.3,369.1 193.3,338.5 175.7,328.3" fill="url(#gGlass)" stroke="#52606d" stroke-width="1"/>
+<polygon points="91,260.8 201.4,324.5 201.4,258.2 91,194.5" fill="url(#gWallL)" stroke="#7b8794" stroke-width="1"/>
+<polygon points="282.4,277.8 201.4,324.5 201.4,258.2 282.4,211.5" fill="url(#gWallR)" stroke="#7b8794" stroke-width="1"/>
+<polygon points="172,147.7 282.4,211.5 201.4,258.2 91,194.5" fill="url(#gRoof)" stroke="#7b8794" stroke-width="1"/>
+<polygon points="273.6,264.1 257.4,273.5 257.4,242.9 273.6,233.5" fill="url(#gGlass)" stroke="#52606d" stroke-width="1"/>
+<polygon points="249.3,278.2 233.1,287.5 233.1,256.9 249.3,247.6" fill="url(#gGlass)" stroke="#52606d" stroke-width="1"/>
+<polygon points="225,292.2 208.8,301.6 208.8,270.9 225,261.6" fill="url(#gGlass)" stroke="#52606d" stroke-width="1"/>
+<polygon points="98.4,246.3 116.1,256.5 116.1,225.9 98.4,215.7" fill="url(#gGlass)" stroke="#52606d" stroke-width="1"/>
+<polygon points="124.2,261.2 141.8,271.4 141.8,240.8 124.2,230.6" fill="url(#gGlass)" stroke="#52606d" stroke-width="1"/>
+<polygon points="149.9,276.1 167.6,286.2 167.6,255.6 149.9,245.4" fill="url(#gGlass)" stroke="#52606d" stroke-width="1"/>
+<polygon points="175.7,290.9 193.3,301.1 193.3,270.5 175.7,260.3" fill="url(#gGlass)" stroke="#52606d" stroke-width="1"/>
+<polygon points="91,192.8 201.4,256.5 201.4,190.2 91,126.5" fill="url(#gWallL)" stroke="#7b8794" stroke-width="1"/>
+<polygon points="282.4,209.8 201.4,256.5 201.4,190.2 282.4,143.5" fill="url(#gWallR)" stroke="#7b8794" stroke-width="1"/>
+<polygon points="172,79.7 282.4,143.5 201.4,190.2 91,126.5" fill="url(#gRoof)" stroke="#7b8794" stroke-width="1"/>
+<polygon points="273.6,196.1 257.4,205.5 257.4,174.9 273.6,165.5" fill="url(#gGlass)" stroke="#52606d" stroke-width="1"/>
+<polygon points="249.3,210.2 233.1,219.5 233.1,188.9 249.3,179.6" fill="url(#gGlass)" stroke="#52606d" stroke-width="1"/>
+<polygon points="225,224.2 208.8,233.6 208.8,203 225,193.6" fill="url(#gGlass)" stroke="#52606d" stroke-width="1"/>
+<polygon points="98.4,178.3 116.1,188.5 116.1,157.9 98.4,147.7" fill="url(#gGlass)" stroke="#52606d" stroke-width="1"/>
+<polygon points="124.2,193.2 141.8,203.4 141.8,172.8 124.2,162.6" fill="url(#gGlass)" stroke="#52606d" stroke-width="1"/>
+<polygon points="149.9,208.1 167.6,218.2 167.6,187.7 149.9,177.5" fill="url(#gGlass)" stroke="#52606d" stroke-width="1"/>
+<polygon points="175.7,222.9 193.3,233.1 193.3,202.5 175.7,192.3" fill="url(#gGlass)" stroke="#52606d" stroke-width="1"/>
+<polygon points="91,124.8 201.4,188.5 201.4,183.4 91,119.7" fill="#aab6c1" stroke="#7b8794" stroke-width="1"/>
+<polygon points="282.4,141.8 201.4,188.5 201.4,183.4 282.4,136.7" fill="#9aa5b1" stroke="#7b8794" stroke-width="1"/>
+<polygon points="172,72.9 282.4,136.7 201.4,183.4 91,119.7" fill="#c5ced6" stroke="#7b8794" stroke-width="1"/>
+<ellipse cx="119.7" cy="290.9" rx="7" ry="13" fill="#5c5a4e" fill-opacity="0.28"/>
+<circle cx="118.4" cy="297.6" r="2.7" fill="#2d2c26" fill-opacity="0.53"/>
+<circle cx="120" cy="294.4" r="1.5" fill="#2d2c26" fill-opacity="0.70"/>
+<circle cx="116.3" cy="291.1" r="1.5" fill="#2d2c26" fill-opacity="0.54"/>
+<circle cx="119.2" cy="285.3" r="1.6" fill="#2d2c26" fill-opacity="0.59"/>
+<circle cx="120.7" cy="283.9" r="2.6" fill="#2d2c26" fill-opacity="0.66"/>
+<circle cx="123.2" cy="302.3" r="3.1" fill="#2d2c26" fill-opacity="0.62"/>
+<circle cx="117.1" cy="297.4" r="2.0" fill="#2d2c26" fill-opacity="0.83"/>
+<circle cx="117.4" cy="288.9" r="2.7" fill="#2d2c26" fill-opacity="0.65"/>
+<circle cx="120.1" cy="300.2" r="1.5" fill="#2d2c26" fill-opacity="0.58"/>
+<circle cx="121.1" cy="293.9" r="2.0" fill="#2d2c26" fill-opacity="0.73"/>
+<circle cx="119.4" cy="295.3" r="3.0" fill="#2d2c26" fill-opacity="0.78"/>
+<circle cx="117.9" cy="289.3" r="2.5" fill="#2d2c26" fill-opacity="0.85"/>
+<circle cx="121.4" cy="296.7" r="3.4" fill="#2d2c26" fill-opacity="0.55"/>
+<circle cx="119.1" cy="286.6" r="1.7" fill="#2d2c26" fill-opacity="0.70"/>
+<ellipse cx="171.3" cy="322.4" rx="7" ry="13" fill="#5c5a4e" fill-opacity="0.28"/>
+<circle cx="167.9" cy="318.1" r="2.9" fill="#2d2c26" fill-opacity="0.73"/>
+<circle cx="174" cy="328.3" r="2.8" fill="#2d2c26" fill-opacity="0.74"/>
+<circle cx="171.9" cy="324.4" r="3.1" fill="#2d2c26" fill-opacity="0.88"/>
+<circle cx="171.1" cy="320" r="1.5" fill="#2d2c26" fill-opacity="0.78"/>
+<circle cx="172.3" cy="314.6" r="3.0" fill="#2d2c26" fill-opacity="0.61"/>
+<circle cx="170.4" cy="319.6" r="1.4" fill="#2d2c26" fill-opacity="0.68"/>
+<circle cx="168.8" cy="329" r="1.5" fill="#2d2c26" fill-opacity="0.81"/>
+<circle cx="168.5" cy="326.4" r="2.2" fill="#2d2c26" fill-opacity="0.85"/>
+<circle cx="168.2" cy="322.4" r="2.5" fill="#2d2c26" fill-opacity="0.85"/>
+<circle cx="173.6" cy="317.8" r="2.0" fill="#2d2c26" fill-opacity="0.67"/>
+<circle cx="170.2" cy="315.4" r="3.3" fill="#2d2c26" fill-opacity="0.56"/>
+<circle cx="168.9" cy="326.9" r="1.9" fill="#2d2c26" fill-opacity="0.69"/>
+<circle cx="171.9" cy="328" r="1.4" fill="#2d2c26" fill-opacity="0.67"/>
+<circle cx="170.3" cy="321.4" r="3.3" fill="#2d2c26" fill-opacity="0.78"/>
+<ellipse cx="145.5" cy="237.8" rx="7" ry="13" fill="#5c5a4e" fill-opacity="0.28"/>
+<circle cx="145.6" cy="236.5" r="2.8" fill="#2d2c26" fill-opacity="0.52"/>
+<circle cx="148.4" cy="235.1" r="3.1" fill="#2d2c26" fill-opacity="0.82"/>
+<circle cx="144.7" cy="240.1" r="1.6" fill="#2d2c26" fill-opacity="0.75"/>
+<circle cx="142.3" cy="244.9" r="1.8" fill="#2d2c26" fill-opacity="0.56"/>
+<circle cx="144.3" cy="246.3" r="1.4" fill="#2d2c26" fill-opacity="0.56"/>
+<circle cx="142.6" cy="239.5" r="1.5" fill="#2d2c26" fill-opacity="0.85"/>
+<circle cx="146.3" cy="245.7" r="1.9" fill="#2d2c26" fill-opacity="0.64"/>
+<circle cx="144.5" cy="245.1" r="3.1" fill="#2d2c26" fill-opacity="0.90"/>
+<circle cx="145.2" cy="238.8" r="1.6" fill="#2d2c26" fill-opacity="0.54"/>
+<circle cx="144.3" cy="242.4" r="3.1" fill="#2d2c26" fill-opacity="0.56"/>
+<circle cx="142" cy="228.2" r="2.5" fill="#2d2c26" fill-opacity="0.56"/>
+<circle cx="145.8" cy="247.7" r="2.5" fill="#2d2c26" fill-opacity="0.89"/>
+<circle cx="148.2" cy="236.5" r="1.9" fill="#2d2c26" fill-opacity="0.65"/>
+<circle cx="143" cy="232.1" r="2.5" fill="#2d2c26" fill-opacity="0.81"/>
+<ellipse cx="197" cy="265.9" rx="7" ry="13" fill="#5c5a4e" fill-opacity="0.28"/>
+<circle cx="195.8" cy="271.2" r="3.0" fill="#2d2c26" fill-opacity="0.89"/>
+<circle cx="199.6" cy="262.5" r="3.0" fill="#2d2c26" fill-opacity="0.80"/>
+<circle cx="195" cy="265.2" r="2.1" fill="#2d2c26" fill-opacity="0.51"/>
+<circle cx="193.6" cy="268.8" r="1.9" fill="#2d2c26" fill-opacity="0.78"/>
+<circle cx="200.4" cy="269.6" r="3.3" fill="#2d2c26" fill-opacity="0.90"/>
+<circle cx="200.4" cy="271.2" r="1.8" fill="#2d2c26" fill-opacity="0.59"/>
+<circle cx="194.8" cy="270.9" r="2.6" fill="#2d2c26" fill-opacity="0.86"/>
+<circle cx="199.5" cy="268.5" r="2.7" fill="#2d2c26" fill-opacity="0.82"/>
+<circle cx="194" cy="261.9" r="3.2" fill="#2d2c26" fill-opacity="0.81"/>
+<circle cx="198.9" cy="268.2" r="1.8" fill="#2d2c26" fill-opacity="0.82"/>
+<circle cx="195.8" cy="260.4" r="3.3" fill="#2d2c26" fill-opacity="0.66"/>
+<circle cx="196.3" cy="257.9" r="2.8" fill="#2d2c26" fill-opacity="0.57"/>
+<circle cx="194.3" cy="271.6" r="3.2" fill="#2d2c26" fill-opacity="0.82"/>
+<circle cx="194.4" cy="259.1" r="3.4" fill="#2d2c26" fill-opacity="0.76"/>
+<ellipse cx="119.7" cy="153.2" rx="7" ry="13" fill="#5c5a4e" fill-opacity="0.28"/>
+<circle cx="118.6" cy="152.5" r="1.7" fill="#2d2c26" fill-opacity="0.51"/>
+<circle cx="123.2" cy="153.3" r="2.5" fill="#2d2c26" fill-opacity="0.87"/>
+<circle cx="119.2" cy="146.8" r="3.1" fill="#2d2c26" fill-opacity="0.58"/>
+<circle cx="117.9" cy="156.9" r="1.9" fill="#2d2c26" fill-opacity="0.73"/>
+<circle cx="118" cy="154.6" r="1.7" fill="#2d2c26" fill-opacity="0.86"/>
+<circle cx="118.7" cy="154.2" r="2.6" fill="#2d2c26" fill-opacity="0.86"/>
+<circle cx="119.2" cy="145.9" r="2.4" fill="#2d2c26" fill-opacity="0.71"/>
+<circle cx="119.9" cy="163.2" r="2.3" fill="#2d2c26" fill-opacity="0.57"/>
+<circle cx="116.1" cy="146.4" r="1.7" fill="#2d2c26" fill-opacity="0.69"/>
+<circle cx="121.4" cy="154" r="2.1" fill="#2d2c26" fill-opacity="0.71"/>
+<circle cx="120.1" cy="149" r="1.6" fill="#2d2c26" fill-opacity="0.72"/>
+<circle cx="117.9" cy="157.2" r="2.9" fill="#2d2c26" fill-opacity="0.70"/>
+<circle cx="120.2" cy="149.5" r="3.2" fill="#2d2c26" fill-opacity="0.68"/>
+<circle cx="120.6" cy="154.4" r="2.4" fill="#2d2c26" fill-opacity="0.78"/>
+<text x="172" y="440" font-size="12" fill="#52606d" text-anchor="middle">Growth on more than one level</text>
+<rect x="322" y="68" width="218" height="76" rx="10" fill="url(#gCard)" stroke="#9aa5b1" stroke-width="2" filter="url(#sh)"/>
+<circle cx="342" cy="88" r="12" fill="url(#gDot)"/>
+<text x="342" y="93" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">1</text>
+<text x="364" y="94" font-size="14" font-weight="700" fill="#1f2933">Size</text>
+<text x="364" y="116" font-size="12" fill="#52606d">over about 10 m² or</text>
+<text x="364" y="132" font-size="12" fill="#52606d">spread across rooms</text>
+<rect x="322" y="160" width="218" height="76" rx="10" fill="url(#gCard)" stroke="#9aa5b1" stroke-width="2" filter="url(#sh)"/>
+<circle cx="342" cy="180" r="12" fill="url(#gDot)"/>
+<text x="342" y="185" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">2</text>
+<text x="364" y="186" font-size="14" font-weight="700" fill="#1f2933">Levels</text>
+<text x="364" y="208" font-size="12" fill="#52606d">more than one storey</text>
+<text x="364" y="224" font-size="12" fill="#52606d">or the whole building</text>
+<rect x="322" y="252" width="218" height="76" rx="10" fill="url(#gCard)" stroke="#9aa5b1" stroke-width="2" filter="url(#sh)"/>
+<circle cx="342" cy="272" r="12" fill="url(#gDot)"/>
+<text x="342" y="277" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">3</text>
+<text x="364" y="278" font-size="14" font-weight="700" fill="#1f2933">HVAC</text>
+<text x="364" y="300" font-size="12" fill="#52606d">ducts or plant serve</text>
+<text x="364" y="316" font-size="12" fill="#52606d">the affected area</text>
+<rect x="322" y="344" width="218" height="76" rx="10" fill="url(#gCard)" stroke="#9aa5b1" stroke-width="2" filter="url(#sh)"/>
+<circle cx="342" cy="364" r="12" fill="url(#gDot)"/>
+<text x="342" y="369" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">4</text>
+<text x="364" y="370" font-size="14" font-weight="700" fill="#1f2933">People</text>
+<text x="364" y="392" font-size="12" fill="#52606d">aged care, hospitals,</text>
+<text x="364" y="408" font-size="12" fill="#52606d">childcare, schools, strata</text>
+<rect x="560" y="68" width="218" height="76" rx="10" fill="url(#gWarn)" stroke="#b54708" stroke-width="2" filter="url(#sh)"/>
+<circle cx="580" cy="88" r="12" fill="url(#gDotW)"/>
+<text x="580" y="93" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">5</text>
+<text x="602" y="94" font-size="14" font-weight="700" fill="#1f2933">Water</text>
+<text x="602" y="116" font-size="12" fill="#52606d">Category 3 or sewage</text>
+<text x="602" y="132" font-size="12" fill="#52606d">in the mix</text>
+<rect x="560" y="160" width="218" height="76" rx="10" fill="url(#gWarn)" stroke="#b54708" stroke-width="2" filter="url(#sh)"/>
+<circle cx="580" cy="180" r="12" fill="url(#gDotW)"/>
+<text x="580" y="185" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">6</text>
+<text x="602" y="186" font-size="14" font-weight="700" fill="#1f2933">Old materials</text>
+<text x="602" y="208" font-size="12" fill="#52606d">asbestos, lead or</text>
+<text x="602" y="224" font-size="12" fill="#52606d">silica likely</text>
+<rect x="560" y="252" width="218" height="76" rx="10" fill="url(#gWarn)" stroke="#b54708" stroke-width="2" filter="url(#sh)"/>
+<circle cx="580" cy="272" r="12" fill="url(#gDotW)"/>
+<text x="580" y="277" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">7</text>
+<text x="602" y="278" font-size="14" font-weight="700" fill="#1f2933">Structure</text>
+<text x="602" y="300" font-size="12" fill="#52606d">hidden cavities or</text>
+<text x="602" y="316" font-size="12" fill="#52606d">load-bearing damage</text>
+<rect x="560" y="344" width="218" height="76" rx="10" fill="url(#gCard)" stroke="#9aa5b1" stroke-width="2" filter="url(#sh)"/>
+<circle cx="580" cy="364" r="12" fill="url(#gDot)"/>
+<text x="580" y="369" font-size="13" font-weight="700" fill="#ffffff" text-anchor="middle">8</text>
+<text x="602" y="370" font-size="14" font-weight="700" fill="#1f2933">Parties</text>
+<text x="602" y="392" font-size="12" fill="#52606d">insurer, strata, hygienist</text>
+<text x="602" y="408" font-size="12" fill="#52606d">or a dispute</text>
+<text x="560" y="450" font-size="13" font-weight="700" fill="#1f2933" text-anchor="middle">One "yes" means a Level 3 plan.</text>
+<text x="776" y="488" font-size="11" fill="#52606d" text-anchor="end">CARSI · Level 3 Mould Remediation · schematic, not to scale</text>
+</svg>
