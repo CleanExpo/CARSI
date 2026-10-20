@@ -169,6 +169,11 @@ const MUST_BLOCK = [
   ['spelled number past nine', 'CARSI covers ten IICRC disciplines.'],
   ['count with plus', 'Courses across 7+ IICRC disciplines.'],
   ['coverage verb before the learner wording', 'CARSI covers your IICRC disciplines.'],
+  // Independent review of 3aec1af2: learner wording must not shelter a coverage claim.
+  ['coverage + "all of your"', 'CARSI covers all of your IICRC disciplines.'],
+  ['coverage + "you hold"', 'CARSI covers all IICRC disciplines you hold.'],
+  ['coverage + "held by"', 'Our catalogue spans IICRC disciplines held by technicians.'],
+  ['third-person catalogue mention', 'Browse courses by IICRC disciplines.'],
 ];
 
 const MUST_PASS = [
@@ -327,6 +332,7 @@ const MUST_BLOCK_FILE = [
     'GP-654 JSX count split across a line break',
     'Earn a CARSI designation, with training that spans {disciplineCountLabel} IICRC\n            disciplines. Every certificate is issued with a verification record.',
   ],
+  ['GP-654 count, IICRC and disciplines on three lines', '7\n<span>IICRC</span>\ndisciplines'],
 ];
 const MUST_PASS_FILE = [
   ['a code on one line, an unrelated word on the next', "disciplines={['WRT']}\ntraining: true,"],

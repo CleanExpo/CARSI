@@ -66,7 +66,7 @@ function buildHomeFaqs(facts: { publishedCourseCount: number }) {
   return [
     {
       question: 'What is CARSI?',
-      // GP-654: the plain-English topics, never a count of IICRC disciplines (GP-523 rule).
+      // GP-654: the plain-English topics, never an IICRC discipline count (GP-523 rule).
       answer: `CARSI is an Australian online training platform offering ${coursePhrase} across ${PUBLIC_TOPIC_LIST}, built for new starters, working technicians, and experienced professionals maintaining CECs.`,
     },
     {
