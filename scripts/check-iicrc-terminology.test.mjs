@@ -739,6 +739,15 @@ const MUST_BLOCK_FILE = [
     'GP-654 HTML comment inside a string',
     "const body = '<h2>CARSI covers 7 IICRC <!-- topic list --> disciplines.</h2>';",
   ],
+  // Review of 6cff84c2: lower-case iicrc shown upper-case by CSS, glued by the markup.
+  [
+    'GP-654 lower-case iicrc in a block-styled span beside a wbr',
+    'export const Copy = () => <h2 className="uppercase"><span className="block">CARSI covers 7 iicrc</span><span>disci<wbr />plines.</span></h2>;',
+  ],
+  [
+    'GP-654 mixed-case Iicrc in display-block HTML',
+    'export const Copy = () => <div dangerouslySetInnerHTML={{ __html: "<span style=\\"display:block\\">7 Iicrc</span><span>disci<wbr>plines</span>" }} />;',
+  ],
   // Review of bcd9b725: an inline element styled as a block starts a new line.
   [
     'GP-654 block-styled span beside a wbr',
