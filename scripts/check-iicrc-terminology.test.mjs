@@ -691,6 +691,19 @@ const MUST_BLOCK_FILE = [
     'GP-654 soft hyphen escape in a string literal beside an element',
     "export const Copy = () => <p>CARSI covers 7 IICRC <b>{'disci\\u00adplines'}</b>.</p>;",
   ],
+  // Review of 42c32b79: a template outside JSX hid its branches.
+  [
+    'GP-654 conditional template assigned outside JSX',
+    "const headline = `CARSI covers 7 IICRC ${expanded ? 'disciplines' : 'topics'}.`;\nexport const Copy = () => <p>{headline}</p>;",
+  ],
+  [
+    'GP-654 conditional template in metadata',
+    "export const metadata = { description: `CARSI covers 7 IICRC ${wide ? 'disciplines' : 'topics'}.` };",
+  ],
+  [
+    'GP-654 conditional template as a branch',
+    "const line = short ? 'CARSI' : `CARSI covers 7 IICRC ${wide ? 'disciplines' : 'topics'}.`;",
+  ],
   [
     'GP-654 too many adjacent conditional variants fails closed',
     `<p>Restoration disciplines${"{a ? 'x' : 'y'}".repeat(12)}</p>`,
@@ -712,6 +725,10 @@ const MUST_PASS_FILE = [
   [
     'an attribute naming a discipline in a tree full of conditionals',
     `<div><Link href="/courses?discipline=CCT">Browse courses</Link>${"{a ? 'x' : 'y'}".repeat(12)}</div>`,
+  ],
+  [
+    'conditional template whose branches render neither phrase',
+    "const headline = `CARSI covers 7 restoration ${wide ? 'disciplines' : 'topics'}.`;",
   ],
   [
     'a word that only starts like the banned one, split across an element',
