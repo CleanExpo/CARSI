@@ -193,6 +193,28 @@ const MUST_BLOCK = [
   ['zero-width space inside the word', 'CARSI covers 7 IICRC disci\u200bplines.'],
   ['soft hyphen entity inside the word', 'CARSI covers 7 IICRC disci&shy;plines.'],
   ['JSX space before a counted singular', '<p>{d} IICRC{" "}discipline{d === 1 ? "" : "s"}</p>'],
+  // Independent review of fd1890a8: only whole learner-data shapes are exempt…
+  ['possessive + unlisted selling verb', '<p>Boost your IICRC disciplines with expert-led tuition.</p>'],
+  ['possessive + "advance"', 'Advance your IICRC disciplines with us.'],
+  ['possessive + "perfect"', 'Perfect your IICRC disciplines with interactive tutorials.'],
+  ['"you hold" + selling tail', 'Sharpen the IICRC disciplines you hold with expert tuition.'],
+  ['selling question', 'Want to boost your IICRC disciplines?'],
+  ['claim riding in front of an exempt question', "label: '7 IICRC disciplines', question: 'Which IICRC disciplines do you hold?'"],
+  ['comment marker is not an exemption (JSX text renders it)', '<p>// Boost your IICRC disciplines today.</p>'],
+  // …and anything between the words other than whitespace is banned.
+  ['JSX escaped ordinary space', '<p>CARSI covers 7 IICRC{"\\u0020"}disciplines.</p>'],
+  ['JSX \\x20', '<p>CARSI covers 7 IICRC{"\\x20"}disciplines.</p>'],
+  ['JSX \\t', '<p>CARSI covers 7 IICRC{"\\t"}disciplines.</p>'],
+  ['JSX \\u{20}', '<p>CARSI covers 7 IICRC{"\\u{20}"}disciplines.</p>'],
+  ['HTML &Tab;', '<p>CARSI covers 7 IICRC&Tab;disciplines.</p>'],
+  ['HTML &#9;', '<p>CARSI covers 7 IICRC&#9;disciplines.</p>'],
+  ['HTML &#x20;', '<p>CARSI covers 7 IICRC&#x20;disciplines.</p>'],
+  ['HTML &NewLine;', '<p>CARSI covers 7 IICRC&NewLine;disciplines.</p>'],
+  ['unknown entity between the words', '<p>CARSI covers 7 IICRC&MadeUp;disciplines.</p>'],
+  ['space variable', '<p>CARSI covers 7 IICRC{sp}disciplines.</p>'],
+  ['String.fromCharCode', '<p>CARSI covers 7 IICRC{String.fromCharCode(32)}disciplines.</p>'],
+  ['template interpolation', '`CARSI covers 7 IICRC${sp}disciplines.`'],
+  ['two expressions', '<p>CARSI covers 7 IICRC{""}{" "}disciplines.</p>'],
 ];
 
 const MUST_PASS = [
@@ -322,8 +344,9 @@ const MUST_PASS = [
   ['plain restoration disciplines', 'Courses across 7 restoration disciplines.'],
   ['learner: a quantity of their own disciplines', 'Which of your seven IICRC disciplines need renewal?'],
   ['learner: all the disciplines they hold', 'Select all IICRC disciplines you hold.'],
-  ['comment about learner data', '// Count all IICRC disciplines held by the learner.'],
-  ['comment: the learner\'s own disciplines', "// The learner's OWN IICRC disciplines: acronyms allowed here, titles still not."],
+  ['onboarding question after another object key', "kind: 'multi', question: 'Which IICRC disciplines do you hold or plan to work in? Select all that apply.',"],
+  ['learner: disciplines due', 'Which of your IICRC disciplines are due?'],
+  ['form prompt: choose the ones you hold', '<label>Choose the IICRC disciplines you currently hold.</label>'],
 ];
 
 let failed = 0;
@@ -357,6 +380,8 @@ const MUST_BLOCK_FILE = [
   ['GP-654 learner benefit across lines', '<p>\n  Explore seven IICRC disciplines\n  at your pace.\n</p>'],
 ];
 const MUST_PASS_FILE = [
+  // Review of fd1890a8 (P2): a learner question wrapped over two lines.
+  ['learner question across a line break', "question:\n  'Which IICRC disciplines do you hold\n  or plan to work in?',"],
   ['a code on one line, an unrelated word on the next', "disciplines={['WRT']}\ntraining: true,"],
   ['plain subject across a break', 'Water damage restoration\ntraining for plumbers.'],
 ];
@@ -407,12 +432,23 @@ for (const [name, file, src, drop] of LIST_FIXTURES) {
     console.error('✖ GP-654 catalogue rule not found exactly once');
     failed++;
   }
-  const t0 = performance.now();
-  scanText(F, longLine, catalogueRule);
-  const ms = performance.now() - t0;
-  if (ms > 100) {
-    console.error(`✖ long near-miss line took ${ms.toFixed(0)}ms (> 100ms)`);
-    failed++;
+  // GP-654 round 5: the learner-data shapes, separator and whitespace normalisers on long lines.
+  const adversarial = [
+    longLine,
+    `${"__a: 'b', ".repeat(1000)}Which IICRC disciplines do you hold x`,
+    `${'IICRC{x}'.repeat(1200)} disciplines`,
+    `IICRC${'&nbsp;'.repeat(1500)}x disciplines`,
+    `{"${'\\u0020'.repeat(1500)}x"} IICRC disciplines`,
+    `${'Which of your '.repeat(700)}IICRC disciplines need renewal x`,
+  ];
+  for (const line of adversarial) {
+    const t0 = performance.now();
+    scanText(F, line, catalogueRule);
+    const ms = performance.now() - t0;
+    if (ms > 100) {
+      console.error(`✖ long near-miss line took ${ms.toFixed(0)}ms (> 100ms): ${line.slice(0, 40)}…`);
+      failed++;
+    }
   }
 }
 

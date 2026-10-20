@@ -95,20 +95,33 @@ function registryTitlesCarryingDesignations() {
 }
 
 /**
- * GP-654: a sentence that positively names the learner's OWN IICRC disciplines — "your … IICRC
- * disciplines", "the learner's own IICRC disciplines", "IICRC disciplines (that) you hold", "do you hold", "held by". A bare "you" or
- * "your" elsewhere in the sentence is not enough ("Explore seven IICRC disciplines at your pace";
- * review of 395315bc).
+ * GP-654: the ONLY sentences exempt from the catalogue rule — learner-data shapes matched end to
+ * end. Three review rounds each found selling copy that a list of catalogue words missed ("at your
+ * pace", 395315bc; "Boost your IICRC disciplines with expert-led tuition", fd1890a8), so nothing
+ * outside these shapes is exempt, comments included (JSX text renders a "//"):
+ *  - a question asking which disciplines the learner holds or must renew;
+ *  - a form prompt asking the learner to select the disciplines they hold.
+ * Leading property keys or a quote ("question: '…") and trailing punctuation are tolerated.
  */
-const LEARNER_OWNED = new RegExp(
-  String.raw`\b(?:your|their|(?:learner|student|technician|user)s?['’]s?)\s+(?:[\w-]+\s+){0,2}IICRC\s+disciplines\b` +
-    String.raw`|\bIICRC\s+disciplines\s+(?:(?:that|which)\s+)?(?:do\s+)?(?:you|they|the\s+learner|learners?|students?)\s+(?:hold|held|have|maintain|renew|work|plan)\b` +
-    String.raw`|\bIICRC\s+disciplines\s+held\s+by\b`,
-  'i'
-);
-/** …and says nothing about what CARSI offers or what the learner will get from it. */
-const CATALOGUE_WORD =
-  /\b(?:CARSI|our|we|catalogue|catalog|courses?|training|programs?|programmes?|pathways?|modules?|lessons?|across|spans?|spanning|cover\w*|offer\w*|teach\w*|taught|includ\w*|explor\w*|master\w*|learn(?!ers?\b)\w*|stud(?!ents?\b)\w*|discover\w*|unlock\w*|gain\w*|earn\w*|build\w*|develop\w*|enrol\w*|pace|online|anywhere)\b/i;
+// Leading object-literal keys, each with an optional short value that never mentions IICRC
+// ("kind: 'multi', question: '"), so a claim cannot ride in front of an exempt question.
+const LEAD =
+  String.raw`^(?:[^A-Za-z]*[A-Za-z_]\w*\s*:\s*(?:['"` +
+  '`' +
+  String.raw`](?:(?!IICRC)[^'"` +
+  '`' +
+  String.raw`\n]){0,40}['"` +
+  '`' +
+  String.raw`]\s*,\s*)?){0,3}[^A-Za-z]*`;
+const TAIL = String.raw`\s*[?.!]?[^A-Za-z]*$`;
+const HOLD = String.raw`(?:hold|have|currently\s+hold|maintain|renew)(?:\s+or\s+plan\s+to\s+work\s+in)?`;
+const LEARNER_DATA_SENTENCE = [
+  String.raw`(?:which|what)\s+IICRC\s+disciplines\s+do\s+you\s+${HOLD}`,
+  String.raw`which\s+of\s+(?:your|their)\s+(?:[\w-]+\s+)?IICRC\s+disciplines\s+(?:needs?\s+renewal|are\s+(?:due|expiring|current))`,
+  String.raw`(?:select|choose|tick|pick|enter|add|list|update)\s+(?:all\s+)?(?:of\s+)?(?:the\s+)?(?:your\s+)?IICRC\s+disciplines\s+(?:(?:that|which)\s+)?you\s+${HOLD}`,
+].map((body) => new RegExp(LEAD + body + TAIL, 'i'));
+/** Something other than plain whitespace between "IICRC" and "disciplines": `{…}` or `&…;`. */
+const SEP = String.raw`(?:\{[^{}\n]{0,60}\}|\$\{[^{}\n]{0,60}\}|&[#\w]{1,30};)`;
 /**
  * Whitespace that renders as a space: JSX `{" "}` / `{' '}` expressions, HTML space
  * entities, and the no-break / thin / zero-width characters (review of 395315bc).
@@ -116,8 +129,8 @@ const CATALOGUE_WORD =
 const RENDERED_SPACE = new RegExp(
   String.raw`\{\s*(["'` +
     '`' +
-    String.raw`])(?:\s|\\u00a0|\\xa0|\\u2009|\\u202f|&nbsp;)*\1\s*\}` +
-    String.raw`|&(?:nbsp|ensp|emsp|thinsp|hairsp|numsp|puncsp|NonBreakingSpace|#0*(?:32|160|8194|8195|8201|8239)|#x0*(?:20|a0|2002|2003|2009|202f));` +
+    String.raw`])(?:\s|\\[tnr]|\\u00(?:20|09|0a|a0)|\\x(?:20|09|0a|a0)|\\u\{0*(?:20|9|a|a0)\}|\\u2009|\\u202f|&(?:nbsp|Tab|NewLine|#0*(?:9|10|32|160)|#x0*(?:9|a|20|a0));)*\1\s*\}` +
+    String.raw`|&(?:nbsp|ensp|emsp|thinsp|hairsp|numsp|puncsp|NonBreakingSpace|Tab|NewLine|ThinSpace|MediumSpace|VeryThinSpace|#0*(?:9|10|13|32|160|8194|8195|8201|8239)|#x0*(?:9|a|d|20|a0|2002|2003|2009|202f));` +
     String.raw`|[  -   　]`,
   'gi'
 );
@@ -239,16 +252,19 @@ export function bannedRules(CODES = IICRC_CODE_ALT) {
       // Fail-closed by design. Two review rounds (6edff7f0, 3aec1af2) each found new spellings
       // of a coverage claim — reversed order, markup between the words, "all of your", three
       // lines of JSX — so this rule does not try to recognise claims. The plural phrase is
-      // banned outright on every scanned surface. The one exemption is a SENTENCE that positively
-      // names the learner's own disciplines ("your IICRC disciplines", "IICRC disciplines you
-      // hold", "held by") and carries no CARSI, catalogue, course, coverage or learning-benefit
-      // word; anything else, rephrase as "restoration disciplines". (Round 3, 395315bc: any "you"
-      // or "your" exempted "Explore seven IICRC disciplines at your pace".)
+      // banned outright on every scanned surface. The only exemption is a whole sentence in one
+      // of the LEARNER_DATA_SENTENCE shapes (a question or form prompt about the disciplines the
+      // learner holds); anything else, rephrase as "restoration disciplines". Earlier exemptions
+      // keyed on "you"/"your" plus a list of selling words, and reviews kept finding selling copy
+      // outside the list (395315bc, fd1890a8).
       // A count in front of the singular ("7 IICRC discipline${s}") and a stat label are also
-      // banned. Zero-width characters are removed, rendered whitespace (`{" "}`, `&nbsp;`) becomes
-      // a space, markup is stripped, and up to three lines are read as one.
+      // banned. Zero-width characters are removed, rendered whitespace (`{" "}`, `{" "}`,
+      // `&nbsp;`, `&Tab;`) becomes a space, markup is stripped, and up to three lines are read as
+      // one. Any other `{…}` expression or `&…;` entity between "IICRC" and "disciplines" is
+      // banned without trying to work out what it renders.
       re: new RegExp(
         String.raw`\bIICRC\s+disciplines\b` +
+          String.raw`|\bIICRC(?:\s|${SEP})*${SEP}(?:\s|${SEP})*disciplines\b` +
           String.raw`|(?<![\w.])(?:\d{1,3}\+?|\$\{[^}\n]{1,40}\}|\{[^}\n]{1,40}\})\s+IICRC\s+discipline\b` +
           String.raw`|\blabel\s*:\s*['"` +
           '`' +
@@ -265,7 +281,7 @@ export function bannedRules(CODES = IICRC_CODE_ALT) {
           .replace(RENDERED_SPACE, ' ')
           .replace(/<\/?[A-Za-z][^<>\n]{0,80}>/g, ' ')
           .split(/(?<=[.!?])\s+/)
-          .filter((s) => !(LEARNER_OWNED.test(s) && !CATALOGUE_WORD.test(s)))
+          .filter((s) => !LEARNER_DATA_SENTENCE.some((shape) => shape.test(s)))
           .join(' '),
       message:
         'Do not measure the CARSI catalogue in IICRC disciplines ("across 7 IICRC disciplines", "IICRC Disciplines" stat) — say "restoration disciplines" or name the topics. A learner\'s own IICRC disciplines may still be referenced.',
