@@ -796,6 +796,7 @@ for (const [name, src, block] of [
   ['learner question in Markdown', 'Which **IICRC disciplines** do you hold?', false],
   ['GP-654 Markdown word split by emphasis', 'CARSI covers 7 IICRC dis**ci**plines.', true],
   ['GP-654 HTML comment in Markdown', 'CARSI covers 7 IICRC <!-- note --> disciplines.', true],
+  ['GP-654 br and wbr in Markdown HTML', '<h2>CARSI covers 7 IICRC<br>disci<wbr>plines</h2>', true],
   [
     'GP-654 HTML span with a quoted > in Markdown',
     'CARSI covers 7 IICRC <span title="a > b">disciplines</span>.',
@@ -835,6 +836,11 @@ for (const [name, src, block] of [
   [
     'GP-654 split word across HTML tags in seed contentBody',
     '{"contentBody": "<p>CARSI covers 7 IICRC dis<b>ci</b>plines.</p>"}',
+    true,
+  ],
+  [
+    'GP-654 br and wbr in seed contentBody',
+    '{"contentBody": "<h2>CARSI covers 7 IICRC<br>disci<wbr>plines</h2>"}',
     true,
   ],
   [
