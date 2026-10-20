@@ -51,14 +51,19 @@ const h = vi.hoisted(() => ({
   candidates: [] as unknown[],
   // Lesson completion dates by lesson id; a lesson not listed was completed with its enrolment.
   lessonDone: {} as Record<string, Date | null>,
+  // Further progress rows (e.g. a lesson the learner marked incomplete).
+  extraProgress: [] as Array<{ lessonId: string; completed: boolean; completedAt: Date | null }>,
 }));
 
 function progressFor(rows: unknown[]) {
-  return (rows as ReturnType<typeof enrolment>[]).map((e) => {
-    const lessonId = e.course.modules[0].lessons[0].id;
-    const at = lessonId in h.lessonDone ? h.lessonDone[lessonId] : e.completedAt;
-    return { lessonId, completed: true, completedAt: at, lastAccessedAt: at ?? NOW };
-  });
+  return [
+    ...(rows as ReturnType<typeof enrolment>[]).map((e) => {
+      const lessonId = e.course.modules[0].lessons[0].id;
+      const at = lessonId in h.lessonDone ? h.lessonDone[lessonId] : e.completedAt;
+      return { lessonId, completed: true, completedAt: at, lastAccessedAt: at ?? NOW };
+    }),
+    ...h.extraProgress.map((p) => ({ ...p, lastAccessedAt: NOW })),
+  ];
 }
 
 vi.mock('@/lib/prisma', () => ({
@@ -90,6 +95,7 @@ describe('renewal summary credits CEC only inside the approval window', () => {
     ];
     h.candidates = [];
     h.lessonDone = {};
+    h.extraProgress = [];
   });
 
   afterEach(() => {
@@ -166,6 +172,20 @@ describe('renewal summary credits CEC only inside the approval window', () => {
     const afterEnd = await getRenewalSummaryForStudent('user-1');
     expect(afterEnd!.cycle_end).toBe('2030-12-31T23:59:59.999Z');
     expect(afterEnd!.cec_earned_in_cycle).toBe(0);
+  });
+
+  it('un-marking an old lesson does not clear the evidence against the period (GP-655)', async () => {
+    // Review of 5284d027: after reactivation re-dated the enrolment to 01/01/2027, the learner
+    // re-marked the first lesson in the period and marked the second (done 01/06/2025)
+    // incomplete. The enrolment stays completed; the second lesson must still fail closed.
+    h.user = { ...h.user, iicrcExpiryDate: new Date('2030-12-31T00:00:00Z') };
+    const e = enrolment(IN_WINDOW, new Date('2027-01-01T00:00:00Z'));
+    e.course.modules[0].lessons.push({ id: 'l-second' });
+    h.enrolments = [e];
+    h.extraProgress = [{ lessonId: 'l-second', completed: false, completedAt: null }];
+    const s = await getRenewalSummaryForStudent('user-1');
+    expect(s!.cec_earned_in_cycle).toBe(0);
+    expect(renewalProgress(s, 1).reached).toBe(false);
   });
 
   it('a lesson added after the learner finished does not remove period credit (GP-655)', async () => {

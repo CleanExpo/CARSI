@@ -312,11 +312,14 @@ async function loadRenewalSummary(
         // A revocation or re-purchase clears completedAt but keeps lesson progress, so the next
         // sync re-dates old learning to now. Count it in the period only when every lesson the
         // learner completed was also completed inside the period; an undated, earlier or later
-        // lesson fails closed (GP-655 reviews of 5b47a9a1 and c4f3d3a7). A lesson added to the
-        // course after the learner finished has no completion and is not evidence either way.
+        // lesson fails closed (GP-655 reviews of 5b47a9a1 and c4f3d3a7). A lesson marked
+        // incomplete also fails closed: un-marking old lessons must not clear the evidence
+        // (review of 5284d027). Only a lesson with no progress at all, such as one added to the
+        // course after the learner finished, is not evidence either way.
         const done = lessonIds.flatMap((id) => {
           const p = progressByLesson.get(id);
-          return p?.completed === true ? [p.completedAt] : [];
+          if (!p) return [];
+          return [p.completed === true ? p.completedAt : null];
         });
         const learnedInPeriod =
           done.length > 0 && done.every((at) => at != null && at >= cycle.start && at <= cycle.end);
