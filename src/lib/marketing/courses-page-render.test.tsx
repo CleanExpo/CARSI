@@ -14,6 +14,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { WATER_COURSE } from '../../../e2e/catalogue-fixtures';
+import { CATALOGUE_TOPIC_TABS } from '../catalogue/discipline-param';
 
 vi.mock('@/components/ThemeProvider', () => ({ useTheme: () => ({ theme: 'light' }) }));
 vi.mock('next/navigation', () => ({
@@ -21,8 +22,6 @@ vi.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams(),
   usePathname: () => '/courses',
 }));
-
-const HERO = 'app/(public)/courses/page.tsx';
 
 // Registry-approved slugs (data/seed/cec-approvals.json, in force on the fixed date below).
 const approved = (slug: string) => ({
@@ -136,7 +135,7 @@ function iicrcSentences(text: string): string[] {
   ].sort();
 }
 
-async function renderCourses(items: unknown[]): Promise<string> {
+async function renderHtml(items: unknown[], discipline?: string): Promise<string> {
   vi.resetModules();
   vi.stubGlobal(
     'fetch',
@@ -147,9 +146,23 @@ async function renderCourses(items: unknown[]): Promise<string> {
     }))
   );
   const { default: CoursesPage } = await import('../../../app/(public)/courses/page');
-  const html = renderToStaticMarkup(await CoursesPage({ searchParams: Promise.resolve({}) }));
+  return renderToStaticMarkup(
+    await CoursesPage({ searchParams: Promise.resolve(discipline ? { discipline } : {}) })
+  );
+}
+
+async function renderCourses(items: unknown[], discipline?: string): Promise<string> {
+  const html = await renderHtml(items, discipline);
   return `${renderedText(html)}\n${jsonLdText(html)}`;
 }
+
+// Every catalogue tab a ?discipline= link or a tab click can open, the hero's destination
+// ('iicrc-cec') included (review of fe12a477).
+const DISCIPLINES: Array<string | undefined> = [
+  undefined,
+  ...CATALOGUE_TOPIC_TABS.filter((t) => t !== 'All'),
+  'iicrc-cec',
+];
 
 // Reviewed: the permitted hero label, third-person IICRC facts and denials, and CEC wording that
 // names CARSI's provider standing or a per-course approval. Numbers are masked as #.
@@ -176,31 +189,67 @@ const REVIEWED_IICRC_SENTENCES = [
   'Which CARSI courses have IICRC CEC hours?',
   'Will a CARSI course make me IICRC certified?',
 ];
-// How many times each state's rendered page names the IICRC.
-const REVIEWED_IICRC_COUNTS = [16, 26, 29, 29];
-// page.tsx as reviewed for GP-639. Any edit to it fails here until it is reviewed and this pin
-// and the lists above are updated together: it is the one file whose every branch this diff owns.
-const REVIEWED_PAGE_SHA256 = '85ba8041bd6b994d2f881073cd37664b807fffc93dc2154a4e04a695ba429d4a';
+// How many times the rendered page names the IICRC in each catalogue state (every tab alike).
+const REVIEWED_IICRC_COUNTS: Record<string, number> = {
+  'catalogue unavailable': 16,
+  'no approval': 26,
+  'one approval': 29,
+  'three approvals': 29,
+};
+// The public-rendering source files of this diff, as reviewed for GP-639. Any edit to one fails
+// here until it is reviewed and these pins and the lists above are updated together: a component
+// can add copy under a state no render reaches, so its every branch is pinned as a file.
+const REVIEWED_SOURCE_SHA256: Record<string, string> = {
+  'app/(public)/courses/page.tsx':
+    '85ba8041bd6b994d2f881073cd37664b807fffc93dc2154a4e04a695ba429d4a',
+  'app/(public)/courses/[slug]/page.tsx':
+    'fa11892a05908c82349ebf30c631ea09117938d66b2713dd6e10c73c69e28887',
+  'app/(public)/pathways/[slug]/page.tsx':
+    '66e4c37b9c7f7e37c7cb0f7bc7cd677db0a6f3c4814aacc6f78bcf8deab9a044',
+  'src/components/lms/CourseGrid.tsx':
+    'ae0da068a86cda6f544644546de0f125825170fb4cc0beb2e0b1b997dd2309f3',
+  'src/components/lms/CourseSearchBar.tsx':
+    'f6e00b2daabe277f1d7c887b1f5357b01ec994cf7d870f489a810b51e16f8e52',
+  'src/lib/catalogue/discipline-param.ts':
+    '1ec7861a70eaac64936bf93025a19a1ee38468c12d0545f8c317b5d33e26641e',
+  'src/lib/cec-display.ts': '9b20d308d90bee310749664428d58fd21afc76d004e92108d3c68eba8a497ddc',
+};
 
 const mentions = (text: string) => (text.match(new RegExp(NAMES_IICRC, 'gi')) ?? []).length;
 
 describe('rendered /courses: every IICRC sentence is a reviewed one (GP-639)', () => {
-  it('source: page.tsx is the reviewed version', () => {
-    expect(createHash('sha256').update(readFileSync(HERO)).digest('hex')).toBe(
-      REVIEWED_PAGE_SHA256
+  it('source: every public-rendering file of this diff is the reviewed version', () => {
+    const now = Object.fromEntries(
+      Object.keys(REVIEWED_SOURCE_SHA256).map((f) => [
+        f,
+        createHash('sha256').update(readFileSync(f)).digest('hex'),
+      ])
     );
+    expect(now).toEqual(REVIEWED_SOURCE_SHA256);
   });
 
-  it('rendered: every catalogue state names the IICRC only in reviewed sentences', async () => {
+  it('rendered: every catalogue state and tab names the IICRC only in reviewed sentences', async () => {
     const seen = new Set<string>();
-    const counts: number[] = [];
-    for (const [, items] of STATES) {
-      const text = await renderCourses(items);
-      for (const s of iicrcSentences(text)) seen.add(s);
-      counts.push(mentions(text));
-    }
+    for (const [state, items] of STATES)
+      for (const discipline of DISCIPLINES) {
+        const text = await renderCourses(items, discipline);
+        for (const s of iicrcSentences(text)) seen.add(s);
+        expect(mentions(text), `${state} | ${discipline ?? 'no tab'}`).toBe(
+          REVIEWED_IICRC_COUNTS[state]
+        );
+      }
     expect([...seen].sort()).toEqual(REVIEWED_IICRC_SENTENCES);
-    expect(counts).toEqual(REVIEWED_IICRC_COUNTS);
+  }, 60_000);
+
+  it('rendered: the hero destination opens the IICRC CEC tab (the tab states are not vacuous)', async () => {
+    const selected = (html: string) => {
+      const div = document.createElement('div');
+      div.innerHTML = html;
+      return div.querySelector('[role="tab"][aria-selected="true"]')?.textContent;
+    };
+    expect(selected(await renderHtml(STATES[2][1], 'iicrc-cec'))).toBe('IICRC CEC');
+    expect(selected(await renderHtml(STATES[2][1], 'Water Damage'))).toBe('Water Damage');
+    expect(selected(await renderHtml(STATES[2][1]))).toBe('All');
   });
 
   it('rendered: the hero link renders when an approval is in force (the states are not vacuous)', async () => {
