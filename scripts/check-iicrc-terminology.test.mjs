@@ -741,6 +741,22 @@ const MUST_BLOCK_FILE = [
   ],
   // Review of 1c70746b: title-case Disciplines after a CSS-upper-cased iicrc.
   [
+    'GP-654 a range of before the singular',
+    "export const metadata = { description: 'CARSI spans a range of IICRC discipline areas.' };",
+  ],
+  [
+    'GP-654 a variety of before the singular',
+    "export const metadata = { description: 'CARSI covers a variety of IICRC discipline topics.' };",
+  ],
+  [
+    'GP-654 the singular before a plural coverage noun with no count',
+    'export const Copy = () => <p>Training across broad IICRC discipline areas.</p>;',
+  ],
+  [
+    'GP-654 a range of with no coverage noun',
+    'export const metadata = { description: "CARSI teaches a wide range of IICRC discipline." };',
+  ],
+  [
     'GP-654 half a dozen before the singular',
     'export const metadata = { description: "CARSI covers half a dozen IICRC discipline areas." };',
   ],
