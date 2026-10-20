@@ -6,7 +6,11 @@ import type { SessionClaims } from '@/lib/auth/session-jwt';
 import { resolveHomeContinueState } from '@/lib/learner-home-state';
 import type { EnrollmentDto, LearnerDashboardSummary } from '@/lib/server/learner-dashboard-data';
 import type { OnboardingProgramRow } from '@/lib/server/onboarding-programs';
-import { RENEWAL_CEC_REQUIRED, type RenewalCourseSuggestion } from '@/types/renewal';
+import {
+  RENEWAL_CEC_REQUIRED,
+  RENEWAL_RULE_NOTE,
+  type RenewalCourseSuggestion,
+} from '@/types/renewal';
 
 function greetingForHour(hour: number): string {
   if (hour < 12) return 'Good morning';
@@ -483,6 +487,7 @@ export function DashboardLearningSection({
                 : `${formatCec(cecRemaining)} CECs remaining`}
             </span>
           </div>
+          <p className={`mt-2 text-[12px] ${muted}`}>{RENEWAL_RULE_NOTE}</p>
           <Link href="/dashboard/student/credentials" className={`${cta} mt-auto pt-7`}>
             View CEC details
             <ArrowRight className="h-4 w-4" aria-hidden />

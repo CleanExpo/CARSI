@@ -6,7 +6,7 @@ import { LinkedInShareButton } from '@/components/lms/LinkedInShareButton';
 import { useToast } from '@/hooks/use-toast';
 import { apiClient } from '@/lib/api/client';
 import { formatCecHoursForDisplay } from '@/lib/cec-display';
-import { RENEWAL_CEC_REQUIRED } from '@/types/renewal';
+import { RENEWAL_CEC_REQUIRED, RENEWAL_RULE_NOTE } from '@/types/renewal';
 import { ArrowRight, Award, Download, FileText, Link2, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -343,6 +343,7 @@ export default function StudentCredentialsPage() {
                 ? 'Renewal target reached'
                 : `${formatCecHoursForDisplay(cecRemaining) ?? cecRemaining} CECs remaining toward the ${cecTarget}-hour renewal target. Unapproved courses add none.`}
             </p>
+            <p className={`mt-2 text-[12px] ${muted}`}>{RENEWAL_RULE_NOTE}</p>
           </div>
         </section>
       ) : null}

@@ -6,6 +6,8 @@
  */
 export const RENEWAL_CEC_REQUIRED = 14;
 export const RENEWAL_CYCLE_YEARS = 4;
+/** Shown beside every learner renewal target, since the summary assumes the standard window. */
+export const RENEWAL_RULE_NOTE = `IICRC rule: ${RENEWAL_CEC_REQUIRED} CECs every ${RENEWAL_CYCLE_YEARS} years. Master and Inspector certifications need ${RENEWAL_CEC_REQUIRED} every 2 years.`;
 
 export interface RenewalCourseSuggestion {
   id: string;

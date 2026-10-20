@@ -15,7 +15,7 @@ import {
 } from '@/components/onboarding/OnboardingProgramsStrip';
 import { apiClient } from '@/lib/api/client';
 import { formatCecHoursForDisplay } from '@/lib/cec-display';
-import { RENEWAL_CEC_REQUIRED } from '@/types/renewal';
+import { RENEWAL_CEC_REQUIRED, RENEWAL_RULE_NOTE } from '@/types/renewal';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -265,6 +265,7 @@ export default function StudentDashboardPage() {
                 ? 'Renewal target reached'
                 : `${formatCecHoursForDisplay(cecRemaining) ?? cecRemaining} CECs remaining toward the ${cecTarget}-hour renewal target. Unapproved courses add none.`}
             </p>
+            <p className={`mt-2 text-[12px] ${muted}`}>{RENEWAL_RULE_NOTE}</p>
             <Link
               href="/dashboard/student/credentials"
               className={`${btnGhost} mt-auto self-start pt-6`}

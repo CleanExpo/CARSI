@@ -5,7 +5,7 @@ import { ErrorBanner } from '@/components/lms/ErrorBanner';
 import { AcronymTooltip } from '@/components/ui/AcronymTooltip';
 import { apiClient } from '@/lib/api/client';
 import type { RenewalSummaryPayload } from '@/types/renewal';
-import { RENEWAL_CEC_REQUIRED, RENEWAL_CYCLE_YEARS } from '@/types/renewal';
+import { RENEWAL_CEC_REQUIRED, RENEWAL_RULE_NOTE } from '@/types/renewal';
 import { AlertTriangle, ArrowRight, Calendar } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
@@ -165,9 +165,7 @@ export function RenewalCockpit() {
               the next courses that close your gaps.
             </p>
             <p className="mt-2 max-w-xl text-xs leading-relaxed text-slate-500">
-              Standard IICRC certifications need {RENEWAL_CEC_REQUIRED} CECs every{' '}
-              {RENEWAL_CYCLE_YEARS} years; Master and Inspector certifications need{' '}
-              {RENEWAL_CEC_REQUIRED} every 2 years. The IICRC confirms your exact requirement.
+              {RENEWAL_RULE_NOTE}
             </p>
             {data.some_cecs_estimated ? (
               <p className="mt-3 max-w-xl text-xs leading-relaxed text-amber-800">
