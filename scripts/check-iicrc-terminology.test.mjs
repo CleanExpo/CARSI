@@ -76,26 +76,56 @@ const MUST_BLOCK = [
   // branch nor the "<acronym>-aligned" branch.
   ['bare acronym list brands a CARSI course', 'WRT, CCT, AMRT — all online, all self-paced.'],
   ['acronym list with ampersand', 'disciplineList="WRT, CRT, ASD & OCT"'],
-  ['IICRC training sold as CARSI\'s', 'IICRC training through CARSI lets you expand your service offering.'],
+  [
+    "IICRC training sold as CARSI's",
+    'IICRC training through CARSI lets you expand your service offering.',
+  ],
   // CEC is fail-closed: data/seed/cec-approvals.json gates every course-level claim.
-  ['course-level CEC claim', 'Completing this training also earns IICRC Continuing Education Credits (CECs).'],
+  [
+    'course-level CEC claim',
+    'Completing this training also earns IICRC Continuing Education Credits (CECs).',
+  ],
   ['blunt CEC claim', 'Every course earns verified CECs.'],
   // Exemptions must not become laundering routes — each of these carries a permitted
   // construction AND a real claim on the same line.
-  ['denial does not launder a claim', 'It does not award CECs. Every CARSI course earns IICRC CECs.'],
-  ['question does not launder a claim', 'Is it accredited? Our courses earn CECs toward your certification.'],
-  ['comment marker does not launder branding', '// note: WRT, ASD and AMRT courses for CARSI clients'],
-  ['scope note does not launder branding', '(IICRC CRT) — and our IICRC AMRT course for CARSI members.'],
+  [
+    'denial does not launder a claim',
+    'It does not award CECs. Every CARSI course earns IICRC CECs.',
+  ],
+  [
+    'question does not launder a claim',
+    'Is it accredited? Our courses earn CECs toward your certification.',
+  ],
+  [
+    'comment marker does not launder branding',
+    '// note: WRT, ASD and AMRT courses for CARSI clients',
+  ],
+  [
+    'scope note does not launder branding',
+    '(IICRC CRT) — and our IICRC AMRT course for CARSI members.',
+  ],
   // Codex round 2 (2026-08-07): four constructions the round-1 rules still could not see.
   // Each had live occurrences while the guard and its self-test both reported green.
-  ['plus-separated acronym list', 'description="WRT + ASD + FSRT training for data centre facility teams."'],
-  ['topic word steps around IICRC training', 'IICRC restoration training for Australian data centres.'],
-  ['CEC eligibility claimed without the word CEC', 'so this course counts toward maintaining a certification you already hold.'],
+  [
+    'plus-separated acronym list',
+    'description="WRT + ASD + FSRT training for data centre facility teams."',
+  ],
+  [
+    'topic word steps around IICRC training',
+    'IICRC restoration training for Australian data centres.',
+  ],
+  [
+    'CEC eligibility claimed without the word CEC',
+    'so this course counts toward maintaining a certification you already hold.',
+  ],
   [
     'interpolation pushes the verb past the window',
     "`Published courses across ${d} restoration discipline${d === 1 ? '' : 's'} — each earning continuing education credits toward an IICRC certification`",
   ],
-  ['IICRC-training rule is not whole-line allowed', 'IICRC training through CARSI — CARSI is IICRC CEC Accredited'],
+  [
+    'IICRC-training rule is not whole-line allowed',
+    'IICRC training through CARSI — CARSI is IICRC CEC Accredited',
+  ],
   // The last two whole-line `allow`s, converted to `neutralise`. Both were latent rather
   // than live — the tree was already clean of them — but a compliant half must never
   // exempt a false half on the same line, which is how this file was bitten three times.
@@ -109,34 +139,97 @@ const MUST_BLOCK = [
   ],
   // Designation NAME rule (06/10/2026). The live title that shipped with no acronym in it:
   // the designation spelled out is still the designation.
-  ['designation name in a course title (live 06/10/2026)', "title: 'Applied Structural Drying — Core Concepts',"],
-  ['designation name in a JSON title', '"title": "Introduction to Advanced Applied Structural Drying | CARSI",'],
+  [
+    'designation name in a course title (live 06/10/2026)',
+    "title: 'Applied Structural Drying — Core Concepts',",
+  ],
+  [
+    'designation name in a JSON title',
+    '"title": "Introduction to Advanced Applied Structural Drying | CARSI",',
+  ],
   ['designation name + course noun', 'Welcome to Carpet Cleaning Technician Fundamentals.'],
-  ['designation name + course noun, ampersand form', 'Fire & Smoke Restoration Technician course for crews'],
+  [
+    'designation name + course noun, ampersand form',
+    'Fire & Smoke Restoration Technician course for crews',
+  ],
   // Independent review 06/10/2026: hyphens between the designation words bypassed the rule.
-  ['hyphenated designation name in a title (review P1)', 'export const probe = { title: "Applied-Structural-Drying — Core Concepts" };'],
-  ['underscored designation name + course noun', 'Carpet_Cleaning_Technician Fundamentals for new starters'],
+  [
+    'hyphenated designation name in a title (review P1)',
+    'export const probe = { title: "Applied-Structural-Drying — Core Concepts" };',
+  ],
+  [
+    'underscored designation name + course noun',
+    'Carpet_Cleaning_Technician Fundamentals for new starters',
+  ],
   ['spaced dash before the course noun', 'Applied Structural Drying - Core Concepts'],
-  ['en-dash designation name in a title (review P1, round 2)', 'export const probe = { title: "Applied\u2013Structural\u2013Drying \u2014 Core Concepts" };'],
-  ['registry title as the PREFIX of another title (review P1, round 2)', 'export const probe = { title: "Introduction to Applied Structural Drying Masterclass" };'],
-  ['registry title + suffix copy (review P1, round 2)', '"title": "Introduction to Applied Structural Drying \u2014 Core Concepts",'],
-  ['registry title + "course" + more (review P1, round 3)', 'export const probe = { title: "Introduction to Applied Structural Drying course Masterclass" };'],
-  ['registry title + "| CARSI" + more (review P1, round 3)', 'export const probe = { title: "Introduction to Applied Structural Drying | CARSI Masterclass" };'],
-  ['registry title inside a sentence + course noun', '"q": "What does the Introduction to Applied Structural Drying course cover?",'],
-  ['registry title concatenated with a suffix (review P1, round 4)', "export const probe = { title: 'Introduction to Applied Structural Drying' + ' Masterclass' };"],
-  ['registry title + CARSI concatenated with a suffix (review P1, round 4)', "export const probe = { title: 'Introduction to Applied Structural Drying | CARSI' + ' Masterclass' };"],
-  ['designation split across concatenated pieces', "export const probe = { title: 'Applied ' + 'Structural Drying' };"],
-  ['commented join after a registry title (review P1, round 5)', "export const probe = { title: 'Introduction to Applied Structural Drying' /* join */ + ' Masterclass' };"],
-  ['commented join inside a designation (review P1, round 5)', "t = { title: 'Applied '/* x */ + 'Structural Drying — Core Concepts' };"],
-  ['prefix concatenated onto a registry title', "export const probe = { title: 'Advanced ' + 'Introduction to Applied Structural Drying' };"],
-  ['microbial designation name in a quiz title', '"title": "Applied Microbial Remediation: Mould Fundamentals — Knowledge Check",'],
+  [
+    'en-dash designation name in a title (review P1, round 2)',
+    'export const probe = { title: "Applied\u2013Structural\u2013Drying \u2014 Core Concepts" };',
+  ],
+  [
+    'registry title as the PREFIX of another title (review P1, round 2)',
+    'export const probe = { title: "Introduction to Applied Structural Drying Masterclass" };',
+  ],
+  [
+    'registry title + suffix copy (review P1, round 2)',
+    '"title": "Introduction to Applied Structural Drying \u2014 Core Concepts",',
+  ],
+  [
+    'registry title + "course" + more (review P1, round 3)',
+    'export const probe = { title: "Introduction to Applied Structural Drying course Masterclass" };',
+  ],
+  [
+    'registry title + "| CARSI" + more (review P1, round 3)',
+    'export const probe = { title: "Introduction to Applied Structural Drying | CARSI Masterclass" };',
+  ],
+  [
+    'registry title inside a sentence + course noun',
+    '"q": "What does the Introduction to Applied Structural Drying course cover?",',
+  ],
+  [
+    'registry title concatenated with a suffix (review P1, round 4)',
+    "export const probe = { title: 'Introduction to Applied Structural Drying' + ' Masterclass' };",
+  ],
+  [
+    'registry title + CARSI concatenated with a suffix (review P1, round 4)',
+    "export const probe = { title: 'Introduction to Applied Structural Drying | CARSI' + ' Masterclass' };",
+  ],
+  [
+    'designation split across concatenated pieces',
+    "export const probe = { title: 'Applied ' + 'Structural Drying' };",
+  ],
+  [
+    'commented join after a registry title (review P1, round 5)',
+    "export const probe = { title: 'Introduction to Applied Structural Drying' /* join */ + ' Masterclass' };",
+  ],
+  [
+    'commented join inside a designation (review P1, round 5)',
+    "t = { title: 'Applied '/* x */ + 'Structural Drying — Core Concepts' };",
+  ],
+  [
+    'prefix concatenated onto a registry title',
+    "export const probe = { title: 'Advanced ' + 'Introduction to Applied Structural Drying' };",
+  ],
+  [
+    'microbial designation name in a quiz title',
+    '"title": "Applied Microbial Remediation: Mould Fundamentals — Knowledge Check",',
+  ],
   // Single acronym naming training (18/10/2026). Every case below was live — in industry FAQ
   // JSON-LD or a CTA — while the guard reported green: the list rule needs two acronyms and
   // the designation rule needs an adjacent "IICRC" or "-aligned".
   ['acronym + courses (plumbing FAQ)', 'Most WRT courses take 8–12 hours of study.'],
-  ['acronym + training (question form)', "question: 'What is WRT training and how does it help a plumbing business?',"],
-  ['acronym + parenthetical + training', 'CRT (Carpet Cleaning Technician) training enables in-house staff.'],
-  ['acronym + training, mid-sentence', 'ASD training complements this with structural moisture monitoring.'],
+  [
+    'acronym + training (question form)',
+    "question: 'What is WRT training and how does it help a plumbing business?',",
+  ],
+  [
+    'acronym + parenthetical + training',
+    'CRT (Carpet Cleaning Technician) training enables in-house staff.',
+  ],
+  [
+    'acronym + training, mid-sentence',
+    'ASD training complements this with structural moisture monitoring.',
+  ],
   ['CARSI + acronym + courses (CTA)', 'Explore CARSI CCT courses'],
   ['acronym + course pathway', "topic: 'CARSI CCT course pathway',"],
   ['acronym + pathway', "label: 'Start the CCT pathway',"],
@@ -152,11 +245,20 @@ const MUST_BLOCK = [
   ['em dash', 'Book ASD\u2014courses this month.'],
   ['possessive', "Explore CARSI WRT's training."],
   ['curly possessive', 'Explore CARSI WRT\u2019s training.'],
-  ['"never" exempts only its own sentence', 'Never call it a WRT course — use CARSI. Book ASD training today.'],
+  [
+    '"never" exempts only its own sentence',
+    'Never call it a WRT course — use CARSI. Book ASD training today.',
+  ],
   // GP-654: the catalogue measured in IICRC disciplines. Each is the exact live string, 20/10/2026.
-  ['counted disciplines in a template', "d > 0 ? `${d} IICRC discipline${d === 1 ? '' : 's'}` : 'x'"],
+  [
+    'counted disciplines in a template',
+    "d > 0 ? `${d} IICRC discipline${d === 1 ? '' : 's'}` : 'x'",
+  ],
   ['the core IICRC disciplines', "'the core IICRC disciplines';"],
-  ['multiple IICRC disciplines', "d > 0 ? `${d} discipline${d === 1 ? '' : 's'}` : 'multiple IICRC disciplines';"],
+  [
+    'multiple IICRC disciplines',
+    "d > 0 ? `${d} discipline${d === 1 ? '' : 's'}` : 'multiple IICRC disciplines';",
+  ],
   ['stats label', "      label: 'IICRC Disciplines',"],
   ['share-image stat', "{ value: '7', label: 'IICRC Disciplines' },"],
   ['a literal count', 'Courses across 7 IICRC disciplines.'],
@@ -194,13 +296,22 @@ const MUST_BLOCK = [
   ['soft hyphen entity inside the word', 'CARSI covers 7 IICRC disci&shy;plines.'],
   ['JSX space before a counted singular', '<p>{d} IICRC{" "}discipline{d === 1 ? "" : "s"}</p>'],
   // Independent review of fd1890a8: only whole learner-data shapes are exempt…
-  ['possessive + unlisted selling verb', '<p>Boost your IICRC disciplines with expert-led tuition.</p>'],
+  [
+    'possessive + unlisted selling verb',
+    '<p>Boost your IICRC disciplines with expert-led tuition.</p>',
+  ],
   ['possessive + "advance"', 'Advance your IICRC disciplines with us.'],
   ['possessive + "perfect"', 'Perfect your IICRC disciplines with interactive tutorials.'],
   ['"you hold" + selling tail', 'Sharpen the IICRC disciplines you hold with expert tuition.'],
   ['selling question', 'Want to boost your IICRC disciplines?'],
-  ['claim riding in front of an exempt question', "label: '7 IICRC disciplines', question: 'Which IICRC disciplines do you hold?'"],
-  ['comment marker is not an exemption (JSX text renders it)', '<p>// Boost your IICRC disciplines today.</p>'],
+  [
+    'claim riding in front of an exempt question',
+    "label: '7 IICRC disciplines', question: 'Which IICRC disciplines do you hold?'",
+  ],
+  [
+    'comment marker is not an exemption (JSX text renders it)',
+    '<p>// Boost your IICRC disciplines today.</p>',
+  ],
   // …and anything between the words other than whitespace is banned.
   ['JSX escaped ordinary space', '<p>CARSI covers 7 IICRC{"\\u0020"}disciplines.</p>'],
   ['JSX \\x20', '<p>CARSI covers 7 IICRC{"\\x20"}disciplines.</p>'],
@@ -216,30 +327,51 @@ const MUST_BLOCK = [
   ['template interpolation', '`CARSI covers 7 IICRC${sp}disciplines.`'],
   ['two expressions', '<p>CARSI covers 7 IICRC{""}{" "}disciplines.</p>'],
   // Independent review of 17342ea9: a count, a separator and a computed plural ending.
-  ['counted, fromCharCode, computed "s"', '<p>CARSI covers {7} IICRC{String.fromCharCode(32)}discipline{"s"}.</p>'],
-  ['counted, space variable, computed "s"', '<p>CARSI covers {count} IICRC{sp}discipline{plural}.</p>'],
+  [
+    'counted, fromCharCode, computed "s"',
+    '<p>CARSI covers {7} IICRC{String.fromCharCode(32)}discipline{"s"}.</p>',
+  ],
+  [
+    'counted, space variable, computed "s"',
+    '<p>CARSI covers {count} IICRC{sp}discipline{plural}.</p>',
+  ],
   ['counted, entity, computed "s"', '<p>CARSI covers 7 IICRC&#8199;discipline{"s"}.</p>'],
   ['counted, escaped em space', '<p>CARSI covers 7 IICRC{"\\u2003"}discipline{"s"}.</p>'],
   ['counted, figure-space entity', '<p>CARSI covers 7 IICRC&numsp;disciplines.</p>'],
-  ['template: count, separator, computed ending', '`${n} IICRC${sp}discipline${n === 1 ? "" : "s"}`'],
+  [
+    'template: count, separator, computed ending',
+    '`${n} IICRC${sp}discipline${n === 1 ? "" : "s"}`',
+  ],
   ['plain space, computed ending', '<p>CARSI covers {n} IICRC discipline{n === 1 ? "" : "s"}.</p>'],
   ['count, separator before IICRC', '<p>CARSI covers {n}{sp}IICRC discipline.</p>'],
-  ['count inside an element, separator after', 'CARSI covers <b>7</b> IICRC{sp}discipline<span>s</span>'],
+  [
+    'count inside an element, separator after',
+    'CARSI covers <b>7</b> IICRC{sp}discipline<span>s</span>',
+  ],
 ];
 
 const MUST_PASS = [
   // Ordinary words that share a short code stay allowed: no offering noun follows them.
-  ['a technician holding stacked certifications (third-person)', 'A **CCT + UFT + OCT** tech can clean, upholster and deodorise.'],
+  [
+    'a technician holding stacked certifications (third-person)',
+    'A **CCT + UFT + OCT** tech can clean, upholster and deodorise.',
+  ],
   ['BMI as body mass index', 'Gym members can track BMI and body-fat trends.'],
   ['RFI as a request for information', 'Send an RFI before the tender closes.'],
   ['CPT as billing codes', 'CPT codes appear on the invoice.'],
   ['RCT as a randomised controlled trial', 'An RCT found the drying method worked.'],
   // Third-person facts with an open word between code and noun stay allowed (closed list only).
   ['holders completing training (third-person)', 'WRT holders completing training'],
-  ['technicians who hold the certification attend training', 'technicians who hold WRT attend training'],
+  [
+    'technicians who hold the certification attend training',
+    'technicians who hold WRT attend training',
+  ],
   // Punctuation forms that name no CARSI offering stay allowed.
   ['month pair before training (October)', 'Sep/Oct training calendar for regional teams'],
-  ['certification fact after a colon', 'FSRT: an IICRC certification covering fire and smoke restoration.'],
+  [
+    'certification fact after a colon',
+    'FSRT: an IICRC certification covering fire and smoke restoration.',
+  ],
   ['code list in data, no offering noun', "certifications: ['WRT', 'ASD'],"],
   // The permitted provider-level phrasing — CARSI's actual standing.
   ['IICRC CEC course', 'Enrol in our IICRC CEC course'],
@@ -256,23 +388,29 @@ const MUST_PASS = [
   ],
   // A PERSON's own credential — allowed ("a student's own recert / member number").
   ['person holds a certification', 'IICRC-certified staff demonstrate compliance'],
-  ['learner self-declares', "Already IICRC certified"],
+  ['learner self-declares', 'Already IICRC certified'],
   // The one real shape the allow exists for: a person's credential list in the directory fixture.
   // Bare credential names only — anything with prose in it is caught by MUST_BLOCK above.
-  [
-    "person's credential list",
-    "certifications: ['IICRC WRT', 'IICRC ASD', 'IICRC FSRT'],",
-  ],
+  ["person's credential list", "certifications: ['IICRC WRT', 'IICRC ASD', 'IICRC FSRT'],"],
   // The legacy WordPress URL slug — an identifier, not copy. Rewriting these breaks redirects.
   ['legacy import slug alone', "href: '/courses/water-iicrc-wrt'"],
   // Constructions that LOOK like the banned ones but are correct, each found live while
   // draining the Codex findings. A blanket rewrite mangled the first two before these
   // cases existed — one of them was the comment documenting this very rule.
-  ['comment documenting the rule', '// (matched against course title/category), not by WRT/ASD/etc.'],
+  [
+    'comment documenting the rule',
+    '// (matched against course title/category), not by WRT/ASD/etc.',
+  ],
   ['third-party requirement', "requirement: 'WRT and FSRT commonly required by adjusters'"],
   ['type doc naming the format', '  /** IICRC code (WRT/CRT/ASD/AMRT/FSRT/OCT/CCT) or null. */'],
-  ['prompt that forbids the acronyms', '   (WRT/ASD/AMRT/FSRT/CCT/TCST) and never call it "[discipline]-aligned".'],
-  ['prerequisite naming the learner\'s own cert', '- Basic understanding (recommended: IICRC WRT certification or equivalent).'],
+  [
+    'prompt that forbids the acronyms',
+    '   (WRT/ASD/AMRT/FSRT/CCT/TCST) and never call it "[discipline]-aligned".',
+  ],
+  [
+    "prerequisite naming the learner's own cert",
+    '- Basic understanding (recommended: IICRC WRT certification or equivalent).',
+  ],
   ['parenthesised scope note', '**colour repair / re-dyeing** (IICRC CRT), or refer.'],
   // Fail-closed copy and the code that enforces it must never be flagged.
   // Negative controls for the single-acronym naming rule (18/10/2026): the certification
@@ -283,20 +421,41 @@ const MUST_PASS = [
   ['date abbreviation is not the designation', 'Oct training day at the Bayswater warehouse.'],
   ['lowercase slug fragment', "href: '/courses/oct-training-2026'"],
   ['prompt forbidding the construction', 'Never call it a WRT course — use the CARSI designation.'],
-  ['the IICRC naming its own course', "The IICRC's WRT course is taught only by IICRC-approved schools."],
+  [
+    'the IICRC naming its own course',
+    "The IICRC's WRT course is taught only by IICRC-approved schools.",
+  ],
   ['plain-English subject', 'Water damage restoration training for plumbers.'],
   ['month abbreviation, title case', 'Book the Oct training session early.'],
   ['month abbreviation, lower case', 'oct training calendar'],
-  ['forbidding sentence on its own', 'Never call it a WRT course; use the CARSI designation instead.'],
-  ['denial that a course carries CECs', 'This course carries no IICRC CECs (pending IICRC approval).'],
+  [
+    'forbidding sentence on its own',
+    'Never call it a WRT course; use the CARSI designation instead.',
+  ],
+  [
+    'denial that a course carries CECs',
+    'This course carries no IICRC CECs (pending IICRC approval).',
+  ],
   ['the FAQ question itself', 'Is this course IICRC CEC accredited or does it award CECs?'],
-  ['code describing the gate', '{/* assert this course earns CECs only when it has registry-approved hours */}'],
-  ['delete-guard test name', "  it('refuses to delete a course carrying CEC records', async () => {"],
+  [
+    'code describing the gate',
+    '{/* assert this course earns CECs only when it has registry-approved hours */}',
+  ],
+  [
+    'delete-guard test name',
+    "  it('refuses to delete a course carrying CEC records', async () => {",
+  ],
   ['third-person CEC definition', 'CEC (Continuing Education Credit): 1 CEC = 1 hour of learning.'],
   // Round-2 exemptions. The first two are the rule's own enforcement text — flagging them
   // would mean a rewrite deletes the instruction that enforces this rule.
-  ['comment naming the school designation', '// an IICRC Registered-Training-School discipline acronym branding a CARSI course'],
-  ['prompt forbidding school acronyms', '3. NEVER brand the course with IICRC Registered-Training-School discipline acronyms'],
+  [
+    'comment naming the school designation',
+    '// an IICRC Registered-Training-School discipline acronym branding a CARSI course',
+  ],
+  [
+    'prompt forbidding school acronyms',
+    '3. NEVER brand the course with IICRC Registered-Training-School discipline acronyms',
+  ],
   [
     'price comparison against IICRC-approved schools',
     'Compare that to $2,000–5,000 per person for face-to-face IICRC certification training at approved schools.',
@@ -304,7 +463,10 @@ const MUST_PASS = [
   ['compliant CEC training phrasing', 'Enrol in our IICRC CEC training today.'],
   // The constructions those two neutralise spans exist to protect.
   ['spelled-out compliant course form', 'Enrol in our IICRC Continuing Education Credit courses.'],
-  ['third-person certification route', 'IICRC certification is obtained through an IICRC approved school and examination.'],
+  [
+    'third-person certification route',
+    'IICRC certification is obtained through an IICRC approved school and examination.',
+  ],
   // The disclaimer itself names IICRC in a NEGATION — the opposite of a claim, and it ships
   // on every course page. If the guard ever blocks this, the product loses its honest framing.
   [
@@ -338,25 +500,52 @@ const MUST_PASS = [
   // Designation NAME rule: the exact IICRC-approved CEC class titles (cec-approvals.json),
   // audience usage, and slugs are not course branding.
   ['IICRC-approved registry title', '"title": "Introduction to Applied Structural Drying",'],
-  ['IICRC-approved registry title named in a question, no course noun', '"q": "What does Introduction to Applied Microbial Remediation cover?",'],
-  ['IICRC-approved registry title + repeated CARSI suffix', '"title": "Introduction to Applied Structural Drying | CARSI | CARSI",'],
-  ['IICRC-approved registry title + CARSI suffix', '"title": "Introduction to Applied Structural Drying | CARSI",'],
-  ['audience usage of a designation name', 'This course is for water damage restoration technicians in Australia.'],
+  [
+    'IICRC-approved registry title named in a question, no course noun',
+    '"q": "What does Introduction to Applied Microbial Remediation cover?",',
+  ],
+  [
+    'IICRC-approved registry title + repeated CARSI suffix',
+    '"title": "Introduction to Applied Structural Drying | CARSI | CARSI",',
+  ],
+  [
+    'IICRC-approved registry title + CARSI suffix',
+    '"title": "Introduction to Applied Structural Drying | CARSI",',
+  ],
+  [
+    'audience usage of a designation name',
+    'This course is for water damage restoration technicians in Australia.',
+  ],
   ['the renamed course title', "title: 'Structural Drying — Core Concepts',"],
   ['a hyphenated slug is the URL, audited live', '"courseSlug": "applied-structural-drying-core",'],
-  ['a hyphenated slug + course noun is still a slug', 'href="/courses/carpet-cleaning-technician-fundamentals"'],
+  [
+    'a hyphenated slug + course noun is still a slug',
+    'href="/courses/carpet-cleaning-technician-fundamentals"',
+  ],
   // GP-654 negative controls: the learner's own disciplines and admin/instructor data labels.
-  ['onboarding asks the learner', "question: 'Which IICRC disciplines do you hold or plan to work in? Select all that apply.',"],
+  [
+    'onboarding asks the learner',
+    "question: 'Which IICRC disciplines do you hold or plan to work in? Select all that apply.',",
+  ],
   ['contact form asks the learner', 'Mention your IICRC discipline if applicable.'],
   ['instructor form option', '<option value="">IICRC Discipline (optional)</option>'],
   ['admin analytics heading', 'title="By IICRC discipline"'],
   ['code comment naming the data', ' * an IICRC discipline code. Display names are anonymous.'],
   ['plain restoration disciplines', 'Courses across 7 restoration disciplines.'],
-  ['learner: a quantity of their own disciplines', 'Which of your seven IICRC disciplines need renewal?'],
+  [
+    'learner: a quantity of their own disciplines',
+    'Which of your seven IICRC disciplines need renewal?',
+  ],
   ['learner: all the disciplines they hold', 'Select all IICRC disciplines you hold.'],
-  ['onboarding question after another object key', "kind: 'multi', question: 'Which IICRC disciplines do you hold or plan to work in? Select all that apply.',"],
+  [
+    'onboarding question after another object key',
+    "kind: 'multi', question: 'Which IICRC disciplines do you hold or plan to work in? Select all that apply.',",
+  ],
   ['learner: disciplines due', 'Which of your IICRC disciplines are due?'],
-  ['form prompt: choose the ones you hold', '<label>Choose the IICRC disciplines you currently hold.</label>'],
+  [
+    'form prompt: choose the ones you hold',
+    '<label>Choose the IICRC disciplines you currently hold.</label>',
+  ],
 ];
 
 let failed = 0;
@@ -387,7 +576,10 @@ const MUST_BLOCK_FILE = [
   ],
   ['GP-654 count, IICRC and disciplines on three lines', '7\n<span>IICRC</span>\ndisciplines'],
   ['GP-654 JSX space expression on its own line', 'CARSI covers 7 IICRC\n{" "}\ndisciplines.'],
-  ['GP-654 learner benefit across lines', '<p>\n  Explore seven IICRC disciplines\n  at your pace.\n</p>'],
+  [
+    'GP-654 learner benefit across lines',
+    '<p>\n  Explore seven IICRC disciplines\n  at your pace.\n</p>',
+  ],
   // Review of d28bbcc0: five spellings React renders as "CARSI covers 7 IICRC disciplines."
   ['GP-654 quoted JSX literal', "<p>CARSI covers 7 IICRC{' disciplines'}.</p>"],
   ['GP-654 string join', "const lead = 'CARSI covers 7 IICRC ' + 'disciplines.';"],
@@ -400,19 +592,66 @@ const MUST_BLOCK_FILE = [
     '<p>CARSI covers 7 IICRC <span className="font-semibold tracking-tight text-slate-900 dark:text-white sm:text-lg md:text-xl">disciplines</span>.</p>',
   ],
   ['GP-654 JSX fragment', '<p>CARSI covers 7 IICRC <>disciplines</>.</p>'],
-  ['GP-654 join with a block comment', "const lead = 'CARSI covers 7 IICRC ' /* stat */ + 'disciplines.';"],
-  ['GP-654 join with a line comment', "const lead = 'CARSI covers 7 IICRC ' + // stat\n  'disciplines.';"],
-  ['GP-654 explicit JSX space over five lines', '<p>\n  CARSI covers 7\n  <b>IICRC</b>\n  {" "}\n  disciplines.\n</p>'],
+  [
+    'GP-654 join with a block comment',
+    "const lead = 'CARSI covers 7 IICRC ' /* stat */ + 'disciplines.';",
+  ],
+  [
+    'GP-654 join with a line comment',
+    "const lead = 'CARSI covers 7 IICRC ' + // stat\n  'disciplines.';",
+  ],
+  // Review of 723bdce5: the rendered-text pass reads the parsed JSX and string joins.
+  [
+    'GP-654 arrow-function prop',
+    '<p>CARSI covers 7 IICRC <span onClick={() => alert("details")}>disciplines</span>.</p>',
+  ],
+  [
+    'GP-654 quoted > in an attribute',
+    '<p>CARSI covers 7 IICRC <span title="Restoration > topics">disciplines</span>.</p>',
+  ],
+  [
+    'GP-654 starred block comment in a join',
+    "const copy = 'CARSI covers 7 IICRC ' /* ** topics ** */ + 'disciplines.';",
+  ],
+  [
+    'GP-654 phrase spread over a long JSX tree',
+    '<p>\n  CARSI covers\n  <strong>7</strong>\n  <em>\n    IICRC\n  </em>\n  {/* stat */}\n  <span className="x">\n    disciplines\n  </span>\n  .\n</p>',
+  ],
+  [
+    'GP-654 explicit JSX space over five lines',
+    '<p>\n  CARSI covers 7\n  <b>IICRC</b>\n  {" "}\n  disciplines.\n</p>',
+  ],
 ];
 const MUST_PASS_FILE = [
   // Review of fd1890a8 (P2): a learner question wrapped over two lines.
-  ['learner question across a line break', "question:\n  'Which IICRC disciplines do you hold\n  or plan to work in?',"],
+  [
+    'learner question across a line break',
+    "question:\n  'Which IICRC disciplines do you hold\n  or plan to work in?',",
+  ],
   ['a code on one line, an unrelated word on the next', "disciplines={['WRT']}\ntraining: true,"],
   ['plain subject across a break', 'Water damage restoration\ntraining for plumbers.'],
 ];
 for (const [name, src] of MUST_BLOCK_FILE) {
   if (scanFile(F_MULTI, src).length === 0) {
     console.error(`✖ MUST BLOCK (file) but passed: ${name}\n    ${JSON.stringify(src)}`);
+    failed++;
+  }
+}
+// Markdown renders emphasis and links as plain text (review of 723bdce5).
+const F_MD = 'public/fixture/copy.md';
+for (const [name, src, block] of [
+  ['GP-654 Markdown emphasis', 'CARSI covers 7 **IICRC** disciplines.', true],
+  [
+    'GP-654 Markdown link text over two lines',
+    'CARSI covers 7 [IICRC\ndisciplines](/about).',
+    true,
+  ],
+  ['learner question in Markdown', 'Which **IICRC disciplines** do you hold?', false],
+]) {
+  if (scanFile(F_MD, src).length > 0 !== block) {
+    console.error(
+      `✖ ${block ? 'MUST BLOCK' : 'MUST PASS'} (markdown): ${name}\n    ${JSON.stringify(src)}`
+    );
     failed++;
   }
 }
@@ -440,7 +679,9 @@ for (const [name, file, src, drop] of LIST_FIXTURES) {
     failed++;
   }
   if (scanText(file, src, reduced).length > 0) {
-    console.error(`✖ shared list: rules built without ${drop.join('/')} still catch ${name} (not reading the list)\n    ${src}`);
+    console.error(
+      `✖ shared list: rules built without ${drop.join('/')} still catch ${name} (not reading the list)\n    ${src}`
+    );
     failed++;
   }
 }
@@ -473,20 +714,25 @@ for (const [name, file, src, drop] of LIST_FIXTURES) {
     `<a${'x'.repeat(20000)} IICRC disciplines`,
     `${'<a '.repeat(6000)}IICRC x`,
     `${"'a' /* ".repeat(2500)}+ 'IICRC x'`,
+    // Review of 723bdce5 (P2): a learner-question prefix followed by trailing whitespace.
+    `Which IICRC disciplines do you hold${' '.repeat(20000)}x`,
   ];
   for (const line of adversarial) {
     const t0 = performance.now();
     scanText(F, line, catalogueRule);
     const ms = performance.now() - t0;
     if (ms > 100) {
-      console.error(`✖ long near-miss line took ${ms.toFixed(0)}ms (> 100ms): ${line.slice(0, 40)}…`);
+      console.error(
+        `✖ long near-miss line took ${ms.toFixed(0)}ms (> 100ms): ${line.slice(0, 40)}…`
+      );
       failed++;
     }
   }
 }
 
 // The acronym-training rule covers public surfaces; docs/ plans are reviewed on their own branch.
-const DOCS_LINE = 'Retarget warm leads from Start Smart and CCT course enquiries if consent allows.';
+const DOCS_LINE =
+  'Retarget warm leads from Start Smart and CCT course enquiries if consent allows.';
 if (scanText(F, DOCS_LINE).length === 0) {
   console.error(`✖ MUST BLOCK on a public surface but passed:\n    ${DOCS_LINE}`);
   failed++;
