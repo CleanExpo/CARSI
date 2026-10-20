@@ -10721,7 +10721,7 @@
    "shortDescription": "Contain, remove, clean, dry and verify a 1–10 m² mould job in an Australian home, with a field tool for every step.",
    "thumbnailUrl": null,
    "instructorId": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-   "status": "published",
+   "status": "draft",
    "priceAud": "49",
    "isFree": false,
    "durationHours": 4,
@@ -10774,7 +10774,7 @@
      "l2-5-3": "Add a screen recording of a complete digital job file opened section by section."
     }
    },
-   "isPublished": true,
+   "isPublished": false,
    "modules": [
     {
      "id": "89adb87e-aaf3-464a-9508-f7378a60726d",
