@@ -142,6 +142,16 @@ const COUNT_WORDS = [
   'many',
   'every',
   'each',
+  // Dozen and other ordinary quantity words ("half a dozen IICRC discipline areas", "a dozen
+  // core IICRC discipline areas"; review of 439fd420). "half a" / "a" need no entry: the
+  // match starts at the count word itself.
+  'half-dozen',
+  'dozens?',
+  'few',
+  'couple',
+  'numerous',
+  'various',
+  'both',
 ].join('|');
 
 /** Something other than plain whitespace between "IICRC" and "disciplines": `{…}` or `&…;`. */
