@@ -656,7 +656,16 @@ export function scanText(file, content, rules = BANNED) {
   return findings;
 }
 
-const SCRIPT_KIND = { '.tsx': 'TSX', '.jsx': 'JSX', '.ts': 'TS', '.js': 'JS', '.mjs': 'JS' };
+// JSON is parsed too, so its strings are read as their decoded value (`"IICRC\ndisciplines"`
+// in data/seo, review of 190018fe).
+const SCRIPT_KIND = {
+  '.tsx': 'TSX',
+  '.jsx': 'JSX',
+  '.ts': 'TS',
+  '.js': 'JS',
+  '.mjs': 'JS',
+  '.json': 'JSON',
+};
 
 /**
  * The text a file renders, as runs with their line numbers, built from the parsed source rather
@@ -701,6 +710,14 @@ export function renderedRuns(file, text) {
   const runs = [];
   const lineOf = (node) => sf.getLineAndCharacterOfPosition(node.getStart(sf)).line + 1;
   const isJsx = (n) => ts.isJsxElement(n) || ts.isJsxFragment(n) || ts.isJsxSelfClosingElement(n);
+  // Type-only wrappers erase at compile time: `('disciplines' as const)` renders its literal
+  // (review of 190018fe), so they read as parentheses do.
+  const isWrap = (n) =>
+    ts.isParenthesizedExpression(n) ||
+    ts.isAsExpression(n) ||
+    ts.isTypeAssertionExpression(n) ||
+    ts.isSatisfiesExpression(n) ||
+    ts.isNonNullExpression(n);
   const isPlus = (n) =>
     ts.isBinaryExpression(n) && n.operatorToken.kind === ts.SyntaxKind.PlusToken;
 
@@ -742,7 +759,7 @@ export function renderedRuns(file, text) {
 
   // null: not authored text at all (an identifier, a call), which the caller reads as `{x}`.
   const alts = (expr, inJsx) => {
-    if (ts.isParenthesizedExpression(expr)) return alts(expr.expression, inJsx);
+    if (isWrap(expr)) return alts(expr.expression, inJsx);
     if (ts.isStringLiteral(expr) || ts.isNoSubstitutionTemplateLiteral(expr)) return [expr.text];
     if (ts.isTemplateExpression(expr)) {
       // A substitution renders its own branches (review of 818f619e); anything else is `${x}`.
@@ -841,14 +858,14 @@ export function renderedRuns(file, text) {
   const inParentText = (node) => {
     let p = node.parent;
     if (isJsx(p)) return true;
-    while (ts.isParenthesizedExpression(p) || isChoice(p)) p = p.parent;
+    while (isWrap(p) || isChoice(p)) p = p.parent;
     return ts.isJsxExpression(p) && isJsx(p.parent);
   };
 
   // A template that a `+` chain, an enclosing template or a JSX tree already expands.
   const inExpandedText = (node) => {
     let p = node.parent;
-    while (ts.isParenthesizedExpression(p) || isChoice(p)) p = p.parent;
+    while (isWrap(p) || isChoice(p)) p = p.parent;
     return isPlus(p) || ts.isTemplateSpan(p) || (ts.isJsxExpression(p) && isJsx(p.parent));
   };
 

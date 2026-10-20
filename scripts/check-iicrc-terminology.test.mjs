@@ -717,6 +717,19 @@ const MUST_BLOCK_FILE = [
     'GP-654 escaped newline in a default parameter',
     "export function Hero({ line = 'CARSI covers 7 IICRC\\tdisciplines.' }) { return line; }",
   ],
+  // Review of 190018fe: type-only wrappers read as unknown expressions.
+  [
+    'GP-654 cast literal inside a JSX word',
+    "export const Copy = () => <p>CARSI covers 7 IICRC disci{'plines' as const}.</p>;",
+  ],
+  [
+    'GP-654 cast literal in a template substitution',
+    "export const metadata = { description: `CARSI covers 7 IICRC ${'disciplines' as const}.` };",
+  ],
+  [
+    'GP-654 satisfies and non-null wrappers',
+    "const a = `CARSI covers 7 IICRC ${('disciplines' satisfies string)}.`;\nconst b = `CARSI covers 7 IICRC ${label ? 'disciplines'! : 'topics'}.`;",
+  ],
   [
     'GP-654 too many adjacent conditional variants fails closed',
     `<p>Restoration disciplines${"{a ? 'x' : 'y'}".repeat(12)}</p>`,
@@ -778,6 +791,35 @@ for (const [name, src, block] of [
     console.error(
       `✖ ${block ? 'MUST BLOCK' : 'MUST PASS'} (markdown): ${name}\n    ${JSON.stringify(src)}`
     );
+    failed++;
+  }
+}
+// JSON strings are read as their decoded value (review of 190018fe).
+const F_JSON = 'data/seo/fixture.json';
+for (const [name, src, block] of [
+  [
+    'GP-654 escaped newline in SEO JSON',
+    '{"description": "CARSI covers 7 IICRC\\ndisciplines."}',
+    true,
+  ],
+  [
+    'GP-654 escaped tab in SEO JSON',
+    '{"description": "CARSI covers 7 IICRC\\tdisciplines."}',
+    true,
+  ],
+  [
+    'GP-654 escaped letter in SEO JSON',
+    '{"description": "CARSI covers 7 IICRC \\u0064isciplines."}',
+    true,
+  ],
+  [
+    'restoration topics in SEO JSON',
+    '{"description": "CARSI covers 7 restoration\\ndisciplines."}',
+    false,
+  ],
+]) {
+  if (scanFile(F_JSON, src).length > 0 !== block) {
+    console.error(`✖ ${block ? 'MUST BLOCK' : 'MUST PASS'} (json): ${name}\n    ${src}`);
     failed++;
   }
 }
