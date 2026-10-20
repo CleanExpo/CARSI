@@ -135,6 +135,31 @@ const RENDERED_SPACE = new RegExp(
   'gi'
 );
 const ZERO_WIDTH = /[​-‍⁠﻿­]|&(?:shy|ZeroWidthSpace|#0*(?:173|8203)|#x0*(?:ad|200b));/gi;
+/** A numeric entity for a letter (`IICR&#67;`) renders as that letter. */
+const LETTER_ENTITY = /&#(?:x0*([0-9a-f]{1,4})|0*(\d{1,5}));/gi;
+/** A quoted literal in a JSX expression (`IICRC{' disciplines'}`) renders as its text. */
+const JSX_LITERAL = /\{\s*(['"`])([^'"`{}\n$\\]{0,80})\1\s*\}/g;
+/** Quoted pieces joined with `+` (`'7 IICRC ' + 'disciplines'`) render as one string. */
+const STRING_JOIN = /(['"`])\s*\+\s*(['"`])/g;
+const MARKUP = /<\/?[A-Za-z][^<>\n]{0,80}>/g;
+
+/**
+ * The text a line renders, as two views: markup read as a break, and markup read as nothing
+ * (`disci<span>plines</span>`; review of d28bbcc0). Callers join them with a NUL, which no rule
+ * matches across.
+ */
+function renderedViews(line) {
+  const text = line
+    .replace(ZERO_WIDTH, '')
+    .replace(RENDERED_SPACE, ' ')
+    .replace(LETTER_ENTITY, (m, hex, dec) => {
+      const ch = String.fromCodePoint(hex ? parseInt(hex, 16) : Number(dec));
+      return /^[A-Za-z]$/.test(ch) ? ch : m;
+    })
+    .replace(JSX_LITERAL, '$2')
+    .replace(STRING_JOIN, '');
+  return [text.replace(MARKUP, ' '), text.replace(MARKUP, '')];
+}
 
 // Banned selling/descriptive phrasings. Each must be something that implies
 // CARSI itself delivers IICRC courses or IICRC certification.
@@ -259,8 +284,9 @@ export function bannedRules(CODES = IICRC_CODE_ALT) {
       // outside the list (395315bc, fd1890a8).
       // A count in front of the singular ("7 IICRC discipline${s}") and a stat label are also
       // banned. Zero-width characters are removed, rendered whitespace (`{" "}`, `{" "}`,
-      // `&nbsp;`, `&Tab;`) becomes a space, markup is stripped, and up to three lines are read as
-      // one. Any other `{…}` expression or `&…;` entity between "IICRC" and "disciplines" is
+      // `&nbsp;`, `&Tab;`) becomes a space, letter entities and quoted JSX literals become their
+      // text, `'…' + '…'` joins, markup is read both as a break and as nothing, and up to six
+      // lines are read as one (renderedViews). Any other `{…}` expression or `&…;` entity between "IICRC" and "disciplines" is
       // banned without trying to work out what it renders.
       re: new RegExp(
         String.raw`\bIICRC\s+disciplines\b` +
@@ -278,15 +304,18 @@ export function bannedRules(CODES = IICRC_CODE_ALT) {
         'i'
       ),
       allow: null,
-      crossLine: 3,
+      // Six lines: a JSX text run with a `{" "}` and inline elements spreads one phrase over
+      // five (review of d28bbcc0).
+      crossLine: 6,
       prepare: (line) =>
-        line
-          .replace(ZERO_WIDTH, '')
-          .replace(RENDERED_SPACE, ' ')
-          .replace(/<\/?[A-Za-z][^<>\n]{0,80}>/g, ' ')
-          .split(/(?<=[.!?])\s+/)
-          .filter((s) => !LEARNER_DATA_SENTENCE.some((shape) => shape.test(s)))
-          .join(' '),
+        renderedViews(line)
+          .map((view) =>
+            view
+              .split(/(?<=[.!?])\s+/)
+              .filter((s) => !LEARNER_DATA_SENTENCE.some((shape) => shape.test(s)))
+              .join(' ')
+          )
+          .join(' \u0000 '),
       message:
         'Do not measure the CARSI catalogue in IICRC disciplines ("across 7 IICRC disciplines", "IICRC Disciplines" stat) — say "restoration disciplines" or name the topics. A learner\'s own IICRC disciplines may still be referenced.',
     },
