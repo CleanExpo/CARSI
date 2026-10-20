@@ -224,7 +224,7 @@ Downloadable PDF preview in feed — users swipe through pages, then submit lead
 
 1. **What is IICRC?** — International Institute of Inspection, Cleaning and Restoration Certification explained for the Australian market
 2. **Why IICRC Matters in Australia** — Insurance requirements, tender pre-qualification, WHS compliance links
-3. **The 5 Core IICRC Disciplines** — water damage restoration, carpet repair, carpet cleaning, odour control, structural drying and mould remediation — what each covers and who needs it
+3. **The Restoration Disciplines** — water damage restoration, carpet repair, carpet cleaning, odour control, structural drying and mould remediation — what each covers and who needs it
 4. **CECs Explained** — How Continuing Education Credits work, renewal cycles, how to track them
 5. **Industry Applications** — How IICRC CEC courses apply to Restoration, Mining, Aged Care, Property, Cleaning, Construction
 6. **Online vs Classroom Training** — Pros, cons, and why online delivery suits Australian tradespeople

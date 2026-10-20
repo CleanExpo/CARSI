@@ -18,6 +18,7 @@ import { disciplinePillsFromCodes } from '@/lib/iicrc-discipline-display';
 import {
   formatCourseCountForCopy,
   getPublicCatalogueFacts,
+  restorationTopicCount,
 } from '@/lib/server/public-catalogue-facts';
 
 export const dynamic = 'force-dynamic';
@@ -25,13 +26,12 @@ export const dynamic = 'force-dynamic';
 export async function generateMetadata(): Promise<Metadata> {
   const facts = await getPublicCatalogueFacts();
   const n = facts.publishedCourseCount;
-  const d = facts.disciplineCodes.length;
+  const t = restorationTopicCount(facts);
   const coursePhrase =
     n > 0
       ? `${formatCourseCountForCopy(n)} published course${n === 1 ? '' : 's'}`
       : 'Published courses';
-  const discPhrase =
-    d > 0 ? `${d} discipline${d === 1 ? '' : 's'}` : 'multiple IICRC disciplines';
+  const discPhrase = `${t} restoration discipline${t === 1 ? '' : 's'}`;
   return {
     title: 'About CARSI | Centre for Australian Restoration and Standards Information',
     description: `CARSI is an Australian online training platform for cleaning and restoration professionals. ${coursePhrase} across ${discPhrase}. 50+ years of combined industry experience.`,
@@ -72,8 +72,8 @@ export default async function AboutPage() {
       label: 'Published courses',
     },
     {
-      value: d > 0 ? formatCourseCountForCopy(d) : '7',
-      label: 'IICRC disciplines',
+      value: formatCourseCountForCopy(restorationTopicCount(facts)),
+      label: 'Restoration disciplines',
     },
     { value: '12+', label: 'Industries served' },
     { value: '24/7', label: 'Study anytime' },
@@ -200,7 +200,7 @@ export default async function AboutPage() {
           <h2 className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>Course catalogue by subject</h2>
           <p className={`mt-4 max-w-2xl ${LANDING_LEAD_CLASS}`}>
             {d > 0
-              ? `Published courses across ${d} restoration discipline${d === 1 ? '' : 's'} — each awarding a CARSI Southern Hemisphere Restoration Designation.`
+              ? `Published courses across ${disciplineRows.length} restoration discipline${disciplineRows.length === 1 ? '' : 's'} — each awarding a CARSI Southern Hemisphere Restoration Designation.`
               : 'Courses across the core restoration subjects. CEC hours apply only to courses the IICRC has approved.'}
           </p>
           <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

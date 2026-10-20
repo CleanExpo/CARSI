@@ -36,6 +36,7 @@
  */
 import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
+import ts from 'typescript';
 import { isEntryPoint } from './lib/is-entry-point.mjs';
 
 import { IICRC_CODE_ALT } from './iicrc-codes.mjs';
@@ -92,6 +93,139 @@ function registryTitlesCarryingDesignations() {
     `(?<!\\+\\s*["'\`])(?<=["'\`])(?:${titles.map(esc).join('|')})(?=(?:\\s*\\|\\s*CARSI)*["'\`](?!\\s*\\+))`,
     'gi'
   );
+}
+
+/**
+ * GP-654: the ONLY sentences exempt from the catalogue rule — learner-data shapes matched end to
+ * end. Three review rounds each found selling copy that a list of catalogue words missed ("at your
+ * pace", 395315bc; "Boost your IICRC disciplines with expert-led tuition", fd1890a8), so nothing
+ * outside these shapes is exempt, comments included (JSX text renders a "//"):
+ *  - a question asking which disciplines the learner holds or must renew;
+ *  - a form prompt asking the learner to select the disciplines they hold.
+ * Leading property keys or a quote ("question: '…") and trailing punctuation are tolerated.
+ */
+// Leading object-literal keys, each with an optional short value that never mentions IICRC
+// ("kind: 'multi', question: '"), so a claim cannot ride in front of an exempt question.
+const LEAD =
+  String.raw`^(?:[^A-Za-z]*[A-Za-z_]\w*\s*:\s*(?:['"` +
+  '`' +
+  String.raw`](?:(?!IICRC)[^'"` +
+  '`' +
+  String.raw`\n]){0,40}['"` +
+  '`' +
+  String.raw`]\s*,\s*)?){0,3}[^A-Za-z]*`;
+// Spaces and ?.! are themselves non-letters; one quantifier keeps the anchored tail linear.
+const TAIL = String.raw`[^A-Za-z]*$`;
+const HOLD = String.raw`(?:hold|have|currently\s+hold|maintain|renew)(?:\s+or\s+plan\s+to\s+work\s+in)?`;
+const LEARNER_DATA_SENTENCE = [
+  String.raw`(?:which|what)\s+IICRC\s+disciplines\s+do\s+you\s+${HOLD}`,
+  String.raw`which\s+of\s+(?:your|their)\s+(?:[\w-]+\s+)?IICRC\s+disciplines\s+(?:needs?\s+renewal|are\s+(?:due|expiring|current))`,
+  String.raw`(?:select|choose|tick|pick|enter|add|list|update)\s+(?:all\s+)?(?:of\s+)?(?:the\s+)?(?:your\s+)?IICRC\s+disciplines\s+(?:(?:that|which)\s+)?you\s+${HOLD}`,
+].map((body) => new RegExp(LEAD + body + TAIL, 'i'));
+/** Words that count or cover the singular "IICRC discipline" the way a number does. */
+const COUNT_WORDS = [
+  'one',
+  'two',
+  'three',
+  'four',
+  'five',
+  'six',
+  'seven',
+  'eight',
+  'nine',
+  'ten',
+  'eleven',
+  'twelve',
+  '(?:a\\s+)?single',
+  'multiple',
+  'several',
+  'many',
+  'every',
+  'each',
+  // Dozen and other ordinary quantity words ("half a dozen IICRC discipline areas", "a dozen
+  // core IICRC discipline areas"; review of 439fd420). "half a" / "a" need no entry: the
+  // match starts at the count word itself.
+  'half-dozen',
+  'dozens?',
+  'few',
+  'couple',
+  'numerous',
+  'various',
+  'both',
+  // Quantity nouns ("a range of IICRC discipline areas", "a variety of IICRC discipline topics";
+  // review of e5bc372d). "of" is one of the modifier words allowed before "IICRC".
+  'range',
+  'variety',
+  'number',
+  'host',
+  'array',
+  'selection',
+  'handful',
+  'plenty',
+  'lots?',
+].join('|');
+
+/** Something other than plain whitespace between "IICRC" and "disciplines": `{…}` or `&…;`. */
+const SEP = String.raw`(?:\{[^{}\n]{0,60}\}|\$\{[^{}\n]{0,60}\}|&[#\w]{1,30};)`;
+/**
+ * Whitespace that renders as a space: JSX `{" "}` / `{' '}` expressions, HTML space
+ * entities, and the no-break / thin / zero-width characters (review of 395315bc).
+ */
+const RENDERED_SPACE = new RegExp(
+  String.raw`\{\s*(["'` +
+    '`' +
+    String.raw`])(?:\s|\\[tnr]|\\u00(?:20|09|0a|a0)|\\x(?:20|09|0a|a0)|\\u\{0*(?:20|9|a|a0)\}|\\u2009|\\u202f|&(?:nbsp|Tab|NewLine|#0*(?:9|10|32|160)|#x0*(?:9|a|20|a0));)*\1\s*\}` +
+    String.raw`|&(?:nbsp|ensp|emsp|thinsp|hairsp|numsp|puncsp|NonBreakingSpace|Tab|NewLine|ThinSpace|MediumSpace|VeryThinSpace|#0*(?:9|10|13|32|160|8194|8195|8201|8239)|#x0*(?:9|a|d|20|a0|2002|2003|2009|202f));` +
+    String.raw`|[  -   　]`,
+  'gi'
+);
+const ZERO_WIDTH = /[​-‍⁠﻿­]|&(?:shy|ZeroWidthSpace|#0*(?:173|8203)|#x0*(?:ad|200b));/gi;
+/** A numeric entity for a letter (`IICR&#67;`) renders as that letter. */
+const LETTER_ENTITY = /&#(?:x0*([0-9a-f]{1,4})|0*(\d{1,5}));/gi;
+/** A quoted literal in a JSX expression (`IICRC{' disciplines'}`) renders as its text. */
+const JSX_LITERAL = /\{\s*(['"`])([^'"`{}\n$\\]{0,80})\1\s*\}/g;
+/**
+ * Quoted pieces joined with `+` (`'7 IICRC ' + 'disciplines'`) render as one string, with or
+ * without a comment beside the `+` (review of d42d3e99).
+ */
+const JOIN_COMMENT =
+  String.raw`(?:\/\*[^*]{0,120}\*\/|\/\/[^\n'"` + '`' + String.raw`]{0,120})?\s*`;
+const STRING_JOIN = new RegExp(
+  String.raw`(['"` +
+    '`' +
+    String.raw`])\s*` +
+    JOIN_COMMENT +
+    String.raw`\+\s*` +
+    JOIN_COMMENT +
+    String.raw`(['"` +
+    '`' +
+    '])',
+  'g'
+);
+/**
+ * An element tag with its attributes (a long Tailwind className included), or a fragment
+ * `<>` / `</>` (review of d42d3e99). `[^<>]` keeps it linear.
+ */
+const MARKUP = /<\/?(?:[A-Za-z][^<>]{0,600})?>/g;
+
+/**
+ * The text a line renders, as two views: markup read as a break, and markup read as nothing
+ * (`disci<span>plines</span>`; review of d28bbcc0). Callers join them with a NUL, which no rule
+ * matches across.
+ */
+function renderedViews(line) {
+  const text = line
+    // Markdown emphasis renders as nothing (`Which **IICRC disciplines** do you hold?`).
+    .replace(/\*{1,3}/g, '')
+    .replace(ZERO_WIDTH, '')
+    .replace(RENDERED_SPACE, ' ')
+    .replace(LETTER_ENTITY, (m, hex, dec) => {
+      const ch = String.fromCodePoint(hex ? parseInt(hex, 16) : Number(dec));
+      return /^[A-Za-z]$/.test(ch) ? ch : m;
+    })
+    .replace(JSX_LITERAL, '$2')
+    .replace(STRING_JOIN, '');
+  return [text.replace(MARKUP, ' '), text.replace(MARKUP, '')];
 }
 
 // Banned selling/descriptive phrasings. Each must be something that implies
@@ -197,6 +331,94 @@ export function bannedRules(CODES = IICRC_CODE_ALT) {
         /\bIICRC[^.!?]{0,40}?training\s+at\s+(?:IICRC[\s-]+)?approved\s+schools?|\bIICRC[\s-]+Registered-Training-School\b|\bIICRC[\s-]+(?:CEC|Continuing[\s-]+Education[\s-]+Credit)\w*(?:[\s-]+\w+){0,3}[\s-]+training\b|\bIICRC[\s-]+(?:CEC|Continuing[\s-]+Education[\s-]+Credit)/gi,
       message:
         'CARSI does not deliver "IICRC training" — say "IICRC CEC course(s)". IICRC training comes from an IICRC-approved school.',
+    },
+    {
+      // The CARSI catalogue measured in IICRC disciplines (GP-654). Found live 20/10/2026 on the
+      // homepage FAQ and FAQPage schema ("80 published courses across 7 IICRC disciplines"), the
+      // certifications lead ("training that spans 7 IICRC disciplines"), the homepage and about
+      // stats ("IICRC Disciplines") and the share image. None was caught: no rule above keys on
+      // the words "IICRC discipline". A count, a quantity word or a coverage verb in front of it,
+      // or a stat label made of it, describes what CARSI teaches. The learner's own disciplines
+      // ("Which IICRC disciplines do you hold?") and admin data labels carry none of those.
+      //
+      // Fail-closed by design. Two review rounds (6edff7f0, 3aec1af2) each found new spellings
+      // of a coverage claim — reversed order, markup between the words, "all of your", three
+      // lines of JSX — so this rule does not try to recognise claims. The plural phrase is
+      // banned outright on every scanned surface. The only exemption is a whole sentence in one
+      // of the LEARNER_DATA_SENTENCE shapes (a question or form prompt about the disciplines the
+      // learner holds); anything else, rephrase as "restoration disciplines". Earlier exemptions
+      // keyed on "you"/"your" plus a list of selling words, and reviews kept finding selling copy
+      // outside the list (395315bc, fd1890a8).
+      // A count in front of the singular ("7 IICRC discipline${s}") and a stat label are also
+      // banned. Zero-width characters are removed, rendered whitespace (`{" "}`, `{" "}`,
+      // `&nbsp;`, `&Tab;`) becomes a space, letter entities and quoted JSX literals become their
+      // text, `'…' + '…'` joins, markup is read both as a break and as nothing, and up to six
+      // lines are read as one (renderedViews). Any other `{…}` expression or `&…;` entity between "IICRC" and "disciplines" is
+      // banned without trying to work out what it renders.
+      re: new RegExp(
+        String.raw`\bIICRC\s+disciplines\b` +
+          // Any separator other than plain whitespace, singular or plural; one way to parse it,
+          // so it stays linear (review of 17342ea9: the counted singular took `{x}` and `{"s"}`).
+          String.raw`|\bIICRC\s*(?:${SEP}\s*)+disciplines?\b` +
+          // The singular with a computed ending ("discipline{s}", "discipline${s}").
+          String.raw`|\bIICRC\s+discipline(?:\{|\$\{)` +
+          // Up to three ordinary words may sit between the count and "IICRC" ("one core IICRC
+          // discipline", "7 core IICRC discipline areas"; review of 4f59d7fa).
+          String.raw`|(?<![\w.])(?:\d{1,3}\+?|\$\{[^}\n]{1,40}\}|\{[^}\n]{1,40}\})(?:(?:\s|${SEP}){1,8}[A-Za-z][\w-]{0,30}){0,3}(?:\s|${SEP}){1,8}IICRC\s+discipline\b` +
+          // A count or coverage word in front of the singular ("CARSI offers one IICRC discipline",
+          // "a single IICRC discipline", "every IICRC discipline"; review of 3dee1845).
+          String.raw`|\b(?:${COUNT_WORDS})(?:(?:\s|${SEP}){1,8}[A-Za-z][\w-]{0,30}){0,3}(?:\s|${SEP}){1,8}IICRC\s+discipline\b` +
+          // The singular before a plural coverage noun measures the catalogue whatever comes
+          // first ("CARSI spans a range of IICRC discipline areas"; review of e5bc372d).
+          String.raw`|\bIICRC\s+discipline\s+(?:areas|topics|categories|streams|tracks|fields|domains)\b` +
+          String.raw`|\blabel\s*:\s*['"` +
+          '`' +
+          String.raw`]IICRC\s+disciplines?['"` +
+          '`' +
+          ']',
+        'i'
+      ),
+      allow: null,
+      // Six lines: a JSX text run with a `{" "}` and inline elements spreads one phrase over
+      // five (review of d28bbcc0).
+      crossLine: 6,
+      // Also checked against the text each JSX tree, string join and Markdown paragraph renders
+      // (renderedRuns): markup, attributes, comments and emphasis are gone there by construction
+      // (review of 723bdce5).
+      rendered: true,
+      prepare: (line) =>
+        renderedViews(line)
+          .map((view) =>
+            view
+              // With markup read as nothing, every mix of block, inline and CSS-block tags
+              // (`<span className="block">…IICRC</span><span>disci<wbr />plines</span>`, review
+              // of bcd9b725) leaves "IICRCdisciplines", in any letter case, because CSS can set
+              // the case shown (reviews of 6cff84c2 and 1c70746b). The plural in any case,
+              // fail-closed: a camelCase plural identifier (`iicrcDisciplines`) is caught too and
+              // must be renamed. The singular only where it cannot be the `iicrcDiscipline` field
+              // (`level={c.level} iicrcDiscipline={…}` in the admin course list) or
+              // `IICRCDisciplineMap`: upper-case IICRC, or a lower-case discipline after it.
+              .replace(/\b(iicrc)(?=disciplines\b)/gi, '$1 ')
+              .replace(
+                /\b(?:IICRC(?=[Dd]iscipline\b|DISCIPLINE\b)|[Ii][Ii][Cc][Rr][Cc](?=discipline\b))/g,
+                '$& '
+              )
+              // After a count, literal or computed ("7 iicrcDiscipline", "{count} iicrcDiscipline",
+              // review of 7fe8c6fe), any case, unless the word is used as a name: followed by
+              // `=`, `:`, `(`, `,` or `}` (`level={c.level} iicrcDiscipline={…}`).
+              .replace(
+                /(?<=(?:\b\d{1,3}\+?|\$?\{[^}\n]{1,40}\})\s{1,8})(iicrc)(?=discipline\b(?!\s*[=:(,}]))/gi,
+                '$1 '
+              )
+              .split(/(?<=[.!?])\s+/)
+              // trimEnd: the shapes end in an anchored tail that is quadratic on trailing
+              // whitespace (review of 723bdce5, P2).
+              .filter((s) => !LEARNER_DATA_SENTENCE.some((shape) => shape.test(s.trimEnd())))
+              .join(' ')
+          )
+          .join(' \u0000 '),
+      message:
+        'Do not measure the CARSI catalogue in IICRC disciplines ("across 7 IICRC disciplines", "IICRC Disciplines" stat) — say "restoration disciplines" or name the topics. A learner\'s own IICRC disciplines may still be referenced.',
     },
     {
       // A course-level claim that CARSI courses EARN CECs. Licence-critical and
@@ -505,6 +727,346 @@ export function scanText(file, content, rules = BANNED) {
   return findings;
 }
 
+// JSON is parsed too, so its strings are read as their decoded value (`"IICRC\ndisciplines"`
+// in data/seo, review of 190018fe).
+const SCRIPT_KIND = {
+  '.tsx': 'TSX',
+  '.jsx': 'JSX',
+  '.ts': 'TS',
+  '.js': 'JS',
+  '.mjs': 'JS',
+  '.json': 'JSON',
+};
+
+/**
+ * The text a file renders, as runs with their line numbers, built from the parsed source rather
+ * than from lines (review of 723bdce5: a regex over source lines kept losing to ordinary
+ * attributes, comments and emphasis):
+ *  - each outermost JSX element or fragment, and each one passed as a prop: its text children,
+ *    string-literal expressions and nested elements' text, in order, once per way its
+ *    conditionals can render. String attributes and comments are never part of it. Any other
+ *    expression reads as `{x}`, so "{count} IICRC disciplines" is still a count.
+ *    Each tree is read twice: as React renders it (JSX text whitespace trimmed at line breaks,
+ *    character references decoded) and with every line break as a space.
+ *  - each outermost `+` join of quoted strings, with comments gone, once per conditional branch.
+ *  - in Markdown, each paragraph with emphasis, code ticks and link targets removed.
+ * Every file is parsed: a substring prefilter missed a word split across elements (review of
+ * 818f619e), and parsing the whole repository takes under a second.
+ */
+// HTML written inside copy (seed contentBody, Markdown) renders without its comments and tags
+// (`<h2>… IICRC <!-- note --> disciplines</h2>`, `<span title="a > b">`; review of 58e106ae).
+// Quoted attribute values may hold `>`. A tag reads as nothing and as a break, as JSX does, and
+// once as a browser lays it out: a block element or `<br>` starts a new line, an inline element
+// or `<wbr>` adds nothing (`<div>…IICRC</div><div>disci<wbr>plines</div>`, reviews of 4882b769
+// and 4cd99e20).
+const HTML_COMMENT = /<!--[\s\S]*?-->/g;
+const HTML_TAG = /<\/?[A-Za-z][^>"']*(?:(?:"[^"]*"|'[^']*')[^>"']*)*>/g;
+const BLOCK_TAGS = new Set(
+  (
+    'address article aside blockquote br dd details dialog div dl dt fieldset figcaption figure ' +
+    'footer form h1 h2 h3 h4 h5 h6 header hgroup hr li main nav ol p pre section summary table ' +
+    'tbody td tfoot th thead tr ul'
+  ).split(' ')
+);
+const tagName = (tag) => (tag.match(/^<\/?([A-Za-z][\w-]*)/)?.[1] ?? '').toLowerCase();
+function htmlViews(t) {
+  if (!t.includes('<')) return [];
+  const c = t.replace(HTML_COMMENT, '');
+  return [
+    c.replace(HTML_TAG, ''),
+    c.replace(HTML_TAG, ' '),
+    c.replace(HTML_TAG, (tag) => (BLOCK_TAGS.has(tagName(tag)) ? ' ' : '')),
+  ];
+}
+
+export function renderedRuns(file, text) {
+  const ext = (file.match(/\.[a-z]+$/i)?.[0] ?? '').toLowerCase();
+  if (ext === '.md' || ext === '.mdx') {
+    const runs = [];
+    let start = 0;
+    const lines = text.split('\n');
+    for (let i = 0; i <= lines.length; i++) {
+      if (i === lines.length || lines[i].trim() === '') {
+        const para = lines.slice(start, i).join(' ');
+        if (para.trim()) {
+          const md = para
+            .replace(/\[([^\]\n]{0,200})\]\([^)\n]{0,400}\)/g, '$1')
+            .replace(/[*_`~]+/g, '');
+          for (const view of [md, ...htmlViews(md)]) runs.push({ line: start + 1, text: view });
+        }
+        start = i + 1;
+      }
+    }
+    return runs;
+  }
+  const kind = SCRIPT_KIND[ext];
+  if (!kind) return [];
+  const sf = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true, ts.ScriptKind[kind]);
+  const runs = [];
+  const lineOf = (node) => sf.getLineAndCharacterOfPosition(node.getStart(sf)).line + 1;
+  const isJsx = (n) => ts.isJsxElement(n) || ts.isJsxFragment(n) || ts.isJsxSelfClosingElement(n);
+  // Type-only wrappers erase at compile time: `('disciplines' as const)` renders its literal
+  // (review of 190018fe), so they read as parentheses do.
+  const isWrap = (n) =>
+    ts.isParenthesizedExpression(n) ||
+    ts.isAsExpression(n) ||
+    ts.isTypeAssertionExpression(n) ||
+    ts.isSatisfiesExpression(n) ||
+    ts.isNonNullExpression(n);
+  const isPlus = (n) =>
+    ts.isBinaryExpression(n) && n.operatorToken.kind === ts.SyntaxKind.PlusToken;
+
+  const opOf = (n) => (ts.isBinaryExpression(n) ? n.operatorToken.kind : null);
+  const isChoice = (n) =>
+    ts.isConditionalExpression(n) ||
+    [
+      ts.SyntaxKind.AmpersandAmpersandToken,
+      ts.SyntaxKind.BarBarToken,
+      ts.SyntaxKind.QuestionQuestionToken,
+    ].includes(opOf(n));
+
+  // A piece of copy is the set of texts it can render (review of 0bb32ada: `{open ? 'disciplines'
+  // : 'topics'}` read as one opaque `{x}`). Each branch of `?:`, `||` and `??` is one
+  // alternative, `&&` adds the empty render, and a branch that is not authored text reads as
+  // `{x}`. The source-line rules still see the raw `{…}`, so nothing they caught is lost.
+  // Sets are joined pairwise and capped at ALT_CAP: past it, every full text is checked as its
+  // own run first, then each keeps only its two ends (400, 200, then 100 characters; a match
+  // across the cut already fired), and a set still over the cap fails closed (`overflow`).
+  const ALT_CAP = 256;
+  let root = null;
+  // Every rule reads a whitespace run as one space, so texts that differ only in whitespace (an
+  // empty `&&` beside an `<Icon />`) are one alternative.
+  const cross = (a, b) => {
+    const out = [...new Set(a.flatMap((x) => b.map((y) => (x + y).replace(/\s+/g, ' '))))];
+    if (out.length <= ALT_CAP) return out;
+    for (const t of out) runs.push({ line: root.line, text: t });
+    for (const keep of [400, 200, 100]) {
+      const ends = [
+        ...new Set(
+          out.map((t) => (t.length > 2 * keep ? `${t.slice(0, keep)}\u0000${t.slice(-keep)}` : t))
+        ),
+      ];
+      if (ends.length <= ALT_CAP) return ends;
+    }
+    root.overflow = true;
+    return out.slice(0, ALT_CAP);
+  };
+
+  // null: not authored text at all (an identifier, a call), which the caller reads as `{x}`.
+  const alts = (expr, inJsx) => {
+    if (isWrap(expr)) return alts(expr.expression, inJsx);
+    // React renders null, undefined and booleans as nothing (`cond ? <p>…</p> : null`), so in JSX
+    // they are the empty text, not an unknown `{x}` that reads like a count before the next block.
+    if (
+      inJsx &&
+      (expr.kind === ts.SyntaxKind.NullKeyword ||
+        expr.kind === ts.SyntaxKind.TrueKeyword ||
+        expr.kind === ts.SyntaxKind.FalseKeyword ||
+        (ts.isIdentifier(expr) && expr.text === 'undefined'))
+    )
+      return [''];
+    if (ts.isStringLiteral(expr) || ts.isNoSubstitutionTemplateLiteral(expr)) return [expr.text];
+    if (ts.isTemplateExpression(expr)) {
+      // A substitution renders its own branches (review of 818f619e); anything else is `${x}`.
+      return expr.templateSpans.reduce(
+        (acc, s) => cross(cross(acc, alts(s.expression, false) ?? ['${x}']), [s.literal.text]),
+        [expr.head.text]
+      );
+    }
+    if (inJsx && isJsx(expr)) return flatten(expr);
+    if (isPlus(expr)) {
+      const l = alts(expr.left, false);
+      const r = alts(expr.right, false);
+      return l === null && r === null ? null : cross(l ?? ['{x}'], r ?? ['{x}']);
+    }
+    if (isChoice(expr)) {
+      const and = opOf(expr) === ts.SyntaxKind.AmpersandAmpersandToken;
+      const branches = ts.isConditionalExpression(expr)
+        ? [expr.whenTrue, expr.whenFalse]
+        : and
+          ? [expr.right]
+          : [expr.left, expr.right];
+      const found = branches.map((b) => alts(b, inJsx));
+      if (found.every((f) => f === null)) return null;
+      return [...new Set([...(and ? [''] : []), ...found.flatMap((f) => f ?? ['{x}'])])];
+    }
+    return null;
+  };
+
+  // React's JSX text rule (Babel's cleanJSXElementLiteralChild): whitespace that touches a line
+  // break is dropped, and non-blank lines join with one space. So `disci` at the end of a line
+  // followed by `<span>plines</span>` renders "disciplines" (review of 818f619e).
+  const reactText = (raw) => {
+    const lines = raw.split(/\r\n|\n|\r/);
+    let last = -1;
+    lines.forEach((l, i) => {
+      if (/[^ \t]/.test(l)) last = i;
+    });
+    let out = '';
+    lines.forEach((l, i) => {
+      let t = l.replace(/\t/g, ' ');
+      if (i > 0) t = t.replace(/^ +/, '');
+      if (i < lines.length - 1) t = t.replace(/ +$/, '');
+      if (t) out += i === last ? t : `${t} `;
+    });
+    return out;
+  };
+  const NAMED_REFS = {
+    nbsp: ' ',
+    amp: '&',
+    lt: '<',
+    gt: '>',
+    quot: '"',
+    apos: "'",
+    shy: '­',
+    zwnj: '‌',
+    zwj: '‍',
+    zerowidthspace: '​',
+    nobreak: '⁠',
+  };
+  // Characters a browser does not show: a word split by a soft hyphen or a zero-width space reads
+  // as one word (review of c6c5a064). The source-line rules strip the same set.
+  const INVISIBLE = /[­​-‍⁠﻿]/g;
+  const visible = (t) => t.replace(INVISIBLE, '');
+  const decodeRefs = (t) =>
+    t.replace(/&(#x[0-9a-f]{1,6}|#[0-9]{1,7}|[a-z]{2,16});/gi, (m, ref) => {
+      const code = /^#x/i.test(ref)
+        ? parseInt(ref.slice(2), 16)
+        : ref[0] === '#'
+          ? parseInt(ref.slice(1), 10)
+          : null;
+      if (code !== null) return code <= 0x10ffff ? String.fromCodePoint(code) : m;
+      return NAMED_REFS[ref.toLowerCase()] ?? m;
+    });
+  let reactMode = false;
+
+  const flatten = (node) => {
+    if (ts.isJsxText(node)) {
+      const raw = node.getText(sf);
+      return [reactMode ? decodeRefs(reactText(raw)) : raw];
+    }
+    if (ts.isJsxExpression(node)) {
+      if (!node.expression) return [''];
+      return alts(node.expression, true) ?? ['{x}'];
+    }
+    // As React renders it, an empty element adds no text (`dis<wbr />ciplines`, review of
+    // c6c5a064); the loose view keeps reading it as a break.
+    // `<br />` is a line break in both views (`IICRC<br />disci<wbr />plines`, review of 58e106ae).
+    // A block element or `<br>` starts a new line in both views, written self-closing or paired
+    // (`<br></br>`, `<div>…</div><div>disci<wbr />plines</div>`, review of 4cd99e20).
+    if (ts.isJsxSelfClosingElement(node)) {
+      if (BLOCK_TAGS.has(node.tagName.getText(sf))) return [' '];
+      return [reactMode ? '' : ' '];
+    }
+    if (ts.isJsxElement(node) || ts.isJsxFragment(node)) {
+      const inner = node.children.reduce((acc, child) => cross(acc, flatten(child)), ['']);
+      const block =
+        ts.isJsxElement(node) && BLOCK_TAGS.has(node.openingElement.tagName.getText(sf));
+      return block ? cross(cross([' '], inner), [' ']) : inner;
+    }
+    return [''];
+  };
+
+  // Already part of an enclosing tree's text: a child element, or a branch of a child `{…}`.
+  // JSX in an attribute (`title={<>…</>}`) is not, so it is a run of its own (review of 0bb32ada).
+  const inParentText = (node) => {
+    let p = node.parent;
+    if (isJsx(p)) return true;
+    while (isWrap(p) || isChoice(p)) p = p.parent;
+    return ts.isJsxExpression(p) && isJsx(p.parent);
+  };
+
+  // A template that a `+` chain, an enclosing template or a JSX tree already expands.
+  const inExpandedText = (node) => {
+    let p = node.parent;
+    while (isWrap(p) || isChoice(p)) p = p.parent;
+    return isPlus(p) || ts.isTemplateSpan(p) || (ts.isJsxExpression(p) && isJsx(p.parent));
+  };
+
+  const emit = (texts) => {
+    for (const text of texts) runs.push({ line: root.line, text });
+    if (root.overflow) runs.push({ line: root.line, text: '', overflow: true });
+  };
+
+  // Whether a tree can render "discipline" at all, decided without expanding it. Every rendered
+  // text is the tree's authored pieces (JSX text, string and template literals) in source order
+  // with some dropped, so the word must be spellable across consecutive kept pieces. A matcher
+  // walks the pieces, free to keep or drop each one; every catalogue alternative needs the word.
+  // Comments, identifiers (`discipline={discipline}`) and attributes are not pieces: flatten never
+  // reads an attribute (`href="/courses?discipline=CCT"`), and JSX passed as a prop is a run of
+  // its own with its own check. Sound where the old substring prefilter was not
+  // (`dis<span title="a > b">ci</span>plines`, review of 818f619e).
+  const WORD = 'discipline';
+  const step = (k, text) => {
+    for (const ch of text.toLowerCase()) {
+      if (k === WORD.length) return k;
+      k = ch === WORD[k] ? k + 1 : ch === WORD[0] ? 1 : 0;
+    }
+    return k;
+  };
+  const canSpell = (node) => {
+    let states = new Set([0]);
+    const piece = (...forms) => {
+      const next = new Set(states);
+      for (const k of states) for (const f of forms) next.add(step(k, f));
+      next.add(0);
+      states = next;
+    };
+    const walk = (n) => {
+      if (states.has(WORD.length) || ts.isJsxAttributes(n)) return;
+      if (ts.isJsxText(n)) {
+        const raw = n.getText(sf);
+        piece(raw, reactText(raw), visible(decodeRefs(reactText(raw))));
+      } else if (
+        ts.isStringLiteral(n) ||
+        ts.isNoSubstitutionTemplateLiteral(n) ||
+        ts.isTemplateHead(n) ||
+        ts.isTemplateMiddle(n) ||
+        ts.isTemplateTail(n)
+      ) {
+        piece(n.text, visible(n.text));
+      }
+      ts.forEachChild(n, walk);
+    };
+    walk(node);
+    return states.has(WORD.length);
+  };
+
+  const visit = (node) => {
+    // A root that cannot spell the word is not expanded, but its children are still visited:
+    // JSX passed as a prop inside it is a root of its own.
+    if (isJsx(node) && !inParentText(node)) {
+      if (canSpell(node)) {
+        root = { line: lineOf(node) };
+        reactMode = true;
+        emit(flatten(node).map(visible));
+        reactMode = false;
+        emit(flatten(node));
+      }
+    } else if (
+      (isPlus(node) && !isPlus(node.parent)) ||
+      ((ts.isTemplateExpression(node) ||
+        ts.isStringLiteral(node) ||
+        ts.isNoSubstitutionTemplateLiteral(node)) &&
+        !inExpandedText(node))
+    ) {
+      // A template or string outside JSX is copy too (`const headline = \`… ${wide ? 'a' : 'b'}\``,
+      // review of 42c32b79), read as its value: the source line of `"IICRC\ndisciplines"` shows
+      // an escape, not the space it renders (review of 4414fcac). Read with and without
+      // invisible characters, as JSX text is.
+      root = { line: lineOf(node) };
+      const v = alts(node, false);
+      if (v !== null) {
+        const html = v.flatMap(htmlViews).map((h) => visible(decodeRefs(h)));
+        emit([...new Set([...v, ...v.map(visible), ...html])]);
+      }
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(sf);
+  return runs;
+}
+
 function ruleHits(rule, content) {
   const base = rule.prepare ? rule.prepare(content) : content;
   const probe = rule.neutralise ? base.replace(rule.neutralise, ' ') : base;
@@ -522,12 +1084,42 @@ export function scanFile(file, text, rules = BANNED) {
   for (let i = 0; i < lines.length; i++) scanLine(file, i + 1, lines[i], findings, rules);
   const docs = file.replace(/\\/g, '/').startsWith('docs/');
   for (const rule of rules.filter((r) => r.crossLine && !(r.skipDocs && docs))) {
-    for (let i = 0; i + 1 < lines.length; i++) {
-      const joined = `${lines[i].trimEnd()} ${lines[i + 1].trimStart()}`;
-      if (ruleHits(rule, joined) && !ruleHits(rule, lines[i]) && !ruleHits(rule, lines[i + 1])) {
+    // `crossLine: true` joins pairs of lines; a number joins up to that many (GP-654: a count,
+    // "<span>IICRC</span>" and "disciplines" on three lines render as one phrase). A window is
+    // reported only when neither of its one-line-shorter windows already fires.
+    const width = rule.crossLine === true ? 2 : rule.crossLine;
+    const join = (from, n) =>
+      lines
+        .slice(from, from + n)
+        .map((l) => l.trim())
+        .join(' ');
+    const hits = (from, n) =>
+      n === 1 ? ruleHits(rule, lines[from]) : ruleHits(rule, join(from, n));
+    for (let n = 2; n <= width; n++) {
+      for (let i = 0; i + n <= lines.length; i++) {
+        if (hits(i, n) && !hits(i, n - 1) && !hits(i + 1, n - 1)) {
+          findings.push(
+            `  ${file}:${i + 1}-${i + n}: ${rule.message}\n    → ${join(i, n).slice(0, 140)}`
+          );
+        }
+      }
+    }
+  }
+  const renderedRules = rules.filter((r) => r.rendered && !(r.skipDocs && docs));
+  if (renderedRules.length > 0) {
+    for (const run of renderedRuns(file, text)) {
+      if (run.overflow) {
         findings.push(
-          `  ${file}:${i + 1}-${i + 2}: ${rule.message}\n    → ${joined.trim().slice(0, 140)}`
+          `  ${file}:${run.line} (rendered): this copy has too many conditional variants to check (over 256); split it into smaller pieces`
         );
+        continue;
+      }
+      for (const rule of renderedRules) {
+        if (ruleHits(rule, run.text)) {
+          findings.push(
+            `  ${file}:${run.line} (rendered): ${rule.message}\n    → ${run.text.replace(/\s+/g, ' ').trim().slice(0, 140)}`
+          );
+        }
       }
     }
   }

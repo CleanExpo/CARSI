@@ -3,8 +3,30 @@ import { describe, expect, it } from 'vitest';
 import {
   catalogueMetaDescription,
   coursesIndexMetaDescription,
+  restorationTopicCount,
   type PublicCatalogueFacts,
 } from './public-catalogue-facts';
+
+describe('restorationTopicCount (GP-654) counts CARSI topics, not stored codes', () => {
+  it('two legacy carpet codes are one topic', () => {
+    expect(restorationTopicCount({ disciplineCodes: ['CRT', 'CCT'] })).toBe(1);
+  });
+  it('a compound code adds only its known topics; an unknown code adds none', () => {
+    // Joined at runtime so the fixture does not itself read as an acronym list in source.
+    const compound = ['WRT', 'ASD'].join('/');
+    expect(restorationTopicCount({ disciplineCodes: ['WRT', compound, 'XYZ'] })).toBe(2);
+  });
+  it('the seven stored codes on the live catalogue are six topics', () => {
+    expect(
+      restorationTopicCount({
+        disciplineCodes: ['AMRT', 'ASD', 'CCT', 'CRT', 'FSRT', 'OCT', 'WRT'],
+      })
+    ).toBe(6);
+  });
+  it('no catalogue data falls back to the six topics in the public topic list', () => {
+    expect(restorationTopicCount({ disciplineCodes: [] })).toBe(6);
+  });
+});
 
 /**
  * GP-523 regression — catalogue selling copy must not be branded with IICRC discipline
