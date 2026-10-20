@@ -216,6 +216,9 @@ describe('licence inventory', () => {
     ['certif', HERO, 'IICRC ' + 'certifications for Australian technicians'],
     ['certif', HERO, 'IICRC ' + 'online certification courses — bought once'],
     ['certif', HERO, 'Certification ' + 'training from the IICRC, online'],
+    // review of b4af1171: an unrelated "No" earlier in the sentence negated the offer
+    ['certif', HERO, 'No waiting for your IICRC ' + 'online certification courses (27)'],
+    ['certif', HERO, 'Not sure? Browse IICRC ' + 'certification courses (27)'],
   ])('controls: %s fires in %s: %s', (term, file, text) => {
     expect(classifyCopy(file, term, text)[0]).toBe('exposure');
   });
@@ -365,5 +368,61 @@ describe('industry metadata never brands CARSI training with the IICRC name', ()
 
   it.each(pages)('metadata: %s', (_slug, src) => {
     expect(iicrcMentions(metadataBlock(src))).toEqual([]);
+  });
+});
+
+/**
+ * Review of b4af1171 (GP-639): a word-limited regex cannot refuse every wording, and an
+ * unlimited one flags 24 third-person lines across the site. The /courses hero link is the one
+ * new public line, so its whole element is pinned: any other label, attribute or second link to
+ * the CEC catalogue fails here, however it is worded.
+ */
+describe('the /courses hero CEC link is pinned to the permitted label', () => {
+  const PINNED =
+    '{catalogueAvailable && cecApprovedCount > 0 ? ( <Link href="/courses?discipline=iicrc-cec#catalogue" > IICRC CEC Accredited courses ({cecApprovedCount}) </Link> ) : null}';
+
+  function heroCecLinks(src: string): string[] {
+    return [
+      ...src.matchAll(
+        /\{[^{}]*\?\s*\(\s*<Link\b[\s\S]*?<\/Link>\s*\)\s*:\s*null\}|<Link\b[\s\S]*?<\/Link>/g
+      ),
+    ]
+      .map((m) => m[0])
+      .filter((el) => el.includes('discipline=iicrc-cec'))
+      .map((el) =>
+        el
+          .replace(/\sclassName="[^"]*"/g, '')
+          .replace(/\s+/g, ' ')
+          .trim()
+      );
+  }
+
+  it('hero: the live page carries exactly the pinned element, once', () => {
+    const src = readFileSync(HERO, 'utf8');
+    expect(src.split('discipline=iicrc-cec').length - 1).toBe(1);
+    expect(heroCecLinks(src)).toEqual([PINNED]);
+  });
+
+  it.each([
+    [
+      'a reworded label',
+      'IICRC CEC Accredited courses ({cecApprovedCount})',
+      'No waiting for your IICRC ' + 'online certification courses ({cecApprovedCount})',
+    ],
+    [
+      'an added attribute',
+      'href="/courses?discipline=iicrc-cec#catalogue"',
+      'title="IICRC ' + 'certification courses" href="/courses?discipline=iicrc-cec#catalogue"',
+    ],
+    [
+      'a dropped gate',
+      '{catalogueAvailable && cecApprovedCount > 0 ? (',
+      '{cecApprovedCount > 0 ? (',
+    ],
+  ])('hero: %s fails the pin (control)', (_name, from, to) => {
+    const src = readFileSync(HERO, 'utf8');
+    const planted = src.replace(from, to);
+    expect(planted).not.toBe(src);
+    expect(heroCecLinks(planted)).not.toEqual([PINNED]);
   });
 });
