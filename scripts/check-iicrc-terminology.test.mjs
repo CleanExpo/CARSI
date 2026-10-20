@@ -656,6 +656,28 @@ const MUST_BLOCK_FILE = [
     'GP-654 phrase before many conditionals',
     `<p>CARSI covers 7 IICRC disciplines.${"{a ? 'x' : 'y'}".repeat(12)}</p>`,
   ],
+  // Review of 818f619e: React drops whitespace at a JSX line break, words split across elements
+  // escaped the substring prefilter, and template substitutions hid their branches.
+  [
+    'GP-654 word joined across a JSX line break',
+    'export const Copy = () => <p>CARSI covers 7 IICRC disci\n<span>plines</span>.</p>;',
+  ],
+  [
+    'GP-654 word split across elements with a quoted >',
+    'export const Copy = () => <p>CARSI covers 7 IICRC dis<span title="Topics > details">ci</span>plines.</p>;',
+  ],
+  [
+    'GP-654 word split into single letters',
+    '<p>CARSI covers 7 IICRC d<b>i</b>s<b>c</b>i<b>p</b>lines.</p>',
+  ],
+  [
+    'GP-654 character reference inside a split word',
+    '<p>CARSI covers 7 IICRC dis<b>&#99;</b>iplines.</p>',
+  ],
+  [
+    'GP-654 conditional inside a template substitution',
+    "export const Copy = () => <p>{`CARSI covers 7 IICRC ${open ? 'disciplines' : 'topics'}.`}</p>;",
+  ],
   [
     'GP-654 too many adjacent conditional variants fails closed',
     `<p>Restoration disciplines${"{a ? 'x' : 'y'}".repeat(12)}</p>`,
@@ -673,6 +695,14 @@ const MUST_PASS_FILE = [
   [
     'conditional whose branches render neither phrase',
     "<p>CARSI covers 7 restoration {wide ? 'disciplines' : 'topics'}.</p>",
+  ],
+  [
+    'an attribute naming a discipline in a tree full of conditionals',
+    `<div><Link href="/courses?discipline=CCT">Browse courses</Link>${"{a ? 'x' : 'y'}".repeat(12)}</div>`,
+  ],
+  [
+    'a word that only starts like the banned one, split across an element',
+    '<p>CARSI covers IICRC dis<span>cussion</span> topics.</p>',
   ],
   [
     'a long page with conditionals spread through its copy',
@@ -699,6 +729,7 @@ for (const [name, src, block] of [
     true,
   ],
   ['learner question in Markdown', 'Which **IICRC disciplines** do you hold?', false],
+  ['GP-654 Markdown word split by emphasis', 'CARSI covers 7 IICRC dis**ci**plines.', true],
 ]) {
   if (scanFile(F_MD, src).length > 0 !== block) {
     console.error(

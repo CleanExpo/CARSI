@@ -656,8 +656,6 @@ export function scanText(file, content, rules = BANNED) {
   return findings;
 }
 
-/** Files the rendered-text pass parses. */
-const RENDERED_PREFILTER = /scip|disci/i;
 const SCRIPT_KIND = { '.tsx': 'TSX', '.jsx': 'JSX', '.ts': 'TS', '.js': 'JS', '.mjs': 'JS' };
 
 /**
@@ -668,11 +666,14 @@ const SCRIPT_KIND = { '.tsx': 'TSX', '.jsx': 'JSX', '.ts': 'TS', '.js': 'JS', '.
  *    string-literal expressions and nested elements' text, in order, once per way its
  *    conditionals can render. String attributes and comments are never part of it. Any other
  *    expression reads as `{x}`, so "{count} IICRC disciplines" is still a count.
+ *    Each tree is read twice: as React renders it (JSX text whitespace trimmed at line breaks,
+ *    character references decoded) and with every line break as a space.
  *  - each outermost `+` join of quoted strings, with comments gone, once per conditional branch.
  *  - in Markdown, each paragraph with emphasis, code ticks and link targets removed.
+ * Every file is parsed: a substring prefilter missed a word split across elements (review of
+ * 818f619e), and parsing the whole repository takes under a second.
  */
 export function renderedRuns(file, text) {
-  if (!RENDERED_PREFILTER.test(text)) return [];
   const ext = (file.match(/\.[a-z]+$/i)?.[0] ?? '').toLowerCase();
   if (ext === '.md' || ext === '.mdx') {
     const runs = [];
@@ -744,7 +745,11 @@ export function renderedRuns(file, text) {
     if (ts.isParenthesizedExpression(expr)) return alts(expr.expression, inJsx);
     if (ts.isStringLiteral(expr) || ts.isNoSubstitutionTemplateLiteral(expr)) return [expr.text];
     if (ts.isTemplateExpression(expr)) {
-      return [expr.head.text + expr.templateSpans.map((s) => '${x}' + s.literal.text).join('')];
+      // A substitution renders its own branches (review of 818f619e); anything else is `${x}`.
+      return expr.templateSpans.reduce(
+        (acc, s) => cross(cross(acc, alts(s.expression, false) ?? ['${x}']), [s.literal.text]),
+        [expr.head.text]
+      );
     }
     if (inJsx && isJsx(expr)) return flatten(expr);
     if (isPlus(expr)) {
@@ -766,8 +771,42 @@ export function renderedRuns(file, text) {
     return null;
   };
 
+  // React's JSX text rule (Babel's cleanJSXElementLiteralChild): whitespace that touches a line
+  // break is dropped, and non-blank lines join with one space. So `disci` at the end of a line
+  // followed by `<span>plines</span>` renders "disciplines" (review of 818f619e).
+  const reactText = (raw) => {
+    const lines = raw.split(/\r\n|\n|\r/);
+    let last = -1;
+    lines.forEach((l, i) => {
+      if (/[^ \t]/.test(l)) last = i;
+    });
+    let out = '';
+    lines.forEach((l, i) => {
+      let t = l.replace(/\t/g, ' ');
+      if (i > 0) t = t.replace(/^ +/, '');
+      if (i < lines.length - 1) t = t.replace(/ +$/, '');
+      if (t) out += i === last ? t : `${t} `;
+    });
+    return out;
+  };
+  const NAMED_REFS = { nbsp: ' ', amp: '&', lt: '<', gt: '>', quot: '"', apos: "'" };
+  const decodeRefs = (t) =>
+    t.replace(/&(#x[0-9a-f]{1,6}|#[0-9]{1,7}|[a-z]{2,8});/gi, (m, ref) => {
+      const code = /^#x/i.test(ref)
+        ? parseInt(ref.slice(2), 16)
+        : ref[0] === '#'
+          ? parseInt(ref.slice(1), 10)
+          : null;
+      if (code !== null) return code <= 0x10ffff ? String.fromCodePoint(code) : m;
+      return NAMED_REFS[ref.toLowerCase()] ?? m;
+    });
+  let reactMode = false;
+
   const flatten = (node) => {
-    if (ts.isJsxText(node)) return [node.getText(sf)];
+    if (ts.isJsxText(node)) {
+      const raw = node.getText(sf);
+      return [reactMode ? decodeRefs(reactText(raw)) : raw];
+    }
     if (ts.isJsxExpression(node)) {
       if (!node.expression) return [''];
       return alts(node.expression, true) ?? ['{x}'];
@@ -793,28 +832,55 @@ export function renderedRuns(file, text) {
     if (root.overflow) runs.push({ line: root.line, text: '', overflow: true });
   };
 
-  // The authored text in a tree: JSX text and string literals. Comments and identifiers
-  // (`discipline={discipline}`) render nothing, so a tree whose authored text cannot spell the
-  // phrase is not expanded.
-  const authoredText = (node) => {
-    const parts = [];
+  // Whether a tree can render "discipline" at all, decided without expanding it. Every rendered
+  // text is the tree's authored pieces (JSX text, string and template literals) in source order
+  // with some dropped, so the word must be spellable across consecutive kept pieces. A matcher
+  // walks the pieces, free to keep or drop each one; every catalogue alternative needs the word.
+  // Comments, identifiers (`discipline={discipline}`) and attributes are not pieces: flatten never
+  // reads an attribute (`href="/courses?discipline=CCT"`), and JSX passed as a prop is a run of
+  // its own with its own check. Sound where the old substring prefilter was not
+  // (`dis<span title="a > b">ci</span>plines`, review of 818f619e).
+  const WORD = 'discipline';
+  const step = (k, text) => {
+    for (const ch of text.toLowerCase()) {
+      if (k === WORD.length) return k;
+      k = ch === WORD[k] ? k + 1 : ch === WORD[0] ? 1 : 0;
+    }
+    return k;
+  };
+  const canSpell = (node) => {
+    let states = new Set([0]);
+    const piece = (...forms) => {
+      const next = new Set(states);
+      for (const k of states) for (const f of forms) next.add(step(k, f));
+      next.add(0);
+      states = next;
+    };
     const walk = (n) => {
-      if (ts.isJsxText(n)) parts.push(n.getText(sf));
-      else if (ts.isStringLiteral(n) || ts.isNoSubstitutionTemplateLiteral(n)) parts.push(n.text);
-      else if (ts.isTemplateExpression(n)) {
-        parts.push(n.head.text, ...n.templateSpans.map((s) => s.literal.text));
-      }
+      if (states.has(WORD.length) || ts.isJsxAttributes(n)) return;
+      if (ts.isJsxText(n)) {
+        const raw = n.getText(sf);
+        piece(raw, reactText(raw), decodeRefs(reactText(raw)));
+      } else if (ts.isStringLiteral(n) || ts.isNoSubstitutionTemplateLiteral(n)) piece(n.text);
+      else if (ts.isTemplateHead(n) || ts.isTemplateMiddle(n) || ts.isTemplateTail(n))
+        piece(n.text);
       ts.forEachChild(n, walk);
     };
     walk(node);
-    return parts.join(' ');
+    return states.has(WORD.length);
   };
 
   const visit = (node) => {
+    // A root that cannot spell the word is not expanded, but its children are still visited:
+    // JSX passed as a prop inside it is a root of its own.
     if (isJsx(node) && !inParentText(node)) {
-      if (!RENDERED_PREFILTER.test(authoredText(node))) return;
-      root = { line: lineOf(node) };
-      emit(flatten(node));
+      if (canSpell(node)) {
+        root = { line: lineOf(node) };
+        reactMode = true;
+        emit(flatten(node));
+        reactMode = false;
+        emit(flatten(node));
+      }
     } else if (isPlus(node) && !isPlus(node.parent)) {
       root = { line: lineOf(node) };
       const v = alts(node, false);
