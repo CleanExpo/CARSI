@@ -22,6 +22,7 @@ import {
   formatCourseCountForCopy,
   getPublicCatalogueFacts,
   PUBLIC_TOPIC_LIST,
+  restorationTopicCount,
 } from '@/lib/server/public-catalogue-facts';
 import { getHomepageFeaturedCourses } from '@/lib/server/public-courses-list';
 import { subscriptionsEnabled } from '@/lib/server/subscriptions-flag';
@@ -97,8 +98,7 @@ export default async function Home() {
     getPublicCatalogueFacts(),
   ]);
   const faqs = buildHomeFaqs(catalogueFacts);
-  const disciplineCountLabel =
-    catalogueFacts.disciplineCodes.length > 0 ? catalogueFacts.disciplineCodes.length : 7;
+  const disciplineCountLabel = restorationTopicCount(catalogueFacts);
   const stats = [
     { value: '24/7', label: 'Study anytime' },
     { value: '12+', label: 'Industries served' },
@@ -110,10 +110,7 @@ export default async function Home() {
       label: 'Courses',
     },
     {
-      value:
-        catalogueFacts.disciplineCodes.length > 0
-          ? formatCourseCountForCopy(catalogueFacts.disciplineCodes.length)
-          : '7',
+      value: formatCourseCountForCopy(disciplineCountLabel),
       label: 'Restoration disciplines',
     },
   ];

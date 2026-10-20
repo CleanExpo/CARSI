@@ -3,6 +3,7 @@ import { cache } from 'react';
 import { getBackendOrigin } from '@/lib/env/public-url';
 import { isBuildPhase } from '@/lib/server/build-phase';
 import type { CourseListItem } from '@/lib/course-list-item';
+import { disciplinePillsFromCodes } from '@/lib/iicrc-discipline-display';
 import { prisma } from '@/lib/prisma';
 
 import { lmsPublishedCourseWhere } from '@/lib/server/public-courses-list';
@@ -179,6 +180,19 @@ export function formatCourseCountForCopy(n: number): string {
  */
 export const PUBLIC_TOPIC_LIST =
   'water damage restoration, structural drying, mould remediation, fire & smoke restoration, odour control and carpet cleaning';
+
+/**
+ * GP-654 — how many of CARSI's restoration topics the published catalogue covers, for the
+ * "Restoration disciplines" stat. Counts distinct CARSI topic labels, never stored discipline
+ * codes: two legacy carpet codes both map to "Carpet Cleaning", and an unknown or compound code is
+ * not a topic. With no catalogue data it falls back to the topics named in PUBLIC_TOPIC_LIST.
+ */
+export function restorationTopicCount(
+  facts: Pick<PublicCatalogueFacts, 'disciplineCodes'>
+): number {
+  const topics = new Set(disciplinePillsFromCodes(facts.disciplineCodes).map((p) => p.label));
+  return topics.size > 0 ? topics.size : PUBLIC_TOPIC_LIST.split(/, | and /).length;
+}
 
 /**
  * Provider standing, not a course-level CEC claim. A CARSI course may only assert that it

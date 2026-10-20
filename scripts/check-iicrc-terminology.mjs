@@ -206,9 +206,30 @@ export function bannedRules(CODES = IICRC_CODE_ALT) {
       // the words "IICRC discipline". A count, a quantity word or a coverage verb in front of it,
       // or a stat label made of it, describes what CARSI teaches. The learner's own disciplines
       // ("Which IICRC disciplines do you hold?") and admin data labels carry none of those.
-      re: /(?:\d+\+?|\$\{[^}\n]{1,40}\}|\{[^}\n]{1,40}\}|\b(?:core|all|multiple|several|many|key|six|seven|eight|nine)|\b(?:across|spans?|spanning|covers?|covering|over)(?:\s+the)?)\s+(?:core\s+)?IICRC\s+disciplines?\b|\blabel\s*:\s*['"`]IICRC\s+disciplines?['"`]/i,
+      // Independent review of 6edff7f0 added: the reversed order ("IICRC disciplines covered by
+      // CARSI"), a count or "IICRC" wrapped in its own JSX element (tags are stripped first), up
+      // to three words between a coverage verb and the phrase ("covers ten IICRC disciplines"),
+      // and a bounded digit run with a left boundary (10,000 digits took ~257ms unbounded).
+      re: new RegExp(
+        String.raw`(?<![\w.])(?:\d{1,3}\+?|\$\{[^}\n]{1,40}\}|\{[^}\n]{1,40}\}|core|all|multiple|several|many|key|six|seven|eight|nine|ten)\s+(?:core\s+)?IICRC\s+disciplines?\b` +
+          String.raw`|\b(?:across|spans?|spanning|covers?|covering|over|offers?|offering|teach(?:es|ing)?)\s+(?:[^\s.!?]{1,40}\s+){0,3}?IICRC\s+disciplines?\b` +
+          String.raw`|\bIICRC\s+disciplines?\s+(?:(?:are|is)\s+)?(?:covered|offered|taught|spanned|included)\b` +
+          String.raw`|\blabel\s*:\s*['"` +
+          '`' +
+          String.raw`]IICRC\s+disciplines?['"` +
+          '`' +
+          ']',
+        'i'
+      ),
       allow: null,
       crossLine: true,
+      // Markup between the words is not part of the sentence a reader sees.
+      prepare: (line) => line.replace(/<\/?[A-Za-z][^<>\n]{0,80}>/g, ' '),
+      // The learner's own disciplines stay allowed, including with a quantity ("your seven IICRC
+      // disciplines", "all IICRC disciplines you hold", "held by the learner") — but not after a
+      // coverage verb, so "CARSI covers your IICRC disciplines" is still a catalogue claim.
+      neutralise:
+        /(?<!\b(?:across|spans?|spanning|covers?|covering|over|offers?|offering|teach(?:es|ing)?)\s+)\b(?:your|my|their|his|her)\s+(?:own\s+)?(?:[\w-]+\s+){0,2}?IICRC\s+disciplines?\b|\bIICRC\s+disciplines?\s+(?:you|they|the\s+(?:learner|student|technician))\s+(?:hold|have|held|work|plan)\w*|\bIICRC\s+disciplines?\s+held\s+by\b/gi,
       message:
         'Do not measure the CARSI catalogue in IICRC disciplines ("across 7 IICRC disciplines", "IICRC Disciplines" stat) — say "restoration disciplines" or name the topics. A learner\'s own IICRC disciplines may still be referenced.',
     },

@@ -161,6 +161,14 @@ const MUST_BLOCK = [
   ['share-image stat', "{ value: '7', label: 'IICRC Disciplines' },"],
   ['a literal count', 'Courses across 7 IICRC disciplines.'],
   ['coverage verb', 'Training that spans the IICRC disciplines.'],
+  // Independent review of 6edff7f0: reversed order, element-separated counts, spelled numbers.
+  ['reversed: disciplines covered by CARSI', 'IICRC disciplines covered by CARSI.'],
+  ['reversed: disciplines taught at CARSI', 'Every one of the IICRC disciplines taught at CARSI.'],
+  ['count inside a JSX element', 'CARSI covers <strong>7</strong> IICRC disciplines.'],
+  ['IICRC inside a JSX element', 'CARSI covers 7 <span>IICRC</span> disciplines.'],
+  ['spelled number past nine', 'CARSI covers ten IICRC disciplines.'],
+  ['count with plus', 'Courses across 7+ IICRC disciplines.'],
+  ['coverage verb before the learner wording', 'CARSI covers your IICRC disciplines.'],
 ];
 
 const MUST_PASS = [
@@ -288,6 +296,9 @@ const MUST_PASS = [
   ['admin analytics heading', 'title="By IICRC discipline"'],
   ['code comment naming the data', ' * an IICRC discipline code. Display names are anonymous.'],
   ['plain restoration disciplines', 'Courses across 7 restoration disciplines.'],
+  ['learner: a quantity of their own disciplines', 'Which of your seven IICRC disciplines need renewal?'],
+  ['learner: all the disciplines they hold', 'Select all IICRC disciplines you hold.'],
+  ['comment about learner data', '// Count all IICRC disciplines held by the learner.'],
 ];
 
 let failed = 0;
@@ -352,6 +363,27 @@ for (const [name, file, src, drop] of LIST_FIXTURES) {
   }
   if (scanText(file, src, reduced).length > 0) {
     console.error(`✖ shared list: rules built without ${drop.join('/')} still catch ${name} (not reading the list)\n    ${src}`);
+    failed++;
+  }
+}
+
+// GP-654 rule on a long near-miss line: bounded quantifiers keep it linear (review of 6edff7f0
+// measured ~257ms for 10,000 digits before the digit run was bounded).
+// Timed on this rule alone: the older CEC-claim rule has its own long-line cost (~200ms here).
+{
+  const longLine = `${'9'.repeat(10000)} X IICRC disciplines`;
+  const catalogueRule = bannedRules().filter((r) =>
+    r.message.startsWith('Do not measure the CARSI catalogue')
+  );
+  if (catalogueRule.length !== 1) {
+    console.error('✖ GP-654 catalogue rule not found exactly once');
+    failed++;
+  }
+  const t0 = performance.now();
+  scanText(F, longLine, catalogueRule);
+  const ms = performance.now() - t0;
+  if (ms > 100) {
+    console.error(`✖ long near-miss line took ${ms.toFixed(0)}ms (> 100ms)`);
     failed++;
   }
 }
