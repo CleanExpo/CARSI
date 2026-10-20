@@ -219,6 +219,20 @@ describe('licence inventory', () => {
     // review of b4af1171: an unrelated "No" earlier in the sentence negated the offer
     ['certif', HERO, 'No waiting for your IICRC ' + 'online certification courses (27)'],
     ['certif', HERO, 'Not sure? Browse IICRC ' + 'certification courses (27)'],
+    // review of c4f98bcc: a not-only construction read as a denial
+    [
+      'certif',
+      HERO,
+      'CARSI does not sell only IICRC ' + 'online certification courses — we also offer more.',
+    ],
+    [
+      'certif',
+      PUBLIC,
+      'CARSI does not sell only IICRC ' + 'online certification courses — we also offer more.',
+    ],
+    ['certif', PUBLIC, 'We do not offer just IICRC ' + 'certification courses.'],
+    // on /courses no denial wording exempts the sentence
+    ['certif', HERO, 'CARSI does not sell IICRC ' + 'certification courses.'],
     // review of 6a1046e8: long modifiers in sibling copy on /courses
     [
       'certif',
@@ -260,7 +274,7 @@ describe('licence inventory', () => {
     ['iicrc-code', GUIDE_PDF, 'Odor Control Technician OCT Specialist skill for fire damage.'],
     ['count-claim', GUIDE_PDF, 'Staff: 14 (8 technicians, 3 project managers, 3 admin)'],
     ['CEC', HERO, 'IICRC CEC Accredited courses (27)'],
-    ['certif', HERO, 'CARSI does not sell IICRC ' + 'certification courses.'],
+    ['certif', PUBLIC, 'CARSI does not sell IICRC ' + 'certification courses.'],
     [
       'certif',
       COST_PAGE,

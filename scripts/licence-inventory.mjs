@@ -120,8 +120,13 @@ const IICRC_CERT_OFFER_ANY_DISTANCE = new RegExp(
 );
 // Only CARSI denying the offer, immediately before it, negates it; a stray "no" or "not"
 // earlier in the sentence does not (review of b4af1171: "No waiting for your IICRC ...").
+// "does not sell only ..." is a not-only offer, not a denial (review of c4f98bcc).
 const CERT_OFFER_DENIED =
-  /\b(?:does|do|did|will|can)(?:\s+not|n['’]t)\s+(?:sell|offer|deliver|provide|award|issue|teach|run)(?:\s+[\w’'-]+){0,2}\s*$/i;
+  /\b(?:does|do|did|will|can)(?:\s+not|n['’]t)\s+(?:sell|offer|deliver|provide|award|issue|teach|run)(?:\s+(?!(?:only|just|merely|solely|exclusively|simply)\b)[\w’'-]+){0,2}\s*$/i;
+const CERT_OFFER_NOT_ONLY = /\b(?:also|as well|too|plus|but)\b/i;
+const certOfferDenied = (sentence, m) =>
+  CERT_OFFER_DENIED.test(sentence.slice(0, m.index)) &&
+  !CERT_OFFER_NOT_ONLY.test(sentence.slice(m.index + m[0].length));
 const CODE_ALT = IICRC_CODES.join('|');
 
 /**
@@ -172,18 +177,19 @@ export const BLOCK_RULES = [
     terms: ['certif', 'iicrc-offer'],
     fn: (sentence) => {
       const m = IICRC_CERT_OFFER.exec(sentence);
-      return Boolean(m) && !CERT_OFFER_DENIED.test(sentence.slice(0, m.index));
+      return Boolean(m) && !certOfferDenied(sentence, m);
     },
   },
   {
     // The /courses page carries the GP-639 hero; on it no word limit applies, so a long run of
-    // modifiers cannot reach a third-person exemption (review of 6a1046e8).
+    // modifiers cannot reach a third-person exemption (review of 6a1046e8), and no denial
+    // wording exempts the sentence (review of c4f98bcc).
     name: 'CARSI offer of IICRC certification on /courses (no word limit)',
     terms: ['certif', 'iicrc-offer'],
     path: /^app\/\(public\)\/courses\/page\.tsx$/,
     fn: (sentence) => {
-      const m = IICRC_CERT_OFFER_ANY_DISTANCE.exec(sentence);
-      return Boolean(m) && !CERT_OFFER_DENIED.test(sentence.slice(0, m.index));
+      // no denial escape on the hero page: it has no reason to name the offer at all
+      return IICRC_CERT_OFFER_ANY_DISTANCE.test(sentence);
     },
   },
   {
