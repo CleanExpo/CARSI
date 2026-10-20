@@ -845,6 +845,13 @@ export function renderedRuns(file, text) {
     return ts.isJsxExpression(p) && isJsx(p.parent);
   };
 
+  // A template that a `+` chain, an enclosing template or a JSX tree already expands.
+  const inExpandedText = (node) => {
+    let p = node.parent;
+    while (ts.isParenthesizedExpression(p) || isChoice(p)) p = p.parent;
+    return isPlus(p) || ts.isTemplateSpan(p) || (ts.isJsxExpression(p) && isJsx(p.parent));
+  };
+
   const emit = (texts) => {
     for (const text of texts) runs.push({ line: root.line, text });
     if (root.overflow) runs.push({ line: root.line, text: '', overflow: true });
@@ -905,10 +912,15 @@ export function renderedRuns(file, text) {
         reactMode = false;
         emit(flatten(node));
       }
-    } else if (isPlus(node) && !isPlus(node.parent)) {
+    } else if (
+      (isPlus(node) && !isPlus(node.parent)) ||
+      (ts.isTemplateExpression(node) && !inExpandedText(node))
+    ) {
+      // A template outside JSX is copy too (`const headline = \`… ${wide ? 'a' : 'b'}\``, review
+      // of 42c32b79). Read with and without invisible characters, as JSX text is.
       root = { line: lineOf(node) };
       const v = alts(node, false);
-      if (v !== null) emit(v);
+      if (v !== null) emit([...new Set([...v, ...v.map(visible)])]);
     }
     ts.forEachChild(node, visit);
   };
