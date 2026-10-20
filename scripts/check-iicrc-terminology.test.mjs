@@ -704,6 +704,19 @@ const MUST_BLOCK_FILE = [
     'GP-654 conditional template as a branch',
     "const line = short ? 'CARSI' : `CARSI covers 7 IICRC ${wide ? 'disciplines' : 'topics'}.`;",
   ],
+  // Review of 4414fcac: an escape inside a string outside JSX hid the space it renders.
+  [
+    'GP-654 escaped newline in a metadata string',
+    'export const metadata = { description: "CARSI covers 7 IICRC\\ndisciplines." };',
+  ],
+  [
+    'GP-654 escaped letter in a string',
+    "const headline = 'CARSI covers 7 IICRC \\u0064isciplines.';",
+  ],
+  [
+    'GP-654 escaped newline in a default parameter',
+    "export function Hero({ line = 'CARSI covers 7 IICRC\\tdisciplines.' }) { return line; }",
+  ],
   [
     'GP-654 too many adjacent conditional variants fails closed',
     `<p>Restoration disciplines${"{a ? 'x' : 'y'}".repeat(12)}</p>`,
