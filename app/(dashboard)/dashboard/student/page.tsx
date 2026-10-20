@@ -208,6 +208,8 @@ export default function StudentDashboardPage() {
   const renewal = useRenewalSummary(Boolean(user));
   const cecProgress = renewalProgress(renewal, approvedCec);
   const cecLabel = formatCecHoursForDisplay(cecProgress.earned);
+  // The record shows every approved CEC; only the renewal card is limited to the period (GP-655).
+  const lifetimeCecLabel = formatCecHoursForDisplay(approvedCec);
   const resumeEnrollment = resume
     ? enrollments.find((e) => e.course_slug === resume.course_slug)
     : undefined;
@@ -238,7 +240,7 @@ export default function StudentDashboardPage() {
                   [inProgress.length, inProgress.length === 1 ? 'In progress' : 'In progress'],
                   [completed.length, completed.length === 1 ? 'Completed' : 'Completed'],
                   [certificates.length, certificates.length === 1 ? 'Certificate' : 'Certificates'],
-                  [cecLabel ?? '0', 'Approved CEC'],
+                  [lifetimeCecLabel ?? '0', 'Approved CEC'],
                 ] as const
               ).map(([value, label]) => (
                 <div key={label} className={`${inset} rounded-xl px-3 py-4`}>

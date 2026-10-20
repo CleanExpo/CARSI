@@ -293,6 +293,8 @@ export default function StudentCredentialsPage() {
   const renewal = useRenewalSummary(Boolean(user));
   const cecProgress = renewalProgress(renewal, approvedCec);
   const cecLabel = formatCecHoursForDisplay(cecProgress.earned);
+  // The record shows every approved CEC; only the renewal card is limited to the period (GP-655).
+  const lifetimeCecLabel = formatCecHoursForDisplay(approvedCec);
 
   return (
     <div className="learner-home -mx-4 w-[calc(100%+2rem)] min-w-0 space-y-10 px-4 pb-16 sm:-mx-6 sm:w-[calc(100%+3rem)] sm:px-6 lg:-mx-10 lg:w-[calc(100%+5rem)] lg:px-10">
@@ -323,7 +325,7 @@ export default function StudentCredentialsPage() {
               <div className={`${inset} rounded-xl px-4 py-5`}>
                 <dt className={`text-[11px] ${muted}`}>Approved IICRC CEC hours</dt>
                 <dd className={`mt-2 text-[2.2rem] leading-none tabular-nums ${heading}`}>
-                  {cecLabel ?? '0'}
+                  {lifetimeCecLabel ?? '0'}
                 </dd>
               </div>
             </dl>
