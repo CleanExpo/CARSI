@@ -11,6 +11,7 @@ Job address: ______________________   Date: ____/____/______   Technician: _____
 - [ ] SWMS and sign-on. PPE and fit test records.
 - [ ] Containment checks, negative air and smoke tests, with times.
 - [ ] Moisture map and daily drying log. Product use records and SDSs.
+- [ ] Contents inventory signed by the client, and written consent for anything disposed of.
 - [ ] Waste record. Post-remediation checks. Verification result in writing.
 - [ ] Handover note: what was found, removed and verified; what the client must do to keep it dry.
 - [ ] Wetting timeline recorded: when it got wet, how long it stayed wet, and the evidence.

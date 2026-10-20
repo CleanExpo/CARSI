@@ -10,9 +10,10 @@ Job address: ______________________   Date: ____/____/______   Technician: _____
 - [ ] Lead paint likely (before 1970) and you need to sand or cut it? Stop. Test the paint: sanding lead paint may be a notifiable lead process. Plan lead controls.
 - [ ] Water from a sewage source? Stop. Switch to the contaminated water procedure.
 - [ ] Growth in the air-conditioning unit or ducts? Stop. Isolate the system and refer to a licensed HVAC contractor (ducted systems: AS/NZS 3666 series). Low-level growth in a single split system is not complex mould under WA Health guidance (Feb 2024).
-- [ ] Affected area well over 10 m²? Stop. Re-scope as a large-loss job.
-- [ ] Structural damage (sagging ceiling, rotten bearers)? Stop. Call a builder or engineer.
+- [ ] Affected area well over 10 m², beyond this course's scope? Stop. Re-scope as a large-loss job.
+- [ ] Structural damage (sagging ceiling, rotten bearers)? Stop. Any load-bearing member that must come out needs a structural engineer.
 - [ ] Occupant very unwell or unable to leave? Stop. Talk to the client about relocation.
+- [ ] Occupant reports health problems, or you cannot tell how far contamination has spread? Recommend an independent assessor before work starts.
 - [ ] Record what you found, the time, and who you told.
 
 Notes:

@@ -12,7 +12,7 @@ Job address: ______________________   Date: ____/____/______   Technician: _____
 - [ ] SDS read: PPE, ventilation, first aid, storage. SDS on site.
 - [ ] Dilution from the label (mL per litre), area treated (m²) and amount used (mL).
 - [ ] Contact time from the label, and how it was achieved.
-- [ ] Occupants told; anyone with asthma or chemical sensitivity considered.
+- [ ] Client briefed before use and given the label and SDS. Client's written consent recorded. Anyone with asthma or chemical sensitivity considered.
 - [ ] Coatings only after verification. Date verified: ______.
 
 Notes:

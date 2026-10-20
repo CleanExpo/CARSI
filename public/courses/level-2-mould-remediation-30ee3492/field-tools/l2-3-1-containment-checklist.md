@@ -13,6 +13,7 @@ Job address: ______________________   Date: ____/____/______   Technician: _____
 - [ ] Floor protection laid along the clean path to the exit.
 - [ ] Signage at the entry: authorised entry only, respiratory protection required.
 - [ ] Start of each shift: walls draw inwards, all seams intact, airlock clean.
+- [ ] Manometer reading logged each shift (−5 Pa or more negative). Breach or lost pressure: stop work. Fix it and re-test, then log and report it.
 - [ ] Record each check with the time and your initials.
 
 Notes:

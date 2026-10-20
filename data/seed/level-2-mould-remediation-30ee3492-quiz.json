@@ -33,7 +33,7 @@
           ],
           "correctIndex": 2,
           "points": 1,
-          "explanation": "This course frames Level 2 as roughly 1–10 m² in a home or small building. Much larger areas are an escalation trigger and are scoped as large-loss work."
+          "explanation": "This course's scope is roughly 1–10 m² in a home or small building. The band sets what the course covers; the remediation response is set by the contamination Condition. Jobs well beyond the band are escalated and scoped as large-loss work."
         },
         {
           "questionText": "Which material is most likely to be colonised right through when it stays wet?",
@@ -306,16 +306,16 @@
           "explanation": "Plate ratings use a clean filter and no ducting. A loaded filter, long ducts and bends cut real airflow, sometimes by half, so plan on the real figure."
         },
         {
-          "questionText": "Smoke from a smoke pencil drifts out of the containment at the door flap. What do you check first?",
+          "questionText": "Smoke from a smoke pencil drifts out of the containment at the door flap. What do you do first?",
           "options": [
-            "The age of the house",
-            "Gaps in the film seals",
-            "The colour of the film",
-            "The client's latest power bill"
+            "Keep cutting and check it later",
+            "Stop work, then find the breach",
+            "Open the window for more air",
+            "Spray the film with some water"
           ],
           "correctIndex": 1,
           "points": 1,
-          "explanation": "Smoke drifting out means air is leaving the work area. Check in order: gaps in the film, a kinked or disconnected exhaust duct, a loaded pre-filter, and a door opened elsewhere."
+          "explanation": "Smoke drifting out means the containment has lost negative pressure. Stop work first. Then check in order: gaps in the film, a kinked or disconnected exhaust duct, a loaded pre-filter, and a door opened elsewhere. Restart only when the manometer shows the pressure is back, and log and report the breach."
         },
         {
           "questionText": "Which respirator does WA Health recommend for mould removal above about 1 m²?",
@@ -420,7 +420,7 @@
           ],
           "correctIndex": 2,
           "points": 1,
-          "explanation": "Mould on framing is mostly on and near the surface. HEPA vacuum, then wire brush or HEPA-shrouded sand, then damp wipe. Soft or rotten timber is a builder's call."
+          "explanation": "Mould on framing is mostly on and near the surface. HEPA vacuum, then wire brush or HEPA-shrouded sand, then damp wipe. Soft or rotten timber goes to a builder, and a load-bearing member that has to come out needs a structural engineer."
         },
         {
           "questionText": "Why should you not break plasterboard over your knee or drop it on the floor?",
@@ -597,7 +597,7 @@
           ],
           "correctIndex": 3,
           "points": 1,
-          "explanation": "Looking clean is your crew's own post-remediation check. Verification, ideally by an independent professional, confirms the area is back to normal, and the clearance is the written result."
+          "explanation": "Looking clean is one part of your crew's own post-remediation evaluation (PRE), with the cloth wipe, odour and dryness checks. Where an independent post-remediation verification (PRV) is needed, the assessor confirms the area is back to Condition 1, and the clearance is the written result."
         },
         {
           "questionText": "Who should verify a job with a newborn returning to the room?",

@@ -17,17 +17,17 @@
       },
       {
         "label": "Stop-and-escalate checks",
-        "description": "Every trigger answered with a reason. The 1996 build is before 2003, so asbestos is treated as possible: the plan stops before any cutting until suspect material is identified by a competent or licensed person. The vulnerable occupant is recognised and changes the plan.",
+        "description": "Every trigger answered with a reason. The 1996 build is before 2003, so asbestos is treated as possible: the plan stops before any cutting until suspect material is identified by a competent or licensed person. The vulnerable occupant is recognised and changes the plan. Because the occupant has a lung condition, the learner recommends that an independent assessor assesses the home before work starts.",
         "maxPoints": 10
       },
       {
         "label": "Scope in work order and metric",
-        "description": "Area in m², containment in m³, removal, cleaning, drying, verification and waste, in the order the work happens.",
+        "description": "Area in m², containment in m³, removal, cleaning, drying, verification and waste, in the order the work happens, with any Condition 2 assumption and its reasons stated.",
         "maxPoints": 20
       },
       {
         "label": "Negative air calculation",
-        "description": "Volume × air changes ÷ real (derated) airflow, with the exhaust point and a smoke-test plan.",
+        "description": "Volume × air changes (at least 4 per hour) ÷ real (derated) airflow, with the exhaust point, a manometer log against −5 Pa, a smoke-test plan and a stop-work rule for a breach.",
         "maxPoints": 15
       },
       {
