@@ -739,6 +739,15 @@ const MUST_BLOCK_FILE = [
     'GP-654 HTML comment inside a string',
     "const body = '<h2>CARSI covers 7 IICRC <!-- topic list --> disciplines.</h2>';",
   ],
+  // Review of bcd9b725: an inline element styled as a block starts a new line.
+  [
+    'GP-654 block-styled span beside a wbr',
+    'export const Copy = () => <h2><span className="block">CARSI covers 7 IICRC</span><span>disci<wbr title="word > break" />plines.</span></h2>;',
+  ],
+  [
+    'GP-654 block-styled span beside an inline split',
+    'export const Copy = () => <h2><span className="block">CARSI covers 7 IICRC</span><span>disci<b>plines</b>.</span></h2>;',
+  ],
   // Review of 4cd99e20: block elements start a new line; `<br>` written as a pair.
   [
     'GP-654 word across two divs with a wbr',
@@ -775,6 +784,10 @@ const MUST_PASS_FILE = [
     "const headline = `CARSI covers 7 restoration ${wide ? 'disciplines' : 'topics'}.`;",
   ],
   [
+    'a field and component named after IICRC disciplines',
+    'export const F = ({ course }) => <div><p>{course.iicrcDisciplines}</p><IICRCDisciplineMap /></div>;',
+  ],
+  [
     'a word that only starts like the banned one, split across an element',
     '<p>CARSI covers IICRC dis<span>cussion</span> topics.</p>',
   ],
@@ -806,6 +819,11 @@ for (const [name, src, block] of [
   ['GP-654 Markdown word split by emphasis', 'CARSI covers 7 IICRC dis**ci**plines.', true],
   ['GP-654 HTML comment in Markdown', 'CARSI covers 7 IICRC <!-- note --> disciplines.', true],
   ['GP-654 br and wbr in Markdown HTML', '<h2>CARSI covers 7 IICRC<br>disci<wbr>plines</h2>', true],
+  [
+    'GP-654 display-block spans and wbr in Markdown HTML',
+    '<h2><span style="display:block">CARSI covers 7 IICRC</span><span>disci<wbr>plines.</span></h2>',
+    true,
+  ],
   [
     'GP-654 divs and wbr in Markdown HTML',
     '<div>CARSI covers 7 IICRC</div><div>disci<wbr>plines</div>',
@@ -850,6 +868,11 @@ for (const [name, src, block] of [
   [
     'GP-654 split word across HTML tags in seed contentBody',
     '{"contentBody": "<p>CARSI covers 7 IICRC dis<b>ci</b>plines.</p>"}',
+    true,
+  ],
+  [
+    'GP-654 display-block spans and wbr in seed contentBody',
+    '{"contentBody": "<h2><span style=\\"display:block\\">CARSI covers 7 IICRC</span><span>disci<wbr>plines.</span></h2>"}',
     true,
   ],
   [
