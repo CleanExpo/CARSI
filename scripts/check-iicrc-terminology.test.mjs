@@ -741,6 +741,22 @@ const MUST_BLOCK_FILE = [
   ],
   // Review of 1c70746b: title-case Disciplines after a CSS-upper-cased iicrc.
   [
+    'GP-654 half a dozen before the singular',
+    'export const metadata = { description: "CARSI covers half a dozen IICRC discipline areas." };',
+  ],
+  [
+    'GP-654 a dozen with a modifier before the singular',
+    'export const metadata = { description: "CARSI covers a dozen core IICRC discipline areas." };',
+  ],
+  [
+    'GP-654 a hyphenated half-dozen before the singular',
+    'export const Copy = () => <p>Train across a half-dozen IICRC discipline areas.</p>;',
+  ],
+  [
+    'GP-654 a few before the singular',
+    'export const metadata = { description: "CARSI covers a few key IICRC discipline areas." };',
+  ],
+  [
     'GP-654 a modifier between a spelled-out count and the singular',
     'export const metadata = { description: "CARSI covers one core IICRC discipline." };',
   ],
