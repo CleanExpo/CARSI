@@ -352,6 +352,8 @@ export function bannedRules(CODES = IICRC_CODE_ALT) {
                 /\b(?:IICRC(?=[Dd]iscipline\b|DISCIPLINE\b)|[Ii][Ii][Cc][Rr][Cc](?=discipline\b))/g,
                 '$& '
               )
+              // After a literal count ("7 iicrcDiscipline"), any case: a number is never the field.
+              .replace(/(?<=\b\d{1,3}\+?\s{1,8})(iicrc)(?=discipline\b)/gi, '$1 ')
               .split(/(?<=[.!?])\s+/)
               // trimEnd: the shapes end in an anchored tail that is quadratic on trailing
               // whitespace (review of 723bdce5, P2).
