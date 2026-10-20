@@ -1,0 +1,378 @@
+{
+  "version": 1,
+  "courseSlug": "fixture-standard-v1-passing",
+  "quizzes": [
+    {
+      "quizId": "00000000-0000-4000-8000-000000002001",
+      "lessonTitle": "Module 1 check",
+      "title": "Module 1 check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Fixture question 1: what do you compare a wet reading against?",
+          "options": [
+            "A dry reference on the same material",
+            "The reading from yesterday only",
+            "A number from the internet",
+            "Nothing"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A dry reference on the same material in an unaffected room tells you what dry looks like in this building."
+        },
+        {
+          "questionText": "Fixture question 2: what do you compare a wet reading against?",
+          "options": [
+            "A dry reference on the same material",
+            "The reading from yesterday only",
+            "A number from the internet",
+            "Nothing"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A dry reference on the same material in an unaffected room tells you what dry looks like in this building."
+        },
+        {
+          "questionText": "Fixture question 3: what do you compare a wet reading against?",
+          "options": [
+            "A dry reference on the same material",
+            "The reading from yesterday only",
+            "A number from the internet",
+            "Nothing"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A dry reference on the same material in an unaffected room tells you what dry looks like in this building."
+        },
+        {
+          "questionText": "Fixture question 4: what do you compare a wet reading against?",
+          "options": [
+            "A dry reference on the same material",
+            "The reading from yesterday only",
+            "A number from the internet",
+            "Nothing"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A dry reference on the same material in an unaffected room tells you what dry looks like in this building."
+        },
+        {
+          "questionText": "Fixture question 5: what do you compare a wet reading against?",
+          "options": [
+            "A dry reference on the same material",
+            "The reading from yesterday only",
+            "A number from the internet",
+            "Nothing"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A dry reference on the same material in an unaffected room tells you what dry looks like in this building."
+        },
+        {
+          "questionText": "Fixture question 6: what do you compare a wet reading against?",
+          "options": [
+            "A dry reference on the same material",
+            "The reading from yesterday only",
+            "A number from the internet",
+            "Nothing"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A dry reference on the same material in an unaffected room tells you what dry looks like in this building."
+        }
+      ]
+    },
+    {
+      "quizId": "00000000-0000-4000-8000-000000002002",
+      "lessonTitle": "Module 2 check",
+      "title": "Module 2 check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Fixture question 1: what do you compare a wet reading against?",
+          "options": [
+            "A dry reference on the same material",
+            "The reading from yesterday only",
+            "A number from the internet",
+            "Nothing"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A dry reference on the same material in an unaffected room tells you what dry looks like in this building."
+        },
+        {
+          "questionText": "Fixture question 2: what do you compare a wet reading against?",
+          "options": [
+            "A dry reference on the same material",
+            "The reading from yesterday only",
+            "A number from the internet",
+            "Nothing"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A dry reference on the same material in an unaffected room tells you what dry looks like in this building."
+        },
+        {
+          "questionText": "Fixture question 3: what do you compare a wet reading against?",
+          "options": [
+            "A dry reference on the same material",
+            "The reading from yesterday only",
+            "A number from the internet",
+            "Nothing"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A dry reference on the same material in an unaffected room tells you what dry looks like in this building."
+        },
+        {
+          "questionText": "Fixture question 4: what do you compare a wet reading against?",
+          "options": [
+            "A dry reference on the same material",
+            "The reading from yesterday only",
+            "A number from the internet",
+            "Nothing"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A dry reference on the same material in an unaffected room tells you what dry looks like in this building."
+        },
+        {
+          "questionText": "Fixture question 5: what do you compare a wet reading against?",
+          "options": [
+            "A dry reference on the same material",
+            "The reading from yesterday only",
+            "A number from the internet",
+            "Nothing"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A dry reference on the same material in an unaffected room tells you what dry looks like in this building."
+        },
+        {
+          "questionText": "Fixture question 6: what do you compare a wet reading against?",
+          "options": [
+            "A dry reference on the same material",
+            "The reading from yesterday only",
+            "A number from the internet",
+            "Nothing"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A dry reference on the same material in an unaffected room tells you what dry looks like in this building."
+        }
+      ]
+    },
+    {
+      "quizId": "00000000-0000-4000-8000-000000002003",
+      "lessonTitle": "Module 3 check",
+      "title": "Module 3 check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Fixture question 1: what do you compare a wet reading against?",
+          "options": [
+            "A dry reference on the same material",
+            "The reading from yesterday only",
+            "A number from the internet",
+            "Nothing"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A dry reference on the same material in an unaffected room tells you what dry looks like in this building."
+        },
+        {
+          "questionText": "Fixture question 2: what do you compare a wet reading against?",
+          "options": [
+            "A dry reference on the same material",
+            "The reading from yesterday only",
+            "A number from the internet",
+            "Nothing"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A dry reference on the same material in an unaffected room tells you what dry looks like in this building."
+        },
+        {
+          "questionText": "Fixture question 3: what do you compare a wet reading against?",
+          "options": [
+            "A dry reference on the same material",
+            "The reading from yesterday only",
+            "A number from the internet",
+            "Nothing"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A dry reference on the same material in an unaffected room tells you what dry looks like in this building."
+        },
+        {
+          "questionText": "Fixture question 4: what do you compare a wet reading against?",
+          "options": [
+            "A dry reference on the same material",
+            "The reading from yesterday only",
+            "A number from the internet",
+            "Nothing"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A dry reference on the same material in an unaffected room tells you what dry looks like in this building."
+        },
+        {
+          "questionText": "Fixture question 5: what do you compare a wet reading against?",
+          "options": [
+            "A dry reference on the same material",
+            "The reading from yesterday only",
+            "A number from the internet",
+            "Nothing"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A dry reference on the same material in an unaffected room tells you what dry looks like in this building."
+        },
+        {
+          "questionText": "Fixture question 6: what do you compare a wet reading against?",
+          "options": [
+            "A dry reference on the same material",
+            "The reading from yesterday only",
+            "A number from the internet",
+            "Nothing"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A dry reference on the same material in an unaffected room tells you what dry looks like in this building."
+        }
+      ]
+    },
+    {
+      "quizId": "00000000-0000-4000-8000-000000002004",
+      "lessonTitle": "Module 4 check",
+      "title": "Module 4 check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Fixture question 1: what do you compare a wet reading against?",
+          "options": [
+            "A dry reference on the same material",
+            "The reading from yesterday only",
+            "A number from the internet",
+            "Nothing"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A dry reference on the same material in an unaffected room tells you what dry looks like in this building."
+        },
+        {
+          "questionText": "Fixture question 2: what do you compare a wet reading against?",
+          "options": [
+            "A dry reference on the same material",
+            "The reading from yesterday only",
+            "A number from the internet",
+            "Nothing"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A dry reference on the same material in an unaffected room tells you what dry looks like in this building."
+        },
+        {
+          "questionText": "Fixture question 3: what do you compare a wet reading against?",
+          "options": [
+            "A dry reference on the same material",
+            "The reading from yesterday only",
+            "A number from the internet",
+            "Nothing"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A dry reference on the same material in an unaffected room tells you what dry looks like in this building."
+        },
+        {
+          "questionText": "Fixture question 4: what do you compare a wet reading against?",
+          "options": [
+            "A dry reference on the same material",
+            "The reading from yesterday only",
+            "A number from the internet",
+            "Nothing"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A dry reference on the same material in an unaffected room tells you what dry looks like in this building."
+        },
+        {
+          "questionText": "Fixture question 5: what do you compare a wet reading against?",
+          "options": [
+            "A dry reference on the same material",
+            "The reading from yesterday only",
+            "A number from the internet",
+            "Nothing"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A dry reference on the same material in an unaffected room tells you what dry looks like in this building."
+        },
+        {
+          "questionText": "Fixture question 6: what do you compare a wet reading against?",
+          "options": [
+            "A dry reference on the same material",
+            "The reading from yesterday only",
+            "A number from the internet",
+            "Nothing"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A dry reference on the same material in an unaffected room tells you what dry looks like in this building."
+        },
+        {
+          "questionText": "Fixture question 7: what do you compare a wet reading against?",
+          "options": [
+            "A dry reference on the same material",
+            "The reading from yesterday only",
+            "A number from the internet",
+            "Nothing"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A dry reference on the same material in an unaffected room tells you what dry looks like in this building."
+        },
+        {
+          "questionText": "Fixture question 8: what do you compare a wet reading against?",
+          "options": [
+            "A dry reference on the same material",
+            "The reading from yesterday only",
+            "A number from the internet",
+            "Nothing"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A dry reference on the same material in an unaffected room tells you what dry looks like in this building."
+        },
+        {
+          "questionText": "Fixture question 9: what do you compare a wet reading against?",
+          "options": [
+            "A dry reference on the same material",
+            "The reading from yesterday only",
+            "A number from the internet",
+            "Nothing"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A dry reference on the same material in an unaffected room tells you what dry looks like in this building."
+        },
+        {
+          "questionText": "Fixture question 10: what do you compare a wet reading against?",
+          "options": [
+            "A dry reference on the same material",
+            "The reading from yesterday only",
+            "A number from the internet",
+            "Nothing"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A dry reference on the same material in an unaffected room tells you what dry looks like in this building."
+        }
+      ]
+    }
+  ]
+}

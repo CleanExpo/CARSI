@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "exportedAt": "2026-10-20T00:00:00.000Z",
+  "publishedOnly": false,
+  "instructors": [],
+  "courses": [
+    {
+      "id": "00000000-0000-4000-8000-000000000005",
+      "slug": "fixture-standard-v1-failing",
+      "title": "Fixture: Thin Course",
+      "description": "Fixture course well below the floors.",
+      "shortDescription": "Thin fixture.",
+      "thumbnailUrl": null,
+      "instructorId": "00000000-0000-4000-8000-000000000009",
+      "status": "draft",
+      "priceAud": 0,
+      "isFree": true,
+      "durationHours": 4,
+      "level": "Foundational",
+      "category": "Water Damage Restoration",
+      "tags": ["fixture"],
+      "iicrcDiscipline": null,
+      "cecHours": 0,
+      "meta": {
+        "standard": "v1",
+        "standardLevel": "L1-foundation",
+        "rolePaths": ["water-and-drying"]
+      },
+      "isPublished": false,
+      "modules": [
+        {
+          "id": "00000000-0000-4000-8000-000000000006",
+          "title": "Only module",
+          "orderIndex": 0,
+          "lessons": [
+            {
+              "id": "00000000-0000-4000-8000-000000000007",
+              "title": "Only lesson",
+              "contentType": "text",
+              "contentBody": "<p>A short page of text with no structure.</p>",
+              "orderIndex": 0,
+              "isPreview": true,
+              "resources": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

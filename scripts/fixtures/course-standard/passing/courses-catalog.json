@@ -1,0 +1,256 @@
+{
+  "version": 1,
+  "exportedAt": "2026-10-20T00:00:00.000Z",
+  "publishedOnly": false,
+  "instructors": [],
+  "courses": [
+    {
+      "id": "00000000-0000-4000-8000-000000000001",
+      "slug": "fixture-standard-v1-passing",
+      "title": "Fixture: Moisture Readings Foundation",
+      "description": "Fixture course that meets every Course Standard v1 floor.",
+      "shortDescription": "Fixture course that meets every floor.",
+      "thumbnailUrl": null,
+      "instructorId": "00000000-0000-4000-8000-000000000009",
+      "status": "draft",
+      "priceAud": 0,
+      "isFree": true,
+      "durationHours": 1.5,
+      "level": "Foundational",
+      "category": "Water Damage Restoration",
+      "tags": ["fixture"],
+      "iicrcDiscipline": null,
+      "cecHours": 0,
+      "meta": {
+        "standard": "v1",
+        "standardLevel": "L1-foundation",
+        "rolePaths": ["water-and-drying"]
+      },
+      "isPublished": false,
+      "modules": [
+        {
+          "id": "00000000-0000-4000-8000-000000004001",
+          "title": "Module 1",
+          "orderIndex": 0,
+          "lessons": [
+            {
+              "id": "00000000-0000-4000-8000-000000001001",
+              "title": "Lesson 1.1",
+              "contentType": "text",
+              "contentBody": "<h2>On the job</h2><p>Lesson 1. A kitchen in Townsville flooded overnight when a flexible hose under the sink split. The owner found 10 mm of water across the vinyl at 6 am and called the insurer, who called you. Two children live in the house and the family wants to stay.</p><h2>The idea</h2><p>Moisture moves from wet materials to drier air. The drier the air around a wet wall, the faster the wall gives up its water. That is why a technician measures the air as well as the materials, and records both on every visit. A reading on its own means little; a reading compared with a dry reference in the same building tells you how far the job has to go. Pick a dry reference on the same material, in a room that was not affected, and write down where it is so the next visit uses the same spot.</p><p>Moisture moves from wet materials to drier air. The drier the air around a wet wall, the faster the wall gives up its water. That is why a technician measures the air as well as the materials, and records both on every visit. A reading on its own means little; a reading compared with a dry reference in the same building tells you how far the job has to go. Pick a dry reference on the same material, in a room that was not affected, and write down where it is so the next visit uses the same spot.</p><p>Moisture moves from wet materials to drier air. The drier the air around a wet wall, the faster the wall gives up its water. That is why a technician measures the air as well as the materials, and records both on every visit. A reading on its own means little; a reading compared with a dry reference in the same building tells you how far the job has to go. Pick a dry reference on the same material, in a room that was not affected, and write down where it is so the next visit uses the same spot.</p><p>Moisture moves from wet materials to drier air. The drier the air around a wet wall, the faster the wall gives up its water. That is why a technician measures the air as well as the materials, and records both on every visit. A reading on its own means little; a reading compared with a dry reference in the same building tells you how far the job has to go. Pick a dry reference on the same material, in a room that was not affected, and write down where it is so the next visit uses the same spot.</p><h2>See it</h2><p>The diagram shows where to take readings along the wall.</p><img src=\"/fixtures/wall-readings.svg\" alt=\"Reading points along a wet wall\" /><h2>Do it in metric</h2><p>The room is 4.0 m by 3.0 m, so the floor area is 12 m². At 2.4 m ceiling height the volume is 28.8 m³. A dehumidifier rated at 50 L/day at 30 °C and 80% RH will remove less water on a cooler day, so plan on about 30 L/day and check the logged readings each visit.</p><h2>Field download</h2><p>Download the moisture map card and fill in one row per reading point.</p><h2>Check yourself</h2><p>Answer the three questions in the module check before you move on.</p><h2>Takeaway</h2><p>Measure the air and the materials, compare with a dry reference, and write it down every visit. Next: setting a drying goal.</p>",
+              "orderIndex": 0,
+              "isPreview": true,
+              "resources": [
+                {
+                  "label": "Moisture map card (PDF)",
+                  "url": "/fixtures/moisture-map-card.pdf",
+                  "kind": "checklist"
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000001002",
+              "title": "Lesson 1.2",
+              "contentType": "text",
+              "contentBody": "<h2>On the job</h2><p>Lesson 2. A kitchen in Townsville flooded overnight when a flexible hose under the sink split. The owner found 10 mm of water across the vinyl at 6 am and called the insurer, who called you. Two children live in the house and the family wants to stay.</p><h2>The idea</h2><p>Moisture moves from wet materials to drier air. The drier the air around a wet wall, the faster the wall gives up its water. That is why a technician measures the air as well as the materials, and records both on every visit. A reading on its own means little; a reading compared with a dry reference in the same building tells you how far the job has to go. Pick a dry reference on the same material, in a room that was not affected, and write down where it is so the next visit uses the same spot.</p><p>Moisture moves from wet materials to drier air. The drier the air around a wet wall, the faster the wall gives up its water. That is why a technician measures the air as well as the materials, and records both on every visit. A reading on its own means little; a reading compared with a dry reference in the same building tells you how far the job has to go. Pick a dry reference on the same material, in a room that was not affected, and write down where it is so the next visit uses the same spot.</p><p>Moisture moves from wet materials to drier air. The drier the air around a wet wall, the faster the wall gives up its water. That is why a technician measures the air as well as the materials, and records both on every visit. A reading on its own means little; a reading compared with a dry reference in the same building tells you how far the job has to go. Pick a dry reference on the same material, in a room that was not affected, and write down where it is so the next visit uses the same spot.</p><p>Moisture moves from wet materials to drier air. The drier the air around a wet wall, the faster the wall gives up its water. That is why a technician measures the air as well as the materials, and records both on every visit. A reading on its own means little; a reading compared with a dry reference in the same building tells you how far the job has to go. Pick a dry reference on the same material, in a room that was not affected, and write down where it is so the next visit uses the same spot.</p><h2>See it</h2><p>The diagram shows where to take readings along the wall.</p><img src=\"/fixtures/wall-readings.svg\" alt=\"Reading points along a wet wall\" /><h2>Do it in metric</h2><p>The room is 4.0 m by 3.0 m, so the floor area is 12 m². At 2.4 m ceiling height the volume is 28.8 m³. A dehumidifier rated at 50 L/day at 30 °C and 80% RH will remove less water on a cooler day, so plan on about 30 L/day and check the logged readings each visit.</p><h2>Field download</h2><p>Download the moisture map card and fill in one row per reading point.</p><h2>Check yourself</h2><p>Answer the three questions in the module check before you move on.</p><h2>Takeaway</h2><p>Measure the air and the materials, compare with a dry reference, and write it down every visit. Next: setting a drying goal.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": [
+                {
+                  "label": "Moisture map card (PDF)",
+                  "url": "/fixtures/moisture-map-card.pdf",
+                  "kind": "checklist"
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000003001",
+              "title": "Module 1 check",
+              "contentType": "quiz",
+              "contentBody": "00000000-0000-4000-8000-000000002001",
+              "orderIndex": 2,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000004002",
+          "title": "Module 2",
+          "orderIndex": 1,
+          "lessons": [
+            {
+              "id": "00000000-0000-4000-8000-000000001003",
+              "title": "Lesson 2.1",
+              "contentType": "text",
+              "contentBody": "<h2>On the job</h2><p>Lesson 3. A kitchen in Townsville flooded overnight when a flexible hose under the sink split. The owner found 10 mm of water across the vinyl at 6 am and called the insurer, who called you. Two children live in the house and the family wants to stay.</p><h2>The idea</h2><p>Moisture moves from wet materials to drier air. The drier the air around a wet wall, the faster the wall gives up its water. That is why a technician measures the air as well as the materials, and records both on every visit. A reading on its own means little; a reading compared with a dry reference in the same building tells you how far the job has to go. Pick a dry reference on the same material, in a room that was not affected, and write down where it is so the next visit uses the same spot.</p><p>Moisture moves from wet materials to drier air. The drier the air around a wet wall, the faster the wall gives up its water. That is why a technician measures the air as well as the materials, and records both on every visit. A reading on its own means little; a reading compared with a dry reference in the same building tells you how far the job has to go. Pick a dry reference on the same material, in a room that was not affected, and write down where it is so the next visit uses the same spot.</p><p>Moisture moves from wet materials to drier air. The drier the air around a wet wall, the faster the wall gives up its water. That is why a technician measures the air as well as the materials, and records both on every visit. A reading on its own means little; a reading compared with a dry reference in the same building tells you how far the job has to go. Pick a dry reference on the same material, in a room that was not affected, and write down where it is so the next visit uses the same spot.</p><p>Moisture moves from wet materials to drier air. The drier the air around a wet wall, the faster the wall gives up its water. That is why a technician measures the air as well as the materials, and records both on every visit. A reading on its own means little; a reading compared with a dry reference in the same building tells you how far the job has to go. Pick a dry reference on the same material, in a room that was not affected, and write down where it is so the next visit uses the same spot.</p><h2>See it</h2><p>The diagram shows where to take readings along the wall.</p><img src=\"/fixtures/wall-readings.svg\" alt=\"Reading points along a wet wall\" /><h2>Do it in metric</h2><p>The room is 4.0 m by 3.0 m, so the floor area is 12 m². At 2.4 m ceiling height the volume is 28.8 m³. A dehumidifier rated at 50 L/day at 30 °C and 80% RH will remove less water on a cooler day, so plan on about 30 L/day and check the logged readings each visit.</p><h2>Field download</h2><p>Download the moisture map card and fill in one row per reading point.</p><h2>Check yourself</h2><p>Answer the three questions in the module check before you move on.</p><h2>Takeaway</h2><p>Measure the air and the materials, compare with a dry reference, and write it down every visit. Next: setting a drying goal.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": [
+                {
+                  "label": "Moisture map card (PDF)",
+                  "url": "/fixtures/moisture-map-card.pdf",
+                  "kind": "checklist"
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000001004",
+              "title": "Lesson 2.2",
+              "contentType": "text",
+              "contentBody": "<h2>On the job</h2><p>Lesson 4. A kitchen in Townsville flooded overnight when a flexible hose under the sink split. The owner found 10 mm of water across the vinyl at 6 am and called the insurer, who called you. Two children live in the house and the family wants to stay.</p><h2>The idea</h2><p>Moisture moves from wet materials to drier air. The drier the air around a wet wall, the faster the wall gives up its water. That is why a technician measures the air as well as the materials, and records both on every visit. A reading on its own means little; a reading compared with a dry reference in the same building tells you how far the job has to go. Pick a dry reference on the same material, in a room that was not affected, and write down where it is so the next visit uses the same spot.</p><p>Moisture moves from wet materials to drier air. The drier the air around a wet wall, the faster the wall gives up its water. That is why a technician measures the air as well as the materials, and records both on every visit. A reading on its own means little; a reading compared with a dry reference in the same building tells you how far the job has to go. Pick a dry reference on the same material, in a room that was not affected, and write down where it is so the next visit uses the same spot.</p><p>Moisture moves from wet materials to drier air. The drier the air around a wet wall, the faster the wall gives up its water. That is why a technician measures the air as well as the materials, and records both on every visit. A reading on its own means little; a reading compared with a dry reference in the same building tells you how far the job has to go. Pick a dry reference on the same material, in a room that was not affected, and write down where it is so the next visit uses the same spot.</p><p>Moisture moves from wet materials to drier air. The drier the air around a wet wall, the faster the wall gives up its water. That is why a technician measures the air as well as the materials, and records both on every visit. A reading on its own means little; a reading compared with a dry reference in the same building tells you how far the job has to go. Pick a dry reference on the same material, in a room that was not affected, and write down where it is so the next visit uses the same spot.</p><h2>See it</h2><p>The diagram shows where to take readings along the wall.</p><img src=\"/fixtures/wall-readings.svg\" alt=\"Reading points along a wet wall\" /><h2>Do it in metric</h2><p>The room is 4.0 m by 3.0 m, so the floor area is 12 m². At 2.4 m ceiling height the volume is 28.8 m³. A dehumidifier rated at 50 L/day at 30 °C and 80% RH will remove less water on a cooler day, so plan on about 30 L/day and check the logged readings each visit.</p><h2>Field download</h2><p>Download the moisture map card and fill in one row per reading point.</p><h2>Check yourself</h2><p>Answer the three questions in the module check before you move on.</p><h2>Takeaway</h2><p>Measure the air and the materials, compare with a dry reference, and write it down every visit. Next: setting a drying goal.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": [
+                {
+                  "label": "Moisture map card (PDF)",
+                  "url": "/fixtures/moisture-map-card.pdf",
+                  "kind": "checklist"
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000003002",
+              "title": "Module 2 check",
+              "contentType": "quiz",
+              "contentBody": "00000000-0000-4000-8000-000000002002",
+              "orderIndex": 2,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000004003",
+          "title": "Module 3",
+          "orderIndex": 2,
+          "lessons": [
+            {
+              "id": "00000000-0000-4000-8000-000000001005",
+              "title": "Lesson 3.1",
+              "contentType": "text",
+              "contentBody": "<h2>On the job</h2><p>Lesson 5. A kitchen in Townsville flooded overnight when a flexible hose under the sink split. The owner found 10 mm of water across the vinyl at 6 am and called the insurer, who called you. Two children live in the house and the family wants to stay.</p><h2>The idea</h2><p>Moisture moves from wet materials to drier air. The drier the air around a wet wall, the faster the wall gives up its water. That is why a technician measures the air as well as the materials, and records both on every visit. A reading on its own means little; a reading compared with a dry reference in the same building tells you how far the job has to go. Pick a dry reference on the same material, in a room that was not affected, and write down where it is so the next visit uses the same spot.</p><p>Moisture moves from wet materials to drier air. The drier the air around a wet wall, the faster the wall gives up its water. That is why a technician measures the air as well as the materials, and records both on every visit. A reading on its own means little; a reading compared with a dry reference in the same building tells you how far the job has to go. Pick a dry reference on the same material, in a room that was not affected, and write down where it is so the next visit uses the same spot.</p><p>Moisture moves from wet materials to drier air. The drier the air around a wet wall, the faster the wall gives up its water. That is why a technician measures the air as well as the materials, and records both on every visit. A reading on its own means little; a reading compared with a dry reference in the same building tells you how far the job has to go. Pick a dry reference on the same material, in a room that was not affected, and write down where it is so the next visit uses the same spot.</p><p>Moisture moves from wet materials to drier air. The drier the air around a wet wall, the faster the wall gives up its water. That is why a technician measures the air as well as the materials, and records both on every visit. A reading on its own means little; a reading compared with a dry reference in the same building tells you how far the job has to go. Pick a dry reference on the same material, in a room that was not affected, and write down where it is so the next visit uses the same spot.</p><h2>See it</h2><p>The diagram shows where to take readings along the wall.</p><img src=\"/fixtures/wall-readings.svg\" alt=\"Reading points along a wet wall\" /><h2>Do it in metric</h2><p>The room is 4.0 m by 3.0 m, so the floor area is 12 m². At 2.4 m ceiling height the volume is 28.8 m³. A dehumidifier rated at 50 L/day at 30 °C and 80% RH will remove less water on a cooler day, so plan on about 30 L/day and check the logged readings each visit.</p><h2>Field download</h2><p>Download the moisture map card and fill in one row per reading point.</p><h2>Check yourself</h2><p>Answer the three questions in the module check before you move on.</p><h2>Takeaway</h2><p>Measure the air and the materials, compare with a dry reference, and write it down every visit. Next: setting a drying goal.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": [
+                {
+                  "label": "Moisture map card (PDF)",
+                  "url": "/fixtures/moisture-map-card.pdf",
+                  "kind": "checklist"
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000001006",
+              "title": "Lesson 3.2",
+              "contentType": "text",
+              "contentBody": "<h2>On the job</h2><p>Lesson 6. A kitchen in Townsville flooded overnight when a flexible hose under the sink split. The owner found 10 mm of water across the vinyl at 6 am and called the insurer, who called you. Two children live in the house and the family wants to stay.</p><h2>The idea</h2><p>Moisture moves from wet materials to drier air. The drier the air around a wet wall, the faster the wall gives up its water. That is why a technician measures the air as well as the materials, and records both on every visit. A reading on its own means little; a reading compared with a dry reference in the same building tells you how far the job has to go. Pick a dry reference on the same material, in a room that was not affected, and write down where it is so the next visit uses the same spot.</p><p>Moisture moves from wet materials to drier air. The drier the air around a wet wall, the faster the wall gives up its water. That is why a technician measures the air as well as the materials, and records both on every visit. A reading on its own means little; a reading compared with a dry reference in the same building tells you how far the job has to go. Pick a dry reference on the same material, in a room that was not affected, and write down where it is so the next visit uses the same spot.</p><p>Moisture moves from wet materials to drier air. The drier the air around a wet wall, the faster the wall gives up its water. That is why a technician measures the air as well as the materials, and records both on every visit. A reading on its own means little; a reading compared with a dry reference in the same building tells you how far the job has to go. Pick a dry reference on the same material, in a room that was not affected, and write down where it is so the next visit uses the same spot.</p><p>Moisture moves from wet materials to drier air. The drier the air around a wet wall, the faster the wall gives up its water. That is why a technician measures the air as well as the materials, and records both on every visit. A reading on its own means little; a reading compared with a dry reference in the same building tells you how far the job has to go. Pick a dry reference on the same material, in a room that was not affected, and write down where it is so the next visit uses the same spot.</p><h2>See it</h2><p>The diagram shows where to take readings along the wall.</p><img src=\"/fixtures/wall-readings.svg\" alt=\"Reading points along a wet wall\" /><h2>Do it in metric</h2><p>The room is 4.0 m by 3.0 m, so the floor area is 12 m². At 2.4 m ceiling height the volume is 28.8 m³. A dehumidifier rated at 50 L/day at 30 °C and 80% RH will remove less water on a cooler day, so plan on about 30 L/day and check the logged readings each visit.</p><h2>Field download</h2><p>Download the moisture map card and fill in one row per reading point.</p><h2>Check yourself</h2><p>Answer the three questions in the module check before you move on.</p><h2>Takeaway</h2><p>Measure the air and the materials, compare with a dry reference, and write it down every visit. Next: setting a drying goal.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": [
+                {
+                  "label": "Moisture map card (PDF)",
+                  "url": "/fixtures/moisture-map-card.pdf",
+                  "kind": "checklist"
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000003003",
+              "title": "Module 3 check",
+              "contentType": "quiz",
+              "contentBody": "00000000-0000-4000-8000-000000002003",
+              "orderIndex": 2,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000004004",
+          "title": "Module 4",
+          "orderIndex": 3,
+          "lessons": [
+            {
+              "id": "00000000-0000-4000-8000-000000001007",
+              "title": "Lesson 4.1",
+              "contentType": "text",
+              "contentBody": "<h2>On the job</h2><p>Lesson 7. A kitchen in Townsville flooded overnight when a flexible hose under the sink split. The owner found 10 mm of water across the vinyl at 6 am and called the insurer, who called you. Two children live in the house and the family wants to stay.</p><h2>The idea</h2><p>Moisture moves from wet materials to drier air. The drier the air around a wet wall, the faster the wall gives up its water. That is why a technician measures the air as well as the materials, and records both on every visit. A reading on its own means little; a reading compared with a dry reference in the same building tells you how far the job has to go. Pick a dry reference on the same material, in a room that was not affected, and write down where it is so the next visit uses the same spot.</p><p>Moisture moves from wet materials to drier air. The drier the air around a wet wall, the faster the wall gives up its water. That is why a technician measures the air as well as the materials, and records both on every visit. A reading on its own means little; a reading compared with a dry reference in the same building tells you how far the job has to go. Pick a dry reference on the same material, in a room that was not affected, and write down where it is so the next visit uses the same spot.</p><p>Moisture moves from wet materials to drier air. The drier the air around a wet wall, the faster the wall gives up its water. That is why a technician measures the air as well as the materials, and records both on every visit. A reading on its own means little; a reading compared with a dry reference in the same building tells you how far the job has to go. Pick a dry reference on the same material, in a room that was not affected, and write down where it is so the next visit uses the same spot.</p><p>Moisture moves from wet materials to drier air. The drier the air around a wet wall, the faster the wall gives up its water. That is why a technician measures the air as well as the materials, and records both on every visit. A reading on its own means little; a reading compared with a dry reference in the same building tells you how far the job has to go. Pick a dry reference on the same material, in a room that was not affected, and write down where it is so the next visit uses the same spot.</p><h2>See it</h2><p>The diagram shows where to take readings along the wall.</p><img src=\"/fixtures/wall-readings.svg\" alt=\"Reading points along a wet wall\" /><h2>Do it in metric</h2><p>The room is 4.0 m by 3.0 m, so the floor area is 12 m². At 2.4 m ceiling height the volume is 28.8 m³. A dehumidifier rated at 50 L/day at 30 °C and 80% RH will remove less water on a cooler day, so plan on about 30 L/day and check the logged readings each visit.</p><h2>Field download</h2><p>Download the moisture map card and fill in one row per reading point.</p><h2>Check yourself</h2><p>Answer the three questions in the module check before you move on.</p><h2>Takeaway</h2><p>Measure the air and the materials, compare with a dry reference, and write it down every visit. Next: setting a drying goal.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": [
+                {
+                  "label": "Moisture map card (PDF)",
+                  "url": "/fixtures/moisture-map-card.pdf",
+                  "kind": "checklist"
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000001008",
+              "title": "Lesson 4.2",
+              "contentType": "text",
+              "contentBody": "<h2>On the job</h2><p>Lesson 8. A kitchen in Townsville flooded overnight when a flexible hose under the sink split. The owner found 10 mm of water across the vinyl at 6 am and called the insurer, who called you. Two children live in the house and the family wants to stay.</p><h2>The idea</h2><p>Moisture moves from wet materials to drier air. The drier the air around a wet wall, the faster the wall gives up its water. That is why a technician measures the air as well as the materials, and records both on every visit. A reading on its own means little; a reading compared with a dry reference in the same building tells you how far the job has to go. Pick a dry reference on the same material, in a room that was not affected, and write down where it is so the next visit uses the same spot.</p><p>Moisture moves from wet materials to drier air. The drier the air around a wet wall, the faster the wall gives up its water. That is why a technician measures the air as well as the materials, and records both on every visit. A reading on its own means little; a reading compared with a dry reference in the same building tells you how far the job has to go. Pick a dry reference on the same material, in a room that was not affected, and write down where it is so the next visit uses the same spot.</p><p>Moisture moves from wet materials to drier air. The drier the air around a wet wall, the faster the wall gives up its water. That is why a technician measures the air as well as the materials, and records both on every visit. A reading on its own means little; a reading compared with a dry reference in the same building tells you how far the job has to go. Pick a dry reference on the same material, in a room that was not affected, and write down where it is so the next visit uses the same spot.</p><p>Moisture moves from wet materials to drier air. The drier the air around a wet wall, the faster the wall gives up its water. That is why a technician measures the air as well as the materials, and records both on every visit. A reading on its own means little; a reading compared with a dry reference in the same building tells you how far the job has to go. Pick a dry reference on the same material, in a room that was not affected, and write down where it is so the next visit uses the same spot.</p><h2>See it</h2><p>The diagram shows where to take readings along the wall.</p><img src=\"/fixtures/wall-readings.svg\" alt=\"Reading points along a wet wall\" /><h2>Do it in metric</h2><p>The room is 4.0 m by 3.0 m, so the floor area is 12 m². At 2.4 m ceiling height the volume is 28.8 m³. A dehumidifier rated at 50 L/day at 30 °C and 80% RH will remove less water on a cooler day, so plan on about 30 L/day and check the logged readings each visit.</p><h2>Field download</h2><p>Download the moisture map card and fill in one row per reading point.</p><h2>Check yourself</h2><p>Answer the three questions in the module check before you move on.</p><h2>Takeaway</h2><p>Measure the air and the materials, compare with a dry reference, and write it down every visit. Next: setting a drying goal.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": [
+                {
+                  "label": "Moisture map card (PDF)",
+                  "url": "/fixtures/moisture-map-card.pdf",
+                  "kind": "checklist"
+                }
+              ]
+            },
+            {
+              "id": "00000000-0000-4000-8000-000000003004",
+              "title": "Module 4 check",
+              "contentType": "quiz",
+              "contentBody": "00000000-0000-4000-8000-000000002004",
+              "orderIndex": 2,
+              "isPreview": false,
+              "resources": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000005",
+      "slug": "fixture-legacy-unmarked",
+      "title": "Fixture: Thin Course",
+      "description": "Fixture course well below the floors.",
+      "shortDescription": "Thin fixture.",
+      "thumbnailUrl": null,
+      "instructorId": "00000000-0000-4000-8000-000000000009",
+      "status": "draft",
+      "priceAud": 0,
+      "isFree": true,
+      "durationHours": 4,
+      "level": "Foundational",
+      "category": "Water Damage Restoration",
+      "tags": ["fixture"],
+      "iicrcDiscipline": null,
+      "cecHours": 0,
+      "meta": {},
+      "isPublished": false,
+      "modules": [
+        {
+          "id": "00000000-0000-4000-8000-000000000006",
+          "title": "Only module",
+          "orderIndex": 0,
+          "lessons": [
+            {
+              "id": "00000000-0000-4000-8000-000000000007",
+              "title": "Only lesson",
+              "contentType": "text",
+              "contentBody": "<p>A short page of text with no structure.</p>",
+              "orderIndex": 0,
+              "isPreview": true,
+              "resources": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
