@@ -174,6 +174,25 @@ const MUST_BLOCK = [
   ['coverage + "you hold"', 'CARSI covers all IICRC disciplines you hold.'],
   ['coverage + "held by"', 'Our catalogue spans IICRC disciplines held by technicians.'],
   ['third-person catalogue mention', 'Browse courses by IICRC disciplines.'],
+  // Independent review of 395315bc: a learner benefit is still a catalogue claim…
+  ['learner benefit: at your pace', '<p>Explore seven IICRC disciplines at your pace.</p>'],
+  ['learner benefit: your own pace', 'Master all IICRC disciplines at your own pace.'],
+  ['learner benefit: you can study', 'You can study the IICRC disciplines online.'],
+  ['learner benefit: possessive + benefit verb', 'Master your IICRC disciplines with us.'],
+  ['learner benefit: no benefit verb, bare "you"', 'Seven IICRC disciplines, one login for you.'],
+  // …and rendered whitespace is still a space.
+  ['JSX space expression', '<p>CARSI covers 7 IICRC{" "}disciplines.</p>'],
+  ['JSX single-quoted space', "<p>CARSI covers 7 IICRC{' '}disciplines.</p>"],
+  ['JSX template space', '<p>CARSI covers 7 IICRC{` `}disciplines.</p>'],
+  ['JSX escaped no-break space', '<p>CARSI covers 7 IICRC{"\\u00a0"}disciplines.</p>'],
+  ['HTML &nbsp;', '<p>CARSI covers 7 IICRC&nbsp;disciplines.</p>'],
+  ['HTML &#160;', '<p>CARSI covers 7 IICRC&#160;disciplines.</p>'],
+  ['HTML &#xA0;', '<p>CARSI covers 7 IICRC&#xA0;disciplines.</p>'],
+  ['literal no-break space', 'CARSI covers 7 IICRC\u00a0disciplines.'],
+  ['narrow no-break space', 'CARSI covers 7 IICRC\u202fdisciplines.'],
+  ['zero-width space inside the word', 'CARSI covers 7 IICRC disci\u200bplines.'],
+  ['soft hyphen entity inside the word', 'CARSI covers 7 IICRC disci&shy;plines.'],
+  ['JSX space before a counted singular', '<p>{d} IICRC{" "}discipline{d === 1 ? "" : "s"}</p>'],
 ];
 
 const MUST_PASS = [
@@ -304,6 +323,7 @@ const MUST_PASS = [
   ['learner: a quantity of their own disciplines', 'Which of your seven IICRC disciplines need renewal?'],
   ['learner: all the disciplines they hold', 'Select all IICRC disciplines you hold.'],
   ['comment about learner data', '// Count all IICRC disciplines held by the learner.'],
+  ['comment: the learner\'s own disciplines', "// The learner's OWN IICRC disciplines: acronyms allowed here, titles still not."],
 ];
 
 let failed = 0;
@@ -333,6 +353,8 @@ const MUST_BLOCK_FILE = [
     'Earn a CARSI designation, with training that spans {disciplineCountLabel} IICRC\n            disciplines. Every certificate is issued with a verification record.',
   ],
   ['GP-654 count, IICRC and disciplines on three lines', '7\n<span>IICRC</span>\ndisciplines'],
+  ['GP-654 JSX space expression on its own line', 'CARSI covers 7 IICRC\n{" "}\ndisciplines.'],
+  ['GP-654 learner benefit across lines', '<p>\n  Explore seven IICRC disciplines\n  at your pace.\n</p>'],
 ];
 const MUST_PASS_FILE = [
   ['a code on one line, an unrelated word on the next', "disciplines={['WRT']}\ntraining: true,"],

@@ -94,11 +94,34 @@ function registryTitlesCarryingDesignations() {
   );
 }
 
-/** GP-654: a sentence about the learner's own IICRC disciplines… */
-const LEARNER_OWNED = /\b(?:you|your|yours|learner|learners|student|students)\b|\bheld\s+by\b/i;
-/** …unless it also talks about what CARSI offers. */
+/**
+ * GP-654: a sentence that positively names the learner's OWN IICRC disciplines — "your … IICRC
+ * disciplines", "the learner's own IICRC disciplines", "IICRC disciplines (that) you hold", "do you hold", "held by". A bare "you" or
+ * "your" elsewhere in the sentence is not enough ("Explore seven IICRC disciplines at your pace";
+ * review of 395315bc).
+ */
+const LEARNER_OWNED = new RegExp(
+  String.raw`\b(?:your|their|(?:learner|student|technician|user)s?['’]s?)\s+(?:[\w-]+\s+){0,2}IICRC\s+disciplines\b` +
+    String.raw`|\bIICRC\s+disciplines\s+(?:(?:that|which)\s+)?(?:do\s+)?(?:you|they|the\s+learner|learners?|students?)\s+(?:hold|held|have|maintain|renew|work|plan)\b` +
+    String.raw`|\bIICRC\s+disciplines\s+held\s+by\b`,
+  'i'
+);
+/** …and says nothing about what CARSI offers or what the learner will get from it. */
 const CATALOGUE_WORD =
-  /\b(?:CARSI|our|we|catalogue|catalog|courses?|training|programs?|programmes?|pathways?|modules?|across|spans?|spanning|cover\w*|offer\w*|teach\w*|taught|includ\w*)\b/i;
+  /\b(?:CARSI|our|we|catalogue|catalog|courses?|training|programs?|programmes?|pathways?|modules?|lessons?|across|spans?|spanning|cover\w*|offer\w*|teach\w*|taught|includ\w*|explor\w*|master\w*|learn(?!ers?\b)\w*|stud(?!ents?\b)\w*|discover\w*|unlock\w*|gain\w*|earn\w*|build\w*|develop\w*|enrol\w*|pace|online|anywhere)\b/i;
+/**
+ * Whitespace that renders as a space: JSX `{" "}` / `{' '}` expressions, HTML space
+ * entities, and the no-break / thin / zero-width characters (review of 395315bc).
+ */
+const RENDERED_SPACE = new RegExp(
+  String.raw`\{\s*(["'` +
+    '`' +
+    String.raw`])(?:\s|\\u00a0|\\xa0|\\u2009|\\u202f|&nbsp;)*\1\s*\}` +
+    String.raw`|&(?:nbsp|ensp|emsp|thinsp|hairsp|numsp|puncsp|NonBreakingSpace|#0*(?:32|160|8194|8195|8201|8239)|#x0*(?:20|a0|2002|2003|2009|202f));` +
+    String.raw`|[  -   　]`,
+  'gi'
+);
+const ZERO_WIDTH = /[​-‍⁠﻿­]|&(?:shy|ZeroWidthSpace|#0*(?:173|8203)|#x0*(?:ad|200b));/gi;
 
 // Banned selling/descriptive phrasings. Each must be something that implies
 // CARSI itself delivers IICRC courses or IICRC certification.
@@ -216,11 +239,14 @@ export function bannedRules(CODES = IICRC_CODE_ALT) {
       // Fail-closed by design. Two review rounds (6edff7f0, 3aec1af2) each found new spellings
       // of a coverage claim — reversed order, markup between the words, "all of your", three
       // lines of JSX — so this rule does not try to recognise claims. The plural phrase is
-      // banned outright on every scanned surface. The one exemption is a SENTENCE about the
-      // learner's own disciplines ("you", "your", "held by") that carries no CARSI, catalogue,
-      // course or coverage word; anything else, rephrase as "restoration disciplines".
+      // banned outright on every scanned surface. The one exemption is a SENTENCE that positively
+      // names the learner's own disciplines ("your IICRC disciplines", "IICRC disciplines you
+      // hold", "held by") and carries no CARSI, catalogue, course, coverage or learning-benefit
+      // word; anything else, rephrase as "restoration disciplines". (Round 3, 395315bc: any "you"
+      // or "your" exempted "Explore seven IICRC disciplines at your pace".)
       // A count in front of the singular ("7 IICRC discipline${s}") and a stat label are also
-      // banned. Markup is stripped first and up to three lines are read as one.
+      // banned. Zero-width characters are removed, rendered whitespace (`{" "}`, `&nbsp;`) becomes
+      // a space, markup is stripped, and up to three lines are read as one.
       re: new RegExp(
         String.raw`\bIICRC\s+disciplines\b` +
           String.raw`|(?<![\w.])(?:\d{1,3}\+?|\$\{[^}\n]{1,40}\}|\{[^}\n]{1,40}\})\s+IICRC\s+discipline\b` +
@@ -235,6 +261,8 @@ export function bannedRules(CODES = IICRC_CODE_ALT) {
       crossLine: 3,
       prepare: (line) =>
         line
+          .replace(ZERO_WIDTH, '')
+          .replace(RENDERED_SPACE, ' ')
           .replace(/<\/?[A-Za-z][^<>\n]{0,80}>/g, ' ')
           .split(/(?<=[.!?])\s+/)
           .filter((s) => !(LEARNER_OWNED.test(s) && !CATALOGUE_WORD.test(s)))
