@@ -684,13 +684,20 @@ const SCRIPT_KIND = {
  */
 // HTML written inside copy (seed contentBody, Markdown) renders without its comments and tags
 // (`<h2>… IICRC <!-- note --> disciplines</h2>`, `<span title="a > b">`; review of 58e106ae).
-// Quoted attribute values may hold `>`. A tag reads as nothing and as a break, as JSX does.
+// Quoted attribute values may hold `>`. A tag reads as nothing and as a break, as JSX does, and
+// once as a browser renders it: `<br>` a break, every other tag nothing
+// (`IICRC<br>disci<wbr>plines`, review of 4882b769).
 const HTML_COMMENT = /<!--[\s\S]*?-->/g;
 const HTML_TAG = /<\/?[A-Za-z][^>"']*(?:(?:"[^"]*"|'[^']*')[^>"']*)*>/g;
+const HTML_BR = /^<br\b/i;
 function htmlViews(t) {
   if (!t.includes('<')) return [];
   const c = t.replace(HTML_COMMENT, '');
-  return [c.replace(HTML_TAG, ''), c.replace(HTML_TAG, ' ')];
+  return [
+    c.replace(HTML_TAG, ''),
+    c.replace(HTML_TAG, ' '),
+    c.replace(HTML_TAG, (tag) => (HTML_BR.test(tag) ? ' ' : '')),
+  ];
 }
 
 export function renderedRuns(file, text) {
