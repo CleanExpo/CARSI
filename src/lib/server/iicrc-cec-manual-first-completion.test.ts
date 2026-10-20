@@ -22,6 +22,16 @@ vi.mock('@/lib/prisma', () => ({
       }),
     },
     lmsIicrcCecSubmission: { findUnique: vi.fn(async () => null) },
+    // Runs the callback on this client; a throw restores the row, as a rollback would.
+    async $transaction(fn: (tx: unknown) => Promise<unknown>) {
+      const before = state.enrollment && { ...state.enrollment };
+      try {
+        return await fn(this);
+      } catch (e) {
+        state.enrollment = before;
+        throw e;
+      }
+    },
   },
 }));
 
@@ -56,6 +66,25 @@ describe('manual IICRC send records the first completion (GP-659)', () => {
       manualSendIicrcCecForEnrollment({ enrollmentId: 'enr-1', studentId: 'stu-1' })
     ).rejects.toThrow();
     expect(state.enrollment?.status).toBe('completed');
-    expect(recordFirstCompletion).toHaveBeenCalledWith('enr-1', state.enrollment?.completedAt);
+    expect(recordFirstCompletion).toHaveBeenCalledWith(
+      'enr-1',
+      state.enrollment?.completedAt,
+      expect.anything(),
+    );
+  });
+
+  it('a failed first-completion write leaves the enrolment active, so a retry records it', async () => {
+    recordFirstCompletion.mockRejectedValueOnce(new Error('transient-db-failure'));
+    await expect(
+      manualSendIicrcCecForEnrollment({ enrollmentId: 'enr-1', studentId: 'stu-1' })
+    ).rejects.toThrow();
+    expect(state.enrollment?.status).toBe('active');
+    expect(state.enrollment?.completedAt).toBeNull();
+
+    await expect(
+      manualSendIicrcCecForEnrollment({ enrollmentId: 'enr-1', studentId: 'stu-1' })
+    ).rejects.toThrow();
+    expect(state.enrollment?.status).toBe('completed');
+    expect(recordFirstCompletion).toHaveBeenCalledTimes(2);
   });
 });

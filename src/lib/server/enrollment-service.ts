@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 
 import type { SessionClaims } from '@/lib/auth/session-jwt';
+import type { Prisma } from '@/generated/prisma/client';
 import { prisma } from '@/lib/prisma';
 import { getOrCreateCourseBySlug } from '@/lib/server/course-catalog-sync';
 import { ensureLmsUserFromClaims } from '@/lib/server/lms-user-sync';
@@ -200,10 +201,15 @@ export async function forceCompleteEnrollment(
 /**
  * Records the learner's first completion of the course, once. Never overwritten or cleared, so a
  * revocation, re-purchase or curriculum edit cannot move old learning into a later IICRC renewal
- * period (GP-659). Every writer that marks an enrolment completed calls this.
+ * period (GP-659). Every writer that marks an enrolment completed calls this inside the same
+ * transaction as the completion, so a failed history write rolls the completion back too.
  */
-export async function recordFirstCompletion(enrollmentId: string, at: Date): Promise<void> {
-  await prisma.lmsEnrollment.updateMany({
+export async function recordFirstCompletion(
+  enrollmentId: string,
+  at: Date,
+  db: Prisma.TransactionClient = prisma,
+): Promise<void> {
+  await db.lmsEnrollment.updateMany({
     where: { id: enrollmentId, firstCompletedAt: null },
     data: { firstCompletedAt: at },
   });
@@ -269,14 +275,18 @@ export async function syncEnrollmentCompletion(
   const newlyGatedCompletion = allLessonsDone && quizGateSatisfied && !wasAlreadyCompleted;
 
   const completedAt = isCompleted ? (prior?.completedAt ?? new Date()) : null;
-  await prisma.lmsEnrollment.update({
-    where: { id: enrollmentId },
-    data: {
-      status: isCompleted ? 'completed' : 'active',
-      completedAt,
-    },
+  // One transaction: if the first-completion write fails, the completion rolls back, so a retry
+  // is still a new completion and still triggers the IICRC auto-submit below.
+  await prisma.$transaction(async (tx) => {
+    await tx.lmsEnrollment.update({
+      where: { id: enrollmentId },
+      data: {
+        status: isCompleted ? 'completed' : 'active',
+        completedAt,
+      },
+    });
+    if (completedAt) await recordFirstCompletion(enrollmentId, completedAt, tx);
   });
-  if (completedAt) await recordFirstCompletion(enrollmentId, completedAt);
 
   if (newlyGatedCompletion && !options?.skipIicrcAutoSubmit) {
     const { processIicrcCecSubmissionForEnrollment } = await import(

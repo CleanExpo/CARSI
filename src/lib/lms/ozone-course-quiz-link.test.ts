@@ -80,6 +80,9 @@ vi.mock('@/lib/prisma', () => ({
     lmsQuizAttempt: {
       findMany: vi.fn(async () => state.passedQuizIds.map((quizId) => ({ quizId }))),
     },
+    async $transaction(fn: (tx: unknown) => Promise<unknown>) {
+      return fn(this);
+    },
   },
 }));
 

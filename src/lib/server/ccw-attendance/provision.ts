@@ -333,11 +333,14 @@ export async function finalizeAttendanceForSignIn(
   }
 
   const now = new Date();
-  const promoted = await prisma.lmsEnrollment.updateMany({
-    where: { id: enrollmentId, status: 'active' },
-    data: { status: 'completed', completedAt: now, certificateIssuedAt: now },
+  const promoted = await prisma.$transaction(async (tx) => {
+    const res = await tx.lmsEnrollment.updateMany({
+      where: { id: enrollmentId, status: 'active' },
+      data: { status: 'completed', completedAt: now, certificateIssuedAt: now },
+    });
+    if (res.count > 0) await recordFirstCompletion(enrollmentId, now, tx);
+    return res;
   });
-  if (promoted.count > 0) await recordFirstCompletion(enrollmentId, now);
 
   if (promoted.count === 0 && enrollment.status !== 'completed') {
     // Not active and not completed → terminal/revoked; never resurrect.

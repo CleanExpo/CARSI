@@ -650,14 +650,16 @@ async function ensureEnrollmentReadyForIicrcManual(enrollmentId: string): Promis
   if (row?.status === 'completed' && row.completedAt) return;
 
   const completedAt = row?.completedAt ?? new Date();
-  await prisma.lmsEnrollment.update({
-    where: { id: enrollmentId },
-    data: {
-      status: 'completed',
-      completedAt,
-    },
+  await prisma.$transaction(async (tx) => {
+    await tx.lmsEnrollment.update({
+      where: { id: enrollmentId },
+      data: {
+        status: 'completed',
+        completedAt,
+      },
+    });
+    await recordFirstCompletion(enrollmentId, completedAt, tx);
   });
-  await recordFirstCompletion(enrollmentId, completedAt);
 }
 
 async function loadSubmissionFailureReason(

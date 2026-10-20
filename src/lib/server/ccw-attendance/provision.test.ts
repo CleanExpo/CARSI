@@ -58,6 +58,16 @@ vi.mock('@/lib/prisma', () => ({
         return { count: 0 };
       }),
     },
+    // Runs the callback on this client; a throw restores the row, as a rollback would.
+    async $transaction(fn: (tx: unknown) => Promise<unknown>) {
+      const before = state.enrollment && { ...state.enrollment };
+      try {
+        return await fn(this);
+      } catch (e) {
+        state.enrollment = before;
+        throw e;
+      }
+    },
   },
 }));
 
@@ -151,7 +161,26 @@ describe('finalizeAttendanceForSignIn — certificate of attendance (no CEC)', (
     expect(state.enrollment?.status).toBe('completed');
     expect(state.enrollment?.certificateIssuedAt).not.toBeNull();
     // GP-659: the first completion is recorded with the same time.
-    expect(recordFirstCompletion).toHaveBeenCalledWith('enr-1', state.enrollment?.certificateIssuedAt);
+    expect(recordFirstCompletion).toHaveBeenCalledWith(
+      'enr-1',
+      state.enrollment?.certificateIssuedAt,
+      expect.anything(),
+    );
+  });
+
+  it('a failed first-completion write rolls the completion back so the retry still certifies (GP-659)', async () => {
+    const now = new Date();
+    state.signIn = { id: 'signin-1', day1CheckedInAt: now, day2CheckedInAt: now, enrollmentId: 'enr-1' };
+    state.enrollment = { id: 'enr-1', status: 'active', certificateIssuedAt: null };
+    recordFirstCompletion.mockRejectedValueOnce(new Error('transient-db-failure'));
+
+    await expect(finalizeAttendanceForSignIn('signin-1')).rejects.toThrow('transient-db-failure');
+    expect(state.enrollment?.status).toBe('active');
+    expect(state.enrollment?.certificateIssuedAt).toBeNull();
+
+    const result = await finalizeAttendanceForSignIn('signin-1');
+    expect(result.status).toBe('certified');
+    expect(recordFirstCompletion).toHaveBeenCalledTimes(2);
   });
 
   it('only one day (or no enrolment) → not_ready, no certificate written', async () => {
