@@ -122,6 +122,28 @@ const LEARNER_DATA_SENTENCE = [
   String.raw`which\s+of\s+(?:your|their)\s+(?:[\w-]+\s+)?IICRC\s+disciplines\s+(?:needs?\s+renewal|are\s+(?:due|expiring|current))`,
   String.raw`(?:select|choose|tick|pick|enter|add|list|update)\s+(?:all\s+)?(?:of\s+)?(?:the\s+)?(?:your\s+)?IICRC\s+disciplines\s+(?:(?:that|which)\s+)?you\s+${HOLD}`,
 ].map((body) => new RegExp(LEAD + body + TAIL, 'i'));
+/** Words that count or cover the singular "IICRC discipline" the way a number does. */
+const COUNT_WORDS = [
+  'one',
+  'two',
+  'three',
+  'four',
+  'five',
+  'six',
+  'seven',
+  'eight',
+  'nine',
+  'ten',
+  'eleven',
+  'twelve',
+  '(?:a\\s+)?single',
+  'multiple',
+  'several',
+  'many',
+  'every',
+  'each',
+].join('|');
+
 /** Something other than plain whitespace between "IICRC" and "disciplines": `{…}` or `&…;`. */
 const SEP = String.raw`(?:\{[^{}\n]{0,60}\}|\$\{[^{}\n]{0,60}\}|&[#\w]{1,30};)`;
 /**
@@ -320,6 +342,9 @@ export function bannedRules(CODES = IICRC_CODE_ALT) {
           // The singular with a computed ending ("discipline{s}", "discipline${s}").
           String.raw`|\bIICRC\s+discipline(?:\{|\$\{)` +
           String.raw`|(?<![\w.])(?:\d{1,3}\+?|\$\{[^}\n]{1,40}\}|\{[^}\n]{1,40}\})(?:\s|${SEP}){1,8}IICRC\s+discipline\b` +
+          // A count or coverage word in front of the singular ("CARSI offers one IICRC discipline",
+          // "a single IICRC discipline", "every IICRC discipline"; review of 3dee1845).
+          String.raw`|\b(?:${COUNT_WORDS})(?:\s|${SEP}){1,8}IICRC\s+discipline\b` +
           String.raw`|\blabel\s*:\s*['"` +
           '`' +
           String.raw`]IICRC\s+disciplines?['"` +

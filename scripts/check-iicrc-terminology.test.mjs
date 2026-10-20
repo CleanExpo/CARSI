@@ -741,6 +741,18 @@ const MUST_BLOCK_FILE = [
   ],
   // Review of 1c70746b: title-case Disciplines after a CSS-upper-cased iicrc.
   [
+    'GP-654 a spelled-out count before the singular',
+    'export const metadata = { description: "CARSI offers one IICRC discipline." };',
+  ],
+  [
+    'GP-654 a single IICRC discipline',
+    'export const metadata = { description: "CARSI offers a single IICRC discipline." };',
+  ],
+  [
+    'GP-654 every IICRC discipline',
+    'export const Copy = () => <p>Training in every IICRC discipline.</p>;',
+  ],
+  [
     'GP-654 a computed count before a glued title-case singular',
     'const count = 1;\nexport const Copy = () => <h2 className="uppercase"><span className="block">Pick from {count}{\' \'}iicrc</span><span>Disci<wbr />pline course.</span></h2>;',
   ],
