@@ -92,8 +92,20 @@ describe('renewal summary credits CEC only inside the approval window', () => {
     expect(s!.by_discipline_lifetime).toEqual({ General: 1 });
   });
 
+  it('follows the IICRC renewal rule: 14 CECs over the 4 years before the renewal date (GP-655)', async () => {
+    // iicrc.org/iicrcfaqs (read 20/10/2026): "14 CECs (hours) every four years". IN_WINDOW was
+    // completed 01/06/2025, 3.5 years before a 31/12/2028 renewal: inside a 4-year cycle, outside
+    // the 3-year one this summary used before.
+    h.user = { ...h.user, iicrcExpiryDate: new Date('2028-12-31T00:00:00Z') };
+    const s = await getRenewalSummaryForStudent('user-1');
+    expect(s!.cec_required).toBe(14);
+    expect(s!.cycle_start).toBe('2024-12-31T00:00:00.000Z');
+    expect(s!.cycle_end).toBe('2028-12-31T23:59:59.999Z');
+    expect(s!.cec_earned_in_cycle).toBe(1);
+  });
+
   it('cycle total excludes in-cycle completions outside the approval window', async () => {
-    // Cycle 31/12/2024 – 31/12/2027 holds AFTER_LAPSE, CURRENT_BEFORE_GRANT and IN_WINDOW.
+    // Cycle 31/12/2023 – 31/12/2027 holds all four completions; only IN_WINDOW was in force.
     h.user = { ...h.user, iicrcExpiryDate: new Date('2027-12-31T00:00:00Z') };
     const s = await getRenewalSummaryForStudent('user-1');
     expect(s!.tracking_mode).toBe('cycle');

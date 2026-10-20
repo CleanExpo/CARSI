@@ -1,4 +1,11 @@
-export const RENEWAL_CEC_REQUIRED = 8;
+/**
+ * IICRC renewal rule for standard technician certifications: "14 CECs (hours) every four years"
+ * (iicrc.org/iicrcfaqs, read 20/10/2026). Master and Inspector certifications need 14 every two
+ * years; the learner's level is not recorded yet, so the summary uses the standard window and the
+ * cockpit says so (GP-655).
+ */
+export const RENEWAL_CEC_REQUIRED = 14;
+export const RENEWAL_CYCLE_YEARS = 4;
 
 export interface RenewalCourseSuggestion {
   id: string;

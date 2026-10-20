@@ -8,12 +8,12 @@ import type {
   RenewalSummaryPayload,
   RenewalTrackingMode,
 } from '@/types/renewal';
-import { RENEWAL_CEC_REQUIRED } from '@/types/renewal';
+import { RENEWAL_CEC_REQUIRED, RENEWAL_CYCLE_YEARS } from '@/types/renewal';
 
 export type { RenewalCourseSuggestion, RenewalSummaryPayload, RenewalTrackingMode };
 export { RENEWAL_CEC_REQUIRED };
 
-const CYCLE_YEARS = 3;
+const CYCLE_YEARS = RENEWAL_CYCLE_YEARS;
 const URGENCY_DAYS = 90;
 
 function endOfUtcDay(d: Date): Date {
