@@ -914,10 +914,15 @@ export function renderedRuns(file, text) {
       }
     } else if (
       (isPlus(node) && !isPlus(node.parent)) ||
-      (ts.isTemplateExpression(node) && !inExpandedText(node))
+      ((ts.isTemplateExpression(node) ||
+        ts.isStringLiteral(node) ||
+        ts.isNoSubstitutionTemplateLiteral(node)) &&
+        !inExpandedText(node))
     ) {
-      // A template outside JSX is copy too (`const headline = \`… ${wide ? 'a' : 'b'}\``, review
-      // of 42c32b79). Read with and without invisible characters, as JSX text is.
+      // A template or string outside JSX is copy too (`const headline = \`… ${wide ? 'a' : 'b'}\``,
+      // review of 42c32b79), read as its value: the source line of `"IICRC\ndisciplines"` shows
+      // an escape, not the space it renders (review of 4414fcac). Read with and without
+      // invisible characters, as JSX text is.
       root = { line: lineOf(node) };
       const v = alts(node, false);
       if (v !== null) emit([...new Set([...v, ...v.map(visible)])]);
