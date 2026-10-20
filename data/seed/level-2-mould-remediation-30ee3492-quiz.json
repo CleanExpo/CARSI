@@ -118,6 +118,54 @@
           "correctIndex": 2,
           "points": 1,
           "explanation": "Growth in the air-conditioning system or ducts is an escalation trigger: isolate the system and escalate. The other findings are typical Level 2 scope items."
+        },
+        {
+          "questionText": "You find black, slimy growth on wet plasterboard paper behind a vanity. What goes in your report?",
+          "options": [
+            "Toxic mould, confirmed by its colour",
+            "Dark growth; genus needs lab analysis",
+            "Stachybotrys, identified by eye on site",
+            "Nothing, unless the client asks you"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Colour and texture overlap between moulds, and one patch can hold several. Describe what you saw (colour, texture, area, material, moisture reading) and leave the genus to an accredited lab analysing a tape lift, swab or air sample. \"Toxic\" is a health claim you cannot make."
+        },
+        {
+          "questionText": "A lab confirms Stachybotrys on the back of the plasterboard. What does that tell you about the job?",
+          "options": [
+            "The occupants have a proven mould illness",
+            "The air holds a measured toxin dose",
+            "The growth can be sprayed and left",
+            "The board has been wet for weeks"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Stachybotrys needs water activity above about 0.90 to 0.94, so finding it means cellulose stayed wet for a long time. Find the water source and check the material next to it. A genus result is not a toxin measurement or a diagnosis, and colonised board is removed, not sprayed."
+        },
+        {
+          "questionText": "A wall cavity smells musty but you can see no growth. What is the sensible next step?",
+          "options": [
+            "Trace the moisture and inspect the cavity",
+            "Mask the smell with an odour spray",
+            "Name the genus from the smell alone",
+            "Ignore it because no growth is visible"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A musty smell comes from gases (MVOCs) given off by growing mould, so something is probably growing out of sight. The gases are shared between species, so the smell cannot name the mould. Find the moisture and open up under dust controls to look."
+        },
+        {
+          "questionText": "Which surface is the most likely place to find Stachybotrys?",
+          "options": [
+            "Window frame with light morning condensation",
+            "Dry skirting in a sunny lounge",
+            "Painted ceiling in a well-aired bathroom",
+            "Plasterboard paper soaked for three weeks"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Stachybotrys is a tertiary coloniser: it needs very wet cellulose, such as the paper face of plasterboard after a leak or flood. Light condensation on a window frame suits low-water moulds such as Cladosporium instead."
         }
       ]
     },
