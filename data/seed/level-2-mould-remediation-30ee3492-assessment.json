@@ -17,7 +17,7 @@
       },
       {
         "label": "Stop-and-escalate checks",
-        "description": "Every trigger answered with a reason; the vulnerable occupant is recognised and changes the plan.",
+        "description": "Every trigger answered with a reason. The 1996 build is before 2003, so asbestos is treated as possible: the plan stops before any cutting until suspect material is identified by a competent or licensed person. The vulnerable occupant is recognised and changes the plan.",
         "maxPoints": 10
       },
       {
@@ -32,7 +32,7 @@
       },
       {
         "label": "Controls and respiratory protection",
-        "description": "Hierarchy of controls applied from the top down; respirator type stated with fit testing and the doffing order.",
+        "description": "Hierarchy of controls applied from the top down; respirator type stated and justified for removal above about 1 m² (a PAPR, or P3 with full face or hood), with fit testing and the doffing order.",
         "maxPoints": 15
       },
       {

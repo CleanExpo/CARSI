@@ -6,7 +6,7 @@ Australian-produced. Metric units. Use on site, then file it in the job record.
 
 Job address: ______________________   Date: ____/____/______   Technician: ______________________
 
-- [ ] Respirator type set in the SWMS for this job: P2 disposable, half-face P2, full-face P3 or powered.
+- [ ] Respirator type set in the SWMS for this job. P2 (disposable or half-face) only for small, low-disturbance work. Removal above about 1 m²: PAPR, or P3 with full face or hood (WA Health, Feb 2024).
 - [ ] Each wearer fit tested on this exact respirator model and size. Date of test recorded.
 - [ ] Clean-shaven where the respirator seals, or a loose-fitting powered respirator issued.
 - [ ] Fit check done each time the respirator is put on.

@@ -150,7 +150,7 @@ These restate the carsi-course-production skill. The skill is the full checklist
   practise (verb), -ise endings.
 - Power: 230 V, 50 Hz, 10 A GPO, RCD or safety switch, test-and-tag. All power maths at 230 V.
 - Metric units first. Imperial only in brackets after the metric value.
-- Products: available in Australia in 240 V form, with the date of the availability check.
+- Products: available in Australia in 230 V form, with the date of the availability check.
 - Standards and regulators: AS/NZS, Safe Work Australia, state WHS regulators and state EPAs.
 - Prices in AUD, with "inc GST" where it applies.
 - Australian places, climate, building types and job types in every scenario.

@@ -15,6 +15,7 @@ Job address: ______________________   Date: ____/____/______   Technician: _____
 - [ ] Verification: who verifies, what is checked, how the result is recorded.
 - [ ] Waste: bag count, weight estimate in kg, disposal point.
 - [ ] Assumptions and exclusions, written plainly.
+- [ ] Wetting timeline: when the water started, how long the material stayed wet, and the evidence for both.
 - [ ] Client sign-off: name, date, questions asked and answers given.
 
 Notes:

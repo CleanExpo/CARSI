@@ -13,6 +13,9 @@ Job address: ______________________   Date: ____/____/______   Technician: _____
 - [ ] Moisture map and daily drying log. Product use records and SDSs.
 - [ ] Waste record. Post-remediation checks. Verification result in writing.
 - [ ] Handover note: what was found, removed and verified; what the client must do to keep it dry.
+- [ ] Wetting timeline recorded: when it got wet, how long it stayed wet, and the evidence.
+- [ ] Rental: cause stated with evidence (building fault, occupant use or both). No legal ruling on who is responsible.
+- [ ] Report written in plain words: the homeowner can ask the insurer for a copy.
 - [ ] Client signature and date. Copy of clearance given.
 
 Notes:

@@ -6,8 +6,8 @@ Australian-produced. Metric units. Use on site, then file it in the job record.
 
 Job address: ______________________   Date: ____/____/______   Technician: ______________________
 
-- [ ] Council or waste facility rules checked for mould waste. Date checked: ______.
-- [ ] Asbestos waste kept completely separate (if any suspect material was found, work is paused).
+- [ ] Waste booked to a licensed skip or a facility that accepts it, not the client's bin. Facility and date checked: ______.
+- [ ] Asbestos waste kept completely separate and handled under state EPA rules (if any suspect material was found, work is paused).
 - [ ] Bags filled inside the containment to no more than 10 kg each.
 - [ ] Goose-neck seal: twist, fold, tape.
 - [ ] Outside of each bag HEPA vacuumed and damp wiped in the airlock; second bag added and sealed.

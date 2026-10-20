@@ -8,7 +8,7 @@ Job address: ______________________   Date: ____/____/______   Technician: _____
 
 - [ ] Job address, PCBU name, supervisor name and phone number.
 - [ ] Task steps in order: set up, contain, remove, clean, dry, verify, pack up.
-- [ ] Hazards for each step: spores and dust, sharp edges, manual handling, electrical, heat, chemicals, falls.
+- [ ] Hazards for each step: spores and dust, silica dust from cutting fibre cement, tile, grout or masonry, sharp edges, manual handling, electrical, heat, chemicals, falls.
 - [ ] Controls for each hazard, written from the top of the hierarchy down.
 - [ ] Respiratory protection type and the date each wearer was last fit tested.
 - [ ] Who may enter the work area, and the clear zone in metres outside it.

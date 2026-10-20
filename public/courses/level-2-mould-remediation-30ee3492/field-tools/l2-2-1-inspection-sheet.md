@@ -8,6 +8,7 @@ Job address: ______________________   Date: ____/____/______   Technician: _____
 
 - [ ] Outside: gutters, downpipes, roof, flashings, ground level against walls, subfloor vents. Note defects with photos.
 - [ ] Roof void (only if safe): daylight, sarking stains, wet insulation, bathroom exhaust ducting ending in the void.
+- [ ] Exhaust fans: does each one discharge outdoors? Bathroom with no window: is the fan on the light with a 10-minute run-on (NCC 2022 benchmark)?
 - [ ] Wet areas: shower recess grout and seals, vanity, toilet, laundry tub, kitchen sink and dishwasher.
 - [ ] Other rooms: ceilings near external walls, behind furniture, wardrobes, window reveals.
 - [ ] Subfloor (if present): standing water, damp soil, leaking pipes, blocked vents.

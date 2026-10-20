@@ -12,7 +12,7 @@ Job address: ______________________   Date: ____/____/______   Technician: _____
 - [ ] Where is the water coming from, and is it still active?
 - [ ] How long has it been wet? Ask the occupant, and note what they say.
 - [ ] Who lives or works here? Note infants, older people, anyone with a lung condition or weakened immune system.
-- [ ] Is the building likely to contain asbestos (built or renovated before 1990) or lead paint (before 1970)?
+- [ ] Could the building contain asbestos (built or renovated before 2003: asbestos was banned from 31 December 2003, so assume it is present and have it identified before disturbing materials) or lead paint (before 1970)?
 - [ ] Is the air-conditioning system in or near the affected area?
 - [ ] Photograph each item above with a scale (tape measure) in shot.
 

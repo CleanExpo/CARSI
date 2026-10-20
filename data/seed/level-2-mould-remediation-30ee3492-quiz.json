@@ -93,7 +93,7 @@
           ],
           "correctIndex": 0,
           "points": 1,
-          "explanation": "Homes built or renovated before 1990 may contain asbestos. Do not cut, drill or break a suspect sheet: stop and arrange sampling by a competent person."
+          "explanation": "Asbestos was banned from 31 December 2003, so assume any home built or renovated before 2003 contains it. Do not cut, drill or break a suspect sheet: stop and have it identified by a competent or licensed person."
         },
         {
           "questionText": "An occupant asks whether the mould caused her child's cough. What is the right response?",
@@ -318,16 +318,16 @@
           "explanation": "Smoke drifting out means air is leaving the work area. Check in order: gaps in the film, a kinked or disconnected exhaust duct, a loaded pre-filter, and a door opened elsewhere."
         },
         {
-          "questionText": "What is the minimum respiratory protection for most Level 2 removal?",
+          "questionText": "Which respirator does WA Health recommend for mould removal above about 1 m²?",
           "options": [
             "No respirator if the room's ventilated",
             "A paper nuisance-dust mask from hardware",
-            "Tight-fitting respirator with a P2 filter",
+            "PAPR, or P3 full-face or hood",
             "A loose cloth face mask only"
           ],
           "correctIndex": 2,
           "points": 1,
-          "explanation": "For most Level 2 removal the minimum is a tight-fitting respirator with a P2 filter, selected and used under AS/NZS 1715. The SWMS may set a higher level."
+          "explanation": "WA Health's February 2024 indoor mould guidance recommends a powered air-purifying respirator (PAPR) for mould removal above about 1 m², or a P3 respirator with a full face or hood where a PAPR is not available. A tight-fitting P2 is the minimum only for small work, and every tight-fitting respirator needs a fit test."
         },
         {
           "questionText": "A technician has a beard and is issued a tight-fitting half-face respirator. What is the problem?",
