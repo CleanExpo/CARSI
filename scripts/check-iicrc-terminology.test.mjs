@@ -741,6 +741,10 @@ const MUST_BLOCK_FILE = [
   ],
   // Review of 1c70746b: title-case Disciplines after a CSS-upper-cased iicrc.
   [
+    'GP-654 a counted singular with title-case Discipline across a wbr',
+    'export const Copy = () => <h2 className="uppercase"><span className="block">Pick from 1 iicrc</span><span>Disci<wbr />pline course.</span></h2>;',
+  ],
+  [
     'GP-654 lower-case iicrc then title-case Disciplines across a wbr',
     'export const Copy = () => <h2 className="uppercase"><span className="block">CARSI covers 7 iicrc</span><span>Disci<wbr title="word > break" />plines.</span></h2>;',
   ],
