@@ -289,7 +289,7 @@ describe('onboarding pathway copy (licence)', () => {
     for (const step of ONBOARDING_FLOW) {
       assertNoDesignationTitle(step.question);
       if (step.kind === 'multi') {
-        // The learner's OWN IICRC disciplines: acronyms allowed here, titles still not.
+        // The learner's OWN IICRC certifications: acronyms allowed here, titles still not.
         for (const option of step.options) assertNoDesignationTitle(option.label);
         continue;
       }

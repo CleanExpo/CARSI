@@ -64,7 +64,7 @@ export function HomeCertificationsSection({
             Credentials that hold up on the job site
           </h2>
           <p className={`mt-4 ${LANDING_LEAD_CLASS}`}>
-            Earn a CARSI designation, with training that spans {disciplineCountLabel} IICRC
+            Earn a CARSI designation, with training that spans {disciplineCountLabel} restoration
             disciplines. Every certificate is issued with a verification record.
           </p>
         </div>
