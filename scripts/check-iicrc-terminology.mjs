@@ -789,9 +789,25 @@ export function renderedRuns(file, text) {
     });
     return out;
   };
-  const NAMED_REFS = { nbsp: ' ', amp: '&', lt: '<', gt: '>', quot: '"', apos: "'" };
+  const NAMED_REFS = {
+    nbsp: ' ',
+    amp: '&',
+    lt: '<',
+    gt: '>',
+    quot: '"',
+    apos: "'",
+    shy: '­',
+    zwnj: '‌',
+    zwj: '‍',
+    zerowidthspace: '​',
+    nobreak: '⁠',
+  };
+  // Characters a browser does not show: a word split by a soft hyphen or a zero-width space reads
+  // as one word (review of c6c5a064). The source-line rules strip the same set.
+  const INVISIBLE = /[­​-‍⁠﻿]/g;
+  const visible = (t) => t.replace(INVISIBLE, '');
   const decodeRefs = (t) =>
-    t.replace(/&(#x[0-9a-f]{1,6}|#[0-9]{1,7}|[a-z]{2,8});/gi, (m, ref) => {
+    t.replace(/&(#x[0-9a-f]{1,6}|#[0-9]{1,7}|[a-z]{2,16});/gi, (m, ref) => {
       const code = /^#x/i.test(ref)
         ? parseInt(ref.slice(2), 16)
         : ref[0] === '#'
@@ -811,7 +827,9 @@ export function renderedRuns(file, text) {
       if (!node.expression) return [''];
       return alts(node.expression, true) ?? ['{x}'];
     }
-    if (ts.isJsxSelfClosingElement(node)) return [' '];
+    // As React renders it, an empty element adds no text (`dis<wbr />ciplines`, review of
+    // c6c5a064); the loose view keeps reading it as a break.
+    if (ts.isJsxSelfClosingElement(node)) return [reactMode ? '' : ' '];
     if (ts.isJsxElement(node) || ts.isJsxFragment(node)) {
       return node.children.reduce((acc, child) => cross(acc, flatten(child)), ['']);
     }
@@ -860,10 +878,16 @@ export function renderedRuns(file, text) {
       if (states.has(WORD.length) || ts.isJsxAttributes(n)) return;
       if (ts.isJsxText(n)) {
         const raw = n.getText(sf);
-        piece(raw, reactText(raw), decodeRefs(reactText(raw)));
-      } else if (ts.isStringLiteral(n) || ts.isNoSubstitutionTemplateLiteral(n)) piece(n.text);
-      else if (ts.isTemplateHead(n) || ts.isTemplateMiddle(n) || ts.isTemplateTail(n))
-        piece(n.text);
+        piece(raw, reactText(raw), visible(decodeRefs(reactText(raw))));
+      } else if (
+        ts.isStringLiteral(n) ||
+        ts.isNoSubstitutionTemplateLiteral(n) ||
+        ts.isTemplateHead(n) ||
+        ts.isTemplateMiddle(n) ||
+        ts.isTemplateTail(n)
+      ) {
+        piece(n.text, visible(n.text));
+      }
       ts.forEachChild(n, walk);
     };
     walk(node);
@@ -877,7 +901,7 @@ export function renderedRuns(file, text) {
       if (canSpell(node)) {
         root = { line: lineOf(node) };
         reactMode = true;
-        emit(flatten(node));
+        emit(flatten(node).map(visible));
         reactMode = false;
         emit(flatten(node));
       }

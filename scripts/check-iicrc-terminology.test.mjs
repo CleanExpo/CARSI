@@ -678,6 +678,19 @@ const MUST_BLOCK_FILE = [
     'GP-654 conditional inside a template substitution',
     "export const Copy = () => <p>{`CARSI covers 7 IICRC ${open ? 'disciplines' : 'topics'}.`}</p>;",
   ],
+  // Review of c6c5a064: an empty element and an invisible character inside a split word.
+  [
+    'GP-654 word split by a <wbr />',
+    'export const Copy = () => <p>CARSI covers 7 IICRC dis<wbr title="word > break" />ciplines.</p>;',
+  ],
+  [
+    'GP-654 soft hyphen inside a split word',
+    'export const Copy = () => <p>CARSI covers 7 IICRC disci<span title="subject > details">&shy;plines</span>.</p>;',
+  ],
+  [
+    'GP-654 soft hyphen escape in a string literal beside an element',
+    "export const Copy = () => <p>CARSI covers 7 IICRC <b>{'disci\\u00adplines'}</b>.</p>;",
+  ],
   [
     'GP-654 too many adjacent conditional variants fails closed',
     `<p>Restoration disciplines${"{a ? 'x' : 'y'}".repeat(12)}</p>`,
