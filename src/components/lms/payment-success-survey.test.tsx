@@ -139,7 +139,32 @@ function typeInto(selector: string, value: string) {
  * "Start lesson 1", and checks the completion request left with exactly what was typed.
  * Checking `disabled` flags alone passed with a non-interactive form (release-gate P1).
  */
+/**
+ * jsdom ignores `inert`, `aria-hidden` and disabled fieldsets when dispatching events, so a
+ * frozen form still "submits" in tests (release-gate P1, second round). Check the element and
+ * every ancestor for the attributes a real browser honours.
+ */
+function expectInteractive(selector: string) {
+  const el = container.querySelector<HTMLElement>(selector);
+  if (!el) throw new Error(`${selector} not rendered`);
+  expect((el as HTMLInputElement | HTMLButtonElement).disabled ?? false).toBe(false);
+  for (let node: HTMLElement | null = el; node; node = node.parentElement) {
+    expect(node.hasAttribute('inert'), `${selector} sits inside an inert element`).toBe(false);
+    expect(node.getAttribute('aria-hidden'), `${selector} sits inside aria-hidden`).not.toBe('true');
+    expect(node.hidden, `${selector} sits inside a hidden element`).toBe(false);
+    expect(node.style.pointerEvents, `${selector} has pointer-events none`).not.toBe('none');
+    if (node.tagName === 'FIELDSET') {
+      expect((node as HTMLFieldSetElement).disabled, `${selector} sits inside a disabled fieldset`).toBe(false);
+    }
+  }
+}
+
 async function passwordFormUsable() {
+  expectInteractive('#ps-full-name');
+  expectInteractive('#ps-password');
+  lessonButton().setAttribute('data-test-lesson', '1');
+  expectInteractive('[data-test-lesson="1"]');
+  lessonButton().removeAttribute('data-test-lesson');
   const before = completionPosts.length;
   typeInto('#ps-full-name', 'Test Guest');
   typeInto('#ps-password', 'a-long-test-password');
