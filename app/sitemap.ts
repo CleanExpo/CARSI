@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next';
 import { getBackendOrigin, getPublicSiteUrl } from '@/lib/env/public-url';
 import { authorityPath } from '@/lib/marketing/authority';
+import { authoritySitemapPaths } from '@/lib/marketing/authority-pages';
 import { ccwRoadshowPath } from '@/lib/marketing/ccw-roadshow';
 import { startSmartBasePath, startSmartPages } from '@/lib/marketing/start-smart';
 import { getPublishedCourseSlugsFromDatabase } from '@/lib/server/public-courses-list';
@@ -140,7 +141,16 @@ const professionalDirectoryPage = {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const directory = await getProfessionalDirectoryStatus();
-  const pages = directory.live ? [...staticPages, professionalDirectoryPage] : staticPages;
+  const basePages = directory.live ? [...staticPages, professionalDirectoryPage] : staticPages;
+  // /for/* authority pages are listed only once their registry entry is approved.
+  const pages = [
+    ...basePages,
+    ...authoritySitemapPaths().map((path) => ({
+      path,
+      priority: 0.6,
+      changeFreq: 'monthly' as const,
+    })),
+  ];
 
   // Static pages
   const staticEntries: MetadataRoute.Sitemap = pages.map((page) => ({
