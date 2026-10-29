@@ -205,8 +205,49 @@ function expectFormAsShipped(scope: Element, shippedHtml: string) {
   }
 }
 
+/**
+ * Release-gate P1, round four: an event handler (onKeyDown, onMouseDown, a capture listener
+ * on a wrapper) leaves the markup alone yet stops a real browser from typing or pressing.
+ * Fire the native events a browser fires for focus, typing and a click, and fail if any of
+ * them is cancelled or focus does not land. React listens at its root, so this reaches every
+ * handler on the control and on every wrapper, in both capture and bubble phases.
+ */
+function expectNothingCancels(el: HTMLElement, kind: 'text' | 'button') {
+  const fire = (event: Event) => {
+    let delivered = true;
+    act(() => {
+      delivered = el.dispatchEvent(event);
+    });
+    expect(delivered, `${event.type} on ${openTag(el)} was cancelled`).toBe(true);
+  };
+  const init = { bubbles: true, cancelable: true, composed: true };
+  fire(new PointerEvent('pointerdown', init));
+  fire(new MouseEvent('mousedown', init));
+  act(() => el.focus());
+  expect(document.activeElement, `${openTag(el)} did not take focus`).toBe(el);
+  fire(new PointerEvent('pointerup', init));
+  fire(new MouseEvent('mouseup', init));
+  if (kind === 'text') {
+    fire(new KeyboardEvent('keydown', { ...init, key: 'a' }));
+    // React's onBeforeInput listens to textInput where the browser has it, else keypress
+    // (with a character code); a real browser also fires native beforeinput. Fire all three.
+    fire(new KeyboardEvent('keypress', { ...init, key: 'a', charCode: 97, keyCode: 97, which: 97 } as KeyboardEventInit));
+    const textInput = new Event('textInput', init) as Event & { data: string };
+    textInput.data = 'a';
+    fire(textInput);
+    fire(new InputEvent('beforeinput', { ...init, data: 'a', inputType: 'insertText' }));
+    fire(new KeyboardEvent('keyup', { ...init, key: 'a' }));
+  } else {
+    fire(new KeyboardEvent('keydown', { ...init, key: 'Enter' }));
+    fire(new KeyboardEvent('keyup', { ...init, key: 'Enter' }));
+  }
+}
+
 async function passwordFormUsable() {
   expectFormAsShipped(container, readFileSync(GOLDEN, 'utf8'));
+  expectNothingCancels(container.querySelector<HTMLElement>('#ps-full-name')!, 'text');
+  expectNothingCancels(container.querySelector<HTMLElement>('#ps-password')!, 'text');
+  expectNothingCancels(lessonButton(), 'button');
   expectInteractive('#ps-full-name');
   expectInteractive('#ps-password');
   lessonButton().setAttribute('data-test-lesson', '1');
@@ -215,9 +256,13 @@ async function passwordFormUsable() {
   const before = completionPosts.length;
   typeInto('#ps-full-name', 'Test Guest');
   typeInto('#ps-password', 'a-long-test-password');
+  let clickDelivered = true;
   await act(async () => {
-    lessonButton().click();
+    clickDelivered = lessonButton().dispatchEvent(
+      new MouseEvent('click', { bubbles: true, cancelable: true, composed: true })
+    );
   });
+  expect(clickDelivered, 'click on Start lesson 1 was cancelled').toBe(true);
   for (let i = 0; i < 3; i += 1) {
     await act(async () => {
       await Promise.resolve();
