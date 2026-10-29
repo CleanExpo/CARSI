@@ -93,6 +93,37 @@ test.describe('payment-success guest form with the survey on', () => {
     expect(capture.survey).toHaveLength(1);
     await typeAndSubmit(page, capture);
   });
+
+  test('after a successful survey save: guest can type and submit @survey-on', async ({ page }) => {
+    const capture = await stubNetwork(page, 200);
+    await page.goto(PATH);
+    await page.getByRole('button', { name: 'Carpet or floor care' }).click();
+    await page.getByRole('button', { name: 'Send answers' }).click();
+    await expect(page.getByText('Thank you. Your answers help us decide')).toBeVisible();
+    expect(capture.survey).toHaveLength(1);
+    await typeAndSubmit(page, capture);
+  });
+
+  test('while the survey save is still sending: guest can type and submit @survey-on', async ({ page }) => {
+    const capture = await stubNetwork(page, 200);
+    // Hold the survey request open for the whole test so the survey stays in its sending state.
+    let release: () => void = () => {};
+    const held = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    await page.route('**/api/lms/checkout/survey', async (route) => {
+      capture.survey.push(route.request().postDataJSON());
+      await held;
+      await route.fulfill({ status: 200, json: { ok: true } }).catch(() => {});
+    });
+    await page.goto(PATH);
+    await page.getByRole('button', { name: 'Carpet or floor care' }).click();
+    await page.getByRole('button', { name: 'Send answers' }).click();
+    await expect(page.getByRole('button', { name: 'Sending…' })).toBeVisible();
+    await typeAndSubmit(page, capture);
+    await expect(page.getByRole('button', { name: 'Sending…' })).toBeVisible();
+    release();
+  });
 });
 
 test.describe('payment-success guest form with the survey off', () => {
