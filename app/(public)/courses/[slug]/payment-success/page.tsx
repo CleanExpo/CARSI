@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
+import { isPurchaseSurveyEnabled } from '@/lib/server/purchase-survey-flag';
 import { PaymentSuccessClient } from './PaymentSuccessClient';
 
 // Post-checkout utility page: never a search result (route-canonical.test.ts).
@@ -17,7 +18,7 @@ export default function PaymentSuccessPage() {
         </main>
       }
     >
-      <PaymentSuccessClient />
+      <PaymentSuccessClient surveyEnabled={isPurchaseSurveyEnabled()} />
     </Suspense>
   );
 }

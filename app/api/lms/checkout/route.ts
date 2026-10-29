@@ -46,6 +46,12 @@ import {
   tryRecordAttributedStage,
 } from '@/lib/server/event-attribution';
 import { parseUtmCookie, UTM_COOKIE_NAME } from '@/lib/analytics/utm-cookie';
+import {
+  FIRST_TOUCH_COOKIE_NAME,
+  firstTouchMetadata,
+  parseFirstTouchCookie,
+} from '@/lib/analytics/first-touch';
+import { isAttributionCaptureEnabled } from '@/lib/server/attribution-capture-flag';
 
 class AccountLookupUnavailable extends Error {}
 
@@ -72,6 +78,15 @@ export async function POST(request: NextRequest) {
     };
     const attributionJourneyId = readAttributionJourneyId(request);
     const utmMetadata = parseUtmCookie(request.cookies.get(UTM_COOKIE_NAME)?.value);
+    // First touch (slice 1a) is added only when the flag is on; off, metadata is unchanged.
+    const attributionMetadata: Record<string, string> = isAttributionCaptureEnabled()
+      ? {
+          ...utmMetadata,
+          ...firstTouchMetadata(
+            parseFirstTouchCookie(request.cookies.get(FIRST_TOUCH_COOKIE_NAME)?.value)
+          ),
+        }
+      : utmMetadata;
 
     const slug = typeof body.slug === 'string' ? body.slug.trim() : '';
     if (!slug) {
@@ -295,7 +310,7 @@ export async function POST(request: NextRequest) {
             customer_email: customerEmail,
             student_id: studentId,
             unit_amount_cents: cents,
-            extra_metadata: { ...utmMetadata, discount_id: disc.id },
+            extra_metadata: { ...attributionMetadata, discount_id: disc.id },
             guest_checkout: guestCheckout && !studentId,
             quantity: checkoutQuantity,
             purchase_mode: purchaseMode,
@@ -351,7 +366,7 @@ export async function POST(request: NextRequest) {
         purchase_mode: purchaseMode,
         team_seat_count: teamSeatCount ?? undefined,
         attribution_journey_id: attributionJourneyId ?? undefined,
-        extra_metadata: utmMetadata,
+        extra_metadata: attributionMetadata,
       });
       await tryRecordAttributedStage(attributionJourneyId, 'checkout_started', {
         courseSlug: slug,
