@@ -79,13 +79,20 @@ const InputSchema = z.object(
       .min(20, 'Provide a fuller outline (your own words, at least 20 characters)')
       .max(8000, maxChars(8000)),
     category: z.string(typeMessage('string')).trim().max(120, maxChars(120)).optional().default(''),
-    module_count: z.coerce
-      .number(typeMessage('number'))
-      // zod 4 .int() also rejects integers beyond Number.MAX_SAFE_INTEGER; zod 3 accepted any
-      // Number.isInteger value, so keep zod 3's rule and message.
-      .refine(Number.isInteger, 'Expected integer, received float')
-      .min(2, 'Number must be greater than or equal to 2')
-      .max(5, 'Number must be less than or equal to 5')
+    // zod 4's z.coerce swallows a throwing Number() (e.g. {"toString":null}) and reports a
+    // type error; zod 3 let it throw, which the route answers with its 500. Coerce by hand so
+    // the throw still escapes. ai-course-builder-differential.test.ts pins this against zod 3.
+    module_count: z
+      .preprocess(
+        (v) => Number(v),
+        z
+          .number(typeMessage('number'))
+          // zod 4 .int() also rejects integers beyond Number.MAX_SAFE_INTEGER; zod 3 accepted any
+          // Number.isInteger value, so keep zod 3's rule and message.
+          .refine(Number.isInteger, 'Expected integer, received float')
+          .min(2, 'Number must be greater than or equal to 2')
+          .max(5, 'Number must be less than or equal to 5')
+      )
       .default(3),
   },
   typeMessage('object')
