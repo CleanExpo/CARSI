@@ -38,16 +38,56 @@ export class AiCourseBuilderError extends Error {
   }
 }
 
-const InputSchema = z.object({
-  title: z.string().trim().min(3, 'Course title is too short').max(160),
-  course_outline: z
-    .string()
-    .trim()
-    .min(20, 'Provide a fuller outline (your own words, at least 20 characters)')
-    .max(8000),
-  category: z.string().trim().max(120).optional().default(''),
-  module_count: z.coerce.number().int().min(2).max(5).default(3),
-});
+// Validation messages reach API callers and the instructor AI-builder page
+// (parseAiCourseBuilderInput returns issues[0].message). zod 4 reworded its built-in
+// messages, so every message here is application-owned and reproduces the exact zod 3.25.76
+// text; src/lib/server/ai-course-builder-input.test.ts holds the parity table.
+function zod3ParsedType(input: unknown): string {
+  if (input === undefined) return 'undefined';
+  if (input === null) return 'null';
+  if (typeof input === 'number') return Number.isNaN(input) ? 'nan' : 'number';
+  if (Array.isArray(input)) return 'array';
+  return typeof input;
+}
+
+function typeMessage(expected: string) {
+  return {
+    error: (iss: { code: string; input?: unknown }): string | undefined => {
+      if (iss.code !== 'invalid_type') return undefined;
+      if (iss.input === undefined) return 'Required';
+      // zod 4 rejects +/-Infinity as a non-number; zod 3 reported it as a non-integer first.
+      if (expected === 'number' && (iss.input === Infinity || iss.input === -Infinity)) {
+        return 'Expected integer, received float';
+      }
+      return `Expected ${expected}, received ${zod3ParsedType(iss.input)}`;
+    },
+  };
+}
+
+const maxChars = (n: number) => `String must contain at most ${n} character(s)`;
+
+const InputSchema = z.object(
+  {
+    title: z
+      .string(typeMessage('string'))
+      .trim()
+      .min(3, 'Course title is too short')
+      .max(160, maxChars(160)),
+    course_outline: z
+      .string(typeMessage('string'))
+      .trim()
+      .min(20, 'Provide a fuller outline (your own words, at least 20 characters)')
+      .max(8000, maxChars(8000)),
+    category: z.string(typeMessage('string')).trim().max(120, maxChars(120)).optional().default(''),
+    module_count: z.coerce
+      .number(typeMessage('number'))
+      .int('Expected integer, received float')
+      .min(2, 'Number must be greater than or equal to 2')
+      .max(5, 'Number must be less than or equal to 5')
+      .default(3),
+  },
+  typeMessage('object')
+);
 
 export type AiCourseBuilderInput = z.infer<typeof InputSchema>;
 
