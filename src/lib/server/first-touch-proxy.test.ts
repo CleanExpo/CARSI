@@ -83,15 +83,25 @@ describe('flag on', () => {
     const value = header!.slice(FIRST_TOUCH_COOKIE_NAME.length + 1).split(';')[0];
     const ft = parseFirstTouchCookie(value);
     expect(ft?.ch).toBe('organic_search');
-    expect(ft?.ref).toBe('www.google.com');
-    expect(ft?.lp).toBe('/courses/moisture');
-    expect(header).not.toMatch(/secret|%40|email/);
+    expect(ft?.ref).toBe('google');
+    expect(ft?.lp).toBe('courses');
+    expect(header).not.toMatch(/secret|%40|email|moisture|www/);
     expect(res.headers.get('x-baseline')).toBe('1');
+  });
+
+  it('an identifying referrer subdomain is stored only as the category other', async () => {
+    const res = await proxy(
+      pageRequest('/for/twelve-queen-street', { referer: 'https://jane-smith.notion.site/notes' })
+    );
+    const header = firstTouchSetCookie(res)!;
+    const value = decodeURIComponent(header.slice(FIRST_TOUCH_COOKIE_NAME.length + 1).split(';')[0]);
+    expect(JSON.parse(value)).toMatchObject({ ch: 'referral', ref: 'other', lp: 'for' });
+    expect(header).not.toMatch(/jane|smith|notion|twelve|queen/);
   });
 
   it('T1a-7: never overwrites an existing first touch on a later page view', async () => {
     const existing = encodeURIComponent(
-      JSON.stringify({ ch: 'social', ref: 'www.linkedin.com', lp: '/', at: '2026-10-01' })
+      JSON.stringify({ ch: 'social', ref: 'linkedin', lp: 'home', at: '2026-10-01' })
     );
     const res = await proxy(
       pageRequest('/courses', {

@@ -322,6 +322,30 @@ describe('purchase survey capability cookie (Authority Machine slice 1b)', () =>
     expect(verifyPurchaseSurveyToken(token, 'cs_other', new Date())).toBe(false);
   });
 
+  it('two checkouts in one browser: starting B keeps A answerable', async () => {
+    process.env[FLAG] = 'true';
+    mocks.findUser.mockResolvedValue(null);
+    const { cookieAuthorisesSession } = await import('@/lib/server/purchase-survey-token');
+    const tokenOf = (res: Response) =>
+      decodeURIComponent(surveyCookie(res)!.slice('carsi_svy='.length).split(';')[0]);
+
+    mocks.createStripe.mockResolvedValueOnce({ checkout_url: 'https://checkout.stripe.test/a', checkout_session_id: 'cs_a' });
+    const resA = await POST(request({ slug: COURSE_SLUG, customer_email: 'new@example.test' }));
+    const cookieA = tokenOf(resA);
+
+    mocks.createStripe.mockResolvedValueOnce({ checkout_url: 'https://checkout.stripe.test/b', checkout_session_id: 'cs_b' });
+    const resB = await POST(
+      new NextRequest('https://carsi.example.test/api/lms/checkout', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', cookie: `carsi_svy=${encodeURIComponent(cookieA)}` },
+        body: JSON.stringify({ slug: 'odour-control', customer_email: 'new@example.test' }),
+      })
+    );
+    const cookieB = tokenOf(resB);
+    expect(cookieAuthorisesSession(cookieB, 'cs_a', new Date())).toBe(true);
+    expect(cookieAuthorisesSession(cookieB, 'cs_b', new Date())).toBe(true);
+  });
+
   it('flag on: the discounted path sets it too', async () => {
     process.env[FLAG] = 'true';
     mocks.verifySession.mockResolvedValue({ sub: 'user-disc' });
@@ -385,8 +409,8 @@ describe('first-touch attribution (Authority Machine slice 1a)', () => {
       utm_source: 'synthex',
       utm_medium: 'social',
       ft_ch: 'organic_search',
-      ft_ref: 'www.google.com',
-      ft_lp: '/courses/moisture',
+      ft_ref: 'google',
+      ft_lp: 'courses',
       ft_at: '2026-10-23',
     });
   });
@@ -402,8 +426,8 @@ describe('first-touch attribution (Authority Machine slice 1a)', () => {
     expect(res.status).toBe(200);
     expect(mocks.createStripe.mock.calls[0][0].extra_metadata).toEqual({
       ft_ch: 'organic_search',
-      ft_ref: 'www.google.com',
-      ft_lp: '/courses/moisture',
+      ft_ref: 'google',
+      ft_lp: 'courses',
       ft_at: '2026-10-23',
       discount_id: 'disc-1',
     });
@@ -470,11 +494,23 @@ describe('first-touch attribution (Authority Machine slice 1a)', () => {
     await POST(requestWithCookie({ slug: COURSE_SLUG, customer_email: 'new@example.test' }, `carsi_ft=${smuggled}`));
 
     const md = mocks.createStripe.mock.calls[0][0].extra_metadata as Record<string, string>;
-    expect(md.ft_lp).toBe('/courses/moisture');
-    expect(JSON.stringify(md)).not.toMatch(/secret|@|\?/);
+    expect(md.ft_lp).toBe('courses');
+    expect(md.ft_ref).toBe('google');
+    expect(JSON.stringify(md)).not.toMatch(/secret|@|\?|moisture/);
     for (const [key, value] of Object.entries(md)) {
       expect(key.length).toBeLessThanOrEqual(40);
       expect(value.length).toBeLessThanOrEqual(500);
     }
+  });
+
+  it('a planted old cookie with an identifying host and slug reaches Stripe only as tokens', async () => {
+    process.env[FLAG] = 'true';
+    mocks.findUser.mockResolvedValue(null);
+    const planted = encodeURIComponent(
+      JSON.stringify({ ch: 'referral', ref: 'jane-smith.notion.site', lp: '/for/twelve-queen-street', at: '2026-10-23' })
+    );
+    await POST(requestWithCookie({ slug: COURSE_SLUG, customer_email: 'new@example.test' }, `carsi_ft=${planted}`));
+    const md = mocks.createStripe.mock.calls[0][0].extra_metadata as Record<string, string>;
+    expect(md).toEqual({ ft_ch: 'referral', ft_ref: 'other', ft_lp: 'for', ft_at: '2026-10-23' });
   });
 });

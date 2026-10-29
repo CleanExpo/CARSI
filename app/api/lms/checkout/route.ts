@@ -57,7 +57,7 @@ import {
   PURCHASE_SURVEY_COOKIE_NAME,
   PURCHASE_SURVEY_COOKIE_PATH,
   PURCHASE_SURVEY_TOKEN_TTL_SECONDS,
-  signPurchaseSurveyToken,
+  nextPurchaseSurveyCookie,
 } from '@/lib/server/purchase-survey-token';
 
 class AccountLookupUnavailable extends Error {}
@@ -65,12 +65,13 @@ class AccountLookupUnavailable extends Error {}
 /**
  * The checkout reply. With the purchase survey on (slice 1b), it also carries the HttpOnly
  * capability cookie that lets this browser, and only this one, answer the survey for this
- * Stripe session. Off, the reply is exactly what it was.
+ * Stripe session (up to three recent checkouts are kept). Off, the reply is exactly what it was.
  */
 function checkoutStarted(checkout_url: string, checkoutSessionId: string, request: NextRequest) {
   const res = NextResponse.json({ checkout_url });
   if (isPurchaseSurveyEnabled()) {
-    res.cookies.set(PURCHASE_SURVEY_COOKIE_NAME, signPurchaseSurveyToken(checkoutSessionId), {
+    const previous = request.cookies.get(PURCHASE_SURVEY_COOKIE_NAME)?.value;
+    res.cookies.set(PURCHASE_SURVEY_COOKIE_NAME, nextPurchaseSurveyCookie(previous, checkoutSessionId), {
       httpOnly: true,
       secure: request.nextUrl.protocol === 'https:' || process.env.NODE_ENV === 'production',
       sameSite: 'lax',

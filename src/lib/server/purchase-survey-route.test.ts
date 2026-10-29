@@ -87,6 +87,13 @@ describe('authorisation: the browser that started checkout', () => {
     expect(stripe.retrieveSession).not.toHaveBeenCalled();
   });
 
+  it('a cookie holding several checkouts authorises each of them', async () => {
+    const { nextPurchaseSurveyCookie } = await import('@/lib/server/purchase-survey-token');
+    const both = nextPurchaseSurveyCookie(nextPurchaseSurveyCookie(undefined, SESSION), 'cs_test_later');
+    const res = await POST(post(GOOD, `${PURCHASE_SURVEY_COOKIE_NAME}=${encodeURIComponent(both)}`));
+    expect(res.status).toBe(200);
+  });
+
   it('forged cookie -> 403', async () => {
     const res = await POST(post(GOOD, `${PURCHASE_SURVEY_COOKIE_NAME}=9999999999.deadbeef`));
     expect(res.status).toBe(403);

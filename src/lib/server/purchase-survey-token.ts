@@ -32,6 +32,46 @@ export function signPurchaseSurveyToken(sessionId: string, now: Date = new Date(
   return `${exp}.${mac(sessionId, exp)}`;
 }
 
+/** At most this many checkouts are remembered; the oldest drops off. */
+export const PURCHASE_SURVEY_MAX_TOKENS = 3;
+/** Three tokens of at most 77 characters plus two separators. */
+export const PURCHASE_SURVEY_COOKIE_MAX_LENGTH = 240;
+const SEPARATOR = '~';
+const TOKEN_SHAPE = /^\d{1,12}\.[0-9a-f]{64}$/;
+
+function liveTokens(cookieValue: string | null | undefined, now: Date): string[] {
+  if (!cookieValue || cookieValue.length > 4096) return [];
+  const nowSeconds = Math.floor(now.getTime() / 1000);
+  return cookieValue
+    .split(SEPARATOR)
+    .filter((t) => TOKEN_SHAPE.test(t) && Number(t.split('.')[0]) >= nowSeconds)
+    .slice(0, PURCHASE_SURVEY_MAX_TOKENS);
+}
+
+/**
+ * The cookie value after starting a checkout: the new session's token first, then up to two
+ * still-live earlier ones, so starting checkout B does not lock checkout A out of its survey.
+ */
+export function nextPurchaseSurveyCookie(
+  existing: string | null | undefined,
+  sessionId: string,
+  now: Date = new Date()
+): string {
+  return [signPurchaseSurveyToken(sessionId, now), ...liveTokens(existing, now)]
+    .slice(0, PURCHASE_SURVEY_MAX_TOKENS)
+    .join(SEPARATOR);
+}
+
+/** True when any token in the cookie verifies for this session id. */
+export function cookieAuthorisesSession(
+  cookieValue: string | null | undefined,
+  sessionId: string,
+  now: Date = new Date()
+): boolean {
+  if (!cookieValue || cookieValue.length > PURCHASE_SURVEY_COOKIE_MAX_LENGTH) return false;
+  return liveTokens(cookieValue, now).some((t) => verifyPurchaseSurveyToken(t, sessionId, now));
+}
+
 export function verifyPurchaseSurveyToken(
   token: string | null | undefined,
   sessionId: string,

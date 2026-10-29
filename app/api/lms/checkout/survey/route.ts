@@ -19,8 +19,8 @@ import { getStripeClient } from '@/lib/api/stripe';
 import { surveyMetadata, validateSurvey } from '@/lib/marketing/purchase-survey';
 import { isPurchaseSurveyEnabled } from '@/lib/server/purchase-survey-flag';
 import {
+  cookieAuthorisesSession,
   PURCHASE_SURVEY_COOKIE_NAME,
-  verifyPurchaseSurveyToken,
 } from '@/lib/server/purchase-survey-token';
 
 const SESSION_ID_PATTERN = /^cs_[A-Za-z0-9_]{1,250}$/;
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ detail: validation.error }, { status: 400 });
   }
 
-  if (!verifyPurchaseSurveyToken(request.cookies.get(PURCHASE_SURVEY_COOKIE_NAME)?.value, sessionId)) {
+  if (!cookieAuthorisesSession(request.cookies.get(PURCHASE_SURVEY_COOKIE_NAME)?.value, sessionId)) {
     return NextResponse.json({ detail: 'Not allowed' }, { status: 403 });
   }
 
