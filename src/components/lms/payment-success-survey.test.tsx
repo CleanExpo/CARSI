@@ -58,6 +58,7 @@ let container: HTMLDivElement;
 let root: Root | null = null;
 let surveyPosts: Array<Record<string, unknown>>;
 let surveyResponse: () => Promise<Response>;
+let completionPosts: Array<Record<string, unknown>>;
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -70,6 +71,7 @@ beforeEach(() => {
   container = document.createElement('div');
   document.body.appendChild(container);
   surveyPosts = [];
+  completionPosts = [];
   surveyResponse = async () => jsonResponse({ saved: true });
   vi.stubGlobal(
     'fetch',
@@ -81,6 +83,11 @@ beforeEach(() => {
       if (url === '/api/lms/checkout/survey') {
         surveyPosts.push(JSON.parse(String(init?.body ?? '{}')) as Record<string, unknown>);
         return surveyResponse();
+      }
+      if (url === '/api/lms/enrollments/guest-complete') {
+        completionPosts.push(JSON.parse(String(init?.body ?? '{}')) as Record<string, unknown>);
+        // A refusal keeps the page in place (a success would navigate away, which jsdom cannot).
+        return jsonResponse({ detail: 'Stopped by the test after the request was sent' }, 400);
       }
       return jsonResponse({}, 404);
     })
@@ -117,12 +124,36 @@ function lessonButton(): HTMLButtonElement {
   return button;
 }
 
-function passwordFormUsable() {
-  const password = container.querySelector<HTMLInputElement>('#ps-password');
-  const name = container.querySelector<HTMLInputElement>('#ps-full-name');
-  expect(password?.disabled).toBe(false);
-  expect(name?.disabled).toBe(false);
-  expect(lessonButton().disabled).toBe(false);
+function typeInto(selector: string, value: string) {
+  const input = container.querySelector<HTMLInputElement>(selector);
+  if (!input) throw new Error(`${selector} not rendered`);
+  const setValue = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!;
+  act(() => {
+    setValue.call(input, value);
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+}
+
+/**
+ * Proves the guest can really finish setup: types a name and password, presses
+ * "Start lesson 1", and checks the completion request left with exactly what was typed.
+ * Checking `disabled` flags alone passed with a non-interactive form (release-gate P1).
+ */
+async function passwordFormUsable() {
+  const before = completionPosts.length;
+  typeInto('#ps-full-name', 'Test Guest');
+  typeInto('#ps-password', 'a-long-test-password');
+  await act(async () => {
+    lessonButton().click();
+  });
+  for (let i = 0; i < 3; i += 1) {
+    await act(async () => {
+      await Promise.resolve();
+    });
+  }
+  expect(completionPosts.slice(before)).toEqual([
+    { session_id: 'cs_test_guest', password: 'a-long-test-password', full_name: 'Test Guest' },
+  ]);
 }
 
 function clickButtonWithText(text: string) {
@@ -142,6 +173,11 @@ describe('payment-success guest screen with the survey flag off', () => {
     expect(container.innerHTML).toBe(readFileSync(GOLDEN, 'utf8'));
   });
 
+  it('a guest can type and submit the password form (completion request fires)', async () => {
+    await renderGuestSetup({ surveyEnabled: false });
+    await passwordFormUsable();
+  });
+
   it('is unchanged when the prop is absent', async () => {
     await renderGuestSetup({});
     expect(container.innerHTML).toBe(readFileSync(GOLDEN, 'utf8'));
@@ -157,13 +193,13 @@ describe('payment-success guest screen with the survey flag on', () => {
     expect(container.textContent).toContain('Optional. We use your answers to decide which courses to build.');
     const html = container.innerHTML;
     expect(html.indexOf('What work do you do?')).toBeLessThan(html.indexOf('ps-password'));
-    passwordFormUsable();
+    await passwordFormUsable();
   });
 
   it('T1b-7: tapping a choice leaves the password form usable', async () => {
     await renderGuestSetup({ surveyEnabled: true });
     clickButtonWithText('Commercial cleaning');
-    passwordFormUsable();
+    await passwordFormUsable();
   });
 
   it('T1b-7: tapping Skip hides the survey and leaves the password form usable', async () => {
@@ -171,7 +207,7 @@ describe('payment-success guest screen with the survey flag on', () => {
     clickButtonWithText('Skip');
     expect(container.textContent).not.toContain('What work do you do?');
     expect(surveyPosts).toHaveLength(0);
-    passwordFormUsable();
+    await passwordFormUsable();
   });
 
   it('T1b-6: a failed save never blocks Start lesson 1', async () => {
@@ -192,6 +228,6 @@ describe('payment-success guest screen with the survey flag on', () => {
         found_via: 'google_search',
       },
     ]);
-    passwordFormUsable();
+    await passwordFormUsable();
   });
 });
