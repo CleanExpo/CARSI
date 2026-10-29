@@ -159,7 +159,54 @@ function expectInteractive(selector: string) {
   }
 }
 
+function openTag(el: Element): string {
+  const attrs = Array.from(el.attributes)
+    .map((a) => `${a.name}=${JSON.stringify(a.value)}`)
+    .sort()
+    .join(' ');
+  return `<${el.tagName.toLowerCase()} ${attrs}>`;
+}
+
+/** The form's own markup plus the opening tag of every element that wraps it. */
+function formChain(scope: Element): { form: string; wrappers: string[] } {
+  const form = scope.querySelector('form');
+  if (!form) throw new Error('guest password form not rendered');
+  const wrappers: string[] = [];
+  for (let node = form.parentElement; node && node !== scope; node = node.parentElement) {
+    wrappers.push(openTag(node));
+  }
+  return { form: form.outerHTML, wrappers };
+}
+
+// Class tokens that let an element outside the form cover it or restyle it:
+// positioning (an overlay), stacking, and Tailwind arbitrary or sibling variants.
+const COVER_OR_RESTYLE = /^(fixed|absolute|sticky|inset-|-?top-|-?left-|-?right-|-?bottom-|z-|-?translate-|-m[tblrxy]?-)|&|~|^peer\b|^group\b/;
+
+/**
+ * Release-gate P1, whole class (three rounds: inert, CSS-hidden, read-only). jsdom applies
+ * no stylesheet and ignores inert, so typing and clicking prove nothing about whether a
+ * real browser would let the guest use the form. Instead: the form and everything wrapping
+ * it must be exactly the markup that shipped before the survey (the golden file), and
+ * nothing else on the screen may carry a style element or a class able to cover or restyle
+ * it. Any change that makes the form unusable has to change one of those.
+ */
+function expectFormAsShipped(scope: Element, shippedHtml: string) {
+  const shipped = document.createElement('div');
+  shipped.innerHTML = shippedHtml;
+  expect(formChain(scope)).toEqual(formChain(shipped));
+  expect(scope.querySelectorAll('style, link').length).toBe(shipped.querySelectorAll('style, link').length);
+  const form = scope.querySelector('form')!;
+  for (const el of Array.from(scope.querySelectorAll('*'))) {
+    if (form.contains(el) || el.contains(form)) continue;
+    expect(el.getAttribute('style'), `${openTag(el)} carries an inline style`).toBeNull();
+    for (const token of Array.from(el.classList)) {
+      expect(COVER_OR_RESTYLE.test(token), `${openTag(el)} has class ${token}`).toBe(false);
+    }
+  }
+}
+
 async function passwordFormUsable() {
+  expectFormAsShipped(container, readFileSync(GOLDEN, 'utf8'));
   expectInteractive('#ps-full-name');
   expectInteractive('#ps-password');
   lessonButton().setAttribute('data-test-lesson', '1');
@@ -254,5 +301,43 @@ describe('payment-success guest screen with the survey flag on', () => {
       },
     ]);
     await passwordFormUsable();
+  });
+});
+
+describe('the "form as shipped" check catches every way of making the form unusable', () => {
+  const shippedHtml = () => readFileSync(GOLDEN, 'utf8');
+  const surveyMarkup = '<section><p>What work do you do?</p></section>';
+
+  function screenWith(mutate: (scope: HTMLDivElement) => void): HTMLDivElement {
+    const scope = document.createElement('div');
+    scope.innerHTML = shippedHtml();
+    const form = scope.querySelector('form')!;
+    form.insertAdjacentHTML('beforebegin', surveyMarkup);
+    mutate(scope);
+    return scope;
+  }
+
+  it('passes the shipped form with a plain survey above it', () => {
+    expect(() => expectFormAsShipped(screenWith(() => {}), shippedHtml())).not.toThrow();
+  });
+
+  const mutants: Array<[string, (scope: HTMLDivElement) => void]> = [
+    ['inert form', (s) => s.querySelector('form')!.setAttribute('inert', '')],
+    ['read-only password', (s) => s.querySelector('#ps-password')!.setAttribute('readonly', '')],
+    ['disabled password', (s) => s.querySelector('#ps-password')!.setAttribute('disabled', '')],
+    ['CSS-hidden form', (s) => s.querySelector('form')!.classList.add('hidden')],
+    ['invisible button', (s) => s.querySelector('button[type="submit"]')!.classList.add('invisible')],
+    ['aria-hidden wrapper', (s) => s.querySelector('form')!.parentElement!.setAttribute('aria-hidden', 'true')],
+    ['inline display none', (s) => s.querySelector('form')!.setAttribute('style', 'display:none')],
+    ['wrapper pointer-events none', (s) => s.querySelector('form')!.parentElement!.classList.add('pointer-events-none')],
+    ['survey overlay', (s) => s.querySelector('section')!.setAttribute('class', 'fixed inset-0 z-50')],
+    ['survey sibling variant', (s) => s.querySelector('section')!.setAttribute('class', '[&~form]:hidden')],
+    ['survey stylesheet', (s) => s.querySelector('section')!.insertAdjacentHTML('beforeend', '<style>form{display:none}</style>')],
+    ['survey inline style', (s) => s.querySelector('section')!.setAttribute('style', 'position:fixed;inset:0')],
+    ['survey pulls up over the form', (s) => s.querySelector('section')!.setAttribute('class', '-mb-40')],
+  ];
+
+  it.each(mutants)('fails on: %s', (_name, mutate) => {
+    expect(() => expectFormAsShipped(screenWith(mutate), shippedHtml())).toThrow();
   });
 });
