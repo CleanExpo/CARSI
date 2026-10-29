@@ -75,12 +75,11 @@ describe('PurchaseSurvey', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it('shows a 60-character box only when Other is chosen', () => {
+  it('has no free-text box, even after choosing Other', () => {
     render('cs_test_1');
-    expect(container.querySelector('#svy-industry-other')).toBeNull();
     act(() => button('Other').click());
-    const box = container.querySelector<HTMLInputElement>('#svy-industry-other');
-    expect(box?.maxLength).toBe(60);
+    expect(button('Other').getAttribute('aria-pressed')).toBe('true');
+    expect(container.querySelectorAll('input, textarea')).toHaveLength(0);
   });
 
   it('sends the chosen values and thanks the buyer', async () => {

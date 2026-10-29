@@ -286,6 +286,60 @@ describe('campaign attribution', () => {
   });
 });
 
+describe('purchase survey capability cookie (Authority Machine slice 1b)', () => {
+  const FLAG = 'PURCHASE_SURVEY_ENABLED';
+
+  afterEach(() => {
+    delete process.env[FLAG];
+  });
+
+  function surveyCookie(res: Response): string | undefined {
+    return res.headers.getSetCookie().find((c) => c.startsWith('carsi_svy='));
+  }
+
+  it('flag off: the checkout response sets no cookie at all (unchanged)', async () => {
+    delete process.env[FLAG];
+    mocks.findUser.mockResolvedValue(null);
+    const res = await POST(request({ slug: COURSE_SLUG, customer_email: 'new@example.test' }));
+    expect(res.status).toBe(200);
+    expect(res.headers.getSetCookie()).toEqual([]);
+  });
+
+  it('flag on: sets an HttpOnly, Secure, SameSite=Lax 24 h cookie that verifies for the new session only', async () => {
+    process.env[FLAG] = 'true';
+    mocks.findUser.mockResolvedValue(null);
+    const res = await POST(request({ slug: COURSE_SLUG, customer_email: 'new@example.test' }));
+    expect(res.status).toBe(200);
+    const header = surveyCookie(res);
+    expect(header).toBeDefined();
+    expect(header).toContain('HttpOnly');
+    expect(header).toContain('Secure');
+    expect(header?.toLowerCase()).toContain('samesite=lax');
+    expect(header).toContain('Max-Age=86400');
+    const { verifyPurchaseSurveyToken } = await import('@/lib/server/purchase-survey-token');
+    const token = decodeURIComponent(header!.slice('carsi_svy='.length).split(';')[0]);
+    expect(verifyPurchaseSurveyToken(token, 'cs_new', new Date())).toBe(true);
+    expect(verifyPurchaseSurveyToken(token, 'cs_other', new Date())).toBe(false);
+  });
+
+  it('flag on: the discounted path sets it too', async () => {
+    process.env[FLAG] = 'true';
+    mocks.verifySession.mockResolvedValue({ sub: 'user-disc' });
+    mocks.findUser.mockResolvedValue({ id: 'user-disc', isActive: true });
+    mocks.findEnrollment.mockResolvedValue(null);
+    mocks.discount.mockResolvedValue({ id: 'disc-1', discountType: 'percent', value: 20 });
+    const res = await POST(
+      new NextRequest('https://carsi.example.test/api/lms/checkout', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', cookie: 'auth_token=tok' },
+        body: JSON.stringify({ slug: COURSE_SLUG, customer_email: 'member@example.test' }),
+      })
+    );
+    expect(res.status).toBe(200);
+    expect(surveyCookie(res)).toBeDefined();
+  });
+});
+
 describe('first-touch attribution (Authority Machine slice 1a)', () => {
   const FLAG = 'ATTRIBUTION_CAPTURE_ENABLED';
   const FIRST_TOUCH = { ch: 'organic_search', ref: 'www.google.com', lp: '/courses/moisture', at: '2026-10-23' };

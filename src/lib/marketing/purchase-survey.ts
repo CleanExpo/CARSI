@@ -1,10 +1,11 @@
 /**
  * Payment-success purchase survey (Authority Machine slice 1b): the two optional questions,
  * their allowlists, and validation. Answers are stored on the Stripe PaymentIntent metadata as
- * `svy_ind`, `svy_ind_other`, `svy_via`, `svy_via_other` and `svy_at`.
+ * `svy_ind`, `svy_via` and `svy_at`.
  *
- * Privacy (APP 3/5): only these choices are collected, the free-text "other" box is short and
- * cleaned, and anything that looks like contact details is refused rather than stored.
+ * Privacy (APP 3/5): controlled choices only. There is no free-text field: "Other" is stored as
+ * the word `other`, and any other field in the request is ignored, so nothing a buyer types can
+ * reach the payment record.
  */
 
 export interface SurveyOption {
@@ -40,40 +41,18 @@ export const FOUND_VIA_OPTIONS = [
 export type IndustryValue = (typeof INDUSTRY_OPTIONS)[number]['value'];
 export type FoundViaValue = (typeof FOUND_VIA_OPTIONS)[number]['value'];
 
-export const OTHER_TEXT_MAX_LENGTH = 60;
-
 export const SURVEY_PURPOSE_NOTICE =
   'Optional. We use your answers to decide which courses to build. We keep them with your order and never show them next to your name.';
 
 export interface SurveyAnswers {
   industry?: IndustryValue;
-  industry_other?: string;
   found_via?: FoundViaValue;
-  found_via_other?: string;
 }
 
 export type SurveyValidation = { ok: true; value: SurveyAnswers } | { ok: false; error: string };
 
 const INDUSTRY_VALUES: readonly string[] = INDUSTRY_OPTIONS.map((o) => o.value);
 const FOUND_VIA_VALUES: readonly string[] = FOUND_VIA_OPTIONS.map((o) => o.value);
-
-const CONTACT_DETAILS =
-  /@|https?:|www\.|\.(com|net|org|au|io|co)\b|\d[\d\s()+-]{6,}\d/i;
-
-/** Cleans free text, or returns null when it must not be stored (contact details). */
-function cleanOther(raw: unknown): string | null | undefined {
-  if (raw == null) return undefined;
-  if (typeof raw !== 'string') return null;
-  if (CONTACT_DETAILS.test(raw)) return null;
-  const cleaned = raw
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/[^A-Za-z0-9 ,.&'()/-]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .slice(0, OTHER_TEXT_MAX_LENGTH)
-    .trim();
-  return cleaned || undefined;
-}
 
 export function validateSurvey(input: unknown): SurveyValidation {
   if (!input || typeof input !== 'object' || Array.isArray(input)) {
@@ -87,11 +66,6 @@ export function validateSurvey(input: unknown): SurveyValidation {
       return { ok: false, error: 'Unknown answer for "What work do you do?".' };
     }
     value.industry = body.industry as IndustryValue;
-    if (value.industry === 'other') {
-      const other = cleanOther(body.industry_other);
-      if (other === null) return { ok: false, error: 'Please leave contact details out of your answer.' };
-      if (other) value.industry_other = other;
-    }
   }
 
   if (body.found_via != null) {
@@ -99,11 +73,6 @@ export function validateSurvey(input: unknown): SurveyValidation {
       return { ok: false, error: 'Unknown answer for "How did you find us?".' };
     }
     value.found_via = body.found_via as FoundViaValue;
-    if (value.found_via === 'other') {
-      const other = cleanOther(body.found_via_other);
-      if (other === null) return { ok: false, error: 'Please leave contact details out of your answer.' };
-      if (other) value.found_via_other = other;
-    }
   }
 
   if (!value.industry && !value.found_via) return { ok: false, error: 'No answer given.' };
@@ -114,9 +83,7 @@ export function validateSurvey(input: unknown): SurveyValidation {
 export function surveyMetadata(answers: SurveyAnswers, now: Date): Record<string, string> {
   return {
     ...(answers.industry ? { svy_ind: answers.industry } : {}),
-    ...(answers.industry_other ? { svy_ind_other: answers.industry_other } : {}),
     ...(answers.found_via ? { svy_via: answers.found_via } : {}),
-    ...(answers.found_via_other ? { svy_via_other: answers.found_via_other } : {}),
     svy_at: now.toISOString().slice(0, 10),
   };
 }

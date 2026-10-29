@@ -5,9 +5,9 @@
  * from in the `carsi_ft` cookie and never overwrites it. At checkout the route copies it into
  * the Stripe Checkout Session metadata as `ft_ch`, `ft_ref`, `ft_lp` and `ft_at`.
  *
- * Privacy (APP 3/5): the referrer is kept as a host only and the landing page as a path only.
- * Query strings and fragments are dropped because they can carry personal data (search terms,
- * emails in links). The cookie is client-held, so every read treats it as untrusted.
+ * Privacy (APP 3/5): the referrer is kept as a host only. The landing page is reduced to a fixed
+ * top-level section, plus a letters-and-hyphens slug for /courses and /for, never an arbitrary
+ * path: paths, query strings and fragments can carry personal data (phone numbers, emails). The cookie is client-held, so every read treats it as untrusted.
  *
  * Pure functions, no DOM and no Next.js imports.
  */
@@ -18,7 +18,6 @@ export const FIRST_TOUCH_COOKIE_NAME = 'carsi_ft';
 export const FIRST_TOUCH_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 90;
 
 const MAX_HOST_LENGTH = 100;
-const MAX_PATH_LENGTH = 200;
 const MAX_RAW_COOKIE_LENGTH = 2048;
 
 export const FIRST_TOUCH_CHANNELS = [
@@ -39,7 +38,7 @@ export interface FirstTouch {
   ch: FirstTouchChannel;
   /** Referrer host, '' for none. */
   ref: string;
-  /** Landing path, no query or fragment. */
+  /** Landing section from `landingSection`: `/`, `/<section>`, `/<section>/<slug>` or `other`. */
   lp: string;
   /** ISO date (YYYY-MM-DD, UTC). */
   at: string;
@@ -93,14 +92,6 @@ function isOwnHost(host: string, siteHost: string): boolean {
   return bareHost(host) === bareHost(siteHost);
 }
 
-/** Same character allowlist as `cleanValue` in utm-cookie.ts, bounded. */
-function cleanToken(value: string, max: number): string {
-  return value
-    .replace(/[^A-Za-z0-9 ._\-+:/]/g, '')
-    .trim()
-    .slice(0, max);
-}
-
 function cleanHost(value: unknown): string {
   if (typeof value !== 'string') return '';
   // A host has no path, query, fragment, credentials or port worth keeping.
@@ -108,11 +99,59 @@ function cleanHost(value: unknown): string {
   return host.replace(/[^a-z0-9.-]/g, '').slice(0, MAX_HOST_LENGTH);
 }
 
-function cleanPath(value: unknown): string {
-  if (typeof value !== 'string') return '';
-  const path = value.split(/[?#]/)[0] ?? '';
-  if (!path.startsWith('/')) return '';
-  return cleanToken(path, MAX_PATH_LENGTH);
+/**
+ * Top-level sections a landing page may be recorded under. Anything else is `other`, so an
+ * arbitrary path (which could carry a phone number, an email or a token) is never stored.
+ */
+export const LANDING_SECTIONS = [
+  'courses',
+  'industries',
+  'for',
+  'blog',
+  'pricing',
+  'membership',
+  'about',
+  'contact',
+  'resources',
+  'news',
+  'designations',
+  'pathways',
+  'iicrc-cec-courses',
+] as const;
+
+/** Sections whose second segment is kept when it is a plain words-and-hyphens slug. */
+const SLUGGED_SECTIONS = new Set(['courses', 'for']);
+const SAFE_SLUG = /^[a-z]+(-[a-z]+)*$/;
+const MAX_SLUG_LENGTH = 80;
+
+/**
+ * Reduces a URL path to what may be stored: `/` (home), `/<section>`, `/courses/<slug>` or
+ * `/for/<slug>` when the slug is letters and hyphens only (no digits) and at most 80 characters,
+ * otherwise `other`. Query and fragment are always dropped.
+ */
+export function landingSection(path: string): string {
+  const clean = (path.split(/[?#]/)[0] ?? '').trim();
+  const segments = clean.split('/').filter(Boolean);
+  if (segments.length === 0) return '/';
+  const section = segments[0];
+  if (!(LANDING_SECTIONS as readonly string[]).includes(section)) return 'other';
+  const slug = segments[1];
+  if (
+    slug &&
+    SLUGGED_SECTIONS.has(section) &&
+    slug.length <= MAX_SLUG_LENGTH &&
+    SAFE_SLUG.test(slug)
+  ) {
+    return `/${section}/${slug}`;
+  }
+  return `/${section}`;
+}
+
+function storedLanding(value: unknown): string | null {
+  if (typeof value !== 'string') return null;
+  if (value === 'other') return 'other';
+  if (!value.startsWith('/')) return null;
+  return landingSection(value);
 }
 
 export function classifyChannel(input: {
@@ -170,7 +209,7 @@ export function buildFirstTouch(input: {
   return {
     ch: classifyChannel({ refHost, utm, siteHost: input.siteHost }),
     ref: refHost,
-    lp: cleanPath(landing?.pathname ?? '') || '/',
+    lp: landingSection(landing?.pathname ?? ''),
     at: input.now.toISOString().slice(0, 10),
   };
 }
@@ -201,7 +240,7 @@ export function parseFirstTouchCookie(raw: string | null | undefined): FirstTouc
     if (typeof ch !== 'string' || !(FIRST_TOUCH_CHANNELS as readonly string[]).includes(ch)) return null;
     const at = obj.at;
     if (typeof at !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(at)) return null;
-    const lp = cleanPath(obj.lp);
+    const lp = storedLanding(obj.lp);
     if (!lp) return null;
     return { ch: ch as FirstTouchChannel, ref: cleanHost(obj.ref), lp, at };
   } catch {

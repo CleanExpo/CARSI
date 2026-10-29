@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest';
 import {
   FOUND_VIA_OPTIONS,
   INDUSTRY_OPTIONS,
-  OTHER_TEXT_MAX_LENGTH,
   surveyMetadata,
   validateSurvey,
 } from './purchase-survey';
@@ -68,46 +67,29 @@ describe('validateSurvey', () => {
     expect(validateSurvey({ industry: ['commercial_cleaning'] }).ok).toBe(false);
   });
 
-  it('T1b-3: markup is stripped from the other box and the result is bounded', () => {
-    const result = validateSurvey({
-      industry: 'other',
-      industry_other: '<b>Pest</b> control <script>x</script>' + ' and more'.repeat(20),
-    });
+  it.each([
+    ['industry_other', { industry: 'other', industry_other: 'Pest control 0412 345 678' }],
+    ['found_via_other', { found_via: 'other', found_via_other: 'jo@example.test' }],
+    ['an unknown field', { industry: 'other', note: '<b>anything</b>' }],
+  ])('T1b-3: %s is ignored; Other keeps only the word other', (_label, input) => {
+    const result = validateSurvey(input);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(result.value.industry_other).not.toMatch(/[<>]/);
-    expect(result.value.industry_other).toMatch(/^Pest control/);
-    expect(result.value.industry_other!.length).toBeLessThanOrEqual(OTHER_TEXT_MAX_LENGTH);
-    expect(OTHER_TEXT_MAX_LENGTH).toBe(60);
-  });
-
-  it.each([
-    'email me jo.citizen@example.com',
-    'jo at example dot com jo@example',
-    'call 0412 345 678',
-    'https://example.com/me',
-  ])('T1b-3: contact details in the other box are rejected, never stored: %s', (text) => {
-    expect(validateSurvey({ industry: 'other', industry_other: text }).ok).toBe(false);
-    expect(validateSurvey({ found_via: 'other', found_via_other: text }).ok).toBe(false);
-  });
-
-  it('ignores other text unless other was chosen', () => {
-    expect(validateSurvey({ industry: 'whs_safety', industry_other: 'anything' })).toEqual({
-      ok: true,
-      value: { industry: 'whs_safety' },
-    });
+    expect(Object.keys(result.value).sort()).toEqual(
+      Object.keys(input).filter((k) => k === 'industry' || k === 'found_via').sort()
+    );
+    expect(JSON.stringify(result.value)).toMatch(/^\{"(industry|found_via)":"other"\}$/);
   });
 });
 
 describe('surveyMetadata', () => {
   it('maps to the svy_* keys with a date, within Stripe limits', () => {
     const md = surveyMetadata(
-      { industry: 'other', industry_other: 'Pest control', found_via: 'ai_assistant' },
+      { industry: 'other', found_via: 'ai_assistant' },
       new Date('2026-10-29T01:00:00Z')
     );
     expect(md).toEqual({
       svy_ind: 'other',
-      svy_ind_other: 'Pest control',
       svy_via: 'ai_assistant',
       svy_at: '2026-10-29',
     });

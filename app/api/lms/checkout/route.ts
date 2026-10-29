@@ -52,8 +52,34 @@ import {
   parseFirstTouchCookie,
 } from '@/lib/analytics/first-touch';
 import { isAttributionCaptureEnabled } from '@/lib/server/attribution-capture-flag';
+import { isPurchaseSurveyEnabled } from '@/lib/server/purchase-survey-flag';
+import {
+  PURCHASE_SURVEY_COOKIE_NAME,
+  PURCHASE_SURVEY_COOKIE_PATH,
+  PURCHASE_SURVEY_TOKEN_TTL_SECONDS,
+  signPurchaseSurveyToken,
+} from '@/lib/server/purchase-survey-token';
 
 class AccountLookupUnavailable extends Error {}
+
+/**
+ * The checkout reply. With the purchase survey on (slice 1b), it also carries the HttpOnly
+ * capability cookie that lets this browser, and only this one, answer the survey for this
+ * Stripe session. Off, the reply is exactly what it was.
+ */
+function checkoutStarted(checkout_url: string, checkoutSessionId: string, request: NextRequest) {
+  const res = NextResponse.json({ checkout_url });
+  if (isPurchaseSurveyEnabled()) {
+    res.cookies.set(PURCHASE_SURVEY_COOKIE_NAME, signPurchaseSurveyToken(checkoutSessionId), {
+      httpOnly: true,
+      secure: request.nextUrl.protocol === 'https:' || process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: PURCHASE_SURVEY_COOKIE_PATH,
+      maxAge: PURCHASE_SURVEY_TOKEN_TTL_SECONDS,
+    });
+  }
+  return res;
+}
 
 /** Runs an account check; a database failure becomes a 503 rather than a charge on doubt. */
 async function guardLookup<T>(check: () => Promise<T>): Promise<T> {
@@ -323,7 +349,7 @@ export async function POST(request: NextRequest) {
             currency: 'aud',
             transactionId: checkout_session_id,
           });
-          return NextResponse.json({ checkout_url });
+          return checkoutStarted(checkout_url, checkout_session_id, request);
         } catch (err) {
           const msg = err instanceof Error ? err.message : String(err);
           if (msg === 'INVALID_AMOUNT') {
@@ -374,7 +400,7 @@ export async function POST(request: NextRequest) {
         currency: unit_amount_cents == null ? undefined : 'aud',
         transactionId: checkout_session_id,
       });
-      return NextResponse.json({ checkout_url });
+      return checkoutStarted(checkout_url, checkout_session_id, request);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       if (msg === 'INVALID_AMOUNT') {

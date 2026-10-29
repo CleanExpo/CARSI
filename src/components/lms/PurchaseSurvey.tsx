@@ -5,7 +5,6 @@ import { useState } from 'react';
 import {
   FOUND_VIA_OPTIONS,
   INDUSTRY_OPTIONS,
-  OTHER_TEXT_MAX_LENGTH,
   SURVEY_PURPOSE_NOTICE,
   type SurveyOption,
 } from '@/lib/marketing/purchase-survey';
@@ -17,18 +16,12 @@ function ChoiceGroup({
   options,
   selected,
   onSelect,
-  otherId,
-  otherValue,
-  onOtherChange,
   disabled,
 }: {
   legend: string;
   options: readonly SurveyOption[];
   selected: string | null;
   onSelect: (value: string) => void;
-  otherId: string;
-  otherValue: string;
-  onOtherChange: (value: string) => void;
   disabled: boolean;
 }) {
   return (
@@ -55,23 +48,6 @@ function ChoiceGroup({
           );
         })}
       </div>
-      {selected === 'other' ? (
-        <div className="space-y-1">
-          <label htmlFor={otherId} className="sr-only">
-            {`${legend} (other)`}
-          </label>
-          <input
-            id={otherId}
-            type="text"
-            maxLength={OTHER_TEXT_MAX_LENGTH}
-            value={otherValue}
-            disabled={disabled}
-            onChange={(e) => onOtherChange(e.target.value)}
-            placeholder="A few words (no contact details)"
-            className="w-full rounded-md border border-white/15 bg-white/5 px-3 py-2 text-sm text-white"
-          />
-        </div>
-      ) : null}
     </fieldset>
   );
 }
@@ -83,9 +59,7 @@ function ChoiceGroup({
  */
 export function PurchaseSurvey({ sessionId }: { sessionId: string | null }) {
   const [industry, setIndustry] = useState<string | null>(null);
-  const [industryOther, setIndustryOther] = useState('');
   const [foundVia, setFoundVia] = useState<string | null>(null);
-  const [foundViaOther, setFoundViaOther] = useState('');
   const [status, setStatus] = useState<Status>('open');
 
   if (!sessionId || status === 'skipped') return null;
@@ -108,9 +82,7 @@ export function PurchaseSurvey({ sessionId }: { sessionId: string | null }) {
         body: JSON.stringify({
           session_id: sessionId,
           ...(industry ? { industry } : {}),
-          ...(industry === 'other' && industryOther.trim() ? { industry_other: industryOther.trim() } : {}),
           ...(foundVia ? { found_via: foundVia } : {}),
-          ...(foundVia === 'other' && foundViaOther.trim() ? { found_via_other: foundViaOther.trim() } : {}),
         }),
       });
       setStatus(res.ok ? 'saved' : 'failed');
@@ -141,9 +113,6 @@ export function PurchaseSurvey({ sessionId }: { sessionId: string | null }) {
         options={INDUSTRY_OPTIONS}
         selected={industry}
         onSelect={setIndustry}
-        otherId="svy-industry-other"
-        otherValue={industryOther}
-        onOtherChange={setIndustryOther}
         disabled={sending}
       />
       <ChoiceGroup
@@ -151,9 +120,6 @@ export function PurchaseSurvey({ sessionId }: { sessionId: string | null }) {
         options={FOUND_VIA_OPTIONS}
         selected={foundVia}
         onSelect={setFoundVia}
-        otherId="svy-found-via-other"
-        otherValue={foundViaOther}
-        onOtherChange={setFoundViaOther}
         disabled={sending}
       />
       {status === 'failed' ? (

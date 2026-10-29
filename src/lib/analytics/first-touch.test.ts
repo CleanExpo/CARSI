@@ -6,6 +6,7 @@ import {
   FIRST_TOUCH_COOKIE_NAME,
   firstTouchCookieHeader,
   firstTouchMetadata,
+  landingSection,
   parseFirstTouchCookie,
   serializeFirstTouchCookie,
 } from './first-touch';
@@ -119,7 +120,61 @@ describe('buildFirstTouch', () => {
       siteHost: SITE,
     });
     expect(ft?.ref.length).toBeLessThanOrEqual(100);
-    expect(ft?.lp.length).toBeLessThanOrEqual(200);
+    expect(ft?.lp).toBe('other');
+  });
+});
+
+describe('landingSection: only a fixed section, plus a letters-and-hyphens slug', () => {
+  it.each([
+    ['/', '/'],
+    ['', '/'],
+    ['/courses', '/courses'],
+    ['/courses/', '/courses'],
+    ['/courses/moisture-meters', '/courses/moisture-meters'],
+    ['/for/nsw-builders', '/for/nsw-builders'],
+    ['/industries/construction', '/industries'],
+    ['/pricing', '/pricing'],
+    ['/courses/0438123456', '/courses'],
+    ['/courses/jo.citizen@example.com', '/courses'],
+    ['/courses/jo-citizen-example-com-0412', '/courses'],
+    ['/for/Nsw-Builders', '/for'],
+    [`/courses/${'a'.repeat(81)}`, '/courses'],
+    [`/courses/${'a'.repeat(80)}`, `/courses/${'a'.repeat(80)}`],
+    ['/courses/moisture/lesson-2', '/courses/moisture'],
+    ['/dashboard/student', 'other'],
+    ['/0438123456', 'other'],
+    ['/jo.citizen@example.com', 'other'],
+    ['/reset-password', 'other'],
+  ])('%s -> %s', (path, expected) => {
+    expect(landingSection(path)).toBe(expected);
+  });
+
+  it('buildFirstTouch stores the section form, never a phone number or email in a path', () => {
+    for (const landingUrl of [
+      'https://carsi.com.au/courses/0438123456',
+      'https://carsi.com.au/courses/jo.citizen%40example.com',
+      'https://carsi.com.au/jo.citizen@example.com',
+    ]) {
+      const ft = buildFirstTouch({ referrer: '', landingUrl, now: NOW, siteHost: SITE });
+      expect(JSON.stringify(ft)).not.toMatch(/0438|citizen|@|%40/);
+    }
+  });
+
+  it('the referrer is a host only, never its path', () => {
+    const ft = buildFirstTouch({
+      referrer: 'https://forum.example.org/users/jo-citizen/0438123456',
+      landingUrl: 'https://carsi.com.au/',
+      now: NOW,
+      siteHost: SITE,
+    });
+    expect(ft?.ref).toBe('forum.example.org');
+  });
+
+  it('a cookie path that breaks the rule is reduced on read', () => {
+    const raw = encodeURIComponent(
+      JSON.stringify({ ch: 'direct', ref: '', lp: '/courses/0438123456', at: '2026-10-29' })
+    );
+    expect(parseFirstTouchCookie(raw)?.lp).toBe('/courses');
   });
 });
 
