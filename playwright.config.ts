@@ -14,6 +14,18 @@ const membershipBaseURL =
   process.env.PLAYWRIGHT_MEMBERSHIP_BASE_URL ??
   (process.env.CI ? `http://localhost:${MEMBERSHIP_CI_PORT}` : undefined);
 const MEMBERSHIP_SPEC = /e2e\/membership-checkout\.spec\.ts$/;
+/**
+ * The payment-success purchase survey (e2e/payment-success-survey.spec.ts) renders only when
+ * PURCHASE_SURVEY_ENABLED=true. Same pattern as the membership project: in CI a third process
+ * serves the SAME build on port 3101 with the flag on; locally set PLAYWRIGHT_SURVEY_BASE_URL.
+ * Flag-on tests carry the @survey-on tag and run only in the `purchase-survey` project; the
+ * flag-off test in the same file runs in the default project.
+ */
+const SURVEY_CI_PORT = 3101;
+const surveyBaseURL =
+  process.env.PLAYWRIGHT_SURVEY_BASE_URL ??
+  (process.env.CI ? `http://localhost:${SURVEY_CI_PORT}` : undefined);
+const SURVEY_SPEC = /e2e\/payment-success-survey\.spec\.ts$/;
 // A project-level testIgnore REPLACES the top-level one, so every project that sets its own must
 // repeat these (the CI build writes a copy of e2e/ under .next/standalone).
 const BUILD_OUTPUT = ['**/.next/**', '**/node_modules/**'];
@@ -45,7 +57,7 @@ export default defineConfig({
     {
       name: 'desktop-chromium',
       use: { ...devices['Desktop Chrome'] },
-      grepInvert: /@authenticated/,
+      grepInvert: /@authenticated|@survey-on/,
       // Flag-on journeys run only in the membership-checkout project below.
       testIgnore: [...BUILD_OUTPUT, MEMBERSHIP_SPEC],
     },
@@ -71,6 +83,17 @@ export default defineConfig({
           },
         ]
       : []),
+    ...(surveyBaseURL
+      ? [
+          {
+            name: 'purchase-survey',
+            testMatch: SURVEY_SPEC,
+            testIgnore: BUILD_OUTPUT,
+            grep: /@survey-on/,
+            use: { ...devices['Desktop Chrome'], baseURL: surveyBaseURL },
+          },
+        ]
+      : []),
   ],
   webServer: [
     {
@@ -88,6 +111,17 @@ export default defineConfig({
             command: `npx next start -p ${MEMBERSHIP_CI_PORT}`,
             url: `http://localhost:${MEMBERSHIP_CI_PORT}`,
             env: { SUBSCRIPTIONS_ENABLED: 'true' },
+            reuseExistingServer: false,
+            timeout: 120_000,
+          },
+        ]
+      : []),
+    ...(process.env.CI && !process.env.PLAYWRIGHT_SURVEY_BASE_URL
+      ? [
+          {
+            command: `npx next start -p ${SURVEY_CI_PORT}`,
+            url: `http://localhost:${SURVEY_CI_PORT}`,
+            env: { PURCHASE_SURVEY_ENABLED: 'true' },
             reuseExistingServer: false,
             timeout: 120_000,
           },
