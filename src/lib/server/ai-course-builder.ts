@@ -81,7 +81,9 @@ const InputSchema = z.object(
     category: z.string(typeMessage('string')).trim().max(120, maxChars(120)).optional().default(''),
     module_count: z.coerce
       .number(typeMessage('number'))
-      .int('Expected integer, received float')
+      // zod 4 .int() also rejects integers beyond Number.MAX_SAFE_INTEGER; zod 3 accepted any
+      // Number.isInteger value, so keep zod 3's rule and message.
+      .refine(Number.isInteger, 'Expected integer, received float')
       .min(2, 'Number must be greater than or equal to 2')
       .max(5, 'Number must be less than or equal to 5')
       .default(3),
@@ -103,7 +105,7 @@ export function parseAiCourseBuilderInput(raw: unknown): AiCourseBuilderInput {
 const QuizQuestionSchema = z.object({
   question: z.string(),
   options: z.array(z.string()).min(2),
-  correct_index: z.number().int().min(0),
+  correct_index: z.number().refine(Number.isInteger, 'Expected integer, received float').min(0),
 });
 
 const LessonSchema = z.object({

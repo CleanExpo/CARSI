@@ -444,6 +444,69 @@ const TABLE: Array<[string, unknown, Expected]> = [
       },
     },
   ],
+  [
+    'module_count 2^53',
+    {
+      title: 'Abc',
+      course_outline: 'An outline in my own words that is long enough.',
+      module_count: 9007199254740992,
+    },
+    { error: 'Number must be less than or equal to 5' },
+  ],
+  [
+    'module_count 2^53 string',
+    {
+      title: 'Abc',
+      course_outline: 'An outline in my own words that is long enough.',
+      module_count: '9007199254740992',
+    },
+    { error: 'Number must be less than or equal to 5' },
+  ],
+  [
+    'module_count -2^53',
+    {
+      title: 'Abc',
+      course_outline: 'An outline in my own words that is long enough.',
+      module_count: -9007199254740992,
+    },
+    { error: 'Number must be greater than or equal to 2' },
+  ],
+  [
+    'module_count 1e21',
+    {
+      title: 'Abc',
+      course_outline: 'An outline in my own words that is long enough.',
+      module_count: 1e21,
+    },
+    { error: 'Number must be less than or equal to 5' },
+  ],
+  [
+    'module_count -1e21',
+    {
+      title: 'Abc',
+      course_outline: 'An outline in my own words that is long enough.',
+      module_count: -1e21,
+    },
+    { error: 'Number must be greater than or equal to 2' },
+  ],
+  [
+    'module_count 2^53+2 string',
+    {
+      title: 'Abc',
+      course_outline: 'An outline in my own words that is long enough.',
+      module_count: '9007199254740994',
+    },
+    { error: 'Number must be less than or equal to 5' },
+  ],
+  [
+    'module_count MAX_SAFE',
+    {
+      title: 'Abc',
+      course_outline: 'An outline in my own words that is long enough.',
+      module_count: 9007199254740991,
+    },
+    { error: 'Number must be less than or equal to 5' },
+  ],
 ];
 
 describe('parseAiCourseBuilderInput zod 3 parity', () => {
