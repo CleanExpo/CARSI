@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { PurchaseSurvey } from '@/components/lms/PurchaseSurvey';
 import { apiClient, ApiClientError } from '@/lib/api/client';
 import { buildGuestPasswordSetupPath, isSafeInternalPath } from '@/lib/auth/guest-recovery-path';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
@@ -11,7 +12,7 @@ import { useEffect, useState } from 'react';
 
 type Phase = 'confirming' | 'guest_setup' | 'done' | 'error';
 
-export function PaymentSuccessClient() {
+export function PaymentSuccessClient({ surveyEnabled = false }: { surveyEnabled?: boolean } = {}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const params = useParams();
@@ -196,6 +197,7 @@ export function PaymentSuccessClient() {
               </a>{' '}
               with this same email — you will not need to pay again.
             </p>
+            {surveyEnabled ? <PurchaseSurvey sessionId={sessionId} /> : null}
             <form onSubmit={handleGuestComplete} className="space-y-3">
               <div className="space-y-1.5">
                 <Label htmlFor="ps-full-name">Full name</Label>

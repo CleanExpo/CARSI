@@ -10,7 +10,7 @@
  * still reach Stripe.
  */
 import { NextRequest } from 'next/server';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   resolveEmail: vi.fn(),
@@ -283,5 +283,234 @@ describe('campaign attribution', () => {
 
     expect(res.status).toBe(200);
     expect(mocks.createStripe.mock.calls[0][0].extra_metadata).toEqual({});
+  });
+});
+
+describe('purchase survey capability cookie (Authority Machine slice 1b)', () => {
+  const FLAG = 'PURCHASE_SURVEY_ENABLED';
+
+  afterEach(() => {
+    delete process.env[FLAG];
+  });
+
+  function surveyCookie(res: Response): string | undefined {
+    return res.headers.getSetCookie().find((c) => c.startsWith('carsi_svy='));
+  }
+
+  it('flag off: the checkout response sets no cookie at all (unchanged)', async () => {
+    delete process.env[FLAG];
+    mocks.findUser.mockResolvedValue(null);
+    const res = await POST(request({ slug: COURSE_SLUG, customer_email: 'new@example.test' }));
+    expect(res.status).toBe(200);
+    expect(res.headers.getSetCookie()).toEqual([]);
+  });
+
+  it('flag on: sets an HttpOnly, Secure, SameSite=Lax 24 h cookie that verifies for the new session only', async () => {
+    process.env[FLAG] = 'true';
+    mocks.findUser.mockResolvedValue(null);
+    const res = await POST(request({ slug: COURSE_SLUG, customer_email: 'new@example.test' }));
+    expect(res.status).toBe(200);
+    const header = surveyCookie(res);
+    expect(header).toBeDefined();
+    expect(header).toContain('HttpOnly');
+    expect(header).toContain('Secure');
+    expect(header?.toLowerCase()).toContain('samesite=lax');
+    expect(header).toContain('Max-Age=86400');
+    const { verifyPurchaseSurveyToken } = await import('@/lib/server/purchase-survey-token');
+    const token = decodeURIComponent(header!.slice('carsi_svy='.length).split(';')[0]);
+    expect(verifyPurchaseSurveyToken(token, 'cs_new', new Date())).toBe(true);
+    expect(verifyPurchaseSurveyToken(token, 'cs_other', new Date())).toBe(false);
+  });
+
+  it('two checkouts in one browser: starting B keeps A answerable', async () => {
+    process.env[FLAG] = 'true';
+    mocks.findUser.mockResolvedValue(null);
+    const { cookieAuthorisesSession } = await import('@/lib/server/purchase-survey-token');
+    const tokenOf = (res: Response) =>
+      decodeURIComponent(surveyCookie(res)!.slice('carsi_svy='.length).split(';')[0]);
+
+    mocks.createStripe.mockResolvedValueOnce({ checkout_url: 'https://checkout.stripe.test/a', checkout_session_id: 'cs_a' });
+    const resA = await POST(request({ slug: COURSE_SLUG, customer_email: 'new@example.test' }));
+    const cookieA = tokenOf(resA);
+
+    mocks.createStripe.mockResolvedValueOnce({ checkout_url: 'https://checkout.stripe.test/b', checkout_session_id: 'cs_b' });
+    const resB = await POST(
+      new NextRequest('https://carsi.example.test/api/lms/checkout', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', cookie: `carsi_svy=${encodeURIComponent(cookieA)}` },
+        body: JSON.stringify({ slug: 'odour-control', customer_email: 'new@example.test' }),
+      })
+    );
+    const cookieB = tokenOf(resB);
+    expect(cookieAuthorisesSession(cookieB, 'cs_a', new Date())).toBe(true);
+    expect(cookieAuthorisesSession(cookieB, 'cs_b', new Date())).toBe(true);
+  });
+
+  it('flag on: the discounted path sets it too', async () => {
+    process.env[FLAG] = 'true';
+    mocks.verifySession.mockResolvedValue({ sub: 'user-disc' });
+    mocks.findUser.mockResolvedValue({ id: 'user-disc', isActive: true });
+    mocks.findEnrollment.mockResolvedValue(null);
+    mocks.discount.mockResolvedValue({ id: 'disc-1', discountType: 'percent', value: 20 });
+    const res = await POST(
+      new NextRequest('https://carsi.example.test/api/lms/checkout', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', cookie: 'auth_token=tok' },
+        body: JSON.stringify({ slug: COURSE_SLUG, customer_email: 'member@example.test' }),
+      })
+    );
+    expect(res.status).toBe(200);
+    expect(surveyCookie(res)).toBeDefined();
+  });
+});
+
+describe('first-touch attribution (Authority Machine slice 1a)', () => {
+  const FLAG = 'ATTRIBUTION_CAPTURE_ENABLED';
+  const FIRST_TOUCH = { ch: 'organic_search', ref: 'www.google.com', lp: '/courses/moisture', at: '2026-10-23' };
+  const ftCookie = `carsi_ft=${encodeURIComponent(JSON.stringify(FIRST_TOUCH))}`;
+  const utmCookie = `carsi_utm=${encodeURIComponent(JSON.stringify({ utm_source: 'synthex', utm_medium: 'social' }))}`;
+
+  function requestWithCookie(body: Record<string, unknown>, cookie: string): NextRequest {
+    return new NextRequest('https://carsi.example.test/api/lms/checkout', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', cookie },
+      body: JSON.stringify(body),
+    });
+  }
+
+  function discountedMember() {
+    mocks.verifySession.mockResolvedValue({ sub: 'user-disc' });
+    mocks.findUser.mockResolvedValue({ id: 'user-disc', isActive: true });
+    mocks.findEnrollment.mockResolvedValue(null);
+    mocks.discount.mockResolvedValue({ id: 'disc-1', discountType: 'percent', value: 20 });
+  }
+
+  beforeEach(() => {
+    delete process.env[FLAG];
+  });
+
+  afterEach(() => {
+    delete process.env[FLAG];
+  });
+
+  it('T1a-1: flag on, guest checkout carries ft_ch, ft_ref, ft_lp and ft_at beside the utm keys', async () => {
+    process.env[FLAG] = 'true';
+    mocks.findUser.mockResolvedValue(null);
+
+    const res = await POST(
+      requestWithCookie(
+        { slug: COURSE_SLUG, customer_email: 'new@example.test', guest_checkout: true },
+        `${utmCookie}; ${ftCookie}`
+      )
+    );
+
+    expect(res.status).toBe(200);
+    expect(mocks.createStripe.mock.calls[0][0].extra_metadata).toEqual({
+      utm_source: 'synthex',
+      utm_medium: 'social',
+      ft_ch: 'organic_search',
+      ft_ref: 'google',
+      ft_lp: 'courses',
+      ft_at: '2026-10-23',
+    });
+  });
+
+  it('T1a-2: flag on, the discounted path carries the first touch and keeps discount_id', async () => {
+    process.env[FLAG] = '1';
+    discountedMember();
+
+    const res = await POST(
+      requestWithCookie({ slug: COURSE_SLUG, customer_email: 'member@example.test' }, `auth_token=tok; ${ftCookie}`)
+    );
+
+    expect(res.status).toBe(200);
+    expect(mocks.createStripe.mock.calls[0][0].extra_metadata).toEqual({
+      ft_ch: 'organic_search',
+      ft_ref: 'google',
+      ft_lp: 'courses',
+      ft_at: '2026-10-23',
+      discount_id: 'disc-1',
+    });
+  });
+
+  it('T1a-3: flag off, metadata is exactly what it is today (utm keys only) on both paths', async () => {
+    mocks.findUser.mockResolvedValue(null);
+    await POST(
+      requestWithCookie(
+        { slug: COURSE_SLUG, customer_email: 'new@example.test', guest_checkout: true },
+        `${utmCookie}; ${ftCookie}`
+      )
+    );
+    expect(mocks.createStripe.mock.calls[0][0].extra_metadata).toEqual({
+      utm_source: 'synthex',
+      utm_medium: 'social',
+    });
+
+    discountedMember();
+    await POST(
+      requestWithCookie(
+        { slug: COURSE_SLUG, customer_email: 'member@example.test' },
+        `auth_token=tok; ${utmCookie}; ${ftCookie}`
+      )
+    );
+    expect(mocks.createStripe.mock.calls[1][0].extra_metadata).toEqual({
+      utm_source: 'synthex',
+      utm_medium: 'social',
+      discount_id: 'disc-1',
+    });
+  });
+
+  it.each([
+    ['html', '<script>alert(1)</script>'],
+    ['5 KB string', 'x'.repeat(5 * 1024)],
+    ['wrong JSON shape', encodeURIComponent(JSON.stringify({ ch: 'evil', student_id: 'forged' }))],
+    ['array', encodeURIComponent(JSON.stringify(['organic_search']))],
+  ])('T1a-4: a hostile %s cookie adds no ft_* keys and checkout still succeeds', async (_label, raw) => {
+    process.env[FLAG] = 'true';
+    mocks.findUser.mockResolvedValue(null);
+
+    const res = await POST(
+      requestWithCookie({ slug: COURSE_SLUG, customer_email: 'new@example.test' }, `carsi_ft=${raw}`)
+    );
+
+    expect(res.status).toBe(200);
+    const md = mocks.createStripe.mock.calls[0][0].extra_metadata as Record<string, string>;
+    expect(Object.keys(md).filter((k) => k.startsWith('ft_'))).toEqual([]);
+    expect(md.student_id).toBeUndefined();
+  });
+
+  it('T1a-5: a cookie carrying query text never puts it into metadata', async () => {
+    process.env[FLAG] = 'true';
+    mocks.findUser.mockResolvedValue(null);
+    const smuggled = encodeURIComponent(
+      JSON.stringify({
+        ch: 'organic_search',
+        ref: 'www.google.com/search?q=secret+name',
+        lp: '/courses/moisture?email=jo@example.test',
+        at: '2026-10-23',
+      })
+    );
+
+    await POST(requestWithCookie({ slug: COURSE_SLUG, customer_email: 'new@example.test' }, `carsi_ft=${smuggled}`));
+
+    const md = mocks.createStripe.mock.calls[0][0].extra_metadata as Record<string, string>;
+    expect(md.ft_lp).toBe('courses');
+    expect(md.ft_ref).toBe('google');
+    expect(JSON.stringify(md)).not.toMatch(/secret|@|\?|moisture/);
+    for (const [key, value] of Object.entries(md)) {
+      expect(key.length).toBeLessThanOrEqual(40);
+      expect(value.length).toBeLessThanOrEqual(500);
+    }
+  });
+
+  it('a planted old cookie with an identifying host and slug reaches Stripe only as tokens', async () => {
+    process.env[FLAG] = 'true';
+    mocks.findUser.mockResolvedValue(null);
+    const planted = encodeURIComponent(
+      JSON.stringify({ ch: 'referral', ref: 'jane-smith.notion.site', lp: '/for/twelve-queen-street', at: '2026-10-23' })
+    );
+    await POST(requestWithCookie({ slug: COURSE_SLUG, customer_email: 'new@example.test' }, `carsi_ft=${planted}`));
+    const md = mocks.createStripe.mock.calls[0][0].extra_metadata as Record<string, string>;
+    expect(md).toEqual({ ft_ch: 'referral', ft_ref: 'other', ft_lp: 'for', ft_at: '2026-10-23' });
   });
 });
