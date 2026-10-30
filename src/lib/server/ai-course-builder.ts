@@ -12,7 +12,7 @@
  * no IICRC discipline-acronym branding; nothing implying CARSI delivers IICRC certification.
  */
 
-import { z } from 'zod';
+import { z } from 'zod/v3';
 
 import { OpenRouterClient } from '@/lib/openrouter/client';
 import { resolveOpenRouterConfig } from '@/lib/openrouter/provider';

@@ -37,9 +37,7 @@ jobs:
         run: npm ci
 
       - name: Verify dependencies
-        run: |
-          echo "Legacy scripts/verify.sh removed; skipping."
-          echo ok | tee verify-output.log
+        run: npm ls --omit=dev --depth=0 > verify-output.log
 
       - name: Upload verification report
         if: always()
