@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import * as z from 'zod';
+import * as z from 'zod/v3';
 
 // The login and register forms validate email with z.string().email(). Expected results were
 // produced by zod 3.25.76 (scratch install outside the repo) so the zod 4 upgrade cannot change

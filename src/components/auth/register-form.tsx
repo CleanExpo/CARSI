@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import * as z from 'zod';
+import * as z from 'zod/v3';
 
 import {
   Form,
@@ -28,7 +28,7 @@ import {
 } from '@/lib/membership-signup-path';
 import { useToast } from '@/hooks/use-toast';
 
-const formSchema = z
+export const formSchema = z
   .object({
     fullName: z.string().min(2, 'Full name must be at least 2 characters'),
     email: z.string().email('Please enter a valid email address'),

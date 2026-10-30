@@ -61,6 +61,15 @@ function rawValues(): unknown[] {
     [{ toString: null }],
     Object.create(null),
     JSON.parse('{"__proto__":{"toString":null}}'),
+    // Astral characters: zod 3 counts UTF-16 code units, zod 4 counts code points.
+    '\u{1F600}',
+    '\u{1F600}a',
+    '\u{1F600}'.repeat(4),
+    '\u{1F600}'.repeat(10),
+    '\u{1F600}'.repeat(61),
+    '\u{1F600}'.repeat(81),
+    '\u{1F600}'.repeat(4001),
+    'e\u0301',
   ];
 }
 
