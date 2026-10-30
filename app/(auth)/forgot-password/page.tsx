@@ -72,7 +72,7 @@ function ForgotPasswordForm() {
           </p>
         )}
         <p className="text-xs font-semibold tracking-wide text-[#146fc2]">
-          IICRC CEC Accredited restoration courses
+          Restoration training from an IICRC CEC Accredited provider
         </p>
       </div>
 

@@ -25,7 +25,7 @@ export default async function RegisterPage({
           Enter your details to create your account
         </p>
         <p className="text-xs font-semibold tracking-wide text-[#146fc2]">
-          IICRC CEC Accredited restoration training
+          Restoration training from an IICRC CEC Accredited provider
         </p>
       </div>
 
