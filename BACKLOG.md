@@ -855,10 +855,11 @@ Founder session continued with event messaging, a large course brain-dump, a res
 steer, and a knowledge-ingest task. Captured here; **triage, do not build mid-session.**
 
 - **Brisbane & Melbourne Tradeshow + Trade Night — messaging locked.**
-  `docs/marketing/brisbane-melbourne-tradeshow-trade-night.md` (Topic, discussion points, message;
-  mixed cleaning+restoration audience, CARSI × CCW, CTA = book a RestoreAssist demo, trade night =
-  Phill McGurk talk). Guards green. **Blocked on founder:** Brisbane/Melbourne dates + venues, and a
-  RestoreAssist demo-booking link/QR. Logistics + live send are founder-gated.
+  `docs/marketing/brisbane-melbourne-tradeshow-trade-night.md` (Topic, discussion points, message).
+  Theme = **AI in business**; brands = **RestoreAssist × Unite-Group × CARSI** (NOT CCW);
+  mixed cleaning+restoration audience; CTA = book a RestoreAssist demo; trade night = Phill McGurk
+  talk on AI in business. Guards green. **Blocked on founder:** Brisbane/Melbourne dates + venues,
+  and a RestoreAssist demo-booking link/QR. Logistics + live send are founder-gated.
 
 - **Course-catalogue expansion into the whole cleaning industry.**
   `docs/content/COURSE_PIPELINE_PROPOSALS.md` turns the brain-dump into a Standard-v1 roadmap:
