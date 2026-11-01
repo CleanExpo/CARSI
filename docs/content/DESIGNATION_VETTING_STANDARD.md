@@ -36,7 +36,7 @@ course's `data/courses/<slug>/vetting/` folder. Reuse the existing engines — d
 | 2 | **Cross-research** | Each key claim is corroborated by **≥2 independent** sources; disagreements are surfaced and resolved, not hidden. Each claim resolves with an evidence receipt to **VERIFIED or JUSTIFIED** — a **GAP is non-passing**: it must be rewritten, removed or substantiated before go-live, never shipped. | `course-truth` skill; `check:sources` |
 | 3 | **Cross AU / International quality & skills check** | The course is mapped against both the **Australian** frame (AS/NZS, Safe Work Australia, state regulators) **and** the relevant **international** reference (e.g. nominative ANSI/IICRC S-standards, ISO) — agreements and the AU-specific deltas both stated. Skills/competencies are mapped explicitly. | Course Standard v1 `australian` floor; standards section indexes (`lib/standards/*`) |
 | 4 | **Industry peer challenge** | A qualified **SME / practitioner** adversarially reviews the course for correctness and real-world defensibility — "would this survive a challenge from a senior tech, a builder, an insurer, or a regulator?". Findings tracked to closure. | SME sign-off (already gated); `persistent-subagents` adversarial review where available |
-| 5 | **Full vetting & sign-off** | All standards-claim gates pass; every claim has its receipt and resolves to VERIFIED/JUSTIFIED (no open GAP); peer-challenge findings are closed; founder signs off. Only then does the course carry its designation live. | `verify:standards-claim`, `check:iicrc-*`, `check:cec`, `check:cec-surfaces` (structural CEC-leak backstop), Course Standard v1 audit (`check:course-standard`), founder gate |
+| 5 | **Full vetting & sign-off** | All standards-claim gates pass; every claim has its receipt and resolves to VERIFIED/JUSTIFIED (no open GAP); peer-challenge findings are closed; founder signs off. Only then does the course carry its designation live. | `check:standards-claims`, `check:iicrc-*`, `check:cec`, `check:cec-surfaces` (structural CEC-leak backstop), Course Standard v1 audit (`check:course-standard`), founder gate |
 
 ## Registrability pathway (goal, not a claim)
 
@@ -56,7 +56,7 @@ granted.**
 ## Guards that enforce the claim disciplines
 
 `check:iicrc-terminology`, `check:iicrc-compliance`, `check:cec`, `check:cec-surfaces`,
-`check:cec-course-brand`, `verify:standards-claim`, `check:au-english`, and `check:course-standard`.
+`check:cec-course-brand`, `check:standards-claims`, `check:au-english`, and `check:course-standard`.
 Absence claims about a
 standard remain **banned**; positive claims cite a section that exists in the licensed index; and
 no IICRC standard text is ever entered into any AI tool (IICRC AI-use policy).

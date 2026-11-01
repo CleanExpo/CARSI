@@ -84,7 +84,7 @@ learn. What rises is the **value of each participant**:
 ## Guardrails
 
 Enforced by `check:iicrc-terminology`, `check:iicrc-compliance`, `check:cec`, `check:cec-course-brand`,
-`verify:standards-claim`, `check:au-english`, and `check:course-standard`. Follow CLAUDE.md § "IICRC CEC terminology" for the exact banned IICRC framings
+`check:standards-claims`, `check:au-english`, and `check:course-standard`. Follow CLAUDE.md § "IICRC CEC terminology" for the exact banned IICRC framings
 (the ones that imply the IICRC accredits or delivers a CARSI course, or that CARSI issues the
 certification); no "registered" / "nationally recognised" claim until granted; no
 guaranteed-income / ROI figures; cite standards nominatively only.
