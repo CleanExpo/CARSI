@@ -69,7 +69,7 @@ is where a Business Coaching course comes in.
 
 ### C. Why CARSI is credible (proof, not adjectives)
 - 54 live courses; 38 IICRC CEC Accredited; a real catalogue and LMS the learner can use today.
-- Australian-produced throughout (AU English, 230 V / AS·NZS, metric, AUD) — built for this market.
+- Australian-produced throughout (AU English, 230 V / AS/NZS, metric, AUD) — built for this market.
 - Business model: annual **membership (~$795)** + course sales + team seats; the directory/registry
   and benchmark give long-term authority.
 
