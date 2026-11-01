@@ -848,3 +848,44 @@ lead designation course (`data/courses/water-damage-restoration-fundamentals/`).
   persistent-subagents doctrine described in `CLAUDE.md` can only run on a local/CLI machine, not a
   cloud session. Decide whether to vendor them into the repo or note the cloud limitation in
   `CLAUDE.md`.
+
+## Discoveries — 2026-11-01 (b) events + course-catalogue expansion + research edge
+
+Founder session continued with event messaging, a large course brain-dump, a research-strategy
+steer, and a knowledge-ingest task. Captured here; **triage, do not build mid-session.**
+
+- **Brisbane & Melbourne Tradeshow + Trade Night — messaging locked.**
+  `docs/marketing/brisbane-melbourne-tradeshow-trade-night.md` (Topic, discussion points, message;
+  mixed cleaning+restoration audience, CARSI × CCW, CTA = book a RestoreAssist demo, trade night =
+  Phill McGurk talk). Guards green. **Blocked on founder:** Brisbane/Melbourne dates + venues, and a
+  RestoreAssist demo-booking link/QR. Logistics + live send are founder-gated.
+
+- **Course-catalogue expansion into the whole cleaning industry.**
+  `docs/content/COURSE_PIPELINE_PROPOSALS.md` turns the brain-dump into a Standard-v1 roadmap:
+  science foundations; WHS visual-inspection/hazard courses (meth/clandestine-lab, visible vs
+  non-visible mould, VOCs + "electrical impulse" *[term needs clarifying]*, sharps & squalor, +
+  asbestos/lead awareness); and cleaner verticals (general/bond, facility, aged care, government,
+  security & sensitive-data, data centre, + childcare/schools, healthcare EVS). **Founder decision
+  needed:** expanding into general cleaning requires **adding `rolePaths`** to Standard v1 (update
+  both `COURSE_STANDARD.md` §3.2 and `scripts/audit-course-depth.mjs` in one reviewed commit). Each
+  course then runs the gated pipeline; none is built yet.
+
+- **Research is the edge (ties to the Evidence Engine, #21–28).** Founder: deep knowledge wins —
+  university papers, Google Scholar, DeepMind, OpenAI Science, white papers, and discovering what
+  clients ask for. Reuse the Evidence Engine (ingest→grade→map→teach→publish), the `course-truth`
+  and `deep-research` skills, and the standards-claim/`check:sources` gates. "Demand discovery"
+  (what clients ask for) is a candidate weekly research note (#23) feeding the roadmap. **Do not
+  feed IICRC standard text into any AI tool** (CLAUDE.md IP rule) — research the open science, cite
+  standards nominatively.
+
+- **LICENCE-CRITICAL positioning caveat.** Founder's "take over from ISSA/IICRC/RIA/IAQ" is
+  **internal ambition only**. Public/marketing/course/SEO copy must never say or imply CARSI
+  replaces or outranks IICRC/RIA/ISSA/IAQ (GOAL rule 3; BACKLOG positioning constraint). Ships as
+  "beyond the standard", never as rivalry. Breach = licence risk.
+
+- **Task: Alex Hormozi YouTube transcripts → "2nd Brain Wiki" — BLOCKED (no access from cloud).**
+  The 2nd Brain Wiki is **not in this repo** (no `2nd Brain/` dir in the cloud checkout), and
+  reliable YouTube-transcript extraction needs tooling not confirmed here. Needs: the 2nd Brain
+  location/access (repo path? Notion? separate repo?), scope (one video vs whole channel), and an
+  IP/attribution call on storing a creator's transcripts. A local/CLI session with the 2nd Brain
+  mounted + a transcript tool (e.g. `yt-dlp --write-auto-sub`) is the right place to run it.
