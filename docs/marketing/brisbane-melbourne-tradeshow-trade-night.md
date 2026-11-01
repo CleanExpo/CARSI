@@ -69,8 +69,9 @@ Stations and the conversation at each:
 3. **CARSI — the know-how behind the AI.** Over 50 courses live; the 9 CARSI Southern Hemisphere
    Restoration Designations; IICRC CEC Accredited provider; the science that lets you trust and
    check what the AI gives you (AI supports judgement — you need to know the subject to own it).
-4. **"Bring your job" AI clinic.** Short, practical walk-throughs: take one real job and show the
-   decision, the documentation and the follow-up, AI-assisted end to end.
+4. **"Bring your job" AI clinic.** Short, practical walk-throughs: use a real job only when its data
+   is authorised for the demonstration and AI processing, with customer identifiers and sensitive
+   job details removed or de-identified. Use synthetic data when those controls aren't available.
 
 ### B. Trade Night (evening — Phill McGurk talk + networking)
 
@@ -133,7 +134,7 @@ Run sheet:
 
 **Proof points (verified — use as-is):** over 50 courses live on carsi.com.au; 9 CARSI Southern
 Hemisphere Restoration Designations; CARSI is an **IICRC CEC Accredited provider** with **38 courses
-approved for IICRC CECs**; Australian-produced throughout (AU English, 230 V / AS·NZS, metric, AUD).
+approved for IICRC CECs**; Australian-produced throughout (AU English, 230 V / AS/NZS, metric, AUD).
 
 **Framing to avoid** (exact banned IICRC list in CLAUDE.md § "IICRC CEC terminology"): any wording
 that implies the IICRC accredits or delivers a CARSI course, or that CARSI issues the certification;

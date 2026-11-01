@@ -8,7 +8,7 @@ course only through the gated pipeline (author → field tools/diagrams → quiz
 **Rules that bind every course below (non-negotiable):**
 - Build to **Course Standard v1** (`docs/content/COURSE_STANDARD.md`): levels, role paths, the
   7-part lesson, the 14 floors.
-- **Australian-produced** (AU English, 230 V / AS·NZS, metric, AUD) — the `carsi-course-production`
+- **Australian-produced** (AU English, 230 V / AS/NZS, metric, AUD) — the `carsi-course-production`
   skill.
 - `cecHours: 0` on every new course; `iicrcDiscipline: null`; designation (if any) in
   `meta.designation`. A CEC claim only after per-course IICRC approval in `cec-approvals.json`
