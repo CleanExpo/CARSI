@@ -33,8 +33,9 @@ different and complementary:
   quality-checked against AU *and* international references, and peer-challenged by practitioners
   (the Designation Vetting Standard) — built to stand up to a senior tech, a builder, an insurer or
   a regulator.
-- **It compounds, and it keeps your IICRC standing.** A CARSI designation course can **also earn
-  IICRC CECs**, so your people maintain their existing IICRC certification *while* deepening
+- **It compounds, and it keeps your IICRC standing.** CARSI is an **IICRC CEC Accredited provider**;
+  a designation course **approved for IICRC CECs** (recorded in the approvals registry) gives your
+  people credit toward maintaining their existing IICRC certification *while* they deepen
   capability. It's not either/or — it's both.
 
 So the answer to "why not rely on certification alone?" is: **keep it, and add the depth, the
@@ -73,7 +74,7 @@ learn. What rises is the **value of each participant**:
 
 | They ask | The honest answer |
 | --- | --- |
-| "Why do I need CARSI if my techs are already IICRC-certified?" | Keep the certification — CARSI adds Australian depth, the business layer and the on-the-job loop, and can also earn the CECs that maintain that certification. |
+| "Why do I need CARSI if my techs are already IICRC-certified?" | Keep the certification — CARSI adds Australian depth, the business layer and the on-the-job loop, and a CARSI designation course **approved for IICRC CECs** gives credit toward maintaining that certification. |
 | "Why a designation, not just a course?" | A designation is a standard your whole team is held to and can prove — vetted to survive challenge — not a one-off attendance. |
 | "Why a subscription instead of paying per course?" | Flat fee, unlimited students, continuously-updated catalogue: the cost is fixed while your team's capability — and value — compounds. |
 | "Why should I trust the content?" | Every designation course is deep-researched, cross-researched, checked against AU and international references, and peer-challenged by practitioners before it ships (the Vetting Standard). |
@@ -82,8 +83,8 @@ learn. What rises is the **value of each participant**:
 
 ## Guardrails
 
-Enforced by `check:iicrc-terminology`, `check:iicrc-compliance`, `check:cec`, `verify:standards-claim`,
-`check:au-english`. Follow CLAUDE.md § "IICRC CEC terminology" for the exact banned IICRC framings
+Enforced by `check:iicrc-terminology`, `check:iicrc-compliance`, `check:cec`, `check:cec-course-brand`,
+`verify:standards-claim`, `check:au-english`, and `check:course-standard`. Follow CLAUDE.md § "IICRC CEC terminology" for the exact banned IICRC framings
 (the ones that imply the IICRC accredits or delivers a CARSI course, or that CARSI issues the
 certification); no "registered" / "nationally recognised" claim until granted; no
 guaranteed-income / ROI figures; cite standards nominatively only.

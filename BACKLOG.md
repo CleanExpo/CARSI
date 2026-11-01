@@ -904,10 +904,12 @@ steer, and a knowledge-ingest task. Captured here; **triage, do not build mid-se
   new machinery. Vetting receipts live in `data/courses/<slug>/vetting/`.
 
 - **Registrability pathway — LEGAL-GATED, claim-critical.** Building courses to the vetting
-  standard makes them *registrable-ready*. Formal "registered / nationally recognised" status in
-  Australia is granted by **ASQA** under the VET framework and is a separate founder- + legal-gated
-  project. **No public/marketing/course copy claims "registered", "nationally recognised" or
-  "accredited qualification" until actually granted** — same discipline as the IICRC CEC line.
+  standard makes them *registrable-ready*. In the Australian VET system **ASQA (or a state body)
+  accredits a course**, while a **Registered Training Organisation (RTO) with that scope delivers
+  the training and issues the nationally recognised qualification** — distinct steps, both
+  founder- + legal-gated. **No public/marketing/course copy claims "registered", "nationally
+  recognised", "RTO" or "accredited qualification" until actually held/granted** — same discipline
+  as the IICRC CEC line.
   Scope this only when the catalogue + evidence base justify it.
 
 - **Industry bespoke-pathway builder (product feature).** Founder wants courses easy to find per
