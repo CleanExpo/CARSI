@@ -5,6 +5,17 @@ research, written content, and media (image / voice / video). It is exposed as a
 Code slash commands in `.claude/commands/` and reuses the existing media tooling rather than
 adding parallel implementations.
 
+> **Status (2026-11-01).** Two things this doc assumes have moved:
+> 1. **The `/course*` slash commands are not committed in this repo** (`.claude/commands/` is
+>    absent). Until they are, run the workflow through the `npm run …` targets, the
+>    `carsi-course-production` skill and the course-kit scripts directly — the stages below still
+>    describe the correct order.
+> 2. **Every course now targets CARSI Course Standard v1** (`docs/content/COURSE_STANDARD.md`): the
+>    four levels, eight role paths, the seven-part lesson pattern and the fourteen measurable
+>    floors. `/course-construct` and `/course-develop` build to that structure; `/course-ship`
+>    gates on `npm run check:course-standard` (the 14-floor audit) in addition to the checks below.
+>    Catalogue readiness + the upgrade queue: `docs/content/COURSE_STANDARD_READINESS.md`.
+
 ## Design principle
 
 Every CARSI media pipeline splits judgement from spend, and this one follows suit:
@@ -22,11 +33,11 @@ invoke `npm run …`, the skills, and (for previews) MCP tools.
 | --- | --- | --- | --- |
 | `/course` | orchestrator | the six below | — |
 | `/course-research` | research | `truth-finder`, `australian-context`, WebSearch | `data/courses/<slug>/research.md` |
-| `/course-construct` | structure | `foundation-first`, `courses-catalog-types.ts` | catalogue skeleton in `data/seed/courses-catalog.json` |
-| `/course-develop` | content | `truth-finder`, `australian-context` | lesson `contentBody` + quizzes + resources |
+| `/course-construct` | structure | `foundation-first`, `courses-catalog-types.ts`, **Course Standard v1** (levels, role paths, 4–6 modules × ≥3 lessons) | catalogue skeleton + `meta.standardLevel`/`rolePaths` in `data/seed/courses-catalog.json` |
+| `/course-develop` | content | `truth-finder`, `australian-context`, **the seven-part lesson pattern** | lesson `contentBody` (7 parts, ≥400 words, a visual, a metric example) + module checks/final quiz + field downloads |
 | `/course-media` | media | `course-thumbnails` (gpt-image-1), `course-voiceover` (ElevenLabs), HeyGen repo scripts | `thumbnailUrl`, per-lesson audio in `resources`, brand video MP4s |
-| `/course-brand` | brand gate | `design-system`, `australian-context` | fixes flagged upstream |
-| `/course-ship` | verify + seed | `verification-first` | DB (via `db:seed-courses`) |
+| `/course-brand` | brand gate | `design-system`, `australian-context`, `check:course-diagrams` | fixes flagged upstream |
+| `/course-ship` | verify + seed | `verification-first`, **`check:course-standard` (14-floor audit)** | sets `meta.standard: "v1"` **last**, then DB (via `db:seed-courses`) |
 
 ## Connectors
 
@@ -39,6 +50,8 @@ invoke `npm run …`, the skills, and (for previews) MCP tools.
 
 ## Governance
 
+- Course Standard v1 (structure + 14 floors): `docs/content/COURSE_STANDARD.md`; audit
+  `npm run audit:course-depth` (report) / `check:course-standard` (CI) / `test:course-depth`.
 - Compound Engineering loop: `docs/agent-framework/COMPOUND_ENGINEERING_LOOP.md`.
 - Verification Gate (mandatory `npm run type-check`): `docs/agent-framework/CARSI_VERIFICATION_GATE.md`.
 - Spend gates: every paid generator has a `--dry-run`, a hard cap, a resumable manifest, and an

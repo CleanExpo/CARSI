@@ -802,3 +802,49 @@ sign-in. Checkout opened Stripe with no enrolment check, so a retry charged twic
 (Brighttouch, 30 Aug). #810 already fixed the welcome-email CTA. This session adds the
 enrolment-before-Stripe guard and the login recovery copy. Founder emails (#808) and
 the single Brighttouch refund (#809) stay out of agent scope.
+
+## Discoveries — 2026-11-01 Education System on Course Standard v1
+
+Founder asked to engage the "full CARSI Training & Education System" (design/generate/produce/
+test/research), AI Intelligence Integration, Business Coaching, and the upcoming Ivi
+Brisbane/Melbourne session. The system already has a spine — **Course Standard v1** (PR #943,
+`docs/content/COURSE_STANDARD.md`: 4 levels, 8 role paths, the 7-part lesson pattern, 14
+machine-checked floors, audit `check:course-standard`). This session produced the research/design
+layer (no new machinery): a catalogue readiness scorecard + upgrade queue
+(`docs/content/COURSE_STANDARD_READINESS.md`) and a worked v1 upgrade blueprint + scaffold for the
+lead designation course (`data/courses/water-damage-restoration-fundamentals/`). The following are
+**intake only — triage, do not work mid-session**:
+
+- **Education-System rollout at scale (the real backlog).** Only **2 of 80** courses are on v1
+  (both Mould). The catalogue is already licence-clean and AU-clean (0/80 fail those floors); the
+  whole gap is *structural depth*. The priority cohort is the **9 CARSI designation courses** — each
+  raised to v1 is a sellable, assessed, designation-bearing course. Lead recommended:
+  `water-damage-restoration-fundamentals` (blueprint written). Coverage gap: no `L0-free` and no
+  `L1-foundation` course on v1, and 7 of 8 role paths uncovered. Sizing, batching and SME capacity
+  are a founder call; each course upgrade is one gated unit (author → build assets → audit 14/14 →
+  set `meta.standard` last → SME + founder sign-off → media → seed → publish).
+
+- **AI Intelligence Integration = the RestoreAssist field↔learning loop.** Frame the "AI" thread as
+  the existing RestoreAssist bundle (BACKLOG #17, Gate 2): learn in CARSI → apply on the job with
+  RestoreAssist → document → the field signal feeds back into course content. Ties to the
+  `restoreassist-national-inspection-report-nir-initiative` + `inspection-to-seo-authority-skill`
+  skills. No new AI course machinery; reuse the AI course builder
+  (`app/api/lms/admin/ai-course-builder/route.ts`) and its input guard.
+
+- **Business Coaching course.** Extends the existing business-skills cluster (Business
+  Administration for Sole Traders, AGI Essentials, Social Media Marketing, Water Damage Marketing &
+  Sales). Build to Standard v1 but as **professional development, not a restoration discipline**:
+  `cecHours: 0`, `iicrcDiscipline: null`, no IICRC/CEC claim. Ivi is a candidate author/presenter —
+  commercials (royalty/fee/co-brand) are founder-only. Depends on the Ivi session outcome.
+
+- **Finding — floor-care pricing inconsistency (founder-gated).** `floor-care-onboarding-operational-readiness`
+  shows `priceAud: 99` live while its `meta.pricing` still describes a `$1295/mo` org subscription.
+  Reconcile on the live page first (pricing is a founder decision), then the metadata.
+
+- **Finding — CLAUDE.md global skills absent in cloud container.** `CLAUDE.md` points to
+  `~/.claude/skills/{waterline,pr-release-gate,persistent-subagents}` (estate claim grammar, the
+  `independent_review.py` release-gate, the sub-agent doctrine). None are present in cloud sessions
+  (only the `synced` account skills + the 3 repo skills are). So the release-gate receipt flow and
+  persistent-subagents doctrine described in `CLAUDE.md` can only run on a local/CLI machine, not a
+  cloud session. Decide whether to vendor them into the repo or note the cloud limitation in
+  `CLAUDE.md`.
