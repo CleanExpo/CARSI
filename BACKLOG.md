@@ -890,3 +890,32 @@ steer, and a knowledge-ingest task. Captured here; **triage, do not build mid-se
   location/access (repo path? Notion? separate repo?), scope (one video vs whole channel), and an
   IP/attribution call on storing a creator's transcripts. A local/CLI session with the 2nd Brain
   mounted + a transcript tool (e.g. `yt-dlp --write-auto-sub`) is the right place to run it.
+  **Update 2026-11-01: founder says the 2nd Brain lives in Vercel** (a separate deployment, not
+  this repo) — so writing to it means finding the Vercel project's backing repo/store, not a path
+  here. Identify the project + its write path before attempting.
+
+## Discoveries — 2026-11-01 (c) designation vetting standard + industry pathway builder
+
+- **CARSI Designation Vetting & QA Standard** — `docs/content/DESIGNATION_VETTING_STANDARD.md`.
+  Codifies the founder's quality bar (deep research → cross-research → cross AU/International
+  quality & skills checks → industry peer challenge → full vetting + sign-off) as the gate every
+  designation course clears to be defensible and registrable-ready. Reuses the Evidence Engine
+  (#21–28), `course-truth`, `deep-research`, the standards-claim gate and Course Standard v1 — no
+  new machinery. Vetting receipts live in `data/courses/<slug>/vetting/`.
+
+- **Registrability pathway — LEGAL-GATED, claim-critical.** Building courses to the vetting
+  standard makes them *registrable-ready*. Formal "registered / nationally recognised" status in
+  Australia is granted by **ASQA** under the VET framework and is a separate founder- + legal-gated
+  project. **No public/marketing/course copy claims "registered", "nationally recognised" or
+  "accredited qualification" until actually granted** — same discipline as the IICRC CEC line.
+  Scope this only when the catalogue + evidence base justify it.
+
+- **Industry bespoke-pathway builder (product feature).** Founder wants courses easy to find per
+  industry: the client enters their details incl. their industry, and the system builds their
+  bespoke learning pathway. This rides directly on the Course Standard v1 **role paths** — expanding
+  `rolePaths` to the cleaning verticals (general/bond, facility, aged-care, government-and-security,
+  data-centre; see proposals doc) is the prerequisite data model, after which "industry → pathway"
+  is a mapping over role paths + levels. Likely reuses the existing `/for/<industry>` authority
+  pages and the healthcare/aged-care/hospitality SEO pages as the entry surface. Scope as: (1)
+  extend role-path taxonomy, (2) tag courses to industries/role-paths, (3) intake form → pathway
+  mapping. Not built here.
