@@ -1,0 +1,20 @@
+{
+  "_scaffold_note": "STAGING SKELETON — not seed data. Structure mirrors data/seed/level-2-mould-remediation-30ee3492-assessment.json (LmsPracticalAssessment). The SME authors `instructions` and at least 3 `criteria`, then moves this file to data/seed/water-damage-restoration-fundamentals-assessment.json and links it via the course's meta.practicalAssessment. Criteria are left empty on purpose — no rubric is invented here.",
+  "version": 1,
+  "courseSlug": "water-damage-restoration-fundamentals",
+  "status": "draft",
+  "note": "Practical task for the CARSI Water Restoration Practitioner v1 upgrade. Instructor-graded against the rubric. SME review required before it is published.",
+  "assessment": {
+    "id": "TBD-generate-a-uuid",
+    "title": "CARSI Water Restoration Practitioner — Practical task: plan and evidence a Category 2 water loss",
+    "passThreshold": 70,
+    "isPublished": false,
+    "instructions": "[AUTHOR: the practical brief. Give a real or supplied Australian water-loss job (place, building, category/class, materials, occupant context, 230 V power reality) and list exactly what the learner submits as evidence — e.g. moisture map + dry goal, category/class call with reasoning, hazard-led PPE/SWMS, drying plan with equipment power budget, defensible job file. Mirror the depth of the Level-2 Mould task. Not yet written.]",
+    "criteria": [
+      { "id": "c1", "label": "[AUTHOR: criterion 1 — e.g. correct water category & class call with reasoning]", "weight": 25, "descriptor": "" },
+      { "id": "c2", "label": "[AUTHOR: criterion 2 — e.g. hazard-led PPE selection and SWMS]", "weight": 25, "descriptor": "" },
+      { "id": "c3", "label": "[AUTHOR: criterion 3 — e.g. moisture map + defensible dry goal in metric]", "weight": 25, "descriptor": "" },
+      { "id": "c4", "label": "[AUTHOR: criterion 4 — e.g. job-file completeness for the AU insurance context]", "weight": 25, "descriptor": "" }
+    ]
+  }
+}
