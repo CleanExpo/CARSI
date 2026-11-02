@@ -21,6 +21,7 @@ import {
   loadContext,
   decide,
   FLOORS,
+  ROLE_PATHS,
   hasPartHeading,
   isFieldDownload,
 } from './audit-course-depth.mjs';
@@ -215,6 +216,34 @@ for (const [floor, label, mutate, makeCtx] of KNOCKOUTS) {
     const s = scoreCourse(c, makeCtx ? makeCtx() : ctx);
     assert.equal(s.floors[floor].applicable, true, `${floor} should apply`);
     assert.equal(s.floors[floor].ok, false, `${floor} should fail for: ${label}`);
+  });
+}
+
+// Positive acceptance: the cleaning-vertical role paths added for the "enter your industry ->
+// bespoke pathway" builder must each pass the metadata floor. The knockout above proves an
+// UNKNOWN path fails; these prove the five KNOWN identifiers pass, so a typo or an accidental
+// removal from ROLE_PATHS is caught before a cleaning course adopts the path.
+const CLEANING_VERTICAL_PATHS = [
+  'general-and-bond',
+  'facility',
+  'aged-care',
+  'government-and-security',
+  'data-centre',
+];
+
+test('the five cleaning-vertical role paths are recognised in ROLE_PATHS', () => {
+  const missing = CLEANING_VERTICAL_PATHS.filter((p) => !ROLE_PATHS.includes(p));
+  assert.deepEqual(missing, [], `ROLE_PATHS is missing: ${missing.join(', ')}`);
+});
+
+for (const path of CLEANING_VERTICAL_PATHS) {
+  test(`metadata passes: rolePaths [${path}]`, () => {
+    const c = clone();
+    c.meta.rolePaths = [path];
+    const s = scoreCourse(c, ctx);
+    assert.equal(s.floors.metadata.applicable, true, 'metadata should apply');
+    assert.equal(s.floors.metadata.ok, true, `metadata should pass for rolePaths [${path}]`);
+    assert.ok(!s.failing.includes('metadata'), `metadata must not be failing for [${path}]`);
   });
 }
 
