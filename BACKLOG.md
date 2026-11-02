@@ -970,3 +970,20 @@ production-database credential):
 2. **DECISIONS #22 — confirm Stripe reaches the site.** Make one purchase, then check for a row in
    `stripe_webhook_events`. No row → re-copy the signing secret (part of #17).
 3. **DECISIONS #1 and #3 — send the CEC packs and the three outreach emails** (Gate 0).
+
+### Discoveries — 2026-11-02 course go-live audit
+
+- **A re-seed deletes learner progress.** `scripts/seed-courses-catalog.ts` → `deleteCourseCurriculum`
+  deletes every `lms_lesson_progress` row of an existing course before rebuilding its lessons.
+  `docs/runbooks/course-go-live.md` now blocks it with a preflight. The structural fix is for the
+  script itself to refuse (exit non-zero) when progress rows exist unless an explicit
+  `--allow-progress-loss` flag is passed, or to upsert lessons by id instead of deleting them.
+- **No per-course quiz seeder.** `npm run db:seed-quizzes` re-writes every quiz on a fixed list, and
+  the list omits the Level 2 and Level 3 Mould quizzes. Add a `--slug=` option.
+- **16 IICRC CEC approvals expire on 18/01/2027** (`npm run check:cec` warns, 77 days out on
+  2026-11-02). Renewal packs: `npx tsx scripts/generate-cec-submission.ts <slug>`; submission is
+  founder-only. Generating packs requires `tsx` (row 33).
+- **Repo and live catalogue have drifted.** The live site lists 80 published courses; the seed
+  marks 54 published. Level 2 Mould was live while the seed said `draft`. That is fixed in the same
+  PR as this note. A re-seed would have unpublished it. A read-only live-vs-seed status report
+  would catch the rest.
