@@ -80,7 +80,7 @@ const add = (rule, file, line, detail) => violations.push({ rule, file, line, de
 const lineOf = (text, idx) => text.slice(0, idx).split('\n').length;
 
 // manifest
-let manifestSrcs = new Set();
+const manifestSrcs = new Set();
 const mPath = path.join(root, cfg.manifest);
 if (fs.existsSync(mPath)) {
   const m = JSON.parse(fs.readFileSync(mPath, 'utf8'));
