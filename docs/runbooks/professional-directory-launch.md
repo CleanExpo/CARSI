@@ -53,27 +53,39 @@ To fill it, two things are needed and **both are founder/data decisions, not age
 1. **Wire the query.** Implement the registry read inside `getVerifiedProfessionals()` (replace the
    `return []` after the live-flag check). Map each row to `VerifiedProfessional`. Keep it
    fail-closed: on a query/connection error, return `[]` — never partial or cached fabricated data.
-2. **Licence check on the mapped data.** A member's *own* IICRC certifications may be shown
+2. **Make the page metadata live-aware.** Today `generateMetadata()` in
+   `app/(public)/professional-directory/page.tsx` returns the same `BASE_METADATA` whether or not the
+   directory is live — and that object still carries the **"Professional Directory — Coming Soon"**
+   title, the "in development" description and the coming-soon Open Graph text. When `status.live` is
+   true it only strips the `noindex` tag, which would make **stale coming-soon copy indexable**.
+   Before indexing is allowed, give `generateMetadata()` a live branch with the real launch title,
+   description and OG text, and keep the coming-soon `BASE_METADATA` for the non-live path.
+3. **Licence check on the mapped data.** A member's *own* IICRC certifications may be shown
    third-person (e.g. "IICRC WRT, ASD") — that is the member describing their credentials, which is
    allowed. Do **not** synthesise CARSI-course/CEC claims from directory data, and do not imply CARSI
    issues those certifications.
-3. **Set the flag.** `PROFESSIONAL_DIRECTORY_LIVE=true` in the production environment.
-4. **Verify the honest-status gate flips correctly.**
+4. **Set the flag.** `PROFESSIONAL_DIRECTORY_LIVE=true` in the production environment.
+5. **Verify the honest-status gate flips correctly.**
    - `getProfessionalDirectoryStatus()` → `{ live: true, listingCount: >0, source: 'nrpg_registry' }`
      only once real rows are returned.
    - The page renders `ProfessionalDirectoryListing`, not the coming-soon gate.
-   - `generateMetadata()` drops the `noindex` robots tag; the sitemap now includes
-     `/professional-directory` (covered by `src/lib/seo/sitemap-real-pages.test.ts`).
-5. **Smoke-test the funnels** against the live page: "Notify me at launch" → contact confirmation;
+   - `generateMetadata()` drops the `noindex` robots tag **and** now serves the live launch copy from
+     step 2 (not the coming-soon title/description/OG); the sitemap includes `/professional-directory`
+     (covered by `src/lib/seo/sitemap-real-pages.test.ts`).
+6. **Smoke-test the funnels** against the live page: "Notify me at launch" → contact confirmation;
    "Submit a professional profile" → `/submit/professional` with the directory lead context.
-6. **Founder sign-off** before announcing, same as any public surface.
+7. **Founder sign-off** before announcing, same as any public surface.
 
 ## 4. Rollback
 
-Set `PROFESSIONAL_DIRECTORY_LIVE` back to unset/`false`. The page immediately returns to the
-`noindex` coming-soon gate and the sitemap drops the URL again — no data is exposed. Because the data
-layer is fail-closed, an incident in the registry sync degrades to the honest gate, not to stale or
-fabricated listings.
+Set `PROFESSIONAL_DIRECTORY_LIVE` back to unset/`false`. The **page** reverts immediately: on the
+next request `status.live` is false, so it renders the `noindex` coming-soon gate and exposes no
+data. The **sitemap** is not immediate — `app/sitemap.ts` exports `revalidate = 300`, so a cached
+sitemap can keep `/professional-directory` for up to five minutes after the flag is cleared. The URL
+resolves to the `noindex` gate in the meantime, so no listings are exposed; if the entry must drop
+from the sitemap at once (e.g. a takedown), trigger an on-demand revalidation of the sitemap route
+(or a deploy/CDN purge) rather than waiting out the window. Because the data layer is fail-closed, an
+incident in the registry sync degrades to the honest gate, not to stale or fabricated listings.
 
 ## 5. What this audit did not change
 
