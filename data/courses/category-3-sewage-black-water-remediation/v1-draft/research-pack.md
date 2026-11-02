@@ -46,7 +46,7 @@ Validate: `node scripts/audit/validate-ledger.mjs data/courses/category-3-sewage
 | GRWM Regulations 2016 reg 15: the PCBU directing the work provides PPE | — |
 | HSWA s 23: a serious infection from work with micro-organisms or human bodily substances is notifiable | Model WHS Regulations reg 699 |
 | Notify WorkSafe as soon as possible (0800 030 040); keep records five years; preserve the site | Notify the WHS regulator immediately |
-| Asbestos rule of thumb: built or renovated before 2000 | Before 1990 |
+| Asbestos rule of thumb: built or renovated before 2000 | Assume it if built or renovated before 31 December 2003, when the national ban took effect; most likely if before 1990 |
 | RPE fit testing at first issue, then at least yearly or after facial change (WorkSafe NZ, per AS/NZS 1715:2009) | Before first use and after facial change (SafeWork SA) |
 | Hepatitis A recommended but not funded for sewage workers; may be employer-funded (NZ Immunisation Handbook) | Hepatitis A and tetanus recommended (Australian Immunisation Handbook) |
 | Current HSNO-compliant SDS mandatory for each hazardous substance in the workplace | SDS copies in the hazardous chemicals register |

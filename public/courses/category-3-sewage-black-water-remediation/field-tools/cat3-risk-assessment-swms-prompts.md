@@ -10,7 +10,7 @@
 | 1 | Look: source, depth, who is inside | Do not wade in | Source still running and cannot be stopped |
 | 2 | Power | Isolate at the board, confirm dead; RCD on every lead; leads tested and tagged (AS/NZS 3760) | Board or fittings under water: licensed electrician |
 | 3 | Structure and slips | Keep out of the drop zone of wet ceilings; manage silt and leads | Sagging ceiling or soft floor: structural engineer |
-| 4 | Asbestos | AU: assume if built or renovated before 1990. NZ: before 2000. Do not break it | Suspect material: licensed assessor |
+| 4 | Asbestos | AU: assume if built or renovated before 31 December 2003 (national ban); most likely if before 1990. NZ: before 2000. Do not break it | Suspect material: licensed assessor |
 | 5 | Confined spaces | Pits, sewers, tanks, tight subfloors: hydrogen sulphide, low oxygen | Entry needed: confined-space-trained crew only |
 | 6 | People | Vulnerable occupants out; children and pets away | Cannot clear the area |
 

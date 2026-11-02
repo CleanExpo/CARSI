@@ -138,7 +138,7 @@
           ],
           "correctIndex": 2,
           "points": 1,
-          "explanation": "WorkSafe New Zealand: any building built or renovated before 2000 could contain asbestos. Australia’s rule of thumb is before 1990. You cannot tell by looking."
+          "explanation": "WorkSafe New Zealand: any building built or renovated before 2000 could contain asbestos. In Australia, assume it in any building built or renovated before 31 December 2003, when the national ban took effect; those built or renovated before 1990 are the most likely to contain it. You cannot tell by looking."
         },
         {
           "questionText": "Why is a septic tank or sewer pit treated as a possible confined space?",
@@ -651,7 +651,7 @@
           ],
           "correctIndex": 0,
           "points": 1,
-          "explanation": "WorkSafe New Zealand: any building built or renovated before 2000 could contain asbestos. Australia’s rule of thumb is before 1990."
+          "explanation": "WorkSafe New Zealand: any building built or renovated before 2000 could contain asbestos. In Australia, assume it in any building built or renovated before 31 December 2003, when the national ban took effect; those built or renovated before 1990 are the most likely to contain it."
         },
         {
           "questionText": "Australian and New Zealand mains supply is nominally what?",
