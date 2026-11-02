@@ -2,13 +2,13 @@
   "version": 1,
   "courseSlug": "fire-smoke-damage-restoration-fundamentals",
   "status": "draft",
-  "note": "DRAFT v1 module checks and final knowledge check for the CARSI Fire & Smoke Restoration Practitioner course. Original CARSI questions written for Australian and New Zealand conditions; no IICRC standard text reproduced. Answer positions balanced (each option position holds a quarter of correct answers). SME review and sign-off required before seeding.",
+  "note": "DRAFT v1 module checks and final knowledge check for the CARSI Fire & Smoke Restoration Practitioner course. Original CARSI questions written for Australian and New Zealand conditions; no IICRC standard text reproduced. Pass mark 80 % on every check (founder decision 2 November 2026). Answer positions balanced across 54 questions (13, 14, 14 and 13 correct answers in positions A to D); the correct answer is the uniquely longest option in 20 of 54. SME review and sign-off required before seeding.",
   "quizzes": [
     {
       "quizId": "3f6b2d1e-8a47-4c59-9e1a-6d0c2b7f4a11",
       "lessonTitle": "Module 1 check",
       "title": "CARSI Fire & Smoke Restoration Practitioner — Module 1 check",
-      "passPercentage": 70,
+      "passPercentage": 80,
       "attemptsAllowed": 3,
       "questions": [
         {
@@ -82,6 +82,18 @@
           "correctIndex": 3,
           "points": 1,
           "explanation": "3.6 × 3.0 = 10.8 m² of floor; 10.8 × 2.4 ≈ 25.9 m³ of air. Record each room separately."
+        },
+        {
+          "questionText": "You arrive at a fire-damaged house and the owner is wiping soot off the benchtop with a wet cloth. What do you do first?",
+          "options": [
+            "Help them finish the wiping so the kitchen is ready for cleaning",
+            "Stop it, explain why, and ask when the house was built",
+            "Leave them to it, because it is their own property",
+            "Hand them a P2 mask and let them keep on wiping"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Wet-wiping dry soot smears it into the surface, and nobody should disturb residue before the hazardous-materials check. The build year starts that check."
         }
       ]
     },
@@ -89,7 +101,7 @@
       "quizId": "7c1e5a90-2b3d-4f8e-a6c4-91d2e0b85f22",
       "lessonTitle": "Module 2 check",
       "title": "CARSI Fire & Smoke Restoration Practitioner — Module 2 check",
-      "passPercentage": 70,
+      "passPercentage": 80,
       "attemptsAllowed": 3,
       "questions": [
         {
@@ -163,6 +175,18 @@
           "correctIndex": 0,
           "points": 1,
           "explanation": "10 × 820 = 8,200 mm² = 0.0082 m² per door; five doors ≈ 0.041 m², about the size of a 200 mm square hole."
+        },
+        {
+          "questionText": "During two days of bushfire smoke, the owners ran their roof-mounted evaporative cooler. What does that mean for your survey?",
+          "options": [
+            "Coolers filter the air, so the rooms they serve are cleaner than the rest",
+            "It matters only if the cooler pads are visibly sooted",
+            "Coolers recirculate indoor air, so nothing came in",
+            "It drew outside air in, so survey the whole house and ducts"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Health authorities advise against evaporative coolers in smoke because they bring outside air inside; one can replace a house's air every 2 to 3 minutes."
         }
       ]
     },
@@ -170,7 +194,7 @@
       "quizId": "a9d43c27-5e61-4b0f-8d73-2c8f19e6b033",
       "lessonTitle": "Module 3 check",
       "title": "CARSI Fire & Smoke Restoration Practitioner — Module 3 check",
-      "passPercentage": 70,
+      "passPercentage": 80,
       "attemptsAllowed": 3,
       "questions": [
         {
@@ -244,6 +268,18 @@
           "correctIndex": 3,
           "points": 1,
           "explanation": "Treat CCA ash as containing copper, chromium and arsenic (up to 10 % by weight). Keep it wet, shovel it, bag it, and never bury it or put it in a garden or organics bin."
+        },
+        {
+          "questionText": "On a Victorian bushfire site, fire-affected fibro cannot be reached to be inspected. How does WorkSafe Victoria say it is treated?",
+          "options": [
+            "As friable, so a Class A licence holder is engaged",
+            "As non-friable until a laboratory sample proves otherwise",
+            "As Class B work if the area is under 10 m²",
+            "As general waste once it has been kept damp"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "WorkSafe Victoria takes a precautionary approach: inaccessible bushfire-affected asbestos is treated as friable and needs a Class A licence holder."
         }
       ]
     },
@@ -251,7 +287,7 @@
       "quizId": "d2e8f6b4-1c07-4a93-b5e2-7f30a8c4d044",
       "lessonTitle": "Module 4 check",
       "title": "CARSI Fire & Smoke Restoration Practitioner — Module 4 check",
-      "passPercentage": 70,
+      "passPercentage": 80,
       "attemptsAllowed": 3,
       "questions": [
         {
@@ -325,6 +361,18 @@
           "correctIndex": 0,
           "points": 1,
           "explanation": "Perimeter 2 × (4.0 + 3.4) = 14.8 m; × 2.4 = 35.5 m²; less 3.8 m² of openings = 31.7 m². With the 13.6 m² ceiling the total is 45.3 m²."
+        },
+        {
+          "questionText": "An office floor of 600 m² has a grid ceiling of 1,200 mm × 600 mm tiles. About how many tiles is that?",
+          "options": [
+            "About 500",
+            "About 720",
+            "About 833",
+            "About 1,000"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "One tile is 1.2 × 0.6 = 0.72 m², so 600 ÷ 0.72 ≈ 833 tiles. Record the count you replace and the test result behind it."
         }
       ]
     },
@@ -332,7 +380,7 @@
       "quizId": "e5b71a3c-9f24-4d68-8c1b-3a6d92f0e055",
       "lessonTitle": "Module 5 check",
       "title": "CARSI Fire & Smoke Restoration Practitioner — Module 5 check",
-      "passPercentage": 70,
+      "passPercentage": 80,
       "attemptsAllowed": 3,
       "questions": [
         {
@@ -406,6 +454,18 @@
           "correctIndex": 3,
           "points": 1,
           "explanation": "17.0 − 10.5 = 6.5 g/kg; 6.5 × 86 ≈ 559 g ≈ 0.56 kg. The air dries fast, but wet materials keep feeding it."
+        },
+        {
+          "questionText": "The owners of a bushfire-affected house want to restart the ducted evaporative cooler that ran through the smoke. What do you advise?",
+          "options": [
+            "Restart it on high to flush the ash out of the ducts",
+            "Keep it off until the system and ducts are cleaned",
+            "Restart it once the outlet grilles are wiped down",
+            "Restart it with new pads; the ducts clear themselves"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Running it before cleaning blows residue across cleaned rooms. EPA Victoria advises professional cleaning of HVAC units and all ductwork, with filters replaced."
         }
       ]
     },
@@ -413,7 +473,7 @@
       "quizId": "f8c26d4e-3a95-4e17-b9d0-5c1e73a2f066",
       "lessonTitle": "Module 6 check",
       "title": "CARSI Fire & Smoke Restoration Practitioner — Module 6 check",
-      "passPercentage": 70,
+      "passPercentage": 80,
       "attemptsAllowed": 3,
       "questions": [
         {
@@ -487,6 +547,18 @@
           "correctIndex": 0,
           "points": 1,
           "explanation": "Australian GST is 10 %: 3,850 × 0.10 = 385, so 3,850 + 385 = A$4,235. Show the area, rate and GST separately."
+        },
+        {
+          "questionText": "An owner asks whether a negative ion generator will remove the fine smoke residue left in a bedroom. What is the accurate answer?",
+          "options": [
+            "Yes, if it runs for 24 hours with the windows shut",
+            "Yes, and it is safe because it makes no ozone",
+            "No, these devices do not remove fine particles",
+            "Only when it is paired with an odour absorber"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "NSW Health says humidifiers, negative ion generators and odour absorbers do not remove fine particles in bushfire smoke. Find and clean the source."
         }
       ]
     },
@@ -494,7 +566,7 @@
       "quizId": "ce2e5ad2-3bec-4437-9572-8e1b22c4d1bd",
       "lessonTitle": "Final knowledge check",
       "title": "CARSI Fire & Smoke Restoration Practitioner — Final knowledge check",
-      "passPercentage": 70,
+      "passPercentage": 80,
       "attemptsAllowed": 3,
       "questions": [
         {

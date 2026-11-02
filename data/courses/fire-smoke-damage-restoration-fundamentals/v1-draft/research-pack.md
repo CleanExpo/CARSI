@@ -18,14 +18,24 @@ tool. The only S700 fact used is publication metadata (first edition, 2025) from
 - **Full credential course.** DECISIONS #27 ("Designation = Level 2") applies only where a
   matching Level 2 course exists. CARSI has no Level 2 fire course (the seed holds only the
   $29 *Introduction to Smoke and Soot Damage Restoration*), so this course teaches and assesses
-  the discipline: 6 modules, 12 teaching lessons, 6 module checks, a 12-question final check and a
-  practical task. `meta.courseRole` records this.
+  the discipline: 6 modules, 12 teaching lessons, 6 module checks (7 questions each), a
+  12-question final check and a practical task. **Pass mark 80 %** for every module check, the
+  final knowledge check and the practical task (founder decision 2 November 2026; FSP-003). `meta.courseRole` records this.
 - **Designation:** `meta.designation` = "CARSI Fire & Smoke Restoration Practitioner",
   `iicrcDiscipline: null`, `cecHours: 0`. No IICRC discipline acronym is used anywhere.
 - **Optional foundation:** `asbestos-awareness-for-restoration-technicians` (per
   `data/seed/designations.json`), recommended in lesson 1.1.
-- **Price unchanged** (A$99). **Duration changed 4 → 3 hours** to match evidenced content
-  (about 111 minutes of reading and questions before the practical task). Founder GAP FSP-122.
+- **Price unchanged** (A$99). **Duration stays at 4 hours** (founder decision 2 November 2026,
+  FSP-122 now JUSTIFIED). The earlier draft cut it to 3 hours because only about 111 minutes were
+  evidenced (46 % of 4 h). This revision adds about 3,750 words of worked AU/NZ scenarios, field
+  walk-throughs, decision points and common mistakes, plus one question per module check:
+  evidenced time is now 57 % of 4 hours (audit 14/14).
+- **Four job types** run through the lessons: house fire, kitchen fire, bushfire-affected
+  building, and commercial (café under apartments, office floor, commercial kitchen).
+- **Bushfire scope.** Bushfire ash and asbestos-in-bushfire content is taught only from AU/NZ
+  regulators and health authorities (NSW EPA, SafeWork NSW, WorkSafe Victoria, EPA Victoria,
+  NSW Health, the Better Health Channel, the Australian CDC, WorkSafe NZ). Lesson 1.1 states that
+  CARSI's nominative S700:2025 alignment is claimed for the restoration method only, not for that material (FSP-128).
 - **Australia and New Zealand** throughout (DECISIONS #35, SKILL.md §5a on PR #979). No US
   framing: the old "not covered by United States wildfire documentation" line is gone.
 
@@ -68,11 +78,11 @@ module-check quiz ids are new. The live seed had 7 modules (over the v1 maximum 
 
 | Status | Entries | Meaning |
 | --- | ---: | --- |
-| VERIFIED | 82 | Source opened 02/11/2026 (Exa search/fetch), verbatim quote ≤ 25 words. 27 are New Zealand sources; 22 were reused from the Water, Mould and WHS Fundamentals ledgers (`reused_from`). |
-| JUSTIFIED | 15 | Our arithmetic (areas, volumes, P = V × I, psychrometrics, GST) on labelled illustrative figures, CARSI's AUD pricing policy, the nominative S700 citation, and the Australian asbestos assumption rule (FSP-126). |
-| GAP | 30 | Not verifiable here. **17 are standards-related** (`standards_related: true`; 16 against S700, 1 against S520); 11 are field-practice claims; 2 are founder decisions. **Every GAP must be cleared before go-live.** |
+| VERIFIED | 106 | Source opened 02/11/2026 (Exa search/fetch), verbatim quote ≤ 25 words. 29 are New Zealand sources; 22 were reused from the Water, Mould and WHS Fundamentals ledgers (`reused_from`). FSP-130 to FSP-160 add the bushfire and scenario sources. |
+| JUSTIFIED | 24 | Our arithmetic (areas, volumes, P = V × I, psychrometrics, GST) on labelled illustrative figures, CARSI's AUD pricing policy, the nominative S700 citation, the Australian asbestos assumption rule (FSP-126), scenario applications of sourced rules (FSP-129, 151, 154), the bushfire-scope statement (FSP-128) and the 4-hour duration (FSP-122). |
+| GAP | 31 | Not verifiable here. **17 are standards-related** (`standards_related: true`; 16 against S700, 1 against S520); 13 are field-practice claims (2 new: FSP-155 test patch judged dry, FSP-161 white-cloth wipe test); 1 is a founder decision (FSP-003). **Every GAP must be cleared before go-live.** |
 
-Grades: VERIFIED A1 ×6, A2 ×65, A3 ×7, B2 ×4; JUSTIFIED B2 ×13, C3 ×2. No vendor page is used as
+Grades: VERIFIED A1 ×6, A2 ×89, A3 ×7, B2 ×4; JUSTIFIED B2 ×21, B3 ×1, C3 ×2. No vendor page is used as
 evidence. The B2 sources are the NIST FireDOC abstract (Cider 1992), Ausgrid's safety site (000),
 and the CARSI Ozone course (repo source, for consistency).
 
@@ -85,11 +95,11 @@ rejected (exit 1) in the same session.
 The checklist generator labels every standards claim "S700"; FSP-089 is the one to check against
 **S520** instead (its reason says so).
 
-## Open GAPs (30)
+## Open GAPs (31)
 
 | ID | Owner | Claim (short) |
 | --- | --- | --- |
-| FSP-003 | founder | Designation rule: module checks + final 70 % + practical 70 %; Practitioner-tier placement |
+| FSP-003 | founder | Designation rule: module checks + final 80 % + practical 80 % (pass mark set 02/11/2026); Practitioner-tier placement |
 | FSP-010 | S700 | The fire restoration arc and its order |
 | FSP-011 | field | Confirm site release (fire service, police, owner) before starting |
 | FSP-025 | field | Fire-damaged wiring: supply restored only by a licensed electrician |
@@ -118,7 +128,8 @@ The checklist generator labels every standards claim "S700"; FSP-089 is the one 
 | FSP-110 | S700 | Verification checklist before handover |
 | FSP-111 | field | Contemporaneous records are stronger |
 | FSP-115 | field | Most fire work is inside an insurance claim |
-| FSP-122 | founder | Duration 3 h (live says 4 h) |
+| FSP-155 | field | Judge a test patch dry; a ring or gloss change is a fail |
+| FSP-161 | field | White-cloth wipe test, recorded area by area |
 
 ## Cross-course asbestos rule (coordinator, 02/11/2026)
 
@@ -154,12 +165,12 @@ management-plan duty. No copy states or implies a post-1990 Australian building 
 
 ## Open questions for Phill
 
-1. **Designation rule (FSP-003):** confirm completion = all module checks + final ≥ 70 % +
-   practical ≥ 70 %, and the Practitioner tier.
-2. **Duration (FSP-122):** 3 h (draft) or keep 4 h (live)? 4 h would need about 2,000 more words.
-3. **S700 scope and bushfire:** the course teaches bushfire-ash and asbestos-in-bushfire content
-   from AU regulators. Please confirm from your licensed copy how S700's scope treats
-   bushfire-affected buildings, so the nominative alignment line is not read as covering them.
+1. **Designation rule (FSP-003):** pass mark is now 80 % everywhere (decided 02/11/2026);
+   still to confirm: completion = all module checks + final + practical, and the Practitioner tier.
+2. **Duration (FSP-122):** decided 02/11/2026: 4 hours kept, material added (57 % evidenced).
+3. **S700 scope and bushfire:** decided 02/11/2026: bushfire content from AU/NZ regulators only,
+   and lesson 1.1 claims the S700 alignment for the restoration method only, not for the bushfire
+   material (FSP-128).
 4. **NZ CCA ash disposal (FSP-071):** no NZ regulator or council page was found; supply the rule
    or keep the "check your council" wording.
 5. **Electronics and corrosion (FSP-093–095):** the 24–48 h window and any RH target.
