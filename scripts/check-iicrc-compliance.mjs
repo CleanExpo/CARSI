@@ -75,6 +75,15 @@ const BANNED = [
     message: 'CARSI delivers IICRC CEC training, not certification — do not say "get certified with CARSI".' },
   { re: /\bcertified\s+online\s+with\s+CARSI\b/i, allow: null,
     message: 'CARSI delivers IICRC CEC training, not certification — reframe "certified online with CARSI".' },
+  // GAP CLOSED 2026-11-02 — a course described as "CEC-accredited training / introduction /
+  // overview / awareness" (or tagged "(CEC-accredited)") implies the COURSE earns CECs. Only a course
+  // in data/seed/cec-approvals.json may say so (CLAUDE.md: CEC is fail-closed, per-course approval).
+  // 12 seed entries carried it with no approval and this guard passed them. Denials ("not IICRC CEC
+  // accredited") are allowed. CARSI's provider wording ("IICRC CEC Accredited provider/courses") is
+  // not matched: the rule only fires on the course-describing nouns below.
+  { re: /\bCEC[\s-]+accredited\s+(training|introduction|overview|awareness|programme|program)\b|\(CEC[\s-]+accredited\)/i,
+    allow: /\bnot\s+(?:<[^>]+>\s*)?(?:IICRC\s+)?CEC[\s-]+accredited\b|\bIICRC\s+CEC\s+Accredited\s+(training|continuing)/i,
+    message: 'A course may be called "CEC-accredited" only once the IICRC has approved it (data/seed/cec-approvals.json). Remove the phrase, or write the denial "not IICRC CEC accredited".' },
 ];
 
 /** A specific IICRC-CEC hour claim on a course (e.g. "8 IICRC CECs", "5 IICRC CEC hours",
@@ -166,7 +175,7 @@ const COPY_EXT = /\.(tsx?|jsx?|mdx?|html?|json)$/;
 const SCANNED_DIRS = [
   'app/', 'src/', 'templates/',
   'docs/marketing/', 'docs/content/',
-  'data/seed/', 'data/voice/',
+  'data/seed/', 'data/voice/', 'data/video/', 'data/courses/',
   'public/courses/',
 ];
 const EXEMPT = [
