@@ -1,6 +1,6 @@
 # SME claim checklist — CARSI Mould Remediation Practitioner (v1 draft, Level 2 designation wrapper)
 
-**For:** Phill (SME, DECISIONS #24) · **Generated:** 02/11/2026 from `data/courses/mould-remediation-fundamentals/v1-draft/evidence/evidence-ledger.jsonl` · **Ledger:** 45 claims: 28 VERIFIED, 7 JUSTIFIED, **10 GAP (listed below)**.
+**For:** Phill (SME, DECISIONS #24) · **Generated:** 02/11/2026 from `data/courses/mould-remediation-fundamentals/v1-draft/evidence/evidence-ledger.jsonl` · **Ledger:** 46 claims: 29 VERIFIED, 7 JUSTIFIED, **10 GAP (listed below)**.
 
 Only the GAP claims need you. VERIFIED and JUSTIFIED claims already carry a source. Tick one box per claim:
 
@@ -36,7 +36,7 @@ Only the GAP claims need you. VERIFIED and JUSTIFIED claims already carry a sour
 ## M2 · Common-failure analysis: why mould jobs come back
 
 - [ ] OK  [ ] Fix  [ ] Cut — **MRP-005** · **S520** — Containment and negative air come before removal and before any air is moved across visible growth.
-    - _Why it is open:_ CARSI working rule supported in mechanism by the NT Government (MRP-009); WorkSafe Queensland also advises drying wet areas as soon as possible with fans. The rule itself and its match to the licensed standard need confirming.
+    - _Why it is open:_ CARSI working rule supported in mechanism by the NT Government (MRP-033); WorkSafe Queensland also advises drying wet areas as soon as possible with fans. The rule itself and its match to the licensed standard need confirming.
 - [ ] OK  [ ] Fix  [ ] Cut — **MRP-037** — The six failure patterns (cause not fixed, porous material kept, air moved before containment, dust left, rebuilt wet, no record) are the common causes of callbacks.
     - _Why it is open:_ The callback review is an illustrative composite, not a measured study. Each failure is tied to a regulator source or Level 2 lesson, but the claim that these are the most common causes has no data behind it. SME to confirm from CARSI field experience, or soften to "failures we see".
 
