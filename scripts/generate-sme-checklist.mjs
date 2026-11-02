@@ -1,6 +1,6 @@
 // SME claim checklist from a course evidence ledger (DECISIONS #24).
-// Usage: node scripts/generate-sme-checklist.cjs <v1-draft-dir/> "<course title>" <standard, e.g. S500> <out.md>
-const fs = require('fs');
+// Usage: node scripts/generate-sme-checklist.mjs <v1-draft-dir/> "<course title>" <standard, e.g. S500> <out.md>
+import fs from 'node:fs';
 const [, , base, title, std, out] = process.argv;
 const r = fs.readFileSync(base + 'evidence/evidence-ledger.jsonl', 'utf8').trim().split('\n').map(JSON.parse);
 const c = JSON.parse(fs.readFileSync(base + 'courses-catalog.json', 'utf8')).courses[0];
