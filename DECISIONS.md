@@ -116,3 +116,16 @@ where a safe fallback exists, the deadline should do something rather than pass 
 | 32 | Go-live hand-off | **Per sign-off.** For each course Phill signs off, agents merge it and prepare a forwardable message for Rana with that course's preflight and seed command. |
 | 33 | CEC renewals expiring 18/01/2027 | Agents generate all 16 renewal packs. Phill submits them. |
 | 34 | WHS Fundamentals course | Written by an Australian registered trainer about three years ago and not updated since. It gets a dated currency review against current WHS law before any re-release. |
+
+## Decided 2026-11-02 — second walkthrough with Phill
+
+| # | Decision | Outcome |
+| --- | --- | --- |
+| 35 | Market scope of course content | **Australia and New Zealand, every course.** New builds include NZ law (HSWA 2015, WorkSafe NZ, NZ thresholds) wherever it differs from Australia; existing courses gain it when rebuilt or reviewed. US framing is removed. Rule: `.claude/skills/carsi-course-production/SKILL.md` §5a. WHS Fundamentals is converted first (PR #977). |
+| 36 | Delivering instructor on the 16 CEC renewal packs | **Phill McGurk.** |
+| 37 | The 4 renewal courses not found on carsi.com.au | **Renew all 4.** Rana locates them in the production database (they may be unpublished or under another slug) so they join the renewal batch. |
+| 38 | Next designation rebuilds | **Structural Drying, Contaminated-Water, Fire & Smoke, and Trauma & Biohazard Practitioner**, all four. |
+| 39 | Pace (supersedes #31) | **Start the next batch now**, without waiting for the Water and Mould sign-offs. Nothing goes live without Phill's sign-off, so the gate is unchanged. |
+| 40 | The 6 intro videos still speaking an unapproved "CEC-accredited" claim | **Re-render all 6** from the corrected scripts. Swapping the new URLs into live courses is a seed step. |
+| 41 | Course prerequisites | **Build enforcement.** A course with a prerequisite (first case: Mould Remediation Practitioner requires Level 2 Mould) is locked until the prerequisite is completed. |
+| 42 | Answer-position skew in the 6 seed quizzes | **Rebalance all 6, including Ozone.** Options are rotated only; no wording changes, so Ozone's `noAiRewrite` text is untouched. |
