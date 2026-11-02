@@ -37,6 +37,12 @@ export const ROLE_PATHS = [
   'carpet-and-floors',
   'supervisor-and-estimator',
   'adjacent-buyers',
+  // Cleaning verticals (industry → bespoke-pathway builder). Keep in sync with COURSE_STANDARD.md §3.2.
+  'general-and-bond',
+  'facility',
+  'aged-care',
+  'government-and-security',
+  'data-centre',
 ];
 export const LESSON_PARTS = [
   'On the job',
