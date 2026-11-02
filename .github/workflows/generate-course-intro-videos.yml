@@ -18,8 +18,12 @@ on:
         description: 'Max videos to render this run (start at 1 to validate)'
         default: '1'
       slug:
-        description: 'Optional single course slug (blank = all pending)'
+        description: 'Optional course slug, or comma-separated slugs (blank = all pending)'
         default: ''
+      force:
+        description: 'Re-render courses that already have a video (use only with slug set)'
+        type: boolean
+        default: false
       engine:
         description: 'HeyGen render engine (avatar_v = highest fidelity; avatar_iv allows expressiveness)'
         type: choice
@@ -92,8 +96,13 @@ jobs:
         if: ${{ inputs.mode == 'generate' }}
         run: |
           SLUG_ARG=""
+          FORCE_ARG=""
           if [ -n "${{ inputs.slug }}" ]; then SLUG_ARG="--slug=${{ inputs.slug }}"; fi
-          npx tsx scripts/generate-course-intro-videos.ts --generate --yes $SLUG_ARG --limit=${{ inputs.limit }}
+          if [ "${{ inputs.force }}" = "true" ]; then
+            if [ -z "${{ inputs.slug }}" ]; then echo "::error::force needs slug set (it would re-render every course)"; exit 1; fi
+            FORCE_ARG="--force"
+          fi
+          npx tsx scripts/generate-course-intro-videos.ts --generate --yes $SLUG_ARG $FORCE_ARG --limit=${{ inputs.limit }}
           npx tsx scripts/apply-intro-video-urls.ts
 
       # main is a protected branch (GH006 on direct push), so results land as a PR for review.
