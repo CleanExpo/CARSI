@@ -147,7 +147,7 @@ async function verifyRoute(route: RouteInfo, baseUrl: string): Promise<RouteInfo
   }
 }
 
-export async function GET(request: NextRequest): Promise<NextResponse<RouteHealthResponse>> {
+export async function GET(request: NextRequest) {
   const denied = requireCron(request);
   if (denied) return denied;
 

@@ -25,10 +25,10 @@ export default function CoachingPartnerDemoPage() {
 
   return (
     <>
-      <PlatformNav />
-      <main id="main-content" className="bg-[#0b1220] pb-20 pt-10 text-slate-100">
+      <PlatformNav current="/ccw-training/partner-demo" />
+      <main id="main-content" className="bg-[#0b1220] pt-10 pb-20 text-slate-100">
         <div className={PUBLIC_SHELL_INNER_CLASS}>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-400/90">
+          <p className="text-xs font-semibold tracking-[0.2em] text-sky-400/90 uppercase">
             Partner demo · GP-637
           </p>
           <h1 className="mt-3 font-[family-name:var(--font-display)] text-3xl font-semibold tracking-tight text-white md:text-4xl">
@@ -37,7 +37,10 @@ export default function CoachingPartnerDemoPage() {
           <p className="mt-4 max-w-2xl text-sm leading-relaxed text-slate-400">
             Sample data only — use this script when showing a prospect coach the member journey.
             Live workspace: subscribe at{' '}
-            <Link href={carsiCoachingMonthlyPath} className="text-sky-300 underline-offset-2 hover:underline">
+            <Link
+              href={carsiCoachingMonthlyPath}
+              className="text-sky-300 underline-offset-2 hover:underline"
+            >
               {carsiCoachingMonthlyPath}
             </Link>
             , then sign in as a member.
@@ -51,12 +54,16 @@ export default function CoachingPartnerDemoPage() {
             </p>
             <dl className="mt-6 grid gap-4 sm:grid-cols-2">
               <div>
-                <dt className="text-xs uppercase tracking-wide text-slate-500">Plan focus</dt>
-                <dd className="mt-1 text-sm text-slate-200">{PARTNER_DEMO_WORKSPACE.horizontalSummary}</dd>
+                <dt className="text-xs tracking-wide text-slate-500 uppercase">Plan focus</dt>
+                <dd className="mt-1 text-sm text-slate-200">
+                  {PARTNER_DEMO_WORKSPACE.horizontalSummary}
+                </dd>
               </div>
               <div>
-                <dt className="text-xs uppercase tracking-wide text-slate-500">Direction</dt>
-                <dd className="mt-1 text-sm text-slate-200">{PARTNER_DEMO_WORKSPACE.directionSummary}</dd>
+                <dt className="text-xs tracking-wide text-slate-500 uppercase">Direction</dt>
+                <dd className="mt-1 text-sm text-slate-200">
+                  {PARTNER_DEMO_WORKSPACE.directionSummary}
+                </dd>
               </div>
             </dl>
           </section>
@@ -88,7 +95,9 @@ export default function CoachingPartnerDemoPage() {
           <section className="mt-8 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-5">
             <h2 className="text-sm font-semibold text-amber-100">Onboarding brief (excerpt)</h2>
             <p className="mt-2 text-sm text-amber-50/90">{snapshot.statements.problemStatement}</p>
-            <p className="mt-2 text-sm text-amber-50/80">Goal: {snapshot.statements.goalStatement}</p>
+            <p className="mt-2 text-sm text-amber-50/80">
+              Goal: {snapshot.statements.goalStatement}
+            </p>
           </section>
         </div>
       </main>
