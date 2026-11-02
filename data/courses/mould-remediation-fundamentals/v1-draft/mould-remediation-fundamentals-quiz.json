@@ -1,0 +1,545 @@
+{
+  "version": 1,
+  "courseSlug": "mould-remediation-fundamentals",
+  "status": "draft",
+  "note": "DRAFT v1 practice module checks and the final designation exam for the CARSI Mould Remediation Practitioner course. Original CARSI questions written for Australian conditions; no IICRC standard text reproduced or paraphrased. SME review and sign-off required before seeding.",
+  "quizzes": [
+    {
+      "quizId": "e59d0a7d-dc7e-4b23-836d-c78b1acb41c5",
+      "lessonTitle": "Module 1 check",
+      "title": "CARSI Mould Remediation Practitioner — Module 1 check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "What must you have completed before enrolling in the CARSI Mould Remediation Practitioner course?",
+          "options": [
+            "Nothing",
+            "CARSI Level 2 Mould Remediation",
+            "IICRC certification",
+            "A Certificate IV in WHS"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Level 2 is the prerequisite. It teaches the work; this course applies it to whole jobs and assesses you for the designation."
+        },
+        {
+          "questionText": "A job has 1.68 m² and 0.50 m² of visible growth. Does it suit the practical task, which asks for a medium job?",
+          "options": [
+            "No, it is small",
+            "Yes: 2.18 m² is inside the 1–10 m² medium band",
+            "No, it is large",
+            "Only if it is commercial"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Add the patches: 1.68 + 0.50 = 2.18 m². WorkSafe Queensland treats 1–10 m² as a medium job."
+        },
+        {
+          "questionText": "Is the CARSI Mould Remediation Practitioner designation IICRC certification?",
+          "options": [
+            "Yes",
+            "No; it is a CARSI credential, separate from IICRC certification, which comes only through IICRC-approved schools and examinations",
+            "Only after the final exam",
+            "Only in Queensland"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "The designation is a CARSI Southern Hemisphere Restoration Designation at the Practitioner tier. It is not IICRC certification and does not lead to it."
+        },
+        {
+          "questionText": "Why did Priya book a licensed asbestos assessor before cutting anything in a 1974 house?",
+          "options": [
+            "It is required for every job",
+            "Homes built before 1990 may contain asbestos, and it cannot be identified by looking",
+            "The insurer asked for it",
+            "To speed up the job"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Pre-1990 buildings may contain asbestos, you cannot tell by looking, and a licence is needed to assess or remove it."
+        },
+        {
+          "questionText": "Why does the plumber repair the shower before remediation starts?",
+          "options": [
+            "The plumber was available first",
+            "If the water problem is not fixed, the mould problem returns",
+            "To save on equipment hire",
+            "So the tenant can shower"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "SafeWork NSW: if the underlying water, moisture or ventilation problem is not fixed, the mould problem will return."
+        },
+        {
+          "questionText": "A 17.28 m³ containment has a scrubber delivering 400 m³/h. About how many air changes per hour is that?",
+          "options": [
+            "About 7",
+            "About 23",
+            "About 40",
+            "About 400"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Air changes per hour = delivered airflow ÷ volume: 400 ÷ 17.28 ≈ 23. Compare it with the job target in the plan."
+        }
+      ]
+    },
+    {
+      "quizId": "bf91664e-08b5-4ea0-9ec3-e9eae89128a9",
+      "lessonTitle": "Module 2 check",
+      "title": "CARSI Mould Remediation Practitioner — Module 2 check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Which four kinds of evidence does Sam record before deciding how a room is affected?",
+          "options": [
+            "Price, timing, access, parking",
+            "What he can see, measure, how the room connects, and what he can smell",
+            "Only visible growth",
+            "Only a spore test"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Visible signs, measurements, connections and smell together support a call that can be defended in writing."
+        },
+        {
+          "questionText": "Room air is 21 °C and 65 %RH and an external wall reads 15 °C. Roughly what is the relative humidity at the wall surface?",
+          "options": [
+            "About 65 %RH",
+            "About 75 %RH",
+            "About 95 %RH",
+            "About 50 %RH"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Vapour pressure 0.65 × 2.488 ≈ 1.617 kPa; saturation at 15 °C ≈ 1.705 kPa; 1.617 ÷ 1.705 ≈ 95%, well above the 70% the ABCB links with mould growth."
+        },
+        {
+          "questionText": "The evidence for a room is mixed. Which way should the call go?",
+          "options": [
+            "Treat it as clean to keep the price down",
+            "Take the more cautious call and record why",
+            "Leave it out of the scope",
+            "Ask the occupant to decide"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Treating an affected room as clean is the failure that spreads mould to a finished job. Take the cautious call and say so in the scope."
+        },
+        {
+          "questionText": "Which failure does SafeWork NSW say makes the mould problem return?",
+          "options": [
+            "Using the wrong colour sheeting",
+            "Not fixing the underlying water, moisture or ventilation problem",
+            "Working on weekends",
+            "Using a refrigerant dehumidifier"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "SafeWork NSW is plain that unless the underlying moisture problem is fixed, the mould problem will return."
+        },
+        {
+          "questionText": "A ceiling was wet for about 86 hours before cleaning. What should have happened to the plasterboard?",
+          "options": [
+            "Cleaned and painted",
+            "Discarded, because it had been wet for more than 48 hours",
+            "Left to dry by itself",
+            "Sprayed with bleach"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "SafeWork NSW advises discarding porous materials that cannot readily be cleaned, have been wet for more than 48 hours or show visible growth."
+        },
+        {
+          "questionText": "Why does running air movers across visible growth before containment cause callbacks?",
+          "options": [
+            "It uses too much power",
+            "Moving air disturbs the growth and spreads spores to clean rooms",
+            "It dries too slowly",
+            "It is noisy"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Moulds release spores when disturbed, including as a building dries out (NT Government). Contain and remove before air moves."
+        }
+      ]
+    },
+    {
+      "quizId": "083665d3-9f27-4a4c-900c-ca188147d8ef",
+      "lessonTitle": "Module 3 check",
+      "title": "CARSI Mould Remediation Practitioner — Module 3 check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "What does Chris do with a summary sentence that has no evidence item next to it?",
+          "options": [
+            "Keeps it if it sounds right",
+            "Removes it or marks it as not recorded",
+            "Adds a guessed reading",
+            "Moves it to the appendix"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Every claim in a defensible file points to evidence. A claim without evidence is removed or honestly marked as not recorded."
+        },
+        {
+          "questionText": "Readings are missing for days 3 to 7. How should the file show that?",
+          "options": [
+            "Fill in likely readings",
+            "Record them as not recorded and note any other evidence covering the period",
+            "Delete the drying section",
+            "Copy the day 2 readings"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Missing readings cannot be invented. An honest gap, with whatever else covers the period, is more credible than a tidy reconstruction."
+        },
+        {
+          "questionText": "Final readings are 12, 12, 11, 13 and 12 against a reference of 11. What is the average?",
+          "options": [
+            "11.0",
+            "12.0",
+            "12.5",
+            "13.0"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "(12 + 12 + 11 + 13 + 12) ÷ 5 = 60 ÷ 5 = 12.0. Whether that is within tolerance is set by the SME-confirmed method."
+        },
+        {
+          "questionText": "A carer with asthma asks whether she should keep working near the storeroom. What does Jo say?",
+          "options": [
+            "It will be fine",
+            "The storeroom is closed until the work is finished; please see your GP about your symptoms; the director has been told",
+            "Wear two masks",
+            "Take antihistamines"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Jo gives no health advice. WorkSafe Queensland advises at-risk workers to avoid mould-affected areas and notify their employer; health questions go to a GP."
+        },
+        {
+          "questionText": "Why does the parents’ message avoid the words “safe levels”?",
+          "options": [
+            "It is too technical",
+            "enHealth states there is no exposure limit or health guideline value for mould",
+            "Parents prefer short messages",
+            "It is a legal requirement"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "With no exposure limit or health guideline value, no number can be promised. The message says what is being done and that results are verified before reopening."
+        },
+        {
+          "questionText": "A $450.00 variation is found when the ceiling is opened. What is the total including GST, and what happens before work continues?",
+          "options": [
+            "$450.00; carry on",
+            "$495.00; written approval from the client, noted to the assessor",
+            "$540.00; verbal approval",
+            "$495.00; no approval needed"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "GST at 10% is $45.00, so $495.00. A scope change is recorded and approved in writing before the extra work starts."
+        }
+      ]
+    },
+    {
+      "quizId": "0bae5236-16a1-44f5-ada4-902b5dedf957",
+      "lessonTitle": "Module 4 check",
+      "title": "CARSI Mould Remediation Practitioner — Module 4 check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Ben wrote that the occupant’s cough “should clear up once the mould is gone”. Why must that come out?",
+          "options": [
+            "It is too long",
+            "It is health advice; a practitioner refers health questions to a GP",
+            "It is spelt wrongly",
+            "It is true but unnecessary"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Practitioners give no medical advice. The right line is that anyone unwell or worried should see their GP."
+        },
+        {
+          "questionText": "A draft scores 12, 15, 11, 12 and 12. Does it pass?",
+          "options": [
+            "Yes, 72",
+            "No, 62 is below the 70 pass mark",
+            "Yes, every criterion scored",
+            "No, 52"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "12 + 15 + 11 + 12 + 12 = 62 out of 100. The practical passes at 70."
+        },
+        {
+          "questionText": "What does the assessor want instead of “P2 masks”?",
+          "options": [
+            "A brand name",
+            "The respirator type, its AS/NZS 1716 marking, the fit-test date and the fit check",
+            "A photo of the box",
+            "Nothing more"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Criterion 3 rewards evidence of correct respiratory protection: an AS/NZS 1716 respirator, fit-tested before first use and fit-checked each wear."
+        }
+      ]
+    },
+    {
+      "quizId": "ce8d62e3-21da-47a9-b987-d627d1b25c22",
+      "lessonTitle": "Final designation exam",
+      "title": "CARSI Mould Remediation Practitioner — Final designation exam",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Which course must be completed before the CARSI Mould Remediation Practitioner designation can be earned?",
+          "options": [
+            "None",
+            "CARSI Level 2 Mould Remediation",
+            "A first-aid course",
+            "A building licence course"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Level 2 is the prerequisite. The designation assesses whether you can apply Level 2 to whole jobs."
+        },
+        {
+          "questionText": "What pass marks apply to the designation?",
+          "options": [
+            "50% for both",
+            "Practical task 70%, final designation exam 80%",
+            "Final exam only, 70%",
+            "Practical only, 90%"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "You need the practical at 70% or better against its rubric and this final exam at 80% or better."
+        },
+        {
+          "questionText": "Which statement about the designation is accurate?",
+          "options": [
+            "It is IICRC certification",
+            "It is a CARSI Southern Hemisphere Restoration Designation at the Practitioner tier",
+            "It replaces Level 2",
+            "It is an RTO qualification"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "It is a CARSI credential, separate from IICRC certification, which comes only through IICRC-approved schools and examinations."
+        },
+        {
+          "questionText": "In what order do the CARSI designation tiers run?",
+          "options": [
+            "Master, Advanced, Practitioner, Foundation",
+            "Foundation, Practitioner, Advanced, Master",
+            "Practitioner, Foundation, Master, Advanced",
+            "Foundation, Advanced, Practitioner, Master"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "The tiers are Foundation, Practitioner, Advanced and Master. This designation is the Practitioner tier."
+        },
+        {
+          "questionText": "What is the first thing to fix on any mould job?",
+          "options": [
+            "The paint finish",
+            "The water or moisture problem causing the growth",
+            "The invoice",
+            "The air movers"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "WorkSafe Queensland: find and fix the water or moisture problem. Without it the mould returns."
+        },
+        {
+          "questionText": "Total visible growth across three rooms is 1.62 m². How is the job sized?",
+          "options": [
+            "Small",
+            "Medium (1–10 m²)",
+            "Large",
+            "Not sized"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "On the WorkSafe Queensland scale, 1–10 m² is a medium job needing extra containment controls, more PPE and more consultation."
+        },
+        {
+          "questionText": "A room shares a door with a growth area, has settled dust and a cold external wall, but no visible growth. What should you do?",
+          "options": [
+            "Record it as clean",
+            "Investigate further (including behind furniture and in cavities) and take the cautious call if the evidence is mixed",
+            "Ignore the smell",
+            "Paint the wall"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Decide on evidence. A cold wall near 95 %RH and dust downwind of growth are reasons to look harder and to take the cautious call."
+        },
+        {
+          "questionText": "Room air at 21 °C and 65 %RH meets a 15 °C wall. Why does that matter?",
+          "options": [
+            "It does not",
+            "The wall surface sits near 95 %RH, above the 70% level linked with mould growth",
+            "The wall dries faster",
+            "The room air gets drier"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Cooling air at the wall raises its RH without adding vapour. The ABCB handbook links mould growth with about 70 %RH."
+        },
+        {
+          "questionText": "Plasterboard has been wet for 86 hours and shows growth. What happens to it?",
+          "options": [
+            "It is cleaned and painted",
+            "It is discarded",
+            "It is left in place to dry",
+            "It is sealed over"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "SafeWork NSW advises discarding porous materials wet for more than 48 hours or with visible growth."
+        },
+        {
+          "questionText": "Which is a common reason mould appears in a clean room after a job?",
+          "options": [
+            "The invoice was late",
+            "Air was moved across visible growth before it was contained",
+            "The containment was too strong",
+            "The dehumidifier was refrigerant"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Moulds release spores when disturbed or as a building dries out. Containment and removal come before airflow."
+        },
+        {
+          "questionText": "Why is a final clean part of the sign-off?",
+          "options": [
+            "It looks good in photos",
+            "Settled dust left within the area or nearby can carry mould",
+            "It is optional",
+            "It replaces verification"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "SafeWork NSW advises a final clean-up to remove dust that may have settled within the area or nearby."
+        },
+        {
+          "questionText": "Why does Queensland Health advise against dry brushing mould?",
+          "options": [
+            "It is slow",
+            "It can release spores into the air",
+            "It damages brushes",
+            "It is too wet"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Abrasive cleaning such as dry brushing can release spores into the air. Level 2 covers HEPA vacuuming and damp wiping."
+        },
+        {
+          "questionText": "A file says “dried” with no readings. What is wrong with it?",
+          "options": [
+            "Nothing",
+            "There is no dry reference and no measured proof of drying",
+            "It should say “dry”",
+            "It needs a photo of the dehumidifier only"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Without a reference there is no dry goal, and without readings there is no proof. Record the numbers."
+        },
+        {
+          "questionText": "Readings are missing from a job file for several days. What is the right approach?",
+          "options": [
+            "Estimate them",
+            "Mark them as not recorded and note other evidence for the period",
+            "Delete the drying log",
+            "Copy readings from another job"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Honest gaps keep a file credible. Never invent readings."
+        },
+        {
+          "questionText": "Who decides what evidence an insurer or tribunal accepts?",
+          "options": [
+            "The practitioner",
+            "That reviewing body",
+            "The tenant",
+            "CARSI"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Acceptance is a matter for the reviewing body. Your job is to make the facts clear, complete and checkable."
+        },
+        {
+          "questionText": "A parent asks if the centre is safe. Which reply is appropriate?",
+          "options": [
+            "Spore levels are now safe",
+            "The affected room is closed, the cause is being fixed, work is done when children are not on site, results are verified before reopening, and health concerns go to a GP",
+            "Mould is harmless",
+            "Keep your child home for a month"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "enHealth states there is no exposure limit or health guideline value for mould, so no safe level is promised and health questions go to a GP."
+        },
+        {
+          "questionText": "Which people does enHealth list as more likely to experience symptoms from mould?",
+          "options": [
+            "People with weakened immune systems, allergies, severe asthma or lung diseases",
+            "Only children",
+            "Only older people",
+            "No one"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Those are the groups enHealth lists. Plan around the most sensitive person and refer health questions to a GP."
+        },
+        {
+          "questionText": "What must happen before a worker first wears a tight-fitting respirator?",
+          "options": [
+            "Nothing",
+            "A fit test, then a fit check each time it goes on",
+            "A fit check only",
+            "A pressure test of the containment"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "SafeWork SA requires a fit test before a tight-fitting respirator is first worn. The fit check is done every time it goes on."
+        },
+        {
+          "questionText": "A scrubber draws 1.8 A and a dehumidifier 4.5 A at 230 V on one 10 A GPO. What is the total current?",
+          "options": [
+            "5.3 A",
+            "6.3 A",
+            "10.3 A",
+            "1,450 A"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "1.8 + 4.5 = 6.3 A, about 1,450 W at 230 V, under the 10 A GPO. Check what else shares the circuit and use an RCD."
+        },
+        {
+          "questionText": "A remediation is $1,950.00 excluding GST. What is the total including GST in AUD?",
+          "options": [
+            "$1,950.00",
+            "$2,145.00",
+            "$2,340.00",
+            "$2,045.00"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "GST is 10%: $195.00 on $1,950.00, so $2,145.00 including GST. Show GST on the quote and invoice."
+        }
+      ]
+    }
+  ]
+}
