@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "courseSlug": "category-3-sewage-black-water-remediation",
+  "status": "draft",
+  "note": "DRAFT v1 practical task for the CARSI Contaminated-Water Practitioner course. Instructor-graded against the rubric. Original CARSI task written for Australian and New Zealand conditions; no IICRC standard text reproduced. SME review and sign-off required before it is published.",
+  "assessment": {
+    "id": "3ff1a4d6-c0ae-4680-a40f-53ccfb7f6479",
+    "title": "CARSI Contaminated-Water Practitioner — Practical task: plan and evidence a Category 3 job from call to handover",
+    "passThreshold": 70,
+    "isPublished": false,
+    "instructions": "## Practical task\n\nPlan and evidence one Category 3 (sewage or black-water) job from first attendance to handover. Use a real job you attended, with names and addresses removed, or the supplied job: a single-storey 1985 brick-veneer home in Toowoomba, Queensland, where a blocked sewer main surcharged through the shower waste overnight. Sewage has spread across the bathroom (2.4 m x 1.8 m), the hallway (5.5 m x 1.1 m) and a carpeted bedroom (3.4 m x 3.0 m), with a water line of about 15 mm and wicking up the plasterboard to about 400 mm. The bedroom has a ducted air-conditioning return. On arrival the air reads 24 degrees C and 70 %RH. One 10 A GPO circuit serves the bedroom and hallway, and a second serves the bathroom and laundry. The owners have a baby. If you use a New Zealand job instead, apply the New Zealand law, regulator and numbers throughout.\n\nSubmit one PDF, or a set of photos and documents, containing:\n\n1. **Category call and loss size.** The source, the category and your reasons, the affected area in square metres and the volume in litres, and who must be kept out.\n2. **Risk assessment and the law.** The six-point hazard walk with the control for each hazard from the top of the hierarchy down; the power isolation and RCD arrangement; the asbestos assumption for the building's age; whether a SWMS is required (Australia) or the equivalent record (New Zealand); and the notification steps if a worker becomes seriously ill.\n3. **PPE and decontamination.** The PPE set by exposure route, with fit-test and fit-check notes and the answer for a bearded worker; the three-zone layout; and the PPE removal order.\n4. **Containment, removal, cleaning and waste.** Containment and HVAC isolation; the AFD air-change calculation in m3/h; each material removed with its area and reason; the clean-then-disinfect record (product, registration or approval, SDS held, dilution, contact time, area); the wastewater route with approval or docket; and the solid-waste streams with dockets.\n5. **Drying, clearance and the file.** Why drying starts only after cleaning is verified; the mould rule; a 230 V power budget per 10 A circuit; the clearance evidence; the plain-English handover to the owners; the consumer guarantee that applies; and an invoice in AUD showing GST.\n\nUse Australian English and metric units throughout. Reference any standard by name only; do not copy text from any standard.",
+    "criteria": [
+      {
+        "label": "Category call and loss size",
+        "description": "Category 3 justified from the source and its history, with reasons; area in m2 and volume in litres calculated with units shown; vulnerable occupants (the baby) recognised and kept out.",
+        "maxPoints": 20
+      },
+      {
+        "label": "Risk assessment and the law",
+        "description": "Hazard walk complete (power, structure, asbestos, confined spaces, people) with controls from the top of the hierarchy; 230 V isolation and RCD; asbestos assumption correct for the building age and country; SWMS or NZ equivalent addressed; notification steps for the job’s country correct.",
+        "maxPoints": 20
+      },
+      {
+        "label": "PPE and decontamination",
+        "description": "PPE chosen by exposure route; respirator fit test and fit check addressed for the job’s country, with a non-seal option for facial hair; three zones laid out; removal order correct with inner gloves last and hand washing.",
+        "maxPoints": 20
+      },
+      {
+        "label": "Containment, removal, cleaning and waste",
+        "description": "Containment set before disturbance with HVAC isolated; AFD airflow calculated in m3/h; porous material removed with areas and reasons; clean then disinfect to the label with a full product record; wastewater to sewer with approval or to a contractor with a docket, never stormwater; solid waste streams kept apart with dockets.",
+        "maxPoints": 20
+      },
+      {
+        "label": "Drying, clearance, file and production",
+        "description": "Drying only after verified cleaning; mould rule applied; 230 V power budget per 10 A circuit with no circuit overloaded; clearance based on recorded evidence; plain-English handover; correct consumer guarantee; AUD invoice with GST; Australian English, metric units and standards named only.",
+        "maxPoints": 20
+      }
+    ]
+  }
+}
