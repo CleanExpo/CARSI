@@ -65,7 +65,7 @@ export function HomeCertificationsSection({
           </h2>
           <p className={`mt-4 ${LANDING_LEAD_CLASS}`}>
             Earn a CARSI designation, with training that spans {disciplineCountLabel} restoration
-            disciplines. Every certificate is issued with a verification record.
+            topics. Every certificate is issued with a verification record.
           </p>
         </div>
 

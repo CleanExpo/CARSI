@@ -34,13 +34,13 @@ const TESTIMONIALS: Testimonial[] = [
     name: 'Yasser Mohamed',
     company: 'Black Gold Carpet Cleaning',
     quote:
-      "Running my own carpet cleaning business means training has to fit around the job. CARSI's 24/7 online access let me complete my CRT preparation between callouts. Worth every dollar.",
+      "Running my own carpet cleaning business means training has to fit around the job. CARSI's 24/7 online access let me complete carpet cleaning modules between callouts. Worth every dollar.",
   },
   {
     name: 'Klark Brown',
     company: 'Restoration Advisers',
     quote:
-      "We've enrolled our entire team through CARSI. The IICRC discipline coverage is comprehensive, the course quality is consistently high, and the platform just works. It's our go-to for keeping technicians certified.",
+      "We've enrolled our entire team through CARSI. The restoration and cleaning topics are comprehensive, the course quality is consistently high, and the platform just works. It's our go-to for keeping technicians current.",
   },
   {
     name: 'Phillip Wolffe',
