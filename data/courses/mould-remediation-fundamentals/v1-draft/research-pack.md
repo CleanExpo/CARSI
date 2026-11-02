@@ -102,7 +102,7 @@ surface RH at 15 °C = 94.8%; 25 °C/72 %RH = 14.33 g/kg; 24 °C/55 %RH = 10.24 
 
 ## Changes from the live seed entry
 
-- **"CEC-accredited training" removed** from the description and short description. The course
+- **the unapproved CEC-accreditation wording removed** from the description and short description. The course
   is not in `data/seed/cec-approvals.json`.
 - **Condition 1/2/3 definitions removed**, and the final-quiz question that restated a condition
   definition. The case study uses the terms as taught in Level 2 and leaves the mapping to Phill.
@@ -147,7 +147,7 @@ short by design. Founder question below.
    prerequisite that reads wrong; the allowed values are a storefront decision.
 4. **Practitioner tier placement** (GAP MRP-006): confirm this designation is the Practitioner
    tier, and publish the designation rules (Level 2 + practical 70% + final exam 80%).
-5. **"CEC-accredited training" in the live seed.** The phrase appears in the live entry for this
+5. **the unapproved CEC-accreditation wording in the live seed.** The phrase appears in the live entry for this
    course and in 12 other seed entries (including published `water-damage-essentials` and
    `ccw-carsi-truckmount-operations`), none of which is in `cec-approvals.json`. The guards pass it,
    but it reads as a CEC claim. This draft removes it; the seed is untouched.

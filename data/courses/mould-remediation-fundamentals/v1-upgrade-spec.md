@@ -33,7 +33,7 @@ The founder ruled one course per level with no duplicate teaching. This course t
 | `meta.prerequisite` | — | `level-2-mould-remediation-30ee3492` |
 | `meta.courseRole` | — | `designation-assessment-and-credential-wrapper` |
 | `durationHours` | 5 | **2.5** — matched to evidenced volume (58%); see §4 |
-| `description` / `shortDescription` | teaching course, "CEC-accredited training" | wrapper; prerequisite stated; no CEC claim |
+| `description` / `shortDescription` | teaching course, the unapproved CEC-accreditation wording | wrapper; prerequisite stated; no CEC claim |
 | kept | slug, title, `priceAud` 99, `cecHours` 0, `iicrcDiscipline` null, `meta.designation`, `designationProgram`, intro video and captions meta, `linearIssue` GP-474, `level`, tags, thumbnail | unchanged |
 
 ## 2. Structure (floor 5.2): 4 modules, each ≥3 lessons
