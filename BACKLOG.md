@@ -1005,6 +1005,7 @@ Fixing a seed file changes the live quiz only after a re-seed, which is catalogu
 `docs/runbooks/course-go-live.md`. The structural fix is to add a "no single option holds more than
 about 40% of correct answers" check to `audit-course-depth` (Course Standard v1, final-quiz floor),
 or to shuffle options per attempt in the quiz API.
+
 ### Discoveries — 2026-11-02 unapproved "CEC-accredited" copy
 
 - **Six rendered intro videos may say "This CEC-accredited training leads to the CARSI …
