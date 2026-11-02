@@ -32,6 +32,8 @@ type PrereqState = 'none' | 'checking' | 'locked' | 'unlocked';
 
 interface PrereqStatusResponse {
   locked: boolean;
+  /** The viewer already holds a live (possibly locked) enrolment, e.g. a team seat. */
+  enrolled?: boolean;
   prerequisites?: { slug: string; title: string }[];
 }
 
@@ -79,6 +81,7 @@ export function EnrolButton({
   const hasPrerequisites = prerequisites.length > 0;
   const [prereqState, setPrereqState] = useState<PrereqState>(hasPrerequisites ? 'checking' : 'none');
   const [lockedBy, setLockedBy] = useState<PrerequisiteLink[]>(prerequisites);
+  const [enrolledWhileLocked, setEnrolledWhileLocked] = useState(false);
 
   // Locked state is UX only; the server refuses enrolment/checkout regardless. On a failed
   // status check the button stays available and the server's answer decides.
@@ -98,6 +101,7 @@ export function EnrolButton({
         if (data.locked && data.prerequisites && data.prerequisites.length > 0) {
           setLockedBy(data.prerequisites);
         }
+        setEnrolledWhileLocked(data.enrolled === true);
         setPrereqState(data.locked ? 'locked' : 'unlocked');
       })
       .catch(() => {
@@ -167,14 +171,15 @@ export function EnrolButton({
     return isPaid ? `Enrol — $${effectivePrice.toFixed(0)} AUD` : 'Enrol Free';
   }
 
-  async function handleMemberEnrol() {
+  async function handleMemberEnrol(modeOverride?: CoursePurchaseMode) {
+    const buyMode: CoursePurchaseMode = modeOverride ?? purchaseMode;
     setLoading(true);
     setError(null);
 
     trackFunnelEvent({
       name: 'enrol_click',
       course_slug: slug,
-      purchase_mode: purchaseMode,
+      purchase_mode: buyMode,
       is_free: effectiveFree,
     });
 
@@ -187,7 +192,7 @@ export function EnrolButton({
       return;
     }
 
-    if (purchaseMode === 'team' && isPaid) {
+    if (buyMode === 'team' && isPaid) {
       const seatErr = validateTeamSeatCount(teamSeats);
       if (seatErr) {
         setError(seatErr);
@@ -198,7 +203,7 @@ export function EnrolButton({
 
     // Active member on a self enrolment → included in membership, no charge.
     // The server re-checks entitlement and fails closed; this is only the UX.
-    if (subState === 'subscribed' && purchaseMode !== 'team') {
+    if (subState === 'subscribed' && buyMode !== 'team') {
       try {
         const enrolled = await apiClient.post<ConfirmResponse>('/api/lms/subscription/enroll', {
           slug,
@@ -219,14 +224,14 @@ export function EnrolButton({
         window.location.origin,
         slug,
         undefined,
-        purchaseMode === 'team' ? { teamSeats } : undefined,
+        buyMode === 'team' ? { teamSeats } : undefined,
       );
       const data = await apiClient.post<CheckoutResponse>('/api/lms/checkout', {
         slug,
         success_url,
         cancel_url,
-        purchase_mode: purchaseMode,
-        ...(purchaseMode === 'team' ? { team_seat_count: teamSeats } : {}),
+        purchase_mode: buyMode,
+        ...(buyMode === 'team' ? { team_seat_count: teamSeats } : {}),
         ...(currentUser.email ? { customer_email: currentUser.email } : {}),
       });
 
@@ -249,8 +254,8 @@ export function EnrolButton({
         trackFunnelEvent({
           name: 'checkout_started',
           course_slug: slug,
-          purchase_mode: purchaseMode,
-          value_aud: purchaseMode === 'team' ? effectivePrice * teamSeats : effectivePrice,
+          purchase_mode: buyMode,
+          value_aud: buyMode === 'team' ? effectivePrice * teamSeats : effectivePrice,
         });
         window.location.href = data.checkout_url;
         return;
@@ -297,6 +302,32 @@ export function EnrolButton({
           signInHref={user ? undefined : `/login?next=${encodeURIComponent(returnTo)}`}
         />
         {error && lockedBy.length === 0 ? <p className="text-sm text-red-500">{error}</p> : null}
+        {/* Anyone may buy TEAM seats for a prerequisite course (founder decision 02/11/2026);
+            every seat, the buyer's included, stays locked until its holder completes it. */}
+        {user && isPaid && !enrolledWhileLocked ? (
+          <div className="space-y-2 pt-2">
+            <CoursePurchaseOptions
+              mode="team"
+              onModeChange={() => {}}
+              teamSeats={teamSeats}
+              onTeamSeatsChange={setTeamSeats}
+              unitPriceAud={effectivePrice}
+              disabled={loading}
+              teamOnly
+            />
+            <Button
+              onClick={() => void handleMemberEnrol('team')}
+              disabled={loading}
+              variant="outline"
+              className="w-full"
+            >
+              {loading
+                ? 'Processing…'
+                : `Buy ${teamSeats} team seats — $${(effectivePrice * teamSeats).toFixed(0)} AUD`}
+            </Button>
+            {error && lockedBy.length > 0 ? <p className="text-sm text-red-500">{error}</p> : null}
+          </div>
+        ) : null}
       </div>
     );
   }
@@ -345,7 +376,7 @@ export function EnrolButton({
         </div>
       ) : null}
       <Button
-        onClick={handleMemberEnrol}
+        onClick={() => void handleMemberEnrol()}
         disabled={loading || subState === 'checking' || prereqState === 'checking'}
         className="w-full rounded-sm border border-[#ed9d24]/70 bg-[#ed9d24] font-semibold text-[#111111] shadow-[0_10px_24px_rgba(237,157,36,0.32)] transition-all hover:bg-[#f2ad4e] hover:shadow-[0_14px_28px_rgba(237,157,36,0.4)]"
         size="lg"

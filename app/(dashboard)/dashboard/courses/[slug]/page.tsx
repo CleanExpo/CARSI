@@ -5,11 +5,14 @@ import { CourseDetailOutline } from '@/components/lms/CourseDetailOutline';
 import { CourseFormattedBody } from '@/components/lms/CourseFormattedBody';
 import { CourseReviews } from '@/components/lms/CourseReviews';
 import { EnrolButton } from '@/components/lms/EnrolButton';
+import { PrerequisiteLockNotice } from '@/components/lms/PrerequisiteLockNotice';
+import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
 import { dash } from '@/lib/dashboard-light-ui';
 import { courseDetailPrimaryAction } from '@/lib/learner-course-cta';
 import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
 import { getOnboardingLearnPath } from '@/lib/onboarding/navigation';
 import { getEnrollmentsForStudent } from '@/lib/server/learner-dashboard-data';
+import { findEnrolledCoursePrerequisiteBlock } from '@/lib/server/course-prerequisites';
 import { getServerSessionClaims } from '@/lib/server/session-server';
 import { getCourse, generateMetadata } from '../../../../(public)/courses/[slug]/page';
 
@@ -49,6 +52,17 @@ export default async function DashboardCourseDetailPage({
     percent: enrollment?.completion_percentage ?? 0,
     completed,
   });
+  // An enrolment can still be locked by a prerequisite: a team seat issued before its holder
+  // completed it (DECISIONS #41, founder decision 02/11/2026). Show the lock, not "Start".
+  // A failed lookup shows the normal action; the lesson routes enforce the gate regardless.
+  const prerequisiteBlock =
+    claims && enrollment && (course.prerequisites?.length ?? 0) > 0
+      ? await findEnrolledCoursePrerequisiteBlock({
+          userId: claims.sub,
+          isAdmin: () => isLmsClaimsAllowedAdminPanel(claims),
+          courseId: enrollment.course_id,
+        }).catch(() => null)
+      : null;
   const learnHref = enrollment?.last_lesson_id
     ? getOnboardingLearnPath(course.slug, enrollment.last_lesson_id)
     : getOnboardingLearnPath(course.slug);
@@ -136,7 +150,11 @@ export default async function DashboardCourseDetailPage({
                     : 'Course completed'}
             </p>
             <div className="mt-5">
-              {action === 'enrol' ? (
+              {prerequisiteBlock && prerequisiteBlock.prerequisites.length > 0 ? (
+                <PrerequisiteLockNotice prerequisites={prerequisiteBlock.prerequisites} />
+              ) : prerequisiteBlock ? (
+                <p className="text-sm text-slate-700">{prerequisiteBlock.detail}</p>
+              ) : action === 'enrol' ? (
                 <EnrolButton
                   slug={course.slug}
                   priceAud={priceNum}

@@ -331,8 +331,13 @@ export async function POST(request: NextRequest) {
     // enrolment — for a course whose prerequisite this buyer has not completed: the paid
     // fulfilment path does not refuse after the money is taken, so this is the paid gate.
     // Completion is tied to an account, so a guest (email-only) buyer must sign in first.
-    // A lookup failure is a 503 (never charge on doubt). Applies to team purchases too:
-    // the buyer's own seat is enrolled by the fulfilment.
+    // A lookup failure is a 503 (never charge on doubt).
+    //
+    // TEAM purchases (founder decision 02/11/2026): anyone may buy seats for a course with a
+    // prerequisite, so the buyer's own completion is NOT checked. Every seat — the buyer's own
+    // included — is issued locked (`prerequisite_gated`) by the fulfilment and stays locked
+    // until that person completes the prerequisite. A signed-in buyer is still required: the
+    // buyer's seat is an enrolment on an account, and the team is provisioned to it.
     if (dbCourse && courseHasPrerequisites(parseCoursePrerequisites(dbCourse.meta))) {
       if (!studentId) {
         return NextResponse.json(
@@ -344,13 +349,16 @@ export async function POST(request: NextRequest) {
           { status: 401 },
         );
       }
-      const block = await guardLookup(() =>
-        findCoursePrerequisiteBlock({
-          userId: studentId!,
-          isAdmin: () => (buyerClaims ? isLmsClaimsAllowedAdminPanel(buyerClaims) : false),
-          course: { slug: dbCourse!.slug, meta: dbCourse!.meta },
-        }),
-      );
+      const block =
+        purchaseMode === 'team'
+          ? null
+          : await guardLookup(() =>
+              findCoursePrerequisiteBlock({
+                userId: studentId!,
+                isAdmin: () => (buyerClaims ? isLmsClaimsAllowedAdminPanel(buyerClaims) : false),
+                course: { slug: dbCourse!.slug, meta: dbCourse!.meta },
+              }),
+            );
       if (block) {
         return NextResponse.json(prerequisiteBlockBody(block), { status: 403 });
       }

@@ -1,9 +1,10 @@
 import { prisma } from '@/lib/prisma';
-import { decideTeamSeatSubscription } from '@/lib/server/entitlements';
 import {
-  getTeamCoursePurchases,
-  getTeamCourseSeatPools,
-} from '@/lib/server/team-course-seats';
+  listPrerequisiteLockedSeats,
+  type PrerequisiteLockedSeat,
+} from '@/lib/server/course-prerequisites';
+import { decideTeamSeatSubscription } from '@/lib/server/entitlements';
+import { getTeamCoursePurchases, getTeamCourseSeatPools } from '@/lib/server/team-course-seats';
 import { countTeamSeatsUsed, repairAndGetTeamForUser } from '@/lib/server/teams';
 
 type TeamRecord = NonNullable<Awaited<ReturnType<typeof repairAndGetTeamForUser>>>;
@@ -41,15 +42,29 @@ export async function serializeTeamForClient(team: TeamRecord, claimsSub: string
     };
   }
 
-  const [seatsUsed, coursePurchases, courseSeatPools, teamSub] = await Promise.all([
+  const coursePurchasesPromise = getTeamCoursePurchases(team.id);
+  const [seatsUsed, coursePurchases, courseSeatPools, teamSub, lockedSeats] = await Promise.all([
     countTeamSeatsUsed(team.id),
-    getTeamCoursePurchases(team.id),
+    coursePurchasesPromise,
     getTeamCourseSeatPools(team.id),
     // WS1-E2 (GP-442): the recurring seat subscription, when this is a Teams
     // subscription team. Drives the owner dashboard seats/usage + status block.
     team.bundleTier === 'teams_subscription'
       ? prisma.lmsTeamSubscription.findUnique({ where: { teamId: team.id } })
       : Promise.resolve(null),
+    // Seats still locked by a course prerequisite (DECISIONS #41). Display only: a failed
+    // lookup shows no badge rather than breaking the team dashboard.
+    coursePurchasesPromise
+      .then((purchases) =>
+        listPrerequisiteLockedSeats(
+          team.members.map((m) => m.userId),
+          purchases.map((p) => p.course_slug)
+        )
+      )
+      .catch((e) => {
+        console.warn('[team-api-serialize] locked-seat lookup failed', e);
+        return new Map<string, PrerequisiteLockedSeat[]>();
+      }),
   ]);
 
   const teamSubscription = teamSub
@@ -102,6 +117,7 @@ export async function serializeTeamForClient(team: TeamRecord, claimsSub: string
       role: m.role,
       email: m.user.email,
       full_name: m.user.fullName,
+      waiting_on_prerequisite: lockedSeats.get(m.userId) ?? [],
     })),
     pending_invites: team.invites.map((i) => ({
       id: i.id,

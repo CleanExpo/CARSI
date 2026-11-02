@@ -173,6 +173,61 @@ describe('decidePrerequisiteAccess — reading with an existing enrolment (grand
   });
 });
 
+describe('decidePrerequisiteAccess — a seat issued locked (prerequisiteGated, 02/11/2026)', () => {
+  // The live mould course has NO prerequisitesEnforcedFrom, so without the gated flag every
+  // enrolment would be grandfathered and a team seat would bypass the lock.
+  const noDate = parseCoursePrerequisites({ prerequisites: [{ courseSlug: L2 }] });
+  const withDate = parseCoursePrerequisites(MOULD_META);
+  const seat = (enrolledAt: Date | null) => ({
+    status: 'active',
+    enrolledAt,
+    paymentReference: 'team:t1',
+    prerequisiteGated: true,
+  });
+
+  it('is NOT grandfathered when the course has no enforcement date', () => {
+    const d = decidePrerequisiteAccess({
+      parsed: noDate,
+      isAdmin: false,
+      facts: facts([]),
+      enrolment: seat(new Date('2026-11-05T00:00:00Z')),
+    });
+    expect(d).toMatchObject({ allowed: false, reason: 'not-met' });
+  });
+
+  it('is NOT grandfathered by an enrolment date before the enforcement date, or a missing one', () => {
+    for (const at of [new Date('2026-10-01T00:00:00Z'), null]) {
+      const d = decidePrerequisiteAccess({ parsed: withDate, isAdmin: false, facts: facts([]), enrolment: seat(at) });
+      expect(d.allowed).toBe(false);
+    }
+  });
+
+  it('unlocks once the holder completes the prerequisite', () => {
+    const d = decidePrerequisiteAccess({
+      parsed: noDate,
+      isAdmin: false,
+      facts: facts([L2]),
+      enrolment: seat(new Date()),
+    });
+    expect(d).toEqual({ allowed: true, reason: 'met' });
+  });
+
+  it('an admin still bypasses', () => {
+    const d = decidePrerequisiteAccess({ parsed: noDate, isAdmin: true, facts: facts([]), enrolment: seat(new Date()) });
+    expect(d).toEqual({ allowed: true, reason: 'admin' });
+  });
+
+  it('an ungated row on the same course is still grandfathered (existing learners unaffected)', () => {
+    const d = decidePrerequisiteAccess({
+      parsed: noDate,
+      isAdmin: false,
+      facts: facts([]),
+      enrolment: { ...seat(new Date()), prerequisiteGated: false },
+    });
+    expect(d).toEqual({ allowed: true, reason: 'grandfathered' });
+  });
+});
+
 describe('payment reference helpers + message', () => {
   it('classifies references', () => {
     expect(isAdminOverridePaymentReference('admin:full-access')).toBe(true);

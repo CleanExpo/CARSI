@@ -13,7 +13,8 @@ type Params = { params: Promise<{ slug: string }> };
  * GET /api/lms/courses/[slug]/prerequisites — the locked state for the course page
  * (DECISIONS #41). UX only: the real gate runs in enrolment, checkout and the lesson/quiz
  * routes. Anonymous viewers are reported `locked` (completion is tied to an account) with
- * `signed_in: false`. A learner already enrolled is not locked (grandfathered at issuance).
+ * `signed_in: false`. A learner already enrolled is not locked (grandfathered at issuance),
+ * except a seat issued locked (`prerequisite_gated`), which stays locked until completed.
  */
 export async function GET(request: NextRequest, context: Params) {
   const { slug: raw } = await context.params;
@@ -42,7 +43,9 @@ export async function GET(request: NextRequest, context: Params) {
 
   const enrolment = await prisma.lmsEnrollment.findUnique({
     where: { studentId_courseId: { studentId: claims.sub, courseId: course.id } },
-    select: { status: true, enrolledAt: true, paymentReference: true },
+    // prerequisiteGated: a team seat issued locked is reported locked here too, so the seat
+    // holder sees "Complete <prerequisite> first" on the course page.
+    select: { status: true, enrolledAt: true, paymentReference: true, prerequisiteGated: true },
   });
   const block = await findCoursePrerequisiteBlock({
     userId: claims.sub,
@@ -55,6 +58,8 @@ export async function GET(request: NextRequest, context: Params) {
     has_prerequisites: true,
     locked: Boolean(block),
     signed_in: true,
+    // A live enrolment (e.g. a locked team seat): the page shows the lock, not a purchase.
+    enrolled: Boolean(enrolment && isEnrolmentAccessAllowed(enrolment.status)),
     detail: block?.detail ?? null,
     prerequisites: block?.prerequisites ?? [],
   });

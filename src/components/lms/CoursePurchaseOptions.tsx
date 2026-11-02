@@ -17,6 +17,11 @@ type Props = {
   unitPriceAud: number;
   disabled?: boolean;
   surface?: FormSurface;
+  /**
+   * Team seats only (no "Just me"): the course is locked for this buyer by a prerequisite,
+   * but anyone may buy seats for their staff (DECISIONS #41, founder decision 02/11/2026).
+   */
+  teamOnly?: boolean;
 };
 
 export function CoursePurchaseOptions({
@@ -27,43 +32,55 @@ export function CoursePurchaseOptions({
   unitPriceAud,
   disabled,
   surface = 'light',
+  teamOnly = false,
 }: Props) {
   const styles = formSurfaceStyles[surface];
   const totalAud = mode === 'team' ? unitPriceAud * teamSeats : unitPriceAud;
 
   return (
     <fieldset className={`space-y-3 rounded-lg border p-3 ${styles.card}`} disabled={disabled}>
-      <legend className={`px-1 text-xs font-medium ${styles.label}`}>Who is this for?</legend>
-      <label className={`flex cursor-pointer items-start gap-2.5 text-sm ${styles.label}`}>
-        <input
-          type="radio"
-          name="purchase-mode"
-          className="mt-1"
-          checked={mode === 'self'}
-          onChange={() => onModeChange('self')}
-        />
-        <span>
-          <span className={`font-medium ${styles.label}`}>Just me</span>
-          <span className={`mt-0.5 block text-xs ${styles.help}`}>
-            One learner — you get course access.
+      <legend className={`px-1 text-xs font-medium ${styles.label}`}>
+        {teamOnly ? 'Buy seats for your team' : 'Who is this for?'}
+      </legend>
+      {teamOnly ? (
+        <p className={`text-xs ${styles.help}`}>
+          Each person&apos;s seat, including yours, stays locked until they complete the
+          prerequisite.
+        </p>
+      ) : (
+        <label className={`flex cursor-pointer items-start gap-2.5 text-sm ${styles.label}`}>
+          <input
+            type="radio"
+            name="purchase-mode"
+            className="mt-1"
+            checked={mode === 'self'}
+            onChange={() => onModeChange('self')}
+          />
+          <span>
+            <span className={`font-medium ${styles.label}`}>Just me</span>
+            <span className={`mt-0.5 block text-xs ${styles.help}`}>
+              One learner — you get course access.
+            </span>
           </span>
-        </span>
-      </label>
-      <label className={`flex cursor-pointer items-start gap-2.5 text-sm ${styles.label}`}>
-        <input
-          type="radio"
-          name="purchase-mode"
-          className="mt-1"
-          checked={mode === 'team'}
-          onChange={() => onModeChange('team')}
-        />
-        <span className="min-w-0 flex-1">
-          <span className={`font-medium ${styles.label}`}>My team</span>
-          <span className={`mt-0.5 block text-xs ${styles.help}`}>
-            Pay for multiple seats — you&apos;ll invite teammates after checkout.
+        </label>
+      )}
+      {teamOnly ? null : (
+        <label className={`flex cursor-pointer items-start gap-2.5 text-sm ${styles.label}`}>
+          <input
+            type="radio"
+            name="purchase-mode"
+            className="mt-1"
+            checked={mode === 'team'}
+            onChange={() => onModeChange('team')}
+          />
+          <span className="min-w-0 flex-1">
+            <span className={`font-medium ${styles.label}`}>My team</span>
+            <span className={`mt-0.5 block text-xs ${styles.help}`}>
+              Pay for multiple seats — you&apos;ll invite teammates after checkout.
+            </span>
           </span>
-        </span>
-      </label>
+        </label>
+      )}
       {mode === 'team' ? (
         <div className={`space-y-1.5 border-t pt-3 ${styles.divider}`}>
           <Label htmlFor="team-seat-count" className={styles.label}>
