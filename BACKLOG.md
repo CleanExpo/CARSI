@@ -1005,3 +1005,15 @@ Fixing a seed file changes the live quiz only after a re-seed, which is catalogu
 `docs/runbooks/course-go-live.md`. The structural fix is to add a "no single option holds more than
 about 40% of correct answers" check to `audit-course-depth` (Course Standard v1, final-quiz floor),
 or to shuffle options per attempt in the quiz API.
+### Discoveries — 2026-11-02 unapproved "CEC-accredited" copy
+
+- **Six rendered intro videos may say "This CEC-accredited training leads to the CARSI …
+  designation" aloud.** The scripts in `data/video/course-intro-video-briefs.json` are fixed, but a
+  rendered video keeps its old audio. The courses are mould-remediation-fundamentals,
+  structural-drying-fundamentals, category-3-sewage-black-water-remediation,
+  fire-smoke-damage-restoration-fundamentals, trauma-crime-scene-decontamination-fundamentals and
+  assessing-indoor-environment-conditions. All six are drafts, but each carries an `introVideoUrl`.
+  Re-render the videos before any of these courses is published (founder: video spend).
+- `check:iicrc-compliance` passed 12 seed entries describing unapproved courses as "CEC-accredited
+  training". The rule that catches it, and the wider scan scope (`data/video/`, `data/courses/`), are
+  in the same PR as this note.
