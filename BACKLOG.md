@@ -987,3 +987,16 @@ production-database credential):
   marks 54 published. Level 2 Mould was live while the seed said `draft`. That is fixed in the same
   PR as this note. A re-seed would have unpublished it. A read-only live-vs-seed status report
   would catch the rest.
+
+### Discoveries — 2026-11-02 unapproved "CEC-accredited" copy
+
+- **Six rendered intro videos may say "This CEC-accredited training leads to the CARSI …
+  designation" aloud.** The scripts in `data/video/course-intro-video-briefs.json` are fixed, but a
+  rendered video keeps its old audio. The courses are mould-remediation-fundamentals,
+  structural-drying-fundamentals, category-3-sewage-black-water-remediation,
+  fire-smoke-damage-restoration-fundamentals, trauma-crime-scene-decontamination-fundamentals and
+  assessing-indoor-environment-conditions. All six are drafts, but each carries an `introVideoUrl`.
+  Re-render the videos before any of these courses is published (founder: video spend).
+- `check:iicrc-compliance` passed 12 seed entries describing unapproved courses as "CEC-accredited
+  training". The rule that catches it, and the wider scan scope (`data/video/`, `data/courses/`), are
+  in the same PR as this note.
