@@ -29,11 +29,11 @@ DECISIONS #25). Anything about a standard's content is a GAP for Phill to check 
 
 | Status | Entries | Meaning |
 | --- | ---: | --- |
-| VERIFIED | 47 | A primary source was opened on 02/11/2026 and supports the claim (quote of 25 words or fewer). |
+| VERIFIED | 49 | A primary source was opened on 02/11/2026 and supports the claim (quote of 25 words or fewer). |
 | JUSTIFIED | 18 | Our arithmetic (psychrometrics, P = V x I, mass balance, unit conversion) or a labelled illustrative figure. |
 | GAP | 29 | Not yet verifiable here; **9 are standards claims** for Phill's licensed copy. **Every GAP blocks go-live.** |
 
-Grades (VERIFIED and JUSTIFIED): A1 x8, A2 x31, A3 x6, B2 x17, C3 x3. No vendor page is used as evidence. Validate with
+Grades (VERIFIED and JUSTIFIED): A1 x8, A2 x33, A3 x6, B2 x17, C3 x3. No vendor page is used as evidence. Validate with
 `node scripts/audit/validate-ledger.mjs <ledger>` (exit 0) and `node scripts/audit/check-mutants.mjs`.
 
 ## New Zealand facts verified (18)
@@ -64,7 +64,7 @@ Grades (VERIFIED and JUSTIFIED): A1 x8, A2 x31, A3 x6, B2 x17, C3 x3. No vendor 
 | Topic | Australia | New Zealand |
 | --- | --- | --- |
 | WHS law | Model WHS laws (all jurisdictions except Victoria); Victoria: OHS Act 2004 | HSWA 2015 s 36; GRWM Regulations 2016 r 6 (hierarchy) |
-| Asbestos date | Built or renovated before 1990 | Built or renovated before 2000 |
+| Asbestos date | Assume it in any building built or renovated before 31 December 2003 (national ban); before 1990 most likely. Register duty: before 31 December 2003 (Queensland: before 31 December 1989) | Built or renovated before 2000 |
 | Asbestos licence | Class B above 10 m² non-friable; ACT: no homeowner or tradesperson removal | Class B (or A) above 10 m² non-friable (Asbestos Regulations 2016 r 56) |
 | Testing and tagging | Equipment in hostile conditions regularly inspected and tested by a competent person (AS/NZS 3760:2022) | Not mandatory; equipment must be electrically safe; AS/NZS 3760 is one way to show it |
 | RCD | Portable gear at work on an RCD; socket RCD up to 20 A trips at no more than 30 mA | RCD protection in certain circumstances such as damp conditions (Electricity (Safety) Regulations 2010) |
@@ -83,6 +83,7 @@ Grades (VERIFIED and JUSTIFIED): A1 x8, A2 x31, A3 x6, B2 x17, C3 x3. No vendor 
 | [WorkSafe Victoria, Occupational Health and Safety Act and regulations](https://www.worksafe.vic.gov.au/occupational-health-and-safety-act-and-regulations) | A2 | SDP-005 |
 | [New Zealand Legislation, Health and Safety at Work Act 2015, section 36](https://www.legislation.govt.nz/act/public/2015/0070/latest/DLM5976895.html) | A1 | SDP-006 |
 | [SafeWork NSW, Class B asbestos removal licence](https://www.safework.nsw.gov.au/licences-and-registrations/licences/class-b-asbestos-removal-licence) | A2 | SDP-007, SDP-009 |
+| [Safe Work Australia, Asbestos (construction duties tool)](https://www.safeworkaustralia.gov.au/duties-tool/construction/hazards-information/asbestos) | A2 | SDP-095, SDP-096 |
 | [WorkSafe New Zealand, Asbestos in Aotearoa New Zealand](https://www.worksafe.govt.nz/topic-and-industry/asbestos/asbestos-information-for-homeowners/asbestos-in-aotearoa-new-zealand/) | A2 | SDP-008 |
 | [Asbestos and Silica Safety and Eradication Agency, Householders and home renovators](https://www.asbestossafety.gov.au/about-asbestos/practical-guidance/householders-and-home-renovators) | A2 | SDP-010 |
 | [New Zealand Legislation, Health and Safety at Work (Asbestos) Regulations 2016, regulation 56](https://legislation.govt.nz/regulation/public/2016/0015/latest/DLM6729225.html) | A1 | SDP-011 |

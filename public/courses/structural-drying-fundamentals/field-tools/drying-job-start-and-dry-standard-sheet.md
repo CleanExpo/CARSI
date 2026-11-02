@@ -16,7 +16,7 @@
 | Question | Answer |
 | --- | --- |
 | Year built / renovated | |
-| Australia: built or renovated before 1990? | Yes / No |
+| Australia: built or renovated before 31 December 2003 (national ban)? Before 1990 = most likely | Yes / No |
 | New Zealand: built or renovated before 2000? | Yes / No |
 | Suspect materials (textured ceilings, older linings, vinyl, underlay) | |
 | Sample taken / results due | |

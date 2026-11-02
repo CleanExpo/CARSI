@@ -12,7 +12,7 @@
     "criteria": [
       {
         "label": "Make safe, duties and asbestos",
-        "description": "Hazards controlled from the top of the hierarchy down; the correct duty holder and law for the stated country; an asbestos decision that applies the correct date for the country (before 1990 Australia, before 2000 New Zealand) and stops cutting until sampled.",
+        "description": "Hazards controlled from the top of the hierarchy down; the correct duty holder and law for the stated country; an asbestos decision that applies the correct date for the country (before 2004 (31 December 2003) Australia, before 2000 New Zealand) and stops cutting until sampled.",
         "maxPoints": 20
       },
       {

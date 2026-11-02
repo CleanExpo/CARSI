@@ -1,6 +1,6 @@
 # SME claim checklist — CARSI Structural Drying Practitioner
 
-**For:** Phill (SME, DECISIONS #24) · **Generated:** 02/11/2026 from `data/courses/structural-drying-fundamentals/v1-draft/evidence/evidence-ledger.jsonl` · **Ledger:** 94 claims: 47 VERIFIED, 18 JUSTIFIED, **29 GAP (listed below)**.
+**For:** Phill (SME, DECISIONS #24) · **Generated:** 02/11/2026 from `data/courses/structural-drying-fundamentals/v1-draft/evidence/evidence-ledger.jsonl` · **Ledger:** 96 claims: 49 VERIFIED, 18 JUSTIFIED, **29 GAP (listed below)**.
 
 Only the GAP claims need you. VERIFIED and JUSTIFIED claims already carry a source. Tick one box per claim:
 
