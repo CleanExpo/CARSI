@@ -1,3 +1,8 @@
+import {
+  carsiCoachingMonthlyPriceLabel,
+  carsiCoachingProductName,
+} from '@/lib/marketing/carsi-coaching-monthly';
+
 export function CoachingComingSoonBanner({ label }: { label?: string }) {
   return (
     <div
@@ -6,9 +11,12 @@ export function CoachingComingSoonBanner({ label }: { label?: string }) {
     >
       <p className="font-semibold">{label ?? 'Coming soon'}</p>
       <p className="mt-1 leading-relaxed text-amber-900/90">
-        We are finishing this part of Business Coaching. You can still subscribe to the{' '}
-        <strong>$495/month</strong> program today — Phill&apos;s team will onboard you by email
-        until the portal and add-on booking are live.
+        We are finishing add-on booking. The{' '}
+        <strong>
+          {carsiCoachingMonthlyPriceLabel} {carsiCoachingProductName}
+        </strong>{' '}
+        subscription and its coaching portal are live today — email support@carsi.com.au to arrange
+        an add-on in the meantime.
       </p>
     </div>
   );

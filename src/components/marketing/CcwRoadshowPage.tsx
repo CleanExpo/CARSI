@@ -11,6 +11,7 @@ import {
   PUBLIC_SHELL_INNER_CLASS,
 } from '@/components/landing/public-shell-width';
 import { CcwEventNav } from '@/components/marketing/CcwEventNav';
+import { BusinessOffersCompare } from '@/components/marketing/BusinessOffersCompare';
 import { CcwFreeTools } from '@/components/marketing/CcwFreeTools';
 import { CcwRoadshowBooking } from '@/components/marketing/CcwRoadshowBooking';
 import { BreadcrumbSchema, FAQSchema, ItemListSchema } from '@/components/seo';
@@ -42,6 +43,7 @@ import {
   isOpenFreeEntrySitting,
   type CcwRoadshowEvent,
 } from '@/lib/marketing/ccw-roadshow';
+import { getBusinessOffers } from '@/lib/marketing/business-offers';
 
 const siteUrl = getPublicSiteUrl();
 const canonical = `${siteUrl}${ccwRoadshowPath}`;
@@ -461,6 +463,13 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
         </div>
       </section>
 
+      <div className="border-t border-slate-200/70 bg-white py-12 md:py-16">
+        <BusinessOffersCompare
+          offers={getBusinessOffers(now)}
+          currentId="growth-days"
+          className={PUBLIC_SHELL_INNER_CLASS}
+        />
+      </div>
       <CcwFreeTools heading="CCW dilution tools" />
       <HomeFaqSection faqs={pageFaqs} />
       <HomeFinalCtaSection />

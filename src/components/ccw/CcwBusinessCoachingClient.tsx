@@ -30,7 +30,12 @@ import {
 } from '@/components/landing/public-shell-width';
 import { MarketingGrowthLinks } from '@/components/marketing/MarketingGrowthLinks';
 import { PlatformNav } from '@/components/marketing/PlatformNav';
-import { businessCoachingPath } from '@/lib/marketing/business-coaching';
+import {
+  businessCoachingPath,
+  businessCoachingProductName,
+  businessCoachingSeatPriceCents,
+  formatAudFromCents,
+} from '@/lib/marketing/business-coaching';
 import {
   carsiCoachingMonthlyPath,
   carsiCoachingMonthlyPriceLabel,
@@ -97,9 +102,8 @@ const faqs = [
       'Owner-operators in cleaning, pressure washing, restoration, and related trades who have capability on the tools but are not getting marketing traction — weak websites, under-used social, SEO spend without results, or no presence in AI search.',
   },
   {
-    question: 'How is this different from the two-day Business Growth Days?',
-    answer:
-      'Growth Days are an intensive in-person event with CCW. Business Coaching is an ongoing monthly program: LMS progress, customised plan, and a recurring owner session — built to scale online.',
+    question: `How is this different from ${businessCoachingProductName} and the Business Growth Days?`,
+    answer: `CARSI runs three separate programs. ${carsiCoachingProductName} (${carsiCoachingMonthlyPriceLabel}) is an ongoing subscription: LMS progress, a customised plan, and a recurring owner session with Phill. ${businessCoachingProductName} is a monthly after-hours group meetup at ${formatAudFromCents(businessCoachingSeatPriceCents)} per seat, booked one session at a time. The Business Growth Days are a one-off two-day in-person event with CCW, priced per sitting and booked through CCW — not a subscription.`,
   },
   {
     question: 'What does $495/month include?',
