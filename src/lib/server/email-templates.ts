@@ -98,6 +98,34 @@ export function formatMarketingBodyAsPlainText(message: string): string {
   return message.replace(/\r\n/g, '\n').trim();
 }
 
+/** Tailwind `max-w-6xl` — used for wide coaching / founder report emails. */
+export const CARSI_EMAIL_MAX_WIDTH_WIDE_PX = 1152;
+
+export function carsiDarkLogoUrl(appOrigin: string): string {
+  return `${appOrigin.replace(/\/$/, '')}/logo/dark-logo.png`;
+}
+
+export function buildCarsiDarkLogoHeaderHtml(
+  appOrigin: string,
+  tagline = 'IICRC CEC Accredited restoration training'
+): string {
+  const home = escapeHtml(appOrigin.replace(/\/$/, ''));
+  const src = escapeHtml(carsiDarkLogoUrl(appOrigin));
+
+  return `
+    <a href="${home}" style="text-decoration: none; display: inline-block;">
+      <img
+        src="${src}"
+        alt="CARSI"
+        width="240"
+        style="display: block; max-width: 240px; width: 100%; height: auto; border: 0; margin: 0 auto;"
+      />
+    </a>
+    <p style="margin: 14px 0 0; font-family: ${BRAND.font}; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: ${BRAND.blue};">
+      ${escapeHtml(tagline)}
+    </p>`;
+}
+
 export function buildCarsiWordmarkHtml(appOrigin: string): string {
   const home = escapeHtml(appOrigin);
   const letterBase = `font-family: ${BRAND.font}; font-weight: 800; font-size: 42px; line-height: 1; letter-spacing: 0.14em;`;
@@ -116,6 +144,8 @@ export function buildCarsiWordmarkHtml(appOrigin: string): string {
 
 export type CarsiEmailDetail = { label: string; value: string; valueHtml?: string };
 
+export type CarsiEmailLayout = 'default' | 'wide';
+
 export type CarsiEmailContent = {
   appOrigin: string;
   preheader: string;
@@ -129,13 +159,27 @@ export type CarsiEmailContent = {
   messageHtmlBare?: boolean;
   cta?: { label: string; href: string };
   noteHtml?: string;
+  /** Default 480px; `wide` uses max-w-6xl (1152px) for report-style emails. */
+  layout?: CarsiEmailLayout;
+  /** Renders `/logo/dark-logo.png` instead of the text wordmark. */
+  headerDarkLogo?: boolean;
+  headerTagline?: string;
 };
 
 export function buildCarsiEmailHtml(options: CarsiEmailContent): string {
   const preheader = escapeHtml(options.preheader);
   const title = escapeHtml(options.title);
   const eyebrow = escapeHtml(options.eyebrow);
-  const wordmark = buildCarsiWordmarkHtml(options.appOrigin);
+  const wide = options.layout === 'wide';
+  const maxWidth = wide ? CARSI_EMAIL_MAX_WIDTH_WIDE_PX : 480;
+  const cardPadding = wide ? '40px 48px 44px' : '32px 28px 28px';
+  const titleSize = wide ? '30px' : '24px';
+  const headerHtml = options.headerDarkLogo
+    ? buildCarsiDarkLogoHeaderHtml(
+        options.appOrigin,
+        options.headerTagline ?? 'IICRC CEC Accredited restoration training'
+      )
+    : buildCarsiWordmarkHtml(options.appOrigin);
 
   const greetingBlock = options.greeting
     ? `
@@ -203,9 +247,9 @@ export function buildCarsiEmailHtml(options: CarsiEmailContent): string {
   const ctaBlock = options.cta
     ? `
       <tr>
-        <td align="center" style="padding: 10px 0 28px;">
+        <td align="${wide ? 'left' : 'center'}" style="padding: ${wide ? '8px 0 32px' : '10px 0 28px'};">
           <a href="${escapeHtml(options.cta.href)}"
-             style="display: inline-block; padding: 14px 36px; font-family: ${BRAND.font}; font-size: 15px; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 2px; background-color: ${BRAND.orange};">
+             style="display: inline-block; padding: ${wide ? '16px 32px' : '14px 36px'}; font-family: ${BRAND.font}; font-size: 15px; font-weight: 600; color: #ffffff; text-decoration: none; border-radius: 4px; background: linear-gradient(135deg, ${BRAND.orange} 0%, #d4841a 100%); box-shadow: 0 4px 24px rgba(237, 157, 36, 0.35);">
             ${escapeHtml(options.cta.label)}
           </a>
         </td>
@@ -233,13 +277,13 @@ export function buildCarsiEmailHtml(options: CarsiEmailContent): string {
   <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all;">${preheader}&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;</div>
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: ${BRAND.pageBg};">
     <tr>
-      <td align="center" style="padding: 48px 20px 40px; background: radial-gradient(ellipse 80% 50% at 50% 0%, ${BRAND.glow} 0%, transparent 70%);">
-        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width: 480px;">
+      <td align="center" style="padding: ${wide ? '56px 24px 48px' : '48px 20px 40px'}; background: radial-gradient(ellipse 90% 55% at 50% 0%, ${BRAND.glow} 0%, transparent 72%);">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width: ${maxWidth}px;">
           <tr>
-            <td align="center" style="padding: 0 0 32px;">${wordmark}</td>
+            <td align="center" style="padding: 0 0 ${wide ? '36px' : '32px'};">${headerHtml}</td>
           </tr>
           <tr>
-            <td style="background-color: ${BRAND.cardBg}; border: 1px solid ${BRAND.cardBorder}; border-radius: 2px;">
+            <td style="background-color: ${BRAND.cardBg}; border: 1px solid ${BRAND.cardBorder}; border-radius: ${wide ? '8px' : '2px'}; box-shadow: ${wide ? '0 24px 80px rgba(0,0,0,0.45)' : 'none'};">
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                 <tr>
                   <td style="height: 2px; background: linear-gradient(90deg, ${BRAND.blue} 0%, ${BRAND.accentA} 50%, ${BRAND.blue} 100%); font-size: 0; line-height: 0;">&nbsp;</td>
@@ -247,13 +291,13 @@ export function buildCarsiEmailHtml(options: CarsiEmailContent): string {
               </table>
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                 <tr>
-                  <td style="padding: 32px 28px 28px;">
+                  <td style="padding: ${cardPadding};">
                     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                       <tr>
                         <td style="padding: 0 0 6px; font-family: ${BRAND.font}; font-size: 11px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: ${BRAND.blue};">${eyebrow}</td>
                       </tr>
                       <tr>
-                        <td style="padding: 0 0 16px; font-family: ${BRAND.font}; font-size: 24px; font-weight: 700; line-height: 1.3; color: ${BRAND.text};">${title}</td>
+                        <td style="padding: 0 0 16px; font-family: ${BRAND.font}; font-size: ${titleSize}; font-weight: 700; line-height: 1.25; color: ${BRAND.text}; letter-spacing: -0.02em;">${title}</td>
                       </tr>
                       ${greetingBlock}
                       ${bodyParagraphs}
@@ -1190,25 +1234,23 @@ export function renderCoachingOnboardingSubmittedCoachEmail(params: {
   reportPlain: string;
   portalUrl: string;
 }): RenderedEmail {
-  const details = [
-    { label: 'Business', value: params.businessName },
-    { label: 'Member', value: params.memberName },
-    { label: 'Email', value: params.memberEmail },
-  ];
-
   return render(
     {
       appOrigin: params.appOrigin,
-      preheader: `Onboarding submission from ${params.businessName}`,
-      eyebrow: 'Business Coaching',
-      title: 'Member onboarding — full details',
+      layout: 'wide',
+      headerDarkLogo: true,
+      headerTagline: 'Business Coaching · Member onboarding packet',
+      preheader: `${params.businessName} — profile, assessment & goals ready for review`,
+      eyebrow: 'Coach briefing',
+      title: 'New member onboarding',
       paragraphs: [
-        'A coaching member completed their profile and assessment and sent the summary below. Reply directly to this email to reach them.',
+        `${params.memberName} at ${params.businessName} completed their CARSI Business Coaching onboarding. Their problem statement, goals, business profile, web & social links, and full assessment are below.`,
+        `Reply to this email to reach them at ${params.memberEmail}.`,
       ],
-      details,
       messageHtml: params.reportHtml,
       messageHtmlBare: true,
-      cta: { label: 'Coaching portal', href: params.portalUrl },
+      cta: { label: 'Open coaching portal', href: params.portalUrl },
+      noteHtml: `Submission generated automatically from ${brandLink(params.portalUrl, 'CARSI Business Coaching')}.`,
     },
     params.reportPlain
   );

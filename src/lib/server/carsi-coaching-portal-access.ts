@@ -3,6 +3,7 @@ import type { SessionClaims } from '@/lib/auth/session-jwt';
 import { carsiCoachingMonthlyPath } from '@/lib/marketing/carsi-coaching-monthly';
 import { decideCoachingPortalEntitlement } from '@/lib/server/carsi-coaching-entitlement';
 import { coachingPortalCanEdit } from '@/lib/server/carsi-coaching-portal-edit';
+import { readCoachingSessionPrepNotes } from '@/lib/server/carsi-coaching-session-prep';
 import {
   getCoachingPortalRowForUser,
   workspaceFromRow,
@@ -51,13 +52,18 @@ export async function getCoachingPortalAccess(
           cancelAtPeriodEnd: row.cancelAtPeriodEnd,
         }
       : null,
-    workspace: row
-      ? workspaceFromRow(row)
-      : {
-          horizontalSummary: '',
-          directionSummary: '',
-          sessionPrepNotes: '',
-          monthlyActions: [],
-        },
+    workspace: await (async () => {
+      const sessionPrepNotes = await readCoachingSessionPrepNotes(claims.sub);
+      if (row) {
+        const ws = workspaceFromRow(row);
+        return { ...ws, sessionPrepNotes: ws.sessionPrepNotes.trim() || sessionPrepNotes };
+      }
+      return {
+        horizontalSummary: '',
+        directionSummary: '',
+        sessionPrepNotes,
+        monthlyActions: [],
+      };
+    })(),
   };
 }

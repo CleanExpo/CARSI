@@ -1,0 +1,1 @@
+export const COACHING_SESSION_PREP_MIN_LENGTH = 15;

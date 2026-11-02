@@ -4,13 +4,14 @@ import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
 
 import { CoachingTextArea } from '@/components/coaching-portal/coaching-form-primitives';
-import { useCoachingPortal } from '@/components/coaching-portal/CoachingPortalContext';
 import {
   coachingCard,
   coachingCardTitle,
   coachingMuted,
   coachingPrimaryBtn,
 } from '@/components/coaching-portal/coaching-ui';
+import { useCoachingPortal } from '@/components/coaching-portal/CoachingPortalContext';
+import { COACHING_SESSION_PREP_MIN_LENGTH } from '@/lib/coaching-portal/session-prep';
 
 export function CoachingSessionPrepCard() {
   const { access } = useCoachingPortal();
@@ -19,8 +20,15 @@ export function CoachingSessionPrepCard() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const trimmedLen = notes.trim().length;
+  const tooShort = trimmedLen > 0 && trimmedLen < COACHING_SESSION_PREP_MIN_LENGTH;
+
   async function save() {
     if (!access.canEdit) return;
+    if (notes.trim().length < COACHING_SESSION_PREP_MIN_LENGTH) {
+      setError(`Add at least ${COACHING_SESSION_PREP_MIN_LENGTH} characters so Phill can prepare.`);
+      return;
+    }
     setSaving(true);
     setError(null);
     setSaved(false);
@@ -47,8 +55,8 @@ export function CoachingSessionPrepCard() {
     <section className={coachingCard}>
       <h2 className={coachingCardTitle}>Session prep</h2>
       <p className={`mt-2 ${coachingMuted}`}>
-        What do you want to grill on this month? Wins, blockers, numbers, and decisions — Phill receives
-        this when you save.
+        What do you want to grill on this month? Wins, blockers, numbers, and decisions — Phill
+        receives this when you save.
       </p>
       <div className="mt-4">
         <CoachingTextArea
@@ -61,13 +69,25 @@ export function CoachingSessionPrepCard() {
         />
       </div>
       {access.canEdit ? (
-        <button type="button" className={`mt-4 ${coachingPrimaryBtn}`} disabled={saving} onClick={() => void save()}>
-          {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-          Save & notify Phill
-        </button>
+        <>
+          <p className={`mt-2 text-xs ${tooShort ? 'text-amber-300/90' : coachingMuted}`}>
+            {trimmedLen}/{COACHING_SESSION_PREP_MIN_LENGTH} characters minimum
+          </p>
+          <button
+            type="button"
+            className={`mt-4 ${coachingPrimaryBtn}`}
+            disabled={saving || trimmedLen < COACHING_SESSION_PREP_MIN_LENGTH}
+            onClick={() => void save()}
+          >
+            {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+            Save & notify Phill
+          </button>
+        </>
       ) : null}
       {saved ? (
-        <p className="mt-3 text-sm font-medium text-emerald-400/95">Saved — Phill has been emailed.</p>
+        <p className="mt-3 text-sm font-medium text-emerald-400/95">
+          Saved — Phill has been emailed.
+        </p>
       ) : null}
       {error ? <p className="mt-3 text-sm text-red-300">{error}</p> : null}
     </section>
