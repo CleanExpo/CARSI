@@ -14,12 +14,13 @@ entered into any AI tool, per the IICRC AI Use Policy and CLAUDE.md.
 
 | Status | Entries | Meaning |
 | --- | ---: | --- |
-| VERIFIED | 26 | An Australian regulator or government page was opened on 02/11/2026 and supports the claim (verbatim quote of 25 words or fewer in the ledger). |
-| JUSTIFIED | 11 | Our own arithmetic from a published method (psychrometrics, P = V x I), or a teaching number the lesson labels illustrative. Reasoning is in the ledger. |
+| VERIFIED | 30 | An Australian regulator or government page was opened on 02/11/2026 and supports the claim (verbatim quote of 25 words or fewer in the ledger). |
+| JUSTIFIED | 13 | Our own arithmetic from a published method (psychrometrics, P = V x I), or a teaching number the lesson labels illustrative. Reasoning is in the ledger. |
 | GAP | 21 | Not yet verifiable from here. **Every GAP below must be cleared before the course goes live.** |
 
-Grades (VERIFIED and JUSTIFIED entries): A1 x1, A2 x24, A3 x5, B2 x1, C3 x6. Every VERIFIED
-source is a regulator, government agency or official body; no vendor page is used as evidence.
+Grades (VERIFIED and JUSTIFIED entries): A1 x1, A2 x29, A3 x3, B2 x3, C3 x7. Every VERIFIED source is a
+regulator, government agency or official body except Ausgrid's Electricity Safety site (B2, a
+network operator's public safety pages); no vendor page is used as evidence.
 
 Validate the ledger with `node scripts/audit/validate-ledger.mjs <ledger>` (it must exit 0), and
 run `node scripts/audit/check-mutants.mjs` in the same session.
@@ -35,10 +36,12 @@ run `node scripts/audit/check-mutants.mjs` in the same session.
 | SafeWork SA — Inspection and testing of electrical equipment | A2 | AS/NZS 3760:2022 (current edition named by the regulator) |
 | WorkSafe ACT — Residual current devices | A2 | portable gear on an RCD; workplace RCD trips at no more than 30 mA (socket outlets up to 20 A) |
 | NSW Government — Voltage optimisation fact sheet | A3 | Australian supply at 230 V (+10 % to −6 %) |
-| Energy Safe Victoria — Electrical equipment | A3 | 50 Hz; 000 |
+| Ausgrid, Electricity Safety — Electrical equipment | B2 | 50 Hz; 000 (network operator, not a regulator) |
 | Electrical Safety Office Queensland — Safety switches | A3 | circuit breakers cut power on too much current |
 | NSW Poisons Information Centre | A2 | 13 11 26 |
-| SafeWork SA — Fit testing and fit checking of RPE | A2 | fit test before first use; fit check each time; hood-type alternative |
+| SafeWork SA — Fit testing and fit checking of RPE | A2 | fit test before first use and after a facial change; fit check each time; hood-type alternative |
+| Safe Work Australia — Model WHS laws | A2 | model laws implemented in all jurisdictions except Victoria |
+| WorkSafe Victoria — OHS Act and regulations; Information for employers | A2 | OHS Act 2004 is Victoria's main WHS law; employers eliminate or reduce risks so far as reasonably practicable |
 | NSW Resources Regulator — Facial hair and RPE fact sheet (March 2024) | A2 | facial hair prevents a seal; poor fit means less than the expected protection |
 | Bureau of Meteorology — Definitions for 9am and 3pm statistics | A2 | dew point; relative humidity depends on temperature |
 | ACCC — Consumer rights and guarantees | A2 | automatic guarantees; due care and skill; fit for stated purpose |
@@ -66,6 +69,19 @@ whether to rename it.
   socket outlet up to 20 A must trip at no more than 30 mA" (WorkSafe ACT).
 - **PPE card:** the hierarchy line now includes *isolate* alongside substitute and engineering
   (Safe Work Australia).
+- **Review of PR #966 (CodeRabbit, each finding checked against the source before fixing):**
+  - *Lesson 3.1:* said the model WHS laws were adopted by "your state regulator"; Victoria has not
+    implemented them (Safe Work Australia). The Melbourne lesson now names Victoria's OHS Act 2004
+    and WorkSafe Victoria (WRP-060 to WRP-062).
+  - *Lesson 3.2, PPE card:* fit testing is also required after a facial change that could affect
+    the seal, or a new make or model (SafeWork SA, WRP-059). The card's "facial hair breaks the
+    seal" now matches the regulator: facial hair along the sealing surface stops it sealing.
+  - *Module 3 check:* the PPE answer and explanations now keep the fit-check requirement.
+  - *Lessons 5.x and 6.1, Module 5 and 6 checks, worksheet, assessment:* "inside g/kg lower than
+    outside proves drying" was wrong. The evidence is a g/kg drop across the dehumidifier plus
+    material readings trending to the dry standard; outside g/kg is context (WRP-063, WRP-064).
+  - *Attribution:* electricitysafety.com.au is Ausgrid's site, not Energy Safe Victoria's;
+    corrected and regraded A3 to B2.
 - **Every S500 citation** now names its edition, ANSI/IICRC S500:2025, per the estate ruling
   (GP-560; `course-truth` Stage 5). No section number is cited.
 

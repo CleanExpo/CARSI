@@ -214,12 +214,12 @@
           "options": [
             "Gloves and a dust mask only",
             "Nothing special is needed for sewage",
-            "Fluid-resistant coveralls, boots, gloves, eye and fit-tested respiratory protection",
+            "Fluid-resistant coveralls, boots, gloves, eye protection, and respiratory protection fit-tested to the wearer and fit-checked each time it is put on",
             "A high-visibility vest and sunglasses"
           ],
           "correctIndex": 2,
           "points": 1,
-          "explanation": "Category 3 means full skin protection plus P2 or higher respiratory protection fit-tested to the wearer, and everything contacted is treated as contaminated."
+          "explanation": "Category 3 means full skin protection plus P2 or higher respiratory protection fit-tested to the wearer and fit-checked each time it is put on, and everything contacted is treated as contaminated."
         },
         {
           "questionText": "Why must a tight-fitting respirator be fit-tested to the wearer?",
@@ -231,7 +231,7 @@
           ],
           "correctIndex": 0,
           "points": 1,
-          "explanation": "A respirator only protects when it seals. Without a good seal contaminated air leaks in and the wearer does not get the expected protection, so a mask that has not passed a fit test is not relied on."
+          "explanation": "A respirator only protects when it seals. Without a good seal contaminated air leaks in and the wearer does not get the expected protection, so a mask that has not passed a fit test is not relied on. A quick fit check every time it goes on confirms the seal, but it does not replace the fit test."
         },
         {
           "questionText": "What should the job file record about PPE?",
@@ -360,16 +360,16 @@
           "explanation": "Airflow without moisture removal just lifts water into air that cannot hold more, so humidity rises, drying stalls and condensation or mould can follow."
         },
         {
-          "questionText": "Inside the drying zone the g/kg is lower than the air outside it. What does that show?",
+          "questionText": "Air leaving the dehumidifier reads a lower g/kg than the air going into it. What does that show?",
           "options": [
             "A new leak has started",
-            "Moisture is being removed and drying is working",
+            "The dehumidifier is removing water from the air",
             "The dehumidifier should be switched off",
             "The readings are not worth taking"
           ],
           "correctIndex": 1,
           "points": 1,
-          "explanation": "Drying-zone air that is drier (lower g/kg) than outside shows the dehumidifier is removing water and the strategy is working. If it is not lower, check the setup."
+          "explanation": "A lower g/kg at the outlet than at the inlet is direct evidence the dehumidifier is removing water. Comparing the drying zone with outside air is context only: dry outdoor air can make a zone that is drying well read wetter than outside, so confirm progress with material readings trending to the dry standard."
         },
         {
           "questionText": "In Australia, what total power does one 10 A circuit deliver, and why does it matter?",
@@ -450,7 +450,7 @@
           ],
           "correctIndex": 1,
           "points": 1,
-          "explanation": "Material readings trending to the dry standard, plus drying-zone g/kg lower than outside, are the measured evidence that drying is progressing."
+          "explanation": "Material readings trending to the dry standard, backed by a g/kg drop across the dehumidifier, are the measured evidence that drying is progressing. Outside g/kg is context, not proof."
         },
         {
           "questionText": "A scope change (extra drying days or removing a material) is needed. What do you do?",
