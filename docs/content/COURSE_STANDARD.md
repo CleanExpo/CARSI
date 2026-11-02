@@ -134,6 +134,13 @@ and the constants in the script must match. Change both together, in one reviewe
 | 5.13 | `australian`     | No US spelling, US voltage or US circuit framing anywhere in the course copy                                                                                                             | `findUsForms` from `scripts/check-au-english.mjs`                                           |
 | 5.14 | `licence`        | No banned IICRC phrasing in the course copy; `cecHours` is 0 unless the slug is approved in `data/seed/cec-approvals.json`; a course with `meta.designation` has `iicrcDiscipline: null` | `scanText` from `scripts/check-iicrc-terminology.mjs`, `cec-approvals.json`                 |
 
+### Designation pass mark (founder decision 02/11/2026)
+
+Every CARSI designation course (a course with `meta.designation`) passes at **80%** across the
+board: every module check (`passPercentage`), the final designation exam (`passPercentage`) and
+the practical task (`passThreshold`). Floor 5.6 stays at 70% because it applies to every course,
+not only designation courses; the 80% designation pass mark sits above that floor.
+
 ### How evidenced learning minutes are counted (floor 5.3)
 
 - Reading: words in teaching lessons ÷ 230 words per minute (HTML tags stripped).

@@ -3,7 +3,7 @@
 **CARSI Contaminated-Water Practitioner — field tool (Module 6)**
 *DRAFT v1 for SME review. Australian-produced for Australia and New Zealand: 230 V / 50 Hz, 10 A GPO, RCD, metric units, AUD.*
 
-Five criteria, 20 points each, pass at 70 points. Use these headings.
+Five criteria, 20 points each, pass at 80 points. Use these headings.
 
 | Criterion | The assessor looks for | Done |
 | --- | --- | --- |

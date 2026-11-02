@@ -16,8 +16,8 @@ Only the GAP claims need you. VERIFIED and JUSTIFIED claims already carry a sour
 
 - [ ] OK  [ ] Fix  [ ] Cut — **MRP-001** · **S520** — The mould remediation standard is cited as AS-IICRC S520:2025 (edition as used by CARSI Level 2 Mould Remediation).
     - _Why it is open:_ Edition taken from the Level 2 entry. Level 3 also cites "ANSI/IICRC S520 2024 edition" and CLAUDE.md cites S520:2024; the previous Practitioner entry was unversioned. Confirm designation and edition.
-- [ ] OK  [ ] Fix  [ ] Cut — **MRP-006** — Designation requirements: Level 2 completed, practical task at 70% or better, final designation exam at 80% or better; CARSI tiers Foundation, Practitioner, Advanced, Master, with this designation at the Practitioner tier.
-    - _Why it is open:_ Founder decision relayed by the coordinator on 02/11/2026 (designation = Level 2 prerequisite; tier names decided). Pass marks carried from the draft (practical 70%, final 80%). The mapping of this designation to the Practitioner tier is inferred from its name; founder to confirm, and the designation rules need a published CARSI source before go-live.
+- [ ] OK  [ ] Fix  [ ] Cut — **MRP-006** — Designation requirements: Level 2 completed, practical task at 80% or better, final designation exam at 80% or better; CARSI tiers Foundation, Practitioner, Advanced, Master, with this designation at the Practitioner tier.
+    - _Why it is open:_ Founder decision relayed by the coordinator on 02/11/2026 (designation = Level 2 prerequisite; tier names decided). Pass marks set by founder decision on 02/11/2026: 80% across the board for every CARSI designation course (module checks, practical task, final exam). The mapping of this designation to the Practitioner tier is inferred from its name; founder to confirm, and the designation rules need a published CARSI source before go-live.
 
 ## M1 · Case study: one job from scope to sign-off
 

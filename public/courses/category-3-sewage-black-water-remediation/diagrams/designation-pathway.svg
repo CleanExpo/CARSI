@@ -22,7 +22,7 @@
 <text x="420.0" y="150" font-size="12" fill="#3e4c59">rubric</text>
 <rect x="600.0" y="70" width="176.0" height="112" rx="8" fill="#fffaf3" stroke="#b54708" stroke-width="2"/>
 <text x="612.0" y="96" font-size="14" font-weight="700" fill="#1f2933">Final exam</text>
-<text x="612.0" y="118" font-size="12" fill="#3e4c59">Pass mark 70 %</text>
+<text x="612.0" y="118" font-size="12" fill="#3e4c59">Pass mark 80 %</text>
 <path d="M202.0,126.0 L214.0,126.0" stroke="#52606d" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
 <path d="M394.0,126.0 L406.0,126.0" stroke="#52606d" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
 <path d="M586.0,126.0 L598.0,126.0" stroke="#52606d" stroke-width="2" fill="none" marker-end="url(#arrow)"/>

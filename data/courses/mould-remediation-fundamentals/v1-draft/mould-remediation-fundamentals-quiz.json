@@ -8,7 +8,7 @@
       "quizId": "e59d0a7d-dc7e-4b23-836d-c78b1acb41c5",
       "lessonTitle": "Module 1 check",
       "title": "CARSI Mould Remediation Practitioner — Module 1 check",
-      "passPercentage": 70,
+      "passPercentage": 80,
       "attemptsAllowed": 3,
       "questions": [
         {
@@ -89,7 +89,7 @@
       "quizId": "bf91664e-08b5-4ea0-9ec3-e9eae89128a9",
       "lessonTitle": "Module 2 check",
       "title": "CARSI Mould Remediation Practitioner — Module 2 check",
-      "passPercentage": 70,
+      "passPercentage": 80,
       "attemptsAllowed": 3,
       "questions": [
         {
@@ -170,7 +170,7 @@
       "quizId": "083665d3-9f27-4a4c-900c-ca188147d8ef",
       "lessonTitle": "Module 3 check",
       "title": "CARSI Mould Remediation Practitioner — Module 3 check",
-      "passPercentage": 70,
+      "passPercentage": 80,
       "attemptsAllowed": 3,
       "questions": [
         {
@@ -251,7 +251,7 @@
       "quizId": "0bae5236-16a1-44f5-ada4-902b5dedf957",
       "lessonTitle": "Module 4 check",
       "title": "CARSI Mould Remediation Practitioner — Module 4 check",
-      "passPercentage": 70,
+      "passPercentage": 80,
       "attemptsAllowed": 3,
       "questions": [
         {
@@ -269,14 +269,14 @@
         {
           "questionText": "A draft scores 12, 15, 11, 12 and 12. Does it pass?",
           "options": [
-            "No, 62 is below the 70 pass mark",
+            "No, 62 is below the 80 pass mark",
             "Yes, 72",
             "Yes, every criterion scored",
             "No, 52"
           ],
           "correctIndex": 0,
           "points": 1,
-          "explanation": "12 + 15 + 11 + 12 + 12 = 62 out of 100. The practical passes at 70."
+          "explanation": "12 + 15 + 11 + 12 + 12 = 62 out of 100. The practical passes at 80."
         },
         {
           "questionText": "What does the assessor want instead of “P2 masks”?",
@@ -315,13 +315,13 @@
           "questionText": "What pass marks apply to the designation?",
           "options": [
             "50% for both",
-            "Final exam only, 70%",
-            "Practical task 70%, final designation exam 80%",
+            "Final exam only, 80%",
+            "Practical task 80%, final designation exam 80%",
             "Practical only, 90%"
           ],
           "correctIndex": 2,
           "points": 1,
-          "explanation": "You need the practical at 70% or better against its rubric and this final exam at 80% or better."
+          "explanation": "You need the practical at 80% or better against its rubric and this final exam at 80% or better."
         },
         {
           "questionText": "Which statement about the designation is accurate?",
