@@ -78,8 +78,13 @@ function buildPack(course: CatalogCourse, instructorName: string | null): string
 
   const registryEntry = getCecApproval(course.slug);
   const today = formatAuDate(new Date());
+  // A course already holding an IICRC approval is a RENEWAL, not a first submission. Saying
+  // "submitted before any CEC claim is made" about a course that has carried approved hours
+  // would misstate its history to the IICRC.
+  const renewal = registryEntry?.status === 'approved' ? registryEntry : null;
+  const expiry = renewal?.expiresAt ? formatAuDate(new Date(renewal.expiresAt)) : null;
 
-  return `# IICRC CEC Course Approval Submission — ${course.title}
+  return `# IICRC CEC Course Approval ${renewal ? 'Renewal' : 'Submission'} — ${course.title}
 
 Prepared ${today} for submission to **CECCourse@iicrcnet.org**.
 
@@ -98,13 +103,21 @@ Prepared ${today} for submission to **CECCourse@iicrcnet.org**.
 ## 3. Dates and duration
 
 - **Delivery:** online, self-paced (on demand) at ${PROVIDER_WEBSITE}
-- **Available from:** ${today} (submitted for approval before any CEC claim is made)
+${
+    renewal
+      ? `- **Renewal of an existing approval:** ${renewal.approvedHours} CEC hour(s), ref ${renewal.iicrcReference}${expiry ? `, expiring ${expiry}` : ''}. CARSI asks the IICRC to renew it.`
+      : `- **Available from:** ${today} (submitted for approval before any CEC claim is made)`
+  }
 - **Duration:** ${
     durationHours != null
       ? `${durationHours} educational hour${durationHours === 1 ? '' : 's'}`
       : 'TBC — founder to confirm the educational (contact) hours'
   }
-- **CEC credit:** none claimed. CARSI asks the IICRC to determine the credit for the duration stated above. No CEC value is published for this course on any surface until an approval is recorded in \`data/seed/cec-approvals.json\`.
+${
+    renewal
+      ? `- **CEC credit:** currently approved as above. CARSI asks the IICRC to confirm the credit on renewal. If the approval lapses, CARSI stops showing CEC hours for this course from its expiry date.`
+      : '- **CEC credit:** none claimed. CARSI asks the IICRC to determine the credit for the duration stated above. No CEC value is published for this course on any surface until an approval is recorded in `data/seed/cec-approvals.json`.'
+  }
 
 ## 4. Course summary and learning objectives
 
