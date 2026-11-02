@@ -16,7 +16,7 @@ External sends, spend, pricing and licence-critical claims NEVER default — the
 | 9 | First franchise target (suggest Jim's Cleaning Group) | Default: agents draft for Jim's; you approve before send | 2026-08-27 | OPEN |
 | 10 | Merge lane for `main`: it deploys to production on push and requires no PR review | Default: KEEP as-is, and agents never open a PR without a passing release receipt | 2026-08-24 | OPEN |
 | 11 | Refund terms for per-course purchases (none exist; `/terms` covers only subscriptions) | Default: agents DRAFT per-course refund terms + a `/refund-policy` page; you approve before publish | 2026-08-24 | OPEN |
-| 12 | Level names for the CARSI tier ladder (Foundation → Practitioner → Advanced → top tier TBD) | No default — naming is founder-owned. Agents propose 3 naming sets; you pick. | 2026-08-30 | OPEN |
+| 12 | Level names for the CARSI tier ladder (Foundation → Practitioner → Advanced → top tier TBD) | No default — naming is founder-owned. Agents propose 3 naming sets; you pick. | 2026-08-30 | **DECIDED 2026-11-02 — Phill: Foundation → Practitioner → Advanced → Master.** Unblocks BACKLOG #25 (tier map). |
 | 13 | Public Research Notes page (1 distilled, cited note/week) — go? | Default: YES at Gate 1 — it is the E-E-A-T engine | 2026-08-30 | OPEN |
 | 14 | Paywalled-journal budget for the evidence sweep | Default: OPEN-ACCESS ONLY (commits no spend). Any paid source is a new cost → founder-only. | 2026-08-30 | OPEN |
 | 15 | GP-523-D1 — course URL slugs still carry a lowercase IICRC discipline prefix (`cct-commercial-carpet-core`, plus wrt/asd/amrt/fsrt) | Default: KEEP the slugs for now; rename ships only with 301 redirects in a follow-up. Rendered copy is already clean and stays guarded. | 2026-08-25 | **DECIDED 2026-10-06** — Phill: rename. Code (database-gated 301s, repo rename, designation-name guards) in branch `fix/carsi-designation-slugs`; the live data edit runs after that merge (BACKLOG #31). |
@@ -100,3 +100,19 @@ deadline**, and **not one has ever been marked RESOLVED, DONE or CLOSED**. Writi
 unblocks the *agent*, not the *work* — so no row above should be treated as progress, and nothing
 downstream should be built assuming an answer arrives. That is why #18 carries a real default:
 where a safe fallback exists, the deadline should do something rather than pass quietly.
+
+## Decided 2026-11-02 — course-release walkthrough with Phill
+
+| # | Decision | Outcome |
+| --- | --- | --- |
+| 24 | Who is the SME for course claims? | **Phill.** He holds licensed ANSI/IICRC S500, S520, S700 and S540. Each rebuilt course reaches him as a claim-by-claim checklist built from its evidence ledger's GAP rows. Claims about what a standard says are checked by Phill against his licensed copy. |
+| 25 | Standards and training manuals as AI input | **Never.** IICRC standards and certification manuals are never read by or entered into an AI tool, even when agent-reachable (for example in Google Drive), per the IICRC AI Use Policy in `CLAUDE.md`. RIA manuals are treated the same unless CARSI holds written RIA permission for AI use. |
+| 26 | Rebuilt Level 3 Mould vs the live Level 3 | **Replace the live course**, keeping the slug `level-3-mould-remediation-c5797369`, its id and links, at the **unchanged A$148.95**. The rebuild was renamed to that slug in the repo. Seeding stays gated on Phill's SME sign-off and the progress preflight (`docs/runbooks/course-go-live.md`). |
+| 27 | Designation courses vs Level courses | **Designation = Level 2.** Earning a Practitioner designation requires the matching Level 2 course, so no content is taught twice. The designation course is the assessment and credential wrapper: whole-job case studies, the practical assessment and the designation exam. Mould is the first case. |
+| 28 | Level 2 Mould SME review | **Confirmed reviewed** before go-live. |
+| 29 | Ozone free course sign-off | Phill reads the course and signs off (it is `noAiRewrite`). Agents prepare a summary of its claims and sources only. |
+| 30 | Course diagrams | Agents build them as SVG, checked by `check:course-diagrams` in CI and reviewed by Phill with the claims. |
+| 31 | Pace of designation-course rebuilds | **Two at a time**. The next batch starts after Phill signs off the current one. |
+| 32 | Go-live hand-off | **Per sign-off.** For each course Phill signs off, agents merge it and prepare a forwardable message for Rana with that course's preflight and seed command. |
+| 33 | CEC renewals expiring 18/01/2027 | Agents generate all 16 renewal packs. Phill submits them. |
+| 34 | WHS Fundamentals course | Written by an Australian registered trainer about three years ago and not updated since. It gets a dated currency review against current WHS law before any re-release. |
