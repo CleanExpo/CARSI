@@ -265,13 +265,17 @@ export type PrerequisiteLockedSeat = {
  */
 export async function listPrerequisiteLockedSeats(
   userIds: readonly string[],
+  /** Only these courses (the team's own purchases), so a manager never sees a member's other enrolments. */
+  courseSlugs: readonly string[],
 ): Promise<Map<string, PrerequisiteLockedSeat[]>> {
   const out = new Map<string, PrerequisiteLockedSeat[]>();
   const ids = [...new Set(userIds)];
-  if (ids.length === 0) return out;
+  const slugs = [...new Set(courseSlugs.map((s) => s.trim().toLowerCase()).filter(Boolean))];
+  if (ids.length === 0 || slugs.length === 0) return out;
   const rows = await prisma.lmsEnrollment.findMany({
     where: {
       studentId: { in: ids },
+      course: { slug: { in: slugs } },
       prerequisiteGated: true,
       // Only a live, not-yet-completed seat can be waiting (completed is always allowed).
       status: 'active',

@@ -4,10 +4,7 @@ import {
   type PrerequisiteLockedSeat,
 } from '@/lib/server/course-prerequisites';
 import { decideTeamSeatSubscription } from '@/lib/server/entitlements';
-import {
-  getTeamCoursePurchases,
-  getTeamCourseSeatPools,
-} from '@/lib/server/team-course-seats';
+import { getTeamCoursePurchases, getTeamCourseSeatPools } from '@/lib/server/team-course-seats';
 import { countTeamSeatsUsed, repairAndGetTeamForUser } from '@/lib/server/teams';
 
 type TeamRecord = NonNullable<Awaited<ReturnType<typeof repairAndGetTeamForUser>>>;
@@ -45,9 +42,10 @@ export async function serializeTeamForClient(team: TeamRecord, claimsSub: string
     };
   }
 
+  const coursePurchasesPromise = getTeamCoursePurchases(team.id);
   const [seatsUsed, coursePurchases, courseSeatPools, teamSub, lockedSeats] = await Promise.all([
     countTeamSeatsUsed(team.id),
-    getTeamCoursePurchases(team.id),
+    coursePurchasesPromise,
     getTeamCourseSeatPools(team.id),
     // WS1-E2 (GP-442): the recurring seat subscription, when this is a Teams
     // subscription team. Drives the owner dashboard seats/usage + status block.
@@ -56,10 +54,17 @@ export async function serializeTeamForClient(team: TeamRecord, claimsSub: string
       : Promise.resolve(null),
     // Seats still locked by a course prerequisite (DECISIONS #41). Display only: a failed
     // lookup shows no badge rather than breaking the team dashboard.
-    listPrerequisiteLockedSeats(team.members.map((m) => m.userId)).catch((e) => {
-      console.warn('[team-api-serialize] locked-seat lookup failed', e);
-      return new Map<string, PrerequisiteLockedSeat[]>();
-    }),
+    coursePurchasesPromise
+      .then((purchases) =>
+        listPrerequisiteLockedSeats(
+          team.members.map((m) => m.userId),
+          purchases.map((p) => p.course_slug)
+        )
+      )
+      .catch((e) => {
+        console.warn('[team-api-serialize] locked-seat lookup failed', e);
+        return new Map<string, PrerequisiteLockedSeat[]>();
+      }),
   ]);
 
   const teamSubscription = teamSub

@@ -112,11 +112,16 @@ vi.mock('@/lib/prisma', () => {
           if (where.prerequisiteGated === true) {
             // listPrerequisiteLockedSeats: gated, live rows for these members, with the course.
             const ids = (where.studentId as { in: string[] }).in;
+            const slugs = (where.course as { slug: { in: string[] } }).slug.in;
             return db.enrolments
+              .map((e) => ({ ...e, course: COURSES.find((c) => c.id === e.courseId)! }))
               .filter(
-                (e) => ids.includes(e.studentId) && e.prerequisiteGated && e.status === where.status
-              )
-              .map((e) => ({ ...e, course: COURSES.find((c) => c.id === e.courseId)! }));
+                (e) =>
+                  ids.includes(e.studentId) &&
+                  slugs.includes(e.course.slug) &&
+                  e.prerequisiteGated &&
+                  e.status === where.status
+              );
           }
           // loadPrerequisiteFacts: this learner's completed prerequisite enrolments.
           const courseIds = (where.courseId as { in: string[] }).in;
@@ -292,7 +297,7 @@ describe('team seat for a member WITHOUT the prerequisite', () => {
 
   it('the manager view lists the member as waiting on the prerequisite', async () => {
     await enrollTeamMemberInPurchasedCourse(member.sub, 'team-1');
-    const waiting = await listPrerequisiteLockedSeats([member.sub, manager.sub]);
+    const waiting = await listPrerequisiteLockedSeats([member.sub, manager.sub], [MOULD]);
     expect(waiting.get(member.sub)).toEqual([
       expect.objectContaining({
         course_slug: MOULD,
@@ -302,13 +307,19 @@ describe('team seat for a member WITHOUT the prerequisite', () => {
     expect(waiting.has(manager.sub)).toBe(false);
   });
 
+  it('the manager view only shows courses this team bought', async () => {
+    await enrollTeamMemberInPurchasedCourse(member.sub, 'team-1');
+    const waiting = await listPrerequisiteLockedSeats([member.sub], ['some-other-course']);
+    expect(waiting.size).toBe(0);
+  });
+
   it('unlocks once the member completes the prerequisite', async () => {
     await enrollTeamMemberInPurchasedCourse(member.sub, 'team-1');
     completePrerequisite(member.sub);
     const res = await openLesson(member);
     expect(res.status).toBe(200);
     expect((await courseStatus(member)).locked).toBe(false);
-    expect((await listPrerequisiteLockedSeats([member.sub])).size).toBe(0);
+    expect((await listPrerequisiteLockedSeats([member.sub], [MOULD])).size).toBe(0);
   });
 
   it('an ordinary (ungated) enrolment on the same course stays grandfathered', async () => {
