@@ -25,6 +25,12 @@ vi.mock('@/lib/prisma', () => ({
   },
 }));
 vi.mock('@/lib/server/auth-from-request', () => ({ getSessionClaimsFromRequest: mocks.claims }));
+// The prerequisite gate (DECISIONS #41) has its own tests; these routes' courses have none.
+vi.mock('@/lib/server/course-prerequisites', async (original) => ({
+  ...(await original<typeof import('@/lib/server/course-prerequisites')>()),
+  findQuizPrerequisiteBlock: vi.fn(async () => null),
+  findEnrolledCoursePrerequisiteBlock: vi.fn(async () => null),
+}));
 vi.mock('@/lib/server/upstream-api', () => ({ getUpstreamBaseUrl: mocks.upstream }));
 vi.mock('@/lib/server/lesson-checkpoint', async (original) => ({
   ...(await original<typeof import('./lesson-checkpoint')>()),

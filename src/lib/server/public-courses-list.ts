@@ -1,6 +1,7 @@
 import type { Prisma } from '@/generated/prisma/client';
 import { normalizeCourseTags, type CheckoutCourse, type CourseListItem } from '@/lib/course-list-item';
 import { prisma } from '@/lib/prisma';
+import { listCoursePrerequisiteLinks } from '@/lib/server/course-prerequisites';
 import { normalizePublicAssetUrl } from '@/lib/remote-image';
 import { isBuildPhase } from '@/lib/server/build-phase';
 import { formatCurrentCecHoursLabel } from '@/lib/server/course-cec-hours';
@@ -512,11 +513,15 @@ export async function getPublishedCourseDetailBySlugFromDatabase(slug: string) {
       })
     : null;
 
+  // Prerequisite courses (DECISIONS #41) for the locked state; no query when there are none.
+  const prerequisites = await listCoursePrerequisiteLinks(row.meta);
+
   const priceNum = Number(row.priceAud);
   return {
     id: row.id,
     slug: row.slug,
     title: row.title,
+    prerequisites,
     description: row.description ?? null,
     short_description: row.shortDescription ?? null,
     price_aud: String(priceNum),

@@ -8,6 +8,7 @@ import { notifyCrmEnrollmentCreated } from '@/lib/server/crm-enrollment-notify';
 import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
 import { captureServerError } from '@/lib/server/sentry';
 import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase';
+import { isPrerequisiteNotMetError, prerequisiteBlockBody } from '@/lib/server/course-prerequisites';
 import { computeDiscountedAud, findActiveUserDiscount } from '@/lib/server/user-discounts';
 import { getOrCreateCourseBySlug } from '@/lib/server/course-catalog-sync';
 
@@ -152,6 +153,9 @@ export async function POST(request: NextRequest) {
       team_purchase: fulfilled.kind === 'team',
     });
   } catch (e) {
+    if (isPrerequisiteNotMetError(e)) {
+      return NextResponse.json(prerequisiteBlockBody(e.block), { status: 403 });
+    }
     const msg = e instanceof Error ? e.message : String(e);
     if (msg === 'COURSE_NOT_FOUND') {
       return NextResponse.json({ detail: 'Course not found' }, { status: 404 });

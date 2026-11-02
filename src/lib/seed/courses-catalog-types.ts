@@ -27,6 +27,21 @@ export type CatalogModule = {
   lessons: CatalogLesson[];
 };
 
+/**
+ * Prerequisite fields a course may carry in `meta` (DECISIONS #41). `meta` stays `unknown`
+ * because it is a free-form bag; the gate parses it defensively with
+ * `parseCoursePrerequisites` (`src/lib/lms/course-prerequisites.ts`), which also honours the
+ * legacy singular `prerequisite` slug. Enforced server-side at enrolment, checkout and
+ * lesson/quiz/assessment access.
+ */
+export type CatalogCoursePrerequisitesMeta = {
+  prerequisites?: { courseSlug: string; reason?: string }[];
+  /** Legacy single prerequisite slug. */
+  prerequisite?: string;
+  /** ISO date: enrolments created before it are grandfathered at lesson/quiz read time. */
+  prerequisitesEnforcedFrom?: string;
+};
+
 export type CatalogCourse = {
   id: string;
   slug: string;

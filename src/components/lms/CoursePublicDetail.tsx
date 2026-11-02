@@ -48,6 +48,8 @@ export type CoursePublicDetailModel = {
   }[];
   instructor?: { full_name: string } | null;
   intro_video_url?: string | null;
+  /** Prerequisite courses (DECISIONS #41). Enforced server-side; shown as a locked state. */
+  prerequisites?: { slug: string; title: string }[];
 };
 
 function youtubeEmbed(url: string): string | null {
@@ -178,7 +180,12 @@ export function CoursePublicDetail({
               ) : null}
 
               <div className="mt-8 lg:hidden">
-                <EnrolButton slug={course.slug} priceAud={priceNum} isFree={course.is_free} />
+                <EnrolButton
+                  slug={course.slug}
+                  priceAud={priceNum}
+                  isFree={course.is_free}
+                  prerequisites={course.prerequisites}
+                />
               </div>
             </div>
 
@@ -244,7 +251,12 @@ export function CoursePublicDetail({
                     : 'One-time payment — lifetime access'}
                 </p>
                 <div className="mt-6">
-                  <EnrolButton slug={course.slug} priceAud={priceNum} isFree={course.is_free} />
+                  <EnrolButton
+                    slug={course.slug}
+                    priceAud={priceNum}
+                    isFree={course.is_free}
+                    prerequisites={course.prerequisites}
+                  />
                 </div>
                 <p className="mt-4 text-center text-xs text-slate-500">
                   or included with{' '}

@@ -5,6 +5,8 @@ import { prisma } from '@/lib/prisma';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { runSerializable } from '@/lib/server/db-tx';
 import { ACCESS_GRANTING_STATUS_LIST } from '@/lib/server/enrollment-access';
+import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
+import { findQuizPrerequisiteBlock, prerequisiteBlockBody } from '@/lib/server/course-prerequisites';
 import { computeQuizResult } from '@/lib/server/lms-completion';
 import { buildQuizFeedback } from '@/lib/lms/quiz-feedback';
 import { CHECKPOINT_UUID, CheckpointError } from '@/lib/lms/lesson-checkpoint';
@@ -106,6 +108,17 @@ export async function POST(request: NextRequest, ctx: Ctx) {
 
   const bindingPresent = parsed !== null && typeof parsed === 'object' &&
     (Object.hasOwn(parsed, 'lessonId') || Object.hasOwn(parsed, 'contentVersion'));
+  // Prerequisite gate (DECISIONS #41) for both submission paths. Grandfathered and
+  // admin-created enrolments pass; see src/lib/server/course-prerequisites.ts.
+  const prereqBlock = await findQuizPrerequisiteBlock({
+    userId: claims.sub,
+    isAdmin: () => isLmsClaimsAllowedAdminPanel(claims),
+    quizId,
+  });
+  if (prereqBlock) {
+    return NextResponse.json(prerequisiteBlockBody(prereqBlock), { status: 403 });
+  }
+
   if (identityPresent || bindingPresent) {
     if (!identityPresent) return boundJson({ detail: 'Unauthorized' }, 401);
     return submitBound(claims.sub, quizId, parsed);

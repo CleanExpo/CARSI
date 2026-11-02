@@ -8,6 +8,15 @@ import { ensureLmsUserFromClaims } from '@/lib/server/lms-user-sync';
 import { isUniqueConstraintError } from '@/lib/server/db-errors';
 import { decideEnrollmentCompleted } from '@/lib/server/lms-completion';
 import { isEnrolmentAccessAllowed, isRevokedStatus } from '@/lib/server/enrollment-access';
+import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
+import {
+  isAdminOverridePaymentReference,
+  isStripeCheckoutPaymentReference,
+} from '@/lib/lms/course-prerequisites';
+import {
+  findCoursePrerequisiteBlock,
+  PrerequisiteNotMetError,
+} from '@/lib/server/course-prerequisites';
 
 /**
  * Quiz gate for completion (Phase 6, 2026-06-29 audit): a course is only
@@ -49,6 +58,14 @@ export async function enrollStudentInCourse(
     },
     select: { id: true, status: true },
   });
+
+  // Prerequisite gate (DECISIONS #41) — checked only when an enrolment is ISSUED (a new
+  // row, or a revoked row being reactivated). An existing active/completed row is
+  // grandfathered and returns 'already_enrolled' below without a re-check.
+  if (!existing || isRevokedStatus(existing.status)) {
+    await assertPrerequisitesForNewEnrolment(claims, course, paymentReference);
+  }
+
   if (existing) {
     // Re-purchase after a refund (WS3 / P0-C): a revoked enrolment MUST be
     // reactivated on a fresh fulfilment — this path only runs after a verified
@@ -91,6 +108,37 @@ export async function enrollStudentInCourse(
     }
     throw error;
   }
+}
+
+/**
+ * Throws `PrerequisiteNotMetError` when this enrolment would skip a course prerequisite.
+ *
+ * Admins and admin-created enrolments (`admin:*`) bypass. A Stripe-paid fulfilment
+ * (`cs_*`) is NEVER refused here: the money is already taken, and `/api/lms/checkout`
+ * refuses to open a session for a learner who has not met the prerequisite, so a paid
+ * order that reaches this point is either legitimate or a gap to investigate (logged).
+ */
+async function assertPrerequisitesForNewEnrolment(
+  claims: SessionClaims,
+  course: { slug: string; meta?: unknown },
+  paymentReference: string,
+): Promise<void> {
+  if (isAdminOverridePaymentReference(paymentReference)) return;
+  const block = await findCoursePrerequisiteBlock({
+    userId: claims.sub,
+    isAdmin: () => isLmsClaimsAllowedAdminPanel(claims),
+    course: { slug: course.slug, meta: course.meta ?? null },
+  });
+  if (!block) return;
+  if (isStripeCheckoutPaymentReference(paymentReference)) {
+    console.warn('[enrollment] paid fulfilment for a course whose prerequisite is not met', {
+      course: course.slug,
+      studentId: claims.sub,
+      paymentReference,
+    });
+    return;
+  }
+  throw new PrerequisiteNotMetError(block);
 }
 
 /** Marks enrolments created for admin-panel users so analytics can exclude them. */

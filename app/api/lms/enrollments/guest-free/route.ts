@@ -5,6 +5,7 @@ import { applyRateLimit, clientIpFrom, UNKNOWN_IP } from '@/lib/rate-limit';
 import { notifyCrmEnrollmentCreated } from '@/lib/server/crm-enrollment-notify';
 import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
 import { enrollStudentInCourse } from '@/lib/server/enrollment-service';
+import { isPrerequisiteNotMetError, prerequisiteBlockBody } from '@/lib/server/course-prerequisites';
 import { findOrCreateGuestUser } from '@/lib/server/guest-checkout';
 import { getFirstLessonLearnPath } from '@/lib/server/first-lesson';
 import { getOrCreateCourseBySlug } from '@/lib/server/course-catalog-sync';
@@ -135,6 +136,9 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (e) {
+    if (isPrerequisiteNotMetError(e)) {
+      return NextResponse.json(prerequisiteBlockBody(e.block), { status: 403 });
+    }
     console.error('[guest-free]', e);
     void captureServerError(e, { route: '/api/lms/enrollments/guest-free' });
     return NextResponse.json({ detail: 'Enrolment failed' }, { status: 500 });
