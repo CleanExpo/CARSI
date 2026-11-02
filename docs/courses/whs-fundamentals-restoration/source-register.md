@@ -4,6 +4,8 @@
 **Built:** 2026-07-11 · **Status:** DRAFT, unpublished, pending founder/SME review
 **Standard applied:** `carsi-course-production` (Australian-produced) + `nexus-copywriter` (prove-it-or-cut-it substantiation gate)
 
+> **Superseded in part on 2 November 2026.** The course had a currency review on that date. See `data/courses/whs-fundamentals-for-restoration-and-cleaning-professionals/currency-review.md`; its evidence ledger is the source of truth. Two rows below are now wrong. The lead "removal levels" are 30/10 µg/dL, not 20/5 (20/5 is the lead-risk-work trigger and the return level). The RCS WEL is no longer "under further review": ministers kept it at 0.05 mg/m³ on 24 June 2026. The July 2026 table is kept unchanged as the historical record.
+
 ## Disclaimer (must remain prominent)
 This course is **educational / pre-training material only**. It is **not** Australian or New Zealand
 legal advice or legal representation. It is a best-practice educational summary compiled from published

@@ -80,7 +80,7 @@
      "sourceRef": "Module 3; https://www.safeworkaustralia.gov.au/safety-topic/hazards/silica/engineered-stone-ban"
     },
     {
-     "questionText": "You must cut and grind concrete and fibre-cement during a strip-out, and the work is assessed as high-risk crystalline silica processing. What must the PCBU do BEFORE work starts?",
+     "questionText": "You must cut and grind concrete and fibre-cement during a strip-out, and the work is assessed as high-risk crystalline silica processing. Under the model WHS Regulations (outside Victoria), what must the PCBU do BEFORE work starts?",
      "options": [
       "Nothing extra — just wear a dust mask",
       "Prepare a written Silica Risk Control Plan, and arrange air monitoring, health monitoring and silica training",
@@ -119,13 +119,13 @@
      "questionText": "A saturated subfloor with sewage needs entry. What must be in place before anyone goes in?",
      "options": [
       "Just a P2 mask",
-      "A confined-space risk assessment, entry permit, atmospheric testing, ventilation, a standby person and a rescue plan (AS 2865 + Confined Spaces COP)",
+      "A confined-space risk assessment, entry permit, atmospheric testing, ventilation, a standby person and a rescue plan (AS/NZS 2865 + Confined Spaces COP)",
       "Nothing if it is only a small space",
       "A White Card"
      ],
      "correctIndex": 1,
      "points": 1,
-     "sourceRef": "Module 5; AS 2865:2009 + Safe Work Australia Confined Spaces Code of Practice — no entry without a rescue plan"
+     "sourceRef": "Module 5; AS/NZS 2865:2009 (Amd 1:2025) + Safe Work Australia Confined Spaces Code of Practice — no entry without a rescue plan"
     },
     {
      "questionText": "Mould is present on a water-damaged job. What is the correct drying approach?",
@@ -137,7 +137,7 @@
      ],
      "correctIndex": 1,
      "points": 1,
-     "sourceRef": "Module 5; WHS duty + enHealth guidance + IICRC S520 as industry method; contain first, HEPA negative air"
+     "sourceRef": "Module 5; WHS duty + enHealth guidance + ANSI/IICRC S520:2024 as industry method; contain first, HEPA negative air"
     },
     {
      "questionText": "A worker is taken to hospital as an in-patient after an incident on site. What are your duties?",
