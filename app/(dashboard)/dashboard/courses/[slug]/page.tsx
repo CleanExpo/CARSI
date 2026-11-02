@@ -137,7 +137,12 @@ export default async function DashboardCourseDetailPage({
             </p>
             <div className="mt-5">
               {action === 'enrol' ? (
-                <EnrolButton slug={course.slug} priceAud={priceNum} isFree={course.is_free} />
+                <EnrolButton
+                  slug={course.slug}
+                  priceAud={priceNum}
+                  isFree={course.is_free}
+                  prerequisites={course.prerequisites}
+                />
               ) : (
                 <Link href={learnHref} className={`${dash.btnPrimary} w-full justify-center`}>
                   {action === 'start'

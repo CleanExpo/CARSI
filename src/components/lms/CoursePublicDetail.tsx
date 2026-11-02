@@ -409,7 +409,12 @@ export function CoursePublicDetail({
               : 'Complete the course and receive a verifiable digital credential for your portfolio.'}
           </p>
           <div className="mx-auto mt-10 max-w-sm">
-            <EnrolButton slug={course.slug} priceAud={priceNum} isFree={course.is_free} />
+            <EnrolButton
+              slug={course.slug}
+              priceAud={priceNum}
+              isFree={course.is_free}
+              prerequisites={course.prerequisites}
+            />
           </div>
           <div className="mt-8">
             <CoursesIndexLink className="text-sm font-semibold text-[#146fc2]">

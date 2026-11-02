@@ -116,4 +116,23 @@ describe('POST /api/lms/enrollments/guest-free — publication gate', () => {
     expect(res.status).toBe(403);
     expect(mocks.findOrCreateGuestUser).not.toHaveBeenCalled();
   });
+
+  it('a free course with a prerequisite is refused (401 sign-in) before any account exists', async () => {
+    mocks.dbCourse.mockResolvedValue(
+      course({
+        status: 'published',
+        isPublished: true,
+        meta: { prerequisites: [{ courseSlug: 'level-2-mould-remediation-30ee3492' }] },
+      }),
+    );
+
+    const res = await POST(request());
+    const body = (await res.json()) as { code?: string };
+
+    expect(res.status).toBe(401);
+    expect(body.code).toBe('prerequisite_sign_in_required');
+    expect(mocks.findOrCreateGuestUser).not.toHaveBeenCalled();
+    expect(mocks.enrol).not.toHaveBeenCalled();
+    expect(mocks.sign).not.toHaveBeenCalled();
+  });
 });

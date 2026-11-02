@@ -147,13 +147,20 @@ export async function POST(request: NextRequest) {
       bodyEmail: body.customer_email,
     });
 
+    // The buyer's session comes from the same credentials `resolveCheckoutEmail` accepts:
+    // the `auth_token` cookie first, else a `Bearer` session token. Both are verified by
+    // `verifySessionToken`; a Bearer-only buyer must not be treated as a guest (the
+    // prerequisite gate would otherwise refuse a learner who has completed it).
+    const bearerToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : '';
     let studentId: string | undefined;
     let buyerClaims: Awaited<ReturnType<typeof verifySessionToken>> = null;
-    if (authTokenCookie) {
-      const c = await verifySessionToken(authTokenCookie);
+    for (const token of [authTokenCookie, bearerToken]) {
+      if (!token) continue;
+      const c = await verifySessionToken(token);
       if (c?.sub) {
         studentId = c.sub;
         buyerClaims = c;
+        break;
       }
     }
     // A still-valid token for a deactivated or deleted learner can't be fulfilled by the webhook,
@@ -271,8 +278,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Charge path: if Postgres is configured but we could not load the course
-    // row, skip the ownership check would open a second Stripe session. Refuse.
-    if (process.env.DATABASE_URL?.trim() && !dbCourse && purchaseMode !== 'team') {
+    // row, skipping the ownership check would open a second Stripe session, and skipping
+    // the prerequisite gate (below) would sell a locked course — the paid fulfilment does
+    // not refuse after the money is taken. Refuse for every purchase mode, team included.
+    if (process.env.DATABASE_URL?.trim() && !dbCourse) {
       return NextResponse.json(
         { detail: 'Could not verify enrolment just now. Please try again shortly.' },
         { status: 503 },

@@ -196,6 +196,60 @@ export async function findQuizPrerequisiteBlock(params: {
   });
 }
 
+/**
+ * Read-time gate keyed by lesson id, for routes that only have the lesson in hand (the
+ * lesson checkpoint). An unknown lesson returns `null`: the caller's own lookup 404s.
+ */
+export async function findLessonPrerequisiteBlock(params: {
+  userId: string;
+  isAdmin: AdminFlag;
+  lessonId: string;
+}): Promise<PrerequisiteBlock | null> {
+  const lesson = await prisma.lmsLesson.findUnique({
+    where: { id: params.lessonId },
+    select: { module: { select: { courseId: true } } },
+  });
+  if (!lesson) return null;
+  return findEnrolledCoursePrerequisiteBlock({
+    userId: params.userId,
+    isAdmin: params.isAdmin,
+    courseId: lesson.module.courseId,
+  });
+}
+
+/**
+ * The subset of `courseIds` whose content `userId` may read now, for list endpoints that
+ * aggregate content across every enrolled course. One query for the course metas; a course
+ * with a prerequisite then goes through the same per-course decision as the read routes
+ * (grandfathering, admin bypass, fail-closed on misconfiguration all unchanged).
+ */
+export async function filterCoursesPassingPrerequisites(params: {
+  userId: string;
+  isAdmin: AdminFlag;
+  courseIds: readonly string[];
+}): Promise<Set<string>> {
+  const ids = [...new Set(params.courseIds)];
+  if (ids.length === 0) return new Set();
+  const courses = await prisma.lmsCourse.findMany({
+    where: { id: { in: ids } },
+    select: { id: true, meta: true },
+    take: ids.length,
+  });
+  const gated = new Set(
+    courses.filter((c) => courseHasPrerequisites(parseCoursePrerequisites(c.meta))).map((c) => c.id),
+  );
+  const allowed = new Set(ids.filter((id) => !gated.has(id)));
+  for (const courseId of gated) {
+    const block = await findEnrolledCoursePrerequisiteBlock({
+      userId: params.userId,
+      isAdmin: params.isAdmin,
+      courseId,
+    });
+    if (!block) allowed.add(courseId);
+  }
+  return allowed;
+}
+
 /** Prerequisite courses (slug + title) for display on the public course page. */
 export async function listCoursePrerequisiteLinks(meta: unknown): Promise<PrerequisiteCourseLink[]> {
   const parsed = parseCoursePrerequisites(meta);

@@ -65,14 +65,18 @@ vi.mock('@/lib/prisma', () => ({
 
 const { POST } = await import('../../../app/api/lms/checkout/route');
 
-function request(signedIn: boolean): NextRequest {
+function request(
+  signedIn: boolean | 'bearer',
+  extra: Record<string, unknown> = {},
+): NextRequest {
   return new NextRequest('https://carsi.example.test/api/lms/checkout', {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
-      ...(signedIn ? { cookie: 'auth_token=tok' } : {}),
+      ...(signedIn === true ? { cookie: 'auth_token=tok' } : {}),
+      ...(signedIn === 'bearer' ? { authorization: 'Bearer tok' } : {}),
     },
-    body: JSON.stringify({ slug: SLUG, customer_email: 'learner@example.com.au' }),
+    body: JSON.stringify({ slug: SLUG, customer_email: 'learner@example.com.au', ...extra }),
   });
 }
 
@@ -135,6 +139,38 @@ describe('checkout — prerequisite gate', () => {
   it('a lookup failure is a 503, never a charge on doubt', async () => {
     mocks.completed.mockRejectedValue(new Error('db down'));
     const res = await POST(request(true));
+    expect(res.status).toBe(503);
+    expect(mocks.createStripe).not.toHaveBeenCalled();
+  });
+
+  it('a Bearer-only buyer who completed the prerequisite reaches Stripe as themselves', async () => {
+    mocks.completed.mockResolvedValue([{ courseId: 'crs-l2' }]);
+    const res = await POST(request('bearer'));
+    expect(res.status).toBe(200);
+    expect(mocks.verifySession).toHaveBeenCalledWith('tok');
+    expect(mocks.createStripe).toHaveBeenCalledWith(expect.objectContaining({ student_id: 'stu' }));
+  });
+
+  it('a Bearer-only buyer without the prerequisite gets the 403 refusal, not a sign-in prompt', async () => {
+    const res = await POST(request('bearer'));
+    const body = (await res.json()) as { code?: string };
+    expect(res.status).toBe(403);
+    expect(body.code).toBe('prerequisite_not_met');
+    expect(mocks.createStripe).not.toHaveBeenCalled();
+  });
+
+  it('an invalid Bearer token is treated as a guest (sign in first)', async () => {
+    mocks.verifySession.mockResolvedValue(null);
+    const res = await POST(request('bearer'));
+    const body = (await res.json()) as { code?: string };
+    expect(res.status).toBe(401);
+    expect(body.code).toBe('prerequisite_sign_in_required');
+    expect(mocks.createStripe).not.toHaveBeenCalled();
+  });
+
+  it('a team purchase fails closed (503) when the course row cannot be loaded', async () => {
+    mocks.dbCourse.mockRejectedValue(new Error('db down'));
+    const res = await POST(request(true, { purchase_mode: 'team', team_seat_count: 3 }));
     expect(res.status).toBe(503);
     expect(mocks.createStripe).not.toHaveBeenCalled();
   });

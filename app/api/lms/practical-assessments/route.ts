@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
+import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { listAvailableAssessmentsForStudent } from '@/lib/server/practical-assessment';
 
@@ -12,6 +13,9 @@ export async function GET(request: NextRequest) {
   if (!claims) {
     return NextResponse.json({ detail: 'Unauthorized' }, { status: 401 });
   }
-  const assessments = await listAvailableAssessmentsForStudent(claims.sub);
+  // Courses still locked behind an unmet prerequisite are left out (DECISIONS #41).
+  const assessments = await listAvailableAssessmentsForStudent(claims.sub, {
+    isAdmin: () => isLmsClaimsAllowedAdminPanel(claims),
+  });
   return NextResponse.json({ assessments });
 }

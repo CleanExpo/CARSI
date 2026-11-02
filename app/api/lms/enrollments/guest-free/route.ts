@@ -5,6 +5,7 @@ import { applyRateLimit, clientIpFrom, UNKNOWN_IP } from '@/lib/rate-limit';
 import { notifyCrmEnrollmentCreated } from '@/lib/server/crm-enrollment-notify';
 import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
 import { enrollStudentInCourse } from '@/lib/server/enrollment-service';
+import { courseHasPrerequisites, parseCoursePrerequisites } from '@/lib/lms/course-prerequisites';
 import { isPrerequisiteNotMetError, prerequisiteBlockBody } from '@/lib/server/course-prerequisites';
 import { findOrCreateGuestUser } from '@/lib/server/guest-checkout';
 import { getFirstLessonLearnPath } from '@/lib/server/first-lesson';
@@ -65,6 +66,7 @@ export async function POST(request: NextRequest) {
   }
 
   let isFree = false;
+  let hasPrerequisites = false;
   try {
     const db = await getOrCreateCourseBySlug(slug);
     // Public, unauthenticated account creation: only a published course may be
@@ -75,12 +77,27 @@ export async function POST(request: NextRequest) {
     }
     const listAud = Number(db.priceAud);
     isFree = db.isFree || !Number.isFinite(listAud) || listAud <= 0;
+    hasPrerequisites = courseHasPrerequisites(parseCoursePrerequisites(db.meta));
   } catch {
     return NextResponse.json({ detail: 'Course not found' }, { status: 404 });
   }
 
   if (!isFree) {
     return NextResponse.json({ detail: 'This course requires payment' }, { status: 403 });
+  }
+
+  // Prerequisite gate (DECISIONS #41), decided BEFORE any account exists. Completion is tied
+  // to an account, and a guest account created here has none, so it could never pass; and
+  // the email may already belong to an account that did complete it. Either way the learner
+  // signs in first — the same answer for both, so it reveals nothing about the email.
+  if (hasPrerequisites) {
+    return NextResponse.json(
+      {
+        detail: 'This course has a prerequisite. Sign in to the account you completed it with to enrol.',
+        code: 'prerequisite_sign_in_required',
+      },
+      { status: 401 },
+    );
   }
 
   try {
