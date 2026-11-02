@@ -115,3 +115,59 @@ Drafts may carry GAPs. **An open GAP on a substantive point blocks go-live**, so
 - **Comcare's coverage** ("national employers") was not separately verified.
 - **"Sources for this lesson" blocks.** None were added. They are a Course Standard v1 element, which this review deliberately did not apply.
 - **The source register.** `docs/courses/whs-fundamentals-restoration/source-register.md` (July 2026) still records the wrong lead "removal levels" claim and the RCS "under further review" wording. A dated note pointing to this review has been added at the top; the July ledger rows themselves were left as the historical record.
+
+## AU/NZ conversion (2 November 2026)
+
+- **Request:** founder Phill — "Recheck this and make the changes to change it back to Australian / New Zealand."
+- **What changed:** the course no longer teaches by contrast with the United States, and it now covers New Zealand law wherever the law differs. The slug, price, module order, lesson IDs, disclaimers and HTML style are unchanged. `meta.origin` is untouched (provenance record); `meta.auNzConversion: "2026-11-02"` was added and `meta.australianProduction` now names HSWA 2015 and WorkSafe New Zealand.
+- **Method:** every New Zealand fact was read on a primary NZ source through Exa on 2 November 2026 (worksafe.govt.nz, legislation.govt.nz, epa.govt.nz, plus mbie.govt.nz, healthnz.govt.nz and govt.nz for three items). Anything not verified was left out of the course or worded as "check WorkSafe New Zealand", and logged as a GAP.
+- **Evidence ledger:** WHS-109 to WHS-164 added (56 entries: 49 VERIFIED, 3 JUSTIFIED, 4 GAP). The ledger now has 164 entries: 125 VERIFIED, 12 JUSTIFIED, 27 GAP. `validate-ledger.mjs`: 0 violations.
+
+### US framing removed (18 in the course, 6 in the quiz)
+
+| # | Where | Removed | Replaced with |
+|---|---|---|---|
+| 1 | Course description | "the PCBU duty of care (not US OSHA)" | the PCBU duty of care, New Zealand's HSWA duties and WorkSafe New Zealand's role |
+| 2 | Course description | "rebuilds the sound structure of a hazardous-operations safety course … fully translated to Australian law" | covers the framework "under Australian WHS law and New Zealand's Health and Safety at Work Act 2015" |
+| 3 | How WHS is governed | "If you have done a US-style safety course … Australia has no OSHA and no single national safety code." (also two absence claims) | a positive opening: both countries run WHS law on the same core idea |
+| 4 | Lead and the GHS | "not the old US term 'MSDS'" | "previously called Material Safety Data Sheets" (WHS-062) |
+| 5 | Choosing the right respirator | "P2 is broadly equivalent to the US 'N95', but in Australia you must specify P2" | "always specify a P2 marked to AS/NZS 1716" — WHS-070 (P2 ≈ N95, GAP) no longer has text behind it and can be closed |
+| 6 | The rest of the kit | lesson title "… and a US→AU translation you can trust" | "The rest of the kit — PPE to AS/NZS standards" |
+| 7 | The rest of the kit | "If your reference material is American, translate it before you rely on it" | "Use this quick reference for the standards and regulators behind your kit on both sides of the Tasman" |
+| 8–16 | The rest of the kit | the nine-row US→AU table: N95/P100; OSHA 1910.134; GFCI; US 120 V/60 Hz; MSDS; HAZWOPER (29 CFR 1910.120); OSHA/PEL; OSHA 6 ft fall trigger; OSHA 90 dBA noise PEL | an AU/NZ table — hazard or kit item, standard or value, Australian regulator or code, New Zealand regulator or code — for respirators (AS/NZS 1716/1715), wet-site power (RCD, AS/NZS 3012/3760), mains (230 V/50 Hz), chemicals (GHS 7), exposure standards (RCS 0.05 vs 0.025 mg/m³), noise (85 dB(A)/140 dB), falls and confined spaces (AS/NZS 2865) |
+| 17 | Confined spaces, biohazard and mould | "not a US-style Bloodborne Pathogens rule" | "in New Zealand it sits under the HSWA duty to manage work-related health risks" (WHS-085's wording is superseded) |
+| 18 | Notifiable incidents | "(not to any federal body, and there is no 'OSHA 300 log' here)" (an absence claim) | "In Australia, some incidents must be reported to …" |
+
+Quiz: the "OSHA" distractor became "WorkSafe New Zealand"; "Notify OSHA" became "Notify Safe Work Australia and wait for its approval"; "An N95, marked to NIOSH 42 CFR 84" became "A surgical mask, with no fit-test needed"; "A GFCI on the US 120 V standard is fine" became "A 300 mA RCD on the switchboard is enough"; "Report to OSHA within 8 hours on a 300 log" became "Report to Safe Work Australia within 30 days"; the respirator sourceRef "specify P2 not N95" became "specify P2 to AS/NZS 1716". The respirator stem now says "in Australia and New Zealand". Two NZ questions were added (HSWA/WorkSafe NZ; a notifiable serious infection). The correct-answer spread is now 3/3/4/4 across 14 questions. No existing correct answer changed.
+
+### New Zealand content added
+
+| Lesson | Added | Ledger |
+|---|---|---|
+| Course title, description, short description; module 1 and lesson titles | "Australia and New Zealand"; NZ named in the disclaimer banner of all 8 content lessons and the notice | WHS-109 |
+| How WHS is governed | HSWA 2015 (from 4 April 2016) and its regulations; WorkSafe New Zealand (Mahi Haumaru Aotearoa); Maritime NZ and the CAA; HSWA draws on the model WHS Act; amendment Act in force 1 April 2027 | WHS-109 to WHS-114 |
+| Who owes what duty | PCBU, officer and worker duties under HSWA; NZ offences → "check WorkSafe New Zealand" | WHS-115, WHS-116 (GAP) |
+| Hierarchy of controls | eliminate, or if not reasonably practicable minimise | WHS-117 |
+| SWMS, JSEA, induction | SWMS and White Card are Australian; on NZ sites follow the induction and safety plan | WHS-118 (JUSTIFIED) |
+| Asbestos | NZ Asbestos Regulations 2016; pre-1 January 2000 buildings likely to contain asbestos; import ban from 1 October 2016; identify or assume; written management plan; pre-2000 demolition/refurbishment inspection; Class A / Class B / ≤10 m² cumulative; no splitting; WorkSafe issues licences | WHS-119 to WHS-126 |
+| Silica | NZ position: HSWA duties and WorkSafe guidance; risk assessment before engineered stone work; H-class extraction, wet methods, fit-tested RPE; RCS WES 0.025 mg/m³ (November 2023); WES advisory unless prescribed; MBIE consulted on options including a ban → "check" | WHS-127 to WHS-132 (132 GAP) |
+| Lead and the GHS | WorkSafe BEI 10 µg/dL (0.48 µmol/L) and BRV 3 µg/dL; medical supervision of suspension and return; Health NZ notification at 0.24 µmol/L; Hazardous Substances Regulations 2017 inventory; SDS readily accessible; GHS 7 (April 2021, transition ended 30 April 2025); 111 | WHS-133 to WHS-141 (140, 141 GAP) |
+| Respirators; the rest of the kit | WorkSafe NZ points to AS/NZS 1716/1715; NZ no-charge rule; AU/NZ reference table | WHS-142, WHS-143 |
+| Electricity on a wet site | 230 V / 50 Hz; RCD in damp conditions (Electricity (Safety) Regulations 2010); AS/NZS 3012 sites; RCD on all construction-site gear; daily RCD test; test and tag to AS/NZS 3760 is one option | WHS-144 to WHS-150 |
+| Confined spaces, biohazard and mould | WorkSafe NZ confined-space steps; NZ biohazard and mould duty under HSWA | WHS-151, WHS-152 |
+| Heat, manual handling, falls and noise | NZ noise levels 85 dB(A) LAeq,8h and 140 dB peak (HSE Regulations 1995 r 11); PCBU pays for hearing protection; other hazards → WorkSafe NZ guidance | WHS-153 to WHS-155 |
+| Clean and dirty zones | NZ pointer: label, EPA NZ approval, council/waste contractor | WHS-156 (JUSTIFIED) |
+| First aid | GRWM Regulations 2016 r 13; kit matched to risk; 111 | WHS-157, WHS-158 |
+| Notifiable incidents | HSWA s 25 notifiable events; notify as soon as possible by the fastest means; 0800 030 040 for a death; s 23 list including serious infections from bodily substances; preserve the site (s 55); 5-year records (s 57) | WHS-159 to WHS-164 |
+| Professional statement | pre-2000 (NZ); report to WorkSafe New Zealand | — |
+
+### New GAPs (logged in the ledger; the course does not state these)
+
+| Ledger | Gap | Action |
+|---|---|---|
+| WHS-116 | NZ HSWA offences and penalties, and any NZ manslaughter position for work deaths | substantiate before adding |
+| WHS-132 | The NZ Government's decision on engineered stone after MBIE's 2024–25 consultation (only C-grade commercial pages report "no decision") | recheck before release |
+| WHS-140 | The NZ poisons advice line number | substantiate before adding |
+| WHS-141 | Whether NZ prescribes blood-lead removal and return levels (the course gives only WorkSafe's BEI and BRV) | substantiate before adding |
+
+Also for the founder: WHS-070 (P2 ≈ N95) and the "US-style" half of WHS-085 no longer have course text behind them; the founder can close or rewrite those rows. HSWA amendment content (in force 1 April 2027) was not reviewed — recheck by March 2027.

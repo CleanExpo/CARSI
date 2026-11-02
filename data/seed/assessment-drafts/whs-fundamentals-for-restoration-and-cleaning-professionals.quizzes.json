@@ -2,7 +2,7 @@
  "version": 1,
  "status": "DRAFT — NOT PUBLISHED — SME REVIEW REQUIRED",
  "courseSlug": "whs-fundamentals-for-restoration-and-cleaning-professionals",
- "disclaimer": "EDUCATIONAL & PRE-TRAINING USE ONLY — NOT LEGAL ADVICE. These questions test the best-practice educational content of the course. They are not legal advice or Australian/New Zealand legal representation. Always verify against current legislation, the official Codes of Practice, Australian Standards and your state or territory WHS regulator before acting.",
+ "disclaimer": "EDUCATIONAL & PRE-TRAINING USE ONLY — NOT LEGAL ADVICE. These questions test the best-practice educational content of the course. They are not legal advice or Australian/New Zealand legal representation. Always verify against current legislation, the official Codes of Practice, Australian Standards and your state or territory WHS regulator (in New Zealand, WorkSafe New Zealand) before acting.",
  "note": "DRAFT end-of-course knowledge check for the CARSI-original 'Work Health and Safety (WHS) Fundamentals for Restoration and Cleaning Professionals' course. Structured identically to the other files in data/seed/assessment-drafts/ (quizId binds to the course's quiz lesson; questions/options/correctIndex/points/sourceRef). Every factual answer is anchored to a Tier-1 source recorded in docs/courses/whs-fundamentals-restoration/source-register.md. DO NOT seed or publish until the founder (SME) has reviewed each question and confirmed currency (see officialSourceRecheck in the course meta). cecHours is null — this course makes no IICRC CEC claim.",
  "quizzes": [
   {
@@ -28,7 +28,7 @@
      "questionText": "In Australia, who ENFORCES work health and safety law (inspections, notices, prosecutions)?",
      "options": [
       "Safe Work Australia",
-      "OSHA",
+      "WorkSafe New Zealand",
       "The Fair Work Commission",
       "Your state or territory WHS regulator (e.g. SafeWork NSW, WorkSafe Victoria)"
      ],
@@ -47,6 +47,18 @@
      "correctIndex": 2,
      "points": 1,
      "sourceRef": "Module 1; WorkSafe Victoria — https://www.worksafe.vic.gov.au/occupational-health-and-safety-act-and-regulations"
+    },
+    {
+     "questionText": "You are working on a restoration job in New Zealand. Which law and regulator govern work health and safety there?",
+     "options": [
+      "The model WHS Act, enforced by Safe Work Australia",
+      "Victoria’s Occupational Health and Safety Act 2004, enforced by WorkSafe Victoria",
+      "The Australian state WHS Act where your business is registered",
+      "The Health and Safety at Work Act 2015 (HSWA), regulated by WorkSafe New Zealand"
+     ],
+     "correctIndex": 3,
+     "points": 1,
+     "sourceRef": "Module 1; WorkSafe New Zealand — https://www.worksafe.govt.nz/laws-and-regulations/acts/hswa/"
     },
     {
      "questionText": "When you apply the hierarchy of controls, where does personal protective equipment (PPE) sit?",
@@ -88,7 +100,7 @@
      "questionText": "You must cut and grind concrete and fibre-cement during a strip-out, and the work is assessed as high-risk crystalline silica processing. Under the model WHS Regulations (outside Victoria), what must the PCBU do BEFORE work starts?",
      "options": [
       "Nothing extra — just wear a dust mask",
-      "Notify OSHA",
+      "Notify Safe Work Australia and wait for its approval",
       "Prepare a written Silica Risk Control Plan, and arrange air monitoring, health monitoring and silica training",
       "Only wet the surface"
      ],
@@ -97,16 +109,16 @@
      "sourceRef": "Module 3; crystalline silica substances regime from 1 Sep 2024 — https://www.safeworkaustralia.gov.au/media-centre/news/stronger-regulation-crystalline-silica-substances-1-september-2024"
     },
     {
-     "questionText": "What is the Australian baseline respirator for mould and general fire/soot clean-up, and to which standard is it marked?",
+     "questionText": "What is the baseline respirator for mould and general fire/soot clean-up in Australia and New Zealand, and to which standard is it marked?",
      "options": [
-      "An N95, marked to NIOSH 42 CFR 84",
+      "A surgical mask, with no fit-test needed",
       "A P2, marked to AS/NZS 1716 (fit-tested if tight-fitting)",
       "A P1, marked to AS/NZS 1715",
       "Any dust mask"
      ],
      "correctIndex": 1,
      "points": 1,
-     "sourceRef": "Module 4; AS/NZS 1716:2012 (device), AS/NZS 1715:2009 (selection/use); specify P2 not N95"
+     "sourceRef": "Module 4; AS/NZS 1716:2012 (device), AS/NZS 1715:2009 (selection/use); specify P2 to AS/NZS 1716; WorkSafe New Zealand silica dust guidance (AS/NZS 1716 devices selected to AS/NZS 1715)"
     },
     {
      "questionText": "You arrive at a flooded home with standing water and running extraction gear. What is the correct electrical-safety approach?",
@@ -114,7 +126,7 @@
       "Ensure all portable equipment and leads are protected by a 30 mA RCD — bring your own portable RCD and confirm isolation before entering standing water near live circuits",
       "Trust the home's own power points and safety switches",
       "Only use battery tools; mains is never safe",
-      "A GFCI on the US 120 V standard is fine"
+      "A 300 mA RCD on the switchboard is enough"
      ],
      "correctIndex": 0,
      "points": 1,
@@ -149,12 +161,24 @@
      "options": [
       "Log it internally and continue work",
       "Notify your state/territory WHS regulator immediately, keep records for at least 5 years, and preserve the incident site until an inspector or the regulator directs otherwise",
-      "Report to OSHA within 8 hours on a 300 log",
+      "Report to Safe Work Australia within 30 days",
       "Only notify if the worker does not return the next day"
      ],
      "correctIndex": 1,
      "points": 1,
      "sourceRef": "Module 7; notifiable incidents (model WHS Act ss.35–39) + site preservation (s.39)"
+    },
+    {
+     "questionText": "On a New Zealand sewage clean-up, a worker contracts a serious infection from contact with bodily substances, and the work was a significant contributing factor. What applies under HSWA?",
+     "options": [
+      "Nothing — only physical injuries can be notifiable",
+      "Report it to Safe Work Australia within 30 days",
+      "It is a notifiable illness: notify WorkSafe New Zealand as soon as possible, preserve the site and keep a record for at least 5 years",
+      "Only notify if the worker is off work for 15 days or more"
+     ],
+     "correctIndex": 2,
+     "points": 1,
+     "sourceRef": "Module 7; HSWA ss 23, 25, 55–57 — https://www.legislation.govt.nz/act/public/2015/0070/latest/whole.html ; https://www.worksafe.govt.nz/notifications/what-events-need-to-be-notified/"
     }
    ]
   }
