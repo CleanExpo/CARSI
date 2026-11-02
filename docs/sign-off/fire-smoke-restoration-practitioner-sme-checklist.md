@@ -1,6 +1,6 @@
-# SME claim checklist — CARSI Fire & Smoke Restoration Practitioner (v1 draft)
+# SME claim checklist — CARSI Fire & Smoke Restoration Practitioner
 
-**For:** Phill (SME, DECISIONS #24) · **Generated:** 02/11/2026 from `data/courses/fire-smoke-damage-restoration-fundamentals/v1-draft/evidence/evidence-ledger.jsonl` · **Ledger:** 127 claims: 82 VERIFIED, 15 JUSTIFIED, **30 GAP (listed below)**.
+**For:** Phill (SME, DECISIONS #24) · **Generated:** 02/11/2026 from `data/courses/fire-smoke-damage-restoration-fundamentals/v1-draft/evidence/evidence-ledger.jsonl` · **Ledger:** 161 claims: 106 VERIFIED, 24 JUSTIFIED, **31 GAP (listed below)**.
 
 Only the GAP claims need you. VERIFIED and JUSTIFIED claims already carry a source. Tick one box per claim:
 
@@ -10,14 +10,12 @@ Only the GAP claims need you. VERIFIED and JUSTIFIED claims already carry a sour
 
 **Claims marked S700:** check each one against your licensed S700 copy, then tick OK, Fix or Cut. For a Fix, write the corrected wording in your own words rather than quoting it.
 
-**Summary:** 17 standards claims (check against S700), 13 method or practice claims (check from field experience).
+**Summary:** 17 standards claims (check against S700), 14 method or practice claims (check from field experience).
 
 ## M1 · What this course covers and who it is for
 
-- [ ] OK  [ ] Fix  [ ] Cut — **FSP-003** — Earning the designation requires passing each module check, the final knowledge check at 70 % and the practical task at 70 %; no separate Level 2 fire course exists, so this course is the full credential course.
-    - _Why it is open:_ The completion rule and pass marks are CARSI design choices with no published CARSI source yet. data/seed/designations.json lists this course as the only required step (asbestos awareness optional). Founder confirms the rule and the Practitioner-tier placement.
-- [ ] OK  [ ] Fix  [ ] Cut — **FSP-122** — The course takes about 3 hours (durationHours 3; the live entry says 4).
-    - _Why it is open:_ The draft states 3 hours: about 39 minutes of reading at 230 words per minute plus 48 questions at 1.5 minutes is about 111 minutes, before the practical task. The live seed says 4 hours, which the content does not evidence. Founder confirms the stated duration (price unchanged).
+- [ ] OK  [ ] Fix  [ ] Cut — **FSP-003** — Earning the designation requires passing each module check, the final knowledge check at 80 % and the practical task at 80 %; no separate Level 2 fire course exists, so this course is the full credential course.
+    - _Why it is open:_ Pass mark set to 80 % for every module check, the final knowledge check and the practical task by founder decision (2 November 2026). No published CARSI source for the completion rule yet, and the Practitioner-tier placement is still to be confirmed. data/seed/designations.json lists this course as the only required step (asbestos awareness optional).
 
 ## M1 · The fire restoration arc: make safe first
 
@@ -60,6 +58,8 @@ Only the GAP claims need you. VERIFIED and JUSTIFIED claims already carry a sour
     - _Why it is open:_ CARSI method wording with no graded source. If it is meant to mirror the standard’s cleaning procedure, the SME checks it against the licensed S700 copy.
 - [ ] OK  [ ] Fix  [ ] Cut — **FSP-083** — Residue behaviour changes with time, so each test is dated.
     - _Why it is open:_ Plausible practice (supported in part by FSP-085 on corrosion worsening with time) but no source on residue cleanability over time was opened.
+- [ ] OK  [ ] Fix  [ ] Cut — **FSP-155** — Judge a test patch only when dry; a patch that dries with a ring or a gloss change has failed.
+    - _Why it is open:_ CARSI field-method wording with no public source found. SME to confirm against field practice and the licensed standard (read by a person, not an AI tool).
 
 ## M4 · Source removal and cleaning: method and sequence
 
@@ -107,6 +107,8 @@ Only the GAP claims need you. VERIFIED and JUSTIFIED claims already carry a sour
     - _Why it is open:_ Same claim is open in the Water draft (WRP-051). No legal or insurer source opened.
 - [ ] OK  [ ] Fix  [ ] Cut — **FSP-115** — Most fire restoration in both countries happens inside an insurance claim; separate the insured event from pre-existing damage; cover is the insurer’s decision.
     - _Why it is open:_ No data source on the share of fire work done under insurance was opened. Same claim is open in the Water and Mould drafts (WRP-058, MRP-048).
+- [ ] OK  [ ] Fix  [ ] Cut — **FSP-161** — Verification includes a clean white-cloth wipe test of surfaces, recorded area by area.
+    - _Why it is open:_ CARSI verification-method wording with no public source found. SME to confirm the wipe-test practice and how results are recorded.
 
 ## When you are done
 
