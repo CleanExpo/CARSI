@@ -48,12 +48,15 @@ WHERE c.slug = '<slug>';
 
 ```bash
 git pull origin main
-DATABASE_URL="<production URL from the password manager>" \
-  npm run db:seed-courses -- --slug=<slug>
+read -r -s -p 'Production DATABASE_URL: ' DATABASE_URL
+printf '\n'
+export DATABASE_URL
+npm run db:seed-courses -- --slug=<slug>
+unset DATABASE_URL
 ```
 
-Type the URL from the password manager into the prompt only. Never commit it, paste it into chat,
-or leave it in shell history.
+`read -s` takes the URL from the password manager as hidden input, so it never appears on screen
+or in shell history. Never commit it or paste it into chat.
 
 **3. Quizzes are a separate, catalogue-wide step. Do not run it as part of a single-course
 go-live.** `npm run db:seed-quizzes` (`scripts/seed-all-quizzes.ts`) has no per-course option. It
