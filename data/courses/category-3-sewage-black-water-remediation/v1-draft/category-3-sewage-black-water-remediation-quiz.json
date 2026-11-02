@@ -1,0 +1,815 @@
+{
+  "version": 1,
+  "courseSlug": "category-3-sewage-black-water-remediation",
+  "status": "draft",
+  "note": "DRAFT v1 module checks and final designation exam for the CARSI Contaminated-Water Practitioner course. Original CARSI questions written for Australian and New Zealand conditions; no IICRC standard text reproduced. SME review and sign-off required before seeding.",
+  "quizzes": [
+    {
+      "quizId": "a7fd12fc-033d-4929-a4be-13602dcd7ec7",
+      "lessonTitle": "Module 1 check",
+      "title": "CARSI Contaminated-Water Practitioner — Module 1 check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "A blocked sewer main surcharges through a floor waste. Which category is the water?",
+          "options": [
+            "Category 1, clean supply",
+            "Category 2, slightly used",
+            "Category 3, grossly contaminated",
+            "Uncategorised until lab tested"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Sewage from a surcharging sewer is a Category 3 source. You call it from the source and its history; you do not wait for a lab result to protect people."
+        },
+        {
+          "questionText": "The evidence on site is mixed between Category 2 and Category 3. What do you do?",
+          "options": [
+            "Call Category 3 and record why",
+            "Call Category 2 to save time",
+            "Average them and call it 2.5",
+            "Wait a week and look again"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "When unsure, call the worse category and write down your reasons. Under-calling black water as grey can make people sick; over-calling mainly costs some efficiency."
+        },
+        {
+          "questionText": "Why does the category matter more than the volume of water?",
+          "options": [
+            "It sets the price per litre",
+            "It decides only the drying time",
+            "It names the insurer to call",
+            "It decides the method and PPE"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Contamination, not the amount of water, decides the method: risk assessment, PPE, removal, cleaning, disposal and then drying."
+        },
+        {
+          "questionText": "How do leptospirosis bacteria get into the body?",
+          "options": [
+            "Only by drinking treated town tap water",
+            "Through cuts, open wounds, eyes, nose, mouth",
+            "Only through intact and completely dry skin",
+            "Only by touching clean and dry timber"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Queensland Government advice: leptospirosis bacteria get in through cuts, open wounds, or the eyes, nose or mouth. Cover cuts with waterproof dressings and wear eye protection."
+        },
+        {
+          "questionText": "Which vaccines does the Australian Immunisation Handbook recommend for workers in regular contact with untreated sewage?",
+          "options": [
+            "Hepatitis A and tetanus",
+            "Influenza and chickenpox only",
+            "Measles and rubella only",
+            "No vaccine is recommended"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "The Handbook recommends hepatitis A and tetanus for plumbers and others in regular contact with untreated sewage. In New Zealand, hepatitis A is recommended (unfunded) for sewage workers. Your doctor or occupational health provider decides."
+        },
+        {
+          "questionText": "A bathroom 2.4 m × 1.8 m and a hallway 6.0 m × 1.1 m are affected. What is the total area?",
+          "options": [
+            "8.64 m²",
+            "12.30 m²",
+            "10.92 m²",
+            "4.32 m²"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "2.4 × 1.8 = 4.32 m² and 6.0 × 1.1 = 6.60 m²; 4.32 + 6.60 = 10.92 m². Area in m² feeds the extraction plan, PPE quantities and the job file."
+        }
+      ]
+    },
+    {
+      "quizId": "bf005d70-1a78-4b4f-a50d-9da5c9d22d87",
+      "lessonTitle": "Module 2 check",
+      "title": "CARSI Contaminated-Water Practitioner — Module 2 check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "In New Zealand, who holds the primary duty of care for workers on a sewage job?",
+          "options": [
+            "The homeowner",
+            "The PCBU",
+            "The insurer",
+            "The apprentice"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Under the Health and Safety at Work Act 2015, section 36, the PCBU must ensure, so far as is reasonably practicable, the health and safety of its workers. Australia’s model WHS laws use the same idea."
+        },
+        {
+          "questionText": "Under Australian model WHS laws, when is a SWMS required?",
+          "options": [
+            "Only after an incident has happened",
+            "Only when an insurer requests it",
+            "Never, as it is optional paperwork",
+            "Before any high-risk construction work starts"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "A SWMS must be prepared before high-risk construction work starts. Triggers on Category 3 jobs include disturbing asbestos, confined spaces, energised electrical work and contaminated atmospheres."
+        },
+        {
+          "questionText": "A technician develops a serious infection after sewage work. In New Zealand, what must the PCBU do?",
+          "options": [
+            "Notify WorkSafe as soon as possible",
+            "Wait for the worker to complain",
+            "Tell the insurer but not WorkSafe",
+            "Nothing, because infections are not notifiable"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "HSWA section 23 includes a serious infection that work significantly contributed to, including contact with human bodily substances. The PCBU notifies WorkSafe as soon as possible and keeps a record for five years."
+        },
+        {
+          "questionText": "A Christchurch house was built in 1994. What is the asbestos assumption before cutting linings?",
+          "options": [
+            "No asbestos after 1990 in NZ",
+            "Asbestos only in the roof sheets",
+            "Assume asbestos until it is checked",
+            "Asbestos does not matter when wet"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "WorkSafe New Zealand: any building built or renovated before 2000 could contain asbestos. In Australia, assume it in any building built or renovated before 31 December 2003, when the national ban took effect; those built or renovated before 1990 are the most likely to contain it. You cannot tell by looking."
+        },
+        {
+          "questionText": "Why is a septic tank or sewer pit treated as a possible confined space?",
+          "options": [
+            "It is too small to enter",
+            "It can hold hydrogen sulphide gas",
+            "It usually sits above the ground",
+            "It holds only clean rainwater now"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Safe Work Australia’s confined-spaces code lists hydrogen sulphide build-up in sewers and pits, and methane displacing oxygen. Entry needs a trained crew, not a torch and good intentions."
+        },
+        {
+          "questionText": "A wet ceiling stain is 3.0 m × 2.4 m holding 10 mm of water. About how much does that water weigh?",
+          "options": [
+            "72 kg",
+            "7.2 kg",
+            "720 kg",
+            "24 kg"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "3.0 × 2.4 = 7.2 m²; × 0.010 m = 0.072 m³ = 72 L. Water is about 1 kg per litre, so about 72 kg hangs over the room. Nobody works in the drop zone."
+        }
+      ]
+    },
+    {
+      "quizId": "3b3cc3f6-41d7-4f50-a902-83f091e0de00",
+      "lessonTitle": "Module 3 check",
+      "title": "CARSI Contaminated-Water Practitioner — Module 3 check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "A technician has a full beard. Which respirator choice is right?",
+          "options": [
+            "A tight-fitting half-face respirator",
+            "A disposable dust mask",
+            "No respirator worn whatsoever",
+            "A hood-type powered respirator"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Facial hair stops a tight-fitting respirator from sealing. A respirator that does not rely on a face seal, such as a hood-type powered respirator, is used instead (SafeWork SA; WorkSafe New Zealand)."
+        },
+        {
+          "questionText": "How often does WorkSafe New Zealand recommend repeating a respirator fit test?",
+          "options": [
+            "Only once, when the worker first starts",
+            "At least yearly, or after facial change",
+            "Every five years, done by the worker",
+            "Never, because a fit check covers it"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "WorkSafe New Zealand recommends fit testing when the respirator is first provided and at least yearly, or after a significant facial change. In Australia, fit test before first use and after a facial change. Fit-check every time in both."
+        },
+        {
+          "questionText": "What is the difference between a fit test and a fit check?",
+          "options": [
+            "Test is formal; check is every wear",
+            "The two are exactly the same thing",
+            "Check is done once a year only",
+            "Test applies only to disposable dust masks"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A fit test is a formal test of seal on the wearer by a competent person. A fit check is the quick seal check the wearer does each time the respirator goes on."
+        },
+        {
+          "questionText": "A technician has a cut on his knuckle. What happens before he starts?",
+          "options": [
+            "Leave it open to air dry",
+            "Dab on sanitiser and then start",
+            "Cover it with a waterproof dressing",
+            "Work gloveless so he can watch"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Cuts are entry points for infection. Health authorities in both countries say to cover cuts with waterproof dressings before contact with floodwater, mud or sewage."
+        },
+        {
+          "questionText": "In the transition zone, which item comes off last?",
+          "options": [
+            "The outer gloves",
+            "The coverall suit",
+            "The work boots",
+            "The inner gloves"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Inner gloves come off last so your bare hands never touch the contaminated outside of the coverall, respirator or boots. Then wash hands and face."
+        },
+        {
+          "questionText": "Where is strip-out waste bagged and sealed?",
+          "options": [
+            "In the van, on the drive back home",
+            "In the transition zone, before the clean area",
+            "On the lounge carpet, to sort out later",
+            "At the tip, just before it is tipped"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Waste is bagged where it comes out and sealed in the transition zone, then taken out by the controlled route. Nothing contaminated crosses into the clean area unbagged."
+        }
+      ]
+    },
+    {
+      "quizId": "bc61020d-d52b-4e49-a50c-4e86a738dbe6",
+      "lessonTitle": "Module 4 check",
+      "title": "CARSI Contaminated-Water Practitioner — Module 4 check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Why is containment set up before the carpet is pulled up?",
+          "options": [
+            "Disturbance spreads it through the house",
+            "The carpet rolls up more easily",
+            "It stops the owner watching work",
+            "Containment is only for mould jobs"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Strip-out and extraction throw contamination into the air and onto surfaces. Containment first keeps it inside the work area."
+        },
+        {
+          "questionText": "How can you see that negative pressure is working?",
+          "options": [
+            "The AFD sounds louder than it did",
+            "The room smells more strongly than before",
+            "Doorway sheeting bows into the work area",
+            "The windows fog up on the outside"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "When the AFD exhausts more air than leaks back in, the work area sits at lower pressure and the doorway sheeting bows inwards. Leaks then flow into the work area, not out."
+        },
+        {
+          "questionText": "Why does Health New Zealand advise against water blasters on sewage-contaminated areas?",
+          "options": [
+            "They use too much water overall",
+            "They damage the concrete surface badly",
+            "They work far too slowly overall",
+            "They spread contaminants into the air"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "High-pressure water creates aerosols that carry contamination into the air you and others breathe. Low-aerosol methods are part of controlling the breathing route."
+        },
+        {
+          "questionText": "Which material is usually removed and discarded after soaking in Category 3 water?",
+          "options": [
+            "Carpet and underlay",
+            "Glazed ceramic tile",
+            "Stainless steel sink",
+            "Sealed concrete slab"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Porous materials such as carpet and underlay absorb contamination and cannot be verified clean, so they generally come out. Non-porous surfaces are usually cleaned and disinfected."
+        },
+        {
+          "questionText": "Why is a surface cleaned before it is disinfected?",
+          "options": [
+            "Cleaning makes disinfectant smell nicer",
+            "Disinfectant cannot work through dirt",
+            "Disinfecting first damages the floor",
+            "It only suits the photographs"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Cleaning removes soil, film and most organisms. Disinfectant cannot reach organisms protected under dirt. NSW Health and Health New Zealand both give the clean-then-disinfect order."
+        },
+        {
+          "questionText": "In Australia, a hard-surface disinfectant claims to kill viruses. What does the TGA require?",
+          "options": [
+            "Nothing, because any claim is allowed",
+            "Inclusion on the ARTG before supply",
+            "Only a registration number from overseas",
+            "Written approval from the local council"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "A virucidal claim is a \"specific claim\". The TGA requires a disinfectant making a specific claim to be included in the Australian Register of Therapeutic Goods before supply."
+        },
+        {
+          "questionText": "A work area is 21.7 m² with a 2.4 m ceiling. What airflow gives 4 air changes per hour?",
+          "options": [
+            "About 52 m³/h",
+            "About 87 m³/h",
+            "About 520 m³/h",
+            "About 208 m³/h"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "21.7 × 2.4 = 52.1 m³; × 4 = about 208 m³/h. The 4 air changes per hour target is an illustrative teaching figure; choose an AFD rated above it."
+        },
+        {
+          "questionText": "A label says 1 part concentrate to 20 parts water. How much concentrate makes a 5 L batch?",
+          "options": [
+            "About 25 mL",
+            "About 500 mL",
+            "About 240 mL",
+            "About 1 L"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "A 1:20 dilution is 1 part in 21 parts total: 5 L ÷ 21 ≈ 0.24 L, about 240 mL, topped up with water to 5 L."
+        },
+        {
+          "questionText": "What do you record for each disinfectant used?",
+          "options": [
+            "Product, approval, dilution, contact time, area",
+            "Only the price and bottle colour",
+            "Only the product brand name shown",
+            "Nothing at all unless someone asks"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "The product record is part of the defensible file: name, registration or approval, dilution, contact time and area treated, with the SDS held."
+        }
+      ]
+    },
+    {
+      "quizId": "3db35e71-461f-4d25-a05c-d0295d958a4a",
+      "lessonTitle": "Module 5 check",
+      "title": "CARSI Contaminated-Water Practitioner — Module 5 check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Where does stormwater go in most Australian and New Zealand cities?",
+          "options": [
+            "To a sewage treatment plant before release",
+            "Back into the town drinking water supply",
+            "Untreated to creeks, rivers and the sea",
+            "Into each building’s own private septic tank"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "EPA Victoria and Watercare both say stormwater reaches waterways untreated. Category 3 water down a stormwater grate puts raw sewage into a waterway."
+        },
+        {
+          "questionText": "A business wants to discharge extracted Category 3 water to the sewer in Victoria. What does it need?",
+          "options": [
+            "A trade waste agreement with the authority",
+            "Nothing, because sewage may go to sewer",
+            "A signed note from the homeowner only",
+            "A written permit from the insurer only"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "EPA Victoria: businesses need a trade waste agreement with the local water authority to discharge trade waste to a sewer. Other authorities have their own approvals; ask first."
+        },
+        {
+          "questionText": "In Auckland, who controls trade waste discharges to the public wastewater system?",
+          "options": [
+            "WorkSafe New Zealand inspectors",
+            "The Ministry of Health",
+            "The homeowner’s insurance company",
+            "Auckland Council, through Watercare"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Auckland’s Trade Waste Bylaw covers discharges to the public wastewater system and is managed by Watercare. Higher-risk trade waste needs a trade waste agreement."
+        },
+        {
+          "questionText": "A broken drain under the slab caused the overflow. Who repairs it in New Zealand?",
+          "options": [
+            "The restoration technician already on site",
+            "An authorised drainlayer or licensed plumber",
+            "The loss adjuster for the insurer",
+            "Any labourer with a good shovel"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Under the Plumbers, Gasfitters, and Drainlayers Act 2006, a person must not do sanitary plumbing or drainlaying unless authorised. In Australia it is licensed plumbing work."
+        },
+        {
+          "questionText": "A grey fibrous backing is found under old vinyl in a 1960s house. What happens to it?",
+          "options": [
+            "Stop work and call a licensed assessor",
+            "Put it in the general skip too",
+            "Snap it up and bag it quickly",
+            "Leave it there for the next owner"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Treat it as asbestos until checked. You cannot tell by looking, and in Australia a licence is needed to assess or remove asbestos. It never goes in the general skip."
+        },
+        {
+          "questionText": "About 400 L of wastewater is extracted with a 45 L recovery tank. How many tank-loads is that?",
+          "options": [
+            "4 tank-loads",
+            "18 tank-loads",
+            "9 tank-loads",
+            "45 tank-loads"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "400 ÷ 45 = 8.9, so 9 tank-loads, each decanted into sealed drums for collection and logged on the wastewater record."
+        }
+      ]
+    },
+    {
+      "quizId": "16de62ef-c97b-44c2-aec0-bad66d66d0db",
+      "lessonTitle": "Module 6 check",
+      "title": "CARSI Contaminated-Water Practitioner — Module 6 check",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "On a Category 3 job, when do air movers go in?",
+          "options": [
+            "Before anything is removed",
+            "As the crew arrives",
+            "Whenever the insurer asks",
+            "After cleaning is verified"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "You dry a clean structure. Contain, remove, clean and disinfect, verify clean, then dry. Air movers across dirty material spread it."
+        },
+        {
+          "questionText": "Mould is found behind a robe during drying. What changes?",
+          "options": [
+            "More air movers aimed straight at it",
+            "AFDs and dehumidifiers only until the clearance",
+            "Nothing, so carry on as first planned",
+            "Bleach is sprayed on and left there"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "The mould rule: no air movers across mouldy surfaces. Contain, run AFDs and dehumidifiers, remediate, and bring in air movers only after cleaning and clearance."
+        },
+        {
+          "questionText": "Two dehumidifiers at 4.5 A and an AFD at 2.5 A run on 230 V. Can they share one 10 A circuit?",
+          "options": [
+            "No, 11.5 A, so split them",
+            "Yes, 230 V allows any load",
+            "Yes, the RCD stops any overload",
+            "No, dehumidifiers each need 400 V"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "4.5 + 4.5 + 2.5 = 11.5 A, more than a 10 A circuit carries; the breaker would trip. Split the load across two circuits, each run through an RCD."
+        },
+        {
+          "questionText": "Why does Queensland Health advise against dry brushing mould?",
+          "options": [
+            "It is too slow for big jobs",
+            "It damages the paint finish on plasterboard",
+            "It can release spores into the air",
+            "It uses far too much detergent overall"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Dry brushing is abrasive and can release mould spores into the air. Use methods that do not spread spores, inside containment."
+        },
+        {
+          "questionText": "What must a Category 3 clearance be based on?",
+          "options": [
+            "How tidy the room looks to the owner",
+            "Recorded evidence that it is clean and dry",
+            "How the lead technician feels about the job",
+            "The finish date that the insurer has set"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Clearance is a decision made on evidence: porous material removed, surfaces visibly clean, cleaning recorded, readings at the dry standard, photographs, and a signed handover."
+        },
+        {
+          "questionText": "Under New Zealand’s Consumer Guarantees Act, how must a service be carried out?",
+          "options": [
+            "As cheaply as is possible",
+            "Exactly as the insurer says",
+            "Within one single working day",
+            "With reasonable care and skill"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "The Consumer Guarantees Act requires services to be carried out with reasonable care and skill and to be fit for purpose. In Australia, the ACL requires due care and skill."
+        },
+        {
+          "questionText": "Why are job records made at the time, not written up later?",
+          "options": [
+            "They are more likely to be accepted",
+            "They take much less time to type",
+            "Insurers ban all notes made at home",
+            "They never need any photographs at all"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Records made as the work happens are the evidence a loss adjuster, regulator or court is most likely to accept. A file rebuilt from memory is weak evidence."
+        },
+        {
+          "questionText": "An invoice is $4,800.00 ex GST in Australia. What is the total inc GST?",
+          "options": [
+            "$4,848.00 AUD",
+            "$5,760.00 AUD",
+            "$5,280.00 AUD",
+            "$4,320.00 AUD"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "GST is 10 %: $4,800.00 × 0.10 = $480.00; $4,800.00 + $480.00 = $5,280.00 AUD inc GST."
+        },
+        {
+          "questionText": "What is a common reason a practical submission is sent back?",
+          "options": [
+            "Too many dated and captioned photos",
+            "No reason given for the category",
+            "Metric units are used throughout it",
+            "Every sum shows its working units"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "The assessor needs your reasoning. A category with no reason, PPE without a fit test, or waste with no route or docket are common reasons for resubmission."
+        }
+      ]
+    },
+    {
+      "quizId": "5d902f10-d8c0-47ad-a1df-ba2cb5d0805c",
+      "lessonTitle": "Final designation exam",
+      "title": "CARSI Contaminated-Water Practitioner — Final designation exam",
+      "passPercentage": 70,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Which of these is a Category 3 water source?",
+          "options": [
+            "A burst cold-water pipe",
+            "A septic tank overflowing",
+            "A leaking rainwater tank",
+            "An overflowing clean bath"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "A failed on-site wastewater system such as a septic tank is a Category 3 source. Clean supply water starts as Category 1, though it can worsen with time and contact."
+        },
+        {
+          "questionText": "Floodwater from a river has entered a home in Hawke’s Bay. How should you treat it?",
+          "options": [
+            "As clean because it came from rain",
+            "As grey water for the first week",
+            "As safe once the sun comes out",
+            "As contaminated with sewage and with chemicals"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Health New Zealand advises assuming floodwater is contaminated with farm run-off, animal and human sewage and chemicals. NSW Health gives the same warning in Australia."
+        },
+        {
+          "questionText": "Which control mainly blocks the swallowing route?",
+          "options": [
+            "Washing hands before eating or vaping",
+            "Wearing a fit-tested P2 respirator mask",
+            "Running an AFD with HEPA filters",
+            "Laying sheeting at the transition zone"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Hand-to-mouth contact is the swallowing route. Washing hands before eating, drinking, smoking or vaping blocks it; the respirator and AFD protect the breathing route."
+        },
+        {
+          "questionText": "Which hepatitis A vaccine position is correct for New Zealand sewage workers?",
+          "options": [
+            "Banned for all sewage workers",
+            "Funded for every adult worker",
+            "Recommended but unfunded, maybe employer-funded",
+            "Not mentioned in the Handbook"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "The New Zealand Immunisation Handbook recommends hepatitis A, unfunded, for occupational groups exposed to faeces, including sewage workers, and notes it may be employer-funded."
+        },
+        {
+          "questionText": "Under Australia’s model WHS Regulations, which infection can be a notifiable serious illness?",
+          "options": [
+            "Any cold caught at home over winter",
+            "One from contact with human body substances",
+            "Only infections that a doctor diagnosed overseas",
+            "None, because only injuries are ever notifiable"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Regulation 699 lists infections significantly contributed to by work, including contact with human blood or body substances, and leptospirosis from animal waste."
+        },
+        {
+          "questionText": "Which job feature is a high-risk construction work trigger for a SWMS in Australia?",
+          "options": [
+            "Work done on a weekday",
+            "Work for a residential client",
+            "Work under a fixed quote",
+            "Work likely to disturb asbestos"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Safe Work Australia lists work likely to disturb asbestos, in or near confined spaces, near energised electrical installations, or in a contaminated atmosphere among high-risk construction work."
+        },
+        {
+          "questionText": "What is the New Zealand rule of thumb for asbestos in buildings?",
+          "options": [
+            "Built or renovated before 2000",
+            "Built or renovated before 1950",
+            "Built or renovated before 1990",
+            "Built or renovated after 2010"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "WorkSafe New Zealand: any building built or renovated before 2000 could contain asbestos. In Australia, assume it in any building built or renovated before 31 December 2003, when the national ban took effect; those built or renovated before 1990 are the most likely to contain it."
+        },
+        {
+          "questionText": "Australian and New Zealand mains supply is nominally what?",
+          "options": [
+            "240 V at 60 Hz",
+            "400 V at 60 Hz",
+            "230 V at 50 Hz",
+            "24 V at 50 Hz"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Both countries supply a nominal 230 V at 50 Hz (NSW Government; NZ Electricity (Safety) Regulations 2010). All power maths in this course is at 230 V."
+        },
+        {
+          "questionText": "In Australia, when is a tight-fitting respirator fit-tested?",
+          "options": [
+            "Only when it starts to feel loose",
+            "Before first use, then after facial changes",
+            "Never, as the wearer checks it daily",
+            "Only when the insurer says it must"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "SafeWork SA: workers pass a fit test before first wearing a tight-fitting respirator, and again after a facial change that may affect the seal. Fit-check each time it goes on."
+        },
+        {
+          "questionText": "What is the first step in the PPE removal order?",
+          "options": [
+            "Clean soil off boots and outer gloves",
+            "Take the respirator off your face first",
+            "Take the inner gloves off your hands",
+            "Wash your face at the station first"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Knock off gross soil from boots and outer gloves first, then outer gloves, coverall inside out, boots, goggles, respirator by the straps, and inner gloves last."
+        },
+        {
+          "questionText": "Why is the HVAC return in the work area switched off and sealed?",
+          "options": [
+            "It draws too much power, 230 V",
+            "It makes the work area too cold",
+            "It interferes with the moisture meter readings",
+            "It would spread contamination through the ducts"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "A return grille in the work area draws contaminated air through the ducted system and into the rest of the building. Seal it and switch it off before disturbance."
+        },
+        {
+          "questionText": "Which material is usually cleaned, disinfected and kept?",
+          "options": [
+            "Sewage-soaked carpet underlay",
+            "Wet ceiling insulation",
+            "Glazed ceramic tile",
+            "Soaked particleboard flooring"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Non-porous surfaces such as glazed tile can be cleaned and disinfected. Porous materials soaked with Category 3 water generally come out because cleaning cannot be verified."
+        },
+        {
+          "questionText": "Two cleaning products are on the van. What is the rule?",
+          "options": [
+            "Mix them for strength",
+            "Never mix the products",
+            "Mix if labels match",
+            "Mix them only outdoors"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Health authorities in both countries say never mix products. Mixing bleach with acids or ammonia-based cleaners can release dangerous gases."
+        },
+        {
+          "questionText": "In New Zealand, what must you hold for each hazardous substance on site?",
+          "options": [
+            "A current safety data sheet",
+            "An overseas product registration number",
+            "A receipt from the supplier",
+            "A photograph of the bottle"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "WorkSafe New Zealand: it is mandatory to have a current SDS for each hazardous substance in the workplace. In Australia, SDS copies go in the hazardous chemicals register."
+        },
+        {
+          "questionText": "Which is a lawful route for extracted Category 3 water?",
+          "options": [
+            "The stormwater grate on the street",
+            "The garden bed beside the house",
+            "The street gutter late at night",
+            "A liquid-waste contractor with a docket"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Lawful routes are the sewer with the authority’s approval, or a liquid-waste contractor with a docket. Stormwater goes untreated to waterways."
+        },
+        {
+          "questionText": "What does Sydney Water require before a business discharges commercial trade wastewater?",
+          "options": [
+            "A verbal okay from the plumber",
+            "A photo of the drain cover",
+            "Formal approval from Sydney Water first",
+            "Nothing at all for small volumes"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Sydney Water says businesses must seek formal approval to discharge commercial trade wastewater. Other authorities have their own rules, so ask before you pump."
+        },
+        {
+          "questionText": "Who may repair a broken sewer drain on a New Zealand property?",
+          "options": [
+            "The restoration supervisor",
+            "An authorised drainlayer",
+            "The house occupant",
+            "Any site labourer"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "The Plumbers, Gasfitters, and Drainlayers Act 2006 restricts drainlaying and sanitary plumbing to authorised people. In Australia it is licensed plumbing work."
+        },
+        {
+          "questionText": "Mould is found on a Category 3 job before drying. What runs until it is cleared?",
+          "options": [
+            "AFDs and dehumidifiers, not air movers",
+            "Air movers on the highest speed",
+            "Heaters running with the windows shut",
+            "Nothing until the insurer next visits"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "The mould rule: contain, run AFDs and dehumidifiers to control moisture, remediate the mould, and bring in air movers only after cleaning and clearance."
+        },
+        {
+          "questionText": "What do the Australian Consumer Law and NZ Consumer Guarantees Act both require of services?",
+          "options": [
+            "A fixed price agreed in writing",
+            "Completion within one calendar week only",
+            "A written warranty of ten years",
+            "Due or reasonable care and skill"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "The ACL guarantees services with due care and skill, fit for stated purpose. The NZ Consumer Guarantees Act requires reasonable care and skill and fitness for purpose."
+        },
+        {
+          "questionText": "What decides that a Category 3 job is ready to hand over?",
+          "options": [
+            "The carpet layer has been booked in",
+            "The odour has mostly gone by now",
+            "Recorded evidence it is clean and dry",
+            "The crew has run out of time"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Clearance is made on recorded evidence: contaminated material removed, surfaces clean, cleaning recorded, readings at the dry standard, photographs and a signed handover."
+        }
+      ]
+    }
+  ]
+}
