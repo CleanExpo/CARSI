@@ -4,6 +4,12 @@ import { NextRequest } from 'next/server';
 const mocks = vi.hoisted(() => ({ claims: vi.fn(), upstream: vi.fn(), admin: vi.fn(), grant: vi.fn(),
   course: vi.fn(), context: vi.fn(), patch: vi.fn(), fetch: vi.fn() }));
 vi.mock('@/lib/server/auth-from-request', () => ({ getSessionClaimsFromRequest: mocks.claims }));
+// The prerequisite gate (DECISIONS #41) has its own tests; these routes' courses have none.
+vi.mock('@/lib/server/course-prerequisites', async (original) => ({
+  ...(await original<typeof import('@/lib/server/course-prerequisites')>()),
+  findQuizPrerequisiteBlock: vi.fn(async () => null),
+  findEnrolledCoursePrerequisiteBlock: vi.fn(async () => null),
+}));
 vi.mock('@/lib/server/upstream-api', () => ({ getUpstreamBaseUrl: mocks.upstream }));
 vi.mock('@/lib/admin/admin-panel-access', () => ({ isLmsClaimsAllowedAdminPanel: mocks.admin }));
 vi.mock('@/lib/server/enrollment-service', () => ({ ensureAdminEnrollmentForCourse: mocks.grant,

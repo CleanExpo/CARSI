@@ -9,7 +9,13 @@ import { createRoot } from 'react-dom/client';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/components/lms/EnrolButton', () => ({ EnrolButton: () => null }));
+const enrolButtonProps = vi.hoisted(() => [] as Record<string, unknown>[]);
+vi.mock('@/components/lms/EnrolButton', () => ({
+  EnrolButton: (props: Record<string, unknown>) => {
+    enrolButtonProps.push(props);
+    return null;
+  },
+}));
 vi.mock('next/navigation', () => ({
   usePathname: () => '/courses/x',
   useRouter: () => ({ push: () => undefined }),
@@ -175,5 +181,39 @@ describe('CoursePublicDetail — review policy beside the public rating (release
   it('no rating, no rating line', () => {
     const html = renderWithRating(null);
     expect(html).not.toContain('>5.0</span>');
+  });
+});
+
+/**
+ * DECISIONS #41: every enrol button on the page must know the course's prerequisites, or a
+ * locked course still offers enrolment and a checkout refusal has no links to show.
+ */
+describe('CoursePublicDetail — prerequisites reach every EnrolButton', () => {
+  it('passes the prerequisite list to each EnrolButton it renders', () => {
+    enrolButtonProps.length = 0;
+    const prerequisites = [{ slug: 'level-2-mould-remediation-30ee3492', title: 'Level 2 — Mould Remediation' }];
+    const course = {
+      slug: 'mould-remediation-fundamentals',
+      title: 'CARSI Mould Remediation Practitioner',
+      price_aud: '99',
+      is_free: false,
+      cec_hours: null,
+      thumbnailUrl: null,
+      prerequisites,
+    };
+    renderToStaticMarkup(
+      createElement(CoursePublicDetail, {
+        course,
+        designation: null,
+        priceLabel: '$99',
+        priceNum: 99,
+        learningOutcomes: [],
+        audienceItems: getCourseAudienceItems(course, null),
+      })
+    );
+    expect(enrolButtonProps.length).toBeGreaterThanOrEqual(3);
+    for (const props of enrolButtonProps) {
+      expect(props.prerequisites).toEqual(prerequisites);
+    }
   });
 });

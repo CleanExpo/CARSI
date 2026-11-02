@@ -76,6 +76,8 @@ interface CourseDetail {
   }[];
   instructor?: { full_name: string } | null;
   intro_video_url?: string | null;
+  /** Prerequisite courses (DECISIONS #41) — drives the locked state. */
+  prerequisites?: { slug: string; title: string }[];
 }
 
 const backendUrl = getBackendOrigin();
@@ -336,6 +338,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
           syllabus: course.syllabus,
           instructor: course.instructor,
           intro_video_url: course.intro_video_url,
+          prerequisites: course.prerequisites ?? [],
         }}
         designation={designation}
         priceLabel={price}

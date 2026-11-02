@@ -203,7 +203,7 @@ const REVIEWED_SOURCE_SHA256: Record<string, string> = {
   'app/(public)/courses/page.tsx':
     '85ba8041bd6b994d2f881073cd37664b807fffc93dc2154a4e04a695ba429d4a',
   'app/(public)/courses/[slug]/page.tsx':
-    'fa11892a05908c82349ebf30c631ea09117938d66b2713dd6e10c73c69e28887',
+    'd8d3fa2564c63e065f06025d673f027f648f2e11d5a1369042b2d42e96639b39',
   'app/(public)/pathways/[slug]/page.tsx':
     '66e4c37b9c7f7e37c7cb0f7bc7cd677db0a6f3c4814aacc6f78bcf8deab9a044',
   'src/components/lms/CourseGrid.tsx':

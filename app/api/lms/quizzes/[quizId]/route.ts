@@ -3,6 +3,8 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { ACCESS_GRANTING_STATUS_LIST } from '@/lib/server/enrollment-access';
+import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
+import { findEnrolledCoursePrerequisiteBlock, prerequisiteBlockBody } from '@/lib/server/course-prerequisites';
 type Ctx = { params: Promise<{ quizId: string }> };
 
 function parseQuizOptions(raw: unknown): { text: string }[] {
@@ -53,6 +55,15 @@ export async function GET(request: NextRequest, ctx: Ctx) {
 
     if (!enrollment) {
       return NextResponse.json({ detail: 'Enrollment required' }, { status: 403 });
+    }
+
+    const prereqBlock = await findEnrolledCoursePrerequisiteBlock({
+      userId: claims.sub,
+      isAdmin: () => isLmsClaimsAllowedAdminPanel(claims),
+      courseId: quiz.courseId,
+    });
+    if (prereqBlock) {
+      return NextResponse.json(prerequisiteBlockBody(prereqBlock), { status: 403 });
     }
 
     const attempts = await prisma.lmsQuizAttempt.count({

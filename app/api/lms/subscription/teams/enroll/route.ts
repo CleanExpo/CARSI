@@ -20,6 +20,7 @@ import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { notifyCrmEnrollmentCreated } from '@/lib/server/crm-enrollment-notify';
 import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
 import { enrollStudentInCourse } from '@/lib/server/enrollment-service';
+import { isPrerequisiteNotMetError, prerequisiteBlockBody } from '@/lib/server/course-prerequisites';
 import { getTeamEntitlements } from '@/lib/server/entitlements';
 import { getFirstLessonLearnPath } from '@/lib/server/first-lesson';
 import { getPublishedCourseForCheckout } from '@/lib/server/public-courses-list';
@@ -94,6 +95,9 @@ export async function POST(request: NextRequest) {
       included_in_membership: true,
     });
   } catch (e) {
+    if (isPrerequisiteNotMetError(e)) {
+      return NextResponse.json(prerequisiteBlockBody(e.block), { status: 403 });
+    }
     const msg = e instanceof Error ? e.message : String(e);
     if (msg === 'COURSE_NOT_FOUND') {
       return NextResponse.json({ detail: 'Course not found' }, { status: 404 });

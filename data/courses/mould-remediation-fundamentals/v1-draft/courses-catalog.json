@@ -41,12 +41,18 @@
         "standardsReferenced": "Nominative only (AS-IICRC S520:2025, edition pending SME confirmation; AS/NZS 1716); no standard text reproduced or paraphrased (IICRC AI Use Policy honoured).",
         "designationProgram": "CARSI Southern Hemisphere Restoration Designations",
         "designation": "CARSI Mould Remediation Practitioner",
-        "prerequisite": "level-2-mould-remediation-30ee3492",
+        "prerequisites": [
+          {
+            "courseSlug": "level-2-mould-remediation-30ee3492",
+            "reason": "The designation course applies CARSI Level 2 Mould Remediation to whole jobs without re-teaching it (founder decision 02/11/2026, DECISIONS #41)."
+          }
+        ],
+        "prerequisitesEnforcedFrom": "2026-11-02T00:00:00+11:00",
         "courseRole": "designation-assessment-and-credential-wrapper",
         "quizFile": "data/courses/mould-remediation-fundamentals/v1-draft/mould-remediation-fundamentals-quiz.json",
         "practicalAssessment": "data/courses/mould-remediation-fundamentals/v1-draft/mould-remediation-fundamentals-assessment.json",
         "evidenceLedger": "data/courses/mould-remediation-fundamentals/v1-draft/evidence/evidence-ledger.jsonl",
-        "draftNote": "DRAFT v1 for SME (Phill) review. Founder decision 02/11/2026: the designation requires Level 2 (meta.prerequisite); this course is the designation assessment and credential wrapper and applies Level 2 to whole jobs without re-teaching it. Scenarios are illustrative and teaching numbers are labelled; every claim is in the evidence ledger, and each open GAP must be cleared before go-live (see research-pack.md). The detail of AS-IICRC S520 is taught from the licensed copy. Diagrams are referenced by filename; briefs are in research-pack.md.",
+        "draftNote": "DRAFT v1 for SME (Phill) review. Founder decision 02/11/2026: the designation requires Level 2 (meta.prerequisites, enforced server-side); this course is the designation assessment and credential wrapper and applies Level 2 to whole jobs without re-teaching it. Scenarios are illustrative and teaching numbers are labelled; every claim is in the evidence ledger, and each open GAP must be cleared before go-live (see research-pack.md). The detail of AS-IICRC S520 is taught from the licensed copy. Diagrams are referenced by filename; briefs are in research-pack.md.",
         "sources": "Sources (SME to verify) listed in data/courses/mould-remediation-fundamentals/v1-draft/research-pack.md and the evidence ledger — Safe Work Australia, WorkSafe Queensland, SafeWork NSW, SafeWork SA, WorkSafe ACT, WorkSafe Victoria, enHealth / Australian Centre for Disease Control, NSW Health, Queensland Health, Better Health Channel, NT Government, NSW Government (energy; asbestos), ABCB, ACCC and ATO.",
         "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784196782/carsi/course-intro/ffd1680b-446d-4986-ae3b-d2a906f4df63.mp4",
         "introCaptionsUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/796a104f8f42428d95773a663755e11c/subtitles_e67685a634474366ae2ba04e29d1ef1c.srt?Expires=1784801581&Signature=pCQ8IXlHqp9hcRQbFliCPtt8jmFEaMQVE~34d5kc4IvrrHGZ5DymvI~2FTEDKre5iBrZv1Xcw6-R0UHbvq~XH0jndJGDYg76BY7qDjWwGXLl~2mS0Mg2m9x5SBiJ6nY59X5FFebkk-Ep24DQudK6MEvHY7QwoAoU471v~5Xqj~oEBEE73QBdfyS~bgEYANK~5f7biSrbGcPimUHtvBmhqaaCWYK9Bm9OOhK5h6ojOM7uHW1XN2Uy1Dt953buN2m5MRB8cdEynd2aQTHVxKykOvPJ9WubXy5SFd6TTqk7Amb59rDOt8tYHZNpUUWHdogymTwBxQ8wqjs-TMK9KI7SwQ__&Key-Pair-Id=K38HBHX5LX3X2H",

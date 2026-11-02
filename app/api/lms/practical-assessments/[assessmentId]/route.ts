@@ -2,6 +2,8 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { ACCESS_GRANTING_STATUS_LIST } from '@/lib/server/enrollment-access';
+import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
+import { findEnrolledCoursePrerequisiteBlock, prerequisiteBlockBody } from '@/lib/server/course-prerequisites';
 import {
   AssessmentError,
   canReviewAssessments,
@@ -42,6 +44,14 @@ export async function GET(request: NextRequest, ctx: Ctx) {
         { status: 403 },
       );
     }
+    const prereqBlock = await findEnrolledCoursePrerequisiteBlock({
+      userId: claims.sub,
+      isAdmin: () => isLmsClaimsAllowedAdminPanel(claims),
+      courseId: assessment.courseId,
+    });
+    if (prereqBlock) {
+      return NextResponse.json(prerequisiteBlockBody(prereqBlock), { status: 403 });
+    }
   }
 
   return NextResponse.json({ assessment });
@@ -65,6 +75,20 @@ export async function POST(request: NextRequest, ctx: Ctx) {
   const evidenceUrls = Array.isArray(body.evidence_urls)
     ? body.evidence_urls.filter((x): x is string => typeof x === 'string')
     : [];
+
+  // Prerequisite gate (DECISIONS #41); an unknown assessment falls through to the submit
+  // path's own not-found.
+  const target = await getPublishedAssessment(assessmentId);
+  if (target) {
+    const prereqBlock = await findEnrolledCoursePrerequisiteBlock({
+      userId: claims.sub,
+      isAdmin: () => isLmsClaimsAllowedAdminPanel(claims),
+      courseId: target.courseId,
+    });
+    if (prereqBlock) {
+      return NextResponse.json(prerequisiteBlockBody(prereqBlock), { status: 403 });
+    }
+  }
 
   try {
     const submission = await submitPracticalAssessment({

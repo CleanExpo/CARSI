@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
 import { CheckpointError, parseCheckpointInput } from '@/lib/lms/lesson-checkpoint';
+import { findLessonPrerequisiteBlock, prerequisiteBlockBody } from '@/lib/server/course-prerequisites';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { getLessonCheckpoint, readCheckpointJsonBody, saveLessonCheckpoint } from '@/lib/server/lesson-checkpoint';
 import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
@@ -18,6 +20,15 @@ async function handle(request: NextRequest, context: Context, write: boolean) {
         request.headers.get('x-carsi-learner-id') !== claims.sub) return json({ detail: 'Unauthorized' }, 401);
     if (!process.env.DATABASE_URL?.trim()) throw new CheckpointError(503);
     const { lessonId } = await context.params;
+    // Prerequisite gate (DECISIONS #41), same decision as the lesson GET: the checkpoint
+    // serves lesson content + quiz questions and accepts writes. A lookup failure falls to
+    // the catch below (503), never through to the content.
+    const prereqBlock = await findLessonPrerequisiteBlock({
+      userId: claims.sub,
+      isAdmin: () => isLmsClaimsAllowedAdminPanel(claims),
+      lessonId,
+    });
+    if (prereqBlock) return json(prerequisiteBlockBody(prereqBlock), 403);
     const result = write
       ? await saveLessonCheckpoint(claims.sub, lessonId, parseCheckpointInput(await readCheckpointJsonBody(request)))
       : await getLessonCheckpoint(claims.sub, lessonId);

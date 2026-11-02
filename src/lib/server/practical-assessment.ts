@@ -8,6 +8,10 @@
  * (Portfolio file uploads are tracked separately — GP-122.)
  */
 import { prisma } from '@/lib/prisma';
+import {
+  filterCoursesPassingPrerequisites,
+  type AdminFlag,
+} from '@/lib/server/course-prerequisites';
 import { runSerializable } from '@/lib/server/db-tx';
 import { ACCESS_GRANTING_STATUS_LIST } from '@/lib/server/enrollment-access';
 
@@ -449,12 +453,23 @@ export async function deletePracticalAssessment(id: string): Promise<void> {
  * Published practical assessments for the courses a student is enrolled in, each with its
  * rubric and the student's latest submission (if any) — powers the student submission page.
  */
-export async function listAvailableAssessmentsForStudent(studentId: string) {
+export async function listAvailableAssessmentsForStudent(
+  studentId: string,
+  opts: { isAdmin?: AdminFlag } = {},
+) {
   const enrolments = await prisma.lmsEnrollment.findMany({
     where: { studentId, status: { in: [...ACCESS_GRANTING_STATUS_LIST] } },
     select: { courseId: true },
   });
-  const courseIds = [...new Set(enrolments.map((e) => e.courseId))];
+  // Prerequisite gate (DECISIONS #41): a course still locked behind a prerequisite does not
+  // list its assessment briefs or rubrics, the same decision as the per-assessment GET.
+  const courseIds = [
+    ...(await filterCoursesPassingPrerequisites({
+      userId: studentId,
+      isAdmin: opts.isAdmin ?? false,
+      courseIds: enrolments.map((e) => e.courseId),
+    })),
+  ];
   if (courseIds.length === 0) return [];
 
   const assessments = await prisma.lmsPracticalAssessment.findMany({
