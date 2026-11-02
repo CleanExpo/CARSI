@@ -8,7 +8,7 @@ const les = {};
 for (const m of c.modules) for (const l of m.lessons) les[l.id] = m.title.replace(/^Module (\d+):.*/, 'M$1') + ' · ' + l.title;
 const order = Object.keys(les);
 const g = r.filter((x) => x.status === 'GAP').sort((a, b) => order.indexOf(a.lesson_id) - order.indexOf(b.lesson_id));
-const isStd = (x) => x.claim_class === 'standards-citation' || /licensed (text|copy)/i.test(x.reason || '');
+const isStd = (x) => x.claim_class === 'standards-citation' || /licensed (text|copy)/i.test(x.reason || '') || /licensed/i.test(x.check_owner || '');
 const s = g.filter(isStd);
 const n = (st) => r.filter((x) => x.status === st).length;
 let o = `# SME claim checklist — ${title}
