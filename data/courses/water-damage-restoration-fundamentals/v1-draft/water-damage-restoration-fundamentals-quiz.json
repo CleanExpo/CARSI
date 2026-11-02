@@ -214,15 +214,15 @@
           "options": [
             "Gloves and a dust mask only",
             "Nothing special is needed for sewage",
-            "Fluid-resistant coveralls, boots, gloves, eye and fit-checked respiratory protection",
+            "Fluid-resistant coveralls, boots, gloves, eye and fit-tested respiratory protection",
             "A high-visibility vest and sunglasses"
           ],
           "correctIndex": 2,
           "points": 1,
-          "explanation": "Category 3 means full skin protection plus P2 or higher respiratory protection fit-checked to the wearer, and everything contacted is treated as contaminated."
+          "explanation": "Category 3 means full skin protection plus P2 or higher respiratory protection fit-tested to the wearer, and everything contacted is treated as contaminated."
         },
         {
-          "questionText": "Why must a tight-fitting respirator be fit-checked to the wearer?",
+          "questionText": "Why must a tight-fitting respirator be fit-tested to the wearer?",
           "options": [
             "It only works if it seals to the face",
             "It makes the mask last longer",
@@ -231,7 +231,7 @@
           ],
           "correctIndex": 0,
           "points": 1,
-          "explanation": "A respirator only protects when it seals. A leaking seal gives close to none of the rated protection, so an unfit-tested mask is treated as no protection."
+          "explanation": "A respirator only protects when it seals. Without a good seal contaminated air leaks in and the wearer does not get the expected protection, so a mask that has not passed a fit test is not relied on."
         },
         {
           "questionText": "What should the job file record about PPE?",
