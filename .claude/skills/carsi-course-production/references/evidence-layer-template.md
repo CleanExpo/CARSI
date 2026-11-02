@@ -101,6 +101,7 @@ the validator accepts and ignores, so the existing negative control still covers
 | `part` | `requirement` / `mechanism` / `evidence` |
 | `evidence_grade` | `A1`…`C3` (VERIFIED and JUSTIFIED entries) |
 | `check_by` | ISO date the source must be re-read (drift-prone facts: 3–6 months) |
+| `also_in` | optional array of other `course:<slug>#<lessonId>` (or `#quiz:…`, `#assessment`, `#description`) surfaces where the same claim is taught. Record a repeated claim once, at its first lesson, and list the repeats here — never duplicate the entry. A lesson's Sources block covers entries whose `lesson_id` is that lesson **or** whose `also_in` names it. |
 
 Worked examples that pass the validator: `evidence-layer-template.example.jsonl` beside this file.
 
@@ -118,7 +119,10 @@ so Row 22's course-page References block can read one shape:
 ```
 
 - One `<li>` per ledger source for that lesson (`VERIFIED` `source_url`, or a `JUSTIFIED`
-  `best_available_source` that is a public URL). Australian date order in copy; ISO in the ledger.
+  `best_available_source` that is a public URL), counting entries whose `lesson_id` is the lesson
+  or whose `also_in` names it. Australian date order in copy; ISO in the ledger.
+- A lesson whose claims are all open `GAP`s says so in its block rather than listing nothing
+  silently (the pilot uses "No external source is cited for this lesson yet").
 - A standard is listed by name and edition only, never linked to pasted text.
 - Never list a source the ledger does not hold, and never list a `GAP` as a source.
 

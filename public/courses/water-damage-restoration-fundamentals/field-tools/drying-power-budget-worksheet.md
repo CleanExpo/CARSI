@@ -14,7 +14,8 @@
 
 ## Psychrometry quick-check (each visit)
 
-Inside drying zone: ______ g/kg  Outside: ______ g/kg → **inside must be lower.**
+Dehumidifier inlet: ______ g/kg  Outlet: ______ g/kg → **outlet must be lower.**
+Drying zone: ______ g/kg  Outside: ______ g/kg (context, not proof)
 
 ## 230 V / 10 A power budget
 
