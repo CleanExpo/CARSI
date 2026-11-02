@@ -15,12 +15,12 @@
     {
      "questionText": "How should you treat the guidance in this course?",
      "options": [
-      "As legally binding Australian legal advice you can rely on in court",
       "As educational, best-practice material that you must verify against current law and your WHS regulator before acting",
+      "As legally binding Australian legal advice you can rely on in court",
       "As a licence to perform asbestos removal and confined-space entry",
       "As a replacement for the Safety Data Sheet"
      ],
-     "correctIndex": 1,
+     "correctIndex": 0,
      "points": 1,
      "sourceRef": "Module 0 — important notice; course disclaimer"
     },
@@ -29,17 +29,22 @@
      "options": [
       "Safe Work Australia",
       "OSHA",
-      "Your state or territory WHS regulator (e.g. SafeWork NSW, WorkSafe Victoria)",
-      "The Fair Work Commission"
+      "The Fair Work Commission",
+      "Your state or territory WHS regulator (e.g. SafeWork NSW, WorkSafe Victoria)"
      ],
-     "correctIndex": 2,
+     "correctIndex": 3,
      "points": 1,
      "sourceRef": "Module 1; Safe Work Australia is the policy body and does not enforce — https://www.safeworkaustralia.gov.au/"
     },
     {
      "questionText": "Which Australian jurisdiction has NOT adopted the model WHS laws and runs its own Occupational Health and Safety Act 2004?",
-     "options": ["New South Wales", "Queensland", "Western Australia", "Victoria"],
-     "correctIndex": 3,
+     "options": [
+      "New South Wales",
+      "Queensland",
+      "Victoria",
+      "Western Australia"
+     ],
+     "correctIndex": 2,
      "points": 1,
      "sourceRef": "Module 1; WorkSafe Victoria — https://www.worksafe.vic.gov.au/occupational-health-and-safety-act-and-regulations"
     },
@@ -58,12 +63,12 @@
     {
      "questionText": "You are removing 12 m² of non-friable (bonded) asbestos cement sheet from a factory. What is required (outside the ACT)?",
      "options": [
-      "No licence — it is bonded, not friable",
       "A Class B (or Class A) asbestos removal licence, because it is more than 10 m² of non-friable asbestos",
+      "No licence — it is bonded, not friable",
       "Only a White Card",
       "A Class A licence is the only option"
      ],
-     "correctIndex": 1,
+     "correctIndex": 0,
      "points": 1,
      "sourceRef": "Module 3; WHS Regulation 487 — https://www.safeworkaustralia.gov.au/safety-topic/hazards/asbestos/whs-duties (ACT: any amount needs a licence)"
     },
@@ -71,11 +76,11 @@
      "questionText": "Since 1 July 2024, what is the status of engineered stone benchtops, panels and slabs in Australia?",
      "options": [
       "Allowed if you wear a P2 respirator",
-      "The manufacture, supply, processing and installation is prohibited; import prohibited from 1 January 2025",
       "Only banned in Victoria",
-      "Allowed for repairs but banned for new kitchens only"
+      "Allowed for repairs but banned for new kitchens only",
+      "The manufacture, supply, processing and installation is prohibited; import prohibited from 1 January 2025"
      ],
-     "correctIndex": 1,
+     "correctIndex": 3,
      "points": 1,
      "sourceRef": "Module 3; https://www.safeworkaustralia.gov.au/safety-topic/hazards/silica/engineered-stone-ban"
     },
@@ -83,11 +88,11 @@
      "questionText": "You must cut and grind concrete and fibre-cement during a strip-out, and the work is assessed as high-risk crystalline silica processing. Under the model WHS Regulations (outside Victoria), what must the PCBU do BEFORE work starts?",
      "options": [
       "Nothing extra — just wear a dust mask",
-      "Prepare a written Silica Risk Control Plan, and arrange air monitoring, health monitoring and silica training",
       "Notify OSHA",
+      "Prepare a written Silica Risk Control Plan, and arrange air monitoring, health monitoring and silica training",
       "Only wet the surface"
      ],
-     "correctIndex": 1,
+     "correctIndex": 2,
      "points": 1,
      "sourceRef": "Module 3; crystalline silica substances regime from 1 Sep 2024 — https://www.safeworkaustralia.gov.au/media-centre/news/stronger-regulation-crystalline-silica-substances-1-september-2024"
     },
@@ -106,12 +111,12 @@
     {
      "questionText": "You arrive at a flooded home with standing water and running extraction gear. What is the correct electrical-safety approach?",
      "options": [
-      "Trust the home's own power points and safety switches",
       "Ensure all portable equipment and leads are protected by a 30 mA RCD — bring your own portable RCD and confirm isolation before entering standing water near live circuits",
+      "Trust the home's own power points and safety switches",
       "Only use battery tools; mains is never safe",
       "A GFCI on the US 120 V standard is fine"
      ],
-     "correctIndex": 1,
+     "correctIndex": 0,
      "points": 1,
      "sourceRef": "Module 5; AS/NZS 3012 & AS/NZS 3760; 230 V/50 Hz; ~30 mA can be fatal"
     },
@@ -119,11 +124,11 @@
      "questionText": "A saturated subfloor with sewage needs entry. What must be in place before anyone goes in?",
      "options": [
       "Just a P2 mask",
-      "A confined-space risk assessment, entry permit, atmospheric testing, ventilation, a standby person and a rescue plan (AS/NZS 2865 + Confined Spaces COP)",
       "Nothing if it is only a small space",
-      "A White Card"
+      "A White Card",
+      "A confined-space risk assessment, entry permit, atmospheric testing, ventilation, a standby person and a rescue plan (AS/NZS 2865 + Confined Spaces COP)"
      ],
-     "correctIndex": 1,
+     "correctIndex": 3,
      "points": 1,
      "sourceRef": "Module 5; AS/NZS 2865:2009 (Amd 1:2025) + Safe Work Australia Confined Spaces Code of Practice — no entry without a rescue plan"
     },
@@ -131,11 +136,11 @@
      "questionText": "Mould is present on a water-damaged job. What is the correct drying approach?",
      "options": [
       "Run air movers immediately to dry fastest",
-      "Use air-filtration devices and dehumidifiers, and do NOT run air movers (which aerosolise spores) until the area is contained and cleared to Condition 1",
       "Fog with antimicrobial and leave it",
+      "Use air-filtration devices and dehumidifiers, and do NOT run air movers (which aerosolise spores) until the area is contained and cleared to Condition 1",
       "Open all windows and use pedestal fans"
      ],
-     "correctIndex": 1,
+     "correctIndex": 2,
      "points": 1,
      "sourceRef": "Module 5; WHS duty + enHealth guidance + ANSI/IICRC S520:2024 as industry method; contain first, HEPA negative air"
     },
