@@ -12,7 +12,7 @@ Total visible growth: ______ m² Size band (WorkSafe Queensland): under 1 m² / 
 | First visit and scope | | | | 2.1 The inspection route and finding the water |
 | Moisture map from a dry reference | | | | 2.2 Moisture readings, dry references and the drying goal |
 | Scope and work plan | | | | 2.3 Writing the scope and work plan |
-| Cause fixed (repair record) | | | | 2.1 |
+| Moisture cause fixed (plumbing or building repair record) | | | | 2.1 |
 | Containment and negative air | | | | 3.1 Choosing and building containment; 3.2 Negative air |
 | PPE: AS/NZS 1716 respirator, fit-test date, fit check | | | | 3.3 Respirators and PPE |
 | Power: amps per circuit at 230 V, RCD, tagged leads | | | | 3.4 Site safety on a mould job |
