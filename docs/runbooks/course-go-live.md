@@ -91,23 +91,31 @@ touched and no re-seed is needed.
 
 ```sql
 -- 1. Read-only: confirm what is live
-SELECT slug, is_published, meta->>'introVideoUrl' AS intro_video
+SELECT slug, is_published,
+       meta->>'introVideoUrl'    AS intro_video,
+       meta->>'introCaptionsUrl' AS intro_captions
 FROM lms_courses
 WHERE slug IN ('mould-remediation-fundamentals','structural-drying-fundamentals',
   'category-3-sewage-black-water-remediation','fire-smoke-damage-restoration-fundamentals',
   'trauma-crime-scene-decontamination-fundamentals','assessing-indoor-environment-conditions');
+```
 
--- 2. Unlink (run inside a transaction; expect at most 6 rows)
+Run the update in its own transaction, one statement at a time, so you can check the count
+before anything is saved:
+
+```sql
 BEGIN;
 UPDATE lms_courses
 SET meta = (meta::jsonb - 'introVideoUrl' - 'introCaptionsUrl')
 WHERE slug IN ('mould-remediation-fundamentals','structural-drying-fundamentals',
   'category-3-sewage-black-water-remediation','fire-smoke-damage-restoration-fundamentals',
   'trauma-crime-scene-decontamination-fundamentals','assessing-indoor-environment-conditions')
-  AND meta ? 'introVideoUrl';
--- check the row count, then:
-COMMIT;
+  AND (meta::jsonb ? 'introVideoUrl' OR meta::jsonb ? 'introCaptionsUrl');
 ```
+
+Check the reported count (`UPDATE n`). It must match the rows in step 1 that had a video or
+captions value, and never exceed 6. If it matches, run `COMMIT;`. If not, run `ROLLBACK;` and send
+Phill the step 1 output.
 
 Then reload each live course page and confirm the intro video is gone. Send Phill the row counts.
 
