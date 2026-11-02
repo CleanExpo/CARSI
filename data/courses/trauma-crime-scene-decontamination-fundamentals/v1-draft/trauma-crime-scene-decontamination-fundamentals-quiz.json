@@ -8,7 +8,7 @@
       "quizId": "9b834e07-3c4d-4486-9c69-ecb025acf516",
       "lessonTitle": "Module 1 check",
       "title": "CARSI Trauma & Biohazard Decontamination Practitioner — Module 1 check",
-      "passPercentage": 70,
+      "passPercentage": 80,
       "attemptsAllowed": 3,
       "questions": [
         {
@@ -82,6 +82,18 @@
           "correctIndex": 0,
           "points": 1,
           "explanation": "Personal items belong to the family. Ask first, set them aside safely, and never share images of a job."
+        },
+        {
+          "questionText": "What pass mark applies to the module checks, the practical task and the final designation exam?",
+          "options": [
+            "70% for the module checks and 80% for the final exam only",
+            "50% for each, because the instructor reviews every attempt",
+            "100% for the practical task and 70% for the rest",
+            "80% for every module check, the practical task and the final exam"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "All three assessments share one bar: 80%. A missed step on a trauma site can hurt someone, so a near miss in a check is a signal to revisit the lesson."
         }
       ]
     },
@@ -89,7 +101,7 @@
       "quizId": "45fd886d-ad20-49b0-9169-0bd6e9a691b2",
       "lessonTitle": "Module 2 check",
       "title": "CARSI Trauma & Biohazard Decontamination Practitioner — Module 2 check",
-      "passPercentage": 70,
+      "passPercentage": 80,
       "attemptsAllowed": 3,
       "questions": [
         {
@@ -163,6 +175,18 @@
           "correctIndex": 2,
           "points": 1,
           "explanation": "The ASHM national guidelines say PEP should start as soon as possible and within 72 hours; the earlier the better."
+        },
+        {
+          "questionText": "In New South Wales, which outcome within 48 hours of a needlestick makes it notifiable to SafeWork NSW?",
+          "options": [
+            "The worker felt a jab through the glove",
+            "The wound was washed for 30 seconds on site",
+            "The item that caused it was a needle rather than glass",
+            "The worker needs HIV PEP, or hepatitis B vaccine and immunoglobulin because they are not immune"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "SafeWork NSW names those two treatments within 48 hours as the triggers, and an infection that follows must also be notified. The PCBU notifies immediately after becoming aware."
         }
       ]
     },
@@ -170,7 +194,7 @@
       "quizId": "107191ed-4951-43d0-bd2a-e377bd7173c6",
       "lessonTitle": "Module 3 check",
       "title": "CARSI Trauma & Biohazard Decontamination Practitioner — Module 3 check",
-      "passPercentage": 70,
+      "passPercentage": 80,
       "attemptsAllowed": 3,
       "questions": [
         {
@@ -244,6 +268,18 @@
           "correctIndex": 0,
           "points": 1,
           "explanation": "Doffing starts with the most contaminated item and ends with hand hygiene, so clean hands are never contaminated by dirty gear."
+        },
+        {
+          "questionText": "In Australia, when does a SWMS become a legal requirement on a trauma decontamination job?",
+          "options": [
+            "When the work becomes high risk construction work, such as work likely to disturb asbestos",
+            "On every job, whatever the task",
+            "Only when the client asks for one in writing",
+            "Never: a SWMS is optional in every case"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A SWMS is required for high risk construction work, which includes work likely to disturb asbestos. On other jobs it is the business’s way of recording how it manages risk, and a generic one must be reviewed for the site."
         }
       ]
     },
@@ -251,7 +287,7 @@
       "quizId": "0039a743-d487-4450-804e-bbb595b1adc5",
       "lessonTitle": "Module 4 check",
       "title": "CARSI Trauma & Biohazard Decontamination Practitioner — Module 4 check",
-      "passPercentage": 70,
+      "passPercentage": 80,
       "attemptsAllowed": 3,
       "questions": [
         {
@@ -325,6 +361,18 @@
           "correctIndex": 1,
           "points": 1,
           "explanation": "20 mL per litre multiplied by 5 L is 100 mL. Measure it with a graduated jug, never by eye."
+        },
+        {
+          "questionText": "The label contact time is 10 minutes, but in a warm kitchen the disinfectant dries in 4. What do you do?",
+          "options": [
+            "Accept 4 minutes, because the surface was wet when applied",
+            "Work smaller sections and re-wet so it stays wet for 10 minutes, or choose a product labelled for that surface",
+            "Double the concentrate so it works faster",
+            "Spray a second product over the top once the first has dried"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "The product only works if the surface stays wet for the full label contact time. Re-wet in smaller sections, check the SDS before changing ventilation, and never alter the dilution or mix products."
         }
       ]
     },
@@ -332,7 +380,7 @@
       "quizId": "e3f49b7d-5bde-43d2-8fcd-8f5ccfe0c889",
       "lessonTitle": "Module 5 check",
       "title": "CARSI Trauma & Biohazard Decontamination Practitioner — Module 5 check",
-      "passPercentage": 70,
+      "passPercentage": 80,
       "attemptsAllowed": 3,
       "questions": [
         {
@@ -406,6 +454,18 @@
           "correctIndex": 2,
           "points": 1,
           "explanation": "NZS 4304:2002 Management of Healthcare Waste sets out classification, packaging, labelling, transport and disposal; councils set local rules."
+        },
+        {
+          "questionText": "A paid job in Geelong produces two 72 L clinical waste bags, each filled to two-thirds. What applies?",
+          "options": [
+            "Nothing extra, because each bag is under 50 L",
+            "The bags can go in general waste if double-bagged",
+            "The 96 L load is over 50 L and paid, so it needs a permitted transporter and a Waste Tracker record",
+            "Only the sharps container needs to be tracked"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Two bags at two-thirds hold 48 L each, 96 L in total. In Victoria only a net load under 50 L carried for no fee or reward escapes the permit and tracking rules, and a paid job never qualifies."
         }
       ]
     },
@@ -413,7 +473,7 @@
       "quizId": "c1237c61-f4ab-44e5-bad9-c3a29d613396",
       "lessonTitle": "Module 6 check",
       "title": "CARSI Trauma & Biohazard Decontamination Practitioner — Module 6 check",
-      "passPercentage": 70,
+      "passPercentage": 80,
       "attemptsAllowed": 3,
       "questions": [
         {
@@ -487,6 +547,18 @@
           "correctIndex": 2,
           "points": 1,
           "explanation": "In New Zealand, call or text 1737 any time to talk with a trained counsellor. 13 11 14 is Lifeline in Australia; 0800 764 766 is the NZ Poisons Centre."
+        },
+        {
+          "questionText": "At the handover walk-through a faint odour remains near the skirting. What do you do?",
+          "options": [
+            "Find and deal with the source, walk the area again and record what was done",
+            "Mask it with a fragrance product and hand over",
+            "Hand over and note the odour for the client to deal with",
+            "Leave a window open and tell the client it will fade"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A lingering odour suggests a source remains, such as fluid under the skirting. Verification is not complete until the source is found and dealt with, and the file records it."
         }
       ]
     },
