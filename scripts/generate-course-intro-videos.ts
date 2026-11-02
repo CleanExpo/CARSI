@@ -15,7 +15,7 @@
  * Phases / modifiers:
  *   --dry-run   Print the per-course plan. NO API, NO spend, NO secrets required.
  *   --generate  Real run: TTS → upload → render → upload → results map. Idempotent (skips done).
- *   --slug=<s>  One course.  --limit=N  Cap.  --force  Re-render done slugs.  --yes  Skip confirm.
+ *   --slug=<s>  One course (or a comma-separated list).  --limit=N  Cap.  --force  Re-render done slugs.  --yes  Skip confirm.
  *
  * Run in CI (or manually) with HEYGEN_API_KEY + HEYGEN_AVATAR_ID + ELEVENLABS_API_KEY + CLOUDINARY_*.
  */
@@ -175,7 +175,9 @@ async function main(): Promise<void> {
   const briefs = await loadBriefs();
   const results = await loadResults();
 
-  let queue = briefs.filter((b) => (onlySlug ? b.courseSlug === onlySlug : true)).filter(isVideoBriefComplete);
+  // --slug accepts one slug or a comma-separated list (e.g. re-rendering a fixed set with --force).
+  const slugSet = onlySlug ? new Set(onlySlug.split(',').map((x) => x.trim()).filter(Boolean)) : null;
+  let queue = briefs.filter((b) => (slugSet ? slugSet.has(b.courseSlug) : true)).filter(isVideoBriefComplete);
   if (!force) queue = queue.filter((b) => !results.results[b.courseSlug]);
   if (queue.length > limit) queue = queue.slice(0, limit);
 
