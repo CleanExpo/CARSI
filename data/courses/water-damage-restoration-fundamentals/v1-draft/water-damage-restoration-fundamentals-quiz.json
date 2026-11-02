@@ -39,7 +39,7 @@
           "questionText": "Why record the air temperature and relative humidity on arrival?",
           "options": [
             "It is only needed for the invoice total",
-            "Insurers refuse claims without the weather",
+            "It is only needed on insured jobs",
             "It sets the starting point for drying decisions",
             "It decides the colour of the report cover"
           ],
@@ -264,7 +264,7 @@
           ],
           "correctIndex": 1,
           "points": 1,
-          "explanation": "A pin (resistance) meter reads moisture in a specific material. A non-invasive meter maps where moisture is; a thermo-hygrometer reads the air."
+          "explanation": "A pin (resistance) meter measures how wet a material is. A non-invasive meter shows where moisture is; a thermo-hygrometer reads the air."
         },
         {
           "questionText": "A thermal camera shows a cold patch on a wall. What is the right next step?",
@@ -276,7 +276,7 @@
           ],
           "correctIndex": 0,
           "points": 1,
-          "explanation": "A thermal camera shows temperature, not water. A cold patch is a question, always confirmed with a moisture meter before any conclusion or removal."
+          "explanation": "A thermal camera shows temperature differences worth checking, not water. Confirm anything it suggests with a moisture meter before you act, and before any conclusion or removal."
         },
         {
           "questionText": "What does specific humidity in g/kg tell you that relative humidity alone does not?",
@@ -462,7 +462,7 @@
           ],
           "correctIndex": 0,
           "points": 1,
-          "explanation": "Changes to an agreed scope are authorised and recorded, not assumed. That keeps the claim defensible and protects the business and the customer."
+          "explanation": "Changes to an agreed scope are authorised and recorded, not assumed. That keeps the job defensible, whoever is paying, and protects the business and the customer."
         },
         {
           "questionText": "Under the Australian Consumer Law, which over-claim should a technician avoid?",
@@ -486,7 +486,7 @@
           ],
           "correctIndex": 2,
           "points": 1,
-          "explanation": "Pricing is in AUD with GST noted where it applies. Clear, dated, AUD pricing is part of the record an insurer and the consumer rely on."
+          "explanation": "Pricing is in AUD with GST noted where it applies. Clear, dated AUD pricing is part of the record the client relies on, and the insurer too when there is a claim."
         }
       ]
     },
@@ -618,19 +618,19 @@
           "explanation": "Air movers aerosolise mould spores, so they are held until remediation and a clearance; meanwhile dehumidifiers and air filtration run under containment."
         },
         {
-          "questionText": "What is the best protection if a claim is questioned months later?",
+          "questionText": "A client paying privately disputes your drying work four months later. What best protects you both?",
           "options": [
-            "A clear, dated, measured job file",
+            "A clear, dated, measured job file made at the time",
             "A good memory of the job",
             "A friendly phone call to the owner",
             "A higher price next time"
           ],
           "correctIndex": 0,
           "points": 1,
-          "explanation": "A dated file with photos, a moisture map, daily readings trending to the dry standard and recorded decisions is the proof that defends the work."
+          "explanation": "Whoever pays, a file made at the time (dated photos, a moisture map, daily readings trending to the dry standard and recorded decisions) is the proof that defends the work and shows the client what was done. Memory and goodwill are not evidence."
         },
         {
-          "questionText": "Which statement about pricing and claims in Australia is correct?",
+          "questionText": "Which statement about pricing and scope on an Australian job is correct?",
           "options": [
             "Price in US dollars and skip GST",
             "Never provide a quote",
