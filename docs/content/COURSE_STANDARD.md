@@ -72,6 +72,15 @@ Recorded in `meta.rolePaths` (at least one). A course may sit on more than one p
 | `carpet-and-floors`             | Carpet and Floors                                 |
 | `supervisor-and-estimator`      | Supervisor and Estimator                          |
 | `adjacent-buyers`               | Property managers, facility managers and builders |
+| `general-and-bond`              | General and Bond Cleaning                         |
+| `facility`                      | Facility Cleaning                                 |
+| `aged-care`                     | Aged Care Cleaning                                |
+| `government-and-security`       | Government, Security and Sensitive-Data Cleaning  |
+| `data-centre`                   | Data Centre Cleaning                              |
+
+The first eight paths are restoration-centric; the last five are the cleaning verticals that power
+the "enter your industry → bespoke pathway" builder. This list is mirrored exactly in `ROLE_PATHS`
+in `scripts/audit-course-depth.mjs` — change both in one commit.
 
 ### 3.3 Courses, modules and lessons
 
