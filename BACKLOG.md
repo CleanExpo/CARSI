@@ -987,3 +987,21 @@ production-database credential):
   marks 54 published. Level 2 Mould was live while the seed said `draft`. That is fixed in the same
   PR as this note. A re-seed would have unpublished it. A read-only live-vs-seed status report
   would catch the rest.
+
+### Discovery — 2026-11-02 quiz answer-position skew
+
+CodeRabbit (#974) found that 19 of 20 final-exam answers in the Mould Practitioner draft sat at the
+same option. Nothing shuffles options at runtime: the grader compares the stored `correctIndex`, so
+a learner can pass by always picking one letter. The Mould and Water v1 drafts are now balanced
+(#974, #976). The same skew is in seed quizzes still to fix:
+- `floor-care-quizzes.json`: 32 of 34 at one position.
+- `category-3-sewage-black-water-remediation-quiz.json`: 8 of 10.
+- `mould-remediation-fundamentals-quiz.json`: 8 of 10.
+- `water-damage-restoration-fundamentals-quiz.json`: 7 of 10.
+- `h5-bird-flu-quiz.json`: 7 of 10.
+- `ozone-and-hydroxyl-generators-what-the-evidence-says-quiz.json`: 5 of 8. Founder sign-off course, `noAiRewrite`: Phill decides.
+
+Fixing a seed file changes the live quiz only after a re-seed, which is catalogue-wide; see
+`docs/runbooks/course-go-live.md`. The structural fix is to add a "no single option holds more than
+about 40% of correct answers" check to `audit-course-depth` (Course Standard v1, final-quiz floor),
+or to shuffle options per attempt in the quiz API.
