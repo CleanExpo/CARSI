@@ -28,8 +28,14 @@ IICRC standard text, IICRC manual or RIA manual was read, paraphrased or entered
 ## Changes from the live seed entry (seed untouched; applies on promotion)
 
 - **7 modules / 14 lessons → 6 modules / 12 teaching lessons**, each to the seven-part pattern, plus
-  6 module checks (36 questions) and a 15-question final designation exam (pass 80%).
-- **`durationHours` 4 → 3.** Evidenced time is 63% of 3 h (floor 50%). At 4 h it would be 47%.
+  6 module checks (42 questions) and a 15-question final designation exam.
+- **Pass mark 80% everywhere** (founder decision 02/11/2026): every module check, the practical task
+  and the final designation exam pass at 80% (`passPercentage`, `passThreshold`, `meta.passMarks`,
+  lesson 1 and the final lesson).
+- **`durationHours` stays 4** (founder decision 02/11/2026). An earlier draft cut it to 3 because
+  evidenced time at 4 h was 47%. The 02/11/2026 depth pass added about 3,840 words of worked AU/NZ
+  scenarios, decision points and common-mistake sections inside the existing lessons, plus one
+  question per module check; evidenced time is now 58% of 4 h (floor 50%).
 - **Removed claims:** "APVMA/TGA-registered products" (the TGA page lists disinfectants regulated by
   the APVMA as excluded goods; surface disinfectant claims for this work are a TGA matter, so the
   course now teaches the TGA specific-claim and ARTG rule); "aligns to the awareness principles";
@@ -40,15 +46,15 @@ IICRC standard text, IICRC manual or RIA manual was read, paraphrased or entered
   `66e30cf7…` (listed in `meta.retiredFromLive`). The live `introCaptionsUrl` (an expiring signed
   HeyGen URL) is dropped from the draft meta; `introVideoUrl` is kept.
 
-## Ledger at a glance (02/11/2026)
+## Ledger at a glance (02/11/2026, after the 4-hour depth pass)
 
 | Status | Entries | Meaning |
 | --- | ---: | --- |
-| VERIFIED | 98 | Source opened on 02/11/2026 through Exa (search extract or fetch); quote of 25 words or fewer. |
-| JUSTIFIED | 12 | CARSI arithmetic on labelled illustrative figures (areas, dilutions, volumes, time windows), plus the nominative S540 citation. |
-| GAP | 16 | Not verifiable here. **Every GAP must be cleared before go-live.** |
+| VERIFIED | 108 | Source opened on 02/11/2026 through Exa (search extract or fetch); quote of 25 words or fewer. |
+| JUSTIFIED | 23 | CARSI arithmetic on labelled illustrative figures (areas, dilutions, volumes, time windows), worked scenarios that apply VERIFIED entries, the nominative S540 citation, and the founder's 80% pass-mark decision (TBP-006). |
+| GAP | 28 | Not verifiable here. **Every GAP must be cleared before go-live.** |
 
-Grades: VERIFIED A1 x20, A2 x75, A3 x1, B1 x1 (ANSI webstore, edition only), B2 x1 (Healthify NZ).
+Grades: VERIFIED A1 x23, A2 x82, A3 x1, B1 x1 (ANSI webstore, edition only), B2 x1 (Healthify NZ).
 No vendor page is used. The standards GAPs carry `check_owner: "Phill (SME) — licensed S540"`
 (the validator requires `check_by` to be a date, so the owner sits in its own field).
 
@@ -65,6 +71,7 @@ No vendor page is used. The standards GAPs carry `check_owner: "Phill (SME) — 
 | Disinfectant claims | No ARTG-equivalent claim register stated: **GAP TBP-066**, taught as "check with EPA NZ and the supplier" | — |
 | Sharps containers | AS/NZS 23907:2023 approved by the NZ Standards Approval Board on 01/10/2025 | Standards Australia store |
 | Healthcare waste | NZS 4304:2002 covers classification to disposal; each regional and local authority has its own plans; trade waste bylaws reference NZS 4304 | Standards NZ; Tararua DC bylaw (A3) |
+| Notifiable events | HSWA s 23: medical treatment within 48 hours of exposure to a substance, and serious infection from work involving contact with human blood or bodily substances; s 56: notify as soon as possible by the fastest means; keep records 5 years | legislation.govt.nz; WorkSafe NZ |
 | Psychosocial | HSWA defines health as physical and mental health; businesses must manage psychosocial risks; frequency, duration, intensity | WorkSafe NZ |
 | Asbestos | Any building built or renovated before 2000 could contain asbestos (AU rule taught beside it: assume possible before 31/12/2003 ban, pre-1990 most likely) | WorkSafe NZ; Safe Work Australia model Code; NSW Government Asbestos |
 | Numbers | 111; Healthline 0800 611 116; 1737; National Poisons Centre 0800 764 766 | Health NZ; poisons.co.nz |
@@ -86,12 +93,20 @@ No vendor page is used. The standards GAPs carry `check_owner: "Phill (SME) — 
   Health lists 2018), no compaction vehicle, rigid lidded transport containers, Schedule 1 tracking;
   Victoria R100 permit, lawful place, 50 L no-fee exemption, Waste Tracker; bags two-thirds full,
   sharps never in bags (NSW Health); sharps not in rubbish or recycling (WorkSafe ACT).
+- **Notifiable incidents:** model WHS Regulations r 699 infection from contact with blood or body
+  substances is a serious illness (AustLII); treatment within 48 hours of exposure to a substance,
+  including blood (Safe Work Australia handbook, Dec 2025); notify immediately and preserve the site
+  (Safe Work Australia); NSW triggers for blood and needlestick exposures: HIV PEP, or hepatitis B
+  vaccine plus HBIG for a non-immune person, within 48 hours, or a resulting infection (SafeWork NSW).
+- **SWMS:** required for high risk construction work, which includes work likely to disturb asbestos
+  (Safe Work Australia); an administrative control (WorkSafe WA); a generic SWMS must be reviewed for
+  the site (SafeWork NSW).
 - **Psychosocial:** health includes psychological health; Part 3.1 and Part 3.2 Division 11; model
   regs apply once implemented; traumatic events or materials and its controls (Safe Work Australia);
   Victorian Psychological Health Regulations 2025 from 01/12/2025 (WorkSafe Victoria); Lifeline 13 11
   14, Beyond Blue 1300 22 4636, 000; healthdirect 1800 022 222; Poisons 13 11 26.
 
-## Open GAPs (16)
+## Open GAPs (28)
 
 | ID | Owner | Claim (short) | Action |
 | --- | --- | --- | --- |
@@ -99,7 +114,6 @@ No vendor page is used. The standards GAPs carry `check_owner: "Phill (SME) — 
 | TBP-050 | Phill — licensed S540 | Three zones and one-way movement consistent with S540:2023 | substantiate |
 | TBP-051 | Phill — licensed S540 | Porous saturated materials usually removed; non-porous cleaned | substantiate |
 | TBP-107 | Phill — licensed S540 | Handover verification check consistent with S540:2023 | substantiate |
-| TBP-006 | founder | Practical 70%, final 80%, Practitioner tier | substantiate |
 | TBP-007 | Phill | Work starts only after police (and coroner) release and on authority | substantiate |
 | TBP-008 | Phill | Low-profile arrival practice | substantiate |
 | TBP-040 | Phill | Hidden fluid migration and heat strain as hazards | substantiate |
@@ -111,11 +125,24 @@ No vendor page is used. The standards GAPs carry `check_owner: "Phill (SME) — 
 | TBP-105 | Phill | Crew controls and warning signs | substantiate |
 | TBP-108 | Phill | Job-record photography practice (privacy law not researched) | substantiate |
 | TBP-122 | Phill | Contemporaneous records are stronger evidence | substantiate |
+| TBP-127 | founder | Practitioner tier (split from TBP-006; pass marks now JUSTIFIED by founder decision) | substantiate |
+| TBP-128 | Phill | First-call question set; firm quote only after the site walk | substantiate |
+| TBP-130 | Phill | Neighbour script; soiled keepsakes bagged for the family to decide | substantiate |
+| TBP-132 | Phill | Unsealable cut means a task outside the contaminated zone; near misses recorded | substantiate |
+| TBP-140 | Phill | Exposure walk-through practice (buddy, driven to ED, item recorded) | substantiate |
+| TBP-146 | Phill | NZ written task plan; suspected-asbestos lining: clean without cutting, sample first | substantiate |
+| TBP-147 | Phill | Clean-zone phone tub and runner; torn-glove response; 30-minute blocks on hot days | substantiate |
+| TBP-150 | Phill | Floorboard lift, clean-or-replace decision | substantiate |
+| TBP-152 | Phill | Surface dries before contact time: smaller sections, re-wet, check SDS | substantiate |
+| TBP-154 | Phill | Syringe with liquid placed whole; items police ask to keep | substantiate |
+| TBP-156 | Phill | Waste storage awaiting collection; rinse water and drains | substantiate |
+| TBP-157 | Phill | Debrief format; apprentice's first job | substantiate |
+| TBP-158 | Phill | Lingering odour means find the source; photographs carry a scale | substantiate |
 
 ## Hours
 
-Teaching words about 8,320 as the audit counts them (12 lessons, about 605 to 780 words each) / 230
-wpm = 36 min; 51 questions x 1.5 min = 76.5 min; total about 113 min = 63% of 180 min.
+Teaching words 12,249 as the audit counts them (12 lessons, about 880 to 1,280 words each) / 230
+wpm = 53 min; 57 questions x 1.5 min = 85.5 min; total about 139 min = 58% of 240 min (4 h).
 
 ## Diagrams
 

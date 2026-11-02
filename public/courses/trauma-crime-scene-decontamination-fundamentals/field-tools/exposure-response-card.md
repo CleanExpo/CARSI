@@ -23,6 +23,15 @@
 | --- | --- | --- |
 | | | |
 
+## Is it notifiable? (supervisor)
+
+- **Australia (model WHS):** notify the regulator **immediately** if the worker needs medical treatment within 48 hours of the exposure, or an infection follows. **NSW test:** HIV PEP, or hepatitis B vaccine plus immunoglobulin for a non-immune worker, within 48 hours. Preserve the site, but help the worker and make the site safe. **Victoria:** check WorkSafe Victoria's rules.
+- **New Zealand (HSWA s 23, s 56):** notify WorkSafe **as soon as possible** if medical treatment is needed within 48 hours of exposure to a substance, or a serious infection follows. Keep the record for at least 5 years.
+
+| Treatment given within 48 h? | Regulator notified (time) | Reference number |
+| --- | --- | --- |
+| | | |
+
 ## Hepatitis B status (keep a copy in your personnel file)
 
 | Dose 1 | Dose 2 | Dose 3 | Serology date (4 to 8 weeks after the course) | Result |
