@@ -113,6 +113,32 @@ Diagrams are hand-written SVG in `public/courses/<slug>/diagrams/`, embedded in 
   not installed. Then look at each diagram rendered — the check measures, the eye confirms.
 - Known limit: on a phone a diagram scales to about 43%, so 11px labels read small.
 
+## Evidence layer — cite-or-cut (MUST for Course Standard v1 and designation courses)
+BACKLOG #21 / the Evidence Engine TEACH stage. **No graded source, no claim.** Full template:
+`references/evidence-layer-template.md`; validator-passing examples:
+`references/evidence-layer-template.example.jsonl`.
+- **Four parts per substantive point** (any number, threshold, safety step, duty, standard, product,
+  price or outcome): the governing requirement (standard or law, nominative, **with edition**) ·
+  why it works (mechanism, CARSI's own words) · what the evidence shows (graded) · a public
+  source list.
+- **Grades are the 2nd Brain's Admiralty A1–C3.** A = regulator, legislation, standards body,
+  university, peer-reviewed (a vendor is never A); B = practitioner or partial read; C = individual
+  or commercial. Below C3 or ungraded is unusable.
+- **One ledger per course** in the existing `course-truth` schema —
+  `data/courses/<slug>/evidence/evidence-ledger.jsonl`, pointed to by `meta.evidenceLedger` — plus
+  `lesson_id`, `part`, `evidence_grade`, `check_by`. Statuses: `VERIFIED` (source opened, quote ≤ 25
+  words) · `JUSTIFIED` (our arithmetic or a labelled illustrative number, with reasoning) · `GAP`
+  (not yet verifiable). **An open `GAP` on a substantive point blocks go-live.**
+- **Standards wording is always `GAP` / `substantiate` for an agent**: the licensed index is not in
+  this repo and IICRC text may not enter any AI tool. Record the nominative citation and edition
+  (estate ruling S500:2025). Cite a `§` only if it exists in the licensed index.
+  Make positive claims only: an absence claim about any standard is banned.
+- **Each teaching lesson ends with `<h3>Sources for this lesson</h3>`**, listing only what that
+  lesson's ledger holds. Never list a `GAP`.
+- **Validate, and prove the validator can fail:** `node scripts/audit/validate-ledger.mjs <ledger>`
+  must exit 0, a planted bad entry must exit 1, and `node scripts/audit/check-mutants.mjs` must pass.
+  Not CI-enforced yet — BACKLOG row 28 wires it.
+
 ## Verification (before publish / before saving an edit)
 Scan the content and reject on any hit:
 - US spellings (color/odor/meter/mold/fiber/center/license-noun).
@@ -123,6 +149,9 @@ Scan the content and reject on any hit:
 - Silent trailer (no audio stream).
 - Any course diagram finding from `npm run check:course-diagrams` (cut off, collision, dangling
   arrow, missing CARSI logo).
+- For a v1 or designation course: an evidence ledger that fails `validate-ledger.mjs`, an open
+  `GAP` on a substantive point, an unversioned standards citation, or a lesson source list that
+  does not match its ledger.
 Fix all before the course goes live. Prod publish/unpublish remains founder-gated.
 
 ## Governance

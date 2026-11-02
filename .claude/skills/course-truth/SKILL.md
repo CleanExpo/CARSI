@@ -37,7 +37,9 @@ keeping, and overwriting destroys the one the ledger exists to preserve.
 ## Stage 3 — Write the ledger
 
 Append to `docs/audit/evidence-ledger.jsonl`. Required on every entry: `id`,
-`claim`, `claim_class`, `surface`, `status`, `feeds`. Then:
+`claim`, `claim_class`, `surface`, `status`, `feeds`. A course carrying an evidence
+layer keeps its own content claims in its course ledger instead (`meta.evidenceLedger`;
+same schema, same validator — see `carsi-course-production`). Then:
 
 ```bash
 node scripts/audit/validate-ledger.mjs docs/audit/evidence-ledger.jsonl
