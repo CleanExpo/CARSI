@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 560" width="800" height="560" role="img" aria-labelledby="t d" font-family="Arial, Helvetica, sans-serif">
+<title id="t">PPE by water category</title>
+<desc id="d">Three columns showing the PPE set growing as the water category rises. Category 1: safety footwear, gloves and eye protection, plus respiratory protection if disturbing dusty or already-mouldy material. Category 2 adds fluid-resistant gloves and a correctly fitted P2 respirator when generating aerosols or handling contaminated materials. Category 3 is full skin protection: fluid-resistant coveralls, gloves, boots and eye protection, with a P2 or higher respirator fit-tested and fit-checked each time, and everything contacted treated as contaminated. New items in each column are marked with a plus sign.</desc>
+<rect width="800" height="560" fill="#ffffff"/>
+<text x="24" y="36" font-size="20" font-weight="700" fill="#1f2933">PPE by water category</text>
+<image x="656" y="14" width="120" height="31" href="data:image/png;base64,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"/>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#52606d"/></marker>
+<marker id="arrowG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0b6e4f"/></marker>
+<marker id="arrowW" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b54708"/></marker>
+<marker id="arrowB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f5f8b"/></marker>
+<linearGradient id="gCard" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e9eef3"/></linearGradient>
+<linearGradient id="gWarn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffaf3"/><stop offset="1" stop-color="#fde6c8"/></linearGradient>
+<linearGradient id="gGreen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3fbf7"/><stop offset="1" stop-color="#d3eee2"/></linearGradient>
+<linearGradient id="gBlue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f8fc"/><stop offset="1" stop-color="#d6e5f2"/></linearGradient>
+<linearGradient id="gRed" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff6f5"/><stop offset="1" stop-color="#f9d7d3"/></linearGradient>
+<linearGradient id="gWater" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dcebf7"/><stop offset="1" stop-color="#b9d6ee"/></linearGradient>
+<radialGradient id="gDot" cx="0.5" cy="0.5" r="0.6" fx="0.35" fy="0.3"><stop offset="0" stop-color="#2fa77c"/><stop offset="1" stop-color="#0a5c42"/></radialGradient>
+<radialGradient id="gDotW" cx="0.5" cy="0.5" r="0.6" fx="0.35" fy="0.3"><stop offset="0" stop-color="#e07a2c"/><stop offset="1" stop-color="#8f3806"/></radialGradient>
+<radialGradient id="gDotB" cx="0.5" cy="0.5" r="0.6" fx="0.35" fy="0.3"><stop offset="0" stop-color="#4b8cc0"/><stop offset="1" stop-color="#174a6e"/></radialGradient>
+<radialGradient id="gDotR" cx="0.5" cy="0.5" r="0.6" fx="0.35" fy="0.3"><stop offset="0" stop-color="#d0564a"/><stop offset="1" stop-color="#912018"/></radialGradient>
+<filter id="sh" x="-10%" y="-10%" width="125%" height="135%"><feGaussianBlur in="SourceAlpha" stdDeviation="2.5"/><feOffset dx="0" dy="3" result="o"/><feComponentTransfer><feFuncA type="linear" slope="0.22"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<rect x="24" y="210" width="232" height="210" rx="10" fill="url(#gBlue)" stroke="#1f5f8b" stroke-width="2" filter="url(#sh)"/>
+<text x="38" y="236" font-size="16" font-weight="700" fill="#1f2933">Category 1</text>
+<text x="38" y="254" font-size="12" font-weight="700" fill="#1f5f8b">clean water</text>
+<rect x="34" y="268" width="212" height="26" rx="6" fill="#f5f7f9" stroke="#c3cad2" stroke-width="1"/>
+<text x="44" y="285" font-size="12" fill="#52606d">Safety footwear</text>
+<rect x="34" y="300" width="212" height="26" rx="6" fill="#f5f7f9" stroke="#c3cad2" stroke-width="1"/>
+<text x="44" y="317" font-size="12" fill="#52606d">Gloves</text>
+<rect x="34" y="332" width="212" height="26" rx="6" fill="#f5f7f9" stroke="#c3cad2" stroke-width="1"/>
+<text x="44" y="349" font-size="12" fill="#52606d">Eye protection</text>
+<rect x="34" y="364" width="212" height="42" rx="6" fill="#ffffff" stroke="#6b7785" stroke-width="1.5" stroke-dasharray="4 3"/>
+<text x="44" y="381" font-size="12" fill="#52606d">Respirator if disturbing dusty</text>
+<text x="44" y="397" font-size="12" fill="#52606d">or already-mouldy material</text>
+<rect x="284" y="162" width="232" height="258" rx="10" fill="url(#gWarn)" stroke="#b54708" stroke-width="2" filter="url(#sh)"/>
+<text x="298" y="188" font-size="16" font-weight="700" fill="#1f2933">Category 2</text>
+<text x="298" y="206" font-size="12" font-weight="700" fill="#b54708">grey water</text>
+<rect x="294" y="220" width="212" height="26" rx="6" fill="#f5f7f9" stroke="#c3cad2" stroke-width="1"/>
+<text x="304" y="237" font-size="12" fill="#52606d">Safety footwear</text>
+<rect x="294" y="252" width="212" height="26" rx="6" fill="#f5f7f9" stroke="#c3cad2" stroke-width="1"/>
+<text x="304" y="269" font-size="12" fill="#52606d">Gloves</text>
+<rect x="294" y="284" width="212" height="26" rx="6" fill="#f5f7f9" stroke="#c3cad2" stroke-width="1"/>
+<text x="304" y="301" font-size="12" fill="#52606d">Eye protection</text>
+<rect x="294" y="316" width="212" height="26" rx="6" fill="#ffffff" stroke="#b54708" stroke-width="2"/>
+<text x="304" y="333" font-size="12" font-weight="700" fill="#1f2933">+ Fluid-resistant gloves</text>
+<rect x="294" y="348" width="212" height="58" rx="6" fill="#ffffff" stroke="#b54708" stroke-width="2"/>
+<text x="304" y="365" font-size="12" font-weight="700" fill="#1f2933">+ Correctly fitted P2 respirator</text>
+<text x="304" y="381" font-size="12" font-weight="700" fill="#1f2933">when generating aerosols or</text>
+<text x="304" y="397" font-size="12" font-weight="700" fill="#1f2933">handling contaminated materials</text>
+<rect x="544" y="130" width="232" height="290" rx="10" fill="url(#gRed)" stroke="#b42318" stroke-width="2" filter="url(#sh)"/>
+<text x="558" y="156" font-size="16" font-weight="700" fill="#1f2933">Category 3</text>
+<text x="558" y="174" font-size="12" font-weight="700" fill="#b42318">black water / sewage</text>
+<rect x="554" y="188" width="212" height="26" rx="6" fill="#ffffff" stroke="#b42318" stroke-width="2"/>
+<text x="564" y="205" font-size="12" font-weight="700" fill="#1f2933">+ Fluid-resistant coveralls</text>
+<rect x="554" y="220" width="212" height="26" rx="6" fill="#f5f7f9" stroke="#c3cad2" stroke-width="1"/>
+<text x="564" y="237" font-size="12" fill="#52606d">Gloves</text>
+<rect x="554" y="252" width="212" height="26" rx="6" fill="#ffffff" stroke="#b42318" stroke-width="2"/>
+<text x="564" y="269" font-size="12" font-weight="700" fill="#1f2933">+ Boots</text>
+<rect x="554" y="284" width="212" height="26" rx="6" fill="#f5f7f9" stroke="#c3cad2" stroke-width="1"/>
+<text x="564" y="301" font-size="12" fill="#52606d">Eye protection</text>
+<rect x="554" y="316" width="212" height="42" rx="6" fill="#ffffff" stroke="#b42318" stroke-width="2"/>
+<text x="564" y="333" font-size="12" font-weight="700" fill="#1f2933">+ P2 or higher respirator, fit-</text>
+<text x="564" y="349" font-size="12" font-weight="700" fill="#1f2933">tested and fit-checked each time</text>
+<rect x="554" y="364" width="212" height="42" rx="6" fill="#ffffff" stroke="#b42318" stroke-width="2"/>
+<text x="564" y="381" font-size="12" font-weight="700" fill="#1f2933">+ Treat everything contacted</text>
+<text x="564" y="397" font-size="12" font-weight="700" fill="#1f2933">as contaminated</text>
+<path d="M140,210 L140,84 L660,84 L660,128" stroke="#52606d" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+<text x="400" y="76" font-size="12" font-weight="700" text-anchor="middle" fill="#1f2933">The PPE set grows as the category rises</text>
+<rect x="24" y="438" width="752" height="82" rx="10" fill="url(#gBlue)" stroke="#1f5f8b" stroke-width="2" filter="url(#sh)"/>
+<text x="40" y="462" font-size="14" font-weight="700" fill="#1f2933">A respirator only protects when it seals</text>
+<text x="40" y="481" font-size="12" fill="#52606d">Fit-test it on the wearer before first use; fit-check it every time it goes on. Facial hair under the seal</text>
+<text x="40" y="497" font-size="12" fill="#52606d">breaks it. PPE is the last line, after isolation and engineering controls. Record the PPE actually used.</text>
+<text x="776" y="548" font-size="12" fill="#52606d" text-anchor="end">CARSI · Water Restoration Practitioner · schematic, not to scale</text>
+</svg>

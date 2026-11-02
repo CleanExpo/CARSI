@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500" role="img" aria-labelledby="t d" font-family="Arial, Helvetica, sans-serif">
+<title id="t">Moisture map and dry goal</title>
+<desc id="d">A schematic room sketch for a lounge wetted by a failed heater valve. Four numbered reading points sit about 1 m apart along the 4 m wet wall, inside a dashed wet boundary. A dry-reference point R is taken on the same timber skirting in an unaffected room, reading 12 % on the pin meter, which sets the dry goal. Point 1 by the valve reads 28 %. Air is logged at 21 °C and 60 %RH. The dry goal is 12 % at every wet timber point, stable on the following visit.</desc>
+<rect width="800" height="500" fill="#ffffff"/>
+<text x="24" y="36" font-size="20" font-weight="700" fill="#1f2933">Moisture map and dry goal</text>
+<image x="656" y="14" width="120" height="31" href="data:image/png;base64,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"/>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#52606d"/></marker>
+<marker id="arrowG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0b6e4f"/></marker>
+<marker id="arrowW" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b54708"/></marker>
+<marker id="arrowB" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f5f8b"/></marker>
+<linearGradient id="gCard" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e9eef3"/></linearGradient>
+<linearGradient id="gWarn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffaf3"/><stop offset="1" stop-color="#fde6c8"/></linearGradient>
+<linearGradient id="gGreen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3fbf7"/><stop offset="1" stop-color="#d3eee2"/></linearGradient>
+<linearGradient id="gBlue" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f8fc"/><stop offset="1" stop-color="#d6e5f2"/></linearGradient>
+<linearGradient id="gRed" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff6f5"/><stop offset="1" stop-color="#f9d7d3"/></linearGradient>
+<linearGradient id="gWater" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dcebf7"/><stop offset="1" stop-color="#b9d6ee"/></linearGradient>
+<radialGradient id="gDot" cx="0.5" cy="0.5" r="0.6" fx="0.35" fy="0.3"><stop offset="0" stop-color="#2fa77c"/><stop offset="1" stop-color="#0a5c42"/></radialGradient>
+<radialGradient id="gDotW" cx="0.5" cy="0.5" r="0.6" fx="0.35" fy="0.3"><stop offset="0" stop-color="#e07a2c"/><stop offset="1" stop-color="#8f3806"/></radialGradient>
+<radialGradient id="gDotB" cx="0.5" cy="0.5" r="0.6" fx="0.35" fy="0.3"><stop offset="0" stop-color="#4b8cc0"/><stop offset="1" stop-color="#174a6e"/></radialGradient>
+<radialGradient id="gDotR" cx="0.5" cy="0.5" r="0.6" fx="0.35" fy="0.3"><stop offset="0" stop-color="#d0564a"/><stop offset="1" stop-color="#912018"/></radialGradient>
+<filter id="sh" x="-10%" y="-10%" width="125%" height="135%"><feGaussianBlur in="SourceAlpha" stdDeviation="2.5"/><feOffset dx="0" dy="3" result="o"/><feComponentTransfer><feFuncA type="linear" slope="0.22"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<line x1="24" y1="66" x2="364" y2="66" stroke="#1f2933" stroke-width="1.5"/>
+<line x1="24" y1="60" x2="24" y2="72" stroke="#1f2933" stroke-width="1.5"/>
+<line x1="364" y1="60" x2="364" y2="72" stroke="#1f2933" stroke-width="1.5"/>
+<text x="194" y="58" font-size="12" font-weight="700" text-anchor="middle" fill="#1f2933">wet wall about 4 m: a point about every 1 m</text>
+<rect x="24" y="80" width="340" height="300" rx="2" fill="url(#gCard)" stroke="#9aa5b1" stroke-width="2" filter="url(#sh)"/>
+<rect x="364" y="80" width="144" height="300" rx="2" fill="url(#gGreen)" stroke="#0b6e4f" stroke-width="2" filter="url(#sh)"/>
+<rect x="28" y="84" width="22" height="16" rx="2" fill="#3e4c59" stroke="#1f2933" stroke-width="1"/>
+<text x="56" y="97" font-size="12" font-weight="700" fill="#1f2933">source: failed heater valve</text>
+<path d="M24,226 C140,252 300,240 364,198" stroke="#1f5f8b" stroke-width="2" fill="none" stroke-dasharray="7 5"/>
+<circle cx="84" cy="122" r="12" fill="url(#gDotB)" stroke="#ffffff" stroke-width="2"/>
+<text x="84" y="125.9" font-size="13" font-weight="700" text-anchor="middle" fill="#ffffff">1</text>
+<circle cx="160" cy="122" r="12" fill="url(#gDotB)" stroke="#ffffff" stroke-width="2"/>
+<text x="160" y="125.9" font-size="13" font-weight="700" text-anchor="middle" fill="#ffffff">2</text>
+<circle cx="236" cy="122" r="12" fill="url(#gDotB)" stroke="#ffffff" stroke-width="2"/>
+<text x="236" y="125.9" font-size="13" font-weight="700" text-anchor="middle" fill="#ffffff">3</text>
+<circle cx="312" cy="122" r="12" fill="url(#gDotB)" stroke="#ffffff" stroke-width="2"/>
+<text x="312" y="125.9" font-size="13" font-weight="700" text-anchor="middle" fill="#ffffff">4</text>
+<text x="84" y="156" font-size="13" font-weight="700" text-anchor="middle" fill="#b42318">28 %</text>
+<text x="214" y="206" font-size="12" text-anchor="middle" fill="#52606d">affected floor about 15 m²</text>
+<text x="200" y="272" font-size="12" font-weight="700" text-anchor="middle" fill="#1f5f8b">wet boundary (dashed)</text>
+<circle cx="194" cy="302" r="12" fill="url(#gDotW)" stroke="#ffffff" stroke-width="2"/>
+<text x="194" y="305.9" font-size="13" font-weight="700" text-anchor="middle" fill="#ffffff">A</text>
+<text x="194" y="334" font-size="12" font-weight="700" text-anchor="middle" fill="#1f2933">air: 21 °C, 60 %RH</text>
+<text x="40" y="366" font-size="13" font-weight="700" fill="#1f2933">Lounge (affected)</text>
+<text x="436" y="106" font-size="13" font-weight="700" text-anchor="middle" fill="#1f2933">Unaffected room</text>
+<circle cx="436" cy="156" r="12" fill="url(#gDot)" stroke="#ffffff" stroke-width="2"/>
+<text x="436" y="159.9" font-size="13" font-weight="700" text-anchor="middle" fill="#ffffff">R</text>
+<text x="436" y="194" font-size="12" font-weight="700" text-anchor="middle" fill="#0b6e4f">dry reference</text>
+<text x="436" y="212" font-size="12" text-anchor="middle" fill="#1f2933">same timber</text>
+<text x="436" y="228" font-size="12" text-anchor="middle" fill="#1f2933">skirting, pin</text>
+<text x="436" y="244" font-size="12" font-weight="700" text-anchor="middle" fill="#1f2933">meter: 12 %</text>
+<rect x="528" y="80" width="248" height="182" rx="10" fill="url(#gCard)" stroke="#9aa5b1" stroke-width="2" filter="url(#sh)"/>
+<text x="542" y="104" font-size="13" font-weight="700" fill="#1f2933">Readings, day 1 (pin meter)</text>
+<circle cx="552" cy="132" r="11" fill="url(#gDot)" stroke="#ffffff" stroke-width="2"/>
+<text x="552" y="135.6" font-size="12" font-weight="700" text-anchor="middle" fill="#ffffff">R</text>
+<text x="572" y="136" font-size="12" fill="#1f2933">dry standard</text>
+<text x="762" y="136" font-size="12" font-weight="700" text-anchor="end" fill="#1f2933">12 %</text>
+<circle cx="552" cy="166" r="11" fill="url(#gDotB)" stroke="#ffffff" stroke-width="2"/>
+<text x="552" y="169.6" font-size="12" font-weight="700" text-anchor="middle" fill="#ffffff">1</text>
+<text x="572" y="170" font-size="12" fill="#1f2933">skirting by valve</text>
+<text x="762" y="170" font-size="12" font-weight="700" text-anchor="end" fill="#1f2933">28 %</text>
+<text x="552" y="204" font-size="12" font-weight="700" text-anchor="middle" fill="#1f5f8b">2–4</text>
+<text x="572" y="204" font-size="12" fill="#1f2933">same wet wall</text>
+<text x="762" y="204" font-size="12" font-weight="700" text-anchor="end" fill="#1f2933">recorded</text>
+<text x="542" y="250" font-size="12" fill="#52606d">Note material and instrument at each.</text>
+<rect x="528" y="278" width="248" height="102" rx="10" fill="url(#gGreen)" stroke="#0b6e4f" stroke-width="2" filter="url(#sh)"/>
+<text x="542" y="302" font-size="14" font-weight="700" fill="#1f2933">Dry goal</text>
+<text x="542" y="324" font-size="12" fill="#1f2933">Every wet timber point back to</text>
+<text x="542" y="341" font-size="12" fill="#1f2933">the 12 % dry standard, stable on</text>
+<text x="542" y="358" font-size="12" fill="#1f2933">the following visit.</text>
+<rect x="24" y="398" width="752" height="58" rx="10" fill="url(#gBlue)" stroke="#1f5f8b" stroke-width="2" filter="url(#sh)"/>
+<text x="40" y="422" font-size="12" font-weight="700" fill="#1f2933">Re-read the same numbered points each visit with the same instrument and mode,</text>
+<text x="40" y="439" font-size="12" fill="#52606d">and photograph the readings, so the numbers are directly comparable and show a trend.</text>
+<text x="776" y="488" font-size="12" fill="#52606d" text-anchor="end">CARSI · Water Restoration Practitioner · schematic, not to scale</text>
+</svg>
