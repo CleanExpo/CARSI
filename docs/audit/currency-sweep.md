@@ -1,6 +1,6 @@
 # GP-567 D3 — Standards currency sweep
 
-Generated `2026-09-07T14:49:59Z` by `scripts/audit/build-sweeps.mjs`.
+Generated `2026-11-02T03:03:48Z` by `scripts/audit/build-sweeps.mjs`.
 
 ## Reproduce
 
@@ -13,22 +13,22 @@ git grep -nI -E S500[^0-9]{0,3}(20[0-9]{2})? -- *.ts *.tsx *.mjs *.js *.json *.m
 <!-- COUNTS-TABLE-BEGIN -->
 | Measure | Count | Class |
 | --- | ---: | --- |
-| Total S500 citation lines | 274 | total |
-| Distinct files citing S500 | 49 | — |
+| Total S500 citation lines | 351 | total |
+| Distinct files citing S500 | 74 | — |
 | Lines asserting the **2021** edition | 20 | edition-class |
 | Files asserting the **2021** edition | 16 | — |
-| Lines asserting the **2025** edition | 0 | edition-class |
-| Lines citing S500 with **no edition at all** | 233 | edition-class |
+| Lines asserting the **2025** edition | 15 | edition-class |
+| Lines citing S500 with **no edition at all** | 295 | edition-class |
 | Lines asserting **another edition** (2026) | 21 | edition-class |
 <!-- COUNTS-TABLE-END -->
 
-The 4 line classes partition the total: 20 + 0 + 233 + 21 = 274.
+The 4 line classes partition the total: 20 + 15 + 295 + 21 = 351.
 
 ## Finding
 
 The estate ruling (2026-09-07, GP-560) is that course content citing S500 teaches the
 **2025** edition. The corpus currently asserts 2021 on **20 lines across 16 files**, and
-cites S500 with **no edition named on 233 lines** — the larger and quieter problem, because an
+cites S500 with **no edition named on 295 lines** — the larger and quieter problem, because an
 unversioned citation cannot be detected as stale by any future sweep.
 
 **Recommended control (not built this run):** a guard requiring every S500 citation to

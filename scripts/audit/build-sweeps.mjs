@@ -161,6 +161,17 @@ if (files2021.length) {
 fs.mkdirSync(OUT, { recursive: true });
 fs.writeFileSync(path.join(OUT, 'currency-sweep.md'), `${cur.join('\n')}\n`);
 
+// `--only=currency` regenerates D3 and stops. D3 is a pure repo scan, but D4 reads
+// live-page snapshots from `.audit-cache/` (scripts/audit/fetch-live.sh) and stamps
+// them with ACCESS. Without this switch, a checkout that lacks the cache would write
+// D3 and then die inside D4: the partial-sweep outcome c11 forbids. Re-fetching to
+// avoid that would publish today's live pages under a stale ACCESS date. Stopping
+// here leaves compliance-language-sweep.md untouched, and c6 still verifies it.
+if (process.argv.includes('--only=currency')) {
+  console.log('OK D3: docs/audit/currency-sweep.md regenerated; D4 not run (--only=currency)');
+  process.exit(0);
+}
+
 // ---------- D4: compliance language ----------------------------------------
 const guards = [
   'check:iicrc-compliance',

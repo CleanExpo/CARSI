@@ -6,13 +6,22 @@
 
 ## Ledger counts
 
+**At the close of Run 1 (2026-09-07)** the ledger held 26 entries: 12 VERIFIED,
+1 JUSTIFIED, 13 GAP, with 1 CONFLICT sidecar. Those are this run's own figures and
+are kept here unchanged.
+
+**Current ledger (re-derived 2026-11-02).** Five entries were appended after Run 1
+by PR #841 (`PR841-001` to `PR841-005`: 4 VERIFIED, 1 GAP). Run 1 did not write them.
+`check-run-record.mjs` (c9) compares this table with the live ledger, so it holds the
+current counts:
+
 | Status | Count |
 | --- | ---: |
-| VERIFIED | 12 |
+| VERIFIED | 16 |
 | JUSTIFIED | 1 |
-| GAP | 13 |
+| GAP | 14 |
 | CONFLICT sidecars | 1 |
-| **Total entries** | **26** |
+| **Total entries** | **31** |
 
 One cross-engine conflict IS recorded, on GP567-025 — see "Round 3" below. The
 sidecar exists so a disagreement sits *beside* the original claim instead of
