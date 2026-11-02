@@ -13,6 +13,7 @@ const state = vi.hoisted(() => ({
   existing: null as { id: string; status: string } | null,
   completedPrereq: false,
   created: 0,
+  lastGated: undefined as boolean | undefined,
 }));
 
 vi.mock('@/lib/server/lms-user-sync', () => ({ ensureLmsUserFromClaims: vi.fn(async () => {}) }));
@@ -34,8 +35,9 @@ vi.mock('@/lib/prisma', () => ({
       findUnique: vi.fn(async () => state.existing),
       findMany: vi.fn(async () => (state.completedPrereq ? [{ courseId: 'crs-l2' }] : [])),
       update: vi.fn(async () => ({})),
-      create: vi.fn(async (args: { data: { id: string } }) => {
+      create: vi.fn(async (args: { data: { id: string; prerequisiteGated?: boolean } }) => {
         state.created += 1;
+        state.lastGated = args.data.prerequisiteGated;
         return { id: args.data.id };
       }),
     },
@@ -52,6 +54,7 @@ beforeEach(() => {
   state.existing = null;
   state.completedPrereq = false;
   state.created = 0;
+  state.lastGated = undefined;
 });
 
 describe('enrollStudentInCourse — prerequisite gate', () => {
@@ -85,12 +88,42 @@ describe('enrollStudentInCourse — prerequisite gate', () => {
     expect(res).toMatchObject({ courseId: 'crs-mould' });
   });
 
-  it('never refuses a Stripe-paid fulfilment (logs instead)', async () => {
+  it('never refuses a Stripe-paid fulfilment, but issues it locked (logs too)', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const res = await enrollStudentInCourse(student, 'mould-remediation-fundamentals', 'cs_paid_123');
     expect(res).toMatchObject({ courseId: 'crs-mould' });
+    expect(state.lastGated).toBe(true);
     expect(warn).toHaveBeenCalled();
     warn.mockRestore();
+  });
+
+  it('a team seat without the prerequisite is issued LOCKED, not skipped', async () => {
+    const res = await enrollStudentInCourse(student, 'mould-remediation-fundamentals', 'team:t1', {
+      onPrerequisiteNotMet: 'lock',
+    });
+    expect(res).toMatchObject({ courseId: 'crs-mould' });
+    expect(state.created).toBe(1);
+    expect(state.lastGated).toBe(true);
+  });
+
+  it('a team seat for a member who has the prerequisite is issued unlocked', async () => {
+    state.completedPrereq = true;
+    await enrollStudentInCourse(student, 'mould-remediation-fundamentals', 'team:t1', {
+      onPrerequisiteNotMet: 'lock',
+    });
+    expect(state.lastGated).toBe(false);
+  });
+
+  it('an admin team seat is issued unlocked', async () => {
+    await enrollStudentInCourse(admin, 'mould-remediation-fundamentals', 'team:t1', {
+      onPrerequisiteNotMet: 'lock',
+    });
+    expect(state.lastGated).toBe(false);
+  });
+
+  it('without the lock option a team reference is still refused (no silent widening)', async () => {
+    await expect(enrollStudentInCourse(student, 'mould-remediation-fundamentals', 'team-seat:t1'))
+      .rejects.toBeInstanceOf(PrerequisiteNotMetError);
   });
 
   it('an existing active enrolment is grandfathered (already_enrolled, no re-check)', async () => {

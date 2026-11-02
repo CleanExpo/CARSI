@@ -14,6 +14,12 @@ interface TeamMember {
   role: string;
   email: string;
   full_name: string | null;
+  /** Seats still locked until this member completes a course prerequisite (DECISIONS #41). */
+  waiting_on_prerequisite?: {
+    course_slug: string;
+    course_title: string;
+    prerequisites: { slug: string; title: string }[];
+  }[];
 }
 
 interface PendingInvite {
@@ -723,9 +729,23 @@ function TeamDashboardPage() {
         <h2 className="text-sm font-semibold text-slate-900">Members</h2>
         <ul className="mt-3 divide-y divide-slate-200">
           {(team.members ?? []).map((m) => (
-            <li key={m.user_id} className="flex justify-between py-2 text-sm">
-              <span className="text-slate-800">{m.full_name || m.email}</span>
-              <span className="text-slate-500 capitalize">{m.role}</span>
+            <li key={m.user_id} className="py-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-slate-800">{m.full_name || m.email}</span>
+                <span className="text-slate-500 capitalize">{m.role}</span>
+              </div>
+              {(m.waiting_on_prerequisite ?? []).map((w) => (
+                <p
+                  key={w.course_slug}
+                  data-testid="member-waiting-on-prerequisite"
+                  className="mt-1 text-xs text-amber-800"
+                >
+                  {w.course_title}: locked until they complete{' '}
+                  {w.prerequisites.length > 0
+                    ? w.prerequisites.map((p) => p.title).join(' and ')
+                    : 'its prerequisite'}
+                </p>
+              ))}
             </li>
           ))}
         </ul>

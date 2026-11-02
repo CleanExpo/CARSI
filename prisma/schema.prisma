@@ -350,6 +350,11 @@ model LmsEnrollment {
   /// retried/late webhook can't overwrite a newer decision. Null for rows never
   /// touched by a reversal event (the guard then treats them as unconstrained).
   statusEventAt        DateTime? @map("status_event_at") @db.Timestamptz(6)
+  /// Issued while the course prerequisite was NOT met (a team seat assigned to a member
+  /// without it, or a team buyer's own seat), so the course stays locked for this learner
+  /// until they complete it (DECISIONS #41, founder 02/11/2026). The read-time gate never
+  /// grandfathers a row with this set, whatever the course's prerequisitesEnforcedFrom.
+  prerequisiteGated    Boolean   @default(false) @map("prerequisite_gated")
 
   student            LmsUser                @relation("EnrollmentStudent", fields: [studentId], references: [id], onDelete: Cascade)
   course             LmsCourse              @relation(fields: [courseId], references: [id], onDelete: Cascade)

@@ -168,6 +168,31 @@ describe('checkout — prerequisite gate', () => {
     expect(mocks.createStripe).not.toHaveBeenCalled();
   });
 
+  // Founder decision 02/11/2026: anyone may buy team seats; each seat stays locked.
+  it('a manager WITHOUT the prerequisite can check out in team mode (no buyer gate)', async () => {
+    const res = await POST(request(true, { purchase_mode: 'team', team_seat_count: 3 }));
+    expect(res.status).toBe(200);
+    expect(mocks.createStripe).toHaveBeenCalledWith(
+      expect.objectContaining({ purchase_mode: 'team', quantity: 3, student_id: 'stu' }),
+    );
+    // The buyer's completion is not even looked up for a team purchase.
+    expect(mocks.completed).not.toHaveBeenCalled();
+  });
+
+  it('an individual without the prerequisite is still blocked (self mode explicit)', async () => {
+    const res = await POST(request(true, { purchase_mode: 'self' }));
+    expect(res.status).toBe(403);
+    expect(mocks.createStripe).not.toHaveBeenCalled();
+  });
+
+  it('a team purchase still needs a signed-in buyer (401 for a guest)', async () => {
+    const res = await POST(request(false, { purchase_mode: 'team', team_seat_count: 3 }));
+    const body = (await res.json()) as { code?: string };
+    expect(res.status).toBe(401);
+    expect(body.code).toBe('prerequisite_sign_in_required');
+    expect(mocks.createStripe).not.toHaveBeenCalled();
+  });
+
   it('a team purchase fails closed (503) when the course row cannot be loaded', async () => {
     mocks.dbCourse.mockRejectedValue(new Error('db down'));
     const res = await POST(request(true, { purchase_mode: 'team', team_seat_count: 3 }));

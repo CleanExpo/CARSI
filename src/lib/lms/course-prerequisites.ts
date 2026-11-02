@@ -35,6 +35,15 @@
  *     and record access), and an enrolment an admin created (`admin:` payment reference)
  *     is the explicit per-learner admin override.
  *
+ * LOCKED SEATS (founder decision 02/11/2026) — anyone may buy TEAM seats for a course with a
+ * prerequisite; each staff member's own seat stays locked until they complete it. Such a seat
+ * is issued with `lms_enrollments.prerequisite_gated = true` (team seat assignment, invite
+ * acceptance, the team buyer's own seat, and any Stripe-paid fulfilment that reaches
+ * enrolment with the prerequisite unmet). A gated row is NEVER grandfathered — neither by a
+ * missing `prerequisitesEnforcedFrom` nor by an early `enrolledAt` — so only completing the
+ * prerequisite (or an admin) unlocks it. Existing rows default to `false` and keep the
+ * grandfathering above unchanged.
+ *
  * Pure and dependency-free (no Prisma) so it is unit-testable anywhere; the server
  * adapter that loads the facts is `src/lib/server/course-prerequisites.ts`.
  */
@@ -134,6 +143,11 @@ export type ExistingEnrolmentFacts = {
   status: string | null;
   enrolledAt: Date | null;
   paymentReference: string | null;
+  /**
+   * `lms_enrollments.prerequisite_gated`: the row was issued while the prerequisite was NOT
+   * met (a team seat, or a team buyer's own seat). Such a row is never grandfathered.
+   */
+  prerequisiteGated?: boolean | null;
 };
 
 export type PrerequisiteFacts = {
@@ -191,10 +205,15 @@ export function decidePrerequisiteAccess(input: PrerequisiteDecisionInput): Prer
     if ((enrolment.status ?? '').trim().toLowerCase() === 'completed') {
       return { allowed: true, reason: 'course-completed' };
     }
-    if (!parsed.enforcedFrom) return { allowed: true, reason: 'grandfathered' };
-    // An unknown enrolment date cannot prove it post-dates the gate: grandfather it.
-    if (!enrolment.enrolledAt || enrolment.enrolledAt.getTime() < parsed.enforcedFrom.getTime()) {
-      return { allowed: true, reason: 'grandfathered' };
+    // A seat issued locked (team seat / team buyer without the prerequisite) is NEVER
+    // grandfathered: it was created knowing the prerequisite was unmet, so only the facts
+    // below (prerequisite completed) unlock it, whatever `prerequisitesEnforcedFrom` says.
+    if (enrolment.prerequisiteGated !== true) {
+      if (!parsed.enforcedFrom) return { allowed: true, reason: 'grandfathered' };
+      // An unknown enrolment date cannot prove it post-dates the gate: grandfather it.
+      if (!enrolment.enrolledAt || enrolment.enrolledAt.getTime() < parsed.enforcedFrom.getTime()) {
+        return { allowed: true, reason: 'grandfathered' };
+      }
     }
   }
 

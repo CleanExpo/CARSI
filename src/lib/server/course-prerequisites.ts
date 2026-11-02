@@ -167,7 +167,7 @@ export async function findEnrolledCoursePrerequisiteBlock(params: {
 
   const enrolment = await prisma.lmsEnrollment.findUnique({
     where: { studentId_courseId: { studentId: params.userId, courseId: params.courseId } },
-    select: { status: true, enrolledAt: true, paymentReference: true },
+    select: { status: true, enrolledAt: true, paymentReference: true, prerequisiteGated: true },
   });
   return findCoursePrerequisiteBlock({
     userId: params.userId,
@@ -248,6 +248,57 @@ export async function filterCoursesPassingPrerequisites(params: {
     if (!block) allowed.add(courseId);
   }
   return allowed;
+}
+
+export type PrerequisiteLockedSeat = {
+  course_slug: string;
+  course_title: string;
+  /** Prerequisite courses this member still has to complete. */
+  prerequisites: (PrerequisiteCourseLink & { href: string })[];
+};
+
+/**
+ * Team manager view: which members hold a seat that is still LOCKED by a prerequisite
+ * (`prerequisite_gated` rows not yet unlocked by completing it). Only gated, live rows are
+ * examined, so a team with no locked seats costs one query. Members are evaluated as
+ * non-admins: this reports the seat's lock, not what an admin viewer could open.
+ */
+export async function listPrerequisiteLockedSeats(
+  userIds: readonly string[],
+): Promise<Map<string, PrerequisiteLockedSeat[]>> {
+  const out = new Map<string, PrerequisiteLockedSeat[]>();
+  const ids = [...new Set(userIds)];
+  if (ids.length === 0) return out;
+  const rows = await prisma.lmsEnrollment.findMany({
+    where: {
+      studentId: { in: ids },
+      prerequisiteGated: true,
+      // Only a live, not-yet-completed seat can be waiting (completed is always allowed).
+      status: 'active',
+    },
+    select: {
+      studentId: true,
+      status: true,
+      enrolledAt: true,
+      paymentReference: true,
+      prerequisiteGated: true,
+      course: { select: { slug: true, title: true, meta: true } },
+    },
+    take: 500,
+  });
+  for (const r of rows) {
+    const block = await findCoursePrerequisiteBlock({
+      userId: r.studentId,
+      isAdmin: false,
+      course: { slug: r.course.slug, meta: r.course.meta },
+      enrolment: r,
+    });
+    if (!block) continue;
+    const list = out.get(r.studentId) ?? [];
+    list.push({ course_slug: r.course.slug, course_title: r.course.title, prerequisites: block.prerequisites });
+    out.set(r.studentId, list);
+  }
+  return out;
 }
 
 /** Prerequisite courses (slug + title) for display on the public course page. */
