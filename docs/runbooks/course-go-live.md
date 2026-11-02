@@ -83,6 +83,34 @@ re-checks banned branding the next morning.
 | CARSI Mould Remediation Practitioner | `mould-remediation-fundamentals` | Being rebuilt as the **designation wrapper for Level 2** (founder 2026-11-02): Level 2 is the prerequisite, and this course adds the whole-job case studies, the practical assessment and the designation exam. | Same path as the Water course. |
 | WHS Fundamentals for Restoration and Cleaning Professionals | `whs-fundamentals-for-restoration-and-cleaning-professionals` | Written by an Australian registered trainer about three years ago and not updated since. | A dated currency review against current Safe Work Australia model laws and state regulators. Phill signs off the changes. Then a PR, then the seed. |
 
+## Unlink intro videos (DECISIONS #46, 2026-11-02)
+
+The intro videos of these 6 courses still speak an unapproved "CEC-accredited" claim. Remove them
+from the live courses until they are re-rendered. This edits only `meta`, so no learner progress is
+touched and no re-seed is needed.
+
+```sql
+-- 1. Read-only: confirm what is live
+SELECT slug, is_published, meta->>'introVideoUrl' AS intro_video
+FROM lms_courses
+WHERE slug IN ('mould-remediation-fundamentals','structural-drying-fundamentals',
+  'category-3-sewage-black-water-remediation','fire-smoke-damage-restoration-fundamentals',
+  'trauma-crime-scene-decontamination-fundamentals','assessing-indoor-environment-conditions');
+
+-- 2. Unlink (run inside a transaction; expect at most 6 rows)
+BEGIN;
+UPDATE lms_courses
+SET meta = (meta::jsonb - 'introVideoUrl' - 'introCaptionsUrl')
+WHERE slug IN ('mould-remediation-fundamentals','structural-drying-fundamentals',
+  'category-3-sewage-black-water-remediation','fire-smoke-damage-restoration-fundamentals',
+  'trauma-crime-scene-decontamination-fundamentals','assessing-indoor-environment-conditions')
+  AND meta ? 'introVideoUrl';
+-- check the row count, then:
+COMMIT;
+```
+
+Then reload each live course page and confirm the intro video is gone. Send Phill the row counts.
+
 ## Rollback
 
 There is no undo for the progress deletion: that is why the preflight blocks it. For everything

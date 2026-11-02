@@ -36,7 +36,8 @@
       "summary": "The Southern Hemisphere credential for professional mould remediation — mould biology and health, Condition 1/2/3 assessment, containment, the correct remediation sequence, PPE by condition and verification.",
       "pathwaySteps": [
         { "courseSlug": "asbestos-awareness-for-restoration-technicians", "order": 1, "required": false, "role": "foundation" },
-        { "courseSlug": "mould-remediation-fundamentals", "order": 2, "required": true, "role": "credential" }
+        { "courseSlug": "level-2-mould-remediation-30ee3492", "order": 2, "required": true, "role": "foundation" },
+        { "courseSlug": "mould-remediation-fundamentals", "order": 3, "required": true, "role": "credential" }
       ],
       "completionRule": "all-required",
       "alsoEarnsCec": true

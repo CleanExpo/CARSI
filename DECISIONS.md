@@ -129,3 +129,16 @@ where a safe fallback exists, the deadline should do something rather than pass 
 | 40 | The 6 intro videos still speaking an unapproved "CEC-accredited" claim | **Re-render all 6** from the corrected scripts. Swapping the new URLs into live courses is a seed step. |
 | 41 | Course prerequisites | **Build enforcement.** A course with a prerequisite (first case: Mould Remediation Practitioner requires Level 2 Mould) is locked until the prerequisite is completed. |
 | 42 | Answer-position skew in the 6 seed quizzes | **Rebalance all 6, including Ozone.** Options are rotated only; no wording changes, so Ozone's `noAiRewrite` text is untouched. |
+
+## Decided 2026-11-02 — third walkthrough with Phill
+
+| # | Decision | Outcome |
+| --- | --- | --- |
+| 43 | Duration of the Trauma & Biohazard and Fire & Smoke rebuilds | **Keep 4 hours and add material** so that at least half the stated time is evidenced (Course Standard v1 floor). Price unchanged. |
+| 44 | Designation pass mark | **80% across the board**: module checks, final designation exam and practical assessment, for every CARSI designation course. |
+| 45 | Psychrometry for the Structural Drying designation | **Stays optional** (a recommended foundation, not a locked prerequisite). |
+| 46 | The 6 intro videos still speaking an unapproved "CEC-accredited" claim | **Unlink them now.** Repo: `meta.introVideoUrl` removed for the 6 slugs. Live: Rana runs the read-and-update in `docs/runbooks/course-go-live.md` § "Unlink intro videos". Re-add after HeyGen is fixed and the re-render succeeds (#40). |
+| 47 | How Phill reviews the open SME claims | **An interactive checklist page per course** (OK / Fix / Cut plus notes, saved). Agents read the answers back and update each course and ledger. |
+| 48 | First course to go live | **CARSI Water Restoration Practitioner.** Its checklist is first. |
+| 49 | Team purchases of a course with a prerequisite | **Anyone may buy team seats**; each staff member's own seat stays locked until they complete the prerequisite. |
+| 50 | Mould Remediation Practitioner pathway | **Level 2 Mould added as a required step** in `data/seed/designations.json`, matching the prerequisite lock (#41). |
