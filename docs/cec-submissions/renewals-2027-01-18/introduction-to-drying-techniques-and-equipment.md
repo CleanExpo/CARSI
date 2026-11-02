@@ -31,7 +31,7 @@ Prepared 2 November 2026 for submission to **CECCourse@iicrcnet.org**.
 
 ## 5. Instructor
 
-- TBC — founder to nominate the delivering instructor (catalogue lists the system instructor)
+- Phill McGurk, CARSI founder (nominated 2 November 2026, DECISIONS #36)
 
 ## 6. Point of contact
 

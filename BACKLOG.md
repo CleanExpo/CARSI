@@ -993,7 +993,7 @@ production-database credential):
 CodeRabbit (#974) found that 19 of 20 final-exam answers in the Mould Practitioner draft sat at the
 same option. Nothing shuffles options at runtime: the grader compares the stored `correctIndex`, so
 a learner can pass by always picking one letter. The Mould and Water v1 drafts are now balanced
-(#974, #976). The same skew is in seed quizzes still to fix:
+(#974, #976). **The 6 seed quizzes below were rebalanced on 2026-11-02 (DECISIONS #42; options rotated only, every correct answer asserted unchanged). They change on the live site only after a quiz re-seed.** The skew was:
 - `floor-care-quizzes.json`: 32 of 34 at one position.
 - `category-3-sewage-black-water-remediation-quiz.json`: 8 of 10.
 - `mould-remediation-fundamentals-quiz.json`: 8 of 10.

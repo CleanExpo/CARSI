@@ -48,6 +48,20 @@ edit is saved.
   frame within the **Australian regulatory context**, never as US-only.
 - AU terminology: GPO, RCD/safety switch, tag-and-test, SWMS, JSEA, site induction, White Card.
 
+### 5a. New Zealand — every course covers AU + NZ (MUST, founder 2026-11-02, DECISIONS #35)
+- CARSI courses serve **Australia and New Zealand**. Wherever NZ law, regulators or thresholds
+  differ, state the NZ position alongside the Australian one: the **Health and Safety at Work Act
+  2015 (HSWA)** and its regulations, **WorkSafe New Zealand**, NZ Workplace Exposure Standards,
+  **EPA NZ** (hazardous substances), and NZ notifiable-event duties. Where nothing differs (AS/NZS
+  standards, 230 V/50 Hz, metric), one statement covers both.
+- Verify each NZ fact against a primary NZ source (worksafe.govt.nz, legislation.govt.nz,
+  epa.govt.nz) and log it in the evidence ledger. An unverified NZ claim is cut or worded as
+  "check WorkSafe NZ", never guessed from the Australian position.
+- New builds include NZ from the start. Existing courses gain NZ coverage when they are rebuilt or
+  currency-reviewed. Pricing stays AUD.
+- Do not frame content around the US ("not OSHA", "US→AU translation"). State the AU/NZ position
+  directly.
+
 ### 6. Market context — Australian
 - **AUD** pricing (note "inc GST" where relevant), Australian climate/seasons, Australian job types,
   Australian facilities (schools, childcare, aged care, strata), Australian examples and place names.

@@ -26,12 +26,12 @@
         {
           "questionText": "What is the professional restoration role in this campaign?",
           "options": [
+            "Support documentation, worker safety planning, cleaning records and client communication within scope.",
             "Diagnose avian influenza.",
             "Replace government biosecurity teams.",
-            "Support documentation, worker safety planning, cleaning records and client communication within scope.",
             "Certify infected premises as disease-free."
           ],
-          "correctIndex": 2,
+          "correctIndex": 0,
           "points": 1,
           "sourceRef": "docs/campaigns/avian-influenza/course/quiz-bank.md Q2"
         },
@@ -40,10 +40,10 @@
           "options": [
             "Dry fogging is required by the Australian Government for H5 bird flu.",
             "Halosil kills Australian H5 in all field conditions.",
-            "Product use must follow label, SDS, regulator position, evidence and authority directions.",
-            "NeoSan is approved for every avian influenza job without review."
+            "NeoSan is approved for every avian influenza job without review.",
+            "Product use must follow label, SDS, regulator position, evidence and authority directions."
           ],
-          "correctIndex": 2,
+          "correctIndex": 3,
           "points": 1,
           "sourceRef": "docs/campaigns/avian-influenza/course/quiz-bank.md Q3"
         },
@@ -74,12 +74,12 @@
         {
           "questionText": "What should a professional do if asked to remove a sick or dead wild bird?",
           "options": [
+            "Confirm authority direction and stay within training, authorisation and scope.",
             "Accept immediately.",
             "Ask the client to move it first.",
-            "Confirm authority direction and stay within training, authorisation and scope.",
             "Use any available PPE and remove it."
           ],
-          "correctIndex": 2,
+          "correctIndex": 0,
           "points": 1,
           "sourceRef": "docs/campaigns/avian-influenza/course/quiz-bank.md Q6"
         },
@@ -88,10 +88,10 @@
           "options": [
             "It improves trust.",
             "It reduces the need for sources.",
-            "It can mislead the public and damage credibility.",
-            "It guarantees rankings."
+            "It guarantees rankings.",
+            "It can mislead the public and damage credibility."
           ],
-          "correctIndex": 2,
+          "correctIndex": 3,
           "points": 1,
           "sourceRef": "docs/campaigns/avian-influenza/course/quiz-bank.md Q7"
         },
@@ -111,23 +111,23 @@
           "questionText": "What is the role of RestoreAssist.app in the course?",
           "options": [
             "Diagnose disease.",
-            "Replace government reporting.",
             "Provide structured field documentation for photos, notes, PPE records, cleaning records and limitations.",
+            "Replace government reporting.",
             "Certify regulatory compliance automatically."
           ],
-          "correctIndex": 2,
+          "correctIndex": 1,
           "points": 1,
           "sourceRef": "docs/campaigns/avian-influenza/course/quiz-bank.md Q9"
         },
         {
           "questionText": "Which source layer should be checked before publishing updated course content?",
           "options": [
-            "Social comments only.",
             "Australian Government, Australian CDC, Animal Health Australia and relevant state/territory guidance.",
+            "Social comments only.",
             "A contractor's opinion.",
             "Product marketing only."
           ],
-          "correctIndex": 1,
+          "correctIndex": 0,
           "points": 1,
           "sourceRef": "docs/campaigns/avian-influenza/course/quiz-bank.md Q10"
         }

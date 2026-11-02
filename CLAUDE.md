@@ -48,6 +48,9 @@ in Australia** in 240 V form (with a dated availability check), **AS/NZS + Safe 
 standards (IICRC framed in the AU context), and **AUD** pricing. US/UK spelling, voltages, or
 US-only products are defects — fix before publish. Full standard + checklist:
 `.claude/skills/carsi-course-production/SKILL.md` (invoke it for any course work).
+**Every course also covers New Zealand** (founder 2026-11-02, DECISIONS #35): where NZ law,
+regulators or thresholds differ (HSWA 2015, WorkSafe NZ, NZ WES, EPA NZ), state the NZ position
+alongside the Australian one, verified against a primary NZ source. No US framing.
 
 ## IICRC CEC terminology — licence-critical (MUST)
 

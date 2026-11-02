@@ -17,8 +17,8 @@ carsi.com.au** (CARSI's own published wording) on 02/11/2026.
 
 | Packs | State | What you need to do |
 | --- | --- | --- |
-| 12 | Summary and module outline filled from the live page | Nominate the **instructor** (section 5 says TBC in every pack) and review the flags below. |
-| 4 | **The live page returned "Course Not Found"**: `introduction-to-drying-techniques-and-equipment`, `introduction-to-mould-identification-and-remediation`, `introduction-to-porous-materials-drying`, `introduction-to-psychrometry-and-the-drying-process` | First check these courses still exist and are published. They hold a CEC approval but may be unpublished or renamed. If they are live, supply the summary and outline (or ask Rana for an LMS export). If they are retired, don't renew them. |
+| 12 | Summary and module outline filled from the live page | Instructor is named (Phill McGurk, DECISIONS #36). Review the flags below. |
+| 4 | **The live page returned "Course Not Found"**: `introduction-to-drying-techniques-and-equipment`, `introduction-to-mould-identification-and-remediation`, `introduction-to-porous-materials-drying`, `introduction-to-psychrometry-and-the-drying-process` | First check these courses still exist and are published. They hold a CEC approval but may be unpublished or renamed. If they are live, supply the summary and outline (or ask Rana for an LMS export). If they are retired, don't renew them. **Phill decided 2 November 2026 to renew all 4 (DECISIONS #37):** Rana locates them in the production database (preflight query below) so their summaries and outlines can be filled. |
 
 ## Flags to review before you send
 
@@ -31,12 +31,25 @@ carsi.com.au** (CARSI's own published wording) on 02/11/2026.
   insurance requirements". That is a loose IICRC reference you may want to reword.
 - Several summaries say the content is "aligned with the IICRC S500 standard". Citing a standard
   nominatively like this is allowed.
-- **Instructor:** every pack has `TBC`. The IICRC asks for the delivering instructor.
+- **Instructor:** Phill McGurk in every pack (DECISIONS #36).
 
 ## Send checklist (per course)
 
-- [ ] Instructor named (section 5)
+- [x] Instructor named (section 5)
 - [ ] Summary and outline read and correct
 - [ ] Sent to `CECCourse@iicrcnet.org` (date: ____)
 - [ ] IICRC renewal confirmed, then a new `expiresAt` recorded in `data/seed/cec-approvals.json`
       (ask an agent; `npm run check:cec` validates it)
+
+## For Rana: locate the 4 courses not found on the live site (read-only)
+
+```sql
+SELECT slug, title, status, is_published
+FROM lms_courses
+WHERE slug ILIKE '%drying-techniques%' OR slug ILIKE '%mould-identification%'
+   OR slug ILIKE '%porous-materials%' OR slug ILIKE '%psychrometry%'
+   OR title ILIKE '%psychrometry%' OR title ILIKE '%porous%';
+```
+
+Send Phill the rows (slug, title, status). If a course exists but is unpublished, its curriculum can be
+exported for the pack; do not publish it as part of the renewal.
