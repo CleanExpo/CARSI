@@ -9,7 +9,7 @@
 - **Proposed slug:** `commercial-floor-care-schools-childcare`
 - **Working title:** Commercial Floor Care for Schools & Childcare Contracts
 - **Domain:** Commercial cleaning (floor care) — carpet, tile & grout, vinyl strip & seal, pressure washing.
-- **IICRC discipline:** Not a core restoration discipline. Closest certification is **CCT (Carpet Cleaning Technician)** for the carpet module; the rest is general commercial floor care + WHS/contract practice. **CEC relevance: low/none** — position as professional development & contract-readiness, **not** as an IICRC-accredited CEC course (no overclaiming).
+- **IICRC discipline:** Not a core restoration discipline. Closest certification is **CCT (Carpet Cleaning Technician)** for the carpet module; the rest is general commercial floor care + WHS/contract practice. **CEC relevance: low/none** — position as professional development & contract-readiness, **not** as an IICRC CEC Accredited course (it is not IICRC CEC accredited; no overclaiming).
 - **Duplication check:** No existing CARSI course covers commercial floor care, schools, or childcare (the catalogue is restoration/air-quality/drying). Clear differentiator — no duplicate.
 
 ## Learner frame
