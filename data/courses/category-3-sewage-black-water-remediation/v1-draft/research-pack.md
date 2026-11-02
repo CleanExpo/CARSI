@@ -185,8 +185,8 @@ figures.
   disinfectants (listed if they make a specific claim such as virucidal), and some sanitisers sit with the APVMA.
 - The old copy's "plumbing interfaces with AS/NZS 3500" was cut: no source opened, and New Zealand plumbing
   compliance runs through its Building Code. Licensed-plumbing duty is stated instead.
-- The old 80 % pass mark on the single knowledge check became 70 % across all checks and the exam, matching the
-  Water and Mould v1 drafts. Phill to confirm.
+- The pass mark is 80 % across all module checks, the practical task and the final exam (founder decision,
+  02/11/2026: 80 % across the board for every CARSI designation course).
 
 ## Licence and production guardrails honoured
 

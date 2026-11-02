@@ -8,7 +8,7 @@
       "quizId": "a7fd12fc-033d-4929-a4be-13602dcd7ec7",
       "lessonTitle": "Module 1 check",
       "title": "CARSI Contaminated-Water Practitioner — Module 1 check",
-      "passPercentage": 70,
+      "passPercentage": 80,
       "attemptsAllowed": 3,
       "questions": [
         {
@@ -89,7 +89,7 @@
       "quizId": "bf005d70-1a78-4b4f-a50d-9da5c9d22d87",
       "lessonTitle": "Module 2 check",
       "title": "CARSI Contaminated-Water Practitioner — Module 2 check",
-      "passPercentage": 70,
+      "passPercentage": 80,
       "attemptsAllowed": 3,
       "questions": [
         {
@@ -170,7 +170,7 @@
       "quizId": "3b3cc3f6-41d7-4f50-a902-83f091e0de00",
       "lessonTitle": "Module 3 check",
       "title": "CARSI Contaminated-Water Practitioner — Module 3 check",
-      "passPercentage": 70,
+      "passPercentage": 80,
       "attemptsAllowed": 3,
       "questions": [
         {
@@ -251,7 +251,7 @@
       "quizId": "bc61020d-d52b-4e49-a50c-4e86a738dbe6",
       "lessonTitle": "Module 4 check",
       "title": "CARSI Contaminated-Water Practitioner — Module 4 check",
-      "passPercentage": 70,
+      "passPercentage": 80,
       "attemptsAllowed": 3,
       "questions": [
         {
@@ -368,7 +368,7 @@
       "quizId": "3db35e71-461f-4d25-a05c-d0295d958a4a",
       "lessonTitle": "Module 5 check",
       "title": "CARSI Contaminated-Water Practitioner — Module 5 check",
-      "passPercentage": 70,
+      "passPercentage": 80,
       "attemptsAllowed": 3,
       "questions": [
         {
@@ -449,7 +449,7 @@
       "quizId": "16de62ef-c97b-44c2-aec0-bad66d66d0db",
       "lessonTitle": "Module 6 check",
       "title": "CARSI Contaminated-Water Practitioner — Module 6 check",
-      "passPercentage": 70,
+      "passPercentage": 80,
       "attemptsAllowed": 3,
       "questions": [
         {
@@ -566,7 +566,7 @@
       "quizId": "5d902f10-d8c0-47ad-a1df-ba2cb5d0805c",
       "lessonTitle": "Final designation exam",
       "title": "CARSI Contaminated-Water Practitioner — Final designation exam",
-      "passPercentage": 70,
+      "passPercentage": 80,
       "attemptsAllowed": 3,
       "questions": [
         {

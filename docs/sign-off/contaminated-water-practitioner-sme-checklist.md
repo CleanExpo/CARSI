@@ -1,6 +1,6 @@
 # SME claim checklist — CARSI Contaminated-Water Practitioner
 
-**For:** Phill (SME, DECISIONS #24) · **Generated:** 02/11/2026 from `data/courses/category-3-sewage-black-water-remediation/v1-draft/evidence/evidence-ledger.jsonl` · **Ledger:** 167 claims: 108 VERIFIED, 16 JUSTIFIED, **43 GAP (listed below)**.
+**For:** Phill (SME, DECISIONS #24) · **Generated:** 02/11/2026 from `data/courses/category-3-sewage-black-water-remediation/v1-draft/evidence/evidence-ledger.jsonl` · **Ledger:** 168 claims: 109 VERIFIED, 16 JUSTIFIED, **43 GAP (listed below)**.
 
 Only the GAP claims need you. VERIFIED and JUSTIFIED claims already carry a source. Tick one box per claim:
 

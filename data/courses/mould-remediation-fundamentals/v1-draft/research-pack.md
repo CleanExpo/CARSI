@@ -68,7 +68,7 @@ licensed S520"`**, which the validator accepts and ignores. Filter on it to buil
 | MRP-003 | Phill (SME) — licensed S520 | The scope-to-sign-off job sequence matches the standard as taught in Level 2 | substantiate |
 | MRP-004 | Phill (SME) — licensed S520 | Verification before containment comes down; tolerance and hold period for "at the reference" | substantiate |
 | MRP-005 | Phill (SME) — licensed S520 | Containment and negative air before removal and before any air moves across visible growth | substantiate |
-| MRP-006 | founder | Designation rules (Level 2 + practical 70% + final 80%) and Practitioner-tier placement need a published CARSI source | substantiate |
+| MRP-006 | founder | Designation rules (Level 2 + practical 80% + final 80%) and Practitioner-tier placement need a published CARSI source | substantiate |
 | MRP-027 | SME | Fit check each time a tight-fitting respirator goes on (SafeWork SA sentence not in the extract read) | substantiate |
 | MRP-037 | SME | The six failure patterns as the common causes of callbacks (illustrative composite, no data) | substantiate or soften |
 | MRP-038 | SME | Contemporaneous records are stronger evidence; acceptance is for the reviewing body | substantiate |
@@ -119,7 +119,7 @@ Practitioner · schematic, not to scale"). Australian English and metric units t
 
 | File | Lesson | What it shows | Labels | Units |
 | --- | --- | --- | --- | --- |
-| `practitioner-designation-pathway.svg` | 1.1 | Left-to-right pathway: Level 2 completed → 4 case-study modules → practical task → final exam → designation; small tier strip below | "CARSI Level 2 Mould Remediation (prerequisite)", "Modules 1–4", "Practical task — pass 70%", "Final designation exam — pass 80%", "CARSI Mould Remediation Practitioner"; tier strip "Foundation → Practitioner → Advanced → Master" with Practitioner highlighted | % |
+| `practitioner-designation-pathway.svg` | 1.1 | Left-to-right pathway: Level 2 completed → 4 case-study modules → practical task → final exam → designation; small tier strip below | "CARSI Level 2 Mould Remediation (prerequisite)", "Modules 1–4", "Practical task — pass 80%", "Final designation exam — pass 80%", "CARSI Mould Remediation Practitioner"; tier strip "Foundation → Practitioner → Advanced → Master" with Practitioner highlighted | % |
 | `scope-to-signoff-timeline.svg` | 1.2 | Ten-day timeline of the Toowoomba job, one band per stage with the evidence recorded beneath | Day 1 Scope, Day 2 Plan, Days 3–4 Fix and contain, Days 4–5 Remove and clean, Days 5–9 Dry, Day 9 Verify, Day 10 Hand over; evidence chips "1.64 m²", "17.28 m³", "≈23 ACH", "6.3 A at 230 V", "$2,145.00 inc GST" | m², m³, ACH, A, V, AUD |
 | `three-room-decision.svg` | 2.1 | Floor plan of a Newcastle unit (bathroom, bedroom, kitchen) with an evidence panel per room and the recorded decision | Panels "See / Measure / Connects / Smell / Decision"; bathroom "0.96 m² growth"; bedroom "wall 15 °C, room 21 °C 65 %RH → surface ≈95 %RH", "0.66 m² behind wardrobe"; kitchen "comparison area"; total "1.62 m²". Decision boxes say "Decision (Level 2 terms)" — no standard definitions | °C, %RH, m² |
 | `six-common-failures.svg` | 2.2 | Six cards in a 3 x 2 grid, each: failure, what the file showed, the Level 2 lesson that covers it | Cause not fixed; Porous material kept ("86 h > 48 h"); Air moved before containment; Dust left; Rebuilt wet ("4.1 g/kg above the house"); No record | h, g/kg |
@@ -146,7 +146,7 @@ short by design. Founder question below.
 3. **Storefront `level` field** is still "Foundational" (kept from the live entry). With a Level 2
    prerequisite that reads wrong; the allowed values are a storefront decision.
 4. **Practitioner tier placement** (GAP MRP-006): confirm this designation is the Practitioner
-   tier, and publish the designation rules (Level 2 + practical 70% + final exam 80%).
+   tier, and publish the designation rules (Level 2 + practical 80% + final exam 80%).
 5. **the unapproved CEC-accreditation wording in the live seed.** The phrase appears in the live entry for this
    course and in 12 other seed entries (including published `water-damage-essentials` and
    `ccw-carsi-truckmount-operations`), none of which is in `cec-approvals.json`. The guards pass it,

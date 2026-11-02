@@ -7,7 +7,7 @@
   "assessment": {
     "id": "TBD-generate-a-uuid",
     "title": "CARSI Water Restoration Practitioner — Practical task: plan and evidence a Category 2 water loss",
-    "passThreshold": 70,
+    "passThreshold": 80,
     "isPublished": false,
     "instructions": "[AUTHOR: the practical brief. Give a real or supplied Australian water-loss job (place, building, category/class, materials, occupant context, 230 V power reality) and list exactly what the learner submits as evidence — e.g. moisture map + dry goal, category/class call with reasoning, hazard-led PPE/SWMS, drying plan with equipment power budget, defensible job file. Mirror the depth of the Level-2 Mould task. Not yet written.]",
     "criteria": [
