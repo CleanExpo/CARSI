@@ -1,8 +1,7 @@
-import { ArrowRight } from 'lucide-react';
-import Link from 'next/link';
 import { Suspense } from 'react';
 
 import { BusinessCoachingBooking } from '@/components/marketing/BusinessCoachingBooking';
+import { BusinessOffersCompare } from '@/components/marketing/BusinessOffersCompare';
 import { MarketingPageShell } from '@/components/marketing/MarketingPageShell';
 import {
   businessCoachingProductName,
@@ -11,7 +10,7 @@ import {
   formatAudFromCents,
   listBookableBusinessCoachingSessions,
 } from '@/lib/marketing/business-coaching';
-import { ccwRoadshowPath } from '@/lib/marketing/ccw-roadshow';
+import { getBusinessOffers } from '@/lib/marketing/business-offers';
 import {
   marketingEyebrowPill,
   marketingPanel,
@@ -54,24 +53,11 @@ export function BusinessCoachingContent() {
           {businessCoachingTagline}
         </p>
 
-        <div
-          className={`mt-6 max-w-2xl rounded-xl border border-amber-200/80 bg-amber-50/90 px-4 py-3 text-sm text-amber-950`}
-        >
-          <p className="font-semibold">This is not the ~$495 two-day Business Growth Days.</p>
-          <p className="mt-1 leading-relaxed text-amber-900/90">
-            <strong>Owner Circle</strong> is the affordable monthly meetup (
-            {formatAudFromCents(businessCoachingSeatPriceCents)} per person). The{' '}
-            <strong>CARSI × CCW Business Growth Days</strong> intensive is a separate, higher-ticket
-            event — details and booking on that page.
-          </p>
-          <Link
-            href={ccwRoadshowPath}
-            className="mt-2 inline-flex items-center gap-1 font-medium text-[#146fc2] hover:underline"
-          >
-            View Business Growth Days (separate product)
-            <ArrowRight className="h-3.5 w-3.5" aria-hidden />
-          </Link>
-        </div>
+        <BusinessOffersCompare
+          offers={getBusinessOffers()}
+          currentId="owner-circle"
+          className="mt-8"
+        />
 
         <div className="mt-10 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="space-y-4">

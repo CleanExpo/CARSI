@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 
 import { CcwBusinessCoachingClient } from '@/components/ccw/CcwBusinessCoachingClient';
+import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-width';
+import { BusinessOffersCompare } from '@/components/marketing/BusinessOffersCompare';
 import {
   carsiCoachingMonthlyPath,
   carsiCoachingMonthlyTagline,
@@ -9,8 +11,13 @@ import {
 } from '@/lib/marketing/carsi-coaching-monthly';
 import { CcwFreeTools } from '@/components/marketing/CcwFreeTools';
 import { getPublicSiteUrl } from '@/lib/env/public-url';
+import { getBusinessOffers } from '@/lib/marketing/business-offers';
 import { OG_IMAGES } from '@/lib/seo/og-image';
 import { isCarsiCoachingMonthlyEnabled } from '@/lib/server/carsi-coaching-monthly-flag';
+
+// The business-offers comparison shows a date-dependent Growth Days price (free, paid or TBA by
+// sitting), so refresh hourly rather than freezing it at build time.
+export const revalidate = 3600;
 
 const siteUrl = getPublicSiteUrl();
 
@@ -46,6 +53,13 @@ export default function CcwTrainingPage() {
       <Suspense fallback={<CcwCoachingFallback />}>
         <CcwBusinessCoachingClient checkoutEnabled={checkoutEnabled} />
       </Suspense>
+      <div className="border-t border-slate-200/70 bg-white py-12 md:py-16">
+        <BusinessOffersCompare
+          offers={getBusinessOffers()}
+          currentId="business-coaching"
+          className={PUBLIC_SHELL_INNER_CLASS}
+        />
+      </div>
       <CcwFreeTools />
     </>
   );
