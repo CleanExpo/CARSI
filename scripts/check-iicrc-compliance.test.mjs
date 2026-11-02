@@ -27,6 +27,15 @@ const allowOf = (...lines) => new Set(lines.map(normaliseLine));
 // needs to reason about award verbs, requirement forms, cadence or clause structure — any numbered
 // IICRC-CEC line that a human has not allowlisted is a finding, full stop.
 const MUST_BLOCK = [
+  // 2026-11-02: describing a course as "CEC-accredited training" is a CEC claim that needs the
+  // course's own IICRC approval. Twelve seed entries and six intro-video scripts carried it with no
+  // approval; formerly this line was a MUST_PASS "site-wide value prop" sample.
+  ['course called "CEC-accredited training" without approval',
+    'Completing this CEC-accredited training also earns IICRC Continuing Education Credits (CECs).'],
+  ['designation course "CEC-accredited training leading to"',
+    'It is CEC-accredited training leading to the CARSI Water Restoration Practitioner designation.'],
+  ['"(CEC-accredited)" tag', '"discipline": "CARSI Water Restoration Practitioner (CEC-accredited)"'],
+  ['lesson title "a CEC-accredited overview"', 'Carpet, fibre and soil: an CEC-accredited overview'],
   ['N IICRC CECs', 'This course awards 4 IICRC CECs.'],
   ['N IICRC Continuing Education Credits', 'Completing it awards 4 IICRC Continuing Education Credits.'],
   ['N IICRC CECs + maintaining-IICRC boilerplate',
@@ -91,14 +100,14 @@ const MUST_PASS_ALWAYS = [
   ['program fact — non-adjacent "require 14 CECs per 4-year cycle"', 'Standard IICRC certifications require 14 CECs per 4-year cycle.'],
   ['program fact — non-adjacent recertification requires', 'IICRC recertification requires 14 CECs per 4-year cycle.'],
   ['program fact — non-adjacent maintain certification', 'maintain your certification with 14 CECs every 4 years'],
-  ['generic no-number CEC framing (site-wide value prop)',
-    'Completing this CEC-accredited training also earns IICRC Continuing Education Credits (CECs).'],
   ['count of courses is not a CEC-hour claim',
     'CARSI delivers 40+ online courses. Each course earns verified Continuing Education Credits (CECs).'],
   ['learner CEC-tracking badge (allowed by CLAUDE.md)', "{ label: '50 CECs Earned' }"],
   ['CEC calculator requirement math (not a course claim)', '21 CECs as a Master'],
   ['ticket ref that abuts CEC', 'GP-498 CEC licence gate — production display path'],
   ['code comment about absence of CEC', 'No registry approval → 0 CEC, never a derived one.'],
+  ['sanctioned provider wording', 'CARSI provides IICRC CEC Accredited training for aged care teams.'],
+  ['negated disclaimer', 'It is <strong>not</strong> IICRC CEC accredited and it does not award CECs.'],
 ];
 
 let failed = 0;
