@@ -7,8 +7,21 @@
 // build-blocking CI scan can't false-positive on legitimately-committed public
 // identifiers. The optional live_/test_ infix catches real Stripe keys whose
 // underscore would otherwise break the token (sk_live_… / rk_test_…); ck_/whsec_
-// have no infix. Scope: Stripe / WooCommerce style tokens (not a general scanner).
-export const SECRET_RE = /(ck|sk|whsec|rk)_(live_|test_)?[A-Za-z0-9]{16,}/;
+// have no infix. GP-573: expanded beyond Stripe-only (still not a full trufflehog).
+export const STRIPE_SECRET_RE = /(ck|sk|whsec|rk)_(live_|test_)?[A-Za-z0-9]{16,}/;
+
+export const SECRET_PATTERNS = [
+  STRIPE_SECRET_RE,
+  /ghp_[A-Za-z0-9]{36,}/,
+  /github_pat_[A-Za-z0-9_]{22,}/,
+  /AKIA[0-9A-Z]{16}/,
+  /xox[baprs]-[A-Za-z0-9-]{10,48}/,
+  /sk-ant-api03-[A-Za-z0-9_-]{20,}/,
+  /sk-proj-[A-Za-z0-9_-]{20,}/,
+];
+
+/** @deprecated use SECRET_PATTERNS — kept for tests that import SECRET_RE */
+export const SECRET_RE = STRIPE_SECRET_RE;
 
 // Placeholder token shapes — applied to the MATCHED TOKEN only (never the whole
 // line), so a real key sitting next to an unrelated '...' or '${…}' or 'example'
@@ -21,9 +34,12 @@ export const PLACEHOLDER_RE = /xxx|your[_-]|example|redacted|placeholder|changem
  * (for example, a token whose suffix is a placeholder label) is ignored.
  */
 export function findSecretToken(content) {
-  const match = content.match(SECRET_RE);
-  if (!match) return null;
-  const token = match[0];
-  if (PLACEHOLDER_RE.test(token)) return null;
-  return token;
+  for (const re of SECRET_PATTERNS) {
+    const match = content.match(re);
+    if (!match) continue;
+    const token = match[0];
+    if (PLACEHOLDER_RE.test(token)) continue;
+    return token;
+  }
+  return null;
 }
