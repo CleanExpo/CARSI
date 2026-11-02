@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "courseSlug": "structural-drying-fundamentals",
+  "status": "draft",
+  "note": "DRAFT v1 practical task for the CARSI Structural Drying Practitioner designation. Instructor-graded against the rubric. Original CARSI task for Australian and New Zealand conditions; no IICRC standard text reproduced. SME review and sign-off required before it is published.",
+  "assessment": {
+    "id": "38bd8bed-e654-5047-befa-8438ea4ef0e7",
+    "title": "CARSI Structural Drying Practitioner — Practical task: plan, run and prove a structural drying job",
+    "passThreshold": 70,
+    "isPublished": false,
+    "instructions": "## Practical task\n\nPlan, run and prove a structural drying job from first visit to a signed-off drying file. Use a real job you have worked on, or the supplied job. **State whether your job is in Australia or New Zealand, and apply that country's rules.**\n\n**Supplied job:** a single-storey 1985 brick-veneer house in Geelong, Victoria (or, if you work in New Zealand, a 1985 timber-framed house in Palmerston North). A kitchen flexible hose failed overnight. Water covered the kitchen (4.0 m x 3.2 m) and the adjoining family room (5.0 m x 4.0 m), wicked about 250 mm up the plasterboard, and sits under a floating timber floor on a concrete slab. On arrival the house reads 18 °C and 78 %RH; outside reads 12 °C and 88 %RH. The kitchen and family room GPOs share one 10 A circuit. A dehumidifier with a process airflow of 300 m³/h is available.\n\nSubmit one PDF, or a set of photos and documents, containing:\n\n1. **Make safe, duties and the asbestos check.** Hazards and controls from the top of the hierarchy down; who holds the duty (WHS laws, the OHS Act 2004 in Victoria, or HSWA 2015 in New Zealand); your asbestos decision for a 1985 building in your country, and what you would do before cutting any lining.\n2. **Dry standard and moisture map.** A numbered sketch, the reference readings (same material, unaffected area, same meter, same scale), and the drying goal for each material. Calculate the wet floor and wall areas in m².\n3. **Psychrometrics and drying system.** Convert the inside and outside readings to g/kg and dew point; choose a closed, open or heat-assisted system and justify it from those numbers; state the carbon monoxide rule.\n4. **Equipment, dehumidification and power.** Air-mover placement with the hold rules ticked; dehumidifier type for these conditions; a litres-per-day estimate from a stated depression; and a 230 V power budget in amps per 10 A circuit with the load split so no circuit is overloaded, plus your country's RCD and testing arrangements.\n5. **Monitoring and the drying file.** A three-visit log showing at least one stall, your diagnosis and the single change you made; final readings against the dry standard; the owner summary; and pricing in AUD with GST (or NZD if you work in New Zealand).\n\nUse Australian English and metric units throughout. Name any standard by title only; do not copy text from any standard.",
+    "criteria": [
+      {
+        "label": "Make safe, duties and asbestos",
+        "description": "Hazards controlled from the top of the hierarchy down; the correct duty holder and law for the stated country; an asbestos decision that applies the correct date for the country (before 1990 Australia, before 2000 New Zealand) and stops cutting until sampled.",
+        "maxPoints": 20
+      },
+      {
+        "label": "Dry standard, moisture map and loss size",
+        "description": "Numbered reading points; references from the same material, unaffected, same meter and scale; a drying goal per material; floor and wall areas correct in m².",
+        "maxPoints": 20
+      },
+      {
+        "label": "Psychrometrics and drying-system choice",
+        "description": "Inside and outside readings converted to g/kg and dew point; system choice justified from g/kg and temperature; condensation risk checked on the slab; carbon monoxide rule stated.",
+        "maxPoints": 20
+      },
+      {
+        "label": "Equipment, dehumidification and 230 V power",
+        "description": "Placement along wet surfaces with mould and contamination hold rules; dehumidifier type suited to 18 °C conditions with reasoning; litres per day calculated correctly; amps totalled per 10 A circuit and split; RCD and testing arrangements correct for the stated country.",
+        "maxPoints": 20
+      },
+      {
+        "label": "Monitoring, diagnosis and the drying file",
+        "description": "A consistent log; a stall diagnosed from the readings with one change recorded with its reason; final readings at the dry standard; a plain-English owner summary; pricing with GST; Australian English, metric units, standards named only.",
+        "maxPoints": 20
+      }
+    ]
+  }
+}
