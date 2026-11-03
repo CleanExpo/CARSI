@@ -1,7 +1,7 @@
 # Water category and class decision card
 
 **CARSI Water Restoration Practitioner — field tool (Module 2)**
-*DRAFT v1 for SME review. Australian-produced: metric units, Australian sources and conditions.*
+*Australian-produced: metric units, Australian sources and conditions.*
 
 ## Category — how contaminated (drives PPE, cleaning, disposal)
 

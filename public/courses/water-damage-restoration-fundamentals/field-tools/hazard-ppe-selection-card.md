@@ -1,7 +1,7 @@
 # Hazard-to-PPE selection card
 
 **CARSI Water Restoration Practitioner — field tool (Module 3)**
-*DRAFT v1 for SME review. Australian-produced: 230 V / 10 A, AS/NZS, Safe Work Australia framing.*
+*Australian-produced: 230 V / 10 A, AS/NZS, Safe Work Australia framing.*
 
 ## Step 1 — walk the hazards and control each (top of the hierarchy first)
 
