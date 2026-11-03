@@ -98,13 +98,6 @@
     "reason": "reviews thread owns testimonials; reported to Phill"
   },
   {
-    "file": "src/lib/coaching-portal/partner-demo.ts",
-    "line": 36,
-    "contains": "businessSize: 'Owner-operator with 2 technicians'",
-    "class": "legitimate",
-    "reason": "GP-654 partner demo: fictional 'Demo Carpet & Restoration Pty Ltd' profile field describing the demo business's own staff size; not a claim about CARSI, its learners or its reach"
-  },
-  {
     "file": "src/lib/cec-display.ts",
     "line": 26,
     "contains": "return `${label} CEC${label === '1' ? '' : 's'}`;",

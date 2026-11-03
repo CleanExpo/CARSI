@@ -17,6 +17,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { useAuth } from '@/components/auth/auth-provider';
 import { CoachingPortalProvider } from '@/components/coaching-portal/CoachingPortalContext';
+import { PartnerDemoBanner } from '@/components/coaching-portal/PartnerDemoBanner';
 import { COACHING_PORTAL_NAV_MAIN } from '@/components/coaching-portal/coaching-portal-nav';
 import { coachingPortalBasePath } from '@/lib/coaching-portal/coaching-portal-paths';
 import { openCoachingSupportEmail } from '@/lib/coaching-portal/support-contact';
@@ -268,6 +269,7 @@ export function CoachingPortalShell({
             <p className="text-sm font-semibold text-white">Business Coaching</p>
           </header>
 
+          <PartnerDemoBanner email={dashboard.user.email} />
           <main className="flex-1 overflow-x-hidden px-4 py-6 sm:px-6 sm:py-8">{children}</main>
         </div>
       </div>

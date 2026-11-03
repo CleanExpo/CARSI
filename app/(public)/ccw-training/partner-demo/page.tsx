@@ -5,7 +5,7 @@ import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-widt
 import { PlatformNav } from '@/components/marketing/PlatformNav';
 import { coachingPortalPath } from '@/lib/coaching-portal/coaching-portal-paths';
 import {
-  PARTNER_DEMO_COACH,
+  PARTNER_DEMO_COACH_NAME,
   PARTNER_DEMO_MEMBER,
   PARTNER_DEMO_ONBOARDING_SNAPSHOT,
   PARTNER_DEMO_WALKTHROUGH_STEPS,
@@ -50,7 +50,7 @@ export default function CoachingPartnerDemoPage() {
             <h2 className="text-lg font-semibold text-white">Sample member</h2>
             <p className="mt-2 text-sm text-slate-400">
               {PARTNER_DEMO_MEMBER.fullName} · {snapshot.profile.businessName} · coached by{' '}
-              {PARTNER_DEMO_COACH.displayName}
+              {PARTNER_DEMO_COACH_NAME}
             </p>
             <dl className="mt-6 grid gap-4 sm:grid-cols-2">
               <div>
@@ -73,20 +73,30 @@ export default function CoachingPartnerDemoPage() {
             <ol className="mt-4 space-y-3">
               {PARTNER_DEMO_WALKTHROUGH_STEPS.map((step, index) => (
                 <li
-                  key={step.segment}
+                  key={step.title}
+                  data-testid={`partner-demo-step-${index + 1}`}
                   className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3"
                 >
                   <span className="text-sm text-slate-200">
                     <span className="mr-2 font-mono text-sky-400/90">{index + 1}.</span>
                     {step.title}
                     <span className="ml-2 text-xs text-slate-500">~{step.minutes} min</span>
+                    <span className="mt-1 block text-xs text-slate-400">
+                      {step.advantage}: {step.shows}
+                    </span>
                   </span>
-                  <Link
-                    href={coachingPortalPath(step.segment)}
-                    className="text-sm font-medium text-sky-300 underline-offset-2 hover:underline"
-                  >
-                    Open in portal
-                  </Link>
+                  {step.status === 'live' && step.segment ? (
+                    <Link
+                      href={coachingPortalPath(step.segment === '/' ? '' : step.segment)}
+                      className="text-sm font-medium text-sky-300 underline-offset-2 hover:underline"
+                    >
+                      Open in portal
+                    </Link>
+                  ) : (
+                    <span className="text-xs font-semibold tracking-wide text-amber-200/90 uppercase">
+                      Coming ({(step.tickets ?? []).join(', ')})
+                    </span>
+                  )}
                 </li>
               ))}
             </ol>
