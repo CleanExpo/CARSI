@@ -34,7 +34,7 @@ export function isMarketingPackDownloadId(v: string | null): v is MarketingPackD
 
 function heading(rawVoice: TradeVoice, title: string, generatedAt: string): string {
   const voice = sanitizeVoice(rawVoice);
-  const who = voice.businessName || 'Your business';
+  const who = 'Your business';
   const day = new Date(generatedAt).toLocaleDateString('en-AU', {
     day: 'numeric',
     month: 'long',

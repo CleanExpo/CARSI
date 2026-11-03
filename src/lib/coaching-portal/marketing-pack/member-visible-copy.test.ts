@@ -55,3 +55,71 @@ describe('member-visible copy from hostile inputs', () => {
     }
   });
 });
+
+// Codex P1 (head 5dfe661f): a member's free-text profile can carry a promise no word filter
+// recognises ("We will fix your mould issue"). Generated copy therefore uses controlled wording
+// only: no business name, a trade label from a fixed list, and a town only if it is shaped like a
+// place name.
+describe('controlled voice', () => {
+  const promise = 'We will fix your mould issue';
+  const planted = {
+    businessName: promise,
+    trade: promise,
+    town: 'We Fix Everything',
+    services: promise,
+  };
+
+  it('never passes profile free text through: no name, no non-place town, trade as a fixed label', () => {
+    // The planted sentence mentions mould, so it maps to the fixed label, never to its own words.
+    expect(sanitizeVoice(planted)).toEqual({
+      businessName: '',
+      trade: 'mould remediation',
+      town: '',
+      services: '',
+    });
+    expect(sanitizeVoice({ ...planted, trade: 'We will sort it out', services: '' }).trade).toBe(
+      ''
+    );
+  });
+
+  it('keeps a real town and maps the trade to a fixed label', () => {
+    expect(
+      sanitizeVoice({
+        businessName: 'Downs Carpet Care',
+        trade: 'Carpet & upholstery',
+        town: 'Toowoomba QLD 4350',
+        services: 'Carpet cleaning, rug cleaning',
+      })
+    ).toEqual({
+      businessName: '',
+      trade: 'carpet and upholstery cleaning',
+      town: 'Toowoomba',
+      services: '',
+    });
+    for (const town of ['Mackay QLD', 'Port Macquarie', "O'Connor", 'St. George']) {
+      expect(sanitizeVoice({ ...planted, town }).town).not.toBe('');
+    }
+  });
+
+  it('no planted profile text reaches the review, checklist, calendar or downloads', () => {
+    const review = reviewWebsite({
+      websiteUrl: 'http://x.test/',
+      fetch: { ok: true, status: 200, html: hostileHtml },
+      googleBusinessUrl: null,
+      voice: planted,
+    });
+    const checklist = buildLocalSearchChecklist(review, planted);
+    const calendar = assembleCalendar(planted, new Date('2026-11-09T00:00:00Z'));
+    const everything = [
+      review.summary,
+      ...review.fixes.flatMap((f) => [f.title, f.why, f.how]),
+      ...checklist.flatMap((i) => [i.label, i.detail]),
+      renderReviewMarkdown(review, planted, '2026-11-09T00:00:00Z'),
+      renderChecklistMarkdown(checklist, planted, '2026-11-09T00:00:00Z'),
+      renderCalendarCsv(calendar),
+    ].join('\n');
+    expect(calendar.posts).toHaveLength(30);
+    expect(everything.toLowerCase()).not.toContain('fix your mould');
+    expect(everything.toLowerCase()).not.toContain('fix everything');
+  });
+});

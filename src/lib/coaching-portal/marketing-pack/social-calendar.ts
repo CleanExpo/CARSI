@@ -6,7 +6,7 @@
  * behind a coach approval step (see RESULT.md for GP-634).
  */
 import { isCompliantCopy } from './compliance';
-import { primaryTown, sanitizeVoice } from './site-review';
+import { sanitizeVoice } from './site-review';
 import type { CalendarCandidate, CalendarPost, SocialCalendar, TradeVoice } from './types';
 
 export const CALENDAR_DAYS = 30;
@@ -19,21 +19,17 @@ function tag(s: string): string {
 /** Deterministic, claim-free month of posts built from the trade voice alone. */
 export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
   const voice = sanitizeVoice(rawVoice);
-  const town = primaryTown(voice.town) || 'our local area';
-  const trade = (voice.trade || 'our trade').toLowerCase();
-  const name = voice.businessName || 'our team';
-  const service =
-    (voice.services || voice.trade || 'our work')
-      .split(/[,;\n]/)
-      .map((s) => s.trim())
-      .filter(Boolean)[0]
-      ?.toLowerCase() ?? trade;
-  const tags = [tag(town), tag(voice.trade.split(/[&,]/)[0] ?? '')].filter(Boolean);
+  const town = voice.town || 'our local area';
+  const trade = voice.trade || 'trade';
+  const service = voice.trade || 'our work';
+  const tags = [voice.town ? tag(voice.town) : '', voice.trade ? tag(voice.trade) : ''].filter(
+    Boolean
+  );
 
   const lines: Array<[string, string]> = [
     [
       'Who we are',
-      `G'day ${town}. We're ${name}, a local ${trade} business. Over the next month we'll share what we do, how we do it and a few tips for looking after your place.`,
+      `G'day ${town}. We're a local ${trade} business. Over the next month we'll share what we do, how we do it and a few tips for looking after your place.`,
     ],
     [
       'Tip',
@@ -49,7 +45,7 @@ export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
     ],
     [
       'Meet the team',
-      `Meet the people behind ${name}. We live and work around ${town}, and we turn up on time with the right gear for the job.`,
+      `Meet the people behind the business. We live and work around ${town}, and we turn up on time with the right gear for the job.`,
     ],
     [
       'Tip',
@@ -69,7 +65,7 @@ export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
     ],
     [
       'How we work',
-      `How a ${name} booking works: you call or message, we ask a few questions, give you a clear quote, then book a time that suits you.`,
+      `How booking with us works: you call or message, we ask a few questions, give you a clear quote, then book a time that suits you.`,
     ],
     [
       'Tip',
@@ -81,7 +77,7 @@ export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
     ],
     [
       'Behind the scenes',
-      `Gear check at ${name}. Looking after our equipment means it works properly on your job. Here's a look inside the van.`,
+      `Gear check. Looking after our equipment means it works properly on your job. Here's a look inside the van.`,
     ],
     [
       'Myth or fact',

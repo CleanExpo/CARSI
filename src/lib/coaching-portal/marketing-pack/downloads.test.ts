@@ -38,6 +38,6 @@ describe('marketing pack downloads', () => {
     const review = reviewWebsite({ websiteUrl: null, fetch: null, googleBusinessUrl: null, voice });
     const md = renderReviewMarkdown(review, voice, '2026-11-09T00:00:00Z');
     expect(md).toContain('### 1. ');
-    expect(md).toContain('Downs Carpet Care, Toowoomba');
+    expect(md).toContain('Your business, Toowoomba');
   });
 });

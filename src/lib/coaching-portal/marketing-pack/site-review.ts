@@ -13,17 +13,59 @@ export function safeText(value: string | null | undefined, fallback: string): st
   return v && isCompliantCopy(v) ? v : fallback;
 }
 
+/** Known trades, most specific first. Generated copy only ever names a trade by these labels. */
+const TRADE_LABELS: Array<[RegExp, string]> = [
+  [/carpet|rug|upholster/i, 'carpet and upholstery cleaning'],
+  [/mou?ld/i, 'mould remediation'],
+  [/fire|smoke|soot/i, 'fire and smoke restoration'],
+  [/water damage|flood|restor|drying/i, 'water damage restoration'],
+  [/pressure|soft wash|exterior wash/i, 'pressure washing'],
+  [/window/i, 'window cleaning'],
+  [/clean/i, 'cleaning'],
+  [/plumb|drain|gas fit/i, 'plumbing'],
+  [/electric/i, 'electrical'],
+  [/paint/i, 'painting'],
+  [/roof|gutter/i, 'roofing'],
+  [/pest|termite/i, 'pest control'],
+  [/floor|tiling|tiler|\btile/i, 'flooring'],
+  [/air ?con|hvac|refrigerat/i, 'air conditioning'],
+  [/lawn|garden|landscap/i, 'landscaping'],
+  [/build|carpent|joiner|renovat/i, 'building'],
+  [/locksmith|\blocks?\b/i, 'locksmith'],
+];
+
+export function tradeLabel(trade: string, services = ''): string {
+  const text = `${trade} ${services}`;
+  return TRADE_LABELS.find(([pattern]) => pattern.test(text))?.[1] ?? '';
+}
+
+/** Words that never appear in a real Australian or NZ place name but do in a sentence. */
+const NOT_A_PLACE =
+  /\b(we|we're|will|you|your|our|us|i|can|fix|fixes|fixed|best|free|always|never|guarantee\w*|promise\w*|get|gets|cheap\w*|results?|everything)\b/i;
+
+/** A town is kept only if it is shaped like a place name: 1 to 4 words of letters. */
+export function placeName(raw: string): string {
+  const town = primaryTown(raw);
+  const shaped =
+    /^[A-Za-z][A-Za-z'.\- ]{0,39}$/.test(town) &&
+    town.split(/\s+/).length <= 4 &&
+    !NOT_A_PLACE.test(town);
+  return shaped && isCompliantCopy(town) ? town : '';
+}
+
 /**
- * Every member-visible line in the pack is built from these values, so a claim in a business
- * name ("Guaranteed Results Plumbing") or trade can never reach the review, checklist,
- * calendar or downloads.
+ * Every member-visible line in the pack is built from these values. A member's profile is free
+ * text and can carry a promise no word filter recognises ("We will fix your mould issue", Codex
+ * P1 head 5dfe661f), so generated copy uses controlled wording only: no business name, a trade
+ * label from a fixed list, and the town only if it is shaped like a place name. Services are used
+ * only to pick the trade label.
  */
 export function sanitizeVoice(voice: TradeVoice): TradeVoice {
   return {
-    businessName: safeText(voice.businessName, 'your business'),
-    trade: safeText(voice.trade, 'your trade'),
-    town: safeText(voice.town, 'your area'),
-    services: safeText(voice.services, ''),
+    businessName: '',
+    trade: tradeLabel(voice.trade ?? '', voice.services ?? ''),
+    town: placeName(voice.town ?? ''),
+    services: '',
   };
 }
 
@@ -233,14 +275,12 @@ export function reviewWebsite(rawInput: ReviewInput): SiteReview {
   const schema = hasLocalBusinessSchema(html);
 
   // The check says the title names the trade and the town, so it tests for both (Codex P1,
-  // head 0b717beb). A placeholder from sanitizeVoice ("your trade", "your area") is unknown and
-  // is not required.
+  // head 0b717beb). An unknown town or trade is not required. Matching uses the member's own
+  // words; nothing from them is displayed.
   const titleText = (title ?? '').toLowerCase();
-  const titleNamesTown = !town || town === 'your area' || titleText.includes(town.toLowerCase());
-  const titleNamesTrade =
-    !trade ||
-    trade === 'your trade' ||
-    tradeStems(trade, input.voice.services).some((stem) => titleText.includes(stem));
+  const titleNamesTown = !town || titleText.includes(town.toLowerCase());
+  const stems = tradeStems(`${rawInput.voice.trade ?? ''} ${trade}`, rawInput.voice.services ?? '');
+  const titleNamesTrade = stems.length === 0 || stems.some((stem) => titleText.includes(stem));
   const titleOk = Boolean(
     title &&
     !GENERIC_TITLES.test(title) &&
@@ -256,7 +296,7 @@ export function reviewWebsite(rawInput: ReviewInput): SiteReview {
       area: 'website',
       title: 'Rewrite your home page title',
       why: `Your page title is ${!title ? 'missing' : isCompliantCopy(title) ? `"${title}"` : 'not about your trade and town'}. It is the blue headline people see in Google results, so it should say what you do and where.`,
-      how: `Use a title like "${trade || 'Your trade'} ${town || 'your town'} | ${input.voice.businessName || 'Business name'}", kept under 60 characters.`,
+      how: `Use a title like "${trade || 'Your trade'} ${town || 'your town'} | Your business name", kept under 60 characters.`,
       impact: 3,
       effort: 1,
     });

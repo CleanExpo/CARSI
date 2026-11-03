@@ -195,11 +195,15 @@ export function requestPage(
   return new Promise((resolvePage) => {
     let settled = false;
     const timers: ReturnType<typeof setTimeout>[] = [];
+    const open: { req?: http.ClientRequest } = {};
+    // Every way out of a hop also tears down its socket: a redirect or capped body that keeps
+    // streaming must not hold a connection open past the deadline (Codex P1, head 5dfe661f).
     const finish = (page: RawPage) => {
       if (!settled) {
         settled = true;
         timers.forEach(clearTimeout);
         resolvePage(page);
+        open.req?.destroy();
       }
     };
     if (deadlineMs <= 0) {
@@ -222,7 +226,7 @@ export function requestPage(
         const location = res.headers.location ?? null;
         const contentType = String(res.headers['content-type'] ?? '');
         if (status >= 300 && status < 400) {
-          res.resume();
+          res.destroy();
           finish({ ok: false, status, location });
           return;
         }
@@ -248,6 +252,7 @@ export function requestPage(
         res.on('error', () => finish({ ok: false, status, error: 'could not read the page' }));
       }
     );
+    open.req = req;
     timers.push(
       setTimeout(() => {
         finish({ ok: false, status: 0, error: 'timed out' });

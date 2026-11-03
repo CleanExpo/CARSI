@@ -94,3 +94,29 @@ describe('DNS-pinned page request', () => {
     expect(hits).toBe(0);
   });
 });
+
+describe('redirect hops (Codex P1, head 5dfe661f)', () => {
+  it('closes a redirect response that keeps streaming, instead of leaving the socket open', async () => {
+    let closed = false;
+    const srv = createServer((req, res) => {
+      req.socket.on('close', () => {
+        closed = true;
+      });
+      res.writeHead(302, { Location: 'http://next.test/', 'Content-Type': 'text/html' });
+      const t = setInterval(() => res.write('x'), 25);
+      res.on('close', () => clearInterval(t));
+    });
+    await new Promise<void>((resolve) => srv.listen(0, '127.0.0.1', resolve));
+    const srvPort = (srv.address() as AddressInfo).port;
+    const allowAll = createGuardedLookup(
+      async () => [{ address: '127.0.0.1', family: 4 }],
+      () => true
+    );
+    const res = await requestPage(new URL(`http://redirect.test:${srvPort}/`), allowAll, 150);
+    expect(res.status).toBe(302);
+    await new Promise((resolve) => setTimeout(resolve, 350));
+    srv.closeAllConnections();
+    await new Promise<void>((resolve) => srv.close(() => resolve()));
+    expect(closed).toBe(true);
+  });
+});
