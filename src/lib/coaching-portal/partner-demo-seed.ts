@@ -21,14 +21,23 @@ import { createHash, randomUUID } from 'node:crypto';
 
 import { COACHING_ASSESSMENT_SECTIONS } from '@/lib/coaching-portal/assessment-schema';
 import type { CoachingOnboardingSnapshot } from '@/lib/coaching-portal/onboarding-snapshot';
-import { PARTNER_DEMO_EMAIL_DOMAIN, isPartnerDemoEmail } from '@/lib/coaching-portal/partner-demo';
+import {
+  PARTNER_DEMO_ASSESSMENT_ANSWERS,
+  PARTNER_DEMO_COACH_NAME,
+  PARTNER_DEMO_EMAIL_DOMAIN,
+  PARTNER_DEMO_MEMBER,
+  PARTNER_DEMO_PROFILE,
+  PARTNER_DEMO_STATEMENTS,
+  PARTNER_DEMO_WORKSPACE,
+  isPartnerDemoEmail,
+} from '@/lib/coaching-portal/partner-demo';
 import type { CoachingActionStatus } from '@/lib/coaching-portal/types';
 
 export { PARTNER_DEMO_EMAIL_DOMAIN, isPartnerDemoEmail };
-export const PARTNER_DEMO_SEED_MEMBER_EMAIL = `partner.demo.member@${PARTNER_DEMO_EMAIL_DOMAIN}`;
+export const PARTNER_DEMO_SEED_MEMBER_EMAIL = PARTNER_DEMO_MEMBER.email;
 export const PARTNER_DEMO_LOCKED_PASSWORD_PREFIX = 'demo-locked:';
 export const PARTNER_DEMO_ENABLED_ENV = 'CARSI_COACHING_DEMO_ENABLED';
-export const PARTNER_DEMO_COACH_LABEL = 'Demo Coach';
+export const PARTNER_DEMO_COACH_LABEL = PARTNER_DEMO_COACH_NAME;
 
 const ID_NAMESPACE = 'carsi:gp-637:partner-demo:';
 const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '::1', '[::1]']);
@@ -105,61 +114,11 @@ type SessionRow = {
 
 export type PartnerDemoSeedPlan = ReturnType<typeof buildPartnerDemoSeedPlan>;
 
-const MEMBER_NAME = 'Jordan Demo';
-
-const PROFILE = {
-  businessName: 'Demo Restoration Co. (sample data)',
-  industry: 'Water damage and carpet restoration',
-  location: 'Austin, Texas (sample)',
-  serviceAreas: 'Austin metro and surrounding counties',
-  yearsInBusiness: '3–5 years',
-  businessSize: 'Owner-operator with a small crew',
-  employeeCount: '5',
-  mainServices: 'Water damage mitigation, carpet cleaning, odour control',
-  website: `https://${PARTNER_DEMO_EMAIL_DOMAIN}`,
-  googleBusinessUrl: '',
-  facebookUrl: '',
-  instagramUrl: '',
-  linkedinUrl: '',
-  tiktokUrl: '',
-  youtubeUrl: '',
-  xUrl: '',
-  socialNotes: 'Sample business for partner demonstrations only.',
-  challenges:
-    'Insurance-referred jobs are steady but margins are thin; quotes for retail cleaning go cold after the first visit.',
-  shortTermGoals: 'Book one more direct (non-insurance) job each week within 90 days.',
-  longTermVision: 'A second crew run by a trained lead, with the owner out of the van three days a week.',
-};
+const MEMBER_NAME = PARTNER_DEMO_MEMBER.fullName;
+const PROFILE = PARTNER_DEMO_PROFILE;
 
 function assessmentAnswers(): Record<string, string> {
-  const answers: Record<string, string> = {
-    owner_role: 'Owner, estimator and lead technician',
-    typical_week:
-      'Mornings on site, afternoons quoting and chasing insurers, invoices on Sunday night.',
-    years_operating: '3–5 years',
-    revenue_band: '$500k–$1M',
-    profitability: 'Modest profit',
-    revenue_notes: 'Cash flow dips when insurers pay late (45–60 days).',
-    lead_sources: 'Two insurance panels, Google Business Profile, repeat property managers.',
-    website_url: PROFILE.website,
-    google_business_url: 'Listed (sample)',
-    facebook_url: 'Not used',
-    instagram_url: 'Not used',
-    linkedin_url: 'Owner profile only',
-    tiktok_url: 'Not used',
-    youtube_url: 'Not used',
-    x_url: 'Not used',
-    social_notes: 'Sample business: no real listings.',
-    marketing_efforts: 'Panel relationships and occasional Google posts; no follow-up system.',
-    enquiry_process: 'Phone answered by the owner when free; voicemail otherwise.',
-    conversion_challenges: 'Retail quotes are sent and never followed up.',
-    ops_strengths: 'Fast mitigation response and good drying records.',
-    ops_pain: 'Owner is the bottleneck for every estimate and every customer call.',
-    tools_used: 'Job management app, spreadsheet for quotes, phone camera for moisture photos.',
-    automation_interest: 'Quote follow-up reminders and a weekly cash-flow snapshot.',
-    top_priorities: '1. Quote follow-up rhythm. 2. Train a crew lead. 3. Weekly numbers.',
-    success_12m: 'A second crew running without the owner on site.',
-  };
+  const answers: Record<string, string> = { ...PARTNER_DEMO_ASSESSMENT_ANSWERS };
   // Fail loudly in tests if the assessment gains a question the demo does not answer.
   for (const section of COACHING_ASSESSMENT_SECTIONS) {
     for (const field of section.fields) {
@@ -177,11 +136,7 @@ export function buildPartnerDemoSeedPlan(now: Date) {
   const approvedAt = at(-14);
   const responses = assessmentAnswers();
 
-  const statements = {
-    problemStatement: 'Retail quotes go cold after the first visit and the owner is the bottleneck.',
-    goalStatement: 'One more direct job booked every week, and a crew lead trained within six months.',
-    extraNotes: 'Partner demo member (GP-637). Sample data only.',
-  };
+  const statements = { ...PARTNER_DEMO_STATEMENTS };
 
   const snapshot: CoachingOnboardingSnapshot = {
     version: 1,
@@ -289,11 +244,9 @@ export function buildPartnerDemoSeedPlan(now: Date) {
       status: 'active',
       currentPeriodEnd: at(365),
       cancelAtPeriodEnd: false,
-      horizontalSummary:
-        'This quarter: lift direct (non-insurance) bookings and get the owner off the tools for quoting.',
-      directionSummary:
-        'Build a quote-to-booking rhythm first, then train a crew lead so a second van can run.',
-      sessionPrepNotes: 'Bring the quote log, last month’s cash-flow snapshot and the crew-lead shortlist.',
+      horizontalSummary: PARTNER_DEMO_WORKSPACE.horizontalSummary,
+      directionSummary: PARTNER_DEMO_WORKSPACE.directionSummary,
+      sessionPrepNotes: PARTNER_DEMO_WORKSPACE.sessionPrepNotes,
       monthlyActionsJson: null as string | null,
     },
     profile: {

@@ -52,6 +52,38 @@ describe('partner demo walkthrough (GP-637)', () => {
   });
 });
 
+describe('one demo member everywhere (review r2 P1)', () => {
+  it('the public walkthrough shows exactly the member, business and coach the seed creates', async () => {
+    const demo = await import('@/lib/coaching-portal/partner-demo');
+    const { buildPartnerDemoSeedPlan, PARTNER_DEMO_COACH_LABEL } = await import(
+      '@/lib/coaching-portal/partner-demo-seed'
+    );
+    const plan = buildPartnerDemoSeedPlan(new Date('2026-11-04T00:00:00.000Z'));
+    const snap = demo.PARTNER_DEMO_ONBOARDING_SNAPSHOT;
+
+    expect(demo.PARTNER_DEMO_MEMBER.fullName).toBe(plan.user.fullName);
+    expect(demo.PARTNER_DEMO_MEMBER.email).toBe(plan.user.email);
+    expect(snap.member).toEqual({ fullName: plan.user.fullName, email: plan.user.email });
+    expect(snap.profile.businessName).toBe(plan.profile.businessName);
+    expect(snap.profile.location).toBe(plan.profile.location);
+    expect(snap.statements.problemStatement).toBe(plan.profile.onboardingProblemStatement);
+    expect(snap.statements.goalStatement).toBe(plan.profile.onboardingGoalStatement);
+    expect(demo.PARTNER_DEMO_WORKSPACE.horizontalSummary).toBe(plan.subscription.horizontalSummary);
+    expect(demo.PARTNER_DEMO_WORKSPACE.directionSummary).toBe(plan.subscription.directionSummary);
+    expect(demo.PARTNER_DEMO_COACH_NAME).toBe(PARTNER_DEMO_COACH_LABEL);
+    for (const s of plan.sessions) expect(s.coachName).toBe(demo.PARTNER_DEMO_COACH_NAME);
+  });
+
+  it('the public page renders the shared demo member, not a second sample', () => {
+    const page = readFileSync(
+      join(ROOT, 'app', '(public)', 'ccw-training', 'partner-demo', 'page.tsx'),
+      'utf8'
+    );
+    expect(page).toContain('PARTNER_DEMO_COACH_NAME');
+    expect(page).not.toContain('PARTNER_DEMO_COACH.displayName');
+  });
+});
+
 describe('isPartnerDemoEmail', () => {
   it('matches only the reserved demo domain', () => {
     expect(isPartnerDemoEmail(`a@${PARTNER_DEMO_EMAIL_DOMAIN}`)).toBe(true);

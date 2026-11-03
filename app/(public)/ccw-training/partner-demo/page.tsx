@@ -5,7 +5,7 @@ import { PUBLIC_SHELL_INNER_CLASS } from '@/components/landing/public-shell-widt
 import { PlatformNav } from '@/components/marketing/PlatformNav';
 import { coachingPortalPath } from '@/lib/coaching-portal/coaching-portal-paths';
 import {
-  PARTNER_DEMO_COACH,
+  PARTNER_DEMO_COACH_NAME,
   PARTNER_DEMO_MEMBER,
   PARTNER_DEMO_ONBOARDING_SNAPSHOT,
   PARTNER_DEMO_WALKTHROUGH_STEPS,
@@ -50,7 +50,7 @@ export default function CoachingPartnerDemoPage() {
             <h2 className="text-lg font-semibold text-white">Sample member</h2>
             <p className="mt-2 text-sm text-slate-400">
               {PARTNER_DEMO_MEMBER.fullName} · {snapshot.profile.businessName} · coached by{' '}
-              {PARTNER_DEMO_COACH.displayName}
+              {PARTNER_DEMO_COACH_NAME}
             </p>
             <dl className="mt-6 grid gap-4 sm:grid-cols-2">
               <div>

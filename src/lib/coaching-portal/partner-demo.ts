@@ -1,63 +1,5 @@
 import type { CoachingPortalWorkspace } from '@/lib/coaching-portal/types';
 import type { CoachingOnboardingSnapshot } from '@/lib/coaching-portal/onboarding-snapshot';
-import { DEFAULT_COACHING_COACH } from '@/lib/coaching-portal/coach-routing';
-
-/** GP-637 — read-only sample data for partner demos (no PII). */
-export const PARTNER_DEMO_MEMBER = {
-  fullName: 'Alex Demo',
-  email: 'demo.member@example.carsi.test',
-  firstName: 'Alex',
-} as const;
-
-export const PARTNER_DEMO_WORKSPACE: CoachingPortalWorkspace = {
-  horizontalSummary:
-    'Focus this quarter: lift average job value on residential carpet cleans and tighten follow-up after quotes.',
-  directionSummary:
-    'Build a repeatable quote-to-booking rhythm, then test one upsell on every residential job for four weeks.',
-  sessionPrepNotes:
-    'Bring last month’s job list, top three objections from quotes, and one competitor ad you keep seeing.',
-  monthlyActions: [
-    { id: 'demo-1', title: 'Script a 60-second quote follow-up call', status: 'in_progress' },
-    { id: 'demo-2', title: 'List three add-ons to offer on every residential job', status: 'todo' },
-    { id: 'demo-3', title: 'Review Google Business profile with fresh photos', status: 'done' },
-  ],
-};
-
-export const PARTNER_DEMO_ONBOARDING_SNAPSHOT: CoachingOnboardingSnapshot = {
-  version: 1,
-  submittedAtIso: '2026-10-15T02:00:00.000Z',
-  member: { fullName: PARTNER_DEMO_MEMBER.fullName, email: PARTNER_DEMO_MEMBER.email },
-  profile: {
-    businessName: 'Demo Carpet & Restoration Pty Ltd',
-    industry: 'Commercial cleaning',
-    location: 'Perth, WA',
-    serviceAreas: 'Perth metro',
-    yearsInBusiness: '3–5 years',
-    businessSize: 'Owner-operator with 2 technicians',
-    employeeCount: '3',
-    mainServices: 'Carpet cleaning, water damage assist',
-    website: 'https://example.carsi.test',
-    googleBusinessUrl: '',
-    facebookUrl: '',
-    instagramUrl: '',
-    linkedinUrl: '',
-    tiktokUrl: '',
-    youtubeUrl: '',
-    xUrl: '',
-    socialNotes: '',
-    challenges: 'Quotes stalling after the first visit; hard to stand out against low-price competitors.',
-    shortTermGoals: 'Raise conversion on quotes sent this month.',
-    longTermVision: 'Stable $40k/month with two vans and a trained second-in-charge.',
-  },
-  assessmentResponses: {},
-  statements: {
-    problemStatement: 'Quotes go cold after the first visit.',
-    goalStatement: 'Add one booked job per week.',
-    extraNotes: 'Partner demo snapshot (GP-637).',
-  },
-};
-
-export const PARTNER_DEMO_COACH = DEFAULT_COACHING_COACH;
 
 /**
  * Seeded demo accounts live on this reserved, non-deliverable domain (RFC 2606 `.invalid`), so
@@ -68,6 +10,99 @@ export const PARTNER_DEMO_EMAIL_DOMAIN = 'demo.carsi.invalid';
 export function isPartnerDemoEmail(email: string | null | undefined): boolean {
   return (email ?? '').trim().toLowerCase().endsWith(`@${PARTNER_DEMO_EMAIL_DOMAIN}`);
 }
+
+/**
+ * GP-637: THE demo member. One home for every fact about the sample business, used by both the
+ * public walkthrough page and the seed (src/lib/coaching-portal/partner-demo-seed.ts), so a
+ * prospect sees the same person and business on the guide and in the live demo login.
+ * Client-safe: no Node imports here. No PII: a fictional, clearly-labelled sample.
+ */
+export const PARTNER_DEMO_MEMBER = {
+  fullName: 'Jordan Demo',
+  email: `partner.demo.member@${PARTNER_DEMO_EMAIL_DOMAIN}`,
+  firstName: 'Jordan',
+} as const;
+
+/** Sessions are labelled with this coach until GP-632 chapters exist. */
+export const PARTNER_DEMO_COACH_NAME = 'Demo Coach';
+
+export const PARTNER_DEMO_PROFILE = {
+  businessName: 'Demo Restoration Co. (sample data)',
+  industry: 'Water damage and carpet restoration',
+  location: 'Austin, Texas (sample)',
+  serviceAreas: 'Austin metro and surrounding counties',
+  yearsInBusiness: '3–5 years',
+  businessSize: 'Owner-operator with a small crew',
+  employeeCount: '5',
+  mainServices: 'Water damage mitigation, carpet cleaning, odour control',
+  website: `https://${PARTNER_DEMO_EMAIL_DOMAIN}`,
+  googleBusinessUrl: '',
+  facebookUrl: '',
+  instagramUrl: '',
+  linkedinUrl: '',
+  tiktokUrl: '',
+  youtubeUrl: '',
+  xUrl: '',
+  socialNotes: 'Sample business for partner demonstrations only.',
+  challenges:
+    'Insurance-referred jobs are steady but margins are thin; quotes for retail cleaning go cold after the first visit.',
+  shortTermGoals: 'Book one more direct (non-insurance) job each week within 90 days.',
+  longTermVision: 'A second crew run by a trained lead, with the owner out of the van three days a week.',
+};
+
+export const PARTNER_DEMO_STATEMENTS = {
+  problemStatement: 'Retail quotes go cold after the first visit and the owner is the bottleneck.',
+  goalStatement: 'One more direct job booked every week, and a crew lead trained within six months.',
+  extraNotes: 'Partner demo member (GP-637). Sample data only.',
+};
+
+export const PARTNER_DEMO_ASSESSMENT_ANSWERS: Record<string, string> = {
+  owner_role: 'Owner, estimator and lead technician',
+  typical_week:
+    'Mornings on site, afternoons quoting and chasing insurers, invoices on Sunday night.',
+  years_operating: '3–5 years',
+  revenue_band: '$500k–$1M',
+  profitability: 'Modest profit',
+  revenue_notes: 'Cash flow dips when insurers pay late (45–60 days).',
+  lead_sources: 'Two insurance panels, Google Business Profile, repeat property managers.',
+  website_url: PARTNER_DEMO_PROFILE.website,
+  google_business_url: 'Listed (sample)',
+  facebook_url: 'Not used',
+  instagram_url: 'Not used',
+  linkedin_url: 'Owner profile only',
+  tiktok_url: 'Not used',
+  youtube_url: 'Not used',
+  x_url: 'Not used',
+  social_notes: 'Sample business: no real listings.',
+  marketing_efforts: 'Panel relationships and occasional Google posts; no follow-up system.',
+  enquiry_process: 'Phone answered by the owner when free; voicemail otherwise.',
+  conversion_challenges: 'Retail quotes are sent and never followed up.',
+  ops_strengths: 'Fast mitigation response and good drying records.',
+  ops_pain: 'Owner is the bottleneck for every estimate and every customer call.',
+  tools_used: 'Job management app, spreadsheet for quotes, phone camera for moisture photos.',
+  automation_interest: 'Quote follow-up reminders and a weekly cash-flow snapshot.',
+  top_priorities: '1. Quote follow-up rhythm. 2. Train a crew lead. 3. Weekly numbers.',
+  success_12m: 'A second crew running without the owner on site.',
+};
+
+export const PARTNER_DEMO_WORKSPACE: CoachingPortalWorkspace = {
+  horizontalSummary:
+    'This quarter: lift direct (non-insurance) bookings and get the owner off the tools for quoting.',
+  directionSummary:
+    'Build a quote-to-booking rhythm first, then train a crew lead so a second van can run.',
+  sessionPrepNotes: 'Bring the quote log, last month’s cash-flow snapshot and the crew-lead shortlist.',
+  monthlyActions: [],
+};
+
+/** Static copy for the public page; the seed builds its own with dates relative to "now". */
+export const PARTNER_DEMO_ONBOARDING_SNAPSHOT: CoachingOnboardingSnapshot = {
+  version: 1,
+  submittedAtIso: '2026-10-15T02:00:00.000Z',
+  member: { fullName: PARTNER_DEMO_MEMBER.fullName, email: PARTNER_DEMO_MEMBER.email },
+  profile: PARTNER_DEMO_PROFILE,
+  assessmentResponses: PARTNER_DEMO_ASSESSMENT_ANSWERS,
+  statements: PARTNER_DEMO_STATEMENTS,
+};
 
 export type PartnerDemoWalkthroughStep = {
   title: string;
