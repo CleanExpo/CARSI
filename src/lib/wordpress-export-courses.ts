@@ -3,6 +3,7 @@ import path from 'node:path';
 
 import { getLmsSeedExportRows } from '@/lib/lms-seed-catalog';
 import { formatCecHoursForDisplay } from '@/lib/cec-display';
+import { disciplineTopicLabel } from '@/lib/iicrc-discipline-display';
 import { enrichCourseWithCecHours, resolveCecHours } from '@/lib/seed/cec-hours';
 import { normalizePublicAssetUrl } from '@/lib/remote-image';
 
@@ -72,10 +73,19 @@ const CATEGORY_SLUG_TO_DISCIPLINE: Record<string, string> = {
 };
 
 /**
- * Many exports have `iicrc_discipline: null` but carry discipline via `meta.wp_categories` slugs.
- * Used so CourseGrid discipline tabs (e.g. WRT) match the WP migration export.
+ * The CARSI plain-English topic for an export row ("Water Restoration"), never an IICRC code.
+ *
+ * GP-527: this used to return the discipline acronym itself, derived from WP categories and
+ * titles — a fail-open path that would re-attach the codes GP-523 removed from CARSI courses to any
+ * surface that routed export rows through it. The code is now only an internal lookup key; the
+ * result goes through `disciplineTopicLabel`, which renders nothing for an unknown value.
  */
 export function inferDisciplineFromWpExport(row: WpExportCourse): string | null {
+  return disciplineTopicLabel(inferDisciplineCode(row));
+}
+
+/** Internal lookup key only. Never return this to a caller or render it. */
+function inferDisciplineCode(row: WpExportCourse): string | null {
   if (row.iicrc_discipline) return row.iicrc_discipline;
   const cats = row.meta?.wp_categories;
   if (Array.isArray(cats)) {

@@ -142,36 +142,19 @@ function loadAllowlist() {
 const ALLOWLIST = loadAllowlist();
 
 const COPY_EXT = /\.(tsx?|jsx?|mdx?|html?|json)$/;
-// Authored, customer-facing surfaces. data/wordpress-export/ is deliberately NOT scanned: it
-// is a frozen legacy WooCommerce import snapshot, not authored copy.
+// Authored, customer-facing surfaces, scanned line by line. data/wordpress-export/ is NOT in this
+// list: it is scanned RECORD by RECORD instead (RECORD_SCANNED_DIRS below), because each course's
+// description is a single physical JSON line and a line finding cannot name the course slug that
+// CEC approval is keyed on.
 //
-// The previous version of this note said the export's CEC prose "is already made inert by the
-// fail-closed resolver". For CEC that is TRUE, and GP-519's doubt about it was misplaced —
-// measured 2026-09-07 through the real path, `getPublishedWpImportRows()` maps every import row
-// through `enrichCourseWithCecHours`, and 0 of the 37 rows that reach the seed still carry a
-// `cec_hours` value. An earlier revision of this comment claimed 34 unapproved claims were
-// being published; that was wrong, counted off the raw export file rather than the code path,
-// and a release reviewer caught it.
-//
-// The note was still incomplete, and dangerously so: it said nothing about `iicrc_discipline`,
-// which NOTHING in the import path touches. 5 of those 37 rows carry one (WRT / ASD), and the
-// seed wrote it straight into `lms_courses`, which would have reverted migration
-// 20260907010000 on those courses. That column is now pinned at the seed.
-//
-// 27 files reference data/wordpress-export/, so "only one reader" would be wrong. Enumerated
-// 2026-09-07 (`git grep -l wordpress-export`), exactly one of them writes these two columns
-// INTO lms_courses — the seed above. seed-wordpress-lessons-wxr.ts and
-// analyze-module-title-mismatch.ts touch neither column; export-draft-courses-wp-dump.ts runs
-// the opposite direction (database -> JSON); wp-export-published-import-slugs.ts only declares
-// the row type. That enumeration is what makes the exclusion safe, so re-run it before
-// trusting this note.
-//
-// The exclusion is now sound, for a stated and tested reason rather than an assumed one: that
-// seed pins both columns to `null` / `0` regardless of what the export says, and
-// scripts/seed-wordpress-export-courses.test.ts asserts it against the real export with a
-// mutation control per field. If a second reader of data/wordpress-export/ is ever added, this
-// exclusion stops being safe — bring the directory into SCANNED_DIRS then, and do not narrow
-// a guard to make it green.
+// GP-527 (2026-11-04): this directory used to be excluded outright, on the reasoning that
+// `db:seed-wp-export` pins `cec_hours` / `iicrc_discipline` to null regardless of the export.
+// That pinning is real and tested (scripts/seed-wordpress-export-courses.test.ts), but it was
+// never the whole story: the same seed writes `description` and `short_description` straight
+// through into lms_courses (seed-wordpress-export-courses.ts, `description: wp.description`), and
+// 30+ of those descriptions carry prose such as "This course is approved for IICRC Continuing
+// Education Credit (CEC): 1 Hour". The exclusion therefore reported clean over exactly the
+// claims GP-525 is about. Do not narrow the record scan to make the guard green.
 const SCANNED_DIRS = [
   'app/', 'src/', 'templates/',
   'docs/marketing/', 'docs/content/',
@@ -251,7 +234,153 @@ export function evaluateContent(file, text, allowlist = ALLOWLIST) {
   return findings;
 }
 
-export { BANNED, CEC_NUMBER, inScope, isExempt, normaliseLine, ALLOWLIST, IICRC_FREE_FILES };
+// ------------------------------------------------------------------------------------------------
+// GP-527 — course RECORD scanning (data/wordpress-export/).
+//
+// Each .json file under RECORD_SCANNED_DIRS must be an array of course records. Every string field
+// of every record is HTML-stripped, split into lines and checked against BANNED, CEC_NUMBER and
+// CEC_APPROVAL_PROSE. CEC approval is decided by EXACT slug match against the approvals registry
+// (never the path-substring test the line scanner uses, which would let "<approved>-copy" through).
+// Findings carry { file, slug, field, line, text } so the failure names the course.
+export const RECORD_SCANNED_DIRS = ['data/wordpress-export/'];
+
+/** A prose claim that a COURSE carries / is approved for IICRC CECs, numbered or not. Scoped to
+ *  course records only: in generic marketing copy "courses approved for IICRC CECs" is a correct
+ *  statement about the registry, but inside one course's own description it is a claim about that
+ *  course. A denial written immediately before the verb ("not approved for", "does not award") is
+ *  not a claim. */
+export const CEC_APPROVAL_PROSE = {
+  re: /(?<!\b(?:not|never)\s+(?:yet\s+|been\s+)?)\b(?:approved|accredited|eligible)\s+for\s+(?:the\s+)?(?:IICRC\s+)?(?:CECs?|Continuing[\s-]+Education[\s-]+Credits?)\b|(?<!\b(?:not|never)\s+)\b(?:carry|carries|earn|earns|award|awards|attract|attracts|grant|grants)\s+(?:\d+(?:\.\d+)?\s+)?(?:IICRC\s+)?(?:CECs?|Continuing[\s-]+Education[\s-]+Credits?)\b/i,
+  message:
+    'Prose CEC-approval claim in a course record for a slug that is not approved in data/seed/cec-approvals.json. Only the founder can record an approval; until then the claim must not ship (fail-closed, CLAUDE.md).',
+};
+
+const ENTITIES = { nbsp: ' ', amp: '&', rsquo: "'", lsquo: "'", ldquo: '"', rdquo: '"', mdash: '-', ndash: '-', quot: '"', apos: "'", lt: '<', gt: '>' };
+
+/** Course-record text as a reader sees it: tags become spaces, common entities decode. A claim
+ *  split by markup ("<strong>approved for</strong> IICRC …") must still read as one claim. */
+export function recordTextLines(value) {
+  return value
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
+    .replace(/&([a-z]+);/gi, (m, name) => ENTITIES[name.toLowerCase()] ?? m)
+    .replace(/ /g, ' ')
+    .split(/\r?\n/)
+    .map(normaliseLine)
+    .filter(Boolean);
+}
+
+/** Every string inside a record, with a dotted field path (meta.pricing, tags.0, …). */
+function stringFields(value, path, out) {
+  if (typeof value === 'string') out.push([path, value]);
+  else if (Array.isArray(value)) value.forEach((v, i) => stringFields(v, `${path}.${i}`, out));
+  else if (value && typeof value === 'object') {
+    for (const [k, v] of Object.entries(value)) stringFields(v, path ? `${path}.${k}` : k, out);
+  }
+  return out;
+}
+
+/** Scan one record file. Fail-closed: unparsable JSON, a non-array, or a non-object entry is a
+ *  finding (never "no records"); a record without a string slug can never be approved. */
+export function evaluateRecords(file, jsonText, { approvedSlugs, allowlist = ALLOWLIST } = {}) {
+  const approved = approvedSlugs ?? new Set(CEC_APPROVED_SLUGS);
+  const findings = [];
+  const structural = (message) =>
+    findings.push({ file, slug: null, field: null, line: 0, text: '', message, structural: true });
+  let rows;
+  try {
+    rows = JSON.parse(jsonText);
+  } catch (err) {
+    structural(`could not be parsed as JSON (${err.message}); a record file the guard cannot read is a failure, never a pass`);
+    return findings;
+  }
+  if (!Array.isArray(rows)) {
+    structural('is not an array of course records; the record scan cannot check it');
+    return findings;
+  }
+  rows.forEach((row, i) => {
+    if (!row || typeof row !== 'object' || Array.isArray(row)) {
+      structural(`entry ${i} is not a course record object`);
+      return;
+    }
+    const slug = typeof row.slug === 'string' && row.slug.trim() ? row.slug.trim() : `<record ${i} has no slug>`;
+    const isApproved = approved.has(slug);
+    for (const [field, value] of stringFields(row, '', [])) {
+      if (field === 'slug') continue;
+      recordTextLines(value).forEach((text, li) => {
+        for (const rule of [...BANNED, CEC_NUMBER, CEC_APPROVAL_PROSE]) {
+          if ((rule === CEC_NUMBER || rule === CEC_APPROVAL_PROSE) && isApproved) continue;
+          if (!rule.re.test(text)) continue;
+          const flagged = rule.allowlisted
+            ? !allowlist.has(text)
+            : !(rule.allow && rule.allow.test(text));
+          if (flagged) findings.push({ file, slug, field, line: li + 1, text, message: rule.message });
+        }
+      });
+    }
+  });
+  return findings;
+}
+
+const exposureKey = (e) => [e.file, e.slug, e.field, normaliseLine(String(e.text ?? ''))].join('\u0000');
+
+/** Split record findings into BLOCKING and KNOWN EXPOSURE (GP-525).
+ *
+ *  The known-exposure list is NOT an approval. It pins, by exact (file, slug, field, text), the
+ *  unbacked claims that already exist in the frozen WordPress export and whose resolution is
+ *  founder-reserved under GP-525 (record the approval, or strip the claim). They are printed on
+ *  every run. Anything else blocks: a new slug, a changed claim (e.g. the hours edited), the same
+ *  text in another field, a stale entry whose claim is gone (so the list only shrinks), and a slug
+ *  that is both on this list and approved in the registry (the entry must then be removed). */
+export function classifyRecordFindings(findings, exposureEntries, approvedSlugs) {
+  const approved = approvedSlugs ?? new Set(CEC_APPROVED_SLUGS);
+  const listed = new Map(exposureEntries.map((e) => [exposureKey(e), e]));
+  const matched = new Set();
+  const blocking = [];
+  const known = [];
+  for (const f of findings) {
+    const key = exposureKey(f);
+    if (!f.structural && listed.has(key)) {
+      matched.add(key);
+      known.push(f);
+    } else {
+      blocking.push(f);
+    }
+  }
+  for (const [key, e] of listed) {
+    if (approved.has(e.slug)) {
+      blocking.push({ ...e, line: 0, message: `slug "${e.slug}" is approved in data/seed/cec-approvals.json but still on the GP-525 known-exposure list; remove the entry from ${KNOWN_EXPOSURE_FILE}` });
+    } else if (!matched.has(key)) {
+      blocking.push({ ...e, line: 0, message: `stale GP-525 known-exposure entry: this claim is no longer present; remove the entry from ${KNOWN_EXPOSURE_FILE}` });
+    }
+  }
+  return { blocking, known };
+}
+
+/** GP-525 known-exposure list. Read from the SCANNED tree (cwd), so a scratch repo without the
+ *  file gets an empty list — stricter, never looser. Fail-closed: a missing, unreadable or
+ *  malformed file is an EMPTY list, so every export claim blocks. */
+export const KNOWN_EXPOSURE_FILE = 'scripts/iicrc-cec-known-exposure.json';
+function loadKnownExposure() {
+  try {
+    const parsed = JSON.parse(readFileSync(KNOWN_EXPOSURE_FILE, 'utf8'));
+    if (parsed?.issue !== 'GP-525' || !Array.isArray(parsed?.entries)) return [];
+    return parsed.entries.filter(
+      (e) => e && ['file', 'slug', 'field', 'text'].every((k) => typeof e[k] === 'string' && e[k])
+    );
+  } catch {
+    return [];
+  }
+}
+
+function formatRecordFinding(f) {
+  const where = f.slug ? `${f.file} [slug: ${f.slug}] ${f.field}${f.line ? ` line ${f.line}` : ''}` : f.file;
+  return `  ${where}: ${f.message}${f.text ? `\n    → ${f.text.slice(0, 150)}` : ''}`;
+}
+
+function inRecordScope(f) { const n = f.replace(/\\/g, '/'); return n.endsWith('.json') && RECORD_SCANNED_DIRS.some((d) => n.startsWith(d)); }
+
+export { BANNED, CEC_NUMBER, CEC_APPROVED_SLUGS, inScope, isExempt, normaliseLine, ALLOWLIST, IICRC_FREE_FILES };
 
 function main() {
   let list = '';
@@ -262,10 +391,36 @@ function main() {
     process.exit(1);
   }
   const findings = [];
-  for (const file of list.split('\n').map((f) => f.trim()).filter((f) => f && COPY_EXT.test(f) && inScope(f) && !isExempt(f))) {
+  const files = list.split('\n').map((f) => f.trim()).filter(Boolean);
+  for (const file of files.filter((f) => COPY_EXT.test(f) && inScope(f) && !isExempt(f))) {
     let text = '';
     try { text = readFileSync(file, 'utf8'); } catch { continue; }
     findings.push(...evaluateContent(file, text));
+  }
+
+  // GP-527: course records, slug-aware. A listed record file that cannot be read is a failure.
+  const recordFindings = [];
+  for (const file of files.filter(inRecordScope)) {
+    let text;
+    try {
+      text = readFileSync(file, 'utf8');
+    } catch (err) {
+      recordFindings.push({ file, slug: null, field: null, line: 0, text: '', structural: true, message: `could not be read (${err.message})` });
+      continue;
+    }
+    recordFindings.push(...evaluateRecords(file, text));
+  }
+  const { blocking, known } = classifyRecordFindings(recordFindings, loadKnownExposure());
+  findings.push(...blocking.map(formatRecordFinding));
+  if (known.length > 0) {
+    const slugs = [...new Set(known.map((f) => f.slug))];
+    const lines = [...new Map(known.map((f) => [exposureKey(f), f])).values()];
+    console.error(
+      `\n⚠ KNOWN EXPOSURE — NOT APPROVED (GP-525): ${lines.length} unbacked CEC claim line(s) in ${slugs.length} course record(s) ` +
+      `are pinned in ${KNOWN_EXPOSURE_FILE} pending the founder's decision (record the IICRC approval, or strip the claim). ` +
+      `They are not approvals; any new or changed claim fails this guard.`
+    );
+    console.error(lines.map((f) => `  ${f.file} [slug: ${f.slug}] ${f.field} line ${f.line} → ${f.text.slice(0, 110)}`).join('\n'));
   }
   for (const file of IICRC_FREE_FILES) {
     let text = '';
