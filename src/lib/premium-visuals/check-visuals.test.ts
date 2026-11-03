@@ -224,6 +224,8 @@ describe('(3) comments and unused strings are not rendered evidence', () => {
       "const note = '<PremiumHero media={x} /> <MotionSection> data-pv-motion';\nexport default function Page() { return <main />; }\n",
     'media={undefined}':
       'export default function Page() { return <main><PremiumHero title="x" media={undefined} /><MotionSection /></main>; }\n',
+    'data-media attribute':
+      'export default function Page() { return <main><PremiumHero title="x" data-media="hero" /><MotionSection /></main>; }\n',
     'media on a different element':
       'export default function Page() { return <main><PremiumHero title="x" /><MediaSection media={m} /><MotionSection /></main>; }\n',
   };
@@ -287,8 +289,13 @@ describe('(4) manifest provenance is validated', () => {
   it('names the shape error for an array or string manifest, not just a version mismatch', () => {
     for (const body of ['[]', '"media"', '[{"version":1,"entries":[]}]']) {
       const r = runJson(fixture(cleanFiles({ 'media.manifest.json': body })));
-      const details = r.json.violations.filter((v) => v.rule === 'manifest-invalid').map((v) => v.detail);
-      expect(details.some((d) => /must be an object/.test(d)), body).toBe(true);
+      const details = r.json.violations
+        .filter((v) => v.rule === 'manifest-invalid')
+        .map((v) => v.detail);
+      expect(
+        details.some((d) => /must be an object/.test(d)),
+        body
+      ).toBe(true);
     }
   });
 
@@ -397,6 +404,18 @@ describe('(5) allowlist and comment false positives', () => {
       'css-art',
       'inline-svg-art',
     ]);
+  });
+
+  it('a // inside JSX text does not hide a real svg or placeholder host on the same line', () => {
+    const r = runJson(
+      fixture(
+        cleanFiles({
+          'components/a.tsx':
+            'export const A = () => <p>See // <svg /><img src="https://picsum.photos/200" /></p>;\n',
+        })
+      )
+    );
+    expect(rules(r.json).sort()).toEqual(['inline-svg-art', 'placeholder-host']);
   });
 
   it('a URL in JSX text is not mistaken for a comment that hides real art', () => {

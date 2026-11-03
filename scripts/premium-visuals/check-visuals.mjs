@@ -296,7 +296,8 @@ function globToRe(g) {
  *   code: comments blanked (strings kept, since a string can be rendered)
  *   bare: comments and string-literal contents blanked (used for positive evidence only)
  * A '...' or "..." literal must close on its line; an unclosed quote is JSX text (e.g. "don't").
- * `//` after ':' or '(' is a URL, not a comment.
+ * `//` after ':' or '(' is a URL, not a comment. In the code view a `//` only counts as a comment at
+ * line start or after `; { } ) ]`, so JSX text such as `See // <svg />` cannot hide a finding.
  */
 function scrub(text, { slashComments, htmlComments }) {
   const code = text.split('');
@@ -317,7 +318,14 @@ function scrub(text, { slashComments, htmlComments }) {
     }
     if (slashComments && c === '/' && d === '/' && text[i - 1] !== ':' && text[i - 1] !== '(') {
       const e = text.indexOf('\n', i); const end = e < 0 ? n : e;
-      blank(code, i, end); blank(bare, i, end); i = end; continue;
+      // Evidence view: any // ends the line, so a comment can never fake a hero or motion section.
+      blank(bare, i, end);
+      // Findings view: only a // that starts a line or follows code punctuation is a comment.
+      // `See // <svg />` in JSX text renders, so it stays visible to the findings rules.
+      let k = i - 1;
+      while (k >= 0 && (text[k] === ' ' || text[k] === '\t')) k--;
+      if (k < 0 || '\n;{})]'.includes(text[k])) blank(code, i, end);
+      i = end; continue;
     }
     if (c === '"' || c === "'" || c === '`') {
       let j = i + 1;
@@ -348,7 +356,7 @@ function hasHeroMedia(code, bare) {
   while ((m = heroRe.exec(bare))) {
     const end = tagEnd(bare, m.index);
     const attrsBare = bare.slice(m.index, end);
-    const attrRe = /\b(media|video)\s*=\s*/g;
+    const attrRe = /(?<![\w$-])(media|video)\s*=\s*/g; // not data-media=, heroMedia=
     let a;
     while ((a = attrRe.exec(attrsBare))) {
       const vStart = m.index + a.index + a[0].length;
