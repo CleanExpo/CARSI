@@ -1,7 +1,7 @@
 # Defensible job-file checklist
 
 **CARSI Water Restoration Practitioner — field tool (Module 6)**
-*DRAFT v1 for SME review. Australian-produced: metric, AUD, AS/NZS / Safe Work Australia framing.*
+*Australian-produced: metric, AUD, AS/NZS / Safe Work Australia framing.*
 
 **Build the file as the job happens — records made at the time are what an assessor or court accepts.**
 

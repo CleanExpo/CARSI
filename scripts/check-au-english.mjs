@@ -92,10 +92,10 @@ export const COPY_MODULES = ['src/lib/seo/answer-engine.ts', 'src/lib/seo/llms-t
 // Quiz files with a hit that predates quiz scanning (19/10/2026). Each needs an owner decision
 // before its copy changes, so they are skipped BY NAME until fixed; every other quiz is scanned.
 //   ccw-truckmount: "converts 120 V to 240 V" (unlabelled US voltage in a contrast).
-//   water-damage-restoration-fundamentals: "dedicated 20 A circuit" (circuit-framing rule).
+// water-damage-restoration-fundamentals left this list on 03/11/2026: the promoted v1 quiz
+// (DECISIONS #48) no longer carries the "dedicated 20 A circuit" line, so it is scanned.
 export const QUIZ_PENDING_FIX = new Set([
   'data/seed/ccw-truckmount.quizzes.json',
-  'data/seed/water-damage-restoration-fundamentals-quiz.json',
 ]);
 
 /**
