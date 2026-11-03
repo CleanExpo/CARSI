@@ -91,8 +91,10 @@ export async function generateMarketingPack(
   deps: MarketingPackDeps
 ): Promise<MarketingPackResult> {
   const now = deps.now();
-  // Claims in member-supplied names never reach member-visible copy or the stored pack.
-  inputs = { ...inputs, voice: sanitizeVoice(inputs.voice) };
+  // Every builder below writes copy from controlled wording only (sanitizeVoice); the raw profile
+  // reaches reviewWebsite so it can check the page against the member's own trade and town
+  // (Codex P1, head 32d27443). Only the sanitised voice is stored.
+  const voice = sanitizeVoice(inputs.voice);
   const fetched = inputs.websiteUrl ? await deps.fetchSite(inputs.websiteUrl) : null;
   const review = reviewWebsite({
     websiteUrl: inputs.websiteUrl,
@@ -111,7 +113,7 @@ export async function generateMarketingPack(
     review,
     checklist,
     calendar,
-    voice: inputs.voice,
+    voice,
     generatedAt: now.toISOString(),
   };
   const saved = await deps.persist({

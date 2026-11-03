@@ -19,17 +19,14 @@ function tag(s: string): string {
 /** Deterministic, claim-free month of posts built from the trade voice alone. */
 export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
   const voice = sanitizeVoice(rawVoice);
-  const town = voice.town || 'our local area';
   const trade = voice.trade || 'trade';
   const service = voice.trade || 'our work';
-  const tags = [voice.town ? tag(voice.town) : '', voice.trade ? tag(voice.trade) : ''].filter(
-    Boolean
-  );
+  const tags = voice.trade ? [tag(voice.trade)] : [];
 
   const lines: Array<[string, string]> = [
     [
       'Who we are',
-      `G'day ${town}. We're a local ${trade} business. Over the next month we'll share what we do, how we do it and a few tips for looking after your place.`,
+      `G'day! We're a local ${trade} business. Over the next month we'll share what we do, how we do it and a few tips for looking after your place.`,
     ],
     [
       'Tip',
@@ -37,7 +34,7 @@ export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
     ],
     [
       'Behind the scenes',
-      `Behind the scenes on a ${service} job in ${town} this week. We start with a walk-through so we can explain what we'll do before we start.`,
+      `Behind the scenes on a ${service} job in the area this week. We start with a walk-through so we can explain what we'll do before we start.`,
     ],
     [
       'Question',
@@ -45,7 +42,7 @@ export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
     ],
     [
       'Meet the team',
-      `Meet the people behind the business. We live and work around ${town}, and we turn up on time with the right gear for the job.`,
+      `Meet the people behind the business. We live and work locally, and we turn up on time with the right gear for the job.`,
     ],
     [
       'Tip',
@@ -53,15 +50,15 @@ export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
     ],
     [
       'Local',
-      `Proud to work across ${town} and the surrounding suburbs. Tell us your suburb in the comments and we'll let you know if we cover it.`,
+      `Proud to work across the local area and the surrounding suburbs. Tell us your suburb in the comments and we'll let you know if we cover it.`,
     ],
     [
       'Seasonal',
-      `Change of season in ${town} is a good time to check on the things you only think about once a year. Here's what we look at on a ${service} visit.`,
+      `A change of season is a good time to check on the things you only think about once a year. Here's what we look at on a ${service} visit.`,
     ],
     [
       'Job story',
-      `A recent ${town} job: the customer called about one problem and we found the cause was somewhere else. Fixing the cause, not just the symptom, is how we work.`,
+      `A recent local job: the customer called about one problem and we found the cause was somewhere else. Fixing the cause, not just the symptom, is how we work.`,
     ],
     [
       'How we work',
@@ -85,7 +82,7 @@ export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
     ],
     [
       'Thank you',
-      `Thanks to everyone in ${town} who has booked with us, sent a referral or left a review. It means a lot to a small local business.`,
+      `Thanks to everyone who has booked with us, sent a referral or left a review. It means a lot to a small local business.`,
     ],
     [
       'Tip',
@@ -93,11 +90,11 @@ export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
     ],
     [
       'Local',
-      `Spotted around ${town} this week while on the road. We love working in this community.`,
+      `Spotted around the area this week while on the road. We love working in this community.`,
     ],
     [
       'Job story',
-      `Before and after from a recent ${service} job in ${town}. No two jobs are the same, so we always explain what to expect before we start.`,
+      `Before and after from a recent ${service} job nearby. No two jobs are the same, so we always explain what to expect before we start.`,
     ],
     [
       'Question',
@@ -117,7 +114,7 @@ export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
     ],
     [
       'Local',
-      `Supporting local: a shout-out to another ${town} business we rate. Who's your favourite local business?`,
+      `Supporting local: a shout-out to another local business we rate. Who's your favourite local business?`,
     ],
     [
       'How we work',
@@ -133,11 +130,11 @@ export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
     ],
     [
       'Reviews',
-      `If we've done a job for you, a short Google review helps other ${town} locals find a business they can trust. Thank you.`,
+      `If we've done a job for you, a short Google review helps other locals find a business they can trust. Thank you.`,
     ],
     [
       'Job story',
-      `Small job, happy customer. Not all jobs are big ones, and we're glad to help with the small stuff around ${town} too.`,
+      `Small job, happy customer. Not all jobs are big ones, and we're glad to help with the small stuff around the area too.`,
     ],
     [
       'Seasonal',
@@ -145,7 +142,7 @@ export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
     ],
     [
       'Booking',
-      `Need ${service} in ${town}? Send us a message or give us a call and we'll talk you through it.`,
+      `Need ${service}? Send us a message or give us a call and we'll talk you through it.`,
     ],
   ];
   return lines.map(([theme, caption]) => ({ theme, caption, hashtags: tags }));

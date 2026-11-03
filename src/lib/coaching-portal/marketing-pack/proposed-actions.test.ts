@@ -59,7 +59,8 @@ describe('buildLocalSearchChecklist', () => {
     expect(items.length).toBeGreaterThanOrEqual(8);
     const gbp = items.find((i) => i.id === 'gbp-claimed');
     expect(gbp?.done).toBe(false);
-    expect(items.map((i) => i.label).join(' ')).toMatch(/Toowoomba/);
+    // Copy never names the town (Codex P1, head 32d27443); the checklist speaks to "your town".
+    expect(items.map((i) => i.label).join(' ')).toMatch(/your town/);
     expect(new Set(items.map((i) => i.id)).size).toBe(items.length);
   });
 });

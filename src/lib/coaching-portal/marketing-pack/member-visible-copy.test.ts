@@ -82,7 +82,7 @@ describe('controlled voice', () => {
     );
   });
 
-  it('keeps a real town and maps the trade to a fixed label', () => {
+  it('keeps no town text and maps the trade to a fixed label', () => {
     expect(
       sanitizeVoice({
         businessName: 'Downs Carpet Care',
@@ -93,12 +93,9 @@ describe('controlled voice', () => {
     ).toEqual({
       businessName: '',
       trade: 'carpet and upholstery cleaning',
-      town: 'Toowoomba',
+      town: '',
       services: '',
     });
-    for (const town of ['Mackay QLD', 'Port Macquarie', "O'Connor", 'St. George']) {
-      expect(sanitizeVoice({ ...planted, town }).town).not.toBe('');
-    }
   });
 
   it('no planted profile text reaches the review, checklist, calendar or downloads', () => {
@@ -121,5 +118,55 @@ describe('controlled voice', () => {
     expect(calendar.posts).toHaveLength(30);
     expect(everything.toLowerCase()).not.toContain('fix your mould');
     expect(everything.toLowerCase()).not.toContain('fix everything');
+  });
+});
+
+// Codex P1 (head 32d27443): a town of "MouldFree" is shaped like a place name but is a claim. No
+// shape or word check can tell the two apart, so no member-typed or page-fetched text is ever
+// displayed: generated copy is fixed wording plus the fixed trade labels only.
+describe('no member or page text is ever displayed', () => {
+  const planted = {
+    businessName: 'Qzbizname Plumbing',
+    trade: 'Qztradeword plumbing',
+    town: 'MouldFree',
+    services: 'Qzservice drains',
+  };
+  const plantedHtml =
+    '<html><head><title>Qzpagetitle MouldFree</title></head><body><h1>Qzheading</h1></body></html>';
+
+  it('review, checklist, calendar and every download contain none of it', () => {
+    const review = reviewWebsite({
+      websiteUrl: 'https://qzurlword.test/',
+      fetch: { ok: true, status: 200, html: plantedHtml, finalUrl: 'https://qzurlword.test/' },
+      googleBusinessUrl: 'https://qzgbpword.test/',
+      voice: planted,
+    });
+    const checklist = buildLocalSearchChecklist(review, planted);
+    const calendar = assembleCalendar(planted, new Date('2026-11-09T00:00:00Z'));
+    const everything = [
+      review.summary,
+      ...review.fixes.flatMap((f) => [f.title, f.why, f.how]),
+      ...review.checks.map((c) => c.label),
+      ...checklist.flatMap((i) => [i.label, i.detail]),
+      ...calendar.posts.flatMap((p) => [p.theme, p.caption, p.hashtags.join(' ')]),
+      renderReviewMarkdown(review, planted, '2026-11-09T00:00:00Z'),
+      renderChecklistMarkdown(checklist, planted, '2026-11-09T00:00:00Z'),
+      renderCalendarCsv(calendar),
+    ]
+      .join('\n')
+      .toLowerCase();
+    expect(calendar.posts).toHaveLength(30);
+    for (const token of [
+      'mouldfree',
+      'qzbizname',
+      'qztradeword',
+      'qzservice',
+      'qzpagetitle',
+      'qzheading',
+      'qzurlword',
+      'qzgbpword',
+    ]) {
+      expect(everything, token).not.toContain(token);
+    }
   });
 });

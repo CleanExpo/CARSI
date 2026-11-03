@@ -7,12 +7,6 @@
 import { isCompliantCopy } from './compliance';
 import type { MarketingFix, SiteCheck, SiteFetchResult, SiteReview, TradeVoice } from './types';
 
-/** Member- or page-supplied text is shown only when it carries no claim; otherwise a neutral stand-in. */
-export function safeText(value: string | null | undefined, fallback: string): string {
-  const v = (value ?? '').trim();
-  return v && isCompliantCopy(v) ? v : fallback;
-}
-
 /** Known trades, most specific first. Generated copy only ever names a trade by these labels. */
 const TRADE_LABELS: Array<[RegExp, string]> = [
   [/carpet|rug|upholster/i, 'carpet and upholstery cleaning'],
@@ -39,32 +33,18 @@ export function tradeLabel(trade: string, services = ''): string {
   return TRADE_LABELS.find(([pattern]) => pattern.test(text))?.[1] ?? '';
 }
 
-/** Words that never appear in a real Australian or NZ place name but do in a sentence. */
-const NOT_A_PLACE =
-  /\b(we|we're|will|you|your|our|us|i|can|fix|fixes|fixed|best|free|always|never|guarantee\w*|promise\w*|get|gets|cheap\w*|results?|everything)\b/i;
-
-/** A town is kept only if it is shaped like a place name: 1 to 4 words of letters. */
-export function placeName(raw: string): string {
-  const town = primaryTown(raw);
-  const shaped =
-    /^[A-Za-z][A-Za-z'.\- ]{0,39}$/.test(town) &&
-    town.split(/\s+/).length <= 4 &&
-    !NOT_A_PLACE.test(town);
-  return shaped && isCompliantCopy(town) ? town : '';
-}
-
 /**
  * Every member-visible line in the pack is built from these values. A member's profile is free
- * text and can carry a promise no word filter recognises ("We will fix your mould issue", Codex
- * P1 head 5dfe661f), so generated copy uses controlled wording only: no business name, a trade
- * label from a fixed list, and the town only if it is shaped like a place name. Services are used
- * only to pick the trade label.
+ * text and can carry a claim no word or shape check recognises ("We will fix your mould issue",
+ * a town of "MouldFree": Codex P1 heads 5dfe661f, 32d27443). So no member-typed text is ever
+ * displayed: no business name, no town, no services, and the trade only as a label from the fixed
+ * list. The raw profile is still used to check the member's website, never to write copy.
  */
 export function sanitizeVoice(voice: TradeVoice): TradeVoice {
   return {
     businessName: '',
     trade: tradeLabel(voice.trade ?? '', voice.services ?? ''),
-    town: placeName(voice.town ?? ''),
+    town: '',
     services: '',
   };
 }
@@ -202,9 +182,11 @@ function tradeStems(trade: string, services: string): string[] {
 
 export function reviewWebsite(rawInput: ReviewInput): SiteReview {
   const input = { ...rawInput, voice: sanitizeVoice(rawInput.voice) };
-  const town = primaryTown(input.voice.town);
+  // Display wording never names the town; the raw town is used only to check the page.
+  const town = '';
+  const checkTown = primaryTown(rawInput.voice.town ?? '');
   const trade = input.voice.trade.trim();
-  const shownUrl = safeText(input.websiteUrl, 'your website');
+  const shownUrl = 'your website';
   const checks: SiteCheck[] = [];
   const gbpSpecs = profileFixes(input.googleBusinessUrl, town);
   // Profile fixes go first so they win ties: for a trade business the map listing comes first.
@@ -265,7 +247,7 @@ export function reviewWebsite(rawInput: ReviewInput): SiteReview {
   const viewport = metaContent(html, 'viewport');
   const h1 = firstMatch(html, /<h1[^>]*>([\s\S]*?)<\/h1>/i);
   const text = stripTags(html);
-  const townWord = town.toLowerCase();
+  const townWord = checkTown.toLowerCase();
   const mentionsTown = townWord.length > 0 && text.toLowerCase().includes(townWord);
   const telLink = /href\s*=\s*["']tel:/i.test(html);
   const looksLikePhone = /(\+?61|\b0)[2-478](\s?\d){8}\b/.test(text);
@@ -278,7 +260,7 @@ export function reviewWebsite(rawInput: ReviewInput): SiteReview {
   // head 0b717beb). An unknown town or trade is not required. Matching uses the member's own
   // words; nothing from them is displayed.
   const titleText = (title ?? '').toLowerCase();
-  const titleNamesTown = !town || titleText.includes(town.toLowerCase());
+  const titleNamesTown = !checkTown || titleText.includes(checkTown.toLowerCase());
   const stems = tradeStems(`${rawInput.voice.trade ?? ''} ${trade}`, rawInput.voice.services ?? '');
   const titleNamesTrade = stems.length === 0 || stems.some((stem) => titleText.includes(stem));
   const titleOk = Boolean(
@@ -295,7 +277,7 @@ export function reviewWebsite(rawInput: ReviewInput): SiteReview {
       id: 'title-generic',
       area: 'website',
       title: 'Rewrite your home page title',
-      why: `Your page title is ${!title ? 'missing' : isCompliantCopy(title) ? `"${title}"` : 'not about your trade and town'}. It is the blue headline people see in Google results, so it should say what you do and where.`,
+      why: `Your page title ${!title ? 'is missing' : 'does not say your trade and town'}. It is the blue headline people see in Google results, so it should say what you do and where.`,
       how: `Use a title like "${trade || 'Your trade'} ${town || 'your town'} | Your business name", kept under 60 characters.`,
       impact: 3,
       effort: 1,

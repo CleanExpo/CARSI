@@ -128,6 +128,33 @@ describe('generateMarketingPack', () => {
     expect((d.persist.mock.calls[0][0] as unknown as { model: string | null }).model).toBeNull();
   });
 
+  it('checks the page title against the raw trade even when the trade has no fixed label (Codex P1, head 32d27443)', async () => {
+    const { d } = deps({
+      fetchSite: vi.fn(async () => ({
+        ok: true,
+        status: 200,
+        html: '<html><head><title>Contact us today in Mackay</title></head><body></body></html>',
+        finalUrl: 'https://mechanic.test/',
+      })),
+    });
+    const result = await generateMarketingPack(
+      'm',
+      {
+        websiteUrl: 'https://mechanic.test/',
+        googleBusinessUrl: null,
+        voice: {
+          businessName: 'Acme',
+          trade: 'mobile mechanic',
+          town: 'Mackay QLD',
+          services: 'vehicle repair',
+        },
+      },
+      d
+    );
+    expect(result.review.checks.find((c) => c.id === 'title')?.passed).toBe(false);
+    expect(result.review.fixes.map((f) => f.id)).toContain('title-generic');
+  });
+
   it('records a failed site fetch as unreadable rather than failing the pack', async () => {
     const { d } = deps({
       fetchSite: vi.fn(async () => ({ ok: false, status: 0, html: null, error: 'blocked' })),

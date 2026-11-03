@@ -18,7 +18,10 @@ describe('social calendar', () => {
     expect(calendar.posts).toHaveLength(CALENDAR_DAYS);
     expect(calendar.posts[0]).toMatchObject({ day: 1, date: '2026-11-09' });
     expect(calendar.posts[29]).toMatchObject({ day: 30, date: '2026-12-08' });
-    expect(calendar.posts.some((p) => p.caption.includes('Toowoomba'))).toBe(true);
+    expect(calendar.posts.some((p) => p.caption.includes('carpet and upholstery cleaning'))).toBe(
+      true
+    );
+    expect(calendar.posts.some((p) => p.caption.includes('Toowoomba'))).toBe(false);
     expect(calendar.source).toBe('template');
   });
 
