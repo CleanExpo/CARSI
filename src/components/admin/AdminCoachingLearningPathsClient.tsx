@@ -181,8 +181,8 @@ export function AdminCoachingLearningPathsClient() {
       ) : null}
 
       {view ? (
-        <div className="grid gap-4 lg:grid-cols-[1fr_1.4fr]">
-          <section className={`p-5 ${surface}`}>
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
+          <section className={`min-w-0 p-5 ${surface}`}>
             <h2 className="text-sm font-semibold text-white">Assessment gaps</h2>
             {!view.hasAssessment ? (
               <p className="mt-2 text-sm text-white/50">No submitted assessment yet.</p>
@@ -211,7 +211,7 @@ export function AdminCoachingLearningPathsClient() {
             </button>
           </section>
 
-          <section className={`p-5 ${surface}`}>
+          <section className={`min-w-0 p-5 ${surface}`}>
             <div className="flex flex-wrap items-center justify-between gap-2">
               <h2 className="text-sm font-semibold text-white">Prescribed path</h2>
               {view.pathStatus === 'draft' ? (
@@ -252,7 +252,7 @@ export function AdminCoachingLearningPathsClient() {
                   >
                     <span className="w-5 text-xs text-white/40">{i + 1}</span>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm text-white">{p.title}</p>
+                      <p className="text-sm break-words text-white">{p.title}</p>
                       <p className="text-xs text-white/45">
                         {p.draft ? 'Draft' : STATUS_LABEL[p.status]} · {p.percent}%
                       </p>

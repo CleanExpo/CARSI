@@ -94,13 +94,17 @@ export function AdminCoachingGapMapClient() {
       {!view && !error ? <Loader2 className="h-6 w-6 animate-spin text-sky-400" /> : null}
 
       {view?.chapters.map((ch) => (
-        <div key={ch.chapterSlug} className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div key={ch.chapterSlug} className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           {ch.areas.map((a) => {
             const key = `${ch.chapterSlug}--${a.area}`;
             const onArea = new Set(a.courses.map((c) => c.id));
             const addable = view.options.filter((o) => !onArea.has(o.id));
             return (
-              <article key={key} className={`flex flex-col p-5 ${surface}`} aria-label={a.label}>
+              <article
+                key={key}
+                className={`flex min-w-0 flex-col p-5 ${surface}`}
+                aria-label={a.label}
+              >
                 <div className="flex items-start justify-between gap-2">
                   <h3 className="text-sm font-semibold text-white">{a.label}</h3>
                   <span className="shrink-0 text-xs text-white/40">
@@ -119,7 +123,7 @@ export function AdminCoachingGapMapClient() {
                         className="flex items-center gap-2 rounded-xl border border-white/8 bg-white/[0.03] px-3 py-2"
                       >
                         <span className="w-4 text-xs text-white/40">{i + 1}</span>
-                        <p className="min-w-0 flex-1 truncate text-sm text-white">{c.title}</p>
+                        <p className="min-w-0 flex-1 text-sm break-words text-white">{c.title}</p>
                         <button
                           type="button"
                           aria-label={`Move ${c.title} up`}
