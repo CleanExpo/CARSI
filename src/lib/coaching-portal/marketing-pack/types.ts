@@ -59,9 +59,9 @@ export type CalendarCandidate = { theme: string; caption: string; hashtags: stri
 
 export type SocialCalendar = {
   posts: CalendarPost[];
-  /** Where the 30 posts came from: all AI, AI topped up from the template, or all template. */
-  source: 'ai' | 'ai+template' | 'template';
-  /** AI drafts dropped by the compliance filter. */
+  /** Vetted templates only; no model text reaches the member calendar. */
+  source: 'template';
+  /** Kept for stored-pack shape; always 0 now that no drafts are filtered. */
   rejectedCount: number;
 };
 

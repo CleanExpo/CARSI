@@ -13,17 +13,20 @@ const voice = {
 
 describe('marketing pack downloads', () => {
   it('calendar CSV has a header and 30 rows and neutralises formula cells', () => {
-    const calendar = assembleCalendar(
-      [
+    // Stored packs are rendered as-is, so the CSV writer neutralises formula cells on its own.
+    const base = assembleCalendar(voice, new Date('2026-11-09T00:00:00Z'));
+    const calendar = {
+      ...base,
+      posts: [
         {
+          ...base.posts[0],
           theme: '=HYPERLINK("x")',
           caption: 'Toowoomba tip: blot, "never" rub.',
           hashtags: ['#Tip'],
         },
+        ...base.posts.slice(1),
       ],
-      voice,
-      new Date('2026-11-09T00:00:00Z')
-    );
+    };
     const csv = renderCalendarCsv(calendar);
     const rows = csv.replace(/^﻿/, '').trim().split('\r\n');
     expect(rows).toHaveLength(31);

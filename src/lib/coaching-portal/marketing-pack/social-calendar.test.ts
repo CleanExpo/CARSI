@@ -1,12 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { findComplianceIssues } from './compliance';
-import {
-  assembleCalendar,
-  buildCalendarMessages,
-  buildFallbackPosts,
-  parseCalendarResponse,
-} from './social-calendar';
+import { assembleCalendar, buildFallbackPosts, CALENDAR_DAYS } from './social-calendar';
 
 const voice = {
   businessName: 'Downs Carpet Care',
@@ -16,40 +11,15 @@ const voice = {
 };
 
 describe('social calendar', () => {
-  it('builds a prompt that carries the trade voice inputs and the claim rules', () => {
-    const messages = buildCalendarMessages(voice);
-    const all = messages.map((m) => m.content).join('\n');
-    expect(all).toContain('Carpet & upholstery');
-    expect(all).toContain('Toowoomba');
-    expect(all).toContain('Downs Carpet Care');
-    expect(all).toContain('rug cleaning');
-    expect(all).toMatch(/no earnings/i);
-    expect(all).toMatch(/guarantee/i);
-    expect(all).toMatch(/Australian English/);
-  });
+  const start = new Date('2026-11-09T00:00:00Z');
 
-  it('parses a JSON array out of a fenced model reply and drops malformed rows', () => {
-    const reply =
-      'Here you go:\n```json\n[{"day":1,"theme":"Intro","caption":"Hello Toowoomba, we are Downs Carpet Care.","hashtags":["#Toowoomba"]},{"day":"x"},{"caption":""}]\n```';
-    const posts = parseCalendarResponse(reply);
-    expect(posts).toHaveLength(1);
-    expect(posts[0]).toMatchObject({ theme: 'Intro', hashtags: ['#Toowoomba'] });
-  });
-
-  it('returns an empty list for a reply with no JSON', () => {
-    expect(parseCalendarResponse('Sorry, I cannot help.')).toEqual([]);
-  });
-
-  it('always yields exactly 30 dated items in the trade voice, even with no AI output', () => {
-    const calendar = assembleCalendar([], voice, new Date('2026-11-09T00:00:00Z'));
-    expect(calendar.posts).toHaveLength(30);
-    expect(calendar.posts.map((p) => p.day)).toEqual(Array.from({ length: 30 }, (_, i) => i + 1));
-    expect(calendar.posts[0].date).toBe('2026-11-09');
-    expect(calendar.posts[29].date).toBe('2026-12-08');
+  it('always yields exactly 30 dated items in the trade voice', () => {
+    const calendar = assembleCalendar(voice, start);
+    expect(calendar.posts).toHaveLength(CALENDAR_DAYS);
+    expect(calendar.posts[0]).toMatchObject({ day: 1, date: '2026-11-09' });
+    expect(calendar.posts[29]).toMatchObject({ day: 30, date: '2026-12-08' });
+    expect(calendar.posts.some((p) => p.caption.includes('Toowoomba'))).toBe(true);
     expect(calendar.source).toBe('template');
-    const text = calendar.posts.map((p) => p.caption).join('\n');
-    expect(text).toContain('Toowoomba');
-    expect(text.toLowerCase()).toContain('carpet');
   });
 
   it('every template post passes the compliance filter', () => {
@@ -58,47 +28,17 @@ describe('social calendar', () => {
     }
   });
 
-  it('drops AI posts that make earnings or guarantee claims and back-fills to 30', () => {
-    const ai = Array.from({ length: 30 }, (_, i) => ({
-      theme: `Tip ${i + 1}`,
-      caption:
-        i % 3 === 0
-          ? 'Guaranteed spotless carpets or your money back!'
-          : i % 3 === 1
-            ? 'Our customers save $500 a year, earn more from their rentals.'
-            : `Toowoomba tip ${i + 1}: vacuum high-traffic areas twice a week.`,
-      hashtags: ['#Toowoomba'],
-    }));
-    const calendar = assembleCalendar(ai, voice, new Date('2026-11-09T00:00:00Z'));
-    expect(calendar.posts).toHaveLength(30);
-    expect(calendar.rejectedCount).toBe(20);
-    expect(calendar.source).toBe('ai+template');
-    for (const post of calendar.posts) {
-      expect(findComplianceIssues(`${post.theme} ${post.caption}`)).toEqual([]);
-    }
+  // Codex P1 x4 (heads 0a953a79, c3b52247, 95f39114, bc601506): a word filter cannot prove that
+  // free-form model text is claim-free. The member calendar is therefore built only from the
+  // vetted template set; no model text can reach it.
+  it('is built only from the vetted template set', () => {
+    const vetted = new Set(buildFallbackPosts(voice).map((p) => p.caption));
+    const calendar = assembleCalendar(voice, start);
+    for (const post of calendar.posts) expect(vetted.has(post.caption)).toBe(true);
   });
 
-  it('drops an every-visit result promise from the calendar (Codex P1, head 95f39114)', () => {
-    const promise = 'Our service gets your carpets spotless every visit.';
-    const ai = Array.from({ length: 30 }, (_, i) => ({
-      theme: `Tip ${i + 1}`,
-      caption: i === 0 ? promise : `Toowoomba tip ${i + 1}: blot spills, never rub them.`,
-      hashtags: [],
-    }));
-    const calendar = assembleCalendar(ai, voice, new Date('2026-11-09T00:00:00Z'));
-    expect(calendar.posts).toHaveLength(30);
-    expect(calendar.rejectedCount).toBe(1);
-    expect(calendar.posts.map((p) => p.caption)).not.toContain(promise);
-  });
-
-  it('uses AI posts only (source ai) when all 30 pass', () => {
-    const ai = Array.from({ length: 34 }, (_, i) => ({
-      theme: `Tip ${i + 1}`,
-      caption: `Toowoomba tip ${i + 1}: blot spills, never rub them.`,
-      hashtags: [],
-    }));
-    const calendar = assembleCalendar(ai, voice, new Date('2026-11-09T00:00:00Z'));
-    expect(calendar.posts).toHaveLength(30);
-    expect(calendar.source).toBe('ai');
+  it('accepts no model input at all', () => {
+    // One parameter for the voice and one for the start date: nothing else can be passed in.
+    expect(assembleCalendar.length).toBe(2);
   });
 });

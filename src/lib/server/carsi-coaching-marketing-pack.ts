@@ -1,9 +1,8 @@
 /**
  * GP-634 (Coaching advantage A7): build a member's AI marketing pack from their assessment and
- * business profile. Website review and checklist are deterministic; the 30-day calendar is
- * drafted through the OpenRouter client CARSI already uses, filtered for claims, and topped up
- * from a template so it always has 30 posts. Each fix is written as a proposed action that the
- * coach approves.
+ * business profile. Website review, checklist and the 30-day calendar are deterministic: the
+ * calendar is filled from a vetted, claim-free template set in the member's trade voice, and no
+ * model text reaches it. Each fix is written as a proposed action that the coach approves.
  */
 import { buildLocalSearchChecklist } from '@/lib/coaching-portal/marketing-pack/local-search-checklist';
 import {
@@ -11,11 +10,7 @@ import {
   type ProposedActionInput,
 } from '@/lib/coaching-portal/marketing-pack/proposed-actions';
 import { reviewWebsite, sanitizeVoice } from '@/lib/coaching-portal/marketing-pack/site-review';
-import {
-  assembleCalendar,
-  buildCalendarMessages,
-  parseCalendarResponse,
-} from '@/lib/coaching-portal/marketing-pack/social-calendar';
+import { assembleCalendar } from '@/lib/coaching-portal/marketing-pack/social-calendar';
 import type {
   ChecklistItem,
   MarketingPack,
@@ -25,15 +20,12 @@ import type {
   TradeVoice,
 } from '@/lib/coaching-portal/marketing-pack/types';
 import { parseAssessmentResponsesJson } from '@/lib/coaching-portal/assessment-schema';
-import { OpenRouterClient } from '@/lib/openrouter/client';
-import { resolveOpenRouterConfig } from '@/lib/openrouter/provider';
 import { prisma } from '@/lib/prisma';
 import { replaceProposedMarketingActions } from '@/lib/server/carsi-coaching-actions-store';
 import { fetchPublicPage } from '@/lib/server/safe-public-fetch';
 
 /** A member may regenerate their pack at most this often. */
 export const MARKETING_PACK_COOLDOWN_MS = 10 * 60 * 1000;
-const AI_TIMEOUT_MS = 60_000;
 
 export type MarketingInputs = {
   websiteUrl: string | null;
@@ -73,8 +65,6 @@ export function resolveMarketingInputs(
 export type MarketingPackDeps = {
   now: () => Date;
   fetchSite: (url: string) => Promise<SiteFetchResult>;
-  /** Returns the raw model reply, or null when no AI provider is configured. */
-  generateCalendarText: (voice: TradeVoice) => Promise<string | null>;
   /**
    * Writes the pack and its proposed actions together: both commit or neither does, so a
    * saved pack (which starts the rebuild cooldown) always has its proposed actions.
@@ -112,20 +102,10 @@ export async function generateMarketingPack(
   });
   const checklist = buildLocalSearchChecklist(review, inputs.voice);
 
-  let aiText: string | null = null;
-  try {
-    aiText = await deps.generateCalendarText(inputs.voice);
-  } catch {
-    aiText = null;
-  }
   const startDate = new Date(
     Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1)
   );
-  const calendar = assembleCalendar(
-    aiText ? parseCalendarResponse(aiText) : [],
-    inputs.voice,
-    startDate
-  );
+  const calendar = assembleCalendar(inputs.voice, startDate);
 
   const pack: MarketingPack = {
     review,
@@ -137,7 +117,7 @@ export async function generateMarketingPack(
   const saved = await deps.persist({
     userId,
     pack,
-    model: calendar.source === 'template' ? null : resolveOpenRouterConfig().model,
+    model: null,
     actions: fixesToProposedActions(review.fixes),
   });
   return {
@@ -149,29 +129,9 @@ export async function generateMarketingPack(
   };
 }
 
-async function openRouterCalendarText(voice: TradeVoice): Promise<string | null> {
-  const cfg = resolveOpenRouterConfig();
-  if (!cfg.configured) return null;
-  const client = new OpenRouterClient({
-    apiKey: cfg.apiKey,
-    baseUrl: cfg.baseUrl,
-    referer: cfg.referer,
-    appTitle: cfg.appTitle,
-    timeoutMs: AI_TIMEOUT_MS,
-  });
-  const response = await client.chat({
-    model: cfg.model,
-    max_tokens: 6000,
-    temperature: 0.7,
-    messages: buildCalendarMessages(voice),
-  });
-  return OpenRouterClient.extractText(response) || null;
-}
-
 export const defaultMarketingPackDeps: MarketingPackDeps = {
   now: () => new Date(),
   fetchSite: fetchPublicPage,
-  generateCalendarText: openRouterCalendarText,
   persist: async ({ userId, pack, model, actions }) =>
     prisma.$transaction(async (tx) => {
       const saved = await tx.carsiCoachingMarketingPack.create({

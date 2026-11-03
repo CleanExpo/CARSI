@@ -11,8 +11,8 @@ import {
 import { requireCoachingPortalEditor } from '@/lib/server/carsi-coaching-portal-gate';
 
 export const dynamic = 'force-dynamic';
-/** Site fetch (8s) plus one model call (60s) fits well inside this. */
-export const maxDuration = 120;
+/** One site fetch (8s total deadline) plus database writes fits well inside this. */
+export const maxDuration = 30;
 
 export async function GET(request: NextRequest) {
   const claims = await getSessionClaimsFromRequest(request);

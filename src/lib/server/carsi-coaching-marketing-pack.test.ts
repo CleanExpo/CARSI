@@ -77,7 +77,6 @@ function deps(overrides: Record<string, unknown> = {}) {
     d: {
       now: () => new Date('2026-11-09T00:00:00Z'),
       fetchSite: vi.fn(async () => ({ ok: true, status: 200, html: weakHtml })),
-      generateCalendarText: vi.fn(async () => null as string | null),
       persist: vi.fn(async (input: { actions: unknown[] }) => {
         saved.push(input);
         proposed.push(...input.actions);
@@ -106,7 +105,7 @@ describe('resolveMarketingInputs', () => {
 });
 
 describe('generateMarketingPack', () => {
-  it('produces a review, checklist, 30-day calendar and proposed actions from the template when AI is off', async () => {
+  it('produces a review, checklist, 30-day calendar and proposed actions', async () => {
     const { d, saved, proposed } = deps();
     const result = await generateMarketingPack('member-1', resolveMarketingInputs(profile, {}), d);
     expect(d.fetchSite).toHaveBeenCalledWith('https://old-site.test/');
@@ -120,15 +119,13 @@ describe('generateMarketingPack', () => {
     expect(result.proposedActionCount).toBe(result.review.fixes.length);
   });
 
-  it('falls back to the template when the AI call throws', async () => {
-    const { d } = deps({
-      generateCalendarText: vi.fn(async () => {
-        throw new Error('timeout');
-      }),
-    });
+  it('builds the calendar from the vetted templates without any model call', async () => {
+    const { d } = deps();
+    expect(Object.keys(d)).not.toContain('generateCalendarText');
     const result = await generateMarketingPack('m', resolveMarketingInputs(profile, {}), d);
     expect(result.calendar.posts).toHaveLength(30);
     expect(result.calendar.source).toBe('template');
+    expect((d.persist.mock.calls[0][0] as unknown as { model: string | null }).model).toBeNull();
   });
 
   it('records a failed site fetch as unreadable rather than failing the pack', async () => {

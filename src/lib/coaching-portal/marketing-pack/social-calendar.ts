@@ -1,76 +1,15 @@
 /**
- * GP-634: 30-day social calendar in the member's trade voice. The model drafts; the compliance
- * filter drops any draft with an earnings, guarantee or superlative claim; a deterministic
- * template tops the calendar up to exactly 30 so a member always receives a full month.
+ * GP-634: 30-day social calendar in the member's trade voice, built only from a vetted,
+ * claim-free template set filled with the member's business name, trade, town and services.
+ * No model text reaches the calendar: four review rounds showed a word filter cannot prove
+ * free-form AI copy is free of earnings, guarantee or outcome claims. AI drafting can return
+ * behind a coach approval step (see RESULT.md for GP-634).
  */
-import { MARKETING_COPY_RULES, isCompliantCopy } from './compliance';
+import { isCompliantCopy } from './compliance';
 import { primaryTown, sanitizeVoice } from './site-review';
 import type { CalendarCandidate, CalendarPost, SocialCalendar, TradeVoice } from './types';
 
 export const CALENDAR_DAYS = 30;
-
-export type ChatMessage = { role: 'system' | 'user'; content: string };
-
-export function buildCalendarMessages(rawVoice: TradeVoice): ChatMessage[] {
-  const voice = sanitizeVoice(rawVoice);
-  const town = primaryTown(voice.town) || voice.town;
-  return [
-    {
-      role: 'system',
-      content: [
-        "You write social media posts for an Australian trade business, in the owner's own voice:",
-        'plain, practical, friendly, first person plural ("we"), short sentences, no hype.',
-        'Rules you must follow for every post:',
-        ...MARKETING_COPY_RULES.map((r) => `- ${r}`),
-        'Reply with a JSON array only, no commentary.',
-      ].join('\n'),
-    },
-    {
-      role: 'user',
-      content: [
-        `Business: ${voice.businessName || 'a local trade business'}`,
-        `Trade: ${voice.trade || 'trade services'}`,
-        `Town: ${town || 'their local area'}`,
-        `Services: ${voice.services || voice.trade}`,
-        '',
-        `Write ${CALENDAR_DAYS + 4} posts for the next month. Mix: practical tips, behind-the-scenes job stories (no customer names or addresses),`,
-        'seasonal reminders for the local area, team and community posts, questions to followers, and soft booking reminders.',
-        'Each item: {"theme": short label, "caption": 40 to 90 words, "hashtags": up to 4 strings starting with #}.',
-      ].join('\n'),
-    },
-  ];
-}
-
-function asCandidate(raw: unknown): CalendarCandidate | null {
-  if (!raw || typeof raw !== 'object') return null;
-  const r = raw as Record<string, unknown>;
-  const caption = typeof r.caption === 'string' ? r.caption.trim() : '';
-  if (caption.length < 10) return null;
-  const theme =
-    typeof r.theme === 'string' && r.theme.trim() ? r.theme.trim().slice(0, 80) : 'Post';
-  const hashtags = Array.isArray(r.hashtags)
-    ? r.hashtags
-        .filter((h): h is string => typeof h === 'string')
-        .map((h) => h.trim())
-        .filter((h) => /^#[\p{L}\p{N}_]{1,40}$/u.test(h))
-        .slice(0, 4)
-    : [];
-  return { theme, caption: caption.slice(0, 1200), hashtags };
-}
-
-/** Pull the first JSON array out of a model reply (bare or inside a ``` fence). */
-export function parseCalendarResponse(text: string): CalendarCandidate[] {
-  const start = text.indexOf('[');
-  const end = text.lastIndexOf(']');
-  if (start < 0 || end <= start) return [];
-  try {
-    const parsed = JSON.parse(text.slice(start, end + 1)) as unknown;
-    if (!Array.isArray(parsed)) return [];
-    return parsed.map(asCandidate).filter((c): c is CalendarCandidate => c !== null);
-  } catch {
-    return [];
-  }
-}
 
 function tag(s: string): string {
   const t = s.replace(/[^\p{L}\p{N}]/gu, '');
@@ -223,35 +162,22 @@ function isoDay(start: Date, offset: number): string {
   return d.toISOString().slice(0, 10);
 }
 
-export function assembleCalendar(
-  aiCandidates: CalendarCandidate[],
-  voice: TradeVoice,
-  startDate: Date
-): SocialCalendar {
-  const accepted: CalendarCandidate[] = [];
-  let rejectedCount = 0;
-  for (const c of aiCandidates) {
-    if (accepted.length >= CALENDAR_DAYS) break;
-    if (isCompliantCopy(`${c.theme} ${c.caption} ${c.hashtags.join(' ')}`)) accepted.push(c);
-    else rejectedCount += 1;
-  }
-  const aiCount = accepted.length;
-  const fallback = buildFallbackPosts(voice).filter((c) =>
-    isCompliantCopy(`${c.theme} ${c.caption}`)
+export function assembleCalendar(voice: TradeVoice, startDate: Date): SocialCalendar {
+  // The filter still runs on the filled templates: member-supplied names are the only variable
+  // text, and sanitizeVoice has already replaced any that carry a claim.
+  const vetted = buildFallbackPosts(voice).filter((c) =>
+    isCompliantCopy(`${c.theme} ${c.caption} ${c.hashtags.join(' ')}`)
   );
-  let i = 0;
-  while (accepted.length < CALENDAR_DAYS && fallback.length > 0) {
-    accepted.push(fallback[i % fallback.length]);
-    i += 1;
+  const chosen: CalendarCandidate[] = [];
+  for (let i = 0; chosen.length < CALENDAR_DAYS && vetted.length > 0; i += 1) {
+    chosen.push(vetted[i % vetted.length]);
   }
-  const posts: CalendarPost[] = accepted.slice(0, CALENDAR_DAYS).map((c, idx) => ({
+  const posts: CalendarPost[] = chosen.map((c, idx) => ({
     day: idx + 1,
     date: isoDay(startDate, idx),
     theme: c.theme,
     caption: c.caption,
     hashtags: c.hashtags,
   }));
-  const source: SocialCalendar['source'] =
-    aiCount === 0 ? 'template' : aiCount >= CALENDAR_DAYS ? 'ai' : 'ai+template';
-  return { posts, source, rejectedCount };
+  return { posts, source: 'template', rejectedCount: 0 };
 }

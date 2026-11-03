@@ -83,12 +83,20 @@ function hasLocalBusinessSchema(html: string): boolean {
   );
 }
 
+/** Google's own country domains members are likely to paste (AU and NZ first). */
+const GOOGLE_DOMAINS = ['google.com', 'google.com.au', 'google.co.nz', 'google.co.uk', 'google.ca'];
+const GOOGLE_HOSTS = new Set(
+  GOOGLE_DOMAINS.flatMap((d) => [d, `www.${d}`, `maps.${d}`, `business.${d}`])
+);
+
 export function isGoogleBusinessLink(url: string): boolean {
   try {
     const u = new URL(url);
     const host = u.hostname.toLowerCase();
-    if (host === 'g.page' || host === 'maps.app.goo.gl' || host === 'goo.gl') return true;
-    if (/(^|\.)google\.[a-z.]+$/.test(host)) {
+    if (host === 'g.page' || host === 'maps.app.goo.gl') return true;
+    if (host === 'goo.gl') return u.pathname.startsWith('/maps');
+    // Exact Google hosts only: a suffix match accepted google.com.evil.example (Codex P1, bc601506).
+    if (GOOGLE_HOSTS.has(host)) {
       return (
         /\/maps|\/search|[?&](cid|ludocid)=|business\.google/.test(`${u.pathname}${u.search}`) ||
         host.startsWith('business.') ||

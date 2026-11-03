@@ -1,7 +1,7 @@
 /**
  * GP-634: runtime claim filter for member marketing copy (Australian Consumer Law: a claim needs
- * evidence). Every AI draft and every template line goes through this before a member sees it.
- * A hit drops the draft; it is never rewritten silently. Patterns follow the build-time guard in
+ * evidence). Member-supplied names and every filled template line go through this before a member
+ * sees them; a flagged name is replaced with a neutral fallback, never rewritten silently. Patterns follow the build-time guard in
  * src/lib/marketing/public-claims-guard.test.ts plus earnings, guarantee and outcome claims,
  * and CARSI's IICRC wording rule. Tighten a false positive with a narrower pattern, never by
  * deleting a rule.
@@ -65,6 +65,11 @@ const RULES: { rule: string; pattern: RegExp }[] = [
   },
   {
     rule: 'outcome claim',
+    pattern:
+      /\b(always|guaranteed\s+to|sure\s+to)\s+(remov|eliminat|kill|fix|get|leav|restor|work|solv|lift|clean)/i,
+  },
+  {
+    rule: 'outcome claim',
     pattern: /\b(completely|totally|entirely|fully)\s+(remov|eliminat|clean|gone|restor)/i,
   },
   // Definite outcome promises, whatever the wording (fail closed for generated drafts).
@@ -117,13 +122,3 @@ export function findComplianceIssues(text: string): ComplianceIssue[] {
 export function isCompliantCopy(text: string): boolean {
   return findComplianceIssues(text).length === 0;
 }
-
-/** Plain-English rules handed to the model; the filter above still checks every draft. */
-export const MARKETING_COPY_RULES = [
-  'No earnings, income, savings or revenue claims, and no dollar figures.',
-  'No guarantees, money-back offers, "risk-free" or "100%" promises.',
-  'No superlatives you cannot prove: no "best", "number one", "#1", "leading", "cheapest".',
-  'No promises about results: nothing a customer "will" get, see or save, no numbers of customers, leads or jobs, no time frames ("in 24 hours"), no percentages, no "every time".',
-  'Do not mention IICRC, any industry body, any standard or any qualification.',
-  'Australian English spelling (colour, mould, odour, organise), metric units, AUD.',
-];

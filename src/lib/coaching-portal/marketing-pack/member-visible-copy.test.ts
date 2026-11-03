@@ -38,7 +38,7 @@ describe('member-visible copy from hostile inputs', () => {
         voice: hostileVoice,
       });
       const checklist = buildLocalSearchChecklist(review, hostileVoice);
-      const calendar = assembleCalendar([], hostileVoice, new Date('2026-11-09T00:00:00Z'));
+      const calendar = assembleCalendar(hostileVoice, new Date('2026-11-09T00:00:00Z'));
       expect(calendar.posts).toHaveLength(30);
 
       const visible = [

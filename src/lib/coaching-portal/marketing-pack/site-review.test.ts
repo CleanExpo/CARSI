@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import { findComplianceIssues } from './compliance';
-import { reviewWebsite } from './site-review';
+import { isGoogleBusinessLink, reviewWebsite } from './site-review';
 
 const fixture = (name: string) => readFileSync(join(__dirname, '__fixtures__', name), 'utf8');
 
@@ -95,6 +95,45 @@ describe('reviewWebsite', () => {
       websiteUrl: null,
       fetch: null,
       googleBusinessUrl: 'https://facebook.com/downs',
+      voice,
+    });
+    expect(review.fixes.map((f) => f.id)).toContain('gbp-link-invalid');
+  });
+});
+
+describe('isGoogleBusinessLink (Codex P1, head bc601506)', () => {
+  it.each([
+    'https://google.com.evil.example/maps',
+    'https://www.google.co.evil.example/maps/place/x',
+    'https://maps.google.attacker.test/',
+    'https://evilgoogle.com/maps',
+    'https://google.com@evil.example/maps',
+    'https://notg.page/r/x',
+    'https://business.site.evil.example/',
+    'https://www.google.com/',
+  ])('rejects %s', (url) => {
+    expect(isGoogleBusinessLink(url)).toBe(false);
+  });
+
+  it.each([
+    'https://g.page/r/downs-carpet-care',
+    'https://maps.app.goo.gl/abc',
+    'https://goo.gl/maps/abc',
+    'https://www.google.com/maps/place/Downs+Carpet+Care',
+    'https://www.google.com.au/maps/place/Downs+Carpet+Care',
+    'https://maps.google.com.au/?cid=123',
+    'https://www.google.co.nz/search?q=downs&ludocid=123',
+    'https://business.google.com/dashboard/l/123',
+    'https://downs-carpet-care.business.site/',
+  ])('accepts %s', (url) => {
+    expect(isGoogleBusinessLink(url)).toBe(true);
+  });
+
+  it('a spoofed host gets the invalid-link fix in the review', () => {
+    const review = reviewWebsite({
+      websiteUrl: null,
+      fetch: null,
+      googleBusinessUrl: 'https://google.com.evil.example/maps',
       voice,
     });
     expect(review.fixes.map((f) => f.id)).toContain('gbp-link-invalid');

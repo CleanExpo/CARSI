@@ -48,6 +48,9 @@ describe('findComplianceIssues', () => {
     'We remove all stains from your couch',
     'Leaves your rugs odour-free',
     'Completely removes pet odours',
+    // Codex P1, head bc601506.
+    'Our team always removes mould from your home.',
+    'Always gets the smell out',
   ])('rejects %s', (text) => {
     expect(findComplianceIssues(text).length).toBeGreaterThan(0);
     expect(isCompliantCopy(text)).toBe(false);
