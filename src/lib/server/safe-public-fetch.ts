@@ -2,9 +2,12 @@
  * GP-634: fetch a member-supplied public web page without letting the server reach private or
  * internal addresses. A member types their own website URL, so every hop (including redirects)
  * is resolved and checked against private, loopback, link-local and metadata ranges before it
- * is requested. Bounded by a timeout, a redirect limit and a body size cap.
+ * is requested. The check runs inside the socket's own DNS lookup, so the checked address is
+ * the connected address. Bounded by a timeout, a redirect limit and a body size cap.
  */
-import { lookup } from 'node:dns/promises';
+import { lookup as dnsLookup } from 'node:dns/promises';
+import http from 'node:http';
+import https from 'node:https';
 import { isIP } from 'node:net';
 
 import type { SiteFetchResult } from '@/lib/coaching-portal/marketing-pack/types';
@@ -121,80 +124,157 @@ export function validatePublicHttpUrl(
   return { ok: true, url };
 }
 
-async function hostIsPublic(hostname: string): Promise<boolean> {
-  const bare = hostname.replace(/^\[|\]$/g, '');
-  if (isIP(bare)) return !isBlockedAddress(bare);
-  try {
-    const addrs = await lookup(bare, { all: true, verbatim: true });
-    return addrs.length > 0 && addrs.every((a) => !isBlockedAddress(a.address));
-  } catch {
-    return false;
-  }
-}
+export type ResolvedAddress = { address: string; family: number };
+export type Resolver = (hostname: string) => Promise<ResolvedAddress[]>;
+type LookupCallback = (
+  err: NodeJS.ErrnoException | null,
+  address: string | ResolvedAddress[],
+  family?: number
+) => void;
+export type GuardedLookup = (
+  hostname: string,
+  options: { all?: boolean } | number | undefined,
+  callback: LookupCallback
+) => void;
 
-async function readCapped(res: Response): Promise<string> {
-  if (!res.body) return '';
-  const reader = res.body.getReader();
-  const chunks: Uint8Array[] = [];
-  let total = 0;
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    total += value.byteLength;
-    if (total > MAX_BYTES) {
-      await reader.cancel();
-      break;
-    }
-    chunks.push(value);
-  }
-  return new TextDecoder('utf-8', { fatal: false }).decode(Buffer.concat(chunks));
-}
+const BLOCKED_CODE = 'ECARSI_PRIVATE_ADDRESS';
 
 /**
- * Note: DNS is checked before each hop, then fetch resolves again. A host that flips its DNS
- * between the two lookups could still reach a private address; the fetch is GET-only, carries
- * no credentials and its body is only parsed as HTML, which limits what that could expose.
+ * The DNS lookup the socket itself uses. Every resolved address is checked here, at connect
+ * time, so the address that was checked is the address that is connected to: a name that
+ * changes its DNS answer between a check and a connect (DNS rebinding) cannot slip through.
+ * Any private answer refuses the whole name.
  */
-export async function fetchPublicPage(raw: string): Promise<SiteFetchResult> {
-  const first = validatePublicHttpUrl(raw);
-  if (!first.ok) return { ok: false, status: 0, html: null, error: first.reason };
-  let url = first.url;
-  for (let hop = 0; hop <= MAX_REDIRECTS; hop += 1) {
-    if (!(await hostIsPublic(url.hostname))) {
-      return { ok: false, status: 0, html: null, error: 'not a public address' };
-    }
-    let res: Response;
-    try {
-      res = await fetch(url, {
+export function createGuardedLookup(
+  resolve: Resolver,
+  isAllowed: (ip: string) => boolean = (ip) => !isBlockedAddress(ip)
+): GuardedLookup {
+  return (hostname, options, callback) => {
+    const wantAll = typeof options === 'object' && options !== null && options.all === true;
+    resolve(hostname)
+      .then((addrs) => {
+        if (addrs.length === 0 || !addrs.every((a) => isAllowed(a.address))) {
+          const err = new Error('not a public address') as NodeJS.ErrnoException;
+          err.code = BLOCKED_CODE;
+          callback(err, wantAll ? [] : '', 0);
+          return;
+        }
+        if (wantAll) callback(null, addrs);
+        else callback(null, addrs[0].address, addrs[0].family);
+      })
+      .catch((e: unknown) => callback(e as NodeJS.ErrnoException, wantAll ? [] : '', 0));
+  };
+}
+
+const systemResolver: Resolver = async (hostname) =>
+  (await dnsLookup(hostname, { all: true, verbatim: true })).map((a) => ({
+    address: a.address,
+    family: a.family,
+  }));
+
+type RawPage = {
+  ok: boolean;
+  status: number;
+  location?: string | null;
+  contentType?: string;
+  body?: string;
+  error?: string;
+};
+
+/** One GET over node:http(s) with the guarded lookup, a timeout and a body cap. No redirects. */
+export function requestPage(url: URL, lookup: GuardedLookup): Promise<RawPage> {
+  const mod = url.protocol === 'https:' ? https : http;
+  return new Promise((resolvePage) => {
+    let settled = false;
+    const finish = (page: RawPage) => {
+      if (!settled) {
+        settled = true;
+        resolvePage(page);
+      }
+    };
+    const req = mod.request(
+      url,
+      {
         method: 'GET',
-        redirect: 'manual',
-        signal: AbortSignal.timeout(TIMEOUT_MS),
+        lookup: lookup as unknown as http.RequestOptions['lookup'],
+        timeout: TIMEOUT_MS,
         headers: {
           'User-Agent': 'CARSI-Coaching-Marketing-Review/1.0',
           Accept: 'text/html,application/xhtml+xml',
         },
-      });
-    } catch (err) {
-      const msg =
-        err instanceof Error && err.name === 'TimeoutError' ? 'timed out' : 'could not connect';
-      return { ok: false, status: 0, html: null, error: msg };
-    }
-    if (res.status >= 300 && res.status < 400) {
-      const location = res.headers.get('location');
-      if (!location)
-        return { ok: false, status: res.status, html: null, error: 'redirect without location' };
-      const next = validatePublicHttpUrl(new URL(location, url).toString());
-      if (!next.ok) return { ok: false, status: res.status, html: null, error: next.reason };
+      },
+      (res) => {
+        const status = res.statusCode ?? 0;
+        const location = res.headers.location ?? null;
+        const contentType = String(res.headers['content-type'] ?? '');
+        if (status >= 300 && status < 400) {
+          res.resume();
+          finish({ ok: false, status, location });
+          return;
+        }
+        const chunks: Buffer[] = [];
+        let total = 0;
+        res.on('data', (chunk: Buffer) => {
+          total += chunk.byteLength;
+          if (total > MAX_BYTES) {
+            res.destroy();
+            finish({
+              ok: true,
+              status,
+              contentType,
+              body: Buffer.concat(chunks).toString('utf8'),
+            });
+            return;
+          }
+          chunks.push(chunk);
+        });
+        res.on('end', () =>
+          finish({ ok: true, status, contentType, body: Buffer.concat(chunks).toString('utf8') })
+        );
+        res.on('error', () => finish({ ok: false, status, error: 'could not read the page' }));
+      }
+    );
+    req.on('timeout', () => {
+      req.destroy();
+      finish({ ok: false, status: 0, error: 'timed out' });
+    });
+    req.on('error', (err: NodeJS.ErrnoException) =>
+      finish({
+        ok: false,
+        status: 0,
+        error: err.code === BLOCKED_CODE ? 'not a public address' : 'could not connect',
+      })
+    );
+    req.end();
+  });
+}
+
+export async function fetchPublicPage(
+  raw: string,
+  lookup: GuardedLookup = createGuardedLookup(systemResolver)
+): Promise<SiteFetchResult> {
+  const first = validatePublicHttpUrl(raw);
+  if (!first.ok) return { ok: false, status: 0, html: null, error: first.reason };
+  let url = first.url;
+  for (let hop = 0; hop <= MAX_REDIRECTS; hop += 1) {
+    const page = await requestPage(url, lookup);
+    if (page.status >= 300 && page.status < 400) {
+      if (!page.location) {
+        return { ok: false, status: page.status, html: null, error: 'redirect without location' };
+      }
+      const next = validatePublicHttpUrl(new URL(page.location, url).toString());
+      if (!next.ok) return { ok: false, status: page.status, html: null, error: next.reason };
       url = next.url;
       continue;
     }
-    if (!res.ok) return { ok: false, status: res.status, html: null, error: `HTTP ${res.status}` };
-    const type = res.headers.get('content-type') ?? '';
-    if (type && !/html|xml/i.test(type)) {
-      return { ok: false, status: res.status, html: null, error: 'not a web page' };
+    if (!page.ok) return { ok: false, status: page.status, html: null, error: page.error };
+    if (page.status < 200 || page.status >= 300) {
+      return { ok: false, status: page.status, html: null, error: `HTTP ${page.status}` };
     }
-    const html = await readCapped(res);
-    return { ok: true, status: res.status, html, finalUrl: url.toString() };
+    if (page.contentType && !/html|xml/i.test(page.contentType)) {
+      return { ok: false, status: page.status, html: null, error: 'not a web page' };
+    }
+    return { ok: true, status: page.status, html: page.body ?? '', finalUrl: url.toString() };
   }
   return { ok: false, status: 0, html: null, error: 'too many redirects' };
 }

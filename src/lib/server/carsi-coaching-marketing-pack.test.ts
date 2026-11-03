@@ -2,9 +2,46 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/lib/prisma', () => ({ prisma: {} }));
+/**
+ * Prisma mock: the top-level client throws on every write, so a write that is not routed
+ * through the transaction client fails the test (Codex P1, head 0a953a79: pack and proposed
+ * actions must commit together).
+ */
+const txWrites: string[] = [];
+const outsideTx = () => {
+  throw new Error('write outside transaction');
+};
+let failActionCreate = false;
+const tx = {
+  carsiCoachingMarketingPack: {
+    create: vi.fn(async () => {
+      txWrites.push('pack');
+      return { id: 'pack-tx' };
+    }),
+  },
+  carsiCoachingAction: {
+    findMany: vi.fn(async () => []),
+    deleteMany: vi.fn(async () => ({ count: 0 })),
+    create: vi.fn(async () => {
+      if (failActionCreate) throw new Error('action write failed');
+      txWrites.push('action');
+      return {};
+    }),
+  },
+};
+vi.mock('@/lib/prisma', () => ({
+  prisma: {
+    $transaction: vi.fn(async (fn: (client: unknown) => Promise<unknown>) => fn(tx)),
+    carsiCoachingMarketingPack: { create: outsideTx },
+    carsiCoachingAction: {
+      findMany: outsideTx,
+      deleteMany: outsideTx,
+      create: outsideTx,
+    },
+  },
+}));
 
-const { generateMarketingPack, resolveMarketingInputs } =
+const { defaultMarketingPackDeps, generateMarketingPack, resolveMarketingInputs } =
   await import('./carsi-coaching-marketing-pack');
 const { isBlockedAddress, validatePublicHttpUrl } = await import('./safe-public-fetch');
 
@@ -39,13 +76,10 @@ function deps(overrides: Record<string, unknown> = {}) {
       now: () => new Date('2026-11-09T00:00:00Z'),
       fetchSite: vi.fn(async () => ({ ok: true, status: 200, html: weakHtml })),
       generateCalendarText: vi.fn(async () => null as string | null),
-      savePack: vi.fn(async (pack: unknown) => {
-        saved.push(pack);
-        return { id: 'pack-1' };
-      }),
-      replaceProposedActions: vi.fn(async (_userId: string, actions: unknown[]) => {
-        proposed.push(...actions);
-        return actions.length;
+      persist: vi.fn(async (input: { actions: unknown[] }) => {
+        saved.push(input);
+        proposed.push(...input.actions);
+        return { id: 'pack-1', proposedActionCount: input.actions.length };
       }),
       ...overrides,
     },
@@ -102,6 +136,50 @@ describe('generateMarketingPack', () => {
     const result = await generateMarketingPack('m', resolveMarketingInputs(profile, {}), d);
     expect(result.review.siteReadable).toBe(false);
     expect(result.calendar.posts).toHaveLength(30);
+  });
+});
+
+describe('defaultMarketingPackDeps.persist', () => {
+  const pack = {
+    review: {
+      websiteUrl: null,
+      googleBusinessUrl: null,
+      siteReadable: false,
+      summary: 's',
+      checks: [],
+      fixes: [],
+    },
+    checklist: [],
+    calendar: { posts: [], source: 'template' as const, rejectedCount: 0 },
+    voice: { businessName: 'b', trade: 't', town: 'x', services: 's' },
+    generatedAt: '2026-11-09T00:00:00Z',
+  };
+  const actions = [
+    {
+      title: 'Fix',
+      description: 'd',
+      status: 'proposed' as const,
+      priority: 'high' as const,
+      goalId: 'marketing-pack:gbp-missing',
+      sortOrder: 0,
+    },
+  ];
+
+  it('writes the pack and its proposed actions through one transaction', async () => {
+    txWrites.length = 0;
+    failActionCreate = false;
+    const res = await defaultMarketingPackDeps.persist({ userId: 'u', pack, model: null, actions });
+    expect(res).toEqual({ id: 'pack-tx', proposedActionCount: 1 });
+    expect(txWrites).toEqual(['pack', 'action']);
+  });
+
+  it('propagates an action write failure so the transaction rolls back the pack', async () => {
+    txWrites.length = 0;
+    failActionCreate = true;
+    await expect(
+      defaultMarketingPackDeps.persist({ userId: 'u', pack, model: null, actions })
+    ).rejects.toThrow('action write failed');
+    failActionCreate = false;
   });
 });
 

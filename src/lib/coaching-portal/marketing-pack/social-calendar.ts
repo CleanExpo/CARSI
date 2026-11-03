@@ -4,14 +4,15 @@
  * template tops the calendar up to exactly 30 so a member always receives a full month.
  */
 import { MARKETING_COPY_RULES, isCompliantCopy } from './compliance';
-import { primaryTown } from './site-review';
+import { primaryTown, sanitizeVoice } from './site-review';
 import type { CalendarCandidate, CalendarPost, SocialCalendar, TradeVoice } from './types';
 
 export const CALENDAR_DAYS = 30;
 
 export type ChatMessage = { role: 'system' | 'user'; content: string };
 
-export function buildCalendarMessages(voice: TradeVoice): ChatMessage[] {
+export function buildCalendarMessages(rawVoice: TradeVoice): ChatMessage[] {
+  const voice = sanitizeVoice(rawVoice);
   const town = primaryTown(voice.town) || voice.town;
   return [
     {
@@ -77,7 +78,8 @@ function tag(s: string): string {
 }
 
 /** Deterministic, claim-free month of posts built from the trade voice alone. */
-export function buildFallbackPosts(voice: TradeVoice): CalendarCandidate[] {
+export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
+  const voice = sanitizeVoice(rawVoice);
   const town = primaryTown(voice.town) || 'our local area';
   const trade = (voice.trade || 'our trade').toLowerCase();
   const name = voice.businessName || 'our team';

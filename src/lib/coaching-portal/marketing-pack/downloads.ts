@@ -1,4 +1,5 @@
 /** GP-634: the three downloadable resource items in a member's marketing pack. */
+import { safeText, sanitizeVoice } from './site-review';
 import type { ChecklistItem, SiteReview, SocialCalendar, TradeVoice } from './types';
 
 export const MARKETING_PACK_DOWNLOADS = [
@@ -31,7 +32,8 @@ export function isMarketingPackDownloadId(v: string | null): v is MarketingPackD
   return MARKETING_PACK_DOWNLOADS.some((d) => d.id === v);
 }
 
-function heading(voice: TradeVoice, title: string, generatedAt: string): string {
+function heading(rawVoice: TradeVoice, title: string, generatedAt: string): string {
+  const voice = sanitizeVoice(rawVoice);
   const who = voice.businessName || 'Your business';
   const day = new Date(generatedAt).toLocaleDateString('en-AU', {
     day: 'numeric',
@@ -47,8 +49,8 @@ export function renderReviewMarkdown(
   generatedAt: string
 ): string {
   const lines = [heading(voice, 'Website and Google review', generatedAt), review.summary, ''];
-  lines.push(`Website: ${review.websiteUrl ?? 'none on file'}`);
-  lines.push(`Google Business Profile: ${review.googleBusinessUrl ?? 'none on file'}`, '');
+  lines.push(`Website: ${safeText(review.websiteUrl, 'none on file')}`);
+  lines.push(`Google Business Profile: ${safeText(review.googleBusinessUrl, 'none on file')}`, '');
   if (review.fixes.length > 0) {
     lines.push('## Your fixes, most useful first', '');
     for (const f of review.fixes) {

@@ -23,6 +23,17 @@ const RULES: { rule: string; pattern: RegExp }[] = [
       /\b(double|triple|10x|grow|boost|increase)\s+your\s+(revenue|income|profits?|sales|earnings)\b/i,
   },
   { rule: 'earnings claim', pattern: /\b(passive|guaranteed|extra)\s+income\b/i },
+  // Fail closed: money words a trade post never needs ("earn thousands", "bring in hundreds").
+  {
+    rule: 'earnings claim',
+    pattern:
+      /\b(earn|earning|make|making|bring(ing)?\s+in|pull(ing)?\s+in|rake\s+in)\s+(thousands|hundreds|millions|a\s+fortune|a\s+living|good\s+money|serious\s+money|money|cash|\d)/i,
+  },
+  {
+    rule: 'earnings claim',
+    pattern: /\b(income|earnings|profits?|revenue|turnover|salary|side\s+hustle|wealth)\b/i,
+  },
+  { rule: 'savings claim', pattern: /\bsave\s+(you\s+)?(money|thousands|hundreds|cash|\$|\d)/i },
   {
     rule: 'earnings claim',
     pattern: /\$\s?\d[\d,.]*\s*(k|m)?\s*(a|per|\/)\s*(day|week|month|year)\b/i,

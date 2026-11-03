@@ -10,7 +10,7 @@ import {
   fixesToProposedActions,
   type ProposedActionInput,
 } from '@/lib/coaching-portal/marketing-pack/proposed-actions';
-import { reviewWebsite } from '@/lib/coaching-portal/marketing-pack/site-review';
+import { reviewWebsite, sanitizeVoice } from '@/lib/coaching-portal/marketing-pack/site-review';
 import {
   assembleCalendar,
   buildCalendarMessages,
@@ -75,12 +75,16 @@ export type MarketingPackDeps = {
   fetchSite: (url: string) => Promise<SiteFetchResult>;
   /** Returns the raw model reply, or null when no AI provider is configured. */
   generateCalendarText: (voice: TradeVoice) => Promise<string | null>;
-  savePack: (pack: {
+  /**
+   * Writes the pack and its proposed actions together: both commit or neither does, so a
+   * saved pack (which starts the rebuild cooldown) always has its proposed actions.
+   */
+  persist: (input: {
     userId: string;
     pack: MarketingPack;
     model: string | null;
-  }) => Promise<{ id: string }>;
-  replaceProposedActions: (userId: string, actions: ProposedActionInput[]) => Promise<number>;
+    actions: ProposedActionInput[];
+  }) => Promise<{ id: string; proposedActionCount: number }>;
 };
 
 export type MarketingPackResult = {
@@ -97,6 +101,8 @@ export async function generateMarketingPack(
   deps: MarketingPackDeps
 ): Promise<MarketingPackResult> {
   const now = deps.now();
+  // Claims in member-supplied names never reach member-visible copy or the stored pack.
+  inputs = { ...inputs, voice: sanitizeVoice(inputs.voice) };
   const fetched = inputs.websiteUrl ? await deps.fetchSite(inputs.websiteUrl) : null;
   const review = reviewWebsite({
     websiteUrl: inputs.websiteUrl,
@@ -128,16 +134,19 @@ export async function generateMarketingPack(
     voice: inputs.voice,
     generatedAt: now.toISOString(),
   };
-  const saved = await deps.savePack({
+  const saved = await deps.persist({
     userId,
     pack,
-    model: calendar.source === 'template' ? null : (resolveOpenRouterConfig().model ?? null),
+    model: calendar.source === 'template' ? null : resolveOpenRouterConfig().model,
+    actions: fixesToProposedActions(review.fixes),
   });
-  const proposedActionCount = await deps.replaceProposedActions(
-    userId,
-    fixesToProposedActions(review.fixes)
-  );
-  return { packId: saved.id, review, checklist, calendar, proposedActionCount };
+  return {
+    packId: saved.id,
+    review,
+    checklist,
+    calendar,
+    proposedActionCount: saved.proposedActionCount,
+  };
 }
 
 async function openRouterCalendarText(voice: TradeVoice): Promise<string | null> {
@@ -163,22 +172,25 @@ export const defaultMarketingPackDeps: MarketingPackDeps = {
   now: () => new Date(),
   fetchSite: fetchPublicPage,
   generateCalendarText: openRouterCalendarText,
-  savePack: async ({ userId, pack, model }) =>
-    prisma.carsiCoachingMarketingPack.create({
-      data: {
-        userId,
-        websiteUrl: pack.review.websiteUrl,
-        googleBusinessUrl: pack.review.googleBusinessUrl,
-        reviewJson: JSON.stringify(pack.review),
-        checklistJson: JSON.stringify(pack.checklist),
-        calendarJson: JSON.stringify(pack.calendar),
-        voiceJson: JSON.stringify(pack.voice),
-        calendarSource: pack.calendar.source,
-        model,
-      },
-      select: { id: true },
+  persist: async ({ userId, pack, model, actions }) =>
+    prisma.$transaction(async (tx) => {
+      const saved = await tx.carsiCoachingMarketingPack.create({
+        data: {
+          userId,
+          websiteUrl: pack.review.websiteUrl,
+          googleBusinessUrl: pack.review.googleBusinessUrl,
+          reviewJson: JSON.stringify(pack.review),
+          checklistJson: JSON.stringify(pack.checklist),
+          calendarJson: JSON.stringify(pack.calendar),
+          voiceJson: JSON.stringify(pack.voice),
+          calendarSource: pack.calendar.source,
+          model,
+        },
+        select: { id: true },
+      });
+      const proposedActionCount = await replaceProposedMarketingActions(userId, actions, tx);
+      return { id: saved.id, proposedActionCount };
     }),
-  replaceProposedActions: replaceProposedMarketingActions,
 };
 
 /** Load inputs from the member's profile and latest submitted assessment. */

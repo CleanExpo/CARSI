@@ -169,9 +169,10 @@ export async function deleteCoachingActionForUser(
  */
 export async function replaceProposedMarketingActions(
   userId: string,
-  actions: ProposedActionInput[]
+  actions: ProposedActionInput[],
+  db: Pick<typeof prisma, 'carsiCoachingAction'> = prisma
 ): Promise<number> {
-  const existing = await prisma.carsiCoachingAction.findMany({
+  const existing = await db.carsiCoachingAction.findMany({
     where: { userId },
     select: { id: true, status: true, goalId: true },
   });
@@ -181,14 +182,14 @@ export async function replaceProposedMarketingActions(
   );
   const pendingIds = marketing.filter((a) => a.status === 'proposed').map((a) => a.id);
   if (pendingIds.length > 0) {
-    await prisma.carsiCoachingAction.deleteMany({
+    await db.carsiCoachingAction.deleteMany({
       where: { userId, status: 'proposed', id: { in: pendingIds } },
     });
   }
   let created = 0;
   for (const a of actions) {
     if (reviewedGoals.has(a.goalId)) continue;
-    await prisma.carsiCoachingAction.create({
+    await db.carsiCoachingAction.create({
       data: {
         id: randomUUID(),
         userId,

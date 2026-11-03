@@ -4,7 +4,28 @@
  * at a page it could not read. Output shape follows seo-page-fix / seo-gbp-audit: an issue, why
  * it matters to a local customer, and how to fix it, ranked by impact over effort.
  */
+import { isCompliantCopy } from './compliance';
 import type { MarketingFix, SiteCheck, SiteFetchResult, SiteReview, TradeVoice } from './types';
+
+/** Member- or page-supplied text is shown only when it carries no claim; otherwise a neutral stand-in. */
+export function safeText(value: string | null | undefined, fallback: string): string {
+  const v = (value ?? '').trim();
+  return v && isCompliantCopy(v) ? v : fallback;
+}
+
+/**
+ * Every member-visible line in the pack is built from these values, so a claim in a business
+ * name ("Guaranteed Results Plumbing") or trade can never reach the review, checklist,
+ * calendar or downloads.
+ */
+export function sanitizeVoice(voice: TradeVoice): TradeVoice {
+  return {
+    businessName: safeText(voice.businessName, 'your business'),
+    trade: safeText(voice.trade, 'your trade'),
+    town: safeText(voice.town, 'your area'),
+    services: safeText(voice.services, ''),
+  };
+}
 
 type FixSpec = Omit<MarketingFix, 'rank' | 'score'>;
 
@@ -118,9 +139,11 @@ function profileFixes(googleBusinessUrl: string | null, town: string): FixSpec[]
   return [];
 }
 
-export function reviewWebsite(input: ReviewInput): SiteReview {
+export function reviewWebsite(rawInput: ReviewInput): SiteReview {
+  const input = { ...rawInput, voice: sanitizeVoice(rawInput.voice) };
   const town = primaryTown(input.voice.town);
   const trade = input.voice.trade.trim();
+  const shownUrl = safeText(input.websiteUrl, 'your website');
   const checks: SiteCheck[] = [];
   const gbpSpecs = profileFixes(input.googleBusinessUrl, town);
   // Profile fixes go first so they win ties: for a trade business the map listing comes first.
@@ -158,7 +181,7 @@ export function reviewWebsite(input: ReviewInput): SiteReview {
       id: 'site-unreachable',
       area: 'website',
       title: 'Make sure your website loads for visitors',
-      why: `We could not read ${input.websiteUrl}${fetched?.error ? ` (${fetched.error})` : ''}. If it is down or blocks visitors, customers and Google cannot see it either.`,
+      why: `We could not read ${shownUrl}${fetched?.error && isCompliantCopy(fetched.error) ? ` (${fetched.error})` : ''}. If it is down or blocks visitors, customers and Google cannot see it either.`,
       how: 'Open the site on your phone using mobile data. If it does not load, contact whoever hosts it. If it loads for you, tell your coach so we can recheck it.',
       impact: 3,
       effort: 2,
@@ -199,7 +222,7 @@ export function reviewWebsite(input: ReviewInput): SiteReview {
       id: 'title-generic',
       area: 'website',
       title: 'Rewrite your home page title',
-      why: `Your page title is "${title || 'missing'}". It is the blue headline people see in Google results, so it should say what you do and where.`,
+      why: `Your page title is ${!title ? 'missing' : isCompliantCopy(title) ? `"${title}"` : 'not about your trade and town'}. It is the blue headline people see in Google results, so it should say what you do and where.`,
       how: `Use a title like "${trade || 'Your trade'} ${town || 'your town'} | ${input.voice.businessName || 'Business name'}", kept under 60 characters.`,
       impact: 3,
       effort: 1,

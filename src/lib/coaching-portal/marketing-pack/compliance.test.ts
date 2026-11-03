@@ -23,6 +23,13 @@ describe('findComplianceIssues', () => {
     'Passive income from every job',
     'Results in 24 hours, every time',
     'Kills 99.9% of mould',
+    // Earnings promises without a dollar figure (Codex P1, head 0a953a79).
+    'We can help you earn thousands each month from your work.',
+    'Bring in hundreds more every week',
+    'Grow your income with a cleaner home',
+    'Boost your profits this winter',
+    'Save you money on every visit',
+    'A side hustle that pays',
   ])('rejects %s', (text) => {
     expect(findComplianceIssues(text).length).toBeGreaterThan(0);
     expect(isCompliantCopy(text)).toBe(false);
