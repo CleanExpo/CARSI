@@ -5,8 +5,9 @@
 # file, and prints the result to the job log.
 #
 #   Every file runs only from main, so only reviewed SQL ever reaches the database.
-#   db/ops/read/*.sql   read-only session (default_transaction_read_only=on): any write fails.
-#                       Runs on demand, as DATABASE_URL_READONLY when that secret is set. This repo is PUBLIC, so its logs are public: read files
+#   db/ops/read/*.sql   every statement must be a plain query (db/ops/check-read-sql.py), run
+#                       in a read-only session. Unattended only as DATABASE_URL_READONLY;
+#                       without that secret a read waits for production-db approval too. This repo is PUBLIC, so its logs are public: read files
 #                       may return course/quiz/catalogue data and counts only, never learner data.
 #   db/ops/write/*.sql  runs only from main, in a single transaction (all-or-nothing), and only
 #                       after a person approves the run in the `production-db` environment
@@ -37,6 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       kind: ${{ steps.check.outputs.kind }}
+      has_readonly_role: ${{ steps.check.outputs.has_readonly_role }}
     steps:
       - uses: actions/checkout@v4
       - name: Validate the requested file
@@ -44,6 +46,7 @@ jobs:
         env:
           FILE: ${{ inputs.file }}
           REF: ${{ github.ref }}
+          HAS_RO: ${{ secrets.DATABASE_URL_READONLY != '' }}
         run: |
           set -euo pipefail
           if [[ ! "$FILE" =~ ^db/ops/(read|write)/[0-9]{2}-[a-z0-9-]+\.sql$ ]]; then
@@ -53,26 +56,29 @@ jobs:
           [ -f "$FILE" ] || { echo "::error::$FILE does not exist on $REF."; exit 1; }
           kind="${BASH_REMATCH[1]}"
           # Provenance: every file, read or write, must be the reviewed copy on main. A file
-          # written on a side branch never runs, so the SQL text guard below is only a backstop.
+          # written on a side branch never runs.
           if [ "$REF" != "refs/heads/main" ]; then
             echo "::error::DB ops runs only from main (got $REF). Merge the reviewed file first."
             exit 1
           fi
           if [ "$kind" = "read" ]; then
-            # Public logs: refuse anything that could print learner data. Comment lines are ignored.
-            if grep -vE '^\s*--' "$FILE" | grep -inE '\blms_users\b|email|password|phone|token|stripe'; then
-              echo "::error::$FILE names a learner table or a sensitive column. Read files run in public logs."
-              exit 1
-            fi
+            # Every statement must be a plain query; SET/COMMIT/DO/DML/meta-commands and learner
+            # columns are refused before any connection. The session's read-only flag can be
+            # switched off from SQL, so this check is what stops a read file from writing.
+            python3 db/ops/check-read-sql.py "$FILE"
           fi
           echo "kind=$kind" >> "$GITHUB_OUTPUT"
+          echo "has_readonly_role=$HAS_RO" >> "$GITHUB_OUTPUT"
           echo "OK: $kind file $FILE on $REF"
 
+  # Reads run unattended only as the least-privilege role. Without DATABASE_URL_READONLY they
+  # use the full role, so they wait for the same production-db approval as writes.
   read:
     needs: plan
     if: needs.plan.outputs.kind == 'read'
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 15
+    environment: ${{ needs.plan.outputs.has_readonly_role == 'true' && 'production-db-read' || 'production-db' }}
     steps:
       - uses: actions/checkout@v4
       - name: Run read-only
