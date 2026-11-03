@@ -213,7 +213,15 @@ describe.runIf(RUNNABLE)('coaching learning path (real PostgreSQL)', async () =>
       where: { userId: memberId },
       orderBy: { sortOrder: 'asc' },
     });
-    expect(rows.map((r) => r.goalId)).toEqual([learningGoalId(extra), learningGoalId(wdMkt())]);
+    expect(rows.filter((r) => r.status !== 'removed').map((r) => r.goalId)).toEqual([
+      learningGoalId(extra),
+      learningGoalId(wdMkt()),
+    ]);
+    // Removed course stays as a hidden tombstone so a later assign cannot re-prescribe it.
+    expect(rows.find((r) => r.goalId === learningGoalId(social()))?.status).toBe('removed');
+    const board = await store.listCoachingActionsForUser(memberId);
+    expect(board.map((b) => b.goalId)).not.toContain(learningGoalId(social()));
+    expect((await lp.assignLearningPathFromAssessment(memberId)).status).toBe('already_assigned');
   });
 
   it('two simultaneous assignments for one member write the path once (review r1 P1)', async () => {

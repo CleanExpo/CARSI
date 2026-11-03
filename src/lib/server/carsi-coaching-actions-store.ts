@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 
-import { LEARNING_GOAL_PREFIX } from '@/lib/coaching-portal/learning-path';
+import { LEARNING_GOAL_PREFIX, LEARNING_REMOVED_STATUS } from '@/lib/coaching-portal/learning-path';
 import type { CoachingActionStatus, CoachingMonthlyAction } from '@/lib/coaching-portal/types';
 import { prisma } from '@/lib/prisma';
 import { isLearningAction, syncLearningPath } from '@/lib/server/carsi-coaching-learning-path';
@@ -35,7 +35,8 @@ export async function listCoachingActionsForUser(userId: string): Promise<Coachi
   // Pull LMS progress onto learning actions first, so completion shows as done on the board.
   const learning = new Map((await syncLearningPath(userId)).map((i) => [i.actionId, i]));
   const rows = await prisma.carsiCoachingAction.findMany({
-    where: { userId },
+    // Coach-removed learning actions stay as tombstones (status is NOT NULL, so NOT is safe).
+    where: { userId, NOT: { status: LEARNING_REMOVED_STATUS } },
     orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
   });
   return rows.map((r) => {

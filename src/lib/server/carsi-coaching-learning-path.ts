@@ -11,6 +11,7 @@
 import {
   DEFAULT_GAP_COURSE_MAP,
   LEARNING_GOAL_PREFIX,
+  LEARNING_REMOVED_STATUS,
   applyCoachPathAdjustment,
   detectAssessmentGaps,
   learningGoalId,
@@ -51,9 +52,8 @@ export type LearningPathStore = {
   updateAction(
     userId: string,
     id: string,
-    data: { status?: CoachingActionStatus; sortOrder?: number }
+    data: { status?: CoachingActionStatus | typeof LEARNING_REMOVED_STATUS; sortOrder?: number }
   ): Promise<void>;
-  deleteActions(userId: string, ids: string[]): Promise<void>;
   publishedCoursesBySlugs(slugs: string[]): Promise<LearningCatalogueCourse[]>;
   publishedCoursesByIds(ids: string[]): Promise<LearningCatalogueCourse[]>;
   completedCourseIds(userId: string): Promise<Set<string>>;
@@ -147,13 +147,27 @@ async function assignLocked(
  * has moved (completion flips the action to done). A coach-set `blocked` holds until the course
  * is actually complete. Writes only when a status really changed.
  */
+type LearningRow = { action: LearningActionRecord; courseId: string };
+
+/** Learning rows, split into those on the path and coach-removed tombstones. */
+function splitLearningRows(actions: LearningActionRecord[]): {
+  active: LearningRow[];
+  removed: LearningRow[];
+} {
+  const rows = actions
+    .map((a) => ({ action: a, courseId: parseLearningGoalId(a.goalId) }))
+    .filter((x): x is LearningRow => x.courseId !== null);
+  return {
+    active: rows.filter((x) => x.action.status !== LEARNING_REMOVED_STATUS),
+    removed: rows.filter((x) => x.action.status === LEARNING_REMOVED_STATUS),
+  };
+}
+
 export async function syncLearningPath(
   userId: string,
   store: LearningPathStore = prismaLearningPathStore
 ): Promise<LearningPathItem[]> {
-  const learning = (await store.listActions(userId))
-    .map((a) => ({ action: a, courseId: parseLearningGoalId(a.goalId) }))
-    .filter((x): x is { action: LearningActionRecord; courseId: string } => x.courseId !== null);
+  const learning = splitLearningRows(await store.listActions(userId)).active;
   if (learning.length === 0) return [];
 
   const ids = learning.map((x) => x.courseId);
@@ -217,9 +231,7 @@ async function adjustLocked(
   store: LearningPathStore
 ): Promise<void> {
   const actions = await store.listActions(userId);
-  const learning = actions
-    .map((a) => ({ action: a, courseId: parseLearningGoalId(a.goalId) }))
-    .filter((x): x is { action: LearningActionRecord; courseId: string } => x.courseId !== null);
+  const { active: learning, removed } = splitLearningRows(actions);
   const currentIds = learning.map((x) => x.courseId);
 
   const wantedAdds = (input.addCourseIds ?? []).filter((id) => !currentIds.includes(id));
@@ -232,10 +244,11 @@ async function adjustLocked(
     order: input.orderCourseIds,
   });
 
-  const removedActionIds = learning
-    .filter((x) => !next.includes(x.courseId))
-    .map((x) => x.action.id);
-  if (removedActionIds.length) await store.deleteActions(userId, removedActionIds);
+  // Removal keeps the row as a tombstone: it leaves the board, and the "already assigned"
+  // guard still sees it, so a full clear is never re-prescribed (review r2 P1).
+  for (const x of learning.filter((l) => !next.includes(l.courseId))) {
+    await store.updateAction(userId, x.action.id, { status: LEARNING_REMOVED_STATUS });
+  }
 
   const kept = learning.filter((x) => next.includes(x.courseId));
   let tail = actions.reduce((max, a) => Math.max(max, a.sortOrder), -1) + 1;
@@ -257,6 +270,12 @@ async function adjustLocked(
     } else {
       const course = addable.find((c) => c.id === courseId);
       if (!course) continue;
+      const tombstone = removed.find((x) => x.courseId === courseId);
+      if (tombstone) {
+        // Re-adding a removed course revives its row; the sync then sets its real status.
+        await store.updateAction(userId, tombstone.action.id, { status: 'todo', sortOrder });
+        continue;
+      }
       toCreate.push({
         courseId,
         title: learningActionTitle(course.title),
@@ -341,9 +360,6 @@ function prismaStoreFor(db: LearningPathDb): LearningPathStore {
             : {}),
         },
       });
-    },
-    async deleteActions(userId, ids) {
-      await db.carsiCoachingAction.deleteMany({ where: { userId, id: { in: ids } } });
     },
     async publishedCoursesBySlugs(slugs) {
       if (slugs.length === 0) return [];

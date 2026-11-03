@@ -219,6 +219,11 @@ export function mappedCourseSlugs(
 }
 
 export const LEARNING_GOAL_PREFIX = 'course:';
+/**
+ * Status of a learning action the coach removed. The row is kept (hidden from the board) so the
+ * coach's decision outlives the row: assignment never re-prescribes a path that was cleared.
+ */
+export const LEARNING_REMOVED_STATUS = 'removed';
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** `goalId` value linking a board action to an LMS course (fits the 64-char column). */

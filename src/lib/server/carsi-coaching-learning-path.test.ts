@@ -100,15 +100,6 @@ function fakeStore(opts: {
       if (data.status !== undefined) row.status = data.status;
       if (data.sortOrder !== undefined) row.sortOrder = data.sortOrder;
     },
-    async deleteActions(userId, ids) {
-      for (const id of ids) {
-        const i = actions.findIndex((a) => a.id === id && a.userId === userId);
-        if (i >= 0) {
-          writes.push(`delete:${userId}:${id}`);
-          actions.splice(i, 1);
-        }
-      }
-    },
     async publishedCoursesBySlugs(slugs) {
       return catalogue.filter((c) => slugs.includes(c.slug));
     },
@@ -339,7 +330,8 @@ describe('adjustLearningPath (coach review)', () => {
     );
     expect(items.map((i) => i.courseId)).toEqual([C_ADMIN, C_WD_MKT]);
     expect(actions.find((a) => a.id === 'biz')).toMatchObject({ status: 'todo', sortOrder: 0 });
-    expect(actions.some((a) => a.goalId === learningGoalId(C_SOCIAL))).toBe(false);
+    // Kept as a tombstone so the coach's decision is durable (review r2 P1).
+    expect(actions.find((a) => a.goalId === learningGoalId(C_SOCIAL))?.status).toBe('removed');
   });
 
   it('refuses to add a course that is not in the published catalogue', async () => {
@@ -410,5 +402,61 @@ describe('enrolment on the path item', () => {
     });
     const items = await syncLearningPath(USER, store);
     expect(items.map((i) => i.enrolled)).toEqual([true, false]);
+  });
+});
+
+describe('coach clears the path (review r2 P1: a full clear must stay cleared)', () => {
+  it('a later assignment does not recreate a path the coach removed entirely', async () => {
+    const { store, actions } = fakeStore({ assessmentJson: MARKETING_GAP_ASSESSMENT });
+    await assignLearningPathFromAssessment(USER, store);
+    const cleared = await adjustLearningPath(
+      USER,
+      { removeCourseIds: [C_SOCIAL, C_WD_MKT] },
+      store
+    );
+    expect(cleared).toEqual([]);
+    const again = await assignLearningPathFromAssessment(USER, store);
+    expect(again.status).toBe('already_assigned');
+    expect(actions).toHaveLength(2);
+    expect(actions.every((a) => a.status === 'removed')).toBe(true);
+  });
+
+  it('removed courses are not on the path and the sync never revives them', async () => {
+    const { store, actions } = fakeStore({
+      actions: [
+        {
+          id: 'l1',
+          userId: USER,
+          title: 'x',
+          goalId: learningGoalId(C_SOCIAL),
+          status: 'removed',
+          sortOrder: 1,
+        },
+      ],
+      progress: {
+        [C_SOCIAL]: { enrolled: true, completed: true, lessonsTotal: 5, lessonsCompleted: 5 },
+      },
+    });
+    expect(await syncLearningPath(USER, store)).toEqual([]);
+    expect(actions[0].status).toBe('removed');
+  });
+
+  it('re-adding a removed course revives the same row instead of creating a duplicate', async () => {
+    const { store, actions } = fakeStore({
+      actions: [
+        {
+          id: 'l1',
+          userId: USER,
+          title: 'x',
+          goalId: learningGoalId(C_SOCIAL),
+          status: 'removed',
+          sortOrder: 1,
+        },
+      ],
+    });
+    const items = await adjustLearningPath(USER, { addCourseIds: [C_SOCIAL] }, store);
+    expect(items.map((i) => i.actionId)).toEqual(['l1']);
+    expect(actions).toHaveLength(1);
+    expect(actions[0].status).toBe('todo');
   });
 });
