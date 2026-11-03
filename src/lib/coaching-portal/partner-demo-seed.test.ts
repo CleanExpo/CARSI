@@ -342,7 +342,8 @@ describe('applyPartnerDemoSeed', () => {
     for (const w of writes) {
       const args = w.args as { where: Record<string, unknown>; create?: Row };
       if (w.table === 'lmsUser') {
-        expect(args.where).toEqual({ id: PARTNER_DEMO_SEED_USER_ID });
+        // Pinned to the demo id AND the demo email, so another login can never match (review r5 P1).
+        expect(args.where).toEqual({ id: PARTNER_DEMO_SEED_USER_ID, email: PARTNER_DEMO_SEED_MEMBER_EMAIL });
         continue;
       }
       if (w.op === 'deleteMany') {
@@ -449,5 +450,33 @@ describe('applyPartnerDemoSeed', () => {
     // Rolled back: no demo user or demo coaching rows were left behind.
     expect(tables.lmsUser.has(PARTNER_DEMO_SEED_USER_ID)).toBe(false);
     expect(tables.carsiCoachingMonthlySubscription.size).toBe(0);
+  });
+
+  it('a login that takes the demo id after the check is not overwritten, and nothing is half-written (review r5 P1)', async () => {
+    const plan = buildPartnerDemoSeedPlan(NOW);
+    const { db, tables } = fakeDb();
+    const raw = db as unknown as { carsiCoachingSession: { findMany: (a: unknown) => Promise<unknown[]> } };
+    const realFindMany = raw.carsiCoachingSession.findMany;
+    // Held by reference: an update the seed applied would show here even after rollback.
+    const claimant: Row = {
+      id: PARTNER_DEMO_SEED_USER_ID,
+      email: 'real.person@carsi.com.au',
+      hashedPassword: '$2a$12$realmemberhash',
+      fullName: 'Real Account',
+    };
+    raw.carsiCoachingSession.findMany = async (a: unknown) => {
+      const r = await realFindMany(a);
+      tables.lmsUser.set(claimant.id, claimant);
+      return r;
+    };
+    await expect(applyPartnerDemoSeed(db, plan, { dryRun: false })).rejects.toThrow(/Unique constraint/);
+    expect(claimant).toEqual({
+      id: PARTNER_DEMO_SEED_USER_ID,
+      email: 'real.person@carsi.com.au',
+      hashedPassword: '$2a$12$realmemberhash',
+      fullName: 'Real Account',
+    });
+    expect(tables.carsiCoachingMonthlySubscription.size).toBe(0);
+    expect(tables.carsiCoachingAction.size).toBe(0);
   });
 });

@@ -455,7 +455,9 @@ async function seedWith(
   upsert(
     'lmsUser',
     {
-      where: { id: userId },
+      // id AND the demo email: a login that took the demo id after the checks above does not
+      // match, so the create collides on the id and the whole transaction rolls back (review r5).
+      where: { id: userId, email: plan.user.email },
       create: { ...plan.user, hashedPassword: lockedHash },
       update: userUpdate,
     },

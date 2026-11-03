@@ -99,6 +99,61 @@ describe.runIf(RUNNABLE)('partner demo seed (real PostgreSQL)', async () => {
     }
   });
 
+  it('a login that takes the demo id between the check and the write keeps its password and name (review r5 P1)', async () => {
+    await prisma.lmsUser.deleteMany({ where: { id: seed.PARTNER_DEMO_SEED_USER_ID } });
+    const claimantEmail = `gp637-claimant-${randomUUID()}@example.test`;
+    const claimantHash = '$2a$12$' + 'r'.repeat(53);
+    // Commit a foreign login at the demo id on a separate connection, just before the seed's
+    // own login write inside its transaction (after every ownership check has run).
+    const racing = {
+      ...db,
+      $transaction: (fn: (tx: unknown) => Promise<unknown>, opts?: unknown) =>
+        (prisma.$transaction as unknown as (f: (tx: unknown) => Promise<unknown>, o?: unknown) => Promise<unknown>)(
+          async (tx) => {
+            const t = tx as { lmsUser: { upsert: (a: unknown) => Promise<unknown> } };
+            const realUpsert = t.lmsUser.upsert.bind(t.lmsUser);
+            const proxied = new Proxy(t, {
+              get(target, key) {
+                if (key !== 'lmsUser') return Reflect.get(target, key);
+                return new Proxy(target.lmsUser, {
+                  get(u, k) {
+                    if (k !== 'upsert') return Reflect.get(u, k);
+                    return async (a: unknown) => {
+                      await prisma.lmsUser.create({
+                        data: {
+                          id: seed.PARTNER_DEMO_SEED_USER_ID,
+                          email: claimantEmail,
+                          hashedPassword: claimantHash,
+                          fullName: 'Real Account',
+                        },
+                      });
+                      return realUpsert(a);
+                    };
+                  },
+                });
+              },
+            });
+            return fn(proxied);
+          },
+          opts
+        ),
+    } as typeof db;
+    try {
+      await expect(
+        seed.applyPartnerDemoSeed(racing, seed.buildPartnerDemoSeedPlan(new Date()), { dryRun: false })
+      ).rejects.toThrow();
+      const row = await prisma.lmsUser.findUniqueOrThrow({ where: { id: seed.PARTNER_DEMO_SEED_USER_ID } });
+      expect(row.email).toBe(claimantEmail);
+      expect(row.hashedPassword).toBe(claimantHash);
+      expect(row.fullName).toBe('Real Account');
+      expect(
+        await prisma.carsiCoachingMonthlySubscription.count({ where: { userId: seed.PARTNER_DEMO_SEED_USER_ID } })
+      ).toBe(0);
+    } finally {
+      await prisma.lmsUser.deleteMany({ where: { id: seed.PARTNER_DEMO_SEED_USER_ID } });
+    }
+  });
+
   it('seeds the demo member, is idempotent, and leaves a real member alone', async () => {
     await prisma.lmsUser.create({
       data: { id: realId, email: realEmail, hashedPassword: '$2a$12$notarealhashnotarealhashnotarealhashnotarealhashnotare' },
