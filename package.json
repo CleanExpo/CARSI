@@ -128,6 +128,8 @@
     "test:strip-ai-writing": "vitest run src/lib/lms/strip-ai-writing-signs.test.ts",
     "ccw:scrape:plan": "npx tsx scripts/scrape-ccw-products.ts --plan",
     "ccw:scrape": "npx tsx scripts/scrape-ccw-products.ts",
+    "check:video-sound": "node scripts/check-course-video-sound.mjs --catalog",
+    "check:video-sound:live": "node scripts/check-course-video-sound.mjs --live",
     "check:course-completeness": "node scripts/check-course-completeness.mjs",
     "audit:course-depth": "node scripts/audit-course-depth.mjs",
     "check:course-standard": "node scripts/audit-course-depth.mjs --ci",
