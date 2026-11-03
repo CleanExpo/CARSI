@@ -144,6 +144,20 @@ if (typeof evaluateRecords !== 'function' || typeof classifyRecordFindings !== '
     ['soft hyphen inside a word', 'This course is appro­ved for IICRC CECs.'],
     ['hours written as a word', 'Continuing Education Credit (CEC): one Hour'],
     ['half an hour', 'Continuing Education Credit (CEC) : half an hour'],
+    // Review r2 (Codex, P1): adjective order slipped past a phrase list. Second miss of the same
+    // class, so the rule changed approach: in a course record for an unapproved slug, ANY CEC /
+    // continuing-education wording blocks. Nothing tries to read the sentence's meaning.
+    ['adjective order "IICRC CEC approved"', 'This course is IICRC CEC approved.'],
+    ['hyphenated "CEC-approved"', 'A CEC-approved course.'],
+    ['bare heading "CEC Credits"', 'CEC Credits'],
+    ['"approved by the IICRC" without CEC', 'This course has been approved by the IICRC.'],
+    ['continuing education without "credit"', 'Earn continuing education hours recognised by the IICRC.'],
+    ['dotted "C.E.C."', 'Worth 2 C.E.C. hours.'],
+    // Fail-closed: a denial is also CEC wording on an unapproved course. CLAUDE.md allows CEC
+    // wording on a course only once it is approved, so the remedy is to remove the wording.
+    ['denial', 'This course is not approved for IICRC CECs.'],
+    ['denial with "yet"', 'This course is not yet approved for IICRC Continuing Education Credits.'],
+    ['does-not-award denial', 'It does not award CECs.'],
   ];
   for (const [name, text] of MUST_BLOCK) {
     for (const field of ['short_description', 'description']) {
@@ -159,10 +173,9 @@ if (typeof evaluateRecords !== 'function' || typeof classifyRecordFindings !== '
 
   const MUST_PASS = [
     ['neutral copy', 'Ten-question knowledge check. Australian-produced.'],
-    ['denial', 'This course is not approved for IICRC CECs.'],
-    ['denial with "yet"', 'This course is not yet approved for IICRC Continuing Education Credits.'],
-    ['does-not-award denial', 'It does not award CECs.'],
     ['duration only', 'Course Duration: Approximately 30 minutes'],
+    ['IICRC endorsement disclaimer (no CEC wording)', 'The IICRC does not endorse any educational provider, product, offering, or service.'],
+    ['word containing "cec" is not CEC', 'Recece and precede the checklist.'],
   ];
   for (const [name, text] of MUST_PASS) {
     const f = scan([course(PLANTED_SLUG, text)]);

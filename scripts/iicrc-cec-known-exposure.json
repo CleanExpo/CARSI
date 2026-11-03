@@ -4,9 +4,627 @@
   "entries": [
     {
       "file": "data/wordpress-export/courses.json",
+      "slug": "introduction-to-creating-a-clean-air-environment",
+      "field": "short_description",
+      "text": "IICRC Certification, only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "introduction-to-iaq-and-mould-understanding-airborne-spread",
+      "field": "short_description",
+      "text": "IICRC Certification, only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "introduction-to-improving-indoor-air-quality-after-waterdamage",
+      "field": "short_description",
+      "text": "IICRC Certification, only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "introduction-to-monitoring-air-quality-job-site",
+      "field": "short_description",
+      "text": "IICRC Certification, only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "asbestos",
+      "field": "meta.wp_categories.2.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "asbestos",
+      "field": "meta.wp_categories.2.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "exterior-envelope-drying",
+      "field": "short_description",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "exterior-envelope-drying",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "exterior-envelope-drying",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "exterior-envelope-drying",
+      "field": "meta.wp_categories.1.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "exterior-envelope-drying",
+      "field": "meta.wp_categories.1.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "complex-water-losses",
+      "field": "short_description",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "complex-water-losses",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "complex-water-losses",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "complex-water-losses",
+      "field": "meta.wp_categories.1.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "complex-water-losses",
+      "field": "meta.wp_categories.1.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "difficult-materials",
+      "field": "short_description",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "difficult-materials",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "difficult-materials",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "difficult-materials",
+      "field": "meta.wp_categories.1.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "difficult-materials",
+      "field": "meta.wp_categories.1.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "largelossdrying",
+      "field": "short_description",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "largelossdrying",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "largelossdrying",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "largelossdrying",
+      "field": "meta.wp_categories.1.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "largelossdrying",
+      "field": "meta.wp_categories.1.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "dryingprotocol",
+      "field": "short_description",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "dryingprotocol",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "dryingprotocol",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "dryingprotocol",
+      "field": "meta.wp_categories.2.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "dryingprotocol",
+      "field": "meta.wp_categories.2.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-damage-marketing",
+      "field": "short_description",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-damage-marketing",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-damage-marketing",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-damage-marketing",
+      "field": "meta.wp_categories.2.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-damage-marketing",
+      "field": "meta.wp_categories.2.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "controlled-drying",
+      "field": "short_description",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "controlled-drying",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "controlled-drying",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "controlled-drying",
+      "field": "meta.wp_categories.1.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "controlled-drying",
+      "field": "meta.wp_categories.1.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "hvacsystems",
+      "field": "short_description",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "hvacsystems",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "hvacsystems",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "hvacsystems",
+      "field": "meta.wp_categories.1.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "hvacsystems",
+      "field": "meta.wp_categories.1.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "science",
+      "field": "short_description",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "science",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "science",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "science",
+      "field": "meta.wp_categories.1.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "science",
+      "field": "meta.wp_categories.1.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "advancedstructural",
+      "field": "short_description",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "advancedstructural",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "advancedstructural",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "advancedstructural",
+      "field": "meta.wp_categories.1.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "advancedstructural",
+      "field": "meta.wp_categories.1.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "forensic",
+      "field": "short_description",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "forensic",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "forensic",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "forensic",
+      "field": "meta.wp_categories.2.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "forensic",
+      "field": "meta.wp_categories.2.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "biologicalcontaminants",
+      "field": "short_description",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "biologicalcontaminants",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "biologicalcontaminants",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "biologicalcontaminants",
+      "field": "meta.wp_categories.1.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "biologicalcontaminants",
+      "field": "meta.wp_categories.1.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "applied-microbial",
+      "field": "short_description",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "applied-microbial",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "applied-microbial",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "applied-microbial",
+      "field": "meta.wp_categories.1.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "applied-microbial",
+      "field": "meta.wp_categories.1.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-losses",
+      "field": "short_description",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-losses",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-losses",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-losses",
+      "field": "meta.wp_categories.2.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-losses",
+      "field": "meta.wp_categories.2.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "moisture-mapping",
+      "field": "short_description",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "moisture-mapping",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "moisture-mapping",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "moisture-mapping",
+      "field": "meta.wp_categories.2.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "moisture-mapping",
+      "field": "meta.wp_categories.2.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "upholstery",
+      "field": "short_description",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "upholstery",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "upholstery",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "upholstery",
+      "field": "meta.wp_categories.2.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "upholstery",
+      "field": "meta.wp_categories.2.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "smokeandsoot",
+      "field": "short_description",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "smokeandsoot",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "smokeandsoot",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "smokeandsoot",
+      "field": "meta.wp_categories.1.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "smokeandsoot",
+      "field": "meta.wp_categories.1.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "social-media-marketing",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "social-media-marketing",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "duct-cleaning",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "duct-cleaning",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "duct-cleaning",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-damage-estimating",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
       "slug": "water-damage-estimating",
       "field": "short_description",
       "text": "This course is approved for IICRC Continuing Education Credit (CEC): 1 Hour."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-damage-estimating",
+      "field": "short_description",
+      "text": "Once completed please email support@carsi.com.au for your Certification of completion confirming your hours of Continuing Education Credits."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-damage-estimating",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-damage-estimating",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-damage-estimating",
+      "field": "meta.wp_categories.1.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-damage-estimating",
+      "field": "meta.wp_categories.1.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-damage-commercial",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
     },
     {
       "file": "data/wordpress-export/courses.json",
@@ -16,9 +634,81 @@
     },
     {
       "file": "data/wordpress-export/courses.json",
+      "slug": "water-damage-commercial",
+      "field": "short_description",
+      "text": "Once completed please email support@carsi.com.au for your Certification of completion confirming your hours of Continuing Education Credits."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-damage-commercial",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-damage-commercial",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-damage-commercial",
+      "field": "meta.wp_categories.1.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-damage-commercial",
+      "field": "meta.wp_categories.1.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "porous-drying",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
       "slug": "porous-drying",
       "field": "short_description",
       "text": "This course is approved for IICRC Continuing Education Credit (CEC): 1 Hour."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "porous-drying",
+      "field": "short_description",
+      "text": "Once completed please email support@carsi.com.au for your Certification of completion confirming your hours of Continuing Education Credits."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "porous-drying",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "porous-drying",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "porous-drying",
+      "field": "meta.wp_categories.1.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "porous-drying",
+      "field": "meta.wp_categories.1.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "structural-drying-2",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
     },
     {
       "file": "data/wordpress-export/courses.json",
@@ -28,9 +718,81 @@
     },
     {
       "file": "data/wordpress-export/courses.json",
+      "slug": "structural-drying-2",
+      "field": "short_description",
+      "text": "Once completed please email support@carsi.com.au for your Certification of completion confirming your hours of Continuing Education Credits."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "structural-drying-2",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "structural-drying-2",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "structural-drying-2",
+      "field": "meta.wp_categories.1.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "structural-drying-2",
+      "field": "meta.wp_categories.1.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-damage",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
       "slug": "water-damage",
       "field": "short_description",
       "text": "This course is approved for IICRC Continuing Education Credit (CEC): 1 Hour."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-damage",
+      "field": "short_description",
+      "text": "Once completed please email support@carsi.com.au for your Certification of completion confirming your hours of Continuing Education Credits."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-damage",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-damage",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-damage",
+      "field": "meta.wp_categories.1.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-damage",
+      "field": "meta.wp_categories.1.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "carpet-cleaning",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
     },
     {
       "file": "data/wordpress-export/courses.json",
@@ -40,9 +802,81 @@
     },
     {
       "file": "data/wordpress-export/courses.json",
+      "slug": "carpet-cleaning",
+      "field": "short_description",
+      "text": "Once completed please email support@carsi.com.au for your Certification of completion confirming your hours of Continuing Education Credits."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "carpet-cleaning",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "carpet-cleaning",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "carpet-cleaning",
+      "field": "meta.wp_categories.2.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "carpet-cleaning",
+      "field": "meta.wp_categories.2.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "odour-control",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
       "slug": "odour-control",
       "field": "short_description",
       "text": "This course is approved for IICRC Continuing Education Credit (CEC): 1 Hour."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "odour-control",
+      "field": "short_description",
+      "text": "Once completed please email support@carsi.com.au for your Certification of completion confirming your hours of Continuing Education Credits."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "odour-control",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "odour-control",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "odour-control",
+      "field": "meta.wp_categories.2.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "odour-control",
+      "field": "meta.wp_categories.2.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "psychrometry-drying",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
     },
     {
       "file": "data/wordpress-export/courses.json",
@@ -52,9 +886,81 @@
     },
     {
       "file": "data/wordpress-export/courses.json",
+      "slug": "psychrometry-drying",
+      "field": "short_description",
+      "text": "Once completed please email support@carsi.com.au for your Certification of completion confirming your hours of Continuing Education Credits."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "psychrometry-drying",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "psychrometry-drying",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "psychrometry-drying",
+      "field": "meta.wp_categories.1.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "psychrometry-drying",
+      "field": "meta.wp_categories.1.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "structural-drying",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
       "slug": "structural-drying",
       "field": "short_description",
       "text": "This course is approved for IICRC Continuing Education Credit (CEC): 1 Hour."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "structural-drying",
+      "field": "short_description",
+      "text": "Once completed please email support@carsi.com.au for your Certification of completion confirming your hours of Continuing Education Credits."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "structural-drying",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "structural-drying",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "structural-drying",
+      "field": "meta.wp_categories.1.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "structural-drying",
+      "field": "meta.wp_categories.1.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-extraction",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
     },
     {
       "file": "data/wordpress-export/courses.json",
@@ -64,9 +970,75 @@
     },
     {
       "file": "data/wordpress-export/courses.json",
+      "slug": "water-extraction",
+      "field": "short_description",
+      "text": "Once completed please email support@carsi.com.au for your Certification of completion confirming your hours of Continuing Education Credits."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-extraction",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-extraction",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-extraction",
+      "field": "meta.wp_categories.2.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-extraction",
+      "field": "meta.wp_categories.2.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "drying-techniques",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
       "slug": "drying-techniques",
       "field": "short_description",
       "text": "This course is approved for IICRC Continuing Education Credit (CEC): 1 Hour."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "drying-techniques",
+      "field": "short_description",
+      "text": "Once completed please email support@carsi.com.au for your Certification of completion confirming your hours of Continuing Education Credits."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "drying-techniques",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "drying-techniques",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "drying-techniques",
+      "field": "meta.wp_categories.1.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "drying-techniques",
+      "field": "meta.wp_categories.1.slug",
+      "text": "cecs"
     },
     {
       "file": "data/wordpress-export/courses.json",
@@ -76,9 +1048,63 @@
     },
     {
       "file": "data/wordpress-export/courses.json",
+      "slug": "mould-identification",
+      "field": "meta.wp_categories.1.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "mould-identification",
+      "field": "meta.wp_categories.1.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "using-ppe",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
       "slug": "using-ppe",
       "field": "short_description",
       "text": "This course is approved for IICRC Continuing Education Credit (CEC): 1 Hour."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "using-ppe",
+      "field": "short_description",
+      "text": "Once completed please email support@carsi.com.au for your Certification of completion confirming your hours of Continuing Education Credits."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "using-ppe",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "using-ppe",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "using-ppe",
+      "field": "meta.wp_categories.1.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "using-ppe",
+      "field": "meta.wp_categories.1.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "safety-procedures",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
     },
     {
       "file": "data/wordpress-export/courses.json",
@@ -88,9 +1114,81 @@
     },
     {
       "file": "data/wordpress-export/courses.json",
+      "slug": "safety-procedures",
+      "field": "short_description",
+      "text": "Once completed please email support@carsi.com.au for your Certification of completion confirming your hours of Continuing Education Credits."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "safety-procedures",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "safety-procedures",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "safety-procedures",
+      "field": "meta.wp_categories.1.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "safety-procedures",
+      "field": "meta.wp_categories.1.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "introduction-to-water-damage-restoration-course",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
       "slug": "introduction-to-water-damage-restoration-course",
       "field": "short_description",
       "text": "This course is approved for IICRC Continuing Education Credit (CEC): 1 Hour."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "introduction-to-water-damage-restoration-course",
+      "field": "short_description",
+      "text": "Once completed please email support@carsi.com.au for your Certification of completion confirming your hours of Continuing Education Credits."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "introduction-to-water-damage-restoration-course",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "introduction-to-water-damage-restoration-course",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "introduction-to-water-damage-restoration-course",
+      "field": "meta.wp_categories.1.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "introduction-to-water-damage-restoration-course",
+      "field": "meta.wp_categories.1.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "glass-cleaning-course",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
     },
     {
       "file": "data/wordpress-export/courses.json",
@@ -100,9 +1198,81 @@
     },
     {
       "file": "data/wordpress-export/courses.json",
+      "slug": "glass-cleaning-course",
+      "field": "short_description",
+      "text": "Once completed please email support@carsi.com.au for your Certificate of completion confirming your hours of Continuing Education Credits."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "glass-cleaning-course",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "glass-cleaning-course",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "glass-cleaning-course",
+      "field": "meta.wp_categories.2.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "glass-cleaning-course",
+      "field": "meta.wp_categories.2.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "safe-work-method-statements-swms-course",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
       "slug": "safe-work-method-statements-swms-course",
       "field": "short_description",
       "text": "This course is approved for IICRC Continuing Education Credit (CEC) : 1 Hour"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "safe-work-method-statements-swms-course",
+      "field": "short_description",
+      "text": "Once completed please email support@carsi.com.au for your Certificate of completion confirming your hours of Continuing Education Credits."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "safe-work-method-statements-swms-course",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "safe-work-method-statements-swms-course",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "safe-work-method-statements-swms-course",
+      "field": "meta.wp_categories.2.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "safe-work-method-statements-swms-course",
+      "field": "meta.wp_categories.2.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "job-safety-and-environmental-analysis-jsea-course",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
     },
     {
       "file": "data/wordpress-export/courses.json",
@@ -112,9 +1282,81 @@
     },
     {
       "file": "data/wordpress-export/courses.json",
+      "slug": "job-safety-and-environmental-analysis-jsea-course",
+      "field": "short_description",
+      "text": "Once completed please email support@carsi.com.au for your Certificate of completion confirming your hours of Continuing Education Credits."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "job-safety-and-environmental-analysis-jsea-course",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "job-safety-and-environmental-analysis-jsea-course",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "job-safety-and-environmental-analysis-jsea-course",
+      "field": "meta.wp_categories.2.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "job-safety-and-environmental-analysis-jsea-course",
+      "field": "meta.wp_categories.2.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "standard-operating-procedures-sop-course",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
       "slug": "standard-operating-procedures-sop-course",
       "field": "short_description",
       "text": "This course is approved for IICRC Continuing Education Credit (CEC) : 1 Hour"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "standard-operating-procedures-sop-course",
+      "field": "short_description",
+      "text": "Once completed please email support@carsi.com.au for your Certificate of completion confirming your hours of Continuing Education Credits."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "standard-operating-procedures-sop-course",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "standard-operating-procedures-sop-course",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "standard-operating-procedures-sop-course",
+      "field": "meta.wp_categories.3.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "standard-operating-procedures-sop-course",
+      "field": "meta.wp_categories.3.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "initial-inspection-report-course",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
     },
     {
       "file": "data/wordpress-export/courses.json",
@@ -124,9 +1366,81 @@
     },
     {
       "file": "data/wordpress-export/courses.json",
+      "slug": "initial-inspection-report-course",
+      "field": "short_description",
+      "text": "Once completed please email support@carsi.com.au for your Certificate of completion confirming your hours of Continuing Education Credits."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "initial-inspection-report-course",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "initial-inspection-report-course",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "initial-inspection-report-course",
+      "field": "meta.wp_categories.2.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "initial-inspection-report-course",
+      "field": "meta.wp_categories.2.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "marketing-course",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
       "slug": "marketing-course",
       "field": "short_description",
       "text": "This course is approved for IICRC Continuing Education Credit (CEC) : 1 Hour"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "marketing-course",
+      "field": "short_description",
+      "text": "Once completed please email support@carsi.com.au for your Certificate of completion confirming your hours of Continuing Education Credits."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "marketing-course",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "marketing-course",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "marketing-course",
+      "field": "meta.wp_categories.3.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "marketing-course",
+      "field": "meta.wp_categories.3.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "risk-assessment-course",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
     },
     {
       "file": "data/wordpress-export/courses.json",
@@ -136,9 +1450,81 @@
     },
     {
       "file": "data/wordpress-export/courses.json",
+      "slug": "risk-assessment-course",
+      "field": "short_description",
+      "text": "Once completed please email support@carsi.com.au for your Certificate of completion confirming your hours of Continuing Education Credits."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "risk-assessment-course",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "risk-assessment-course",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "risk-assessment-course",
+      "field": "meta.wp_categories.3.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "risk-assessment-course",
+      "field": "meta.wp_categories.3.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "level-1-mould-remediation",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
       "slug": "level-1-mould-remediation",
       "field": "short_description",
       "text": "This course is approved for IICRC Continuing Education Credit (CEC) : 2 Hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "level-1-mould-remediation",
+      "field": "short_description",
+      "text": "Once completed please email support@carsi.com.au for your Certificate of completion confirming your hours of Continuing Education Credits."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "level-1-mould-remediation",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "level-1-mould-remediation",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "level-1-mould-remediation",
+      "field": "meta.wp_categories.2.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "level-1-mould-remediation",
+      "field": "meta.wp_categories.2.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "admin-sole-trader",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
     },
     {
       "file": "data/wordpress-export/courses.json",
@@ -148,9 +1534,51 @@
     },
     {
       "file": "data/wordpress-export/courses.json",
+      "slug": "admin-sole-trader",
+      "field": "short_description",
+      "text": "Once completed please email support@carsi.com.au for your Certificate of completion confirming your hours of Continuing Education Credits."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "admin-sole-trader",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "admin-sole-trader",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "admin-sole-trader",
+      "field": "meta.wp_categories.3.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "admin-sole-trader",
+      "field": "meta.wp_categories.3.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
       "slug": "level-3-mould-remediation",
       "field": "description",
       "text": "This advanced course covers large-area and complex mould remediation - the jobs that exceed a standard residential scope. It builds on CARSI's Level 2 course and works through full containment with continuous negative pressure, structural and contents remediation, coordination with an Indoor Environmental Professional, independent clearance, hazardous-material interfaces, and the insurer and litigation-grade documentation these projects demand. It applies ANSI/IICRC S520:2024, in particular the Limitations, Complexities, Complications and Conflicts of §8, to difficult Australian scenarios. It carries IICRC Continuing Education Credit (CEC) hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "level-3-mould-remediation",
+      "field": "meta.wp_categories.2.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "level-3-mould-remediation",
+      "field": "meta.wp_categories.2.slug",
+      "text": "cecs"
     },
     {
       "file": "data/wordpress-export/courses.json",
@@ -160,9 +1588,63 @@
     },
     {
       "file": "data/wordpress-export/courses.json",
+      "slug": "level-2-mould-remediation",
+      "field": "meta.wp_categories.2.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "level-2-mould-remediation",
+      "field": "meta.wp_categories.2.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "safety-data-sheet-sds-course",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
       "slug": "safety-data-sheet-sds-course",
       "field": "short_description",
       "text": "This course is approved for IICRC Continuing Education Credit (CEC) : 2 Hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "safety-data-sheet-sds-course",
+      "field": "short_description",
+      "text": "Once completed please email support@carsi.com.au for your Certificate of completion confirming your hours of Continuing Education Credits."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "safety-data-sheet-sds-course",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "safety-data-sheet-sds-course",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "safety-data-sheet-sds-course",
+      "field": "meta.wp_categories.2.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "safety-data-sheet-sds-course",
+      "field": "meta.wp_categories.2.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "donning-and-doffing-ppe",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
     },
     {
       "file": "data/wordpress-export/courses.json",
@@ -172,9 +1654,81 @@
     },
     {
       "file": "data/wordpress-export/courses.json",
+      "slug": "donning-and-doffing-ppe",
+      "field": "short_description",
+      "text": "Once completed please email support@carsi.com.au for your Certificate of completion confirming your hours of Continuing Education Credits."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "donning-and-doffing-ppe",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "donning-and-doffing-ppe",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "donning-and-doffing-ppe",
+      "field": "meta.wp_categories.1.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "donning-and-doffing-ppe",
+      "field": "meta.wp_categories.1.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "moisture-meter-course",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
       "slug": "moisture-meter-course",
       "field": "short_description",
       "text": "This course is approved for IICRC Continuing Education Credit (CEC) : 3 Hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "moisture-meter-course",
+      "field": "short_description",
+      "text": "Once completed please email support@carsi.com.au for your Certificate of completion confirming your hours of Continuing Education Credits."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "moisture-meter-course",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "moisture-meter-course",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "moisture-meter-course",
+      "field": "meta.wp_categories.3.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "moisture-meter-course",
+      "field": "meta.wp_categories.3.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "carpet-cleaning-basics",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
     },
     {
       "file": "data/wordpress-export/courses.json",
@@ -184,9 +1738,81 @@
     },
     {
       "file": "data/wordpress-export/courses.json",
+      "slug": "carpet-cleaning-basics",
+      "field": "short_description",
+      "text": "Once completed please email support@carsi.com.au for your Certificate of completion confirming your hours of Continuing Education Credits."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "carpet-cleaning-basics",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "carpet-cleaning-basics",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "carpet-cleaning-basics",
+      "field": "meta.wp_categories.3.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "carpet-cleaning-basics",
+      "field": "meta.wp_categories.3.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "asthmaallergy",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
       "slug": "asthmaallergy",
       "field": "short_description",
       "text": "This course is approved for IICRC Continuing Education Credit (CEC) : 6 Hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "asthmaallergy",
+      "field": "short_description",
+      "text": "Once completed please email support@carsi.com.au for your Certificate of completion confirming your hours of Continuing Education Credits."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "asthmaallergy",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "asthmaallergy",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "asthmaallergy",
+      "field": "meta.wp_categories.1.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "asthmaallergy",
+      "field": "meta.wp_categories.1.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "infectious-control-for-the-business-owner",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
     },
     {
       "file": "data/wordpress-export/courses.json",
@@ -196,9 +1822,81 @@
     },
     {
       "file": "data/wordpress-export/courses.json",
+      "slug": "infectious-control-for-the-business-owner",
+      "field": "short_description",
+      "text": "Once completed please email support@carsi.com.au for your Certificate of completion confirming your hours of Continuing Education Credits."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "infectious-control-for-the-business-owner",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "infectious-control-for-the-business-owner",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "infectious-control-for-the-business-owner",
+      "field": "meta.wp_categories.1.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "infectious-control-for-the-business-owner",
+      "field": "meta.wp_categories.1.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "using-atp-to-create-protocols",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
       "slug": "using-atp-to-create-protocols",
       "field": "short_description",
       "text": "This course is approved for IICRC Continuing Education Credit (CEC) : 1 Hour"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "using-atp-to-create-protocols",
+      "field": "short_description",
+      "text": "Once completed please email support@carsi.com.au for your Certificate of completion confirming your hours of Continuing Education Credits."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "using-atp-to-create-protocols",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "using-atp-to-create-protocols",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "using-atp-to-create-protocols",
+      "field": "meta.wp_categories.2.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "using-atp-to-create-protocols",
+      "field": "meta.wp_categories.2.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "infection-control-in-child-care",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
     },
     {
       "file": "data/wordpress-export/courses.json",
@@ -208,7 +1906,85 @@
     },
     {
       "file": "data/wordpress-export/courses.json",
+      "slug": "infection-control-in-child-care",
+      "field": "short_description",
+      "text": "Once completed please email support@carsi.com.au for your Certificate of completion confirming your hours of Continuing Education Credits."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "infection-control-in-child-care",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "infection-control-in-child-care",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "infection-control-in-child-care",
+      "field": "meta.wp_categories.1.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "infection-control-in-child-care",
+      "field": "meta.wp_categories.1.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
       "slug": "neosan-labs-product-training-course",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "neosan-labs-product-training-course",
+      "field": "short_description",
+      "text": "This course is approved for IICRC Continuing Education Credit (CEC) : 5 Hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "neosan-labs-product-training-course",
+      "field": "short_description",
+      "text": "Once completed please email support@carsi.com.au for your Certificate of completion confirming your hours of Continuing Education Credits."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "neosan-labs-product-training-course",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "neosan-labs-product-training-course",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "neosan-labs-product-training-course",
+      "field": "meta.wp_categories.1.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "neosan-labs-product-training-course",
+      "field": "meta.wp_categories.1.slug",
+      "text": "cecs"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "microbe-clean-basic-understanding-course",
+      "field": "short_description",
+      "text": "Continuing Education Credit:"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "microbe-clean-basic-understanding-course",
       "field": "short_description",
       "text": "This course is approved for IICRC Continuing Education Credit (CEC) : 5 Hours"
     },
@@ -216,7 +1992,31 @@
       "file": "data/wordpress-export/courses.json",
       "slug": "microbe-clean-basic-understanding-course",
       "field": "short_description",
-      "text": "This course is approved for IICRC Continuing Education Credit (CEC) : 5 Hours"
+      "text": "Once completed please email support@carsi.com.au for your Certificate of completion confirming your hours of Continuing Education Credits."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "microbe-clean-basic-understanding-course",
+      "field": "short_description",
+      "text": "The approved status does not award IICRC Certification,"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "microbe-clean-basic-understanding-course",
+      "field": "short_description",
+      "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "microbe-clean-basic-understanding-course",
+      "field": "meta.wp_categories.2.name",
+      "text": "CEC Credits"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "microbe-clean-basic-understanding-course",
+      "field": "meta.wp_categories.2.slug",
+      "text": "cecs"
     }
   ]
 }

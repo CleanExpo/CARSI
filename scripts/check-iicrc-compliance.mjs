@@ -238,22 +238,29 @@ export function evaluateContent(file, text, allowlist = ALLOWLIST) {
 // GP-527 — course RECORD scanning (data/wordpress-export/).
 //
 // Each .json file under RECORD_SCANNED_DIRS must be an array of course records. Every string field
-// of every record is HTML-stripped, split into lines and checked against BANNED, CEC_NUMBER and
-// CEC_APPROVAL_PROSE. CEC approval is decided by EXACT slug match against the approvals registry
+// of every record is HTML-stripped, split into lines (and also checked whole, so a claim cannot hide
+// across lines) against BANNED, CEC_NUMBER and CEC_APPROVAL_PROSE. CEC approval is decided by EXACT slug match against the approvals registry
 // (never the path-substring test the line scanner uses, which would let "<approved>-copy" through).
 // Findings carry { file, slug, field, line, text } so the failure names the course.
 export const RECORD_SCANNED_DIRS = ['data/wordpress-export/'];
 
-/** A prose claim that a COURSE carries / is approved for IICRC CECs, numbered or not. Scoped to
- *  course records only: in generic marketing copy "courses approved for IICRC CECs" is a correct
- *  statement about the registry, but inside one course's own description it is a claim about that
- *  course. A denial written immediately before the verb ("not approved for", "does not award") is
- *  not a claim. The last branch catches hours written as words ("(CEC): one Hour"), which the
- *  numeric CEC_NUMBER rule cannot see. */
+/** Any CEC / continuing-education wording in a course record whose slug is not approved.
+ *
+ *  BLOCK-BY-DEFAULT, deliberately not a phrase list. The first version of this rule enumerated
+ *  claim shapes ("approved for …", "carries …", "(CEC): N Hours") and independent review defeated
+ *  it twice with ordinary wording (a claim split across lines; "IICRC CEC approved"). That is the
+ *  same lesson recorded on CEC_NUMBER above: a regex over free prose cannot tell a claim from a
+ *  non-claim. Inside ONE course's own record there is no need to: CLAUDE.md allows CEC wording on a
+ *  course only once that course is approved, so for an unapproved slug every mention is a finding —
+ *  claims, headings ("CEC Credits"), "approved by the IICRC", and denials alike. The remedy is to
+ *  remove the wording or record the approval; there is no exemption by wording.
+ *
+ *  Scoped to course records only. In generic marketing copy "courses the IICRC has approved for
+ *  CECs" is a correct statement about the registry and is handled by the line rules. */
 export const CEC_APPROVAL_PROSE = {
-  re: /(?<!\b(?:not|never)\s+(?:yet\s+|been\s+)?)\b(?:approved|accredited|eligible)\s+for\s+(?:the\s+)?(?:IICRC\s+)?(?:CECs?|Continuing[\s-]+Education[\s-]+Credits?)\b|(?<!\b(?:not|never)\s+)\b(?:carry|carries|earn|earns|award|awards|attract|attracts|grant|grants)\s+(?:\d+(?:\.\d+)?\s+)?(?:IICRC\s+)?(?:CECs?|Continuing[\s-]+Education[\s-]+Credits?)\b|\((?:IICRC\s+)?CECs?\)\s*:?\s*(?:\d+(?:\.\d+)?|one|two|three|four|five|six|seven|eight|nine|ten|half)\s+(?:an?\s+)?hours?\b/i,
+  re: /\bCECs?\b|\bC\.\s*E\.\s*C\b|continuing[\s-]+education|\bapprov\w*\s+by\s+(?:the\s+)?IICRC\b|\bIICRC[\s-]+(?:CEC[\s-]+)?(?:approv|accredit|certif)\w*/i,
   message:
-    'Prose CEC-approval claim in a course record for a slug that is not approved in data/seed/cec-approvals.json. Only the founder can record an approval; until then the claim must not ship (fail-closed, CLAUDE.md).',
+    'CEC / continuing-education wording in the record of a course that is not approved in data/seed/cec-approvals.json. On an unapproved course any such wording is blocked (claims, headings and denials alike); remove it, or the founder records the IICRC approval (fail-closed, CLAUDE.md).',
 };
 
 const ENTITIES = { nbsp: ' ', amp: '&', rsquo: "'", lsquo: "'", ldquo: '"', rdquo: '"', mdash: '-', ndash: '-', quot: '"', apos: "'", lt: '<', gt: '>' };
