@@ -35,7 +35,8 @@ describe('partner demo walkthrough (GP-637)', () => {
       expect(step.shows.trim(), step.title).not.toBe('');
       if (step.status === 'coming') {
         expect(step.segment, step.title).toBeNull();
-        expect(step.ticket, step.title).toMatch(/^GP-\d+$/);
+        expect(step.tickets?.length ?? 0, step.title).toBeGreaterThan(0);
+        for (const t of step.tickets ?? []) expect(t, step.title).toMatch(/^GP-\d+$/);
       }
     }
   });
@@ -48,6 +49,18 @@ describe('partner demo walkthrough (GP-637)', () => {
       const at = sheet.indexOf(heading, from);
       expect(at, heading).toBeGreaterThanOrEqual(0);
       from = at + heading.length;
+    }
+  });
+
+  it('each coming step names exactly the tickets its run sheet section names', () => {
+    const sheet = readFileSync(join(ROOT, 'docs', 'coaching', 'partner-demo-runsheet.md'), 'utf8');
+    for (const [i, step] of PARTNER_DEMO_WALKTHROUGH_STEPS.entries()) {
+      if (step.status !== 'coming') continue;
+      const start = sheet.indexOf(`## ${i + 1}. ${step.title}`);
+      const end = sheet.indexOf('\n## ', start + 1);
+      const section = sheet.slice(start, end === -1 ? undefined : end);
+      const status = section.match(/\*\*Status:\*\* coming \(([^)]*)\)/)?.[1] ?? '';
+      expect(step.tickets, step.title).toEqual(status.match(/GP-\d+/g));
     }
   });
 });

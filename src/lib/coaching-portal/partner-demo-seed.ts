@@ -41,6 +41,7 @@ export const PARTNER_DEMO_COACH_LABEL = PARTNER_DEMO_COACH_NAME;
 
 const ID_NAMESPACE = 'carsi:gp-637:partner-demo:';
 const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '::1', '[::1]']);
+const OVERRIDING_HOST_PARAMS = new Set(['host', 'hostaddr']);
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 /** Deterministic RFC 4122 version-5-shaped UUID for a demo row key. */
@@ -64,12 +65,26 @@ export function checkPartnerDemoSeedAllowed(input: {
   if (input.env[PARTNER_DEMO_ENABLED_ENV] !== 'true') {
     return { ok: false, reason: `${PARTNER_DEMO_ENABLED_ENV} must be exactly "true"` };
   }
-  let host: string;
+  let url: URL;
   try {
-    host = new URL(input.databaseUrl ?? '').hostname;
+    url = new URL(input.databaseUrl ?? '');
   } catch {
     return { ok: false, reason: 'DATABASE_URL is missing or not a URL' };
   }
+  if (url.protocol !== 'postgres:' && url.protocol !== 'postgresql:') {
+    return { ok: false, reason: 'DATABASE_URL must be a postgres:// or postgresql:// URL' };
+  }
+  // node-postgres lets ?host= (and libpq ?hostaddr=) override the URL hostname, so a URL that
+  // names localhost can still connect elsewhere. Refuse any such parameter rather than guess.
+  for (const key of url.searchParams.keys()) {
+    if (OVERRIDING_HOST_PARAMS.has(key.toLowerCase())) {
+      return {
+        ok: false,
+        reason: `DATABASE_URL must not set the "${key}" query parameter; it overrides the host this guard checks`,
+      };
+    }
+  }
+  const host = url.hostname;
   if (!host) return { ok: false, reason: 'DATABASE_URL has no host' };
   if (LOCAL_HOSTS.has(host)) return { ok: true, host };
   if (input.allowHost && input.allowHost === host) return { ok: true, host };

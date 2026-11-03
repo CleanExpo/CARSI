@@ -94,7 +94,7 @@ export default function CoachingPartnerDemoPage() {
                     </Link>
                   ) : (
                     <span className="text-xs font-semibold tracking-wide text-amber-200/90 uppercase">
-                      Coming ({step.ticket})
+                      Coming ({(step.tickets ?? []).join(', ')})
                     </span>
                   )}
                 </li>

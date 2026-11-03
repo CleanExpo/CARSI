@@ -114,8 +114,8 @@ export type PartnerDemoWalkthroughStep = {
   status: 'live' | 'coming';
   /** What the prospect sees on the screen, in one sentence. */
   shows: string;
-  /** Linear ticket that lights the step up (coming steps only). */
-  ticket?: string;
+  /** Linear tickets that light the step up (coming steps only), as named in the run sheet. */
+  tickets?: string[];
 };
 
 /**
@@ -194,7 +194,7 @@ export const PARTNER_DEMO_WALKTHROUGH_STEPS: readonly PartnerDemoWalkthroughStep
     advantage: 'A3 assistant and A7 marketing pack',
     status: 'coming',
     shows: 'Coming: grounded answers from the coach’s own material, and a marketing pack per member.',
-    ticket: 'GP-630',
+    tickets: ['GP-630', 'GP-634'],
   },
   {
     title: 'Your chapter and the Hall',
@@ -203,6 +203,6 @@ export const PARTNER_DEMO_WALKTHROUGH_STEPS: readonly PartnerDemoWalkthroughStep
     advantage: 'A5 chapters and A9 TradeHall',
     status: 'coming',
     shows: 'Coming: the coach’s own chapter, members and currency, and the Hall seminar room.',
-    ticket: 'GP-632',
+    tickets: ['GP-632', 'GP-636'],
   },
 ];

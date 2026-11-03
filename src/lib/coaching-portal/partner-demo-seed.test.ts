@@ -164,6 +164,44 @@ describe('partner demo seed guard', () => {
     ).toBe(true);
   });
 
+  it('refuses a URL whose query parameters move the connection elsewhere (CodeRabbit PR #1007)', () => {
+    // node-postgres reads ?host= over the URL hostname, so the guard must not trust the hostname alone.
+    for (const url of [
+      'postgresql://u:p@localhost:5432/carsi?host=db.example.com',
+      'postgresql://u:p@127.0.0.1:5432/carsi?sslmode=disable&host=db.example.com',
+      'postgresql://u:p@localhost:5432/carsi?%68ost=db.example.com',
+      'postgresql://u:p@localhost:5432/carsi?HOST=db.example.com',
+      'postgresql://u:p@localhost:5432/carsi?hostaddr=203.0.113.9',
+    ]) {
+      const r = checkPartnerDemoSeedAllowed({ env: ENABLED, databaseUrl: url });
+      expect(r.ok, url).toBe(false);
+    }
+    // Naming the remote host does not unlock a URL that hides it in a parameter either.
+    expect(
+      checkPartnerDemoSeedAllowed({
+        env: ENABLED,
+        databaseUrl: 'postgresql://u:p@localhost:5432/carsi?host=db.example.com',
+        allowHost: 'localhost',
+      }).ok
+    ).toBe(false);
+    // An ordinary local URL with harmless parameters is still allowed.
+    expect(
+      checkPartnerDemoSeedAllowed({
+        env: ENABLED,
+        databaseUrl: 'postgresql://u:p@localhost:5432/carsi?sslmode=disable&schema=public',
+      }).ok
+    ).toBe(true);
+  });
+
+  it('refuses anything that is not a postgres:// or postgresql:// URL', () => {
+    for (const url of ['socket://localhost/var/run/postgresql?db=carsi', 'http://localhost:5432/carsi']) {
+      expect(checkPartnerDemoSeedAllowed({ env: ENABLED, databaseUrl: url }).ok, url).toBe(false);
+    }
+    expect(
+      checkPartnerDemoSeedAllowed({ env: ENABLED, databaseUrl: 'postgres://u:p@localhost:5432/carsi' }).ok
+    ).toBe(true);
+  });
+
   it('refuses a missing or unparseable DATABASE_URL', () => {
     expect(checkPartnerDemoSeedAllowed({ env: ENABLED, databaseUrl: '' }).ok).toBe(false);
     expect(checkPartnerDemoSeedAllowed({ env: ENABLED, databaseUrl: 'not a url' }).ok).toBe(false);
