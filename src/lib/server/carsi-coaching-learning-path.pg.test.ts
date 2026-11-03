@@ -6,7 +6,11 @@
  *   - completing a course in the LMS flips its action to done on the member's board read;
  *   - the member cannot change a learning action's status or delete it, but can still delete an
  *     ordinary action (goal_id NULL — the NOT-LIKE-on-NULL trap);
- *   - the coach can remove, add and reorder, and another member's rows are never touched.
+ *   - the coach can remove, add and reorder, and another member's rows are never touched;
+ *   - an assigned path is a draft the member cannot see or edit until the coach approves it;
+ *   - the coach's gap-map edit is stored as an UNPUBLISHED pathway that no public pathway read
+ *     returns (with a published control pathway proving the read sees data), and assignment
+ *     uses it.
  * Cleans up after itself. Locally it is skipped without a local DATABASE_URL; in CI it must run.
  */
 import { randomUUID } from 'node:crypto';
@@ -42,10 +46,15 @@ describe.runIf(RUNNABLE)('coaching learning path (real PostgreSQL)', async () =>
   const { prisma } = await import('@/lib/prisma');
   const lp = await import('@/lib/server/carsi-coaching-learning-path');
   const store = await import('@/lib/server/carsi-coaching-actions-store');
-  const { learningGoalId } = await import('@/lib/coaching-portal/learning-path');
+  const { learningGoalId, GAP_MAP_SLUG_PREFIX } =
+    await import('@/lib/coaching-portal/learning-path');
+  const gapMap = await import('@/lib/server/carsi-coaching-gap-map');
+  const { DEFAULT_COACHING_CHAPTER_SLUG } = await import('@/lib/coaching-portal/coach-routing');
 
   const memberId = randomUUID();
   const otherId = randomUUID();
+  const mapMemberId = randomUUID();
+  const controlPathwayId = randomUUID();
   const instructorId = randomUUID();
   const createdCourseIds: string[] = [];
   const courseIdBySlug = new Map<string, string>();
@@ -94,7 +103,7 @@ describe.runIf(RUNNABLE)('coaching learning path (real PostgreSQL)', async () =>
 
   beforeAll(async () => {
     await prisma.lmsUser.createMany({
-      data: [memberId, otherId, instructorId].map((id) => ({
+      data: [memberId, otherId, mapMemberId, instructorId].map((id) => ({
         id,
         email: `gp633-${id}@example.test`,
         hashedPassword: 'provisional:x',
@@ -107,7 +116,7 @@ describe.runIf(RUNNABLE)('coaching learning path (real PostgreSQL)', async () =>
     ] as const) {
       courseIdBySlug.set(slug, await ensureCourse(slug, title));
     }
-    for (const userId of [memberId, otherId]) {
+    for (const userId of [memberId, otherId, mapMemberId]) {
       await prisma.carsiCoachingMonthlySubscription.create({
         data: { userId, status: 'active' },
       });
@@ -132,7 +141,10 @@ describe.runIf(RUNNABLE)('coaching learning path (real PostgreSQL)', async () =>
   });
 
   afterAll(async () => {
-    await prisma.lmsUser.deleteMany({ where: { id: { in: [memberId, otherId] } } });
+    await prisma.lmsLearningPathway.deleteMany({
+      where: { OR: [{ slug: { startsWith: GAP_MAP_SLUG_PREFIX } }, { id: controlPathwayId }] },
+    });
+    await prisma.lmsUser.deleteMany({ where: { id: { in: [memberId, otherId, mapMemberId] } } });
     await prisma.lmsCourse.deleteMany({ where: { id: { in: createdCourseIds } } });
     await prisma.lmsUser.deleteMany({ where: { id: instructorId } });
     await prisma.$disconnect();
@@ -155,6 +167,46 @@ describe.runIf(RUNNABLE)('coaching learning path (real PostgreSQL)', async () =>
     ]);
     expect((await lp.assignLearningPathFromAssessment(memberId)).status).toBe('already_assigned');
     expect(await prisma.carsiCoachingAction.count({ where: { userId: otherId } })).toBe(0);
+  });
+
+  it('the assigned path is a draft: hidden from the member board until the coach approves', async () => {
+    const drafts = await prisma.carsiCoachingAction.findMany({
+      where: { userId: memberId, goalId: { startsWith: 'course:' } },
+    });
+    expect(drafts.map((d) => d.status)).toEqual(['proposed', 'proposed']);
+    const board = await store.listCoachingActionsForUser(memberId);
+    expect(board.map((b) => b.goalId)).toEqual([null]);
+
+    // The member cannot touch a draft they cannot see, nor re-create it under its id.
+    await store.upsertCoachingActionForUser(memberId, {
+      id: drafts[0].id,
+      title: 'Member edit',
+      status: 'done',
+      progressNote: 'sneaky',
+    });
+    const untouched = await prisma.carsiCoachingAction.findUniqueOrThrow({
+      where: { id: drafts[0].id },
+    });
+    expect(untouched).toMatchObject({ status: 'proposed', progressNote: null });
+
+    const members = await lp.listCoachingLearningMembers();
+    expect(members.find((m) => m.userId === memberId)?.draftCount).toBe(2);
+    const view = await lp.getCoachLearningPathView(memberId);
+    expect(view.pathStatus).toBe('draft');
+    expect(view.path.every((p) => p.draft)).toBe(true);
+
+    const res = await lp.approveLearningPath(memberId);
+    expect(res.approved).toBe(2);
+    const live = await store.listCoachingActionsForUser(memberId);
+    expect(live.map((b) => b.goalId)).toEqual([
+      null,
+      learningGoalId(social()),
+      learningGoalId(wdMkt()),
+    ]);
+    expect((await lp.getCoachLearningPathView(memberId)).pathStatus).toBe('approved');
+    expect(
+      (await lp.listCoachingLearningMembers()).find((m) => m.userId === memberId)?.draftCount
+    ).toBe(0);
   });
 
   it('flips the action to done on the board when the LMS completes the course', async () => {
@@ -248,6 +300,56 @@ describe.runIf(RUNNABLE)('coaching learning path (real PostgreSQL)', async () =>
     expect(wrote).toBe(false);
     const after = await prisma.carsiCoachingAction.findUniqueOrThrow({ where: { id: row.id } });
     expect(after.status).toBe('removed');
+  });
+
+  it('a coach gap-map edit is an unpublished pathway no public read returns, and assignment uses it', async () => {
+    const extra = courseIdBySlug.get(extraSlug)!;
+    // Positive control: a published pathway the public reads DO return.
+    await prisma.lmsLearningPathway.create({
+      data: {
+        id: controlPathwayId,
+        slug: `gp633-control-${controlPathwayId.slice(0, 8)}`,
+        title: 'GP-633 control pathway',
+        isPublished: true,
+        courses: { create: [{ courseId: extra, orderIndex: 0 }] },
+      },
+    });
+    await gapMap.saveGapMapEntry({
+      chapterSlug: DEFAULT_COACHING_CHAPTER_SLUG,
+      area: 'marketing',
+      courseIds: [extra],
+    });
+    const row = await prisma.lmsLearningPathway.findFirstOrThrow({
+      where: { slug: { startsWith: GAP_MAP_SLUG_PREFIX } },
+      include: { courses: true },
+    });
+    expect(row).toMatchObject({ isPublished: false, iicrcDiscipline: null });
+    expect(row.courses.map((c) => c.courseId)).toEqual([extra]);
+
+    const { GET } = await import('../../../app/api/lms/pathways/route');
+    const publicSlugs = ((await (await GET()).json()) as { items: { slug: string }[] }).items.map(
+      (i) => i.slug
+    );
+    expect(publicSlugs).toContain(`gp633-control-${controlPathwayId.slice(0, 8)}`);
+    expect(publicSlugs.some((s) => s.startsWith(GAP_MAP_SLUG_PREFIX))).toBe(false);
+    const { getPathwayProgressForStudent } = await import('@/lib/server/pathway-progress');
+    const progressIds = (await getPathwayProgressForStudent(memberId)).map((p) => p.pathway_id);
+    expect(progressIds).toContain(controlPathwayId);
+    expect(progressIds).not.toContain(row.id);
+
+    expect((await lp.assignLearningPathFromAssessment(mapMemberId)).status).toBe('assigned');
+    const mapped = await prisma.carsiCoachingAction.findMany({ where: { userId: mapMemberId } });
+    expect(mapped.map((m) => m.goalId)).toEqual([learningGoalId(extra)]);
+
+    await gapMap.resetGapMapEntry({
+      chapterSlug: DEFAULT_COACHING_CHAPTER_SLUG,
+      area: 'marketing',
+    });
+    expect(
+      await prisma.lmsLearningPathway.count({
+        where: { slug: { startsWith: GAP_MAP_SLUG_PREFIX } },
+      })
+    ).toBe(0);
   });
 
   it('two simultaneous coach adds of one course create one action', async () => {

@@ -10,6 +10,8 @@ type Member = {
   email: string;
   fullName: string | null;
   subscriptionStatus: string;
+  /** Draft courses waiting for approval (older API responses may omit it). */
+  draftCount?: number;
 };
 
 type PathItem = {
@@ -19,6 +21,8 @@ type PathItem = {
   title: string;
   status: 'todo' | 'in_progress' | 'done' | 'blocked';
   percent: number;
+  /** Prescribed but not yet approved: the member cannot see it. */
+  draft?: boolean;
 };
 
 type CourseOption = { id: string; slug: string; title: string };
@@ -28,6 +32,7 @@ type MemberView = {
   gaps: LearningGap[];
   path: PathItem[];
   options: CourseOption[];
+  pathStatus?: 'none' | 'draft' | 'approved';
   result?: { status: string };
 };
 
@@ -39,17 +44,22 @@ const STATUS_LABEL: Record<PathItem['status'], string> = {
 };
 
 const ASSIGN_RESULT: Record<string, string> = {
-  assigned: 'Path assigned from the assessment.',
+  assigned: 'Draft path created from the assessment. Review it, then approve it for the member.',
+  approved: 'Path approved. The member now sees it on their Actions board and Resources page.',
   already_assigned: 'This member already has a path. Adjust it below.',
   no_assessment: 'No submitted assessment yet, so there is nothing to prescribe from.',
   no_gaps: 'The assessment shows no clear gap. Add courses by hand if you want a path.',
   no_modules: 'No published course matches these gaps yet. Add courses by hand.',
 };
 
-const surface =
+export const coachingAdminSurface =
   'rounded-2xl border border-white/10 bg-white/[0.04] shadow-[0_1px_0_rgba(255,255,255,0.04)_inset]';
-const btn =
+export const coachingAdminButton =
   'rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white/85 hover:bg-white/10 disabled:opacity-40';
+const surface = coachingAdminSurface;
+const btn = coachingAdminButton;
+const primaryBtn =
+  'rounded-lg border border-sky-400/40 bg-sky-500/20 px-3 py-2 text-sm font-semibold text-sky-100 hover:bg-sky-500/30 disabled:opacity-40';
 
 export function AdminCoachingLearningPathsClient() {
   const [members, setMembers] = useState<Member[]>([]);
@@ -139,8 +149,9 @@ export function AdminCoachingLearningPathsClient() {
       <header className="mb-6">
         <h1 className="text-2xl font-bold text-white">Learning paths</h1>
         <p className="mt-1 max-w-2xl text-sm text-white/55">
-          CARSI courses prescribed from each coaching member’s assessment. Review the gaps, then
-          remove, add or reorder courses. Progress comes straight from the LMS.
+          CARSI courses prescribed from each coaching member’s assessment. A new path is a draft the
+          member cannot see. Review the gaps, remove, add or reorder courses, then approve it.
+          Progress comes straight from the LMS.
         </p>
       </header>
 
@@ -157,7 +168,9 @@ export function AdminCoachingLearningPathsClient() {
           <option value="">Choose a coaching member…</option>
           {members.map((m) => (
             <option key={m.userId} value={m.userId}>
-              {(m.fullName?.trim() || m.email) + ` (${m.subscriptionStatus})`}
+              {(m.fullName?.trim() || m.email) +
+                ` (${m.subscriptionStatus})` +
+                (m.draftCount ? ' · draft waiting for approval' : '')}
             </option>
           ))}
         </select>
@@ -199,8 +212,35 @@ export function AdminCoachingLearningPathsClient() {
           </section>
 
           <section className={`p-5 ${surface}`}>
-            <h2 className="text-sm font-semibold text-white">Prescribed path</h2>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 className="text-sm font-semibold text-white">Prescribed path</h2>
+              {view.pathStatus === 'draft' ? (
+                <span className="rounded-full border border-amber-300/30 bg-amber-300/10 px-2.5 py-0.5 text-xs font-medium text-amber-200">
+                  Draft, not visible to the member
+                </span>
+              ) : view.pathStatus === 'approved' ? (
+                <span className="rounded-full border border-emerald-300/30 bg-emerald-300/10 px-2.5 py-0.5 text-xs font-medium text-emerald-200">
+                  Approved, visible to the member
+                </span>
+              ) : null}
+            </div>
             {notice ? <p className="mt-2 text-xs text-sky-300">{notice}</p> : null}
+            {view.pathStatus === 'draft' ? (
+              <div className="mt-3 flex flex-wrap items-center gap-3 rounded-xl border border-amber-300/20 bg-amber-300/[0.06] px-3 py-3">
+                <p className="min-w-0 flex-1 text-xs text-white/70">
+                  Check the courses below. Approving publishes the path to the member’s Actions
+                  board and Resources page.
+                </p>
+                <button
+                  type="button"
+                  className={primaryBtn}
+                  disabled={busy}
+                  onClick={() => void post({ op: 'approve' })}
+                >
+                  Approve path
+                </button>
+              </div>
+            ) : null}
             {view.path.length === 0 ? (
               <p className="mt-2 text-sm text-white/50">No courses on this path yet.</p>
             ) : (
@@ -214,7 +254,7 @@ export function AdminCoachingLearningPathsClient() {
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm text-white">{p.title}</p>
                       <p className="text-xs text-white/45">
-                        {STATUS_LABEL[p.status]} · {p.percent}%
+                        {p.draft ? 'Draft' : STATUS_LABEL[p.status]} · {p.percent}%
                       </p>
                     </div>
                     <button

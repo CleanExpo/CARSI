@@ -47,15 +47,16 @@ export const LEARNING_GAP_THRESHOLD = 2;
 /** Default cap so a path stays short enough to finish between monthly sessions. */
 export const DEFAULT_LEARNING_PATH_LIMIT = 4;
 
+/** Gap area → course slugs in priority order, per coaching chapter. */
+export type GapCourseMap = Record<CoachingChapterSlug, Record<LearningGapArea, string[]>>;
+
 /**
- * Gap area → recommended course slugs, per coaching chapter, in priority order. Slugs that are
- * not live in the published catalogue are skipped at assignment time (fail closed).
- * Coach-editable storage for this map is a follow-up; today a coach adjusts each member's path.
+ * Built-in gap area → recommended course slugs, per coaching chapter, in priority order. Slugs
+ * that are not live in the published catalogue are skipped at assignment time (fail closed).
+ * A coach can replace any area from Admin > Learning paths; the edit is stored as an unpublished
+ * learning pathway (see `gapMapPathwaySlug`) and wins over this default for that area only.
  */
-export const DEFAULT_GAP_COURSE_MAP: Record<
-  CoachingChapterSlug,
-  Record<LearningGapArea, string[]>
-> = {
+export const DEFAULT_GAP_COURSE_MAP: GapCourseMap = {
   [DEFAULT_COACHING_CHAPTER_SLUG]: {
     marketing: ['social-media-marketing', 'introduction-to-water-damage-marketing-and-sales'],
     sales: [
@@ -174,7 +175,7 @@ export type RecommendedLearningModule = {
 
 export function recommendLearningModules(input: {
   gaps: LearningGap[];
-  courseMap: Record<CoachingChapterSlug, Record<LearningGapArea, string[]>>;
+  courseMap: GapCourseMap;
   catalogue: LearningCatalogueCourse[];
   completedCourseIds: Set<string>;
   chapterSlug?: CoachingChapterSlug;
@@ -208,9 +209,7 @@ export function recommendLearningModules(input: {
 }
 
 /** Every course slug any chapter map can prescribe — the set the server looks up. */
-export function mappedCourseSlugs(
-  courseMap: Record<CoachingChapterSlug, Record<LearningGapArea, string[]>> = DEFAULT_GAP_COURSE_MAP
-): string[] {
+export function mappedCourseSlugs(courseMap: GapCourseMap = DEFAULT_GAP_COURSE_MAP): string[] {
   const all = new Set<string>();
   for (const chapter of Object.values(courseMap)) {
     for (const slugs of Object.values(chapter)) for (const s of slugs) all.add(s);
@@ -224,6 +223,34 @@ export const LEARNING_GOAL_PREFIX = 'course:';
  * coach's decision outlives the row: assignment never re-prescribes a path that was cleared.
  */
 export const LEARNING_REMOVED_STATUS = 'removed';
+/**
+ * Status of a learning action prescribed from the assessment but not yet approved by the coach.
+ * The member never sees a draft and progress sync never writes to one; the coach's Approve turns
+ * every draft on the path into a live `todo` in one step.
+ */
+export const LEARNING_PROPOSED_STATUS = 'proposed';
+
+/**
+ * Coach edits to the gap map live in `lms_learning_pathways` under this reserved slug prefix,
+ * always unpublished, so every public pathway read (which filters `is_published`) skips them.
+ */
+export const GAP_MAP_SLUG_PREFIX = 'coaching-gap-map--';
+
+export function gapMapPathwaySlug(chapterSlug: CoachingChapterSlug, area: LearningGapArea): string {
+  return `${GAP_MAP_SLUG_PREFIX}${chapterSlug}--${area}`;
+}
+
+export function parseGapMapPathwaySlug(
+  slug: string
+): { chapterSlug: CoachingChapterSlug; area: LearningGapArea } | null {
+  if (!slug.startsWith(GAP_MAP_SLUG_PREFIX)) return null;
+  const rest = slug.slice(GAP_MAP_SLUG_PREFIX.length);
+  const cut = rest.lastIndexOf('--');
+  if (cut <= 0) return null;
+  const area = rest.slice(cut + 2) as LearningGapArea;
+  if (!LEARNING_GAP_AREAS.includes(area)) return null;
+  return { chapterSlug: rest.slice(0, cut), area };
+}
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** `goalId` value linking a board action to an LMS course (fits the 64-char column). */

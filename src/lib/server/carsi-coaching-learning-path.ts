@@ -9,8 +9,8 @@
  * Postgres; `prismaLearningPathStore` is the production implementation.
  */
 import {
-  DEFAULT_GAP_COURSE_MAP,
   LEARNING_GOAL_PREFIX,
+  LEARNING_PROPOSED_STATUS,
   LEARNING_REMOVED_STATUS,
   applyCoachPathAdjustment,
   detectAssessmentGaps,
@@ -19,6 +19,7 @@ import {
   parseLearningGoalId,
   recommendLearningModules,
   rollupLearningProgress,
+  type GapCourseMap,
   type LearningCatalogueCourse,
   type LearningCourseProgress,
   type LearningGapArea,
@@ -27,6 +28,11 @@ import {
 import { parseAssessmentResponsesJson } from '@/lib/coaching-portal/assessment-schema';
 import type { CoachingActionStatus } from '@/lib/coaching-portal/types';
 import { prisma } from '@/lib/prisma';
+import { loadGapCourseMap, prismaGapMapStoreFor } from '@/lib/server/carsi-coaching-gap-map';
+
+/** Statuses a learning action can be written with: board statuses, a draft, or a tombstone. */
+export type LearningActionWriteStatus =
+  CoachingActionStatus | typeof LEARNING_PROPOSED_STATUS | typeof LEARNING_REMOVED_STATUS;
 
 export type LearningActionRecord = {
   id: string;
@@ -47,7 +53,14 @@ export type LearningPathStore = {
   listActions(userId: string): Promise<LearningActionRecord[]>;
   createLearningActions(
     userId: string,
-    rows: Array<{ courseId: string; title: string; description: string; sortOrder: number }>
+    rows: Array<{
+      courseId: string;
+      title: string;
+      description: string;
+      sortOrder: number;
+      /** `proposed` (draft, hidden from the member) or `todo` (live). Defaults to `todo`. */
+      status?: typeof LEARNING_PROPOSED_STATUS | 'todo';
+    }>
   ): Promise<void>;
   /**
    * Compare-and-set: writes only if the row still has `expectedStatus` (the status the caller
@@ -58,8 +71,10 @@ export type LearningPathStore = {
     userId: string,
     id: string,
     expectedStatus: string,
-    data: { status?: CoachingActionStatus | typeof LEARNING_REMOVED_STATUS; sortOrder?: number }
+    data: { status?: LearningActionWriteStatus; sortOrder?: number }
   ): Promise<boolean>;
+  /** The gap-to-course map: built-in default with the coach's edits laid over it. */
+  gapCourseMap(): Promise<GapCourseMap>;
   publishedCoursesBySlugs(slugs: string[]): Promise<LearningCatalogueCourse[]>;
   publishedCoursesByIds(ids: string[]): Promise<LearningCatalogueCourse[]>;
   completedCourseIds(userId: string): Promise<Set<string>>;
@@ -77,6 +92,9 @@ export type LearningPathItem = {
   /** Member holds a live enrolment, so the lesson player will open for them. */
   enrolled: boolean;
 };
+
+/** Coach-side path item: drafts included, flagged so the coach knows what still needs approval. */
+export type CoachLearningPathItem = LearningPathItem & { draft: boolean };
 
 const AREA_REASON: Record<LearningGapArea, string> = {
   marketing: 'marketing and online visibility',
@@ -99,7 +117,8 @@ export type AssignLearningPathResult =
   | { status: 'already_assigned' | 'no_assessment' | 'no_gaps' | 'no_modules' };
 
 /**
- * Prescribe courses from the member's latest submitted assessment. Runs once: if any learning
+ * Prescribe courses from the member's latest submitted assessment, as a DRAFT the coach must
+ * approve before the member sees it. Runs once: if any learning
  * action already exists (assigned before, or shaped by the coach) it writes nothing, so a coach
  * removal is never undone by a re-run.
  */
@@ -125,11 +144,12 @@ async function assignLocked(
   if (gaps.length === 0) return { status: 'no_gaps' };
 
   // Sequential on purpose: these run on the locked transaction's single connection.
-  const catalogue = await store.publishedCoursesBySlugs(mappedCourseSlugs(DEFAULT_GAP_COURSE_MAP));
+  const courseMap = await store.gapCourseMap();
+  const catalogue = await store.publishedCoursesBySlugs(mappedCourseSlugs(courseMap));
   const completed = await store.completedCourseIds(userId);
   const modules = recommendLearningModules({
     gaps,
-    courseMap: DEFAULT_GAP_COURSE_MAP,
+    courseMap,
     catalogue,
     completedCourseIds: completed,
   });
@@ -143,6 +163,8 @@ async function assignLocked(
       title: learningActionTitle(m.title),
       description: learningActionDescription(m),
       sortOrder: start + i,
+      // A draft until the coach approves it: the member sees nothing yet (GP-633 spec).
+      status: LEARNING_PROPOSED_STATUS,
     }))
   );
   return { status: 'assigned', modules };
@@ -155,20 +177,37 @@ async function assignLocked(
  */
 type LearningRow = { action: LearningActionRecord; courseId: string };
 
-/** Learning rows, split into those on the path and coach-removed tombstones. */
+/**
+ * Learning rows, split into live (the member sees them), drafts awaiting coach approval, and
+ * coach-removed tombstones.
+ */
 function splitLearningRows(actions: LearningActionRecord[]): {
   active: LearningRow[];
+  proposed: LearningRow[];
   removed: LearningRow[];
 } {
   const rows = actions
     .map((a) => ({ action: a, courseId: parseLearningGoalId(a.goalId) }))
     .filter((x): x is LearningRow => x.courseId !== null);
+  const hidden = (s: string) => s === LEARNING_REMOVED_STATUS || s === LEARNING_PROPOSED_STATUS;
   return {
-    active: rows.filter((x) => x.action.status !== LEARNING_REMOVED_STATUS),
+    active: rows.filter((x) => !hidden(x.action.status)),
+    proposed: rows.filter((x) => x.action.status === LEARNING_PROPOSED_STATUS),
     removed: rows.filter((x) => x.action.status === LEARNING_REMOVED_STATUS),
   };
 }
 
+const NO_PROGRESS: LearningCourseProgress = {
+  enrolled: false,
+  completed: false,
+  lessonsTotal: 0,
+  lessonsCompleted: 0,
+};
+
+/**
+ * The member's LIVE learning path with LMS progress. Drafts and tombstones are never returned
+ * and never written, so a path the coach has not approved cannot reach the member's board.
+ */
 export async function syncLearningPath(
   userId: string,
   store: LearningPathStore = prismaLearningPathStore
@@ -185,12 +224,7 @@ export async function syncLearningPath(
 
   const items: LearningPathItem[] = [];
   for (const { action, courseId } of learning) {
-    const p = progress.get(courseId) ?? {
-      enrolled: false,
-      completed: false,
-      lessonsTotal: 0,
-      lessonsCompleted: 0,
-    };
+    const p = progress.get(courseId) ?? NO_PROGRESS;
     const rolled = rollupLearningProgress(p);
     const status: CoachingActionStatus =
       action.status === 'blocked' && rolled.status !== 'done' ? 'blocked' : rolled.status;
@@ -229,10 +263,62 @@ export async function adjustLearningPath(
   userId: string,
   input: LearningPathAdjustmentInput,
   store: LearningPathStore = prismaLearningPathStore
-): Promise<LearningPathItem[]> {
+): Promise<CoachLearningPathItem[]> {
   await store.withMemberLock(userId, (locked) => adjustLocked(userId, input, locked));
-  const items = await syncLearningPath(userId, store);
-  return items.sort((a, b) => a.sortOrder - b.sortOrder);
+  return coachLearningPath(userId, store);
+}
+
+/**
+ * The coach's view of the path: live items (synced with the LMS, as the member sees them) plus
+ * drafts with read-only progress, in board order. Drafts are never written here.
+ */
+export async function coachLearningPath(
+  userId: string,
+  store: LearningPathStore = prismaLearningPathStore
+): Promise<CoachLearningPathItem[]> {
+  const live = (await syncLearningPath(userId, store)).map((i) => ({ ...i, draft: false }));
+  const drafts = splitLearningRows(await store.listActions(userId)).proposed;
+  if (drafts.length === 0) return live.sort((a, b) => a.sortOrder - b.sortOrder);
+
+  const ids = drafts.map((d) => d.courseId);
+  const [courses, progress] = await Promise.all([
+    store.publishedCoursesByIds(ids),
+    store.courseProgress(userId, ids),
+  ]);
+  const courseById = new Map(courses.map((c) => [c.id, c]));
+  const draftItems: CoachLearningPathItem[] = drafts.map(({ action, courseId }) => {
+    const p = progress.get(courseId) ?? NO_PROGRESS;
+    const course = courseById.get(courseId);
+    return {
+      actionId: action.id,
+      courseId,
+      slug: course?.slug ?? '',
+      title: course?.title ?? action.title,
+      status: 'todo',
+      percent: rollupLearningProgress(p).percent,
+      sortOrder: action.sortOrder,
+      enrolled: p.enrolled,
+      draft: true,
+    };
+  });
+  return [...live, ...draftItems].sort((a, b) => a.sortOrder - b.sortOrder);
+}
+
+/**
+ * Coach approval: every draft course on the member's path goes live (`todo`) in one step, under
+ * the member lock, compare-and-set. The progress sync then gives each its real status. Courses
+ * the coach removed stay removed.
+ */
+export async function approveLearningPath(
+  userId: string,
+  store: LearningPathStore = prismaLearningPathStore
+): Promise<{ approved: number; path: CoachLearningPathItem[] }> {
+  const approved = await store.withMemberLock(userId, async (locked) => {
+    const drafts = splitLearningRows(await locked.listActions(userId)).proposed;
+    for (const d of drafts) await coachWrite(locked, userId, d.action, { status: 'todo' });
+    return drafts.length;
+  });
+  return { approved, path: await coachLearningPath(userId, store) };
 }
 
 /**
@@ -262,8 +348,16 @@ async function adjustLocked(
   store: LearningPathStore
 ): Promise<void> {
   const actions = await store.listActions(userId);
-  const { active: learning, removed } = splitLearningRows(actions);
+  const split = splitLearningRows(actions);
+  const removed = split.removed;
+  // The coach edits the whole path, drafts included, in board order.
+  const learning = [...split.active, ...split.proposed].sort(
+    (a, b) => a.action.sortOrder - b.action.sortOrder
+  );
   const currentIds = learning.map((x) => x.courseId);
+  // While a draft is waiting, anything the coach adds joins the draft; once the path is live,
+  // the coach adding a course is itself the approval.
+  const newStatus = split.proposed.length > 0 ? LEARNING_PROPOSED_STATUS : 'todo';
 
   const wantedAdds = (input.addCourseIds ?? []).filter((id) => !currentIds.includes(id));
   const addable = wantedAdds.length ? await store.publishedCoursesByIds(wantedAdds) : [];
@@ -284,12 +378,7 @@ async function adjustLocked(
   const kept = learning.filter((x) => next.includes(x.courseId));
   let tail = actions.reduce((max, a) => Math.max(max, a.sortOrder), -1) + 1;
   const slots = kept.map((x) => x.action.sortOrder).sort((a, b) => a - b);
-  const toCreate: Array<{
-    courseId: string;
-    title: string;
-    description: string;
-    sortOrder: number;
-  }> = [];
+  const toCreate: Parameters<LearningPathStore['createLearningActions']>[1] = [];
 
   for (const [i, courseId] of next.entries()) {
     const existing = kept.find((x) => x.courseId === courseId);
@@ -304,7 +393,7 @@ async function adjustLocked(
       const tombstone = removed.find((x) => x.courseId === courseId);
       if (tombstone) {
         // Re-adding a removed course revives its row; the sync then sets its real status.
-        await coachWrite(store, userId, tombstone.action, { status: 'todo', sortOrder });
+        await coachWrite(store, userId, tombstone.action, { status: newStatus, sortOrder });
         continue;
       }
       toCreate.push({
@@ -312,6 +401,7 @@ async function adjustLocked(
         title: learningActionTitle(course.title),
         description: 'Added to your learning path by your coach.',
         sortOrder,
+        status: newStatus,
       });
     }
   }
@@ -333,6 +423,7 @@ type LearningPathDb = Pick<
   | 'lmsEnrollment'
   | 'lmsLesson'
   | 'lmsLessonProgress'
+  | 'lmsLearningPathway'
 >;
 
 /**
@@ -375,7 +466,7 @@ function prismaStoreFor(db: LearningPathDb): LearningPathStore {
           title: r.title,
           description: r.description,
           goalId: learningGoalId(r.courseId),
-          status: 'todo',
+          status: r.status ?? 'todo',
           assignedTo: 'customer',
           sortOrder: r.sortOrder,
         })),
@@ -392,6 +483,9 @@ function prismaStoreFor(db: LearningPathDb): LearningPathStore {
         },
       });
       return res.count > 0;
+    },
+    async gapCourseMap() {
+      return loadGapCourseMap(prismaGapMapStoreFor(db));
     },
     async publishedCoursesBySlugs(slugs) {
       if (slugs.length === 0) return [];
@@ -456,40 +550,51 @@ export type CoachingLearningMember = {
   email: string;
   fullName: string | null;
   subscriptionStatus: string;
+  /** Draft courses waiting for the coach's approval (0 when nothing is waiting). */
+  draftCount: number;
 };
 
 /** Coaching members the coach can review (every monthly coaching subscription row). */
 export async function listCoachingLearningMembers(): Promise<CoachingLearningMember[]> {
-  const rows = await prisma.carsiCoachingMonthlySubscription.findMany({
-    orderBy: { createdAt: 'desc' },
-    select: { userId: true, status: true, user: { select: { email: true, fullName: true } } },
-  });
+  const [rows, drafts] = await Promise.all([
+    prisma.carsiCoachingMonthlySubscription.findMany({
+      orderBy: { createdAt: 'desc' },
+      select: { userId: true, status: true, user: { select: { email: true, fullName: true } } },
+    }),
+    prisma.carsiCoachingAction.groupBy({
+      by: ['userId'],
+      where: { status: LEARNING_PROPOSED_STATUS, goalId: { startsWith: LEARNING_GOAL_PREFIX } },
+      _count: { _all: true },
+    }),
+  ]);
+  const draftsByUser = new Map(drafts.map((d) => [d.userId, d._count._all]));
   return rows.map((r) => ({
     userId: r.userId,
     email: r.user.email,
     fullName: r.user.fullName,
     subscriptionStatus: r.status,
+    draftCount: draftsByUser.get(r.userId) ?? 0,
   }));
 }
 
-/** Coach view of one member: the gaps behind the path, the path with progress, and add options. */
+/**
+ * Coach view of one member: the gaps behind the path, the path with progress (drafts flagged),
+ * whether it is waiting for approval, and the courses the coach can add.
+ */
 export async function getCoachLearningPathView(userId: string) {
   const json = await prismaLearningPathStore.latestSubmittedAssessmentJson(userId);
   const gaps = json ? detectAssessmentGaps(parseAssessmentResponsesJson(json)) : [];
   const [path, options] = await Promise.all([
-    syncLearningPath(userId),
+    coachLearningPath(userId),
     prisma.lmsCourse.findMany({
       where: PUBLISHED,
       orderBy: { title: 'asc' },
       select: { id: true, slug: true, title: true },
     }),
   ]);
-  return {
-    hasAssessment: Boolean(json),
-    gaps,
-    path: path.sort((a, b) => a.sortOrder - b.sortOrder),
-    options,
-  };
+  const pathStatus: 'none' | 'draft' | 'approved' =
+    path.length === 0 ? 'none' : path.some((p) => p.draft) ? 'draft' : 'approved';
+  return { hasAssessment: Boolean(json), gaps, path, pathStatus, options };
 }
 
 /** Paths are only written for people who have a coaching membership row. */
