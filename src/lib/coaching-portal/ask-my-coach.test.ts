@@ -118,6 +118,16 @@ describe('compliance (d)', () => {
       'Is the Google Business Profile module approved by anyone?',
       'Does the Google Business Profile module count as continuing-education?',
       'Will the Google Business Profile module help me get licenced?',
+      // Codex r3 P1: punctuated, spaced and misspelt forms.
+      'Do Google Business Profile reviews earn C.E.C. credits?',
+      'Do Google Business Profile reviews earn C E C points?',
+      'Do Google Business Profile reviews earn c-e-c hours?',
+      'Is there a cerification for Google Business Profile reviews?',
+      'Is the Google Business Profile module acreditation ready?',
+      'Do Google Business Profile reviews give me a qualifcation?',
+      'Is the Google Business Profile module I.I.C.R.C. recognised?',
+      'Do Google Business Profile reviews earn credits toward anything?',
+      'Is the Google Business Profile module aproved?',
     ]) {
       expect(isComplianceSensitiveQuestion(q)).toBe(true);
       const kbWithMatch: CoachKnowledgeBase = {
@@ -135,6 +145,10 @@ describe('compliance (d)', () => {
       false
     );
     expect(isComplianceSensitiveQuestion('How do I handle uncertainty in quoting?')).toBe(false);
+    expect(isComplianceSensitiveQuestion('How often should I do a price check on jobs?')).toBe(
+      false
+    );
+    expect(isComplianceSensitiveQuestion('How do I improve my Google reviews?')).toBe(false);
   });
 
   it('assistant copy and the default knowledge base pass the IICRC/CEC compliance scanner', () => {

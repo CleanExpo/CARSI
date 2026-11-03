@@ -62,19 +62,109 @@ export function normaliseQuestion(raw: unknown): string | null {
 
 /**
  * Questions about certification, recertification, accreditation, licensing, qualifications,
- * credentials, designations, approvals or continuing-education credits are never answered by
+ * credentials, designations, approvals, credits or continuing education are never answered by
  * the assistant. They carry licence risk for CARSI, so a person answers them.
  *
- * Matched by STEM anywhere in a word, not by a list of whole words: a word list let "cert" and
- * then "recertification" through (Codex review rounds 1 and 2). A false positive only sends a
- * question to the coach, which is the safe direction. "certain" is the one carve-out, because
- * it is everyday English and carries no credential meaning.
+ * Three review rounds each found a new spelling past a word list ("cert", "recertification",
+ * "C.E.C.", "cerification"), so the check now covers the whole class at once:
+ *   1. stems anywhere in a word (cert, accred, licen, qualif, credent, designat, approv, credit);
+ *   2. the acronyms IICRC and CEC with all punctuation and spacing removed ("C.E.C.", "c e c");
+ *   3. any word within a small edit distance of a credential term, so misspellings still match.
+ * A false positive only sends a question to the coach, which is the safe direction. "certain"
+ * is the one carve-out, because it is everyday English with no credential meaning.
  */
-const COMPLIANCE_TOPIC_RE =
-  /iicrc|\bcecs?\b|continuing[\s-]*ed|cert(?!ain)|accred|licen[cs]|qualif|credent|designat|\bapprov/i;
+const COMPLIANCE_STEM_RE =
+  /cert(?!ain)|accred|licen[cs]|qualif|credent|designat|\bapprov|\bcredit|continuing[\s-]*ed/i;
+
+const COMPLIANCE_ACRONYMS = ['iicrc', 'cec'];
+
+const COMPLIANCE_TERMS = [
+  'certification',
+  'certificate',
+  'certified',
+  'certify',
+  'recertification',
+  'accreditation',
+  'accredited',
+  'licence',
+  'license',
+  'licensed',
+  'licenced',
+  'qualification',
+  'qualified',
+  'credential',
+  'designation',
+  'approval',
+  'approved',
+  'credits',
+  'continuing',
+  'iicrc',
+];
+
+function normaliseForCompliance(text: string): string {
+  return text.normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase();
+}
+
+/** Optimal string alignment distance, capped: returns cap + 1 once the cap is exceeded. */
+function editDistanceWithin(a: string, b: string, cap: number): number {
+  if (Math.abs(a.length - b.length) > cap) return cap + 1;
+  const rows: number[][] = [];
+  for (let i = 0; i <= a.length; i += 1) {
+    rows.push(new Array<number>(b.length + 1).fill(0));
+    rows[i][0] = i;
+  }
+  for (let j = 0; j <= b.length; j += 1) rows[0][j] = j;
+  for (let i = 1; i <= a.length; i += 1) {
+    let rowMin = Infinity;
+    for (let j = 1; j <= b.length; j += 1) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      let v = Math.min(rows[i - 1][j] + 1, rows[i][j - 1] + 1, rows[i - 1][j - 1] + cost);
+      if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) {
+        v = Math.min(v, rows[i - 2][j - 2] + 1);
+      }
+      rows[i][j] = v;
+      rowMin = Math.min(rowMin, v);
+    }
+    if (rowMin > cap) return cap + 1;
+  }
+  return rows[a.length][b.length];
+}
+
+function isNearComplianceTerm(word: string): boolean {
+  if (word.length < 5) return false;
+  return COMPLIANCE_TERMS.some((term) => {
+    const cap = term.length >= 10 ? 2 : 1;
+    return editDistanceWithin(word, term, cap) <= cap;
+  });
+}
+
+/**
+ * Acronyms spelt with dots, dashes or spaces ("C.E.C.", "c e c", "I-I-C-R-C") arrive as runs
+ * of one-letter words; joining each run back together lets them match. Ordinary words are not
+ * joined, so "price check" does not read as "cec".
+ */
+function mentionsComplianceAcronym(words: string[]): boolean {
+  const candidates = [...words];
+  let run = '';
+  for (const w of [...words, '']) {
+    if (w.length === 1) {
+      run += w;
+      continue;
+    }
+    if (run) candidates.push(run);
+    run = '';
+  }
+  return candidates.some((w) =>
+    COMPLIANCE_ACRONYMS.some((a) => w === a || w === `${a}s` || w.startsWith(a))
+  );
+}
 
 export function isComplianceSensitiveQuestion(text: string): boolean {
-  return COMPLIANCE_TOPIC_RE.test(text);
+  const t = normaliseForCompliance(text);
+  if (COMPLIANCE_STEM_RE.test(t)) return true;
+  const words = t.split(/[^a-z]+/).filter(Boolean);
+  if (mentionsComplianceAcronym(words)) return true;
+  return words.some(isNearComplianceTerm);
 }
 
 /** Member-facing assistant copy, kept in one place so the compliance test scans all of it. */

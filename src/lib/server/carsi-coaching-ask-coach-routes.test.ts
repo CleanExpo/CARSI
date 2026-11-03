@@ -176,6 +176,18 @@ describe('member route /api/coaching/portal/ask-coach', () => {
     expect(state.rows[0]).toMatchObject({ userId: MEMBER_A, coachId: 'coach-phill-mcgurk' });
   });
 
+  it('never auto-answers a disguised credential question, even when the material matches', async () => {
+    state.claims = member(MEMBER_A);
+    for (const question of [
+      'Does quoting and job costing earn C.E.C. credits?',
+      'Is there a cerification for quoting and job costing?',
+    ]) {
+      const json = await (await memberPOST(req(MEMBER_URL, { question }))).json();
+      expect(json.result).toMatchObject({ status: 'sent_to_coach', reason: 'compliance_topic' });
+    }
+    expect(state.rows).toHaveLength(2);
+  });
+
   it('a member reads only their own questions', async () => {
     state.claims = member(MEMBER_B);
     await memberPOST(req(MEMBER_URL, { question: 'What should I name my second brand?' }));
