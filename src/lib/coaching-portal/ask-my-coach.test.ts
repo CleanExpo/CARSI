@@ -108,6 +108,16 @@ describe('compliance (d)', () => {
       'Do I get certs for the Google Business Profile work?',
       'What qualification do I hold after the Google Business Profile module?',
       'Does the Google Business Profile module give me a designation or credential?',
+      // Codex r2 P1: prefixes, typos and punctuation must not slip past either.
+      'What recertification options do I have for Google Business Profile reviews?',
+      'Can I recert using the Google Business Profile module?',
+      'Do I need to re-certify after the Google Business Profile work?',
+      'Is there a certfication for Google Business Profile reviews?',
+      'Do the Google Business Profile reviews count toward my CEC’s?',
+      'Is the Google Business Profile module accredidted?',
+      'Is the Google Business Profile module approved by anyone?',
+      'Does the Google Business Profile module count as continuing-education?',
+      'Will the Google Business Profile module help me get licenced?',
     ]) {
       expect(isComplianceSensitiveQuestion(q)).toBe(true);
       const kbWithMatch: CoachKnowledgeBase = {
@@ -120,6 +130,11 @@ describe('compliance (d)', () => {
       });
     }
     expect(isComplianceSensitiveQuestion('How do I get more Google reviews?')).toBe(false);
+    // Everyday words that merely contain a stem stay answerable.
+    expect(isComplianceSensitiveQuestion('I am not certain my Google reviews are working.')).toBe(
+      false
+    );
+    expect(isComplianceSensitiveQuestion('How do I handle uncertainty in quoting?')).toBe(false);
   });
 
   it('assistant copy and the default knowledge base pass the IICRC/CEC compliance scanner', () => {

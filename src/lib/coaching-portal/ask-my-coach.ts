@@ -61,12 +61,17 @@ export function normaliseQuestion(raw: unknown): string | null {
 }
 
 /**
- * Certification (including "cert"), accreditation, licensing, qualification, credential,
- * designation and continuing-education questions are never
- * answered by the assistant. They carry licence risk for CARSI, so a person answers them.
+ * Questions about certification, recertification, accreditation, licensing, qualifications,
+ * credentials, designations, approvals or continuing-education credits are never answered by
+ * the assistant. They carry licence risk for CARSI, so a person answers them.
+ *
+ * Matched by STEM anywhere in a word, not by a list of whole words: a word list let "cert" and
+ * then "recertification" through (Codex review rounds 1 and 2). A false positive only sends a
+ * question to the coach, which is the safe direction. "certain" is the one carve-out, because
+ * it is everyday English and carries no credential meaning.
  */
 const COMPLIANCE_TOPIC_RE =
-  /\b(iicrc|cecs?|continuing\s+education|certs?|certif\w*|accredit\w*|licen[cs]\w*|qualif\w*|credential\w*|designation\w*)\b/i;
+  /iicrc|\bcecs?\b|continuing[\s-]*ed|cert(?!ain)|accred|licen[cs]|qualif|credent|designat|\bapprov/i;
 
 export function isComplianceSensitiveQuestion(text: string): boolean {
   return COMPLIANCE_TOPIC_RE.test(text);

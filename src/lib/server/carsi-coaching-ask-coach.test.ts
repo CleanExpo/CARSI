@@ -129,6 +129,19 @@ describe('askMyCoach', () => {
     expect(rows).toHaveLength(1);
   });
 
+  it('(b) a recertification question creates an open coach item, not an answer', async () => {
+    const { store, rows } = fakeStore({ [MEMBER_A]: 'coach-x' });
+    const r = await askMyCoach(
+      store,
+      kbLookup,
+      MEMBER_A,
+      'What recertification options do I have for Google Business Profile reviews?'
+    );
+    expect(r).toMatchObject({ status: 'sent_to_coach', reason: 'compliance_topic' });
+    expect(rows).toHaveLength(1);
+    expect(rows[0].coachAnswer).toBeNull();
+  });
+
   it('(c) never cites another coach’s knowledge base', async () => {
     // Coach Y's material answers this; member A belongs to coach X, whose material does not.
     const { store, rows } = fakeStore({ [MEMBER_A]: 'coach-x', [MEMBER_B]: 'coach-y' });
