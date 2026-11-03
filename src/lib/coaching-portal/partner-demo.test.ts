@@ -73,15 +73,7 @@ describe('one demo member everywhere (review r2 P1)', () => {
     expect(demo.PARTNER_DEMO_COACH_NAME).toBe(PARTNER_DEMO_COACH_LABEL);
     for (const s of plan.sessions) expect(s.coachName).toBe(demo.PARTNER_DEMO_COACH_NAME);
   });
-
-  it('the public page renders the shared demo member, not a second sample', () => {
-    const page = readFileSync(
-      join(ROOT, 'app', '(public)', 'ccw-training', 'partner-demo', 'page.tsx'),
-      'utf8'
-    );
-    expect(page).toContain('PARTNER_DEMO_COACH_NAME');
-    expect(page).not.toContain('PARTNER_DEMO_COACH.displayName');
-  });
+  // What the public page actually renders is checked in partner-demo-page.test.tsx.
 });
 
 describe('isPartnerDemoEmail', () => {
