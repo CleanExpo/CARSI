@@ -216,7 +216,7 @@ export function defaultWorkspaceForNewSubscriber(): CoachingPortalWorkspace {
     monthlyActions: [
       {
         id: 'welcome-1',
-        title: 'Complete onboarding email from Phill’s team',
+        title: 'Complete onboarding email from your coaching team',
         status: 'todo',
       },
       {

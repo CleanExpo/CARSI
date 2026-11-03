@@ -18,6 +18,7 @@ import {
   coachingSecondaryBtn,
 } from '@/components/coaching-portal/coaching-ui';
 import { useCoachingPortal } from '@/components/coaching-portal/CoachingPortalContext';
+import { useCoach } from '@/components/coaching-portal/CoachContext';
 
 type Eligibility = {
   eligible: boolean;
@@ -29,6 +30,7 @@ type Eligibility = {
 };
 
 export function CoachingOnboardingSubmitForm() {
+  const coach = useCoach();
   const { access, onboardingSubmit } = useCoachingPortal();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -120,7 +122,7 @@ export function CoachingOnboardingSubmitForm() {
   if (!eligibility.assessmentSubmitted) {
     return (
       <div className={coachingPage}>
-        <p className={coachingMuted}>Submit your business assessment before sending to Phill.</p>
+        <p className={coachingMuted}>Submit your business assessment before sending to {coach.name}.</p>
         <Link
           href="/dashboard/coaching/onboarding/assessment"
           className={`mt-4 inline-flex ${coachingPrimaryBtn}`}
@@ -139,7 +141,7 @@ export function CoachingOnboardingSubmitForm() {
           <div className="flex gap-3">
             <CheckCircle2 className="h-8 w-8 shrink-0 text-emerald-400" aria-hidden />
             <div>
-              <h1 className="text-xl font-semibold text-white">Sent to Phill</h1>
+              <h1 className="text-xl font-semibold text-white">Sent to {coach.name}</h1>
               <p className={`mt-2 ${coachingMuted}`}>
                 Your full profile, assessment, and message were emailed to the coaching team
                 {when
@@ -157,7 +159,7 @@ export function CoachingOnboardingSubmitForm() {
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <Link href="/dashboard/coaching/onboarding/packet" className={coachingPrimaryBtn}>
-                  View what we sent Phill
+                  View what we sent {coach.name}
                 </Link>
                 <Link href="/dashboard/coaching/sessions" className={coachingSecondaryBtn}>
                   Book your first session
@@ -182,10 +184,10 @@ export function CoachingOnboardingSubmitForm() {
       <header className="mt-5 mb-8">
         <p className={coachingEyebrow}>Onboarding</p>
         <h1 className="mt-2 text-2xl font-semibold tracking-tight text-white sm:text-[1.75rem]">
-          Send your details to Phill
+          Send your details to {coach.name}
         </h1>
         <p className={`mt-2 max-w-2xl ${coachingMuted}`}>
-          We will automatically email Phill your complete business profile, every assessment answer,
+          We will automatically email {coach.name} your complete business profile, every assessment answer,
           and your web/social links — plus the problem and goal you write below. You will get a
           confirmation email as well.
         </p>
@@ -194,7 +196,7 @@ export function CoachingOnboardingSubmitForm() {
       <div className={`${coachingCard} space-y-6`}>
         <CoachingFormSection
           title="In your own words"
-          description="These lines are highlighted for Phill at the top of the email. They are pre-filled from your profile — edit them if you want to be clearer."
+          description={`These lines are highlighted for ${coach.name} at the top of the email. They are pre-filled from your profile — edit them if you want to be clearer.`}
         >
           <CoachingTextArea
             label="What is the biggest problem you are facing right now?"
@@ -215,7 +217,7 @@ export function CoachingOnboardingSubmitForm() {
             onChange={setGoalStatement}
           />
           <CoachingTextArea
-            label="Anything else Phill should know before your first session?"
+            label={`Anything else ${coach.name} should know before your first session?`}
             rows={3}
             value={extraNotes}
             disabled={!access.canEdit}
@@ -233,7 +235,7 @@ export function CoachingOnboardingSubmitForm() {
           />
           <span className={`text-sm ${coachingMuted}`}>
             I confirm this is accurate. I understand my full profile and assessment will be emailed
-            to Phill and I will receive a confirmation copy. I cannot edit this submission later in
+            to {coach.name} and I will receive a confirmation copy. I cannot edit this submission later in
             the portal.
           </span>
         </label>
@@ -250,7 +252,7 @@ export function CoachingOnboardingSubmitForm() {
             onClick={() => void submit()}
           >
             {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-            Submit to Phill
+            Submit to {coach.name}
           </button>
           <Link href="/dashboard/coaching/onboarding/assessment" className={coachingSecondaryBtn}>
             Review assessment

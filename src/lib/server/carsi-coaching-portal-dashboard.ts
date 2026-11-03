@@ -5,6 +5,7 @@ import {
   importLegacyActionsFromSubscriptionJson,
   listCoachingActionsForUser,
 } from '@/lib/server/carsi-coaching-actions-store';
+import { coachNameForCopy, getCoachForMember } from '@/lib/server/carsi-coaching-coaches';
 import { getCoachingPortalAccess } from '@/lib/server/carsi-coaching-portal-access';
 import { coachingPortalPath } from '@/lib/coaching-portal/coaching-portal-paths';
 import { getCoachingPortalRowForUser } from '@/lib/server/carsi-coaching-subscription-store';
@@ -191,13 +192,15 @@ export async function loadCoachingPortalDashboard(
     homeState = 'active';
   }
 
+  const coachName = coachNameForCopy(await getCoachForMember(claims.sub));
+
   let welcomeMessage = 'Here is what needs your attention this week.';
   if (access.mode === 'locked') {
     welcomeMessage = 'Subscribe to unlock your coaching workspace.';
   } else if (homeState === 'onboarding') {
     welcomeMessage = "Let's get to know your business and prepare for your first coaching session.";
   } else if (homeState === 'assessment_pending') {
-    welcomeMessage = 'Your assessment is with Phill. Here is what happens next.';
+    welcomeMessage = `Your assessment is with ${coachName}. Here is what happens next.`;
   }
 
   const bookingUrl =
@@ -220,15 +223,14 @@ export async function loadCoachingPortalDashboard(
     {
       id: 'assessment' as const,
       title: 'Complete your business assessment',
-      description: 'Help Phill understand your biggest challenges and opportunities.',
+      description: `Help ${coachName} understand your biggest challenges and opportunities.`,
       complete: assessmentSubmitted,
       href: coachingPortalPath('/onboarding/assessment'),
     },
     {
       id: 'submit' as const,
-      title: 'Send your details to Phill',
-      description:
-        'Confirm your problem, your goal, and we will email Phill your full profile and assessment.',
+      title: `Send your details to ${coachName}`,
+      description: `Confirm your problem, your goal, and we will email ${coachName} your full profile and assessment.`,
       complete: onboardingSubmitComplete,
       href: coachingPortalPath('/onboarding/submit'),
     },

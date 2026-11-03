@@ -15,6 +15,7 @@ import {
 import { COACHING_ASSESSMENT_SECTIONS } from '@/lib/coaching-portal/assessment-schema';
 import { COACHING_SOCIAL_FIELDS } from '@/lib/coaching-portal/business-profile';
 import type { CoachingOnboardingSnapshot } from '@/lib/coaching-portal/onboarding-snapshot';
+import { useCoach } from '@/components/coaching-portal/CoachContext';
 
 function Field({ label, value }: { label: string; value: string }) {
   if (!value.trim()) return null;
@@ -39,6 +40,7 @@ function Field({ label, value }: { label: string; value: string }) {
 }
 
 export function CoachingOnboardingPacketView() {
+  const coach = useCoach();
   const [loading, setLoading] = useState(true);
   const [snapshot, setSnapshot] = useState<CoachingOnboardingSnapshot | null>(null);
   const [submittedAt, setSubmittedAt] = useState<string | null>(null);
@@ -73,7 +75,7 @@ export function CoachingOnboardingPacketView() {
           href="/dashboard/coaching/onboarding/submit"
           className={`mt-4 inline-flex ${coachingSecondaryBtn}`}
         >
-          Send to Phill
+          Send to {coach.name}
         </Link>
       </div>
     );
@@ -94,7 +96,7 @@ export function CoachingOnboardingPacketView() {
       </Link>
       <header className="mt-5 mb-6">
         <p className={coachingEyebrow}>Read-only record</p>
-        <h1 className="mt-2 text-2xl font-semibold text-white">What we sent Phill</h1>
+        <h1 className="mt-2 text-2xl font-semibold text-white">What we sent {coach.name}</h1>
         <p className={`mt-2 max-w-2xl ${coachingMuted}`}>
           Frozen copy of your onboarding at submission ({submittedLabel}). Contact support if
           something urgent needs correcting.

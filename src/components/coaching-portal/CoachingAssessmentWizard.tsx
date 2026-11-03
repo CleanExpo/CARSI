@@ -17,6 +17,7 @@ import {
   coachingSecondaryBtn,
 } from '@/components/coaching-portal/coaching-ui';
 import { useCoachingPortal } from '@/components/coaching-portal/CoachingPortalContext';
+import { useCoach } from '@/components/coaching-portal/CoachContext';
 import {
   COACHING_ASSESSMENT_SECTIONS,
   emptyAssessmentResponses,
@@ -90,6 +91,7 @@ function AssessmentFieldControl({
 }
 
 export function CoachingAssessmentWizard() {
+  const coach = useCoach();
   const { access, assessment } = useCoachingPortal();
   const [step, setStep] = useState(0);
   const [responses, setResponses] = useState<AssessmentResponses>(emptyAssessmentResponses());
@@ -216,11 +218,11 @@ export function CoachingAssessmentWizard() {
         <div className={coachingCard}>
           <p className="font-medium text-white">Thank you — your assessment has been submitted.</p>
           <p className={`mt-2 ${coachingMuted}`}>
-            Phill will review your answers and follow up by email.
+            {coach.name} will review your answers and follow up by email.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link href="/dashboard/coaching/onboarding/submit" className={coachingPrimaryBtn}>
-              Next: Send to Phill
+              Next: Send to {coach.name}
             </Link>
             <Link href="/dashboard/coaching" className={coachingSecondaryBtn}>
               Back to Home

@@ -3,7 +3,7 @@ import { COACHING_SESSION_PREP_MIN_LENGTH } from '@/lib/coaching-portal/session-
 import { carsiCoachingPortalPath } from '@/lib/marketing/carsi-coaching-program';
 import { prisma } from '@/lib/prisma';
 import { getAppOrigin } from '@/lib/server/app-url';
-import { getCarsiCoachingMonthlyNotifyRecipients } from '@/lib/server/carsi-coaching-monthly-notify';
+import { getCoachRoutingForMember } from '@/lib/server/carsi-coaching-coaches';
 import {
   getCoachingPortalRowForUser,
   updateCoachingPortalWorkspace,
@@ -55,9 +55,16 @@ export async function saveCoachingSessionPrep(
   if (notes.length < COACHING_SESSION_PREP_MIN_LENGTH) {
     return {
       ok: false,
-      detail: `Add at least ${COACHING_SESSION_PREP_MIN_LENGTH} characters so Phill can prepare.`,
+      detail: `Add at least ${COACHING_SESSION_PREP_MIN_LENGTH} characters so ${
+        (await getCoachRoutingForMember(claims.sub)).coachName
+      } can prepare.`,
     };
   }
+
+  // Resolve the coach before saving, so unknown routing changes nothing.
+  const coachRecipients = input.notifyCoach
+    ? (await getCoachRoutingForMember(claims.sub)).recipients
+    : [];
 
   await persistCoachingSessionPrepNotes(claims.sub, notes);
 
@@ -82,7 +89,7 @@ export async function saveCoachingSessionPrep(
     });
 
     await sendEmail({
-      to: getCarsiCoachingMonthlyNotifyRecipients(),
+      to: coachRecipients,
       subject: `[CARSI Coaching] Session prep — ${businessName}`,
       html: coachEmail.html,
       text: coachEmail.text,

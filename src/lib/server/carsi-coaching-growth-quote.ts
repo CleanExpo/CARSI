@@ -3,7 +3,7 @@ import { findGrowthServiceById } from '@/lib/coaching-portal/growth-services';
 import { carsiCoachingPortalPath } from '@/lib/marketing/carsi-coaching-program';
 import { prisma } from '@/lib/prisma';
 import { getAppOrigin } from '@/lib/server/app-url';
-import { getCarsiCoachingMonthlyNotifyRecipients } from '@/lib/server/carsi-coaching-monthly-notify';
+import { getCoachRoutingForMember } from '@/lib/server/carsi-coaching-coaches';
 import { sendEmail } from '@/lib/server/email';
 import {
   renderCoachingGrowthQuoteCoachEmail,
@@ -39,6 +39,7 @@ export async function submitCoachingGrowthQuoteRequest(
   const appOrigin = getAppOrigin();
   const portalUrl = `${appOrigin.replace(/\/$/, '')}${carsiCoachingPortalPath}/services`;
 
+  const routing = await getCoachRoutingForMember(claims.sub);
   const coachEmail = renderCoachingGrowthQuoteCoachEmail({
     appOrigin,
     businessName,
@@ -52,7 +53,7 @@ export async function submitCoachingGrowthQuoteRequest(
   });
 
   await sendEmail({
-    to: getCarsiCoachingMonthlyNotifyRecipients(),
+    to: routing.recipients,
     subject: `[CARSI Growth] Quote request — ${match.item.title} — ${businessName}`,
     html: coachEmail.html,
     text: coachEmail.text,
@@ -65,6 +66,7 @@ export async function submitCoachingGrowthQuoteRequest(
     serviceTitle: match.item.title,
     rateLabel: match.item.rateLabel,
     portalUrl,
+    coachName: routing.coachName,
   });
 
   await sendEmail({

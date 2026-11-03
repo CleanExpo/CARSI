@@ -22,6 +22,7 @@ import {
   coachingSecondaryBtn,
 } from '@/components/coaching-portal/coaching-ui';
 import { useCoachingPortal } from '@/components/coaching-portal/CoachingPortalContext';
+import { useCoach } from '@/components/coaching-portal/CoachContext';
 import {
   COACHING_BUSINESS_SIZE_OPTIONS,
   COACHING_INDUSTRY_OPTIONS,
@@ -35,6 +36,7 @@ import {
 } from '@/lib/coaching-portal/business-profile';
 
 export function CoachingOnboardingProfileForm() {
+  const coach = useCoach();
   const { access } = useCoachingPortal();
   const [form, setForm] = useState<CoachingBusinessProfileForm>(EMPTY_COACHING_BUSINESS_PROFILE);
   const [loading, setLoading] = useState(true);
@@ -109,7 +111,7 @@ export function CoachingOnboardingProfileForm() {
           Business profile
         </h1>
         <p className={`mt-2 max-w-2xl ${coachingMuted}`}>
-          A clear picture of your business — including where you show up online — helps Phill tailor
+          A clear picture of your business — including where you show up online — helps {coach.name} tailor
           your coaching plan and growth recommendations.
         </p>
 

@@ -13,7 +13,7 @@ import {
 import { carsiCoachingPortalPath } from '@/lib/marketing/carsi-coaching-program';
 import { prisma } from '@/lib/prisma';
 import { getAppOrigin } from '@/lib/server/app-url';
-import { getCarsiCoachingMonthlyNotifyRecipients } from '@/lib/server/carsi-coaching-monthly-notify';
+import { getCoachRoutingForMember } from '@/lib/server/carsi-coaching-coaches';
 import { sendEmail } from '@/lib/server/email';
 import {
   renderCoachingOnboardingSubmittedCoachEmail,
@@ -167,6 +167,9 @@ export async function submitCoachingOnboardingToCoach(
     statements,
   };
 
+  // Resolve the coach before saving: if routing is unknown, nothing is frozen and nothing is sent.
+  const { recipients: coachRecipients, coachName } = await getCoachRoutingForMember(userId);
+
   await prisma.carsiCoachingBusinessProfile.update({
     where: { userId },
     data: {
@@ -197,7 +200,6 @@ export async function submitCoachingOnboardingToCoach(
   });
 
   const businessLabel = profile.businessName.trim() || member.fullName;
-  const coachRecipients = getCarsiCoachingMonthlyNotifyRecipients();
   const coachEmail = renderCoachingOnboardingSubmittedCoachEmail({
     appOrigin,
     businessName: businessLabel,
@@ -223,6 +225,7 @@ export async function submitCoachingOnboardingToCoach(
     problemStatement,
     goalStatement,
     portalUrl,
+    coachName,
   });
 
   await sendEmail({

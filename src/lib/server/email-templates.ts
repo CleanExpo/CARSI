@@ -1154,8 +1154,11 @@ export function renderCarsiCoachingMonthlyWelcomeEmail(params: {
   amountLabel: string;
   dashboardUrl: string;
   coachingPageUrl: string;
+  /** Member-facing coach name; partner chapters pass their coach. Defaults to Phill. */
+  coachName?: string;
 }): RenderedEmail {
   const name = params.name.trim() || 'there';
+  const coachName = params.coachName?.trim() || 'Phill';
   return render(
     {
       appOrigin: params.appOrigin,
@@ -1164,7 +1167,7 @@ export function renderCarsiCoachingMonthlyWelcomeEmail(params: {
       title: 'Welcome to CARSI Business Coaching',
       paragraphs: [
         `Hi ${name},`,
-        'Thank you — your monthly Business Coaching subscription is confirmed. Phill and the CARSI team will email you within one business day with onboarding, your LMS roadmap, and the date for your first monthly planning session.',
+        `Thank you — your monthly Business Coaching subscription is confirmed. ${coachName} and the CARSI team will email you within one business day with onboarding, your LMS roadmap, and the date for your first monthly planning session.`,
         'Between sessions, work through the steps in your coaching portal so each month builds on the last.',
       ],
       details: [
@@ -1174,7 +1177,7 @@ export function renderCarsiCoachingMonthlyWelcomeEmail(params: {
       cta: { label: 'Open your coaching portal', href: params.dashboardUrl },
       noteHtml: `Program details: ${brandLink(params.coachingPageUrl, 'carsi.com.au/ccw-training')}.`,
     },
-    `Hi ${name},\n\nYour CARSI Business Coaching subscription is confirmed (${params.amountLabel}/month).\n\nWe will email you within one business day with onboarding and your first monthly session with Phill.\n\nDashboard: ${params.dashboardUrl}\nProgram: ${params.coachingPageUrl}\n`
+    `Hi ${name},\n\nYour CARSI Business Coaching subscription is confirmed (${params.amountLabel}/month).\n\nWe will email you within one business day with onboarding and your first monthly session with ${coachName}.\n\nDashboard: ${params.dashboardUrl}\nProgram: ${params.coachingPageUrl}\n`
   );
 }
 
@@ -1263,8 +1266,11 @@ export function renderCoachingOnboardingSubmittedMemberEmail(params: {
   problemStatement: string;
   goalStatement: string;
   portalUrl: string;
+  /** Member-facing coach name; defaults to Phill. */
+  coachName?: string;
 }): RenderedEmail {
   const name = params.name.trim() || 'there';
+  const coachName = params.coachName?.trim() || 'Phill';
   const summaryHtml = `
     <p style="margin: 0 0 12px; font-size: 14px; color: rgba(255,255,255,0.55);">What you told us</p>
     <p style="margin: 0 0 8px; font-size: 13px; font-weight: 600; color: #2490ed;">Your biggest problem</p>
@@ -1275,13 +1281,13 @@ export function renderCoachingOnboardingSubmittedMemberEmail(params: {
   return render(
     {
       appOrigin: params.appOrigin,
-      preheader: 'Phill has received your business profile and assessment',
+      preheader: `${coachName} has received your business profile and assessment`,
       eyebrow: 'Business Coaching',
       title: 'You’re all set — we’re on it',
       paragraphs: [
         `Hi ${name},`,
-        `Thank you for completing onboarding for ${params.businessName}. Your full business profile, assessment answers, and web/social links have been sent to Phill and the CARSI coaching team.`,
-        'Phill will review everything and follow up within one business day to confirm your first monthly planning session.',
+        `Thank you for completing onboarding for ${params.businessName}. Your full business profile, assessment answers, and web/social links have been sent to ${coachName} and the CARSI coaching team.`,
+        `${coachName} will review everything and follow up within one business day to confirm your first monthly planning session.`,
       ],
       messageHtml: summaryHtml,
       cta: { label: 'Open coaching portal', href: params.portalUrl },
@@ -1386,8 +1392,11 @@ export function renderCoachingGrowthQuoteMemberEmail(params: {
   serviceTitle: string;
   rateLabel: string;
   portalUrl: string;
+  /** Member-facing coach name; defaults to Phill. */
+  coachName?: string;
 }): RenderedEmail {
   const name = params.name.trim() || 'there';
+  const coachName = params.coachName?.trim() || 'Phill';
   return render(
     {
       appOrigin: params.appOrigin,
@@ -1397,7 +1406,7 @@ export function renderCoachingGrowthQuoteMemberEmail(params: {
       paragraphs: [
         `Hi ${name},`,
         `Thanks for your interest in ${params.serviceTitle} (indicative ${params.rateLabel}).`,
-        'Phill or the CARSI team will reply with a written quote — final pricing is confirmed before any work starts.',
+        `${coachName} or the CARSI team will reply with a written quote — final pricing is confirmed before any work starts.`,
         'Your coaching membership covers strategy and accountability; implementation is quoted separately.',
       ],
       details: [{ label: 'Service', value: params.serviceTitle }],

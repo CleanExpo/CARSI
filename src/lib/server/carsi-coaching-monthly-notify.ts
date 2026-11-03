@@ -27,8 +27,10 @@ export async function sendCarsiCoachingMonthlyFounderNotificationEmail(params: {
   amountLabel: string;
   stripeCheckoutSessionId: string;
   stripeSubscriptionId?: string;
+  /** The member's coach inbox (GP-632). Omitted: the founder / ops inbox, as before. */
+  to?: string[];
 }) {
-  const to = getCarsiCoachingMonthlyNotifyRecipients();
+  const to = params.to ?? getCarsiCoachingMonthlyNotifyRecipients();
   if (to.length === 0) return { sent: false, reason: 'not_configured' as const };
 
   const { html, text } = renderCarsiCoachingMonthlyFounderNotificationEmail(params);

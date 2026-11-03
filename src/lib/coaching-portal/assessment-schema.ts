@@ -20,7 +20,7 @@ export const COACHING_ASSESSMENT_SECTIONS: AssessmentSection[] = [
   {
     id: 'background',
     title: 'Business background',
-    description: 'Help Phill understand how your business runs today.',
+    description: 'Help your coach understand how your business runs today.',
     fields: [
       { id: 'owner_role', label: 'Your role in the business', type: 'text' },
       { id: 'typical_week', label: 'What does a typical week look like?', type: 'textarea' },

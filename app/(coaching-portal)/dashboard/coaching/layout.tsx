@@ -1,6 +1,8 @@
 import { redirect } from 'next/navigation';
 
+import { CoachProvider } from '@/components/coaching-portal/CoachContext';
 import { CoachingPortalShell } from '@/components/coaching-portal/CoachingPortalShell';
+import { getPortalCoachForMember } from '@/lib/server/carsi-coaching-coaches';
 import { loadCoachingPortalDashboard } from '@/lib/server/carsi-coaching-portal-dashboard';
 import { getServerSessionClaims } from '@/lib/server/session-server';
 
@@ -12,7 +14,14 @@ export default async function CoachingPortalLayout({ children }: { children: Rea
     redirect('/login?next=/dashboard/coaching');
   }
 
-  const dashboard = await loadCoachingPortalDashboard(claims);
+  const [dashboard, coach] = await Promise.all([
+    loadCoachingPortalDashboard(claims),
+    getPortalCoachForMember(claims.sub),
+  ]);
 
-  return <CoachingPortalShell dashboard={dashboard}>{children}</CoachingPortalShell>;
+  return (
+    <CoachProvider coach={coach}>
+      <CoachingPortalShell dashboard={dashboard}>{children}</CoachingPortalShell>
+    </CoachProvider>
+  );
 }

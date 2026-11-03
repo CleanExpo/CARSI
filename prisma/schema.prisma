@@ -73,6 +73,7 @@ model LmsUser {
   coachingAssessments           CarsiCoachingAssessment[]
   coachingSessions              CarsiCoachingSession[]
   coachingActions               CarsiCoachingAction[]
+  coachingCoachProfiles         CarsiCoachingCoach[]
   margotConversations           MargotConversation[]
   ccwRoadshowSignIns    CcwRoadshowSignIn[]       @relation("SignInStudent")
 
@@ -1275,12 +1276,42 @@ model CarsiCoachingBusinessProfile {
   onboardingSnapshotJson       String?   @map("onboarding_snapshot_json") @db.Text
   sessionPrepNotes             String?   @map("session_prep_notes") @db.Text
   completedAt         DateTime? @map("completed_at") @db.Timestamptz(6)
+  /// Null means the default coach (Phill), so members created before chapters existed keep routing to him.
+  coachId             String?   @map("coach_id") @db.Uuid
   createdAt           DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt           DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  user LmsUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user  LmsUser             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  coach CarsiCoachingCoach? @relation(fields: [coachId], references: [id], onDelete: SetNull)
 
+  @@index([coachId])
   @@map("carsi_coaching_business_profiles")
+}
+
+/// A coaching chapter: the coach's name, members, currency and price on the shared engine (GP-632).
+model CarsiCoachingCoach {
+  id                String   @id @default(uuid()) @db.Uuid
+  userId            String?  @map("user_id") @db.Uuid
+  displayName       String   @map("display_name") @db.VarChar(120)
+  chapterSlug       String   @unique @map("chapter_slug") @db.VarChar(64)
+  chapterName       String   @map("chapter_name") @db.VarChar(120)
+  currency          String   @default("aud") @db.VarChar(3)
+  monthlyPriceCents Int?     @map("monthly_price_cents")
+  stripePriceId     String?  @map("stripe_price_id") @db.VarChar(255)
+  notificationEmail String   @map("notification_email") @db.VarChar(320)
+  /// Chapter branding: a #rrggbb accent and an https logo image URL. Null uses CARSI's own brand.
+  brandColour       String?  @map("brand_colour") @db.VarChar(7)
+  logoUrl           String?  @map("logo_url") @db.VarChar(500)
+  isDefault         Boolean  @default(false) @map("is_default")
+  isDemo            Boolean  @default(false) @map("is_demo")
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user     LmsUser?                       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  members  CarsiCoachingBusinessProfile[]
+
+  @@index([userId])
+  @@map("carsi_coaching_coaches")
 }
 
 model CarsiCoachingAssessment {

@@ -42,7 +42,7 @@ export const COACHING_RESOURCE_SECTIONS: CoachingResourceSection[] = [
   {
     id: 'visibility',
     title: 'Marketing & local visibility',
-    description: 'Practical checklists Phill often assigns in month one.',
+    description: 'Practical checklists your coach often assigns in month one.',
     items: [
       {
         id: 'gbp-checklist',
@@ -65,12 +65,12 @@ export const COACHING_RESOURCE_SECTIONS: CoachingResourceSection[] = [
   {
     id: 'operations',
     title: 'Operations & money',
-    description: 'Templates and habits to discuss with Phill on calls.',
+    description: 'Templates and habits to discuss with your coach on calls.',
     items: [
       {
         id: 'session-prep',
         title: 'Session prep (portal)',
-        description: 'Tell Phill what you want to cover before each monthly call.',
+        description: 'Tell your coach what you want to cover before each monthly call.',
         href: coachingPortalPath('/sessions'),
         tag: 'Workspace',
       },

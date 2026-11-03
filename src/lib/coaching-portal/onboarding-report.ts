@@ -144,7 +144,7 @@ export function buildOnboardingReportHtml(params: {
           ? `
       <tr>
         <td colspan="2" style="padding: 18px 24px 22px; border-top: 1px solid ${BRAND.cardBorder};">
-          <p style="margin: 0 0 10px; font-family: ${BRAND.font}; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: ${BRAND.blue};">Notes for Phill</p>
+          <p style="margin: 0 0 10px; font-family: ${BRAND.font}; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: ${BRAND.blue};">Notes for your coach</p>
           <div style="font-family: ${BRAND.font}; font-size: 15px; line-height: 1.65; color: ${BRAND.text};">${formatPlainMessageAsHtml(statements.extraNotes)}</div>
         </td>
       </tr>`
@@ -219,7 +219,7 @@ export function buildOnboardingReportPlainText(params: {
   ];
 
   if (statements.extraNotes.trim()) {
-    lines.push('', 'Notes for Phill:', statements.extraNotes);
+    lines.push('', 'Notes for your coach:', statements.extraNotes);
   }
 
   lines.push('', '--- Business profile ---', '');

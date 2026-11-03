@@ -9,6 +9,11 @@ import {
 } from '@/lib/marketing/carsi-coaching-monthly';
 import { prisma } from '@/lib/prisma';
 import { getAppOrigin } from '@/lib/server/app-url';
+import {
+  coachNameForCopy,
+  getCoachForMember,
+  getCoachRoutingForMember,
+} from '@/lib/server/carsi-coaching-coaches';
 import { CARSI_COACHING_MONTHLY_CHECKOUT_SOURCE } from '@/lib/server/carsi-coaching-monthly-checkout';
 import { sendCarsiCoachingMonthlyFounderNotificationEmail } from '@/lib/server/carsi-coaching-monthly-notify';
 import { upsertCoachingMonthlySubscription } from '@/lib/server/carsi-coaching-subscription-store';
@@ -35,7 +40,17 @@ export type CarsiCoachingMonthlyFulfillmentResult = {
 
 function resolveAmountLabel(session: Stripe.Checkout.Session): string {
   if (session.amount_total != null) {
-    return formatCoachingAudFromCents(session.amount_total);
+    const currency = session.currency?.trim().toLowerCase() || 'aud';
+    if (currency === 'aud') return formatCoachingAudFromCents(session.amount_total);
+    // Partner chapters bill in their own currency. Intl knows each currency's minor unit,
+    // so a zero-decimal amount is not divided by 100.
+    try {
+      const format = new Intl.NumberFormat('en-AU', { style: 'currency', currency });
+      const digits = format.resolvedOptions().maximumFractionDigits ?? 2;
+      return format.format(session.amount_total / 10 ** digits);
+    } catch {
+      return `${currency.toUpperCase()} ${session.amount_total} (minor units)`;
+    }
   }
   return formatCoachingAudFromCents(carsiCoachingMonthlyPriceCents);
 }
@@ -139,12 +154,15 @@ export async function processCarsiCoachingMonthlyCheckoutCompleted(
   const dashboardUrl = `${appOrigin}/dashboard/student`;
   const coachingPageUrl = `${appOrigin}${carsiCoachingMonthlyPath}`;
 
+  const coach = carsiUserId ? await getCoachForMember(carsiUserId) : null;
+
   const { html, text } = renderCarsiCoachingMonthlyWelcomeEmail({
     appOrigin,
     name: contactName,
     amountLabel,
     dashboardUrl,
     coachingPageUrl,
+    coachName: coachNameForCopy(coach),
   });
 
   const customerResult = await sendEmail({
@@ -156,7 +174,12 @@ export async function processCarsiCoachingMonthlyCheckoutCompleted(
 
   let founderResult: { sent: boolean } = { sent: false };
   try {
+    // The new member's contact details go to their own coach; no coach keeps the founder inbox.
+    const coachInbox = carsiUserId
+      ? (await getCoachRoutingForMember(carsiUserId)).recipients
+      : undefined;
     founderResult = await sendCarsiCoachingMonthlyFounderNotificationEmail({
+      to: coachInbox,
       appOrigin,
       contactName,
       contactEmail: email,

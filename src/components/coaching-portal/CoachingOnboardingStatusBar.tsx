@@ -4,15 +4,16 @@ import Link from 'next/link';
 
 import { useCoachingPortal } from '@/components/coaching-portal/CoachingPortalContext';
 import { coachingMuted } from '@/components/coaching-portal/coaching-ui';
+import { useCoach } from '@/components/coaching-portal/CoachContext';
 
 const STEP_LABELS: Record<string, string> = {
   profile: 'Profile',
   assessment: 'Assessment',
-  submit: 'Sent to Phill',
   session: 'Session booked',
 };
 
 export function CoachingOnboardingStatusBar() {
+  const coach = useCoach();
   const { onboarding, onboardingSubmit, access } = useCoachingPortal();
 
   if (access.mode === 'locked') return null;
@@ -40,13 +41,14 @@ export function CoachingOnboardingStatusBar() {
             href="/dashboard/coaching/onboarding/packet"
             className="text-xs font-semibold text-sky-300 hover:text-sky-200"
           >
-            View what we sent Phill →
+            View what we sent {coach.name} →
           </Link>
         ) : null}
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
         {onboarding.steps.map((step) => {
-          const label = STEP_LABELS[step.id] ?? step.title;
+          const label =
+            step.id === 'submit' ? `Sent to ${coach.name}` : (STEP_LABELS[step.id] ?? step.title);
           return (
             <Link
               key={step.id}

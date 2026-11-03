@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { CoachingPriceChangedError } from '@/lib/coaching-portal/coaches';
 import { carsiCoachingMonthlyPath } from '@/lib/marketing/carsi-coaching-monthly';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { createCarsiCoachingMonthlyCheckoutSession } from '@/lib/server/carsi-coaching-monthly-checkout';
@@ -28,6 +29,25 @@ export async function POST(request: NextRequest) {
   const body = (await request.json().catch(() => ({}))) as {
     success_url?: string;
     cancel_url?: string;
+    expected_amount_cents?: unknown;
+    expected_currency?: unknown;
+  };
+
+  // The price the member was shown. Checkout never bills an amount they did not see.
+  if (
+    typeof body.expected_amount_cents !== 'number' ||
+    !Number.isInteger(body.expected_amount_cents) ||
+    typeof body.expected_currency !== 'string' ||
+    !body.expected_currency.trim()
+  ) {
+    return NextResponse.json(
+      { detail: 'Refresh the page to load your price, then try again.' },
+      { status: 400 }
+    );
+  }
+  const expectedCharge = {
+    amountCents: body.expected_amount_cents,
+    currency: body.expected_currency.trim().toLowerCase(),
   };
 
   const origin = request.nextUrl.origin;
@@ -48,9 +68,16 @@ export async function POST(request: NextRequest) {
       appOrigin: origin,
       successUrl: success_url,
       cancelUrl: cancel_url,
+      expectedCharge,
     });
     return NextResponse.json({ checkout_url: session.checkout_url, url: session.checkout_url });
   } catch (error) {
+    if (error instanceof CoachingPriceChangedError) {
+      return NextResponse.json(
+        { detail: 'Your coaching price has changed. Refresh the page to see it before paying.' },
+        { status: 409 }
+      );
+    }
     console.error('[coaching/monthly/checkout]', error);
     return NextResponse.json({ detail: UNAVAILABLE }, { status: 503 });
   }

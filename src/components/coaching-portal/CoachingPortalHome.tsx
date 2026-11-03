@@ -14,6 +14,7 @@ import {
 } from '@/components/coaching-portal/coaching-ui';
 import { CoachingOnboardingStatusBar } from '@/components/coaching-portal/CoachingOnboardingStatusBar';
 import { useCoachingPortal } from '@/components/coaching-portal/CoachingPortalContext';
+import { useCoach } from '@/components/coaching-portal/CoachContext';
 import { CheckCircle2, Circle } from 'lucide-react';
 
 function LockedHome() {
@@ -114,6 +115,7 @@ function OnboardingChecklist() {
 }
 
 function AssessmentPendingHome() {
+  const coach = useCoach();
   const { user, welcomeMessage, assessment } = useCoachingPortal();
   const submittedLabel = assessment.submittedAt
     ? new Date(assessment.submittedAt).toLocaleDateString('en-AU', {
@@ -136,7 +138,7 @@ function AssessmentPendingHome() {
       <section className={coachingCard}>
         <h2 className={coachingCardTitle}>Assessment submitted</h2>
         <p className={`mt-2 ${coachingMuted}`}>
-          Phill is reviewing your answers{submittedLabel ? ` (submitted ${submittedLabel})` : ''}.
+          {coach.name} is reviewing your answers{submittedLabel ? ` (submitted ${submittedLabel})` : ''}.
           You&apos;ll receive your growth plan and monthly actions after your review — usually
           before your next session.
         </p>
@@ -147,7 +149,7 @@ function AssessmentPendingHome() {
         ) : null}
         <div className="mt-6 flex flex-wrap gap-3">
           <Link href="/dashboard/coaching/onboarding/packet" className={coachingSecondaryBtn}>
-            What we sent Phill
+            What we sent {coach.name}
           </Link>
           <Link href="/dashboard/coaching/onboarding/assessment" className={coachingSecondaryBtn}>
             View your answers
@@ -162,6 +164,7 @@ function AssessmentPendingHome() {
 }
 
 function ActiveHome() {
+  const coach = useCoach();
   const { user, welcomeMessage, plan, actions, sessions } = useCoachingPortal();
 
   return (
@@ -192,7 +195,7 @@ function ActiveHome() {
           <section className={coachingCard}>
             <h2 className={coachingCardTitle}>Growth plan</h2>
             <p className={`mt-2 ${coachingMuted}`}>
-              No approved growth plan yet. Phill will publish your plan after reviewing your
+              No approved growth plan yet. {coach.name} will publish your plan after reviewing your
               assessment.
             </p>
             <Link href="/dashboard/coaching/plan" className={`mt-4 inline-flex ${coachingSecondaryBtn}`}>
@@ -276,7 +279,7 @@ function ActiveHome() {
         </section>
 
         <section className={coachingCard}>
-          <h2 className="text-sm font-semibold text-slate-300">Latest guidance from Phill</h2>
+          <h2 className="text-sm font-semibold text-slate-300">Latest guidance from {coach.name}</h2>
           {plan.latestGuidance ? (
             <p className={`mt-2 text-sm text-slate-200`}>{plan.latestGuidance}</p>
           ) : (

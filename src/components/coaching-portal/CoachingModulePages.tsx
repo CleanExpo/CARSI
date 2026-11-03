@@ -15,6 +15,7 @@ import {
 import { CoachingGrowthQuoteDialog } from '@/components/coaching-portal/CoachingGrowthQuoteDialog';
 import { useCoachingPortal } from '@/components/coaching-portal/CoachingPortalContext';
 import { CoachingSessionPrepCard } from '@/components/coaching-portal/CoachingSessionPrepCard';
+import { useCoach } from '@/components/coaching-portal/CoachContext';
 import { COACHING_RESOURCE_SECTIONS } from '@/lib/coaching-portal/coaching-resources';
 import {
   COACHING_GROWTH_SERVICE_CATEGORIES,
@@ -22,7 +23,6 @@ import {
 } from '@/lib/coaching-portal/growth-services';
 import { openCoachingSupportEmail } from '@/lib/coaching-portal/support-contact';
 import type { CoachingActionStatus } from '@/lib/coaching-portal/types';
-import { carsiCoachingMonthlyPriceLabel } from '@/lib/marketing/carsi-coaching-monthly';
 import { carsiCoachingAddOnContactEmail } from '@/lib/marketing/carsi-coaching-program';
 import { ExternalLink } from 'lucide-react';
 
@@ -45,6 +45,7 @@ const FILTERS: Array<{ id: 'all' | CoachingActionStatus; label: string }> = [
 ];
 
 export function CoachingPlanPage() {
+  const coach = useCoach();
   const { access, plan } = useCoachingPortal();
   const [horizontal, setHorizontal] = useState(access.workspace.horizontalSummary);
   const [direction, setDirection] = useState(access.workspace.directionSummary);
@@ -70,7 +71,7 @@ export function CoachingPlanPage() {
     <div className={coachingPage}>
       <h1 className="text-2xl font-semibold text-white">My plan</h1>
       <p className={`mt-2 ${coachingMuted}`}>
-        Your direction, goals, and focus — updated with Phill each month.
+        Your direction, goals, and focus — updated with {coach.name} each month.
       </p>
 
       {plan.hasApprovedPlan ? (
@@ -84,7 +85,7 @@ export function CoachingPlanPage() {
       ) : (
         <section className={`${coachingCard} mt-6`}>
           <p className={coachingMuted}>
-            No approved growth plan yet. Phill will publish your plan after reviewing your
+            No approved growth plan yet. {coach.name} will publish your plan after reviewing your
             assessment.
           </p>
         </section>
@@ -125,6 +126,7 @@ export function CoachingPlanPage() {
 }
 
 export function CoachingActionsPage() {
+  const coach = useCoach();
   const { access } = useCoachingPortal();
   const [items, setItems] = useState<ActionItem[]>([]);
   const [filter, setFilter] = useState<'all' | CoachingActionStatus>('all');
@@ -165,7 +167,7 @@ export function CoachingActionsPage() {
     <div className={coachingPage}>
       <h1 className="text-2xl font-semibold text-white">Actions</h1>
       <p className={`mt-2 ${coachingMuted}`}>
-        Steps for this month — set with Phill, executed by you.
+        Steps for this month — set with {coach.name}, executed by you.
       </p>
 
       <div className="mt-6 flex flex-wrap gap-2">
@@ -233,6 +235,7 @@ type SessionRow = {
 };
 
 export function CoachingSessionsPage() {
+  const coach = useCoach();
   const { bookingUrl, access, sessions } = useCoachingPortal();
   const [history, setHistory] = useState<SessionRow[]>([]);
 
@@ -250,7 +253,7 @@ export function CoachingSessionsPage() {
     <div className={coachingPage}>
       <h1 className="text-2xl font-semibold text-white">Sessions</h1>
       <p className={`mt-2 ${coachingMuted}`}>
-        Your consultations with Phill — prep, join, and follow-up.
+        Your consultations with {coach.name} — prep, join, and follow-up.
       </p>
 
       <CoachingSessionPrepCard />
@@ -377,6 +380,7 @@ export function CoachingResourcesPage() {
 }
 
 export function CoachingBillingPage() {
+  const coach = useCoach();
   const { access } = useCoachingPortal();
   const subscription = access.subscription;
   const [loading, setLoading] = useState(false);
@@ -431,8 +435,7 @@ export function CoachingBillingPage() {
               Plan
             </dt>
             <dd className="mt-1 text-lg font-semibold text-white">
-              {carsiCoachingMonthlyPriceLabel}
-              <span className="text-sm font-normal text-slate-400"> / month</span>
+              {coach.priceLabel ?? 'Contact support@carsi.com.au for your plan price'}
             </dd>
           </div>
           <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-4">
@@ -507,13 +510,14 @@ export function CoachingBillingPage() {
 }
 
 export function CoachingServicesPage() {
+  const coach = useCoach();
   const [quoteService, setQuoteService] = useState<GrowthServiceItem | null>(null);
 
   return (
     <div className={coachingPage}>
       <h1 className="text-2xl font-semibold text-white">Growth services</h1>
       <p className={`mt-2 ${coachingMuted}`}>
-        Optional implementation work — quoted separately from your {carsiCoachingMonthlyPriceLabel}{' '}
+        Optional implementation work — quoted separately from your {coach.priceLabel ?? 'monthly plan'}{' '}
         coaching membership. Rates below are indicative; you&apos;ll receive a written quote before
         any work starts.
       </p>
