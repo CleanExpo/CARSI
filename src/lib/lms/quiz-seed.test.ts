@@ -14,9 +14,13 @@ import {
 
 const SEED_DIR = join(process.cwd(), 'data', 'seed');
 const WDRF = 'water-damage-restoration-fundamentals';
-const WDRF_QUIZ = JSON.parse(
+const WDRF_FILE = JSON.parse(
   readFileSync(join(SEED_DIR, 'water-damage-restoration-fundamentals-quiz.json'), 'utf8')
-).quizzes[0].quizId as string;
+) as { quizzes: { quizId: string; questions: unknown[] }[] };
+/** Read from the seed, so the test follows the course when its quizzes change. */
+const WDRF_QUIZ_IDS = WDRF_FILE.quizzes.map((q) => q.quizId);
+const WDRF_QUIZ = WDRF_QUIZ_IDS[0];
+const WDRF_QUESTIONS = WDRF_FILE.quizzes.reduce((n, q) => n + q.questions.length, 0);
 
 /** Mocked Prisma: every course in the catalogue exists, with id `course:<slug>`. */
 function mockDb(existingQuizzes: Record<string, string> = {}) {
@@ -99,7 +103,7 @@ describe('runQuizSeed --slug', () => {
     const upserted = r.db.lmsQuiz.upsert.mock.calls.map(
       ([a]) => (a as { where: { id: string } }).where.id
     );
-    expect(upserted).toEqual([WDRF_QUIZ]);
+    expect(upserted).toEqual(WDRF_QUIZ_IDS);
     const questionQuizIds = new Set([
       ...r.db.lmsQuizQuestion.findMany.mock.calls.map(
         ([a]) => (a as { where: { quizId: string } }).where.quizId
@@ -111,8 +115,8 @@ describe('runQuizSeed --slug', () => {
         ([a]) => (a as { data: { quizId: string } }).data.quizId
       ),
     ]);
-    expect([...questionQuizIds]).toEqual([WDRF_QUIZ]);
-    expect(r.db.lmsQuizQuestion.create).toHaveBeenCalledTimes(10);
+    expect([...questionQuizIds]).toEqual(WDRF_QUIZ_IDS);
+    expect(r.db.lmsQuizQuestion.create).toHaveBeenCalledTimes(WDRF_QUESTIONS);
   });
 
   it('does not use the draft for a catalogue course (drafts carry different quizIds)', () => {
