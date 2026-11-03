@@ -126,6 +126,9 @@ export function AdminCoachingLearningPathsClient() {
         return;
       }
       setLoaded({ userId, view: data });
+      // Keep the member picker's "draft waiting" flag in step with what was just saved.
+      const draftCount = data.path.filter((p) => p.draft).length;
+      setMembers((prev) => prev.map((m) => (m.userId === userId ? { ...m, draftCount } : m)));
       setNotice(data.result ? (ASSIGN_RESULT[data.result.status] ?? '') : 'Path saved.');
     } finally {
       setBusy(false);

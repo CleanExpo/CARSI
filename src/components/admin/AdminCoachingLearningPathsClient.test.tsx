@@ -176,5 +176,9 @@ describe('AdminCoachingLearningPathsClient', () => {
     expect(container.textContent).toContain('Approved, visible to the member');
     expect(container.textContent).toContain('Path approved.');
     expect(findApprove()).toBeUndefined();
+    // The member picker no longer flags this member as waiting once the path is approved.
+    expect(container.querySelector('select')?.textContent).not.toContain(
+      'draft waiting for approval'
+    );
   });
 });
