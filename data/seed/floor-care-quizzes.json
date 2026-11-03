@@ -24,12 +24,12 @@
         {
           "questionText": "Why is a childcare floor treated as a higher-risk surface than a back-of-house storeroom?",
           "options": [
-            "It is always a different material",
             "Children and vulnerable people use it at close range",
+            "It is always a different material",
             "It is cleaned less often",
             "It is never sealed"
           ],
-          "correctIndex": 1,
+          "correctIndex": 0,
           "points": 1
         },
         {
@@ -37,10 +37,10 @@
           "options": [
             "It sterilises the floor",
             "It prevents illness",
-            "It supports hygiene and reduces soil load",
-            "It is medically proven to kill germs"
+            "It is medically proven to kill germs",
+            "It supports hygiene and reduces soil load"
           ],
-          "correctIndex": 2,
+          "correctIndex": 3,
           "points": 1
         }
       ]
@@ -56,11 +56,11 @@
           "questionText": "Why do we work from clean areas toward dirty areas?",
           "options": [
             "It is faster",
-            "To avoid spreading soil into areas already cleaned",
             "It uses less chemical",
+            "To avoid spreading soil into areas already cleaned",
             "The client prefers it"
           ],
-          "correctIndex": 1,
+          "correctIndex": 2,
           "points": 1
         },
         {
@@ -77,12 +77,12 @@
         {
           "questionText": "Why does clean equipment matter?",
           "options": [
-            "It looks professional only",
             "Dirty pads, mops and solution re-deposit soil",
+            "It looks professional only",
             "It is a legal requirement to shine tools",
             "It has no real effect"
           ],
-          "correctIndex": 1,
+          "correctIndex": 0,
           "points": 1
         }
       ]
@@ -98,22 +98,22 @@
           "questionText": "How current must an SDS be to be considered current under the model WHS framework?",
           "options": [
             "Every 12 months",
-            "Not more than 5 years old",
             "Only when the product changes",
-            "Every 10 years"
+            "Every 10 years",
+            "Not more than 5 years old"
           ],
-          "correctIndex": 1,
+          "correctIndex": 3,
           "points": 1
         },
         {
           "questionText": "Where does PPE sit in the hierarchy of controls?",
           "options": [
             "First and most effective",
-            "The last resort, supplementing higher controls",
             "It replaces engineering controls",
+            "The last resort, supplementing higher controls",
             "It is not part of the hierarchy"
           ],
-          "correctIndex": 1,
+          "correctIndex": 2,
           "points": 1
         },
         {
@@ -130,12 +130,12 @@
         {
           "questionText": "Which is correct about Victoria?",
           "options": [
-            "It uses the model WHS framework",
             "It operates under its own OHS Act and Regulations",
+            "It uses the model WHS framework",
             "It has no chemical safety laws",
             "It does not require SDS"
           ],
-          "correctIndex": 1,
+          "correctIndex": 0,
           "points": 1
         }
       ]
@@ -151,22 +151,22 @@
           "questionText": "Why should you never use a strong acidic cleaner on natural stone?",
           "options": [
             "It is too expensive",
-            "It etches and damages the stone",
             "It does not clean",
-            "It voids the warranty only"
+            "It voids the warranty only",
+            "It etches and damages the stone"
           ],
-          "correctIndex": 1,
+          "correctIndex": 3,
           "points": 1
         },
         {
           "questionText": "What must you confirm before stripping a vinyl floor?",
           "options": [
             "The colour",
-            "Whether it is sealed",
             "The brand of mop",
+            "Whether it is sealed",
             "The time of day"
           ],
-          "correctIndex": 1,
+          "correctIndex": 2,
           "points": 1
         },
         {
@@ -192,34 +192,34 @@
         {
           "questionText": "Where do you get the re-entry time for a freshly sealed floor?",
           "options": [
-            "From experience",
             "From the product SDS/TDS",
+            "From experience",
             "From the client",
             "There is a fixed national time"
           ],
-          "correctIndex": 1,
+          "correctIndex": 0,
           "points": 1
         },
         {
           "questionText": "When would you choose encapsulation over hot water extraction in a school?",
           "options": [
             "Never",
-            "When fast return-to-service in an occupied room matters",
             "Only outdoors",
-            "When you want the longest dry time"
+            "When you want the longest dry time",
+            "When fast return-to-service in an occupied room matters"
           ],
-          "correctIndex": 1,
+          "correctIndex": 3,
           "points": 1
         },
         {
           "questionText": "Why do we rinse / neutralise after cleaning?",
           "options": [
             "To use more product",
-            "To remove residue so the floor does not re-soil or stay slippery",
             "It is optional",
+            "To remove residue so the floor does not re-soil or stay slippery",
             "To add gloss"
           ],
-          "correctIndex": 1,
+          "correctIndex": 2,
           "points": 1
         }
       ]
@@ -245,23 +245,23 @@
         {
           "questionText": "Which pad choice risks damage?",
           "options": [
-            "Matching the pad to the surface and task",
             "An aggressive pad on a soft finish",
+            "Matching the pad to the surface and task",
             "Checking the pad before use",
             "Carrying spare pads"
           ],
-          "correctIndex": 1,
+          "correctIndex": 0,
           "points": 1
         },
         {
           "questionText": "A circuit keeps tripping the RCD. What is correct?",
           "options": [
             "Bypass the RCD",
-            "Stop and report a possible electrical fault",
             "Tape the breaker on",
-            "Ignore it and continue"
+            "Ignore it and continue",
+            "Stop and report a possible electrical fault"
           ],
-          "correctIndex": 1,
+          "correctIndex": 3,
           "points": 1
         }
       ]
@@ -277,11 +277,11 @@
           "questionText": "Name a reason a job can fail that is not about cleaning skill.",
           "options": [
             "The client is fussy",
-            "A flat battery, missing tool or damaged hose",
             "The weather is fine",
+            "A flat battery, missing tool or damaged hose",
             "The floor is clean"
           ],
-          "correctIndex": 1,
+          "correctIndex": 2,
           "points": 1
         },
         {
@@ -298,12 +298,12 @@
         {
           "questionText": "When must the daily pre-start be completed?",
           "options": [
-            "After the first job",
             "Before you leave",
+            "After the first job",
             "Only weekly",
             "Only if a machine looks faulty"
           ],
-          "correctIndex": 1,
+          "correctIndex": 0,
           "points": 1
         }
       ]
@@ -319,22 +319,22 @@
           "questionText": "What goes up before you make a floor wet?",
           "options": [
             "Nothing",
-            "Wet-floor signage and barricading/exclusion",
             "A coffee break",
-            "The invoice"
+            "The invoice",
+            "Wet-floor signage and barricading/exclusion"
           ],
-          "correctIndex": 1,
+          "correctIndex": 3,
           "points": 1
         },
         {
           "questionText": "You must run a lead across a corridor children use. What do you do?",
           "options": [
             "Leave it loose",
-            "Route and manage it so it is not a trip hazard, or find another path",
             "Tell no one",
+            "Route and manage it so it is not a trip hazard, or find another path",
             "Run several leads to be safe"
           ],
-          "correctIndex": 1,
+          "correctIndex": 2,
           "points": 1
         },
         {
@@ -360,34 +360,34 @@
         {
           "questionText": "A teacher asks you to move because a class is coming through. What is the professional response?",
           "options": [
-            "Refuse — you were there first",
             "Respond politely and adjust your work zone",
+            "Refuse — you were there first",
             "Ignore them",
             "Pack up and leave the site"
           ],
-          "correctIndex": 1,
+          "correctIndex": 0,
           "points": 1
         },
         {
           "questionText": "When should you communicate a delay or issue?",
           "options": [
             "After the job, if asked",
-            "Early and plainly, as soon as you know",
             "Never — keep it quiet",
-            "Only to other technicians"
+            "Only to other technicians",
+            "Early and plainly, as soon as you know"
           ],
-          "correctIndex": 1,
+          "correctIndex": 3,
           "points": 1
         },
         {
           "questionText": "Where should chemicals never be placed on a childcare site?",
           "options": [
             "In the locked vehicle",
-            "Within reach of children",
             "In a secure staging area",
+            "Within reach of children",
             "With the rest of the equipment"
           ],
-          "correctIndex": 1,
+          "correctIndex": 2,
           "points": 1
         }
       ]
@@ -413,23 +413,23 @@
         {
           "questionText": "A Working With Children check means...",
           "options": [
-            "You have met every child-safe obligation",
             "It is a starting point alongside the code of conduct and supervision",
+            "You have met every child-safe obligation",
             "You can be alone with children",
             "Photos of children are fine"
           ],
-          "correctIndex": 1,
+          "correctIndex": 0,
           "points": 1
         },
         {
           "questionText": "How should you behave regarding CCTV on site?",
           "options": [
-            "Assume it is operating and act accordingly",
             "Assume there is none",
             "Cover the cameras",
-            "Only behave when supervised"
+            "Only behave when supervised",
+            "Assume it is operating and act accordingly"
           ],
-          "correctIndex": 0,
+          "correctIndex": 3,
           "points": 1
         }
       ]
@@ -445,11 +445,11 @@
           "questionText": "What do you do when you find pre-existing damage during final inspection?",
           "options": [
             "Ignore it",
-            "Photograph and record it in the notes",
             "Repair it yourself",
+            "Photograph and record it in the notes",
             "Blame the last cleaner"
           ],
-          "correctIndex": 1,
+          "correctIndex": 2,
           "points": 1
         },
         {
@@ -466,12 +466,12 @@
         {
           "questionText": "A job cannot be completed to scope. What is correct?",
           "options": [
-            "Leave quietly",
             "Document it and escalate to the supervisor",
+            "Leave quietly",
             "Invent a completion note",
             "Do something not in scope to fill time"
           ],
-          "correctIndex": 1,
+          "correctIndex": 0,
           "points": 1
         }
       ]

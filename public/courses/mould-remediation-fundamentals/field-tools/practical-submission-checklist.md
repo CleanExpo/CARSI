@@ -1,7 +1,7 @@
 # Practical submission checklist
 
 **CARSI Mould Remediation Practitioner — field tool (Module 4)**
-*DRAFT v1 for SME review. Five criteria x 20 points; 70 to pass. Then the final designation exam at 80%.*
+*DRAFT v1 for SME review. Five criteria x 20 points; 80 to pass. Then the final designation exam at 80%.*
 
 | Criterion | The assessor needs to see | Done |
 | --- | --- | --- |

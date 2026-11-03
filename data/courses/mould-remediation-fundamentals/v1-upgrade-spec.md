@@ -46,7 +46,7 @@ The founder ruled one course per level with no duplicate teaching. This course t
 | M4 Designation assessment | 4.1 Preparing your practical submission · Module 4 check · Final designation exam |
 
 7 teaching lessons, 4 practice checks (6/6/6/3 questions), final designation exam (20 questions,
-pass 80%), practical task (5 criteria, pass 70%).
+pass 80%), practical task (5 criteria, pass 80%).
 
 ## 3. Per-floor work
 

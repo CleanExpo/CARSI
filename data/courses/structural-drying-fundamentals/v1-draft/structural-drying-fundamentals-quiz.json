@@ -1,0 +1,815 @@
+{
+  "version": 1,
+  "courseSlug": "structural-drying-fundamentals",
+  "status": "draft",
+  "note": "DRAFT v1 module checks and final designation exam for the CARSI Structural Drying Practitioner course. Original CARSI questions for Australian and New Zealand conditions; no IICRC standard text reproduced. Answer positions balanced. SME review and sign-off required before seeding.",
+  "quizzes": [
+    {
+      "quizId": "a9f094b5-5654-5244-8fa4-30cbe9a64cf6",
+      "lessonTitle": "Module 1 check",
+      "title": "CARSI Structural Drying Practitioner — Module 1 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "You arrive at a wet house. Which comes first in the CARSI drying arc?",
+          "options": [
+            "Set up air movers across the wet floor",
+            "Take the final dry readings",
+            "Assess the job and make it safe",
+            "Send the owner a drying invoice"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Assess and make safe comes first: power to wet areas is isolated and hazards are identified before any equipment goes in or any reading is trusted."
+        },
+        {
+          "questionText": "Who holds the primary duty of care for workers on a drying job in both Australia and New Zealand?",
+          "options": [
+            "The person conducting a business or undertaking (PCBU)",
+            "The homeowner whose house is wet",
+            "The insurer who assigned the job",
+            "The equipment hire company"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Both the model WHS laws and the NZ Health and Safety at Work Act 2015 place the primary duty on the PCBU, so far as is reasonably practicable."
+        },
+        {
+          "questionText": "A 1996 house in Auckland needs plasterboard cut along a flood line. What should happen first?",
+          "options": [
+            "Cut it, because only pre-1990 buildings can contain asbestos",
+            "Cut it wet, because wet asbestos is always safe",
+            "Ask the owner whether they think it has asbestos",
+            "Treat it as possibly containing asbestos and arrange sampling before cutting"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "WorkSafe New Zealand advises that any building built or renovated before 2000 could contain asbestos, and you cannot tell by looking. In Australia the rule is wider than 1990: assume asbestos in any building built or renovated before the national ban on 31 December 2003. Sample before you cut."
+        },
+        {
+          "questionText": "Which reading makes a valid dry standard for a wet hallway timber floor?",
+          "options": [
+            "A plasterboard wall in the same hallway",
+            "The same timber floor in an unaffected bedroom, same meter, same scale",
+            "A number remembered from a job last summer",
+            "The wet hallway floor read on a different meter"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "A dry standard comes from the same material in an unaffected part of the same building, measured with the same meter on the same scale."
+        },
+        {
+          "questionText": "Why can a relative-scale reading on plasterboard not be compared with one on concrete?",
+          "options": [
+            "Concrete never holds water",
+            "A relative number only compares readings of the same material on the same meter",
+            "Relative scales are only for timber",
+            "Plasterboard readings are always in %MC"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Relative scales are not moisture content; they are comparable only within one material on one meter, which is why the reference must match the material."
+        },
+        {
+          "questionText": "A 1.20 kg timber offcut reads 24 %MC; its reference is 11 %MC. About how much water must it lose?",
+          "options": [
+            "About 0.156 kg (156 mL)",
+            "About 0.288 kg (288 mL)",
+            "About 0.013 kg (13 mL)",
+            "About 0.126 kg (126 mL)"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Dry mass is 1.20 / 1.24 = 0.968 kg; at 11 %MC it weighs 0.968 x 1.11 = 1.074 kg; 1.20 - 1.074 = 0.126 kg."
+        },
+        {
+          "questionText": "Why are reference readings taken before any equipment is switched on?",
+          "options": [
+            "Airflow and dehumidification change the readings you are trying to capture",
+            "Meters do not work once equipment is running",
+            "Equipment trips the RCD while you take readings",
+            "Reference readings are only needed on the last day"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "References describe the house at rest. Running air movers and dehumidifiers changes the materials and the air, so take references first."
+        }
+      ]
+    },
+    {
+      "quizId": "23ceb952-402b-5d77-81dc-2b0555a6a6b2",
+      "lessonTitle": "Module 2 check",
+      "title": "CARSI Structural Drying Practitioner — Module 2 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Which number shows that water has actually left the air?",
+          "options": [
+            "A falling relative humidity on its own",
+            "A rising air temperature",
+            "A falling humidity ratio in g/kg",
+            "A louder dehumidifier"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Relative humidity depends on temperature, so warming the air lowers RH without removing water. The humidity ratio in g/kg changes only when water is added or removed."
+        },
+        {
+          "questionText": "What is the dew point?",
+          "options": [
+            "The temperature of a wet surface",
+            "The RH at which mould grows",
+            "The highest temperature on a drying job",
+            "The temperature to which air must be cooled for dew to form"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "The Bureau of Meteorology defines dew point as the temperature to which air must be cooled, at constant pressure, for dew to occur."
+        },
+        {
+          "questionText": "Day one reads 20 °C and 80 %RH (11.7 g/kg); day two reads 26 °C and 55 %RH (11.6 g/kg). What happened?",
+          "options": [
+            "About a third of the water was removed",
+            "The room got much wetter",
+            "Almost no water was removed; the room warmed",
+            "The dehumidifier doubled its output"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "The g/kg is almost unchanged, so the air holds the same water. The RH fell only because the temperature rose."
+        },
+        {
+          "questionText": "Dehumidifier inlet reads 11.6 g/kg and outlet 7.9 g/kg. What is the g/kg depression?",
+          "options": [
+            "19.5 g/kg",
+            "3.7 g/kg",
+            "1.5 g/kg",
+            "7.9 g/kg"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Depression is inlet minus outlet: 11.6 - 7.9 = 3.7 g/kg. Outlet below inlet shows the unit is removing water."
+        },
+        {
+          "questionText": "The affected room reads 11.6 g/kg and an unaffected room 8.2 g/kg. What does this tell you?",
+          "options": [
+            "Wet materials are still evaporating water into the affected room",
+            "The job is finished",
+            "The outside air is the problem",
+            "The dehumidifier has failed"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Affected above unaffected means evaporation is still loading the air. As drying proceeds the affected g/kg should trend down towards the unaffected reading."
+        },
+        {
+          "questionText": "The room is 24 °C and 60 %RH (dew point 15.8 °C). The slab measures 14 °C. What is the risk?",
+          "options": [
+            "No risk, because the slab is warmer than 10 °C",
+            "The slab will dry faster than the walls",
+            "Condensation on the slab, because it is below the dew point",
+            "The RH reading is wrong"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Air cooled to its dew point condenses. A surface colder than the room dew point can collect condensation, so lower the g/kg or warm the surface."
+        },
+        {
+          "questionText": "How many grains per pound is 1 g/kg?",
+          "options": [
+            "7 grains per pound",
+            "70 grains per pound",
+            "0.7 grains per pound",
+            "7000 grains per pound"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "There are 7000 grains in a pound, so 1 g per 1000 g of air is 7 grains per pound. Convert imported figures to g/kg before you log them."
+        }
+      ]
+    },
+    {
+      "quizId": "0a26873c-e90e-5985-9f61-aeaac7016cd8",
+      "lessonTitle": "Module 3 check",
+      "title": "CARSI Structural Drying Practitioner — Module 3 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Which three things drive evaporation from a wet surface?",
+          "options": [
+            "Light, noise and time",
+            "Pressure washing, chemicals and heat lamps",
+            "Only air movement",
+            "A vapour pressure difference, air movement at the surface, and energy"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Vapour moves from high to low vapour pressure, moving air thins the still layer at the surface, and evaporation needs energy (about 2.45 MJ per kg)."
+        },
+        {
+          "questionText": "Why does a wet slab under a floating floor dry slowly?",
+          "options": [
+            "Concrete cannot hold water",
+            "It is dense and covered, so water must travel to a surface that airflow cannot reach",
+            "Floating floors are waterproof",
+            "Air movers do not work on concrete"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Dense materials hold water deep inside, and a covering blocks evaporation. The covering usually has to be lifted before the slab can dry."
+        },
+        {
+          "questionText": "About how much heat is needed just to evaporate 10 L of water?",
+          "options": [
+            "About 2.45 MJ (0.68 kWh)",
+            "About 24.5 MJ (6.8 kWh)",
+            "About 245 MJ (68 kWh)",
+            "About 0.25 MJ (0.07 kWh)"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "10 L is 10 kg; 10 x 2.45 MJ/kg = 24.5 MJ; divided by 3.6 MJ per kWh is about 6.8 kWh."
+        },
+        {
+          "questionText": "Four air movers point at the centre of a room; the wet wall bases are not drying. What is the fix?",
+          "options": [
+            "Add four more air movers in the centre",
+            "Turn the dehumidifier off",
+            "Open every window regardless of the weather",
+            "Angle the air movers along the wet wall bases so airflow sweeps the wet surfaces"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Airflow has to be on the wet surfaces. Angling along the wall bases, working around the room in one direction, puts the air where the water is."
+        },
+        {
+          "questionText": "An imported air mover is rated at 2,000 CFM. What is that in metric?",
+          "options": [
+            "About 3,400 m³/h",
+            "About 1,180 m³/h",
+            "About 34,000 m³/h",
+            "About 340 m³/h"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "1 CFM = 1.699 m³/h, so 2,000 x 1.699 = about 3,400 m³/h."
+        },
+        {
+          "questionText": "Visible mould is found on a wet wall. What happens to the air movers?",
+          "options": [
+            "Run them at full speed to dry the mould",
+            "Point them at the mould from further away",
+            "Hold them: dry with dehumidifiers and air filtration under containment until remediation",
+            "Run them only overnight"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "High airflow across mouldy surfaces spreads spores. Hold air movers until remediation, and treat suspected mould as mould."
+        },
+        {
+          "questionText": "A wet wall reads colder than the air around it. Why?",
+          "options": [
+            "The meter is broken",
+            "Cold walls cannot be wet",
+            "Air movers chill the wall by blowing cold air from outside",
+            "Evaporation draws heat from the surface"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Evaporating water takes heat from the air and the material, so a wet surface cools. It is also why heat speeds drying."
+        }
+      ]
+    },
+    {
+      "quizId": "6d5504c3-59fa-5a4a-86e4-575b0f59ceaf",
+      "lessonTitle": "Module 4 check",
+      "title": "CARSI Structural Drying Practitioner — Module 4 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "How does a refrigerant dehumidifier remove water?",
+          "options": [
+            "It filters water out with a paper filter",
+            "It heats water until it boils away",
+            "It cools air below its dew point on a cold coil so the water condenses and drains",
+            "It absorbs water into a turning wheel"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Air passes over a coil colder than its dew point; vapour condenses and drains, and the air is reheated before it leaves."
+        },
+        {
+          "questionText": "Why does a refrigerant unit remove little water in a cold Dunedin basement?",
+          "options": [
+            "Refrigerant units only work outdoors",
+            "The coil must run close to freezing to get below the dew point, and it can ice",
+            "Cold air holds more water than warm air",
+            "The unit needs outside air to work"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "At 12 °C and 85 %RH the dew point is 9.6 °C. The coil must run below that, close to freezing, so icing and low output are likely."
+        },
+        {
+          "questionText": "Which dehumidifier type keeps working best when the air is cold?",
+          "options": [
+            "A desiccant dehumidifier",
+            "A conventional refrigerant dehumidifier",
+            "An air mover",
+            "An air filtration device"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Desiccants adsorb water rather than condensing it on a cold coil, so they keep working in cold, dry conditions."
+        },
+        {
+          "questionText": "What must be done with a desiccant dehumidifier’s reactivation air?",
+          "options": [
+            "Blow it back into the wet room",
+            "Run it through an air mover",
+            "Duct it out of the drying zone, usually outside",
+            "Nothing; it is dry air"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Reactivation air carries the removed water as warm, wet air. Returning it to the room would put the water straight back."
+        },
+        {
+          "questionText": "Process airflow 340 m³/h, depression 3.7 g/kg. About how much water is removed per day?",
+          "options": [
+            "About 36 L/day",
+            "About 3.6 L/day",
+            "About 360 L/day",
+            "About 1.5 L/day"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "340 x 1.2 = 408 kg/h of air; 408 x 3.7 / 1000 = 1.51 kg/h; x 24 = about 36 L/day."
+        },
+        {
+          "questionText": "The calculated removal is 36 L/day but the pump log shows 10 L/day. What should you check?",
+          "options": [
+            "Nothing; calculations always overestimate",
+            "Add more air movers",
+            "Switch the dehumidifier off",
+            "Filter, outlet, pump line and meter: a large mismatch points to a fault or misreading"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "The calculation and the condensate log should broadly agree. A big gap points to a blocked filter, restricted outlet, leaking pump line or a misread meter."
+        },
+        {
+          "questionText": "A desiccant’s reactivation duct has been left venting into the drying zone. What happens?",
+          "options": [
+            "The desiccant dries faster",
+            "The removed water goes straight back into the room air",
+            "Nothing; reactivation air is dry",
+            "The unit switches to refrigerant mode"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Reactivation air carries the water the wheel collected as warm, wet air. Vent it out of the drying zone, usually outside."
+        }
+      ]
+    },
+    {
+      "quizId": "809de8fe-8902-57d8-9644-1b39837f6a75",
+      "lessonTitle": "Module 5 check",
+      "title": "CARSI Structural Drying Practitioner — Module 5 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Inside reads 11.6 g/kg. Outside in Townsville reads 19.0 g/kg. Should you open the windows to dry?",
+          "options": [
+            "Yes; any fresh air helps",
+            "No; outside air is wetter, so keep the zone closed",
+            "Yes, because it is warm outside",
+            "Only if the RH outside is under 90 %"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Open drying helps only when outside g/kg is lower than inside. Townsville summer air is far wetter, so stay closed and dehumidify."
+        },
+        {
+          "questionText": "Christchurch outside air is 6.4 g/kg at 9 °C; inside is 8.4 g/kg at 18 °C. Why may opening up still slow drying?",
+          "options": [
+            "The outside air is wetter",
+            "Cold air carries more water",
+            "Opening windows trips the RCD",
+            "The cold air chills the materials, so evaporation slows"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Outside air is drier, but at 9 °C it removes heat that evaporation needs. Closed drying with electric heat is usually the better plan."
+        },
+        {
+          "questionText": "What is the rule for fuel-burning heaters and generators on a drying job?",
+          "options": [
+            "Never run them indoors: they produce carbon monoxide",
+            "Run them indoors only with a window open a little",
+            "Run them indoors overnight when nobody is home",
+            "Use them in an internal garage only"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Carbon monoxide has no colour, smell or taste and can kill. Australian and New Zealand guidance says never to run them inside or in poorly ventilated areas."
+        },
+        {
+          "questionText": "About how much power can one 10 A circuit supply at 230 V?",
+          "options": [
+            "About 1150 W",
+            "About 23,000 W",
+            "About 2300 W",
+            "About 230 W"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "230 V x 10 A = 2300 W in total, and several GPOs often share one circuit."
+        },
+        {
+          "questionText": "A dehumidifier (4.5 A), four air movers (1.2 A each) and an air filtration device (2.0 A) share one 10 A circuit. What is the total and what do you do?",
+          "options": [
+            "7.7 A: fine as it is",
+            "9.3 A: fine with no headroom needed",
+            "6.9 A: add more equipment",
+            "11.3 A: over the rating, so split the load across circuits"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "4.5 + 4.8 + 2.0 = 11.3 A, over 10 A before any start-up surge. Split it, for example 6.9 A and 4.4 A on separate circuits."
+        },
+        {
+          "questionText": "How do Australian and New Zealand rules on testing and tagging differ?",
+          "options": [
+            "They are identical in every respect",
+            "New Zealand bans testing and tagging",
+            "Australia requires inspection and testing of equipment in hostile conditions; New Zealand requires safe equipment and treats tagging as one way to show it",
+            "Australia has no rules on electrical equipment"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "In Australia, equipment in hostile conditions is regularly inspected and tested by a competent person. WorkSafe NZ says tagging is not mandatory but equipment must be safe and RCD-protected in damp conditions."
+        },
+        {
+          "questionText": "Where must a generator be placed on a drying job?",
+          "options": [
+            "In the internal garage with the door half open",
+            "Outside, away from openings, never indoors or in an internal garage",
+            "In the wet room, so its heat helps drying",
+            "Anywhere, if a window is open"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Generators produce carbon monoxide. Both Queensland and New Zealand guidance say never to run one indoors, including an internal garage."
+        }
+      ]
+    },
+    {
+      "quizId": "79d6b3fc-89ac-5674-b92a-57e416dee3c0",
+      "lessonTitle": "Module 6 check",
+      "title": "CARSI Structural Drying Practitioner — Module 6 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Air g/kg is rising and the house feels sticky after more air movers were added. What is the likely cause?",
+          "options": [
+            "Evaporation is outrunning dehumidification",
+            "The materials are already dry",
+            "The RCD is faulty",
+            "The outside air is too dry"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "More airflow lifted more water than the dehumidifiers could remove. Check the depression and add dehumidification or reduce airflow."
+        },
+        {
+          "questionText": "The air is dry but a timber floor has not moved for a day. What is a sound single change?",
+          "options": [
+            "Add air movers across the whole house",
+            "Declare it dry",
+            "Focus heat and airflow on that floor, or open it up, and record why",
+            "Turn off the dehumidifier"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Dry air with a static material means the water is bound deep or covered. Change one thing aimed at that material and record the reason."
+        },
+        {
+          "questionText": "Which item is essential in the drying file?",
+          "options": [
+            "Final readings showing each material at its dry standard",
+            "The brand of the technician’s van",
+            "A guess of how long it took",
+            "The owner’s opinion that it feels dry"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "The file proves the outcome: references, daily logs, changes with reasons, photos and final readings at the dry standard."
+        },
+        {
+          "questionText": "In the Christchurch case, what is done before any ceiling lining is cut?",
+          "options": [
+            "Cut a test hole to look inside",
+            "Spray the lining with antimicrobial",
+            "Nothing; weatherboard houses have no asbestos",
+            "Arrange asbestos sampling, because the house was built before 2000"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "A 1978 house may contain asbestos in textured ceilings and older linings. Sample first and treat suspect material as asbestos until results return."
+        },
+        {
+          "questionText": "Why is closed drying with heat and a desiccant chosen in the Christchurch case?",
+          "options": [
+            "Desiccants are always cheaper",
+            "The air is cold, so a refrigerant coil would run near freezing and outside air would chill the house",
+            "Refrigerant units are banned in New Zealand",
+            "The owner asked for it"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "At 12 °C the refrigerant coil would ice. Heat drives evaporation, and a desiccant keeps removing water in cold conditions."
+        },
+        {
+          "questionText": "A A$2,400 ex-GST drying charge is invoiced in Australia. What is the price including GST?",
+          "options": [
+            "A$2,400",
+            "A$2,640",
+            "A$2,160",
+            "A$2,760"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "GST is 10 % in Australia: 2,400 x 1.10 = A$2,640."
+        },
+        {
+          "questionText": "A job is declared dry because the air reads 6.5 g/kg, but a slab is still above its reference. Is it finished?",
+          "options": [
+            "Yes; dry air means dry materials",
+            "Yes, if the owner agrees",
+            "Only if the dehumidifier is still running",
+            "No; every mapped material must reach its dry standard"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Dry air is not the finish line. The file must show every mapped point at its reference reading before the job is verified dry."
+        }
+      ]
+    },
+    {
+      "quizId": "c10a3bf1-bb44-54f2-a28c-47ca63c7ab8a",
+      "lessonTitle": "Final designation exam",
+      "title": "CARSI Structural Drying Practitioner — Final designation exam",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "What is the drying goal for each wet material?",
+          "options": [
+            "To return it to its dry standard, measured against the same material unaffected",
+            "To make its surface feel dry to the touch",
+            "To get the meter reading to zero",
+            "To dry it for exactly three days"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "The goal is a measured return to the dry standard, set from an unaffected reference of the same material, same meter and same scale."
+        },
+        {
+          "questionText": "In New Zealand, which Act places the primary duty of care on the PCBU?",
+          "options": [
+            "The Occupational Health and Safety Act 2004",
+            "The Consumer Guarantees Act 1993",
+            "The Health and Safety at Work Act 2015",
+            "The Electricity (Safety) Regulations 2010"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Section 36 of the HSWA 2015 sets the PCBU’s primary duty. Victoria’s OHS Act 2004 is an Australian state law."
+        },
+        {
+          "questionText": "In Australia, a licence is needed to remove how much non-friable asbestos?",
+          "options": [
+            "More than 1 m²",
+            "More than 50 m²",
+            "Any amount, in every state",
+            "More than 10 m²"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "A Class B licence is needed above 10 m² of non-friable asbestos, and the ACT does not allow homeowners or tradespeople to remove any amount themselves."
+        },
+        {
+          "questionText": "Why log g/kg rather than relative humidity alone?",
+          "options": [
+            "g/kg is easier to read on a meter",
+            "Relative humidity is an imperial unit",
+            "g/kg does not change when air warms or cools, so it shows real water removal",
+            "g/kg is only used outside"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "RH depends on temperature. The humidity ratio changes only when water is added or removed, so it is the number to compare."
+        },
+        {
+          "questionText": "Which five points are read on every visit?",
+          "options": [
+            "Only the affected room",
+            "Outside, unaffected room, affected room, dehumidifier inlet and outlet",
+            "The switchboard, the van, the meter, the owner and the insurer",
+            "Five random places in the wet room"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Those five readings show the context, the target, the evaporation load and the dehumidifier’s performance."
+        },
+        {
+          "questionText": "The dehumidifier outlet reads higher in g/kg than its inlet. What does that mean?",
+          "options": [
+            "The unit is not removing water: investigate it",
+            "The unit is working very well",
+            "The room is fully dry",
+            "Nothing; outlet readings are not useful"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A working dehumidifier’s outlet is drier than its inlet. A higher outlet g/kg means a fault, a misreading, or reactivation air getting back in."
+        },
+        {
+          "questionText": "A cold external wall is at 13 °C and the room dew point is 16.3 °C. What do you do?",
+          "options": [
+            "Ignore it; walls cannot condense",
+            "Add air movers aimed at the wall from outside",
+            "Lower the room g/kg, warm the surface, or both, before trusting readings there",
+            "Open the windows in a humid coastal summer"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "A surface below the dew point can collect condensation, which would mask true drying. Fix the condition first."
+        },
+        {
+          "questionText": "What does an air mover do?",
+          "options": [
+            "Moves air across wet surfaces to thin the still layer and carry vapour away",
+            "Removes water from the air",
+            "Heats the room",
+            "Filters mould spores"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Air movers drive evaporation. Dehumidifiers remove the water from the air, and air filtration devices capture particles."
+        },
+        {
+          "questionText": "Why might more air movers make a job worse?",
+          "options": [
+            "They cool the dehumidifier coil",
+            "They always trip RCDs",
+            "They make the materials denser",
+            "They can lift more water into the air than the dehumidifiers remove"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Airflow and dehumidification must be in step. Without enough dehumidification the room g/kg rises and drying stalls."
+        },
+        {
+          "questionText": "A desiccant unit moves 500 m³/h and lowers air from 7.4 to 3.0 g/kg. About how much water per day?",
+          "options": [
+            "About 6.3 L/day",
+            "About 63 L/day",
+            "About 630 L/day",
+            "About 26 L/day"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "500 x 1.2 x 4.4 x 24 / 1000 = about 63 L/day."
+        },
+        {
+          "questionText": "The daily litres from a dehumidifier fall steadily as the job proceeds. What is the usual reason?",
+          "options": [
+            "The unit is broken",
+            "The room is drying, so inlet g/kg and the depression fall",
+            "The supply frequency has changed",
+            "The filter has been removed"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "A falling daily figure is expected as the air dries, provided the materials are also approaching their dry standard."
+        },
+        {
+          "questionText": "When does open drying with outside air help?",
+          "options": [
+            "Whenever it is not raining",
+            "Only at night",
+            "Whenever outside RH is below 100 %",
+            "When outside g/kg is lower than inside and the air is warm enough not to chill the materials"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Both conditions matter: drier air by g/kg and a temperature that does not slow evaporation."
+        },
+        {
+          "questionText": "Which heat source is acceptable inside a drying zone?",
+          "options": [
+            "Electric heat on a budgeted, RCD-protected circuit",
+            "An LPG cabinet heater",
+            "A petrol generator running a heater",
+            "A kerosene space heater"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Fuel-burning heaters and engines produce carbon monoxide. Only electric heat goes inside, within the power budget."
+        },
+        {
+          "questionText": "What is the nominal mains supply in both Australia and New Zealand?",
+          "options": [
+            "200 V at 60 Hz",
+            "240 V at 60 Hz",
+            "230 V at 50 Hz",
+            "400 V at 50 Hz for every GPO"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Both countries supply a nominal 230 V at 50 Hz to standard outlets. Three-phase 400 V is not the standard GPO supply."
+        },
+        {
+          "questionText": "A larger desiccant has a 15 A plug. What is the right response?",
+          "options": [
+            "File the earth pin to fit a 10 A GPO",
+            "Use any adaptor from the van",
+            "Plug it into a power board with other machines",
+            "Use a 15 A outlet or a suitable supply; never modify the plug or force an adaptor"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "A 15 A plug is made not to fit a 10 A outlet. It needs a supply rated for it."
+        },
+        {
+          "questionText": "On a damp New Zealand job, what does the Electricity (Safety) Regulations 2010 regime expect of leads and appliances?",
+          "options": [
+            "Nothing until they have been tagged",
+            "Testing every hour",
+            "RCD protection in damp conditions, and equipment kept electrically safe",
+            "Use of battery tools only"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "WorkSafe NZ says equipment must be RCD-protected in circumstances such as damp conditions and be electrically safe; tagging is one way to show it."
+        },
+        {
+          "questionText": "What trip current applies to an Australian workplace RCD on a socket outlet up to 20 A?",
+          "options": [
+            "No more than 300 mA",
+            "No more than 30 mA",
+            "No more than 3 A",
+            "No more than 10 A"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "WorkSafe ACT guidance sets a tripping current not exceeding 30 mA for socket outlets not exceeding 20 A."
+        },
+        {
+          "questionText": "A drying log shows a stall. What is the disciplined response?",
+          "options": [
+            "Diagnose from the readings, change one thing, and record why",
+            "Change everything at once",
+            "Stop taking readings",
+            "Wait a week without changes"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Changing one thing at a time, with the reason recorded, lets the next reading show whether the change worked."
+        },
+        {
+          "questionText": "What is the New Zealand consumer guarantee for services such as drying?",
+          "options": [
+            "Services are always free if late",
+            "There is no guarantee for services",
+            "Services are carried out with reasonable care and skill",
+            "Only goods carry guarantees"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Section 28 of the Consumer Guarantees Act 1993 guarantees that services are carried out with reasonable care and skill."
+        },
+        {
+          "questionText": "Which two pieces of evidence earn the CARSI Structural Drying Practitioner designation?",
+          "options": [
+            "The graded practical task and the final designation exam",
+            "Attendance and a photo of the van",
+            "A supplier invoice and a meter receipt",
+            "A first-aid certificate and a CARSI login"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "The designation is awarded on the practical task, graded against the rubric, and the final designation exam."
+        }
+      ]
+    }
+  ]
+}

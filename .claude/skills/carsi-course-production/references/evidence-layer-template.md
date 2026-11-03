@@ -47,11 +47,22 @@ Reliability letter × credibility number, set once per source and applied to how
 A discovery tool (Google Scholar, a search engine, an AI summary) is never the source — grade the
 underlying paper, page or regulator record you actually read.
 
+**Availability exception (DECISIONS #54, founder 03/11/2026).** An Australian distributor's or
+stockist's own product page is sufficient evidence that a product is **sold in Australia** — for
+**availability only**. Such a row may be `VERIFIED` at grade **C1**, and must carry
+`claim_type: "availability"` so the exception is explicit on the row. It is never evidence for a
+performance or specification claim (output, efficacy, accuracy, power draw, battery life,
+certification): those still need an A or B source, or stay `JUSTIFIED` / `GAP`. A claim that
+bundles availability with a specification ("sold in Australia and runs on batteries") should be
+split so the C1 row carries the availability half only. No other C-grade source may support
+`VERIFIED`.
+
 ## 3. Which status each point gets
 
 | Situation | Status | Grade | Required fields (validator-enforced) |
 | --- | --- | --- | --- |
 | A primary source was opened and says this | `VERIFIED` | A or B | `source_url`, `access_date` (ISO), `quote` (≤ 25 words) |
+| An Australian distributor's or stockist's own product page shows the product is sold here (availability only, DECISIONS #54) | `VERIFIED` | C1 | as above, plus `claim_type: "availability"` |
 | Our own arithmetic from a graded method (e.g. psychrometric humidity ratio), or a labelled illustrative teaching number | `JUSTIFIED` | grade of the method's source | `confidence` (high/medium/low), `reasoning`, `best_available_source` |
 | Not yet verifiable here (licensed standard wording, stale product check, a figure with no source) | `GAP` | — | `reason`, `recommended_action` (`rewrite` / `remove` / `substantiate`) |
 
@@ -100,6 +111,7 @@ the validator accepts and ignores, so the existing negative control still covers
 | `lesson_id` | the lesson UUID the claim appears in |
 | `part` | `requirement` / `mechanism` / `evidence` |
 | `evidence_grade` | `A1`…`C3` (VERIFIED and JUSTIFIED entries) |
+| `claim_type` | `"availability"` on a `VERIFIED` C1 row resting on an Australian distributor/stockist page (DECISIONS #54). Omit otherwise. |
 | `check_by` | ISO date the source must be re-read (drift-prone facts: 3–6 months) |
 | `also_in` | optional array of other `course:<slug>#<lessonId>` (or `#quiz:…`, `#assessment`, `#description`) surfaces where the same claim is taught. Record a repeated claim once, at its first lesson, and list the repeats here — never duplicate the entry. A lesson's Sources block covers entries whose `lesson_id` is that lesson **or** whose `also_in` names it. |
 

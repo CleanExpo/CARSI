@@ -23,34 +23,34 @@
         {
           "questionText": "Category 1 or 2 water that is left and supports microbial growth or passes through contaminated materials:",
           "options": [
+            "Deteriorates to Category 3 and must be treated as such",
             "Stays the same category permanently",
             "Becomes safe to drink over time",
-            "Deteriorates to Category 3 and must be treated as such",
             "Only changes category if a laboratory confirms it"
           ],
-          "correctIndex": 2,
+          "correctIndex": 0,
           "points": 1
         },
         {
           "questionText": "For a saturated Category 3 job, how should porous materials such as carpet, underlay and wet plasterboard generally be treated?",
           "options": [
             "Dried in place and kept, because replacement is expensive",
-            "Discarded as contaminated waste — they usually cannot be effectively cleaned and verified",
             "Sprayed with fragrance and left",
-            "Sent to general household recycling"
+            "Sent to general household recycling",
+            "Discarded as contaminated waste — they usually cannot be effectively cleaned and verified"
           ],
-          "correctIndex": 1,
+          "correctIndex": 3,
           "points": 1
         },
         {
           "questionText": "What must happen before any worker enters a Category 3 site?",
           "options": [
             "Nothing — start extraction immediately to save time",
-            "A documented risk assessment and Safe Work Method Statement (SWMS), with vulnerable occupants removed and power isolated",
             "Only a photo of the damage for the insurer",
+            "A documented risk assessment and Safe Work Method Statement (SWMS), with vulnerable occupants removed and power isolated",
             "A coat of antimicrobial over everything"
           ],
-          "correctIndex": 1,
+          "correctIndex": 2,
           "points": 1
         },
         {
@@ -67,34 +67,34 @@
         {
           "questionText": "Where should contaminated Category 3 water generally be disposed of?",
           "options": [
+            "To sewer under the water authority&rsquo;s trade-waste rules, or via a licensed liquid-waste contractor",
             "Into the nearest stormwater drain",
             "Onto the garden or nature strip",
-            "To sewer under the water authority&rsquo;s trade-waste rules, or via a licensed liquid-waste contractor",
             "Left on site to evaporate"
           ],
-          "correctIndex": 2,
+          "correctIndex": 0,
           "points": 1
         },
         {
           "questionText": "When choosing an antimicrobial/disinfectant for a Category 3 job in Australia, you should:",
           "options": [
             "Use any product with a US EPA registration as if it applied here",
-            "Use a product legal for the purpose in Australia (e.g. APVMA/TGA as applicable), following the Australian label and SDS",
             "Mix bleach with an acid cleaner for extra strength",
-            "Apply antimicrobial over visible soiling without cleaning first"
+            "Apply antimicrobial over visible soiling without cleaning first",
+            "Use a product legal for the purpose in Australia (e.g. APVMA/TGA as applicable), following the Australian label and SDS"
           ],
-          "correctIndex": 1,
+          "correctIndex": 3,
           "points": 1
         },
         {
           "questionText": "Mould is found on a wall during a sewage remediation. What is the correct approach to airflow?",
           "options": [
             "Aim air movers at the mould to dry it quickly",
-            "Contain, run AFDs and dehumidifiers, remediate the mould, and introduce air movers only after the area is cleaned and cleared",
             "Increase fan speed to push spores outside",
+            "Contain, run AFDs and dehumidifiers, remediate the mould, and introduce air movers only after the area is cleaned and cleared",
             "Ignore it and keep drying"
           ],
-          "correctIndex": 1,
+          "correctIndex": 2,
           "points": 1
         },
         {
@@ -111,12 +111,12 @@
         {
           "questionText": "A Category 3 job is complete when:",
           "options": [
-            "The area looks tidy and smells clean",
             "The contamination is removed, surfaces are cleaned and sanitised, materials are dried to the dry standard, any mould is cleared, and it is all documented",
+            "The area looks tidy and smells clean",
             "The water has been extracted",
             "The customer says it looks fine"
           ],
-          "correctIndex": 1,
+          "correctIndex": 0,
           "points": 1
         }
       ]

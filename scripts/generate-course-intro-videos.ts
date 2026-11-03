@@ -15,7 +15,7 @@
  * Phases / modifiers:
  *   --dry-run   Print the per-course plan. NO API, NO spend, NO secrets required.
  *   --generate  Real run: TTS → upload → render → upload → results map. Idempotent (skips done).
- *   --slug=<s>  One course.  --limit=N  Cap.  --force  Re-render done slugs.  --yes  Skip confirm.
+ *   --slug=<s>  One course (or a comma-separated list).  --limit=N  Cap.  --force  Re-render done slugs.  --yes  Skip confirm.
  *
  * Run in CI (or manually) with HEYGEN_API_KEY + HEYGEN_AVATAR_ID + ELEVENLABS_API_KEY + CLOUDINARY_*.
  */
@@ -144,7 +144,12 @@ async function renderAvatarWithAudio(apiKey: string, brief: CourseLessonVideoBri
     );
     const status = poll.data?.status;
     if (status === 'completed' && poll.data.video_url) return { videoUrl: poll.data.video_url, captionUrl: poll.data.caption_url ?? poll.data.subtitle_url };
-    if (status === 'failed') throw new Error(`HeyGen render failed: ${JSON.stringify(poll.data.error ?? 'unknown')}`);
+    if (status === 'failed') {
+      // HeyGen often returns no `error` field on a failed render. Log the whole poll payload so the
+      // cause (credits, plan, avatar access, engine) is visible in the run log.
+      const detail = poll.data.error ?? poll.data;
+      throw new Error(`HeyGen render failed (video_id ${videoId}): ${JSON.stringify(detail).slice(0, 600)}`);
+    }
   }
   throw new Error(`HeyGen render timed out (video_id ${videoId}).`);
 }
@@ -175,7 +180,9 @@ async function main(): Promise<void> {
   const briefs = await loadBriefs();
   const results = await loadResults();
 
-  let queue = briefs.filter((b) => (onlySlug ? b.courseSlug === onlySlug : true)).filter(isVideoBriefComplete);
+  // --slug accepts one slug or a comma-separated list (e.g. re-rendering a fixed set with --force).
+  const slugSet = onlySlug ? new Set(onlySlug.split(',').map((x) => x.trim()).filter(Boolean)) : null;
+  let queue = briefs.filter((b) => (slugSet ? slugSet.has(b.courseSlug) : true)).filter(isVideoBriefComplete);
   if (!force) queue = queue.filter((b) => !results.results[b.courseSlug]);
   if (queue.length > limit) queue = queue.slice(0, limit);
 
@@ -205,7 +212,15 @@ async function main(): Promise<void> {
   if (!(await confirmSpend(queue.length))) return;
 
   let ok = 0;
+  let consecutiveFailures = 0;
+  // Stop after this many failures in a row: each attempt spends ElevenLabs credits on the voice
+  // track before HeyGen is reached, so an account-level HeyGen fault should not burn the batch.
+  const MAX_CONSECUTIVE_FAILURES = Number(process.env.INTRO_VIDEO_MAX_CONSECUTIVE_FAILURES ?? 2);
   for (const b of queue) {
+    if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
+      console.error(`\n✗ Stopping: ${consecutiveFailures} renders failed in a row. Fix the cause before re-running.`);
+      break;
+    }
     try {
       console.log(`\n▶ ${b.courseSlug} …`);
       const mp3 = await elevenTts(b.script, voiceFor(b));
@@ -217,12 +232,22 @@ async function main(): Promise<void> {
       results.results[b.courseSlug] = { url: uploaded.url, captionsUrl: captionUrl };
       await writeResults(results);
       ok += 1;
+      consecutiveFailures = 0;
       console.log(`  ✓ ${uploaded.url}`);
     } catch (err) {
+      consecutiveFailures += 1;
       console.error(`  ✗ ${b.courseSlug}: ${(err as Error).message}`);
     }
   }
   console.log(`\nRendered ${ok}/${queue.length}. Results → ${RESULTS_PATH}`);
+  // A run that rendered nothing must not report success (2026-11-02: 0/6 rendered, job green).
+  // A partial run exits 0 so the workflow still opens a PR for the renders already paid for.
+  if (ok === 0) {
+    console.error('::error::No intro video rendered. See the ✗ lines above for the HeyGen response.');
+    process.exitCode = 1;
+  } else if (ok < queue.length) {
+    console.error(`::warning::Only ${ok}/${queue.length} intro videos rendered.`);
+  }
   console.log('Next: npx tsx scripts/apply-intro-video-urls.ts   (writes introVideoUrl into the catalog)');
 }
 

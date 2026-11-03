@@ -40,6 +40,12 @@ import {
   findActivePaidCourseOwnership,
 } from '@/lib/server/paid-course-ownership';
 import { getPublishedCourseForCheckout } from '@/lib/server/public-courses-list';
+import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
+import { parseCoursePrerequisites, courseHasPrerequisites } from '@/lib/lms/course-prerequisites';
+import {
+  findCoursePrerequisiteBlock,
+  prerequisiteBlockBody,
+} from '@/lib/server/course-prerequisites';
 import { captureServerError } from '@/lib/server/sentry';
 import {
   readAttributionJourneyId,
@@ -141,10 +147,21 @@ export async function POST(request: NextRequest) {
       bodyEmail: body.customer_email,
     });
 
+    // The buyer's session comes from the same credentials `resolveCheckoutEmail` accepts:
+    // the `auth_token` cookie first, else a `Bearer` session token. Both are verified by
+    // `verifySessionToken`; a Bearer-only buyer must not be treated as a guest (the
+    // prerequisite gate would otherwise refuse a learner who has completed it).
+    const bearerToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : '';
     let studentId: string | undefined;
-    if (authTokenCookie) {
-      const c = await verifySessionToken(authTokenCookie);
-      if (c?.sub) studentId = c.sub;
+    let buyerClaims: Awaited<ReturnType<typeof verifySessionToken>> = null;
+    for (const token of [authTokenCookie, bearerToken]) {
+      if (!token) continue;
+      const c = await verifySessionToken(token);
+      if (c?.sub) {
+        studentId = c.sub;
+        buyerClaims = c;
+        break;
+      }
     }
     // A still-valid token for a deactivated or deleted learner can't be fulfilled by the webhook,
     // so refuse before charging.
@@ -247,11 +264,12 @@ export async function POST(request: NextRequest) {
     let isFreeCatalog =
       course.is_free === true || !Number.isFinite(listAud) || listAud <= 0;
 
-    let dbCourse: { id: string; priceAud: unknown; isFree: boolean } | null = null;
+    let dbCourse: { id: string; slug: string; meta: unknown; priceAud: unknown; isFree: boolean } | null =
+      null;
     if (process.env.DATABASE_URL?.trim()) {
       try {
         const c = await getOrCreateCourseBySlug(slug);
-        dbCourse = { id: c.id, priceAud: c.priceAud, isFree: c.isFree };
+        dbCourse = { id: c.id, slug: c.slug, meta: c.meta, priceAud: c.priceAud, isFree: c.isFree };
         listAud = Number(c.priceAud);
         isFreeCatalog = c.isFree === true || !Number.isFinite(listAud) || listAud <= 0;
       } catch {
@@ -260,8 +278,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Charge path: if Postgres is configured but we could not load the course
-    // row, skip the ownership check would open a second Stripe session. Refuse.
-    if (process.env.DATABASE_URL?.trim() && !dbCourse && purchaseMode !== 'team') {
+    // row, skipping the ownership check would open a second Stripe session, and skipping
+    // the prerequisite gate (below) would sell a locked course — the paid fulfilment does
+    // not refuse after the money is taken. Refuse for every purchase mode, team included.
+    if (process.env.DATABASE_URL?.trim() && !dbCourse) {
       return NextResponse.json(
         { detail: 'Could not verify enrolment just now. Please try again shortly.' },
         { status: 503 },
@@ -304,6 +324,43 @@ export async function POST(request: NextRequest) {
           { detail: 'Could not verify enrolment just now. Please try again shortly.' },
           { status: 503 },
         );
+      }
+    }
+
+    // Prerequisite gate (DECISIONS #41). Never open a Stripe session — or report a free
+    // enrolment — for a course whose prerequisite this buyer has not completed: the paid
+    // fulfilment path does not refuse after the money is taken, so this is the paid gate.
+    // Completion is tied to an account, so a guest (email-only) buyer must sign in first.
+    // A lookup failure is a 503 (never charge on doubt).
+    //
+    // TEAM purchases (founder decision 02/11/2026): anyone may buy seats for a course with a
+    // prerequisite, so the buyer's own completion is NOT checked. Every seat — the buyer's own
+    // included — is issued locked (`prerequisite_gated`) by the fulfilment and stays locked
+    // until that person completes the prerequisite. A signed-in buyer is still required: the
+    // buyer's seat is an enrolment on an account, and the team is provisioned to it.
+    if (dbCourse && courseHasPrerequisites(parseCoursePrerequisites(dbCourse.meta))) {
+      if (!studentId) {
+        return NextResponse.json(
+          {
+            detail:
+              'This course has a prerequisite. Sign in to the account you completed it with to enrol.',
+            code: 'prerequisite_sign_in_required',
+          },
+          { status: 401 },
+        );
+      }
+      const block =
+        purchaseMode === 'team'
+          ? null
+          : await guardLookup(() =>
+              findCoursePrerequisiteBlock({
+                userId: studentId!,
+                isAdmin: () => (buyerClaims ? isLmsClaimsAllowedAdminPanel(buyerClaims) : false),
+                course: { slug: dbCourse!.slug, meta: dbCourse!.meta },
+              }),
+            );
+      if (block) {
+        return NextResponse.json(prerequisiteBlockBody(block), { status: 403 });
       }
     }
 

@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "courseSlug": "trauma-crime-scene-decontamination-fundamentals",
+  "status": "draft",
+  "note": "DRAFT v1 practical task for the CARSI Trauma & Biohazard Decontamination Practitioner course. Instructor-graded against the rubric. Original CARSI task written for Australian and New Zealand conditions; no IICRC standard text reproduced. SME review and sign-off required before it is published.",
+  "assessment": {
+    "id": "cc871893-e4a3-48c1-b679-5544426445b8",
+    "title": "CARSI Trauma & Biohazard Decontamination Practitioner — Practical task: plan and evidence a trauma decontamination job",
+    "passThreshold": 80,
+    "isPublished": false,
+    "instructions": "## Practical task\n\nPlan and document a trauma and biohazard decontamination job from first call to client sign-off. Use a real job you have attended (with every identifying detail removed), or one of the supplied jobs:\n\n- **Australia:** a ground-floor unit in Parramatta, NSW. A resident died and was found after several days. Police have released the scene and the property manager has instructed you. The bedroom is 3.2 m x 2.6 m with carpet on a concrete slab; the carpet stain is about 1.2 m x 0.9 m and a mattress is affected. A 10 A GPO in the hallway is available. Family members will be on site.\n- **New Zealand:** a café kitchen in Christchurch after a staff injury. The owner has instructed you. About 1.5 m x 1.0 m of vinyl floor and a 0.6 m x 1.8 m timber bench are affected, and broken glass is present.\n\nThe task is marked out of 100 points against the five criteria below and passes at 80 points (80%), the same pass mark as every module check and the final exam.\n\nKeep everything non-graphic and respectful. Submit one PDF, or a set of photos and documents, containing:\n\n1. **Release, authority and conduct.** Who released the scene and who instructed you, the law that applies (WHS Act, Victorian OHS Act or NZ HSWA), your low-profile arrival and how family, staff or neighbours are protected.\n2. **Risk assessment and SWMS.** A site-specific hazard walk (biological, sharps, chemical, electrical, manual handling, heat, psychological), the control chosen for each from the top of the hierarchy down, the 230 V / RCD arrangement, and the stop-and-escalate triggers.\n3. **PPE and exposure readiness.** The PPE set with the respirator standard (AS/NZS 1716) and fit-test record, the donning and doffing order, each worker's hepatitis B status (Australian or NZ Immunisation Handbook position), and the exposure response with the 72-hour PEP window and the AU or NZ numbers.\n4. **Zones, removal and disinfection.** A zone sketch, the remove-or-clean decision for each material with reasons, areas in m², and the clean-then-disinfect record: product, ARTG number (AU) or label, SDS and supplier evidence (NZ), dilution in mL per litre, and contact time achieved.\n5. **Sharps, waste and the job file.** Sharps handling and container, bag volumes (two-thirds rule), the waste rule for your jurisdiction (NSW, Victoria, another state's EPA, or NZS 4304 and the council), the crew wellbeing plan with support lines, the verification walk-through and the sign-off.\n\nWrite in Australian English, use metric units throughout, name standards only (no copied standard text), and price any quote in AUD (inc GST) or NZD for a NZ client.",
+    "criteria": [
+      {
+        "label": "Release, authority, law and conduct",
+        "description": "Release and authority recorded with times; the correct law for the jurisdiction named; low-profile arrival; family, staff and neighbours protected; personal items and confidentiality handled respectfully and without graphic detail.",
+        "maxPoints": 20
+      },
+      {
+        "label": "Risk assessment, SWMS and stop triggers",
+        "description": "Every hazard class assessed; controls chosen from the top of the hierarchy down, consistent with the AU WHS principles or NZ GRWM regulation 6; 230 V gear through an RCD; the SWMS revised when the site changes; stop-and-escalate triggers stated.",
+        "maxPoints": 20
+      },
+      {
+        "label": "PPE and exposure readiness",
+        "description": "PPE matched to the remaining hazards; AS/NZS 1716 respirator with a fit test and fit check; a correct donning and doffing order; hepatitis B status recorded against the AU or NZ Handbook; the exposure response with 30-second wash, same-day assessment and the 72-hour PEP window; correct AU or NZ numbers.",
+        "maxPoints": 20
+      },
+      {
+        "label": "Zones, removal and clean-then-disinfect",
+        "description": "Three zones with one-way movement; real extent found beyond the visible edge; remove-or-clean decisions with reasons and m²; cleaning before disinfecting; dilution worked in mL per litre; contact time achieved; product claim checked on the ARTG (AU) or label, SDS and supplier evidence held (NZ).",
+        "maxPoints": 20
+      },
+      {
+        "label": "Sharps, waste, crew wellbeing and the job file",
+        "description": "Sharps found by looking and handled with tools into a rigid container closed at the fill line; bags at two-thirds or less with volumes; the correct jurisdiction waste rule and contractor; a crew wellbeing plan with support lines; a verification walk-through and client sign-off; Australian English, metric units, standards named only.",
+        "maxPoints": 20
+      }
+    ]
+  }
+}

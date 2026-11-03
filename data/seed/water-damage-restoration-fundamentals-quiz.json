@@ -1,123 +1,645 @@
 {
   "version": 1,
   "courseSlug": "water-damage-restoration-fundamentals",
+  "status": "approved",
+  "note": "Module checks and final knowledge check for the CARSI Water Restoration Practitioner course. Original CARSI questions written for Australian conditions; no IICRC standard text reproduced. SME sign-off by Phill McGurk 02/11/2026 (PR #992); promoted from the v1-draft staging folder 03/11/2026 (DECISIONS #48).",
   "quizzes": [
     {
-      "quizId": "e7798876-961d-4e4c-a2f0-f91ded4cc2d1",
-      "lessonTitle": "Final knowledge check",
-      "title": "Water Damage Restoration Fundamentals — Knowledge Check",
+      "quizId": "8874f437-a8ad-4c2c-bcdb-6dbf36c108a0",
+      "lessonTitle": "Module 1 check",
+      "title": "CARSI Water Restoration Practitioner — Module 1 check",
       "passPercentage": 80,
       "attemptsAllowed": 3,
       "questions": [
         {
-          "questionText": "A supply line to a bathroom vanity has burst, releasing clean mains water that has not contacted contaminated materials. How is this water categorised?",
+          "questionText": "You arrive first at a water-damaged unit. What is your first task?",
           "options": [
-            "Category 1 — clean water",
-            "Category 2 — significantly contaminated (grey water)",
-            "Category 3 — grossly contaminated (black water)",
-            "It cannot be categorised until laboratory testing is complete"
+            "Make the site safe and size the loss",
+            "Start setting up the air movers straight away",
+            "Pull up the carpet to check the underlay",
+            "Ring the insurer first for an approval number"
           ],
           "correctIndex": 0,
-          "points": 1
+          "points": 1,
+          "explanation": "The first hour is make safe and size the loss, not start drying. Sizing and safety drive every later decision, and machines come after the hazards are controlled."
         },
         {
-          "questionText": "Clean (Category 1) water has been sitting in a warm, closed building for several days. What is the correct professional position on its category?",
+          "questionText": "Which figure best sizes a water loss for the job file?",
           "options": [
-            "It remains Category 1 permanently because it started clean",
-            "It can degrade toward Category 2 or 3 over time and should be reassessed, and when unsure treated as the worse category",
-            "It automatically becomes Category 3 after 24 hours in all cases",
-            "Category does not change once it has been recorded on the first visit"
+            "The number of towels used to mop",
+            "How worried the owner sounds by phone",
+            "The age of the building in years",
+            "The affected floor area in square metres"
           ],
-          "correctIndex": 1,
-          "points": 1
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Affected area in m² is the measurable figure that sizes the loss and feeds the drying plan, the equipment and the quote. The others are not measurements."
         },
         {
-          "questionText": "In the classes of water intrusion, what does Class 4 describe?",
+          "questionText": "Why record the air temperature and relative humidity on arrival?",
           "options": [
-            "The least amount of water, affecting only part of a room",
-            "An entire room with carpet and underlay affected and wicking up walls",
-            "Specialty drying situations where water is bound in low-permeability materials such as hardwood, plaster or concrete",
-            "Any job involving Category 3 water regardless of how much water is present"
+            "It is only needed for the final invoice",
+            "It is only ever needed on insured jobs",
+            "It sets the starting point for drying decisions",
+            "It decides which colour the report cover uses"
           ],
           "correctIndex": 2,
-          "points": 1
+          "points": 1,
+          "explanation": "The starting air condition (°C and %RH) is the baseline every later psychrometric decision and reading is compared against, so it is recorded at the first attendance."
         },
         {
-          "questionText": "Before entering standing water near electrical fittings on an Australian job site, what is the correct approach?",
+          "questionText": "What is the correct order of the restoration arc?",
           "options": [
-            "Enter immediately because 230 V mains is low enough to be safe in water",
-            "Ensure the supply is isolated where needed, use a residual current device (safety switch/RCD) on portable equipment, and use only tested-and-tagged leads",
-            "Only wear rubber boots and proceed, as boots fully remove the electrical risk",
-            "Switch off one power point and assume the whole area is now de-energised"
+            "Dry, make safe, verify, then understand the water and document",
+            "Make safe, understand, control source, assess, dry, monitor, verify, document",
+            "Document first, then dry, then make safe, then assess moisture",
+            "Assess moisture, invoice, then control the source and make safe"
           ],
           "correctIndex": 1,
-          "points": 1
+          "points": 1,
+          "explanation": "The arc runs make safe, understand the water and materials, control the source, assess moisture, dry, monitor, verify and document. Each step feeds the next, so order matters."
         },
         {
-          "questionText": "You are working with Category 3 (black water / sewage). Which PPE approach is appropriate?",
+          "questionText": "A floor looks dry on the surface two days after a leak. What does that tell you?",
           "options": [
-            "Gloves only, since sewage dries quickly",
-            "Full skin protection — fluid-resistant coveralls, gloves, boots and eye protection — plus P2 or higher respiratory protection fit-checked to the wearer",
-            "A dust mask and ordinary work clothes",
-            "No PPE is required once the bulk water has been extracted"
-          ],
-          "correctIndex": 1,
-          "points": 1
-        },
-        {
-          "questionText": "What is the purpose of taking a 'dry standard' reading during moisture assessment?",
-          "options": [
-            "To record the outdoor humidity for the day",
-            "To provide a reference reading from unaffected material of the same type, which becomes the target the wet material is dried back to",
-            "To calibrate the thermal imaging camera against the moisture meter",
-            "To set an arbitrary fixed number that applies to every job regardless of the building"
-          ],
-          "correctIndex": 1,
-          "points": 1
-        },
-        {
-          "questionText": "Why must dehumidification be balanced with airflow during structural drying?",
-          "options": [
-            "Because airflow alone, without removing the evaporated moisture, just raises the humidity in the room and stalls drying",
-            "Because dehumidifiers replace the need to measure moisture readings",
-            "Because airflow lowers the room temperature below freezing",
-            "Because dehumidification is only needed in dry inland climates"
+            "Surface dryness is not proof the materials are dry",
+            "The job is finished and you can now leave",
+            "The leak never actually reached any of the materials",
+            "The underlay beneath is guaranteed to be dry too"
           ],
           "correctIndex": 0,
-          "points": 1
+          "points": 1,
+          "explanation": "A dry-looking surface can sit over wet skirting, wall base and underlay. Only measured readings against a dry standard prove a material is dry."
         },
         {
-          "questionText": "On a standard Australian 10 A GPO circuit (approximately 2300 W total at 230 V, often shared across several outlets), how should drying equipment be powered?",
+          "questionText": "A hose discharging about 2 L/min runs for 36 hours. Roughly how much water is that?",
           "options": [
-            "Plug in as many machines as physically fit into the available outlets",
-            "Add up each machine's actual current draw at 230 V, keep the total safely below each circuit's rating, and spread load across separate circuits",
-            "Assume every outlet is on its own dedicated 20 A circuit",
-            "Run all equipment from a single power board on one outlet to keep leads tidy"
+            "About 43 L",
+            "About 430 L",
+            "About 43,000 L",
+            "About 4320 L"
           ],
-          "correctIndex": 1,
-          "points": 1
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "36 hours is 2160 minutes, and 2 L/min × 2160 min ≈ 4320 L. Estimating the volume explains why even a slow leak over a weekend is urgent."
+        }
+      ]
+    },
+    {
+      "quizId": "9860fee3-daf0-4007-92b7-93229547a9d8",
+      "lessonTitle": "Module 2 check",
+      "title": "CARSI Water Restoration Practitioner — Module 2 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "A burst mains supply line floods a laundry. Which category is this, before any degradation?",
+          "options": [
+            "Category 2 (grey water)",
+            "Category 3 (black water)",
+            "It is never categorised",
+            "Category 1 (clean water)"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "A sanitary mains supply line is a clean source, so it starts as Category 1. Category describes likely contamination, and a clean supply carries none to begin with."
         },
         {
-          "questionText": "Visible mould is present in a water-damaged room. What is the correct drying approach?",
+          "questionText": "Clean water sits in a warm, closed building for two days. What can happen to its category?",
           "options": [
-            "Run air movers at full speed to dry the mould as fast as possible",
-            "Do not run air movers; dry using air filtration devices (AFDs/air scrubbers) and dehumidifiers only under containment, and introduce air movers only after remediation and a clearance",
-            "Air movers are fine as long as a dehumidifier is also running",
-            "Open all windows and use air movers to push the spores outside"
+            "It always stays Category 1 no matter what",
+            "It automatically becomes Category 3 in an hour",
+            "It can degrade toward Category 2 or 3",
+            "The category becomes irrelevant after a single day"
           ],
-          "correctIndex": 1,
-          "points": 1
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "A category can worsen over time as clean water contacts soils and supports growth, so a Friday Category 1 loss may be reassessed worse on Monday."
         },
         {
-          "questionText": "Why does measured drying documentation matter in the Australian insurance context?",
+          "questionText": "You are unsure whether water is Category 2 or Category 3. What is the safe call?",
           "options": [
-            "It is optional paperwork that only slows the job down",
-            "Insurers and assessors expect measured evidence — readings trending to a dry standard — not just 'it looks dry', and a clear dated file protects the customer, technician and insurer if a claim is later questioned",
-            "It replaces the need to obtain authority for scope changes",
-            "It allows the technician to guarantee a fixed dry time to the client"
+            "Assume the lower category to save on costs",
+            "Treat it as the worse category and reassess",
+            "Ignore the category and start drying straight away",
+            "Let the owner decide the category for you"
           ],
           "correctIndex": 1,
-          "points": 1
+          "points": 1,
+          "explanation": "When unsure, treat water as the worse category and reassess. That protects people, and the reasons for the call are recorded in the job file."
+        },
+        {
+          "questionText": "What does the class of a water loss describe?",
+          "options": [
+            "The amount of water and how hard it is to dry",
+            "How contaminated it is and how risky it is to touch",
+            "The price of the job in AUD, including any GST charged",
+            "Which insurer is paying the claim and how much it covers"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Class describes the quantity of water and the likely rate of evaporation — how big the drying job is. Contamination is category, which is a separate judgement."
+        },
+        {
+          "questionText": "Water has soaked a ceiling, the wall insulation and the carpet from above. Which class is most likely?",
+          "options": [
+            "Class 1 (least water, small area only)",
+            "Class 2 (whole room, some wall wicking)",
+            "Ceilings never have a class at all",
+            "Class 3 (greatest amount, often from above)"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Saturation of ceilings, walls, insulation and subfloor, often from above, is Class 3 — the greatest amount of water and the most drying capacity needed."
+        },
+        {
+          "questionText": "Wicking reaches 300 mm up the walls over a 6 m perimeter. Roughly what wall area is wet?",
+          "options": [
+            "About 0.18 m²",
+            "About 18 m²",
+            "About 1.8 m²",
+            "About 180 m²"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "6 m × 0.3 m = 1.8 m² of wall. Reading the wicking height in millimetres lets you estimate the wetted area and size the class."
+        }
+      ]
+    },
+    {
+      "quizId": "618e4230-aa48-4ed6-977b-2389f20971e2",
+      "lessonTitle": "Module 3 check",
+      "title": "CARSI Water Restoration Practitioner — Module 3 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "There is standing water near a live 230 V power board. What do you do first?",
+          "options": [
+            "Reach in and unplug the leads quickly before the water spreads",
+            "Start extracting the water immediately, keeping well clear of the board",
+            "Isolate the circuit at the board and confirm it is dead",
+            "Throw a dry towel over the board and carry on working"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Water and 230 V mains are a fatal mix. Isolate the circuit at the switchboard and confirm it is dead before any contact — never reach into energised standing water."
+        },
+        {
+          "questionText": "Under the model WHS laws, who holds the primary duty to control risks on the job?",
+          "options": [
+            "The tenant living in the water-damaged property",
+            "The PCBU conducting the business or undertaking",
+            "The insurer that is paying the claim",
+            "The owner of the property next door"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "The person conducting a business or undertaking (PCBU) must eliminate risks so far as is reasonably practicable, or minimise them. The duty cannot be contracted away."
+        },
+        {
+          "questionText": "Which control is the strongest on the hierarchy of controls?",
+          "options": [
+            "Eliminating the hazard",
+            "Wearing a respirator",
+            "Erecting warning signs",
+            "Writing safe procedures"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Elimination sits at the top of the hierarchy; PPE and administrative controls are the least effective because they rely on human behaviour and do not remove the hazard."
+        },
+        {
+          "questionText": "Which PPE set suits Category 3 (black water / sewage) work?",
+          "options": [
+            "Gloves and a disposable dust mask only, worn with ordinary work clothes and closed shoes on site",
+            "Nothing special, because ordinary work clothes and a quick hand wash afterwards are enough for sewage work",
+            "A high-visibility vest, sunglasses and a cap, the same as you would wear on outdoor site visits",
+            "Fluid-resistant coveralls, boots, gloves, eye protection, and a respirator fit-tested to the wearer and fit-checked each use"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Category 3 means full skin protection plus P2 or higher respiratory protection fit-tested to the wearer and fit-checked each time it is put on, and everything contacted is treated as contaminated."
+        },
+        {
+          "questionText": "Why must a tight-fitting respirator be fit-tested to the wearer?",
+          "options": [
+            "It makes the mask and its filters last longer",
+            "It is only a paperwork requirement for the file",
+            "It only works if it seals to the face",
+            "Fit has no real effect on the protection given"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "A respirator only protects when it seals. Without a good seal contaminated air leaks in and the wearer does not get the expected protection, so a mask that has not passed a fit test is not relied on. A quick fit check every time it goes on confirms the seal, but it does not replace the fit test."
+        },
+        {
+          "questionText": "What should the job file record about PPE?",
+          "options": [
+            "Only the PPE carried in the van",
+            "The PPE actually used on the job",
+            "Nothing, because PPE is not ever recorded",
+            "Only what the PPE cost in AUD"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Record the PPE actually used, not just what was available, because the file must show the control that was in place at the time of the work."
+        }
+      ]
+    },
+    {
+      "quizId": "eb442750-ac7a-4baf-bac4-fd6db0f7f30c",
+      "lessonTitle": "Module 4 check",
+      "title": "CARSI Water Restoration Practitioner — Module 4 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Which instrument gives a quantitative moisture reading inside a specific material such as timber?",
+          "options": [
+            "A thermal imaging (infrared) camera",
+            "A pin (resistance) moisture meter",
+            "A thermo-hygrometer held near it",
+            "A tape measure and torch"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "A pin (resistance) meter measures how wet a material is. A non-invasive meter shows where moisture is; a thermo-hygrometer reads the air."
+        },
+        {
+          "questionText": "A thermal camera shows a cold patch on a wall. What is the right next step?",
+          "options": [
+            "Confirm it with a moisture meter before acting",
+            "Record it straight away as confirmed wet material",
+            "Ignore it, because cold patches never mean anything",
+            "Start removing that section of plasterboard at once"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A thermal camera shows temperature differences worth checking, not water. Confirm anything it suggests with a moisture meter before you act, and before any conclusion or removal."
+        },
+        {
+          "questionText": "What does specific humidity in g/kg tell you that relative humidity alone does not?",
+          "options": [
+            "The colour of any water on the floor",
+            "The price of the dehumidifier you should hire",
+            "How old the building and its materials are",
+            "How much water the air is actually carrying"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Specific humidity (g/kg) is the honest measure of how much water the air carries. Relative humidity moves with temperature and can mislead on its own."
+        },
+        {
+          "questionText": "What is a dry standard (dry reference) reading?",
+          "options": [
+            "A reading taken on the hottest day of the whole year",
+            "The target number printed on the side of the meter's box",
+            "The same material read in an unaffected area of the building",
+            "A reading taken only after the whole drying job has finished"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "The dry standard is the same material, same instrument and mode, read in an unaffected part of the building. It becomes the drying goal for that material."
+        },
+        {
+          "questionText": "Why read the same labelled points on every monitoring visit?",
+          "options": [
+            "It makes the report shorter and quicker to write",
+            "So the readings are comparable and show a trend",
+            "It means fewer readings are needed over the job",
+            "It keeps the owner out of the room longer"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Reading the same labelled points each visit makes the numbers directly comparable and shows the drying trend toward the dry standard — the evidence the job is working."
+        },
+        {
+          "questionText": "When is a drying job complete?",
+          "options": [
+            "When affected materials reach the dry standard and readings are stable",
+            "After exactly three days, regardless of what the meter readings show",
+            "When the room smells better and the carpet feels dry underfoot",
+            "When the owner walks through and says the room feels dry"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Drying is finished when every affected point reaches the dry standard and holds on the next visit — measured and stable, not assumed from feel or a fixed number of days."
+        }
+      ]
+    },
+    {
+      "quizId": "ed90b217-493e-4dc0-93ac-87e51e86451c",
+      "lessonTitle": "Module 5 check",
+      "title": "CARSI Water Restoration Practitioner — Module 5 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "What are the four levers that control the rate of structural drying?",
+          "options": [
+            "Evaporation, dehumidification, temperature and air exchange/containment",
+            "Pricing, speed, equipment colour and branding",
+            "Lighting, insulation, carpeting and paint colour",
+            "Carpet, timber, plasterboard and ceramic tiles"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "The four levers are evaporation (air movers), dehumidification, temperature and air exchange or containment. Managing them together is what dries a structure."
+        },
+        {
+          "questionText": "You run air movers in a closed, humid room with no dehumidification. What happens?",
+          "options": [
+            "The room dries about twice as fast as normal",
+            "Nothing changes at all in the room or materials",
+            "The air movers remove all of the moisture themselves",
+            "Humidity rises, drying stalls and secondary damage is risked"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Airflow without moisture removal just lifts water into air that cannot hold more, so humidity rises, drying stalls and condensation or mould can follow."
+        },
+        {
+          "questionText": "Air leaving the dehumidifier reads a lower g/kg than the air going into it. What does that show?",
+          "options": [
+            "A new leak has started inside the room",
+            "The dehumidifier should now be switched off completely",
+            "The dehumidifier is removing water from the air",
+            "The readings are not worth taking or recording"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "A lower g/kg at the outlet than at the inlet is direct evidence the dehumidifier is removing water. Comparing the drying zone with outside air is context only: dry outdoor air can make a zone that is drying well read wetter than outside, so confirm progress with material readings trending to the dry standard."
+        },
+        {
+          "questionText": "In Australia, what total power does one 10 A circuit deliver, and why does it matter?",
+          "options": [
+            "Unlimited power, so plug in as many machines as you want overnight",
+            "About 2300 W — so you must budget machine amps per circuit",
+            "About 230 W — so only one small fan fits per circuit",
+            "It does not matter on drying jobs; there is nothing to budget"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "230 V × 10 A ≈ 2300 W per circuit, and outlets often share one breaker, so you add up machine current draws and keep each circuit safely under its rating."
+        },
+        {
+          "questionText": "An LGR dehumidifier draws 4.5 A and each air mover draws 1.2 A. What is one dehumidifier plus four air movers?",
+          "options": [
+            "About 9.3 A",
+            "About 5.7 A",
+            "About 2.4 A",
+            "About 20 A"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "4.5 + (4 × 1.2) = 4.5 + 4.8 = 9.3 A, which is too close to a 10 A circuit limit once start-up surges are added, so the load is split across two circuits."
+        },
+        {
+          "questionText": "Visible mould is present on a wet wall. What does the drying rule say about air movers?",
+          "options": [
+            "Run the air movers harder and longer so the wall dries faster",
+            "Air movers are always fine on any job, mould or no mould",
+            "Switch everything off and leave the site until the wall dries naturally",
+            "Do not run air movers; use dehumidifiers and air filtration under containment"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "High airflow across mould aerosolises spores and spreads contamination. While mould is present, dry with air filtration and dehumidifiers under containment; air movers wait for a clearance."
+        }
+      ]
+    },
+    {
+      "quizId": "6220f5b8-3191-4701-8811-b1714153388b",
+      "lessonTitle": "Module 6 check",
+      "title": "CARSI Water Restoration Practitioner — Module 6 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Which set of records belongs in a defensible water-damage job file?",
+          "options": [
+            "A one-line invoice and a signed note saying the job is done",
+            "Only the final dry reading from the last day, and nothing else",
+            "The technician's memory of the job, retold if anyone ever asks later",
+            "Cause, category/class, dated photos, a moisture map, daily readings and recorded decisions"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "The file records the loss, dated photos, a moisture map with the dry standard, the drying plan, daily metric readings, safety and who authorised each decision."
+        },
+        {
+          "questionText": "When should the job file be built?",
+          "options": [
+            "Months later, written up from your memory",
+            "Only if a dispute or complaint arises",
+            "As the job happens, in real time",
+            "After the final invoice has been paid"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Build the file as the work happens. Records made at the time are accurate and are what an assessor or court will accept; reconstructed notes are weak."
+        },
+        {
+          "questionText": "Which readings best prove that drying is working day to day?",
+          "options": [
+            "The owner's opinion that the room feels drier each morning when they walk in",
+            "Falling material readings toward the dry standard and a lower g/kg in the zone",
+            "The number of air movers and dehumidifiers left running in the room each day",
+            "How loud the equipment is and how warm the room feels when you arrive"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Material readings trending to the dry standard, backed by a g/kg drop across the dehumidifier, are the measured evidence that drying is progressing. Outside g/kg is context, not proof."
+        },
+        {
+          "questionText": "A scope change (extra drying days or removing a material) is needed. What do you do?",
+          "options": [
+            "Get it authorised and recorded before acting",
+            "Go ahead and sort the paperwork afterwards",
+            "Never change the scope for any reason",
+            "Ask the neighbour for permission to proceed"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Changes to an agreed scope are authorised and recorded, not assumed. That keeps the job defensible, whoever is paying, and protects the business and the customer."
+        },
+        {
+          "questionText": "Under the Australian Consumer Law, which over-claim should a technician avoid?",
+          "options": [
+            "Saying moisture readings will be taken and recorded on each visit",
+            "Explaining the drying plan to the client in plain, simple English",
+            "Quoting the price in Australian dollars and noting GST where applicable",
+            "Promising a material is 'sterilised' or guaranteeing a fixed dry time"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Services must be provided with due care and skill and be fit for the stated purpose, so avoid over-claims like 'sterilised' or a guaranteed dry time you cannot control."
+        },
+        {
+          "questionText": "How are quotes and invoices expressed for Australian restoration work?",
+          "options": [
+            "In US dollars, with no GST shown at all",
+            "In litres of water removed from the building overall",
+            "In Australian dollars (AUD), noting GST where it applies",
+            "In whatever currency the owner or the insurer prefers"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Pricing is in AUD with GST noted where it applies. Clear, dated AUD pricing is part of the record the client relies on, and the insurer too when there is a claim."
+        }
+      ]
+    },
+    {
+      "quizId": "e7798876-961d-4e4c-a2f0-f91ded4cc2d1",
+      "lessonTitle": "Final knowledge check",
+      "title": "CARSI Water Restoration Practitioner — Final knowledge check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "What is the professional aim of water damage restoration?",
+          "options": [
+            "To make the room look tidy as quickly as possible so owners are happy",
+            "To replace every item that got wet, whether or not it could be dried",
+            "To return the structure and restorable contents to a dry, safe condition with evidence",
+            "To finish the job and pack up before the owner gets home from work"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "The aim is a dry, safe condition achieved quickly and safely with measured evidence, and knowing when to restore a material rather than remove it."
+        },
+        {
+          "questionText": "Water categories describe what?",
+          "options": [
+            "How much water there is across the floor",
+            "How contaminated the water is likely to be",
+            "The price of the job to the client",
+            "The brand of dehumidifier used to dry it"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Category is about likely contamination (Category 1 clean, 2 grey, 3 black). The amount of water and drying difficulty is the separate idea of class."
+        },
+        {
+          "questionText": "A toilet overflow contains urine but no faeces. What category is it, typically?",
+          "options": [
+            "Category 2",
+            "Category 1",
+            "Category 3",
+            "No category"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Grey water containing urine but no faeces is typically Category 2, recorded with its reasons and watched for degradation toward Category 3 over time."
+        },
+        {
+          "questionText": "Which is the strongest control under the hierarchy of controls?",
+          "options": [
+            "Personal protective equipment",
+            "Erecting warning signs",
+            "A written procedure",
+            "Eliminating the hazard"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Elimination removes the hazard and is the most effective control; PPE and administrative controls are the last and least reliable lines of defence."
+        },
+        {
+          "questionText": "You must work near standing water and a live 230 V supply. What comes first?",
+          "options": [
+            "Start extracting straight away and keep a close watch for sparks",
+            "Isolate and confirm the power is dead, and use an RCD",
+            "Wear thicker rubber gloves and boots, then carry on as normal",
+            "Nothing special is required if you work quickly and carefully enough"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Isolate the circuit, confirm it is dead, and run portable equipment through an RCD on tested-and-tagged leads. Water and 230 V mains can be fatal."
+        },
+        {
+          "questionText": "Which instrument reading is the honest measure of how much water the air carries?",
+          "options": [
+            "Relative humidity reading alone",
+            "Dew point in percent",
+            "The air temperature alone",
+            "Specific humidity in g/kg"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Specific humidity (g/kg) states the actual moisture the air carries. Relative humidity changes with temperature, so it can mislead when used on its own."
+        },
+        {
+          "questionText": "How is the drying goal for a material set?",
+          "options": [
+            "From a dry-standard reading of the same material in an unaffected area",
+            "From a round number everyone in the industry uses for every material",
+            "From the owner's guess about how dry the room used to be",
+            "From the outside air temperature on the first morning of the job"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "The dry goal is the dry-standard reading taken from the same material, same instrument and mode, in an unaffected part of the same building."
+        },
+        {
+          "questionText": "Why does airflow without dehumidification stall drying in a closed room?",
+          "options": [
+            "The air movers run out of power after a few hours overnight",
+            "The carpet and underlay absorb the moving air, so it cannot circulate",
+            "Moisture is lifted into air that cannot hold more, so humidity rises",
+            "It does not stall; more airflow always speeds drying in any room"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Evaporated water has nowhere to go without dehumidification or exchange, so humidity climbs, drying stops and secondary damage is risked."
+        },
+        {
+          "questionText": "One 10 A circuit at 230 V delivers roughly how much total power?",
+          "options": [
+            "About 230 W",
+            "About 23,000 W",
+            "No fixed limit",
+            "About 2300 W"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "230 V × 10 A ≈ 2300 W. Because outlets often share one breaker, you budget machine current draws so a circuit is not overloaded overnight."
+        },
+        {
+          "questionText": "Visible mould is on a wet wall you are drying. What does the rule require?",
+          "options": [
+            "Hold the air movers; use dehumidifiers and air filtration under containment",
+            "Run extra air movers across the wall so it dries faster",
+            "Ignore it and keep drying as normal until the job finishes",
+            "Spray it with any cleaner and switch on all the fans"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Air movers aerosolise mould spores, so they are held until remediation and a clearance; meanwhile dehumidifiers and air filtration run under containment."
+        },
+        {
+          "questionText": "A client paying privately disputes your drying work four months later. What best protects you both?",
+          "options": [
+            "A friendly phone call to smooth things over with them",
+            "A good memory of the job and what was said",
+            "A clear, dated, measured job file made at the time",
+            "A higher price next time to cover the dispute costs"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Whoever pays, a file made at the time (dated photos, a moisture map, daily readings trending to the dry standard and recorded decisions) is the proof that defends the work and shows the client what was done. Memory and goodwill are not evidence."
+        },
+        {
+          "questionText": "Which statement about pricing and scope on an Australian job is correct?",
+          "options": [
+            "Price in US dollars, skip GST, and change the scope whenever you like",
+            "Price in AUD with GST where it applies, and get scope changes authorised",
+            "Guarantee a fixed dry time to win the job, then price it later",
+            "Never provide a written quote, and agree any scope changes by handshake only"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Australian work is priced in AUD with GST noted; scope changes are authorised and recorded, and over-claims such as a guaranteed dry time are avoided."
         }
       ]
     }

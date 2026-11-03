@@ -1,7 +1,7 @@
 # Moisture map and dry-goal sheet
 
 **CARSI Water Restoration Practitioner — field tool (Module 4)**
-*DRAFT v1 for SME review. Australian-produced: metric readings throughout.*
+*Australian-produced: metric readings throughout.*
 
 ## Set the dry standard first
 
@@ -30,4 +30,4 @@ Dry-reference point: __________ Material: __________ Reading: __________ (units)
 | 2 | | | | |
 | 3 | | | | |
 
-**Confirm a thermal-camera hit with a moisture meter before acting.** **Drying is complete** when every affected point reaches the dry goal and is **stable** on the next visit — measured, not assumed.
+Use each instrument for what it does best: a non-invasive meter shows where moisture is, a pin meter measures how wet a material is, a thermo-hygrometer reads the air, and a thermal camera shows temperature differences worth checking. **Confirm anything the thermal camera suggests with a moisture meter before you act.** **Drying is complete** when every affected point reaches the dry goal and is **stable** on the next visit — measured, not assumed.

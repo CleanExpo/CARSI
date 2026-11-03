@@ -8,6 +8,15 @@ import { ensureLmsUserFromClaims } from '@/lib/server/lms-user-sync';
 import { isUniqueConstraintError } from '@/lib/server/db-errors';
 import { decideEnrollmentCompleted } from '@/lib/server/lms-completion';
 import { isEnrolmentAccessAllowed, isRevokedStatus } from '@/lib/server/enrollment-access';
+import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
+import {
+  isAdminOverridePaymentReference,
+  isStripeCheckoutPaymentReference,
+} from '@/lib/lms/course-prerequisites';
+import {
+  findCoursePrerequisiteBlock,
+  PrerequisiteNotMetError,
+} from '@/lib/server/course-prerequisites';
 
 /**
  * Quiz gate for completion (Phase 6, 2026-06-29 audit): a course is only
@@ -35,10 +44,23 @@ export type EnrollResult =
   | 'already_enrolled'
   | { enrollmentId: string; courseId: string };
 
+export type EnrollOptions = {
+  /**
+   * What to do when the learner has NOT met the course prerequisite (DECISIONS #41):
+   *  - 'refuse' (default): throw `PrerequisiteNotMetError`; no enrolment is issued;
+   *  - 'lock': issue the enrolment with `prerequisiteGated = true`, so the course stays
+   *    locked for this learner until they complete the prerequisite. Used for TEAM seats
+   *    (founder decision 02/11/2026: anyone may buy seats; each member's seat stays locked).
+   * A Stripe-paid fulfilment (`cs_*`) always behaves as 'lock': the money is already taken.
+   */
+  onPrerequisiteNotMet?: 'refuse' | 'lock';
+};
+
 export async function enrollStudentInCourse(
   claims: SessionClaims,
   slug: string,
-  paymentReference: string
+  paymentReference: string,
+  options: EnrollOptions = {},
 ): Promise<EnrollResult> {
   await ensureLmsUserFromClaims(claims);
   const course = await getOrCreateCourseBySlug(slug);
@@ -49,6 +71,20 @@ export async function enrollStudentInCourse(
     },
     select: { id: true, status: true },
   });
+
+  // Prerequisite gate (DECISIONS #41) — checked only when an enrolment is ISSUED (a new
+  // row, or a revoked row being reactivated). An existing active/completed row is
+  // grandfathered and returns 'already_enrolled' below without a re-check.
+  let prerequisiteGated = false;
+  if (!existing || isRevokedStatus(existing.status)) {
+    prerequisiteGated = await checkPrerequisitesForNewEnrolment(
+      claims,
+      course,
+      paymentReference,
+      options.onPrerequisiteNotMet ?? 'refuse',
+    );
+  }
+
   if (existing) {
     // Re-purchase after a refund (WS3 / P0-C): a revoked enrolment MUST be
     // reactivated on a fresh fulfilment — this path only runs after a verified
@@ -63,6 +99,7 @@ export async function enrollStudentInCourse(
           paymentReference,
           completedAt: null,
           certificateIssuedAt: null,
+          prerequisiteGated,
         },
       });
       return { enrollmentId: existing.id, courseId: course.id };
@@ -78,6 +115,7 @@ export async function enrollStudentInCourse(
         courseId: course.id,
         status: 'active',
         paymentReference,
+        prerequisiteGated,
       },
     });
 
@@ -91,6 +129,42 @@ export async function enrollStudentInCourse(
     }
     throw error;
   }
+}
+
+/**
+ * Decides how a NEW enrolment meets the course prerequisite. Returns `false` when the
+ * prerequisite is met (or does not apply), `true` when the enrolment must be issued LOCKED
+ * (`prerequisiteGated`), and throws `PrerequisiteNotMetError` when it must be refused.
+ *
+ * Admins and admin-created enrolments (`admin:*`) bypass. A Stripe-paid fulfilment
+ * (`cs_*`) is NEVER refused here — the money is already taken — but it is issued locked.
+ * An individual checkout refuses a buyer without the prerequisite, so an individual order
+ * reaching this point is a gap to investigate (logged); a team buyer's own seat is the
+ * expected case (founder decision 02/11/2026). Team seat assignment passes `mode: 'lock'`.
+ */
+async function checkPrerequisitesForNewEnrolment(
+  claims: SessionClaims,
+  course: { slug: string; meta?: unknown },
+  paymentReference: string,
+  mode: 'refuse' | 'lock',
+): Promise<boolean> {
+  if (isAdminOverridePaymentReference(paymentReference)) return false;
+  const block = await findCoursePrerequisiteBlock({
+    userId: claims.sub,
+    isAdmin: () => isLmsClaimsAllowedAdminPanel(claims),
+    course: { slug: course.slug, meta: course.meta ?? null },
+  });
+  if (!block) return false;
+  if (mode === 'lock') return true;
+  if (isStripeCheckoutPaymentReference(paymentReference)) {
+    console.warn('[enrollment] paid fulfilment for a course whose prerequisite is not met; issued locked', {
+      course: course.slug,
+      studentId: claims.sub,
+      paymentReference,
+    });
+    return true;
+  }
+  throw new PrerequisiteNotMetError(block);
 }
 
 /** Marks enrolments created for admin-panel users so analytics can exclude them. */

@@ -135,7 +135,11 @@ export async function addCourseTeamMemberByEmail(params: {
 
   for (const slug of enrollSlugs) {
     try {
-      await enrollStudentInCourse(memberClaims, slug, `team:${team.id}`);
+      // A member without the course prerequisite still gets their seat, issued LOCKED
+      // (prerequisiteGated) until they complete it — founder decision 02/11/2026.
+      await enrollStudentInCourse(memberClaims, slug, `team:${team.id}`, {
+        onPrerequisiteNotMet: 'lock',
+      });
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       if (msg !== 'COURSE_NOT_FOUND') {

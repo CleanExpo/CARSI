@@ -10,17 +10,20 @@ summary of the course's **evidence ledger** — the machine record of every subs
 Standards are referenced **by name only** — no IICRC (or other) standard text was reproduced or
 entered into any AI tool, per the IICRC AI Use Policy and CLAUDE.md.
 
-## Ledger at a glance (pilot pass, 02/11/2026)
+## Ledger at a glance (after SME sign-off, 02/11/2026)
 
 | Status | Entries | Meaning |
 | --- | ---: | --- |
-| VERIFIED | 30 | An Australian regulator or government page was opened on 02/11/2026 and supports the claim (verbatim quote of 25 words or fewer in the ledger). |
-| JUSTIFIED | 13 | Our own arithmetic from a published method (psychrometrics, P = V x I), or a teaching number the lesson labels illustrative. Reasoning is in the ledger. |
-| GAP | 21 | Not yet verifiable from here. **Every GAP below must be cleared before the course goes live.** |
+| VERIFIED | 34 | A source was opened on 02/11/2026 and supports the claim (verbatim quote of 25 words or fewer in the ledger): 30 Australian regulator or government pages, plus 4 Australian distributor or retailer pages for instrument availability (WRP-065 to WRP-068). |
+| JUSTIFIED | 38 | 13 are our own arithmetic from a published method (psychrometrics, P = V x I), or a teaching number the lesson labels illustrative. 21 are SME confirmations (Phill McGurk, 02/11/2026): 18 confirmed as written and 3 in SME-supplied wording. 4 are the instruments' battery power (WRP-069 to WRP-072), split out on 03/11/2026 because a stockist page verifies availability only (DECISIONS #54). Reasoning is in the ledger. |
+| GAP | 0 | All 21 GAPs were cleared by the SME on 02/11/2026 (see "SME sign-off" below). |
 
-Grades (VERIFIED and JUSTIFIED entries): A1 x1, A2 x29, A3 x3, B2 x3, C3 x7. Every VERIFIED source is a
-regulator, government agency or official body except Ausgrid's Electricity Safety site (B2, a
-network operator's public safety pages); no vendor page is used as evidence.
+Grades (VERIFIED and JUSTIFIED entries): A1 x1, A2 x29, A3 x3, B1 x25, B2 x3, C1 x4, C3 x7. Every VERIFIED
+source is a regulator, government agency or official body except Ausgrid's Electricity Safety site (B2, a
+network operator's public safety pages) and four Australian distributor or retailer pages (C1). Those
+vendor pages are used only for the commercial fact they are the primary record of: that a brand is sold
+in Australia (availability only, DECISIONS #54). The 25 B1 entries are SME confirmations (practitioner
+source): the 21 sign-off answers plus the four battery-power rows WRP-069 to WRP-072.
 
 Validate the ledger with `node scripts/audit/validate-ledger.mjs <ledger>` (it must exit 0), and
 run `node scripts/audit/check-mutants.mjs` in the same session.
@@ -85,31 +88,39 @@ whether to rename it.
 - **Every S500 citation** now names its edition, ANSI/IICRC S500:2025, per the estate ruling
   (GP-560; `course-truth` Stage 5). No section number is cited.
 
-## Open GAPs for the SME (21) — each must be cleared before go-live
+## SME sign-off (02/11/2026)
 
-| ID | Claim (short) | Action |
-| --- | --- | --- |
-| WRP-005 | Wet materials support microbial growth, corrosion, swelling, delamination over hours and days | substantiate |
-| WRP-007 | The ordered restoration arc | substantiate |
-| WRP-008 | Category 1/2/3 descriptions and example sources | substantiate (licensed S500:2025 copy) |
-| WRP-009 | Category can worsen over time; when unsure treat as worse | substantiate (licensed S500:2025 copy) |
-| WRP-010 | Stuck toilet flush puts about 15 L down (6 L pan + 9 L cistern) | **rewrite** (check against WELS-rated cisterns) |
-| WRP-011 | Urine without faeces is typically Category 2 | substantiate (licensed S500:2025 copy) |
-| WRP-012 | Class 1–4 descriptions, incl. Class 2 wicking to roughly 300 mm | substantiate (licensed S500:2025 copy) |
-| WRP-014 | Humid tropics make the same class harder to dry | substantiate |
-| WRP-021 | Hazards usually recorded in a SWMS or job safety analysis | substantiate |
-| WRP-028 | Hazard catalogue (biological, structural, confined space, heat) | substantiate |
-| WRP-029 | PPE sets by category; P2 as minimum for aerosols | substantiate (AS/NZS 1715 / state health) |
-| WRP-035 | More than 1 m² of sewage-contaminated material triggers P2 | substantiate (CARSI threshold, unsourced) |
-| WRP-036 | Instrument roles; confirm thermal hits with a meter | substantiate |
-| WRP-037 | Protimeter, Tramex, Delmhorst, FLIR available in AU (checked 2026-07-09) | substantiate (re-check AU distributor, 230 V models) |
-| WRP-040 | Dry standard from an unaffected reference; complete when reached and stable | substantiate (licensed S500:2025 copy) |
-| WRP-041 | Timber equilibrium differs with local climate | substantiate |
-| WRP-045 | Four drying levers; airflow without dehumidification stalls | substantiate |
-| WRP-049 | Several outlets in a room often share one breaker | substantiate |
-| WRP-050 | Mould hold-rule: no air movers on visible mould until clearance | substantiate (licensed mould-remediation standard, SME) |
-| WRP-051 | Records made at the time are what an assessor or court accepts | substantiate (or soften) |
-| WRP-058 | Most AU water work sits inside an insurance claim; insurers expect measured evidence | substantiate |
+**Reviewer:** Phill McGurk, founder and SME (DECISIONS #24, #47). **Date:** 2 November 2026.
+He reviewed all 21 GAP claims in the v1 draft: **18 OK, 3 Fix, 0 Cut.**
+
+- **OK, correct as written (18):** WRP-005, 007, 008, 009, 010, 011, 012, 014, 021, 028, 029, 035,
+  040, 041, 045, 049, 050, 051. Each is now JUSTIFIED (SME confirmation). The S500 claims (WRP-007,
+  008, 009, 011, 012, 040) were checked against his licensed ANSI/IICRC S500:2025 copy. WRP-050, the
+  mould hold-rule, is an S520 check, and he confirmed it against his licensed ANSI/IICRC S520 copy.
+  None is marked VERIFIED: an SME confirmation is not an opened source.
+- **Fix (3), SME-supplied wording:**
+  - **WRP-036, instrument roles.** Now reads: use each instrument for what it does best. A
+    non-invasive meter shows where moisture is, a pin meter measures how wet a material is, a
+    thermo-hygrometer reads the air, and a thermal camera shows temperature differences worth
+    checking. Confirm anything the thermal camera suggests with a moisture meter before you act.
+    Changed in lesson 4.1, the Module 4 check explanations, the moisture-map field tool and the
+    moisture-instruments diagram.
+  - **WRP-037, instrument brands.** Now reads: Protimeter, Tramex, Delmhorst and FLIR moisture
+    instruments are battery-powered and widely available in Australia. The "230 V" framing is gone.
+    Australian availability was re-checked against an Australian distributor or retailer page for
+    each brand (VERIFIED, WRP-065 to WRP-068): 02/11/2026, with WRP-066 and WRP-068 re-read on
+    03/11/2026 for their AUD price-listing quotes. Battery power rests on the SME's
+    answer (JUSTIFIED, WRP-069 to WRP-072), with the stockist's listing as the supporting record,
+    since a stockist page verifies availability only (DECISIONS #54). No brand GAP remains.
+  - **WRP-058, the insurance context.** The SME rejected "most water-damage work is inside an
+    insurance claim". It now reads: much water-damage work runs through an insurance claim, but
+    plenty doesn't. The excess is too high, the client is self-insured or uninsured, or they choose
+    to pay privately. Whoever pays, measured drying records protect you and the client. Lessons 6.1
+    and 6.2, the insurance-context diagram, and five quiz items (Module 1, Module 6 and the Final
+    knowledge check) no longer assume a job is insured or that insurers require something as a
+    blanket rule.
+- **Status:** 0 open GAPs. The draft is ready for a promotion PR into `data/seed/` (DECISIONS #48:
+  Water goes live first).
 
 Illustrative teaching numbers (hose 2 L/min, 4.5 A / 1.2 A draws, $1200 AUD job) are JUSTIFIED
 with low confidence and stay labelled illustrative in the lessons; confirm or replace with real

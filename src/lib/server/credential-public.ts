@@ -1,10 +1,12 @@
 import { prisma } from '@/lib/prisma';
 
+import { isUuidParam } from '@/lib/server/uuid-param';
+
+import { certificateHolderDisplayName } from '@/lib/server/certificate-name';
 import {
   buildCompletionCertificatePdf,
   completionCertificateDataFromEnrollment,
 } from '@/lib/server/certificate-pdf';
-import { certificateHolderDisplayName } from '@/lib/server/certificate-name';
 import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
 
 /** Public verification JSON (matches CredentialVerificationCard + certificate preview). */
@@ -31,7 +33,7 @@ export async function getPublicCredentialJson(
   credentialId: string,
   origin: string
 ): Promise<PublicCredentialJson | null> {
-  if (!credentialId?.trim() || !process.env.DATABASE_URL?.trim()) return null;
+  if (!isUuidParam(credentialId) || !process.env.DATABASE_URL?.trim()) return null;
 
   const row = await prisma.lmsEnrollment.findFirst({
     where: {
@@ -66,11 +68,10 @@ export async function getPublicCredentialJson(
   };
 }
 
-export async function getPublicCredentialPdfBuffer(credentialId: string): Promise<
-  | { ok: true; pdf: Uint8Array; filename: string }
-  | { ok: false; reason: 'not_found' }
-> {
-  if (!credentialId?.trim() || !process.env.DATABASE_URL?.trim()) {
+export async function getPublicCredentialPdfBuffer(
+  credentialId: string
+): Promise<{ ok: true; pdf: Uint8Array; filename: string } | { ok: false; reason: 'not_found' }> {
+  if (!isUuidParam(credentialId) || !process.env.DATABASE_URL?.trim()) {
     return { ok: false, reason: 'not_found' };
   }
 

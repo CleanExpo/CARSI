@@ -1,6 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs/promises';
+import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
+
+import { requireCron } from '@/lib/server/cron-auth';
 
 interface RouteInfo {
   path: string;
@@ -34,8 +36,16 @@ const KNOWN_ROUTES: Array<{ path: string; methods: string[]; file: string }> = [
     file: 'app/api/health/routes/route.ts',
   },
   { path: '/api/margot/chat', methods: ['POST'], file: 'app/api/margot/chat/route.ts' },
-  { path: '/api/margot/chat/history', methods: ['GET'], file: 'app/api/margot/chat/history/route.ts' },
-  { path: '/api/margot/chat/speech', methods: ['GET', 'POST'], file: 'app/api/margot/chat/speech/route.ts' },
+  {
+    path: '/api/margot/chat/history',
+    methods: ['GET'],
+    file: 'app/api/margot/chat/history/route.ts',
+  },
+  {
+    path: '/api/margot/chat/speech',
+    methods: ['GET', 'POST'],
+    file: 'app/api/margot/chat/speech/route.ts',
+  },
   {
     path: '/api/health/professional-directory',
     methods: ['GET'],
@@ -137,7 +147,10 @@ async function verifyRoute(route: RouteInfo, baseUrl: string): Promise<RouteInfo
   }
 }
 
-export async function GET(request: NextRequest): Promise<NextResponse<RouteHealthResponse>> {
+export async function GET(request: NextRequest) {
+  const denied = requireCron(request);
+  if (denied) return denied;
+
   const searchParams = request.nextUrl.searchParams;
   const verify = searchParams.get('verify') === 'true';
 

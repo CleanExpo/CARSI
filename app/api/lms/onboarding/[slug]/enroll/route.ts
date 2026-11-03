@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { enrollStudentInCourse } from '@/lib/server/enrollment-service';
+import { isPrerequisiteNotMetError, prerequisiteBlockBody } from '@/lib/server/course-prerequisites';
 import { getOrgEntitlements } from '@/lib/server/entitlements';
 import { getOnboardingCourseBySlug } from '@/lib/server/onboarding-programs';
 import { teamSubscriptionsEnabled } from '@/lib/server/subscriptions-flag';
@@ -50,6 +51,9 @@ export async function POST(request: NextRequest, ctx: Ctx) {
           included_in_org_subscription: true,
         });
       } catch (e) {
+        if (isPrerequisiteNotMetError(e)) {
+          return NextResponse.json(prerequisiteBlockBody(e.block), { status: 403 });
+        }
         const msg = e instanceof Error ? e.message : String(e);
         if (msg === 'COURSE_NOT_FOUND') {
           return NextResponse.json({ detail: 'Program not found' }, { status: 404 });

@@ -1,0 +1,719 @@
+{
+  "version": 1,
+  "courseSlug": "fire-smoke-damage-restoration-fundamentals",
+  "status": "draft",
+  "note": "DRAFT v1 module checks and final knowledge check for the CARSI Fire & Smoke Restoration Practitioner course. Original CARSI questions written for Australian and New Zealand conditions; no IICRC standard text reproduced. Pass mark 80 % on every check (founder decision 2 November 2026). Answer positions balanced across 54 questions (13, 14, 14 and 13 correct answers in positions A to D); the correct answer is the uniquely longest option in 20 of 54. SME review and sign-off required before seeding.",
+  "quizzes": [
+    {
+      "quizId": "3f6b2d1e-8a47-4c59-9e1a-6d0c2b7f4a11",
+      "lessonTitle": "Module 1 check",
+      "title": "CARSI Fire & Smoke Restoration Practitioner — Module 1 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Under the model WHS laws, who holds the primary duty of care for workers on a fire job?",
+          "options": [
+            "The property owner who rang to book the job",
+            "The insurer that has accepted and will pay the claim",
+            "The person conducting the business or undertaking (PCBU)",
+            "The most senior technician who is on site that day"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "The model WHS laws put the primary duty of care on the PCBU. New Zealand’s HSWA places the same primary duty on the PCBU."
+        },
+        {
+          "questionText": "Which law governs workplace health and safety on a fire job in Victoria?",
+          "options": [
+            "The Occupational Health and Safety Act 2004",
+            "The model WHS Act, as in every other state",
+            "The Health and Safety at Work Act 2015 (NZ)",
+            "No workplace safety act applies to restoration"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "The model WHS laws apply everywhere in Australia except Victoria, where the OHS Act 2004 applies and WorkSafe Victoria regulates. HSWA 2015 is New Zealand law."
+        },
+        {
+          "questionText": "Which order follows the fire restoration arc taught in this course?",
+          "options": [
+            "Clean, deodorise, assess, then make the site safe last",
+            "Assess, deodorise, clean, remove the source, then verify",
+            "Make safe, deodorise, clean, then remove the source",
+            "Make safe, assess, mitigate, remove source, clean, odour, verify"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Each step changes what the next one finds: deodorising before source removal only masks odour, and cleaning before the hazard check can spread asbestos or lead."
+        },
+        {
+          "questionText": "A worker is seriously injured on a fire job in Hamilton, New Zealand. What must the PCBU do?",
+          "options": [
+            "Raise it at the weekly toolbox meeting, then report it",
+            "Notify WorkSafe as soon as possible by the fastest means",
+            "Report it only if emergency services did not attend",
+            "Tell the insurer, who passes the report on to WorkSafe"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Under HSWA a PCBU must notify WorkSafe as soon as possible, by the fastest means available, even if emergency services attend, and keep records for at least five years."
+        },
+        {
+          "questionText": "An air scrubber draws 2.5 A and a HEPA vacuum 4.3 A on one 10 A circuit. How much headroom is left?",
+          "options": [
+            "6.8 A",
+            "3.2 A",
+            "7.5 A",
+            "5.7 A"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "2.5 + 4.3 = 6.8 A, so a 10 A circuit has 3.2 A left. A 3.9 A dehumidifier would overload it, so it goes on a second circuit once an electrician confirms it is safe."
+        },
+        {
+          "questionText": "A kitchen is 3.6 m by 3.0 m with a 2.4 m ceiling. What are its floor area and air volume?",
+          "options": [
+            "6.6 m² and about 15.8 m³",
+            "10.8 m² and about 108 m³",
+            "25.9 m² and about 10.8 m³",
+            "10.8 m² and about 25.9 m³"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "3.6 × 3.0 = 10.8 m² of floor; 10.8 × 2.4 ≈ 25.9 m³ of air. Record each room separately."
+        },
+        {
+          "questionText": "You arrive at a fire-damaged house and the owner is wiping soot off the benchtop with a wet cloth. What do you do first?",
+          "options": [
+            "Help them finish the wiping so the kitchen is ready for cleaning",
+            "Stop it, explain why, and ask when the house was built",
+            "Leave them to it, because it is their own property",
+            "Hand them a P2 mask and let them keep on wiping"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Wet-wiping dry soot smears it into the surface, and nobody should disturb residue before the hazardous-materials check. The build year starts that check."
+        }
+      ]
+    },
+    {
+      "quizId": "7c1e5a90-2b3d-4f8e-a6c4-91d2e0b85f22",
+      "lessonTitle": "Module 2 check",
+      "title": "CARSI Fire & Smoke Restoration Practitioner — Module 2 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "What does PM2.5 describe?",
+          "options": [
+            "Particles under 2.5 microns that can reach deep into the lungs",
+            "Smoke that has cooled to below 2.5 °C after the fire",
+            "A residue layer about 2.5 mm thick on painted surfaces",
+            "A respirator filter rated for 2.5 hours of continuous use"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Australian health advice describes PM2.5 as particles under 2.5 microns that, when breathed in, go deep into the lungs and enter the bloodstream."
+        },
+        {
+          "questionText": "A couch smouldered for hours before the alarm. What residue would you expect to test for first?",
+          "options": [
+            "A dry, powdery residue that smears very little",
+            "No residue, because smouldering fires burn clean",
+            "A wet, smeary residue with a strong smell",
+            "Only a fuel-oil residue from the heater"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Slow, low-oxygen smouldering fires tend to leave wetter, smeary residue with a strong smell. Treat it as a hypothesis and confirm with test patches."
+        },
+        {
+          "questionText": "Why can an upstairs bedroom smell strongly of smoke while showing little soot?",
+          "options": [
+            "Smoke odour only travels downward through a building",
+            "The smell comes from fresh paint, not from the fire itself",
+            "Soot always collects inside the HVAC filter, not on rooms",
+            "Porous materials absorbed odour compounds carried in the smoke"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Carpet, upholstery, plasterboard and timber absorb odour-causing compounds, so odour and visible soot do not always match. Survey every room."
+        },
+        {
+          "questionText": "Which pathway carries smoke up a stairwell to rooms well above a ground-floor fire?",
+          "options": [
+            "Deposition on cool surfaces",
+            "Absorption into carpet",
+            "The stack effect",
+            "Test-patch transfer"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Warm, smoke-laden air rises through stairwells, risers and cavities, carrying smoke to upper floors and the roof space."
+        },
+        {
+          "questionText": "Why does the assessment record a boundary between affected and unaffected areas?",
+          "options": [
+            "It is only needed when asbestos has been found on the job",
+            "It sets the scope, quote and cleaning plan; assessors check it",
+            "It replaces the need to take photographs of every room",
+            "It tells the owner which rooms they can clean themselves"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "The boundary, recorded with what you saw, smelt and measured, sets the scope and is the first thing an insurer’s assessor will check."
+        },
+        {
+          "questionText": "Five doors each have a 10 mm gap under an 820 mm leaf. What is the total open gap?",
+          "options": [
+            "About 0.041 m²",
+            "About 4.1 m²",
+            "About 0.0082 m²",
+            "About 0.41 m²"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "10 × 820 = 8,200 mm² = 0.0082 m² per door; five doors ≈ 0.041 m², about the size of a 200 mm square hole."
+        },
+        {
+          "questionText": "During two days of bushfire smoke, the owners ran their roof-mounted evaporative cooler. What does that mean for your survey?",
+          "options": [
+            "Coolers filter the air, so the rooms they serve are cleaner than the rest",
+            "It matters only if the cooler pads are visibly sooted",
+            "Coolers recirculate indoor air, so nothing came in",
+            "It drew outside air in, so survey the whole house and ducts"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Health authorities advise against evaporative coolers in smoke because they bring outside air inside; one can replace a house's air every 2 to 3 minutes."
+        }
+      ]
+    },
+    {
+      "quizId": "a9d43c27-5e61-4b0f-8d73-2c8f19e6b033",
+      "lessonTitle": "Module 3 check",
+      "title": "CARSI Fire & Smoke Restoration Practitioner — Module 3 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Which build-date rule should trigger \"suspect asbestos\" on a fire job?",
+          "options": [
+            "Australia: only buildings built before 1990; NZ: before 2000",
+            "Both countries: only buildings built before 1970",
+            "AU: built or renovated before the 2003 ban; NZ: before 2000",
+            "Australia: before 2000; NZ: only buildings built before 1990"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "In Australia, assume asbestos may be present in any building built or renovated before the national ban took effect on 31 December 2003; pre-1990 buildings are the most likely to contain it. In New Zealand, any building built or renovated before 2000 could contain asbestos (WorkSafe NZ)."
+        },
+        {
+          "questionText": "Fire has cracked 8.1 m² of fibre-cement eaves lining in a 1972 house. Who removes it?",
+          "options": [
+            "A Class A licensed asbestos removalist",
+            "Anyone, because it is under 10 m²",
+            "A Class B removalist, because it was non-friable",
+            "The restoration crew, if they wear P2 masks"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Fire-damaged asbestos is treated as friable (NSW EPA; WorkSafe NZ reclassifies it), so it is Class A work whatever its area. The 10 m² exemption no longer applies."
+        },
+        {
+          "questionText": "What is the restorer’s first action on finding suspect fire-damaged asbestos debris?",
+          "options": [
+            "Sweep it into bags quickly before it spreads any further",
+            "Hose it down with high-pressure water to settle the dust",
+            "Vacuum it with the household vacuum cleaner already on site",
+            "Stop, leave it undisturbed, keep people out and hand it over"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Stop, isolate and hand the area to a licensed assessor and Class A removalist. Cleaning in that area waits for clearance."
+        },
+        {
+          "questionText": "How do the Australian and New Zealand silica exposure standards compare?",
+          "options": [
+            "Both are 0.05 mg/m³",
+            "Australia 0.05 mg/m³; New Zealand 0.025 mg/m³",
+            "Australia 0.025 mg/m³; New Zealand 0.05 mg/m³",
+            "Both are 0.1 mg/m³"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Australia’s RCS standard is 0.05 mg/m³ (8-hour TWA) and stays there at the 1 December 2026 WEL switch. WorkSafe NZ lowered its standard to 0.025 mg/m³ in November 2023."
+        },
+        {
+          "questionText": "A 1978 house in Tauranga has fire-blistered paint. What should you presume?",
+          "options": [
+            "That it is lead-free because it was built after 1970",
+            "That it may contain lead-based paint",
+            "That only exterior paint can contain lead",
+            "That fire has burnt off any lead"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "WorkSafe NZ and Health New Zealand say to presume lead-based paint in buildings from the 1980s or earlier. Lead paint cannot be identified by its appearance."
+        },
+        {
+          "questionText": "How should ash from a burnt CCA-treated pergola be handled?",
+          "options": [
+            "Sweep it up dry and put it in the garden or organics bin",
+            "Hose it off the slab with high-pressure water",
+            "Dig it into the garden beds, where ash helps the soil",
+            "Moisten, shovel, double-bag and take it to landfill"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Treat CCA ash as containing copper, chromium and arsenic (up to 10 % by weight). Keep it wet, shovel it, bag it, and never bury it or put it in a garden or organics bin."
+        },
+        {
+          "questionText": "On a Victorian bushfire site, fire-affected fibro cannot be reached to be inspected. How does WorkSafe Victoria say it is treated?",
+          "options": [
+            "As friable, so a Class A licence holder is engaged",
+            "As non-friable until a laboratory sample proves otherwise",
+            "As Class B work if the area is under 10 m²",
+            "As general waste once it has been kept damp"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "WorkSafe Victoria takes a precautionary approach: inaccessible bushfire-affected asbestos is treated as friable and needs a Class A licence holder."
+        }
+      ]
+    },
+    {
+      "quizId": "d2e8f6b4-1c07-4a93-b5e2-7f30a8c4d044",
+      "lessonTitle": "Module 4 check",
+      "title": "CARSI Fire & Smoke Restoration Practitioner — Module 4 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "After a pot burnt dry on the stove, walls show a faint yellow film and a very strong smell. Which residue fits best?",
+          "options": [
+            "Protein residue",
+            "Dry smoke residue",
+            "Fuel-oil residue",
+            "Wet smoke residue from foam"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Cooking fires leave a thin, near-invisible yellowish protein film with odour out of proportion to what you can see."
+        },
+        {
+          "questionText": "Why test a cleaning method on a small patch before cleaning a whole surface?",
+          "options": [
+            "Because insurers pay a set fee for every test patch done",
+            "To check whether the owner is happy with the colour first",
+            "To pick a method that will not damage the surface, and record it",
+            "Because test patches are only needed on glass and mirrors"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Starting with the least aggressive method on a hidden patch protects paint, finishes and fabrics, and the dated record protects you later."
+        },
+        {
+          "questionText": "Dry, powdery soot covers a ceiling. What do you use first?",
+          "options": [
+            "A wet cloth with detergent to lift the soot straight away",
+            "A pressure washer on low to rinse the ceiling clean",
+            "An ozone generator overnight before any cleaning starts",
+            "Dry methods: HEPA vacuuming and dry chemical sponges"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Liquid smears dry soot into the surface. Dry methods come first on dry residue, then wet methods only if the test patch shows they are needed."
+        },
+        {
+          "questionText": "In which order should a room be cleaned?",
+          "options": [
+            "Floor, then walls, then fixtures, then the ceiling last",
+            "Walls, then floor, then the ceiling, then the fixtures",
+            "Ceiling, then walls, then fixtures, then floor",
+            "Any order at all, as long as the crew works quickly"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Work top-down so falling residue lands on surfaces not yet cleaned, and work from the least to the most affected rooms."
+        },
+        {
+          "questionText": "What must happen before charred materials are removed as source material?",
+          "options": [
+            "The odour treatment for the whole of the house",
+            "The hazardous-materials check for that area",
+            "The final verification and the handover to the owner",
+            "Repainting the walls and ceilings in that room"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Source removal disturbs materials, so it comes after the asbestos, lead and ash checks (Module 3) have cleared that area."
+        },
+        {
+          "questionText": "A 4.0 m by 3.4 m room has a 2.4 m ceiling, a 2.1 m² window and a 1.7 m² door. What is the wall area to clean?",
+          "options": [
+            "About 31.7 m²",
+            "About 35.5 m²",
+            "About 13.6 m²",
+            "About 45.3 m²"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Perimeter 2 × (4.0 + 3.4) = 14.8 m; × 2.4 = 35.5 m²; less 3.8 m² of openings = 31.7 m². With the 13.6 m² ceiling the total is 45.3 m²."
+        },
+        {
+          "questionText": "An office floor of 600 m² has a grid ceiling of 1,200 mm × 600 mm tiles. About how many tiles is that?",
+          "options": [
+            "About 500",
+            "About 720",
+            "About 833",
+            "About 1,000"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "One tile is 1.2 × 0.6 = 0.72 m², so 600 ÷ 0.72 ≈ 833 tiles. Record the count you replace and the test result behind it."
+        }
+      ]
+    },
+    {
+      "quizId": "e5b71a3c-9f24-4d68-8c1b-3a6d92f0e055",
+      "lessonTitle": "Module 5 check",
+      "title": "CARSI Fire & Smoke Restoration Practitioner — Module 5 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Why does residue from burnt PVC threaten metal fittings and electronics?",
+          "options": [
+            "PVC residue is magnetic, so it attracts metal dust onto fittings",
+            "PVC smoke only affects painted surfaces, not bare metal",
+            "Burning PVC forms hydrogen chloride, an acid that corrodes metal",
+            "It does not: only water from firefighting corrodes metal"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Hydrogen chloride from burning PVC deposits on materials, and studies show smoke causing pitting corrosion of stainless steel and aluminium alloy that worsens with time."
+        },
+        {
+          "questionText": "What did corrosion research show about humidity and smoke?",
+          "options": [
+            "Corrosion depends on factors including humidity and time",
+            "Humidity has no measurable effect on smoke corrosion",
+            "Only very dry air lets smoke residue corrode metal",
+            "Corrosion stops completely after the first hour or so"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Studies used high humidity and found corrosion depends on the metal, temperature, humidity, exposure time and surface. Lowering humidity is part of mitigation."
+        },
+        {
+          "questionText": "The owner wants to switch on smoke-filmed point-of-sale terminals to see if they work. What do you advise?",
+          "options": [
+            "Switch them on, then clean them only if they fail to start",
+            "Spray them with water to rinse the residue, then switch on",
+            "Run them for an hour so the heat dries out the residue",
+            "Do not power them; isolate, document and refer to a specialist"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Powering a contaminated board can turn a cleanable item into a loss. Isolate it and refer it to an electronics restoration specialist."
+        },
+        {
+          "questionText": "Which three groups are used to triage fire-affected contents?",
+          "options": [
+            "Clean, dirty and very dirty, sorted by how they look",
+            "Restore on site, restore off site, total loss",
+            "Owner’s, tenant’s and insurer’s, by who paid for them",
+            "Keep, sell and donate, as the owner prefers"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Every item is photographed and inventoried, then placed in one of the three groups before it is cleaned or moved."
+        },
+        {
+          "questionText": "A ducted system ran for an hour after the fire. What is the rule for it?",
+          "options": [
+            "Run it on high for a day to clear the smoke from the house",
+            "Keep it off until professionally cleaned and filters replaced",
+            "Replace the filter and switch it straight back on again",
+            "Ignore it, because ductwork is outside the restoration scope"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Running a contaminated system re-contaminates rooms you have already cleaned. Assess outlets, filters, coil and ductwork and record any referral."
+        },
+        {
+          "questionText": "A 72.9 m³ kitchen holds about 86 kg of air. Air drops from 17.0 to 10.5 g/kg. About how much water leaves the air?",
+          "options": [
+            "About 5.6 kg",
+            "About 56 kg",
+            "About 0.056 kg",
+            "About 0.56 kg"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "17.0 − 10.5 = 6.5 g/kg; 6.5 × 86 ≈ 559 g ≈ 0.56 kg. The air dries fast, but wet materials keep feeding it."
+        },
+        {
+          "questionText": "The owners of a bushfire-affected house want to restart the ducted evaporative cooler that ran through the smoke. What do you advise?",
+          "options": [
+            "Restart it on high to flush the ash out of the ducts",
+            "Keep it off until the system and ducts are cleaned",
+            "Restart it once the outlet grilles are wiped down",
+            "Restart it with new pads; the ducts clear themselves"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Running it before cleaning blows residue across cleaned rooms. EPA Victoria advises professional cleaning of HVAC units and all ductwork, with filters replaced."
+        }
+      ]
+    },
+    {
+      "quizId": "f8c26d4e-3a95-4e17-b9d0-5c1e73a2f066",
+      "lessonTitle": "Module 6 check",
+      "title": "CARSI Fire & Smoke Restoration Practitioner — Module 6 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Which order controls smoke odour?",
+          "options": [
+            "Remove the source, clean, seal, treat remaining odour, verify",
+            "Treat with a device, then clean, then remove the source",
+            "Seal everything first, then clean the surfaces, then verify",
+            "Verify first, then remove the source, then clean and seal"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Odour is residue. Device treatments work only after source removal and cleaning; sealing locks in what cannot be cleaned."
+        },
+        {
+          "questionText": "What are the ozone workplace limits in Australia and New Zealand?",
+          "options": [
+            "Australia 1 ppm peak; New Zealand 0.1 ppm ceiling",
+            "Australia 0.1 ppm peak; New Zealand has no ozone limit",
+            "Both 0.1 ppm (0.2 mg/m³): AU peak limit, NZ ceiling",
+            "Both 0.5 ppm as an eight-hour time-weighted average"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Australia: peak limitation of 0.1 ppm (0.2 mg/m³). New Zealand: WES ceiling of 0.1 ppm (0.2 mg/m³), not to be exceeded at any time."
+        },
+        {
+          "questionText": "A tenant returns tomorrow morning. Can an overnight ozone treatment go ahead?",
+          "options": [
+            "Yes, as long as the windows are opened at 6 am to air it out",
+            "Yes, because 0.1 ppm is a safe level for the occupants too",
+            "Yes, if the tenant sleeps in another room with the door shut",
+            "No: ozone needs an empty space; re-entry is decided on readings"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "The 0.1 ppm figure is a worker limit, not occupant clearance. Re-entry is a site-specific decision based on the manufacturer’s instructions and calibrated readings."
+        },
+        {
+          "questionText": "A supplier says a hydroxyl unit is safe with the family at home. What does this course advise?",
+          "options": [
+            "Accept it, because the unit is not an ozone generator",
+            "Run it at double the setting so the odour clears faster",
+            "Ask for an independent test report; keep people out until known",
+            "Use it in the bedrooms only, where the family sleeps"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "A 2021 study measured organic acids and new particles forming while a hydroxyl generator ran. The CARSI Ozone course recommends keeping people out until you know what yours produces."
+        },
+        {
+          "questionText": "Under New Zealand’s Consumer Guarantees Act, how must a restoration service be carried out?",
+          "options": [
+            "Only in the way the insurer directs, whatever the result",
+            "With reasonable care and skill, and fit for purpose",
+            "At the lowest possible price the restorer can offer",
+            "Within 24 hours of the fire, whatever the job size"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "The CGA guarantees services are carried out with reasonable care and skill and are fit for purpose. In Australia the ACL requires an acceptable level of care and skill."
+        },
+        {
+          "questionText": "A clean-and-seal stage is A$3,850 excluding GST. What is the price including Australian GST?",
+          "options": [
+            "A$4,235",
+            "A$3,850",
+            "A$4,042.50",
+            "A$4,427.50"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Australian GST is 10 %: 3,850 × 0.10 = 385, so 3,850 + 385 = A$4,235. Show the area, rate and GST separately."
+        },
+        {
+          "questionText": "An owner asks whether a negative ion generator will remove the fine smoke residue left in a bedroom. What is the accurate answer?",
+          "options": [
+            "Yes, if it runs for 24 hours with the windows shut",
+            "Yes, and it is safe because it makes no ozone",
+            "No, these devices do not remove fine particles",
+            "Only when it is paired with an odour absorber"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "NSW Health says humidifiers, negative ion generators and odour absorbers do not remove fine particles in bushfire smoke. Find and clean the source."
+        }
+      ]
+    },
+    {
+      "quizId": "ce2e5ad2-3bec-4437-9572-8e1b22c4d1bd",
+      "lessonTitle": "Final knowledge check",
+      "title": "CARSI Fire & Smoke Restoration Practitioner — Final knowledge check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Why must the hazardous-materials check come before any cleaning on a fire job?",
+          "options": [
+            "Cleaning chemicals do not work on hazardous materials",
+            "The insurer requires the check for billing purposes only",
+            "Cleaning can disturb and spread asbestos, lead dust or toxic ash",
+            "It does not: cleaning can start straight away on arrival"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "The arc puts make-safe and the hazard check first because wiping, brushing and source removal disturb materials and put contaminants into the air."
+        },
+        {
+          "questionText": "Which statement about PM2.5 is correct?",
+          "options": [
+            "They are small enough to reach deep into the lungs and blood",
+            "They are large enough to see as flakes of ash on surfaces",
+            "They only exist outdoors during bushfires, never indoors",
+            "They become harmless as soon as the fire has been put out"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "PM2.5 particles are under 2.5 microns. They can linger and reach dangerous levels inside buildings after the fire."
+        },
+        {
+          "questionText": "A 1995 house in Nelson, New Zealand, has fire-cracked cladding. Should you suspect asbestos?",
+          "options": [
+            "No: asbestos stopped being used everywhere in 1990",
+            "No: cladding products never contained any asbestos",
+            "Only if the house is in Australia, not New Zealand",
+            "Yes: in New Zealand, buildings before 2000 may contain it"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "WorkSafe NZ says any building built or renovated before 2000 could contain asbestos. In Australia the rule is any building built or renovated before the 31 December 2003 ban, with pre-1990 buildings the most likely."
+        },
+        {
+          "questionText": "Who removes fire-damaged asbestos-containing material in either country?",
+          "options": [
+            "A Class B licensed asbestos removalist",
+            "A Class A licensed asbestos removalist",
+            "The restoration crew wearing P2 respirators",
+            "The property owner, with council approval"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "NSW EPA treats fire-impacted ACM as friable (Class A); WorkSafe NZ says to reclassify it as friable and use a Class A removalist."
+        },
+        {
+          "questionText": "A cutting method keeps a crew at 0.04 mg/m³ of respirable crystalline silica. Which statement is correct?",
+          "options": [
+            "Under both the Australian and New Zealand standards",
+            "Under the AU standard but above the NZ standard",
+            "Above both the Australian and New Zealand standards",
+            "Above the AU standard but under the NZ standard"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Australia: 0.05 mg/m³. New Zealand: 0.025 mg/m³. 0.04 sits between them."
+        },
+        {
+          "questionText": "How much copper, chromium and arsenic can CCA ash and char contain by weight?",
+          "options": [
+            "Up to 0.1 %",
+            "Up to 50 %",
+            "None once burnt",
+            "Up to 10 %"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "EPA Victoria and Queensland Health say the ash and char can contain up to 10 % by weight copper, chromium and arsenic."
+        },
+        {
+          "questionText": "Which residue is a thin yellowish film from a cooking fire, with a very strong smell?",
+          "options": [
+            "Protein residue",
+            "Dry smoke residue",
+            "Fuel-oil residue",
+            "Wet smoke residue"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Protein residue is near-invisible but discolours paint and varnish, and its odour is out of proportion to what you see."
+        },
+        {
+          "questionText": "Which cleaning approach suits dry, powdery soot?",
+          "options": [
+            "A wet wipe first, so the soot does not become airborne",
+            "A solvent degreaser first, to cut through the film",
+            "Dry methods first: HEPA vacuum and dry chemical sponge",
+            "High-pressure water first, then a dry sponge to finish"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Liquids smear dry soot into the surface; dry methods come first, then wet methods only if testing shows they are needed."
+        },
+        {
+          "questionText": "What did a study of smoke from many materials find about corrosion?",
+          "options": [
+            "Only the smoke from burning PVC was found to be corrosive",
+            "No smoke was corrosive when held at 75 % relative humidity",
+            "Corrosion only happened on metal heated above 100 °C",
+            "All smokes tested were corrosive, varying with metal and humidity"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Hirschler and Smith found all smokes tested were corrosive, with corrosion depending on metal, temperature, humidity, exposure time and surface."
+        },
+        {
+          "questionText": "A ducted system is filmed with soot inside. When can it run again?",
+          "options": [
+            "Straight away, as long as it runs on recirculation",
+            "After the carpet and soft furnishings have been cleaned",
+            "Once professionally cleaned with its filters replaced",
+            "Once the smell of smoke in the house has faded"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "A contaminated system re-contaminates cleaned rooms, so it stays off and isolated until cleaned."
+        },
+        {
+          "questionText": "What is the workplace ozone limit in both Australia and New Zealand?",
+          "options": [
+            "1.0 ppm as an eight-hour time-weighted average",
+            "0.1 ppm (0.2 mg/m³), not to be exceeded at any time",
+            "0.5 ppm averaged over any 15-minute period",
+            "There is no ozone limit in either country"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Australia has a peak limitation of 0.1 ppm and New Zealand a ceiling of 0.1 ppm. It is a worker limit, not clearance for occupants."
+        },
+        {
+          "questionText": "ICNZ advice to New Zealand policyholders after a fire is to contact the insurer when?",
+          "options": [
+            "As soon as they can and before having any work done",
+            "Only after all of the repairs have been finished",
+            "Only if the damage looks expensive to put right",
+            "Any time within 12 months of the fire"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "ICNZ advises contacting the insurer before any work is done. For the restorer, get scope approval before work beyond emergency mitigation."
+        }
+      ]
+    }
+  ]
+}

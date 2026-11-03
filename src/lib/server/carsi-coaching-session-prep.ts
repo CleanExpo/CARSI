@@ -1,4 +1,5 @@
 import type { SessionClaims } from '@/lib/auth/session-jwt';
+import { COACHING_SESSION_PREP_MIN_LENGTH } from '@/lib/coaching-portal/session-prep';
 import { carsiCoachingPortalPath } from '@/lib/marketing/carsi-coaching-program';
 import { prisma } from '@/lib/prisma';
 import { getAppOrigin } from '@/lib/server/app-url';
@@ -11,30 +12,54 @@ import {
 import { sendEmail } from '@/lib/server/email';
 import { renderCoachingSessionPrepCoachEmail } from '@/lib/server/email-templates';
 
-const MIN_PREP_LENGTH = 15;
+export async function persistCoachingSessionPrepNotes(
+  userId: string,
+  notes: string
+): Promise<void> {
+  const row = await getCoachingPortalRowForUser(userId);
+  if (row) {
+    const current = workspaceFromRow(row);
+    await updateCoachingPortalWorkspace(userId, {
+      ...current,
+      sessionPrepNotes: notes,
+    });
+    return;
+  }
+
+  await prisma.carsiCoachingBusinessProfile.upsert({
+    where: { userId },
+    create: { userId, sessionPrepNotes: notes },
+    update: { sessionPrepNotes: notes },
+  });
+}
+
+export async function readCoachingSessionPrepNotes(userId: string): Promise<string> {
+  const [row, profile] = await Promise.all([
+    getCoachingPortalRowForUser(userId),
+    prisma.carsiCoachingBusinessProfile.findUnique({
+      where: { userId },
+      select: { sessionPrepNotes: true },
+    }),
+  ]);
+
+  const fromSubscription = row ? workspaceFromRow(row).sessionPrepNotes.trim() : '';
+  if (fromSubscription) return fromSubscription;
+  return profile?.sessionPrepNotes?.trim() ?? '';
+}
 
 export async function saveCoachingSessionPrep(
   claims: SessionClaims,
   input: { notes: string; notifyCoach: boolean }
 ): Promise<{ ok: true; savedAt: string } | { ok: false; detail: string }> {
   const notes = input.notes.trim();
-  if (notes.length < MIN_PREP_LENGTH) {
+  if (notes.length < COACHING_SESSION_PREP_MIN_LENGTH) {
     return {
       ok: false,
-      detail: `Add at least ${MIN_PREP_LENGTH} characters so Phill can prepare.`,
+      detail: `Add at least ${COACHING_SESSION_PREP_MIN_LENGTH} characters so Phill can prepare.`,
     };
   }
 
-  const row = await getCoachingPortalRowForUser(claims.sub);
-  if (!row) {
-    return { ok: false, detail: 'Active coaching subscription required.' };
-  }
-
-  const current = workspaceFromRow(row);
-  await updateCoachingPortalWorkspace(claims.sub, {
-    ...current,
-    sessionPrepNotes: notes,
-  });
+  await persistCoachingSessionPrepNotes(claims.sub, notes);
 
   const profile = await prisma.carsiCoachingBusinessProfile.findUnique({
     where: { userId: claims.sub },

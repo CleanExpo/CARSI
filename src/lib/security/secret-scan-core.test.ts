@@ -28,6 +28,13 @@ describe('findSecretToken — detects real secrets', () => {
     expect(findSecretToken('WOO=' + makeKey('ck'))).not.toBeNull();
   });
 
+  it('flags common non-Stripe provider tokens (GP-573)', () => {
+    const ghBody = (ALNUM + ALNUM).slice(0, 36);
+    expect(findSecretToken('GH=' + 'ghp_' + ghBody)).not.toBeNull();
+    expect(findSecretToken('AWS=' + 'AKIA' + 'ABCDEFGHIJKLMNOP')).not.toBeNull();
+    expect(findSecretToken('SLACK=' + 'xoxb-' + ALNUM.slice(0, 24))).not.toBeNull();
+  });
+
   it('detects a real key even when the line ALSO contains ... / ${…} / example (the whole-line bug)', () => {
     const k = makeKey('sk', 'live');
     expect(findSecretToken('key: "' + k + '", // ...more')).not.toBeNull();

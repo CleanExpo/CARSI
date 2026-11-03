@@ -172,7 +172,11 @@ export async function fulfillCourseCheckoutForUser(params: {
 }> {
   const { claims, courseSlug, paymentReference, purchaseMode, teamSeatCount } = params;
 
-  const result = await enrollStudentInCourse(claims, courseSlug, paymentReference);
+  // A team buyer need not hold the course prerequisite (founder decision 02/11/2026): their
+  // own seat is issued LOCKED (prerequisiteGated) until they complete it, like any seat.
+  const result = await enrollStudentInCourse(claims, courseSlug, paymentReference, {
+    onPrerequisiteNotMet: purchaseMode === 'team' ? 'lock' : 'refuse',
+  });
   const alreadyEnrolled = result === 'already_enrolled';
 
   if (purchaseMode !== 'team' || !teamSeatCount || teamSeatCount < 2) {
@@ -225,7 +229,8 @@ export async function enrollTeamMemberInPurchasedCourse(
   if (!claims) return;
 
   try {
-    await enrollStudentInCourse(claims, slug, `team:${teamId}`);
+    // Without the prerequisite the seat is issued LOCKED, not skipped (02/11/2026).
+    await enrollStudentInCourse(claims, slug, `team:${teamId}`, { onPrerequisiteNotMet: 'lock' });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     if (msg !== 'COURSE_NOT_FOUND') {

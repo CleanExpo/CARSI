@@ -1,0 +1,755 @@
+{
+  "version": 1,
+  "courseSlug": "trauma-crime-scene-decontamination-fundamentals",
+  "status": "draft",
+  "note": "DRAFT v1 module checks and final designation exam for the CARSI Trauma & Biohazard Decontamination Practitioner course. Original CARSI questions written for Australian and New Zealand conditions; no IICRC standard text reproduced. SME review and sign-off required before seeding.",
+  "quizzes": [
+    {
+      "quizId": "9b834e07-3c4d-4486-9c69-ecb025acf516",
+      "lessonTitle": "Module 1 check",
+      "title": "CARSI Trauma & Biohazard Decontamination Practitioner — Module 1 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Which workplace safety law applies to a trauma decontamination job in Christchurch?",
+          "options": [
+            "The model WHS Act as implemented in New South Wales",
+            "The Victorian Occupational Health and Safety Act 2004",
+            "No workplace law applies to cleaning contractors",
+            "The Health and Safety at Work Act 2015 (HSWA)"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "New Zealand work is governed by HSWA 2015, which puts the primary duty on the PCBU. The model WHS laws apply in Australian jurisdictions except Victoria."
+        },
+        {
+          "questionText": "Which Australian jurisdiction has not implemented the model WHS laws?",
+          "options": [
+            "Queensland",
+            "Victoria",
+            "Tasmania",
+            "The ACT"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Safe Work Australia states the model laws are implemented in all jurisdictions except Victoria, which uses its Occupational Health and Safety Act 2004."
+        },
+        {
+          "questionText": "What makes trauma and biohazard decontamination different from ordinary cleaning?",
+          "options": [
+            "It combines biological, sharps, chemical and psychological hazards that must be controlled before work starts",
+            "It uses stronger fragrances to cover odours",
+            "It is always done by the property owner",
+            "It never needs a written method statement"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "The work exposes the crew to blood-borne viruses, sharps, concentrated chemicals and traumatic material, so hazards are assessed and controlled first."
+        },
+        {
+          "questionText": "When may decontamination of a scene begin?",
+          "options": [
+            "As soon as the family asks you to start",
+            "Before police arrive, to save time",
+            "After police, and the coroner where involved, have released the scene and a person with authority has instructed you",
+            "Whenever the neighbours complain about the smell"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Work starts only after release and on the instruction of someone with authority over the property; record who released it and who instructed you."
+        },
+        {
+          "questionText": "A family member wants to walk into the affected room while you work. What do you do?",
+          "options": [
+            "Let them in if they promise not to touch anything",
+            "Keep them out of the contaminated zone and explain kindly why",
+            "Hand them a pair of gloves and let them help",
+            "Leave the door open so they can watch"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Your duty extends to others affected by the work, including family. The contaminated zone is for people in full PPE only."
+        },
+        {
+          "questionText": "You find a box of photographs and jewellery in the affected bedroom. What is the right approach?",
+          "options": [
+            "Ask before moving or discarding personal items, and set keepsakes aside for the family where they can be cleaned or bagged",
+            "Discard everything in the room to be safe",
+            "Keep valuable items for safekeeping at your depot without telling anyone",
+            "Photograph the items and post them to show the job"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Personal items belong to the family. Ask first, set them aside safely, and never share images of a job."
+        },
+        {
+          "questionText": "What pass mark applies to the module checks, the practical task and the final designation exam?",
+          "options": [
+            "70% for the module checks and 80% for the final exam only",
+            "50% for each, because the instructor reviews every attempt",
+            "100% for the practical task and 70% for the rest",
+            "80% for every module check, the practical task and the final exam"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "All three assessments share one bar: 80%. A missed step on a trauma site can hurt someone, so a near miss in a check is a signal to revisit the lesson."
+        }
+      ]
+    },
+    {
+      "quizId": "45fd886d-ad20-49b0-9169-0bd6e9a691b2",
+      "lessonTitle": "Module 2 check",
+      "title": "CARSI Trauma & Biohazard Decontamination Practitioner — Module 2 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Which three blood-borne viruses matter most in this work in Australia and New Zealand?",
+          "options": [
+            "Influenza, measles and hepatitis A",
+            "Tetanus, hepatitis A and norovirus",
+            "Hepatitis B, hepatitis C and HIV",
+            "COVID-19, chickenpox and HIV"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "healthdirect names hepatitis B, hepatitis C and HIV as the major blood-borne viruses in Australia."
+        },
+        {
+          "questionText": "A worker with a cut on his knuckle touches a dried stain bare-handed. Which exposure route is this?",
+          "options": [
+            "A sharps injury",
+            "A mucous membrane splash",
+            "No route: dried blood cannot transmit a virus",
+            "Contact with non-intact skin"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Broken skin lets fluid in. Cover cuts with a waterproof dressing and glove up before touching any stain, wet or dry."
+        },
+        {
+          "questionText": "Why are standard precautions applied on every trauma job?",
+          "options": [
+            "Because the family always tells you the health status",
+            "Only when the deceased was known to be unwell",
+            "Because they replace the need for a risk assessment",
+            "Because you cannot tell by looking whether blood carries a virus"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Standard precautions treat all blood and body fluids as potentially infectious, whatever the source."
+        },
+        {
+          "questionText": "In Australia, who is the Immunisation Handbook's hepatitis B recommendation for workers aimed at?",
+          "options": [
+            "Only hospital doctors and nurses",
+            "People whose work involves handling human tissue, blood or body fluids, or used needles, who are not immune",
+            "Only people over 60",
+            "Nobody: hepatitis B vaccine is for travel only"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "The Handbook recommends hepatitis B vaccine for non-immune people whose work involves handling blood, body fluids or used needles."
+        },
+        {
+          "questionText": "What is the first thing to do after a needlestick injury on site?",
+          "options": [
+            "Wash the wound with soap and water for at least 30 seconds, then go straight to a doctor or emergency department",
+            "Squeeze the wound hard to push the blood out",
+            "Finish the job, then see a doctor next week",
+            "Pour disinfectant into the wound and carry on"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "healthdirect advises washing for at least 30 seconds and getting medical advice immediately. Do not squeeze the wound."
+        },
+        {
+          "questionText": "If HIV post-exposure prophylaxis is recommended, when should it start?",
+          "options": [
+            "Within 14 days",
+            "Only after the source person is tested",
+            "As soon as possible, and within 72 hours",
+            "After the 3-dose hepatitis B course is finished"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "The ASHM national guidelines say PEP should start as soon as possible and within 72 hours; the earlier the better."
+        },
+        {
+          "questionText": "In New South Wales, which outcome within 48 hours of a needlestick makes it notifiable to SafeWork NSW?",
+          "options": [
+            "The worker felt a jab through the glove",
+            "The wound was washed for 30 seconds on site",
+            "The item that caused it was a needle rather than glass",
+            "The worker needs HIV PEP, or hepatitis B vaccine and immunoglobulin because they are not immune"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "SafeWork NSW names those two treatments within 48 hours as the triggers, and an infection that follows must also be notified. The PCBU notifies immediately after becoming aware."
+        }
+      ]
+    },
+    {
+      "quizId": "107191ed-4951-43d0-bd2a-e377bd7173c6",
+      "lessonTitle": "Module 3 check",
+      "title": "CARSI Trauma & Biohazard Decontamination Practitioner — Module 3 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Which control is the most effective on the hierarchy?",
+          "options": [
+            "Wearing a respirator",
+            "Eliminating the hazard",
+            "Writing a procedure",
+            "Putting up a warning sign"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Elimination is the best way to manage risk; administrative controls and PPE are the least effective."
+        },
+        {
+          "questionText": "Under New Zealand's GRWM Regulations 2016, when is PPE used?",
+          "options": [
+            "To minimise any risk that remains after higher-order and administrative controls",
+            "As the first control on every job",
+            "Only when the client asks for it",
+            "Instead of a risk assessment"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Regulation 6 places PPE last: if a risk remains after other controls, the PCBU ensures suitable PPE is provided and used."
+        },
+        {
+          "questionText": "The crew finds a second affected room halfway through the job. What happens to the SWMS?",
+          "options": [
+            "Carry on with the original SWMS",
+            "Throw it away; it no longer applies",
+            "Stop, reassess and revise the SWMS, then re-brief the crew",
+            "Revise it after the job is finished"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "A SWMS is written for the site as found. When the site changes, work stops until the hazards and controls are updated and briefed."
+        },
+        {
+          "questionText": "A surgical mask is offered for scraping dried blood. Why is it not enough?",
+          "options": [
+            "It is too hot to wear",
+            "Surgical masks are banned in Australia",
+            "It protects better than a respirator, so it is overkill",
+            "It protects against large droplet splashes only, not small particles or aerosols"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "WorkSafe Queensland notes surgical masks protect against splashes of large droplets only. Scraping and scrubbing can make particles that need a respirator."
+        },
+        {
+          "questionText": "What must happen before a worker first wears a tight-fitting respirator?",
+          "options": [
+            "They read the box",
+            "They pass a fit test",
+            "They shave once a month",
+            "Nothing, provided it is the right size"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "SafeWork SA states workers must pass a fit test before first wearing a tight-fitting respirator, then fit-check it each time it goes on."
+        },
+        {
+          "questionText": "When taking PPE off in the transition zone, what comes off first?",
+          "options": [
+            "The outer gloves, the dirtiest item",
+            "The respirator",
+            "The eye protection",
+            "The inner gloves"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Doffing starts with the most contaminated item and ends with hand hygiene, so clean hands are never contaminated by dirty gear."
+        },
+        {
+          "questionText": "In Australia, when does a SWMS become a legal requirement on a trauma decontamination job?",
+          "options": [
+            "When the work becomes high risk construction work, such as work likely to disturb asbestos",
+            "On every job, whatever the task",
+            "Only when the client asks for one in writing",
+            "Never: a SWMS is optional in every case"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A SWMS is required for high risk construction work, which includes work likely to disturb asbestos. On other jobs it is the business’s way of recording how it manages risk, and a generic one must be reviewed for the site."
+        }
+      ]
+    },
+    {
+      "quizId": "0039a743-d487-4450-804e-bbb595b1adc5",
+      "lessonTitle": "Module 4 check",
+      "title": "CARSI Trauma & Biohazard Decontamination Practitioner — Module 4 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "In which zone does PPE come off and waste get sealed?",
+          "options": [
+            "The clean zone",
+            "The contaminated zone",
+            "The client's kitchen",
+            "The transition zone"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "The transition zone sits between dirty and clean; it is where bags are sealed, tools wiped and PPE removed."
+        },
+        {
+          "questionText": "Why is the visible edge of a carpet stain not taken as the boundary of removal?",
+          "options": [
+            "Carpet always needs to be removed wall to wall",
+            "Because the insurer pays by the square metre",
+            "Because the stain will spread overnight",
+            "Fluids migrate into underlay, the floor beneath and nearby gaps beyond what shows on the surface"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Blood and body fluids travel below and beyond the surface stain, so the crew inspects and cuts past the visible edge."
+        },
+        {
+          "questionText": "Which material is usually removed rather than cleaned in place?",
+          "options": [
+            "Ceramic floor tiles",
+            "A glass window",
+            "A mattress saturated with blood",
+            "A stainless steel bench"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Porous materials saturated with blood cannot be reliably cleaned through; non-porous surfaces are usually cleaned and disinfected."
+        },
+        {
+          "questionText": "Why must a surface be cleaned before a disinfectant is applied?",
+          "options": [
+            "Cleaning makes the disinfectant smell better",
+            "It is only needed for carpets",
+            "Dirt and grime stop the disinfectant reaching the surface or working properly",
+            "The disinfectant is cheaper that way"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Department of Health guidance says thorough cleaning must come before disinfection, because soil blocks contact and affects how well the product works."
+        },
+        {
+          "questionText": "In Australia, a disinfectant label claims it kills viruses. What does that mean for the product?",
+          "options": [
+            "It is a specific claim, so the product must be listed on the ARTG before supply",
+            "It needs no regulation",
+            "It must be registered with the local council",
+            "It may only be used in hospitals"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "The TGA treats claims against viruses, spores, tuberculosis, mycobacteria or fungi as specific claims requiring ARTG listing."
+        },
+        {
+          "questionText": "A label directs 20 mL of concentrate per litre. How much goes into a 5 L bucket?",
+          "options": [
+            "20 mL",
+            "100 mL",
+            "50 mL",
+            "250 mL"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "20 mL per litre multiplied by 5 L is 100 mL. Measure it with a graduated jug, never by eye."
+        },
+        {
+          "questionText": "The label contact time is 10 minutes, but in a warm kitchen the disinfectant dries in 4. What do you do?",
+          "options": [
+            "Accept 4 minutes, because the surface was wet when applied",
+            "Work smaller sections and re-wet so it stays wet for 10 minutes, or choose a product labelled for that surface",
+            "Double the concentrate so it works faster",
+            "Spray a second product over the top once the first has dried"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "The product only works if the surface stays wet for the full label contact time. Re-wet in smaller sections, check the SDS before changing ventilation, and never alter the dilution or mix products."
+        }
+      ]
+    },
+    {
+      "quizId": "e3f49b7d-5bde-43d2-8fcd-8f5ccfe0c889",
+      "lessonTitle": "Module 5 check",
+      "title": "CARSI Trauma & Biohazard Decontamination Practitioner — Module 5 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Where must a used needle never be placed?",
+          "options": [
+            "In a rigid sharps container",
+            "Beside the container while you fetch tongs, on a stable tray",
+            "In a sharps container held by its handle",
+            "In a waste bag"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Sharps must never be placed in waste bags. They go straight into a rigid, puncture-resistant sharps container."
+        },
+        {
+          "questionText": "How should the sharps container move during a search?",
+          "options": [
+            "Carry the container to the sharp",
+            "Carry the sharp to the container in your hand",
+            "Throw sharps into the container from a distance",
+            "Leave sharps for the client to collect"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Bringing the container to the sharp keeps the distance the sharp travels, and the chance of a slip, as short as possible."
+        },
+        {
+          "questionText": "Which standard replaced AS 4031 and AS/NZS 4261 for sharps containers?",
+          "options": [
+            "AS/NZS 23907:2023",
+            "AS/NZS 3760:2022",
+            "AS/NZS 1716",
+            "NZS 4304:2002"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "AS/NZS 23907:2023 amalgamated and replaced the older single-use and reusable container standards. Check which edition your regulator names."
+        },
+        {
+          "questionText": "How full may a clinical waste bag be filled?",
+          "options": [
+            "Right to the top, then compacted",
+            "No more than two-thirds of its capacity",
+            "Three-quarters, then taped",
+            "As full as it will hold if double-bagged"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "NSW Health policy says waste bags must not be filled beyond two-thirds, so they can be closed securely without compaction."
+        },
+        {
+          "questionText": "In Victoria, a paid job produces 144 L of clinical waste. What does transport require?",
+          "options": [
+            "Nothing, if it is double-bagged",
+            "A permitted transporter and a Waste Tracker record",
+            "Only a council skip permit",
+            "A note to the landlord"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Clinical waste (R100) is reportable priority waste in Victoria. The exemption applies only to loads under 50 litres carried for no fee or reward."
+        },
+        {
+          "questionText": "Which New Zealand standard covers the management of healthcare waste?",
+          "options": [
+            "AS/NZS 3112",
+            "AS/NZS 1715",
+            "NZS 4304:2002",
+            "NZS 3604"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "NZS 4304:2002 Management of Healthcare Waste sets out classification, packaging, labelling, transport and disposal; councils set local rules."
+        },
+        {
+          "questionText": "A paid job in Geelong produces two 72 L clinical waste bags, each filled to two-thirds. What applies?",
+          "options": [
+            "Nothing extra, because each bag is under 50 L",
+            "The bags can go in general waste if double-bagged",
+            "The 96 L load is over 50 L and paid, so it needs a permitted transporter and a Waste Tracker record",
+            "Only the sharps container needs to be tracked"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Two bags at two-thirds hold 48 L each, 96 L in total. In Victoria only a net load under 50 L carried for no fee or reward escapes the permit and tracking rules, and a paid job never qualifies."
+        }
+      ]
+    },
+    {
+      "quizId": "c1237c61-f4ab-44e5-bad9-c3a29d613396",
+      "lessonTitle": "Module 6 check",
+      "title": "CARSI Trauma & Biohazard Decontamination Practitioner — Module 6 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Under Australian WHS law, what does \"health\" include?",
+          "options": [
+            "Both physical and psychological health",
+            "Physical health only",
+            "Only injuries that need hospital treatment",
+            "Only illnesses caused by chemicals"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "The model WHS Act defines health as physical and psychological health, so traumatic exposure is a workplace hazard."
+        },
+        {
+          "questionText": "Which Victorian regulations on psychosocial hazards commenced on 1 December 2025?",
+          "options": [
+            "The model WHS Regulations 2011",
+            "The Occupational Health and Safety (Psychological Health) Regulations 2025",
+            "The Environment Protection Regulations 2021",
+            "The GRWM Regulations 2016"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "WorkSafe Victoria confirms the Psychological Health Regulations commenced on 1 December 2025 and include traumatic events or content."
+        },
+        {
+          "questionText": "Which is a control Safe Work Australia gives for workers exposed to traumatic events?",
+          "options": [
+            "Ask workers to keep their feelings to themselves",
+            "Send the same person to every traumatic job",
+            "Increase breaks, recovery time and support",
+            "Remove all breaks so the job finishes faster"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Safe Work Australia lists more breaks, recovery time and support, rotating roles, and honest job information among its controls."
+        },
+        {
+          "questionText": "What does the supervisor confirm in the handover walk-through?",
+          "options": [
+            "That the room smells of fragrance",
+            "That the family has paid in full",
+            "That the photographs look good for marketing",
+            "No visible residue, all marked porous material removed, full contact times achieved and no remaining odour source"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Verification is a check of the result in good light, followed by a client walk-through and sign-off recorded in the job file."
+        },
+        {
+          "questionText": "A client says \"skip the paperwork, we trust you\". Does your safety duty move to the client?",
+          "options": [
+            "Yes, once the client signs a waiver",
+            "Yes, if the job is under 10 m²",
+            "Only in New Zealand",
+            "No. A duty holder cannot transfer their duties to another person"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Safe Work Australia states duties are not transferable, and HSWA 2015 s 31 says the same in New Zealand. Keep the file."
+        },
+        {
+          "questionText": "What is the free call-or-text support number in New Zealand?",
+          "options": [
+            "13 11 14",
+            "0800 764 766",
+            "1737",
+            "000"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "In New Zealand, call or text 1737 any time to talk with a trained counsellor. 13 11 14 is Lifeline in Australia; 0800 764 766 is the NZ Poisons Centre."
+        },
+        {
+          "questionText": "At the handover walk-through a faint odour remains near the skirting. What do you do?",
+          "options": [
+            "Find and deal with the source, walk the area again and record what was done",
+            "Mask it with a fragrance product and hand over",
+            "Hand over and note the odour for the client to deal with",
+            "Leave a window open and tell the client it will fade"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A lingering odour suggests a source remains, such as fluid under the skirting. Verification is not complete until the source is found and dealt with, and the file records it."
+        }
+      ]
+    },
+    {
+      "quizId": "6442856d-e14d-4c8a-b80d-42aa4a5b8595",
+      "lessonTitle": "Final designation exam",
+      "title": "CARSI Trauma & Biohazard Decontamination Practitioner — Final designation exam",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "A Melbourne job sits under which workplace safety law?",
+          "options": [
+            "The Victorian Occupational Health and Safety Act 2004",
+            "The model WHS Act as adopted in Victoria",
+            "The NZ Health and Safety at Work Act 2015",
+            "No law, as it is a private home"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Victoria is the one Australian jurisdiction that has not implemented the model WHS laws; WorkSafe Victoria regulates its OHS Act 2004."
+        },
+        {
+          "questionText": "Which statement about blood-borne virus exposure routes is correct?",
+          "options": [
+            "Only sharps injuries can transmit a virus",
+            "Intact skin absorbs viruses readily",
+            "Dried blood carries no risk at all",
+            "Sharps injuries, splashes to mucous membranes and contact with broken skin are the main work routes"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Queensland Health names percutaneous injury and mucous membrane or non-intact skin contact as the occupational exposure routes."
+        },
+        {
+          "questionText": "In New Zealand, how is hepatitis B vaccine listed for adults at occupational risk?",
+          "options": [
+            "Not recommended",
+            "Recommended, but not funded",
+            "Recommended and funded for all workers",
+            "Compulsory by law"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "The NZ Immunisation Handbook lists occupational risk under \"recommended, not funded\"; it is funded after a needle-stick injury."
+        },
+        {
+          "questionText": "There is no post-exposure prophylaxis for which blood-borne virus?",
+          "options": [
+            "HIV",
+            "Hepatitis B",
+            "Hepatitis C",
+            "All three have PEP"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Queensland Health notes no PEP is available for hepatitis C, which is why prevention is critical. PEP exists for HIV and hepatitis B."
+        },
+        {
+          "questionText": "Which respirator standard should workplace respirators comply with?",
+          "options": [
+            "AS/NZS 3816",
+            "AS/NZS 1716",
+            "AS/NZS 23907",
+            "AS/NZS 3112"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "WorkSafe Queensland says respirators used at work should comply with AS/NZS 1716. Fit-test before first use."
+        },
+        {
+          "questionText": "What is wrong with spraying disinfectant on a soiled bench and wiping it after ten seconds?",
+          "options": [
+            "Nothing, provided the product smells strong",
+            "The bench should have been sanded first",
+            "The surface was not cleaned first and the product did not stay wet for its contact time",
+            "Disinfectant should always be wiped off immediately"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Clean first, then apply at the label rate and keep the surface wet for the full contact time stated on the label."
+        },
+        {
+          "questionText": "In New Zealand, which agency approves and classifies hazardous substances such as disinfectants?",
+          "options": [
+            "The Environmental Protection Authority (EPA NZ)",
+            "The Therapeutic Goods Administration",
+            "The local district council",
+            "Safe Work Australia"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "EPA NZ approves and classifies hazardous substances; WorkSafe NZ enforces workplace requirements. The TGA is Australian."
+        },
+        {
+          "questionText": "Which product claim in Australia triggers ARTG listing before supply?",
+          "options": [
+            "A claim that it smells fresh",
+            "A claim that it removes dirt",
+            "A claim that the disinfectant kills viruses",
+            "A claim that it is made in Australia"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Kill claims against viruses, spores, tuberculosis, mycobacteria or fungi are specific claims that require ARTG listing."
+        },
+        {
+          "questionText": "In New South Wales, how is clinical and related waste classified?",
+          "options": [
+            "As general solid waste",
+            "As special waste",
+            "As recyclable waste",
+            "As household waste if double-bagged"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "NSW EPA has pre-classified clinical and related waste as special waste, with specific transport and management requirements."
+        },
+        {
+          "questionText": "Used sharps are found on a commercial site. Where can they go?",
+          "options": [
+            "Only into an approved rigid sharps container for the clinical waste stream",
+            "General rubbish if wrapped in tape",
+            "The recycling bin",
+            "A waste bag inside a box"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "WorkSafe ACT states used sharps cannot be placed in general rubbish or recycling at a workplace; NSW Health says never in waste bags."
+        },
+        {
+          "questionText": "A 72 L clinical waste bag may hold at most how much?",
+          "options": [
+            "72 L",
+            "36 L",
+            "60 L",
+            "48 L"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Two-thirds of 72 L is 48 L. Filling no further lets the bag close securely without compaction."
+        },
+        {
+          "questionText": "Which hazard does Safe Work Australia name that is central to trauma work?",
+          "options": [
+            "Exposure to loud music",
+            "Long commutes to the depot",
+            "Working with computers",
+            "Exposure to traumatic events or materials"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Safe Work Australia names exposure to traumatic events or materials as a psychosocial hazard that PCBUs must manage."
+        },
+        {
+          "questionText": "In New Zealand, how does HSWA define health?",
+          "options": [
+            "Physical health only",
+            "Physical and mental health",
+            "Freedom from infectious disease only",
+            "Whatever the employer decides"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "WorkSafe NZ confirms HSWA defines health as physical and mental health, so psychosocial risks must be managed."
+        },
+        {
+          "questionText": "A worker lifts a mattress at 9:00 am Monday and feels a needlestick. By when must HIV PEP start if recommended?",
+          "options": [
+            "By 9:00 am the following Monday",
+            "Within 24 hours or never",
+            "As soon as possible, and no later than 9:00 am Thursday",
+            "Only after a hepatitis B blood test"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "The window is 72 hours: 9:00 am Monday plus 72 hours is 9:00 am Thursday. Earlier is better, so the worker is assessed the same day."
+        },
+        {
+          "questionText": "Which record belongs in a defensible job file?",
+          "options": [
+            "Each disinfectant used, with its ARTG number or NZ label, the dilution, the area and the contact time",
+            "Social media posts about the job",
+            "Photographs of the family",
+            "A summary written a month later from memory"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Records made as the work happens show what was done. Product, dilution, area and contact time prove the disinfection step."
+        }
+      ]
+    }
+  ]
+}

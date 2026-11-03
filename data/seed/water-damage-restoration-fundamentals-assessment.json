@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "courseSlug": "water-damage-restoration-fundamentals",
+  "status": "approved",
+  "note": "Practical task for the CARSI Water Restoration Practitioner course. Instructor-graded against the rubric. Original CARSI task written for Australian conditions; no IICRC standard text reproduced. SME sign-off 02/11/2026 (PR #992); promoted 03/11/2026 (DECISIONS #48). No seeder reads this file yet: scripts/seed-ccw-truckmount-assessment.ts is hard-wired to the CCW file, so the task is entered in the admin practical-assessment screen.",
+  "assessment": {
+    "id": "01333fce-79ba-4b80-9e26-5f5888bfdd13",
+    "title": "CARSI Water Restoration Practitioner — Practical task: plan and evidence a Category 2 water loss",
+    "passThreshold": 80,
+    "isPublished": true,
+    "instructions": "## Practical task\n\nPlan and document a Category 2 (grey water) water-damage job from first attendance to a defensible dry goal. Use a real job you have attended, or the supplied job: a single-storey Ballarat home where a dishwasher supply hose failed on a Saturday and ran until Sunday afternoon. Grey water has spread across a timber-look floor in the kitchen (4.2 m x 3.0 m) and into the adjoining hallway (3.5 m x 1.0 m), wicking up the plasterboard wall base to about 250 mm. On arrival the air reads 22 degrees C and 68 %RH. A standard 10 A GPO serves the kitchen, shared with the next room. The occupants include an elderly resident.\n\nSubmit one PDF, or a set of photos and documents, containing:\n\n1. **First attendance and the water call.** The category and class with your reasons, the date and time of attendance, and the affected floor area in square metres. State what makes this Category 2 rather than Category 1 or 3, and note the degradation watch.\n2. **Safety and PPE by hazard.** Hazards identified (electrical, biological, slip, structural, chemical), the control applied to each from the top of the hierarchy down, the power isolation and RCD arrangement, and the PPE selected for Category 2 with a fit-test and fit-check note. State when you would stop and escalate.\n3. **Moisture map and dry goal.** A room sketch with numbered reading points, the material and instrument at each point, the dry-standard reference from an unaffected area, and the dry goal. Record the air in degrees C, %RH and g/kg.\n4. **Drying plan and power budget.** The equipment chosen and placed, with a 230 V / 10 A power budget totalling each machine's current draw in amps per circuit and showing the load split so no circuit is overloaded. Note the psychrometric check (dehumidifier outlet g/kg lower than inlet; drying-zone and outside g/kg recorded as context, not proof).\n5. **Documentation and insurance context.** How the job file is built as the work happens, what measured evidence proves drying, how scope changes are authorised, pricing in AUD with GST, and the plain-English explanation given to the elderly occupant.\n\nUse Australian English, metric units and 230 V equipment throughout. Reference any standard by name only; do not copy text from any standard.",
+    "criteria": [
+      {
+        "label": "Water call: category, class and loss size",
+        "description": "Category 2 justified with reasons (source, contamination, time, conditions), class identified, affected area given in square metres, and a degradation watch noted.",
+        "maxPoints": 20
+      },
+      {
+        "label": "Hazard-led safety and PPE",
+        "description": "Hazards identified and controlled from the top of the hierarchy down; 230 V power isolated and RCD used with tested-and-tagged leads; Category 2 PPE selected with a fit-test and fit-check note; stop-and-escalate triggers stated. The elderly occupant is recognised and changes the plan.",
+        "maxPoints": 20
+      },
+      {
+        "label": "Moisture map and defensible dry goal",
+        "description": "Numbered reading points with material and instrument recorded, a dry-standard reference from an unaffected area, a dry goal set from it, and air logged in degrees C, %RH and g/kg.",
+        "maxPoints": 20
+      },
+      {
+        "label": "Drying plan and 230 V power budget",
+        "description": "Equipment chosen and placed with reasons; current draws totalled in amps per 10 A circuit with the load split so no circuit is overloaded; psychrometric check stated (dehumidifier outlet g/kg lower than inlet, with drying-zone and outside g/kg recorded as context); mould hold-rule acknowledged if growth is suspected.",
+        "maxPoints": 20
+      },
+      {
+        "label": "Documentation, insurance context and Australian production",
+        "description": "Job file built as the work happens with measured evidence of drying; scope changes authorised and recorded; pricing in AUD with GST; plain-English occupant communication; Australian English, metric units and 230 V throughout; standards named only, no copied standard text.",
+        "maxPoints": 20
+      }
+    ]
+  }
+}

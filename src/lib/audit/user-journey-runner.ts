@@ -486,11 +486,12 @@ export const COMMON_JOURNEYS: JourneyDefinition[] = [
       {
         id: 'check_routes_health',
         name: 'Check routes health endpoint',
-        description: 'Verify /api/health/routes returns route listing',
+        description:
+          'Internal route listing — requires CRON bearer (GP-573); expect 401 when anonymous',
         action: { type: 'navigate', url: '/api/health/routes' },
         expectedOutcome: {
-          success_indicators: ['page_loaded'],
-          failure_indicators: ['error'],
+          success_indicators: ['401', 'Unauthorized'],
+          failure_indicators: ['total_routes'],
           performance_threshold_ms: 2000,
         },
         timeout_ms: 5000,

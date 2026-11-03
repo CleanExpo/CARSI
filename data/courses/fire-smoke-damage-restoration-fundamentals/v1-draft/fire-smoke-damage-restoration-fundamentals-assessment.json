@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "courseSlug": "fire-smoke-damage-restoration-fundamentals",
+  "status": "draft",
+  "note": "DRAFT v1 practical task for the CARSI Fire & Smoke Restoration Practitioner course. Instructor-graded against the rubric; pass mark 80 % (founder decision 2 November 2026). Original CARSI task written for Australian and New Zealand conditions; no IICRC standard text reproduced. SME review and sign-off required before it is published.",
+  "assessment": {
+    "id": "5b9e2f17-4c83-4a6d-9e05-1d7a3c8b6f77",
+    "title": "CARSI Fire & Smoke Restoration Practitioner — Practical task: plan and evidence a whole fire job",
+    "passThreshold": 80,
+    "isPublished": false,
+    "instructions": "## Practical task\n\nPlan and document a fire and smoke restoration job from first attendance to handover. Use a real job you have attended, or one of the two supplied jobs. **Choose the job for the country you work in**, and apply that country's rules throughout.\n\n**Job A (Australia).** A 1974 single-storey brick-veneer house in Toowoomba, Queensland. A kitchen fire on a Friday night was put out by the fire service. The kitchen (3.8 m x 3.2 m) is heavily sooted with a sticky film; the lounge (5.0 m x 4.2 m) and hall (7.0 m x 1.1 m) have lighter, powdery residue; all three rooms have 2.4 m ceilings. Fibre-cement eaves lining over the kitchen window (0.45 m x 6.0 m) is cracked, with fragments on the patio. A CCA-treated pine pergola beside the kitchen burnt. The ducted reverse-cycle system ran for 40 minutes after the fire. Firefighting water has wetted the kitchen floor. It is 27 degrees C and 76 %RH inside. Power is off at the board. The owners have a 4-year-old and want to move back in within a week.\n\n**Job B (New Zealand).** A 1985 weatherboard house in Palmerston North. A lounge fire from a heater was put out by Fire and Emergency New Zealand. The lounge (4.6 m x 4.0 m) is heavily sooted with powdery residue; the kitchen (3.4 m x 3.0 m) has a yellowish film from a pot that burnt dry during the evacuation; the hall (6.0 m x 1.0 m) has light residue; all rooms have 2.4 m ceilings. Fibre-cement soffits outside the lounge (0.5 m x 5.0 m) are cracked. Old paint on the lounge window frames has blistered. The ducted heat pump ran after the fire. It is 18 degrees C and 70 %RH inside. Power is off at the board. The tenant is pregnant and wants to return as soon as possible.\n\nSubmit one PDF, or a set of photos and documents, containing:\n\n1. **Make safe and site control.** Site release, structure, power (licensed electrician; your equipment on RCDs, with a 230 V power budget showing amps per 10 A circuit), occupants, and the notification duty that would apply in your country if a worker were seriously injured.\n2. **Hazardous materials (your country's rules).** The asbestos build-date flag and what fire damage means for the cracked fibre-cement, with the licence class and who you hand over to; lead-paint presumption; silica exposure standard for any cutting; CCA ash handling (Job A). State what you will not touch and why.\n3. **Survey, boundary and residue.** A room sketch with the affected boundary, migration pathways found, residue type per room and surface, and a test-patch plan (location, size in mm, method, record). Floor areas in m² and air volumes in m³.\n4. **Mitigation, cleaning, contents and HVAC.** Corrosion priorities and timing, humidity plan (degrees C, %RH, g/kg), source removal, cleaning method and top-down sequence by residue, contents triage into the three groups with a photo inventory, and the HVAC decision.\n5. **Odour control, verification and job file.** The odour-control sequence; whether any device treatment is used and, if so, the isolation, ozone limit (0.1 ppm worker limit) and re-entry basis given the child or the pregnant tenant; the verification checklist; the job file index; scope approval with the insurer; a price for one stage in AUD (Job A: show 10 % GST); and the consumer guarantee that applies in your country.\n\nUse Australian English, metric units and 230 V equipment throughout. Reference any standard by name only; do not copy text from any standard.",
+    "criteria": [
+      {
+        "label": "Make safe, site control and power",
+        "description": "Site release confirmed; structural hazards controlled; supply left to a licensed electrician; equipment on RCDs with a correct 230 V power budget per 10 A circuit; occupants managed; the correct notification duty stated for the chosen country (Australia: immediately, preserve the site; New Zealand: as soon as possible, fastest means, records kept five years).",
+        "maxPoints": 20
+      },
+      {
+        "label": "Hazardous materials applied for the chosen country",
+        "description": "Correct asbestos build-date rule (Australia: assume possible if built or renovated before the 31 December 2003 ban, most likely before 1990, and ask for the asbestos register on a workplace; New Zealand: built or renovated before 2000); cracked fibre-cement treated as friable, Class A licensed removal, stop-isolate-hand-over; lead presumption correct for the country; silica standard correct (0.05 or 0.025 mg/m3); CCA ash handled wet, bagged and sent to landfill (Job A); respirators fit-tested and fit-checked.",
+        "maxPoints": 20
+      },
+      {
+        "label": "Survey, boundary and residue identification",
+        "description": "Whole-building survey with migration pathways; a recorded boundary; residue type identified per room and surface with reasons; a test-patch plan with size, location and record; areas in m2 and volumes in m3 correct.",
+        "maxPoints": 20
+      },
+      {
+        "label": "Mitigation, cleaning, contents and HVAC",
+        "description": "Corrosion treated as early mitigation with electronics isolated, not powered; humidity plan in degrees C, %RH and g/kg; source removal after the hazard check; method matched to residue, dry before wet on dry residue, top-down from least affected rooms; contents triaged into three groups with a photo inventory; contaminated HVAC kept off until cleaned.",
+        "maxPoints": 20
+      },
+      {
+        "label": "Odour control, verification, job file and Australian production",
+        "description": "Odour sequence source-clean-seal-treat-verify; no ozone with occupants present, 0.1 ppm stated as a worker limit not clearance, re-entry on measured readings; hydroxyl not assumed safe; verification checklist; job file built as work happens; insurer scope approval; AUD price (with 10 % GST for Job A); correct consumer guarantee for the country; Australian English, metric, 230 V; standards named only.",
+        "maxPoints": 20
+      }
+    ]
+  }
+}

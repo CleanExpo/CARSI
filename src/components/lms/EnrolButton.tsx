@@ -3,6 +3,10 @@
 import { useAuth } from '@/components/auth/auth-provider';
 import { CoursePurchaseOptions } from '@/components/lms/CoursePurchaseOptions';
 import { GuestEnrolForm, guestCheckoutRefusalDestination } from '@/components/lms/GuestEnrolForm';
+import {
+  PrerequisiteLockNotice,
+  type PrerequisiteLink,
+} from '@/components/lms/PrerequisiteLockNotice';
 import { Button } from '@/components/ui/button';
 import { authApi } from '@/lib/api/auth';
 import { apiClient, ApiClientError } from '@/lib/api/client';
@@ -20,7 +24,20 @@ interface EnrolButtonProps {
   slug: string;
   priceAud?: number;
   isFree?: boolean;
+  /** Prerequisite courses (DECISIONS #41). Non-empty → the course may be locked for this learner. */
+  prerequisites?: PrerequisiteLink[];
 }
+
+type PrereqState = 'none' | 'checking' | 'locked' | 'unlocked';
+
+interface PrereqStatusResponse {
+  locked: boolean;
+  /** The viewer already holds a live (possibly locked) enrolment, e.g. a team seat. */
+  enrolled?: boolean;
+  prerequisites?: { slug: string; title: string }[];
+}
+
+const NO_PREREQUISITES: PrerequisiteLink[] = [];
 
 type PricingApi = {
   payableAud: number;
@@ -46,7 +63,12 @@ interface ConfirmResponse {
   team_purchase?: boolean;
 }
 
-export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonProps) {
+export function EnrolButton({
+  slug,
+  priceAud = 0,
+  isFree = false,
+  prerequisites = NO_PREREQUISITES,
+}: EnrolButtonProps) {
   const pathname = usePathname();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -56,6 +78,39 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
   const [mode, setMode] = useState<'guest' | 'member'>('guest');
   const [purchaseMode, setPurchaseMode] = useState<CoursePurchaseMode>('self');
   const [teamSeats, setTeamSeats] = useState(MIN_TEAM_SEATS);
+  const hasPrerequisites = prerequisites.length > 0;
+  const [prereqState, setPrereqState] = useState<PrereqState>(hasPrerequisites ? 'checking' : 'none');
+  const [lockedBy, setLockedBy] = useState<PrerequisiteLink[]>(prerequisites);
+  const [enrolledWhileLocked, setEnrolledWhileLocked] = useState(false);
+
+  // Locked state is UX only; the server refuses enrolment/checkout regardless. On a failed
+  // status check the button stays available and the server's answer decides.
+  useEffect(() => {
+    if (!hasPrerequisites) return;
+    if (!user?.id) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- mirrors the subscription-status effect above
+      setPrereqState('locked');
+      return;
+    }
+    let cancelled = false;
+    setPrereqState('checking');
+    apiClient
+      .get<PrereqStatusResponse>(`/api/lms/courses/${encodeURIComponent(slug)}/prerequisites`)
+      .then((data) => {
+        if (cancelled) return;
+        if (data.locked && data.prerequisites && data.prerequisites.length > 0) {
+          setLockedBy(data.prerequisites);
+        }
+        setEnrolledWhileLocked(data.enrolled === true);
+        setPrereqState(data.locked ? 'locked' : 'unlocked');
+      })
+      .catch(() => {
+        if (!cancelled) setPrereqState('unlocked');
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [hasPrerequisites, user?.id, slug]);
 
   useEffect(() => {
     if (!user) {
@@ -116,14 +171,15 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
     return isPaid ? `Enrol — $${effectivePrice.toFixed(0)} AUD` : 'Enrol Free';
   }
 
-  async function handleMemberEnrol() {
+  async function handleMemberEnrol(modeOverride?: CoursePurchaseMode) {
+    const buyMode: CoursePurchaseMode = modeOverride ?? purchaseMode;
     setLoading(true);
     setError(null);
 
     trackFunnelEvent({
       name: 'enrol_click',
       course_slug: slug,
-      purchase_mode: purchaseMode,
+      purchase_mode: buyMode,
       is_free: effectiveFree,
     });
 
@@ -136,7 +192,7 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
       return;
     }
 
-    if (purchaseMode === 'team' && isPaid) {
+    if (buyMode === 'team' && isPaid) {
       const seatErr = validateTeamSeatCount(teamSeats);
       if (seatErr) {
         setError(seatErr);
@@ -147,7 +203,7 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
 
     // Active member on a self enrolment → included in membership, no charge.
     // The server re-checks entitlement and fails closed; this is only the UX.
-    if (subState === 'subscribed' && purchaseMode !== 'team') {
+    if (subState === 'subscribed' && buyMode !== 'team') {
       try {
         const enrolled = await apiClient.post<ConfirmResponse>('/api/lms/subscription/enroll', {
           slug,
@@ -168,14 +224,14 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
         window.location.origin,
         slug,
         undefined,
-        purchaseMode === 'team' ? { teamSeats } : undefined,
+        buyMode === 'team' ? { teamSeats } : undefined,
       );
       const data = await apiClient.post<CheckoutResponse>('/api/lms/checkout', {
         slug,
         success_url,
         cancel_url,
-        purchase_mode: purchaseMode,
-        ...(purchaseMode === 'team' ? { team_seat_count: teamSeats } : {}),
+        purchase_mode: buyMode,
+        ...(buyMode === 'team' ? { team_seat_count: teamSeats } : {}),
         ...(currentUser.email ? { customer_email: currentUser.email } : {}),
       });
 
@@ -198,13 +254,22 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
         trackFunnelEvent({
           name: 'checkout_started',
           course_slug: slug,
-          purchase_mode: purchaseMode,
-          value_aud: purchaseMode === 'team' ? effectivePrice * teamSeats : effectivePrice,
+          purchase_mode: buyMode,
+          value_aud: buyMode === 'team' ? effectivePrice * teamSeats : effectivePrice,
         });
         window.location.href = data.checkout_url;
         return;
       }
     } catch (err) {
+      if (err instanceof ApiClientError && err.payload?.code === 'prerequisite_not_met') {
+        const fromServer = Array.isArray(err.payload?.prerequisites)
+          ? (err.payload.prerequisites as PrerequisiteLink[])
+          : [];
+        if (fromServer.length > 0) setLockedBy(fromServer);
+        setPrereqState('locked');
+        setError(err.message || null);
+        return;
+      }
       if (err instanceof ApiClientError && err.status === 409) {
         const refusal = guestCheckoutRefusalDestination({
           already_enrolled: err.payload?.already_enrolled === true || Boolean(err.payload?.learn_path),
@@ -226,6 +291,45 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
     } finally {
       setLoading(false);
     }
+  }
+
+  if (prereqState === 'locked') {
+    const returnTo = pathname && pathname.startsWith('/') ? pathname : `/courses/${slug}`;
+    return (
+      <div className="space-y-2">
+        <PrerequisiteLockNotice
+          prerequisites={lockedBy.length > 0 ? lockedBy : prerequisites}
+          signInHref={user ? undefined : `/login?next=${encodeURIComponent(returnTo)}`}
+        />
+        {error && lockedBy.length === 0 ? <p className="text-sm text-red-500">{error}</p> : null}
+        {/* Anyone may buy TEAM seats for a prerequisite course (founder decision 02/11/2026);
+            every seat, the buyer's included, stays locked until its holder completes it. */}
+        {user && isPaid && !enrolledWhileLocked ? (
+          <div className="space-y-2 pt-2">
+            <CoursePurchaseOptions
+              mode="team"
+              onModeChange={() => {}}
+              teamSeats={teamSeats}
+              onTeamSeatsChange={setTeamSeats}
+              unitPriceAud={effectivePrice}
+              disabled={loading}
+              teamOnly
+            />
+            <Button
+              onClick={() => void handleMemberEnrol('team')}
+              disabled={loading}
+              variant="outline"
+              className="w-full"
+            >
+              {loading
+                ? 'Processing…'
+                : `Buy ${teamSeats} team seats — $${(effectivePrice * teamSeats).toFixed(0)} AUD`}
+            </Button>
+            {error && lockedBy.length > 0 ? <p className="text-sm text-red-500">{error}</p> : null}
+          </div>
+        ) : null}
+      </div>
+    );
   }
 
   if (!user || mode === 'guest') {
@@ -272,8 +376,8 @@ export function EnrolButton({ slug, priceAud = 0, isFree = false }: EnrolButtonP
         </div>
       ) : null}
       <Button
-        onClick={handleMemberEnrol}
-        disabled={loading || subState === 'checking'}
+        onClick={() => void handleMemberEnrol()}
+        disabled={loading || subState === 'checking' || prereqState === 'checking'}
         className="w-full rounded-sm border border-[#ed9d24]/70 bg-[#ed9d24] font-semibold text-[#111111] shadow-[0_10px_24px_rgba(237,157,36,0.32)] transition-all hover:bg-[#f2ad4e] hover:shadow-[0_14px_28px_rgba(237,157,36,0.4)]"
         size="lg"
       >
