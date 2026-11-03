@@ -49,11 +49,17 @@ export type LearningPathStore = {
     userId: string,
     rows: Array<{ courseId: string; title: string; description: string; sortOrder: number }>
   ): Promise<void>;
+  /**
+   * Compare-and-set: writes only if the row still has `expectedStatus` (the status the caller
+   * read), and reports whether it wrote. A writer acting on a stale read changes nothing, so a
+   * progress sync can never overwrite a coach removal that landed mid-read (review r3 P1).
+   */
   updateAction(
     userId: string,
     id: string,
+    expectedStatus: string,
     data: { status?: CoachingActionStatus | typeof LEARNING_REMOVED_STATUS; sortOrder?: number }
-  ): Promise<void>;
+  ): Promise<boolean>;
   publishedCoursesBySlugs(slugs: string[]): Promise<LearningCatalogueCourse[]>;
   publishedCoursesByIds(ids: string[]): Promise<LearningCatalogueCourse[]>;
   completedCourseIds(userId: string): Promise<Set<string>>;
@@ -188,7 +194,11 @@ export async function syncLearningPath(
     const rolled = rollupLearningProgress(p);
     const status: CoachingActionStatus =
       action.status === 'blocked' && rolled.status !== 'done' ? 'blocked' : rolled.status;
-    if (status !== action.status) await store.updateAction(userId, action.id, { status });
+    if (status !== action.status) {
+      const wrote = await store.updateAction(userId, action.id, action.status, { status });
+      // The row changed under this read (e.g. the coach removed it): report nothing stale.
+      if (!wrote) continue;
+    }
     const course = courseById.get(courseId);
     items.push({
       actionId: action.id,
@@ -247,7 +257,9 @@ async function adjustLocked(
   // Removal keeps the row as a tombstone: it leaves the board, and the "already assigned"
   // guard still sees it, so a full clear is never re-prescribed (review r2 P1).
   for (const x of learning.filter((l) => !next.includes(l.courseId))) {
-    await store.updateAction(userId, x.action.id, { status: LEARNING_REMOVED_STATUS });
+    await store.updateAction(userId, x.action.id, x.action.status, {
+      status: LEARNING_REMOVED_STATUS,
+    });
   }
 
   const kept = learning.filter((x) => next.includes(x.courseId));
@@ -265,7 +277,7 @@ async function adjustLocked(
     const sortOrder = i < slots.length ? slots[i] : tail++;
     if (existing) {
       if (existing.action.sortOrder !== sortOrder) {
-        await store.updateAction(userId, existing.action.id, { sortOrder });
+        await store.updateAction(userId, existing.action.id, existing.action.status, { sortOrder });
       }
     } else {
       const course = addable.find((c) => c.id === courseId);
@@ -273,7 +285,10 @@ async function adjustLocked(
       const tombstone = removed.find((x) => x.courseId === courseId);
       if (tombstone) {
         // Re-adding a removed course revives its row; the sync then sets its real status.
-        await store.updateAction(userId, tombstone.action.id, { status: 'todo', sortOrder });
+        await store.updateAction(userId, tombstone.action.id, LEARNING_REMOVED_STATUS, {
+          status: 'todo',
+          sortOrder,
+        });
         continue;
       }
       toCreate.push({
@@ -350,9 +365,9 @@ function prismaStoreFor(db: LearningPathDb): LearningPathStore {
         })),
       });
     },
-    async updateAction(userId, id, data) {
-      await db.carsiCoachingAction.updateMany({
-        where: { id, userId },
+    async updateAction(userId, id, expectedStatus, data) {
+      const res = await db.carsiCoachingAction.updateMany({
+        where: { id, userId, status: expectedStatus },
         data: {
           ...(data.sortOrder !== undefined ? { sortOrder: data.sortOrder } : {}),
           ...(data.status !== undefined
@@ -360,6 +375,7 @@ function prismaStoreFor(db: LearningPathDb): LearningPathStore {
             : {}),
         },
       });
+      return res.count > 0;
     },
     async publishedCoursesBySlugs(slugs) {
       if (slugs.length === 0) return [];

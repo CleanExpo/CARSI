@@ -237,6 +237,19 @@ describe.runIf(RUNNABLE)('coaching learning path (real PostgreSQL)', async () =>
     );
   });
 
+  it('a write based on a stale status changes nothing (review r3 P1)', async () => {
+    const row = await prisma.carsiCoachingAction.findFirstOrThrow({
+      where: { userId: memberId, goalId: learningGoalId(social()) },
+    });
+    expect(row.status).toBe('removed');
+    const wrote = await lp.prismaLearningPathStore.updateAction(memberId, row.id, 'todo', {
+      status: 'done',
+    });
+    expect(wrote).toBe(false);
+    const after = await prisma.carsiCoachingAction.findUniqueOrThrow({ where: { id: row.id } });
+    expect(after.status).toBe('removed');
+  });
+
   it('two simultaneous coach adds of one course create one action', async () => {
     const extra = courseIdBySlug.get(extraSlug)!;
     await Promise.all([

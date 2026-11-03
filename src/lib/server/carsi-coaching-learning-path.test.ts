@@ -93,12 +93,14 @@ function fakeStore(opts: {
         });
       }
     },
-    async updateAction(userId, id, data) {
+    async updateAction(userId, id, expectedStatus, data) {
       const row = actions.find((a) => a.id === id && a.userId === userId);
       if (!row) throw new Error(`update of foreign or missing action ${id}`);
+      if (row.status !== expectedStatus) return false;
       writes.push(`update:${userId}:${id}:${JSON.stringify(data)}`);
       if (data.status !== undefined) row.status = data.status;
       if (data.sortOrder !== undefined) row.sortOrder = data.sortOrder;
+      return true;
     },
     async publishedCoursesBySlugs(slugs) {
       return catalogue.filter((c) => slugs.includes(c.slug));
@@ -458,5 +460,45 @@ describe('coach clears the path (review r2 P1: a full clear must stay cleared)',
     expect(items.map((i) => i.actionId)).toEqual(['l1']);
     expect(actions).toHaveLength(1);
     expect(actions[0].status).toBe('todo');
+  });
+});
+
+describe('member read racing a coach removal (review r3 P1)', () => {
+  it('a progress sync that started before the removal cannot revive the removed course', async () => {
+    const { store, actions } = fakeStore({
+      actions: [
+        {
+          id: 'l1',
+          userId: USER,
+          title: 'x',
+          goalId: learningGoalId(C_SOCIAL),
+          status: 'todo',
+          sortOrder: 1,
+        },
+      ],
+      progress: {
+        [C_SOCIAL]: { enrolled: true, completed: true, lessonsTotal: 5, lessonsCompleted: 5 },
+      },
+    });
+    // Pause the member's sync after it has read the rows, while the coach removes the course.
+    let release!: () => void;
+    const gate = new Promise<void>((r) => (release = r));
+    let paused!: () => void;
+    const reachedProgress = new Promise<void>((r) => (paused = r));
+    const slowStore: LearningPathStore = {
+      ...store,
+      async courseProgress(userId, ids) {
+        paused();
+        await gate;
+        return store.courseProgress(userId, ids);
+      },
+    };
+    const memberRead = syncLearningPath(USER, slowStore);
+    await reachedProgress;
+    await adjustLearningPath(USER, { removeCourseIds: [C_SOCIAL] }, store);
+    expect(actions[0].status).toBe('removed');
+    release();
+    await memberRead;
+    expect(actions[0].status).toBe('removed');
   });
 });
