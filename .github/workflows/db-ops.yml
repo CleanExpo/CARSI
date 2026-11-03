@@ -1,0 +1,137 @@
+# DB ops — run ONE reviewed SQL file from db/ops/ against the production database (carsi-db).
+#
+# Why: nobody should paste the production DATABASE_URL into a chat, terminal or agent session.
+# The URL lives only in the DATABASE_URL Actions secret; this job reads it, runs the chosen
+# file, and prints the result to the job log.
+#
+#   Every file runs only from main, so only reviewed SQL ever reaches the database.
+#   db/ops/read/*.sql   every statement must be a plain query over allowlisted tables
+#                       (db/ops/check-read-sql.py); run by db/ops/run-read.py in a READ ONLY
+#                       transaction, as DATABASE_URL_READONLY when that secret is set.
+#   Both kinds wait for a person's approval in the production-db environment, and neither uses
+#   psql, so no psql meta-command (shell escape, gexec, copy) can run from a file. This repo is PUBLIC, so its logs are public: read files
+#                       may return course/quiz/catalogue data and counts only, never learner data.
+#   db/ops/write/*.sql  runs only from main, in a single transaction (all-or-nothing), and only
+#                       after a person approves the run in the `production-db` environment
+#                       (Settings → Environments → production-db → Required reviewers).
+#
+# A guard's silence is not a pass: every step exits non-zero on a bad input (missing secret,
+# file outside db/ops, any run off main, a read file naming learner tables/columns).
+
+name: DB ops
+
+on:
+  workflow_dispatch:
+    inputs:
+      file:
+        description: 'SQL file to run, e.g. db/ops/read/04-water-go-live-preflight.sql'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: db-ops
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      kind: ${{ steps.check.outputs.kind }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate the requested file
+        id: check
+        env:
+          FILE: ${{ inputs.file }}
+          REF: ${{ github.ref }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$FILE" =~ ^db/ops/(read|write)/[0-9]{2}-[a-z0-9-]+\.sql$ ]]; then
+            echo "::error::'$FILE' is not a file under db/ops/read/ or db/ops/write/ named NN-name.sql."
+            exit 1
+          fi
+          [ -f "$FILE" ] || { echo "::error::$FILE does not exist on $REF."; exit 1; }
+          kind="${BASH_REMATCH[1]}"
+          # Provenance: every file, read or write, must be the reviewed copy on main. A file
+          # written on a side branch never runs.
+          if [ "$REF" != "refs/heads/main" ]; then
+            echo "::error::DB ops runs only from main (got $REF). Merge the reviewed file first."
+            exit 1
+          fi
+          if [ "$kind" = "read" ]; then
+            # Every statement must be a plain query; SET/COMMIT/DO/DML/meta-commands and learner
+            # columns are refused before any connection. The session's read-only flag can be
+            # switched off from SQL, so this check is what stops a read file from writing.
+            python3 db/ops/test_check_read_sql.py
+            python3 db/ops/check-read-sql.py "$FILE"
+          else
+            python3 db/ops/test_check_read_sql.py
+            python3 db/ops/check-read-sql.py --write "$FILE"
+          fi
+          echo "kind=$kind" >> "$GITHUB_OUTPUT"
+          echo "OK: $kind file $FILE on $REF"
+
+  # Every read waits for a person's approval in production-db, like a write: the file name is
+  # shown before anything runs, and the output lands in a public log.
+  read:
+    needs: plan
+    if: needs.plan.outputs.kind == 'read'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production-db
+    steps:
+      - uses: actions/checkout@v4
+      # setup-python gives a pip-installable interpreter (the runner's system Python is
+      # externally managed, so a bare pip install is refused there).
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run read-only
+        env:
+          FILE: ${{ inputs.file }}
+          # Prefer a least-privilege read role (no SELECT on learner tables) when it is set.
+          READONLY_URL: ${{ secrets.DATABASE_URL_READONLY }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          set -euo pipefail
+          if [ -n "${READONLY_URL:-}" ]; then
+            DATABASE_URL="$READONLY_URL"; echo "Using DATABASE_URL_READONLY (least-privilege role)."
+          else
+            echo "::warning::DATABASE_URL_READONLY is not set; using DATABASE_URL in a read-only session."
+          fi
+          [ -n "${DATABASE_URL:-}" ] || { echo "::error::DATABASE_URL secret is not set."; exit 1; }
+          # Not psql: its meta-commands (gexec, the shell escape) could run from the file. run-read.py
+          # sends the SQL only, in a READ ONLY transaction that is rolled back.
+          python3 -m pip install --quiet --disable-pip-version-check "psycopg[binary]==3.2.3"
+          # libpq rejects Prisma-only URL params such as schema=; drop them.
+          DATABASE_URL="$(printf '%s' "$DATABASE_URL" | sed -E 's/([?&])schema=[^&]*&?/\1/; s/[?&]$//')"
+          export DATABASE_URL
+          python3 db/ops/run-read.py "$FILE"
+
+  write:
+    needs: plan
+    if: needs.plan.outputs.kind == 'write'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production-db
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run in one transaction
+        env:
+          FILE: ${{ inputs.file }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          set -euo pipefail
+          [ -n "${DATABASE_URL:-}" ] || { echo "::error::DATABASE_URL secret is not set."; exit 1; }
+          # Not psql (its meta-commands could run a shell with the URL in the environment):
+          # run-write.py sends the SQL only, in one transaction, committed once at the end.
+          python3 -m pip install --quiet --disable-pip-version-check "psycopg[binary]==3.2.3"
+          DATABASE_URL="$(printf '%s' "$DATABASE_URL" | sed -E 's/([?&])schema=[^&]*&?/\1/; s/[?&]$//')"
+          export DATABASE_URL
+          python3 db/ops/run-write.py "$FILE"
