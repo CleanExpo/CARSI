@@ -47,6 +47,24 @@ const RULES: { rule: string; pattern: RegExp }[] = [
     pattern: /\b100\s?%\s+(satisfaction|success|results?|safe|effective)\b/i,
   },
   { rule: 'outcome claim', pattern: /\b(every|each)\s+time\b/i },
+  // Definite outcome promises, whatever the wording (fail closed for generated drafts).
+  { rule: 'outcome claim', pattern: /\bpromis(e|es|ed|ing)\b/i },
+  {
+    rule: 'outcome claim',
+    pattern:
+      /\b(will|'ll|’ll)\s+(get|see|have|receive|win|look|be|feel|stay|last|never|always|double|triple|save|earn|make|grow|increase|boost)\b/i,
+  },
+  {
+    rule: 'outcome claim',
+    pattern:
+      /\b\d+\s+(new\s+|more\s+|extra\s+)?(customers|clients|leads|jobs|bookings|enquiries|calls|reviews|sales)\b/i,
+  },
+  {
+    rule: 'outcome claim',
+    pattern: /\b(in|within|under)\s+\d+\s*(minutes?|mins?|hours?|hrs?|days?|weeks?|months?)\b/i,
+  },
+  { rule: 'outcome claim', pattern: /\d+(\.\d+)?\s?%/ },
+  { rule: 'outcome claim', pattern: /\b(brand[- ]new|like new|good as new)\b/i },
   { rule: 'outcome claim', pattern: /\b(kills?|removes?|eliminates?)\s+\d{2}(\.\d+)?\s?%/i },
   { rule: 'outcome claim', pattern: /\bpermanent(ly)?\s+(fix|remov|result)/i },
   // Superlatives the member cannot substantiate.
@@ -85,7 +103,7 @@ export const MARKETING_COPY_RULES = [
   'No earnings, income, savings or revenue claims, and no dollar figures.',
   'No guarantees, money-back offers, "risk-free" or "100%" promises.',
   'No superlatives you cannot prove: no "best", "number one", "#1", "leading", "cheapest".',
-  'No promises about results such as "every time" or "kills 99.9%".',
+  'No promises about results: nothing a customer "will" get, see or save, no numbers of customers, leads or jobs, no time frames ("in 24 hours"), no percentages, no "every time".',
   'Do not mention IICRC, any industry body, any standard or any qualification.',
   'Australian English spelling (colour, mould, odour, organise), metric units, AUD.',
 ];

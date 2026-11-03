@@ -30,6 +30,15 @@ describe('findComplianceIssues', () => {
     'Boost your profits this winter',
     'Save you money on every visit',
     'A side hustle that pays',
+    // Definite outcome promises without the word "guarantee" (Codex P1, head c3b52247).
+    'We promise you will get 10 new customers in 30 days if you book with us.',
+    "You'll get more bookings after one visit",
+    'You will see results straight away',
+    'Get 5 new leads a week',
+    'Fully dry in 24 hours',
+    '50% fewer callbacks',
+    'Your carpets will look brand new',
+    'Promised spotless finish',
   ])('rejects %s', (text) => {
     expect(findComplianceIssues(text).length).toBeGreaterThan(0);
     expect(isCompliantCopy(text)).toBe(false);

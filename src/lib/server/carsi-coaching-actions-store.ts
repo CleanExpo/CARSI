@@ -156,8 +156,9 @@ export async function deleteCoachingActionForUser(
   userId: string,
   actionId: string
 ): Promise<boolean> {
+  // A proposed or declined action is the coach's to decide; the member cannot remove it.
   const result = await prisma.carsiCoachingAction.deleteMany({
-    where: { id: actionId, userId },
+    where: { id: actionId, userId, status: { in: [...MEMBER_SETTABLE_ACTION_STATUSES] } },
   });
   return result.count > 0;
 }

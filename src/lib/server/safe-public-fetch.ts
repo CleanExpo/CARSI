@@ -181,17 +181,31 @@ type RawPage = {
   error?: string;
 };
 
-/** One GET over node:http(s) with the guarded lookup, a timeout and a body cap. No redirects. */
-export function requestPage(url: URL, lookup: GuardedLookup): Promise<RawPage> {
+/**
+ * One GET over node:http(s) with the guarded lookup and a body cap. No redirects. `deadlineMs`
+ * is an absolute limit on the whole request (DNS, connect, headers and body): a site that
+ * drips bytes slowly is cut off at the deadline, not merely when it goes idle.
+ */
+export function requestPage(
+  url: URL,
+  lookup: GuardedLookup,
+  deadlineMs: number = TIMEOUT_MS
+): Promise<RawPage> {
   const mod = url.protocol === 'https:' ? https : http;
   return new Promise((resolvePage) => {
     let settled = false;
+    const timers: ReturnType<typeof setTimeout>[] = [];
     const finish = (page: RawPage) => {
       if (!settled) {
         settled = true;
+        timers.forEach(clearTimeout);
         resolvePage(page);
       }
     };
+    if (deadlineMs <= 0) {
+      finish({ ok: false, status: 0, error: 'timed out' });
+      return;
+    }
     const req = mod.request(
       url,
       {
@@ -234,9 +248,15 @@ export function requestPage(url: URL, lookup: GuardedLookup): Promise<RawPage> {
         res.on('error', () => finish({ ok: false, status, error: 'could not read the page' }));
       }
     );
+    timers.push(
+      setTimeout(() => {
+        finish({ ok: false, status: 0, error: 'timed out' });
+        req.destroy();
+      }, deadlineMs)
+    );
     req.on('timeout', () => {
-      req.destroy();
       finish({ ok: false, status: 0, error: 'timed out' });
+      req.destroy();
     });
     req.on('error', (err: NodeJS.ErrnoException) =>
       finish({
@@ -251,13 +271,16 @@ export function requestPage(url: URL, lookup: GuardedLookup): Promise<RawPage> {
 
 export async function fetchPublicPage(
   raw: string,
-  lookup: GuardedLookup = createGuardedLookup(systemResolver)
+  lookup: GuardedLookup = createGuardedLookup(systemResolver),
+  totalMs: number = TIMEOUT_MS
 ): Promise<SiteFetchResult> {
   const first = validatePublicHttpUrl(raw);
   if (!first.ok) return { ok: false, status: 0, html: null, error: first.reason };
+  // One deadline for the whole fetch, shared by every redirect hop.
+  const deadline = Date.now() + totalMs;
   let url = first.url;
   for (let hop = 0; hop <= MAX_REDIRECTS; hop += 1) {
-    const page = await requestPage(url, lookup);
+    const page = await requestPage(url, lookup, deadline - Date.now());
     if (page.status >= 300 && page.status < 400) {
       if (!page.location) {
         return { ok: false, status: page.status, html: null, error: 'redirect without location' };

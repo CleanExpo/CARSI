@@ -148,6 +148,16 @@ describe('proposed actions in the actions store', () => {
     expect(rows[0].status).toBe('declined');
   });
 
+  it('a member cannot delete a proposed or declined action, but can delete their own working action', async () => {
+    seedProposed('p1');
+    rows.push({ ...rows[0], id: 'd1', status: 'declined' });
+    rows.push({ ...rows[0], id: 'w1', status: 'todo', goalId: null });
+    expect(await store.deleteCoachingActionForUser('member-1', 'p1')).toBe(false);
+    expect(await store.deleteCoachingActionForUser('member-1', 'd1')).toBe(false);
+    expect(await store.deleteCoachingActionForUser('member-1', 'w1')).toBe(true);
+    expect(rows.map((r) => r.id).sort()).toEqual(['d1', 'p1']);
+  });
+
   it('reviewing an unknown action is not found', async () => {
     expect(
       await store.reviewProposedCoachingAction({ actionId: 'nope', decision: 'approve' })
