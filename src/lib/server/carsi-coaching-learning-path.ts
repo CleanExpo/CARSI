@@ -36,6 +36,11 @@ export type LearningActionRecord = {
 };
 
 export type LearningPathStore = {
+  /**
+   * Run `fn` holding a per-member write lock, with a store bound to that lock. Assignment and
+   * coach edits read-then-write, so two at once would otherwise duplicate courses (review r1 P1).
+   */
+  withMemberLock<T>(userId: string, fn: (locked: LearningPathStore) => Promise<T>): Promise<T>;
   latestSubmittedAssessmentJson(userId: string): Promise<string | null>;
   /** Every board action for the member, in board order. */
   listActions(userId: string): Promise<LearningActionRecord[]>;
@@ -63,6 +68,8 @@ export type LearningPathItem = {
   status: CoachingActionStatus;
   percent: number;
   sortOrder: number;
+  /** Member holds a live enrolment, so the lesson player will open for them. */
+  enrolled: boolean;
 };
 
 const AREA_REASON: Record<LearningGapArea, string> = {
@@ -94,6 +101,13 @@ export async function assignLearningPathFromAssessment(
   userId: string,
   store: LearningPathStore = prismaLearningPathStore
 ): Promise<AssignLearningPathResult> {
+  return store.withMemberLock(userId, (locked) => assignLocked(userId, locked));
+}
+
+async function assignLocked(
+  userId: string,
+  store: LearningPathStore
+): Promise<AssignLearningPathResult> {
   const actions = await store.listActions(userId);
   if (actions.some((a) => a.goalId?.startsWith(LEARNING_GOAL_PREFIX))) {
     return { status: 'already_assigned' };
@@ -104,10 +118,9 @@ export async function assignLearningPathFromAssessment(
   const gaps = detectAssessmentGaps(parseAssessmentResponsesJson(json));
   if (gaps.length === 0) return { status: 'no_gaps' };
 
-  const [catalogue, completed] = await Promise.all([
-    store.publishedCoursesBySlugs(mappedCourseSlugs(DEFAULT_GAP_COURSE_MAP)),
-    store.completedCourseIds(userId),
-  ]);
+  // Sequential on purpose: these run on the locked transaction's single connection.
+  const catalogue = await store.publishedCoursesBySlugs(mappedCourseSlugs(DEFAULT_GAP_COURSE_MAP));
+  const completed = await store.completedCourseIds(userId);
   const modules = recommendLearningModules({
     gaps,
     courseMap: DEFAULT_GAP_COURSE_MAP,
@@ -171,6 +184,7 @@ export async function syncLearningPath(
       status,
       percent: rolled.percent,
       sortOrder: action.sortOrder,
+      enrolled: p.enrolled,
     });
   }
   return items;
@@ -192,6 +206,16 @@ export async function adjustLearningPath(
   input: LearningPathAdjustmentInput,
   store: LearningPathStore = prismaLearningPathStore
 ): Promise<LearningPathItem[]> {
+  await store.withMemberLock(userId, (locked) => adjustLocked(userId, input, locked));
+  const items = await syncLearningPath(userId, store);
+  return items.sort((a, b) => a.sortOrder - b.sortOrder);
+}
+
+async function adjustLocked(
+  userId: string,
+  input: LearningPathAdjustmentInput,
+  store: LearningPathStore
+): Promise<void> {
   const actions = await store.listActions(userId);
   const learning = actions
     .map((a) => ({ action: a, courseId: parseLearningGoalId(a.goalId) }))
@@ -242,9 +266,6 @@ export async function adjustLearningPath(
     }
   }
   if (toCreate.length) await store.createLearningActions(userId, toCreate);
-
-  const items = await syncLearningPath(userId, store);
-  return items.sort((a, b) => a.sortOrder - b.sortOrder);
 }
 
 /** True when the action is a prescribed course (member cannot edit its status by hand). */
@@ -254,103 +275,133 @@ export function isLearningAction(goalId: string | null | undefined): boolean {
 
 const PUBLISHED = { status: 'published', isPublished: true } as const;
 
-export const prismaLearningPathStore: LearningPathStore = {
-  async latestSubmittedAssessmentJson(userId) {
-    const row = await prisma.carsiCoachingAssessment.findFirst({
-      where: { userId, submittedAt: { not: null } },
-      orderBy: { submittedAt: 'desc' },
-      select: { responsesJson: true },
-    });
-    return row?.responsesJson ?? null;
-  },
-  async listActions(userId) {
-    return prisma.carsiCoachingAction.findMany({
-      where: { userId },
-      orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
-      select: { id: true, title: true, goalId: true, status: true, sortOrder: true },
-    });
-  },
-  async createLearningActions(userId, rows) {
-    await prisma.carsiCoachingAction.createMany({
-      data: rows.map((r) => ({
-        userId,
-        title: r.title,
-        description: r.description,
-        goalId: learningGoalId(r.courseId),
-        status: 'todo',
-        assignedTo: 'customer',
-        sortOrder: r.sortOrder,
-      })),
-    });
-  },
-  async updateAction(userId, id, data) {
-    await prisma.carsiCoachingAction.updateMany({
-      where: { id, userId },
-      data: {
-        ...(data.sortOrder !== undefined ? { sortOrder: data.sortOrder } : {}),
-        ...(data.status !== undefined
-          ? { status: data.status, completedAt: data.status === 'done' ? new Date() : null }
-          : {}),
-      },
-    });
-  },
-  async deleteActions(userId, ids) {
-    await prisma.carsiCoachingAction.deleteMany({ where: { userId, id: { in: ids } } });
-  },
-  async publishedCoursesBySlugs(slugs) {
-    if (slugs.length === 0) return [];
-    return prisma.lmsCourse.findMany({
-      where: { slug: { in: slugs }, ...PUBLISHED },
-      select: { id: true, slug: true, title: true },
-    });
-  },
-  async publishedCoursesByIds(ids) {
-    if (ids.length === 0) return [];
-    return prisma.lmsCourse.findMany({
-      where: { id: { in: ids }, ...PUBLISHED },
-      select: { id: true, slug: true, title: true },
-    });
-  },
-  async completedCourseIds(userId) {
-    const rows = await prisma.lmsEnrollment.findMany({
-      where: { studentId: userId, completedAt: { not: null }, status: { not: 'revoked' } },
-      select: { courseId: true },
-    });
-    return new Set(rows.map((r) => r.courseId));
-  },
-  async courseProgress(userId, courseIds) {
-    const out = new Map<string, LearningCourseProgress>();
-    if (courseIds.length === 0) return out;
-    const [enrolments, lessons, done] = await Promise.all([
-      prisma.lmsEnrollment.findMany({
-        where: { studentId: userId, courseId: { in: courseIds }, status: { not: 'revoked' } },
-        select: { courseId: true, completedAt: true },
-      }),
-      prisma.lmsLesson.findMany({
-        where: { module: { courseId: { in: courseIds } } },
-        select: { module: { select: { courseId: true } } },
-      }),
-      prisma.lmsLessonProgress.findMany({
-        where: {
-          studentId: userId,
-          completed: true,
-          lesson: { module: { courseId: { in: courseIds } } },
-        },
-        select: { lesson: { select: { module: { select: { courseId: true } } } } },
-      }),
-    ]);
-    for (const id of courseIds) {
-      const e = enrolments.find((x) => x.courseId === id);
-      out.set(id, {
-        enrolled: Boolean(e),
-        completed: Boolean(e?.completedAt),
-        lessonsTotal: lessons.filter((l) => l.module.courseId === id).length,
-        lessonsCompleted: done.filter((d) => d.lesson.module.courseId === id).length,
+type LearningPathDb = Pick<
+  typeof prisma,
+  | 'carsiCoachingAssessment'
+  | 'carsiCoachingAction'
+  | 'lmsCourse'
+  | 'lmsEnrollment'
+  | 'lmsLesson'
+  | 'lmsLessonProgress'
+>;
+
+/**
+ * The member lock is a row lock on the member's `lms_users` row (always present, and every
+ * coaching row cascades from it) taken inside a transaction, so assignment and coach edits for
+ * one member run one at a time. No schema change needed.
+ */
+async function withPrismaMemberLock<T>(
+  userId: string,
+  fn: (locked: LearningPathStore) => Promise<T>
+): Promise<T> {
+  return prisma.$transaction(async (tx) => {
+    await tx.$queryRaw`SELECT id FROM lms_users WHERE id = ${userId}::uuid FOR UPDATE`;
+    return fn(prismaStoreFor(tx));
+  });
+}
+
+function prismaStoreFor(db: LearningPathDb): LearningPathStore {
+  return {
+    withMemberLock: withPrismaMemberLock,
+    async latestSubmittedAssessmentJson(userId) {
+      const row = await db.carsiCoachingAssessment.findFirst({
+        where: { userId, submittedAt: { not: null } },
+        orderBy: { submittedAt: 'desc' },
+        select: { responsesJson: true },
       });
-    }
-    return out;
-  },
-};
+      return row?.responsesJson ?? null;
+    },
+    async listActions(userId) {
+      return db.carsiCoachingAction.findMany({
+        where: { userId },
+        orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+        select: { id: true, title: true, goalId: true, status: true, sortOrder: true },
+      });
+    },
+    async createLearningActions(userId, rows) {
+      await db.carsiCoachingAction.createMany({
+        data: rows.map((r) => ({
+          userId,
+          title: r.title,
+          description: r.description,
+          goalId: learningGoalId(r.courseId),
+          status: 'todo',
+          assignedTo: 'customer',
+          sortOrder: r.sortOrder,
+        })),
+      });
+    },
+    async updateAction(userId, id, data) {
+      await db.carsiCoachingAction.updateMany({
+        where: { id, userId },
+        data: {
+          ...(data.sortOrder !== undefined ? { sortOrder: data.sortOrder } : {}),
+          ...(data.status !== undefined
+            ? { status: data.status, completedAt: data.status === 'done' ? new Date() : null }
+            : {}),
+        },
+      });
+    },
+    async deleteActions(userId, ids) {
+      await db.carsiCoachingAction.deleteMany({ where: { userId, id: { in: ids } } });
+    },
+    async publishedCoursesBySlugs(slugs) {
+      if (slugs.length === 0) return [];
+      return db.lmsCourse.findMany({
+        where: { slug: { in: slugs }, ...PUBLISHED },
+        select: { id: true, slug: true, title: true },
+      });
+    },
+    async publishedCoursesByIds(ids) {
+      if (ids.length === 0) return [];
+      return db.lmsCourse.findMany({
+        where: { id: { in: ids }, ...PUBLISHED },
+        select: { id: true, slug: true, title: true },
+      });
+    },
+    async completedCourseIds(userId) {
+      const rows = await db.lmsEnrollment.findMany({
+        where: { studentId: userId, completedAt: { not: null }, status: { not: 'revoked' } },
+        select: { courseId: true },
+      });
+      return new Set(rows.map((r) => r.courseId));
+    },
+    async courseProgress(userId, courseIds) {
+      const out = new Map<string, LearningCourseProgress>();
+      if (courseIds.length === 0) return out;
+      const [enrolments, lessons, done] = await Promise.all([
+        db.lmsEnrollment.findMany({
+          where: { studentId: userId, courseId: { in: courseIds }, status: { not: 'revoked' } },
+          select: { courseId: true, completedAt: true },
+        }),
+        db.lmsLesson.findMany({
+          where: { module: { courseId: { in: courseIds } } },
+          select: { module: { select: { courseId: true } } },
+        }),
+        db.lmsLessonProgress.findMany({
+          where: {
+            studentId: userId,
+            completed: true,
+            lesson: { module: { courseId: { in: courseIds } } },
+          },
+          select: { lesson: { select: { module: { select: { courseId: true } } } } },
+        }),
+      ]);
+      for (const id of courseIds) {
+        const e = enrolments.find((x) => x.courseId === id);
+        out.set(id, {
+          enrolled: Boolean(e),
+          completed: Boolean(e?.completedAt),
+          lessonsTotal: lessons.filter((l) => l.module.courseId === id).length,
+          lessonsCompleted: done.filter((d) => d.lesson.module.courseId === id).length,
+        });
+      }
+      return out;
+    },
+  };
+}
+
+export const prismaLearningPathStore: LearningPathStore = prismaStoreFor(prisma);
 
 export type CoachingLearningMember = {
   userId: string;

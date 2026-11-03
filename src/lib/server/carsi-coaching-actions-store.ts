@@ -24,7 +24,7 @@ export type CoachingActionRow = {
   goalId: string | null;
   createdAt: Date;
   /** Set when the action is a prescribed CARSI course (GP-633); progress comes from the LMS. */
-  learning: { courseSlug: string; percent: number } | null;
+  learning: { courseSlug: string; percent: number; enrolled: boolean } | null;
 };
 
 function normalizeStatus(raw: string): CoachingActionStatus {
@@ -51,7 +51,7 @@ export async function listCoachingActionsForUser(userId: string): Promise<Coachi
       coachFeedback: r.coachFeedback,
       goalId: r.goalId,
       createdAt: r.createdAt,
-      learning: li ? { courseSlug: li.slug, percent: li.percent } : null,
+      learning: li ? { courseSlug: li.slug, percent: li.percent, enrolled: li.enrolled } : null,
     };
   });
 }

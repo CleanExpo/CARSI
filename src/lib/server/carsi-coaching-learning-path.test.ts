@@ -58,8 +58,19 @@ function fakeStore(opts: {
   const progress = opts.progress ?? {};
   const writes: string[] = [];
   let nextId = 1;
+  // Per-member mutex standing in for the row lock the Prisma store takes in a transaction.
+  const locks = new Map<string, Promise<unknown>>();
 
   const store: LearningPathStore = {
+    async withMemberLock(userId, fn) {
+      const prev = locks.get(userId) ?? Promise.resolve();
+      const run = prev.then(() => fn(store));
+      locks.set(
+        userId,
+        run.catch(() => undefined)
+      );
+      return run;
+    },
     async latestSubmittedAssessmentJson(userId) {
       return userId === USER ? (opts.assessmentJson ?? null) : null;
     },
@@ -347,5 +358,57 @@ describe('adjustLearningPath (coach review)', () => {
     const { store } = seeded();
     const items = await adjustLearningPath(USER, { addCourseIds: [C_SOCIAL] }, store);
     expect(items.map((i) => i.courseId)).toEqual([C_SOCIAL, C_WD_MKT]);
+  });
+});
+
+describe('concurrency (review r1 P1: concurrent assignment duplicated courses)', () => {
+  it('two simultaneous assignments write the path once', async () => {
+    const { store, actions } = fakeStore({ assessmentJson: MARKETING_GAP_ASSESSMENT });
+    const results = await Promise.all([
+      assignLearningPathFromAssessment(USER, store),
+      assignLearningPathFromAssessment(USER, store),
+    ]);
+    expect(results.map((r) => r.status).sort()).toEqual(['already_assigned', 'assigned']);
+    const goals = actions.map((a) => a.goalId);
+    expect(goals).toEqual([learningGoalId(C_SOCIAL), learningGoalId(C_WD_MKT)]);
+  });
+
+  it('two simultaneous coach adds of the same course create one action', async () => {
+    const { store, actions } = fakeStore({});
+    await Promise.all([
+      adjustLearningPath(USER, { addCourseIds: [C_ADMIN] }, store),
+      adjustLearningPath(USER, { addCourseIds: [C_ADMIN] }, store),
+    ]);
+    expect(actions.filter((a) => a.goalId === learningGoalId(C_ADMIN))).toHaveLength(1);
+  });
+});
+
+describe('enrolment on the path item', () => {
+  it('reports whether the member is enrolled so the board can link correctly', async () => {
+    const { store } = fakeStore({
+      actions: [
+        {
+          id: 'l1',
+          userId: USER,
+          title: 'x',
+          goalId: learningGoalId(C_SOCIAL),
+          status: 'todo',
+          sortOrder: 1,
+        },
+        {
+          id: 'l2',
+          userId: USER,
+          title: 'y',
+          goalId: learningGoalId(C_WD_MKT),
+          status: 'todo',
+          sortOrder: 2,
+        },
+      ],
+      progress: {
+        [C_SOCIAL]: { enrolled: true, completed: false, lessonsTotal: 4, lessonsCompleted: 0 },
+      },
+    });
+    const items = await syncLearningPath(USER, store);
+    expect(items.map((i) => i.enrolled)).toEqual([true, false]);
   });
 });

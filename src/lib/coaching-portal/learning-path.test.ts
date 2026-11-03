@@ -6,6 +6,7 @@ import {
   DEFAULT_GAP_COURSE_MAP,
   applyCoachPathAdjustment,
   detectAssessmentGaps,
+  learningCourseLink,
   learningGoalId,
   parseLearningGoalId,
   recommendLearningModules,
@@ -255,5 +256,25 @@ describe('partner demo member', () => {
       'introduction-to-project-management-for-water-losses',
       'admin-sole-trader',
     ]);
+  });
+});
+
+describe('learningCourseLink (review r1 P1: never send an unenrolled member to the lesson player)', () => {
+  it('sends an enrolled member to the lesson player', () => {
+    expect(learningCourseLink({ courseSlug: 'social-media-marketing', enrolled: true })).toEqual({
+      href: '/dashboard/learn/social-media-marketing',
+      label: 'Continue the course',
+    });
+  });
+
+  it('sends a member without an enrolment to the course page to enrol, not the player', () => {
+    expect(learningCourseLink({ courseSlug: 'social-media-marketing', enrolled: false })).toEqual({
+      href: '/courses/social-media-marketing',
+      label: 'View the course',
+    });
+  });
+
+  it('gives no link when the course is not in the published catalogue', () => {
+    expect(learningCourseLink({ courseSlug: '', enrolled: true })).toBeNull();
   });
 });

@@ -215,4 +215,30 @@ describe.runIf(RUNNABLE)('coaching learning path (real PostgreSQL)', async () =>
     });
     expect(rows.map((r) => r.goalId)).toEqual([learningGoalId(extra), learningGoalId(wdMkt())]);
   });
+
+  it('two simultaneous assignments for one member write the path once (review r1 P1)', async () => {
+    const results = await Promise.all([
+      lp.assignLearningPathFromAssessment(otherId),
+      lp.assignLearningPathFromAssessment(otherId),
+      lp.assignLearningPathFromAssessment(otherId),
+    ]);
+    expect(results.filter((r) => r.status === 'assigned')).toHaveLength(1);
+    const rows = await prisma.carsiCoachingAction.findMany({ where: { userId: otherId } });
+    expect(rows.map((r) => r.goalId).sort()).toEqual(
+      [learningGoalId(social()), learningGoalId(wdMkt())].sort()
+    );
+  });
+
+  it('two simultaneous coach adds of one course create one action', async () => {
+    const extra = courseIdBySlug.get(extraSlug)!;
+    await Promise.all([
+      lp.adjustLearningPath(otherId, { addCourseIds: [extra] }),
+      lp.adjustLearningPath(otherId, { addCourseIds: [extra] }),
+    ]);
+    expect(
+      await prisma.carsiCoachingAction.count({
+        where: { userId: otherId, goalId: learningGoalId(extra) },
+      })
+    ).toBe(1);
+  });
 });

@@ -252,6 +252,22 @@ export function rollupLearningProgress(p: LearningCourseProgress): {
   return { percent, status: started ? 'in_progress' : 'todo' };
 }
 
+/**
+ * Where a learning action should send the member. The lesson player refuses anyone without an
+ * enrolment, and most prescribed courses are paid, so an unenrolled member goes to the course
+ * page, where they can enrol.
+ */
+export function learningCourseLink(input: {
+  courseSlug: string;
+  enrolled: boolean;
+}): { href: string; label: string } | null {
+  if (!input.courseSlug) return null;
+  const slug = encodeURIComponent(input.courseSlug);
+  return input.enrolled
+    ? { href: `/dashboard/learn/${slug}`, label: 'Continue the course' }
+    : { href: `/courses/${slug}`, label: 'View the course' };
+}
+
 export type CoachPathAdjustment = {
   add?: string[];
   remove?: string[];

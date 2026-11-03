@@ -20,6 +20,7 @@ import {
   COACHING_GROWTH_SERVICE_CATEGORIES,
   type GrowthServiceItem,
 } from '@/lib/coaching-portal/growth-services';
+import { learningCourseLink } from '@/lib/coaching-portal/learning-path';
 import { openCoachingSupportEmail } from '@/lib/coaching-portal/support-contact';
 import type { CoachingActionStatus } from '@/lib/coaching-portal/types';
 import { carsiCoachingMonthlyPriceLabel } from '@/lib/marketing/carsi-coaching-monthly';
@@ -35,7 +36,7 @@ type ActionItem = {
   priority: string | null;
   progressNote?: string | null;
   /** Prescribed CARSI course (GP-633): status and progress follow the LMS. */
-  learning?: { courseSlug: string; percent: number } | null;
+  learning?: { courseSlug: string; percent: number; enrolled: boolean } | null;
 };
 
 const STATUS_LABEL: Record<CoachingActionStatus, string> = {
@@ -44,6 +45,25 @@ const STATUS_LABEL: Record<CoachingActionStatus, string> = {
   done: 'Completed',
   blocked: 'Blocked',
 };
+
+/** Enrolled members open the lesson player; others go to the course page to enrol. */
+function LearningCourseAction({
+  learning,
+  status,
+  className,
+}: {
+  learning: NonNullable<ActionItem['learning']>;
+  status: CoachingActionStatus;
+  className: string;
+}) {
+  const link = learningCourseLink(learning);
+  if (!link) return null;
+  return (
+    <Link href={link.href} className={className}>
+      {status === 'done' && learning.enrolled ? 'Review the course' : link.label}
+    </Link>
+  );
+}
 
 function LearningProgress({ learning }: { learning: NonNullable<ActionItem['learning']> }) {
   return (
@@ -234,14 +254,11 @@ export function CoachingActionsPage() {
                     <span className="rounded-lg border border-white/10 px-2 py-1 text-xs text-slate-300">
                       {STATUS_LABEL[a.status]}
                     </span>
-                    {a.learning.courseSlug && a.status !== 'done' ? (
-                      <Link
-                        href={`/dashboard/learn/${a.learning.courseSlug}`}
-                        className="text-xs font-semibold text-sky-300 hover:text-sky-200"
-                      >
-                        {a.status === 'todo' ? 'Start the course' : 'Continue the course'}
-                      </Link>
-                    ) : null}
+                    <LearningCourseAction
+                      learning={a.learning}
+                      status={a.status}
+                      className="text-xs font-semibold text-sky-300 hover:text-sky-200"
+                    />
                   </>
                 ) : (
                   <select
@@ -405,13 +422,12 @@ function CoachingLearningPathSection() {
                 <p className={`mt-1 text-xs ${coachingMuted}`}>{STATUS_LABEL[a.status]}</p>
                 {a.learning ? <LearningProgress learning={a.learning} /> : null}
               </div>
-              {a.learning?.courseSlug ? (
-                <Link
-                  href={`/dashboard/learn/${a.learning.courseSlug}`}
+              {a.learning ? (
+                <LearningCourseAction
+                  learning={a.learning}
+                  status={a.status}
                   className={`inline-flex shrink-0 items-center text-sm font-semibold text-sky-300 hover:text-sky-200 ${coachingSecondaryBtn} !min-h-9 !px-3`}
-                >
-                  {a.status === 'done' ? 'Review' : 'Open'}
-                </Link>
+                />
               ) : null}
             </li>
           ))}
