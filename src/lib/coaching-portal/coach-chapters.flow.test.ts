@@ -118,7 +118,11 @@ const db = vi.hoisted(() => {
 const sent = vi.hoisted(() => [] as Array<{ to: string | string[]; subject: string; html: string; text?: string }>);
 /** Subjects whose send should report failure (simulates a provider outage for one email). */
 const failSubjects = vi.hoisted(() => [] as string[]);
-const stripeCalls = vi.hoisted(() => ({ sessions: [] as Row[], updates: [] as Row[] }));
+const stripeCalls = vi.hoisted(() => ({
+  sessions: [] as Row[],
+  updates: [] as Row[],
+  stored: new Map<string, Record<string, string>>(),
+}));
 
 vi.mock('@/lib/prisma', () => ({ prisma: db.prisma }));
 vi.mock('@/lib/server/email', () => ({
@@ -150,8 +154,10 @@ vi.mock('@/lib/api/stripe', () => ({
         },
         update: async (id: string, params: Row) => {
           stripeCalls.updates.push({ id, ...params });
+          stripeCalls.stored.set(id, params.metadata as Record<string, string>);
           return { id };
         },
+        retrieve: async (id: string) => ({ id, metadata: stripeCalls.stored.get(id) ?? {} }),
       },
     },
     subscriptions: { retrieve: async () => { throw new Error('not used'); } },
@@ -258,6 +264,7 @@ describe('GP-632 multi-coach chapters flow', () => {
     db.reset();
     sent.length = 0;
     stripeCalls.sessions.length = 0;
+    stripeCalls.stored.clear();
     stripeCalls.updates.length = 0;
     delete process.env.CARSI_COACHING_MONTHLY_NOTIFY_EMAIL;
     failSubjects.length = 0;
@@ -560,8 +567,10 @@ describe('GP-632 multi-coach chapters flow', () => {
 
     failSubjects.length = 0;
     sent.length = 0;
+    // Stripe re-delivers the original event, so the session copy carries no sent flags;
+    // the fulfillment must read the current flags from Stripe.
     const retry = await processCarsiCoachingMonthlyCheckoutCompleted(
-      { ...session, metadata: written } as unknown as Stripe.Checkout.Session,
+      session as unknown as Stripe.Checkout.Session,
       { appOrigin: 'https://carsi.example' }
     );
     expect(retry.founderEmailSent).toBe(true);
@@ -570,9 +579,8 @@ describe('GP-632 multi-coach chapters flow', () => {
 
     // A third delivery sends nothing.
     sent.length = 0;
-    const done = stripeCalls.updates.at(-1)?.metadata as Record<string, string>;
     const third = await processCarsiCoachingMonthlyCheckoutCompleted(
-      { ...session, metadata: done } as unknown as Stripe.Checkout.Session,
+      session as unknown as Stripe.Checkout.Session,
       { appOrigin: 'https://carsi.example' }
     );
     expect(third.skipped).toBe('already_emailed');

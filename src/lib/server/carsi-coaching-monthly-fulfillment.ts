@@ -35,6 +35,24 @@ export function isCarsiCoachingMonthlyCheckoutSession(session: Stripe.Checkout.S
   return session.metadata?.source === CARSI_COACHING_MONTHLY_CHECKOUT_SOURCE;
 }
 
+/**
+ * The session's metadata as Stripe holds it now. A webhook retry replays the original event,
+ * whose session copy predates the sent flags written after the first attempt, so the flags
+ * are read from Stripe. If Stripe cannot be reached the event's copy is used.
+ */
+async function currentSessionMetadata(
+  session: Stripe.Checkout.Session
+): Promise<Record<string, string>> {
+  const given = session.metadata ?? {};
+  try {
+    const fresh = await getStripeClient().checkout.sessions.retrieve(session.id);
+    return { ...given, ...(fresh.metadata ?? {}) };
+  } catch (err) {
+    console.error('[coaching-monthly] could not read current session metadata:', err);
+    return given;
+  }
+}
+
 export type CarsiCoachingMonthlyFulfillmentResult = {
   fulfilled: boolean;
   skipped?: string;
@@ -141,8 +159,9 @@ export async function processCarsiCoachingMonthlyCheckoutCompleted(
   const contactPhone =
     session.customer_details?.phone?.trim() || session.metadata?.contact_phone?.trim() || undefined;
 
-  const customerDone = session.metadata?.[CONFIRMATION_SENT_META] === 'true';
-  const coachFlag = session.metadata?.[COACH_NOTICE_SENT_META];
+  const metadata = await currentSessionMetadata(session);
+  const customerDone = metadata[CONFIRMATION_SENT_META] === 'true';
+  const coachFlag = metadata[COACH_NOTICE_SENT_META];
   // No coach flag on a session the welcome was already sent for = marked by earlier code,
   // which sent both emails together; treat the notice as sent so nothing goes out twice.
   const coachDone = coachFlag === 'true' || (customerDone && coachFlag === undefined);
@@ -210,7 +229,7 @@ export async function processCarsiCoachingMonthlyCheckoutCompleted(
       const stripe = getStripeClient();
       await stripe.checkout.sessions.update(session.id, {
         metadata: {
-          ...(session.metadata ?? {}),
+          ...metadata,
           [CONFIRMATION_SENT_META]: customerDone || customerResult.sent ? 'true' : 'false',
           [COACH_NOTICE_SENT_META]: coachDone || founderResult.sent ? 'true' : 'false',
         },
