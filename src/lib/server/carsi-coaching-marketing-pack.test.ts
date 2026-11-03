@@ -118,6 +118,12 @@ describe('safe public fetch guard', () => {
     'fc00::1',
     'fe80::1',
     '::ffff:127.0.0.1',
+    // Hex forms of IPv4-mapped / IPv4-compatible addresses (how WHATWG URL normalises them).
+    '::ffff:7f00:1',
+    '::ffff:a9fe:a9fe',
+    '::7f00:1',
+    '0:0:0:0:0:ffff:7f00:1',
+    '::ffff:0:a00:1',
   ])('blocks private or local address %s', (ip) => {
     expect(isBlockedAddress(ip)).toBe(true);
   });
@@ -135,6 +141,10 @@ describe('safe public fetch guard', () => {
     ['http://localhost/', false],
     ['https://user:pw@example.com/', false],
     ['https://example.com:8443/', false],
+    ['http://[::ffff:127.0.0.1]/', false],
+    ['http://[::ffff:169.254.169.254]/', false],
+    ['http://2130706433/', false],
+    ['http://0x7f.1/', false],
     ['https://example.com/page', true],
     ['example.com', true],
   ])('validatePublicHttpUrl(%s) ok=%s', (raw, ok) => {

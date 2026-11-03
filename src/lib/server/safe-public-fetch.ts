@@ -42,19 +42,48 @@ function blockedV4(ip: string): boolean {
   });
 }
 
+/** Expand any valid IPv6 text form (::, embedded dotted IPv4) to eight 16-bit groups. */
+function expandIPv6(ip: string): number[] | null {
+  let text = ip.toLowerCase().split('%')[0];
+  const dotted = text.match(/(\d+\.\d+\.\d+\.\d+)$/);
+  if (dotted) {
+    const n = ipv4ToInt(dotted[1]);
+    text = `${text.slice(0, -dotted[1].length)}${(n >>> 16).toString(16)}:${(n & 0xffff).toString(16)}`;
+  }
+  const halves = text.split('::');
+  if (halves.length > 2) return null;
+  const head = halves[0] ? halves[0].split(':') : [];
+  const tail = halves.length === 2 && halves[1] ? halves[1].split(':') : [];
+  const fill = halves.length === 2 ? 8 - head.length - tail.length : 0;
+  if (fill < 0) return null;
+  const groups = [...head, ...Array<string>(fill).fill('0'), ...tail].map((g) => parseInt(g, 16));
+  if (groups.length !== 8 || groups.some((g) => Number.isNaN(g) || g < 0 || g > 0xffff)) {
+    return null;
+  }
+  return groups;
+}
+
+function v4FromGroups(hi: number, lo: number): string {
+  return [hi >>> 8, hi & 0xff, lo >>> 8, lo & 0xff].join('.');
+}
+
 export function isBlockedAddress(ip: string): boolean {
   const kind = isIP(ip);
   if (kind === 4) return blockedV4(ip);
   if (kind !== 6) return true;
-  const lower = ip.toLowerCase();
-  const mapped = lower.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/);
-  if (mapped) return blockedV4(mapped[1]);
-  if (lower === '::' || lower === '::1') return true;
-  const first = parseInt(lower.split(':')[0] || '0', 16);
-  if ((first & 0xfe00) === 0xfc00) return true; // fc00::/7 unique local
-  if ((first & 0xffc0) === 0xfe80) return true; // fe80::/10 link local
-  if ((first & 0xff00) === 0xff00) return true; // multicast
-  if (lower.startsWith('64:ff9b:') || lower.startsWith('2001:db8')) return true;
+  const g = expandIPv6(ip);
+  if (!g) return true;
+  // ::/64 covers ::, ::1, IPv4-compatible (::a.b.c.d), IPv4-mapped (::ffff:a.b.c.d) and
+  // IPv4-translated (::ffff:0:a.b.c.d) in every text form. None is a public web host.
+  if (g[0] === 0 && g[1] === 0 && g[2] === 0 && g[3] === 0) return true;
+  if ((g[0] & 0xfe00) === 0xfc00) return true; // fc00::/7 unique local
+  if ((g[0] & 0xffc0) === 0xfe80) return true; // fe80::/10 link local
+  if ((g[0] & 0xffc0) === 0xfec0) return true; // fec0::/10 site local (deprecated)
+  if ((g[0] & 0xff00) === 0xff00) return true; // multicast
+  if (g[0] === 0x64 && g[1] === 0xff9b) return true; // NAT64
+  if (g[0] === 0x2001 && g[1] === 0x0db8) return true; // documentation
+  if (g[0] === 0x2001 && g[1] === 0x0000) return true; // Teredo
+  if (g[0] === 0x2002) return blockedV4(v4FromGroups(g[1], g[2])); // 6to4 wraps an IPv4
   return false;
 }
 
