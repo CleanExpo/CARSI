@@ -381,6 +381,53 @@ describe.runIf(RUNNABLE)('coaching learning path (real PostgreSQL)', async () =>
     expect(await prisma.lmsLearningPathway.count({ where: { slug: marketingSlug } })).toBe(0);
   });
 
+  it('treats status as the publication flag: a legacy isPublished=false course is pickable, a draft is not (review r2 P1)', async () => {
+    const legacyId = randomUUID();
+    const draftId = randomUUID();
+    for (const [id, status, isPublished] of [
+      [legacyId, 'published', false],
+      [draftId, 'draft', true],
+    ] as const) {
+      await prisma.lmsCourse.create({
+        data: {
+          id,
+          slug: `gp633-${status}-${id.slice(0, 8)}`,
+          title: `GP-633 ${status} course`,
+          instructorId,
+          status,
+          isPublished,
+          priceAud: 0,
+        },
+      });
+      createdCourseIds.push(id);
+    }
+
+    const pickable = (await gapMap.prismaGapMapStore.publishedCatalogue()).map((c) => c.id);
+    expect(pickable).toContain(legacyId);
+    expect(pickable).not.toContain(draftId);
+    await gapMap.saveGapMapEntry({
+      chapterSlug: DEFAULT_COACHING_CHAPTER_SLUG,
+      area: 'sales',
+      courseIds: [legacyId],
+    });
+    await expect(
+      gapMap.saveGapMapEntry({
+        chapterSlug: DEFAULT_COACHING_CHAPTER_SLUG,
+        area: 'sales',
+        courseIds: [draftId],
+      })
+    ).rejects.toBeInstanceOf(gapMap.GapMapValidationError);
+    await gapMap.resetGapMapEntry({ chapterSlug: DEFAULT_COACHING_CHAPTER_SLUG, area: 'sales' });
+
+    // The coach's per-member path picker and add use the same rule.
+    const view = await lp.getCoachLearningPathView(mapMemberId);
+    expect(view.options.map((o) => o.id)).toContain(legacyId);
+    expect(view.options.map((o) => o.id)).not.toContain(draftId);
+    const path = await lp.adjustLearningPath(mapMemberId, { addCourseIds: [legacyId, draftId] });
+    expect(path.map((p) => p.courseId)).toContain(legacyId);
+    expect(path.map((p) => p.courseId)).not.toContain(draftId);
+  });
+
   it('two simultaneous coach adds of one course create one action', async () => {
     const extra = courseIdBySlug.get(extraSlug)!;
     await Promise.all([

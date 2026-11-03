@@ -23,6 +23,7 @@ import {
   type LearningGapArea,
 } from '@/lib/coaching-portal/learning-path';
 import { prisma } from '@/lib/prisma';
+import { lmsPublishedCourseWhere } from '@/lib/server/public-courses-list';
 
 /** Most courses one gap area may prescribe; a path is capped at 4 overall anyway. */
 export const GAP_MAP_MAX_COURSES = 8;
@@ -154,7 +155,9 @@ export async function resetGapMapEntry(
   return getGapMapView(store);
 }
 
-const PUBLISHED = { status: 'published', isPublished: true } as const;
+// The site-wide publication rule: `status` is canonical; the legacy `isPublished` flag is not
+// read (about 20 published courses still carry isPublished=false). Review r2 P1.
+const PUBLISHED = lmsPublishedCourseWhere;
 const COURSE_SELECT = { id: true, slug: true, title: true } as const;
 
 type GapMapDb = Pick<typeof prisma, 'lmsLearningPathway' | 'lmsCourse'>;

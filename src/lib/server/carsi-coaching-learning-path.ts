@@ -28,6 +28,7 @@ import {
 import { parseAssessmentResponsesJson } from '@/lib/coaching-portal/assessment-schema';
 import type { CoachingActionStatus } from '@/lib/coaching-portal/types';
 import { prisma } from '@/lib/prisma';
+import { lmsPublishedCourseWhere } from '@/lib/server/public-courses-list';
 import { loadGapCourseMap, prismaGapMapStoreFor } from '@/lib/server/carsi-coaching-gap-map';
 
 /** Statuses a learning action can be written with: board statuses, a draft, or a tombstone. */
@@ -413,7 +414,9 @@ export function isLearningAction(goalId: string | null | undefined): boolean {
   return parseLearningGoalId(goalId) !== null;
 }
 
-const PUBLISHED = { status: 'published', isPublished: true } as const;
+// The site-wide publication rule: `status` is canonical; the legacy `isPublished` flag is not
+// read (about 20 published courses still carry isPublished=false). Review r2 P1.
+const PUBLISHED = lmsPublishedCourseWhere;
 
 type LearningPathDb = Pick<
   typeof prisma,
