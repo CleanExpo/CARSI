@@ -15,14 +15,15 @@ entered into any AI tool, per the IICRC AI Use Policy and CLAUDE.md.
 | Status | Entries | Meaning |
 | --- | ---: | --- |
 | VERIFIED | 34 | A source was opened on 02/11/2026 and supports the claim (verbatim quote of 25 words or fewer in the ledger): 30 Australian regulator or government pages, plus 4 Australian distributor or retailer pages for instrument availability (WRP-065 to WRP-068). |
-| JUSTIFIED | 34 | 13 are our own arithmetic from a published method (psychrometrics, P = V x I), or a teaching number the lesson labels illustrative. 21 are SME confirmations (Phill McGurk, 02/11/2026): 18 confirmed as written and 3 in SME-supplied wording. Reasoning is in the ledger. |
+| JUSTIFIED | 38 | 13 are our own arithmetic from a published method (psychrometrics, P = V x I), or a teaching number the lesson labels illustrative. 21 are SME confirmations (Phill McGurk, 02/11/2026): 18 confirmed as written and 3 in SME-supplied wording. 4 are the instruments' battery power (WRP-069 to WRP-072), split out on 03/11/2026 because a stockist page verifies availability only (DECISIONS #54). Reasoning is in the ledger. |
 | GAP | 0 | All 21 GAPs were cleared by the SME on 02/11/2026 (see "SME sign-off" below). |
 
-Grades (VERIFIED and JUSTIFIED entries): A1 x1, A2 x29, A3 x3, B1 x21, B2 x3, C1 x4, C3 x7. Every VERIFIED
+Grades (VERIFIED and JUSTIFIED entries): A1 x1, A2 x29, A3 x3, B1 x25, B2 x3, C1 x4, C3 x7. Every VERIFIED
 source is a regulator, government agency or official body except Ausgrid's Electricity Safety site (B2, a
 network operator's public safety pages) and four Australian distributor or retailer pages (C1). Those
 vendor pages are used only for the commercial fact they are the primary record of: that a brand is sold
-in Australia and runs on batteries. The 21 SME confirmations are graded B1 (practitioner source).
+in Australia (availability only, DECISIONS #54). The 25 B1 entries are SME confirmations (practitioner
+source): the 21 sign-off answers plus the four battery-power rows WRP-069 to WRP-072.
 
 Validate the ledger with `node scripts/audit/validate-ledger.mjs <ledger>` (it must exit 0), and
 run `node scripts/audit/check-mutants.mjs` in the same session.
@@ -106,9 +107,11 @@ He reviewed all 21 GAP claims in the v1 draft: **18 OK, 3 Fix, 0 Cut.**
     moisture-instruments diagram.
   - **WRP-037, instrument brands.** Now reads: Protimeter, Tramex, Delmhorst and FLIR moisture
     instruments are battery-powered and widely available in Australia. The "230 V" framing is gone.
-    Australian availability and battery power were re-checked on 02/11/2026 against an Australian
-    distributor or retailer page for each brand (VERIFIED, WRP-065 to WRP-068). All four brands were
-    verified, so no brand GAP remains.
+    Australian availability was re-checked against an Australian distributor or retailer page for
+    each brand (VERIFIED, WRP-065 to WRP-068): 02/11/2026, with WRP-066 and WRP-068 re-read on
+    03/11/2026 for their AUD price-listing quotes. Battery power rests on the SME's
+    answer (JUSTIFIED, WRP-069 to WRP-072), with the stockist's listing as the supporting record,
+    since a stockist page verifies availability only (DECISIONS #54). No brand GAP remains.
   - **WRP-058, the insurance context.** The SME rejected "most water-damage work is inside an
     insurance claim". It now reads: much water-damage work runs through an insurance claim, but
     plenty doesn't. The excess is too high, the client is self-insured or uninsured, or they choose
