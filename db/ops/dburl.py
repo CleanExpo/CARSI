@@ -12,9 +12,14 @@ registered with ::add-mask:: so they stay hidden in the public log even outside 
 When the value cannot be understood, the error describes its shape (length, lines, markers),
 never its content.
 """
+import os
 import re
 import shlex
-from urllib.parse import quote
+from urllib.parse import parse_qsl, quote, urlencode
+
+# Prisma-only URL params that libpq rejects.
+PRISMA_PARAMS = {"schema", "connection_limit", "pool_timeout", "pgbouncer", "socket_timeout",
+                 "statement_cache_size"}
 
 
 class BadUrl(Exception):
@@ -22,9 +27,13 @@ class BadUrl(Exception):
 
 
 def _mask(*values):
+    """Hide values in the Actions log. Only on a runner: elsewhere it would print them."""
+    if os.environ.get("GITHUB_ACTIONS") != "true":
+        return
     for v in values:
-        if v and len(v) > 3:
-            print(f"::add-mask::{v}")
+        for line in (v or "").splitlines():  # one command per line; a newline would end it
+            if len(line) > 3:
+                print(f"::add-mask::{line}")
 
 
 def _build(user, password, host, port, db, sslmode):
@@ -33,7 +42,7 @@ def _build(user, password, host, port, db, sslmode):
     _mask(password, host)
     url = f"postgresql://{quote(user, safe='')}:{quote(password, safe='')}@{host}"
     url += f":{port}" if port else ""
-    url += f"/{db}" if db else ""
+    url += f"/{quote(db, safe='')}" if db else ""
     return url + f"?sslmode={sslmode or 'require'}"
 
 
@@ -55,10 +64,21 @@ def normalise(raw: str) -> str:
         user = re.match(r"postgres(?:ql)?://([^:@/]*)(?::([^@/]*))?@([^:/?]+)", url)
         if user:
             _mask(user.group(2), user.group(3))
-        url = re.sub(r"([?&])schema=[^&]*&?", r"\1", url)
-        return re.sub(r"[?&]$", "", url)
-    if "psql" in s or re.search(r"(^|\s)-h\s", s):
-        tokens = shlex.split(s)
+        base, _, query = url.partition("?")
+        keep = [(k, v) for k, v in parse_qsl(query, keep_blank_values=True)
+                if k.lower() not in PRISMA_PARAMS]
+        return base + ("?" + urlencode(keep) if keep else "")
+    pairs = dict((k.strip().lower(), v.strip()) for k, v in
+                 re.findall(r"(?m)^\s*([A-Za-z_]+)\s*[=:]\s*(\S+)\s*$", s))
+    if pairs.get("host") and pairs.get("password"):
+        return _build(pairs.get("username") or pairs.get("user"), pairs.get("password"),
+                      pairs.get("host"), pairs.get("port"),
+                      pairs.get("database") or pairs.get("dbname"), pairs.get("sslmode"))
+    if re.search(r"(^|\s)psql(\s|$)", s) or re.search(r"(^|\s)-h\s", s):
+        try:
+            tokens = shlex.split(s)
+        except ValueError:
+            raise BadUrl(f"the psql flags could not be read ({describe(raw)})") from None
         env = dict(t.split("=", 1) for t in tokens if re.match(r"^PG[A-Z]+=", t))
         opt = {}
         for i, t in enumerate(tokens):
@@ -68,12 +88,6 @@ def normalise(raw: str) -> str:
         return _build(opt.get("-U") or env.get("PGUSER"), env.get("PGPASSWORD"),
                       opt.get("-h") or env.get("PGHOST"), opt.get("-p") or env.get("PGPORT"),
                       opt.get("-d") or env.get("PGDATABASE"), ssl and ssl.group(1))
-    pairs = dict((k.strip().lower(), v.strip()) for k, v in
-                 re.findall(r"(?m)^\s*([A-Za-z_]+)\s*[=:]\s*(\S+)\s*$", s))
-    if pairs.get("host") and pairs.get("password"):
-        return _build(pairs.get("username") or pairs.get("user"), pairs.get("password"),
-                      pairs.get("host"), pairs.get("port"),
-                      pairs.get("database") or pairs.get("dbname"), pairs.get("sslmode"))
     raise BadUrl("DATABASE_URL is not a connection string, psql flags or connection "
                  f"parameters ({describe(raw)}). Paste DigitalOcean's 'Connection string'.")
 

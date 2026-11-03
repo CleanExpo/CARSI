@@ -2,8 +2,11 @@
 import contextlib
 import importlib.util
 import io
+import os
 import pathlib
 import sys
+
+os.environ["GITHUB_ACTIONS"] = "true"  # masks are printed only on an Actions runner
 
 here = pathlib.Path(__file__).parent
 spec = importlib.util.spec_from_file_location("dburl", here / "dburl.py")
@@ -20,9 +23,12 @@ OK = {
     "postgres scheme": WANT.replace("postgresql://", "postgres://", 1),
     "psql with URL": f"psql '{WANT}'",
     "flags": "PGPASSWORD=fakepass psql -U doadmin -h db.example.com -p 25060 -d defaultdb --set=sslmode=require",
+    "repeated schema params": WANT.replace("?sslmode=require", "?schema=public&schema=other&sslmode=require&connection_limit=5"),
+    "parameters with psql in the host": "username = doadmin\npassword = fakepass\nhost = db.example.com\nport = 25060\ndatabase = defaultdb\nsslmode = require\n# psql\n",
     "parameters": "username = doadmin\npassword = fakepass\nhost = db.example.com\nport = 25060\ndatabase = defaultdb\nsslmode = require\n",
 }
-BAD = {"empty": "", "just a password": "fakepass", "host only": "db.example.com"}
+BAD = {"empty": "", "just a password": "fakepass", "host only": "db.example.com",
+       "flags with an unmatched quote": "PGPASSWORD='fakepass psql -U doadmin -h db.example.com"}
 
 failed = 0
 for name, raw in OK.items():
@@ -44,5 +50,20 @@ for name, raw in BAD.items():
         if "fakepass" in str(e) or "example.com" in str(e):
             print(f"FAIL {name}: error message leaks the value")
             failed += 1
+# A newline in a password must not reach the runner as a second command.
+out = io.StringIO()
+with contextlib.redirect_stdout(out):
+    dburl._mask("fake\n::stop-commands::x")
+if any(not line.startswith("::add-mask::") for line in out.getvalue().splitlines()):
+    print("FAIL newline in a masked value produced a non-mask line")
+    failed += 1
+# Off a runner, nothing is printed (the mask command would print the password itself).
+os.environ.pop("GITHUB_ACTIONS")
+out = io.StringIO()
+with contextlib.redirect_stdout(out):
+    dburl.normalise(WANT)
+if out.getvalue():
+    print("FAIL printed outside GitHub Actions")
+    failed += 1
 print(f"{len(OK)} accepted + {len(BAD)} refused formats, {failed} failed")
 sys.exit(1 if failed else 0)
