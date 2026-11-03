@@ -21,10 +21,14 @@ order of strength:
    for a Postgres role with `SELECT` on course and quiz tables only, and none on `lms_users` or other
    learner tables. When it is set, read files connect as that role, so even a query that slipped
    through review cannot read learner data.
-3. **Statement check (enforced).** `db/ops/check-read-sql.py` runs before any connection and
-   refuses a `read/` file unless every statement is a plain query: no `SET`, `COMMIT`, `DO`, writes,
-   DDL, `set_config()`, psql meta-commands, or learner tables and sensitive columns. This matters
-   because a session's read-only flag can be switched off from SQL. Without
+3. **Statement check (enforced).** `db/ops/check-read-sql.py` is a single-pass SQL lexer (comments,
+   strings, dollar quotes and quoted identifiers handled the way PostgreSQL reads them). It runs
+   before any connection and refuses a `read/` file unless every statement is a plain query: no
+   `SET`, `COMMIT`, `DO`, writes, DDL, `set_config()`, server file functions, backslash commands,
+   or learner tables and sensitive columns. Its regression cases, including every bypass found in
+   review, are in `db/ops/test_check_read_sql.py` and run on every DB ops run.
+4. **No psql for reads.** `db/ops/run-read.py` sends the SQL text only, in a `READ ONLY`
+   transaction that is rolled back, so psql meta-commands cannot run at all. Without
    `DATABASE_URL_READONLY`, reads also wait for a person's approval in `production-db`.
 
 **Run one:** Actions → DB ops → Run workflow → pick the file path (e.g. `db/ops/read/04-water-go-live-preflight.sql`).

@@ -65,6 +65,7 @@ jobs:
             # Every statement must be a plain query; SET/COMMIT/DO/DML/meta-commands and learner
             # columns are refused before any connection. The session's read-only flag can be
             # switched off from SQL, so this check is what stops a read file from writing.
+            python3 db/ops/test_check_read_sql.py
             python3 db/ops/check-read-sql.py "$FILE"
           fi
           echo "kind=$kind" >> "$GITHUB_OUTPUT"
@@ -81,6 +82,11 @@ jobs:
     environment: ${{ needs.plan.outputs.has_readonly_role == 'true' && 'production-db-read' || 'production-db' }}
     steps:
       - uses: actions/checkout@v4
+      # setup-python gives a pip-installable interpreter (the runner's system Python is
+      # externally managed, so a bare pip install is refused there).
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
       - name: Run read-only
         env:
           FILE: ${{ inputs.file }}
@@ -95,12 +101,13 @@ jobs:
             echo "::warning::DATABASE_URL_READONLY is not set; using DATABASE_URL in a read-only session."
           fi
           [ -n "${DATABASE_URL:-}" ] || { echo "::error::DATABASE_URL secret is not set."; exit 1; }
-          command -v psql >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client; }
-          # psql rejects Prisma-only URL params such as schema=; drop them.
-          URL="$(printf '%s' "$DATABASE_URL" | sed -E 's/([?&])schema=[^&]*&?/\1/; s/[?&]$//')"
-          export PGOPTIONS='-c default_transaction_read_only=on -c statement_timeout=30000'
-          export PGCONNECT_TIMEOUT=15
-          psql "$URL" -v ON_ERROR_STOP=1 -X -P pager=off -f "$FILE"
+          # Not psql: its meta-commands (gexec, the shell escape) could run from the file. run-read.py
+          # sends the SQL only, in a READ ONLY transaction that is rolled back.
+          python3 -m pip install --quiet --disable-pip-version-check "psycopg[binary]==3.2.3"
+          # libpq rejects Prisma-only URL params such as schema=; drop them.
+          DATABASE_URL="$(printf '%s' "$DATABASE_URL" | sed -E 's/([?&])schema=[^&]*&?/\1/; s/[?&]$//')"
+          export DATABASE_URL
+          python3 db/ops/run-read.py "$FILE"
 
   write:
     needs: plan
