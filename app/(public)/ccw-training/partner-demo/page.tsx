@@ -73,20 +73,30 @@ export default function CoachingPartnerDemoPage() {
             <ol className="mt-4 space-y-3">
               {PARTNER_DEMO_WALKTHROUGH_STEPS.map((step, index) => (
                 <li
-                  key={step.segment}
+                  key={step.title}
+                  data-testid={`partner-demo-step-${index + 1}`}
                   className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3"
                 >
                   <span className="text-sm text-slate-200">
                     <span className="mr-2 font-mono text-sky-400/90">{index + 1}.</span>
                     {step.title}
                     <span className="ml-2 text-xs text-slate-500">~{step.minutes} min</span>
+                    <span className="mt-1 block text-xs text-slate-400">
+                      {step.advantage}: {step.shows}
+                    </span>
                   </span>
-                  <Link
-                    href={coachingPortalPath(step.segment)}
-                    className="text-sm font-medium text-sky-300 underline-offset-2 hover:underline"
-                  >
-                    Open in portal
-                  </Link>
+                  {step.status === 'live' && step.segment ? (
+                    <Link
+                      href={coachingPortalPath(step.segment === '/' ? '' : step.segment)}
+                      className="text-sm font-medium text-sky-300 underline-offset-2 hover:underline"
+                    >
+                      Open in portal
+                    </Link>
+                  ) : (
+                    <span className="text-xs font-semibold tracking-wide text-amber-200/90 uppercase">
+                      Coming ({step.ticket})
+                    </span>
+                  )}
                 </li>
               ))}
             </ol>
