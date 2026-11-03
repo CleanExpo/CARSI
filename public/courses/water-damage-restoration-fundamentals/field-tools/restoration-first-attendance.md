@@ -1,7 +1,7 @@
 # First-attendance roadmap card
 
 **CARSI Water Restoration Practitioner — field tool (Module 1)**
-*DRAFT v1 for SME review. Australian-produced: 230 V / 50 Hz, 10 A GPO, metric, AUD.*
+*Australian-produced: 230 V / 50 Hz, 10 A GPO, metric, AUD.*
 
 ## The first hour on site — in order
 

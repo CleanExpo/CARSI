@@ -1,7 +1,7 @@
 # Drying and power-budget worksheet
 
 **CARSI Water Restoration Practitioner — field tool (Module 5)**
-*DRAFT v1 for SME review. Australian-produced: 230 V / 50 Hz, 10 A GPO.*
+*Australian-produced: 230 V / 50 Hz, 10 A GPO.*
 
 ## The four drying levers
 

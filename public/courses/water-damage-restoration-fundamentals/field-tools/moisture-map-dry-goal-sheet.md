@@ -1,7 +1,7 @@
 # Moisture map and dry-goal sheet
 
 **CARSI Water Restoration Practitioner — field tool (Module 4)**
-*DRAFT v1 for SME review. Australian-produced: metric readings throughout.*
+*Australian-produced: metric readings throughout.*
 
 ## Set the dry standard first
 
