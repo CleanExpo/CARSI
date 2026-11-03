@@ -46,7 +46,27 @@ const RULES: { rule: string; pattern: RegExp }[] = [
     rule: 'guarantee claim',
     pattern: /\b100\s?%\s+(satisfaction|success|results?|safe|effective)\b/i,
   },
-  { rule: 'outcome claim', pattern: /\b(every|each)\s+time\b/i },
+  // "every time", "every visit", "each clean": a result promised on every job.
+  {
+    rule: 'outcome claim',
+    pattern:
+      /\b(every|each)\s+(single\s+)?(time|visit|job|clean|service|booking|call[- ]?out|treatment)\b/i,
+  },
+  // Absolute result words (fail closed): a finish nobody can promise on every job.
+  {
+    rule: 'outcome claim',
+    pattern:
+      /\b(spotless|flawless|perfect(ly)?|immaculate|pristine|stain[- ]free|odou?r[- ]free|mou?ld[- ]free|germ[- ]free|allergen[- ]free)\b/i,
+  },
+  {
+    rule: 'outcome claim',
+    pattern:
+      /\b(remov(e|es|ing)|eliminat(e|es|ing)|kill(s|ing)?|get(s|ting)?\s+rid\s+of|lift(s|ing)?)\s+(all|every|any)\b/i,
+  },
+  {
+    rule: 'outcome claim',
+    pattern: /\b(completely|totally|entirely|fully)\s+(remov|eliminat|clean|gone|restor)/i,
+  },
   // Definite outcome promises, whatever the wording (fail closed for generated drafts).
   { rule: 'outcome claim', pattern: /\bpromis(e|es|ed|ing)\b/i },
   {

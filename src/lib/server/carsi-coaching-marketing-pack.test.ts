@@ -12,7 +12,9 @@ const outsideTx = () => {
   throw new Error('write outside transaction');
 };
 let failActionCreate = false;
+const lockTaken = vi.fn(async () => [{ locked: 1 }]);
 const tx = {
+  $queryRaw: lockTaken,
   carsiCoachingMarketingPack: {
     create: vi.fn(async () => {
       txWrites.push('pack');
@@ -171,6 +173,7 @@ describe('defaultMarketingPackDeps.persist', () => {
     const res = await defaultMarketingPackDeps.persist({ userId: 'u', pack, model: null, actions });
     expect(res).toEqual({ id: 'pack-tx', proposedActionCount: 1 });
     expect(txWrites).toEqual(['pack', 'action']);
+    expect(lockTaken).toHaveBeenCalled();
   });
 
   it('propagates an action write failure so the transaction rolls back the pack', async () => {

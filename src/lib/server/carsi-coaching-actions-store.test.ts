@@ -27,54 +27,92 @@ function matches(row: Row, where: Record<string, unknown>) {
   });
 }
 
-vi.mock('@/lib/prisma', () => ({
-  prisma: {
-    carsiCoachingAction: {
-      findMany: async ({ where }: { where: Record<string, unknown> }) =>
-        rows.filter((r) => matches(r, where)),
-      findFirst: async ({ where }: { where: Record<string, unknown> }) =>
-        rows.find((r) => matches(r, where)) ?? null,
-      update: async ({ where, data }: { where: { id: string }; data: Partial<Row> }) => {
-        const row = rows.find((r) => r.id === where.id)!;
-        Object.assign(row, data);
-        return row;
-      },
-      updateMany: async ({
-        where,
-        data,
-      }: {
-        where: Record<string, unknown>;
-        data: Partial<Row>;
-      }) => {
-        const hit = rows.filter((r) => matches(r, where));
-        hit.forEach((r) => Object.assign(r, data));
-        return { count: hit.length };
-      },
-      create: async ({ data }: { data: Partial<Row> }) => {
-        const row = {
-          description: null,
-          dueDate: null,
-          priority: null,
-          progressNote: null,
-          coachFeedback: null,
-          goalId: null,
-          sortOrder: 0,
-          completedAt: null,
-          createdAt: new Date(),
-          ...data,
-        } as Row;
-        rows.push(row);
-        return row;
-      },
-      deleteMany: async ({ where }: { where: Record<string, unknown> }) => {
-        const before = rows.length;
-        for (let i = rows.length - 1; i >= 0; i -= 1)
-          if (matches(rows[i], where)) rows.splice(i, 1);
-        return { count: before - rows.length };
-      },
+/**
+ * Per-key lock standing in for pg_advisory_xact_lock: held until the transaction that took it
+ * settles. Lets the race test below interleave a coach review with a pack rebuild.
+ */
+const lockQueues = new Map<string, Promise<void>>();
+let afterFindMany: (() => void) | null = null;
+const tick = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
+
+vi.mock('@/lib/prisma', () => {
+  const actions = {
+    findMany: async ({ where }: { where: Record<string, unknown> }) => {
+      const found = rows.filter((r) => matches(r, where)).map((r) => ({ ...r }));
+      if (afterFindMany) {
+        const hook = afterFindMany;
+        afterFindMany = null;
+        hook();
+        for (let i = 0; i < 5; i += 1) await tick();
+      }
+      return found;
     },
-  },
-}));
+    findFirst: async ({ where }: { where: Record<string, unknown> }) =>
+      rows.find((r) => matches(r, where)) ?? null,
+    update: async ({ where, data }: { where: { id: string }; data: Partial<Row> }) => {
+      const row = rows.find((r) => r.id === where.id)!;
+      Object.assign(row, data);
+      return row;
+    },
+    updateMany: async ({ where, data }: { where: Record<string, unknown>; data: Partial<Row> }) => {
+      const hit = rows.filter((r) => matches(r, where));
+      hit.forEach((r) => Object.assign(r, data));
+      return { count: hit.length };
+    },
+    create: async ({ data }: { data: Partial<Row> }) => {
+      const row = {
+        description: null,
+        dueDate: null,
+        priority: null,
+        progressNote: null,
+        coachFeedback: null,
+        goalId: null,
+        sortOrder: 0,
+        completedAt: null,
+        createdAt: new Date(),
+        ...data,
+      } as Row;
+      rows.push(row);
+      return row;
+    },
+    deleteMany: async ({ where }: { where: Record<string, unknown> }) => {
+      const before = rows.length;
+      for (let i = rows.length - 1; i >= 0; i -= 1) if (matches(rows[i], where)) rows.splice(i, 1);
+      return { count: before - rows.length };
+    },
+  };
+  const client = {
+    carsiCoachingAction: actions,
+    $queryRaw: async () => {
+      throw new Error('lock taken outside a transaction');
+    },
+    $transaction: async (fn: (tx: unknown) => Promise<unknown>) => {
+      const releases: (() => void)[] = [];
+      const tx = {
+        carsiCoachingAction: actions,
+        $queryRaw: async (_strings: TemplateStringsArray, ...values: unknown[]) => {
+          const key = String(values[0]);
+          const prior = lockQueues.get(key) ?? Promise.resolve();
+          let release!: () => void;
+          const held = new Promise<void>((resolve) => (release = resolve));
+          lockQueues.set(
+            key,
+            prior.then(() => held)
+          );
+          releases.push(release);
+          await prior;
+          return [{ locked: 1 }];
+        },
+      };
+      try {
+        return await fn(tx);
+      } finally {
+        releases.forEach((r) => r());
+      }
+    },
+  };
+  return { prisma: client };
+});
 
 const store = await import('./carsi-coaching-actions-store');
 
@@ -164,6 +202,43 @@ describe('proposed actions in the actions store', () => {
     ).toEqual({ ok: false, reason: 'not_found' });
   });
 
+  it('a pack rebuild racing a coach approval never re-proposes the approved fix (Codex P1, head 95f39114)', async () => {
+    seedProposed('pending-title');
+    rows[rows.length - 1].goalId = 'marketing-pack:title-generic';
+    let review: Promise<unknown> = Promise.resolve();
+    // The coach approves right after the rebuild has read the member's actions.
+    afterFindMany = () => {
+      review = store.reviewProposedCoachingAction({
+        actionId: 'pending-title',
+        decision: 'approve',
+      });
+    };
+    const { prisma } = await import('@/lib/prisma');
+    await prisma.$transaction((tx) =>
+      store.replaceProposedMarketingActions(
+        'member-1',
+        [
+          {
+            title: 'Rewrite your page title',
+            description: 'x',
+            status: 'proposed',
+            priority: 'medium',
+            goalId: 'marketing-pack:title-generic',
+            sortOrder: 0,
+          },
+        ],
+        tx as Parameters<typeof store.replaceProposedMarketingActions>[2]
+      )
+    );
+    const decided = (await review) as { ok: boolean };
+    const forGoal = rows.filter((r) => r.goalId === 'marketing-pack:title-generic');
+    // Exactly one row for the fix: either the coach's approval stands alone, or the approval was
+    // refused because the rebuild replaced the row first. Never an approved row plus a new proposal.
+    expect(forGoal).toHaveLength(1);
+    if (decided.ok) expect(forGoal[0].status).toBe('todo');
+    else expect(forGoal[0].status).toBe('proposed');
+  });
+
   it('replaceProposedMarketingActions keeps reviewed actions and replaces only pending ones', async () => {
     seedProposed('old-pending');
     rows.push({
@@ -172,24 +247,31 @@ describe('proposed actions in the actions store', () => {
       status: 'todo',
       goalId: 'marketing-pack:title-generic',
     });
-    const created = await store.replaceProposedMarketingActions('member-1', [
-      {
-        title: 'Claim your Google Business Profile',
-        description: 'x',
-        status: 'proposed',
-        priority: 'high',
-        goalId: 'marketing-pack:gbp-missing',
-        sortOrder: 0,
-      },
-      {
-        title: 'Rewrite your page title',
-        description: 'x',
-        status: 'proposed',
-        priority: 'medium',
-        goalId: 'marketing-pack:title-generic',
-        sortOrder: 1,
-      },
-    ]);
+    const { prisma } = await import('@/lib/prisma');
+    const created = await prisma.$transaction((tx) =>
+      store.replaceProposedMarketingActions(
+        'member-1',
+        [
+          {
+            title: 'Claim your Google Business Profile',
+            description: 'x',
+            status: 'proposed',
+            priority: 'high',
+            goalId: 'marketing-pack:gbp-missing',
+            sortOrder: 0,
+          },
+          {
+            title: 'Rewrite your page title',
+            description: 'x',
+            status: 'proposed',
+            priority: 'medium',
+            goalId: 'marketing-pack:title-generic',
+            sortOrder: 1,
+          },
+        ],
+        tx as Parameters<typeof store.replaceProposedMarketingActions>[2]
+      )
+    );
     // gbp-missing re-proposed (old pending replaced); title-generic already approved, so skipped.
     expect(created).toBe(1);
     expect(rows.filter((r) => r.status === 'proposed').map((r) => r.goalId)).toEqual([

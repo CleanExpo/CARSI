@@ -78,6 +78,19 @@ describe('social calendar', () => {
     }
   });
 
+  it('drops an every-visit result promise from the calendar (Codex P1, head 95f39114)', () => {
+    const promise = 'Our service gets your carpets spotless every visit.';
+    const ai = Array.from({ length: 30 }, (_, i) => ({
+      theme: `Tip ${i + 1}`,
+      caption: i === 0 ? promise : `Toowoomba tip ${i + 1}: blot spills, never rub them.`,
+      hashtags: [],
+    }));
+    const calendar = assembleCalendar(ai, voice, new Date('2026-11-09T00:00:00Z'));
+    expect(calendar.posts).toHaveLength(30);
+    expect(calendar.rejectedCount).toBe(1);
+    expect(calendar.posts.map((p) => p.caption)).not.toContain(promise);
+  });
+
   it('uses AI posts only (source ai) when all 30 pass', () => {
     const ai = Array.from({ length: 34 }, (_, i) => ({
       theme: `Tip ${i + 1}`,

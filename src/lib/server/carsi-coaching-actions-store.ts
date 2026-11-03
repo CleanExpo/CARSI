@@ -12,6 +12,7 @@ import {
   type CoachingMonthlyAction,
   type MemberSettableActionStatus,
 } from '@/lib/coaching-portal/types';
+import type { Prisma } from '@/generated/prisma/client';
 import { prisma } from '@/lib/prisma';
 
 const STATUS_MAP: Record<string, CoachingActionStatus> = {
@@ -163,16 +164,34 @@ export async function deleteCoachingActionForUser(
   return result.count > 0;
 }
 
+export type MarketingActionsTx = Pick<
+  Prisma.TransactionClient,
+  'carsiCoachingAction' | '$queryRaw'
+>;
+
+/**
+ * Serialises every change to one member's proposed marketing actions (a pack rebuild and a coach
+ * review). Postgres transaction-scoped advisory lock: released when the transaction ends, so it
+ * must run inside one. Without it a rebuild that read the actions before a concurrent approval
+ * would re-propose the fix the coach had just approved (Codex P1, head 95f39114).
+ */
+async function lockMemberMarketingActions(tx: MarketingActionsTx, userId: string): Promise<void> {
+  const key = `carsi-coaching-marketing-actions:${userId}`;
+  await tx.$queryRaw`SELECT 1 AS locked FROM pg_advisory_xact_lock(hashtext(${key}))`;
+}
+
 /**
  * GP-634: write the marketing pack's proposed actions. Pending (still proposed) marketing
  * actions from an earlier pack are replaced; any fix the coach already approved or declined is
- * left alone and not proposed again. Returns the number of actions created.
+ * left alone and not proposed again. Returns the number of actions created. Must be called with
+ * a transaction client: the member's actions are locked for the rest of that transaction.
  */
 export async function replaceProposedMarketingActions(
   userId: string,
   actions: ProposedActionInput[],
-  db: Pick<typeof prisma, 'carsiCoachingAction'> = prisma
+  db: MarketingActionsTx
 ): Promise<number> {
+  await lockMemberMarketingActions(db, userId);
   const existing = await db.carsiCoachingAction.findMany({
     where: { userId },
     select: { id: true, status: true, goalId: true },
@@ -221,21 +240,30 @@ export async function reviewProposedCoachingAction(input: {
   decision: CoachDecision;
   coachFeedback?: string | null;
 }): Promise<ReviewProposedActionResult> {
-  const row = await prisma.carsiCoachingAction.findFirst({
-    where: { id: input.actionId },
-    select: { id: true, status: true },
+  return prisma.$transaction(async (tx) => {
+    const owner = await tx.carsiCoachingAction.findFirst({
+      where: { id: input.actionId },
+      select: { userId: true },
+    });
+    if (!owner) return { ok: false, reason: 'not_found' } as const;
+    // Same lock as a pack rebuild, then re-read: the status seen is the committed one.
+    await lockMemberMarketingActions(tx, owner.userId);
+    const row = await tx.carsiCoachingAction.findFirst({
+      where: { id: input.actionId },
+      select: { id: true, status: true },
+    });
+    if (!row) return { ok: false, reason: 'not_proposed' } as const;
+    const decision = decideCoachReview(row.status, input.decision);
+    if (!decision.ok) return decision;
+    const feedback = input.coachFeedback?.trim();
+    const result = await tx.carsiCoachingAction.updateMany({
+      where: { id: row.id, status: 'proposed' },
+      data: {
+        status: decision.status,
+        ...(feedback ? { coachFeedback: feedback.slice(0, 4000) } : {}),
+      },
+    });
+    if (result.count === 0) return { ok: false, reason: 'not_proposed' } as const;
+    return { ok: true, status: decision.status } as const;
   });
-  if (!row) return { ok: false, reason: 'not_found' };
-  const decision = decideCoachReview(row.status, input.decision);
-  if (!decision.ok) return decision;
-  const feedback = input.coachFeedback?.trim();
-  const result = await prisma.carsiCoachingAction.updateMany({
-    where: { id: row.id, status: 'proposed' },
-    data: {
-      status: decision.status,
-      ...(feedback ? { coachFeedback: feedback.slice(0, 4000) } : {}),
-    },
-  });
-  if (result.count === 0) return { ok: false, reason: 'not_proposed' };
-  return { ok: true, status: decision.status };
 }

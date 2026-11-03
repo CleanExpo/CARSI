@@ -39,6 +39,15 @@ describe('findComplianceIssues', () => {
     '50% fewer callbacks',
     'Your carpets will look brand new',
     'Promised spotless finish',
+    // Unqualified result promises in other frequency or result wording (Codex P1, head 95f39114).
+    'Our service gets your carpets spotless every visit.',
+    'Fresh, clean carpets every job.',
+    'Each clean leaves your home stain-free',
+    'A flawless finish on your tiles',
+    'Perfect results for Toowoomba homes',
+    'We remove all stains from your couch',
+    'Leaves your rugs odour-free',
+    'Completely removes pet odours',
   ])('rejects %s', (text) => {
     expect(findComplianceIssues(text).length).toBeGreaterThan(0);
     expect(isCompliantCopy(text)).toBe(false);
@@ -53,6 +62,9 @@ describe('findComplianceIssues', () => {
     'Put your phone number at the top of the page.',
     'Put a heading at the top such as "Plumbing in Mackay".',
     'The best way to dry a rug is flat, in the shade.',
+    'Blot spills, never rub them.',
+    'Every carpet is different, so we test a small patch first.',
+    'Ask about stain protection at your next clean.',
   ])('allows %s', (text) => {
     expect(findComplianceIssues(text)).toEqual([]);
   });

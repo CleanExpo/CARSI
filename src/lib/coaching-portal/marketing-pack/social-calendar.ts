@@ -102,7 +102,7 @@ export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
     ],
     [
       'Behind the scenes',
-      `Behind the scenes on a ${service} job in ${town} this week. Every job starts with a walk-through so we can explain what we'll do before we start.`,
+      `Behind the scenes on a ${service} job in ${town} this week. We start with a walk-through so we can explain what we'll do before we start.`,
     ],
     [
       'Question',
@@ -162,7 +162,7 @@ export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
     ],
     [
       'Job story',
-      `Before and after from a recent ${service} job in ${town}. Every job is different, so we always explain what to expect before we start.`,
+      `Before and after from a recent ${service} job in ${town}. No two jobs are the same, so we always explain what to expect before we start.`,
     ],
     [
       'Question',
@@ -202,7 +202,7 @@ export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
     ],
     [
       'Job story',
-      `Small job, happy customer. Not every job is a big one, and we're glad to help with the small stuff around ${town} too.`,
+      `Small job, happy customer. Not all jobs are big ones, and we're glad to help with the small stuff around ${town} too.`,
     ],
     [
       'Seasonal',
