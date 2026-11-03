@@ -47,12 +47,14 @@ export const PARTNER_DEMO_PROFILE = {
   challenges:
     'Insurance-referred jobs are steady but margins are thin; quotes for retail cleaning go cold after the first visit.',
   shortTermGoals: 'Book one more direct (non-insurance) job each week within 90 days.',
-  longTermVision: 'A second crew run by a trained lead, with the owner out of the van three days a week.',
+  longTermVision:
+    'A second crew run by a trained lead, with the owner out of the van three days a week.',
 };
 
 export const PARTNER_DEMO_STATEMENTS = {
   problemStatement: 'Retail quotes go cold after the first visit and the owner is the bottleneck.',
-  goalStatement: 'One more direct job booked every week, and a crew lead trained within six months.',
+  goalStatement:
+    'One more direct job booked every week, and a crew lead trained within six months.',
   extraNotes: 'Partner demo member (GP-637). Sample data only.',
 };
 
@@ -90,7 +92,8 @@ export const PARTNER_DEMO_WORKSPACE: CoachingPortalWorkspace = {
     'This quarter: lift direct (non-insurance) bookings and get the owner off the tools for quoting.',
   directionSummary:
     'Build a quote-to-booking rhythm first, then train a crew lead so a second van can run.',
-  sessionPrepNotes: 'Bring the quote log, last month’s cash-flow snapshot and the crew-lead shortlist.',
+  sessionPrepNotes:
+    'Bring the quote log, last month’s cash-flow snapshot and the crew-lead shortlist.',
   monthlyActions: [],
 };
 
@@ -129,7 +132,8 @@ export const PARTNER_DEMO_WALKTHROUGH_STEPS: readonly PartnerDemoWalkthroughStep
     minutes: 1,
     advantage: 'One workspace per member',
     status: 'live',
-    shows: 'The member’s home: plan focus, next action and next session, with the Demo mode banner.',
+    shows:
+      'The member’s home: plan focus, next action and next session, with the Demo mode banner.',
   },
   {
     title: 'Business profile',
@@ -185,7 +189,8 @@ export const PARTNER_DEMO_WALKTHROUGH_STEPS: readonly PartnerDemoWalkthroughStep
     minutes: 0.5,
     advantage: 'A6 prescribed learning path',
     status: 'live',
-    shows: 'The resource library today. Modules assigned from assessment gaps arrive with A6 (GP-633).',
+    shows:
+      'CARSI courses picked from the assessment gaps, with live course progress, above the resource library.',
   },
   {
     title: 'Ask my coach assistant and marketing pack',
@@ -193,7 +198,8 @@ export const PARTNER_DEMO_WALKTHROUGH_STEPS: readonly PartnerDemoWalkthroughStep
     minutes: 0.5,
     advantage: 'A3 assistant and A7 marketing pack',
     status: 'coming',
-    shows: 'Coming: grounded answers from the coach’s own material, and a marketing pack per member.',
+    shows:
+      'Coming: grounded answers from the coach’s own material, and a marketing pack per member.',
     tickets: ['GP-630', 'GP-634'],
   },
   {

@@ -9,6 +9,7 @@ import {
   ClipboardCheck,
   GraduationCap,
   LogOut,
+  Route,
   Mail,
   Megaphone,
   Percent,
@@ -80,6 +81,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const contactsActive = pathname.startsWith('/admin/contacts');
   const marketingActive = pathname.startsWith('/admin/marketing');
   const businessCoachingAdminActive = pathname.startsWith('/admin/business-coaching');
+  const learningPathsActive = pathname.startsWith('/admin/coaching-learning-paths');
   const analyticsActive = pathname.startsWith('/admin/analytics');
   const yearlyMembershipActive = pathname.startsWith('/admin/yearly-membership');
   const iicrcCecActive = pathname.startsWith('/admin/iicrc-cec');
@@ -170,6 +172,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             label="Owner Circle"
             icon={Users}
             active={businessCoachingAdminActive}
+          />
+          <NavButton
+            href="/admin/coaching-learning-paths"
+            label="Learning paths"
+            icon={Route}
+            active={learningPathsActive}
           />
           <NavButton
             href="/admin/ccw-roadshow"
