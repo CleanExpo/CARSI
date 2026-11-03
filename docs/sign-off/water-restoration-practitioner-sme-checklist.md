@@ -1,6 +1,6 @@
 # SME claim checklist — CARSI Water Restoration Practitioner
 
-**For:** Phill (SME, DECISIONS #24) · **Generated:** 02/11/2026 from `data/courses/water-damage-restoration-fundamentals/v1-draft/evidence/evidence-ledger.jsonl` · **Ledger:** 68 claims: 34 VERIFIED, 34 JUSTIFIED, **0 GAP (listed below)**.
+**For:** Phill (SME, DECISIONS #24) · **Generated:** 02/11/2026 from `data/courses/water-damage-restoration-fundamentals/v1-draft/evidence/evidence-ledger.jsonl` · **Ledger:** 72 claims: 34 VERIFIED, 38 JUSTIFIED, **0 GAP (listed below)**.
 
 Only the GAP claims need you. VERIFIED and JUSTIFIED claims already carry a source. Tick one box per claim:
 
