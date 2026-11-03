@@ -502,3 +502,37 @@ describe('member read racing a coach removal (review r3 P1)', () => {
     expect(actions[0].status).toBe('removed');
   });
 });
+
+describe('coach removal racing a member read (reverse of review r3)', () => {
+  it('the removal still applies when a progress sync moved the status first', async () => {
+    const { store, actions } = fakeStore({
+      actions: [
+        {
+          id: 'l1',
+          userId: USER,
+          title: 'x',
+          goalId: learningGoalId(C_SOCIAL),
+          status: 'todo',
+          sortOrder: 1,
+        },
+      ],
+    });
+    let interleaved = false;
+    const racingStore: LearningPathStore = {
+      ...store,
+      async withMemberLock(userId, fn) {
+        return store.withMemberLock(userId, () => fn(racingStore));
+      },
+      async updateAction(userId, id, expected, data) {
+        if (!interleaved && data.status === 'removed') {
+          interleaved = true;
+          actions[0].status = 'done'; // a member sync lands between the coach's read and write
+        }
+        return store.updateAction(userId, id, expected, data);
+      },
+    };
+    const items = await adjustLearningPath(USER, { removeCourseIds: [C_SOCIAL] }, racingStore);
+    expect(actions[0].status).toBe('removed');
+    expect(items).toEqual([]);
+  });
+});

@@ -235,6 +235,27 @@ export async function adjustLearningPath(
   return items.sort((a, b) => a.sortOrder - b.sortOrder);
 }
 
+/**
+ * A coach edit, written compare-and-set. The coach holds the member lock, so the only other
+ * writer is a progress sync, which can move the status once between our read and our write.
+ * Re-read and retry (bounded) so the coach's decision always lands; never blind-overwrite.
+ */
+async function coachWrite(
+  store: LearningPathStore,
+  userId: string,
+  action: LearningActionRecord,
+  data: Parameters<LearningPathStore['updateAction']>[3]
+): Promise<void> {
+  let expected = action.status;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    if (await store.updateAction(userId, action.id, expected, data)) return;
+    const fresh = (await store.listActions(userId)).find((a) => a.id === action.id);
+    if (!fresh) return;
+    expected = fresh.status;
+  }
+  throw new Error(`learning path: could not apply coach edit to action ${action.id}`);
+}
+
 async function adjustLocked(
   userId: string,
   input: LearningPathAdjustmentInput,
@@ -257,9 +278,7 @@ async function adjustLocked(
   // Removal keeps the row as a tombstone: it leaves the board, and the "already assigned"
   // guard still sees it, so a full clear is never re-prescribed (review r2 P1).
   for (const x of learning.filter((l) => !next.includes(l.courseId))) {
-    await store.updateAction(userId, x.action.id, x.action.status, {
-      status: LEARNING_REMOVED_STATUS,
-    });
+    await coachWrite(store, userId, x.action, { status: LEARNING_REMOVED_STATUS });
   }
 
   const kept = learning.filter((x) => next.includes(x.courseId));
@@ -277,7 +296,7 @@ async function adjustLocked(
     const sortOrder = i < slots.length ? slots[i] : tail++;
     if (existing) {
       if (existing.action.sortOrder !== sortOrder) {
-        await store.updateAction(userId, existing.action.id, existing.action.status, { sortOrder });
+        await coachWrite(store, userId, existing.action, { sortOrder });
       }
     } else {
       const course = addable.find((c) => c.id === courseId);
@@ -285,10 +304,7 @@ async function adjustLocked(
       const tombstone = removed.find((x) => x.courseId === courseId);
       if (tombstone) {
         // Re-adding a removed course revives its row; the sync then sets its real status.
-        await store.updateAction(userId, tombstone.action.id, LEARNING_REMOVED_STATUS, {
-          status: 'todo',
-          sortOrder,
-        });
+        await coachWrite(store, userId, tombstone.action, { status: 'todo', sortOrder });
         continue;
       }
       toCreate.push({
