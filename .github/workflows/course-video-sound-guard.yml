@@ -26,6 +26,7 @@ jobs:
         with:
           node-version: '22'
       - name: Install ffmpeg and ffprobe
+        if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - name: Test sound guard
         run: node --test scripts/check-course-video-sound.test.mjs
@@ -42,6 +43,7 @@ jobs:
         with:
           node-version: '22'
       - name: Install ffmpeg and ffprobe
+        if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
       - name: Check live course videos
         run: node scripts/check-course-video-sound.mjs --live
