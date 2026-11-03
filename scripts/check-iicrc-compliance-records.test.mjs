@@ -87,6 +87,14 @@ function runGuardIn(files) {
   if (!planted.out.includes(PLANTED_SLUG)) fail(`guard output does not name the slug ${PLANTED_SLUG}`);
   if (planted.out.includes('gp527-clean-course')) fail('guard output names the clean course');
 
+  // Review r1 (Codex, P1): the same claim split across two lines must fail the real guard too.
+  const split = runGuardIn({
+    [EXPORT_FILE]: JSON.stringify([course(PLANTED_SLUG, 'This course is approved for\nIICRC Continuing Education Credits.')]),
+  });
+  if (split.status === 0 || !split.out.includes(PLANTED_SLUG)) {
+    fail(`multi-line prose CEC-approval claim for "${PLANTED_SLUG}" PASSED the guard or was not named`);
+  }
+
   const clean = runGuardIn({
     [EXPORT_FILE]: JSON.stringify([course('gp527-clean-course', 'A neutral description.')], null, 2),
   });
@@ -127,6 +135,15 @@ if (typeof evaluateRecords !== 'function' || typeof classifyRecordFindings !== '
     ['"earns N CECs" without IICRC adjacency', 'Completing it earns 2 CECs.'],
     ['claim split by HTML tags', '<p>This course is <strong>approved for</strong> IICRC <em>Continuing Education Credit (CEC)</em>: 1 Hour.</p>'],
     ['claim split by an entity', 'This course is approved&nbsp;for IICRC Continuing Education Credit (CEC):&nbsp;2 Hours.'],
+    // Review r1 (Codex, P1): a claim split across lines passed because lines were checked alone.
+    ['claim split across two lines', 'This course is approved for\nIICRC Continuing Education Credits.'],
+    ['claim split one word per line', 'This course is approved\nfor\nIICRC\nCECs.'],
+    ['hours split from "(CEC)"', 'Continuing Education Credit (CEC)\n: 3 Hours'],
+    ['claim split across a <br>', 'It carries<br />IICRC Continuing Education Credit (CEC) hours.'],
+    ['zero-width space inside the claim', 'This course is approved​ for IICRC​ Continuing Education Credit (CEC): 1 Hour.'],
+    ['soft hyphen inside a word', 'This course is appro­ved for IICRC CECs.'],
+    ['hours written as a word', 'Continuing Education Credit (CEC): one Hour'],
+    ['half an hour', 'Continuing Education Credit (CEC) : half an hour'],
   ];
   for (const [name, text] of MUST_BLOCK) {
     for (const field of ['short_description', 'description']) {

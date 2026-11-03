@@ -248,9 +248,10 @@ export const RECORD_SCANNED_DIRS = ['data/wordpress-export/'];
  *  course records only: in generic marketing copy "courses approved for IICRC CECs" is a correct
  *  statement about the registry, but inside one course's own description it is a claim about that
  *  course. A denial written immediately before the verb ("not approved for", "does not award") is
- *  not a claim. */
+ *  not a claim. The last branch catches hours written as words ("(CEC): one Hour"), which the
+ *  numeric CEC_NUMBER rule cannot see. */
 export const CEC_APPROVAL_PROSE = {
-  re: /(?<!\b(?:not|never)\s+(?:yet\s+|been\s+)?)\b(?:approved|accredited|eligible)\s+for\s+(?:the\s+)?(?:IICRC\s+)?(?:CECs?|Continuing[\s-]+Education[\s-]+Credits?)\b|(?<!\b(?:not|never)\s+)\b(?:carry|carries|earn|earns|award|awards|attract|attracts|grant|grants)\s+(?:\d+(?:\.\d+)?\s+)?(?:IICRC\s+)?(?:CECs?|Continuing[\s-]+Education[\s-]+Credits?)\b/i,
+  re: /(?<!\b(?:not|never)\s+(?:yet\s+|been\s+)?)\b(?:approved|accredited|eligible)\s+for\s+(?:the\s+)?(?:IICRC\s+)?(?:CECs?|Continuing[\s-]+Education[\s-]+Credits?)\b|(?<!\b(?:not|never)\s+)\b(?:carry|carries|earn|earns|award|awards|attract|attracts|grant|grants)\s+(?:\d+(?:\.\d+)?\s+)?(?:IICRC\s+)?(?:CECs?|Continuing[\s-]+Education[\s-]+Credits?)\b|\((?:IICRC\s+)?CECs?\)\s*:?\s*(?:\d+(?:\.\d+)?|one|two|three|four|five|six|seven|eight|nine|ten|half)\s+(?:an?\s+)?hours?\b/i,
   message:
     'Prose CEC-approval claim in a course record for a slug that is not approved in data/seed/cec-approvals.json. Only the founder can record an approval; until then the claim must not ship (fail-closed, CLAUDE.md).',
 };
@@ -265,6 +266,8 @@ export function recordTextLines(value) {
     .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
     .replace(/&([a-z]+);/gi, (m, name) => ENTITIES[name.toLowerCase()] ?? m)
     .replace(/ /g, ' ')
+    // Invisible characters must not split a word or a phrase (soft hyphen, zero-width, BOM).
+    .replace(/[­​-‍⁠﻿]/g, '')
     .split(/\r?\n/)
     .map(normaliseLine)
     .filter(Boolean);
@@ -305,18 +308,30 @@ export function evaluateRecords(file, jsonText, { approvedSlugs, allowlist = ALL
     }
     const slug = typeof row.slug === 'string' && row.slug.trim() ? row.slug.trim() : `<record ${i} has no slug>`;
     const isApproved = approved.has(slug);
+    const rules = [...BANNED, CEC_NUMBER, CEC_APPROVAL_PROSE].filter(
+      (rule) => !(isApproved && (rule === CEC_NUMBER || rule === CEC_APPROVAL_PROSE))
+    );
+    const flags = (rule, text) =>
+      rule.re.test(text) && (rule.allowlisted ? !allowlist.has(text) : !(rule.allow && rule.allow.test(text)));
     for (const [field, value] of stringFields(row, '', [])) {
       if (field === 'slug') continue;
-      recordTextLines(value).forEach((text, li) => {
-        for (const rule of [...BANNED, CEC_NUMBER, CEC_APPROVAL_PROSE]) {
-          if ((rule === CEC_NUMBER || rule === CEC_APPROVAL_PROSE) && isApproved) continue;
-          if (!rule.re.test(text)) continue;
-          const flagged = rule.allowlisted
-            ? !allowlist.has(text)
-            : !(rule.allow && rule.allow.test(text));
-          if (flagged) findings.push({ file, slug, field, line: li + 1, text, message: rule.message });
+      const lines = recordTextLines(value);
+      const hitRules = new Set();
+      lines.forEach((text, li) => {
+        for (const rule of rules) {
+          if (!flags(rule, text)) continue;
+          hitRules.add(rule);
+          findings.push({ file, slug, field, line: li + 1, text, message: rule.message });
         }
       });
+      // Review r1 (Codex, P1): a claim split across lines ("approved for\nIICRC Continuing
+      // Education Credits.") matched no single line. Check the whole field as one text too; a rule
+      // that fires only there is reported once for the field (line 0, the joined text).
+      const joined = lines.join(' ');
+      for (const rule of rules) {
+        if (hitRules.has(rule) || !flags(rule, joined)) continue;
+        findings.push({ file, slug, field, line: 0, text: joined, message: `${rule.message} (claim spans several lines)` });
+      }
     }
   });
   return findings;
