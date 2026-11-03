@@ -271,6 +271,7 @@ export function recordTextLines(value) {
   return value
     .replace(/<[^>]*>/g, ' ')
     .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCodePoint(parseInt(h, 16)))
     .replace(/&([a-z]+);/gi, (m, name) => ENTITIES[name.toLowerCase()] ?? m)
     .replace(/ /g, ' ')
     // Invisible characters must not split a word or a phrase (soft hyphen, zero-width, BOM).
@@ -280,9 +281,20 @@ export function recordTextLines(value) {
     .filter(Boolean);
 }
 
-/** Every string inside a record, with a dotted field path (meta.pricing, tags.0, …). */
+/** The same text with markup delimiters turned to spaces instead of whole tags removed, so text
+ *  inside attributes that still renders (alt, title, aria-label) is checked too. */
+function rawRecordText(value) {
+  return recordTextLines(value.replace(/[<>"'=/]/g, ' ')).join(' ');
+}
+
+/** Every string inside a record, with a dotted field path (meta.pricing, tags.0, …). Positive
+ *  numbers under a CEC-named key (cec_hours, meta.cec, …) are included as "key: N" text: that is a
+ *  CEC-hours claim in its plainest form. */
 function stringFields(value, path, out) {
   if (typeof value === 'string') out.push([path, value]);
+  else if (typeof value === 'number' && value > 0 && /cec/i.test(path.split('.').pop() ?? '')) {
+    out.push([path, `${path}: ${value} CEC hours`]);
+  }
   else if (Array.isArray(value)) value.forEach((v, i) => stringFields(v, `${path}.${i}`, out));
   else if (value && typeof value === 'object') {
     for (const [k, v] of Object.entries(value)) stringFields(v, path ? `${path}.${k}` : k, out);
@@ -337,7 +349,14 @@ export function evaluateRecords(file, jsonText, { approvedSlugs, allowlist = ALL
       const joined = lines.join(' ');
       for (const rule of rules) {
         if (hitRules.has(rule) || !flags(rule, joined)) continue;
+        hitRules.add(rule);
         findings.push({ file, slug, field, line: 0, text: joined, message: `${rule.message} (claim spans several lines)` });
+      }
+      // Text inside tag attributes (alt / title) renders but was removed with the tag above.
+      const raw = rawRecordText(value);
+      for (const rule of rules) {
+        if (hitRules.has(rule) || !flags(rule, raw)) continue;
+        findings.push({ file, slug, field, line: 0, text: raw, message: `${rule.message} (inside markup)` });
       }
     }
   });

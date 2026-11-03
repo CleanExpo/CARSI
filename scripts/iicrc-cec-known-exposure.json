@@ -611,6 +611,12 @@
     {
       "file": "data/wordpress-export/courses.json",
       "slug": "water-damage-estimating",
+      "field": "cec_hours",
+      "text": "cec_hours: 1 CEC hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-damage-estimating",
       "field": "meta.wp_categories.1.name",
       "text": "CEC Credits"
     },
@@ -653,6 +659,12 @@
     {
       "file": "data/wordpress-export/courses.json",
       "slug": "water-damage-commercial",
+      "field": "cec_hours",
+      "text": "cec_hours: 1 CEC hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-damage-commercial",
       "field": "meta.wp_categories.1.name",
       "text": "CEC Credits"
     },
@@ -695,6 +707,12 @@
     {
       "file": "data/wordpress-export/courses.json",
       "slug": "porous-drying",
+      "field": "cec_hours",
+      "text": "cec_hours: 1 CEC hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "porous-drying",
       "field": "meta.wp_categories.1.name",
       "text": "CEC Credits"
     },
@@ -737,6 +755,12 @@
     {
       "file": "data/wordpress-export/courses.json",
       "slug": "structural-drying-2",
+      "field": "cec_hours",
+      "text": "cec_hours: 1 CEC hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "structural-drying-2",
       "field": "meta.wp_categories.1.name",
       "text": "CEC Credits"
     },
@@ -779,6 +803,12 @@
     {
       "file": "data/wordpress-export/courses.json",
       "slug": "water-damage",
+      "field": "cec_hours",
+      "text": "cec_hours: 1 CEC hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-damage",
       "field": "meta.wp_categories.1.name",
       "text": "CEC Credits"
     },
@@ -821,6 +851,12 @@
     {
       "file": "data/wordpress-export/courses.json",
       "slug": "carpet-cleaning",
+      "field": "cec_hours",
+      "text": "cec_hours: 1 CEC hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "carpet-cleaning",
       "field": "meta.wp_categories.2.name",
       "text": "CEC Credits"
     },
@@ -863,6 +899,12 @@
     {
       "file": "data/wordpress-export/courses.json",
       "slug": "odour-control",
+      "field": "cec_hours",
+      "text": "cec_hours: 1 CEC hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "odour-control",
       "field": "meta.wp_categories.2.name",
       "text": "CEC Credits"
     },
@@ -905,6 +947,12 @@
     {
       "file": "data/wordpress-export/courses.json",
       "slug": "psychrometry-drying",
+      "field": "cec_hours",
+      "text": "cec_hours: 1 CEC hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "psychrometry-drying",
       "field": "meta.wp_categories.1.name",
       "text": "CEC Credits"
     },
@@ -947,6 +995,12 @@
     {
       "file": "data/wordpress-export/courses.json",
       "slug": "structural-drying",
+      "field": "cec_hours",
+      "text": "cec_hours: 1 CEC hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "structural-drying",
       "field": "meta.wp_categories.1.name",
       "text": "CEC Credits"
     },
@@ -989,6 +1043,12 @@
     {
       "file": "data/wordpress-export/courses.json",
       "slug": "water-extraction",
+      "field": "cec_hours",
+      "text": "cec_hours: 1 CEC hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "water-extraction",
       "field": "meta.wp_categories.2.name",
       "text": "CEC Credits"
     },
@@ -1031,6 +1091,12 @@
     {
       "file": "data/wordpress-export/courses.json",
       "slug": "drying-techniques",
+      "field": "cec_hours",
+      "text": "cec_hours: 1 CEC hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "drying-techniques",
       "field": "meta.wp_categories.1.name",
       "text": "CEC Credits"
     },
@@ -1049,6 +1115,12 @@
     {
       "file": "data/wordpress-export/courses.json",
       "slug": "mould-identification",
+      "field": "cec_hours",
+      "text": "cec_hours: 1 CEC hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "mould-identification",
       "field": "meta.wp_categories.1.name",
       "text": "CEC Credits"
     },
@@ -1091,6 +1163,12 @@
     {
       "file": "data/wordpress-export/courses.json",
       "slug": "using-ppe",
+      "field": "cec_hours",
+      "text": "cec_hours: 1 CEC hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "using-ppe",
       "field": "meta.wp_categories.1.name",
       "text": "CEC Credits"
     },
@@ -1133,6 +1211,12 @@
     {
       "file": "data/wordpress-export/courses.json",
       "slug": "safety-procedures",
+      "field": "cec_hours",
+      "text": "cec_hours: 1 CEC hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "safety-procedures",
       "field": "meta.wp_categories.1.name",
       "text": "CEC Credits"
     },
@@ -1175,6 +1259,12 @@
     {
       "file": "data/wordpress-export/courses.json",
       "slug": "introduction-to-water-damage-restoration-course",
+      "field": "cec_hours",
+      "text": "cec_hours: 1 CEC hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "introduction-to-water-damage-restoration-course",
       "field": "meta.wp_categories.1.name",
       "text": "CEC Credits"
     },
@@ -1217,6 +1307,12 @@
     {
       "file": "data/wordpress-export/courses.json",
       "slug": "glass-cleaning-course",
+      "field": "cec_hours",
+      "text": "cec_hours: 1 CEC hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "glass-cleaning-course",
       "field": "meta.wp_categories.2.name",
       "text": "CEC Credits"
     },
@@ -1259,6 +1355,12 @@
     {
       "file": "data/wordpress-export/courses.json",
       "slug": "safe-work-method-statements-swms-course",
+      "field": "cec_hours",
+      "text": "cec_hours: 1 CEC hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "safe-work-method-statements-swms-course",
       "field": "meta.wp_categories.2.name",
       "text": "CEC Credits"
     },
@@ -1301,6 +1403,12 @@
     {
       "file": "data/wordpress-export/courses.json",
       "slug": "job-safety-and-environmental-analysis-jsea-course",
+      "field": "cec_hours",
+      "text": "cec_hours: 1 CEC hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "job-safety-and-environmental-analysis-jsea-course",
       "field": "meta.wp_categories.2.name",
       "text": "CEC Credits"
     },
@@ -1343,6 +1451,12 @@
     {
       "file": "data/wordpress-export/courses.json",
       "slug": "standard-operating-procedures-sop-course",
+      "field": "cec_hours",
+      "text": "cec_hours: 1 CEC hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "standard-operating-procedures-sop-course",
       "field": "meta.wp_categories.3.name",
       "text": "CEC Credits"
     },
@@ -1381,6 +1495,12 @@
       "slug": "initial-inspection-report-course",
       "field": "short_description",
       "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "initial-inspection-report-course",
+      "field": "cec_hours",
+      "text": "cec_hours: 1 CEC hours"
     },
     {
       "file": "data/wordpress-export/courses.json",
@@ -1427,6 +1547,12 @@
     {
       "file": "data/wordpress-export/courses.json",
       "slug": "marketing-course",
+      "field": "cec_hours",
+      "text": "cec_hours: 1 CEC hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "marketing-course",
       "field": "meta.wp_categories.3.name",
       "text": "CEC Credits"
     },
@@ -1469,6 +1595,12 @@
     {
       "file": "data/wordpress-export/courses.json",
       "slug": "risk-assessment-course",
+      "field": "cec_hours",
+      "text": "cec_hours: 2 CEC hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "risk-assessment-course",
       "field": "meta.wp_categories.3.name",
       "text": "CEC Credits"
     },
@@ -1507,6 +1639,12 @@
       "slug": "level-1-mould-remediation",
       "field": "short_description",
       "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "level-1-mould-remediation",
+      "field": "cec_hours",
+      "text": "cec_hours: 2 CEC hours"
     },
     {
       "file": "data/wordpress-export/courses.json",
@@ -1553,6 +1691,12 @@
     {
       "file": "data/wordpress-export/courses.json",
       "slug": "admin-sole-trader",
+      "field": "cec_hours",
+      "text": "cec_hours: 4 CEC hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "admin-sole-trader",
       "field": "meta.wp_categories.3.name",
       "text": "CEC Credits"
     },
@@ -1571,6 +1715,12 @@
     {
       "file": "data/wordpress-export/courses.json",
       "slug": "level-3-mould-remediation",
+      "field": "cec_hours",
+      "text": "cec_hours: 5 CEC hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "level-3-mould-remediation",
       "field": "meta.wp_categories.2.name",
       "text": "CEC Credits"
     },
@@ -1585,6 +1735,12 @@
       "slug": "level-2-mould-remediation",
       "field": "description",
       "text": "This standard remediation course takes you from identifying mould to safely remediating a typical residential Australian job. It follows the process and principles of ANSI/IICRC S520:2024 - safety, documentation, contamination control, contamination removal and moisture correction - and applies them under Australian work health and safety law. It assumes you have completed CARSI's Introduction to Mould Identification, or have equivalent knowledge, and it prepares you for the complex and large-loss work covered in Level 3. It carries IICRC Continuing Education Credit (CEC) hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "level-2-mould-remediation",
+      "field": "cec_hours",
+      "text": "cec_hours: 4 CEC hours"
     },
     {
       "file": "data/wordpress-export/courses.json",
@@ -1631,6 +1787,12 @@
     {
       "file": "data/wordpress-export/courses.json",
       "slug": "safety-data-sheet-sds-course",
+      "field": "cec_hours",
+      "text": "cec_hours: 2 CEC hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "safety-data-sheet-sds-course",
       "field": "meta.wp_categories.2.name",
       "text": "CEC Credits"
     },
@@ -1669,6 +1831,12 @@
       "slug": "donning-and-doffing-ppe",
       "field": "short_description",
       "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "donning-and-doffing-ppe",
+      "field": "cec_hours",
+      "text": "cec_hours: 1 CEC hours"
     },
     {
       "file": "data/wordpress-export/courses.json",
@@ -1715,6 +1883,12 @@
     {
       "file": "data/wordpress-export/courses.json",
       "slug": "moisture-meter-course",
+      "field": "cec_hours",
+      "text": "cec_hours: 3 CEC hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "moisture-meter-course",
       "field": "meta.wp_categories.3.name",
       "text": "CEC Credits"
     },
@@ -1753,6 +1927,12 @@
       "slug": "carpet-cleaning-basics",
       "field": "short_description",
       "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "carpet-cleaning-basics",
+      "field": "cec_hours",
+      "text": "cec_hours: 3 CEC hours"
     },
     {
       "file": "data/wordpress-export/courses.json",
@@ -1799,6 +1979,12 @@
     {
       "file": "data/wordpress-export/courses.json",
       "slug": "asthmaallergy",
+      "field": "cec_hours",
+      "text": "cec_hours: 6 CEC hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "asthmaallergy",
       "field": "meta.wp_categories.1.name",
       "text": "CEC Credits"
     },
@@ -1837,6 +2023,12 @@
       "slug": "infectious-control-for-the-business-owner",
       "field": "short_description",
       "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "infectious-control-for-the-business-owner",
+      "field": "cec_hours",
+      "text": "cec_hours: 7 CEC hours"
     },
     {
       "file": "data/wordpress-export/courses.json",
@@ -1883,6 +2075,12 @@
     {
       "file": "data/wordpress-export/courses.json",
       "slug": "using-atp-to-create-protocols",
+      "field": "cec_hours",
+      "text": "cec_hours: 1 CEC hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "using-atp-to-create-protocols",
       "field": "meta.wp_categories.2.name",
       "text": "CEC Credits"
     },
@@ -1925,6 +2123,12 @@
     {
       "file": "data/wordpress-export/courses.json",
       "slug": "infection-control-in-child-care",
+      "field": "cec_hours",
+      "text": "cec_hours: 3 CEC hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "infection-control-in-child-care",
       "field": "meta.wp_categories.1.name",
       "text": "CEC Credits"
     },
@@ -1967,6 +2171,12 @@
     {
       "file": "data/wordpress-export/courses.json",
       "slug": "neosan-labs-product-training-course",
+      "field": "cec_hours",
+      "text": "cec_hours: 5 CEC hours"
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "neosan-labs-product-training-course",
       "field": "meta.wp_categories.1.name",
       "text": "CEC Credits"
     },
@@ -2005,6 +2215,12 @@
       "slug": "microbe-clean-basic-understanding-course",
       "field": "short_description",
       "text": "only qualified continuing education hours."
+    },
+    {
+      "file": "data/wordpress-export/courses.json",
+      "slug": "microbe-clean-basic-understanding-course",
+      "field": "cec_hours",
+      "text": "cec_hours: 5 CEC hours"
     },
     {
       "file": "data/wordpress-export/courses.json",

@@ -158,6 +158,10 @@ if (typeof evaluateRecords !== 'function' || typeof classifyRecordFindings !== '
     ['denial', 'This course is not approved for IICRC CECs.'],
     ['denial with "yet"', 'This course is not yet approved for IICRC Continuing Education Credits.'],
     ['does-not-award denial', 'It does not award CECs.'],
+    // Pre-round-3 probes: text that renders but sits inside markup or behind an entity.
+    ['image alt text', '<img alt="approved for IICRC CEC: 1 hour" src="x.png">'],
+    ['link title attribute', '<a title="CEC credits" href="#">Read more</a>'],
+    ['hex entity', 'Worth &#x43;EC hours.'],
   ];
   for (const [name, text] of MUST_BLOCK) {
     for (const field of ['short_description', 'description']) {
@@ -195,6 +199,25 @@ if (typeof evaluateRecords !== 'function' || typeof classifyRecordFindings !== '
     if (scan([course(`${approvedSlug}-copy`, claim)], new Set([approvedSlug])).length === 0) {
       fail('slug approval matched by substring (approved-slug prefix exempted another course)');
     }
+  }
+
+  // A structured positive CEC-hours number on an unapproved slug is the claim in its plainest form.
+  for (const rec of [
+    { slug: PLANTED_SLUG, title: 't', cec_hours: 5 },
+    { slug: PLANTED_SLUG, title: 't', meta: { cec_hours: 2 } },
+  ]) {
+    const f = scan([rec]);
+    if (f.length === 0) fail(`numeric CEC hours passed: ${JSON.stringify(rec)}`);
+  }
+  for (const rec of [
+    { slug: PLANTED_SLUG, title: 't', cec_hours: null },
+    { slug: PLANTED_SLUG, title: 't', cec_hours: 0 },
+    { slug: PLANTED_SLUG, title: 't', price_aud: 99, duration_hours: 4 },
+  ]) {
+    if (scan([rec]).length > 0) fail(`no-claim numeric record blocked: ${JSON.stringify(rec)}`);
+  }
+  if (approvedSlug && scan([{ slug: approvedSlug, title: 't', cec_hours: 1 }], new Set([approvedSlug])).length > 0) {
+    fail('approved slug blocked for its own cec_hours');
   }
 
   // A record with no slug cannot be matched to an approval: it must still block.
