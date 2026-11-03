@@ -14,12 +14,11 @@ JOIN lms_courses c ON c.id = q.course_id
 WHERE c.slug = 'water-damage-restoration-fundamentals'
 ORDER BY q.created_at;
 
--- Q2. Structure of each quiz: question order and option count only. Question text and
+-- Q2. Structure of each quiz: question order only. Question text and
 --     answers are deliberately NOT selected: DB ops logs are public, and printing them would
 --     publish the assessment key. To read the questions themselves, open this course's quiz
 --     in TablePlus or the admin screen, never through DB ops.
-SELECT q.title AS quiz, qq.order_index + 1 AS question_no, qq.id AS question_id,
-       jsonb_array_length(qq.options::jsonb) AS option_count
+SELECT q.title AS quiz, qq.order_index + 1 AS question_no, qq.id AS question_id
 FROM lms_quiz_questions qq
 JOIN lms_quizzes q ON q.id = qq.quiz_id
 JOIN lms_courses c ON c.id = q.course_id

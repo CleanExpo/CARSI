@@ -5,9 +5,11 @@
 # file, and prints the result to the job log.
 #
 #   Every file runs only from main, so only reviewed SQL ever reaches the database.
-#   db/ops/read/*.sql   every statement must be a plain query (db/ops/check-read-sql.py), run
-#                       in a read-only session. Unattended only as DATABASE_URL_READONLY;
-#                       without that secret a read waits for production-db approval too. This repo is PUBLIC, so its logs are public: read files
+#   db/ops/read/*.sql   every statement must be a plain query over allowlisted tables
+#                       (db/ops/check-read-sql.py); run by db/ops/run-read.py in a READ ONLY
+#                       transaction, as DATABASE_URL_READONLY when that secret is set.
+#   Both kinds wait for a person's approval in the production-db environment, and neither uses
+#   psql, so no psql meta-command (shell escape, gexec, copy) can run from a file. This repo is PUBLIC, so its logs are public: read files
 #                       may return course/quiz/catalogue data and counts only, never learner data.
 #   db/ops/write/*.sql  runs only from main, in a single transaction (all-or-nothing), and only
 #                       after a person approves the run in the `production-db` environment
@@ -38,7 +40,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       kind: ${{ steps.check.outputs.kind }}
-      has_readonly_role: ${{ steps.check.outputs.has_readonly_role }}
     steps:
       - uses: actions/checkout@v4
       - name: Validate the requested file
@@ -46,7 +47,6 @@ jobs:
         env:
           FILE: ${{ inputs.file }}
           REF: ${{ github.ref }}
-          HAS_RO: ${{ secrets.DATABASE_URL_READONLY != '' }}
         run: |
           set -euo pipefail
           if [[ ! "$FILE" =~ ^db/ops/(read|write)/[0-9]{2}-[a-z0-9-]+\.sql$ ]]; then
@@ -67,19 +67,21 @@ jobs:
             # switched off from SQL, so this check is what stops a read file from writing.
             python3 db/ops/test_check_read_sql.py
             python3 db/ops/check-read-sql.py "$FILE"
+          else
+            python3 db/ops/test_check_read_sql.py
+            python3 db/ops/check-read-sql.py --write "$FILE"
           fi
           echo "kind=$kind" >> "$GITHUB_OUTPUT"
-          echo "has_readonly_role=$HAS_RO" >> "$GITHUB_OUTPUT"
           echo "OK: $kind file $FILE on $REF"
 
-  # Reads run unattended only as the least-privilege role. Without DATABASE_URL_READONLY they
-  # use the full role, so they wait for the same production-db approval as writes.
+  # Every read waits for a person's approval in production-db, like a write: the file name is
+  # shown before anything runs, and the output lands in a public log.
   read:
     needs: plan
     if: needs.plan.outputs.kind == 'read'
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    environment: ${{ needs.plan.outputs.has_readonly_role == 'true' && 'production-db-read' || 'production-db' }}
+    environment: production-db
     steps:
       - uses: actions/checkout@v4
       # setup-python gives a pip-installable interpreter (the runner's system Python is
@@ -113,10 +115,13 @@ jobs:
     needs: plan
     if: needs.plan.outputs.kind == 'write'
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 15
     environment: production-db
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
       - name: Run in one transaction
         env:
           FILE: ${{ inputs.file }}
@@ -124,8 +129,9 @@ jobs:
         run: |
           set -euo pipefail
           [ -n "${DATABASE_URL:-}" ] || { echo "::error::DATABASE_URL secret is not set."; exit 1; }
-          command -v psql >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client; }
-          URL="$(printf '%s' "$DATABASE_URL" | sed -E 's/([?&])schema=[^&]*&?/\1/; s/[?&]$//')"
-          export PGOPTIONS='-c statement_timeout=60000'
-          export PGCONNECT_TIMEOUT=15
-          psql "$URL" -v ON_ERROR_STOP=1 -X -P pager=off --single-transaction -f "$FILE"
+          # Not psql (its meta-commands could run a shell with the URL in the environment):
+          # run-write.py sends the SQL only, in one transaction, committed once at the end.
+          python3 -m pip install --quiet --disable-pip-version-check "psycopg[binary]==3.2.3"
+          DATABASE_URL="$(printf '%s' "$DATABASE_URL" | sed -E 's/([?&])schema=[^&]*&?/\1/; s/[?&]$//')"
+          export DATABASE_URL
+          python3 db/ops/run-write.py "$FILE"

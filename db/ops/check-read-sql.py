@@ -1,6 +1,7 @@
 """Refuse a db/ops/read/*.sql file unless every statement is a plain query.
 
-Usage: python3 db/ops/check-read-sql.py <file>   (exit 0 = allowed, 1 = refused)
+Usage: python3 db/ops/check-read-sql.py <file>           (read file: exit 0 = allowed, 1 = refused)
+       python3 db/ops/check-read-sql.py --write <file>   (write file: lexes cleanly, no backslash)
 
 The read job's read-only session can be switched off from SQL, so this check (run before any
 connection) is what keeps a read file from writing. It is a single-pass lexer, not a regex
@@ -14,7 +15,13 @@ string marker inside a comment, cannot hide a statement.
   - Every statement must begin with SELECT, WITH, TABLE or VALUES.
   - No forbidden word anywhere in a statement, whether bare or "quoted": writes, DDL, session
     and transaction control, set_config, dblink, lo_*, pg_read_file and friends.
-  - No learner tables or sensitive column names (logs are public).
+  - Tables: a word naming any table in prisma/schema.prisma must be on ALLOWED_TABLES (an
+    allowlist, not a denylist), so learner, admin, payment and CRM tables cannot be read.
+    pg_* catalog names are refused too.
+  - Columns: learner ids and quiz content (question text, options, answers) are refused, and so is
+    a bare * (count(*) is fine), so an allowed table cannot be dumped whole.
+  - No row/table serialisers (table_to_xml, row_to_json, json_agg...) and no & (U&"..." escapes).
+  Logs of this public repository are public; the allowlist is what keeps learner data out of them.
 """
 import re
 import sys
@@ -29,7 +36,25 @@ FORBIDDEN = {
     "dblink_exec", "pg_read_file", "pg_read_binary_file", "pg_ls_dir", "pg_terminate_backend",
     "pg_cancel_backend", "pg_reload_conf", "pg_sleep", "query_to_xml", "query_to_json",
 }
-SENSITIVE = re.compile(r"lms_users|email|password|phone|token|stripe", re.I)
+SENSITIVE = re.compile(r"email|password|phone|token|stripe|secret|hash|address", re.I)
+ALLOWED_TABLES = {
+    "lms_courses", "lms_modules", "lms_lessons", "lms_quizzes", "lms_quiz_questions",
+    "lms_quiz_attempts", "lms_enrollments", "lms_lesson_progress",
+}
+SENSITIVE_COLUMNS = {
+    "question_text", "options", "correct_index", "explanation", "answers", "student_id",
+    "user_id", "payment_reference", "content_version", "score_percent", "notes",
+}
+SERIALISER = re.compile(r"_to_xml$|^xml|to_jsonb?$|_to_json$|^json_|^jsonb_|_agg$|^row_to", re.I)
+
+
+def known_tables() -> set:
+    import pathlib
+    schema = pathlib.Path(__file__).resolve().parents[2] / "prisma" / "schema.prisma"
+    names = set(re.findall(r'@@map\("([A-Za-z0-9_]+)"\)', schema.read_text(encoding="utf-8")))
+    if len(names) < 10:
+        raise SystemExit(f"::error::could not read table names from {schema}")
+    return {n.lower() for n in names}
 STARTERS = {"select", "with", "table", "values"}
 
 
@@ -130,23 +155,48 @@ def problems(sql: str) -> list:
         statements.append(stmt)
     except Refused as e:
         return [str(e)]
+    tables = known_tables()
     for stmt in statements:
         words = [t for k, t in stmt if k == "word"]
         if not stmt:
             continue
+        for idx, (kind, text) in enumerate(stmt):
+            if kind == "punct" and text == "&":
+                out.append("'&' is not allowed (blocks U&\"...\" escaped names)")
+            if kind == "punct" and text == "*":
+                prev = stmt[idx - 1] if idx else ("", "")
+                if prev != ("punct", "("):
+                    out.append("bare * is not allowed (name the columns; count(*) is fine)")
         if not words or words[0].lower() not in STARTERS:
             out.append(f"statement does not start with SELECT/WITH/TABLE/VALUES: {words[:3]}")
         for w in words:
             lw = w.lower()
             if lw in FORBIDDEN or lw.startswith("lo_"):
                 out.append(f"forbidden word {w!r}")
-            if SENSITIVE.search(w):
-                out.append(f"learner table or sensitive column {w!r} (logs are public)")
+            if SENSITIVE.search(w) or lw in SENSITIVE_COLUMNS:
+                out.append(f"sensitive column {w!r} (logs are public)")
+            if (lw in tables and lw not in ALLOWED_TABLES) or lw.startswith("pg_"):
+                out.append(f"table {w!r} is not on the read allowlist (logs are public)")
+            if SERIALISER.search(lw):
+                out.append(f"row/table serialiser {w!r} is not allowed")
     return out
 
 
+def write_problems(sql: str) -> list:
+    """Write files may contain any SQL, but must lex cleanly and carry no psql meta-command."""
+    try:
+        for _ in tokens(sql):
+            pass
+    except Refused as e:
+        return [str(e)]
+    return []
+
+
 if __name__ == "__main__":
-    found = problems(open(sys.argv[1], encoding="utf-8").read())
+    write = sys.argv[1] == "--write"
+    path = sys.argv[2] if write else sys.argv[1]
+    text = open(path, encoding="utf-8").read()
+    found = write_problems(text) if write else problems(text)
     for p in found:
-        print(f"::error::{sys.argv[1]}: {p}")
+        print(f"::error::{path}: {p}")
     sys.exit(1 if found else 0)
