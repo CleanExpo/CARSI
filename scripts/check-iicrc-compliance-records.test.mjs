@@ -218,6 +218,10 @@ if (typeof evaluateRecords !== 'function' || typeof classifyRecordFindings !== '
   for (const rec of [
     { slug: PLANTED_SLUG, title: 't', cec_hours: 5 },
     { slug: PLANTED_SLUG, title: 't', meta: { cec_hours: 2 } },
+    // Review r4 (Codex, P1): hours stored as a string or inside a list under a CEC key.
+    { slug: PLANTED_SLUG, title: 't', cec_hours: '5' },
+    { slug: PLANTED_SLUG, title: 't', meta: { cec_hours: [5] } },
+    { slug: PLANTED_SLUG, title: 't', meta: { cec: { hours: 3 } } },
   ]) {
     const f = scan([rec]);
     if (f.length === 0) fail(`numeric CEC hours passed: ${JSON.stringify(rec)}`);
@@ -225,6 +229,7 @@ if (typeof evaluateRecords !== 'function' || typeof classifyRecordFindings !== '
   for (const rec of [
     { slug: PLANTED_SLUG, title: 't', cec_hours: null },
     { slug: PLANTED_SLUG, title: 't', cec_hours: 0 },
+    { slug: PLANTED_SLUG, title: 't', cec_hours: '0' },
     { slug: PLANTED_SLUG, title: 't', price_aud: 99, duration_hours: 4 },
   ]) {
     if (scan([rec]).length > 0) fail(`no-claim numeric record blocked: ${JSON.stringify(rec)}`);
@@ -232,6 +237,15 @@ if (typeof evaluateRecords !== 'function' || typeof classifyRecordFindings !== '
   if (approvedSlug && scan([{ slug: approvedSlug, title: 't', cec_hours: 1 }], new Set([approvedSlug])).length > 0) {
     fail('approved slug blocked for its own cec_hours');
   }
+
+  // Review r4 (Codex, P1): CEC wording in the slug itself is course copy too (it is the URL).
+  for (const slug of ['gp527-cec-approved-course', 'gp527-continuing-education-course']) {
+    // Title is neutral on purpose: course() puts the slug in the title, which would make this vacuous.
+    if (scan([{ ...course(slug, 'Neutral.', 'Neutral.'), title: 'Neutral title' }]).length === 0) {
+      fail(`CEC wording in slug passed: ${slug}`);
+    }
+  }
+  if (scan([course('gp527-neutral-course', 'Neutral.', 'Neutral.')]).length > 0) fail('neutral slug blocked');
 
   // A record with no slug cannot be matched to an approval: it must still block.
   if (scan([{ title: 'x', short_description: claim }]).length === 0) fail('slug-less record passed');

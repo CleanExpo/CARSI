@@ -302,14 +302,21 @@ function rawRecordText(value) {
 /** Every string inside a record, with a dotted field path (meta.pricing, tags.0, …). Positive
  *  numbers under a CEC-named key (cec_hours, meta.cec, …) are included as "key: N" text: that is a
  *  CEC-hours claim in its plainest form. */
-function stringFields(value, path, out) {
-  if (typeof value === 'string') out.push([path, value]);
-  else if (typeof value === 'number' && value > 0 && /cec/i.test(path.split('.').pop() ?? '')) {
-    out.push([path, `${path}: ${value} CEC hours`]);
-  }
-  else if (Array.isArray(value)) value.forEach((v, i) => stringFields(v, `${path}.${i}`, out));
+function stringFields(value, path, out, underCec = false) {
+  // Review r4 (Codex, P1): the CEC context is the whole key path, not the last key, and the value
+  // may be a numeric string or sit in a list ("cec_hours": "5", "meta.cec_hours": [5], cec.hours).
+  const cec = underCec || /cec/i.test(path.split('.').pop() ?? '');
+  const hours =
+    typeof value === 'number'
+      ? value
+      : typeof value === 'string' && /^\s*\d+(?:\.\d+)?\s*$/.test(value)
+        ? Number(value)
+        : NaN;
+  if (cec && hours > 0) out.push([path, `${path}: ${hours} CEC hours`]);
+  else if (typeof value === 'string') out.push([path, value]);
+  else if (Array.isArray(value)) value.forEach((v, i) => stringFields(v, `${path}.${i}`, out, cec));
   else if (value && typeof value === 'object') {
-    for (const [k, v] of Object.entries(value)) stringFields(v, path ? `${path}.${k}` : k, out);
+    for (const [k, v] of Object.entries(value)) stringFields(v, path ? `${path}.${k}` : k, out, cec);
   }
   return out;
 }
@@ -345,7 +352,7 @@ export function evaluateRecords(file, jsonText, { approvedSlugs, allowlist = ALL
     const flags = (rule, text) =>
       rule.re.test(text) && (rule.allowlisted ? !allowlist.has(text) : !(rule.allow && rule.allow.test(text)));
     for (const [field, value] of stringFields(row, '', [])) {
-      if (field === 'slug') continue;
+      // The slug is scanned too (review r4, Codex, P1): it is the course's public URL.
       const lines = recordTextLines(value);
       const hitRules = new Set();
       lines.forEach((text, li) => {
