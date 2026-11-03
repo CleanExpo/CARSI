@@ -1,0 +1,109 @@
+# DB ops — run ONE reviewed SQL file from db/ops/ against the production database (carsi-db).
+#
+# Why: nobody should paste the production DATABASE_URL into a chat, terminal or agent session.
+# The URL lives only in the DATABASE_URL Actions secret; this job reads it, runs the chosen
+# file, and prints the result to the job log.
+#
+#   db/ops/read/*.sql   read-only session (default_transaction_read_only=on): any write fails.
+#                       Runs on demand. This repo is PUBLIC, so its logs are public: read files
+#                       may return course/quiz/catalogue data and counts only, never learner data.
+#   db/ops/write/*.sql  runs only from main, in a single transaction (all-or-nothing), and only
+#                       after a person approves the run in the `production-db` environment
+#                       (Settings → Environments → production-db → Required reviewers).
+#
+# A guard's silence is not a pass: every step exits non-zero on a bad input (missing secret,
+# file outside db/ops, a read file naming learner tables/columns, a write file off main).
+
+name: DB ops
+
+on:
+  workflow_dispatch:
+    inputs:
+      file:
+        description: 'SQL file to run, e.g. db/ops/read/04-water-go-live-preflight.sql'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: db-ops
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      kind: ${{ steps.check.outputs.kind }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate the requested file
+        id: check
+        env:
+          FILE: ${{ inputs.file }}
+          REF: ${{ github.ref }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$FILE" =~ ^db/ops/(read|write)/[0-9]{2}-[a-z0-9-]+\.sql$ ]]; then
+            echo "::error::'$FILE' is not a file under db/ops/read/ or db/ops/write/ named NN-name.sql."
+            exit 1
+          fi
+          [ -f "$FILE" ] || { echo "::error::$FILE does not exist on $REF."; exit 1; }
+          kind="${BASH_REMATCH[1]}"
+          if [ "$kind" = "read" ]; then
+            # Public logs: refuse anything that could print learner data. Comment lines are ignored.
+            if grep -vE '^\s*--' "$FILE" | grep -inE '\blms_users\b|email|password|phone|token|stripe'; then
+              echo "::error::$FILE names a learner table or a sensitive column. Read files run in public logs."
+              exit 1
+            fi
+          else
+            if [ "$REF" != "refs/heads/main" ]; then
+              echo "::error::Write files run only from main (got $REF). Merge the reviewed file first."
+              exit 1
+            fi
+          fi
+          echo "kind=$kind" >> "$GITHUB_OUTPUT"
+          echo "OK: $kind file $FILE on $REF"
+
+  read:
+    needs: plan
+    if: needs.plan.outputs.kind == 'read'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run read-only
+        env:
+          FILE: ${{ inputs.file }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          set -euo pipefail
+          [ -n "${DATABASE_URL:-}" ] || { echo "::error::DATABASE_URL secret is not set."; exit 1; }
+          command -v psql >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client; }
+          # psql rejects Prisma-only URL params such as schema=; drop them.
+          URL="$(printf '%s' "$DATABASE_URL" | sed -E 's/([?&])schema=[^&]*&?/\1/; s/[?&]$//')"
+          export PGOPTIONS='-c default_transaction_read_only=on -c statement_timeout=30000'
+          export PGCONNECT_TIMEOUT=15
+          psql "$URL" -v ON_ERROR_STOP=1 -X -P pager=off -f "$FILE"
+
+  write:
+    needs: plan
+    if: needs.plan.outputs.kind == 'write'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: production-db
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run in one transaction
+        env:
+          FILE: ${{ inputs.file }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          set -euo pipefail
+          [ -n "${DATABASE_URL:-}" ] || { echo "::error::DATABASE_URL secret is not set."; exit 1; }
+          command -v psql >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client; }
+          URL="$(printf '%s' "$DATABASE_URL" | sed -E 's/([?&])schema=[^&]*&?/\1/; s/[?&]$//')"
+          export PGOPTIONS='-c statement_timeout=60000'
+          export PGCONNECT_TIMEOUT=15
+          psql "$URL" -v ON_ERROR_STOP=1 -X -P pager=off --single-transaction -f "$FILE"
