@@ -29,6 +29,12 @@ one — "industry standard practice" asserts that a standard exists and says tha
 | `JUSTIFIED` | `confidence` + `reasoning` + `best_available_source` | 100% verification is unavailable; the justification IS the product |
 | `GAP` | `reason` + `recommended_action` | No defensible basis — flag for rewrite or removal |
 
+A `VERIFIED` source is normally grade A or B. One exception (DECISIONS #54): an Australian
+distributor's or stockist's own product page may support `VERIFIED` at grade C1 for an
+**availability** claim only ("sold in Australia"), marked `claim_type: "availability"` — never for
+performance or specification. Grades and the full rule:
+`.claude/skills/carsi-course-production/references/evidence-layer-template.md` §2–3.
+
 Disagreement between two research engines is a `conflict` **sidecar** recorded
 beside the original entry. It never overwrites the original and it is never a
 fourth status: the original claim and the disagreement are both facts worth

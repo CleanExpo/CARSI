@@ -38,6 +38,9 @@ edit is saved.
 ### 4. Products & equipment — available in Australia, current
 - Reference brands/models **actually sold in Australia** through Australian distributors, in
   **240 V/50 Hz** configuration. **State the date** of the availability check (products change).
+  An Australian distributor's or stockist's own product page is enough evidence for
+  **availability only** (VERIFIED at grade C1 with `claim_type: "availability"`, DECISIONS #54),
+  never for a performance or specification claim.
 - Do NOT cite US-only products, US voltages, or US spec sheets as if locally available. Where a US
   brand sells in Australia, use its **Australian distributor + 240 V model + AU pricing**.
 
