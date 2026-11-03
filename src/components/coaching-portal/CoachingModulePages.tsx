@@ -42,7 +42,13 @@ const FILTERS: Array<{ id: 'all' | CoachingActionStatus; label: string }> = [
   { id: 'in_progress', label: 'In progress' },
   { id: 'done', label: 'Completed' },
   { id: 'blocked', label: 'Blocked' },
+  { id: 'proposed', label: 'Waiting for coach' },
 ];
+
+/** Statuses the member can pick; proposed/declined are set by the coach only (GP-634). */
+const MEMBER_STATUS_OPTIONS = FILTERS.filter(
+  (f) => f.id !== 'all' && f.id !== 'proposed' && f.id !== 'declined'
+);
 
 export function CoachingPlanPage() {
   const { access, plan } = useCoachingPortal();
@@ -147,7 +153,10 @@ export function CoachingActionsPage() {
   }, []);
 
   const visible = useMemo(
-    () => (filter === 'all' ? items : items.filter((a) => a.status === filter)),
+    () =>
+      filter === 'all'
+        ? items.filter((a) => a.status !== 'declined')
+        : items.filter((a) => a.status === filter),
     [items, filter]
   );
 
@@ -194,20 +203,26 @@ export function CoachingActionsPage() {
               <p className="font-semibold text-white">{a.title}</p>
               {a.description ? <p className={`mt-1 ${coachingMuted}`}>{a.description}</p> : null}
               <div className="mt-3 flex flex-wrap items-center gap-2">
-                <select
-                  value={a.status}
-                  disabled={!access.canEdit}
-                  onChange={(e) =>
-                    void updateAction({ ...a, status: e.target.value as CoachingActionStatus })
-                  }
-                  className="rounded-lg border border-white/10 bg-[#060a14] px-2 py-1 text-xs text-white"
-                >
-                  {FILTERS.filter((f) => f.id !== 'all').map((f) => (
-                    <option key={f.id} value={f.id}>
-                      {f.label}
-                    </option>
-                  ))}
-                </select>
+                {a.status === 'proposed' ? (
+                  <span className="rounded-full bg-amber-400/10 px-2.5 py-1 text-xs font-semibold text-amber-200">
+                    Waiting for your coach to approve
+                  </span>
+                ) : (
+                  <select
+                    value={a.status}
+                    disabled={!access.canEdit}
+                    onChange={(e) =>
+                      void updateAction({ ...a, status: e.target.value as CoachingActionStatus })
+                    }
+                    className="rounded-lg border border-white/10 bg-[#060a14] px-2 py-1 text-xs text-white"
+                  >
+                    {MEMBER_STATUS_OPTIONS.map((f) => (
+                      <option key={f.id} value={f.id}>
+                        {f.label}
+                      </option>
+                    ))}
+                  </select>
+                )}
                 {a.dueDate ? (
                   <span className="text-xs text-slate-500">
                     Due {new Date(a.dueDate).toLocaleDateString('en-AU')}

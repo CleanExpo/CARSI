@@ -1,0 +1,43 @@
+import { describe, expect, it } from 'vitest';
+
+import { findComplianceIssues, isCompliantCopy } from './compliance';
+
+describe('findComplianceIssues', () => {
+  it.each([
+    'Earn $5,000 a week with our system',
+    'Make $200k this year',
+    'Double your revenue in 30 days',
+    'Triple your income',
+    'Guaranteed results or your money back',
+    'We guarantee a spotless carpet',
+    '100% satisfaction every time',
+    'Risk-free booking',
+    'The number one cleaner in town',
+    'Industry-leading service',
+    'World-class restoration',
+    'The best carpet cleaner in Toowoomba',
+    'Cheapest prices on the Downs',
+    'Top-rated plumber on the coast',
+    'We follow the IICRC standards on every job',
+    'Proud iicrc members since 2019',
+    'Passive income from every job',
+    'Results in 24 hours, every time',
+    'Kills 99.9% of mould',
+  ])('rejects %s', (text) => {
+    expect(findComplianceIssues(text).length).toBeGreaterThan(0);
+    expect(isCompliantCopy(text)).toBe(false);
+  });
+
+  it.each([
+    'Fresh carpets for Toowoomba homes this spring. Book a clean online.',
+    'Behind the scenes: how we dry a rug after a deep clean.',
+    'Our technicians keep their training up to date.',
+    'Ask us how often a family home should have its carpets cleaned.',
+    'Earned a five-star review this week. Thanks, Sarah.',
+    'Put your phone number at the top of the page.',
+    'Put a heading at the top such as "Plumbing in Mackay".',
+    'The best way to dry a rug is flat, in the shade.',
+  ])('allows %s', (text) => {
+    expect(findComplianceIssues(text)).toEqual([]);
+  });
+});

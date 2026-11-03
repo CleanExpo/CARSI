@@ -205,7 +205,9 @@ export async function loadCoachingPortalDashboard(
     `mailto:support@carsi.com.au?subject=${encodeURIComponent('Book my Business Coaching session')}`;
 
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  const monthActions = actions.filter((a) => a.createdAt >= monthStart);
+  // GP-634: proposed (awaiting coach) and declined actions are not on the member's list yet.
+  const memberActions = actions.filter((a) => a.status !== 'proposed' && a.status !== 'declined');
+  const monthActions = memberActions.filter((a) => a.createdAt >= monthStart);
   const completedThisMonth = monthActions.filter((a) => a.status === 'done').length;
   const nextAction = actions.find((a) => a.status === 'todo' || a.status === 'in_progress') ?? null;
 
@@ -293,7 +295,7 @@ export async function loadCoachingPortalDashboard(
       latestGuidance: growthPlan?.latestGuidance ?? null,
     },
     actions: {
-      items: actions.map((a) => ({
+      items: memberActions.map((a) => ({
         id: a.id,
         title: a.title,
         description: a.description,

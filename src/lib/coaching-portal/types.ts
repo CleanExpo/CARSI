@@ -1,4 +1,16 @@
-export type CoachingActionStatus = 'todo' | 'in_progress' | 'done' | 'blocked';
+export type CoachingActionStatus =
+  | 'todo'
+  | 'in_progress'
+  | 'done'
+  | 'blocked'
+  /** GP-634: suggested (e.g. from the marketing pack), waiting for the coach to approve. */
+  | 'proposed'
+  /** GP-634: the coach declined a proposed action. */
+  | 'declined';
+
+/** Statuses a member may set themselves; proposed/declined are coach-only. */
+export const MEMBER_SETTABLE_ACTION_STATUSES = ['todo', 'in_progress', 'done', 'blocked'] as const;
+export type MemberSettableActionStatus = (typeof MEMBER_SETTABLE_ACTION_STATUSES)[number];
 
 export type CoachingMonthlyAction = {
   id: string;
