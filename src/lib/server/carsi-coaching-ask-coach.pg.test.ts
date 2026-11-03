@@ -122,6 +122,12 @@ describe.runIf(RUNNABLE)('ask my coach (real PostgreSQL)', async () => {
     expect(after.progressNote).toBe('Leaning towards leasing.');
   });
 
+  it('member cannot delete the question (Codex r1 P1)', async () => {
+    const row = await prisma.carsiCoachingAction.findFirstOrThrow({ where: { userId: memberId } });
+    expect(await actions.deleteCoachingActionForUser(memberId, row.id)).toBe(false);
+    expect(await prisma.carsiCoachingAction.count({ where: { id: row.id } })).toBe(1);
+  });
+
   it('only the first coach answer lands, and the member sees it', async () => {
     const row = await prisma.carsiCoachingAction.findFirstOrThrow({ where: { userId: memberId } });
     const [a, b] = await Promise.all([

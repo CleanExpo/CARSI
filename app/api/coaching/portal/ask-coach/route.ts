@@ -5,7 +5,7 @@ import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { askMyCoach, listMyCoachQuestions } from '@/lib/server/carsi-coaching-ask-coach';
 import { getAskCoachStore } from '@/lib/server/carsi-coaching-ask-coach-store';
 import { isCarsiCoachingAssistantEnabled } from '@/lib/server/carsi-coaching-assistant-flag';
-import { requireCoachingPortalEditor } from '@/lib/server/carsi-coaching-portal-gate';
+import { requireCoachingPortalSubscriber } from '@/lib/server/carsi-coaching-portal-gate';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,7 +23,8 @@ async function gate(request: NextRequest) {
   if (!isCarsiCoachingAssistantEnabled()) {
     return { error: NextResponse.json({ detail: 'Not found.' }, { status: 404 }) };
   }
-  return requireCoachingPortalEditor(request);
+  // Subscribers only: unlike the editor gate, this admits no admin preview or dev unlock.
+  return requireCoachingPortalSubscriber(request);
 }
 
 export async function GET(request: NextRequest) {

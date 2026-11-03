@@ -5,7 +5,6 @@
  * question to another member or coach through the request body.
  */
 import { NextRequest } from 'next/server';
-import { NextResponse } from 'next/server';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { AskCoachQuestionRecord, AskCoachStore } from '@/lib/server/carsi-coaching-ask-coach';
@@ -14,7 +13,7 @@ const MEMBER_A = '11111111-1111-4111-8111-111111111111';
 const MEMBER_B = '22222222-2222-4222-8222-222222222222';
 
 const state = vi.hoisted(() => ({
-  claims: null as { sub: string } | null,
+  claims: null as { sub: string; email: string; full_name: string; role: string } | null,
   entitled: true,
   admin: false,
   rows: [] as AskCoachQuestionRecord[],
@@ -24,21 +23,13 @@ vi.mock('@/lib/server/auth-from-request', () => ({
   getSessionClaimsFromRequest: async () => state.claims,
 }));
 
-vi.mock('@/lib/server/carsi-coaching-portal-gate', () => ({
-  requireCoachingPortalEditor: async () => {
-    if (!state.claims) {
-      return { error: NextResponse.json({ detail: 'Sign in required.' }, { status: 401 }) };
-    }
-    if (!state.entitled) {
-      return {
-        error: NextResponse.json(
-          { detail: 'Active coaching subscription required.' },
-          { status: 403 }
-        ),
-      };
-    }
-    return { claims: state.claims, entitled: true };
-  },
+// The REAL portal gate runs; only the subscription row behind it is faked. Codex r1 P1: a
+// mocked gate hid that the editor gate also admits admins and the dev unlock.
+vi.mock('@/lib/server/carsi-coaching-subscription-store', () => ({
+  getCoachingPortalRowForUser: async () =>
+    state.entitled
+      ? { status: 'active', currentPeriodEnd: new Date(Date.now() + 30 * 86_400_000) }
+      : null,
 }));
 
 vi.mock('@/lib/admin/admin-session', () => ({
@@ -96,6 +87,10 @@ import {
   POST as coachPOST,
 } from '../../../app/api/admin/coaching/questions/route';
 
+function member(sub: string, role = 'student') {
+  return { sub, email: `${sub}@example.test`, full_name: 'Member', role };
+}
+
 function req(url: string, body?: unknown) {
   return new NextRequest(
     url,
@@ -126,7 +121,7 @@ describe('member route /api/coaching/portal/ask-coach', () => {
   });
 
   it('returns 404 for a signed-in member while the flag is off (default)', async () => {
-    state.claims = { sub: MEMBER_A };
+    state.claims = member(MEMBER_A);
     for (const value of ['', 'false', '1', 'TRUE ']) {
       vi.stubEnv('CARSI_COACHING_ASSISTANT_ENABLED', value);
       expect((await memberGET(req(MEMBER_URL))).status).toBe(404);
@@ -135,7 +130,7 @@ describe('member route /api/coaching/portal/ask-coach', () => {
   });
 
   it('returns 403 without an active coaching subscription', async () => {
-    state.claims = { sub: MEMBER_A };
+    state.claims = member(MEMBER_A);
     state.entitled = false;
     expect((await memberPOST(req(MEMBER_URL, { question: 'Should I lease a van?' }))).status).toBe(
       403
@@ -143,8 +138,20 @@ describe('member route /api/coaching/portal/ask-coach', () => {
     expect(state.rows).toHaveLength(0);
   });
 
+  it('returns 403 for an admin or a dev unlock without a coaching subscription', async () => {
+    state.entitled = false;
+    state.claims = member(MEMBER_A, 'admin');
+    expect((await memberGET(req(MEMBER_URL))).status).toBe(403);
+    state.claims = member(MEMBER_A);
+    vi.stubEnv('CARSI_COACHING_PORTAL_DEV_UNLOCK', 'true');
+    expect((await memberPOST(req(MEMBER_URL, { question: 'Should I lease a van?' }))).status).toBe(
+      403
+    );
+    expect(state.rows).toHaveLength(0);
+  });
+
   it('answers with citations from the coach material', async () => {
-    state.claims = { sub: MEMBER_A };
+    state.claims = member(MEMBER_A);
     const res = await memberPOST(
       req(MEMBER_URL, { question: 'How do I stop undercharging when quoting jobs?' })
     );
@@ -155,7 +162,7 @@ describe('member route /api/coaching/portal/ask-coach', () => {
   });
 
   it('sends an ungrounded question to the coach, ignoring any userId or coachId in the body', async () => {
-    state.claims = { sub: MEMBER_A };
+    state.claims = member(MEMBER_A);
     const res = await memberPOST(
       req(MEMBER_URL, {
         question: 'Should I lease or buy my next van?',
@@ -170,15 +177,15 @@ describe('member route /api/coaching/portal/ask-coach', () => {
   });
 
   it('a member reads only their own questions', async () => {
-    state.claims = { sub: MEMBER_B };
+    state.claims = member(MEMBER_B);
     await memberPOST(req(MEMBER_URL, { question: 'What should I name my second brand?' }));
-    state.claims = { sub: MEMBER_A };
+    state.claims = member(MEMBER_A);
     const json = await (await memberGET(req(`${MEMBER_URL}?userId=${MEMBER_B}`))).json();
     expect(json.questions).toEqual([]);
   });
 
   it('rejects an invalid question with 400', async () => {
-    state.claims = { sub: MEMBER_A };
+    state.claims = member(MEMBER_A);
     expect((await memberPOST(req(MEMBER_URL, { question: '' }))).status).toBe(400);
     expect((await memberPOST(req(MEMBER_URL, null))).status).toBe(400);
   });
@@ -193,7 +200,7 @@ describe('coach route /api/admin/coaching/questions', () => {
   });
 
   it('lists open questions and lets the coach answer once', async () => {
-    state.claims = { sub: MEMBER_A };
+    state.claims = member(MEMBER_A);
     await memberPOST(req(MEMBER_URL, { question: 'Should I lease or buy my next van?' }));
     state.admin = true;
     const inbox = await (await coachGET(req(COACH_URL))).json();

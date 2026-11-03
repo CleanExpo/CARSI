@@ -103,6 +103,11 @@ describe('compliance (d)', () => {
       'Is CARSI accredited to certify me?',
       'Will I get certified after the program?',
       'Is the Google Business Profile course CEC approved?',
+      // Shorthand and near-synonyms (Codex r1 P1: 'cert' slipped through).
+      'Can my Google Business Profile reviews earn me a cert?',
+      'Do I get certs for the Google Business Profile work?',
+      'What qualification do I hold after the Google Business Profile module?',
+      'Does the Google Business Profile module give me a designation or credential?',
     ]) {
       expect(isComplianceSensitiveQuestion(q)).toBe(true);
       const kbWithMatch: CoachKnowledgeBase = {

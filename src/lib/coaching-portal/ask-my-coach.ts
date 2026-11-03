@@ -61,11 +61,12 @@ export function normaliseQuestion(raw: unknown): string | null {
 }
 
 /**
- * Certification, accreditation, licensing and continuing-education questions are never
+ * Certification (including "cert"), accreditation, licensing, qualification, credential,
+ * designation and continuing-education questions are never
  * answered by the assistant. They carry licence risk for CARSI, so a person answers them.
  */
 const COMPLIANCE_TOPIC_RE =
-  /\b(iicrc|cecs?|continuing\s+education|certif\w*|accredit\w*|licen[cs]\w*)\b/i;
+  /\b(iicrc|cecs?|continuing\s+education|certs?|certif\w*|accredit\w*|licen[cs]\w*|qualif\w*|credential\w*|designation\w*)\b/i;
 
 export function isComplianceSensitiveQuestion(text: string): boolean {
   return COMPLIANCE_TOPIC_RE.test(text);
