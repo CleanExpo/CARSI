@@ -262,7 +262,15 @@ export async function listCoachingCoaches(): Promise<(CoachRecord & { memberCoun
     select: { ...COACH_SELECT, _count: { select: { members: true } } },
     orderBy: [{ isDefault: 'desc' }, { createdAt: 'asc' }],
   });
-  return coaches.map(({ _count, ...coach }) => ({ ...coach, memberCount: _count.members }));
+  // Default-chapter members are stored with a NULL coach_id, so count them the way the
+  // default coach's dashboard lists them.
+  const unassigned = coaches.some((c) => c.isDefault)
+    ? await prisma.carsiCoachingBusinessProfile.count({ where: { coachId: null } })
+    : 0;
+  return coaches.map(({ _count, ...coach }) => ({
+    ...coach,
+    memberCount: _count.members + (coach.isDefault ? unassigned : 0),
+  }));
 }
 
 type CreateCoachResult = { ok: true; coach: CoachRecord } | { ok: false; detail: string };

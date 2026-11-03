@@ -116,14 +116,20 @@ const db = vi.hoisted(() => {
 });
 
 const sent = vi.hoisted(() => [] as Array<{ to: string | string[]; subject: string; html: string; text?: string }>);
+/** Subjects whose send should report failure (simulates a provider outage for one email). */
+const failSubjects = vi.hoisted(() => [] as string[]);
 const stripeCalls = vi.hoisted(() => ({ sessions: [] as Row[], updates: [] as Row[] }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: db.prisma }));
 vi.mock('@/lib/server/email', () => ({
   sendEmail: vi.fn(async (params: { to: string | string[]; subject: string; html: string; text?: string }) => {
+    if (failSubjects.some((f) => params.subject.includes(f))) return { sent: false };
     sent.push(params);
     return { sent: true };
   }),
+}));
+vi.mock('@/lib/admin/admin-session', () => ({
+  getAdminSessionOrNull: async () => ({ email: 'admin@example.com' }),
 }));
 vi.mock('@/lib/api/stripe', () => ({
   getStripeClient: () => ({
@@ -174,6 +180,9 @@ import { submitCoachingOnboardingToCoach } from '@/lib/server/carsi-coaching-onb
 import { saveCoachingSessionPrep } from '@/lib/server/carsi-coaching-session-prep';
 import { COACHING_GROWTH_SERVICE_CATEGORIES } from '@/lib/coaching-portal/growth-services';
 import { coachPriceDisclosure } from '@/lib/coaching-portal/coaches';
+import { getCoachForViewer } from '@/lib/server/carsi-coaching-coaches';
+import { POST as adminCreateCoach } from '../../../app/api/admin/business-coaching/coaches/route';
+import { NextRequest } from 'next/server';
 import type Stripe from 'stripe';
 
 const FOUNDER = 'phill.mcgurk@gmail.com';
@@ -251,6 +260,7 @@ describe('GP-632 multi-coach chapters flow', () => {
     stripeCalls.sessions.length = 0;
     stripeCalls.updates.length = 0;
     delete process.env.CARSI_COACHING_MONTHLY_NOTIFY_EMAIL;
+    failSubjects.length = 0;
     // The migration's seeded default chapter.
     db.t('carsiCoachingCoach').push({
       id: 'coach-default',
@@ -485,5 +495,111 @@ describe('GP-632 multi-coach chapters flow', () => {
     await assignMemberToCoach('member-m', null);
     expect((await getCoachForMember('member-m'))?.isDefault).toBe(true);
     expect(await assignMemberToCoach('member-m', 'no-such-coach')).toMatchObject({ ok: false });
+  });
+
+  it('admin opens a chapter linked to the coach login, and that coach then sees their dashboard', async () => {
+    db.t('lmsUser').push({ id: 'c0c0c0c0-0000-4000-8000-00000000000c', email: 'casey.coach@example.com', fullName: 'Casey Coach' });
+    const body = {
+      displayName: 'Casey Coach',
+      chapterName: 'Casey Coaching UK',
+      chapterSlug: 'uk-chapter',
+      currency: 'gbp',
+      monthlyPriceCents: 39900,
+      notificationEmail: 'casey.inbox@example.com',
+      coachLoginEmail: 'Casey.Coach@example.com',
+    };
+    const post = (b: Record<string, unknown>) =>
+      adminCreateCoach(
+        new NextRequest('http://localhost/api/admin/business-coaching/coaches', {
+          method: 'POST',
+          body: JSON.stringify(b),
+        })
+      );
+
+    // A chapter must name a coach login, and that login must exist.
+    const withoutLogin: Record<string, unknown> = { ...body };
+    delete withoutLogin.coachLoginEmail;
+    expect((await post(withoutLogin)).status).toBe(400);
+    expect((await post({ ...body, coachLoginEmail: 'nobody@example.com' })).status).toBe(404);
+    expect(db.t('carsiCoachingCoach')).toHaveLength(1);
+
+    const res = await post(body);
+    expect(res.status).toBe(201);
+    const viewer = await getCoachForViewer(claimsFor('c0c0c0c0-0000-4000-8000-00000000000c', 'casey.coach@example.com', 'Casey Coach'));
+    expect(viewer?.chapterSlug).toBe('uk-chapter');
+    expect(viewer?.userId).toBe('c0c0c0c0-0000-4000-8000-00000000000c');
+  });
+
+  it('a failed coach notice is not marked sent; the retry reaches coach B without re-sending the welcome', async () => {
+    const { coachB } = await setUpTwoCoaches();
+    seedMember('member-r', 'owner.r@example.com', 'Rory Owner');
+    await assignMemberToCoach('member-r', coachB.id);
+    const session = {
+      id: 'cs_test_retry',
+      mode: 'subscription',
+      status: 'complete',
+      payment_status: 'paid',
+      amount_total: 49700,
+      currency: 'usd',
+      customer_details: { email: 'owner.r@example.com', name: 'Rory Owner' },
+      metadata: { source: 'carsi-coaching-monthly', carsi_user_id: 'member-r', contact_name: 'Rory Owner' } as Record<string, string>,
+      subscription: null,
+    };
+
+    failSubjects.push('New subscription');
+    const first = await processCarsiCoachingMonthlyCheckoutCompleted(
+      session as unknown as Stripe.Checkout.Session,
+      { appOrigin: 'https://carsi.example' }
+    );
+    expect(first.customerEmailSent).toBe(true);
+    expect(first.founderEmailSent).toBe(false);
+    expect(recipientsOf('New subscription')).toEqual([]);
+    // Stripe metadata after the first attempt, as the next delivery would read it.
+    const written = stripeCalls.updates.at(-1)?.metadata as Record<string, string>;
+    expect(written).toBeTruthy();
+
+    failSubjects.length = 0;
+    sent.length = 0;
+    const retry = await processCarsiCoachingMonthlyCheckoutCompleted(
+      { ...session, metadata: written } as unknown as Stripe.Checkout.Session,
+      { appOrigin: 'https://carsi.example' }
+    );
+    expect(retry.founderEmailSent).toBe(true);
+    expect(recipientsOf('New subscription')).toEqual([COACH_B_EMAIL]);
+    expect(recipientsOf('Welcome to')).toEqual([]);
+
+    // A third delivery sends nothing.
+    sent.length = 0;
+    const done = stripeCalls.updates.at(-1)?.metadata as Record<string, string>;
+    const third = await processCarsiCoachingMonthlyCheckoutCompleted(
+      { ...session, metadata: done } as unknown as Stripe.Checkout.Session,
+      { appOrigin: 'https://carsi.example' }
+    );
+    expect(third.skipped).toBe('already_emailed');
+    expect(sent).toEqual([]);
+  });
+
+  it('a session already marked sent by the previous code is not emailed again', async () => {
+    seedMember('member-l', 'owner.l@example.com', 'Lee Owner');
+    const legacy = await processCarsiCoachingMonthlyCheckoutCompleted(
+      {
+        id: 'cs_test_legacy',
+        mode: 'subscription',
+        status: 'complete',
+        payment_status: 'paid',
+        amount_total: 49500,
+        currency: 'aud',
+        customer_details: { email: 'owner.l@example.com', name: 'Lee Owner' },
+        metadata: {
+          source: 'carsi-coaching-monthly',
+          carsi_user_id: 'member-l',
+          coaching_monthly_emails_sent: 'true',
+        },
+        subscription: null,
+      } as unknown as Stripe.Checkout.Session,
+      { appOrigin: 'https://carsi.example' }
+    );
+    expect(legacy.skipped).toBe('already_emailed');
+    expect(sent).toEqual([]);
   });
 });

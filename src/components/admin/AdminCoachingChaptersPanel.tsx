@@ -32,6 +32,7 @@ const EMPTY = {
   price: '',
   stripePriceId: '',
   notificationEmail: '',
+  coachLoginEmail: '',
   brandColour: '',
   logoUrl: '',
 };
@@ -98,6 +99,7 @@ export function AdminCoachingChaptersPanel() {
       monthlyPriceCents: Number.isFinite(cents) ? cents : null,
       stripePriceId: form.stripePriceId || null,
       notificationEmail: form.notificationEmail,
+      coachLoginEmail: form.coachLoginEmail,
       brandColour: form.brandColour || null,
       logoUrl: form.logoUrl || null,
     });
@@ -179,6 +181,7 @@ export function AdminCoachingChaptersPanel() {
             {field('chapterName', 'Chapter name')}
             {field('chapterSlug', 'Chapter slug (e.g. us-west)')}
             {field('notificationEmail', 'Coach inbox email')}
+            {field('coachLoginEmail', 'Coach CARSI login email')}
             <select
               className={input}
               aria-label="Currency"

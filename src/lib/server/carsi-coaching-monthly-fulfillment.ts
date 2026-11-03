@@ -25,7 +25,11 @@ import {
   readCustomerId,
 } from '@/lib/server/stripe-subscription-map';
 
+/** Member welcome sent. Sessions marked by earlier code carry only this key. */
 const CONFIRMATION_SENT_META = 'coaching_monthly_emails_sent';
+/** Coach notice sent ('true') or still owed ('false'), recorded separately so a failed coach
+ * notice is retried on the next delivery without re-sending the member welcome (GP-632). */
+const COACH_NOTICE_SENT_META = 'coaching_monthly_coach_notice_sent';
 
 export function isCarsiCoachingMonthlyCheckoutSession(session: Stripe.Checkout.Session): boolean {
   return session.metadata?.source === CARSI_COACHING_MONTHLY_CHECKOUT_SOURCE;
@@ -137,8 +141,12 @@ export async function processCarsiCoachingMonthlyCheckoutCompleted(
   const contactPhone =
     session.customer_details?.phone?.trim() || session.metadata?.contact_phone?.trim() || undefined;
 
-  const alreadySent = session.metadata?.[CONFIRMATION_SENT_META] === 'true';
-  if (alreadySent) {
+  const customerDone = session.metadata?.[CONFIRMATION_SENT_META] === 'true';
+  const coachFlag = session.metadata?.[COACH_NOTICE_SENT_META];
+  // No coach flag on a session the welcome was already sent for = marked by earlier code,
+  // which sent both emails together; treat the notice as sent so nothing goes out twice.
+  const coachDone = coachFlag === 'true' || (customerDone && coachFlag === undefined);
+  if (customerDone && coachDone) {
     return {
       fulfilled: true,
       skipped: 'already_emailed',
@@ -165,32 +173,36 @@ export async function processCarsiCoachingMonthlyCheckoutCompleted(
     coachName: coachNameForCopy(coach),
   });
 
-  const customerResult = await sendEmail({
-    to: email,
-    subject: `Welcome to ${carsiCoachingProductName}`,
-    html,
-    text,
-  });
+  const customerResult = customerDone
+    ? { sent: false }
+    : await sendEmail({
+        to: email,
+        subject: `Welcome to ${carsiCoachingProductName}`,
+        html,
+        text,
+      });
 
   let founderResult: { sent: boolean } = { sent: false };
-  try {
-    // The new member's contact details go to their own coach; no coach keeps the founder inbox.
-    const coachInbox = carsiUserId
-      ? (await getCoachRoutingForMember(carsiUserId)).recipients
-      : undefined;
-    founderResult = await sendCarsiCoachingMonthlyFounderNotificationEmail({
-      to: coachInbox,
-      appOrigin,
-      contactName,
-      contactEmail: email,
-      contactPhone,
-      carsiUserId: carsiUserId || '—',
-      amountLabel,
-      stripeCheckoutSessionId: session.id,
-      stripeSubscriptionId: subscriptionId,
-    });
-  } catch (err) {
-    console.error('[coaching-monthly] founder notification failed:', err);
+  if (!coachDone) {
+    try {
+      // The new member's contact details go to their own coach; no coach keeps the founder inbox.
+      const coachInbox = carsiUserId
+        ? (await getCoachRoutingForMember(carsiUserId)).recipients
+        : undefined;
+      founderResult = await sendCarsiCoachingMonthlyFounderNotificationEmail({
+        to: coachInbox,
+        appOrigin,
+        contactName,
+        contactEmail: email,
+        contactPhone,
+        carsiUserId: carsiUserId || '—',
+        amountLabel,
+        stripeCheckoutSessionId: session.id,
+        stripeSubscriptionId: subscriptionId,
+      });
+    } catch (err) {
+      console.error('[coaching-monthly] founder notification failed:', err);
+    }
   }
 
   if (customerResult.sent || founderResult.sent) {
@@ -199,7 +211,8 @@ export async function processCarsiCoachingMonthlyCheckoutCompleted(
       await stripe.checkout.sessions.update(session.id, {
         metadata: {
           ...(session.metadata ?? {}),
-          [CONFIRMATION_SENT_META]: 'true',
+          [CONFIRMATION_SENT_META]: customerDone || customerResult.sent ? 'true' : 'false',
+          [COACH_NOTICE_SENT_META]: coachDone || founderResult.sent ? 'true' : 'false',
         },
       });
     } catch {
@@ -207,9 +220,18 @@ export async function processCarsiCoachingMonthlyCheckoutCompleted(
     }
   }
 
+  if (!coachDone && !founderResult.sent) {
+    console.error(
+      '[coaching-monthly] coach notice not sent; it will be retried on the next delivery',
+      {
+        session: session.id,
+      }
+    );
+  }
+
   return {
     fulfilled: true,
-    customerEmailSent: customerResult.sent,
-    founderEmailSent: founderResult.sent,
+    customerEmailSent: customerDone || customerResult.sent,
+    founderEmailSent: coachDone || founderResult.sent,
   };
 }

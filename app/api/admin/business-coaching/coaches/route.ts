@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getAdminSessionOrNull } from '@/lib/admin/admin-session';
+import { prisma } from '@/lib/prisma';
 import { createCoachingCoach, listCoachingCoaches } from '@/lib/server/carsi-coaching-coaches';
 
 export const dynamic = 'force-dynamic';
@@ -26,8 +27,27 @@ export async function POST(request: NextRequest) {
   }
 
   const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
+  // The coach's own CARSI login: without it nobody could open the chapter's dashboard.
+  const coachLoginEmail =
+    typeof body.coachLoginEmail === 'string' ? body.coachLoginEmail.trim().toLowerCase() : '';
+  if (!coachLoginEmail) {
+    return NextResponse.json(
+      { detail: "Enter the coach's CARSI login email so they can open their dashboard." },
+      { status: 400 }
+    );
+  }
   // Revenue-share terms are deliberately not accepted here: they need Phill's sign-off first.
   try {
+    const coachUser = await prisma.lmsUser.findUnique({
+      where: { email: coachLoginEmail },
+      select: { id: true },
+    });
+    if (!coachUser) {
+      return NextResponse.json(
+        { detail: 'No CARSI account uses that coach login email. Ask the coach to register first.' },
+        { status: 404 }
+      );
+    }
     const result = await createCoachingCoach({
       displayName: String(body.displayName ?? ''),
       chapterSlug: String(body.chapterSlug ?? ''),
@@ -39,7 +59,7 @@ export async function POST(request: NextRequest) {
       notificationEmail: String(body.notificationEmail ?? ''),
       brandColour: typeof body.brandColour === 'string' ? body.brandColour : null,
       logoUrl: typeof body.logoUrl === 'string' ? body.logoUrl : null,
-      userId: typeof body.userId === 'string' ? body.userId : null,
+      userId: coachUser.id,
     });
     if (!result.ok) return NextResponse.json({ detail: result.detail }, { status: 400 });
     return NextResponse.json({ coach: result.coach }, { status: 201 });

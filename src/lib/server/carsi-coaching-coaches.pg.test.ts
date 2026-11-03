@@ -148,6 +148,10 @@ describe.runIf(RUNNABLE)('coaching chapters (real PostgreSQL)', () => {
     const listed = await chapters.listCoachingCoaches();
     expect(listed[0].isDefault).toBe(true);
     expect(listed.find((c) => c.id === b.coach.id)?.memberCount).toBe(1);
+    // The default chapter counts its unassigned (NULL coach_id) members, as its dashboard lists them.
+    const defaultRow = listed.find((c) => c.isDefault)!;
+    expect(defaultRow.memberCount).toBe(await prisma.carsiCoachingBusinessProfile.count({ where: { coachId: null } }));
+    expect(defaultRow.memberCount).toBeGreaterThan(0);
 
     // Unassigning returns the member to the default chapter (stored as NULL).
     expect(await chapters.assignMemberToCoach(memberB, null)).toEqual({ ok: true });
