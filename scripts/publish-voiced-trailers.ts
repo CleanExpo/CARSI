@@ -1,0 +1,127 @@
+/**
+ * GP-671: put the voiced course trailers live.
+ *
+ * The 50 course trailers in data/video/gp671-voiced-trailers.json shipped silent. Each has a
+ * voiced remix (same picture, voiceover added) in --dir as <slug>.mp4. Per course this script:
+ *   1. uploads the voiced file to Cloudinary as a NEW asset (the silent original is kept, so a
+ *      rollback is one meta write back to `silentUrl`);
+ *   2. switches LmsCourse.meta.introVideoUrl from the silent URL to the voiced one, only if the
+ *      live value is still exactly the silent URL (compare-and-set: anything else is reported,
+ *      never overwritten).
+ * Uploaded URLs are written back into the map as `voicedUrl` after each upload, so a re-run
+ * never uploads twice and is a no-op once every course is switched.
+ *
+ * Usage (credentials come from the env file dotenv loads; nothing is printed):
+ *   npx tsx scripts/publish-voiced-trailers.ts --dir=<folder of voiced mp4s> --check   # read-only
+ *   npx tsx scripts/publish-voiced-trailers.ts --dir=<folder of voiced mp4s> --apply
+ *   npx tsx scripts/publish-voiced-trailers.ts --rollback                                # voiced -> silent
+ *   npx tsx scripts/publish-voiced-trailers.ts --dir=<folder> --upload-only  # step 1 only, no database
+ *   npx tsx scripts/publish-voiced-trailers.ts --sql [--rollback]            # step 2 as one SQL statement
+ * --upload-only and --sql exist for when the database is switched from the Supabase SQL editor.
+ */
+import 'dotenv/config';
+
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+import { isCloudinaryConfigured, uploadVideoToCloudinary } from '@/lib/server/cloudinary-upload';
+import { prisma } from '@/lib/prisma';
+
+const MAP = 'data/video/gp671-voiced-trailers.json';
+const FOLDER = 'carsi/course-trailers';
+const arg = (n: string) => (process.argv.find((a) => a.startsWith(`--${n}=`)) || '').split('=').slice(1).join('=');
+const mode = process.argv.includes('--upload-only') ? 'upload' : process.argv.includes('--sql') ? 'sql' : process.argv.includes('--apply') ? 'apply' : process.argv.includes('--rollback') ? 'rollback' : 'check';
+const dir = arg('dir');
+
+type Row = { slug: string; silentUrl: string; voicedUrl?: string };
+const map = JSON.parse(readFileSync(MAP, 'utf8')) as { trailers: Row[] };
+const save = () => writeFileSync(MAP, JSON.stringify(map, null, 1) + '\n', 'utf8');
+
+function liveUrl(meta: unknown): string | null {
+  if (!meta || typeof meta !== 'object' || Array.isArray(meta)) return null;
+  const v = (meta as Record<string, unknown>).introVideoUrl;
+  return typeof v === 'string' ? v.trim() : null;
+}
+
+async function swap(slug: string, from: string, to: string): Promise<boolean> {
+  const row = await prisma.lmsCourse.findUnique({ where: { slug }, select: { meta: true } });
+  if (!row || liveUrl(row.meta) !== from) return false;
+  const meta = { ...(row.meta as Record<string, unknown>), introVideoUrl: to };
+  const res = await prisma.lmsCourse.updateMany({
+    where: { slug, meta: { path: ['introVideoUrl'], equals: from } },
+    data: { meta },
+  });
+  return res.count === 1;
+}
+
+const q = (v: string) => `'${v.replace(/'/g, "''")}'`;
+
+/** One compare-and-set UPDATE: a row moves only if its live URL is still the expected one. */
+function printSql(rollback: boolean) {
+  const rows = map.trailers.filter((r) => r.voicedUrl);
+  if (rows.length !== map.trailers.length) throw new Error(`${map.trailers.length - rows.length} trailer(s) not uploaded yet`);
+  const values = rows
+    .map((r) => `  (${q(r.slug)}, ${q(rollback ? r.voicedUrl! : r.silentUrl)}, ${q(rollback ? r.silentUrl : r.voicedUrl!)})`)
+    .join(',\n');
+  console.log(`UPDATE lms_courses c
+SET meta = jsonb_set(c.meta::jsonb, '{introVideoUrl}', to_jsonb(v.new_url))
+FROM (VALUES
+${values}
+) AS v(slug, old_url, new_url)
+WHERE c.slug = v.slug AND c.meta::jsonb->>'introVideoUrl' = v.old_url
+RETURNING c.slug;`);
+}
+
+async function upload() {
+  let n = 0;
+  for (const r of map.trailers) {
+    if (r.voicedUrl) continue;
+    const file = join(dir, `${r.slug}.mp4`);
+    if (!existsSync(file)) throw new Error(`missing ${file}`);
+    r.voicedUrl = (await uploadVideoToCloudinary(readFileSync(file), FOLDER)).url;
+    save();
+    console.log(`UPLOADED     ${r.slug} ${r.voicedUrl}`);
+    n += 1;
+  }
+  console.log(`SUMMARY uploaded=${n} total_with_url=${map.trailers.filter((r) => r.voicedUrl).length}/${map.trailers.length}`);
+}
+
+async function main() {
+  if (mode === 'sql') return printSql(process.argv.includes('--rollback'));
+  const host = (() => { try { return new URL(process.env.DATABASE_URL || '').hostname; } catch { return 'none'; } })();
+  console.log(`mode=${mode} db=${host} cloudinary=${isCloudinaryConfigured() ? 'configured' : 'MISSING'}`);
+  if (mode !== 'rollback' && (!dir || !existsSync(dir))) throw new Error('--dir=<folder of voiced mp4s> is required');
+  if ((mode === 'apply' || mode === 'upload') && !isCloudinaryConfigured()) throw new Error('Cloudinary is not configured');
+  if (mode === 'upload') return upload();
+
+  const tally: Record<string, number> = {};
+  const note = (k: string, slug: string, extra = '') => { tally[k] = (tally[k] || 0) + 1; console.log(`${k.padEnd(12)} ${slug} ${extra}`); };
+
+  for (const r of map.trailers) {
+    const course = await prisma.lmsCourse.findUnique({ where: { slug: r.slug }, select: { meta: true } });
+    const live = course ? liveUrl(course.meta) : null;
+    if (!course) { note('NO-COURSE', r.slug); continue; }
+
+    if (mode === 'rollback') {
+      if (r.voicedUrl && live === r.voicedUrl) note((await swap(r.slug, r.voicedUrl, r.silentUrl)) ? 'ROLLED-BACK' : 'RACE', r.slug);
+      else note('UNTOUCHED', r.slug, `live=${live}`);
+      continue;
+    }
+    if (r.voicedUrl && live === r.voicedUrl) { note('DONE', r.slug); continue; }
+    if (live !== r.silentUrl) { note('LIVE-CHANGED', r.slug, `live=${live}`); continue; }
+    const file = join(dir, `${r.slug}.mp4`);
+    if (!existsSync(file)) { note('NO-FILE', r.slug); continue; }
+    if (mode === 'check') { note('READY', r.slug); continue; }
+
+    if (!r.voicedUrl) {
+      r.voicedUrl = (await uploadVideoToCloudinary(readFileSync(file), FOLDER)).url;
+      save();
+    }
+    note((await swap(r.slug, r.silentUrl, r.voicedUrl)) ? 'SWITCHED' : 'RACE', r.slug, r.voicedUrl);
+  }
+  console.log('SUMMARY ' + JSON.stringify(tally));
+}
+
+main()
+  .catch((e) => { console.error(e instanceof Error ? e.message : e); process.exitCode = 1; })
+  .finally(() => prisma.$disconnect());
