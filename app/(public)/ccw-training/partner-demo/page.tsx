@@ -14,7 +14,7 @@ import {
 import { carsiCoachingMonthlyPath } from '@/lib/marketing/carsi-coaching-monthly';
 
 export const metadata: Metadata = {
-  title: 'Business Coaching partner demo | CARSI',
+  title: 'Business Coaching partner demo',
   description:
     'Ten-minute walkthrough of the CARSI Business Coaching workspace — sample member, plan, and actions (demo data only).',
   robots: { index: false, follow: false },
