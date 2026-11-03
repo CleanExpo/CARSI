@@ -66,9 +66,11 @@ jobs:
             # columns are refused before any connection. The session's read-only flag can be
             # switched off from SQL, so this check is what stops a read file from writing.
             python3 db/ops/test_check_read_sql.py
+            python3 db/ops/test_dburl.py
             python3 db/ops/check-read-sql.py "$FILE"
           else
             python3 db/ops/test_check_read_sql.py
+            python3 db/ops/test_dburl.py
             python3 db/ops/check-read-sql.py --write "$FILE"
           fi
           echo "kind=$kind" >> "$GITHUB_OUTPUT"
@@ -106,8 +108,7 @@ jobs:
           # Not psql: its meta-commands (gexec, the shell escape) could run from the file. run-read.py
           # sends the SQL only, in a READ ONLY transaction that is rolled back.
           python3 -m pip install --quiet --disable-pip-version-check "psycopg[binary]==3.2.3"
-          # libpq rejects Prisma-only URL params such as schema=; drop them.
-          DATABASE_URL="$(printf '%s' "$DATABASE_URL" | sed -E 's/([?&])schema=[^&]*&?/\1/; s/[?&]$//')"
+          # db/ops/dburl.py accepts any DigitalOcean format and drops Prisma's schema= param.
           export DATABASE_URL
           python3 db/ops/run-read.py "$FILE"
 
@@ -132,6 +133,5 @@ jobs:
           # Not psql (its meta-commands could run a shell with the URL in the environment):
           # run-write.py sends the SQL only, in one transaction, committed once at the end.
           python3 -m pip install --quiet --disable-pip-version-check "psycopg[binary]==3.2.3"
-          DATABASE_URL="$(printf '%s' "$DATABASE_URL" | sed -E 's/([?&])schema=[^&]*&?/\1/; s/[?&]$//')"
           export DATABASE_URL
           python3 db/ops/run-write.py "$FILE"
