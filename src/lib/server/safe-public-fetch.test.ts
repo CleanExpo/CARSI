@@ -120,3 +120,25 @@ describe('redirect hops (Codex P1, head 5dfe661f)', () => {
     expect(closed).toBe(true);
   });
 });
+
+describe('oversized pages (Codex P1, head 06f8e812)', () => {
+  it('a page over the size cap is reported unreadable, never reviewed from a cut-off prefix', async () => {
+    const big = createServer((_req, res) => {
+      res.writeHead(200, { 'Content-Type': 'text/html' });
+      res.end(
+        `<html><!--${'x'.repeat(1_600_000)}--><head><title>Plumber Mackay</title></head><body><h1>Mackay</h1></body></html>`
+      );
+    });
+    await new Promise<void>((resolve) => big.listen(0, '127.0.0.1', resolve));
+    const bigPort = (big.address() as AddressInfo).port;
+    const allowAll = createGuardedLookup(
+      async () => [{ address: '127.0.0.1', family: 4 }],
+      () => true
+    );
+    const res = await requestPage(new URL(`http://big.test:${bigPort}/`), allowAll, 5000);
+    await new Promise<void>((resolve) => big.close(() => resolve()));
+    expect(res.ok).toBe(false);
+    expect(res.error).toBe('page too large to check');
+    expect(res.body).toBeUndefined();
+  });
+});

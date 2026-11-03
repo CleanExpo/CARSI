@@ -235,13 +235,10 @@ export function requestPage(
         res.on('data', (chunk: Buffer) => {
           total += chunk.byteLength;
           if (total > MAX_BYTES) {
+            // A cut-off prefix would be reviewed as if it were the whole page and could report
+            // fixes for things that are there (Codex P1, head 06f8e812). Too large means unreadable.
             res.destroy();
-            finish({
-              ok: true,
-              status,
-              contentType,
-              body: Buffer.concat(chunks).toString('utf8'),
-            });
+            finish({ ok: false, status, error: 'page too large to check' });
             return;
           }
           chunks.push(chunk);
