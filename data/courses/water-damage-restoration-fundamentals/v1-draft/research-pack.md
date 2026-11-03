@@ -22,7 +22,8 @@ Grades (VERIFIED and JUSTIFIED entries): A1 x1, A2 x29, A3 x3, B1 x25, B2 x3, C1
 source is a regulator, government agency or official body except Ausgrid's Electricity Safety site (B2, a
 network operator's public safety pages) and four Australian distributor or retailer pages (C1). Those
 vendor pages are used only for the commercial fact they are the primary record of: that a brand is sold
-in Australia and runs on batteries. The 21 SME confirmations are graded B1 (practitioner source).
+in Australia (availability only, DECISIONS #54). The 25 B1 entries are SME confirmations (practitioner
+source): the 21 sign-off answers plus the four battery-power rows WRP-069 to WRP-072.
 
 Validate the ledger with `node scripts/audit/validate-ledger.mjs <ledger>` (it must exit 0), and
 run `node scripts/audit/check-mutants.mjs` in the same session.
@@ -106,8 +107,9 @@ He reviewed all 21 GAP claims in the v1 draft: **18 OK, 3 Fix, 0 Cut.**
     moisture-instruments diagram.
   - **WRP-037, instrument brands.** Now reads: Protimeter, Tramex, Delmhorst and FLIR moisture
     instruments are battery-powered and widely available in Australia. The "230 V" framing is gone.
-    Australian availability was re-checked on 02/11/2026 against an Australian distributor or
-    retailer page for each brand (VERIFIED, WRP-065 to WRP-068). Battery power rests on the SME's
+    Australian availability was re-checked against an Australian distributor or retailer page for
+    each brand (VERIFIED, WRP-065 to WRP-068): 02/11/2026, with WRP-066 and WRP-068 re-read on
+    03/11/2026 for their AUD price-listing quotes. Battery power rests on the SME's
     answer (JUSTIFIED, WRP-069 to WRP-072), with the stockist's listing as the supporting record,
     since a stockist page verifies availability only (DECISIONS #54). No brand GAP remains.
   - **WRP-058, the insurance context.** The SME rejected "most water-damage work is inside an
