@@ -409,21 +409,23 @@ export async function POST(request: NextRequest) {
     }
 
     if (session.metadata?.source === 'carsi-coaching-monthly') {
-      let coachNoticeOwed = false;
+      let emailOwed = false;
       try {
         const result = await processCarsiCoachingMonthlyCheckoutCompleted(session, {
           appOrigin: getAppOrigin(),
         });
-        coachNoticeOwed = result.fulfilled && result.founderEmailSent === false;
+        emailOwed =
+          result.fulfilled &&
+          (result.customerEmailSent === false || result.founderEmailSent === false);
       } catch (err) {
         // A failed lookup (coach, Stripe metadata) may leave an email owed: retry, never drop.
         console.error('[stripe webhook] carsi-coaching-monthly fulfillment', err);
-        coachNoticeOwed = true;
+        emailOwed = true;
       }
-      // GP-632: the coach's new-member notice did not go out. Ask Stripe to deliver the
-      // event again; the fulfillment sends only what is still owed.
-      if (coachNoticeOwed) {
-        return await retryLater('coaching-monthly coach notice not sent');
+      // GP-632: the member welcome or the coach's new-member notice did not go out. Ask
+      // Stripe to deliver the event again; the fulfillment sends only what is still owed.
+      if (emailOwed) {
+        return await retryLater('coaching-monthly email not sent');
       }
       return await acknowledge();
     }

@@ -592,6 +592,43 @@ describe('GP-632 multi-coach chapters flow', () => {
     expect(sent).toEqual([]);
   });
 
+  it('a failed member welcome is not marked sent; the retry sends only the welcome', async () => {
+    const { coachB } = await setUpTwoCoaches();
+    seedMember('member-w', 'owner.w@example.com', 'Wren Owner');
+    await assignMemberToCoach('member-w', coachB.id);
+    const session = {
+      id: 'cs_test_welcome_retry',
+      mode: 'subscription',
+      status: 'complete',
+      payment_status: 'paid',
+      amount_total: 49700,
+      currency: 'usd',
+      customer_details: { email: 'owner.w@example.com', name: 'Wren Owner' },
+      metadata: { source: 'carsi-coaching-monthly', carsi_user_id: 'member-w', contact_name: 'Wren Owner' } as Record<string, string>,
+      subscription: null,
+    };
+
+    failSubjects.push('Welcome to');
+    const first = await processCarsiCoachingMonthlyCheckoutCompleted(
+      session as unknown as Stripe.Checkout.Session,
+      { appOrigin: 'https://carsi.example' }
+    );
+    expect(first.fulfilled).toBe(true);
+    expect(first.customerEmailSent).toBe(false);
+    expect(first.founderEmailSent).toBe(true);
+    expect(recipientsOf('New subscription')).toEqual([COACH_B_EMAIL]);
+
+    failSubjects.length = 0;
+    sent.length = 0;
+    const retry = await processCarsiCoachingMonthlyCheckoutCompleted(
+      session as unknown as Stripe.Checkout.Session,
+      { appOrigin: 'https://carsi.example' }
+    );
+    expect(retry.customerEmailSent).toBe(true);
+    expect(recipientsOf('Welcome to')).toEqual(['owner.w@example.com']);
+    expect(recipientsOf('New subscription')).toEqual([]);
+  });
+
   it('a replay that cannot read the current sent flags sends nothing and fails so Stripe retries', async () => {
     const { coachB } = await setUpTwoCoaches();
     seedMember('member-u', 'owner.u@example.com', 'Uma Owner');

@@ -100,6 +100,20 @@ describe('Stripe webhook coaching-monthly coach notice retry', () => {
     expect(mocks.markProcessed).not.toHaveBeenCalled();
   });
 
+  it('returns 500 and releases the claim while the member welcome is still owed', async () => {
+    mocks.fulfil.mockResolvedValue({
+      fulfilled: true,
+      customerEmailSent: false,
+      founderEmailSent: true,
+    });
+
+    const response = await deliver();
+
+    expect(response.status).toBe(500);
+    expect(mocks.release).toHaveBeenCalledWith(expect.anything(), 'evt_coaching_monthly');
+    expect(mocks.markProcessed).not.toHaveBeenCalled();
+  });
+
   it('acknowledges once both emails are sent', async () => {
     mocks.fulfil.mockResolvedValue({
       fulfilled: true,
