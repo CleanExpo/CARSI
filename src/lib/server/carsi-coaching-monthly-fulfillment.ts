@@ -38,19 +38,14 @@ export function isCarsiCoachingMonthlyCheckoutSession(session: Stripe.Checkout.S
 /**
  * The session's metadata as Stripe holds it now. A webhook retry replays the original event,
  * whose session copy predates the sent flags written after the first attempt, so the flags
- * are read from Stripe. If Stripe cannot be reached the event's copy is used.
+ * are read from Stripe. If Stripe cannot be reached this throws: deciding from the event's
+ * stale copy would send the member welcome again. The caller retries later.
  */
 async function currentSessionMetadata(
   session: Stripe.Checkout.Session
 ): Promise<Record<string, string>> {
-  const given = session.metadata ?? {};
-  try {
-    const fresh = await getStripeClient().checkout.sessions.retrieve(session.id);
-    return { ...given, ...(fresh.metadata ?? {}) };
-  } catch (err) {
-    console.error('[coaching-monthly] could not read current session metadata:', err);
-    return given;
-  }
+  const fresh = await getStripeClient().checkout.sessions.retrieve(session.id);
+  return { ...(session.metadata ?? {}), ...(fresh.metadata ?? {}) };
 }
 
 export type CarsiCoachingMonthlyFulfillmentResult = {

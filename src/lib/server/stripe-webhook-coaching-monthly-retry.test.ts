@@ -114,6 +114,16 @@ describe('Stripe webhook coaching-monthly coach notice retry', () => {
     expect(mocks.release).not.toHaveBeenCalled();
   });
 
+  it('returns 500 and releases the claim when fulfillment throws (e.g. coach lookup failed)', async () => {
+    mocks.fulfil.mockRejectedValue(new Error('coach lookup failed'));
+
+    const response = await deliver();
+
+    expect(response.status).toBe(500);
+    expect(mocks.release).toHaveBeenCalledWith(expect.anything(), 'evt_coaching_monthly');
+    expect(mocks.markProcessed).not.toHaveBeenCalled();
+  });
+
   it('still acknowledges a session it does not fulfil (nothing owed to retry)', async () => {
     mocks.fulfil.mockResolvedValue({ fulfilled: false, skipped: 'no_email' });
 

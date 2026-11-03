@@ -416,7 +416,9 @@ export async function POST(request: NextRequest) {
         });
         coachNoticeOwed = result.fulfilled && result.founderEmailSent === false;
       } catch (err) {
+        // A failed lookup (coach, Stripe metadata) may leave an email owed: retry, never drop.
         console.error('[stripe webhook] carsi-coaching-monthly fulfillment', err);
+        coachNoticeOwed = true;
       }
       // GP-632: the coach's new-member notice did not go out. Ask Stripe to deliver the
       // event again; the fulfillment sends only what is still owed.

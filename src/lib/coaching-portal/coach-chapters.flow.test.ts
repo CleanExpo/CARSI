@@ -122,6 +122,7 @@ const stripeCalls = vi.hoisted(() => ({
   sessions: [] as Row[],
   updates: [] as Row[],
   stored: new Map<string, Record<string, string>>(),
+  failRetrieve: false,
 }));
 
 vi.mock('@/lib/prisma', () => ({ prisma: db.prisma }));
@@ -157,7 +158,10 @@ vi.mock('@/lib/api/stripe', () => ({
           stripeCalls.stored.set(id, params.metadata as Record<string, string>);
           return { id };
         },
-        retrieve: async (id: string) => ({ id, metadata: stripeCalls.stored.get(id) ?? {} }),
+        retrieve: async (id: string) => {
+          if (stripeCalls.failRetrieve) throw new Error('Stripe unreachable');
+          return { id, metadata: stripeCalls.stored.get(id) ?? {} };
+        },
       },
     },
     subscriptions: { retrieve: async () => { throw new Error('not used'); } },
@@ -265,6 +269,7 @@ describe('GP-632 multi-coach chapters flow', () => {
     sent.length = 0;
     stripeCalls.sessions.length = 0;
     stripeCalls.stored.clear();
+    stripeCalls.failRetrieve = false;
     stripeCalls.updates.length = 0;
     delete process.env.CARSI_COACHING_MONTHLY_NOTIFY_EMAIL;
     failSubjects.length = 0;
@@ -584,6 +589,40 @@ describe('GP-632 multi-coach chapters flow', () => {
       { appOrigin: 'https://carsi.example' }
     );
     expect(third.skipped).toBe('already_emailed');
+    expect(sent).toEqual([]);
+  });
+
+  it('a replay that cannot read the current sent flags sends nothing and fails so Stripe retries', async () => {
+    const { coachB } = await setUpTwoCoaches();
+    seedMember('member-u', 'owner.u@example.com', 'Uma Owner');
+    await assignMemberToCoach('member-u', coachB.id);
+    const session = {
+      id: 'cs_test_unreachable',
+      mode: 'subscription',
+      status: 'complete',
+      payment_status: 'paid',
+      amount_total: 49700,
+      currency: 'usd',
+      customer_details: { email: 'owner.u@example.com', name: 'Uma Owner' },
+      metadata: { source: 'carsi-coaching-monthly', carsi_user_id: 'member-u', contact_name: 'Uma Owner' } as Record<string, string>,
+      subscription: null,
+    };
+    failSubjects.push('New subscription');
+    await processCarsiCoachingMonthlyCheckoutCompleted(
+      session as unknown as Stripe.Checkout.Session,
+      { appOrigin: 'https://carsi.example' }
+    );
+    expect(recipientsOf('Welcome to')).toEqual(['owner.u@example.com']);
+
+    failSubjects.length = 0;
+    sent.length = 0;
+    stripeCalls.failRetrieve = true;
+    await expect(
+      processCarsiCoachingMonthlyCheckoutCompleted(
+        session as unknown as Stripe.Checkout.Session,
+        { appOrigin: 'https://carsi.example' }
+      )
+    ).rejects.toThrow();
     expect(sent).toEqual([]);
   });
 
