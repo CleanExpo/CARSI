@@ -5,9 +5,9 @@ through the **DB ops** workflow (`.github/workflows/db-ops.yml`), so nobody past
 password into a chat, a terminal history or an agent session. The workflow reads it from the
 `DATABASE_URL` GitHub Actions secret.
 
-| Folder | What may go here | How it runs |
-| --- | --- | --- |
-| `read/` | Queries that only read. | Any time, in a read-only session (`default_transaction_read_only=on`), so a stray write fails instead of saving. |
+| Folder   | What may go here             | How it runs                                                                                                            |
+| -------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `read/`  | Queries that only read.      | Any time, in a read-only session (`default_transaction_read_only=on`), so a stray write fails instead of saving.       |
 | `write/` | Statements that change data. | Only from `main`, inside one transaction, and only after a person approves the run in the `production-db` environment. |
 
 **This repository is public, and so are its Actions logs.** A `read/` query may return only
