@@ -74,6 +74,31 @@ describe.runIf(RUNNABLE)('partner demo seed (real PostgreSQL)', async () => {
     });
   });
 
+  it('refuses, changing nothing, when a planned row id is owned by another member (review r1 P1)', async () => {
+    const otherId = randomUUID();
+    const plan = seed.buildPartnerDemoSeedPlan(new Date());
+    const clashId = plan.actions[0].id;
+    await prisma.lmsUser.create({
+      data: { id: otherId, email: `gp637-other-${otherId}@example.test`, hashedPassword: 'provisional:x' },
+    });
+    try {
+      await prisma.carsiCoachingAction.create({
+        data: { id: clashId, userId: otherId, title: 'Real member action' },
+      });
+      for (const dryRun of [true, false]) {
+        await expect(seed.applyPartnerDemoSeed(db, plan, { dryRun })).rejects.toThrow(
+          /owned by another member/
+        );
+      }
+      const row = await prisma.carsiCoachingAction.findUniqueOrThrow({ where: { id: clashId } });
+      expect(row.title).toBe('Real member action');
+      expect(row.userId).toBe(otherId);
+      expect(await prisma.lmsUser.count({ where: { id: seed.PARTNER_DEMO_SEED_USER_ID } })).toBe(0);
+    } finally {
+      await prisma.lmsUser.delete({ where: { id: otherId } });
+    }
+  });
+
   it('seeds the demo member, is idempotent, and leaves a real member alone', async () => {
     await prisma.lmsUser.create({
       data: { id: realId, email: realEmail, hashedPassword: '$2a$12$notarealhashnotarealhashnotarealhashnotarealhashnotare' },

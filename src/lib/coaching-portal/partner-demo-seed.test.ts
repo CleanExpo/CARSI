@@ -52,18 +52,31 @@ function fakeDb(seed?: { users?: Row[] }) {
       for (const row of tables[name].values()) if (matches(row, where)) return { ...row };
       return null;
     },
+    findMany: async ({ where }: { where: Record<string, unknown> }) => {
+      const idIn = (where.id as { in?: unknown[] } | undefined)?.in;
+      const userNot = (where.userId as { not?: unknown } | undefined)?.not;
+      return [...tables[name].values()]
+        .filter((r) => (idIn ? idIn.includes(r.id) : true))
+        .filter((r) => (userNot !== undefined ? r.userId !== userNot : true))
+        .map((r) => ({ ...r }));
+    },
     upsert: async (args: {
       where: Record<string, unknown>;
       create: Row;
       update: Record<string, unknown>;
     }) => {
       writes.push({ table: name, op: 'upsert', args });
-      const key = uniqueKey;
-      const existing = [...tables[name].values()].find((r) => r[key] === args.where[key]);
+      // Like Prisma/Postgres: the row must match EVERY where field (unique key plus any extra
+      // filters); otherwise a create is attempted and a duplicate key raises.
+      const existing = [...tables[name].values()].find((r) => matches(r, args.where));
       if (existing) {
         Object.assign(existing, args.update);
         return { ...existing };
       }
+      const clash = [...tables[name].values()].find(
+        (r) => r.id === args.create.id || (uniqueKey !== 'id' && r[uniqueKey] === args.create[uniqueKey])
+      );
+      if (clash) throw new Error(`Unique constraint failed on ${name}`);
       tables[name].set(args.create.id, { ...args.create });
       return { ...args.create };
     },
@@ -80,7 +93,7 @@ function fakeDb(seed?: { users?: Row[] }) {
     },
   });
 
-  const db = {
+  const delegates = {
     lmsUser: delegate('lmsUser'),
     carsiCoachingMonthlySubscription: delegate('carsiCoachingMonthlySubscription', 'userId'),
     carsiCoachingBusinessProfile: delegate('carsiCoachingBusinessProfile', 'userId'),
@@ -88,6 +101,21 @@ function fakeDb(seed?: { users?: Row[] }) {
     carsiCoachingGrowthPlan: delegate('carsiCoachingGrowthPlan', 'userId'),
     carsiCoachingAction: delegate('carsiCoachingAction'),
     carsiCoachingSession: delegate('carsiCoachingSession'),
+  };
+  const db = {
+    ...delegates,
+    // All-or-nothing like a database transaction: restore every table if the callback throws.
+    $transaction: async (fn: (tx: unknown) => Promise<unknown>) => {
+      const saved = Object.fromEntries(
+        Object.entries(tables).map(([k, t]) => [k, new Map([...t].map(([id, r]) => [id, { ...r }]))])
+      );
+      try {
+        return await fn(delegates);
+      } catch (err) {
+        for (const [k, t] of Object.entries(saved)) tables[k] = t;
+        throw err;
+      }
+    },
   } as unknown as PartnerDemoSeedDb;
 
   const snapshot = () =>
@@ -289,8 +317,9 @@ describe('applyPartnerDemoSeed', () => {
         // One row per member: the lookup key itself must be the demo member.
         expect(args.where).toEqual({ userId: PARTNER_DEMO_SEED_USER_ID });
       } else {
-        // Many rows per member: looked up by a deterministic demo id from the plan.
-        expect(Object.keys(args.where)).toEqual(['id']);
+        // Many rows per member: matched on the planned demo id AND the demo member, so the
+        // write can never update a row someone else owns.
+        expect(args.where).toEqual({ id: args.where.id, userId: PARTNER_DEMO_SEED_USER_ID });
         expect(planIds.has(String(args.where.id))).toBe(true);
       }
     }
@@ -334,5 +363,53 @@ describe('applyPartnerDemoSeed', () => {
       applyPartnerDemoSeed(db, buildPartnerDemoSeedPlan(NOW), { dryRun: false })
     ).rejects.toThrow(/belongs to a different account/);
     expect(writes).toEqual([]);
+  });
+  it('refuses, writing nothing, when a planned row id is owned by another member', async () => {
+    const plan = buildPartnerDemoSeedPlan(NOW);
+    for (const [table, id] of [
+      ['carsiCoachingAction', plan.actions[0].id],
+      ['carsiCoachingSession', plan.sessions[1].id],
+      ['carsiCoachingAssessment', plan.assessment.id],
+    ] as const) {
+      const realId = '33333333-3333-4333-8333-333333333333';
+      const { db, tables, writes, snapshot } = fakeDb({
+        users: [{ id: realId, email: 'real@carsi.com.au', hashedPassword: '$2a$12$x' }],
+      });
+      tables[table].set(id, { id, userId: realId, title: 'Real member row' });
+      const before = snapshot();
+      for (const dryRun of [true, false]) {
+        await expect(applyPartnerDemoSeed(db, plan, { dryRun }), table).rejects.toThrow(
+          /owned by another member/
+        );
+      }
+      expect(writes, table).toEqual([]);
+      expect(snapshot(), table).toBe(before);
+    }
+  });
+
+  it('a collision appearing after the check still cannot update the other member, and nothing is half-written', async () => {
+    const plan = buildPartnerDemoSeedPlan(NOW);
+    const realId = '44444444-4444-4444-8444-444444444444';
+    const { db, tables } = fakeDb({
+      users: [{ id: realId, email: 'late@carsi.com.au', hashedPassword: '$2a$12$x' }],
+    });
+    // Simulate another member's row appearing between the ownership check and the writes.
+    const raw = db as unknown as { carsiCoachingSession: { findMany: (a: unknown) => Promise<unknown[]> } };
+    const realFindMany = raw.carsiCoachingSession.findMany;
+    // Keep a handle on the other member's row object: any update the seed applied to it would
+    // show on this object even after the fake's rollback swaps the table maps back.
+    const lateRow: Row = { id: plan.actions[2].id, userId: realId, title: 'Arrived late' };
+    raw.carsiCoachingSession.findMany = async (a: unknown) => {
+      const r = await realFindMany(a);
+      tables.carsiCoachingAction.set(lateRow.id, lateRow);
+      return r;
+    };
+    await expect(applyPartnerDemoSeed(db, plan, { dryRun: false })).rejects.toThrow(
+      /Unique constraint/
+    );
+    expect(lateRow).toEqual({ id: plan.actions[2].id, userId: realId, title: 'Arrived late' });
+    // Rolled back: no demo user or demo coaching rows were left behind.
+    expect(tables.lmsUser.has(PARTNER_DEMO_SEED_USER_ID)).toBe(false);
+    expect(tables.carsiCoachingMonthlySubscription.size).toBe(0);
   });
 });

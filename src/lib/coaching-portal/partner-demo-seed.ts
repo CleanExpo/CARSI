@@ -351,9 +351,15 @@ type Delegate = {
   upsert(args: UpsertArgs): Promise<unknown>;
   deleteMany(args: { where: Where }): Promise<{ count: number }>;
 };
+type ManyRowDelegate = Delegate & {
+  findMany(args: {
+    where: Where;
+    select?: Record<string, boolean>;
+  }): Promise<{ id: string; userId: string }[]>;
+};
 
-/** The subset of the Prisma client the seed uses (the CLI passes the real client). */
-export type PartnerDemoSeedDb = {
+/** The delegates the seed reads and writes (a Prisma client or an interactive-transaction client). */
+export type PartnerDemoSeedDelegates = {
   lmsUser: Delegate & {
     findUnique(args: {
       where: { email: string } | { id: string };
@@ -362,14 +368,22 @@ export type PartnerDemoSeedDb = {
   };
   carsiCoachingMonthlySubscription: Delegate;
   carsiCoachingBusinessProfile: Delegate;
-  carsiCoachingAssessment: Delegate;
+  carsiCoachingAssessment: ManyRowDelegate;
   carsiCoachingGrowthPlan: Delegate;
-  carsiCoachingAction: Delegate;
-  carsiCoachingSession: Delegate;
+  carsiCoachingAction: ManyRowDelegate;
+  carsiCoachingSession: ManyRowDelegate;
+};
+
+/** The subset of the Prisma client the seed uses (the CLI passes the real client). */
+export type PartnerDemoSeedDb = PartnerDemoSeedDelegates & {
+  $transaction<T>(
+    fn: (tx: PartnerDemoSeedDelegates) => Promise<T>,
+    options?: { timeout?: number; maxWait?: number }
+  ): Promise<T>;
 };
 
 export type PartnerDemoSeedOperation = {
-  table: keyof PartnerDemoSeedDb;
+  table: keyof PartnerDemoSeedDelegates;
   op: 'upsert' | 'deleteMany';
   id?: string;
   where: Where;
@@ -389,17 +403,20 @@ function stripKeys<T extends Record<string, unknown>>(row: T, keys: string[]) {
   return out;
 }
 
-export async function applyPartnerDemoSeed(
-  db: PartnerDemoSeedDb,
+const MANY_ROW_TABLES = ['carsiCoachingAssessment', 'carsiCoachingAction', 'carsiCoachingSession'] as const;
+
+/**
+ * Reads, refuses or plans, then (unless dry run) writes — all through `d`. When writing, `d` is an
+ * interactive transaction, so the checks and every write commit together or not at all.
+ */
+async function seedWith(
+  d: PartnerDemoSeedDelegates,
   plan: PartnerDemoSeedPlan,
-  opts: { dryRun: boolean }
+  dryRun: boolean
 ): Promise<PartnerDemoSeedReport> {
   const userId = plan.user.id;
-  if (userId !== PARTNER_DEMO_SEED_USER_ID || !isPartnerDemoEmail(plan.user.email)) {
-    throw new Error('partner demo seed: plan is not the demo member');
-  }
 
-  const byEmail = await db.lmsUser.findUnique({
+  const byEmail = await d.lmsUser.findUnique({
     where: { email: plan.user.email },
     select: { id: true, email: true, hashedPassword: true },
   });
@@ -410,12 +427,31 @@ export async function applyPartnerDemoSeed(
   }
   const byId = byEmail
     ? byEmail
-    : await db.lmsUser.findUnique({
+    : await d.lmsUser.findUnique({
         where: { id: userId },
         select: { id: true, email: true, hashedPassword: true },
       });
   if (byId && byId.email !== plan.user.email) {
     throw new Error('partner demo seed: demo id is held by a non-demo email; refusing');
+  }
+
+  // A planned row id must be free or already the demo member's. Ids are deterministic, so refuse
+  // loudly rather than ever touching a row another member owns (GP-637 review r1, P1).
+  const plannedIds: Record<(typeof MANY_ROW_TABLES)[number], string[]> = {
+    carsiCoachingAssessment: [plan.assessment.id],
+    carsiCoachingAction: plan.actions.map((a) => a.id),
+    carsiCoachingSession: plan.sessions.map((s) => s.id),
+  };
+  for (const table of MANY_ROW_TABLES) {
+    const foreign = await d[table].findMany({
+      where: { id: { in: plannedIds[table] }, userId: { not: userId } },
+      select: { id: true, userId: true },
+    });
+    if (foreign.length > 0) {
+      throw new Error(
+        `partner demo seed: ${table} id ${foreign[0].id} is owned by another member (${foreign[0].userId}); refusing to touch it`
+      );
+    }
   }
 
   const current = byId?.hashedPassword ?? '';
@@ -435,15 +471,15 @@ export async function applyPartnerDemoSeed(
         : 'relocked';
 
   const ops: { meta: PartnerDemoSeedOperation; run: () => Promise<unknown> }[] = [];
-  const upsert = (table: keyof PartnerDemoSeedDb, args: UpsertArgs, id?: string) =>
+  const upsert = (table: keyof PartnerDemoSeedDelegates, args: UpsertArgs, id?: string) =>
     ops.push({
       meta: { table, op: 'upsert', id, where: args.where },
-      run: () => (db[table] as Delegate).upsert(args),
+      run: () => (d[table] as Delegate).upsert(args),
     });
-  const deleteMany = (table: keyof PartnerDemoSeedDb, where: Where) =>
+  const deleteMany = (table: keyof PartnerDemoSeedDelegates, where: Where) =>
     ops.push({
       meta: { table, op: 'deleteMany', where },
-      run: () => (db[table] as Delegate).deleteMany({ where }),
+      run: () => (d[table] as Delegate).deleteMany({ where }),
     });
 
   const userUpdate: Record<string, unknown> = stripKeys(plan.user, ['id', 'email']);
@@ -459,7 +495,7 @@ export async function applyPartnerDemoSeed(
   );
 
   const perUser = (
-    table: keyof PartnerDemoSeedDb,
+    table: keyof PartnerDemoSeedDelegates,
     row: Record<string, unknown> & { id: string; userId: string }
   ) =>
     upsert(table, {
@@ -472,14 +508,16 @@ export async function applyPartnerDemoSeed(
   perUser('carsiCoachingGrowthPlan', plan.growthPlan);
 
   const perRow = (
-    table: keyof PartnerDemoSeedDb,
+    table: (typeof MANY_ROW_TABLES)[number],
     rows: (Record<string, unknown> & { id: string; userId: string })[]
   ) => {
     deleteMany(table, { userId, id: { notIn: rows.map((r) => r.id) } });
     for (const row of rows) {
+      // Matching on id AND the demo member means a row someone else owns can never be updated:
+      // it does not match, the create then collides on the id, and the transaction rolls back.
       upsert(
         table,
-        { where: { id: row.id }, create: row, update: stripKeys(row, ['id', 'userId']) },
+        { where: { id: row.id, userId }, create: row, update: stripKeys(row, ['id', 'userId']) },
         row.id
       );
     }
@@ -488,15 +526,27 @@ export async function applyPartnerDemoSeed(
   perRow('carsiCoachingAction', plan.actions);
   perRow('carsiCoachingSession', plan.sessions);
 
-  if (!opts.dryRun) {
+  if (!dryRun) {
     for (const op of ops) await op.run();
   }
 
   return {
-    dryRun: opts.dryRun,
+    dryRun,
     userId,
     email: plan.user.email,
     passwordState,
     operations: ops.map((o) => o.meta),
   };
+}
+
+export async function applyPartnerDemoSeed(
+  db: PartnerDemoSeedDb,
+  plan: PartnerDemoSeedPlan,
+  opts: { dryRun: boolean }
+): Promise<PartnerDemoSeedReport> {
+  if (plan.user.id !== PARTNER_DEMO_SEED_USER_ID || !isPartnerDemoEmail(plan.user.email)) {
+    throw new Error('partner demo seed: plan is not the demo member');
+  }
+  if (opts.dryRun) return seedWith(db, plan, true);
+  return db.$transaction((tx) => seedWith(tx, plan, false), { timeout: 30_000, maxWait: 10_000 });
 }
