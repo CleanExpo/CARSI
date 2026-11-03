@@ -281,6 +281,18 @@ export function recordTextLines(value) {
     .filter(Boolean);
 }
 
+/** Tags a browser renders as a break between words. Every other tag is inline: it adds no space. */
+const BLOCK_TAG_RE = /<\/?(?:address|article|aside|blockquote|br|dd|div|dl|dt|fieldset|figcaption|figure|footer|form|h[1-6]|header|hr|img|li|main|nav|ol|p|pre|section|table|tbody|td|tfoot|th|thead|tr|ul)\b[^>]*>/gi;
+
+/** The field's text as a browser shows it: block tags separate words, inline tags join with no
+ *  space. Review r3 (Codex, P1): "IICRC <span>C</span><span>E</span><span>C</span> approved"
+ *  renders as "IICRC CEC approved", but the tag-to-space step above read it as "C E C".
+ *  KNOWN LIMIT (stated, not hidden): text a browser draws from CSS (::before content, hidden
+ *  elements shown by a stylesheet) or from an image is not text in the record and is not seen. */
+function renderedRecordText(value) {
+  return recordTextLines(value.replace(BLOCK_TAG_RE, ' ').replace(/<[^>]*>/g, '')).join(' ');
+}
+
 /** The same text with markup delimiters turned to spaces instead of whole tags removed, so text
  *  inside attributes that still renders (alt, title, aria-label) is checked too. */
 function rawRecordText(value) {
@@ -351,6 +363,13 @@ export function evaluateRecords(file, jsonText, { approvedSlugs, allowlist = ALL
         if (hitRules.has(rule) || !flags(rule, joined)) continue;
         hitRules.add(rule);
         findings.push({ file, slug, field, line: 0, text: joined, message: `${rule.message} (claim spans several lines)` });
+      }
+      // Text as a browser renders it (inline tags join with no space).
+      const rendered = renderedRecordText(value);
+      for (const rule of rules) {
+        if (hitRules.has(rule) || !flags(rule, rendered)) continue;
+        hitRules.add(rule);
+        findings.push({ file, slug, field, line: 0, text: rendered, message: `${rule.message} (as rendered, across inline markup)` });
       }
       // Text inside tag attributes (alt / title) renders but was removed with the tag above.
       const raw = rawRecordText(value);

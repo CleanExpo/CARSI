@@ -91,6 +91,12 @@ function runGuardIn(files) {
   const split = runGuardIn({
     [EXPORT_FILE]: JSON.stringify([course(PLANTED_SLUG, 'This course is approved for\nIICRC Continuing Education Credits.')]),
   });
+  const inline = runGuardIn({
+    [EXPORT_FILE]: JSON.stringify([course(PLANTED_SLUG, 'This course is IICRC <span>C</span><span>E</span><span>C</span> approved.')]),
+  });
+  if (inline.status === 0 || !inline.out.includes(PLANTED_SLUG)) {
+    fail(`inline-markup CEC wording for "${PLANTED_SLUG}" PASSED the guard or was not named`);
+  }
   if (split.status === 0 || !split.out.includes(PLANTED_SLUG)) {
     fail(`multi-line prose CEC-approval claim for "${PLANTED_SLUG}" PASSED the guard or was not named`);
   }
@@ -162,6 +168,12 @@ if (typeof evaluateRecords !== 'function' || typeof classifyRecordFindings !== '
     ['image alt text', '<img alt="approved for IICRC CEC: 1 hour" src="x.png">'],
     ['link title attribute', '<a title="CEC credits" href="#">Read more</a>'],
     ['hex entity', 'Worth &#x43;EC hours.'],
+    // Review r3 (Codex, P1): inline tags inside a word. A browser renders "CEC"; the old
+    // tag-to-space step produced "C E C". Text is now extracted the way a browser shows it.
+    ['inline spans inside a word', 'This course is IICRC <span>C</span><span>E</span><span>C</span> approved.'],
+    ['bold first letter', 'Earn <b>C</b>EC hours.'],
+    ['inline tag inside "education"', 'Continuing <em>edu</em>cation credits apply.'],
+    ['nested inline tags across words', 'IICRC <strong><span>CEC</span></strong> <i>appro</i>ved'],
   ];
   for (const [name, text] of MUST_BLOCK) {
     for (const field of ['short_description', 'description']) {
@@ -180,6 +192,7 @@ if (typeof evaluateRecords !== 'function' || typeof classifyRecordFindings !== '
     ['duration only', 'Course Duration: Approximately 30 minutes'],
     ['IICRC endorsement disclaimer (no CEC wording)', 'The IICRC does not endorse any educational provider, product, offering, or service.'],
     ['word containing "cec" is not CEC', 'Recece and precede the checklist.'],
+    ['block tags separate words', '<p>Spec</p><p>Echo</p><li>sec</li><li>c</li>'],
   ];
   for (const [name, text] of MUST_PASS) {
     const f = scan([course(PLANTED_SLUG, text)]);
