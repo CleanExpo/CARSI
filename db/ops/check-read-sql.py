@@ -26,6 +26,9 @@ string marker inside a comment, cannot hide a statement.
     so every table in the statement is checked.
   - Whole rows: a table or its alias may only be used as alias.column, so SELECT c FROM t c,
     c::text and (c) cannot print a whole row.
+  - Words: every other word must be a keyword, an allowed function, a column on ALLOWED_COLUMNS
+    (an allowlist, so checkpoint JSON or lesson bodies cannot be named), or a name the
+    statement defines (alias, CTE, AS output name). A CTE is never callable as a function.
   - No & (U&"..." escapes).
   Logs of this public repository are public; the allowlist is what keeps learner data out of them.
 """
@@ -80,6 +83,24 @@ SOURCE_END = {
 }
 # Sources outside the Prisma tables: migration history and schema metadata (no learner data).
 META_SOURCES = {"_prisma_migrations"}
+INFO_SCHEMA_VIEWS = {"columns", "tables"}
+# The only columns a read file may name. An allowlist: anything else (checkpoint JSON, lesson
+# bodies, learner ids, quiz content) is refused, because job logs are public.
+ALLOWED_COLUMNS = {
+    "id", "slug", "title", "status", "is_published", "price_aud", "course_id", "module_id",
+    "lesson_id", "quiz_id", "order_index", "pass_percentage", "attempts_allowed", "created_at",
+    "updated_at", "prerequisite_gated",
+    # _prisma_migrations and information_schema (schema metadata, no learner data)
+    "migration_name", "finished_at", "rolled_back_at", "started_at", "applied_steps_count",
+    "column_name", "data_type", "is_nullable", "column_default", "table_name", "table_schema",
+}
+KEYWORDS = {
+    "select", "from", "where", "join", "inner", "left", "right", "full", "outer", "cross",
+    "natural", "on", "using", "and", "or", "not", "in", "is", "null", "as", "order", "by", "group",
+    "having", "limit", "offset", "asc", "desc", "nulls", "first", "last", "distinct", "union",
+    "all", "except", "intersect", "exists", "like", "ilike", "between", "true", "false", "with",
+    "values", "any", "some", "window", "fetch",
+} | FUNCTIONS
 
 
 class Refused(Exception):
@@ -208,27 +229,30 @@ def problems(sql: str) -> list:
 
 
 def structure_problems(stmt: list) -> list:
-    """Function allowlist, FROM/JOIN sources, and no whole-row references."""
+    """Word allowlist: every word is a keyword, an allowed function or column, or a name the
+    statement itself defines (a table alias, CTE, subquery alias or AS output name)."""
     out = []
     low = [(k, t.lower()) for k, t in stmt]
 
     def at(i):
         return low[i] if 0 <= i < len(low) else ("", "")
 
-    # CTE names: <word> AS ( ... ). Their columns are already checked, so they may be sources.
-    ctes = {low[i][1] for i in range(len(low) - 2)
-            if low[i][0] == "word" and at(i + 1) == ("word", "as") and at(i + 2) == ("punct", "(")}
-    for i, (k, t) in enumerate(low):
-        if k == "word" and at(i + 1) == ("punct", "(") and t not in FUNCTIONS | PAREN_KEYWORDS | ctes:
-            out.append(f"function {stmt[i][1]!r} is not on the allowlist")
+    def is_word(i):
+        return at(i)[0] == "word"
 
-    protected = set()      # table names and their aliases: usable only as name.column
-    defining = set()       # token positions where such a name is declared
+    ctes, derived, protected = set(), set(), set()
+    defining = set()       # positions where a name is declared, not used
+    # CTE names: <word> AS ( ... ). Their output columns are checked inside the CTE.
+    for i in range(len(low) - 2):
+        if is_word(i) and at(i + 1) == ("word", "as") and at(i + 2) == ("punct", "("):
+            ctes.add(low[i][1])
+            defining.add(i)
     for i, (k, t) in enumerate(low):
         if k != "word" or t not in ("from", "join"):
             continue
         j = i + 1
-        if at(j) == ("punct", "("):
+        subquery = at(j) == ("punct", "(")
+        if subquery:
             depth = 0
             while j < len(low):
                 if low[j] == ("punct", "("):
@@ -238,35 +262,65 @@ def structure_problems(stmt: list) -> list:
                     if depth == 0:
                         break
                 j += 1
-        elif at(j)[0] == "word":
+        elif is_word(j):
             name = at(j)[1]
             if name in ("public", "information_schema") and at(j + 1) == ("punct", "."):
+                schema = name
                 defining.add(j)
                 j += 2
-                name = at(j)[1] if at(j)[0] == "word" else ""
-                ok = name in ALLOWED_TABLES | META_SOURCES or at(j - 2)[1] == "information_schema"
+                name = at(j)[1] if is_word(j) else ""
+                ok = (name in INFO_SCHEMA_VIEWS) if schema == "information_schema" else (
+                    name in ALLOWED_TABLES | META_SOURCES)
             else:
                 ok = name in ALLOWED_TABLES | META_SOURCES | ctes
             if not ok:
                 out.append(f"FROM/JOIN source {name!r} is not an allowed table, CTE or subquery")
             if name not in ctes:
                 protected.add(name)
-                defining.add(j)
+            defining.add(j)
         else:
             out.append(f"FROM/JOIN must be followed by a table or (subquery), not {at(j)[1]!r}")
             continue
         j += 1
         if at(j) == ("word", "as"):
             j += 1
-        if at(j)[0] == "word" and at(j)[1] not in SOURCE_END:
-            protected.add(at(j)[1])
+        if is_word(j) and at(j)[1] not in KEYWORDS:
+            (derived if subquery else protected).add(at(j)[1])
             defining.add(j)
             j += 1
         if at(j) == ("punct", ","):
             out.append("comma joins are not allowed (use JOIN ... ON so every table is checked)")
+    # Output names: AS <word> (not a CTE). Allowed only where declared.
+    for i in range(1, len(low)):
+        if at(i - 1) == ("word", "as") and is_word(i) and i not in defining:
+            defining.add(i)
+
     for i, (k, t) in enumerate(low):
-        if k == "word" and t in protected and i not in defining and at(i + 1) != ("punct", "."):
-            out.append(f"whole-row reference {stmt[i][1]!r} (select alias.column, not the row)")
+        if k != "word" or i in defining or t.isdigit():
+            continue  # numbers (1, 1.5) are values, not names
+        if at(i - 1) == ("punct", ".") and is_word(i - 2):
+            q = at(i - 2)[1]
+            if q in ctes | derived:
+                continue  # columns of a CTE or subquery were checked where they were selected
+            if q == "information_schema" or q == "public":
+                continue  # the source rule above checked this name
+            if t not in ALLOWED_COLUMNS:
+                out.append(f"column {stmt[i][1]!r} is not on the read allowlist (logs are public)")
+            continue
+        if at(i + 1) == ("punct", "("):
+            if t not in FUNCTIONS | PAREN_KEYWORDS:
+                out.append(f"function {stmt[i][1]!r} is not on the allowlist")
+            continue
+        if t in protected:
+            if at(i + 1) != ("punct", "."):
+                out.append(f"whole-row reference {stmt[i][1]!r} (select alias.column, not the row)")
+            continue
+        if at(i + 1) == ("punct", ".") and t in ctes | derived | {"public", "information_schema"}:
+            continue
+        if t in ctes | derived:
+            continue  # a CTE or subquery row holds only columns already checked
+        if t not in KEYWORDS | ALLOWED_COLUMNS:
+            out.append(f"word {stmt[i][1]!r} is not a keyword or an allowed column")
     return out
 
 

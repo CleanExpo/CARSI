@@ -27,7 +27,7 @@ order of strength:
    named in `prisma/schema.prisma` and every `pg_*` catalog name is refused, as are learner ids, quiz
    content (question text, options, answers), a bare `*` or `alias.*`, any function not on its
    `FUNCTIONS` allowlist (so no serialiser such as `table_to_xml_and_xmlschema` or `row_to_json`),
-   a FROM/JOIN source that is not an allowed table, CTE or subquery, comma joins, a whole-row
+   any column not on its `ALLOWED_COLUMNS` allowlist (so `checkpoint` JSON and lesson bodies cannot be read), a FROM/JOIN source that is not an allowed table, CTE or subquery, comma joins, a whole-row
    reference (`SELECT e FROM lms_enrollments e`, `e::text`), `&` (escaped names), writes,
    `TABLE`, `SET`/`COMMIT`/`DO`, and backslash commands. Regression cases for every bypass found in review are in
    `db/ops/test_check_read_sql.py`; they run on every DB ops run.

@@ -52,10 +52,19 @@ REFUSE = {
     "comma join to an unlisted table": "SELECT c.id FROM lms_courses c, auth_users u;\n",
     "other schema": "SELECT u.id FROM auth.users u;\n",
     "set-returning function source": "SELECT x.k FROM json_each('{}') x;\n",
+    # Cursor security review, #999 head 93d2176.
+    "CTE named like a serialiser": "WITH query_to_xml_and_xmlschema AS (SELECT 1) SELECT query_to_xml_and_xmlschema('select * from lms_users', true, false, '');\n",
+    "lesson-progress checkpoint JSON": "SELECT p.checkpoint FROM lms_lesson_progress p;\n",
+    "checkpoint answers by key": "SELECT p.checkpoint ->> 'answers' FROM lms_lesson_progress p;\n",
+    "unqualified checkpoint": "SELECT checkpoint FROM lms_lesson_progress;\n",
+    "lesson body": "SELECT l.content_body FROM lms_lessons l;\n",
+    "revoked reason": "SELECT e.revoked_reason FROM lms_enrollments e;\n",
+    "output name shadows a column": "SELECT p.id AS checkpoint, checkpoint FROM lms_lesson_progress p;\n",
 }
 ALLOW = {
     "words inside strings and comments": "SELECT 'drop; update /* -- ' AS a, \"title\" FROM lms_courses; -- delete\n",
     "plain join with counts": "SELECT c.slug, (SELECT count(*) FROM lms_modules m WHERE m.course_id = c.id) FROM lms_courses c;\n",
+    "numbers and an output name": "SELECT q.title, q.pass_percentage AS pass FROM lms_quizzes q WHERE q.order_index + 1 > 1.5 ORDER BY q.title;\n",
     "CTE and subquery sources": "WITH x AS (SELECT c.id FROM lms_courses c) SELECT s.id FROM (SELECT x.id FROM x) s;\n",
     "allowed tables with counts": "SELECT c.slug, count(*) FROM lms_courses c JOIN lms_modules m ON m.course_id = c.id GROUP BY c.slug;\n",
 }
