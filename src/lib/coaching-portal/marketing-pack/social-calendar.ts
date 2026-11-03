@@ -162,11 +162,19 @@ function isoDay(start: Date, offset: number): string {
   return d.toISOString().slice(0, 10);
 }
 
+/** The template set filled with neutral wording only; proven claim-free by its own test. */
+const NEUTRAL_VOICE: TradeVoice = { businessName: '', trade: '', town: '', services: '' };
+
+const isCompliantPost = (c: CalendarCandidate) =>
+  isCompliantCopy(`${c.theme} ${c.caption} ${c.hashtags.join(' ')}`);
+
 export function assembleCalendar(voice: TradeVoice, startDate: Date): SocialCalendar {
-  // The filter still runs on the filled templates: member-supplied names are the only variable
-  // text, and sanitizeVoice has already replaced any that carry a claim.
-  const vetted = buildFallbackPosts(voice).filter((c) =>
-    isCompliantCopy(`${c.theme} ${c.caption} ${c.hashtags.join(' ')}`)
+  // Member-supplied names are the only variable text. A post they make non-compliant (a town of
+  // "1" becomes the tag #1) is replaced by the same template in neutral wording, so the member
+  // always gets 30 compliant posts (Codex P1, head 0b717beb).
+  const neutral = buildFallbackPosts(NEUTRAL_VOICE);
+  const vetted = buildFallbackPosts(voice).map((c, i) =>
+    isCompliantPost(c) ? c : neutral[i % neutral.length]
   );
   const chosen: CalendarCandidate[] = [];
   for (let i = 0; chosen.length < CALENDAR_DAYS && vetted.length > 0; i += 1) {

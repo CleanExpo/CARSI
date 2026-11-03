@@ -139,3 +139,38 @@ describe('isGoogleBusinessLink (Codex P1, head bc601506)', () => {
     expect(review.fixes.map((f) => f.id)).toContain('gbp-link-invalid');
   });
 });
+
+describe('page title check (Codex P1, head 0b717beb)', () => {
+  const page = (title: string) => ({
+    ok: true,
+    status: 200,
+    html: `<html><head><title>${title}</title></head><body><h1>Hi</h1></body></html>`,
+    finalUrl: 'https://mackay-plumbing.test/',
+  });
+  const plumber = { businessName: 'Acme', trade: 'Plumbing', town: 'Mackay QLD', services: '' };
+  const titleCheck = (title: string) =>
+    reviewWebsite({
+      websiteUrl: 'https://mackay-plumbing.test/',
+      fetch: page(title),
+      googleBusinessUrl: null,
+      voice: plumber,
+    });
+
+  it('fails a non-generic title that names neither the trade nor the town', () => {
+    const review = titleCheck('Contact us for more details');
+    expect(review.checks.find((c) => c.id === 'title')?.passed).toBe(false);
+    expect(review.fixes.map((f) => f.id)).toContain('title-generic');
+  });
+
+  it('fails a title that names the trade but not the town', () => {
+    expect(
+      titleCheck('Plumbing services you can book').checks.find((c) => c.id === 'title')?.passed
+    ).toBe(false);
+  });
+
+  it('passes a title that names both the trade and the town', () => {
+    const review = titleCheck('Plumber Mackay | Acme Plumbing');
+    expect(review.checks.find((c) => c.id === 'title')?.passed).toBe(true);
+    expect(review.fixes.map((f) => f.id)).not.toContain('title-generic');
+  });
+});

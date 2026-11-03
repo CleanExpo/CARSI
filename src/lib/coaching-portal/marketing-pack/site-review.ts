@@ -147,6 +147,17 @@ function profileFixes(googleBusinessUrl: string | null, town: string): FixSpec[]
   return [];
 }
 
+const TRADE_STOPWORDS = new Set(['your', 'and', 'the', 'services', 'service', 'trade', 'repairs']);
+
+/** Five-letter stems of the trade and service words, so "Plumbing" also matches "Plumber". */
+function tradeStems(trade: string, services: string): string[] {
+  return `${trade} ${services}`
+    .toLowerCase()
+    .split(/[^a-z]+/)
+    .filter((w) => w.length >= 4 && !TRADE_STOPWORDS.has(w))
+    .map((w) => w.slice(0, 5));
+}
+
 export function reviewWebsite(rawInput: ReviewInput): SiteReview {
   const input = { ...rawInput, voice: sanitizeVoice(rawInput.voice) };
   const town = primaryTown(input.voice.town);
@@ -221,8 +232,22 @@ export function reviewWebsite(rawInput: ReviewInput): SiteReview {
   const https = /^https:/i.test(finalUrl);
   const schema = hasLocalBusinessSchema(html);
 
+  // The check says the title names the trade and the town, so it tests for both (Codex P1,
+  // head 0b717beb). A placeholder from sanitizeVoice ("your trade", "your area") is unknown and
+  // is not required.
+  const titleText = (title ?? '').toLowerCase();
+  const titleNamesTown = !town || town === 'your area' || titleText.includes(town.toLowerCase());
+  const titleNamesTrade =
+    !trade ||
+    trade === 'your trade' ||
+    tradeStems(trade, input.voice.services).some((stem) => titleText.includes(stem));
   const titleOk = Boolean(
-    title && !GENERIC_TITLES.test(title) && title.length >= 15 && title.length <= 65
+    title &&
+    !GENERIC_TITLES.test(title) &&
+    title.length >= 15 &&
+    title.length <= 65 &&
+    titleNamesTown &&
+    titleNamesTrade
   );
   checks.push({ id: 'title', label: 'Page title names your trade and town', passed: titleOk });
   if (!titleOk) {

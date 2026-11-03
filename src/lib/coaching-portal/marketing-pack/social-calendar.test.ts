@@ -31,6 +31,16 @@ describe('social calendar', () => {
   // Codex P1 x4 (heads 0a953a79, c3b52247, 95f39114, bc601506): a word filter cannot prove that
   // free-form model text is claim-free. The member calendar is therefore built only from the
   // vetted template set; no model text can reach it.
+  it('the neutral-wording templates used as the fallback are all compliant', () => {
+    const neutral = buildFallbackPosts({ businessName: '', trade: '', town: '', services: '' });
+    expect(neutral.length).toBe(buildFallbackPosts(voice).length);
+    for (const post of neutral) {
+      expect(
+        findComplianceIssues(`${post.theme} ${post.caption} ${post.hashtags.join(' ')}`)
+      ).toEqual([]);
+    }
+  });
+
   it('is built only from the vetted template set', () => {
     const vetted = new Set(buildFallbackPosts(voice).map((p) => p.caption));
     const calendar = assembleCalendar(voice, start);
@@ -41,4 +51,20 @@ describe('social calendar', () => {
     // One parameter for the voice and one for the start date: nothing else can be passed in.
     expect(assembleCalendar.length).toBe(2);
   });
+
+  it.each(['1', '100', 'No. 1', '#1 Town'])(
+    'still yields 30 compliant posts when the town is %s (Codex P1, head 0b717beb)',
+    (town) => {
+      const calendar = assembleCalendar(
+        { businessName: 'Acme', trade: 'Plumbing', town, services: 'Plumbing' },
+        start
+      );
+      expect(calendar.posts).toHaveLength(CALENDAR_DAYS);
+      for (const post of calendar.posts) {
+        expect(
+          findComplianceIssues(`${post.theme} ${post.caption} ${post.hashtags.join(' ')}`)
+        ).toEqual([]);
+      }
+    }
+  );
 });
