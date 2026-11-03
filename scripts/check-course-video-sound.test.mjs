@@ -42,6 +42,19 @@ test('extracts video and source URLs, resolves entities, ignores posters and ded
   ]);
 });
 
+test('keeps video URLs without a file extension (signed or streaming URLs)', () => {
+  assert.deepEqual(extractVideoUrls(
+    '<video src="https://cdn.test/play?token=abc"></video><video src=""></video>',
+    'https://example.test/courses/test',
+  ), ['https://cdn.test/play?token=abc']);
+});
+
+test('short audio coverage is its own failure', () => {
+  assert.equal(classify({ hasAudio: true, maxDb: -4, meanDb: -20, coverage: 0.25 }), 'SHORT_AUDIO');
+  assert.equal(classify({ hasAudio: true, maxDb: -4, meanDb: -20, coverage: 0.95 }), 'OK');
+  assert.equal(classify({ hasAudio: true, maxDb: -4, meanDb: -20 }), 'OK');
+});
+
 test('empty URL list exits 1', async () => {
   const result = await invoke(['--urls']);
   assert.equal(result.code, 1);
@@ -63,6 +76,12 @@ test('real ffmpeg fixtures and CLI enforcement', async (t) => {
   const silent = join(dir, 'silent.mp4');
   const sound = join(dir, 'sound.mp4');
   const noAudio = join(dir, 'no-audio.mp4');
+  const shortAudio = join(dir, 'short-audio.mp4');
+  await run('ffmpeg', [
+    '-hide_banner', '-loglevel', 'error', '-nostdin', '-f', 'lavfi', '-i', 'color=black:s=16x16:r=10',
+    '-f', 'lavfi', '-t', '1', '-i', 'sine=frequency=1000:sample_rate=44100', '-c:a', 'aac',
+    '-t', '4', '-c:v', 'mpeg4', '-y', shortAudio,
+  ], { timeout: 30_000 });
   for (const [path, audio] of [[silent, 'anullsrc=r=44100:cl=mono'], [sound, 'sine=frequency=1000:sample_rate=44100'], [noAudio, null]]) {
     await run('ffmpeg', [
       '-hide_banner', '-loglevel', 'error', '-nostdin', '-f', 'lavfi', '-i', 'color=black:s=16x16:r=10',
@@ -74,6 +93,32 @@ test('real ffmpeg fixtures and CLI enforcement', async (t) => {
     assert.equal((await measure(silent)).verdict, 'SILENT');
     assert.equal((await measure(sound)).verdict, 'OK');
     assert.equal((await measure(noAudio)).verdict, 'NO_AUDIO');
+  });
+  await t.test('audio that stops early is SHORT_AUDIO, measured over the whole video', async () => {
+    const result = await measure(shortAudio);
+    assert.equal(result.verdict, 'SHORT_AUDIO');
+    assert.ok(result.coverage < 0.5, `coverage ${result.coverage}`);
+  });
+  await t.test('catalogue reads meta.introVideoUrl and holds known-silent entries to the list', async () => {
+    const catalogue = join(dir, 'catalogue.json');
+    const known = join(dir, 'known.json');
+    const { writeFile } = await import('node:fs/promises');
+    await writeFile(catalogue, JSON.stringify({ courses: [
+      { slug: 'top', introVideoUrl: sound },
+      { slug: 'meta-only', meta: { introVideoUrl: silent } },
+    ] }));
+    await writeFile(known, JSON.stringify({ tracker: 'GP-671', urls: [] }));
+    const strict = await invoke(['--catalog', catalogue, known]);
+    assert.equal(strict.code, 1, 'a silent meta-only video must fail');
+    assert.match(strict.stdout, /^SILENT .*pages=\/courses\/meta-only/m);
+    await writeFile(known, JSON.stringify({ tracker: 'GP-671', urls: [silent] }));
+    const held = await invoke(['--catalog', catalogue, known]);
+    assert.equal(held.code, 0, held.stderr);
+    assert.match(held.stdout, /^SILENT .*KNOWN GP-671/m);
+    await writeFile(known, JSON.stringify({ tracker: 'GP-671', urls: [sound] }));
+    const stale = await invoke(['--catalog', catalogue, known]);
+    assert.equal(stale.code, 1, 'a known entry that now has sound must be removed');
+    assert.match(stale.stderr, /remove it from the known-silent list/);
   });
   await t.test('CLI exits 1 for silence and 0 for sound', async () => {
     const bad = await invoke(['--urls', silent]);

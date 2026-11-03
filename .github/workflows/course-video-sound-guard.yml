@@ -8,6 +8,7 @@ on:
     paths:
       - 'data/seed/courses-catalog.json'
       - 'scripts/check-course-video-sound*.mjs'
+      - 'scripts/check-course-video-sound.known.json'
       - 'scripts/lib/is-entry-point.mjs'
       - '.github/workflows/course-video-sound-guard.yml'
       - 'package.json'
