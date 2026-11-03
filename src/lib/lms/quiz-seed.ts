@@ -2,8 +2,11 @@
  * Quiz seeding core for `scripts/seed-all-quizzes.ts` (`npm run db:seed-quizzes`).
  *
  * Two modes, chosen explicitly on the command line:
- *   --slug=<course-slug>  seed ONLY that course's quiz file(s). Any failure exits non-zero and,
- *                         because everything is validated before the first write, writes nothing.
+ *   --slug=<course-slug>  seed ONLY that course's quiz file(s). Validation and DB checks all run
+ *                         before the first write, so any failure found there exits non-zero having
+ *                         written nothing. The writes themselves are sequential (not one
+ *                         transaction, as before): a connection drop mid-write can leave a quiz with
+ *                         some or none of its questions. Re-run the same command to repair it.
  *   --all                 the previous behaviour: every file on QUIZ_FILES, fault-tolerant (a bad
  *                         file is logged and skipped, exit code 0).
  * With neither flag the run refuses (exit 1) and writes nothing.
@@ -332,6 +335,9 @@ export async function runQuizSeed(argv: readonly string[], deps: RunDeps): Promi
       return 0;
     } catch (e) {
       deps.error(`✗ ${args.slug}: ${e instanceof Error ? e.message : String(e)}`);
+      deps.error(
+        `  Some quizzes for "${args.slug}" may have been partly written. Re-run the same command to finish.`
+      );
       return 1;
     }
   }
