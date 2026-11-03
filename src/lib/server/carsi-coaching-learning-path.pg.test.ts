@@ -55,6 +55,12 @@ describe.runIf(RUNNABLE)('coaching learning path (real PostgreSQL)', async () =>
   const otherId = randomUUID();
   const mapMemberId = randomUUID();
   const controlPathwayId = randomUUID();
+  // Coach map edits already in this database. They are set aside for the run (the tests assume
+  // the built-in map) and put back exactly afterwards; only rows this suite creates are deleted.
+  type SavedPathway = Awaited<
+    ReturnType<typeof prisma.lmsLearningPathway.findMany<{ include: { courses: true } }>>
+  >[number];
+  let setAside: SavedPathway[] = [];
   const instructorId = randomUUID();
   const createdCourseIds: string[] = [];
   const courseIdBySlug = new Map<string, string>();
@@ -102,6 +108,13 @@ describe.runIf(RUNNABLE)('coaching learning path (real PostgreSQL)', async () =>
   }
 
   beforeAll(async () => {
+    setAside = await prisma.lmsLearningPathway.findMany({
+      where: { slug: { startsWith: GAP_MAP_SLUG_PREFIX } },
+      include: { courses: true },
+    });
+    await prisma.lmsLearningPathway.deleteMany({
+      where: { id: { in: setAside.map((p) => p.id) } },
+    });
     await prisma.lmsUser.createMany({
       data: [memberId, otherId, mapMemberId, instructorId].map((id) => ({
         id,
@@ -141,9 +154,28 @@ describe.runIf(RUNNABLE)('coaching learning path (real PostgreSQL)', async () =>
   });
 
   afterAll(async () => {
+    // Only rows this suite created: its own map edits (none of the set-aside ids) and the control.
     await prisma.lmsLearningPathway.deleteMany({
-      where: { OR: [{ slug: { startsWith: GAP_MAP_SLUG_PREFIX } }, { id: controlPathwayId }] },
+      where: {
+        OR: [
+          {
+            slug: { startsWith: GAP_MAP_SLUG_PREFIX },
+            id: { notIn: setAside.map((p) => p.id) },
+          },
+          { id: controlPathwayId },
+        ],
+      },
     });
+    for (const { courses, ...pathway } of setAside) {
+      await prisma.lmsLearningPathway.create({
+        data: {
+          ...pathway,
+          courses: {
+            create: courses.map((c) => ({ courseId: c.courseId, orderIndex: c.orderIndex })),
+          },
+        },
+      });
+    }
     await prisma.lmsUser.deleteMany({ where: { id: { in: [memberId, otherId, mapMemberId] } } });
     await prisma.lmsCourse.deleteMany({ where: { id: { in: createdCourseIds } } });
     await prisma.lmsUser.deleteMany({ where: { id: instructorId } });
@@ -319,8 +351,9 @@ describe.runIf(RUNNABLE)('coaching learning path (real PostgreSQL)', async () =>
       area: 'marketing',
       courseIds: [extra],
     });
-    const row = await prisma.lmsLearningPathway.findFirstOrThrow({
-      where: { slug: { startsWith: GAP_MAP_SLUG_PREFIX } },
+    const marketingSlug = `${GAP_MAP_SLUG_PREFIX}${DEFAULT_COACHING_CHAPTER_SLUG}--marketing`;
+    const row = await prisma.lmsLearningPathway.findUniqueOrThrow({
+      where: { slug: marketingSlug },
       include: { courses: true },
     });
     expect(row).toMatchObject({ isPublished: false, iicrcDiscipline: null });
@@ -345,11 +378,7 @@ describe.runIf(RUNNABLE)('coaching learning path (real PostgreSQL)', async () =>
       chapterSlug: DEFAULT_COACHING_CHAPTER_SLUG,
       area: 'marketing',
     });
-    expect(
-      await prisma.lmsLearningPathway.count({
-        where: { slug: { startsWith: GAP_MAP_SLUG_PREFIX } },
-      })
-    ).toBe(0);
+    expect(await prisma.lmsLearningPathway.count({ where: { slug: marketingSlug } })).toBe(0);
   });
 
   it('two simultaneous coach adds of one course create one action', async () => {
