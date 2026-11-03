@@ -4,15 +4,16 @@
 # The URL lives only in the DATABASE_URL Actions secret; this job reads it, runs the chosen
 # file, and prints the result to the job log.
 #
+#   Every file runs only from main, so only reviewed SQL ever reaches the database.
 #   db/ops/read/*.sql   read-only session (default_transaction_read_only=on): any write fails.
-#                       Runs on demand. This repo is PUBLIC, so its logs are public: read files
+#                       Runs on demand, as DATABASE_URL_READONLY when that secret is set. This repo is PUBLIC, so its logs are public: read files
 #                       may return course/quiz/catalogue data and counts only, never learner data.
 #   db/ops/write/*.sql  runs only from main, in a single transaction (all-or-nothing), and only
 #                       after a person approves the run in the `production-db` environment
 #                       (Settings → Environments → production-db → Required reviewers).
 #
 # A guard's silence is not a pass: every step exits non-zero on a bad input (missing secret,
-# file outside db/ops, a read file naming learner tables/columns, a write file off main).
+# file outside db/ops, any run off main, a read file naming learner tables/columns).
 
 name: DB ops
 
@@ -51,15 +52,16 @@ jobs:
           fi
           [ -f "$FILE" ] || { echo "::error::$FILE does not exist on $REF."; exit 1; }
           kind="${BASH_REMATCH[1]}"
+          # Provenance: every file, read or write, must be the reviewed copy on main. A file
+          # written on a side branch never runs, so the SQL text guard below is only a backstop.
+          if [ "$REF" != "refs/heads/main" ]; then
+            echo "::error::DB ops runs only from main (got $REF). Merge the reviewed file first."
+            exit 1
+          fi
           if [ "$kind" = "read" ]; then
             # Public logs: refuse anything that could print learner data. Comment lines are ignored.
             if grep -vE '^\s*--' "$FILE" | grep -inE '\blms_users\b|email|password|phone|token|stripe'; then
               echo "::error::$FILE names a learner table or a sensitive column. Read files run in public logs."
-              exit 1
-            fi
-          else
-            if [ "$REF" != "refs/heads/main" ]; then
-              echo "::error::Write files run only from main (got $REF). Merge the reviewed file first."
               exit 1
             fi
           fi
@@ -76,9 +78,16 @@ jobs:
       - name: Run read-only
         env:
           FILE: ${{ inputs.file }}
+          # Prefer a least-privilege read role (no SELECT on learner tables) when it is set.
+          READONLY_URL: ${{ secrets.DATABASE_URL_READONLY }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           set -euo pipefail
+          if [ -n "${READONLY_URL:-}" ]; then
+            DATABASE_URL="$READONLY_URL"; echo "Using DATABASE_URL_READONLY (least-privilege role)."
+          else
+            echo "::warning::DATABASE_URL_READONLY is not set; using DATABASE_URL in a read-only session."
+          fi
           [ -n "${DATABASE_URL:-}" ] || { echo "::error::DATABASE_URL secret is not set."; exit 1; }
           command -v psql >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client; }
           # psql rejects Prisma-only URL params such as schema=; drop them.
