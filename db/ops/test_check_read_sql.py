@@ -38,10 +38,25 @@ REFUSE = {
     "quiz answers": "SELECT question_text, correct_index FROM lms_quiz_questions;\n",
     "learner ids": "SELECT student_id FROM lms_enrollments;\n",
     "catalog view": "SELECT query FROM pg_stat_activity;\n",
+    # Cursor security review, #999 head a467cef: dump forms that named no blocked identifier.
+    "TABLE statement": "TABLE lms_enrollments;\n",
+    "TABLE inside a CTE": "WITH x AS (TABLE lms_quiz_questions) SELECT x.id FROM x;\n",
+    "whole row by alias": "SELECT e FROM lms_enrollments e;\n",
+    "whole row by table name": "SELECT lms_quiz_questions FROM lms_quiz_questions;\n",
+    "whole row cast to text": "SELECT q::text FROM lms_quiz_questions q;\n",
+    "whole row in parentheses": "SELECT (a) FROM lms_quiz_attempts a;\n",
+    "alias.* expansion": "SELECT e.* FROM lms_enrollments e;\n",
+    "xmlschema serialiser": "SELECT table_to_xml_and_xmlschema('lms_users', true, false, '');\n",
+    "query serialiser": "SELECT query_to_xml_and_xmlschema('select * from lms_users', true, false, '');\n",
+    "unlisted function on a row": "SELECT format('%s', e) FROM lms_enrollments e;\n",
+    "comma join to an unlisted table": "SELECT c.id FROM lms_courses c, auth_users u;\n",
+    "other schema": "SELECT u.id FROM auth.users u;\n",
+    "set-returning function source": "SELECT x.k FROM json_each('{}') x;\n",
 }
 ALLOW = {
-    "words inside strings and comments": "SELECT 'drop; update /* -- ' AS a, \"title\" FROM t; -- delete\n",
-    "plain join with counts": "SELECT c.slug, (SELECT count(*) FROM m WHERE m.c = c.id) FROM c;\n",
+    "words inside strings and comments": "SELECT 'drop; update /* -- ' AS a, \"title\" FROM lms_courses; -- delete\n",
+    "plain join with counts": "SELECT c.slug, (SELECT count(*) FROM lms_modules m WHERE m.course_id = c.id) FROM lms_courses c;\n",
+    "CTE and subquery sources": "WITH x AS (SELECT c.id FROM lms_courses c) SELECT s.id FROM (SELECT x.id FROM x) s;\n",
     "allowed tables with counts": "SELECT c.slug, count(*) FROM lms_courses c JOIN lms_modules m ON m.course_id = c.id GROUP BY c.slug;\n",
 }
 

@@ -23,11 +23,13 @@ order of strength:
    through review cannot read learner data.
 3. **Table allowlist and statement check (enforced).** `db/ops/check-read-sql.py` is a single-pass
    SQL lexer that runs before any connection. A `read/` file may only contain plain queries
-   (`SELECT`/`WITH`/`TABLE`/`VALUES`) over the tables on its `ALLOWED_TABLES` list. Every other table
+   (`SELECT`/`WITH`/`VALUES`) over the tables on its `ALLOWED_TABLES` list. Every other table
    named in `prisma/schema.prisma` and every `pg_*` catalog name is refused, as are learner ids, quiz
-   content (question text, options, answers), a bare `*`, row/table serialisers (`table_to_xml`,
-   `row_to_json`, `json_agg`), `&` (escaped names), writes, `SET`/`COMMIT`/`DO`, and backslash
-   commands. Regression cases for every bypass found in review are in
+   content (question text, options, answers), a bare `*` or `alias.*`, any function not on its
+   `FUNCTIONS` allowlist (so no serialiser such as `table_to_xml_and_xmlschema` or `row_to_json`),
+   a FROM/JOIN source that is not an allowed table, CTE or subquery, comma joins, a whole-row
+   reference (`SELECT e FROM lms_enrollments e`, `e::text`), `&` (escaped names), writes,
+   `TABLE`, `SET`/`COMMIT`/`DO`, and backslash commands. Regression cases for every bypass found in review are in
    `db/ops/test_check_read_sql.py`; they run on every DB ops run.
 4. **No psql, and a person approves every run.** `run-read.py` and `run-write.py` (psycopg) send
    the SQL text only, so psql meta-commands cannot run. Every run, read or write, waits for approval

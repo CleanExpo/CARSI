@@ -12,7 +12,7 @@ string marker inside a comment, cannot hide a statement.
     $tag$ dollar-quoted strings, "quoted identifiers", words, and punctuation.
   - Any backslash outside a string or comment is refused (psql meta-commands such as \\gexec
     or \\!). The read job does not use psql anyway (db/ops/run-read.py sends plain SQL).
-  - Every statement must begin with SELECT, WITH, TABLE or VALUES.
+  - Every statement must begin with SELECT, WITH or VALUES (TABLE x is SELECT * and is refused).
   - No forbidden word anywhere in a statement, whether bare or "quoted": writes, DDL, session
     and transaction control, set_config, dblink, lo_*, pg_read_file and friends.
   - Tables: a word naming any table in prisma/schema.prisma must be on ALLOWED_TABLES (an
@@ -20,7 +20,13 @@ string marker inside a comment, cannot hide a statement.
     pg_* catalog names are refused too.
   - Columns: learner ids and quiz content (question text, options, answers) are refused, and so is
     a bare * (count(*) is fine), so an allowed table cannot be dumped whole.
-  - No row/table serialisers (table_to_xml, row_to_json, json_agg...) and no & (U&"..." escapes).
+  - Functions: only those on FUNCTIONS may be called, so no serialiser (table_to_xml,
+    query_to_xml_and_xmlschema, row_to_json, json_agg...) can dump a table named in a string.
+  - FROM/JOIN: every source is an allowed table, a CTE or a (subquery); comma joins are refused,
+    so every table in the statement is checked.
+  - Whole rows: a table or its alias may only be used as alias.column, so SELECT c FROM t c,
+    c::text and (c) cannot print a whole row.
+  - No & (U&"..." escapes).
   Logs of this public repository are public; the allowlist is what keeps learner data out of them.
 """
 import re
@@ -31,7 +37,7 @@ FORBIDDEN = {
     "grant", "revoke", "copy", "call", "do", "set", "reset", "commit", "rollback", "begin",
     "start", "savepoint", "release", "abort", "end", "lock", "vacuum", "analyze", "analyse",
     "reindex", "cluster", "refresh", "notify", "listen", "unlisten", "prepare", "execute",
-    "deallocate", "discard", "import", "load", "security", "comment", "into", "explain",
+    "deallocate", "discard", "import", "load", "security", "comment", "into", "explain", "table",
     "set_config", "transaction_read_only", "default_transaction_read_only", "dblink",
     "dblink_exec", "pg_read_file", "pg_read_binary_file", "pg_ls_dir", "pg_terminate_backend",
     "pg_cancel_backend", "pg_reload_conf", "pg_sleep", "query_to_xml", "query_to_json",
@@ -55,7 +61,25 @@ def known_tables() -> set:
     if len(names) < 10:
         raise SystemExit(f"::error::could not read table names from {schema}")
     return {n.lower() for n in names}
-STARTERS = {"select", "with", "table", "values"}
+STARTERS = {"select", "with", "values"}
+# The only functions a read file may call. Anything else followed by "(" is refused.
+FUNCTIONS = {
+    "count", "sum", "min", "max", "avg", "coalesce", "nullif", "lower", "upper", "length",
+    "round", "abs", "floor", "ceil", "greatest", "least", "now", "current_database", "date_trunc",
+}
+# SQL keywords that may be followed by "(" (they are syntax, not function calls).
+PAREN_KEYWORDS = {
+    "in", "exists", "as", "values", "from", "join", "using", "over", "filter", "on", "and", "or",
+    "not", "where", "when", "then", "else", "select", "by", "any", "all", "some", "case", "with",
+    "union", "except", "intersect", "is", "distinct", "having", "between", "like", "ilike",
+}
+# Words after a FROM/JOIN source that end it rather than name an alias.
+SOURCE_END = {
+    "where", "join", "inner", "left", "right", "full", "cross", "natural", "on", "using", "group",
+    "order", "limit", "offset", "union", "except", "intersect", "having", "window", "fetch",
+}
+# Sources outside the Prisma tables: migration history and schema metadata (no learner data).
+META_SOURCES = {"_prisma_migrations"}
 
 
 class Refused(Exception):
@@ -157,6 +181,7 @@ def problems(sql: str) -> list:
         return [str(e)]
     tables = known_tables()
     for stmt in statements:
+        out.extend(structure_problems(stmt))
         words = [t for k, t in stmt if k == "word"]
         if not stmt:
             continue
@@ -168,7 +193,7 @@ def problems(sql: str) -> list:
                 if prev != ("punct", "("):
                     out.append("bare * is not allowed (name the columns; count(*) is fine)")
         if not words or words[0].lower() not in STARTERS:
-            out.append(f"statement does not start with SELECT/WITH/TABLE/VALUES: {words[:3]}")
+            out.append(f"statement does not start with SELECT/WITH/VALUES: {words[:3]}")
         for w in words:
             lw = w.lower()
             if lw in FORBIDDEN or lw.startswith("lo_"):
@@ -179,6 +204,69 @@ def problems(sql: str) -> list:
                 out.append(f"table {w!r} is not on the read allowlist (logs are public)")
             if SERIALISER.search(lw):
                 out.append(f"row/table serialiser {w!r} is not allowed")
+    return out
+
+
+def structure_problems(stmt: list) -> list:
+    """Function allowlist, FROM/JOIN sources, and no whole-row references."""
+    out = []
+    low = [(k, t.lower()) for k, t in stmt]
+
+    def at(i):
+        return low[i] if 0 <= i < len(low) else ("", "")
+
+    # CTE names: <word> AS ( ... ). Their columns are already checked, so they may be sources.
+    ctes = {low[i][1] for i in range(len(low) - 2)
+            if low[i][0] == "word" and at(i + 1) == ("word", "as") and at(i + 2) == ("punct", "(")}
+    for i, (k, t) in enumerate(low):
+        if k == "word" and at(i + 1) == ("punct", "(") and t not in FUNCTIONS | PAREN_KEYWORDS | ctes:
+            out.append(f"function {stmt[i][1]!r} is not on the allowlist")
+
+    protected = set()      # table names and their aliases: usable only as name.column
+    defining = set()       # token positions where such a name is declared
+    for i, (k, t) in enumerate(low):
+        if k != "word" or t not in ("from", "join"):
+            continue
+        j = i + 1
+        if at(j) == ("punct", "("):
+            depth = 0
+            while j < len(low):
+                if low[j] == ("punct", "("):
+                    depth += 1
+                elif low[j] == ("punct", ")"):
+                    depth -= 1
+                    if depth == 0:
+                        break
+                j += 1
+        elif at(j)[0] == "word":
+            name = at(j)[1]
+            if name in ("public", "information_schema") and at(j + 1) == ("punct", "."):
+                defining.add(j)
+                j += 2
+                name = at(j)[1] if at(j)[0] == "word" else ""
+                ok = name in ALLOWED_TABLES | META_SOURCES or at(j - 2)[1] == "information_schema"
+            else:
+                ok = name in ALLOWED_TABLES | META_SOURCES | ctes
+            if not ok:
+                out.append(f"FROM/JOIN source {name!r} is not an allowed table, CTE or subquery")
+            if name not in ctes:
+                protected.add(name)
+                defining.add(j)
+        else:
+            out.append(f"FROM/JOIN must be followed by a table or (subquery), not {at(j)[1]!r}")
+            continue
+        j += 1
+        if at(j) == ("word", "as"):
+            j += 1
+        if at(j)[0] == "word" and at(j)[1] not in SOURCE_END:
+            protected.add(at(j)[1])
+            defining.add(j)
+            j += 1
+        if at(j) == ("punct", ","):
+            out.append("comma joins are not allowed (use JOIN ... ON so every table is checked)")
+    for i, (k, t) in enumerate(low):
+        if k == "word" and t in protected and i not in defining and at(i + 1) != ("punct", "."):
+            out.append(f"whole-row reference {stmt[i][1]!r} (select alias.column, not the row)")
     return out
 
 
