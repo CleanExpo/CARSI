@@ -1,7 +1,7 @@
 'use client';
 
 import { ArrowDown, ArrowUp, Loader2, Trash2 } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { LEARNING_GAP_LABELS, type LearningGap } from '@/lib/coaching-portal/learning-path';
 
@@ -54,7 +54,11 @@ const btn =
 export function AdminCoachingLearningPathsClient() {
   const [members, setMembers] = useState<Member[]>([]);
   const [selected, setSelected] = useState<string>('');
-  const [view, setView] = useState<MemberView | null>(null);
+  // The view always carries the member it was loaded for. A response for any other member is
+  // dropped, so a slow request can never put member A's path under member B (review r4 P1).
+  const [loaded, setLoaded] = useState<{ userId: string; view: MemberView } | null>(null);
+  const selectedRef = useRef('');
+  const view = loaded && loaded.userId === selected ? loaded.view : null;
   const [addId, setAddId] = useState('');
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState('');
@@ -73,36 +77,45 @@ export function AdminCoachingLearningPathsClient() {
   }, []);
 
   const loadMember = useCallback(async (userId: string) => {
+    selectedRef.current = userId;
     setSelected(userId);
-    setView(null);
+    setLoaded(null);
+    setAddId('');
     setNotice('');
     setError('');
     if (!userId) return;
     const res = await fetch(
       `/api/admin/coaching/learning-path?userId=${encodeURIComponent(userId)}`
     );
+    if (selectedRef.current !== userId) return;
     if (!res.ok) {
       setError('Could not load this member’s learning path.');
       return;
     }
-    setView((await res.json()) as MemberView);
+    const data = (await res.json()) as MemberView;
+    if (selectedRef.current !== userId) return;
+    setLoaded({ userId, view: data });
   }, []);
 
   async function post(body: Record<string, unknown>) {
+    // Save for the member whose path is on screen, never a newer selection.
+    const userId = loaded?.userId;
+    if (!userId || userId !== selectedRef.current) return;
     setBusy(true);
     setError('');
     try {
       const res = await fetch('/api/admin/coaching/learning-path', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: selected, ...body }),
+        body: JSON.stringify({ userId, ...body }),
       });
       const data = (await res.json()) as MemberView & { detail?: string };
+      if (selectedRef.current !== userId) return;
       if (!res.ok) {
         setError(data.detail ?? 'Save failed.');
         return;
       }
-      setView(data);
+      setLoaded({ userId, view: data });
       setNotice(data.result ? (ASSIGN_RESULT[data.result.status] ?? '') : 'Path saved.');
     } finally {
       setBusy(false);
@@ -137,6 +150,7 @@ export function AdminCoachingLearningPathsClient() {
         <span className="text-xs font-semibold tracking-wide text-white/45 uppercase">Member</span>
         <select
           value={selected}
+          disabled={busy}
           onChange={(e) => void loadMember(e.target.value)}
           className="mt-2 w-full rounded-lg border border-white/15 bg-[#0b1220] px-3 py-2 text-sm text-white"
         >
