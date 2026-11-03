@@ -1,156 +1,68 @@
 /**
- * Seed ALL course knowledge-check quizzes from the repo's seed data (GP-484).
+ * Seed course knowledge-check quizzes from the repo's seed data (GP-484), one course or all.
+ *
+ * USAGE (run AFTER `db:seed-courses` has created the target course):
+ *   npm run db:seed-quizzes -- --slug=<course-slug> --dry-run   # preview, no DB connection
+ *   npm run db:seed-quizzes -- --slug=<course-slug>             # seed ONLY that course
+ *   npm run db:seed-quizzes -- --slug=<course-slug> --allow-draft
+ *        # a course whose quiz exists only as data/seed/assessment-drafts/<slug>.quizzes.json
+ *        # (e.g. level-2-mould-remediation) — only after SME/founder sign-off
+ *   npm run db:seed-quizzes -- --all                            # every file on QUIZ_FILES
+ * With no --slug and no --all the script refuses and writes nothing (exit 1).
+ *
+ * --slug resolves the course's file the same way --all does (the catalogue file on QUIZ_FILES whose
+ * `courseSlug` matches); the draft file is used only when no catalogue file exists, because drafts
+ * for catalogue courses carry different quizIds and would add a second quiz to the course.
+ * An unknown slug, a missing/invalid file or a missing course exits non-zero; every file is
+ * validated before the first write.
+ *
+ * WRITES: upserts each quiz by its stable quizId; questions go through `writeQuizQuestions` —
+ * unchanged questions keep their ids, a changed question set DELETES and re-creates that quiz's
+ * questions (learners' saved quiz content versions go stale). Quiz attempts are never deleted.
+ * Logic and tests: src/lib/lms/quiz-seed.ts.
  *
  * MANUAL ONLY — this does NOT run at deploy. The production boot path is `start:production`
  * (do-migrate.sh → node server.js), which applies Prisma migrations and never seeds course
- * content; the live DB is the source of truth for quizzes/courses (GP-503). Run this by hand
- * only for a deliberate, reviewed re-seed (it also runs inside the manual `start:with-course-seed`
- * convenience script). Each quiz file follows the shared schema (`courseSlug`, `quizzes[]` with
- * `quizId/title/passPercentage/attemptsAllowed/questions[]`) used by seed-h5-bird-flu-quiz.ts /
- * seed-floor-care-quizzes.ts / seed-commercial-floor-care-quiz.ts, which remain for targeted
- * one-off runs.
- *
- * FAULT-TOLERANT BY DESIGN: this script always exits 0. A bad quiz file or a missing course
- * must never stop the process it is run alongside — a boot-blocking seeder would take prod down.
- * Failures are logged loudly and the affected quiz is skipped.
- *
- * Idempotent: upserts each quiz by its stable id and replaces its questions.
+ * content; the live DB is the source of truth for quizzes/courses (GP-503). `--all` also runs
+ * inside the manual `start:with-course-seed` convenience script and keeps its original
+ * fault-tolerant contract: a bad file or missing course is logged and skipped, exit 0.
  */
 import 'dotenv/config';
 
-import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
-import { prisma } from '../src/lib/prisma';
-import { writeQuizQuestions } from '../src/lib/lms/quiz-explanation-carry';
+import { runQuizSeed, type QuizSeedDb } from '../src/lib/lms/quiz-seed';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SEED_DIR = join(__dirname, '..', 'data', 'seed');
 
-const QUIZ_FILES = [
-  'h5-bird-flu-quiz.json',
-  'floor-care-quizzes.json',
-  'commercial-floor-care-quiz.json',
-  'ccw-truckmount.quizzes.json',
-  'water-damage-restoration-fundamentals-quiz.json',
-  'mould-remediation-fundamentals-quiz.json',
-  'structural-drying-fundamentals-quiz.json',
-  'category-3-sewage-black-water-remediation-quiz.json',
-  'asbestos-awareness-for-restoration-technicians-quiz.json',
-  'psychrometry-building-science-for-drying-quiz.json',
-  'moisture-meters-readings-and-dry-standards-quiz.json',
-  'fire-smoke-damage-restoration-fundamentals-quiz.json',
-  'trauma-crime-scene-decontamination-fundamentals-quiz.json',
-  'carpet-cleaning-fundamentals-quiz.json',
-  'timber-floor-assessment-restoration-quiz.json',
-  'assessing-indoor-environment-conditions-quiz.json',
-  'ozone-and-hydroxyl-generators-what-the-evidence-says-quiz.json',
-  'asthma-and-allergy-course-quiz.json',
-  'agi-essentials-small-business-quiz.json',
-  'social-media-marketing-quiz.json',
-  'admin-sole-trader-quiz.json',
-];
-
-type QuizQuestion = {
-  questionText: string;
-  options: string[];
-  correctIndex: number;
-  points?: number;
-  // Practitioner-authored "why" for a wrong answer (never generated from IICRC standard text).
-  explanation?: string | null;
-};
-
-type QuizDef = {
-  quizId: string;
-  lessonTitle?: string;
-  title: string;
-  passPercentage: number;
-  attemptsAllowed: number;
-  questions: QuizQuestion[];
-};
-
-type QuizzesFile = {
-  version: number;
-  courseSlug: string;
-  quizzes: QuizDef[];
-};
-
-function isQuizzesFile(value: unknown): value is QuizzesFile {
-  if (typeof value !== 'object' || value === null) return false;
-  const v = value as Record<string, unknown>;
-  return typeof v.courseSlug === 'string' && Array.isArray(v.quizzes);
-}
-
-async function seedQuizFile(fileName: string): Promise<number> {
-  const parsed: unknown = JSON.parse(readFileSync(join(SEED_DIR, fileName), 'utf8'));
-  if (!isQuizzesFile(parsed)) {
-    throw new Error(`${fileName} is not in the expected quizzes-file shape`);
-  }
-
-  const course = await prisma.lmsCourse.findUnique({
-    where: { slug: parsed.courseSlug },
-    select: { id: true },
-  });
-  if (!course) {
-    throw new Error(`Course "${parsed.courseSlug}" not found — run db:seed-courses first.`);
-  }
-
-  let seeded = 0;
-  for (const quiz of parsed.quizzes) {
-    quiz.questions.forEach((q) => {
-      if (!Array.isArray(q.options) || q.options.length < 2) {
-        throw new Error(`Quiz "${quiz.title}" has a question with fewer than 2 options.`);
-      }
-      if (q.correctIndex < 0 || q.correctIndex >= q.options.length) {
-        throw new Error(`Quiz "${quiz.title}" has a correctIndex out of range.`);
-      }
-    });
-
-    await prisma.lmsQuiz.upsert({
-      where: { id: quiz.quizId },
-      create: {
-        id: quiz.quizId,
-        courseId: course.id,
-        title: quiz.title,
-        passPercentage: quiz.passPercentage,
-        attemptsAllowed: quiz.attemptsAllowed,
+async function main(): Promise<number> {
+  let disconnect: (() => Promise<void>) | undefined;
+  try {
+    return await runQuizSeed(process.argv.slice(2), {
+      seedDir: SEED_DIR,
+      getDb: async () => {
+        // Imported lazily so --dry-run and refused runs never open a connection.
+        const { prisma } = await import('../src/lib/prisma');
+        disconnect = () => prisma.$disconnect();
+        return prisma satisfies QuizSeedDb;
       },
-      update: {
-        courseId: course.id,
-        title: quiz.title,
-        passPercentage: quiz.passPercentage,
-        attemptsAllowed: quiz.attemptsAllowed,
-      },
+      log: (m) => console.log(m),
+      error: (m) => console.error(m),
     });
-
-    // Unchanged questions keep their ids; authored explanations are never erased.
-    await writeQuizQuestions(prisma, quiz.quizId, quiz.questions);
-    seeded += 1;
+  } finally {
+    await disconnect?.();
   }
-
-  return seeded;
 }
 
-async function main() {
-  let ok = 0;
-  let failed = 0;
-  for (const fileName of QUIZ_FILES) {
-    try {
-      const seeded = await seedQuizFile(fileName);
-      ok += seeded;
-      console.log(`✓ ${fileName}: seeded ${seeded} quiz(zes).`);
-    } catch (e) {
-      failed += 1;
-      console.error(`✗ ${fileName}: SKIPPED —`, e instanceof Error ? e.message : e);
-    }
-  }
-  console.log(`Quiz seed complete: ${ok} quiz(zes) seeded, ${failed} file(s) skipped.`);
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main()
+    .then((code) => {
+      process.exitCode = code;
+    })
+    .catch((e) => {
+      console.error('seed-all-quizzes failed unexpectedly:', e);
+      process.exitCode = 1;
+    });
 }
-
-main()
-  .catch((e) => {
-    // Never block boot — log and continue to next start.
-    console.error('seed-all-quizzes failed unexpectedly (boot continues):', e);
-  })
-  .finally(() => prisma.$disconnect());

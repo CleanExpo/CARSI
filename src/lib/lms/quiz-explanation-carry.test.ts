@@ -165,11 +165,17 @@ describe('explanation carry-forward', () => {
     }
     const seeds = scripts.filter(([, src]) => /writeQuizQuestions\(prisma, /.test(src));
     expect(seeds.map(([f]) => f).sort()).toEqual([
-      'seed-all-quizzes.ts',
       'seed-assessment-draft.ts',
       'seed-commercial-floor-care-quiz.ts',
       'seed-floor-care-quizzes.ts',
       'seed-h5-bird-flu-quiz.ts',
     ]);
+    // seed-all-quizzes.ts delegates to src/lib/lms/quiz-seed.ts, which must use the shared writer.
+    expect(readFileSync(path.join(dir, 'seed-all-quizzes.ts'), 'utf8')).toMatch(
+      /from '\.\.\/src\/lib\/lms\/quiz-seed'/
+    );
+    const core = readFileSync(path.join(process.cwd(), 'src/lib/lms/quiz-seed.ts'), 'utf8');
+    expect(core).toMatch(/writeQuizQuestions\(db, /);
+    expect(core).not.toMatch(/lmsQuizQuestion\.deleteMany\(/);
   });
 });

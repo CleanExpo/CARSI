@@ -100,7 +100,8 @@ the player renders), then let the deploy boot path seed them:
 
 ```bash
 npm run db:seed-courses    # imports the catalogue (incl. attached resources)
-npm run db:seed-quizzes    # imports quiz files
+npm run db:seed-quizzes -- --slug=<slug> --dry-run   # preview one course's quiz file(s)
+npm run db:seed-quizzes -- --slug=<slug>             # imports that course's quiz file(s) only
 ```
 
 ## Guardrails (run in both phases)

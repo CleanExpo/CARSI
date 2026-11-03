@@ -52,7 +52,7 @@
     "start": "prisma migrate deploy && next start",
     "start:production": "bash scripts/start-production.sh",
     "db:migrate:do": "bash scripts/do-migrate.sh",
-    "start:with-course-seed": "prisma migrate deploy && npm run db:seed-courses && npm run db:seed-quizzes && next start",
+    "start:with-course-seed": "prisma migrate deploy && npm run db:seed-courses && npm run db:seed-quizzes -- --all && next start",
     "db:export-courses": "npx tsx scripts/export-courses-catalog.ts",
     "db:seed-courses": "npx tsx scripts/seed-courses-catalog.ts",
     "db:seed-quizzes": "npx tsx scripts/seed-all-quizzes.ts",
