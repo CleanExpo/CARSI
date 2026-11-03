@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 
+import { isAskCoachGoalId } from '@/lib/coaching-portal/ask-my-coach';
 import { LEARNING_GOAL_PREFIX, LEARNING_REMOVED_STATUS } from '@/lib/coaching-portal/learning-path';
 import type { CoachingActionStatus, CoachingMonthlyAction } from '@/lib/coaching-portal/types';
 import { prisma } from '@/lib/prisma';
@@ -122,8 +123,12 @@ export async function upsertCoachingActionForUser(
       select: { id: true, goalId: true },
     });
     if (owned) {
-      // A prescribed course's title and status follow the LMS; the member can only add a note.
-      const update = isLearningAction(owned.goalId) ? { progressNote: data.progressNote } : data;
+      // A prescribed course's title and status follow the LMS, and a question to the coach
+      // (GP-630) is closed by the coach's answer; on both the member can only add a note.
+      const update =
+        isLearningAction(owned.goalId) || isAskCoachGoalId(owned.goalId)
+          ? { progressNote: data.progressNote }
+          : data;
       await prisma.carsiCoachingAction.update({ where: { id: owned.id }, data: update });
       return;
     }
