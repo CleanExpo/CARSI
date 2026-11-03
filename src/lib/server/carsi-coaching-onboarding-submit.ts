@@ -13,6 +13,7 @@ import {
 import { carsiCoachingPortalPath } from '@/lib/marketing/carsi-coaching-program';
 import { prisma } from '@/lib/prisma';
 import { getAppOrigin } from '@/lib/server/app-url';
+import { assignLearningPathFromAssessment } from '@/lib/server/carsi-coaching-learning-path';
 import { getCarsiCoachingMonthlyNotifyRecipients } from '@/lib/server/carsi-coaching-monthly-notify';
 import { sendEmail } from '@/lib/server/email';
 import {
@@ -178,6 +179,15 @@ export async function submitCoachingOnboardingToCoach(
       onboardingSnapshotJson: serializeOnboardingSnapshot(snapshot),
     },
   });
+
+  // GP-633: prescribe CARSI courses from the assessment gaps onto the action board. A failure
+  // here must not block the onboarding hand-off; the coach can assign from the admin review.
+  try {
+    await assignLearningPathFromAssessment(userId);
+  } catch (err) {
+    console.error('[coaching] learning path assignment failed', { userId, err });
+  }
+
   const appOrigin = getAppOrigin();
   const portalUrl = `${appOrigin.replace(/\/$/, '')}${carsiCoachingPortalPath}`;
 

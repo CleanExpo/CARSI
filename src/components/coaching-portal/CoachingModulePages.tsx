@@ -34,7 +34,34 @@ type ActionItem = {
   dueDate: string | null;
   priority: string | null;
   progressNote?: string | null;
+  /** Prescribed CARSI course (GP-633): status and progress follow the LMS. */
+  learning?: { courseSlug: string; percent: number } | null;
 };
+
+const STATUS_LABEL: Record<CoachingActionStatus, string> = {
+  todo: 'Not started',
+  in_progress: 'In progress',
+  done: 'Completed',
+  blocked: 'Blocked',
+};
+
+function LearningProgress({ learning }: { learning: NonNullable<ActionItem['learning']> }) {
+  return (
+    <div className="mt-3">
+      <div
+        className="h-1.5 w-full max-w-xs overflow-hidden rounded-full bg-white/10"
+        role="progressbar"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={learning.percent}
+        aria-label="Course progress"
+      >
+        <div className="h-full rounded-full bg-sky-400" style={{ width: `${learning.percent}%` }} />
+      </div>
+      <p className="mt-1 text-xs text-slate-400">{learning.percent}% of the course complete</p>
+    </div>
+  );
+}
 
 const FILTERS: Array<{ id: 'all' | CoachingActionStatus; label: string }> = [
   { id: 'all', label: 'All' },
@@ -191,23 +218,47 @@ export function CoachingActionsPage() {
         <ul className="mt-6 space-y-3">
           {visible.map((a) => (
             <li key={a.id} className={coachingCard}>
-              <p className="font-semibold text-white">{a.title}</p>
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="font-semibold text-white">{a.title}</p>
+                {a.learning ? (
+                  <span className="rounded-full bg-sky-400/10 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-sky-300 uppercase">
+                    Learning
+                  </span>
+                ) : null}
+              </div>
               {a.description ? <p className={`mt-1 ${coachingMuted}`}>{a.description}</p> : null}
+              {a.learning ? <LearningProgress learning={a.learning} /> : null}
               <div className="mt-3 flex flex-wrap items-center gap-2">
-                <select
-                  value={a.status}
-                  disabled={!access.canEdit}
-                  onChange={(e) =>
-                    void updateAction({ ...a, status: e.target.value as CoachingActionStatus })
-                  }
-                  className="rounded-lg border border-white/10 bg-[#060a14] px-2 py-1 text-xs text-white"
-                >
-                  {FILTERS.filter((f) => f.id !== 'all').map((f) => (
-                    <option key={f.id} value={f.id}>
-                      {f.label}
-                    </option>
-                  ))}
-                </select>
+                {a.learning ? (
+                  <>
+                    <span className="rounded-lg border border-white/10 px-2 py-1 text-xs text-slate-300">
+                      {STATUS_LABEL[a.status]}
+                    </span>
+                    {a.learning.courseSlug && a.status !== 'done' ? (
+                      <Link
+                        href={`/dashboard/learn/${a.learning.courseSlug}`}
+                        className="text-xs font-semibold text-sky-300 hover:text-sky-200"
+                      >
+                        {a.status === 'todo' ? 'Start the course' : 'Continue the course'}
+                      </Link>
+                    ) : null}
+                  </>
+                ) : (
+                  <select
+                    value={a.status}
+                    disabled={!access.canEdit}
+                    onChange={(e) =>
+                      void updateAction({ ...a, status: e.target.value as CoachingActionStatus })
+                    }
+                    className="rounded-lg border border-white/10 bg-[#060a14] px-2 py-1 text-xs text-white"
+                  >
+                    {FILTERS.filter((f) => f.id !== 'all').map((f) => (
+                      <option key={f.id} value={f.id}>
+                        {f.label}
+                      </option>
+                    ))}
+                  </select>
+                )}
                 {a.dueDate ? (
                   <span className="text-xs text-slate-500">
                     Due {new Date(a.dueDate).toLocaleDateString('en-AU')}
@@ -318,6 +369,58 @@ export function CoachingSessionsPage() {
   );
 }
 
+function CoachingLearningPathSection() {
+  const [items, setItems] = useState<ActionItem[] | null>(null);
+
+  useEffect(() => {
+    void fetch('/api/coaching/portal/actions')
+      .then((res) => (res.ok ? res.json() : { items: [] }))
+      .then((data: { items?: ActionItem[] }) =>
+        setItems((data.items ?? []).filter((a) => a.learning))
+      )
+      .catch(() => setItems([]));
+  }, []);
+
+  if (items === null) return null;
+
+  const done = items.filter((a) => a.status === 'done').length;
+
+  return (
+    <section className={coachingCard}>
+      <h2 className={coachingCardTitle}>Your learning path</h2>
+      <p className={`mt-1 ${coachingMuted}`}>
+        {items.length === 0
+          ? 'Once Phill has your business assessment, the CARSI courses that match your gaps appear here.'
+          : `Courses picked from your business assessment. ${done} of ${items.length} completed.`}
+      </p>
+      {items.length > 0 ? (
+        <ol className="mt-5 divide-y divide-white/[0.06]">
+          {items.map((a) => (
+            <li
+              key={a.id}
+              className="flex flex-col gap-2 py-4 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-white">{a.title}</p>
+                <p className={`mt-1 text-xs ${coachingMuted}`}>{STATUS_LABEL[a.status]}</p>
+                {a.learning ? <LearningProgress learning={a.learning} /> : null}
+              </div>
+              {a.learning?.courseSlug ? (
+                <Link
+                  href={`/dashboard/learn/${a.learning.courseSlug}`}
+                  className={`inline-flex shrink-0 items-center text-sm font-semibold text-sky-300 hover:text-sky-200 ${coachingSecondaryBtn} !min-h-9 !px-3`}
+                >
+                  {a.status === 'done' ? 'Review' : 'Open'}
+                </Link>
+              ) : null}
+            </li>
+          ))}
+        </ol>
+      ) : null}
+    </section>
+  );
+}
+
 export function CoachingResourcesPage() {
   return (
     <div className={coachingPage}>
@@ -327,6 +430,7 @@ export function CoachingResourcesPage() {
         your plan; hands-on implementation is quoted under Growth services.
       </p>
       <div className="mt-8 space-y-6">
+        <CoachingLearningPathSection />
         {COACHING_RESOURCE_SECTIONS.map((section) => (
           <section key={section.id} className={coachingCard}>
             <h2 className={coachingCardTitle}>{section.title}</h2>
