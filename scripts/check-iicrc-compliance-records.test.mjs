@@ -32,6 +32,19 @@ const fail = (msg) => {
   failed++;
 };
 
+/** The exact <style> block reviewed in the real export (GP-673 review 2 placed it inside a word). */
+function reviewedStyleBlock() {
+  const rows = JSON.parse(readFileSync(join(HERE, '..', EXPORT_FILE), 'utf8'));
+  for (const r of rows) {
+    const m = typeof r.description === 'string' ? r.description.match(/<style>[\s\S]*?<\/style>/) : null;
+    if (m) return m[0];
+  }
+  throw new Error('the real export no longer holds its reviewed <style> block; update the test deliberately');
+}
+/** GP-673 review 2: a Markdown table whose header cells render "C", "E", "C". */
+const R2_TABLE = 'Earn 2 | C | E | C | hours\n--- | --- | --- | --- | ---\nTraining | credit | award | for | completion';
+const R2_TABLE_NEUTRAL = 'Earn 2 | X | Y | Z | hours\n--- | --- | --- | --- | ---\nTraining | credit | award | for | completion';
+
 const course = (slug, short_description, description = '<p>Neutral course copy.</p>') => ({
   slug,
   title: `Course ${slug}`,
@@ -124,6 +137,22 @@ function runGuardIn(files) {
     [EXPORT_FILE]: JSON.stringify([{ ...course(PLANTED_SLUG, 'Neutral.', 'Certainly! Neutral copy with \u2019quotes\u2019 and a list.'), title: 'Neutral title' }]),
   });
   if (tidied.status !== 0) fail(`GP-673 control: text the page only tidies was blocked\n${tidied.out.slice(0, 600)}`);
+  // GP-673 review 2 (Codex, P1 x3): the real guard, on compositions the real student page
+  // (CourseFormattedBody) renders as "CEC", each beside a neutral control built the same way.
+  {
+    const style = reviewedStyleBlock();
+    for (const [cat, bad, neutralText] of [
+      ['render-cta', 'Earn 2 C<h2>Already Purchased This Course?</h2><p>Access Here</p>EC hours.', 'Earn 2 credit<h2>Already Purchased This Course?</h2><p>Access Here</p> hours.'],
+      ['render-style', `Earn 2 C${style}EC hours.`, `Earn 2 credit${style} hours.`],
+    ]) {
+      const r = runGuardIn({ [EXPORT_FILE]: JSON.stringify([{ ...course(PLANTED_SLUG, 'Neutral.', bad), title: 'Neutral title' }]) });
+      if (r.status === 0 || !r.out.includes(PLANTED_SLUG)) fail(`GP-673[${cat}] real guard passed or did not name the slug for: ${bad.slice(0, 80)}`);
+      const ok = runGuardIn({ [EXPORT_FILE]: JSON.stringify([{ ...course(PLANTED_SLUG, 'Neutral.', neutralText), title: 'Neutral title' }]) });
+      if (ok.status !== 0) fail(`GP-673[${cat}] control: neutral text built the same way was blocked\n${ok.out.slice(0, 600)}`);
+    }
+    const table = runGuardIn({ [EXPORT_FILE]: JSON.stringify([{ ...course(PLANTED_SLUG, 'Neutral.', R2_TABLE), title: 'Neutral title' }]) });
+    if (table.status === 0 || !table.out.includes(PLANTED_SLUG)) fail('GP-673[render-table] real guard passed or did not name the slug for the C | E | C table');
+  }
   // Fail closed: a guard that cannot load the page's text stripper must fail, never pass.
   {
     const dir = mkdtempSync(join(tmpdir(), 'gp673-nostrip-'));
@@ -169,7 +198,7 @@ try {
 } catch (err) {
   fail(`cannot import the guard: ${err.message}`);
 }
-const { evaluateRecords, classifyRecordFindings, RECORD_SCANNED_DIRS, CEC_APPROVED_SLUGS } = mod ?? {};
+const { evaluateRecords, classifyRecordFindings, RECORD_SCANNED_DIRS, CEC_APPROVED_SLUGS, UNREADABLE_MESSAGE, studentView, renderedProblems } = mod ?? {};
 
 if (typeof evaluateRecords !== 'function' || typeof classifyRecordFindings !== 'function') {
   fail('guard does not export evaluateRecords / classifyRecordFindings');
@@ -410,6 +439,106 @@ if (typeof evaluateRecords !== 'function' || typeof classifyRecordFindings !== '
       }
     }
   }
+  // GP-673 review 2 (Codex, P1 x3). The real student page removes the legacy purchase block and
+  // <style> blocks and renders Markdown tables, and each can join or space letters into "CEC". The
+  // CEC WORDING rules must fire on what the page shows (a readability finding alone is not enough
+  // for these), and the same construct with neutral letters must not draw a wording finding.
+  {
+    const wording = (f) => f.filter((x) => x.message !== UNREADABLE_MESSAGE);
+    const style = reviewedStyleBlock();
+    for (const [cat, bad, neutralText, neutralMayBeUnreadable] of [
+      ['render-cta', 'Earn 2 C<h2>Already Purchased This Course?</h2><p>Access Here</p>EC hours.', 'Earn 2 credit<h2>Already Purchased This Course?</h2><p>Access Here</p> hours.', false],
+      ['render-cta', 'Earn 2 C<h3 class="x">Already Purchased This Course</h3><p>Use the link. Access Here.</p>EC hours.', null, false],
+      ['render-style', `Earn 2 C${style}EC hours.`, `Earn 2 credit${style} hours.`, false],
+      ['render-table', R2_TABLE, R2_TABLE_NEUTRAL, true],
+    ]) {
+      const rec = (text) => ({ ...course(PLANTED_SLUG, 'Neutral.', text), title: 'Neutral title' });
+      const f = scan([rec(bad)]);
+      if (wording(f).length === 0) fail(`GP-673[${cat}] no CEC wording finding on what the page shows for: ${bad.slice(0, 90)}`);
+      else if (!wording(f).some((x) => x.slug === PLANTED_SLUG && x.field === 'description')) fail(`GP-673[${cat}] finding does not name slug/field`);
+      if (neutralText === null) continue;
+      const n = scan([rec(neutralText)]);
+      if (wording(n).length > 0) fail(`GP-673[${cat}] control: neutral text drew a CEC wording finding\n    ${wording(n).map((x) => x.text).join(' | ')}`);
+      if (!neutralMayBeUnreadable && n.length > 0) fail(`GP-673[${cat}] control: neutral text was blocked\n    ${n.map((x) => x.text).join(' | ')}`);
+      // Tables are not in the reviewed output markup, so the neutral table is still unreadable.
+      if (neutralMayBeUnreadable && n.length === 0) fail(`GP-673[${cat}] control: a Markdown table (not reviewed output markup) passed the readability gate`);
+    }
+  }
+  // Brief item 2: CEC wording in link text, link targets, titles, image alt / title / file names,
+  // and other attributes a learner sees or a screen reader reads, inside course text.
+  {
+    const LINK_IMAGE = [
+      ['link text joins "C" + "EC"', 'Earn 2 <a href="https://carsi.com.au/courses">C</a>EC hours.'],
+      ['link target path', '<p><a href="https://carsi.com.au/cec-approved-course">Read more</a></p>'],
+      ['percent-encoded link target', '<p><a href="https://carsi.com.au/%43EC-hours">Read more</a></p>'],
+      ['entity in link target', '<p><a href="https://carsi.com.au/x#&#67;EC">Read more</a></p>'],
+      ['link title attribute', '<p><a href="https://carsi.com.au/x" title="CEC approved">Read more</a></p>'],
+      ['Markdown link title', 'See [Read more](https://carsi.com.au/x "CEC approved") today.'],
+      ['Markdown image alt', '![CEC approved badge](https://carsi.com.au/badge.png)'],
+      ['image file name', '<img src="https://carsi.com.au/wp-content/uploads/IICRC-CEC-approved.png" alt="Badge">'],
+      ['image title', '<img src="https://carsi.com.au/wp-content/uploads/badge.png" alt="Badge" title="CEC approved">'],
+      ['image alt joined to a letter', 'Earn 2 C<img src="https://carsi.com.au/x.png" alt="EC"> hours.'],
+      ['aria-label on a link', '<p><a href="https://carsi.com.au/x" aria-label="CEC approved course">Read more</a></p>'],
+      ['bare address the page turns into a link', 'See https://carsi.com.au/cec-hours for details.'],
+    ];
+    for (const [name, text] of LINK_IMAGE) {
+      const f = scan([{ ...course(PLANTED_SLUG, 'Neutral.', text), title: 'Neutral title' }]);
+      if (f.length === 0) fail(`GP-673[link-image] MUST BLOCK but passed: ${name}\n    ${text}`);
+    }
+    for (const [name, text] of [
+      ['neutral reviewed link', '<p><a href="https://carsi.com.au/courses/drying" role="button">Read more</a></p>'],
+      ['neutral bare address', 'See https://carsi.com.au/courses for details.'],
+    ]) {
+      const f = scan([{ ...course(PLANTED_SLUG, 'Neutral.', text), title: 'Neutral title' }]);
+      if (f.length > 0) fail(`GP-673[link-image] control blocked: ${name}\n    ${f.map((x) => x.text).join(' | ')}`);
+    }
+  }
+  // Review 2 warning GP673-W1: reviewed attribute VALUES are enforced, not only attribute names.
+  for (const [name, text] of [
+    ['ul type other than disc', '<ul type="x"><li>Neutral</li></ul>'],
+    ['a role other than button', '<p><a href="https://carsi.com.au/x" role="tab">Link</a></p>'],
+  ]) {
+    if (scan([{ ...course(PLANTED_SLUG, 'Neutral.', text), title: 'Neutral title' }]).length === 0) fail(`GP-673[attr-value] MUST BLOCK but passed: ${name}`);
+  }
+  // The rendered-output layer alone. The input gate already blocks most of these records, so these
+  // checks prove the second layer works by itself (each one was watched fail with that part removed).
+  if (typeof studentView !== 'function' || typeof renderedProblems !== 'function') {
+    fail('GP-673[render-output] guard does not export studentView / renderedProblems');
+  } else {
+    const view = (t) => studentView(t);
+    const flat = (s) => s.replace(/\s+/g, ' ').trim();
+    const realRowsOut = JSON.parse(readFileSync(join(HERE, '..', EXPORT_FILE), 'utf8'));
+    const imgOwner = realRowsOut.find((r) => /<img\b/i.test(r.description ?? ''));
+    const imgOnly = imgOwner?.description.match(/<img\b[^>]*>/i)?.[0];
+    const OUT = [
+      ['image alt sits in the visible text', () => flat(view('Earn 2 C<img src="https://carsi.com.au/x.png" alt="EC"> hours.').text).includes('CEC')],
+      ['link target is collected', () => view('<p><a href="https://carsi.com.au/cec-x">Read</a></p>').attrs.includes('https://carsi.com.au/cec-x')],
+      ['percent-escapes in a link target decode', () => view('<p><a href="https://carsi.com.au/%43EC">Read</a></p>').attrs.includes('https://carsi.com.au/CEC')],
+      ['Markdown table cells are separated', () => /C E C/.test(flat(view(R2_TABLE).text))],
+      ['purchase block is removed as the page does', () => flat(view('Earn 2 C<h2>Already Purchased This Course?</h2><p>Access Here</p>EC hours.').text) === 'Earn 2 CEC hours.'],
+      ['hidden CSS on rendered markup is a problem', () => renderedProblems(view('<p style="display:none">Neutral.</p>'), PLANTED_SLUG).length > 0],
+      ['reviewed CSS on rendered markup is not a problem', () => renderedProblems(view('<p style="margin: 0in; font-family: Calibri;">Neutral.</p>'), PLANTED_SLUG).length === 0],
+      ['an unreviewed rendered image is a problem', () => renderedProblems(view('![Badge](https://carsi.com.au/badge.png)'), PLANTED_SLUG).length > 0],
+      ['the reviewed image renders clean on its own course', () => Boolean(imgOnly) && renderedProblems(view(imgOnly), imgOwner.slug).length === 0],
+      ['the reviewed image is a problem on another course', () => Boolean(imgOnly) && renderedProblems(view(imgOnly), PLANTED_SLUG).length > 0],
+      ['a rendered table is a problem', () => renderedProblems(view(R2_TABLE_NEUTRAL), PLANTED_SLUG).length > 0],
+    ];
+    for (const [name, check] of OUT) {
+      let ok = false;
+      try {
+        ok = check();
+      } catch (err) {
+        fail(`GP-673[render-output] crashed: ${name} (${err.message})`);
+        continue;
+      }
+      if (!ok) fail(`GP-673[render-output] ${name}: not true`);
+    }
+  }
+  // Rendered markup that is not in the reviewed output list (here a Markdown quote) is unreadable.
+  if (scan([{ ...course(PLANTED_SLUG, 'Neutral.', '> A neutral quote.'), title: 'Neutral title' }]).length === 0) {
+    fail('GP-673[render-output] MUST BLOCK but passed: Markdown blockquote (not reviewed output markup)');
+  }
+
   // Percent-encoded wording in the slug (the URL bar decodes it).
   if (scan([{ ...course('gp673-%63ec-course', 'Neutral.', 'Neutral.'), title: 'Neutral title' }]).length === 0) {
     fail('GP-673[encoding] MUST BLOCK but passed: percent-encoded "cec" in the slug');

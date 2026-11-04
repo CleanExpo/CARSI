@@ -25,22 +25,39 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { isEntryPoint } from './lib/is-entry-point.mjs';
 
-/** GP-673 review r1 (Codex, P1). Course descriptions reach learners through
- *  CourseFormattedBody -> sourceToStudentHtml, which first runs stripAiWritingSigns: it deletes
- *  citation markers ("[cite: 1]", "{{name}}") and stock phrases ("In conclusion, "), and that can
- *  join letters the scanner read apart. The record scan therefore also reads each field after the
- *  site's OWN function has run. It is imported from the app source, not copied, so the two cannot
- *  drift. The file has no imports and only erasable type syntax; Node 22.18+ loads .ts directly.
- *  If it cannot be loaded, the record scan fails closed (see evaluateRecords). */
-const STUDENT_STRIP_FILE = 'src/lib/lms/strip-ai-writing-signs.ts';
+/** GP-673 reviews r1 and r2 (Codex, P1). Course descriptions reach learners through the React
+ *  component CourseFormattedBody: stripLegacyPurchaseCta, then sourceToStudentHtml
+ *  (stripAiWritingSigns, Markdown or HTML clean-up, DOMPurify). Each of those steps can delete
+ *  text or markup and so join letters, or space them ("C E C" in a Markdown table). Copying the
+ *  steps one by one lost that race twice, so the record scan now renders each field with the REAL
+ *  component, imported from the app source through tsx (a dev dependency), and reads the result.
+ *  If the render path cannot be loaded, the record scan fails closed (see evaluateRecords). */
+const STUDENT_RENDER_FILES = ['src/components/lms/CourseFormattedBody.tsx', 'src/lib/lms/strip-ai-writing-signs.ts'];
 let STUDENT_TEXT_STRIP = null;
-let STUDENT_STRIP_ERROR = '';
+let STUDENT_RENDER = null;
+let PARSE_FRAGMENT = null;
+let STUDENT_RENDER_ERROR = '';
 try {
-  const mod = await import(pathToFileURL(join(dirname(fileURLToPath(import.meta.url)), '..', STUDENT_STRIP_FILE)).href);
-  if (typeof mod.stripAiWritingSigns !== 'function') throw new Error('stripAiWritingSigns is not exported');
-  STUDENT_TEXT_STRIP = mod.stripAiWritingSigns;
+  const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+  const { tsImport } = await import('tsx/esm/api');
+  const opts = { parentURL: import.meta.url, tsconfig: join(root, 'tsconfig.json') };
+  // One at a time: jsdom (under DOMPurify) and parse5 share a module that must not load twice at once.
+  const body = await tsImport(pathToFileURL(join(root, STUDENT_RENDER_FILES[0])).href, opts);
+  const strip = await tsImport(pathToFileURL(join(root, STUDENT_RENDER_FILES[1])).href, opts);
+  const React = await tsImport('react', opts);
+  const server = await tsImport('react-dom/server', opts);
+  const parse5 = await import('parse5');
+  if (typeof body.CourseFormattedBody !== 'function') throw new Error('CourseFormattedBody is not exported');
+  if (typeof strip.stripAiWritingSigns !== 'function') throw new Error('stripAiWritingSigns is not exported');
+  const createElement = React.createElement ?? React.default?.createElement;
+  const renderToStaticMarkup = server.renderToStaticMarkup ?? server.default?.renderToStaticMarkup;
+  if (typeof createElement !== 'function' || typeof renderToStaticMarkup !== 'function') throw new Error('react / react-dom/server did not load');
+  if (typeof parse5.parseFragment !== 'function') throw new Error('parse5.parseFragment is not exported');
+  STUDENT_TEXT_STRIP = strip.stripAiWritingSigns;
+  STUDENT_RENDER = (text) => renderToStaticMarkup(createElement(body.CourseFormattedBody, { text }));
+  PARSE_FRAGMENT = parse5.parseFragment;
 } catch (err) {
-  STUDENT_STRIP_ERROR = err?.message ?? String(err);
+  STUDENT_RENDER_ERROR = err?.message ?? String(err);
 }
 const studentStrip = (value) => (STUDENT_TEXT_STRIP ? STUDENT_TEXT_STRIP(value) : value);
 
@@ -427,22 +444,32 @@ function stringFields(value, path, out, underCec = false) {
 // CSS or markup inside a word, text inside images or SVG, look-alike characters, encodings the
 // scanner did not decode, record fields the scanner does not know, and text the student page
 // itself changes before display (review r1: stripAiWritingSigns deletes markers and stock phrases;
-// tag-free fields render as Markdown). Each field is read as stored AND after the site's own
-// stripAiWritingSigns, and Markdown link/image/code/escape syntax in visible text is a finding.
+// tag-free fields render as Markdown; review r2: the page deletes the legacy purchase block and
+// <style> blocks, and renders Markdown tables). Each field is read as stored, after the site's own
+// stripAiWritingSigns, AND as the real student component CourseFormattedBody renders it (imported,
+// not copied; see studentView): its visible text, and every attribute it renders (link targets,
+// titles, image alt, src and srcset). Markdown link/image/code/escape syntax in visible text is a
+// finding too.
 //
 // CONTROL. The export is frozen (WordPress, April 2026). For a course NOT approved in
 // data/seed/cec-approvals.json, every field must use only the markup, CSS declarations, characters
-// and record shape already reviewed in that export (the lists below). Anything else is a finding:
+// and record shape already reviewed in that export (the lists below), and what the student page
+// renders from it must use only the reviewed output markup (OUTPUT_TAGS, the same attribute and CSS
+// lists, and the reviewed image by its rendered form). Anything else is a finding:
 // "the checker cannot read this the way a browser shows it". The lists are exact values, never
 // patterns, and are never derived from the export at run time, so an edit cannot approve itself.
 // A new construct ships only by a human adding it here, in a reviewed change.
 //
 // RESIDUAL (stated, not hidden): wording drawn into the pixels of the ONE reviewed image (its source
 // returned 404 on 04/11/2026, so it shows nothing today); ASCII look-alikes such as "C3C" or "(EC";
-// lower-case "cec" in the middle of a word; a future change to the student renderer beyond
-// stripAiWritingSigns and Markdown (the stripper is imported, so its own changes are followed);
-// other screens that show these fields differently; and any surface outside data/wordpress-export/ (authored
-// source under app/ and src/ is covered by the line rules and code review, not by this gate).
+// lower-case "cec" in the middle of a word; text a site stylesheet could add to the reviewed tags
+// (the component's own classes only set fonts, colours, spacing and a drop cap); other screens that
+// show these fields differently (cards show short_description as plain text, which the stored-text
+// views read); and any surface outside data/wordpress-export/ (authored source under app/ and src/
+// is covered by the line rules and code review, not by this gate). The render path is imported, so
+// a change to it is followed; a change that renders new markup fails closed. A layout difference
+// between parse5's text walk and a real browser (for example CSS that makes a block inline) is not
+// modelled; the CSS that could do it is outside the reviewed lists.
 // Approved courses are not held to the gate: they may state CEC wording openly.
 
 /** Record fields and the value types the reviewed export uses. "hours" is a CEC-hours string such
@@ -527,6 +554,8 @@ const REVIEWED_IMAGES = [
     slug: 'large-loss-mastery-super-course',
     src: 'https://carsi.com.au/wp-content/uploads/2022/06/Things-to-Do-in-Sydney-3-1024x512.png',
     sha256: 'b3f9a62392fc11950cf92f61a477a59b8ef982748b9a5eee859b44405063fc21',
+    // The same image as the student page renders it (renderedImageKey), observed 04/11/2026.
+    rendered_sha256: '09fd9251d8ff2704820b4bab838172c7f55404368f472656626a04369738ca2b',
     reason:
       'Venue picture for the in-person course (alt "Novotel Accommodation", file "Things-to-Do-in-Sydney-3"). On 04/11/2026 the ' +
       'GP-673 job fetched this src and the i0.wp.com copy: both returned HTTP 404, so no image pixels reach a learner; a broken ' +
@@ -733,6 +762,105 @@ export function readabilityProblems(value, slug, { compareStyleBlocks = true } =
 }
 const MARKDOWN_SYNTAX_RE = /[[\]`\\]/;
 
+/** Elements a browser lays out inline: their text joins the text beside them with no space. Every
+ *  other element is treated as a block, which shows as a break between words. */
+const INLINE_TAGS = new Set(['a', 'abbr', 'b', 'bdi', 'bdo', 'cite', 'code', 'del', 'dfn', 'em', 'i', 'img', 'ins', 'kbd', 'mark', 'q', 's', 'samp', 'small', 'span', 'strong', 'sub', 'sup', 'time', 'u', 'var']);
+/** Elements the real student page renders for the frozen export (observed 04/11/2026 by rendering
+ *  every field of every unapproved course): the reviewed input tags, plus <img> only as a reviewed
+ *  image (REVIEWED_IMAGES.rendered_sha256). Anything else the page would render (a Markdown table,
+ *  quote, code block, list number, or a heading kicker <span>) is unreviewed output: a finding. */
+const OUTPUT_TAGS = new Set([...READABLE_TAGS, 'img']);
+
+/** Percent-escapes decoded as an address bar shows them; a malformed escape is left as typed. */
+function decodePercent(s) {
+  try {
+    return decodeURIComponent(s);
+  } catch {
+    return s.replace(/%([0-9a-f]{2})/gi, (_, h) => String.fromCharCode(parseInt(h, 16)));
+  }
+}
+
+/** One field as the real student page shows it. Renders `value` with CourseFormattedBody, parses
+ *  the HTML with parse5 (the HTML standard's parser, as a browser does) and returns:
+ *    text      the visible text: inline elements join, blocks and <br> separate words, and an
+ *              image's alt text sits where the image is (a broken image or a screen reader shows it);
+ *    attrs     every attribute value on the rendered course markup except style and class, each also
+ *              percent-decoded (link targets, titles, image alt, src and srcset file names);
+ *    problems  rendered markup outside the reviewed output lists (readability gate, unapproved only). */
+function studentView(value) {
+  const problems = new Set();
+  let html;
+  try {
+    html = STUDENT_RENDER(value);
+  } catch (err) {
+    return { text: '', attrs: [], images: [], problems: [`the student page could not render this field (${err?.message ?? err})`] };
+  }
+  if (!html) return { text: '', attrs: [], images: [], problems: [] };
+  const top = PARSE_FRAGMENT(html).childNodes;
+  const wrapper = top.length === 1 && top[0].tagName === 'div' ? top[0] : null;
+  if (!wrapper) problems.add('the student page rendered something other than its one wrapper element');
+  const parts = [];
+  const attrs = [];
+  const images = [];
+  const walk = (node) => {
+    for (const c of node.childNodes ?? []) {
+      if (c.nodeName === '#text') {
+        parts.push(c.value);
+        continue;
+      }
+      if (!c.tagName) continue; // comments are not shown
+      const name = c.tagName;
+      const block = !INLINE_TAGS.has(name);
+      if (block) parts.push(' ');
+      for (const a of c.attrs) {
+        if (a.name !== 'style' && a.name !== 'class') attrs.push(a.value, decodePercent(a.value));
+      }
+      if (name === 'img') {
+        parts.push(c.attrs.find((a) => a.name === 'alt')?.value ?? '');
+        images.push(renderedImageKey(c));
+      }
+      problems.add(outputElementProblem(c));
+      walk(c.content ?? c);
+      if (block) parts.push(' ');
+    }
+  };
+  walk(wrapper ?? { childNodes: top });
+  problems.delete(null);
+  return { text: parts.join(''), attrs: [...new Set(attrs)], images, problems: [...problems] };
+}
+
+/** SHA-256 of a rendered <img>'s attributes (name, value), sorted. A changed src, srcset, alt or
+ *  size is a new, unreviewed image. */
+const renderedImageKey = (el) => sha256(JSON.stringify(el.attrs.map((a) => [a.name, a.value]).sort()));
+
+/** Rendered-output problems of one field for one course: markup outside the reviewed output lists,
+ *  and any rendered image that is not the reviewed one for THIS course. */
+function renderedProblems(view, slug) {
+  const out = [...view.problems];
+  if (view.images.some((key) => !REVIEWED_IMAGES.some((r) => r.slug === slug && r.rendered_sha256 === key))) {
+    out.push('the student page renders an image that has not been reviewed for this course (text inside an image cannot be read)');
+  }
+  return out;
+}
+
+/** A rendered element outside the reviewed output lists, or null. */
+function outputElementProblem(el) {
+  const name = el.tagName;
+  if (!OUTPUT_TAGS.has(name)) return `the student page renders a <${name}> element (not in the reviewed output markup)`;
+  if (name === 'img') return null; // pinned per course by the caller (renderedImageKey)
+  for (const { name: attr, value } of el.attrs) {
+    if (!(READABLE_ATTRS[name] ?? []).includes(attr)) return `the student page renders a ${attr} attribute on <${name}> (not in the reviewed output markup)`;
+    if (attr === 'style') {
+      for (const decl of value.split(';').map(normaliseCss).filter(Boolean)) {
+        if (!READABLE_CSS.get(name)?.has(decl)) return `the student page renders CSS "${decl.slice(0, 60)}" on <${name}> (not a reviewed declaration for it)`;
+      }
+    } else if (READABLE_ATTR_VALUES[`${name}.${attr}`] && !READABLE_ATTR_VALUES[`${name}.${attr}`].includes(value.trim().toLowerCase())) {
+      return `the student page renders ${attr}="${value.slice(0, 30)}" on <${name}> (not a reviewed value)`;
+    }
+  }
+  return null;
+}
+
 /** Every string in a record with its dotted field path (keys are covered by recordShapeProblems). */
 function allStrings(value, path, out) {
   if (typeof value === 'string') out.push([path, value]);
@@ -759,9 +887,15 @@ export function evaluateRecords(file, jsonText, { approvedSlugs, allowlist = ALL
     structural('is not an array of course records; the record scan cannot check it');
     return findings;
   }
-  if (!STUDENT_TEXT_STRIP) {
-    structural(`the student page's text stripper (${STUDENT_STRIP_FILE}) could not be loaded (${STUDENT_STRIP_ERROR}); the checker cannot read records the way learners see them, so this is a failure, never a pass. Node 22.18 or later loads it`);
+  if (!STUDENT_RENDER || !STUDENT_TEXT_STRIP) {
+    structural(`the student page's render path (${STUDENT_RENDER_FILES.join(', ')}, through tsx) could not be loaded (${STUDENT_RENDER_ERROR}); the checker cannot read records the way learners see them, so this is a failure, never a pass. Run npm ci first`);
   }
+  // One render per distinct field value per scan (the readability gate and the wording rules share it).
+  const viewCache = new Map();
+  const viewOf = (value) => {
+    if (!viewCache.has(value)) viewCache.set(value, studentView(value));
+    return viewCache.get(value);
+  };
   const seenSlugs = new Set();
   rows.forEach((row, i) => {
     if (!row || typeof row !== 'object' || Array.isArray(row)) {
@@ -791,9 +925,11 @@ export function evaluateRecords(file, jsonText, { approvedSlugs, allowlist = ALL
         const shown = studentStrip(value);
         // The student page deletes <style> blocks (sanitizeCourseHtml forbids them), so the stripped
         // view drops them unchecked; the stored view above still compares them exactly.
+        // GP-673 review r2: and what the real student page renders must use only reviewed markup.
         const problems = new Set([
           ...readabilityProblems(value, slug),
           ...(shown !== value ? readabilityProblems(shown, slug, { compareStyleBlocks: false }) : []),
+          ...(STUDENT_RENDER ? renderedProblems(viewOf(value), slug) : []),
         ]);
         for (const problem of problems) unreadable(field, problem);
       }
@@ -843,6 +979,24 @@ export function evaluateRecords(file, jsonText, { approvedSlugs, allowlist = ALL
             if (hitRules.has(rule) || !flags(rule, view)) continue;
             hitRules.add(rule);
             findings.push({ file, slug, field, line: 0, text: view, message: `${rule.message} (as shown after the page removes AI-writing markers)` });
+          }
+        }
+      }
+      // GP-673 review r2 (Codex, P1 x3): the field as the REAL student page renders it (purchase
+      // block and <style> removed, Markdown tables and links rendered), then every attribute the
+      // rendered page carries (link targets, titles, image alt / src / file names).
+      if (STUDENT_RENDER) {
+        const view = viewOf(value);
+        const views = [
+          [view.text, 'as the student page renders it'],
+          ...view.attrs.map((a) => [a, 'in a link or image attribute on the student page']),
+        ];
+        for (const [raw, where] of views) {
+          const text = recordTextLines(raw).join(' ');
+          for (const rule of rules) {
+            if (hitRules.has(rule) || !flags(rule, text)) continue;
+            hitRules.add(rule);
+            findings.push({ file, slug, field, line: 0, text, message: `${rule.message} (${where})` });
           }
         }
       }
@@ -910,6 +1064,9 @@ function formatRecordFinding(f) {
 function inRecordScope(f) { const n = f.replace(/\\/g, '/'); return n.endsWith('.json') && RECORD_SCANNED_DIRS.some((d) => n.startsWith(d)); }
 
 export { BANNED, CEC_NUMBER, CEC_APPROVED_SLUGS, inScope, isExempt, normaliseLine, ALLOWLIST, IICRC_FREE_FILES };
+// The rendered-output layer on its own, so the self-test can prove each part works even where the
+// input gate would already block the same record.
+export { studentView, renderedProblems };
 
 function main() {
   let list = '';
