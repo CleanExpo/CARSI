@@ -126,6 +126,10 @@ describe('compliance (d)', () => {
       'Is the Google Business Profile module acreditation ready?',
       'Do Google Business Profile reviews give me a qualifcation?',
       'Is the Google Business Profile module I.I.C.R.C. recognised?',
+      // Codex r4 P1: continuing professional development.
+      'Can I use the Google Business Profile module for my CPD?',
+      'Does the Google Business Profile module count for C.P.D. points?',
+      'Is the Google Business Profile module professional development I can log?',
       'Do Google Business Profile reviews earn credits toward anything?',
       'Is the Google Business Profile module aproved?',
     ]) {
@@ -198,6 +202,14 @@ describe('default knowledge base', () => {
       expect(item.sourceHref).toMatch(/^(\/|https:\/\/)/);
     }
     expect(getCoachKnowledgeBase('some-other-coach')).toBeNull();
+  });
+
+  it('sends a CPD question to the coach even though the default material matches it', () => {
+    const kb = getCoachKnowledgeBase(DEFAULT_COACHING_COACH.id);
+    if (!kb) throw new Error('missing default knowledge base');
+    expect(
+      answerFromKnowledgeBase('Can I use the Google Business Profile module for my CPD?', kb)
+    ).toEqual({ status: 'needs_coach', reason: 'compliance_topic' });
   });
 
   it('answers a real member question from the default coach material', () => {

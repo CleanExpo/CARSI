@@ -68,15 +68,15 @@ export function normaliseQuestion(raw: unknown): string | null {
  * Three review rounds each found a new spelling past a word list ("cert", "recertification",
  * "C.E.C.", "cerification"), so the check now covers the whole class at once:
  *   1. stems anywhere in a word (cert, accred, licen, qualif, credent, designat, approv, credit);
- *   2. the acronyms IICRC and CEC with all punctuation and spacing removed ("C.E.C.", "c e c");
+ *   2. the acronyms IICRC, CEC and CPD with all punctuation and spacing removed ("C.E.C.", "c e c");
  *   3. any word within a small edit distance of a credential term, so misspellings still match.
  * A false positive only sends a question to the coach, which is the safe direction. "certain"
  * is the one carve-out, because it is everyday English with no credential meaning.
  */
 const COMPLIANCE_STEM_RE =
-  /cert(?!ain)|accred|licen[cs]|qualif|credent|designat|\bapprov|\bcredit|continuing[\s-]*ed/i;
+  /cert(?!ain)|accred|licen[cs]|qualif|credent|designat|\bapprov|\bcredit|continuing[\s-]*ed|professional[\s-]*develop/i;
 
-const COMPLIANCE_ACRONYMS = ['iicrc', 'cec'];
+const COMPLIANCE_ACRONYMS = ['iicrc', 'cec', 'cpd'];
 
 const COMPLIANCE_TERMS = [
   'certification',
