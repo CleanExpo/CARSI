@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { findComplianceIssues } from './compliance';
+import { KNOWN_TRADE_LABELS, tradeLabel } from './site-review';
 import { assembleCalendar, buildFallbackPosts, CALENDAR_DAYS } from './social-calendar';
 
 const voice = {
@@ -200,5 +201,42 @@ describe('calendar trade voice for trades beyond the first label set (Codex P1, 
     );
     expect(calendar.tradeMatched).toBe(false);
     expect(calendar.posts).toHaveLength(30);
+  });
+});
+
+describe('a trade is never given another trade’s wording (Codex P1, head 02eba1cb)', () => {
+  const start = new Date('2026-11-09');
+  const label = (trade: string, services = '') => {
+    const c = assembleCalendar({ businessName: '', trade, town: '', services }, start);
+    return c.tradeMatched ? c.posts[0].caption : null;
+  };
+
+  it.each(['Window glazing', 'Roof plumber', 'Glass and window repairs', 'Painter and tiler'])(
+    'compound trade "%s" names two trades, so it gets general wording and the notice',
+    (trade) => {
+      expect(label(trade)).toBeNull();
+    }
+  );
+
+  it.each([
+    ['Window cleaner', '', 'window cleaning'],
+    ['Flood restoration', '', 'water damage restoration'],
+    ['Restoration', 'Water damage, mould, fire', 'restoration'],
+    ['Trauma and biohazard cleaning', '', 'biohazard cleaning'],
+    ['Owner operator', 'Carpet cleaning', 'carpet and upholstery cleaning'],
+  ])('"%s" / "%s" keeps its specific label "%s"', (trade, services, expected) => {
+    expect(label(trade, services)).toBe(
+      `G'day! We do ${expected} work. Over the next month we'll share what we do and a few tips for looking after your place.`
+    );
+  });
+});
+
+describe('no two label rules overlap', () => {
+  it('every known label, typed as a trade, maps back to itself', () => {
+    expect(KNOWN_TRADE_LABELS.length).toBeGreaterThan(30);
+    const crossed = KNOWN_TRADE_LABELS.filter((l) => tradeLabel(l) !== l).map(
+      (l) => `${l} -> ${tradeLabel(l) || '(none)'}`
+    );
+    expect(crossed).toEqual([]);
   });
 });

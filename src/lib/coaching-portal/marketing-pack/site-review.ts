@@ -7,10 +7,9 @@
 import { isCompliantCopy } from './compliance';
 import type { MarketingFix, SiteCheck, SiteFetchResult, SiteReview, TradeVoice } from './types';
 
-/** Known trades, most specific first. Generated copy only ever names a trade by these labels. */
+/** Known trades. Generated copy only ever names a trade by these labels. */
 const TRADE_LABELS: Array<[RegExp, string]> = [
-  // Specialist cleaning first, so the generic /clean/ and /removal/ rules below cannot claim them.
-  [/waterproof/i, 'waterproofing'], // before /roof/
+  [/waterproof/i, 'waterproofing'],
   [/biohazard|trauma|crime scene/i, 'biohazard cleaning'],
   [/asbestos/i, 'asbestos removal'],
   [/graffiti/i, 'graffiti removal'],
@@ -20,14 +19,15 @@ const TRADE_LABELS: Array<[RegExp, string]> = [
   [/carpet|rug|upholster/i, 'carpet and upholstery cleaning'],
   [/mou?ld/i, 'mould remediation'],
   [/fire|smoke|soot/i, 'fire and smoke restoration'],
-  [/water damage|flood|restor|drying/i, 'water damage restoration'],
+  [/water damage|flood|drying/i, 'water damage restoration'],
+  [/restor/i, 'restoration'],
   [/pressure|soft wash|exterior wash/i, 'pressure washing'],
   [/window/i, 'window cleaning'],
   [/clean/i, 'cleaning'],
   [/plumb|drain|gas fit/i, 'plumbing'],
   [/electric/i, 'electrical'],
   [/paint/i, 'painting'],
-  [/roof|gutter/i, 'roofing'],
+  [/\broof|gutter/i, 'roofing'],
   [/pest|termite/i, 'pest control'],
   [/floor|tiling|tiler|\btile/i, 'flooring'],
   [/air ?con|hvac|refrigerat/i, 'air conditioning'],
@@ -48,9 +48,29 @@ const TRADE_LABELS: Array<[RegExp, string]> = [
   [/removalist|\bremovals\b/i, 'removals'],
 ];
 
+/** Every label generated copy can use; each must map back to itself (tested). */
+export const KNOWN_TRADE_LABELS: readonly string[] = [...new Set(TRADE_LABELS.map(([, l]) => l))];
+
+/** Broad labels that give way to any specific one: "Carpet cleaning" is carpet cleaning. */
+const GENERIC_LABELS = new Set(['cleaning', 'restoration']);
+
+/** null: the text names no known trade. '': it names two or more, so no label is safe. */
+function labelFor(text: string): string | null {
+  const found = [...new Set(TRADE_LABELS.filter(([p]) => p.test(text)).map(([, l]) => l))];
+  if (found.length === 0) return null;
+  const specific = found.filter((l) => !GENERIC_LABELS.has(l));
+  const pick = specific.length > 0 ? specific : found;
+  return pick.length === 1 ? pick[0] : '';
+}
+
+/**
+ * The member's trade as a fixed label, or '' when there is no single safe one. Order in the list
+ * never decides: a trade naming two specific trades ("Window glazing", "Roof plumber") gets no
+ * label, so the member sees general wording and the notice rather than another trade's wording
+ * (Codex P1, head 02eba1cb). The trade field decides; services are read only when it names none.
+ */
 export function tradeLabel(trade: string, services = ''): string {
-  const text = `${trade} ${services}`;
-  return TRADE_LABELS.find(([pattern]) => pattern.test(text))?.[1] ?? '';
+  return labelFor(trade) ?? labelFor(services) ?? '';
 }
 
 /**
