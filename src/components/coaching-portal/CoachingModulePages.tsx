@@ -12,6 +12,7 @@ import {
   coachingPrimaryBtn,
   coachingSecondaryBtn,
 } from '@/components/coaching-portal/coaching-ui';
+import { CoachingAskCoachPanel } from '@/components/coaching-portal/CoachingAskCoachPanel';
 import { CoachingGrowthQuoteDialog } from '@/components/coaching-portal/CoachingGrowthQuoteDialog';
 import { useCoachingPortal } from '@/components/coaching-portal/CoachingPortalContext';
 import { CoachingSessionPrepCard } from '@/components/coaching-portal/CoachingSessionPrepCard';
@@ -175,6 +176,8 @@ export function CoachingPlanPage() {
           </button>
         ) : null}
       </section>
+
+      <CoachingAskCoachPanel className="mt-4" />
     </div>
   );
 }

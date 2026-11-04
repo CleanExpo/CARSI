@@ -22,7 +22,13 @@ function matches(row: Row, where: Record<string, unknown>): boolean {
   return Object.entries(where).every(([k, v]) => {
     // Prisma combinators used by the store since the learning-path merge (GP-633).
     if (k === 'OR') return (v as Record<string, unknown>[]).some((w) => matches(row, w));
-    if (k === 'NOT') return !matches(row, v as Record<string, unknown>);
+    // NOT takes one filter or a list, and a list means none of them may match.
+    if (k === 'NOT') {
+      const list = Array.isArray(v)
+        ? (v as Record<string, unknown>[])
+        : [v as Record<string, unknown>];
+      return list.every((w) => !matches(row, w));
+    }
     if (v && typeof v === 'object' && 'in' in (v as object)) {
       return ((v as { in: unknown[] }).in ?? []).includes(row[k as keyof Row]);
     }
@@ -207,6 +213,17 @@ describe('proposed actions in the actions store', () => {
     expect(await store.deleteCoachingActionForUser('member-1', 'd1')).toBe(false);
     expect(await store.deleteCoachingActionForUser('member-1', 'w1')).toBe(true);
     expect(rows.map((r) => r.id).sort()).toEqual(['d1', 'p1']);
+  });
+
+  it('after the GP-630 merge a member still cannot delete a learning course or a question to the coach', async () => {
+    seedProposed('q1');
+    rows[0] = { ...rows[0], status: 'todo', goalId: 'ask-coach:coach-1' };
+    rows.push({ ...rows[0], id: 'l1', goalId: 'course:course-1' });
+    rows.push({ ...rows[0], id: 'm1', goalId: 'marketing-pack:gbp-missing' });
+    expect(await store.deleteCoachingActionForUser('member-1', 'q1')).toBe(false);
+    expect(await store.deleteCoachingActionForUser('member-1', 'l1')).toBe(false);
+    expect(await store.deleteCoachingActionForUser('member-1', 'm1')).toBe(true);
+    expect(rows.map((r) => r.id).sort()).toEqual(['l1', 'q1']);
   });
 
   it('reviewing an unknown action is not found', async () => {
