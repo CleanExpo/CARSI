@@ -101,7 +101,7 @@ describe('AdminShell responsive navigation', () => {
     });
     expect(document.querySelector('[role="dialog"]')).toBeNull();
     expect(trigger().getAttribute('aria-expanded')).toBe('false');
-    expect(document.activeElement).toBe(trigger());
+    await vi.waitFor(() => expect(document.activeElement).toBe(trigger()));
   });
 
   it('closes when selecting a navigation link, including the current page', async () => {
@@ -114,7 +114,7 @@ describe('AdminShell responsive navigation', () => {
     link.addEventListener('click', (event) => event.preventDefault());
     await act(async () => link.click());
     expect(document.querySelector('[role="dialog"]')).toBeNull();
-    expect(document.activeElement).toBe(trigger());
+    await vi.waitFor(() => expect(document.activeElement).toBe(trigger()));
   });
 
   it('closes when the route changes outside a navigation click', async () => {
@@ -136,5 +136,14 @@ describe('AdminShell responsive navigation', () => {
     await open();
     await act(async () => onBreakpoint?.({ matches: true }));
     expect(document.querySelector('[role="dialog"]')).toBeNull();
+  });
+
+  it('keeps desktop navigation sizing while the phone drawer can scroll', async () => {
+    await render();
+    const nav = container.querySelector('aside nav')!;
+    expect(nav.classList.contains('overflow-y-auto')).toBe(true);
+    expect(nav.classList.contains('md:overflow-visible')).toBe(true);
+    expect(nav.classList.contains('md:min-h-auto')).toBe(true);
+    expect(nav.classList.contains('whitespace-nowrap')).toBe(true);
   });
 });

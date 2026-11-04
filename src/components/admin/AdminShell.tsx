@@ -133,7 +133,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
       <nav
         aria-label="Admin navigation"
-        className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto px-2 py-4 [&>*]:shrink-0"
+        className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto px-2 py-4 whitespace-nowrap md:min-h-auto md:overflow-visible [&>*]:shrink-0"
         onClick={(event) => {
           if ((event.target as HTMLElement).closest('a')) setOpen(false);
         }}
