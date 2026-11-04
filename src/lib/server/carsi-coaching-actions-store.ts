@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 
+import { ASK_COACH_GOAL_PREFIX, isAskCoachGoalId } from '@/lib/coaching-portal/ask-my-coach';
 import {
   LEARNING_GOAL_PREFIX,
   LEARNING_PROPOSED_STATUS,
@@ -135,8 +136,12 @@ export async function upsertCoachingActionForUser(
     // edit, and must not be re-created under the same id either.
     if (owned && MEMBER_HIDDEN_STATUSES.includes(owned.status)) return;
     if (owned) {
-      // A prescribed course's title and status follow the LMS; the member can only add a note.
-      const update = isLearningAction(owned.goalId) ? { progressNote: data.progressNote } : data;
+      // A prescribed course's title and status follow the LMS, and a question to the coach
+      // (GP-630) is closed by the coach's answer; on both the member can only add a note.
+      const update =
+        isLearningAction(owned.goalId) || isAskCoachGoalId(owned.goalId)
+          ? { progressNote: data.progressNote }
+          : data;
       await prisma.carsiCoachingAction.update({ where: { id: owned.id }, data: update });
       return;
     }
@@ -151,13 +156,22 @@ export async function deleteCoachingActionForUser(
   userId: string,
   actionId: string
 ): Promise<boolean> {
-  // Prescribed courses are removed by the coach (admin learning-path review), not the member.
-  // goal_id is nullable, so "not a learning action" must include NULL explicitly.
+  // Prescribed courses are removed by the coach (admin learning-path review), not the member,
+  // and a question sent to the coach (GP-630) stays until the coach has answered it.
+  // goal_id is nullable, so "not a protected action" must include NULL explicitly.
   const result = await prisma.carsiCoachingAction.deleteMany({
     where: {
       id: actionId,
       userId,
-      OR: [{ goalId: null }, { NOT: { goalId: { startsWith: LEARNING_GOAL_PREFIX } } }],
+      OR: [
+        { goalId: null },
+        {
+          NOT: [
+            { goalId: { startsWith: LEARNING_GOAL_PREFIX } },
+            { goalId: { startsWith: ASK_COACH_GOAL_PREFIX } },
+          ],
+        },
+      ],
     },
   });
   return result.count > 0;
