@@ -697,6 +697,7 @@ function inScope(file) {
  *  that legitimately quote the banned phrases in order to forbid them. */
 const EXEMPT = [
   'scripts/check-iicrc-terminology.mjs',
+  'docs/agents/CLAUDE.md',
   'CLAUDE.md',
   'skills/context/project-context.skill.md',
   // The course-asset-kit engine's banned-phrase scanner mirrors this guard's
