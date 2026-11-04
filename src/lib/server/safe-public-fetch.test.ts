@@ -2,7 +2,12 @@ import { createServer, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import { createGuardedLookup, fetchPublicPage, requestPage } from './safe-public-fetch';
+import {
+  createGuardedLookup,
+  fetchPublicPage,
+  requestPage,
+  resolveRedirectTarget,
+} from './safe-public-fetch';
 
 let server: Server;
 let port = 0;
@@ -140,5 +145,22 @@ describe('oversized pages (Codex P1, head 06f8e812)', () => {
     expect(res.ok).toBe(false);
     expect(res.error).toBe('page too large to check');
     expect(res.body).toBeUndefined();
+  });
+});
+
+describe('malformed redirects (Codex P1, head a7d9f836)', () => {
+  it('an unparseable Location is a failed hop, not a thrown error', () => {
+    expect(() =>
+      resolveRedirectTarget('http://[', new URL('https://downs.example/'))
+    ).not.toThrow();
+    expect(resolveRedirectTarget('http://[', new URL('https://downs.example/'))).toEqual({
+      ok: false,
+      reason: 'invalid redirect',
+    });
+  });
+
+  it('positive control: a normal relative Location still resolves', () => {
+    const next = resolveRedirectTarget('/about', new URL('https://downs.example/'));
+    expect(next.ok && next.url.toString()).toBe('https://downs.example/about');
   });
 });

@@ -271,6 +271,23 @@ export function requestPage(
   });
 }
 
+/**
+ * Resolve and validate a redirect Location. An unparseable Location is a failed hop, never a
+ * thrown error, so one bad redirect cannot abort the whole marketing pack (Codex P1, head a7d9f836).
+ */
+export function resolveRedirectTarget(
+  location: string,
+  base: URL
+): ReturnType<typeof validatePublicHttpUrl> {
+  let target: string;
+  try {
+    target = new URL(location, base).toString();
+  } catch {
+    return { ok: false, reason: 'invalid redirect' };
+  }
+  return validatePublicHttpUrl(target);
+}
+
 export async function fetchPublicPage(
   raw: string,
   lookup: GuardedLookup = createGuardedLookup(systemResolver),
@@ -287,7 +304,7 @@ export async function fetchPublicPage(
       if (!page.location) {
         return { ok: false, status: page.status, html: null, error: 'redirect without location' };
       }
-      const next = validatePublicHttpUrl(new URL(page.location, url).toString());
+      const next = resolveRedirectTarget(page.location, url);
       if (!next.ok) return { ok: false, status: page.status, html: null, error: next.reason };
       url = next.url;
       continue;
