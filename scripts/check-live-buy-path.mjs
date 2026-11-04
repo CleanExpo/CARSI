@@ -80,8 +80,9 @@ export function findLocalOrigins(text, { attributeValues = false } = {}) {
   const found = (s.match(LOCAL_ORIGIN_RE) || []).map((m) => m.toLowerCase().replace(/\\\//g, '/'));
   for (const m of s.matchAll(URL_LIKE_RE)) {
     const [, scheme, authority] = m;
+    // Browsers strip spaces around a URL value, so `href=" //host"` is still a link.
     const inAttribute =
-      attributeValues || /=\s*["']?$/.test(s.slice(Math.max(0, m.index - 3), m.index));
+      attributeValues || /=\s*["']?\s*$/.test(s.slice(Math.max(0, m.index - 16), m.index));
     if (!scheme && !inAttribute && !/[.:]/.test(authority)) continue;
     let host;
     try {
@@ -481,23 +482,34 @@ export async function audit(faults = []) {
           );
           continue;
         }
-        // The card must still ask for the buyer's email: checkout cannot start without it.
+        // The card must still ask for the buyer's email: checkout cannot start without it. The
+        // field counts only if a buyer can see it: no hidden or transparent element from the field
+        // up to the page, and some of it left after every ancestor that clips its overflow.
         const hasEmail = await page.evaluate(
-          (sel) =>
-            [...document.querySelectorAll(sel)].some((card) =>
-              [...card.querySelectorAll('input[type="email"], input[name*="email" i]')].some(
-                (el) => {
-                  const r = el.getBoundingClientRect();
-                  const st = getComputedStyle(el);
-                  return (
-                    r.width > 0 &&
-                    r.height > 0 &&
-                    st.visibility !== 'hidden' &&
-                    st.display !== 'none'
-                  );
+          (sel) => {
+            const usable = (el) => {
+              const r = el.getBoundingClientRect();
+              let box = { l: r.left, t: r.top, r: r.right, b: r.bottom };
+              for (let n = el; n && n.nodeType === 1; n = n.parentElement) {
+                const st = getComputedStyle(n);
+                if (st.display === 'none' || st.visibility === 'hidden' || Number(st.opacity) === 0)
+                  return false;
+                if (n !== el && (st.overflowX !== 'visible' || st.overflowY !== 'visible')) {
+                  const c = n.getBoundingClientRect();
+                  box = {
+                    l: Math.max(box.l, c.left),
+                    t: Math.max(box.t, c.top),
+                    r: Math.min(box.r, c.right),
+                    b: Math.min(box.b, c.bottom),
+                  };
                 }
-              )
-            ),
+              }
+              return box.r - box.l > 0 && box.b - box.t > 0;
+            };
+            return [...document.querySelectorAll(sel)].some((card) =>
+              [...card.querySelectorAll('input[type="email"], input[name*="email" i]')].some(usable)
+            );
+          },
           QUICK_ENROL_CARD_SELECTOR
         );
         if (!hasEmail) faults.push(`QUICK-ENROL CARD HAS NO EMAIL FIELD ${path} (${scheme})`);

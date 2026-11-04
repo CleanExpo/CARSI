@@ -247,6 +247,10 @@ check('a dotless scheme-relative host is caught when it is an attribute value', 
   ]);
   // In prose it stays a comment-shaped string, not a link.
   assert.deepEqual(findLocalOrigins('wait //10 then retry'), []);
+  // CodeRabbit on #1033 (round 2): browsers strip spaces around a URL value, so these are links too.
+  assert.deepEqual(findLocalOrigins('<a href=" //2130706433/learn">x</a>'), ['//2130706433']);
+  assert.deepEqual(findLocalOrigins("<a href = '  //2130706433'>x</a>"), ['//2130706433']);
+  assert.deepEqual(findLocalOrigins('<img src=\n\t//2130706433/p.png>'), ['//2130706433']);
 });
 check('the quick-enrol card selector is the data attribute on the card (GP-674)', () => {
   assert.equal(QUICK_ENROL_CARD_ATTR, 'data-quick-enrol-card');

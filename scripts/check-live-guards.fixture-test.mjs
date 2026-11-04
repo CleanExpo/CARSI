@@ -18,6 +18,8 @@
  *   buy path            clean (quick-enrol card AND a newsletter)    -> 0
  *                       card gone, newsletter email form still there -> 1  NO QUICK-ENROL CARD
  *                       card shown but with no email field           -> 1  QUICK-ENROL CARD HAS NO EMAIL FIELD
+ *                       email field under a transparent wrapper      -> 1  QUICK-ENROL CARD HAS NO EMAIL FIELD
+ *                       email field under a zero-height clip         -> 1  QUICK-ENROL CARD HAS NO EMAIL FIELD
  *                       http://127.1:8080/ and http://2130706433:8080/ in page text -> 1 LOCALHOST
  *
  * The clean runs are the positive controls: without them a fixture that is broken in some other
@@ -111,15 +113,22 @@ function cecPage({ plantNonCec, decoyCounter }) {
 }
 
 const field = 'style="color:#111;background:#fff;border:1px solid #555;display:block"';
-const quickEnrolCard = (withEmail = true) =>
+// email: 'shown', 'none', or present but unusable: under a transparent or a zero-height clipped wrapper.
+const EMAIL_WRAP = {
+  shown: '<div>',
+  transparent: '<div style="opacity:0">',
+  clipped: '<div style="height:0;overflow:hidden">',
+};
+const quickEnrolCard = (email = 'shown') =>
   `<form data-quick-enrol-card="" style="background:#fff;color:#111;padding:8px">` +
   `<label for="guest-full-name" style="color:#111">Full name</label>` +
   `<input id="guest-full-name" ${field}>` +
-  (withEmail
-    ? `<label for="guest-email" style="color:#111">Email</label>` +
-      `<input id="guest-email" type="email" ${field}>`
-    : '') +
+  (email === 'none'
+    ? ''
+    : `${EMAIL_WRAP[email]}<label for="guest-email" style="color:#111">Email</label>` +
+      `<input id="guest-email" type="email" ${field}></div>`) +
   `</form>`;
+const EMAIL_SCENARIO = { noEmail: 'none', hiddenEmail: 'transparent', clippedEmail: 'clipped' };
 const newsletter =
   `<form class="newsletter"><label for="nl" style="color:#111">Newsletter</label>` +
   `<input id="nl" type="email" name="email" ${field}></form>`;
@@ -128,7 +137,7 @@ function buyPage(path, scenario) {
   if (PAID_PATHS.includes(path)) {
     return doc(
       `${nav}<h1>Paid course</h1>` +
-        (scenario === 'noCard' ? '' : quickEnrolCard(scenario !== 'noEmail')) +
+        (scenario === 'noCard' ? '' : quickEnrolCard(EMAIL_SCENARIO[scenario] || 'shown')) +
         newsletter
     );
   }
@@ -230,6 +239,8 @@ const CASES = [
   ['buy:clean', './check-live-buy-path.mjs', 0, /passed/],
   ['buy:noCard', './check-live-buy-path.mjs', 1, /NO QUICK-ENROL CARD/],
   ['buy:noEmail', './check-live-buy-path.mjs', 1, /QUICK-ENROL CARD HAS NO EMAIL FIELD/],
+  ['buy:hiddenEmail', './check-live-buy-path.mjs', 1, /QUICK-ENROL CARD HAS NO EMAIL FIELD/],
+  ['buy:clippedEmail', './check-live-buy-path.mjs', 1, /QUICK-ENROL CARD HAS NO EMAIL FIELD/],
   [
     'buy:loopback',
     './check-live-buy-path.mjs',
