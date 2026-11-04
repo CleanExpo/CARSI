@@ -1,0 +1,140 @@
+// @vitest-environment jsdom
+
+import { act } from 'react';
+import { createRoot, type Root } from 'react-dom/client';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { AdminShell } from './AdminShell';
+
+globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+
+const navigation = vi.hoisted(() => ({ pathname: '/admin/coaching-learning-paths' }));
+vi.mock('next/navigation', () => ({
+  usePathname: () => navigation.pathname,
+  useRouter: () => ({ push: vi.fn() }),
+}));
+vi.mock('@/components/auth/auth-provider', () => ({
+  useAuth: () => ({ user: null, signOut: vi.fn() }),
+}));
+vi.mock('@/components/layout/ViewModeToggle', () => ({ ViewModeToggle: () => null }));
+
+let root: Root;
+let container: HTMLDivElement;
+let desktop: boolean;
+let onBreakpoint: ((event: { matches: boolean }) => void) | undefined;
+
+beforeEach(() => {
+  navigation.pathname = '/admin/coaching-learning-paths';
+  desktop = false;
+  onBreakpoint = undefined;
+  vi.stubGlobal(
+    'matchMedia',
+    vi.fn(() => ({
+      matches: desktop,
+      addEventListener: (_: string, listener: typeof onBreakpoint) => {
+        onBreakpoint = listener;
+      },
+      removeEventListener: vi.fn(),
+    }))
+  );
+  container = document.createElement('div');
+  document.body.appendChild(container);
+  root = createRoot(container);
+});
+
+afterEach(async () => {
+  await act(async () => root.unmount());
+  container.remove();
+  vi.unstubAllGlobals();
+});
+
+async function render() {
+  await act(async () =>
+    root.render(
+      <AdminShell>
+        <h1>Learning paths</h1>
+      </AdminShell>
+    )
+  );
+}
+
+function trigger() {
+  const button = container.querySelector<HTMLButtonElement>(
+    'button[aria-label="Open navigation menu"]'
+  );
+  expect(button, 'phone navigation needs a labelled menu button').not.toBeNull();
+  return button!;
+}
+
+async function open() {
+  trigger().focus();
+  await act(async () => trigger().click());
+  expect(trigger().getAttribute('aria-expanded')).toBe('true');
+  const dialog = document.querySelector<HTMLElement>('[role="dialog"]');
+  expect(dialog).not.toBeNull();
+  return dialog!;
+}
+
+describe('AdminShell responsive navigation', () => {
+  it('at phone width hides the persistent sidebar and opens navigation with the menu button', async () => {
+    await render();
+    const sidebar = container.querySelector('aside')!;
+    expect(sidebar.classList.contains('hidden')).toBe(true);
+    expect(sidebar.classList.contains('md:flex')).toBe(true);
+    expect(trigger().closest('header')?.classList.contains('md:hidden')).toBe(true);
+    expect(trigger().getAttribute('aria-expanded')).toBe('false');
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
+    const dialog = await open();
+    expect(dialog.textContent).toContain('Learning paths');
+    expect(dialog.textContent).toContain('Owner Circle');
+    expect(dialog.getAttribute('aria-modal')).toBe('true');
+    expect(dialog.contains(document.activeElement)).toBe(true);
+  });
+
+  it('Escape closes the drawer and returns focus to the menu button', async () => {
+    await render();
+    await open();
+    await act(async () => {
+      document.activeElement?.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
+      );
+    });
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
+    expect(trigger().getAttribute('aria-expanded')).toBe('false');
+    expect(document.activeElement).toBe(trigger());
+  });
+
+  it('closes when selecting a navigation link, including the current page', async () => {
+    await render();
+    const dialog = await open();
+    const link = dialog.querySelector<HTMLAnchorElement>(
+      'a[href="/admin/coaching-learning-paths"]'
+    )!;
+    // Keep jsdom from attempting a full navigation; the real click still reaches the nav.
+    link.addEventListener('click', (event) => event.preventDefault());
+    await act(async () => link.click());
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
+    expect(document.activeElement).toBe(trigger());
+  });
+
+  it('closes when the route changes outside a navigation click', async () => {
+    await render();
+    await open();
+    navigation.pathname = '/admin/business-coaching';
+    await render();
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
+  });
+
+  it('at desktop width retains the 240px sidebar and clears any open mobile modal on resize', async () => {
+    desktop = true;
+    await render();
+    const sidebar = container.querySelector('aside')!;
+    expect(sidebar.classList.contains('md:w-[240px]')).toBe(true);
+    expect(sidebar.classList.contains('md:flex')).toBe(true);
+    expect(sidebar.querySelectorAll('nav a')).toHaveLength(17);
+    expect(container.querySelector('main')?.classList.contains('min-w-0')).toBe(true);
+    await open();
+    await act(async () => onBreakpoint?.({ matches: true }));
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
+  });
+});
