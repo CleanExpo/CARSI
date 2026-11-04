@@ -24,6 +24,7 @@ import {
 import {
   getMyAccountability,
   recordPortalVisit,
+  saveMyKpis,
   type AccountabilityStore,
 } from '@/lib/server/carsi-coaching-accountability';
 
@@ -169,6 +170,49 @@ describe('the quiet banner after another page has already recorded the visit', (
     const view = await getMyAccountability(store, USER, back);
     expect(view.quiet).toEqual({ daysSilent: 15 });
     expect(box.acc?.lastSeenAt).toBe(back.toISOString());
+  });
+});
+
+describe('writes that land between the visit and the Home view', () => {
+  it('keeps the quiet mark when the member saves KPIs before opening Home', async () => {
+    const { store, box } = memoryStore(setUp(T0));
+    const back = new Date(T0.getTime() + 15 * DAY);
+    await recordPortalVisit(store, USER, back);
+    const saved = await saveMyKpis(
+      store,
+      USER,
+      [{ label: 'Quotes sent' }, { label: 'Jobs won' }, { label: 'Site visits' }],
+      new Date(back.getTime() + 30_000)
+    );
+    expect(saved.status).toBe('ok');
+    expect(box.acc?.quietReturn).toEqual({ daysSilent: 15, at: back.toISOString() });
+    const view = await getMyAccountability(store, USER, new Date(back.getTime() + 60_000));
+    expect(view.quiet).toEqual({ daysSilent: 15 });
+  });
+
+  it('shows the plan it wrote, not the one read before a concurrent KPI save', async () => {
+    const { store, box } = memoryStore(setUp(T0));
+    const back = new Date(T0.getTime() + 15 * DAY);
+    const defs = normaliseKpiDefinitions([
+      { label: 'Calls made' },
+      { label: 'Jobs won' },
+      { label: 'Reviews' },
+    ]);
+    if (!defs.ok) throw new Error('fixture');
+    const realRead = store.readPlan.bind(store);
+    let reads = 0;
+    store.readPlan = async (userId) => {
+      const plan = await realRead(userId);
+      reads += 1;
+      // A KPI save from another tab commits right after the view's first read.
+      if (reads === 1 && box.acc) {
+        box.acc = { ...box.acc, kpis: defs.kpis };
+        box.version += 1;
+      }
+      return plan;
+    };
+    const view = await getMyAccountability(store, USER, back);
+    expect(view.kpis.map((k) => k.label)).toEqual(['Calls made', 'Jobs won', 'Reviews']);
   });
 });
 

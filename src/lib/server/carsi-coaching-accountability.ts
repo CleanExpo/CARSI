@@ -199,12 +199,15 @@ export async function getMyAccountability(
   const [plan, actions] = await Promise.all([store.readPlan(userId), store.listActions(userId)]);
   const acc = plan?.accountability ?? null;
   let quiet: { daysSilent: number } | null = null;
+  let latest = acc;
   if (acc && (visitDue(acc, now) || acc.quietReturn)) {
     // Records the visit if one is due, and clears the "returned after a quiet spell" mark.
     // The banner is decided inside the compare-and-set loop, from the plan version this view
     // actually wrote, so two views loading together show it once (Codex r1 P2). A view that
     // finds nothing to write (the other view got there first) shows no banner.
-    await mutatePlan(store, userId, (current) => {
+    // The view is built from the plan this write produced or found, not the earlier read, so a
+    // KPI or check-in save that lands in between is not shown stale.
+    latest = await mutatePlan(store, userId, (current) => {
       quiet = null;
       if (!current) return null;
       const visited = withVisit(current, now) ?? current;
@@ -214,7 +217,7 @@ export async function getMyAccountability(
       return rest;
     });
   }
-  return memberView(acc, actions, now, quiet);
+  return memberView(latest, actions, now, quiet);
 }
 
 export type SaveOutcome =

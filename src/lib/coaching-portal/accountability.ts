@@ -211,6 +211,8 @@ export function applyKpiDefinitions(
     checkIns: current?.checkIns ?? [],
     lastSeenAt: nowIso,
     notified: current?.notified ?? {},
+    // A KPI save must not drop a visit's "returned after a quiet spell" mark (GP-677).
+    ...(current?.quietReturn ? { quietReturn: current.quietReturn } : {}),
   };
 }
 
