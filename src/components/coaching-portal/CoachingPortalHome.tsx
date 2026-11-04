@@ -12,6 +12,7 @@ import {
   coachingPrimaryBtn,
   coachingSecondaryBtn,
 } from '@/components/coaching-portal/coaching-ui';
+import { CoachingAskCoachPanel } from '@/components/coaching-portal/CoachingAskCoachPanel';
 import { CoachingOnboardingStatusBar } from '@/components/coaching-portal/CoachingOnboardingStatusBar';
 import { useCoachingPortal } from '@/components/coaching-portal/CoachingPortalContext';
 import { CheckCircle2, Circle } from 'lucide-react';
@@ -300,6 +301,8 @@ function ActiveHome() {
             </p>
           )}
         </section>
+
+        <CoachingAskCoachPanel className="lg:col-span-2" />
       </div>
     </div>
   );
