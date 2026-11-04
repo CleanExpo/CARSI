@@ -19,6 +19,7 @@ const state = vi.hoisted(() => ({
   admin: false,
   corpus: [] as CoachCorpusRecord[],
   questions: 0,
+  extraCount: 0,
 }));
 
 vi.mock('@/lib/server/auth-from-request', () => ({
@@ -43,6 +44,9 @@ vi.mock('@/lib/server/carsi-coaching-coach-corpus-store', () => {
     },
     async listApprovedItems(coachId) {
       return state.corpus.filter((r) => r.coachId === coachId && r.approvedAt !== null);
+    },
+    async countItems(coachId) {
+      return state.corpus.filter((r) => r.coachId === coachId).length + state.extraCount;
     },
     async createItem(coachId, input) {
       const row: CoachCorpusRecord = {
@@ -137,6 +141,7 @@ beforeEach(() => {
   state.admin = false;
   state.corpus = [];
   state.questions = 0;
+  state.extraCount = 0;
   vi.stubEnv('CARSI_COACHING_ASSISTANT_ENABLED', 'true');
 });
 
@@ -239,6 +244,16 @@ describe('coach knowledge-base routes with the flag on', () => {
     expect(
       (await itemPATCH(req(`${CORPUS_URL}/x`, 'PATCH', { action: 'other' }), ctx('x'))).status
     ).toBe(400);
+  });
+});
+
+describe('item limit (Codex r1)', () => {
+  it('returns 409 and stores nothing once the coach is at the limit', async () => {
+    state.admin = true;
+    state.extraCount = 10_000;
+    const r = await corpusPOST(req(CORPUS_URL, 'POST', TRANSCRIPT));
+    expect(r.status).toBe(409);
+    expect(state.corpus).toHaveLength(0);
   });
 });
 

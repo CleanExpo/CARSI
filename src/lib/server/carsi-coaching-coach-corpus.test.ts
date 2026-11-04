@@ -13,7 +13,7 @@ import { describe, expect, it } from 'vitest';
 
 import { getCoachKnowledgeBase } from '@/lib/coaching-portal/coach-knowledge-base';
 import { DEFAULT_COACHING_COACH } from '@/lib/coaching-portal/coach-routing';
-import type { CoachCorpusRecord } from '@/lib/coaching-portal/coach-corpus';
+import { COACH_CORPUS_ITEM_MAX, type CoachCorpusRecord } from '@/lib/coaching-portal/coach-corpus';
 import {
   askMyCoach,
   type AskCoachQuestionRecord,
@@ -65,6 +65,9 @@ function corpusStore(): CoachCorpusStore & { rows: CoachCorpusRecord[] } {
     },
     async listApprovedItems(coachId) {
       return rows.filter((r) => r.coachId === coachId && r.approvedAt !== null);
+    },
+    async countItems(coachId) {
+      return rows.filter((r) => r.coachId === coachId).length;
     },
     async createItem(coachId, input) {
       const row: CoachCorpusRecord = {
@@ -304,6 +307,45 @@ describe('(e) compliance boundary from GP-630', () => {
     });
     expect(r.status).toBe('refused_standards');
     expect(corpus.rows).toHaveLength(0);
+  });
+});
+
+describe('Codex r1: standards text without its header, and the item limit', () => {
+  it('refuses a headerless standards excerpt at the add boundary and stores nothing', async () => {
+    const corpus = corpusStore();
+    const headerless =
+      'Section 12.2.1 The restorer shall inspect the structure. ' +
+      '12.2.2 The restorer shall document moisture readings. 12.2.3 The restorer shall ' +
+      'establish drying goals before equipment is placed. Section 12.3 covers drying equipment ' +
+      'placement and monitoring frequency for every affected area of the structure in detail.';
+    const r = await addCoachCorpusItem(corpus, COACH_A, {
+      sourceType: 'framework',
+      title: 'My drying notes',
+      body: headerless,
+    });
+    expect(r.status).toBe('refused_standards');
+    expect(corpus.rows).toHaveLength(0);
+  });
+
+  it('refuses to add past the per-coach limit instead of silently dropping material', async () => {
+    const corpus = corpusStore();
+    for (let i = 0; i < COACH_CORPUS_ITEM_MAX; i += 1) {
+      corpus.rows.push({
+        id: `seed-${i}`,
+        coachId: COACH_A,
+        sourceType: 'sop',
+        title: `SOP ${i}`,
+        body: TRANSCRIPT.body,
+        provenanceUrl: null,
+        approvedAt: new Date(),
+        createdAt: new Date(),
+      });
+    }
+    const r = await addCoachCorpusItem(corpus, COACH_A, TRANSCRIPT);
+    expect(r.status).toBe('limit_reached');
+    expect(corpus.rows).toHaveLength(COACH_CORPUS_ITEM_MAX);
+    // Another coach is not affected by this coach's count.
+    expect((await addCoachCorpusItem(corpus, COACH_B, TRANSCRIPT)).status).toBe('added');
   });
 });
 

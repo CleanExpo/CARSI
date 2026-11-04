@@ -52,6 +52,14 @@ export async function POST(request: NextRequest) {
       { status: 422 }
     );
   }
+  if (result.status === 'limit_reached') {
+    return NextResponse.json(
+      {
+        detail: `Your knowledge base holds up to ${result.limit} items. Remove one before adding another.`,
+      },
+      { status: 409 }
+    );
+  }
   const items = await listCoachCorpus(store, DEFAULT_COACHING_COACH.id);
   return NextResponse.json({ ok: true, item: result.item, items });
 }

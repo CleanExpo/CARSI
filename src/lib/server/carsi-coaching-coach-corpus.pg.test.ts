@@ -81,6 +81,28 @@ describe.runIf(RUNNABLE)('coach knowledge base (real PostgreSQL)', async () => {
     expect(await store.listItems(COACH_A)).toEqual([]);
   });
 
+  it('reads every approved row, even past the add limit, and counts per coach (Codex r1)', async () => {
+    const { COACH_CORPUS_ITEM_MAX } = await import('@/lib/coaching-portal/coach-corpus');
+    const total = COACH_CORPUS_ITEM_MAX + 1;
+    await prisma.carsiCoachingCoachCorpusItem.createMany({
+      data: Array.from({ length: total }, (_, i) => ({
+        coachId: COACH_A,
+        sourceType: 'sop',
+        title: `SOP ${i}`,
+        body: INPUT.body,
+        approvedAt: new Date(Date.UTC(2026, 0, 1, 0, 0, i)),
+      })),
+    });
+    expect(await store.countItems(COACH_A)).toBe(total);
+    expect(await store.countItems(COACH_B)).toBe(0);
+    expect(await store.listApprovedItems(COACH_A)).toHaveLength(total);
+    expect(await store.listItems(COACH_A)).toHaveLength(total);
+    const blocked = await rules.addCoachCorpusItem(store, COACH_A, INPUT);
+    expect(blocked.status).toBe('limit_reached');
+    expect(await store.countItems(COACH_A)).toBe(total);
+    await prisma.carsiCoachingCoachCorpusItem.deleteMany({ where: { coachId: COACH_A } });
+  });
+
   it('treats a non-UUID id as not found', async () => {
     expect(await store.approveItem(COACH_A, 'not-a-uuid')).toBeNull();
     expect(await store.deleteItem(COACH_A, 'not-a-uuid')).toBe(false);

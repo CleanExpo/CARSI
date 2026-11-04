@@ -3,6 +3,8 @@
  *
  * Every query is scoped by coach id in its WHERE clause, including approve and delete, so one
  * coach can never read, approve or remove another coach's material by guessing an id.
+ * Reads are not capped: the per-coach item limit is enforced when adding
+ * (COACH_CORPUS_ITEM_MAX), so a read never silently drops an item (Codex r1).
  */
 import {
   isCoachCorpusSourceType,
@@ -11,8 +13,6 @@ import {
 import { prisma } from '@/lib/prisma';
 import type { CoachCorpusStore } from '@/lib/server/carsi-coaching-coach-corpus';
 import { isUuidParam } from '@/lib/server/uuid-param';
-
-const LIST_MAX = 500;
 
 const SELECT = {
   id: true,
@@ -48,7 +48,6 @@ export const prismaCoachCorpusStore: CoachCorpusStore = {
     const rows = await prisma.carsiCoachingCoachCorpusItem.findMany({
       where: { coachId },
       orderBy: { createdAt: 'desc' },
-      take: LIST_MAX,
       select: SELECT,
     });
     return toRecords(rows);
@@ -58,10 +57,13 @@ export const prismaCoachCorpusStore: CoachCorpusStore = {
     const rows = await prisma.carsiCoachingCoachCorpusItem.findMany({
       where: { coachId, approvedAt: { not: null } },
       orderBy: { createdAt: 'asc' },
-      take: LIST_MAX,
       select: SELECT,
     });
     return toRecords(rows);
+  },
+
+  async countItems(coachId) {
+    return prisma.carsiCoachingCoachCorpusItem.count({ where: { coachId } });
   },
 
   async createItem(coachId, input) {

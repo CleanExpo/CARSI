@@ -114,6 +114,28 @@ describe('isStandardsText (IICRC AI-use prohibition at ingest)', () => {
   it('does not refuse ordinary coaching material', () => {
     expect(isStandardsText(TRANSCRIPT)).toBe(false);
   });
+
+  it('refuses standard body text pasted without its "ANSI/IICRC S500" header (Codex r1)', () => {
+    const headerless = excerpt.replace('ANSI/IICRC S500 ', '');
+    expect(headerless).not.toMatch(/IICRC/);
+    expect(isStandardsText(headerless)).toBe(true);
+    expect(isStandardsText(`${TRANSCRIPT}\n\n${headerless}`)).toBe(true);
+  });
+
+  it('refuses a paragraph written in normative "shall" clauses even with no numbering', () => {
+    const shalls =
+      'The technician shall inspect the room. The technician shall record readings. ' +
+      'The technician shall set drying goals before any equipment goes in.';
+    expect(isStandardsText(shalls)).toBe(true);
+  });
+
+  it('allows the odd "shall" or numbered step in ordinary material', () => {
+    expect(
+      isStandardsText(
+        `${TRANSCRIPT}\n\nWe shall see how the quote lands. Step 1.2 is the walk-through.`
+      )
+    ).toBe(false);
+  });
 });
 
 describe('chunkCorpusText', () => {

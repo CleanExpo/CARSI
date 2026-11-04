@@ -48,6 +48,11 @@ export const COACH_CORPUS_BODY_MIN = 50;
 /** About a long book chapter or a two-hour transcript. */
 export const COACH_CORPUS_BODY_MAX = 200_000;
 export const COACH_CORPUS_URL_MAX = 500;
+/**
+ * Items one coach may hold. Enforced when adding, so every stored item is always read in full
+ * (answers, the list, export) and nothing is ever dropped silently (Codex r1).
+ */
+export const COACH_CORPUS_ITEM_MAX = 200;
 /** Longest passage quoted in one answer. Longer paragraphs are split at sentence ends. */
 export const COACH_CORPUS_PASSAGE_MAX = 1200;
 
@@ -139,13 +144,36 @@ export function chunkCorpusText(body: string): string[] {
   return paragraphs(body).flatMap(splitLong);
 }
 
+/** Deep clause numbers ("12.3.4") and section citations ("Section 4.2", "§ 12.3"). */
+const CLAUSE_CITE_RE = /\b\d{1,2}\.\d{1,2}\.\d{1,3}\b|(?:\bSection|§)\s*\d{1,2}(?:\.\d{1,2})*/gi;
+const NORMATIVE_SHALL_RE = /\bshall\b/gi;
+const STANDARD_SHAPE_MIN = 3;
+
 /**
- * True when the text looks like pasted IICRC standard body text. Checked on the whole text
- * and on each paragraph, so an excerpt buried in a long transcript is still caught.
+ * Standard body text has a shape coaching material does not: clustered clause numbers or
+ * repeated normative "shall". Unlike the course-kit scanner this needs no "IICRC S500" header,
+ * so an excerpt pasted without its title is still refused (Codex r1). Checked on every passage
+ * and every pair of neighbouring passages, so an excerpt split across a passage break is caught.
+ */
+function hasStandardShape(text: string): boolean {
+  const cites = text.match(CLAUSE_CITE_RE)?.length ?? 0;
+  const shalls = text.match(NORMATIVE_SHALL_RE)?.length ?? 0;
+  return cites >= STANDARD_SHAPE_MIN || shalls >= STANDARD_SHAPE_MIN;
+}
+
+/**
+ * True when the text looks like pasted IICRC standard body text: the course-kit excerpt
+ * scanner on the whole text and on each paragraph (headed excerpts), plus the header-free
+ * shape check on every passage and neighbouring pair. A false positive only asks the coach to
+ * rephrase, which is the safe direction for a licence rule.
  */
 export function isStandardsText(body: string): boolean {
   if (scanTextForStandardExcerpt(body)) return true;
-  return paragraphs(body).some((p) => scanTextForStandardExcerpt(p) !== null);
+  if (paragraphs(body).some((p) => scanTextForStandardExcerpt(p) !== null)) return true;
+  const passages = chunkCorpusText(body);
+  return passages.some(
+    (p, i) => hasStandardShape(p) || (i > 0 && hasStandardShape(`${passages[i - 1]} ${p}`))
+  );
 }
 
 function passageIsUsable(title: string, passage: string): boolean {

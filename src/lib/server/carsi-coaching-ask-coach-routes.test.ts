@@ -42,6 +42,7 @@ vi.mock('@/lib/server/carsi-coaching-coach-corpus-store', () => ({
   getCoachCorpusStore: () => ({
     listItems: async () => [],
     listApprovedItems: async () => [],
+    countItems: async () => 0,
     createItem: async () => {
       throw new Error('not used');
     },

@@ -9,6 +9,7 @@
  */
 import type { CoachKnowledgeBase } from '@/lib/coaching-portal/ask-my-coach';
 import {
+  COACH_CORPUS_ITEM_MAX,
   COACH_CORPUS_SOURCE_TYPES,
   chunkCorpusText,
   corpusKnowledgeItems,
@@ -25,6 +26,7 @@ import type { KnowledgeBaseLookup } from '@/lib/server/carsi-coaching-ask-coach'
 export interface CoachCorpusStore {
   listItems(coachId: string): Promise<CoachCorpusRecord[]>;
   listApprovedItems(coachId: string): Promise<CoachCorpusRecord[]>;
+  countItems(coachId: string): Promise<number>;
   createItem(coachId: string, input: CoachCorpusInput): Promise<CoachCorpusRecord>;
   /** Sets approved_at once; null when the item is not this coach's. */
   approveItem(coachId: string, id: string): Promise<CoachCorpusRecord | null>;
@@ -72,7 +74,8 @@ export async function listCoachCorpus(
 export type AddCorpusResult =
   | { status: 'added'; item: CoachCorpusItemView }
   | { status: 'invalid'; error: string }
-  | { status: 'refused_standards' };
+  | { status: 'refused_standards' }
+  | { status: 'limit_reached'; limit: number };
 
 /** New items start unapproved: nothing a coach adds is used until they approve it. */
 export async function addCoachCorpusItem(
@@ -84,6 +87,10 @@ export async function addCoachCorpusItem(
   if (!v.ok) return { status: 'invalid', error: v.error };
   if (isStandardsText(`${v.value.title}\n\n${v.value.body}`))
     return { status: 'refused_standards' };
+  // A coach at the limit removes something first; the store never drops rows on read.
+  if ((await store.countItems(coachId)) >= COACH_CORPUS_ITEM_MAX) {
+    return { status: 'limit_reached', limit: COACH_CORPUS_ITEM_MAX };
+  }
   const row = await store.createItem(coachId, v.value);
   return { status: 'added', item: toView(row) };
 }
