@@ -32,6 +32,9 @@ export async function GET(request: NextRequest) {
   if (!isUuidParam(userId)) {
     return NextResponse.json({ detail: 'Invalid userId.' }, { status: 400 });
   }
+  if (!(await isCoachingMember(userId))) {
+    return NextResponse.json({ detail: 'Not a coaching member.' }, { status: 404 });
+  }
   return NextResponse.json(await getCoachLearningPathView(userId));
 }
 
