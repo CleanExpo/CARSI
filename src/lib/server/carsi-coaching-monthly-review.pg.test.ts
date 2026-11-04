@@ -159,7 +159,7 @@ describe.runIf(RUNNABLE)('coaching monthly review (real PostgreSQL)', async () =
     expect(still?.title).toBe(draft!.title);
 
     // Approve all.
-    const res = await mr.approveMonthlyReview(memberId, undefined);
+    const res = await mr.approveMonthlyReview(memberId, undefined, view.revision);
     expect(res).toEqual({ status: 'approved', published: view.actions.length });
     const boardAfter = await store.listCoachingActionsForUser(memberId);
     expect(boardAfter).toHaveLength(5 + view.actions.length);

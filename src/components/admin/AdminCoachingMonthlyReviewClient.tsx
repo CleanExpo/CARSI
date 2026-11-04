@@ -38,6 +38,8 @@ export type MonthlyReviewView = {
   review: MonthInReview | null;
   guidance: string;
   actions: DraftAction[];
+  revision: string | null;
+  stale: boolean;
 };
 
 type PostResponse = MonthlyReviewView & {
@@ -150,13 +152,16 @@ export function AdminCoachingMonthlyReviewClient() {
       const res = await fetch('/api/admin/coaching/monthly-review', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, op, edits }),
+        // The draft version on screen. The server refuses the write if the draft moved on.
+        body: JSON.stringify({ userId, op, edits, revision: view?.revision ?? null }),
       });
       const data = (await res.json().catch(() => null)) as PostResponse | null;
       if (selectedRef.current !== userId) return;
       if (!res.ok || !data) {
         setNotice('');
         setError(data?.detail ?? 'That did not work. Nothing was published.');
+        // The draft changed elsewhere: show the latest version rather than keep editing a stale one.
+        if (data?.result?.status === 'conflict') show(userId, data);
         return;
       }
       show(userId, data);
@@ -303,6 +308,12 @@ export function AdminCoachingMonthlyReviewClient() {
               <p className="mt-4 text-sm text-white/50">Draft a review to start editing.</p>
             ) : (
               <>
+                {view.stale ? (
+                  <p className="mt-4 rounded-lg border border-amber-400/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-100">
+                    This draft was made for a session that is no longer the member’s next session.
+                    Draft the review again for the new session, or discard it.
+                  </p>
+                ) : null}
                 <label className="mt-4 block">
                   <span className={label}>Latest guidance</span>
                   <textarea
@@ -415,7 +426,7 @@ export function AdminCoachingMonthlyReviewClient() {
                   <button
                     type="button"
                     className={primaryBtn}
-                    disabled={busy || !guidance.trim()}
+                    disabled={busy || view.stale || !guidance.trim()}
                     onClick={() => void post('approve')}
                   >
                     Approve all and publish
@@ -423,7 +434,7 @@ export function AdminCoachingMonthlyReviewClient() {
                   <button
                     type="button"
                     className={btn}
-                    disabled={busy}
+                    disabled={busy || view.stale}
                     onClick={() => void post('save')}
                   >
                     Save draft

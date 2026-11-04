@@ -46,6 +46,7 @@ const RESULT_HTTP: Record<MonthlyReviewWriteResult['status'], number> = {
   approved: 200,
   discarded: 200,
   nothing_to_approve: 409,
+  conflict: 409,
   invalid: 400,
 };
 
@@ -73,15 +74,18 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  // The draft version the coach's editor holds. Writes against any other version are refused.
+  const revision = typeof body?.revision === 'string' ? body.revision : null;
   let result: MonthlyReviewWriteResult;
-  if (body?.op === 'save') result = await saveMonthlyReview(userId, body.edits);
-  else if (body?.op === 'approve') result = await approveMonthlyReview(userId, body.edits);
-  else if (body?.op === 'discard') result = await discardMonthlyReview(userId);
+  if (body?.op === 'save') result = await saveMonthlyReview(userId, body.edits, revision);
+  else if (body?.op === 'approve')
+    result = await approveMonthlyReview(userId, body.edits, revision);
+  else if (body?.op === 'discard') result = await discardMonthlyReview(userId, revision);
   else return NextResponse.json({ detail: 'Unknown op.' }, { status: 400 });
 
   const view = await getMonthlyReviewView(userId);
   const detail =
-    result.status === 'invalid'
+    result.status === 'invalid' || result.status === 'conflict'
       ? result.detail
       : result.status === 'nothing_to_approve'
         ? 'There is no draft review to approve. Generate one first.'

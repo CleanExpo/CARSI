@@ -83,9 +83,9 @@ describe('admin monthly review route', () => {
   it('passes the coach edits through to approve and reports the result', async () => {
     mock.approve.mockResolvedValue({ status: 'approved', published: 3 });
     const edits = { guidance: 'g', actions: [] };
-    const res = await post({ userId: USER, op: 'approve', edits });
+    const res = await post({ userId: USER, op: 'approve', edits, revision: 'rev-1' });
     expect(res.status).toBe(200);
-    expect(mock.approve).toHaveBeenCalledWith(USER, edits);
+    expect(mock.approve).toHaveBeenCalledWith(USER, edits, 'rev-1');
     expect((await res.json()).result).toEqual({ status: 'approved', published: 3 });
   });
 
@@ -96,6 +96,20 @@ describe('admin monthly review route', () => {
     const res = await post({ userId: USER, op: 'save', edits: {} });
     expect(res.status).toBe(400);
     expect((await res.json()).detail).toBe('Guidance cannot be empty.');
+  });
+
+  it('passes the revision to save and discard, and answers 409 when the draft moved on (review r3)', async () => {
+    mock.save.mockResolvedValue({ status: 'conflict', detail: 'Reload.' });
+    const res = await post({ userId: USER, op: 'save', edits: {}, revision: 'rev-2' });
+    expect(res.status).toBe(409);
+    expect(mock.save).toHaveBeenCalledWith(USER, {}, 'rev-2');
+    mock.discard.mockResolvedValue({ status: 'discarded' });
+    expect((await post({ userId: USER, op: 'discard', revision: 'rev-3' })).status).toBe(200);
+    expect(mock.discard).toHaveBeenCalledWith(USER, 'rev-3');
+    // A non-string revision is passed as null, never trusted as-is.
+    mock.approve.mockResolvedValue({ status: 'conflict', detail: 'Reload.' });
+    expect((await post({ userId: USER, op: 'approve', revision: { $ne: 1 } })).status).toBe(409);
+    expect(mock.approve).toHaveBeenCalledWith(USER, undefined, null);
   });
 
   it('rejects an unknown op', async () => {

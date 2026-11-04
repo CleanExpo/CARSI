@@ -100,6 +100,13 @@ export type MonthlyReviewView = {
   review: MonthInReview | null;
   guidance: string;
   actions: DraftAction[];
+  /**
+   * The draft's version. Changes on every generate and save (the review record row is recreated).
+   * Save, approve and discard must send back the revision they were looking at (review r3).
+   */
+  revision: string | null;
+  /** True when the draft was made for a session that is no longer the member's next session. */
+  stale: boolean;
 };
 
 export type ModelDraftFn = (
@@ -170,6 +177,10 @@ const NO_SESSION =
   'Book the member’s next session first. A monthly review is drafted for a booked session.';
 const STATE_CHANGED =
   'This review was approved, saved or discarded while the new draft was being written. Reload and try again.';
+const DRAFT_MOVED_ON =
+  'This draft changed since you opened it (another tab or coach saved, approved or redrafted it). Reload to see the latest version.';
+const SESSION_MOVED_ON =
+  'This draft was made for a session that is no longer the member’s next session. Draft the review again for the new session.';
 
 function parseRecord(description: string | null): ReviewRecord | null {
   if (!description) return null;
@@ -233,7 +244,22 @@ async function currentDraft(store: MonthlyReviewStore, userId: string) {
     .filter((r) => !isReviewRecord(r))
     .sort((a, b) => a.sortOrder - b.sortOrder)
     .map(toDraftAction);
-  return { record, actions };
+  return { record, actions, revision: record ? recordRowFound!.id : null };
+}
+
+/**
+ * Every coach write runs this under the member lock: the draft must still be the exact version the
+ * coach was looking at, and still belong to the member's next booked session. Anything else is a
+ * conflict and nothing is written.
+ */
+function draftConflict(
+  draft: { record: ReviewRecord | null; revision: string | null },
+  revision: unknown,
+  member: MonthlyReviewMember
+): string | null {
+  if (typeof revision !== 'string' || revision !== draft.revision) return DRAFT_MOVED_ON;
+  if (draft.record?.sessionId !== member.nextSession?.id) return SESSION_MOVED_ON;
+  return null;
 }
 
 /** Coach view: the draft review (if any) plus what the editor needs. */
@@ -262,11 +288,15 @@ export async function getMonthlyReviewView(
       review: null,
       guidance: '',
       actions: [],
+      revision: null,
+      stale: false,
     };
   }
   return {
     ...base,
     status: 'draft',
+    revision: draft.revision,
+    stale: draft.record.sessionId !== (member.nextSession?.id ?? null),
     generatedAt: draft.record.generatedAt,
     source: draft.record.source,
     review: draft.record.review,
@@ -355,21 +385,26 @@ export type MonthlyReviewWriteResult =
   | { status: 'approved'; published: number }
   | { status: 'discarded' }
   | { status: 'nothing_to_approve' }
+  | { status: 'conflict'; detail: string }
   | { status: 'invalid'; detail: string };
 
 /** Save coach edits to the draft. Still hidden from the member. */
 export async function saveMonthlyReview(
   userId: string,
   rawEdits: unknown,
+  revision: unknown,
   store: MonthlyReviewStore = prismaMonthlyReviewStore,
   now: Date = new Date()
 ): Promise<MonthlyReviewWriteResult> {
   return store.withMemberLock(userId, async (locked) => {
     const member = await locked.loadMember(userId, now);
+    const draft = await currentDraft(locked, userId);
+    const { record } = draft;
+    if (!record) return { status: 'nothing_to_approve' };
+    const conflict = draftConflict(draft, revision, member);
+    if (conflict) return { status: 'conflict', detail: conflict };
     const valid = validateCoachEdits(rawEdits, parsePlanGoals(member.goalsJson));
     if (!valid.ok) return { status: 'invalid', detail: valid.detail };
-    const { record } = await currentDraft(locked, userId);
-    if (!record) return { status: 'nothing_to_approve' };
     await locked.deleteDraftRows(userId);
     await locked.createRows(userId, [
       recordRow({ ...record, guidance: valid.edits.guidance }, MONTHLY_DRAFT_STATUS),
@@ -382,23 +417,28 @@ export async function saveMonthlyReview(
 /**
  * Approve all: publish the draft actions to the member's board as `todo` and set the plan's latest
  * guidance. With `rawEdits`, the edited set is what gets published. Running it twice publishes once.
+ * `revision` must be the draft version the coach approved from (see draftConflict).
  */
 export async function approveMonthlyReview(
   userId: string,
   rawEdits: unknown,
+  revision: unknown,
   store: MonthlyReviewStore = prismaMonthlyReviewStore,
   now: Date = new Date()
 ): Promise<MonthlyReviewWriteResult> {
   return store.withMemberLock(userId, async (locked) => {
     const member = await locked.loadMember(userId, now);
-    const { record, actions } = await currentDraft(locked, userId);
-    let final = { guidance: record?.guidance ?? '', actions };
+    const draft = await currentDraft(locked, userId);
+    const { record, actions } = draft;
+    if (!record) return { status: 'nothing_to_approve' };
+    const conflict = draftConflict(draft, revision, member);
+    if (conflict) return { status: 'conflict', detail: conflict };
+    let final = { guidance: record.guidance, actions };
     if (rawEdits !== undefined) {
       const valid = validateCoachEdits(rawEdits, parsePlanGoals(member.goalsJson));
       if (!valid.ok) return { status: 'invalid', detail: valid.detail };
       final = valid.edits;
     }
-    if (!record) return { status: 'nothing_to_approve' };
     if (!final.guidance.trim()) return { status: 'invalid', detail: 'Guidance cannot be empty.' };
 
     await locked.deleteDraftRows(userId);
@@ -411,12 +451,20 @@ export async function approveMonthlyReview(
   });
 }
 
-/** Throw the draft away. The member never saw it. */
+/**
+ * Throw the draft away. The member never saw it. Only the version the coach was looking at is
+ * discarded; a stale-session draft can still be discarded so the coach can clear it.
+ */
 export async function discardMonthlyReview(
   userId: string,
+  revision: unknown,
   store: MonthlyReviewStore = prismaMonthlyReviewStore
 ): Promise<MonthlyReviewWriteResult> {
   return store.withMemberLock(userId, async (locked) => {
+    const draft = await currentDraft(locked, userId);
+    if (draft.record && (typeof revision !== 'string' || revision !== draft.revision)) {
+      return { status: 'conflict', detail: DRAFT_MOVED_ON };
+    }
     await locked.deleteDraftRows(userId);
     return { status: 'discarded' };
   });

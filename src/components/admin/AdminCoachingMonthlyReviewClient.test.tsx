@@ -38,6 +38,8 @@ function draftView(title: string): MonthlyReviewView {
     },
     guidance: 'New draft guidance',
     actions: [{ title, description: null, goalId: 'g1', priority: 'high', dueDate: '2026-11-20' }],
+    revision: 'rev-1',
+    stale: false,
   };
 }
 
@@ -102,7 +104,12 @@ describe('AdminCoachingMonthlyReviewClient', () => {
   });
 
   it('approve sends the edited draft for the member on screen, after confirmation', async () => {
-    const posts: { userId: string; op: string; edits?: { actions: { title: string }[] } }[] = [];
+    const posts: {
+      userId: string;
+      op: string;
+      revision?: string;
+      edits?: { actions: { title: string }[] };
+    }[] = [];
     vi.stubGlobal(
       'fetch',
       vi.fn(async (url: string, init?: RequestInit) => {
@@ -138,8 +145,54 @@ describe('AdminCoachingMonthlyReviewClient', () => {
     expect(posts).toHaveLength(1);
     expect(posts[0].userId).toBe(A);
     expect(posts[0].op).toBe('approve');
+    expect(posts[0].revision).toBe('rev-1');
     expect(posts[0].edits?.actions[0].title).toBe('Edited by coach');
     expect(container.textContent).toContain('Published 1 action and the new guidance.');
+  });
+
+  it('a draft for a replaced session cannot be approved or saved, only drafted again (review r3)', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) =>
+        url.includes('userId=') ? json({ ...draftView('A'), stale: true }) : json({ members })
+      )
+    );
+    act(() => root.render(<AdminCoachingMonthlyReviewClient />));
+    await flush();
+    await choose(A);
+    expect(container.textContent).toContain('made for a session that is no longer');
+    expect(button('Approve all and publish').disabled).toBe(true);
+    expect(button('Save draft').disabled).toBe(true);
+    expect(button('Draft again').disabled).toBe(false);
+  });
+
+  it('a 409 conflict shows why and loads the latest draft instead of the stale edits (review r3)', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string, init?: RequestInit) => {
+        if (init?.method === 'POST') {
+          return json(
+            {
+              ...draftView('Saved in another tab'),
+              revision: 'rev-2',
+              result: { status: 'conflict', detail: 'This draft changed since you opened it.' },
+              detail: 'This draft changed since you opened it.',
+            },
+            false
+          );
+        }
+        return url.includes('userId=') ? json(draftView('Old title')) : json({ members });
+      })
+    );
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    act(() => root.render(<AdminCoachingMonthlyReviewClient />));
+    await flush();
+    await choose(A);
+    act(() => button('Approve all and publish').click());
+    await flush();
+    expect(container.textContent).toContain('This draft changed since you opened it.');
+    const title = container.querySelector('input[aria-label="Action 1 title"]') as HTMLInputElement;
+    expect(title.value).toBe('Saved in another tab');
   });
 
   it('does nothing when the coach cancels the confirmation', async () => {

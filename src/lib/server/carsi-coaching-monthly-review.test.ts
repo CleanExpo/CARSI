@@ -135,7 +135,12 @@ function demoStore() {
     rows.filter(
       (r) => r.userId === userId && (MEMBER_BOARD_STATUSES as readonly string[]).includes(r.status)
     );
-  return { store, rows, plan, writes, memberBoard };
+  return { store, rows, plan, writes, memberBoard, member };
+}
+
+/** The revision the coach's editor holds: the one the view returned. */
+async function rev(t: { store: MonthlyReviewStore }) {
+  return (await getMonthlyReviewView(USER, t.store, NOW)).revision;
 }
 
 const MODEL_REPLY = JSON.stringify({
@@ -232,7 +237,7 @@ describe('generateMonthlyReview (GP-629 demo member)', () => {
     });
     await Promise.resolve();
     await Promise.resolve();
-    expect(await approveMonthlyReview(USER, undefined, t.store)).toMatchObject({
+    expect(await approveMonthlyReview(USER, undefined, await rev(t), t.store)).toMatchObject({
       status: 'approved',
     });
     const boardAfterApprove = t.memberBoard().length;
@@ -240,7 +245,7 @@ describe('generateMonthlyReview (GP-629 demo member)', () => {
     release({ text: MODEL_REPLY, model: 'mock/model' });
     await expect(slow).rejects.toThrow(MonthlyReviewConflictError);
     expect(t.rows.some((r) => r.status === MONTHLY_DRAFT_STATUS)).toBe(false);
-    expect(await approveMonthlyReview(USER, undefined, t.store)).toEqual({
+    expect(await approveMonthlyReview(USER, undefined, null, t.store)).toEqual({
       status: 'nothing_to_approve',
     });
     expect(t.memberBoard().length).toBe(boardAfterApprove);
@@ -261,7 +266,7 @@ describe('generateMonthlyReview (GP-629 demo member)', () => {
     });
     await Promise.resolve();
     await Promise.resolve();
-    await discardMonthlyReview(USER, t.store);
+    await discardMonthlyReview(USER, await rev(t), t.store);
     release(null);
     await expect(slow).rejects.toThrow(MonthlyReviewConflictError);
     expect(t.rows.some((r) => r.status === MONTHLY_DRAFT_STATUS)).toBe(false);
@@ -281,7 +286,7 @@ describe('generateMonthlyReview (GP-629 demo member)', () => {
     const deps = { store: noSession, now: NOW, draftWithModel: async () => null };
     await expect(generateMonthlyReview(USER, deps)).rejects.toThrow(MonthlyReviewConflictError);
     expect(t.rows.some((r) => r.status === MONTHLY_DRAFT_STATUS)).toBe(false);
-    expect(await approveMonthlyReview(USER, undefined, noSession)).toEqual({
+    expect(await approveMonthlyReview(USER, undefined, null, noSession)).toEqual({
       status: 'nothing_to_approve',
     });
     expect(t.memberBoard().map((r) => r.id)).toEqual(['a1', 'a2', 'a3', 'a4', 'a5']);
@@ -291,7 +296,7 @@ describe('generateMonthlyReview (GP-629 demo member)', () => {
     const t = demoStore();
     const deps = { store: t.store, now: NOW, draftWithModel: async () => null };
     await generateMonthlyReview(USER, deps);
-    await approveMonthlyReview(USER, undefined, t.store);
+    await approveMonthlyReview(USER, undefined, await rev(t), t.store);
     await expect(generateMonthlyReview(USER, deps)).rejects.toThrow(MonthlyReviewConflictError);
     expect(t.rows.some((r) => r.status === MONTHLY_DRAFT_STATUS)).toBe(false);
   });
@@ -321,6 +326,7 @@ describe('coach edit, approve and discard', () => {
           view.actions[2],
         ],
       },
+      view.revision,
       t.store
     );
     expect(res.status).toBe('saved');
@@ -335,7 +341,7 @@ describe('coach edit, approve and discard', () => {
   it('approve-all publishes drafts as todo on the member board and sets latest guidance', async () => {
     const t = await generated();
     const view = await getMonthlyReviewView(USER, t.store);
-    const res = await approveMonthlyReview(USER, undefined, t.store);
+    const res = await approveMonthlyReview(USER, undefined, view.revision, t.store);
     expect(res).toEqual({ status: 'approved', published: view.actions.length });
 
     const board = t.memberBoard();
@@ -365,6 +371,7 @@ describe('coach edit, approve and discard', () => {
         guidance: 'Final words.',
         actions: [{ ...view.actions[0], title: 'Only this one' }],
       },
+      view.revision,
       t.store
     );
     const published = t.memberBoard().filter((r) => !r.id.startsWith('a'));
@@ -374,9 +381,10 @@ describe('coach edit, approve and discard', () => {
 
   it('approving twice publishes once', async () => {
     const t = await generated();
-    await approveMonthlyReview(USER, undefined, t.store);
+    const revision = await rev(t);
+    await approveMonthlyReview(USER, undefined, revision, t.store);
     const count = t.memberBoard().length;
-    expect(await approveMonthlyReview(USER, undefined, t.store)).toEqual({
+    expect(await approveMonthlyReview(USER, undefined, revision, t.store)).toEqual({
       status: 'nothing_to_approve',
     });
     expect(t.memberBoard().length).toBe(count);
@@ -393,7 +401,7 @@ describe('coach edit, approve and discard', () => {
       { guidance: 'ok', actions: [{ ...view.actions[0], dueDate: '2026-13-45' }] },
       { guidance: 'ok', actions: [{ ...view.actions[0], priority: 'urgent' }] },
     ]) {
-      const res = await approveMonthlyReview(USER, edits as never, t.store);
+      const res = await approveMonthlyReview(USER, edits as never, view.revision, t.store);
       expect(res.status).toBe('invalid');
     }
     expect(JSON.stringify(t.rows)).toBe(before);
@@ -402,9 +410,101 @@ describe('coach edit, approve and discard', () => {
 
   it('discard removes the drafts and leaves the member untouched', async () => {
     const t = await generated();
-    expect(await discardMonthlyReview(USER, t.store)).toEqual({ status: 'discarded' });
+    expect(await discardMonthlyReview(USER, await rev(t), t.store)).toEqual({
+      status: 'discarded',
+    });
     expect(t.rows.some((r) => r.status === MONTHLY_DRAFT_STATUS)).toBe(false);
     expect(t.memberBoard().map((r) => r.id)).toEqual(['a1', 'a2', 'a3', 'a4', 'a5']);
     expect((await getMonthlyReviewView(USER, t.store)).status).toBe('none');
+  });
+
+  it('a stale editor tab cannot approve over a newer saved draft (review r3 P1)', async () => {
+    const t = await generated();
+    const tabA = await getMonthlyReviewView(USER, t.store, NOW);
+    // Tab B saves a different draft; the draft revision moves on.
+    const tabB = await getMonthlyReviewView(USER, t.store, NOW);
+    expect(
+      await saveMonthlyReview(
+        USER,
+        { guidance: 'Tab B guidance.', actions: [tabB.actions[0]] },
+        tabB.revision,
+        t.store,
+        NOW
+      )
+    ).toEqual({ status: 'saved' });
+    const boardBefore = t.memberBoard().map((r) => r.id);
+
+    // Tab A approves what it last saw.
+    const res = await approveMonthlyReview(
+      USER,
+      { guidance: tabA.guidance, actions: tabA.actions },
+      tabA.revision,
+      t.store,
+      NOW
+    );
+    expect(res.status).toBe('conflict');
+    expect(t.memberBoard().map((r) => r.id)).toEqual(boardBefore);
+    expect(t.plan.latestGuidance).toBe('Keep the 48-hour call rule going.');
+    expect((await getMonthlyReviewView(USER, t.store, NOW)).guidance).toBe('Tab B guidance.');
+    // A stale save and a stale discard are refused the same way.
+    expect(
+      (await saveMonthlyReview(USER, { guidance: 'x', actions: [] }, tabA.revision, t.store, NOW))
+        .status
+    ).toBe('conflict');
+    expect((await discardMonthlyReview(USER, tabA.revision, t.store)).status).toBe('conflict');
+    expect((await getMonthlyReviewView(USER, t.store, NOW)).status).toBe('draft');
+    // A write without any revision is refused too.
+    expect((await approveMonthlyReview(USER, undefined, null, t.store, NOW)).status).toBe(
+      'conflict'
+    );
+    expect(t.plan.latestGuidance).toBe('Keep the 48-hour call rule going.');
+  });
+
+  it('a draft made for a session that was replaced cannot be published (review r3 P1)', async () => {
+    const t = await generated();
+    t.member.nextSession = {
+      id: '44444444-4444-4444-8444-444444444444',
+      scheduledAt: new Date('2026-11-17T00:00:00.000Z'),
+      prepResponsesJson: null,
+    };
+    const view = await getMonthlyReviewView(USER, t.store, NOW);
+    expect(view.status).toBe('draft');
+    expect(view.stale).toBe(true);
+    const boardBefore = t.memberBoard().map((r) => r.id);
+    expect((await approveMonthlyReview(USER, undefined, view.revision, t.store, NOW)).status).toBe(
+      'conflict'
+    );
+    expect(
+      (
+        await saveMonthlyReview(
+          USER,
+          { guidance: view.guidance, actions: view.actions },
+          view.revision,
+          t.store,
+          NOW
+        )
+      ).status
+    ).toBe('conflict');
+    expect(t.memberBoard().map((r) => r.id)).toEqual(boardBefore);
+    expect(t.plan.latestGuidance).toBe('Keep the 48-hour call rule going.');
+
+    // Drafting again for the new session replaces the stale draft and can then be approved.
+    await generateMonthlyReview(USER, {
+      store: t.store,
+      now: NOW,
+      draftWithModel: async () => null,
+    });
+    const fresh = await getMonthlyReviewView(USER, t.store, NOW);
+    expect(fresh.stale).toBe(false);
+    expect((await approveMonthlyReview(USER, undefined, fresh.revision, t.store, NOW)).status).toBe(
+      'approved'
+    );
+  });
+
+  it('a fresh draft is not stale and carries a revision', async () => {
+    const t = await generated();
+    const view = await getMonthlyReviewView(USER, t.store, NOW);
+    expect(view.stale).toBe(false);
+    expect(typeof view.revision).toBe('string');
   });
 });
