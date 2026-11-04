@@ -1,7 +1,7 @@
 /**
  * Route cover for `POST /api/lms/checkout/survey` (Authority Machine slice 1b).
  * Answers are written to the PaymentIntent metadata, once, only for a paid session, and only
- * from the browser that started that checkout (signed `carsi_svy` cookie). A session id alone
+ * from the browser that started that checkout (signed `carsi_svy_<id>` cookie). A session id alone
  * is not enough: it appears in the success URL and could be shared or leaked.
  */
 import { NextRequest } from 'next/server';
@@ -21,7 +21,7 @@ vi.mock('@/lib/api/stripe', () => ({
 }));
 
 const { POST } = await import('../../../app/api/lms/checkout/survey/route');
-const { PURCHASE_SURVEY_COOKIE_NAME, PURCHASE_SURVEY_TOKEN_TTL_SECONDS, signPurchaseSurveyToken } =
+const { purchaseSurveyCookieName, PURCHASE_SURVEY_TOKEN_TTL_SECONDS, signPurchaseSurveyToken } =
   await import('@/lib/server/purchase-survey-token');
 
 const FLAG = 'PURCHASE_SURVEY_ENABLED';
@@ -36,7 +36,7 @@ function post(body: unknown, cookie: string | null = validCookie()): NextRequest
 }
 
 function validCookie(sessionId = SESSION, issuedAt = new Date()): string {
-  return `${PURCHASE_SURVEY_COOKIE_NAME}=${signPurchaseSurveyToken(sessionId, issuedAt)}`;
+  return `${purchaseSurveyCookieName(sessionId)}=${signPurchaseSurveyToken(sessionId, issuedAt)}`;
 }
 
 const GOOD = { session_id: SESSION, industry: 'commercial_cleaning', found_via: 'google_search' };
@@ -87,15 +87,25 @@ describe('authorisation: the browser that started checkout', () => {
     expect(stripe.retrieveSession).not.toHaveBeenCalled();
   });
 
-  it('a cookie holding several checkouts authorises each of them', async () => {
-    const { nextPurchaseSurveyCookie } = await import('@/lib/server/purchase-survey-token');
-    const both = nextPurchaseSurveyCookie(nextPurchaseSurveyCookie(undefined, SESSION), 'cs_test_later');
-    const res = await POST(post(GOOD, `${PURCHASE_SURVEY_COOKIE_NAME}=${encodeURIComponent(both)}`));
+  it("several checkout cookies in one browser: this session's cookie authorises it", async () => {
+    const res = await POST(post(GOOD, `${validCookie('cs_test_later')}; ${validCookie()}`));
     expect(res.status).toBe(200);
   });
 
+  it("another session's valid token under this session's cookie name -> 403", async () => {
+    const planted = `${purchaseSurveyCookieName(SESSION)}=${signPurchaseSurveyToken('cs_test_other')}`;
+    const res = await POST(post(GOOD, planted));
+    expect(res.status).toBe(403);
+    expect(stripe.retrieveSession).not.toHaveBeenCalled();
+  });
+
   it('forged cookie -> 403', async () => {
-    const res = await POST(post(GOOD, `${PURCHASE_SURVEY_COOKIE_NAME}=9999999999.deadbeef`));
+    const res = await POST(post(GOOD, `${purchaseSurveyCookieName(SESSION)}=9999999999.deadbeef`));
+    expect(res.status).toBe(403);
+  });
+
+  it('the old shared carsi_svy cookie no longer authorises', async () => {
+    const res = await POST(post(GOOD, `carsi_svy=${signPurchaseSurveyToken(SESSION)}`));
     expect(res.status).toBe(403);
   });
 });

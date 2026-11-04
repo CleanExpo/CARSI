@@ -66,6 +66,22 @@ vi.mock('@/lib/server/event-attribution', () => ({
   tryRecordAttributedStage: vi.fn().mockResolvedValue(undefined),
 }));
 
+// Only the survey route (GP-662 overlapping-start cover) reaches this client.
+const surveyStripe = vi.hoisted(() => ({ updatePI: vi.fn() }));
+vi.mock('@/lib/api/stripe', () => ({
+  getStripeClient: () => ({
+    checkout: {
+      sessions: {
+        retrieve: async (id: string) => ({ id, payment_status: 'paid', payment_intent: `pi_for_${id}` }),
+      },
+    },
+    paymentIntents: {
+      retrieve: async (id: string) => ({ id, metadata: {} }),
+      update: surveyStripe.updatePI,
+    },
+  }),
+}));
+
 vi.mock('@/lib/prisma', () => ({
   prisma: {
     lmsUser: { findUnique: mocks.findUser },
@@ -74,6 +90,7 @@ vi.mock('@/lib/prisma', () => ({
 }));
 
 const { POST } = await import('../../../app/api/lms/checkout/route');
+const { POST: SURVEY_POST } = await import('../../../app/api/lms/checkout/survey/route');
 
 const COURSE_SLUG = 'level-1-mould-remediation-2cc96b85';
 const COURSE_ID = 'course-mould-1';
@@ -294,7 +311,7 @@ describe('purchase survey capability cookie (Authority Machine slice 1b)', () =>
   });
 
   function surveyCookie(res: Response): string | undefined {
-    return res.headers.getSetCookie().find((c) => c.startsWith('carsi_svy='));
+    return res.headers.getSetCookie().find((c) => c.startsWith('carsi_svy_'));
   }
 
   it('flag off: the checkout response sets no cookie at all (unchanged)', async () => {
@@ -316,34 +333,13 @@ describe('purchase survey capability cookie (Authority Machine slice 1b)', () =>
     expect(header).toContain('Secure');
     expect(header?.toLowerCase()).toContain('samesite=lax');
     expect(header).toContain('Max-Age=86400');
-    const { verifyPurchaseSurveyToken } = await import('@/lib/server/purchase-survey-token');
-    const token = decodeURIComponent(header!.slice('carsi_svy='.length).split(';')[0]);
+    const { purchaseSurveyCookieName, verifyPurchaseSurveyToken } = await import(
+      '@/lib/server/purchase-survey-token'
+    );
+    expect(header!.startsWith(`${purchaseSurveyCookieName('cs_new')}=`)).toBe(true);
+    const token = decodeURIComponent(header!.split(';')[0].split('=')[1]);
     expect(verifyPurchaseSurveyToken(token, 'cs_new', new Date())).toBe(true);
     expect(verifyPurchaseSurveyToken(token, 'cs_other', new Date())).toBe(false);
-  });
-
-  it('two checkouts in one browser: starting B keeps A answerable', async () => {
-    process.env[FLAG] = 'true';
-    mocks.findUser.mockResolvedValue(null);
-    const { cookieAuthorisesSession } = await import('@/lib/server/purchase-survey-token');
-    const tokenOf = (res: Response) =>
-      decodeURIComponent(surveyCookie(res)!.slice('carsi_svy='.length).split(';')[0]);
-
-    mocks.createStripe.mockResolvedValueOnce({ checkout_url: 'https://checkout.stripe.test/a', checkout_session_id: 'cs_a' });
-    const resA = await POST(request({ slug: COURSE_SLUG, customer_email: 'new@example.test' }));
-    const cookieA = tokenOf(resA);
-
-    mocks.createStripe.mockResolvedValueOnce({ checkout_url: 'https://checkout.stripe.test/b', checkout_session_id: 'cs_b' });
-    const resB = await POST(
-      new NextRequest('https://carsi.example.test/api/lms/checkout', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json', cookie: `carsi_svy=${encodeURIComponent(cookieA)}` },
-        body: JSON.stringify({ slug: 'odour-control', customer_email: 'new@example.test' }),
-      })
-    );
-    const cookieB = tokenOf(resB);
-    expect(cookieAuthorisesSession(cookieB, 'cs_a', new Date())).toBe(true);
-    expect(cookieAuthorisesSession(cookieB, 'cs_b', new Date())).toBe(true);
   });
 
   it('flag on: the discounted path sets it too', async () => {
@@ -512,5 +508,100 @@ describe('first-touch attribution (Authority Machine slice 1a)', () => {
     await POST(requestWithCookie({ slug: COURSE_SLUG, customer_email: 'new@example.test' }, `carsi_ft=${planted}`));
     const md = mocks.createStripe.mock.calls[0][0].extra_metadata as Record<string, string>;
     expect(md).toEqual({ ft_ch: 'referral', ft_ref: 'other', ft_lp: 'for', ft_at: '2026-10-23' });
+  });
+});
+
+/**
+ * A browser cookie jar for one origin and path: applies each response's Set-Cookie headers in
+ * order, as a browser does. A later header for the same name replaces the earlier value, and
+ * Max-Age=0 deletes it.
+ */
+function applySetCookies(jar: Map<string, string>, res: Response): void {
+  for (const header of res.headers.getSetCookie()) {
+    const [pair, ...attrs] = header.split(';');
+    const eq = pair.indexOf('=');
+    const name = pair.slice(0, eq).trim();
+    const value = decodeURIComponent(pair.slice(eq + 1).trim());
+    if (attrs.some((a) => /^\s*max-age=0\s*$/i.test(a)) || value === '') jar.delete(name);
+    else jar.set(name, value);
+  }
+}
+
+function cookieHeader(jar: Map<string, string>): string {
+  return [...jar].map(([name, value]) => `${name}=${encodeURIComponent(value)}`).join('; ');
+}
+
+function checkoutFrom(jar: Map<string, string>, slug: string): NextRequest {
+  const cookie = cookieHeader(jar);
+  return new NextRequest('https://carsi.example.test/api/lms/checkout', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', ...(cookie ? { cookie } : {}) },
+    body: JSON.stringify({ slug, customer_email: 'new@example.test' }),
+  });
+}
+
+async function surveyStatus(jar: Map<string, string>, sessionId: string): Promise<number> {
+  const cookie = cookieHeader(jar);
+  const res = await SURVEY_POST(
+    new NextRequest('https://carsi.example.test/api/lms/checkout/survey', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', ...(cookie ? { cookie } : {}) },
+      body: JSON.stringify({ session_id: sessionId, industry: 'commercial_cleaning', found_via: 'google_search' }),
+    })
+  );
+  return res.status;
+}
+
+function nextSession(id: string): void {
+  mocks.createStripe.mockResolvedValueOnce({
+    checkout_url: `https://checkout.stripe.test/${id}`,
+    checkout_session_id: id,
+  });
+}
+
+describe('overlapping checkout starts keep every survey answerable (GP-662)', () => {
+  const FLAG = 'PURCHASE_SURVEY_ENABLED';
+
+  beforeEach(() => {
+    process.env[FLAG] = 'true';
+    mocks.findUser.mockResolvedValue(null);
+    surveyStripe.updatePI.mockReset();
+    surveyStripe.updatePI.mockResolvedValue({});
+  });
+
+  afterEach(() => {
+    delete process.env[FLAG];
+  });
+
+  it.each([
+    ['A reply lands first', false],
+    ['B reply lands first', true],
+  ])('two starts that read the same earlier cookie both stay answerable (%s)', async (_label, bFirst) => {
+    const jar = new Map<string, string>();
+    nextSession('cs_test_earlier');
+    applySetCookies(jar, await POST(checkoutFrom(jar, COURSE_SLUG)));
+
+    // Both requests leave the browser before either reply arrives, so both carry the same jar.
+    nextSession('cs_test_a');
+    const resA = await POST(checkoutFrom(jar, COURSE_SLUG));
+    nextSession('cs_test_b');
+    const resB = await POST(checkoutFrom(jar, 'odour-control'));
+    for (const res of bFirst ? [resB, resA] : [resA, resB]) applySetCookies(jar, res);
+
+    expect(await surveyStatus(jar, 'cs_test_a')).toBe(200);
+    expect(await surveyStatus(jar, 'cs_test_b')).toBe(200);
+    expect(await surveyStatus(jar, 'cs_test_earlier')).toBe(200);
+    expect(await surveyStatus(jar, 'cs_test_never_started')).toBe(403);
+  });
+
+  it('sequential starts keep only the three newest checkouts', async () => {
+    const jar = new Map<string, string>();
+    for (const id of ['cs_test_1', 'cs_test_2', 'cs_test_3', 'cs_test_4', 'cs_test_5']) {
+      nextSession(id);
+      applySetCookies(jar, await POST(checkoutFrom(jar, COURSE_SLUG)));
+    }
+    expect([...jar.keys()].filter((name) => name.startsWith('carsi_svy'))).toHaveLength(3);
+    for (const id of ['cs_test_3', 'cs_test_4', 'cs_test_5']) expect(await surveyStatus(jar, id)).toBe(200);
+    for (const id of ['cs_test_1', 'cs_test_2']) expect(await surveyStatus(jar, id)).toBe(403);
   });
 });

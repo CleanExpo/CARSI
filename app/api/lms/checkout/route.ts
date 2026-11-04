@@ -60,10 +60,9 @@ import {
 import { isAttributionCaptureEnabled } from '@/lib/server/attribution-capture-flag';
 import { isPurchaseSurveyEnabled } from '@/lib/server/purchase-survey-flag';
 import {
-  PURCHASE_SURVEY_COOKIE_NAME,
   PURCHASE_SURVEY_COOKIE_PATH,
   PURCHASE_SURVEY_TOKEN_TTL_SECONDS,
-  nextPurchaseSurveyCookie,
+  purchaseSurveyCookieChanges,
 } from '@/lib/server/purchase-survey-token';
 
 class AccountLookupUnavailable extends Error {}
@@ -71,19 +70,22 @@ class AccountLookupUnavailable extends Error {}
 /**
  * The checkout reply. With the purchase survey on (slice 1b), it also carries the HttpOnly
  * capability cookie that lets this browser, and only this one, answer the survey for this
- * Stripe session (up to three recent checkouts are kept). Off, the reply is exactly what it was.
+ * Stripe session. Each session has its own cookie, so two checkouts started at once cannot
+ * overwrite each other (GP-662); up to three recent checkouts are kept. Off, the reply is
+ * exactly what it was.
  */
 function checkoutStarted(checkout_url: string, checkoutSessionId: string, request: NextRequest) {
   const res = NextResponse.json({ checkout_url });
   if (isPurchaseSurveyEnabled()) {
-    const previous = request.cookies.get(PURCHASE_SURVEY_COOKIE_NAME)?.value;
-    res.cookies.set(PURCHASE_SURVEY_COOKIE_NAME, nextPurchaseSurveyCookie(previous, checkoutSessionId), {
+    const options = {
       httpOnly: true,
       secure: request.nextUrl.protocol === 'https:' || process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      sameSite: 'lax' as const,
       path: PURCHASE_SURVEY_COOKIE_PATH,
-      maxAge: PURCHASE_SURVEY_TOKEN_TTL_SECONDS,
-    });
+    };
+    const { set, expire } = purchaseSurveyCookieChanges(request.cookies.getAll(), checkoutSessionId);
+    res.cookies.set(set.name, set.value, { ...options, maxAge: PURCHASE_SURVEY_TOKEN_TTL_SECONDS });
+    for (const name of expire) res.cookies.set(name, '', { ...options, maxAge: 0 });
   }
   return res;
 }
