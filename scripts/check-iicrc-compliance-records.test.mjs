@@ -87,6 +87,19 @@ function runGuardIn(files) {
   if (!planted.out.includes(PLANTED_SLUG)) fail(`guard output does not name the slug ${PLANTED_SLUG}`);
   if (planted.out.includes('gp527-clean-course')) fail('guard output names the clean course');
 
+  // Review r5 (Codex, P1): neutral prose plus cec_hours "1 Hour" must fail the real guard, and a
+  // zero-hours control must pass it.
+  const unitHours = runGuardIn({
+    [EXPORT_FILE]: JSON.stringify([{ ...course(PLANTED_SLUG, 'Neutral.', 'Neutral.'), title: 'Neutral title', cec_hours: '1 Hour' }]),
+  });
+  if (unitHours.status === 0 || !unitHours.out.includes(PLANTED_SLUG)) {
+    fail(`cec_hours "1 Hour" for "${PLANTED_SLUG}" PASSED the guard or was not named`);
+  }
+  const zeroHours = runGuardIn({
+    [EXPORT_FILE]: JSON.stringify([{ ...course(PLANTED_SLUG, 'Neutral.', 'Neutral.'), title: 'Neutral title', cec_hours: '0 Hours' }]),
+  });
+  if (zeroHours.status !== 0) fail(`zero-hours control ("0 Hours") was blocked:\n${zeroHours.out}`);
+
   // Review r1 (Codex, P1): the same claim split across two lines must fail the real guard too.
   const split = runGuardIn({
     [EXPORT_FILE]: JSON.stringify([course(PLANTED_SLUG, 'This course is approved for\nIICRC Continuing Education Credits.')]),
@@ -222,6 +235,10 @@ if (typeof evaluateRecords !== 'function' || typeof classifyRecordFindings !== '
     { slug: PLANTED_SLUG, title: 't', cec_hours: '5' },
     { slug: PLANTED_SLUG, title: 't', meta: { cec_hours: [5] } },
     { slug: PLANTED_SLUG, title: 't', meta: { cec: { hours: 3 } } },
+    // Review r5 (Codex, P1): ordinary unit wording in a CEC field ("1 Hour") is still a claim.
+    { slug: PLANTED_SLUG, title: 't', cec_hours: '1 Hour' },
+    { slug: PLANTED_SLUG, title: 't', cec_hours: '1.5 hours' },
+    { slug: PLANTED_SLUG, title: 't', meta: { cec_hours: ['3 Hours'] } },
   ]) {
     const f = scan([rec]);
     if (f.length === 0) fail(`numeric CEC hours passed: ${JSON.stringify(rec)}`);
@@ -230,6 +247,8 @@ if (typeof evaluateRecords !== 'function' || typeof classifyRecordFindings !== '
     { slug: PLANTED_SLUG, title: 't', cec_hours: null },
     { slug: PLANTED_SLUG, title: 't', cec_hours: 0 },
     { slug: PLANTED_SLUG, title: 't', cec_hours: '0' },
+    { slug: PLANTED_SLUG, title: 't', cec_hours: '0 Hours' },
+    { slug: PLANTED_SLUG, title: 't', cec_hours: '' },
     { slug: PLANTED_SLUG, title: 't', price_aud: 99, duration_hours: 4 },
   ]) {
     if (scan([rec]).length > 0) fail(`no-claim numeric record blocked: ${JSON.stringify(rec)}`);

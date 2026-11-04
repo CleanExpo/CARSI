@@ -305,12 +305,14 @@ function rawRecordText(value) {
 function stringFields(value, path, out, underCec = false) {
   // Review r4 (Codex, P1): the CEC context is the whole key path, not the last key, and the value
   // may be a numeric string or sit in a list ("cec_hours": "5", "meta.cec_hours": [5], cec.hours).
+  // Review r5 (Codex, P1): the string may carry ordinary unit wording ("1 Hour", "1.5 hours"), so
+  // under a CEC key any positive number in the string is the hours claim, not only a bare number.
   const cec = underCec || /cec/i.test(path.split('.').pop() ?? '');
   const hours =
     typeof value === 'number'
       ? value
-      : typeof value === 'string' && /^\s*\d+(?:\.\d+)?\s*$/.test(value)
-        ? Number(value)
+      : typeof value === 'string'
+        ? Math.max(0, ...(value.match(/\d+(?:\.\d+)?/g) ?? []).map(Number))
         : NaN;
   if (cec && hours > 0) out.push([path, `${path}: ${hours} CEC hours`]);
   else if (typeof value === 'string') out.push([path, value]);
