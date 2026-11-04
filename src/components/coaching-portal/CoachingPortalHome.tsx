@@ -19,7 +19,7 @@ import { useCoachingPortal } from '@/components/coaching-portal/CoachingPortalCo
 import { CheckCircle2, Circle } from 'lucide-react';
 
 function LockedHome() {
-  const { access } = useCoachingPortal();
+  const { access, checkoutEnabled } = useCoachingPortal();
   return (
     <div className={coachingPage}>
       <div className={coachingCard}>
@@ -31,7 +31,7 @@ function LockedHome() {
           catalogue.
         </p>
         <div className="mt-6 max-w-sm">
-          <BusinessCoachingMonthlySubscribe checkoutEnabled={true} />
+          <BusinessCoachingMonthlySubscribe checkoutEnabled={checkoutEnabled} />
         </div>
         <Link href={access.subscribeUrl} className={`mt-4 inline-flex ${coachingSecondaryBtn}`}>
           View programme
@@ -186,7 +186,10 @@ function ActiveHome() {
             {plan.focusDescription ? (
               <p className={`mt-2 ${coachingMuted}`}>{plan.focusDescription}</p>
             ) : null}
-            <Link href="/dashboard/coaching/plan" className={`mt-4 inline-flex ${coachingPrimaryBtn}`}>
+            <Link
+              href="/dashboard/coaching/plan"
+              className={`mt-4 inline-flex ${coachingPrimaryBtn}`}
+            >
               View my plan
             </Link>
           </section>
@@ -197,7 +200,10 @@ function ActiveHome() {
               No approved growth plan yet. Phill will publish your plan after reviewing your
               assessment.
             </p>
-            <Link href="/dashboard/coaching/plan" className={`mt-4 inline-flex ${coachingSecondaryBtn}`}>
+            <Link
+              href="/dashboard/coaching/plan"
+              className={`mt-4 inline-flex ${coachingSecondaryBtn}`}
+            >
               View plan
             </Link>
           </section>
@@ -217,14 +223,20 @@ function ActiveHome() {
                   })}
                 </p>
               ) : null}
-              <Link href="/dashboard/coaching/actions" className={`mt-4 inline-flex ${coachingPrimaryBtn}`}>
+              <Link
+                href="/dashboard/coaching/actions"
+                className={`mt-4 inline-flex ${coachingPrimaryBtn}`}
+              >
                 View action
               </Link>
             </>
           ) : (
             <>
               <p className={`mt-2 ${coachingMuted}`}>No actions assigned yet.</p>
-              <Link href="/dashboard/coaching/actions" className={`mt-4 inline-flex ${coachingSecondaryBtn}`}>
+              <Link
+                href="/dashboard/coaching/actions"
+                className={`mt-4 inline-flex ${coachingSecondaryBtn}`}
+              >
                 Action board
               </Link>
             </>

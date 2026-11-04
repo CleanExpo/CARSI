@@ -39,6 +39,7 @@ CLAUDE.local.md
 
 # IDE
 .idea/
+.cursor/
 *.swp
 *.swo
 .DS_Store

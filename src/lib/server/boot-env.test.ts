@@ -57,6 +57,15 @@ describe('findMissingRequiredEnv', () => {
     );
   });
 
+  it('flags CARSI_COACHING_PORTAL_DEV_UNLOCK in production', () => {
+    expect(
+      findMissingRequiredEnv({
+        ...FULL_ENV,
+        CARSI_COACHING_PORTAL_DEV_UNLOCK: 'true',
+      }),
+    ).toContain('CARSI_COACHING_PORTAL_DEV_UNLOCK (must not be true in production)');
+  });
+
   it('reports EVERY missing var at once (so the operator fixes them in one redeploy)', () => {
     // The whole operational point of AC-5: a fully unprovisioned env lists all
     // four, not just the first — a regression to first-miss-only must fail here.

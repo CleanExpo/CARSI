@@ -1,0 +1,19 @@
+name: Coaching accountability (daily)
+
+# GP-635 scheduled check-ins and coach alerts. Requires CRON_SECRET on the app (same as recert).
+# With CARSI_COACHING_ACCOUNTABILITY_EMAILS_ENABLED off, the route dry-runs and sends nothing.
+
+on:
+  schedule:
+    - cron: '0 10 * * *' # 10:00 UTC daily
+  workflow_dispatch: {}
+
+jobs:
+  coaching-accountability:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger coaching-accountability cron
+        run: |
+          curl -fsS --max-time 300 -X GET \
+            "https://carsi.com.au/api/cron/coaching-accountability" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"

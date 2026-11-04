@@ -32,7 +32,7 @@
  * css-art, canvas-drawing). It never exempts budgets, provenance, placeholders or page rules.
  *
  * Exit: 0 = no findings, or report-only; 1 = findings in enforce mode; 2 = configuration error.
- * Usage: check-visuals [--root .] [--report-only] [--json] [--limit N] [--config visuals.config.json] [--list-extensions]
+ * Usage: check-visuals [--root .] [--report-only] [--json] [--limit N] [--config config/visuals.config.json] [--list-extensions]
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -58,18 +58,13 @@ function main() {
     return;
   }
   const root = path.resolve(opt('--root', '.'));
-  // No --config: the repo keeps its config in config/ (main, 92b3593b) or, before that move, at
-  // the root. Reading only the root after the move fell back to "enforce" and failed every PR.
-  const cfgDefault = ['config/visuals.config.json', 'visuals.config.json'].find((p) =>
-    fs.existsSync(path.join(root, p))
-  ) || 'visuals.config.json';
-  const cfgPath = path.join(root, opt('--config', cfgDefault));
+  const cfgPath = path.join(root, opt('--config', 'config/visuals.config.json'));
 
   const DEFAULTS = {
     mode: 'enforce',
     srcDirs: ['app', 'src', 'components', 'pages', 'apps/web'],
     publicDirs: ['public', 'apps/web/public'],
-    manifest: 'media.manifest.json',
+    manifest: 'config/media.manifest.json',
     ignore: ['node_modules', '.next', 'dist', 'build', 'out', 'coverage', '.git', '.turbo', 'storybook-static', '__tests__', 'tests', 'e2e', '.vercel'],
     allowlist: [],
     marketingPages: ['**/app/**/page.{tsx,jsx,ts,js,mdx}', '**/pages/**/*.{tsx,jsx,mdx}'],

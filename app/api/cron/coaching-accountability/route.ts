@@ -22,7 +22,8 @@ export const dynamic = 'force-dynamic';
  * - E-mail flag off (the default) → dry run: reports what would be sent, sends nothing,
  *   writes nothing.
  * - Both on → sends each reminder once (marked on the plan so a re-run never repeats it).
- * The report carries member ids and reminder kinds only. Not scheduled anywhere yet.
+ * Scheduled daily via `.github/workflows/notifications-coaching-accountability.yml`
+ * (Bearer CRON_SECRET, same as DigitalOcean app env).
  */
 export async function GET(request: Request) {
   const denied = requireCron(request);
