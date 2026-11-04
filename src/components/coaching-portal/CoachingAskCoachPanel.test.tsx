@@ -4,10 +4,10 @@ import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const portal = vi.hoisted(() => ({ canEdit: true }));
+const portal = vi.hoisted(() => ({ canEdit: true, mode: 'subscriber' as const }));
 
 vi.mock('@/components/coaching-portal/CoachingPortalContext', () => ({
-  useCoachingPortal: () => ({ access: { canEdit: portal.canEdit } }),
+  useCoachingPortal: () => ({ access: { canEdit: portal.canEdit, mode: portal.mode } }),
 }));
 
 import { CoachingAskCoachPanel } from './CoachingAskCoachPanel';

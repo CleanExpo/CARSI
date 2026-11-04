@@ -1,10 +1,25 @@
 import { randomUUID } from 'node:crypto';
 
 import { ASK_COACH_GOAL_PREFIX, isAskCoachGoalId } from '@/lib/coaching-portal/ask-my-coach';
-import { LEARNING_GOAL_PREFIX, LEARNING_REMOVED_STATUS } from '@/lib/coaching-portal/learning-path';
+import {
+  LEARNING_DRAFT_REMOVED_STATUS,
+  LEARNING_GOAL_PREFIX,
+  LEARNING_PROPOSED_STATUS,
+  LEARNING_REMOVED_STATUS,
+} from '@/lib/coaching-portal/learning-path';
 import type { CoachingActionStatus, CoachingMonthlyAction } from '@/lib/coaching-portal/types';
 import { prisma } from '@/lib/prisma';
 import { isLearningAction, syncLearningPath } from '@/lib/server/carsi-coaching-learning-path';
+
+/**
+ * Rows the member never sees: coach-removed tombstones and draft courses the coach has not yet
+ * approved (GP-633). Every member read and write goes through this list.
+ */
+const MEMBER_HIDDEN_STATUSES = [
+  LEARNING_REMOVED_STATUS,
+  LEARNING_PROPOSED_STATUS,
+  LEARNING_DRAFT_REMOVED_STATUS,
+];
 
 const STATUS_MAP: Record<string, CoachingActionStatus> = {
   todo: 'todo',
@@ -36,8 +51,8 @@ export async function listCoachingActionsForUser(userId: string): Promise<Coachi
   // Pull LMS progress onto learning actions first, so completion shows as done on the board.
   const learning = new Map((await syncLearningPath(userId)).map((i) => [i.actionId, i]));
   const rows = await prisma.carsiCoachingAction.findMany({
-    // Coach-removed learning actions stay as tombstones (status is NOT NULL, so NOT is safe).
-    where: { userId, NOT: { status: LEARNING_REMOVED_STATUS } },
+    // Tombstones and unapproved drafts stay hidden (status is NOT NULL, so NOT IN is safe).
+    where: { userId, NOT: { status: { in: MEMBER_HIDDEN_STATUSES } } },
     orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
   });
   return rows.map((r) => {
@@ -120,8 +135,11 @@ export async function upsertCoachingActionForUser(
   if (existingId) {
     const owned = await prisma.carsiCoachingAction.findFirst({
       where: { id: existingId, userId },
-      select: { id: true, goalId: true },
+      select: { id: true, goalId: true, status: true },
     });
+    // A row the member cannot see (an unapproved draft or a removed course) is not theirs to
+    // edit, and must not be re-created under the same id either.
+    if (owned && MEMBER_HIDDEN_STATUSES.includes(owned.status)) return;
     if (owned) {
       // A prescribed course's title and status follow the LMS, and a question to the coach
       // (GP-630) is closed by the coach's answer; on both the member can only add a note.

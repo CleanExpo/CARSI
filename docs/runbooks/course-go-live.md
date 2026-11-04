@@ -58,12 +58,16 @@ unset DATABASE_URL
 `read -s` takes the URL from the password manager as hidden input, so it never appears on screen
 or in shell history. Never commit it or paste it into chat.
 
-**3. Quizzes are a separate, catalogue-wide step. Do not run it as part of a single-course
-go-live.** `npm run db:seed-quizzes` (`scripts/seed-all-quizzes.ts`) has no per-course option. It
-re-writes the questions of **every** quiz on its fixed `QUIZ_FILES` list in one run, and that list
-does **not** include the Level 2 or Level 3 Mould quiz files. A per-course quiz seeder is an open
-item (BACKLOG discoveries, 2026-11-02). Until it exists, raise any course whose quiz must go live
-with Phill rather than running the all-quiz seeder.
+**3. Quizzes are a separate step.** Use the per-slug seeder (do **not** run bare
+`npm run db:seed-quizzes` with no flags — that refuses, and `--all` rewrites every quiz on the list):
+
+```bash
+npm run db:seed-quizzes -- --slug=<slug> --dry-run   # preview
+npm run db:seed-quizzes -- --slug=<slug>             # apply for that course only
+```
+
+Repo check (no DB): `npm run check:water-go-live`. After seed, live probe:
+`npm run check:water-go-live:live`.
 
 **4. Check the live page**: `https://carsi.com.au/courses/<slug>` shows the expected title,
 price and module count, plus the "CARSI-issued credential, not an IICRC certification" line.

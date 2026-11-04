@@ -186,6 +186,21 @@ npm run db:studio
 
 ---
 
+## Repository layout
+
+| Area       | Paths                                                                                |
+| ---------- | ------------------------------------------------------------------------------------ |
+| Governance | [`docs/governance/`](docs/governance/) — objective, backlog, decisions, engine, spec |
+| Agents     | [`docs/agents/`](docs/agents/) — `CLAUDE.md`, `AGENTS.md`                            |
+| App        | `app/`, `src/` (incl. instrumentation), `public/`, `proxy.ts`                        |
+| Data & DB  | `data/`, `prisma/`, `db/ops/` (prod SQL via GitHub workflow only)                    |
+| Deploy     | `app.yaml`, `deploy/Dockerfile`                                                      |
+| CI & docs  | `.github/workflows/`, `docs/`, `scripts/`, `e2e/`                                    |
+
+Local Docker build: `docker build -f deploy/Dockerfile .` (repo root is the build context).
+
+---
+
 ## Contributing
 
 - Keep changes focused and PR-ready

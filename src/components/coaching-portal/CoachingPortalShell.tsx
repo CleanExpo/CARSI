@@ -18,7 +18,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/components/auth/auth-provider';
 import { CoachingPortalProvider } from '@/components/coaching-portal/CoachingPortalContext';
 import { PartnerDemoBanner } from '@/components/coaching-portal/PartnerDemoBanner';
-import { COACHING_PORTAL_NAV_MAIN } from '@/components/coaching-portal/coaching-portal-nav';
+import { coachingPortalNavItems } from '@/components/coaching-portal/coaching-portal-nav';
 import { coachingPortalBasePath } from '@/lib/coaching-portal/coaching-portal-paths';
 import { openCoachingSupportEmail } from '@/lib/coaching-portal/support-contact';
 import type { CoachingPortalDashboard } from '@/lib/server/carsi-coaching-portal-dashboard';
@@ -189,7 +189,7 @@ export function CoachingPortalShell({
           Workspace
         </p>
         <ul className="space-y-0.5">
-          {COACHING_PORTAL_NAV_MAIN.map((item) => (
+          {coachingPortalNavItems(dashboard.features).map((item) => (
             <SidebarNavLink
               key={item.href}
               href={item.href}

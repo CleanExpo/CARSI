@@ -15,22 +15,18 @@ import { randomUUID } from 'node:crypto';
 
 import { afterAll, describe, expect, it } from 'vitest';
 
-const DB_URL = process.env.DATABASE_URL?.trim() ?? '';
-const IN_CI = process.env.CI === 'true';
-const HOST = (() => {
-  try {
-    return DB_URL ? new URL(DB_URL).hostname : '';
-  } catch {
-    return '';
-  }
-})();
-const RUNNABLE = Boolean(DB_URL) && ['localhost', '127.0.0.1', '::1'].includes(HOST);
+import { pgSuiteTarget } from '@/test-utils/pg-disposable';
+
+// Loopback host AND CARSI_PG_DISPOSABLE=1, or no run at all (src/test-utils/pg-disposable.ts).
+const TARGET = pgSuiteTarget(process.env);
+const RUNNABLE = TARGET.runnable;
 
 if (!RUNNABLE) {
   describe('partner demo seed (real PostgreSQL)', () => {
-    if (IN_CI) {
-      it('must run in CI: needs DATABASE_URL pointing at the local migrated postgres service', () => {
-        throw new Error(`CI=true but no usable local DATABASE_URL (host: "${HOST || 'none'}").`);
+    const refusal = TARGET.refusal;
+    if (refusal) {
+      it('refuses: needs a disposable loopback DATABASE_URL (CARSI_PG_DISPOSABLE=1)', () => {
+        throw new Error(refusal);
       });
     } else {
       it.skip('runs in CI (E2E job, `npm run test:pg`): no local DATABASE_URL here', () => {});

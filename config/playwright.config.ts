@@ -1,4 +1,10 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { defineConfig, devices } from '@playwright/test';
+
+// This file lives in config/; every path (specs, output, auth state, web server working
+// directory) must resolve from the repo root, where package.json and next.config.ts live.
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:3000';
 
@@ -31,7 +37,8 @@ const SURVEY_SPEC = /e2e\/payment-success-survey\.spec\.ts$/;
 const BUILD_OUTPUT = ['**/.next/**', '**/node_modules/**'];
 
 export default defineConfig({
-  testDir: '.',
+  testDir: repoRoot,
+  outputDir: path.join(repoRoot, 'test-results'),
   // `auth.setup.ts` is matched by the dedicated `setup` project below (not by the
   // `*.spec.ts` glob), so it runs once to mint a real session before the
   // authenticated journeys.
@@ -70,7 +77,7 @@ export default defineConfig({
       dependencies: ['setup'],
       use: {
         ...devices['Desktop Chrome'],
-        storageState: 'playwright/.auth/student.json',
+        storageState: path.join(repoRoot, 'playwright/.auth/student.json'),
       },
     },
     ...(membershipBaseURL
@@ -99,6 +106,7 @@ export default defineConfig({
     {
       command: process.env.CI ? 'npm run build && npm run start' : 'npm run dev',
       url: baseURL,
+      cwd: repoRoot,
       reuseExistingServer: !process.env.CI,
       // CI runs a full production build inside the webServer; allow headroom so a
       // cold `next build` doesn't trip the startup timeout on slower runners.
@@ -110,6 +118,7 @@ export default defineConfig({
           {
             command: `npx next start -p ${MEMBERSHIP_CI_PORT}`,
             url: `http://localhost:${MEMBERSHIP_CI_PORT}`,
+            cwd: repoRoot,
             env: { SUBSCRIPTIONS_ENABLED: 'true' },
             reuseExistingServer: false,
             timeout: 120_000,
@@ -121,6 +130,7 @@ export default defineConfig({
           {
             command: `npx next start -p ${SURVEY_CI_PORT}`,
             url: `http://localhost:${SURVEY_CI_PORT}`,
+            cwd: repoRoot,
             env: { PURCHASE_SURVEY_ENABLED: 'true' },
             reuseExistingServer: false,
             timeout: 120_000,
