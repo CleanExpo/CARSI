@@ -170,7 +170,7 @@ describe('AdminShell responsive navigation', () => {
     const sidebar = container.querySelector('aside')!;
     expect(sidebar.classList.contains('md:w-[240px]')).toBe(true);
     expect(sidebar.classList.contains('md:flex')).toBe(true);
-    expect(sidebar.querySelectorAll('nav a')).toHaveLength(18);
+    expect(sidebar.querySelectorAll('nav a')).toHaveLength(19);
     expect(container.querySelector('main')?.classList.contains('min-w-0')).toBe(true);
     await open();
     await act(async () => onBreakpoint?.({ matches: true }));
