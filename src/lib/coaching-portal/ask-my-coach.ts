@@ -225,53 +225,67 @@ export function contentTokens(text: string): Set<string> {
 }
 
 /**
- * Everyday business words a question may contain without the cited item containing them. Kept
- * short on purpose. Nothing credential-related may ever be added (a test enforces it).
+ * Everyday words a question may contain without the cited item containing them. Only words
+ * that carry no topic of their own (how-to verbs and adverbs), never a subject such as
+ * "manage", "work" or "business" (Codex r5). They never count toward a match either. Nothing
+ * credential-related may ever be added (a test enforces it).
  */
 export const ASK_COACH_EVERYDAY_WORDS: ReadonlySet<string> = new Set([
-  'business',
   'set',
   'setup',
   'use',
   'using',
   'start',
   'starting',
-  'improve',
-  'improving',
-  'help',
-  'make',
-  'making',
-  'work',
-  'working',
-  'run',
-  'running',
-  'manage',
-  'handle',
-  'grow',
-  'growing',
   'more',
   'better',
   'right',
   'first',
   'often',
-  'time',
-  'week',
-  'month',
-  'customer',
-  'customers',
-  'client',
-  'clients',
 ]);
 
 const EVERYDAY_STEMS = new Set([...ASK_COACH_EVERYDAY_WORDS].map(stem));
 
-/** An item must match at least this many of the question's words from its own text. */
+/**
+ * Generic words that appear all through coaching material. A question must still be covered
+ * for them, but they never count toward the match, so "How do I grow my business?" is not
+ * answered by an item that merely mentions growing and the business (Codex r5).
+ */
+export const ASK_COACH_GENERIC_WORDS: ReadonlySet<string> = new Set([
+  'business',
+  'businesses',
+  'work',
+  'working',
+  'grow',
+  'growing',
+  'growth',
+  'manage',
+  'handle',
+  'improve',
+  'help',
+  'make',
+  'run',
+  'job',
+  'jobs',
+  'customer',
+  'customers',
+  'client',
+  'clients',
+  'money',
+  'time',
+  'plan',
+]);
+
+const GENERIC_STEMS = new Set([...ASK_COACH_GENERIC_WORDS].map(stem));
+
+/** An item must match at least this many of the question's topic words (not allow-listed). */
 export const ASK_COACH_MIN_MATCHED = 2;
 const MAX_PASSAGES = 2;
 
 /**
  * Fail closed. The assistant answers only when ONE item covers EVERY content word of the
- * question, apart from the short everyday-business list above. Any word the item does not
+ * question, apart from the short everyday list above, and shares at least two topic words
+ * with it. Any word the item does not
  * contain (a credential term, a misspelling, an acronym nobody listed, a topic the coach never
  * wrote about) sends the question to the coach, so a new phrasing can only cause an escalation,
  * never an answer. The compliance check runs first as a second, independent layer.
@@ -294,8 +308,9 @@ export function answerFromKnowledgeBase(
       let matched = 0;
       let uncovered = 0;
       for (const t of q) {
-        if (itemTokens.has(t)) matched += 1;
-        else if (!EVERYDAY_STEMS.has(t)) uncovered += 1;
+        if (EVERYDAY_STEMS.has(t)) continue;
+        if (!itemTokens.has(t)) uncovered += 1;
+        else if (!GENERIC_STEMS.has(t)) matched += 1;
       }
       return { item, matched, uncovered };
     })

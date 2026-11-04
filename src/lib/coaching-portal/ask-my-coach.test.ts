@@ -298,6 +298,56 @@ describe('fail closed: auto-answer only when the cited item covers every content
     );
   });
 
+  it('Codex r5: a generic question is not answered from loosely related default material', () => {
+    const kb = getCoachKnowledgeBase(DEFAULT_COACHING_COACH.id);
+    if (!kb) throw new Error('missing default knowledge base');
+    for (const q of [
+      'How do I manage my work and business?',
+      'How do I handle my clients better?',
+      'How do I grow my business?',
+      'How do I run my work better?',
+      'How can I improve my customers work?',
+    ]) {
+      expect(answerFromKnowledgeBase(q, kb).status, q).toBe('needs_coach');
+    }
+  });
+
+  it('allow-listed words never count toward the match: every item needs two of its own topic words', () => {
+    const kb = getCoachKnowledgeBase(DEFAULT_COACHING_COACH.id);
+    if (!kb) throw new Error('missing default knowledge base');
+    const filler = [...ASK_COACH_EVERYDAY_WORDS].join(' ');
+    for (const item of kb.items) {
+      // Every word of the item, one at a time, padded with the whole allow-list: still one topic
+      // word, so it must go to the coach even though nothing is uncovered.
+      for (const word of `${item.title} ${item.body}`
+        .split(/[^A-Za-z]+/)
+        .filter((w) => w.length > 2)) {
+        const r = answerFromKnowledgeBase(`${filler} ${word} ${filler}`, kb);
+        expect(r.status, `${item.id}: ${word}`).toBe('needs_coach');
+      }
+    }
+  });
+
+  it('the allow-list holds no topic-bearing words', () => {
+    for (const w of [
+      'manage',
+      'handle',
+      'grow',
+      'improve',
+      'work',
+      'run',
+      'help',
+      'make',
+      'business',
+      'customer',
+      'customers',
+      'client',
+      'clients',
+    ]) {
+      expect(ASK_COACH_EVERYDAY_WORDS.has(w), w).toBe(false);
+    }
+  });
+
   it('the everyday allow-list is short and holds no credential wording', () => {
     expect(ASK_COACH_EVERYDAY_WORDS.size).toBeLessThanOrEqual(40);
     for (const w of ASK_COACH_EVERYDAY_WORDS) {
