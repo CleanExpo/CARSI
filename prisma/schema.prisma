@@ -1362,3 +1362,21 @@ model CarsiCoachingAction {
   @@index([userId, status])
   @@map("carsi_coaching_actions")
 }
+
+/// GP-631 (Coaching advantage A4): a coach's own knowledge base. Keyed by coach id (the same
+/// string Ask my coach routes questions by), not by a member, so a member leaving never removes
+/// it. Used by Ask my coach only once approved_at is set; the coach can delete rows at any time.
+model CarsiCoachingCoachCorpusItem {
+  id            String    @id @default(uuid()) @db.Uuid
+  coachId       String    @map("coach_id") @db.VarChar(64)
+  sourceType    String    @map("source_type") @db.VarChar(32)
+  title         String    @db.VarChar(200)
+  body          String    @db.Text
+  provenanceUrl String?   @map("provenance_url") @db.VarChar(500)
+  approvedAt    DateTime? @map("approved_at") @db.Timestamptz(6)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([coachId, approvedAt], map: "idx_carsi_coaching_coach_corpus_coach_approved")
+  @@map("carsi_coaching_coach_corpus")
+}

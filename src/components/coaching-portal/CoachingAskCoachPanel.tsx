@@ -167,12 +167,26 @@ function AskResult({ result }: { result: AskMyCoachResult }) {
                 {source ? (
                   <p className="mt-1 text-xs text-slate-400">
                     Source:{' '}
-                    <Link
-                      href={source.sourceHref}
-                      className="text-sky-300 underline-offset-2 hover:underline"
-                    >
-                      {source.sourceLabel}
-                    </Link>
+                    {/* GP-631: a coach's own item links out only when it has a web address. */}
+                    {!source.sourceHref ? (
+                      <span className="text-slate-300">{source.sourceLabel}</span>
+                    ) : /^https?:\/\//.test(source.sourceHref) ? (
+                      <a
+                        href={source.sourceHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sky-300 underline-offset-2 hover:underline"
+                      >
+                        {source.sourceLabel}
+                      </a>
+                    ) : (
+                      <Link
+                        href={source.sourceHref}
+                        className="text-sky-300 underline-offset-2 hover:underline"
+                      >
+                        {source.sourceLabel}
+                      </Link>
+                    )}
                   </p>
                 ) : null}
               </div>

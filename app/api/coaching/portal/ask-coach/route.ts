@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { getCoachKnowledgeBase } from '@/lib/coaching-portal/coach-knowledge-base';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { askMyCoach, listMyCoachQuestions } from '@/lib/server/carsi-coaching-ask-coach';
 import { getAskCoachStore } from '@/lib/server/carsi-coaching-ask-coach-store';
 import { isCarsiCoachingAssistantEnabled } from '@/lib/server/carsi-coaching-assistant-flag';
+import { coachKnowledgeBaseFor } from '@/lib/server/carsi-coaching-coach-corpus';
+import { getCoachCorpusStore } from '@/lib/server/carsi-coaching-coach-corpus-store';
 import { requireCoachingPortalSubscriber } from '@/lib/server/carsi-coaching-portal-gate';
 
 export const dynamic = 'force-dynamic';
@@ -40,7 +41,9 @@ export async function POST(request: NextRequest) {
 
   const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
   const store = getAskCoachStore();
-  const result = await askMyCoach(store, getCoachKnowledgeBase, g.claims.sub, body?.question);
+  // GP-631: the member's coach's own approved material, else CARSI's published coaching text.
+  const knowledgeBase = coachKnowledgeBaseFor(getCoachCorpusStore());
+  const result = await askMyCoach(store, knowledgeBase, g.claims.sub, body?.question);
   if (result.status === 'invalid') {
     return NextResponse.json(
       { detail: 'Ask a question between 5 and 1000 characters.' },
