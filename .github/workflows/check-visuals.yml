@@ -1,7 +1,27 @@
 name: check-visuals
 on:
   pull_request:
-    paths: ["**/*.tsx", "**/*.jsx", "**/*.ts", "**/*.js", "**/*.mdx", "**/*.html", "**/*.astro", "**/*.vue", "**/*.svelte", "**/*.css", "**/*.scss", "**/*.sass", "**/*.less", "**/public/**", "media.manifest.json", "visuals.config.json", "scripts/premium-visuals/**", ".github/workflows/check-visuals.yml"]
+    paths:
+      [
+        '**/*.tsx',
+        '**/*.jsx',
+        '**/*.ts',
+        '**/*.js',
+        '**/*.mdx',
+        '**/*.html',
+        '**/*.astro',
+        '**/*.vue',
+        '**/*.svelte',
+        '**/*.css',
+        '**/*.scss',
+        '**/*.sass',
+        '**/*.less',
+        '**/public/**',
+        'config/media.manifest.json',
+        'config/visuals.config.json',
+        'scripts/premium-visuals/**',
+        '.github/workflows/check-visuals.yml',
+      ]
 permissions:
   contents: read
 jobs:
@@ -14,6 +34,6 @@ jobs:
         with:
           node-version: 22
       # Mode comes from visuals.config.json ("report" = list findings, never fail; "enforce" = fail the PR on any finding).
-      # Exit 2 = configuration error and fails in both modes. Neither mode is visual acceptance (see AGENTS.md).
+      # Exit 2 = configuration error and fails in both modes. Neither mode is visual acceptance (see docs/agents/AGENTS.md).
       # The path list must cover every extension the scanner reads; src/lib/premium-visuals/check-visuals.test.ts checks it.
       - run: node scripts/premium-visuals/check-visuals.mjs --root .

@@ -33,6 +33,13 @@ export function findMissingRequiredEnv(env: NodeJS.ProcessEnv = process.env): st
     missing.push(`JWT_SECRET (min ${MIN_JWT_SECRET_LENGTH} chars)`);
   }
 
+  if (
+    env.NODE_ENV === 'production' &&
+    env.CARSI_COACHING_PORTAL_DEV_UNLOCK?.trim().toLowerCase() === 'true'
+  ) {
+    missing.push('CARSI_COACHING_PORTAL_DEV_UNLOCK (must not be true in production)');
+  }
+
   return missing;
 }
 
