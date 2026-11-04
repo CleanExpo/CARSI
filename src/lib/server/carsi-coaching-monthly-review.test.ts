@@ -69,6 +69,8 @@ function demoStore() {
     row(OTHER, 'o1', 'Another member’s action', 'todo'),
   ];
   const plan = { latestGuidance: 'Keep the 48-hour call rule going.' as string | null };
+  /** Legacy monthly_actions_json actions; imported only while the member has no rows (as in prod). */
+  const legacy: Row[] = [];
   let nextId = 1;
   const writes: string[] = [];
   const member: MonthlyReviewMember = {
@@ -129,13 +131,18 @@ function demoStore() {
       writes.push(`guidance:${userId}`);
       plan.latestGuidance = text;
     },
+    async importLegacyActions(userId) {
+      writes.push(`importLegacy:${userId}`);
+      if (rows.some((r) => r.userId === userId)) return;
+      for (const l of legacy) if (l.userId === userId) rows.push({ ...l });
+    },
   };
   /** What the member's board read would return: only the four board statuses. */
   const memberBoard = (userId = USER) =>
     rows.filter(
       (r) => r.userId === userId && (MEMBER_BOARD_STATUSES as readonly string[]).includes(r.status)
     );
-  return { store, rows, plan, writes, memberBoard, member };
+  return { store, rows, plan, writes, memberBoard, member, legacy };
 }
 
 /** The revision the coach's editor holds: the one the view returned. */
@@ -198,6 +205,28 @@ describe('generateMonthlyReview (GP-629 demo member)', () => {
     expect(drafts.filter((d) => d.goalId?.startsWith(REVIEW_GOAL_PREFIX))).toHaveLength(1);
     expect(drafts.every((d) => (d.goalId ?? '').length <= 64)).toBe(true);
     expect(t.writes.some((w) => w.includes(OTHER))).toBe(false);
+  });
+
+  it('imports legacy actions before drafting, so a draft never hides them from the member (review f037d802 P1)', async () => {
+    const t = demoStore();
+    // A member who has never opened the portal: no action rows, only legacy monthly_actions_json.
+    for (let i = t.rows.length - 1; i >= 0; i--) if (t.rows[i].userId === USER) t.rows.splice(i, 1);
+    t.legacy.push(
+      row(USER, 'l1', 'Legacy: chase overdue invoices', 'todo'),
+      row(USER, 'l2', 'Legacy: update price list', 'blocked')
+    );
+
+    const view = await generateMonthlyReview(USER, {
+      store: t.store,
+      now: NOW,
+      draftWithModel: async () => null,
+    });
+
+    const imported = t.writes.indexOf(`importLegacy:${USER}`);
+    expect(imported).toBeGreaterThanOrEqual(0);
+    expect(imported).toBeLessThan(t.writes.findIndex((w) => w.startsWith(`create:${USER}`)));
+    expect(t.memberBoard().map((r) => r.id)).toEqual(['l1', 'l2']);
+    expect(view.review?.counts.total).toBe(2);
   });
 
   it('works with no AI configured (fallback grounded in the board)', async () => {

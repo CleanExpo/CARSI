@@ -28,6 +28,7 @@ import {
 import { OpenRouterClient } from '@/lib/openrouter/client';
 import { resolveOpenRouterConfig } from '@/lib/openrouter/provider';
 import { prisma } from '@/lib/prisma';
+import { importLegacyActionsFromSubscriptionJson } from '@/lib/server/carsi-coaching-actions-store';
 import { readCoachingSessionPrepNotes } from '@/lib/server/carsi-coaching-session-prep';
 
 const MODEL_TIMEOUT_MS = 45_000;
@@ -76,6 +77,12 @@ export type MonthlyReviewStore = {
   deleteDraftRows(userId: string): Promise<void>;
   createRows(userId: string, rows: NewMonthlyReviewRow[]): Promise<void>;
   setLatestGuidance(userId: string, guidance: string): Promise<void>;
+  /**
+   * Brings the member's legacy `monthly_actions_json` onto the board if they have no action rows
+   * yet. The portal does this on first visit, but only while the member has zero rows, so a draft
+   * written first would suppress it for good (review f037d802 P1).
+   */
+  importLegacyActions(userId: string): Promise<void>;
 };
 
 /** What is stored as JSON in the review record's description. */
@@ -321,6 +328,9 @@ export async function generateMonthlyReview(
   const now = deps.now ?? new Date();
   const draftWithModel = deps.draftWithModel ?? draftMonthlyReviewWithOpenRouter;
 
+  // Import first: the review must see the member's legacy actions, and a draft row written before
+  // the import would stop the portal from ever importing them.
+  await store.importLegacyActions(userId);
   const [member, rows] = await Promise.all([store.loadMember(userId, now), store.listRows(userId)]);
   // A review belongs to one booked session (GP-629: "before each scheduled session"). Without one
   // there is no key to stop a second approved batch, so nothing is drafted (review r2 P1).
@@ -481,6 +491,7 @@ type MonthlyReviewDb = Pick<
   | 'carsiCoachingSession'
   | 'carsiCoachingBusinessProfile'
   | 'lmsUser'
+  | 'carsiCoachingMonthlySubscription'
 >;
 
 function prismaStoreFor(db: MonthlyReviewDb): MonthlyReviewStore {
@@ -553,6 +564,15 @@ function prismaStoreFor(db: MonthlyReviewDb): MonthlyReviewStore {
         create: { userId, latestGuidance: guidance },
         update: { latestGuidance: guidance },
       });
+    },
+    async importLegacyActions(userId) {
+      const sub = await db.carsiCoachingMonthlySubscription.findUnique({
+        where: { userId },
+        select: { monthlyActionsJson: true },
+      });
+      if (sub?.monthlyActionsJson) {
+        await importLegacyActionsFromSubscriptionJson(userId, sub.monthlyActionsJson);
+      }
     },
   };
   return store;
