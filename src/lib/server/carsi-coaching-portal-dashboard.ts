@@ -1,13 +1,14 @@
 import type { SessionClaims } from '@/lib/auth/session-jwt';
+import { coachingPortalPath } from '@/lib/coaching-portal/coaching-portal-paths';
 import type { CoachingActionStatus, CoachingPortalFeatures } from '@/lib/coaching-portal/types';
 import { prisma } from '@/lib/prisma';
+import { isCarsiCoachingAccountabilityEnabled } from '@/lib/server/carsi-coaching-accountability-flag';
 import {
   importLegacyActionsFromSubscriptionJson,
   listCoachingActionsForUser,
 } from '@/lib/server/carsi-coaching-actions-store';
-import { isCarsiCoachingAccountabilityEnabled } from '@/lib/server/carsi-coaching-accountability-flag';
+import { isCarsiCoachingMonthlyEnabled } from '@/lib/server/carsi-coaching-monthly-flag';
 import { getCoachingPortalAccess } from '@/lib/server/carsi-coaching-portal-access';
-import { coachingPortalPath } from '@/lib/coaching-portal/coaching-portal-paths';
 import { getCoachingPortalRowForUser } from '@/lib/server/carsi-coaching-subscription-store';
 
 export type CoachingHomeState = 'locked' | 'onboarding' | 'assessment_pending' | 'active';
@@ -89,6 +90,8 @@ export type CoachingPortalDashboard = {
     hasBookedAny: boolean;
   };
   bookingUrl: string | null;
+  /** Same switch as /ccw-training — hide Stripe checkout when monthly coaching is off. */
+  checkoutEnabled: boolean;
   features: CoachingPortalFeatures;
 };
 
@@ -328,6 +331,7 @@ export async function loadCoachingPortalDashboard(
       hasBookedAny,
     },
     bookingUrl,
+    checkoutEnabled: isCarsiCoachingMonthlyEnabled(),
     features: { accountability: isCarsiCoachingAccountabilityEnabled() },
   };
 }
