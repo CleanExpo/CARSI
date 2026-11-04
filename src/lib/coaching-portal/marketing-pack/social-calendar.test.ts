@@ -115,3 +115,50 @@ describe('no template asserts customer activity (Codex P1, head ce8eb97f)', () =
     expect(posts.filter((p) => /thanks to everyone who has booked/i.test(p.caption))).toEqual([]);
   });
 });
+
+describe('every template reads correctly and claims nothing for any trade (GP-634 class sweep)', () => {
+  // One trade for each fixed label, plus an unlisted trade and no trade at all.
+  const trades = [
+    'Carpet cleaning',
+    'Mould',
+    'Fire and smoke',
+    'Flood restoration',
+    'Pressure washing',
+    'Window cleaner',
+    'Cleaner',
+    'Plumber',
+    'Electrician',
+    'Painter',
+    'Roofer',
+    'Pest control',
+    'Tiler',
+    'Air con',
+    'Landscaper',
+    'Builder',
+    'Locksmith',
+    'Mobile mechanic',
+    '',
+  ];
+  const unproven = [
+    /our work/i, // the old empty-trade fallback ("Quick our work tip", "Need our work?")
+    /\ba (?:[aeiou])/i, // "a electrical job", "a air conditioning job"
+    /business we rate/i,
+    /busy season/i,
+    /here's what you can/i,
+    /usually means/i,
+    /makes a real difference/i,
+    /early signs are easy to miss/i,
+  ];
+
+  it.each(trades)('trade "%s": 30 posts, plain grammar, no unproven statement', (trade) => {
+    const posts = assembleCalendar(
+      { businessName: '', trade, town: '', services: '' },
+      new Date('2026-11-09')
+    ).posts;
+    expect(posts).toHaveLength(30);
+    for (const p of posts) {
+      for (const re of unproven) expect(p.caption, p.caption).not.toMatch(re);
+      expect(p.caption, p.caption).not.toMatch(/ {2}|\s[.,?]/);
+    }
+  });
+});

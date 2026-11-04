@@ -1,6 +1,6 @@
 /**
  * GP-634: 30-day social calendar in the member's trade voice, built only from a vetted,
- * claim-free template set filled with the member's business name, trade, town and services.
+ * claim-free template set; the only member-derived text is a trade label from a fixed list.
  * No model text reaches the calendar: four review rounds showed a word filter cannot prove
  * free-form AI copy is free of earnings, guarantee or outcome claims. AI drafting can return
  * behind a coach approval step (see RESULT.md for GP-634).
@@ -19,26 +19,29 @@ function tag(s: string): string {
 /** Deterministic, claim-free month of posts built from the trade voice alone. */
 export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
   const voice = sanitizeVoice(rawVoice);
-  const trade = voice.trade || 'trade';
-  const service = voice.trade || 'our work';
+  // The trade label is only ever used as "<label> work" with no article in front of it, so every
+  // label (and the empty fallback) reads correctly: "plumbing work", "air conditioning work",
+  // "trade work". Every other line is either general advice or a fill-in prompt in [brackets]:
+  // nothing asserts a job, a customer, a habit or a season the member has not supplied.
+  const work = voice.trade ? `${voice.trade} work` : 'trade work';
   const tags = voice.trade ? [tag(voice.trade)] : [];
 
   const lines: Array<[string, string]> = [
     [
       'Who we are',
-      `G'day! We're a ${trade} business. Over the next month we'll share what we do and a few tips for looking after your place.`,
+      `G'day! We do ${work}. Over the next month we'll share what we do and a few tips for looking after your place.`,
     ],
     [
       'Tip',
-      `Quick ${service} tip: deal with small problems early. A little attention now usually means a smaller job later. Ask us if you're not sure what to look for.`,
+      `Quick tip: deal with small problems early. Ask us if you're not sure what to look for.`,
     ],
     [
       'Behind the scenes',
-      `Behind the scenes on a ${service} job: [add a photo and one line about a real job you did this week].`,
+      `Behind the scenes: [add a photo and one line about a real job you did this week].`,
     ],
     [
       'Question',
-      `What's one thing you'd like to know about ${trade}? Drop it in the comments and we'll answer it in a post this month.`,
+      `What's one thing you'd like to know about ${work}? Drop it in the comments and we'll answer it in a post this month.`,
     ],
     [
       'Meet the team',
@@ -46,7 +49,7 @@ export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
     ],
     [
       'Tip',
-      `Before you book any ${service}, ask what's included, how long it takes and what you need to do to get ready. A good tradie will happily explain.`,
+      `Before you book any ${work}, ask what's included, how long it takes and what you need to do to get ready.`,
     ],
     [
       'Local',
@@ -54,7 +57,7 @@ export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
     ],
     [
       'Seasonal',
-      `A change of season is a good time to check on the things you only think about once a year. [Add what you check on a ${service} visit.]`,
+      `A change of season is a good time to check on the things you only think about once a year. [Add what you check on a visit.]`,
     ],
     [
       'Job story',
@@ -66,11 +69,11 @@ export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
     ],
     [
       'Tip',
-      `Three things to check before you call a ${trade} business: are they local, are they insured, and do they explain the job in plain English?`,
+      `Three things to ask before you book ${work}: are they local, are they insured, and do they explain the job in plain English?`,
     ],
     [
       'Question',
-      `Have you had ${service} done before? What made it a good or bad experience? We're always keen to hear.`,
+      `Have you had ${work} done before? What made it a good or bad experience? We're keen to hear.`,
     ],
     [
       'Behind the scenes',
@@ -78,32 +81,26 @@ export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
     ],
     [
       'Myth or fact',
-      `Myth or fact: "you only need ${service} when something looks wrong." Often the early signs are easy to miss. Ask us what to watch for.`,
+      `Myth or fact: "you only need ${work} when something looks wrong." [Say whether this is a myth or a fact in your trade, and why.]`,
     ],
     [
       'Thank you',
       `A thank-you post: [if you have had bookings, referrals or reviews, thank those people here; otherwise skip this post].`,
     ],
-    [
-      'Tip',
-      `Looking after things between ${service} visits makes a real difference. [Add one care tip you give your customers.]`,
-    ],
+    ['Tip', `Care tip: [add one care tip you give your customers between visits].`],
     ['Local', `Spotted around the area this week: [add a local photo you took].`],
     [
       'Job story',
-      `Before and after: [add your own before and after photos from a real ${service} job, with the customer's permission].`,
+      `Before and after: [add your own before and after photos from a real job, with the customer's permission].`,
     ],
     [
       'Question',
-      `Poll time: when do you usually think about ${service}? Before guests arrive, at the change of season, or when something goes wrong?`,
+      `Poll time: when do you usually think about ${work}? At the change of season, before a big event, or when something goes wrong?`,
     ],
-    [
-      'Training',
-      `Training: [add a course or skill you are really working on for ${trade}, or skip this post].`,
-    ],
+    ['Training', `Training: [add a course or skill you are really working on, or skip this post].`],
     [
       'Tip',
-      `Safety first: if a ${trade} job involves electrics, heights or chemicals, it's worth getting someone trained to do it.`,
+      `Safety first: if a job involves electrics, heights or chemicals, use someone trained to do it.`,
     ],
     [
       'Behind the scenes',
@@ -111,7 +108,7 @@ export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
     ],
     [
       'Local',
-      `Supporting local: a shout-out to another local business we rate. Who's your favourite local business?`,
+      `Supporting local: [give a shout-out to a local business you really rate, or skip this post].`,
     ],
     [
       'How we work',
@@ -119,11 +116,11 @@ export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
     ],
     [
       'Tip',
-      `If something goes wrong after hours, here's what you can safely do yourself until a professional can get there.`,
+      `After-hours tip: [add one thing a customer can safely do themselves until a professional arrives, or skip this post].`,
     ],
     [
       'Question',
-      `What's the one ${trade} question you've always wanted to ask but never have? No silly questions here.`,
+      `What's the one question about ${work} you've always wanted to ask? No silly questions here.`,
     ],
     [
       'Reviews',
@@ -135,12 +132,9 @@ export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
     ],
     [
       'Seasonal',
-      `Planning ahead: now is a good time to book ${service} before the busy season. Message us and we'll find a time that suits.`,
+      `Planning ahead: if you know you'll need ${work} later in the year, message us and we'll find a time that suits.`,
     ],
-    [
-      'Booking',
-      `Need ${service}? Send us a message or give us a call and we'll talk you through it.`,
-    ],
+    ['Booking', `Need ${work}? Send us a message or give us a call and we'll talk you through it.`],
   ];
   return lines.map(([theme, caption]) => ({ theme, caption, hashtags: tags }));
 }
