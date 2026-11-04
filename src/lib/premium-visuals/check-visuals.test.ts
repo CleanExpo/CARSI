@@ -282,9 +282,50 @@ describe('(4) manifest provenance is validated', () => {
     it(`rejects ${name}`, () => {
       const r = runJson(fixture(files));
       expect(rules(r.json)).toContain('manifest-invalid');
-      expect(r.status).toBe(1);
+      // GP-688: an invalid manifest is a configuration error (exit 2), not an ordinary finding.
+      expect(r.status).toBe(2);
+      expect(r.stderr).toMatch(/configuration error: .*media\.manifest\.json/);
     });
   }
+
+  // GP-688: report mode used to list a broken manifest and still exit 0.
+  const withReport = (files: Files): Files => ({
+    ...files,
+    'config/visuals.config.json': REPORT,
+  });
+  for (const name of [
+    'malformed JSON',
+    'non-object manifest',
+    'entries not an array',
+    'invalid kind',
+  ]) {
+    it(`report mode: ${name} is a configuration error (exit 2), with the full report still printed`, () => {
+      const r = runJson(fixture(withReport(bad[name])));
+      expect(r.json.mode).toBe('report-only');
+      expect(rules(r.json)).toContain('manifest-invalid');
+      expect(r.status).toBe(2);
+      expect(r.stderr).toMatch(/configuration error: .*media\.manifest\.json/);
+      expect(run(fixture(withReport(bad[name]))).status).toBe(2);
+    });
+  }
+
+  it('report mode with a valid manifest still exits 0 even with findings (happy path)', () => {
+    const r = runJson(
+      fixture(withReport(cleanFiles({ 'public/media/stray.webp': Buffer.alloc(1024) })))
+    );
+    expect(rules(r.json)).toContain('unmanifested-public-media');
+    expect(rules(r.json)).not.toContain('manifest-invalid');
+    expect(r.status).toBe(0);
+    expect(r.stderr).not.toMatch(/configuration error/);
+  });
+
+  it('a manifest entry whose file is missing stays an ordinary finding, not a configuration error', () => {
+    const files = withReport(cleanFiles());
+    delete files['public/media/hero.webp'];
+    const r = runJson(fixture(files));
+    expect(rules(r.json)).toContain('manifest-missing-file');
+    expect(r.status).toBe(0);
+  });
 
   it('names the shape error for an array or string manifest, not just a version mismatch', () => {
     for (const body of ['[]', '"media"', '[{"version":1,"entries":[]}]']) {
@@ -466,6 +507,30 @@ describe('(6) mode labelling, config, workflow and docs', () => {
         )
       ).status
     ).toBe(2);
+  });
+
+  // GP-688: a missing config used to fall back to built-in defaults silently.
+  it('a missing config/visuals.config.json is a configuration error (exit 2), not silent defaults', () => {
+    for (const mode of [ENFORCE, REPORT]) {
+      const files = cleanFiles({ 'config/visuals.config.json': mode });
+      delete files['config/visuals.config.json'];
+      const r = run(fixture(files));
+      expect(r.status).toBe(2);
+      expect(r.stderr).toMatch(/configuration error: .*visuals\.config\.json.*not found/);
+      expect(r.stdout).toBe('');
+    }
+  });
+
+  it('a --config path that does not exist is a configuration error (exit 2)', () => {
+    const r = run(fixture(cleanFiles()), ['--config', 'config/nope.json']);
+    expect(r.status).toBe(2);
+    expect(r.stderr).toMatch(/configuration error: .*nope\.json.*not found/);
+  });
+
+  it('a present, valid config still runs (happy path for the missing-config check)', () => {
+    const r = run(fixture(cleanFiles()));
+    expect(r.status).toBe(0);
+    expect(r.stderr).not.toMatch(/configuration error/);
   });
 
   it('the workflow path filter covers every extension the scanner reads', () => {
