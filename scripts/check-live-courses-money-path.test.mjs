@@ -45,9 +45,13 @@ check('the CEC link the ticket names is the path the check opens', () => {
   assert.equal(CEC_PATH, '/courses?discipline=iicrc-cec#catalogue');
 });
 
-check('reads a price only when it is above zero', () => {
-  assert.equal(pricedAud('$29CARSI Specialty Courses Collection1 CEC'), 29);
+check('reads a price only from a whole price label, and only above zero', () => {
+  assert.equal(pricedAud('$29'), 29);
   assert.equal(pricedAud('View · $1,250'), 1250);
+  assert.equal(pricedAud('$29 AUD'), 29);
+  // CodeRabbit on #1033: a "$29" inside a description is not a price badge.
+  assert.equal(pricedAud('$29CARSI Specialty Courses Collection1 CEC'), null);
+  assert.equal(pricedAud('Save $29 on drying kits when you enrol'), null);
   assert.equal(pricedAud('A$ 49.50'), 49.5);
   assert.equal(pricedAud('Free'), null);
   assert.equal(pricedAud('$0'), null);
@@ -70,8 +74,8 @@ check('first screen with no priced class and no CEC link is a fault (GP-676 rule
     site: SITE,
     label: 'desktop',
     courseLinks: [
-      { href: '/courses/free-a', text: 'Free Intro to drying' },
-      { href: '/courses/free-b', text: 'Free' },
+      { href: '/courses/free-a', labels: ['Free', 'Intro to drying'] },
+      { href: '/courses/free-b', labels: ['Free'] },
     ],
     links: ['/', '/courses', '#catalogue', '/pricing'],
   });
@@ -93,7 +97,7 @@ check('first screen passes on a priced class alone', () => {
   const r = judgeFirstScreen({
     site: SITE,
     label: 'mobile',
-    courseLinks: [{ href: '/courses/approved-a', text: '$29 1 CEC Approved A' }],
+    courseLinks: [{ href: '/courses/approved-a', labels: ['$29', '1 CEC', 'Approved A'] }],
     links: ['/'],
   });
   assert.equal(r.fault, null);
@@ -104,8 +108,20 @@ check('the catalogue itself (/courses) is not counted as a priced class', () => 
   const r = judgeFirstScreen({
     site: SITE,
     label: 'desktop',
-    courseLinks: [{ href: '/courses', text: 'Courses from $29' }],
+    courseLinks: [{ href: '/courses', labels: ['$29'] }],
     links: ['/courses'],
+  });
+  assert.match(r.fault, /NO PRICED CLASS AND NO CEC LINK/);
+});
+
+check('a free class whose description mentions a dollar amount is not a priced class', () => {
+  const r = judgeFirstScreen({
+    site: SITE,
+    label: 'desktop',
+    courseLinks: [
+      { href: '/courses/free-a', labels: ['Free', 'Free intro', 'Kits from $29 at your supplier'] },
+    ],
+    links: ['/'],
   });
   assert.match(r.fault, /NO PRICED CLASS AND NO CEC LINK/);
 });

@@ -70,14 +70,19 @@ const URL_LIKE_RE =
  * resolves to with isPrivateHost, the same test the redirect and browser checks use, so short,
  * decimal and hex spellings (http://127.1:8080/, http://2130706433:8080/, //0x7f.1) and other
  * private ranges are caught. A scheme-relative string with neither a dot nor a port (`//10`) is
- * left to the regex pass: in page text that shape is far more often a code comment than a link.
+ * skipped in free text, where that shape is far more often a code comment than a link, but is
+ * judged when it is an attribute value (`href="//2130706433/"`), and always when the caller
+ * passes `attributeValues: true` because every token in the text is a link.
  */
-export function findLocalOrigins(text) {
+export function findLocalOrigins(text, { attributeValues = false } = {}) {
   if (!text) return [];
   const s = String(text);
   const found = (s.match(LOCAL_ORIGIN_RE) || []).map((m) => m.toLowerCase().replace(/\\\//g, '/'));
-  for (const [, scheme, authority] of s.matchAll(URL_LIKE_RE)) {
-    if (!scheme && !/[.:]/.test(authority)) continue;
+  for (const m of s.matchAll(URL_LIKE_RE)) {
+    const [, scheme, authority] = m;
+    const inAttribute =
+      attributeValues || /=\s*["']?$/.test(s.slice(Math.max(0, m.index - 3), m.index));
+    if (!scheme && !inAttribute && !/[.:]/.test(authority)) continue;
     let host;
     try {
       host = new URL(`http://${authority}/`).hostname;
@@ -466,7 +471,7 @@ export async function audit(faults = []) {
             )
             .join(' ')
         );
-        for (const o of findLocalOrigins(hrefs))
+        for (const o of findLocalOrigins(hrefs, { attributeValues: true }))
           faults.push(`LOCALHOST ${path} (${scheme}, rendered): ${o}`);
         if (!cardShown) {
           // The page loaded (goto succeeded) but the buyer has no card to enrol with. Another
@@ -476,6 +481,26 @@ export async function audit(faults = []) {
           );
           continue;
         }
+        // The card must still ask for the buyer's email: checkout cannot start without it.
+        const hasEmail = await page.evaluate(
+          (sel) =>
+            [...document.querySelectorAll(sel)].some((card) =>
+              [...card.querySelectorAll('input[type="email"], input[name*="email" i]')].some(
+                (el) => {
+                  const r = el.getBoundingClientRect();
+                  const st = getComputedStyle(el);
+                  return (
+                    r.width > 0 &&
+                    r.height > 0 &&
+                    st.visibility !== 'hidden' &&
+                    st.display !== 'none'
+                  );
+                }
+              )
+            ),
+          QUICK_ENROL_CARD_SELECTOR
+        );
+        if (!hasEmail) faults.push(`QUICK-ENROL CARD HAS NO EMAIL FIELD ${path} (${scheme})`);
         const fields = await page.evaluate(readFormColours, QUICK_ENROL_CARD_SELECTOR);
         if (fields.length === 0) faults.push(`QUICK-ENROL CARD HAS NO FIELDS ${path} (${scheme})`);
         fieldsRead += fields.length;

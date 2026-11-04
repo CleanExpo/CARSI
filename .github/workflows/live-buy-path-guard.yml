@@ -6,11 +6,12 @@ name: Live Buy-Path Guard
 #   - a local origin (localhost:8080, 127.1, 2130706433, any private host) in a public page,
 #     a redirect, or the sign-out redirect;
 #   - a paid course page with no quick-enrol card (found by its data-quick-enrol-card
-#     attribute; another email form on the page does not count), or a card field whose text
-#     is (nearly) the colour of its background.
+#     attribute; another email form on the page does not count), a card with no email field,
+#     or a card field whose text is (nearly) the colour of its background.
 # live-courses-money-path (GP-676): the GP-639 catalogue faults
 #   - the logged-out first screen of /courses (desktop and mobile) shows no priced class and
-#     no link to the IICRC CEC classes;
+#     no link to the IICRC CEC classes (a hidden or clipped link, or a "$29" inside a free
+#     class's description, does not count), or loads anything from a private host;
 #   - /courses?discipline=iicrc-cec#catalogue lists a class with no current approval in
 #     data/seed/cec-approvals.json, or opens a tab other than "IICRC CEC".
 # planted-fault-proof: runs both guards against a local fixture site with each fault planted

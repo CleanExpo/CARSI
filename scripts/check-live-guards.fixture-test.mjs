@@ -11,8 +11,13 @@
  *                       priced class only on first screen (no link)  -> 0
  *                       no priced class and no CEC link on screen 1  -> 1  NO PRICED CLASS AND NO CEC LINK
  *                       CEC tab lists a class that is not approved   -> 1  NOT CEC-APPROVED
+ *                       "$29" only in a free class's description     -> 1  NO PRICED CLASS AND NO CEC LINK
+ *                       CEC link hidden (transparent parent, clipped) -> 1 NO PRICED CLASS AND NO CEC LINK
+ *                       page loads an image from 127.1               -> 1  LOCALHOST (browser request blocked)
+ *                       decoy "N courses" above a partial CEC list   -> 2  read 3 of 4
  *   buy path            clean (quick-enrol card AND a newsletter)    -> 0
  *                       card gone, newsletter email form still there -> 1  NO QUICK-ENROL CARD
+ *                       card shown but with no email field           -> 1  QUICK-ENROL CARD HAS NO EMAIL FIELD
  *                       http://127.1:8080/ and http://2130706433:8080/ in page text -> 1 LOCALHOST
  *
  * The clean runs are the positive controls: without them a fixture that is broken in some other
@@ -48,47 +53,73 @@ const doc = (body) =>
   `<style>body{margin:0;font:16px sans-serif;color:#111;background:#fff}` +
   `.hero{min-height:1400px}.card{display:block;padding:8px}</style></head><body>${body}</body></html>`;
 
-const card = (slug, text) => `<a class="card" href="/courses/${slug}">${text}</a>`;
+const card = (slug, badge, body = 'Class') =>
+  `<a class="card" href="/courses/${slug}"><span>${badge}</span><p>${body}</p></a>`;
 const nav = `<nav><a href="/">Home</a> <a href="/courses">Courses</a> <a href="/pricing">Pricing</a></nav>`;
 
-function coursesPage({ cecLink, pricedOnFirstScreen }) {
+const CEC_HREF = '/courses?discipline=iicrc-cec#catalogue';
+
+function coursesPage({
+  cecLink,
+  pricedOnFirstScreen,
+  dollarInFreeDescription,
+  hiddenCecLink,
+  privateImage,
+}) {
   const first = [
     nav,
-    pricedOnFirstScreen ? card(CEC_SLUGS[0], '$29 1 CEC First class') : '',
-    card('free-intro-fixture', 'Free Intro'),
+    pricedOnFirstScreen ? card(CEC_SLUGS[0], '$29', 'First class') : '',
+    card(
+      'free-intro-fixture',
+      'Free',
+      dollarInFreeDescription ? 'Free intro. Kits from $29 at your supplier' : 'Free intro'
+    ),
     `<a href="#catalogue">Browse the catalogue</a>`,
-    cecLink ? `<a href="/courses?discipline=iicrc-cec#catalogue">CEC Accredited courses</a>` : '',
+    cecLink ? `<a href="${CEC_HREF}">CEC Accredited courses</a>` : '',
+    // Present in the DOM and inside the viewport box, but a visitor cannot see either one.
+    hiddenCecLink
+      ? `<div style="opacity:0"><a href="${CEC_HREF}">CEC (transparent parent)</a></div>` +
+        `<div style="height:0;overflow:hidden"><a href="${CEC_HREF}">CEC (clipped)</a></div>`
+      : '',
+    privateImage ? `<img alt="" src="http://127.1:9/pixel.png" width="1" height="1">` : '',
   ].join(' ');
   // Priced classes exist BELOW the fold in every variant: the rule is about the first screen.
   return doc(
     `<div class="hero">${first}</div>` +
       `<div id="catalogue"><div role="tablist"><button role="tab" aria-selected="true">All</button></div>` +
       `<span>4 courses</span><section aria-label="Course results">` +
-      CEC_SLUGS.map((s) => card(s, '$29 1 CEC Class')).join('') +
-      card('free-intro-fixture', 'Free Intro') +
+      CEC_SLUGS.map((s) => card(s, '$29', '1 CEC Class')).join('') +
+      card('free-intro-fixture', 'Free', 'Free intro') +
       `</section></div>`
   );
 }
 
-function cecPage({ plantNonCec }) {
+function cecPage({ plantNonCec, decoyCounter }) {
   const slugs = plantNonCec ? [...CEC_SLUGS, NOT_CEC] : CEC_SLUGS;
+  // Decoy: an unrelated count above the catalogue that equals the rows rendered, while the
+  // catalogue's own counter says one more class exists than was rendered (a partial list).
+  const decoy = decoyCounter ? `<p><span>${slugs.length} courses</span> in your plan</p>` : '';
+  const counter = decoyCounter ? slugs.length + 1 : slugs.length;
   return doc(
-    `<div id="catalogue"><div role="tablist"><button role="tab" aria-selected="false">All</button>` +
+    `${decoy}<div id="catalogue"><div role="tablist"><button role="tab" aria-selected="false">All</button>` +
       `<button role="tab" aria-selected="true">IICRC CEC</button></div>` +
-      `<span>${slugs.length} courses</span><section aria-label="Course results">` +
-      slugs.map((s) => card(s, '$29 1 CEC Class') + card(s, 'View course')).join('') +
+      `<span>${counter} courses</span><section aria-label="Course results">` +
+      slugs.map((s) => card(s, '$29', '1 CEC Class') + card(s, 'View course')).join('') +
       `</section><label>Rows per page <select aria-label="Rows per page">` +
       `<option value="12">12</option><option value="all">All</option></select></label></div>`
   );
 }
 
 const field = 'style="color:#111;background:#fff;border:1px solid #555;display:block"';
-const quickEnrolCard =
+const quickEnrolCard = (withEmail = true) =>
   `<form data-quick-enrol-card="" style="background:#fff;color:#111;padding:8px">` +
   `<label for="guest-full-name" style="color:#111">Full name</label>` +
   `<input id="guest-full-name" ${field}>` +
-  `<label for="guest-email" style="color:#111">Email</label>` +
-  `<input id="guest-email" type="email" ${field}></form>`;
+  (withEmail
+    ? `<label for="guest-email" style="color:#111">Email</label>` +
+      `<input id="guest-email" type="email" ${field}>`
+    : '') +
+  `</form>`;
 const newsletter =
   `<form class="newsletter"><label for="nl" style="color:#111">Newsletter</label>` +
   `<input id="nl" type="email" name="email" ${field}></form>`;
@@ -96,7 +127,9 @@ const newsletter =
 function buyPage(path, scenario) {
   if (PAID_PATHS.includes(path)) {
     return doc(
-      `${nav}<h1>Paid course</h1>${scenario === 'noCard' ? '' : quickEnrolCard}${newsletter}`
+      `${nav}<h1>Paid course</h1>` +
+        (scenario === 'noCard' ? '' : quickEnrolCard(scenario !== 'noEmail')) +
+        newsletter
     );
   }
   if (path === '/' && scenario === 'loopback') {
@@ -120,10 +153,21 @@ const server = createServer((req, res) => {
   if (scenario.startsWith('courses:') && u.pathname === '/courses') {
     html =
       u.searchParams.get('discipline') === 'iicrc-cec'
-        ? cecPage({ plantNonCec: scenario === 'courses:nonCec' })
+        ? cecPage({
+            plantNonCec: scenario === 'courses:nonCec',
+            decoyCounter: scenario === 'courses:decoyCounter',
+          })
         : coursesPage({
-            cecLink: scenario !== 'courses:noPricedNoLink' && scenario !== 'courses:pricedOnly',
+            cecLink: ![
+              'courses:noPricedNoLink',
+              'courses:pricedOnly',
+              'courses:dollarInFreeDescription',
+              'courses:hiddenCecLink',
+            ].includes(scenario),
             pricedOnFirstScreen: scenario === 'courses:pricedOnly',
+            dollarInFreeDescription: scenario === 'courses:dollarInFreeDescription',
+            hiddenCecLink: scenario === 'courses:hiddenCecLink',
+            privateImage: scenario === 'courses:privateRequest',
           });
   } else {
     html = buyPage(u.pathname, scenario.replace(/^buy:/, ''));
@@ -164,8 +208,28 @@ const CASES = [
     1,
     new RegExp(`NOT CEC-APPROVED .*${NOT_CEC}`),
   ],
+  [
+    'courses:dollarInFreeDescription',
+    './check-live-courses-money-path.mjs',
+    1,
+    /NO PRICED CLASS AND NO CEC LINK/,
+  ],
+  [
+    'courses:hiddenCecLink',
+    './check-live-courses-money-path.mjs',
+    1,
+    /NO PRICED CLASS AND NO CEC LINK/,
+  ],
+  [
+    'courses:privateRequest',
+    './check-live-courses-money-path.mjs',
+    1,
+    /LOCALHOST .*127\.0\.0\.1:9/,
+  ],
+  ['courses:decoyCounter', './check-live-courses-money-path.mjs', 2, /read 3 of 4/],
   ['buy:clean', './check-live-buy-path.mjs', 0, /passed/],
   ['buy:noCard', './check-live-buy-path.mjs', 1, /NO QUICK-ENROL CARD/],
+  ['buy:noEmail', './check-live-buy-path.mjs', 1, /QUICK-ENROL CARD HAS NO EMAIL FIELD/],
   [
     'buy:loopback',
     './check-live-buy-path.mjs',

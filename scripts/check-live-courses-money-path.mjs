@@ -9,12 +9,17 @@
  *   1. FIRST SCREEN: the logged-out first screen of /courses (desktop 1366x900 and mobile
  *      390x844, scrolled to the top) shows no priced class AND no link to the CEC classes
  *      (/courses?discipline=iicrc-cec). Either one on screen is enough.
+ *      "Seen" means inside the viewport after ancestor clipping, with no transparent or hidden
+ *      ancestor; a price counts only as a whole badge label, not a "$29" inside a description.
  *   2. CEC LIST: /courses?discipline=iicrc-cec#catalogue opens a list that is not all CEC-approved
  *      classes. Every listed class must hold a current approval in data/seed/cec-approvals.json
  *      (the same test as isCecApprovalCurrent in src/lib/seed/cec-approvals.ts: status approved,
  *      hours above zero, expiresAt not yet reached). The list is read in full ("All" rows per
  *      page) and must match the page's own "N courses" counter, and the link must open the
  *      "IICRC CEC" tab.
+ *
+ * Requests from the audited pages to a raw IP or a private host are blocked and reported, as in
+ * the buy-path guard.
  *
  * Only a subset rule: the registry also holds classes not on the LMS, so the counts never need
  * to match the registry.
@@ -30,6 +35,7 @@
  */
 import { readFileSync } from 'node:fs';
 
+import { blockBrowserRequest } from './check-live-buy-path.mjs';
 import { isEntryPoint } from './lib/is-entry-point.mjs';
 
 const SITE = (process.env.CARSI_SITE || 'https://carsi.com.au').replace(/\/$/, '');
@@ -45,9 +51,15 @@ export const VIEWPORTS = [
   },
 ];
 
-/** The amount in a "$29" / "A$ 49.50" / "View · $1,250" price, or null when free or absent. */
+/**
+ * The amount in a whole price label ("$29", "A$ 49.50", "$29 AUD", "View · $1,250"), or null
+ * when the text is free, absent, or only mentions a dollar amount among other words. A card's
+ * link wraps its description too (seen live), so "$29" inside a sentence is not a price badge.
+ */
 export function pricedAud(text) {
-  const m = /\$\s?(\d[\d,]*(?:\.\d+)?)/.exec(String(text || ''));
+  const m = /^\s*(?:View\s*·\s*)?A?\$\s?(\d[\d,]*(?:\.\d+)?)(?:\s*AUD)?\s*$/.exec(
+    String(text || '')
+  );
   if (!m) return null;
   const n = Number(m[1].replace(/,/g, ''));
   return Number.isFinite(n) && n > 0 ? n : null;
@@ -82,7 +94,9 @@ function isClassHref(href, site) {
 export function judgeFirstScreen({ site, label, courseLinks, links }) {
   const pricedClasses = new Set(
     courseLinks
-      .filter((l) => isClassHref(l.href, site) && pricedAud(l.text) !== null)
+      .filter(
+        (l) => isClassHref(l.href, site) && (l.labels || []).some((t) => pricedAud(t) !== null)
+      )
       .map((l) => l.href)
   ).size;
   const cecLinks = links.filter((h) => isCecLink(h, site)).length;
@@ -161,24 +175,37 @@ export function summarise({ faults, errors, screensRead, cecRead }) {
 
 const RESULTS = 'section[aria-label="Course results"] a[href^="/courses/"]';
 
-/** In the page: what the visitor can see without scrolling. */
+/**
+ * In the page: what the visitor can see without scrolling. An element counts only when some of
+ * it is inside the viewport AFTER clipping by every ancestor that clips its overflow, and no
+ * element on its ancestor chain is transparent, hidden or not displayed.
+ */
 function readFirstScreen() {
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
   const seen = (el) => {
-    const r = el.getBoundingClientRect();
-    const s = getComputedStyle(el);
-    return (
-      r.width > 0 &&
-      r.height > 0 &&
-      r.bottom > 0 &&
-      r.right > 0 &&
-      r.top < vh &&
-      r.left < vw &&
-      s.visibility !== 'hidden' &&
-      s.display !== 'none' &&
-      Number(s.opacity) > 0
-    );
+    let box = el.getBoundingClientRect();
+    box = { l: box.left, t: box.top, r: box.right, b: box.bottom };
+    for (let n = el; n && n.nodeType === 1; n = n.parentElement) {
+      const st = getComputedStyle(n);
+      if (st.display === 'none' || st.visibility === 'hidden' || Number(st.opacity) === 0) {
+        return false;
+      }
+      if (n !== el && (st.overflowX !== 'visible' || st.overflowY !== 'visible')) {
+        const c = n.getBoundingClientRect();
+        box = {
+          l: Math.max(box.l, c.left),
+          t: Math.max(box.t, c.top),
+          r: Math.min(box.r, c.right),
+          b: Math.min(box.b, c.bottom),
+        };
+      }
+    }
+    box = {
+      l: Math.max(box.l, 0),
+      t: Math.max(box.t, 0),
+      r: Math.min(box.r, window.innerWidth),
+      b: Math.min(box.b, window.innerHeight),
+    };
+    return box.r - box.l > 0 && box.b - box.t > 0;
   };
   const anchors = [...document.querySelectorAll('a[href]')].filter(seen);
   return {
@@ -186,20 +213,35 @@ function readFirstScreen() {
     links: anchors.map((a) => a.getAttribute('href')),
     courseLinks: anchors
       .filter((a) => /^\/courses\/|\/\/[^/]+\/courses\//.test(a.getAttribute('href')))
-      .map((a) => ({ href: a.getAttribute('href'), text: a.textContent.replace(/\s+/g, ' ') })),
+      .map((a) => ({
+        href: a.getAttribute('href'),
+        // Each visible leaf element's own text: the price badge is one, the description another.
+        labels: [...a.querySelectorAll('*')]
+          .filter((e) => e.children.length === 0 && seen(e))
+          .map((e) => e.textContent.replace(/\s+/g, ' ').trim())
+          .filter(Boolean),
+      })),
   };
 }
 
-/** In the page: the active tab, the "N courses" counter and every class slug in the results. */
+/**
+ * In the page: the active tab, the catalogue's own "N courses" counter and every class slug in
+ * the results. The counter is the one NEAREST the results (searched outward from the results
+ * section, ancestor by ancestor), so an unrelated count elsewhere on the page cannot stand in
+ * for it (Codex review of #1033).
+ */
 function readCecList(resultsSelector) {
   const active = document.querySelector('[role="tab"][aria-selected="true"]');
   let counter = null;
-  for (const el of document.querySelectorAll('span, p, div')) {
-    if (el.children.length) continue;
-    const m = /^\s*(\d+) courses?\s*$/.exec(el.textContent || '');
-    if (m) {
-      counter = Number(m[1]);
-      break;
+  const section = document.querySelector('section[aria-label="Course results"]');
+  for (let n = section && section.parentElement; n && counter === null; n = n.parentElement) {
+    for (const el of n.querySelectorAll('span, p, div')) {
+      if (el.children.length) continue;
+      const m = /^\s*(\d+) courses?\s*$/.exec(el.textContent || '');
+      if (m) {
+        counter = Number(m[1]);
+        break;
+      }
     }
   }
   const slugs = [
@@ -210,6 +252,22 @@ function readCecList(resultsSelector) {
     ),
   ];
   return { activeTab: active ? active.textContent.trim() : null, counter, slugs };
+}
+
+/**
+ * The same browser boundary as the buy-path guard: a request off the audited site to a raw IP
+ * or a named private host is reported as a fault and aborted, so the runner never reaches an
+ * internal service from a public page.
+ */
+async function guardRequests(page, where, faults) {
+  await page.route('**/*', (route) => {
+    const url = route.request().url();
+    if (blockBrowserRequest(url, SITE)) {
+      faults.push(`LOCALHOST ${where} (browser request blocked): ${new URL(url).origin}`);
+      return route.abort();
+    }
+    return route.continue();
+  });
 }
 
 export async function audit(faults = [], errors = []) {
@@ -232,6 +290,7 @@ export async function audit(faults = [], errors = []) {
         hasTouch: Boolean(vp.hasTouch),
       });
       try {
+        await guardRequests(page, `/courses (${vp.label})`, faults);
         await page.goto(SITE + '/courses', { waitUntil: 'domcontentloaded', timeout: 30000 });
         // The cards are the sign the catalogue rendered; until then "nothing priced" means nothing.
         await page.waitForSelector(RESULTS, { timeout: 20000 });
@@ -252,6 +311,7 @@ export async function audit(faults = [], errors = []) {
 
     const page = await browser.newPage({ viewport: VIEWPORTS[0].viewport });
     try {
+      await guardRequests(page, CEC_PATH, faults);
       await page.goto(SITE + CEC_PATH, { waitUntil: 'domcontentloaded', timeout: 30000 });
       await page.waitForSelector(RESULTS, { timeout: 20000 });
       // Show every row; a pager would otherwise hide all but the first 12. A choice made before
