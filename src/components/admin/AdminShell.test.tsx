@@ -96,7 +96,8 @@ describe('AdminShell responsive navigation', () => {
     await open();
     await act(async () => {
       document.activeElement?.dispatchEvent(
-        new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
+        // Cancelable like a real key press, so a handler that vetoes dismissal fails this test.
+        new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true })
       );
     });
     expect(document.querySelector('[role="dialog"]')).toBeNull();
