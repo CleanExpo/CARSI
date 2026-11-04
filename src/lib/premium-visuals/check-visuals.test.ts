@@ -305,7 +305,12 @@ describe('(4) manifest provenance is validated', () => {
       expect(rules(r.json)).toContain('manifest-invalid');
       expect(r.status).toBe(2);
       expect(r.stderr).toMatch(/configuration error: .*media\.manifest\.json/);
-      expect(run(fixture(withReport(bad[name]))).status).toBe(2);
+      const text = run(fixture(withReport(bad[name])));
+      expect(text.status).toBe(2);
+      // The notice must not claim the run cannot fail when it is about to exit 2.
+      expect(text.stdout).toMatch(/REPORT-ONLY/);
+      expect(text.stdout).toMatch(/invalid manifest exits 2/);
+      expect(text.stdout).toMatch(/not visual acceptance/i);
     });
   }
 
@@ -317,6 +322,7 @@ describe('(4) manifest provenance is validated', () => {
     expect(rules(r.json)).not.toContain('manifest-invalid');
     expect(r.status).toBe(0);
     expect(r.stderr).not.toMatch(/configuration error/);
+    expect(run(fixture(withReport(cleanFiles()))).stdout).not.toMatch(/invalid manifest exits 2/);
   });
 
   it('a manifest entry whose file is missing stays an ordinary finding, not a configuration error', () => {
