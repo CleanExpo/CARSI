@@ -9,6 +9,14 @@ import type { MarketingFix, SiteCheck, SiteFetchResult, SiteReview, TradeVoice }
 
 /** Known trades, most specific first. Generated copy only ever names a trade by these labels. */
 const TRADE_LABELS: Array<[RegExp, string]> = [
+  // Specialist cleaning first, so the generic /clean/ and /removal/ rules below cannot claim them.
+  [/waterproof/i, 'waterproofing'], // before /roof/
+  [/biohazard|trauma|crime scene/i, 'biohazard cleaning'],
+  [/asbestos/i, 'asbestos removal'],
+  [/graffiti/i, 'graffiti removal'],
+  [/odou?r/i, 'odour removal'],
+  [/\bducts?\b/i, 'duct cleaning'],
+  [/detailing|detailer/i, 'car detailing'],
   [/carpet|rug|upholster/i, 'carpet and upholstery cleaning'],
   [/mou?ld/i, 'mould remediation'],
   [/fire|smoke|soot/i, 'fire and smoke restoration'],
@@ -26,6 +34,18 @@ const TRADE_LABELS: Array<[RegExp, string]> = [
   [/lawn|garden|landscap/i, 'landscaping'],
   [/build|carpent|joiner|renovat/i, 'building'],
   [/locksmith|\blocks?\b/i, 'locksmith'],
+  [/mechanic|vehicle|automotive|\bauto\b|panel beat/i, 'mechanical'],
+  [/handy ?man|odd jobs/i, 'handyman'],
+  [/concret/i, 'concreting'],
+  [/fenc/i, 'fencing'],
+  [/glaz|glass/i, 'glazing'],
+  [/plaster/i, 'plastering'],
+  [/brick/i, 'bricklaying'],
+  [/solar/i, 'solar installation'],
+  [/arborist|\btrees?\b/i, 'tree care'],
+  [/\bpools?\b/i, 'pool care'],
+  [/appliance/i, 'appliance service'],
+  [/removalist|\bremovals\b/i, 'removals'],
 ];
 
 export function tradeLabel(trade: string, services = ''): string {

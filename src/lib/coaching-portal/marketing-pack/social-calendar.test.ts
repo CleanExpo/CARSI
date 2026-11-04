@@ -162,3 +162,43 @@ describe('every template reads correctly and claims nothing for any trade (GP-63
     }
   });
 });
+
+describe('calendar trade voice for trades beyond the first label set (Codex P1, head e9248b38)', () => {
+  const start = new Date('2026-11-09');
+  it.each([
+    ['Mobile mechanic', 'Vehicle repairs', 'mechanical'],
+    ['Handyman', '', 'handyman'],
+    ['Concreter', '', 'concreting'],
+    ['Fencing', '', 'fencing'],
+    ['Glazier', '', 'glazing'],
+    ['Plasterer', '', 'plastering'],
+    ['Bricklayer', '', 'bricklaying'],
+    ['Solar installer', '', 'solar installation'],
+    ['Arborist', 'Tree removal', 'tree care'],
+    ['Pool maintenance', '', 'pool care'],
+    ['Appliance repairs', '', 'appliance service'],
+    ['Removalist', '', 'removals'],
+    ['Duct cleaning', '', 'duct cleaning'],
+    ['Asbestos removal', '', 'asbestos removal'],
+    ['Trauma and biohazard cleaning', '', 'biohazard cleaning'],
+    ['Odour control', '', 'odour removal'],
+    ['Graffiti removal', '', 'graffiti removal'],
+    ['Car detailing', '', 'car detailing'],
+    ['Waterproofer', '', 'waterproofing'],
+  ])('trade "%s" gets posts in its own trade wording', (trade, services, label) => {
+    const calendar = assembleCalendar({ businessName: '', trade, town: '', services }, start);
+    expect(calendar.tradeMatched).toBe(true);
+    expect(
+      calendar.posts.filter((p) => p.caption.includes(`${label} work`)).length
+    ).toBeGreaterThan(5);
+  });
+
+  it('a trade with no vetted label is flagged as general wording, never passed off as trade-specific', () => {
+    const calendar = assembleCalendar(
+      { businessName: '', trade: 'Bespoke harp tuning', town: '', services: '' },
+      start
+    );
+    expect(calendar.tradeMatched).toBe(false);
+    expect(calendar.posts).toHaveLength(30);
+  });
+});

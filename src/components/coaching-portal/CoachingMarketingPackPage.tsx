@@ -226,8 +226,10 @@ export function CoachingMarketingPackPage() {
               30-day social calendar
             </h2>
             <p className={`mt-1 ${coachingMuted}`}>
-              Drafts in your voice for {pack.voice.town || 'your area'}. Edit them to sound like you
-              and add your own job photos before posting.
+              {pack.calendar.tradeMatched === false
+                ? 'We do not have wording for your trade yet, so these drafts use general trade wording. Your coach can help you tailor them.'
+                : `Drafts written for ${pack.voice.trade || 'your trade'}.`}{' '}
+              Edit them to sound like you and add your own job photos before posting.
             </p>
             <ol className="mt-5 space-y-3">
               {posts.map((p) => (

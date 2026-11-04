@@ -63,6 +63,11 @@ export type SocialCalendar = {
   source: 'template';
   /** Kept for stored-pack shape; always 0 now that no drafts are filtered. */
   rejectedCount: number;
+  /**
+   * False when the member's trade has no vetted label, so the posts use general trade wording.
+   * The page says so rather than presenting them as written for that trade (Codex P1, e9248b38).
+   */
+  tradeMatched: boolean;
 };
 
 export type MarketingPack = {

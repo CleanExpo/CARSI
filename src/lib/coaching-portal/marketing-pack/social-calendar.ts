@@ -171,5 +171,10 @@ export function assembleCalendar(voice: TradeVoice, startDate: Date): SocialCale
     caption: c.caption,
     hashtags: c.hashtags,
   }));
-  return { posts, source: 'template', rejectedCount: 0 };
+  return {
+    posts,
+    source: 'template',
+    rejectedCount: 0,
+    tradeMatched: Boolean(sanitizeVoice(voice).trade),
+  };
 }
