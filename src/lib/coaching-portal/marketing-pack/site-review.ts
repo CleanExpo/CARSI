@@ -117,12 +117,17 @@ export function isGoogleBusinessLink(url: string): boolean {
     const host = u.hostname.toLowerCase();
     // A link must name one listing: generic roots, dashboards and plain searches do not
     // (Codex P1, head 4119a2a2). Short links need an ID segment after the host or prefix.
-    const hasId = (prefix: string) =>
-      u.pathname.startsWith(prefix) &&
-      u.pathname.slice(prefix.length).replace(/\/+$/, '').length > 0;
-    if (host === 'g.page') return hasId('/');
-    if (host === 'maps.app.goo.gl') return hasId('/');
-    if (host === 'goo.gl') return hasId('/maps/');
+    // Web links only, and each short-link shape is matched whole so a bare prefix such as
+    // g.page/r/ never counts as a listing ID (Codex P1, heads 4119a2a2 and 6735fbf0).
+    if (u.protocol !== 'https:' && u.protocol !== 'http:') return false;
+    const path = u.pathname.replace(/\/+$/, '');
+    const ID = '[A-Za-z0-9_-]+';
+    if (host === 'g.page') {
+      if (path.startsWith('/r/') || path === '/r') return new RegExp(`^/r/${ID}(/.*)?$`).test(path);
+      return new RegExp(`^/${ID}(/.*)?$`).test(path);
+    }
+    if (host === 'maps.app.goo.gl') return new RegExp(`^/${ID}$`).test(path);
+    if (host === 'goo.gl') return new RegExp(`^/maps/${ID}$`).test(path);
     // Exact Google hosts only: a suffix match accepted google.com.evil.example (Codex P1, bc601506).
     if (GOOGLE_HOSTS.has(host)) {
       if (/[?&](cid|ludocid)=\d+/.test(u.search)) return true;
@@ -130,7 +135,7 @@ export function isGoogleBusinessLink(url: string): boolean {
       if (host.startsWith('business.')) return /\/l\/\d+/.test(u.pathname);
       return false;
     }
-    if (host.endsWith('.business.site')) return true;
+    if (/^[a-z0-9-]+\.business\.site$/.test(host)) return true;
     return false;
   } catch {
     return false;

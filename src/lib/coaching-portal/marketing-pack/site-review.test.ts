@@ -199,3 +199,40 @@ describe('generic Google pages are not a linked Business Profile (Codex P1, head
     }
   );
 });
+
+describe('isGoogleBusinessLink short-link shapes (Codex P1, head 6735fbf0)', () => {
+  it.each([
+    'https://g.page/r/',
+    'https://g.page/r',
+    'ftp://g.page/r/listing',
+    'ftp://maps.app.goo.gl/abc',
+    'javascript://g.page/listing',
+    'https://maps.app.goo.gl/abc/extra',
+    'https://goo.gl/maps/',
+    'https://.business.site/',
+    'https://a.b.business.site/',
+  ])('rejects %s', (url) => {
+    expect(isGoogleBusinessLink(url)).toBe(false);
+  });
+
+  it.each([
+    'https://g.page/r/CabcDEF123',
+    'https://g.page/downs-carpet-care',
+    'http://maps.app.goo.gl/abc123',
+    'https://goo.gl/maps/xyz789',
+    'https://downs.business.site/',
+  ])('accepts %s', (url) => {
+    expect(isGoogleBusinessLink(url)).toBe(true);
+  });
+
+  it('reports gbp-link-invalid for a bare g.page/r/ link in the review', () => {
+    const review = reviewWebsite({
+      websiteUrl: null,
+      fetch: null,
+      googleBusinessUrl: 'https://g.page/r/',
+      voice,
+    });
+    expect(review.fixes.map((f) => f.id)).toEqual(expect.arrayContaining(['gbp-link-invalid']));
+    expect(review.checks.find((c) => c.id === 'google-business-profile')?.passed).toBe(false);
+  });
+});
