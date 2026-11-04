@@ -18,14 +18,27 @@ type Row = {
 
 const rows: Row[] = [];
 
-function matches(row: Row, where: Record<string, unknown>) {
+function matches(row: Row, where: Record<string, unknown>): boolean {
   return Object.entries(where).every(([k, v]) => {
+    // Prisma combinators used by the store since the learning-path merge (GP-633).
+    if (k === 'OR') return (v as Record<string, unknown>[]).some((w) => matches(row, w));
+    if (k === 'NOT') return !matches(row, v as Record<string, unknown>);
     if (v && typeof v === 'object' && 'in' in (v as object)) {
       return ((v as { in: unknown[] }).in ?? []).includes(row[k as keyof Row]);
+    }
+    if (v && typeof v === 'object' && 'startsWith' in (v as object)) {
+      const cell = row[k as keyof Row];
+      return typeof cell === 'string' && cell.startsWith((v as { startsWith: string }).startsWith);
     }
     return row[k as keyof Row] === v;
   });
 }
+
+// The learning-path LMS sync is covered by its own tests; here it contributes no courses.
+vi.mock('@/lib/server/carsi-coaching-learning-path', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/server/carsi-coaching-learning-path')>()),
+  syncLearningPath: async () => [],
+}));
 
 /**
  * Per-key lock standing in for pg_advisory_xact_lock: held until the transaction that took it

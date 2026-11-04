@@ -82,8 +82,13 @@ top of every portal screen.
 ## 8. Learning path and resources
 
 - **Screen:** `/dashboard/coaching/resources`
-- **Proves:** A6 prescribed learning path. Today: the resource library.
-- **Say:** "Assessment gaps will assign CARSI modules automatically (GP-633). Today the member has the library."
+- **Proves:** A6 prescribed learning path (GP-633).
+- **Before the demo:** in Admin, open **Learning paths**, choose the demo member and press
+  **Assign from assessment** (the seed does not assign it). The demo answers point to sales,
+  operations and technology gaps, so up to four published courses are prescribed.
+- **Say:** "The member's assessment picked these CARSI courses. Their progress shows here and on
+  the Actions board, and finishing a course ticks off the action. I can remove, add or reorder
+  courses for each member."
 
 ## 9. Ask my coach assistant and marketing pack
 
@@ -103,7 +108,7 @@ top of every portal screen.
 
 - The **Demo US chapter with USD pricing** needs GP-632's coach table. It is drafted, not built:
   see `docs/coaching/partner-demo-chapter-DRAFT.md`.
-- **Assistant exchanges, assigned modules and the marketing pack** are not seeded because their
-  screens do not exist yet (GP-630, GP-633, GP-634).
+- **Assistant exchanges and the marketing pack** are not seeded because their screens do not
+  exist yet (GP-630, GP-634). The learning path is assigned by hand before the demo (section 8).
 - **Scheduled nightly reset** is not set up. Re-running the seed is the reset; scheduling it needs
   a decision on which preview database the demo lives in.

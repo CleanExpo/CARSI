@@ -20,6 +20,7 @@ import {
   COACHING_GROWTH_SERVICE_CATEGORIES,
   type GrowthServiceItem,
 } from '@/lib/coaching-portal/growth-services';
+import { learningCourseLink } from '@/lib/coaching-portal/learning-path';
 import { openCoachingSupportEmail } from '@/lib/coaching-portal/support-contact';
 import type { CoachingActionStatus } from '@/lib/coaching-portal/types';
 import { carsiCoachingMonthlyPriceLabel } from '@/lib/marketing/carsi-coaching-monthly';
@@ -34,7 +35,55 @@ type ActionItem = {
   dueDate: string | null;
   priority: string | null;
   progressNote?: string | null;
+  /** Prescribed CARSI course (GP-633): status and progress follow the LMS. */
+  learning?: { courseSlug: string; percent: number; enrolled: boolean } | null;
 };
+
+const STATUS_LABEL: Record<CoachingActionStatus, string> = {
+  todo: 'Not started',
+  in_progress: 'In progress',
+  done: 'Completed',
+  blocked: 'Blocked',
+  proposed: 'Waiting for coach',
+  declined: 'Declined by coach',
+};
+
+/** Enrolled members open the lesson player; others go to the course page to enrol. */
+function LearningCourseAction({
+  learning,
+  status,
+  className,
+}: {
+  learning: NonNullable<ActionItem['learning']>;
+  status: CoachingActionStatus;
+  className: string;
+}) {
+  const link = learningCourseLink(learning);
+  if (!link) return null;
+  return (
+    <Link href={link.href} className={className}>
+      {status === 'done' && learning.enrolled ? 'Review the course' : link.label}
+    </Link>
+  );
+}
+
+function LearningProgress({ learning }: { learning: NonNullable<ActionItem['learning']> }) {
+  return (
+    <div className="mt-3">
+      <div
+        className="h-1.5 w-full max-w-xs overflow-hidden rounded-full bg-white/10"
+        role="progressbar"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={learning.percent}
+        aria-label="Course progress"
+      >
+        <div className="h-full rounded-full bg-sky-400" style={{ width: `${learning.percent}%` }} />
+      </div>
+      <p className="mt-1 text-xs text-slate-400">{learning.percent}% of the course complete</p>
+    </div>
+  );
+}
 
 const FILTERS: Array<{ id: 'all' | CoachingActionStatus; label: string }> = [
   { id: 'all', label: 'All' },
@@ -200,13 +249,32 @@ export function CoachingActionsPage() {
         <ul className="mt-6 space-y-3">
           {visible.map((a) => (
             <li key={a.id} className={coachingCard}>
-              <p className="font-semibold text-white">{a.title}</p>
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="font-semibold text-white">{a.title}</p>
+                {a.learning ? (
+                  <span className="rounded-full bg-sky-400/10 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-sky-300 uppercase">
+                    Learning
+                  </span>
+                ) : null}
+              </div>
               {a.description ? <p className={`mt-1 ${coachingMuted}`}>{a.description}</p> : null}
+              {a.learning ? <LearningProgress learning={a.learning} /> : null}
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 {a.status === 'proposed' ? (
                   <span className="rounded-full bg-amber-400/10 px-2.5 py-1 text-xs font-semibold text-amber-200">
                     Waiting for your coach to approve
                   </span>
+                ) : a.learning ? (
+                  <>
+                    <span className="rounded-lg border border-white/10 px-2 py-1 text-xs text-slate-300">
+                      {STATUS_LABEL[a.status]}
+                    </span>
+                    <LearningCourseAction
+                      learning={a.learning}
+                      status={a.status}
+                      className="text-xs font-semibold text-sky-300 hover:text-sky-200"
+                    />
+                  </>
                 ) : (
                   <select
                     value={a.status}
@@ -333,6 +401,57 @@ export function CoachingSessionsPage() {
   );
 }
 
+function CoachingLearningPathSection() {
+  const [items, setItems] = useState<ActionItem[] | null>(null);
+
+  useEffect(() => {
+    void fetch('/api/coaching/portal/actions')
+      .then((res) => (res.ok ? res.json() : { items: [] }))
+      .then((data: { items?: ActionItem[] }) =>
+        setItems((data.items ?? []).filter((a) => a.learning))
+      )
+      .catch(() => setItems([]));
+  }, []);
+
+  if (items === null) return null;
+
+  const done = items.filter((a) => a.status === 'done').length;
+
+  return (
+    <section className={coachingCard}>
+      <h2 className={coachingCardTitle}>Your learning path</h2>
+      <p className={`mt-1 ${coachingMuted}`}>
+        {items.length === 0
+          ? 'Once Phill has your business assessment, the CARSI courses that match your gaps appear here.'
+          : `Courses picked from your business assessment. ${done} of ${items.length} completed.`}
+      </p>
+      {items.length > 0 ? (
+        <ol className="mt-5 divide-y divide-white/[0.06]">
+          {items.map((a) => (
+            <li
+              key={a.id}
+              className="flex flex-col gap-2 py-4 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-white">{a.title}</p>
+                <p className={`mt-1 text-xs ${coachingMuted}`}>{STATUS_LABEL[a.status]}</p>
+                {a.learning ? <LearningProgress learning={a.learning} /> : null}
+              </div>
+              {a.learning ? (
+                <LearningCourseAction
+                  learning={a.learning}
+                  status={a.status}
+                  className={`inline-flex shrink-0 items-center text-sm font-semibold text-sky-300 hover:text-sky-200 ${coachingSecondaryBtn} !min-h-9 !px-3`}
+                />
+              ) : null}
+            </li>
+          ))}
+        </ol>
+      ) : null}
+    </section>
+  );
+}
+
 export function CoachingResourcesPage() {
   return (
     <div className={coachingPage}>
@@ -342,6 +461,7 @@ export function CoachingResourcesPage() {
         your plan; hands-on implementation is quoted under Growth services.
       </p>
       <div className="mt-8 space-y-6">
+        <CoachingLearningPathSection />
         {COACHING_RESOURCE_SECTIONS.map((section) => (
           <section key={section.id} className={coachingCard}>
             <h2 className={coachingCardTitle}>{section.title}</h2>
