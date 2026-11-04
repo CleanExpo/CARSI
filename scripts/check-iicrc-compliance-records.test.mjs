@@ -114,6 +114,41 @@ function runGuardIn(files) {
     fail(`multi-line prose CEC-approval claim for "${PLANTED_SLUG}" PASSED the guard or was not named`);
   }
 
+  // GP-673 review r1 (Codex, P1): the real guard, on text the student page renders as "CEC".
+  for (const text of ['Earn 2 [C](#credit)EC hours.', 'Earn 2 C[cite: 1]EC hours.', 'Earn 2 C<strong>In conclusion, </strong>EC hours.']) {
+    const r = runGuardIn({ [EXPORT_FILE]: JSON.stringify([{ ...course(PLANTED_SLUG, 'Neutral.', text), title: 'Neutral title' }]) });
+    if (r.status === 0 || !r.out.includes(PLANTED_SLUG)) fail(`GP-673[renderer] real guard passed or did not name the slug for: ${text}`);
+  }
+  // Control: text the page only tidies (curly quotes, a stock opener) still passes the real guard.
+  const tidied = runGuardIn({
+    [EXPORT_FILE]: JSON.stringify([{ ...course(PLANTED_SLUG, 'Neutral.', 'Certainly! Neutral copy with \u2019quotes\u2019 and a list.'), title: 'Neutral title' }]),
+  });
+  if (tidied.status !== 0) fail(`GP-673 control: text the page only tidies was blocked\n${tidied.out.slice(0, 600)}`);
+  // Fail closed: a guard that cannot load the page's text stripper must fail, never pass.
+  {
+    const dir = mkdtempSync(join(tmpdir(), 'gp673-nostrip-'));
+    try {
+      mkdirSync(join(dir, 'scripts', 'lib'), { recursive: true });
+      writeFileSync(join(dir, 'scripts', 'check-iicrc-compliance.mjs'), readFileSync(GUARD));
+      writeFileSync(join(dir, 'scripts', 'lib', 'is-entry-point.mjs'), readFileSync(join(HERE, 'lib', 'is-entry-point.mjs')));
+      for (const [rel, body] of Object.entries({
+        'src/lib/reviews/review-policy.ts': 'export const reviewPolicy = "How was your course?";\n',
+        'src/components/lms/ReviewPolicy.tsx': 'export function ReviewPolicy() { return null; }\n',
+        [EXPORT_FILE]: JSON.stringify([course('gp673-clean-course', 'A neutral description.')]),
+      })) {
+        mkdirSync(dirname(join(dir, rel)), { recursive: true });
+        writeFileSync(join(dir, rel), body);
+      }
+      execFileSync('git', ['init', '-q'], { cwd: dir });
+      const r = spawnSync(process.execPath, [join(dir, 'scripts', 'check-iicrc-compliance.mjs')], { cwd: dir, encoding: 'utf8' });
+      if (r.status === 0 || !`${r.stdout}${r.stderr}`.includes('could not be loaded')) {
+        fail(`GP-673[renderer] guard without the page's text stripper did not fail closed (exit ${r.status})`);
+      }
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  }
+
   const clean = runGuardIn({
     [EXPORT_FILE]: JSON.stringify([course('gp527-clean-course', 'A neutral description.')], null, 2),
   });
@@ -311,7 +346,7 @@ if (typeof evaluateRecords !== 'function' || typeof classifyRecordFindings !== '
       ['flex order', '<p style="display:flex"><strong style="order:2">EC</strong><strong style="order:1">C</strong> hours</p>'],
       ['bidi override shows reversed text', '<p style="direction:rtl;unicode-bidi:bidi-override">devorppa CRCII</p>'],
       ['bdo element', '<bdo dir="rtl">devorppa CRCII</bdo>'],
-      ['bidi control character', '‮devorppa CRCII'],
+      ['bidi control character', '\u202Edevorppa CRCII'],
     ],
     'hidden-decoy': [
       ['display:none decoy inside a word', 'Earn C<strong style="display:none">x</strong>EC hours.'],
@@ -335,12 +370,12 @@ if (typeof evaluateRecords !== 'function' || typeof classifyRecordFindings !== '
       ['unreviewed base64 image', '<img src="data:image/png;base64,iVBORw0KGgo=">'],
     ],
     'look-alike': [
-      ['Cyrillic letters', 'IICRC СЕС approved'],
-      ['Greek epsilon', 'Earn CΕC hours.'],
-      ['fullwidth letters', 'Earn ＣＥＣ hours.'],
+      ['Cyrillic letters', 'IICRC \u0421\u0415\u0421 approved'],
+      ['Greek epsilon', 'Earn C\u0395C hours.'],
+      ['fullwidth letters', 'Earn \uFF23\uFF25\uFF23 hours.'],
       ['mathematical bold letters', 'Earn \u{1D402}\u{1D404}\u{1D402} hours.'],
-      ['combining accent splits the word', 'Earn ĆEC hours.'],
-      ['C with cedilla', 'Earn ÇEC hours.'],
+      ['combining accent splits the word', 'Earn C\u0301EC hours.'],
+      ['C with cedilla', 'Earn \u00C7EC hours.'],
     ],
     encoding: [
       ['numeric entity without semicolon', 'Worth &#67EC hours.'],
@@ -353,6 +388,18 @@ if (typeof evaluateRecords !== 'function' || typeof classifyRecordFindings !== '
       ['upper-case CEC inside a word', 'Earn ProCECplus hours.'],
     ],
   };
+  // Review r1 (Codex, P1): the student page renders the stored text through stripAiWritingSigns
+  // and, for tag-free fields, Markdown. Text those steps join or turn into images must block.
+  EVASIONS.renderer = [
+    ['Markdown link joins "C" + "EC"', 'Earn 2 [C](#credit)EC hours.'],
+    ['Markdown image', '![Reviewed training badge](https://example.invalid/badge.png)'],
+    ['Markdown code span', 'Earn 2 `C`EC hours.'],
+    ['citation marker removed by the page', 'Earn 2 C[cite: 1]EC hours.'],
+    ['template placeholder removed by the page', 'Earn 2 C{{name}}EC hours.'],
+    ['stock phrase removed inside allowed markup', 'Earn 2 C<strong>In conclusion, </strong>EC hours.'],
+    ['vendor marker word removed inside allowed markup', 'Earn 2 C<strong>oaicite</strong>EC hours.'],
+    ['hiding tag formed only after the page strips a placeholder', 'Earn C<{{x}}strong style="display:none">x</strong>EC hours.'],
+  ];
   for (const [cat, cases] of Object.entries(EVASIONS)) {
     for (const [name, text] of cases) {
       const rec = { ...course(PLANTED_SLUG, 'Neutral.', text), title: 'Neutral title' };

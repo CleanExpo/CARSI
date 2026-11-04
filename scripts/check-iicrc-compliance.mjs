@@ -22,8 +22,27 @@ import { execSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { isEntryPoint } from './lib/is-entry-point.mjs';
+
+/** GP-673 review r1 (Codex, P1). Course descriptions reach learners through
+ *  CourseFormattedBody -> sourceToStudentHtml, which first runs stripAiWritingSigns: it deletes
+ *  citation markers ("[cite: 1]", "{{name}}") and stock phrases ("In conclusion, "), and that can
+ *  join letters the scanner read apart. The record scan therefore also reads each field after the
+ *  site's OWN function has run. It is imported from the app source, not copied, so the two cannot
+ *  drift. The file has no imports and only erasable type syntax; Node 22.18+ loads .ts directly.
+ *  If it cannot be loaded, the record scan fails closed (see evaluateRecords). */
+const STUDENT_STRIP_FILE = 'src/lib/lms/strip-ai-writing-signs.ts';
+let STUDENT_TEXT_STRIP = null;
+let STUDENT_STRIP_ERROR = '';
+try {
+  const mod = await import(pathToFileURL(join(dirname(fileURLToPath(import.meta.url)), '..', STUDENT_STRIP_FILE)).href);
+  if (typeof mod.stripAiWritingSigns !== 'function') throw new Error('stripAiWritingSigns is not exported');
+  STUDENT_TEXT_STRIP = mod.stripAiWritingSigns;
+} catch (err) {
+  STUDENT_STRIP_ERROR = err?.message ?? String(err);
+}
+const studentStrip = (value) => (STUDENT_TEXT_STRIP ? STUDENT_TEXT_STRIP(value) : value);
 
 /** Founder-approved IICRC-CEC course slugs — read from the CEC approvals registry
  *  (`data/seed/cec-approvals.json`, the SSOT; validated by `npm run check:cec`).
@@ -406,7 +425,10 @@ function stringFields(value, path, out, underCec = false) {
 // converge, so another regex patch is the wrong control. Known disguises of that kind: text drawn by
 // CSS (::before content, web fonts), text reordered by CSS or bidi controls, decoy letters hidden by
 // CSS or markup inside a word, text inside images or SVG, look-alike characters, encodings the
-// scanner did not decode, and record fields the scanner does not know.
+// scanner did not decode, record fields the scanner does not know, and text the student page
+// itself changes before display (review r1: stripAiWritingSigns deletes markers and stock phrases;
+// tag-free fields render as Markdown). Each field is read as stored AND after the site's own
+// stripAiWritingSigns, and Markdown link/image/code/escape syntax in visible text is a finding.
 //
 // CONTROL. The export is frozen (WordPress, April 2026). For a course NOT approved in
 // data/seed/cec-approvals.json, every field must use only the markup, CSS declarations, characters
@@ -417,7 +439,9 @@ function stringFields(value, path, out, underCec = false) {
 //
 // RESIDUAL (stated, not hidden): wording drawn into the pixels of the ONE reviewed image (its source
 // returned 404 on 04/11/2026, so it shows nothing today); ASCII look-alikes such as "C3C" or "(EC";
-// lower-case "cec" in the middle of a word; and any surface outside data/wordpress-export/ (authored
+// lower-case "cec" in the middle of a word; a future change to the student renderer beyond
+// stripAiWritingSigns and Markdown (the stripper is imported, so its own changes are followed);
+// other screens that show these fields differently; and any surface outside data/wordpress-export/ (authored
 // source under app/ and src/ is covered by the line rules and code review, not by this gate).
 // Approved courses are not held to the gate: they may state CEC wording openly.
 
@@ -614,7 +638,7 @@ const REVIEWED_THUMBNAILS = new Map([
  *  dashes, curly quotes, bullet and ellipsis. Everything else (Cyrillic or Greek look-alikes,
  *  fullwidth or mathematical letters, accents, combining marks, zero-width and bidi controls) is a
  *  finding, checked after entities are decoded. */
-const UNREADABLE_CHAR_RE = /[^\t\n\r\x20-\x7E §–—‘’“”•…]/u;
+const UNREADABLE_CHAR_RE = /[^\t\n\r\x20-\x7E\u00A0\u00A7\u2013\u2014\u2018\u2019\u201C\u201D\u2022\u2026]/u;
 
 /** HTML's legacy entity names, which browsers decode in text even without ";" (WHATWG named
  *  character references that have a no-semicolon form). Case-sensitive, matched as a prefix. */
@@ -643,7 +667,7 @@ const TAG_AT = /<(\/?)([a-zA-Z][a-zA-Z0-9]*)((?:\s+[^\s"'>/=]+(?:\s*=\s*(?:"[^"]
 const ATTR_RE = /([^\s"'>/=]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'>]+)))?/g;
 
 /** Problems that make one string field unreadable to the scanner (deduplicated, in order). */
-export function readabilityProblems(value, slug) {
+export function readabilityProblems(value, slug, { compareStyleBlocks = true } = {}) {
   const problems = new Set();
   // Characters, after numeric references decode (browsers decode "&#1057;" to a Cyrillic letter).
   const bad = decodeNumericRefs(value).match(UNREADABLE_CHAR_RE);
@@ -658,7 +682,7 @@ export function readabilityProblems(value, slug) {
   }
   // <style> blocks: only an exact reviewed block, with no attributes.
   const rest = value.replace(/<style\b([^>]*)>([\s\S]*?)<\/style\s*>/gi, (_, attrs, css) => {
-    if (attrs.trim() || !REVIEWED_STYLE_BLOCKS.has(normaliseStyleBlock(css))) problems.add('a <style> block that is not the reviewed one (CSS can draw, hide or reorder text)');
+    if (compareStyleBlocks && (attrs.trim() || !REVIEWED_STYLE_BLOCKS.has(normaliseStyleBlock(css)))) problems.add('a <style> block that is not the reviewed one (CSS can draw, hide or reorder text)');
     return ' ';
   });
   for (let i = rest.indexOf('<'); i !== -1; i = rest.indexOf('<', i + 1)) {
@@ -698,8 +722,16 @@ export function readabilityProblems(value, slug) {
       }
     }
   }
+  // GP-673 review r1 (Codex, P1): a field with no HTML tag is rendered as Markdown, where
+  // "[C](#x)EC" shows "CEC", "![alt](url)" becomes an image and "`C`EC" shows "CEC". The reviewed
+  // export's visible text uses none of the characters those constructs need, so any of them in
+  // visible text is a finding, whichever way the page renders the field.
+  const visible = decodeNumericRefs(rest.replace(/<[a-zA-Z/!?][^>]*>?/g, ' '));
+  const syntax = visible.match(MARKDOWN_SYNTAX_RE);
+  if (syntax) problems.add(`"${syntax[0]}" in visible text (Markdown link, image, code or escape syntax the page would render)`);
   return [...problems];
 }
+const MARKDOWN_SYNTAX_RE = /[[\]`\\]/;
 
 /** Every string in a record with its dotted field path (keys are covered by recordShapeProblems). */
 function allStrings(value, path, out) {
@@ -727,6 +759,9 @@ export function evaluateRecords(file, jsonText, { approvedSlugs, allowlist = ALL
     structural('is not an array of course records; the record scan cannot check it');
     return findings;
   }
+  if (!STUDENT_TEXT_STRIP) {
+    structural(`the student page's text stripper (${STUDENT_STRIP_FILE}) could not be loaded (${STUDENT_STRIP_ERROR}); the checker cannot read records the way learners see them, so this is a failure, never a pass. Node 22.18 or later loads it`);
+  }
   const seenSlugs = new Set();
   rows.forEach((row, i) => {
     if (!row || typeof row !== 'object' || Array.isArray(row)) {
@@ -752,7 +787,15 @@ export function evaluateRecords(file, jsonText, { approvedSlugs, allowlist = ALL
         unreadable('thumbnail_url', 'a course-card thumbnail that is not the pinned one for this course (text inside an image cannot be read)');
       }
       for (const [field, value] of allStrings(row, '', [])) {
-        for (const problem of readabilityProblems(value, slug)) unreadable(field, problem);
+        // The text as stored, and as the student page shows it after its stripper has run.
+        const shown = studentStrip(value);
+        // The student page deletes <style> blocks (sanitizeCourseHtml forbids them), so the stripped
+        // view drops them unchecked; the stored view above still compares them exactly.
+        const problems = new Set([
+          ...readabilityProblems(value, slug),
+          ...(shown !== value ? readabilityProblems(shown, slug, { compareStyleBlocks: false }) : []),
+        ]);
+        for (const problem of problems) unreadable(field, problem);
       }
     }
     const flags = (rule, text) =>
@@ -789,6 +832,19 @@ export function evaluateRecords(file, jsonText, { approvedSlugs, allowlist = ALL
       for (const rule of rules) {
         if (hitRules.has(rule) || !flags(rule, raw)) continue;
         findings.push({ file, slug, field, line: 0, text: raw, message: `${rule.message} (inside markup)` });
+      }
+      // GP-673 review r1 (Codex, P1): the student page first runs the site's own
+      // stripAiWritingSigns, which deletes citation markers and stock phrases and so can join
+      // letters ("C<strong>In conclusion, </strong>EC" shows "CEC"). Read the field that way too.
+      const shown = studentStrip(value);
+      if (shown !== value) {
+        for (const view of [recordTextLines(shown).join(' '), renderedRecordText(shown), rawRecordText(shown)]) {
+          for (const rule of rules) {
+            if (hitRules.has(rule) || !flags(rule, view)) continue;
+            hitRules.add(rule);
+            findings.push({ file, slug, field, line: 0, text: view, message: `${rule.message} (as shown after the page removes AI-writing markers)` });
+          }
+        }
       }
     }
   });
