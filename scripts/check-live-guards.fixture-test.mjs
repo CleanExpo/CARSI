@@ -146,8 +146,13 @@ function buyPage(path, scenario) {
       `${nav}<a href="http://127.1:8080/learn/x">Start</a> <a href="http://2130706433:8080/">Go</a>`
     );
   }
-  return doc(`${nav}<h1>${path}</h1>`);
+  // GP-686: URL-like text in script and CSS comments is not a link. Every clean page carries
+  // it, so the clean run (exit 0) proves the guard does not raise a false LOCALHOST on it.
+  return doc(`${nav}<h1>${path}</h1>${commentDecoys}`);
 }
+const commentDecoys =
+  '<script> //127.1:8080 means local dev only </script>' +
+  '<style>/* //10.0.0.1:8080 is the old staging box */ h1{margin:0}</style>';
 
 // ---- server --------------------------------------------------------------------------------
 

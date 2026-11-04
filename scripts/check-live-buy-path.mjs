@@ -62,6 +62,38 @@ const LOCAL_ORIGIN_RE =
 const URL_LIKE_RE =
   /(?<![\w.+-])(https?:)?(?:\/\/|\\\/\\\/)(\[[0-9a-f:.]+\](?::\d+)?|[^\s/\\?#"'`<>()[\]{},;&|^]+)/gi;
 
+const HTML_QUOTE_ENTITY_RE = /&(?:quot|apos|#0*3[49]|#x0*2[27]);$/i;
+const isSpace = (c) => c === ' ' || c === '\t' || c === '\n' || c === '\r' || c === '\f';
+
+/**
+ * Whether a scheme-relative `//host` starting at `index` sits where a browser or parser reads a
+ * URL: the whole text (a Location header), an attribute value (`=` then optional padding, an
+ * optional quote, optional padding), a quoted string (JS, JSON, an `&quot;`-encoded data
+ * attribute, CSS `@import "..."`), CSS `url(`, or a later srcset candidate after a comma.
+ * JSON-escaped `\/\/` only ever appears inside a string, so it always counts.
+ *
+ * Anything else, above all a `//` that opens a script line comment or sits inside a CSS
+ * comment, is not a link (GP-686 item 2). The walk back crosses only the whitespace run in
+ * front of this match, so the whole scan stays linear however much padding a page carries
+ * (GP-686 item 3: the old look-back was a fixed 16 characters).
+ */
+function inUrlPosition(s, index) {
+  if (s.startsWith('\\/', index)) return true;
+  let i = index - 1;
+  while (i >= 0 && isSpace(s[i])) i -= 1;
+  if (i < 0) return true;
+  const c = s[i];
+  if (c === '=' || c === ',') return true;
+  if (c === '(') return /url$/i.test(s.slice(Math.max(0, i - 3), i));
+  const entity = c === ';' && HTML_QUOTE_ENTITY_RE.exec(s.slice(Math.max(0, i - 9), i + 1));
+  if (c !== '"' && c !== "'" && c !== '`' && !entity) return false;
+  if (i === index - 1) return true;
+  // Padding between a quote and the URL counts only inside an attribute value: `href=" //h"`.
+  let j = i - (entity ? entity[0].length : 1);
+  while (j >= 0 && isSpace(s[j])) j -= 1;
+  return j >= 0 && s[j] === '=';
+}
+
 /**
  * Every local origin found in a piece of text (HTML or a Location header), as written.
  *
@@ -69,21 +101,26 @@ const URL_LIKE_RE =
  * The parsed pass (GP-674) hands each URL-like string to the URL parser and judges the host it
  * resolves to with isPrivateHost, the same test the redirect and browser checks use, so short,
  * decimal and hex spellings (http://127.1:8080/, http://2130706433:8080/, //0x7f.1) and other
- * private ranges are caught. A scheme-relative string with neither a dot nor a port (`//10`) is
- * skipped in free text, where that shape is far more often a code comment than a link, but is
- * judged when it is an attribute value (`href="//2130706433/"`), and always when the caller
- * passes `attributeValues: true` because every token in the text is a link.
+ * private ranges are caught. In both passes a scheme-relative string (`//127.1:8080`) is judged
+ * only where inUrlPosition says a URL is read (`href="//2130706433/"`, `url(//h)`, `"//h"`), so
+ * `//` text in a script or CSS comment is not a false LOCALHOST (GP-686), and always when the
+ * caller passes `attributeValues: true` because every token in the text is a link.
  */
 export function findLocalOrigins(text, { attributeValues = false } = {}) {
   if (!text) return [];
   const s = String(text);
-  const found = (s.match(LOCAL_ORIGIN_RE) || []).map((m) => m.toLowerCase().replace(/\\\//g, '/'));
+  // A scheme makes a string a URL wherever it stands. A scheme-relative `//host` is a URL only
+  // where a browser or parser reads one (GP-686): elsewhere it is a script or CSS comment.
+  const isLink = (scheme, index) => scheme || attributeValues || inUrlPosition(s, index);
+  const found = [];
+  for (const m of s.matchAll(LOCAL_ORIGIN_RE)) {
+    if (isLink(/^https?:/i.test(m[0]), m.index)) {
+      found.push(m[0].toLowerCase().replace(/\\\//g, '/'));
+    }
+  }
   for (const m of s.matchAll(URL_LIKE_RE)) {
     const [, scheme, authority] = m;
-    // Browsers strip spaces around a URL value, so `href=" //host"` is still a link.
-    const inAttribute =
-      attributeValues || /=\s*["']?\s*$/.test(s.slice(Math.max(0, m.index - 16), m.index));
-    if (!scheme && !inAttribute && !/[.:]/.test(authority)) continue;
+    if (!isLink(scheme, m.index)) continue;
     let host;
     try {
       host = new URL(`http://${authority}/`).hostname;
