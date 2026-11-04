@@ -1,13 +1,13 @@
 /**
  * POST /api/lms/checkout/survey
- * Body: { session_id, industry?, found_via? } (allowlisted choices only; no free text)
+ * Body: { session_id, survey_key, industry?, found_via? } (allowlisted choices only; no free text)
  *
  * Saves the optional payment-success survey (Authority Machine slice 1b) onto the Stripe
  * PaymentIntent metadata. Dark unless PURCHASE_SURVEY_ENABLED (404 otherwise).
  *
- * Capability: the HttpOnly `carsi_svk` browser-key cookie whose binding the checkout route stored
- * on this session's metadata (the id alone is not enough; it travels in the success URL), the
- * session must be under 24 hours old, and it must be paid.
+ * Capability: `survey_key`, the browser tab's own key whose binding the checkout route stored on
+ * this session's metadata (the id alone is not enough; it travels in the success URL). The
+ * session must also be under 24 hours old and paid.
  * Write-once: a PaymentIntent that already carries `svy_at` is left unchanged, and a per-intent
  * idempotency key stops a concurrent second write. PaymentIntent
  * metadata is used because it stays writable after payment.
@@ -19,11 +19,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getStripeClient } from '@/lib/api/stripe';
 import { surveyMetadata, validateSurvey } from '@/lib/marketing/purchase-survey';
 import { isPurchaseSurveyEnabled } from '@/lib/server/purchase-survey-flag';
-import {
-  PURCHASE_SURVEY_COOKIE_NAME,
-  purchaseSurveyKeyFromCookie,
-  sessionAuthorisedForSurvey,
-} from '@/lib/server/purchase-survey-token';
+import { parsePurchaseSurveyKey, sessionAuthorisedForSurvey } from '@/lib/server/purchase-survey-token';
 
 const SESSION_ID_PATTERN = /^cs_[A-Za-z0-9_]{1,250}$/;
 
@@ -47,9 +43,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ detail: validation.error }, { status: 400 });
   }
 
-  // A missing or forged cookie is refused before any Stripe call.
-  const surveyCookie = request.cookies.get(PURCHASE_SURVEY_COOKIE_NAME)?.value;
-  if (!purchaseSurveyKeyFromCookie(surveyCookie)) {
+  // A missing or malformed key is refused before any Stripe call.
+  const surveyKey = parsePurchaseSurveyKey(body.survey_key);
+  if (!surveyKey) {
     return NextResponse.json({ detail: 'Not allowed' }, { status: 403 });
   }
 
@@ -62,9 +58,9 @@ export async function POST(request: NextRequest) {
   let paymentIntentId: string | null = null;
   try {
     const session = await stripe.checkout.sessions.retrieve(sessionId);
-    // The key must match the binding stored on this session: another browser's session, or one
+    // The key must match the binding stored on this session: another tab's session, or one
     // older than 24 hours, is refused before its payment state is revealed.
-    if (!sessionAuthorisedForSurvey(session, surveyCookie)) {
+    if (!sessionAuthorisedForSurvey(session, surveyKey)) {
       return NextResponse.json({ detail: 'Not allowed' }, { status: 403 });
     }
     if (session.payment_status !== 'paid') {

@@ -1,8 +1,8 @@
 /**
  * Route cover for `POST /api/lms/checkout/survey` (Authority Machine slice 1b).
  * Answers are written to the PaymentIntent metadata, once, only for a paid session, and only
- * from the browser that started that checkout (its `carsi_svk` key matches the binding stored on
- * the session). A session id alone is not enough: it appears in the success URL and could be
+ * from the browser tab that started that checkout (its `survey_key` matches the binding stored
+ * on the session). A session id alone is not enough: it appears in the success URL and could be
  * shared or leaked.
  */
 import { NextRequest } from 'next/server';
@@ -22,27 +22,24 @@ vi.mock('@/lib/api/stripe', () => ({
 }));
 
 const { POST } = await import('../../../app/api/lms/checkout/survey/route');
-const { newPurchaseSurveyCookieValue, PURCHASE_SURVEY_COOKIE_NAME, purchaseSurveyBinding } = await import(
-  '@/lib/server/purchase-survey-token'
-);
+const { purchaseSurveyBinding } = await import('@/lib/server/purchase-survey-token');
 
 const FLAG = 'PURCHASE_SURVEY_ENABLED';
 const SESSION = 'cs_test_paid';
 
-function post(body: unknown, cookie: string | null = validCookie()): NextRequest {
+/** This tab's key, and the binding checkout stored on its session. */
+const TAB_KEY = '00112233445566778899aabbccddeeff';
+const OTHER_TAB_KEY = 'ffeeddccbbaa99887766554433221100';
+const BINDING = purchaseSurveyBinding(TAB_KEY);
+
+/** A survey POST. `key` is added as survey_key unless it is null. */
+function post(body: unknown, key: unknown = TAB_KEY, cookie?: string): NextRequest {
+  const withKey = key === null || typeof body !== 'object' || body === null ? body : { ...body, survey_key: key };
   return new NextRequest('https://carsi.example.test/api/lms/checkout/survey', {
     method: 'POST',
     headers: { 'content-type': 'application/json', ...(cookie ? { cookie } : {}) },
-    body: JSON.stringify(body),
+    body: JSON.stringify(withKey),
   });
-}
-
-/** This browser's key cookie, and the binding checkout stored on its session. */
-const BROWSER_COOKIE = newPurchaseSurveyCookieValue();
-const BINDING = purchaseSurveyBinding(BROWSER_COOKIE.slice(0, 32));
-
-function validCookie(value = BROWSER_COOKIE): string {
-  return `${PURCHASE_SURVEY_COOKIE_NAME}=${value}`;
 }
 
 /** A paid Checkout Session created a minute ago by this browser's checkout. */
@@ -78,32 +75,37 @@ afterEach(() => {
   errorSpy.mockRestore();
 });
 
-describe('authorisation: the browser that started checkout', () => {
-  it('valid cookie for this session -> 200 and saved', async () => {
+describe('authorisation: the browser tab that started checkout', () => {
+  it("this tab's key for its session -> 200 and saved", async () => {
     const res = await POST(post(GOOD));
     expect(res.status).toBe(200);
     expect(stripe.updatePI).toHaveBeenCalledTimes(1);
   });
 
-  it('no cookie -> 403, no Stripe call', async () => {
-    const res = await POST(post(GOOD, null));
+  it.each([
+    ['missing', null],
+    ['empty', ''],
+    ['not hex', 'zz'.repeat(16)],
+    ['too long', 'ab'.repeat(17)],
+    ['upper case', TAB_KEY.toUpperCase()],
+    ['an object', { key: TAB_KEY }],
+  ])('survey_key %s -> 403, no Stripe call', async (_label, key) => {
+    const res = await POST(post(GOOD, key));
     expect(res.status).toBe(403);
     expect(stripe.retrieveSession).not.toHaveBeenCalled();
     expect(stripe.updatePI).not.toHaveBeenCalled();
   });
 
-  it("another browser's valid key -> 403, and nothing about the payment is read or written", async () => {
-    const res = await POST(post(GOOD, validCookie(newPurchaseSurveyCookieValue())));
+  it("another tab's key -> 403, and nothing about the payment is read or written", async () => {
+    const res = await POST(post(GOOD, OTHER_TAB_KEY));
     expect(res.status).toBe(403);
     expect(stripe.retrievePI).not.toHaveBeenCalled();
     expect(stripe.updatePI).not.toHaveBeenCalled();
   });
 
-  it('forged cookie (right shape, wrong signature) -> 403, no Stripe call', async () => {
-    const forged = `${'a'.repeat(32)}.${'b'.repeat(64)}`;
-    const res = await POST(post(GOOD, validCookie(forged)));
+  it('the binding itself, sent as the key, is refused', async () => {
+    const res = await POST(post(GOOD, BINDING));
     expect(res.status).toBe(403);
-    expect(stripe.retrieveSession).not.toHaveBeenCalled();
   });
 
   it('a session with no binding (started while the flag was off) -> 403', async () => {
@@ -121,16 +123,11 @@ describe('authorisation: the browser that started checkout', () => {
     expect((await POST(post(GOOD))).status).toBe(200);
   });
 
-  it('the old per-checkout and shared survey cookies no longer authorise', async () => {
-    for (const cookie of [`carsi_svy=${BROWSER_COOKIE}`, `carsi_svy_0123456789abcdef=${BROWSER_COOKIE}`]) {
-      const res = await POST(post(GOOD, cookie));
+  it('cookies do not authorise: the old carsi_svy cookie and a carsi_svk cookie without the key are refused', async () => {
+    for (const cookie of [`carsi_svy=${TAB_KEY}`, `carsi_svk=${TAB_KEY}`]) {
+      const res = await POST(post(GOOD, null, cookie));
       expect(res.status).toBe(403);
     }
-  });
-
-  it("several cookies in one browser: only this browser's key cookie counts", async () => {
-    const res = await POST(post(GOOD, `auth_token=x; carsi_svy=junk; ${validCookie()}`));
-    expect(res.status).toBe(200);
   });
 });
 
@@ -262,7 +259,7 @@ describe('POST /api/lms/checkout/survey', () => {
   it('a malformed JSON body is 400', async () => {
     const req = new NextRequest('https://carsi.example.test/api/lms/checkout/survey', {
       method: 'POST',
-      headers: { 'content-type': 'application/json', cookie: validCookie() },
+      headers: { 'content-type': 'application/json' },
       body: '{not json',
     });
     const res = await POST(req);

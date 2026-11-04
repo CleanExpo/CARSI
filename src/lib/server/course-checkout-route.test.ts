@@ -311,45 +311,49 @@ describe('campaign attribution', () => {
   });
 });
 
-describe('purchase survey capability cookie (Authority Machine slice 1b)', () => {
+describe('purchase survey tab key (Authority Machine slice 1b, GP-662)', () => {
   const FLAG = 'PURCHASE_SURVEY_ENABLED';
+  const TAB_KEY = '0123456789abcdef0123456789abcdef';
 
   afterEach(() => {
     delete process.env[FLAG];
   });
 
-  function surveyCookie(res: Response): string | undefined {
-    return res.headers.getSetCookie().find((c) => c.startsWith('carsi_svk='));
-  }
-
-  it('flag off: the checkout response sets no cookie at all (unchanged)', async () => {
+  it('flag off: a survey_key in the body is ignored; no cookie and metadata unchanged', async () => {
     delete process.env[FLAG];
     mocks.findUser.mockResolvedValue(null);
-    const res = await POST(request({ slug: COURSE_SLUG, customer_email: 'new@example.test' }));
+    const res = await POST(request({ slug: COURSE_SLUG, customer_email: 'new@example.test', survey_key: TAB_KEY }));
     expect(res.status).toBe(200);
     expect(res.headers.getSetCookie()).toEqual([]);
+    expect(mocks.createStripe.mock.calls[0][0].extra_metadata).toEqual({});
   });
 
-  it('flag on: sets an HttpOnly, Secure, SameSite=Lax 30-day key cookie and binds it to the new session', async () => {
+  it("flag on: binds the tab's key into the new session's metadata and sets no cookie", async () => {
     process.env[FLAG] = 'true';
     mocks.findUser.mockResolvedValue(null);
-    const res = await POST(request({ slug: COURSE_SLUG, customer_email: 'new@example.test' }));
+    const res = await POST(request({ slug: COURSE_SLUG, customer_email: 'new@example.test', survey_key: TAB_KEY }));
     expect(res.status).toBe(200);
-    const header = surveyCookie(res);
-    expect(header).toBeDefined();
-    expect(header).toContain('HttpOnly');
-    expect(header).toContain('Secure');
-    expect(header?.toLowerCase()).toContain('samesite=lax');
-    expect(header).toContain('Max-Age=2592000');
-    expect(header).toContain('Path=/;');
-    expect(res.headers.getSetCookie()).toHaveLength(1);
-    const { purchaseSurveyBinding, purchaseSurveyKeyFromCookie } = await import('@/lib/server/purchase-survey-token');
-    const key = purchaseSurveyKeyFromCookie(decodeURIComponent(header!.split(';')[0].split('=')[1]));
-    expect(key).not.toBeNull();
-    expect(mocks.createStripe.mock.calls[0][0].extra_metadata).toEqual({ svy_bk: purchaseSurveyBinding(key!) });
+    expect(res.headers.getSetCookie()).toEqual([]);
+    const { purchaseSurveyBinding } = await import('@/lib/server/purchase-survey-token');
+    expect(mocks.createStripe.mock.calls[0][0].extra_metadata).toEqual({ svy_bk: purchaseSurveyBinding(TAB_KEY) });
+    expect(purchaseSurveyBinding(TAB_KEY)).not.toContain(TAB_KEY);
   });
 
-  it('flag on: the discounted path sets it too', async () => {
+  it.each([
+    ['missing', undefined],
+    ['not hex', 'zz'.repeat(16)],
+    ['too short', 'ab'.repeat(15)],
+    ['upper case', 'AB'.repeat(16)],
+    ['not a string', 12345],
+  ])('flag on, survey_key %s: checkout still works and stores no binding', async (_label, key) => {
+    process.env[FLAG] = 'true';
+    mocks.findUser.mockResolvedValue(null);
+    const res = await POST(request({ slug: COURSE_SLUG, customer_email: 'new@example.test', survey_key: key }));
+    expect(res.status).toBe(200);
+    expect(mocks.createStripe.mock.calls[0][0].extra_metadata).toEqual({});
+  });
+
+  it('flag on: the discounted path binds it too, next to discount_id', async () => {
     process.env[FLAG] = 'true';
     mocks.verifySession.mockResolvedValue({ sub: 'user-disc' });
     mocks.findUser.mockResolvedValue({ id: 'user-disc', isActive: true });
@@ -359,13 +363,13 @@ describe('purchase survey capability cookie (Authority Machine slice 1b)', () =>
       new NextRequest('https://carsi.example.test/api/lms/checkout', {
         method: 'POST',
         headers: { 'content-type': 'application/json', cookie: 'auth_token=tok' },
-        body: JSON.stringify({ slug: COURSE_SLUG, customer_email: 'member@example.test' }),
+        body: JSON.stringify({ slug: COURSE_SLUG, customer_email: 'member@example.test', survey_key: TAB_KEY }),
       })
     );
     expect(res.status).toBe(200);
-    expect(surveyCookie(res)).toBeDefined();
+    const { purchaseSurveyBinding } = await import('@/lib/server/purchase-survey-token');
     expect(mocks.createStripe.mock.calls[0][0].extra_metadata).toEqual({
-      svy_bk: expect.stringMatching(/^[0-9a-f]{32}$/),
+      svy_bk: purchaseSurveyBinding(TAB_KEY),
       discount_id: 'disc-1',
     });
   });
@@ -522,42 +526,32 @@ describe('first-touch attribution (Authority Machine slice 1a)', () => {
   });
 });
 
-/**
- * A browser cookie jar for one origin and path: applies each response's Set-Cookie headers in
- * order, as a browser does. A later header for the same name replaces the earlier value, and
- * Max-Age=0 deletes it.
- */
-function applySetCookies(jar: Map<string, string>, res: Response): void {
-  for (const header of res.headers.getSetCookie()) {
-    const [pair, ...attrs] = header.split(';');
-    const eq = pair.indexOf('=');
-    const name = pair.slice(0, eq).trim();
-    const value = decodeURIComponent(pair.slice(eq + 1).trim());
-    if (attrs.some((a) => /^\s*max-age=0\s*$/i.test(a)) || value === '') jar.delete(name);
-    else jar.set(name, value);
-  }
+/** One browser tab: its sessionStorage key, as the client helper keeps it. */
+type Tab = { key: string };
+
+function newTab(): Tab {
+  return { key: [...crypto.getRandomValues(new Uint8Array(16))].map((b) => b.toString(16).padStart(2, '0')).join('') };
 }
 
-function cookieHeader(jar: Map<string, string>): string {
-  return [...jar].map(([name, value]) => `${name}=${encodeURIComponent(value)}`).join('; ');
-}
-
-function checkoutFrom(jar: Map<string, string>, slug: string): NextRequest {
-  const cookie = cookieHeader(jar);
+function checkoutFrom(tab: Tab, slug: string): NextRequest {
   return new NextRequest('https://carsi.example.test/api/lms/checkout', {
     method: 'POST',
-    headers: { 'content-type': 'application/json', ...(cookie ? { cookie } : {}) },
-    body: JSON.stringify({ slug, customer_email: 'new@example.test' }),
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ slug, customer_email: 'new@example.test', survey_key: tab.key }),
   });
 }
 
-async function surveyStatus(jar: Map<string, string>, sessionId: string): Promise<number> {
-  const cookie = cookieHeader(jar);
+async function surveyStatus(tab: Tab | null, sessionId: string): Promise<number> {
   const res = await SURVEY_POST(
     new NextRequest('https://carsi.example.test/api/lms/checkout/survey', {
       method: 'POST',
-      headers: { 'content-type': 'application/json', ...(cookie ? { cookie } : {}) },
-      body: JSON.stringify({ session_id: sessionId, industry: 'commercial_cleaning', found_via: 'google_search' }),
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        session_id: sessionId,
+        industry: 'commercial_cleaning',
+        found_via: 'google_search',
+        ...(tab ? { survey_key: tab.key } : {}),
+      }),
     })
   );
   return res.status;
@@ -577,10 +571,6 @@ function nextSession(id: string): void {
   });
 }
 
-function surveyCookieNames(jar: Map<string, string>): string[] {
-  return [...jar.keys()].filter((name) => name.startsWith('carsi_sv'));
-}
-
 describe('overlapping checkout starts keep every survey answerable (GP-662)', () => {
   const FLAG = 'PURCHASE_SURVEY_ENABLED';
 
@@ -596,76 +586,50 @@ describe('overlapping checkout starts keep every survey answerable (GP-662)', ()
     delete process.env[FLAG];
   });
 
-  it.each([
-    ['A, B, C', [0, 1, 2]],
-    ['C, B, A', [2, 1, 0]],
-    ['B, C, A', [1, 2, 0]],
-  ])('three starts that read the same cookies all stay answerable (replies land %s)', async (_label, order) => {
-    const jar = new Map<string, string>();
-    nextSession('cs_test_earlier');
-    applySetCookies(jar, await POST(checkoutFrom(jar, COURSE_SLUG)));
-
-    // All three requests leave the browser before any reply arrives, so all carry the same jar.
-    const replies: Response[] = [];
-    for (const id of ['cs_test_a', 'cs_test_b', 'cs_test_c']) {
-      nextSession(id);
-      replies.push(await POST(checkoutFrom(jar, COURSE_SLUG)));
+  it("a browser's very first checkouts, started at once in two tabs, both stay answerable", async () => {
+    const [tab1, tab2] = [newTab(), newTab()];
+    nextSession('cs_test_tab1');
+    nextSession('cs_test_tab2');
+    // Both requests are in flight together; neither reply writes anything the other depends on.
+    const replies = await Promise.all([POST(checkoutFrom(tab1, COURSE_SLUG)), POST(checkoutFrom(tab2, 'odour-control'))]);
+    for (const res of replies) {
+      expect(res.status).toBe(200);
+      expect(res.headers.getSetCookie()).toEqual([]);
     }
-    for (const i of order) applySetCookies(jar, replies[i]);
-
-    for (const id of ['cs_test_earlier', 'cs_test_a', 'cs_test_b', 'cs_test_c']) {
-      expect(await surveyStatus(jar, id)).toBe(200);
-    }
-    expect(surveyCookieNames(jar)).toEqual(['carsi_svk']);
+    expect(await surveyStatus(tab1, 'cs_test_tab1')).toBe(200);
+    expect(await surveyStatus(tab2, 'cs_test_tab2')).toBe(200);
   });
 
-  it("a browser's first two checkouts, started at once after the page set the key, both stay answerable", async () => {
-    const { newPurchaseSurveyCookieValue } = await import('@/lib/server/purchase-survey-token');
-    // The proxy sets this on the first page view (purchase-survey-key-proxy.test.ts).
-    const jar = new Map<string, string>([['carsi_svk', newPurchaseSurveyCookieValue()]]);
-    nextSession('cs_test_a');
-    const resA = await POST(checkoutFrom(jar, COURSE_SLUG));
-    nextSession('cs_test_b');
-    const resB = await POST(checkoutFrom(jar, 'odour-control'));
-    applySetCookies(jar, resB);
-    applySetCookies(jar, resA);
-    expect(await surveyStatus(jar, 'cs_test_a')).toBe(200);
-    expect(await surveyStatus(jar, 'cs_test_b')).toBe(200);
+  it('three overlapping starts from one tab all stay answerable', async () => {
+    const tab = newTab();
+    const ids = ['cs_test_a', 'cs_test_b', 'cs_test_c'];
+    for (const id of ids) nextSession(id);
+    await Promise.all(ids.map(() => POST(checkoutFrom(tab, COURSE_SLUG))));
+    for (const id of ids) expect(await surveyStatus(tab, id)).toBe(200);
   });
 
-  it('many sequential starts: every session stays answerable and there is still one cookie', async () => {
-    const jar = new Map<string, string>();
-    const ids = ['cs_test_1', 'cs_test_2', 'cs_test_3', 'cs_test_4', 'cs_test_5'];
-    for (const id of ids) {
-      nextSession(id);
-      applySetCookies(jar, await POST(checkoutFrom(jar, COURSE_SLUG)));
-    }
-    for (const id of ids) expect(await surveyStatus(jar, id)).toBe(200);
-    expect(surveyCookieNames(jar)).toEqual(['carsi_svk']);
-  });
-
-  it('another browser cannot answer, and a session never started is refused', async () => {
-    const jar = new Map<string, string>();
+  it("one tab cannot answer another tab's checkout, and no key or a never-started session is refused", async () => {
+    const [mine, other] = [newTab(), newTab()];
     nextSession('cs_test_mine');
-    applySetCookies(jar, await POST(checkoutFrom(jar, COURSE_SLUG)));
-    const { newPurchaseSurveyCookieValue } = await import('@/lib/server/purchase-survey-token');
-    const otherBrowser = new Map<string, string>([['carsi_svk', newPurchaseSurveyCookieValue()]]);
-    expect(await surveyStatus(otherBrowser, 'cs_test_mine')).toBe(403);
-    expect(await surveyStatus(new Map(), 'cs_test_mine')).toBe(403);
-    expect(await surveyStatus(jar, 'cs_test_never_started')).toBe(400);
+    await POST(checkoutFrom(mine, COURSE_SLUG));
+    expect(await surveyStatus(other, 'cs_test_mine')).toBe(403);
+    expect(await surveyStatus(null, 'cs_test_mine')).toBe(403);
+    expect(await surveyStatus(mine, 'cs_test_never_started')).toBe(400);
   });
 
-  it('junk and forged cookies change nothing: one Set-Cookie, a fresh valid key, checkout succeeds', async () => {
-    const jar = new Map<string, string>();
-    for (let i = 0; i < 120; i += 1) jar.set(`carsi_svy_${i.toString(16).padStart(16, '0')}`, '9999999999.' + '0'.repeat(64));
-    const forged = `${'a'.repeat(32)}.${'b'.repeat(64)}`;
-    jar.set('carsi_svk', forged);
+  it('junk cookies on the request change nothing: no Set-Cookie and the binding still works', async () => {
+    const tab = newTab();
+    const junk = Array.from({ length: 120 }, (_, i) => `carsi_svy_${i}=9999999999.${'0'.repeat(64)}`).join('; ');
     nextSession('cs_test_junk');
-    const res = await POST(checkoutFrom(jar, COURSE_SLUG));
+    const res = await POST(
+      new NextRequest('https://carsi.example.test/api/lms/checkout', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', cookie: `${junk}; carsi_svk=forged` },
+        body: JSON.stringify({ slug: COURSE_SLUG, customer_email: 'new@example.test', survey_key: tab.key }),
+      })
+    );
     expect(res.status).toBe(200);
-    expect(res.headers.getSetCookie()).toHaveLength(1);
-    applySetCookies(jar, res);
-    expect(jar.get('carsi_svk')).not.toBe(forged);
-    expect(await surveyStatus(jar, 'cs_test_junk')).toBe(200);
+    expect(res.headers.getSetCookie()).toEqual([]);
+    expect(await surveyStatus(tab, 'cs_test_junk')).toBe(200);
   });
 });

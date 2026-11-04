@@ -60,30 +60,12 @@ import {
 import { isAttributionCaptureEnabled } from '@/lib/server/attribution-capture-flag';
 import { isPurchaseSurveyEnabled } from '@/lib/server/purchase-survey-flag';
 import {
+  parsePurchaseSurveyKey,
   PURCHASE_SURVEY_BINDING_METADATA_KEY,
-  PURCHASE_SURVEY_COOKIE_NAME,
   purchaseSurveyBinding,
-  purchaseSurveyCookieForCheckout,
-  purchaseSurveyCookieOptions,
 } from '@/lib/server/purchase-survey-token';
 
 class AccountLookupUnavailable extends Error {}
-
-/**
- * The checkout reply. With the purchase survey on (slice 1b), it also carries the HttpOnly
- * browser-key cookie whose binding was stored on this Stripe session, so this browser, and only
- * this one, can answer the survey. The value is the browser's existing key when it has one, so
- * checkouts started at the same moment all write the same value (GP-662). Off, the reply is
- * exactly what it was.
- */
-function checkoutStarted(checkout_url: string, surveyCookie: string | null, request: NextRequest) {
-  const res = NextResponse.json({ checkout_url });
-  if (surveyCookie) {
-    const secure = request.nextUrl.protocol === 'https:' || process.env.NODE_ENV === 'production';
-    res.cookies.set(PURCHASE_SURVEY_COOKIE_NAME, surveyCookie, purchaseSurveyCookieOptions(secure));
-  }
-  return res;
-}
 
 /** Runs an account check; a database failure becomes a 503 rather than a charge on doubt. */
 async function guardLookup<T>(check: () => Promise<T>): Promise<T> {
@@ -105,6 +87,7 @@ export async function POST(request: NextRequest) {
       full_name?: string;
       purchase_mode?: string;
       team_seat_count?: number;
+      survey_key?: unknown;
     };
     const attributionJourneyId = readAttributionJourneyId(request);
     const utmMetadata = parseUtmCookie(request.cookies.get(UTM_COOKIE_NAME)?.value);
@@ -117,12 +100,11 @@ export async function POST(request: NextRequest) {
           ),
         }
       : utmMetadata;
-    // Purchase survey (slice 1b): bind this browser's key to the session being created.
-    const surveyCookie = isPurchaseSurveyEnabled()
-      ? purchaseSurveyCookieForCheckout(request.cookies.get(PURCHASE_SURVEY_COOKIE_NAME)?.value)
-      : null;
-    const checkoutMetadata: Record<string, string> = surveyCookie
-      ? { ...attributionMetadata, [PURCHASE_SURVEY_BINDING_METADATA_KEY]: purchaseSurveyBinding(surveyCookie.key) }
+    // Purchase survey (slice 1b, GP-662): bind the browser tab's own key to the session being
+    // created. The server sets no cookie, so overlapping checkouts cannot overwrite each other.
+    const surveyKey = isPurchaseSurveyEnabled() ? parsePurchaseSurveyKey(body.survey_key) : null;
+    const checkoutMetadata: Record<string, string> = surveyKey
+      ? { ...attributionMetadata, [PURCHASE_SURVEY_BINDING_METADATA_KEY]: purchaseSurveyBinding(surveyKey) }
       : attributionMetadata;
 
     const slug = typeof body.slug === 'string' ? body.slug.trim() : '';
@@ -411,7 +393,7 @@ export async function POST(request: NextRequest) {
             currency: 'aud',
             transactionId: checkout_session_id,
           });
-          return checkoutStarted(checkout_url, surveyCookie?.value ?? null, request);
+          return NextResponse.json({ checkout_url });
         } catch (err) {
           const msg = err instanceof Error ? err.message : String(err);
           if (msg === 'INVALID_AMOUNT') {
@@ -462,7 +444,7 @@ export async function POST(request: NextRequest) {
         currency: unit_amount_cents == null ? undefined : 'aud',
         transactionId: checkout_session_id,
       });
-      return checkoutStarted(checkout_url, surveyCookie?.value ?? null, request);
+      return NextResponse.json({ checkout_url });
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       if (msg === 'INVALID_AMOUNT') {

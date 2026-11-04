@@ -8,7 +8,7 @@ import {
 } from '@/lib/analytics/first-touch';
 
 /** Router prefetches and RSC payload fetches are not a visitor landing on a page. */
-export function isPageNavigation(request: NextRequest): boolean {
+function isPageNavigation(request: NextRequest): boolean {
   if (request.method !== 'GET') return false;
   const h = request.headers;
   if (h.has('rsc') || h.has('next-router-prefetch') || h.has('next-router-state-tree')) return false;

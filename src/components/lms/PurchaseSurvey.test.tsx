@@ -99,6 +99,24 @@ describe('PurchaseSurvey', () => {
     expect(container.textContent).toContain('Thank you');
   });
 
+  it("sends this tab's checkout key with the answers (GP-662)", async () => {
+    window.sessionStorage.setItem('carsi_svk', '00112233445566778899aabbccddeeff');
+    try {
+      render('cs_test_1');
+      act(() => button('Builder or construction trade').click());
+      act(() => button('Send answers').click());
+      await settle();
+      const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+      expect(JSON.parse(String(init.body))).toEqual({
+        session_id: 'cs_test_1',
+        survey_key: '00112233445566778899aabbccddeeff',
+        industry: 'builder_trade',
+      });
+    } finally {
+      window.sessionStorage.removeItem('carsi_svk');
+    }
+  });
+
   it('T1b-6: a failed save shows a soft note and never throws', async () => {
     fetchMock.mockRejectedValue(new Error('offline'));
     render('cs_test_1');
