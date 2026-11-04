@@ -102,7 +102,7 @@
     "test:e2e": "playwright test --config config/playwright.config.ts e2e",
     "test:smoke": "playwright test --config config/playwright.config.ts e2e/smoke.spec.ts",
     "test:a11y": "playwright test --config config/playwright.config.ts e2e/a11y.spec.ts",
-    "test:unit": "vitest run",
+    "test:unit": "vitest run --config config/vitest.config.ts",
     "test:pg": "vitest run --config config/vitest.pg.config.ts",
     "verify:membership-guard": "npx tsx scripts/verify-membership-claim-guard.ts",
     "voice:plan": "npx tsx scripts/generate-course-voiceover.ts --plan",

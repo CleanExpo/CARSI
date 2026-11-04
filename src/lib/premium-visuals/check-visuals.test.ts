@@ -473,12 +473,14 @@ describe('(6) mode labelling, config, workflow and docs', () => {
       spawnSync(process.execPath, [SCRIPT, '--list-extensions'], { encoding: 'utf8' }).stdout
     ) as { code: string[]; style: string[] };
     const wf = fs.readFileSync(path.join(REPO, '.github/workflows/check-visuals.yml'), 'utf8');
-    const missing = [...exts.code, ...exts.style].filter((e) => !wf.includes(`"**/*.${e}"`));
+    const missing = [...exts.code, ...exts.style].filter(
+      (e) => !wf.includes(`"**/*.${e}"`) && !wf.includes(`'**/*.${e}'`)
+    );
     expect(exts.code.length).toBeGreaterThan(0);
     expect(missing).toEqual([]);
-    expect(wf).toContain('"**/public/**"');
-    expect(wf).toContain('"config/visuals.config.json"');
-    expect(wf).toContain('"config/media.manifest.json"');
+    expect(wf).toMatch(/["']\*\*\/public\/\*\*["']/);
+    expect(wf).toMatch(/["']config\/visuals\.config\.json["']/);
+    expect(wf).toMatch(/["']config\/media\.manifest\.json["']/);
   });
 
   it('repo docs do not claim CI enforcement while visuals.config.json is report-only', () => {
@@ -488,6 +490,8 @@ describe('(6) mode labelling, config, workflow and docs', () => {
       mode: string;
     };
     for (const doc of ['docs/agents/AGENTS.md', 'docs/agents/CLAUDE.md']) {
+      const t = fs.readFileSync(path.join(REPO, doc), 'utf8');
+      if (cfg.mode === 'report') {
         expect(t, doc).not.toMatch(/It is enforced in CI/);
         expect(t, doc).toMatch(/report-only/);
       }
@@ -498,9 +502,9 @@ describe('(6) mode labelling, config, workflow and docs', () => {
   it('the docs point at the scaffold that exists, and the scaffold states its real install state', () => {
     const tpl = 'scripts/premium-visuals/marketing-page.template.tsx.txt';
     expect(fs.existsSync(path.join(REPO, tpl))).toBe(true);
-    for (const doc of ['AGENTS.md', 'CLAUDE.md'])
-      expect(fs.readFileSync(path.join(REPO, doc), 'utf8'), doc).toContain(tpl);
     for (const doc of ['docs/agents/AGENTS.md', 'docs/agents/CLAUDE.md'])
+      expect(fs.readFileSync(path.join(REPO, doc), 'utf8'), doc).toContain(tpl);
+    const pkg = JSON.parse(fs.readFileSync(path.join(REPO, 'package.json'), 'utf8')) as Record<
       string,
       Record<string, string> | undefined
     >;
