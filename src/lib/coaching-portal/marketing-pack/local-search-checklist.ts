@@ -44,9 +44,9 @@ export function buildLocalSearchChecklist(
     },
     {
       id: 'reviews-ask',
-      label: 'Ask every happy customer for a Google review',
+      label: 'Ask every customer for an honest Google review',
       detail:
-        'Send your review link by text the same day the job is finished. Reply to every review.',
+        'Send your review link to every customer by text the same day the job is finished, whatever the outcome. Never pick who to ask based on whether they seem happy. Reply to every review.',
       done: false,
     },
     {

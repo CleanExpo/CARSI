@@ -132,7 +132,8 @@ export function isGoogleBusinessLink(url: string): boolean {
     if (GOOGLE_HOSTS.has(host)) {
       if (/[?&](cid|ludocid)=\d+/.test(u.search)) return true;
       if (/^\/maps\/place\/[^/]+/.test(u.pathname)) return true;
-      if (host.startsWith('business.')) return /\/l\/\d+/.test(u.pathname);
+      // business.google.com pages are the owner's sign-in dashboard, not a public listing
+      // (Codex P1, head 22a64240), so they never count.
       return false;
     }
     if (/^[a-z0-9-]+\.business\.site$/.test(host)) return true;

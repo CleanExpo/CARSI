@@ -133,7 +133,6 @@ describe('isGoogleBusinessLink (Codex P1, head bc601506)', () => {
     'https://www.google.com.au/maps/place/Downs+Carpet+Care',
     'https://maps.google.com.au/?cid=123',
     'https://www.google.co.nz/search?q=downs&ludocid=123',
-    'https://business.google.com/dashboard/l/123',
     'https://downs-carpet-care.business.site/',
   ])('accepts %s', (url) => {
     expect(isGoogleBusinessLink(url)).toBe(true);
@@ -235,4 +234,13 @@ describe('isGoogleBusinessLink short-link shapes (Codex P1, head 6735fbf0)', () 
     expect(review.fixes.map((f) => f.id)).toEqual(expect.arrayContaining(['gbp-link-invalid']));
     expect(review.checks.find((c) => c.id === 'google-business-profile')?.passed).toBe(false);
   });
+});
+
+describe('isGoogleBusinessLink rejects the private dashboard (Codex P1, head 22a64240)', () => {
+  it.each(['https://business.google.com/dashboard/l/123', 'https://business.google.com/l/123'])(
+    'rejects %s',
+    (url) => {
+      expect(isGoogleBusinessLink(url)).toBe(false);
+    }
+  );
 });
