@@ -254,3 +254,44 @@ describe('business.google.com never counts, even with a cid (Codex P1, head ce8e
     expect(isGoogleBusinessLink(url)).toBe(false);
   });
 });
+
+describe('a listing marker counts only on a listing path (Codex P1, head 7c3a51b7)', () => {
+  // Class: a cid/ludocid or place path anywhere on a Google host was taken as a listing.
+  const hosts = ['google.com', 'www.google.com', 'maps.google.com', 'www.google.com.au', 'maps.google.co.nz'];
+  const unrelated = [
+    '/robots.txt?cid=123',
+    '/url?q=https://evil.example&cid=123',
+    '/search?cid=123',
+    '/maps/dir?cid=123',
+    '/travel?ludocid=123',
+    '/imgres?ludocid=123',
+    '/maps?cid=123abc',
+    '/maps?cid=',
+    '/robots.txt/maps/place/x',
+    '/maps/placex/Downs',
+  ];
+  it.each(hosts.flatMap((h) => unrelated.map((p) => `https://${h}${p}`)))('rejects %s', (url) => {
+    expect(isGoogleBusinessLink(url)).toBe(false);
+  });
+
+  it.each([
+    'https://www.google.com/maps?cid=123',
+    'https://www.google.com.au/maps?cid=456',
+    'https://maps.google.com/?cid=123',
+    'https://maps.google.com/maps?cid=123',
+    'https://www.google.com/search?q=downs+carpet&ludocid=123',
+    'https://www.google.com/maps/place/Downs+Carpet+Care/@-27.5,151.9,15z',
+  ])('accepts %s', (url) => {
+    expect(isGoogleBusinessLink(url)).toBe(true);
+  });
+
+  it('the review gives the invalid-link fix for robots.txt?cid=123', () => {
+    const review = reviewWebsite({
+      websiteUrl: null,
+      fetch: null,
+      googleBusinessUrl: 'https://www.google.com/robots.txt?cid=123',
+      voice,
+    });
+    expect(review.fixes.map((f) => f.id)).toContain('gbp-link-invalid');
+  });
+});

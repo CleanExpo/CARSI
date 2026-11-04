@@ -244,10 +244,15 @@ export function isGoogleBusinessLink(url: string): boolean {
     if (host === 'goo.gl') return new RegExp(`^/maps/${ID}$`).test(path);
     // Exact Google hosts only: a suffix match accepted google.com.evil.example (Codex P1, bc601506).
     if (GOOGLE_HOSTS.has(host)) {
-      if (/[?&](cid|ludocid)=\d+/.test(u.search)) return true;
-      if (/^\/maps\/place\/[^/]+/.test(u.pathname)) return true;
+      // Only whole listing shapes count: a marker is read only on the path that carries a
+      // listing, never anywhere on the host ("/robots.txt?cid=123": Codex P1, head 7c3a51b7).
       // business.google.com pages are the owner's sign-in dashboard, not a public listing
       // (Codex P1, head 22a64240), so they never count.
+      const numeric = (name: string) => /^\d+$/.test(u.searchParams.get(name) ?? '');
+      const mapsPath = path === '/maps' || (path === '' && host.startsWith('maps.'));
+      if (mapsPath && numeric('cid')) return true;
+      if (path === '/search' && numeric('ludocid')) return true;
+      if (/^\/maps\/place\/[^/]+(\/.*)?$/.test(path)) return true;
       return false;
     }
     if (/^[a-z0-9-]+\.business\.site$/.test(host)) return true;
