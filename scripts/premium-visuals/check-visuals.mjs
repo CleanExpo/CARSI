@@ -32,7 +32,7 @@
  * css-art, canvas-drawing). It never exempts budgets, provenance, placeholders or page rules.
  *
  * Exit: 0 = no findings, or report-only; 1 = findings in enforce mode; 2 = configuration error.
- * Usage: check-visuals [--root .] [--report-only] [--json] [--limit N] [--config visuals.config.json] [--list-extensions]
+ * Usage: check-visuals [--root .] [--report-only] [--json] [--limit N] [--config config/visuals.config.json] [--list-extensions]
  */
 import fs from 'node:fs';
 import path from 'node:path';

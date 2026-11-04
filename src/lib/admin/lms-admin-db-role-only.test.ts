@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
 import { NextRequest } from 'next/server';
@@ -110,20 +110,13 @@ describe('LMS admin is granted by the DB role only', () => {
     };
     walk(join(root, 'src'));
     walk(join(root, 'app'));
-    // Every script at the repository root, which is where the request middleware (proxy.ts in
-    // Next 16, middleware.* before it), instrumentation and next.config live. The entry points
-    // this app runs today must exist: a renamed or moved one fails here instead of going unscanned.
+    // Repository-root scripts: request middleware (proxy.ts), Next config. Instrumentation lives under src/.
     const rootScripts = readdirSync(root, { withFileTypes: true })
       .filter((e) => e.isFile() && isSource(e.name))
       .map((e) => e.name);
-    expect(rootScripts).toEqual(
-      expect.arrayContaining([
-        'proxy.ts',
-        'instrumentation.ts',
-        'instrumentation-client.ts',
-        'next.config.ts',
-      ])
-    );
+    expect(rootScripts).toEqual(expect.arrayContaining(['proxy.ts', 'next.config.ts']));
+    expect(existsSync(join(root, 'src', 'instrumentation.ts'))).toBe(true);
+    expect(existsSync(join(root, 'src', 'instrumentation-client.ts'))).toBe(true);
     files.push(...rootScripts.map((name) => join(root, name)));
     const users = (re: RegExp) =>
       files

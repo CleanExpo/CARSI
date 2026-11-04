@@ -10,7 +10,7 @@ Two engines, one queue:
 
 ## ENGINE START — paste this to start any build session
 ```
-ENGINE START. Read GOAL.md, DECISIONS.md, BACKLOG.md (repo root). You are the single owner of
+ENGINE START. Read docs/governance/GOAL.md, DECISIONS.md, BACKLOG.md (same folder). You are the single owner of
 this repo for this session. Take the topmost unblocked BACKLOG items you can complete today,
 in order. Build through docs/agent-framework/CARSI_VERIFICATION_GATE.md; licence guards are
 release blockers. Anything blocked on the founder: add to DECISIONS.md with default + deadline,

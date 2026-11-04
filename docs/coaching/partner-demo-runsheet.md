@@ -84,11 +84,14 @@ top of every portal screen.
 - **Screen:** `/dashboard/coaching/resources`
 - **Proves:** A6 prescribed learning path (GP-633).
 - **Before the demo:** in Admin, open **Learning paths**, choose the demo member and press
-  **Assign from assessment** (the seed does not assign it). The demo answers point to sales,
-  operations and technology gaps, so up to four published courses are prescribed.
-- **Say:** "The member's assessment picked these CARSI courses. Their progress shows here and on
-  the Actions board, and finishing a course ticks off the action. I can remove, add or reorder
-  courses for each member."
+  **Assign from assessment** (the seed does not assign it), then **Approve path**. A new path is
+  a draft the member cannot see until it is approved. The demo answers point to sales,
+  operations and technology gaps, so up to four published courses are prescribed. The
+  **Gap-to-course map** on the same page sets which courses each gap prescribes.
+- **Say:** "The member's assessment picked these CARSI courses, and I approved them before the
+  member saw them. Their progress shows here and on the Actions board, and finishing a course
+  ticks off the action. I can remove, add or reorder courses for each member, and change which
+  courses each gap prescribes."
 
 ## 9. Ask my coach assistant and marketing pack
 

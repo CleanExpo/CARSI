@@ -1,4 +1,8 @@
+**Read [`../governance/GOAL.md`](../governance/GOAL.md) first** — then [`../governance/DECISIONS.md`](../governance/DECISIONS.md), then [`../governance/BACKLOG.md`](../governance/BACKLOG.md). Session control: [`../governance/ENGINE.md`](../governance/ENGINE.md). Autonomous backlog contract: [`../governance/SPEC.md`](../governance/SPEC.md).
 
+Licence and course rules: [`CLAUDE.md`](CLAUDE.md) in this folder.
+
+---
 
 ## Premium Visual & Motion Standard (HARD RULE — Phill McGurk, 2 Nov 2026)
 
@@ -14,3 +18,13 @@ This applies to every page a customer can see.
 6. **Visibility pillars first:** Find → Crawl → Index → Ranking are set up before any SEO/AEO/GEO tactics.
 7. **Process:** plan the page with the **SPM** skill (`/spm` — spec before build, include the media plan and prompt manifest), then pass the **SDA visual and commercial evidence gate** (`skills/visual-qa`, `sda_evidence_gate.py`: real Playwright screenshots at 390/768/1440, reduced-motion check, video frame review, named SDA rubric). Non-zero = HOLD.
 8. Once the package is installed: generate media with `npx generate-media --prompts media.prompts.json` (dry run by default; `--go` uses the existing Higgsfield plan; keys from env, never printed) and render 3D with `npx blender-render model.glb --id <id>`. Neither command is available in CARSI today.
+
+---
+
+## Compound Engineering loop
+
+Autonomous and semi-autonomous work follows the continuous ship loop in
+`docs/agent-framework/COMPOUND_ENGINEERING_LOOP.md` (Plan → Work → Review →
+Compound → Kanban movement). Every code-modifying pass must pass the
+`docs/agent-framework/CARSI_VERIFICATION_GATE.md` checklist, and `npm run
+type-check` is mandatory before any pass is marked Done.

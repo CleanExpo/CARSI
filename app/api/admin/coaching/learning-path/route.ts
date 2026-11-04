@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAdminSessionOrNull } from '@/lib/admin/admin-session';
 import {
   adjustLearningPath,
+  approveLearningPath,
   assignLearningPathFromAssessment,
   getCoachLearningPathView,
   isCoachingMember,
@@ -16,7 +17,9 @@ export const dynamic = 'force-dynamic';
  * GP-633 coach review of prescribed learning paths. Admin (coach) only.
  * GET            → coaching members
  * GET ?userId=   → one member's gaps, path with LMS progress, and courses the coach can add
- * POST           → { userId, op: 'assign' } or { userId, op: 'adjust', add?, remove?, order? }
+ * POST           → { userId, op: 'assign' } (creates a DRAFT the member cannot see),
+ *                  { userId, op: 'approve' } (the coach approves the draft; it goes live), or
+ *                  { userId, op: 'adjust', add?, remove?, order? }
  */
 export async function GET(request: NextRequest) {
   if (!(await getAdminSessionOrNull())) {
@@ -28,6 +31,9 @@ export async function GET(request: NextRequest) {
   }
   if (!isUuidParam(userId)) {
     return NextResponse.json({ detail: 'Invalid userId.' }, { status: 400 });
+  }
+  if (!(await isCoachingMember(userId))) {
+    return NextResponse.json({ detail: 'Not a coaching member.' }, { status: 404 });
   }
   return NextResponse.json(await getCoachLearningPathView(userId));
 }
@@ -54,6 +60,14 @@ export async function POST(request: NextRequest) {
   if (body?.op === 'assign') {
     const result = await assignLearningPathFromAssessment(userId);
     return NextResponse.json({ result, ...(await getCoachLearningPathView(userId)) });
+  }
+
+  if (body?.op === 'approve') {
+    const { approved } = await approveLearningPath(userId);
+    return NextResponse.json({
+      result: { status: approved > 0 ? 'approved' : 'nothing_to_approve', approved },
+      ...(await getCoachLearningPathView(userId)),
+    });
   }
 
   if (body?.op === 'adjust') {

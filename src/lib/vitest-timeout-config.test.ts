@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import config from '../../vitest.config';
+import config from '../../config/vitest.config';
 
 /**
  * Guards the suite-wide `testTimeout`.
@@ -10,12 +10,12 @@ import config from '../../vitest.config';
  * assertions were sound. The cause was never a slow test: the files that timed out do well
  * under a second of actual work, while several hundred suites running in parallel on a loaded
  * machine inflate wall-clock time many-fold. The exact suite count is deliberately not stated
- * here or in vitest.config.ts — it grows with every test added, so it is one more figure that
+ * here or in config/vitest.config.ts — it grows with every test added, so it is one more figure that
  * would go stale and be refuted by the next reader to run the suite.
  *
  * Per-test timings here are NOT reproducible — the same test has been observed varying by
  * up to 8.8x between runs, and two release reviews were failed for quoting a single run as
- * a worst case. See vitest.config.ts for the sampled scatter and for why the margin is
+ * a worst case. See config/vitest.config.ts for the sampled scatter and for why the margin is
  * argued against the highest value ever recorded (5459ms) rather than against any one run.
  * Do not restate a point measurement in this file.
  *

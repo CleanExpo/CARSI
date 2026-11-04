@@ -1,8 +1,8 @@
 // Default marketing page scaffold: copy for every new public page. check-visuals flags a page without a rendered PremiumHero + MotionSection.
 // NOT INSTALLED: @cleanexpo/premium-visuals is not yet a CARSI dependency, so this file does not compile until it is added to package.json.
-// media.manifest.json lives at the repo root; in CARSI "@/" maps to ./src, so import it relatively from the page's folder.
+// media.manifest.json lives at config/media.manifest.json; in CARSI "@/" maps to ./src, so import it relatively from the page's folder.
 import { PremiumHero, MediaSection, MediaCard, MotionSection, Carousel, type MediaEntry } from '@cleanexpo/premium-visuals';
-import manifest from '../../media.manifest.json'; // REPLACE depth: relative path from this page to the repo root
+import manifest from '../../config/media.manifest.json'; // REPLACE depth: relative path from this page to config/
 
 const m = (src: string) => (manifest.entries as MediaEntry[]).find((e) => e.src === src)!;
 

@@ -51,39 +51,78 @@ function loadApprovedSlugsFromRegistry() {
 }
 
 const BANNED = [
-  { re: /\bIICRC[\s-]+courses?\b/i, allow: /\bIICRC[\s-]+(CEC|Continuing[\s-]+Education[\s-]+Credit)/i,
-    message: 'Use "IICRC CEC course(s)", not "IICRC course(s)".' },
-  { re: /\bIICRC[\s-]*(certification|certified)[\s-]+courses?\b/i, allow: null,
-    message: 'CARSI does not deliver IICRC certification courses — say "IICRC CEC course(s)".' },
-  { re: /\b(get|getting|become|becoming|be|earn(?:ing)?)\s+IICRC[\s-]*certified\b/i, allow: null,
-    message: 'CARSI does not make you "IICRC certified" — it delivers IICRC CEC courses.' },
-  { re: /IICRC[\s-]*certif\w*\s+with\s+CARSI/i, allow: null,
-    message: 'Do not imply CARSI grants IICRC certification.' },
-  { re: /\bIICRC[\s-]*Accredited\b/i, allow: /\bIICRC[\s-]+CEC[\s-]+Accredited\b/i,
-    message: 'Say "IICRC CEC Accredited", never bare "IICRC Accredited".' },
-  { re: /\bIICRC[\s-]*accredited[\s-]+courses?\b/i, allow: null,
-    message: 'Not "IICRC-accredited course(s)" — say "IICRC CEC Accredited course(s)" (even in a negated disclaimer, write "not IICRC CEC accredited").' },
-  { re: /\bIICRC[\s-]+courses?[\s-]+accredit\w*\b/i, allow: null,
-    message: 'Do not imply IICRC accredits CARSI\'s courses — say "IICRC CEC Accredited course(s)".' },
+  {
+    re: /\bIICRC[\s-]+courses?\b/i,
+    allow: /\bIICRC[\s-]+(CEC|Continuing[\s-]+Education[\s-]+Credit)/i,
+    message: 'Use "IICRC CEC course(s)", not "IICRC course(s)".',
+  },
+  {
+    re: /\bIICRC[\s-]*(certification|certified)[\s-]+courses?\b/i,
+    allow: null,
+    message: 'CARSI does not deliver IICRC certification courses — say "IICRC CEC course(s)".',
+  },
+  {
+    re: /\b(get|getting|become|becoming|be|earn(?:ing)?)\s+IICRC[\s-]*certified\b/i,
+    allow: null,
+    message: 'CARSI does not make you "IICRC certified" — it delivers IICRC CEC courses.',
+  },
+  {
+    re: /IICRC[\s-]*certif\w*\s+with\s+CARSI/i,
+    allow: null,
+    message: 'Do not imply CARSI grants IICRC certification.',
+  },
+  {
+    re: /\bIICRC[\s-]*Accredited\b/i,
+    allow: /\bIICRC[\s-]+CEC[\s-]+Accredited\b/i,
+    message: 'Say "IICRC CEC Accredited", never bare "IICRC Accredited".',
+  },
+  {
+    re: /\bIICRC[\s-]*accredited[\s-]+courses?\b/i,
+    allow: null,
+    message:
+      'Not "IICRC-accredited course(s)" — say "IICRC CEC Accredited course(s)" (even in a negated disclaimer, write "not IICRC CEC accredited").',
+  },
+  {
+    re: /\bIICRC[\s-]+courses?[\s-]+accredit\w*\b/i,
+    allow: null,
+    message:
+      'Do not imply IICRC accredits CARSI\'s courses — say "IICRC CEC Accredited course(s)".',
+  },
   // GAP CLOSED — "IICRC-approved" as a CARSI offering. Legitimate uses (real IICRC schools /
   // exams / the CE-provider program / board-approval process) are allowed.
-  { re: /\bIICRC[\s-]*approved\b/i,
-    allow: /\bIICRC[\s-]*approved\s+(school|examination|exam|instructor|course\s+of\s+study)|IICRC[\s-]*board[\s-]*approv|(CE|CEC)[\s-]*provider|IICRC[\s-]*approv\w*\s+CE\b/i,
-    message: 'Bare "IICRC-approved" implies IICRC approves CARSI\'s courses/certifications — say "IICRC CEC Accredited".' },
+  {
+    re: /\bIICRC[\s-]*approved\b/i,
+    allow:
+      /\bIICRC[\s-]*approved\s+(school|examination|exam|instructor|course\s+of\s+study)|IICRC[\s-]*board[\s-]*approv|(CE|CEC)[\s-]*provider|IICRC[\s-]*approv\w*\s+CE\b/i,
+    message:
+      'Bare "IICRC-approved" implies IICRC approves CARSI\'s courses/certifications — say "IICRC CEC Accredited".',
+  },
   // GAP CLOSED — "get / certified ... with CARSI" without IICRC adjacency.
-  { re: /\b(get|gain|become|be)\s+certified\b[^.\n]{0,24}\bwith\s+CARSI\b/i, allow: null,
-    message: 'CARSI delivers IICRC CEC training, not certification — do not say "get certified with CARSI".' },
-  { re: /\bcertified\s+online\s+with\s+CARSI\b/i, allow: null,
-    message: 'CARSI delivers IICRC CEC training, not certification — reframe "certified online with CARSI".' },
+  {
+    re: /\b(get|gain|become|be)\s+certified\b[^.\n]{0,24}\bwith\s+CARSI\b/i,
+    allow: null,
+    message:
+      'CARSI delivers IICRC CEC training, not certification — do not say "get certified with CARSI".',
+  },
+  {
+    re: /\bcertified\s+online\s+with\s+CARSI\b/i,
+    allow: null,
+    message:
+      'CARSI delivers IICRC CEC training, not certification — reframe "certified online with CARSI".',
+  },
   // GAP CLOSED 2026-11-02 — a course described as "CEC-accredited training / introduction /
   // overview / awareness" (or tagged "(CEC-accredited)") implies the COURSE earns CECs. Only a course
   // in data/seed/cec-approvals.json may say so (CLAUDE.md: CEC is fail-closed, per-course approval).
   // 12 seed entries carried it with no approval and this guard passed them. Denials ("not IICRC CEC
   // accredited") are allowed. CARSI's provider wording ("IICRC CEC Accredited provider/courses") is
   // not matched: the rule only fires on the course-describing nouns below.
-  { re: /\bCEC[\s-]+accredited\s+(training|introduction|overview|awareness|programme|program)\b|\(CEC[\s-]+accredited\)/i,
-    allow: /\bnot\s+(?:<[^>]+>\s*)?(?:IICRC\s+)?CEC[\s-]+accredited\b|\bIICRC\s+CEC\s+Accredited\s+(training|continuing)/i,
-    message: 'A course may be called "CEC-accredited" only once the IICRC has approved it (data/seed/cec-approvals.json). Remove the phrase, or write the denial "not IICRC CEC accredited".' },
+  {
+    re: /\bCEC[\s-]+accredited\s+(training|introduction|overview|awareness|programme|program)\b|\(CEC[\s-]+accredited\)/i,
+    allow:
+      /\bnot\s+(?:<[^>]+>\s*)?(?:IICRC\s+)?CEC[\s-]+accredited\b|\bIICRC\s+CEC\s+Accredited\s+(training|continuing)/i,
+    message:
+      'A course may be called "CEC-accredited" only once the IICRC has approved it (data/seed/cec-approvals.json). Remove the phrase, or write the denial "not IICRC CEC accredited".',
+  },
 ];
 
 /** A specific IICRC-CEC hour claim on a course (e.g. "8 IICRC CECs", "5 IICRC CEC hours",
@@ -119,13 +158,16 @@ const CEC_NUMBER = {
   re: /\b\d+(?:\.\d+)?\s*IICRC\s+(?:CEC|Continuing[\s-]+Education[\s-]+Credit)|\((?:IICRC\s+)?CEC\)\s*:?\s*\d+(?:\.\d+)?\s*Hours?/i,
   // Marks this rule as gated by the exact-text allowlist (see scanLine) rather than a regex `allow`.
   allowlisted: true,
-  message: 'Specific IICRC CEC-hour claim on a non-approved course. Every numbered "N IICRC CEC(s)" claim is blocked by default; it ships ONLY if a human adds the line\'s exact text to scripts/iicrc-cec-allowlist.json (approvedLines) after review, or the file sits under a founder-approved course slug (data/seed/cec-approvals.json). No pattern/auto-exemption — a near-miss still blocks. If this is a genuine IICRC program-requirement fact, add the exact line to the allowlist; if it is a course-award claim, remove the CEC number (fail-closed, CLAUDE.md).',
+  message:
+    'Specific IICRC CEC-hour claim on a non-approved course. Every numbered "N IICRC CEC(s)" claim is blocked by default; it ships ONLY if a human adds the line\'s exact text to scripts/iicrc-cec-allowlist.json (approvedLines) after review, or the file sits under a founder-approved course slug (data/seed/cec-approvals.json). No pattern/auto-exemption — a near-miss still blocks. If this is a genuine IICRC program-requirement fact, add the exact line to the allowlist; if it is a course-award claim, remove the CEC number (fail-closed, CLAUDE.md).',
 };
 
 /** Normalise a line for exact allowlist comparison: trim ends, collapse internal whitespace runs.
  *  Deliberately conservative — case and wording are preserved, so a near-miss variant does NOT
  *  match an allowlisted line (no accidental wildcarding). */
-function normaliseLine(s) { return s.replace(/\s+/g, ' ').trim(); }
+function normaliseLine(s) {
+  return s.replace(/\s+/g, ' ').trim();
+}
 
 /** Load the human-maintained exact-line allowlist (`scripts/iicrc-cec-allowlist.json`).
  *  Fail-closed: missing/unreadable/malformed file => EMPTY set (every numbered-CEC line blocks). */
@@ -156,14 +198,21 @@ const COPY_EXT = /\.(tsx?|jsx?|mdx?|html?|json)$/;
 // Education Credit (CEC): 1 Hour". The exclusion therefore reported clean over exactly the
 // claims GP-525 is about. Do not narrow the record scan to make the guard green.
 const SCANNED_DIRS = [
-  'app/', 'src/', 'templates/',
-  'docs/marketing/', 'docs/content/',
-  'data/seed/', 'data/voice/', 'data/video/', 'data/courses/',
+  'app/',
+  'src/',
+  'templates/',
+  'docs/marketing/',
+  'docs/content/',
+  'data/seed/',
+  'data/voice/',
+  'data/video/',
+  'data/courses/',
   'public/courses/',
 ];
 const EXEMPT = [
   'scripts/check-iicrc-compliance.mjs',
   'scripts/check-iicrc-terminology.mjs',
+  'docs/agents/CLAUDE.md',
   'CLAUDE.md',
   // Guard / phrase-catalogue infrastructure that legitimately names the banned phrases.
   'src/lib/course-kit/iicrc-phrases.ts',
@@ -197,8 +246,14 @@ export function evaluateIicrcFree(file, text) {
   return findings;
 }
 
-function inScope(f) { const n = f.replace(/\\/g, '/'); return SCANNED_DIRS.some((d) => n.startsWith(d)); }
-function isExempt(f) { const n = f.replace(/\\/g, '/'); return EXEMPT.some((e) => n === e || n.endsWith('/' + e)); }
+function inScope(f) {
+  const n = f.replace(/\\/g, '/');
+  return SCANNED_DIRS.some((d) => n.startsWith(d));
+}
+function isExempt(f) {
+  const n = f.replace(/\\/g, '/');
+  return EXEMPT.some((e) => n === e || n.endsWith('/' + e));
+}
 
 function scanLine(file, lineNo, content, findings, allowlist) {
   // A specific CEC-hour claim is exempt ONLY when the file belongs to a founder-approved
@@ -454,7 +509,10 @@ export { BANNED, CEC_NUMBER, CEC_APPROVED_SLUGS, inScope, isExempt, normaliseLin
 function main() {
   let list = '';
   try {
-    list = execSync('git ls-files --cached --others --exclude-standard', { encoding: 'utf8', maxBuffer: 128 * 1024 * 1024 });
+    list = execSync('git ls-files --cached --others --exclude-standard', {
+      encoding: 'utf8',
+      maxBuffer: 128 * 1024 * 1024,
+    });
   } catch (err) {
     console.error('check-iicrc-compliance: failed to list tracked files:', err.message);
     process.exit(1);
@@ -463,7 +521,11 @@ function main() {
   const files = list.split('\n').map((f) => f.trim()).filter(Boolean);
   for (const file of files.filter((f) => COPY_EXT.test(f) && inScope(f) && !isExempt(f))) {
     let text = '';
-    try { text = readFileSync(file, 'utf8'); } catch { continue; }
+    try {
+      text = readFileSync(file, 'utf8');
+    } catch {
+      continue;
+    }
     findings.push(...evaluateContent(file, text));
   }
 
@@ -497,7 +559,9 @@ function main() {
       text = readFileSync(file, 'utf8');
     } catch {
       // Scope floor: a listed file that vanished is a failure, never a silent pass.
-      findings.push(`  ${file}: listed as IICRC-free but could not be read — update IICRC_FREE_FILES deliberately`);
+      findings.push(
+        `  ${file}: listed as IICRC-free but could not be read — update IICRC_FREE_FILES deliberately`
+      );
       continue;
     }
     findings.push(...evaluateIicrcFree(file, text));
@@ -508,7 +572,9 @@ function main() {
     console.error('CARSI is an IICRC CEC provider, not a certifying body, and a course may only');
     console.error('advertise CEC hours once the founder confirms IICRC approval. Fix these:\n');
     console.error(findings.join('\n'));
-    console.error('\nSee CLAUDE.md § "IICRC CEC terminology". A numbered CEC line that is a genuine IICRC program-requirement fact ships ONLY by adding its exact text to scripts/iicrc-cec-allowlist.json after human review; otherwise remove the CEC number (fail-closed).\n');
+    console.error(
+      '\nSee CLAUDE.md § "IICRC CEC terminology". A numbered CEC line that is a genuine IICRC program-requirement fact ships ONLY by adding its exact text to scripts/iicrc-cec-allowlist.json after human review; otherwise remove the CEC number (fail-closed).\n'
+    );
     process.exit(1);
   }
   console.log('✓ IICRC/CEC compliance guard passed.');
