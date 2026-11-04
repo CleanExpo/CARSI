@@ -1,8 +1,9 @@
 /**
  * Route cover for `POST /api/lms/checkout/survey` (Authority Machine slice 1b).
  * Answers are written to the PaymentIntent metadata, once, only for a paid session, and only
- * from the browser that started that checkout (signed `carsi_svy_<id>` cookie). A session id alone
- * is not enough: it appears in the success URL and could be shared or leaked.
+ * from the browser that started that checkout (its `carsi_svk` key matches the binding stored on
+ * the session). A session id alone is not enough: it appears in the success URL and could be
+ * shared or leaked.
  */
 import { NextRequest } from 'next/server';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -21,8 +22,9 @@ vi.mock('@/lib/api/stripe', () => ({
 }));
 
 const { POST } = await import('../../../app/api/lms/checkout/survey/route');
-const { purchaseSurveyCookieName, PURCHASE_SURVEY_TOKEN_TTL_SECONDS, signPurchaseSurveyToken } =
-  await import('@/lib/server/purchase-survey-token');
+const { newPurchaseSurveyCookieValue, PURCHASE_SURVEY_COOKIE_NAME, purchaseSurveyBinding } = await import(
+  '@/lib/server/purchase-survey-token'
+);
 
 const FLAG = 'PURCHASE_SURVEY_ENABLED';
 const SESSION = 'cs_test_paid';
@@ -35,8 +37,24 @@ function post(body: unknown, cookie: string | null = validCookie()): NextRequest
   });
 }
 
-function validCookie(sessionId = SESSION, issuedAt = new Date()): string {
-  return `${purchaseSurveyCookieName(sessionId)}=${signPurchaseSurveyToken(sessionId, issuedAt)}`;
+/** This browser's key cookie, and the binding checkout stored on its session. */
+const BROWSER_COOKIE = newPurchaseSurveyCookieValue();
+const BINDING = purchaseSurveyBinding(BROWSER_COOKIE.slice(0, 32));
+
+function validCookie(value = BROWSER_COOKIE): string {
+  return `${PURCHASE_SURVEY_COOKIE_NAME}=${value}`;
+}
+
+/** A paid Checkout Session created a minute ago by this browser's checkout. */
+function paidSession(overrides: Record<string, unknown> = {}) {
+  return {
+    id: SESSION,
+    payment_status: 'paid',
+    payment_intent: 'pi_test_1',
+    created: Math.floor(Date.now() / 1000) - 60,
+    metadata: { svy_bk: BINDING },
+    ...overrides,
+  };
 }
 
 const GOOD = { session_id: SESSION, industry: 'commercial_cleaning', found_via: 'google_search' };
@@ -47,7 +65,7 @@ beforeEach(() => {
   process.env[FLAG] = 'true';
   process.env.STRIPE_SECRET_KEY = 'sk_test_synthetic';
   stripe.retrieveSession.mockReset();
-  stripe.retrieveSession.mockResolvedValue({ id: SESSION, payment_status: 'paid', payment_intent: 'pi_test_1' });
+  stripe.retrieveSession.mockResolvedValue(paidSession());
   stripe.retrievePI.mockReset();
   stripe.retrievePI.mockResolvedValue({ id: 'pi_test_1', metadata: {} });
   stripe.updatePI.mockReset();
@@ -74,39 +92,45 @@ describe('authorisation: the browser that started checkout', () => {
     expect(stripe.updatePI).not.toHaveBeenCalled();
   });
 
-  it('cookie issued for another session -> 403, no Stripe call', async () => {
-    const res = await POST(post(GOOD, validCookie('cs_test_other')));
+  it("another browser's valid key -> 403, and nothing about the payment is read or written", async () => {
+    const res = await POST(post(GOOD, validCookie(newPurchaseSurveyCookieValue())));
+    expect(res.status).toBe(403);
+    expect(stripe.retrievePI).not.toHaveBeenCalled();
+    expect(stripe.updatePI).not.toHaveBeenCalled();
+  });
+
+  it('forged cookie (right shape, wrong signature) -> 403, no Stripe call', async () => {
+    const forged = `${'a'.repeat(32)}.${'b'.repeat(64)}`;
+    const res = await POST(post(GOOD, validCookie(forged)));
     expect(res.status).toBe(403);
     expect(stripe.retrieveSession).not.toHaveBeenCalled();
   });
 
-  it('expired cookie -> 403, no Stripe call', async () => {
-    const issued = new Date(Date.now() - (PURCHASE_SURVEY_TOKEN_TTL_SECONDS + 60) * 1000);
-    const res = await POST(post(GOOD, validCookie(SESSION, issued)));
+  it('a session with no binding (started while the flag was off) -> 403', async () => {
+    stripe.retrieveSession.mockResolvedValue(paidSession({ metadata: {} }));
+    const res = await POST(post(GOOD));
     expect(res.status).toBe(403);
-    expect(stripe.retrieveSession).not.toHaveBeenCalled();
+    expect(stripe.updatePI).not.toHaveBeenCalled();
   });
 
-  it("several checkout cookies in one browser: this session's cookie authorises it", async () => {
-    const res = await POST(post(GOOD, `${validCookie('cs_test_later')}; ${validCookie()}`));
+  it('a session created more than 24 hours ago -> 403; 23 hours ago still works', async () => {
+    const nowSeconds = Math.floor(Date.now() / 1000);
+    stripe.retrieveSession.mockResolvedValue(paidSession({ created: nowSeconds - 25 * 3600 }));
+    expect((await POST(post(GOOD))).status).toBe(403);
+    stripe.retrieveSession.mockResolvedValue(paidSession({ created: nowSeconds - 23 * 3600 }));
+    expect((await POST(post(GOOD))).status).toBe(200);
+  });
+
+  it('the old per-checkout and shared survey cookies no longer authorise', async () => {
+    for (const cookie of [`carsi_svy=${BROWSER_COOKIE}`, `carsi_svy_0123456789abcdef=${BROWSER_COOKIE}`]) {
+      const res = await POST(post(GOOD, cookie));
+      expect(res.status).toBe(403);
+    }
+  });
+
+  it("several cookies in one browser: only this browser's key cookie counts", async () => {
+    const res = await POST(post(GOOD, `auth_token=x; carsi_svy=junk; ${validCookie()}`));
     expect(res.status).toBe(200);
-  });
-
-  it("another session's valid token under this session's cookie name -> 403", async () => {
-    const planted = `${purchaseSurveyCookieName(SESSION)}=${signPurchaseSurveyToken('cs_test_other')}`;
-    const res = await POST(post(GOOD, planted));
-    expect(res.status).toBe(403);
-    expect(stripe.retrieveSession).not.toHaveBeenCalled();
-  });
-
-  it('forged cookie -> 403', async () => {
-    const res = await POST(post(GOOD, `${purchaseSurveyCookieName(SESSION)}=9999999999.deadbeef`));
-    expect(res.status).toBe(403);
-  });
-
-  it('the old shared carsi_svy cookie no longer authorises', async () => {
-    const res = await POST(post(GOOD, `carsi_svy=${signPurchaseSurveyToken(SESSION)}`));
-    expect(res.status).toBe(403);
   });
 });
 
@@ -124,11 +148,7 @@ describe('POST /api/lms/checkout/survey', () => {
   });
 
   it('accepts an expanded payment_intent object', async () => {
-    stripe.retrieveSession.mockResolvedValue({
-      id: SESSION,
-      payment_status: 'paid',
-      payment_intent: { id: 'pi_obj', metadata: {} },
-    });
+    stripe.retrieveSession.mockResolvedValue(paidSession({ payment_intent: { id: 'pi_obj', metadata: {} } }));
     stripe.retrievePI.mockResolvedValue({ id: 'pi_obj', metadata: {} });
     const res = await POST(post(GOOD));
     expect(res.status).toBe(200);
@@ -136,7 +156,7 @@ describe('POST /api/lms/checkout/survey', () => {
   });
 
   it('T1b-1: an unpaid session is refused with 400 and nothing is written', async () => {
-    stripe.retrieveSession.mockResolvedValue({ id: SESSION, payment_status: 'unpaid', payment_intent: 'pi_x' });
+    stripe.retrieveSession.mockResolvedValue(paidSession({ payment_status: 'unpaid', payment_intent: 'pi_x' }));
     const res = await POST(post(GOOD));
     expect(res.status).toBe(400);
     expect(stripe.updatePI).not.toHaveBeenCalled();
@@ -150,7 +170,7 @@ describe('POST /api/lms/checkout/survey', () => {
   });
 
   it('a paid session with no PaymentIntent is refused with 409 and nothing is written', async () => {
-    stripe.retrieveSession.mockResolvedValue({ id: SESSION, payment_status: 'paid', payment_intent: null });
+    stripe.retrieveSession.mockResolvedValue(paidSession({ payment_intent: null }));
     const res = await POST(post(GOOD));
     expect(res.status).toBe(409);
     expect(stripe.updatePI).not.toHaveBeenCalled();

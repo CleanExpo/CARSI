@@ -66,13 +66,21 @@ vi.mock('@/lib/server/event-attribution', () => ({
   tryRecordAttributedStage: vi.fn().mockResolvedValue(undefined),
 }));
 
-// Only the survey route (GP-662 overlapping-start cover) reaches this client.
-const surveyStripe = vi.hoisted(() => ({ updatePI: vi.fn() }));
+// Only the survey route (GP-662 overlapping-start cover) reaches this client. It serves back
+// each Checkout Session as the mocked checkout created it, metadata included.
+const surveyStripe = vi.hoisted(() => ({
+  updatePI: vi.fn(),
+  sessions: new Map<string, Record<string, unknown>>(),
+}));
 vi.mock('@/lib/api/stripe', () => ({
   getStripeClient: () => ({
     checkout: {
       sessions: {
-        retrieve: async (id: string) => ({ id, payment_status: 'paid', payment_intent: `pi_for_${id}` }),
+        retrieve: async (id: string) => {
+          const session = surveyStripe.sessions.get(id);
+          if (!session) throw new Error('No such checkout.session');
+          return session;
+        },
       },
     },
     paymentIntents: {
@@ -311,7 +319,7 @@ describe('purchase survey capability cookie (Authority Machine slice 1b)', () =>
   });
 
   function surveyCookie(res: Response): string | undefined {
-    return res.headers.getSetCookie().find((c) => c.startsWith('carsi_svy_'));
+    return res.headers.getSetCookie().find((c) => c.startsWith('carsi_svk='));
   }
 
   it('flag off: the checkout response sets no cookie at all (unchanged)', async () => {
@@ -322,7 +330,7 @@ describe('purchase survey capability cookie (Authority Machine slice 1b)', () =>
     expect(res.headers.getSetCookie()).toEqual([]);
   });
 
-  it('flag on: sets an HttpOnly, Secure, SameSite=Lax 24 h cookie that verifies for the new session only', async () => {
+  it('flag on: sets an HttpOnly, Secure, SameSite=Lax 30-day key cookie and binds it to the new session', async () => {
     process.env[FLAG] = 'true';
     mocks.findUser.mockResolvedValue(null);
     const res = await POST(request({ slug: COURSE_SLUG, customer_email: 'new@example.test' }));
@@ -332,14 +340,13 @@ describe('purchase survey capability cookie (Authority Machine slice 1b)', () =>
     expect(header).toContain('HttpOnly');
     expect(header).toContain('Secure');
     expect(header?.toLowerCase()).toContain('samesite=lax');
-    expect(header).toContain('Max-Age=86400');
-    const { purchaseSurveyCookieName, verifyPurchaseSurveyToken } = await import(
-      '@/lib/server/purchase-survey-token'
-    );
-    expect(header!.startsWith(`${purchaseSurveyCookieName('cs_new')}=`)).toBe(true);
-    const token = decodeURIComponent(header!.split(';')[0].split('=')[1]);
-    expect(verifyPurchaseSurveyToken(token, 'cs_new', new Date())).toBe(true);
-    expect(verifyPurchaseSurveyToken(token, 'cs_other', new Date())).toBe(false);
+    expect(header).toContain('Max-Age=2592000');
+    expect(header).toContain('Path=/;');
+    expect(res.headers.getSetCookie()).toHaveLength(1);
+    const { purchaseSurveyBinding, purchaseSurveyKeyFromCookie } = await import('@/lib/server/purchase-survey-token');
+    const key = purchaseSurveyKeyFromCookie(decodeURIComponent(header!.split(';')[0].split('=')[1]));
+    expect(key).not.toBeNull();
+    expect(mocks.createStripe.mock.calls[0][0].extra_metadata).toEqual({ svy_bk: purchaseSurveyBinding(key!) });
   });
 
   it('flag on: the discounted path sets it too', async () => {
@@ -357,6 +364,10 @@ describe('purchase survey capability cookie (Authority Machine slice 1b)', () =>
     );
     expect(res.status).toBe(200);
     expect(surveyCookie(res)).toBeDefined();
+    expect(mocks.createStripe.mock.calls[0][0].extra_metadata).toEqual({
+      svy_bk: expect.stringMatching(/^[0-9a-f]{32}$/),
+      discount_id: 'disc-1',
+    });
   });
 });
 
@@ -552,11 +563,22 @@ async function surveyStatus(jar: Map<string, string>, sessionId: string): Promis
   return res.status;
 }
 
+/** The next Stripe checkout gets this id; it is stored as created, so the survey route sees it. */
 function nextSession(id: string): void {
-  mocks.createStripe.mockResolvedValueOnce({
-    checkout_url: `https://checkout.stripe.test/${id}`,
-    checkout_session_id: id,
+  mocks.createStripe.mockImplementationOnce(async (args: { extra_metadata?: Record<string, string> }) => {
+    surveyStripe.sessions.set(id, {
+      id,
+      payment_status: 'paid',
+      payment_intent: `pi_for_${id}`,
+      created: Math.floor(Date.now() / 1000),
+      metadata: { ...(args.extra_metadata ?? {}) },
+    });
+    return { checkout_url: `https://checkout.stripe.test/${id}`, checkout_session_id: id };
   });
+}
+
+function surveyCookieNames(jar: Map<string, string>): string[] {
+  return [...jar.keys()].filter((name) => name.startsWith('carsi_sv'));
 }
 
 describe('overlapping checkout starts keep every survey answerable (GP-662)', () => {
@@ -565,6 +587,7 @@ describe('overlapping checkout starts keep every survey answerable (GP-662)', ()
   beforeEach(() => {
     process.env[FLAG] = 'true';
     mocks.findUser.mockResolvedValue(null);
+    surveyStripe.sessions.clear();
     surveyStripe.updatePI.mockReset();
     surveyStripe.updatePI.mockResolvedValue({});
   });
@@ -574,34 +597,75 @@ describe('overlapping checkout starts keep every survey answerable (GP-662)', ()
   });
 
   it.each([
-    ['A reply lands first', false],
-    ['B reply lands first', true],
-  ])('two starts that read the same earlier cookie both stay answerable (%s)', async (_label, bFirst) => {
+    ['A, B, C', [0, 1, 2]],
+    ['C, B, A', [2, 1, 0]],
+    ['B, C, A', [1, 2, 0]],
+  ])('three starts that read the same cookies all stay answerable (replies land %s)', async (_label, order) => {
     const jar = new Map<string, string>();
     nextSession('cs_test_earlier');
     applySetCookies(jar, await POST(checkoutFrom(jar, COURSE_SLUG)));
 
-    // Both requests leave the browser before either reply arrives, so both carry the same jar.
+    // All three requests leave the browser before any reply arrives, so all carry the same jar.
+    const replies: Response[] = [];
+    for (const id of ['cs_test_a', 'cs_test_b', 'cs_test_c']) {
+      nextSession(id);
+      replies.push(await POST(checkoutFrom(jar, COURSE_SLUG)));
+    }
+    for (const i of order) applySetCookies(jar, replies[i]);
+
+    for (const id of ['cs_test_earlier', 'cs_test_a', 'cs_test_b', 'cs_test_c']) {
+      expect(await surveyStatus(jar, id)).toBe(200);
+    }
+    expect(surveyCookieNames(jar)).toEqual(['carsi_svk']);
+  });
+
+  it("a browser's first two checkouts, started at once after the page set the key, both stay answerable", async () => {
+    const { newPurchaseSurveyCookieValue } = await import('@/lib/server/purchase-survey-token');
+    // The proxy sets this on the first page view (purchase-survey-key-proxy.test.ts).
+    const jar = new Map<string, string>([['carsi_svk', newPurchaseSurveyCookieValue()]]);
     nextSession('cs_test_a');
     const resA = await POST(checkoutFrom(jar, COURSE_SLUG));
     nextSession('cs_test_b');
     const resB = await POST(checkoutFrom(jar, 'odour-control'));
-    for (const res of bFirst ? [resB, resA] : [resA, resB]) applySetCookies(jar, res);
-
+    applySetCookies(jar, resB);
+    applySetCookies(jar, resA);
     expect(await surveyStatus(jar, 'cs_test_a')).toBe(200);
     expect(await surveyStatus(jar, 'cs_test_b')).toBe(200);
-    expect(await surveyStatus(jar, 'cs_test_earlier')).toBe(200);
-    expect(await surveyStatus(jar, 'cs_test_never_started')).toBe(403);
   });
 
-  it('sequential starts keep only the three newest checkouts', async () => {
+  it('many sequential starts: every session stays answerable and there is still one cookie', async () => {
     const jar = new Map<string, string>();
-    for (const id of ['cs_test_1', 'cs_test_2', 'cs_test_3', 'cs_test_4', 'cs_test_5']) {
+    const ids = ['cs_test_1', 'cs_test_2', 'cs_test_3', 'cs_test_4', 'cs_test_5'];
+    for (const id of ids) {
       nextSession(id);
       applySetCookies(jar, await POST(checkoutFrom(jar, COURSE_SLUG)));
     }
-    expect([...jar.keys()].filter((name) => name.startsWith('carsi_svy'))).toHaveLength(3);
-    for (const id of ['cs_test_3', 'cs_test_4', 'cs_test_5']) expect(await surveyStatus(jar, id)).toBe(200);
-    for (const id of ['cs_test_1', 'cs_test_2']) expect(await surveyStatus(jar, id)).toBe(403);
+    for (const id of ids) expect(await surveyStatus(jar, id)).toBe(200);
+    expect(surveyCookieNames(jar)).toEqual(['carsi_svk']);
+  });
+
+  it('another browser cannot answer, and a session never started is refused', async () => {
+    const jar = new Map<string, string>();
+    nextSession('cs_test_mine');
+    applySetCookies(jar, await POST(checkoutFrom(jar, COURSE_SLUG)));
+    const { newPurchaseSurveyCookieValue } = await import('@/lib/server/purchase-survey-token');
+    const otherBrowser = new Map<string, string>([['carsi_svk', newPurchaseSurveyCookieValue()]]);
+    expect(await surveyStatus(otherBrowser, 'cs_test_mine')).toBe(403);
+    expect(await surveyStatus(new Map(), 'cs_test_mine')).toBe(403);
+    expect(await surveyStatus(jar, 'cs_test_never_started')).toBe(400);
+  });
+
+  it('junk and forged cookies change nothing: one Set-Cookie, a fresh valid key, checkout succeeds', async () => {
+    const jar = new Map<string, string>();
+    for (let i = 0; i < 120; i += 1) jar.set(`carsi_svy_${i.toString(16).padStart(16, '0')}`, '9999999999.' + '0'.repeat(64));
+    const forged = `${'a'.repeat(32)}.${'b'.repeat(64)}`;
+    jar.set('carsi_svk', forged);
+    nextSession('cs_test_junk');
+    const res = await POST(checkoutFrom(jar, COURSE_SLUG));
+    expect(res.status).toBe(200);
+    expect(res.headers.getSetCookie()).toHaveLength(1);
+    applySetCookies(jar, res);
+    expect(jar.get('carsi_svk')).not.toBe(forged);
+    expect(await surveyStatus(jar, 'cs_test_junk')).toBe(200);
   });
 });

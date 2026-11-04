@@ -60,32 +60,27 @@ import {
 import { isAttributionCaptureEnabled } from '@/lib/server/attribution-capture-flag';
 import { isPurchaseSurveyEnabled } from '@/lib/server/purchase-survey-flag';
 import {
-  PURCHASE_SURVEY_COOKIE_PATH,
-  PURCHASE_SURVEY_TOKEN_TTL_SECONDS,
-  purchaseSurveyCookieChanges,
+  PURCHASE_SURVEY_BINDING_METADATA_KEY,
+  PURCHASE_SURVEY_COOKIE_NAME,
+  purchaseSurveyBinding,
+  purchaseSurveyCookieForCheckout,
+  purchaseSurveyCookieOptions,
 } from '@/lib/server/purchase-survey-token';
 
 class AccountLookupUnavailable extends Error {}
 
 /**
  * The checkout reply. With the purchase survey on (slice 1b), it also carries the HttpOnly
- * capability cookie that lets this browser, and only this one, answer the survey for this
- * Stripe session. Each session has its own cookie, so two checkouts started at once cannot
- * overwrite each other (GP-662); up to three recent checkouts are kept. Off, the reply is
+ * browser-key cookie whose binding was stored on this Stripe session, so this browser, and only
+ * this one, can answer the survey. The value is the browser's existing key when it has one, so
+ * checkouts started at the same moment all write the same value (GP-662). Off, the reply is
  * exactly what it was.
  */
-function checkoutStarted(checkout_url: string, checkoutSessionId: string, request: NextRequest) {
+function checkoutStarted(checkout_url: string, surveyCookie: string | null, request: NextRequest) {
   const res = NextResponse.json({ checkout_url });
-  if (isPurchaseSurveyEnabled()) {
-    const options = {
-      httpOnly: true,
-      secure: request.nextUrl.protocol === 'https:' || process.env.NODE_ENV === 'production',
-      sameSite: 'lax' as const,
-      path: PURCHASE_SURVEY_COOKIE_PATH,
-    };
-    const { set, expire } = purchaseSurveyCookieChanges(request.cookies.getAll(), checkoutSessionId);
-    res.cookies.set(set.name, set.value, { ...options, maxAge: PURCHASE_SURVEY_TOKEN_TTL_SECONDS });
-    for (const name of expire) res.cookies.set(name, '', { ...options, maxAge: 0 });
+  if (surveyCookie) {
+    const secure = request.nextUrl.protocol === 'https:' || process.env.NODE_ENV === 'production';
+    res.cookies.set(PURCHASE_SURVEY_COOKIE_NAME, surveyCookie, purchaseSurveyCookieOptions(secure));
   }
   return res;
 }
@@ -122,6 +117,13 @@ export async function POST(request: NextRequest) {
           ),
         }
       : utmMetadata;
+    // Purchase survey (slice 1b): bind this browser's key to the session being created.
+    const surveyCookie = isPurchaseSurveyEnabled()
+      ? purchaseSurveyCookieForCheckout(request.cookies.get(PURCHASE_SURVEY_COOKIE_NAME)?.value)
+      : null;
+    const checkoutMetadata: Record<string, string> = surveyCookie
+      ? { ...attributionMetadata, [PURCHASE_SURVEY_BINDING_METADATA_KEY]: purchaseSurveyBinding(surveyCookie.key) }
+      : attributionMetadata;
 
     const slug = typeof body.slug === 'string' ? body.slug.trim() : '';
     if (!slug) {
@@ -396,7 +398,7 @@ export async function POST(request: NextRequest) {
             customer_email: customerEmail,
             student_id: studentId,
             unit_amount_cents: cents,
-            extra_metadata: { ...attributionMetadata, discount_id: disc.id },
+            extra_metadata: { ...checkoutMetadata, discount_id: disc.id },
             guest_checkout: guestCheckout && !studentId,
             quantity: checkoutQuantity,
             purchase_mode: purchaseMode,
@@ -409,7 +411,7 @@ export async function POST(request: NextRequest) {
             currency: 'aud',
             transactionId: checkout_session_id,
           });
-          return checkoutStarted(checkout_url, checkout_session_id, request);
+          return checkoutStarted(checkout_url, surveyCookie?.value ?? null, request);
         } catch (err) {
           const msg = err instanceof Error ? err.message : String(err);
           if (msg === 'INVALID_AMOUNT') {
@@ -452,7 +454,7 @@ export async function POST(request: NextRequest) {
         purchase_mode: purchaseMode,
         team_seat_count: teamSeatCount ?? undefined,
         attribution_journey_id: attributionJourneyId ?? undefined,
-        extra_metadata: attributionMetadata,
+        extra_metadata: checkoutMetadata,
       });
       await tryRecordAttributedStage(attributionJourneyId, 'checkout_started', {
         courseSlug: slug,
@@ -460,7 +462,7 @@ export async function POST(request: NextRequest) {
         currency: unit_amount_cents == null ? undefined : 'aud',
         transactionId: checkout_session_id,
       });
-      return checkoutStarted(checkout_url, checkout_session_id, request);
+      return checkoutStarted(checkout_url, surveyCookie?.value ?? null, request);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       if (msg === 'INVALID_AMOUNT') {
