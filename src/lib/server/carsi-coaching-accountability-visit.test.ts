@@ -3,15 +3,17 @@
  * Proves:
  * - a visit is recorded at most once per 6-hour window, and only on a plan that has
  *   accountability set up;
- * - the coaching portal layout (which wraps every member portal page) records the visit for
- *   a subscriber while the feature flag is on, and does nothing while it is off;
- * - recording the visit from the layout does not hide the "you've been quiet" banner the
- *   Home card shows a member returning after 14 or more quiet days.
+ * - the coaching portal layout (which wraps every member portal page) mounts the visit
+ *   tracker for a subscriber while the feature flag is on, and not otherwise (the tracker
+ *   itself, which fires on every page change, is tested in CoachingPortalVisitBeacon.test.tsx);
+ * - a visit recorded by another page first does not hide the "you've been quiet" banner the
+ *   Home card shows a member returning after 14 or more quiet days, and the banner shows once
+ *   even when two views load together.
  */
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   applyKpiDefinitions,
@@ -96,14 +98,22 @@ describe('recordPortalVisit', () => {
     await recordPortalVisit(store, USER, back);
     expect(daysSilent(box.acc!, back)).toBe(0);
   });
+
+  it('two pages recording together write once', async () => {
+    const { store, box } = memoryStore(setUp(T0));
+    const back = new Date(T0.getTime() + 15 * DAY);
+    await Promise.all([recordPortalVisit(store, USER, back), recordPortalVisit(store, USER, back)]);
+    expect(box.writes).toBe(1);
+    expect(box.acc?.quietReturn).toEqual({ daysSilent: 15, at: back.toISOString() });
+  });
 });
 
-describe('the quiet banner after the layout has already recorded the visit', () => {
+describe('the quiet banner after another page has already recorded the visit', () => {
   it('still tells a member returning after 15 quiet days, once', async () => {
     const { store, box } = memoryStore(setUp(T0));
     const back = new Date(T0.getTime() + 15 * DAY);
 
-    // The layout runs first on every portal page, then the Home card asks the API.
+    // The member opens Actions first (visit recorded), then the Home card asks the API.
     await recordPortalVisit(store, USER, back);
     const view = await getMyAccountability(store, USER, new Date(back.getTime() + 60_000));
     expect(view.quiet).toEqual({ daysSilent: 15 });
@@ -112,6 +122,28 @@ describe('the quiet banner after the layout has already recorded the visit', () 
     // Shown once: the next view in the same window has no banner.
     const again = await getMyAccountability(store, USER, new Date(back.getTime() + 120_000));
     expect(again.quiet).toBeNull();
+  });
+
+  it('shows the banner once when two views load together', async () => {
+    const { store } = memoryStore(setUp(T0));
+    const back = new Date(T0.getTime() + 15 * DAY);
+    await recordPortalVisit(store, USER, back);
+    const at = new Date(back.getTime() + 60_000);
+    const views = await Promise.all([
+      getMyAccountability(store, USER, at),
+      getMyAccountability(store, USER, at),
+    ]);
+    expect(views.filter((v) => v.quiet !== null)).toHaveLength(1);
+  });
+
+  it('shows the banner once when the Home card itself is the first view', async () => {
+    const { store } = memoryStore(setUp(T0));
+    const back = new Date(T0.getTime() + 15 * DAY);
+    const views = await Promise.all([
+      getMyAccountability(store, USER, back),
+      getMyAccountability(store, USER, back),
+    ]);
+    expect(views.filter((v) => v.quiet !== null)).toHaveLength(1);
   });
 
   it('drops an unseen quiet mark once the visit window has passed', async () => {
@@ -148,8 +180,6 @@ const layoutState = vi.hoisted(() => ({
   claims: null as { sub: string } | null,
   entitled: true,
   flag: true,
-  reads: [] as string[],
-  failVisit: false,
 }));
 
 vi.mock('next/navigation', () => ({
@@ -170,41 +200,31 @@ vi.mock('@/components/coaching-portal/CoachingPortalShell', () => ({
   CoachingPortalShell: ({ children }: { children: unknown }) => children,
 }));
 
+vi.mock('@/components/coaching-portal/CoachingPortalVisitBeacon', () => ({
+  CoachingPortalVisitBeacon: function CoachingPortalVisitBeacon() {
+    return null;
+  },
+}));
+
 vi.mock('@/lib/server/carsi-coaching-accountability-flag', () => ({
   isCarsiCoachingAccountabilityEnabled: () => layoutState.flag,
   isCarsiCoachingAccountabilityEmailEnabled: () => false,
 }));
 
-// The layout's store: records which member's plan the visit looked up.
-vi.mock('@/lib/server/carsi-coaching-accountability-store', () => ({
-  getAccountabilityStore: () => ({
-    async readPlan(userId: string) {
-      layoutState.reads.push(userId);
-      if (layoutState.failVisit) throw new Error('database down');
-      return null;
-    },
-    async writeAccountability() {
-      return true;
-    },
-    async listActions() {
-      return [];
-    },
-    async listMembers() {
-      return [];
-    },
-  }),
-}));
+/** True when the rendered tree contains the visit tracker. */
+function hasBeacon(node: unknown): boolean {
+  if (!node || typeof node !== 'object') return false;
+  if (Array.isArray(node)) return node.some(hasBeacon);
+  const el = node as { type?: { name?: string }; props?: { children?: unknown } };
+  if (el.type?.name === 'CoachingPortalVisitBeacon') return true;
+  return hasBeacon(el.props?.children);
+}
 
 describe('coaching portal layout', () => {
   beforeEach(() => {
     layoutState.claims = { sub: USER };
     layoutState.entitled = true;
     layoutState.flag = true;
-    layoutState.reads = [];
-    layoutState.failVisit = false;
-  });
-  afterEach(() => {
-    vi.restoreAllMocks();
   });
 
   async function renderLayout() {
@@ -213,29 +233,18 @@ describe('coaching portal layout', () => {
     return Layout({ children: 'page' });
   }
 
-  it('records a visit for a subscriber on any portal page while the flag is on', async () => {
-    const out = await renderLayout();
-    expect(out).toBeTruthy();
-    expect(layoutState.reads).toEqual([USER]);
+  it('mounts the visit tracker for a subscriber while the flag is on', async () => {
+    expect(hasBeacon(await renderLayout())).toBe(true);
   });
 
-  it('records nothing while the feature flag is off', async () => {
+  it('does not mount it while the feature flag is off', async () => {
     layoutState.flag = false;
-    await renderLayout();
-    expect(layoutState.reads).toEqual([]);
+    expect(hasBeacon(await renderLayout())).toBe(false);
   });
 
-  it('records nothing for a signed-in user without an active subscription', async () => {
+  it('does not mount it for a signed-in user without an active subscription', async () => {
     layoutState.entitled = false;
-    await renderLayout();
-    expect(layoutState.reads).toEqual([]);
-  });
-
-  it('still renders the page when recording the visit fails', async () => {
-    layoutState.failVisit = true;
-    vi.spyOn(console, 'warn').mockImplementation(() => {});
-    await expect(renderLayout()).resolves.toBeTruthy();
-    expect(layoutState.reads).toEqual([USER]);
+    expect(hasBeacon(await renderLayout())).toBe(false);
   });
 
   it('wraps every member portal page, so no page is left out', () => {

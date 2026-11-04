@@ -199,19 +199,20 @@ export async function getMyAccountability(
   const [plan, actions] = await Promise.all([store.readPlan(userId), store.listActions(userId)]);
   const acc = plan?.accountability ?? null;
   let quiet: { daysSilent: number } | null = null;
-  if (acc) {
-    quiet = quietOnArrival(acc, now);
-    if (visitDue(acc, now) || acc.quietReturn) {
-      // Records the visit if one is due, and clears the "returned after a quiet spell" mark:
-      // the banner is shown once, on this view, whichever page recorded the visit.
-      await mutatePlan(store, userId, (current) => {
-        if (!current) return null;
-        const visited = withVisit(current, now) ?? current;
-        if (visited === current && !current.quietReturn) return null;
-        const { quietReturn: _shown, ...rest } = visited;
-        return rest;
-      });
-    }
+  if (acc && (visitDue(acc, now) || acc.quietReturn)) {
+    // Records the visit if one is due, and clears the "returned after a quiet spell" mark.
+    // The banner is decided inside the compare-and-set loop, from the plan version this view
+    // actually wrote, so two views loading together show it once (Codex r1 P2). A view that
+    // finds nothing to write (the other view got there first) shows no banner.
+    await mutatePlan(store, userId, (current) => {
+      quiet = null;
+      if (!current) return null;
+      const visited = withVisit(current, now) ?? current;
+      if (visited === current && !current.quietReturn) return null;
+      quiet = quietOnArrival(current, now);
+      const { quietReturn: _shown, ...rest } = visited;
+      return rest;
+    });
   }
   return memberView(acc, actions, now, quiet);
 }

@@ -273,6 +273,37 @@ describe('member route /api/coaching/portal/accountability', () => {
     const second = (await (await memberGET(req(MEMBER_URL))).json()).accountability;
     expect(second.quiet).toBeNull();
   });
+
+  it('GP-677: POST { visit: true } from any portal page records the visit', async () => {
+    seedDemoMember(MEMBER_A);
+    vi.useFakeTimers({ toFake: ['Date'] });
+    const back = new Date(T0.getTime() + 15 * DAY);
+    vi.setSystemTime(back);
+
+    expect((await memberPOST(req(MEMBER_URL, { visit: true }))).status).toBe(401);
+
+    state.claims = member(MEMBER_A);
+    const res = await memberPOST(req(MEMBER_URL, { visit: true }));
+    expect(res.status).toBe(204);
+    const acc = state.plans.get(MEMBER_A)!.accountability as PlanAccountability;
+    expect(acc.lastSeenAt).toBe(back.toISOString());
+
+    // The Home card opened next still says "you've been quiet", once.
+    const home = (await (await memberGET(req(MEMBER_URL))).json()).accountability;
+    expect(home.quiet).toEqual({ daysSilent: 15 });
+  });
+
+  it('GP-677: a visit is not recorded without an active subscription, or with the flag off', async () => {
+    seedDemoMember(MEMBER_A);
+    state.claims = member(MEMBER_A);
+    state.entitled = false;
+    expect((await memberPOST(req(MEMBER_URL, { visit: true }))).status).toBe(403);
+    state.entitled = true;
+    vi.stubEnv('CARSI_COACHING_ACCOUNTABILITY_ENABLED', '');
+    expect((await memberPOST(req(MEMBER_URL, { visit: true }))).status).toBe(404);
+    const acc = state.plans.get(MEMBER_A)!.accountability as PlanAccountability;
+    expect(acc.lastSeenAt).toBe(T0.toISOString());
+  });
 });
 
 describe('coach route /api/admin/coaching/accountability', () => {
