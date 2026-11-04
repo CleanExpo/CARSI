@@ -37,7 +37,7 @@ export type AuthorityIcon = 'hardhat' | 'clipboard' | 'building' | 'stethoscope'
 export type AuthorityCardIcon = 'shield' | 'droplets' | 'wind' | 'clipboard';
 
 export interface AuthorityHeroImage {
-  /** Path under /public or an allowed remote image URL. */
+  /** A committed file under public/images/for/, e.g. `/images/for/nsw-builders.jpg`. */
   src: string;
   alt: string;
 }
@@ -679,10 +679,19 @@ export function authoritySitemapPaths(
 
 const NINETY_DAYS_MS = 90 * 24 * 60 * 60 * 1000;
 
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 /**
- * Problems that stop an entry being approved. A draft is always allowed; an approved entry must
- * name its approver, carry sourced and fresh claims, and link at least one published course.
- * `liveSlugs`, when given, is the set of published course slugs the bundle is checked against.
+ * Hero images must be committed files under public/images/for/. The registry test checks that
+ * every path named here exists, so a missing or remote image cannot pass approval.
+ */
+const HERO_SRC = /^\/images\/for\/[a-z0-9-]+\.(jpg|jpeg|png|webp|avif)$/;
+
+/**
+ * Problems that stop an entry being approved. A draft is always allowed. For an approved entry
+ * every required item below must be present AND valid; an absent item is a problem, never a pass:
+ * approver, approval date (ISO, not in the future), hero image (committed path + alt text), at
+ * least one claim (https source, `O` tag, verified within 90 days), and at least one course,
+ * each published. `liveSlugs`, when given, is the set of published course slugs.
  */
 export function validateAuthorityPage(
   entry: AuthorityPageEntry,
@@ -691,10 +700,15 @@ export function validateAuthorityPage(
 ): string[] {
   if (entry.status !== 'approved') return [];
   const problems: string[] = [];
-  if (!entry.approvedBy) problems.push('approvedBy is required');
-  if (!entry.approvedAt) problems.push('approvedAt is required');
-  if (!entry.heroImage?.src.trim() || !entry.heroImage.alt.trim()) {
-    problems.push('a hero visual with alt text is required');
+  if (!entry.approvedBy?.trim()) problems.push('approvedBy is required');
+  const approvedAt = entry.approvedAt ?? '';
+  if (!ISO_DATE.test(approvedAt) || Number.isNaN(Date.parse(approvedAt))) {
+    problems.push('approvedAt must be an ISO date (YYYY-MM-DD)');
+  } else if (Date.parse(approvedAt) > now.getTime()) {
+    problems.push('approvedAt is in the future');
+  }
+  if (!entry.heroImage || !HERO_SRC.test(entry.heroImage.src) || !entry.heroImage.alt.trim()) {
+    problems.push('a hero visual under /images/for/ with alt text is required');
   }
   if (entry.bundle.publishedSlugs.length === 0) {
     problems.push('at least one published course is required in the bundle');
@@ -704,9 +718,12 @@ export function validateAuthorityPage(
       if (!liveSlugs.has(slug)) problems.push(`bundle course is not published: ${slug}`);
     }
   }
+  if (entry.claims.length === 0) problems.push('at least one sourced claim is required');
   for (const claim of entry.claims) {
-    if (!claim.sourceUrl) problems.push(`claim is missing sourceUrl: ${claim.text.slice(0, 40)}`);
-    if (!claim.tag) problems.push(`claim is missing tag: ${claim.text.slice(0, 40)}`);
+    if (!/^https:\/\/\S+$/.test(claim.sourceUrl)) {
+      problems.push(`claim sourceUrl must be https: ${claim.text.slice(0, 40)}`);
+    }
+    if (claim.tag !== 'O') problems.push(`claim is missing tag: ${claim.text.slice(0, 40)}`);
     const verified = Date.parse(claim.lastVerified);
     if (Number.isNaN(verified)) {
       problems.push(`claim is missing lastVerified: ${claim.text.slice(0, 40)}`);

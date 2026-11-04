@@ -285,6 +285,48 @@ describe('approval guard', () => {
     expect(validateAuthorityPage(noSrc, now).join(' ')).toMatch(/sourceUrl/);
   });
 
+  // Review round 1 found two required items that passed while absent or not real. Each
+  // required approval item is now checked for presence and validity; one row per item.
+  it('rejects approval when any required item is absent or not real', () => {
+    const ok = fresh(approved(authorityPages[0]));
+    expect(validateAuthorityPage(ok, new Date(), liveSlugs)).toEqual([]);
+    const broken: Record<string, [AuthorityPageEntry, RegExp]> = {
+      'no claims at all': [{ ...ok, claims: [] }, /claim/],
+      'blank approver': [{ ...ok, approvedBy: '  ' }, /approvedBy/],
+      'approval date not a date': [{ ...ok, approvedAt: 'soon' }, /approvedAt/],
+      'approval date in the future': [{ ...ok, approvedAt: '2999-01-01' }, /approvedAt/],
+      'remote hero image': [
+        { ...ok, heroImage: { ...HERO, src: 'https://example.com/a.jpg' } },
+        /hero/,
+      ],
+      'hero outside /images/for/': [
+        { ...ok, heroImage: { ...HERO, src: '/og-image.png' } },
+        /hero/,
+      ],
+      'claim not https': [
+        { ...ok, claims: [{ ...ok.claims[0], sourceUrl: 'http://x.example' }] },
+        /sourceUrl/,
+      ],
+    };
+    for (const [why, [entry, re]] of Object.entries(broken)) {
+      const problems = validateAuthorityPage(entry, new Date(), liveSlugs);
+      expect(problems.join(' '), why).toMatch(re);
+      expect(buildAuthorityMetadata(entry, liveSlugs).robots, why).toEqual(NOINDEX);
+      expect(authoritySitemapPaths(liveSlugs, [entry]), why).toEqual([]);
+    }
+  });
+
+  it('every hero image named in the registry is a committed file under public/', () => {
+    const missing = (pages: AuthorityPageEntry[]) =>
+      pages
+        .filter((p) => p.heroImage)
+        .map((p) => p.heroImage!.src)
+        .filter((src) => !existsSync(join(ROOT, 'public', src)));
+    expect(missing(authorityPages)).toEqual([]);
+    // Control: the same check fires for a path that is not committed.
+    expect(missing([approved(authorityPages[0])])).toEqual([HERO.src]);
+  });
+
   it('rejects approval without a hero visual and alt text', () => {
     expect(
       validateAuthorityPage({ ...approved(authorityPages[0]), heroImage: null }, now).join(' ')
