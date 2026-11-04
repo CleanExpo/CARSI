@@ -56,7 +56,7 @@ export function findLocalOrigins(text) {
 
 /** Parse "rgb(a, b, c)" / "rgba(a, b, c, x)" into [r, g, b, alpha]. */
 export function parseRgb(value) {
-  const m = /rgba?\(\s*(\d+)[,\s]+(\d+)[,\s]+(\d+)(?:[,\s/]+([\d.]+%?))?\s*\)/i.exec(
+  const m = /^\s*rgba?\(\s*(\d+)[,\s]+(\d+)[,\s]+(\d+)(?:[,\s/]+([\d.]+%?))?\s*\)\s*$/i.exec(
     String(value || '')
   );
   if (!m) return null;
@@ -138,6 +138,73 @@ export function summarise({ faults, unjudged, pagesRead, fieldsRead, redirectsRe
   };
 }
 
+/**
+ * Loopback, private, link-local and unspecified hosts. The URL parser has already normalised
+ * short and decimal IPv4 forms (127.1, 2130706433) to dotted quads before this sees them.
+ */
+export function isPrivateHost(hostname) {
+  const h = String(hostname || '')
+    .toLowerCase()
+    .replace(/^\[|\]$/g, '')
+    .replace(/\.$/, '');
+  if (!h) return false;
+  if (h === 'localhost' || h.endsWith('.localhost')) return true;
+  const v4 = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(h);
+  if (v4) {
+    const [a, b] = [Number(v4[1]), Number(v4[2])];
+    return (
+      a === 0 ||
+      a === 10 ||
+      a === 127 ||
+      (a === 169 && b === 254) ||
+      (a === 172 && b >= 16 && b <= 31) ||
+      (a === 192 && b === 168)
+    );
+  }
+  if (h.includes(':')) {
+    return (
+      h === '::1' || h === '::' || /^f[cd][0-9a-f]{0,2}:/.test(h) || /^fe[89ab][0-9a-f]?:/.test(h)
+    );
+  }
+  return false;
+}
+
+/**
+ * Decide a redirect BEFORE it is fetched. Same-origin hops are followed. A hop to a private or
+ * loopback host is the GP-626 fault itself: report it and never request it. Any other off-site
+ * hop is not followed and the audit cannot vouch for the page (exit 2).
+ */
+export function redirectDecision(location, current, site) {
+  let next;
+  try {
+    next = new URL(location, current);
+  } catch {
+    return { follow: false, error: `unparseable redirect Location "${location}" from ${current}` };
+  }
+  if (next.origin === new URL(site).origin) return { follow: true, next: next.href };
+  if (isPrivateHost(next.hostname) || findLocalOrigins(location).length) {
+    return {
+      follow: false,
+      fault: `redirect to a private host ${next.origin} (Location: ${location}), not followed`,
+    };
+  }
+  return { follow: false, error: `${current} redirected off-site to ${next.origin}; not followed` };
+}
+
+/** An audit that threw part-way: a fault already found still makes it red (1), else 2. */
+export function failureSummary(error, faults) {
+  if (faults.length) {
+    return {
+      code: 1,
+      lines: [
+        `✗ buy-path guard found ${faults.length} fault(s) on ${SITE} before it stopped (${error.message}):`,
+        ...faults.map((f) => '  - ' + f),
+      ],
+    };
+  }
+  return { code: 2, lines: [`✗ buy-path guard could not audit ${SITE}: ${error.message}`] };
+}
+
 const UA = { 'User-Agent': 'carsi-live-buy-path-guard' };
 
 async function fetchRaw(url, init = {}) {
@@ -151,14 +218,20 @@ async function fetchRaw(url, init = {}) {
 }
 
 /** Follow up to 5 redirects by hand so every Location on the way is scanned too. */
-async function fetchPage(url) {
+async function fetchPage(url, faults) {
   const hops = [];
   let current = url;
   for (let i = 0; i < 6; i += 1) {
     const r = await fetchRaw(current);
     hops.push(r);
     if (r.status >= 300 && r.status < 400 && r.location) {
-      current = new URL(r.location, current).href;
+      const d = redirectDecision(r.location, current, SITE);
+      if (d.fault) {
+        faults.push(`LOCALHOST ${url}: ${d.fault}`);
+        return { hops, finalBody: null, stopped: true };
+      }
+      if (!d.follow) throw new Error(d.error);
+      current = d.next;
       continue;
     }
     if (r.status >= 400) throw new Error(`${url} returned HTTP ${r.status}`);
@@ -243,16 +316,15 @@ function readFormColours() {
   return out;
 }
 
-export async function audit() {
-  const faults = [];
+export async function audit(faults = []) {
   const unjudged = [];
   let pagesRead = 0;
   let fieldsRead = 0;
   let redirectsRead = 0;
 
   for (const path of PUBLIC_PATHS.concat(PAID_COURSE_PATHS)) {
-    const { hops, finalBody } = await fetchPage(SITE + path);
-    if (!finalBody) throw new Error(`${path} returned an empty page`);
+    const { hops, finalBody, stopped } = await fetchPage(SITE + path, faults);
+    if (!finalBody && !stopped) throw new Error(`${path} returned an empty page`);
     pagesRead += 1;
     for (const h of hops) {
       for (const o of findLocalOrigins(h.location)) faults.push(`LOCALHOST ${path} redirect: ${o}`);
@@ -287,7 +359,26 @@ export async function audit() {
         colorScheme: scheme,
         viewport: { width: 1366, height: 900 },
       });
+      // The browser never requests a private or loopback host other than the audited site
+      // itself (a local fixture is a loopback origin). Such a request is the fault: report it
+      // and abort it, so the runner never reaches an internal service.
+      const siteOrigin = new URL(SITE).origin;
+      let currentPath = '';
+      await page.route('**/*', (route) => {
+        let u;
+        try {
+          u = new URL(route.request().url());
+        } catch {
+          return route.continue();
+        }
+        if (u.origin !== siteOrigin && isPrivateHost(u.hostname)) {
+          faults.push(`LOCALHOST ${currentPath} (${scheme}, browser request blocked): ${u.origin}`);
+          return route.abort();
+        }
+        return route.continue();
+      });
       for (const path of PAID_COURSE_PATHS) {
+        currentPath = path;
         await page.goto(SITE + path, { waitUntil: 'domcontentloaded', timeout: 30000 });
         try {
           // The page renders a hidden duplicate email input; wait for ANY visible one.
@@ -344,14 +435,14 @@ export async function audit() {
 }
 
 async function main() {
-  let result;
+  const faults = [];
+  let outcome;
   try {
-    result = await audit();
+    outcome = summarise(await audit(faults));
   } catch (e) {
-    console.error(`✗ buy-path guard could not audit ${SITE}: ${e.message}`);
-    process.exit(2);
+    outcome = failureSummary(e, faults);
   }
-  const { code, lines } = summarise(result);
+  const { code, lines } = outcome;
   for (const line of lines) (code === 0 ? console.log : console.error)(line);
   process.exit(code);
 }

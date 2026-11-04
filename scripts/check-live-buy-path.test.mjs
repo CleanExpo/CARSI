@@ -7,9 +7,12 @@ import assert from 'node:assert/strict';
 
 import {
   contrastRatio,
+  failureSummary,
   findLocalOrigins,
+  isPrivateHost,
   isUnreadable,
   judgeContrast,
+  redirectDecision,
   summarise,
 } from './check-live-buy-path.mjs';
 
@@ -109,6 +112,65 @@ check('exit codes: fault is 1, unjudged or vacuous is 2, clean and non-vacuous i
   assert.equal(summarise({ ...base, redirectsRead: 1 }).code, 2);
   // A real fault outranks an unjudged field: red, not "could not look".
   assert.equal(summarise({ ...base, faults: ['x'], unjudged: ['y'] }).code, 1);
+});
+check('a marked-unreadable colour stays unknown even when it wraps an rgb() value', () => {
+  assert.equal(
+    judgeContrast({ color: 'UNREADABLE:rgb(0,0,0)', background: 'rgb(255,255,255)' }),
+    'unknown'
+  );
+  assert.equal(
+    judgeContrast({ color: 'rgb(0,0,0)', background: 'UNREADABLE:rgb(255,255,255)' }),
+    'unknown'
+  );
+});
+check('private and loopback hosts are recognised; public hosts are not', () => {
+  for (const h of [
+    'localhost',
+    'preview.localhost',
+    '127.0.0.1',
+    '127.1.2.3',
+    '10.0.0.5',
+    '192.168.1.1',
+    '172.16.0.1',
+    '172.31.255.255',
+    '169.254.169.254',
+    '0.0.0.0',
+    '[::1]',
+    '::1',
+    '[fd00::1]',
+  ]) {
+    assert.equal(isPrivateHost(h), true, h);
+  }
+  for (const h of ['carsi.com.au', 'checkout.stripe.com', '172.32.0.1', '11.0.0.1']) {
+    assert.equal(isPrivateHost(h), false, h);
+  }
+});
+check('a redirect is followed only within the audited site; never to a private host', () => {
+  const site = 'https://carsi.com.au';
+  assert.deepEqual(redirectDecision('/login', 'https://carsi.com.au/register', site), {
+    follow: true,
+    next: 'https://carsi.com.au/login',
+  });
+  const local = redirectDecision('http://localhost:8080/login', 'https://carsi.com.au/x', site);
+  assert.equal(local.follow, false);
+  assert.match(local.fault, /localhost:8080/);
+  const meta = redirectDecision('http://169.254.169.254/latest', 'https://carsi.com.au/x', site);
+  assert.equal(meta.follow, false);
+  assert.ok(meta.fault);
+  const offsite = redirectDecision('https://example.com/', 'https://carsi.com.au/x', site);
+  assert.equal(offsite.follow, false);
+  assert.equal(offsite.fault, undefined);
+  assert.match(offsite.error, /example\.com/);
+  // The local fixture site itself is a loopback origin; same-origin hops there are allowed.
+  assert.equal(
+    redirectDecision('/login', 'http://127.0.0.1:4799/x', 'http://127.0.0.1:4799').follow,
+    true
+  );
+});
+check('a fault already found survives a later audit error (red, not "could not look")', () => {
+  const e = new Error('later page timed out');
+  assert.equal(failureSummary(e, ['LOCALHOST /: http://localhost:8080']).code, 1);
+  assert.equal(failureSummary(e, []).code, 2);
 });
 
 if (failures) {
