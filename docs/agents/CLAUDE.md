@@ -1,6 +1,6 @@
-**Read `GOAL.md` first** — then `DECISIONS.md`, then `BACKLOG.md`. They are the objective
+**Read [`../governance/GOAL.md`](../governance/GOAL.md) first** — then [`../governance/DECISIONS.md`](../governance/DECISIONS.md), then [`../governance/BACKLOG.md`](../governance/BACKLOG.md). They are the objective
 function, the founder queue and the single work queue. All work comes from the top of the
-backlog; discoveries go to its bottom, not into the running session. `ENGINE.md` describes how
+backlog; discoveries go to its bottom, not into the running session. [`../governance/ENGINE.md`](../governance/ENGINE.md) describes how
 a session starts and what only Phill may do.
 
 <!-- Unite-Hub (CleanExpo/Unite-Hub) held the cross-repo portfolio registry; decommissioned 2026-06-20. No active replacement registry is wired here. -->
@@ -13,7 +13,9 @@ a session starts and what only Phill may do.
 
 > Registry: previously `D:\Unite-Hub\.portfolio\PORTFOLIO.yaml` (single source of truth); Unite-Hub decommissioned 2026-06-20, no active replacement wired here.
 
----# CLAUDE.md
+---
+
+# CLAUDE.md
 
 Project-specific guidance for CARSI.
 

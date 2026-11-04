@@ -1,16 +1,16 @@
-import { configDefaults, defineConfig } from 'vitest/config';
 import { fileURLToPath } from 'node:url';
+import { configDefaults, defineConfig } from 'vitest/config';
 
 export default defineConfig({
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '@': fileURLToPath(new URL('../src', import.meta.url)),
     },
   },
   test: {
     include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
     // Real-PostgreSQL tests (*.pg.test.ts) need a database; they run in CI's E2E job via
-    // `npm run test:pg` (vitest.pg.config.ts), never in the database-free unit suite.
+    // `npm run test:pg` (config/vitest.pg.config.ts), never in the database-free unit suite.
     exclude: [...configDefaults.exclude, '**/*.pg.test.ts'],
     environment: 'node',
     // Vitest's default is 5000ms and it was too tight for THIS suite — not because the

@@ -3,6 +3,7 @@ import type { SessionClaims } from '@/lib/auth/session-jwt';
 
 /** Local/dev only — allows saving coaching portal forms without a Stripe coaching row. */
 export function isCoachingPortalDevUnlock(): boolean {
+  if (process.env.NODE_ENV === 'production') return false;
   return process.env.CARSI_COACHING_PORTAL_DEV_UNLOCK === 'true';
 }
 

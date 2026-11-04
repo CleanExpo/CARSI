@@ -5,7 +5,7 @@ import { defineConfig } from 'vitest/config';
 /**
  * Real-PostgreSQL tests (*.pg.test.ts). They need DATABASE_URL pointing at a disposable, migrated
  * local PostgreSQL, which CI's E2E job provides (`npm run test:pg`). They are excluded from the
- * database-free unit suite in vitest.config.ts. Files run one at a time: they share one database.
+ * database-free unit suite in config/vitest.config.ts. Files run one at a time: they share one database.
  *
  * They write and delete shared rows, so globalSetup REFUSES the run unless DATABASE_URL is a
  * loopback host AND CARSI_PG_DISPOSABLE=1 (src/test-utils/pg-disposable.ts). Locally, with a
@@ -18,7 +18,7 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '@': fileURLToPath(new URL('../src', import.meta.url)),
     },
   },
   test: {

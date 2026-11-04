@@ -4,10 +4,10 @@ import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const portal = vi.hoisted(() => ({ canEdit: true }));
+const portal = vi.hoisted(() => ({ canEdit: true, mode: 'subscriber' as const }));
 
 vi.mock('@/components/coaching-portal/CoachingPortalContext', () => ({
-  useCoachingPortal: () => ({ access: { canEdit: portal.canEdit } }),
+  useCoachingPortal: () => ({ access: { canEdit: portal.canEdit, mode: portal.mode } }),
 }));
 
 import { CoachingAskCoachPanel } from './CoachingAskCoachPanel';
@@ -100,6 +100,49 @@ describe('CoachingAskCoachPanel', () => {
     expect(container.textContent).toContain('Templates and habits.');
     const link = container.querySelector('a[href="/ccw-training"]');
     expect(link?.textContent).toBe('Coaching programme: what is included');
+  });
+
+  it('names a coach’s own item as the source, linking only when it has a web address (GP-631)', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(json({ questions: [] }))
+      .mockResolvedValueOnce(
+        json({
+          result: {
+            status: 'answered',
+            passages: [
+              { itemId: 'a', title: 'Episode 12', text: 'Measure the square metres.' },
+              { itemId: 'b', title: 'Chapter 3', text: 'Write the roster first.' },
+            ],
+            citations: [
+              {
+                itemId: 'a',
+                title: 'Episode 12',
+                sourceLabel: 'Transcript: Episode 12',
+                sourceHref: 'https://example.test/podcast/12',
+              },
+              {
+                itemId: 'b',
+                title: 'Chapter 3',
+                sourceLabel: 'Book chapter: Chapter 3',
+                sourceHref: '',
+              },
+            ],
+          },
+          questions: [],
+        })
+      );
+    vi.stubGlobal('fetch', fetchMock);
+    await render();
+    typeQuestion('How do I price a carpet job?');
+    await act(async () => {
+      askButton().click();
+    });
+    const external = container.querySelector('a[href="https://example.test/podcast/12"]');
+    expect(external?.textContent).toBe('Transcript: Episode 12');
+    expect(external?.getAttribute('rel')).toContain('noopener');
+    expect(container.textContent).toContain('Book chapter: Chapter 3');
+    expect(container.querySelector('a[href=""]')).toBeNull();
   });
 
   it('tells the member the question went to the coach and lists the coach answer later', async () => {

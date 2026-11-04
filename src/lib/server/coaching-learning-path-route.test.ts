@@ -96,4 +96,16 @@ describe('approval is coach-only', () => {
     expect((await POST(post({ userId: MEMBER, op: 'approve' }))).status).toBe(404);
     expect(mocks.approve).not.toHaveBeenCalled();
   });
+
+  it('GET ?userId= refuses someone who is not a coaching member', async () => {
+    mocks.session.mockResolvedValue({ email: 'coach@example.test' });
+    mocks.isMember.mockResolvedValue(false);
+    const res = await GET(
+      new NextRequest(
+        `https://carsi.example.test/api/admin/coaching/learning-path?userId=${MEMBER}`
+      )
+    );
+    expect(res.status).toBe(404);
+    expect(mocks.view).not.toHaveBeenCalled();
+  });
 });
