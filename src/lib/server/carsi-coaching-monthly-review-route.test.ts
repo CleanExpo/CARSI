@@ -10,7 +10,9 @@ const mock = vi.hoisted(() => ({
   approve: vi.fn(),
   save: vi.fn(),
   discard: vi.fn(),
+  Conflict: class MonthlyReviewConflictError extends Error {},
 }));
+const MonthlyReviewConflictError = mock.Conflict;
 
 vi.mock('@/lib/admin/admin-session', () => ({ getAdminSessionOrNull: mock.admin }));
 vi.mock('@/lib/server/carsi-coaching-learning-path', () => ({
@@ -23,6 +25,7 @@ vi.mock('@/lib/server/carsi-coaching-monthly-review', () => ({
   approveMonthlyReview: mock.approve,
   saveMonthlyReview: mock.save,
   discardMonthlyReview: mock.discard,
+  MonthlyReviewConflictError: mock.Conflict,
 }));
 
 const { GET, POST } = await import('../../../app/api/admin/coaching/monthly-review/route');
@@ -41,7 +44,8 @@ function post(body: unknown) {
 }
 
 beforeEach(() => {
-  for (const fn of Object.values(mock)) fn.mockReset();
+  for (const [key, fn] of Object.entries(mock))
+    if (key !== 'Conflict') (fn as ReturnType<typeof vi.fn>).mockReset();
   mock.admin.mockResolvedValue({ sub: 'admin' });
   mock.isMember.mockResolvedValue(true);
   mock.view.mockResolvedValue({ status: 'none' });
@@ -61,6 +65,19 @@ describe('admin monthly review route', () => {
     mock.isMember.mockResolvedValue(false);
     expect((await post({ userId: USER, op: 'generate' })).status).toBe(404);
     expect(mock.generate).not.toHaveBeenCalled();
+  });
+
+  it('GET for one member refuses a non-member before reading anything (review r1 P1)', async () => {
+    mock.isMember.mockResolvedValue(false);
+    const res = await GET(new NextRequest(`${URL_BASE}?userId=${USER}`));
+    expect(res.status).toBe(404);
+    expect(mock.view).not.toHaveBeenCalled();
+  });
+
+  it('answers 409 when a draft lost a race to an approval or discard', async () => {
+    mock.generate.mockRejectedValue(new MonthlyReviewConflictError('changed'));
+    const res = await post({ userId: USER, op: 'generate' });
+    expect(res.status).toBe(409);
   });
 
   it('passes the coach edits through to approve and reports the result', async () => {

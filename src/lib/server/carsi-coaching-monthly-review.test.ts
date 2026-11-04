@@ -16,6 +16,7 @@ import {
   discardMonthlyReview,
   generateMonthlyReview,
   getMonthlyReviewView,
+  MonthlyReviewConflictError,
   saveMonthlyReview,
   type MonthlyReviewMember,
   type MonthlyReviewRow,
@@ -213,6 +214,66 @@ describe('generateMonthlyReview (GP-629 demo member)', () => {
     const first = t.rows.filter((r) => r.status === MONTHLY_DRAFT_STATUS).length;
     await generateMonthlyReview(USER, deps);
     expect(t.rows.filter((r) => r.status === MONTHLY_DRAFT_STATUS).length).toBe(first);
+  });
+
+  it('a slow draft that started before an approval never writes a new draft after it (review r1 P1)', async () => {
+    const t = demoStore();
+    await generateMonthlyReview(USER, {
+      store: t.store,
+      now: NOW,
+      draftWithModel: async () => null,
+    });
+
+    let release!: (v: { text: string; model: string } | null) => void;
+    const slow = generateMonthlyReview(USER, {
+      store: t.store,
+      now: NOW,
+      draftWithModel: () => new Promise((r) => (release = r)),
+    });
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(await approveMonthlyReview(USER, undefined, t.store)).toMatchObject({
+      status: 'approved',
+    });
+    const boardAfterApprove = t.memberBoard().length;
+
+    release({ text: MODEL_REPLY, model: 'mock/model' });
+    await expect(slow).rejects.toThrow(MonthlyReviewConflictError);
+    expect(t.rows.some((r) => r.status === MONTHLY_DRAFT_STATUS)).toBe(false);
+    expect(await approveMonthlyReview(USER, undefined, t.store)).toEqual({
+      status: 'nothing_to_approve',
+    });
+    expect(t.memberBoard().length).toBe(boardAfterApprove);
+  });
+
+  it('a slow draft loses to a discard that happened while it waited', async () => {
+    const t = demoStore();
+    await generateMonthlyReview(USER, {
+      store: t.store,
+      now: NOW,
+      draftWithModel: async () => null,
+    });
+    let release!: (v: null) => void;
+    const slow = generateMonthlyReview(USER, {
+      store: t.store,
+      now: NOW,
+      draftWithModel: () => new Promise((r) => (release = r)),
+    });
+    await Promise.resolve();
+    await Promise.resolve();
+    await discardMonthlyReview(USER, t.store);
+    release(null);
+    await expect(slow).rejects.toThrow(MonthlyReviewConflictError);
+    expect(t.rows.some((r) => r.status === MONTHLY_DRAFT_STATUS)).toBe(false);
+  });
+
+  it('refuses to draft again for a session whose review is already approved', async () => {
+    const t = demoStore();
+    const deps = { store: t.store, now: NOW, draftWithModel: async () => null };
+    await generateMonthlyReview(USER, deps);
+    await approveMonthlyReview(USER, undefined, t.store);
+    await expect(generateMonthlyReview(USER, deps)).rejects.toThrow(MonthlyReviewConflictError);
+    expect(t.rows.some((r) => r.status === MONTHLY_DRAFT_STATUS)).toBe(false);
   });
 });
 

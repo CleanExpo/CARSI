@@ -135,6 +135,41 @@ function isReviewRecord(row: MonthlyReviewRow): boolean {
   return Boolean(row.goalId?.startsWith(REVIEW_GOAL_PREFIX));
 }
 
+/** Thrown when the coach-side state changed while a draft was being written (HTTP 409). */
+export class MonthlyReviewConflictError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'MonthlyReviewConflictError';
+  }
+}
+
+/**
+ * The coach-side state a generation is based on: every draft row and review record, with status.
+ * Compared again under the member lock, so an approve, save or discard that lands while the model
+ * is drafting makes the slow generation stand down instead of overwriting or resurrecting a draft.
+ */
+function coachStateFingerprint(rows: MonthlyReviewRow[]): string {
+  return rows
+    .filter((r) => r.status === MONTHLY_DRAFT_STATUS || isReviewRecord(r))
+    .map((r) => `${r.id}:${r.status}`)
+    .sort()
+    .join('|');
+}
+
+function sessionAlreadyApproved(rows: MonthlyReviewRow[], sessionId: string | null): boolean {
+  if (!sessionId) return false;
+  return rows.some(
+    (r) =>
+      r.status === MONTHLY_REVIEW_APPROVED_STATUS &&
+      r.goalId === `${REVIEW_GOAL_PREFIX}${sessionId}`
+  );
+}
+
+const ALREADY_APPROVED =
+  'The review for this session is already approved and published. It can be drafted again once the next session is booked.';
+const STATE_CHANGED =
+  'This review was approved, saved or discarded while the new draft was being written. Reload and try again.';
+
 function parseRecord(description: string | null): ReviewRecord | null {
   if (!description) return null;
   try {
@@ -256,6 +291,10 @@ export async function generateMonthlyReview(
   const draftWithModel = deps.draftWithModel ?? draftMonthlyReviewWithOpenRouter;
 
   const [member, rows] = await Promise.all([store.loadMember(userId, now), store.listRows(userId)]);
+  const sessionId = member.nextSession?.id ?? null;
+  if (sessionAlreadyApproved(rows, sessionId))
+    throw new MonthlyReviewConflictError(ALREADY_APPROVED);
+  const snapshot = coachStateFingerprint(rows);
   const input = {
     memberName: member.memberName,
     businessName: member.businessName,
@@ -290,6 +329,13 @@ export async function generateMonthlyReview(
   };
 
   await store.withMemberLock(userId, async (locked) => {
+    const current = await locked.listRows(userId);
+    if (sessionAlreadyApproved(current, sessionId)) {
+      throw new MonthlyReviewConflictError(ALREADY_APPROVED);
+    }
+    if (coachStateFingerprint(current) !== snapshot) {
+      throw new MonthlyReviewConflictError(STATE_CHANGED);
+    }
     await locked.deleteDraftRows(userId);
     await locked.createRows(userId, [
       recordRow(record, MONTHLY_DRAFT_STATUS),

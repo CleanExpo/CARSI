@@ -10,6 +10,7 @@ import {
   discardMonthlyReview,
   generateMonthlyReview,
   getMonthlyReviewView,
+  MonthlyReviewConflictError,
   saveMonthlyReview,
   type MonthlyReviewWriteResult,
 } from '@/lib/server/carsi-coaching-monthly-review';
@@ -33,6 +34,9 @@ export async function GET(request: NextRequest) {
   }
   if (!isUuidParam(userId)) {
     return NextResponse.json({ detail: 'Invalid userId.' }, { status: 400 });
+  }
+  if (!(await isCoachingMember(userId))) {
+    return NextResponse.json({ detail: 'Not a coaching member.' }, { status: 404 });
   }
   return NextResponse.json(await getMonthlyReviewView(userId));
 }
@@ -59,7 +63,14 @@ export async function POST(request: NextRequest) {
   }
 
   if (body?.op === 'generate') {
-    return NextResponse.json(await generateMonthlyReview(userId));
+    try {
+      return NextResponse.json(await generateMonthlyReview(userId));
+    } catch (e) {
+      if (e instanceof MonthlyReviewConflictError) {
+        return NextResponse.json({ detail: e.message }, { status: 409 });
+      }
+      throw e;
+    }
   }
 
   let result: MonthlyReviewWriteResult;
