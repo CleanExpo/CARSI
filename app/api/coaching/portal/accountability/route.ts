@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import {
   getMyAccountability,
+  recordPortalVisit,
   saveMyKpis,
   submitMyCheckIn,
 } from '@/lib/server/carsi-coaching-accountability';
@@ -17,6 +18,7 @@ export const dynamic = 'force-dynamic';
  * GET  → the caller's own KPIs, check-in state, streak, completion rate and KPI trend
  * POST → { kpis: [{ id?, label }] } sets 3 to 5 KPIs on the plan,
  *        or { checkIn: { values: { [kpiId]: number } } } saves this fortnight's numbers
+ *        or { visit: true } records a portal page visit (204), at most once every 6 hours
  * Sign-in is checked first (401), then the feature flag (404), then the subscription (403).
  * The member always comes from the session, never from the request.
  */
@@ -48,6 +50,12 @@ export async function POST(request: NextRequest) {
   const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
   const store = getAccountabilityStore();
   const now = new Date();
+
+  if (body && body.visit === true) {
+    // GP-677: sent by the portal on every page change; throttled to one write per 6 hours.
+    await recordPortalVisit(store, g.claims.sub, now);
+    return new NextResponse(null, { status: 204 });
+  }
 
   let outcome;
   if (body && 'kpis' in body) {
