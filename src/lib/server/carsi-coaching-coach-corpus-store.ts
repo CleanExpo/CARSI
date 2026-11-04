@@ -10,11 +10,9 @@ import {
 } from '@/lib/coaching-portal/coach-corpus';
 import { prisma } from '@/lib/prisma';
 import type { CoachCorpusStore } from '@/lib/server/carsi-coaching-coach-corpus';
+import { isUuidParam } from '@/lib/server/uuid-param';
 
 const LIST_MAX = 500;
-
-/** Ids are UUIDs; anything else cannot match a row, and would make Postgres throw. */
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const SELECT = {
   id: true,
@@ -76,7 +74,8 @@ export const prismaCoachCorpusStore: CoachCorpusStore = {
   },
 
   async approveItem(coachId, id) {
-    if (!UUID_RE.test(id)) return null;
+    // Ids are UUIDs; anything else cannot match a row, and would make Postgres throw.
+    if (!isUuidParam(id)) return null;
     // Conditional: the first approval time stands; re-approving changes nothing.
     await prisma.carsiCoachingCoachCorpusItem.updateMany({
       where: { id, coachId, approvedAt: null },
@@ -90,7 +89,7 @@ export const prismaCoachCorpusStore: CoachCorpusStore = {
   },
 
   async deleteItem(coachId, id) {
-    if (!UUID_RE.test(id)) return false;
+    if (!isUuidParam(id)) return false;
     const { count } = await prisma.carsiCoachingCoachCorpusItem.deleteMany({
       where: { id, coachId },
     });
