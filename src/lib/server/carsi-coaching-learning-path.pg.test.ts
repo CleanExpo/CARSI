@@ -15,26 +15,22 @@
  */
 import { randomUUID } from 'node:crypto';
 
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
+
+import { pgSuiteTarget } from '@/test-utils/pg-disposable';
 
 import { emptyAssessmentResponses } from '@/lib/coaching-portal/assessment-schema';
 
-const DB_URL = process.env.DATABASE_URL?.trim() ?? '';
-const IN_CI = process.env.CI === 'true';
-const HOST = (() => {
-  try {
-    return DB_URL ? new URL(DB_URL).hostname : '';
-  } catch {
-    return '';
-  }
-})();
-const RUNNABLE = Boolean(DB_URL) && ['localhost', '127.0.0.1', '::1'].includes(HOST);
+// Loopback host AND CARSI_PG_DISPOSABLE=1, or no run at all (src/test-utils/pg-disposable.ts).
+const TARGET = pgSuiteTarget(process.env);
+const RUNNABLE = TARGET.runnable;
 
 if (!RUNNABLE) {
   describe('coaching learning path (real PostgreSQL)', () => {
-    if (IN_CI) {
-      it('must run in CI: needs DATABASE_URL pointing at the local migrated postgres service', () => {
-        throw new Error(`CI=true but no usable local DATABASE_URL (host: "${HOST || 'none'}").`);
+    const refusal = TARGET.refusal;
+    if (refusal) {
+      it('refuses: needs a disposable loopback DATABASE_URL (CARSI_PG_DISPOSABLE=1)', () => {
+        throw new Error(refusal);
       });
     } else {
       it.skip('runs in CI (E2E job, `npm run test:pg`): no local DATABASE_URL here', () => {});
@@ -55,25 +51,58 @@ describe.runIf(RUNNABLE)('coaching learning path (real PostgreSQL)', async () =>
   const otherId = randomUUID();
   const mapMemberId = randomUUID();
   const controlPathwayId = randomUUID();
-  // Exact ids of every pathway row this suite creates. Cleanup deletes these and nothing else, so
-  // a coach map edit made by anyone else (before or during the run) is never touched (review r1,
-  // r3 P1). The suite also refuses to run on a database that already holds coach map edits.
-  const createdPathwayIds = new Set<string>([controlPathwayId]);
+  // Isolation. The primary control is the database itself: globalSetup and the gate above refuse
+  // anything but a loopback DATABASE_URL marked CARSI_PG_DISPOSABLE=1, so no coach writes here
+  // (review r4 P1). Defence in depth below: each test records the pathway rows and courses it
+  // creates, with the course list it saved, and afterEach deletes exactly those. A pathway row is
+  // deleted only under its row lock and only if its courses are still the ones the test saved, so
+  // a coach's re-save of the same gap (same row id, upsert) is left alone (review r1, r3, r4 P1).
+  // Members, subscriptions, assessments and the fixture courses are built once in beforeAll and
+  // removed in afterAll: the tests below are one story (assign, approve, complete, adjust) and
+  // each later test reads the state an earlier one wrote.
+  const testPathways = new Map<string, string[]>();
+  const testCourseIds: string[] = [];
 
-  async function deleteCreatedPathways(ids: Set<string>): Promise<void> {
-    await prisma.lmsLearningPathway.deleteMany({ where: { id: { in: [...ids] } } });
+  /** Delete one pathway row if, under its row lock, it still holds exactly `savedCourseIds`. */
+  async function deleteOwnPathway(id: string, savedCourseIds: string[]): Promise<boolean> {
+    return prisma.$transaction(async (tx) => {
+      const locked = await tx.$queryRaw<{ id: string }[]>`
+        SELECT id FROM lms_learning_pathways WHERE id = ${id}::uuid FOR UPDATE`;
+      if (locked.length === 0) return false;
+      const now = await tx.lmsLearningPathwayCourse.findMany({
+        where: { pathwayId: id },
+        orderBy: { orderIndex: 'asc' },
+        select: { courseId: true },
+      });
+      if (JSON.stringify(now.map((c) => c.courseId)) !== JSON.stringify(savedCourseIds)) {
+        return false;
+      }
+      await tx.lmsLearningPathway.delete({ where: { id } });
+      return true;
+    });
   }
 
-  /** Save a map edit and record the row it wrote as this suite's own. */
+  async function deleteOwnPathways(own: Map<string, string[]>): Promise<void> {
+    for (const [id, savedCourseIds] of own) await deleteOwnPathway(id, savedCourseIds);
+  }
+
+  /** Save a map edit and record the row and course list it wrote as this test's own. */
   async function saveMap(input: Parameters<typeof gapMap.saveGapMapEntry>[0]) {
     const view = await gapMap.saveGapMapEntry(input);
     const row = await prisma.lmsLearningPathway.findUnique({
       where: { slug: `${GAP_MAP_SLUG_PREFIX}${input.chapterSlug}--${input.area}` },
       select: { id: true },
     });
-    if (row) createdPathwayIds.add(row.id);
+    if (row) testPathways.set(row.id, [...input.courseIds]);
     return view;
   }
+
+  afterEach(async () => {
+    await deleteOwnPathways(testPathways);
+    testPathways.clear();
+    await prisma.lmsCourse.deleteMany({ where: { id: { in: testCourseIds } } });
+    testCourseIds.length = 0;
+  });
   const instructorId = randomUUID();
   const createdCourseIds: string[] = [];
   const courseIdBySlug = new Map<string, string>();
@@ -168,7 +197,6 @@ describe.runIf(RUNNABLE)('coaching learning path (real PostgreSQL)', async () =>
   });
 
   afterAll(async () => {
-    await deleteCreatedPathways(createdPathwayIds);
     await prisma.lmsUser.deleteMany({ where: { id: { in: [memberId, otherId, mapMemberId] } } });
     await prisma.lmsCourse.deleteMany({ where: { id: { in: createdCourseIds } } });
     await prisma.lmsUser.deleteMany({ where: { id: instructorId } });
@@ -339,6 +367,7 @@ describe.runIf(RUNNABLE)('coaching learning path (real PostgreSQL)', async () =>
         courses: { create: [{ courseId: extra, orderIndex: 0 }] },
       },
     });
+    testPathways.set(controlPathwayId, [extra]);
     await saveMap({
       chapterSlug: DEFAULT_COACHING_CHAPTER_SLUG,
       area: 'marketing',
@@ -375,7 +404,7 @@ describe.runIf(RUNNABLE)('coaching learning path (real PostgreSQL)', async () =>
   });
 
   it('cleanup deletes only rows this suite created, never a coach edit made during the run (review r3 P1)', async () => {
-    const mine = new Set<string>();
+    const mine = new Map<string, string[]>();
     const ownId = randomUUID();
     const coachId = randomUUID();
     await prisma.lmsLearningPathway.create({
@@ -385,7 +414,7 @@ describe.runIf(RUNNABLE)('coaching learning path (real PostgreSQL)', async () =>
         title: 'suite-owned',
       },
     });
-    mine.add(ownId);
+    mine.set(ownId, []);
     // A coach saves a different gap while the suite is running: not in the suite's id list.
     await prisma.lmsLearningPathway.create({
       data: {
@@ -394,10 +423,116 @@ describe.runIf(RUNNABLE)('coaching learning path (real PostgreSQL)', async () =>
         title: 'coach edit',
       },
     });
-    await deleteCreatedPathways(mine);
+    await deleteOwnPathways(mine);
     expect(await prisma.lmsLearningPathway.count({ where: { id: ownId } })).toBe(0);
     expect(await prisma.lmsLearningPathway.count({ where: { id: coachId } })).toBe(1);
     await prisma.lmsLearningPathway.delete({ where: { id: coachId } });
+  });
+
+  it('cleanup never deletes a coach re-save of a gap the suite saved: same row id, new courses (review r4 P1)', async () => {
+    const extra = courseIdBySlug.get(extraSlug)!;
+    const slug = `${GAP_MAP_SLUG_PREFIX}${DEFAULT_COACHING_CHAPTER_SLUG}--money`;
+    const mine = new Map<string, string[]>();
+    await gapMap.saveGapMapEntry({
+      chapterSlug: DEFAULT_COACHING_CHAPTER_SLUG,
+      area: 'money',
+      courseIds: [extra],
+    });
+    const suiteRow = await prisma.lmsLearningPathway.findUniqueOrThrow({ where: { slug } });
+    mine.set(suiteRow.id, [extra]);
+    try {
+      // A coach re-saves the SAME gap while the suite runs. The upsert keeps the row id.
+      await gapMap.saveGapMapEntry({
+        chapterSlug: DEFAULT_COACHING_CHAPTER_SLUG,
+        area: 'money',
+        courseIds: [wdMkt(), social()],
+      });
+      const coachRow = await prisma.lmsLearningPathway.findUniqueOrThrow({ where: { slug } });
+      expect(coachRow.id).toBe(suiteRow.id);
+
+      await deleteOwnPathways(mine);
+      const kept = await prisma.lmsLearningPathway.findUniqueOrThrow({
+        where: { slug },
+        include: { courses: { orderBy: { orderIndex: 'asc' } } },
+      });
+      expect(kept.courses.map((c) => c.courseId)).toEqual([wdMkt(), social()]);
+
+      // Positive control: the same cleanup DOES delete the row while it still holds the
+      // suite's own course list.
+      await gapMap.saveGapMapEntry({
+        chapterSlug: DEFAULT_COACHING_CHAPTER_SLUG,
+        area: 'money',
+        courseIds: [extra],
+      });
+      await deleteOwnPathways(mine);
+      expect(await prisma.lmsLearningPathway.count({ where: { slug } })).toBe(0);
+    } finally {
+      await gapMap.resetGapMapEntry({ chapterSlug: DEFAULT_COACHING_CHAPTER_SLUG, area: 'money' });
+    }
+  });
+
+  it('cleanup racing a coach re-save of the same gap never loses the coach edit', async () => {
+    const extra = courseIdBySlug.get(extraSlug)!;
+    const slug = `${GAP_MAP_SLUG_PREFIX}${DEFAULT_COACHING_CHAPTER_SLUG}--money`;
+    try {
+      for (let round = 0; round < 5; round += 1) {
+        await gapMap.saveGapMapEntry({
+          chapterSlug: DEFAULT_COACHING_CHAPTER_SLUG,
+          area: 'money',
+          courseIds: [extra],
+        });
+        const suiteRow = await prisma.lmsLearningPathway.findUniqueOrThrow({ where: { slug } });
+        await Promise.all([
+          deleteOwnPathways(new Map([[suiteRow.id, [extra]]])),
+          gapMap.saveGapMapEntry({
+            chapterSlug: DEFAULT_COACHING_CHAPTER_SLUG,
+            area: 'money',
+            courseIds: [wdMkt()],
+          }),
+        ]);
+        // Whichever ran first, the coach's list is what is stored.
+        const rows = await prisma.lmsLearningPathway.findMany({
+          where: { slug },
+          include: { courses: true },
+        });
+        expect(rows).toHaveLength(1);
+        expect(rows[0].courses.map((c) => c.courseId)).toEqual([wdMkt()]);
+        await gapMap.resetGapMapEntry({
+          chapterSlug: DEFAULT_COACHING_CHAPTER_SLUG,
+          area: 'money',
+        });
+      }
+    } finally {
+      await gapMap.resetGapMapEntry({ chapterSlug: DEFAULT_COACHING_CHAPTER_SLUG, area: 'money' });
+    }
+  });
+
+  it('two simultaneous coach saves of one gap leave one row holding exactly one of the two lists', async () => {
+    const extra = courseIdBySlug.get(extraSlug)!;
+    const slug = `${GAP_MAP_SLUG_PREFIX}${DEFAULT_COACHING_CHAPTER_SLUG}--money`;
+    const lists = [[extra, wdMkt()], [social()]];
+    try {
+      for (let round = 0; round < 5; round += 1) {
+        await Promise.all(
+          lists.map((courseIds) =>
+            gapMap.saveGapMapEntry({
+              chapterSlug: DEFAULT_COACHING_CHAPTER_SLUG,
+              area: 'money',
+              courseIds,
+            })
+          )
+        );
+        const rows = await prisma.lmsLearningPathway.findMany({
+          where: { slug },
+          include: { courses: { orderBy: { orderIndex: 'asc' } } },
+        });
+        expect(rows).toHaveLength(1);
+        expect(lists).toContainEqual(rows[0].courses.map((c) => c.courseId));
+        expect(rows[0]).toMatchObject({ isPublished: false, iicrcDiscipline: null });
+      }
+    } finally {
+      await gapMap.resetGapMapEntry({ chapterSlug: DEFAULT_COACHING_CHAPTER_SLUG, area: 'money' });
+    }
   });
 
   it('treats status as the publication flag: a legacy isPublished=false course is pickable, a draft is not (review r2 P1)', async () => {
@@ -418,7 +553,7 @@ describe.runIf(RUNNABLE)('coaching learning path (real PostgreSQL)', async () =>
           priceAud: 0,
         },
       });
-      createdCourseIds.push(id);
+      testCourseIds.push(id);
     }
 
     const pickable = (await gapMap.prismaGapMapStore.publishedCatalogue()).map((c) => c.id);
