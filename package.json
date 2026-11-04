@@ -42,6 +42,7 @@
     "audit:verify": "node scripts/audit/verify-all.mjs",
     "test:cec-surfaces": "node scripts/check-cec-surfaces.test.mjs",
     "test:guard-enumeration": "node scripts/check-guard-enumeration.test.mjs",
+    "test:agent-doc-paths": "node --test scripts/check-agent-doc-entrypoints.test.mjs",
     "test:water-go-live": "node scripts/verify-water-course-go-live.test.mjs",
     "check:cec": "node scripts/check-cec-approvals.mjs",
     "check:hero-tiles": "node scripts/check-hero-tiles.mjs",
