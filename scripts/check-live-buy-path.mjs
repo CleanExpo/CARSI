@@ -162,11 +162,42 @@ export function isPrivateHost(hostname) {
     );
   }
   if (h.includes(':')) {
+    // IPv4-mapped (::ffff:a.b.c.d) and IPv4-compatible (::a.b.c.d) addresses carry an IPv4
+    // address; the URL parser writes them as hex groups (::ffff:7f00:1). Judge the IPv4 inside.
+    const embedded =
+      /^::(?:ffff:)?(?:(\d{1,3}(?:\.\d{1,3}){3})|([0-9a-f]{1,4}):([0-9a-f]{1,4}))$/.exec(h);
+    if (embedded) {
+      if (embedded[1]) return isPrivateHost(embedded[1]);
+      const hi = parseInt(embedded[2], 16);
+      const lo = parseInt(embedded[3], 16);
+      return isPrivateHost(`${hi >> 8}.${hi & 255}.${lo >> 8}.${lo & 255}`);
+    }
     return (
       h === '::1' || h === '::' || /^f[cd][0-9a-f]{0,2}:/.test(h) || /^fe[89ab][0-9a-f]?:/.test(h)
     );
   }
   return false;
+}
+
+/**
+ * The browser boundary. Any request off the audited site to a raw IP address is refused, in any
+ * spelling, and so is any named private host (localhost, *.localhost). A public page has no
+ * reason to load from a bare IP, and refusing the whole class ends the chase after spellings
+ * (review rounds 1 and 2 each found one more). The URL parser has already normalised the host.
+ * Known limit: a DNS name that resolves to a private address is not caught here.
+ */
+export function blockBrowserRequest(url, site) {
+  let u;
+  try {
+    u = new URL(url);
+  } catch {
+    return false;
+  }
+  if (u.protocol !== 'http:' && u.protocol !== 'https:') return false;
+  if (u.origin === new URL(site).origin) return false;
+  const h = u.hostname.replace(/^\[|\]$/g, '');
+  const ipLiteral = h.includes(':') || /^\d{1,3}(\.\d{1,3}){3}$/.test(h);
+  return ipLiteral || isPrivateHost(u.hostname);
 }
 
 /**
@@ -359,20 +390,16 @@ export async function audit(faults = []) {
         colorScheme: scheme,
         viewport: { width: 1366, height: 900 },
       });
-      // The browser never requests a private or loopback host other than the audited site
-      // itself (a local fixture is a loopback origin). Such a request is the fault: report it
-      // and abort it, so the runner never reaches an internal service.
-      const siteOrigin = new URL(SITE).origin;
+      // The browser never requests a raw IP or private host other than the audited site itself
+      // (a local fixture is a loopback origin). Such a request is the fault: report it and abort
+      // it, so the runner never reaches an internal service.
       let currentPath = '';
       await page.route('**/*', (route) => {
-        let u;
-        try {
-          u = new URL(route.request().url());
-        } catch {
-          return route.continue();
-        }
-        if (u.origin !== siteOrigin && isPrivateHost(u.hostname)) {
-          faults.push(`LOCALHOST ${currentPath} (${scheme}, browser request blocked): ${u.origin}`);
+        const url = route.request().url();
+        if (blockBrowserRequest(url, SITE)) {
+          faults.push(
+            `LOCALHOST ${currentPath} (${scheme}, browser request blocked): ${new URL(url).origin}`
+          );
           return route.abort();
         }
         return route.continue();

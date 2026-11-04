@@ -6,6 +6,7 @@
 import assert from 'node:assert/strict';
 
 import {
+  blockBrowserRequest,
   contrastRatio,
   failureSummary,
   findLocalOrigins,
@@ -167,6 +168,44 @@ check('a redirect is followed only within the audited site; never to a private h
     true
   );
 });
+check('IPv4-mapped IPv6 loopback is private, in both spellings the URL parser can produce', () => {
+  assert.equal(isPrivateHost(new URL('http://[::ffff:127.0.0.1]:8080/').hostname), true);
+  assert.equal(isPrivateHost('[::ffff:7f00:1]'), true);
+  assert.equal(isPrivateHost('[::ffff:a00:5]'), true);
+  assert.equal(isPrivateHost('[::ffff:808:808]'), false);
+});
+check(
+  'the browser refuses every raw-IP host other than the audited site, whatever the spelling',
+  () => {
+    // Round 2 of review found one more loopback spelling. Rather than chase spellings, the browser
+    // boundary refuses ANY IP-literal host that is not the site; named hosts get the private check.
+    for (const url of [
+      'http://[::ffff:127.0.0.1]:8080/a.png',
+      'http://[::ffff:7f00:1]/',
+      'http://[::127.0.0.1]/',
+      'http://127.1/',
+      'http://2130706433/',
+      'http://0x7f.1/',
+      'http://93.184.216.34/',
+      'http://[2001:db8::1]/',
+      'http://localhost:3000/',
+      'http://preview.localhost/',
+    ]) {
+      assert.equal(blockBrowserRequest(url, 'https://carsi.com.au'), true, url);
+    }
+    for (const url of [
+      'https://carsi.com.au/_next/static/a.js',
+      'https://js.stripe.com/v3/',
+      'https://www.googletagmanager.com/gtm.js',
+      'data:image/png;base64,AAAA',
+    ]) {
+      assert.equal(blockBrowserRequest(url, 'https://carsi.com.au'), false, url);
+    }
+    // The local fixture site is itself a loopback origin and must stay reachable.
+    assert.equal(blockBrowserRequest('http://127.0.0.1:4799/x', 'http://127.0.0.1:4799'), false);
+    assert.equal(blockBrowserRequest('http://127.0.0.1:4800/x', 'http://127.0.0.1:4799'), true);
+  }
+);
 check('a fault already found survives a later audit error (red, not "could not look")', () => {
   const e = new Error('later page timed out');
   assert.equal(failureSummary(e, ['LOCALHOST /: http://localhost:8080']).code, 1);
