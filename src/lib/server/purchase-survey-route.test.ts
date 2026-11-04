@@ -1,7 +1,7 @@
 /**
  * Route cover for `POST /api/lms/checkout/survey` (Authority Machine slice 1b).
  * Answers are written to the PaymentIntent metadata, once, only for a paid session, and only
- * from the browser tab that started that checkout (its `survey_key` matches the binding stored
+ * from the browser tab that started that checkout (one of its `survey_keys` matches the binding stored
  * on the session). A session id alone is not enough: it appears in the success URL and could be
  * shared or leaked.
  */
@@ -32,9 +32,10 @@ const TAB_KEY = '00112233445566778899aabbccddeeff';
 const OTHER_TAB_KEY = 'ffeeddccbbaa99887766554433221100';
 const BINDING = purchaseSurveyBinding(TAB_KEY);
 
-/** A survey POST. `key` is added as survey_key unless it is null. */
+/** A survey POST. `key` is sent in survey_keys (a lone value is wrapped) unless it is null. */
 function post(body: unknown, key: unknown = TAB_KEY, cookie?: string): NextRequest {
-  const withKey = key === null || typeof body !== 'object' || body === null ? body : { ...body, survey_key: key };
+  const keys = Array.isArray(key) ? key : [key];
+  const withKey = key === null || typeof body !== 'object' || body === null ? body : { ...body, survey_keys: keys };
   return new NextRequest('https://carsi.example.test/api/lms/checkout/survey', {
     method: 'POST',
     headers: { 'content-type': 'application/json', ...(cookie ? { cookie } : {}) },
@@ -89,7 +90,10 @@ describe('authorisation: the browser tab that started checkout', () => {
     ['too long', 'ab'.repeat(17)],
     ['upper case', TAB_KEY.toUpperCase()],
     ['an object', { key: TAB_KEY }],
-  ])('survey_key %s -> 403, no Stripe call', async (_label, key) => {
+    ['an empty list', []],
+    ['more than five keys', [TAB_KEY, ...Array.from({ length: 5 }, () => OTHER_TAB_KEY)]],
+    ['one bad entry among good ones', [TAB_KEY, 'zz'.repeat(16)]],
+  ])('survey_keys %s -> 403, no Stripe call', async (_label, key) => {
     const res = await POST(post(GOOD, key));
     expect(res.status).toBe(403);
     expect(stripe.retrieveSession).not.toHaveBeenCalled();
@@ -101,6 +105,24 @@ describe('authorisation: the browser tab that started checkout', () => {
     expect(res.status).toBe(403);
     expect(stripe.retrievePI).not.toHaveBeenCalled();
     expect(stripe.updatePI).not.toHaveBeenCalled();
+  });
+
+  it("this tab's key among its other recent keys -> 200 (GP-662: one fresh key per checkout)", async () => {
+    const res = await POST(post(GOOD, [OTHER_TAB_KEY, TAB_KEY]));
+    expect(res.status).toBe(200);
+    expect(stripe.updatePI).toHaveBeenCalledTimes(1);
+  });
+
+  it('a lone survey_key string (the old single-key body) is refused', async () => {
+    const res = await POST(
+      new NextRequest('https://carsi.example.test/api/lms/checkout/survey', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ ...GOOD, survey_key: TAB_KEY, survey_keys: TAB_KEY }),
+      })
+    );
+    expect(res.status).toBe(403);
+    expect(stripe.retrieveSession).not.toHaveBeenCalled();
   });
 
   it('the binding itself, sent as the key, is refused', async () => {

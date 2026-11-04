@@ -526,18 +526,30 @@ describe('first-touch attribution (Authority Machine slice 1a)', () => {
   });
 });
 
-/** One browser tab: its sessionStorage key, as the client helper keeps it. */
-type Tab = { key: string };
+/** One browser tab: its sessionStorage list of recent keys, newest first, as the client keeps it. */
+type Tab = { keys: string[] };
 
 function newTab(): Tab {
-  return { key: [...crypto.getRandomValues(new Uint8Array(16))].map((b) => b.toString(16).padStart(2, '0')).join('') };
+  return { keys: [] };
 }
 
+/** A tab opened from `tab`: the browser copies sessionStorage, so it starts with the same keys. */
+function copiedTab(tab: Tab): Tab {
+  return { keys: [...tab.keys] };
+}
+
+function freshKey(): string {
+  return [...crypto.getRandomValues(new Uint8Array(16))].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+/** Every checkout makes a fresh key, kept at the front of the tab's list (at most five). */
 function checkoutFrom(tab: Tab, slug: string): NextRequest {
+  const key = freshKey();
+  tab.keys = [key, ...tab.keys].slice(0, 5);
   return new NextRequest('https://carsi.example.test/api/lms/checkout', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ slug, customer_email: 'new@example.test', survey_key: tab.key }),
+    body: JSON.stringify({ slug, customer_email: 'new@example.test', survey_key: key }),
   });
 }
 
@@ -550,7 +562,7 @@ async function surveyStatus(tab: Tab | null, sessionId: string): Promise<number>
         session_id: sessionId,
         industry: 'commercial_cleaning',
         found_via: 'google_search',
-        ...(tab ? { survey_key: tab.key } : {}),
+        ...(tab ? { survey_keys: tab.keys } : {}),
       }),
     })
   );
@@ -617,15 +629,31 @@ describe('overlapping checkout starts keep every survey answerable (GP-662)', ()
     expect(await surveyStatus(mine, 'cs_test_never_started')).toBe(400);
   });
 
+  it('a tab opened from another (copied sessionStorage) cannot answer the checkouts either starts afterwards', async () => {
+    const opener = newTab();
+    nextSession('cs_test_before_copy');
+    await POST(checkoutFrom(opener, COURSE_SLUG));
+    const child = copiedTab(opener);
+    nextSession('cs_test_opener_after');
+    nextSession('cs_test_child_after');
+    await Promise.all([POST(checkoutFrom(opener, COURSE_SLUG)), POST(checkoutFrom(child, 'odour-control'))]);
+    expect(await surveyStatus(opener, 'cs_test_opener_after')).toBe(200);
+    expect(await surveyStatus(child, 'cs_test_child_after')).toBe(200);
+    expect(await surveyStatus(child, 'cs_test_opener_after')).toBe(403);
+    expect(await surveyStatus(opener, 'cs_test_child_after')).toBe(403);
+  });
+
   it('junk cookies on the request change nothing: no Set-Cookie and the binding still works', async () => {
     const tab = newTab();
+    const key = freshKey();
+    tab.keys = [key];
     const junk = Array.from({ length: 120 }, (_, i) => `carsi_svy_${i}=9999999999.${'0'.repeat(64)}`).join('; ');
     nextSession('cs_test_junk');
     const res = await POST(
       new NextRequest('https://carsi.example.test/api/lms/checkout', {
         method: 'POST',
         headers: { 'content-type': 'application/json', cookie: `${junk}; carsi_svk=forged` },
-        body: JSON.stringify({ slug: COURSE_SLUG, customer_email: 'new@example.test', survey_key: tab.key }),
+        body: JSON.stringify({ slug: COURSE_SLUG, customer_email: 'new@example.test', survey_key: key }),
       })
     );
     expect(res.status).toBe(200);

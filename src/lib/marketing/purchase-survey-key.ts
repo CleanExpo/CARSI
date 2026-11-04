@@ -1,17 +1,22 @@
 /**
- * The browser tab's purchase-survey key (Authority Machine slice 1b, GP-662). Browser only.
+ * The browser tab's purchase-survey keys (Authority Machine slice 1b, GP-662). Browser only.
  *
- * A tab makes one random 128-bit key, keeps it in sessionStorage, and sends it with each
- * checkout request; the server stores only a binding of it on the Stripe session. The same tab
- * comes back from Stripe to the payment-success page with the same sessionStorage, and the
- * survey sends the key to prove it is the tab that started the checkout.
+ * Every checkout makes a fresh random 128-bit key, keeps it at the front of a short list in
+ * sessionStorage (newest five), and sends it with that checkout request; the server stores
+ * only a binding of it on the new Stripe session. The same tab comes back from Stripe to the
+ * payment-success page with the same sessionStorage, and the survey sends the list to prove it
+ * is the tab that started the checkout.
  *
  * sessionStorage, not a cookie: a tab's script reads and writes it one step at a time and each
- * tab has its own, so overlapping checkouts can never replace each other's key. The server
+ * tab has its own, so overlapping checkouts can never replace each other's key. A tab opened
+ * from another starts with a copy of the opener's sessionStorage; because each checkout makes
+ * a new key, keys made after the copy are known only to the tab that made them. The server
  * never writes it. When storage is unavailable (private modes, blocked storage) there is no
  * key; checkout works as before and the optional survey is refused.
  */
 export const PURCHASE_SURVEY_KEY_STORAGE_NAME = 'carsi_svk';
+/** At most this many recent checkout keys are kept per tab; the server accepts the same count. */
+export const PURCHASE_SURVEY_KEY_LIMIT = 5;
 
 const KEY_SHAPE = /^[0-9a-f]{32}$/;
 
@@ -23,27 +28,30 @@ function tabStorage(): Storage | null {
   }
 }
 
-/** This tab's existing key, or null. Never creates one. */
-export function readPurchaseSurveyKey(storage: Storage | null = tabStorage()): string | null {
+/** This tab's recent keys, newest first (well-formed entries only). Never creates one. */
+export function readPurchaseSurveyKeys(storage: Storage | null = tabStorage()): string[] {
   try {
-    const value = storage?.getItem(PURCHASE_SURVEY_KEY_STORAGE_NAME) ?? null;
-    return value && KEY_SHAPE.test(value) ? value : null;
+    const value = storage?.getItem(PURCHASE_SURVEY_KEY_STORAGE_NAME) ?? '';
+    return value
+      .split(',')
+      .filter((k) => KEY_SHAPE.test(k))
+      .slice(0, PURCHASE_SURVEY_KEY_LIMIT);
   } catch {
-    return null;
+    return [];
   }
 }
 
-/** This tab's key, made and stored on first use. Null when storage or crypto is unavailable. */
+/** A fresh key for one checkout, stored first in this tab's list. Null when storage or crypto is unavailable. */
 export function purchaseSurveyKeyForCheckout(storage: Storage | null = tabStorage()): string | null {
-  const existing = readPurchaseSurveyKey(storage);
-  if (existing || !storage) return existing;
+  if (!storage) return null;
   try {
     const bytes = new Uint8Array(16);
     globalThis.crypto.getRandomValues(bytes);
     const key = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
-    storage.setItem(PURCHASE_SURVEY_KEY_STORAGE_NAME, key);
+    const keys = [key, ...readPurchaseSurveyKeys(storage)].slice(0, PURCHASE_SURVEY_KEY_LIMIT);
+    storage.setItem(PURCHASE_SURVEY_KEY_STORAGE_NAME, keys.join(','));
     // A storage that silently drops writes would leave a key the success page cannot read back.
-    return readPurchaseSurveyKey(storage);
+    return readPurchaseSurveyKeys(storage)[0] === key ? key : null;
   } catch {
     return null;
   }

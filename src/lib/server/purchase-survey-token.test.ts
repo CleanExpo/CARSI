@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import {
   parsePurchaseSurveyKey,
+  parsePurchaseSurveyKeys,
+  PURCHASE_SURVEY_MAX_KEYS,
   PURCHASE_SURVEY_BINDING_METADATA_KEY,
   PURCHASE_SURVEY_WINDOW_SECONDS,
   purchaseSurveyBinding,
@@ -30,6 +32,15 @@ describe('purchase survey tab key (GP-662)', () => {
     }
   });
 
+  it('a key list is 1 to 5 well-formed keys, else refused whole', () => {
+    expect(PURCHASE_SURVEY_MAX_KEYS).toBe(5);
+    expect(parsePurchaseSurveyKeys([KEY])).toEqual([KEY]);
+    expect(parsePurchaseSurveyKeys([KEY, OTHER])).toEqual([KEY, OTHER]);
+    for (const bad of [undefined, null, KEY, [], [KEY, 'zz'], Array(6).fill(KEY), { 0: KEY }, [KEY.toUpperCase()]]) {
+      expect(parsePurchaseSurveyKeys(bad)).toBeNull();
+    }
+  });
+
   it('the binding is 32 hex, stable for one key, different per key, and not the key itself', () => {
     expect(purchaseSurveyBinding(KEY)).toMatch(/^[0-9a-f]{32}$/);
     expect(purchaseSurveyBinding(KEY)).toBe(purchaseSurveyBinding(KEY));
@@ -52,6 +63,13 @@ describe('sessionAuthorisedForSurvey', () => {
     for (const bad of [undefined, '', KEY.toUpperCase(), purchaseSurveyBinding(KEY)]) {
       expect(sessionAuthorisedForSurvey(boundSession(KEY), bad, NOW)).toBe(false);
     }
+  });
+
+  it('accepts when any key in the list matches, refuses when none does (GP-662)', () => {
+    expect(sessionAuthorisedForSurvey(boundSession(KEY), [OTHER, KEY], NOW)).toBe(true);
+    expect(sessionAuthorisedForSurvey(boundSession(KEY), [OTHER], NOW)).toBe(false);
+    expect(sessionAuthorisedForSurvey(boundSession(KEY), [], NOW)).toBe(false);
+    expect(sessionAuthorisedForSurvey(boundSession(KEY), Array(6).fill(KEY), NOW)).toBe(false);
   });
 
   it('a session that stored the raw key instead of its binding is refused', () => {

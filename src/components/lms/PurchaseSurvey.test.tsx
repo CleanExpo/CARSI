@@ -99,8 +99,8 @@ describe('PurchaseSurvey', () => {
     expect(container.textContent).toContain('Thank you');
   });
 
-  it("sends this tab's checkout key with the answers (GP-662)", async () => {
-    window.sessionStorage.setItem('carsi_svk', '00112233445566778899aabbccddeeff');
+  it("sends this tab's recent checkout keys with the answers (GP-662)", async () => {
+    window.sessionStorage.setItem('carsi_svk', '00112233445566778899aabbccddeeff,ffeeddccbbaa99887766554433221100');
     try {
       render('cs_test_1');
       act(() => button('Builder or construction trade').click());
@@ -109,7 +109,7 @@ describe('PurchaseSurvey', () => {
       const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
       expect(JSON.parse(String(init.body))).toEqual({
         session_id: 'cs_test_1',
-        survey_key: '00112233445566778899aabbccddeeff',
+        survey_keys: ['00112233445566778899aabbccddeeff', 'ffeeddccbbaa99887766554433221100'],
         industry: 'builder_trade',
       });
     } finally {
