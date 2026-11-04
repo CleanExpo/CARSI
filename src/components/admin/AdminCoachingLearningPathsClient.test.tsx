@@ -136,4 +136,49 @@ describe('AdminCoachingLearningPathsClient', () => {
     expect(container.textContent).toContain('Course B');
     expect(container.textContent).not.toContain('Path saved.');
   });
+
+  it('shows a draft path as not visible to the member and approves it for that member', async () => {
+    const posts: unknown[] = [];
+    const draft = {
+      ...viewOf(COURSE_A, 'Course A'),
+      pathStatus: 'draft',
+      path: [{ ...viewOf(COURSE_A, 'Course A').path[0], draft: true }],
+    };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string, init?: RequestInit) => {
+        if (init?.method === 'POST') {
+          posts.push(JSON.parse(String(init.body)));
+          return json({
+            ...viewOf(COURSE_A, 'Course A'),
+            pathStatus: 'approved',
+            result: { status: 'approved', approved: 1 },
+          });
+        }
+        if (url.endsWith(`userId=${A}`)) return json(draft);
+        return json({ members: [{ ...members[0], draftCount: 1 }, members[1]] });
+      })
+    );
+
+    await act(async () => root.render(<AdminCoachingLearningPathsClient />));
+    await flush();
+    expect(container.textContent).toContain('draft waiting for approval');
+    choose(A);
+    await flush();
+    expect(container.textContent).toContain('Draft, not visible to the member');
+    const findApprove = () =>
+      [...container.querySelectorAll('button')].find((b) => b.textContent === 'Approve path');
+    const approve = findApprove() as HTMLButtonElement;
+    expect(approve).toBeTruthy();
+    await act(async () => approve.click());
+    await flush();
+    expect(posts).toEqual([{ userId: A, op: 'approve' }]);
+    expect(container.textContent).toContain('Approved, visible to the member');
+    expect(container.textContent).toContain('Path approved.');
+    expect(findApprove()).toBeUndefined();
+    // The member picker no longer flags this member as waiting once the path is approved.
+    expect(container.querySelector('select')?.textContent).not.toContain(
+      'draft waiting for approval'
+    );
+  });
 });

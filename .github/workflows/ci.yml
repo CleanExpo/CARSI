@@ -385,6 +385,9 @@ jobs:
         run: npm run test:pg
         env:
           NODE_ENV: test
+          # The suites write and delete shared rows, so they refuse any database not marked
+          # throwaway. This job's postgres service is created for the run and discarded after it.
+          CARSI_PG_DISPOSABLE: '1'
 
       # The yearly-membership grant ROTATES an existing member's password and
       # reveals it only in the welcome email, so a second grant locks the member
