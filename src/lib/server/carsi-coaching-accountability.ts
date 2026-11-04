@@ -112,7 +112,10 @@ export type MemberAccountabilityView = {
   streak: number;
   completion: { done: number; total: number; percent: number };
   trend: KpiTrendPoint[];
-  /** Set once, on the first visit after 14 or more quiet days. */
+  /**
+   * Set once, on the first view after 14 or more quiet days, even when another portal page
+   * recorded that visit a moment earlier (within the 6-hour visit window).
+   */
   quiet: { daysSilent: number } | null;
   nudges: Array<Pick<MemberNudge, 'kind'> & { title?: string; dueDate?: string }>;
 };
@@ -141,6 +144,52 @@ function memberView(
   };
 }
 
+function visitDue(acc: PlanAccountability, now: Date): boolean {
+  const last = acc.lastSeenAt ? Date.parse(acc.lastSeenAt) : 0;
+  return now.getTime() - last >= VISIT_RECORD_INTERVAL_MS;
+}
+
+/** The visit as it should be written, or null when one was recorded inside the window. */
+function withVisit(current: PlanAccountability | null, now: Date): PlanAccountability | null {
+  if (!current || !visitDue(current, now)) return null;
+  const silent = daysSilent(current, now);
+  const nowIso = now.toISOString();
+  const { quietReturn: _previous, ...rest } = current;
+  return {
+    ...rest,
+    lastSeenAt: nowIso,
+    ...(silent >= QUIET_NUDGE_DAYS ? { quietReturn: { daysSilent: silent, at: nowIso } } : {}),
+  };
+}
+
+/**
+ * GP-677 — records that the member opened a coaching portal page, which resets the quiet clock
+ * behind the day-14 nudge and the day-21 coach alert. Called from the portal layout, so every
+ * member page counts. At most one write per 6-hour window, and the window is re-checked
+ * against the latest plan inside the compare-and-set loop, so two pages loading together
+ * write once. A member without accountability set up is left untouched.
+ */
+export async function recordPortalVisit(
+  store: AccountabilityStore,
+  userId: string,
+  now: Date
+): Promise<void> {
+  const plan = await store.readPlan(userId);
+  if (!plan?.accountability || !visitDue(plan.accountability, now)) return;
+  await mutatePlan(store, userId, (current) => withVisit(current, now));
+}
+
+function quietOnArrival(acc: PlanAccountability, now: Date): { daysSilent: number } | null {
+  const silent = daysSilent(acc, now);
+  if (silent >= QUIET_NUDGE_DAYS) return { daysSilent: silent };
+  // Another portal page already recorded this visit; the mark it left keeps the banner.
+  const qr = acc.quietReturn;
+  if (qr && now.getTime() - Date.parse(qr.at) < VISIT_RECORD_INTERVAL_MS) {
+    return { daysSilent: qr.daysSilent };
+  }
+  return null;
+}
+
 /** The member's own accountability, then records this visit (which resets the quiet clock). */
 export async function getMyAccountability(
   store: AccountabilityStore,
@@ -150,17 +199,25 @@ export async function getMyAccountability(
   const [plan, actions] = await Promise.all([store.readPlan(userId), store.listActions(userId)]);
   const acc = plan?.accountability ?? null;
   let quiet: { daysSilent: number } | null = null;
-  if (acc) {
-    const silent = daysSilent(acc, now);
-    if (silent >= QUIET_NUDGE_DAYS) quiet = { daysSilent: silent };
-    const last = acc.lastSeenAt ? Date.parse(acc.lastSeenAt) : 0;
-    if (now.getTime() - last >= VISIT_RECORD_INTERVAL_MS) {
-      await mutatePlan(store, userId, (current) =>
-        current ? { ...current, lastSeenAt: now.toISOString() } : null
-      );
-    }
+  let latest = acc;
+  if (acc && (visitDue(acc, now) || acc.quietReturn)) {
+    // Records the visit if one is due, and clears the "returned after a quiet spell" mark.
+    // The banner is decided inside the compare-and-set loop, from the plan version this view
+    // actually wrote, so two views loading together show it once (Codex r1 P2). A view that
+    // finds nothing to write (the other view got there first) shows no banner.
+    // The view is built from the plan this write produced or found, not the earlier read, so a
+    // KPI or check-in save that lands in between is not shown stale.
+    latest = await mutatePlan(store, userId, (current) => {
+      quiet = null;
+      if (!current) return null;
+      const visited = withVisit(current, now) ?? current;
+      if (visited === current && !current.quietReturn) return null;
+      quiet = quietOnArrival(current, now);
+      const { quietReturn: _shown, ...rest } = visited;
+      return rest;
+    });
   }
-  return memberView(acc, actions, now, quiet);
+  return memberView(latest, actions, now, quiet);
 }
 
 export type SaveOutcome =
