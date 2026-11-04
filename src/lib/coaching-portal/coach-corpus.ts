@@ -144,16 +144,26 @@ export function chunkCorpusText(body: string): string[] {
   return paragraphs(body).flatMap(splitLong);
 }
 
-/** Deep clause numbers ("12.3.4") and section citations ("Section 4.2", "§ 12.3"). */
-const CLAUSE_CITE_RE = /\b\d{1,2}\.\d{1,2}\.\d{1,3}\b|(?:\bSection|§)\s*\d{1,2}(?:\.\d{1,2})*/gi;
-const NORMATIVE_SHALL_RE = /\bshall\b/gi;
+/**
+ * Clause citations: deep clause numbers ("12.3.4"), or a section sign or the word "Section"
+ * followed by a dotted number ("Section 4.2", "§ 12.3"). A plain "Section 2" of a book is not
+ * counted.
+ */
+const CLAUSE_CITE_RE =
+  /\b\d{1,2}\.\d{1,2}\.\d{1,3}\b|§\s*\d{1,2}(?:\.\d{1,2})*|\bSection\s+\d{1,2}\.\d{1,2}/gi;
+/**
+ * Normative "shall" as standards use it ("the restorer shall inspect"). Everyday speech is
+ * left out: "shall" after I/we/you/they/he/she ("we shall see", "I shall call") or before
+ * we/I/us ("shall we start?").
+ */
+const NORMATIVE_SHALL_RE = /(?<!\b(?:i|we|you|they|he|she)\s+)\bshall\b(?!\s+(?:we|i|us)\b)/gi;
 const STANDARD_SHAPE_MIN = 3;
 
 /**
- * Standard body text has a shape coaching material does not: clustered clause numbers or
- * repeated normative "shall". Unlike the course-kit scanner this needs no "IICRC S500" header,
- * so an excerpt pasted without its title is still refused (Codex r1). Checked on every passage
- * and every pair of neighbouring passages, so an excerpt split across a passage break is caught.
+ * Standard body text has a shape coaching material does not: clause citations and normative
+ * "shall" clauses. Counted across the WHOLE item, so no window can be dodged by spreading the
+ * clauses out between commentary (Codex r1 found a missing header, r2 an interleaving; both
+ * were window problems, so the window is gone). Needs no "IICRC S500" header.
  */
 function hasStandardShape(text: string): boolean {
   const cites = text.match(CLAUSE_CITE_RE)?.length ?? 0;
@@ -164,16 +174,13 @@ function hasStandardShape(text: string): boolean {
 /**
  * True when the text looks like pasted IICRC standard body text: the course-kit excerpt
  * scanner on the whole text and on each paragraph (headed excerpts), plus the header-free
- * shape check on every passage and neighbouring pair. A false positive only asks the coach to
- * rephrase, which is the safe direction for a licence rule.
+ * shape check on the whole item. A false positive only asks the coach to rephrase, which is
+ * the safe direction for a licence rule.
  */
 export function isStandardsText(body: string): boolean {
   if (scanTextForStandardExcerpt(body)) return true;
   if (paragraphs(body).some((p) => scanTextForStandardExcerpt(p) !== null)) return true;
-  const passages = chunkCorpusText(body);
-  return passages.some(
-    (p, i) => hasStandardShape(p) || (i > 0 && hasStandardShape(`${passages[i - 1]} ${p}`))
-  );
+  return hasStandardShape(body);
 }
 
 function passageIsUsable(title: string, passage: string): boolean {

@@ -129,6 +129,41 @@ describe('isStandardsText (IICRC AI-use prohibition at ingest)', () => {
     expect(isStandardsText(shalls)).toBe(true);
   });
 
+  it('refuses headerless clauses interleaved with commentary paragraphs (Codex r2)', () => {
+    const body = [
+      'Section 12.2.1 The restorer shall inspect the structure before work starts.',
+      'That one matters on every job, so walk the whole house with the owner first.',
+      'Section 12.2.2 The restorer shall document moisture readings in each room.',
+      'I keep the readings on my phone so the owner can see them on the spot.',
+      'Section 12.2.3 The restorer shall establish drying goals before equipment is placed.',
+    ].join('\n\n');
+    expect(isStandardsText(body)).toBe(true);
+  });
+
+  it('refuses normative "shall" clauses spread far apart in a long item (Codex r2)', () => {
+    const filler = Array.from(
+      { length: 30 },
+      (_, i) => `Paragraph ${i} about quoting work and keeping the van tidy.`
+    );
+    const body = [
+      'The technician shall inspect the room.',
+      ...filler,
+      'The technician shall record readings.',
+      ...filler,
+      'The technician shall set drying goals.',
+    ].join('\n\n');
+    expect(isStandardsText(body)).toBe(true);
+  });
+
+  it('allows everyday "shall we" and "we shall see" across a long transcript (Codex r2)', () => {
+    const chat = Array.from(
+      { length: 40 },
+      (_, i) =>
+        `Shall we look at quote ${i}? We shall see what the owner says, and I shall call them back.`
+    ).join('\n\n');
+    expect(isStandardsText(`${TRANSCRIPT}\n\n${chat}`)).toBe(false);
+  });
+
   it('allows the odd "shall" or numbered step in ordinary material', () => {
     expect(
       isStandardsText(

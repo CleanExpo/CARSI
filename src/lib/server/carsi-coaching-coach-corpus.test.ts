@@ -327,6 +327,24 @@ describe('Codex r1: standards text without its header, and the item limit', () =
     expect(corpus.rows).toHaveLength(0);
   });
 
+  it('refuses headerless clauses interleaved with commentary at the add boundary (Codex r2)', async () => {
+    const corpus = corpusStore();
+    const body = [
+      'Section 12.2.1 The restorer shall inspect the structure before work starts.',
+      'That one matters on every job, so walk the whole house with the owner first.',
+      'Section 12.2.2 The restorer shall document moisture readings in each room.',
+      'I keep the readings on my phone so the owner can see them on the spot.',
+      'Section 12.2.3 The restorer shall establish drying goals before equipment is placed.',
+    ].join('\n\n');
+    const r = await addCoachCorpusItem(corpus, COACH_A, {
+      sourceType: 'transcript',
+      title: 'Episode 14',
+      body,
+    });
+    expect(r.status).toBe('refused_standards');
+    expect(corpus.rows).toHaveLength(0);
+  });
+
   it('refuses to add past the per-coach limit instead of silently dropping material', async () => {
     const corpus = corpusStore();
     for (let i = 0; i < COACH_CORPUS_ITEM_MAX; i += 1) {
