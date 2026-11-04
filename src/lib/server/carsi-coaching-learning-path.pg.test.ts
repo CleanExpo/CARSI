@@ -42,7 +42,7 @@ describe.runIf(RUNNABLE)('coaching learning path (real PostgreSQL)', async () =>
   const { prisma } = await import('@/lib/prisma');
   const lp = await import('@/lib/server/carsi-coaching-learning-path');
   const store = await import('@/lib/server/carsi-coaching-actions-store');
-  const { learningGoalId, GAP_MAP_SLUG_PREFIX } =
+  const { learningGoalId, GAP_MAP_SLUG_PREFIX, LEARNING_DRAFT_REMOVED_STATUS } =
     await import('@/lib/coaching-portal/learning-path');
   const gapMap = await import('@/lib/server/carsi-coaching-gap-map');
   const { DEFAULT_COACHING_CHAPTER_SLUG } = await import('@/lib/coaching-portal/coach-routing');
@@ -62,6 +62,7 @@ describe.runIf(RUNNABLE)('coaching learning path (real PostgreSQL)', async () =>
   // each later test reads the state an earlier one wrote.
   const testPathways = new Map<string, string[]>();
   const testCourseIds: string[] = [];
+  const testUserIds: string[] = [];
 
   /** Delete one pathway row if, under its row lock, it still holds exactly `savedCourseIds`. */
   async function deleteOwnPathway(id: string, savedCourseIds: string[]): Promise<boolean> {
@@ -102,6 +103,9 @@ describe.runIf(RUNNABLE)('coaching learning path (real PostgreSQL)', async () =>
     testPathways.clear();
     await prisma.lmsCourse.deleteMany({ where: { id: { in: testCourseIds } } });
     testCourseIds.length = 0;
+    // Deleting a member cascades to their subscription, assessment and actions.
+    await prisma.lmsUser.deleteMany({ where: { id: { in: testUserIds } } });
+    testUserIds.length = 0;
   });
   const instructorId = randomUUID();
   const createdCourseIds: string[] = [];
@@ -580,6 +584,65 @@ describe.runIf(RUNNABLE)('coaching learning path (real PostgreSQL)', async () =>
     const path = await lp.adjustLearningPath(mapMemberId, { addCourseIds: [legacyId, draftId] });
     expect(path.map((p) => p.courseId)).toContain(legacyId);
     expect(path.map((p) => p.courseId)).not.toContain(draftId);
+  });
+
+  it('a draft the coach empties stays a draft: a later add waits for approval and the member sees none of it (CodeRabbit, PR #1018)', async () => {
+    const extra = courseIdBySlug.get(extraSlug)!;
+    const userId = randomUUID();
+    testUserIds.push(userId);
+    await prisma.lmsUser.create({
+      data: { id: userId, email: `gp633-${userId}@example.test`, hashedPassword: 'provisional:x' },
+    });
+    await prisma.carsiCoachingMonthlySubscription.create({ data: { userId, status: 'active' } });
+    await prisma.carsiCoachingAssessment.create({
+      data: {
+        userId,
+        status: 'submitted',
+        submittedAt: new Date(),
+        responsesJson: JSON.stringify({
+          ...emptyAssessmentResponses(),
+          lead_sources: 'Word of mouth only',
+          marketing_efforts: 'Nothing',
+          top_priorities: 'More leads and a website',
+          profitability: 'Modest profit',
+        }),
+      },
+    });
+    expect((await lp.assignLearningPathFromAssessment(userId)).status).toBe('assigned');
+    expect(await lp.adjustLearningPath(userId, { removeCourseIds: [social(), wdMkt()] })).toEqual(
+      []
+    );
+    const tombstones = await prisma.carsiCoachingAction.findMany({ where: { userId } });
+    expect(tombstones.map((r) => r.status)).toEqual([
+      LEARNING_DRAFT_REMOVED_STATUS,
+      LEARNING_DRAFT_REMOVED_STATUS,
+    ]);
+
+    // The member can neither see nor edit a draft tombstone.
+    expect(await store.listCoachingActionsForUser(userId)).toEqual([]);
+    await store.upsertCoachingActionForUser(userId, {
+      id: tombstones[0].id,
+      title: 'Member edit',
+      status: 'done',
+      progressNote: 'sneaky',
+    });
+    expect(
+      await prisma.carsiCoachingAction.findUniqueOrThrow({ where: { id: tombstones[0].id } })
+    ).toMatchObject({ status: LEARNING_DRAFT_REMOVED_STATUS, progressNote: null });
+
+    // A course the coach adds now joins the draft; the member still sees nothing.
+    await lp.adjustLearningPath(userId, { addCourseIds: [extra] });
+    const added = await prisma.carsiCoachingAction.findFirstOrThrow({
+      where: { userId, goalId: learningGoalId(extra) },
+    });
+    expect(added.status).toBe('proposed');
+    expect(await store.listCoachingActionsForUser(userId)).toEqual([]);
+    expect((await lp.getCoachLearningPathView(userId)).pathStatus).toBe('draft');
+
+    expect((await lp.approveLearningPath(userId)).approved).toBe(1);
+    expect((await store.listCoachingActionsForUser(userId)).map((b) => b.goalId)).toEqual([
+      learningGoalId(extra),
+    ]);
   });
 
   it('two simultaneous coach adds of one course create one action', async () => {

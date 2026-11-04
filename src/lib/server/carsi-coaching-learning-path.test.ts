@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { learningGoalId } from '@/lib/coaching-portal/learning-path';
+import { LEARNING_DRAFT_REMOVED_STATUS, learningGoalId } from '@/lib/coaching-portal/learning-path';
 import {
   adjustLearningPath,
   assignLearningPathFromAssessment,
@@ -303,7 +303,8 @@ describe('coach clears the path (review r2 P1: a full clear must stay cleared)',
     const again = await assignLearningPathFromAssessment(USER, store);
     expect(again.status).toBe('already_assigned');
     expect(actions).toHaveLength(2);
-    expect(actions.every((a) => a.status === 'removed')).toBe(true);
+    // The path was a draft (never approved), so its tombstones are draft tombstones (PR #1018).
+    expect(actions.every((a) => a.status === LEARNING_DRAFT_REMOVED_STATUS)).toBe(true);
   });
 
   it('removed courses are not on the path and the sync never revives them', async () => {

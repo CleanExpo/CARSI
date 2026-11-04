@@ -46,6 +46,7 @@ const STATUS_LABEL: Record<PathItem['status'], string> = {
 const ASSIGN_RESULT: Record<string, string> = {
   assigned: 'Draft path created from the assessment. Review it, then approve it for the member.',
   approved: 'Path approved. The member now sees it on their Actions board and Resources page.',
+  nothing_to_approve: 'Nothing to approve: this path has no draft courses waiting.',
   already_assigned: 'This member already has a path. Adjust it below.',
   no_assessment: 'No submitted assessment yet, so there is nothing to prescribe from.',
   no_gaps: 'The assessment shows no clear gap. Add courses by hand if you want a path.',

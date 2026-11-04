@@ -10,6 +10,7 @@
  */
 import {
   LEARNING_GOAL_PREFIX,
+  LEARNING_DRAFT_REMOVED_STATUS,
   LEARNING_PROPOSED_STATUS,
   LEARNING_REMOVED_STATUS,
   applyCoachPathAdjustment,
@@ -33,7 +34,10 @@ import { loadGapCourseMap, prismaGapMapStoreFor } from '@/lib/server/carsi-coach
 
 /** Statuses a learning action can be written with: board statuses, a draft, or a tombstone. */
 export type LearningActionWriteStatus =
-  CoachingActionStatus | typeof LEARNING_PROPOSED_STATUS | typeof LEARNING_REMOVED_STATUS;
+  | CoachingActionStatus
+  | typeof LEARNING_PROPOSED_STATUS
+  | typeof LEARNING_REMOVED_STATUS
+  | typeof LEARNING_DRAFT_REMOVED_STATUS;
 
 export type LearningActionRecord = {
   id: string;
@@ -186,15 +190,20 @@ function splitLearningRows(actions: LearningActionRecord[]): {
   active: LearningRow[];
   proposed: LearningRow[];
   removed: LearningRow[];
+  /** True when a live course was removed, i.e. the path had been approved. */
+  removedAfterApproval: boolean;
 } {
   const rows = actions
     .map((a) => ({ action: a, courseId: parseLearningGoalId(a.goalId) }))
     .filter((x): x is LearningRow => x.courseId !== null);
-  const hidden = (s: string) => s === LEARNING_REMOVED_STATUS || s === LEARNING_PROPOSED_STATUS;
+  const tombstone = (s: string) =>
+    s === LEARNING_REMOVED_STATUS || s === LEARNING_DRAFT_REMOVED_STATUS;
+  const hidden = (s: string) => tombstone(s) || s === LEARNING_PROPOSED_STATUS;
   return {
     active: rows.filter((x) => !hidden(x.action.status)),
     proposed: rows.filter((x) => x.action.status === LEARNING_PROPOSED_STATUS),
-    removed: rows.filter((x) => x.action.status === LEARNING_REMOVED_STATUS),
+    removed: rows.filter((x) => tombstone(x.action.status)),
+    removedAfterApproval: rows.some((x) => x.action.status === LEARNING_REMOVED_STATUS),
   };
 }
 
@@ -213,7 +222,15 @@ export async function syncLearningPath(
   userId: string,
   store: LearningPathStore = prismaLearningPathStore
 ): Promise<LearningPathItem[]> {
-  const learning = splitLearningRows(await store.listActions(userId)).active;
+  return syncLearningRows(userId, await store.listActions(userId), store);
+}
+
+async function syncLearningRows(
+  userId: string,
+  actions: LearningActionRecord[],
+  store: LearningPathStore
+): Promise<LearningPathItem[]> {
+  const learning = splitLearningRows(actions).active;
   if (learning.length === 0) return [];
 
   const ids = learning.map((x) => x.courseId);
@@ -277,8 +294,14 @@ export async function coachLearningPath(
   userId: string,
   store: LearningPathStore = prismaLearningPathStore
 ): Promise<CoachLearningPathItem[]> {
-  const live = (await syncLearningPath(userId, store)).map((i) => ({ ...i, draft: false }));
-  const drafts = splitLearningRows(await store.listActions(userId)).proposed;
+  // One read: live and draft items come from the same snapshot, so an approval landing
+  // between two reads cannot drop the rows from both (CodeRabbit, PR #1018).
+  const actions = await store.listActions(userId);
+  const live = (await syncLearningRows(userId, actions, store)).map((i) => ({
+    ...i,
+    draft: false,
+  }));
+  const drafts = splitLearningRows(actions).proposed;
   if (drafts.length === 0) return live.sort((a, b) => a.sortOrder - b.sortOrder);
 
   const ids = drafts.map((d) => d.courseId);
@@ -357,8 +380,11 @@ async function adjustLocked(
   );
   const currentIds = learning.map((x) => x.courseId);
   // While a draft is waiting, anything the coach adds joins the draft; once the path is live,
-  // the coach adding a course is itself the approval.
-  const newStatus = split.proposed.length > 0 ? LEARNING_PROPOSED_STATUS : 'todo';
+  // the coach adding a course is itself the approval. A draft the coach emptied is still a
+  // draft: its rows are all draft tombstones (CodeRabbit, PR #1018).
+  const emptiedDraft =
+    split.active.length === 0 && !split.removedAfterApproval && split.removed.length > 0;
+  const newStatus = split.proposed.length > 0 || emptiedDraft ? LEARNING_PROPOSED_STATUS : 'todo';
 
   const wantedAdds = (input.addCourseIds ?? []).filter((id) => !currentIds.includes(id));
   const addable = wantedAdds.length ? await store.publishedCoursesByIds(wantedAdds) : [];
@@ -372,8 +398,13 @@ async function adjustLocked(
 
   // Removal keeps the row as a tombstone: it leaves the board, and the "already assigned"
   // guard still sees it, so a full clear is never re-prescribed (review r2 P1).
+  // A draft course removed before approval gets its own tombstone, so the path stays a draft.
   for (const x of learning.filter((l) => !next.includes(l.courseId))) {
-    await coachWrite(store, userId, x.action, { status: LEARNING_REMOVED_STATUS });
+    const status =
+      x.action.status === LEARNING_PROPOSED_STATUS
+        ? LEARNING_DRAFT_REMOVED_STATUS
+        : LEARNING_REMOVED_STATUS;
+    await coachWrite(store, userId, x.action, { status });
   }
 
   const kept = learning.filter((x) => next.includes(x.courseId));

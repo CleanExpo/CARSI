@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
   if (body?.op === 'approve') {
     const { approved } = await approveLearningPath(userId);
     return NextResponse.json({
-      result: { status: 'approved', approved },
+      result: { status: approved > 0 ? 'approved' : 'nothing_to_approve', approved },
       ...(await getCoachLearningPathView(userId)),
     });
   }

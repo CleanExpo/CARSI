@@ -229,6 +229,13 @@ export const LEARNING_REMOVED_STATUS = 'removed';
  * every draft on the path into a live `todo` in one step.
  */
 export const LEARNING_PROPOSED_STATUS = 'proposed';
+/**
+ * Status of a DRAFT course the coach removed before approving. Hidden like `removed`, but it
+ * records that the path was never approved: while a path holds only these (no live course and no
+ * course removed after approval), a course the coach adds still joins the draft instead of going
+ * live (CodeRabbit, PR #1018).
+ */
+export const LEARNING_DRAFT_REMOVED_STATUS = 'proposed_removed';
 
 /**
  * Coach edits to the gap map live in `lms_learning_pathways` under this reserved slug prefix,

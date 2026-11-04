@@ -80,6 +80,16 @@ describe('approval is coach-only', () => {
     expect(await res.json()).toMatchObject({ result: { status: 'approved', approved: 2 } });
   });
 
+  it('approving with no draft waiting reports nothing_to_approve, not approved', async () => {
+    mocks.session.mockResolvedValue({ email: 'coach@example.test' });
+    mocks.approve.mockResolvedValue({ approved: 0 });
+    const res = await POST(post({ userId: MEMBER, op: 'approve' }));
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({
+      result: { status: 'nothing_to_approve', approved: 0 },
+    });
+  });
+
   it('approve refuses someone who is not a coaching member', async () => {
     mocks.session.mockResolvedValue({ email: 'coach@example.test' });
     mocks.isMember.mockResolvedValue(false);

@@ -7,7 +7,12 @@
  */
 import { describe, expect, it } from 'vitest';
 
-import { LEARNING_PROPOSED_STATUS, learningGoalId } from '@/lib/coaching-portal/learning-path';
+import {
+  LEARNING_DRAFT_REMOVED_STATUS,
+  LEARNING_PROPOSED_STATUS,
+  LEARNING_REMOVED_STATUS,
+  learningGoalId,
+} from '@/lib/coaching-portal/learning-path';
 import {
   adjustLearningPath,
   approveLearningPath,
@@ -148,7 +153,9 @@ describe('approveLearningPath', () => {
     await assignLearningPathFromAssessment(USER, store);
     await adjustLearningPath(USER, { removeCourseIds: [C_SOCIAL] }, store);
     await approveLearningPath(USER, store);
-    expect(actions.find((a) => a.goalId === learningGoalId(C_SOCIAL))?.status).toBe('removed');
+    expect(actions.find((a) => a.goalId === learningGoalId(C_SOCIAL))?.status).toBe(
+      LEARNING_DRAFT_REMOVED_STATUS
+    );
     expect((await syncLearningPath(USER, store)).map((m) => m.courseId)).toEqual([C_WD_MKT]);
   });
 });
@@ -195,6 +202,62 @@ describe('coach edits keep the draft a draft', () => {
       C_WD_MKT,
       C_ESTIMATING,
     ]);
+  });
+
+  it('emptying the draft keeps it a draft: a course added afterwards waits for approval (CodeRabbit, PR #1018)', async () => {
+    const { store, actions } = fakeStore({ assessmentJson: MARKETING_GAP_ASSESSMENT });
+    await assignLearningPathFromAssessment(USER, store);
+    await adjustLearningPath(USER, { removeCourseIds: [C_SOCIAL, C_WD_MKT] }, store);
+    await adjustLearningPath(USER, { addCourseIds: [C_ADMIN] }, store);
+    expect(actions.find((a) => a.goalId === learningGoalId(C_ADMIN))?.status).toBe(
+      LEARNING_PROPOSED_STATUS
+    );
+    expect(await syncLearningPath(USER, store)).toEqual([]);
+    expect((await approveLearningPath(USER, store)).approved).toBe(1);
+    expect((await syncLearningPath(USER, store)).map((m) => m.courseId)).toEqual([C_ADMIN]);
+  });
+
+  it('re-adding a course removed from an emptied draft revives it as a draft', async () => {
+    const { store, actions } = fakeStore({ assessmentJson: MARKETING_GAP_ASSESSMENT });
+    await assignLearningPathFromAssessment(USER, store);
+    await adjustLearningPath(USER, { removeCourseIds: [C_SOCIAL, C_WD_MKT] }, store);
+    await adjustLearningPath(USER, { addCourseIds: [C_SOCIAL] }, store);
+    const rows = actions.filter((a) => a.goalId === learningGoalId(C_SOCIAL));
+    expect(rows).toHaveLength(1);
+    expect(rows[0].status).toBe(LEARNING_PROPOSED_STATUS);
+    expect(await syncLearningPath(USER, store)).toEqual([]);
+  });
+
+  it('an approved path the coach empties still takes later additions live', async () => {
+    const { store, actions } = fakeStore({ assessmentJson: MARKETING_GAP_ASSESSMENT });
+    await assignLearningPathFromAssessment(USER, store);
+    await approveLearningPath(USER, store);
+    await adjustLearningPath(USER, { removeCourseIds: [C_SOCIAL, C_WD_MKT] }, store);
+    expect(actions.filter((a) => a.goalId?.startsWith('course:')).map((a) => a.status)).toEqual([
+      LEARNING_REMOVED_STATUS,
+      LEARNING_REMOVED_STATUS,
+    ]);
+    await adjustLearningPath(USER, { addCourseIds: [C_ADMIN] }, store);
+    expect((await syncLearningPath(USER, store)).map((m) => m.courseId)).toEqual([C_ADMIN]);
+  });
+
+  it('the coach view reads the member rows once, so live and draft items come from one snapshot (CodeRabbit, PR #1018)', async () => {
+    const { store } = fakeStore({ assessmentJson: MARKETING_GAP_ASSESSMENT });
+    await assignLearningPathFromAssessment(USER, store);
+    let reads = 0;
+    const counted = {
+      ...store,
+      async listActions(userId: string) {
+        reads += 1;
+        return store.listActions(userId);
+      },
+    };
+    const path = await coachLearningPath(USER, counted);
+    expect(path.map((p) => [p.courseId, p.draft])).toEqual([
+      [C_SOCIAL, true],
+      [C_WD_MKT, true],
+    ]);
+    expect(reads).toBe(1);
   });
 
   it('a path the coach builds by hand (no assessment draft) is live', async () => {

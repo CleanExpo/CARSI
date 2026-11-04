@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 
 import { ASK_COACH_GOAL_PREFIX, isAskCoachGoalId } from '@/lib/coaching-portal/ask-my-coach';
 import {
+  LEARNING_DRAFT_REMOVED_STATUS,
   LEARNING_GOAL_PREFIX,
   LEARNING_PROPOSED_STATUS,
   LEARNING_REMOVED_STATUS,
@@ -14,7 +15,11 @@ import { isLearningAction, syncLearningPath } from '@/lib/server/carsi-coaching-
  * Rows the member never sees: coach-removed tombstones and draft courses the coach has not yet
  * approved (GP-633). Every member read and write goes through this list.
  */
-const MEMBER_HIDDEN_STATUSES = [LEARNING_REMOVED_STATUS, LEARNING_PROPOSED_STATUS];
+const MEMBER_HIDDEN_STATUSES = [
+  LEARNING_REMOVED_STATUS,
+  LEARNING_PROPOSED_STATUS,
+  LEARNING_DRAFT_REMOVED_STATUS,
+];
 
 const STATUS_MAP: Record<string, CoachingActionStatus> = {
   todo: 'todo',
