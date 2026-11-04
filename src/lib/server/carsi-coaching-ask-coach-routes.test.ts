@@ -36,6 +36,21 @@ vi.mock('@/lib/admin/admin-session', () => ({
   getAdminSessionOrNull: async () => (state.admin ? { sub: 'admin' } : null),
 }));
 
+// GP-631: the coach has no material of their own here, so answers come from CARSI's
+// published coaching text, which is what these GP-630 cases were written against.
+vi.mock('@/lib/server/carsi-coaching-coach-corpus-store', () => ({
+  getCoachCorpusStore: () => ({
+    listItems: async () => [],
+    listApprovedItems: async () => [],
+    countItems: async () => 0,
+    createItem: async () => {
+      throw new Error('not used');
+    },
+    approveItem: async () => null,
+    deleteItem: async () => false,
+  }),
+}));
+
 vi.mock('@/lib/server/carsi-coaching-ask-coach-store', () => {
   const store: AskCoachStore = {
     async coachIdForMember() {
