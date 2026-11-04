@@ -21,6 +21,8 @@ export type CoachKnowledgeItem = {
 
 export type CoachKnowledgeBase = {
   coachId: string;
+  /** Which knowledge source built this base (see coach-knowledge-base.ts). */
+  sourceId?: string;
   items: CoachKnowledgeItem[];
 };
 
@@ -199,30 +201,81 @@ const STOPWORDS = new Set(
 );
 
 function stem(word: string): string {
+  if (word.endsWith('ies') && word.length >= 5) return `${word.slice(0, -3)}y`;
   for (const suffix of ['ing', 'ed', 'es', 's', 'e']) {
-    if (word.endsWith(suffix) && word.length - suffix.length >= 4) {
+    const min = suffix === 's' ? 3 : 4;
+    if (word.endsWith(suffix) && word.length - suffix.length >= min) {
       return word.slice(0, -suffix.length);
     }
   }
   return word;
 }
 
-/** Content words, lower-cased and lightly stemmed so "quoting" matches "quote". */
+/**
+ * Content words, lower-cased and lightly stemmed so "quoting" matches "quote". Every word that
+ * is not a stopword counts, however short: "c e c" or "CPD" must be covered like any other word.
+ */
 export function contentTokens(text: string): Set<string> {
   const out = new Set<string>();
-  for (const raw of text.toLowerCase().split(/[^a-z0-9]+/)) {
-    if (raw.length < 3 || STOPWORDS.has(raw)) continue;
+  for (const raw of normaliseForCompliance(text).split(/[^a-z0-9]+/)) {
+    if (!raw || STOPWORDS.has(raw)) continue;
     out.add(stem(raw));
   }
   return out;
 }
 
-/** Share of the question's content words an item must contain to count as covering it. */
-export const ASK_COACH_MIN_COVERAGE = 0.5;
-/** And never on a single shared word. */
+/**
+ * Everyday business words a question may contain without the cited item containing them. Kept
+ * short on purpose. Nothing credential-related may ever be added (a test enforces it).
+ */
+export const ASK_COACH_EVERYDAY_WORDS: ReadonlySet<string> = new Set([
+  'business',
+  'set',
+  'setup',
+  'use',
+  'using',
+  'start',
+  'starting',
+  'improve',
+  'improving',
+  'help',
+  'make',
+  'making',
+  'work',
+  'working',
+  'run',
+  'running',
+  'manage',
+  'handle',
+  'grow',
+  'growing',
+  'more',
+  'better',
+  'right',
+  'first',
+  'often',
+  'time',
+  'week',
+  'month',
+  'customer',
+  'customers',
+  'client',
+  'clients',
+]);
+
+const EVERYDAY_STEMS = new Set([...ASK_COACH_EVERYDAY_WORDS].map(stem));
+
+/** An item must match at least this many of the question's words from its own text. */
 export const ASK_COACH_MIN_MATCHED = 2;
 const MAX_PASSAGES = 2;
 
+/**
+ * Fail closed. The assistant answers only when ONE item covers EVERY content word of the
+ * question, apart from the short everyday-business list above. Any word the item does not
+ * contain (a credential term, a misspelling, an acronym nobody listed, a topic the coach never
+ * wrote about) sends the question to the coach, so a new phrasing can only cause an escalation,
+ * never an answer. The compliance check runs first as a second, independent layer.
+ */
 export function answerFromKnowledgeBase(
   question: string,
   kb: CoachKnowledgeBase
@@ -239,11 +292,15 @@ export function answerFromKnowledgeBase(
     .map((item) => {
       const itemTokens = contentTokens(`${item.title} ${item.body}`);
       let matched = 0;
-      for (const t of q) if (itemTokens.has(t)) matched += 1;
-      return { item, matched, coverage: matched / q.size };
+      let uncovered = 0;
+      for (const t of q) {
+        if (itemTokens.has(t)) matched += 1;
+        else if (!EVERYDAY_STEMS.has(t)) uncovered += 1;
+      }
+      return { item, matched, uncovered };
     })
-    .filter((s) => s.matched >= ASK_COACH_MIN_MATCHED && s.coverage >= ASK_COACH_MIN_COVERAGE)
-    .sort((a, b) => b.coverage - a.coverage || b.matched - a.matched)
+    .filter((s) => s.uncovered === 0 && s.matched >= ASK_COACH_MIN_MATCHED)
+    .sort((a, b) => b.matched - a.matched)
     .slice(0, MAX_PASSAGES);
 
   if (scored.length === 0) return { status: 'needs_coach', reason: 'no_grounded_source' };

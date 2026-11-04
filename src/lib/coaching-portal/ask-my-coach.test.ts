@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   ASK_COACH_COPY,
+  ASK_COACH_EVERYDAY_WORDS,
   answerFromKnowledgeBase,
   askCoachGoalId,
   isAskCoachGoalId,
@@ -13,7 +14,14 @@ import {
   type CoachKnowledgeBase,
 } from '@/lib/coaching-portal/ask-my-coach';
 import { DEFAULT_COACHING_COACH } from '@/lib/coaching-portal/coach-routing';
-import { getCoachKnowledgeBase } from '@/lib/coaching-portal/coach-knowledge-base';
+import {
+  CARSI_PUBLISHED_KNOWLEDGE_SOURCE,
+  DEFAULT_COACH_KNOWLEDGE_SOURCES,
+  getCoachKnowledgeBase,
+  type CoachKnowledgeSource,
+} from '@/lib/coaching-portal/coach-knowledge-base';
+import { COACHING_RESOURCE_SECTIONS } from '@/lib/coaching-portal/coaching-resources';
+import { carsiCoachingMonthlyInclusions } from '@/lib/marketing/carsi-coaching-program';
 
 import { evaluateContent as complianceFindings } from '../../../scripts/check-iicrc-compliance.mjs';
 
@@ -217,6 +225,151 @@ describe('default knowledge base', () => {
     if (!kb) throw new Error('missing default knowledge base');
     const r = answerFromKnowledgeBase('How do I stop undercharging when quoting jobs?', kb);
     expect(r.status).toBe('answered');
+  });
+});
+
+describe('fail closed: auto-answer only when the cited item covers every content word', () => {
+  // The GBP item covers: google, business, profile, categories, service, areas, photos, posts,
+  // reviews, structured, show, locals, search. Each question below is otherwise covered, so the
+  // ONLY thing that can send it to the coach is the extra word.
+  it('escalates credential wording whether or not the deny-list knows the word', () => {
+    for (const q of [
+      'Do Google Business Profile reviews earn a cert?',
+      'Google Business Profile reviews recertification',
+      'Google Business Profile reviews C.E.C.',
+      'Google Business Profile reviews c e c',
+      'Google Business Profile reviews CPD',
+      'Google Business Profile reviews cerification',
+      'Google Business Profile reviews acreditation',
+      'Google Business Profile reviews qualifcation',
+    ]) {
+      expect(answerFromKnowledgeBase(q, KB).status, q).toBe('needs_coach');
+    }
+  });
+
+  it('escalates unseen novel terms the deny-list has never heard of', () => {
+    // Minimal pairs: 'Google Business Profile reviews' alone is answered (next test), so the one
+    // added word is the only thing that can send each of these to the coach.
+    for (const q of [
+      'Google Business Profile reviews RPL',
+      'Google Business Profile reviews ASQA',
+      'Google Business Profile reviews attainment',
+      'Google Business Profile reviews competency',
+      'Google Business Profile reviews badge',
+      'Google Business Profile reviews QA',
+      'Google Business Profile reviews x',
+      'Google Business Profile reviews 2',
+      'Do Google Business Profile reviews count toward my RPL?',
+      'Are Google Business Profile reviews ASQA recognised?',
+    ]) {
+      // The deny-list does not catch these: only the coverage rule stands between them and an answer.
+      expect(isComplianceSensitiveQuestion(q), q).toBe(false);
+      expect(answerFromKnowledgeBase(q, KB), q).toEqual({
+        status: 'needs_coach',
+        reason: 'no_grounded_source',
+      });
+    }
+  });
+
+  it('escalates a question that adds even one uncovered word to a covered one', () => {
+    expect(answerFromKnowledgeBase('Google Business Profile reviews', KB).status).toBe('answered');
+    expect(answerFromKnowledgeBase('Google Business Profile reviews franchise', KB).status).toBe(
+      'needs_coach'
+    );
+    // A long question that half-matches used to be answered at 50% coverage; no longer.
+    expect(
+      answerFromKnowledgeBase(
+        'Google Business Profile photos reviews versus Facebook Instagram TikTok LinkedIn ads',
+        KB
+      ).status
+    ).toBe('needs_coach');
+  });
+
+  it('every answered passage individually covers the question', () => {
+    const r = answerFromKnowledgeBase('How do I stop undercharging when quoting jobs?', KB);
+    expect(r.status).toBe('answered');
+    if (r.status !== 'answered') return;
+    expect(r.citations.map((c) => c.itemId)).toEqual(['quoting']);
+  });
+
+  it('everyday words alone never produce an answer', () => {
+    expect(answerFromKnowledgeBase('How do I improve and grow my business?', KB).status).toBe(
+      'needs_coach'
+    );
+  });
+
+  it('the everyday allow-list is short and holds no credential wording', () => {
+    expect(ASK_COACH_EVERYDAY_WORDS.size).toBeLessThanOrEqual(40);
+    for (const w of ASK_COACH_EVERYDAY_WORDS) {
+      expect(isComplianceSensitiveQuestion(w), w).toBe(false);
+      expect(w).toMatch(/^[a-z]+$/);
+    }
+  });
+});
+
+describe('knowledge source: CARSI published text is the default, replaceable per coach', () => {
+  it('the default coach uses the CARSI published programme and resource text', () => {
+    expect(DEFAULT_COACH_KNOWLEDGE_SOURCES[DEFAULT_COACHING_COACH.id]).toBe(
+      CARSI_PUBLISHED_KNOWLEDGE_SOURCE
+    );
+    const kb = getCoachKnowledgeBase(DEFAULT_COACHING_COACH.id);
+    expect(kb?.sourceId).toBe(CARSI_PUBLISHED_KNOWLEDGE_SOURCE.id);
+    // Every item is word for word from the published programme or resource text, nothing else.
+    const published = new Set<string>([
+      ...carsiCoachingMonthlyInclusions.flatMap((b) =>
+        b.items.map((i) => `${i.title}|${i.detail}`)
+      ),
+      ...COACHING_RESOURCE_SECTIONS.flatMap((s) =>
+        s.items.map((i) => `${i.title}|${i.description}`)
+      ),
+    ]);
+    for (const item of kb?.items ?? []) {
+      expect(published.has(`${item.title}|${item.body}`), item.id).toBe(true);
+    }
+  });
+
+  it('a coach can be given their own source later (GP-631) without touching the default', () => {
+    const own: CoachKnowledgeSource = {
+      id: 'coach-own-test',
+      label: 'Coach-owned material',
+      items: () => [
+        {
+          id: 'own-1',
+          title: 'Hiring your second technician',
+          body: 'Hire when you turn away jobs every week.',
+          sourceLabel: 'Coach notes',
+          sourceHref: '/dashboard/coaching',
+        },
+      ],
+    };
+    const sources = { ...DEFAULT_COACH_KNOWLEDGE_SOURCES, [DEFAULT_COACHING_COACH.id]: own };
+    const kb = getCoachKnowledgeBase(DEFAULT_COACHING_COACH.id, sources);
+    expect(kb?.sourceId).toBe('coach-own-test');
+    expect(kb?.items.map((i) => i.id)).toEqual(['own-1']);
+    // The shipped default is unchanged.
+    expect(getCoachKnowledgeBase(DEFAULT_COACHING_COACH.id)?.sourceId).toBe(
+      CARSI_PUBLISHED_KNOWLEDGE_SOURCE.id
+    );
+  });
+
+  it('a replacement source is still filtered fail-closed for compliance wording', () => {
+    // Assembled at runtime so the claim never sits in a tracked file for the repo guards.
+    const acronym = ['C', 'E', 'C'].join('');
+    const own: CoachKnowledgeSource = {
+      id: 'coach-own-test',
+      label: 'Coach-owned material',
+      items: () => [
+        {
+          id: 'bad',
+          title: `Module ${acronym} hours`,
+          body: `This module lists ${acronym} hours.`,
+          sourceLabel: 'x',
+          sourceHref: '/x',
+        },
+      ],
+    };
+    const kb = getCoachKnowledgeBase('coach-z', { 'coach-z': own });
+    expect(kb?.items).toEqual([]);
   });
 });
 

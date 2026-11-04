@@ -59,22 +59,49 @@ function buildDefaultCoachItems(): CoachKnowledgeItem[] {
     }))
   );
 
-  return [...programme, ...resources].filter(
-    (item) => !isComplianceSensitiveQuestion(`${item.title} ${item.body}`)
-  );
+  return [...programme, ...resources];
 }
 
-const KNOWLEDGE_BASES: Record<string, () => CoachKnowledgeBase> = {
-  [DEFAULT_COACHING_COACH.id]: () => ({
-    coachId: DEFAULT_COACHING_COACH.id,
-    items: buildDefaultCoachItems(),
-  }),
+/** Where a coach's knowledge base comes from. GP-631 adds coach-owned sources beside this one. */
+export type CoachKnowledgeSource = {
+  id: string;
+  label: string;
+  items: () => CoachKnowledgeItem[];
 };
 
-/** The knowledge base for one coach, or null when that coach has none. */
-export function getCoachKnowledgeBase(coachId: string): CoachKnowledgeBase | null {
-  const build = Object.prototype.hasOwnProperty.call(KNOWLEDGE_BASES, coachId)
-    ? KNOWLEDGE_BASES[coachId]
+/**
+ * The default source (owner decision, 4 Nov 2026): CARSI's own published coaching programme
+ * and portal resource text, quoted word for word.
+ */
+export const CARSI_PUBLISHED_KNOWLEDGE_SOURCE: CoachKnowledgeSource = {
+  id: 'carsi-published-programme-and-resources',
+  label: 'CARSI published coaching programme and resources',
+  items: buildDefaultCoachItems,
+};
+
+/** Coach id to knowledge source. Replace one entry to give that coach their own material. */
+export const DEFAULT_COACH_KNOWLEDGE_SOURCES: Readonly<Record<string, CoachKnowledgeSource>> =
+  Object.freeze({
+    [DEFAULT_COACHING_COACH.id]: CARSI_PUBLISHED_KNOWLEDGE_SOURCE,
+  });
+
+/**
+ * The knowledge base for one coach, or null when that coach has none. Whatever the source,
+ * items touching certification, accreditation or CEC wording are dropped (fail closed).
+ */
+export function getCoachKnowledgeBase(
+  coachId: string,
+  sources: Readonly<Record<string, CoachKnowledgeSource>> = DEFAULT_COACH_KNOWLEDGE_SOURCES
+): CoachKnowledgeBase | null {
+  const source = Object.prototype.hasOwnProperty.call(sources, coachId)
+    ? sources[coachId]
     : undefined;
-  return build ? build() : null;
+  if (!source) return null;
+  return {
+    coachId,
+    sourceId: source.id,
+    items: source
+      .items()
+      .filter((item) => !isComplianceSensitiveQuestion(`${item.title} ${item.body}`)),
+  };
 }
