@@ -115,17 +115,22 @@ export function isGoogleBusinessLink(url: string): boolean {
   try {
     const u = new URL(url);
     const host = u.hostname.toLowerCase();
-    if (host === 'g.page' || host === 'maps.app.goo.gl') return true;
-    if (host === 'goo.gl') return u.pathname.startsWith('/maps');
+    // A link must name one listing: generic roots, dashboards and plain searches do not
+    // (Codex P1, head 4119a2a2). Short links need an ID segment after the host or prefix.
+    const hasId = (prefix: string) =>
+      u.pathname.startsWith(prefix) &&
+      u.pathname.slice(prefix.length).replace(/\/+$/, '').length > 0;
+    if (host === 'g.page') return hasId('/');
+    if (host === 'maps.app.goo.gl') return hasId('/');
+    if (host === 'goo.gl') return hasId('/maps/');
     // Exact Google hosts only: a suffix match accepted google.com.evil.example (Codex P1, bc601506).
     if (GOOGLE_HOSTS.has(host)) {
-      return (
-        /\/maps|\/search|[?&](cid|ludocid)=|business\.google/.test(`${u.pathname}${u.search}`) ||
-        host.startsWith('business.') ||
-        host.startsWith('maps.')
-      );
+      if (/[?&](cid|ludocid)=\d+/.test(u.search)) return true;
+      if (/^\/maps\/place\/[^/]+/.test(u.pathname)) return true;
+      if (host.startsWith('business.')) return /\/l\/\d+/.test(u.pathname);
+      return false;
     }
-    if (host === 'business.site' || host.endsWith('.business.site')) return true;
+    if (host.endsWith('.business.site')) return true;
     return false;
   } catch {
     return false;

@@ -111,6 +111,16 @@ describe('isGoogleBusinessLink (Codex P1, head bc601506)', () => {
     'https://notg.page/r/x',
     'https://business.site.evil.example/',
     'https://www.google.com/',
+    // Generic roots, dashboards and searches name no listing (Codex P1, head 4119a2a2).
+    'https://g.page/',
+    'https://maps.app.goo.gl/',
+    'https://goo.gl/maps/',
+    'https://business.google.com/',
+    'https://business.google.com/dashboard',
+    'https://maps.google.com/',
+    'https://www.google.com/maps',
+    'https://www.google.com/search?q=carpet+cleaner',
+    'https://business.site/',
   ])('rejects %s', (url) => {
     expect(isGoogleBusinessLink(url)).toBe(false);
   });
@@ -173,4 +183,19 @@ describe('page title check (Codex P1, head 0b717beb)', () => {
     expect(review.checks.find((c) => c.id === 'title')?.passed).toBe(true);
     expect(review.fixes.map((f) => f.id)).not.toContain('title-generic');
   });
+});
+
+describe('generic Google pages are not a linked Business Profile (Codex P1, head 4119a2a2)', () => {
+  it.each(['https://g.page/', 'https://maps.app.goo.gl/', 'https://business.google.com/'])(
+    '%s gets the invalid-link fix and does not pass the GBP check',
+    (url) => {
+      const review = reviewWebsite({
+        websiteUrl: null,
+        fetch: null,
+        googleBusinessUrl: url,
+        voice,
+      });
+      expect(review.fixes.map((f) => f.id)).toContain('gbp-link-invalid');
+    }
+  );
 });
