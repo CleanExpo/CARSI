@@ -19,10 +19,47 @@
  * on the course AND adds the course slug to CEC_APPROVED_SLUGS below.
  */
 import { execSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { isEntryPoint } from './lib/is-entry-point.mjs';
+
+/** GP-673 reviews r1 and r2 (Codex, P1). Course descriptions reach learners through the React
+ *  component CourseFormattedBody: stripLegacyPurchaseCta, then sourceToStudentHtml
+ *  (stripAiWritingSigns, Markdown or HTML clean-up, DOMPurify). Each of those steps can delete
+ *  text or markup and so join letters, or space them ("C E C" in a Markdown table). Copying the
+ *  steps one by one lost that race twice, so the record scan now renders each field with the REAL
+ *  component, imported from the app source through tsx (a dev dependency), and reads the result.
+ *  If the render path cannot be loaded, the record scan fails closed (see evaluateRecords). */
+const STUDENT_RENDER_FILES = ['src/components/lms/CourseFormattedBody.tsx', 'src/lib/lms/strip-ai-writing-signs.ts'];
+let STUDENT_TEXT_STRIP = null;
+let STUDENT_RENDER = null;
+let PARSE_FRAGMENT = null;
+let STUDENT_RENDER_ERROR = '';
+try {
+  const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+  const { tsImport } = await import('tsx/esm/api');
+  const opts = { parentURL: import.meta.url, tsconfig: join(root, 'tsconfig.json') };
+  // One at a time: jsdom (under DOMPurify) and parse5 share a module that must not load twice at once.
+  const body = await tsImport(pathToFileURL(join(root, STUDENT_RENDER_FILES[0])).href, opts);
+  const strip = await tsImport(pathToFileURL(join(root, STUDENT_RENDER_FILES[1])).href, opts);
+  const React = await tsImport('react', opts);
+  const server = await tsImport('react-dom/server', opts);
+  const parse5 = await import('parse5');
+  if (typeof body.CourseFormattedBody !== 'function') throw new Error('CourseFormattedBody is not exported');
+  if (typeof strip.stripAiWritingSigns !== 'function') throw new Error('stripAiWritingSigns is not exported');
+  const createElement = React.createElement ?? React.default?.createElement;
+  const renderToStaticMarkup = server.renderToStaticMarkup ?? server.default?.renderToStaticMarkup;
+  if (typeof createElement !== 'function' || typeof renderToStaticMarkup !== 'function') throw new Error('react / react-dom/server did not load');
+  if (typeof parse5.parseFragment !== 'function') throw new Error('parse5.parseFragment is not exported');
+  STUDENT_TEXT_STRIP = strip.stripAiWritingSigns;
+  STUDENT_RENDER = (text) => renderToStaticMarkup(createElement(body.CourseFormattedBody, { text }));
+  PARSE_FRAGMENT = parse5.parseFragment;
+} catch (err) {
+  STUDENT_RENDER_ERROR = err?.message ?? String(err);
+}
+const studentStrip = (value) => (STUDENT_TEXT_STRIP ? STUDENT_TEXT_STRIP(value) : value);
 
 /** Founder-approved IICRC-CEC course slugs — read from the CEC approvals registry
  *  (`data/seed/cec-approvals.json`, the SSOT; validated by `npm run check:cec`).
@@ -312,22 +349,48 @@ export const RECORD_SCANNED_DIRS = ['data/wordpress-export/'];
  *
  *  Scoped to course records only. In generic marketing copy "courses the IICRC has approved for
  *  CECs" is a correct statement about the registry and is handled by the line rules. */
+/** What may stand between the letters of a spaced-out "C E C" and still read as CEC: ANY run of
+ *  characters that are not letters or digits (spaces, dashes of every width, bullets, ellipses,
+ *  quotes, commas, colons, …). GP-673 review r3 (Codex, P1 GP673-R3-DASH): the old list (space and
+ *  . - _ * /) missed the en and em dash the reviewed character set allows. One rule for the whole
+ *  class, not a longer list: a list loses to the next character nobody enumerated. Every view of a
+ *  record (stored, rendered, attribute, decoded) is matched against this same rule. */
+const CEC_LETTER_SEP = '[^\\p{L}\\p{N}]*';
+
 export const CEC_APPROVAL_PROSE = {
-  re: /\bCECs?\b|\bC\.\s*E\.\s*C\b|continuing[\s-]+education|\bapprov\w*\s+by\s+(?:the\s+)?IICRC\b|\bIICRC[\s-]+(?:CEC[\s-]+)?(?:approv|accredit|certif)\w*/i,
+  // GP-673: letters spaced or punctuated apart ("C E C", "C-E-C", "C.E.C.", "C–E–C"), and "CEC"
+  // glued to a word at either end ("CECapproved", "approvedCECs"), read as CEC to a learner too.
+  re: new RegExp(
+    String.raw`\bCECs?\b|\bC${CEC_LETTER_SEP}E${CEC_LETTER_SEP}Cs?\b|\bCECs?(?=[a-z])|(?<=[a-z])CECs?\b|continuing[\s-]*education|\bapprov\w*\s+by\s+(?:the\s+)?IICRC\b|\bIICRC[\s-]*(?:CEC[\s-]*)?(?:approv|accredit|certif)\w*`,
+    'iu'
+  ),
   message:
     'CEC / continuing-education wording in the record of a course that is not approved in data/seed/cec-approvals.json. On an unapproved course any such wording is blocked (claims, headings and denials alike); remove it, or the founder records the IICRC approval (fail-closed, CLAUDE.md).',
 };
 
+/** GP-673: upper-case "CEC" inside a longer word ("IICRCCECapproved"). Case-sensitive on purpose:
+ *  lower-case "cec" inside words is ordinary spelling ("Recece"), upper-case is the acronym. */
+export const CEC_INSIDE_WORD = { re: /CEC/, message: CEC_APPROVAL_PROSE.message };
+
 const ENTITIES = { nbsp: ' ', amp: '&', rsquo: "'", lsquo: "'", ldquo: '"', rdquo: '"', mdash: '-', ndash: '-', quot: '"', apos: "'", lt: '<', gt: '>' };
+
+/** A numeric character reference as a browser decodes it. GP-673: browsers decode "&#67EC" (no
+ *  semicolon) as "CEC", so the semicolon is optional. An out-of-range number becomes U+FFFD, as in
+ *  a browser, instead of crashing the guard. */
+function codePoint(n) {
+  return Number.isInteger(n) && n > 0 && n <= 0x10ffff && !(n >= 0xd800 && n <= 0xdfff) ? String.fromCodePoint(n) : '\uFFFD';
+}
+function decodeNumericRefs(s) {
+  return s
+    .replace(/&#(\d+);?/g, (_, n) => codePoint(Number(n)))
+    .replace(/&#x([0-9a-f]+);?/gi, (_, h) => codePoint(parseInt(h, 16)));
+}
 
 /** Course-record text as a reader sees it: tags become spaces, common entities decode. A claim
  *  split by markup ("<strong>approved for</strong> IICRC …") must still read as one claim. */
 export function recordTextLines(value) {
-  return value
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
-    .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCodePoint(parseInt(h, 16)))
-    .replace(/&([a-z]+);/gi, (m, name) => ENTITIES[name.toLowerCase()] ?? m)
+  return decodeNumericRefs(value.replace(/<[^>]*>/g, ' '))
+    .replace(/&([a-z]+);/gi, (m, name) => (Object.hasOwn(ENTITIES, name.toLowerCase()) ? ENTITIES[name.toLowerCase()] : m))
     .replace(/ /g, ' ')
     // Invisible characters must not split a word or a phrase (soft hyphen, zero-width, BOM).
     .replace(/[­​-‍⁠﻿]/g, '')
@@ -342,8 +405,8 @@ const BLOCK_TAG_RE = /<\/?(?:address|article|aside|blockquote|br|dd|div|dl|dt|fi
 /** The field's text as a browser shows it: block tags separate words, inline tags join with no
  *  space. Review r3 (Codex, P1): "IICRC <span>C</span><span>E</span><span>C</span> approved"
  *  renders as "IICRC CEC approved", but the tag-to-space step above read it as "C E C".
- *  KNOWN LIMIT (stated, not hidden): text a browser draws from CSS (::before content, hidden
- *  elements shown by a stylesheet) or from an image is not text in the record and is not seen. */
+ *  Text a browser draws from CSS or an image is not text in the record and is not seen here; for
+ *  unapproved courses the GP-673 readability gate below fails such constructs closed instead. */
 function renderedRecordText(value) {
   return recordTextLines(value.replace(BLOCK_TAG_RE, ' ').replace(/<[^>]*>/g, '')).join(' ');
 }
@@ -351,7 +414,9 @@ function renderedRecordText(value) {
 /** The same text with markup delimiters turned to spaces instead of whole tags removed, so text
  *  inside attributes that still renders (alt, title, aria-label) is checked too. */
 function rawRecordText(value) {
-  return recordTextLines(value.replace(/[<>"'=/]/g, ' ')).join(' ');
+  // GP-673: percent-escapes too ("gp-%63ec-course" is shown as "gp-cec-course" in the address bar).
+  const unescaped = value.replace(/%([0-9a-f]{2})/gi, (_, h) => String.fromCharCode(parseInt(h, 16)));
+  return recordTextLines(unescaped.replace(/[<>"'=/]/g, ' ')).join(' ');
 }
 
 /** Every string inside a record, with a dotted field path (meta.pricing, tags.0, …). Positive
@@ -378,6 +443,443 @@ function stringFields(value, path, out, underCec = false) {
   return out;
 }
 
+// ------------------------------------------------------------------------------------------------
+// GP-673 — READABILITY GATE for course records.
+//
+// THREAT MODEL. A deliberate adversary edits data/wordpress-export/ so that a learner SEES CEC
+// wording on a course the IICRC has not approved, while this text scanner reads something harmless.
+// GP-527's four review rounds each found a new disguise (a claim split across lines, reordered
+// wording, tags inside a word, hours stored as a string or in the slug); the P1 counts did not
+// converge, so another regex patch is the wrong control. Known disguises of that kind: text drawn by
+// CSS (::before content, web fonts), text reordered by CSS or bidi controls, decoy letters hidden by
+// CSS or markup inside a word, text inside images or SVG, look-alike characters, encodings the
+// scanner did not decode, record fields the scanner does not know, and text the student page
+// itself changes before display (review r1: stripAiWritingSigns deletes markers and stock phrases;
+// tag-free fields render as Markdown; review r2: the page deletes the legacy purchase block and
+// <style> blocks, and renders Markdown tables). Each field is read as stored, after the site's own
+// stripAiWritingSigns, AND as the real student component CourseFormattedBody renders it (imported,
+// not copied; see studentView): its visible text, and every attribute it renders (link targets,
+// titles, image alt, src and srcset). Markdown link/image/code/escape syntax in visible text is a
+// finding too.
+//
+// CONTROL. The export is frozen (WordPress, April 2026). For a course NOT approved in
+// data/seed/cec-approvals.json, every field must use only the markup, CSS declarations, characters
+// and record shape already reviewed in that export (the lists below), and what the student page
+// renders from it must use only the reviewed output markup (OUTPUT_TAGS, the same attribute and CSS
+// lists, and the reviewed image by its rendered form). Anything else is a finding:
+// "the checker cannot read this the way a browser shows it". The lists are exact values, never
+// patterns, and are never derived from the export at run time, so an edit cannot approve itself.
+// A new construct ships only by a human adding it here, in a reviewed change.
+//
+// RESIDUAL (stated, not hidden): wording drawn into the pixels of the ONE reviewed image (its source
+// returned 404 on 04/11/2026, so it shows nothing today); ASCII look-alikes such as "C3C" or "(EC";
+// lower-case "cec" in the middle of a word; text a site stylesheet could add to the reviewed tags
+// (the component's own classes only set fonts, colours, spacing and a drop cap); other screens that
+// show these fields differently (cards show short_description as plain text, which the stored-text
+// views read); and any surface outside data/wordpress-export/ (authored source under app/ and src/
+// is covered by the line rules and code review, not by this gate). The render path is imported, so
+// a change to it is followed; a change that renders new markup fails closed. A layout difference
+// between parse5's text walk and a real browser (for example CSS that makes a block inline) is not
+// modelled; the CSS that could do it is outside the reviewed lists.
+// Approved courses are not held to the gate: they may state CEC wording openly.
+
+/** Record fields and the value types the reviewed export uses. "hours" is a CEC-hours string such
+ *  as "", "0" or "1.5 Hours" (the hours rule above still reads it); "string[]" and "category[]" are
+ *  arrays of those shapes. Any other key, or a known key holding another type, is a finding. */
+const RECORD_SHAPE = {
+  slug: ['string'], title: ['string'], description: ['string'], short_description: ['string'],
+  thumbnail_url: ['string'], status: ['string'], price_aud: ['number'], is_free: ['boolean'],
+  duration_hours: ['number', 'null'], level: ['string', 'null'], category: ['string'],
+  tags: ['string[]'], iicrc_discipline: ['string', 'null'], cec_hours: ['number', 'null', 'hours'],
+  cppp40421_unit_code: ['string', 'null'], cppp40421_unit_name: ['string', 'null'],
+  meta: ['object'], wp_id: ['number'], wp_permalink: ['string'],
+  'meta.wp_id': ['number'], 'meta.wp_categories': ['category[]'], 'meta.wp_tags': ['string[]'],
+  'meta.original_price': ['string', 'number', 'null'], 'meta.sale_price': ['string', 'number', 'null'],
+};
+const isPlainObject = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
+const SHAPE_TEST = {
+  string: (v) => typeof v === 'string',
+  number: (v) => typeof v === 'number' && Number.isFinite(v),
+  boolean: (v) => typeof v === 'boolean',
+  null: (v) => v === null,
+  object: isPlainObject,
+  hours: (v) => typeof v === 'string' && /^\s*(?:\d+(?:\.\d+)?\s*(?:hours?)?)?\s*$/i.test(v),
+  'string[]': (v) => Array.isArray(v) && v.every((x) => typeof x === 'string'),
+  'category[]': (v) =>
+    Array.isArray(v) &&
+    v.every((c) => isPlainObject(c) && Object.keys(c).sort().join() === 'id,name,slug' &&
+      typeof c.id === 'number' && typeof c.name === 'string' && typeof c.slug === 'string'),
+};
+
+/** Fields of a record that are outside the reviewed shape: [field, problem]. */
+export function recordShapeProblems(row) {
+  const out = [];
+  const typeName = (v) => (v === null ? 'null' : Array.isArray(v) ? 'list' : typeof v);
+  const check = (path, v) => {
+    const allowed = Object.hasOwn(RECORD_SHAPE, path) ? RECORD_SHAPE[path] : undefined;
+    if (!allowed) out.push([path, `field "${path}" is not in the reviewed record shape`]);
+    else if (!allowed.some((t) => SHAPE_TEST[t](v))) out.push([path, `field "${path}" holds a ${typeName(v)} value the reviewed record shape does not allow`]);
+  };
+  for (const [k, v] of Object.entries(row)) {
+    check(k, v);
+    if (k === 'meta' && isPlainObject(v)) for (const [mk, mv] of Object.entries(v)) check(`meta.${mk}`, mv);
+  }
+  return out;
+}
+
+/** Elements and attributes the reviewed export uses. <img> is accepted only as an exact reviewed
+ *  tag (REVIEWED_IMAGES); <style> only as an exact reviewed block (REVIEWED_STYLE_BLOCKS). */
+const READABLE_TAGS = new Set(['p', 'a', 'br', 'ul', 'li', 'strong', 'em', 'h1', 'h2', 'h3', 'h4']);
+const READABLE_ATTRS = { p: ['style'], li: ['style'], ul: ['style', 'type'], strong: ['style'], a: ['href', 'role'] };
+const READABLE_ATTR_VALUES = { 'ul.type': ['disc'], 'a.role': ['button'] };
+/** Every inline CSS declaration in the reviewed export, per element, normalised (lower case, no
+ *  spaces around ":"). Anything else (display, order, direction:rtl, content, font-size:0, negative
+ *  margins, other colours, url(), escapes, comments) could hide, reorder or draw text: a finding.
+ *  Per element on purpose: colour, background and the relative (em) sizes are accepted only on <p>,
+ *  a block, which cannot sit inside a word and cannot nest in another <p>, so it can neither hide a
+ *  decoy letter inside a word nor shrink text by compounding. The one inline element, <strong>,
+ *  may only set a fixed 16px. */
+const READABLE_CSS = new Map([
+  ['p', new Set([
+    'margin:0in', 'margin-left:.375in', 'padding:10px 14px', 'font-family:calibri',
+    'font-size:0.85em', 'font-size:0.95em', 'font-size:11.0pt', 'font-size:13.5pt',
+    // One callout box: grey text on a pale yellow background with a border.
+    'color:#555', 'background:#fff8e1', 'border:1px solid #b58900', 'border-radius:6px',
+  ])],
+  ['li', new Set(['margin-top:0', 'margin-bottom:0', 'vertical-align:middle', 'list-style-type:none'])],
+  // Left-to-right only; "embed" with ltr does not reorder left-to-right text.
+  ['ul', new Set(['direction:ltr', 'unicode-bidi:embed', 'margin-top:0in', 'margin-bottom:0in'])],
+  ['strong', new Set(['font-size:16px'])],
+]);
+/** The one <style> block in the export (Elementor heading sizes), compared after comments and stray
+ *  <br /> are removed and whitespace is normalised. It sets only padding, margin, line-height,
+ *  colour:inherit and font sizes 15-59px on heading classes. */
+const REVIEWED_STYLE_BLOCKS = new Set([
+  '.elementor-heading-title{padding:0;margin:0;line-height:1}.elementor-widget-heading .elementor-heading-title[class*=elementor-size-]>a{color:inherit;font-size:inherit;line-height:inherit}.elementor-widget-heading .elementor-heading-title.elementor-size-small{font-size:15px}.elementor-widget-heading .elementor-heading-title.elementor-size-medium{font-size:19px}.elementor-widget-heading .elementor-heading-title.elementor-size-large{font-size:29px}.elementor-widget-heading .elementor-heading-title.elementor-size-xl{font-size:39px}.elementor-widget-heading .elementor-heading-title.elementor-size-xxl{font-size:59px}',
+]);
+/** Images reviewed by a person, per course, compared by SHA-256 of the exact tag text (so a changed
+ *  src, srcset or alt is a new, unreviewed image). Text inside an image cannot be read by this
+ *  checker; each entry says why the image is acceptable. */
+const REVIEWED_IMAGES = [
+  {
+    slug: 'large-loss-mastery-super-course',
+    src: 'https://carsi.com.au/wp-content/uploads/2022/06/Things-to-Do-in-Sydney-3-1024x512.png',
+    sha256: 'b3f9a62392fc11950cf92f61a477a59b8ef982748b9a5eee859b44405063fc21',
+    // The same image as the student page renders it (renderedImageKey), observed 04/11/2026.
+    rendered_sha256: '09fd9251d8ff2704820b4bab838172c7f55404368f472656626a04369738ca2b',
+    reason:
+      'Venue picture for the in-person course (alt "Novotel Accommodation", file "Things-to-Do-in-Sydney-3"). On 04/11/2026 the ' +
+      'GP-673 job fetched this src and the i0.wp.com copy: both returned HTTP 404, so no image pixels reach a learner; a broken ' +
+      'image shows only its alt text, which the record scan reads. Any change to the tag is a new, unreviewed image.',
+  },
+];
+/** Course-card thumbnails (thumbnail_url, which the seed copies to lms_courses.thumbnailUrl) for
+ *  unapproved courses, pinned per course exactly as in the frozen export, under THUMBNAIL_BASE.
+ *  These were pinned, not opened one by one: the pin stops a NEW or swapped image (for example a
+ *  "CEC approved" badge) arriving unseen. Whether an existing thumbnail already shows CEC wording
+ *  is GP-525 content, not something this text checker can decide. "" (no image) is accepted. */
+const THUMBNAIL_BASE = 'https://carsi.com.au/wp-content/uploads/';
+const REVIEWED_THUMBNAILS = new Map([
+  ["adjusters", "2024/08/Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-drying-techniques-3.png"],
+  ["admin-sole-trader", "2021/06/admin.png"],
+  ["advanced-applied", "2024/09/Copy-of-Copy-of-Copy-of-INTRO-SERIES-MEMBERSHIP-17-1.png"],
+  ["advancedstructural", "2024/04/Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-drying-techniques-1.png"],
+  ["affiliate-membership", "2021/04/HISTORY-2021-04-06T153308.009.png"],
+  ["agi-smallbusiness", "2024/05/Copy-of-Copy-of-Copy-of-Copy-of-drying-techniques.png"],
+  ["air-quality-and-odour", "2025/07/air-quality-and-odour.png"],
+  ["antiques", "2024/11/ANTIQUES-COURSE.png"],
+  ["applied-microbial", "2024/04/Copy-of-Copy-of-drying-techniques-1.png"],
+  ["asbestos", "2024/08/Copy-of-Copy-of-INTRO-SERIES-MEMBERSHIP.png"],
+  ["asthmaallergy", "2021/02/ASTHMA-AND-ALLERGY.png"],
+  ["biologicalcontaminants", "2024/04/Copy-of-Copy-of-Copy-of-drying-techniques-2.png"],
+  ["carpet-cleaning", "2023/12/basic-carpet-cleaning.png"],
+  ["carpet-cleaning-basics", "2021/02/CARPET-CLEANING-2.png"],
+  ["carsi-chatgpt-ebook", "2023/05/GPT-BOOK.png"],
+  ["chat-gpt", "2023/09/chat-gpt.png"],
+  ["collaborative-development-your-personal-ai-assistant", "2024/10/Copy-of-Add-a-heading.png"],
+  ["complex-water-losses", "2024/06/Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-drying-techniques-1.png"],
+  ["controlled-drying", "2024/05/Copy-of-Copy-of-Copy-of-Copy-of-drying-techniques-3.png"],
+  ["dehumidifiers", "2024/07/Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-drying-techniques-6.png"],
+  ["difficult-materials", "2024/06/Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-drying-techniques-1-1.png"],
+  ["donning-and-doffing-ppe", "2021/03/DONNING-AND-DOFFING-1-1.png"],
+  ["drying-healthcare", "2024/09/Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-INTRO-SERIES-MEMBERSHIP.png"],
+  ["drying-techniques", "2023/12/drying-techniques-2.png"],
+  ["drying-transportation", "2024/11/Copy-of-Copy-of-Copy-of-Copy-of-Live-AI-course-graphic-idea-3.png"],
+  ["dryingprotocol", "2024/06/Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-drying-techniques-2.png"],
+  ["duct-cleaning", "2023/12/DUCT-CLEANING.png"],
+  ["dust-particulates-in-indoor-air", "2025/07/DUST-AND-PARTICULATES.png"],
+  ["educational", "2024/10/EDUCATIONAL-SITES-COURSE-1.png"],
+  ["exterior-envelope-drying", "2024/06/Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-drying-techniques.png"],
+  ["forensic", "2024/04/Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-drying-techniques.png"],
+  ["foundation-membership", "2021/03/HISTORY-48.png"],
+  ["free-library", "2021/03/Copy-of-EDUCATIONAL-SITES-COURSE.png"],
+  ["fundamental-business-framework", "2022/04/FBF.png"],
+  ["glass-cleaning-course", "2022/05/GLASS-CLEANING.png"],
+  ["heat-drying", "2024/07/Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-drying-techniques-2.png"],
+  ["hospitality", "2024/10/HOSPITALITY-SITES-COURSE.png"],
+  ["hvac-systems-and-indoor-air-quality", "2025/07/HVAC-SYSTEMS-INDOOR-AIR-QUALITY.png"],
+  ["hvacsystems", "2024/04/Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-drying-techniques.png"],
+  ["industrial-2", "2024/10/INDUSTRIAL-SITE-COURSE-2.png"],
+  ["infection-control-in-child-care", "2021/02/CHILD-CARE.png"],
+  ["infectious-control-for-the-business-owner", "2021/02/BUSINESS-OWNER.png"],
+  ["infrared", "2024/09/Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-INTRO-SERIES-MEMBERSHIP-1.png"],
+  ["initial-inspection-report-course", "2021/10/INSPECTION.png"],
+  ["introduction-to-creating-a-clean-air-environment", "2025/05/CLEAN-AIR-ENVIRONMENT-COVER-1.png"],
+  ["introduction-to-iaq-and-mould-understanding-airborne-spread", "2025/05/AIRBORNE-SPREAD-COVER-2.png"],
+  ["introduction-to-improving-indoor-air-quality-after-waterdamage", "2025/05/inproving-indoor-air-quality-after-water-damage-2.png"],
+  ["introduction-to-monitoring-air-quality-job-site", "2025/04/AIR-QUALITY-JOB-SITE-COVER-2.png"],
+  ["introduction-to-water-damage-restoration-course", "2023/12/water-damage-restoration-1.png"],
+  ["job-safety-and-environmental-analysis-jsea-course", "2022/03/JOB-SAFETY.png"],
+  ["large-loss-mastery-course-split-payment", "2022/07/Facebook-LLM-post.png"],
+  ["large-loss-mastery-super-course", "2022/07/Facebook-LLM-post.png"],
+  ["largelossdrying", "2024/06/Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-drying-techniques-2-1.png"],
+  ["laser-measure", "2023/11/LASER-DISTANCE-MEASURER-ASSISTANCE.png"],
+  ["level-1-mould-remediation", "2021/08/LEVEL-1-MOULD.png"],
+  ["level-2-mould-remediation", "2021/05/LEVEL-2-MOUD.png"],
+  ["level-3-mould-remediation", "2021/05/LEVEL-3-MOULD.png"],
+  ["litigation-support", "2024/09/Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-INTRO-SERIES-MEMBERSHIP.png"],
+  ["marketing-course", "2021/10/MARKETING.png"],
+  ["membership", "2021/03/growth.png"],
+  ["microbe-clean-basic-understanding-course", "2021/02/MICROBE.png"],
+  ["moisture-mapping", "2024/04/Copy-of-Copy-of-Copy-of-drying-techniques.png"],
+  ["moisture-meter-course", "2021/03/MOSITURE-METER.png"],
+  ["mould-identification", "2023/12/mould-identification.png"],
+  ["neosan-labs-product-training-course", "2021/02/NEOSAN.png"],
+  ["odour-control", "2023/12/odour-1.png"],
+  ["porous-drying", "2023/12/porous-1.png"],
+  ["psychrometry-drying", "2023/12/PSYCHROMETRY-1-1.png"],
+  ["risk-assessment-course", "2021/09/RISK-ASSESSMENT.png"],
+  ["safe-work-method-statements-swms-course", "2022/03/SAFE-WORK.png"],
+  ["safety-data-sheet-sds-course", "2021/05/SAFETY-DATA.png"],
+  ["safety-procedures", "2023/12/water-damage.png"],
+  ["science", "2024/04/Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-drying-techniques.png"],
+  ["smokeandsoot", "2024/04/Copy-of-drying-techniques.png"],
+  ["social-media-marketing", "2024/02/social-media-marketing-1.png"],
+  ["standard-operating-procedures-sop-course", "2022/03/STANDARD-OPERATING.png"],
+  ["structural-drying", "2023/12/structural-drying-1.png"],
+  ["structural-drying-2", "2023/12/applied-structural-drying-1.png"],
+  ["submerged-items-recovery", "2024/11/SUBMERGED-ITEMS-COURSE.png"],
+  ["technician-flow-chart", "2023/06/Screenshot-2023-06-19-112619.png"],
+  ["timber-drying", "2024/07/Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-drying-techniques-3.png"],
+  ["timber-floor", "2024/07/Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-drying-techniques-1.png"],
+  ["ultraviolet", "2024/09/Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-INTRO-SERIES-MEMBERSHIP.png"],
+  ["upholstery", "2024/04/Copy-of-Copy-of-drying-techniques.png"],
+  ["using-air-scrubbers-and-afds", "2025/07/JOB-SITE-AIR-QUALITY.png"],
+  ["using-atp-to-create-protocols", "2021/02/ATP.png"],
+  ["using-ppe", "2023/12/ppe.png"],
+  ["water-damage", "2024/07/Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-Copy-of-drying-techniques-5-1.png"],
+  ["water-damage-commercial", "2023/12/water-damage-commercial-1.png"],
+  ["water-damage-estimating", "2023/12/water-damage-estimating-1.png"],
+  ["water-damage-marketing", "2024/05/Copy-of-Copy-of-Copy-of-Copy-of-drying-techniques-2-1.png"],
+  ["water-extraction", "2023/12/water-extraction-1-1.png"],
+  ["water-losses", "2024/04/Copy-of-Copy-of-Copy-of-drying-techniques-1.png"],
+]);
+/** Characters the reviewed export uses: printable ASCII, tab and line breaks, no-break space, §,
+ *  dashes, curly quotes, bullet and ellipsis. Everything else (Cyrillic or Greek look-alikes,
+ *  fullwidth or mathematical letters, accents, combining marks, zero-width and bidi controls) is a
+ *  finding, checked after entities are decoded. */
+const UNREADABLE_CHAR_RE = /[^\t\n\r\x20-\x7E\u00A0\u00A7\u2013\u2014\u2018\u2019\u201C\u201D\u2022\u2026]/u;
+
+/** HTML's legacy entity names, which browsers decode in text even without ";" (WHATWG named
+ *  character references that have a no-semicolon form). Case-sensitive, matched as a prefix. */
+const LEGACY_ENTITY_START = new RegExp(
+  '^(?:' +
+    ('AElig AMP Aacute Acirc Agrave Aring Atilde Auml COPY Ccedil ETH Eacute Ecirc Egrave Euml GT Iacute Icirc Igrave Iuml LT ' +
+      'Ntilde Oacute Ocirc Ograve Oslash Otilde Ouml QUOT REG THORN Uacute Ucirc Ugrave Uuml Yacute aacute acirc acute aelig ' +
+      'agrave amp aring atilde auml brvbar ccedil cedil cent copy curren deg divide eacute ecirc egrave eth euml frac12 frac14 ' +
+      'frac34 gt iacute icirc iexcl igrave iquest iuml laquo lt macr micro middot nbsp not ntilde oacute ocirc ograve ordf ordm ' +
+      'oslash otilde ouml para plusmn pound quot raquo reg sect shy sup1 sup2 sup3 szlig thorn times uacute ucirc ugrave uml ' +
+      'uuml yacute yen yuml').split(' ').join('|') +
+    ')'
+);
+
+export const UNREADABLE_MESSAGE =
+  'GP-673: the checker cannot read this the way a browser shows it. For a course not approved in data/seed/cec-approvals.json, ' +
+  'only the markup, CSS, characters and record fields already reviewed in the frozen export are accepted, because anything else ' +
+  'could show a learner CEC wording this checker never sees. Remove it, or add it to the reviewed lists in scripts/check-iicrc-compliance.mjs in a reviewed change.';
+
+const normaliseCss = (s) => s.replace(/\s+/g, ' ').replace(/\s*([{}:;,>])\s*/g, '$1').trim().toLowerCase();
+const normaliseStyleBlock = (s) => normaliseCss(s.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/<br\s*\/?>/gi, ' '));
+const decodeAttr = (s) => decodeNumericRefs(s).replace(/&([a-z]+);?/gi, (m, n) => (Object.hasOwn(ENTITIES, n.toLowerCase()) ? ENTITIES[n.toLowerCase()] : m));
+const sha256 = (s) => createHash('sha256').update(s, 'utf8').digest('hex');
+
+const TAG_AT = /<(\/?)([a-zA-Z][a-zA-Z0-9]*)((?:\s+[^\s"'>/=]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s"'>]+))?)*)\s*(\/?)>/y;
+const ATTR_RE = /([^\s"'>/=]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'>]+)))?/g;
+
+/** Problems that make one string field unreadable to the scanner (deduplicated, in order). */
+export function readabilityProblems(value, slug, { compareStyleBlocks = true } = {}) {
+  const problems = new Set();
+  // Characters, after numeric references decode (browsers decode "&#1057;" to a Cyrillic letter).
+  const bad = decodeNumericRefs(value).match(UNREADABLE_CHAR_RE);
+  if (bad) problems.add(`character U+${bad[0].codePointAt(0).toString(16).toUpperCase().padStart(4, '0')} is outside the reviewed character set (look-alike, accent, invisible or direction control)`);
+  // Named entities the scanner does not decode would show a learner a different letter: any
+  // "&name;" outside ENTITIES, and "&name" without ";" when it starts with one of the legacy names
+  // a browser decodes even without the semicolon ("&Ccedil" shows "Ç"). A bare "&" in a URL query
+  // ("&utm-source=") is not an entity and shows as typed.
+  for (const m of value.matchAll(/&([a-zA-Z][a-zA-Z0-9]*)(;?)/g)) {
+    const known = m[2] && Object.hasOwn(ENTITIES, m[1].toLowerCase());
+    if (!known && (m[2] || LEGACY_ENTITY_START.test(m[1]))) problems.add(`entity "${m[0]}" is not one the checker decodes`);
+  }
+  // <style> blocks: only an exact reviewed block, with no attributes.
+  const rest = value.replace(/<style\b([^>]*)>([\s\S]*?)<\/style\s*>/gi, (_, attrs, css) => {
+    if (compareStyleBlocks && (attrs.trim() || !REVIEWED_STYLE_BLOCKS.has(normaliseStyleBlock(css)))) problems.add('a <style> block that is not the reviewed one (CSS can draw, hide or reorder text)');
+    return ' ';
+  });
+  for (let i = rest.indexOf('<'); i !== -1; i = rest.indexOf('<', i + 1)) {
+    if (!/[a-zA-Z/!?]/.test(rest[i + 1] ?? '')) continue; // a literal "<" in text
+    TAG_AT.lastIndex = i;
+    const m = TAG_AT.exec(rest);
+    if (!m) {
+      problems.add('markup the checker cannot parse (comment, declaration or malformed tag)');
+      continue;
+    }
+    const [tagText, close, rawName, attrs] = m;
+    const name = rawName.toLowerCase();
+    if (name === 'img' && !close) {
+      const reviewed = REVIEWED_IMAGES.some((r) => r.slug === slug && r.sha256 === sha256(tagText));
+      if (!reviewed) problems.add('an image that has not been reviewed (text inside an image cannot be read)');
+      continue;
+    }
+    if (!READABLE_TAGS.has(name)) {
+      problems.add(`a <${name}> element (not in the reviewed markup)`);
+      continue;
+    }
+    if (close) {
+      if (attrs.trim()) problems.add(`a closing </${name}> tag with attributes`);
+      continue;
+    }
+    for (const a of attrs.matchAll(ATTR_RE)) {
+      const attr = a[1].toLowerCase();
+      const val = decodeAttr(a[2] ?? a[3] ?? a[4] ?? '');
+      if (!(READABLE_ATTRS[name] ?? []).includes(attr)) {
+        problems.add(`a ${attr} attribute on <${name}> (not in the reviewed markup)`);
+      } else if (attr === 'style') {
+        for (const decl of val.split(';').map(normaliseCss).filter(Boolean)) {
+          if (!READABLE_CSS.get(name)?.has(decl)) problems.add(`CSS "${decl.slice(0, 60)}" on <${name}> (not a reviewed declaration for it; CSS can hide, reorder or draw text)`);
+        }
+      } else if (READABLE_ATTR_VALUES[`${name}.${attr}`] && !READABLE_ATTR_VALUES[`${name}.${attr}`].includes(val.trim().toLowerCase())) {
+        problems.add(`${attr}="${val.slice(0, 30)}" on <${name}> (not a reviewed value)`);
+      }
+    }
+  }
+  // GP-673 review r1 (Codex, P1): a field with no HTML tag is rendered as Markdown, where
+  // "[C](#x)EC" shows "CEC", "![alt](url)" becomes an image and "`C`EC" shows "CEC". The reviewed
+  // export's visible text uses none of the characters those constructs need, so any of them in
+  // visible text is a finding, whichever way the page renders the field.
+  const visible = decodeNumericRefs(rest.replace(/<[a-zA-Z/!?][^>]*>?/g, ' '));
+  const syntax = visible.match(MARKDOWN_SYNTAX_RE);
+  if (syntax) problems.add(`"${syntax[0]}" in visible text (Markdown link, image, code or escape syntax the page would render)`);
+  return [...problems];
+}
+const MARKDOWN_SYNTAX_RE = /[[\]`\\]/;
+
+/** Elements a browser lays out inline: their text joins the text beside them with no space. Every
+ *  other element is treated as a block, which shows as a break between words. */
+const INLINE_TAGS = new Set(['a', 'abbr', 'b', 'bdi', 'bdo', 'cite', 'code', 'del', 'dfn', 'em', 'i', 'img', 'ins', 'kbd', 'mark', 'q', 's', 'samp', 'small', 'span', 'strong', 'sub', 'sup', 'time', 'u', 'var']);
+/** Elements the real student page renders for the frozen export (observed 04/11/2026 by rendering
+ *  every field of every unapproved course): the reviewed input tags, plus <img> only as a reviewed
+ *  image (REVIEWED_IMAGES.rendered_sha256). Anything else the page would render (a Markdown table,
+ *  quote, code block, list number, or a heading kicker <span>) is unreviewed output: a finding. */
+const OUTPUT_TAGS = new Set([...READABLE_TAGS, 'img']);
+
+/** Percent-escapes decoded as an address bar shows them; a malformed escape is left as typed. */
+function decodePercent(s) {
+  try {
+    return decodeURIComponent(s);
+  } catch {
+    return s.replace(/%([0-9a-f]{2})/gi, (_, h) => String.fromCharCode(parseInt(h, 16)));
+  }
+}
+
+/** One field as the real student page shows it. Renders `value` with CourseFormattedBody, parses
+ *  the HTML with parse5 (the HTML standard's parser, as a browser does) and returns:
+ *    text      the visible text: inline elements join, blocks and <br> separate words, and an
+ *              image's alt text sits where the image is (a broken image or a screen reader shows it);
+ *    attrs     every attribute value on the rendered course markup except style and class, each also
+ *              percent-decoded (link targets, titles, image alt, src and srcset file names);
+ *    problems  rendered markup outside the reviewed output lists (readability gate, unapproved only). */
+function studentView(value) {
+  const problems = new Set();
+  let html;
+  try {
+    html = STUDENT_RENDER(value);
+  } catch (err) {
+    return { text: '', attrs: [], images: [], problems: [`the student page could not render this field (${err?.message ?? err})`] };
+  }
+  if (!html) return { text: '', attrs: [], images: [], problems: [] };
+  const top = PARSE_FRAGMENT(html).childNodes;
+  const wrapper = top.length === 1 && top[0].tagName === 'div' ? top[0] : null;
+  if (!wrapper) problems.add('the student page rendered something other than its one wrapper element');
+  const parts = [];
+  const attrs = [];
+  const images = [];
+  const walk = (node) => {
+    for (const c of node.childNodes ?? []) {
+      if (c.nodeName === '#text') {
+        parts.push(c.value);
+        continue;
+      }
+      if (!c.tagName) continue; // comments are not shown
+      const name = c.tagName;
+      const block = !INLINE_TAGS.has(name);
+      if (block) parts.push(' ');
+      for (const a of c.attrs) {
+        if (a.name !== 'style' && a.name !== 'class') attrs.push(a.value, decodePercent(a.value));
+      }
+      if (name === 'img') {
+        parts.push(c.attrs.find((a) => a.name === 'alt')?.value ?? '');
+        images.push(renderedImageKey(c));
+      }
+      problems.add(outputElementProblem(c));
+      walk(c.content ?? c);
+      if (block) parts.push(' ');
+    }
+  };
+  walk(wrapper ?? { childNodes: top });
+  problems.delete(null);
+  return { text: parts.join(''), attrs: [...new Set(attrs)], images, problems: [...problems] };
+}
+
+/** SHA-256 of a rendered <img>'s attributes (name, value), sorted. A changed src, srcset, alt or
+ *  size is a new, unreviewed image. */
+const renderedImageKey = (el) => sha256(JSON.stringify(el.attrs.map((a) => [a.name, a.value]).sort()));
+
+/** Rendered-output problems of one field for one course: markup outside the reviewed output lists,
+ *  and any rendered image that is not the reviewed one for THIS course. */
+function renderedProblems(view, slug) {
+  const out = [...view.problems];
+  if (view.images.some((key) => !REVIEWED_IMAGES.some((r) => r.slug === slug && r.rendered_sha256 === key))) {
+    out.push('the student page renders an image that has not been reviewed for this course (text inside an image cannot be read)');
+  }
+  return out;
+}
+
+/** A rendered element outside the reviewed output lists, or null. */
+function outputElementProblem(el) {
+  const name = el.tagName;
+  if (!OUTPUT_TAGS.has(name)) return `the student page renders a <${name}> element (not in the reviewed output markup)`;
+  if (name === 'img') return null; // pinned per course by the caller (renderedImageKey)
+  for (const { name: attr, value } of el.attrs) {
+    if (!(READABLE_ATTRS[name] ?? []).includes(attr)) return `the student page renders a ${attr} attribute on <${name}> (not in the reviewed output markup)`;
+    if (attr === 'style') {
+      for (const decl of value.split(';').map(normaliseCss).filter(Boolean)) {
+        if (!READABLE_CSS.get(name)?.has(decl)) return `the student page renders CSS "${decl.slice(0, 60)}" on <${name}> (not a reviewed declaration for it)`;
+      }
+    } else if (READABLE_ATTR_VALUES[`${name}.${attr}`] && !READABLE_ATTR_VALUES[`${name}.${attr}`].includes(value.trim().toLowerCase())) {
+      return `the student page renders ${attr}="${value.slice(0, 30)}" on <${name}> (not a reviewed value)`;
+    }
+  }
+  return null;
+}
+
+/** Every string in a record with its dotted field path (keys are covered by recordShapeProblems). */
+function allStrings(value, path, out) {
+  if (typeof value === 'string') out.push([path, value]);
+  else if (Array.isArray(value)) value.forEach((v, i) => allStrings(v, `${path}.${i}`, out));
+  else if (isPlainObject(value)) for (const [k, v] of Object.entries(value)) allStrings(v, path ? `${path}.${k}` : k, out);
+  return out;
+}
+
 /** Scan one record file. Fail-closed: unparsable JSON, a non-array, or a non-object entry is a
  *  finding (never "no records"); a record without a string slug can never be approved. */
 export function evaluateRecords(file, jsonText, { approvedSlugs, allowlist = ALLOWLIST } = {}) {
@@ -396,16 +898,53 @@ export function evaluateRecords(file, jsonText, { approvedSlugs, allowlist = ALL
     structural('is not an array of course records; the record scan cannot check it');
     return findings;
   }
+  if (!STUDENT_RENDER || !STUDENT_TEXT_STRIP) {
+    structural(`the student page's render path (${STUDENT_RENDER_FILES.join(', ')}, through tsx) could not be loaded (${STUDENT_RENDER_ERROR}); the checker cannot read records the way learners see them, so this is a failure, never a pass. Run npm ci first`);
+  }
+  // One render per distinct field value per scan (the readability gate and the wording rules share it).
+  const viewCache = new Map();
+  const viewOf = (value) => {
+    if (!viewCache.has(value)) viewCache.set(value, studentView(value));
+    return viewCache.get(value);
+  };
+  const seenSlugs = new Set();
   rows.forEach((row, i) => {
     if (!row || typeof row !== 'object' || Array.isArray(row)) {
       structural(`entry ${i} is not a course record object`);
       return;
     }
     const slug = typeof row.slug === 'string' && row.slug.trim() ? row.slug.trim() : `<record ${i} has no slug>`;
-    const isApproved = approved.has(slug);
-    const rules = [...BANNED, CEC_NUMBER, CEC_APPROVAL_PROSE].filter(
-      (rule) => !(isApproved && (rule === CEC_NUMBER || rule === CEC_APPROVAL_PROSE))
+    // GP-673: approval needs the slug EXACTLY (" approved-slug " is a different URL), and one slug
+    // may appear once (a second record must not borrow the first one's approval).
+    if (seenSlugs.has(slug)) structural(`slug "${slug}" appears in more than one record; one course, one record`);
+    seenSlugs.add(slug);
+    const isApproved = approved.has(slug) && row.slug === slug;
+    const rules = [...BANNED, CEC_NUMBER, CEC_APPROVAL_PROSE, CEC_INSIDE_WORD].filter(
+      (rule) => !(isApproved && (rule === CEC_NUMBER || rule === CEC_APPROVAL_PROSE || rule === CEC_INSIDE_WORD))
     );
+    // GP-673: an unapproved course must be fully readable (shape, markup, CSS, characters).
+    if (!isApproved) {
+      const unreadable = (field, text) => findings.push({ file, slug, field, line: 0, text, message: UNREADABLE_MESSAGE });
+      for (const [field, problem] of recordShapeProblems(row)) unreadable(field, problem);
+      const thumb = row.thumbnail_url;
+      const pinned = REVIEWED_THUMBNAILS.get(slug);
+      if (typeof thumb === 'string' && thumb !== '' && (pinned === undefined || thumb !== THUMBNAIL_BASE + pinned)) {
+        unreadable('thumbnail_url', 'a course-card thumbnail that is not the pinned one for this course (text inside an image cannot be read)');
+      }
+      for (const [field, value] of allStrings(row, '', [])) {
+        // The text as stored, and as the student page shows it after its stripper has run.
+        const shown = studentStrip(value);
+        // The student page deletes <style> blocks (sanitizeCourseHtml forbids them), so the stripped
+        // view drops them unchecked; the stored view above still compares them exactly.
+        // GP-673 review r2: and what the real student page renders must use only reviewed markup.
+        const problems = new Set([
+          ...readabilityProblems(value, slug),
+          ...(shown !== value ? readabilityProblems(shown, slug, { compareStyleBlocks: false }) : []),
+          ...(STUDENT_RENDER ? renderedProblems(viewOf(value), slug) : []),
+        ]);
+        for (const problem of problems) unreadable(field, problem);
+      }
+    }
     const flags = (rule, text) =>
       rule.re.test(text) && (rule.allowlisted ? !allowlist.has(text) : !(rule.allow && rule.allow.test(text)));
     for (const [field, value] of stringFields(row, '', [])) {
@@ -440,6 +979,37 @@ export function evaluateRecords(file, jsonText, { approvedSlugs, allowlist = ALL
       for (const rule of rules) {
         if (hitRules.has(rule) || !flags(rule, raw)) continue;
         findings.push({ file, slug, field, line: 0, text: raw, message: `${rule.message} (inside markup)` });
+      }
+      // GP-673 review r1 (Codex, P1): the student page first runs the site's own
+      // stripAiWritingSigns, which deletes citation markers and stock phrases and so can join
+      // letters ("C<strong>In conclusion, </strong>EC" shows "CEC"). Read the field that way too.
+      const shown = studentStrip(value);
+      if (shown !== value) {
+        for (const view of [recordTextLines(shown).join(' '), renderedRecordText(shown), rawRecordText(shown)]) {
+          for (const rule of rules) {
+            if (hitRules.has(rule) || !flags(rule, view)) continue;
+            hitRules.add(rule);
+            findings.push({ file, slug, field, line: 0, text: view, message: `${rule.message} (as shown after the page removes AI-writing markers)` });
+          }
+        }
+      }
+      // GP-673 review r2 (Codex, P1 x3): the field as the REAL student page renders it (purchase
+      // block and <style> removed, Markdown tables and links rendered), then every attribute the
+      // rendered page carries (link targets, titles, image alt / src / file names).
+      if (STUDENT_RENDER) {
+        const view = viewOf(value);
+        const views = [
+          [view.text, 'as the student page renders it'],
+          ...view.attrs.map((a) => [a, 'in a link or image attribute on the student page']),
+        ];
+        for (const [raw, where] of views) {
+          const text = recordTextLines(raw).join(' ');
+          for (const rule of rules) {
+            if (hitRules.has(rule) || !flags(rule, text)) continue;
+            hitRules.add(rule);
+            findings.push({ file, slug, field, line: 0, text, message: `${rule.message} (${where})` });
+          }
+        }
       }
     }
   });
@@ -505,6 +1075,9 @@ function formatRecordFinding(f) {
 function inRecordScope(f) { const n = f.replace(/\\/g, '/'); return n.endsWith('.json') && RECORD_SCANNED_DIRS.some((d) => n.startsWith(d)); }
 
 export { BANNED, CEC_NUMBER, CEC_APPROVED_SLUGS, inScope, isExempt, normaliseLine, ALLOWLIST, IICRC_FREE_FILES };
+// The rendered-output layer on its own, so the self-test can prove each part works even where the
+// input gate would already block the same record.
+export { studentView, renderedProblems };
 
 function main() {
   let list = '';
