@@ -41,6 +41,22 @@ describe('pgSuiteTarget: the real-Postgres suites only ever run against a throwa
     }
   });
 
+  it('refuses a loopback URL whose query string redirects the connection elsewhere', () => {
+    for (const url of [
+      `${LOCAL}?host=db.example.com`,
+      `${LOCAL}?sslmode=disable&hostaddr=203.0.113.7`,
+      `${LOCAL}?HOST=db.example.com`,
+      `${LOCAL}?options=-c%20search_path%3Dx&host=/var/run/postgresql`,
+    ]) {
+      const target = pgSuiteTarget({ DATABASE_URL: url, CARSI_PG_DISPOSABLE: '1' });
+      expect(target.runnable).toBe(false);
+      expect(target.refusal).toMatch(/query string/);
+    }
+    expect(
+      pgSuiteTarget({ DATABASE_URL: `${LOCAL}?schema=public`, CARSI_PG_DISPOSABLE: '1' })
+    ).toEqual({ runnable: true, refusal: null });
+  });
+
   it('refuses a DATABASE_URL it cannot parse, or one with no host', () => {
     for (const url of ['not a url', 'postgresql:///carsi?host=/tmp']) {
       const target = pgSuiteTarget({ DATABASE_URL: url, CARSI_PG_DISPOSABLE: '1' });

@@ -30,12 +30,24 @@ export function pgSuiteTarget(env: PgEnv): PgSuiteTarget {
         }
       : { runnable: false, refusal: null };
   }
-  let host: string;
+  let parsed: URL;
   try {
-    host = new URL(url).hostname.toLowerCase();
+    parsed = new URL(url);
   } catch {
     return { runnable: false, refusal: `${REFUSING}: DATABASE_URL is not a valid URL.` };
   }
+  // Postgres clients honour host/hostaddr in the query string over the authority, so a loopback
+  // authority proves nothing while either is present.
+  const redirect = [...parsed.searchParams.keys()].some((k) =>
+    ['host', 'hostaddr'].includes(k.toLowerCase())
+  );
+  if (redirect) {
+    return {
+      runnable: false,
+      refusal: `${REFUSING}: DATABASE_URL sets host or hostaddr in its query string, which overrides the loopback host.`,
+    };
+  }
+  const host = parsed.hostname.toLowerCase();
   if (!LOOPBACK_HOSTS.has(host)) {
     return {
       runnable: false,
