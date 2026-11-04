@@ -17,7 +17,8 @@
  *   manifest-missing          no media.manifest.json at all
  *   manifest-invalid          manifest not {version:1, entries:[...]}, or an entry with a bad src, kind
  *                             (image|video|render), source (client|stock|generated|blender), non-string
- *                             credit/alt, duplicate src, or a video without a poster
+ *                             credit/alt, duplicate src, or a video without a poster. Listed as a finding
+ *                             AND a configuration error: exit 2 in every mode, report mode included (GP-688)
  *   manifest-missing-file     manifest entry (or poster) whose file is not in any public dir
  *   hero-missing-media        marketing page without a rendered <PremiumHero media|video={...}> (or data-pv-hero + media element)
  *   no-motion                 marketing page with no rendered <MotionSection> / data-pv-motion
@@ -31,7 +32,8 @@
  * The allowlist exempts files from the code-drawn-art rules only (inline-svg-art, svg-asset,
  * css-art, canvas-drawing). It never exempts budgets, provenance, placeholders or page rules.
  *
- * Exit: 0 = no findings, or report-only; 1 = findings in enforce mode; 2 = configuration error.
+ * Exit: 0 = no findings, or report-only; 1 = findings in enforce mode; 2 = configuration error in any
+ * mode: the config file is missing or invalid (no silent defaults), or the manifest is invalid (GP-688).
  * Usage: check-visuals [--root .] [--report-only] [--json] [--limit N] [--config config/visuals.config.json] [--list-extensions]
  */
 import fs from 'node:fs';
@@ -58,13 +60,13 @@ function main() {
     return;
   }
   const root = path.resolve(opt('--root', '.'));
-  const cfgPath = path.join(root, opt('--config', 'visuals.config.json'));
+  const cfgPath = path.join(root, opt('--config', 'config/visuals.config.json'));
 
   const DEFAULTS = {
     mode: 'enforce',
     srcDirs: ['app', 'src', 'components', 'pages', 'apps/web'],
     publicDirs: ['public', 'apps/web/public'],
-    manifest: 'media.manifest.json',
+    manifest: 'config/media.manifest.json',
     ignore: ['node_modules', '.next', 'dist', 'build', 'out', 'coverage', '.git', '.turbo', 'storybook-static', '__tests__', 'tests', 'e2e', '.vercel'],
     allowlist: [],
     marketingPages: ['**/app/**/page.{tsx,jsx,ts,js,mdx}', '**/pages/**/*.{tsx,jsx,mdx}'],
@@ -72,13 +74,13 @@ function main() {
     minMarketingPages: 1,
     budgets: { imageMaxKB: 450, videoMaxKB: 6000, legacyRasterMaxKB: 80 },
   };
-  let cfg = { ...DEFAULTS };
-  if (fs.existsSync(cfgPath)) {
-    let u;
-    try { u = JSON.parse(fs.readFileSync(cfgPath, 'utf8')); } catch (e) { return configError(`${cfgPath} is not valid JSON (${e.message})`); }
-    if (!u || typeof u !== 'object' || Array.isArray(u)) return configError(`${cfgPath} must be a JSON object`);
-    cfg = { ...DEFAULTS, ...u, budgets: { ...DEFAULTS.budgets, ...(u.budgets || {}) } };
-  }
+  // A missing config is a configuration error, never a silent fall-back to the defaults (GP-688).
+  // DEFAULTS only fill keys a present config leaves out.
+  if (!fs.existsSync(cfgPath)) return configError(`${cfgPath} not found; create it (see config/README.md) or pass --config <path>`);
+  let u;
+  try { u = JSON.parse(fs.readFileSync(cfgPath, 'utf8')); } catch (e) { return configError(`${cfgPath} is not valid JSON (${e.message})`); }
+  if (!u || typeof u !== 'object' || Array.isArray(u)) return configError(`${cfgPath} must be a JSON object`);
+  const cfg = { ...DEFAULTS, ...u, budgets: { ...DEFAULTS.budgets, ...(u.budgets || {}) } };
   if (!['report', 'enforce'].includes(cfg.mode)) return configError(`mode must be "report" or "enforce", got ${JSON.stringify(cfg.mode)}`);
   for (const k of ['srcDirs', 'publicDirs', 'ignore', 'allowlist', 'marketingPages', 'nonMarketing']) {
     if (!Array.isArray(cfg[k]) || !cfg[k].every((s) => typeof s === 'string')) return configError(`${k} must be an array of strings`);
@@ -268,6 +270,13 @@ function main() {
   if (process.env.GITHUB_STEP_SUMMARY) {
     const rows = Object.entries(byRule).map(([k, n]) => `| ${k} | ${n} |`).join('\n');
     fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `### check-visuals (${mode}): ${violations.length} findings, ${marketing.length} marketing pages\n\n**${notice}**\n\n| rule | count |\n|---|---|\n${rows}\n`);
+  }
+  // An invalid manifest is a configuration error in every mode (GP-688). The report above is still
+  // printed in full so the manifest-invalid details are visible; only the exit status changes.
+  const manifestInvalid = byRule['manifest-invalid'] || 0;
+  if (manifestInvalid) {
+    configError(`${cfg.manifest} is invalid (${manifestInvalid} manifest-invalid finding(s)); fix it before the scan can be trusted`);
+    return;
   }
   // Set exitCode and let Node exit naturally: a forced exit drops stdout still buffered in a pipe (GP-667).
   process.exitCode = violations.length && !reportOnly ? 1 : 0;

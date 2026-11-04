@@ -17,6 +17,7 @@ import {
   Send,
   Users,
   MessageCircleQuestion,
+  Library,
   LineChart,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -87,6 +88,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const learningPathsActive = pathname.startsWith('/admin/coaching-learning-paths');
   const monthlyReviewActive = pathname.startsWith('/admin/coaching-monthly-review');
   const coachQuestionsActive = pathname.startsWith('/admin/coaching-questions');
+  const coachKnowledgeActive = pathname.startsWith('/admin/coaching-knowledge');
   const accountabilityActive = pathname.startsWith('/admin/coaching-accountability');
   const analyticsActive = pathname.startsWith('/admin/analytics');
   const yearlyMembershipActive = pathname.startsWith('/admin/yearly-membership');
@@ -197,6 +199,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             label="Coach questions"
             icon={MessageCircleQuestion}
             active={coachQuestionsActive}
+          />
+          <NavButton
+            href="/admin/coaching-knowledge"
+            label="Coach knowledge base"
+            icon={Library}
+            active={coachKnowledgeActive}
           />
           <NavButton
             href="/admin/coaching-accountability"
