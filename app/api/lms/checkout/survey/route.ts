@@ -58,8 +58,8 @@ export async function POST(request: NextRequest) {
   let paymentIntentId: string | null = null;
   try {
     const session = await stripe.checkout.sessions.retrieve(sessionId);
-    // A key must match the binding stored on this session: another tab's session, or one
-    // older than 24 hours, is refused before its payment state is revealed.
+    // A key must match the binding stored on this session: another browser's session (or an
+    // independent tab's), or one older than 24 hours, is refused before its payment state is revealed.
     if (!sessionAuthorisedForSurvey(session, surveyKeys)) {
       return NextResponse.json({ detail: 'Not allowed' }, { status: 403 });
     }

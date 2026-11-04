@@ -643,6 +643,17 @@ describe('overlapping checkout starts keep every survey answerable (GP-662)', ()
     expect(await surveyStatus(opener, 'cs_test_child_after')).toBe(403);
   });
 
+  it('the boundary is the browser: a tab copied after a checkout holds that checkout\'s key, as every tab shared the old cookie', async () => {
+    const opener = newTab();
+    nextSession('cs_test_copied_after');
+    await POST(checkoutFrom(opener, COURSE_SLUG));
+    const child = copiedTab(opener);
+    expect(await surveyStatus(opener, 'cs_test_copied_after')).toBe(200);
+    // Same browser, same person: documented, not a leak. Someone with only the URL is still refused.
+    expect(await surveyStatus(child, 'cs_test_copied_after')).toBe(200);
+    expect(await surveyStatus(newTab(), 'cs_test_copied_after')).toBe(403);
+  });
+
   it('junk cookies on the request change nothing: no Set-Cookie and the binding still works', async () => {
     const tab = newTab();
     const key = freshKey();

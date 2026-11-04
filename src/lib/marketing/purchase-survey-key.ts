@@ -8,11 +8,16 @@
  * is the tab that started the checkout.
  *
  * sessionStorage, not a cookie: a tab's script reads and writes it one step at a time and each
- * tab has its own, so overlapping checkouts can never replace each other's key. A tab opened
- * from another starts with a copy of the opener's sessionStorage; because each checkout makes
- * a new key, keys made after the copy are known only to the tab that made them. The server
+ * tab has its own, so overlapping checkouts can never replace each other's key. The server
  * never writes it. When storage is unavailable (private modes, blocked storage) there is no
  * key; checkout works as before and the optional survey is refused.
+ *
+ * Security boundary: the browser, as with the HttpOnly cookie this replaces ("this browser, and
+ * only this one"). The capability keeps a person who only has the success URL (shared, logged,
+ * leaked) from writing answers onto someone else's payment. It does not try to separate tabs of
+ * one browser: a tab opened from another starts with a copy of the opener's sessionStorage, so
+ * it holds the keys made before the copy, exactly as every tab shared the old cookie. Keys made
+ * after the copy are known only to the tab that made them, because each checkout makes a new key.
  */
 export const PURCHASE_SURVEY_KEY_STORAGE_NAME = 'carsi_svk';
 /** At most this many recent checkout keys are kept per tab; the server accepts the same count. */

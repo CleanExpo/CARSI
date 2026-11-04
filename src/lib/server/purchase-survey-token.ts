@@ -15,6 +15,9 @@
  * sessionStorage, and the server writes nothing to the browser, so overlapping checkouts
  * cannot overwrite each other.
  *
+ * Security boundary: the browser that started the checkout, not one tab of it (see
+ * `purchase-survey-key.ts`); a tab copied from the opener inherits the keys made before the copy.
+ *
  * Binding: HMAC-SHA256 over a label and the key, keyed with the existing session secret
  * (JWT_SECRET), cut to 32 hex. No new secret. Stripe holds only the binding, never the key.
  */
