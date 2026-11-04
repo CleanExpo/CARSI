@@ -23,7 +23,7 @@ const TRADE_WORDS: Array<[RegExp, string]> = [
   [/^(?:carpets?|rugs?|upholster\w*)$/, 'carpet and upholstery cleaning'],
   [/^mou?lds?$/, 'mould remediation'],
   [/^(?:fire|smoke|soot)$/, 'fire and smoke restoration'],
-  [/^(?:water|damage|flood\w*|drying)$/, 'water damage restoration'],
+  [/^(?:water|flood\w*|drying)$/, 'water damage restoration'],
   [/^restor\w*$/, 'restoration'],
   [/^pressure$/, 'pressure washing'],
   [/^windows?$/, 'window cleaning'],
@@ -60,21 +60,54 @@ const NEUTRAL_WORDS = new Set(
     'service servicing solutions maintenance installation installations installer installers ' +
     'install removal control remediation care fitter fitters fitting technician technicians tech ' +
     'operator owner business co company pty ltd car cars wash washing soft exterior interior home ' +
-    'house'
+    'house damage'
   ).split(' ')
 );
 
 /** Every label generated copy can use; each must map back to itself (tested). */
 export const KNOWN_TRADE_LABELS: readonly string[] = [...new Set(TRADE_WORDS.map(([, l]) => l))];
 
-/** Broad labels that give way to any specific one: "Carpet cleaning" is carpet cleaning. */
-const GENERIC_LABELS = new Set(['cleaning', 'restoration']);
+/**
+ * Broad activity labels. One gives way to a specific label only when that label is a KIND of the
+ * activity: "Carpet cleaning" is carpet cleaning, but "Roof cleaning" is a cleaner, not a roofer,
+ * so it gets no label (GP-634 pre-review probe, head 0e87b2de).
+ */
+const GENERIC_KINDS: Record<string, ReadonlySet<string>> = {
+  cleaning: new Set([
+    'carpet and upholstery cleaning',
+    'window cleaning',
+    'duct cleaning',
+    'biohazard cleaning',
+    'car detailing',
+    'pressure washing',
+    'odour removal',
+    'graffiti removal',
+    'mould remediation',
+    'pool care',
+    'fire and smoke restoration',
+    'water damage restoration',
+  ]),
+  restoration: new Set([
+    'fire and smoke restoration',
+    'water damage restoration',
+    'mould remediation',
+  ]),
+};
 
 /**
- * null: the text names no trade at all. '': it is not positively identified, either because a
- * word is not understood ("Window tinting") or because it names two trades ("Window glazing").
+ * Labels whose word names only the object, not the activity: "Carpet fitter" and "Windows" do not
+ * clean anything, so these need a cleaning word in the same text.
  */
-function labelFor(text: string): string | null {
+const NEEDS_CLEANING_WORD = new Set(['carpet and upholstery cleaning', 'window cleaning', 'duct cleaning']);
+const CLEANING_WORD = /^(?:clean(?:er|ers|ing)?|wash(?:er|ers|es|ing)?)$/;
+
+/**
+ * null: the text names no trade at all. '': it is not positively identified, because a word is
+ * not understood ("Window tinting"), it names two trades ("Window glazing"), a broad activity is
+ * paired with a trade that is not a kind of it ("Roof cleaning"), or an object word has no
+ * activity ("Carpet fitter").
+ */
+function labelFor(text: string, activityElsewhere = false): string | null {
   const words = text.toLowerCase().match(/[a-z]+/g) ?? [];
   const found = new Set<string>();
   for (const w of words) {
@@ -84,9 +117,15 @@ function labelFor(text: string): string | null {
     found.add(hit[1]);
   }
   if (found.size === 0) return null;
-  const specific = [...found].filter((l) => !GENERIC_LABELS.has(l));
-  const pick = specific.length > 0 ? specific : [...found];
-  return pick.length === 1 ? pick[0] : '';
+  const generic = [...found].filter((l) => l in GENERIC_KINDS);
+  const specific = [...found].filter((l) => !(l in GENERIC_KINDS));
+  if (specific.length === 0) return generic.length === 1 ? generic[0] : '';
+  if (specific.length > 1) return '';
+  const [label] = specific;
+  if (generic.some((g) => !GENERIC_KINDS[g].has(label))) return '';
+  if (NEEDS_CLEANING_WORD.has(label) && !activityElsewhere && !words.some((w) => CLEANING_WORD.test(w)))
+    return '';
+  return label;
 }
 
 /**
@@ -96,7 +135,15 @@ function labelFor(text: string): string | null {
  * 593a73d4). The trade field decides; services are read only when it names no trade at all.
  */
 export function tradeLabel(trade: string, services = ''): string {
-  return labelFor(trade) ?? labelFor(services) ?? '';
+  const fromTrade = labelFor(trade);
+  if (fromTrade === null) return labelFor(services) ?? '';
+  if (fromTrade !== '') return fromTrade;
+  // "Carpet & upholstery" names only the object; the activity may be in services, but only
+  // when services on their own identify the very same label ("Carpet cleaning, rug cleaning").
+  const objectOnly = labelFor(trade, true);
+  return objectOnly && NEEDS_CLEANING_WORD.has(objectOnly) && labelFor(services) === objectOnly
+    ? objectOnly
+    : '';
 }
 
 /**

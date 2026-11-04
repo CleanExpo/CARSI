@@ -268,3 +268,87 @@ describe('a trade is labelled only when every word in it is understood (Codex P1
     expect(tradeLabel(trade)).toBe(expected);
   });
 });
+
+describe('a broad activity word never borrows another trade’s label (GP-634 pre-review class fix, head 0e87b2de)', () => {
+  // "Roof cleaning" is a cleaner, not a roofer; "Carpet fitter" lays carpet, it does not clean it.
+  it.each([
+    'Roof cleaning',
+    'Gutter cleaning',
+    'Builders clean',
+    'Tile cleaning',
+    'Floor cleaning',
+    'Brick cleaning',
+    'Concrete cleaning',
+    'Solar cleaning',
+    'Glass cleaning',
+    'Air conditioning cleaning',
+    'Roof restoration',
+    'Carpet restoration',
+    'Carpet fitter',
+    'Carpet installer',
+    'Carpets',
+    'Windows',
+    'Ducts',
+    'Storm damage',
+  ])('"%s" is not positively identified, so it gets no label', (trade) => {
+    expect(tradeLabel(trade)).toBe('');
+  });
+
+  it.each([
+    ['Damage restoration', 'restoration'],
+    ['Fire damage restoration', 'fire and smoke restoration'],
+    ['Water damage', 'water damage restoration'],
+    ['Window washing', 'window cleaning'],
+    ['Pool cleaning', 'pool care'],
+    ['Mould cleaning', 'mould remediation'],
+    ['Crime scene cleaning', 'biohazard cleaning'],
+  ])('"%s" is understood as "%s"', (trade, expected) => {
+    expect(tradeLabel(trade)).toBe(expected);
+  });
+
+  it('every label that is not a kind of cleaning or restoration stays unlabelled when paired with one', () => {
+    const cleaningKinds = new Set([
+      'carpet and upholstery cleaning',
+      'window cleaning',
+      'duct cleaning',
+      'biohazard cleaning',
+      'car detailing',
+      'pressure washing',
+      'odour removal',
+      'graffiti removal',
+      'mould remediation',
+      'pool care',
+      'fire and smoke restoration',
+      'water damage restoration',
+    ]);
+    const restorationKinds = new Set([
+      'fire and smoke restoration',
+      'water damage restoration',
+      'mould remediation',
+    ]);
+    const specific = KNOWN_TRADE_LABELS.filter((l) => l !== 'cleaning' && l !== 'restoration');
+    const borrowed = [
+      ...specific.filter((l) => !cleaningKinds.has(l)).map((l) => `${l} cleaning`),
+      ...specific.filter((l) => !restorationKinds.has(l)).map((l) => `${l} restoration`),
+    ]
+      .filter((t) => tradeLabel(t) !== '')
+      .map((t) => `${t} -> ${tradeLabel(t)}`);
+    expect(borrowed).toEqual([]);
+    // and the kinds themselves still keep their label
+    for (const l of cleaningKinds) expect(tradeLabel(`${l} cleaning`), l).toBe(l);
+    for (const l of restorationKinds) expect(tradeLabel(`${l} restoration`), l).toBe(l);
+  });
+});
+
+describe('an object-only trade takes its activity only from matching services', () => {
+  it.each([
+    ['Carpet & upholstery', 'Carpet cleaning, rug cleaning', 'carpet and upholstery cleaning'],
+    ['Windows', 'Window cleaning', 'window cleaning'],
+    ['Carpet fitter', '', ''],
+    ['Carpet fitter', 'Carpet laying', ''],
+    ['Windows', 'Glazing and repairs', ''],
+    ['Roof cleaning', 'Roof cleaning', ''],
+  ])('"%s" / "%s" -> "%s"', (trade, services, expected) => {
+    expect(tradeLabel(trade, services)).toBe(expected);
+  });
+});
