@@ -70,10 +70,11 @@ describe('controlled voice', () => {
   };
 
   it('never passes profile free text through: no name, no non-place town, trade as a fixed label', () => {
-    // The planted sentence mentions mould, so it maps to the fixed label, never to its own words.
+    // The planted sentence is not a trade name (its other words are not understood), so it gets
+    // no label at all; it never maps to its own words (Codex P1, head 593a73d4).
     expect(sanitizeVoice(planted)).toEqual({
       businessName: '',
-      trade: 'mould remediation',
+      trade: '',
       town: '',
       services: '',
     });

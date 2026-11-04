@@ -7,67 +7,93 @@
 import { isCompliantCopy } from './compliance';
 import type { MarketingFix, SiteCheck, SiteFetchResult, SiteReview, TradeVoice } from './types';
 
-/** Known trades. Generated copy only ever names a trade by these labels. */
-const TRADE_LABELS: Array<[RegExp, string]> = [
-  [/waterproof/i, 'waterproofing'],
-  [/biohazard|trauma|crime scene/i, 'biohazard cleaning'],
-  [/asbestos/i, 'asbestos removal'],
-  [/graffiti/i, 'graffiti removal'],
-  [/odou?r/i, 'odour removal'],
-  [/\bducts?\b/i, 'duct cleaning'],
-  [/detailing|detailer/i, 'car detailing'],
-  [/carpet|rug|upholster/i, 'carpet and upholstery cleaning'],
-  [/mou?ld/i, 'mould remediation'],
-  [/fire|smoke|soot/i, 'fire and smoke restoration'],
-  [/water damage|flood|drying/i, 'water damage restoration'],
-  [/restor/i, 'restoration'],
-  [/pressure|soft wash|exterior wash/i, 'pressure washing'],
-  [/window/i, 'window cleaning'],
-  [/clean/i, 'cleaning'],
-  [/plumb|drain|gas fit/i, 'plumbing'],
-  [/electric/i, 'electrical'],
-  [/paint/i, 'painting'],
-  [/\broof|gutter/i, 'roofing'],
-  [/pest|termite/i, 'pest control'],
-  [/floor|tiling|tiler|\btile/i, 'flooring'],
-  [/air ?con|hvac|refrigerat/i, 'air conditioning'],
-  [/lawn|garden|landscap/i, 'landscaping'],
-  [/build|carpent|joiner|renovat/i, 'building'],
-  [/locksmith|\blocks?\b/i, 'locksmith'],
-  [/mechanic|vehicle|automotive|\bauto\b|panel beat/i, 'mechanical'],
-  [/handy ?man|odd jobs/i, 'handyman'],
-  [/concret/i, 'concreting'],
-  [/fenc/i, 'fencing'],
-  [/glaz|glass/i, 'glazing'],
-  [/plaster/i, 'plastering'],
-  [/brick/i, 'bricklaying'],
-  [/solar/i, 'solar installation'],
-  [/arborist|\btrees?\b/i, 'tree care'],
-  [/\bpools?\b/i, 'pool care'],
-  [/appliance/i, 'appliance service'],
-  [/removalist|\bremovals\b/i, 'removals'],
+/**
+ * Known trades. Generated copy only ever names a trade by these labels. Each rule matches one
+ * WHOLE word of the member's trade (lower case, letters only), never a fragment of one, so
+ * "fireplace" is not "fire" and "moulding" is not "mould" (Codex P1, head 593a73d4).
+ */
+const TRADE_WORDS: Array<[RegExp, string]> = [
+  [/^waterproof\w*$/, 'waterproofing'],
+  [/^(?:biohazards?|trauma|crime|scene)$/, 'biohazard cleaning'],
+  [/^asbestos$/, 'asbestos removal'],
+  [/^odou?rs?$/, 'odour removal'],
+  [/^graffiti$/, 'graffiti removal'],
+  [/^ducts?$/, 'duct cleaning'],
+  [/^detail(?:ing|er|ers)$/, 'car detailing'],
+  [/^(?:carpets?|rugs?|upholster\w*)$/, 'carpet and upholstery cleaning'],
+  [/^mou?lds?$/, 'mould remediation'],
+  [/^(?:fire|smoke|soot)$/, 'fire and smoke restoration'],
+  [/^(?:water|damage|flood\w*|drying)$/, 'water damage restoration'],
+  [/^restor\w*$/, 'restoration'],
+  [/^pressure$/, 'pressure washing'],
+  [/^windows?$/, 'window cleaning'],
+  [/^clean(?:er|ers|ing)?$/, 'cleaning'],
+  [/^(?:plumb\w*|gas|gasfit\w*)$/, 'plumbing'],
+  [/^(?:electric\w*|sparky|sparkies)$/, 'electrical'],
+  [/^paint(?:er|ers|ing)?$/, 'painting'],
+  [/^(?:roof\w*|gutters?|guttering)$/, 'roofing'],
+  [/^(?:pests?|termites?)$/, 'pest control'],
+  [/^(?:floor\w*|til(?:e|es|er|ers|ing))$/, 'flooring'],
+  [/^(?:air|con|aircon|condition\w*|hvac|refrigerat\w*)$/, 'air conditioning'],
+  [/^(?:lawns?|mowing|gardens?|gardener|gardening|landscap\w*)$/, 'landscaping'],
+  [/^(?:build\w*|carpent\w*|joiner\w*|renovat\w*)$/, 'building'],
+  [/^(?:locksmiths?|locks?)$/, 'locksmith'],
+  [/^(?:mechanics?|mechanical|vehicles?|automotive|auto|panel|beater|beating)$/, 'mechanical'],
+  [/^(?:handym[ae]n|odd|jobs)$/, 'handyman'],
+  [/^concret\w*$/, 'concreting'],
+  [/^fenc(?:e|es|er|ers|ing)$/, 'fencing'],
+  [/^(?:glaz\w*|glass)$/, 'glazing'],
+  [/^plaster\w*$/, 'plastering'],
+  [/^brick\w*$/, 'bricklaying'],
+  [/^solar$/, 'solar installation'],
+  [/^(?:arborists?|trees?)$/, 'tree care'],
+  [/^pools?$/, 'pool care'],
+  [/^appliances?$/, 'appliance service'],
+  [/^(?:removalists?|removals)$/, 'removals'],
 ];
 
+/** Words that describe how or where a trade works, never which trade it is. */
+const NEUTRAL_WORDS = new Set(
+  (
+    'and the of a an for mobile residential commercial domestic industrial strata local general ' +
+    'specialist specialists contractor contractors contracting professional professionals services ' +
+    'service servicing solutions maintenance installation installations installer installers ' +
+    'install removal control remediation care fitter fitters fitting technician technicians tech ' +
+    'operator owner business co company pty ltd car cars wash washing soft exterior interior home ' +
+    'house'
+  ).split(' ')
+);
+
 /** Every label generated copy can use; each must map back to itself (tested). */
-export const KNOWN_TRADE_LABELS: readonly string[] = [...new Set(TRADE_LABELS.map(([, l]) => l))];
+export const KNOWN_TRADE_LABELS: readonly string[] = [...new Set(TRADE_WORDS.map(([, l]) => l))];
 
 /** Broad labels that give way to any specific one: "Carpet cleaning" is carpet cleaning. */
 const GENERIC_LABELS = new Set(['cleaning', 'restoration']);
 
-/** null: the text names no known trade. '': it names two or more, so no label is safe. */
+/**
+ * null: the text names no trade at all. '': it is not positively identified, either because a
+ * word is not understood ("Window tinting") or because it names two trades ("Window glazing").
+ */
 function labelFor(text: string): string | null {
-  const found = [...new Set(TRADE_LABELS.filter(([p]) => p.test(text)).map(([, l]) => l))];
-  if (found.length === 0) return null;
-  const specific = found.filter((l) => !GENERIC_LABELS.has(l));
-  const pick = specific.length > 0 ? specific : found;
+  const words = text.toLowerCase().match(/[a-z]+/g) ?? [];
+  const found = new Set<string>();
+  for (const w of words) {
+    if (NEUTRAL_WORDS.has(w)) continue;
+    const hit = TRADE_WORDS.find(([re]) => re.test(w));
+    if (!hit) return '';
+    found.add(hit[1]);
+  }
+  if (found.size === 0) return null;
+  const specific = [...found].filter((l) => !GENERIC_LABELS.has(l));
+  const pick = specific.length > 0 ? specific : [...found];
   return pick.length === 1 ? pick[0] : '';
 }
 
 /**
- * The member's trade as a fixed label, or '' when there is no single safe one. Order in the list
- * never decides: a trade naming two specific trades ("Window glazing", "Roof plumber") gets no
- * label, so the member sees general wording and the notice rather than another trade's wording
- * (Codex P1, head 02eba1cb). The trade field decides; services are read only when it names none.
+ * The member's trade as a fixed label, or '' when it is not positively identified. List order
+ * never decides, and an unknown word or a second trade gives no label, so the member sees general
+ * wording and the notice rather than another trade's wording (Codex P1, heads 02eba1cb,
+ * 593a73d4). The trade field decides; services are read only when it names no trade at all.
  */
 export function tradeLabel(trade: string, services = ''): string {
   return labelFor(trade) ?? labelFor(services) ?? '';

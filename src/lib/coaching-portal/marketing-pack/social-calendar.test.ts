@@ -177,7 +177,7 @@ describe('calendar trade voice for trades beyond the first label set (Codex P1, 
     ['Solar installer', '', 'solar installation'],
     ['Arborist', 'Tree removal', 'tree care'],
     ['Pool maintenance', '', 'pool care'],
-    ['Appliance repairs', '', 'appliance service'],
+    ['Appliance servicing', '', 'appliance service'],
     ['Removalist', '', 'removals'],
     ['Duct cleaning', '', 'duct cleaning'],
     ['Asbestos removal', '', 'asbestos removal'],
@@ -238,5 +238,33 @@ describe('no two label rules overlap', () => {
       (l) => `${l} -> ${tradeLabel(l) || '(none)'}`
     );
     expect(crossed).toEqual([]);
+  });
+});
+
+describe('a trade is labelled only when every word in it is understood (Codex P1, head 593a73d4)', () => {
+  it.each([
+    'Window tinting',
+    'Fireplace cleaning',
+    'Car wash',
+    'Rubbish removal',
+    'Pool fencing and glass',
+    'Bathroom renovations and tiling',
+    'Drainage engineer',
+    'Floristry',
+    'Moulding and trim',
+  ])('"%s" is not positively identified, so it gets no label', (trade) => {
+    expect(tradeLabel(trade)).toBe('');
+  });
+
+  it.each([
+    ['Mobile window cleaning services', 'window cleaning'],
+    ['Residential carpet cleaner', 'carpet and upholstery cleaning'],
+    ['Plumber and gas fitter', 'plumbing'],
+    ['Commercial electrician', 'electrical'],
+    ['Water damage restoration specialists', 'water damage restoration'],
+    ['Crime scene cleaning', 'biohazard cleaning'],
+    ['Tree removal', 'tree care'],
+  ])('"%s" is fully understood as "%s"', (trade, expected) => {
+    expect(tradeLabel(trade)).toBe(expected);
   });
 });
