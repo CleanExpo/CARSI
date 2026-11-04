@@ -105,6 +105,44 @@ describe('AdminShell responsive navigation', () => {
     await vi.waitFor(() => expect(document.activeElement).toBe(trigger()));
   });
 
+  it('keeps focus inside the open drawer and wraps Tab and Shift+Tab', async () => {
+    await render();
+    const dialog = await open();
+    const outside = document.createElement('button');
+    outside.textContent = 'Control outside the drawer';
+    document.body.appendChild(outside);
+    try {
+      // A modal drawer must not let focus land on a control behind it.
+      await act(async () => outside.focus());
+      expect(document.activeElement).not.toBe(outside);
+      expect(dialog.contains(document.activeElement)).toBe(true);
+      await act(async () => trigger().focus());
+      expect(document.activeElement).not.toBe(trigger());
+      expect(dialog.contains(document.activeElement)).toBe(true);
+
+      const focusable = Array.from(
+        dialog.querySelectorAll<HTMLElement>('a[href], button:not([disabled])')
+      );
+      expect(focusable.length).toBeGreaterThan(1);
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const tab = (shiftKey: boolean) =>
+        act(async () => {
+          document.activeElement?.dispatchEvent(
+            new KeyboardEvent('keydown', { key: 'Tab', shiftKey, bubbles: true, cancelable: true })
+          );
+        });
+
+      await act(async () => last.focus());
+      await tab(false);
+      expect(document.activeElement).toBe(first);
+      await tab(true);
+      expect(document.activeElement).toBe(last);
+    } finally {
+      outside.remove();
+    }
+  });
+
   it('closes when selecting a navigation link, including the current page', async () => {
     await render();
     const dialog = await open();
