@@ -119,6 +119,8 @@
     "video:demo:composite": "npx tsx scripts/generate-demo-videos.ts --composite",
     "video:demo:upload": "npx tsx scripts/generate-demo-videos.ts --upload",
     "video:demo:generate": "npx tsx scripts/generate-demo-videos.ts --execute",
+    "video:trailers:check": "node scripts/publish-voiced-trailers.sql-check.mjs",
+    "video:trailers:publish": "npx tsx scripts/publish-voiced-trailers.ts",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",
     "db:studio": "prisma studio",
