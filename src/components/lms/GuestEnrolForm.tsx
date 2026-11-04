@@ -182,7 +182,12 @@ export function GuestEnrolForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className={`space-y-3 rounded-lg border p-4 ${styles.card}`}>
+    // data-quick-enrol-card: the daily live buy-path guard finds this card by it (GP-674).
+    <form
+      onSubmit={handleSubmit}
+      data-quick-enrol-card=""
+      className={`space-y-3 rounded-lg border p-4 ${styles.card}`}
+    >
       <p className={`text-xs ${styles.help}`}>
         {freePath
           ? 'Quick enrol — create your account and start learning in one step.'

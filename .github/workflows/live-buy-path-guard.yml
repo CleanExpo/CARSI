@@ -1,18 +1,32 @@
 name: Live Buy-Path Guard
 
-# GP-638. Reads PRODUCTION and fails if the two 8 Oct 2026 buying-path faults come back:
-#   - a local origin (localhost:8080 etc.) in a public page, a redirect, or the sign-out redirect;
-#   - an enrol-form field whose text is (nearly) the colour of its background.
+# Reads PRODUCTION and fails if a money-path fault comes back. Three jobs:
+#
+# live-buy-path-guard (GP-638, hardened in GP-674): the two 8 Oct 2026 buying-path faults
+#   - a local origin (localhost:8080, 127.1, 2130706433, any private host) in a public page,
+#     a redirect, or the sign-out redirect;
+#   - a paid course page with no quick-enrol card (found by its data-quick-enrol-card
+#     attribute; another email form on the page does not count), a card with no email field,
+#     or a card field whose text is (nearly) the colour of its background.
+# live-courses-money-path (GP-676): the GP-639 catalogue faults
+#   - the logged-out first screen of /courses (desktop and mobile) shows no priced class and
+#     no link to the IICRC CEC classes (a hidden or clipped link, or a "$29" inside a free
+#     class's description, does not count), or loads anything from a private host;
+#   - /courses?discipline=iicrc-cec#catalogue lists a class with no current approval in
+#     data/seed/cec-approvals.json, or opens a tab other than "IICRC CEC".
+# planted-fault-proof: runs both guards against a local fixture site with each fault planted
+#   and proves each one exits 1 for the right reason, and the clean fixture exits 0.
+#
 # NO CREDENTIALS: it reads public pages only, so it is not gated behind a repo variable.
 #
-# EXIT CODES, and why the job fails on both 1 and 2:
-#   0  clean AND non-vacuous (pages, form fields and both sign-out redirects were read)
+# EXIT CODES, and why each job fails on both 1 and 2:
+#   0  clean AND non-vacuous (pages, cards, form fields, redirects or lists were actually read)
 #   1  a fault was found
-#   2  could not audit, including a form colour it could not judge (for example a colour format
-#      the browser could not convert). "I could not look" must never render as "nothing is wrong".
+#   2  could not audit, including a form colour it could not judge or a CEC list it could not
+#      read in full. "I could not look" must never render as "nothing is wrong".
 #
 # Not on push, for the same reason as live-catalogue-guard.yml: its verdict is about the live
-# site, not the pull request. After changing the guard, run it by hand:
+# site, not the pull request. After changing a guard, run it by hand:
 #   gh workflow run live-buy-path-guard.yml --ref <branch>
 
 on:
@@ -53,3 +67,48 @@ jobs:
 
       - name: Audit the live buying path
         run: node scripts/check-live-buy-path.mjs
+
+  live-courses-money-path:
+    name: Live Courses Money Path
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Prove the check's own rules still fire
+        run: node scripts/check-live-courses-money-path.test.mjs
+
+      - name: Install dependencies and Chromium
+        run: |
+          npm ci --no-audit --no-fund --ignore-scripts
+          npx playwright install --with-deps chromium
+
+      - name: Audit the live /courses first screen and CEC list
+        run: node scripts/check-live-courses-money-path.mjs
+
+  planted-fault-proof:
+    name: Planted-Fault Proof (both guards)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies and Chromium
+        run: |
+          npm ci --no-audit --no-fund --ignore-scripts
+          npx playwright install --with-deps chromium
+
+      - name: Each planted fault turns its guard red; the clean fixture stays green
+        run: node scripts/check-live-guards.fixture-test.mjs

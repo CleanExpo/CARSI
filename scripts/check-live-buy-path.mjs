@@ -9,9 +9,13 @@
  *
  * Checks:
  *   - LOCALHOST: no public page's HTML, and no redirect from /api/auth/logout, may contain a
- *     local origin (localhost, *.localhost, 127.x, 0.0.0.0, [::1]).
- *   - CONTRAST: on each paid course page, every visible enrol-form input and its label must have
- *     a text colour different from its effective background colour.
+ *     local origin (localhost, *.localhost, 127.x in any spelling such as 127.1 or 2130706433,
+ *     0.0.0.0, [::1], or another private host).
+ *   - QUICK-ENROL CARD (GP-674): each paid course page must show the quick-enrol card, found by
+ *     its data attribute (QUICK_ENROL_CARD_SELECTOR, set in GuestEnrolForm.tsx). A missing card
+ *     is a fault even when another email form (a newsletter) is still on the page.
+ *   - CONTRAST: on each paid course page, every visible input and label in the quick-enrol card
+ *     must have a text colour different from its effective background colour.
  *
  * Exit 0 = clean and non-vacuous. Exit 1 = a fault was found. Exit 2 = could not audit
  * (network failure, zero forms/pages checked, or a colour the guard could not judge).
@@ -29,7 +33,7 @@
  *   CARSI_SITE=https://staging.example node scripts/check-live-buy-path.mjs
  *   PW_CHROMIUM=/path/to/chromium node scripts/check-live-buy-path.mjs   # optional browser path
  */
-import { pathToFileURL } from 'node:url';
+import { isEntryPoint } from './lib/is-entry-point.mjs';
 
 const SITE = (process.env.CARSI_SITE || 'https://carsi.com.au').replace(/\/$/, '');
 
@@ -41,17 +45,54 @@ export const PAID_COURSE_PATHS = [
   '/courses/job-safety-and-environmental-analysis-jsea-course',
 ];
 
+/**
+ * The quick-enrol card on a course page (GP-674). GuestEnrolForm.tsx puts this attribute on its
+ * <form>, and GuestEnrolForm.test.tsx imports the name from here, so the two cannot drift.
+ */
+export const QUICK_ENROL_CARD_ATTR = 'data-quick-enrol-card';
+export const QUICK_ENROL_CARD_SELECTOR = `form[${QUICK_ENROL_CARD_ATTR}]`;
+
 const LOCAL_ORIGIN_RE =
   /(?<![\w.+-])(?:https?:)?(?:\/\/|\\\/\\\/)(?:(?:[a-z0-9-]+\.)*localhost\.?|127(?:\.\d{1,3}){3}|0\.0\.0\.0|\[::1?\])(?::\d+)?(?![\w.-])/gi;
 
-/** Every local origin found in a piece of text (HTML or a Location header). */
-export function findLocalOrigins(text) {
+/**
+ * Any URL-like string: an optional http(s) scheme, `//` (or JSON-escaped `\/\/`), then the
+ * authority as written, up to the first character that cannot be part of one.
+ */
+const URL_LIKE_RE =
+  /(?<![\w.+-])(https?:)?(?:\/\/|\\\/\\\/)(\[[0-9a-f:.]+\](?::\d+)?|[^\s/\\?#"'`<>()[\]{},;&|^]+)/gi;
+
+/**
+ * Every local origin found in a piece of text (HTML or a Location header), as written.
+ *
+ * Two passes. The regex pass names localhost, *.localhost, dotted 127.x, 0.0.0.0 and [::1].
+ * The parsed pass (GP-674) hands each URL-like string to the URL parser and judges the host it
+ * resolves to with isPrivateHost, the same test the redirect and browser checks use, so short,
+ * decimal and hex spellings (http://127.1:8080/, http://2130706433:8080/, //0x7f.1) and other
+ * private ranges are caught. A scheme-relative string with neither a dot nor a port (`//10`) is
+ * skipped in free text, where that shape is far more often a code comment than a link, but is
+ * judged when it is an attribute value (`href="//2130706433/"`), and always when the caller
+ * passes `attributeValues: true` because every token in the text is a link.
+ */
+export function findLocalOrigins(text, { attributeValues = false } = {}) {
   if (!text) return [];
-  return [
-    ...new Set(
-      (String(text).match(LOCAL_ORIGIN_RE) || []).map((m) => m.toLowerCase().replace(/\\\//g, '/'))
-    ),
-  ];
+  const s = String(text);
+  const found = (s.match(LOCAL_ORIGIN_RE) || []).map((m) => m.toLowerCase().replace(/\\\//g, '/'));
+  for (const m of s.matchAll(URL_LIKE_RE)) {
+    const [, scheme, authority] = m;
+    // Browsers strip spaces around a URL value, so `href=" //host"` is still a link.
+    const inAttribute =
+      attributeValues || /=\s*["']?\s*$/.test(s.slice(Math.max(0, m.index - 16), m.index));
+    if (!scheme && !inAttribute && !/[.:]/.test(authority)) continue;
+    let host;
+    try {
+      host = new URL(`http://${authority}/`).hostname;
+    } catch {
+      continue;
+    }
+    if (isPrivateHost(host)) found.push(`${scheme || ''}//${authority}`.toLowerCase());
+  }
+  return [...new Set(found)];
 }
 
 /** Parse "rgb(a, b, c)" / "rgba(a, b, c, x)" into [r, g, b, alpha]. */
@@ -271,8 +312,8 @@ async function fetchPage(url, faults) {
   throw new Error(`${url} redirected more than 5 times`);
 }
 
-/** In the page: computed colours for each visible input/label in a form that holds an email field. */
-function readFormColours() {
+/** In the page: computed colours for each visible input/label in the visible quick-enrol card. */
+function readFormColours(cardSelector) {
   // Any CSS colour (oklch, lab, color(), named, hex, rgb) -> sRGB by painting it on a 1x1 canvas.
   // A value the canvas rejects leaves the sentinel fill in place and comes back as null.
   const canvas = document.createElement('canvas');
@@ -322,9 +363,7 @@ function readFormColours() {
     const s = getComputedStyle(el);
     return r.width > 0 && r.height > 0 && s.visibility !== 'hidden' && s.display !== 'none';
   };
-  const forms = [...document.querySelectorAll('form')].filter((f) =>
-    [...f.querySelectorAll('input[type="email"], input[name*="email" i]')].some(visible)
-  );
+  const forms = [...document.querySelectorAll(cardSelector)].filter(visible);
   const out = [];
   for (const f of forms) {
     for (const el of f.querySelectorAll(
@@ -407,27 +446,23 @@ export async function audit(faults = []) {
       for (const path of PAID_COURSE_PATHS) {
         currentPath = path;
         await page.goto(SITE + path, { waitUntil: 'domcontentloaded', timeout: 30000 });
+        let cardShown = true;
         try {
-          // The page renders a hidden duplicate email input; wait for ANY visible one.
+          // The page can render a hidden duplicate card; wait for ANY visible one.
           await page.waitForFunction(
-            () =>
-              [...document.querySelectorAll('input[type="email"], input[name*="email" i]')].some(
-                (el) => {
-                  const r = el.getBoundingClientRect();
-                  const st = getComputedStyle(el);
-                  return (
-                    r.width > 0 &&
-                    r.height > 0 &&
-                    st.visibility !== 'hidden' &&
-                    st.display !== 'none'
-                  );
-                }
-              ),
-            null,
+            (sel) =>
+              [...document.querySelectorAll(sel)].some((el) => {
+                const r = el.getBoundingClientRect();
+                const st = getComputedStyle(el);
+                return (
+                  r.width > 0 && r.height > 0 && st.visibility !== 'hidden' && st.display !== 'none'
+                );
+              }),
+            QUICK_ENROL_CARD_SELECTOR,
             { timeout: 20000 }
           );
         } catch {
-          throw new Error(`no visible email field on ${path} (${scheme}) within 20 s`);
+          cardShown = false;
         }
         await page.waitForTimeout(500);
         const hrefs = await page.evaluate(() =>
@@ -437,10 +472,49 @@ export async function audit(faults = []) {
             )
             .join(' ')
         );
-        for (const o of findLocalOrigins(hrefs))
+        for (const o of findLocalOrigins(hrefs, { attributeValues: true }))
           faults.push(`LOCALHOST ${path} (${scheme}, rendered): ${o}`);
-        const fields = await page.evaluate(readFormColours);
-        if (fields.length === 0) faults.push(`NO ENROL FORM ${path} (${scheme})`);
+        if (!cardShown) {
+          // The page loaded (goto succeeded) but the buyer has no card to enrol with. Another
+          // email form on the page does not count: that was the gap GP-674 closed.
+          faults.push(
+            `NO QUICK-ENROL CARD ${path} (${scheme}): no visible ${QUICK_ENROL_CARD_SELECTOR} within 20 s`
+          );
+          continue;
+        }
+        // The card must still ask for the buyer's email: checkout cannot start without it. The
+        // field counts only if a buyer can see it: no hidden or transparent element from the field
+        // up to the page, and some of it left after every ancestor that clips its overflow.
+        const hasEmail = await page.evaluate(
+          (sel) => {
+            const usable = (el) => {
+              const r = el.getBoundingClientRect();
+              let box = { l: r.left, t: r.top, r: r.right, b: r.bottom };
+              for (let n = el; n && n.nodeType === 1; n = n.parentElement) {
+                const st = getComputedStyle(n);
+                if (st.display === 'none' || st.visibility === 'hidden' || Number(st.opacity) === 0)
+                  return false;
+                if (n !== el && (st.overflowX !== 'visible' || st.overflowY !== 'visible')) {
+                  const c = n.getBoundingClientRect();
+                  box = {
+                    l: Math.max(box.l, c.left),
+                    t: Math.max(box.t, c.top),
+                    r: Math.min(box.r, c.right),
+                    b: Math.min(box.b, c.bottom),
+                  };
+                }
+              }
+              return box.r - box.l > 0 && box.b - box.t > 0;
+            };
+            return [...document.querySelectorAll(sel)].some((card) =>
+              [...card.querySelectorAll('input[type="email"], input[name*="email" i]')].some(usable)
+            );
+          },
+          QUICK_ENROL_CARD_SELECTOR
+        );
+        if (!hasEmail) faults.push(`QUICK-ENROL CARD HAS NO EMAIL FIELD ${path} (${scheme})`);
+        const fields = await page.evaluate(readFormColours, QUICK_ENROL_CARD_SELECTOR);
+        if (fields.length === 0) faults.push(`QUICK-ENROL CARD HAS NO FIELDS ${path} (${scheme})`);
         fieldsRead += fields.length;
         for (const f of fields) {
           const pairs = [[f.tag, f.color]];
@@ -474,4 +548,4 @@ async function main() {
   process.exit(code);
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1] || '').href) main();
+if (isEntryPoint(import.meta.url)) main();

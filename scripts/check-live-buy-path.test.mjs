@@ -13,6 +13,8 @@ import {
   isPrivateHost,
   isUnreadable,
   judgeContrast,
+  QUICK_ENROL_CARD_ATTR,
+  QUICK_ENROL_CARD_SELECTOR,
   redirectDecision,
   summarise,
 } from './check-live-buy-path.mjs';
@@ -206,6 +208,54 @@ check(
     assert.equal(blockBrowserRequest('http://127.0.0.1:4800/x', 'http://127.0.0.1:4799'), true);
   }
 );
+check('fires on short, decimal and hex loopback spellings in page text (GP-674)', () => {
+  // The text scan used to match dotted 127.x only. The URL parser reads all of these as
+  // 127.0.0.1, which is how the guard now judges them.
+  assert.deepEqual(findLocalOrigins('<a href="http://127.1:8080/learn">Start</a>'), [
+    'http://127.1:8080',
+  ]);
+  assert.deepEqual(findLocalOrigins('<a href="http://2130706433:8080/">Start</a>'), [
+    'http://2130706433:8080',
+  ]);
+  assert.deepEqual(findLocalOrigins('<img src="//0x7f.1:3000/a.png">'), ['//0x7f.1:3000']);
+  assert.deepEqual(findLocalOrigins('{"u":"http:\\/\\/127.1:8080\\/learn"}'), [
+    'http://127.1:8080',
+  ]);
+  assert.deepEqual(findLocalOrigins('href="https://[::ffff:7f00:1]:8080/x"'), [
+    'https://[::ffff:7f00:1]:8080',
+  ]);
+  // Private ranges are judged by the same isPrivateHost the redirect and browser checks use.
+  assert.deepEqual(findLocalOrigins('<a href="http://10.0.0.5/admin">x</a>'), ['http://10.0.0.5']);
+});
+check('the parsed text pass stays silent on public hosts, versions and comments', () => {
+  assert.deepEqual(
+    findLocalOrigins(
+      '<a href="https://carsi.com.au/courses">x</a><script src="https://js.stripe.com/v3/"></script>' +
+        '<link href="//fonts.example.com/a.css"> v1.27.0.1 https://8.8.8.8/ // 10 seconds //10 a//127.1'
+    ),
+    []
+  );
+});
+check('a dotless scheme-relative host is caught when it is an attribute value', () => {
+  // CodeRabbit on #1033: `//2130706433` has no dot or port, but as a link it is 127.0.0.1.
+  assert.deepEqual(findLocalOrigins('<a href="//2130706433/learn">x</a>'), ['//2130706433']);
+  assert.deepEqual(findLocalOrigins("<img src='//2130706433'>"), ['//2130706433']);
+  assert.deepEqual(findLocalOrigins('<a href=//2130706433/x>x</a>'), ['//2130706433']);
+  // The rendered scan passes bare attribute values joined by spaces: every one is a link.
+  assert.deepEqual(findLocalOrigins('/courses //2130706433/x #top', { attributeValues: true }), [
+    '//2130706433',
+  ]);
+  // In prose it stays a comment-shaped string, not a link.
+  assert.deepEqual(findLocalOrigins('wait //10 then retry'), []);
+  // CodeRabbit on #1033 (round 2): browsers strip spaces around a URL value, so these are links too.
+  assert.deepEqual(findLocalOrigins('<a href=" //2130706433/learn">x</a>'), ['//2130706433']);
+  assert.deepEqual(findLocalOrigins("<a href = '  //2130706433'>x</a>"), ['//2130706433']);
+  assert.deepEqual(findLocalOrigins('<img src=\n\t//2130706433/p.png>'), ['//2130706433']);
+});
+check('the quick-enrol card selector is the data attribute on the card (GP-674)', () => {
+  assert.equal(QUICK_ENROL_CARD_ATTR, 'data-quick-enrol-card');
+  assert.equal(QUICK_ENROL_CARD_SELECTOR, 'form[data-quick-enrol-card]');
+});
 check('a fault already found survives a later audit error (red, not "could not look")', () => {
   const e = new Error('later page timed out');
   assert.equal(failureSummary(e, ['LOCALHOST /: http://localhost:8080']).code, 1);

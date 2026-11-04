@@ -1,6 +1,8 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 
+import { QUICK_ENROL_CARD_ATTR } from '../../../scripts/check-live-buy-path.mjs';
+
 import {
   GuestEnrolForm,
   guestCheckoutRefusalDestination,
@@ -148,5 +150,21 @@ describe('guestCheckoutRefusalDestination — already-enrolled checkout 409', ()
     expect(guestCheckoutRefusalDestination({ checkout_url: 'https://stripe.test' } as never)).toBe(
       null
     );
+  });
+});
+
+/**
+ * GP-674. The daily live buy-path guard reads ONLY the quick-enrol card, found by this data
+ * attribute, and goes red when the card is missing from a paid course page. The attribute name
+ * is imported from the guard, so renaming it on either side fails here rather than in the
+ * daily run against production.
+ */
+describe('GuestEnrolForm: carries the attribute the live buy-path guard selects', () => {
+  it.each([
+    ['paid', { slug: 'using-atp-to-create-protocols', priceAud: 20, isFree: false }],
+    ['free', { slug: 'using-air-scrubbers-and-afds', priceAud: 0, isFree: true }],
+  ])('%s: the <form> itself carries the guard attribute', (_mode, props) => {
+    const html = render(props);
+    expect(html).toMatch(new RegExp(`^<form[^>]*\\s${QUICK_ENROL_CARD_ATTR}=""`));
   });
 });
