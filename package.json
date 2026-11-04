@@ -23,6 +23,8 @@
     "test:live-course-fields": "node scripts/check-live-course-fields.test.mjs",
     "audit:orphaned-payments": "node scripts/audit-orphaned-payments.mjs",
     "test:orphaned-payments": "node scripts/audit-orphaned-payments.test.mjs",
+    "check:live-buy-path": "node scripts/check-live-buy-path.mjs",
+    "test:live-buy-path": "node scripts/check-live-buy-path.test.mjs",
     "test:live-catalogue": "node scripts/check-live-catalogue.test.mjs && node scripts/live-catalogue-ci-summary.test.mjs",
     "verify:standards-claim": "node scripts/check-standards-claims.mjs --text",
     "check:standards-claims": "node scripts/check-standards-claims.mjs",
