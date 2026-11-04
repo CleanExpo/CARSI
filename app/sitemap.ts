@@ -142,10 +142,13 @@ const professionalDirectoryPage = {
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const directory = await getProfessionalDirectoryStatus();
   const basePages = directory.live ? [...staticPages, professionalDirectoryPage] : staticPages;
-  // /for/* authority pages are listed only once their registry entry is approved.
+  // Published LMS catalogue (empty when the database is unavailable).
+  const dbCourses = await getPublishedCourseSlugsFromDatabase();
+  // /for/* authority pages are listed only when publishable: approved and valid against the
+  // database catalogue. The remote API fallback below is not used for this decision.
   const pages = [
     ...basePages,
-    ...authoritySitemapPaths().map((path) => ({
+    ...authoritySitemapPaths(new Set(dbCourses.map((c) => c.slug))).map((path) => ({
       path,
       priority: 0.6,
       changeFreq: 'monthly' as const,
@@ -161,7 +164,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   // Dynamic course pages — published LMS catalogue, then remote API fallback
-  const dbCourses = await getPublishedCourseSlugsFromDatabase();
   // Only courses whose public page renders: onboarding courses redirect to the dashboard.
   const courses = (dbCourses.length > 0 ? dbCourses : await getCourses()).filter(
     hasPublicCoursePage

@@ -4,8 +4,10 @@ import { healthcareRecommendedSlugs } from '@/lib/marketing/industry-track1-topi
  * Registry for the six /for/<industry> authority pages (CARSI Authority Machine, slice 3).
  *
  * Every page starts as a `draft`: noindex, nofollow, absent from the sitemap. A page becomes
- * indexable only through a committed change that sets `status: 'approved'` with `approvedBy`
- * and `approvedAt` filled in, which `validateAuthorityPage` checks.
+ * indexable only through a committed change that sets `status: 'approved'` with `approvedBy`,
+ * `approvedAt` and a `heroImage` filled in. `isAuthorityPagePublishable` is the one rule that
+ * decides indexing, the sitemap and the draft banner; it runs `validateAuthorityPage` against the
+ * published course list.
  *
  * Claims: only facts opened at the primary source (tag `O`) on `lastVerified`. Anything the
  * research marked secondary (`S`) or UNVERIFIED is not in this file. Prices are never typed
@@ -34,11 +36,19 @@ export interface AuthorityPlannedModule {
 export type AuthorityIcon = 'hardhat' | 'clipboard' | 'building' | 'stethoscope' | 'home' | 'spray';
 export type AuthorityCardIcon = 'shield' | 'droplets' | 'wind' | 'clipboard';
 
+export interface AuthorityHeroImage {
+  /** Path under /public or an allowed remote image URL. */
+  src: string;
+  alt: string;
+}
+
 export interface AuthorityPageEntry {
   slug: string;
   status: AuthorityStatus;
   approvedBy: string | null;
   approvedAt: string | null;
+  /** Required before approval. Null while the visual is not chosen. */
+  heroImage: AuthorityHeroImage | null;
   audience: string;
   /** Lower-case label used mid-sentence by shared components ("Live courses for builders"). */
   shortAudience: string;
@@ -74,7 +84,8 @@ const VHBA_URL =
 
 const swaCode = (text: string): AuthorityClaim => ({
   text,
-  sourceTitle: 'Model Code of Practice: Managing the risks of biological hazards at work (March 2026)',
+  sourceTitle:
+    'Model Code of Practice: Managing the risks of biological hazards at work (March 2026)',
   publisher: 'Safe Work Australia',
   sourceUrl: SWA_CODE_URL,
   tag: 'O',
@@ -93,6 +104,7 @@ export const authorityPages: AuthorityPageEntry[] = [
     status: 'draft',
     approvedBy: null,
     approvedAt: null,
+    heroImage: null,
     audience: 'NSW licensed builders',
     shortAudience: 'builders',
     icon: 'hardhat',
@@ -108,9 +120,9 @@ export const authorityPages: AuthorityPageEntry[] = [
     whyCards: [
       {
         icon: 'droplets',
-        title: 'Reinstating over wet material',
+        title: 'Measure before you reinstate',
         description:
-          'Lining, flooring and cabinetry go back over framing that looks dry. Learn how moisture is measured and what a dry standard means before the next coat of paint.',
+          'Before lining, flooring or cabinetry goes back over framing that got wet, measure it. Learn how moisture is measured and what a dry standard means before the next coat of paint.',
       },
       {
         icon: 'clipboard',
@@ -153,7 +165,8 @@ export const authorityPages: AuthorityPageEntry[] = [
           status: 'not_built',
         },
         {
-          title: 'Insurance repair after flood and storm: Category 3 water, safety and documentation',
+          title:
+            'Insurance repair after flood and storm: Category 3 water, safety and documentation',
           minutes: 60,
           status: 'not_built',
         },
@@ -181,6 +194,7 @@ export const authorityPages: AuthorityPageEntry[] = [
     status: 'draft',
     approvedBy: null,
     approvedAt: null,
+    heroImage: null,
     audience: 'Insurance claims staff and loss adjusters',
     shortAudience: 'claims staff and loss adjusters',
     icon: 'clipboard',
@@ -272,6 +286,7 @@ export const authorityPages: AuthorityPageEntry[] = [
     status: 'draft',
     approvedBy: null,
     approvedAt: null,
+    heroImage: null,
     audience: 'Facility managers and building owners',
     shortAudience: 'facility managers and building owners',
     icon: 'building',
@@ -283,7 +298,12 @@ export const authorityPages: AuthorityPageEntry[] = [
     headlineAccent: 'to a leak or flood',
     description:
       'For facility managers and building owners who direct the response to a leak or flood. Self-paced courses on commercial water damage, moisture and mould.',
-    topics: ['First response', 'Commercial buildings', 'Mould and air quality', 'Choosing a restorer'],
+    topics: [
+      'First response',
+      'Commercial buildings',
+      'Mould and air quality',
+      'Choosing a restorer',
+    ],
     whyCards: [
       {
         icon: 'droplets',
@@ -357,6 +377,7 @@ export const authorityPages: AuthorityPageEntry[] = [
     status: 'draft',
     approvedBy: null,
     approvedAt: null,
+    heroImage: null,
     audience: 'Victorian healthcare facilities',
     shortAudience: 'healthcare facilities',
     icon: 'stethoscope',
@@ -392,7 +413,8 @@ export const authorityPages: AuthorityPageEntry[] = [
     claims: [
       {
         text: 'Victorian Health Building Authority technical advice HTA-2024-002 says a hospital must establish a contractual arrangement with at least one qualified, skilled and experienced remediation subcontractor.',
-        sourceTitle: 'HTA-2024-002 Responding to flooding events: restoration for healthcare facilities',
+        sourceTitle:
+          'HTA-2024-002 Responding to flooding events: restoration for healthcare facilities',
         publisher: 'Victorian Health Building Authority',
         sourceUrl: VHBA_URL,
         tag: 'O',
@@ -400,7 +422,8 @@ export const authorityPages: AuthorityPageEntry[] = [
       },
       {
         text: 'The same advice says remediation technicians should have, at the very least, completed the water damage restoration and applied microbial remediation technician qualifications issued by the IICRC.',
-        sourceTitle: 'HTA-2024-002 Responding to flooding events: restoration for healthcare facilities',
+        sourceTitle:
+          'HTA-2024-002 Responding to flooding events: restoration for healthcare facilities',
         publisher: 'Victorian Health Building Authority',
         sourceUrl: VHBA_URL,
         tag: 'O',
@@ -410,7 +433,10 @@ export const authorityPages: AuthorityPageEntry[] = [
     scopeNote:
       'Those IICRC certifications are obtained only through schools and examinations approved by the IICRC. CARSI does not deliver them. CARSI is an IICRC CEC Accredited provider, and CEC hours are shown only on a course with an approval in force. The advice above covers Victoria; check the rules in your state. CARSI courses sit beside, and do not replace, hospital infection-control policy. The modules listed as being built are not for sale yet.',
     bundle: {
-      publishedSlugs: [...healthcareRecommendedSlugs, 'introduction-to-drying-health-care-facilities'],
+      publishedSlugs: [
+        ...healthcareRecommendedSlugs,
+        'introduction-to-drying-health-care-facilities',
+      ],
       plannedModules: [
         {
           title: 'Water damage and mould in clinical environments',
@@ -445,6 +471,7 @@ export const authorityPages: AuthorityPageEntry[] = [
     status: 'draft',
     approvedBy: null,
     approvedAt: null,
+    heroImage: null,
     audience: 'Property managers and strata managers',
     shortAudience: 'property and strata managers',
     icon: 'home',
@@ -467,8 +494,7 @@ export const authorityPages: AuthorityPageEntry[] = [
       {
         icon: 'clipboard',
         title: 'Document it',
-        description:
-          'Know what to photograph, measure and record at entry, during and at exit.',
+        description: 'Know what to photograph, measure and record at entry, during and at exit.',
       },
       {
         icon: 'shield',
@@ -540,6 +566,7 @@ export const authorityPages: AuthorityPageEntry[] = [
     status: 'draft',
     approvedBy: null,
     approvedAt: null,
+    heroImage: null,
     audience: 'Commercial cleaning contractors and supervisors',
     shortAudience: 'cleaning contractors and supervisors',
     icon: 'spray',
@@ -555,9 +582,9 @@ export const authorityPages: AuthorityPageEntry[] = [
     whyCards: [
       {
         icon: 'droplets',
-        title: 'Find it early',
+        title: 'Know the signs',
         description:
-          'Cleaners are often the first to see a stain, a smell or a damp patch. Learn what the signs mean.',
+          'If you see a stain, a smell or a damp patch on a routine job, learn what the signs can mean and what to report.',
       },
       {
         icon: 'shield',
@@ -626,13 +653,28 @@ export function getAuthorityPage(slug: string): AuthorityPageEntry {
   return entry;
 }
 
-export function approvedAuthorityPages(): AuthorityPageEntry[] {
-  return authorityPages.filter((p) => p.status === 'approved');
+/**
+ * The one rule for whether a page may be indexed, listed in the sitemap and shown without the
+ * draft banner: approved, and `validateAuthorityPage` finds no problem against `liveSlugs`, the
+ * published course slugs read from the database. An empty or failed read means not publishable.
+ */
+export function isAuthorityPagePublishable(
+  entry: AuthorityPageEntry,
+  liveSlugs: ReadonlySet<string>,
+  now: Date = new Date()
+): boolean {
+  return entry.status === 'approved' && validateAuthorityPage(entry, now, liveSlugs).length === 0;
 }
 
-/** Sitemap paths: approved entries only. */
-export function authoritySitemapPaths(pages: AuthorityPageEntry[] = authorityPages): string[] {
-  return pages.filter((p) => p.status === 'approved').map((p) => `/for/${p.slug}`);
+/** Sitemap paths: publishable entries only. */
+export function authoritySitemapPaths(
+  liveSlugs: ReadonlySet<string>,
+  pages: AuthorityPageEntry[] = authorityPages,
+  now: Date = new Date()
+): string[] {
+  return pages
+    .filter((p) => isAuthorityPagePublishable(p, liveSlugs, now))
+    .map((p) => `/for/${p.slug}`);
 }
 
 const NINETY_DAYS_MS = 90 * 24 * 60 * 60 * 1000;
@@ -651,6 +693,9 @@ export function validateAuthorityPage(
   const problems: string[] = [];
   if (!entry.approvedBy) problems.push('approvedBy is required');
   if (!entry.approvedAt) problems.push('approvedAt is required');
+  if (!entry.heroImage?.src.trim() || !entry.heroImage.alt.trim()) {
+    problems.push('a hero visual with alt text is required');
+  }
   if (entry.bundle.publishedSlugs.length === 0) {
     problems.push('at least one published course is required in the bundle');
   }

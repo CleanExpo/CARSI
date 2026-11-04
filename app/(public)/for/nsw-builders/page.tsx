@@ -1,15 +1,17 @@
 import type { Metadata } from 'next';
 
-import { AuthorityPageView } from '@/components/industries/AuthorityPageView';
-import { buildAuthorityMetadata } from '@/lib/marketing/authority-metadata';
+import { AuthorityPage } from '@/components/industries/AuthorityPage';
+import { authorityMetadata } from '@/lib/marketing/authority-metadata';
 import { getAuthorityPage } from '@/lib/marketing/authority-pages';
 
 export const dynamic = 'force-dynamic';
 
-const entry = getAuthorityPage('nsw-builders');
+const SLUG = 'nsw-builders';
 
-export const metadata: Metadata = buildAuthorityMetadata(entry);
+export function generateMetadata(): Promise<Metadata> {
+  return authorityMetadata(getAuthorityPage(SLUG));
+}
 
 export default function Page() {
-  return <AuthorityPageView entry={entry} />;
+  return <AuthorityPage slug={SLUG} />;
 }

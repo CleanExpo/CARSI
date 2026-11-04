@@ -10,14 +10,15 @@ import {
   Stethoscope,
   Wind,
 } from 'lucide-react';
+import Image from 'next/image';
 
 import {
   IndustryCTA,
+  IndustryCourseSection,
   IndustryEvidenceLinks,
   IndustryFAQSection,
   IndustryHero,
   IndustryPageLayout,
-  IndustryRecommendedCourses,
   IndustryWhySection,
 } from '@/components/industries';
 import {
@@ -27,11 +28,13 @@ import {
   PUBLIC_SHELL_INNER_CLASS,
 } from '@/components/landing/public-shell-width';
 import { FAQSchema } from '@/components/seo/JsonLd';
-import type {
-  AuthorityCardIcon,
-  AuthorityIcon,
-  AuthorityPageEntry,
+import {
+  isAuthorityPagePublishable,
+  type AuthorityCardIcon,
+  type AuthorityIcon,
+  type AuthorityPageEntry,
 } from '@/lib/marketing/authority-pages';
+import type { IndustryCourseItem } from '@/lib/server/industry-courses';
 
 const ACCENT = '#146fc2';
 const CHIP_COLOURS = ['#146fc2', '#0f5fa8', '#2490ed', '#0b4a82'];
@@ -60,9 +63,17 @@ function auDate(iso: string): string {
 
 /**
  * One layout for all six /for/<industry> pages, composed from the existing industry components.
- * A draft shows a visible banner; the page is noindex until the registry entry is approved.
+ * `courses` is the published bundle as read from the database (see AuthorityPage). The course
+ * grid, the live-course count and the draft banner all come from that one list.
  */
-export function AuthorityPageView({ entry }: { entry: AuthorityPageEntry }) {
+export function AuthorityPageView({
+  entry,
+  courses,
+}: {
+  entry: AuthorityPageEntry;
+  courses: IndustryCourseItem[];
+}) {
+  const publishable = isAuthorityPagePublishable(entry, new Set(courses.map((c) => c.slug)));
   const evidence = entry.claims.map((claim) => ({
     title: claim.sourceTitle,
     publisher: claim.publisher,
@@ -74,10 +85,10 @@ export function AuthorityPageView({ entry }: { entry: AuthorityPageEntry }) {
     <IndustryPageLayout>
       <FAQSchema questions={entry.faqs} />
 
-      {entry.status === 'draft' && (
+      {!publishable && (
         <div className="border-b border-amber-200 bg-amber-50 py-3 text-center text-sm text-amber-900">
           <div className={PUBLIC_SHELL_INNER_CLASS}>
-            Draft page. Not yet approved for publication and hidden from search engines.
+            Draft page. Not yet cleared for publication and hidden from search engines.
           </div>
         </div>
       )}
@@ -94,11 +105,24 @@ export function AuthorityPageView({ entry }: { entry: AuthorityPageEntry }) {
           color: CHIP_COLOURS[i % CHIP_COLOURS.length],
         }))}
         stats={[
-          { value: String(entry.bundle.publishedSlugs.length), label: 'Live courses linked below' },
+          { value: String(courses.length), label: 'Live courses linked below' },
           { value: String(entry.claims.length), label: 'Sourced rules and facts' },
           { value: 'IICRC CEC', label: 'Shown only on courses with an approval in force' },
         ]}
       />
+
+      {entry.heroImage && (
+        <div className={`${PUBLIC_SHELL_INNER_CLASS} pt-10`}>
+          <Image
+            src={entry.heroImage.src}
+            alt={entry.heroImage.alt}
+            width={1600}
+            height={900}
+            priority
+            className="h-auto w-full rounded-3xl border border-slate-200/70 object-cover"
+          />
+        </div>
+      )}
 
       <IndustryWhySection
         industryName={entry.shortAudience}
@@ -123,10 +147,10 @@ export function AuthorityPageView({ entry }: { entry: AuthorityPageEntry }) {
         </div>
       </section>
 
-      <IndustryRecommendedCourses
+      <IndustryCourseSection
         industryName={entry.shortAudience}
         disciplineList="Live courses"
-        courseSlugs={entry.bundle.publishedSlugs}
+        courses={courses}
       />
 
       {entry.bundle.plannedModules.length > 0 && (
