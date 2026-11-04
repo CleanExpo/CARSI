@@ -22,6 +22,9 @@ function matches(row: Row, where: Where): boolean {
     }
     const value = row[key as keyof Row];
     if (cond === null) return value === null;
+    if (typeof cond === 'object' && cond && 'in' in cond) {
+      return (cond as { in: unknown[] }).in.includes(value);
+    }
     if (typeof cond === 'object' && cond && 'startsWith' in cond) {
       return (
         typeof value === 'string' && value.startsWith((cond as { startsWith: string }).startsWith)
