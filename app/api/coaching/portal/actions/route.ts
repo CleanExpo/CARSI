@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ detail: 'Title required.' }, { status: 400 });
   }
 
-  await upsertCoachingActionForUser(claims.sub, {
+  const result = await upsertCoachingActionForUser(claims.sub, {
     id: typeof body.id === 'string' ? body.id : undefined,
     title: body.title,
     description: typeof body.description === 'string' ? body.description : null,
@@ -40,6 +40,8 @@ export async function POST(request: NextRequest) {
     progressNote: typeof body.progressNote === 'string' ? body.progressNote : null,
     dueDate: typeof body.dueDate === 'string' && body.dueDate ? new Date(body.dueDate) : null,
   });
+  // A coach draft is answered exactly like a row that does not exist (GP-629).
+  if (!result.ok) return NextResponse.json({ detail: 'Not found.' }, { status: 404 });
 
   const items = await listCoachingActionsForUser(claims.sub);
   return NextResponse.json({ items });

@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 
-import { LEARNING_GOAL_PREFIX, LEARNING_REMOVED_STATUS } from '@/lib/coaching-portal/learning-path';
+import { LEARNING_GOAL_PREFIX } from '@/lib/coaching-portal/learning-path';
+import { MEMBER_BOARD_STATUSES } from '@/lib/coaching-portal/monthly-review';
 import type { CoachingActionStatus, CoachingMonthlyAction } from '@/lib/coaching-portal/types';
 import { prisma } from '@/lib/prisma';
 import { isLearningAction, syncLearningPath } from '@/lib/server/carsi-coaching-learning-path';
@@ -27,6 +28,10 @@ export type CoachingActionRow = {
   learning: { courseSlug: string; percent: number; enrolled: boolean } | null;
 };
 
+function isMemberBoardStatus(raw: string): boolean {
+  return (MEMBER_BOARD_STATUSES as readonly string[]).includes(raw);
+}
+
 function normalizeStatus(raw: string): CoachingActionStatus {
   return STATUS_MAP[raw] ?? 'todo';
 }
@@ -35,8 +40,9 @@ export async function listCoachingActionsForUser(userId: string): Promise<Coachi
   // Pull LMS progress onto learning actions first, so completion shows as done on the board.
   const learning = new Map((await syncLearningPath(userId)).map((i) => [i.actionId, i]));
   const rows = await prisma.carsiCoachingAction.findMany({
-    // Coach-removed learning actions stay as tombstones (status is NOT NULL, so NOT is safe).
-    where: { userId, NOT: { status: LEARNING_REMOVED_STATUS } },
+    // Allowlist of the four board statuses. Coach-removed learning actions (tombstones), coach
+    // drafts and monthly review records (GP-629) have other statuses and never reach the member.
+    where: { userId, status: { in: [...MEMBER_BOARD_STATUSES] } },
     orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
   });
   return rows.map((r) => {
@@ -103,7 +109,7 @@ export async function upsertCoachingActionForUser(
     priority?: string | null;
     progressNote?: string | null;
   }
-): Promise<void> {
+): Promise<{ ok: boolean }> {
   const status = input.status ?? 'todo';
   const data = {
     title: input.title.slice(0, 500),
@@ -119,19 +125,22 @@ export async function upsertCoachingActionForUser(
   if (existingId) {
     const owned = await prisma.carsiCoachingAction.findFirst({
       where: { id: existingId, userId },
-      select: { id: true, goalId: true },
+      select: { id: true, goalId: true, status: true },
     });
     if (owned) {
+      // Coach drafts and review records (GP-629) and removed courses are not the member's to edit.
+      if (!isMemberBoardStatus(owned.status)) return { ok: false };
       // A prescribed course's title and status follow the LMS; the member can only add a note.
       const update = isLearningAction(owned.goalId) ? { progressNote: data.progressNote } : data;
       await prisma.carsiCoachingAction.update({ where: { id: owned.id }, data: update });
-      return;
+      return { ok: true };
     }
   }
 
   await prisma.carsiCoachingAction.create({
     data: { id: existingId || randomUUID(), userId, ...data },
   });
+  return { ok: true };
 }
 
 export async function deleteCoachingActionForUser(
@@ -144,6 +153,8 @@ export async function deleteCoachingActionForUser(
     where: {
       id: actionId,
       userId,
+      // Only board rows: a coach draft or review record (GP-629) is never the member's to delete.
+      status: { in: [...MEMBER_BOARD_STATUSES] },
       OR: [{ goalId: null }, { NOT: { goalId: { startsWith: LEARNING_GOAL_PREFIX } } }],
     },
   });

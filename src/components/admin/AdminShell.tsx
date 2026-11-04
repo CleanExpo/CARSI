@@ -12,6 +12,7 @@ import {
   Route,
   Mail,
   Megaphone,
+  NotebookPen,
   Percent,
   Send,
   Users,
@@ -82,6 +83,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const marketingActive = pathname.startsWith('/admin/marketing');
   const businessCoachingAdminActive = pathname.startsWith('/admin/business-coaching');
   const learningPathsActive = pathname.startsWith('/admin/coaching-learning-paths');
+  const monthlyReviewActive = pathname.startsWith('/admin/coaching-monthly-review');
   const analyticsActive = pathname.startsWith('/admin/analytics');
   const yearlyMembershipActive = pathname.startsWith('/admin/yearly-membership');
   const iicrcCecActive = pathname.startsWith('/admin/iicrc-cec');
@@ -178,6 +180,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             label="Learning paths"
             icon={Route}
             active={learningPathsActive}
+          />
+          <NavButton
+            href="/admin/coaching-monthly-review"
+            label="Monthly reviews"
+            icon={NotebookPen}
+            active={monthlyReviewActive}
           />
           <NavButton
             href="/admin/ccw-roadshow"
