@@ -1,0 +1,25 @@
+name: Coaching accountability run (daily)
+
+# GP-635 / GP-677: daily coaching accountability run (check-in prompts, due-soon and overdue
+# action reminders, the day-14 "you've been quiet" nudge, day-21 coach alerts).
+# Safe to run while the feature is off: with CARSI_COACHING_ACCOUNTABILITY_ENABLED unset the
+# route answers { enabled: false } and does nothing; with the e-mail flag
+# CARSI_COACHING_ACCOUNTABILITY_EMAILS_ENABLED unset it is a dry run that sends and writes
+# nothing. Turning either flag on is a separate, founder-approved step.
+# Requires the repo secret CRON_SECRET that matches the app's CRON_SECRET env var.
+# If CRON_SECRET is not set on the app, the route returns 503 (fail-closed) and this job errors.
+
+on:
+  schedule:
+    - cron: '30 22 * * *' # 22:30 UTC daily (08:30 AEST, Brisbane has no daylight saving)
+  workflow_dispatch: {}
+
+jobs:
+  coaching-accountability:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger coaching accountability cron
+        run: |
+          curl -fsS --max-time 120 -X GET \
+            "https://carsi.com.au/api/cron/coaching-accountability" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"

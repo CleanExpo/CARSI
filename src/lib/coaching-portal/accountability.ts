@@ -42,8 +42,13 @@ export type PlanAccountability = {
   startedAt: string;
   kpis: AccountabilityKpi[];
   checkIns: KpiCheckIn[];
-  /** Last time the member opened their coaching portal (recorded at most once a day). */
+  /** Last time the member opened their coaching portal (recorded at most every 6 hours). */
   lastSeenAt: string | null;
+  /**
+   * Set when a visit is recorded after 14 or more quiet days, so the Home card can still say
+   * "you've been quiet" even when another portal page recorded that visit first (GP-677).
+   */
+  quietReturn?: { daysSilent: number; at: string };
   /** Reminder keys already e-mailed, so a scheduled re-run never repeats one. */
   notified: Record<string, string>;
 };
@@ -107,12 +112,21 @@ function parseAccountability(raw: unknown): PlanAccountability | null {
   if (isRecord(raw.notified)) {
     for (const [k, v] of Object.entries(raw.notified)) if (isIso(v)) notified[k] = v;
   }
+  const qr = raw.quietReturn;
+  const quietReturn =
+    isRecord(qr) &&
+    typeof qr.daysSilent === 'number' &&
+    Number.isFinite(qr.daysSilent) &&
+    isIso(qr.at)
+      ? { daysSilent: qr.daysSilent, at: qr.at }
+      : undefined;
   return {
     coachId: raw.coachId,
     startedAt: raw.startedAt,
     kpis: kpis.map((k) => ({ id: k.id, label: k.label })),
     checkIns,
     lastSeenAt: isIso(raw.lastSeenAt) ? raw.lastSeenAt : null,
+    ...(quietReturn ? { quietReturn } : {}),
     notified,
   };
 }
