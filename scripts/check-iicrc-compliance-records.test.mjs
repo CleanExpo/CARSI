@@ -493,6 +493,71 @@ if (typeof evaluateRecords !== 'function' || typeof classifyRecordFindings !== '
       if (f.length > 0) fail(`GP-673[link-image] control blocked: ${name}\n    ${f.map((x) => x.text).join(' | ')}`);
     }
   }
+  // GP-673 review 3 (Codex, P1 GP673-R3-DASH): letters split by an en or em dash read as "CEC" to a
+  // learner, raw, as an entity or percent-encoded. The fix is one shared rule (any character that
+  // is not a letter or digit separates the letters), so every punctuation character a learner can
+  // read between C, E and C is covered, not only the ones a review happened to try. Each case has a
+  // control built the same way with other letters, which must not draw a wording finding.
+  {
+    const wording = (f) => f.filter((x) => x.message !== UNREADABLE_MESSAGE);
+    const rec = (text) => ({ ...course(PLANTED_SLUG, 'Neutral.', text), title: 'Neutral title' });
+    const DASH = [
+      ['en dash', 'Earn 2 C–E–C hours.', 'Earn 2 A–B–C hours.'],
+      ['em dash', 'Earn 2 C—E—C hours.', 'Earn 2 A—B—C hours.'],
+      ['spaced en dash', 'Earn 2 C – E – C hours.', 'Earn 2 A – B – C hours.'],
+      ['en dash entity (numeric)', 'Earn 2 C&#8211;E&#8211;C hours.', 'Earn 2 A&#8211;B&#8211;C hours.'],
+      ['em dash entity (hex)', 'Earn 2 C&#x2014;E&#x2014;C hours.', 'Earn 2 A&#x2014;B&#x2014;C hours.'],
+      ['en dash entity (named)', 'Earn 2 C&ndash;E&ndash;C hours.', 'Earn 2 A&ndash;B&ndash;C hours.'],
+      ['bullet', 'Earn 2 C•E•C hours.', 'Earn 2 A•B•C hours.'],
+      ['ellipsis', 'Earn 2 C…E…C hours.', 'Earn 2 A…B…C hours.'],
+      ['no-break space', 'Earn 2 C E C hours.', 'Earn 2 A B C hours.'],
+      ['curly apostrophe', 'Earn 2 C’E’C hours.', 'Earn 2 A’B’C hours.'],
+      ['comma', 'Earn 2 C,E,C hours.', 'Earn 2 A,B,C hours.'],
+      ['colon', 'Earn 2 C:E:C hours.', 'Earn 2 A:B:C hours.'],
+      ['plus', 'Earn 2 C+E+C hours.', 'Earn 2 A+B+C hours.'],
+      ['tilde', 'Earn 2 C~E~C hours.', 'Earn 2 A~B~C hours.'],
+      ['percent-encoded en dash in a link target', '<p><a href="https://carsi.com.au/C%E2%80%93E%E2%80%93C-hours">Read more</a></p>', '<p><a href="https://carsi.com.au/A%E2%80%93B%E2%80%93C-hours">Read more</a></p>'],
+      ['en dash entity in a link target', '<p><a href="https://carsi.com.au/C&#8211;E&#8211;C-hours">Read more</a></p>', '<p><a href="https://carsi.com.au/A&#8211;B&#8211;C-hours">Read more</a></p>'],
+    ];
+    for (const [name, bad, neutralText] of DASH) {
+      const f = wording(scan([rec(bad)]));
+      if (f.length === 0) fail(`GP-673[dash] MUST DRAW A CEC WORDING FINDING but did not: ${name}\n    ${bad}`);
+      else if (!f.some((x) => x.slug === PLANTED_SLUG && x.field === 'description')) fail(`GP-673[dash] finding does not name slug/field: ${name}`);
+      const n = wording(scan([rec(neutralText)]));
+      if (n.length > 0) fail(`GP-673[dash] control drew a CEC wording finding: ${name}\n    ${n.map((x) => x.text).join(' | ')}`);
+    }
+    // Ordinary prose with a dash between words, and initials, must not read as CEC.
+    for (const text of ['Clean – extract – contain.', 'Section C – Equipment checks.', 'Grades A, B and C.']) {
+      const n = wording(scan([rec(text)]));
+      if (n.length > 0) fail(`GP-673[dash] control drew a CEC wording finding on ordinary prose: ${text}\n    ${n.map((x) => x.text).join(' | ')}`);
+    }
+    // The real guard, end to end, on two of the cases above.
+    for (const bad of ['Earn 2 C–E–C hours.', '<p><a href="https://carsi.com.au/C%E2%80%93E%E2%80%93C-hours">Read more</a></p>']) {
+      const r = runGuardIn({ [EXPORT_FILE]: JSON.stringify([rec(bad)]) });
+      if (r.status === 0 || !r.out.includes(PLANTED_SLUG)) fail(`GP-673[dash] real guard passed or did not name the slug for: ${bad}`);
+    }
+  }
+  // GP-673 review 3 (Codex, P0 GP673-R3-ATTR-MUTATION): each feed of the rendered view into the
+  // wording rules needs a case that ONLY that feed can catch, so deleting the feed turns this test
+  // red. The stored-text views cannot see these: the purchase block (removed only by the page) sits
+  // inside the link target, or the wording exists only before or only after percent-decoding.
+  {
+    const wording = (f) => f.filter((x) => x.message !== UNREADABLE_MESSAGE);
+    const rec = (text) => ({ ...course(PLANTED_SLUG, 'Neutral.', text), title: 'Neutral title' });
+    const CTA = '<h2>Already Purchased This Course?</h2><p>Access Here</p>';
+    const link = (href) => `<p><a href="https://carsi.com.au/${href}">Read more</a></p>`;
+    const ATTR_FEED = [
+      ['purchase block inside a link target (rendered attribute)', link(`C${CTA}EC-hours`), link(`courses${CTA}-drying`)],
+      ['purchase block inside a link target, then a percent escape (decoded attribute only)', link(`C${CTA}%45C-hours`), link(`C${CTA}%45X-hours`)],
+      ['wording only before percent-decoding (raw attribute only)', link('x%CEC-approved'), link('x%CEX-approved')],
+    ];
+    for (const [name, bad, neutralText] of ATTR_FEED) {
+      const f = wording(scan([rec(bad)]));
+      if (f.length === 0) fail(`GP-673[attr-feed] MUST DRAW A CEC WORDING FINDING but did not: ${name}\n    ${bad}`);
+      const n = wording(scan([rec(neutralText)]));
+      if (n.length > 0) fail(`GP-673[attr-feed] control drew a CEC wording finding: ${name}\n    ${n.map((x) => x.text).join(' | ')}`);
+    }
+  }
   // Review 2 warning GP673-W1: reviewed attribute VALUES are enforced, not only attribute names.
   for (const [name, text] of [
     ['ul type other than disc', '<ul type="x"><li>Neutral</li></ul>'],

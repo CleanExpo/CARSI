@@ -349,10 +349,21 @@ export const RECORD_SCANNED_DIRS = ['data/wordpress-export/'];
  *
  *  Scoped to course records only. In generic marketing copy "courses the IICRC has approved for
  *  CECs" is a correct statement about the registry and is handled by the line rules. */
+/** What may stand between the letters of a spaced-out "C E C" and still read as CEC: ANY run of
+ *  characters that are not letters or digits (spaces, dashes of every width, bullets, ellipses,
+ *  quotes, commas, colons, …). GP-673 review r3 (Codex, P1 GP673-R3-DASH): the old list (space and
+ *  . - _ * /) missed the en and em dash the reviewed character set allows. One rule for the whole
+ *  class, not a longer list: a list loses to the next character nobody enumerated. Every view of a
+ *  record (stored, rendered, attribute, decoded) is matched against this same rule. */
+const CEC_LETTER_SEP = '[^\\p{L}\\p{N}]*';
+
 export const CEC_APPROVAL_PROSE = {
-  // GP-673: letters spaced or punctuated apart ("C E C", "C-E-C", "C.E.C."), and "CEC" glued to a
-  // word at either end ("CECapproved", "approvedCECs"), read as CEC to a learner too.
-  re: /\bCECs?\b|\bC[\s.\-_*/]*E[\s.\-_*/]*Cs?\b|\bCECs?(?=[a-z])|(?<=[a-z])CECs?\b|continuing[\s-]*education|\bapprov\w*\s+by\s+(?:the\s+)?IICRC\b|\bIICRC[\s-]*(?:CEC[\s-]*)?(?:approv|accredit|certif)\w*/i,
+  // GP-673: letters spaced or punctuated apart ("C E C", "C-E-C", "C.E.C.", "C–E–C"), and "CEC"
+  // glued to a word at either end ("CECapproved", "approvedCECs"), read as CEC to a learner too.
+  re: new RegExp(
+    String.raw`\bCECs?\b|\bC${CEC_LETTER_SEP}E${CEC_LETTER_SEP}Cs?\b|\bCECs?(?=[a-z])|(?<=[a-z])CECs?\b|continuing[\s-]*education|\bapprov\w*\s+by\s+(?:the\s+)?IICRC\b|\bIICRC[\s-]*(?:CEC[\s-]*)?(?:approv|accredit|certif)\w*`,
+    'iu'
+  ),
   message:
     'CEC / continuing-education wording in the record of a course that is not approved in data/seed/cec-approvals.json. On an unapproved course any such wording is blocked (claims, headings and denials alike); remove it, or the founder records the IICRC approval (fail-closed, CLAUDE.md).',
 };
