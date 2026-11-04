@@ -188,13 +188,24 @@ export async function submitMyCheckIn(
   rawValues: unknown,
   now: Date
 ): Promise<SaveOutcome> {
-  const plan = await store.readPlan(userId);
-  if (!plan?.accountability || plan.accountability.kpis.length === 0) return { status: 'no_kpis' };
-  const values = normaliseCheckInValues(plan.accountability.kpis, rawValues);
-  if (!values.ok) return { status: 'invalid', reason: values.reason };
-  const acc = await mutatePlan(store, userId, (current) =>
-    current ? applyCheckIn(current, values.values, now) : null
-  );
+  // Values are checked against the KPIs of the exact plan version being written, inside the
+  // compare-and-set loop. Checking against an earlier read let a concurrent KPI edit store
+  // the check-in under ids the plan no longer has (Codex r1 P1).
+  let outcome: SaveOutcome | null = null;
+  const acc = await mutatePlan(store, userId, (current) => {
+    if (!current || current.kpis.length === 0) {
+      outcome = { status: 'no_kpis' };
+      return null;
+    }
+    const values = normaliseCheckInValues(current.kpis, rawValues);
+    if (!values.ok) {
+      outcome = { status: 'invalid', reason: values.reason };
+      return null;
+    }
+    outcome = null;
+    return applyCheckIn(current, values.values, now);
+  });
+  if (outcome) return outcome;
   return { status: 'ok', view: memberView(acc, await store.listActions(userId), now, null) };
 }
 
