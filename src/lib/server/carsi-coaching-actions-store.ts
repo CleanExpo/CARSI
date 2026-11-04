@@ -1,7 +1,25 @@
 import { randomUUID } from 'node:crypto';
 
+import { ASK_COACH_GOAL_PREFIX, isAskCoachGoalId } from '@/lib/coaching-portal/ask-my-coach';
+import {
+  LEARNING_DRAFT_REMOVED_STATUS,
+  LEARNING_GOAL_PREFIX,
+  LEARNING_PROPOSED_STATUS,
+  LEARNING_REMOVED_STATUS,
+} from '@/lib/coaching-portal/learning-path';
 import type { CoachingActionStatus, CoachingMonthlyAction } from '@/lib/coaching-portal/types';
 import { prisma } from '@/lib/prisma';
+import { isLearningAction, syncLearningPath } from '@/lib/server/carsi-coaching-learning-path';
+
+/**
+ * Rows the member never sees: coach-removed tombstones and draft courses the coach has not yet
+ * approved (GP-633). Every member read and write goes through this list.
+ */
+const MEMBER_HIDDEN_STATUSES = [
+  LEARNING_REMOVED_STATUS,
+  LEARNING_PROPOSED_STATUS,
+  LEARNING_DRAFT_REMOVED_STATUS,
+];
 
 const STATUS_MAP: Record<string, CoachingActionStatus> = {
   todo: 'todo',
@@ -21,6 +39,8 @@ export type CoachingActionRow = {
   coachFeedback: string | null;
   goalId: string | null;
   createdAt: Date;
+  /** Set when the action is a prescribed CARSI course (GP-633); progress comes from the LMS. */
+  learning: { courseSlug: string; percent: number; enrolled: boolean } | null;
 };
 
 function normalizeStatus(raw: string): CoachingActionStatus {
@@ -28,22 +48,29 @@ function normalizeStatus(raw: string): CoachingActionStatus {
 }
 
 export async function listCoachingActionsForUser(userId: string): Promise<CoachingActionRow[]> {
+  // Pull LMS progress onto learning actions first, so completion shows as done on the board.
+  const learning = new Map((await syncLearningPath(userId)).map((i) => [i.actionId, i]));
   const rows = await prisma.carsiCoachingAction.findMany({
-    where: { userId },
+    // Tombstones and unapproved drafts stay hidden (status is NOT NULL, so NOT IN is safe).
+    where: { userId, NOT: { status: { in: MEMBER_HIDDEN_STATUSES } } },
     orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
   });
-  return rows.map((r) => ({
-    id: r.id,
-    title: r.title,
-    description: r.description,
-    status: normalizeStatus(r.status),
-    dueDate: r.dueDate,
-    priority: r.priority,
-    progressNote: r.progressNote,
-    coachFeedback: r.coachFeedback,
-    goalId: r.goalId,
-    createdAt: r.createdAt,
-  }));
+  return rows.map((r) => {
+    const li = learning.get(r.id);
+    return {
+      id: r.id,
+      title: r.title,
+      description: r.description,
+      status: normalizeStatus(r.status),
+      dueDate: r.dueDate,
+      priority: r.priority,
+      progressNote: r.progressNote,
+      coachFeedback: r.coachFeedback,
+      goalId: r.goalId,
+      createdAt: r.createdAt,
+      learning: li ? { courseSlug: li.slug, percent: li.percent, enrolled: li.enrolled } : null,
+    };
+  });
 }
 
 export async function importLegacyActionsFromSubscriptionJson(
@@ -108,10 +135,19 @@ export async function upsertCoachingActionForUser(
   if (existingId) {
     const owned = await prisma.carsiCoachingAction.findFirst({
       where: { id: existingId, userId },
-      select: { id: true },
+      select: { id: true, goalId: true, status: true },
     });
+    // A row the member cannot see (an unapproved draft or a removed course) is not theirs to
+    // edit, and must not be re-created under the same id either.
+    if (owned && MEMBER_HIDDEN_STATUSES.includes(owned.status)) return;
     if (owned) {
-      await prisma.carsiCoachingAction.update({ where: { id: owned.id }, data });
+      // A prescribed course's title and status follow the LMS, and a question to the coach
+      // (GP-630) is closed by the coach's answer; on both the member can only add a note.
+      const update =
+        isLearningAction(owned.goalId) || isAskCoachGoalId(owned.goalId)
+          ? { progressNote: data.progressNote }
+          : data;
+      await prisma.carsiCoachingAction.update({ where: { id: owned.id }, data: update });
       return;
     }
   }
@@ -125,8 +161,23 @@ export async function deleteCoachingActionForUser(
   userId: string,
   actionId: string
 ): Promise<boolean> {
+  // Prescribed courses are removed by the coach (admin learning-path review), not the member,
+  // and a question sent to the coach (GP-630) stays until the coach has answered it.
+  // goal_id is nullable, so "not a protected action" must include NULL explicitly.
   const result = await prisma.carsiCoachingAction.deleteMany({
-    where: { id: actionId, userId },
+    where: {
+      id: actionId,
+      userId,
+      OR: [
+        { goalId: null },
+        {
+          NOT: [
+            { goalId: { startsWith: LEARNING_GOAL_PREFIX } },
+            { goalId: { startsWith: ASK_COACH_GOAL_PREFIX } },
+          ],
+        },
+      ],
+    },
   });
   return result.count > 0;
 }

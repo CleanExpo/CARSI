@@ -9,11 +9,14 @@ import {
   ClipboardCheck,
   GraduationCap,
   LogOut,
+  Route,
   Mail,
   Megaphone,
   Percent,
   Send,
   Users,
+  MessageCircleQuestion,
+  LineChart,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -80,6 +83,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const contactsActive = pathname.startsWith('/admin/contacts');
   const marketingActive = pathname.startsWith('/admin/marketing');
   const businessCoachingAdminActive = pathname.startsWith('/admin/business-coaching');
+  const learningPathsActive = pathname.startsWith('/admin/coaching-learning-paths');
+  const coachQuestionsActive = pathname.startsWith('/admin/coaching-questions');
+  const accountabilityActive = pathname.startsWith('/admin/coaching-accountability');
   const analyticsActive = pathname.startsWith('/admin/analytics');
   const yearlyMembershipActive = pathname.startsWith('/admin/yearly-membership');
   const iicrcCecActive = pathname.startsWith('/admin/iicrc-cec');
@@ -92,9 +98,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="relative z-10 flex h-dvh min-h-0 w-full max-w-full overflow-hidden">
+    <div className="relative z-10 flex h-dvh min-h-0 w-full max-w-full flex-col overflow-hidden md:flex-row">
       <aside
-        className="scrollbar-glass flex h-full w-[240px] shrink-0 flex-col overflow-hidden"
+        className="scrollbar-glass flex w-full shrink-0 flex-col overflow-hidden md:h-full md:w-[240px]"
         style={{
           background: 'rgba(8, 12, 24, 0.88)',
           backdropFilter: 'blur(24px) saturate(180%)',
@@ -115,7 +121,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </div>
         </div>
 
-        <nav className="flex flex-1 flex-col gap-0.5 px-2 py-4">
+        {/* Phones: the menu is one row that scrolls sideways above the page; md and up: the sidebar. */}
+        <nav className="flex gap-0.5 overflow-x-auto px-2 py-2 whitespace-nowrap md:flex-1 md:flex-col md:overflow-visible md:py-4 [&>*]:shrink-0">
           <NavButton href="/admin" label="Overview" icon={BarChart3} active={overviewActive} />
           <NavButton href="/admin/users" label="Users" icon={Users} active={usersActive} />
           <NavButton href="/admin/courses" label="Courses" icon={BookOpen} active={coursesActive} />
@@ -172,6 +179,24 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             active={businessCoachingAdminActive}
           />
           <NavButton
+            href="/admin/coaching-learning-paths"
+            label="Learning paths"
+            icon={Route}
+            active={learningPathsActive}
+          />
+          <NavButton
+            href="/admin/coaching-questions"
+            label="Coach questions"
+            icon={MessageCircleQuestion}
+            active={coachQuestionsActive}
+          />
+          <NavButton
+            href="/admin/coaching-accountability"
+            label="Member accountability"
+            icon={LineChart}
+            active={accountabilityActive}
+          />
+          <NavButton
             href="/admin/ccw-roadshow"
             label="CCW Roadshow"
             icon={CalendarDays}
@@ -185,7 +210,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           />
         </nav>
 
-        <div className="mt-auto border-t border-white/6 px-2 py-3 pb-6">
+        <div className="mt-auto border-t border-white/6 px-2 py-1 md:py-3 md:pb-6">
           <button
             type="button"
             onClick={() => void handleSignOut()}

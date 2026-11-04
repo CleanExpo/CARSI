@@ -1,0 +1,256 @@
+{
+ "version": 1,
+ "issue": "GP-671",
+ "trailers": [
+  {
+   "slug": "tile-cleaning-for-carpet-cleaners",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782955572/carsi/course-trailers/b57c6d29-8a03-4872-ae39-9e15d3f82112.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717544/carsi/course-trailers/981a8e52-2984-4bc7-9dbb-eddd30ad22c1.mp4"
+  },
+  {
+   "slug": "large-loss-mastery-course",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782955309/carsi/course-trailers/8a2e4e39-200c-4157-b4a2-21d043db1661.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717547/carsi/course-trailers/ae6294fa-a669-4088-bf96-deed06fe465d.mp4"
+  },
+  {
+   "slug": "introduction-to-advanced-structural-drying",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782954688/carsi/course-trailers/05b74697-fc56-4840-bfce-b5845ce8580a.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717551/carsi/course-trailers/0e2207fd-42b3-418e-a87f-929f7e6b38d2.mp4"
+  },
+  {
+   "slug": "introduction-to-residential-duct-cleaning",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782955092/carsi/course-trailers/8b04f9c5-bf71-4c5a-891a-f1465f655d15.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717555/carsi/course-trailers/2b58419f-28bc-4e8a-8dbd-3cda5db59eba.mp4"
+  },
+  {
+   "slug": "refrigerant-dehumidifiers-for-water-loss-restoration",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782955406/carsi/course-trailers/f4ba4afa-3e5d-462b-b48a-0dcd51dc2334.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717558/carsi/course-trailers/50da7b98-38a0-4c24-b8b7-11b795cf9f4b.mp4"
+  },
+  {
+   "slug": "insurance-adjusters-and-their-roles",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782954686/carsi/course-trailers/01b2a974-bd79-4ca7-b7b6-2d26c9d28045.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717560/carsi/course-trailers/0d8f2e96-3e61-462c-b8bc-c28b6c424f94.mp4"
+  },
+  {
+   "slug": "carpet-cleaning-basics-b66757ce",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782954653/carsi/course-trailers/06757d59-4c1c-48cb-9ab4-36b122898f75.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717562/carsi/course-trailers/17bb4f2f-c0e4-49a8-b87e-b20121e2b922.mp4"
+  },
+  {
+   "slug": "introduction-to-structural-drying-concepts",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782955127/carsi/course-trailers/4518942f-ae6d-4bd5-8d6b-95281c93f293.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717566/carsi/course-trailers/bac49855-dd76-461a-8f3e-342ba4f5cf93.mp4"
+  },
+  {
+   "slug": "collaborative-development-your-personal-ai-assistant",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782954656/carsi/course-trailers/26fb0494-37a0-4f3e-9e89-3d1a123b901c.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717568/carsi/course-trailers/5c285e33-e864-49ee-82d7-ee24029fb422.mp4"
+  },
+  {
+   "slug": "introduction-to-basic-carpet-cleaning-and-drying",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782954816/carsi/course-trailers/13a4bc87-6e42-45b3-8fb2-0fa51452949e.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717570/carsi/course-trailers/f29ecddd-6e87-4de2-a143-d0661833feab.mp4"
+  },
+  {
+   "slug": "introduction-to-psychrometry-science-and-calculations",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782955079/carsi/course-trailers/83fcccbe-d8e3-4d94-a5a4-511d370e7130.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717572/carsi/course-trailers/dbdd31d5-efc8-4213-8b7d-b2bb7eb1d5f7.mp4"
+  },
+  {
+   "slug": "introduction-to-iaq-and-mould",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782954897/carsi/course-trailers/693f7e5a-be70-44b4-9b32-02d9862e6fdb.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717574/carsi/course-trailers/f78ddebf-56cc-4a53-ab54-02c5b7315b4e.mp4"
+  },
+  {
+   "slug": "introduction-to-smoke-and-soot-damage-restoration",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782955124/carsi/course-trailers/6347fc84-198c-4160-a748-9a9589141415.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717576/carsi/course-trailers/ffb5c88b-acae-4507-818d-40a06c6ff3b0.mp4"
+  },
+  {
+   "slug": "introduction-to-water-damage-marketing-and-sales",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782955284/carsi/course-trailers/ac66a0bc-bd93-4a3a-af6f-d5994bf72e2d.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717578/carsi/course-trailers/9d6d19e0-78da-4107-9a80-b9de079dc6c2.mp4"
+  },
+  {
+   "slug": "introduction-to-safety-procedures-for-water-damage-work",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782955113/carsi/course-trailers/cfd72cc2-87ec-4beb-b493-95fb64d9f691.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717581/carsi/course-trailers/a70adebb-0e7e-4ffc-8917-c18e47cfabad.mp4"
+  },
+  {
+   "slug": "introduction-to-applied-microbial-remediation",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782954712/carsi/course-trailers/42d726b3-6d00-4f41-a1bf-a57bc769bcd3.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717586/carsi/course-trailers/b70ea8f6-713c-444f-89f8-f74c2a52405c.mp4"
+  },
+  {
+   "slug": "introduction-to-digital-moisture-mapping",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782954863/carsi/course-trailers/a545628b-7b29-4397-99e5-6db4fff996db.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717588/carsi/course-trailers/bed046e3-ad46-4fb2-8845-b4ae9d6aae25.mp4"
+  },
+  {
+   "slug": "moisture-meter-course",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782955334/carsi/course-trailers/703e8746-f76a-4a12-b940-87a0ed55e9d4.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717590/carsi/course-trailers/05509d81-f1fb-49ec-9147-6ed5332630ca.mp4"
+  },
+  {
+   "slug": "level-2-mould-remediation-30ee3492",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782955324/carsi/course-trailers/f2f8ed36-d549-4f97-967d-20c5f20206fe.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717593/carsi/course-trailers/74669c14-68f0-48cf-b628-bf049e189502.mp4"
+  },
+  {
+   "slug": "using-atp-to-create-protocols",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782955576/carsi/course-trailers/9148c026-5d90-43e9-8d08-11afbd631eaf.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717597/carsi/course-trailers/1911a344-b889-452a-ae1e-c960e10d89f7.mp4"
+  },
+  {
+   "slug": "level-3-mould-remediation-c5797369",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782955326/carsi/course-trailers/0ac63ce8-72af-4234-945b-f918f1e98a64.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717600/carsi/course-trailers/d305c1db-af05-4c58-bec9-a712f2e8dbe7.mp4"
+  },
+  {
+   "slug": "safety-data-sheet-sds-course",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782955413/carsi/course-trailers/2d327ff2-c739-4340-899c-7ce63ca400bb.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717602/carsi/course-trailers/ea3b21c1-bb7d-406b-a114-1576fa1da0ba.mp4"
+  },
+  {
+   "slug": "standard-operating-procedures-sop-course",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782955559/carsi/course-trailers/f4d9dd95-cc80-420f-b84e-b215f54c0747.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717603/carsi/course-trailers/cb9fb24a-05d7-4cee-8f43-bc9c4aa4e72f.mp4"
+  },
+  {
+   "slug": "risk-assessment-course",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782955409/carsi/course-trailers/41063dab-ce18-4ba7-896d-c1ae744aaf12.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717606/carsi/course-trailers/45fb12e3-58d6-46a4-9e1d-0a8722accbe0.mp4"
+  },
+  {
+   "slug": "microbe-clean-basic-understanding-course",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782955329/carsi/course-trailers/2d8f050a-3d9d-47e5-ae12-a7926c3dcd2a.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717608/carsi/course-trailers/fa8196e8-fa6e-4224-9b9e-8a2fff6d8c53.mp4"
+  },
+  {
+   "slug": "level-1-mould-remediation-2cc96b85",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782955322/carsi/course-trailers/4f78a87e-b11f-4caf-9999-1541bf34316b.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717610/carsi/course-trailers/72e93c97-7350-4910-b921-eef5c24fb88c.mp4"
+  },
+  {
+   "slug": "safe-work-method-statements-swms-course",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782955411/carsi/course-trailers/bd4a25c6-9c6c-41ea-8eb2-dc03b7f2be05.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717613/carsi/course-trailers/1c84ed8d-f853-4eb7-a818-49dda96d7618.mp4"
+  },
+  {
+   "slug": "job-safety-and-environmental-analysis-jsea-course",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782955302/carsi/course-trailers/27b74b06-91f1-4d33-9554-a477cea9aeb3.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717617/carsi/course-trailers/30fbda50-a48f-41a4-9bbf-ac6f0f384407.mp4"
+  },
+  {
+   "slug": "introduction-to-water-damage-restoration",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782955297/carsi/course-trailers/03584320-d4b8-4a9a-ab1e-dc808c572c9f.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717619/carsi/course-trailers/35ec3adc-42e8-4fe0-9358-f58788056043.mp4"
+  },
+  {
+   "slug": "introduction-to-water-damage-estimating",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782955268/carsi/course-trailers/bb11bc16-3475-4530-ba52-206ab6855173.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717621/carsi/course-trailers/e024df41-ebc2-4361-96d9-94139e23ab79.mp4"
+  },
+  {
+   "slug": "introduction-to-water-extraction-methods",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782955300/carsi/course-trailers/9166e6b1-0936-4dc4-84c4-53c4a168dc7d.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717624/carsi/course-trailers/24e634d5-72ee-4ca2-839a-c73409551986.mp4"
+  },
+  {
+   "slug": "introduction-to-water-damage-in-commercial-buildings",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782955279/carsi/course-trailers/09c657e8-ac73-4296-b90d-e512c856ff27.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717627/carsi/course-trailers/3899054f-70aa-4350-8d15-34f6dca0052a.mp4"
+  },
+  {
+   "slug": "introduction-to-using-personal-protective-equipment",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782955131/carsi/course-trailers/b7b8a93a-8efb-4ae7-9e79-2aa84e7c8dee.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717630/carsi/course-trailers/a875b540-0de5-4b4a-bf51-4e062bf80fb6.mp4"
+  },
+  {
+   "slug": "introduction-to-project-management-for-water-losses",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782954926/carsi/course-trailers/fe39d80b-d54f-4879-b45f-114cdca52943.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717632/carsi/course-trailers/942137fd-a671-469d-8cac-36eb33a01dc9.mp4"
+  },
+  {
+   "slug": "introduction-to-odour-control-and-removal-techniques",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782954924/carsi/course-trailers/d4b13bfb-7b57-4b64-9d12-1dc46572ac18.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717636/carsi/course-trailers/bc54efcb-1662-4571-8912-133b39719af7.mp4"
+  },
+  {
+   "slug": "introduction-to-water-damage-principles",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782955287/carsi/course-trailers/8759febf-8d69-437b-8173-60c2b7575633.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717638/carsi/course-trailers/23d39e1a-393f-4b2f-93a6-c2946213f373.mp4"
+  },
+  {
+   "slug": "introduction-to-monitoring-air-quality-on-the-job-site",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782954922/carsi/course-trailers/24e9cb8e-d9de-4a2e-bf31-23d1088823a6.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717640/carsi/course-trailers/009b5734-f883-4c85-a9c0-3ce7a3cd2aaf.mp4"
+  },
+  {
+   "slug": "introduction-to-creating-a-clean-air-environment",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782954829/carsi/course-trailers/8b782fde-a4ad-4ff7-b4be-9440c2f66df7.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717642/carsi/course-trailers/8f9c120b-565d-4c20-aa37-0d86213163fa.mp4"
+  },
+  {
+   "slug": "introduction-to-controlled-environment-drying-methods",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782954821/carsi/course-trailers/336ec983-0745-4bd3-a975-b97a01baa4d3.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717644/carsi/course-trailers/0e92e7ea-0647-4ce2-9dc0-3cf2aed73e05.mp4"
+  },
+  {
+   "slug": "introduction-to-forensic-investigations-for-water-losses",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782954895/carsi/course-trailers/bb5d2204-42d2-4a40-8570-5cf2079a5d13.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717646/carsi/course-trailers/9d97472a-054b-4f0d-96d0-f4973d0cee41.mp4"
+  },
+  {
+   "slug": "introduction-to-asbestos-asbestos-awareness",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782954812/carsi/course-trailers/30684b12-59e1-4b8a-ac17-a689c11c3773.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717649/carsi/course-trailers/1837e606-f09f-4b45-807f-39549122f7e5.mp4"
+  },
+  {
+   "slug": "introduction-to-applied-structural-drying",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782954714/carsi/course-trailers/aa61ec6e-6e18-4418-b3b6-80c6252f8348.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717651/carsi/course-trailers/a1f3ce3e-a32a-44e0-b6ac-525a7c11c2b7.mp4"
+  },
+  {
+   "slug": "introduction-to-consulting-for-complex-water-losses",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782954819/carsi/course-trailers/7684867f-b66c-4229-8ecf-1b4312e1a7b9.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717653/carsi/course-trailers/9073445f-1dac-4670-9bc8-e9f6c694c0e3.mp4"
+  },
+  {
+   "slug": "introduction-to-advanced-drying-equipment-and-methods",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782954697/carsi/course-trailers/b7f78a6c-9594-4ad2-bd4f-c811add024bc.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717658/carsi/course-trailers/0ce97532-2b29-4a46-9c79-99710bc2a43d.mp4"
+  },
+  {
+   "slug": "introduction-to-advanced-structural-drying-concepts",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782954707/carsi/course-trailers/d9fc9d5e-690e-4a06-be3e-5dc4aa406d4e.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717660/carsi/course-trailers/306da1a0-d385-4605-a858-68cb5008fc4d.mp4"
+  },
+  {
+   "slug": "glass-cleaning-course",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782954678/carsi/course-trailers/7517413c-c16b-4810-9121-2d2d472b000c.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717662/carsi/course-trailers/7f15c1ee-4c08-4a27-84b1-6cc40214cc72.mp4"
+  },
+  {
+   "slug": "fundamental-business-framework",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782954672/carsi/course-trailers/d23df64c-ab32-4cab-9f84-2e0459b20e83.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717666/carsi/course-trailers/1fc0e56f-a782-48fb-bc19-12dc828cb5b9.mp4"
+  },
+  {
+   "slug": "infectious-control-for-the-business-owner",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782954684/carsi/course-trailers/4dde4c70-c10d-434e-903d-1dd3a708a655.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717668/carsi/course-trailers/8c229d5d-e9ab-49f0-8a9a-392ceb990897.mp4"
+  },
+  {
+   "slug": "donning-and-doffing-ppe",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782954661/carsi/course-trailers/c41da514-4e1b-4aa4-a791-d89fdc4d893a.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717670/carsi/course-trailers/c8dc9cfb-1a90-4fb3-b438-d511da30f66c.mp4"
+  },
+  {
+   "slug": "infection-control-in-child-care",
+   "silentUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1782954682/carsi/course-trailers/7bd349f4-f4ad-4b53-b1bd-bb03bdf1db81.mp4",
+   "voicedUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1793717672/carsi/course-trailers/1bdd63b3-a4b7-446e-898a-663b3cda762a.mp4"
+  }
+ ]
+}
