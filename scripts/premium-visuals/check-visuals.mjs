@@ -58,7 +58,12 @@ function main() {
     return;
   }
   const root = path.resolve(opt('--root', '.'));
-  const cfgPath = path.join(root, opt('--config', 'visuals.config.json'));
+  // No --config: the repo keeps its config in config/ (main, 92b3593b) or, before that move, at
+  // the root. Reading only the root after the move fell back to "enforce" and failed every PR.
+  const cfgDefault = ['config/visuals.config.json', 'visuals.config.json'].find((p) =>
+    fs.existsSync(path.join(root, p))
+  ) || 'visuals.config.json';
+  const cfgPath = path.join(root, opt('--config', cfgDefault));
 
   const DEFAULTS = {
     mode: 'enforce',
