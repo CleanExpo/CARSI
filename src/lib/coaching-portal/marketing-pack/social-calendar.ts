@@ -26,7 +26,7 @@ export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
   const lines: Array<[string, string]> = [
     [
       'Who we are',
-      `G'day! We're a local ${trade} business. Over the next month we'll share what we do, how we do it and a few tips for looking after your place.`,
+      `G'day! We're a ${trade} business. Over the next month we'll share what we do and a few tips for looking after your place.`,
     ],
     [
       'Tip',
@@ -34,7 +34,7 @@ export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
     ],
     [
       'Behind the scenes',
-      `Behind the scenes on a ${service} job in the area this week. We start with a walk-through so we can explain what we'll do before we start.`,
+      `Behind the scenes on a ${service} job: [add a photo and one line about a real job you did this week].`,
     ],
     [
       'Question',
@@ -42,7 +42,7 @@ export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
     ],
     [
       'Meet the team',
-      `Meet the people behind the business. We live and work locally, and we turn up on time with the right gear for the job.`,
+      `Meet the people behind the business: [add your name, a photo and one true line about you or your team].`,
     ],
     [
       'Tip',
@@ -50,19 +50,19 @@ export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
     ],
     [
       'Local',
-      `Proud to work across the local area and the surrounding suburbs. Tell us your suburb in the comments and we'll let you know if we cover it.`,
+      `The areas we cover: [list the suburbs you really service]. Tell us your suburb in the comments and we'll let you know.`,
     ],
     [
       'Seasonal',
-      `A change of season is a good time to check on the things you only think about once a year. Here's what we look at on a ${service} visit.`,
+      `A change of season is a good time to check on the things you only think about once a year. [Add what you check on a ${service} visit.]`,
     ],
     [
       'Job story',
-      `A recent local job: the customer called about one problem and we found the cause was somewhere else. Fixing the cause, not just the symptom, is how we work.`,
+      `Job story: [describe a real recent job in one or two lines, with the customer's permission].`,
     ],
     [
       'How we work',
-      `How booking with us works: you call or message, we ask a few questions, give you a clear quote, then book a time that suits you.`,
+      `How booking with us works: [list your real booking steps, for example how you quote and confirm a time].`,
     ],
     [
       'Tip',
@@ -74,7 +74,7 @@ export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
     ],
     [
       'Behind the scenes',
-      `Gear check. Looking after our equipment means it works properly on your job. Here's a look inside the van.`,
+      `Gear check: [add a photo of your gear and one line about a tool you use].`,
     ],
     [
       'Myth or fact',
@@ -82,19 +82,19 @@ export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
     ],
     [
       'Thank you',
-      `Thanks to everyone who has booked with us, sent a referral or left a review. It means a lot to a small local business.`,
+      `Thanks to everyone who has booked with us, sent a referral or left a review. It means a lot.`,
     ],
     [
       'Tip',
-      `Looking after things between ${service} visits makes a real difference. Here's our simple routine we share with customers.`,
+      `Looking after things between ${service} visits makes a real difference. [Add one care tip you give your customers.]`,
     ],
     [
       'Local',
-      `Spotted around the area this week while on the road. We love working in this community.`,
+      `Spotted around the area this week: [add a local photo you took].`,
     ],
     [
       'Job story',
-      `Before and after from a recent ${service} job nearby. No two jobs are the same, so we always explain what to expect before we start.`,
+      `Before and after: [add your own before and after photos from a real ${service} job, with the customer's permission].`,
     ],
     [
       'Question',
@@ -102,7 +102,7 @@ export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
     ],
     [
       'Training',
-      `Our team keeps learning. This month we're brushing up on the latest methods and safety practices for ${trade}.`,
+      `Training: [add a course or skill you are really working on for ${trade}, or skip this post].`,
     ],
     [
       'Tip',
@@ -110,7 +110,7 @@ export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
     ],
     [
       'Behind the scenes',
-      `What happens after we pack up: we check the work with you, answer questions and leave the place tidy.`,
+      `What happens after we pack up: [describe what you really do at the end of a job].`,
     ],
     [
       'Local',
@@ -118,7 +118,7 @@ export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
     ],
     [
       'How we work',
-      `What to expect on the day: we arrive in the window we booked, explain the plan, do the work and walk you through the result.`,
+      `What to expect on the day: [describe how your visits really run, step by step].`,
     ],
     [
       'Tip',
@@ -134,7 +134,7 @@ export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
     ],
     [
       'Job story',
-      `Small job, happy customer. Not all jobs are big ones, and we're glad to help with the small stuff around the area too.`,
+      `Small jobs welcome: [add a real small job you did recently, or tell people which small jobs you take on].`,
     ],
     [
       'Seasonal',

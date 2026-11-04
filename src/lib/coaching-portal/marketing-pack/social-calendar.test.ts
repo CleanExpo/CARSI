@@ -71,3 +71,37 @@ describe('social calendar', () => {
     }
   );
 });
+
+describe('calendar makes no factual claims about the member (Codex P1, head 9aa848f3)', () => {
+  const empty = { businessName: '', trade: '', town: '', services: '' };
+  const posts = assembleCalendar(empty, new Date('2026-11-09')).posts;
+  const invented = [
+    /recent local job/i,
+    /we found the cause/i,
+    /we live and work locally/i,
+    /turn up on time/i,
+    /arrive in the window/i,
+    /our team keeps learning/i,
+    /happy customer/i,
+    /leave the place tidy/i,
+    /small local business/i,
+    /we love working in this community/i,
+    /proud to work across/i,
+  ];
+
+  it('still gives 30 compliant posts for a profile with no evidence', () => {
+    expect(posts).toHaveLength(30);
+  });
+
+  it.each(invented.map((r) => [r.source, r] as const))('never says "%s"', (_s, re) => {
+    expect(posts.filter((p) => re.test(p.caption))).toEqual([]);
+  });
+
+  it('turns job, team and practice posts into fill-in prompts', () => {
+    for (const theme of ['Job story', 'Meet the team', 'How we work', 'Training']) {
+      const themed = posts.filter((p) => p.theme === theme);
+      expect(themed.length).toBeGreaterThan(0);
+      for (const p of themed) expect(p.caption).toMatch(/\[[^\]]+\]/);
+    }
+  });
+});
