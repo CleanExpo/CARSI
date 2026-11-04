@@ -5,8 +5,8 @@
 CREATE TABLE "carsi_coaching_marketing_packs" (
     "id" UUID NOT NULL,
     "user_id" UUID NOT NULL,
-    "website_url" VARCHAR(500),
-    "google_business_url" VARCHAR(500),
+    "website_url" TEXT,
+    "google_business_url" TEXT,
     "review_json" TEXT NOT NULL,
     "checklist_json" TEXT NOT NULL,
     "calendar_json" TEXT NOT NULL,

@@ -256,3 +256,14 @@ describe('safe public fetch guard', () => {
     expect(validatePublicHttpUrl(raw).ok).toBe(ok);
   });
 });
+
+describe('stored URLs fit any URL the assessment accepts (Codex P1, head 90f4498a)', () => {
+  it('the marketing pack table stores both URLs as TEXT, not a 500-char VARCHAR', () => {
+    const sql = readFileSync(
+      join(process.cwd(), 'prisma/migrations/20261104120000_coaching_marketing_pack/migration.sql'),
+      'utf8'
+    );
+    expect(sql).toMatch(/"website_url" TEXT,/);
+    expect(sql).toMatch(/"google_business_url" TEXT,/);
+  });
+});
