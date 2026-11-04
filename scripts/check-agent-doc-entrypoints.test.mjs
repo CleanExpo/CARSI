@@ -15,6 +15,7 @@
  * Each failure mode is planted below in a throwaway fixture, so a pass on the real
  * repo cannot come from a check that is unable to fail.
  */
+import { spawnSync } from 'node:child_process';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readFileSync } from 'node:fs';
@@ -116,6 +117,67 @@ test('control: premium visual section removed from AGENTS.md fails', () => {
     errs.some((m) => /Premium Visual/.test(m)),
     errs.join('\n')
   );
+});
+
+test('control: alwaysApply: true only in a later --- block (not the front matter) fails', () => {
+  const errs = errorsFor((d) => {
+    const p = join(d, '.cursor/rules/carsi-agent-rules.mdc');
+    const text = readFileSync(p, 'utf8').replace('alwaysApply: true', 'alwaysApply: false');
+    writeFileSync(p, `${text}\n---\nalwaysApply: true\n---\n`);
+  });
+  assert.ok(
+    errs.some((m) => /alwaysApply/.test(m)),
+    errs.join('\n')
+  );
+});
+
+test('control: import inside an indented code block does not count', () => {
+  const errs = errorsFor((d) => {
+    const p = join(d, '.claude/CLAUDE.md');
+    writeFileSync(
+      p,
+      readFileSync(p, 'utf8').replace(
+        '@../docs/agents/CLAUDE.md',
+        '\n    @../docs/agents/CLAUDE.md\n'
+      )
+    );
+  });
+  assert.ok(
+    errs.some((m) => m.includes('.claude/CLAUDE.md') && m.includes('docs/agents/CLAUDE.md')),
+    errs.join('\n')
+  );
+});
+
+test('control: licence heading kept but its section body emptied fails', () => {
+  const errs = errorsFor((d) => {
+    const p = join(d, 'docs/agents/CLAUDE.md');
+    const text = readFileSync(p, 'utf8');
+    const start = text.indexOf('## IICRC CEC terminology');
+    const bodyStart = text.indexOf('\n', start) + 1;
+    const next = text.indexOf('\n## ', bodyStart);
+    writeFileSync(p, text.slice(0, bodyStart) + '\n' + text.slice(next + 1));
+  });
+  assert.ok(
+    errs.some((m) => /IICRC CEC terminology/.test(m) && /empty/.test(m)),
+    errs.join('\n')
+  );
+});
+
+test('control: default git check-ignore detects an ignored entry point', () => {
+  const dir = fixture((d) => {
+    spawnSync('git', ['init', '-q', d]);
+    writeFileSync(join(d, '.gitignore'), '.claude/CLAUDE.md\n');
+  });
+  try {
+    const errs = checkAgentDocEntrypoints(dir);
+    assert.ok(
+      errs.some((m) => m.includes('.claude/CLAUDE.md') && /ignored/.test(m)),
+      errs.join('\n')
+    );
+    assert.ok(!errs.some((m) => m.includes('.cursor/rules') && /ignored/.test(m)), errs.join('\n'));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 test('control: licence section removed from CLAUDE.md fails', () => {

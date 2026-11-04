@@ -30,10 +30,49 @@ function gitIgnored(root) {
   };
 }
 
-/** `@path` references outside fenced and inline code. */
+/** Drop indented code blocks: 4-space/tab lines that open after a blank line. */
+function stripIndentedCode(text) {
+  const out = [];
+  let prevBlank = true;
+  let inBlock = false;
+  for (const line of text.split('\n')) {
+    const indented = /^( {4}|\t)/.test(line);
+    inBlock = indented && (inBlock || prevBlank);
+    if (!inBlock) out.push(line);
+    if (line.trim() !== '') prevBlank = false;
+    else prevBlank = true;
+  }
+  return out.join('\n');
+}
+
+/** `@path` references outside fenced, indented and inline code. */
 function references(text) {
-  const prose = text.replace(/```[\s\S]*?```/g, '').replace(/`[^`\n]*`/g, '');
+  const prose = stripIndentedCode(text.replace(/```[\s\S]*?```/g, '')).replace(/`[^`\n]*`/g, '');
   return [...prose.matchAll(/(?:^|\s)@([^\s`]+\.mdc?)\b/g)].map((m) => m[1]);
+}
+
+/** The leading `---` front matter block only (Cursor ignores later blocks). */
+function frontMatter(text) {
+  const m = /^---\r?\n([\s\S]*?)\r?\n---\r?\n/.exec(text);
+  return m ? m[1] : '';
+}
+
+/** Body of the heading whose text contains `marker`, up to the next heading of the same or higher level. */
+function sectionBody(text, marker) {
+  const lines = text.split('\n');
+  const at = lines.findIndex((l) => /^#{1,6}\s/.test(l) && l.includes(marker));
+  if (at < 0) return null;
+  const level = /^#+/.exec(lines[at])[0].length;
+  const body = [];
+  for (const line of lines.slice(at + 1)) {
+    const h = /^(#+)\s/.exec(line);
+    if (h && h[1].length <= level) break;
+    body.push(line);
+  }
+  return body
+    .join('\n')
+    .replace(/^-{3,}\s*$/gm, '')
+    .trim();
 }
 
 export function checkAgentDocEntrypoints(root, { isIgnored = gitIgnored(root) } = {}) {
@@ -47,7 +86,7 @@ export function checkAgentDocEntrypoints(root, { isIgnored = gitIgnored(root) } 
     if (isIgnored(e.path))
       errors.push(`${e.path} is git-ignored, so it never reaches other machines`);
     const text = readFileSync(abs, 'utf8');
-    if (e.alwaysApply && !/^---[\s\S]*?^alwaysApply:\s*true\s*$[\s\S]*?^---/m.test(text)) {
+    if (e.alwaysApply && !/^alwaysApply:\s*true\s*$/m.test(frontMatter(text))) {
       errors.push(`${e.path} must set alwaysApply: true in its front matter`);
     }
     const base = e.base === 'file' ? dirname(abs) : root;
@@ -59,8 +98,13 @@ export function checkAgentDocEntrypoints(root, { isIgnored = gitIgnored(root) } 
   for (const doc of RULE_DOCS) {
     const abs = join(root, doc.path);
     if (!existsSync(abs)) errors.push(`${doc.path} is missing`);
-    else if (!readFileSync(abs, 'utf8').includes(doc.marker)) {
-      errors.push(`${doc.path} no longer contains the "${doc.marker}" section agents rely on`);
+    else {
+      const body = sectionBody(readFileSync(abs, 'utf8'), doc.marker);
+      if (body === null) {
+        errors.push(`${doc.path} no longer contains the "${doc.marker}" section agents rely on`);
+      } else if (body === '') {
+        errors.push(`${doc.path} keeps the "${doc.marker}" heading but its section is empty`);
+      }
     }
   }
   return errors;
