@@ -105,3 +105,13 @@ describe('calendar makes no factual claims about the member (Codex P1, head 9aa8
     }
   });
 });
+
+describe('no template asserts customer activity (Codex P1, head ce8eb97f)', () => {
+  const posts = assembleCalendar(
+    { businessName: '', trade: '', town: '', services: '' },
+    new Date('2026-11-09')
+  ).posts;
+  it('never thanks customers as a fact', () => {
+    expect(posts.filter((p) => /thanks to everyone who has booked/i.test(p.caption))).toEqual([]);
+  });
+});

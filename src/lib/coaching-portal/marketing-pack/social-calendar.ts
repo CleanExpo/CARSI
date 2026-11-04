@@ -82,16 +82,13 @@ export function buildFallbackPosts(rawVoice: TradeVoice): CalendarCandidate[] {
     ],
     [
       'Thank you',
-      `Thanks to everyone who has booked with us, sent a referral or left a review. It means a lot.`,
+      `A thank-you post: [if you have had bookings, referrals or reviews, thank those people here; otherwise skip this post].`,
     ],
     [
       'Tip',
       `Looking after things between ${service} visits makes a real difference. [Add one care tip you give your customers.]`,
     ],
-    [
-      'Local',
-      `Spotted around the area this week: [add a local photo you took].`,
-    ],
+    ['Local', `Spotted around the area this week: [add a local photo you took].`],
     [
       'Job story',
       `Before and after: [add your own before and after photos from a real ${service} job, with the customer's permission].`,

@@ -12,6 +12,8 @@ describe('review ask follows Google policy (Codex P1, head 22a64240)', () => {
     expect(item).toBeDefined();
     expect(item!.label).toMatch(/every customer/i);
     expect(item!.label).toMatch(/honest/i);
-    expect(`${item!.label} ${item!.detail}`).not.toMatch(/(ask|every) (\w+ )?happy|positive review|5-star/i);
+    expect(`${item!.label} ${item!.detail}`).not.toMatch(
+      /(ask|every) (\w+ )?happy|positive review|5-star/i
+    );
   });
 });

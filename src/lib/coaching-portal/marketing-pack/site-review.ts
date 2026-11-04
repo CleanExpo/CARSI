@@ -108,7 +108,8 @@ function hasLocalBusinessSchema(html: string): boolean {
 /** Google's own country domains members are likely to paste (AU and NZ first). */
 const GOOGLE_DOMAINS = ['google.com', 'google.com.au', 'google.co.nz', 'google.co.uk', 'google.ca'];
 const GOOGLE_HOSTS = new Set(
-  GOOGLE_DOMAINS.flatMap((d) => [d, `www.${d}`, `maps.${d}`, `business.${d}`])
+  // business.* is the owner's sign-in dashboard, never a public listing (Codex P1, ce8eb97f).
+  GOOGLE_DOMAINS.flatMap((d) => [d, `www.${d}`, `maps.${d}`])
 );
 
 export function isGoogleBusinessLink(url: string): boolean {

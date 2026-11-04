@@ -244,3 +244,13 @@ describe('isGoogleBusinessLink rejects the private dashboard (Codex P1, head 22a
     }
   );
 });
+
+describe('business.google.com never counts, even with a cid (Codex P1, head ce8eb97f)', () => {
+  it.each([
+    'https://business.google.com/dashboard/l/123?cid=456',
+    'https://business.google.com/?ludocid=456',
+    'https://business.google.com/maps/place/x',
+  ])('rejects %s', (url) => {
+    expect(isGoogleBusinessLink(url)).toBe(false);
+  });
+});
