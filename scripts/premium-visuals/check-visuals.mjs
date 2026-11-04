@@ -4,7 +4,8 @@
  *
  * A static, text-level heuristic. A clean run is NOT visual acceptance: the SDA visual
  * evidence gate (real screenshots, video frames) and the owner's review of the rendered
- * page are still required. Report-only mode lists findings and never fails the build.
+ * page are still required. Report-only mode lists findings and does not fail the build on
+ * them; a configuration error (missing config, invalid manifest) still exits 2.
  *
  * FINDINGS (fail in enforce mode):
  *   inline-svg-art            inline <svg> not marked data-pv-allow="icon|logo" (use lucide/real icon sets for UI)
@@ -248,8 +249,12 @@ function main() {
   // ---- report ----
   const byRule = violations.reduce((a, v) => ((a[v.rule] = (a[v.rule] || 0) + 1), a), {});
   const mode = reportOnly ? 'report-only' : 'enforce';
+  // An invalid manifest exits 2 in every mode (GP-688), so the report-only notice must say so.
+  const manifestInvalid = byRule['manifest-invalid'] || 0;
   const notice = reportOnly
-    ? 'REPORT-ONLY: findings do not fail the build. This is not visual acceptance.'
+    ? manifestInvalid
+      ? 'REPORT-ONLY: findings do not fail the build, but an invalid manifest exits 2 (configuration error). This is not visual acceptance.'
+      : 'REPORT-ONLY: findings do not fail the build. This is not visual acceptance.'
     : 'Static heuristic only: a pass here is not visual acceptance; the SDA evidence gate and owner review still apply.';
   const summary = {
     root, mode, notice, visualAcceptance: false,
@@ -273,7 +278,6 @@ function main() {
   }
   // An invalid manifest is a configuration error in every mode (GP-688). The report above is still
   // printed in full so the manifest-invalid details are visible; only the exit status changes.
-  const manifestInvalid = byRule['manifest-invalid'] || 0;
   if (manifestInvalid) {
     configError(`${cfg.manifest} is invalid (${manifestInvalid} manifest-invalid finding(s)); fix it before the scan can be trusted`);
     return;
