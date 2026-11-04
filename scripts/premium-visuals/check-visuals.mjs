@@ -58,13 +58,13 @@ function main() {
     return;
   }
   const root = path.resolve(opt('--root', '.'));
-  const cfgPath = path.join(root, opt('--config', 'visuals.config.json'));
+  const cfgPath = path.join(root, opt('--config', 'config/visuals.config.json'));
 
   const DEFAULTS = {
     mode: 'enforce',
     srcDirs: ['app', 'src', 'components', 'pages', 'apps/web'],
     publicDirs: ['public', 'apps/web/public'],
-    manifest: 'media.manifest.json',
+    manifest: 'config/media.manifest.json',
     ignore: ['node_modules', '.next', 'dist', 'build', 'out', 'coverage', '.git', '.turbo', 'storybook-static', '__tests__', 'tests', 'e2e', '.vercel'],
     allowlist: [],
     marketingPages: ['**/app/**/page.{tsx,jsx,ts,js,mdx}', '**/pages/**/*.{tsx,jsx,mdx}'],
