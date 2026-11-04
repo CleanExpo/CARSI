@@ -232,7 +232,7 @@ export function AdminCoachingMonthlyReviewClient() {
               <button
                 type="button"
                 className={btn}
-                disabled={busy}
+                disabled={busy || !view.nextSession}
                 onClick={() => void post('generate')}
               >
                 {hasDraft ? 'Draft again' : 'Draft review'}
@@ -247,7 +247,9 @@ export function AdminCoachingMonthlyReviewClient() {
 
             {!review ? (
               <p className="mt-4 text-sm text-white/50">
-                No draft yet. Draft one before the session; the member will not see it.
+                {view.nextSession
+                  ? 'No draft yet. Draft one before the session; the member will not see it.'
+                  : 'Book the member’s next session first. A monthly review is drafted for a booked session.'}
               </p>
             ) : (
               <div className="mt-4 space-y-4">

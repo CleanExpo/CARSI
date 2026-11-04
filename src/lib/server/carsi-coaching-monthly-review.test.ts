@@ -267,6 +267,26 @@ describe('generateMonthlyReview (GP-629 demo member)', () => {
     expect(t.rows.some((r) => r.status === MONTHLY_DRAFT_STATUS)).toBe(false);
   });
 
+  it('refuses to draft without a booked next session, so a review always keys to one session (review r2 P1)', async () => {
+    const t = demoStore();
+    const noSession: MonthlyReviewStore = {
+      ...t.store,
+      async withMemberLock(_userId, fn) {
+        return fn(noSession);
+      },
+      async loadMember(userId, now) {
+        return { ...(await t.store.loadMember(userId, now)), nextSession: null };
+      },
+    };
+    const deps = { store: noSession, now: NOW, draftWithModel: async () => null };
+    await expect(generateMonthlyReview(USER, deps)).rejects.toThrow(MonthlyReviewConflictError);
+    expect(t.rows.some((r) => r.status === MONTHLY_DRAFT_STATUS)).toBe(false);
+    expect(await approveMonthlyReview(USER, undefined, noSession)).toEqual({
+      status: 'nothing_to_approve',
+    });
+    expect(t.memberBoard().map((r) => r.id)).toEqual(['a1', 'a2', 'a3', 'a4', 'a5']);
+  });
+
   it('refuses to draft again for a session whose review is already approved', async () => {
     const t = demoStore();
     const deps = { store: t.store, now: NOW, draftWithModel: async () => null };

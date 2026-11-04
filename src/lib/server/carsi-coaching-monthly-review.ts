@@ -156,8 +156,7 @@ function coachStateFingerprint(rows: MonthlyReviewRow[]): string {
     .join('|');
 }
 
-function sessionAlreadyApproved(rows: MonthlyReviewRow[], sessionId: string | null): boolean {
-  if (!sessionId) return false;
+function sessionAlreadyApproved(rows: MonthlyReviewRow[], sessionId: string): boolean {
   return rows.some(
     (r) =>
       r.status === MONTHLY_REVIEW_APPROVED_STATUS &&
@@ -167,6 +166,8 @@ function sessionAlreadyApproved(rows: MonthlyReviewRow[], sessionId: string | nu
 
 const ALREADY_APPROVED =
   'The review for this session is already approved and published. It can be drafted again once the next session is booked.';
+const NO_SESSION =
+  'Book the member’s next session first. A monthly review is drafted for a booked session.';
 const STATE_CHANGED =
   'This review was approved, saved or discarded while the new draft was being written. Reload and try again.';
 
@@ -291,7 +292,10 @@ export async function generateMonthlyReview(
   const draftWithModel = deps.draftWithModel ?? draftMonthlyReviewWithOpenRouter;
 
   const [member, rows] = await Promise.all([store.loadMember(userId, now), store.listRows(userId)]);
-  const sessionId = member.nextSession?.id ?? null;
+  // A review belongs to one booked session (GP-629: "before each scheduled session"). Without one
+  // there is no key to stop a second approved batch, so nothing is drafted (review r2 P1).
+  if (!member.nextSession) throw new MonthlyReviewConflictError(NO_SESSION);
+  const sessionId = member.nextSession.id;
   if (sessionAlreadyApproved(rows, sessionId))
     throw new MonthlyReviewConflictError(ALREADY_APPROVED);
   const snapshot = coachStateFingerprint(rows);
@@ -319,8 +323,8 @@ export async function generateMonthlyReview(
   const draft = composeMonthlyReviewDraft(input, reply?.text ?? null);
   const record: ReviewRecord = {
     version: 1,
-    sessionId: member.nextSession?.id ?? null,
-    sessionAt: member.nextSession?.scheduledAt.toISOString() ?? null,
+    sessionId,
+    sessionAt: member.nextSession.scheduledAt.toISOString(),
     generatedAt: now.toISOString(),
     source: draft.source,
     model: draft.source === 'model' ? (reply?.model ?? null) : null,
