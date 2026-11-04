@@ -285,8 +285,65 @@ describe('approval guard', () => {
     expect(validateAuthorityPage(noSrc, now).join(' ')).toMatch(/sourceUrl/);
   });
 
-  // Review round 1 found two required items that passed while absent or not real. Each
-  // required approval item is now checked for presence and validity; one row per item.
+  // Review rounds 1 and 2 each found required items that passed while absent, blank or not
+  // real. The rule is now an allow-list: every leaf of an approved entry is required unless it
+  // is named in MAY_BE_EMPTY. This test walks the leaves itself, so a new field is covered the
+  // day it is added.
+  it('blanking any leaf of a valid approved entry makes it unpublishable (allow-list)', () => {
+    const ok = fresh(approved(authorityPages[0]));
+    expect(isAuthorityPagePublishable(ok, liveSlugs)).toBe(true);
+    const MAY_BE_EMPTY = new Set(['bundle.plannedModules', 'bundle.plannedModules[].minutes']);
+    const paths: string[] = [];
+    const walk = (value: unknown, path: string) => {
+      if (path) paths.push(path);
+      if (value && typeof value === 'object') {
+        for (const [k, v] of Object.entries(value)) walk(v, path ? `${path}.${k}` : k);
+      }
+    };
+    walk(ok, '');
+    const setAt = (entry: AuthorityPageEntry, path: string, value: unknown) => {
+      const copy = structuredClone(entry) as unknown as Record<string, unknown>;
+      const keys = path.split('.');
+      let node = copy as Record<string, unknown>;
+      for (const k of keys.slice(0, -1)) node = node[k] as Record<string, unknown>;
+      node[keys[keys.length - 1]] = value;
+      return copy as unknown as AuthorityPageEntry;
+    };
+    const getAt = (entry: unknown, path: string) =>
+      path.split('.').reduce((n, k) => (n as Record<string, unknown>)[k], entry);
+    let checked = 0;
+    for (const path of paths) {
+      if (MAY_BE_EMPTY.has(path.replace(/\.\d+/g, '[]'))) continue;
+      const current = getAt(ok, path);
+      const blanks: unknown[] = [null];
+      if (typeof current === 'string') blanks.push('', '   ');
+      if (Array.isArray(current)) blanks.push([]);
+      for (const blank of blanks) {
+        checked += 1;
+        const e = setAt(ok, path, blank);
+        expect(isAuthorityPagePublishable(e, liveSlugs), `${path} = ${JSON.stringify(blank)}`).toBe(
+          false
+        );
+      }
+    }
+    expect(checked).toBeGreaterThan(100);
+  });
+
+  it('dates must be real calendar dates and not in the future', () => {
+    const ok = fresh(approved(authorityPages[0]));
+    const claim = ok.claims[0];
+    const cases: Record<string, AuthorityPageEntry> = {
+      'approvedAt 31 February': { ...ok, approvedAt: '2026-02-31' },
+      'approvedAt month 13': { ...ok, approvedAt: '2026-13-01' },
+      'approvedAt with a time': { ...ok, approvedAt: '2026-10-29T00:00:00Z' },
+      'lastVerified in the future': { ...ok, claims: [{ ...claim, lastVerified: '2999-01-01' }] },
+      'lastVerified 30 April 31st': { ...ok, claims: [{ ...claim, lastVerified: '2026-04-31' }] },
+    };
+    for (const [why, e] of Object.entries(cases)) {
+      expect(isAuthorityPagePublishable(e, liveSlugs), why).toBe(false);
+    }
+  });
+
   it('rejects approval when any required item is absent or not real', () => {
     const ok = fresh(approved(authorityPages[0]));
     expect(validateAuthorityPage(ok, new Date(), liveSlugs)).toEqual([]);

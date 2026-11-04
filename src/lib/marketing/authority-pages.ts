@@ -677,9 +677,9 @@ export function authoritySitemapPaths(
     .map((p) => `/for/${p.slug}`);
 }
 
-const NINETY_DAYS_MS = 90 * 24 * 60 * 60 * 1000;
+const DAY_MS = 24 * 60 * 60 * 1000;
+const NINETY_DAYS_MS = 90 * DAY_MS;
 
-const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 /**
  * Hero images must be committed files under public/images/for/. The registry test checks that
  * every path named here exists, so a missing or remote image cannot pass approval.
@@ -687,11 +687,51 @@ const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const HERO_SRC = /^\/images\/for\/[a-z0-9-]+\.(jpg|jpeg|png|webp|avif)$/;
 
 /**
- * Problems that stop an entry being approved. A draft is always allowed. For an approved entry
- * every required item below must be present AND valid; an absent item is a problem, never a pass:
- * approver, approval date (ISO, not in the future), hero image (committed path + alt text), at
- * least one claim (https source, `O` tag, verified within 90 days), and at least one course,
- * each published. `liveSlugs`, when given, is the set of published course slugs.
+ * The only parts of an approved entry that may be empty or null. Everything else is required:
+ * this is an allow-list, so a field added later is required until someone names it here.
+ * Paths use `[]` for any array index.
+ */
+const MAY_BE_EMPTY = new Set(['bundle.plannedModules', 'bundle.plannedModules[].minutes']);
+
+/** Every string non-blank, every array non-empty, nothing null, except MAY_BE_EMPTY. */
+function missingLeaves(value: unknown, path: string, out: string[]): void {
+  const key = path.replace(/\.\d+/g, '[]');
+  const empty =
+    value === null ||
+    value === undefined ||
+    (typeof value === 'string' && value.trim() === '') ||
+    (Array.isArray(value) && value.length === 0);
+  if (empty) {
+    if (!MAY_BE_EMPTY.has(key)) out.push(`${path} is required`);
+    return;
+  }
+  if (typeof value === 'object') {
+    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
+      missingLeaves(v, path ? `${path}.${k}` : k, out);
+    }
+  }
+}
+
+/**
+ * A real calendar date written YYYY-MM-DD, no later than tomorrow (UTC) so an Australian date
+ * written today is accepted. `Date.parse` alone accepts 2026-02-31 and rolls it to 3 March.
+ */
+function calendarDateProblem(value: string, now: Date): string | null {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return 'must be a date written YYYY-MM-DD';
+  const time = Date.parse(`${value}T00:00:00Z`);
+  if (Number.isNaN(time) || new Date(time).toISOString().slice(0, 10) !== value) {
+    return 'is not a real calendar date';
+  }
+  if (time > now.getTime() + DAY_MS) return 'is in the future';
+  return null;
+}
+
+/**
+ * Problems that stop an entry being approved. A draft is always allowed. For an approved entry:
+ * first every leaf must be present (see MAY_BE_EMPTY); then each field rule applies: approval
+ * and claim dates are real calendar dates not in the future, the hero image is a path under
+ * /images/for/, each claim has an https source and tag `O` and was verified within 90 days, and
+ * every bundle course is in `liveSlugs` (the published course slugs) when given.
  */
 export function validateAuthorityPage(
   entry: AuthorityPageEntry,
@@ -700,35 +740,35 @@ export function validateAuthorityPage(
 ): string[] {
   if (entry.status !== 'approved') return [];
   const problems: string[] = [];
-  if (!entry.approvedBy?.trim()) problems.push('approvedBy is required');
-  const approvedAt = entry.approvedAt ?? '';
-  if (!ISO_DATE.test(approvedAt) || Number.isNaN(Date.parse(approvedAt))) {
-    problems.push('approvedAt must be an ISO date (YYYY-MM-DD)');
-  } else if (Date.parse(approvedAt) > now.getTime()) {
-    problems.push('approvedAt is in the future');
-  }
-  if (!entry.heroImage || !HERO_SRC.test(entry.heroImage.src) || !entry.heroImage.alt.trim()) {
-    problems.push('a hero visual under /images/for/ with alt text is required');
-  }
-  if (entry.bundle.publishedSlugs.length === 0) {
+  missingLeaves(entry, '', problems);
+  if (entry.bundle?.publishedSlugs?.length === 0) {
     problems.push('at least one published course is required in the bundle');
+  }
+  if (entry.claims?.length === 0) problems.push('at least one sourced claim is required');
+  // A missing leaf means the shape is incomplete; the field rules below would read through it.
+  if (problems.length > 0) return problems;
+
+  const approvedAtProblem = calendarDateProblem(entry.approvedAt!, now);
+  if (approvedAtProblem) problems.push(`approvedAt ${approvedAtProblem}`);
+  if (!HERO_SRC.test(entry.heroImage!.src)) {
+    problems.push('the hero visual must be a committed file under /images/for/');
   }
   if (liveSlugs) {
     for (const slug of entry.bundle.publishedSlugs) {
       if (!liveSlugs.has(slug)) problems.push(`bundle course is not published: ${slug}`);
     }
   }
-  if (entry.claims.length === 0) problems.push('at least one sourced claim is required');
   for (const claim of entry.claims) {
+    const label = claim.text.slice(0, 40);
     if (!/^https:\/\/\S+$/.test(claim.sourceUrl)) {
-      problems.push(`claim sourceUrl must be https: ${claim.text.slice(0, 40)}`);
+      problems.push(`claim sourceUrl must be https: ${label}`);
     }
-    if (claim.tag !== 'O') problems.push(`claim is missing tag: ${claim.text.slice(0, 40)}`);
-    const verified = Date.parse(claim.lastVerified);
-    if (Number.isNaN(verified)) {
-      problems.push(`claim is missing lastVerified: ${claim.text.slice(0, 40)}`);
-    } else if (now.getTime() - verified > NINETY_DAYS_MS) {
-      problems.push(`claim is older than 90 days: ${claim.text.slice(0, 40)}`);
+    if (claim.tag !== 'O') problems.push(`claim tag must be O: ${label}`);
+    const dateProblem = calendarDateProblem(claim.lastVerified, now);
+    if (dateProblem) {
+      problems.push(`claim lastVerified ${dateProblem}: ${label}`);
+    } else if (now.getTime() - Date.parse(`${claim.lastVerified}T00:00:00Z`) > NINETY_DAYS_MS) {
+      problems.push(`claim is older than 90 days: ${label}`);
     }
   }
   return problems;
