@@ -16,6 +16,7 @@ import {
   Send,
   Users,
   MessageCircleQuestion,
+  LineChart,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -84,6 +85,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const businessCoachingAdminActive = pathname.startsWith('/admin/business-coaching');
   const learningPathsActive = pathname.startsWith('/admin/coaching-learning-paths');
   const coachQuestionsActive = pathname.startsWith('/admin/coaching-questions');
+  const accountabilityActive = pathname.startsWith('/admin/coaching-accountability');
   const analyticsActive = pathname.startsWith('/admin/analytics');
   const yearlyMembershipActive = pathname.startsWith('/admin/yearly-membership');
   const iicrcCecActive = pathname.startsWith('/admin/iicrc-cec');
@@ -187,6 +189,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             label="Coach questions"
             icon={MessageCircleQuestion}
             active={coachQuestionsActive}
+          />
+          <NavButton
+            href="/admin/coaching-accountability"
+            label="Member accountability"
+            icon={LineChart}
+            active={accountabilityActive}
           />
           <NavButton
             href="/admin/ccw-roadshow"

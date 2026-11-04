@@ -12,6 +12,7 @@ import {
   coachingPrimaryBtn,
   coachingSecondaryBtn,
 } from '@/components/coaching-portal/coaching-ui';
+import { CoachingCheckInCard } from '@/components/coaching-portal/CoachingAccountability';
 import { CoachingAskCoachPanel } from '@/components/coaching-portal/CoachingAskCoachPanel';
 import { CoachingOnboardingStatusBar } from '@/components/coaching-portal/CoachingOnboardingStatusBar';
 import { useCoachingPortal } from '@/components/coaching-portal/CoachingPortalContext';
@@ -286,6 +287,8 @@ function ActiveHome() {
             </p>
           )}
         </section>
+
+        <CoachingCheckInCard className="lg:col-span-2" />
 
         <section className={`${coachingCard} lg:col-span-2`}>
           <h2 className="text-sm font-semibold text-slate-300">Progress summary</h2>

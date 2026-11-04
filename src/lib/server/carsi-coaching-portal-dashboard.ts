@@ -1,10 +1,11 @@
 import type { SessionClaims } from '@/lib/auth/session-jwt';
-import type { CoachingActionStatus } from '@/lib/coaching-portal/types';
+import type { CoachingActionStatus, CoachingPortalFeatures } from '@/lib/coaching-portal/types';
 import { prisma } from '@/lib/prisma';
 import {
   importLegacyActionsFromSubscriptionJson,
   listCoachingActionsForUser,
 } from '@/lib/server/carsi-coaching-actions-store';
+import { isCarsiCoachingAccountabilityEnabled } from '@/lib/server/carsi-coaching-accountability-flag';
 import { getCoachingPortalAccess } from '@/lib/server/carsi-coaching-portal-access';
 import { coachingPortalPath } from '@/lib/coaching-portal/coaching-portal-paths';
 import { getCoachingPortalRowForUser } from '@/lib/server/carsi-coaching-subscription-store';
@@ -88,6 +89,7 @@ export type CoachingPortalDashboard = {
     hasBookedAny: boolean;
   };
   bookingUrl: string | null;
+  features: CoachingPortalFeatures;
 };
 
 function firstNameFromClaims(claims: SessionClaims): string {
@@ -326,5 +328,6 @@ export async function loadCoachingPortalDashboard(
       hasBookedAny,
     },
     bookingUrl,
+    features: { accountability: isCarsiCoachingAccountabilityEnabled() },
   };
 }
