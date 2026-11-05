@@ -9,9 +9,11 @@ import {
   defaultMarketingPackDeps,
   generateMarketingPack,
   getLatestMarketingPackForUser,
+  listMarketingPackSummariesForUser,
   loadMarketingInputsForUser,
   MARKETING_PACK_COOLDOWN_MS,
 } from '@/lib/server/carsi-coaching-marketing-pack';
+import { packProgressDelta } from '@/lib/coaching-portal/marketing-pack/pack-summary';
 import { requireCoachingPortalEditor } from '@/lib/server/carsi-coaching-portal-gate';
 
 export const dynamic = 'force-dynamic';
@@ -22,7 +24,12 @@ export async function GET(request: NextRequest) {
   const claims = await getSessionClaimsFromRequest(request);
   if (!claims) return NextResponse.json({ detail: 'Sign in required.' }, { status: 401 });
   const pack = await getLatestMarketingPackForUser(claims.sub);
-  return NextResponse.json({ pack });
+  const history = await listMarketingPackSummariesForUser(claims.sub);
+  const progress =
+    history.length >= 2
+      ? packProgressDelta(history[0], history[1])
+      : { checksDelta: null, fixCountDelta: null };
+  return NextResponse.json({ pack, history, progress });
 }
 
 /** GP-634: member builds (or rebuilds) their marketing pack from their assessment and profile. */
@@ -63,5 +70,10 @@ export async function POST(request: NextRequest) {
     );
   }
   const pack = await getLatestMarketingPackForUser(userId);
-  return NextResponse.json({ pack });
+  const history = await listMarketingPackSummariesForUser(userId);
+  const progress =
+    history.length >= 2
+      ? packProgressDelta(history[0], history[1])
+      : { checksDelta: null, fixCountDelta: null };
+  return NextResponse.json({ pack, history, progress });
 }

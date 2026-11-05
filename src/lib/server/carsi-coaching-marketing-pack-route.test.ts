@@ -36,6 +36,7 @@ vi.mock('@/lib/admin/admin-session', () => ({
 vi.mock('@/lib/server/carsi-coaching-marketing-pack', () => ({
   MARKETING_PACK_COOLDOWN_MS: 600_000,
   getLatestMarketingPackForUser: async () => state.latest,
+  listMarketingPackSummariesForUser: async () => [],
   loadMarketingInputsForUser: async () => state.inputs,
   generateMarketingPack: async () => {
     if (state.generateThrows) throw new Error('boom');
