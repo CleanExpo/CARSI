@@ -1,3 +1,5 @@
+import { z } from 'zod/v3';
+
 import { healthcareRecommendedSlugs } from '@/lib/marketing/industry-track1-topics';
 
 /**
@@ -686,30 +688,111 @@ const NINETY_DAYS_MS = 90 * DAY_MS;
  */
 const HERO_SRC = /^\/images\/for\/[a-z0-9-]+\.(jpg|jpeg|png|webp|avif)$/;
 
-/**
- * The only parts of an approved entry that may be empty or null. Everything else is required:
- * this is an allow-list, so a field added later is required until someone names it here.
- * Paths use `[]` for any array index.
- */
-const MAY_BE_EMPTY = new Set(['bundle.plannedModules', 'bundle.plannedModules[].minutes']);
+const nonBlank = z.string().refine((s) => s.trim() !== '', 'is required');
+const nonEmpty = <T extends z.ZodTypeAny>(item: T) => z.array(item).min(1, 'is required');
 
-/** Every string non-blank, every array non-empty, nothing null, except MAY_BE_EMPTY. */
-function missingLeaves(value: unknown, path: string, out: string[]): void {
-  const key = path.replace(/\.\d+/g, '[]');
-  const empty =
-    value === null ||
-    value === undefined ||
-    (typeof value === 'string' && value.trim() === '') ||
-    (Array.isArray(value) && value.length === 0);
-  if (empty) {
-    if (!MAY_BE_EMPTY.has(key)) out.push(`${path} is required`);
-    return;
-  }
-  if (typeof value === 'object') {
-    for (const [k, v] of Object.entries(value as Record<string, unknown>)) {
-      missingLeaves(v, path ? `${path}.${k}` : k, out);
-    }
-  }
+/**
+ * The full shape of an approved entry. Strict: every key must be present with the right type,
+ * every string non-blank, every list non-empty, and no unknown key may appear. The only parts
+ * that may be empty are `bundle.plannedModules` (no planned modules) and a planned module's
+ * `minutes` (length not yet known). `approvedShapeMatches` below fails type-check if this and
+ * `AuthorityPageEntry` drift apart, so a field added to one is required in the other.
+ */
+const approvedEntrySchema = z
+  .object({
+    slug: nonBlank,
+    status: z.literal('approved'),
+    approvedBy: nonBlank,
+    approvedAt: nonBlank,
+    heroImage: z.object({ src: nonBlank, alt: nonBlank }).strict(),
+    audience: nonBlank,
+    shortAudience: nonBlank,
+    icon: z.enum(['hardhat', 'clipboard', 'building', 'stethoscope', 'home', 'spray']),
+    title: nonBlank,
+    metaDescription: nonBlank,
+    keywords: nonEmpty(nonBlank),
+    headline: nonBlank,
+    headlineAccent: nonBlank,
+    description: nonBlank,
+    topics: nonEmpty(nonBlank),
+    whyCards: nonEmpty(
+      z
+        .object({
+          icon: z.enum(['shield', 'droplets', 'wind', 'clipboard']),
+          title: nonBlank,
+          description: nonBlank,
+        })
+        .strict()
+    ),
+    claims: nonEmpty(
+      z
+        .object({
+          text: nonBlank,
+          sourceTitle: nonBlank,
+          publisher: nonBlank,
+          sourceUrl: nonBlank,
+          tag: z.literal('O'),
+          lastVerified: nonBlank,
+        })
+        .strict()
+    ),
+    scopeNote: nonBlank,
+    bundle: z
+      .object({
+        publishedSlugs: nonEmpty(nonBlank),
+        plannedModules: z.array(
+          z
+            .object({
+              title: nonBlank,
+              minutes: z.number().int().positive().nullable(),
+              status: z.literal('not_built'),
+            })
+            .strict()
+        ),
+      })
+      .strict(),
+    faqs: nonEmpty(z.object({ question: nonBlank, answer: nonBlank }).strict()),
+    livePageHref: nonBlank,
+    livePageLabel: nonBlank,
+  })
+  .strict();
+
+/** An approved entry as the interface describes it: approval fields filled in. */
+type ApprovedAuthorityPageEntry = Omit<
+  AuthorityPageEntry,
+  'status' | 'approvedBy' | 'approvedAt' | 'heroImage'
+> & {
+  status: 'approved';
+  approvedBy: string;
+  approvedAt: string;
+  heroImage: AuthorityHeroImage;
+};
+
+/** Deep, key-by-key type identity. Intersections and interfaces are flattened first. */
+type DeepPlain<T> = T extends readonly (infer U)[]
+  ? DeepPlain<U>[]
+  : T extends object
+    ? { [K in keyof T]: DeepPlain<T[K]> }
+    : T;
+type Identical<A, B> =
+  (<T>() => T extends DeepPlain<A> ? 1 : 2) extends <T>() => T extends DeepPlain<B> ? 1 : 2
+    ? true
+    : false;
+/** Type-check fails here when the schema and the interface describe different shapes. */
+export const approvedShapeMatches: Identical<
+  z.infer<typeof approvedEntrySchema>,
+  ApprovedAuthorityPageEntry
+> = true;
+
+function shapeProblems(entry: unknown): string[] {
+  const result = approvedEntrySchema.safeParse(entry);
+  if (result.success) return [];
+  return result.error.issues.map((issue) => {
+    const path = issue.path.join('.') || 'entry';
+    return issue.code === 'unrecognized_keys'
+      ? `${path} has unknown keys: ${issue.keys.join(', ')}`
+      : `${path} is required (${issue.message})`;
+  });
 }
 
 /**
@@ -728,7 +811,7 @@ function calendarDateProblem(value: string, now: Date): string | null {
 
 /**
  * Problems that stop an entry being approved. A draft is always allowed. For an approved entry:
- * first every leaf must be present (see MAY_BE_EMPTY); then each field rule applies: approval
+ * first the entry must match the strict approved shape (`approvedEntrySchema`); then each field rule applies: approval
  * and claim dates are real calendar dates not in the future, the hero image is a path under
  * /images/for/, each claim has an https source and tag `O` and was verified within 90 days, and
  * every bundle course is in `liveSlugs` (the published course slugs) when given.
@@ -740,12 +823,12 @@ export function validateAuthorityPage(
 ): string[] {
   if (entry.status !== 'approved') return [];
   const problems: string[] = [];
-  missingLeaves(entry, '', problems);
+  problems.push(...shapeProblems(entry));
   if (entry.bundle?.publishedSlugs?.length === 0) {
     problems.push('at least one published course is required in the bundle');
   }
   if (entry.claims?.length === 0) problems.push('at least one sourced claim is required');
-  // A missing leaf means the shape is incomplete; the field rules below would read through it.
+  // An incomplete shape stops here; the field rules below would read through a missing part.
   if (problems.length > 0) return problems;
 
   const approvedAtProblem = calendarDateProblem(entry.approvedAt!, now);

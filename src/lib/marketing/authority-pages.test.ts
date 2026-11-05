@@ -286,9 +286,9 @@ describe('approval guard', () => {
   });
 
   // Review rounds 1 and 2 each found required items that passed while absent, blank or not
-  // real. The rule is now an allow-list: every leaf of an approved entry is required unless it
-  // is named in MAY_BE_EMPTY. This test walks the leaves itself, so a new field is covered the
-  // day it is added.
+  // real. The rule is now a strict schema: every leaf of an approved entry is required except
+  // the two named below (the same two the schema lets be empty). This test walks the leaves
+  // itself, so a new field is covered the day it is added.
   it('blanking any leaf of a valid approved entry makes it unpublishable (allow-list)', () => {
     const ok = fresh(approved(authorityPages[0]));
     expect(isAuthorityPagePublishable(ok, liveSlugs)).toBe(true);
@@ -327,6 +327,70 @@ describe('approval guard', () => {
       }
     }
     expect(checked).toBeGreaterThan(100);
+  });
+
+  // Review round 3 (PC lane, afec365f): the leaf walk only visits keys that are present, so an
+  // approved entry with a key removed, or `whyCards: [{}]`, passed. The approved shape is now a
+  // strict schema: every key must exist, carry the right type, and no unknown key may appear.
+  // This test deletes each key in turn, so a field added later is covered with no test change.
+  it('removing any key, or giving any leaf the wrong type, makes it unpublishable', () => {
+    const ok = fresh(approved(authorityPages[0]));
+    expect(isAuthorityPagePublishable(ok, liveSlugs)).toBe(true);
+    const paths: string[] = [];
+    const walk = (value: unknown, path: string) => {
+      if (path) paths.push(path);
+      if (value && typeof value === 'object') {
+        for (const [k, v] of Object.entries(value)) walk(v, path ? `${path}.${k}` : k);
+      }
+    };
+    walk(ok, '');
+    const edit = (path: string, change: (node: Record<string, unknown>, key: string) => void) => {
+      const copy = structuredClone(ok) as unknown as Record<string, unknown>;
+      const keys = path.split('.');
+      let node = copy;
+      for (const k of keys.slice(0, -1)) node = node[k] as Record<string, unknown>;
+      change(node, keys[keys.length - 1]);
+      return copy as unknown as AuthorityPageEntry;
+    };
+    let checked = 0;
+    for (const path of paths) {
+      const parent = path.split('.').slice(0, -1);
+      const parentIsArray = Array.isArray(
+        parent.reduce((n, k) => (n as Record<string, unknown>)[k], ok as unknown)
+      );
+      // Deleting an array element is "fewer items", covered by the blanking test; delete keys.
+      if (!parentIsArray) {
+        checked += 1;
+        const removed = edit(path, (node, key) => delete node[key]);
+        expect(isAuthorityPagePublishable(removed, liveSlugs), `without ${path}`).toBe(false);
+      }
+      checked += 1;
+      const wrongType = edit(path, (node, key) => {
+        node[key] = typeof node[key] === 'number' ? 'ten' : 42;
+      });
+      expect(isAuthorityPagePublishable(wrongType, liveSlugs), `${path} = 42`).toBe(false);
+    }
+    expect(checked).toBeGreaterThan(100);
+    const cases: Record<string, AuthorityPageEntry> = {
+      'whyCards: [{}]': { ...ok, whyCards: [{}] as AuthorityPageEntry['whyCards'] },
+      'unknown top-level key': { ...ok, extra: 'x' } as AuthorityPageEntry,
+      'unknown claim key': {
+        ...ok,
+        claims: [{ ...ok.claims[0], note: 'x' }] as AuthorityPageEntry['claims'],
+      },
+      'unknown hero key': {
+        ...ok,
+        heroImage: { ...HERO, extra: 'x' } as AuthorityPageEntry['heroImage'],
+      },
+      'icon not in the list': { ...ok, icon: 'rocket' as AuthorityPageEntry['icon'] },
+      'claim tag S': {
+        ...ok,
+        claims: [{ ...ok.claims[0], tag: 'S' as 'O' }],
+      },
+    };
+    for (const [why, e] of Object.entries(cases)) {
+      expect(isAuthorityPagePublishable(e, liveSlugs), why).toBe(false);
+    }
   });
 
   it('dates must be real calendar dates and not in the future', () => {
