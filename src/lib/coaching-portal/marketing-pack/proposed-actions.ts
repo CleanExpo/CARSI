@@ -20,10 +20,10 @@ export type CoachDecision = 'approve' | 'decline';
 export function fixesToProposedActions(fixes: MarketingFix[]): ProposedActionInput[] {
   return fixes.map((fix, i) => ({
     title: fix.title.slice(0, 500),
-    description: `${fix.why}\n\nHow: ${fix.how}`,
+    description: `${fix.why}\n\nHow: ${fix.how}`.slice(0, 4000),
     status: 'proposed',
     priority: fix.impact === 3 ? 'high' : fix.impact === 2 ? 'medium' : 'low',
-    goalId: `${MARKETING_ACTION_GOAL_PREFIX}${fix.id}`,
+    goalId: `${MARKETING_ACTION_GOAL_PREFIX}${fix.id}`.slice(0, 120),
     sortOrder: i,
   }));
 }

@@ -34,6 +34,24 @@ describe('fixesToProposedActions', () => {
       expect(['high', 'medium', 'low']).toContain(a.priority);
     });
   });
+
+  it('caps description and goalId length', () => {
+    const actions = fixesToProposedActions([
+      {
+        id: 'x'.repeat(200),
+        rank: 1,
+        area: 'website',
+        title: 'T',
+        why: 'w'.repeat(5000),
+        how: 'h',
+        impact: 1,
+        effort: 1,
+        score: 1,
+      },
+    ]);
+    expect(actions[0].description.length).toBeLessThanOrEqual(4000);
+    expect(actions[0].goalId.length).toBeLessThanOrEqual(120);
+  });
 });
 
 describe('decideCoachReview', () => {
