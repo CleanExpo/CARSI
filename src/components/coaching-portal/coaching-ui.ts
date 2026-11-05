@@ -10,6 +10,7 @@ export const coachingPrimaryBtn =
   'inline-flex min-h-10 items-center justify-center rounded-lg bg-[#146fc2] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#125da8] disabled:opacity-50';
 export const coachingSecondaryBtn =
   'inline-flex min-h-10 items-center justify-center rounded-lg border border-white/15 bg-transparent px-4 text-sm font-semibold text-slate-100 transition-colors hover:bg-white/5 disabled:opacity-50';
+export const coachingAlertText = 'text-sm text-amber-300';
 
 export function coachingProgressTrackClass() {
   return 'h-2 w-full overflow-hidden rounded-full bg-white/[0.08] ring-1 ring-white/[0.06]';
