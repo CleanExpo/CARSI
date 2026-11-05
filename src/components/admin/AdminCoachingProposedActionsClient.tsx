@@ -7,6 +7,10 @@ import {
   COACH_FEEDBACK_MAX_CHARS,
   normalizeCoachFeedback,
 } from '@/lib/coaching-portal/marketing-pack/coach-input-limits';
+import {
+  marketingFixAreaLabel,
+  marketingFixImpactBadgeClass,
+} from '@/lib/coaching-portal/marketing-pack/ui-labels';
 
 type ProposedItem = {
   id: string;
@@ -14,11 +18,23 @@ type ProposedItem = {
   description: string | null;
   priority: string | null;
   createdAt: string;
+  marketing: {
+    rank: number;
+    fixId: string;
+    area: 'website' | 'google-business-profile' | null;
+    impact: 1 | 2 | 3 | null;
+    effort: 1 | 2 | 3 | null;
+    impactLabel: string | null;
+    effortLabel: string | null;
+    packGeneratedAt: string | null;
+  } | null;
   member: {
     email: string;
     name: string | null;
     businessName: string | null;
     location: string | null;
+    website: string | null;
+    googleBusinessUrl: string | null;
   };
 };
 
@@ -91,8 +107,8 @@ export function AdminCoachingProposedActionsClient() {
       <header>
         <h1 className="text-2xl font-semibold text-white">Coaching: proposed actions</h1>
         <p className="mt-1 text-sm text-slate-400">
-          Fixes from members&apos; marketing packs. Approve to add one to the member&apos;s action
-          list, or decline it. A note is shown to the member as coach feedback.
+          Marketing-pack fixes only. Approve to add one to the member&apos;s action list, or decline
+          it. A note is shown to the member as coach feedback.
         </p>
       </header>
       {error ? (
@@ -115,18 +131,51 @@ export function AdminCoachingProposedActionsClient() {
                 <p className="text-xs text-slate-500">
                   {email}
                   {list[0].member.location ? ` · ${list[0].member.location}` : ''}
+                  {list[0].member.website ? ` · ${list[0].member.website}` : ''}
                 </p>
                 <ul className="mt-4 space-y-3">
                   {list.map((item) => (
                     <li key={item.id} className="rounded-xl border border-white/[0.06] p-4">
                       <div className="flex flex-wrap items-center gap-2">
                         <p className="text-sm font-semibold text-white">{item.title}</p>
+                        {item.marketing ? (
+                          <>
+                            <span className="font-mono text-xs text-sky-300/90">
+                              #{item.marketing.rank}
+                            </span>
+                            {item.marketing.area ? (
+                              <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-[10px] font-semibold tracking-wide text-slate-400 uppercase">
+                                {marketingFixAreaLabel(item.marketing.area)}
+                              </span>
+                            ) : null}
+                            {item.marketing.impactLabel && item.marketing.impact ? (
+                              <span
+                                className={`rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase ring-1 ring-inset ${marketingFixImpactBadgeClass(
+                                  item.marketing.impact
+                                )}`}
+                              >
+                                {item.marketing.impactLabel}
+                              </span>
+                            ) : null}
+                            {item.marketing.effortLabel ? (
+                              <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-[10px] font-semibold text-slate-400">
+                                {item.marketing.effortLabel}
+                              </span>
+                            ) : null}
+                          </>
+                        ) : null}
                         {item.priority ? (
                           <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-[10px] font-semibold tracking-wide text-slate-400 uppercase">
                             {item.priority}
                           </span>
                         ) : null}
                       </div>
+                      {item.marketing?.packGeneratedAt ? (
+                        <p className="mt-1 text-[11px] text-slate-600">
+                          From pack built{' '}
+                          {new Date(item.marketing.packGeneratedAt).toLocaleString('en-AU')}
+                        </p>
+                      ) : null}
                       {item.description ? (
                         <p className="mt-1 text-sm whitespace-pre-line text-slate-400">
                           {item.description}
