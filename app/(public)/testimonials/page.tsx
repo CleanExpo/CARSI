@@ -1,15 +1,14 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { HomeFinalCtaSection } from '@/components/landing/HomeFinalCtaSection';
-import { HomeTrustStrip } from '@/components/landing/HomeTrustStrip';
+import { LANDING_LEAD_CLASS } from '@/components/landing/public-shell-width';
 import {
-  LANDING_DISPLAY_H2_CLASS,
-  LANDING_EYEBROW_CLASS,
-  LANDING_LEAD_CLASS,
-  PUBLIC_SHELL_INNER_CLASS,
-} from '@/components/landing/public-shell-width';
-import { PlatformNav } from '@/components/marketing/PlatformNav';
+  PlatformBentoFeatured,
+  PlatformContextualNext,
+  PlatformPageHeroFromSurface,
+  PlatformPageSection,
+} from '@/components/marketing/platform/PlatformPagePattern';
+import { StaticMarketingClosingCta } from '@/components/marketing/StaticMarketingClosingCta';
 import {
   TestimonialCard,
   type Testimonial,
@@ -79,25 +78,10 @@ export default function TestimonialsPage() {
 
   return (
     <>
-      <section className="relative overflow-hidden border-b border-slate-200/70 bg-white">
-        <div
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_88%_0%,rgba(36,144,237,0.11),transparent_58%)]"
-          aria-hidden
-        />
-        <div className={`relative ${PUBLIC_SHELL_INNER_CLASS} py-16 md:py-24`}>
-          <p className={LANDING_EYEBROW_CLASS}>Student reviews</p>
-          <h1 className="mt-3 max-w-3xl font-[family-name:var(--font-display)] text-[2.15rem] leading-[1.1] font-semibold tracking-[-0.02em] text-slate-950 md:text-[3.1rem] md:leading-[1.06]">
-            What our students say
-          </h1>
-          <p className={`mt-5 max-w-2xl text-pretty ${LANDING_LEAD_CLASS}`}>
-            Real feedback from cleaning and restoration professionals across Australia who have
-            trained with CARSI and earned IICRC Continuing Education Credits.
-          </p>
-          <PlatformNav current="/testimonials" />
-        </div>
-      </section>
-
-      <HomeTrustStrip
+      <PlatformPageHeroFromSurface
+        current="/testimonials"
+        variant="centered"
+        glow="center"
         stats={[
           { value: '5.0', label: 'Average rating' },
           { value: String(TESTIMONIALS.length), label: 'Verified reviews' },
@@ -106,53 +90,80 @@ export default function TestimonialsPage() {
         ]}
       />
 
-      <section className="border-t border-slate-200/70 bg-[#fafbfc] py-16 md:py-24" aria-label="Featured review">
-        <div className={`${PUBLIC_SHELL_INNER_CLASS} grid gap-10 lg:grid-cols-[1.2fr_0.8fr]`}>
-          <TestimonialCard testimonial={featured} />
-          <div>
-            <p className={LANDING_EYEBROW_CLASS}>Trusted by teams</p>
-            <h2 className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>
-              From solo operators to national restoration firms
-            </h2>
-            <p className={`mt-4 ${LANDING_LEAD_CLASS}`}>
-              Reviews span carpet cleaning, mould remediation, insurance restoration, and industry
-              media — all grounded in practical field experience.
-            </p>
-          </div>
-        </div>
-      </section>
+      <PlatformPageSection
+        id="featured-review"
+        eyebrow="Featured"
+        title="From solo operators to national firms"
+        tone="muted"
+        layout="wide"
+      >
+        <PlatformBentoFeatured
+          featured={<TestimonialCard testimonial={featured} />}
+          aside={
+            <>
+              <p className={LANDING_LEAD_CLASS}>
+                Reviews span carpet cleaning, mould remediation, insurance restoration, and industry
+                media — grounded in practical field experience, not marketing filler.
+              </p>
+              <p className={`mt-4 text-sm text-slate-500`}>
+                Scroll the grid below for more voices, or share your own experience at the bottom.
+              </p>
+            </>
+          }
+        />
+      </PlatformPageSection>
 
-      <section className="border-t border-slate-200/70 bg-white py-16 md:py-24" aria-label="Testimonials">
-        <div className={PUBLIC_SHELL_INNER_CLASS}>
-          <p className={LANDING_EYEBROW_CLASS}>The field</p>
-          <h2 className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>More voices from the industry</h2>
-          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {rest.map((t) => (
-              <TestimonialCard key={t.name} testimonial={t} />
-            ))}
-          </div>
+      <PlatformPageSection
+        id="more-reviews"
+        eyebrow="The field"
+        title="More voices"
+        tone="white"
+        layout="wide"
+      >
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {rest.map((t) => (
+            <TestimonialCard key={t.name} testimonial={t} />
+          ))}
         </div>
-      </section>
+      </PlatformPageSection>
 
-      <section className="border-t border-slate-200/70 bg-[#fafbfc] py-16 md:py-24" aria-label="Share feedback">
-        <div className={`${PUBLIC_SHELL_INNER_CLASS} text-center`}>
-          <p className={LANDING_EYEBROW_CLASS}>Your voice</p>
-          <h2 className={`mx-auto mt-3 max-w-xl ${LANDING_DISPLAY_H2_CLASS}`}>Share your experience</h2>
-          <p className={`mx-auto mt-4 max-w-lg ${LANDING_LEAD_CLASS}`}>
-            Have you trained with CARSI? We&apos;d love to hear from you.
-          </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <Link
-              href="/contact"
-              className="inline-flex min-h-12 items-center rounded-full bg-[#146fc2] px-7 text-sm font-semibold text-white hover:bg-[#0f5fa8]"
-            >
-              Send feedback
-            </Link>
-            <a
-              href={socialProfileUrl('facebook')}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex min-h-12 items-center rounded-full border border-slate-200 bg-white px-7 text-sm font-semibold text-slate-800 hover:border-[#2490ed]/40 hover:text-[#146fc2]"
+      <PlatformPageSection
+        id="share-feedback"
+        eyebrow="Your voice"
+        title="Share your experience"
+        lead="Have you trained with CARSI? We'd love to hear from you."
+        tone="accent"
+        align="center"
+        layout="wide"
+      >
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <Link
+            href="/contact"
+            className="inline-flex min-h-12 items-center rounded-full bg-[#146fc2] px-7 text-sm font-semibold text-white hover:bg-[#0f5fa8]"
+          >
+            Send feedback
+          </Link>
+          <a
+            href={socialProfileUrl('facebook')}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-12 items-center rounded-full border border-slate-200 bg-white px-7 text-sm font-semibold text-slate-800 hover:border-[#2490ed]/40 hover:text-[#146fc2]"
+          >
+            Review on Facebook
+          </a>
+          <a
+            href={socialProfileUrl('linkedin')}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-12 items-center rounded-full border border-slate-200 bg-white px-7 text-sm font-semibold text-slate-800 hover:border-[#2490ed]/40 hover:text-[#146fc2]"
+          >
+            Review on LinkedIn
+          </a>
+        </div>
+      </PlatformPageSection>
+
+      <PlatformContextualNext current="/testimonials" />
+      <StaticMarketingClosingCta />
             >
               Review on Facebook
             </a>
