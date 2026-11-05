@@ -1,31 +1,54 @@
 'use client';
 
 import {
+  CalendarDays,
   CheckCircle2,
   Circle,
   ClipboardCopy,
+  ClipboardList,
   Download,
+  Globe,
+  ListChecks,
   Loader2,
   RefreshCw,
   Sparkles,
+  Target,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 
 import {
+  coachingAlertText,
   coachingCard,
   coachingCardTitle,
   coachingEyebrow,
+  coachingFixImpactAccent,
+  coachingHeroBand,
   coachingMuted,
   coachingPage,
   coachingPrimaryBtn,
+  coachingProgressFill,
+  coachingProgressFillStyle,
+  coachingProgressTrackClass,
   coachingSecondaryBtn,
-  coachingAlertText,
+  coachingSuccessBanner,
 } from '@/components/coaching-portal/coaching-ui';
 import { useCoachingPortal } from '@/components/coaching-portal/CoachingPortalContext';
+import { CoachingBuildProgressStrip } from '@/components/coaching-portal/visual/CoachingBuildProgressStrip';
+import { CoachingPageJumpNav } from '@/components/coaching-portal/visual/CoachingPageJumpNav';
+import { CoachingStatGrid } from '@/components/coaching-portal/visual/CoachingStatGrid';
+import { CoachingSupportPanel } from '@/components/coaching-portal/visual/CoachingSupportPanel';
 import { coachingPortalPath } from '@/lib/coaching-portal/coaching-portal-paths';
 import { marketingPackErrorFromResponse } from '@/lib/coaching-portal/marketing-pack/api-messages';
 import { MARKETING_PACK_DOWNLOADS } from '@/lib/coaching-portal/marketing-pack/downloads';
+import {
+  checklistCompletionPercent,
+  MARKETING_PACK_BUILD_STEPS,
+  MARKETING_PACK_SECTION_IDS,
+  marketingPackJumpLinks,
+  marketingPackStats,
+} from '@/lib/coaching-portal/marketing-pack/marketing-pack-view';
+import type { MarketingPackSummary } from '@/lib/coaching-portal/marketing-pack/pack-summary';
 import type {
   ChecklistItem,
   SiteReview,
@@ -38,7 +61,6 @@ import {
   marketingFixImpactBadgeClass,
   marketingFixImpactLabel,
 } from '@/lib/coaching-portal/marketing-pack/ui-labels';
-import type { MarketingPackSummary } from '@/lib/coaching-portal/marketing-pack/pack-summary';
 
 type Pack = {
   id: string;
@@ -51,56 +73,25 @@ type Pack = {
 
 type PackProgress = { checksDelta: number | null; fixCountDelta: number | null };
 
+const STAT_ICONS = {
+  fixes: Target,
+  checks: Globe,
+  checklist: ClipboardList,
+  social: CalendarDays,
+} as const;
+
 function MarketingPackLoadingSkeleton() {
   return (
     <div className="mt-10 space-y-4" aria-busy="true" aria-label="Loading marketing pack">
       {[1, 2, 3].map((i) => (
         <div
           key={i}
-          className={`${coachingCard} animate-pulse space-y-3`}
+          className={`${coachingCard} space-y-3 motion-safe:animate-pulse`}
           style={{ animationDelay: `${i * 80}ms` }}
         >
           <div className="h-4 w-40 rounded bg-white/10" />
           <div className="h-3 w-full max-w-md rounded bg-white/[0.06]" />
           <div className="h-3 w-5/6 rounded bg-white/[0.06]" />
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function PackSummaryStrip({
-  review,
-  checklist,
-  calendar,
-}: {
-  review: SiteReview;
-  checklist: ChecklistItem[];
-  calendar: SocialCalendar;
-}) {
-  const checksPassed = review.checks.filter((c) => c.passed).length;
-  const checklistDone = checklist.filter((i) => i.done).length;
-  const stats = [
-    { label: 'Priority fixes', value: String(review.fixes.length) },
-    {
-      label: 'Site checks passed',
-      value: review.checks.length ? `${checksPassed}/${review.checks.length}` : '—',
-    },
-    { label: 'Checklist done', value: `${checklistDone}/${checklist.length}` },
-    { label: 'Social drafts', value: String(calendar.posts.length) },
-  ];
-
-  return (
-    <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-      {stats.map((s) => (
-        <div
-          key={s.label}
-          className="rounded-xl border border-white/[0.08] bg-gradient-to-br from-[#0c1424] to-[#0a101c] px-4 py-3 ring-1 ring-white/[0.04]"
-        >
-          <p className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">
-            {s.label}
-          </p>
-          <p className="mt-1 text-2xl font-semibold text-white tabular-nums">{s.value}</p>
         </div>
       ))}
     </div>
@@ -195,87 +186,129 @@ export function CoachingMarketingPackPage() {
     return pack.calendar.posts.find((p) => p.date === iso) ?? pack.calendar.posts[0] ?? null;
   }, [pack]);
 
+  const statItems = useMemo(
+    () =>
+      pack
+        ? marketingPackStats({
+            review: pack.review,
+            checklist: pack.checklist,
+            calendar: pack.calendar,
+          }).map((s) => ({
+            ...s,
+            icon: STAT_ICONS[s.id as keyof typeof STAT_ICONS],
+          }))
+        : [],
+    [pack]
+  );
+
+  const jumpLinks = useMemo(
+    () => (pack ? marketingPackJumpLinks(pack.review.checks.length > 0) : []),
+    [pack]
+  );
+
+  const checklistPercent = pack ? checklistCompletionPercent(pack.checklist) : 0;
+
   return (
-    <div className={coachingPage}>
-      <p className={coachingEyebrow}>Marketing pack</p>
-      <h1 className="mt-2 text-2xl font-semibold tracking-tight text-white sm:text-[1.75rem]">
-        Your website, Google and social plan
-      </h1>
-      <p className={`mt-2 max-w-2xl ${coachingMuted}`}>
-        Built from your assessment and business profile: a plain-English review of your website and
-        Google Business Profile link, a local-search checklist, and 30 days of claim-safe social
-        drafts in your trade voice. We use vetted templates and automated checks — not open-ended
-        AI copy — so nothing over-promises. Your coach approves each fix before it joins your action
-        list.
-      </p>
+    <div className={coachingPage} data-testid="marketing-pack-page">
+      <div className={coachingHeroBand} data-testid="marketing-pack-hero">
+        <p className={coachingEyebrow}>Marketing pack · Advantage A7</p>
+        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-white sm:text-[1.75rem]">
+          Your website, Google and social plan
+        </h1>
+        <p className={`mt-3 max-w-2xl ${coachingMuted}`}>
+          Built from your assessment and business profile: plain-English review, local-search
+          checklist, and 30 days of claim-safe social drafts. Vetted templates and automated checks
+          — not open-ended AI copy. Your coach approves each fix before it joins your action list.
+        </p>
 
-      <section
-        className={`mt-5 rounded-xl border border-white/[0.08] bg-white/[0.02] px-4 py-3 ${coachingMuted}`}
-        aria-labelledby="mp-how"
-      >
-        <h2 id="mp-how" className="text-xs font-semibold tracking-wide text-slate-400 uppercase">
-          How your pack is built
-        </h2>
-        <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-slate-300">
-          <li>We read your public home page once (secure fetch) and run local-search checks.</li>
-          <li>We validate your Google profile link shape — we do not log into Google for you.</li>
-          <li>Social posts come from vetted templates filled with your trade label only.</li>
-          <li>Each ranked fix becomes a proposed action until your coach approves it.</li>
-        </ul>
-      </section>
-
-      <div className="mt-6 flex flex-wrap items-center gap-3" aria-live="polite" aria-atomic="true">
-        <button
-          type="button"
-          className={coachingPrimaryBtn}
-          disabled={!access.canEdit || building}
-          aria-busy={building}
-          onClick={() => void build()}
+        <section
+          className="mt-5 rounded-xl border border-white/[0.06] bg-black/20 px-4 py-3"
+          aria-labelledby="mp-how"
         >
-          {building ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden />
-          ) : pack ? (
-            <RefreshCw className="mr-2 h-4 w-4" aria-hidden />
-          ) : (
-            <Sparkles className="mr-2 h-4 w-4" aria-hidden />
-          )}
-          {building ? 'Building your pack…' : pack ? 'Rebuild my pack' : 'Build my marketing pack'}
-        </button>
-        {pack ? (
-          <span className="text-xs text-slate-500">
-            Built {new Date(pack.generatedAt).toLocaleString('en-AU')}
-          </span>
+          <h2 id="mp-how" className="text-xs font-semibold tracking-wide text-slate-400 uppercase">
+            How your pack is built
+          </h2>
+          <ul className="mt-2 grid gap-2 sm:grid-cols-2">
+            {[
+              'Secure one-time read of your public home page',
+              'Google link shape check (we never sign in for you)',
+              'Claim-safe social templates in your trade voice',
+              'Ranked fixes → coach approval → action board',
+            ].map((line) => (
+              <li key={line} className="flex gap-2 text-sm text-slate-300">
+                <ListChecks className="mt-0.5 h-4 w-4 shrink-0 text-sky-400/80" aria-hidden />
+                {line}
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <div
+          className="mt-6 flex flex-wrap items-center gap-3"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          <button
+            type="button"
+            className={coachingPrimaryBtn}
+            disabled={!access.canEdit || building}
+            aria-busy={building}
+            data-testid="marketing-pack-build"
+            onClick={() => void build()}
+          >
+            {building ? (
+              <Loader2 className="mr-2 h-4 w-4 motion-safe:animate-spin" aria-hidden />
+            ) : pack ? (
+              <RefreshCw className="mr-2 h-4 w-4" aria-hidden />
+            ) : (
+              <Sparkles className="mr-2 h-4 w-4" aria-hidden />
+            )}
+            {building
+              ? 'Building your pack…'
+              : pack
+                ? 'Rebuild my pack'
+                : 'Build my marketing pack'}
+          </button>
+          {pack ? (
+            <span className="text-xs text-slate-500">
+              Built {new Date(pack.generatedAt).toLocaleString('en-AU')}
+            </span>
+          ) : null}
+          {!access.canEdit ? (
+            <span className={`text-xs ${coachingMuted}`}>
+              Available with an active coaching plan.
+            </span>
+          ) : null}
+        </div>
+
+        <CoachingBuildProgressStrip active={building} steps={MARKETING_PACK_BUILD_STEPS} />
+
+        {statusMessage && !error ? (
+          <p className="mt-3 text-xs text-sky-300/90">{statusMessage}</p>
         ) : null}
-        {!access.canEdit ? (
-          <span className={`text-xs ${coachingMuted}`}>
-            Available with an active coaching plan.
-          </span>
+        {error ? (
+          <p
+            role="alert"
+            className={`mt-4 ${coachingAlertText}`}
+            data-testid="marketing-pack-error"
+          >
+            {error}
+          </p>
         ) : null}
       </div>
-      {statusMessage && !error ? (
-        <p className={`mt-3 text-xs text-sky-300/90`}>{statusMessage}</p>
-      ) : null}
-      {building ? (
-        <p className={`mt-3 text-xs ${coachingMuted}`}>
-          This usually takes under a minute while we fetch your website and assemble your calendar.
-        </p>
-      ) : null}
-      {error ? (
-        <p role="alert" className={`mt-4 ${coachingAlertText}`}>
-          {error}
-        </p>
-      ) : null}
+
+      {pack ? <CoachingPageJumpNav links={jumpLinks} testId="marketing-pack-jump" /> : null}
 
       {loading ? (
         <MarketingPackLoadingSkeleton />
       ) : !pack ? (
-        <section className={`mt-8 ${coachingCard}`}>
+        <section className={`mt-8 ${coachingCard}`} data-testid="marketing-pack-empty">
           <div className="flex gap-3">
             <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-sky-400/80" aria-hidden />
             <div>
               <h2 className={coachingCardTitle}>No pack yet</h2>
               <p className={`mt-1 ${coachingMuted}`}>
-                Check your website and Google Business Profile links are in your{' '}
+                Add your website and Google Business Profile links in your{' '}
                 <Link
                   href={coachingPortalPath('/onboarding/profile')}
                   className="text-sky-400 hover:underline"
@@ -290,7 +323,10 @@ export function CoachingMarketingPackPage() {
       ) : (
         <>
           {progress.checksDelta != null && progress.checksDelta !== 0 ? (
-            <p className="mt-4 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-100">
+            <p
+              className={`mt-6 ${coachingSuccessBanner}`}
+              data-testid="marketing-pack-progress-delta"
+            >
               Since your last pack, site checks passed changed by{' '}
               {progress.checksDelta > 0 ? '+' : ''}
               {progress.checksDelta}. Rebuild after you publish website changes.
@@ -298,19 +334,20 @@ export function CoachingMarketingPackPage() {
           ) : null}
           {history.length > 1 ? (
             <p className={`mt-2 text-xs ${coachingMuted}`}>
-              {history.length} saved packs on file — showing the latest. Rebuild to refresh after
-              you update your site or Google link.
+              {history.length} saved packs on file — showing the latest.
             </p>
           ) : null}
 
-          <PackSummaryStrip
-            review={pack.review}
-            checklist={pack.checklist}
-            calendar={pack.calendar}
-          />
+          <div className="mt-8">
+            <CoachingStatGrid items={statItems} testIdPrefix="marketing-pack-stat" />
+          </div>
 
-          <div className="mt-8 space-y-6">
-            <section className={coachingCard} aria-labelledby="mp-downloads">
+          <div className="mt-8 scroll-mt-28 space-y-6">
+            <section
+              id={MARKETING_PACK_SECTION_IDS.downloads}
+              className={`${coachingCard} scroll-mt-28`}
+              aria-labelledby="mp-downloads"
+            >
               <h2 id="mp-downloads" className={coachingCardTitle}>
                 Your resources
               </h2>
@@ -327,6 +364,7 @@ export function CoachingMarketingPackPage() {
                     <a
                       href={`/api/coaching/portal/marketing-pack/download?item=${d.id}`}
                       className={`${coachingSecondaryBtn} !min-h-9 shrink-0 gap-1.5 !px-3`}
+                      data-testid={`marketing-pack-download-${d.id}`}
                     >
                       <Download className="h-3.5 w-3.5" aria-hidden />
                       Download
@@ -337,7 +375,11 @@ export function CoachingMarketingPackPage() {
             </section>
 
             {pack.review.checks.length > 0 ? (
-              <section className={coachingCard} aria-labelledby="mp-checks">
+              <section
+                id={MARKETING_PACK_SECTION_IDS.checks}
+                className={`${coachingCard} scroll-mt-28`}
+                aria-labelledby="mp-checks"
+              >
                 <h2 id="mp-checks" className={coachingCardTitle}>
                   What we checked
                 </h2>
@@ -362,18 +404,26 @@ export function CoachingMarketingPackPage() {
               </section>
             ) : null}
 
-            <section className={coachingCard} aria-labelledby="mp-gbp">
+            <section
+              id={MARKETING_PACK_SECTION_IDS.gbp}
+              className={`${coachingCard} scroll-mt-28`}
+              aria-labelledby="mp-gbp"
+            >
               <h2 id="mp-gbp" className={coachingCardTitle}>
                 Google Business Profile
               </h2>
               <p className={`mt-1 ${coachingMuted}`}>
-                We check that your saved link looks like a real Maps or Business Profile listing. We
-                do not sign in to Google or score photos, reviews or categories — your coach can
-                walk through those on the checklist in session.
+                We verify your saved link looks like a real Maps or Business Profile listing. We do
+                not sign in to Google or score photos, reviews or categories — walk through those
+                with your coach using the checklist below.
               </p>
             </section>
 
-            <section className={coachingCard} aria-labelledby="mp-review">
+            <section
+              id={MARKETING_PACK_SECTION_IDS.review}
+              className={`${coachingCard} scroll-mt-28`}
+              aria-labelledby="mp-review"
+            >
               <h2 id="mp-review" className={coachingCardTitle}>
                 Website and Google review
               </h2>
@@ -383,10 +433,11 @@ export function CoachingMarketingPackPage() {
                   {pack.review.fixes.map((f) => (
                     <li
                       key={f.id}
-                      className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-4 transition-colors hover:border-white/[0.1]"
+                      className={`rounded-lg border border-white/[0.06] bg-white/[0.02] p-4 transition-colors hover:border-white/[0.12] ${coachingFixImpactAccent(f.impact)}`}
+                      data-testid={`marketing-pack-fix-${f.rank}`}
                     >
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="font-mono text-xs text-sky-300">{f.rank}</span>
+                        <span className="font-mono text-xs text-sky-300">#{f.rank}</span>
                         <p className="text-sm font-semibold text-white">{f.title}</p>
                         <span
                           className={`rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase ring-1 ring-inset ${marketingFixImpactBadgeClass(f.impact)}`}
@@ -423,10 +474,32 @@ export function CoachingMarketingPackPage() {
               </p>
             </section>
 
-            <section className={coachingCard} aria-labelledby="mp-checklist">
-              <h2 id="mp-checklist" className={coachingCardTitle}>
-                Local-search checklist
-              </h2>
+            <section
+              id={MARKETING_PACK_SECTION_IDS.checklist}
+              className={`${coachingCard} scroll-mt-28`}
+              aria-labelledby="mp-checklist"
+            >
+              <div className="flex flex-wrap items-end justify-between gap-4">
+                <h2 id="mp-checklist" className={coachingCardTitle}>
+                  Local-search checklist
+                </h2>
+                <p className="text-xs font-semibold text-slate-400 tabular-nums">
+                  {checklistPercent}% complete
+                </p>
+              </div>
+              <div
+                className={`mt-3 ${coachingProgressTrackClass()}`}
+                role="progressbar"
+                aria-valuenow={checklistPercent}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label="Checklist completion"
+              >
+                <div
+                  className={coachingProgressFill}
+                  style={coachingProgressFillStyle(checklistPercent)}
+                />
+              </div>
               <ul className="mt-4 space-y-3">
                 {pack.checklist.map((i) => (
                   <li key={i.id} className="flex gap-3">
@@ -447,7 +520,11 @@ export function CoachingMarketingPackPage() {
               </ul>
             </section>
 
-            <section className={coachingCard} aria-labelledby="mp-calendar">
+            <section
+              id={MARKETING_PACK_SECTION_IDS.calendar}
+              className={`${coachingCard} scroll-mt-28`}
+              aria-labelledby="mp-calendar"
+            >
               <h2 id="mp-calendar" className={coachingCardTitle}>
                 30-day social calendar
               </h2>
@@ -455,11 +532,14 @@ export function CoachingMarketingPackPage() {
                 {pack.calendar.tradeMatched === false
                   ? 'We do not have wording for your trade yet, so these drafts use general trade wording. Your coach can help you tailor them.'
                   : `Drafts written for ${pack.voice.trade || 'your trade'}.`}{' '}
-                Edit them to sound like you and add your own job photos before posting. Reuse the
-                same caption on Google Business Profile posts where it fits.
+                Add your own job photos before posting. Reuse captions on Google Business Profile
+                where they fit.
               </p>
               {todaysPost ? (
-                <div className="mt-4 flex flex-wrap items-center gap-2 rounded-lg border border-sky-500/20 bg-sky-500/10 px-3 py-2">
+                <div
+                  className="mt-4 flex flex-wrap items-center gap-2 rounded-lg border border-sky-500/20 bg-sky-500/10 px-3 py-2"
+                  data-testid="marketing-pack-today"
+                >
                   <p className="text-xs text-sky-100">
                     Today&apos;s draft (Day {todaysPost.day}): {todaysPost.theme}
                   </p>
@@ -517,6 +597,17 @@ export function CoachingMarketingPackPage() {
                 </button>
               ) : null}
             </section>
+
+            <CoachingSupportPanel
+              id={MARKETING_PACK_SECTION_IDS.support}
+              mailSubject="Business Coaching — marketing pack help"
+              tips={[
+                'If your website blocks our checker, email us the URL you see in a normal browser.',
+                'Wait ten minutes between rebuilds so we do not rate-limit your account.',
+                'Approve fixes with your coach on the action board — do not skip coach review.',
+              ]}
+              testId="marketing-pack-support"
+            />
           </div>
         </>
       )}
