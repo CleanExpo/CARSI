@@ -270,7 +270,12 @@ export function CoachingPortalShell({
           </header>
 
           <PartnerDemoBanner email={dashboard.user.email} />
-          <main className="flex-1 overflow-x-hidden px-4 py-6 sm:px-6 sm:py-8">{children}</main>
+          <main
+            className="flex-1 overflow-x-hidden px-4 py-6 sm:px-6 sm:py-8"
+            data-testid="coaching-portal-main"
+          >
+            {children}
+          </main>
         </div>
       </div>
     </CoachingPortalProvider>
