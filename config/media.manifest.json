@@ -1,4 +1,54 @@
 {
   "version": 1,
-  "entries": []
+  "entries": [
+    {
+      "src": "/images/for/nsw-builders.webp",
+      "kind": "image",
+      "source": "generated",
+      "credit": "CARSI marketing asset (self-hosted WebP); derived from hero-tile library",
+      "alt": "Technician checks moisture in timber framing before reinstatement work"
+    },
+    {
+      "src": "/images/for/insurance-claims-staff.webp",
+      "kind": "image",
+      "source": "generated",
+      "credit": "CARSI marketing asset (self-hosted WebP); course cover library",
+      "alt": "Restoration drying setup documented after a commercial water loss"
+    },
+    {
+      "src": "/images/for/facility-managers.webp",
+      "kind": "image",
+      "source": "generated",
+      "credit": "CARSI marketing asset (self-hosted WebP); hero-tile library",
+      "alt": "Air movers set up for structural drying in a commercial building"
+    },
+    {
+      "src": "/images/for/healthcare-facilities.webp",
+      "kind": "image",
+      "source": "generated",
+      "credit": "CARSI marketing asset (self-hosted WebP); course cover library",
+      "alt": "Healthcare facility cleaning crew working in a clinical corridor"
+    },
+    {
+      "src": "/images/for/property-and-strata-managers.webp",
+      "kind": "image",
+      "source": "generated",
+      "credit": "CARSI marketing asset (self-hosted WebP); course cover library",
+      "alt": "Building materials staged for reinstatement after water damage"
+    },
+    {
+      "src": "/images/for/commercial-cleaning-contractors.webp",
+      "kind": "image",
+      "source": "generated",
+      "credit": "CARSI marketing asset (self-hosted WebP); hero-tile library",
+      "alt": "Technician using carpet extraction equipment on a commercial cleaning job"
+    },
+    {
+      "src": "/images/for/test-hero.webp",
+      "kind": "image",
+      "source": "generated",
+      "credit": "CARSI test fixture for authority page approval tests",
+      "alt": "A technician reads a moisture meter"
+    }
+  ]
 }
