@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import {
+  hasMinimumMarketingVoice,
+  MARKETING_PROFILE_REQUIRED_MESSAGE,
+} from '@/lib/coaching-portal/marketing-pack/voice-gate';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import {
   defaultMarketingPackDeps,
@@ -42,14 +46,8 @@ export async function POST(request: NextRequest) {
   }
 
   const inputs = await loadMarketingInputsForUser(userId);
-  if (!inputs.voice.trade && !inputs.voice.businessName) {
-    return NextResponse.json(
-      {
-        detail:
-          'Fill in your business profile first so the pack is written for your trade and town.',
-      },
-      { status: 400 }
-    );
+  if (!hasMinimumMarketingVoice(inputs.voice)) {
+    return NextResponse.json({ detail: MARKETING_PROFILE_REQUIRED_MESSAGE }, { status: 400 });
   }
 
   try {
