@@ -1,5 +1,7 @@
 import type { SessionClaims } from '@/lib/auth/session-jwt';
 import { coachingPortalPath } from '@/lib/coaching-portal/coaching-portal-paths';
+import { MARKETING_ACTION_GOAL_PREFIX } from '@/lib/coaching-portal/marketing-pack/proposed-actions';
+import { hasMinimumMarketingVoice } from '@/lib/coaching-portal/marketing-pack/voice-gate';
 import type { CoachingActionStatus, CoachingPortalFeatures } from '@/lib/coaching-portal/types';
 import { prisma } from '@/lib/prisma';
 import { isCarsiCoachingAccountabilityEnabled } from '@/lib/server/carsi-coaching-accountability-flag';
@@ -8,6 +10,7 @@ import {
   listCoachingActionsForUser,
 } from '@/lib/server/carsi-coaching-actions-store';
 import { isCarsiCoachingMonthlyEnabled } from '@/lib/server/carsi-coaching-monthly-flag';
+import { getLatestMarketingPackForUser } from '@/lib/server/carsi-coaching-marketing-pack';
 import { getCoachingPortalAccess } from '@/lib/server/carsi-coaching-portal-access';
 import { getCoachingPortalRowForUser } from '@/lib/server/carsi-coaching-subscription-store';
 
@@ -93,6 +96,14 @@ export type CoachingPortalDashboard = {
   /** Same switch as /ccw-training — hide Stripe checkout when monthly coaching is off. */
   checkoutEnabled: boolean;
   features: CoachingPortalFeatures;
+  marketing: {
+    profileReady: boolean;
+    hasPack: boolean;
+    generatedAt: string | null;
+    proposedFixCount: number;
+    checksPassed: number | null;
+    checksTotal: number | null;
+  };
 };
 
 function firstNameFromClaims(claims: SessionClaims): string {
@@ -136,7 +147,7 @@ export async function loadCoachingPortalDashboard(
     await importLegacyActionsFromSubscriptionJson(userId, subRow.monthlyActionsJson);
   }
 
-  const [profile, draftAssessment, latestSubmitted, growthPlan, actions, sessions] =
+  const [profile, draftAssessment, latestSubmitted, growthPlan, actions, sessions, latestPack] =
     await Promise.all([
       prisma.carsiCoachingBusinessProfile.findUnique({ where: { userId } }),
       prisma.carsiCoachingAssessment.findFirst({
@@ -154,6 +165,7 @@ export async function loadCoachingPortalDashboard(
         orderBy: { scheduledAt: 'desc' },
         take: 20,
       }),
+      getLatestMarketingPackForUser(userId),
     ]);
 
   const profileComplete = isProfileComplete(profile);
@@ -212,6 +224,15 @@ export async function loadCoachingPortalDashboard(
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   // GP-634: proposed (awaiting coach) and declined actions are not on the member's list yet.
   const memberActions = actions.filter((a) => a.status !== 'proposed' && a.status !== 'declined');
+  const proposedMarketingFixCount = actions.filter(
+    (a) => a.status === 'proposed' && a.goalId?.startsWith(MARKETING_ACTION_GOAL_PREFIX)
+  ).length;
+  const marketingProfileReady = hasMinimumMarketingVoice({
+    businessName: profile?.businessName ?? '',
+    trade: profile?.industry ?? '',
+    town: profile?.location ?? '',
+    services: profile?.mainServices ?? '',
+  });
   const monthActions = memberActions.filter((a) => a.createdAt >= monthStart);
   const completedThisMonth = monthActions.filter((a) => a.status === 'done').length;
   const nextAction = actions.find((a) => a.status === 'todo' || a.status === 'in_progress') ?? null;
@@ -335,5 +356,15 @@ export async function loadCoachingPortalDashboard(
     bookingUrl,
     checkoutEnabled: isCarsiCoachingMonthlyEnabled(),
     features: { accountability: isCarsiCoachingAccountabilityEnabled() },
+    marketing: {
+      profileReady: marketingProfileReady,
+      hasPack: Boolean(latestPack),
+      generatedAt: latestPack?.generatedAt ?? null,
+      proposedFixCount: proposedMarketingFixCount,
+      checksPassed: latestPack
+        ? latestPack.review.checks.filter((c) => c.passed).length
+        : null,
+      checksTotal: latestPack ? latestPack.review.checks.length : null,
+    },
   };
 }
