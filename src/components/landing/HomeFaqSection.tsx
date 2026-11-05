@@ -37,13 +37,7 @@ function LedgerItem({
   const panelId = `home-faq-panel-${index}`;
 
   return (
-    <motion.li
-      className="border-b border-slate-200/80 first:border-t"
-      initial={reduceMotion ? false : { opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.3 }}
-      transition={{ ...spring, delay: index * 0.06 }}
-    >
+    <li className="border-b border-slate-200/80 first:border-t">
       <h3>
         <button
           type="button"
@@ -107,7 +101,7 @@ function LedgerItem({
           <span className="w-9 sm:w-10" aria-hidden />
         </div>
       </div>
-    </motion.li>
+    </li>
   );
 }
 
@@ -157,13 +151,7 @@ export function HomeFaqSection({
             <p className={`mt-4 max-w-sm ${LANDING_LEAD_CLASS}`}>{lead}</p>
 
             {/* Support card */}
-            <motion.div
-              className="relative mt-10 max-w-sm overflow-hidden rounded-2xl border border-slate-200/90 bg-[#fafbfc] p-6 shadow-[0_24px_50px_-38px_rgba(15,23,42,0.35)]"
-              initial={reduceMotion ? false : { opacity: 0, y: 18 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.4 }}
-              transition={{ ...spring, delay: 0.15 }}
-            >
+            <div className="relative mt-10 max-w-sm overflow-hidden rounded-2xl border border-slate-200/90 bg-[#fafbfc] p-6 shadow-[0_24px_50px_-38px_rgba(15,23,42,0.35)]">
               <div
                 className="pointer-events-none absolute -top-10 -right-10 h-32 w-32 rounded-full bg-[radial-gradient(closest-side,rgba(36,144,237,0.16),transparent_70%)] blur-xl"
                 aria-hidden
@@ -185,7 +173,7 @@ export function HomeFaqSection({
                 Message CARSI support
                 <ArrowRight className="h-4 w-4" aria-hidden />
               </Link>
-            </motion.div>
+            </div>
           </div>
 
           <ul>
