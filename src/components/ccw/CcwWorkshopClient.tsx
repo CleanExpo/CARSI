@@ -1,7 +1,6 @@
 'use client';
 
 import { HomeFaqSection } from '@/components/landing/HomeFaqSection';
-import { HomeFinalCtaSection } from '@/components/landing/HomeFinalCtaSection';
 import { HomeTrustStrip } from '@/components/landing/HomeTrustStrip';
 import {
   LANDING_DISPLAY_H2_CLASS,
@@ -10,13 +9,14 @@ import {
   PUBLIC_SHELL_INNER_CLASS,
 } from '@/components/landing/public-shell-width';
 import { MarketingGrowthLinks } from '@/components/marketing/MarketingGrowthLinks';
+import { PlatformContextualNext } from '@/components/marketing/platform/PlatformPagePattern';
 import { PlatformNav } from '@/components/marketing/PlatformNav';
+import { StaticMarketingClosingCta } from '@/components/marketing/StaticMarketingClosingCta';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { CCW_COURSE_ZIP_HREF, CCW_COURSE_ZIP_PATH } from '@/lib/ccw/course-zip';
 import { carsiCoachingMonthlyPath } from '@/lib/marketing/carsi-coaching-monthly';
 import { ccwWorkshopPath } from '@/lib/marketing/marketing-growth-links';
-import Link from 'next/link';
 import { marketingInput } from '@/lib/marketing/marketing-ui';
 import {
   ArrowRight,
@@ -31,6 +31,7 @@ import {
   ShieldCheck,
   Target,
 } from 'lucide-react';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -125,6 +126,14 @@ function AgendaLine({ text }: { text: string }) {
   );
 }
 
+/** Committed course art — square crop reads cleanly in the hero card (no wide-barrel stretch). */
+const WORKSHOP_HERO_IMAGE = {
+  src: '/images/courses/upholstery-cleaning.webp',
+  alt: 'Hands-on upholstery and carpet cleaning practice during a CARSI workshop delivery',
+  width: 1024,
+  height: 1024,
+} as const;
+
 export function CcwWorkshopClient() {
   const searchParams = useSearchParams();
   const [gateOpen, setGateOpen] = useState(false);
@@ -193,33 +202,58 @@ export function CcwWorkshopClient() {
 
   return (
     <>
-      <section className="relative overflow-hidden border-b border-slate-200/70 bg-white">
+      <section className="relative overflow-hidden border-b border-slate-200/70 bg-[#f4f7fa]">
         <div
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_80%_0%,rgba(36,144,237,0.11),transparent_58%)]"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_15%_0%,rgba(36,144,237,0.12),transparent_58%)]"
           aria-hidden
         />
-        <div className={`relative ${PUBLIC_SHELL_INNER_CLASS} py-16 text-center md:py-24`}>
-          <p className={LANDING_EYEBROW_CLASS}>CARSI · 2 days · Hands-on</p>
-          <h1 className="mx-auto mt-3 max-w-3xl font-[family-name:var(--font-display)] text-[2.15rem] leading-[1.1] font-semibold tracking-[-0.02em] text-slate-950 md:text-[3.1rem] md:leading-[1.06]">
-            The Carpet Cleaning Workshop
-          </h1>
-          <p className={`mx-auto mt-5 max-w-2xl ${LANDING_LEAD_CLASS}`}>{PILLAR_LINE}</p>
-          <p className="mx-auto mt-3 text-sm font-medium text-[#146fc2]">{ANCHORED_HERO}</p>
-          <p className={`mx-auto mt-6 max-w-xl ${LANDING_LEAD_CLASS}`}>
-            This page is for enrolled participants to access the workshop resource pack after your
-            session.
-          </p>
-          <div className="flex justify-center">
-            <PlatformNav current={ccwWorkshopPath} />
-            <p className="mt-6 text-sm text-slate-500">
-              Looking for monthly business coaching?{' '}
-              <Link
-                href={carsiCoachingMonthlyPath}
-                className="font-medium text-[#146fc2] hover:underline"
-              >
-                CARSI Business Coaching
-              </Link>
-            </p>
+        <div className={`relative ${PUBLIC_SHELL_INNER_CLASS} py-14 md:py-20`}>
+          <div className="grid items-start gap-10 lg:grid-cols-[1.05fr_auto] lg:gap-14">
+            <div className="text-center lg:text-left">
+              <p className={LANDING_EYEBROW_CLASS}>CARSI · 2 days · Hands-on</p>
+              <h1 className="mx-auto mt-3 max-w-3xl font-[family-name:var(--font-display)] text-[2.15rem] leading-[1.1] font-semibold tracking-[-0.02em] text-slate-950 md:text-[3.1rem] md:leading-[1.06] lg:mx-0">
+                The Carpet Cleaning Workshop
+              </h1>
+              <p className={`mx-auto mt-5 max-w-2xl ${LANDING_LEAD_CLASS} lg:mx-0`}>
+                {PILLAR_LINE}
+              </p>
+              <p className="mx-auto mt-3 text-sm font-medium text-[#146fc2] lg:mx-0">
+                {ANCHORED_HERO}
+              </p>
+              <p className={`mx-auto mt-6 max-w-xl ${LANDING_LEAD_CLASS} lg:mx-0`}>
+                This page is for enrolled participants to access the workshop resource pack after
+                your session.
+              </p>
+              <div className="mt-8 flex flex-col items-center gap-5 lg:items-start">
+                <PlatformNav current={ccwWorkshopPath} />
+                <p className="max-w-md text-center text-sm text-slate-500 lg:text-left">
+                  Looking for monthly business coaching?{' '}
+                  <Link
+                    href={carsiCoachingMonthlyPath}
+                    className="font-medium text-[#146fc2] hover:underline"
+                  >
+                    CARSI Business Coaching
+                  </Link>
+                </p>
+              </div>
+            </div>
+            <figure className="mx-auto w-full max-w-[min(100%,22rem)] shrink-0 lg:mx-0">
+              <div className="relative aspect-square overflow-hidden rounded-2xl border border-slate-200/90 bg-slate-100 shadow-[0_20px_50px_-28px_rgba(15,23,42,0.35)] ring-1 ring-slate-900/5">
+                {/* Native img + object-cover: avoids Next/Image width forcing on unoptimized builds */}
+                <img
+                  src={WORKSHOP_HERO_IMAGE.src}
+                  alt={WORKSHOP_HERO_IMAGE.alt}
+                  width={WORKSHOP_HERO_IMAGE.width}
+                  height={WORKSHOP_HERO_IMAGE.height}
+                  loading="eager"
+                  decoding="async"
+                  className="absolute inset-0 h-full w-full object-cover object-center"
+                />
+              </div>
+              <figcaption className="mt-3 text-center text-xs leading-relaxed text-slate-500 lg:text-left">
+                Hands-on modules — fibre, chemistry, upholstery and business on the tools.
+              </figcaption>
+            </figure>
           </div>
         </div>
       </section>
@@ -475,7 +509,7 @@ export function CcwWorkshopClient() {
       <div className={`${PUBLIC_SHELL_INNER_CLASS} py-12`}>
         <MarketingGrowthLinks currentHref={ccwWorkshopPath} />
       </div>
-      <HomeFinalCtaSection />
+      <PlatformContextualNext current={ccwWorkshopPath} />
     </>
   );
 }
