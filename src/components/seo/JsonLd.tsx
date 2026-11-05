@@ -339,7 +339,35 @@ export function BreadcrumbSchema({ items }: BreadcrumbSchemaProps) {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      dangerouslySetInnerHTML={{ __html: serializeJsonLd(schema) }}
+    />
+  );
+}
+
+interface WebPageSchemaProps {
+  name: string;
+  description: string;
+  url: string;
+  /** ISO date string for dateModified when claims or approval were last refreshed. */
+  dateModified?: string;
+}
+
+export function WebPageSchema({ name, description, url, dateModified }: WebPageSchemaProps) {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name,
+    description,
+    url,
+    ...(dateModified ? { dateModified } : {}),
+    isPartOf: { '@id': 'https://carsi.com.au/#website' },
+    publisher: { '@id': 'https://carsi.com.au/#organization' },
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: serializeJsonLd(schema) }}
     />
   );
 }

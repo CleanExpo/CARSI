@@ -3,6 +3,7 @@ export {
   WebsiteSchema,
   CourseSchema,
   BreadcrumbSchema,
+  WebPageSchema,
   FAQSchema,
   ArticleSchema,
   ItemListSchema,
