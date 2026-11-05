@@ -15,7 +15,7 @@ import {
   ShieldCheck,
   Users,
 } from 'lucide-react';
-import { HomeFinalCtaSection } from '@/components/landing/HomeFinalCtaSection';
+import { StaticMarketingClosingCta } from '@/components/marketing/StaticMarketingClosingCta';
 import { HomeTrustStrip } from '@/components/landing/HomeTrustStrip';
 import {
   LANDING_DISPLAY_H2_CLASS,
@@ -458,7 +458,7 @@ export default function AuthorityPage() {
         <div className={`${PUBLIC_SHELL_INNER_CLASS} py-12`}>
           <MarketingGrowthLinks currentHref={authorityPath} />
         </div>
-        <HomeFinalCtaSection />
+        <StaticMarketingClosingCta />
       </>
     </>
   );
