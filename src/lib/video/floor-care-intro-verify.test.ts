@@ -1,7 +1,9 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, vi } from 'vitest';
+import { EventEmitter } from 'node:events';
 import { mkdtemp, rm, stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
+import { PassThrough } from 'node:stream';
 import { fileURLToPath } from 'node:url';
 
 import {
@@ -18,6 +20,7 @@ import {
   ffmpegBinaryPath,
   FLOOR_CARE_INTRO_PROBE_CONSTRAINTS,
   type RunCaptureFn,
+  type RunCaptureProcess,
 } from './floor-care-intro-plan';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
@@ -201,34 +204,179 @@ describe('verifyFloorCareIntroVideo (real local integration, no network)', () =>
   });
 });
 
+/**
+ * A child process whose lifetime the test drives. Nothing here waits on the
+ * wall clock: suite load stretches real `spawn` and `setTimeout`, and that is
+ * what made the old 5000ms cases time out (issue #890).
+ */
+function fakeCaptureProcess() {
+  const stdout = new PassThrough();
+  const stderr = new PassThrough();
+  const events = new EventEmitter();
+  let killSignal: NodeJS.Signals | undefined;
+  const processHandle: RunCaptureProcess = {
+    stdout,
+    stderr,
+    kill(signal?: NodeJS.Signals) {
+      killSignal = signal;
+      return true;
+    },
+    on(event, listener) {
+      events.on(event, listener);
+    },
+  };
+  return {
+    process: processHandle,
+    stdout,
+    stderr,
+    get killSignal() {
+      return killSignal;
+    },
+    fail(err: Error) {
+      events.emit('error', err);
+    },
+    close(code: number | null) {
+      events.emit('close', code);
+    },
+  };
+}
+
+function manualTimeout() {
+  let fire: (() => void) | undefined;
+  let cancelled = false;
+  let armedForMs: number | undefined;
+  return {
+    schedule(onTimeout: () => void, timeoutMs: number) {
+      armedForMs = timeoutMs;
+      fire = onTimeout;
+      return () => {
+        cancelled = true;
+      };
+    },
+    // Always invoke the callback. Cancel only records that runCapture asked
+    // to disarm the timer; a callback already queued still runs.
+    trigger() {
+      fire?.();
+    },
+    get cancelled() {
+      return cancelled;
+    },
+    get armedForMs() {
+      return armedForMs;
+    },
+  };
+}
+
 describe('runCapture bounded timeout', () => {
   it('rejects a hung child process instead of waiting forever', async () => {
-    const start = Date.now();
-    await expect(
-      runCapture(process.execPath, ['-e', 'setInterval(() => {}, 1000);'], { timeoutMs: 300 })
-    ).rejects.toThrow(/timed out/i);
-    expect(Date.now() - start).toBeLessThan(2000);
-  }, 3000);
+    const child = fakeCaptureProcess();
+    const timer = manualTimeout();
+    const pending = runCapture(process.execPath, ['-e', 'setInterval(() => {}, 1000);'], {
+      timeoutMs: 300,
+      scheduleTimeout: timer.schedule,
+      spawnProcess: () => child.process,
+    });
+
+    let settled = false;
+    pending.then(
+      () => {
+        settled = true;
+      },
+      () => {
+        settled = true;
+      }
+    );
+    await Promise.resolve();
+    expect(settled).toBe(false);
+    expect(timer.armedForMs).toBe(300);
+
+    timer.trigger();
+    await expect(pending).rejects.toThrow(/timed out after 300ms/i);
+    expect(child.killSignal).toBe('SIGKILL');
+  });
 
   it('does not wait for the timeout when the child errors immediately (e.g. missing binary)', async () => {
-    const start = Date.now();
+    const child = fakeCaptureProcess();
+    const timer = manualTimeout();
+    const pending = runCapture('carsi-does-not-exist-binary-xyz', [], {
+      timeoutMs: 5000,
+      scheduleTimeout: timer.schedule,
+      spawnProcess: () => child.process,
+    });
+
+    child.fail(new Error('spawn carsi-does-not-exist-binary-xyz ENOENT'));
+
     let error: unknown;
     try {
-      await runCapture('carsi-does-not-exist-binary-xyz', [], { timeoutMs: 5000 });
+      await pending;
     } catch (err) {
       error = err;
     }
-    expect(error).toBeDefined();
+    expect(String(error)).toMatch(/ENOENT/);
     expect(String(error)).not.toMatch(/timed out/i);
-    expect(Date.now() - start).toBeLessThan(1000);
-  }, 3000);
+    expect(timer.cancelled).toBe(true);
+    expect(child.killSignal).toBeUndefined();
+    timer.trigger();
+    expect(child.killSignal).toBeUndefined();
+  });
 
   it('resolves normally for a fast command well within the timeout', async () => {
-    const result = await runCapture(process.execPath, ['-e', 'process.stdout.write("ok")'], {
+    const child = fakeCaptureProcess();
+    const timer = manualTimeout();
+    const pending = runCapture(process.execPath, ['-e', 'process.stdout.write("ok")'], {
       timeoutMs: 5000,
+      scheduleTimeout: timer.schedule,
+      spawnProcess: () => child.process,
     });
-    expect(result.stdout).toBe('ok');
-  }, 5000);
+
+    child.stdout.write('ok');
+    child.close(0);
+
+    await expect(pending).resolves.toEqual({ stdout: 'ok', stderr: '' });
+    expect(timer.cancelled).toBe(true);
+    expect(timer.armedForMs).toBe(5000);
+    // A timer that was already queued when the child exited must not kill it.
+    timer.trigger();
+    expect(child.killSignal).toBeUndefined();
+  });
+
+  it('arms the default wall-clock timer for the requested duration and clears it on exit', async () => {
+    const child = fakeCaptureProcess();
+    const scheduled: Array<{ ms: number | undefined; callback: () => void }> = [];
+    const setTimeoutSpy = vi.spyOn(globalThis, 'setTimeout').mockImplementation(((
+      callback: () => void,
+      ms?: number
+    ) => {
+      scheduled.push({ ms, callback });
+      return 0 as unknown as ReturnType<typeof setTimeout>;
+    }) as typeof setTimeout);
+    const clearTimeoutSpy = vi.spyOn(globalThis, 'clearTimeout').mockImplementation(() => {});
+
+    let pending: Promise<{ stdout: string; stderr: string }>;
+    let lateCallback: (() => void) | undefined;
+    let armedFor: Array<number | undefined>;
+    let clearCalls = 0;
+    try {
+      pending = runCapture(process.execPath, ['-e', 'process.stdout.write("ok")'], {
+        timeoutMs: 5000,
+        spawnProcess: () => child.process,
+      });
+      child.stdout.write('ok');
+      child.close(0);
+      armedFor = scheduled.map((entry) => entry.ms);
+      lateCallback = scheduled[0]?.callback;
+      clearCalls = clearTimeoutSpy.mock.calls.length;
+    } finally {
+      setTimeoutSpy.mockRestore();
+      clearTimeoutSpy.mockRestore();
+    }
+
+    await expect(pending).resolves.toEqual({ stdout: 'ok', stderr: '' });
+    expect(armedFor).toEqual([5000]);
+    expect(clearCalls).toBe(1);
+    lateCallback?.();
+    expect(child.killSignal).toBeUndefined();
+  });
 });
 
 describe('verifyFloorCareIntroVideo fails closed', () => {
