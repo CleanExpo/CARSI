@@ -27,7 +27,9 @@ import {
   coachingProgressTrackClass,
   coachingSecondaryBtn,
 } from '@/components/coaching-portal/coaching-ui';
+import { CoachingPageHeader, CoachingSupportPanel } from '@/components/coaching-portal/visual';
 import { useCoachingPortal } from '@/components/coaching-portal/CoachingPortalContext';
+import { COACHING_PAGE_META } from '@/lib/coaching-portal/coaching-page-meta';
 import {
   ACCOUNTABILITY_COPY,
   ACCOUNTABILITY_KPI_MAX,
@@ -338,13 +340,17 @@ function KpiTrendChart({ view }: { view: MemberAccountabilityView }) {
 /** GP-635 Progress page: KPI setup, fortnightly check-in, streak, completion rate, KPI trend. */
 export function CoachingProgressPage() {
   const { access } = useCoachingPortal();
+  const meta = COACHING_PAGE_META.progress;
   const { state, replace } = useAccountability();
   const [editingKpis, setEditingKpis] = useState(false);
 
   if (state.status === 'loading') {
     return (
-      <div className={coachingPage}>
-        <Loader2 className="h-5 w-5 animate-spin text-slate-500" aria-label="Loading" />
+      <div className={coachingPage} data-testid="coaching-progress-loading">
+        <Loader2
+          className="mx-auto mt-16 h-8 w-8 motion-safe:animate-spin text-slate-500"
+          aria-label="Loading"
+        />
       </div>
     );
   }
@@ -368,14 +374,13 @@ export function CoachingProgressPage() {
   };
 
   return (
-    <div className={coachingPage}>
-      <header className="mb-8">
-        <p className={coachingEyebrow}>Accountability</p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-white sm:text-[1.75rem]">
-          {COPY.pageTitle}
-        </h1>
-        <p className={`mt-2 max-w-2xl ${coachingMuted}`}>{COPY.pageIntro}</p>
-      </header>
+    <div className={coachingPage} data-testid="coaching-progress-page">
+      <CoachingPageHeader
+        eyebrow={meta.eyebrow}
+        title={meta.title}
+        description={COPY.pageIntro}
+        testId="coaching-progress-header"
+      />
 
       {view.quiet ? (
         <div className="mb-6">
@@ -468,6 +473,13 @@ export function CoachingProgressPage() {
           </section>
         ) : null}
       </div>
+
+      <CoachingSupportPanel
+        className="mt-8"
+        mailSubject={meta.supportSubject}
+        tips={meta.supportTips}
+        testId="coaching-progress-support"
+      />
     </div>
   );
 }
