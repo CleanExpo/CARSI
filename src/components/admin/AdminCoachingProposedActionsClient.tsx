@@ -3,6 +3,11 @@
 import { Check, Loader2, X } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 
+import {
+  COACH_FEEDBACK_MAX_CHARS,
+  normalizeCoachFeedback,
+} from '@/lib/coaching-portal/marketing-pack/coach-input-limits';
+
 type ProposedItem = {
   id: string;
   title: string;
@@ -60,7 +65,11 @@ export function AdminCoachingProposedActionsClient() {
       const res = await fetch('/api/admin/coaching/proposed-actions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ actionId: id, decision, coachFeedback: notes[id] ?? '' }),
+        body: JSON.stringify({
+          actionId: id,
+          decision,
+          coachFeedback: normalizeCoachFeedback(notes[id] ?? '') ?? '',
+        }),
       });
       if (!res.ok) {
         const data = (await res.json().catch(() => ({}))) as { detail?: string };
@@ -96,66 +105,71 @@ export function AdminCoachingProposedActionsClient() {
       ) : items.length === 0 ? (
         <p className="text-sm text-slate-400">Nothing waiting for review.</p>
       ) : (
-        Object.entries(byMember).map(([email, list]) => (
-          <section key={email} className={`${surface} p-5`}>
-            <h2 className="text-base font-semibold text-white">
-              {list[0].member.businessName || list[0].member.name || email}
-            </h2>
-            <p className="text-xs text-slate-500">
-              {email}
-              {list[0].member.location ? ` · ${list[0].member.location}` : ''}
-            </p>
-            <ul className="mt-4 space-y-3">
-              {list.map((item) => (
-                <li key={item.id} className="rounded-xl border border-white/[0.06] p-4">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="text-sm font-semibold text-white">{item.title}</p>
-                    {item.priority ? (
-                      <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-[10px] font-semibold tracking-wide text-slate-400 uppercase">
-                        {item.priority}
-                      </span>
-                    ) : null}
-                  </div>
-                  {item.description ? (
-                    <p className="mt-1 text-sm whitespace-pre-line text-slate-400">
-                      {item.description}
-                    </p>
-                  ) : null}
-                  <label className="mt-3 block text-xs text-slate-500">
-                    Note for the member (optional)
-                    <input
-                      type="text"
-                      maxLength={500}
-                      value={notes[item.id] ?? ''}
-                      onChange={(e) => setNotes((n) => ({ ...n, [item.id]: e.target.value }))}
-                      className="mt-1 w-full rounded-lg border border-white/10 bg-[#060a14] px-3 py-2 text-sm text-white"
-                    />
-                  </label>
-                  <div className="mt-3 flex gap-2">
-                    <button
-                      type="button"
-                      disabled={busyId === item.id}
-                      onClick={() => void decide(item.id, 'approve')}
-                      className="inline-flex min-h-9 items-center gap-1.5 rounded-lg bg-[#146fc2] px-3 text-sm font-semibold text-white hover:bg-[#125da8] disabled:opacity-50"
-                    >
-                      <Check className="h-4 w-4" aria-hidden />
-                      Approve
-                    </button>
-                    <button
-                      type="button"
-                      disabled={busyId === item.id}
-                      onClick={() => void decide(item.id, 'decline')}
-                      className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-white/15 px-3 text-sm font-semibold text-slate-100 hover:bg-white/5 disabled:opacity-50"
-                    >
-                      <X className="h-4 w-4" aria-hidden />
-                      Decline
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ))
+        <ul className="space-y-6" aria-label="Proposed actions by member">
+          {Object.entries(byMember).map(([email, list]) => (
+            <li key={email}>
+              <section className={`${surface} p-5`}>
+                <h2 className="text-base font-semibold text-white">
+                  {list[0].member.businessName || list[0].member.name || email}
+                </h2>
+                <p className="text-xs text-slate-500">
+                  {email}
+                  {list[0].member.location ? ` · ${list[0].member.location}` : ''}
+                </p>
+                <ul className="mt-4 space-y-3">
+                  {list.map((item) => (
+                    <li key={item.id} className="rounded-xl border border-white/[0.06] p-4">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="text-sm font-semibold text-white">{item.title}</p>
+                        {item.priority ? (
+                          <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-[10px] font-semibold tracking-wide text-slate-400 uppercase">
+                            {item.priority}
+                          </span>
+                        ) : null}
+                      </div>
+                      {item.description ? (
+                        <p className="mt-1 text-sm whitespace-pre-line text-slate-400">
+                          {item.description}
+                        </p>
+                      ) : null}
+                      <label className="mt-3 block text-xs text-slate-500">
+                        Note for the member (optional)
+                        <input
+                          type="text"
+                          maxLength={COACH_FEEDBACK_MAX_CHARS}
+                          aria-label={`Coach note for ${item.title}`}
+                          value={notes[item.id] ?? ''}
+                          onChange={(e) => setNotes((n) => ({ ...n, [item.id]: e.target.value }))}
+                          className="mt-1 w-full rounded-lg border border-white/10 bg-[#060a14] px-3 py-2 text-sm text-white"
+                        />
+                      </label>
+                      <div className="mt-3 flex gap-2">
+                        <button
+                          type="button"
+                          disabled={busyId === item.id}
+                          onClick={() => void decide(item.id, 'approve')}
+                          className="inline-flex min-h-9 items-center gap-1.5 rounded-lg bg-[#146fc2] px-3 text-sm font-semibold text-white hover:bg-[#125da8] disabled:opacity-50"
+                        >
+                          <Check className="h-4 w-4" aria-hidden />
+                          Approve
+                        </button>
+                        <button
+                          type="button"
+                          disabled={busyId === item.id}
+                          onClick={() => void decide(item.id, 'decline')}
+                          className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-white/15 px-3 text-sm font-semibold text-slate-100 hover:bg-white/5 disabled:opacity-50"
+                        >
+                          <X className="h-4 w-4" aria-hidden />
+                          Decline
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );
