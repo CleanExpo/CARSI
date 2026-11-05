@@ -318,7 +318,7 @@ export function reviewWebsite(rawInput: ReviewInput): SiteReview {
   const trade = input.voice.trade.trim();
   const shownUrl = 'your website';
   const checks: SiteCheck[] = [];
-  const gbpSpecs = profileFixes(input.googleBusinessUrl, town);
+  const gbpSpecs = profileFixes(input.googleBusinessUrl, checkTown);
   // Profile fixes go first so they win ties: for a trade business the map listing comes first.
   const specs: FixSpec[] = [...gbpSpecs];
   checks.push({
@@ -408,7 +408,7 @@ export function reviewWebsite(rawInput: ReviewInput): SiteReview {
       area: 'website',
       title: 'Rewrite your home page title',
       why: `Your page title ${!title ? 'is missing' : 'does not say your trade and town'}. It is the blue headline people see in Google results, so it should say what you do and where.`,
-      how: `Use a title like "${trade || 'Your trade'} ${town || 'your town'} | Your business name", kept under 60 characters.`,
+      how: `Use a title like "${trade || 'Your trade'} ${checkTown || 'your town'} | Your business name", kept under 60 characters.`,
       impact: 3,
       effort: 1,
     });
@@ -422,7 +422,7 @@ export function reviewWebsite(rawInput: ReviewInput): SiteReview {
       area: 'website',
       title: 'Add a search result description',
       why: 'Without one, Google picks random text from your page for the grey snippet under your link, which rarely makes someone click.',
-      how: `Write one or two sentences (about 150 characters) that say what you do in ${town || 'your area'} and how to book. Your website editor usually has an "SEO description" box.`,
+      how: `Write one or two sentences (about 150 characters) that say what you do in ${checkTown || 'your area'} and how to book. Your website editor usually has an "SEO description" box.`,
       impact: 2,
       effort: 1,
     });
@@ -435,7 +435,7 @@ export function reviewWebsite(rawInput: ReviewInput): SiteReview {
       area: 'website',
       title: 'Add a clear main heading',
       why: 'Visitors decide in seconds whether you do what they need. A main heading also tells Google what the page is about.',
-      how: `Put a heading at the top such as "${trade || 'Your service'} in ${town || 'your town'}" and set it as Heading 1 in your editor.`,
+      how: `Put a heading at the top such as "${trade || 'Your service'} in ${checkTown || 'your town'}" and set it as Heading 1 in your editor.`,
       impact: 2,
       effort: 1,
     });
@@ -446,9 +446,9 @@ export function reviewWebsite(rawInput: ReviewInput): SiteReview {
     specs.push({
       id: 'town-not-mentioned',
       area: 'website',
-      title: `Say that you work in ${town || 'your area'}`,
+      title: `Say that you work in ${checkTown || 'your area'}`,
       why: 'Google matches local searches to pages that name the place. If your town and suburbs are not on the page, you are less likely to show up.',
-      how: `Add a short "Areas we service" line naming ${town || 'your town'} and the main suburbs you cover, in plain text, not only inside an image.`,
+      how: `Add a short "Areas we service" line naming ${checkTown || 'your town'} and the main suburbs you cover, in plain text, not only inside an image.`,
       impact: 3,
       effort: 1,
     });
@@ -517,7 +517,7 @@ export function reviewWebsite(rawInput: ReviewInput): SiteReview {
       area: 'website',
       title: 'Describe your photos',
       why: `${imgsNoAlt} photo${imgsNoAlt === 1 ? ' has' : 's have'} no description. Descriptions help Google understand your work and help people using screen readers.`,
-      how: `Give each photo a short description such as "${trade || 'Job'} in ${town || 'your suburb'}: before and after".`,
+      how: `Give each photo a short description such as "${trade || 'Job'} in ${checkTown || 'your suburb'}: before and after".`,
       impact: 1,
       effort: 1,
     });
@@ -525,10 +525,12 @@ export function reviewWebsite(rawInput: ReviewInput): SiteReview {
 
   const fixes = rankFixes(specs);
   const passed = checks.filter((c) => c.passed).length;
+  const auditNote =
+    ' This is an automated first pass on your home page, not a full SEO audit. Your coach can go deeper in session.';
   const summary =
     fixes.length === 0
-      ? `Your website and Google link cover the local-search basics we check (${passed} of ${checks.length}). Keep posting and collecting reviews.`
-      : `We checked ${checks.length} local-search basics for ${town || 'your area'} and ${passed} are in place. Start with fix 1, "${fixes[0].title}".`;
+      ? `Your website and Google link cover the local-search basics we check (${passed} of ${checks.length}). Keep posting and collecting reviews.${auditNote}`
+      : `We checked ${checks.length} local-search basics for ${checkTown || 'your area'} and ${passed} are in place. Start with fix 1, "${fixes[0].title}".${auditNote}`;
 
   return {
     websiteUrl: input.websiteUrl,
