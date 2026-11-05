@@ -43,15 +43,44 @@ export function computeHealth(input: { dbOk: boolean; aiConfigured: boolean }): 
   };
 }
 
+/** A stalled probe older than this no longer blocks a fresh attempt, so a query
+ *  stuck on a half-open socket cannot pin readiness at "unhealthy" for ever. */
+const STALE_PROBE_MS = 30_000;
+
+/** The SELECT 1 currently running, shared by every caller (GP-693). */
+let inFlight: { query: Promise<unknown>; startedAt: number } | null = null;
+
+/**
+ * Start a SELECT 1, or join the one already running. A caller that times out
+ * stops waiting but the query keeps its pool slot until the driver answers, so
+ * repeated health hits during a database stall must not each open a new query.
+ * At most one probe query is outstanding per STALE_PROBE_MS.
+ */
+function sharedProbeQuery(): Promise<unknown> {
+  const now = Date.now();
+  if (inFlight && now - inFlight.startedAt < STALE_PROBE_MS) return inFlight.query;
+  // Promise.resolve().then(...) turns a synchronous throw into a rejection and
+  // gives Prisma's lazy promise a .then so the query actually runs.
+  const query = Promise.resolve().then(() => prisma.$queryRaw`SELECT 1`);
+  const entry = { query, startedAt: now };
+  inFlight = entry;
+  const clear = () => {
+    if (inFlight === entry) inFlight = null;
+  };
+  query.then(clear, clear);
+  return query;
+}
+
 /** Cheap DB reachability probe, bounded by a timeout. Maps any failure — including
- *  a hang — to `false`; never throws. */
+ *  a hang — to `false`; never throws. Concurrent and repeated callers share one
+ *  in-flight query (see sharedProbeQuery). */
 export async function probeDatabase(timeoutMs: number = PROBE_TIMEOUT_MS): Promise<boolean> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   try {
     const timeout = new Promise<never>((_, reject) => {
       timer = setTimeout(() => reject(new Error('probeDatabase: timed out')), timeoutMs);
     });
-    await Promise.race([prisma.$queryRaw`SELECT 1`, timeout]);
+    await Promise.race([sharedProbeQuery(), timeout]);
     return true;
   } catch {
     return false;
