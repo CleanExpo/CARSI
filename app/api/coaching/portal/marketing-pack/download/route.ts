@@ -7,6 +7,7 @@ import {
   renderChecklistMarkdown,
   renderReviewMarkdown,
 } from '@/lib/coaching-portal/marketing-pack/downloads';
+import { attachmentContentDisposition } from '@/lib/coaching-portal/marketing-pack/content-disposition';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { getLatestMarketingPackForUser } from '@/lib/server/carsi-coaching-marketing-pack';
 
@@ -36,7 +37,7 @@ export async function GET(request: NextRequest) {
     status: 200,
     headers: {
       'Content-Type': meta.contentType,
-      'Content-Disposition': `attachment; filename="${meta.filename}"`,
+      'Content-Disposition': attachmentContentDisposition(meta.filename),
       'Cache-Control': 'private, no-store',
       'X-Content-Type-Options': 'nosniff',
     },
