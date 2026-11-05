@@ -1,6 +1,6 @@
 'use client';
 
-import { Loader2 } from 'lucide-react';
+import { ClipboardList, Compass, ExternalLink, Loader2, Megaphone, Video } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -10,23 +10,33 @@ import {
   coachingMuted,
   coachingPage,
   coachingPrimaryBtn,
+  coachingProgressFill,
+  coachingProgressFillStyle,
+  coachingProgressTrackClass,
   coachingSecondaryBtn,
 } from '@/components/coaching-portal/coaching-ui';
 import { CoachingAskCoachPanel } from '@/components/coaching-portal/CoachingAskCoachPanel';
 import { CoachingGrowthQuoteDialog } from '@/components/coaching-portal/CoachingGrowthQuoteDialog';
 import { useCoachingPortal } from '@/components/coaching-portal/CoachingPortalContext';
 import { CoachingSessionPrepCard } from '@/components/coaching-portal/CoachingSessionPrepCard';
+import {
+  CoachingEmptyState,
+  CoachingFilterPills,
+  CoachingPageHeader,
+  CoachingSection,
+  CoachingStatGrid,
+  CoachingSupportPanel,
+} from '@/components/coaching-portal/visual';
+import { actionBoardStats } from '@/lib/coaching-portal/action-board-view';
+import { COACHING_PAGE_META } from '@/lib/coaching-portal/coaching-page-meta';
 import { COACHING_RESOURCE_SECTIONS } from '@/lib/coaching-portal/coaching-resources';
 import {
   COACHING_GROWTH_SERVICE_CATEGORIES,
   type GrowthServiceItem,
 } from '@/lib/coaching-portal/growth-services';
 import { learningCourseLink } from '@/lib/coaching-portal/learning-path';
-import { openCoachingSupportEmail } from '@/lib/coaching-portal/support-contact';
 import type { CoachingActionStatus } from '@/lib/coaching-portal/types';
 import { carsiCoachingMonthlyPriceLabel } from '@/lib/marketing/carsi-coaching-monthly';
-import { carsiCoachingAddOnContactEmail } from '@/lib/marketing/carsi-coaching-program';
-import { ExternalLink } from 'lucide-react';
 
 type ActionItem = {
   id: string;
@@ -72,14 +82,17 @@ function LearningProgress({ learning }: { learning: NonNullable<ActionItem['lear
   return (
     <div className="mt-3">
       <div
-        className="h-1.5 w-full max-w-xs overflow-hidden rounded-full bg-white/10"
+        className={coachingProgressTrackClass()}
         role="progressbar"
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={learning.percent}
         aria-label="Course progress"
       >
-        <div className="h-full rounded-full bg-sky-400" style={{ width: `${learning.percent}%` }} />
+        <div
+          className={coachingProgressFill}
+          style={coachingProgressFillStyle(learning.percent)}
+        />
       </div>
       <p className="mt-1 text-xs text-slate-400">{learning.percent}% of the course complete</p>
     </div>
@@ -102,6 +115,7 @@ const MEMBER_STATUS_OPTIONS = FILTERS.filter(
 
 export function CoachingPlanPage() {
   const { access, plan } = useCoachingPortal();
+  const meta = COACHING_PAGE_META.plan;
   const [horizontal, setHorizontal] = useState(access.workspace.horizontalSummary);
   const [direction, setDirection] = useState(access.workspace.directionSummary);
   const [saving, setSaving] = useState(false);
@@ -123,31 +137,31 @@ export function CoachingPlanPage() {
   }
 
   return (
-    <div className={coachingPage}>
-      <h1 className="text-2xl font-semibold text-white">My plan</h1>
-      <p className={`mt-2 ${coachingMuted}`}>
-        Your direction, goals, and focus — updated with Phill each month.
-      </p>
+    <div className={coachingPage} data-testid="coaching-plan-page">
+      <CoachingPageHeader
+        eyebrow={meta.eyebrow}
+        title={meta.title}
+        description={meta.description}
+        testId="coaching-plan-header"
+      />
 
       {plan.hasApprovedPlan ? (
-        <section className={`${coachingCard} mt-6`}>
-          <h2 className={coachingCardTitle}>Current focus</h2>
-          <p className="mt-2 text-lg font-semibold text-white">{plan.focusTitle}</p>
+        <CoachingSection title="Current focus" className="mt-0" testId="coaching-plan-focus">
+          <p className="mt-3 text-lg font-semibold text-white">{plan.focusTitle}</p>
           {plan.focusDescription ? (
             <p className={`mt-2 ${coachingMuted}`}>{plan.focusDescription}</p>
           ) : null}
-        </section>
+        </CoachingSection>
       ) : (
-        <section className={`${coachingCard} mt-6`}>
-          <p className={coachingMuted}>
-            No approved growth plan yet. Phill will publish your plan after reviewing your
-            assessment.
-          </p>
-        </section>
+        <CoachingEmptyState
+          icon={Compass}
+          title="Plan in review"
+          description="Phill will publish your approved growth plan after reviewing your assessment."
+          testId="coaching-plan-empty"
+        />
       )}
 
-      <section className={`${coachingCard} mt-4 space-y-4`}>
-        <h2 className={coachingCardTitle}>Business direction</h2>
+      <CoachingSection title="Business direction" className="space-y-4" testId="coaching-plan-direction">
         <label className="block text-xs text-slate-400">Horizontal (what you bring today)</label>
         <textarea
           value={horizontal}
@@ -175,15 +189,22 @@ export function CoachingPlanPage() {
             Save
           </button>
         ) : null}
-      </section>
+      </CoachingSection>
 
       <CoachingAskCoachPanel className="mt-4" />
+      <CoachingSupportPanel
+        className="mt-4"
+        mailSubject={meta.supportSubject}
+        tips={meta.supportTips}
+        testId="coaching-plan-support"
+      />
     </div>
   );
 }
 
 export function CoachingActionsPage() {
   const { access } = useCoachingPortal();
+  const meta = COACHING_PAGE_META.actions;
   const [items, setItems] = useState<ActionItem[]>([]);
   const [filter, setFilter] = useState<'all' | CoachingActionStatus>('all');
   const [loading, setLoading] = useState(true);
@@ -212,6 +233,15 @@ export function CoachingActionsPage() {
     [items, filter]
   );
 
+  const boardStats = useMemo(
+    () =>
+      actionBoardStats(items).map((s) => ({
+        ...s,
+        icon: s.id === 'coach' ? Megaphone : ClipboardList,
+      })),
+    [items]
+  );
+
   async function updateAction(action: ActionItem) {
     if (!access.canEdit) return;
     await fetch('/api/coaching/portal/actions', {
@@ -223,31 +253,38 @@ export function CoachingActionsPage() {
   }
 
   return (
-    <div className={coachingPage}>
-      <h1 className="text-2xl font-semibold text-white">Actions</h1>
-      <p className={`mt-2 ${coachingMuted}`}>
-        Steps for this month — set with Phill, executed by you.
-      </p>
+    <div className={coachingPage} data-testid="coaching-actions-page">
+      <CoachingPageHeader
+        eyebrow={meta.eyebrow}
+        title={meta.title}
+        description={meta.description}
+        testId="coaching-actions-header"
+      />
 
-      <div className="mt-6 flex flex-wrap gap-2">
-        {FILTERS.map((f) => (
-          <button
-            key={f.id}
-            type="button"
-            onClick={() => setFilter(f.id)}
-            className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
-              filter === f.id ? 'bg-[#146fc2] text-white' : 'bg-white/10 text-slate-300'
-            }`}
-          >
-            {f.label}
-          </button>
-        ))}
-      </div>
+      {!loading && items.length > 0 ? (
+        <div className="mb-6">
+          <CoachingStatGrid items={boardStats} testIdPrefix="coaching-action-stat" />
+        </div>
+      ) : null}
+
+      <CoachingFilterPills
+        options={FILTERS}
+        value={filter}
+        onChange={setFilter}
+        testId="coaching-action-filters"
+      />
 
       {loading ? (
-        <Loader2 className="mx-auto mt-12 h-8 w-8 animate-spin text-sky-400" />
+        <Loader2 className="mx-auto mt-12 h-8 w-8 motion-safe:animate-spin text-sky-400" aria-label="Loading" />
       ) : visible.length === 0 ? (
-        <p className={`mt-8 ${coachingMuted}`}>No actions in this view yet.</p>
+        <div className="mt-8">
+          <CoachingEmptyState
+            icon={ClipboardList}
+            title="No actions in this view"
+            description="Try another filter, or wait for your coach to assign monthly actions after your plan is approved."
+            testId="coaching-actions-empty"
+          />
+        </div>
       ) : (
         <ul className="mt-6 space-y-3">
           {visible.map((a) => (
@@ -304,6 +341,13 @@ export function CoachingActionsPage() {
           ))}
         </ul>
       )}
+
+      <CoachingSupportPanel
+        className="mt-8"
+        mailSubject={meta.supportSubject}
+        tips={meta.supportTips}
+        testId="coaching-actions-support"
+      />
     </div>
   );
 }
@@ -320,6 +364,7 @@ type SessionRow = {
 
 export function CoachingSessionsPage() {
   const { bookingUrl, access, sessions } = useCoachingPortal();
+  const meta = COACHING_PAGE_META.sessions;
   const [history, setHistory] = useState<SessionRow[]>([]);
 
   useEffect(() => {
@@ -333,19 +378,20 @@ export function CoachingSessionsPage() {
   const upcoming = sessions.upcoming;
 
   return (
-    <div className={coachingPage}>
-      <h1 className="text-2xl font-semibold text-white">Sessions</h1>
-      <p className={`mt-2 ${coachingMuted}`}>
-        Your consultations with Phill — prep, join, and follow-up.
-      </p>
+    <div className={coachingPage} data-testid="coaching-sessions-page">
+      <CoachingPageHeader
+        eyebrow={meta.eyebrow}
+        title={meta.title}
+        description={meta.description}
+        testId="coaching-sessions-header"
+      />
 
       <CoachingSessionPrepCard />
 
-      <section className={`${coachingCard} mt-4`}>
-        <h2 className={coachingCardTitle}>Upcoming session</h2>
+      <CoachingSection title="Upcoming session" testId="coaching-sessions-upcoming">
         {upcoming ? (
           <>
-            <p className="mt-2 font-medium text-white">
+            <p className="font-medium text-white">
               {new Date(upcoming.scheduledAt).toLocaleString('en-AU', {
                 dateStyle: 'full',
                 timeStyle: 'short',
@@ -358,7 +404,7 @@ export function CoachingSessionsPage() {
             {upcoming.meetingUrl ? (
               <a
                 href={upcoming.meetingUrl}
-                className={`mt-4 inline-flex ${coachingPrimaryBtn}`}
+                className={`inline-flex ${coachingPrimaryBtn}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -368,25 +414,27 @@ export function CoachingSessionsPage() {
           </>
         ) : (
           <>
-            <p className={`mt-2 ${coachingMuted}`}>You have no upcoming sessions scheduled.</p>
+            <CoachingEmptyState
+              icon={Video}
+              title="No upcoming session"
+              description="Book your next consultation when you are ready — prep notes from your workspace travel with you."
+              testId="coaching-sessions-empty-upcoming"
+            />
             {access.canEdit && bookingUrl ? (
-              <a href={bookingUrl} className={`mt-4 inline-flex ${coachingPrimaryBtn}`}>
+              <a href={bookingUrl} className={`inline-flex ${coachingPrimaryBtn}`}>
                 Book your session
               </a>
             ) : null}
           </>
         )}
-      </section>
+      </CoachingSection>
 
-      <section className={`${coachingCard} mt-4`}>
-        <h2 className={coachingCardTitle}>Session history</h2>
+      <CoachingSection title="Session history" testId="coaching-sessions-history">
         {history.filter((s) => s.status === 'completed' || new Date(s.scheduledAt) < new Date())
           .length === 0 ? (
-          <p className={`mt-2 ${coachingMuted}`}>
-            Past sessions will appear here after your first call.
-          </p>
+          <p className={coachingMuted}>Past sessions will appear here after your first call.</p>
         ) : (
-          <ul className="mt-4 space-y-3">
+          <ul className="space-y-3">
             {history.map((s) => (
               <li key={s.id} className="border-b border-white/10 pb-3 last:border-0">
                 <p className="text-sm font-medium text-white">
@@ -399,7 +447,14 @@ export function CoachingSessionsPage() {
             ))}
           </ul>
         )}
-      </section>
+      </CoachingSection>
+
+      <CoachingSupportPanel
+        className="mt-8"
+        mailSubject={meta.supportSubject}
+        tips={meta.supportTips}
+        testId="coaching-sessions-support"
+      />
     </div>
   );
 }
@@ -456,20 +511,20 @@ function CoachingLearningPathSection() {
 }
 
 export function CoachingResourcesPage() {
+  const meta = COACHING_PAGE_META.resources;
   return (
-    <div className={coachingPage}>
-      <h1 className="text-2xl font-semibold tracking-tight text-white">Resources</h1>
-      <p className={`mt-2 max-w-2xl ${coachingMuted}`}>
-        Learning, checklists, and workspace links curated for coaching members. Strategy stays in
-        your plan; hands-on implementation is quoted under Growth services.
-      </p>
-      <div className="mt-8 space-y-6">
+    <div className={coachingPage} data-testid="coaching-resources-page">
+      <CoachingPageHeader
+        eyebrow={meta.eyebrow}
+        title={meta.title}
+        description={meta.description}
+        testId="coaching-resources-header"
+      />
+      <div className="space-y-6">
         <CoachingLearningPathSection />
         {COACHING_RESOURCE_SECTIONS.map((section) => (
-          <section key={section.id} className={coachingCard}>
-            <h2 className={coachingCardTitle}>{section.title}</h2>
-            <p className={`mt-1 ${coachingMuted}`}>{section.description}</p>
-            <ul className="mt-5 divide-y divide-white/[0.06]">
+          <CoachingSection key={section.id} title={section.title} testId={`coaching-resource-${section.id}`}>
+            <p className={`-mt-2 mb-4 ${coachingMuted}`}>{section.description}</p>
               {section.items.map((item) => (
                 <li
                   key={item.id}
@@ -498,24 +553,22 @@ export function CoachingResourcesPage() {
                 </li>
               ))}
             </ul>
-          </section>
+          </CoachingSection>
         ))}
       </div>
-      <p className={`mt-8 text-sm ${coachingMuted}`}>
-        Questions?{' '}
-        <a
-          href={`mailto:${carsiCoachingAddOnContactEmail}`}
-          className="text-sky-400 hover:underline"
-        >
-          {carsiCoachingAddOnContactEmail}
-        </a>
-      </p>
+      <CoachingSupportPanel
+        className="mt-8"
+        mailSubject={meta.supportSubject}
+        tips={meta.supportTips}
+        testId="coaching-resources-support"
+      />
     </div>
   );
 }
 
 export function CoachingBillingPage() {
   const { access } = useCoachingPortal();
+  const meta = COACHING_PAGE_META.billing;
   const subscription = access.subscription;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -554,16 +607,16 @@ export function CoachingBillingPage() {
   }
 
   return (
-    <div className={coachingPage}>
-      <h1 className="text-2xl font-semibold tracking-tight text-white">Billing</h1>
-      <p className={`mt-2 max-w-2xl ${coachingMuted}`}>
-        CARSI Business Coaching is billed monthly through Stripe. This is separate from annual LMS
-        membership and one-off course purchases.
-      </p>
+    <div className={coachingPage} data-testid="coaching-billing-page">
+      <CoachingPageHeader
+        eyebrow={meta.eyebrow}
+        title={meta.title}
+        description={meta.description}
+        testId="coaching-billing-header"
+      />
 
-      <section className={`${coachingCard} mt-8`}>
-        <h2 className={coachingCardTitle}>Your membership</h2>
-        <dl className="mt-5 grid gap-5 sm:grid-cols-2">
+      <CoachingSection title="Your membership" testId="coaching-billing-membership">
+        <dl className="grid gap-5 sm:grid-cols-2">
           <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-4">
             <dt className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">
               Plan
@@ -601,11 +654,10 @@ export function CoachingBillingPage() {
             </div>
           ) : null}
         </dl>
-      </section>
+      </CoachingSection>
 
-      <section className={`${coachingCard} mt-4`}>
-        <h2 className={coachingCardTitle}>Payment & invoices</h2>
-        <p className={`mt-2 ${coachingMuted}`}>
+      <CoachingSection title="Payment & invoices" testId="coaching-billing-portal">
+        <p className={coachingMuted}>
           Update your card, download invoices, or cancel your coaching subscription in the secure
           Stripe customer portal.
         </p>
@@ -628,34 +680,41 @@ export function CoachingBillingPage() {
           <p className={`mt-4 ${coachingMuted}`}>Subscribe to manage billing.</p>
         )}
         {error ? <p className="mt-3 text-sm text-red-300">{error}</p> : null}
-      </section>
+      </CoachingSection>
 
-      <section className={`${coachingCard} mt-4`}>
-        <h2 className={coachingCardTitle}>Growth services</h2>
-        <p className={`mt-2 ${coachingMuted}`}>
+      <CoachingSection title="Growth services" testId="coaching-billing-services">
+        <p className={coachingMuted}>
           Website, SEO, and implementation work are invoiced separately. Request quotes from{' '}
           <Link href="/dashboard/coaching/services" className="text-sky-400 hover:underline">
             Growth services
           </Link>
           .
         </p>
-      </section>
+      </CoachingSection>
+
+      <CoachingSupportPanel
+        className="mt-8"
+        mailSubject={meta.supportSubject}
+        tips={meta.supportTips}
+        testId="coaching-billing-support"
+      />
     </div>
   );
 }
 
 export function CoachingServicesPage() {
+  const meta = COACHING_PAGE_META.services;
   const [quoteService, setQuoteService] = useState<GrowthServiceItem | null>(null);
 
   return (
-    <div className={coachingPage}>
-      <h1 className="text-2xl font-semibold text-white">Growth services</h1>
-      <p className={`mt-2 ${coachingMuted}`}>
-        Optional implementation work — quoted separately from your {carsiCoachingMonthlyPriceLabel}{' '}
-        coaching membership. Rates below are indicative; you&apos;ll receive a written quote before
-        any work starts.
-      </p>
-      <div className="mt-6 space-y-4">
+    <div className={coachingPage} data-testid="coaching-services-page">
+      <CoachingPageHeader
+        eyebrow={meta.eyebrow}
+        title={meta.title}
+        description={`Optional implementation work — quoted separately from your ${carsiCoachingMonthlyPriceLabel} coaching membership. Rates below are indicative; you receive a written quote before any work starts.`}
+        testId="coaching-services-header"
+      />
+      <div className="space-y-4">
         {COACHING_GROWTH_SERVICE_CATEGORIES.map((cat) => (
           <section key={cat.id} className={coachingCard}>
             <h2 className="text-xs font-semibold tracking-wide text-slate-500 uppercase">
@@ -699,15 +758,13 @@ export function CoachingServicesPage() {
           </section>
         ))}
       </div>
-      <div className="mt-6 flex flex-wrap gap-3">
-        <button
-          type="button"
-          className={coachingSecondaryBtn}
-          onClick={() => openCoachingSupportEmail('Business Coaching support')}
-        >
-          Contact support
-        </button>
-      </div>
+      <CoachingSupportPanel
+        className="mt-8"
+        title="Questions before you quote?"
+        mailSubject={meta.supportSubject}
+        tips={meta.supportTips}
+        testId="coaching-services-support"
+      />
       {quoteService ? (
         <CoachingGrowthQuoteDialog
           key={quoteService.id}
