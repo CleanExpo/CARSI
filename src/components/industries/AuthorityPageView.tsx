@@ -10,7 +10,6 @@ import {
   Wind,
   type LucideIcon,
 } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 
 import {
@@ -18,11 +17,12 @@ import {
   IndustryCourseSection,
   IndustryEvidenceLinks,
   IndustryFAQSection,
-  IndustryHero,
   IndustryPageLayout,
-  IndustryWhySection,
 } from '@/components/industries';
 import { AuthorityForCrossLinks } from '@/components/industries/AuthorityForCrossLinks';
+import { RoleGuideHero } from '@/components/industries/role-guide/RoleGuideHero';
+import { RoleGuideScopeSection } from '@/components/industries/role-guide/RoleGuideScopeSection';
+import { RoleGuideWhySection } from '@/components/industries/role-guide/RoleGuideWhySection';
 import {
   LANDING_DISPLAY_H2_CLASS,
   LANDING_EYEBROW_CLASS,
@@ -51,7 +51,6 @@ import { ROLE_GUIDES_HUB_PATH, roleGuidePagePath } from '@/lib/marketing/role-gu
 import type { IndustryCourseItem } from '@/lib/server/industry-courses';
 
 const ACCENT = '#146fc2';
-const CHIP_COLOURS = ['#146fc2', '#0f5fa8', '#2490ed', '#0b4a82'];
 
 const HERO_ICONS: Record<AuthorityIcon, LucideIcon> = {
   hardhat: HardHat,
@@ -143,72 +142,45 @@ export function AuthorityPageView({
         </div>
       )}
 
-      <IndustryHero
+      <RoleGuideHero
         icon={HERO_ICONS[entry.icon]}
-        industryName={entry.audience}
-        accentColor={ACCENT}
+        audience={entry.audience}
         headline={entry.headline}
         headlineAccent={entry.headlineAccent}
         description={entry.description}
-        disciplines={entry.topics.map((label, i) => ({
-          label,
-          color: CHIP_COLOURS[i % CHIP_COLOURS.length],
-        }))}
+        topics={entry.topics}
+        heroImage={entry.heroImage}
         stats={[
           { value: String(courses.length), label: 'Live courses linked below' },
           { value: String(entry.claims.length), label: 'Sourced rules and facts' },
-          { value: 'IICRC CEC', label: 'Shown only on courses with an approval in force' },
+          { value: 'IICRC CEC', label: 'On approved courses only' },
         ]}
+        sourcesUpdatedLabel={auDate(sourcesUpdated)}
+        approvalLabel={
+          entry.approvedAt ? `Approval record dated ${auDate(entry.approvedAt)}.` : undefined
+        }
       />
 
-      <p className={`${PUBLIC_SHELL_INNER_CLASS} -mt-6 pb-2 text-xs text-slate-500 md:-mt-8`}>
-        Primary sources last opened {auDate(sourcesUpdated)}.
-        {entry.approvedAt ? ` Approval record dated ${auDate(entry.approvedAt)}.` : ''}
-      </p>
-
-      {entry.heroImage && (
-        <div className={`${PUBLIC_SHELL_INNER_CLASS} pt-10`}>
-          <Image
-            src={entry.heroImage.src}
-            alt={entry.heroImage.alt}
-            width={1600}
-            height={900}
-            priority
-            className="h-auto w-full rounded-3xl border border-slate-200/70 object-cover"
-          />
-        </div>
-      )}
-
-      <IndustryWhySection
+      <RoleGuideWhySection
         industryName={entry.shortAudience}
         headline="Built around the"
         headlineAccent="work you do"
-        accentColor={ACCENT}
-        cards={entry.whyCards.map((card, i) => ({
+        heroImage={entry.heroImage}
+        cards={entry.whyCards.map((card) => ({
           icon: CARD_ICONS[card.icon],
           title: card.title,
           description: card.description,
-          color: CHIP_COLOURS[i % CHIP_COLOURS.length],
         }))}
       />
 
-      <IndustryEvidenceLinks links={evidence} />
+      <IndustryEvidenceLinks links={evidence} presentation="role-guide" />
 
-      <section className="border-t border-slate-200/70 bg-[#fafbfc] py-16 md:py-20">
-        <div className={PUBLIC_SHELL_INNER_CLASS}>
-          <p className={LANDING_EYEBROW_CLASS}>What CARSI does and does not claim</p>
-          <h2 className={`mt-3 max-w-2xl ${LANDING_DISPLAY_H2_CLASS}`}>Read this first</h2>
-          <p className={`mt-4 max-w-3xl ${LANDING_LEAD_CLASS}`}>{entry.scopeNote}</p>
-          <p className="mt-6 text-sm text-slate-600">
-            <Link
-              href={entry.livePageHref}
-              className="font-semibold text-[#146fc2] underline-offset-4 hover:underline"
-            >
-              {entry.livePageLabel}
-            </Link>
-          </p>
-        </div>
-      </section>
+      <RoleGuideScopeSection
+        scopeNote={entry.scopeNote}
+        livePageHref={entry.livePageHref}
+        livePageLabel={entry.livePageLabel}
+        heroImage={entry.heroImage}
+      />
 
       <IndustryCourseSection
         industryName={entry.shortAudience}
