@@ -22,6 +22,8 @@ interface IndustryCourseSectionProps {
   disciplineList: string;
   courses: Course[];
   initialTab?: string;
+  /** Shown below the grid when publishable but the live list is empty. */
+  emptyLiveCoursesNote?: string;
 }
 
 export function IndustryCourseSection({
@@ -29,6 +31,7 @@ export function IndustryCourseSection({
   disciplineList,
   courses,
   initialTab,
+  emptyLiveCoursesNote,
 }: IndustryCourseSectionProps) {
   const defaultTab =
     initialTab && courses.some((c) => (c.discipline ?? '').toUpperCase().includes(initialTab))
@@ -52,6 +55,11 @@ export function IndustryCourseSection({
         <div className="mt-10">
           <CourseGrid courses={courses} initialTab={defaultTab} surface="light" />
         </div>
+        {courses.length === 0 && emptyLiveCoursesNote ? (
+          <p className="mt-8 max-w-2xl rounded-2xl border border-amber-200/80 bg-amber-50/90 px-5 py-4 text-sm leading-relaxed text-amber-950">
+            {emptyLiveCoursesNote}
+          </p>
+        ) : null}
       </div>
     </section>
   );

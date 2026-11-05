@@ -86,9 +86,13 @@ export function AuthorityPageView({
       <FAQSchema questions={entry.faqs} />
 
       {!publishable && (
-        <div className="border-b border-amber-200 bg-amber-50 py-3 text-center text-sm text-amber-900">
-          <div className={PUBLIC_SHELL_INNER_CLASS}>
-            Draft page. Not yet cleared for publication and hidden from search engines.
+        <div
+          role="status"
+          className="border-b border-amber-300/80 bg-gradient-to-r from-amber-50 to-amber-100/90 py-3.5 text-center text-sm text-amber-950 shadow-sm"
+        >
+          <div className={`${PUBLIC_SHELL_INNER_CLASS} font-medium`}>
+            Draft page — not cleared for publication. Hidden from search until Phill approves the
+            approval record and live course links.
           </div>
         </div>
       )}
@@ -151,6 +155,11 @@ export function AuthorityPageView({
         industryName={entry.shortAudience}
         disciplineList="Live courses"
         courses={courses}
+        emptyLiveCoursesNote={
+          publishable && courses.length === 0
+            ? 'This page is approved, but no published courses match its bundle yet. The grid will fill in automatically once those slugs are live in the catalogue.'
+            : undefined
+        }
       />
 
       {entry.bundle.plannedModules.length > 0 && (
