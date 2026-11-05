@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import {
   AlertTriangle,
   ArrowRight,
@@ -20,10 +19,9 @@ import {
   Users,
   Wrench,
 } from 'lucide-react';
+import Link from 'next/link';
 
 import { HomeFaqSection } from '@/components/landing/HomeFaqSection';
-import { HomeFinalCtaSection } from '@/components/landing/HomeFinalCtaSection';
-import { HomeTrustStrip } from '@/components/landing/HomeTrustStrip';
 import {
   LANDING_DISPLAY_H2_CLASS,
   LANDING_EYEBROW_CLASS,
@@ -31,12 +29,14 @@ import {
   PUBLIC_SHELL_INNER_CLASS,
 } from '@/components/landing/public-shell-width';
 import { MarketingGrowthLinks } from '@/components/marketing/MarketingGrowthLinks';
-import { MarketingSectionHeader } from '@/components/marketing/MarketingSectionHeader';
 import {
   MarketingPageShell,
   marketingPageInnerWideClass,
 } from '@/components/marketing/MarketingPageShell';
+import { MarketingSectionHeader } from '@/components/marketing/MarketingSectionHeader';
 import { PlatformNav } from '@/components/marketing/PlatformNav';
+import { StaticMarketingClosingCta } from '@/components/marketing/StaticMarketingClosingCta';
+import { PlatformContextualNext } from '@/components/marketing/platform/PlatformPagePattern';
 import { BreadcrumbSchema, FAQSchema } from '@/components/seo';
 import {
   marketingBtnPrimary,
@@ -47,13 +47,14 @@ import {
   marketingPanelHover,
   marketingSection,
 } from '@/lib/marketing/marketing-ui';
+import { platformSurfaceByHref } from '@/lib/marketing/platform-surface';
 import {
-  getStartSmartOperatingConnections,
   getStartSmartLeadPathsForPage,
+  getStartSmartOperatingConnections,
   getStartSmartPageFaqs,
-  startSmartLeadPaths,
   startSmartBasePath,
   startSmartHubFaqs,
+  startSmartLeadPaths,
   startSmartPages,
   startSmartReadinessLoop,
   startSmartReadinessRules,
@@ -80,7 +81,10 @@ function SourceList({ sources }: { sources: StartSmartSource[] }) {
               <p className="text-sm font-semibold text-slate-950">{source.label}</p>
               <p className="mt-2 text-xs leading-5 text-slate-500">{source.note}</p>
             </div>
-            <ExternalLink className="mt-0.5 h-4 w-4 shrink-0 text-[#146fc2] dark:text-[#7ec5ff]" aria-hidden="true" />
+            <ExternalLink
+              className="mt-0.5 h-4 w-4 shrink-0 text-[#146fc2] dark:text-[#7ec5ff]"
+              aria-hidden="true"
+            />
           </div>
         </a>
       ))}
@@ -93,6 +97,123 @@ function Pill({ children }: { children: string }) {
     <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600">
       {children}
     </span>
+  );
+}
+
+const START_SMART_HERO_IMAGE = {
+  src: '/images/hero-tiles/carpet-extraction.webp',
+  alt: 'Professional carpet extraction on a job — the field skills Start Smart covers before you buy gear',
+  width: 512,
+  height: 512,
+} as const;
+
+const START_SMART_HERO_STATS = [
+  { value: '8', label: 'Sub-pillars' },
+  { value: '4', label: 'Readiness gates' },
+  { value: '24/7', label: 'Online learning' },
+  { value: 'AU', label: 'Market context' },
+] as const;
+
+function StartSmartHubHero() {
+  const surface = platformSurfaceByHref(startSmartBasePath);
+  if (!surface) throw new Error('platform-surface: missing Start Smart hub');
+
+  return (
+    <section className="relative overflow-hidden border-b border-slate-200/80 bg-[#fafbfc]">
+      <div
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(165deg,rgba(36,144,237,0.06)_0%,transparent_42%)]"
+        aria-hidden
+      />
+      <div className={`relative ${PUBLIC_SHELL_INNER_CLASS} py-10 md:py-14 lg:py-16`}>
+        <p className={LANDING_EYEBROW_CLASS}>{surface.eyebrow}</p>
+
+        <div className="mt-6 grid items-start gap-10 lg:mt-8 lg:grid-cols-[minmax(0,1fr)_min(100%,340px)] lg:gap-14 xl:grid-cols-[minmax(0,1fr)_380px]">
+          <div className="order-2 min-w-0 lg:order-1">
+            <h1 className="max-w-2xl font-[family-name:var(--font-display)] text-[2.05rem] leading-[1.1] font-semibold tracking-[-0.03em] text-slate-950 md:text-[2.85rem] md:leading-[1.06] lg:max-w-[16ch] xl:max-w-[18ch]">
+              {surface.headline}
+            </h1>
+            <p className={`mt-5 max-w-xl text-pretty ${LANDING_LEAD_CLASS}`}>{surface.lead}</p>
+
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <Link
+                href="/courses"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[#146fc2] px-7 text-sm font-semibold text-white shadow-[0_12px_32px_-14px_rgba(20,111,194,0.55)] hover:bg-[#0f5fa8]"
+              >
+                Explore CARSI courses
+                <ArrowRight className="h-4 w-4" aria-hidden />
+              </Link>
+              <Link
+                href="/pricing"
+                className="inline-flex min-h-11 items-center justify-center rounded-full border border-slate-200 bg-white px-7 text-sm font-semibold text-slate-800 hover:border-[#2490ed]/35 hover:text-[#146fc2]"
+              >
+                View membership
+              </Link>
+            </div>
+
+            <dl className="mt-10 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-slate-200/80 pt-8 sm:grid-cols-4">
+              {START_SMART_HERO_STATS.map((stat) => (
+                <div key={stat.label}>
+                  <dt className="text-[11px] font-medium tracking-wide text-slate-500 uppercase">
+                    {stat.label}
+                  </dt>
+                  <dd className="mt-1 font-[family-name:var(--font-display)] text-xl font-semibold text-slate-950 tabular-nums md:text-2xl">
+                    {stat.value}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+
+          <aside className="order-1 mx-auto w-full max-w-[280px] sm:max-w-[320px] lg:order-2 lg:mx-0 lg:w-full lg:max-w-none">
+            <figure>
+              <div className="aspect-square w-full overflow-hidden rounded-[1.35rem] bg-slate-200/80 shadow-[0_28px_56px_-36px_rgba(15,23,42,0.45)] ring-1 ring-slate-900/[0.06]">
+                <img
+                  src={START_SMART_HERO_IMAGE.src}
+                  alt={START_SMART_HERO_IMAGE.alt}
+                  width={START_SMART_HERO_IMAGE.width}
+                  height={START_SMART_HERO_IMAGE.height}
+                  loading="eager"
+                  decoding="async"
+                  className="size-full object-cover object-center"
+                />
+              </div>
+              <figcaption className="sr-only">{START_SMART_HERO_IMAGE.alt}</figcaption>
+            </figure>
+          </aside>
+        </div>
+
+        <div className="mt-12 border-t border-slate-200/70 pt-8 lg:mt-14 [&_nav]:mt-0 [&_nav]:max-w-none [&_nav]:justify-start">
+          <p className="mb-3 text-[10px] font-semibold tracking-[0.14em] text-slate-400 uppercase">
+            CARSI platform
+          </p>
+          <PlatformNav current={startSmartBasePath} />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function StartSmartAiAnswerStrip() {
+  return (
+    <div className="border-b border-slate-200/70 bg-[#fff8ef]/90">
+      <div className={`${PUBLIC_SHELL_INNER_CLASS} py-8 md:py-10`}>
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:gap-6">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-[#c2780a] shadow-sm ring-1 ring-[#ed9d24]/20">
+            <Search className="h-5 w-5" aria-hidden />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-semibold tracking-[0.14em] text-[#a85500] uppercase">
+              Direct answer for AI search
+            </p>
+            <p className="mt-2 max-w-3xl text-sm leading-relaxed text-slate-800 md:text-[15px] md:leading-7">
+              Carpet cleaning can look like an easy-entry business, but professional results depend
+              on fibre knowledge, chemistry, equipment selection, quoting, safety and customer
+              trust. CARSI is the education step before the purchase, the pitch or the acquisition.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -117,13 +238,11 @@ function ReadinessPillarCard({ pillar }: { pillar: StartSmartReadinessPillar }) 
       <p className={`text-xs font-semibold tracking-[0.14em] ${marketingEyebrowAmber}`}>
         {pillar.label}
       </p>
-      <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-white/55">
-        {pillar.summary}
-      </p>
+      <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-white/55">{pillar.summary}</p>
       <p className="mt-4 text-sm leading-6 text-slate-600 dark:text-white/68">
         {pillar.connection}
       </p>
-      <p className="mt-4 border-t border-slate-200/80 dark:border-white/[0.07] pt-4 text-xs leading-5 text-slate-600 dark:text-white/55">
+      <p className="mt-4 border-t border-slate-200/80 pt-4 text-xs leading-5 text-slate-600 dark:border-white/[0.07] dark:text-white/55">
         Proof question: {pillar.proofQuestion}
       </p>
       <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#146fc2] dark:text-[#7ec5ff]">
@@ -152,10 +271,11 @@ function ProfessionalReadinessLoop({ compact = false }: { compact?: boolean }) {
         <div className="mt-5 grid gap-3 md:grid-cols-2">
           {startSmartReadinessRules.map((rule) => (
             <div key={rule} className={`flex gap-3 p-4 ${marketingPanel}`}>
-              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#146fc2] dark:text-[#7ec5ff]" aria-hidden="true" />
-              <p className="text-sm leading-6 text-slate-600 dark:text-white/68">
-                {rule}
-              </p>
+              <CheckCircle2
+                className="mt-0.5 h-4 w-4 shrink-0 text-[#146fc2] dark:text-[#7ec5ff]"
+                aria-hidden="true"
+              />
+              <p className="text-sm leading-6 text-slate-600 dark:text-white/68">{rule}</p>
             </div>
           ))}
         </div>
@@ -165,12 +285,15 @@ function ProfessionalReadinessLoop({ compact = false }: { compact?: boolean }) {
 }
 
 function OperatingConnectionCard({ connection }: { connection: StartSmartOperatingConnection }) {
-  const Icon = readinessIconByLabel[connection.pillar as keyof typeof readinessIconByLabel] ?? Compass;
+  const Icon =
+    readinessIconByLabel[connection.pillar as keyof typeof readinessIconByLabel] ?? Compass;
 
   return (
     <div className={`p-5 ${marketingPanel}`}>
       <div className="flex items-start gap-3">
-        <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#2490ed]/25 bg-[#2490ed]/10 text-[#146fc2] dark:text-[#7ec5ff]`}>
+        <div
+          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#2490ed]/25 bg-[#2490ed]/10 text-[#146fc2] dark:text-[#7ec5ff]`}
+        >
           <Icon className="h-4 w-4" aria-hidden="true" />
         </div>
         <div>
@@ -182,7 +305,7 @@ function OperatingConnectionCard({ connection }: { connection: StartSmartOperati
           </p>
         </div>
       </div>
-      <div className="mt-4 grid gap-3 border-t border-slate-200/80 dark:border-white/[0.07] pt-4">
+      <div className="mt-4 grid gap-3 border-t border-slate-200/80 pt-4 dark:border-white/[0.07]">
         <div>
           <p className={`text-xs font-semibold tracking-[0.14em] ${marketingEyebrow}`}>
             Decision gate
@@ -241,9 +364,7 @@ function LeadPathCard({ path }: { path: StartSmartLeadPath }) {
       <h3 className="mt-2 text-base font-semibold text-slate-900 dark:text-white/90">
         {path.title}
       </h3>
-      <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-white/55">
-        {path.body}
-      </p>
+      <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-white/55">{path.body}</p>
       <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#146fc2] dark:text-[#7ec5ff]">
         {path.label} <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
       </span>
@@ -284,71 +405,11 @@ export function StartSmartHub({ siteUrl }: { siteUrl: string }) {
       <BreadcrumbSchema items={breadcrumbs} />
       <FAQSchema questions={startSmartHubFaqs} />
 
-        <section className="relative overflow-hidden border-b border-slate-200/70 bg-white">
-          <div
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_15%_0%,rgba(36,144,237,0.11),transparent_58%)]"
-            aria-hidden
-          />
-          <div className={`relative ${PUBLIC_SHELL_INNER_CLASS} grid gap-8 py-16 md:py-24 lg:grid-cols-[1.15fr_0.85fr] lg:items-end`}>
-          <div>
-            <div className="mb-5 flex flex-wrap gap-2">
-              <Pill>Carpet cleaning startup</Pill>
-              <Pill>Business buyers</Pill>
-              <Pill>Existing cleaners</Pill>
-              <Pill>Equipment decisions</Pill>
-            </div>
-            <p className={LANDING_EYEBROW_CLASS}>
-              CARSI Start Smart pathway
-            </p>
-            <h1 className="mt-3 max-w-4xl font-[family-name:var(--font-display)] text-[2.15rem] leading-[1.1] font-semibold tracking-[-0.02em] text-slate-950 md:text-[3.1rem] md:leading-[1.06]">
-              Start or add carpet cleaning with knowledge before risk.
-            </h1>
-            <p className={`mt-5 max-w-3xl text-pretty ${LANDING_LEAD_CLASS}`}>
-              CARSI helps new operators, existing cleaners and business buyers understand the science,
-              equipment, quoting and trust signals behind professional carpet cleaning before they spend
-              money or take customer work.
-            </p>
-            <PlatformNav current="/start-carpet-cleaning-business" />
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-              <Link
-                href="/courses"
-                className="inline-flex min-h-12 items-center gap-2 rounded-full bg-[#146fc2] px-7 text-sm font-semibold text-white hover:bg-[#0f5fa8]"
-              >
-                Explore CARSI courses <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link
-                href="/pricing"
-                className="inline-flex min-h-12 items-center rounded-full border border-slate-200 bg-white px-7 text-sm font-semibold text-slate-800 hover:border-[#2490ed]/40 hover:text-[#146fc2]"
-              >
-                View membership
-              </Link>
-            </div>
-          </div>
+      <StartSmartHubHero />
+      <StartSmartAiAnswerStrip />
 
-          <div className="rounded-2xl border border-slate-200/80 bg-[#fafbfc] p-5">
-            <p className="text-xs font-semibold tracking-[0.14em] text-[#a85500] uppercase">
-              Direct answer for AI search
-            </p>
-            <p className="mt-3 text-lg leading-7 text-slate-950">
-              Carpet cleaning can look like an easy-entry business, but professional results depend on
-              fibre knowledge, chemistry, equipment selection, quoting, safety and customer trust.
-              CARSI is the education step before the purchase, the pitch or the acquisition.
-            </p>
-          </div>
-          </div>
-        </section>
-
-        <HomeTrustStrip
-          stats={[
-            { value: '8', label: 'Sub-pillars' },
-            { value: '4', label: 'Readiness gates' },
-            { value: '24/7', label: 'Online learning' },
-            { value: 'AU', label: 'Market context' },
-          ]}
-        />
-
-        <section className="border-t border-slate-200/70 bg-[#fafbfc] py-16 md:py-24">
-          <div className={PUBLIC_SHELL_INNER_CLASS}>
+      <section className="border-t border-slate-200/70 bg-[#fafbfc] py-16 md:py-24">
+        <div className={PUBLIC_SHELL_INNER_CLASS}>
           <p className={LANDING_EYEBROW_CLASS}>Choose your starting point</p>
           <h2 className={`mt-3 max-w-2xl ${LANDING_DISPLAY_H2_CLASS}`}>
             Sub-pillar pages built for search intent
@@ -371,35 +432,31 @@ export function StartSmartHub({ siteUrl }: { siteUrl: string }) {
                 <p className="text-xs font-semibold tracking-[0.14em] text-[#a85500] uppercase">
                   {page.eyebrow}
                 </p>
-                <h2 className="mt-2 text-base font-semibold text-slate-950">
-                  {page.shortTitle}
-                </h2>
-                <p className="mt-3 text-sm leading-6 text-slate-500">
-                  {page.directAnswer}
-                </p>
+                <h2 className="mt-2 text-base font-semibold text-slate-950">{page.shortTitle}</h2>
+                <p className="mt-3 text-sm leading-6 text-slate-500">{page.directAnswer}</p>
                 <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#146fc2]">
                   Read page <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
                 </span>
               </Link>
             ))}
           </div>
-          </div>
-        </section>
-
-        <div className="border-t border-slate-200/70 bg-white py-16 md:py-24">
-          <div className={PUBLIC_SHELL_INNER_CLASS}>
-        <ProfessionalReadinessLoop />
-          </div>
         </div>
+      </section>
 
-        <div className="border-t border-slate-200/70 bg-[#fafbfc] py-16 md:py-24">
-          <div className={PUBLIC_SHELL_INNER_CLASS}>
-        <StartSmartLeadPaths paths={startSmartLeadPaths} />
-          </div>
+      <div className="border-t border-slate-200/70 bg-white py-16 md:py-24">
+        <div className={PUBLIC_SHELL_INNER_CLASS}>
+          <ProfessionalReadinessLoop />
         </div>
+      </div>
 
-        <section className="border-t border-slate-200/70 bg-white py-16 md:py-24">
-          <div className={`${PUBLIC_SHELL_INNER_CLASS} grid gap-5 lg:grid-cols-3`}>
+      <div className="border-t border-slate-200/70 bg-[#fafbfc] py-16 md:py-24">
+        <div className={PUBLIC_SHELL_INNER_CLASS}>
+          <StartSmartLeadPaths paths={startSmartLeadPaths} />
+        </div>
+      </div>
+
+      <section className="border-t border-slate-200/70 bg-white py-16 md:py-24">
+        <div className={`${PUBLIC_SHELL_INNER_CLASS} grid gap-5 lg:grid-cols-3`}>
           {[
             {
               icon: Brain,
@@ -419,61 +476,60 @@ export function StartSmartHub({ siteUrl }: { siteUrl: string }) {
           ].map(({ icon: Icon, title, body }) => (
             <div key={title} className="rounded-2xl border border-slate-200/80 bg-[#fafbfc] p-5">
               <Icon className="h-6 w-6 text-[#146fc2]" aria-hidden="true" />
-              <h2 className="mt-4 text-lg font-semibold text-slate-950">
-                {title}
-              </h2>
-              <p className="mt-2 text-sm leading-6 text-slate-500">
-                {body}
-              </p>
+              <h2 className="mt-4 text-lg font-semibold text-slate-950">{title}</h2>
+              <p className="mt-2 text-sm leading-6 text-slate-500">{body}</p>
             </div>
           ))}
-          </div>
-        </section>
+        </div>
+      </section>
 
-        <HomeFaqSection faqs={startSmartHubFaqs} />
+      <HomeFaqSection faqs={startSmartHubFaqs} />
 
-        <section className="border-t border-slate-200/70 bg-[#fafbfc] py-16 md:py-24">
-          <div className={PUBLIC_SHELL_INNER_CLASS}>
+      <section className="border-t border-slate-200/70 bg-[#fafbfc] py-16 md:py-24">
+        <div className={PUBLIC_SHELL_INNER_CLASS}>
           <p className={LANDING_EYEBROW_CLASS}>Trusted references</p>
-          <h2 className={`mt-3 max-w-2xl ${LANDING_DISPLAY_H2_CLASS}`}>Source-backed, not hype-backed</h2>
+          <h2 className={`mt-3 max-w-2xl ${LANDING_DISPLAY_H2_CLASS}`}>
+            Source-backed, not hype-backed
+          </h2>
           <p className={`mt-4 max-w-2xl ${LANDING_LEAD_CLASS}`}>
             CARSI should be discoverable anywhere in the world, but the pages stay honest: online
-            learning supports competence; local legal, insurance and certification requirements still
-            need to be checked.
+            learning supports competence; local legal, insurance and certification requirements
+            still need to be checked.
           </p>
           <div className="mt-10">
-          <SourceList
-            sources={[
-              {
-                label: 'IICRC Carpet Cleaning Technician',
-                url: 'https://iicrc.org/cct/',
-                note: 'Core reference for the art and science of carpet cleaning.',
-              },
-              {
-                label: 'Google Search Central',
-                url: 'https://developers.google.com/search/docs/fundamentals/seo-starter-guide',
-                note: 'Technical SEO starts with crawlable, useful pages and clear titles, descriptions and links.',
-              },
-              {
-                label: 'Google AI features guidance',
-                url: 'https://developers.google.com/search/docs/appearance/ai-features',
-                note: 'AI search inclusion still depends on eligible, useful, accessible web content.',
-              },
-              {
-                label: 'CARSI pricing',
-                url: 'https://carsi.com.au/pricing',
-                note: 'Membership, online access and course options for learners.',
-              },
-            ]}
-          />
+            <SourceList
+              sources={[
+                {
+                  label: 'IICRC Carpet Cleaning Technician',
+                  url: 'https://iicrc.org/cct/',
+                  note: 'Core reference for the art and science of carpet cleaning.',
+                },
+                {
+                  label: 'Google Search Central',
+                  url: 'https://developers.google.com/search/docs/fundamentals/seo-starter-guide',
+                  note: 'Technical SEO starts with crawlable, useful pages and clear titles, descriptions and links.',
+                },
+                {
+                  label: 'Google AI features guidance',
+                  url: 'https://developers.google.com/search/docs/appearance/ai-features',
+                  note: 'AI search inclusion still depends on eligible, useful, accessible web content.',
+                },
+                {
+                  label: 'CARSI pricing',
+                  url: 'https://carsi.com.au/pricing',
+                  note: 'Membership, online access and course options for learners.',
+                },
+              ]}
+            />
           </div>
-          </div>
-        </section>
-
-        <div className={`${PUBLIC_SHELL_INNER_CLASS} py-12`}>
-        <MarketingGrowthLinks currentHref={startSmartBasePath} />
         </div>
-        <HomeFinalCtaSection />
+      </section>
+
+      <div className={`${PUBLIC_SHELL_INNER_CLASS} py-12`}>
+        <MarketingGrowthLinks currentHref={startSmartBasePath} />
+      </div>
+      <PlatformContextualNext current={startSmartBasePath} />
+      <StaticMarketingClosingCta />
     </>
   );
 }
@@ -495,7 +551,7 @@ export function StartSmartDetail({ page, siteUrl }: { page: StartSmartPage; site
       <FAQSchema questions={pageFaqs} />
 
       <article>
-        <header className="grid gap-8 pb-10 pt-2 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
+        <header className="grid gap-8 pt-2 pb-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
           <div>
             <Link
               href={startSmartBasePath}
@@ -503,13 +559,11 @@ export function StartSmartDetail({ page, siteUrl }: { page: StartSmartPage; site
             >
               Back to Start Smart
             </Link>
-            <p className={`mb-3 ${marketingEyebrow}`}>
-              {page.eyebrow}
-            </p>
-            <h1 className="font-display max-w-4xl text-4xl font-bold tracking-tight sm:text-5xl text-slate-900 dark:text-white/90">
+            <p className={`mb-3 ${marketingEyebrow}`}>{page.eyebrow}</p>
+            <h1 className="font-display max-w-4xl text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl dark:text-white/90">
               {page.title}
             </h1>
-            <p className="mt-5 max-w-3xl text-base leading-7 sm:text-lg text-slate-600 dark:text-white/68">
+            <p className="mt-5 max-w-3xl text-base leading-7 text-slate-600 sm:text-lg dark:text-white/68">
               {page.description}
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
@@ -532,7 +586,10 @@ export function StartSmartDetail({ page, siteUrl }: { page: StartSmartPage; site
                 ['Intent', page.intent],
                 ['Outcome', page.outcome],
               ].map(([label, value]) => (
-                <div key={label} className="rounded-xl border border-slate-200/80 dark:border-white/6 bg-slate-50 dark:bg-white/[0.03] p-3">
+                <div
+                  key={label}
+                  className="rounded-xl border border-slate-200/80 bg-slate-50 p-3 dark:border-white/6 dark:bg-white/[0.03]"
+                >
                   <p className={`text-xs font-semibold tracking-[0.14em] ${marketingEyebrow}`}>
                     {label}
                   </p>
@@ -547,13 +604,19 @@ export function StartSmartDetail({ page, siteUrl }: { page: StartSmartPage; site
 
         <section className={`grid gap-5 ${marketingSection} lg:grid-cols-3`}>
           <div className={`p-5 lg:col-span-1 ${marketingPanel}`}>
-            <AlertTriangle className="h-6 w-6 text-[#a85500] dark:text-[#ed9d24]" aria-hidden="true" />
+            <AlertTriangle
+              className="h-6 w-6 text-[#a85500] dark:text-[#ed9d24]"
+              aria-hidden="true"
+            />
             <h2 className="mt-4 text-xl font-semibold text-slate-900 dark:text-white/90">
               Beginner risks to avoid
             </h2>
             <ul className="mt-4 space-y-3">
               {page.risks.map((risk) => (
-                <li key={risk} className="flex gap-3 text-sm leading-6 text-slate-600 dark:text-white/55">
+                <li
+                  key={risk}
+                  className="flex gap-3 text-sm leading-6 text-slate-600 dark:text-white/55"
+                >
                   <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#ed9d24]" />
                   <span>{risk}</span>
                 </li>
@@ -568,8 +631,14 @@ export function StartSmartDetail({ page, siteUrl }: { page: StartSmartPage; site
             </h2>
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               {page.learnFirst.map((item) => (
-                <div key={item} className="flex gap-3 rounded-xl border border-slate-200/80 dark:border-white/6 bg-slate-50 dark:bg-white/[0.03] p-3 text-sm leading-6 text-slate-600 dark:text-white/55">
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#146fc2] dark:text-[#7ec5ff]" aria-hidden="true" />
+                <div
+                  key={item}
+                  className="flex gap-3 rounded-xl border border-slate-200/80 bg-slate-50 p-3 text-sm leading-6 text-slate-600 dark:border-white/6 dark:bg-white/[0.03] dark:text-white/55"
+                >
+                  <CheckCircle2
+                    className="mt-0.5 h-4 w-4 shrink-0 text-[#146fc2] dark:text-[#7ec5ff]"
+                    aria-hidden="true"
+                  />
                   <span>{item}</span>
                 </div>
               ))}
@@ -593,9 +662,7 @@ export function StartSmartDetail({ page, siteUrl }: { page: StartSmartPage; site
                 <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-xl border border-[#2490ed]/25 bg-[#2490ed]/10 font-mono text-sm text-[#146fc2] dark:text-[#7ec5ff]">
                   {index + 1}
                 </div>
-                <p className="text-sm leading-6 text-slate-600 dark:text-white/68">
-                  {step}
-                </p>
+                <p className="text-sm leading-6 text-slate-600 dark:text-white/68">{step}</p>
               </div>
             ))}
           </div>
@@ -616,10 +683,7 @@ export function StartSmartDetail({ page, siteUrl }: { page: StartSmartPage; site
             <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-white/55">
               {page.cta.body}
             </p>
-            <Link
-              href={page.cta.href}
-              className={`mt-5 ${marketingBtnPrimary}`}
-            >
+            <Link href={page.cta.href} className={`mt-5 ${marketingBtnPrimary}`}>
               {page.cta.label} <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -631,7 +695,10 @@ export function StartSmartDetail({ page, siteUrl }: { page: StartSmartPage; site
             </h2>
             <div className="mt-5 space-y-3">
               {pageFaqs.map((faq) => (
-                <details key={faq.question} className="rounded-xl border border-slate-200/80 dark:border-white/6 bg-slate-50 dark:bg-white/[0.03] p-4">
+                <details
+                  key={faq.question}
+                  className="rounded-xl border border-slate-200/80 bg-slate-50 p-4 dark:border-white/6 dark:bg-white/[0.03]"
+                >
                   <summary className="cursor-pointer text-sm font-semibold text-slate-900 dark:text-white/90">
                     {faq.question}
                   </summary>
@@ -662,7 +729,10 @@ export function StartSmartDetail({ page, siteUrl }: { page: StartSmartPage; site
                 href={`${startSmartBasePath}/${related.slug}`}
                 className={`group p-4 ${marketingPanel} ${marketingPanelHover}`}
               >
-                <GraduationCap className="h-5 w-5 text-[#146fc2] dark:text-[#7ec5ff]" aria-hidden="true" />
+                <GraduationCap
+                  className="h-5 w-5 text-[#146fc2] dark:text-[#7ec5ff]"
+                  aria-hidden="true"
+                />
                 <p className="mt-3 text-sm font-semibold text-slate-900 dark:text-white/90">
                   {related.shortTitle}
                 </p>
@@ -684,11 +754,12 @@ export function StartSmartIndexingNote() {
   return (
     <div className={`p-5 ${marketingPanel}`}>
       <div className="flex items-start gap-3">
-        <ClipboardCheck className="mt-0.5 h-5 w-5 shrink-0 text-[#146fc2] dark:text-[#7ec5ff]" aria-hidden="true" />
+        <ClipboardCheck
+          className="mt-0.5 h-5 w-5 shrink-0 text-[#146fc2] dark:text-[#7ec5ff]"
+          aria-hidden="true"
+        />
         <div>
-          <p className="text-sm font-semibold text-slate-900 dark:text-white/90">
-            Indexing setup
-          </p>
+          <p className="text-sm font-semibold text-slate-900 dark:text-white/90">Indexing setup</p>
           <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-white/55">
             These pages are included in the sitemap and robots discovery path. Search Console
             submission still requires an authenticated property owner session or API credential.
