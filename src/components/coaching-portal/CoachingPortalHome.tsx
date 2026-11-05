@@ -17,6 +17,8 @@ import { CoachingAskCoachPanel } from '@/components/coaching-portal/CoachingAskC
 import { CoachingOnboardingStatusBar } from '@/components/coaching-portal/CoachingOnboardingStatusBar';
 import { useCoachingPortal } from '@/components/coaching-portal/CoachingPortalContext';
 import { CoachingFeatureSpotlight } from '@/components/coaching-portal/visual/CoachingFeatureSpotlight';
+import { CoachingQuickLinks } from '@/components/coaching-portal/visual/CoachingQuickLinks';
+import { coachingHomeQuickLinks } from '@/lib/coaching-portal/coaching-home-quick-links';
 import { coachingPortalPath } from '@/lib/coaching-portal/coaching-portal-paths';
 import { CheckCircle2, Circle, Megaphone } from 'lucide-react';
 
@@ -179,6 +181,14 @@ function ActiveHome() {
       </header>
 
       <CoachingOnboardingStatusBar />
+
+      <CoachingQuickLinks
+        links={coachingHomeQuickLinks({
+          marketingReady: marketing.profileReady,
+          proposedFixCount: marketing.proposedFixCount,
+        })}
+        testId="coaching-home-quick-links"
+      />
 
       {marketing.profileReady ? (
         <CoachingFeatureSpotlight
