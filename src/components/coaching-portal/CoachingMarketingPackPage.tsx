@@ -33,9 +33,12 @@ import type {
   TradeVoice,
 } from '@/lib/coaching-portal/marketing-pack/types';
 import {
+  marketingFixEffortBadgeClass,
+  marketingFixEffortLabel,
   marketingFixImpactBadgeClass,
   marketingFixImpactLabel,
 } from '@/lib/coaching-portal/marketing-pack/ui-labels';
+import type { MarketingPackSummary } from '@/lib/coaching-portal/marketing-pack/pack-summary';
 
 type Pack = {
   id: string;
@@ -45,6 +48,8 @@ type Pack = {
   voice: TradeVoice;
   generatedAt: string;
 };
+
+type PackProgress = { checksDelta: number | null; fixCountDelta: number | null };
 
 function MarketingPackLoadingSkeleton() {
   return (
@@ -105,6 +110,11 @@ function PackSummaryStrip({
 export function CoachingMarketingPackPage() {
   const { access } = useCoachingPortal();
   const [pack, setPack] = useState<Pack | null>(null);
+  const [history, setHistory] = useState<MarketingPackSummary[]>([]);
+  const [progress, setProgress] = useState<PackProgress>({
+    checksDelta: null,
+    fixCountDelta: null,
+  });
   const [loading, setLoading] = useState(true);
   const [building, setBuilding] = useState(false);
   const [error, setError] = useState('');
@@ -120,8 +130,14 @@ export function CoachingMarketingPackPage() {
           setError(marketingPackErrorFromResponse(res.status, body));
           return;
         }
-        const data = (await res.json()) as { pack: Pack | null };
+        const data = (await res.json()) as {
+          pack: Pack | null;
+          history?: MarketingPackSummary[];
+          progress?: PackProgress;
+        };
         setPack(data.pack);
+        setHistory(data.history ?? []);
+        setProgress(data.progress ?? { checksDelta: null, fixCountDelta: null });
         setError('');
       })
       .catch(() => setError('Could not load your marketing pack.'))
@@ -131,15 +147,22 @@ export function CoachingMarketingPackPage() {
   async function build() {
     setBuilding(true);
     setError('');
-    setStatusMessage('Building your pack — reading your website and drafting posts…');
+    setStatusMessage('Building your pack — checking your website and assembling your calendar…');
     try {
       const res = await fetch('/api/coaching/portal/marketing-pack', { method: 'POST' });
-      const data = (await res.json().catch(() => ({}))) as { pack?: Pack | null; detail?: string };
+      const data = (await res.json().catch(() => ({}))) as {
+        pack?: Pack | null;
+        history?: MarketingPackSummary[];
+        progress?: PackProgress;
+        detail?: string;
+      };
       if (!res.ok) {
         setError(marketingPackErrorFromResponse(res.status, data));
         setStatusMessage('');
       } else {
         setPack(data.pack ?? null);
+        setHistory(data.history ?? []);
+        setProgress(data.progress ?? { checksDelta: null, fixCountDelta: null });
         setStatusMessage('Your marketing pack is ready.');
       }
     } catch {
@@ -165,6 +188,13 @@ export function CoachingMarketingPackPage() {
     [pack, showAllPosts]
   );
 
+  const todaysPost = useMemo(() => {
+    if (!pack) return null;
+    const today = new Date();
+    const iso = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    return pack.calendar.posts.find((p) => p.date === iso) ?? pack.calendar.posts[0] ?? null;
+  }, [pack]);
+
   return (
     <div className={coachingPage}>
       <p className={coachingEyebrow}>Marketing pack</p>
@@ -173,9 +203,26 @@ export function CoachingMarketingPackPage() {
       </h1>
       <p className={`mt-2 max-w-2xl ${coachingMuted}`}>
         Built from your assessment and business profile: a plain-English review of your website and
-        Google Business Profile, a local-search checklist and 30 days of draft posts in your voice.
-        Your coach approves each fix before it joins your action list.
+        Google Business Profile link, a local-search checklist, and 30 days of claim-safe social
+        drafts in your trade voice. We use vetted templates and automated checks — not open-ended
+        AI copy — so nothing over-promises. Your coach approves each fix before it joins your action
+        list.
       </p>
+
+      <section
+        className={`mt-5 rounded-xl border border-white/[0.08] bg-white/[0.02] px-4 py-3 ${coachingMuted}`}
+        aria-labelledby="mp-how"
+      >
+        <h2 id="mp-how" className="text-xs font-semibold tracking-wide text-slate-400 uppercase">
+          How your pack is built
+        </h2>
+        <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-slate-300">
+          <li>We read your public home page once (secure fetch) and run local-search checks.</li>
+          <li>We validate your Google profile link shape — we do not log into Google for you.</li>
+          <li>Social posts come from vetted templates filled with your trade label only.</li>
+          <li>Each ranked fix becomes a proposed action until your coach approves it.</li>
+        </ul>
+      </section>
 
       <div className="mt-6 flex flex-wrap items-center gap-3" aria-live="polite" aria-atomic="true">
         <button
@@ -210,7 +257,7 @@ export function CoachingMarketingPackPage() {
       ) : null}
       {building ? (
         <p className={`mt-3 text-xs ${coachingMuted}`}>
-          This usually takes under a minute while we read your website and draft your posts.
+          This usually takes under a minute while we fetch your website and assemble your calendar.
         </p>
       ) : null}
       {error ? (
@@ -242,6 +289,20 @@ export function CoachingMarketingPackPage() {
         </section>
       ) : (
         <>
+          {progress.checksDelta != null && progress.checksDelta !== 0 ? (
+            <p className="mt-4 rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-100">
+              Since your last pack, site checks passed changed by{' '}
+              {progress.checksDelta > 0 ? '+' : ''}
+              {progress.checksDelta}. Rebuild after you publish website changes.
+            </p>
+          ) : null}
+          {history.length > 1 ? (
+            <p className={`mt-2 text-xs ${coachingMuted}`}>
+              {history.length} saved packs on file — showing the latest. Rebuild to refresh after
+              you update your site or Google link.
+            </p>
+          ) : null}
+
           <PackSummaryStrip
             review={pack.review}
             checklist={pack.checklist}
@@ -301,6 +362,17 @@ export function CoachingMarketingPackPage() {
               </section>
             ) : null}
 
+            <section className={coachingCard} aria-labelledby="mp-gbp">
+              <h2 id="mp-gbp" className={coachingCardTitle}>
+                Google Business Profile
+              </h2>
+              <p className={`mt-1 ${coachingMuted}`}>
+                We check that your saved link looks like a real Maps or Business Profile listing. We
+                do not sign in to Google or score photos, reviews or categories — your coach can
+                walk through those on the checklist in session.
+              </p>
+            </section>
+
             <section className={coachingCard} aria-labelledby="mp-review">
               <h2 id="mp-review" className={coachingCardTitle}>
                 Website and Google review
@@ -320,6 +392,11 @@ export function CoachingMarketingPackPage() {
                           className={`rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase ring-1 ring-inset ${marketingFixImpactBadgeClass(f.impact)}`}
                         >
                           {marketingFixImpactLabel(f.impact)}
+                        </span>
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase ring-1 ring-inset ${marketingFixEffortBadgeClass(f.effort)}`}
+                        >
+                          {marketingFixEffortLabel(f.effort)}
                         </span>
                         <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-[10px] font-semibold tracking-wide text-slate-400 uppercase">
                           {f.area === 'website' ? 'Website' : 'Google profile'}
@@ -378,8 +455,24 @@ export function CoachingMarketingPackPage() {
                 {pack.calendar.tradeMatched === false
                   ? 'We do not have wording for your trade yet, so these drafts use general trade wording. Your coach can help you tailor them.'
                   : `Drafts written for ${pack.voice.trade || 'your trade'}.`}{' '}
-                Edit them to sound like you and add your own job photos before posting.
+                Edit them to sound like you and add your own job photos before posting. Reuse the
+                same caption on Google Business Profile posts where it fits.
               </p>
+              {todaysPost ? (
+                <div className="mt-4 flex flex-wrap items-center gap-2 rounded-lg border border-sky-500/20 bg-sky-500/10 px-3 py-2">
+                  <p className="text-xs text-sky-100">
+                    Today&apos;s draft (Day {todaysPost.day}): {todaysPost.theme}
+                  </p>
+                  <button
+                    type="button"
+                    className={`${coachingSecondaryBtn} !min-h-8 gap-1 !px-2.5 !text-xs`}
+                    onClick={() => void copyCaption(todaysPost.day, todaysPost.caption)}
+                  >
+                    <ClipboardCopy className="h-3.5 w-3.5" aria-hidden />
+                    Copy today&apos;s post
+                  </button>
+                </div>
+              ) : null}
               <ol className="mt-5 space-y-3">
                 {posts.map((p) => (
                   <li
