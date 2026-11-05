@@ -1,16 +1,18 @@
+import { Plus } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Plus } from 'lucide-react';
 
-import { HomeFinalCtaSection } from '@/components/landing/HomeFinalCtaSection';
-import { HomeTrustStrip } from '@/components/landing/HomeTrustStrip';
 import {
   LANDING_DISPLAY_H2_CLASS,
   LANDING_EYEBROW_CLASS,
   LANDING_LEAD_CLASS,
   PUBLIC_SHELL_INNER_CLASS,
 } from '@/components/landing/public-shell-width';
-import { PlatformNav } from '@/components/marketing/PlatformNav';
+import {
+  PlatformContextualNext,
+  PlatformPageHeroFromSurface,
+  PlatformPageStatStrip,
+} from '@/components/marketing/platform/PlatformPagePattern';
 import {
   PodcastCarsiHero,
   PodcastCategoryPills,
@@ -18,6 +20,7 @@ import {
   PodcastShowCard,
   type PodcastShowData,
 } from '@/components/marketing/podcast/PodcastShowCard';
+import { StaticMarketingClosingCta } from '@/components/marketing/StaticMarketingClosingCta';
 import { BreadcrumbSchema, PodcastSeriesSchema } from '@/components/seo';
 import { getBackendOrigin, getPublicSiteUrl } from '@/lib/env/public-url';
 import { OG_IMAGES } from '@/lib/seo/og-image';
@@ -144,25 +147,14 @@ export default async function PodcastPage({
           />
         ))}
 
-      <section className="relative overflow-hidden border-b border-slate-200/70 bg-white">
-        <div
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_80%_0%,rgba(36,144,237,0.11),transparent_58%)]"
-          aria-hidden
-        />
-        <div className={`relative ${PUBLIC_SHELL_INNER_CLASS} py-16 md:py-24`}>
-          <p className={LANDING_EYEBROW_CLASS}>CARSI Industry Hub</p>
-          <h1 className="mt-3 max-w-3xl font-[family-name:var(--font-display)] text-[2.15rem] leading-[1.1] font-semibold tracking-[-0.02em] text-slate-950 md:text-[3.1rem] md:leading-[1.06]">
-            Podcast directory
-          </h1>
-          <p className={`mt-5 max-w-2xl text-pretty ${LANDING_LEAD_CLASS}`}>
-            Podcasts for Australian restoration, HVAC, flooring, and indoor environment
-            professionals — curated by CARSI.
-          </p>
-          <PlatformNav current="/podcast" />
-        </div>
-      </section>
+      <PlatformPageHeroFromSurface
+        current="/podcast"
+        variant="catalog"
+        glow="right"
+        overrides={{ headline: 'Podcast directory' }}
+      />
 
-      <HomeTrustStrip
+      <PlatformPageStatStrip
         stats={[
           { value: total > 0 ? String(total) : '—', label: 'Shows listed' },
           { value: String(CATEGORIES.length), label: 'Topics' },
@@ -191,7 +183,10 @@ export default async function PodcastPage({
       </section>
 
       {carsiShow && !category && !q ? (
-        <section className="border-t border-slate-200/70 bg-white py-16 md:py-24" aria-label="CARSI original podcast">
+        <section
+          className="border-t border-slate-200/70 bg-white py-16 md:py-24"
+          aria-label="CARSI original podcast"
+        >
           <div className={PUBLIC_SHELL_INNER_CLASS}>
             <p className={LANDING_EYEBROW_CLASS}>CARSI production</p>
             <h2 className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>Our flagship show</h2>
@@ -242,12 +237,27 @@ export default async function PodcastPage({
         className="border-t border-slate-200/70 bg-white py-16"
         aria-label="Submit a podcast"
       >
-        <div className={`${PUBLIC_SHELL_INNER_CLASS} flex flex-col gap-4 rounded-2xl border border-slate-200/80 bg-[#fafbfc] p-6 sm:flex-row sm:items-center sm:justify-between`}>
+        <div
+          className={`${PUBLIC_SHELL_INNER_CLASS} flex flex-col gap-4 rounded-2xl border border-slate-200/80 bg-[#fafbfc] p-6 sm:flex-row sm:items-center sm:justify-between`}
+        >
           <div>
             <p className="text-base font-semibold text-slate-950">Know a podcast we should list?</p>
             <p className="mt-1 text-sm text-slate-500">
-              Submit industry podcasts for review — free to list for indoor environment professionals.
+              Submit industry podcasts for review — free to list for indoor environment
+              professionals.
             </p>
+          </div>
+          <Link
+            href="/contact"
+            className="inline-flex shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-800 hover:border-[#2490ed]/40 hover:text-[#146fc2]"
+          >
+            <Plus className="h-4 w-4" aria-hidden />
+            Submit podcast
+          </Link>
+        </div>
+      </section>
+
+      <PlatformContextualNext current="/podcast" />
           </div>
           <Link
             href="/contact"
