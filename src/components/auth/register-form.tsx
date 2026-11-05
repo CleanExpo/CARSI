@@ -27,6 +27,7 @@ import {
   MEMBERSHIP_PATH,
 } from '@/lib/membership-signup-path';
 import { useToast } from '@/hooks/use-toast';
+import { purchaseSurveyCheckoutField } from '@/lib/marketing/purchase-survey-key';
 
 export const formSchema = z
   .object({
@@ -108,7 +109,7 @@ export function RegisterForm() {
           const { success_url, cancel_url } = buildCourseCheckoutUrls(window.location.origin, slug);
           const checkout = await apiClient.post<{ enrolled?: boolean; checkout_url?: string }>(
             '/api/lms/checkout',
-            { slug, success_url, cancel_url, customer_email: values.email }
+            { slug, success_url, cancel_url, customer_email: values.email, ...purchaseSurveyCheckoutField() }
           );
           const checkoutUrl = checkout.checkout_url;
           if (checkoutUrl) {

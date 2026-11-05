@@ -66,6 +66,30 @@ vi.mock('@/lib/server/event-attribution', () => ({
   tryRecordAttributedStage: vi.fn().mockResolvedValue(undefined),
 }));
 
+// Only the survey route (GP-662 overlapping-start cover) reaches this client. It serves back
+// each Checkout Session as the mocked checkout created it, metadata included.
+const surveyStripe = vi.hoisted(() => ({
+  updatePI: vi.fn(),
+  sessions: new Map<string, Record<string, unknown>>(),
+}));
+vi.mock('@/lib/api/stripe', () => ({
+  getStripeClient: () => ({
+    checkout: {
+      sessions: {
+        retrieve: async (id: string) => {
+          const session = surveyStripe.sessions.get(id);
+          if (!session) throw new Error('No such checkout.session');
+          return session;
+        },
+      },
+    },
+    paymentIntents: {
+      retrieve: async (id: string) => ({ id, metadata: {} }),
+      update: surveyStripe.updatePI,
+    },
+  }),
+}));
+
 vi.mock('@/lib/prisma', () => ({
   prisma: {
     lmsUser: { findUnique: mocks.findUser },
@@ -74,6 +98,7 @@ vi.mock('@/lib/prisma', () => ({
 }));
 
 const { POST } = await import('../../../app/api/lms/checkout/route');
+const { POST: SURVEY_POST } = await import('../../../app/api/lms/checkout/survey/route');
 
 const COURSE_SLUG = 'level-1-mould-remediation-2cc96b85';
 const COURSE_ID = 'course-mould-1';
@@ -286,67 +311,49 @@ describe('campaign attribution', () => {
   });
 });
 
-describe('purchase survey capability cookie (Authority Machine slice 1b)', () => {
+describe('purchase survey tab key (Authority Machine slice 1b, GP-662)', () => {
   const FLAG = 'PURCHASE_SURVEY_ENABLED';
+  const TAB_KEY = '0123456789abcdef0123456789abcdef';
 
   afterEach(() => {
     delete process.env[FLAG];
   });
 
-  function surveyCookie(res: Response): string | undefined {
-    return res.headers.getSetCookie().find((c) => c.startsWith('carsi_svy='));
-  }
-
-  it('flag off: the checkout response sets no cookie at all (unchanged)', async () => {
+  it('flag off: a survey_key in the body is ignored; no cookie and metadata unchanged', async () => {
     delete process.env[FLAG];
     mocks.findUser.mockResolvedValue(null);
-    const res = await POST(request({ slug: COURSE_SLUG, customer_email: 'new@example.test' }));
+    const res = await POST(request({ slug: COURSE_SLUG, customer_email: 'new@example.test', survey_key: TAB_KEY }));
     expect(res.status).toBe(200);
     expect(res.headers.getSetCookie()).toEqual([]);
+    expect(mocks.createStripe.mock.calls[0][0].extra_metadata).toEqual({});
   });
 
-  it('flag on: sets an HttpOnly, Secure, SameSite=Lax 24 h cookie that verifies for the new session only', async () => {
+  it("flag on: binds the tab's key into the new session's metadata and sets no cookie", async () => {
     process.env[FLAG] = 'true';
     mocks.findUser.mockResolvedValue(null);
-    const res = await POST(request({ slug: COURSE_SLUG, customer_email: 'new@example.test' }));
+    const res = await POST(request({ slug: COURSE_SLUG, customer_email: 'new@example.test', survey_key: TAB_KEY }));
     expect(res.status).toBe(200);
-    const header = surveyCookie(res);
-    expect(header).toBeDefined();
-    expect(header).toContain('HttpOnly');
-    expect(header).toContain('Secure');
-    expect(header?.toLowerCase()).toContain('samesite=lax');
-    expect(header).toContain('Max-Age=86400');
-    const { verifyPurchaseSurveyToken } = await import('@/lib/server/purchase-survey-token');
-    const token = decodeURIComponent(header!.slice('carsi_svy='.length).split(';')[0]);
-    expect(verifyPurchaseSurveyToken(token, 'cs_new', new Date())).toBe(true);
-    expect(verifyPurchaseSurveyToken(token, 'cs_other', new Date())).toBe(false);
+    expect(res.headers.getSetCookie()).toEqual([]);
+    const { purchaseSurveyBinding } = await import('@/lib/server/purchase-survey-token');
+    expect(mocks.createStripe.mock.calls[0][0].extra_metadata).toEqual({ svy_bk: purchaseSurveyBinding(TAB_KEY) });
+    expect(purchaseSurveyBinding(TAB_KEY)).not.toContain(TAB_KEY);
   });
 
-  it('two checkouts in one browser: starting B keeps A answerable', async () => {
+  it.each([
+    ['missing', undefined],
+    ['not hex', 'zz'.repeat(16)],
+    ['too short', 'ab'.repeat(15)],
+    ['upper case', 'AB'.repeat(16)],
+    ['not a string', 12345],
+  ])('flag on, survey_key %s: checkout still works and stores no binding', async (_label, key) => {
     process.env[FLAG] = 'true';
     mocks.findUser.mockResolvedValue(null);
-    const { cookieAuthorisesSession } = await import('@/lib/server/purchase-survey-token');
-    const tokenOf = (res: Response) =>
-      decodeURIComponent(surveyCookie(res)!.slice('carsi_svy='.length).split(';')[0]);
-
-    mocks.createStripe.mockResolvedValueOnce({ checkout_url: 'https://checkout.stripe.test/a', checkout_session_id: 'cs_a' });
-    const resA = await POST(request({ slug: COURSE_SLUG, customer_email: 'new@example.test' }));
-    const cookieA = tokenOf(resA);
-
-    mocks.createStripe.mockResolvedValueOnce({ checkout_url: 'https://checkout.stripe.test/b', checkout_session_id: 'cs_b' });
-    const resB = await POST(
-      new NextRequest('https://carsi.example.test/api/lms/checkout', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json', cookie: `carsi_svy=${encodeURIComponent(cookieA)}` },
-        body: JSON.stringify({ slug: 'odour-control', customer_email: 'new@example.test' }),
-      })
-    );
-    const cookieB = tokenOf(resB);
-    expect(cookieAuthorisesSession(cookieB, 'cs_a', new Date())).toBe(true);
-    expect(cookieAuthorisesSession(cookieB, 'cs_b', new Date())).toBe(true);
+    const res = await POST(request({ slug: COURSE_SLUG, customer_email: 'new@example.test', survey_key: key }));
+    expect(res.status).toBe(200);
+    expect(mocks.createStripe.mock.calls[0][0].extra_metadata).toEqual({});
   });
 
-  it('flag on: the discounted path sets it too', async () => {
+  it('flag on: the discounted path binds it too, next to discount_id', async () => {
     process.env[FLAG] = 'true';
     mocks.verifySession.mockResolvedValue({ sub: 'user-disc' });
     mocks.findUser.mockResolvedValue({ id: 'user-disc', isActive: true });
@@ -356,11 +363,15 @@ describe('purchase survey capability cookie (Authority Machine slice 1b)', () =>
       new NextRequest('https://carsi.example.test/api/lms/checkout', {
         method: 'POST',
         headers: { 'content-type': 'application/json', cookie: 'auth_token=tok' },
-        body: JSON.stringify({ slug: COURSE_SLUG, customer_email: 'member@example.test' }),
+        body: JSON.stringify({ slug: COURSE_SLUG, customer_email: 'member@example.test', survey_key: TAB_KEY }),
       })
     );
     expect(res.status).toBe(200);
-    expect(surveyCookie(res)).toBeDefined();
+    const { purchaseSurveyBinding } = await import('@/lib/server/purchase-survey-token');
+    expect(mocks.createStripe.mock.calls[0][0].extra_metadata).toEqual({
+      svy_bk: purchaseSurveyBinding(TAB_KEY),
+      discount_id: 'disc-1',
+    });
   });
 });
 
@@ -512,5 +523,152 @@ describe('first-touch attribution (Authority Machine slice 1a)', () => {
     await POST(requestWithCookie({ slug: COURSE_SLUG, customer_email: 'new@example.test' }, `carsi_ft=${planted}`));
     const md = mocks.createStripe.mock.calls[0][0].extra_metadata as Record<string, string>;
     expect(md).toEqual({ ft_ch: 'referral', ft_ref: 'other', ft_lp: 'for', ft_at: '2026-10-23' });
+  });
+});
+
+/** One browser tab: its sessionStorage list of recent keys, newest first, as the client keeps it. */
+type Tab = { keys: string[] };
+
+function newTab(): Tab {
+  return { keys: [] };
+}
+
+/** A tab opened from `tab`: the browser copies sessionStorage, so it starts with the same keys. */
+function copiedTab(tab: Tab): Tab {
+  return { keys: [...tab.keys] };
+}
+
+function freshKey(): string {
+  return [...crypto.getRandomValues(new Uint8Array(16))].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+/** Every checkout makes a fresh key, kept at the front of the tab's list (at most five). */
+function checkoutFrom(tab: Tab, slug: string): NextRequest {
+  const key = freshKey();
+  tab.keys = [key, ...tab.keys].slice(0, 5);
+  return new NextRequest('https://carsi.example.test/api/lms/checkout', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ slug, customer_email: 'new@example.test', survey_key: key }),
+  });
+}
+
+async function surveyStatus(tab: Tab | null, sessionId: string): Promise<number> {
+  const res = await SURVEY_POST(
+    new NextRequest('https://carsi.example.test/api/lms/checkout/survey', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        session_id: sessionId,
+        industry: 'commercial_cleaning',
+        found_via: 'google_search',
+        ...(tab ? { survey_keys: tab.keys } : {}),
+      }),
+    })
+  );
+  return res.status;
+}
+
+/** The next Stripe checkout gets this id; it is stored as created, so the survey route sees it. */
+function nextSession(id: string): void {
+  mocks.createStripe.mockImplementationOnce(async (args: { extra_metadata?: Record<string, string> }) => {
+    surveyStripe.sessions.set(id, {
+      id,
+      payment_status: 'paid',
+      payment_intent: `pi_for_${id}`,
+      created: Math.floor(Date.now() / 1000),
+      metadata: { ...(args.extra_metadata ?? {}) },
+    });
+    return { checkout_url: `https://checkout.stripe.test/${id}`, checkout_session_id: id };
+  });
+}
+
+describe('overlapping checkout starts keep every survey answerable (GP-662)', () => {
+  const FLAG = 'PURCHASE_SURVEY_ENABLED';
+
+  beforeEach(() => {
+    process.env[FLAG] = 'true';
+    mocks.findUser.mockResolvedValue(null);
+    surveyStripe.sessions.clear();
+    surveyStripe.updatePI.mockReset();
+    surveyStripe.updatePI.mockResolvedValue({});
+  });
+
+  afterEach(() => {
+    delete process.env[FLAG];
+  });
+
+  it("a browser's very first checkouts, started at once in two tabs, both stay answerable", async () => {
+    const [tab1, tab2] = [newTab(), newTab()];
+    nextSession('cs_test_tab1');
+    nextSession('cs_test_tab2');
+    // Both requests are in flight together; neither reply writes anything the other depends on.
+    const replies = await Promise.all([POST(checkoutFrom(tab1, COURSE_SLUG)), POST(checkoutFrom(tab2, 'odour-control'))]);
+    for (const res of replies) {
+      expect(res.status).toBe(200);
+      expect(res.headers.getSetCookie()).toEqual([]);
+    }
+    expect(await surveyStatus(tab1, 'cs_test_tab1')).toBe(200);
+    expect(await surveyStatus(tab2, 'cs_test_tab2')).toBe(200);
+  });
+
+  it('three overlapping starts from one tab all stay answerable', async () => {
+    const tab = newTab();
+    const ids = ['cs_test_a', 'cs_test_b', 'cs_test_c'];
+    for (const id of ids) nextSession(id);
+    await Promise.all(ids.map(() => POST(checkoutFrom(tab, COURSE_SLUG))));
+    for (const id of ids) expect(await surveyStatus(tab, id)).toBe(200);
+  });
+
+  it("one tab cannot answer another tab's checkout, and no key or a never-started session is refused", async () => {
+    const [mine, other] = [newTab(), newTab()];
+    nextSession('cs_test_mine');
+    await POST(checkoutFrom(mine, COURSE_SLUG));
+    expect(await surveyStatus(other, 'cs_test_mine')).toBe(403);
+    expect(await surveyStatus(null, 'cs_test_mine')).toBe(403);
+    expect(await surveyStatus(mine, 'cs_test_never_started')).toBe(400);
+  });
+
+  it('a tab opened from another (copied sessionStorage) cannot answer the checkouts either starts afterwards', async () => {
+    const opener = newTab();
+    nextSession('cs_test_before_copy');
+    await POST(checkoutFrom(opener, COURSE_SLUG));
+    const child = copiedTab(opener);
+    nextSession('cs_test_opener_after');
+    nextSession('cs_test_child_after');
+    await Promise.all([POST(checkoutFrom(opener, COURSE_SLUG)), POST(checkoutFrom(child, 'odour-control'))]);
+    expect(await surveyStatus(opener, 'cs_test_opener_after')).toBe(200);
+    expect(await surveyStatus(child, 'cs_test_child_after')).toBe(200);
+    expect(await surveyStatus(child, 'cs_test_opener_after')).toBe(403);
+    expect(await surveyStatus(opener, 'cs_test_child_after')).toBe(403);
+  });
+
+  it('the boundary is the browser: a tab copied after a checkout holds that checkout\'s key, as every tab shared the old cookie', async () => {
+    const opener = newTab();
+    nextSession('cs_test_copied_after');
+    await POST(checkoutFrom(opener, COURSE_SLUG));
+    const child = copiedTab(opener);
+    expect(await surveyStatus(opener, 'cs_test_copied_after')).toBe(200);
+    // Same browser, same person: documented, not a leak. Someone with only the URL is still refused.
+    expect(await surveyStatus(child, 'cs_test_copied_after')).toBe(200);
+    expect(await surveyStatus(newTab(), 'cs_test_copied_after')).toBe(403);
+  });
+
+  it('junk cookies on the request change nothing: no Set-Cookie and the binding still works', async () => {
+    const tab = newTab();
+    const key = freshKey();
+    tab.keys = [key];
+    const junk = Array.from({ length: 120 }, (_, i) => `carsi_svy_${i}=9999999999.${'0'.repeat(64)}`).join('; ');
+    nextSession('cs_test_junk');
+    const res = await POST(
+      new NextRequest('https://carsi.example.test/api/lms/checkout', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', cookie: `${junk}; carsi_svk=forged` },
+        body: JSON.stringify({ slug: COURSE_SLUG, customer_email: 'new@example.test', survey_key: key }),
+      })
+    );
+    expect(res.status).toBe(200);
+    expect(res.headers.getSetCookie()).toEqual([]);
+    expect(await surveyStatus(tab, 'cs_test_junk')).toBe(200);
   });
 });

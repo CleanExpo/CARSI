@@ -60,33 +60,12 @@ import {
 import { isAttributionCaptureEnabled } from '@/lib/server/attribution-capture-flag';
 import { isPurchaseSurveyEnabled } from '@/lib/server/purchase-survey-flag';
 import {
-  PURCHASE_SURVEY_COOKIE_NAME,
-  PURCHASE_SURVEY_COOKIE_PATH,
-  PURCHASE_SURVEY_TOKEN_TTL_SECONDS,
-  nextPurchaseSurveyCookie,
+  parsePurchaseSurveyKey,
+  PURCHASE_SURVEY_BINDING_METADATA_KEY,
+  purchaseSurveyBinding,
 } from '@/lib/server/purchase-survey-token';
 
 class AccountLookupUnavailable extends Error {}
-
-/**
- * The checkout reply. With the purchase survey on (slice 1b), it also carries the HttpOnly
- * capability cookie that lets this browser, and only this one, answer the survey for this
- * Stripe session (up to three recent checkouts are kept). Off, the reply is exactly what it was.
- */
-function checkoutStarted(checkout_url: string, checkoutSessionId: string, request: NextRequest) {
-  const res = NextResponse.json({ checkout_url });
-  if (isPurchaseSurveyEnabled()) {
-    const previous = request.cookies.get(PURCHASE_SURVEY_COOKIE_NAME)?.value;
-    res.cookies.set(PURCHASE_SURVEY_COOKIE_NAME, nextPurchaseSurveyCookie(previous, checkoutSessionId), {
-      httpOnly: true,
-      secure: request.nextUrl.protocol === 'https:' || process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: PURCHASE_SURVEY_COOKIE_PATH,
-      maxAge: PURCHASE_SURVEY_TOKEN_TTL_SECONDS,
-    });
-  }
-  return res;
-}
 
 /** Runs an account check; a database failure becomes a 503 rather than a charge on doubt. */
 async function guardLookup<T>(check: () => Promise<T>): Promise<T> {
@@ -108,6 +87,7 @@ export async function POST(request: NextRequest) {
       full_name?: string;
       purchase_mode?: string;
       team_seat_count?: number;
+      survey_key?: unknown;
     };
     const attributionJourneyId = readAttributionJourneyId(request);
     const utmMetadata = parseUtmCookie(request.cookies.get(UTM_COOKIE_NAME)?.value);
@@ -120,6 +100,12 @@ export async function POST(request: NextRequest) {
           ),
         }
       : utmMetadata;
+    // Purchase survey (slice 1b, GP-662): bind the browser tab's own key to the session being
+    // created. The server sets no cookie, so overlapping checkouts cannot overwrite each other.
+    const surveyKey = isPurchaseSurveyEnabled() ? parsePurchaseSurveyKey(body.survey_key) : null;
+    const checkoutMetadata: Record<string, string> = surveyKey
+      ? { ...attributionMetadata, [PURCHASE_SURVEY_BINDING_METADATA_KEY]: purchaseSurveyBinding(surveyKey) }
+      : attributionMetadata;
 
     const slug = typeof body.slug === 'string' ? body.slug.trim() : '';
     if (!slug) {
@@ -394,7 +380,7 @@ export async function POST(request: NextRequest) {
             customer_email: customerEmail,
             student_id: studentId,
             unit_amount_cents: cents,
-            extra_metadata: { ...attributionMetadata, discount_id: disc.id },
+            extra_metadata: { ...checkoutMetadata, discount_id: disc.id },
             guest_checkout: guestCheckout && !studentId,
             quantity: checkoutQuantity,
             purchase_mode: purchaseMode,
@@ -407,7 +393,7 @@ export async function POST(request: NextRequest) {
             currency: 'aud',
             transactionId: checkout_session_id,
           });
-          return checkoutStarted(checkout_url, checkout_session_id, request);
+          return NextResponse.json({ checkout_url });
         } catch (err) {
           const msg = err instanceof Error ? err.message : String(err);
           if (msg === 'INVALID_AMOUNT') {
@@ -450,7 +436,7 @@ export async function POST(request: NextRequest) {
         purchase_mode: purchaseMode,
         team_seat_count: teamSeatCount ?? undefined,
         attribution_journey_id: attributionJourneyId ?? undefined,
-        extra_metadata: attributionMetadata,
+        extra_metadata: checkoutMetadata,
       });
       await tryRecordAttributedStage(attributionJourneyId, 'checkout_started', {
         courseSlug: slug,
@@ -458,7 +444,7 @@ export async function POST(request: NextRequest) {
         currency: unit_amount_cents == null ? undefined : 'aud',
         transactionId: checkout_session_id,
       });
-      return checkoutStarted(checkout_url, checkout_session_id, request);
+      return NextResponse.json({ checkout_url });
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       if (msg === 'INVALID_AMOUNT') {
