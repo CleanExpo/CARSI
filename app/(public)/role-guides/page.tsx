@@ -2,14 +2,12 @@ import { ArrowRight } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-import { StaticMarketingClosingCta } from '@/components/marketing/StaticMarketingClosingCta';
-import { PlatformNav } from '@/components/marketing/PlatformNav';
 import {
-  LANDING_DISPLAY_H2_CLASS,
-  LANDING_EYEBROW_CLASS,
-  LANDING_LEAD_CLASS,
-  PUBLIC_SHELL_INNER_CLASS,
-} from '@/components/landing/public-shell-width';
+  PlatformContextualNext,
+  PlatformPageHeroFromSurface,
+  PlatformPageSection,
+} from '@/components/marketing/platform/PlatformPagePattern';
+import { StaticMarketingClosingCta } from '@/components/marketing/StaticMarketingClosingCta';
 import { getPublicSiteUrl } from '@/lib/env/public-url';
 import { authorityForNavItems } from '@/lib/marketing/authority-for-nav';
 import { ROLE_GUIDES_HUB_PATH } from '@/lib/marketing/role-guides-path';
@@ -35,65 +33,81 @@ export const metadata: Metadata = {
 export default function ForRoleGuidesHubPage() {
   return (
     <>
-      <section className="relative overflow-hidden border-b border-slate-200/70 bg-white">
-        <div
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_90%_0%,rgba(36,144,237,0.11),transparent_58%)]"
-          aria-hidden
-        />
-        <div className={`relative ${PUBLIC_SHELL_INNER_CLASS} py-16 md:py-24`}>
-          <p className={LANDING_EYEBROW_CLASS}>CARSI Authority Machine</p>
-          <h1 className="mt-3 max-w-4xl font-[family-name:var(--font-display)] text-[2.15rem] leading-[1.1] font-semibold tracking-[-0.02em] text-slate-950 md:text-[3.1rem] md:leading-[1.06]">
-            Training guides written for the role you hire for
-          </h1>
-          <p className={`mt-5 max-w-3xl text-pretty ${LANDING_LEAD_CLASS}`}>
-            Each guide links live courses, cites primary Australian sources, and states what CARSI
-            does and does not claim. Guides stay out of search until they pass approval and
-            catalogue checks.
-          </p>
-          <PlatformNav current={ROLE_GUIDES_HUB_PATH} />
-          <p className="mt-8 text-sm text-slate-600">
+      <PlatformPageHeroFromSurface
+        current={ROLE_GUIDES_HUB_PATH}
+        variant="editorial"
+        glow="right"
+        actions={
+          <>
             <Link
               href="/authority"
-              className="font-semibold text-[#146fc2] underline-offset-4 hover:underline"
+              className="inline-flex min-h-12 items-center gap-2 rounded-full bg-[#146fc2] px-7 text-sm font-semibold text-white hover:bg-[#0f5fa8]"
             >
-              CARSI Authority Hub
+              Authority Hub
+              <ArrowRight className="h-4 w-4" aria-hidden />
             </Link>
-            {' — citation assets, research intake and machine-readable references.'}
-          </p>
-        </div>
-      </section>
-
-      <section className="border-t border-slate-200/70 bg-[#fafbfc] py-16 md:py-24">
-        <div className={PUBLIC_SHELL_INNER_CLASS}>
-          <p className={LANDING_EYEBROW_CLASS}>Six audiences</p>
-          <h2 className={`mt-3 max-w-2xl ${LANDING_DISPLAY_H2_CLASS}`}>Choose your guide</h2>
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {authorityForNavItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.slug}
-                  href={item.href}
-                  className="group flex h-full flex-col rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm transition hover:border-[#2490ed]/35"
-                >
-                  <Icon className="h-5 w-5 text-[#146fc2]" aria-hidden />
-                  <p className="mt-4 font-[family-name:var(--font-display)] text-lg font-semibold text-slate-950 group-hover:text-[#146fc2]">
-                    {item.audience}
-                  </p>
-                  <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-500">
-                    {item.summary}
-                  </p>
-                  <span className="mt-5 inline-flex items-center gap-1 text-sm font-medium text-[#146fc2]">
-                    Open guide
-                    <ArrowRight className="h-4 w-4" aria-hidden />
-                  </span>
-                </Link>
-              );
-            })}
+            <Link
+              href="/courses"
+              className="inline-flex min-h-12 items-center rounded-full border border-slate-200 bg-white px-7 text-sm font-semibold text-slate-800 hover:border-[#2490ed]/40 hover:text-[#146fc2]"
+            >
+              Browse courses
+            </Link>
+          </>
+        }
+        aside={
+          <div className="rounded-2xl border border-slate-200/80 bg-[#fafbfc] p-6">
+            <p className="text-xs font-semibold tracking-[0.14em] text-[#146fc2] uppercase">
+              Approval & search
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-slate-700">
+              Guides stay noindex until Phill approves copy and bundle courses pass catalogue
+              checks. Draft pages show a preview banner — never internal-only language in public
+              HTML.
+            </p>
           </div>
-        </div>
-      </section>
+        }
+      />
 
+      <PlatformPageSection
+        id="role-guide-grid"
+        eyebrow="Six audiences"
+        title="Pick the job title you hire for"
+        tone="white"
+        layout="wide"
+      >
+        <div className="mt-12 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+          {authorityForNavItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.slug}
+                href={item.href}
+                className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-[#fafbfc] p-6 shadow-sm transition hover:border-[#2490ed]/40 hover:bg-white"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <Icon className="h-6 w-6 text-[#146fc2]" aria-hidden />
+                  <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold tracking-wide text-slate-500 uppercase ring-1 ring-slate-200/80">
+                    Guide
+                  </span>
+                </div>
+                <p className="mt-5 font-[family-name:var(--font-display)] text-xl font-semibold text-slate-950 group-hover:text-[#146fc2]">
+                  {item.audience}
+                </p>
+                <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-600">{item.summary}</p>
+                <span className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-[#146fc2]">
+                  Open guide
+                  <ArrowRight
+                    className="h-4 w-4 transition group-hover:translate-x-0.5"
+                    aria-hidden
+                  />
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      </PlatformPageSection>
+
+      <PlatformContextualNext current={ROLE_GUIDES_HUB_PATH} />
       <StaticMarketingClosingCta />
     </>
   );
