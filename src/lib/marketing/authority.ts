@@ -1,3 +1,5 @@
+import { ROLE_GUIDES_HUB_PATH } from '@/lib/marketing/role-guides-path';
+
 export type AuthoritySource = {
   label: string;
   url: string;
@@ -82,6 +84,13 @@ export const authorityAssets: AuthorityAsset[] = [
     audience: 'Editors, contributors, AI answer engines and internal teams',
   },
   {
+    title: 'Role-specific training guides',
+    summary:
+      'Six role-specific guides that link live courses to builders, insurers, facility teams, healthcare, strata and cleaning contractors with cited sources.',
+    href: ROLE_GUIDES_HUB_PATH,
+    audience: 'Buyers, partners and search — each guide is noindex until approved',
+  },
+  {
     title: 'Start Smart readiness data',
     summary:
       'A structured map connecting professional equipment, service, chemicals and training before operators buy gear or take paid work.',
@@ -124,8 +133,7 @@ export const authorityTopics: AuthorityTopic[] = [
   },
   {
     title: 'Training due diligence for business buyers',
-    question:
-      'What should a buyer check before valuing a cleaning or carpet cleaning business?',
+    question: 'What should a buyer check before valuing a cleaning or carpet cleaning business?',
     proof:
       'Review equipment condition, staff training evidence, service boundaries, chemical records and callback patterns.',
     assets: [
@@ -140,11 +148,7 @@ export const authorityTopics: AuthorityTopic[] = [
       'Why does pH, dwell time, agitation and rinse matter before a new operator selects products?',
     proof:
       'Product choice must follow fibre, soil, stain history, SDS awareness, equipment method and customer sensitivity.',
-    assets: [
-      '/start-carpet-cleaning-business/chemistry-for-beginners',
-      '/courses',
-      '/research',
-    ],
+    assets: ['/start-carpet-cleaning-business/chemistry-for-beginners', '/courses', '/research'],
   },
   {
     title: 'Evidence-backed industry education',
@@ -194,36 +198,31 @@ export const communityChannels: AuthorityCommunityChannel[] = [
 export const citationTargets: CitationTarget[] = [
   {
     title: 'Industry associations and member resource pages',
-    fit:
-      'Best for high-trust links to training, readiness guides, credential verification and case study submissions.',
+    fit: 'Best for high-trust links to training, readiness guides, credential verification and case study submissions.',
     action:
       'Offer CARSI Start Smart as a free pre-start resource and invite reciprocal event/resource listing where appropriate.',
   },
   {
     title: 'Supplier education hubs',
-    fit:
-      'Best for CCW-aligned equipment, chemistry and service decision support without reducing CARSI to product promotion.',
+    fit: 'Best for CCW-aligned equipment, chemistry and service decision support without reducing CARSI to product promotion.',
     action:
       'Publish product-neutral buying checklists that link to CARSI training and CCW hands-on workshop enquiries.',
   },
   {
     title: 'Podcasts, YouTube channels and trade newsletters',
-    fit:
-      'Best for building an identifiable expert voice around learning, safety, quoting and business growth.',
+    fit: 'Best for building an identifiable expert voice around learning, safety, quoting and business growth.',
     action:
       'Pitch short evidence-led segments: one problem, one method, one mistake to avoid, one CARSI reference page.',
   },
   {
     title: 'Business startup and acquisition communities',
-    fit:
-      'Best for reaching people searching for low-barrier service business ideas or buying cleaning businesses.',
+    fit: 'Best for reaching people searching for low-barrier service business ideas or buying cleaning businesses.',
     action:
       'Place CARSI as the knowledge-before-risk resource for carpet cleaning startup decisions.',
   },
   {
     title: 'AI answer engines and search indexes',
-    fit:
-      'Best for stable, structured, source-backed answers to common cleaning and restoration training queries.',
+    fit: 'Best for stable, structured, source-backed answers to common cleaning and restoration training queries.',
     action:
       'Keep `robots.txt`, `llms.txt`, sitemap, citation pack, structured data and Bing/Google indexing current.',
   },

@@ -54,6 +54,8 @@ vi.mock('@/lib/server/professional-directory', async (importOriginal) => ({
   })),
 }));
 
+import { AuthorityPage } from '@/components/industries/AuthorityPage';
+import { AuthorityPageView } from '@/components/industries/AuthorityPageView';
 import sitemap from '../../../app/sitemap';
 import { authorityMetadata, buildAuthorityMetadata } from './authority-metadata';
 import {
@@ -63,8 +65,7 @@ import {
   validateAuthorityPage,
   type AuthorityPageEntry,
 } from './authority-pages';
-import { AuthorityPage } from '@/components/industries/AuthorityPage';
-import { AuthorityPageView } from '@/components/industries/AuthorityPageView';
+import { roleGuidePagePath } from './role-guides-path';
 
 process.env.DATABASE_URL ||= 'postgresql://test-only-placeholder/none';
 
@@ -79,16 +80,22 @@ const catalogueBySlug = new Map(
   (catalogue as Array<{ slug: string; priceAud: string; isFree: boolean }>).map((c) => [c.slug, c])
 );
 
-const HERO = { src: '/images/for/test-hero.jpg', alt: 'A technician reads a moisture meter' };
+const HERO = {
+  src: '/images/for/test-hero.webp',
+  alt: 'A technician reads a moisture meter',
+};
 
 /** Render a page the way production does: real loader, real cards. */
 async function renderPage(slug: string): Promise<string> {
   return renderToStaticMarkup(await AuthorityPage({ slug }));
 }
 
-/** Course slugs linked as cards in the rendered HTML. */
-function cardSlugs(html: string): string[] {
-  return [...new Set([...html.matchAll(/href="\/courses\/([a-z0-9-]+)"/g)].map((m) => m[1]))];
+/** Course slugs linked as cards in the rendered HTML (optional slugs to ignore, e.g. awaiting catalogue). */
+function cardSlugs(html: string, ignoreSlugs: readonly string[] = []): string[] {
+  const ignore = new Set(ignoreSlugs);
+  return [
+    ...new Set([...html.matchAll(/href="\/courses\/([a-z0-9-]+)"/g)].map((m) => m[1])),
+  ].filter((slug) => !ignore.has(slug));
 }
 
 /** The number shown beside "Live courses linked below". */
@@ -113,7 +120,11 @@ function approved(entry: AuthorityPageEntry): AuthorityPageEntry {
     status: 'approved',
     approvedBy: 'Phill',
     approvedAt: '2026-10-29',
-    heroImage: HERO,
+    heroImage: entry.heroImage ?? HERO,
+    bundle: {
+      ...entry.bundle,
+      awaitingCatalogueSlugs: entry.bundle.awaitingCatalogueSlugs ?? [],
+    },
   };
 }
 
@@ -134,12 +145,16 @@ describe('registry', () => {
     }
   });
 
-  it('every linked course is a published course in the catalogue', () => {
+  it('every linked published course is in the seed catalogue as published', () => {
     for (const p of authorityPages) {
       expect(p.bundle.publishedSlugs.length, p.slug).toBeGreaterThan(0);
       expect(new Set(p.bundle.publishedSlugs).size, p.slug).toBe(p.bundle.publishedSlugs.length);
       for (const slug of p.bundle.publishedSlugs) {
         expect(liveSlugs.has(slug), `${p.slug} -> ${slug}`).toBe(true);
+      }
+      for (const slug of p.bundle.awaitingCatalogueSlugs ?? []) {
+        expect(catalogueBySlug.has(slug), `${p.slug} awaiting -> ${slug}`).toBe(true);
+        expect(liveSlugs.has(slug), `${p.slug} awaiting must not block grid`).toBe(true);
       }
     }
   });
@@ -179,7 +194,10 @@ describe('noindex gate (finding 1: approval validation owns indexability)', () =
   });
 
   it('a valid approved entry with every course published becomes indexable', () => {
-    expect(buildAuthorityMetadata(ok, liveSlugs).robots).toEqual(INDEX);
+    const meta = buildAuthorityMetadata(ok, liveSlugs);
+    expect(meta.robots).toEqual(INDEX);
+    expect(meta.openGraph?.images).toBeDefined();
+    expect(meta.twitter?.images).toBeDefined();
   });
 
   it('approved status alone is not enough: each failed check keeps the page noindex', () => {
@@ -224,9 +242,11 @@ describe('noindex gate (finding 1: approval validation owns indexability)', () =
 
   it('every page file uses the registry-driven metadata (noindex while draft, no DB read)', async () => {
     for (const p of authorityPages) {
-      const file = join(ROOT, 'app', '(public)', 'for', p.slug, 'page.tsx');
+      const file = join(ROOT, 'app', '(public)', 'role-guides', p.slug, 'page.tsx');
       expect(existsSync(file), file).toBe(true);
-      const mod = (await import(/* @vite-ignore */ `../../../app/(public)/for/${p.slug}/page`)) as {
+      const mod = (await import(
+        /* @vite-ignore */ `../../../app/(public)/role-guides/${p.slug}/page`
+      )) as {
         generateMetadata: () => Promise<{ robots: unknown }>;
       };
       const before = db.calls;
@@ -237,16 +257,16 @@ describe('noindex gate (finding 1: approval validation owns indexability)', () =
 });
 
 describe('sitemap', () => {
-  it('lists no /for/ URL while all are draft', async () => {
+  it('lists no role-guide child URL while all are draft', async () => {
     const urls = (await sitemap()).map((e) => e.url);
-    expect(urls.filter((u) => u.includes('/for/'))).toEqual([]);
+    expect(urls.filter((u) => u.includes('/role-guides/'))).toEqual([]);
   });
 
   it('lists exactly the approved entries that pass validation', () => {
     const good = fresh(approved(authorityPages[1]));
     const noApprover = { ...fresh(approved(authorityPages[2])), approvedBy: null };
     const pages = [good, noApprover, authorityPages[0]];
-    expect(authoritySitemapPaths(liveSlugs, pages)).toEqual([`/for/${good.slug}`]);
+    expect(authoritySitemapPaths(liveSlugs, pages)).toEqual([roleGuidePagePath(good.slug)]);
     expect(authoritySitemapPaths(new Set(), pages)).toEqual([]);
     expect(authoritySitemapPaths(liveSlugs)).toEqual([]);
   });
@@ -292,7 +312,11 @@ describe('approval guard', () => {
   it('blanking any leaf of a valid approved entry makes it unpublishable (allow-list)', () => {
     const ok = fresh(approved(authorityPages[0]));
     expect(isAuthorityPagePublishable(ok, liveSlugs)).toBe(true);
-    const MAY_BE_EMPTY = new Set(['bundle.plannedModules', 'bundle.plannedModules[].minutes']);
+    const MAY_BE_EMPTY = new Set([
+      'bundle.plannedModules',
+      'bundle.plannedModules[].minutes',
+      'bundle.awaitingCatalogueSlugs',
+    ]);
     const paths: string[] = [];
     const walk = (value: unknown, path: string) => {
       if (path) paths.push(path);
@@ -444,8 +468,11 @@ describe('approval guard', () => {
         .map((p) => p.heroImage!.src)
         .filter((src) => !existsSync(join(ROOT, 'public', src)));
     expect(missing(authorityPages)).toEqual([]);
-    // Control: the same check fires for a path that is not committed.
-    expect(missing([approved(authorityPages[0])])).toEqual([HERO.src]);
+    expect(
+      missing([
+        { ...approved(authorityPages[0]), heroImage: { ...HERO, src: '/images/for/missing.webp' } },
+      ])
+    ).toEqual(['/images/for/missing.webp']);
   });
 
   it('rejects approval without a hero visual and alt text', () => {
@@ -511,7 +538,9 @@ describe('never-claim strings', () => {
   it('renders the real course cards for every linked course (finding 2)', () => {
     for (const p of authorityPages) {
       const html = rendered.find((r) => r.slug === p.slug)!.html;
-      expect(cardSlugs(html).sort(), p.slug).toEqual([...p.bundle.publishedSlugs].sort());
+      expect(cardSlugs(html, p.bundle.awaitingCatalogueSlugs ?? []).sort(), p.slug).toEqual(
+        [...p.bundle.publishedSlugs].sort()
+      );
     }
   });
 
@@ -534,28 +563,37 @@ describe('never-claim strings', () => {
   });
 
   it('the live-course count equals the cards shown, even when a course is unpublished (finding 3)', async () => {
-    for (const r of rendered) expect(liveCountStat(r.html), r.slug).toBe(cardSlugs(r.html).length);
+    for (const r of rendered) {
+      const p = authorityPages.find((x) => x.slug === r.slug)!;
+      expect(liveCountStat(r.html), r.slug).toBe(
+        cardSlugs(r.html, p.bundle.awaitingCatalogueSlugs ?? []).length
+      );
+    }
     const p = authorityPages[0];
     db.hiddenSlugs = new Set([p.bundle.publishedSlugs[0]]);
     try {
       const html = await renderPage(p.slug);
-      expect(cardSlugs(html)).not.toContain(p.bundle.publishedSlugs[0]);
+      expect(cardSlugs(html, p.bundle.awaitingCatalogueSlugs ?? [])).not.toContain(
+        p.bundle.publishedSlugs[0]
+      );
       expect(liveCountStat(html)).toBe(p.bundle.publishedSlugs.length - 1);
     } finally {
       db.hiddenSlugs = new Set();
     }
   });
 
-  it('shows the hero visual only when the entry has one', () => {
+  it('shows the hero visual when the entry has one', () => {
     const p = authorityPages[0];
+    expect(p.heroImage).not.toBeNull();
     const without = renderToStaticMarkup(
-      createElement(AuthorityPageView, { entry: p, courses: [] })
+      createElement(AuthorityPageView, {
+        entry: { ...p, heroImage: null },
+        courses: [],
+      })
     );
-    expect(without).not.toContain(HERO.alt);
-    const withHero = renderToStaticMarkup(
-      createElement(AuthorityPageView, { entry: { ...p, heroImage: HERO }, courses: [] })
-    );
-    expect(withHero).toContain(`alt="${HERO.alt}"`);
+    expect(without).not.toContain(p.heroImage!.alt);
+    const html = rendered.find((r) => r.slug === p.slug)!.html;
+    expect(html).toContain(p.heroImage!.alt);
   });
 
   it('carries no unsourced generalisation from the review (findings 4 and 5)', () => {
@@ -580,7 +618,10 @@ describe('never-claim strings', () => {
       // Catalogue prices are the one permitted dollar figure; they are checked above.
       for (const slug of p.bundle.publishedSlugs)
         html = html.split(cataloguePriceLabel(slug)).join('');
-      const src = readFileSync(join(ROOT, 'app', '(public)', 'for', p.slug, 'page.tsx'), 'utf8');
+      const src = readFileSync(
+        join(ROOT, 'app', '(public)', 'role-guides', p.slug, 'page.tsx'),
+        'utf8'
+      );
       const registryText = JSON.stringify(p);
       for (const re of NEVER) {
         expect(re.test(html), `${p.slug} html ${re}`).toBe(false);
@@ -595,11 +636,17 @@ describe('never-claim strings', () => {
     expect(html).toMatch(/not regulated (agent )?CPD|not offered as regulated/i);
   });
 
-  it('draft pages show a visible draft banner and name each claim source', () => {
+  it('draft pages show a visible preview banner and name each claim source', () => {
     for (const p of authorityPages) {
       const html = rendered.find((r) => r.slug === p.slug)!.html;
-      expect(html).toMatch(/Draft/);
+      expect(html).toMatch(/Preview page|Draft/);
       for (const c of p.claims) expect(html).toContain(c.sourceUrl.replace(/&/g, '&amp;'));
     }
+  });
+
+  it('includes breadcrumb and role cross-link markers', () => {
+    const html = rendered.find((r) => r.slug === authorityPages[0].slug)!.html;
+    expect(html).toContain('Role guides');
+    expect(html).toContain('Related training guides');
   });
 });
