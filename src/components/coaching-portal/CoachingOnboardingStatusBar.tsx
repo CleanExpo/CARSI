@@ -23,6 +23,7 @@ export function CoachingOnboardingStatusBar() {
     <section
       className="mb-8 rounded-xl border border-white/[0.08] bg-white/[0.02] p-4 sm:p-5"
       aria-label="Onboarding progress"
+      data-testid="coaching-onboarding-status"
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
