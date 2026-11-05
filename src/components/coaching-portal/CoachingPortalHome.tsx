@@ -16,6 +16,7 @@ import { CoachingCheckInCard } from '@/components/coaching-portal/CoachingAccoun
 import { CoachingAskCoachPanel } from '@/components/coaching-portal/CoachingAskCoachPanel';
 import { CoachingOnboardingStatusBar } from '@/components/coaching-portal/CoachingOnboardingStatusBar';
 import { useCoachingPortal } from '@/components/coaching-portal/CoachingPortalContext';
+import { CoachingFeatureSpotlight } from '@/components/coaching-portal/visual/CoachingFeatureSpotlight';
 import { coachingPortalPath } from '@/lib/coaching-portal/coaching-portal-paths';
 import { CheckCircle2, Circle, Megaphone } from 'lucide-react';
 
@@ -180,31 +181,29 @@ function ActiveHome() {
       <CoachingOnboardingStatusBar />
 
       {marketing.profileReady ? (
-        <section className={`${coachingCard} mb-4 border-sky-500/20 bg-gradient-to-br from-sky-950/40 to-[#0a101c]`}>
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex gap-3">
-              <Megaphone className="mt-0.5 h-5 w-5 shrink-0 text-sky-400" aria-hidden />
-              <div>
-                <h2 className={coachingCardTitle}>Marketing pack (A7)</h2>
-                <p className={`mt-1 ${coachingMuted}`}>
-                  {marketing.hasPack
-                    ? `Website review, local-search checklist and 30 days of draft posts${
-                        marketing.checksPassed != null && marketing.checksTotal
-                          ? ` — ${marketing.checksPassed}/${marketing.checksTotal} site checks passing`
-                          : ''
-                      }.`
-                    : 'Run an automated review of your website and Google link, get ranked fixes, and a month of claim-safe social drafts.'}
-                  {marketing.proposedFixCount > 0
-                    ? ` ${marketing.proposedFixCount} fix${marketing.proposedFixCount === 1 ? '' : 'es'} waiting for your coach on the action board.`
-                    : ''}
-                </p>
-              </div>
-            </div>
-            <Link href={coachingPortalPath('/marketing')} className={coachingPrimaryBtn}>
-              {marketing.hasPack ? 'Open marketing pack' : 'Build my pack'}
-            </Link>
-          </div>
-        </section>
+        <CoachingFeatureSpotlight
+          testId="home-marketing-pack-spotlight"
+          eyebrow="Advantage A7"
+          title="Marketing pack"
+          icon={Megaphone}
+          description={
+            marketing.hasPack
+              ? `Website review, checklist and 30 days of drafts${
+                  marketing.checksPassed != null && marketing.checksTotal
+                    ? ` — ${marketing.checksPassed}/${marketing.checksTotal} site checks passing`
+                    : ''
+                }.${
+                  marketing.proposedFixCount > 0
+                    ? ` ${marketing.proposedFixCount} fix${marketing.proposedFixCount === 1 ? '' : 'es'} awaiting coach approval.`
+                    : ''
+                }`
+              : 'Automated website and Google link review, ranked fixes, and claim-safe social drafts — coach approves before anything hits your action board.'
+          }
+          primaryHref={coachingPortalPath('/marketing')}
+          primaryLabel={marketing.hasPack ? 'Open marketing pack' : 'Build my pack'}
+          secondaryHref={coachingPortalPath('/actions')}
+          secondaryLabel={marketing.proposedFixCount > 0 ? 'View proposed fixes' : 'Action board'}
+        />
       ) : null}
 
       <div className="grid gap-4 lg:grid-cols-2">
