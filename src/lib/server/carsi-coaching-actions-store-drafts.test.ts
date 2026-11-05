@@ -28,6 +28,7 @@ vi.mock('@/lib/server/carsi-coaching-learning-path', () => ({
   isLearningAction: (goalId: string | null) => Boolean(goalId?.startsWith('course:')),
 }));
 
+import { MARKETING_ACTION_GOAL_PREFIX } from '@/lib/coaching-portal/marketing-pack/proposed-actions';
 import { MEMBER_BOARD_STATUSES } from '@/lib/coaching-portal/monthly-review';
 import {
   deleteCoachingActionForUser,
@@ -45,12 +46,21 @@ beforeEach(() => {
 });
 
 describe('member action store hides coach drafts (GP-629)', () => {
-  it('reads only the four board statuses (an allowlist, so a new hidden status can never leak)', async () => {
+  it('reads an allowlist: board statuses, plus marketing-pack rows waiting on the coach', async () => {
     await listCoachingActionsForUser(USER);
     const where = mock.findMany.mock.calls[0][0].where;
     expect(where.userId).toBe(USER);
-    expect(where.status).toEqual({ in: [...MEMBER_BOARD_STATUSES] });
+    // No bare status filter: a new hidden status is absent from both branches, so it cannot leak.
+    expect(where.status).toBeUndefined();
+    expect(where.OR).toEqual([
+      { status: { in: [...MEMBER_BOARD_STATUSES] } },
+      {
+        status: { in: ['proposed', 'declined'] },
+        goalId: { startsWith: MARKETING_ACTION_GOAL_PREFIX },
+      },
+    ]);
     expect(MEMBER_BOARD_STATUSES).toEqual(['todo', 'in_progress', 'done', 'blocked']);
+    expect(MARKETING_ACTION_GOAL_PREFIX).toBe('marketing-pack:');
   });
 
   it('refuses a member edit of a draft row: no update, no create with that id', async () => {

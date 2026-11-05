@@ -40,8 +40,18 @@ export async function POST(request: NextRequest) {
     progressNote: typeof body.progressNote === 'string' ? body.progressNote : null,
     dueDate: typeof body.dueDate === 'string' && body.dueDate ? new Date(body.dueDate) : null,
   });
-  // A coach draft is answered exactly like a row that does not exist (GP-629).
-  if (!result.ok) return NextResponse.json({ detail: 'Not found.' }, { status: 404 });
+  if (!result.ok) {
+    // Marketing-pack rows the member can see, but only the coach can move (GP-634).
+    if ('reason' in result && result.reason === 'awaiting_coach') {
+      return NextResponse.json(
+        { detail: 'This action is waiting for your coach to approve it.' },
+        { status: 409 }
+      );
+    }
+    // A coach draft, review record or hidden learning row is answered exactly like a
+    // row that does not exist (GP-629).
+    return NextResponse.json({ detail: 'Not found.' }, { status: 404 });
+  }
 
   const items = await listCoachingActionsForUser(claims.sub);
   return NextResponse.json({ items });

@@ -104,6 +104,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const contactsActive = pathname.startsWith('/admin/contacts');
   const marketingActive = pathname.startsWith('/admin/marketing');
   const businessCoachingAdminActive = pathname.startsWith('/admin/business-coaching');
+  const coachingActionsActive = pathname.startsWith('/admin/coaching-actions');
   const learningPathsActive = pathname.startsWith('/admin/coaching-learning-paths');
   const monthlyReviewActive = pathname.startsWith('/admin/coaching-monthly-review');
   const coachQuestionsActive = pathname.startsWith('/admin/coaching-questions');
@@ -191,6 +192,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           label="Owner Circle"
           icon={Users}
           active={businessCoachingAdminActive}
+        />
+        <NavButton
+          href="/admin/coaching-actions"
+          label="Coaching approvals"
+          icon={ClipboardCheck}
+          active={coachingActionsActive}
         />
         <NavButton
           href="/admin/coaching-learning-paths"

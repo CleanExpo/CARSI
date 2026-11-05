@@ -170,7 +170,12 @@ describe('AdminShell responsive navigation', () => {
     const sidebar = container.querySelector('aside')!;
     expect(sidebar.classList.contains('md:w-[240px]')).toBe(true);
     expect(sidebar.classList.contains('md:flex')).toBe(true);
-    expect(sidebar.querySelectorAll('nav a')).toHaveLength(19);
+    const links = sidebar.querySelectorAll('nav a');
+    // Main's shared sidebar, plus GP-634's Coaching approvals entry.
+    expect(links).toHaveLength(20);
+    expect(sidebar.querySelector('a[href="/admin/coaching-actions"]')?.textContent).toContain(
+      'Coaching approvals'
+    );
     expect(container.querySelector('main')?.classList.contains('min-w-0')).toBe(true);
     await open();
     await act(async () => onBreakpoint?.({ matches: true }));

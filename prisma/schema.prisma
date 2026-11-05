@@ -73,6 +73,7 @@ model LmsUser {
   coachingAssessments           CarsiCoachingAssessment[]
   coachingSessions              CarsiCoachingSession[]
   coachingActions               CarsiCoachingAction[]
+  coachingMarketingPacks        CarsiCoachingMarketingPack[]
   margotConversations           MargotConversation[]
   ccwRoadshowSignIns    CcwRoadshowSignIn[]       @relation("SignInStudent")
 
@@ -1361,6 +1362,29 @@ model CarsiCoachingAction {
 
   @@index([userId, status])
   @@map("carsi_coaching_actions")
+}
+
+/// GP-634 (Coaching advantage A7): one generated AI marketing pack per run. The member's
+/// downloadable resources (website review, local-search checklist, 30-day social calendar) are
+/// read from the latest row; fixes are written to carsi_coaching_actions as status 'proposed'.
+model CarsiCoachingMarketingPack {
+  id                String   @id @default(uuid()) @db.Uuid
+  userId            String   @map("user_id") @db.Uuid
+  websiteUrl        String?  @map("website_url") @db.Text
+  googleBusinessUrl String?  @map("google_business_url") @db.Text
+  reviewJson        String   @map("review_json") @db.Text
+  checklistJson     String   @map("checklist_json") @db.Text
+  calendarJson      String   @map("calendar_json") @db.Text
+  voiceJson         String   @map("voice_json") @db.Text
+  /// 'ai' | 'ai+template' | 'template'
+  calendarSource    String   @map("calendar_source") @db.VarChar(32)
+  model             String?  @db.VarChar(120)
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user LmsUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("carsi_coaching_marketing_packs")
 }
 
 /// GP-631 (Coaching advantage A4): a coach's own knowledge base. Keyed by coach id (the same
