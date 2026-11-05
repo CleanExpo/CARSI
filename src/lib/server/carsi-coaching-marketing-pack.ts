@@ -21,6 +21,10 @@ import type {
 } from '@/lib/coaching-portal/marketing-pack/types';
 import { parseAssessmentResponsesJson } from '@/lib/coaching-portal/assessment-schema';
 import { parseStoredMarketingPackRow } from '@/lib/coaching-portal/marketing-pack/stored-pack';
+import {
+  summarizeMarketingPack,
+  type MarketingPackSummary,
+} from '@/lib/coaching-portal/marketing-pack/pack-summary';
 import { prisma } from '@/lib/prisma';
 import { replaceProposedMarketingActions } from '@/lib/server/carsi-coaching-actions-store';
 import { fetchPublicPage } from '@/lib/server/safe-public-fetch';
@@ -200,4 +204,41 @@ export async function getLatestMarketingPackForUser(
     createdAt: row.createdAt,
   });
   return parsed;
+}
+
+const PACK_HISTORY_LIMIT = 5;
+
+/** Recent packs for progress comparison (newest first). */
+export async function listMarketingPackSummariesForUser(
+  userId: string,
+  limit = PACK_HISTORY_LIMIT
+): Promise<MarketingPackSummary[]> {
+  const rows = await prisma.carsiCoachingMarketingPack.findMany({
+    where: { userId },
+    orderBy: { createdAt: 'desc' },
+    take: limit,
+    select: {
+      id: true,
+      reviewJson: true,
+      checklistJson: true,
+      calendarJson: true,
+      voiceJson: true,
+      calendarSource: true,
+      createdAt: true,
+    },
+  });
+  const summaries: MarketingPackSummary[] = [];
+  for (const row of rows) {
+    const parsed = parseStoredMarketingPackRow({
+      id: row.id,
+      calendarSource: row.calendarSource,
+      reviewJson: row.reviewJson,
+      checklistJson: row.checklistJson,
+      calendarJson: row.calendarJson,
+      voiceJson: row.voiceJson,
+      createdAt: row.createdAt,
+    });
+    if (parsed) summaries.push(summarizeMarketingPack(parsed.id, parsed));
+  }
+  return summaries;
 }
