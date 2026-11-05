@@ -67,6 +67,16 @@ const nextConfig: NextConfig = {
       // Existing marketing links use /signup; keep the course return path and
       // attribution query intact while sending learners to the real form.
       { source: '/signup', destination: '/register', permanent: true },
+      {
+        source: '/for',
+        destination: '/role-guides',
+        permanent: true,
+      },
+      {
+        source: '/for/:slug',
+        destination: '/role-guides/:slug',
+        permanent: true,
+      },
       // Personal onboarding is a dashboard modal, not the enterprise-only
       // /dashboard/onboarding hub. Give public visitors a useful starting point.
       { source: '/onboarding', destination: '/pathways', permanent: false },

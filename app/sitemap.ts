@@ -1,13 +1,14 @@
-import { MetadataRoute } from 'next';
 import { getBackendOrigin, getPublicSiteUrl } from '@/lib/env/public-url';
 import { authorityPath } from '@/lib/marketing/authority';
 import { authoritySitemapPaths } from '@/lib/marketing/authority-pages';
 import { ccwRoadshowPath } from '@/lib/marketing/ccw-roadshow';
+import { ROLE_GUIDES_HUB_PATH } from '@/lib/marketing/role-guides-path';
 import { startSmartBasePath, startSmartPages } from '@/lib/marketing/start-smart';
-import { getPublishedCourseSlugsFromDatabase } from '@/lib/server/public-courses-list';
+import { hasPublicCoursePage } from '@/lib/seo/public-course-page';
 import { isBuildPhase } from '@/lib/server/build-phase';
 import { getProfessionalDirectoryStatus } from '@/lib/server/professional-directory';
-import { hasPublicCoursePage } from '@/lib/seo/public-course-page';
+import { getPublishedCourseSlugsFromDatabase } from '@/lib/server/public-courses-list';
+import { MetadataRoute } from 'next';
 
 // ISR: regenerate every 5 minutes instead of on every crawl (issue #129). Build-safe
 // because getCourses/getPathways short-circuit during the build phase.
@@ -53,6 +54,7 @@ const staticPages = [
   { path: '/refund-policy', priority: 0.35, changeFreq: 'yearly' as const },
   { path: '/support', priority: 0.4, changeFreq: 'monthly' as const },
   { path: authorityPath, priority: 0.82, changeFreq: 'weekly' as const },
+  { path: ROLE_GUIDES_HUB_PATH, priority: 0.74, changeFreq: 'weekly' as const },
   { path: ccwRoadshowPath, priority: 0.9, changeFreq: 'daily' as const },
   { path: '/ccw-melbourne', priority: 0.85, changeFreq: 'daily' as const },
   { path: '/ccw-sydney', priority: 0.85, changeFreq: 'daily' as const },
