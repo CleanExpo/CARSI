@@ -4,13 +4,14 @@ import {
   Droplets,
   HardHat,
   House,
-  type LucideIcon,
   Shield,
   SprayCan,
   Stethoscope,
   Wind,
+  type LucideIcon,
 } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 import {
   IndustryCTA,
@@ -21,19 +22,32 @@ import {
   IndustryPageLayout,
   IndustryWhySection,
 } from '@/components/industries';
+import { AuthorityForCrossLinks } from '@/components/industries/AuthorityForCrossLinks';
 import {
   LANDING_DISPLAY_H2_CLASS,
   LANDING_EYEBROW_CLASS,
   LANDING_LEAD_CLASS,
   PUBLIC_SHELL_INNER_CLASS,
 } from '@/components/landing/public-shell-width';
-import { FAQSchema } from '@/components/seo/JsonLd';
+import {
+  BreadcrumbSchema,
+  FAQSchema,
+  ItemListSchema,
+  WebPageSchema,
+} from '@/components/seo/JsonLd';
+import { getPublicSiteUrl } from '@/lib/env/public-url';
+import { catalogueCourseTitle } from '@/lib/marketing/authority-catalogue-titles';
+import {
+  authorityPageLatestVerified,
+  formatAuthorityAuDate,
+} from '@/lib/marketing/authority-for-nav';
 import {
   isAuthorityPagePublishable,
   type AuthorityCardIcon,
   type AuthorityIcon,
   type AuthorityPageEntry,
 } from '@/lib/marketing/authority-pages';
+import { ROLE_GUIDES_HUB_PATH, roleGuidePagePath } from '@/lib/marketing/role-guides-path';
 import type { IndustryCourseItem } from '@/lib/server/industry-courses';
 
 const ACCENT = '#146fc2';
@@ -57,8 +71,7 @@ const CARD_ICONS: Record<AuthorityCardIcon, LucideIcon> = {
 
 /** 2026-10-20 -> 20/10/2026 (Australian date order). */
 function auDate(iso: string): string {
-  const [y, m, d] = iso.split('-');
-  return `${d}/${m}/${y}`;
+  return formatAuthorityAuDate(iso);
 }
 
 /**
@@ -73,7 +86,12 @@ export function AuthorityPageView({
   entry: AuthorityPageEntry;
   courses: IndustryCourseItem[];
 }) {
+  const siteUrl = getPublicSiteUrl();
+  const pageUrl = `${siteUrl}${roleGuidePagePath(entry.slug)}`;
   const publishable = isAuthorityPagePublishable(entry, new Set(courses.map((c) => c.slug)));
+  const sourcesUpdated = authorityPageLatestVerified(entry);
+  const featuredCourse = courses[0];
+  const awaitingSlugs = entry.bundle.awaitingCatalogueSlugs;
   const evidence = entry.claims.map((claim) => ({
     title: claim.sourceTitle,
     publisher: claim.publisher,
@@ -83,7 +101,34 @@ export function AuthorityPageView({
 
   return (
     <IndustryPageLayout>
+      <WebPageSchema
+        name={entry.title}
+        description={entry.metaDescription}
+        url={pageUrl}
+        dateModified={sourcesUpdated}
+      />
+      <BreadcrumbSchema
+        items={[
+          { name: 'Home', url: siteUrl },
+          { name: 'Role guides', url: `${siteUrl}${ROLE_GUIDES_HUB_PATH}` },
+          { name: entry.audience, url: pageUrl },
+        ]}
+      />
       <FAQSchema questions={entry.faqs} />
+      {courses.length > 0 ? (
+        <ItemListSchema
+          name={`Live courses for ${entry.shortAudience}`}
+          description="Published CARSI courses linked from this role guide."
+          itemType="Course"
+          items={courses.map((course) => ({
+            name: course.title,
+            url: `${siteUrl}/courses/${course.slug}`,
+            description: course.short_description ?? course.title,
+            price: course.is_free ? 0 : Number(course.price_aud),
+            isFree: course.is_free,
+          }))}
+        />
+      ) : null}
 
       {!publishable && (
         <div
@@ -91,8 +136,9 @@ export function AuthorityPageView({
           className="border-b border-amber-300/80 bg-gradient-to-r from-amber-50 to-amber-100/90 py-3.5 text-center text-sm text-amber-950 shadow-sm"
         >
           <div className={`${PUBLIC_SHELL_INNER_CLASS} font-medium`}>
-            Draft page — not cleared for publication. Hidden from search until Phill approves the
-            approval record and live course links.
+            Preview page — sources and courses are real, but this guide is not listed in search yet.
+            It goes live once approval, hero imagery and every linked course are confirmed on the
+            catalogue.
           </div>
         </div>
       )}
@@ -114,6 +160,11 @@ export function AuthorityPageView({
           { value: 'IICRC CEC', label: 'Shown only on courses with an approval in force' },
         ]}
       />
+
+      <p className={`${PUBLIC_SHELL_INNER_CLASS} -mt-6 pb-2 text-xs text-slate-500 md:-mt-8`}>
+        Primary sources last opened {auDate(sourcesUpdated)}.
+        {entry.approvedAt ? ` Approval record dated ${auDate(entry.approvedAt)}.` : ''}
+      </p>
 
       {entry.heroImage && (
         <div className={`${PUBLIC_SHELL_INNER_CLASS} pt-10`}>
@@ -148,6 +199,14 @@ export function AuthorityPageView({
           <p className={LANDING_EYEBROW_CLASS}>What CARSI does and does not claim</p>
           <h2 className={`mt-3 max-w-2xl ${LANDING_DISPLAY_H2_CLASS}`}>Read this first</h2>
           <p className={`mt-4 max-w-3xl ${LANDING_LEAD_CLASS}`}>{entry.scopeNote}</p>
+          <p className="mt-6 text-sm text-slate-600">
+            <Link
+              href={entry.livePageHref}
+              className="font-semibold text-[#146fc2] underline-offset-4 hover:underline"
+            >
+              {entry.livePageLabel}
+            </Link>
+          </p>
         </div>
       </section>
 
@@ -158,9 +217,42 @@ export function AuthorityPageView({
         emptyLiveCoursesNote={
           publishable && courses.length === 0
             ? 'This page is approved, but no published courses match its bundle yet. The grid will fill in automatically once those slugs are live in the catalogue.'
-            : undefined
+            : courses.length < entry.bundle.publishedSlugs.length
+              ? `${entry.bundle.publishedSlugs.length - courses.length} course(s) in this bundle are not published on the catalogue yet. Only live courses are shown below.`
+              : undefined
         }
       />
+
+      {awaitingSlugs.length > 0 ? (
+        <section className="border-t border-slate-200/70 bg-[#fafbfc] py-12 md:py-16">
+          <div className={PUBLIC_SHELL_INNER_CLASS}>
+            <p className={LANDING_EYEBROW_CLASS}>Catalogue catch-up</p>
+            <h2 className={`mt-3 max-w-2xl text-xl font-semibold text-slate-950 md:text-2xl`}>
+              Named on this guide — added to the grid when live
+            </h2>
+            <p className={`mt-4 max-w-2xl ${LANDING_LEAD_CLASS}`}>
+              These courses are in the CARSI seed catalogue but may not be on the live site yet.
+              They do not block publication of this guide; cards appear automatically once the
+              course page is published.
+            </p>
+            <ul className="mt-8 space-y-3">
+              {awaitingSlugs.map((slug) => (
+                <li key={slug}>
+                  <Link
+                    href={`/courses/${slug}`}
+                    className="flex flex-col rounded-2xl border border-slate-200/80 bg-white px-5 py-4 transition hover:border-[#146fc2]/35 sm:flex-row sm:items-center sm:justify-between"
+                  >
+                    <span className="font-medium text-slate-900">{catalogueCourseTitle(slug)}</span>
+                    <span className="mt-1 text-sm text-slate-500 sm:mt-0">
+                      Opens when published on carsi.com.au
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      ) : null}
 
       {entry.bundle.plannedModules.length > 0 && (
         <section className="border-t border-slate-200/70 bg-white py-16 md:py-20">
@@ -193,6 +285,8 @@ export function AuthorityPageView({
 
       <IndustryFAQSection industryName={entry.audience} faqs={entry.faqs} />
 
+      <AuthorityForCrossLinks currentSlug={entry.slug} />
+
       <IndustryCTA
         subtitle={entry.audience}
         title="Talk to CARSI about"
@@ -200,8 +294,8 @@ export function AuthorityPageView({
         description="Ask about the live courses, team seats, or the modules being built."
         ctaText="Talk to CARSI"
         ctaHref="/contact"
-        secondaryHref={entry.livePageHref}
-        secondaryText={entry.livePageLabel}
+        secondaryHref={featuredCourse ? `/courses/${featuredCourse.slug}` : '/courses'}
+        secondaryText={featuredCourse ? 'Open a recommended course' : 'Browse all courses'}
         accentColor={ACCENT}
       />
     </IndustryPageLayout>

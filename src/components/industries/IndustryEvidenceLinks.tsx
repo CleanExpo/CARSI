@@ -44,7 +44,7 @@ export function IndustryEvidenceLinks({ links }: IndustryEvidenceLinksProps) {
                 className="group flex h-full items-start justify-between gap-4 rounded-2xl border border-slate-200/80 bg-[#fafbfc] p-6 transition hover:border-[#146fc2]/35 hover:bg-white"
               >
                 <span>
-                  <span className="block text-sm font-semibold text-slate-950">{link.title}</span>
+                  <h3 className="text-sm font-semibold text-slate-950">{link.title}</h3>
                   <span className="mt-1 block text-xs font-medium text-[#146fc2]">
                     {link.publisher}
                   </span>
