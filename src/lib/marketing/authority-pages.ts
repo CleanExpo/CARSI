@@ -1,6 +1,7 @@
 import { z } from 'zod/v3';
 
 import { healthcareRecommendedSlugs } from '@/lib/marketing/industry-track1-topics';
+import { roleGuidePagePath } from '@/lib/marketing/role-guides-path';
 
 /**
  * Registry for the six /for/<industry> authority pages (CARSI Authority Machine, slice 3).
@@ -66,7 +67,15 @@ export interface AuthorityPageEntry {
   claims: AuthorityClaim[];
   /** What CARSI does and does not claim on this page. */
   scopeNote: string;
-  bundle: { publishedSlugs: string[]; plannedModules: AuthorityPlannedModule[] };
+  bundle: {
+    publishedSlugs: string[];
+    /**
+     * Courses named on this guide but not required to be live before approval (seed may be ahead of
+     * production). Shown as “when live” links; they do not block `isAuthorityPagePublishable`.
+     */
+    awaitingCatalogueSlugs: string[];
+    plannedModules: AuthorityPlannedModule[];
+  };
   faqs: { question: string; answer: string }[];
   /** The existing, live /industries page for this audience. */
   livePageHref: string;
@@ -100,13 +109,22 @@ const iicrcFaq = {
     'No. CARSI is an IICRC CEC Accredited provider. Where the IICRC has approved a course, its CEC hours are shown on the course page. IICRC certification itself is obtained only through schools and examinations approved by the IICRC.',
 };
 
+function forHero(slug: AuthorityPageEntry['slug'], alt: string): AuthorityHeroImage {
+  return { src: `/images/for/${slug}.webp`, alt };
+}
+
+const MOISTURE_METERS_SLUG = 'moisture-meters-readings-and-dry-standards';
+
 export const authorityPages: AuthorityPageEntry[] = [
   {
     slug: 'nsw-builders',
     status: 'draft',
     approvedBy: null,
     approvedAt: null,
-    heroImage: null,
+    heroImage: forHero(
+      'nsw-builders',
+      'Technician checks moisture in timber framing before reinstatement work'
+    ),
     audience: 'NSW licensed builders',
     shortAudience: 'builders',
     icon: 'hardhat',
@@ -155,11 +173,11 @@ export const authorityPages: AuthorityPageEntry[] = [
       publishedSlugs: [
         'water-damage-essentials',
         'introduction-to-water-damage-restoration',
-        'moisture-meters-readings-and-dry-standards',
         'moisture-mould-and-indoor-air-quality-understanding-the-link',
         'introduction-to-digital-moisture-mapping',
         'introduction-to-water-damage-principles',
       ],
+      awaitingCatalogueSlugs: [MOISTURE_METERS_SLUG],
       plannedModules: [
         {
           title: 'Water-damaged homes: what the builder must check before reinstating',
@@ -196,7 +214,10 @@ export const authorityPages: AuthorityPageEntry[] = [
     status: 'draft',
     approvedBy: null,
     approvedAt: null,
-    heroImage: null,
+    heroImage: forHero(
+      'insurance-claims-staff',
+      'Restoration drying setup documented after a commercial water loss'
+    ),
     audience: 'Insurance claims staff and loss adjusters',
     shortAudience: 'claims staff and loss adjusters',
     icon: 'clipboard',
@@ -256,8 +277,8 @@ export const authorityPages: AuthorityPageEntry[] = [
         'introduction-to-water-damage-principles',
         'introduction-to-forensic-investigations-for-water-losses',
         'introduction-to-water-damage-estimating',
-        'moisture-meters-readings-and-dry-standards',
       ],
+      awaitingCatalogueSlugs: [MOISTURE_METERS_SLUG],
       plannedModules: [
         {
           title:
@@ -288,7 +309,10 @@ export const authorityPages: AuthorityPageEntry[] = [
     status: 'draft',
     approvedBy: null,
     approvedAt: null,
-    heroImage: null,
+    heroImage: forHero(
+      'facility-managers',
+      'Air movers set up for structural drying in a commercial building'
+    ),
     audience: 'Facility managers and building owners',
     shortAudience: 'facility managers and building owners',
     icon: 'building',
@@ -348,6 +372,7 @@ export const authorityPages: AuthorityPageEntry[] = [
         'moisture-mould-and-indoor-air-quality-understanding-the-link',
         'introduction-to-iaq-and-mould-understanding-airborne-spread-and-containment',
       ],
+      awaitingCatalogueSlugs: [],
       plannedModules: [
         { title: 'Water first response for building managers', minutes: 60, status: 'not_built' },
         {
@@ -379,7 +404,10 @@ export const authorityPages: AuthorityPageEntry[] = [
     status: 'draft',
     approvedBy: null,
     approvedAt: null,
-    heroImage: null,
+    heroImage: forHero(
+      'healthcare-facilities',
+      'Healthcare facility cleaning crew working in a clinical corridor'
+    ),
     audience: 'Victorian healthcare facilities',
     shortAudience: 'healthcare facilities',
     icon: 'stethoscope',
@@ -439,6 +467,7 @@ export const authorityPages: AuthorityPageEntry[] = [
         ...healthcareRecommendedSlugs,
         'introduction-to-drying-health-care-facilities',
       ],
+      awaitingCatalogueSlugs: [],
       plannedModules: [
         {
           title: 'Water damage and mould in clinical environments',
@@ -473,7 +502,10 @@ export const authorityPages: AuthorityPageEntry[] = [
     status: 'draft',
     approvedBy: null,
     approvedAt: null,
-    heroImage: null,
+    heroImage: forHero(
+      'property-and-strata-managers',
+      'Building materials staged for reinstatement after water damage'
+    ),
     audience: 'Property managers and strata managers',
     shortAudience: 'property and strata managers',
     icon: 'home',
@@ -543,6 +575,7 @@ export const authorityPages: AuthorityPageEntry[] = [
         'introduction-to-water-damage-restoration',
         'introduction-to-air-quality-fundamentals',
       ],
+      awaitingCatalogueSlugs: [],
       plannedModules: [
         { title: 'Mould and damp in Australian homes', minutes: 60, status: 'not_built' },
       ],
@@ -568,7 +601,10 @@ export const authorityPages: AuthorityPageEntry[] = [
     status: 'draft',
     approvedBy: null,
     approvedAt: null,
-    heroImage: null,
+    heroImage: forHero(
+      'commercial-cleaning-contractors',
+      'Technician using carpet extraction equipment on a commercial cleaning job'
+    ),
     audience: 'Commercial cleaning contractors and supervisors',
     shortAudience: 'cleaning contractors and supervisors',
     icon: 'spray',
@@ -623,6 +659,7 @@ export const authorityPages: AuthorityPageEntry[] = [
         'introduction-to-safety-procedures-for-water-damage-work',
         'introduction-to-water-damage-in-commercial-buildings',
       ],
+      awaitingCatalogueSlugs: [],
       plannedModules: [
         {
           title: 'Mould and water-damaged buildings: recognise, stop, escalate',
@@ -676,7 +713,7 @@ export function authoritySitemapPaths(
 ): string[] {
   return pages
     .filter((p) => isAuthorityPagePublishable(p, liveSlugs, now))
-    .map((p) => `/for/${p.slug}`);
+    .map((p) => roleGuidePagePath(p.slug));
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -740,6 +777,7 @@ const approvedEntrySchema = z
     bundle: z
       .object({
         publishedSlugs: nonEmpty(nonBlank),
+        awaitingCatalogueSlugs: z.array(nonBlank),
         plannedModules: z.array(
           z
             .object({
