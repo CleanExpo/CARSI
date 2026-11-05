@@ -1,11 +1,14 @@
 import type { Metadata } from 'next';
 
 import { getPublicSiteUrl } from '@/lib/env/public-url';
+import { ROLE_GUIDES_HUB_PATH, roleGuidePagePath } from '@/lib/marketing/role-guides-path';
+import { authorityPageLatestVerified } from '@/lib/marketing/authority-for-nav';
 import {
   isAuthorityPagePublishable,
   type AuthorityPageEntry,
 } from '@/lib/marketing/authority-pages';
-import { getIndustryCoursesBySlugs } from '@/lib/server/industry-courses';
+import { OG_IMAGES, OG_IMAGE_URLS } from '@/lib/seo/og-image';
+import { loadAuthorityPageCourses } from '@/lib/server/authority-page-data';
 
 /**
  * Metadata for a /for/<industry> page. Indexable only when `isAuthorityPagePublishable` passes
@@ -17,7 +20,7 @@ export function buildAuthorityMetadata(
   now: Date = new Date()
 ): Metadata {
   const siteUrl = getPublicSiteUrl();
-  const url = `${siteUrl}/for/${entry.slug}`;
+  const url = `${siteUrl}${roleGuidePagePath(entry.slug)}`;
   const indexable = isAuthorityPagePublishable(entry, liveSlugs, now);
 
   return {
@@ -26,7 +29,19 @@ export function buildAuthorityMetadata(
     keywords: entry.keywords,
     robots: { index: indexable, follow: indexable },
     alternates: { canonical: url },
-    openGraph: { title: entry.title, description: entry.metaDescription, type: 'website', url },
+    openGraph: {
+      title: entry.title,
+      description: entry.metaDescription,
+      type: 'website',
+      url,
+      images: OG_IMAGES,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: entry.title,
+      description: entry.metaDescription,
+      images: OG_IMAGE_URLS,
+    },
   };
 }
 
@@ -38,10 +53,15 @@ export async function authorityMetadata(entry: AuthorityPageEntry): Promise<Meta
   if (entry.status !== 'approved') return buildAuthorityMetadata(entry, new Set());
   let liveSlugs: ReadonlySet<string> = new Set();
   try {
-    const courses = await getIndustryCoursesBySlugs(entry.bundle.publishedSlugs);
+    const { courses } = await loadAuthorityPageCourses(entry.slug);
     liveSlugs = new Set(courses.map((c) => c.slug));
   } catch (error) {
-    console.error(`[authority-metadata] course read failed for /for/${entry.slug}; noindex`, error);
+    console.error(`[authority-metadata] course read failed for ${roleGuidePagePath(entry.slug)}; noindex`, error);
   }
-  return buildAuthorityMetadata(entry, liveSlugs);
+  const base = buildAuthorityMetadata(entry, liveSlugs);
+  const verified = authorityPageLatestVerified(entry);
+  return {
+    ...base,
+    other: { 'article:modified_time': verified },
+  };
 }
