@@ -103,13 +103,23 @@ export function AdminCoachingProposedActionsClient() {
   }, {});
 
   return (
-    <div className="mx-auto w-full max-w-5xl space-y-6 p-6">
-      <header>
-        <h1 className="text-2xl font-semibold text-white">Coaching: proposed actions</h1>
-        <p className="mt-1 text-sm text-slate-400">
+    <div className="mx-auto w-full max-w-5xl space-y-6 p-6" data-testid="admin-coaching-proposed">
+      <header className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+        <p className="text-xs font-semibold tracking-wide text-sky-400/90 uppercase">
+          GP-634 · Marketing pack
+        </p>
+        <h1 className="mt-1 text-2xl font-semibold text-white">Coaching: proposed actions</h1>
+        <p className="mt-2 max-w-2xl text-sm text-slate-400">
           Marketing-pack fixes only. Approve to add one to the member&apos;s action list, or decline
           it. A note is shown to the member as coach feedback.
         </p>
+        {!loading && items.length > 0 ? (
+          <p className="mt-4 text-sm font-medium text-amber-200/90">
+            {items.length} fix{items.length === 1 ? '' : 'es'} awaiting your decision across{' '}
+            {Object.keys(byMember).length} member
+            {Object.keys(byMember).length === 1 ? '' : 's'}.
+          </p>
+        ) : null}
       </header>
       {error ? (
         <p role="alert" className="text-sm text-amber-300">
