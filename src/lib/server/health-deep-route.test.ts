@@ -42,5 +42,7 @@ describe('GET /api/health/deep (no upstream configured)', () => {
     expect(response.status).toBe(503);
     expect(body.status).toBe('unhealthy');
     expect(body.dependencies.database.status).toBe('unhealthy');
+    expect(body.dependencies.backend.status).toBe('unchecked');
+    expect(mock.fetch).not.toHaveBeenCalled();
   });
 });
