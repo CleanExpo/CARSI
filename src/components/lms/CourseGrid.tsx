@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { Search, SlidersHorizontal } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
@@ -10,11 +10,11 @@ import {
   paginateCatalogueRows,
   type CataloguePageSizeChoice,
 } from '@/lib/catalogue-pagination';
+import { disciplineTabToParam } from '@/lib/catalogue/discipline-param';
 import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
 import { CataloguePagination } from './CataloguePagination';
 import { CourseCard } from './CourseCard';
 import { CourseGridSkeleton } from './CourseCardSkeleton';
-import { disciplineTabToParam } from '@/lib/catalogue/discipline-param';
 
 const smoothEase: [number, number, number, number] = [0.4, 0, 0.2, 1];
 
@@ -101,6 +101,11 @@ interface CourseGridProps {
   cardVariant?: 'catalog' | 'featured' | 'premium';
   /** Real recommendation slugs; hides the Recommended tab when empty. */
   recommendedSlugs?: readonly string[];
+  /**
+   * Embedded: curated lists on role guides / industry pages — no topic tabs, lighter filters,
+   * cards visible without motion-gated opacity (avoids blank grids before hydration).
+   */
+  preset?: 'catalogue' | 'embedded';
 }
 
 type SortKey = 'title' | 'price' | 'updated' | 'modules';
@@ -248,7 +253,10 @@ export function CourseGrid({
   cardVariant = 'catalog',
   recommendedSlugs = [],
   syncTabToUrl = false,
+  preset = 'catalogue',
 }: CourseGridProps) {
+  const reduceMotion = useReducedMotion();
+  const embedded = preset === 'embedded';
   const { theme } = useTheme();
   const isDark = surface === 'auto' ? theme === 'dark' : surface === 'dark';
   const controlClass = isDark
@@ -381,51 +389,57 @@ export function CourseGrid({
   return (
     <div>
       {/* Discipline tab bar */}
-      <div
-        className={
-          isDark
-            ? 'scrollbar-hide mb-5 flex gap-2 overflow-x-auto rounded-xl border border-white/10 bg-white/[0.04] p-1'
-            : 'scrollbar-hide mb-5 flex gap-2 overflow-x-auto rounded-lg border border-slate-200 bg-white p-1'
-        }
-        role="tablist"
-        aria-label="Filter by topic"
-      >
-        {visibleTabs.map((tab) => {
-          const isActive = activeTab === tab;
-          const accentColor =
-            (isDark ? tabColors[tab] : (tabColorsLight[tab] ?? tabColors[tab])) ?? '#0f5fa8';
-          return (
-            <button
-              key={tab}
-              role="tab"
-              aria-selected={isActive}
-              onClick={() => selectTab(tab)}
-              className="relative min-h-[44px] rounded-md px-4 py-2.5 text-sm font-semibold whitespace-nowrap transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2490ed]/40"
-              style={
-                isActive
-                  ? { color: accentColor, background: `${accentColor}18` }
-                  : { color: isDark ? 'rgba(255,255,255,0.55)' : '#475569' }
-              }
-            >
-              {tab}
-              {isActive && (
-                <span
-                  className="absolute right-0 bottom-0 left-0 h-0.5 rounded-full"
-                  style={{ background: accentColor }}
-                />
-              )}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Search + sort */}
-      <div className="mb-6 grid gap-3 lg:grid-cols-[minmax(220px,1fr)_auto] lg:items-end">
+      {!embedded ? (
         <div
           className={
-            tagOptions.length > 0
-              ? 'grid gap-3 md:grid-cols-2 xl:grid-cols-[minmax(220px,1.3fr)_repeat(5,minmax(130px,0.8fr))]'
-              : 'grid gap-3 md:grid-cols-2 xl:grid-cols-[minmax(220px,1.3fr)_repeat(4,minmax(130px,0.8fr))]'
+            isDark
+              ? 'scrollbar-hide mb-5 flex gap-2 overflow-x-auto rounded-xl border border-white/10 bg-white/[0.04] p-1'
+              : 'scrollbar-hide mb-5 flex gap-2 overflow-x-auto rounded-lg border border-slate-200 bg-white p-1'
+          }
+          role="tablist"
+          aria-label="Filter by topic"
+        >
+          {visibleTabs.map((tab) => {
+            const isActive = activeTab === tab;
+            const accentColor =
+              (isDark ? tabColors[tab] : (tabColorsLight[tab] ?? tabColors[tab])) ?? '#0f5fa8';
+            return (
+              <button
+                key={tab}
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => selectTab(tab)}
+                className="relative min-h-[44px] rounded-md px-4 py-2.5 text-sm font-semibold whitespace-nowrap transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2490ed]/40"
+                style={
+                  isActive
+                    ? { color: accentColor, background: `${accentColor}18` }
+                    : { color: isDark ? 'rgba(255,255,255,0.55)' : '#475569' }
+                }
+              >
+                {tab}
+                {isActive && (
+                  <span
+                    className="absolute right-0 bottom-0 left-0 h-0.5 rounded-full"
+                    style={{ background: accentColor }}
+                  />
+                )}
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
+
+      {/* Search + sort */}
+      <div
+        className={`mb-6 grid gap-3 ${embedded ? 'lg:grid-cols-[minmax(220px,1fr)_auto]' : 'lg:grid-cols-[minmax(220px,1fr)_auto] lg:items-end'}`}
+      >
+        <div
+          className={
+            embedded
+              ? 'grid gap-3 md:grid-cols-[minmax(220px,1fr)_minmax(160px,0.5fr)]'
+              : tagOptions.length > 0
+                ? 'grid gap-3 md:grid-cols-2 xl:grid-cols-[minmax(220px,1.3fr)_repeat(5,minmax(130px,0.8fr))]'
+                : 'grid gap-3 md:grid-cols-2 xl:grid-cols-[minmax(220px,1.3fr)_repeat(4,minmax(130px,0.8fr))]'
           }
         >
           <div className="relative">
@@ -447,68 +461,72 @@ export function CourseGrid({
             />
           </div>
 
-          <select
-            value={levelFilter}
-            onChange={(e) => setLevelFilter(e.target.value)}
-            aria-label="Filter by level"
-            className={controlClass}
-          >
-            <option value="all">All levels</option>
-            {levelOptions.map((level) => (
-              <option key={level} value={level}>
-                {level[0]?.toUpperCase()}
-                {level.slice(1)}
-              </option>
-            ))}
-          </select>
+          {!embedded ? (
+            <>
+              <select
+                value={levelFilter}
+                onChange={(e) => setLevelFilter(e.target.value)}
+                aria-label="Filter by level"
+                className={controlClass}
+              >
+                <option value="all">All levels</option>
+                {levelOptions.map((level) => (
+                  <option key={level} value={level}>
+                    {level[0]?.toUpperCase()}
+                    {level.slice(1)}
+                  </option>
+                ))}
+              </select>
 
-          <select
-            value={priceFilter}
-            onChange={(e) => setPriceFilter(e.target.value as PriceFilter)}
-            aria-label="Filter by price"
-            className={controlClass}
-          >
-            <option value="all">All pricing</option>
-            <option value="free">Free</option>
-            <option value="paid">Paid</option>
-          </select>
+              <select
+                value={priceFilter}
+                onChange={(e) => setPriceFilter(e.target.value as PriceFilter)}
+                aria-label="Filter by price"
+                className={controlClass}
+              >
+                <option value="all">All pricing</option>
+                <option value="free">Free</option>
+                <option value="paid">Paid</option>
+              </select>
 
-          <select
-            value={cecFilter}
-            onChange={(e) => setCecFilter(e.target.value as CecFilter)}
-            aria-label="Filter by CEC availability"
-            className={controlClass}
-          >
-            <option value="all">Any CEC status</option>
-            <option value="has-cec">Approved IICRC CEC</option>
-          </select>
+              <select
+                value={cecFilter}
+                onChange={(e) => setCecFilter(e.target.value as CecFilter)}
+                aria-label="Filter by CEC availability"
+                className={controlClass}
+              >
+                <option value="all">Any CEC status</option>
+                <option value="has-cec">Approved IICRC CEC</option>
+              </select>
 
-          <select
-            value={durationFilter}
-            onChange={(e) => setDurationFilter(e.target.value as DurationFilter)}
-            aria-label="Filter by duration"
-            className={controlClass}
-          >
-            <option value="all">Any duration</option>
-            <option value="short">1h or less</option>
-            <option value="medium">1-3h</option>
-            <option value="long">3h+</option>
-          </select>
+              <select
+                value={durationFilter}
+                onChange={(e) => setDurationFilter(e.target.value as DurationFilter)}
+                aria-label="Filter by duration"
+                className={controlClass}
+              >
+                <option value="all">Any duration</option>
+                <option value="short">1h or less</option>
+                <option value="medium">1-3h</option>
+                <option value="long">3h+</option>
+              </select>
 
-          {tagOptions.length > 0 ? (
-            <select
-              value={tagFilter}
-              onChange={(e) => setTagFilter(e.target.value)}
-              aria-label="Filter by tag"
-              className={controlClass}
-            >
-              <option value="all">All tags</option>
-              {tagOptions.map((tag) => (
-                <option key={tag} value={tag}>
-                  {tag}
-                </option>
-              ))}
-            </select>
+              {tagOptions.length > 0 ? (
+                <select
+                  value={tagFilter}
+                  onChange={(e) => setTagFilter(e.target.value)}
+                  aria-label="Filter by tag"
+                  className={controlClass}
+                >
+                  <option value="all">All tags</option>
+                  {tagOptions.map((tag) => (
+                    <option key={tag} value={tag}>
+                      {tag}
+                    </option>
+                  ))}
+                </select>
+              ) : null}
+            </>
           ) : null}
         </div>
 
@@ -548,31 +566,41 @@ export function CourseGrid({
         ) : filtered.length > 0 ? (
           <>
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
-              {paging.pageRows.map((course, i) => (
-                <motion.div
-                  key={course.id}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, ease: smoothEase, delay: Math.min(i, 8) * 0.05 }}
-                >
+              {paging.pageRows.map((course, i) => {
+                const card = (
                   <CourseCard course={course} priorityImage={i < 4} variant={cardVariant} />
-                </motion.div>
-              ))}
+                );
+                if (embedded || reduceMotion) {
+                  return <div key={course.id}>{card}</div>;
+                }
+                return (
+                  <motion.div
+                    key={course.id}
+                    initial={false}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35, ease: smoothEase }}
+                  >
+                    {card}
+                  </motion.div>
+                );
+              })}
             </div>
-            <CataloguePagination
-              page={paging.page}
-              pageCount={paging.pageCount}
-              pageSize={pageSize}
-              start={paging.start}
-              end={paging.end}
-              total={paging.total}
-              onPageChange={setPage}
-              tone="light"
-              onPageSizeChange={(size) => {
-                setPageSize(size);
-                setPage(1);
-              }}
-            />
+            {embedded && paging.pageCount <= 1 ? null : (
+              <CataloguePagination
+                page={paging.page}
+                pageCount={paging.pageCount}
+                pageSize={pageSize}
+                start={paging.start}
+                end={paging.end}
+                total={paging.total}
+                onPageChange={setPage}
+                tone="light"
+                onPageSizeChange={(size) => {
+                  setPageSize(size);
+                  setPage(1);
+                }}
+              />
+            )}
           </>
         ) : (
           <div className="py-20 text-center">

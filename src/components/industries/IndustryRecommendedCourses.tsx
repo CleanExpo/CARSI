@@ -27,6 +27,7 @@ export async function IndustryRecommendedCourses({
       disciplineList={disciplineList}
       courses={courses}
       initialTab={disciplines[0]}
+      courseGridPreset="catalogue"
     />
   );
 }

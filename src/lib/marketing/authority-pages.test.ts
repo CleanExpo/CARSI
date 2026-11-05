@@ -100,7 +100,7 @@ function cardSlugs(html: string, ignoreSlugs: readonly string[] = []): string[] 
 
 /** The number shown beside "Live courses linked below". */
 function liveCountStat(html: string): number {
-  const m = html.match(/>(\d+)<\/p><p[^>]*>Live courses linked below/);
+  const m = html.match(/Live courses linked below<\/dt>\s*<dd[^>]*>([^<]+)<\/dd>/);
   if (!m) throw new Error('live course stat not found');
   return Number(m[1]);
 }

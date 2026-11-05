@@ -24,6 +24,8 @@ interface IndustryCourseSectionProps {
   initialTab?: string;
   /** Shown below the grid when publishable but the live list is empty. */
   emptyLiveCoursesNote?: string;
+  /** Use embedded grid on role guides (no topic tabs, visible cards without motion fade-in). */
+  courseGridPreset?: 'catalogue' | 'embedded';
 }
 
 export function IndustryCourseSection({
@@ -32,6 +34,7 @@ export function IndustryCourseSection({
   courses,
   initialTab,
   emptyLiveCoursesNote,
+  courseGridPreset = 'embedded',
 }: IndustryCourseSectionProps) {
   const defaultTab =
     initialTab && courses.some((c) => (c.discipline ?? '').toUpperCase().includes(initialTab))
@@ -53,7 +56,12 @@ export function IndustryCourseSection({
           course, its CEC hours are shown on the course page.
         </p>
         <div className="mt-10">
-          <CourseGrid courses={courses} initialTab={defaultTab} surface="light" />
+          <CourseGrid
+            courses={courses}
+            initialTab={defaultTab}
+            surface="light"
+            preset={courseGridPreset}
+          />
         </div>
         {courses.length === 0 && emptyLiveCoursesNote ? (
           <p className="mt-8 max-w-2xl rounded-2xl border border-amber-200/80 bg-amber-50/90 px-5 py-4 text-sm leading-relaxed text-amber-950">
