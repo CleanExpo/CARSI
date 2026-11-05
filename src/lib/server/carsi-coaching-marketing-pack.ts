@@ -20,6 +20,7 @@ import type {
   TradeVoice,
 } from '@/lib/coaching-portal/marketing-pack/types';
 import { parseAssessmentResponsesJson } from '@/lib/coaching-portal/assessment-schema';
+import { parseStoredMarketingPackRow } from '@/lib/coaching-portal/marketing-pack/stored-pack';
 import { prisma } from '@/lib/prisma';
 import { replaceProposedMarketingActions } from '@/lib/server/carsi-coaching-actions-store';
 import { fetchPublicPage } from '@/lib/server/safe-public-fetch';
@@ -189,17 +190,14 @@ export async function getLatestMarketingPackForUser(
     orderBy: { createdAt: 'desc' },
   });
   if (!row) return null;
-  try {
-    return {
-      id: row.id,
-      calendarSource: row.calendarSource,
-      review: JSON.parse(row.reviewJson) as SiteReview,
-      checklist: JSON.parse(row.checklistJson) as ChecklistItem[],
-      calendar: JSON.parse(row.calendarJson) as SocialCalendar,
-      voice: JSON.parse(row.voiceJson) as TradeVoice,
-      generatedAt: row.createdAt.toISOString(),
-    };
-  } catch {
-    return null;
-  }
+  const parsed = parseStoredMarketingPackRow({
+    id: row.id,
+    calendarSource: row.calendarSource,
+    reviewJson: row.reviewJson,
+    checklistJson: row.checklistJson,
+    calendarJson: row.calendarJson,
+    voiceJson: row.voiceJson,
+    createdAt: row.createdAt,
+  });
+  return parsed;
 }
