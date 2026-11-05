@@ -45,6 +45,12 @@ export const coachingInfoBanner =
 export const coachingJumpNavLink =
   'inline-flex min-h-9 shrink-0 items-center rounded-full border border-white/10 bg-white/[0.03] px-3.5 text-xs font-semibold text-slate-200 transition-colors hover:border-sky-500/30 hover:bg-sky-500/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400';
 
+export const coachingFilterPillActive =
+  'rounded-full bg-[#146fc2] px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm ring-1 ring-sky-400/30';
+
+export const coachingFilterPillIdle =
+  'rounded-full bg-white/[0.06] px-3.5 py-1.5 text-xs font-semibold text-slate-300 ring-1 ring-white/[0.06] transition-colors hover:bg-white/10 hover:text-white';
+
 export function coachingProgressTrackClass() {
   return 'h-2 w-full overflow-hidden rounded-full bg-white/[0.08] ring-1 ring-white/[0.06]';
 }
