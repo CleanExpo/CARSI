@@ -1,6 +1,7 @@
 import { access, mkdir, readFile, stat } from 'node:fs/promises';
 import { basename, dirname, join, resolve } from 'node:path';
-import { spawn } from 'node:child_process';
+import { spawn, type SpawnOptions } from 'node:child_process';
+import type { Readable } from 'node:stream';
 import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
 
@@ -392,11 +393,37 @@ export function ffmpegBinaryPath(): string {
 
 export type RunCaptureFn = (command: string, args: string[]) => Promise<{ stdout: string; stderr: string }>;
 
+/** The slice of a child process `runCapture` actually drives. */
+export type RunCaptureProcess = {
+  stdout: Readable | null;
+  stderr: Readable | null;
+  kill(signal?: NodeJS.Signals): boolean;
+  on(event: 'error', listener: (err: Error) => void): void;
+  on(event: 'close', listener: (code: number | null) => void): void;
+};
+
 export type RunCaptureOptions = {
   timeoutMs?: number;
+  /**
+   * Arms the kill timer and returns the function that cancels it.
+   * Production uses the wall clock. Tests pass a fake so a busy machine
+   * cannot expire the deadline while the child is still doing nothing.
+   */
+  scheduleTimeout?: (onTimeout: () => void, timeoutMs: number) => () => void;
+  /** Defaults to `node:child_process` spawn. Tests pass a fake child. */
+  spawnProcess?: (command: string, args: readonly string[], options: SpawnOptions) => RunCaptureProcess;
 };
 
 const DEFAULT_RUN_CAPTURE_TIMEOUT_MS = 30_000;
+
+function scheduleWallClockTimeout(onTimeout: () => void, timeoutMs: number): () => void {
+  const timer = setTimeout(onTimeout, timeoutMs);
+  return () => clearTimeout(timer);
+}
+
+function spawnCaptureProcess(command: string, args: readonly string[], options: SpawnOptions): RunCaptureProcess {
+  return spawn(command, args, options);
+}
 
 export function runCapture(
   command: string,
@@ -404,18 +431,30 @@ export function runCapture(
   options: RunCaptureOptions = {}
 ): Promise<{ stdout: string; stderr: string }> {
   const timeoutMs = options.timeoutMs ?? DEFAULT_RUN_CAPTURE_TIMEOUT_MS;
+  const scheduleTimeout = options.scheduleTimeout ?? scheduleWallClockTimeout;
+  const spawnProcess = options.spawnProcess ?? spawnCaptureProcess;
 
   return new Promise((resolvePromise, reject) => {
-    const child = spawn(command, args, { stdio: ['ignore', 'pipe', 'pipe'] });
+    const child = spawnProcess(command, args, { stdio: ['ignore', 'pipe', 'pipe'] });
     let stdout = '';
     let stderr = '';
     let settled = false;
 
-    const timer = setTimeout(() => {
+    const cancelTimer = scheduleTimeout(() => {
+      // `clearTimeout` cannot stop a callback that is already queued. Once the
+      // child has exited, that late tick must not kill anything else.
+      if (settled) return;
       settled = true;
       child.kill('SIGKILL');
       reject(new Error(`${command} timed out after ${timeoutMs}ms`));
     }, timeoutMs);
+
+    const settle = (finish: () => void) => {
+      if (settled) return;
+      settled = true;
+      cancelTimer();
+      finish();
+    };
 
     child.stdout?.on('data', (chunk) => {
       stdout += chunk.toString();
@@ -424,17 +463,13 @@ export function runCapture(
       stderr += chunk.toString();
     });
     child.on('error', (err) => {
-      if (settled) return;
-      settled = true;
-      clearTimeout(timer);
-      reject(err);
+      settle(() => reject(err));
     });
     child.on('close', (code) => {
-      if (settled) return;
-      settled = true;
-      clearTimeout(timer);
-      if (code === 0) resolvePromise({ stdout, stderr });
-      else reject(new Error(`${command} exited ${code}${stderr ? `: ${stderr.slice(-1000)}` : ''}`));
+      settle(() => {
+        if (code === 0) resolvePromise({ stdout, stderr });
+        else reject(new Error(`${command} exited ${code}${stderr ? `: ${stderr.slice(-1000)}` : ''}`));
+      });
     });
   });
 }
