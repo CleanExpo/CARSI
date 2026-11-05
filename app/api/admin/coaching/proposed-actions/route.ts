@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getAdminSessionOrNull } from '@/lib/admin/admin-session';
+import { normalizeCoachFeedback } from '@/lib/coaching-portal/marketing-pack/coach-input-limits';
 import { prisma } from '@/lib/prisma';
 import { reviewProposedCoachingAction } from '@/lib/server/carsi-coaching-actions-store';
 
@@ -69,7 +70,7 @@ export async function POST(request: NextRequest) {
   const result = await reviewProposedCoachingAction({
     actionId,
     decision,
-    coachFeedback: typeof body?.coachFeedback === 'string' ? body.coachFeedback : null,
+    coachFeedback: normalizeCoachFeedback(body?.coachFeedback),
   });
   if (!result.ok) {
     return NextResponse.json(
