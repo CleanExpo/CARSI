@@ -20,7 +20,6 @@ import {
   BusinessCoachingPortalSection,
 } from '@/components/ccw/BusinessCoachingProgramSections';
 import { HomeFaqSection } from '@/components/landing/HomeFaqSection';
-import { HomeFinalCtaSection } from '@/components/landing/HomeFinalCtaSection';
 import { HomeTrustStrip } from '@/components/landing/HomeTrustStrip';
 import {
   LANDING_DISPLAY_H2_CLASS,
@@ -29,7 +28,9 @@ import {
   PUBLIC_SHELL_INNER_CLASS,
 } from '@/components/landing/public-shell-width';
 import { MarketingGrowthLinks } from '@/components/marketing/MarketingGrowthLinks';
+import { PlatformContextualNext } from '@/components/marketing/platform/PlatformPagePattern';
 import { PlatformNav } from '@/components/marketing/PlatformNav';
+import { StaticMarketingClosingCta } from '@/components/marketing/StaticMarketingClosingCta';
 import {
   businessCoachingPath,
   businessCoachingProductName,
@@ -353,7 +354,8 @@ export function CcwBusinessCoachingClient({ checkoutEnabled }: { checkoutEnabled
       <div className={`${PUBLIC_SHELL_INNER_CLASS} py-12`}>
         <MarketingGrowthLinks currentHref={carsiCoachingMonthlyPath} />
       </div>
-      <HomeFinalCtaSection />
+      <PlatformContextualNext current={carsiCoachingMonthlyPath} />
+      <StaticMarketingClosingCta />
     </>
   );
 }
