@@ -1,13 +1,14 @@
 import { randomUUID } from 'node:crypto';
 
 import { ASK_COACH_GOAL_PREFIX, isAskCoachGoalId } from '@/lib/coaching-portal/ask-my-coach';
-import { LEARNING_GOAL_PREFIX, LEARNING_REMOVED_STATUS } from '@/lib/coaching-portal/learning-path';
+import { LEARNING_GOAL_PREFIX } from '@/lib/coaching-portal/learning-path';
 import {
   decideCoachReview,
   MARKETING_ACTION_GOAL_PREFIX,
   type CoachDecision,
   type ProposedActionInput,
 } from '@/lib/coaching-portal/marketing-pack/proposed-actions';
+import { MEMBER_BOARD_STATUSES } from '@/lib/coaching-portal/monthly-review';
 import {
   MEMBER_SETTABLE_ACTION_STATUSES,
   type CoachingActionStatus,
@@ -45,6 +46,10 @@ export type CoachingActionRow = {
   learning: { courseSlug: string; percent: number; enrolled: boolean } | null;
 };
 
+function isMemberBoardStatus(raw: string): boolean {
+  return (MEMBER_BOARD_STATUSES as readonly string[]).includes(raw);
+}
+
 function normalizeStatus(raw: string): CoachingActionStatus {
   return STATUS_MAP[raw] ?? 'todo';
 }
@@ -59,8 +64,20 @@ export async function listCoachingActionsForUser(userId: string): Promise<Coachi
   // Pull LMS progress onto learning actions first, so completion shows as done on the board.
   const learning = new Map((await syncLearningPath(userId)).map((i) => [i.actionId, i]));
   const rows = await prisma.carsiCoachingAction.findMany({
-    // Coach-removed learning actions stay as tombstones (status is NOT NULL, so NOT is safe).
-    where: { userId, NOT: { status: LEARNING_REMOVED_STATUS } },
+    // Allowlist. The four board statuses are the member's own work. Marketing-pack rows
+    // waiting on the coach (GP-634) are the only `proposed` / `declined` rows a member may
+    // see: learning-path drafts reuse status `proposed`, and coach drafts, review records
+    // (GP-629) and removed courses (GP-633) stay off the board.
+    where: {
+      userId,
+      OR: [
+        { status: { in: [...MEMBER_BOARD_STATUSES] } },
+        {
+          status: { in: ['proposed', 'declined'] },
+          goalId: { startsWith: MARKETING_ACTION_GOAL_PREFIX },
+        },
+      ],
+    },
     orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
   });
   return rows.map((r) => {
@@ -116,7 +133,10 @@ export async function importLegacyActionsFromSubscriptionJson(
   });
 }
 
-export type UpsertCoachingActionResult = { ok: true } | { ok: false; reason: 'awaiting_coach' };
+export type UpsertCoachingActionResult =
+  | { ok: true }
+  | { ok: false; reason: 'awaiting_coach' }
+  | { ok: false };
 
 /**
  * Member create/edit. A member may only set the four working statuses, and may not edit an
@@ -152,8 +172,14 @@ export async function upsertCoachingActionForUser(
       select: { id: true, status: true, goalId: true },
     });
     if (owned) {
-      if (COACH_HELD_STATUSES.includes(owned.status))
-        return { ok: false, reason: 'awaiting_coach' };
+      // Marketing-pack rows the member can see, but only the coach can approve or decline (GP-634).
+      const marketingHeld =
+        COACH_HELD_STATUSES.includes(owned.status) &&
+        Boolean(owned.goalId?.startsWith(MARKETING_ACTION_GOAL_PREFIX));
+      if (marketingHeld) return { ok: false, reason: 'awaiting_coach' };
+      // Coach drafts, review records (GP-629), learning drafts and removed courses are not
+      // the member's to edit, and returning here also stops them being re-created under the same id.
+      if (!isMemberBoardStatus(owned.status)) return { ok: false };
       // A prescribed course's title and status follow the LMS, and a question to the coach
       // (GP-630) is closed by the coach's answer; on both the member can only add a note.
       const update =
@@ -183,7 +209,9 @@ export async function deleteCoachingActionForUser(
     where: {
       id: actionId,
       userId,
-      status: { in: [...MEMBER_SETTABLE_ACTION_STATUSES] },
+      // Board rows only. That excludes marketing proposed/declined (GP-634), coach drafts
+      // and review records (GP-629), and learning drafts or tombstones (GP-633).
+      status: { in: [...MEMBER_BOARD_STATUSES] },
       OR: [
         { goalId: null },
         {

@@ -88,7 +88,8 @@ const AUTHOR_DIRECTED =
 function maskAuthorDirected(text) {
   return text.replace(AUTHOR_DIRECTED, (m) => ' '.repeat(m.length));
 }
-const SEARCH_GIMMICK = /\bsearch(?:ing)?\s+(?:the\s+)?(?:ANSI\/)?(?:IICRC[\s-]*)?S\s?5\d0\b[^.\n]{0,30}\bfor\b/i;
+const SEARCH_GIMMICK =
+  /\bsearch(?:ing)?\s+(?:the\s+)?(?:ANSI\/)?(?:IICRC[\s-]*)?S\s?5\d0\b[^.\n]{0,30}\bfor\b/i;
 // A section citation and its top-level number, e.g. "§9.1.7" or "section 12" → "9" / "12".
 const SECTION_CITE = /(?:§|section)\s?(\d{1,2})(?:\.\d+)*/i;
 // STRONG assertion of regulatory content — soft verbs (cover/include/reference/
@@ -196,7 +197,14 @@ function evaluate(text, strict = true) {
 }
 
 const COPY_EXT = /\.(tsx?|jsx?|mdx?|html?|mjs)$/;
-const SCANNED_DIRS = ['app/', 'src/', 'templates/', 'docs/marketing/', 'docs/content/', 'public/courses/'];
+const SCANNED_DIRS = [
+  'app/',
+  'src/',
+  'templates/',
+  'docs/marketing/',
+  'docs/content/',
+  'public/courses/',
+];
 const JSON_SCANNED_DIRS = ['data/seed/', '.curation/', 'data/wordpress-export/'];
 function inScope(file) {
   const norm = file.replace(/\\/g, '/');
@@ -211,6 +219,7 @@ function inScope(file) {
 const EXEMPT = [
   'scripts/check-standards-claims.mjs',
   'scripts/check-standards-claims.test.mjs',
+  'docs/agents/CLAUDE.md',
   'CLAUDE.md',
   'src/lib/course-kit/standards-excerpt.ts',
   'src/lib/course-kit/ai-course-builder-guard.ts',
@@ -221,7 +230,7 @@ function isExempt(file) {
   return EXEMPT.some((e) => norm === e || norm.endsWith('/' + e));
 }
 
-export { evaluate, isExempt, inScope, JSON_SCANNED_DIRS, SCANNED_DIRS };
+export { evaluate, inScope, isExempt, JSON_SCANNED_DIRS, SCANNED_DIRS };
 
 // Only run the scanner when invoked directly (not when imported by the test).
 const invokedDirectly = process.argv[1] && process.argv[1].endsWith('check-standards-claims.mjs');
@@ -230,75 +239,98 @@ if (!invokedDirectly) {
 } else main();
 
 function main() {
-const findings = [];
-// NOTE (2026-07-17): sentence-splitting `content` before evaluate() was tried here
-// — it is what evaluate()'s "sentence-ish unit" contract implies — and it made the
-// scan WORSE (5 findings → 7), because finer units let the proximity window pair a
-// standard's name with more unrelated negations. Reverted deliberately; do not
-// re-attempt without measuring. The residual false positives are a RULE-scope
-// question (see the ABSENCE note in evaluate), not a chunking one.
-function scanLine(file, lineNo, content, strict) {
-  for (const msg of evaluate(content, strict)) {
-    findings.push(`  ${file}:${lineNo}: ${msg}\n    → ${content.trim().slice(0, 140)}`);
+  const findings = [];
+  // NOTE (2026-07-17): sentence-splitting `content` before evaluate() was tried here
+  // — it is what evaluate()'s "sentence-ish unit" contract implies — and it made the
+  // scan WORSE (5 findings → 7), because finer units let the proximity window pair a
+  // standard's name with more unrelated negations. Reverted deliberately; do not
+  // re-attempt without measuring. The residual false positives are a RULE-scope
+  // question (see the ABSENCE note in evaluate), not a chunking one.
+  function scanLine(file, lineNo, content, strict) {
+    for (const msg of evaluate(content, strict)) {
+      findings.push(`  ${file}:${lineNo}: ${msg}\n    → ${content.trim().slice(0, 140)}`);
+    }
   }
-}
 
-const argv = process.argv.slice(2);
-const textIdx = argv.indexOf('--text');
-if (textIdx !== -1) {
-  // Pre-publish gate: validate a raw string (any brand copy about to go public).
-  const text = argv[textIdx + 1] || '';
-  text.split('\n').forEach((line, i) => scanLine('<stdin>', i + 1, line, true));
-} else if (argv.includes('--staged')) {
-  let diff = '';
-  try {
-    diff = execSync('git diff --cached --no-color -U0', { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
-  } catch (err) {
-    console.error('check-standards-claims: failed to read staged diff:', err.message);
+  const argv = process.argv.slice(2);
+  const textIdx = argv.indexOf('--text');
+  if (textIdx !== -1) {
+    // Pre-publish gate: validate a raw string (any brand copy about to go public).
+    const text = argv[textIdx + 1] || '';
+    text.split('\n').forEach((line, i) => scanLine('<stdin>', i + 1, line, true));
+  } else if (argv.includes('--staged')) {
+    let diff = '';
+    try {
+      diff = execSync('git diff --cached --no-color -U0', {
+        encoding: 'utf8',
+        maxBuffer: 64 * 1024 * 1024,
+      });
+    } catch (err) {
+      console.error('check-standards-claims: failed to read staged diff:', err.message);
+      process.exit(1);
+    }
+    let currentFile = null;
+    let lineNo = 0;
+    for (const line of diff.split('\n')) {
+      const fm = line.match(/^\+\+\+ b\/(.+)$/);
+      if (fm) {
+        currentFile = fm[1];
+        continue;
+      }
+      const hunk = line.match(/^@@ -\d+(?:,\d+)? \+(\d+)/);
+      if (hunk) {
+        lineNo = parseInt(hunk[1], 10);
+        continue;
+      }
+      if (!line.startsWith('+') || line.startsWith('+++')) continue;
+      if (!currentFile || !inScope(currentFile) || isExempt(currentFile)) continue;
+      scanLine(currentFile, lineNo, line.slice(1), false);
+      lineNo++;
+    }
+  } else {
+    let list = '';
+    try {
+      list = execSync('git ls-files --cached --others --exclude-standard', {
+        encoding: 'utf8',
+        maxBuffer: 64 * 1024 * 1024,
+      });
+    } catch (err) {
+      console.error('check-standards-claims: failed to list tracked files:', err.message);
+      process.exit(1);
+    }
+    const files = list
+      .split('\n')
+      .map((f) => f.trim())
+      .filter((f) => f && inScope(f) && !isExempt(f));
+    for (const file of files) {
+      let text = '';
+      try {
+        text = readFileSync(file, 'utf8');
+      } catch {
+        continue;
+      }
+      text.split('\n').forEach((line, i) => scanLine(file, i + 1, line, false));
+    }
+  }
+
+  if (findings.length > 0) {
+    console.error('\n✖ Standards-claim guard failed (2026-07-15 incident)\n');
+    console.error(
+      'A claim about an IICRC standard must be verified against the LICENSED section index'
+    );
+    console.error(
+      '(lib/standards) and cited by a section that exists — never a scrape, never an absence claim.\n'
+    );
+    console.error(findings.join('\n'));
+    console.error(
+      '\nSee CLAUDE.md § "Standards claims" (licence-critical).\n' +
+        'Fix the copy: state what the standard DOES say, cited to a section that exists.\n' +
+        'Genuine false positive? Tighten the rule, or add the file to EXEMPT in this script\n' +
+        'if it only DESCRIBES the rule — then add a case to check-standards-claims.test.mjs.\n' +
+        'Do not bypass and do not weaken the catch.\n'
+    );
     process.exit(1);
   }
-  let currentFile = null;
-  let lineNo = 0;
-  for (const line of diff.split('\n')) {
-    const fm = line.match(/^\+\+\+ b\/(.+)$/);
-    if (fm) { currentFile = fm[1]; continue; }
-    const hunk = line.match(/^@@ -\d+(?:,\d+)? \+(\d+)/);
-    if (hunk) { lineNo = parseInt(hunk[1], 10); continue; }
-    if (!line.startsWith('+') || line.startsWith('+++')) continue;
-    if (!currentFile || !inScope(currentFile) || isExempt(currentFile)) continue;
-    scanLine(currentFile, lineNo, line.slice(1), false);
-    lineNo++;
-  }
-} else {
-  let list = '';
-  try {
-    list = execSync('git ls-files --cached --others --exclude-standard', { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
-  } catch (err) {
-    console.error('check-standards-claims: failed to list tracked files:', err.message);
-    process.exit(1);
-  }
-  const files = list.split('\n').map((f) => f.trim()).filter((f) => f && inScope(f) && !isExempt(f));
-  for (const file of files) {
-    let text = '';
-    try { text = readFileSync(file, 'utf8'); } catch { continue; }
-    text.split('\n').forEach((line, i) => scanLine(file, i + 1, line, false));
-  }
-}
-
-if (findings.length > 0) {
-  console.error('\n✖ Standards-claim guard failed (2026-07-15 incident)\n');
-  console.error('A claim about an IICRC standard must be verified against the LICENSED section index');
-  console.error('(lib/standards) and cited by a section that exists — never a scrape, never an absence claim.\n');
-  console.error(findings.join('\n'));
-  console.error(
-    '\nSee CLAUDE.md § "Standards claims" (licence-critical).\n' +
-      'Fix the copy: state what the standard DOES say, cited to a section that exists.\n' +
-      'Genuine false positive? Tighten the rule, or add the file to EXEMPT in this script\n' +
-      'if it only DESCRIBES the rule — then add a case to check-standards-claims.test.mjs.\n' +
-      'Do not bypass and do not weaken the catch.\n'
-  );
-  process.exit(1);
-}
-console.log('✓ Standards-claim guard passed.');
-process.exit(0);
+  console.log('✓ Standards-claim guard passed.');
+  process.exit(0);
 }

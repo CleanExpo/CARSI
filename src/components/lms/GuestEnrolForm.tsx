@@ -17,6 +17,7 @@ import {
 import { trackFunnelEvent } from '@/lib/analytics/track-funnel-event';
 import { TurnstileWidget } from '@/components/security/TurnstileWidget';
 import { isSafeInternalPath } from '@/lib/auth/guest-recovery-path';
+import { purchaseSurveyCheckoutField } from '@/lib/marketing/purchase-survey-key';
 
 /** Fail-closed client check: empty or space-only email never reaches checkout or free enrol. */
 export function guestEnrolEmailIsUsable(value: string): boolean {
@@ -139,6 +140,7 @@ export function GuestEnrolForm({
           full_name: fullName,
           purchase_mode: purchaseMode,
           ...(purchaseMode === 'team' ? { team_seat_count: teamSeats } : {}),
+          ...purchaseSurveyCheckoutField(),
         }),
       });
       const data = (await res.json().catch(() => ({}))) as {
@@ -182,7 +184,12 @@ export function GuestEnrolForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className={`space-y-3 rounded-lg border p-4 ${styles.card}`}>
+    // data-quick-enrol-card: the daily live buy-path guard finds this card by it (GP-674).
+    <form
+      onSubmit={handleSubmit}
+      data-quick-enrol-card=""
+      className={`space-y-3 rounded-lg border p-4 ${styles.card}`}
+    >
       <p className={`text-xs ${styles.help}`}>
         {freePath
           ? 'Quick enrol — create your account and start learning in one step.'

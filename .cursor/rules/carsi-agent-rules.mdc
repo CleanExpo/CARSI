@@ -1,0 +1,16 @@
+---
+description: CARSI agent rules (licence, IICRC terminology, Premium Visual & Motion Standard)
+globs:
+alwaysApply: true
+---
+
+# CARSI agent rules (Cursor entry point)
+
+The rule files live in `docs/agents/`. Read and follow both before any work in this repo.
+Keep these references; `scripts/check-agent-doc-entrypoints.test.mjs` fails CI if they break (GP-680).
+
+Licence, course production and IICRC terminology rules:
+@docs/agents/CLAUDE.md
+
+Premium Visual & Motion Standard, verification gate and compound loop:
+@docs/agents/AGENTS.md

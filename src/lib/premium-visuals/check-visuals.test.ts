@@ -77,8 +77,8 @@ function runJson(root: string, extra: string[] = []) {
 }
 
 const rules = (s: Summary) => s.violations.map((v) => v.rule);
-const ENFORCE = JSON.stringify({ mode: 'enforce' });
-const REPORT = JSON.stringify({ mode: 'report' });
+const ENFORCE = JSON.stringify({ mode: 'enforce', manifest: 'config/media.manifest.json' });
+const REPORT = JSON.stringify({ mode: 'report', manifest: 'config/media.manifest.json' });
 const MANIFEST_OK = JSON.stringify({
   version: 1,
   entries: [
@@ -106,8 +106,8 @@ const BARE_PAGE = 'export default function Page() { return <main><h1>Plain</h1><
 /** A clean fixture: one compliant marketing page with real, manifested, present media. */
 function cleanFiles(extra: Files = {}): Files {
   return {
-    'visuals.config.json': ENFORCE,
-    'media.manifest.json': MANIFEST_OK,
+    'config/visuals.config.json': ENFORCE,
+    'config/media.manifest.json': MANIFEST_OK,
     'public/media/hero.webp': Buffer.alloc(10 * 1024),
     'app/page.tsx': GOOD_PAGE,
     ...extra,
@@ -137,7 +137,7 @@ describe('(1) JSON output is complete when piped', () => {
   });
 
   it('report mode keeps the full JSON and exits 0', () => {
-    const files = cleanFiles({ 'visuals.config.json': REPORT });
+    const files = cleanFiles({ 'config/visuals.config.json': REPORT });
     for (let i = 0; i < 15; i++) files[`components/art${i}.tsx`] = '<svg></svg>\n'.repeat(100);
     const r = runJson(fixture(files));
     expect(r.json.total).toBe(1500);
@@ -200,7 +200,7 @@ describe('(2) marketing-route coverage', () => {
 
   it('a repo that declares minMarketingPages 0 may have none', () => {
     const files = cleanFiles({
-      'visuals.config.json': JSON.stringify({ mode: 'enforce', minMarketingPages: 0 }),
+      'config/visuals.config.json': JSON.stringify({ mode: 'enforce', minMarketingPages: 0 }),
     });
     delete files['app/page.tsx'];
     const r = runJson(fixture(files));
@@ -256,7 +256,7 @@ describe('(4) manifest provenance is validated', () => {
     alt: 'Technician',
   };
   const withEntry = (e: unknown) =>
-    cleanFiles({ 'media.manifest.json': JSON.stringify({ version: 1, entries: [e] }) });
+    cleanFiles({ 'config/media.manifest.json': JSON.stringify({ version: 1, entries: [e] }) });
   const bad: Record<string, Files> = {
     'missing src': withEntry({ ...entry, src: undefined }),
     'invalid kind': withEntry({ ...entry, kind: 'drawing' }),
@@ -265,13 +265,13 @@ describe('(4) manifest provenance is validated', () => {
     'object alt': withEntry({ ...entry, alt: { text: 'x' } }),
     'path traversal src': withEntry({ ...entry, src: '/../secret.webp' }),
     'non-object entry': withEntry('hero.webp'),
-    'non-object manifest': cleanFiles({ 'media.manifest.json': '[]' }),
+    'non-object manifest': cleanFiles({ 'config/media.manifest.json': '[]' }),
     'entries not an array': cleanFiles({
-      'media.manifest.json': JSON.stringify({ version: 1, entries: {} }),
+      'config/media.manifest.json': JSON.stringify({ version: 1, entries: {} }),
     }),
-    'malformed JSON': cleanFiles({ 'media.manifest.json': '{ "version": 1, ' }),
+    'malformed JSON': cleanFiles({ 'config/media.manifest.json': '{ "version": 1, ' }),
     'video without poster': cleanFiles({
-      'media.manifest.json': JSON.stringify({
+      'config/media.manifest.json': JSON.stringify({
         version: 1,
         entries: [entry, { ...entry, src: '/media/v.mp4', kind: 'video' }],
       }),
@@ -282,13 +282,60 @@ describe('(4) manifest provenance is validated', () => {
     it(`rejects ${name}`, () => {
       const r = runJson(fixture(files));
       expect(rules(r.json)).toContain('manifest-invalid');
-      expect(r.status).toBe(1);
+      // GP-688: an invalid manifest is a configuration error (exit 2), not an ordinary finding.
+      expect(r.status).toBe(2);
+      expect(r.stderr).toMatch(/configuration error: .*media\.manifest\.json/);
     });
   }
 
+  // GP-688: report mode used to list a broken manifest and still exit 0.
+  const withReport = (files: Files): Files => ({
+    ...files,
+    'config/visuals.config.json': REPORT,
+  });
+  for (const name of [
+    'malformed JSON',
+    'non-object manifest',
+    'entries not an array',
+    'invalid kind',
+  ]) {
+    it(`report mode: ${name} is a configuration error (exit 2), with the full report still printed`, () => {
+      const r = runJson(fixture(withReport(bad[name])));
+      expect(r.json.mode).toBe('report-only');
+      expect(rules(r.json)).toContain('manifest-invalid');
+      expect(r.status).toBe(2);
+      expect(r.stderr).toMatch(/configuration error: .*media\.manifest\.json/);
+      const text = run(fixture(withReport(bad[name])));
+      expect(text.status).toBe(2);
+      // The notice must not claim the run cannot fail when it is about to exit 2.
+      expect(text.stdout).toMatch(/REPORT-ONLY/);
+      expect(text.stdout).toMatch(/invalid manifest exits 2/);
+      expect(text.stdout).toMatch(/not visual acceptance/i);
+    });
+  }
+
+  it('report mode with a valid manifest still exits 0 even with findings (happy path)', () => {
+    const r = runJson(
+      fixture(withReport(cleanFiles({ 'public/media/stray.webp': Buffer.alloc(1024) })))
+    );
+    expect(rules(r.json)).toContain('unmanifested-public-media');
+    expect(rules(r.json)).not.toContain('manifest-invalid');
+    expect(r.status).toBe(0);
+    expect(r.stderr).not.toMatch(/configuration error/);
+    expect(run(fixture(withReport(cleanFiles()))).stdout).not.toMatch(/invalid manifest exits 2/);
+  });
+
+  it('a manifest entry whose file is missing stays an ordinary finding, not a configuration error', () => {
+    const files = withReport(cleanFiles());
+    delete files['public/media/hero.webp'];
+    const r = runJson(fixture(files));
+    expect(rules(r.json)).toContain('manifest-missing-file');
+    expect(r.status).toBe(0);
+  });
+
   it('names the shape error for an array or string manifest, not just a version mismatch', () => {
     for (const body of ['[]', '"media"', '[{"version":1,"entries":[]}]']) {
-      const r = runJson(fixture(cleanFiles({ 'media.manifest.json': body })));
+      const r = runJson(fixture(cleanFiles({ 'config/media.manifest.json': body })));
       const details = r.json.violations
         .filter((v) => v.rule === 'manifest-invalid')
         .map((v) => v.detail);
@@ -328,7 +375,7 @@ describe('(5) allowlist and comment false positives', () => {
     const r = runJson(
       fixture(
         cleanFiles({
-          'visuals.config.json': allowLogo,
+          'config/visuals.config.json': allowLogo,
           'public/catalogue-logo.webp': Buffer.alloc(500 * 1024),
         })
       )
@@ -351,7 +398,7 @@ describe('(5) allowlist and comment false positives', () => {
     const r = runJson(
       fixture(
         cleanFiles({
-          'visuals.config.json': cfg,
+          'config/visuals.config.json': cfg,
           'components/ui/card.tsx':
             'export const C = () => <img src="https://picsum.photos/200" />;\n',
         })
@@ -365,7 +412,7 @@ describe('(5) allowlist and comment false positives', () => {
     const r = runJson(
       fixture(
         cleanFiles({
-          'visuals.config.json': cfg,
+          'config/visuals.config.json': cfg,
           'components/ui/check.tsx': 'export const C = () => <svg viewBox="0 0 1 1" />;\n',
         })
       )
@@ -433,7 +480,7 @@ describe('(5) allowlist and comment false positives', () => {
 describe('(6) mode labelling, config, workflow and docs', () => {
   it('report-only mode is labelled as not visual acceptance, in text and JSON', () => {
     const root = fixture(
-      cleanFiles({ 'visuals.config.json': REPORT, 'components/a.tsx': '<svg />\n' })
+      cleanFiles({ 'config/visuals.config.json': REPORT, 'components/a.tsx': '<svg />\n' })
     );
     const text = run(root);
     expect(text.status).toBe(0);
@@ -452,19 +499,44 @@ describe('(6) mode labelling, config, workflow and docs', () => {
 
   it('an unknown mode or malformed config is a configuration error (exit 2), not a pass', () => {
     expect(
-      run(fixture(cleanFiles({ 'visuals.config.json': JSON.stringify({ mode: 'enforced' }) })))
-        .status
+      run(
+        fixture(cleanFiles({ 'config/visuals.config.json': JSON.stringify({ mode: 'enforced' }) }))
+      ).status
     ).toBe(2);
-    expect(run(fixture(cleanFiles({ 'visuals.config.json': '{ "mode": ' }))).status).toBe(2);
+    expect(run(fixture(cleanFiles({ 'config/visuals.config.json': '{ "mode": ' }))).status).toBe(2);
     expect(
       run(
         fixture(
           cleanFiles({
-            'visuals.config.json': JSON.stringify({ mode: 'enforce', allowlist: '**' }),
+            'config/visuals.config.json': JSON.stringify({ mode: 'enforce', allowlist: '**' }),
           })
         )
       ).status
     ).toBe(2);
+  });
+
+  // GP-688: a missing config used to fall back to built-in defaults silently.
+  it('a missing config/visuals.config.json is a configuration error (exit 2), not silent defaults', () => {
+    for (const mode of [ENFORCE, REPORT]) {
+      const files = cleanFiles({ 'config/visuals.config.json': mode });
+      delete files['config/visuals.config.json'];
+      const r = run(fixture(files));
+      expect(r.status).toBe(2);
+      expect(r.stderr).toMatch(/configuration error: .*visuals\.config\.json.*not found/);
+      expect(r.stdout).toBe('');
+    }
+  });
+
+  it('a --config path that does not exist is a configuration error (exit 2)', () => {
+    const r = run(fixture(cleanFiles()), ['--config', 'config/nope.json']);
+    expect(r.status).toBe(2);
+    expect(r.stderr).toMatch(/configuration error: .*nope\.json.*not found/);
+  });
+
+  it('a present, valid config still runs (happy path for the missing-config check)', () => {
+    const r = run(fixture(cleanFiles()));
+    expect(r.status).toBe(0);
+    expect(r.stderr).not.toMatch(/configuration error/);
   });
 
   it('the workflow path filter covers every extension the scanner reads', () => {
@@ -472,17 +544,23 @@ describe('(6) mode labelling, config, workflow and docs', () => {
       spawnSync(process.execPath, [SCRIPT, '--list-extensions'], { encoding: 'utf8' }).stdout
     ) as { code: string[]; style: string[] };
     const wf = fs.readFileSync(path.join(REPO, '.github/workflows/check-visuals.yml'), 'utf8');
-    const missing = [...exts.code, ...exts.style].filter((e) => !wf.includes(`"**/*.${e}"`));
+    const missing = [...exts.code, ...exts.style].filter(
+      (e) => !wf.includes(`"**/*.${e}"`) && !wf.includes(`'**/*.${e}'`)
+    );
     expect(exts.code.length).toBeGreaterThan(0);
     expect(missing).toEqual([]);
-    expect(wf).toContain('"**/public/**"');
+    expect(wf).toMatch(/["']\*\*\/public\/\*\*["']/);
+    expect(wf).toMatch(/["']config\/visuals\.config\.json["']/);
+    expect(wf).toMatch(/["']config\/media\.manifest\.json["']/);
   });
 
   it('repo docs do not claim CI enforcement while visuals.config.json is report-only', () => {
-    const cfg = JSON.parse(fs.readFileSync(path.join(REPO, 'visuals.config.json'), 'utf8')) as {
+    const cfg = JSON.parse(
+      fs.readFileSync(path.join(REPO, 'config/visuals.config.json'), 'utf8')
+    ) as {
       mode: string;
     };
-    for (const doc of ['AGENTS.md', 'CLAUDE.md']) {
+    for (const doc of ['docs/agents/AGENTS.md', 'docs/agents/CLAUDE.md']) {
       const t = fs.readFileSync(path.join(REPO, doc), 'utf8');
       if (cfg.mode === 'report') {
         expect(t, doc).not.toMatch(/It is enforced in CI/);
@@ -495,7 +573,7 @@ describe('(6) mode labelling, config, workflow and docs', () => {
   it('the docs point at the scaffold that exists, and the scaffold states its real install state', () => {
     const tpl = 'scripts/premium-visuals/marketing-page.template.tsx.txt';
     expect(fs.existsSync(path.join(REPO, tpl))).toBe(true);
-    for (const doc of ['AGENTS.md', 'CLAUDE.md'])
+    for (const doc of ['docs/agents/AGENTS.md', 'docs/agents/CLAUDE.md'])
       expect(fs.readFileSync(path.join(REPO, doc), 'utf8'), doc).toContain(tpl);
     const pkg = JSON.parse(fs.readFileSync(path.join(REPO, 'package.json'), 'utf8')) as Record<
       string,

@@ -1,5 +1,6 @@
 {
   "mode": "report",
+  "manifest": "config/media.manifest.json",
   "allowlist": [
     "**/components/ui/**",
     "**/icons/**",

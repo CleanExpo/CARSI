@@ -29,6 +29,7 @@ const ENDPOINT = '/api/coaching/portal/ask-coach';
 export function CoachingAskCoachPanel({ className = '' }: { className?: string }) {
   const { access } = useCoachingPortal();
   const [available, setAvailable] = useState(false);
+  const [staffPreviewBlocked, setStaffPreviewBlocked] = useState(false);
   const [questions, setQuestions] = useState<MemberQuestionView[]>([]);
   const [question, setQuestion] = useState('');
   const [asking, setAsking] = useState(false);
@@ -39,16 +40,35 @@ export function CoachingAskCoachPanel({ className = '' }: { className?: string }
     let cancelled = false;
     fetch(ENDPOINT)
       .then(async (res) => {
-        if (!res.ok || cancelled) return;
-        const data = (await res.json()) as { questions?: MemberQuestionView[] };
-        setQuestions(data.questions ?? []);
-        setAvailable(true);
+        if (cancelled) return;
+        if (res.ok) {
+          const data = (await res.json()) as { questions?: MemberQuestionView[] };
+          setQuestions(data.questions ?? []);
+          setAvailable(true);
+          return;
+        }
+        if (access.mode === 'staff_preview' && res.status === 403) {
+          setStaffPreviewBlocked(true);
+        }
       })
       .catch(() => undefined);
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [access.mode]);
+
+  if (staffPreviewBlocked) {
+    return (
+      <section className={`${coachingCard} ${className}`}>
+        <p className={coachingEyebrow}>Ask my coach</p>
+        <h2 className={`mt-1 ${coachingCardTitle}`}>Subscriber feature</h2>
+        <p className={`mt-2 ${coachingMuted}`}>
+          Staff preview can browse the workspace, but Ask my coach needs an active coaching
+          subscription — the same gate paying members hit.
+        </p>
+      </section>
+    );
+  }
 
   if (!available) return null;
 
@@ -167,12 +187,26 @@ function AskResult({ result }: { result: AskMyCoachResult }) {
                 {source ? (
                   <p className="mt-1 text-xs text-slate-400">
                     Source:{' '}
-                    <Link
-                      href={source.sourceHref}
-                      className="text-sky-300 underline-offset-2 hover:underline"
-                    >
-                      {source.sourceLabel}
-                    </Link>
+                    {/* GP-631: a coach's own item links out only when it has a web address. */}
+                    {!source.sourceHref ? (
+                      <span className="text-slate-300">{source.sourceLabel}</span>
+                    ) : /^https?:\/\//.test(source.sourceHref) ? (
+                      <a
+                        href={source.sourceHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sky-300 underline-offset-2 hover:underline"
+                      >
+                        {source.sourceLabel}
+                      </a>
+                    ) : (
+                      <Link
+                        href={source.sourceHref}
+                        className="text-sky-300 underline-offset-2 hover:underline"
+                      >
+                        {source.sourceLabel}
+                      </Link>
+                    )}
                   </p>
                 ) : null}
               </div>

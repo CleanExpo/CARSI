@@ -22,24 +22,19 @@ import { NextRequest } from 'next/server';
 import pg from 'pg';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
+import { pgSuiteTarget } from '@/test-utils/pg-disposable';
+
 const DB_URL = process.env.DATABASE_URL?.trim() ?? '';
-const IN_CI = process.env.CI === 'true';
-const HOST = (() => {
-  try {
-    return DB_URL ? new URL(DB_URL).hostname : '';
-  } catch {
-    return '';
-  }
-})();
-const RUNNABLE = Boolean(DB_URL) && ['localhost', '127.0.0.1', '::1'].includes(HOST);
+// Loopback host AND CARSI_PG_DISPOSABLE=1, or no run at all (src/test-utils/pg-disposable.ts).
+const TARGET = pgSuiteTarget(process.env);
+const RUNNABLE = TARGET.runnable;
 
 if (!RUNNABLE) {
   describe('course-review locks (real PostgreSQL)', () => {
-    if (IN_CI) {
-      it('must run in CI: needs DATABASE_URL pointing at the local migrated postgres service', () => {
-        throw new Error(
-          `CI=true but no usable local DATABASE_URL (host: "${HOST || 'none'}"). The two-session lock proof must run, not skip.`
-        );
+    const refusal = TARGET.refusal;
+    if (refusal) {
+      it('refuses: needs a disposable loopback DATABASE_URL (CARSI_PG_DISPOSABLE=1)', () => {
+        throw new Error(refusal);
       });
     } else {
       it.skip('runs in CI (E2E job, `npm run test:pg`): no local DATABASE_URL here', () => {});

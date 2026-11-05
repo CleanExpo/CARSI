@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server';
 
-import { getBackendOrigin, getHealthCheckPath } from '@/lib/env/public-url';
+import { probeDatabase } from '@/lib/server/health';
 import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
+
+// Always run live — a cached deep check would report a stale status.
+export const dynamic = 'force-dynamic';
 
 interface DependencyCheck {
   name: string;
@@ -50,9 +53,12 @@ async function checkDatabase(): Promise<DependencyCheck> {
 
   const upstream = getUpstreamBaseUrl();
   if (!upstream) {
+    // Single-app deployment: this process owns the database, so probe it
+    // directly (same SELECT 1 as /api/health/ready).
+    const ok = await probeDatabase();
     result.latency_ms = Date.now() - start;
-    result.status = 'unchecked';
-    result.error = 'No external API configured (/ready check skipped)';
+    result.status = ok ? 'healthy' : 'unhealthy';
+    result.error = ok ? null : 'Database probe failed';
     return result;
   }
 
@@ -90,13 +96,16 @@ async function checkBackend(): Promise<DependencyCheck> {
   };
 
   const upstream = getUpstreamBaseUrl();
+  if (!upstream) {
+    // No separate backend: this process serves the API itself. Fetching a
+    // bare relative path here always threw, which made this route 503.
+    result.latency_ms = Date.now() - start;
+    result.error = 'No separate backend in this deployment';
+    return result;
+  }
 
   try {
-    const url = upstream
-      ? `${upstream.replace(/\/$/, '')}/api/v1/health`
-      : `${getBackendOrigin()}${getHealthCheckPath()}`;
-
-    const response = await fetch(url, {
+    const response = await fetch(`${upstream.replace(/\/$/, '')}/api/v1/health`, {
       method: 'GET',
       signal: AbortSignal.timeout(5000),
     });

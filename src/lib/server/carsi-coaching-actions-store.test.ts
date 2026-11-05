@@ -164,6 +164,33 @@ describe('proposed actions in the actions store', () => {
     expect(items[0].status).toBe('proposed');
   });
 
+  it('does not list a learning draft or a coach draft that is not a marketing-pack row', async () => {
+    seedProposed();
+    rows.push({
+      ...rows[0],
+      id: 'course-draft',
+      status: 'proposed',
+      goalId: 'course:11111111-1111-4111-8111-111111111111',
+      title: 'Hidden course',
+    });
+    rows.push({
+      ...rows[0],
+      id: 'coach-draft',
+      status: 'draft',
+      goalId: null,
+      title: 'Hidden draft',
+    });
+    rows.push({
+      ...rows[0],
+      id: 'declined-pack',
+      status: 'declined',
+      goalId: 'marketing-pack:title-generic',
+      title: 'Declined fix',
+    });
+    const items = await store.listCoachingActionsForUser('member-1');
+    expect(items.map((i) => i.id).sort()).toEqual(['a1', 'declined-pack']);
+  });
+
   it('a member cannot self-approve a proposed action through the normal upsert', async () => {
     seedProposed();
     const result = await store.upsertCoachingActionForUser('member-1', {

@@ -43,7 +43,10 @@ export interface AskCoachStore {
   saveCoachAnswer(id: string, answer: string): Promise<AskCoachQuestionRecord | null>;
 }
 
-export type KnowledgeBaseLookup = (coachId: string) => CoachKnowledgeBase | null;
+/** Sync for the published source; async once a coach's own corpus (GP-631) is read from storage. */
+export type KnowledgeBaseLookup = (
+  coachId: string
+) => CoachKnowledgeBase | null | Promise<CoachKnowledgeBase | null>;
 
 export type AskMyCoachResult =
   | { status: 'answered'; passages: AskPassage[]; citations: AskCitation[] }
@@ -67,7 +70,7 @@ export async function askMyCoach(
   const coachId = await store.coachIdForMember(userId);
   if (!coachId) return { status: 'no_coach' };
 
-  const kb = knowledgeBaseFor(coachId) ?? { coachId, items: [] };
+  const kb = (await knowledgeBaseFor(coachId)) ?? { coachId, items: [] };
   const answer = answerFromKnowledgeBase(question, kb);
   if (answer.status === 'answered') return answer;
 

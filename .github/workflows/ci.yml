@@ -190,6 +190,18 @@ jobs:
       - name: IICRC / CEC compliance guard self-test
         run: npm run test:iicrc-compliance
 
+      - name: Live buy-path guard self-test (GP-638)
+        run: npm run test:live-buy-path
+
+      - name: Guard enumeration self-test
+        run: npm run test:guard-enumeration
+
+      # GP-680: the rule files moved to docs/agents/. Claude Code and Cursor only auto-load
+      # their own entry points, so .claude/CLAUDE.md and .cursor/rules/carsi-agent-rules.mdc
+      # must keep pointing at the licence and premium-visual rules, or agents work without them.
+      - name: Agent rule entry-point self-test
+        run: npm run test:agent-doc-paths
+
       # Licence-critical STRUCTURAL backstop (GP-498): scans the whole application (app/, src/)
       # for the leak class the copy scanner cannot see — any code that reads the RAW course CEC
       # column (`.cecHours`) or uses `iicrcDiscipline` as a CEC/eligibility signal outside the
@@ -385,6 +397,9 @@ jobs:
         run: npm run test:pg
         env:
           NODE_ENV: test
+          # The suites write and delete shared rows, so they refuse any database not marked
+          # throwaway. This job's postgres service is created for the run and discarded after it.
+          CARSI_PG_DISPOSABLE: '1'
 
       # The yearly-membership grant ROTATES an existing member's password and
       # reveals it only in the welcome email, so a second grant locks the member

@@ -8,6 +8,7 @@ import {
   SURVEY_PURPOSE_NOTICE,
   type SurveyOption,
 } from '@/lib/marketing/purchase-survey';
+import { readPurchaseSurveyKeys } from '@/lib/marketing/purchase-survey-key';
 
 type Status = 'open' | 'sending' | 'saved' | 'failed' | 'skipped';
 
@@ -74,6 +75,8 @@ export function PurchaseSurvey({ sessionId }: { sessionId: string | null }) {
 
   async function send() {
     if (!industry && !foundVia) return;
+    // The keys this tab sent with its recent checkouts (GP-662); without one the server refuses.
+    const surveyKeys = readPurchaseSurveyKeys();
     setStatus('sending');
     try {
       const res = await fetch('/api/lms/checkout/survey', {
@@ -81,6 +84,7 @@ export function PurchaseSurvey({ sessionId }: { sessionId: string | null }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           session_id: sessionId,
+          ...(surveyKeys.length > 0 ? { survey_keys: surveyKeys } : {}),
           ...(industry ? { industry } : {}),
           ...(foundVia ? { found_via: foundVia } : {}),
         }),

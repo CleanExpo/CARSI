@@ -22,7 +22,7 @@ function matches(row: Row, where: Where): boolean {
     }
     const value = row[key as keyof Row];
     if (cond === null) return value === null;
-    // GP-634: delete is limited to member-settable statuses with `status: { in: [...] }`.
+    // Status filters use `{ in: [...] }` (board rows, and GP-634's member-settable set).
     if (typeof cond === 'object' && cond && 'in' in cond) {
       return ((cond as { in: unknown[] }).in ?? []).includes(value);
     }

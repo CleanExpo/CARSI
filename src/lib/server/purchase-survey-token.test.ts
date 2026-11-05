@@ -1,81 +1,87 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  cookieAuthorisesSession,
-  nextPurchaseSurveyCookie,
-  PURCHASE_SURVEY_COOKIE_MAX_LENGTH,
-  PURCHASE_SURVEY_COOKIE_NAME,
-  PURCHASE_SURVEY_TOKEN_TTL_SECONDS,
-  signPurchaseSurveyToken,
-  verifyPurchaseSurveyToken,
+  parsePurchaseSurveyKey,
+  parsePurchaseSurveyKeys,
+  PURCHASE_SURVEY_MAX_KEYS,
+  PURCHASE_SURVEY_BINDING_METADATA_KEY,
+  PURCHASE_SURVEY_WINDOW_SECONDS,
+  purchaseSurveyBinding,
+  sessionAuthorisedForSurvey,
 } from './purchase-survey-token';
 
 const NOW = new Date('2026-10-29T00:00:00Z');
+const NOW_SECONDS = Math.floor(NOW.getTime() / 1000);
+const KEY = '00112233445566778899aabbccddeeff';
+const OTHER = 'ffeeddccbbaa99887766554433221100';
 
-describe('purchase survey capability token', () => {
-  it('lasts 24 hours under the carsi_svy name', () => {
-    expect(PURCHASE_SURVEY_TOKEN_TTL_SECONDS).toBe(60 * 60 * 24);
-    expect(PURCHASE_SURVEY_COOKIE_NAME).toBe('carsi_svy');
+function boundSession(key: string, created = NOW_SECONDS - 60) {
+  return { created, metadata: { [PURCHASE_SURVEY_BINDING_METADATA_KEY]: purchaseSurveyBinding(key) } };
+}
+
+describe('purchase survey tab key (GP-662)', () => {
+  it('binding goes in svy_bk; answers are accepted for 24 hours', () => {
+    expect(PURCHASE_SURVEY_BINDING_METADATA_KEY).toBe('svy_bk');
+    expect(PURCHASE_SURVEY_WINDOW_SECONDS).toBe(60 * 60 * 24);
   });
 
-  it('verifies for the session it was issued for', () => {
-    const token = signPurchaseSurveyToken('cs_test_a', NOW);
-    expect(verifyPurchaseSurveyToken(token, 'cs_test_a', NOW)).toBe(true);
-  });
-
-  it('does not verify for another session', () => {
-    const token = signPurchaseSurveyToken('cs_test_a', NOW);
-    expect(verifyPurchaseSurveyToken(token, 'cs_test_b', NOW)).toBe(false);
-  });
-
-  it('does not verify once expired', () => {
-    const token = signPurchaseSurveyToken('cs_test_a', NOW);
-    const later = new Date(NOW.getTime() + (PURCHASE_SURVEY_TOKEN_TTL_SECONDS + 1) * 1000);
-    expect(verifyPurchaseSurveyToken(token, 'cs_test_a', later)).toBe(false);
-  });
-
-  it('rejects a tampered expiry or signature, and junk, without throwing', () => {
-    const token = signPurchaseSurveyToken('cs_test_a', NOW);
-    const [exp, sig] = token.split('.');
-    expect(verifyPurchaseSurveyToken(`${Number(exp) + 999999}.${sig}`, 'cs_test_a', NOW)).toBe(false);
-    expect(verifyPurchaseSurveyToken(`${exp}.${sig.slice(0, -2)}aa`, 'cs_test_a', NOW)).toBe(false);
-    for (const junk of [undefined, '', 'x', '.', '1.2.3', '<script>']) {
-      expect(verifyPurchaseSurveyToken(junk, 'cs_test_a', NOW)).toBe(false);
+  it('accepts only 32 lower-case hex characters as a key', () => {
+    expect(parsePurchaseSurveyKey(KEY)).toBe(KEY);
+    for (const bad of [undefined, null, '', KEY.toUpperCase(), KEY.slice(1), `${KEY}0`, `${KEY.slice(0, 31)}g`, 42, { KEY }, [KEY]]) {
+      expect(parsePurchaseSurveyKey(bad)).toBeNull();
     }
+  });
+
+  it('a key list is 1 to 5 well-formed keys, else refused whole', () => {
+    expect(PURCHASE_SURVEY_MAX_KEYS).toBe(5);
+    expect(parsePurchaseSurveyKeys([KEY])).toEqual([KEY]);
+    expect(parsePurchaseSurveyKeys([KEY, OTHER])).toEqual([KEY, OTHER]);
+    for (const bad of [undefined, null, KEY, [], [KEY, 'zz'], Array(6).fill(KEY), { 0: KEY }, [KEY.toUpperCase()]]) {
+      expect(parsePurchaseSurveyKeys(bad)).toBeNull();
+    }
+  });
+
+  it('the binding is 32 hex, stable for one key, different per key, and not the key itself', () => {
+    expect(purchaseSurveyBinding(KEY)).toMatch(/^[0-9a-f]{32}$/);
+    expect(purchaseSurveyBinding(KEY)).toBe(purchaseSurveyBinding(KEY));
+    expect(purchaseSurveyBinding(KEY)).not.toBe(purchaseSurveyBinding(OTHER));
+    expect(purchaseSurveyBinding(KEY)).not.toBe(KEY);
   });
 });
 
-describe('the carsi_svy cookie holds up to three checkouts', () => {
-  it('checkout B started after A keeps A authorised (A paid later still works)', () => {
-    const afterA = nextPurchaseSurveyCookie(undefined, 'cs_test_a', NOW);
-    const afterB = nextPurchaseSurveyCookie(afterA, 'cs_test_b', NOW);
-    expect(cookieAuthorisesSession(afterB, 'cs_test_a', NOW)).toBe(true);
-    expect(cookieAuthorisesSession(afterB, 'cs_test_b', NOW)).toBe(true);
-    expect(cookieAuthorisesSession(afterB, 'cs_test_c', NOW)).toBe(false);
+describe('sessionAuthorisedForSurvey', () => {
+  it("authorises the tab's own session", () => {
+    expect(sessionAuthorisedForSurvey(boundSession(KEY), KEY, NOW)).toBe(true);
   });
 
-  it('keeps only the three newest, so the cookie stays bounded', () => {
-    let value: string | undefined;
-    for (const id of ['cs_test_1', 'cs_test_2', 'cs_test_3', 'cs_test_4']) {
-      value = nextPurchaseSurveyCookie(value, id, NOW);
+  it("refuses another tab's session, a missing or malformed binding, and a bad key", () => {
+    expect(sessionAuthorisedForSurvey(boundSession(OTHER), KEY, NOW)).toBe(false);
+    expect(sessionAuthorisedForSurvey({ created: NOW_SECONDS, metadata: {} }, KEY, NOW)).toBe(false);
+    expect(sessionAuthorisedForSurvey({ created: NOW_SECONDS, metadata: null }, KEY, NOW)).toBe(false);
+    const truncated = { created: NOW_SECONDS, metadata: { svy_bk: purchaseSurveyBinding(KEY).slice(0, 31) } };
+    expect(sessionAuthorisedForSurvey(truncated, KEY, NOW)).toBe(false);
+    for (const bad of [undefined, '', KEY.toUpperCase(), purchaseSurveyBinding(KEY)]) {
+      expect(sessionAuthorisedForSurvey(boundSession(KEY), bad, NOW)).toBe(false);
     }
-    expect(cookieAuthorisesSession(value, 'cs_test_1', NOW)).toBe(false);
-    for (const id of ['cs_test_2', 'cs_test_3', 'cs_test_4']) {
-      expect(cookieAuthorisesSession(value, id, NOW)).toBe(true);
-    }
-    expect(value!.length).toBeLessThanOrEqual(PURCHASE_SURVEY_COOKIE_MAX_LENGTH);
   });
 
-  it('drops junk and expired entries from an existing cookie', () => {
-    const old = signPurchaseSurveyToken('cs_test_old', new Date(NOW.getTime() - 2 * 24 * 3600 * 1000));
-    const value = nextPurchaseSurveyCookie(`<script>~${old}~${'x'.repeat(4000)}`, 'cs_test_new', NOW);
-    expect(value.split('~')).toHaveLength(1);
-    expect(cookieAuthorisesSession(value, 'cs_test_new', NOW)).toBe(true);
+  it('accepts when any key in the list matches, refuses when none does (GP-662)', () => {
+    expect(sessionAuthorisedForSurvey(boundSession(KEY), [OTHER, KEY], NOW)).toBe(true);
+    expect(sessionAuthorisedForSurvey(boundSession(KEY), [OTHER], NOW)).toBe(false);
+    expect(sessionAuthorisedForSurvey(boundSession(KEY), [], NOW)).toBe(false);
+    expect(sessionAuthorisedForSurvey(boundSession(KEY), Array(6).fill(KEY), NOW)).toBe(false);
   });
 
-  it('a junk or oversized cookie authorises nothing and never throws', () => {
-    for (const junk of [undefined, '', '~~~', 'a~b', 'x'.repeat(5000)]) {
-      expect(cookieAuthorisesSession(junk, 'cs_test_a', NOW)).toBe(false);
-    }
+  it('a session that stored the raw key instead of its binding is refused', () => {
+    expect(sessionAuthorisedForSurvey({ created: NOW_SECONDS, metadata: { svy_bk: KEY } }, KEY, NOW)).toBe(false);
+  });
+
+  it('accepts for 24 hours after the session was created, with 5 minutes of clock allowance', () => {
+    const day = PURCHASE_SURVEY_WINDOW_SECONDS;
+    expect(sessionAuthorisedForSurvey(boundSession(KEY, NOW_SECONDS - day), KEY, NOW)).toBe(true);
+    expect(sessionAuthorisedForSurvey(boundSession(KEY, NOW_SECONDS - day - 1), KEY, NOW)).toBe(false);
+    expect(sessionAuthorisedForSurvey(boundSession(KEY, NOW_SECONDS + 300), KEY, NOW)).toBe(true);
+    expect(sessionAuthorisedForSurvey(boundSession(KEY, NOW_SECONDS + 301), KEY, NOW)).toBe(false);
+    expect(sessionAuthorisedForSurvey({ ...boundSession(KEY), created: null }, KEY, NOW)).toBe(false);
   });
 });

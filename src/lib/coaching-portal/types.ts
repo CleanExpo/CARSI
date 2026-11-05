@@ -31,3 +31,9 @@ export const EMPTY_COACHING_PORTAL_WORKSPACE: CoachingPortalWorkspace = {
   sessionPrepNotes: '',
   monthlyActions: [],
 };
+
+/** Feature switches the server resolves for the coaching workspace. */
+export type CoachingPortalFeatures = {
+  /** GP-635 check-ins and progress (CARSI_COACHING_ACCOUNTABILITY_ENABLED). */
+  accountability: boolean;
+};
