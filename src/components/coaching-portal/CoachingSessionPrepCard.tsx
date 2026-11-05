@@ -52,7 +52,7 @@ export function CoachingSessionPrepCard() {
   }
 
   return (
-    <section className={coachingCard}>
+    <section className={`${coachingCard} mt-4`} data-testid="coaching-session-prep">
       <h2 className={coachingCardTitle}>Session prep</h2>
       <p className={`mt-2 ${coachingMuted}`}>
         What do you want to grill on this month? Wins, blockers, numbers, and decisions — Phill
