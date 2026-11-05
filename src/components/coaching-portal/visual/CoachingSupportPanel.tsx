@@ -17,6 +17,7 @@ export function CoachingSupportPanel({
   mailSubject = 'Business Coaching — marketing pack help',
   tips,
   testId = 'coaching-support-panel',
+  className = '',
 }: {
   id?: string;
   title?: string;
@@ -24,11 +25,12 @@ export function CoachingSupportPanel({
   mailSubject?: string;
   tips?: string[];
   testId?: string;
+  className?: string;
 }) {
   return (
     <section
       id={id}
-      className={`${coachingCard} border-sky-500/15 bg-[#0c1424]/90`}
+      className={`${coachingCard} border-sky-500/15 bg-[#0c1424]/90 ${className}`}
       aria-labelledby={id ? `${id}-title` : undefined}
       data-testid={testId}
     >
