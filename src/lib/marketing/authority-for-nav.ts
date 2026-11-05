@@ -8,7 +8,7 @@ import {
   Stethoscope,
 } from 'lucide-react';
 
-import { authorityPages, type AuthorityIcon, type AuthorityPageEntry } from '@/lib/marketing/authority-pages';
+import { authorityPages, type AuthorityHeroImage, type AuthorityIcon, type AuthorityPageEntry } from '@/lib/marketing/authority-pages';
 import { roleGuidePagePath } from '@/lib/marketing/role-guides-path';
 
 const ICONS: Record<AuthorityIcon, LucideIcon> = {
@@ -26,6 +26,7 @@ export type AuthorityForNavItem = {
   audience: string;
   summary: string;
   icon: LucideIcon;
+  heroImage: AuthorityHeroImage | null;
 };
 
 /** Navigation cards for the six /for/<role> authority guides. */
@@ -35,6 +36,7 @@ export const authorityForNavItems: AuthorityForNavItem[] = authorityPages.map((e
   audience: entry.audience,
   summary: entry.metaDescription,
   icon: ICONS[entry.icon],
+  heroImage: entry.heroImage,
 }));
 
 /** Latest claim verification date on an entry (ISO YYYY-MM-DD). */
