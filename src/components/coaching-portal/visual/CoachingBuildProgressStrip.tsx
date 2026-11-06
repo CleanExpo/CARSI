@@ -15,10 +15,11 @@ export function CoachingBuildProgressStrip({
 }) {
   const [index, setIndex] = useState(0);
   const [wasActive, setWasActive] = useState(active);
-  // Reset to the first step when the build stops (state adjusted during render, not in an effect).
+  // Reset to the first step whenever the build starts or stops (state adjusted during render,
+  // not in an effect). Resetting on start too means a late tick before cleanup cannot carry over.
   if (active !== wasActive) {
     setWasActive(active);
-    if (!active) setIndex(0);
+    setIndex(0);
   }
 
   useEffect(() => {
