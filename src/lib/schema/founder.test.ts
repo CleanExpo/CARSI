@@ -30,6 +30,15 @@ describe('buildFounderPersonSchema', () => {
     }
   });
 
+  it('never links a profile page that does not exist (RA-8173)', () => {
+    for (const url of CARSI_FOUNDER_SAME_AS as string[]) {
+      // restoreassist.com.au is retired and does not resolve.
+      expect(url).not.toMatch(/restoreassist\.com\.au/);
+      // The RestoreAssist author page is not published yet; add it back here once it is live.
+      expect(url).not.toMatch(/\/authors\/phill-mcgurk/);
+    }
+  });
+
   it('declares topical authority via knowsAbout', () => {
     expect(Array.isArray(schema.knowsAbout)).toBe(true);
     expect((schema.knowsAbout as string[]).join(' ').toLowerCase()).toContain('iicrc');
