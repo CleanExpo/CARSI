@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 
 import {
@@ -25,13 +26,12 @@ export function RoleGuideScopeSection({
     <section className="border-t border-slate-200/70 bg-[#fafbfc]">
       {heroImage ? (
         <div className="relative h-44 overflow-hidden md:h-52 lg:h-56">
-          <img
+          <Image
             src={heroImage.src}
             alt=""
-            width={512}
-            height={512}
+            fill
+            sizes="100vw"
             loading="lazy"
-            decoding="async"
             className="size-full object-cover object-center"
             aria-hidden
           />

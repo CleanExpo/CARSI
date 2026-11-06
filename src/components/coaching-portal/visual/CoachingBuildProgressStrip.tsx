@@ -14,12 +14,15 @@ export function CoachingBuildProgressStrip({
   testId?: string;
 }) {
   const [index, setIndex] = useState(0);
+  const [wasActive, setWasActive] = useState(active);
+  // Reset to the first step when the build stops (state adjusted during render, not in an effect).
+  if (active !== wasActive) {
+    setWasActive(active);
+    if (!active) setIndex(0);
+  }
 
   useEffect(() => {
-    if (!active) {
-      setIndex(0);
-      return;
-    }
+    if (!active) return;
     const id = window.setInterval(() => {
       setIndex((i) => (i + 1) % steps.length);
     }, 2200);

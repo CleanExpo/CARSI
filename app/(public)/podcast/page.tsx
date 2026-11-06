@@ -258,18 +258,7 @@ export default async function PodcastPage({
       </section>
 
       <PlatformContextualNext current="/podcast" />
-          </div>
-          <Link
-            href="/contact"
-            className="inline-flex shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-800 hover:border-[#2490ed]/40 hover:text-[#146fc2]"
-          >
-            <Plus className="h-4 w-4" aria-hidden />
-            Submit podcast
-          </Link>
-        </div>
-      </section>
-
-      <HomeFinalCtaSection />
+      <StaticMarketingClosingCta />
     </>
   );
 }

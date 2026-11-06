@@ -11,7 +11,7 @@ export type PlatformRelatedLink = {
 /** Three contextual next steps per platform page — not a duplicate 8-up grid. */
 export const PLATFORM_RELATED_BY_HREF: Record<string, PlatformRelatedLink[]> = {
   '/restoration-training-cost-australia': [
-    { href: '/courses', label: 'Course catalogue', detail: 'Live price and CECs on every course' },
+    { href: '/courses', label: 'Course catalogue', detail: 'Live price and duration on every course' },
     { href: '/pricing', label: 'Membership tiers', detail: 'Compare access options in one place' },
     {
       href: startSmartBasePath,
@@ -33,7 +33,7 @@ export const PLATFORM_RELATED_BY_HREF: Record<string, PlatformRelatedLink[]> = {
     {
       href: '/restoration-training-cost-australia',
       label: 'Training costs',
-      detail: 'Separate coaching from CEC spend',
+      detail: 'Separate coaching from course spend',
     },
   ],
   '/ccw-training/workshop': [
@@ -42,7 +42,7 @@ export const PLATFORM_RELATED_BY_HREF: Record<string, PlatformRelatedLink[]> = {
       label: 'Business Coaching',
       detail: 'Monthly owner plan after the workshop',
     },
-    { href: '/courses', label: 'Online courses', detail: 'Keep CECs current between deliveries' },
+    { href: '/courses', label: 'Online courses', detail: 'Keep learning between deliveries' },
     {
       href: startSmartBasePath,
       label: 'Start Smart',

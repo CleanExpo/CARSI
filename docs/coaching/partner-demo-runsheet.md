@@ -101,18 +101,12 @@ top of every portal screen.
   checklist, 30 days of claim-safe social drafts, and ranked fixes. Fixes land on the action board
   as proposed items until the coach approves them."
 
-## 10. Ask my coach assistant
+## 10. Coming next: assistant, your chapter and the Hall
 
-- **Status:** coming (GP-630). Nothing to click yet.
-- **Proves:** A3.
+- **Status:** coming (GP-630 assistant, GP-632 chapters, GP-636 TradeHall). Nothing to click yet.
+- **Proves:** A3, A5 and A9.
 - **Say:** "Members will ask questions answered from your own material, and unanswered ones come to
-  you."
-
-## 11. Your chapter and the Hall
-
-- **Status:** coming (GP-632 chapters, GP-636 TradeHall). Nothing to click yet.
-- **Proves:** A5 and A9.
-- **Say:** "You would run your own chapter: your name, your members, your currency. A US chapter
+  you. You would run your own chapter: your name, your members, your currency. A US chapter
   prices in US dollars. Your members also get a seat in the Hall."
 
 ## What is not in the demo yet

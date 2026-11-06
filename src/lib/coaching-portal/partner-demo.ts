@@ -122,7 +122,7 @@ export type PartnerDemoWalkthroughStep = {
 };
 
 /**
- * GP-637 eleven-step run sheet, in the order a prospect coach should see it. Mirrors
+ * GP-637 ten-step run sheet, in the order a prospect coach should see it. Mirrors
  * docs/coaching/partner-demo-runsheet.md (a test keeps the two in step).
  */
 export const PARTNER_DEMO_WALKTHROUGH_STEPS: readonly PartnerDemoWalkthroughStep[] = [
@@ -195,28 +195,20 @@ export const PARTNER_DEMO_WALKTHROUGH_STEPS: readonly PartnerDemoWalkthroughStep
   {
     title: 'Marketing pack',
     segment: '/marketing',
-    minutes: 1.5,
+    minutes: 1,
     advantage: 'A7 marketing pack',
     status: 'live',
     shows:
       'Automated website review, local-search checklist, 30-day social calendar and coach-approved fixes.',
   },
   {
-    title: 'Ask my coach assistant',
+    title: 'Coming next: assistant, your chapter and the Hall',
     segment: null,
     minutes: 0.5,
-    advantage: 'A3 assistant',
+    advantage: 'A3 assistant, A5 chapters and A9 TradeHall',
     status: 'coming',
-    shows: 'Coming: grounded answers from the coach’s own material.',
-    tickets: ['GP-630'],
-  },
-  {
-    title: 'Your chapter and the Hall',
-    segment: null,
-    minutes: 1,
-    advantage: 'A5 chapters and A9 TradeHall',
-    status: 'coming',
-    shows: 'Coming: the coach’s own chapter, members and currency, and the Hall seminar room.',
-    tickets: ['GP-632', 'GP-636'],
+    shows:
+      'Coming: grounded answers from the coach’s own material, the coach’s own chapter, members and currency, and the Hall seminar room.',
+    tickets: ['GP-630', 'GP-632', 'GP-636'],
   },
 ];

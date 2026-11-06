@@ -30,6 +30,6 @@ export function packProgressDelta(
   };
 }
 
-export function findFixInReview(review: SiteReview, fixId: string) {
+export function findFixInReview(review: Pick<SiteReview, 'fixes'>, fixId: string) {
   return review.fixes.find((f) => f.id === fixId) ?? null;
 }

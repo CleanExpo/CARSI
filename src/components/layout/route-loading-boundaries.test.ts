@@ -14,10 +14,14 @@ describe('route loading boundaries', () => {
   });
 
   it('keeps the skeleton on each logged-in group', () => {
-    for (const group of ['(admin)', '(dashboard)', '(coaching-portal)']) {
-      expect(readFileSync(join(APP, group, 'loading.tsx'), 'utf8')).toContain(
-        'RouteLoadingSkeleton'
-      );
+    // GP-634: the coaching portal renders its own branded workspace skeleton.
+    const skeletons: Record<string, string> = {
+      '(admin)': 'RouteLoadingSkeleton',
+      '(dashboard)': 'RouteLoadingSkeleton',
+      '(coaching-portal)': 'CoachingWorkspaceLoading',
+    };
+    for (const [group, skeleton] of Object.entries(skeletons)) {
+      expect(readFileSync(join(APP, group, 'loading.tsx'), 'utf8'), group).toContain(skeleton);
     }
   });
 });

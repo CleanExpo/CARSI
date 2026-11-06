@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 import { getPublicSiteUrl } from '@/lib/env/public-url';
-import { ROLE_GUIDES_HUB_PATH, roleGuidePagePath } from '@/lib/marketing/role-guides-path';
+import { roleGuidePagePath } from '@/lib/marketing/role-guides-path';
 import { authorityPageLatestVerified } from '@/lib/marketing/authority-for-nav';
 import {
   isAuthorityPagePublishable,

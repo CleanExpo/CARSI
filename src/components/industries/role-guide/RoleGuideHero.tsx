@@ -1,5 +1,6 @@
 import type { LucideIcon } from 'lucide-react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 import {
@@ -110,14 +111,13 @@ export function RoleGuideHero({
           {heroImage ? (
             <aside className="mx-auto w-full max-w-[280px] sm:max-w-[320px] lg:mx-0 lg:w-full lg:max-w-none">
               <figure>
-                <div className="aspect-square w-full overflow-hidden rounded-[1.35rem] bg-slate-200/80 shadow-[0_28px_56px_-36px_rgba(15,23,42,0.45)] ring-1 ring-slate-900/[0.06]">
-                  <img
+                <div className="relative aspect-square w-full overflow-hidden rounded-[1.35rem] bg-slate-200/80 shadow-[0_28px_56px_-36px_rgba(15,23,42,0.45)] ring-1 ring-slate-900/[0.06]">
+                  <Image
                     src={heroImage.src}
                     alt={heroImage.alt}
-                    width={512}
-                    height={512}
+                    fill
+                    sizes="(min-width: 1024px) 40vw, 320px"
                     loading="eager"
-                    decoding="async"
                     className="size-full object-cover object-center"
                   />
                 </div>

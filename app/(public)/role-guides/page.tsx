@@ -9,7 +9,7 @@ import type { Metadata } from 'next';
 const siteUrl = getPublicSiteUrl();
 
 export const metadata: Metadata = {
-  title: 'Role-specific training guides | CARSI',
+  title: 'Role-specific training guides',
   description:
     'Source-backed CARSI guides for builders, insurers, facility teams, healthcare, strata and cleaning contractors — each linking live courses for that job.',
   alternates: { canonical: `${siteUrl}${ROLE_GUIDES_HUB_PATH}` },

@@ -525,6 +525,7 @@ export function CoachingResourcesPage() {
         {COACHING_RESOURCE_SECTIONS.map((section) => (
           <CoachingSection key={section.id} title={section.title} testId={`coaching-resource-${section.id}`}>
             <p className={`-mt-2 mb-4 ${coachingMuted}`}>{section.description}</p>
+            <ul className="divide-y divide-white/[0.06]">
               {section.items.map((item) => (
                 <li
                   key={item.id}

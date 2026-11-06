@@ -31,6 +31,7 @@ import {
   ShieldCheck,
   Target,
 } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -239,14 +240,12 @@ export function CcwWorkshopClient() {
             </div>
             <figure className="mx-auto w-full max-w-[min(100%,22rem)] shrink-0 lg:mx-0">
               <div className="relative aspect-square overflow-hidden rounded-2xl border border-slate-200/90 bg-slate-100 shadow-[0_20px_50px_-28px_rgba(15,23,42,0.35)] ring-1 ring-slate-900/5">
-                {/* Native img + object-cover: avoids Next/Image width forcing on unoptimized builds */}
-                <img
+                <Image
                   src={WORKSHOP_HERO_IMAGE.src}
                   alt={WORKSHOP_HERO_IMAGE.alt}
-                  width={WORKSHOP_HERO_IMAGE.width}
-                  height={WORKSHOP_HERO_IMAGE.height}
+                  fill
+                  sizes="352px"
                   loading="eager"
-                  decoding="async"
                   className="absolute inset-0 h-full w-full object-cover object-center"
                 />
               </div>
@@ -510,6 +509,7 @@ export function CcwWorkshopClient() {
         <MarketingGrowthLinks currentHref={ccwWorkshopPath} />
       </div>
       <PlatformContextualNext current={ccwWorkshopPath} />
+      <StaticMarketingClosingCta />
     </>
   );
 }

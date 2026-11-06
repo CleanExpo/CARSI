@@ -1,6 +1,5 @@
 /** GP-634: local-search checklist, ticked where the review saw the item already in place. */
-import { safeTownLabel } from './safe-place-label';
-import { sanitizeVoice } from './site-review';
+import { primaryTown, sanitizeVoice } from './site-review';
 import type { ChecklistItem, SiteReview, TradeVoice } from './types';
 
 export function buildLocalSearchChecklist(
@@ -8,7 +7,7 @@ export function buildLocalSearchChecklist(
   rawVoice: TradeVoice
 ): ChecklistItem[] {
   const voice = sanitizeVoice(rawVoice);
-  const town = safeTownLabel(rawVoice);
+  const town = primaryTown(voice.town) || 'your town';
   const passed = (id: string) => review.checks.find((c) => c.id === id)?.passed ?? false;
   return [
     {
