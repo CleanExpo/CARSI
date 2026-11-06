@@ -11,7 +11,7 @@ export type PlatformRelatedLink = {
 /** Three contextual next steps per platform page — not a duplicate 8-up grid. */
 export const PLATFORM_RELATED_BY_HREF: Record<string, PlatformRelatedLink[]> = {
   '/restoration-training-cost-australia': [
-    { href: '/courses', label: 'Course catalogue', detail: 'Live price and duration on every course' },
+    { href: '/courses', label: 'Course catalogue', detail: 'Browse published courses' },
     { href: '/pricing', label: 'Membership tiers', detail: 'Compare access options in one place' },
     {
       href: startSmartBasePath,
