@@ -206,8 +206,10 @@ const REVIEWED_SOURCE_SHA256: Record<string, string> = {
     'd8d3fa2564c63e065f06025d673f027f648f2e11d5a1369042b2d42e96639b39',
   'app/(public)/pathways/[slug]/page.tsx':
     '66e4c37b9c7f7e37c7cb0f7bc7cd677db0a6f3c4814aacc6f78bcf8deab9a044',
+  // GP-696 re-pin after GP-661 b3613864 (embedded preset: layout only; every IICRC, CEC,
+  // certification, accreditation and approval line is byte-identical to the GP-639 review).
   'src/components/lms/CourseGrid.tsx':
-    'ae0da068a86cda6f544644546de0f125825170fb4cc0beb2e0b1b997dd2309f3',
+    '5e2ce9b348771667120c6ce2f6376bca3f48253b7676d1e7270c4f12500d77cc',
   'src/components/lms/CourseSearchBar.tsx':
     'f6e00b2daabe277f1d7c887b1f5357b01ec994cf7d870f489a810b51e16f8e52',
   'src/lib/catalogue/discipline-param.ts':

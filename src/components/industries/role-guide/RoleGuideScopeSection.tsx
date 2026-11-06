@@ -25,6 +25,7 @@ export function RoleGuideScopeSection({
     <section className="border-t border-slate-200/70 bg-[#fafbfc]">
       {heroImage ? (
         <div className="relative h-44 overflow-hidden md:h-52 lg:h-56">
+          {/* eslint-disable-next-line @next/next/no-img-element -- native img in a fixed-aspect box (GP-661 layout); next/image conversion is a GP-696 follow-up */}
           <img
             src={heroImage.src}
             alt=""

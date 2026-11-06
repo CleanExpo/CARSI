@@ -122,7 +122,7 @@ export type PartnerDemoWalkthroughStep = {
 };
 
 /**
- * GP-637 eleven-step run sheet, in the order a prospect coach should see it. Mirrors
+ * GP-637 ten-step run sheet, in the order a prospect coach should see it. Mirrors
  * docs/coaching/partner-demo-runsheet.md (a test keeps the two in step).
  */
 export const PARTNER_DEMO_WALKTHROUGH_STEPS: readonly PartnerDemoWalkthroughStep[] = [
@@ -193,22 +193,14 @@ export const PARTNER_DEMO_WALKTHROUGH_STEPS: readonly PartnerDemoWalkthroughStep
       'CARSI courses picked from the assessment gaps, with live course progress, above the resource library.',
   },
   {
-    title: 'Marketing pack',
-    segment: '/marketing',
-    minutes: 1.5,
-    advantage: 'A7 marketing pack',
-    status: 'live',
-    shows:
-      'Automated website review, local-search checklist, 30-day social calendar and coach-approved fixes.',
-  },
-  {
-    title: 'Ask my coach assistant',
+    title: 'Ask my coach assistant and marketing pack',
     segment: null,
     minutes: 0.5,
-    advantage: 'A3 assistant',
+    advantage: 'A3 assistant and A7 marketing pack',
     status: 'coming',
-    shows: 'Coming: grounded answers from the coach’s own material.',
-    tickets: ['GP-630'],
+    shows:
+      'Coming: grounded answers from the coach’s own material, and a marketing pack per member.',
+    tickets: ['GP-630', 'GP-634'],
   },
   {
     title: 'Your chapter and the Hall',

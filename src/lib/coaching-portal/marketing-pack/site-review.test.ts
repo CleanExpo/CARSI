@@ -54,7 +54,7 @@ describe('reviewWebsite', () => {
       expect(fix.how.length).toBeGreaterThan(20);
       expect(findComplianceIssues(`${fix.title} ${fix.why} ${fix.how}`)).toEqual([]);
     }
-    expect(review.summary).toMatch(/Toowoomba|your area/);
+    expect(review.summary).toMatch(/your area/);
   });
 
   it('finds no on-page fixes for a strong fixture site', () => {

@@ -111,6 +111,7 @@ export function RoleGuideHero({
             <aside className="mx-auto w-full max-w-[280px] sm:max-w-[320px] lg:mx-0 lg:w-full lg:max-w-none">
               <figure>
                 <div className="aspect-square w-full overflow-hidden rounded-[1.35rem] bg-slate-200/80 shadow-[0_28px_56px_-36px_rgba(15,23,42,0.45)] ring-1 ring-slate-900/[0.06]">
+                  {/* eslint-disable-next-line @next/next/no-img-element -- native img in a fixed-aspect box (GP-661 layout); next/image conversion is a GP-696 follow-up */}
                   <img
                     src={heroImage.src}
                     alt={heroImage.alt}

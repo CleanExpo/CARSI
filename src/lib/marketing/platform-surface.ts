@@ -19,7 +19,7 @@ export const PLATFORM_SURFACE_PAGES: PlatformSurfacePage[] = [
     eyebrow: 'Australian pricing, in Australian dollars',
     headline: 'What restoration training actually costs in Australia',
     lead: 'Training gets sold with the price at the bottom of the page, so here it is at the top — one published fee read at source, set beside what a CARSI course costs, dated and linked so you can verify it.',
-    summary: 'Honest price anchoring: certification vs continuing education, with sources and dates.',
+    summary: 'Honest price anchoring: published training fees beside CARSI course prices, with sources and dates.',
   },
   {
     href: '/ccw-training',

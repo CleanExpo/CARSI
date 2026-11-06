@@ -38,6 +38,7 @@ export function RoleGuideWhySection({
           <div className="lg:sticky lg:top-24 lg:self-start">
             <figure>
               <div className="aspect-[4/5] w-full max-w-md overflow-hidden rounded-2xl bg-slate-100 shadow-[0_24px_48px_-32px_rgba(15,23,42,0.35)] ring-1 ring-slate-900/[0.06] lg:max-w-none">
+                {/* eslint-disable-next-line @next/next/no-img-element -- native img in a fixed-aspect box (GP-661 layout); next/image conversion is a GP-696 follow-up */}
                 <img
                   src={heroImage.src}
                   alt=""

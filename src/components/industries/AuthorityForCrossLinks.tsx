@@ -54,6 +54,7 @@ function AuthorityForCard({ item }: { item: AuthorityForNavItem }) {
     >
       {item.heroImage ? (
         <div className="relative aspect-[2/1] overflow-hidden bg-slate-100">
+          {/* eslint-disable-next-line @next/next/no-img-element -- native img in a fixed-aspect box (GP-661 layout); next/image conversion is a GP-696 follow-up */}
           <img
             src={item.heroImage.src}
             alt={item.heroImage.alt}

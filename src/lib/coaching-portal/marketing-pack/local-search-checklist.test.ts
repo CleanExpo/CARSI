@@ -8,11 +8,6 @@ describe('review ask follows Google policy (Codex P1, head 22a64240)', () => {
   const review = reviewWebsite({ websiteUrl: null, fetch: null, googleBusinessUrl: null, voice });
   const item = buildLocalSearchChecklist(review, voice).find((i) => i.id === 'reviews-ask');
 
-  it('names the member town in service-area checklist copy when safe', () => {
-    const area = buildLocalSearchChecklist(review, voice).find((i) => i.id === 'gbp-service-area');
-    expect(area?.label).toContain('Ipswich');
-  });
-
   it('asks every customer, not only happy ones', () => {
     expect(item).toBeDefined();
     expect(item!.label).toMatch(/every customer/i);

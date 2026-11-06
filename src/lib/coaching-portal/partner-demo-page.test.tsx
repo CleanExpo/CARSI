@@ -38,7 +38,7 @@ describe('/ccw-training/partner-demo page (rendered)', () => {
     }
   });
 
-  it('lists all walkthrough steps, with coming steps labelled and not linked', () => {
+  it('lists all ten steps, with coming steps labelled and not linked', () => {
     PARTNER_DEMO_WALKTHROUGH_STEPS.forEach((step) => expect(text).toContain(step.title));
     const html = renderToStaticMarkup(createElement(CoachingPartnerDemoPage));
     for (const [i, step] of PARTNER_DEMO_WALKTHROUGH_STEPS.entries()) {
@@ -58,11 +58,9 @@ describe('/ccw-training/partner-demo page (rendered)', () => {
     }
   });
 
-  it('shows GP-630 on the assistant coming step only', () => {
+  it('shows both tickets on each combined coming step', () => {
     const html = renderToStaticMarkup(createElement(CoachingPartnerDemoPage));
-    expect(html).toContain('Coming (GP-630)');
-    expect(html).toContain('Marketing pack');
-    expect(html).not.toContain('Coming (GP-630, GP-634)');
+    expect(html).toContain('Coming (GP-630, GP-634)');
     expect(html).toContain('Coming (GP-632, GP-636)');
   });
 });

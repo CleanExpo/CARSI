@@ -240,6 +240,7 @@ export function CcwWorkshopClient() {
             <figure className="mx-auto w-full max-w-[min(100%,22rem)] shrink-0 lg:mx-0">
               <div className="relative aspect-square overflow-hidden rounded-2xl border border-slate-200/90 bg-slate-100 shadow-[0_20px_50px_-28px_rgba(15,23,42,0.35)] ring-1 ring-slate-900/5">
                 {/* Native img + object-cover: avoids Next/Image width forcing on unoptimized builds */}
+                {/* eslint-disable-next-line @next/next/no-img-element -- native img in a fixed-aspect box (GP-661 layout); next/image conversion is a GP-696 follow-up */}
                 <img
                   src={WORKSHOP_HERO_IMAGE.src}
                   alt={WORKSHOP_HERO_IMAGE.alt}
@@ -510,6 +511,7 @@ export function CcwWorkshopClient() {
         <MarketingGrowthLinks currentHref={ccwWorkshopPath} />
       </div>
       <PlatformContextualNext current={ccwWorkshopPath} />
+      <StaticMarketingClosingCta />
     </>
   );
 }
