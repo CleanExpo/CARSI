@@ -93,25 +93,28 @@ top of every portal screen.
   ticks off the action. I can remove, add or reorder courses for each member, and change which
   courses each gap prescribes."
 
-## 9. Ask my coach assistant and marketing pack
+## 9. Marketing pack
 
-- **Status:** coming (GP-630 assistant, GP-634 marketing pack). Nothing to click yet.
-- **Proves:** A3 and A7.
+- **Screen:** `/dashboard/coaching/marketing`
+- **Proves:** A7 marketing pack (GP-634).
+- **Say:** "Each member gets an automated review of their website and Google link, a local-search
+  checklist, 30 days of claim-safe social drafts, and ranked fixes. Fixes land on the action board
+  as proposed items until the coach approves them."
+
+## 10. Coming next: assistant, your chapter and the Hall
+
+- **Status:** coming (GP-630 assistant, GP-632 chapters, GP-636 TradeHall). Nothing to click yet.
+- **Proves:** A3, A5 and A9.
 - **Say:** "Members will ask questions answered from your own material, and unanswered ones come to
-  you. Each member also gets a marketing pack built from their assessment."
-
-## 10. Your chapter and the Hall
-
-- **Status:** coming (GP-632 chapters, GP-636 TradeHall). Nothing to click yet.
-- **Proves:** A5 and A9.
-- **Say:** "You would run your own chapter: your name, your members, your currency. A US chapter
+  you. You would run your own chapter: your name, your members, your currency. A US chapter
   prices in US dollars. Your members also get a seat in the Hall."
 
 ## What is not in the demo yet
 
 - The **Demo US chapter with USD pricing** needs GP-632's coach table. It is drafted, not built:
   see `docs/coaching/partner-demo-chapter-DRAFT.md`.
-- **Assistant exchanges and the marketing pack** are not seeded because their screens do not
-  exist yet (GP-630, GP-634). The learning path is assigned by hand before the demo (section 8).
+- **Assistant exchanges** are not seeded because that screen is still being built (GP-630). The
+  marketing pack is live — build or open a saved pack on `/dashboard/coaching/marketing`. The
+  learning path is assigned by hand before the demo (section 8).
 - **Scheduled nightly reset** is not set up. Re-running the seed is the reset; scheduling it needs
   a decision on which preview database the demo lives in.

@@ -58,9 +58,10 @@ describe('/ccw-training/partner-demo page (rendered)', () => {
     }
   });
 
-  it('shows both tickets on each combined coming step', () => {
+  it('shows the marketing pack as live and every ticket on the combined coming step', () => {
     const html = renderToStaticMarkup(createElement(CoachingPartnerDemoPage));
-    expect(html).toContain('Coming (GP-630, GP-634)');
-    expect(html).toContain('Coming (GP-632, GP-636)');
+    expect(html).toContain('Marketing pack');
+    expect(html).not.toContain('GP-634');
+    expect(html).toContain('Coming (GP-630, GP-632, GP-636)');
   });
 });
