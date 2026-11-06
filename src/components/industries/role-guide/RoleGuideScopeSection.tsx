@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 
 import {
@@ -25,14 +26,12 @@ export function RoleGuideScopeSection({
     <section className="border-t border-slate-200/70 bg-[#fafbfc]">
       {heroImage ? (
         <div className="relative h-44 overflow-hidden md:h-52 lg:h-56">
-          {/* eslint-disable-next-line @next/next/no-img-element -- native img in a fixed-aspect box (GP-661 layout); next/image conversion is a GP-696 follow-up */}
-          <img
+          <Image
             src={heroImage.src}
             alt=""
-            width={512}
-            height={512}
+            fill
+            sizes="100vw"
             loading="lazy"
-            decoding="async"
             className="size-full object-cover object-center"
             aria-hidden
           />

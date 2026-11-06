@@ -1,4 +1,5 @@
 import { ArrowRight } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 import {
@@ -82,14 +83,12 @@ export function RoleGuidesHubGrid() {
               >
                 <div className="relative aspect-[5/4] overflow-hidden bg-slate-100">
                   {item.heroImage ? (
-                    // eslint-disable-next-line @next/next/no-img-element -- native img in a fixed-aspect box (GP-661 layout); next/image conversion is a GP-696 follow-up
-                    <img
+                    <Image
                       src={item.heroImage.src}
                       alt={item.heroImage.alt}
-                      width={512}
-                      height={512}
+                      fill
+                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                       loading="lazy"
-                      decoding="async"
                       className="size-full object-cover object-center transition duration-500 group-hover:scale-[1.03]"
                     />
                   ) : (

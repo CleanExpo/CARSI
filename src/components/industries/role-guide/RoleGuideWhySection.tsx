@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import type { LucideIcon } from 'lucide-react';
 
 import {
@@ -37,15 +38,13 @@ export function RoleGuideWhySection({
         {heroImage ? (
           <div className="lg:sticky lg:top-24 lg:self-start">
             <figure>
-              <div className="aspect-[4/5] w-full max-w-md overflow-hidden rounded-2xl bg-slate-100 shadow-[0_24px_48px_-32px_rgba(15,23,42,0.35)] ring-1 ring-slate-900/[0.06] lg:max-w-none">
-                {/* eslint-disable-next-line @next/next/no-img-element -- native img in a fixed-aspect box (GP-661 layout); next/image conversion is a GP-696 follow-up */}
-                <img
+              <div className="relative aspect-[4/5] w-full max-w-md overflow-hidden rounded-2xl bg-slate-100 shadow-[0_24px_48px_-32px_rgba(15,23,42,0.35)] ring-1 ring-slate-900/[0.06] lg:max-w-none">
+                <Image
                   src={heroImage.src}
                   alt=""
-                  width={512}
-                  height={512}
+                  fill
+                  sizes="(min-width: 1024px) 40vw, 448px"
                   loading="lazy"
-                  decoding="async"
                   className="size-full object-cover object-[center_35%]"
                   aria-hidden
                 />
