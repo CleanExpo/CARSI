@@ -8,9 +8,9 @@
  *
  * `sameAs` MUST contain only verified, personal profiles of the named person —
  * never a brand/business account (that would misattribute the entity) and never
- * an email-derived string. LinkedIn + the RestoreAssist author page are the
- * sourced, verified profiles; a professional Facebook/Instagram URL can be
- * appended once confirmed.
+ * an email-derived string. LinkedIn is the sourced, verified profile. The
+ * RestoreAssist author page and a professional Facebook/Instagram URL can be
+ * appended once each one is live and confirmed.
  */
 
 import type { SchemaObject } from './shared';
@@ -21,7 +21,7 @@ export const CARSI_FOUNDER_ID = 'https://carsi.com.au/#founder';
 /** Verified personal profiles only (E-E-A-T sameAs). */
 export const CARSI_FOUNDER_SAME_AS: string[] = [
   'https://www.linkedin.com/in/phill-mcgurk',
-  'https://restoreassist.com.au/authors/phill-mcgurk',
+  // RestoreAssist author page left out until it is live (RA-8173).
 ];
 
 export const CARSI_FOUNDER_KNOWS_ABOUT: string[] = [
