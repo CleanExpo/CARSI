@@ -1,0 +1,20 @@
+{
+  "status": "PASS_LOCAL_CONTENT_CHECKS",
+  "arithmetic": {
+    "cafe": 385,
+    "maintenance": 285,
+    "knownSales": 500,
+    "beansGap": 2,
+    "cupsGap": 100,
+    "correctedCafe": 349
+  },
+  "sixExistingExamplesRetained": true,
+  "fiveCasesSupplied": true,
+  "recordedDemoSeparatedFromPractice": true,
+  "tipBeforeFirstSend": true,
+  "approvedMasterUnchanged": true,
+  "liveFiveCaseExecution": "NOT_RUN",
+  "browserVisualCheck": "PASS \u2014 browser opened guide, confirmed tip first and five-case section readable, no horizontal overflow at current viewport",
+  "independentReview": "NOT_RUN",
+  "browserOpeningEvidence": "opening-browser.png"
+}

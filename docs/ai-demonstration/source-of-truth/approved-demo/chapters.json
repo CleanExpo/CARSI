@@ -1,0 +1,87 @@
+[
+  {
+    "title": "AI in Business",
+    "startSec": 0.0,
+    "endSec": 35.12
+  },
+  {
+    "title": "01  Open ChatGPT",
+    "startSec": 35.12,
+    "endSec": 38.28
+  },
+  {
+    "title": "02  Click the message box",
+    "startSec": 38.28,
+    "endSec": 39.96
+  },
+  {
+    "title": "02  Enter the facts",
+    "startSec": 39.96,
+    "endSec": 54.04
+  },
+  {
+    "title": "TIP  Don\u2019t press Enter yet",
+    "startSec": 54.04,
+    "endSec": 58.12
+  },
+  {
+    "title": "03  Add the request",
+    "startSec": 58.12,
+    "endSec": 74.92
+  },
+  {
+    "title": "03  Read the complete prompt",
+    "startSec": 74.92,
+    "endSec": 98.92
+  },
+  {
+    "title": "04  Send and read the answer",
+    "startSec": 98.92,
+    "endSec": 106.12
+  },
+  {
+    "title": "05  Reveal the complete answer",
+    "startSec": 106.12,
+    "endSec": 107.44
+  },
+  {
+    "title": "05  Check the calculation",
+    "startSec": 107.44,
+    "endSec": 114.2
+  },
+  {
+    "title": "05  Read the first answer",
+    "startSec": 114.2,
+    "endSec": 142.2
+  },
+  {
+    "title": "06  Correct the draft",
+    "startSec": 142.2,
+    "endSec": 163.56
+  },
+  {
+    "title": "06  Read the correction",
+    "startSec": 163.56,
+    "endSec": 179.56
+  },
+  {
+    "title": "06  Send, then check again",
+    "startSec": 179.56,
+    "endSec": 182.76
+  },
+  {
+    "title": "07  Reveal the checked answer",
+    "startSec": 182.76,
+    "endSec": 184.08
+  },
+  {
+    "title": "07  Read the checked answer",
+    "startSec": 184.08,
+    "endSec": 203.08
+  },
+  {
+    "title": "Apply the workflow",
+    "startSec": 203.08,
+    "endSec": 266.4
+  }
+]

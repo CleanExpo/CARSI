@@ -1,0 +1,38 @@
+{
+  "date": "2026-11-09",
+  "scope": "Historical RestoreAssist talk/product candidate sources discovered from the October vault reference",
+  "status": "EXCLUDED FROM CURRENT TALK CONTENT",
+  "reason": "November owner correction defines AI in Business as the current talk and explicitly separates RestoreAssist demo. Retain custody/hash references without adopting old branding, event assumptions, legal/product claims, colloquial greeting or private-business screenshots.",
+  "sources": [
+    {
+      "path": "/Users/phillmcgurk/.local/state/gs/projects/RestoreAssist/ai-business/2026-10-14-spec.md",
+      "bytes": 76771,
+      "sha256": "2f1669f0b32c7dcaa9a6af9869549d8686a47b64d67f6c7b3a4a0205a29a9fda",
+      "status": "Historical alternate brief; excluded"
+    },
+    {
+      "path": "/Users/phillmcgurk/.local/state/gs/projects/RestoreAssist/talks-2026-11/melbourne/talk-script.md",
+      "bytes": 19362,
+      "sha256": "f820a6b10e7c30c0433c72e402591599135d59682d505d13f7b40606c916196b",
+      "status": "Historical alternate brief; excluded"
+    },
+    {
+      "path": "/Users/phillmcgurk/.local/state/gs/projects/RestoreAssist/talks-2026-11/melbourne/deck.html",
+      "bytes": 10294389,
+      "sha256": "d50b1b77e349ac33c115e2c10d993f049f94cd03ebb7ee23a6d147bd81f0ff3e",
+      "status": "Historical alternate brief; excluded"
+    },
+    {
+      "path": "/Users/phillmcgurk/.local/state/gs/projects/RestoreAssist/talks-2026-11/melbourne/deck-melbourne.pdf",
+      "bytes": 1942723,
+      "sha256": "302399ba486f7761427f1e184c739b397594f55f9983ba7d7187d3f3265eff95",
+      "status": "Historical alternate brief; excluded"
+    },
+    {
+      "path": "/Users/phillmcgurk/.local/state/gs/projects/RestoreAssist/events-2026-11/02-melbourne-copy.md",
+      "bytes": 7300,
+      "sha256": "04e54ed3ec0e20a828ef4dc8dbfd901f91036cd519cb5959b25dda0b892c10c2",
+      "status": "Historical alternate brief; excluded"
+    }
+  ]
+}

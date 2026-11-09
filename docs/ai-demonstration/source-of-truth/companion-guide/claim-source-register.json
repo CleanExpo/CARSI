@@ -1,0 +1,51 @@
+{
+  "status": "PRIVATE_CONTENT_REVISION",
+  "parentVideoSHA256": "446042327ce9bb0c8a0f163f4658df8fbc4dc60637a6fdbfba14085599a2d88f",
+  "sourceGuideSHA256": "5d32671c0632153a20b90f2c2472f12a787314ce81e76b8c518d95aa8164b8fb",
+  "reviewDate": "2026-11-09",
+  "claims": [
+    {
+      "claim": "Sign in and start a chat",
+      "class": "DOCUMENTED",
+      "source": "https://learn.chatgpt.com/docs/quickstart",
+      "locator": "Setup / Web / Open ChatGPT and sign in / Start a chat"
+    },
+    {
+      "claim": "Provide context, output and boundaries; refine the prompt",
+      "class": "DOCUMENTED",
+      "source": "https://learn.chatgpt.com/docs/prompting",
+      "locator": "Add useful context; Goal, Context, Output, Boundaries"
+    },
+    {
+      "claim": "Review the output, correct it, and check before use",
+      "class": "DOCUMENTED",
+      "source": "https://learn.chatgpt.com/docs/use-chatgpt",
+      "locator": "Make the result ready to use"
+    },
+    {
+      "claim": "Shift+Enter creates a newline without submitting in the captured desktop session",
+      "class": "OBSERVED_EXISTING_CAPTURE",
+      "source": "/Users/phillmcgurk/Documents/Codex/2026-11-07/files-pasted-by-the-user-session/outputs/AI-in-Business-Keyboard-Tips/review/keyboard-tip.png",
+      "locator": "Accepted baseline tip at54.04\u201358.12sec; source capture09/11/2026"
+    },
+    {
+      "claim": "An exact Temporary chat \u2192 Unpersonalized menu label is required",
+      "class": "UNVERIFIED_REMOVED",
+      "source": "Not supported by the inspected quickstart; no claim that the label cannot exist"
+    },
+    {
+      "claim": "385,285,500; stock gaps2bags/100cups; corrected cafe total349",
+      "class": "CALCULATED",
+      "source": "Fictional guide inputs",
+      "locator": "Deterministic arithmetic in content-verification.json"
+    },
+    {
+      "claim": "Five practice cases and expected checks",
+      "class": "AUTHORED",
+      "source": "This handout revision",
+      "locator": "Not executed as five live model runs; no reliability or saving guarantee"
+    }
+  ],
+  "independentReview": "NOT_RUN",
+  "publication": "HOLD \u2014 private revision only; no claim of independent TRD release"
+}

@@ -1,0 +1,44 @@
+{
+  "prompts": {
+    "facts": "Fictional cafe enquiry: 20 lunch boxes at A$18 each; delivery A$25. Customer asks for next Tuesday. GST treatment, exact date, delivery address, availability and allergy requirements are unknown.",
+    "request": "Draft a short customer email of no more than 90 words. Show 20 x A$18 + A$25 = A$385. Ask for missing details. Do not invent, add GST, confirm the order or promise allergy suitability. Give only the email draft, without commentary.",
+    "correction": "Rewrite as plain text in the chat, not the email composer. Keep under 65 words. Ask the customer to confirm the exact date and delivery address; do not infer a date. Keep A$385 as an estimate, leave GST unresolved, confirm availability later and do not promise allergy suitability."
+  },
+  "observedResponses": {
+    "first": "Hi, Thank you for your enquiry about 20 lunch boxes for next Tuesday, 10 November 2026. Here's the estimated cost: 20 × A$18 + A$25 delivery = A$385. GST treatment is yet to be confirmed. Could you please provide your delivery address, preferred delivery time, and any dietary restrictions or allergy requirements? We'll also need to check availability for your requested date and confirm whether we can accommodate any allergy requirements. We look forward to hearing from you! Kind regards, Café Team",
+    "checked": "Hi, Thanks for your lunch box enquiry! 20 × A$18 + A$25 delivery = A$385 estimated total (GST treatment to be confirmed). Could you please confirm the exact delivery date, delivery address, preferred time, and any dietary or allergy requirements? We'll check availability and discuss allergy requirements before confirming your order. Kind regards, Café Team"
+  },
+  "reading": [
+    {
+      "id": "03  Read the complete prompt",
+      "startFrame": 1873,
+      "endFrame": 2473,
+      "words": 70,
+      "quiet": true
+    },
+    {
+      "id": "05  Read the first answer",
+      "startFrame": 2855,
+      "endFrame": 3555,
+      "words": 82,
+      "quiet": true
+    },
+    {
+      "id": "06  Read the correction",
+      "startFrame": 4089,
+      "endFrame": 4489,
+      "words": 48,
+      "quiet": true
+    },
+    {
+      "id": "07  Read the checked answer",
+      "startFrame": 4602,
+      "endFrame": 5077,
+      "words": 55,
+      "quiet": true
+    }
+  ],
+  "classification": "Recorded prompts/responses, preserved from approved demonstration; responses are observations, not endorsed factual answers",
+  "artifactSHA256": "446042327ce9bb0c8a0f163f4658df8fbc4dc60637a6fdbfba14085599a2d88f",
+  "fps": 25
+}

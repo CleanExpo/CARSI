@@ -1018,3 +1018,14 @@ or to shuffle options per attempt in the quiz API.
 - `check:iicrc-compliance` passed 12 seed entries describing unapproved courses as "CEC-accredited
   training". The rule that catches it, and the wider scan scope (`data/video/`, `data/courses/`), are
   in the same PR as this note.
+
+
+### UNI-2934 — AI in Business source recovery and full presentation continuation (09/11/2026)
+
+Owner: MacBook/codex. Phill requested continuing the complete 15-minute talk and consolidating relevant cross-machine/LLM material in the existing CARSI repository.
+
+- Working collection: [source-of-truth](../ai-demonstration/source-of-truth/README.md); scope and acceptance: [CONSOLIDATION.md](../ai-demonstration/CONSOLIDATION.md).
+- Recoveries: original 14-scene/900-second content, later editions, 45 distinct primary owner instructions, approved 266.4-second master custody reference, captions/timeline, recorded prompts/responses, companion guide and baseline SQL/policies. Coverage limits are explicit.
+- Continue with the proposed 900-second run sheet; create the remaining whole-sentence narration and visuals, perform exact-artifact sync/reading-window/full-playback review and obtain owner acceptance. Preserve approved media bytes and avoid replaying the introduction. No paid generation is authorised by source recovery.
+- Native MacBook/Mini/PC logs and bounded ChatGPT title/candidate searches are recorded. Two bounded Claude desktop searches are recorded; complete Claude web and other provider web histories remain unverified; recover through supported access if made available.
+- Source publication requires fresh repository checks, independent exact-SHA review and release receipt. Production release, human merge, rights and video-board gates remain separate. Overall presentation remains In Progress.

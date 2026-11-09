@@ -1,0 +1,8 @@
+{
+  "status": "HOLD",
+  "errors": [
+    "playback contains stall/error/seek",
+    "independentWatchListen: missing or changed evidence"
+  ],
+  "semanticLimit": "Evidence integrity is checked; visual meaning and owner acceptance require real reviewers."
+}

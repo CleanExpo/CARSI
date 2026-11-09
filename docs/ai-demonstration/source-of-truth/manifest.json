@@ -1,0 +1,365 @@
+{
+  "schemaVersion": 1,
+  "createdOn": "2026-11-09",
+  "repository": "CleanExpo/CARSI",
+  "scope": "Task-only public source collection with private-media custody references; no claim of complete account coverage",
+  "sourceBranch": "uni-2934-ai-business-presentation",
+  "sourceMainSHA": "a62dbd78b0008bbe8518c1eeee9e8af1962e084b",
+  "sourceBeforeMainMergeSHA": "b72dd449",
+  "custody": {
+    "macBookRoot": "/Users/phillmcgurk/Documents/Codex/2026-11-07/files-pasted-by-the-user-session",
+    "miniWorktree": "/Volumes/Mini Mini 2T Storage/worktrees/CARSI/feat/ai-demonstration",
+    "approvedMiniMaster": "/Volumes/Mini Mini 2T Storage/tmp/uni-2934-cinematic/keyboard-tips-review/AI-in-Business-Keyboard-Tips.mp4",
+    "originalCapture": "work/shared-timeline/clean/ and work/shared-timeline/*.mp4 on MacBook",
+    "originalAvatar": "outputs/AI-in-Business-Cinematic-Tutorial/narration/margot-tutorial.mp4 on MacBook",
+    "previousWholeTalkPack": "/Volumes/Mini Mini 2T Storage/tmp/uni-2934-cinematic/full-narration/AI-in-Business-Cinematic-Review.zip"
+  },
+  "files": [
+    {
+      "path": "CONTINUE-THE-PRESENTATION.md",
+      "bytes": 5263,
+      "sha256": "de7412d431c1e68a752d3727018f358d7f62100e4e1d2c6f10b0317d8a5ab687"
+    },
+    {
+      "path": "DECISIONS.md",
+      "bytes": 1732,
+      "sha256": "8abfaa5900f513add784694fb534d130ddc209f75b5b1ec85dd50a0f9a651d85"
+    },
+    {
+      "path": "README.md",
+      "bytes": 4793,
+      "sha256": "0cefa5c9ce611582c9619202c80f7fab10bede45d1054b4736920272ad8387d1"
+    },
+    {
+      "path": "approved-demo/Follow-the-demonstration.md",
+      "bytes": 1910,
+      "sha256": "51b61846e4ee7579924195511012ef3e15fa8ad199b121a6b2fea1a68cc82dd2"
+    },
+    {
+      "path": "approved-demo/Margot-script.md",
+      "bytes": 2105,
+      "sha256": "d81bc2b8b0851541f825bf9161e85dfa0e4b41520e737139b1f45837960c575e"
+    },
+    {
+      "path": "approved-demo/Review-notes.md",
+      "bytes": 2454,
+      "sha256": "68045510df226f14efb7bc204e8ed6ed1434878feb4fd1144cd8b9adc8fe1c9f"
+    },
+    {
+      "path": "approved-demo/captions.json",
+      "bytes": 5727,
+      "sha256": "bd7fa9227ffb0cbbf59a9f95aefe32b8e96edb19fdc1e37a089dbb19be195275"
+    },
+    {
+      "path": "approved-demo/chapters.json",
+      "bytes": 1591,
+      "sha256": "2a003e8dae3bf67d4faa7e1b41588e1d48125c456cb318ed5df96a58c8fda2ff"
+    },
+    {
+      "path": "approved-demo/receipt.json",
+      "bytes": 10205,
+      "sha256": "6e3e430115ce02c29a492c9a74469dee2ad2a37b561083558137d17ac9ae6c77"
+    },
+    {
+      "path": "approved-demo/review/browser-playback.json",
+      "bytes": 2628,
+      "sha256": "306c97893730617fa43ff2ac885e21ac4bfdbd44eebf2f97e35cf5da3ad03320"
+    },
+    {
+      "path": "approved-demo/review/media-probe.json",
+      "bytes": 3699,
+      "sha256": "0eb4487f844cbc36abe2c4a50e5b82806e982f8ba89623df9540d48d1317f216"
+    },
+    {
+      "path": "approved-demo/review/privacy-ocr.json",
+      "bytes": 143487,
+      "sha256": "671376a527fb9ca74d606b17d10f960ccde3358e8331e720403a7bacd70a9cad"
+    },
+    {
+      "path": "approved-demo/review/privacy-review.json",
+      "bytes": 531,
+      "sha256": "baa561238ea53ffca227301da2ef31c41974d27a3b3e38b0fe60743e77084020"
+    },
+    {
+      "path": "approved-demo/review/technical-verification.json",
+      "bytes": 10205,
+      "sha256": "6e3e430115ce02c29a492c9a74469dee2ad2a37b561083558137d17ac9ae6c77"
+    },
+    {
+      "path": "approved-demo/sync-evidence-manifest.json",
+      "bytes": 7870,
+      "sha256": "f40f0bf79dcd7a2a25eb15d716e22fb3caf4cd75387c85cb1fca30cd6b2fcbfb"
+    },
+    {
+      "path": "approved-demo/sync-gate-result.json",
+      "bytes": 255,
+      "sha256": "611ff7d1f8b10de6702131a73aea6e6a307fba6dbf5151864ea0d43cd39a1b02"
+    },
+    {
+      "path": "approved-demo/timeline.json",
+      "bytes": 13506,
+      "sha256": "2a8bf2ea1b01f0a77b9fc95c07450d5e82f5269c596a1592d9c9ce9d9ab4b242"
+    },
+    {
+      "path": "baseline/APPROVED-BASELINE.md",
+      "bytes": 3714,
+      "sha256": "fb70ac352c5dad15641a9c494e857591afed2464135d779f122d9ee6c520b40c"
+    },
+    {
+      "path": "baseline/BASELINE-LOCK-RECEIPT.md",
+      "bytes": 2327,
+      "sha256": "8f2669dcb42477265ab8aba05696d421cf8c852c20494da6e6113fd2d3427995"
+    },
+    {
+      "path": "baseline/VIDEO-SYNC-RULE.md",
+      "bytes": 3738,
+      "sha256": "7df2892e5a464dd3ab680e5347f66af28481fc3671f37d6c8713addb24017923"
+    },
+    {
+      "path": "baseline/approved-baseline.json",
+      "bytes": 2698,
+      "sha256": "ddc65ed8f2d4fcedce7f48d026274ab3cd7b1d630fb06bdf7159c307844f9228"
+    },
+    {
+      "path": "baseline/baseline-schema.sql",
+      "bytes": 1651,
+      "sha256": "2951c9d83861dda7542c1d80f44d34dc358cb61ff0c510c770a7b129fefdc990"
+    },
+    {
+      "path": "baseline/baseline-seed.sql",
+      "bytes": 3178,
+      "sha256": "42ea4795926c6031a1246497eb9fb21112d5918f67264025b9d02b70468f5694"
+    },
+    {
+      "path": "baseline/baseline-verification.json",
+      "bytes": 1369,
+      "sha256": "dc5d910ede16957971e30e86603b930fe2b09bda6b3e70cc7ccd51e23128aaaf"
+    },
+    {
+      "path": "baseline/gate-tests.json",
+      "bytes": 388,
+      "sha256": "9ab7ecab1e82b89493f126d57aa47c06f6ec307e734f8cd75e67aeb8d11a3a4a"
+    },
+    {
+      "path": "baseline/shared-install-verification.json",
+      "bytes": 695,
+      "sha256": "8aeec4d64357ab2aecc418b60e861b7a25e725cdb6e681bd7e7254b2d9aa86e9"
+    },
+    {
+      "path": "baseline/skill-snapshots/remotion-editing/SKILL.md",
+      "bytes": 1182,
+      "sha256": "d1c6b9924a35b452f3b434b703c91f2263307579c8a44a799eacd8d41c479b9b"
+    },
+    {
+      "path": "baseline/skill-snapshots/remotion-editing/references/video-sync-contract.md",
+      "bytes": 547,
+      "sha256": "ec1ae999825d7435ece5505ebc8608b66ffe045e72a43f7e71c67c679287f8cd"
+    },
+    {
+      "path": "baseline/skill-snapshots/remotion-production/SKILL.md",
+      "bytes": 1452,
+      "sha256": "9434d530e5d17fb8129c07ef8b614dfb81599586bd254944ccfd0d9d7f9a3c88"
+    },
+    {
+      "path": "baseline/skill-snapshots/remotion-render-pipeline/SKILL.md",
+      "bytes": 2257,
+      "sha256": "55a3521af93840f5c774dfb34cd282a961716c263769ffd7bbb3d31b042d85f9"
+    },
+    {
+      "path": "baseline/verify_sync.py",
+      "bytes": 3511,
+      "sha256": "4c630bf7658d970007b99611cf7221221142072800050e3ab07efef5caa7831f"
+    },
+    {
+      "path": "companion-guide/ChatGPT-business-task-guide.html",
+      "bytes": 14709,
+      "sha256": "81cb7d77750d46ce532575ef10e6b20d1148be9031f67160d8eb550d5438302f"
+    },
+    {
+      "path": "companion-guide/Follow-the-demonstration.md",
+      "bytes": 1995,
+      "sha256": "afcbcf2da17336f8af2102df33150766f8002b5c09b7c7cf3ec4ccbecd44ef0d"
+    },
+    {
+      "path": "companion-guide/README.md",
+      "bytes": 1792,
+      "sha256": "6f6c398266249de2bdcb973f2bca07c3160a146ee0e25ea381ec06f2c129653e"
+    },
+    {
+      "path": "companion-guide/claim-source-register.json",
+      "bytes": 2196,
+      "sha256": "ddb8cb566ca0cf75fa04c45351cc5c2788910fec99f5790d41f0712989bedde6"
+    },
+    {
+      "path": "companion-guide/content-verification.json",
+      "bytes": 651,
+      "sha256": "903f897399feb6553496be632174c11494001565135260e1a12bd1d59adebac2"
+    },
+    {
+      "path": "companion-guide/opening-browser.png",
+      "bytes": 162170,
+      "sha256": "7a3fee7983109cbe51b74c66d0504ed1b09c5d9fa28b4a6b3e20845939c3bb21"
+    },
+    {
+      "path": "continuation-run-sheet.json",
+      "bytes": 7577,
+      "sha256": "04ccef5379609d3763eef5c0933a50573c749f88dd70fa675416d408caf0c575"
+    },
+    {
+      "path": "editions.json",
+      "bytes": 3011,
+      "sha256": "69f33898c4b911effc669b48ad7b9d842ba02f2793e03c119a0e3e382ab9a091"
+    },
+    {
+      "path": "history/2026-10-14-ai-pathways/README.md",
+      "bytes": 1268,
+      "sha256": "075d9aa28d304d695a9d9ec0b19fe76f2ea584f34848d619a95138348671acc5"
+    },
+    {
+      "path": "history/2026-10-14-ai-pathways/demo-runbook.md",
+      "bytes": 3608,
+      "sha256": "266348d9f87d114a75e563257ee61d0af236489ce0099183625638c628325c5e"
+    },
+    {
+      "path": "history/2026-10-14-ai-pathways/design-research.md",
+      "bytes": 39602,
+      "sha256": "cb72ab6def297883a9e9850f9285ac02955595698968b5051a8aa1f2d25d0bbe"
+    },
+    {
+      "path": "history/2026-10-14-ai-pathways/handout.md",
+      "bytes": 3841,
+      "sha256": "fd102da13ab13e0b8888483a14d6713bf6fd6ba5fd87298c6e6e4fe65ab0db01"
+    },
+    {
+      "path": "history/2026-10-14-ai-pathways/research.md",
+      "bytes": 23089,
+      "sha256": "106f8cf0d869cbd14d6a4adbcf7b1e551d9afb642075c3571c79951a382a7aca"
+    },
+    {
+      "path": "history/2026-10-14-ai-pathways/slides-outline.md",
+      "bytes": 9130,
+      "sha256": "2e83ca5dac4853a876a52988cdc048fbde5683e2a2830010e4c096a96b2d4545"
+    },
+    {
+      "path": "history/2026-10-14-ai-pathways/talk-script.md",
+      "bytes": 12963,
+      "sha256": "923a4bae324a407f00d424ddbedacfbb594cc85f84f7532fb6dfd4bdf411ca6e"
+    },
+    {
+      "path": "history/2026-10-14-grill.md",
+      "bytes": 3811,
+      "sha256": "8b4d2f017207243c778eb2c85bf60fc13621e0a80d82afdc6ead06328f9a5225"
+    },
+    {
+      "path": "history/build-scripts/README.md",
+      "bytes": 408,
+      "sha256": "430c936c264b43776feffc85950c6aea959f83d37973f5a10a0734c47d610458"
+    },
+    {
+      "path": "history/build-scripts/build.py",
+      "bytes": 12517,
+      "sha256": "ab5eb4a2df705fbd1b9c813246048c7e6e6f5b0b5a97d67f087513112de25217"
+    },
+    {
+      "path": "history/build-scripts/delivery_gate.py",
+      "bytes": 1167,
+      "sha256": "c7592f7ed18ce9161c79585ae4a7ad032b93b08277a3905a8a554ac4573fa861"
+    },
+    {
+      "path": "history/build-scripts/handoff.py",
+      "bytes": 2648,
+      "sha256": "36676ee26d94beb3ed4e15d5e2ff683bc500306749fbbe50c5aa1d94583c2555"
+    },
+    {
+      "path": "history/build-scripts/prepare.py",
+      "bytes": 4882,
+      "sha256": "f1031a5ca0e5cba832eaa410a3603be4dc7bcfd06f03f44de5b3f16842c7beb8"
+    },
+    {
+      "path": "history/build-scripts/verify.py",
+      "bytes": 4632,
+      "sha256": "3ec62e0deeeebf964d859d97c8b97560ccb70cc6235e4a78175f85c0ab628d4a"
+    },
+    {
+      "path": "history/compact-tutorial-b72dd449.ts",
+      "bytes": 23358,
+      "sha256": "88cb6dea23db85edfd69cac92998d9f9121edf07dddd1f05acfdb395a637c2d4"
+    },
+    {
+      "path": "history/compact-tutorial.json",
+      "bytes": 21663,
+      "sha256": "d20d38bb85fa7d590f4ca3d72ab0fb37492e1bc52a7cd9f449911ecbdc2154e9"
+    },
+    {
+      "path": "history/full-talk-8343fe8d.ts",
+      "bytes": 25876,
+      "sha256": "ea8b0b220f847df0023e60290654861151d9dfc6a2782c513ac313b79b93dfbe"
+    },
+    {
+      "path": "history/full-talk.json",
+      "bytes": 24674,
+      "sha256": "893f7bb96c96b77902ac0759428751b91c0fe55cedf440b81fe6c7965ccf75ba"
+    },
+    {
+      "path": "private-assets.json",
+      "bytes": 1363,
+      "sha256": "5699d2820d15ebefd95c40f7a6d98a7adc49404d08ba71e974f906a7199bbd89"
+    },
+    {
+      "path": "provenance/alternate-brief-candidates.json",
+      "bytes": 1927,
+      "sha256": "f42ac19eb05a93a64207a005b602ed94202fe1d4fff4d16616dcdeeff80ffc50"
+    },
+    {
+      "path": "provenance/chatgpt-coverage.json",
+      "bytes": 4433,
+      "sha256": "59982ed8475fb0aa7011e1a51b2e99ca07f2175cd8b325d16498e5b9dfe0a68d"
+    },
+    {
+      "path": "provenance/claude-desktop-coverage.json",
+      "bytes": 1185,
+      "sha256": "a07870254fbcc9cd22301e0f0349bb27a2e3949693c4fb97429c3f061cd99e79"
+    },
+    {
+      "path": "provenance/coverage.json",
+      "bytes": 4861,
+      "sha256": "394a201cc38304ab749cfd4abe07143fc16c874e2f91c2b5f76b9f94f41e7015"
+    },
+    {
+      "path": "provenance/native-log-coverage.json",
+      "bytes": 5137,
+      "sha256": "b4a944f42bf7c712f2ef06b703dba0e19bbdc5a22be2cdf4b5bc26b2dbcaf2c1"
+    },
+    {
+      "path": "provenance/original-planning-pack.json",
+      "bytes": 2071,
+      "sha256": "9adad229468a4f7c6f2c9c7d3fe35ebf69b72511651330dbc69649d520e49df1"
+    },
+    {
+      "path": "provenance/owner-instructions.json",
+      "bytes": 19456,
+      "sha256": "4e3f67cd30c5e0232f56d8b92d1f76506c11b6c2a51039e45dd1b2a58bb1f90e"
+    },
+    {
+      "path": "provenance/pc-native-log-coverage.json",
+      "bytes": 10607,
+      "sha256": "c9960174201798a599d418de8347ab4697e93b2a9be4768abcfbf3b24e2fab38"
+    },
+    {
+      "path": "provenance/vault-provenance.json",
+      "bytes": 992,
+      "sha256": "9c70e3ce8cc321715a79b77f4e449f091994db53b6acb13caefd38641ba3b426"
+    },
+    {
+      "path": "recorded-workflow.json",
+      "bytes": 2558,
+      "sha256": "42e5c4628498071379f5e72f4dd990c92fe60c1f69b39cd68cd40731dcf37c90"
+    },
+    {
+      "path": "verify_collection.py",
+      "bytes": 7804,
+      "sha256": "2090e0b070a157be050541b64638eb13dc0f0ff3fd3aa8432008920f423b28aa"
+    }
+  ],
+  "collectionBranch": "uni-2934-presentation-source-data"
+}

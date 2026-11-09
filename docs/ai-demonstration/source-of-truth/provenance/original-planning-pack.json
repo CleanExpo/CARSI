@@ -1,0 +1,43 @@
+{
+  "date": "2026-11-09",
+  "sourceRoot": "/Users/phillmcgurk/.local/state/gs/projects/Unite-Group/spm/2026-10-14-ai-pathways-smb",
+  "classification": "HISTORICAL SOURCE; verify dated claims and apply November owner corrections before use",
+  "files": [
+    {
+      "source": "/Users/phillmcgurk/.local/state/gs/projects/Unite-Group/spm/2026-10-14-ai-pathways-smb/demo-runbook.md",
+      "path": "history/2026-10-14-ai-pathways/demo-runbook.md",
+      "sha256": "266348d9f87d114a75e563257ee61d0af236489ce0099183625638c628325c5e",
+      "bytes": 3608
+    },
+    {
+      "source": "/Users/phillmcgurk/.local/state/gs/projects/Unite-Group/spm/2026-10-14-ai-pathways-smb/design-research.md",
+      "path": "history/2026-10-14-ai-pathways/design-research.md",
+      "sha256": "cb72ab6def297883a9e9850f9285ac02955595698968b5051a8aa1f2d25d0bbe",
+      "bytes": 39602
+    },
+    {
+      "source": "/Users/phillmcgurk/.local/state/gs/projects/Unite-Group/spm/2026-10-14-ai-pathways-smb/handout.md",
+      "path": "history/2026-10-14-ai-pathways/handout.md",
+      "sha256": "fd102da13ab13e0b8888483a14d6713bf6fd6ba5fd87298c6e6e4fe65ab0db01",
+      "bytes": 3841
+    },
+    {
+      "source": "/Users/phillmcgurk/.local/state/gs/projects/Unite-Group/spm/2026-10-14-ai-pathways-smb/research.md",
+      "path": "history/2026-10-14-ai-pathways/research.md",
+      "sha256": "106f8cf0d869cbd14d6a4adbcf7b1e551d9afb642075c3571c79951a382a7aca",
+      "bytes": 23089
+    },
+    {
+      "source": "/Users/phillmcgurk/.local/state/gs/projects/Unite-Group/spm/2026-10-14-ai-pathways-smb/slides-outline.md",
+      "path": "history/2026-10-14-ai-pathways/slides-outline.md",
+      "sha256": "2e83ca5dac4853a876a52988cdc048fbde5683e2a2830010e4c096a96b2d4545",
+      "bytes": 9130
+    },
+    {
+      "source": "/Users/phillmcgurk/.local/state/gs/projects/Unite-Group/spm/2026-10-14-ai-pathways-smb/talk-script.md",
+      "path": "history/2026-10-14-ai-pathways/talk-script.md",
+      "sha256": "923a4bae324a407f00d424ddbedacfbb594cc85f84f7532fb6dfd4bdf411ca6e",
+      "bytes": 12963
+    }
+  ]
+}

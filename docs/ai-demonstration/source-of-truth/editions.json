@@ -1,0 +1,70 @@
+{
+  "repository": "https://github.com/CleanExpo/CARSI",
+  "issue": "UNI-2934",
+  "board": "MAC-MELBOURNE-AI-BUSINESS",
+  "targetDurationSec": 900,
+  "approvedDemoSHA256": "446042327ce9bb0c8a0f163f4658df8fbc4dc60637a6fdbfba14085599a2d88f",
+  "editions": [
+    {
+      "id": "full-talk-8343fe8d",
+      "sourceCommit": "8343fe8d76aa71d99c5c86d4a2f87fe7a6fc9af3",
+      "role": "Original strengthened 14-scene presentation, broader business context",
+      "plannedDurationSec": 900,
+      "status": "HISTORICAL CONTENT SOURCE; external claims require fresh verification",
+      "data": "history/full-talk.json"
+    },
+    {
+      "id": "overview-d94006e5",
+      "sourceCommit": "d94006e54bddf106acb668893ed66fdb5f110e12",
+      "role": "Earlier whole-talk narration and practical-task correction",
+      "observedExportDurationSec": 526.32,
+      "status": "HISTORICAL; shorter than target, not approved current demo"
+    },
+    {
+      "id": "compact-b72dd449",
+      "sourceCommit": "b72dd449",
+      "role": "Later cinematic ChatGPT tutorial source",
+      "plannedDurationSec": 900,
+      "status": "HISTORICAL; nominal 900s schedule does not establish 15-minute narration",
+      "data": "history/compact-tutorial.json"
+    },
+    {
+      "id": "keyboard-tips-20261109",
+      "role": "Approved actual OpenAI screen demonstration",
+      "durationSec": 266.4,
+      "frames": 6660,
+      "fps": 25,
+      "sha256": "446042327ce9bb0c8a0f163f4658df8fbc4dc60637a6fdbfba14085599a2d88f",
+      "artifact": "approved-demo/AI-in-Business-Keyboard-Tips.mp4",
+      "ownerStatus": "OWNER_APPROVED_BASELINE",
+      "productionStatus": "HOLD",
+      "acceptanceEvidence": "baseline/approved-baseline.json",
+      "note": "Original receipt/timeline PENDING labels predate owner acceptance; retain unchanged. Independent watch/listen and strict production evidence remain incomplete."
+    },
+    {
+      "id": "companion-guide-20261109",
+      "role": "Separate guide revision with six exercises and five fictional cases",
+      "status": "PRIVATE CONTENT REVISION; no claim of live five-case model execution",
+      "entry": "companion-guide/ChatGPT-business-task-guide.html"
+    },
+    {
+      "id": "full-talk-continuation-20261109",
+      "role": "Proposed full 900-second editorial integration",
+      "status": "AUTHORED PLAN; not rendered or owner accepted",
+      "data": "continuation-run-sheet.json"
+    }
+  ],
+  "precedence": [
+    "Current explicit owner decisions",
+    "Exact owner-approved demo and its preserved bytes",
+    "Current companion guide as an unaccepted revision",
+    "Original full-talk content for continuation",
+    "Historical compact/overview editions for provenance only"
+  ],
+  "excluded": [
+    "Rejected timing exports are not starting masters",
+    "RestoreAssist presentation and parked Spaces deck are separate briefs",
+    "2025 RIA day-seminar blueprint is a different event and duration",
+    "Private company screenshots, raw account logs and unlicensed Artlist media"
+  ]
+}

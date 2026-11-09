@@ -1,0 +1,23 @@
+{
+  "status": "PASS",
+  "sql": "schema and seed applied twice;1baseline/10requirements; integrity ok",
+  "negativeControls": {
+    "baselineUpdate": "Approved baselines are immutable; insert a new approved version",
+    "baselineDelete": "Preserve approved baseline history",
+    "requirementUpdate": "Approved requirements are immutable",
+    "requirementDelete": "Preserve approved requirements"
+  },
+  "skillFilesChecked": [
+    "/Users/phillmcgurk/.codex/skills/remotion-editing/SKILL.md",
+    "/Users/phillmcgurk/.codex/skills/remotion-production/SKILL.md",
+    "/Users/phillmcgurk/.codex/skills/remotion-render-pipeline/SKILL.md",
+    "/Users/phillmcgurk/.claude/skills/remotion-editing/SKILL.md",
+    "/Users/phillmcgurk/.claude/skills/remotion-production/SKILL.md",
+    "/Users/phillmcgurk/.claude/skills/remotion-render-pipeline/SKILL.md"
+  ],
+  "masterSHA256": "446042327ce9bb0c8a0f163f4658df8fbc4dc60637a6fdbfba14085599a2d88f",
+  "baselineAcceptance": "OWNER_APPROVED",
+  "productionGate": "HOLD remains; no independent review fabricated",
+  "applicationDatabaseChanged": false,
+  "installerCheckCorrection": "An initial assertion searched the entire gate report for owner acceptance and matched the semantic-limit explanation; corrected to inspect errors only. No shared install had begun before correction. Second run passed; no production gate changed."
+}

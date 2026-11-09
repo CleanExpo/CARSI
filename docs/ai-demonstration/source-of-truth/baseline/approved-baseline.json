@@ -1,0 +1,35 @@
+{
+  "id": "narrated-software-demo-20261109",
+  "taskId": "MAC-MELBOURNE-AI-BUSINESS",
+  "relatedLinear": "UNI-2934",
+  "approvedBy": "Phill McGurk",
+  "approvalDate": "2026-11-09",
+  "approvalSource": "Explicit owner message in this Codex chat after requested full-screen playback",
+  "approvalQuote": "This actually makes sense now.. Well done..Lets now lock this in as the new starting standards and we can then improve, enhance, and make client changes from this moment on..",
+  "sha256": "446042327ce9bb0c8a0f163f4658df8fbc4dc60637a6fdbfba14085599a2d88f",
+  "durationSec": 266.4,
+  "frames": 6660,
+  "fps": 25,
+  "artifactPath": "/Users/phillmcgurk/Documents/Codex/2026-11-07/files-pasted-by-the-user-session/outputs/AI-in-Business-Keyboard-Tips/AI-in-Business-Keyboard-Tips.mp4",
+  "sharedArtifactPath": "/Volumes/Mini Mini 2T Storage/tmp/uni-2934-cinematic/keyboard-tips-review/AI-in-Business-Keyboard-Tips.mp4",
+  "status": "OWNER_APPROVED_BASELINE",
+  "publicationStatus": "HOLD",
+  "scope": "Starting quality standard for narrated software demonstrations and future client variants; this presentation section accepted. No publication or universal pipeline deployment approval.",
+  "requirements": [
+    "One frame timeline for original whole-sentence narration, actual clean screen actions, captions and reading windows",
+    "Large readable prompt and response; complete workflow: Open, Brief, Send, Check, Correct, Approve",
+    "No premature send: spoken Do not send yet plus actual Shift+Enter new-line action and visible tip; describe visual-only tips honestly",
+    "Preserve native source cadence; no borrowed-word edits; no time-stretched speech; qualified continuous typing capture",
+    "Anchor instructions to corresponding clicks within250ms; active typing unexplained unchanged text <=750ms",
+    "Explicit reading intervals >=3s and >=words/3 seconds, with gentle motion/progress rather than apparent stalls",
+    "Final exact-SHA playback at1x unmuted; separate fullscreen from replay; no restart when entering fullscreen",
+    "Fictional generic business content only; every-second privacy frame review plus transcript/OCR checks",
+    "Preserve approved master; client changes produce new artifacts with parent SHA and fresh affected-action and full-playback checks",
+    "Retain independent watch/listen, six-board, rights, spending and release gates; owner baseline approval does not imply they ran"
+  ],
+  "unresolvedProductionEvidence": [
+    "Independent watch/listen receipt absent",
+    "Strict playback gate retains startup seek/wait at time zero; no midplayback stalls observed",
+    "Six production boards and licence/release requirements remain separate"
+  ]
+}
