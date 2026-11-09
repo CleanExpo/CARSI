@@ -26,9 +26,14 @@
       "sha256": "8abfaa5900f513add784694fb534d130ddc209f75b5b1ec85dd50a0f9a651d85"
     },
     {
+      "path": "INSTAGRAM-TRAINING-TEXT-BLOCK.md",
+      "bytes": 4146,
+      "sha256": "80428f80d0a4f01ac4cbc14ba8fcf96e759dba815d0f8f491266483debfa4360"
+    },
+    {
       "path": "README.md",
-      "bytes": 4793,
-      "sha256": "0cefa5c9ce611582c9619202c80f7fab10bede45d1054b4736920272ad8387d1"
+      "bytes": 4945,
+      "sha256": "24eb72f33b6e736c2b84a8725cfeac725845dfc66e088ff7d885f03efc7e9b3b"
     },
     {
       "path": "approved-demo/Follow-the-demonstration.md",
@@ -207,8 +212,8 @@
     },
     {
       "path": "editions.json",
-      "bytes": 3011,
-      "sha256": "69f33898c4b911effc669b48ad7b9d842ba02f2793e03c119a0e3e382ab9a091"
+      "bytes": 2999,
+      "sha256": "12f795662abae6d4677ac0e845915667b28dde4fbebe7517246e99ab60a42f04"
     },
     {
       "path": "history/2026-10-14-ai-pathways/README.md",
@@ -322,8 +327,13 @@
     },
     {
       "path": "provenance/coverage.json",
-      "bytes": 4861,
-      "sha256": "394a201cc38304ab749cfd4abe07143fc16c874e2f91c2b5f76b9f94f41e7015"
+      "bytes": 5293,
+      "sha256": "110697dd8928aeee15366a4d55beb426554629991c41c1c7c09929c91fc91334"
+    },
+    {
+      "path": "provenance/instagram-training-recovery.json",
+      "bytes": 4800,
+      "sha256": "8baae292c7677e290367b0b60fba07b8e40ae5dc115b641e6ec974b6c185b28d"
     },
     {
       "path": "provenance/native-log-coverage.json",

@@ -2,6 +2,8 @@
 
 09/11/2026 · CleanExpo/CARSI · UNI-2934 · owner MacBook/codex
 
+Recovered Instagram/Facebook training ideas are in [the reusable text block](INSTAGRAM-TRAINING-TEXT-BLOCK.md), with original conversation provenance.
+
 Start with [current decisions](DECISIONS.md), the [edition register](editions.json) and the [full 15-minute continuation](CONTINUE-THE-PRESENTATION.md). The accepted 4:26.40 video is a demonstration segment, not the whole talk.
 
 | Material | Location | Status |

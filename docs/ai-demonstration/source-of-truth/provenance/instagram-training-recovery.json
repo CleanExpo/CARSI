@@ -1,0 +1,67 @@
+{
+  "status": "RECOVERED; creative adaptation prepared, no new film or model training",
+  "conversationTitle": "Video training system for restoration standards",
+  "sessionId": "fca2924c-1382-41ed-83f6-486db999d1cd",
+  "ownerMessage": {
+    "path": "/Users/phill-mac/.claude/projects/-Volumes-Mini-Mini-2T-Storage-code-Synthex--claude-worktrees-showpiece-business-card-4a0e4b/fca2924c-1382-41ed-83f6-486db999d1cd.jsonl",
+    "line": 13,
+    "timestamp": "2026-11-08T00:33:50.164Z",
+    "text": "https://www.facebook.com/share/r/1DY9S3t73i/?mibextid=wwXIfr\nhttps://www.facebook.com/share/r/19pu3LJnZ3/?mibextid=wwXIfr\nhttps://www.facebook.com/share/r/1FVieMbPsA/?mibextid=wwXIfr\nhttps://www.facebook.com/share/r/19fcx1F1iB/?mibextid=wwXIfr\nhttps://www.facebook.com/share/r/19yqxPPn9f/?mibextid=wwXIfr\nhttps://www.facebook.com/share/r/1KEAtpgXH8/?mibextid=wwXIfr\n\nFor training purposes only. What I need is for you to be able to see all aspects of these videos, the presentations styles, the message, the references we have and missing, the images, the production style, and everything within these short Instagram/Facebook Shorts videos.  I need for you to start to train our system on video designs, and messages. Also, it is very important that if we are creating videos they are actually follow all IICRC Certified Standards, OH&S Standards, Best Practices, Have the actual right materials, Look like an Australian Property, Australian Accent if spoke (Margot), the steps and processes are being documented and within the line and standards, correct procedures are completed, etc.. SO FIND MORE from these channels as I feel they are covering the most of these and ticking them off to do many training runs. The idea is to understand the WHY x 5 layers deep, with each layer ensuring on the previous and also answering the real questions of WHY a Professional Restoration Provider and what is a Professional Restoration Provider. I"
+  },
+  "sourceRepository": "CleanExpo/Synthex",
+  "sourceCommit": "46e1521cccd78eaaaa460e4bcaada7973286e7a8",
+  "sourceFiles": [
+    {
+      "path": "docs/ree/restoration-video-training/README.md",
+      "sha256": "bafdd0dd77b0f33841ac2712c28b7f06e8b03b29f8b6ff2c3c2c42e561b93ad9"
+    },
+    {
+      "path": "docs/ree/restoration-video-training/channel-catalogue.md",
+      "sha256": "6c66b81a5af75f6df8944d6241935ce9f6efe5f099f99d10fcff2af0fbe23112"
+    },
+    {
+      "path": "docs/ree/restoration-video-training/reels.jsonl",
+      "sha256": "32487d3dc2d67ee6149232fd09623699a8b00f72bc2bc6b9c773963a0c64cacf"
+    },
+    {
+      "path": "docs/ree/restoration-video-training/reels/reel-1.md",
+      "sha256": "b1338c5bd474947b21f7b8617544b14cff19b70e547a37e381cc3c2e591e4351"
+    },
+    {
+      "path": "docs/ree/restoration-video-training/reels/reel-2.md",
+      "sha256": "7a241bffdf07f819bcfdb149157b2a33503dd70c2b5bb14c62566cdd9fac0ff0"
+    },
+    {
+      "path": "docs/ree/restoration-video-training/reels/reel-3.md",
+      "sha256": "d2b5cbc7920e3b0e0e4439f2963d1e9ed3d79e009af2aab697625df81839d8c1"
+    },
+    {
+      "path": "docs/ree/restoration-video-training/reels/reel-4.md",
+      "sha256": "d072ad5a88877ff5d0e50d604615bf562fab9b50d088425181c82b94125a427f"
+    },
+    {
+      "path": "docs/ree/restoration-video-training/reels/reel-5.md",
+      "sha256": "744727535c9b7e22ff6d9dc153cf45b3608e9de866e3c0a544f8e58a5f8e5028"
+    },
+    {
+      "path": "docs/ree/restoration-video-training/reels/reel-6.md",
+      "sha256": "4ea01b8dc2ea14148730a4ac5b41f7afb53a1030c3c2589dc5b8e7d90167380c"
+    },
+    {
+      "path": "docs/ree/restoration-video-training/standards-register.md",
+      "sha256": "42fe8a0d473b88a7ea4dea4cb32d0f8035e98a2233f264629d5525feee25debd"
+    },
+    {
+      "path": "docs/ree/restoration-video-training/test-plan-25x25x25.md",
+      "sha256": "9adc94d50d0f8274f51bcee492b5c4606efb9287223af3c3e596e9adc78ef0d8"
+    },
+    {
+      "path": "docs/ree/restoration-video-training/why-five-layers.md",
+      "sha256": "3fd44e6d4f0b031a5cb063f37f5af618ce5c94f826d8e198a479e53fd31d9506"
+    }
+  ],
+  "sourceCoverage": "Read direct primary brief and six production-style/lesson sections, README and WHY/test-plan material. Technical standards and creator metadata not independently revalidated; no new video viewing or downloading.",
+  "supersession": "Replaces earlier exact-keyword-only Mini coverage inference: a relevant broader video-training conversation exists. It is related creative methodology, not an alternate AI in Business content brief.",
+  "excluded": "Unrelated CCW campaign, emails, third-party media and full copyrighted standards texts",
+  "newInstructions": "Owner requested adding this discussion during consolidation on09/11/2026; changes made after prior candidate review require fresh exact-head evidence."
+}

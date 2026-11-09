@@ -35,7 +35,7 @@
       "frames": 6660,
       "fps": 25,
       "sha256": "446042327ce9bb0c8a0f163f4658df8fbc4dc60637a6fdbfba14085599a2d88f",
-      "artifact": "approved-demo/AI-in-Business-Keyboard-Tips.mp4",
+      "artifact": "private-assets.json#approvedMaster",
       "ownerStatus": "OWNER_APPROVED_BASELINE",
       "productionStatus": "HOLD",
       "acceptanceEvidence": "baseline/approved-baseline.json",

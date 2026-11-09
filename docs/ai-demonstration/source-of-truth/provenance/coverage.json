@@ -105,5 +105,11 @@
     "status": "Two bounded history searches and one unrelated visible candidate inspected; no current presentation source recovered",
     "receipt": "claude-desktop-coverage.json",
     "limitation": "Not complete account coverage; UI work stopped when user changed app"
+  },
+  "instagramTrainingRecovery": {
+    "primarySource": "Mini Claude fca2924c-1382-41ed-83f6-486db999d1cd",
+    "directOwnerMessageUTC": "2026-11-08T00:33:50.164Z",
+    "receipt": "instagram-training-recovery.json",
+    "scope": "Related six-reel video design/training brief found by broader Instagram keywords, missed by exact presentation-topic queries; relevant creative lessons adapted, restoration work excluded from talk."
   }
 }
