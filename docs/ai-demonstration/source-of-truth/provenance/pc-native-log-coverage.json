@@ -1,0 +1,228 @@
+{
+  "scope": "Bounded classification of PC candidate native logs selected by parent estate search",
+  "date": "2026-11-09",
+  "exactTopicTerms": [
+    "AI.in.Business",
+    "UNI-2934",
+    "MAC-MELBOURNE-AI-BUSINESS",
+    "ai.demonstration"
+  ],
+  "retrievedFiles": 21,
+  "relevantPrimarySources": 0,
+  "files": [
+    {
+      "machine": "PC",
+      "llm": "Claude",
+      "path": "C:/Users/Disaster Recovery 4/.claude/projects/D--TradeHall/246057cd-525e-4986-8f3e-1670bd109e22.jsonl",
+      "sha256": "ee9e3de534b01ba5fe1ec10f0f6e7711153bf7a8d4a3112ba940553863cda7aa",
+      "exactTopicLineCount": 0,
+      "status": "EXCLUDED",
+      "reason": "TradeHall booth resource research, BRII/IAQ/podcast; no current presentation material"
+    },
+    {
+      "machine": "PC",
+      "llm": "Claude",
+      "path": "C:/Users/Disaster Recovery 4/.claude/projects/D--TradeHall/246057cd-525e-4986-8f3e-1670bd109e22/subagents/agent-a4468950d03d00a16.jsonl",
+      "sha256": "f9a182f2b47afddb52251e1b1fca90d57288c204bce94710776bcfb13e2777a3",
+      "exactTopicLineCount": 0,
+      "status": "EXCLUDED",
+      "reason": "TradeHall booth resource research, BRII/IAQ/podcast; no current presentation material"
+    },
+    {
+      "machine": "PC",
+      "llm": "Codex",
+      "path": "C:/Users/Disaster Recovery 4/.codex/sessions/2026/11/04/rollout-2026-11-04T11-22-18-01a1a426-5361-7da3-a1be-8ba41c22664a.jsonl",
+      "sha256": "9027b877881ecdf43aa5f3e2ef1c7dda3d68fbb5d2e9b6144f167f69d539c472",
+      "exactTopicLineCount": 0,
+      "status": "EXCLUDED",
+      "reason": "UNI-3145 BRII website graphics/review; no current presentation material"
+    },
+    {
+      "machine": "PC",
+      "llm": "Claude",
+      "path": "C:\\Users\\Disaster Recovery 4\\.claude\\projects\\--wsl-localhost-Ubuntu-home-phill-mcgurk-agent-work-ivi-s2\\e7076357-15b8-426d-a164-41531a2dbc5c.jsonl",
+      "sha256": "87801ab57238a13f24a33dab2ca24297bcd406c56e07ffc7a78e01e4f30a0a66",
+      "exactTopicLineCount": 0,
+      "genericIviLineCount": 1,
+      "status": "EXCLUDED",
+      "reason": "Generic Ivi/BRII/portfolio match; none of four exact task topics present"
+    },
+    {
+      "machine": "PC",
+      "llm": "Claude",
+      "path": "C:\\Users\\Disaster Recovery 4\\.claude\\projects\\--wsl-localhost-Ubuntu-home-phill-mcgurk-agent-work-ivi-s3\\e5fac14f-1d7d-465b-947d-657e3f065e87.jsonl",
+      "sha256": "d06f3bc3e79f4ef21535c302b1868fc36e17757647eb7fe5366d220b2e7456da",
+      "exactTopicLineCount": 0,
+      "genericIviLineCount": 2,
+      "status": "EXCLUDED",
+      "reason": "Generic Ivi/BRII/portfolio match; none of four exact task topics present"
+    },
+    {
+      "machine": "PC",
+      "llm": "Claude",
+      "path": "C:\\Users\\Disaster Recovery 4\\.claude\\projects\\C--agent-work-brii-job3-review\\7dfbc6fc-ff9a-4ca5-87f1-d3cc1f62f111.jsonl",
+      "sha256": "c88f5a6c888332bb2c1b53b35d7e9fdbe7b14a003f959d11b3748123351589a6",
+      "exactTopicLineCount": 0,
+      "genericIviLineCount": 4,
+      "status": "EXCLUDED",
+      "reason": "Generic Ivi/BRII/portfolio match; none of four exact task topics present"
+    },
+    {
+      "machine": "PC",
+      "llm": "Claude",
+      "path": "C:\\Users\\Disaster Recovery 4\\.claude\\projects\\D--Ivi---BRII\\887f26b7-74c3-4044-baba-5888ee266754\\subagents\\agent-a23ba1cb3ba438c0d.jsonl",
+      "sha256": "f6bf4ddbffc92a3138bee7f7e3102c5cbeedbe5b66f508a227b8e2b598fa4fe5",
+      "exactTopicLineCount": 0,
+      "genericIviLineCount": 2,
+      "status": "EXCLUDED",
+      "reason": "Generic Ivi/BRII/portfolio match; none of four exact task topics present"
+    },
+    {
+      "machine": "PC",
+      "llm": "Claude",
+      "path": "C:\\Users\\Disaster Recovery 4\\.claude\\projects\\D--Ivi---BRII\\887f26b7-74c3-4044-baba-5888ee266754.jsonl",
+      "sha256": "87e872c35652d2ba3b188b2f4b61ec4da3d07e7a4885fda8e7d9d2c3ee1d0f01",
+      "exactTopicLineCount": 0,
+      "genericIviLineCount": 21,
+      "status": "EXCLUDED",
+      "reason": "Generic Ivi/BRII/portfolio match; none of four exact task topics present"
+    },
+    {
+      "machine": "PC",
+      "llm": "Claude",
+      "path": "C:\\Users\\Disaster Recovery 4\\.claude\\projects\\D--Ivi---BRII\\b82059f9-6c94-4499-9ab9-462ce4fe5a4e.jsonl",
+      "sha256": "70a8cda26cc12cac7b86023171bf4d040e7ff25d973530919a932e983c795615",
+      "exactTopicLineCount": 0,
+      "genericIviLineCount": 21,
+      "status": "EXCLUDED",
+      "reason": "Generic Ivi/BRII/portfolio match; none of four exact task topics present"
+    },
+    {
+      "machine": "PC",
+      "llm": "Claude",
+      "path": "C:\\Users\\Disaster Recovery 4\\.claude\\projects\\D--Ivi---BRII\\b9478156-ecec-40fe-bbbf-71d0c22a7470\\subagents\\agent-a783d48c7db2e24eb.jsonl",
+      "sha256": "7fca24ee388650a1453ad6c9a08b13a72c03b37119476ebe73ca776feac3ecac",
+      "exactTopicLineCount": 0,
+      "genericIviLineCount": 5,
+      "status": "EXCLUDED",
+      "reason": "Generic Ivi/BRII/portfolio match; none of four exact task topics present"
+    },
+    {
+      "machine": "PC",
+      "llm": "Claude",
+      "path": "C:\\Users\\Disaster Recovery 4\\.claude\\projects\\D--Ivi---BRII\\b9478156-ecec-40fe-bbbf-71d0c22a7470.jsonl",
+      "sha256": "e399e9a639cb4f6e86560e217c120036f981f8692c444cabf161ffb24f9d018e",
+      "exactTopicLineCount": 0,
+      "genericIviLineCount": 18,
+      "status": "EXCLUDED",
+      "reason": "Generic Ivi/BRII/portfolio match; none of four exact task topics present"
+    },
+    {
+      "machine": "PC",
+      "llm": "Claude",
+      "path": "C:\\Users\\Disaster Recovery 4\\.claude\\projects\\D--Unite-Group\\21abe814-b9c5-417a-a004-fb4da1322fe2.jsonl",
+      "sha256": "ec45cd548c24e87f638be0d9f9d46d57615500f773f4c71669249ae72dbf074e",
+      "exactTopicLineCount": 0,
+      "genericIviLineCount": 1,
+      "status": "EXCLUDED",
+      "reason": "Generic Ivi/BRII/portfolio match; none of four exact task topics present"
+    },
+    {
+      "machine": "PC",
+      "llm": "Claude",
+      "path": "C:\\Users\\Disaster Recovery 4\\.claude\\projects\\D--Unite-Group\\4553ad47-5f3d-4bb0-9c0a-80f33f346561.jsonl",
+      "sha256": "07c44eca574e2b39499d36e6d05d9692a2099cce5eea77b3925f7a37fcf3c663",
+      "exactTopicLineCount": 0,
+      "genericIviLineCount": 1,
+      "status": "EXCLUDED",
+      "reason": "Generic Ivi/BRII/portfolio match; none of four exact task topics present"
+    },
+    {
+      "machine": "PC",
+      "llm": "Claude",
+      "path": "C:\\Users\\Disaster Recovery 4\\.claude\\projects\\D--Unite-Group\\5017bbcc-de47-4660-848c-94a398528e67.jsonl",
+      "sha256": "d5f655778b1f49726148180705cbebbb4521ac01359ff08213b6f1b09d8e64a5",
+      "exactTopicLineCount": 0,
+      "genericIviLineCount": 5,
+      "status": "EXCLUDED",
+      "reason": "Generic Ivi/BRII/portfolio match; none of four exact task topics present"
+    },
+    {
+      "machine": "PC",
+      "llm": "Claude",
+      "path": "C:\\Users\\Disaster Recovery 4\\.claude\\projects\\D--Unite-Group\\cc544138-8794-4af4-9fdb-a2a307cee794.jsonl",
+      "sha256": "6bb598f74e9767a57d94c94674a168d2e1c825ccf0716491c381e0fa42baea05",
+      "exactTopicLineCount": 0,
+      "genericIviLineCount": 2,
+      "status": "EXCLUDED",
+      "reason": "Generic Ivi/BRII/portfolio match; none of four exact task topics present"
+    },
+    {
+      "machine": "PC",
+      "llm": "Claude",
+      "path": "C:\\Users\\Disaster Recovery 4\\.claude\\projects\\D--Unite-Group\\d0a063c1-6af4-49b9-b534-d09dd32e2c8a.jsonl",
+      "sha256": "4923339330e16fbeaf374cb3fd59bfdf9a33e10b8fdc8761b487444093cc962b",
+      "exactTopicLineCount": 0,
+      "genericIviLineCount": 7,
+      "status": "EXCLUDED",
+      "reason": "Generic Ivi/BRII/portfolio match; none of four exact task topics present"
+    },
+    {
+      "machine": "PC",
+      "llm": "Claude",
+      "path": "C:\\Users\\Disaster Recovery 4\\.claude\\projects\\D--Unite-Group\\d751527e-b0f7-4ae5-aa85-25876503f7a1.jsonl",
+      "sha256": "3dace799e9df1456c6e07b056390f41d2a5c75b6018d858aed4f10e6fc11a30d",
+      "exactTopicLineCount": 0,
+      "genericIviLineCount": 3,
+      "status": "EXCLUDED",
+      "reason": "Generic Ivi/BRII/portfolio match; none of four exact task topics present"
+    },
+    {
+      "machine": "PC",
+      "llm": "Codex",
+      "path": "C:\\Users\\Disaster Recovery 4\\.codex\\sessions\\2026\\11\\04\\rollout-2026-11-04T20-32-16-01a1a61d-d8ed-7641-9c5b-970ee10fa513.jsonl",
+      "sha256": "0eea493b4662b49758143d1e753feb2df000f4c3dd8fcb46c59ba924cd7aa9e9",
+      "exactTopicLineCount": 0,
+      "genericIviLineCount": 3,
+      "status": "EXCLUDED",
+      "reason": "Generic Ivi/BRII/portfolio match; none of four exact task topics present"
+    },
+    {
+      "machine": "PC",
+      "llm": "Codex",
+      "path": "C:\\Users\\Disaster Recovery 4\\.codex\\sessions\\2026\\11\\04\\rollout-2026-11-04T20-32-16-01a1a61d-d901-77a2-b308-274d1ba26ca8.jsonl",
+      "sha256": "6fde794c1d421cd3967e7feab5f6be25b27d44ac5fe367495b4338520bfc960a",
+      "exactTopicLineCount": 0,
+      "genericIviLineCount": 0,
+      "status": "EXCLUDED",
+      "reason": "Additional same-prefix child retrieved; no exact task topic or Ivi match"
+    },
+    {
+      "machine": "PC",
+      "llm": "Codex",
+      "path": "C:\\Users\\Disaster Recovery 4\\.codex\\sessions\\2026\\11\\08\\rollout-2026-11-08T22-14-09-01a1bb14-8f77-7bf3-a3ec-4bb97143e788.jsonl",
+      "sha256": "eea2cd15cbde8b66de379e468851f4e088ff7254e3e723272837ba37b3ce46d7",
+      "exactTopicLineCount": 0,
+      "genericIviLineCount": 11,
+      "status": "EXCLUDED",
+      "reason": "Generic Ivi/BRII/portfolio match; none of four exact task topics present"
+    },
+    {
+      "machine": "PC",
+      "llm": "Codex",
+      "path": "C:\\Users\\Disaster Recovery 4\\.codex\\sessions\\2026\\11\\08\\rollout-2026-11-08T22-16-54-01a1bb17-1266-7d21-a385-b24adee7ac3c.jsonl",
+      "sha256": "80551a7c2f354e90dd6187b6fe6e964c830ef868b54e0fb74191247846f29015",
+      "exactTopicLineCount": 0,
+      "genericIviLineCount": 13,
+      "status": "EXCLUDED",
+      "reason": "Generic Ivi/BRII/portfolio match; none of four exact task topics present"
+    }
+  ],
+  "coverageLimits": [
+    "Native Windows roots and candidates supplied by parent only; not independent global completeness claim",
+    "21 files retrieved:20 keyword candidates plus one extra same-prefix Codex child without keywords",
+    "Unrelated raw excerpts remain scratch only and must not enter the presentation repository",
+    "Claude web, other LLM accounts and deleted conversations remain unverified"
+  ],
+  "conclusion": "No current AI in Business presentation content recovered from these PC native conversation candidates."
+}

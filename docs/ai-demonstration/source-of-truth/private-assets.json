@@ -1,0 +1,23 @@
+{
+  "publicationStatus": "HOLD; private media is not included in the public Git repository",
+  "reason": "Source consolidation is authorised; production video release has separate independent review, six-board, rights and owner release requirements.",
+  "approvedMaster": {
+    "filename": "AI-in-Business-Keyboard-Tips.mp4",
+    "sha256": "446042327ce9bb0c8a0f163f4658df8fbc4dc60637a6fdbfba14085599a2d88f",
+    "bytes": 27829704,
+    "frames": 6660,
+    "fps": 25,
+    "durationSec": 266.4,
+    "macBookPath": "/Users/phillmcgurk/Documents/Codex/2026-11-07/files-pasted-by-the-user-session/outputs/AI-in-Business-Keyboard-Tips/AI-in-Business-Keyboard-Tips.mp4",
+    "miniPath": "/Volumes/Mini Mini 2T Storage/tmp/uni-2934-cinematic/keyboard-tips-review/AI-in-Business-Keyboard-Tips.mp4"
+  },
+  "otherMediaCustody": {
+    "capture": "MacBook work/shared-timeline/clean/ and work/shared-timeline/*.mp4",
+    "originalAvatar": "MacBook outputs/AI-in-Business-Cinematic-Tutorial/narration/margot-tutorial.mp4",
+    "previousWholeTalkPack": "Mini /Volumes/Mini Mini 2T Storage/tmp/uni-2934-cinematic/full-narration/AI-in-Business-Cinematic-Review.zip"
+  },
+  "limits": [
+    "Other-media locators preserve known custody, not full per-file integrity or portability verification",
+    "Private asset path availability on PC and other machines remains unverified"
+  ]
+}

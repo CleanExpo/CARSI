@@ -1,0 +1,28 @@
+{
+  "date": "2026-11-09",
+  "surface": "Signed-in Claude desktop app history search",
+  "queries": [
+    {
+      "text": "AI in Business",
+      "returnedResults": 5,
+      "classification": "Fuzzy matches to unrelated operational conversations; no exact presentation title shown"
+    },
+    {
+      "text": "Melbourne",
+      "returnedResults": 2,
+      "classification": "Equipment rental pricing and IICRC school certification candidates"
+    }
+  ],
+  "selectedCandidate": {
+    "url": "https://claude.ai/chat/f222a29b-e6d8-489f-994d-456353698279",
+    "title": "IICRC certification requirements for Australian schools",
+    "scopeRead": "Returned visible messages10\u201312 of12",
+    "classification": "EXCLUDED: school/instructor application, unrelated to AI presentation"
+  },
+  "limits": [
+    "Not an account-wide content export or review of all returned matches",
+    "User changed the app during attempted return to original view; UI work stopped without further actions",
+    "No messages sent, no model generation requested, no unrelated excerpts retained in collection",
+    "Other providers, deleted chats and protected original October session remain unverified"
+  ]
+}

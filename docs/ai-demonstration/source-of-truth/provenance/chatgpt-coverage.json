@@ -1,0 +1,78 @@
+{
+  "source": "Connected ChatGPT history via Codex app",
+  "date": "2026-11-09",
+  "activeTitlesSearched": 1069,
+  "archivedTitlesSearched": 46,
+  "activeHistoryExhausted": true,
+  "archivedHistoryExhausted": true,
+  "method": "Title screening across complete returned active/archived lists; full returned turns reviewed for3selected candidate conversations. This is not a content search or review of every message in every conversation.",
+  "candidateReviews": [
+    {
+      "id": "6928d1dc-1a4c-8322-b35b-1cf0b64347ee",
+      "title": "RIA 2026 AI seminar blueprint",
+      "createdAt": 1764283063.840999,
+      "reviewedTurns": 2,
+      "hasMore": false,
+      "classification": "Separate brief; excluded from current15minute sequence.",
+      "ownerMessages": [
+        {
+          "id": "bd897502-a283-4a0c-ba14-3b77c47e9d5d",
+          "text": "1. From beginner to \"Expert\" (Self taught expert)\n2. Its a mix, Inbedded Youtube videos, Podcast recording with Notebooklm demonstration, Hands on, standing in-front, social experiments during the day, interactive, in groups, activities, takeaways.\n3. A real out put generated using A free Tool - Gemini Studio, Bolt.new, Replit, etc\n4. I am alone\n5. All."
+        },
+        {
+          "id": "74d5dbab-048a-4e5d-84ae-80e5d4a5f5c3",
+          "text": "https://www.youtube.com/watch?v=39o0uYPo4jU\ni have to generate a day seminar for the Professional Restoration Industry at the 2026 RIA Australia Tradeshow. \nThe subject is AI. AI in business, AI in everyday life, AI is coming, AI is taking over the industry. \nThis video demonstrates the change, not take over. But is what is changing and why you need to embrace, not shy away.\n\nI would love for you to take this idea and generate a Professional Presentation - 8hours / 3 blocks of 2 hours and 1 block of 1 hour (1 hour for luch break). I want to make the seminar extremely interactive. They need there laptop with access to their socials, and google search console. \n\nWhat are you able to generate for me?"
+        }
+      ]
+    },
+    {
+      "id": "67096b63-25c8-8001-9cd5-0025184dc9ec",
+      "title": "LLM Beginners Presentation Guide",
+      "createdAt": 1728670563.342872,
+      "reviewedTurns": 5,
+      "hasMore": false,
+      "classification": "Historical beginner presentation, dated2024. Reusable subject ideas only; prices/models/visual direction superseded.",
+      "ownerMessages": [
+        {
+          "id": "aaa25fb3-24d9-447d-a5d3-5b1e2a8213df",
+          "text": "Help me create another 2:\nUses for Business Opportunities\r\n\r\nEmerging applications show an expanding role of LLMs in various industries.\r\n\r\nRepetitive Tasks - Streamlining\r\nConsistency – The same way\n\n[User attached 1 image; image contents were not included]"
+        },
+        {
+          "id": "aaa29b88-da44-4819-8ce9-59e00a5b7cb6",
+          "text": "\"title\": \"Getting Started\",\r\n        \"content\": \"Start by choosing a platform, typing a question, and experimenting with different topics.\",\n\nProvide a list of the common 5 LLM used by beginners that are free"
+        },
+        {
+          "id": "aaa2c724-a465-4574-ae10-e9a8e195fad8",
+          "text": "Next"
+        },
+        {
+          "id": "aaa2414e-d307-4921-b2e9-ab9d4f7c48ec",
+          "text": "This image is very clustered. Design the images with minimal text and just simplify the image. The slide page is providing the text and information.\nJust look at the text for the slide and create a simple image"
+        },
+        {
+          "id": "aaa24eda-694f-4c2f-9388-02ac83b61a7e",
+          "text": "This is great, use Dall-e to genreate each image for each presentation page"
+        }
+      ]
+    },
+    {
+      "id": "6aed4e1a-82a8-8321-a77c-95f1e97ed42a",
+      "title": "RestoreAssist Presentation Generation",
+      "createdAt": 1793936929.389059,
+      "reviewedTurns": 1,
+      "hasMore": false,
+      "classification": "Separate brief; excluded from current15minute sequence.",
+      "ownerMessages": [
+        {
+          "id": "64bcd28c-b6ed-4a4b-bf9c-1a97da0276fc",
+          "text": "Generate one for RestoreAssist"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Relevant content inside an unrelated chat title may remain undiscovered.",
+    "Images not returned by the history reader were not inspected.",
+    "No Claude web, Gemini web, Grok web, deleted chats or other account/profile export recovered."
+  ]
+}

@@ -1,0 +1,231 @@
+{
+  "schema": 1,
+  "artifact": {
+    "path": "/Users/phillmcgurk/Documents/Codex/2026-11-07/files-pasted-by-the-user-session/outputs/AI-in-Business-Keyboard-Tips/AI-in-Business-Keyboard-Tips.mp4",
+    "sha256": "446042327ce9bb0c8a0f163f4658df8fbc4dc60637a6fdbfba14085599a2d88f"
+  },
+  "fps": 25,
+  "singleTimeline": true,
+  "ownerRejected": false,
+  "captureMotionQualified": true,
+  "activeTypingMeasured": true,
+  "typingStalls": [],
+  "anchors": [
+    {
+      "id": "Do not send yet cue",
+      "visibleActionFrame": 1351,
+      "spokenWordFrame": 1353,
+      "mismatchSec": 0.08,
+      "reviewedInFinal": true,
+      "evidence": {
+        "path": "/Users/phillmcgurk/Documents/Codex/2026-11-07/files-pasted-by-the-user-session/outputs/AI-in-Business-Keyboard-Tips/review/keyboard-tip.png",
+        "sha256": "3e944a360f03d7dc8bdfcb2fedbee93dd5308fbd37ec5c8d03f0170e9cfff5aa"
+      },
+      "note": "Headline accompanies actual spoken Do not send yet. Shift+Enter is an additional visual tutorial, not newly generated narration. Key press at source 0.802s; new paragraph visible at 0.862s.",
+      "reviewer": "MacBook/codex \u2014 own final-artifact visual checkpoint review; independent watch/listen pending"
+    },
+    {
+      "id": "Click message box",
+      "visibleActionFrame": 958,
+      "spokenWordFrame": 959,
+      "mismatchSec": 0.009999999999999995,
+      "reviewedInFinal": true,
+      "evidence": {
+        "path": "/Users/phillmcgurk/Documents/Codex/2026-11-07/files-pasted-by-the-user-session/outputs/AI-in-Business-Keyboard-Tips/review/action-01.png",
+        "sha256": "7000b849979398c4a4244c0ba0729b1a055c95fd7b61ca379f66f483905aba1b"
+      },
+      "reviewer": "MacBook/codex \u2014 own final-artifact visual checkpoint review; independent watch/listen pending"
+    },
+    {
+      "id": "Prices in facts",
+      "visibleActionFrame": 1084,
+      "spokenWordFrame": 1081,
+      "mismatchSec": 0.11699999999999999,
+      "reviewedInFinal": true,
+      "evidence": {
+        "path": "/Users/phillmcgurk/Documents/Codex/2026-11-07/files-pasted-by-the-user-session/outputs/AI-in-Business-Keyboard-Tips/review/action-02.png",
+        "sha256": "bf0dee61e037aa92375dcdba43a30f7c10abe58b19517b78cfeafd75ad61cc2a"
+      },
+      "reviewer": "MacBook/codex \u2014 own final-artifact visual checkpoint review; independent watch/listen pending"
+    },
+    {
+      "id": "First Send",
+      "visibleActionFrame": 2492,
+      "spokenWordFrame": 2495,
+      "mismatchSec": 0.11329999999999996,
+      "reviewedInFinal": true,
+      "evidence": {
+        "path": "/Users/phillmcgurk/Documents/Codex/2026-11-07/files-pasted-by-the-user-session/outputs/AI-in-Business-Keyboard-Tips/review/action-03.png",
+        "sha256": "71ac33ffb6a23839ae7f3893cc0d63881ff66b91fd10d7f44635c7895c80a85e"
+      },
+      "reviewer": "MacBook/codex \u2014 own final-artifact visual checkpoint review; independent watch/listen pending"
+    },
+    {
+      "id": "Type correction",
+      "visibleActionFrame": 3595,
+      "spokenWordFrame": 3594,
+      "mismatchSec": 0.0532999999999999,
+      "reviewedInFinal": true,
+      "evidence": {
+        "path": "/Users/phillmcgurk/Documents/Codex/2026-11-07/files-pasted-by-the-user-session/outputs/AI-in-Business-Keyboard-Tips/review/action-04.png",
+        "sha256": "3a6dd570607f343d410cd6b50b7288b43faf7047ef890cf6fd67212390c37ab6"
+      },
+      "reviewer": "MacBook/codex \u2014 own final-artifact visual checkpoint review; independent watch/listen pending"
+    },
+    {
+      "id": "Second Send",
+      "visibleActionFrame": 4508,
+      "spokenWordFrame": 4508,
+      "mismatchSec": 0.013299999999999979,
+      "reviewedInFinal": true,
+      "evidence": {
+        "path": "/Users/phillmcgurk/Documents/Codex/2026-11-07/files-pasted-by-the-user-session/outputs/AI-in-Business-Keyboard-Tips/review/action-05.png",
+        "sha256": "c5d4f2190c937f087ce6f0ff7f193f6e342dec855b7529711252e81afd4838d6"
+      },
+      "reviewer": "MacBook/codex \u2014 own final-artifact visual checkpoint review; independent watch/listen pending"
+    }
+  ],
+  "speech": [
+    {
+      "startFrame": 0,
+      "sourceStartSec": 0,
+      "sourceEndSec": 35.12,
+      "durationSec": 35.12,
+      "endFrame": 878.0,
+      "measuredSamples": 1685760,
+      "sampleRate": 48000
+    },
+    {
+      "startFrame": 878,
+      "sourceStartSec": 35.12,
+      "sourceEndSec": 38.24,
+      "durationSec": 3.1200000000000045,
+      "endFrame": 956.0,
+      "measuredSamples": 149760,
+      "sampleRate": 48000
+    },
+    {
+      "startFrame": 957,
+      "sourceStartSec": 42.88,
+      "sourceEndSec": 44.56,
+      "durationSec": 1.6799999999999997,
+      "endFrame": 999.0,
+      "measuredSamples": 80640,
+      "sampleRate": 48000
+    },
+    {
+      "startFrame": 1067,
+      "sourceStartSec": 47.16,
+      "sourceEndSec": 49.96,
+      "durationSec": 2.8000000000000043,
+      "endFrame": 1137.0,
+      "measuredSamples": 134400,
+      "sampleRate": 48000
+    },
+    {
+      "startFrame": 1351,
+      "sourceStartSec": 52.96,
+      "sourceEndSec": 54.56,
+      "durationSec": 1.6000000000000014,
+      "endFrame": 1391.0,
+      "measuredSamples": 76800,
+      "sampleRate": 48000
+    },
+    {
+      "startFrame": 1453,
+      "sourceStartSec": 54.56,
+      "sourceEndSec": 67.2,
+      "durationSec": 12.64,
+      "endFrame": 1769.0,
+      "measuredSamples": 606720,
+      "sampleRate": 48000
+    },
+    {
+      "startFrame": 2485,
+      "sourceStartSec": 67.2,
+      "sourceEndSec": 69.88,
+      "durationSec": 2.6799999999999926,
+      "endFrame": 2552.0,
+      "measuredSamples": 128640,
+      "sampleRate": 48000
+    },
+    {
+      "startFrame": 2686,
+      "sourceStartSec": 75.32,
+      "sourceEndSec": 82.08,
+      "durationSec": 6.760000000000005,
+      "endFrame": 2855.0,
+      "measuredSamples": 324480,
+      "sampleRate": 48000
+    },
+    {
+      "startFrame": 3555,
+      "sourceStartSec": 82.08,
+      "sourceEndSec": 86.56,
+      "durationSec": 4.480000000000004,
+      "endFrame": 3667.0,
+      "measuredSamples": 215040,
+      "sampleRate": 48000
+    },
+    {
+      "startFrame": 4507,
+      "sourceStartSec": 86.56,
+      "sourceEndSec": 88.48,
+      "durationSec": 1.9200000000000017,
+      "endFrame": 4555.0,
+      "measuredSamples": 92160,
+      "sampleRate": 48000
+    },
+    {
+      "startFrame": 5077,
+      "sourceStartSec": 88.48,
+      "sourceEndSec": 151.8,
+      "durationSec": 63.32000000000001,
+      "endFrame": 6660.0,
+      "measuredSamples": 3039360,
+      "sampleRate": 48000
+    }
+  ],
+  "reading": [
+    {
+      "id": "03  Read the complete prompt",
+      "startFrame": 1873,
+      "endFrame": 2473,
+      "words": 70,
+      "quiet": true
+    },
+    {
+      "id": "05  Read the first answer",
+      "startFrame": 2855,
+      "endFrame": 3555,
+      "words": 82,
+      "quiet": true
+    },
+    {
+      "id": "06  Read the correction",
+      "startFrame": 4089,
+      "endFrame": 4489,
+      "words": 48,
+      "quiet": true
+    },
+    {
+      "id": "07  Read the checked answer",
+      "startFrame": 4602,
+      "endFrame": 5077,
+      "words": 55,
+      "quiet": true
+    }
+  ],
+  "playback": {
+    "path": "/Users/phillmcgurk/Documents/Codex/2026-11-07/files-pasted-by-the-user-session/outputs/AI-in-Business-Keyboard-Tips/review/browser-playback.json",
+    "sha256": "306c97893730617fa43ff2ac885e21ac4bfdbd44eebf2f97e35cf5da3ad03320"
+  },
+  "privacyReview": {
+    "path": "/Users/phillmcgurk/Documents/Codex/2026-11-07/files-pasted-by-the-user-session/outputs/AI-in-Business-Keyboard-Tips/review/privacy-review.json",
+    "sha256": "baa561238ea53ffca227301da2ef31c41974d27a3b3e38b0fe60743e77084020"
+  },
+  "independentWatchListen": {
+    "path": "/Users/phillmcgurk/Documents/Codex/2026-11-07/files-pasted-by-the-user-session/outputs/AI-in-Business-Keyboard-Tips/review/independent-watch-listen.json",
+    "sha256": "MISSING"
+  }
+}

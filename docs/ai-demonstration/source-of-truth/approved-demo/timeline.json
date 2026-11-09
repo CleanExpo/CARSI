@@ -1,0 +1,478 @@
+{
+  "taskId": "MAC-MELBOURNE-AI-BUSINESS",
+  "fps": 25,
+  "frames": 6660,
+  "durationSec": 266.4,
+  "pieces": [
+    {
+      "name": "AI in Business",
+      "startFrame": 0,
+      "frames": 878,
+      "kind": "cinematic",
+      "capture": null,
+      "crop": null,
+      "source": 0,
+      "note": "",
+      "voice": {
+        "startFrame": 0,
+        "sourceStartSec": 0,
+        "sourceEndSec": 35.12,
+        "durationSec": 35.12,
+        "endFrame": 877.9999999999999
+      }
+    },
+    {
+      "name": "01  Open ChatGPT",
+      "startFrame": 878,
+      "frames": 79,
+      "kind": "screen",
+      "capture": "loading",
+      "crop": [
+        430,
+        250,
+        800,
+        340
+      ],
+      "source": 0,
+      "note": "Actual temporary OpenAI session \u00b7 signed-in view \u00b7 fictional information",
+      "voice": {
+        "startFrame": 878,
+        "sourceStartSec": 35.12,
+        "sourceEndSec": 38.24,
+        "durationSec": 3.1200000000000045,
+        "endFrame": 956.0000000000001
+      }
+    },
+    {
+      "name": "02  Click the message box",
+      "startFrame": 957,
+      "frames": 42,
+      "kind": "screen",
+      "capture": "facts-continuous",
+      "crop": [
+        430,
+        250,
+        800,
+        340
+      ],
+      "source": 0,
+      "note": "Click the message box",
+      "voice": {
+        "startFrame": 957,
+        "sourceStartSec": 42.88,
+        "sourceEndSec": 44.56,
+        "durationSec": 1.6799999999999997,
+        "endFrame": 999.0
+      },
+      "limitSource": 0.12
+    },
+    {
+      "name": "02  Enter the facts",
+      "startFrame": 999,
+      "frames": 352,
+      "kind": "screen",
+      "capture": "facts-continuous",
+      "crop": [
+        430,
+        250,
+        800,
+        340
+      ],
+      "source": 0.24,
+      "note": "Actual typing \u00b7 include the prices and unknown details",
+      "voice": {
+        "startFrame": 1067,
+        "sourceStartSec": 47.16,
+        "sourceEndSec": 49.96,
+        "durationSec": 2.8000000000000043,
+        "endFrame": 1137.0
+      }
+    },
+    {
+      "name": "TIP  Don\u2019t press Enter yet",
+      "startFrame": 1351,
+      "frames": 102,
+      "kind": "screen",
+      "capture": "/Users/phillmcgurk/Documents/Codex/2026-11-07/files-pasted-by-the-user-session/work/shortcut-rebuild/shift-enter.mp4",
+      "crop": [
+        280,
+        345,
+        780,
+        115
+      ],
+      "source": 0,
+      "note": "Shift + Enter = new line \u00b7 Enter = send \u00b7 wait until the prompt is complete",
+      "voice": {
+        "startFrame": 1351,
+        "sourceStartSec": 52.96,
+        "sourceEndSec": 54.56,
+        "durationSec": 1.6000000000000014,
+        "endFrame": 1391.0
+      },
+      "keyCue": true
+    },
+    {
+      "name": "03  Add the request",
+      "startFrame": 1453,
+      "frames": 420,
+      "kind": "screen",
+      "capture": "request-continuous",
+      "crop": [
+        430,
+        250,
+        800,
+        340
+      ],
+      "source": 0.12,
+      "note": "Keep typing below the facts \u00b7 Shift + Enter adds another line without sending",
+      "voice": {
+        "startFrame": 1453,
+        "sourceStartSec": 54.56,
+        "sourceEndSec": 67.2,
+        "durationSec": 12.64,
+        "endFrame": 1769.0
+      }
+    },
+    {
+      "name": "03  Read the complete prompt",
+      "startFrame": 1873,
+      "frames": 600,
+      "kind": "still",
+      "capture": "/Users/phillmcgurk/Documents/Codex/2026-11-07/files-pasted-by-the-user-session/work/shared-timeline/clean/request-continuous/000232.jpg",
+      "crop": [
+        430,
+        250,
+        800,
+        340
+      ],
+      "source": 0,
+      "note": "Reading interval \u00b7 complete prompt \u00b7 next step follows automatically"
+    },
+    {
+      "name": "04  Send and read the answer",
+      "startFrame": 2473,
+      "frames": 180,
+      "kind": "screen",
+      "capture": "first-send-response",
+      "crop": [
+        425,
+        55,
+        800,
+        710
+      ],
+      "source": 0,
+      "note": "TIP: Enter sends the prompt \u00b7 check first, then press Enter or click Send",
+      "voice": {
+        "startFrame": 2485,
+        "sourceStartSec": 67.2,
+        "sourceEndSec": 69.88,
+        "durationSec": 2.6799999999999926,
+        "endFrame": 2552.0
+      },
+      "cameraBefore": {
+        "until": 1.04,
+        "crop": [
+          430,
+          250,
+          800,
+          340
+        ]
+      }
+    },
+    {
+      "name": "05  Reveal the complete answer",
+      "startFrame": 2653,
+      "frames": 33,
+      "kind": "screen",
+      "capture": "first-reply-scroll",
+      "crop": [
+        425,
+        55,
+        800,
+        710
+      ],
+      "source": 0,
+      "note": "Scroll to read the complete answer"
+    },
+    {
+      "name": "05  Check the calculation",
+      "startFrame": 2686,
+      "frames": 169,
+      "kind": "still",
+      "capture": "/Users/phillmcgurk/Documents/Codex/2026-11-07/files-pasted-by-the-user-session/work/shared-timeline/clean/first-reply-scroll/000034.jpg",
+      "crop": [
+        435,
+        150,
+        780,
+        300
+      ],
+      "source": 0,
+      "note": "A$385 is correct \u00b7 check the inferred date before using this draft",
+      "voice": {
+        "startFrame": 2686,
+        "sourceStartSec": 75.32,
+        "sourceEndSec": 82.08,
+        "durationSec": 6.760000000000005,
+        "endFrame": 2855.0
+      }
+    },
+    {
+      "name": "05  Read the first answer",
+      "startFrame": 2855,
+      "frames": 700,
+      "kind": "still",
+      "capture": "/Users/phillmcgurk/Documents/Codex/2026-11-07/files-pasted-by-the-user-session/work/shared-timeline/clean/first-reply-scroll/000034.jpg",
+      "crop": [
+        435,
+        110,
+        780,
+        320
+      ],
+      "source": 0,
+      "note": "Read the draft \u00b7 verify prices, dates and promises \u00b7 progress below",
+      "pan": [
+        110,
+        310,
+        10,
+        10
+      ]
+    },
+    {
+      "name": "06  Correct the draft",
+      "startFrame": 3555,
+      "frames": 534,
+      "kind": "screen",
+      "capture": "correction-continuous",
+      "crop": [
+        430,
+        540,
+        800,
+        285
+      ],
+      "source": 0,
+      "note": "Read the correction, then type \u00b7 keep the context in the same chat",
+      "voice": {
+        "startFrame": 3555,
+        "sourceStartSec": 82.08,
+        "sourceEndSec": 86.56,
+        "durationSec": 4.480000000000004,
+        "endFrame": 3667.0
+      },
+      "prepend": 1.28
+    },
+    {
+      "name": "06  Read the correction",
+      "startFrame": 4089,
+      "frames": 400,
+      "kind": "still",
+      "capture": "/Users/phillmcgurk/Documents/Codex/2026-11-07/files-pasted-by-the-user-session/work/shared-timeline/clean/correction-continuous/000327.jpg",
+      "crop": [
+        430,
+        540,
+        800,
+        285
+      ],
+      "source": 0,
+      "note": "Reading interval \u00b7 complete correction \u00b7 next step follows automatically"
+    },
+    {
+      "name": "06  Send, then check again",
+      "startFrame": 4489,
+      "frames": 80,
+      "kind": "screen",
+      "capture": "second-send-response",
+      "crop": [
+        425,
+        55,
+        800,
+        710
+      ],
+      "source": 0,
+      "note": "Actual Send and revised response",
+      "voice": {
+        "startFrame": 4507,
+        "sourceStartSec": 86.56,
+        "sourceEndSec": 88.48,
+        "durationSec": 1.9200000000000017,
+        "endFrame": 4555.0
+      },
+      "cameraBefore": {
+        "until": 1.04,
+        "crop": [
+          430,
+          540,
+          800,
+          285
+        ]
+      }
+    },
+    {
+      "name": "07  Reveal the checked answer",
+      "startFrame": 4569,
+      "frames": 33,
+      "kind": "screen",
+      "capture": "checked-reply-scroll",
+      "crop": [
+        425,
+        55,
+        800,
+        710
+      ],
+      "source": 0,
+      "note": "Scroll to read the complete revised answer"
+    },
+    {
+      "name": "07  Read the checked answer",
+      "startFrame": 4602,
+      "frames": 475,
+      "kind": "still",
+      "capture": "/Users/phillmcgurk/Documents/Codex/2026-11-07/files-pasted-by-the-user-session/work/shared-timeline/clean/checked-reply-scroll/000035.jpg",
+      "crop": [
+        425,
+        340,
+        800,
+        315
+      ],
+      "source": 0,
+      "note": "Reading interval \u00b7 exact date and address now requested"
+    },
+    {
+      "name": "Apply the workflow",
+      "startFrame": 5077,
+      "frames": 1583,
+      "kind": "cinematic",
+      "capture": null,
+      "crop": null,
+      "source": 88.48,
+      "note": "",
+      "voice": {
+        "startFrame": 5077,
+        "sourceStartSec": 88.48,
+        "sourceEndSec": 151.8,
+        "durationSec": 63.32000000000001,
+        "endFrame": 6660.0
+      }
+    }
+  ],
+  "speech": [
+    {
+      "startFrame": 0,
+      "sourceStartSec": 0,
+      "sourceEndSec": 35.12,
+      "durationSec": 35.12,
+      "endFrame": 877.9999999999999
+    },
+    {
+      "startFrame": 878,
+      "sourceStartSec": 35.12,
+      "sourceEndSec": 38.24,
+      "durationSec": 3.1200000000000045,
+      "endFrame": 956.0000000000001
+    },
+    {
+      "startFrame": 957,
+      "sourceStartSec": 42.88,
+      "sourceEndSec": 44.56,
+      "durationSec": 1.6799999999999997,
+      "endFrame": 999.0
+    },
+    {
+      "startFrame": 1067,
+      "sourceStartSec": 47.16,
+      "sourceEndSec": 49.96,
+      "durationSec": 2.8000000000000043,
+      "endFrame": 1137.0
+    },
+    {
+      "startFrame": 1351,
+      "sourceStartSec": 52.96,
+      "sourceEndSec": 54.56,
+      "durationSec": 1.6000000000000014,
+      "endFrame": 1391.0
+    },
+    {
+      "startFrame": 1453,
+      "sourceStartSec": 54.56,
+      "sourceEndSec": 67.2,
+      "durationSec": 12.64,
+      "endFrame": 1769.0
+    },
+    {
+      "startFrame": 2485,
+      "sourceStartSec": 67.2,
+      "sourceEndSec": 69.88,
+      "durationSec": 2.6799999999999926,
+      "endFrame": 2552.0
+    },
+    {
+      "startFrame": 2686,
+      "sourceStartSec": 75.32,
+      "sourceEndSec": 82.08,
+      "durationSec": 6.760000000000005,
+      "endFrame": 2855.0
+    },
+    {
+      "startFrame": 3555,
+      "sourceStartSec": 82.08,
+      "sourceEndSec": 86.56,
+      "durationSec": 4.480000000000004,
+      "endFrame": 3667.0
+    },
+    {
+      "startFrame": 4507,
+      "sourceStartSec": 86.56,
+      "sourceEndSec": 88.48,
+      "durationSec": 1.9200000000000017,
+      "endFrame": 4555.0
+    },
+    {
+      "startFrame": 5077,
+      "sourceStartSec": 88.48,
+      "sourceEndSec": 151.8,
+      "durationSec": 63.32000000000001,
+      "endFrame": 6660.0
+    }
+  ],
+  "reading": [
+    {
+      "id": "03  Read the complete prompt",
+      "startFrame": 1873,
+      "endFrame": 2473,
+      "words": 70,
+      "quiet": true
+    },
+    {
+      "id": "05  Read the first answer",
+      "startFrame": 2855,
+      "endFrame": 3555,
+      "words": 82,
+      "quiet": true
+    },
+    {
+      "id": "06  Read the correction",
+      "startFrame": 4089,
+      "endFrame": 4489,
+      "words": 48,
+      "quiet": true
+    },
+    {
+      "id": "07  Read the checked answer",
+      "startFrame": 4602,
+      "endFrame": 5077,
+      "words": 55,
+      "quiet": true
+    }
+  ],
+  "sourceAudio": "/Users/phillmcgurk/Documents/Codex/2026-11-07/files-pasted-by-the-user-session/outputs/AI-in-Business-Cinematic-Tutorial/narration/margot-tutorial.mp4",
+  "ownerAcceptance": "PENDING",
+  "method": "Direct smooth original; complete sentences only; native 25fps, limited-range yuv420p, no B frames; each source composited once, final video stream copied. Actual OpenAI session plus fresh Shift+Enter capture; whole sentences, no borrowed-word splice. Reading intervals are explicit with continuous progress; calculator instruction precedes first answer reading.",
+  "prompts": {
+    "facts": "Fictional cafe enquiry: 20 lunch boxes at A$18 each; delivery A$25. Customer asks for next Tuesday. GST treatment, exact date, delivery address, availability and allergy requirements are unknown.",
+    "request": "Draft a short customer email of no more than 90 words. Show 20 x A$18 + A$25 = A$385. Ask for missing details. Do not invent, add GST, confirm the order or promise allergy suitability. Give only the email draft, without commentary.",
+    "correction": "Rewrite as plain text in the chat, not the email composer. Keep under 65 words. Ask the customer to confirm the exact date and delivery address; do not infer a date. Keep A$385 as an estimate, leave GST unresolved, confirm availability later and do not promise allergy suitability."
+  },
+  "observedResponses": {
+    "first": "Hi, Thank you for your enquiry about 20 lunch boxes for next Tuesday, 10 November 2026. Here's the estimated cost: 20 \u00d7 A$18 + A$25 delivery = A$385. GST treatment is yet to be confirmed. Could you please provide your delivery address, preferred delivery time, and any dietary restrictions or allergy requirements? We'll also need to check availability for your requested date and confirm whether we can accommodate any allergy requirements. We look forward to hearing from you! Kind regards, Caf\u00e9 Team",
+    "checked": "Hi, Thanks for your lunch box enquiry! 20 \u00d7 A$18 + A$25 delivery = A$385 estimated total (GST treatment to be confirmed). Could you please confirm the exact delivery date, delivery address, preferred time, and any dietary or allergy requirements? We'll check availability and discuss allergy requirements before confirming your order. Kind regards, Caf\u00e9 Team"
+  }
+}

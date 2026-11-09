@@ -1,0 +1,150 @@
+{
+  "classification": "AUTHORED editorial plan, not an observed render",
+  "parentDemoSHA256": "446042327ce9bb0c8a0f163f4658df8fbc4dc60637a6fdbfba14085599a2d88f",
+  "fps": 25,
+  "totalFrames": 22500,
+  "totalSec": 900,
+  "preservesOriginalSceneIds": true,
+  "scenes": [
+    {
+      "sceneId": "hook",
+      "startFrame": 0,
+      "frames": 6660,
+      "startSec": 0,
+      "durationSec": 266.4,
+      "title": "A complete checked workflow: approved demonstration",
+      "productionNote": "Play the complete approved 266.4-second artifact once, unchanged, from frame zero to natural end. It supplies the only opening, tool identification, real clicks, Shift+Enter, complete prompt, responses and corrections. Do not prepend or replay the old Margot introduction.",
+      "delivery": "approved locked video"
+    },
+    {
+      "sceneId": "shift-agents",
+      "startFrame": 6660,
+      "frames": 1500,
+      "startSec": 266.4,
+      "durationSec": 60,
+      "title": "Where this helps in a business",
+      "productionNote": "Reconnect to the broader business talk: repeatable drafting and organising work. Use café, salon, accountant, clinic and retail examples. Avoid unsupported savings statistics or owner-business material.",
+      "delivery": "new complete-sentence Margot narration and visuals pending; human presenter notes available"
+    },
+    {
+      "sceneId": "shift-schedule",
+      "startFrame": 8160,
+      "frames": 1125,
+      "startSec": 326.4,
+      "durationSec": 45,
+      "title": "Build a useful Monday briefing",
+      "productionNote": "Fictional opening notes: delivery expected, one staff absence and two customer callbacks. Ask for priorities, owner and missing information. Prepared example only; no automatic access to diary or inbox.",
+      "delivery": "new complete-sentence Margot narration and visuals pending; human presenter notes available"
+    },
+    {
+      "sceneId": "shift-connect",
+      "startFrame": 9285,
+      "frames": 1125,
+      "startSec": 371.4,
+      "durationSec": 45,
+      "title": "Task, source, format and limits",
+      "productionNote": "Show the four parts of a brief. Keep source facts above the request and limits explicit. Reinforce the approved prompt rather than replaying its typing.",
+      "delivery": "new complete-sentence Margot narration and visuals pending; human presenter notes available"
+    },
+    {
+      "sceneId": "ladder",
+      "startFrame": 10410,
+      "frames": 1125,
+      "startSec": 416.4,
+      "durationSec": 45,
+      "title": "Start small and increase responsibility gradually",
+      "productionNote": "Move from a checked draft to repeatable templates, then controlled workflows. A person checks each result. No implication that connected automation has been configured.",
+      "delivery": "new complete-sentence Margot narration and visuals pending; human presenter notes available"
+    },
+    {
+      "sceneId": "rungs-0-2",
+      "startFrame": 11535,
+      "frames": 1500,
+      "startSec": 461.4,
+      "durationSec": 60,
+      "title": "Replies, estimates and business rules",
+      "productionNote": "Compare a short enquiry reply with a prepared estimate. Supplied prices only. Missing prices remain questions. Keep the older A$220 job separate from the approved café A$385 example.",
+      "delivery": "new complete-sentence Margot narration and visuals pending; human presenter notes available"
+    },
+    {
+      "sceneId": "rungs-3-5",
+      "startFrame": 13035,
+      "frames": 1500,
+      "startSec": 521.4,
+      "durationSec": 60,
+      "title": "Meeting follow-ups and staff handovers",
+      "productionNote": "Use the companion guide: factual meeting follow-up and staff handover. Separate decisions from suggestions. Missing owner or due date stays unresolved. Label all authored outputs as examples.",
+      "delivery": "new complete-sentence Margot narration and visuals pending; human presenter notes available"
+    },
+    {
+      "sceneId": "demo",
+      "startFrame": 14535,
+      "frames": 1500,
+      "startSec": 581.4,
+      "durationSec": 60,
+      "title": "Check facts, calculations and promises",
+      "productionNote": "Debrief the observed inferred-date error without replaying the introduction. Explain the human check: independent arithmetic, exact date, availability, tax treatment and allergy promises. Do not present generated output as verified evidence.",
+      "delivery": "new complete-sentence Margot narration and visuals pending; human presenter notes available"
+    },
+    {
+      "sceneId": "privacy-oaic",
+      "startFrame": 16035,
+      "frames": 1125,
+      "startSec": 641.4,
+      "durationSec": 45,
+      "title": "Use fictional information while practising",
+      "productionNote": "Show fictional records. Removing a name may leave identifying detail. Real records need the business’s approved information-handling process. No legal assurance is implied.",
+      "delivery": "new complete-sentence Margot narration and visuals pending; human presenter notes available"
+    },
+    {
+      "sceneId": "training-switch",
+      "startFrame": 17160,
+      "frames": 1000,
+      "startSec": 686.4,
+      "durationSec": 40,
+      "title": "Use the approved account and check settings",
+      "productionNote": "Use the business-approved account. Inspect current settings and connections. Do not make fresh retention/training promises from dated notes. This exercise needs no inbox connection.",
+      "delivery": "new complete-sentence Margot narration and visuals pending; human presenter notes available"
+    },
+    {
+      "sceneId": "policy",
+      "startFrame": 18160,
+      "frames": 1125,
+      "startSec": 726.4,
+      "durationSec": 45,
+      "title": "Write simple rules for your team",
+      "productionNote": "Four rules: use approved tools; supply only authorised information; check facts and promises; have a person approve external action. Keep them visible and practical.",
+      "delivery": "new complete-sentence Margot narration and visuals pending; human presenter notes available"
+    },
+    {
+      "sceneId": "quiz",
+      "startFrame": 19285,
+      "frames": 1500,
+      "startSec": 771.4,
+      "durationSec": 60,
+      "title": "Choose one useful task",
+      "productionNote": "Choose one repeated task, its source inputs and a way to check the result. No score, worksheet instruction, forced quiz pause or compulsory audience response.",
+      "delivery": "new complete-sentence Margot narration and visuals pending; human presenter notes available"
+    },
+    {
+      "sceneId": "actions",
+      "startFrame": 20785,
+      "frames": 1125,
+      "startSec": 831.4,
+      "durationSec": 45,
+      "title": "Run a one-week trial",
+      "productionNote": "Record checking time and corrections across the five fictional cases in the guide before using real information. Continue only when the checked result helps. Cases are authored, not already executed model runs.",
+      "delivery": "new complete-sentence Margot narration and visuals pending; human presenter notes available"
+    },
+    {
+      "sceneId": "prices",
+      "startFrame": 21910,
+      "frames": 590,
+      "startSec": 876.4,
+      "durationSec": 23.6,
+      "title": "Choose tools after proving the task",
+      "productionNote": "Use the existing approved tool and prove the workflow before comparing paid plans. Avoid dated prices. One short closing statement; do not repeat the full tutorial summary.",
+      "delivery": "new complete-sentence Margot narration and visuals pending; human presenter notes available"
+    }
+  ]
+}

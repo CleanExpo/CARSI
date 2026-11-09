@@ -1,0 +1,14 @@
+{
+  "reviewer": "MacBook/codex",
+  "artifactSHA256": "446042327ce9bb0c8a0f163f4658df8fbc4dc60637a6fdbfba14085599a2d88f",
+  "method": "Reviewed nine contact sheets covering every one-second frame, plus exact final Shift+Enter and action checkpoints. OCR supplementary; not owner acceptance.",
+  "framesReviewed": 266,
+  "ownerAcceptance": false,
+  "transcriptFindings": [],
+  "supplementaryOCR": {
+    "engine": "Apple Vision VNRecognizeTextRequest accurate",
+    "framesScanned": 266,
+    "findings": [],
+    "status": "PASS"
+  }
+}

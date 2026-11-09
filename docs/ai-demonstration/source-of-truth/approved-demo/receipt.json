@@ -1,0 +1,252 @@
+{
+  "edition": "Whole-sentence rebuild with demonstrated keyboard tip",
+  "sha256": "446042327ce9bb0c8a0f163f4658df8fbc4dc60637a6fdbfba14085599a2d88f",
+  "durationSec": 266.4,
+  "frames": 6660,
+  "fps": 25,
+  "ownerAcceptance": "APPROVED_BASELINE_2026-11-09",
+  "productionStatus": "HOLD \u2014 independent review and production gates remain",
+  "sourceOriginalSHA256": "61781da8b9cb26089ca47ed0230985043696c45f9885e3bb33fc41b8e451cc26",
+  "method": "Direct smooth original; complete sentences only; native 25fps, limited-range yuv420p, no B frames; each source composited once, final video stream copied. Actual OpenAI session plus fresh Shift+Enter capture; whole sentences, no borrowed-word splice. Reading intervals are explicit with continuous progress; calculator instruction precedes first answer reading.",
+  "wholeDecode": "PASS",
+  "packetCadence": "Every video PTS interval exactly 40ms; no B frames; original cadence retained",
+  "audioVideoDriftSec": 0.0,
+  "speechPlacement": [
+    {
+      "sourceRange": [
+        0,
+        35.12
+      ],
+      "outputStartSec": 0.0,
+      "windows": 66,
+      "minimumCorrelation": 0.9988712225294261
+    },
+    {
+      "sourceRange": [
+        35.12,
+        38.24
+      ],
+      "outputStartSec": 35.12,
+      "windows": 6,
+      "minimumCorrelation": 0.9997767895209215
+    },
+    {
+      "sourceRange": [
+        42.88,
+        44.56
+      ],
+      "outputStartSec": 38.28,
+      "windows": 3,
+      "minimumCorrelation": 0.999590390828377
+    },
+    {
+      "sourceRange": [
+        47.16,
+        49.96
+      ],
+      "outputStartSec": 42.68,
+      "windows": 5,
+      "minimumCorrelation": 0.9997619537121569
+    },
+    {
+      "sourceRange": [
+        52.96,
+        54.56
+      ],
+      "outputStartSec": 54.04,
+      "windows": 3,
+      "minimumCorrelation": 0.9995045617435658
+    },
+    {
+      "sourceRange": [
+        54.56,
+        67.2
+      ],
+      "outputStartSec": 58.12,
+      "windows": 24,
+      "minimumCorrelation": 0.9995255092045527
+    },
+    {
+      "sourceRange": [
+        67.2,
+        69.88
+      ],
+      "outputStartSec": 99.4,
+      "windows": 5,
+      "minimumCorrelation": 0.9995855564036134
+    },
+    {
+      "sourceRange": [
+        75.32,
+        82.08
+      ],
+      "outputStartSec": 107.44,
+      "windows": 13,
+      "minimumCorrelation": 0.9997051902980614
+    },
+    {
+      "sourceRange": [
+        82.08,
+        86.56
+      ],
+      "outputStartSec": 142.2,
+      "windows": 8,
+      "minimumCorrelation": 0.9999141911119737
+    },
+    {
+      "sourceRange": [
+        86.56,
+        88.48
+      ],
+      "outputStartSec": 180.28,
+      "windows": 3,
+      "minimumCorrelation": 0.9999694169998762
+    },
+    {
+      "sourceRange": [
+        88.48,
+        151.8
+      ],
+      "outputStartSec": 203.08,
+      "windows": 117,
+      "minimumCorrelation": 0.997914724131087
+    }
+  ],
+  "typingMotion": [
+    {
+      "piece": "02  Enter the facts",
+      "maxUnchangedSec": 0.16,
+      "over750ms": []
+    },
+    {
+      "piece": "03  Add the request",
+      "maxUnchangedSec": 0.2,
+      "over750ms": []
+    },
+    {
+      "piece": "06  Correct the draft",
+      "maxUnchangedSec": 0.16,
+      "over750ms": []
+    }
+  ],
+  "oneSecondFrames": 266,
+  "anchors": [
+    {
+      "id": "Do not send yet cue",
+      "visibleActionFrame": 1351,
+      "spokenWordFrame": 1353,
+      "mismatchSec": 0.08,
+      "reviewedInFinal": true,
+      "evidence": {
+        "path": "/Users/phillmcgurk/Documents/Codex/2026-11-07/files-pasted-by-the-user-session/outputs/AI-in-Business-Keyboard-Tips/review/keyboard-tip.png",
+        "sha256": "3e944a360f03d7dc8bdfcb2fedbee93dd5308fbd37ec5c8d03f0170e9cfff5aa"
+      },
+      "note": "Headline accompanies actual spoken Do not send yet. Shift+Enter is an additional visual tutorial, not newly generated narration. Key press at source 0.802s; new paragraph visible at 0.862s.",
+      "reviewer": "MacBook/codex \u2014 own final-artifact visual checkpoint review; independent watch/listen pending"
+    },
+    {
+      "id": "Click message box",
+      "visibleActionFrame": 958,
+      "spokenWordFrame": 959,
+      "mismatchSec": 0.009999999999999995,
+      "reviewedInFinal": true,
+      "evidence": {
+        "path": "/Users/phillmcgurk/Documents/Codex/2026-11-07/files-pasted-by-the-user-session/outputs/AI-in-Business-Keyboard-Tips/review/action-01.png",
+        "sha256": "7000b849979398c4a4244c0ba0729b1a055c95fd7b61ca379f66f483905aba1b"
+      },
+      "reviewer": "MacBook/codex \u2014 own final-artifact visual checkpoint review; independent watch/listen pending"
+    },
+    {
+      "id": "Prices in facts",
+      "visibleActionFrame": 1084,
+      "spokenWordFrame": 1081,
+      "mismatchSec": 0.11699999999999999,
+      "reviewedInFinal": true,
+      "evidence": {
+        "path": "/Users/phillmcgurk/Documents/Codex/2026-11-07/files-pasted-by-the-user-session/outputs/AI-in-Business-Keyboard-Tips/review/action-02.png",
+        "sha256": "bf0dee61e037aa92375dcdba43a30f7c10abe58b19517b78cfeafd75ad61cc2a"
+      },
+      "reviewer": "MacBook/codex \u2014 own final-artifact visual checkpoint review; independent watch/listen pending"
+    },
+    {
+      "id": "First Send",
+      "visibleActionFrame": 2492,
+      "spokenWordFrame": 2495,
+      "mismatchSec": 0.11329999999999996,
+      "reviewedInFinal": true,
+      "evidence": {
+        "path": "/Users/phillmcgurk/Documents/Codex/2026-11-07/files-pasted-by-the-user-session/outputs/AI-in-Business-Keyboard-Tips/review/action-03.png",
+        "sha256": "71ac33ffb6a23839ae7f3893cc0d63881ff66b91fd10d7f44635c7895c80a85e"
+      },
+      "reviewer": "MacBook/codex \u2014 own final-artifact visual checkpoint review; independent watch/listen pending"
+    },
+    {
+      "id": "Type correction",
+      "visibleActionFrame": 3595,
+      "spokenWordFrame": 3594,
+      "mismatchSec": 0.0532999999999999,
+      "reviewedInFinal": true,
+      "evidence": {
+        "path": "/Users/phillmcgurk/Documents/Codex/2026-11-07/files-pasted-by-the-user-session/outputs/AI-in-Business-Keyboard-Tips/review/action-04.png",
+        "sha256": "3a6dd570607f343d410cd6b50b7288b43faf7047ef890cf6fd67212390c37ab6"
+      },
+      "reviewer": "MacBook/codex \u2014 own final-artifact visual checkpoint review; independent watch/listen pending"
+    },
+    {
+      "id": "Second Send",
+      "visibleActionFrame": 4508,
+      "spokenWordFrame": 4508,
+      "mismatchSec": 0.013299999999999979,
+      "reviewedInFinal": true,
+      "evidence": {
+        "path": "/Users/phillmcgurk/Documents/Codex/2026-11-07/files-pasted-by-the-user-session/outputs/AI-in-Business-Keyboard-Tips/review/action-05.png",
+        "sha256": "c5d4f2190c937f087ce6f0ff7f193f6e342dec855b7529711252e81afd4838d6"
+      },
+      "reviewer": "MacBook/codex \u2014 own final-artifact visual checkpoint review; independent watch/listen pending"
+    }
+  ],
+  "limitation": "Correlation proves unchanged audio placement, not semantic action matching or speaker output. Owner review and independent watch/listen pending.",
+  "playbackSummary": {
+    "durationSec": 266.4,
+    "normalSpeed": true,
+    "soundEnabled": true,
+    "droppedFrames": 0,
+    "midPlaybackStalls": 0,
+    "startupQualification": "At time zero seeking/waiting events precede first playing at the same recorded millisecond; raw events retained. Fullscreen false. Hardware speaker output not independently verified."
+  },
+  "ownerApproval": {
+    "id": "narrated-software-demo-20261109",
+    "taskId": "MAC-MELBOURNE-AI-BUSINESS",
+    "relatedLinear": "UNI-2934",
+    "approvedBy": "Phill McGurk",
+    "approvalDate": "2026-11-09",
+    "approvalSource": "Explicit owner message in this Codex chat after requested full-screen playback",
+    "approvalQuote": "This actually makes sense now.. Well done..Lets now lock this in as the new starting standards and we can then improve, enhance, and make client changes from this moment on..",
+    "sha256": "446042327ce9bb0c8a0f163f4658df8fbc4dc60637a6fdbfba14085599a2d88f",
+    "durationSec": 266.4,
+    "frames": 6660,
+    "fps": 25,
+    "artifactPath": "/Users/phillmcgurk/Documents/Codex/2026-11-07/files-pasted-by-the-user-session/outputs/AI-in-Business-Keyboard-Tips/AI-in-Business-Keyboard-Tips.mp4",
+    "sharedArtifactPath": "/Volumes/Mini Mini 2T Storage/tmp/uni-2934-cinematic/keyboard-tips-review/AI-in-Business-Keyboard-Tips.mp4",
+    "status": "OWNER_APPROVED_BASELINE",
+    "publicationStatus": "HOLD",
+    "scope": "Starting quality standard for narrated software demonstrations and future client variants; this presentation section accepted. No publication or universal pipeline deployment approval.",
+    "requirements": [
+      "One frame timeline for original whole-sentence narration, actual clean screen actions, captions and reading windows",
+      "Large readable prompt and response; complete workflow: Open, Brief, Send, Check, Correct, Approve",
+      "No premature send: spoken Do not send yet plus actual Shift+Enter new-line action and visible tip; describe visual-only tips honestly",
+      "Preserve native source cadence; no borrowed-word edits; no time-stretched speech; qualified continuous typing capture",
+      "Anchor instructions to corresponding clicks within250ms; active typing unexplained unchanged text <=750ms",
+      "Explicit reading intervals >=3s and >=words/3 seconds, with gentle motion/progress rather than apparent stalls",
+      "Final exact-SHA playback at1x unmuted; separate fullscreen from replay; no restart when entering fullscreen",
+      "Fictional generic business content only; every-second privacy frame review plus transcript/OCR checks",
+      "Preserve approved master; client changes produce new artifacts with parent SHA and fresh affected-action and full-playback checks",
+      "Retain independent watch/listen, six-board, rights, spending and release gates; owner baseline approval does not imply they ran"
+    ],
+    "unresolvedProductionEvidence": [
+      "Independent watch/listen receipt absent",
+      "Strict playback gate retains startup seek/wait at time zero; no midplayback stalls observed",
+      "Six production boards and licence/release requirements remain separate"
+    ]
+  }
+}

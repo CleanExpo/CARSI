@@ -1,0 +1,136 @@
+{
+  "scope": "Read-only conversation recovery for MAC-MELBOURNE-AI-BUSINESS / UNI-2934",
+  "searchedAt": "2026-11-09",
+  "sources": [
+    {
+      "machine": "MacBook",
+      "llm": "Codex",
+      "root": "/Users/phillmcgurk/.codex/sessions",
+      "searchTerms": [
+        "UNI-2934",
+        "MAC-MELBOURNE-AI-BUSINESS",
+        "AI.in.Business"
+      ],
+      "keywordMatchingFiles": 16,
+      "primaryConversations": [
+        "01a1b39b-3950-7b23-8447-e2d331a8bd38",
+        "01a1b59f-c3d3-77a2-ac21-ca77c265c439"
+      ],
+      "relevantInheritedChildren": [
+        "01a1b3c7-663d-7832-8277-76165623e9c1",
+        "01a1b400-b3e8-7c43-84be-72353435a226",
+        "01a1b400-dacc-7701-91b6-70be2521b87c"
+      ],
+      "curatedExtract": "curated-user-decisions.json",
+      "notes": "Other exact-keyword matches were estate context, automation or unrelated conversations. Current growing main log hash is a point-in-time snapshot, not immutable source identity."
+    },
+    {
+      "machine": "MacBook",
+      "llm": "Claude",
+      "root": "/Users/phillmcgurk/.claude/projects",
+      "searchTerms": [
+        "UNI-2934",
+        "MAC-MELBOURNE-AI-BUSINESS",
+        "AI.in.Business",
+        "Margot",
+        "ai.demonstration",
+        "ivi.sims",
+        "cinematic.presenter"
+      ],
+      "keywordMatchingFiles": 0,
+      "status": "No matching local native logs found; absence does not establish that no Claude web conversation exists."
+    },
+    {
+      "machine": "Mini",
+      "llm": "Codex",
+      "root": "/Users/phill-mac/.codex/sessions",
+      "searchTerms": [
+        "UNI-2934",
+        "MAC-MELBOURNE-AI-BUSINESS",
+        "AI.in.Business"
+      ],
+      "keywordMatchingFiles": 5,
+      "status": "Five candidate logs inspected; no short direct task conversation recovered. Matches were inherited estate/board context."
+    },
+    {
+      "machine": "Mini",
+      "llm": "Claude",
+      "root": "/Users/phill-mac/.claude/projects",
+      "searchTerms": [
+        "UNI-2934",
+        "MAC-MELBOURNE-AI-BUSINESS",
+        "AI.in.Business"
+      ],
+      "keywordMatchingFiles": 5,
+      "status": "Five candidates inspected. One older unrelated marketing strategy discussion; another CCW video teammate message merely references this task's ASR model path. No primary AI in Business presentation conversation recovered from these matches."
+    }
+  ],
+  "limitations": [
+    "This recovery covers native local log roots on MacBook and Mini only; parent task handles PC and connected ChatGPT histories.",
+    "Broad generic Margot matches on Mini are not treated as relevant evidence without topic confirmation.",
+    "Claude web, other browser profiles, other LLM accounts and deleted conversations are not proven covered.",
+    "Do not commit raw conversation archives or scratch local-targeted-inventory.json: they include unrelated estate material."
+  ],
+  "miniExcludedCandidateReceipts": [
+    {
+      "id": "c6bef293-6089-4fa1-8d90-d7e783adb006",
+      "llm": "Claude",
+      "sha256": "6796ccb622391a51212afe7b6372e6562c8eb15dbee33b30fe9168e1060f413a",
+      "reason": "Older unrelated marketing discussion"
+    },
+    {
+      "id": "fca2924c-1382-41ed-83f6-486db999d1cd",
+      "llm": "Claude",
+      "sha256": "fafbcd9cfa427d8587bf5b3071d7a6a01042e892b5a1a1517f3506858b27851d",
+      "reason": "CCW video ASR model path reference, different subject"
+    },
+    {
+      "id": "129830cc-d7e7-4773-8d1d-35722db22e35",
+      "llm": "Claude",
+      "sha256": "febcddcefc849660addb968fa3bcfba4d6d8ba3e247587bf2d0a2bda1dcc26f8",
+      "reason": "CCW video teammate message, different subject"
+    },
+    {
+      "id": "agent-a6178503c4fb5c2f0",
+      "llm": "Claude",
+      "sha256": "aa972cbcd6adf3299305d369d1f85ca98c592e55c4cd07a6f02ec1e3f5265a2d",
+      "reason": "ASR model path reference, different subject"
+    },
+    {
+      "id": "171371b8-a95b-4b1b-bddc-e7fa38a0fda4",
+      "llm": "Claude",
+      "sha256": "e7c00ffc32a392aeb7bef3e294b0677fa23e54a2d723611d72792bfe1c45ff2d",
+      "reason": "Board inventory mention only"
+    },
+    {
+      "id": "01a1bb4c-e43b-7521-a6fd-faaad737f91f",
+      "llm": "Codex",
+      "sha256": "44fd47ba12c5a7150fc3ebc913308b57dbe60565c1337fb1ff76742fa98d8717",
+      "reason": "Inherited estate context"
+    },
+    {
+      "id": "01a1b8cd-b2ae-7642-b68d-688b106d8fe1",
+      "llm": "Codex",
+      "sha256": "f9557c37452641d5ed84746cb4a3fb2a3f5d90d4e60ae94e936bf0ccd17ef520",
+      "reason": "Inherited estate context"
+    },
+    {
+      "id": "01a1bb96-2e56-75e3-87c8-39f89b9ea21c",
+      "llm": "Codex",
+      "sha256": "af4f849e8627bb74a9fbeaccf3ce4367741b17471023267b2ac0eaf3c68fd2da",
+      "reason": "Inherited estate context"
+    },
+    {
+      "id": "01a1bbe0-2006-7b52-a89e-3a6f70508df3",
+      "llm": "Codex",
+      "sha256": "2a2c9986a3f879cfcde0409cf860a8ad2e2650d871e32999d19e19721e5fb902",
+      "reason": "Inherited estate context"
+    },
+    {
+      "id": "01a1bcf6-ce3d-76e3-833e-8ccba26192aa",
+      "llm": "Codex",
+      "sha256": "b098ef2e83ed927140403c94517121a6be33e0b49e90084457b56a1b63b4e6c1",
+      "reason": "Inherited estate context"
+    }
+  ]
+}

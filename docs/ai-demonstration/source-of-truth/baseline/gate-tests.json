@@ -1,0 +1,15 @@
+{
+  "fixtureTestsOnly": true,
+  "checks": [
+    "valid fixture accepted",
+    "ownerRejected defect rejected",
+    "singleTimeline defect rejected",
+    "captureMotionQualified defect rejected",
+    "anchors defect rejected",
+    "typingStalls defect rejected",
+    "reading defect rejected",
+    "artifact defect rejected",
+    "1 second action drift rejected"
+  ],
+  "result": "PASS"
+}

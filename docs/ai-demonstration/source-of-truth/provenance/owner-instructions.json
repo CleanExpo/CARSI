@@ -1,0 +1,339 @@
+{
+  "classification": "DOCUMENTED: direct owner messages, curated task-only extracts",
+  "snapshotDate": "2026-11-09",
+  "note": "Growing conversation hashes identify a point-in-time snapshot. Child histories are duplicates, not independent corroboration. No raw tool traces or unrelated chats included.",
+  "sources": [
+    {
+      "machine": "MacBook",
+      "llm": "Codex",
+      "path": "/Users/phillmcgurk/.codex/sessions/2026/11/07/rollout-2026-11-07T11-24-16-01a1b39b-3950-7b23-8447-e2d331a8bd38.jsonl",
+      "sha256": "8f6fa08293999d20baf37cbc63f0c8a3e9fa00d86b6bea3eef24deab59f6eef3",
+      "metadata": {
+        "id": "01a1b39b-3950-7b23-8447-e2d331a8bd38",
+        "cwd": "/Users/phillmcgurk/Documents/Codex/2026-11-07/re",
+        "timestamp": "2026-11-07T01:24:16.858Z"
+      },
+      "status": "relevant primary conversation"
+    },
+    {
+      "machine": "MacBook",
+      "llm": "Codex",
+      "path": "/Users/phillmcgurk/.codex/sessions/2026/11/07/rollout-2026-11-07T20-48-28-01a1b59f-c3d3-77a2-ac21-ca77c265c439.jsonl",
+      "sha256": "02e8f025290e0a755d64cbe17c20104992d45c3d10bae3c23b783942c6d7b0f9",
+      "metadata": {
+        "id": "01a1b59f-c3d3-77a2-ac21-ca77c265c439",
+        "cwd": "/Users/phillmcgurk/Documents/Codex/2026-11-07/files-pasted-by-the-user-session",
+        "timestamp": "2026-11-07T10:48:28.887Z"
+      },
+      "status": "relevant primary conversation"
+    },
+    {
+      "machine": "MacBook",
+      "llm": "Codex",
+      "path": "/Users/phillmcgurk/.codex/sessions/2026/11/07/rollout-2026-11-07T13-15-07-01a1b400-b3e8-7c43-84be-72353435a226.jsonl",
+      "sha256": "7dcfa38528fe953eadbb4415ad68b3718a4723bec3cf009ed552afe2cfd007a4",
+      "metadata": {
+        "id": "01a1b39b-3950-7b23-8447-e2d331a8bd38",
+        "cwd": "/Users/phillmcgurk/Documents/Codex/2026-11-07/re",
+        "timestamp": "2026-11-07T01:24:16.858Z"
+      },
+      "status": "inherited child conversation, deduplicate"
+    },
+    {
+      "machine": "MacBook",
+      "llm": "Codex",
+      "path": "/Users/phillmcgurk/.codex/sessions/2026/11/07/rollout-2026-11-07T12-12-31-01a1b3c7-663d-7832-8277-76165623e9c1.jsonl",
+      "sha256": "f821bf5d8b1687c66ad46e6e9d7ab22afba8f635a4ae8c50a78a9b2b132345c7",
+      "metadata": {
+        "id": "01a1b39b-3950-7b23-8447-e2d331a8bd38",
+        "cwd": "/Users/phillmcgurk/Documents/Codex/2026-11-07/re",
+        "timestamp": "2026-11-07T01:24:16.858Z"
+      },
+      "status": "inherited child conversation, deduplicate"
+    },
+    {
+      "machine": "MacBook",
+      "llm": "Codex",
+      "path": "/Users/phillmcgurk/.codex/sessions/2026/11/07/rollout-2026-11-07T13-15-17-01a1b400-dacc-7701-91b6-70be2521b87c.jsonl",
+      "sha256": "762965a171238e51919266e5432e47c7a903eec9b6e1ec3e9d69f403d3d822ec",
+      "metadata": {
+        "id": "01a1b39b-3950-7b23-8447-e2d331a8bd38",
+        "cwd": "/Users/phillmcgurk/Documents/Codex/2026-11-07/re",
+        "timestamp": "2026-11-07T01:24:16.858Z"
+      },
+      "status": "inherited child conversation, deduplicate"
+    }
+  ],
+  "messages": [
+    {
+      "source": "01a1b39b-3950-7b23-8447-e2d331a8bd38",
+      "line": 232,
+      "timestamp": "2026-11-07T02:04:05.737Z",
+      "text": "Keep going and build the AI in Business presentation with slides and speaker notes. Make it practical for business owners, with real examples of how they can use AI in their day-to-day work."
+    },
+    {
+      "source": "01a1b39b-3950-7b23-8447-e2d331a8bd38",
+      "line": 345,
+      "timestamp": "2026-11-07T02:07:56.395Z",
+      "text": "We already have a Slideshow presentation, we should be just adjusting and strengthening it"
+    },
+    {
+      "source": "01a1b39b-3950-7b23-8447-e2d331a8bd38",
+      "line": 476,
+      "timestamp": "2026-11-07T02:11:02.465Z",
+      "text": "Check the PC and SSD for the existing AI in Business slideshow, then strengthen that presentation with practical day-to-day examples and speaker notes."
+    },
+    {
+      "source": "01a1b39b-3950-7b23-8447-e2d331a8bd38",
+      "line": 660,
+      "timestamp": "2026-11-07T02:16:22.927Z",
+      "text": "You have it, you just need to find it and and pull it"
+    },
+    {
+      "source": "01a1b39b-3950-7b23-8447-e2d331a8bd38",
+      "line": 1306,
+      "timestamp": "2026-11-07T02:42:26.972Z",
+      "text": "Open the presentation so I can review the slides and speaker notes. I am also bringing in some noew stying elements that wil need to be incorpoartted and input into the presentation"
+    },
+    {
+      "source": "01a1b39b-3950-7b23-8447-e2d331a8bd38",
+      "line": 1338,
+      "timestamp": "2026-11-07T02:43:49.742Z",
+      "text": "Open the presentation and speaker notes in Chrome for me so I can review them while I get the new styling elements ready."
+    },
+    {
+      "source": "01a1b39b-3950-7b23-8447-e2d331a8bd38",
+      "line": 1353,
+      "timestamp": "2026-11-07T03:05:30.961Z",
+      "text": "can you grab the details from [[http://100.107.147.59:8765/?v=cinematic-client-v2](http://100.107.147.59:8765/?v=cinematic-client-v2)] located on the mac mini?"
+    },
+    {
+      "source": "01a1b39b-3950-7b23-8447-e2d331a8bd38",
+      "line": 1374,
+      "timestamp": "2026-11-07T03:05:48.866Z",
+      "text": "I've also saved a detailed handoff for the other builder at:\n\n`Brand-Video-Studio/presentations/restoreassist-trade-night/CLIENT_RENDERING_PRODUCTION_HANDOFF.md`"
+    },
+    {
+      "source": "01a1b39b-3950-7b23-8447-e2d331a8bd38",
+      "line": 1496,
+      "timestamp": "2026-11-07T03:14:23.365Z",
+      "text": "Go ahead and apply that cinematic styling to the existing AI in Business presentation. I would like full Higgsfield, Artlist, Claude Motion, 3d Rendering, and ll the trimmings to showcase waht is possible, what we can do, and how far AI has come, then open the updated version for me to review.\nBrand-Video-Studio/presentations/restoreassist-trade-night/CINEMATIC_PRESENTER_MODE_BUILDER_PROMPT.md"
+    },
+    {
+      "source": "01a1b39b-3950-7b23-8447-e2d331a8bd38",
+      "line": 1681,
+      "timestamp": "2026-11-07T03:18:04.869Z",
+      "text": "Use Margot and her voice from elevenlabs (emily) you have all the details"
+    },
+    {
+      "source": "01a1b39b-3950-7b23-8447-e2d331a8bd38",
+      "line": 2535,
+      "timestamp": "2026-11-07T03:33:29.320Z",
+      "text": "Approve the one-run preview recovery. Go ahead and open the updated AI in Business presentation, Margot introduction and speaker notes in Chrome for me to review."
+    },
+    {
+      "source": "01a1b39b-3950-7b23-8447-e2d331a8bd38",
+      "line": 2735,
+      "timestamp": "2026-11-07T04:45:51.873Z",
+      "text": "Have Margot present the full AI in Business presentation using Emily’s voice, with her narration synced to the slides and animations."
+    },
+    {
+      "source": "01a1b39b-3950-7b23-8447-e2d331a8bd38",
+      "line": 3996,
+      "timestamp": "2026-11-07T05:20:24.262Z",
+      "text": "I've updated the Chrome extension. Go ahead and verify the full Margot presentation, check the slide and animation sync, then open it with the speaker notes for me to review. (i just dont get the lack of thoughtful control you are providing me.. There is none.. How is this even a stop and ask? If it required, then do it..It doesnt cost me anything, and it doesnt break the code)"
+    },
+    {
+      "source": "01a1b39b-3950-7b23-8447-e2d331a8bd38",
+      "line": 4713,
+      "timestamp": "2026-11-07T08:46:06.603Z",
+      "text": "Play it from the beginning in fullscreen so I can review Margot, the slides, animations and narration together."
+    },
+    {
+      "source": "01a1b39b-3950-7b23-8447-e2d331a8bd38",
+      "line": 4755,
+      "timestamp": "2026-11-07T09:53:58.388Z",
+      "text": "Remove the G'day and all Ozzy Colloquialisms from your memory. HARD CODE THIS AGAIN."
+    },
+    {
+      "source": "01a1b39b-3950-7b23-8447-e2d331a8bd38",
+      "line": 4781,
+      "timestamp": "2026-11-07T09:59:12.529Z",
+      "text": "Remove G’day and any other Australian slang from Margot’s presentation too, including the narration and speaker notes, then open the corrected version for me to review."
+    },
+    {
+      "source": "01a1b39b-3950-7b23-8447-e2d331a8bd38",
+      "line": 5193,
+      "timestamp": "2026-11-07T10:08:44.962Z",
+      "text": "The self check doesnt make any sence in this presentation.."
+    },
+    {
+      "source": "01a1b39b-3950-7b23-8447-e2d331a8bd38",
+      "line": 5547,
+      "timestamp": "2026-11-07T10:34:53.140Z",
+      "text": "Play the corrected presentation from the beginning in fullscreen so I can review Margot, the slides, animations and narration together. - Have a full watcher, audio, video, transitions, and if the Message makes sence from start to finish"
+    },
+    {
+      "source": "01a1b59f-c3d3-77a2-ac21-ca77c265c439",
+      "line": 131,
+      "timestamp": "2026-11-07T10:49:51.368Z",
+      "text": "The Presentation doesnt make any sense.. Are we using Claude or OpenAi tools? Is that what Margot is explaining?  If we are, then there needs to show clear instructions on the secquence of events to perfrom these tasks"
+    },
+    {
+      "source": "01a1b59f-c3d3-77a2-ac21-ca77c265c439",
+      "line": 664,
+      "timestamp": "2026-11-07T11:05:11.085Z",
+      "text": "Now update Margot’s narration and video to match the revised slides, then play the full presentation so I can review the sequence.- Is this the latest as of Novemeber 07th 2026? Also, we are back to FLat Pack Ikea visuals"
+    },
+    {
+      "source": "01a1b59f-c3d3-77a2-ac21-ca77c265c439",
+      "line": 1725,
+      "timestamp": "2026-11-07T11:36:58.438Z",
+      "text": "It would be better with the actual visuals of the site loading and the key strokes and teh response in the video. Use claude video, add remotion, all tools you can use and splice into the end product"
+    },
+    {
+      "source": "01a1b59f-c3d3-77a2-ac21-ca77c265c439",
+      "line": 1805,
+      "timestamp": "2026-11-07T11:38:12.331Z",
+      "text": "Dont show any of my work. it needs to be a clean openai system view"
+    },
+    {
+      "source": "01a1b59f-c3d3-77a2-ac21-ca77c265c439",
+      "line": 3147,
+      "timestamp": "2026-11-07T18:03:07.615Z",
+      "text": "Play the full presentation from the beginning so I can review Margot’s narration alongside the actual OpenAI screen sequence."
+    },
+    {
+      "source": "01a1b59f-c3d3-77a2-ac21-ca77c265c439",
+      "line": 3181,
+      "timestamp": "2026-11-07T18:06:56.412Z",
+      "text": "Make sure Margot’s narration matches each click and keystroke as it happens on the OpenAI screen, and leave enough time to read the prompt and response."
+    },
+    {
+      "source": "01a1b59f-c3d3-77a2-ac21-ca77c265c439",
+      "line": 3771,
+      "timestamp": "2026-11-08T00:21:43.853Z",
+      "text": "Make the OpenAI screen larger so I can clearly read the prompt and response, and keep Margot’s narration in sync with the clicks and typing."
+    },
+    {
+      "source": "01a1b59f-c3d3-77a2-ac21-ca77c265c439",
+      "line": 4019,
+      "timestamp": "2026-11-08T05:27:50.344Z",
+      "text": "Play the full presentation from the beginning in full screen so I can check the larger OpenAI screen and Margot’s narration together."
+    },
+    {
+      "source": "01a1b59f-c3d3-77a2-ac21-ca77c265c439",
+      "line": 4086,
+      "timestamp": "2026-11-08T05:30:58.980Z",
+      "text": "Can you work on the timing now..It seems so get stuck in stages"
+    },
+    {
+      "source": "01a1b59f-c3d3-77a2-ac21-ca77c265c439",
+      "line": 4429,
+      "timestamp": "2026-11-08T09:46:43.811Z",
+      "text": "Play the revised presentation from the beginning in full screen so I can check the timing and Margot’s narration with the OpenAI screen."
+    },
+    {
+      "source": "01a1b59f-c3d3-77a2-ac21-ca77c265c439",
+      "line": 4470,
+      "timestamp": "2026-11-08T09:54:41.385Z",
+      "text": "Can you smooth out any remaining pauses so it flows naturally, while keeping Margot in sync with the clicks and typing and leaving enough time to read the prompt and response?"
+    },
+    {
+      "source": "01a1b59f-c3d3-77a2-ac21-ca77c265c439",
+      "line": 4692,
+      "timestamp": "2026-11-08T09:58:09.005Z",
+      "text": "Why does it always do a double take on the intro?"
+    },
+    {
+      "source": "01a1b59f-c3d3-77a2-ac21-ca77c265c439",
+      "line": 4777,
+      "timestamp": "2026-11-08T10:00:39.161Z",
+      "text": "Play the smoother version from the beginning in full screen with sound, without restarting the intro, so I can check the flow and Margot’s timing with the OpenAI screen."
+    },
+    {
+      "source": "01a1b59f-c3d3-77a2-ac21-ca77c265c439",
+      "line": 4837,
+      "timestamp": "2026-11-08T10:03:06.105Z",
+      "text": "It is still very glitchy"
+    },
+    {
+      "source": "01a1b59f-c3d3-77a2-ac21-ca77c265c439",
+      "line": 4960,
+      "timestamp": "2026-11-08T10:04:42.740Z",
+      "text": "The video stalls, and the conversation and the text pause and then they dont sink up for a while"
+    },
+    {
+      "source": "01a1b59f-c3d3-77a2-ac21-ca77c265c439",
+      "line": 5272,
+      "timestamp": "2026-11-08T10:14:31.866Z",
+      "text": "Its getting better but still not 100%.. WHats the reason and why is it si difficult? You need to find a solution as this is not good enough for us to use in any future projects and allow the HARD Code system change"
+    },
+    {
+      "source": "01a1b59f-c3d3-77a2-ac21-ca77c265c439",
+      "line": 5376,
+      "timestamp": "2026-11-08T10:19:17.385Z",
+      "text": "Go ahead and recapture the OpenAI screen and rebuild the presentation properly using the shared timeline, then play it in full screen with sound so I can check Margot is in sync."
+    },
+    {
+      "source": "01a1b59f-c3d3-77a2-ac21-ca77c265c439",
+      "line": 6055,
+      "timestamp": "2026-11-08T10:43:40.216Z",
+      "text": "Still not right. It starts off of, and then in the middle struggles, and then picks back up at the end"
+    },
+    {
+      "source": "01a1b59f-c3d3-77a2-ac21-ca77c265c439",
+      "line": 6244,
+      "timestamp": "2026-11-08T13:32:36.646Z",
+      "text": "The original is smooth. It’s the exported version that hesitates. Rebuild it with whole sentences and get Margot and the screen actions properly in sync before playing it again."
+    },
+    {
+      "source": "01a1b59f-c3d3-77a2-ac21-ca77c265c439",
+      "line": 6634,
+      "timestamp": "2026-11-08T21:35:15.884Z",
+      "text": "Play the rebuilt version from the beginning in full screen with sound so I can check the flow and Margot’s timing with the OpenAI screen."
+    },
+    {
+      "source": "01a1b59f-c3d3-77a2-ac21-ca77c265c439",
+      "line": 6710,
+      "timestamp": "2026-11-08T21:54:56.729Z",
+      "text": "Can you check the middle section again and smooth out any hesitation, keeping Margot’s narration in sync with the OpenAI clicks and typing? - Also, it would be helpful if within the demonstration it tells us to not hit enter yet - If you added a \"TIP\" shift + enter (displayed and shown) how to enter down the page without the \"Enter\" button sending the request, that would also be great. And if you come across any more of these tips, tricks and short cuts, add them also."
+    },
+    {
+      "source": "01a1b59f-c3d3-77a2-ac21-ca77c265c439",
+      "line": 7320,
+      "timestamp": "2026-11-09T00:40:58.774Z",
+      "text": "Play the revised presentation from the beginning in full screen with sound so I can check the smoother middle section, Margot’s timing and the Shift + Enter tip."
+    },
+    {
+      "source": "01a1b59f-c3d3-77a2-ac21-ca77c265c439",
+      "line": 7401,
+      "timestamp": "2026-11-09T00:47:06.986Z",
+      "text": "This actually makes sense now.. Well done..Lets now lock this in as the new starting standards and we can then improve, enhance, and make client changes from this moment on.. Make sure the SQL files are updated, the .md files, and the skills are all updated before closong this section of the task down and moving onto the next tasks within the Presentation."
+    },
+    {
+      "source": "01a1b59f-c3d3-77a2-ac21-ca77c265c439",
+      "line": 7524,
+      "timestamp": "2026-11-09T00:51:29.285Z",
+      "text": "Has everything now been updated and we can perform a session handoff?"
+    },
+    {
+      "source": "01a1b59f-c3d3-77a2-ac21-ca77c265c439",
+      "line": 7551,
+      "timestamp": "2026-11-09T01:11:06.836Z",
+      "text": "/clear"
+    },
+    {
+      "source": "01a1b59f-c3d3-77a2-ac21-ca77c265c439",
+      "line": 7561,
+      "timestamp": "2026-11-09T01:11:18.105Z",
+      "text": "### Session handoff\n\n**1. Completed**\n\nThe smoother middle section, whole-sentence narration and Shift + Enter demonstration are accepted. SQL records, Markdown policies, memory and the three relevant video skills are updated.\n\n**2. Starting problem**\n\nThe exported presentation hesitated and narration drifted from screen actions. Work belongs to `MAC-MELBOURNE-AI-BUSINESS`, related to `UNI-2934`.\n\n**3. Locked decisions**\n\nThe approved 4:26.40 video is the new minimum starting standard. Preserve it; future improvements and client changes become separate versions.\n\nNothing was pushed, deployed or publicly released. Local and shared installations are verified.\n\n**4. Key files**\n\n- [Approved presentation](/Users/phillmcgurk/Documents/Codex/2026-11-07/files-pasted-by-the-user-session/outputs/AI-in-Business-Keyboard-Tips/AI-in-Business-Keyboard-Tips.mp4)\n- [Baseline standard](/Users/phillmcgurk/Documents/Codex/2026-11-07/files-pasted-by-the-user-session/outputs/Video-Synchronisation-System/APPROVED-BASELINE.md)\n- [Update and verification receipt](/Users/phillmcgurk/Documents/Codex/2026-11-07/files-pasted-by-the-user-session/outputs/Video-Synchronisation-System/BASELINE-LOCK-RECEIPT.md)\n\n**5. Running state**\n\nPreview server returned HTTP 200. This workspace has no Git branch. The timing section is closed; the overall presentation remains open under MacBook/codex.\n\n**6. Verification**\n\nLocal and shared video hashes match. SQL integrity passed with ten requirements. Installed skills match the saved copies. All sixteen shared package file hashes passed.\n\n**7. Deferred**\n\nIndependent watch/listen and publication requirements remain separate. Other machines and remote rendering pipelines have not been verified.\n\n**8. Pick up here**\n\nRead the board card, then review remaining presentation content against the accepted baseline. Do not repeat the accepted timing repair.\n\nFirst command:\n```bash\nssh mini-lan python3 .local/bin/sot_hook.py show MAC-MELBOURNE-AI-BUSINESS\n```\n\n**9. Risks**\n\nThe strict production gate still flags recorded startup events and missing independent review. No production database was changed; the SQL register is local.\n\n**10. Handoff check**\n\nCompleted work, remaining work and release boundaries are recorded. Safe to stop.\n\nHandoff complete. Next safe action: review the remaining presentation content while preserving the approved master.\n\nLESSON: Carry the approved baseline and its evidence into every handoff."
+    },
+    {
+      "source": "01a1b59f-c3d3-77a2-ac21-ca77c265c439",
+      "line": 7660,
+      "timestamp": "2026-11-09T01:16:42.512Z",
+      "text": "The full 15min presentation needs to be continued. Track down all the data and information form all teh conversations from over all computers, and LLMs and compile them into the single Github repo so we have clean data to work from"
+    }
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "date": "2026-11-09",
+  "status": "PARTIAL RECOVERY; no assertion of every LLM conversation",
+  "native": [
+    {
+      "machine": "MacBook",
+      "llm": "Codex",
+      "root": "/Users/phillmcgurk/.codex/sessions",
+      "searchTerms": [
+        "UNI-2934",
+        "MAC-MELBOURNE-AI-BUSINESS",
+        "AI.in.Business"
+      ],
+      "keywordMatchingFiles": 16,
+      "primaryConversations": [
+        "01a1b39b-3950-7b23-8447-e2d331a8bd38",
+        "01a1b59f-c3d3-77a2-ac21-ca77c265c439"
+      ],
+      "relevantInheritedChildren": [
+        "01a1b3c7-663d-7832-8277-76165623e9c1",
+        "01a1b400-b3e8-7c43-84be-72353435a226",
+        "01a1b400-dacc-7701-91b6-70be2521b87c"
+      ],
+      "curatedExtract": "owner-instructions.json",
+      "notes": "Other exact-keyword matches were estate context, automation or unrelated conversations. Current growing main log hash is a point-in-time snapshot, not immutable source identity."
+    },
+    {
+      "machine": "MacBook",
+      "llm": "Claude",
+      "root": "/Users/phillmcgurk/.claude/projects",
+      "searchTerms": [
+        "UNI-2934",
+        "MAC-MELBOURNE-AI-BUSINESS",
+        "AI.in.Business",
+        "Margot",
+        "ai.demonstration",
+        "ivi.sims",
+        "cinematic.presenter"
+      ],
+      "keywordMatchingFiles": 0,
+      "status": "No matching local native logs found; absence does not establish that no Claude web conversation exists."
+    },
+    {
+      "machine": "Mini",
+      "llm": "Codex",
+      "root": "/Users/phill-mac/.codex/sessions",
+      "searchTerms": [
+        "UNI-2934",
+        "MAC-MELBOURNE-AI-BUSINESS",
+        "AI.in.Business"
+      ],
+      "keywordMatchingFiles": 5,
+      "status": "Five candidate logs inspected; no short direct task conversation recovered. Matches were inherited estate/board context."
+    },
+    {
+      "machine": "Mini",
+      "llm": "Claude",
+      "root": "/Users/phill-mac/.claude/projects",
+      "searchTerms": [
+        "UNI-2934",
+        "MAC-MELBOURNE-AI-BUSINESS",
+        "AI.in.Business"
+      ],
+      "keywordMatchingFiles": 5,
+      "status": "Five candidates inspected. One older unrelated marketing strategy discussion; another CCW video teammate message merely references this task's ASR model path. No primary AI in Business presentation conversation recovered from these matches."
+    }
+  ],
+  "chatgpt": {
+    "activeTitlesSearched": 1069,
+    "archivedTitlesSearched": 46,
+    "activeHistoryExhausted": true,
+    "archivedHistoryExhausted": true,
+    "method": "Title screening across complete returned active/archived lists; full returned turns reviewed for3selected candidate conversations. This is not a content search or review of every message in every conversation."
+  },
+  "PC": {
+    "status": "Completed native Windows complete-file keyword scan; all 20 candidates classified and excluded as unrelated. One additional child retrieved and excluded.",
+    "device": "Phill_Desktop",
+    "claudeFilesScanned": 1751,
+    "codexFilesScanned": 162,
+    "candidateFiles": 20,
+    "classifiedFilesIncludingExtraChild": 21,
+    "relevantPrimarySources": 0,
+    "receipt": "pc-native-log-coverage.json"
+  },
+  "gaps": [
+    "Claude web account-wide histories, Gemini/Grok/other provider accounts and deleted histories remain unverified; two bounded Claude desktop history searches are recorded separately",
+    "Relevant material hidden in unrelated ChatGPT titles may remain; only selected candidate turns were read",
+    "Raw screen captures and original avatar media remain in custody; historical build scripts require portability work"
+  ],
+  "owner": "MacBook/codex",
+  "nextAction": "Continue the 15-minute talk from the recovered source and proposed run sheet; preserve approved demonstration. Recover other provider web histories only if supported access becomes available.",
+  "planningStores": {
+    "MacBook": {
+      "vault": "Exact-topic local Markdown search recovered one October grill; MCP wiki keyword results were broad and did not establish exact source coverage.",
+      "localPlanningStore": "Exact-topic Markdown/JSON search recovered original six-file AI Pathways pack plus separate RestoreAssist briefs; original pack preserved and alternate briefs catalogued/excluded."
+    },
+    "Mini": {
+      "vault": "/Users/phill-mac/2nd-brain absent at probed path; not treated as an empty estate vault."
+    },
+    "limits": [
+      "October grill explicitly says Q1/Q2 are reconstructed and original session is behind secrets gate; no access attempted to that protected source."
+    ]
+  },
+  "claudeDesktop": {
+    "status": "Two bounded history searches and one unrelated visible candidate inspected; no current presentation source recovered",
+    "receipt": "claude-desktop-coverage.json",
+    "limitation": "Not complete account coverage; UI work stopped when user changed app"
+  },
+  "instagramTrainingRecovery": {
+    "primarySource": "Mini Claude fca2924c-1382-41ed-83f6-486db999d1cd",
+    "directOwnerMessageUTC": "2026-11-08T00:33:50.164Z",
+    "receipt": "instagram-training-recovery.json",
+    "scope": "Related six-reel video design/training brief found by broader Instagram keywords, missed by exact presentation-topic queries; relevant creative lessons adapted, restoration work excluded from talk."
+  }
+}
