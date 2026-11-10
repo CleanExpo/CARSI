@@ -460,8 +460,9 @@ export function AdminUserDetailClient({
     if (!user.isVerified) {
       items.push({
         id: 'verify',
-        title: 'Account is unverified',
-        detail: 'They may bounce on sign-in. Reset password if they are locked out.',
+        title: 'Email address not confirmed',
+        detail:
+          'Sign-in still works. The address has not been confirmed by a link, so it may be mistyped. A password reset email confirms it.',
       });
     }
     if (user.neverStartedCount > 0) {

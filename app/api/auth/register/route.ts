@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { signSessionToken } from '@/lib/auth/session-jwt';
+import { signEmailVerificationToken, signSessionToken } from '@/lib/auth/session-jwt';
 import { SESSION_SENTINEL_COOKIE } from '@/lib/auth/session-sentinel';
 import { sendRegistrationWelcomeEmail } from '@/lib/server/auth-email';
 import { getAppOrigin } from '@/lib/server/app-url';
@@ -68,11 +68,23 @@ export async function POST(request: NextRequest) {
     const accessToken = await signSessionToken(claims);
 
     const origin = getAppOrigin(request);
+    // GP-699: the welcome email carries a confirm link. It opens the
+    // /confirm-email page, which changes nothing until the person presses the
+    // button there. A signing failure must not block sign-up, so the email
+    // falls back to the plain dashboard button.
+    let confirmUrl: string | undefined;
+    try {
+      const verifyToken = await signEmailVerificationToken(claims.sub, claims.email);
+      confirmUrl = `${origin}/confirm-email?token=${encodeURIComponent(verifyToken)}`;
+    } catch (e) {
+      console.error('[register] confirm link', e instanceof Error ? e.message : String(e));
+    }
     void sendRegistrationWelcomeEmail({
       to: claims.email,
       fullName: claims.full_name,
       dashboardUrl: `${origin}/dashboard/student`,
       appOrigin: origin,
+      confirmUrl,
     }).catch((e) => console.error('[register] welcome email', e));
 
     const response = NextResponse.json({

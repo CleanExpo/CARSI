@@ -66,12 +66,14 @@ export async function sendRegistrationWelcomeEmail(params: {
   fullName: string;
   dashboardUrl: string;
   appOrigin: string;
+  confirmUrl?: string;
 }): Promise<SendEmailResult> {
   const name = params.fullName.trim() || params.to.split('@')[0];
   const { html, text } = renderRegistrationWelcomeEmail({
     appOrigin: params.appOrigin,
     name,
     dashboardUrl: params.dashboardUrl,
+    confirmUrl: params.confirmUrl,
   });
 
   return sendEmail({

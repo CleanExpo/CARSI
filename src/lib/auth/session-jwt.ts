@@ -25,6 +25,11 @@ export async function signSessionToken(claims: SessionClaims): Promise<string> {
 export async function verifySessionToken(token: string): Promise<SessionClaims | null> {
   try {
     const { payload } = await jwtVerify(token, getSessionSecretBytes());
+    // GP-699: a session token carries neither a purpose nor an audience. Every
+    // link token signed with this key (reset, share, unsubscribe, email
+    // confirmation, check-in) carries at least one, so none of them can ever be
+    // presented as a login session, whatever other claims it holds.
+    if (payload.purpose !== undefined || payload.aud !== undefined) return null;
     const sub = typeof payload.sub === 'string' ? payload.sub : '';
     const email = typeof payload.email === 'string' ? payload.email : '';
     const full_name = typeof payload.full_name === 'string' ? payload.full_name : 'User';
@@ -106,6 +111,44 @@ export async function verifyEmailUnsubscribeToken(token: string): Promise<string
     if (payload.purpose !== 'email_unsubscribe') return null;
     const sub = typeof payload.sub === 'string' ? payload.sub : '';
     return sub || null;
+  } catch {
+    return null;
+  }
+}
+
+const EMAIL_VERIFICATION_AUDIENCE = 'carsi-email-verification';
+
+/**
+ * GP-699 — link in the registration welcome email that proves the person can
+ * read mail at the address they signed up with. The token carries the address
+ * it was issued for, so it cannot confirm a different address later. Its own
+ * audience keeps it from being accepted as a reset, share or unsubscribe token.
+ * The address travels in `addr`, never `email`: a session token is the only
+ * token allowed to carry `email`, and `verifySessionToken` also refuses any
+ * token that has a purpose or an audience.
+ */
+export async function signEmailVerificationToken(userId: string, email: string): Promise<string> {
+  return new SignJWT({ purpose: 'email_verification', addr: email.trim().toLowerCase() })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setSubject(userId)
+    .setAudience(EMAIL_VERIFICATION_AUDIENCE)
+    .setIssuedAt()
+    .setExpirationTime('7d')
+    .sign(getSessionSecretBytes());
+}
+
+export async function verifyEmailVerificationToken(
+  token: string,
+): Promise<{ userId: string; email: string } | null> {
+  try {
+    const { payload } = await jwtVerify(token, getSessionSecretBytes(), {
+      audience: EMAIL_VERIFICATION_AUDIENCE,
+    });
+    if (payload.purpose !== 'email_verification') return null;
+    const userId = typeof payload.sub === 'string' ? payload.sub : '';
+    const email = typeof payload.addr === 'string' ? payload.addr : '';
+    if (!userId || !email) return null;
+    return { userId, email };
   } catch {
     return null;
   }

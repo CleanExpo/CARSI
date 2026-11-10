@@ -489,7 +489,10 @@ export function renderRegistrationWelcomeEmail(params: {
   appOrigin: string;
   name: string;
   dashboardUrl: string;
+  /** GP-699: when present, the main button confirms the address and the dashboard link moves to the note. */
+  confirmUrl?: string;
 }): RenderedEmail {
+  const confirm = params.confirmUrl;
   return render(
     {
       appOrigin: params.appOrigin,
@@ -500,15 +503,24 @@ export function renderRegistrationWelcomeEmail(params: {
       paragraphs: [
         'Thank you for joining CARSI Learning — professional IICRC CEC Accredited restoration courses for Australian technicians and teams.',
         'Your account is active. Sign in to browse courses, track CEC progress, and continue your learning path.',
+        ...(confirm
+          ? ['Please confirm your email address so we know certificates and reminders reach you.']
+          : []),
       ],
       details: [
         { label: 'Account', value: params.name },
         { label: 'Status', value: 'Active' },
       ],
-      cta: { label: 'Go to my dashboard', href: params.dashboardUrl },
-      noteHtml: `Need help? ${brandLink(`${params.appOrigin}/contact`, 'Contact our team')}.`,
+      cta: confirm
+        ? { label: 'Confirm my email', href: confirm }
+        : { label: 'Go to my dashboard', href: params.dashboardUrl },
+      noteHtml: confirm
+        ? `Then open ${brandLink(params.dashboardUrl, 'your dashboard')}. Need help? ${brandLink(`${params.appOrigin}/contact`, 'Contact our team')}.`
+        : `Need help? ${brandLink(`${params.appOrigin}/contact`, 'Contact our team')}.`,
     },
-    `Hi ${params.name},\n\nWelcome to CARSI Learning.\n\nDashboard: ${params.dashboardUrl}`
+    confirm
+      ? `Hi ${params.name},\n\nWelcome to CARSI Learning.\n\nConfirm your email: ${confirm}\n\nDashboard: ${params.dashboardUrl}`
+      : `Hi ${params.name},\n\nWelcome to CARSI Learning.\n\nDashboard: ${params.dashboardUrl}`
   );
 }
 
