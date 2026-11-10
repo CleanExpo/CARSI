@@ -1,5 +1,6 @@
 name: Brand Video Automation
 
+# Manual dispatch only: HeyGen generation costs real money and needs owner approval (RA-8288).
 on:
   workflow_dispatch:
     inputs:
@@ -11,8 +12,6 @@ on:
         description: 'Optional comma-separated script ids'
         required: false
         default: ''
-  schedule:
-    - cron: '17 18 * * 1'
 
 permissions:
   contents: read
