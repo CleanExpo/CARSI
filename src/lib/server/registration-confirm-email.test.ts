@@ -23,7 +23,7 @@ vi.mock('@/lib/auth/session-jwt', () => ({
 
 const { POST } = await import('../../../app/api/auth/register/route');
 
-const CONFIRM_URL = 'https://carsi.example.test/api/auth/verify-email?token=abc.def.ghi';
+const CONFIRM_URL = 'https://carsi.example.test/confirm-email?token=abc.def.ghi';
 
 describe('registration welcome email template (GP-699)', () => {
   it('carries the confirm link in the HTML and the plain-text body', () => {

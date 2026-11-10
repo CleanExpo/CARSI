@@ -25,6 +25,11 @@ export async function signSessionToken(claims: SessionClaims): Promise<string> {
 export async function verifySessionToken(token: string): Promise<SessionClaims | null> {
   try {
     const { payload } = await jwtVerify(token, getSessionSecretBytes());
+    // GP-699: a session token carries neither a purpose nor an audience. Every
+    // link token signed with this key (reset, share, unsubscribe, email
+    // confirmation, check-in) carries at least one, so none of them can ever be
+    // presented as a login session, whatever other claims it holds.
+    if (payload.purpose !== undefined || payload.aud !== undefined) return null;
     const sub = typeof payload.sub === 'string' ? payload.sub : '';
     const email = typeof payload.email === 'string' ? payload.email : '';
     const full_name = typeof payload.full_name === 'string' ? payload.full_name : 'User';
@@ -118,9 +123,12 @@ const EMAIL_VERIFICATION_AUDIENCE = 'carsi-email-verification';
  * read mail at the address they signed up with. The token carries the address
  * it was issued for, so it cannot confirm a different address later. Its own
  * audience keeps it from being accepted as a reset, share or unsubscribe token.
+ * The address travels in `addr`, never `email`: a session token is the only
+ * token allowed to carry `email`, and `verifySessionToken` also refuses any
+ * token that has a purpose or an audience.
  */
 export async function signEmailVerificationToken(userId: string, email: string): Promise<string> {
-  return new SignJWT({ purpose: 'email_verification', email: email.trim().toLowerCase() })
+  return new SignJWT({ purpose: 'email_verification', addr: email.trim().toLowerCase() })
     .setProtectedHeader({ alg: 'HS256' })
     .setSubject(userId)
     .setAudience(EMAIL_VERIFICATION_AUDIENCE)
@@ -138,7 +146,7 @@ export async function verifyEmailVerificationToken(
     });
     if (payload.purpose !== 'email_verification') return null;
     const userId = typeof payload.sub === 'string' ? payload.sub : '';
-    const email = typeof payload.email === 'string' ? payload.email : '';
+    const email = typeof payload.addr === 'string' ? payload.addr : '';
     if (!userId || !email) return null;
     return { userId, email };
   } catch {

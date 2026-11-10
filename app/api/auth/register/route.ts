@@ -68,12 +68,14 @@ export async function POST(request: NextRequest) {
     const accessToken = await signSessionToken(claims);
 
     const origin = getAppOrigin(request);
-    // GP-699: the welcome email carries a confirm link. A signing failure must
-    // not block sign-up, so the email falls back to the plain dashboard button.
+    // GP-699: the welcome email carries a confirm link. It opens the
+    // /confirm-email page, which changes nothing until the person presses the
+    // button there. A signing failure must not block sign-up, so the email
+    // falls back to the plain dashboard button.
     let confirmUrl: string | undefined;
     try {
       const verifyToken = await signEmailVerificationToken(claims.sub, claims.email);
-      confirmUrl = `${origin}/api/auth/verify-email?token=${encodeURIComponent(verifyToken)}`;
+      confirmUrl = `${origin}/confirm-email?token=${encodeURIComponent(verifyToken)}`;
     } catch (e) {
       console.error('[register] confirm link', e instanceof Error ? e.message : String(e));
     }
