@@ -48,6 +48,13 @@ describe('email verification token (GP-699)', () => {
     expect(payload.exp - payload.iat).toBe(7 * 24 * 60 * 60);
   });
 
+  it('carries the address in addr and never in the session claim email', async () => {
+    const token = await signEmailVerificationToken('user-123', 'student@example.test');
+    const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString());
+    expect(payload.addr).toBe('student@example.test');
+    expect(payload).not.toHaveProperty('email');
+  });
+
   it('rejects a malformed token', async () => {
     expect(await verifyEmailVerificationToken('not-a-jwt')).toBeNull();
   });
