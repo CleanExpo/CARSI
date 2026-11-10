@@ -45,7 +45,11 @@ export async function POST(request: NextRequest) {
 
     await prisma.lmsUser.update({
       where: { id: userId },
-      data: { hashedPassword: await hashPassword(newPassword) },
+      // GP-699: the reset link is only ever emailed to the account address
+      // (forgot-password is its sole issuer), so completing a reset proves the
+      // person can read that mailbox. Same write as the password, so the two
+      // can never disagree.
+      data: { hashedPassword: await hashPassword(newPassword), isVerified: true },
     });
 
     const claims = await sessionClaimsForUserId(userId);

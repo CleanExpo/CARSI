@@ -87,4 +87,24 @@ describe('POST /api/auth/reset-password', () => {
     expect(res.status).toBe(200);
     expect(body.redirect_to).toBe('/dashboard/student');
   });
+
+  it('marks the account email-verified, because the reset link only ever goes to the account address (GP-699)', async () => {
+    const res = await POST(request({ token: 'reset-token', new_password: 'A-strong-pass-9' }));
+
+    expect(res.status).toBe(200);
+    expect(mocks.updateUser).toHaveBeenCalledTimes(1);
+    expect(mocks.updateUser.mock.calls[0][0]).toMatchObject({
+      where: { id: 'user-1' },
+      data: { hashedPassword: '$2a$12$new', isVerified: true },
+    });
+  });
+
+  it('does not mark anything verified when the reset token is invalid (GP-699)', async () => {
+    mocks.verifyToken.mockResolvedValue(null);
+
+    const res = await POST(request({ token: 'bad', new_password: 'A-strong-pass-9' }));
+
+    expect(res.status).toBe(400);
+    expect(mocks.updateUser).not.toHaveBeenCalled();
+  });
 });

@@ -110,3 +110,38 @@ export async function verifyEmailUnsubscribeToken(token: string): Promise<string
     return null;
   }
 }
+
+const EMAIL_VERIFICATION_AUDIENCE = 'carsi-email-verification';
+
+/**
+ * GP-699 — link in the registration welcome email that proves the person can
+ * read mail at the address they signed up with. The token carries the address
+ * it was issued for, so it cannot confirm a different address later. Its own
+ * audience keeps it from being accepted as a reset, share or unsubscribe token.
+ */
+export async function signEmailVerificationToken(userId: string, email: string): Promise<string> {
+  return new SignJWT({ purpose: 'email_verification', email: email.trim().toLowerCase() })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setSubject(userId)
+    .setAudience(EMAIL_VERIFICATION_AUDIENCE)
+    .setIssuedAt()
+    .setExpirationTime('7d')
+    .sign(getSessionSecretBytes());
+}
+
+export async function verifyEmailVerificationToken(
+  token: string,
+): Promise<{ userId: string; email: string } | null> {
+  try {
+    const { payload } = await jwtVerify(token, getSessionSecretBytes(), {
+      audience: EMAIL_VERIFICATION_AUDIENCE,
+    });
+    if (payload.purpose !== 'email_verification') return null;
+    const userId = typeof payload.sub === 'string' ? payload.sub : '';
+    const email = typeof payload.email === 'string' ? payload.email : '';
+    if (!userId || !email) return null;
+    return { userId, email };
+  } catch {
+    return null;
+  }
+}

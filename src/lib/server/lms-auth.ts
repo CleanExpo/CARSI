@@ -237,3 +237,19 @@ export async function registerUserWithPassword(params: {
     },
   };
 }
+
+/**
+ * GP-699 — the one place an account is marked email-verified from a confirm
+ * link. Only an active account that still has the address the link was issued
+ * for is changed. Returns false when nothing matched, so the caller never
+ * reports a confirmation that did not happen.
+ */
+export async function markEmailVerified(userId: string, email: string): Promise<boolean> {
+  const normalized = email.trim().toLowerCase();
+  if (!userId || !normalized) return false;
+  const result = await prisma.lmsUser.updateMany({
+    where: { id: userId, email: normalized, isActive: true },
+    data: { isVerified: true },
+  });
+  return result.count > 0;
+}

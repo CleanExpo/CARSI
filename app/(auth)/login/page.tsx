@@ -6,9 +6,9 @@ import { registerPathWithNext } from '@/lib/membership-signup-path';
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string | string[] }>;
+  searchParams: Promise<{ next?: string | string[]; email_confirmed?: string | string[] }>;
 }) {
-  const { next } = await searchParams;
+  const { next, email_confirmed: emailConfirmed } = await searchParams;
   const registerHref = registerPathWithNext(typeof next === 'string' ? next : null);
   return (
     <div
@@ -26,6 +26,23 @@ export default async function LoginPage({
           Restoration training from an IICRC CEC Accredited provider
         </p>
       </div>
+
+      {/* GP-699: outcome of the confirm link in the welcome email. */}
+      {emailConfirmed === '1' ? (
+        <p
+          role="status"
+          className="mb-4 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800"
+        >
+          Your email address is confirmed. Sign in to continue.
+        </p>
+      ) : emailConfirmed === '0' ? (
+        <p
+          role="status"
+          className="mb-4 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900"
+        >
+          That confirmation link is invalid or has expired. You can still sign in.
+        </p>
+      ) : null}
 
       <LoginForm />
 
