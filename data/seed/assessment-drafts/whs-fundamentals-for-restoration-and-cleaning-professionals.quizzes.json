@@ -211,12 +211,12 @@
      "options": [
       "Nothing, because the fire was in the kitchen",
       "Run the system to clear the smoke",
-      "HVAC and duct inspection and cleaning, and do not run the system until it is cleared",
+      "A HVAC and duct inspection to assess the system, and do not run it until it is assessed",
       "Clean only the rooms that burned"
      ],
      "correctIndex": 2,
      "points": 1,
-     "explanation": "Ducts carry soot and smoke residue to rooms the fire never touched. Inspect and clean the system, and keep it switched off until it is cleared.",
+     "explanation": "Ducts can carry soot and smoke residue to rooms the fire never touched. Suggest an inspection to assess the system and keep it switched off until then. Cleaning depends on what the inspection finds.",
      "sourceRef": "Module 5; Site conditions checklist lesson (CARSI-original best practice; legal references UNVERIFIED, see evidence ledger)"
     },
     {
@@ -237,12 +237,12 @@
      "options": [
       "Photograph everything up close and start the clean-up",
       "Carry on with the inspection of the other rooms",
-      "Stop: leave, touch nothing, notify the police and the insurer, and do no work until a specialist contamination assessment",
+      "Stop: leave, touch nothing, notify the police, phone the insurer directly, and do no work until a specialist assessment",
       "Open the windows to ventilate the house"
      ],
      "correctIndex": 2,
      "points": 1,
-     "explanation": "Signs of drug manufacture are a STOP item. Leave, touch nothing, notify the police and the insurer, and wait for a specialist assessment before any work.",
+     "explanation": "Signs of drug manufacture are a STOP item. Leave, touch nothing, notify the police and phone the insurer directly. Written reports never name what you saw; they state only that work is suspended pending a specialist contamination assessment.",
      "sourceRef": "Module 5; Site conditions checklist lesson (CARSI-original best practice; legal references UNVERIFIED, see evidence ledger)"
     },
     {
@@ -262,13 +262,13 @@
      "questionText": "The job includes fixing a roof leak and removing wet ceiling sheets from a stairwell. What is the first requirement before work starts?",
      "options": [
       "Start with the ceiling and use the roof later",
-      "Fall-prevention controls and a safe work method statement, and check the current falls rule for your state or territory",
+      "Falls controls, plus a safe work method statement if it is high risk construction work; check your state or territory rule",
       "A single ladder and a spotter",
       "Nothing, if the roof is below 3 metres"
      ],
      "correctIndex": 1,
      "points": 1,
-     "explanation": "Working at heights needs controls and a safe work method statement before work begins. The detailed falls rules differ by state and territory, so check the current rule for your jurisdiction.",
+     "explanation": "Every height task needs falls controls before work begins. A safe work method statement is required where the task is high risk construction work, for example a fall risk of more than 2 metres (threshold UNVERIFIED). The falls rules differ by state and territory, so check the current rule for your jurisdiction.",
      "sourceRef": "Module 5; Site conditions checklist lesson (CARSI-original best practice; legal references UNVERIFIED, see evidence ledger)"
     },
     {
