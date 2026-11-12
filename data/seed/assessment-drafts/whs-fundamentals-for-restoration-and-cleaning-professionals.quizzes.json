@@ -179,6 +179,110 @@
      "correctIndex": 2,
      "points": 1,
      "sourceRef": "Module 7; HSWA ss 23, 25, 55–57 — https://www.legislation.govt.nz/act/public/2015/0070/latest/whole.html ; https://www.worksafe.govt.nz/notifications/what-events-need-to-be-notified/"
+    },
+    {
+     "questionText": "On the checklist, the answer for item 9 (access issues) is left blank. How should the record read?",
+     "options": [
+      "No, because nothing was reported",
+      "Not checked, and the item is open until someone looks on site",
+      "Yes, because blanks are treated as the safe answer",
+      "Not applicable"
+     ],
+     "correctIndex": 1,
+     "points": 1,
+     "explanation": "A blank is never a No. If nobody has looked, the record says not checked, and the job is not ready to plan around that item.",
+     "sourceRef": "Module 5; Site conditions checklist lesson (CARSI-original best practice; legal references UNVERIFIED, see evidence ledger)"
+    },
+    {
+     "questionText": "At intake, the client says over the phone that the power is on. What do you record?",
+     "options": [
+      "Power on, confirmed",
+      "Power on, reported but not confirmed, until you check the switchboard on site",
+      "Nothing, because phone answers are not recorded",
+      "Power off, to be safe"
+     ],
+     "correctIndex": 1,
+     "points": 1,
+     "explanation": "A phone answer is a lead, not a fact. It stays reported, not confirmed, until you check it on site.",
+     "sourceRef": "Module 5; Site conditions checklist lesson (CARSI-original best practice; legal references UNVERIFIED, see evidence ledger)"
+    },
+    {
+     "questionText": "A fire claim is booked for a house with ducted heating and ducted air conditioning. What does the checklist trigger?",
+     "options": [
+      "Nothing, because the fire was in the kitchen",
+      "Run the system to clear the smoke",
+      "A HVAC and duct inspection to assess the system, and do not run it until it is assessed",
+      "Clean only the rooms that burned"
+     ],
+     "correctIndex": 2,
+     "points": 1,
+     "explanation": "Ducts can carry soot and smoke residue to rooms the fire never touched. Suggest an inspection to assess the system and keep it switched off until then. Cleaning depends on what the inspection finds.",
+     "sourceRef": "Module 5; Site conditions checklist lesson (CARSI-original best practice; legal references UNVERIFIED, see evidence ledger)"
+    },
+    {
+     "questionText": "The power to the property is off and the job needs drying equipment. What is the correct next step?",
+     "options": [
+      "Reconnect the supply yourself at the switchboard",
+      "Arrange a generator, and have an electrician check the installation before power is reconnected",
+      "Skip the drying equipment",
+      "Run leads from the neighbour's house"
+     ],
+     "correctIndex": 1,
+     "points": 1,
+     "explanation": "Power off plus power required means generator hire. Never reconnect a flooded or fire-damaged supply yourself: an electrician checks it first.",
+     "sourceRef": "Module 5; Site conditions checklist lesson (CARSI-original best practice; legal references UNVERIFIED, see evidence ledger)"
+    },
+    {
+     "questionText": "At the initial inspection you see glassware, tubing, chemical containers and blacked-out windows. What do you do?",
+     "options": [
+      "Photograph everything up close and start the clean-up",
+      "Carry on with the inspection of the other rooms",
+      "Stop: leave, touch nothing, notify the police, phone the insurer directly, and do no work until a specialist assessment",
+      "Open the windows to ventilate the house"
+     ],
+     "correctIndex": 2,
+     "points": 1,
+     "explanation": "Signs of drug manufacture are a STOP item. Leave, touch nothing, notify the police and phone the insurer directly. Written reports never name what you saw; they state only that work is suspended pending a specialist contamination assessment.",
+     "sourceRef": "Module 5; Site conditions checklist lesson (CARSI-original best practice; legal references UNVERIFIED, see evidence ledger)"
+    },
+    {
+     "questionText": "Neighbours tell you there have been several break-ins on this street recently. What does the checklist trigger, and where does it go?",
+     "options": [
+      "Two-person attendance and overnight equipment security, recorded in the internal job record only",
+      "A warning to the homeowner in the insurer report",
+      "Refusing the job",
+      "Nothing, because it is only a rumour"
+     ],
+     "correctIndex": 0,
+     "points": 1,
+     "explanation": "A known higher-risk area triggers two-person attendance and overnight security. Item 17 is internal only, so it stays out of client and insurer reports. Say only the consequence, such as two-person attendance required.",
+     "sourceRef": "Module 5; Site conditions checklist lesson (CARSI-original best practice; legal references UNVERIFIED, see evidence ledger)"
+    },
+    {
+     "questionText": "The job includes fixing a roof leak and removing wet ceiling sheets from a stairwell. What is the first requirement before work starts?",
+     "options": [
+      "Start with the ceiling and use the roof later",
+      "Falls controls, plus a safe work method statement if it is high risk construction work; check your state or territory rule",
+      "A single ladder and a spotter",
+      "Nothing, if the roof is below 3 metres"
+     ],
+     "correctIndex": 1,
+     "points": 1,
+     "explanation": "Every height task needs falls controls before work begins. A safe work method statement is required where the task is high risk construction work, for example a fall risk of more than 2 metres (threshold UNVERIFIED). The falls rules differ by state and territory, so check the current rule for your jurisdiction.",
+     "sourceRef": "Module 5; Site conditions checklist lesson (CARSI-original best practice; legal references UNVERIFIED, see evidence ledger)"
+    },
+    {
+     "questionText": "There is no room on the property for a skip bin and the street is narrow. What do you do?",
+     "options": [
+      "Place the skip on the road without checking",
+      "Plan an alternative such as a trailer or cage tipper, or check whether your local council requires a permit for a skip on the road",
+      "Cancel the job",
+      "Put the waste in the neighbour's bin"
+     ],
+     "correctIndex": 1,
+     "points": 1,
+     "explanation": "No skip space triggers an alternative or a permit check. Council permit rules vary, so check the current rule with the local council.",
+     "sourceRef": "Module 5; Site conditions checklist lesson (CARSI-original best practice; legal references UNVERIFIED, see evidence ledger)"
     }
    ]
   }
