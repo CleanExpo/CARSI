@@ -14,7 +14,6 @@ import { PlatformNav } from '@/components/marketing/PlatformNav';
 import { StaticMarketingClosingCta } from '@/components/marketing/StaticMarketingClosingCta';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { CCW_COURSE_ZIP_HREF, CCW_COURSE_ZIP_PATH } from '@/lib/ccw/course-zip';
 import { carsiCoachingMonthlyPath } from '@/lib/marketing/carsi-coaching-monthly';
 import { ccwWorkshopPath } from '@/lib/marketing/marketing-growth-links';
 import { marketingInput } from '@/lib/marketing/marketing-ui';
@@ -22,7 +21,6 @@ import {
   ArrowRight,
   BookOpen,
   CheckCircle2,
-  Download,
   Eye,
   EyeOff,
   GraduationCap,
@@ -487,16 +485,8 @@ export function CcwWorkshopClient() {
                     </p>
                   </div>
                 </div>
-                <a
-                  href={CCW_COURSE_ZIP_HREF}
-                  download
-                  className="inline-flex w-full items-center justify-center gap-3 rounded-xl border border-white/10 bg-[#146fc2] px-6 py-4 text-sm font-semibold text-white transition hover:bg-[#1769b8] sm:w-auto"
-                >
-                  <Download className="h-5 w-5 shrink-0" aria-hidden />
-                  Download workshop pack (ZIP)
-                </a>
-                <p className="mt-4 font-mono text-[11px] break-all text-slate-600 dark:text-white/55">
-                  {CCW_COURSE_ZIP_PATH.replace(/^\//, '')}
+                <p className="text-sm leading-relaxed text-slate-700 dark:text-white/70">
+                  Your trainer will send the workshop pack directly.
                 </p>
               </section>
             )}
