@@ -1,6 +1,8 @@
 # SME claim checklist — CARSI Fire & Smoke Restoration Practitioner
 
-**For:** Phill (SME, DECISIONS #24) · **Generated:** 02/11/2026 from `data/courses/fire-smoke-damage-restoration-fundamentals/v1-draft/evidence/evidence-ledger.jsonl` · **Ledger:** 161 claims: 106 VERIFIED, 24 JUSTIFIED, **31 GAP (listed below)**.
+**For:** Phill (SME, DECISIONS #24) · **Generated:** 13/11/2026 from `data/courses/fire-smoke-damage-restoration-fundamentals/v1-draft/evidence/evidence-ledger.jsonl` · **Ledger:** 161 claims: 107 VERIFIED, 24 JUSTIFIED, **30 GAP (listed below)**.
+
+> **Public-source pass, 13/11/2026:** 1 of the 31 GAP rows in this ledger was closed from public primary sources (each now carries its URL, access date and quote), leaving 30 open. This checklist lists only the rows still open.
 
 Only the GAP claims need you. VERIFIED and JUSTIFIED claims already carry a source. Tick one box per claim:
 
@@ -10,7 +12,7 @@ Only the GAP claims need you. VERIFIED and JUSTIFIED claims already carry a sour
 
 **Claims marked S700:** check each one against your licensed S700 copy, then tick OK, Fix or Cut. For a Fix, write the corrected wording in your own words rather than quoting it.
 
-**Summary:** 17 standards claims (check against S700), 14 method or practice claims (check from field experience).
+**Summary:** 17 standards claims (check against S700), 13 method or practice claims (check from field experience).
 
 ## M1 · What this course covers and who it is for
 
@@ -21,8 +23,6 @@ Only the GAP claims need you. VERIFIED and JUSTIFIED claims already carry a sour
 
 - [ ] OK  [ ] Fix  [ ] Cut — **FSP-010** · **S700** — A fire job follows the arc: make safe, assess, mitigate, remove the source, clean, control odour, verify, with documentation throughout.
     - _Why it is open:_ The ordered arc is CARSI method wording with no graded source opened. If it is meant to mirror the standard’s procedure, the SME confirms it against the licensed S700 copy.
-- [ ] OK  [ ] Fix  [ ] Cut — **FSP-011** — Confirm with whoever controls the site (fire service, police or owner) that it has been released before starting; a fire scene may be under investigation.
-    - _Why it is open:_ No AU or NZ fire-service or police page on scene release was opened. Plausible practice, uncited.
 - [ ] OK  [ ] Fix  [ ] Cut — **FSP-025** — Fire damages wiring in ways that cannot be seen, so restoring supply is for a licensed electrician.
     - _Why it is open:_ No regulator page on fire-damaged wiring was opened. The licensed-electrician rule is sound practice but uncited here.
 

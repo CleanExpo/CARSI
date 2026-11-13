@@ -1,6 +1,8 @@
 # SME claim checklist — CARSI Contaminated-Water Practitioner
 
-**For:** Phill (SME, DECISIONS #24) · **Generated:** 02/11/2026 from `data/courses/category-3-sewage-black-water-remediation/v1-draft/evidence/evidence-ledger.jsonl` · **Ledger:** 168 claims: 109 VERIFIED, 16 JUSTIFIED, **43 GAP (listed below)**.
+**For:** Phill (SME, DECISIONS #24) · **Generated:** 13/11/2026 from `data/courses/category-3-sewage-black-water-remediation/v1-draft/evidence/evidence-ledger.jsonl` · **Ledger:** 168 claims: 110 VERIFIED, 16 JUSTIFIED, **42 GAP (listed below)**.
+
+> **Public-source pass, 13/11/2026:** 1 of the 43 GAP rows in this ledger was closed from public primary sources (each now carries its URL, access date and quote), leaving 42 open. This checklist lists only the rows still open.
 
 Only the GAP claims need you. VERIFIED and JUSTIFIED claims already carry a source. Tick one box per claim:
 
@@ -10,7 +12,7 @@ Only the GAP claims need you. VERIFIED and JUSTIFIED claims already carry a sour
 
 **Claims marked S500:** check each one against your licensed S500 copy, then tick OK, Fix or Cut. For a Fix, write the corrected wording in your own words rather than quoting it.
 
-**Summary:** 9 standards claims (check against S500), 34 method or practice claims (check from field experience).
+**Summary:** 9 standards claims (check against S500), 33 method or practice claims (check from field experience).
 
 ## M1 · Category 3 water: what it is and how you make the call
 
@@ -50,8 +52,6 @@ Only the GAP claims need you. VERIFIED and JUSTIFIED claims already carry a sour
     - _Why it is open:_ CARSI PPE threshold. Health New Zealand and the NZ civil defence agency name P2/N95 masks for public flood clean-up, but no graded source sets P2 as the professional minimum for sewage work. SME to confirm.
 - [ ] OK  [ ] Fix  [ ] Cut — **CWP-078** — Goggles or a face shield, a fluid-resistant coverall, inner plus outer gloves, and cleanable waterproof boots form the CARSI hands-on Category 3 PPE set.
     - _Why it is open:_ CARSI PPE set. Health authorities name gloves, boots, eye protection and protective clothing for flood clean-up, but the professional set (double gloves, fluid-resistant coverall) is CARSI practice for SME confirmation.
-- [ ] OK  [ ] Fix  [ ] Cut — **CWP-081** — Coveralls and respirators add heat stress on hot days, so breaks, water and a cool clean area are planned.
-    - _Why it is open:_ Sound practice; no graded heat-stress source opened for this lesson.
 
 ## M3 · Decontamination: getting out clean
 
