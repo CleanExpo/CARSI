@@ -1,0 +1,1010 @@
+{
+  "version": 1,
+  "courseSlug": "hard-floor-care",
+  "status": "draft",
+  "note": "DRAFT v1 module checks and final exam for the CARSI Hard Floor Care course. Original CARSI questions for Australian and New Zealand conditions; no IICRC standard text reproduced. Pass mark 80% for every check and the final exam (founder decision of 02/11/2026); the review pack's 90% final and must-pass questions are open founder decisions because the platform cannot enforce them. Answer positions balanced. SME review and sign-off required before seeding.",
+  "quizzes": [
+    {
+      "quizId": "6cd7cc9d-ff21-52ae-baff-6ee7633942b8",
+      "lessonTitle": "Module 1 check",
+      "title": "CARSI Hard Floor Care — Module 1 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Which floor family does acid damage most?",
+          "options": [
+            "Vinyl sheet flooring",
+            "Coated timber boards",
+            "Calcium-based natural stone",
+            "Glazed ceramic tile"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Acidic products can etch calcium-based stones such as marble and limestone, and etching changes the stone itself. The other floors have different weak points, and the maker's sheet decides their method."
+        },
+        {
+          "questionText": "Why is steam a poor choice on coated timber?",
+          "options": [
+            "Steam leaves thick residue",
+            "Water reaches the boards",
+            "Steam lifts vinyl tiles",
+            "Steam cannot reach grout"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "ATFA advises that steam cleaning is safest assumed unsuitable on timber unless the timber or finish maker approves it, because water and heat can get under the coating and into the boards."
+        },
+        {
+          "questionText": "What is usually being cleaned on a hard floor?",
+          "options": [
+            "The sub-floor below",
+            "The floor fixings",
+            "The building frame",
+            "The surface layer"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Most cleaning acts on the glaze, factory finish, polish or coating. Keeping that surface layer healthy is what keeps the floor lasting."
+        },
+        {
+          "questionText": "A 1996 vinyl floor has no test results. What now?",
+          "options": [
+            "Stop and refer it",
+            "Strip it with care",
+            "Clean it gently first",
+            "Sand a small patch"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A floor laid before the ban that cannot be shown to be asbestos-free is treated as suspected asbestos-containing material. Stop and refer for competent assessment; do not try gentler work."
+        },
+        {
+          "questionText": "When did the national asbestos ban start in Australia?",
+          "options": [
+            "31 December 2003",
+            "1 January 1990",
+            "31 December 1980",
+            "1 January 2010"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "The Australia-wide ban began on 31 December 2003. It did not remove asbestos already installed, which is why older floors need the asbestos question asked."
+        },
+        {
+          "questionText": "In New Zealand, which buildings could contain asbestos?",
+          "options": [
+            "Built or renovated before 2000",
+            "Built or renovated after 2010",
+            "Only commercial buildings, never homes",
+            "Only buildings that have tiles"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "WorkSafe New Zealand says any building built or renovated before 2000 could contain asbestos. Newer parts of a building may be lower risk, but extensions and refurbishments before 2000 still count."
+        },
+        {
+          "questionText": "Can you identify asbestos in a floor by sight?",
+          "options": [
+            "Yes, from tile colour",
+            "Yes, from tile size",
+            "No, assessment is needed",
+            "Yes, from the pattern"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "You cannot tell if materials contain asbestos just by looking. Colour, size and pattern do not clear a floor, so the decision rests on dates, records and competent assessment."
+        },
+        {
+          "questionText": "Tiles are lifting on a floor that may hold asbestos. What do you do?",
+          "options": [
+            "Stop and report it",
+            "Press them flat first",
+            "Wet and lift them",
+            "Vacuum up the debris"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Broken, lifting or crumbling tiles on a suspected asbestos floor are not a cleaning job. Stop, keep people away, and report it so competent people can assess it."
+        },
+        {
+          "questionText": "What must be on site before a product is opened?",
+          "options": [
+            "A copy of invoice",
+            "The product SDS copy",
+            "A spare machine pad",
+            "The manager's mobile number"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Anyone who uses hazardous chemicals must keep copies of the SDS in the workplace. Read it before the product is opened, not after a problem."
+        },
+        {
+          "questionText": "Which control should come first in the hierarchy?",
+          "options": [
+            "Eliminate the risk",
+            "Wear protective gloves",
+            "Post warning signs",
+            "Train crew once"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Safe Work Australia says to aim to eliminate risks first. PPE is the last line of defence, so it never replaces controls higher in the order."
+        },
+        {
+          "questionText": "What does the AS 4586 P class describe?",
+          "options": [
+            "Slip resistance when wet",
+            "Hardness of timber boards",
+            "Acid resistance of stone",
+            "Dilution of cleaning products"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "AS 4586 classifies the slip resistance of new pedestrian surface materials. A coating applied later can change how the floor grips, so record the class and any later test."
+        },
+        {
+          "questionText": "What is the supply voltage for the machines you use?",
+          "options": [
+            "A nominal 24 V",
+            "A nominal 415 V",
+            "A nominal 12 V",
+            "A nominal 230 V"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Australia and New Zealand supply is a nominal 230 V on standard outlets, normally rated 10 A. Check each machine's data plate before plugging in."
+        },
+        {
+          "questionText": "Two machines draw 5.5 A and 4.0 A on one 10 A circuit. What is the total?",
+          "options": [
+            "9.5 A, leaving 5 A",
+            "1.5 A, leaving 8.5 A",
+            "21.9 A, over the limit",
+            "9.5 A, leaving 0.5 A"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Add the currents: 5.5 + 4.0 = 9.5 A, which leaves only 0.5 A. Run one machine at a time or use a separate circuit."
+        },
+        {
+          "questionText": "A new product arrives. Which step comes before the first use?",
+          "options": [
+            "Read label and SDS",
+            "Mix it extra strong",
+            "Use it on timber",
+            "Pour it in bucket"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "The label and SDS state the dilution, hazards, protective equipment and surface warnings. Never mix two products, and never guess a dilution."
+        },
+        {
+          "questionText": "You cannot identify the floor. What is the right step?",
+          "options": [
+            "Use your strongest product",
+            "Stop and get advice",
+            "Use the hottest water",
+            "Choose a medium pad"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "If the floor or its coating cannot be identified, the limits of safe method cannot be set. Stop, test a hidden spot only as the maker allows, or ask the manufacturer."
+        }
+      ]
+    },
+    {
+      "quizId": "8251b2a5-73f3-53c2-af57-65a0962a0e9f",
+      "lessonTitle": "Module 2 check",
+      "title": "CARSI Hard Floor Care — Module 2 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "What comes before choosing a cleaning method?",
+          "options": [
+            "Buying the product",
+            "Identifying the floor",
+            "Starting the machine",
+            "Wetting the floor"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Naming the floor and its surface layer comes first, because the method depends on it. Five minutes of identification prevents most damage claims."
+        },
+        {
+          "questionText": "A pale tile cannot be named. How do you treat it?",
+          "options": [
+            "As glazed porcelain",
+            "As painted timber",
+            "As acid-sensitive stone",
+            "As flexible vinyl"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "If a stone cannot be identified, treat it as acid-sensitive, because a wrong guess on calcium-based stone etches it permanently. Use only products the maker states are safe for stone."
+        },
+        {
+          "questionText": "Which record best identifies a floor?",
+          "options": [
+            "A quick glance only",
+            "A guess by feel",
+            "A client's casual opinion",
+            "The maker's care sheet"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "A maker's care sheet names the product and what suits it. Appearance and feel are starting points only."
+        },
+        {
+          "questionText": "What do you do with a timber coating you cannot name?",
+          "options": [
+            "Use steam on it",
+            "Stop and get advice",
+            "Use a rotary machine",
+            "Use a strong stripper"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "ATFA directs the reader to the coating manufacturer's advice. A coating you cannot name means the limits cannot be set, so stop."
+        },
+        {
+          "questionText": "How big is a typical hidden-spot test?",
+          "options": [
+            "A whole room of floor",
+            "Small and out of sight",
+            "One full row of tiles",
+            "A third of a hall"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "The test is small, out of sight and made with the intended product, dilution and dwell. The worked example uses 100 mm x 100 mm, which is 0.01 m2."
+        },
+        {
+          "questionText": "What does the hidden-spot test record?",
+          "options": [
+            "Product, dilution, dwell, result",
+            "The weather that day",
+            "The vehicle parking position",
+            "The supplier invoice number"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "The record ties the result to the exact product, dilution, dwell and floor. Without those details the test cannot be repeated or defended."
+        },
+        {
+          "questionText": "What does a pH reading prove about a product?",
+          "options": [
+            "Nothing about floor safety",
+            "Safe on all floors",
+            "No rinse is needed",
+            "It will not etch"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A pH reading is information about the solution. Surface compatibility, formulation, concentration and method also matter, so a reading never proves safety."
+        },
+        {
+          "questionText": "What decides the dilution of a cleaner?",
+          "options": [
+            "The pad colour",
+            "The product label",
+            "The machine speed",
+            "The soil colour"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "The label states the dilution. One commercial vinyl maker's sheet says to always dilute chemicals to appropriate levels for each application."
+        },
+        {
+          "questionText": "A label says 1 part product to 20 parts water. How much product is in 10 L of mix?",
+          "options": [
+            "About 0.95 L",
+            "About 0.48 L",
+            "About 1.0 L",
+            "About 2.0 L"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "One part in 21 is product: 10 divided by 21 is 0.476 L. Check the label's ratio each time, because 1:20 is only an illustration."
+        },
+        {
+          "questionText": "Two products are both on the van. What is the rule?",
+          "options": [
+            "Mix them equally",
+            "Never mix them",
+            "Mix when cold",
+            "Mix for stains"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Never mix two products. Each SDS states incompatibilities, and a mix can release gas or damage the floor."
+        },
+        {
+          "questionText": "Where do you find protective equipment for a product?",
+          "options": [
+            "The invoice copy",
+            "The pad packet",
+            "The price list",
+            "The product SDS"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "The SDS states the hazards, the protective equipment, the first aid steps and spill steps. Keep a copy in the workplace."
+        },
+        {
+          "questionText": "A hidden-spot test dulls the gloss. What now?",
+          "options": [
+            "Stop, get advice",
+            "Double the strength",
+            "Apply it wider",
+            "Finish the floor"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Any change in gloss, colour or feel is a sign the product is incompatible. Stop, record it and obtain technical advice. Do not increase strength."
+        }
+      ]
+    },
+    {
+      "quizId": "38e2d2c0-356b-5560-81db-736af9b2bcba",
+      "lessonTitle": "Module 3 check",
+      "title": "CARSI Hard Floor Care — Module 3 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Which equipment suits rinse and recovery on grout?",
+          "options": [
+            "Dry microfibre mop",
+            "Single disc burnisher",
+            "Hand squeegee tool",
+            "Truck-mount spinner tool"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "A truck-mount with a hard-surface spinner tool does rinse and recovery on tile, grout and rough stone. It needs separate truck-mount training and a plan for the wastewater."
+        },
+        {
+          "questionText": "What sets a machine's working limits?",
+          "options": [
+            "The operator's habit",
+            "Last job's notes",
+            "The approved setup",
+            "Pad colour alone"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "The approved setup records the maker's values for this floor, coating, product and tool. Habit and last job's notes are how settings get copied wrongly."
+        },
+        {
+          "questionText": "A maker says auto scrubbing takes about 20% of damp-mop time. What is the saving on a 2.0 h job?",
+          "options": [
+            "About 24 min",
+            "About 120 min",
+            "About 96 min",
+            "About 12 min"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "20% of 2.0 h is 0.4 h, or 24 min. The saving is the other 1.6 h, which is 96 min. Time your own crew before quoting from one maker's ratio."
+        },
+        {
+          "questionText": "Which area favours damp mopping over a scrubber?",
+          "options": [
+            "A long open corridor",
+            "A tight obstructed corner",
+            "A large empty hall",
+            "A wide clear foyer"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "One maker's sheet says to use damp mopping in obstructed areas only and auto scrubbing in unobstructed areas."
+        },
+        {
+          "questionText": "What must be true of a lead before use?",
+          "options": [
+            "It is long, thick",
+            "No cuts or repairs",
+            "It is bright yellow",
+            "It is wound tightly"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Leads and plugs must be undamaged, with no cuts, repairs or exposed conductors. Test-and-tag and the RCD test sit on top of that visual check."
+        },
+        {
+          "questionText": "What is the first thing to do when a circuit trips mid-pass?",
+          "options": [
+            "Make the area safe",
+            "Reset it and continue",
+            "Use a longer lead",
+            "Add one more machine"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A tripped circuit leaves a wet floor and a stopped machine. Make the area safe, find the cause such as total current or a damaged lead, and fix it before resuming."
+        },
+        {
+          "questionText": "Which statement about pad colour is correct?",
+          "options": [
+            "One colour suits all",
+            "Darker always cleans more",
+            "Maker names the pad",
+            "Colour sets the speed"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Pads are specified by the maker for the product. There is no universal pad ladder that carries to every floor."
+        },
+        {
+          "questionText": "A maker's sheet lists 300 rpm or lower for its own vinyl. What does that mean for other floors?",
+          "options": [
+            "It applies to everything",
+            "It applies to timber",
+            "It applies to stone",
+            "It does not transfer"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "That figure is an example of a maker specifying a setup for its own product. A different floor, coating or product has its own setup."
+        },
+        {
+          "questionText": "Where does a pressure limit for a hard-surface tool come from?",
+          "options": [
+            "The makers' sheets",
+            "A thumb rule",
+            "The loudest machine",
+            "A client's request"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Pressure and temperature limits come from the makers of the floor, the grout and the tool, and are recorded in the approved setup."
+        },
+        {
+          "questionText": "A limit cannot be found. What is the correct step?",
+          "options": [
+            "Use the last number",
+            "Pick a mid setting",
+            "Stop and obtain advice",
+            "Start low and rise"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "When a limit cannot be established, stop and obtain technical advice. Do not substitute a generic number or work upward from a guess."
+        },
+        {
+          "questionText": "A 2 m2 test patch used 0.2 L. What rate does that give?",
+          "options": [
+            "0.1 L per m2",
+            "0.4 L per m2",
+            "1.0 L per m2",
+            "0.2 L per m2"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "0.2 L over 2 m2 is 0.1 L per m2. Multiply by the floor area and add an allowance for edges and re-treatment."
+        },
+        {
+          "questionText": "Why record where each setup value came from?",
+          "options": [
+            "It saves an hour",
+            "It replaces the SDS",
+            "It cuts the quote",
+            "It makes it defensible"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "A recorded source shows the value was taken from the maker, not guessed. That is the defence if a floor is later disputed."
+        }
+      ]
+    },
+    {
+      "quizId": "82f83dce-c3e7-5a08-97bf-e6fcdd64ffe0",
+      "lessonTitle": "Module 4 check",
+      "title": "CARSI Hard Floor Care — Module 4 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "What comes before any pressure on grout?",
+          "options": [
+            "A tap and scratch",
+            "A hot water rinse",
+            "A coat of sealer",
+            "A second spray pass"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Tap and scratch the grout in a grid first. Loose, crumbling or hollow results mean stop and quote a repair, because the floor is not ready for a restorative clean."
+        },
+        {
+          "questionText": "Grout crumbles at several test points. What do you quote?",
+          "options": [
+            "A stronger clean",
+            "A faster clean",
+            "A second sealer",
+            "A re-grout quote"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Crumbling grout means the floor cannot take a restorative clean. Quote a repair or re-grout instead of risking the grout and the owner's trust."
+        },
+        {
+          "questionText": "What is done before wet work starts?",
+          "options": [
+            "Seal the grout",
+            "Rinse the walls",
+            "Wax the tiles",
+            "Remove dry soil"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Dry soil is vacuumed or dust-mopped first, as a maker's guide does before wet work. It stops slurry and protects the pads and brushes."
+        },
+        {
+          "questionText": "Where must wastewater not go?",
+          "options": [
+            "The stormwater drain",
+            "A trade-waste route",
+            "A bunded tank",
+            "A recovery tank"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "NSW EPA guidance states that nothing other than clean rainwater should enter the stormwater drain. Confirm the trade-waste or council route first."
+        },
+        {
+          "questionText": "An unknown stone is in a foyer. How is it treated?",
+          "options": [
+            "As acid-proof stone",
+            "As sensitive stone",
+            "As glazed tile",
+            "As vinyl tile"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "A stone that cannot be identified is treated as acid-sensitive until proven otherwise, because acid etching on calcium-based stone is permanent."
+        },
+        {
+          "questionText": "What does the AS 4586 P class describe?",
+          "options": [
+            "Grout age on tiles",
+            "Acid use on stone",
+            "Wax levels on floors",
+            "Wet slip on surfaces"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "The class comes from a wet pendulum test of a new surface. A coating applied later can change how the floor grips, so record the class and any later test."
+        },
+        {
+          "questionText": "A coating is unknown. What is the step?",
+          "options": [
+            "Strip it hard",
+            "Seal over it",
+            "Wax over it",
+            "Test then record"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Scratch a hidden area, put a water drop on it and make a hidden-spot test with the intended product. If it stays unknown, obtain advice."
+        },
+        {
+          "questionText": "Etched patches appear on a stone floor. What now?",
+          "options": [
+            "Use acid cleaner",
+            "Scrub them harder",
+            "Seek specialist advice",
+            "Wax over them"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Etching changes the stone surface and is not a cleaning problem. A stone supplier advises seeking professional advice for dull or etched patches."
+        },
+        {
+          "questionText": "When can grout sealer go on?",
+          "options": [
+            "When the floor is damp",
+            "When the floor is dry",
+            "While rinse water is pooling",
+            "Before the very final rinse"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "The floor must be rinsed and fully dry first. A maker's guide says to remove rinse water and let the floor dry completely."
+        },
+        {
+          "questionText": "A 300 mm tile is how many square metres?",
+          "options": [
+            "0.09 m2",
+            "0.3 m2",
+            "0.9 m2",
+            "3.0 m2"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "0.3 m times 0.3 m is 0.09 m2. A 20 m2 floor holds about 222 tiles of that size."
+        }
+      ]
+    },
+    {
+      "quizId": "ae061ecf-4c38-5a35-a43a-657770f1f502",
+      "lessonTitle": "Module 5 check",
+      "title": "CARSI Hard Floor Care — Module 5 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "A resilient floor has no records and is old. What first?",
+          "options": [
+            "Start the strip",
+            "Test with scrubber",
+            "Scratch a sample",
+            "Stop and refer"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "A floor that cannot be ruled out as asbestos-containing is presumed, so the job stops and is referred. Looking at a floor cannot tell you."
+        },
+        {
+          "questionText": "What must not happen to stripping solution?",
+          "options": [
+            "Soaking for dwell",
+            "Recovery by vacuum",
+            "Fresh water rinse",
+            "Drying on floor"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "One maker's guide says not to allow stripping solution to dry on the floor. Dry residue is harder to remove and spoils the recoat."
+        },
+        {
+          "questionText": "Which sheets set the method on a strip job?",
+          "options": [
+            "A pack chart sheet",
+            "Last year quote sheet",
+            "A forum thread post",
+            "The three makers' sheets"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "The floor, finish and stripper makers can each limit the method. The approved setup record names all three."
+        },
+        {
+          "questionText": "What follows the strip and rinse?",
+          "options": [
+            "An instant fresh coat",
+            "Full drying, then check",
+            "A second wax coat",
+            "A new pad swap"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "The floor must be rinsed, the rinse water removed and the floor fully dry. Verify residue removal by the finish maker's method before any coat."
+        },
+        {
+          "questionText": "Where does strip wastewater go?",
+          "options": [
+            "The nearest street gutter",
+            "An approved waste route",
+            "The public stormwater drain",
+            "The back garden bed"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Only clean rainwater goes to the stormwater drain. Confirm the site or council route before the first mix."
+        },
+        {
+          "questionText": "What does ATFA advise about steam on timber?",
+          "options": [
+            "Assume it is safe",
+            "Use it every week",
+            "Use it sparingly always",
+            "Assume it is unsafe"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "ATFA says that unless the floor or finish maker says it is OK, it is safest to assume steam cleaning is not appropriate on timber."
+        },
+        {
+          "questionText": "How wet should a timber mop be?",
+          "options": [
+            "Left dripping wet",
+            "Wrung until moist",
+            "Soaked in cleaner",
+            "Flooded then left"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "ATFA advises that the mop is wrung out until it is moist before mopping. Standing water is a hazard to boards and coating."
+        },
+        {
+          "questionText": "A grey patch has worn through the coating. What next?",
+          "options": [
+            "Refer to finisher",
+            "Mop it harder",
+            "Wax over it",
+            "Steam it clean"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Cleaning cannot restore worn coating. Photograph the patch with a scale, record it and refer it to a timber floor finisher."
+        },
+        {
+          "questionText": "Which cleaner does ATFA name for damp mopping?",
+          "options": [
+            "A strong detergent",
+            "An abrasive powder",
+            "Any bleach mix",
+            "A neutral cleaner"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "ATFA advises a neutral pH wood floor cleaner or the product the finish maker recommends, and says to avoid harsh detergents and abrasives."
+        },
+        {
+          "questionText": "150 m2 at 10 m2 per litre needs how much mix?",
+          "options": [
+            "1.5 L",
+            "150 L",
+            "15 L",
+            "1 L"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "150 divided by 10 is 15 L. The coverage figure is an illustration, so always use the label of the product on site."
+        }
+      ]
+    },
+    {
+      "quizId": "9a68c7d4-6727-51a1-a9b3-d0ea50d4ea48",
+      "lessonTitle": "Final exam",
+      "title": "CARSI Hard Floor Care — Final exam",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "An old floor cannot be ruled out as asbestos-containing. What do you do?",
+          "options": [
+            "Start the clean",
+            "Dry sand it",
+            "Sweep it up",
+            "Stop and refer"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "A floor that cannot be ruled out is presumed to contain asbestos. The job stops and is referred, and no work method is taught or used."
+        },
+        {
+          "questionText": "Who decides a floor is asbestos-free?",
+          "options": [
+            "A quick visual look",
+            "An old site guess",
+            "A written test result",
+            "A coworker's firm hunch"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "A person cannot tell by looking. Only a written result from a competent person rules a floor out; otherwise it is presumed."
+        },
+        {
+          "questionText": "Where do you find a product's hazards and first aid?",
+          "options": [
+            "The supplier invoice total",
+            "The pad box label",
+            "The safety data sheet",
+            "The trade price brochure"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "The safety data sheet lists hazards, protective equipment and first aid. Keep a copy available at the workplace for the products you use."
+        },
+        {
+          "questionText": "Why is no universal pH band taught?",
+          "options": [
+            "One band suits all floors",
+            "Makers' limits differ by floor",
+            "Labels never state a pH",
+            "Only stone has any limits"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Limits come from the floor maker, the finish maker and the product label. A single band would be unsafe for some floors."
+        },
+        {
+          "questionText": "What is the approved setup record for?",
+          "options": [
+            "Billing the client later",
+            "Storing last year's quotes",
+            "Listing staff holiday dates",
+            "Recording limits before work"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "The record names the floor, coating, product, dilution, dwell, tool and limits from the makers before the work starts."
+        },
+        {
+          "questionText": "Limits cannot be established. What next?",
+          "options": [
+            "Stop and get advice",
+            "Guess a safe setting",
+            "Copy last job's settings",
+            "Use the pack chart"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "If a limit cannot be established from the makers' sheets, stop and obtain technical advice. A guess or a copied setting is not an approval."
+        },
+        {
+          "questionText": "What is checked on a machine before use?",
+          "options": [
+            "Colour and brand name",
+            "Length and cable weight",
+            "Damage and RCD test",
+            "Price and unit age"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "The pre-start check covers leads, plug, RCD, guards and the pad or brush. A damaged lead or a failed RCD means the machine does not run."
+        },
+        {
+          "questionText": "Which supply does a machine in Australia usually use?",
+          "options": [
+            "24 V and 15 A",
+            "415 V and 5 A",
+            "12 V and 30 A",
+            "230 V and 10 A"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Australian general power outlets are 230 V and 10 A, so a machine and its leads must suit that circuit."
+        },
+        {
+          "questionText": "Grout is loose at several test points. What next?",
+          "options": [
+            "Raise the pressure",
+            "Add a pre-spray",
+            "Quote a repair",
+            "Skip the test"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Loose or crumbling grout means the floor cannot take a restorative clean. Quote a repair or re-grout and use no pressure."
+        },
+        {
+          "questionText": "Which stone is sensitive to acidic products?",
+          "options": [
+            "Glazed porcelain tile",
+            "Sheet vinyl floor",
+            "Sealed concrete slab",
+            "Marble and limestone"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Calcium-based stones such as marble and limestone are etched by acidic products, and etching is permanent."
+        },
+        {
+          "questionText": "What must stripping solution never do on the floor?",
+          "options": [
+            "Soak for the dwell",
+            "Dry on the floor",
+            "Touch the scrub pad",
+            "Reach the vacuum tool"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "One maker's guide says not to allow stripping solution to dry on the floor. Dried residue is harder to remove and spoils the recoat."
+        },
+        {
+          "questionText": "A steam mop is offered for a timber floor. What is safest?",
+          "options": [
+            "Assume it is unsafe",
+            "Assume it suits all",
+            "Use it every week",
+            "Use it each visit"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "ATFA advises that unless the floor or finish maker says it is OK, it is safest to assume steam cleaning is not appropriate on timber."
+        },
+        {
+          "questionText": "A grey patch has worn through the coating. What next?",
+          "options": [
+            "Mop it harder",
+            "Refer to finisher",
+            "Wax over it",
+            "Steam it dry"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Cleaning cannot restore worn coating. Photograph the patch with a scale, record it and refer it to a timber floor finisher."
+        },
+        {
+          "questionText": "120 m2 at A$14 per m2 gives what before GST?",
+          "options": [
+            "A$1,512 before GST",
+            "A$1,848 before GST",
+            "A$840 before GST",
+            "A$1,680 before GST"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "120 times 14 is 1,680. Adding 10% GST gives 1,848. The rate is an illustrative example, not a market rate."
+        },
+        {
+          "questionText": "A$1,680 plus 10% GST totals what?",
+          "options": [
+            "A$1,680 with GST",
+            "A$1,764 with GST",
+            "A$1,848 with GST",
+            "A$168 with GST"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "10% of 1,680 is 168, so the total is 1,848. Confirm the GST rate that applies in your country."
+        },
+        {
+          "questionText": "What goes on the handover page?",
+          "options": [
+            "Staff pay rate list",
+            "Photos and care sheet",
+            "Supplier discount terms sheet",
+            "Competitor price list copy"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "The handover page holds the floor, setup lines, photos, the maker's return-to-use time, the care sheet and the next service date."
+        },
+        {
+          "questionText": "Where does tile cleaning wastewater go?",
+          "options": [
+            "The stormwater drain",
+            "The street gutter",
+            "Approved waste route",
+            "A garden bed"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "NSW EPA guidance states that nothing other than clean rainwater should enter the stormwater drain. Use the approved site or council route."
+        },
+        {
+          "questionText": "What does an AS 4586 class describe?",
+          "options": [
+            "Grout colour rating bands",
+            "Wet pendulum slip classes",
+            "Pad wear rating bands",
+            "Stone hardness rating bands"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "The standard gives wet pendulum slip classes P0 to P5 for new pedestrian surfaces. A later coating can change how the floor grips."
+        },
+        {
+          "questionText": "Who records Met or Not yet on the practical day?",
+          "options": [
+            "A trained assessor",
+            "The learner alone",
+            "Any site visitor",
+            "A supplier rep"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "An assessor watches each task and records Met or Not yet against the criteria. Critical criteria must all be met."
+        },
+        {
+          "questionText": "Which unit does this course use for area?",
+          "options": [
+            "Square feet",
+            "Square metres",
+            "Square yards",
+            "Square inches"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "The course uses metric units first, so areas are in square metres. Machine power uses 230 V and 10 A."
+        }
+      ]
+    }
+  ]
+}

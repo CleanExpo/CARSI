@@ -1,0 +1,33 @@
+# Tile, stone and grout job sheet
+
+CARSI Hard Floor Care. DRAFT v1 for SME review.
+
+## Floor and approved setup
+
+- Tile or stone type: ______________  Calcium-based stone? Y / N / unknown (unknown = treat as acid-sensitive)
+- Coating on the surface (scratch, water drop, hidden spot): ______________
+- Product, dilution, dwell: ______________ (from the label and SDS)
+- Tool, pad or brush, and the pressure or temperature limits from the makers: ______________
+- If any limit cannot be established: STOP and obtain technical advice.
+
+## Tap-and-scratch grid (about one point per m2)
+
+| Point | Tap (sound) | Scratch (grout) | Pass / Stop |
+| --- | --- | --- | --- |
+| 1 | | | |
+| 2 | | | |
+| 3 | | | |
+| 4 | | | |
+| 5 | | | |
+
+Any loose, crumbling or hollow result: STOP. Quote a repair or re-grout. No pressure.
+
+## Job record
+
+- Dry soil removed? Edges protected? Y / N
+- Pre-spray and dwell (label): ______________
+- Re-treatment lines after raking-light check: ______________
+- Floor fully dry before sealing? Y / N
+- Wastewater route (never the stormwater drain): ______________
+- Slip class before: ______  Coating applied? Y / N  Test after: ______
+- Before and after photos taken? Y / N

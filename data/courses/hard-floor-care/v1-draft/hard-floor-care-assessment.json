@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "courseSlug": "hard-floor-care",
+  "status": "draft",
+  "note": "DRAFT v1 practical task for the Hard Floor Care supervised practical day. Instructor-graded against the rubric. Original CARSI task for Australian and New Zealand conditions; no IICRC standard text reproduced. Criteria marked (critical) must all be met. SME review and sign-off required before it is published.",
+  "assessment": {
+    "id": "7671f3ba-b5bb-5c9e-a59e-611f5fa3afff",
+    "title": "Hard Floor Care — Practical task: supervised practical day",
+    "passThreshold": 80,
+    "isPublished": false,
+    "instructions": "## Practical task\n\nWork through the supervised practical day. An assessor watches each task and records Met or Not yet. Work only on the supplied sample panels and boards, which the assessor has documented. No task on the day involves suspected asbestos-containing material: where a scenario suggests it, the correct performance is to stop and refer.\n\n**State whether your own jobs are in Australia or New Zealand, and apply that country's dates and rules.**\n\nTasks, in order:\n\n1. Complete the pre-job check and stop sheet for the day's scenario, including the asbestos questions, and make the stop-and-refer decision for the floor laid before the ban.\n2. Find the hazards, protective equipment and first aid steps on a real SDS.\n3. Identify the sample boards and panels and record the floor, the surface layer and your confidence. Flag the calcium-based stone and any floor whose maker's sheet restricts method.\n4. Mix products at the label dilution, record what you used, and match the products to floors with no unsafe match.\n5. Complete the approved setup record for each task before starting it, and stop when limits cannot be established.\n6. Run the pre-start check on the machines, including leads, RCD and guards.\n7. Tap-test and scratch-test grout before any pressure, then clean a grouted test panel, with the product and tool settings recorded in the approved setup.\n8. On the supplied documented panel, follow the maker's instructions for coating removal: keep the product wet for the dwell the maker states, recover it, rinse, and verify residue removal by the maker's method before coating.\n9. Identify a timber coating, clean it with a damp, well-wrung pad and the coating maker's cleaner, and write the referral note for a worn traffic lane.\n10. Price a 120 m² floor both ways (full strip and recoat, and scrub and recoat), with GST, and write the handover steps.\n\nSigns, barriers and protective equipment must be in place for the whole day.\n\nSubmit the completed pre-job sheet, approved setup records, job record and handover page, with the assessor's sign-off record.",
+    "criteria": [
+      {
+        "label": "Pre-job check and asbestos stop-and-refer (critical)",
+        "description": "Completes the pre-job check; applies the Australian and New Zealand dates; decides to stop and refer when asbestos cannot be ruled out; gives no work method for it; records who was told.",
+        "maxPoints": 15
+      },
+      {
+        "label": "SDS reading and floor identification (critical for flagged floors)",
+        "description": "Finds hazards, protective equipment and first aid on a real SDS; identifies sample floors and their surface layers; correctly flags the calcium-based stone and any floor whose maker restricts method.",
+        "maxPoints": 15
+      },
+      {
+        "label": "Chemistry by compatibility (critical)",
+        "description": "Mixes at the label dilution; records the product and dilution; matches products to floors with no unsafe match; never mixes two products; does not use a universal pH band as proof of safety.",
+        "maxPoints": 15
+      },
+      {
+        "label": "Approved setup record and machine pre-start check (critical)",
+        "description": "Completes the approved setup record before work (floor, coating, product, dilution, dwell, pad or brush, speed and pressure limits from the maker, recovery, drying); stops when limits cannot be established; completes the pre-start check including leads, RCD and guards.",
+        "maxPoints": 15
+      },
+      {
+        "label": "Tile and grout (critical for the tap test)",
+        "description": "Tap-tests and scratch-tests grout before pressure; protects edges; pre-sprays, agitates and recovers per the recorded setup; checks the result in raking light; stops and quotes a re-grout when grout is loose.",
+        "maxPoints": 10
+      },
+      {
+        "label": "Coating removal and recoat (critical for residue verification)",
+        "description": "Follows the maker's dwell, keeps product from drying, recovers slurry, rinses, verifies residue removal by the maker's method before coating, and lays thin even coats with no puddles or missed edges. Disposes of wastewater to site or council rules.",
+        "maxPoints": 15
+      },
+      {
+        "label": "Timber, quote and handover",
+        "description": "Identifies the timber coating; cleans damp only; refers worn coating to a timber floor finisher; prices both ways with GST; completes a handover with photos, return-to-use times from the maker, a care sheet and the next service date.",
+        "maxPoints": 10
+      },
+      {
+        "label": "Site safety throughout (critical)",
+        "description": "Signs and barriers in place and personal protective equipment worn for the whole day; no unsafe power or slip hazard left unaddressed.",
+        "maxPoints": 5
+      }
+    ]
+  }
+}
