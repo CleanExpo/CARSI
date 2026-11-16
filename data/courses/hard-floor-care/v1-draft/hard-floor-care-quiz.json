@@ -584,11 +584,11 @@
             "Strip it hard",
             "Seal over it",
             "Wax over it",
-            "Test then record"
+            "Test if allowed, record"
           ],
           "correctIndex": 3,
           "points": 1,
-          "explanation": "Scratch a hidden area, put a water drop on it and make a hidden-spot test with the intended product. If it stays unknown, obtain advice."
+          "explanation": "Scratch a hidden area and put a water drop on it. Make a hidden-spot test with the intended product only as the maker allows. If the coating stays unknown or no approved test method is available, stop and obtain technical advice."
         },
         {
           "questionText": "Etched patches appear on a stone floor. What now?",

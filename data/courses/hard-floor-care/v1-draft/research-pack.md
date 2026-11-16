@@ -64,7 +64,7 @@ Validate with `node scripts/audit/validate-ledger.mjs data/courses/hard-floor-ca
 
 ## Open GAPs
 
-23 GAP entries are listed with their reasons in `docs/sign-off/hard-floor-care-practitioner-sme-checklist.md`, together with the open decisions. Held pack questions are listed there too.
+25 GAP entries are listed with their reasons in `docs/sign-off/hard-floor-care-practitioner-sme-checklist.md`, together with the open decisions. Held pack questions are listed there too.
 
 ## Tool notes
 

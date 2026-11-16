@@ -20,7 +20,8 @@ Person told: ______________  Date and time: ______________
 
 - SDS on site for every product? Y / N
 - Hazards, protective equipment, first aid, mixing and surface warnings read? Y / N
-- Poisons Information Centre 13 11 26. Emergency 000.
+- Australia: Poisons Information Centre 13 11 26. Emergency 000.
+- New Zealand: National Poisons Centre 0800 764 766. Emergency 111.
 
 ## 3. Controls and protective equipment
 

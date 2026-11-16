@@ -20,6 +20,8 @@ CARSI Hard Floor Care. DRAFT v1 for SME review.
 | 4 | | | |
 | 5 | | | |
 
+More points than rows: attach numbered continuation sheets with the same columns. Number every point and mark its place on the floor plan.
+
 Any loose, crumbling or hollow result: STOP. Quote remedial work or a re-grout. No pressure.
 
 ## Job record

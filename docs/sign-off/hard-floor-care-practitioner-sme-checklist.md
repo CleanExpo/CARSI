@@ -1,8 +1,8 @@
 # SME claim checklist - CARSI Hard Floor Care (v1 DRAFT)
 
-**For:** the subject-matter expert (SME) reviewing this draft. **Ledger:** `data/courses/hard-floor-care/v1-draft/evidence/evidence-ledger.jsonl` with 127 claims: 64 VERIFIED, 40 JUSTIFIED, **23 GAP (listed below)**.
+**For:** the subject-matter expert (SME) reviewing this draft. **Ledger:** `data/courses/hard-floor-care/v1-draft/evidence/evidence-ledger.jsonl` with 129 claims: 65 VERIFIED, 39 JUSTIFIED, **25 GAP (listed below)**.
 
-Only the GAP claims and the open items below need an answer. VERIFIED and JUSTIFIED claims already carry a source or stated reasoning. Tick one box per claim:
+Only the GAP claims, the open items and the JUSTIFIED claims that name an SME check (all listed below) need an answer. VERIFIED claims carry a source, and the other JUSTIFIED claims carry stated reasoning. Tick one box per claim:
 
 - **OK**: the claim is correct as worded.
 - **Fix**: write the correct wording beside it.
@@ -44,13 +44,36 @@ Asbestos is held. The course teaches identify, presume, stop and refer, and it g
 
 - [ ] OK  [ ] Fix  [ ] Cut - **O12 Held pack wording on pH and soils**: The pack's wording about soil chemistry and pH, including its statement about grease, is not used. No universal pH band, pad colour, machine speed or pressure is taught as a rule.
 
-- [ ] OK  [ ] Fix  [ ] Cut - **O13 Slip claims**: The AS 4586 pendulum classes P0 to P5 rest on a secondary summary from a drainage supplier. The standard text was not read. Confirm against the standard.
+- [ ] OK  [ ] Fix  [ ] Cut - **O13 Slip claims**: The AS 4586 pendulum classes P0 to P5 rest on a secondary summary from a drainage supplier. The standard text was not read. Confirm against the standard (HFC-029 and HFC-081 are open GAP claims).
 
 - [ ] OK  [ ] Fix  [ ] Cut - **O14 Timber care sheet host**: The ATFA care sheet was read from a copy hosted by a paint company. Confirm it matches the current ATFA edition.
 
-- [ ] OK  [ ] Fix  [ ] Cut - **O15 GST rates**: 10 percent (Australia) and 15 percent (New Zealand) are stated from general knowledge; the ATO and Inland Revenue pages were not opened. Confirm before publication.
+- [ ] OK  [ ] Fix  [ ] Cut - **O15 GST rates**: 10 percent (Australia) and 15 percent (New Zealand) were checked on the ATO and Inland Revenue pages on 16/11/2026 (HFC-115). Confirm they are still current at publication.
 
 - [ ] OK  [ ] Fix  [ ] Cut - **O16 Records retention**: No retention period is stated. HFC-126 is open.
+
+## JUSTIFIED claims that name an SME check
+
+- [ ] OK  [ ] Fix  [ ] Cut - **HFC-004** - The three floor families (tile and stone, resilient, timber) are a CARSI teaching grouping, not a regulatory or standards classification.
+    - _Why it needs the SME:_ A teaching device chosen to sort the failure modes the course covers. No regulator or standard defines these three families, and the lesson says so. Best available source: CARSI course design decision; SME to confirm the grouping is useful.
+
+- [ ] OK  [ ] Fix  [ ] Cut - **HFC-040** - If a stone cannot be identified, treat it as acid-sensitive and use only products the maker states are safe for stone until advice is obtained.
+    - _Why it needs the SME:_ Conservative default that follows from the etching rule: a wrong guess on calcium-based stone is permanent. The pack's drop-of-acid test was not used because it is itself a risk and is unsourced. Best available source: Stone supplier care guide; SME to confirm.
+
+- [ ] OK  [ ] Fix  [ ] Cut - **HFC-056** - Pre-start checks for every machine: leads and plugs undamaged, RCD in use, pad or brush matches the approved setup, tank clean and filled with the right mix, signs out.
+    - _Why it needs the SME:_ Consistent with AS/NZS 3760 inspection practice and the pre-job controls already sourced; the exact check list is a CARSI field tool and is flagged for the practitioner SME to confirm. Best available source: AS/NZS 3760 (by number); SafeWork NSW electrical inspection and testing page.
+
+- [ ] OK  [ ] Fix  [ ] Cut - **HFC-073** - Tap-testing and scratch-testing grout before any pressure, and stopping and quoting a re-grout when grout is loose, crumbling or drummy, is a safe stop rule.
+    - _Why it needs the SME:_ From the review pack's tile and grout procedure. The stop rule is conservative and low risk: the worst case is an unnecessary quote. No source was opened that states how grout fails under a water jet, so the reason is left as a caution, not a measurement. Best available source: Review pack SOP; practitioner SME to confirm.
+
+- [ ] OK  [ ] Fix  [ ] Cut - **HFC-074** - Protect skirting, carpet edges and cabinetry before wet work, and check the result in raking light before leaving.
+    - _Why it needs the SME:_ Ordinary workmanship from the review pack; no regulator or maker source was needed or opened. Best available source: Review pack SOP; practitioner SME to confirm.
+
+- [ ] OK  [ ] Fix  [ ] Cut - **HFC-116** - A residential program and a commercial program differ by access hours, traffic, records and who signs; a program is a scheduled series of visits, not one visit.
+    - _Why it needs the SME:_ From the review pack. It is a course design statement, not a legal or technical claim. Best available source: Review pack SOP; practitioner SME to confirm.
+
+- [ ] OK  [ ] Fix  [ ] Cut - **HFC-123** - A handover pack holds before and after photos, the approved setup record, the return-to-use time from the finish maker, the care sheet and the next service date.
+    - _Why it needs the SME:_ From the review pack. It is a record-keeping convention, not a legal requirement. The return-to-use time is taken from the maker, not invented. Best available source: Review pack SOP; practitioner SME to confirm.
 
 ## Open GAP claims
 
@@ -69,6 +92,9 @@ Asbestos is held. The course teaches identify, presume, stop and refer, and it g
 
 - [ ] OK  [ ] Fix  [ ] Cut - **HFC-007** - Definitions of glazed ceramic, porcelain, quarry tile, terracotta, VCT, LVT and linoleum as used in the lesson table.
     - _Why it is open:_ Product-class descriptions were taken from the review pack, not from a manufacturer or Australian trade source opened this session. The lesson keeps them to one plain line each. (suggested action: substantiate)
+
+- [ ] OK  [ ] Fix  [ ] Cut - **HFC-029** - Slip resistance classification of new pedestrian surface materials is the title of AS 4586; its wet pendulum test gives P0 to P5 classes with P5 the highest slip resistance.
+    - _Why it is open:_ The only source opened was a secondary summary from a drainage supplier. The standard text was not read, so the class names and their order are not confirmed. Standards wording stays open until a qualified person checks it against the standard. (suggested action: substantiate)
 
 ### Module 2: Chemistry: soil, surface, label and SDS
 
@@ -103,6 +129,9 @@ Asbestos is held. The course teaches identify, presume, stop and refer, and it g
 
 - [ ] OK  [ ] Fix  [ ] Cut - **HFC-088** - That a stripper that softens grout or glaze is a stop condition and the sequence of rinse, check and drying before sealing.
     - _Why it is open:_ From the pack. The stop condition is sensible and low risk but unsourced. The dry-before-sealing principle is supported only by the vinyl maker's rinse and dry advice. (suggested action: substantiate)
+
+- [ ] OK  [ ] Fix  [ ] Cut - **HFC-081** - Slip resistance classification of new pedestrian surface materials is the title of AS 4586; its wet pendulum classification runs P0 to P5 with P5 the highest.
+    - _Why it is open:_ The only source opened was a secondary summary from a drainage supplier. The standard text was not read, so the class names and their order are not confirmed. Standards wording stays open until a qualified person checks it against the standard. (suggested action: substantiate)
 
 ### Module 4: Tile and grout restorative clean
 
