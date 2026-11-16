@@ -36,9 +36,9 @@ No standard or manual text was read or entered into any AI tool. Standards are r
 
 | Status | Entries | Meaning |
 | --- | ---: | --- |
-| VERIFIED | 65 | A primary or named source was opened on 16/11/2026 and supports the claim (quote of 25 words or fewer). |
-| JUSTIFIED | 39 | CARSI arithmetic, a labelled illustrative figure, or a course policy with stated reasoning and the best available source. |
-| GAP | 25 | Not yet verifiable here. **Every GAP blocks go-live.** |
+| VERIFIED | 44 | A primary or named source was opened on 16/11/2026 and supports the claim (quote of 25 words or fewer). |
+| JUSTIFIED | 38 | CARSI arithmetic, a labelled illustrative figure, or a course policy with stated reasoning and the best available source. |
+| GAP | 26 | Not yet verifiable here. **Every GAP blocks go-live.** |
 
 Validate with `node scripts/audit/validate-ledger.mjs data/courses/hard-floor-care/v1-draft/evidence/evidence-ledger.jsonl` (exit 0).
 
@@ -46,29 +46,29 @@ Validate with `node scripts/audit/validate-ledger.mjs data/courses/hard-floor-ca
 
 | Source | Verified claims |
 | --- | ---: |
-| [Australian stone supplier guide, How to clean natural stone without damaging it](https://www.tnstone.com.au/resources/how-to-clean-natural-stone/) | 7 |
-| [Australasian Timber Flooring Association, Floor care and maintenance (2016, hosted by Resene)](https://www.resene.com/archspec/datasheets/ProSelect-tech-info/pdf/ATFA-Floor-Care-and-maintenance.pdf) | 13 |
-| [Godfrey Hirst, Maintenance Recommendations for Commercial Sheet Vinyl, Australia / New Zealand (August 2022)](https://res.cloudinary.com/gh/image/upload/v1/products/488344/docs/care-and-maintenance/guide.pdf) | 20 |
+| [Australian stone supplier guide, How to clean natural stone without damaging it](https://www.tnstone.com.au/resources/how-to-clean-natural-stone/) | 4 |
+| [Australasian Timber Flooring Association, Floor care and maintenance (2016, hosted by Resene)](https://www.resene.com/archspec/datasheets/ProSelect-tech-info/pdf/ATFA-Floor-Care-and-maintenance.pdf) | 8 |
+| [Godfrey Hirst, Maintenance Recommendations for Commercial Sheet Vinyl, Australia / New Zealand (August 2022)](https://res.cloudinary.com/gh/image/upload/v1/products/488344/docs/care-and-maintenance/guide.pdf) | 12 |
 | [NSW Government, When was asbestos banned in Australia?](https://www.asbestos.nsw.gov.au/safety/safety-in-the-home/when-was-asbestos-banned-in-australia) | 2 |
 | [WorkSafe New Zealand, Asbestos in Aotearoa New Zealand](https://www.worksafe.govt.nz/topic-and-industry/asbestos/asbestos-information-for-homeowners/asbestos-in-aotearoa-new-zealand/) | 4 |
 | [Safe Work Australia, Model Code of Practice: How to manage and control asbestos in the workplace](https://www.safeworkaustralia.gov.au/system/files/documents/1705/mcop-how-to-manage-and-control-asbestos-in-the-workplace-v1.pdf) | 3 |
 | [Safe Work Australia, Duties of a PCBU](https://www.safeworkaustralia.gov.au/law-and-regulation/duties-under-whs-laws/duties-pcbu) | 1 |
 | [New Zealand Legislation, Health and Safety at Work Act 2015, section 36](https://www.legislation.govt.nz/act/public/2015/0070/latest/DLM5976895.html) | 1 |
 | [Safe Work Australia, Manage the risks](https://www.safeworkaustralia.gov.au/duties-tool/construction/pcbu/manage-risks) | 1 |
-| [Safe Work Australia, Safety data sheets](https://www.safeworkaustralia.gov.au/safety-topic/hazards/chemicals/safety-data-sheets) | 2 |
+| [Safe Work Australia, Safety data sheets](https://www.safeworkaustralia.gov.au/safety-topic/hazards/chemicals/safety-data-sheets) | 1 |
 | [Safe Work Australia, Slips, trips and falls](https://www.safeworkaustralia.gov.au/safety-topic/hazards/slips-trips-and-falls) | 1 |
 | [NSW Poisons Information Centre, About](https://www.poisonsinfo.nsw.gov.au/about) | 1 |
-| [SafeWork NSW, Electrical inspection and testing](https://www.safework.nsw.gov.au/hazards-a-z/electrical-and-power/electrical-inspection-and-testing) | 2 |
+| [SafeWork NSW, Electrical inspection and testing](https://www.safework.nsw.gov.au/hazards-a-z/electrical-and-power/electrical-inspection-and-testing) | 0 (opened; AS/NZS 3760 named without an edition, so HFC-028 is a GAP) |
 | [ACO Drain, Understanding slip resistance (secondary summary of AS 4586)](https://acodrain.com.au/understanding-slip-resistance/) | 0 (opened; both claims held as GAP) |
 | [Inland Revenue New Zealand, GST](https://www.ird.govt.nz/gst) | 1 |
 | [ATO, How GST works](https://www.ato.gov.au/businesses-and-organisations/gst-excise-and-indirect-taxes/gst/how-gst-works) | (same claim as the Inland Revenue row) |
 | [National Poisons Centre New Zealand, Contact](https://poisons.co.nz/contact/) | 1 |
 | [New Zealand Police, 111 Emergency Services](https://www.police.govt.nz/call-111) | 1 |
-| [NSW EPA, Guidance for stormwater management: the drain is just for rain](https://www.epa.nsw.gov.au/Your-environment/Water/The-drain-is-just-for-rain) | 4 |
+| [NSW EPA, Guidance for stormwater management: the drain is just for rain](https://www.epa.nsw.gov.au/Your-environment/Water/The-drain-is-just-for-rain) | 2 |
 
 ## Open GAPs
 
-25 GAP entries are listed with their reasons in `docs/sign-off/hard-floor-care-practitioner-sme-checklist.md`, together with the open decisions. Held pack questions are listed there too.
+26 GAP entries are listed with their reasons in `docs/sign-off/hard-floor-care-practitioner-sme-checklist.md`, together with the open decisions. Held pack questions are listed there too.
 
 ## Tool notes
 

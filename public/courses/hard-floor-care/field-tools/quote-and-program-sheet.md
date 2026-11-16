@@ -2,21 +2,20 @@
 
 CARSI Hard Floor Care. DRAFT v1 for SME review.
 
+All stop rules on the Pre-job check and stop sheet (S1 to S19) apply before and during this job. If one applies, stop.
+
 ## Quote (price both ways)
 
 - Site, area in m2, and country (Australia or New Zealand): ______________
-- Floor identified and asbestos gate result: ______________ (if not ruled out in writing: stop and refer)
+- Floor identified and asbestos gate result: ______________ (rule S1)
 - GST rate for the country (confirm locally): ______
 - Option A: strip and recoat. Rate per m2 from your own costs: ______ Price before GST: ______  GST: ______  Total: ______
 - Option B: scrub and recoat. Rate per m2 from your own costs: ______ Price before GST: ______  GST: ______  Total: ______
 - Timed test panel result (minutes per m2): ______
 
-## Conditions and stops written into the quote
+## Stop rules written into the quote
 
-- Assumes a documented asbestos-free floor. If asbestos cannot be ruled out, work stops and is referred.
-- Loose or crumbling grout: stop and quote remedial work.
-- Unknown coating or etched stone: stop and obtain advice.
-- Limits that cannot be established from the makers' sheets: stop and obtain advice.
+Written into the quote as conditions (tick each): asbestos gate, rule S1 Y / N. Grout rule, S12 Y / N. Unknown-coating rule, S6 Y / N. Maker's limits rule, S7 Y / N.
 
 ## Program (commercial sites)
 
@@ -42,7 +41,7 @@ CARSI Hard Floor Care. DRAFT v1 for SME review.
 
 ## Practical day preparation
 
-- Work only on documented panels and boards. Suspected asbestos in a scenario: stop and refer.
+- Work only on documented panels and boards. The stop rules apply on the day, S1 included.
 - Bring: label and SDS for each product, the approved setup record template, personal protective equipment.
 
 More items, options or tasks than fields: attach numbered continuation sheets with the same fields, one section per option or task.

@@ -1,6 +1,6 @@
 # SME claim checklist - CARSI Hard Floor Care (v1 DRAFT)
 
-**For:** the subject-matter expert (SME) reviewing this draft. **Ledger:** `data/courses/hard-floor-care/v1-draft/evidence/evidence-ledger.jsonl` with 129 claims: 65 VERIFIED, 39 JUSTIFIED, **25 GAP (listed below)**.
+**For:** the subject-matter expert (SME) reviewing this draft. **Ledger:** `data/courses/hard-floor-care/v1-draft/evidence/evidence-ledger.jsonl` with 108 claims: 44 VERIFIED, 38 JUSTIFIED, **26 GAP (listed below)**.
 
 Only the GAP claims, the open items and the JUSTIFIED claims that name an SME check (all listed below) need an answer. VERIFIED claims carry a source, and the other JUSTIFIED claims carry stated reasoning. Tick one box per claim:
 
@@ -44,7 +44,7 @@ Asbestos is held. The course teaches identify, presume, stop and refer, and it g
 
 - [ ] OK  [ ] Fix  [ ] Cut - **O12 Held pack wording on pH and soils**: The pack's wording about soil chemistry and pH, including its statement about grease, is not used. No universal pH band, pad colour, machine speed or pressure is taught as a rule.
 
-- [ ] OK  [ ] Fix  [ ] Cut - **O13 Slip claims**: The AS 4586 pendulum classes P0 to P5 rest on a secondary summary from a drainage supplier. The standard text was not read. Confirm against the standard (HFC-029 and HFC-081 are open GAP claims; HFC-030 and HFC-083 rest on the standard's title only).
+- [ ] OK  [ ] Fix  [ ] Cut - **O13 Slip claims**: The AS 4586 pendulum classes P0 to P5 rest on a secondary summary from a drainage supplier. The standard text was not read. Confirm against the standard (HFC-029 and HFC-030 are open GAP claims; HFC-083 rests on the standard's title only).
 
 - [ ] OK  [ ] Fix  [ ] Cut - **O14 Timber care sheet host**: The ATFA care sheet was read from a copy hosted by a paint company. Confirm it matches the current ATFA edition.
 
@@ -55,6 +55,10 @@ Asbestos is held. The course teaches identify, presume, stop and refer, and it g
 - [ ] OK  [ ] Fix  [ ] Cut - **O17 Critical-criterion rule (GP-729)**: The platform grades from the total percentage only, so a learner can pass with a failed critical criterion. Do not seed this course until the critical-criterion rule is decided (GP-729). Until then the assessor applies the rule by hand.
 
 - [ ] OK  [ ] Fix  [ ] Cut - **O18 Power example figure**: The worked examples use a 10 A outlet at 230 V as an example figure and say the circuit's own rating is confirmed on site. No regulator page for the outlet rating was opened (HFC-031). Confirm the wording.
+
+- [ ] OK  [ ] Fix  [ ] Cut - **O19 Standard editions**: AS/NZS 3760 (HFC-028) and AS 4586 (HFC-029, HFC-030) are named by the sources that were opened without an edition, so each is a GAP. Confirm the edition in force and what each covers against the licensed copy. The lessons give no test interval and no class limit.
+
+- [ ] OK  [ ] Fix  [ ] Cut - **O20 Stop rules**: The Pre-job check and stop sheet (section 6) is the one list of the 19 stop rules the lessons teach, S1 to S19, and every other field tool points back to it. Confirm the list is complete and each rule is worded as you want it taught.
 
 ## JUSTIFIED claims that name an SME check
 
@@ -81,6 +85,12 @@ Asbestos is held. The course teaches identify, presume, stop and refer, and it g
 
 ## Open GAP claims
 
+### Module 1: Three floor families and the surface layer
+
+- [ ] OK  [ ] Fix  [ ] Cut - **HFC-007** - Definitions of glazed ceramic, porcelain, quarry tile, terracotta, VCT, LVT and linoleum as used in the lesson table.
+    - _Why it is open:_ Product-class descriptions were taken from the review pack, not from a manufacturer or Australian trade source opened this session. The lesson keeps them to one plain line each. (suggested action: substantiate)
+
+
 ### Module 1: Asbestos: identify, presume, stop and refer
 
 - [ ] OK  [ ] Fix  [ ] Cut - **HFC-018** - Which Australian state or territory rules apply to assessment, sampling, registers and licensing for floor coverings, and the licence class or area limits for removal.
@@ -92,31 +102,30 @@ Asbestos is held. The course teaches identify, presume, stop and refer, and it g
 - [ ] OK  [ ] Fix  [ ] Cut - **HFC-020** - The percentage of asbestos in vinyl floor tiles.
     - _Why it is open:_ The pack gives a range. No primary source for the figure was opened, and a learner cannot judge content by eye, so the lesson omits it. (suggested action: remove)
 
-### Module 1: Three floor families and the surface layer
 
-- [ ] OK  [ ] Fix  [ ] Cut - **HFC-007** - Definitions of glazed ceramic, porcelain, quarry tile, terracotta, VCT, LVT and linoleum as used in the lesson table.
-    - _Why it is open:_ Product-class descriptions were taken from the review pack, not from a manufacturer or Australian trade source opened this session. The lesson keeps them to one plain line each. (suggested action: substantiate)
+### Module 1: SDS, protective equipment, slip risk and power
+
+- [ ] OK  [ ] Fix  [ ] Cut - **HFC-028** - AS/NZS 3760 covers in-service safety inspection and testing of electrical equipment and RCDs, including tagging methods.
+    - _Why it is open:_ The opened SafeWork NSW page (Electrical inspection and testing) names AS/NZS 3760 without an edition, and the licensed standard text is not available here. An unversioned citation is a GAP until the licence holder confirms the edition in force and what it covers. (suggested action: substantiate)
 
 - [ ] OK  [ ] Fix  [ ] Cut - **HFC-029** - Slip resistance classification of new pedestrian surface materials is the title of AS 4586; its wet pendulum test gives P0 to P5 classes with P5 the highest slip resistance.
     - _Why it is open:_ The only source opened was a secondary summary from a drainage supplier. The standard text was not read, so the class names and their order are not confirmed. Standards wording stays open until a qualified person checks it against the standard. (suggested action: substantiate)
 
-### Module 2: Chemistry: soil, surface, label and SDS
+- [ ] OK  [ ] Fix  [ ] Cut - **HFC-030** - The AS 4586 class describes a new surface, so a coating applied on site can change how the floor grips and the published class may no longer apply.
+    - _Why it is open:_ The claim names AS 4586 without an edition, and the standard was not read (its title was seen only through a secondary summary). An unversioned citation is a GAP until the licence holder confirms the edition and the statement. (suggested action: substantiate)
 
-- [ ] OK  [ ] Fix  [ ] Cut - **HFC-052** - Why alkaline cleaners suit some soils and acidic cleaners suit scale, and how to explain stripper chemistry.
-    - _Why it is open:_ The pack's chemistry explanations (metal crosslinks, caustic or amine strippers, universal windows, grease and mineral pH) were not verified from a manufacturer or Australian source. The lesson does not teach them. The pack's statement about grease is held; see the SME checklist. (suggested action: substantiate)
 
 ### Module 2: The floor identification routine
 
 - [ ] OK  [ ] Fix  [ ] Cut - **HFC-043** - Visual and touch cues the lesson uses to separate tile, stone, resilient and timber floors, and how to recognise linoleum, polished vinyl tile and a factory finish.
     - _Why it is open:_ The cues come from the review pack's identification routine. No manufacturer or Australian trade source was opened for them, so the lesson presents them as starting points and tells the learner to confirm by record or maker. (suggested action: substantiate)
 
-### Module 3: The approved setup record
 
-- [ ] OK  [ ] Fix  [ ] Cut - **HFC-066** - Any universal pressure, temperature, pH band, pad colour or machine speed for hard floors, including the pack's pressure figure for the truck-mount hard-surface tool.
-    - _Why it is open:_ Held for a qualified reviewer. No pressure, temperature, pad or speed figure is taught as a rule. Only an attributed maker example (300 rpm or lower for one maker's sheet vinyl) appears, and it is not a rule for any other floor. (suggested action: remove)
+### Module 2: Chemistry: soil, surface, label and SDS
 
-- [ ] OK  [ ] Fix  [ ] Cut - **HFC-067** - Validated pressure, temperature, dwell, pad and speed values for the actual equipment and chemicals used on the practical day.
-    - _Why it is open:_ The technical reviewer must supply them with references, per the correction sheet. Until then the practical day records the maker's values for the actual products used. (suggested action: substantiate)
+- [ ] OK  [ ] Fix  [ ] Cut - **HFC-052** - Why alkaline cleaners suit some soils and acidic cleaners suit scale, and how to explain stripper chemistry.
+    - _Why it is open:_ The pack's chemistry explanations (metal crosslinks, caustic or amine strippers, universal windows, grease and mineral pH) were not verified from a manufacturer or Australian source. The lesson does not teach them. The pack's statement about grease is held; see the SME checklist. (suggested action: substantiate)
+
 
 ### Module 3: Which machine for which job, and the pre-start check
 
@@ -126,16 +135,15 @@ Asbestos is held. The course teaches identify, presume, stop and refer, and it g
 - [ ] OK  [ ] Fix  [ ] Cut - **HFC-059** - That a truck-mount operations course must be completed before running a hard-surface tool on a truck mount.
     - _Why it is open:_ A prerequisite taken from the review pack. The founder must decide whether it becomes a platform prerequisite and which course satisfies it. (suggested action: substantiate)
 
-### Module 4: Coatings on tile and stone, sealers and slip
 
-- [ ] OK  [ ] Fix  [ ] Cut - **HFC-087** - The method to remove a given coating (wax, acrylic sealer, linseed oil) from each tile or stone type, including solvent de-waxers, tile wax strippers, clinging foam strippers and honing for heavy build-up.
-    - _Why it is open:_ The pack lists methods by tile type. None was verified against a maker or Australian source, so the lesson teaches only the identify, test and record steps and says the method comes from the approved setup. Honing is held for referral. (suggested action: substantiate)
+### Module 3: The approved setup record
 
-- [ ] OK  [ ] Fix  [ ] Cut - **HFC-088** - That a stripper that softens grout or glaze is a stop condition and the sequence of rinse, check and drying before sealing.
-    - _Why it is open:_ From the pack. The stop condition is sensible and low risk but unsourced. The dry-before-sealing principle is supported only by the vinyl maker's rinse and dry advice. (suggested action: substantiate)
+- [ ] OK  [ ] Fix  [ ] Cut - **HFC-066** - Any universal pressure, temperature, pH band, pad colour or machine speed for hard floors, including the pack's pressure figure for the truck-mount hard-surface tool.
+    - _Why it is open:_ Held for a qualified reviewer. No pressure, temperature, pad or speed figure is taught as a rule. Only an attributed maker example (300 rpm or lower for one maker's sheet vinyl) appears, and it is not a rule for any other floor. (suggested action: remove)
 
-- [ ] OK  [ ] Fix  [ ] Cut - **HFC-081** - Slip resistance classification of new pedestrian surface materials is the title of AS 4586; its wet pendulum classification runs P0 to P5 with P5 the highest.
-    - _Why it is open:_ The only source opened was a secondary summary from a drainage supplier. The standard text was not read, so the class names and their order are not confirmed. Standards wording stays open until a qualified person checks it against the standard. (suggested action: substantiate)
+- [ ] OK  [ ] Fix  [ ] Cut - **HFC-067** - Validated pressure, temperature, dwell, pad and speed values for the actual equipment and chemicals used on the practical day.
+    - _Why it is open:_ The technical reviewer must supply them with references, per the correction sheet. Until then the practical day records the maker's values for the actual products used. (suggested action: substantiate)
+
 
 ### Module 4: Tile and grout restorative clean
 
@@ -145,13 +153,15 @@ Asbestos is held. The course teaches identify, presume, stop and refer, and it g
 - [ ] OK  [ ] Fix  [ ] Cut - **HFC-077** - Why high pressure damages loose grout, and any pressure value at which damage begins.
     - _Why it is open:_ No source was opened. The lesson does not state a mechanism or a figure; the stop rule rests on the tap test and the recorded setup. (suggested action: substantiate)
 
-### Module 5: Coated timber floors: damp-only care and referral
 
-- [ ] OK  [ ] Fix  [ ] Cut - **HFC-111** - When a timber floor needs a maintenance coat versus a full sand and recoat, and the floor-finisher's methods and wait times.
-    - _Why it is open:_ Outside the cleaner's scope. No source was opened. The lesson refers the decision to a timber floor finisher and the finish maker. (suggested action: remove)
+### Module 4: Coatings on tile and stone, sealers and slip
 
-- [ ] OK  [ ] Fix  [ ] Cut - **HFC-112** - A target pH for the timber cleaner (the pack's 'pH 7 to 8') and any sealer residue check.
-    - _Why it is open:_ The pack gave a universal band. It is held; the lesson says to use the cleaner the finish maker recommends and records it. (suggested action: substantiate)
+- [ ] OK  [ ] Fix  [ ] Cut - **HFC-087** - The method to remove a given coating (wax, acrylic sealer, linseed oil) from each tile or stone type, including solvent de-waxers, tile wax strippers, clinging foam strippers and honing for heavy build-up.
+    - _Why it is open:_ The pack lists methods by tile type. None was verified against a maker or Australian source, so the lesson teaches only the identify, test and record steps and says the method comes from the approved setup. Honing is held for referral. (suggested action: substantiate)
+
+- [ ] OK  [ ] Fix  [ ] Cut - **HFC-088** - That a stripper that softens grout or glaze is a stop condition and the sequence of rinse, check and drying before sealing.
+    - _Why it is open:_ From the pack. The stop condition is sensible and low risk but unsourced. The dry-before-sealing principle is supported only by the vinyl maker's rinse and dry advice. (suggested action: substantiate)
+
 
 ### Module 5: Resilient floors: strip, rinse, dry and recoat
 
@@ -164,13 +174,15 @@ Asbestos is held. The course teaches identify, presume, stop and refer, and it g
 - [ ] OK  [ ] Fix  [ ] Cut - **HFC-101** - Whether a given resilient floor (vinyl tile, sheet, linoleum, rubber) tolerates stripping, and which products it accepts.
     - _Why it is open:_ Varies by product and maker. Not generalised. The identification routine in Module 2 and the maker's sheet decide it. (suggested action: substantiate)
 
-### Module 6: Handover, records and the supervised practical day
 
-- [ ] OK  [ ] Fix  [ ] Cut - **HFC-126** - How long job records must be kept, and any record rule from a regulator or an insurer.
-    - _Why it is open:_ The pack gave a period. It was not verified. The lesson says to keep records as long as the client contract and the insurer require, and to check the period locally. (suggested action: substantiate)
+### Module 5: Coated timber floors: damp-only care and referral
 
-- [ ] OK  [ ] Fix  [ ] Cut - **HFC-127** - The equipment, product and sample values for the supervised practical day.
-    - _Why it is open:_ The pack gave a bill of materials. None was validated. The assessor must set the values on the day from the makers' sheets. (suggested action: substantiate)
+- [ ] OK  [ ] Fix  [ ] Cut - **HFC-111** - When a timber floor needs a maintenance coat versus a full sand and recoat, and the floor-finisher's methods and wait times.
+    - _Why it is open:_ Outside the cleaner's scope. No source was opened. The lesson refers the decision to a timber floor finisher and the finish maker. (suggested action: remove)
+
+- [ ] OK  [ ] Fix  [ ] Cut - **HFC-112** - A target pH for the timber cleaner (the pack's 'pH 7 to 8') and any sealer residue check.
+    - _Why it is open:_ The pack gave a universal band. It is held; the lesson says to use the cleaner the finish maker recommends and records it. (suggested action: substantiate)
+
 
 ### Module 6: Quoting: residential and commercial programs
 
@@ -179,3 +191,12 @@ Asbestos is held. The course teaches identify, presume, stop and refer, and it g
 
 - [ ] OK  [ ] Fix  [ ] Cut - **HFC-119** - Maintenance intervals for a commercial program (for example every 6 to 12 months).
     - _Why it is open:_ From the pack. No source was opened that supports a universal interval; the lesson says to set the next service date from the maker's sheet and the measured wear. (suggested action: remove)
+
+
+### Module 6: Handover, records and the supervised practical day
+
+- [ ] OK  [ ] Fix  [ ] Cut - **HFC-126** - How long job records must be kept, and any record rule from a regulator or an insurer.
+    - _Why it is open:_ The pack gave a period. It was not verified. The lesson says to keep records as long as the client contract and the insurer require, and to check the period locally. (suggested action: substantiate)
+
+- [ ] OK  [ ] Fix  [ ] Cut - **HFC-127** - The equipment, product and sample values for the supervised practical day.
+    - _Why it is open:_ The pack gave a bill of materials. None was validated. The assessor must set the values on the day from the makers' sheets. (suggested action: substantiate)

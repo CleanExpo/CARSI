@@ -2,6 +2,8 @@
 
 CARSI Hard Floor Care. DRAFT v1 for SME review.
 
+All stop rules on the Pre-job check and stop sheet (S1 to S19) apply before and during this job. If one applies, stop.
+
 ## Pre-start check (every machine, every job)
 
 - [ ] Leads and plugs undamaged; no cuts, taped joins or exposed conductors
@@ -9,8 +11,8 @@ CARSI Hard Floor Care. DRAFT v1 for SME review.
 - [ ] Pad driver or brush fitted and secure; pad or brush matches the approved setup
 - [ ] Solution tank clean and filled with a fresh, correctly diluted mix
 - [ ] Truck mount: recovery hose and filters checked; spinner jets clear
-- [ ] Total current within the circuit's own rating, confirmed on site, at 230 V
-- [ ] Signs and barriers out before the first pass
+- [ ] Other loads on the circuit plus machine currents within the circuit's own rating, confirmed on site, at 230 V (rule S4)
+- [ ] Signs and barriers out before the first pass (rule S5)
 
 ## Approved setup (one per task, filled in before starting)
 
@@ -28,7 +30,7 @@ CARSI Hard Floor Care. DRAFT v1 for SME review.
 | Rate measured on the test patch (L/m2) and patch size | | |
 | Hidden-spot test result | | |
 
-If any limit cannot be established: STOP and obtain technical advice. Do not substitute a generic pressure, pH band, pad colour or speed.
+Every limit established from the maker's sheets? Y / N (rules S7 and S10)
 
 Supervisor initials: ______  Date: ______
 

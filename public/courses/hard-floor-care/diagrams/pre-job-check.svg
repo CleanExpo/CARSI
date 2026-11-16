@@ -29,7 +29,7 @@
 <line x1="519.34" y1="106.5" x2="542.34" y2="106.5" stroke="#52606d" stroke-width="2" marker-end="url(#arrow)"/>
 <rect x="24" y="175" width="752" height="85" rx="10" fill="url(#gRed)" stroke="#b42318" stroke-width="2" filter="url(#sh)"/>
 <text x="40" y="199" font-size="14" font-weight="700" fill="#1f2933">Power: 230 V, circuit rating, RCD, current test tags</text>
-<text x="40" y="218" font-size="12" fill="#1f2933">Add the machine currents on each circuit. Over the circuit rating, or no safe circuit: stop and fix it.</text>
+<text x="40" y="218" font-size="12" fill="#1f2933">Machine currents plus other loads on the circuit must stay within its rating. Over it, or no safe circuit: stop.</text>
 <text x="40" y="235" font-size="12" fill="#1f2933">Missing SDS, missing signs or an unsafe circuit is a stop, not a delay.</text>
 <text x="776" y="292" font-size="12" fill="#52606d" text-anchor="end">CARSI · Hard Floor Care · pre-job check</text>
 </svg>

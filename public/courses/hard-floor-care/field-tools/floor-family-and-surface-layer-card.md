@@ -2,6 +2,8 @@
 
 CARSI Hard Floor Care. One page for the clipboard. DRAFT v1 for SME review.
 
+All stop rules on the Pre-job check and stop sheet (S1 to S19) apply before and during this job. If one applies, stop.
+
 ## Three floor families (a CARSI teaching grouping)
 
 | Family | Typical members | Typical way it fails |
@@ -14,7 +16,7 @@ CARSI Hard Floor Care. One page for the clipboard. DRAFT v1 for SME review.
 
 1. What is the floor, and what is the surface layer on it (glaze, factory finish, applied polish, coating)?
 2. What do the label, the SDS and the manufacturer's instructions for this floor and product say?
-3. Can the approved setup be recorded? If limits cannot be established, stop and obtain technical advice.
+3. Can the approved setup be recorded? Y / N (rules S6 and S7)
 
 ## Record
 

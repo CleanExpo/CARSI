@@ -165,7 +165,7 @@
           ],
           "correctIndex": 3,
           "points": 1,
-          "explanation": "Add the currents: 5.5 + 4.0 = 9.5 A, which leaves only 0.5 A of the 10 A example figure. Confirm the circuit's own rating and what else is on it before choosing: run one machine at a time or use a separate circuit with enough capacity."
+          "explanation": "Add the currents: 5.5 + 4.0 = 9.5 A, which leaves only 0.5 A of the 10 A example figure. On a real circuit, the machine currents plus everything else already on it must stay within the circuit's own rating, so confirm both before choosing: run one machine at a time or use a separate circuit with enough capacity."
         },
         {
           "questionText": "A new product arrives. Which step comes before the first use?",
@@ -333,7 +333,7 @@
           "explanation": "The SDS states the hazards, the protective equipment, the first aid steps and spill steps. Keep a copy in the workplace."
         },
         {
-          "questionText": "A hidden-spot test dulls the gloss. What now?",
+          "questionText": "A cleaner's hidden-spot test dulls the gloss. What now?",
           "options": [
             "Stop, get advice",
             "Double the strength",
@@ -342,7 +342,7 @@
           ],
           "correctIndex": 0,
           "points": 1,
-          "explanation": "Any change in gloss, colour or feel is a sign the product is incompatible. Stop, record it and obtain technical advice. Do not increase strength."
+          "explanation": "Any unexpected change or damage in gloss, colour or feel is a sign the product is incompatible with this floor. Stop, record it and obtain technical advice. Do not increase strength."
         }
       ]
     },
