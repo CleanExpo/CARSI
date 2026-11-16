@@ -4,7 +4,7 @@ CARSI Hard Floor Care. DRAFT v1 for SME review.
 
 ## Pre-start check (every machine, every job)
 
-- [ ] Leads and plugs undamaged; no cuts, repairs or exposed conductors
+- [ ] Leads and plugs undamaged; no cuts, taped joins or exposed conductors
 - [ ] RCD in use and tested; test-and-tag date current
 - [ ] Pad driver or brush fitted and secure; pad or brush matches the approved setup
 - [ ] Solution tank clean and filled with a fresh, correctly diluted mix

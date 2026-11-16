@@ -14,7 +14,7 @@ CARSI Hard Floor Care. DRAFT v1 for SME review.
 ## Conditions and stops written into the quote
 
 - Assumes a documented asbestos-free floor. If asbestos cannot be ruled out, work stops and is referred.
-- Loose or crumbling grout: stop and quote a repair.
+- Loose or crumbling grout: stop and quote remedial work.
 - Unknown coating or etched stone: stop and obtain advice.
 - Limits that cannot be established from the makers' sheets: stop and obtain advice.
 

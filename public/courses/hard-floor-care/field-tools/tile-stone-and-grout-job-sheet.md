@@ -20,7 +20,7 @@ CARSI Hard Floor Care. DRAFT v1 for SME review.
 | 4 | | | |
 | 5 | | | |
 
-Any loose, crumbling or hollow result: STOP. Quote a repair or re-grout. No pressure.
+Any loose, crumbling or hollow result: STOP. Quote remedial work or a re-grout. No pressure.
 
 ## Job record
 

@@ -405,13 +405,13 @@
           "questionText": "What must be true of a lead before use?",
           "options": [
             "It is long, thick",
-            "No cuts or repairs",
+            "No cuts or taped joins",
             "It is bright yellow",
             "It is wound tightly"
           ],
           "correctIndex": 1,
           "points": 1,
-          "explanation": "Leads and plugs must be undamaged, with no cuts, repairs or exposed conductors. Test-and-tag and the RCD test sit on top of that visual check."
+          "explanation": "Leads and plugs must be undamaged, with no cuts, taped joins or exposed conductors. Test-and-tag and the RCD test sit on top of that visual check."
         },
         {
           "questionText": "What is the first thing to do when a circuit trips mid-pass?",
@@ -516,7 +516,7 @@
           ],
           "correctIndex": 0,
           "points": 1,
-          "explanation": "Tap and scratch the grout in a grid first. Loose, crumbling or hollow results mean stop and quote a repair, because the floor is not ready for a restorative clean."
+          "explanation": "Tap and scratch the grout in a grid first. Loose, crumbling or hollow results mean stop and quote remedial work, because the floor is not ready for a restorative clean."
         },
         {
           "questionText": "Grout crumbles at several test points. What do you quote?",
@@ -528,7 +528,7 @@
           ],
           "correctIndex": 3,
           "points": 1,
-          "explanation": "Crumbling grout means the floor cannot take a restorative clean. Quote a repair or re-grout instead of risking the grout and the owner's trust."
+          "explanation": "Crumbling grout means the floor cannot take a restorative clean. Quote remedial work or a re-grout instead of risking the grout and the owner's trust."
         },
         {
           "questionText": "What is done before wet work starts?",
@@ -865,12 +865,12 @@
           "options": [
             "Raise the pressure",
             "Add a pre-spray",
-            "Quote a repair",
+            "Quote remedial work",
             "Skip the test"
           ],
           "correctIndex": 2,
           "points": 1,
-          "explanation": "Loose or crumbling grout means the floor cannot take a restorative clean. Quote a repair or re-grout and use no pressure."
+          "explanation": "Loose or crumbling grout means the floor cannot take a restorative clean. Quote remedial work or a re-grout and use no pressure."
         },
         {
           "questionText": "Which stone is sensitive to acidic products?",
