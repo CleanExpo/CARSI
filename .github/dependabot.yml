@@ -23,6 +23,11 @@ updates:
       timezone: "Australia/Brisbane"
     open-pull-requests-limit: 3
     groups:
+      # All codeql-action steps (init, analyze, ...) must run the same version,
+      # majors included, or CodeQL fails with a configuration error (GP-722).
+      # Listed first: Dependabot puts a dependency in the first group it matches.
+      codeql-action:
+        patterns: ["github/codeql-action*"]
       actions:
         patterns: ["*"]
         update-types: ["minor", "patch"]
