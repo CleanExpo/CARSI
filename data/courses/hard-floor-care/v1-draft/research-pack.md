@@ -36,9 +36,9 @@ No standard or manual text was read or entered into any AI tool. Standards are r
 
 | Status | Entries | Meaning |
 | --- | ---: | --- |
-| VERIFIED | 64 | A primary or named source was opened on 16/11/2026 and supports the claim (quote of 25 words or fewer). |
-| JUSTIFIED | 40 | CARSI arithmetic, a labelled illustrative figure, or a course policy with stated reasoning and the best available source. |
-| GAP | 23 | Not yet verifiable here. **Every GAP blocks go-live.** |
+| VERIFIED | 65 | A primary or named source was opened on 16/11/2026 and supports the claim (quote of 25 words or fewer). |
+| JUSTIFIED | 39 | CARSI arithmetic, a labelled illustrative figure, or a course policy with stated reasoning and the best available source. |
+| GAP | 25 | Not yet verifiable here. **Every GAP blocks go-live.** |
 
 Validate with `node scripts/audit/validate-ledger.mjs data/courses/hard-floor-care/v1-draft/evidence/evidence-ledger.jsonl` (exit 0).
 
@@ -59,7 +59,11 @@ Validate with `node scripts/audit/validate-ledger.mjs data/courses/hard-floor-ca
 | [Safe Work Australia, Slips, trips and falls](https://www.safeworkaustralia.gov.au/safety-topic/hazards/slips-trips-and-falls) | 1 |
 | [NSW Poisons Information Centre, About](https://www.poisonsinfo.nsw.gov.au/about) | 1 |
 | [SafeWork NSW, Electrical inspection and testing](https://www.safework.nsw.gov.au/hazards-a-z/electrical-and-power/electrical-inspection-and-testing) | 2 |
-| [ACO Drain, Understanding slip resistance (secondary summary of AS 4586)](https://acodrain.com.au/understanding-slip-resistance/) | 2 |
+| [ACO Drain, Understanding slip resistance (secondary summary of AS 4586)](https://acodrain.com.au/understanding-slip-resistance/) | 0 (opened; both claims held as GAP) |
+| [Inland Revenue New Zealand, GST](https://www.ird.govt.nz/gst) | 1 |
+| [ATO, How GST works](https://www.ato.gov.au/businesses-and-organisations/gst-excise-and-indirect-taxes/gst/how-gst-works) | (same claim as the Inland Revenue row) |
+| [National Poisons Centre New Zealand, Contact](https://poisons.co.nz/contact/) | 1 |
+| [New Zealand Police, 111 Emergency Services](https://www.police.govt.nz/call-111) | 1 |
 | [NSW EPA, Guidance for stormwater management: the drain is just for rain](https://www.epa.nsw.gov.au/Your-environment/Water/The-drain-is-just-for-rain) | 4 |
 
 ## Open GAPs
