@@ -9,7 +9,7 @@ CARSI Hard Floor Care. DRAFT v1 for SME review.
 - [ ] Pad driver or brush fitted and secure; pad or brush matches the approved setup
 - [ ] Solution tank clean and filled with a fresh, correctly diluted mix
 - [ ] Truck mount: recovery hose and filters checked; spinner jets clear
-- [ ] Total current on the circuit within 10 A at 230 V
+- [ ] Total current within the circuit's own rating, confirmed on site, at 230 V
 - [ ] Signs and barriers out before the first pass
 
 ## Approved setup (one per task, filled in before starting)
@@ -25,8 +25,11 @@ CARSI Hard Floor Care. DRAFT v1 for SME review.
 | Machine speed | | |
 | Pressure and temperature limits (truck-mount tool) | | |
 | Recovery and drying requirement | | |
+| Rate measured on the test patch (L/m2) and patch size | | |
 | Hidden-spot test result | | |
 
 If any limit cannot be established: STOP and obtain technical advice. Do not substitute a generic pressure, pH band, pad colour or speed.
 
 Supervisor initials: ______  Date: ______
+
+More items, options or tasks than fields: attach numbered continuation sheets with the same fields, one section per option or task.

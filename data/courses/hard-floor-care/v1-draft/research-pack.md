@@ -10,7 +10,7 @@ No standard or manual text was read or entered into any AI tool. Standards are r
 
 - **One blended course, six modules, 13 teaching lessons.** Module 1 safe start and the three floor families; Module 2 floor identification and chemistry by compatibility; Module 3 machines and the approved setup record; Module 4 tile, stone and grout; Module 5 resilient and timber floors; Module 6 quoting, handover and the practical day. Each module ends with a check; Module 6 ends with the 20-question final exam.
 
-- **Australia and New Zealand.** Each country is stated where rules differ. Power is 230 V and 10 A. Units are metric first.
+- **Australia and New Zealand.** Each country is stated where rules differ. Power is a nominal 230 V; worked examples use a 10 A outlet figure. Units are metric first.
 
 - **Credential settings.** status draft, isPublished false, cecHours 0, iicrcDiscipline null, meta.standard v1, role path carpet-and-floors, price A$495 (founder to confirm), level Foundational, category Cleaning.
 

@@ -44,13 +44,17 @@ Asbestos is held. The course teaches identify, presume, stop and refer, and it g
 
 - [ ] OK  [ ] Fix  [ ] Cut - **O12 Held pack wording on pH and soils**: The pack's wording about soil chemistry and pH, including its statement about grease, is not used. No universal pH band, pad colour, machine speed or pressure is taught as a rule.
 
-- [ ] OK  [ ] Fix  [ ] Cut - **O13 Slip claims**: The AS 4586 pendulum classes P0 to P5 rest on a secondary summary from a drainage supplier. The standard text was not read. Confirm against the standard (HFC-029 and HFC-081 are open GAP claims).
+- [ ] OK  [ ] Fix  [ ] Cut - **O13 Slip claims**: The AS 4586 pendulum classes P0 to P5 rest on a secondary summary from a drainage supplier. The standard text was not read. Confirm against the standard (HFC-029 and HFC-081 are open GAP claims; HFC-030 and HFC-083 rest on the standard's title only).
 
 - [ ] OK  [ ] Fix  [ ] Cut - **O14 Timber care sheet host**: The ATFA care sheet was read from a copy hosted by a paint company. Confirm it matches the current ATFA edition.
 
 - [ ] OK  [ ] Fix  [ ] Cut - **O15 GST rates**: 10 percent (Australia) and 15 percent (New Zealand) were checked on the ATO and Inland Revenue pages on 16/11/2026 (HFC-115). Confirm they are still current at publication.
 
 - [ ] OK  [ ] Fix  [ ] Cut - **O16 Records retention**: No retention period is stated. HFC-126 is open.
+
+- [ ] OK  [ ] Fix  [ ] Cut - **O17 Critical-criterion rule (GP-729)**: The platform grades from the total percentage only, so a learner can pass with a failed critical criterion. Do not seed this course until the critical-criterion rule is decided (GP-729). Until then the assessor applies the rule by hand.
+
+- [ ] OK  [ ] Fix  [ ] Cut - **O18 Power example figure**: The worked examples use a 10 A outlet at 230 V as an example figure and say the circuit's own rating is confirmed on site. No regulator page for the outlet rating was opened (HFC-031). Confirm the wording.
 
 ## JUSTIFIED claims that name an SME check
 

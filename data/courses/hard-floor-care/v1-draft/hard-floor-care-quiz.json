@@ -129,10 +129,10 @@
           ],
           "correctIndex": 0,
           "points": 1,
-          "explanation": "Safe Work Australia says to aim to eliminate risks first. PPE is the last line of defence, so it never replaces controls higher in the order."
+          "explanation": "Safe Work Australia says to aim to eliminate risks first and ranks PPE among the least effective controls, so it never replaces controls higher in the order."
         },
         {
-          "questionText": "What does the AS 4586 P class describe?",
+          "questionText": "What does AS 4586 classify?",
           "options": [
             "Slip resistance when wet",
             "Hardness of timber boards",
@@ -153,10 +153,10 @@
           ],
           "correctIndex": 3,
           "points": 1,
-          "explanation": "Australia and New Zealand supply is a nominal 230 V on standard outlets, normally rated 10 A. Check each machine's data plate before plugging in."
+          "explanation": "Australia and New Zealand supply is a nominal 230 V. The course examples use a 10 A outlet figure. Check each machine's data plate before plugging in."
         },
         {
-          "questionText": "Two machines draw 5.5 A and 4.0 A on one 10 A circuit. What is the total?",
+          "questionText": "Two machines draw 5.5 A and 4.0 A. Using a 10 A outlet figure as the example, what is the total?",
           "options": [
             "9.5 A, leaving 5 A",
             "1.5 A, leaving 8.5 A",
@@ -165,7 +165,7 @@
           ],
           "correctIndex": 3,
           "points": 1,
-          "explanation": "Add the currents: 5.5 + 4.0 = 9.5 A, which leaves only 0.5 A. Run one machine at a time or use a separate circuit."
+          "explanation": "Add the currents: 5.5 + 4.0 = 9.5 A, which leaves only 0.5 A of the 10 A example figure. Confirm the circuit's own rating and what else is on it before choosing: run one machine at a time or use a separate circuit with enough capacity."
         },
         {
           "questionText": "A new product arrives. Which step comes before the first use?",
@@ -405,7 +405,7 @@
           "questionText": "What must be true of a lead before use?",
           "options": [
             "It is long, thick",
-            "No cuts or taped joins",
+            "It has no damage",
             "It is bright yellow",
             "It is wound tightly"
           ],
@@ -567,7 +567,7 @@
           "explanation": "A stone that cannot be identified is treated as acid-sensitive until proven otherwise, because acid etching on calcium-based stone is permanent."
         },
         {
-          "questionText": "What does the AS 4586 P class describe?",
+          "questionText": "What does AS 4586 classify?",
           "options": [
             "Grout age on tiles",
             "Acid use on stone",
@@ -576,7 +576,7 @@
           ],
           "correctIndex": 3,
           "points": 1,
-          "explanation": "The class comes from a wet pendulum test of a new surface. A coating applied later can change how the floor grips, so record the class and any later test."
+          "explanation": "The standard classifies the wet slip resistance of a new surface. A coating applied later can change how the floor grips, so record the class and any later test."
         },
         {
           "questionText": "A coating is unknown. What is the step?",
@@ -584,7 +584,7 @@
             "Strip it hard",
             "Seal over it",
             "Wax over it",
-            "Test if allowed, record"
+            "Identify it first"
           ],
           "correctIndex": 3,
           "points": 1,
@@ -849,7 +849,7 @@
           "explanation": "The pre-start check covers leads, plug, RCD, guards and the pad or brush. A damaged lead or a failed RCD means the machine does not run."
         },
         {
-          "questionText": "Which supply does a machine in Australia usually use?",
+          "questionText": "Which supply figures do the course power examples use?",
           "options": [
             "24 V and 15 A",
             "415 V and 5 A",
@@ -858,7 +858,7 @@
           ],
           "correctIndex": 3,
           "points": 1,
-          "explanation": "Australian general power outlets are 230 V and 10 A, so a machine and its leads must suit that circuit."
+          "explanation": "The examples use 230 V and a 10 A outlet figure. The circuit's own rating is confirmed on site, and a machine and its leads must suit it."
         },
         {
           "questionText": "Grout is loose at several test points. What next?",
@@ -969,10 +969,10 @@
           "explanation": "NSW EPA guidance states that nothing other than clean rainwater should enter the stormwater drain. Use the approved site or council route."
         },
         {
-          "questionText": "What does an AS 4586 class describe?",
+          "questionText": "What does AS 4586 set out?",
           "options": [
             "Grout colour rating bands",
-            "Wet pendulum slip classes",
+            "Wet slip resistance classes",
             "Pad wear rating bands",
             "Stone hardness rating bands"
           ],
@@ -1002,7 +1002,7 @@
           ],
           "correctIndex": 1,
           "points": 1,
-          "explanation": "The course uses metric units first, so areas are in square metres. Machine power uses 230 V and 10 A."
+          "explanation": "The course uses metric units first, so areas are in square metres. Machine power examples use 230 V and a 10 A outlet figure."
         }
       ]
     }

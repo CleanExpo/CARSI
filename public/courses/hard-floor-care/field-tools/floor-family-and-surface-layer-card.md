@@ -21,3 +21,5 @@ CARSI Hard Floor Care. One page for the clipboard. DRAFT v1 for SME review.
 - Floor family: __________  Floor type: __________  Surface layer: __________
 - Year laid (if known): ______  Asbestos question answered on the stop sheet? Y / N
 - Hidden spot tested at: ______________  Result: ______________
+
+More items, options or tasks than fields: attach numbered continuation sheets with the same fields, one section per option or task.

@@ -33,4 +33,7 @@ CARSI Hard Floor Care. DRAFT v1 for SME review.
 - Steam used on the floor before? Y / N (do not assume steam is safe)
 - Damp-mop log: pad wrung until moist? Y / N  Edges dry? Y / N
 - Worn or bare patch? Y / N  Photo with scale taken? Y / N
+- What was seen and where (note for the finisher): ______________
 - Referral to a timber floor finisher: ______________
+
+More items, options or tasks than fields: attach numbered continuation sheets with the same fields, one section per option or task.

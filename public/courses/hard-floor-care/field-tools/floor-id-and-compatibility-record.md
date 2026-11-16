@@ -14,6 +14,9 @@ CARSI Hard Floor Care. One page for the job file. DRAFT v1 for SME review.
 
 Floor identified with confidence? Y / N. If N: STOP and ask the maker or an expert.
 
+- Condition of the floor: ______________
+- Floor photographed in place, with any markings on offcuts? Y / N
+
 ## Chemistry check
 
 - Product and lot: ______________  Label and SDS read? Y / N
@@ -23,8 +26,10 @@ Floor identified with confidence? Y / N. If N: STOP and ask the maker or an expe
 
 ## Hidden-spot test (about 100 mm x 100 mm)
 
-- Location: ______________  Dwell: ______________
+- Location: ______________  Product and dilution: ______________  Dwell: ______________
 - Result (gloss, colour, surface feel): ______________
 - Any change? STOP. Limits cannot be established? STOP and obtain technical advice.
 
 Assessor or supervisor initials: ______  Date: ______
+
+More items, options or tasks than fields: attach numbered continuation sheets with the same fields, one section per option or task.
