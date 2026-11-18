@@ -13,7 +13,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const tsx = join(root, 'node_modules', '.bin', 'tsx');
+// `node --import tsx` loads TypeScript in-process. The tsx CLI wrapper instead opens an IPC
+// socket under TMPDIR, which fails (EINVAL) when TMPDIR is a long path, as in review sandboxes.
 const script = join(root, 'scripts', 'seed-courses-catalog.ts');
 const UNREACHABLE = 'postgresql://refuse-test:x@refuse-test.invalid:1/none';
 
@@ -21,7 +22,7 @@ function run(args, env) {
   const base = { ...process.env };
   delete base.DATABASE_URL;
   delete base.SEED_COURSE_SLUG;
-  const r = spawnSync(tsx, [script, ...args], {
+  const r = spawnSync(process.execPath, ['--import', 'tsx', script, ...args], {
     cwd: root,
     env: { ...base, ...env },
     encoding: 'utf8',
