@@ -1,4 +1,5 @@
 import type { SessionClaims } from '@/lib/auth/session-jwt';
+import { safeNextPath } from '@/lib/membership-signup-path';
 
 /** Server-side admin bootstrap email from env (no Prisma — safe for Edge middleware). */
 export function getAdminEmail(): string {
@@ -57,8 +58,9 @@ export function getPostLoginRedirectPath(
   requestedNext?: string | null
 ): string {
   const defaultPath = getDefaultAppPathForClaims(claims);
-  const next = requestedNext?.trim();
-  if (!next || !next.startsWith('/') || next.startsWith('//')) {
+  // One owner for the same-origin rule: `/\\host` is read by browsers as `//host`.
+  const next = safeNextPath(requestedNext?.trim());
+  if (!next) {
     return defaultPath;
   }
   if (next.startsWith('/admin') && !isLmsClaimsAllowedAdminPanel(claims)) {

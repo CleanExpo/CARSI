@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { authApi } from '@/lib/api/auth';
 import { apiClient, ApiClientError } from '@/lib/api/client';
 import { buildCourseCheckoutUrls } from '@/lib/checkout-urls';
+import { confirmFreeEnrolment } from '@/lib/lms/confirm-free-enrolment';
 import {
   MIN_TEAM_SEATS,
   type CoursePurchaseMode,
@@ -239,10 +240,7 @@ export function EnrolButton({
 
       if (data.enrolled) {
         try {
-          const confirmed = await apiClient.post<ConfirmResponse>('/api/lms/enrollments/confirm', {
-            slug,
-          });
-          window.location.href = confirmed.learn_url ?? '/dashboard/student';
+          window.location.href = await confirmFreeEnrolment(slug);
         } catch (err) {
           const msg =
             err instanceof ApiClientError ? err.message : 'Could not complete free enrolment.';
