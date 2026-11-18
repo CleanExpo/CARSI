@@ -100,36 +100,33 @@ jobs:
 
       - name: Build script arguments
         id: args
-        # Free-text inputs reach the shell only through env and are validated, never
-        # interpolated into the script (same pattern as db-ops.yml).
+        # Free-text inputs reach the shell only through env and are validated as whole
+        # strings by the script (tested in scripts/media-workflow-args.test.mjs).
         env:
+          INPUT_MODE: ${{ inputs.mode }}
           INPUT_SLUG: ${{ inputs.slug }}
           INPUT_LIMIT: ${{ inputs.limit }}
-        run: |
-          case "${{ inputs.mode }}" in
-            plan)     PHASE="--plan" ;;
-            dry-run)  PHASE="--generate --dry-run" ;;
-            generate) PHASE="--generate --yes --persist=seed" ;;
-          esac
-          if [ -n "$INPUT_SLUG" ] && ! printf '%s' "$INPUT_SLUG" | grep -Eq '^[a-z0-9][a-z0-9-]{0,120}$'; then
-            echo "::error::slug must be lowercase letters, digits and hyphens"; exit 1
-          fi
-          if [ -n "$INPUT_LIMIT" ] && ! printf '%s' "$INPUT_LIMIT" | grep -Eq '^[0-9]{1,4}$'; then
-            echo "::error::limit must be a whole number"; exit 1
-          fi
-          EXTRA=""
-          [ -n "$INPUT_SLUG" ]  && EXTRA="$EXTRA --slug=$INPUT_SLUG"
-          [ -n "$INPUT_LIMIT" ] && EXTRA="$EXTRA --limit=$INPUT_LIMIT"
-          echo "phase=$PHASE" >> "$GITHUB_OUTPUT"
-          echo "extra=$EXTRA" >> "$GITHUB_OUTPUT"
+        run: bash scripts/media-workflow-args.sh
 
       - name: Generate thumbnails
         if: ${{ inputs.media == 'thumbnails' || inputs.media == 'both' }}
-        run: npx tsx scripts/generate-course-thumbnails.ts ${{ steps.args.outputs.phase }} ${{ steps.args.outputs.extra }}
+        env:
+          PHASE: ${{ steps.args.outputs.phase }}
+          EXTRA: ${{ steps.args.outputs.extra }}
+        run: |
+          read -ra PHASE_ARGS <<< "$PHASE"
+          read -ra EXTRA_ARGS <<< "$EXTRA"
+          npx tsx scripts/generate-course-thumbnails.ts "${PHASE_ARGS[@]}" "${EXTRA_ARGS[@]}"
 
       - name: Generate voiceovers
         if: ${{ inputs.media == 'voice' || inputs.media == 'both' }}
-        run: npx tsx scripts/generate-course-voiceover.ts ${{ steps.args.outputs.phase }} ${{ steps.args.outputs.extra }}
+        env:
+          PHASE: ${{ steps.args.outputs.phase }}
+          EXTRA: ${{ steps.args.outputs.extra }}
+        run: |
+          read -ra PHASE_ARGS <<< "$PHASE"
+          read -ra EXTRA_ARGS <<< "$EXTRA"
+          npx tsx scripts/generate-course-voiceover.ts "${PHASE_ARGS[@]}" "${EXTRA_ARGS[@]}"
 
       - name: Upload generated artifacts
         if: always()

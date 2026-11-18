@@ -85,6 +85,11 @@ jobs:
       - name: Australian-English guard self-test
         run: npm run test:au-english
 
+      # The seed script must refuse a run with no course slug (a whole-catalogue seed deletes
+      # learner progress), and the media workflow must refuse multi-line slug/limit inputs.
+      - name: Seed and media-input guard tests
+        run: npm run test:seed-guards
+
       # CARSI designation registry validity. This script existed but was run by NO workflow
       # (audited 2026-08-07) — a guard nothing invokes is not a guard. It validates that every
       # designation resolves to a real catalogue course, so a renamed or removed course cannot
