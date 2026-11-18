@@ -2,20 +2,21 @@
  * Upsert LMS courses from `data/seed/courses-catalog.json` into Postgres (e.g. remote server).
  * Idempotent per course slug: replaces modules/lessons to match the JSON snapshot.
  *
- * Usage (target DB):
- *   DATABASE_URL="postgresql://..." npm run db:seed-courses
+ * Usage (target DB), one of these is required (a run with neither is refused):
+ *   DATABASE_URL="postgresql://..." npm run db:seed-courses -- --slug=<slug>   (one course)
+ *   DATABASE_URL="postgresql://..." npm run db:seed-courses -- --all           (whole catalogue)
+ * SEED_COURSE_SLUG=<slug> works in place of --slug. Without `--`, npm keeps the flag itself.
  *
  * Optional:
  *   SEED_INSTRUCTOR_ID=<uuid> — force every course to use this instructor (must exist or be listed in JSON).
- *   --slug=<slug> — seed only one course (e.g. floor-care-onboarding-operational-readiness).
  *
  * Loads `.env` when present via dotenv/config.
  *
  * MANUAL ONLY — do NOT wire this into the deploy/boot path. Production boot (`start:production`)
  * applies migrations and starts the server without seeding; the live DB is the source of truth
  * for course content, so seeding at deploy would overwrite manually-curated prod rows (GP-503).
- * Run only for a deliberate, reviewed re-seed:
- *   DATABASE_URL="postgresql://..." npm run db:seed-courses
+ * Run only for a deliberate, reviewed re-seed (docs/runbooks/course-go-live.md):
+ *   DATABASE_URL="postgresql://..." npm run db:seed-courses -- --slug=<slug>
  */
 import 'dotenv/config';
 
@@ -186,14 +187,31 @@ async function seedCourse(c: CatalogCourse, instructorOverride: string | undefin
   });
 }
 
-function argSlug(): string | undefined {
-  const fromEnv = process.env.SEED_COURSE_SLUG?.trim();
-  if (fromEnv) return fromEnv.toLowerCase();
+/**
+ * Which courses to seed. A whole-catalogue seed deletes learner lesson progress for every
+ * course (deleteCourseCurriculum), so it must be asked for explicitly with `--all`. A missing
+ * or blank slug is refused: npm drops `--slug=x` unless it follows `--`, which would otherwise
+ * turn a one-course seed into a whole-catalogue one. Runs before any database access.
+ */
+function seedScope(): { slug: string } | { all: true } {
+  const all = process.argv.includes('--all');
+  const envRaw = process.env.SEED_COURSE_SLUG;
   const flag = process.argv.find((a) => a.startsWith('--slug='));
-  return flag ? flag.slice('--slug='.length).trim().toLowerCase() : undefined;
+  const refuse = (why: string): never => {
+    console.error(`refusing: ${why}. Seed one course with -- --slug=<slug>, or the whole catalogue with -- --all.`);
+    process.exit(1);
+  };
+  if (envRaw !== undefined && !envRaw.trim()) refuse('blank SEED_COURSE_SLUG');
+  if (flag !== undefined && !flag.slice('--slug='.length).trim()) refuse('blank --slug');
+  const slug = (envRaw?.trim() || flag?.slice('--slug='.length).trim() || '').toLowerCase();
+  if (all && slug) refuse('--all and a slug together');
+  if (all) return { all: true };
+  if (!slug) refuse('no --slug and no --all');
+  return { slug };
 }
 
 async function main() {
+  const scope = seedScope();
   if (!process.env.DATABASE_URL?.trim()) {
     console.error('DATABASE_URL is not set.');
     process.exit(1);
@@ -208,7 +226,7 @@ async function main() {
     process.exit(1);
   }
 
-  const onlySlug = argSlug();
+  const onlySlug = 'slug' in scope ? scope.slug : undefined;
   const courses = onlySlug
     ? data.courses.filter((c) => c.slug.trim().toLowerCase() === onlySlug)
     : data.courses;
@@ -239,8 +257,8 @@ async function main() {
     console.log(`Seeded course: ${c.slug}`);
   }
 
-  const scope = onlySlug ? `slug "${onlySlug}"` : `${courses.length} course(s)`;
-  console.log(`Done. ${scope} from ${CATALOG_PATH}`);
+  const done = onlySlug ? `slug "${onlySlug}"` : `${courses.length} course(s)`;
+  console.log(`Done. ${done} from ${CATALOG_PATH}`);
 }
 
 main()

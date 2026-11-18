@@ -1,6 +1,6 @@
-name: Generate course media & seed
+name: Generate course media
 
-# Manual "Run workflow" button (Actions tab → Generate course media & seed → Run workflow).
+# Manual "Run workflow" button (Actions tab → Generate course media → Run workflow).
 #
 # Runs the cost-bearing authoring scripts on GitHub's runners, which hold the API
 # credentials (GitHub Actions repo secrets) that a local shell may lack:
@@ -12,15 +12,15 @@ name: Generate course media & seed
 # lazy-loaded) and are idempotent (skip slugs/lessons already 'done' in their results
 # manifest). The job commits the updated catalogue + manifests and opens a PR.
 #
-# The optional `seed` job imports the catalogue into Postgres (db:seed-courses). It is
-# OFF by default and only runs when seed_after=true AND mode=generate, against the
-# DATABASE_URL repo secret.
+# This workflow never writes to the database. It used to carry an optional seed job; that
+# was removed (CARSI first wave W0b, 2026-11-19) because it seeded the dispatch ref rather
+# than the generated branch and skipped the progress preflight. Importing a merged catalogue
+# change into production is founder-run, one course at a time: docs/runbooks/course-go-live.md.
 #
 # CARSI is hosted on DigitalOcean — CI credentials are GitHub Actions repo secrets
 # (Settings → Secrets and variables → Actions), NOT pulled from Vercel. Required secrets:
 # CLOUDINARY_CLOUD_NAME (= dmaulkthb), CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET,
-# OPENAI_API_KEY (thumbnails), ELEVENLABS_API_KEY + ELEVENLABS_VOICE_ID (voice),
-# DATABASE_URL (only when seed_after=true).
+# OPENAI_API_KEY (thumbnails), ELEVENLABS_API_KEY + ELEVENLABS_VOICE_ID (voice).
 
 on:
   workflow_dispatch:
@@ -43,10 +43,6 @@ on:
         description: "Cap how many items to generate this run (blank = script HARD_CAP: 25 thumbs / 50 voice)"
         required: false
         default: ""
-      seed_after:
-        description: "After a successful generate, import the catalogue into Postgres (db:seed-courses)"
-        type: boolean
-        default: false
 
 permissions:
   contents: write
@@ -62,7 +58,6 @@ env:
   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
   ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
   ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}
-  DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
 jobs:
   generate:
@@ -94,7 +89,6 @@ jobs:
             voice)      need ELEVENLABS_API_KEY; need ELEVENLABS_VOICE_ID ;;
             both)       need OPENAI_API_KEY; need ELEVENLABS_API_KEY; need ELEVENLABS_VOICE_ID ;;
           esac
-          if [ "${{ inputs.seed_after }}" = "true" ]; then need DATABASE_URL; fi
 
           if [ -n "$MISSING" ]; then
             echo "::error::Missing required GitHub Actions repo secrets:$MISSING"
@@ -106,15 +100,26 @@ jobs:
 
       - name: Build script arguments
         id: args
+        # Free-text inputs reach the shell only through env and are validated, never
+        # interpolated into the script (same pattern as db-ops.yml).
+        env:
+          INPUT_SLUG: ${{ inputs.slug }}
+          INPUT_LIMIT: ${{ inputs.limit }}
         run: |
           case "${{ inputs.mode }}" in
             plan)     PHASE="--plan" ;;
             dry-run)  PHASE="--generate --dry-run" ;;
             generate) PHASE="--generate --yes --persist=seed" ;;
           esac
+          if [ -n "$INPUT_SLUG" ] && ! printf '%s' "$INPUT_SLUG" | grep -Eq '^[a-z0-9][a-z0-9-]{0,120}$'; then
+            echo "::error::slug must be lowercase letters, digits and hyphens"; exit 1
+          fi
+          if [ -n "$INPUT_LIMIT" ] && ! printf '%s' "$INPUT_LIMIT" | grep -Eq '^[0-9]{1,4}$'; then
+            echo "::error::limit must be a whole number"; exit 1
+          fi
           EXTRA=""
-          [ -n "${{ inputs.slug }}" ]  && EXTRA="$EXTRA --slug=${{ inputs.slug }}"
-          [ -n "${{ inputs.limit }}" ] && EXTRA="$EXTRA --limit=${{ inputs.limit }}"
+          [ -n "$INPUT_SLUG" ]  && EXTRA="$EXTRA --slug=$INPUT_SLUG"
+          [ -n "$INPUT_LIMIT" ] && EXTRA="$EXTRA --limit=$INPUT_LIMIT"
           echo "phase=$PHASE" >> "$GITHUB_OUTPUT"
           echo "extra=$EXTRA" >> "$GITHUB_OUTPUT"
 
@@ -157,7 +162,7 @@ jobs:
           COMPARE_URL="${{ github.server_url }}/${{ github.repository }}/pull/new/${BRANCH}"
           if gh pr create --base main --head "$BRANCH" \
             --title "Course media: ${{ inputs.media }} (run ${{ github.run_id }})" \
-            --body "Automated ${{ inputs.media }} generation. Cloudinary URLs written into \`data/seed/courses-catalog.json\`. Review and merge; run the seed step (or db:seed-courses) to import into Postgres." \
+            --body "Automated ${{ inputs.media }} generation. Cloudinary URLs written into \`data/seed/courses-catalog.json\`. Review and merge. Importing into the live database is founder-run, one course at a time: docs/runbooks/course-go-live.md." \
             --draft; then
             echo "Opened a draft PR for branch $BRANCH."
           else
@@ -168,22 +173,3 @@ jobs:
             echo "### Course media generated ✅"
             echo "Branch \`$BRANCH\` — review the catalogue diff and merge."
           } >> "$GITHUB_STEP_SUMMARY"
-
-  seed:
-    needs: generate
-    if: ${{ inputs.seed_after == true && inputs.mode == 'generate' }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
-        with:
-          node-version: 22
-          cache: npm
-      - name: Install dependencies
-        run: npm ci
-      - name: Seed courses into Postgres
-        run: |
-          echo "Seeding production catalogue into Postgres (db:seed-courses)…"
-          npm run db:seed-courses
-          echo "### Catalogue seeded into Postgres ✅" >> "$GITHUB_STEP_SUMMARY"

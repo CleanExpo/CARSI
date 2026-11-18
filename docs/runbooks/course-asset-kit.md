@@ -99,7 +99,7 @@ Attach the finished flashcards/slides/audio/image/video as lesson `resources` in
 the player renders), then let the deploy boot path seed them:
 
 ```bash
-npm run db:seed-courses    # imports the catalogue (incl. attached resources)
+npm run db:seed-courses -- --slug=<slug>   # imports that course (incl. attached resources); a run with no slug is refused
 npm run db:seed-quizzes -- --slug=<slug> --dry-run   # preview one course's quiz file(s)
 npm run db:seed-quizzes -- --slug=<slug>             # imports that course's quiz file(s) only
 ```
