@@ -25,7 +25,9 @@ import {
   isMembershipCheckoutResume,
   loginPathWithNext,
   MEMBERSHIP_PATH,
+  safeNextPath,
 } from '@/lib/membership-signup-path';
+import { confirmFreeEnrolment } from '@/lib/lms/confirm-free-enrolment';
 import { useToast } from '@/hooks/use-toast';
 import { purchaseSurveyCheckoutField } from '@/lib/marketing/purchase-survey-key';
 
@@ -74,8 +76,8 @@ export function RegisterForm() {
         iicrc_member_number: values.iicrcMemberNumber || undefined,
       });
 
-      const next = searchParams.get('next') ?? searchParams.get('redirect') ?? '/dashboard';
-      const safePath = next.startsWith('/') && !next.startsWith('//') ? next : '/dashboard';
+      const safePath =
+        safeNextPath(searchParams.get('next') ?? searchParams.get('redirect')) ?? '/dashboard';
 
       // Came from "Start membership": open the membership checkout as the account just
       // created (the session cookie is now set). Any failure lands on /subscribe, where the
@@ -120,9 +122,25 @@ export function RegisterForm() {
             return;
           }
           if (checkout.enrolled) {
-            toast({ title: 'You’re enrolled — welcome!' });
+            // Checkout only reports that the course is free; the enrolment is written by the
+            // confirm call. Without it the learner was told "enrolled" and sent to an empty
+            // dashboard (GP-591). On failure, return them to the course page, where they are
+            // now signed in and the Enrol button can finish the job.
+            let learnUrl: string;
+            try {
+              learnUrl = await confirmFreeEnrolment(slug);
+            } catch {
+              const message = 'Account created, but enrolment did not finish. Press Enrol to try again.';
+              setError(message);
+              toast({ title: message, variant: 'destructive' });
+              window.setTimeout(() => {
+                window.location.href = `/courses/${encodeURIComponent(slug)}`;
+              }, 1500);
+              return;
+            }
+            toast({ title: 'You’re enrolled. Opening your first lesson…' });
             window.setTimeout(() => {
-              window.location.href = `/dashboard/student?course=${encodeURIComponent(slug)}`;
+              window.location.href = learnUrl;
             }, 200);
             return;
           }

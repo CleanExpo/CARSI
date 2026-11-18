@@ -21,6 +21,8 @@ Stranger → first course. Run this against **staging or local** with a fresh em
 - `src/lib/first-run-redirects.test.ts` — `/signup` and `/onboarding` redirects.
 - `e2e/first-run-aliases.spec.ts` — register/pathways smoke.
 - `e2e/spm-carsi-first-run.spec.ts` — stranger pathways → catalogue CTA.
+- `src/components/auth/register-form.free-course.test.tsx` — sign up from a free course → enrolment confirmed → first lesson (confirm failure returns to the course with a retry message).
+- `src/lib/admin/admin-panel-access.test.ts` — sign-in `next` refuses `/\host` and `//host`.
 
 ## Done when
 
