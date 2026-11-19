@@ -101,6 +101,7 @@
     "check:authority-bundles": "npx tsx scripts/check-authority-page-bundles.ts",
     "verify:authority-bundle-courses": "npx tsx scripts/verify-authority-bundle-courses.ts",
     "verify:go-live-readiness": "node scripts/verify-go-live-readiness.mjs",
+    "verify:product-excellence": "node scripts/product-excellence-smoke.mjs",
     "db:seed-safety-ppe-docx": "npx tsx scripts/seed-safety-ppe-docx.ts",
     "db:seed-whs-compliance-docx": "npx tsx scripts/seed-whs-compliance-docx.ts",
     "db:seed-marketing-business-docx": "npx tsx scripts/seed-marketing-business-docx.ts",
