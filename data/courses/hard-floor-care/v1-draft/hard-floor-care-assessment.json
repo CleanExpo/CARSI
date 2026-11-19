@@ -12,7 +12,7 @@
     "criteria": [
       {
         "label": "Pre-job check and asbestos stop-and-refer (critical)",
-        "description": "Completes the pre-job check; applies the Australian and New Zealand dates; decides to stop and refer when asbestos cannot be ruled out; gives no work method for it; records who was told.",
+        "description": "Completes the pre-job check; applies the Australian and New Zealand dates; decides to stop and refer when asbestos cannot be ruled out; gives no work method for it; records who was told. Completes the silica add-on: identifies whether a step is silica work, names the engineering control and the respirator in that order, and states a clean-up method that makes no dust.",
         "maxPoints": 15
       },
       {

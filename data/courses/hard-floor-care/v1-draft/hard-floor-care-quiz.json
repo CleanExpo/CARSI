@@ -190,6 +190,54 @@
           "correctIndex": 1,
           "points": 1,
           "explanation": "If the floor or its coating cannot be identified, the limits of safe method cannot be set. Stop, test a hidden spot only as the maker allows, or ask the manufacturer."
+        },
+        {
+          "questionText": "Which task is processing a crystalline silica substance under the Australian model WHS Regulations?",
+          "options": [
+            "Damp-mopping a sealed porcelain floor",
+            "Raking out cement grout with a multi-tool",
+            "Applying sealer to granite with a roller",
+            "Spot-cleaning terrazzo with a cloth"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Using a power tool to cut, grind or drill a material with at least 1% crystalline silica is processing. Cement grout can contain it, and a multi-tool is a power tool. The other tasks use no power tool on the material."
+        },
+        {
+          "questionText": "In Australia, when may a respirator be the only control for silica processing?",
+          "options": [
+            "Whenever the job is under one hour",
+            "When the worker has been fit-tested",
+            "Only when engineering controls are not reasonably practicable",
+            "When the material has less than 10% silica"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Controlled processing needs at least one engineering control, such as water or on-tool extraction, plus a respirator for remaining risk. A respirator alone is allowed only when those controls are not reasonably practicable."
+        },
+        {
+          "questionText": "What is New Zealand's exposure standard for respirable crystalline silica?",
+          "options": [
+            "0.25 mg/m³",
+            "0.1 mg/m³",
+            "0.05 mg/m³",
+            "0.025 mg/m³"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "WorkSafe New Zealand lowered it to 0.025 mg/m³ (8-hour average) in November 2023. Australia's figure is 0.05 mg/m³, twice as high."
+        },
+        {
+          "questionText": "Grinding is finished. How should the silica dust be cleaned up?",
+          "options": [
+            "With an H- or M-class vacuum or wet methods",
+            "With a broom, then a household vacuum",
+            "Blown outside with compressed air",
+            "Left to settle overnight, then swept"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Dry sweeping, compressed air and general-purpose vacuums put the fine dust back in the air. Use wet methods or an H- or M-class vacuum."
         }
       ]
     },
