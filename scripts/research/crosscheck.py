@@ -85,8 +85,12 @@ def norm(s):
     return re.sub(r"[^a-z0-9.%/]+", " ", s.lower()).strip()
 
 
+def _scheme_ok(url):
+    return url.startswith("https://")
+
+
 def quote_found(url, quote):
-    if not url or not quote or not url.startswith("https://"):
+    if not url or not quote or not _scheme_ok(url):
         return "NO_URL_OR_QUOTE"
     try:
         req = urllib.request.Request(url, headers=BROWSER_HEADERS)
@@ -158,11 +162,11 @@ def main():
         sys.exit("--claims, --out and --max-usd are required for a model run")
     if a.max_usd <= 0 or a.max_usd > DAILY_CAP_USD:
         sys.exit(f"--max-usd must be between 0 and {DAILY_CAP_USD}")
-    k = key()
     claims = [json.loads(l) for l in open(a.claims) if l.strip()]
     banned = [c["id"] for c in claims if IICRC_RX.search(c["claim"])]
     if banned:
         sys.exit(f"REFUSED: claims {banned} name an IICRC standard; check them against the licensed index, not an AI tool")
+    k = key()
     run_spend = 0.0
     with open(a.out, "a") as out:
         for c in claims:
