@@ -30,7 +30,8 @@ PER_CALL_RESERVE_USD = 0.25  # refuse a call unless this much headroom remains
 
 # IICRC prohibits entering its standards into any AI tool (CLAUDE.md). Claims that
 # name an IICRC standard are refused here and go to the licensed-index route instead.
-IICRC_RX = re.compile(r"\bIICRC\b|\bANSI/IICRC\b|\bS\s?5[0-9]{2}\b|\bS\s?100\b", re.I)
+IICRC_RX = re.compile(r"\bIICRC\b|\bS[\s-]?5[0-9]{2}\b|\bS[\s-]?100\b", re.I)
+MIN_QUOTE_CHARS = 20  # a shorter quote matches too many pages to prove anything
 
 PROMPT = """You are checking one factual claim for an Australian training course.
 Use web search. Rely ONLY on primary sources: legislation (legislation.gov.au,
@@ -92,6 +93,8 @@ def _scheme_ok(url):
 def quote_found(url, quote):
     if not url or not quote or not _scheme_ok(url):
         return "NO_URL_OR_QUOTE"
+    if len(norm(quote)) < MIN_QUOTE_CHARS:
+        return "QUOTE_TOO_SHORT"
     try:
         req = urllib.request.Request(url, headers=BROWSER_HEADERS)
         with urllib.request.urlopen(req, timeout=45) as r:
@@ -183,7 +186,7 @@ def main():
                 try:
                     r = call("/chat/completions", k, body)
                     text = r["choices"][0]["message"].get("content") or ""
-                    cost = float(r.get("usage", {}).get("cost") or 0)
+                    cost = max(float(r.get("usage", {}).get("cost") or 0), 0.0)
                     err = None
                 except Exception as e:  # recorded, never treated as a pass
                     text, cost, err = "", 0.0, f"{type(e).__name__}: {e}"

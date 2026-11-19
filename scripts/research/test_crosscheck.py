@@ -91,7 +91,8 @@ class Caps(unittest.TestCase):
 
 class IicrcGuard(unittest.TestCase):
     def test_refuses_iicrc_and_s_standard_claims_without_calling(self):
-        for text in ["ANSI/IICRC S500 requires drying", "The S520 says", "IICRC guidance", "S 500 section 12"]:
+        for text in ["ANSI/IICRC S500 requires drying", "The S520 says", "IICRC guidance", "S 500 section 12",
+                     "the s-500 says", "S500:2021 clause", "iicrc rules", "ANSI IICRC S100"]:
             fake = FakeChat(daily=0.0)
             with mock.patch.object(cc, "key", return_value="x"), mock.patch.object(cc, "call", fake):
                 code, _ = run_main(["--claims", claims_file([dict(CLAIM, claim=text)]),
@@ -135,8 +136,13 @@ class QuoteCheck(unittest.TestCase):
         # The local server is http, so allow it only for this test.
         with mock.patch.object(cc, "_scheme_ok", lambda u: True):
             self.assertEqual(cc.quote_found(self.base + "/page", "kept for 30 years after the date"), "QUOTE_FOUND")
-            self.assertEqual(cc.quote_found(self.base + "/page", "kept for 7 years"), "QUOTE_NOT_IN_PAGE")
-            self.assertEqual(cc.quote_found(self.base + "/missing", "x"), "FETCH_FAILED:HTTP404")
+            self.assertEqual(cc.quote_found(self.base + "/page", "kept for 7 years after the date"), "QUOTE_NOT_IN_PAGE")
+            self.assertEqual(cc.quote_found(self.base + "/missing", "a quote long enough to fetch"), "FETCH_FAILED:HTTP404")
+
+    def test_short_or_empty_quote_never_found(self):
+        with mock.patch.object(cc, "_scheme_ok", lambda u: True):
+            for q in ["—", "  ", "30", "the record"]:
+                self.assertEqual(cc.quote_found(self.base + "/page", q), "QUOTE_TOO_SHORT", repr(q))
 
 
 if __name__ == "__main__":
