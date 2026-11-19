@@ -187,6 +187,67 @@ class InputValidation(unittest.TestCase):
         self.assertEqual((chats, keys), (0, 0))
 
 
+class ModelOutput(unittest.TestCase):
+    """Review round 2, finding 1: model output is untrusted; one owner coerces it."""
+
+    def test_wrong_types_become_malformed_and_the_row_is_still_written(self):
+        for bad in [{"verdict": "SUPPORTED", "source_url": 7, "quote": "these are long quoted words from a page"},
+                    {"verdict": "SUPPORTED", "source_url": "https://x.test", "quote": ["a", "list"]},
+                    {"verdict": "TRUE", "source_url": "", "quote": ""},
+                    ["not", "an", "object"]]:
+            out = tempfile.mktemp(suffix=".jsonl")
+
+            def fake(path, k, body=None, timeout=180, bad=bad):
+                if path == "/key":
+                    return {"data": {"usage_daily": 0.0}}
+                return {"choices": [{"message": {"content": json.dumps(bad)}}], "usage": {"cost": 0.01}}
+
+            with mock.patch.object(cc, "key", return_value="x"), mock.patch.object(cc, "call", fake):
+                code, _ = run_main(["--claims", claims_file([CLAIM]), "--out", out, "--max-usd", "1"])
+            self.assertEqual(code, 0, bad)
+            rows = [json.loads(l) for l in open(out)]
+            self.assertEqual(len(rows), len(cc.MODELS), bad)
+            for r in rows:
+                self.assertIn(r["verdict"], {"MALFORMED", "UNPARSED"}, bad)
+                self.assertEqual(r["cost_usd"], 0.01)
+                for f in cc.ANSWER_FIELDS:
+                    self.assertIsInstance(r[f], str)
+
+    def test_quote_found_never_crashes_on_wrong_types(self):
+        self.assertEqual(cc.quote_found(7, "x" * 30), "NO_URL_OR_QUOTE")
+        self.assertEqual(cc.quote_found("https://x.test", ["x"]), "NO_URL_OR_QUOTE")
+
+
+class VisibleTextOnly(unittest.TestCase):
+    """Review round 2, finding 2: only words a reader sees can confirm a quote."""
+
+    def _check(self, page, quote):
+        class R(io.BytesIO):
+            headers = {"Content-Type": "text/html"}
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *a):
+                return False
+
+        with mock.patch.object(cc.urllib.request, "urlopen", lambda req, timeout=0: R(page)):
+            return cc.quote_found("https://example.test/p", quote)
+
+    def test_script_style_comment_and_head_text_do_not_count(self):
+        q = "the exact quotation appears only here"
+        for page in [f"<html><script>{q}</script><body>Other content</body></html>",
+                     f"<html><style>/* {q} */</style><body>Other</body></html>",
+                     f"<html><!-- {q} --><body>Other</body></html>",
+                     f"<html><head><meta content='{q}'><title>{q}</title></head><body>Other</body></html>",
+                     f"<html><body><template>{q}</template>Other</body></html>"]:
+            self.assertEqual(self._check(page.encode(), q), "QUOTE_NOT_IN_PAGE", page)
+
+    def test_visible_body_text_counts(self):
+        q = "the exact quotation appears only here"
+        self.assertEqual(self._check(f"<html><body><p>See: {q}.</p></body></html>".encode(), q), "QUOTE_FOUND")
+
+
 class IicrcGuard(unittest.TestCase):
     def test_refuses_iicrc_and_s_standard_claims_without_calling(self):
         for text in ["ANSI/IICRC S500 requires drying", "The S520 says", "IICRC guidance", "S 500 section 12",

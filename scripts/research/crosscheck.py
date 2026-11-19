@@ -23,6 +23,7 @@ import subprocess
 import sys
 import urllib.error
 import urllib.request
+from html.parser import HTMLParser
 
 API = "https://openrouter.ai/api/v1"
 MODELS = ["moonshotai/kimi-k3.1-pro", "deepseek/deepseek-v4.1-flash-1017"]
@@ -90,6 +91,10 @@ def daily_spend(k):
     return float(call("/key", k)["data"]["usage_daily"])
 
 
+ANSWER_FIELDS = ("verdict", "correction", "source_url", "section", "quote")
+VERDICTS = {"SUPPORTED", "CONTRADICTED", "PARTLY", "NOT_FOUND"}
+
+
 def parse(text):
     m = re.search(r"\{.*\}", text or "", re.S)
     if not m:
@@ -98,6 +103,56 @@ def parse(text):
         return json.loads(m.group(0))
     except json.JSONDecodeError:
         return None
+
+
+def coerce_answer(text):
+    """The ONE place model output enters the program. Everything after this sees only
+    these five string fields. Anything else (wrong type, unknown verdict, not an object)
+    becomes UNPARSED or MALFORMED with empty fields, so it can never crash the run or
+    pass a check."""
+    raw = parse(text)
+    out = {f: "" for f in ANSWER_FIELDS}
+    if not isinstance(raw, dict):
+        out["verdict"] = "UNPARSED"
+        return out
+    bad = False
+    for f in ANSWER_FIELDS:
+        v = raw.get(f, "")
+        if isinstance(v, str):
+            out[f] = v[:2000]
+        else:
+            bad = True
+    if bad or out["verdict"] not in VERDICTS:
+        return {**{f: "" for f in ANSWER_FIELDS}, "verdict": "MALFORMED"}
+    return out
+
+
+class _VisibleText(HTMLParser):
+    """Collect only text a reader sees: no script, style, template, head or comments."""
+    HIDDEN = {"script", "style", "template", "noscript", "head", "svg"}
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.depth, self.parts = 0, []
+
+    def handle_starttag(self, tag, attrs):
+        if tag in self.HIDDEN:
+            self.depth += 1
+
+    def handle_endtag(self, tag):
+        if tag in self.HIDDEN and self.depth:
+            self.depth -= 1
+
+    def handle_data(self, data):
+        if not self.depth:
+            self.parts.append(data)
+
+
+def visible_text(html_doc):
+    p = _VisibleText()
+    p.feed(html_doc)
+    p.close()
+    return " ".join(p.parts)
 
 
 def norm(s):
@@ -111,7 +166,7 @@ def _scheme_ok(url):
 
 
 def quote_found(url, quote):
-    if not url or not quote or not _scheme_ok(url):
+    if not isinstance(url, str) or not isinstance(quote, str) or not url or not quote or not _scheme_ok(url):
         return "NO_URL_OR_QUOTE"
     if len(norm(quote)) < MIN_QUOTE_CHARS:
         return "QUOTE_TOO_SHORT"
@@ -122,7 +177,7 @@ def quote_found(url, quote):
             raw = r.read(20_000_000)
     except urllib.error.HTTPError as e:
         return f"FETCH_FAILED:HTTP{e.code}"
-    except (urllib.error.URLError, TimeoutError, ValueError) as e:
+    except Exception as e:  # any fetch failure is a failure, never a crash or a pass
         return f"FETCH_FAILED:{type(e).__name__}"
     if "pdf" in ctype.lower() or raw[:5] == b"%PDF-":
         try:
@@ -132,7 +187,10 @@ def quote_found(url, quote):
         except Exception as e:  # unreadable PDF is a failure, never a pass
             return f"PDF_UNREADABLE:{type(e).__name__}"
     else:
-        text = raw.decode("utf-8", "replace")
+        try:
+            text = visible_text(raw.decode("utf-8", "replace"))
+        except Exception as e:
+            return f"HTML_UNREADABLE:{type(e).__name__}"
     return "QUOTE_FOUND" if norm(quote) in norm(text) else "QUOTE_NOT_IN_PAGE"
 
 
@@ -227,12 +285,11 @@ def main():
                     # A failed request may still have been billed: count the full reserve.
                     text, cost, err = "", PER_CALL_RESERVE_USD, type(e).__name__
                 run_spend += cost
-                ans = parse(text) or {}
-                row = {"id": c["id"], "model": model, "cost_usd": round(cost, 5),
-                       "verdict": ans.get("verdict", "UNPARSED" if not err else "ERROR"),
-                       "correction": ans.get("correction", ""), "source_url": ans.get("source_url", ""),
-                       "section": ans.get("section", ""), "quote": ans.get("quote", ""),
-                       "quote_check": quote_found(ans.get("source_url"), ans.get("quote")),
+                ans = coerce_answer(text)
+                if err:
+                    ans["verdict"] = "ERROR"
+                row = {"id": c["id"], "model": model, "cost_usd": round(cost, 5), **ans,
+                       "quote_check": quote_found(ans["source_url"], ans["quote"]),
                        "error": err}
                 out.write(json.dumps(row, ensure_ascii=False) + "\n"); out.flush()
                 print(f"{c['id']} {model.split('/')[0]:<10} {row['verdict']:<12} {row['quote_check']:<22} "
