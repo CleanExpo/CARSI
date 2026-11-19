@@ -34,7 +34,7 @@
     "test:standards-claims": "node scripts/check-standards-claims.test.mjs",
     "check:au-english": "node scripts/check-au-english.mjs",
     "test:au-english": "node scripts/check-au-english.test.mjs",
-    "test:seed-guards": "node --test scripts/seed-courses-catalog.refuse.test.mjs scripts/media-workflow-args.test.mjs",
+    "test:seed-guards": "node --test scripts/seed-courses-catalog.refuse.test.mjs scripts/media-workflow-args.test.mjs scripts/playwright-e2e-ports.test.mjs",
     "check:iicrc-compliance": "node scripts/check-iicrc-compliance.mjs",
     "test:iicrc-compliance": "node scripts/check-iicrc-compliance.test.mjs && node scripts/check-iicrc-compliance-records.test.mjs",
     "check:cec-course-brand": "node scripts/check-cec-course-brand.mjs",
