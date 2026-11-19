@@ -17,6 +17,7 @@ claims.jsonl rows: {"id": "...", "claim": "...", "jurisdiction": "AU|NZ|AU+NZ"}
 import argparse
 import html
 import json
+import math
 import re
 import subprocess
 import sys
@@ -27,6 +28,25 @@ API = "https://openrouter.ai/api/v1"
 MODELS = ["moonshotai/kimi-k3.1-pro", "deepseek/deepseek-v4.1-flash-1017"]
 DAILY_CAP_USD = 20.0
 PER_CALL_RESERVE_USD = 0.25  # refuse a call unless this much headroom remains
+
+# The reserve is only a cap if no single call can cost more than it. Each request
+# therefore carries a provider-enforced price ceiling (USD per million tokens) and a
+# completion-token limit, and every response is checked against the assumed prompt
+# size. worst_case_call_usd() must stay at or below PER_CALL_RESERVE_USD (tested).
+PRICE_CEILING = {  # model -> (prompt, completion) USD per million tokens, OpenRouter max_price
+    "moonshotai/kimi-k3.1-pro": (0.30, 9.00),
+    "deepseek/deepseek-v4.1-flash-1017": (0.35, 1.30),
+}
+MAX_COMPLETION_TOKENS = 4000
+MAX_PROMPT_TOKENS = 50_000  # our prompt is ~400 tokens; web results add the rest
+WEB_RESULTS = 5
+WEB_USD_PER_RESULT = 0.004  # OpenRouter web plugin, USD 4 per 1,000 results
+JURISDICTIONS = {"AU", "NZ", "AU+NZ"}
+
+
+def worst_case_call_usd(model):
+    p, c = PRICE_CEILING[model]
+    return (MAX_PROMPT_TOKENS * p + MAX_COMPLETION_TOKENS * c) / 1e6 + WEB_RESULTS * WEB_USD_PER_RESULT
 
 # IICRC prohibits entering its standards into any AI tool (CLAUDE.md). Claims that
 # name an IICRC standard are refused here and go to the licensed-index route instead.
@@ -163,10 +183,16 @@ def main():
         return recheck(a.recheck)
     if not (a.claims and a.out and a.max_usd is not None):
         sys.exit("--claims, --out and --max-usd are required for a model run")
-    if a.max_usd <= 0 or a.max_usd > DAILY_CAP_USD:
-        sys.exit(f"--max-usd must be between 0 and {DAILY_CAP_USD}")
+    if not math.isfinite(a.max_usd) or a.max_usd <= 0 or a.max_usd > DAILY_CAP_USD:
+        sys.exit(f"--max-usd must be a number above 0 and at most {DAILY_CAP_USD}")
     claims = [json.loads(l) for l in open(a.claims) if l.strip()]
-    banned = [c["id"] for c in claims if IICRC_RX.search(c["claim"])]
+    for c in claims:
+        if not (isinstance(c, dict) and all(isinstance(c.get(f), str) for f in ("id", "claim", "jurisdiction"))):
+            sys.exit(f"REFUSED: each claim needs string id, claim and jurisdiction: {str(c)[:80]}")
+        if c["jurisdiction"] not in JURISDICTIONS:
+            sys.exit(f"REFUSED: claim {c['id']} jurisdiction must be one of {sorted(JURISDICTIONS)}")
+    # Scan exactly what would be sent, not one field of it.
+    banned = [c["id"] for c in claims if IICRC_RX.search(PROMPT.format(claim=c["claim"], jurisdiction=c["jurisdiction"]))]
     if banned:
         sys.exit(f"REFUSED: claims {banned} name an IICRC standard; check them against the licensed index, not an AI tool")
     k = key()
@@ -179,17 +205,27 @@ def main():
                     print(f"STOP: daily spend ${today:.2f} at the ${DAILY_CAP_USD} cap"); return 2
                 if run_spend + PER_CALL_RESERVE_USD > a.max_usd:
                     print(f"STOP: run spend ${run_spend:.2f} at --max-usd {a.max_usd}"); return 2
-                body = {"model": model, "max_tokens": 4000,
-                        "messages": [{"role": "user", "content": PROMPT.format(**c)}],
-                        "plugins": [{"id": "web", "max_results": 5}],
+                p_max, c_max = PRICE_CEILING[model]
+                body = {"model": model, "max_tokens": MAX_COMPLETION_TOKENS,
+                        "messages": [{"role": "user", "content": PROMPT.format(claim=c["claim"], jurisdiction=c["jurisdiction"])}],
+                        "plugins": [{"id": "web", "max_results": WEB_RESULTS}],
+                        "provider": {"max_price": {"prompt": p_max, "completion": c_max}},
                         "usage": {"include": True}}
+                stop = None
                 try:
                     r = call("/chat/completions", k, body)
                     text = r["choices"][0]["message"].get("content") or ""
-                    cost = max(float(r.get("usage", {}).get("cost") or 0), 0.0)
+                    usage = r.get("usage") or {}
+                    raw_cost = usage.get("cost")
+                    cost = float(raw_cost) if raw_cost is not None else float("nan")
                     err = None
+                    if not math.isfinite(cost) or cost < 0:
+                        cost, stop = PER_CALL_RESERVE_USD, "cost not reported; counted the full reserve and stopped"
+                    elif cost > PER_CALL_RESERVE_USD or (usage.get("prompt_tokens") or 0) > MAX_PROMPT_TOKENS:
+                        stop = f"one call cost ${cost:.4f}, past the per-call bound; stopped"
                 except Exception as e:  # recorded, never treated as a pass
-                    text, cost, err = "", 0.0, f"{type(e).__name__}: {e}"
+                    # A failed request may still have been billed: count the full reserve.
+                    text, cost, err = "", PER_CALL_RESERVE_USD, type(e).__name__
                 run_spend += cost
                 ans = parse(text) or {}
                 row = {"id": c["id"], "model": model, "cost_usd": round(cost, 5),
@@ -206,6 +242,8 @@ def main():
                 if row["quote"]:
                     print(f"    quote: {row['quote']}")
                 sys.stdout.flush()
+                if stop:
+                    print(f"STOP: {stop}"); return 2
     print(f"run spend ${run_spend:.4f}; today ${daily_spend(k):.2f} of ${DAILY_CAP_USD}")
     return 0
 
