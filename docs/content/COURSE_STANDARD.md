@@ -112,6 +112,33 @@ Every teaching lesson uses these seven parts, in this order, each under its own 
 7. **Takeaway.** Two lines the learner remembers, plus the next step (the next lesson, a glossary
    term or a calculator).
 
+### 4.1 Minimum deliverable for every course (founder, 19/11/2026)
+
+Phill set this as "the absolute minimum" for CARSI course development. A course that misses any
+item is not ready to launch or to sell. The full working rules are in the
+`carsi-course-production` skill (`.claude/skills/carsi-course-production/SKILL.md`).
+
+1. **Cover image.** Made for the course with the OpenAI image model (`gpt_image_2_6` on the
+   Higgsfield plan, or `gpt-image-1` through the generate-course-media workflow), set as
+   `thumbnailUrl`. Never stock. No words or logos generated inside the image.
+2. **A lesson-specific OpenAI image in every teaching lesson.** It shows that lesson's job,
+   material or technique, not a generic scene. Captioned "AI illustration, not a site photo", with
+   alt text.
+3. **A diagram in every teaching lesson.** Hand-written SVG that passes
+   `npm run check:course-diagrams`.
+4. **The seven-part layout** above, in every teaching lesson.
+5. **Four learning styles in every teaching lesson:**
+   - **See it:** the image and the diagram.
+   - **Read it:** The idea and the Takeaway.
+   - **Do it:** the metric worked example and the field download.
+   - **Recall it:** the Check yourself questions and the module check.
+   Listening (narration) is optional. It costs money, so it needs the founder's approval.
+6. **Guardrails.** No IICRC standard text in any AI prompt. Australian and New Zealand settings,
+   equipment and units. Every image is looked at on a desktop and on a phone before review.
+
+The audit checks only that a visual exists (floor 5.10). It does not yet check for the cover, the
+lesson image or the diagram separately, so human review checks items 1 to 3 until the audit does.
+
 ## 5. Measurable floors
 
 Each floor is checked by `scripts/audit-course-depth.mjs` against the seed data. The numbers here

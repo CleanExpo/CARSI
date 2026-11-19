@@ -104,9 +104,40 @@ edit is saved.
 ## Course quality bar (applies with the AU standard)
 - Real, substantive modules (not stubs); consistent structure; correct `iicrcDiscipline` (or neutral
   for general/knowledge courses); CEC only when genuinely accredited (founder decides value).
-- Course-card placeholder is data-driven (see `CourseTextThumbnail`); no ad-hoc stock cover images.
+- Every course has a generated cover image (see the minimum deliverable below). The data-driven
+  `CourseTextThumbnail` placeholder is only a fallback while the cover is being made. Never use
+  ad-hoc stock cover images.
 - Trailers are branded Remotion renders **with audio** (voiced via the sanctioned Synthex ElevenLabs
   config, single voice) — a silent trailer is a defect.
+
+## Minimum deliverable for every course (MUST, founder 19/11/2026)
+Phill: "This is the absolute minimum I am expecting for the CARSI Course Development system."
+A course that misses any item below is not ready to launch or to sell. Make a todo for each item
+on every course build or upgrade. The same list is in `docs/content/COURSE_STANDARD.md` §4.1.
+
+1. **Cover image.** Generate it for the course with the OpenAI image model (`gpt_image_2_6` on the
+   Higgsfield plan, or `gpt-image-1` through `.github/workflows/generate-course-media.yml`), and
+   set it as `thumbnailUrl`. No stock images. Never let the model draw words or logos.
+2. **A lesson-specific OpenAI image in every teaching lesson.** Write each prompt from that
+   lesson's own job, material or technique, set on an Australian or New Zealand site, so no two
+   lessons share a generic scene. Store the image as webp in `public/courses/<slug>/images/`, and
+   give it alt text and the caption "AI illustration, not a site photo".
+3. **A diagram in every teaching lesson**, built to the diagram rules below and passing
+   `npm run check:course-diagrams`.
+4. **The seven-part layout** (`COURSE_STANDARD.md` §4) in every teaching lesson: On the job, The
+   idea, See it, Do it in metric, Field download, Check yourself, Takeaway.
+5. **Four learning styles in every teaching lesson:**
+   - **See it:** the image and the diagram.
+   - **Read it:** The idea and the Takeaway.
+   - **Do it:** the metric worked example and the field download.
+   - **Recall it:** the Check yourself questions and the module check.
+   Listening (ElevenLabs narration) is optional. It costs money per character, so it needs the
+   founder's approval of a quoted cost first.
+6. **Guardrails.**
+   - Never put IICRC standard text in an image prompt or any other AI prompt.
+   - Use only images made on plans CARSI already pays for, with no new spend.
+   - Look at every image and diagram in a real browser, on a desktop and on a phone, before review.
+   - A wrong, generic or garbled image is a defect: remake it.
 
 ## Course diagrams — fit, clear, branded (MUST)
 Founder-approved 20/10/2026 on the Level 2 Mould Remediation diagrams; every course from now on.
