@@ -35,9 +35,11 @@ import {
 } from '@/components/coaching-portal/coaching-ui';
 import { useCoachingPortal } from '@/components/coaching-portal/CoachingPortalContext';
 import { CoachingBuildProgressStrip } from '@/components/coaching-portal/visual/CoachingBuildProgressStrip';
+import { CoachingMarketingPackFirstWin } from '@/components/coaching-portal/visual/CoachingMarketingPackFirstWin';
 import { CoachingPageJumpNav } from '@/components/coaching-portal/visual/CoachingPageJumpNav';
 import { CoachingStatGrid } from '@/components/coaching-portal/visual/CoachingStatGrid';
 import { CoachingSupportPanel } from '@/components/coaching-portal/visual/CoachingSupportPanel';
+import { MARKETING_PACK_BUILD_EVENT } from '@/lib/analytics/carsi-events';
 import { coachingPortalPath } from '@/lib/coaching-portal/coaching-portal-paths';
 import { marketingPackErrorFromResponse } from '@/lib/coaching-portal/marketing-pack/api-messages';
 import { MARKETING_PACK_DOWNLOADS } from '@/lib/coaching-portal/marketing-pack/downloads';
@@ -99,7 +101,7 @@ function MarketingPackLoadingSkeleton() {
 }
 
 export function CoachingMarketingPackPage() {
-  const { access } = useCoachingPortal();
+  const { access, marketing } = useCoachingPortal();
   const [pack, setPack] = useState<Pack | null>(null);
   const [history, setHistory] = useState<MarketingPackSummary[]>([]);
   const [progress, setProgress] = useState<PackProgress>({
@@ -210,6 +212,10 @@ export function CoachingMarketingPackPage() {
 
   return (
     <div className={coachingPage} data-testid="marketing-pack-page">
+      <CoachingMarketingPackFirstWin
+        profileReady={marketing?.profileReady ?? false}
+        hasPack={Boolean(pack)}
+      />
       <div className={coachingHeroBand} data-testid="marketing-pack-hero">
         <p className={coachingEyebrow}>Marketing pack · Advantage A7</p>
         <h1 className="mt-2 text-2xl font-semibold tracking-tight text-white sm:text-[1.75rem]">
@@ -254,6 +260,8 @@ export function CoachingMarketingPackPage() {
             disabled={!access.canEdit || building}
             aria-busy={building}
             data-testid="marketing-pack-build"
+            data-carsi-event={MARKETING_PACK_BUILD_EVENT}
+            data-carsi-context="coaching-marketing"
             onClick={() => void build()}
           >
             {building ? (
