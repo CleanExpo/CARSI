@@ -57,6 +57,6 @@ Let the hygrometer settle (follow the maker's settling time). Hold it at about c
 
 - **Check device:** the maker's fixed reference for testing a pin meter.
 - **Reference block:** the maker's plate or block for testing a pinless meter.
-- **Tag out:** label an instrument out of service until it is repaired and checked.
+- **Tag out:** label an instrument out of service until it has been serviced and checked.
 
 Print this page and keep it in your meter case. Every formula on it is worked through in Module 5.
