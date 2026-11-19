@@ -230,14 +230,14 @@
         {
           "questionText": "Grinding is finished. How should the silica dust be cleaned up?",
           "options": [
-            "With an H- or M-class vacuum or wet methods",
+            "With an H-class vacuum or wet methods",
             "With a broom, then a household vacuum",
             "Blown outside with compressed air",
             "Left to settle overnight, then swept"
           ],
           "correctIndex": 0,
           "points": 1,
-          "explanation": "Dry sweeping, compressed air and general-purpose vacuums put the fine dust back in the air. Use wet methods or an H- or M-class vacuum."
+          "explanation": "Dry sweeping, compressed air and general-purpose vacuums put the fine dust back in the air. Use wet methods or an H-class vacuum (Australia also allows M-class)."
         }
       ]
     },

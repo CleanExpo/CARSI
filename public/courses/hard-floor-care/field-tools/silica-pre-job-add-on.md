@@ -13,12 +13,12 @@ If both answers are yes, complete sections 2 to 4 before the machine starts.
 - [ ] Engineering control at the tool: wet / on-tool extraction (vacuum class: H / M) / LEV / isolation
 - [ ] Others kept out of the dust zone (barrier, signs, doors closed)
 - [ ] Respirator for anyone still at risk: model ______, AS/NZS 1716, fit test date ____
-- [ ] Clean-up method: wet wipe / low-pressure water / wet sweep / H- or M-class vacuum. No dry sweep, no compressed air.
+- [ ] Clean-up method: wet wipe / low-pressure water / wet sweep / H-class vacuum (M-class also allowed in Australia). No dry sweep, no compressed air.
 
 ## 3. Australia: high risk? (written decision)
 - [ ] Assessed as: high risk / not high risk / cannot tell (treat as high risk). Reason: ______
 If high risk:
-- [ ] Silica risk control plan (or SWMS for construction work) done before work. Victoria: hazard control statement.
+- [ ] Silica risk control plan (or SWMS for high-risk construction work) done before work. Victoria: hazard control statement.
 - [ ] Workers trained (accredited or regulator-approved course): names and dates ______
 - [ ] Air monitoring arranged. Above 0.05 mg/m³: regulator told within 14 days.
 - [ ] Health monitoring arranged for exposed workers.
