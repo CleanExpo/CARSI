@@ -16,6 +16,8 @@ from unittest import mock
 sys.path.insert(0, os.path.dirname(__file__))
 import crosscheck as cc  # noqa: E402
 
+cc.LEDGER_DIR = tempfile.mkdtemp(prefix="crosscheck-test-ledger-")
+
 
 def claims_file(rows):
     f = tempfile.NamedTemporaryFile("w", suffix=".jsonl", delete=False)
@@ -24,9 +26,11 @@ def claims_file(rows):
     return f.name
 
 
-def run_main(argv):
+def run_main(argv, ledger_dir=None):
     out = io.StringIO()
-    with mock.patch.object(sys, "argv", ["crosscheck.py", *argv]), redirect_stdout(out):
+    ledger_dir = ledger_dir or tempfile.mkdtemp(prefix="crosscheck-test-ledger-")
+    with mock.patch.object(sys, "argv", ["crosscheck.py", *argv]), redirect_stdout(out), \
+            mock.patch.object(cc, "LEDGER_DIR", ledger_dir):
         try:
             code = cc.main()
         except SystemExit as e:
@@ -109,6 +113,63 @@ class Caps(unittest.TestCase):
         self.assertEqual(code, 2)
         self.assertIn("daily spend", text)
         self.assertLessEqual(cc.DAILY_CAP_USD - 0.40 + fake.chat_calls * 0.20, cc.DAILY_CAP_USD)
+
+    def test_separate_runs_share_the_daily_cap_when_openrouter_is_stale(self):
+        # OpenRouter reports 0 all day. Two runs, each allowed USD 20, must still stop at USD 20 together.
+        shared = tempfile.mkdtemp()
+        chats = {"n": 0}
+
+        def stale(path, k, body=None, timeout=180):
+            if path == "/key":
+                return {"data": {"usage_daily": 0.0}}
+            chats["n"] += 1
+            ans = {"verdict": "SUPPORTED", "correction": "", "source_url": "", "section": "r 1", "quote": ""}
+            return {"choices": [{"message": {"content": json.dumps(ans)}}],
+                    "usage": {"cost": 0.20, "prompt_tokens": 400}}
+
+        rows = [dict(CLAIM, id=f"C{i}") for i in range(80)]
+        with mock.patch.object(cc, "call", stale), mock.patch.object(cc, "quote_found", return_value="X"):
+            first, _ = run_main(["--claims", claims_file(rows), "--out", self.out, "--max-usd", "20"], shared)
+            second, text = run_main(["--claims", claims_file(rows), "--out", self.out, "--max-usd", "20"], shared)
+        self.assertEqual(second, 2)
+        self.assertIn("daily spend", text)
+        self.assertLessEqual(chats["n"] * 0.20, cc.DAILY_CAP_USD)
+
+    def test_unreadable_spend_record_blocks_before_any_chat_call(self):
+        for bad in ["x", "[1]", '{"usd": true}', '{"usd": -1}', '{"usd": "1"}', '{}']:
+            d = tempfile.mkdtemp()
+            with open(cc._ledger_file_in(d), "w") as f:
+                f.write(bad)
+            fake = FakeChat(daily=0.0)
+            with mock.patch.object(cc, "call", fake):
+                code, _ = run_main(["--claims", claims_file([CLAIM]), "--out", self.out, "--max-usd", "5"], d)
+            self.assertNotEqual(code, 0, bad)
+            self.assertEqual(fake.chat_calls, 0, bad)
+
+    def test_concurrent_bookings_never_pass_the_daily_cap(self):
+        # Many runs booking at once: the lock must make read-check-write one step.
+        d = tempfile.mkdtemp()
+
+        def slow_zero(k):
+            import time
+            time.sleep(0.002)  # widen the window between reading and writing the record
+            return 0.0
+
+        granted = []
+        with mock.patch.object(cc, "LEDGER_DIR", d), mock.patch.object(cc, "daily_spend", slow_zero):
+            def worker():
+                for _ in range(20):
+                    path, _today = cc.book_call("k")
+                    if path:
+                        granted.append(1)
+
+            threads = [threading.Thread(target=worker) for _ in range(8)]
+            for t in threads:
+                t.start()
+            for t in threads:
+                t.join()
+        self.assertLessEqual(len(granted) * cc.PER_CALL_RESERVE_USD, cc.DAILY_CAP_USD)
+        self.assertEqual(len(granted), int(cc.DAILY_CAP_USD / cc.PER_CALL_RESERVE_USD))
 
     def test_max_usd_above_daily_cap_refused(self):
         with mock.patch.object(cc, "call", FakeChat(daily=0.0)):

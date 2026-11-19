@@ -177,7 +177,9 @@ substantive point (law, duty, number, limit, date, product, standard edition) ru
    It sends each claim to Kimi (`moonshotai/kimi-k3.1-pro`) and DeepSeek
    (`deepseek/deepseek-v4.1-flash-1017`) through OpenRouter with web search, asks for primary
    sources only, then fetches each cited page and checks the quoted words are on it
-   (`QUOTE_FOUND`). Cap: USD 20/day, checked live, plus `--max-usd` per run; the key is read from
+   (`QUOTE_FOUND`). Cap: USD 20/day, checked against OpenRouter's live figure and a shared
+   daily record on this Mac (`~/.local/state/carsi-research/`, booked before every call), plus
+   `--max-usd` per run; the key is read from
    Keychain item `openrouter-api-key`. Authority: Phill, 20/11/2026, CARSI course research only.
 3. **Read the result, do not trust it.** A model answer is a lead (grade L). A claim enters the
    ledger as `VERIFIED` only after the primary source is opened and the quote confirmed there

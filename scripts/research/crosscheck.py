@@ -15,9 +15,13 @@ Usage:
 claims.jsonl rows: {"id": "...", "claim": "...", "jurisdiction": "AU|NZ|AU+NZ"}
 """
 import argparse
+import contextlib
+import datetime
+import fcntl
 import html
 import json
 import math
+import os
 import re
 import subprocess
 import sys
@@ -136,6 +140,70 @@ def call(path, k, body=None, timeout=180):
                                           "X-Title": "CARSI course research"})
     with _KEY_OPENER.open(req, timeout=timeout) as r:
         return json.load(r)
+
+
+# Shared daily spend record on this machine (the only one holding the key). OpenRouter's
+# usage_daily can lag or stay stale, so the cap never rests on it alone: every run books the
+# full reserve here, under a lock, before each call, and settles to the counted cost after.
+LEDGER_DIR = os.path.expanduser("~/.local/state/carsi-research")
+
+
+def _ledger_file_in(d):
+    return os.path.join(d, f"spend-{datetime.datetime.now(datetime.timezone.utc):%Y-%m-%d}.json")
+
+
+@contextlib.contextmanager
+def _ledger_locked():
+    os.makedirs(LEDGER_DIR, exist_ok=True)
+    with open(os.path.join(LEDGER_DIR, "spend.lock"), "a") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            fcntl.flock(lock, fcntl.LOCK_UN)
+
+
+def _ledger_read(path):
+    """Booked spend for the day. No file yet means 0. Anything unreadable stops the program."""
+    try:
+        with open(path) as f:
+            v = real_number(json.load(f).get("usd"))
+    except FileNotFoundError:
+        return 0.0
+    except Exception as e:
+        sys.exit(f"BLOCKED: the daily spend record {path} is unreadable ({type(e).__name__})")
+    if v is None:
+        sys.exit(f"BLOCKED: the daily spend record {path} does not hold a usable amount")
+    return v
+
+
+def _ledger_write(path, usd):
+    tmp = path + ".tmp"
+    with open(tmp, "w") as f:
+        json.dump({"usd": round(usd, 6)}, f)
+    os.replace(tmp, path)
+
+
+def book_call(k):
+    """Single owner of the daily cap. Under the lock, in one step: day total = the higher of
+    OpenRouter's figure and the record; refuse if one more full reserve would pass the cap;
+    otherwise raise the record to that day total plus the reserve. Raising it to OpenRouter's
+    figure first means spend OpenRouter has seen (earlier runs, other use) is never forgotten
+    if OpenRouter's figure then stops moving.
+    Returns (record path, day total), or (None, day total) at the cap."""
+    with _ledger_locked():
+        path = _ledger_file_in(LEDGER_DIR)
+        today = max(daily_spend(k), _ledger_read(path))
+        if today + PER_CALL_RESERVE_USD > DAILY_CAP_USD:
+            return None, today
+        _ledger_write(path, today + PER_CALL_RESERVE_USD)
+        return path, today
+
+
+def settle_call(path, cost):
+    """Replace the reserve booked for one call with the cost counted for it."""
+    with _ledger_locked():
+        _ledger_write(path, max(0.0, _ledger_read(path) - PER_CALL_RESERVE_USD) + cost)
 
 
 def daily_spend(k):
@@ -319,16 +387,14 @@ def main():
         sys.exit(f"REFUSED: claims {banned} name an IICRC standard; check them against the licensed index, not an AI tool")
     k = key()
     run_spend = 0.0
-    day_start = daily_spend(k)
     with open(a.out, "a") as out:
         for c in claims:
             for model in MODELS:
-                # OpenRouter's figure can lag, so this run's own spend always counts too.
-                today = max(daily_spend(k), day_start + run_spend)
-                if today + PER_CALL_RESERVE_USD > DAILY_CAP_USD:
-                    print(f"STOP: daily spend ${today:.2f} at the ${DAILY_CAP_USD} cap"); return 2
                 if run_spend + PER_CALL_RESERVE_USD > a.max_usd:
                     print(f"STOP: run spend ${run_spend:.2f} at --max-usd {a.max_usd}"); return 2
+                booking, today = book_call(k)
+                if booking is None:
+                    print(f"STOP: daily spend ${today:.2f} at the ${DAILY_CAP_USD} cap"); return 2
                 p_max, c_max = PRICE_CEILING[model]
                 body = {"model": model, "max_tokens": MAX_COMPLETION_TOKENS,
                         "messages": [{"role": "user", "content": c["_prompt"]}],
@@ -353,6 +419,7 @@ def main():
                     text, cost, err = "", PER_CALL_RESERVE_USD, type(e).__name__
                     stop = "no valid cost for this call; counted the full reserve and stopped"
                 run_spend += cost
+                settle_call(booking, cost)
                 ans = coerce_answer(text)
                 if err:
                     ans["verdict"] = "ERROR"
