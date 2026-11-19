@@ -18,6 +18,8 @@ import { CoachingOnboardingStatusBar } from '@/components/coaching-portal/Coachi
 import { useCoachingPortal } from '@/components/coaching-portal/CoachingPortalContext';
 import { CoachingFeatureSpotlight } from '@/components/coaching-portal/visual/CoachingFeatureSpotlight';
 import { CoachingQuickLinks } from '@/components/coaching-portal/visual/CoachingQuickLinks';
+import { CoachingMonthSummaryCard } from '@/components/coaching-portal/visual/CoachingMonthSummaryCard';
+import { buildCoachingHomeMonthSummary } from '@/lib/coaching-portal/coaching-home-month-summary';
 import { coachingHomeQuickLinks } from '@/lib/coaching-portal/coaching-home-quick-links';
 import { coachingPortalPath } from '@/lib/coaching-portal/coaching-portal-paths';
 import { CheckCircle2, Circle, Megaphone } from 'lucide-react';
@@ -169,6 +171,14 @@ function AssessmentPendingHome() {
 
 function ActiveHome() {
   const { user, welcomeMessage, plan, actions, sessions, marketing } = useCoachingPortal();
+  const monthSummary = buildCoachingHomeMonthSummary({
+    completedThisMonth: actions.completedThisMonth,
+    totalThisMonth: actions.totalThisMonth,
+    proposedFixCount: marketing.proposedFixCount,
+    marketingHasPack: marketing.hasPack,
+    profileReady: marketing.profileReady,
+    nextActionTitle: actions.nextAction?.title ?? null,
+  });
 
   return (
     <div className={coachingPage}>
@@ -340,20 +350,7 @@ function ActiveHome() {
 
         <CoachingCheckInCard className="lg:col-span-2" />
 
-        <section className={`${coachingCard} lg:col-span-2`}>
-          <h2 className="text-sm font-semibold text-slate-300">Progress summary</h2>
-          {actions.totalThisMonth > 0 ? (
-            <p className="mt-2 text-lg text-white">
-              <span className="font-semibold">{actions.completedThisMonth}</span> of{' '}
-              <span className="font-semibold">{actions.totalThisMonth}</span> actions completed this
-              month.
-            </p>
-          ) : (
-            <p className={`mt-2 ${coachingMuted}`}>
-              No actions recorded this month yet. Check your action board after your plan is set.
-            </p>
-          )}
-        </section>
+        <CoachingMonthSummaryCard summary={monthSummary} />
 
         <CoachingAskCoachPanel className="lg:col-span-2" />
       </div>
