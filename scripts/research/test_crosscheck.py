@@ -300,7 +300,9 @@ class IicrcGuard(unittest.TestCase):
                      "S.220 flooring", "per S900", "the I.I.C.R.C. view",
                      "S\u2013500 drying", "S\u2011500 drying", "S/500 drying", "S_500 drying", "S -- 500",
                      "\uff33\uff15\uff10\uff10 drying", "\u0405500 drying", "S\u0665\u0660\u0660",
-                     "IICR\u200bC rules", "drying per S 5 0 0"[:0] + "S\u00a0500 drying"]:
+                     "IICR\u200bC rules", "S\u00a0500 drying",
+                     "S\n500 requires drying", "S------500 drying", "S" + "-" * 40 + "500", "S 5 0 0 drying",
+                     "S\n\n\n500", "I-I-C-R-C rules", "I\nI\nC\nR\nC", "s(500)", "S'500"]:
             fake = FakeChat(daily=0.0)
             with mock.patch.object(cc, "key", return_value="x"), mock.patch.object(cc, "call", fake):
                 code, _ = run_main(["--claims", claims_file([dict(CLAIM, claim=text)]),
@@ -318,8 +320,10 @@ class IicrcGuard(unittest.TestCase):
             self.assertEqual(fake.chat_calls, 0, repr(text))
 
     def test_allows_ordinary_whs_claim(self):
-        self.assertIsNone(cc.IICRC_RX.search(CLAIM["claim"]))
-        self.assertIsNone(cc.IICRC_RX.search("AS/NZS 1716:2012 respirators"))
+        for text in [CLAIM["claim"], "AS/NZS 1716:2012 respirators", "reg 529CB(3)", "The PCBU's 100 workers",
+                     "Schedule 14", "0.05 mg/m3", "Regulations 2017, 1 July 2024", "Victoria 319L(1)(a)",
+                     cc.PROMPT.format(claim="x", jurisdiction="AU+NZ")]:
+            self.assertFalse(cc.names_iicrc(text), text)
 
 
 class QuoteCheck(unittest.TestCase):

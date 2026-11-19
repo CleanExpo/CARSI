@@ -51,12 +51,30 @@ def worst_case_call_usd(model):
 
 # IICRC prohibits entering its standards into any AI tool (CLAUDE.md). Claims that
 # name an IICRC standard are refused here and go to the licensed-index route instead.
-# Fail closed, on text that model_safe() has already limited to plain ASCII: "IICRC" with any
-# punctuation between its letters, and "S" followed by up to 5 punctuation or space characters
-# and a number from 100 to 999 (the IICRC S-standard pattern), whatever the separator.
-_SEP = r"[^A-Za-z0-9\n]"
-IICRC_RX = re.compile(r"(?<![A-Za-z])I{0}{{0,2}}I{0}{{0,2}}C{0}{{0,2}}R{0}{{0,2}}C(?![A-Za-z])".format(_SEP)
-                      + r"|(?<![A-Za-z0-9])S{0}{{0,5}}[1-9][0-9]{{2}}(?![0-9])".format(_SEP), re.I)
+def names_iicrc(text):
+    """True if text names IICRC or an IICRC S-standard. Run on text model_safe() has passed.
+
+    It keeps only runs of letters and runs of digits and drops everything else (spaces, line
+    breaks, any punctuation, in any amount), so nothing between the parts is described and no
+    separator can slip through. Apostrophes are dropped first, so a possessive ("worker's")
+    stays one word. Refused: the letters alone contain IICRC; or a standalone S is followed by
+    digit runs whose first three digits form 100-999 ("S500", "S-500", "S 5 0 0", "S\n500").
+    Named limit: a disguise a person would not type by accident ("S five hundred") is not caught.
+    """
+    runs = re.findall(r"[A-Za-z]+|[0-9]+", text.replace("'", ""))
+    if "IICRC" in "".join(r for r in runs if r.isalpha()).upper():
+        return True
+    for i, r in enumerate(runs):
+        if r.upper() != "S":
+            continue
+        digits = ""
+        for nxt in runs[i + 1:]:
+            if not nxt.isdigit() or len(digits) >= 3:
+                break
+            digits += nxt
+        if len(digits) >= 3 and digits[0] != "0":
+            return True
+    return False
 
 
 def model_safe(text):
@@ -284,7 +302,7 @@ def main():
     unsafe = [c["id"] for c in claims if not model_safe(c["_prompt"])]
     if unsafe:
         sys.exit(f"REFUSED: claims {unsafe} contain characters outside plain ASCII; retype them in plain text")
-    banned = [c["id"] for c in claims if IICRC_RX.search(c["_prompt"])]
+    banned = [c["id"] for c in claims if names_iicrc(c["_prompt"])]
     if banned:
         sys.exit(f"REFUSED: claims {banned} name an IICRC standard; check them against the licensed index, not an AI tool")
     k = key()

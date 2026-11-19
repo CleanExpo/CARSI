@@ -168,7 +168,9 @@ substantive point (law, duty, number, limit, date, product, standard edition) ru
 **before** it is written into a lesson:
 1. **Write the claims down first**, one per line, in `claims.jsonl`
    (`{"id","claim","jurisdiction":"AU|NZ|AU+NZ"}`), in plain ASCII text (the runner refuses
-   curly quotes, long dashes and other special characters). Training knowledge may suggest a
+   curly quotes, long dashes and other special characters). Write legal sections as
+   "section 274", not "s 274": a lone "s" before a number reads as an S-standard and is
+   refused. Training knowledge may suggest a
    claim; it never settles one.
 2. **Cross-check with two independent models**:
    `python3 scripts/research/crosscheck.py --claims claims.jsonl --out results.jsonl --max-usd <n>`.
@@ -183,7 +185,9 @@ substantive point (law, duty, number, limit, date, product, standard edition) ru
    `CONTRADICTED`/`PARTLY`: open the source and correct the claim, or cut it. Nothing found:
    `GAP`.
 4. **Never send IICRC standard text or IICRC standard claims to the runner.** It refuses any claim
-   naming IICRC or an S-standard; those stay `GAP`/`substantiate` against the licensed index.
+   naming IICRC or an S-standard, however it is spaced or punctuated; those stay
+   `GAP`/`substantiate` against the licensed index. The guard catches what a person types, not a
+   deliberate disguise ("S five hundred"): never try to word a standard past it.
 5. **Keep `results.jsonl` beside the ledger** as the research record for the course.
 
 ## Evidence layer — cite-or-cut (MUST for Course Standard v1 and designation courses)
