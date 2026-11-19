@@ -84,7 +84,7 @@ class Caps(unittest.TestCase):
         self.assertGreater(fake.chat_calls, 0)
 
     def test_unusable_daily_spend_blocks_before_any_chat_call(self):
-        for bad in [float("nan"), float("inf"), -1.0, "abc", None]:
+        for bad in [float("nan"), float("inf"), -1.0, "abc", None, True, False, "0.5", [1]]:
             fake = FakeChat(daily=0.0)
             orig = fake.__call__
 
@@ -163,6 +163,23 @@ class PerCallBound(unittest.TestCase):
             code, text = run_main(["--claims", claims_file([CLAIM]), "--out", self.out, "--max-usd", "5"])
         self.assertEqual(code, 2)
         self.assertIn("cost not reported", text)
+
+    def test_cost_that_is_not_a_real_number_fails_closed(self):
+        for bad in [False, True, "0.01", None, [0.01], {"usd": 0.01}, float("nan"), -0.01]:
+            calls = {"n": 0}
+
+            def fake(path, k, body=None, timeout=180, bad=bad):
+                if path == "/key":
+                    return {"data": {"usage_daily": 0.0}}
+                calls["n"] += 1
+                return {"choices": [{"message": {"content": "{}"}}], "usage": {"cost": bad}}
+
+            rows = [dict(CLAIM, id=f"C{i}") for i in range(5)]
+            with mock.patch.object(cc, "call", fake), mock.patch.object(cc, "quote_found", return_value="X"):
+                code, text = run_main(["--claims", claims_file(rows), "--out", self.out, "--max-usd", "5"])
+            self.assertEqual(code, 2, bad)
+            self.assertEqual(calls["n"], 1, bad)
+            self.assertIn("cost not reported", text, bad)
 
     def test_failed_request_counts_the_full_reserve(self):
         calls = {"n": 0}
@@ -280,13 +297,25 @@ class IicrcGuard(unittest.TestCase):
         for text in ["ANSI/IICRC S500 requires drying", "The S520 says", "IICRC guidance", "S 500 section 12",
                      "the s-500 says", "S500:2021 clause", "iicrc rules", "ANSI IICRC S100",
                      "S700 section 4 covers fire damage", "s-800 inspection", "S 300 upholstery",
-                     "S.220 flooring", "per S900", "the I.I.C.R.C. view"]:
+                     "S.220 flooring", "per S900", "the I.I.C.R.C. view",
+                     "S\u2013500 drying", "S\u2011500 drying", "S/500 drying", "S_500 drying", "S -- 500",
+                     "\uff33\uff15\uff10\uff10 drying", "\u0405500 drying", "S\u0665\u0660\u0660",
+                     "IICR\u200bC rules", "drying per S 5 0 0"[:0] + "S\u00a0500 drying"]:
             fake = FakeChat(daily=0.0)
             with mock.patch.object(cc, "key", return_value="x"), mock.patch.object(cc, "call", fake):
                 code, _ = run_main(["--claims", claims_file([dict(CLAIM, claim=text)]),
                                     "--out", tempfile.mktemp(), "--max-usd", "1"])
             self.assertNotEqual(code, 0, text)
             self.assertEqual(fake.chat_calls, 0, text)
+
+    def test_refuses_any_character_outside_plain_ascii(self):
+        for text in ["Air monitoring \u2013 30 years", "kept 30 years\u200b", "caf\u00e9 rule", "line\x00break"]:
+            fake = FakeChat(daily=0.0)
+            with mock.patch.object(cc, "key", return_value="x"), mock.patch.object(cc, "call", fake):
+                code, _ = run_main(["--claims", claims_file([dict(CLAIM, claim=text)]),
+                                    "--out", tempfile.mktemp(), "--max-usd", "1"])
+            self.assertNotEqual(code, 0, repr(text))
+            self.assertEqual(fake.chat_calls, 0, repr(text))
 
     def test_allows_ordinary_whs_claim(self):
         self.assertIsNone(cc.IICRC_RX.search(CLAIM["claim"]))

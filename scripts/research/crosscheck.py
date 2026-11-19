@@ -51,8 +51,28 @@ def worst_case_call_usd(model):
 
 # IICRC prohibits entering its standards into any AI tool (CLAUDE.md). Claims that
 # name an IICRC standard are refused here and go to the licensed-index route instead.
-# Fail closed: any IICRC spelling, and any S-number from S100 to S999 (the IICRC S-standard pattern).
-IICRC_RX = re.compile(r"\bI\.?I\.?C\.?R\.?C\b|\bS[\s.-]?[1-9][0-9]{2}\b", re.I)
+# Fail closed, on text that model_safe() has already limited to plain ASCII: "IICRC" with any
+# punctuation between its letters, and "S" followed by up to 5 punctuation or space characters
+# and a number from 100 to 999 (the IICRC S-standard pattern), whatever the separator.
+_SEP = r"[^A-Za-z0-9\n]"
+IICRC_RX = re.compile(r"(?<![A-Za-z])I{0}{{0,2}}I{0}{{0,2}}C{0}{{0,2}}R{0}{{0,2}}C(?![A-Za-z])".format(_SEP)
+                      + r"|(?<![A-Za-z0-9])S{0}{{0,5}}[1-9][0-9]{{2}}(?![0-9])".format(_SEP), re.I)
+
+
+def model_safe(text):
+    """Single owner of what may be sent to a model: printable ASCII and newlines only.
+    An allow-list, so look-alike letters, other dashes, other digits and invisible
+    characters are refused rather than listed."""
+    return all(32 <= ord(ch) <= 126 or ch == "\n" for ch in text)
+
+
+def real_number(v):
+    """Single owner of every number read from OpenRouter (spend, cost, tokens): a real
+    int or float only (never true/false, a string or null), finite and at least 0.
+    Anything else returns None, and every caller treats None as fail-closed."""
+    if type(v) not in (int, float) or not math.isfinite(v) or v < 0:
+        return None
+    return float(v)
 MIN_QUOTE_CHARS = 20  # a shorter quote matches too many pages to prove anything
 
 PROMPT = """You are checking one factual claim for an Australian training course.
@@ -92,10 +112,10 @@ def daily_spend(k):
     """Today's spend from OpenRouter. Anything but a finite, non-negative number stops
     the program: a cap measured against an unreadable value is no cap."""
     try:
-        v = float(call("/key", k)["data"]["usage_daily"])
+        v = real_number(call("/key", k)["data"]["usage_daily"])
     except Exception as e:
         sys.exit(f"BLOCKED: could not read today's OpenRouter spend ({type(e).__name__})")
-    if not math.isfinite(v) or v < 0:
+    if v is None:
         sys.exit("BLOCKED: OpenRouter reported an unusable daily spend")
     return v
 
@@ -258,8 +278,13 @@ def main():
             sys.exit(f"REFUSED: each claim needs string id, claim and jurisdiction: {str(c)[:80]}")
         if c["jurisdiction"] not in JURISDICTIONS:
             sys.exit(f"REFUSED: claim {c['id']} jurisdiction must be one of {sorted(JURISDICTIONS)}")
-    # Scan exactly what would be sent, not one field of it.
-    banned = [c["id"] for c in claims if IICRC_RX.search(PROMPT.format(claim=c["claim"], jurisdiction=c["jurisdiction"]))]
+    # Build each prompt once; the scanned text is exactly the text sent.
+    for c in claims:
+        c["_prompt"] = PROMPT.format(claim=c["claim"], jurisdiction=c["jurisdiction"])
+    unsafe = [c["id"] for c in claims if not model_safe(c["_prompt"])]
+    if unsafe:
+        sys.exit(f"REFUSED: claims {unsafe} contain characters outside plain ASCII; retype them in plain text")
+    banned = [c["id"] for c in claims if IICRC_RX.search(c["_prompt"])]
     if banned:
         sys.exit(f"REFUSED: claims {banned} name an IICRC standard; check them against the licensed index, not an AI tool")
     k = key()
@@ -276,7 +301,7 @@ def main():
                     print(f"STOP: run spend ${run_spend:.2f} at --max-usd {a.max_usd}"); return 2
                 p_max, c_max = PRICE_CEILING[model]
                 body = {"model": model, "max_tokens": MAX_COMPLETION_TOKENS,
-                        "messages": [{"role": "user", "content": PROMPT.format(claim=c["claim"], jurisdiction=c["jurisdiction"])}],
+                        "messages": [{"role": "user", "content": c["_prompt"]}],
                         "plugins": [{"id": "web", "max_results": WEB_RESULTS}],
                         "provider": {"max_price": {"prompt": p_max, "completion": c_max}},
                         "usage": {"include": True}}
@@ -285,12 +310,12 @@ def main():
                     r = call("/chat/completions", k, body)
                     text = r["choices"][0]["message"].get("content") or ""
                     usage = r.get("usage") or {}
-                    raw_cost = usage.get("cost")
-                    cost = float(raw_cost) if raw_cost is not None else float("nan")
+                    cost = real_number(usage.get("cost"))
+                    tokens = real_number(usage.get("prompt_tokens", 0))
                     err = None
-                    if not math.isfinite(cost) or cost < 0:
+                    if cost is None:
                         cost, stop = PER_CALL_RESERVE_USD, "cost not reported; counted the full reserve and stopped"
-                    elif cost > PER_CALL_RESERVE_USD or (usage.get("prompt_tokens") or 0) > MAX_PROMPT_TOKENS:
+                    elif tokens is None or cost > PER_CALL_RESERVE_USD or tokens > MAX_PROMPT_TOKENS:
                         stop = f"one call cost ${cost:.4f}, past the per-call bound; stopped"
                 except Exception as e:  # recorded, never treated as a pass
                     # A failed request may still have been billed: count the full reserve.

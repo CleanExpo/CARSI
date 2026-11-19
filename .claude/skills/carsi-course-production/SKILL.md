@@ -167,8 +167,9 @@ strengths to discover and research, and stop defaulting to what the LLM remember
 substantive point (law, duty, number, limit, date, product, standard edition) runs this route
 **before** it is written into a lesson:
 1. **Write the claims down first**, one per line, in `claims.jsonl`
-   (`{"id","claim","jurisdiction":"AU|NZ|AU+NZ"}`). Training knowledge may suggest a claim; it
-   never settles one.
+   (`{"id","claim","jurisdiction":"AU|NZ|AU+NZ"}`), in plain ASCII text (the runner refuses
+   curly quotes, long dashes and other special characters). Training knowledge may suggest a
+   claim; it never settles one.
 2. **Cross-check with two independent models**:
    `python3 scripts/research/crosscheck.py --claims claims.jsonl --out results.jsonl --max-usd <n>`.
    It sends each claim to Kimi (`moonshotai/kimi-k3.1-pro`) and DeepSeek
