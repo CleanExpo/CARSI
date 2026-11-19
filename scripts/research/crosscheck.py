@@ -88,7 +88,15 @@ def call(path, k, body=None, timeout=180):
 
 
 def daily_spend(k):
-    return float(call("/key", k)["data"]["usage_daily"])
+    """Today's spend from OpenRouter. Anything but a finite, non-negative number stops
+    the program: a cap measured against an unreadable value is no cap."""
+    try:
+        v = float(call("/key", k)["data"]["usage_daily"])
+    except Exception as e:
+        sys.exit(f"BLOCKED: could not read today's OpenRouter spend ({type(e).__name__})")
+    if not math.isfinite(v) or v < 0:
+        sys.exit("BLOCKED: OpenRouter reported an unusable daily spend")
+    return v
 
 
 ANSWER_FIELDS = ("verdict", "correction", "source_url", "section", "quote")

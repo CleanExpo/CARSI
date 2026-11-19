@@ -83,6 +83,21 @@ class Caps(unittest.TestCase):
         self.assertLessEqual(fake.chat_calls * 0.20, 1.0)
         self.assertGreater(fake.chat_calls, 0)
 
+    def test_unusable_daily_spend_blocks_before_any_chat_call(self):
+        for bad in [float("nan"), float("inf"), -1.0, "abc", None]:
+            fake = FakeChat(daily=0.0)
+            orig = fake.__call__
+
+            def wrapped(path, k, body=None, timeout=180, bad=bad):
+                if path == "/key":
+                    return {"data": {"usage_daily": bad}}
+                return orig(path, k, body, timeout)
+
+            with mock.patch.object(cc, "call", wrapped):
+                code, _ = run_main(["--claims", claims_file([CLAIM]), "--out", self.out, "--max-usd", "5"])
+            self.assertNotEqual(code, 0, bad)
+            self.assertEqual(fake.chat_calls, 0, bad)
+
     def test_max_usd_above_daily_cap_refused(self):
         with mock.patch.object(cc, "call", FakeChat(daily=0.0)):
             code, _ = run_main(["--claims", claims_file([CLAIM]), "--out", self.out, "--max-usd", "25"])
