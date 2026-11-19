@@ -25,7 +25,7 @@ console.log(JSON.stringify({
 function load(env) {
   const base = { ...process.env };
   for (const k of Object.keys(base)) {
-    if (k.startsWith('E2E_PORT') || k.startsWith('PLAYWRIGHT_') || k === 'CI') delete base[k];
+    if (k.startsWith('E2E_PORT') || k.startsWith('PLAYWRIGHT_') || k === 'CI' || k === 'PORT') delete base[k];
   }
   const r = spawnSync(process.execPath, ['--import', 'tsx', '--input-type=module', '-e', PRINT], {
     cwd: root,
@@ -62,6 +62,16 @@ test('E2E_PORT, E2E_PORT_2 and E2E_PORT_3 move every server and base URL', () =>
   const byName = Object.fromEntries(c.projects);
   assert.equal(byName['membership-checkout'], 'http://localhost:45002');
   assert.equal(byName['purchase-survey'], 'http://localhost:45003');
+});
+
+// UNI-3472: a developer's own PORT is kept when E2E_PORT is unset, so the server and the URL
+// Playwright waits on agree. E2E_PORT still wins when both are set.
+test('a local PORT is kept for the main server when E2E_PORT is unset', () => {
+  const c = load({ PORT: '4999' });
+  assert.equal(c.baseURL, 'http://localhost:4999');
+  assert.equal(c.servers[0].url, 'http://localhost:4999');
+  assert.equal(c.servers[0].port, '4999');
+  assert.equal(load({ PORT: '4999', E2E_PORT: '45001' }).servers[0].port, '45001');
 });
 
 test('an explicit PLAYWRIGHT_BASE_URL still wins over E2E_PORT', () => {
