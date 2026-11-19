@@ -82,7 +82,7 @@ Ranked by floors passed, then content volume. "Des" = carries a CARSI designatio
 
 | # | slug | floors | mods | less | words | Des | representative gaps |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | moisture-meters-readings-and-dry-standards | 4/13 | 7 | 31 | 12439 | – | structure, depth, pattern, downloads, visual |
+| 1 | moisture-meters-readings-and-dry-standards | 13/13 (v1, 20/11/2026) | 6 | 38 | 28497 | – | none in the audit; draft pending SME sign-off, 12 evidence GAPs and the humanizer re-scan |
 | 2 | asthma-and-allergy-course | 4/13 | 5 | 22 | 5370 | – | depth, checks, pattern, downloads, visual |
 | 3 | psychrometry-building-science-for-drying | 3/13 | 10 | 41 | 13757 | – | structure, depth, pattern, downloads, visual |
 | 4–6 | introduction-to-drying-{educational,transport,industrial} | 3/13 | 5 | 5 | ~5k | – | structure, finalQuiz, pattern, downloads |

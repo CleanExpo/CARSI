@@ -1,7 +1,1178 @@
 {
   "version": 1,
   "courseSlug": "moisture-meters-readings-and-dry-standards",
+  "note": "Module checks (v1 upgrade, 20/11/2026, draft pending SME sign-off) and the final knowledge check for CARSI Professional Moisture Meters. Original CARSI questions written for Australian and New Zealand conditions; no IICRC standard text reproduced.",
   "quizzes": [
+    {
+      "quizId": "fb6fa8e0-8334-4d9f-bfa3-2bc7b35cf6b2",
+      "lessonTitle": "Module 1 check",
+      "title": "CARSI Professional Moisture Meters — Module 1 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "A loss adjuster questions your \"dry\" call on a hallway wall. What makes your reading defensible?",
+          "options": [
+            "A confident verbal assurance afterwards",
+            "A photograph showing display digits",
+            "Instrument, mode, place and baseline",
+            "Agreement with a neighbour's reading"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "A statement others can check names the instrument and mode, the location, any correction and the baseline. A verbal assurance or a bare photo of the display cannot be repeated or checked."
+        },
+        {
+          "questionText": "Which skills does this course assume you already have from Psychrometry?",
+          "options": [
+            "Calculating dew point, g/kg, EMC",
+            "Drilling concrete slabs for probes",
+            "Replacing wall linings after floods",
+            "Servicing meters at a laboratory"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "The course assumes you can already calculate dew point, humidity ratio in g/kg and EMC. Slab drilling, relining and laboratory servicing are not prerequisites for it."
+        },
+        {
+          "questionText": "In this course, a section labelled \"CARSI method\" or \"worked example\" is what?",
+          "options": [
+            "Copied from licensed standards",
+            "Paraphrase of one source",
+            "Extract from a standard",
+            "CARSI's own checkable method"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Those labels mark CARSI's own field method and arithmetic, which you can check with the formula beside it. Quotes and linked paraphrase are labelled differently, and no standard text is copied."
+        },
+        {
+          "questionText": "You need a reading on wet plasterboard beside a double GPO. What goes first?",
+          "options": [
+            "Pins straight into the board",
+            "Pinless scan away from outlet",
+            "Charging the meter nearby first",
+            "Pins directly above the outlet"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Pinless mode scans without piercing anything you have not checked, and you move off the GPO and its service lines before confirming with pins. Pins first risks hitting a cable or pipe."
+        },
+        {
+          "questionText": "On a contaminated job, which area do you test first so you do not spread contamination?",
+          "options": [
+            "The worst-affected wall before anything",
+            "The area nearest the leak",
+            "Whichever room the owner prefers",
+            "Unaffected control area, then others"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Testing the unaffected control area first stops you carrying contamination into it on your meter and pins. Starting at the worst area means every later reading risks cross-contamination."
+        },
+        {
+          "questionText": "Why tell the owner before using pins on finished surfaces?",
+          "options": [
+            "Pins leave holes in finishes",
+            "Pins void every meter warranty",
+            "Pins corrupt the stored baseline",
+            "Pins always cause electrical faults"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Pins leave small holes, so the owner should agree first and you should test in inconspicuous places where a reading there answers the question. The other reasons are not what the lesson teaches."
+        },
+        {
+          "questionText": "Which free document explains how pin and pinless meters estimate moisture content?",
+          "options": [
+            "The Queensland flood rebuilding guide",
+            "The New Zealand Building Code",
+            "USDA Wood Handbook chapter 13",
+            "AS 1884:2021 flooring installation standard"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "The USDA Wood Handbook, chapter 13, explains how electrical meters estimate moisture content. The QBCC guide ties readings to rebuilding decisions instead, and AS 1884:2021 is a paid standard."
+        },
+        {
+          "questionText": "A vinyl installer says your slab is not to the standard. Which paid standards might they mean?",
+          "options": [
+            "NZ Building Code clause E3",
+            "AS 1884:2021 or ASTM F2170",
+            "USDA Wood Handbook chapter 13",
+            "MBIE tolerances guide, section 2.5"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "AS 1884:2021 covers resilient floor coverings and ASTM F2170 covers in situ slab RH testing, and both are paid. The other three are free guides or legislation."
+        },
+        {
+          "questionText": "How does CARSI cite a paid standard?",
+          "options": [
+            "By number and edition only",
+            "Quoting its key clauses fully",
+            "Pasting tables into the lesson",
+            "Summarising its requirements in detail"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "CARSI names a paid standard by number and edition and tells you to read the current edition yourself. Describing what a standard requires without having read it is the mistake the lesson warns against."
+        }
+      ]
+    },
+    {
+      "quizId": "0d8e547d-00fc-43dd-98cb-db0af1c8d8b5",
+      "lessonTitle": "Module 2 check",
+      "title": "CARSI Professional Moisture Meters — Module 2 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "In the moisture content formula, what is the divisor?",
+          "options": [
+            "The original wet mass",
+            "The final dry mass",
+            "The mass of water",
+            "The cut specimen volume"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "The formula divides the water by the oven-dry mass, so the dry wood is the fixed yardstick. Dividing by the wet mass would understate the moisture content."
+        },
+        {
+          "questionText": "A specimen weighs 150.0 g wet and 120.0 g oven-dry. What is its moisture content?",
+          "options": [
+            "25%",
+            "20%",
+            "30%",
+            "80%"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Water is 150.0 − 120.0 = 30.0 g, and 30.0 ÷ 120.0 × 100 = 25%. Dividing by the wet mass instead gives the tempting but wrong 20%."
+        },
+        {
+          "questionText": "Why can very wet wood show a moisture content above 100%?",
+          "options": [
+            "The meter scale overflows quickly",
+            "Oven temperature was set wrongly",
+            "The wet mass was double-counted",
+            "Water outweighs the dry wood"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "The water is divided by the dry mass, so a sample holding more water than its own dry mass passes 100%. It is not a calculation error."
+        },
+        {
+          "questionText": "What do uninsulated pins report?",
+          "options": [
+            "The driest layer reached",
+            "The average stud moisture",
+            "The wettest wood touched",
+            "The painted surface only"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Uninsulated pins sense the lowest resistance along their length, so they report the wettest layer touched. They do not average the stud."
+        },
+        {
+          "questionText": "How deep do insulated pins go in a 45 mm stud?",
+          "options": [
+            "About 9 to 11 mm",
+            "About 20 to 25 mm",
+            "About 2 to 3 mm",
+            "About 40 to 45 mm"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "One-fifth to one-quarter of 45 mm is 9 to 11.25 mm, which reflects the average moisture content of the piece. Deeper pins reach the far face instead."
+        },
+        {
+          "questionText": "A surface reading is higher than the deep reading. What does that suggest?",
+          "options": [
+            "Core wetter than the surface",
+            "Both layers equally wet today",
+            "The pins are too short",
+            "Surface wetter than the core"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "A higher surface reading suggests the surface has been rewetted, for example by cleaning, while the core is drier. It does not point to a wet core."
+        },
+        {
+          "questionText": "Which layers dominate a pinless meter reading?",
+          "options": [
+            "The deepest framing",
+            "The surface layers",
+            "The wall cavity",
+            "The back face"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "The field of a pinless meter weakens rapidly with depth, so the surface layers dominate the reading. It does not average the whole thickness."
+        },
+        {
+          "questionText": "How do you confirm a pinless wet band?",
+          "options": [
+            "Repeat the pinless scan again",
+            "Raise the pinless meter scale",
+            "Confirm with pins at depth",
+            "Scan again with firm pressure"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "A second pinless scan has the same shallow view. Pins at depth, inside the band and just outside it, measure the spots the scan found."
+        },
+        {
+          "questionText": "A pinless meter reads low on a skirting board, but pins show a wet core. Why?",
+          "options": [
+            "Dry skin over wet core",
+            "Pins always read too high",
+            "Skirting boards are never wet",
+            "Pinless meters ignore wet timber"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Surface layers dominate a pinless reading, so a dry outer layer over a wet core can read low. Pinless meters do not ignore wet timber."
+        },
+        {
+          "questionText": "What does a thermal camera measure?",
+          "options": [
+            "Moisture distribution",
+            "Relative humidity",
+            "Condensation risk",
+            "Surface temperature"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "A thermal camera measures surface temperature only. A cool patch may be wet, but the camera cannot tell you that without a moisture meter."
+        },
+        {
+          "questionText": "A patch measures 21.5 °C in a room with a 17.0 °C dew point. What follows?",
+          "options": [
+            "It sits below the dew point",
+            "It sits above the dew point",
+            "It matches the room air temperature",
+            "It sits at the dew point"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "At 21.5 °C the patch is above the 17.0 °C dew point, so condensation is not the explanation. Condensation needs a surface at or below the dew point."
+        },
+        {
+          "questionText": "What confirms a camera suspect?",
+          "options": [
+            "A moisture meter reading",
+            "A second camera image",
+            "A longer scan time",
+            "Another cooler patch nearby"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Only a moisture meter gives a moisture reading. A second image shows temperature again and cannot tell a leak from a draught."
+        },
+        {
+          "questionText": "Which instrument finds the edges of a wet area quickly?",
+          "options": [
+            "A pin meter",
+            "A hygrometer log",
+            "A pinless meter",
+            "An oven-dry test"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "A pinless meter scans a wall quickly and shows where a wet area starts and stops. Pins then confirm the readings at depth."
+        },
+        {
+          "questionText": "What depth do you set for insulated pins in a 19 mm floorboard?",
+          "options": [
+            "About 8 to 10 mm",
+            "About 4 to 5 mm",
+            "About 1 to 2 mm",
+            "About 15 to 20 mm"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "One-fifth to one-quarter of 19 mm is 3.8 to 4.75 mm, so about 4 to 5 mm. Deeper pins would reach the far face of the board."
+        },
+        {
+          "questionText": "A thermal image shows a cold strip on a ceiling. What next?",
+          "options": [
+            "Call it a roof leak",
+            "Record the ceiling as wet",
+            "Ignore it, cameras are unreliable",
+            "Confirm it with a meter"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "A cold strip can be a draught or missing insulation, so it is not proven wet. A meter reading confirms or clears it before any repair call."
+        }
+      ]
+    },
+    {
+      "quizId": "c14f611f-a242-43da-a513-1b5a093b60b8",
+      "lessonTitle": "Module 3 check",
+      "title": "CARSI Professional Moisture Meters — Module 3 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Which reading may be reported as a moisture content percentage?",
+          "options": [
+            "Plasterboard read on reference scale",
+            "Concrete read on timber scale",
+            "Timber with species correction applied",
+            "Masonry read on reference scale"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "A percentage needs a meter calibrated for the material, with corrections applied. Plasterboard, concrete and masonry readings are points even when the display looks like a percentage."
+        },
+        {
+          "questionText": "What is the only fair comparison for 64 points on wet plasterboard?",
+          "options": [
+            "Unaffected plasterboard, same meter, same scale",
+            "Timber kickboard reading in the kitchen",
+            "A published figure for gypsum plasterboard",
+            "Wet plasterboard measured at another property"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Points only mean something against the same material, meter and scale in an unaffected area. A different material, meter or building changes what the number represents."
+        },
+        {
+          "questionText": "Your meter shows 28 on its timber scale pressed on concrete. What do you write?",
+          "options": [
+            "Slab 28% moisture, timber scale reading",
+            "Slab 28% EMC, timber scale corrected",
+            "Slab 28 percent, qualitative, no baseline",
+            "Slab 28 points, timber scale, qualitative"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "The timber scale is not calibrated for concrete, so the number is qualitative points that need an unaffected slab baseline. Calling it a percentage claims more than the meter can say."
+        },
+        {
+          "questionText": "What is the reliable range for a resistance meter on timber?",
+          "options": [
+            "About 2% to 20%",
+            "About 6% to 30%",
+            "About 10% to 60%",
+            "About 30% to 60%"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Resistance meters are reliable on timber from about 6% to 30%. Many meters display much higher numbers, but the display range is not the reliable range."
+        },
+        {
+          "questionText": "A stud reads 45% on the timber scale on day 1. How do you write it?",
+          "options": [
+            "Stud 45.0% MC, quantitative reading",
+            "Stud 45% MC, reliable range",
+            "Stud 45% MC, 1% accuracy",
+            "Above 30%, qualitative, re-read daily"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Readings above 30% must be treated as qualitative only. A percentage with a decimal, or an accuracy claim, promises precision the meter does not have in that zone."
+        },
+        {
+          "questionText": "When does quantitative tracking of a wet stud start?",
+          "options": [
+            "When readings fall below 30%",
+            "When readings first exceed 30%",
+            "When the meter powers on",
+            "When the first day ends"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Below 30% a corrected timber reading is a measurement again, so tracking in percent can start. Above 30% you record the reading as qualitative and keep re-reading."
+        },
+        {
+          "questionText": "What does equilibrium moisture content describe?",
+          "options": [
+            "Moisture content timber reaches when fully oven dried",
+            "Moisture content above which timber starts shrinking more",
+            "Moisture content where the meter reads most accurately",
+            "Level where timber neither gains nor loses water"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "EMC is the balance point between the timber and the surrounding air, so it changes with the room. It is not the oven-dry state, the shrinkage point or an instrument setting."
+        },
+        {
+          "questionText": "An office is steady at 22 °C, 45 %RH with EMC 8.4%. Unaffected skirting reads 8.6%. What does that suggest?",
+          "options": [
+            "Wet skirting needing immediate stripping out",
+            "Good dry baseline close to EMC",
+            "Meter fault needing replacement before use",
+            "Reading invalid above reliable range limits"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "A reading within a fraction of a percent of the room's EMC is what dry timber should read there. It is a trustworthy baseline, not a sign of water or a faulty meter."
+        },
+        {
+          "questionText": "Why do humid tropical rooms give a higher EMC?",
+          "options": [
+            "Warm air always dries timber more quickly",
+            "Tropical timber species always contain less water",
+            "More humid air holds balanced timber higher",
+            "Pin meters read lower in humid rooms"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Timber balances with the air around it, so higher relative humidity at a given temperature means a higher EMC. A reading around 14% in the tropics can be normal."
+        },
+        {
+          "questionText": "Plasterboard shows 64 and unaffected plasterboard 12. Percent or points?",
+          "options": [
+            "Points, same meter and scale",
+            "Percent, because it is wet",
+            "Percent, using the timber table",
+            "Percent, only above thirty points"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "The meter is not calibrated for plasterboard, so the numbers are points that only compare with the same material unaffected. Wetness alone does not make a reading a percentage."
+        },
+        {
+          "questionText": "Why do qualitative readings carry no decimal places?",
+          "options": [
+            "Decimals are banned by every meter maker",
+            "Decimals take longer to enter in reports",
+            "Decimals only apply to the points scale",
+            "Decimals claim precision the meter lacks there"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "A decimal implies the meter can resolve that fine a difference, which it cannot above the reliable range or off its calibrated material. Whole numbers state only what the meter can support."
+        },
+        {
+          "questionText": "What do you compare unaffected timber skirting against?",
+          "options": [
+            "The highest reading on the wet wall",
+            "The maximum value the meter scale shows",
+            "The room EMC from temperature and humidity",
+            "The reading taken at the last visit"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Dry timber reads what the room's temperature and humidity say it should, so the EMC is the check on a baseline. The other options do not describe where dry timber should sit."
+        },
+        {
+          "questionText": "A bearer at 9 °C is colder than the 20 °C calibration. What do you do?",
+          "options": [
+            "Subtract the temperature correction",
+            "Add the temperature correction",
+            "Leave the reading uncorrected",
+            "Double the displayed reading"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Cold wood conducts less, so a resistance meter reads it too dry and the correction is added. Subtracting is for warm wood."
+        },
+        {
+          "questionText": "A rafter at 35 °C reads 14.0%, calibrated at 20 °C. What is the corrected reading?",
+          "options": [
+            "12.7%",
+            "15.3%",
+            "13.3%",
+            "14.7%"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Wood 15 °C warmer than calibration gives 15 ÷ 5.6 × 0.5 = 1.34, subtracted from 14.0. Adding it would give 15.3% and be wrong because warm wood reads too wet."
+        },
+        {
+          "questionText": "What should you record with a corrected pin reading?",
+          "options": [
+            "Only the final corrected percent figure",
+            "The weather forecast for that day",
+            "Wood temperature and the correction applied",
+            "The occupant's name and the address"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Someone else can only check the correction if the wood temperature and the amount applied are written next to it. A bare corrected figure cannot be traced."
+        },
+        {
+          "questionText": "Where does a species correction come from?",
+          "options": [
+            "The table supplied with your meter",
+            "The offsets printed in this lesson",
+            "A rule of thumb from experience",
+            "The builder's memory of the species"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Species tables are specific to each meter design, so the correction comes from your own meter's documentation. The offsets in this course are invented for practice."
+        },
+        {
+          "questionText": "A radiata stud at 11 °C reads 19.0%. The invented table gives +1, species first. What is the corrected reading?",
+          "options": [
+            "20.8%",
+            "20.0%",
+            "19.8%",
+            "21.8%"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Species first gives 20.0%, then 9 °C colder adds 9 ÷ 5.6 × 0.5 = 0.80, giving 20.8%. Stopping at 20.0% skips the temperature step and 19.8% skips the species step."
+        },
+        {
+          "questionText": "What do you do when the species is unknown?",
+          "options": [
+            "Assume radiata pine and report normally",
+            "Use the highest species offset available",
+            "Skip the reading and keep moving",
+            "Say species unknown; treat as estimate"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Do not present a guessed setting as measured. Say the species is unknown and treat the figure as an estimate until you can confirm it."
+        },
+        {
+          "questionText": "Which condition can push a pin reading above the true moisture content?",
+          "options": [
+            "Cold wood without any correction",
+            "Preservative or fire retardant treatment",
+            "Insulated pins reading at depth",
+            "Pins aligned to maker instructions"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Treatment chemicals are electrolytes that raise conductivity, so the meter reads high. Cold wood reads low, and insulated pins or correct alignment reduce error."
+        },
+        {
+          "questionText": "Treated plates read 26% and untreated studs 17% after a storm-tide flood. How do you report them?",
+          "options": [
+            "Report both, note treatment, seawater, track trend",
+            "Report 26% only, because it is highest",
+            "Report the average of both as 21.5%",
+            "Discard the plates and keep the studs"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Both readings go in the record with a note that treatment and seawater may make the plates read high. The trend over several visits is more reliable than either single number."
+        },
+        {
+          "questionText": "Is the conductivity of wood higher along or across the grain?",
+          "options": [
+            "Higher across the grain",
+            "Equal in every direction",
+            "Highest in tangential direction",
+            "Higher along the grain"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Wood conducts best along the grain, in the approximate ratio 1.0 to 0.55 to 0.50 for longitudinal, radial and tangential. That is one reason pin orientation matters."
+        },
+        {
+          "questionText": "In the worked example, which correction comes first?",
+          "options": [
+            "Temperature first, then species",
+            "Both together, one step",
+            "Species first, then temperature",
+            "Whichever the builder prefers"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "The invented maker's table says to apply species first, then temperature. Your own maker's documentation sets the real order, and you write it down."
+        },
+        {
+          "questionText": "Which temperature goes on the worksheet with the reading?",
+          "options": [
+            "Wood temperature at reading point",
+            "Outside air temperature that day",
+            "Thermostat setting in the room",
+            "Temperature of the previous visit"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "The correction depends on the temperature of the wood where you read it, so that is the figure to record. Air temperature and thermostat settings can differ widely from the wood."
+        },
+        {
+          "questionText": "Why can seawater lead to a false high reading?",
+          "options": [
+            "Salt makes timber physically absorb more",
+            "Electrolytes in the wood raise conductivity",
+            "Salt crystals stop the pins touching",
+            "Seawater cools the wood below calibration"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Seawater leaves salts that raise the wood's conductivity, so the meter reads high without extra water. Cooler wood would read low, not high."
+        }
+      ]
+    },
+    {
+      "quizId": "fb0dc895-4b8a-4679-b4aa-99f3e2ba1b3b",
+      "lessonTitle": "Module 4 check",
+      "title": "CARSI Professional Moisture Meters — Module 4 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Why is one stud reading of 14% not enough to approve relining a 4 m wall?",
+          "options": [
+            "Water wicks unevenly, so one stud misleads",
+            "Studs never hold water, so skip them",
+            "Fourteen percent is above the QBCC limit",
+            "A single reading needs no temperature correction"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Water moves unevenly through framing, so one stud can read dry while the plate or another stud is still wet. 14% is also below the 16% QBCC figure, so the problem is coverage, not the number."
+        },
+        {
+          "questionText": "Why do you read the bottom plate as well as the studs?",
+          "options": [
+            "It always reads the same as studs",
+            "It lets you skip the control stud",
+            "It is often the wettest framing piece",
+            "It is the only piece pins reach"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "The plate sits at the bottom where water collects, so it is often the last piece to dry. In the worked example the plate corrects to 16.6%, still above 16%."
+        },
+        {
+          "questionText": "Below what moisture content does the QBCC guide say relining can go ahead, with the framing sound?",
+          "options": [
+            "Below 20%, with the framing sound",
+            "Below 13%, with the framing sound",
+            "Below 10%, with the framing sound",
+            "Below 16%, with the framing sound"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "The QBCC flood guide gives 16%, and it also says the framing must present as sound. 9% to 13% is the normal in-service range, which is why a lower figure is tempting but not the limit."
+        },
+        {
+          "questionText": "Where does the plasterboard baseline reading come from?",
+          "options": [
+            "The wettest point on the wall",
+            "Known-dry plasterboard in an unaffected room",
+            "A printed table from the maker",
+            "Whatever reading the meter shows first"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "The baseline is the same board, same meter and same mode in a dry area, so it shows what dry reads today. A table or the wettest point cannot tell you that."
+        },
+        {
+          "questionText": "The baseline is 13 points. Readings are 24 at 600 mm and 14 at 800 mm. Where is the wet boundary?",
+          "options": [
+            "Between 0 and 200 mm",
+            "Between 200 and 400 mm",
+            "Between 400 and 600 mm",
+            "Between 600 and 800 mm"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "The boundary is where readings return to the baseline. At 800 mm the reading is 14, within one point of 13, while 600 mm is still high at 24."
+        },
+        {
+          "questionText": "Why is the plasterboard baseline re-read at every visit?",
+          "options": [
+            "Conditions shift, so old baselines mislead",
+            "Plasterboard changes colour when it dries",
+            "The meter loses its calibration daily",
+            "The maker’s requirement changes each week"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Drying changes the air in the building, so the dry reference moves. Without a same-day baseline you cannot tell drying from a building-wide change."
+        },
+        {
+          "questionText": "Why can a surface reading not clear a slab for vinyl planks?",
+          "options": [
+            "It measures humidity at the wrong depth",
+            "It is qualitative and misses deep moisture",
+            "It cannot be used on any concrete",
+            "It is only valid after seven days"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "A surface meter gives a shallow, qualitative number in points. The QBCC guide names a flooring hygrometer as the most reliable test, and ARFA treats surface results as indicative only."
+        },
+        {
+          "questionText": "The room is 23 °C and 68% RH, the dew point is 16.8 °C and the slab is 16.5 °C. What does that mean?",
+          "options": [
+            "Slab is above dew point, readings reliable",
+            "Slab and air are equal, no issue",
+            "Slab is below dew point, condensation possible",
+            "Dew point is irrelevant for concrete slabs"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "A surface colder than the dew point can collect condensation, which pushes surface readings up. Here the slab is 0.3 °C below it, so the surface numbers cannot be trusted alone."
+        },
+        {
+          "questionText": "Who sets the hygrometer test method and acceptance limit for a slab?",
+          "options": [
+            "Floor covering maker and the current standard",
+            "Whoever owns the pinless meter on site",
+            "The technician’s experience of similar earlier jobs",
+            "The surface reading taken on the day"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "The acceptance limit comes from the floor covering manufacturer and the named standard, which this course does not restate. A surface reading or personal experience cannot set it."
+        },
+        {
+          "questionText": "Is a waffle pod part of the concrete thickness?",
+          "options": [
+            "Yes, use the full nominal slab thickness",
+            "Yes, because foam carries load like concrete",
+            "No, set depth from concrete over it",
+            "No, pods never affect any test point"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "The pod is foam, so only the concrete over it counts. In the example the hole depth must be set from 85 mm of topping, not the 310 mm rib depth."
+        },
+        {
+          "questionText": "A test hole breaks into white foam. What do you record?",
+          "options": [
+            "Slab is dry because foam is dry",
+            "Point invalid for concrete RH, choose another",
+            "Drill deeper until you reach concrete again",
+            "Move the probe up and read anyway"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "A probe in foam does not measure the concrete, so the point is invalid. Moving the probe up or drilling deeper to rescue it gives a result that does not mean what it appears to."
+        },
+        {
+          "questionText": "No safe, valid in-situ test point exists. Can a surface reading stand in?",
+          "options": [
+            "Yes, if the reading is low",
+            "Yes, once the slab is warm",
+            "Yes, provided the installer agrees verbally",
+            "No, record no valid in-situ result"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "A surface reading is not a basis for accepting a floor, so it cannot replace a valid test. Record “no valid in-situ result” and seek an accepted alternative."
+        },
+        {
+          "questionText": "A pinless scan shows stripes every 450 mm. What does that spacing suggest?",
+          "options": [
+            "Fixings or studs behind the board",
+            "A burst pipe behind the board",
+            "Salt contamination spread across the wall",
+            "A flat battery in the meter"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Regular spacing that matches stud centres points to the frame, not to water, which does not form even stripes. Pins beside a stripe then confirm it."
+        },
+        {
+          "questionText": "One ceiling sheet reads 60 points while the sheets either side read 15, with no stain. What do you check first?",
+          "options": [
+            "Whether the roof is leaking above",
+            "Whether the room is too cold",
+            "Whether that sheet has foil backing",
+            "Whether the battery has gone flat"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "A uniform high across exactly one sheet points to the board, such as foil backing or metal behind it. Water rarely stops at the edge of one sheet."
+        },
+        {
+          "questionText": "How do you confirm that a suspected stud-line false high is not moisture?",
+          "options": [
+            "Another pinless scan at the same spot",
+            "Pins in the board beside the stripe",
+            "Scan again more quickly along the stripe",
+            "Ignore it because stripes are always dry"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Pins measure at the tips and do not respond to a stud behind the board, so a baseline reading beside the stripe confirms it. Repeating a pinless scan only repeats the same error."
+        },
+        {
+          "questionText": "What read pattern do you use on a framing wall before relining?",
+          "options": [
+            "One stud at mid height near corner",
+            "Only the bottom plate at one end",
+            "Several studs at three heights plus plate",
+            "Every stud, but at one height only"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Water wicks unevenly, so the wall needs several studs, three heights and the plate to be represented. A single point or a single height can miss the wet part."
+        },
+        {
+          "questionText": "What comes before tracing the boundary on plasterboard?",
+          "options": [
+            "Read a known-dry baseline of same board",
+            "Mark the boundary using a pencil first",
+            "Convert every reading into percent moisture content",
+            "Wait three days before taking any readings"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Without the baseline you do not know what dry reads on that board, so you cannot find where readings return to it. Points are not converted to percent."
+        },
+        {
+          "questionText": "How should surface readings on concrete be treated?",
+          "options": [
+            "Quantitative proof once corrected for temperature",
+            "Qualitative pointers, not proof of dryness",
+            "Valid only below the dew point",
+            "Equal to an in-situ hygrometer result"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Surface readings are shallow and qualitative, so they point to where to test but cannot clear a slab. A hygrometer test decides."
+        }
+      ]
+    },
+    {
+      "quizId": "9e105995-3ecf-4171-b87d-40208dbaa032",
+      "lessonTitle": "Module 5 check",
+      "title": "CARSI Professional Moisture Meters — Module 5 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Why is comparing two moisture meters the weakest check?",
+          "options": [
+            "They read different scales",
+            "Reference plates wear out",
+            "Both can drift together",
+            "Readings take too long"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Two meters can be wrong in the same direction, so agreement proves little. The maker’s check device or reference block is a fixed reference, which is why it comes first."
+        },
+        {
+          "questionText": "A meter still fails after a new battery and cleaning. What do you do?",
+          "options": [
+            "Tag it out, use another",
+            "Keep using it, note offset",
+            "Wait one week, retest it",
+            "Compare it against another meter"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A meter that fails after a battery change and cleaning is out of service until it is repaired and checked. Comparing it with another meter is the weakest check, so it cannot clear it."
+        },
+        {
+          "questionText": "Your pin meter last passed its check on Monday and fails on Wednesday. Which readings do you flag?",
+          "options": [
+            "Wednesday morning readings alone",
+            "Only readings above target",
+            "None; Monday’s check passed",
+            "Everything since Monday’s check"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "The last good check is the last point you can vouch for the meter, so every reading after it is in question. Flagging them lets you re-read with a checked meter."
+        },
+        {
+          "questionText": "A technician leaves pins in a wet stud, then reads an unaffected stud. Which mistake is this?",
+          "options": [
+            "Wrong electrode, mode or scale",
+            "Pins left in wet material",
+            "Flat or weak meter batteries",
+            "No daily accuracy check made"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "The pins carry moisture and contamination from the wet stud to the next one, which can lift the reading and spread contamination to the control area. Wiping the pins after each reading prevents it."
+        },
+        {
+          "questionText": "A file shows 9% on bearers in a 6 °C subfloor, and the meter was calibrated at 20 °C. How much correction applies?",
+          "options": [
+            "Add about 1.25 percentage points",
+            "Subtract about 1.25 percentage points",
+            "Add about 2.5 percentage points",
+            "No correction is needed here"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "The wood is 14 °C colder than the calibration temperature: 14 ÷ 5.6 × 0.5 = 1.25, added because the wood is colder. Subtracting is for wood warmer than the calibration temperature."
+        },
+        {
+          "questionText": "Which habit prevents mistake 3, wrong electrode, mode or scale?",
+          "options": [
+            "Carry spare batteries every visit",
+            "Wipe pins after each reading",
+            "Log the morning calibration check",
+            "Set and record before reading"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Mistake 3 is a settings error, so the habit is to set and record the mode, scale and species before the first reading. Spare batteries, wiping pins and the morning check each prevent a different mistake."
+        },
+        {
+          "questionText": "Why is a reading at the dehumidifier outlet unreliable as the room condition?",
+          "options": [
+            "Sensors cannot measure warm moving air",
+            "It shows outlet air, not room",
+            "The sensor needs a weekly check",
+            "Outlet air always reads 50% RH"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Air at the outlet describes what the machine is putting out, not the air the timber sits in. The room reading, taken clear of the outlet, is the one to compare with the material."
+        },
+        {
+          "questionText": "Two rooms both read 50% RH, at 18 °C and 26 °C. Which holds more water vapour?",
+          "options": [
+            "The 18 °C room holds more",
+            "Both rooms hold exactly the same",
+            "The 26 °C room holds more",
+            "Neither can be compared at all"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Warm air holds more water at the same RH: about 10.5 g/kg at 26 °C against about 6.4 g/kg at 18 °C. That is why you compare rooms in g/kg, not RH alone."
+        },
+        {
+          "questionText": "Why let a hygrometer settle in the room before you read it?",
+          "options": [
+            "So it matches room conditions",
+            "To warm up its battery",
+            "Because readings drop over time",
+            "So the sensor can dry"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "A sensor carried in from another place needs time to reach the room’s air, so an early reading describes where it has been. Follow the maker’s settling time before you log the number."
+        },
+        {
+          "questionText": "What does tagging a meter out mean?",
+          "options": [
+            "Downgraded to scanning dry areas only",
+            "Kept as back-up for concrete slabs",
+            "Given a new calibration serial tag",
+            "Marked out of service until checked"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Tag-out labels the instrument out of service until it is repaired and checked, so nobody picks it up by mistake. It is not a downgrade or a back-up role."
+        },
+        {
+          "questionText": "What is the maker’s reference block used for?",
+          "options": [
+            "Testing a pin meter’s electrodes",
+            "Settling two hygrometers in air",
+            "Testing a pinless meter’s reading",
+            "Correcting readings for wood temperature"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "The reference block or plate is the fixed reference for a pinless meter. A pin meter uses the maker’s check device instead, which is the tempting mix-up."
+        },
+        {
+          "questionText": "What is the correct order of the morning checks?",
+          "options": [
+            "Log, hygrometers, pinless, pin, self-check",
+            "Self-check, pin, pinless, hygrometers, log",
+            "Hygrometers, log, self-check, pin, pinless",
+            "Pinless, self-check, log, hygrometers, pin"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "The routine starts with the meter’s own self-check, then the two moisture meter checks, then the hygrometer pair, and ends by writing the result in the log. The log comes last because it records the outcome."
+        }
+      ]
+    },
+    {
+      "quizId": "9751ae1e-95ea-4ed6-9bb6-3d88c9c965d3",
+      "lessonTitle": "Module 6 check",
+      "title": "CARSI Professional Moisture Meters — Module 6 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Where does the dry standard for hallway framing come from?",
+          "options": [
+            "A chart of average timber moisture figures",
+            "The wettest stud found at first scan",
+            "An unaffected stud in the same building",
+            "A figure quoted by the building owner"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "The dry standard is the same material, unaffected, in the same building, read with the same meter, mode and scale on the same visit. A published average cannot account for this building, this season or this meter."
+        },
+        {
+          "questionText": "The control reads 11.7% and QBCC gives below 16%. Which framing goal does the lesson use?",
+          "options": [
+            "14% or less, written on day 1",
+            "16% exactly, because the guide says so",
+            "Whatever the meter reads when fans stop",
+            "Exactly 11.7%, the same as the control"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "The goal is no wetter than the 16% relining figure and close to the dry standard, so the worked example sets 14% or less. It is written on day 1, not read off the meter at the end."
+        },
+        {
+          "questionText": "The control stud reads 11.7% but the room EMC is 18.6%. What do you do first?",
+          "options": [
+            "Trust the stud; disregard atmospheric readings",
+            "Average the two figures and record",
+            "Raise the goal until it matches",
+            "Re-check the air, control and settings"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "A gap that large means one of the inputs is wrong: the air reading, the control location, the species setting or the temperature correction. Averaging or moving the goal hides the fault instead of finding it."
+        },
+        {
+          "questionText": "Why does the map use fixed, numbered reading points?",
+          "options": [
+            "It lets technicians read anywhere they like",
+            "Each visit compares the same spot again",
+            "It removes the need for any control",
+            "It makes corrections unnecessary on later days"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "A trend means something only if each day reads the same point with the same settings. Fixed points do not replace the control, and corrections still apply on every visit."
+        },
+        {
+          "questionText": "On day 5 the control reads 11.6% and P1 has fallen to 16.3%. What does this show?",
+          "options": [
+            "The meter has drifted and needs replacement",
+            "P1 has already reached its 14% goal",
+            "The control stud is wet and unreliable",
+            "Drying is working; the building is steady"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "The control has stayed near 11.7% all week, so nothing has changed for the whole building and the fall at P1 is drying. P1 at 16.3% is still above the 14% goal."
+        },
+        {
+          "questionText": "P1 reads 24.2%, 19.8% and 16.3% on days 1, 3 and 5. What is the trend?",
+          "options": [
+            "Falling, but still above its goal",
+            "Rising slowly and above its goal",
+            "Flat, with drying clearly stalled here",
+            "Falling, and already below its goal"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Each visit is lower than the last, so the point is drying, but 16.3% is still above the 14% goal. Comparing with the goal, not only with yesterday, is what the map is for."
+        },
+        {
+          "questionText": "Day 7 framing readings (corrected) are 15.8%, 15.1%, 14.6% and 15.5%, and the framing is sound. What does the QBCC condition say?",
+          "options": [
+            "Relining must wait until all readings reach 14%",
+            "Relining must wait until the slab is tested",
+            "Relining may go ahead; all are below 16%",
+            "Relining must wait until framing reads under 12%"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "QBCC asks for framing below 16% that presents as sound, and every reading is below 16%. The 14% figure is your own goal, which you record separately as not yet met."
+        },
+        {
+          "questionText": "Boards at 13.5% go into a room with an EMC of 12.0%. What does the Queensland timbers guidance indicate?",
+          "options": [
+            "Acclimatisation is required; the difference is 1.5%",
+            "Acclimatisation is not indicated; difference is 1.5%",
+            "Acclimatisation is not indicated; difference exceeds 2%",
+            "Acclimatisation is required; the difference exceeds 2%"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "The difference is 13.5 − 12.0 = 1.5%, inside the 2% figure, so acclimatisation is not indicated. It would be considered only if the difference were more than 2%."
+        },
+        {
+          "questionText": "Who decides acclimatisation and floor-covering acceptance limits?",
+          "options": [
+            "The installer and the product manufacturer",
+            "The drying technician, using the meter",
+            "The loss adjuster, working from photographs",
+            "The occupants, judging by touch alone"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "You supply readings, the dry standard, the goal and a conclusion in writing; the installer and manufacturer answer for the floor-covering and acclimatisation decisions. A meter reading cannot set a product limit."
+        },
+        {
+          "questionText": "Outside air is 15.56 g/kg and the hallway 11.96 g/kg. What follows?",
+          "options": [
+            "Ventilating would dry the hallway much faster",
+            "Outside air is drier, so open windows",
+            "Humidity ratio cannot compare indoor with outdoors",
+            "Ventilating would add water to the hallway"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Outside air holds more water per kilogram than the hallway, so bringing it in would add water. Humidity ratio in g/kg is exactly the number that lets you compare the two."
+        },
+        {
+          "questionText": "Which reading acts as the control for the air in the case?",
+          "options": [
+            "The laundry floor at its wettest point",
+            "The lounge at 22 °C and 52%RH",
+            "The outside air at 25 °C, 78%RH",
+            "The hallway at 23 °C and 68%RH"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "The lounge is the unaffected room, so it shows what the building normally holds. The hallway is the drying space and outside is the third reading, not the control."
+        },
+        {
+          "questionText": "What must the written day 1 statement contain beyond the readings?",
+          "options": [
+            "A guarantee that everything is dry",
+            "Only photographs, without any meter settings",
+            "Settings, standard, goal and the rule",
+            "The adjuster’s name and claim number"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "A defensible statement carries the settings, the dry standard, the goal and the rule you applied. It never promises that the job is dry before the readings say so."
+        },
+        {
+          "questionText": "Which checklist line comes straight after the morning calibration check?",
+          "options": [
+            "Air readings for space, control and outside",
+            "The final written drying-status statement for sign-off",
+            "Reading the fixed map points each visit",
+            "Setting the drying goal for the relining"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "The checklist runs safety, the calibration check, then the air readings, because the air decides what the timber should read and whether ventilating helps. The statement comes last."
+        },
+        {
+          "questionText": "How is a laundry plasterboard reading of 61 recorded?",
+          "options": [
+            "As 61% moisture content in the board",
+            "As 61% once corrected for wood temperature",
+            "As 61 times the unaffected board reading",
+            "As 61 points on the reference scale"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Plasterboard is read in points on the reference scale, against unaffected board, never as a percentage. A figure above 30 is qualitative whatever the material."
+        },
+        {
+          "questionText": "What must a written drying-status statement contain?",
+          "options": [
+            "Approximate readings, rounded to whole numbers",
+            "Readings, settings, standard, goal and rule",
+            "The drying goal, without any readings",
+            "Instrument settings, without the dry standard"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Anyone who was not on site needs the readings, the settings, the dry standard, the goal and the rule you applied to check the conclusion. Leaving any one out makes the statement impossible to repeat."
+        }
+      ]
+    },
     {
       "quizId": "f3a7c2e1-5b8d-4c6a-9e1f-2d7b8a4c6e90",
       "lessonTitle": "Final knowledge check: mixed practice across all modules",
