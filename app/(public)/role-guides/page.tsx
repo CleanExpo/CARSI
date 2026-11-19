@@ -1,3 +1,4 @@
+import { RoleGuideHubViewTracker } from '@/components/analytics/RoleGuideHubViewTracker';
 import { PlatformContextualNext } from '@/components/marketing/platform/PlatformPagePattern';
 import { RoleGuidesHubGrid, RoleGuidesHubHero } from '@/components/marketing/RoleGuidesHub';
 import { StaticMarketingClosingCta } from '@/components/marketing/StaticMarketingClosingCta';
@@ -26,6 +27,7 @@ export const metadata: Metadata = {
 export default function ForRoleGuidesHubPage() {
   return (
     <>
+      <RoleGuideHubViewTracker />
       <RoleGuidesHubHero />
       <RoleGuidesHubGrid />
       <PlatformContextualNext current={ROLE_GUIDES_HUB_PATH} />
