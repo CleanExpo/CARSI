@@ -105,7 +105,7 @@ db:seed-floor-care-quizzes`):
    db:seed-<slug>-quizzes` script — same idempotent upsert-by-`quizId` pattern, same
    pre-write validation (options.length >= 2, correctIndex in range) already proven
    correct against these three draft files in this batch.
-3. **Run the course catalog seed first if needed.** `npm run db:seed-courses` must
+3. **Run the course catalog seed first if needed.** `npm run db:seed-courses -- --slug=<slug>` must
    have already created the `LmsCourse` row for the target slug (it is a live,
    published course, so this is normally already true in production) before the quiz
    seed script can resolve `courseSlug` to a course id — the seed script fails loudly
