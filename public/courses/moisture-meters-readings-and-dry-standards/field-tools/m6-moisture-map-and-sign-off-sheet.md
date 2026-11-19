@@ -52,13 +52,13 @@ Calibration check result for every instrument: __________ Time: __________
 
 - Moisture content: MC = (wet − oven-dry) ÷ oven-dry × 100 (%)
 - Pin depth for average MC: thickness ÷ 5 to thickness ÷ 4 (mm)
-- Temperature correction for pins: MC read + 0.5 × (T cal − T wood) ÷ 5.6 (% MC)
+- Temperature correction for pins: MC read + 0.5 × (T cal − T wood) ÷ 5.6 (% MC), only where your maker gives no method and the meter does not correct for temperature itself
 - Relining check (QBCC): all corrected framing readings below 16%, framing sound
 - Acclimatisation pointer (Construction timbers in Queensland): |delivered MC − in-service EMC| greater than 2%
 
 ## Field checklist
 
-- [ ] Safety: power assessed, pinless first near services, PPE for contaminated water
+- [ ] Safety: power confirmed safe, pinless first near services, PPE for contaminated water
 - [ ] Morning calibration check logged for every instrument
 - [ ] Air: drying space, the control and outside, in g/kg and dew point
 - [ ] Dry standard from the same material, unaffected, same meter and scale
@@ -72,7 +72,7 @@ Calibration check result for every instrument: __________ Time: __________
 ## Relining and floor coverings
 
 - Relining: all corrected framing readings below 16% and the framing sound (QBCC). Also test your own goal. Record both.
-- Floor timber: difference between board MC and the room EMC. More than 2% means acclimatisation is considered. The installer decides.
+- Floor timber: difference between board MC and the average in-service EMC (the EMC for the conditions the room usually runs at, not one day's reading). More than 2% means acclimatisation is considered. The installer decides.
 - Slab under a floor covering: surface readings only point. Specify a hygrometer test to the installer's method and limits.
 - Acceptance limits for floor coverings and adhesives belong to the product manufacturer and the installer.
 

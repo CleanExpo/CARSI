@@ -9,19 +9,19 @@ Correct by about **0.5% moisture content for each 5.6 °C** the wood temperature
 
 `MC corrected = MC read + 0.5 × (T cal − T wood) ÷ 5.6`
 
-Use the calibration temperature in your meter's manual. The worked examples in the course assume **20 °C**.
+Use your meter's manual first: its calibration temperature, its own temperature table or method if it gives one, and its correction order. If the meter already corrects for temperature, do not apply this formula as well. The worked examples in the course assume **20 °C**.
 
 ## Steps
 
 1. Identify the species (ask the builder or floor supplier if unsure).
 2. Measure the **wood temperature** at the point you read.
 3. Take the reading and note the read height (mm) and pin depth (mm).
-4. Apply the species correction from **your meter's** table or setting, in the order your maker specifies. This course does not reproduce any maker's numbers.
-5. Apply the temperature correction.
+4. Apply the species correction from **your meter's** table or setting and the temperature correction **in the order your maker specifies**, whichever comes first in your manual. This course does not reproduce any maker's numbers.
+5. Apply the temperature correction once only: skip a manual correction if your meter has already applied one.
 6. Check the notes column: treated timber? salt water or seawater? surface water? pins oriented as the maker instructs?
 7. Remember: above 30% a reading stays qualitative whatever the correction.
 
-## Worked examples (CARSI illustrations; species offsets are invented)
+## Worked examples (CARSI illustrations; species offsets and the species-first order are invented)
 
 | Point | Species | Raw % | Wood °C | Species correction | Temperature correction | Corrected % |
 | --- | --- | --- | --- | --- | --- | --- |

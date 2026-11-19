@@ -48,8 +48,8 @@
 <text x="330" y="265" font-size="14" font-weight="700" fill="#1f2933">temperature</text>
 <text x="296" y="294" font-size="12" font-weight="700" fill="#b54708">Fix</text>
 <text x="296" y="312" font-size="12" fill="#3e4c59">Measure wood temperature;</text>
-<text x="296" y="328" font-size="12" fill="#3e4c59">correct pin readings by about</text>
-<text x="296" y="344" font-size="12" fill="#3e4c59">0.5% per 5.6 °C.</text>
+<text x="296" y="328" font-size="12" fill="#3e4c59">correct pin readings the</text>
+<text x="296" y="344" font-size="12" fill="#3e4c59">maker’s way, once only.</text>
 <rect x="544" y="224" width="232" height="134" rx="8" fill="#f3fbf7" stroke="#0b6e4f" stroke-width="2"/>
 <circle cx="568" cy="250" r="12" fill="#ffffff" stroke="#0b6e4f" stroke-width="2"/>
 <text x="568" y="255" font-size="13" font-weight="700" text-anchor="middle" fill="#1f2933">6</text>

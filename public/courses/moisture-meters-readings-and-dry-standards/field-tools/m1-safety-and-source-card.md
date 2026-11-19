@@ -5,7 +5,7 @@
 
 ## 1. Before the first reading: safety checklist
 
-- [ ] Power to the wet area has been assessed (confirmed with the site supervisor): __________
+- [ ] Power to the wet area confirmed safe by the site supervisor (an assessment alone is not enough; no confirmation, no readings): __________
 - [ ] Pins stay well away from GPOs, switches, light fittings and the vertical and horizontal lines where cables and pipes usually run.
 - [ ] Pinless scan first on walls; pins only where I have checked what is behind the surface.
 - [ ] Hands dry. Meter and charger never tested with wet hands.

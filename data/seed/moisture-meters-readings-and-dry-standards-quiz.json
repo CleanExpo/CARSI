@@ -56,7 +56,7 @@
           ],
           "correctIndex": 1,
           "points": 1,
-          "explanation": "Pinless mode scans without piercing anything you have not checked, and you move off the GPO and its service lines before confirming with pins. Pins first risks hitting a cable or pipe."
+          "explanation": "Once power is confirmed safe, pinless mode scans without piercing anything you have not checked, and you move off the GPO and its service lines before confirming with pins. Pins first risks hitting a cable or pipe."
         },
         {
           "questionText": "On a contaminated job, which area do you test first so you do not spread contamination?",
@@ -755,7 +755,7 @@
           ],
           "correctIndex": 3,
           "points": 1,
-          "explanation": "A surface reading is not a basis for accepting a floor, so it cannot replace a valid test. Record “no valid in-situ result” and seek an accepted alternative."
+          "explanation": "A surface reading is not a basis for accepting a floor, so it cannot replace a valid test. Record “no valid in-situ result” and seek an alternative accepted for that floor assembly."
         },
         {
           "questionText": "A pinless scan shows stripes every 450 mm. What does that spacing suggest?",
@@ -767,7 +767,7 @@
           ],
           "correctIndex": 0,
           "points": 1,
-          "explanation": "Regular spacing that matches stud centres points to the frame, not to water, which does not form even stripes. Pins beside a stripe then confirm it."
+          "explanation": "Regular spacing that matches stud centres points to the frame, not to water, which does not form even stripes. Then check the stripe itself; a reading beside it is only a control."
         },
         {
           "questionText": "According to a meter maker, what can throw off a pinless reading?",
@@ -782,16 +782,16 @@
           "explanation": "Meter maker Delmhorst says pipes, nails, staples and other metallic objects can throw off pinless readings, so confirm a suspect high with a pin meter. The other three are good habits, not causes of a false reading."
         },
         {
-          "questionText": "How do you confirm that a suspected stud-line false high is not moisture?",
+          "questionText": "How do you check a suspected stud-line false high before clearing it?",
           "options": [
             "Another pinless scan at the same spot",
-            "Pins in the board beside the stripe",
+            "Check the stripe itself, not beside it",
             "Scan again more quickly along the stripe",
             "Ignore it because stripes are always dry"
           ],
           "correctIndex": 1,
           "points": 1,
-          "explanation": "Pins measure at the tips and do not respond to a stud behind the board, so a baseline reading beside the stripe confirms it. Repeating a pinless scan only repeats the same error."
+          "explanation": "A reading beside the stripe is only a control: a wet stud or wet strip on the line can sit next to dry board. Check the line itself by a suitable method once you know what is behind it. A repeat pinless scan only repeats the same error."
         },
         {
           "questionText": "What read pattern do you use on a framing wall before relining?",
@@ -860,7 +860,7 @@
           ],
           "correctIndex": 0,
           "points": 1,
-          "explanation": "A meter that fails after a battery change and cleaning is out of service until it is repaired and checked. Comparing it with another meter is the weakest check, so it cannot clear it."
+          "explanation": "A meter that fails after a battery change and cleaning is out of service until it is repaired and checked. Comparing it with another meter is the weakest check, so it cannot clear it. With the checked replacement, re-read the control and fixed points and start a new series."
         },
         {
           "questionText": "Your pin meter last passed its check on Monday and fails on Wednesday. Which readings do you flag?",
@@ -1076,7 +1076,7 @@
           "explanation": "QBCC asks for framing below 16% that presents as sound, and every reading is below 16%. The 14% figure is your own goal, which you record separately as not yet met."
         },
         {
-          "questionText": "Boards at 13.5% go into a room with an EMC of 12.0%. What does the Queensland timbers guidance indicate?",
+          "questionText": "Boards at 13.5% go into a room whose average in-service EMC is 12.0%. What does the Queensland timbers guidance indicate?",
           "options": [
             "Acclimatisation is required; the difference is 1.5%",
             "Acclimatisation is not indicated; difference is 1.5%",
@@ -1346,7 +1346,7 @@
           ],
           "correctIndex": 3,
           "points": 1,
-          "explanation": "Regular spacing matching stud centres points to fixings or studs; confirm with pins beside a stripe."
+          "explanation": "Regular spacing matching stud centres points to fixings or studs; then check the stripe itself, because a reading beside it is only a control."
         },
         {
           "questionText": "Which daily calibration check is the weakest on its own?",
@@ -1409,7 +1409,7 @@
           "explanation": "A surface below the dew point can collect condensation, so surface readings cannot separate it from slab moisture."
         },
         {
-          "questionText": "Boards arrive at 13.5% for a room whose EMC is 12.0%. Under the CTIQ guidance, is acclimatisation indicated?",
+          "questionText": "Boards arrive at 13.5% for a room whose average in-service EMC is 12.0%. Under the CTIQ guidance, is acclimatisation indicated?",
           "options": [
             "Yes, outside the 2 percent",
             "Yes, always for any timber",

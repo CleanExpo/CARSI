@@ -7,7 +7,7 @@
 <rect x="40" y="80" width="200" height="110" fill="#d9dee3" stroke="#52606d" stroke-width="1.5"/>
 <text x="140" y="108" font-size="15" font-weight="700" fill="#1f2933" text-anchor="middle">1. Weigh it wet</text>
 <text x="140" y="148" font-size="24" font-weight="700" fill="#1f2933" text-anchor="middle">412.6 g</text>
-<text x="140" y="176" font-size="12" fill="#3e4c59" text-anchor="middle">25 mm bottom-plate offcut</text>
+<text x="140" y="176" font-size="12" fill="#3e4c59" text-anchor="middle">25 mm loose offcut</text>
 <rect x="300" y="80" width="200" height="110" fill="#d9dee3" stroke="#52606d" stroke-width="1.5"/>
 <text x="400" y="108" font-size="15" font-weight="700" fill="#1f2933" text-anchor="middle">2. Oven-dry it</text>
 <text x="400" y="148" font-size="24" font-weight="700" fill="#1f2933" text-anchor="middle">101–105 °C</text>

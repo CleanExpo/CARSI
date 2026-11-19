@@ -8,13 +8,13 @@
 - [ ] Built-in self-check run
 - [ ] Pin meter on the maker's check device: result logged
 - [ ] Pinless meter on the maker's reference block: result logged
-- [ ] Hygrometers settled side by side: difference logged
+- [ ] Hygrometers settled side by side: difference logged as an agreement check (agreement is not an accuracy pass)
 - [ ] Battery, mode, scale and species set before the first reading
 - [ ] Pins withdrawn and wiped after every reading
 - [ ] Wood temperature measured with every pin reading
-- [ ] Failed meter tagged out; readings since the last good check flagged
+- [ ] Any failed check: readings since the last good check flagged at once, even if a re-check passes; a meter that still fails tagged out
 
-Comparing two moisture meters is only a back-up: both can be wrong in the same direction.
+Comparing two moisture meters is only a back-up: both can be wrong in the same direction. Two hygrometers that agree can share the same error too; an accuracy check needs a suitable reference or the maker's own verification method.
 
 ## The six common meter mistakes (one-line checklist)
 
@@ -22,12 +22,12 @@ Comparing two moisture meters is only a back-up: both can be wrong in the same d
 2. Wrong meter type for the material: pins for timber at depth; pinless to scan; hygrometer for slabs and air.
 3. Wrong electrode, mode or scale: set and record mode, scale and species before the first reading.
 4. Pins left in wet material: withdraw and wipe pins after each reading; store them dry.
-5. Ignoring material temperature: measure wood temperature and correct pin readings.
+5. Ignoring material temperature: measure wood temperature and correct pin readings the maker's way, once only.
 6. No accuracy check: run and log the daily check.
 
 ## Temperature correction for a pin meter
 
-Correction (percentage points) = (difference in °C) ÷ 5.6 × 0.5. Add it when the wood is colder than the calibration temperature; subtract it when the wood is warmer. Use your maker's calibration temperature.
+Use your meter maker's temperature table or method where the manual gives one. If the meter corrects for temperature itself, do not correct again. Only where the maker gives no method, for a pin meter that does not correct internally, use the Wood Handbook's general approximation: correction (percentage points) = (difference in °C) ÷ 5.6 × 0.5. Add it when the wood is colder than the calibration temperature; subtract it when the wood is warmer. Use your maker's calibration temperature.
 
 Worked example (CARSI illustration): 9% at 6 °C wood, calibrated at 20 °C: 14 ÷ 5.6 × 0.5 = 1.25; 9 + 1.25 = 10.25%.
 
@@ -42,7 +42,7 @@ Let the hygrometer settle (follow the maker's settling time). Hold it at about c
 
 ## Daily check log
 
-| Date | Time | Instrument ID | Check device or reference block result | Hygrometer pair (°C / %RH) | Pass or fail | Action | Initials |
+| Date | Time | Instrument ID | Check device or reference block result | Hygrometer pair (°C / %RH; agree or not) | Meter check pass or fail | Action | Initials |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | | | | | | | | |
 | | | | | | | | |
@@ -51,7 +51,7 @@ Let the hygrometer settle (follow the maker's settling time). Hold it at about c
 | | | | | | | | |
 | | | | | | | | |
 
-**If a check fails:** replace the battery, clean the pins or plate, check again. If it still fails, tag it out, use a checked meter, send it to the maker or an Australian service agent, and flag every reading taken since the last good check in the job file.
+**If a check fails:** flag every reading taken since the last good check in the job file straight away, even if the meter passes after a new battery or cleaning. Then replace the battery, clean the pins or plate, and check again. If it still fails, tag it out and send it to the maker or an Australian service agent. Before you carry on with a checked replacement meter, re-read the unaffected control and the fixed points with it, record the instrument change, and start a new reading series: its readings are not automatically comparable with the old meter's.
 
 ## Glossary
 

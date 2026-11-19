@@ -31,7 +31,7 @@
 <rect x="530" y="274" width="28" height="18" rx="2" fill="#ffffff" stroke="#1f2933" stroke-width="2"/>
 <text x="570" y="288" font-size="13" fill="#1f2933">Double GPO (230 V)</text>
 <text x="530" y="326" font-size="13" fill="#3e4c59">Confirm power to the wet area</text>
-<text x="530" y="344" font-size="13" fill="#3e4c59">has been assessed before any</text>
+<text x="530" y="344" font-size="13" fill="#3e4c59">is made safe before any</text>
 <text x="530" y="362" font-size="13" fill="#3e4c59">reading.</text>
 <text x="24" y="414" font-size="11" fill="#52606d">CARSI · Professional Moisture Meters · schematic, not to scale</text>
 </svg>
