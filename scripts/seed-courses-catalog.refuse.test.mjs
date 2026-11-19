@@ -4,11 +4,19 @@
 // so a slugless run is an easy mistake. Run: node --test scripts/seed-courses-catalog.refuse.test.mjs
 //
 // No database is touched: DATABASE_URL points at an unresolvable host, and the refusal must
-// fire before any database access. The --all case unsets DATABASE_URL and expects the
+// fire before any database access. The --all case sets DATABASE_URL to empty and expects the
 // script's own "DATABASE_URL is not set." exit, proving --all passes the refusal.
+//
+// The script imports dotenv/config, which fills any variable that is ABSENT from the
+// repository .env. Deleting DATABASE_URL is therefore not enough: on a machine whose .env
+// holds a real database, the --all case would run a real whole-catalogue seed. So every run
+// points dotenv at an empty file, drops inherited DOTENV_CONFIG_* overrides, and keeps
+// DATABASE_URL present (dotenv never overrides a variable that exists, even when empty).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
+import { mkdtempSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -17,11 +25,15 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 // socket under TMPDIR, which fails (EINVAL) when TMPDIR is a long path, as in review sandboxes.
 const script = join(root, 'scripts', 'seed-courses-catalog.ts');
 const UNREACHABLE = 'postgresql://refuse-test:x@refuse-test.invalid:1/none';
+const EMPTY_DOTENV = join(mkdtempSync(join(tmpdir(), 'seed-refuse-')), 'empty.env');
+writeFileSync(EMPTY_DOTENV, '');
 
 function run(args, env) {
   const base = { ...process.env };
-  delete base.DATABASE_URL;
+  for (const k of Object.keys(base)) if (k.startsWith('DOTENV_CONFIG_')) delete base[k];
   delete base.SEED_COURSE_SLUG;
+  base.DATABASE_URL = '';
+  base.DOTENV_CONFIG_PATH = EMPTY_DOTENV;
   const r = spawnSync(process.execPath, ['--import', 'tsx', script, ...args], {
     cwd: root,
     env: { ...base, ...env },
@@ -51,7 +63,7 @@ test('blank SEED_COURSE_SLUG is refused', () => {
 });
 
 test('--all passes the refusal (stops at the missing DATABASE_URL instead)', () => {
-  const r = run(['--all'], {});
+  const r = run(['--all'], { DATABASE_URL: '' });
   assert.equal(r.code, 1);
   assert.match(r.out, /DATABASE_URL is not set\./);
   assert.doesNotMatch(r.out, /refusing:/);
