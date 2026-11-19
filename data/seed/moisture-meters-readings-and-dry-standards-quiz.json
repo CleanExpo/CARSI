@@ -712,14 +712,14 @@
         {
           "questionText": "Who sets the hygrometer test method and acceptance limit for a slab?",
           "options": [
-            "Floor covering maker and the current standard",
+            "Floor covering maker and the specified standard",
             "Whoever owns the pinless meter on site",
             "The technician’s experience of similar earlier jobs",
             "The surface reading taken on the day"
           ],
           "correctIndex": 0,
           "points": 1,
-          "explanation": "The acceptance limit comes from the floor covering manufacturer and the named standard, which this course does not restate. A surface reading or personal experience cannot set it."
+          "explanation": "The acceptance limit comes from the floor covering manufacturer and the standard named in the job specification, which this course does not restate. A surface reading or personal experience cannot set it."
         },
         {
           "questionText": "Is a waffle pod part of the concrete thickness?",
@@ -770,16 +770,16 @@
           "explanation": "Regular spacing that matches stud centres points to the frame, not to water, which does not form even stripes. Pins beside a stripe then confirm it."
         },
         {
-          "questionText": "One ceiling sheet reads 60 points while the sheets either side read 15, with no stain. What do you check first?",
+          "questionText": "According to a meter maker, what can throw off a pinless reading?",
           "options": [
-            "Whether the roof is leaking above",
-            "Whether the room is too cold",
-            "Whether that sheet has foil backing",
-            "Whether the battery has gone flat"
+            "A meter checked that morning",
+            "Writing the reading in points",
+            "Nails, pipes and other metal",
+            "Recording the mode and scale"
           ],
           "correctIndex": 2,
           "points": 1,
-          "explanation": "A uniform high across exactly one sheet points to the board, such as foil backing or metal behind it. Water rarely stops at the edge of one sheet."
+          "explanation": "Meter maker Delmhorst says pipes, nails, staples and other metallic objects can throw off pinless readings, so confirm a suspect high with a pin meter. The other three are good habits, not causes of a false reading."
         },
         {
           "questionText": "How do you confirm that a suspected stud-line false high is not moisture?",
@@ -884,7 +884,7 @@
           ],
           "correctIndex": 1,
           "points": 1,
-          "explanation": "The pins carry moisture and contamination from the wet stud to the next one, which can lift the reading and spread contamination to the control area. Wiping the pins after each reading prevents it."
+          "explanation": "Leaving the pins in the wet stud is mistake 4, pins left in wet material. The fix is to withdraw the pins after each reading and clean them of contaminants after each use, as meter maker Delmhorst advises."
         },
         {
           "questionText": "A file shows 9% on bearers in a 6 °C subfloor, and the meter was calibrated at 20 °C. How much correction applies?",
@@ -1370,7 +1370,7 @@
           ],
           "correctIndex": 1,
           "points": 1,
-          "explanation": "Pins left in wet material carry moisture and contamination to the next reading."
+          "explanation": "Leaving pins in wet material is one of the six mistakes; withdraw the pins and clean them after each use (Delmhorst). The other three are good habits."
         },
         {
           "questionText": "What is the dry standard for a wet plasterboard wall?",

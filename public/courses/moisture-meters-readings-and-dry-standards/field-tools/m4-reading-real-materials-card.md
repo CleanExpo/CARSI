@@ -10,7 +10,7 @@
 - [ ] Plasterboard: read a known-dry patch of the same board first (the baseline), then trace and mark the boundary
 - [ ] Plasterboard: re-read the baseline every visit
 - [ ] Concrete: check the slab temperature against the room dew point; record surface readings as qualitative
-- [ ] Concrete: specify a hygrometer test to the named method; the floor covering maker and the current standard set the limit
+- [ ] Concrete: specify a hygrometer test to the named method; the floor covering maker and the standard named in the job specification set the limit
 - [ ] Odd number? Run the false-reading table below before you record it
 
 ## Formulas and units
@@ -27,9 +27,7 @@
 
 | Symptom | Possible cause | Check |
 | --- | --- | --- |
-| High in a straight line on a wall | Nail line, metal stud, angle bead or pipe | Move 50 mm sideways; confirm with pins |
-| High across a whole sheet | Foil-backed board or metal behind | Check the back of an offcut; use pins |
-| High on a painted or sealed surface | Coating or surface water | Dry the surface; read at depth with insulated pins |
+| High in a straight line on a wall (pinless) | Nail line, metal stud, angle bead or pipe | Confirm with a pin meter beside the line |
 | High on treated timber or after salt water | Salts, treatment or seawater | Compare with untreated timber nearby; track the trend |
 | Low in a cold space, high in a hot one | No temperature correction | Measure wood temperature and correct |
 | Jumping readings | Poor contact, low battery or wrong mode | Clean electrodes, check battery and mode, re-read |

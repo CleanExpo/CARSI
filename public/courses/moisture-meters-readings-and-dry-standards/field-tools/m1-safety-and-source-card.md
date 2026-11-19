@@ -38,7 +38,7 @@ Example (CARSI illustration, not from a real job): stud 2 at 300 mm, pin meter w
 | ARFA Technical Bulletin 001 (April 2025) | Free (trade body) | Slab RH probe depth: 40% of slab thickness, e.g. 80 mm in a 200 mm slab |
 | AS/NZS 1080.1:2012 | Paid | How is timber moisture content tested? |
 | AS 1884:2021 | Paid | How are resilient floor coverings installed? |
-| ASTM F2170 (this course cites 2019a; confirm the current edition at astm.org) | Paid | How is slab relative humidity tested with in situ probes? |
-| ANSI/IICRC S500:2025 (title only) | Paid | Professional water damage restoration |
+| ASTM F2170-19a (the edition listed on the ASTM store on 20/11/2026; check the store again before you cite it) | Paid | How is slab relative humidity tested with in situ probes? |
+| AS-IICRC S500:2025 (Standards Australia adoption of ANSI/IICRC S500:2021) | Paid | Professional water damage restoration |
 
 **How to cite a paid standard:** by number and edition only. Do not describe what it requires unless you have read the current edition.
