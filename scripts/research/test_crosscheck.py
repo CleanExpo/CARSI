@@ -326,6 +326,46 @@ class IicrcGuard(unittest.TestCase):
             self.assertFalse(cc.names_iicrc(text), text)
 
 
+class KeyNeverLeaves(unittest.TestCase):
+    """The key may only ever go to the OpenRouter address itself: a redirect is refused."""
+
+    def test_redirect_is_refused_and_the_key_is_not_forwarded(self):
+        seen = []
+
+        class Sink(http.server.BaseHTTPRequestHandler):
+            def do_GET(self):
+                seen.append(self.headers.get("Authorization"))
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(b'{"data": {"usage_daily": 0}}')
+
+            def log_message(self, *a):
+                pass
+
+        sink = http.server.HTTPServer(("127.0.0.1", 0), Sink)
+        sink_url = f"http://127.0.0.1:{sink.server_port}/elsewhere"
+
+        class Origin(http.server.BaseHTTPRequestHandler):
+            def do_GET(self):
+                self.send_response(302)
+                self.send_header("Location", sink_url)
+                self.end_headers()
+
+            def log_message(self, *a):
+                pass
+
+        origin = http.server.HTTPServer(("127.0.0.1", 0), Origin)
+        for srv in (sink, origin):
+            threading.Thread(target=srv.serve_forever, daemon=True).start()
+            self.addCleanup(srv.server_close)
+            self.addCleanup(srv.shutdown)
+        with mock.patch.object(cc, "API", f"http://127.0.0.1:{origin.server_port}"):
+            with self.assertRaises(Exception):
+                cc.call("/key", "sentinel-test-token")
+        self.assertEqual(seen, [], "the request followed the redirect and reached another host")
+
+
 class QuoteCheck(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

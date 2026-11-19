@@ -117,12 +117,24 @@ def key():
     return r.stdout.strip()
 
 
+class _RefuseRedirect(urllib.request.HTTPRedirectHandler):
+    """urllib copies the Authorization header to a redirect's target. A request carrying
+    the key must never leave the OpenRouter address, so every redirect is refused."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        raise urllib.error.HTTPError(req.full_url, code, "redirect refused", headers, fp)
+
+
+_KEY_OPENER = urllib.request.build_opener(_RefuseRedirect)
+
+
 def call(path, k, body=None, timeout=180):
+    """The only function that sends the key, and only to API + path."""
     req = urllib.request.Request(API + path, data=json.dumps(body).encode() if body else None,
                                  headers={"Authorization": f"Bearer {k}",
                                           "Content-Type": "application/json",
                                           "X-Title": "CARSI course research"})
-    with urllib.request.urlopen(req, timeout=timeout) as r:
+    with _KEY_OPENER.open(req, timeout=timeout) as r:
         return json.load(r)
 
 
