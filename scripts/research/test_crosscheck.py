@@ -98,6 +98,18 @@ class Caps(unittest.TestCase):
             self.assertNotEqual(code, 0, bad)
             self.assertEqual(fake.chat_calls, 0, bad)
 
+    def test_daily_cap_holds_when_openrouter_usage_lags(self):
+        # OpenRouter's usage_daily never moves during the run; the run's own spend must still count.
+        fake = FakeChat(daily=cc.DAILY_CAP_USD - 0.40, cost=0.20)
+        fake_lag = lambda path, k, body=None, timeout=180: (  # noqa: E731
+            {"data": {"usage_daily": cc.DAILY_CAP_USD - 0.40}} if path == "/key" else fake(path, k, body, timeout))
+        rows = [dict(CLAIM, id=f"C{i}") for i in range(20)]
+        with mock.patch.object(cc, "call", fake_lag), mock.patch.object(cc, "quote_found", return_value="NO_URL_OR_QUOTE"):
+            code, text = run_main(["--claims", claims_file(rows), "--out", self.out, "--max-usd", "5"])
+        self.assertEqual(code, 2)
+        self.assertIn("daily spend", text)
+        self.assertLessEqual(cc.DAILY_CAP_USD - 0.40 + fake.chat_calls * 0.20, cc.DAILY_CAP_USD)
+
     def test_max_usd_above_daily_cap_refused(self):
         with mock.patch.object(cc, "call", FakeChat(daily=0.0)):
             code, _ = run_main(["--claims", claims_file([CLAIM]), "--out", self.out, "--max-usd", "25"])
@@ -266,7 +278,9 @@ class VisibleTextOnly(unittest.TestCase):
 class IicrcGuard(unittest.TestCase):
     def test_refuses_iicrc_and_s_standard_claims_without_calling(self):
         for text in ["ANSI/IICRC S500 requires drying", "The S520 says", "IICRC guidance", "S 500 section 12",
-                     "the s-500 says", "S500:2021 clause", "iicrc rules", "ANSI IICRC S100"]:
+                     "the s-500 says", "S500:2021 clause", "iicrc rules", "ANSI IICRC S100",
+                     "S700 section 4 covers fire damage", "s-800 inspection", "S 300 upholstery",
+                     "S.220 flooring", "per S900", "the I.I.C.R.C. view"]:
             fake = FakeChat(daily=0.0)
             with mock.patch.object(cc, "key", return_value="x"), mock.patch.object(cc, "call", fake):
                 code, _ = run_main(["--claims", claims_file([dict(CLAIM, claim=text)]),

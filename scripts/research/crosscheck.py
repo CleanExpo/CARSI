@@ -51,7 +51,8 @@ def worst_case_call_usd(model):
 
 # IICRC prohibits entering its standards into any AI tool (CLAUDE.md). Claims that
 # name an IICRC standard are refused here and go to the licensed-index route instead.
-IICRC_RX = re.compile(r"\bIICRC\b|\bS[\s-]?5[0-9]{2}\b|\bS[\s-]?100\b", re.I)
+# Fail closed: any IICRC spelling, and any S-number from S100 to S999 (the IICRC S-standard pattern).
+IICRC_RX = re.compile(r"\bI\.?I\.?C\.?R\.?C\b|\bS[\s.-]?[1-9][0-9]{2}\b", re.I)
 MIN_QUOTE_CHARS = 20  # a shorter quote matches too many pages to prove anything
 
 PROMPT = """You are checking one factual claim for an Australian training course.
@@ -263,10 +264,12 @@ def main():
         sys.exit(f"REFUSED: claims {banned} name an IICRC standard; check them against the licensed index, not an AI tool")
     k = key()
     run_spend = 0.0
+    day_start = daily_spend(k)
     with open(a.out, "a") as out:
         for c in claims:
             for model in MODELS:
-                today = daily_spend(k)
+                # OpenRouter's figure can lag, so this run's own spend always counts too.
+                today = max(daily_spend(k), day_start + run_spend)
                 if today + PER_CALL_RESERVE_USD > DAILY_CAP_USD:
                     print(f"STOP: daily spend ${today:.2f} at the ${DAILY_CAP_USD} cap"); return 2
                 if run_spend + PER_CALL_RESERVE_USD > a.max_usd:
