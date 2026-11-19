@@ -348,8 +348,10 @@ def main():
                     elif tokens is None or cost > PER_CALL_RESERVE_USD or tokens > MAX_PROMPT_TOKENS:
                         stop = f"one call cost ${cost:.4f}, past the per-call bound; stopped"
                 except Exception as e:  # recorded, never treated as a pass
-                    # A failed request may still have been billed: count the full reserve.
+                    # Any path without a validated cost (failed request, malformed reply) may
+                    # still have been billed: count the full reserve and stop the run.
                     text, cost, err = "", PER_CALL_RESERVE_USD, type(e).__name__
+                    stop = "no valid cost for this call; counted the full reserve and stopped"
                 run_spend += cost
                 ans = coerce_answer(text)
                 if err:

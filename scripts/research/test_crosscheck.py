@@ -191,10 +191,33 @@ class PerCallBound(unittest.TestCase):
             raise TimeoutError("slow")
 
         with mock.patch.object(cc, "call", fake), mock.patch.object(cc, "quote_found", return_value="X"):
-            code, _ = run_main(["--claims", claims_file([dict(CLAIM, id=f"C{i}") for i in range(5)]),
-                                "--out", self.out, "--max-usd", "0.5"])
+            code, text = run_main(["--claims", claims_file([dict(CLAIM, id=f"C{i}") for i in range(5)]),
+                                   "--out", self.out, "--max-usd", "5"])
         self.assertEqual(code, 2)
-        self.assertEqual(calls["n"], 2)  # 2 x 0.25 reserve reaches the 0.50 run cap
+        self.assertEqual(calls["n"], 1)  # the reserve is counted and the run stops at once
+        self.assertIn("full reserve", text)
+
+    def test_any_response_without_a_valid_cost_stops_at_once(self):
+        # Every shape that is not a clean answer with a real cost: one call, then stop.
+        for bad in [{"choices": [{"message": {"content": "{}"}}], "usage": [1]},
+                    {"choices": [{"message": {"content": "{}"}}], "usage": "x"},
+                    {"choices": [], "usage": {"cost": 0.01}},
+                    {"usage": {"cost": 0.01}},
+                    [1, 2],
+                    None]:
+            calls = {"n": 0}
+
+            def fake(path, k, body=None, timeout=180, bad=bad):
+                if path == "/key":
+                    return {"data": {"usage_daily": 0.0}}
+                calls["n"] += 1
+                return bad
+
+            rows = [dict(CLAIM, id=f"C{i}") for i in range(5)]
+            with mock.patch.object(cc, "call", fake), mock.patch.object(cc, "quote_found", return_value="X"):
+                code, _ = run_main(["--claims", claims_file(rows), "--out", self.out, "--max-usd", "5"])
+            self.assertEqual(code, 2, bad)
+            self.assertEqual(calls["n"], 1, bad)
 
 
 class InputValidation(unittest.TestCase):
