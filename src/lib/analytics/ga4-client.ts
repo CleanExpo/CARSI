@@ -5,6 +5,7 @@
  * has not loaded yet (e.g. blocked by an ad blocker, or fired before the
  * bootstrap script finishes).
  */
+import type { CarsiProductEventPayload } from './carsi-product-events';
 import type {
   CheckoutStartedPayload,
   CourseViewPayload,
@@ -119,5 +120,12 @@ export function trackMembershipView(payload: MembershipViewPayload): void {
 export function trackMembershipCheckoutStarted(payload: MembershipCheckoutStartedPayload): void {
   sendGa4Event('membership_checkout_started', {
     ...(typeof payload.value_aud === 'number' ? { value: payload.value_aud, currency: 'AUD' } : {}),
+  });
+}
+
+export function trackCarsiProductEvent(payload: CarsiProductEventPayload): void {
+  sendGa4Event(payload.name, {
+    ...(payload.context ? { carsi_context: payload.context } : {}),
+    ...(payload.href ? { link_url: payload.href } : {}),
   });
 }
