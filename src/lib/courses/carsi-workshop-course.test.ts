@@ -144,6 +144,31 @@ describe('CARSI carpet cleaning workshop course data', () => {
     expect(text).not.toMatch(/\b(color|odor|fiber|center|mold|liter)s?\b/i);
   });
 
+  it('never lists a product above the nylon pH ceiling without telling learners to check it first', () => {
+    // The pH lesson teaches a nylon ceiling of 10; a product table row whose pH tops 10
+    // must be named in a paragraph that tells the learner to test before it goes on nylon.
+    const ceilingLesson = allLessons().find((l) => /Nylon pH ceiling: 10/.test(l.contentBody));
+    expect(ceilingLesson).toBeDefined();
+    for (const lesson of allLessons()) {
+      // Only product tables: those whose second column header is pH.
+      const productTables = (lesson.contentBody.match(/<table>.*?<\/table>/g) ?? []).filter((t) =>
+        /<thead><tr><th>[^<]*<\/th><th>pH<\/th>/.test(t)
+      );
+      const rows = productTables.flatMap((t) => t.match(/<tr><td>[^<]+<\/td><td>[^<]*<\/td>/g) ?? []);
+      const paragraphs = lesson.contentBody.match(/<p>.*?<\/p>/g) ?? [];
+      for (const row of rows) {
+        const [, product, ph] = /<tr><td>([^<]+)<\/td><td>([^<]*)<\/td>/.exec(row) ?? [];
+        const numbers = (ph ?? '').match(/\d+(?:\.\d+)?/g)?.map(Number) ?? [];
+        if (numbers.length === 0 || Math.max(...numbers) <= 10) continue;
+        const name = (product ?? '').split(/\s+/)[0];
+        const warned = paragraphs.some(
+          (p) => p.includes(name) && /nylon ceiling of 10/i.test(p) && /pH strip/i.test(p)
+        );
+        expect(warned, `${lesson.title}: ${product} (pH ${ph}) has no nylon ceiling check`).toBe(true);
+      }
+    }
+  });
+
   it('is in the seed catalogue identically, so the existing seeder loads it', () => {
     const seeded = seed.courses.find((c) => c.slug === SLUG);
     expect(seeded).toEqual(course);

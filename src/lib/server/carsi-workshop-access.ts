@@ -79,7 +79,40 @@ export function canDownloadParticipantManual(state: WorkshopAccessState): boolea
   return state === 'enrolled' || state === 'staff';
 }
 
+/**
+ * Cohort-only courses: a learner gets in only through the Day-1 attendance check-in (or an
+ * admin), and completion is written only by the two-day attendance finalisation. This set is
+ * the one owner of that rule; the enrolment writer, the completion writer and the
+ * certificate wording all ask it.
+ */
+const COHORT_ONLY_COURSE_SLUGS: ReadonlySet<string> = new Set(['ccw-2-day-workshop']);
+
+/**
+ * Payment reference the attendance provisioner writes on a cohort enrolment. Must equal
+ * `CCW_ATTENDANCE_PAYMENT_REFERENCE` in `ccw-attendance/provision.ts` (asserted by test);
+ * kept here to avoid an import cycle with the enrolment writer.
+ */
+export const COHORT_ENROLMENT_PAYMENT_REFERENCE = 'ccw:attendance';
+
+export function isCohortOnlyCourse(slug: string | null | undefined): boolean {
+  return typeof slug === 'string' && COHORT_ONLY_COURSE_SLUGS.has(slug.trim().toLowerCase());
+}
+
+/**
+ * May this payment reference issue an enrolment on the course? Every course except a
+ * cohort-only course: yes. A cohort-only course: only the attendance check-in or an admin
+ * (`admin:*`). Free confirm, membership, team, org and Stripe paths are refused.
+ */
+export function mayIssueEnrolment(
+  courseSlug: string | null | undefined,
+  paymentReference: string | null | undefined
+): boolean {
+  if (!isCohortOnlyCourse(courseSlug)) return true;
+  const ref = (paymentReference ?? '').trim().toLowerCase();
+  return ref === COHORT_ENROLMENT_PAYMENT_REFERENCE || ref.startsWith('admin:');
+}
+
 /** Cohort workshops issue a certificate of attendance (both days checked in), not completion. */
 export function certificateKindForCourseSlug(slug: string | null | undefined): 'completion' | 'attendance' {
-  return slug === 'ccw-2-day-workshop' ? 'attendance' : 'completion';
+  return isCohortOnlyCourse(slug) ? 'attendance' : 'completion';
 }
