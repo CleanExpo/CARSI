@@ -220,6 +220,16 @@ const KNOCKOUTS = [
   ],
   [
     'plainText',
+    'hex HTML entity in a lesson title',
+    (c) => (teachingLessons(c)[0].title = 'Readings &#x2014; what they mean'),
+  ],
+  [
+    'plainText',
+    'two-letter named entity in a lesson title',
+    (c) => (teachingLessons(c)[0].title = 'Readings &lt; 15%'),
+  ],
+  [
+    'plainText',
     'reference card numbered for another module',
     (c) => (teachingLessons(c)[0].title = 'Module 4 reference card: corrections'),
   ],
@@ -236,7 +246,7 @@ const KNOCKOUTS = [
 ];
 
 test('plainText passes: a letter after "&" with a semicolon is ordinary text, not an entity', () => {
-  for (const t of ['R&D; methods', 'Q&A; session', 'AT&T; training']) {
+  for (const t of ['R&D; methods', 'Q&A; session', 'AT&T; training', 'Q&As; worked examples']) {
     const c = clone();
     teachingLessons(c)[0].title = t;
     const s = scoreCourse(c, ctx);
