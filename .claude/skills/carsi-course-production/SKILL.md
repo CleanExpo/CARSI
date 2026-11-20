@@ -161,6 +161,37 @@ Diagrams are hand-written SVG in `public/courses/<slug>/diagrams/`, embedded in 
   not installed. Then look at each diagram rendered — the check measures, the eye confirms.
 - Known limit: on a phone a diagram scales to about 43%, so 11px labels read small.
 
+## Research pipeline — models find, sources prove (MUST, founder 20/11/2026)
+Course facts never come from an agent's training knowledge. Phill, 20/11/2026: use the models'
+strengths to discover and research, and stop defaulting to what the LLM remembers. Every
+substantive point (law, duty, number, limit, date, product, standard edition) runs this route
+**before** it is written into a lesson:
+1. **Write the claims down first**, one per line, in `claims.jsonl`
+   (`{"id","claim","jurisdiction":"AU|NZ|AU+NZ"}`), in plain ASCII text (the runner refuses
+   curly quotes, long dashes and other special characters). Write legal sections as
+   "section 274", not "s 274": a lone "s" before a number reads as an S-standard and is
+   refused. Training knowledge may suggest a
+   claim; it never settles one.
+2. **Cross-check with two independent models**:
+   `python3 scripts/research/crosscheck.py --claims claims.jsonl --out results.jsonl --max-usd <n>`.
+   It sends each claim to Kimi (`moonshotai/kimi-k3.1-pro`) and DeepSeek
+   (`deepseek/deepseek-v4.1-flash-1017`) through OpenRouter with web search, asks for primary
+   sources only, then fetches each cited page and checks the quoted words are on it
+   (`QUOTE_FOUND`). Cap: USD 20/day, checked against OpenRouter's live figure and a shared
+   daily record on this Mac (`~/.local/state/carsi-research/`, booked before every call), plus
+   `--max-usd` per run; the key is read from
+   Keychain item `openrouter-api-key`. Authority: Phill, 20/11/2026, CARSI course research only.
+3. **Read the result, do not trust it.** A model answer is a lead (grade L). A claim enters the
+   ledger as `VERIFIED` only after the primary source is opened and the quote confirmed there
+   (`QUOTE_FOUND`, or opened by hand for a PDF). The two models disagree, or either says
+   `CONTRADICTED`/`PARTLY`: open the source and correct the claim, or cut it. Nothing found:
+   `GAP`.
+4. **Never send IICRC standard text or IICRC standard claims to the runner.** It refuses any claim
+   naming IICRC or an S-standard, however it is spaced or punctuated; those stay
+   `GAP`/`substantiate` against the licensed index. The guard catches what a person types, not a
+   deliberate disguise ("S five hundred"): never try to word a standard past it.
+5. **Keep `results.jsonl` beside the ledger** as the research record for the course.
+
 ## Evidence layer — cite-or-cut (MUST for Course Standard v1 and designation courses)
 BACKLOG #21 / the Evidence Engine TEACH stage. **No graded source, no claim.** Full template:
 `references/evidence-layer-template.md`; validator-passing examples:
