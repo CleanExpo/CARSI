@@ -31,7 +31,10 @@ import { createInterface } from 'node:readline/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { isCloudinaryConfigured, uploadVideoToCloudinary } from '../src/lib/server/cloudinary-upload';
+import {
+  isCloudinaryConfigured,
+  uploadVideoToCloudinary,
+} from '../src/lib/server/cloudinary-upload';
 import {
   COURSES_CATALOG_VERSION,
   isCoursesCatalogFile,
@@ -84,7 +87,8 @@ function sleep(ms: number): Promise<void> {
 
 async function readCatalog(): Promise<CoursesCatalogFile> {
   const parsed: unknown = JSON.parse(await readFile(CATALOG_PATH, 'utf8'));
-  if (!isCoursesCatalogFile(parsed)) throw new Error(`Invalid courses catalogue at ${CATALOG_PATH}.`);
+  if (!isCoursesCatalogFile(parsed))
+    throw new Error(`Invalid courses catalogue at ${CATALOG_PATH}.`);
   return parsed;
 }
 
@@ -264,7 +268,9 @@ async function renderVideo(apiKey: string, brief: CourseLessonVideoBrief): Promi
       throw new Error(`HeyGen render failed: ${poll.data.failure_message ?? 'unknown'}`);
     }
   }
-  throw new Error(`HeyGen render timed out after ${POLL_MAX_ATTEMPTS} polls (video_id ${videoId}).`);
+  throw new Error(
+    `HeyGen render timed out after ${POLL_MAX_ATTEMPTS} polls (video_id ${videoId}).`
+  );
 }
 
 async function downloadBuffer(url: string): Promise<Buffer> {
@@ -353,7 +359,8 @@ async function generate(timestamp: string): Promise<void> {
   const limit = argValue('limit') ? Number(argValue('limit')) : Infinity;
 
   const briefsFile = await loadBriefs();
-  if (!briefsFile) throw new Error(`No briefs file at ${BRIEFS_PATH}. Run --plan first, then author.`);
+  if (!briefsFile)
+    throw new Error(`No briefs file at ${BRIEFS_PATH}. Run --plan first, then author.`);
   const results = await loadResults();
   const done = new Set(results.items.filter((i) => i.status === 'done').map((i) => i.key));
 
@@ -383,9 +390,15 @@ async function generate(timestamp: string): Promise<void> {
   if (dryRun) {
     for (const brief of queue) {
       console.log(`\n── ${brief.courseSlug} / ${brief.lessonTitle} (${brief.locale}) ──`);
-      console.log(`avatar: ${brief.avatarId ?? process.env.HEYGEN_AVATAR_ID ?? '(set HEYGEN_AVATAR_ID)'}`);
-      console.log(`voice : ${brief.voiceId ?? process.env.HEYGEN_VOICE_ID ?? '(set HEYGEN_VOICE_ID)'}`);
-      console.log(`captions: ${brief.captions ? 'srt' : 'none'}  | script (${brief.script.length} chars):`);
+      console.log(
+        `avatar: ${brief.avatarId ?? process.env.HEYGEN_AVATAR_ID ?? '(set HEYGEN_AVATAR_ID)'}`
+      );
+      console.log(
+        `voice : ${brief.voiceId ?? process.env.HEYGEN_VOICE_ID ?? '(set HEYGEN_VOICE_ID)'}`
+      );
+      console.log(
+        `captions: ${brief.captions ? 'srt' : 'none'}  | script (${brief.script.length} chars):`
+      );
       console.log(brief.script);
     }
     console.log(`\n[dry-run] ${queue.length} render request(s) shown. No API calls, no spend.`);
@@ -412,9 +425,15 @@ async function generate(timestamp: string): Promise<void> {
     try {
       // Persist the locally-built SRT for the team / future subtitle tracks.
       await mkdir(SRT_DIR, { recursive: true });
-      await writeFile(join(SRT_DIR, `${brief.lessonId}.${brief.locale}.srt`), buildSrt(brief.script));
+      await writeFile(
+        join(SRT_DIR, `${brief.lessonId}.${brief.locale}.srt`),
+        buildSrt(brief.script)
+      );
 
-      const scriptHash = createHash('sha256').update(brief.script.trim()).digest('hex').slice(0, 12);
+      const scriptHash = createHash('sha256')
+        .update(brief.script.trim())
+        .digest('hex')
+        .slice(0, 12);
       const { videoUrl, captionUrl } = await renderVideo(apiKey, brief);
       const buffer = await downloadBuffer(videoUrl);
       const { url } = await uploadVideoToCloudinary(buffer, VIDEO_FOLDER);
@@ -460,7 +479,9 @@ async function generate(timestamp: string): Promise<void> {
   if (seedUpdates.size) {
     const changed = await persistToSeed(seedUpdates);
     console.log(`Updated ${changed} lesson resource list(s) in ${CATALOG_PATH}.`);
-    console.log('Next: run `npm run db:seed-courses` to import the new video links into the DB.');
+    console.log(
+      'Next: run `npm run db:seed-courses -- --slug=<slug> --apply` to import the new video links.'
+    );
   }
   console.log(`\nDone. ${ok}/${queue.length} rendered.`);
 }

@@ -244,6 +244,41 @@ async function main() {
     process.exit(1);
   }
 
+  // THIS SCRIPT IS NO LONGER THE DEFAULT IMPORT PATH.
+  //
+  // scripts/import-course-safe.ts is, and `db:seed-courses` now points at it. What remains here
+  // is a restricted migration path, kept because delete-and-recreate is occasionally the thing
+  // you actually want (a corrupted curriculum, a course being rebuilt from scratch) and because
+  // deleting the script would strand the documentation that still names it.
+  //
+  // It is restricted rather than deleted, and the restriction is an explicit flag rather than a
+  // rename, because the directive this came from is specific: prove the old destructive
+  // behaviour cannot be triggered ACCIDENTALLY. A rename would not do that -- someone following
+  // a stale runbook would simply type the new name. Nobody types this flag by accident.
+  //
+  // What this script still does that the importer does not: it REPLACES a course's curriculum,
+  // deleting every module and lesson and -- deliberately, not merely by cascade -- every
+  // lms_lesson_progress row attached to them. The importer reconciles instead, so a lesson that
+  // still exists in the catalogue keeps its row and its learner progress.
+  if (!process.argv.includes('--legacy-destructive-replace')) {
+    console.error(
+      `\nrefusing: this is the LEGACY destructive seeder. It is no longer the default path.\n\n` +
+        `  It deletes every module and lesson for the course(s) it touches, and every learner\n` +
+        `  progress row attached to them, then recreates the curriculum from the catalogue.\n` +
+        `  A lesson whose content did not change still loses its learners' completion history.\n\n` +
+        `  Use the safe importer instead. It reconciles rather than replaces, so progress on a\n` +
+        `  retained lesson survives, and it is a dry run until you ask for a write:\n\n` +
+        `      npm run db:seed-courses -- --slug=<slug>            # preview one course\n` +
+        `      npm run db:seed-courses -- --slug=<slug> --apply    # write it\n` +
+        `      npm run db:seed-courses -- --all --apply            # whole catalogue\n\n` +
+        `  If replacing the curriculum really is what you want -- a rebuild, a corrupted\n` +
+        `  course -- say so explicitly and this script will run:\n\n` +
+        `      npm run db:seed-courses-legacy -- --slug=<slug> --legacy-destructive-replace\n\n` +
+        `  NOTHING has been written.\n`
+    );
+    process.exit(1);
+  }
+
   const raw = readFileSync(CATALOG_PATH, 'utf8');
   const data = JSON.parse(raw) as unknown;
   if (!isCoursesCatalogFile(data)) {

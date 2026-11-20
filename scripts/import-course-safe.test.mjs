@@ -36,22 +36,29 @@ if (!process.env.DATABASE_URL) {
 
 const sql = (q) =>
   execFileSync('psql', [process.env.DATABASE_URL, '-tAc', q], { encoding: 'utf8' }).trim();
-const importer = (...args) => {
+/** Run the importer with exactly the arguments given — no implicit --slug. */
+const importerRaw = (...args) => {
   try {
     return {
       code: 0,
-      out: execFileSync(
-        'npx',
-        ['tsx', 'scripts/import-course-safe.ts', `--slug=${SLUG}`, ...args],
-        {
-          encoding: 'utf8',
-        }
-      ),
+      out: execFileSync('npx', ['tsx', 'scripts/import-course-safe.ts', ...args], {
+        encoding: 'utf8',
+      }),
     };
   } catch (e) {
     return { code: e.status ?? 1, out: `${e.stdout ?? ''}${e.stderr ?? ''}` };
   }
 };
+/**
+ * Run the importer scoped to this test's course.
+ *
+ * NOTE: this injects --slug, so it CANNOT be used for --all cases: the importer refuses
+ * --slug and --all together, and a case that expected a refusal would pass for that reason
+ * instead of the one it was testing. That happened while writing the --all block below — the
+ * assertion went green on "refusing: --slug and --all together" and proved nothing. Use
+ * importerRaw for anything whole-catalogue.
+ */
+const importer = (...args) => importerRaw(`--slug=${SLUG}`, ...args);
 
 const progressForCourse = () =>
   Number(
@@ -233,6 +240,57 @@ check('fixture: learner has progress', before === 2, `expected 2, got ${before}`
     sql(`update lms_modules set course_id=(select id from lms_courses where slug='${SLUG}')
          where id='${ours}'`);
   }
+}
+
+// 6. WHOLE-CATALOGUE import fails closed: one at-risk course refuses the entire run.
+//
+// This is the adoption guarantee. db:seed-courses now routes to this importer, so `--all` is
+// what CI and operators run against a whole catalogue. It plans every course read-only before
+// writing anything, and one blocked course stops the lot -- a half-applied catalogue is worse
+// than an unapplied one, and an operator told "course 34 of 80 would destroy progress" after 33
+// commits has no clean state to go back to.
+{
+  const ORPHAN_ALL = '77777777-7777-7777-7777-777777777777';
+  sql(`insert into lms_lessons (id, module_id, title, content_type, content_body, order_index,
+         is_preview, created_at)
+       select '${ORPHAN_ALL}', m.id, 'DB-only lesson for --all', 'text', 'x', 98, false, now()
+       from lms_modules m join lms_courses c on c.id=m.course_id where c.slug='${SLUG}'
+       order by m.order_index limit 1`);
+  sql(`insert into lms_lesson_progress (id, student_id, lesson_id, completed, last_accessed_at,
+         updated_at)
+       values (gen_random_uuid(), '${LEARNER}', '${ORPHAN_ALL}', true, now(), now())`);
+
+  const snapshot = sql(`select count(*) from lms_lesson_progress where student_id='${LEARNER}'`);
+  const { code, out } = importerRaw('--all', '--apply');
+
+  check('--all REFUSES when any course would lose progress', code !== 0, out);
+  check('  ...naming the course responsible', out.includes(SLUG), out);
+  check(
+    '  ...and saying the whole run was refused on purpose',
+    /half-applied catalogue is worse/.test(out),
+    out
+  );
+  check(
+    '--all wrote nothing for ANY course',
+    sql(`select count(*) from lms_lesson_progress where student_id='${LEARNER}'`) === snapshot,
+    'progress changed during a refused --all run'
+  );
+  check(
+    '  ...including the orphan it objected to',
+    Number(sql(`select count(*) from lms_lessons where id='${ORPHAN_ALL}'`)) === 1,
+    'the orphan lesson was removed despite the refusal'
+  );
+
+  // Positive control: with the orphan gone there is nothing at risk, so --all must SUCCEED.
+  // Without this, "refuses" would also be satisfied by an --all that can never run.
+  sql(`delete from lms_lessons where id='${ORPHAN_ALL}'`);
+  const ok = importerRaw('--all', '--apply');
+  check('control: --all SUCCEEDS once nothing is at risk', ok.code === 0, ok.out);
+  check(
+    '  ...and preserved the learner progress it was protecting',
+    Number(sql(`select count(*) from lms_lesson_progress where student_id='${LEARNER}'`)) > 0,
+    'progress vanished during a successful --all run'
+  );
 }
 
 if (failed > 0) {

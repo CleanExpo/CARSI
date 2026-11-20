@@ -66,7 +66,8 @@ async function main() {
   });
   if (!course) {
     throw new Error(
-      `Course "${parsed.courseSlug}" not found. Run "npm run db:seed-courses" first.`,
+      `Course "${parsed.courseSlug}" not found. Run ` +
+        `"npm run db:seed-courses -- --slug=${parsed.courseSlug} --apply" first.`
     );
   }
 

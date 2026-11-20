@@ -61,7 +61,12 @@ const run = (script, ...args) => {
     return { code: e.status ?? 1, out: `${e.stdout ?? ''}${e.stderr ?? ''}` };
   }
 };
-const seeder = (...a) => run('scripts/seed-courses-catalog.ts', ...a);
+// The legacy seeder now refuses without an explicit destructive flag (it is no longer the
+// default path). These cases are testing the preflight BEHIND that gate, so they pass the flag.
+// The gate itself is asserted separately below.
+const seeder = (...a) =>
+  run('scripts/seed-courses-catalog.ts', '--legacy-destructive-replace', ...a);
+const seederUngated = (...a) => run('scripts/seed-courses-catalog.ts', ...a);
 const importer = (...a) => run('scripts/import-course-safe.ts', ...a);
 
 let failed = 0;
@@ -126,6 +131,30 @@ const populate = () => {
 };
 const depopulate = () => sql(`delete from lms_modules where id='${MOD}'`);
 process.on('exit', depopulate);
+
+// 0. The legacy destructive path is unreachable without an explicit flag.
+//
+// This is the adoption guarantee: db:seed-courses now routes to the safe importer, and the
+// delete-and-recreate seeder cannot be triggered by the command an operator would reach for.
+// A rename would not have achieved that -- someone following a stale runbook would type the new
+// name. Nobody types --legacy-destructive-replace by accident.
+{
+  populate();
+  const before = curriculum();
+  const gated = seederUngated(`--slug=${stub.slug}`);
+  check('legacy seeder REFUSES without --legacy-destructive-replace', gated.code !== 0, gated.out);
+  check(
+    '  ...and points the operator at the safe importer',
+    /db:seed-courses -- --slug=<slug> --apply/.test(gated.out),
+    gated.out
+  );
+  const after = curriculum();
+  check(
+    '  ...having written nothing',
+    after.modules === before.modules && after.lessons === before.lessons,
+    `curriculum changed: ${JSON.stringify(before)} -> ${JSON.stringify(after)}`
+  );
+}
 
 // 1 + 2. The legacy seeder refuses, by slug and under --all, and writes nothing.
 {

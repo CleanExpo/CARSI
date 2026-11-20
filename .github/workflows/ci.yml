@@ -446,10 +446,13 @@ jobs:
       # Seed the course catalogue so the data-dependent journeys in
       # e2e/carsi-journeys.spec.ts (course list, WRT filter, "Carpet" search,
       # course detail by slug) run against real data instead of an empty DB.
-      # --all is explicit: the seed script refuses a run with no slug (whole-catalogue seeds
-      # delete learner progress, so they must be asked for). This is CI's own test database.
+      #
+      # db:seed-courses is now the SAFE IMPORTER (scripts/import-course-safe.ts), not the
+      # delete-and-recreate seeder. It reconciles, and it is a dry run until asked to write, so
+      # --apply is required and --all is still explicit. On this fresh database every course is
+      # an add: nothing to reconcile, no progress to protect, no stub to refuse.
       - name: Seed course catalogue for E2E
-        run: npm run db:seed-courses -- --all
+        run: npm run db:seed-courses -- --all --apply
 
       # Seed the deterministic E2E student (student@carsi.com.au / student123) and
       # enrol them in the first catalogue course. Must run AFTER db:seed-courses so
@@ -545,7 +548,7 @@ jobs:
   # demonstrated against a mock.
   #
   # Its OWN Postgres service, deliberately not shared with E2E. These suites mutate the
-  # catalogue — the empty-curriculum guard runs `db:seed-courses -- --all` and depopulates a
+  # catalogue — the empty-curriculum guard runs whole-catalogue seeds and depopulates a
   # course to prove the refusal — so sharing a database with the E2E specs would make one job's
   # fixtures the other job's flake.
   # ------------------------------------------------------------------------------------------
@@ -604,7 +607,7 @@ jobs:
       # no-ops and this whole-catalogue seed must still succeed. If this step fails, the guard is
       # over-firing, and it would have broken the E2E job's own seed step too.
       - name: Seed the catalogue (proves the guards are no-ops on a fresh database)
-        run: npm run db:seed-courses -- --all
+        run: npm run db:seed-courses -- --all --apply
 
       # Order is deliberate: each suite leaves the database usable for the next, and the guard
       # suite runs last because its final act is a full re-seed.
@@ -613,6 +616,14 @@ jobs:
       # only PARTIALLY. The suites exit 0 when they find no database, by design, so that a
       # developer running them by hand is told rather than failed — without this wrapper a
       # dropped env block would give a green job that exercised nothing.
+      # First, because it is the only suite that does not depend on the seed step above having
+      # worked: it creates and migrates a database of its own and seeds that. Adopting the
+      # importer as db:seed-courses broke exactly this path -- the importer did not create the
+      # instructor row that lms_courses.instructor_id requires -- and every other suite here
+      # passed anyway, because they all run against a database something else had already seeded.
+      - name: Cold start - the default seed path on a schema-only database
+        run: bash scripts/ci-db-suite.sh test:import-course-bootstrap
+
       - name: Learner progress survives a course re-import
         run: bash scripts/ci-db-suite.sh test:import-course
 
