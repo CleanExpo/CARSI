@@ -239,6 +239,16 @@ async function applyImport(course: Course, plan: ImportPlan, allowProgressLoss: 
       //        DELETE FROM ONLY lms_lessons.
       //    Both are measured in scripts/import-course-safe.locks.test.mjs (blocks B and D),
       //    each against a READ COMMITTED control that loses the row.
+      //
+      //    SO BE CLEAR ABOUT WHICH ONE IS THE GUARANTEE: it is the ABORT, not this lock. The
+      //    lock narrows the window; it cannot close it, because it is always taken after the
+      //    snapshot is already fixed. Only the serializable abort covers every case. Anyone
+      //    tempted to drop the isolation level back to READ COMMITTED because "we take the
+      //    locks anyway" would be removing the actual protection and keeping the decoration:
+      //    block D fails immediately under READ COMMITTED, with both rows silently deleted.
+      //    (Review initially advised the lock-first ordering as sufficient and then withdrew
+      //    that advice on reading the Postgres source. Keeping the correction here, in the
+      //    code, rather than only in the pull request.)
       if (plan.moduleRemovals.length) {
         await tx.$queryRaw`SELECT id FROM lms_modules WHERE id = ANY(${plan.moduleRemovals}::uuid[]) FOR UPDATE`;
       }
