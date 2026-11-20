@@ -100,3 +100,22 @@ def from_env(name: str = "DATABASE_URL") -> str:
     except BadUrl as e:
         print(f"::error::{e}")
         sys.exit(1)
+
+
+def connect(psycopg, url, attempts=6, wait=10):
+    """Open the connection, retrying while a just-added Trusted source takes effect.
+
+    Only the connection is retried: no SQL has been sent when a connect times out, so this is
+    safe for write files too. Errors never include the URL (psycopg does not print it).
+    """
+    import time
+    for n in range(1, attempts + 1):
+        try:
+            return psycopg.connect(url, connect_timeout=15, autocommit=False)
+        except psycopg.OperationalError as e:
+            if n == attempts:
+                print("::error::Could not connect to the database. If this is a timeout, the "
+                      "database's Trusted sources did not let this runner in (see db/ops/README.md).")
+                raise
+            print(f"Connect attempt {n} of {attempts} failed ({type(e).__name__}); retrying in {wait}s.")
+            time.sleep(wait)

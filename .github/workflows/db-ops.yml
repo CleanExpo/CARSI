@@ -67,10 +67,12 @@ jobs:
             # switched off from SQL, so this check is what stops a read file from writing.
             python3 db/ops/test_check_read_sql.py
             python3 db/ops/test_dburl.py
+            python3 db/ops/test_do_firewall.py
             python3 db/ops/check-read-sql.py "$FILE"
           else
             python3 db/ops/test_check_read_sql.py
             python3 db/ops/test_dburl.py
+            python3 db/ops/test_do_firewall.py
             python3 db/ops/check-read-sql.py --write "$FILE"
           fi
           echo "kind=$kind" >> "$GITHUB_OUTPUT"
@@ -91,6 +93,13 @@ jobs:
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: '3.12'
+      # carsi-db only accepts its Trusted sources; a hosted runner's address changes every run,
+      # so the runner adds itself here and the always-run step below removes it again.
+      - name: Let this runner through Trusted sources
+        env:
+          DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
+          DB_CLUSTER_NAME: carsi-db
+        run: python3 db/ops/do_firewall.py open
       - name: Run read-only
         env:
           FILE: ${{ inputs.file }}
@@ -111,6 +120,12 @@ jobs:
           # db/ops/dburl.py accepts any DigitalOcean format and drops Prisma's schema= param.
           export DATABASE_URL
           python3 db/ops/run-read.py "$FILE"
+      - name: Remove this runner from Trusted sources
+        if: always()
+        env:
+          DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
+          DB_CLUSTER_NAME: carsi-db
+        run: python3 db/ops/do_firewall.py close
 
   write:
     needs: plan
@@ -123,6 +138,13 @@ jobs:
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: '3.12'
+      # carsi-db only accepts its Trusted sources; a hosted runner's address changes every run,
+      # so the runner adds itself here and the always-run step below removes it again.
+      - name: Let this runner through Trusted sources
+        env:
+          DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
+          DB_CLUSTER_NAME: carsi-db
+        run: python3 db/ops/do_firewall.py open
       - name: Run in one transaction
         env:
           FILE: ${{ inputs.file }}
@@ -135,3 +157,9 @@ jobs:
           python3 -m pip install --quiet --disable-pip-version-check "psycopg[binary]==3.2.3"
           export DATABASE_URL
           python3 db/ops/run-write.py "$FILE"
+      - name: Remove this runner from Trusted sources
+        if: always()
+        env:
+          DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
+          DB_CLUSTER_NAME: carsi-db
+        run: python3 db/ops/do_firewall.py close
