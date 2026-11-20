@@ -48,6 +48,12 @@ const sql = (q) => execFileSync('psql', [URL, '-tAc', q], { encoding: 'utf8' }).
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 let failed = 0;
+/** A skipped case is not a pass, and the summary must not imply it proved anything. */
+const skipped = [];
+const skip = (name, why) => {
+  skipped.push(`${name} (${why})`);
+  console.log(`  SKIP  ${name} — ${why}`);
+};
 const check = (name, ok, detail) => {
   console.log(`${ok ? '  ok  ' : '  FAIL'} ${name}`);
   if (!ok) {
@@ -236,7 +242,7 @@ await raceCase({
 // Lesson id absent at plan time, created by a rival under a module of the other course.
 const les = mod.lessons[mod.lessons.length - 1];
 if (!otherModuleId) {
-  console.log('\n  skip  lesson-id race: the other course has no module to hang a rival lesson on');
+  skip('lesson-id collision', 'the other course has no module to hang a rival lesson on');
 } else {
   await raceCase({
     kind: 'lesson',
@@ -261,8 +267,14 @@ if (failed > 0) {
   console.error('  named, which is the harm the ownership guard exists to prevent.');
   process.exit(1);
 }
-console.log(
-  '\n✓ An incoming id created under another course mid-import aborts the transaction;' +
-    '\n  the other course keeps its row, and a clean import still succeeds.'
-);
+if (skipped.length) {
+  console.log(`\n⚠ PARTIAL — the cases that ran passed, but ${skipped.length} did NOT run and`);
+  console.log('  are therefore NOT proven:');
+  for (const s of skipped) console.log(`    - ${s}`);
+} else {
+  console.log(
+    '\n✓ An incoming id created under another course mid-import aborts the transaction;' +
+      '\n  the other course keeps its row, and a clean import still succeeds.'
+  );
+}
 process.exit(0);

@@ -224,8 +224,21 @@ async function applyImport(course: Course, plan: ImportPlan, allowProgressLoss: 
       // 1. Lock the doomed modules BEFORE reading what is inside them. Deleting a module
       //    cascades module -> lesson -> progress, so a lesson inserted into a doomed module
       //    after planning dies with it, taking progress that plan.progressAtRisk never saw and
-      //    nobody consented to losing. Taking this lock first is what makes the read below
-      //    complete rather than a snapshot something can still be added to.
+      //    nobody consented to losing.
+      //
+      //    This lock does NOT make the read below complete, and an earlier version of this
+      //    comment wrongly said it did. Under SERIALIZABLE the snapshot is fixed by this
+      //    transaction's first statement, so what the read can see was already decided before
+      //    the lock was taken. Two different windows, two different guards:
+      //      - a lesson committed AFTER this lock cannot be inserted at all, because its
+      //        foreign-key check needs FOR KEY SHARE on a module we hold FOR UPDATE;
+      //      - a lesson committed between the snapshot and this lock is invisible to the read,
+      //        and no row lock can reach it. Postgres covers that one itself: its cascade
+      //        refuses to delete rows not visible to a serializable snapshot, aborting with
+      //        "could not serialize access due to concurrent update" from inside
+      //        DELETE FROM ONLY lms_lessons.
+      //    Both are measured in scripts/import-course-safe.locks.test.mjs (blocks B and D),
+      //    each against a READ COMMITTED control that loses the row.
       if (plan.moduleRemovals.length) {
         await tx.$queryRaw`SELECT id FROM lms_modules WHERE id = ANY(${plan.moduleRemovals}::uuid[]) FOR UPDATE`;
       }

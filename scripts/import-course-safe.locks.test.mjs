@@ -22,6 +22,11 @@
  *      another course inside the window, which FOR UPDATE cannot lock because it does not exist
  *      yet. Its control is the vulnerability itself: the same interleaving under READ COMMITTED
  *      must actually steal the module.
+ *   D. SERIALIZABLE refuses to CASCADE over a child committed after its snapshot. The importer's
+ *      module lock blocks lessons added after it is taken, but a lesson committed between the
+ *      transaction's snapshot and that lock is invisible to the doomed-lesson read while still
+ *      present for the cascade. No row lock reaches that sliver; Postgres's own referential-
+ *      integrity check does.
  *
  * EACH TEST HAS A POSITIVE CONTROL. A blocked insert is only evidence if the same insert
  * succeeds when the lock is NOT held — otherwise a typo, a missing column or a bad id would
@@ -125,6 +130,16 @@ function openSession() {
 }
 
 let failed = 0;
+/**
+ * Cases that did not run. A skip is not a failure, but it is NOT a pass either, and the summary
+ * must never imply it proved anything. Review caught exactly that here: block C skipped when the
+ * database held one course, and the success message still claimed SERIALIZABLE was measured.
+ */
+const skipped = [];
+const skip = (name, why) => {
+  skipped.push(`${name} (${why})`);
+  console.log(`  SKIP  ${name} — ${why}`);
+};
 const check = (name, ok, detail) => {
   console.log(`${ok ? '  ok  ' : '  FAIL'} ${name}`);
   if (!ok) {
@@ -255,7 +270,7 @@ const insertLesson = (lessonId) =>
 {
   const otherCourse = sql(`select id from lms_courses where id <> '${ids.course}' limit 1`);
   if (!otherCourse) {
-    console.log('  skip  phantom-reparent: only one course in this database');
+    skip('SERIALIZABLE prevents the phantom reparent', 'only one course in this database');
   } else {
     /** Interleave: importer reads ownership -> rival creates the id elsewhere -> importer upserts. */
     const race = async (isolation) => {
@@ -308,15 +323,89 @@ const insertLesson = (lessonId) =>
   }
 }
 
+// ---------------------------------------------------------------------------------------------
+// D. SERIALIZABLE aborts a CASCADE over a child committed after the snapshot.
+//
+// The importer locks the doomed modules before reading what is inside them, which blocks lessons
+// added AFTER the lock. Review pointed out the remaining sliver: under SERIALIZABLE the snapshot
+// is fixed by the transaction's first statement, so a lesson committed between that snapshot and
+// the module lock is invisible to the doomed-lesson read -- yet still present for the cascade
+// when the module is deleted. No row lock can close that; the lock was taken too late.
+//
+// What covers it is Postgres's own referential-integrity cascade check, which refuses to delete
+// rows it cannot see under a serializable snapshot. Measured here rather than taken on trust,
+// with the vulnerability as the control.
+// ---------------------------------------------------------------------------------------------
+{
+  /** Snapshot, then let a rival add a child, then delete the parent and watch the cascade. */
+  const cascadeRace = async (isolation) => {
+    const probeModule = randomUUID();
+    const postSnapshotLesson = randomUUID();
+    sql(`insert into lms_modules (id, course_id, title, order_index, created_at)
+         values ('${probeModule}', '${ids.course}', 'cascade probe', 94, now())`);
+    const session = openSession();
+    try {
+      // The first statement fixes the snapshot — exactly as the importer's first read does.
+      await session.run(
+        `BEGIN ISOLATION LEVEL ${isolation};\n` +
+          `SELECT count(*) FROM lms_lessons WHERE module_id='${probeModule}';`,
+        'SNAPSHOT-FIXED'
+      );
+      sql(`insert into lms_lessons (id, module_id, title, content_type, content_body,
+             order_index, is_preview, created_at)
+           values ('${postSnapshotLesson}', '${probeModule}', 'post-snapshot lesson', 'text',
+                   'x', 94, false, now())`);
+      await session.run(`DELETE FROM lms_modules WHERE id='${probeModule}';\nCOMMIT;`, 'DONE');
+      return {
+        lessonSurvived:
+          sql(`select count(*) from lms_lessons where id='${postSnapshotLesson}'`) === '1',
+        log: session.log,
+      };
+    } finally {
+      session.close();
+      try {
+        sql(`delete from lms_modules where id='${probeModule}'`);
+      } catch {
+        /* best effort */
+      }
+    }
+  };
+
+  // Control: the default isolation level really does lose the invisible child.
+  const rc = await cascadeRace('READ COMMITTED');
+  check(
+    'control: under READ COMMITTED the cascade SILENTLY deletes the unseen lesson',
+    !rc.lessonSurvived,
+    'the race did not reproduce, so the serializable result below proves nothing'
+  );
+
+  const ser = await cascadeRace('SERIALIZABLE');
+  check('SERIALIZABLE refuses to cascade over the unseen lesson', ser.lessonSurvived, ser.log);
+  check(
+    '  ...aborting in the cascade itself, naming the child delete',
+    /could not serialize/i.test(ser.log) && /DELETE FROM ONLY/i.test(ser.log),
+    ser.log
+  );
+}
+
 if (failed > 0) {
   console.error(`\n✖ lock-semantics test FAILED — ${failed} assertion(s).`);
   console.error('  The safe importer’s concurrency guard rests on these locks. If they do not');
   console.error('  conflict as asserted, its recount can be bypassed and the guard is unsound.');
   process.exit(1);
 }
-console.log(
-  '\n✓ Measured, each against a passing control: FOR UPDATE on a lesson blocks new progress,' +
-    '\n  FOR UPDATE on a module blocks new lessons, and SERIALIZABLE aborts the phantom reparent' +
-    '\n  that READ COMMITTED lets through.'
-);
+// The blanket claim is printed ONLY when every case ran. Annotating it with a skip notice
+// underneath is not enough: the claim itself would still assert something unmeasured.
+if (skipped.length) {
+  console.log(`\n⚠ PARTIAL — the cases that ran passed, but ${skipped.length} did NOT run and`);
+  console.log('  are therefore NOT proven:');
+  for (const s of skipped) console.log(`    - ${s}`);
+} else {
+  console.log(
+    '\n✓ Measured, each against a passing control: FOR UPDATE on a lesson blocks new progress,' +
+      '\n  FOR UPDATE on a module blocks new lessons, SERIALIZABLE aborts the phantom reparent,' +
+      '\n  and it refuses to cascade over a child it cannot see — all of which READ COMMITTED' +
+      '\n  lets through.'
+  );
+}
 process.exit(0);
