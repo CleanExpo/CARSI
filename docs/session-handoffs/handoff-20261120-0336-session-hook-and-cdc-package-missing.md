@@ -39,8 +39,12 @@ indoor-environment evidence package as two independently gated tracks.
   against `main`, subscribed to PR activity. Not merged.
 
 **Decisions locked this session:**
-- Hook runs **synchronously**, not async — nothing may run `type-check` against an empty
-  `node_modules`. Founder was offered async and has not answered.
+- Hook runs **synchronously**, not async, so `type-check` is not the thing that discovers
+  `node_modules` is empty. That holds only after a **successful** run: Claude Code treats a
+  non-zero SessionStart hook as a non-blocking error, so if all three install attempts fail the
+  session still starts without dependencies. Retry by hand with
+  `CLAUDE_CODE_REMOTE=true ./.claude/hooks/session-start.sh`. Founder was offered async and has
+  not answered.
 - Hook uses `npm install`, not `npm ci`, so a cached container image is reused rather than deleted
   and rebuilt. Lockfile still respected.
 - Hook install is **retried up to 3×**: the egress proxy reset a tunnel mid-transfer on one of two
@@ -84,8 +88,14 @@ npx vitest run --config config/vitest.config.ts \
   src/lib/lms/strip-ai-writing-signs.test.ts                   # 1 file, 6 tests passed
 CLAUDE_CODE_REMOTE=true ./.claude/hooks/session-start.sh       # cold: 783 pkgs + prisma generate
 CLAUDE_CODE_REMOTE=true ./.claude/hooks/session-start.sh       # warm: skipped, 0.004s, no npm output
-./.claude/hooks/session-start.sh                               # CLAUDE_CODE_REMOTE unset: no-op
+env -u CLAUDE_CODE_REMOTE ./.claude/hooks/session-start.sh     # local: exits 0, no-op
 ```
+
+`env -u` is load-bearing: a cloud session has `CLAUDE_CODE_REMOTE=true` in its own environment,
+so running the hook bare does **not** exercise the local path — it takes the remote path and hits
+the hash-skip, which is equally instant and looks identical. The first draft of this handoff drew
+the local-no-op conclusion from a bare run, which did not prove it; the `env -u` form does, and
+that is what was run.
 
 Hash-guard coverage was proven per input: editing each of `.claude/hooks/session-start.sh`,
 `package.json`, `package-lock.json`, `prisma/schema.prisma`, `prisma.config.ts` made

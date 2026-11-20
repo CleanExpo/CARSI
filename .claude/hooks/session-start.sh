@@ -2,8 +2,11 @@
 # CARSI SessionStart hook — installs dependencies so a Claude Code cloud session can run
 # type-check, lint and the unit tests straight away.
 #
-# Runs synchronously: the session waits for it. That costs a few seconds at startup and buys
-# the guarantee that nothing runs `npm run type-check` against an empty node_modules.
+# Runs synchronously: the session waits for it, which costs a few seconds at startup so that
+# `npm run type-check` is not the thing that discovers node_modules is empty. That holds only
+# after a SUCCESSFUL run: Claude Code treats a non-zero SessionStart hook as a non-blocking
+# error, so if all three install attempts fail the session still starts, without dependencies.
+# To retry by hand in that case:  CLAUDE_CODE_REMOTE=true ./.claude/hooks/session-start.sh
 #
 # Idempotent. The install only runs when a file that decides what gets installed has changed
 # since it last succeeded. The hash file lives inside node_modules, so it disappears with the
@@ -19,7 +22,12 @@ if [ "${CLAUDE_CODE_REMOTE:-}" != "true" ]; then
 fi
 
 hashes=node_modules/.session-start.sha256
-if ! sha256sum --check --status "$hashes" 2>/dev/null; then
+# Two conditions, not one. postinstall generates the Prisma client into src/generated/prisma,
+# which is gitignored (.gitignore:149) and sits OUTSIDE node_modules — so the stamp's location
+# does not protect its lifetime. With node_modules intact and that directory gone, all five
+# hashes still match, and skipping on hashes alone left `npm run type-check` with 390
+# unresolved-import errors when this was tested. Require the generated client too.
+if ! sha256sum --check --status "$hashes" 2>/dev/null || [ ! -d src/generated/prisma ]; then
   # Drop the old hashes first: if the install dies partway, the next session retries it
   # instead of trusting a stale pass.
   rm -f "$hashes"
