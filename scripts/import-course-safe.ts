@@ -365,13 +365,37 @@ async function applyImport(course: Course, plan: ImportPlan, allowProgressLoss: 
     {
       // FOR UPDATE cannot lock a row that does not exist yet, so an id CREATED under another
       // course between the ownership check above and the upserts below sits outside every lock
-      // taken there. Serializable is what closes that last gap: the predicate locks SSI takes
-      // over those ownership reads conflict with such an insert, so one of the two transactions
-      // aborts with a serialization failure instead of the row being quietly reparented. The
-      // cost is that a genuinely concurrent write can abort this import; it is handled in
-      // main() and reported as "nothing was written, re-run", which is the right failure for a
-      // tool whose entire purpose is to not lose data.
+      // taken there. Serializable is what closes that last gap.
+      //
+      // Be precise about WHY, because the first version of this comment got it wrong and the
+      // measured error says so. It is not SSI predicate locks over the ownership reads: that
+      // failure reads "could not serialize access due to read/write dependencies among
+      // transactions". What is actually measured here is
+      //     ERROR: could not serialize access due to concurrent update
+      // which is Postgres checking, in ExecCheckTupleVisible, whether the row an upsert
+      // conflicted with is visible to this transaction's snapshot -- and refusing when it is
+      // not, because the snapshot predates the rival's commit. Either way the row is not
+      // reparented; but the guarantee rests on the upsert's conflict path under a serializable
+      // snapshot, not on the reads above, so do not assume removing those reads is free.
+      //
+      // The cost is that a genuinely concurrent write can abort this import; main() reports it
+      // as "nothing was written, re-run", which is the right failure for a tool whose entire
+      // purpose is to not lose data.
       isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+      // Prisma's interactive-transaction default is 5000 ms, and this transaction does one
+      // sequential write per module and per lesson: the largest catalogue course
+      // (floor-care-onboarding, 12 modules / 38 lessons) is ~51 round-trips plus the locks and
+      // reads. Measured end-to-end at ~850 ms against a local unix-socket Postgres, so ~5 ms a
+      // round-trip; against a networked database at 60 ms that is ~3 s and the default becomes a
+      // coin toss. It was: the first end-to-end race test of this importer died on P2028, not on
+      // anything to do with the race.
+      //
+      // 30 s is deliberate on both sides. It is ~6x the worst networked estimate, and it BOUNDS
+      // the window in which this transaction's FOR UPDATE locks keep learners from saving
+      // progress on the affected lessons. A minutes-long ceiling would trade one data-integrity
+      // problem for an availability one.
+      timeout: 30_000,
+      maxWait: 10_000,
     }
   );
 }
@@ -421,6 +445,14 @@ async function main() {
       die(
         'aborted: another write to this course landed while the import was running, so the\n' +
           '  transaction could not be serialized. NOTHING was written \u2014 re-run it.'
+      );
+    }
+    if (code === 'P2028' || /expired transaction/i.test(String(e))) {
+      die(
+        'aborted: the transaction ran out of time before it finished. NOTHING was written \u2014\n' +
+          '  the whole point of the single transaction is that a partial curriculum is never\n' +
+          '  committed. Re-run it; if it keeps timing out the database is too slow or too\n' +
+          '  contended for this course size, and the timeout above needs raising deliberately.'
       );
     }
     throw e;
