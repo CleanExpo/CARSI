@@ -207,7 +207,29 @@ const KNOCKOUTS = [
     'banned IICRC selling phrase in the description',
     (c) => (c.description = 'Get IICRC certified with CARSI in one weekend.'),
   ],
+  [
+    'plainText',
+    'raw HTML entity in a lesson title',
+    (c) => (teachingLessons(c)[0].title = 'Species correction: the maker&rsquo;s table'),
+  ],
+  [
+    'plainText',
+    'numeric HTML entity in a module title',
+    (c) => (c.modules[0].title = 'Readings &#8212; what they mean'),
+  ],
+  [
+    'plainText',
+    'reference card numbered for another module',
+    (c) => (teachingLessons(c)[0].title = 'Module 4 reference card: corrections'),
+  ],
 ];
+
+test('plainText passes: a reference card numbered for its own module, and a real apostrophe', () => {
+  const c = clone();
+  c.modules[1].lessons[0].title = 'Module 2 reference card: the maker’s table';
+  const s = scoreCourse(c, ctx);
+  assert.equal(s.floors.plainText.ok, true, s.floors.plainText.why);
+});
 
 for (const [floor, label, mutate, makeCtx] of KNOCKOUTS) {
   test(`${floor} fails: ${label}`, () => {

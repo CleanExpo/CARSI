@@ -50,7 +50,7 @@ invoke `npm run …`, the skills, and (for previews) MCP tools.
 
 ## Governance
 
-- Course Standard v1 (structure + 14 floors): `docs/content/COURSE_STANDARD.md`; audit
+- Course Standard v1 (structure + 15 floors): `docs/content/COURSE_STANDARD.md`; audit
   `npm run audit:course-depth` (report) / `check:course-standard` (CI) / `test:course-depth`.
 - Compound Engineering loop: `docs/agent-framework/COMPOUND_ENGINEERING_LOOP.md`.
 - Verification Gate (mandatory `npm run type-check`): `docs/agent-framework/CARSI_VERIFICATION_GATE.md`.

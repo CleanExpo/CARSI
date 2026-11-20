@@ -87,8 +87,13 @@ const FLOORS = [
   'practical',
   'australian',
   'licence',
+  'plainText',
 ];
 export { FLOORS };
+// A named or numeric HTML entity. Plain-text fields are rendered as text, so one of these shows
+// up on the page literally (e.g. "maker&rsquo;s").
+const RAW_ENTITY = /&(?:[a-z][a-z0-9]*|#\d+|#x[0-9a-f]+);/i;
+const REFERENCE_CARD_TITLE = /^Module (\d+) reference card\b/i;
 
 // ── helpers ─────────────────────────────────────────────────────────────────────────────────
 function stripHtml(s) {
@@ -401,6 +406,28 @@ export function scoreCourse(course, ctx) {
     if (meta.designation && course.iicrcDiscipline != null)
       why.push('designation course with iicrcDiscipline set');
     set('licence', why.length === 0, why.join('; '));
+  }
+  // 5.15 plainText: plain-text fields carry no raw HTML entity, and a "Module N reference card"
+  // lesson sits in module N (a regrouping that renumbers modules must renumber its cards).
+  {
+    const why = [];
+    const plain = [
+      ['course title', course.title],
+      ['shortDescription', course.shortDescription],
+    ];
+    modules.forEach((m, i) => {
+      plain.push([`module ${i + 1} title`, m.title]);
+      for (const l of m.lessons || []) {
+        plain.push(['lesson title', l.title]);
+        for (const x of resourcesOf(l)) plain.push(['resource label', x?.label]);
+        const card = REFERENCE_CARD_TITLE.exec(String(l.title || ''));
+        if (card && Number(card[1]) !== i + 1) why.push(`"${l.title}" sits in module ${i + 1}`);
+      }
+    });
+    const raw = plain.filter(([, s]) => typeof s === 'string' && RAW_ENTITY.test(s));
+    if (raw.length)
+      why.unshift(`${raw.length} raw HTML entity(ies), e.g. ${raw[0][0]} "${raw[0][1]}"`);
+    set('plainText', why.length === 0, why.join('; '));
   }
 
   const applicable = FLOORS.filter((k) => r[k].applicable);
