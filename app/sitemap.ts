@@ -36,6 +36,7 @@ const staticPages = [
   { path: '/ccw-truckmount-operations', priority: 0.78, changeFreq: 'weekly' as const },
   { path: '/calendar', priority: 0.7, changeFreq: 'weekly' as const },
   { path: '/research', priority: 0.72, changeFreq: 'weekly' as const },
+  { path: '/resources/swms-templates', priority: 0.7, changeFreq: 'monthly' as const },
   { path: '/news', priority: 0.68, changeFreq: 'weekly' as const },
   { path: '/jobs', priority: 0.66, changeFreq: 'weekly' as const },
   { path: '/podcast', priority: 0.64, changeFreq: 'weekly' as const },

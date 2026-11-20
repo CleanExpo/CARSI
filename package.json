@@ -52,6 +52,8 @@
     "check:live-cec": "npx tsx scripts/check-live-cec.ts",
     "test:live-cec-route": "vitest run --config config/vitest.config.ts src/lib/server/live-cec-route.test.ts",
     "check:designations": "node scripts/check-designations.mjs",
+    "check:swms-templates": "node scripts/check-swms-templates.mjs",
+    "test:swms-templates": "node scripts/check-swms-templates.test.mjs",
     "check:model-currency": "node scripts/check-model-currency.mjs",
     "report:rwr": "tsx scripts/report-rwr.ts",
     "test:model-currency": "node scripts/check-model-currency.test.mjs",
