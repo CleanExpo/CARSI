@@ -208,14 +208,19 @@ async function applyImport(course: Course, plan: ImportPlan) {
       update: scalars,
     });
 
-    // Remove what is genuinely gone, narrowest first. Lessons cascade their progress; that
-    // count was reported and consented to before we got here.
+    // Lessons genuinely absent from the catalogue go now. Their progress dies with them, and
+    // that count was reported and consented to before we got here.
     if (plan.lessonRemovals.length) {
       await tx.lmsLesson.deleteMany({ where: { id: { in: plan.lessonRemovals } } });
     }
-    if (plan.moduleRemovals.length) {
-      await tx.lmsModule.deleteMany({ where: { id: { in: plan.moduleRemovals } } });
-    }
+
+    // ORDER IS LOAD-BEARING. Obsolete modules are deleted AFTER the lesson upserts below, not
+    // here. A lesson that MOVES from a removed module to a surviving one is still "preserved"
+    // as far as the plan is concerned — its id is in both sets — but deleting its old module
+    // first would cascade through the lesson to its progress, and the upsert would then
+    // recreate the lesson with no history. The plan would have promised 0 rows at risk while
+    // silently destroying them: the exact defect this importer exists to prevent. Reparent
+    // first, delete the emptied modules last.
 
     // Upsert in place — this is the whole point. A surviving lesson keeps its row, so every
     // lms_lesson_progress row pointing at it keeps its foreign key and its history.
@@ -242,6 +247,14 @@ async function applyImport(course: Course, plan: ImportPlan) {
           update: lesson,
         });
       }
+    }
+
+    // Now, and only now. Every retained lesson has been reparented to its destination module
+    // above, so these modules hold nothing we meant to keep and the cascade is harmless. A
+    // lesson still sitting here is one the catalogue dropped, and its removal was counted in
+    // progressAtRisk and consented to.
+    if (plan.moduleRemovals.length) {
+      await tx.lmsModule.deleteMany({ where: { id: { in: plan.moduleRemovals } } });
     }
   });
 }

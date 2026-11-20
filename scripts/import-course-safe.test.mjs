@@ -80,6 +80,12 @@ if (lessons === 0) {
   console.error(`FAIL: course "${SLUG}" has no lessons in this database — seed it first.`);
   process.exit(1);
 }
+// The learner must exist before any progress row can reference it. Creating it here rather
+// than assuming a hand-made fixture is what makes this test runnable on a fresh database.
+sql(`insert into lms_users (id, email, hashed_password, full_name, created_at, updated_at)
+     values ('${LEARNER}', 'synthetic-learner@example.test',
+             '$2b$12$syntheticfixturehashnotarealsecret', 'Synthetic Learner', now(), now())
+     on conflict (id) do nothing`);
 sql(`delete from lms_lesson_progress where student_id='${LEARNER}'`);
 sql(`insert into lms_lesson_progress (id, student_id, lesson_id, completed, last_accessed_at, updated_at)
      select gen_random_uuid(), '${LEARNER}', l.id, true, now(), now()
@@ -137,6 +143,52 @@ check('fixture: learner has progress', before === 2, `expected 2, got ${before}`
   );
   const survivors = progressForCourse();
   check(`other progress still preserved (${survivors})`, survivors === before, out);
+}
+
+// 4. A lesson that MOVES between modules keeps its progress.
+//
+// Regression test for a Major data-integrity defect found in review: the first version
+// deleted obsolete modules BEFORE upserting lessons. A lesson moving from a removed module to
+// a surviving one was therefore cascade-deleted (taking its progress) and then recreated
+// empty — while planImport reported it as "preserved", because its id appears in both the
+// existing and incoming sets. The plan promised 0 rows at risk and destroyed them anyway.
+//
+// Simulated by moving a catalogue lesson into a DB-only module: the catalogue still claims the
+// lesson (so it is retained and reparented), while its current module is absent from the
+// catalogue (so it is removed). That is exactly the shape that used to lose progress.
+{
+  const ORPHAN_MODULE = '88888888-8888-8888-8888-888888888888';
+  const movedLesson = sql(`select l.id from lms_lessons l
+     join lms_modules m on m.id=l.module_id join lms_courses c on c.id=m.course_id
+     where c.slug='${SLUG}' order by m.order_index, l.order_index limit 1`);
+
+  sql(`insert into lms_modules (id, course_id, title, order_index, created_at)
+       select '${ORPHAN_MODULE}', c.id, 'DB-only module', 98, now()
+       from lms_courses c where c.slug='${SLUG}'`);
+  sql(`update lms_lessons set module_id='${ORPHAN_MODULE}' where id='${movedLesson}'`);
+  sql(
+    `delete from lms_lesson_progress where student_id='${LEARNER}' and lesson_id='${movedLesson}'`
+  );
+  sql(`insert into lms_lesson_progress (id, student_id, lesson_id, completed, last_accessed_at, updated_at)
+       values (gen_random_uuid(), '${LEARNER}', '${movedLesson}', true, now(), now())`);
+
+  const progressBefore = Number(
+    sql(`select count(*) from lms_lesson_progress where lesson_id='${movedLesson}'`)
+  );
+  check('moved-lesson fixture has progress', progressBefore === 1, `got ${progressBefore}`);
+
+  const { code, out } = importer('--apply');
+  check('moving a lesson needs no progress-loss consent', code === 0, out);
+  check(
+    'MOVED lesson KEEPS its progress',
+    Number(sql(`select count(*) from lms_lesson_progress where lesson_id='${movedLesson}'`)) === 1,
+    'the lesson was cascade-deleted with its old module and recreated empty'
+  );
+  check(
+    'moved lesson was reparented out of the removed module',
+    sql(`select count(*) from lms_modules where id='${ORPHAN_MODULE}'`) === '0',
+    'the emptied module should have been deleted after the reparent'
+  );
 }
 
 if (failed > 0) {
