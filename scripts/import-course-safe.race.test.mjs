@@ -44,6 +44,14 @@ if (!process.env.DATABASE_URL) {
 }
 
 const URL = process.env.DATABASE_URL;
+/**
+ * Unique per-run application_name for the importer we spawn. This is what lets the lock probe
+ * name OUR backend rather than "a backend that looks about right" -- see waitUntilBlockedBy.
+ * Verified to reach Postgres through Prisma: a blocked importer shows up in pg_stat_activity as
+ * application_name='carsi-race-<pid>-<ms>' running the lms_courses upsert.
+ */
+const IMPORTER_TAG = `carsi-race-${process.pid}-${Date.now()}`;
+const TAGGED_URL = `${URL}${URL.includes('?') ? '&' : '?'}application_name=${IMPORTER_TAG}`;
 const sql = (q) => execFileSync('psql', [URL, '-tAc', q], { encoding: 'utf8' }).trim();
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -82,6 +90,8 @@ const importer = (...args) => {
 function importerAsync(...args) {
   const proc = spawn('npx', ['tsx', 'scripts/import-course-safe.ts', `--slug=${SLUG}`, ...args], {
     stdio: ['ignore', 'pipe', 'pipe'],
+    // Tagged connection, so the lock probe can identify THIS process's backend.
+    env: { ...process.env, DATABASE_URL: TAGGED_URL },
   });
   let out = '';
   let exited = null;
@@ -132,14 +142,21 @@ function importerAsync(...args) {
  *      while the importer has not reached its course upsert at all -- the same vacuous-pass
  *      failure in a subtler disguise.
  *
- * pg_blocking_pids() removes the ambiguity: it names the backends actually blocking a given pid.
- * Requiring OUR holder's pid to appear in it proves this exact importer is waiting on this exact
- * lock, which places it inside its transaction, past the ownership check and before the module
- * and lesson upserts.
+ *   3. Requiring our holder's pid in pg_blocking_pids() of a backend querying lms_courses. Much
+ *      tighter, but still not the importer: ANOTHER session querying lms_courses could wait on
+ *      the SAME holder and satisfy it while the importer has not reached its upsert.
+ *
+ * This version names the backend outright. The importer we spawn connects with a unique
+ * application_name (IMPORTER_TAG), so the probe asks the only question that cannot be satisfied
+ * by anything else: is OUR importer's own backend blocked by OUR lock holder? Both halves are
+ * identities, not descriptions, so there is nothing left for a lookalike session to satisfy.
+ *
+ * It also fails CLOSED. If application_name ever stopped reaching Postgres, the probe would match
+ * nothing and the assertion would fail loudly, rather than quietly matching something else.
  */
 async function waitUntilBlockedBy(holderPid, ms = 25000) {
   const probe = `select count(*) from pg_stat_activity a
-       where a.query ilike '%lms_courses%'
+       where a.application_name = '${IMPORTER_TAG}'
          and ${Number(holderPid)} = any(pg_blocking_pids(a.pid))`;
   const deadline = Date.now() + ms;
   while (sql(probe) === '0') {
@@ -247,10 +264,10 @@ async function raceCase(target) {
     // Then wait for POSTGRES to confirm that OUR holder is the one blocking it.
     const blocked = await waitUntilBlockedBy(holderPid);
     check(
-      'Postgres confirms the importer is blocked BY OUR lock (pg_blocking_pids)',
+      "Postgres confirms OUR importer's backend is blocked by OUR lock",
       blocked && run.alive,
-      'no backend was blocked by our holder, so the race never happened and everything below' +
-        ' would be measuring nothing'
+      `no backend with application_name='${IMPORTER_TAG}' was blocked by pid ${holderPid}, so` +
+        ' the race never happened and everything below would be measuring nothing'
     );
     target.rivalCreates();
     lock.release();
