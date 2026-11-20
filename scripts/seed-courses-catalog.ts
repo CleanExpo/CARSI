@@ -271,15 +271,24 @@ async function main() {
 
   const override = process.env.SEED_INSTRUCTOR_ID?.trim();
 
-  // PREFLIGHT: refuse any course whose catalogue entry would empty a populated curriculum.
+  // PREFLIGHT: refuse a run in which a zero-module catalogue entry meets a populated course.
+  //
+  // READ THE REASON CAREFULLY, because it is no longer the obvious one. seedCourse now SKIPS the
+  // curriculum delete entirely for a zero-module entry, so such a seed is no longer destructive.
+  // What it is instead is a SILENT NO-OP: the course record updates, the existing curriculum is
+  // left exactly as it was, and the run prints "Seeded course: <slug>" over content it never
+  // touched. An operator who seeds a course and is told it succeeded will reasonably believe the
+  // database now matches the catalogue. For these 34 entries it does not and cannot.
+  //
+  // So this refuses in order to surface a CATALOGUE DEFECT, not to prevent a deletion.
   //
   // 34 of the 80 entries in this catalogue are metadata-only stubs with zero modules, recorded
   // so the CEC approvals registry can reference them by slug; three carry an explicit
   // seedWarning that seeding the slug "would replace the course curriculum in the target
-  // database with this empty stub". seedCourse calls deleteCourseCurriculum unconditionally and
-  // then creates c.modules, so for a stub that is a delete with no corresponding create.
+  // database with this empty stub".
   //
-  // Measured against a real database before this guard existed: seeding one stub slug deleted
+  // HISTORY, not current behaviour -- measured against a real database before any of this
+  // existed, and the reason the guards were written: seeding one stub slug deleted
   // 1 module, 2 lessons and 2 learner progress rows, created nothing, and printed
   // "Seeded course: <slug>" followed by "Done." A success message over total destruction.
   // `--all` walks every entry, so it would do that to all 34 at once.
@@ -311,13 +320,15 @@ async function main() {
     console.error(
       `\nrefusing: ${emptying.length} course(s) in this seed have NO modules in the catalogue but` +
         ` DO have curriculum in this database.\n` +
-        `  Seeding them would delete that curriculum and create nothing:\n`
+        `  Their curriculum is SAFE — seedCourse skips the delete for a zero-module entry. The\n` +
+        `  problem is the opposite one: seeding them cannot update that curriculum at all, so the\n` +
+        `  run would report "Seeded course" over content it never touched:\n`
     );
     for (const e of emptying) {
       console.error(
         `    ${e.slug}\n` +
-          `      would delete ${e.modules} module(s), ${e.lessons} lesson(s)` +
-          `, ${e.progress} learner progress row(s)`
+          `      would leave ${e.modules} module(s), ${e.lessons} lesson(s)` +
+          `, ${e.progress} learner progress row(s) untouched`
       );
     }
     console.error(

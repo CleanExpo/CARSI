@@ -139,7 +139,7 @@ process.on('exit', depopulate);
 
   const one = seeder(`--slug=${stub.slug}`);
   check('legacy seeder REFUSES a stub slug', one.code !== 0, one.out);
-  check('  ...naming the course and what would be deleted', one.out.includes(stub.slug), one.out);
+  check('  ...naming the affected course', one.out.includes(stub.slug), one.out);
   const afterOne = curriculum();
   check(
     'legacy seeder wrote nothing',
