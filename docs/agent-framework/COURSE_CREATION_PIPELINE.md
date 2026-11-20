@@ -22,7 +22,8 @@ Every CARSI media pipeline splits judgement from spend, and this one follows sui
 
 > Claude authors a JSON **brief/draft** → a deterministic `tsx` script consumes it, calls the
 > paid API, uploads to Cloudinary → results persist into `data/seed/courses-catalog.json` →
-> `npm run db:seed-courses` imports to Postgres.
+> `npm run db:seed-courses -- --slug=<slug> --apply` imports to Postgres (a run without
+> `--apply` previews and writes nothing).
 
 Slash commands carry workflow and judgement. They do **not** re-implement API calls — they
 invoke `npm run …`, the skills, and (for previews) MCP tools.
@@ -37,7 +38,7 @@ invoke `npm run …`, the skills, and (for previews) MCP tools.
 | `/course-develop` | content | `truth-finder`, `australian-context`, **the seven-part lesson pattern** | lesson `contentBody` (7 parts, ≥400 words, a visual, a metric example) + module checks/final quiz + field downloads |
 | `/course-media` | media | `course-thumbnails` (gpt-image-1), `course-voiceover` (ElevenLabs), HeyGen repo scripts | `thumbnailUrl`, per-lesson audio in `resources`, brand video MP4s |
 | `/course-brand` | brand gate | `design-system`, `australian-context`, `check:course-diagrams` | fixes flagged upstream |
-| `/course-ship` | verify + seed | `verification-first`, **`check:course-standard` (14-floor audit)** | sets `meta.standard: "v1"` **last**, then DB (via `db:seed-courses`) |
+| `/course-ship` | verify + seed | `verification-first`, **`check:course-standard` (14-floor audit)** | sets `meta.standard: "v1"` **last**, then DB (via `db:seed-courses -- --slug=<slug> --apply`) |
 
 ## Connectors
 
@@ -69,5 +70,7 @@ npm run db:thumbnails:generate -- --slug=<slug> --dry-run
 npm run voice:generate -- --slug=<slug> --dry-run
 
 # 3. Ship:
-npm run type-check && npm run db:seed-courses
+npm run type-check
+npm run db:seed-courses -- --slug=<slug>           # preview; writes nothing
+npm run db:seed-courses -- --slug=<slug> --apply   # import
 ```

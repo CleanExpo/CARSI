@@ -96,10 +96,12 @@ npm run db:thumbnails:plan && npm run db:thumbnails:generate   # course thumbnai
 
 Attach the finished flashcards/slides/audio/image/video as lesson `resources` in
 `data/seed/courses-catalog.json` (see `src/lib/lms/lesson-resources.ts` for the shapes
-the player renders), then let the deploy boot path seed them:
+the player renders), then import them. Boot seeding is gone -- `start:with-course-seed` was removed -- so this is a
+step someone runs deliberately:
 
 ```bash
-npm run db:seed-courses -- --slug=<slug>   # imports that course (incl. attached resources); a run with no slug is refused
+npm run db:seed-courses -- --slug=<slug>           # preview one course; writes nothing
+npm run db:seed-courses -- --slug=<slug> --apply   # import it (incl. attached resources)
 npm run db:seed-quizzes -- --slug=<slug> --dry-run   # preview one course's quiz file(s)
 npm run db:seed-quizzes -- --slug=<slug>             # imports that course's quiz file(s) only
 ```

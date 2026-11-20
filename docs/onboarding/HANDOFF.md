@@ -78,12 +78,16 @@ git diff data/seed/courses-catalog.json                     # review; if drift y
 git checkout -- data/seed/courses-catalog.json              # restore the committed (intended) JSON before seeding
 
 # 3b. Seed the course, then its quizzes — the quiz needs its course to exist first.
-DATABASE_URL=<prod> npm run db:seed-courses                 # idempotent upsert by slug; course lands as DRAFT
+DATABASE_URL=<prod> npm run db:seed-floor-care-course       # imports THIS course only (--slug + --apply); lands as DRAFT
 DATABASE_URL=<prod> npm run db:seed-floor-care-quizzes      # idempotent upsert by quiz id; creates 11 quizzes
 ```
 
-Both seeds are safe to re-run. `db:seed-courses` replaces this course's modules/lessons to match the
-JSON; `db:seed-floor-care-quizzes` upserts each quiz by id and replaces its questions.
+Both seeds are safe to re-run. `db:seed-floor-care-course` **reconciles** this course's
+modules/lessons against the JSON rather than replacing them, so a lesson still in the catalogue keeps
+its row and every learner's progress on it; it refuses outright if the import would delete learner
+progress or leave the course with no curriculum. `db:seed-floor-care-quizzes` upserts each quiz by id
+and replaces its questions. To see what either would do without writing, run the importer directly:
+`npm run db:seed-courses -- --slug=floor-care-onboarding-operational-readiness` (no `--apply`).
 
 ---
 
@@ -133,7 +137,8 @@ To publish (when you've chosen), pick one lever and then make it **durable in gi
 PATCH /api/admin/courses   { "courseIds": ["6011d465-1981-487b-84e3-a53b10a2bd07"], "published": true }
 
 # Lever 2 — JSON + reseed (durable, but re-syncs the whole catalogue — mind §1 drift warning):
-#   set status:"published", isPublished:true on this course in courses-catalog.json, then db:seed-courses
+#   set status:"published", isPublished:true on this course in courses-catalog.json, then
+#   db:seed-floor-care-course (or db:seed-courses -- --slug=<slug> --apply)
 ```
 
 A course is public when `isPublished === true` **OR** `status === 'published'`
@@ -212,7 +217,7 @@ Find them all: `grep -rno "\[COMPANY TO CONFIRM[^]]*\]" docs/onboarding`.
 - [ ] Production DB snapshot taken.
 - [ ] `npm run type-check` green in a networked env.
 - [ ] Drift check done (§3a); committed JSON is the intended catalogue.
-- [ ] `db:seed-courses` then `db:seed-floor-care-quizzes` run against prod (course is in, as draft).
+- [ ] `db:seed-floor-care-course` then `db:seed-floor-care-quizzes` run against prod (course is in, as draft).
 - [ ] Quiz flow smoke-tested (GET hides answers; POST scores; attempts limited).
 - [ ] **Access-control decision made** (§5): free pilot / manual provisioning vs build billing first.
 - [ ] Published via chosen lever **and** published state committed to `courses-catalog.json`.

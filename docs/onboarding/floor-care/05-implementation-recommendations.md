@@ -18,7 +18,9 @@ A matching LMS course has been authored into the CARSI catalogue
 
 - **12 modules** mirroring `01-module-structure.md`, each with text lessons and a knowledge check
   (inline Q&A + answer key), ending in a final practical-assessment module.
-- Seed it with `npm run db:seed-courses` (after `npm run type-check`); it starts as a **draft** and free.
+- Seed it with `npm run db:seed-floor-care-course` (after `npm run type-check`); it starts as a
+  **draft** and free. That script is the safe importer scoped to this slug, with `--apply`; the bare
+  `npm run db:seed-courses` previews and writes nothing.
 - Keep the LMS lesson content and these docs in step — the docs are the master; the course is the
   delivery. When a doc changes, update the matching lesson.
 
@@ -31,8 +33,8 @@ safety/reputation-critical modules, 80–85% elsewhere).
 
 > **Seed order matters.** Quizzes are a separate seed step from the catalogue:
 > ```bash
-> npm run db:seed-courses              # recreates lessons (knowledge-checks are contentType 'quiz')
-> npm run db:seed-floor-care-quizzes   # creates the LmsQuiz/LmsQuizQuestion rows they point to
+> npm run db:seed-floor-care-course   # reconciles lessons (knowledge-checks are contentType 'quiz')
+> npm run db:seed-floor-care-quizzes  # creates the LmsQuiz/LmsQuizQuestion rows they point to
 > ```
 > Run the catalogue seed first (the quiz needs its course to exist); both steps are idempotent.
 

@@ -38,21 +38,26 @@ deterministic:
 - Every narration ends on **one clear next action**, mirroring the lesson.
 
 ## Preflight (the operator confirms once)
+
 - `ELEVENLABS_API_KEY` set; `ELEVENLABS_VOICE_ID` set (an en-AU / neutral-professional voice) or a per-lesson `voiceId` in the brief.
 - Cloudinary configured (`CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET`).
 - This is an **authoring tool run manually** — never in CI or app runtime; it spends money.
 
 ## Procedure
+
 1. **Gather lesson data.** Read the course's lessons in `data/seed/courses-catalog.json` (title + `contentBody`) and the research pack at `data/courses/<slug>/research.md` if present.
 2. **Scaffold briefs.** `npm run voice:plan -- --slug=<slug>` writes one skeleton per lesson (empty `script`, null voice settings, `locale: en-AU`). Re-running never overwrites an authored brief unless `--force`.
-3. **Author each `script` (the core step).** Write narration grounded in the lesson `contentBody` — not a verbatim read; spoken, scannable, en-AU. Optionally set `voiceId`, `modelId`, `stability`, `similarityBoost`, `style` (else calm-professional defaults apply). Record *why* in `authorNote`.
+3. **Author each `script` (the core step).** Write narration grounded in the lesson `contentBody` — not a verbatim read; spoken, scannable, en-AU. Optionally set `voiceId`, `modelId`, `stability`, `similarityBoost`, `style` (else calm-professional defaults apply). Record _why_ in `authorNote`.
 4. **Dry-run a request (free).** `npm run voice:generate -- --slug=<slug> --dry-run` prints the voice id, settings and text — no API/Cloudinary. Tighten scripts that read robotic or run long.
 5. **One real generation.** `npm run voice:generate -- --slug=<slug> --limit=1 --yes` → play the returned Cloudinary MP3; confirm pace, tone and pronunciation of technical terms.
 6. **Review — BLOCKING gate before the batch.** Re-author and regenerate weak audio with `--force --yes`.
 7. **Batch generate.** `npm run voice:generate -- --slug=<slug> --yes` (hard cap `VOICE_MAX_GENERATIONS`, write-after-each manifest protect against runaway spend).
-8. **Import + verify.** Default persistence writes the audio URL into the seed JSON; run `npm run db:seed-courses` to import. Confirm the lesson exposes the audio resource.
+8. **Import + verify.** Default persistence writes the audio URL into the seed JSON; run `npm run db:seed-courses -- --slug=<slug> --apply` to import (without `--apply` it only
+   previews; the generator prints one apply command per affected course). Confirm the lesson exposes
+   the audio resource.
 
 ### Script-quality rubric (all must hold)
+
 - **Spoken, not read** — natural sentences, no markup or list syntax voiced aloud.
 - **Grounded** — every claim traces to the lesson/research; nothing unverified introduced.
 - **en-AU** — spelling and examples; technical terms pronounceable (spell out acronyms on first use where it helps TTS).
@@ -60,6 +65,7 @@ deterministic:
 - **Length-appropriate** — fits the lesson; long lessons split into per-section briefs rather than one wall of text.
 
 ## Flags reference (`scripts/generate-course-voiceover.ts`)
+
 `--plan` · `--generate` · `--dry-run` · `--slug=<slug>` · `--limit=N` · `--force` ·
 `--persist=seed|db|both` (default `seed`) · `--yes` (skip the interactive spend confirmation).
 Env: `ELEVENLABS_VOICE_ID`, `ELEVENLABS_MODEL_ID` (default `eleven_multilingual_v2`),
@@ -67,6 +73,7 @@ Env: `ELEVENLABS_VOICE_ID`, `ELEVENLABS_MODEL_ID` (default `eleven_multilingual_
 `data/voice/course-voice-results.json` (gitignored).
 
 ## See also
+
 - Slash commands: `/course-media` (drives this skill), `/course` (full pipeline).
 - `skills/design/course-thumbnails.skill.md` (the sibling image generator this mirrors).
 - `docs/plans/2026-06-18-carsi-video-assistant-production-pack.md` (voice direction source).

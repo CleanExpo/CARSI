@@ -973,11 +973,16 @@ production-database credential):
 
 ### Discoveries — 2026-11-02 course go-live audit
 
-- **A re-seed deletes learner progress.** `scripts/seed-courses-catalog.ts` → `deleteCourseCurriculum`
-  deletes every `lms_lesson_progress` row of an existing course before rebuilding its lessons.
-  `docs/runbooks/course-go-live.md` now blocks it with a preflight. The structural fix is for the
-  script itself to refuse (exit non-zero) when progress rows exist unless an explicit
-  `--allow-progress-loss` flag is passed, or to upsert lessons by id instead of deleting them.
+- ~~**A re-seed deletes learner progress.**~~ **RESOLVED 2026-11-20 (PR #1137, #1141, #1144).** The
+  structural fix proposed here was built, and both halves of it: `scripts/import-course-safe.ts`
+  upserts modules and lessons **by id** instead of deleting them, and refuses (exit non-zero,
+  nothing written) when the import would delete progress rows unless `--allow-progress-loss` is
+  passed. It is now the `db:seed-courses` default path and is a dry run until `--apply`. The
+  delete-and-recreate seeder survives as `db:seed-courses-legacy`, unreachable without
+  `--legacy-destructive-replace`. It also refuses to empty a curriculum
+  (`--allow-empty-curriculum`) and refuses, with no override, an incoming id owned by another
+  course. `docs/runbooks/course-go-live.md` keeps the preflight as a governance gate: the tool
+  stops an accident, it does not grant the authority.
 - **No per-course quiz seeder.** `npm run db:seed-quizzes` re-writes every quiz on a fixed list, and
   the list omits the Level 2 and Level 3 Mould quizzes. Add a `--slug=` option.
 - **16 IICRC CEC approvals expire on 18/01/2027** (`npm run check:cec` warns, 77 days out on
