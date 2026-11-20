@@ -47,6 +47,7 @@ import { readFileSync } from 'node:fs';
 
 import { Prisma } from '../src/generated/prisma/client';
 import { prisma } from '../src/lib/prisma';
+import { catalogueIdConflicts } from '../src/lib/seed/catalogue-ids';
 import { getApprovedCecHours } from '../src/lib/seed/cec-approvals';
 
 const CATALOG = 'data/seed/courses-catalog.json';
@@ -189,6 +190,19 @@ export async function planImport(course: Course): Promise<ImportPlan> {
     progressAtRisk,
     progressPreserved,
   };
+}
+
+/** Refuse before planning, before instructors, before any write. */
+function refuseOnCatalogueConflicts(courses: Course[]) {
+  const conflicts = catalogueIdConflicts(courses);
+  if (!conflicts.length) return;
+  die(
+    `${conflicts.length} id conflict(s) inside ${CATALOG} itself:\n` +
+      conflicts.map((c) => `    ${c}`).join('\n') +
+      `\n  Nothing was read from the database and nothing was written. These are duplicates in\n` +
+      `  the catalogue, not a database conflict, so no consent flag applies -- there is no\n` +
+      `  correct import of a curriculum id that belongs to two courses. Fix the catalogue ids.`
+  );
 }
 
 type Instructor = { id: string; email: string; fullName?: string | null };
@@ -583,6 +597,10 @@ async function importAll(
 ) {
   console.log(`\nplanning ${courses.length} course(s) from ${CATALOG} \u2014 nothing written yet`);
 
+  // Before everything else, and needing no database: a duplicate id inside the catalogue would
+  // otherwise pass every plan and then abort part-way through the apply loop.
+  refuseOnCatalogueConflicts(courses);
+
   // Read-only, and before the planning loop: a catalogue that names an instructor nobody can
   // supply is refused with an explanation rather than a foreign-key error on course 1 of 80.
   const { needed, toCreate } = await resolveInstructors(courses, instructors);
@@ -605,10 +623,21 @@ async function importAll(
   const progressPreserved = evaluated.reduce((n, e) => n + e.plan.progressPreserved, 0);
   const progressAtRisk = evaluated.reduce((n, e) => n + e.plan.progressAtRisk, 0);
 
+  // EVERY evaluated course is written, not just the structurally changed ones: applyImport
+  // upserts the course scalars (title, pricing, CEC hours, meta) and every lesson's content
+  // whether or not the curriculum structure moved. The old wording here said
+  // "N course(s) with curriculum changes, M unchanged", which was false. Measured on an
+  // already-seeded database, a second --all --apply printed "0 course(s) with curriculum
+  // changes, 80 unchanged" and "applying 0 course(s)", then moved updated_at on all 80.
+  // Understating what a seeder wrote is the exact failure this importer exists to stop; its own
+  // output does not get to commit it.
   console.log(
-    `  ${changing.length} course(s) with curriculum changes, ${
-      evaluated.length - changing.length
-    } unchanged`
+    `  ${evaluated.length} course(s) will be WRITTEN \u2014 course metadata and lesson content are` +
+      `\n  rewritten for every one, whether or not the curriculum structure moved`
+  );
+  console.log(
+    `  of those, ${changing.length} have curriculum STRUCTURE changes` +
+      ` (modules or lessons added/removed)${changing.length ? ':' : ''}`
   );
   for (const e of changing.slice(0, 20)) {
     console.log(
@@ -644,7 +673,9 @@ async function importAll(
     return;
   }
 
-  console.log(`\napplying ${changing.length} course(s), one transaction each...`);
+  // evaluated, not changing: the loop below writes every course. Saying "applying 0" and then
+  // writing 80 is the contradiction this replaces.
+  console.log(`\napplying ${evaluated.length} course(s), one transaction each...`);
   // After every blocker, so a refused run still writes nothing -- the ordering mistake this
   // repo already made once in the legacy seeder, where the instructor upsert committed before
   // the preflight and "NOTHING has been written" was false.
@@ -687,6 +718,9 @@ async function main() {
 
   const course = catalog.courses.find((c) => c.slug === slug);
   if (!course) die(`slug "${slug}" is not in ${CATALOG}`);
+  // One course cannot collide with another incoming course, but it can list the same module or
+  // lesson id twice, in which case the second upsert silently wins.
+  refuseOnCatalogueConflicts([course]);
   const plan = await planImport(course);
 
   // An import that would leave the course with NO curriculum is refused. The progress guard does

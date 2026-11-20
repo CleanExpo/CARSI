@@ -261,6 +261,21 @@ check('fixture: learner has progress', before === 2, `expected 2, got ${before}`
        values (gen_random_uuid(), '${LEARNER}', '${ORPHAN_ALL}', true, now(), now())`);
 
   const snapshot = sql(`select count(*) from lms_lesson_progress where student_id='${LEARNER}'`);
+
+  // A SENTINEL, because the progress count alone does not prove what this block claims. If a
+  // regression moved the blocker check after the first write, --all would write courses 1..n-1
+  // and only then refuse -- and both the progress count and the orphan check below would still
+  // pass, because neither looks at any other course. So: scribble over a DIFFERENT course's
+  // title in the database. --all rewrites course scalars for every course it applies, so if it
+  // writes anything at all before refusing, the catalogue title comes back and the sentinel is
+  // gone. The sentinel surviving is the only evidence here that nothing was written.
+  const SENTINEL = 'SENTINEL do-not-write-during-a-refused-run';
+  const victim = sql(`select c.slug from lms_courses c
+                      join lms_modules m on m.course_id = c.id
+                      where c.slug <> '${SLUG}' order by c.slug limit 1`);
+  check('fixture: a second course exists to carry a sentinel title', Boolean(victim), 'none found');
+  if (victim) sql(`update lms_courses set title='${SENTINEL}' where slug='${victim}'`);
+
   const { code, out } = importerRaw('--all', '--apply');
 
   check('--all REFUSES when any course would lose progress', code !== 0, out);
@@ -271,9 +286,15 @@ check('fixture: learner has progress', before === 2, `expected 2, got ${before}`
     out
   );
   check(
-    '--all wrote nothing for ANY course',
+    '--all lost no learner progress',
     sql(`select count(*) from lms_lesson_progress where student_id='${LEARNER}'`) === snapshot,
     'progress changed during a refused --all run'
+  );
+  check(
+    '--all wrote nothing for ANY course (sentinel on an unblocked course survived)',
+    sql(`select title from lms_courses where slug='${victim}'`) === SENTINEL,
+    `"${victim}" was rewritten from the catalogue during a run that was supposed to refuse ` +
+      `before writing anything`
   );
   check(
     '  ...including the orphan it objected to',
@@ -284,6 +305,7 @@ check('fixture: learner has progress', before === 2, `expected 2, got ${before}`
   // Positive control: with the orphan gone there is nothing at risk, so --all must SUCCEED.
   // Without this, "refuses" would also be satisfied by an --all that can never run.
   sql(`delete from lms_lessons where id='${ORPHAN_ALL}'`);
+  // This run SHOULD write, so it legitimately restores the sentinel course's catalogue title.
   const ok = importerRaw('--all', '--apply');
   check('control: --all SUCCEEDS once nothing is at risk', ok.code === 0, ok.out);
   check(
