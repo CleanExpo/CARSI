@@ -100,22 +100,29 @@ async function seedCourse(c: CatalogCourse, instructorOverride: string | undefin
     });
     const courseId = existing?.id ?? c.id;
 
-    // The batch preflight in main() reads outside any transaction, so it can be stale by the
-    // time this runs: it walks every course in the run, and another writer can add curriculum to
-    // this one in between. Re-check at the destructive boundary, where the answer still matters.
-    // A zero-module catalogue entry must never reach deleteCourseCurriculum against a populated
-    // course -- the delete has no corresponding create, so the curriculum simply goes.
+    // A zero-module catalogue entry has nothing to put back, so there is nothing to make room
+    // for: DON'T DELETE AT ALL. The delete exists only to clear the way for the incoming
+    // curriculum, and an empty incoming curriculum needs no clearing.
+    //
+    // This replaces a count-then-check guard, which could not have worked. At READ COMMITTED a
+    // writer can commit a module after the count returns zero and before deleteCourseCurriculum
+    // reads the module list, and the helper would then delete it with no replacement. Guarding
+    // the call could only ever narrow that window; not making the call closes it by
+    // construction, for every isolation level, with no lock and no recount.
+    //
+    // The count below is for the LOG LINE only. A stale count misreports a number in a message;
+    // it cannot lose data, because nothing here deletes anything.
     if (c.modules.length === 0) {
       const populated = await tx.lmsModule.count({ where: { courseId } });
       if (populated > 0) {
-        throw new Error(
-          `aborted: "${c.slug}" has no modules in the catalogue but ${populated} in the database.\n` +
-            `  Curriculum appeared since the preflight ran. Nothing was written for this course.`
+        console.warn(
+          `  note: "${c.slug}" has no modules in the catalogue, so its ${populated} existing` +
+            ` module(s) were left untouched. Metadata only — curriculum was NOT replaced.`
         );
       }
+    } else {
+      await deleteCourseCurriculum(tx, courseId);
     }
-
-    await deleteCourseCurriculum(tx, courseId);
 
     const priceAud = new Prisma.Decimal(c.priceAud);
 
