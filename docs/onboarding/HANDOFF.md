@@ -17,16 +17,17 @@ controls below.
 
 ## 0. What's already done vs what's left
 
-| Done (merged to `main`) | Left for you (this doc) |
-| --- | --- |
-| Onboarding program docs (`docs/onboarding/floor-care/`) | Run the mandatory `type-check` gate in a networked env |
-| LMS course in `data/seed/courses-catalog.json` (12 modules, 38 lessons) | Seed the course + quizzes into the **production** DB |
-| 11 structured quizzes (`data/seed/floor-care-quizzes.json`) | Smoke-test the quiz flow against a real DB |
-| Branding (CARSI Maintenance Company Onboarding) + `meta.pricing` | Decide access model & **publish** (see the §5 warning) |
-| Verified structurally: catalogue guard, branding, quiz integrity, en-AU | Deferred build A: **Stripe subscription billing** |
-| | Deferred build B: fill `[COMPANY TO CONFIRM]` placeholders |
+| Done (merged to `main`)                                                 | Left for you (this doc)                                    |
+| ----------------------------------------------------------------------- | ---------------------------------------------------------- |
+| Onboarding program docs (`docs/onboarding/floor-care/`)                 | Run the mandatory `type-check` gate in a networked env     |
+| LMS course in `data/seed/courses-catalog.json` (12 modules, 38 lessons) | Seed the course + quizzes into the **production** DB       |
+| 11 structured quizzes (`data/seed/floor-care-quizzes.json`)             | Smoke-test the quiz flow against a real DB                 |
+| Branding (CARSI Maintenance Company Onboarding) + `meta.pricing`        | Decide access model & **publish** (see the §5 warning)     |
+| Verified structurally: catalogue guard, branding, quiz integrity, en-AU | Deferred build A: **Stripe subscription billing**          |
+|                                                                         | Deferred build B: fill `[COMPANY TO CONFIRM]` placeholders |
 
 **Key identifiers**
+
 - Course slug: `floor-care-onboarding-operational-readiness`
 - Course id (for the admin publish API): `6011d465-1981-487b-84e3-a53b10a2bd07`
 - Current state in JSON: `status: "draft"`, `isPublished: false`, `isFree: true`, `priceAud: "0"`
@@ -45,10 +46,10 @@ controls below.
    - `npm ci` and a generated Prisma client (`npx prisma generate`).
 3. **Prefer staging first.** If a staging DB exists, run the whole runbook there before touching prod.
 
-> ⚠️ **`npm run db:seed-courses` upserts EVERY course in `courses-catalog.json` (all ~23) and replaces
-> their modules/lessons to match the committed JSON.** If production has had courses edited via the
-> admin UI that are not reflected in the JSON, a seed will overwrite that drift. **Check for drift
-> first** (Step 3a). If you only want to touch this one course, see the targeted option in §5.
+> ⚠️ **`npm run db:seed-courses` is now the SAFE IMPORTER and a dry run until you add `--apply`.** It reconciles rather than replaces, so learner progress on a retained lesson survives. Scope it with `-- --slug=<slug>`; `-- --all` plans every course and refuses the whole run if any one of them would lose progress. The old delete-and-recreate behaviour is `db:seed-courses-legacy -- --legacy-destructive-replace` and destroys learner progress.
+> The drift caveat still applies: if production has courses edited via the admin UI that are not
+> reflected in the committed JSON, an `--apply` run reconciles them towards the JSON and that
+> drift is lost. **Check for drift first** (Step 3a). To touch one course only, see §5.
 
 ---
 
@@ -153,6 +154,7 @@ This was deliberately **not** built (it's app + payments work, not content). The
 recorded on the course in `meta.pricing` so nothing is lost.
 
 **Current state of the code (for scoping):**
+
 - Course purchases today are **one-time** Stripe `mode: 'payment'`
   (`app/api/lms/checkout/route.ts`). No recurring billing is wired.
 - Stripe **subscription helpers already exist but are unused**: `createSubscription`,
@@ -161,6 +163,7 @@ recorded on the course in `meta.pricing` so nothing is lost.
   `src/lib/lms/pricing-tiers.ts`) but it is **annual, per-seat**, not monthly-unlimited — not a drop-in.
 
 **A minimal build would need:**
+
 1. A recurring **Stripe Price** (AUD 1,295/month; GST handled per your tax config) and a checkout in
    `mode: 'subscription'`.
 2. An **organisation/account** entity that owns the subscription and grants its members access to the

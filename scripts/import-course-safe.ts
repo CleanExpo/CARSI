@@ -47,6 +47,7 @@ import { readFileSync } from 'node:fs';
 
 import { Prisma } from '../src/generated/prisma/client';
 import { prisma } from '../src/lib/prisma';
+import { catalogueIdConflicts } from '../src/lib/seed/catalogue-ids';
 import { getApprovedCecHours } from '../src/lib/seed/cec-approvals';
 
 const CATALOG = 'data/seed/courses-catalog.json';
@@ -189,6 +190,115 @@ export async function planImport(course: Course): Promise<ImportPlan> {
     progressAtRisk,
     progressPreserved,
   };
+}
+
+/** Refuse before planning, before instructors, before any write. */
+function refuseOnCatalogueConflicts(courses: Course[]) {
+  const conflicts = catalogueIdConflicts(courses);
+  if (!conflicts.length) return;
+  die(
+    `${conflicts.length} id conflict(s) inside ${CATALOG} itself:\n` +
+      conflicts.map((c) => `    ${c}`).join('\n') +
+      `\n  Nothing was read from the database and nothing was written. These are duplicates in\n` +
+      `  the catalogue, not a database conflict, so no consent flag applies -- there is no\n` +
+      `  correct import of a curriculum id that belongs to two courses. Fix the catalogue ids.`
+  );
+}
+
+type Instructor = { id: string; email: string; fullName?: string | null };
+
+// Catalogue instructor rows carry a placeholder where a password hash goes, never a usable
+// credential: they are authorship records for a course, not accounts anyone signs in with. Same
+// constant and same intent as the legacy seeder's.
+const SEED_PASSWORD_PLACEHOLDER = 'catalog:seed-from-json';
+
+/**
+ * Read-only. Work out which instructor rows this run would have to create, and refuse NOW if a
+ * course names one that neither the catalogue nor the database can supply.
+ *
+ * WHY THIS EXISTS -- measured, not theorised. `lms_courses.instructor_id` is NOT NULL with a
+ * foreign key to `lms_users.id`, and no migration creates that row. On a schema-only database
+ * with 0 users and 0 courses, the command this importer now backs did this:
+ *
+ *   npm run db:seed-courses -- --slug=<slug> --apply
+ *     Foreign key constraint violated on the constraint: `lms_courses_instructor_id_fkey`
+ *     courses after: 0
+ *
+ * The legacy seeder bootstrapped those rows (`ensureInstructors`) and this importer did not, so
+ * making it the default path would have broken every fresh database -- CI's own seed step and any
+ * new deployment included. It surfaced only when the new default was run against an untouched
+ * database; against an already-seeded one it passes, which is why adopting a path needs a fresh
+ * database and not a developer's working one.
+ *
+ * Refusing here keeps the failure legible and keeps it before the first write, rather than
+ * letting a foreign key fire part-way through a transaction.
+ */
+async function resolveInstructors(
+  courses: Course[],
+  catalogued: Instructor[]
+): Promise<{ needed: string[]; toCreate: Instructor[] }> {
+  const needed = [...new Set(courses.map((c) => c.instructorId))];
+  const byId = new Map(catalogued.map((i) => [i.id, i]));
+  const present = new Set(
+    (await prisma.lmsUser.findMany({ where: { id: { in: needed } }, select: { id: true } })).map(
+      (u) => u.id
+    )
+  );
+
+  const unsatisfiable = needed.filter((id) => !byId.has(id) && !present.has(id));
+  if (unsatisfiable.length) {
+    die(
+      `${unsatisfiable.length} instructor id(s) named by these courses do not exist and cannot\n` +
+        `  be created, because ${CATALOG} does not list them under "instructors" either:\n` +
+        unsatisfiable.map((id) => `    ${id}`).join('\n') +
+        `\n  lms_courses.instructor_id is NOT NULL with a foreign key to lms_users.id, so the\n` +
+        `  import would die on that constraint part-way through. Nothing was written. Add the\n` +
+        `  instructor to the catalogue, or create the user row first.`
+    );
+  }
+
+  // Only the rows the catalogue has to supply. An instructor already in the database is left
+  // exactly as it is: importing a course does not rewrite a live user row as a side effect.
+  return { needed, toCreate: needed.filter((id) => !present.has(id)).map((id) => byId.get(id)!) };
+}
+
+/** Writes. Called only under --apply, and only after every blocker has passed. */
+async function ensureInstructors(needed: string[], toCreate: Instructor[]) {
+  if (toCreate.length) {
+    console.log(`  creating ${toCreate.length} catalogue instructor row(s) (none existed)`);
+    // ON CONFLICT DO NOTHING on the id, so two importers racing on a fresh database do not make
+    // each other fail, and a re-run is a no-op.
+    await prisma.lmsUser.createMany({
+      data: toCreate.map((u) => ({
+        id: u.id,
+        email: u.email,
+        fullName: u.fullName ?? null,
+        hashedPassword: SEED_PASSWORD_PLACEHOLDER,
+        isActive: true,
+        isVerified: true,
+      })),
+      skipDuplicates: true,
+    });
+  }
+
+  // A positive check, not an assumption. skipDuplicates also swallows a conflict on the UNIQUE
+  // email, which would leave the id still absent and every course insert still doomed -- and the
+  // operator would get a foreign-key error instead of an explanation. Prove the ids are there.
+  const have = new Set(
+    (await prisma.lmsUser.findMany({ where: { id: { in: needed } }, select: { id: true } })).map(
+      (u) => u.id
+    )
+  );
+  const missing = needed.filter((id) => !have.has(id));
+  if (missing.length) {
+    die(
+      `${missing.length} instructor row(s) are still absent after the bootstrap:\n` +
+        missing.map((id) => `    ${id}`).join('\n') +
+        `\n  The most likely cause is another lms_users row already holding the catalogue\n` +
+        `  instructor's email address under a different id, so the insert was skipped. No course\n` +
+        `  was written. Reconcile the user row by hand.`
+    );
+  }
 }
 
 function printPlan(plan: ImportPlan, outcome: 'dry-run' | 'applying' | 'blocked') {
@@ -439,17 +549,178 @@ async function applyImport(course: Course, plan: ImportPlan, allowProgressLoss: 
   );
 }
 
+/** Why a course cannot be imported with the flags given. Empty means it is clear to apply. */
+function blockers(
+  plan: ImportPlan,
+  allowProgressLoss: boolean,
+  allowEmptyCurriculum: boolean
+): string[] {
+  const out: string[] = [];
+  // Never consentable: these ids belong to another course, so no version of this import is right.
+  if (plan.foreignIds.length) {
+    out.push(`${plan.foreignIds.length} incoming id(s) belong to a different course`);
+  }
+  if (plan.emptiesCurriculum && !allowEmptyCurriculum) {
+    out.push(
+      `would delete the ENTIRE curriculum (${plan.moduleRemovals.length} module(s), ` +
+        `${plan.lessonRemovals.length} lesson(s)) and create nothing`
+    );
+  }
+  if (plan.progressAtRisk > 0 && !allowProgressLoss) {
+    out.push(`would delete ${plan.progressAtRisk} learner progress row(s)`);
+  }
+  return out;
+}
+
+/**
+ * Whole-catalogue import.
+ *
+ * This exists so the safe importer can replace the legacy seeder as the DEFAULT path. Without it
+ * `db:seed-courses -- --all` had nowhere to go but the delete-and-recreate seeder, which is the
+ * thing being retired.
+ *
+ * It is NOT a loop over the single-slug path. Two differences matter:
+ *
+ *   - EVERY course is planned, read-only, BEFORE anything is written. One blocked course refuses
+ *     the whole run. A half-applied catalogue is worse than an unapplied one, and an operator
+ *     who is told "course 34 of 80 would destroy progress" after 33 courses have been committed
+ *     has no clean state to return to.
+ *   - Each course is then applied in its OWN transaction, as the legacy seeder did. One
+ *     serialization failure must not discard 79 good imports.
+ */
+async function importAll(
+  courses: Course[],
+  instructors: Instructor[],
+  apply: boolean,
+  allowProgressLoss: boolean,
+  allowEmptyCurriculum: boolean
+) {
+  console.log(`\nplanning ${courses.length} course(s) from ${CATALOG} \u2014 nothing written yet`);
+
+  // Before everything else, and needing no database: a duplicate id inside the catalogue would
+  // otherwise pass every plan and then abort part-way through the apply loop.
+  refuseOnCatalogueConflicts(courses);
+
+  // Read-only, and before the planning loop: a catalogue that names an instructor nobody can
+  // supply is refused with an explanation rather than a foreign-key error on course 1 of 80.
+  const { needed, toCreate } = await resolveInstructors(courses, instructors);
+
+  const evaluated: Array<{ course: Course; plan: ImportPlan; why: string[] }> = [];
+  for (const course of courses) {
+    const plan = await planImport(course);
+    evaluated.push({ course, plan, why: blockers(plan, allowProgressLoss, allowEmptyCurriculum) });
+  }
+
+  const changing = evaluated.filter(
+    (e) =>
+      e.plan.moduleAdds.length ||
+      e.plan.moduleRemovals.length ||
+      e.plan.lessonAdds.length ||
+      e.plan.lessonRemovals.length ||
+      !e.plan.courseExists
+  );
+  const blocked = evaluated.filter((e) => e.why.length);
+  const progressPreserved = evaluated.reduce((n, e) => n + e.plan.progressPreserved, 0);
+  const progressAtRisk = evaluated.reduce((n, e) => n + e.plan.progressAtRisk, 0);
+
+  // EVERY evaluated course is written, not just the structurally changed ones: applyImport
+  // upserts the course scalars (title, pricing, CEC hours, meta) and every lesson's content
+  // whether or not the curriculum structure moved. The old wording here said
+  // "N course(s) with curriculum changes, M unchanged", which was false. Measured on an
+  // already-seeded database, a second --all --apply printed "0 course(s) with curriculum
+  // changes, 80 unchanged" and "applying 0 course(s)", then moved updated_at on all 80.
+  // Understating what a seeder wrote is the exact failure this importer exists to stop; its own
+  // output does not get to commit it.
+  console.log(
+    `  ${evaluated.length} course(s) will be WRITTEN \u2014 course metadata and lesson content are` +
+      `\n  rewritten for every one, whether or not the curriculum structure moved`
+  );
+  console.log(
+    `  of those, ${changing.length} have curriculum STRUCTURE changes` +
+      ` (modules or lessons added/removed)${changing.length ? ':' : ''}`
+  );
+  for (const e of changing.slice(0, 20)) {
+    console.log(
+      `    ${e.course.slug}` +
+        `  modules +${e.plan.moduleAdds.length}/-${e.plan.moduleRemovals.length}` +
+        `  lessons +${e.plan.lessonAdds.length}/-${e.plan.lessonRemovals.length}`
+    );
+  }
+  if (changing.length > 20) console.log(`    ... and ${changing.length - 20} more`);
+  console.log(`  learner progress preserved: ${progressPreserved}`);
+  console.log(
+    `  learner progress AT RISK:   ${progressAtRisk}` +
+      (progressAtRisk ? '   <-- these rows die with their removed lessons' : '')
+  );
+
+  if (blocked.length) {
+    console.error(
+      `\nREFUSED \u2014 nothing written. ${blocked.length} course(s) cannot be imported:\n`
+    );
+    for (const e of blocked) {
+      console.error(`    ${e.course.slug}`);
+      for (const w of e.why) console.error(`      ${w}`);
+    }
+    die(
+      `the whole run is refused, deliberately: a half-applied catalogue is worse than an\n` +
+        `  unapplied one. Fix the catalogue, import the courses you mean with --slug=<slug>, or\n` +
+        `  pass the consent flag the message above names.`
+    );
+  }
+
+  if (!apply) {
+    console.log('\nDRY RUN \u2014 nothing written. Add --apply.');
+    return;
+  }
+
+  // evaluated, not changing: the loop below writes every course. Saying "applying 0" and then
+  // writing 80 is the contradiction this replaces.
+  console.log(`\napplying ${evaluated.length} course(s), one transaction each...`);
+  // After every blocker, so a refused run still writes nothing -- the ordering mistake this
+  // repo already made once in the legacy seeder, where the instructor upsert committed before
+  // the preflight and "NOTHING has been written" was false.
+  await ensureInstructors(needed, toCreate);
+  let done = 0;
+  for (const e of evaluated) {
+    await applyImport(e.course, e.plan, allowProgressLoss);
+    done += 1;
+  }
+  console.log(`done. ${done} course(s) imported; ${progressPreserved} progress row(s) preserved.`);
+}
+
 async function main() {
   const slug = argOf('slug');
-  if (!slug) die('no --slug. This importer is slug-scoped by design; there is no --all.');
+  const all = has('all');
+  // Same contract as the legacy seeder it replaces: exactly one of --slug or --all. npm drops a
+  // bare --slug=x that is not after --, so a slugless run is an easy mistake to make.
+  if (slug && all) die('--slug and --all together. Pick one.');
+  if (!slug && !all) {
+    die(
+      'no --slug and no --all. Import one course with -- --slug=<slug>, or the whole\n' +
+        '  catalogue with -- --all. Both are dry runs until you add --apply.'
+    );
+  }
 
-  const catalog = JSON.parse(readFileSync(CATALOG, 'utf8')) as { courses: Course[] };
-  const course = catalog.courses.find((c) => c.slug === slug);
-  if (!course) die(`slug "${slug}" is not in ${CATALOG}`);
+  const catalog = JSON.parse(readFileSync(CATALOG, 'utf8')) as {
+    courses: Course[];
+    instructors?: Instructor[];
+  };
+  const instructors = catalog.instructors ?? [];
 
   const apply = has('apply');
   const allowProgressLoss = has('allow-progress-loss');
   const allowEmptyCurriculum = has('allow-empty-curriculum');
+
+  if (all) {
+    await importAll(catalog.courses, instructors, apply, allowProgressLoss, allowEmptyCurriculum);
+    return;
+  }
+
+  const course = catalog.courses.find((c) => c.slug === slug);
+  if (!course) die(`slug "${slug}" is not in ${CATALOG}`);
+  // One course cannot collide with another incoming course, but it can list the same module or
+  // lesson id twice, in which case the second upsert silently wins.
+  refuseOnCatalogueConflicts([course]);
   const plan = await planImport(course);
 
   // An import that would leave the course with NO curriculum is refused. The progress guard does
@@ -506,7 +777,13 @@ async function main() {
         `  Re-run with --allow-progress-loss if that is genuinely intended.`
     );
   }
+  // Read-only, and reported in the dry run too, so a missing instructor is not a surprise that
+  // waits for --apply.
+  const { needed, toCreate } = await resolveInstructors([course], instructors);
+
   if (!apply) return;
+
+  await ensureInstructors(needed, toCreate);
 
   try {
     await applyImport(course, plan, allowProgressLoss);

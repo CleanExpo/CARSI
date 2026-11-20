@@ -256,7 +256,11 @@ export async function seedQuizzesFile(
     select: { id: true },
   });
   if (!course) {
-    throw new Error(`Course "${file.courseSlug}" not found — run db:seed-courses first.`);
+    throw new Error(
+      `Course "${file.courseSlug}" not found — run\n` +
+        `  npm run db:seed-courses -- --slug=${file.courseSlug} --apply\n` +
+        `first. (db:seed-courses is a dry run without --apply.)`
+    );
   }
   for (const quiz of file.quizzes) {
     const existing = await db.lmsQuiz.findUnique({

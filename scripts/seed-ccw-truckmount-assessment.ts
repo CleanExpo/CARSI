@@ -83,7 +83,10 @@ async function main() {
     select: { id: true },
   });
   if (!course) {
-    throw new Error(`Course "${courseSlug}" not found. Run "npm run db:seed-courses" first.`);
+    throw new Error(
+      `Course "${courseSlug}" not found. Run ` +
+        `"npm run db:seed-courses -- --slug=${courseSlug} --apply" first.`
+    );
   }
 
   await prisma.lmsPracticalAssessment.upsert({
