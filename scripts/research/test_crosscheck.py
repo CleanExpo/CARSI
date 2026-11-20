@@ -17,6 +17,10 @@ sys.path.insert(0, os.path.dirname(__file__))
 import crosscheck as cc  # noqa: E402
 
 cc.LEDGER_DIR = tempfile.mkdtemp(prefix="crosscheck-test-ledger-")
+# Model-run tests must not depend on pypdf being installed on the machine running
+# them. The PdfReader class below tests the real check and the refusal.
+REAL_PDF_READER_AVAILABLE = cc.pdf_reader_available
+cc.pdf_reader_available = lambda: True
 
 
 def claims_file(rows):
@@ -488,6 +492,52 @@ class QuoteCheck(unittest.TestCase):
         with mock.patch.object(cc, "_scheme_ok", lambda u: True):
             for q in ["—", "  ", "30", "the record"]:
                 self.assertEqual(cc.quote_found(self.base + "/page", q), "QUOTE_TOO_SHORT", repr(q))
+
+
+
+class PdfReader(unittest.TestCase):
+    """A missing pypdf must stop the run, never pass PDF sources off as unreadable."""
+
+    def test_real_check_follows_the_installed_packages(self):
+        with mock.patch("importlib.util.find_spec", return_value=None):
+            self.assertFalse(REAL_PDF_READER_AVAILABLE())
+        with mock.patch("importlib.util.find_spec", return_value=object()):
+            self.assertTrue(REAL_PDF_READER_AVAILABLE())
+
+    def test_model_run_refused_before_key_or_spend(self):
+        fake = FakeChat(daily=0.0)
+        k = mock.Mock(return_value="x")
+        with mock.patch.object(cc, "pdf_reader_available", lambda: False), \
+                mock.patch.object(cc, "key", k), mock.patch.object(cc, "call", fake):
+            code, _ = run_main(["--claims", claims_file([CLAIM]), "--out", tempfile.mktemp(), "--max-usd", "1"])
+        self.assertEqual(code, cc.PDF_READER_HELP)
+        self.assertEqual((fake.chat_calls, k.call_count), (0, 0))
+
+    def test_recheck_refused(self):
+        with mock.patch.object(cc, "pdf_reader_available", lambda: False):
+            code, _ = run_main(["--recheck", tempfile.mktemp()])
+        self.assertEqual(code, cc.PDF_READER_HELP)
+
+    def test_quote_check_names_the_missing_reader(self):
+        class H(http.server.BaseHTTPRequestHandler):
+            def do_GET(self):
+                self.send_response(200)
+                self.send_header("Content-Type", "application/pdf")
+                self.end_headers()
+                self.wfile.write(b"%PDF-1.4 not a real document")
+
+            def log_message(self, *a):
+                pass
+
+        srv = http.server.HTTPServer(("127.0.0.1", 0), H)
+        threading.Thread(target=srv.serve_forever, daemon=True).start()
+        try:
+            with mock.patch.object(cc, "_scheme_ok", lambda u: True), mock.patch.dict(sys.modules, {"pypdf": None}):
+                got = cc.quote_found(f"http://127.0.0.1:{srv.server_port}/a.pdf", "a quote long enough to fetch")
+        finally:
+            srv.shutdown()
+            srv.server_close()
+        self.assertEqual(got, "PDF_READER_MISSING")
 
 
 if __name__ == "__main__":

@@ -19,6 +19,7 @@ import contextlib
 import datetime
 import fcntl
 import html
+import importlib.util
 import json
 import math
 import os
@@ -310,6 +311,9 @@ def quote_found(url, quote):
         try:
             import io
             from pypdf import PdfReader
+        except ImportError:  # a missing tool is not a source fault; say which it is
+            return "PDF_READER_MISSING"
+        try:
             text = " ".join((p.extract_text() or "") for p in PdfReader(io.BytesIO(raw)).pages)
         except Exception as e:  # unreadable PDF is a failure, never a pass
             return f"PDF_UNREADABLE:{type(e).__name__}"
@@ -354,6 +358,14 @@ def summary(path):
     return 0
 
 
+PDF_READER_HELP = ("REFUSED: pypdf is not installed, so PDF sources cannot be checked. "
+                   "Install it first: python3 -m pip install -r scripts/research/requirements.txt")
+
+
+def pdf_reader_available():
+    return importlib.util.find_spec("pypdf") is not None
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--summary", help="print an existing results file without links")
@@ -365,11 +377,17 @@ def main():
     if a.summary:
         return summary(a.summary)
     if a.recheck:
+        if not pdf_reader_available():
+            sys.exit(PDF_READER_HELP)
         return recheck(a.recheck)
     if not (a.claims and a.out and a.max_usd is not None):
         sys.exit("--claims, --out and --max-usd are required for a model run")
     if not math.isfinite(a.max_usd) or a.max_usd <= 0 or a.max_usd > DAILY_CAP_USD:
         sys.exit(f"--max-usd must be a number above 0 and at most {DAILY_CAP_USD}")
+    # Checked before the key is read or any money is spent: without pypdf every PDF
+    # source would come back unreadable and look like a bad source.
+    if not pdf_reader_available():
+        sys.exit(PDF_READER_HELP)
     claims = [json.loads(l) for l in open(a.claims) if l.strip()]
     for c in claims:
         if not (isinstance(c, dict) and all(isinstance(c.get(f), str) for f in ("id", "claim", "jurisdiction"))):
