@@ -110,7 +110,8 @@ Short, regular, real-world reinforcement keeps the standard alive:
 1. Fill placeholders; assign an owner and review date.
 2. Train supervisors on the assessment framework and sign-off form first — they run the program.
 3. Issue the induction pack and run the first inductions.
-4. Seed the LMS course (draft); pilot with one cohort; capture feedback.
+4. Seed the LMS course — note it publishes unless you set `status`/`isPublished` to unpublished in
+   the catalogue first; pilot with one cohort; capture feedback.
 5. Add auto-marked quizzes and learner sign-off tracking.
 6. Produce the priority video clips (gated spend) once content is settled.
 7. Start the toolbox-talk loop and the refresher cycle for safety-critical modules.

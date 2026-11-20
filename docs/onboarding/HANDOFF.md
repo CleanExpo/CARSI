@@ -30,7 +30,12 @@ controls below.
 
 - Course slug: `floor-care-onboarding-operational-readiness`
 - Course id (for the admin publish API): `6011d465-1981-487b-84e3-a53b10a2bd07`
-- Current state in JSON: `status: "draft"`, `isPublished: false`, `isFree: true`, `priceAud: "0"`
+- Committed catalogue state (`data/seed/courses-catalog.json`, checked 2026-11-20):
+  `status: "published"`, `isPublished: true`, `isFree: false`, `priceAud: "99"` — **all four of these
+  were previously documented here as draft/false/true/"0", which was wrong on every field.** The
+  importer writes all four to the database on apply, so they decide whether the course is live and
+  what it costs. These are the *repo's* values; what is currently in the production database has
+  **not** been verified from this environment — check it with the §1 preflight before acting.
 - Quiz bank: `data/seed/floor-care-quizzes.json` — 11 quizzes, 34 questions
 - Scripts: `db:seed-courses`, `db:seed-floor-care-quizzes`, `db:seed-e2e-user`, `db:export-courses`
 
@@ -130,14 +135,25 @@ Or run the Playwright suite (Journey 8 covers the quiz render): `npm run test:e2
 
 ## 5. Publish — and the access-control decision ⚠️
 
-**Read before publishing.** The course is currently `isFree: true` / `priceAud: "0"`. **If you publish
-it to the public catalogue as-is, any logged-in user can enrol for free.** That is fine for an internal
-pilot, but it is **not** access control for the paid **$1,295/month + GST** organisation subscription.
+**Read before publishing.** The committed catalogue has this course as `isFree: false` /
+`priceAud: "99"` and already `published` / `isPublished: true`. Two consequences, both different from
+what this section used to say:
+
+- **Seeding publishes it.** §3b's import writes `status` and `isPublished`, so the course goes live as
+  a side effect of seeding, not as a separate decision at this step. Stage it by setting both to
+  unpublished in the catalogue first if that is not what you want.
+- **It is a paid course, not a free one.** This section previously said it was `isFree: true` /
+  `priceAud: "0"` and that publishing as-is let any logged-in user enrol for free. That is not the
+  catalogue's state. Publishing as-is lists an **A$99** course.
+
+Either way, a public publish is **not** access control for the paid **$1,295/month + GST**
+organisation subscription.
 
 Choose the model that matches intent:
 
-- **A — Internal/free pilot or manual provisioning (no billing yet):** publish (or keep off the public
-  catalogue and provision enrolments per organisation). Access is not metered.
+- **A — Internal/free pilot or manual provisioning (no billing yet):** this now requires a catalogue
+  change as well — set `isFree: true` and `priceAud: "0"` — or keep it off the public catalogue and
+  provision enrolments per organisation. Access is not metered.
 - **B — Paid org subscription enforced:** do **not** rely on a public free publish. Build the
   subscription billing + access gating first (Deferred build A), or provision access per-organisation
   via a team/manual enrolment until then.
