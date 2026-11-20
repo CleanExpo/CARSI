@@ -19,7 +19,7 @@ If both answers are yes, complete sections 2 to 4 before the work starts.
 - [ ] Assessed as: high risk / not high risk / cannot tell (treat as high risk). Reason: ______
 If high risk:
 - [ ] Silica risk control plan (or SWMS for high-risk construction work) done before work. Victoria: hazard control statement.
-- [ ] Workers trained (accredited or regulator-approved course): names and dates ______
+- [ ] Workers trained (nationally recognised or regulator-approved course): names and dates ______
 - [ ] Air monitoring arranged. Above 0.05 mg/m³: regulator told within 14 days.
 - [ ] Health monitoring arranged for exposed workers.
 - [ ] Records filed: training (5 years after the worker leaves), health monitoring and air monitoring (30 years).
