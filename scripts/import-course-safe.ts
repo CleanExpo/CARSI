@@ -197,112 +197,183 @@ const asJson = (v: unknown) =>
   v === undefined || v === null ? Prisma.DbNull : (v as Prisma.InputJsonValue);
 
 async function applyImport(course: Course, plan: ImportPlan, allowProgressLoss: boolean) {
-  await prisma.$transaction(async (tx) => {
-    // Close the window between planning and applying. planImport counted progress outside any
-    // transaction, so a learner could complete a doomed lesson in between and lose it without
-    // the consent flag ever being asked for.
-    //
-    // Locking the doomed LESSON rows is what makes the recount trustworthy: in Postgres an
-    // insert into lms_lesson_progress takes FOR KEY SHARE on its parent lesson, which
-    // conflicts with FOR UPDATE. So holding FOR UPDATE on these lessons blocks new progress
-    // for them until this transaction ends. Recounting inside the transaction alone would not
-    // — nothing would stop a concurrent insert landing right after the count.
-    if (plan.lessonRemovals.length) {
-      await tx.$queryRaw`SELECT id FROM lms_lessons WHERE id = ANY(${plan.lessonRemovals}::uuid[]) FOR UPDATE`;
-      const atRiskNow = await tx.lmsLessonProgress.count({
-        where: { lessonId: { in: plan.lessonRemovals } },
+  const incomingModuleIds = course.modules.map((m) => m.id);
+  const incomingLessonIds = course.modules.flatMap((m) => m.lessons.map((l) => l.id));
+
+  await prisma.$transaction(
+    async (tx) => {
+      const courseId = plan.courseExists
+        ? ((await tx.lmsCourse.findUnique({ where: { slug: course.slug }, select: { id: true } }))
+            ?.id ?? course.id)
+        : course.id;
+
+      // ---- Re-decide, under locks, everything planImport decided without them. ----
+      //
+      // planImport reads outside any transaction, so each of its conclusions can be stale by
+      // the time we arrive here. Two of them destroy data when wrong, so both are taken again
+      // under locks that block the very writes that would invalidate them.
+      //
+      // The conflict those locks rely on is MEASURED, not assumed. On Postgres 16.15 inserting
+      // a child row runs
+      //     SELECT 1 FROM ONLY <parent> x WHERE id = $1 FOR KEY SHARE OF x
+      // as its foreign-key check, and that statement blocks against FOR UPDATE on the parent.
+      // Verified both ways in scripts/import-course-safe.locks.test.mjs: FOR UPDATE on a lesson
+      // blocks new progress for it, and FOR UPDATE on a module blocks new lessons under it,
+      // until this transaction ends.
+
+      // 1. Lock the doomed modules BEFORE reading what is inside them. Deleting a module
+      //    cascades module -> lesson -> progress, so a lesson inserted into a doomed module
+      //    after planning dies with it, taking progress that plan.progressAtRisk never saw and
+      //    nobody consented to losing. Taking this lock first is what makes the read below
+      //    complete rather than a snapshot something can still be added to.
+      if (plan.moduleRemovals.length) {
+        await tx.$queryRaw`SELECT id FROM lms_modules WHERE id = ANY(${plan.moduleRemovals}::uuid[]) FOR UPDATE`;
+      }
+
+      // 2. Everything this transaction will actually destroy: lessons the catalogue dropped,
+      //    plus whatever is still sitting in a doomed module that the catalogue does not claim.
+      //    That second set is precisely what the plan's count cannot include.
+      const doomed = await tx.lmsLesson.findMany({
+        where: {
+          OR: [
+            { id: { in: plan.lessonRemovals } },
+            ...(plan.moduleRemovals.length
+              ? [{ moduleId: { in: plan.moduleRemovals }, id: { notIn: incomingLessonIds } }]
+              : []),
+          ],
+        },
+        select: { id: true },
       });
-      if (atRiskNow > 0 && !allowProgressLoss) {
+      const doomedIds = doomed.map((l) => l.id);
+
+      if (doomedIds.length) {
+        await tx.$queryRaw`SELECT id FROM lms_lessons WHERE id = ANY(${doomedIds}::uuid[]) FOR UPDATE`;
+        const atRiskNow = await tx.lmsLessonProgress.count({
+          where: { lessonId: { in: doomedIds } },
+        });
+        if (atRiskNow > 0 && !allowProgressLoss) {
+          throw new Error(
+            `aborted: this import would destroy ${atRiskNow} learner progress row(s), which the ` +
+              `plan did not show. Nothing was written. Re-run to see the current plan, and pass ` +
+              `--allow-progress-loss only if losing them is genuinely intended.`
+          );
+        }
+      }
+
+      // 3. Ownership again, and under lock. The upserts below select by GLOBAL id and overwrite
+      //    the parent, so an incoming id owned by another course would be reparented into this
+      //    one, stripping curriculum from a course this run never named. planImport checked it,
+      //    but another writer could have moved an id into another course since. No consent flag
+      //    exists for this: there is no version of it that is correct.
+      await tx.$queryRaw`SELECT id FROM lms_modules WHERE id = ANY(${incomingModuleIds}::uuid[]) FOR UPDATE`;
+      await tx.$queryRaw`SELECT id FROM lms_lessons WHERE id = ANY(${incomingLessonIds}::uuid[]) FOR UPDATE`;
+      const foreignModules = await tx.lmsModule.findMany({
+        where: { id: { in: incomingModuleIds }, courseId: { not: courseId } },
+        select: { id: true },
+      });
+      const foreignLessons = await tx.lmsLesson.findMany({
+        where: { id: { in: incomingLessonIds }, module: { courseId: { not: courseId } } },
+        select: { id: true },
+      });
+      const foreignNow = [...foreignModules.map((m) => m.id), ...foreignLessons.map((l) => l.id)];
+      if (foreignNow.length) {
         throw new Error(
-          `aborted: ${atRiskNow} learner progress row(s) appeared since the plan was computed. ` +
-            `Nothing was written. Re-run to see the current plan, and pass --allow-progress-loss ` +
-            `only if losing them is genuinely intended.`
+          `aborted: ${foreignNow.length} incoming id(s) belong to a different course:\n` +
+            foreignNow.map((id) => `    ${id}`).join('\n') +
+            `\n  Nothing was written. Fix the catalogue ids.`
         );
       }
-    }
 
-    const courseId = plan.courseExists
-      ? ((await tx.lmsCourse.findUnique({ where: { slug: course.slug }, select: { id: true } }))
-          ?.id ?? course.id)
-      : course.id;
+      const scalars = {
+        title: course.title,
+        description: course.description ?? null,
+        shortDescription: course.shortDescription ?? null,
+        thumbnailUrl: course.thumbnailUrl ?? null,
+        instructorId: course.instructorId,
+        status: course.status,
+        priceAud: new Prisma.Decimal(course.priceAud),
+        isFree: course.isFree,
+        durationHours: course.durationHours ?? null,
+        level: course.level ?? null,
+        category: course.category ?? null,
+        tags: asJson(course.tags),
+        iicrcDiscipline: course.iicrcDiscipline ?? null,
+        // Licence-critical, and reused rather than reimplemented: CEC hours come ONLY from the
+        // approvals registry (the SSOT) or the catalogue's explicit founder-set value. Nothing
+        // is derived here. Same call the existing seeder makes.
+        cecHours: getApprovedCecHours(course.slug) ?? course.cecHours ?? null,
+        meta: asJson(course.meta),
+        isPublished: course.isPublished ?? null,
+      };
 
-    const scalars = {
-      title: course.title,
-      description: course.description ?? null,
-      shortDescription: course.shortDescription ?? null,
-      thumbnailUrl: course.thumbnailUrl ?? null,
-      instructorId: course.instructorId,
-      status: course.status,
-      priceAud: new Prisma.Decimal(course.priceAud),
-      isFree: course.isFree,
-      durationHours: course.durationHours ?? null,
-      level: course.level ?? null,
-      category: course.category ?? null,
-      tags: asJson(course.tags),
-      iicrcDiscipline: course.iicrcDiscipline ?? null,
-      // Licence-critical, and reused rather than reimplemented: CEC hours come ONLY from the
-      // approvals registry (the SSOT) or the catalogue's explicit founder-set value. Nothing
-      // is derived here. Same call the existing seeder makes.
-      cecHours: getApprovedCecHours(course.slug) ?? course.cecHours ?? null,
-      meta: asJson(course.meta),
-      isPublished: course.isPublished ?? null,
-    };
-
-    await tx.lmsCourse.upsert({
-      where: { slug: course.slug },
-      create: { id: courseId, slug: course.slug, ...scalars },
-      update: scalars,
-    });
-
-    // Lessons genuinely absent from the catalogue go now. Their progress dies with them, and
-    // that count was reported and consented to before we got here.
-    if (plan.lessonRemovals.length) {
-      await tx.lmsLesson.deleteMany({ where: { id: { in: plan.lessonRemovals } } });
-    }
-
-    // ORDER IS LOAD-BEARING. Obsolete modules are deleted AFTER the lesson upserts below, not
-    // here. A lesson that MOVES from a removed module to a surviving one is still "preserved"
-    // as far as the plan is concerned — its id is in both sets — but deleting its old module
-    // first would cascade through the lesson to its progress, and the upsert would then
-    // recreate the lesson with no history. The plan would have promised 0 rows at risk while
-    // silently destroying them: the exact defect this importer exists to prevent. Reparent
-    // first, delete the emptied modules last.
-
-    // Upsert in place — this is the whole point. A surviving lesson keeps its row, so every
-    // lms_lesson_progress row pointing at it keeps its foreign key and its history.
-    for (const m of course.modules) {
-      await tx.lmsModule.upsert({
-        where: { id: m.id },
-        create: { id: m.id, courseId, title: m.title, orderIndex: m.orderIndex },
-        update: { courseId, title: m.title, orderIndex: m.orderIndex },
+      await tx.lmsCourse.upsert({
+        where: { slug: course.slug },
+        create: { id: courseId, slug: course.slug, ...scalars },
+        update: scalars,
       });
-      for (const l of m.lessons) {
-        const lesson = {
-          moduleId: m.id,
-          title: l.title,
-          contentType: l.contentType,
-          contentBody: l.contentBody ?? null,
-          orderIndex: l.orderIndex,
-          isPreview: l.isPreview ?? false,
-          resources: asJson(l.resources),
-          durationMinutes: l.durationMinutes ?? null,
-        };
-        await tx.lmsLesson.upsert({
-          where: { id: l.id },
-          create: { id: l.id, ...lesson },
-          update: lesson,
-        });
-      }
-    }
 
-    // Now, and only now. Every retained lesson has been reparented to its destination module
-    // above, so these modules hold nothing we meant to keep and the cascade is harmless. A
-    // lesson still sitting here is one the catalogue dropped, and its removal was counted in
-    // progressAtRisk and consented to.
-    if (plan.moduleRemovals.length) {
-      await tx.lmsModule.deleteMany({ where: { id: { in: plan.moduleRemovals } } });
+      // Lessons genuinely absent from the catalogue go now. Their progress dies with them, and
+      // that count was reported and consented to before we got here.
+      if (plan.lessonRemovals.length) {
+        await tx.lmsLesson.deleteMany({ where: { id: { in: plan.lessonRemovals } } });
+      }
+
+      // ORDER IS LOAD-BEARING. Obsolete modules are deleted AFTER the lesson upserts below, not
+      // here. A lesson that MOVES from a removed module to a surviving one is still "preserved"
+      // as far as the plan is concerned — its id is in both sets — but deleting its old module
+      // first would cascade through the lesson to its progress, and the upsert would then
+      // recreate the lesson with no history. The plan would have promised 0 rows at risk while
+      // silently destroying them: the exact defect this importer exists to prevent. Reparent
+      // first, delete the emptied modules last.
+
+      // Upsert in place — this is the whole point. A surviving lesson keeps its row, so every
+      // lms_lesson_progress row pointing at it keeps its foreign key and its history.
+      for (const m of course.modules) {
+        await tx.lmsModule.upsert({
+          where: { id: m.id },
+          create: { id: m.id, courseId, title: m.title, orderIndex: m.orderIndex },
+          update: { courseId, title: m.title, orderIndex: m.orderIndex },
+        });
+        for (const l of m.lessons) {
+          const lesson = {
+            moduleId: m.id,
+            title: l.title,
+            contentType: l.contentType,
+            contentBody: l.contentBody ?? null,
+            orderIndex: l.orderIndex,
+            isPreview: l.isPreview ?? false,
+            resources: asJson(l.resources),
+            durationMinutes: l.durationMinutes ?? null,
+          };
+          await tx.lmsLesson.upsert({
+            where: { id: l.id },
+            create: { id: l.id, ...lesson },
+            update: lesson,
+          });
+        }
+      }
+
+      // Now, and only now. Every retained lesson has been reparented to its destination module
+      // above, so these modules hold nothing we meant to keep and the cascade is harmless. A
+      // lesson still sitting here is one the catalogue dropped, and its progress was counted by
+      // the locked recount in step 2 and consented to — including any that arrived after the
+      // plan was printed, which is the whole reason that recount exists.
+      if (plan.moduleRemovals.length) {
+        await tx.lmsModule.deleteMany({ where: { id: { in: plan.moduleRemovals } } });
+      }
+    },
+    {
+      // FOR UPDATE cannot lock a row that does not exist yet, so an id CREATED under another
+      // course between the ownership check above and the upserts below sits outside every lock
+      // taken there. Serializable is what closes that last gap: the predicate locks SSI takes
+      // over those ownership reads conflict with such an insert, so one of the two transactions
+      // aborts with a serialization failure instead of the row being quietly reparented. The
+      // cost is that a genuinely concurrent write can abort this import; it is handled in
+      // main() and reported as "nothing was written, re-run", which is the right failure for a
+      // tool whose entire purpose is to not lose data.
+      isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
     }
-  });
+  );
 }
 
 async function main() {
@@ -339,7 +410,21 @@ async function main() {
   }
   if (!apply) return;
 
-  await applyImport(course, plan, allowProgressLoss);
+  try {
+    await applyImport(course, plan, allowProgressLoss);
+  } catch (e) {
+    // Serializable makes a concurrent write to this course abort the import rather than let it
+    // reparent or destroy a row the plan never mentioned. Report that as the recoverable thing
+    // it is: nothing was written, so re-running is always safe.
+    const code = (e as { code?: string }).code;
+    if (code === 'P2034' || /40001|could not serialize/i.test(String(e))) {
+      die(
+        'aborted: another write to this course landed while the import was running, so the\n' +
+          '  transaction could not be serialized. NOTHING was written \u2014 re-run it.'
+      );
+    }
+    throw e;
+  }
   const after = await planImport(course);
   console.log(
     `done. ${after.lessonAdds.length + after.lessonRemovals.length === 0 ? 'curriculum now matches the catalogue' : 'WARNING: drift remains'}; ` +

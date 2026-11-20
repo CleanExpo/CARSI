@@ -68,6 +68,7 @@
     "db:seed-courses": "npx tsx scripts/seed-courses-catalog.ts",
     "db:import-course": "npx tsx scripts/import-course-safe.ts",
     "test:import-course": "node scripts/import-course-safe.test.mjs",
+    "test:import-course-locks": "node scripts/import-course-safe.locks.test.mjs",
     "db:seed-quizzes": "npx tsx scripts/seed-all-quizzes.ts",
     "db:seed-commercial-floor-care-quiz": "npx tsx scripts/seed-commercial-floor-care-quiz.ts",
     "db:seed-ccw-truckmount-assessment": "npx tsx scripts/seed-ccw-truckmount-assessment.ts",
