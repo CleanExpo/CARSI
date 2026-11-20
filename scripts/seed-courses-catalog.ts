@@ -29,7 +29,10 @@ import { prisma } from '../src/lib/prisma';
 
 type PrismaTx = Parameters<Parameters<typeof prisma.$transaction>[0]>[0];
 import type { CatalogCourse, CoursesCatalogFile } from '../src/lib/seed/courses-catalog-types';
-import { COURSES_CATALOG_VERSION, isCoursesCatalogFile } from '../src/lib/seed/courses-catalog-types';
+import {
+  COURSES_CATALOG_VERSION,
+  isCoursesCatalogFile,
+} from '../src/lib/seed/courses-catalog-types';
 import { getApprovedCecHours } from '../src/lib/seed/cec-approvals';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -97,7 +100,29 @@ async function seedCourse(c: CatalogCourse, instructorOverride: string | undefin
     });
     const courseId = existing?.id ?? c.id;
 
-    await deleteCourseCurriculum(tx, courseId);
+    // A zero-module catalogue entry has nothing to put back, so there is nothing to make room
+    // for: DON'T DELETE AT ALL. The delete exists only to clear the way for the incoming
+    // curriculum, and an empty incoming curriculum needs no clearing.
+    //
+    // This replaces a count-then-check guard, which could not have worked. At READ COMMITTED a
+    // writer can commit a module after the count returns zero and before deleteCourseCurriculum
+    // reads the module list, and the helper would then delete it with no replacement. Guarding
+    // the call could only ever narrow that window; not making the call closes it by
+    // construction, for every isolation level, with no lock and no recount.
+    //
+    // The count below is for the LOG LINE only. A stale count misreports a number in a message;
+    // it cannot lose data, because nothing here deletes anything.
+    if (c.modules.length === 0) {
+      const populated = await tx.lmsModule.count({ where: { courseId } });
+      if (populated > 0) {
+        console.warn(
+          `  note: "${c.slug}" has no modules in the catalogue, so its ${populated} existing` +
+            ` module(s) were left untouched. Metadata only — curriculum was NOT replaced.`
+        );
+      }
+    } else {
+      await deleteCourseCurriculum(tx, courseId);
+    }
 
     const priceAud = new Prisma.Decimal(c.priceAud);
 
@@ -198,7 +223,9 @@ function seedScope(): { slug: string } | { all: true } {
   const envRaw = process.env.SEED_COURSE_SLUG;
   const flag = process.argv.find((a) => a.startsWith('--slug='));
   const refuse = (why: string): never => {
-    console.error(`refusing: ${why}. Seed one course with -- --slug=<slug>, or the whole catalogue with -- --all.`);
+    console.error(
+      `refusing: ${why}. Seed one course with -- --slug=<slug>, or the whole catalogue with -- --all.`
+    );
     process.exit(1);
   };
   if (envRaw !== undefined && !envRaw.trim()) refuse('blank SEED_COURSE_SLUG');
@@ -236,12 +263,88 @@ async function main() {
       console.error(`No course with slug "${onlySlug}" in ${CATALOG_PATH}.`);
       process.exit(1);
     }
-    console.log('No courses in catalog; nothing to seed. Run db:export-courses locally and commit JSON.');
+    console.log(
+      'No courses in catalog; nothing to seed. Run db:export-courses locally and commit JSON.'
+    );
     return;
   }
 
   const override = process.env.SEED_INSTRUCTOR_ID?.trim();
 
+  // PREFLIGHT: refuse a run in which a zero-module catalogue entry meets a populated course.
+  //
+  // READ THE REASON CAREFULLY, because it is no longer the obvious one. seedCourse now SKIPS the
+  // curriculum delete entirely for a zero-module entry, so such a seed is no longer destructive.
+  // What it is instead is a SILENT NO-OP: the course record updates, the existing curriculum is
+  // left exactly as it was, and the run prints "Seeded course: <slug>" over content it never
+  // touched. An operator who seeds a course and is told it succeeded will reasonably believe the
+  // database now matches the catalogue. For these 34 entries it does not and cannot.
+  //
+  // So this refuses in order to surface a CATALOGUE DEFECT, not to prevent a deletion.
+  //
+  // 34 of the 80 entries in this catalogue are metadata-only stubs with zero modules, recorded
+  // so the CEC approvals registry can reference them by slug; three carry an explicit
+  // seedWarning that seeding the slug "would replace the course curriculum in the target
+  // database with this empty stub".
+  //
+  // HISTORY, not current behaviour -- measured against a real database before any of this
+  // existed, and the reason the guards were written: seeding one stub slug deleted
+  // 1 module, 2 lessons and 2 learner progress rows, created nothing, and printed
+  // "Seeded course: <slug>" followed by "Done." A success message over total destruction.
+  // `--all` walks every entry, so it would do that to all 34 at once.
+  //
+  // The check is deliberately scoped to courses that HAVE curriculum right now. On a fresh or
+  // CI database a stub course has no modules, nothing is at risk, and this is a no-op — which is
+  // why it does not break the E2E seed step.
+  const emptying: Array<{ slug: string; modules: number; lessons: number; progress: number }> = [];
+  for (const c of courses) {
+    if (c.modules.length > 0) continue;
+    const existing = await prisma.lmsCourse.findUnique({
+      where: { slug: c.slug },
+      select: { modules: { select: { id: true, lessons: { select: { id: true } } } } },
+    });
+    const moduleIds = (existing?.modules ?? []).map((m) => m.id);
+    if (moduleIds.length === 0) continue;
+    const lessonIds = (existing?.modules ?? []).flatMap((m) => m.lessons.map((l) => l.id));
+    const progress = lessonIds.length
+      ? await prisma.lmsLessonProgress.count({ where: { lessonId: { in: lessonIds } } })
+      : 0;
+    emptying.push({
+      slug: c.slug,
+      modules: moduleIds.length,
+      lessons: lessonIds.length,
+      progress,
+    });
+  }
+  if (emptying.length > 0) {
+    console.error(
+      `\nrefusing: ${emptying.length} course(s) in this seed have NO modules in the catalogue but` +
+        ` DO have curriculum in this database.\n` +
+        `  Their curriculum is SAFE — seedCourse skips the delete for a zero-module entry. The\n` +
+        `  problem is the opposite one: seeding them cannot update that curriculum at all, so the\n` +
+        `  run would report "Seeded course" over content it never touched:\n`
+    );
+    for (const e of emptying) {
+      console.error(
+        `    ${e.slug}\n` +
+          `      would leave ${e.modules} module(s), ${e.lessons} lesson(s)` +
+          `, ${e.progress} learner progress row(s) untouched`
+      );
+    }
+    console.error(
+      `\n  These are metadata-only catalogue stubs. Fix the catalogue entries, or seed the` +
+        ` courses\n  you actually mean with -- --slug=<slug>. NOTHING has been written.\n` +
+        `\n  The safe importer refuses this too and explains per course:` +
+        `\n    npm run db:import-course -- --slug=<slug>\n`
+    );
+    process.exit(1);
+  }
+
+  // AFTER the preflight, deliberately. ensureInstructors upserts every catalogue instructor
+  // outside any course transaction, so running it first made the refusal above print
+  // "NOTHING has been written" when instructor rows had in fact already been committed. The
+  // preflight reads only lmsCourse and lmsLessonProgress, so it does not need them; the override
+  // check does, because on a fresh database that instructor exists only once this has run.
   await ensureInstructors(data);
 
   if (override) {

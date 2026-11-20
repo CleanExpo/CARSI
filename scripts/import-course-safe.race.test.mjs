@@ -207,13 +207,27 @@ if (!course) {
 }
 
 const ourCourseId = sql(`select id from lms_courses where slug='${SLUG}'`);
-const otherCourseId = sql(`select id from lms_courses where slug <> '${SLUG}' limit 1`);
+// Pick the rival course BY the thing the lesson case needs: a course that actually has a
+// module to hang a rival lesson on, chosen deterministically.
+//
+// `select id from lms_courses where slug <> ... limit 1` was wrong twice over. 34 of the 80
+// catalogue entries have no modules at all, and with no ORDER BY the row is arbitrary, so on a
+// freshly seeded database this landed on a module-less stub, the lesson case skipped, and the
+// suite reported PARTIAL. It passed earlier only because the arbitrary pick happened to have
+// modules — a flaky CI job, which is worse than a failing one.
+const otherCourseId = sql(
+  `select c.id from lms_courses c join lms_modules m on m.course_id = c.id
+   where c.slug <> '${SLUG}' order by c.slug, m.order_index limit 1`
+);
 if (!ourCourseId) {
   console.error(`FAIL: course "${SLUG}" is not in this database — seed it first.`);
   process.exit(1);
 }
 if (!otherCourseId) {
-  console.log('SKIPPED (not a pass): only one course in this database, so no rival owner exists.');
+  console.log(
+    'SKIPPED (not a pass): no other course in this database HAS a module, so there is no rival' +
+      '\n  owner to collide with. Seed the catalogue first.'
+  );
   process.exit(0);
 }
 const otherModuleId = sql(
