@@ -118,6 +118,34 @@ function importerAsync(...args) {
   };
 }
 
+/**
+ * Wait until PostgreSQL itself reports a backend parked on the course row we hold.
+ *
+ * Waiting for the CLI to print "applying (one transaction)" is NOT enough, and review was right
+ * to call that out: that line is printed before applyImport opens the transaction, so the marker
+ * plus a sleep proves only that the process had not exited -- it could be slow for any reason and
+ * the race would silently never happen. Measured on Postgres 16.15, a backend blocked on our
+ * FOR UPDATE reports exactly:
+ *
+ *   state=active  wait_event_type=Lock  wait_event=transactionid
+ *   query=INSERT INTO "public"."lms_courses" (...)
+ *
+ * which is the importer's own course upsert waiting on the lock holder's transaction id. That is
+ * the signal, and it means the importer is inside its transaction, past the ownership check and
+ * before the module and lesson upserts.
+ */
+async function waitUntilBlockedOnCourse(ms = 25000) {
+  const probe = `select count(*) from pg_stat_activity
+       where wait_event_type='Lock' and wait_event='transactionid'
+         and query ilike '%lms_courses%'`;
+  const deadline = Date.now() + ms;
+  while (sql(probe) === '0') {
+    if (Date.now() > deadline) return false;
+    await sleep(200);
+  }
+  return true;
+}
+
 /** Hold FOR UPDATE on a row until released. */
 function holdRowLock(lockSql) {
   const proc = spawn('psql', [URL, '-tA'], { stdio: ['pipe', 'pipe', 'pipe'] });
@@ -187,19 +215,27 @@ async function raceCase(target) {
 
   // RACE.
   target.makeAbsent();
+
+  // Sentinel for the ROLLBACK assertion. The importer's course upsert runs before the module and
+  // lesson upserts, so if the transaction aborted but that write stuck, the import would have
+  // partially committed. Proving the foreign row survived says nothing about that: this does.
+  // The catalogue title is written over this value on any successful import.
+  const sentinel = `SENTINEL-${Date.now()}`;
+  sql(`update lms_courses set title='${sentinel}' where id='${ourCourseId}'`);
+
   const lock = holdRowLock(`SELECT id FROM lms_courses WHERE id='${ourCourseId}' FOR UPDATE;`);
   let result;
   try {
     await lock.acquired();
     const run = importerAsync('--apply');
-    // Wait for the CLI to say it has passed planning and the ownership check and is now inside
-    // the transaction, rather than sleeping and hoping.
     await run.waitFor('applying (one transaction)');
-    await sleep(1500);
+    // Then wait for POSTGRES to confirm the wait, not for a sleep to elapse.
+    const blocked = await waitUntilBlockedOnCourse();
     check(
-      'importer is blocked mid-transaction when the rival writes',
-      run.alive,
-      'it finished first, so the race never happened and the result below is meaningless'
+      'importer is confirmed by Postgres to be blocked on the course row',
+      blocked && run.alive,
+      'no backend was waiting on our lock, so the race never happened and everything below' +
+        ' would be measuring nothing'
     );
     target.rivalCreates();
     lock.release();
@@ -218,6 +254,11 @@ async function raceCase(target) {
     `race: the other course KEEPS the ${target.kind}`,
     target.ownerOf() === otherCourseId,
     `owner is now ${target.ownerOf()} (ours is ${ourCourseId})`
+  );
+  check(
+    'race: the earlier course write ROLLED BACK (sentinel intact)',
+    sql(`select title from lms_courses where id='${ourCourseId}'`) === sentinel,
+    'the course upsert committed while the transaction aborted — a PARTIAL import'
   );
 
   // Restore: drop the rival row and let a clean import rebuild the curriculum.
