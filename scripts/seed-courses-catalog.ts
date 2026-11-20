@@ -29,7 +29,10 @@ import { prisma } from '../src/lib/prisma';
 
 type PrismaTx = Parameters<Parameters<typeof prisma.$transaction>[0]>[0];
 import type { CatalogCourse, CoursesCatalogFile } from '../src/lib/seed/courses-catalog-types';
-import { COURSES_CATALOG_VERSION, isCoursesCatalogFile } from '../src/lib/seed/courses-catalog-types';
+import {
+  COURSES_CATALOG_VERSION,
+  isCoursesCatalogFile,
+} from '../src/lib/seed/courses-catalog-types';
 import { getApprovedCecHours } from '../src/lib/seed/cec-approvals';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -198,7 +201,9 @@ function seedScope(): { slug: string } | { all: true } {
   const envRaw = process.env.SEED_COURSE_SLUG;
   const flag = process.argv.find((a) => a.startsWith('--slug='));
   const refuse = (why: string): never => {
-    console.error(`refusing: ${why}. Seed one course with -- --slug=<slug>, or the whole catalogue with -- --all.`);
+    console.error(
+      `refusing: ${why}. Seed one course with -- --slug=<slug>, or the whole catalogue with -- --all.`
+    );
     process.exit(1);
   };
   if (envRaw !== undefined && !envRaw.trim()) refuse('blank SEED_COURSE_SLUG');
@@ -236,7 +241,9 @@ async function main() {
       console.error(`No course with slug "${onlySlug}" in ${CATALOG_PATH}.`);
       process.exit(1);
     }
-    console.log('No courses in catalog; nothing to seed. Run db:export-courses locally and commit JSON.');
+    console.log(
+      'No courses in catalog; nothing to seed. Run db:export-courses locally and commit JSON.'
+    );
     return;
   }
 
@@ -250,6 +257,64 @@ async function main() {
       console.error(`SEED_INSTRUCTOR_ID=${override} not found. Create that user or omit override.`);
       process.exit(1);
     }
+  }
+
+  // PREFLIGHT: refuse any course whose catalogue entry would empty a populated curriculum.
+  //
+  // 34 of the 80 entries in this catalogue are metadata-only stubs with zero modules, recorded
+  // so the CEC approvals registry can reference them by slug; three carry an explicit
+  // seedWarning that seeding the slug "would replace the course curriculum in the target
+  // database with this empty stub". seedCourse calls deleteCourseCurriculum unconditionally and
+  // then creates c.modules, so for a stub that is a delete with no corresponding create.
+  //
+  // Measured against a real database before this guard existed: seeding one stub slug deleted
+  // 1 module, 2 lessons and 2 learner progress rows, created nothing, and printed
+  // "Seeded course: <slug>" followed by "Done." A success message over total destruction.
+  // `--all` walks every entry, so it would do that to all 34 at once.
+  //
+  // The check is deliberately scoped to courses that HAVE curriculum right now. On a fresh or
+  // CI database a stub course has no modules, nothing is at risk, and this is a no-op — which is
+  // why it does not break the E2E seed step.
+  const emptying: Array<{ slug: string; modules: number; lessons: number; progress: number }> = [];
+  for (const c of courses) {
+    if (c.modules.length > 0) continue;
+    const existing = await prisma.lmsCourse.findUnique({
+      where: { slug: c.slug },
+      select: { modules: { select: { id: true, lessons: { select: { id: true } } } } },
+    });
+    const moduleIds = (existing?.modules ?? []).map((m) => m.id);
+    if (moduleIds.length === 0) continue;
+    const lessonIds = (existing?.modules ?? []).flatMap((m) => m.lessons.map((l) => l.id));
+    const progress = lessonIds.length
+      ? await prisma.lmsLessonProgress.count({ where: { lessonId: { in: lessonIds } } })
+      : 0;
+    emptying.push({
+      slug: c.slug,
+      modules: moduleIds.length,
+      lessons: lessonIds.length,
+      progress,
+    });
+  }
+  if (emptying.length > 0) {
+    console.error(
+      `\nrefusing: ${emptying.length} course(s) in this seed have NO modules in the catalogue but` +
+        ` DO have curriculum in this database.\n` +
+        `  Seeding them would delete that curriculum and create nothing:\n`
+    );
+    for (const e of emptying) {
+      console.error(
+        `    ${e.slug}\n` +
+          `      would delete ${e.modules} module(s), ${e.lessons} lesson(s)` +
+          `, ${e.progress} learner progress row(s)`
+      );
+    }
+    console.error(
+      `\n  These are metadata-only catalogue stubs. Fix the catalogue entries, or seed the` +
+        ` courses\n  you actually mean with -- --slug=<slug>. NOTHING has been written.\n` +
+        `\n  The safe importer refuses this too and explains per course:` +
+        `\n    npm run db:import-course -- --slug=<slug>\n`
+    );
+    process.exit(1);
   }
 
   for (const c of courses) {

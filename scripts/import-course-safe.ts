@@ -114,6 +114,21 @@ export type ImportPlan = {
    * would silently move that row out of B. Never a legitimate import; always refused.
    */
   foreignIds: string[];
+  /**
+   * True when the incoming course has NO modules at all while the database has some, i.e. this
+   * import would leave the course with no curriculum whatsoever.
+   *
+   * This is not hypothetical. 34 of the 80 entries in data/seed/courses-catalog.json are
+   * metadata-only stubs with zero modules, recorded so the CEC approvals registry can reference
+   * them by slug; three carry an explicit seedWarning saying a seed of that slug "would replace
+   * the course curriculum in the target database with this empty stub". Measured against a real
+   * database, importing one of those slugs deleted a module, two lessons and two progress rows
+   * and created nothing.
+   *
+   * The progress guard alone does NOT cover this: with no learner progress attached, the import
+   * ran clean and printed "curriculum now matches the catalogue" while destroying the lot.
+   */
+  emptiesCurriculum: boolean;
 };
 
 /**
@@ -164,6 +179,7 @@ export async function planImport(course: Course): Promise<ImportPlan> {
     slug: course.slug,
     courseExists: Boolean(existing),
     foreignIds: [...foreignModules.map((m) => m.id), ...foreignLessons.map((l) => l.id)],
+    emptiesCurriculum: incomingModuleIds.size === 0 && existingModuleIds.size > 0,
     moduleAdds: [...incomingModuleIds].filter((id) => !existingModuleIds.has(id)),
     moduleUpdates: [...incomingModuleIds].filter((id) => existingModuleIds.has(id)),
     moduleRemovals: [...existingModuleIds].filter((id) => !incomingModuleIds.has(id)),
@@ -433,12 +449,37 @@ async function main() {
 
   const apply = has('apply');
   const allowProgressLoss = has('allow-progress-loss');
+  const allowEmptyCurriculum = has('allow-empty-curriculum');
   const plan = await planImport(course);
 
-  // Decide BEFORE printing. An earlier version printed "applying..." and then refused, which
-  // reads as though a write had already begun.
+  // An import that would leave the course with NO curriculum is refused. The progress guard does
+  // not cover it: measured against a real database, a stub import with no learner progress
+  // attached ran clean and printed "curriculum now matches the catalogue" while deleting a module
+  // and two lessons. 34 of 80 catalogue entries are metadata-only stubs, so this is the ordinary
+  // case, not the exotic one.
+  //
+  // Unlike a foreign id, emptying a course is conceivably deliberate one day, so there is a flag
+  // rather than a flat refusal -- but it is not --allow-progress-loss. Losing progress and
+  // deleting an entire curriculum are different decisions and must be consented to separately.
+  const emptyBlocked = apply && plan.emptiesCurriculum && !allowEmptyCurriculum;
   const blocked = apply && plan.progressAtRisk > 0 && !allowProgressLoss;
-  printPlan(plan, plan.foreignIds.length || blocked ? 'blocked' : apply ? 'applying' : 'dry-run');
+  printPlan(
+    plan,
+    plan.foreignIds.length || blocked || emptyBlocked ? 'blocked' : apply ? 'applying' : 'dry-run'
+  );
+
+  // Say it in the dry run too, so the plan is never read as safe by someone who only looks at
+  // the counts. The run is not refused here -- a preview that refuses to preview is useless --
+  // but it cannot be quiet about it either.
+  if (plan.emptiesCurriculum && !apply) {
+    console.log(
+      `\n  WARNING: the catalogue has NO modules for "${plan.slug}", so applying this would\n` +
+        `  delete its entire curriculum (${plan.moduleRemovals.length} module(s), ` +
+        `${plan.lessonRemovals.length} lesson(s)) and create nothing.\n` +
+        `  34 of the catalogue's entries are metadata-only stubs. If this is one of them, this\n` +
+        `  is a catalogue defect, not an import. --apply will refuse.`
+    );
+  }
 
   // Never consentable: these ids belong to another course, so there is no version of this
   // import that is correct. Refused in dry run too, so the plan is never shown as safe.
@@ -447,6 +488,16 @@ async function main() {
       `${plan.foreignIds.length} incoming id(s) already belong to a different course:\n` +
         plan.foreignIds.map((id) => `    ${id}`).join('\n') +
         `\n  Importing would move them out of that course. Fix the catalogue ids.`
+    );
+  }
+  if (emptyBlocked) {
+    die(
+      `the catalogue has NO modules for "${plan.slug}", so this import would delete the\n` +
+        `  course's ENTIRE curriculum (${plan.moduleRemovals.length} module(s), ` +
+        `${plan.lessonRemovals.length} lesson(s)) and create nothing.\n` +
+        `  This is what a metadata-only catalogue stub does to a populated database, and 34 of\n` +
+        `  the catalogue's 80 entries are such stubs. Fix the catalogue entry, or pass\n` +
+        `  --allow-empty-curriculum if emptying this course really is the intention.`
     );
   }
   if (blocked) {
