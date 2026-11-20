@@ -336,15 +336,15 @@ export function CcwBusinessCoachingClient({ checkoutEnabled }: { checkoutEnabled
           <div>
             <p className="text-sm font-semibold text-slate-900">Hands-on carpet workshop</p>
             <p className="mt-1 text-sm text-slate-600">
-              Two-day CCW fibre &amp; chemistry workshop — participant pack lives on a separate
-              page.
+              Two-day CARSI fibre &amp; chemistry workshop. The online course and participant
+              manual live on a separate page.
             </p>
           </div>
           <Link
             href={carsiCoachingWorkshopPath}
             className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-[#146fc2] shadow-sm transition hover:border-[#2490ed]/40"
           >
-            CCW workshop materials
+            CARSI workshop materials
             <ArrowRight className="h-4 w-4" aria-hidden />
           </Link>
         </div>

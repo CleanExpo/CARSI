@@ -10,6 +10,11 @@ import { decideEnrollmentCompleted } from '@/lib/server/lms-completion';
 import { isEnrolmentAccessAllowed, isRevokedStatus } from '@/lib/server/enrollment-access';
 import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
 import {
+  isAdminClaims,
+  isInstructorClaims,
+  shouldStaffAutoEnrol,
+} from '@/lib/server/carsi-workshop-access';
+import {
   isAdminOverridePaymentReference,
   isStripeCheckoutPaymentReference,
 } from '@/lib/lms/course-prerequisites';
@@ -203,6 +208,25 @@ export async function getCourseIdForLesson(lessonId: string): Promise<string | n
     select: { module: { select: { courseId: true } } },
   });
   return lesson?.module.courseId ?? null;
+}
+
+/**
+ * Staff access for a lesson: admins (any course) and instructors (allow-listed courses only,
+ * see `carsi-workshop-access.ts`) receive a no-purchase enrolment before the normal
+ * enrolment check runs. Everyone else is untouched and must hold their own enrolment.
+ */
+export async function ensureStaffEnrollmentForLesson(
+  claims: SessionClaims,
+  lessonId: string
+): Promise<void> {
+  if (!isAdminClaims(claims) && !isInstructorClaims(claims)) return;
+  const lesson = await prisma.lmsLesson.findUnique({
+    where: { id: lessonId },
+    select: { module: { select: { course: { select: { id: true, slug: true } } } } },
+  });
+  const course = lesson?.module.course;
+  if (!course || !shouldStaffAutoEnrol(claims, course.slug)) return;
+  await ensureAdminEnrollmentForCourse(claims, course.id);
 }
 
 async function lessonTotalsForCourse(courseId: string): Promise<{ ids: string[]; total: number }> {

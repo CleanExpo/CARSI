@@ -12208,6 +12208,829 @@
      ]
     }
    ]
+  },
+  {
+   "id": "511b348a-c96b-4e41-a1ee-cc9215827b4b",
+   "slug": "ccw-2-day-workshop",
+   "title": "CARSI Carpet Cleaning Workshop (2-Day)",
+   "description": "A two-day, hands-on carpet and upholstery cleaning workshop run by CARSI on the Sydney roadshow, 30 to 31 July 2026. Day 1 covers safety and standards, fibre science, cleaning chemistry, the five cleaning principles and spot and stain removal. Day 2 covers upholstery fabric and construction, upholstery methods, hard-floor inspection and cleaning, machinery maintenance, the business of cleaning and a seven-role expert case review. Four follow-on modules cover advanced stain removal, strip and seal, add-on services and marketing. Every module is taught at three levels, Newby, Intermediate and Pro, with a quiz for each. Attending both days earns a CARSI certificate of attendance. This workshop carries no IICRC CECs. Delivered on the CARSI roadshow with partner venue Carpet Cleaners Warehouse (CCW).",
+   "shortDescription": "CARSI two-day hands-on carpet and upholstery cleaning workshop: fibre, chemistry, the five cleaning principles, stains, upholstery, hard floors, machinery and business. Delivered on the CARSI roadshow with partner venue Carpet Cleaners Warehouse (CCW).",
+   "thumbnailUrl": "/images/courses/upholstery-cleaning.webp",
+   "instructorId": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+   "status": "unlisted",
+   "priceAud": "0",
+   "isFree": true,
+   "durationHours": 14,
+   "level": "Practitioner",
+   "category": "Carpet & Upholstery Cleaning",
+   "tags": [
+    "carpet cleaning",
+    "upholstery cleaning",
+    "hard floors",
+    "spot and stain removal",
+    "machinery maintenance",
+    "business of cleaning",
+    "workshop",
+    "roadshow",
+    "Australian configuration"
+   ],
+   "iicrcDiscipline": null,
+   "cecHours": 0,
+   "meta": {
+    "designation": null,
+    "programme": "CARSI Business Growth Days",
+    "access": "Free for eligible CARSI roadshow attendees and authorised CARSI instructors. Not listed in the public catalogue.",
+    "partnerCredit": "Roadshow partner: Carpet Cleaners Warehouse (CCW) \u2014 venue host and equipment supplier",
+    "cec": "No IICRC CECs. This workshop names commercial products, so it is not submitted for CEC approval. Attending both days earns a CARSI certificate of attendance.",
+    "sources": [
+     "CARSI_Participant_Manual (Participant Take-Home Manual, 40 pages, Modules 1-11 and appendices)",
+     "CARSI_CCW_Product_Guide (How-To, dilutions and SDS links)",
+     "CARSI_2Day_CCW_Deck.pptx (trainer deck, 42 slides, slide text and speaker notes)",
+     "docs/course-content/ccw-workshop/09-machine-maintenance-schedules.md",
+     "docs/course-content/ccw-workshop/12-advanced-stain-removal.md",
+     "docs/course-content/ccw-workshop/13-strip-and-seal.md",
+     "docs/course-content/ccw-workshop/14-add-on-services.md",
+     "docs/course-content/ccw-workshop/15-marketing-engine.md",
+     "docs/course-content/ccw-workshop/quizzes-answer-key.md",
+     "docs/course-content/ccw-workshop/substantiation-ledger.md (claims marked CUT were not reused)"
+    ],
+    "productAvailabilityChecked": "April 2026 (CARSI x CCW Product Guide); machine specifications July 2026 (expansion pack ledger); not re-checked 20/11/2026"
+   },
+   "isPublished": false,
+   "modules": [
+    {
+     "id": "63c2975d-5a0d-5313-ba25-cd299a231ad8",
+     "title": "Module 1: Welcome to the Workshop: Safety and Standards",
+     "orderIndex": 0,
+     "lessons": [
+      {
+       "id": "5dae753d-99ef-59c2-9012-322da4350fc0",
+       "title": "How the two days run",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Describe what you will do on Day 1 and Day 2 and why the course is hands-on.</li><li>Place yourself at the Newby, Intermediate or Pro level and say what you want from each module.</li><li>Explain what the certificate of attendance needs.</li></ul><p>This is a workshop, not a lecture. By the end of Day 2 you will have done every core technique at least once with a trainer watching. The course is CARSI original material, taught by Phill McGurk, and the take-home manual is a CARSI document. It refers to published standards but does not copy them.</p><h3>The two days</h3><table><thead><tr><th>Day</th><th>Module</th><th>Time allowed</th></tr></thead><tbody><tr><td>Day 1</td><td>Module 1: Welcome to the Workshop: Safety and Standards</td><td>60 minutes</td></tr><tr><td>Day 1</td><td>Module 2: Fibre Science</td><td>75 minutes</td></tr><tr><td>Day 1</td><td>Module 3: Chemistry of Cleaning</td><td>90 minutes</td></tr><tr><td>Day 1</td><td>Module 4: The Five Cleaning Principles (hands-on)</td><td>105 minutes</td></tr><tr><td>Day 1</td><td>Module 5: Spot and Stain Removal</td><td>105 minutes</td></tr><tr><td>Day 2</td><td>Module 6: Upholstery Theory: Fibre and Fabric Construction</td><td>90 minutes</td></tr><tr><td>Day 2</td><td>Module 7: Upholstery Hands-On</td><td>135 minutes</td></tr><tr><td>Day 2</td><td>Module 8: Hard Floors</td><td>75 minutes</td></tr><tr><td>Day 2</td><td>Module 9: Machinery and Preventive Maintenance</td><td>90 minutes</td></tr><tr><td>Day 2</td><td>Module 10: The Business of Cleaning</td><td>60 minutes</td></tr><tr><td>Day 2</td><td>Module 11: Expert Board Case Review</td><td>45 minutes</td></tr></tbody></table><p>Modules 12 to 15 in this course go further on stains, then strip and seal, then add-on services and marketing. They are written for you to read after the workshop days.</p><h3>Three levels in every module</h3><ul><li><strong>Newby:</strong> under 12 months in the industry. You are learning the vocabulary, the safe defaults and the five cleaning principles.</li><li><strong>Intermediate:</strong> one to five years on the tools, with formal training behind you. You are ready for chemistry choices and for working out why a job went wrong.</li><li><strong>Pro:</strong> five years or more. You are working on edge cases, pricing, inspection-grade judgement and training other people.</li></ul><p>Every module ends with a take-away for each level. Read all three and ask where you actually are, not where you would like to be. Being honest about it is the fastest way to improve.</p><h3>How the figures in this course are labelled</h3><p>Where a number comes from a published source, the lesson says so. Where it is CARSI professional judgement, such as a rule of thumb from the trainer, the lesson says that instead. Nothing here is invented to fill a gap.</p><h3>The certificate</h3><p>Attending both days earns a CARSI certificate of attendance. You need to be checked in on Day 1 and again on Day 2. The workshop does not carry IICRC CECs.</p>",
+       "orderIndex": 0,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "9135a719-39ec-5050-b5c8-dab91c70315b",
+       "title": "Standards and your scope of work",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Name the IICRC standard that covers each kind of work in the table.</li><li>Say which jobs a carpet technician takes on and which ones to document and refer.</li><li>Explain the water category stop rule.</li></ul><p>The IICRC publishes a family of ANSI consensus standards that mark out professional scope for carpet and textile floor coverings and for restoration work. Knowing which one governs a job is the first step to working inside your scope, and to knowing when to call a specialist.</p><table><thead><tr><th>Standard</th><th>Covers</th><th>Your role as a carpet technician</th></tr></thead><tbody><tr><td>ANSI/IICRC S100</td><td>Cleaning of textile floor coverings</td><td>Primary reference for carpet cleaning</td></tr><tr><td>ANSI/IICRC S300</td><td>Upholstery cleaning</td><td>Primary reference for fabric and soft furniture</td></tr><tr><td>ANSI/IICRC S220</td><td>Inspection of hard-surface floors</td><td>Inspection scope for tile, stone, resilient floors and timber</td></tr><tr><td>ANSI/IICRC S500</td><td>Water damage restoration</td><td>Recognise Category 1, Category 2 and Category 3 water and know when to stop</td></tr><tr><td>ANSI/IICRC S520</td><td>Mould remediation</td><td>Recognise visible mould. It is outside this workshop's scope</td></tr><tr><td>ANSI/IICRC S540</td><td>Trauma and crime-scene cleaning</td><td>Not within a carpet technician's scope without the right credentials</td></tr><tr><td>ANSI/IICRC S700</td><td>Fire and smoke restoration</td><td>Soot on carpet: refer to a restorer</td></tr><tr><td>ANSI/IICRC S800</td><td>Inspection of textile floor coverings</td><td>The inspector's scope. You support it with documentation</td></tr></tbody></table><p>This table is a CARSI summary of scope. For the definitive wording, buy and read the standards from the IICRC.</p><h3>Why cite a standard at all</h3><p>A technician who can say \"I followed the published standard for this job and wrote down what I did\" is in a far stronger position than one who says \"that is how I have always done it\". That is professional judgement, not a legal rule, but it holds up on every complaint you will ever deal with.</p><h3>Know when to stop</h3><p>You can clean after a Category 1 (clean water) intrusion within your scope. Category 2 (grey water with significant contamination) and Category 3 (grossly contaminated water, for example sewage) need restorers trained to the water damage standard. If you are in doubt, stop, then photograph it, write it up and refer it. Working outside your scope is a liability, not a favour to the customer.</p>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "b54666c8-9829-532e-9880-f33f7ba02b5c",
+       "title": "Safety you do not negotiate",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>List the personal protective equipment for chemical work and for truck-mount work.</li><li>State what you must carry for every chemical you use.</li><li>Explain the electrical and slip controls on a wet job.</li></ul><p>Every cleaner handles chemicals. The alkaline pre-spray that lifts grease from a commercial carpet can blister skin on contact and hurt your lungs if you breathe the mist for an hour. Safety is the first skill of the trade.</p><h3>Personal protective equipment</h3><ul><li>Nitrile gloves for chemical handling, as a minimum. Replace them when they tear.</li><li>Safety glasses when you spray overhead or use a high-pressure wand.</li><li>A P2 respirator when you atomise stronger alkalines or use dry compounds.</li><li>Closed-toe, non-slip footwear on every job.</li><li>Hearing protection around a running truck-mount. The manual puts typical levels at 85 dBA and above.</li></ul><h3>Hazardous chemicals</h3><ul><li>Keep a Safety Data Sheet (SDS) in the vehicle for every chemical you use. In most Australian jurisdictions the WHS regulations require one on site for each hazardous chemical in use.</li><li>Label every decanted container with the product, the hazard and the date.</li><li>Write an exposure control plan that lists the likely exposures and the protective equipment for each task.</li><li>Know the first aid section of the SDS by heart. Phone the Poisons Information Centre on 13 11 26 if someone is exposed.</li></ul><h3>Electrical, water, slips and heat</h3><ul><li>Plug portable extractors into a circuit protected by an RCD (safety switch). Press the test button at the start of every job.</li><li>Portable electrical equipment should be tested and tagged to AS/NZS 3760 on its schedule.</li><li>Run cables along walls and put up signs and door wedges to manage trips.</li><li>Put out \"Wet Floor\" signs until the floor meets its drying target (see Module 4).</li><li>Watch for heat stress in hot, strenuous work and rotate people through the hands-on stations.</li></ul><h3>New Zealand</h3><p>In New Zealand the Health and Safety at Work Act 2015 and WorkSafe New Zealand apply in place of the Australian WHS laws and regulators. Where this course names an Australian regulator or rule, check the New Zealand position on worksafe.govt.nz, and on epa.govt.nz for hazardous substances, before you rely on it. The AS/NZS standards, 230 V and 50 Hz supply and metric units are the same on both sides of the Tasman.</p><h3>Take-aways by experience level</h3><ul><li><strong>Newby:</strong> Know the standard families and which one covers which job. Know which protective equipment goes on before which chemistry.</li><li><strong>Intermediate:</strong> Know which standard governs the scope of work. Build an exposure control plan for your own business.</li><li><strong>Pro:</strong> Understand how a published recommendation differs from a requirement, and how standards are revised over time.</li></ul>",
+       "orderIndex": 2,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "df727d0b-deca-5ffc-bcda-664444a91979",
+       "title": "Module 1 Knowledge Check: Welcome to the Workshop: Safety and Standards",
+       "contentType": "quiz",
+       "contentBody": "9e556294-9c3b-529e-a9cf-80f2c5936887",
+       "orderIndex": 3,
+       "isPreview": false,
+       "resources": [
+        {
+         "label": "Module 1 Knowledge Check: Welcome to the Workshop: Safety and Standards",
+         "url": "quiz:9e556294-9c3b-529e-a9cf-80f2c5936887"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "4dfc5620-9cc9-526e-b434-c9d52077a7fe",
+     "title": "Module 2: Fibre Science",
+     "orderIndex": 1,
+     "lessons": [
+      {
+       "id": "18890080-0a4b-5427-9757-ce497c3ed0b5",
+       "title": "The three fibre families",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Sort the common carpet and upholstery fibres into synthetic, protein or cellulosic families.</li><li>Say why fibre identification comes before any other decision.</li></ul><p>Fibre identification is the highest-value skill in carpet cleaning. Every later choice, from chemistry to temperature to agitation to drying, is limited by the fibre in front of you. Get it wrong and you will either under-clean the job or damage the fibre beyond repair.</p><h3>Synthetic (petroleum-based, mostly)</h3><ul><li><strong>Nylon 6 and nylon 6,6:</strong> the dominant residential and commercial fibre. Resilient, takes dye well and is sensitive to pH.</li><li><strong>Polyester (PET):</strong> low cost, hydrophobic, strong stain resistance and poor resilience.</li><li><strong>Triexta:</strong> corn-derived, with built-in stain resistance.</li><li><strong>Olefin (polypropylene):</strong> solution-dyed, so the colour runs right through. Poor resilience and a low heat tolerance.</li><li><strong>Acrylic:</strong> imitates wool and is less common in modern carpet.</li></ul><h3>Protein (animal)</h3><ul><li><strong>Wool:</strong> a warm hand, self-extinguishing, prefers acidic chemistry and must never be over-wetted.</li><li><strong>Silk:</strong> very sensitive to moisture and to alkaline chemistry. Inspect and refer antique pieces.</li></ul><h3>Cellulosic (plant)</h3><p>Cotton, linen, rayon, acetate, jute, sisal, coir. Rayon can lose up to 70 per cent of its strength when wet, so keep moisture and agitation low.</p>",
+       "orderIndex": 0,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "3bcad3b1-b458-5e69-9561-904fbddffb73",
+       "title": "Identifying a fibre: hand, then burn, then float",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Run the field sequence of hand-feel, burn test and float test on a tuft.</li><li>Read the result against the burn table and the field card.</li></ul><p>In the field the reliable order is hand-feel first, then a burn test to confirm. A burn test on a single tuft taken from an inconspicuous spot is decisive. Pluck the tuft over a non-flammable surface, keep chemicals well away, and have water to hand. That precaution is CARSI practice, not a figure from a standard.</p><table><thead><tr><th>Fibre</th><th>Burn behaviour</th><th>Hand and odour</th></tr></thead><tbody><tr><td>Wool</td><td>Burns slowly, self-extinguishes, leaves crushable black ash</td><td>Warm and springy, burnt-hair smell</td></tr><tr><td>Silk</td><td>Burns slowly, similar to wool, faint smell</td><td>Smooth, cool, slight lustre</td></tr><tr><td>Cotton or linen</td><td>Burns freely with an afterglow, fluffy grey ash</td><td>Matte, soaks up water at once</td></tr><tr><td>Rayon</td><td>Burns like cotton, very fast</td><td>Soft, weakens badly when wet</td></tr><tr><td>Nylon</td><td>Melts and burns, leaves a hard grey or tan bead, celery-like smell</td><td>Resilient, springs back</td></tr><tr><td>Polyester</td><td>Melts and burns, leaves a hard black bead, sweet smell</td><td>Smooth, low resilience</td></tr><tr><td>Olefin</td><td>Melts then burns, sooty smoke, waxy smell</td><td>Waxy hand, even solution-dyed colour</td></tr></tbody></table><h3>The field card, step by step</h3><ol><li><strong>Hand-feel.</strong> A warm, springy, slightly oily feel suggests wool. A smooth, cool, lustrous feel suggests silk or rayon. Waxy with even colour suggests olefin. Springing back suggests nylon.</li><li><strong>Burn one tuft.</strong> Self-extinguishing with a burnt-hair smell points to wool or silk. A hard grey bead with a celery smell is nylon. A hard black bead with a sweet smell is polyester. Sooty smoke with a waxy smell is olefin. Paper-like fluffy ash is cotton or another cellulosic.</li><li><strong>Float a fibre in cool water.</strong> If it floats, it is olefin. Most other fibres sink.</li></ol><p>On day one you will rotate through the burn and float stations, plus solubility and hand-feel so you can feel the differences, not just read about them.</p>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "b6152fc4-4df7-5f9a-ab25-95b94d0ae9c0",
+       "title": "The fibre fence and the weakest-member rule",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Read the pH limit, the temperature limit and the agitation tolerance for each fibre from the table.</li><li>Apply the weakest-member rule to a blended fibre.</li></ul><p>Every fibre has a chemistry fence. Cross it and you damage the fibre. The table below is CARSI's rule-of-thumb starting point. Always check the manufacturer's care instructions when you can get them.</p><table><thead><tr><th>Fibre</th><th>pH range</th><th>Maximum water temperature</th><th>Agitation tolerance</th></tr></thead><tbody><tr><td>Nylon</td><td>5.5 to 10 (never above 10)</td><td>60 to 80 \u00b0C</td><td>Medium to high</td></tr><tr><td>Polyester</td><td>5.5 to 10</td><td>60 to 80 \u00b0C</td><td>Medium</td></tr><tr><td>Triexta</td><td>5.5 to 10</td><td>60 to 80 \u00b0C</td><td>Medium to high</td></tr><tr><td>Olefin</td><td>5.5 to 10</td><td>60 \u00b0C maximum (low melt point)</td><td>Medium</td></tr><tr><td>Wool</td><td>4.5 to 8 (acidic preferred)</td><td>40 \u00b0C maximum</td><td>Low</td></tr><tr><td>Silk</td><td>4.5 to 7.5</td><td>Ambient to 35 \u00b0C</td><td>Very low</td></tr><tr><td>Rayon</td><td>Neutral, 6 to 8</td><td>Ambient to 35 \u00b0C</td><td>Very low (loses strength when wet)</td></tr><tr><td>Cotton</td><td>6 to 9</td><td>Ambient to 50 \u00b0C</td><td>Low to medium</td></tr></tbody></table><h3>The weakest-member rule</h3><p>On a blend, the more delicate fibre decides the chemistry. Treat an 80 per cent wool, 20 per cent nylon blend as wool. A 50/50 silk and cotton drapery is silk for pH purposes.</p><h3>Common mistake</h3><p>Cleaning an unlabelled rug with a nylon-strength pre-spray and hot water because the pile \"looks like nylon\". If you have not burn-tested it, assume the more delicate fibre until you have proved otherwise.</p><h3>Take-aways by experience level</h3><ul><li><strong>Newby:</strong> Name five fibres by sight and burn test. Know that wool and nylon need different chemistry.</li><li><strong>Intermediate:</strong> Map fibre to its pH range, temperature limit and agitation tolerance on any carpet in the field. Spot-test rayon before you wet it.</li><li><strong>Pro:</strong> Call the weakest-member rule on blends and explain why cationic surfactants damage the dye blockers on nylon.</li></ul>",
+       "orderIndex": 2,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "5f2d0b5d-9ad0-568b-9a9f-b1df8acf0c9f",
+       "title": "Module 2 Knowledge Check: Fibre Science",
+       "contentType": "quiz",
+       "contentBody": "b2d367f6-4c93-5411-8c51-ee40c0e77f3e",
+       "orderIndex": 3,
+       "isPreview": false,
+       "resources": [
+        {
+         "label": "Module 2 Knowledge Check: Fibre Science",
+         "url": "quiz:b2d367f6-4c93-5411-8c51-ee40c0e77f3e"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "7a43d425-5739-5bb9-b133-3e553726dad5",
+     "title": "Module 3: Chemistry of Cleaning",
+     "orderIndex": 2,
+     "lessons": [
+      {
+       "id": "566fbd69-455e-530a-bea3-ea2a012f4014",
+       "title": "pH in practice and the two rules you do not break",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Place a product in the right pH zone and say what it is for.</li><li>State the nylon pH ceiling and the wool finish rule.</li><li>Check a final rinse with a pH strip the right way.</li></ul><p>The pH scale runs from 0 to 14. CARSI uses practical zones, written as our own working guide.</p><table><thead><tr><th>Zone</th><th>pH range</th><th>Practical meaning</th></tr></thead><tbody><tr><td>Strong acid</td><td>0 to 3</td><td>Rust removers and acidic dye-set products. Use with care</td></tr><tr><td>Mild acid</td><td>4 to 6</td><td>Wool finish rinses and general acidic neutralisers</td></tr><tr><td>Neutral</td><td>6 to 8</td><td>Test default, safe on most fibres</td></tr><tr><td>Mild alkaline</td><td>8 to 10</td><td>General pre-spray zone for synthetic fibres</td></tr><tr><td>Strong alkaline</td><td>Above 10</td><td>Degreasers. Never go above 10 on nylon</td></tr></tbody></table><h3>Two rules you do not break</h3><ul><li><strong>Nylon pH ceiling: 10.</strong> Go over it and you strip the acid-dye sites, which shows up as colour loss.</li><li><strong>Wool finish: acidic, pH 4.5 to 6.5.</strong> Skip it and you yellow the wool and roughen the hand.</li></ul><h3>Read the substrate, not the bottle</h3><p>A pH strip dipped in the pre-spray bottle tells you about the bottle. A damp strip pressed to the cleaned carpet tells you what the fibre is actually holding. The two numbers can be 1.0 to 2.0 units apart, because fibres such as wool and cotton buffer acid and alkaline differently. Your callback risk sits in the second number.</p><h3>Final rinse target</h3><p>Aim for a final substrate pH of 6.5 to 8.0. That helps prevent re-soiling, browning or yellowing. Press a fresh strip to a damp spot after extraction. It takes 15 seconds. If the reading is outside the range, re-rinse with a matched pH-correcting product.</p>",
+       "orderIndex": 0,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "ed9251eb-129e-5bc8-9fd9-088f70ac7369",
+       "title": "Surfactants, soil classes and CHAT",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Name the four surfactant families and one thing each is used for.</li><li>Sort soil into its three classes and name the first action for each.</li><li>Trade one CHAT dial against another for a given job.</li></ul><h3>Surfactant families</h3><p>A surfactant is the bridge between water and soil. The one you choose affects cleaning power, residue, re-soiling and how well it sits with the fibre's dye system.</p><ul><li><strong>Anionic:</strong> the workhorse. Strong detergency and good foam. It can leave a sticky residue if rinsed badly.</li><li><strong>Cationic:</strong> disinfecting and antistatic. It damages the acid-dye blockers on nylon, so avoid it on nylon carpet.</li><li><strong>Non-ionic:</strong> low foaming and good with solvents. Common in pre-sprays.</li><li><strong>Amphoteric:</strong> changes charge with pH. Gentle, and used in wool-safe formulas.</li></ul><h3>Soil classes</h3><ul><li><strong>Water-soluble</strong> (sugar, urine salts, beverages): any aqueous cleaning removes it.</li><li><strong>Solvent-soluble</strong> (oils, grease, tar, ink): needs emulsifying or a solvent.</li><li><strong>Insoluble</strong> (sand, grit, fibre): removed mechanically by vacuuming and pile-lifting.</li></ul><p>Every dirty carpet is a mix of all three. Principle 1 (dry soil removal) takes most of the insoluble soil. Principle 2 (suspension) lifts the water-soluble and solvent-soluble soil with chemistry.</p><h3>CHAT: four dials you control</h3><p><strong>C</strong>hemistry, <strong>H</strong>eat, <strong>A</strong>gitation and <strong>T</strong>ime. You can trade one for another inside the fibre fence. Lower the pH and you can add heat or time. Lower the temperature and you can add agitation. Shorten the dwell and you can raise the chemistry strength. The skill is knowing which dial to turn on which fibre.</p><ol><li>A cold job in winter: add dwell time and go slightly higher in pH, within the fence, to make up for the lost heat.</li><li>A delicate wool rug: keep pH down and heat down, then make up with a longer dwell and gentler agitation.</li><li>Heavy commercial grease on nylon: pH 10 at most, plus heat, soft agitation and an 8 to 10 minute dwell.</li></ol>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "71008ded-a056-5948-bd55-a8544443f3a0",
+       "title": "Wool and the pH 7 myth",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Explain what the WoolSafe mark does and does not mean.</li><li>Say why alkalinity matters more than pH alone on wool, together with heat and dwell.</li></ul><p>The most common belief in carpet cleaning is that pH 7 means wool-safe. It does not.</p><p>WoolSafe is a certification mark run by an independent organisation in Otley, in the United Kingdom. A product earns it only by passing the organisation's test methods and holding a current licence to show the mark. A product sold as \"wool-safe\" or \"wool-compatible\" without the mark is making an uncertified claim. It may still suit wool. It has not been through the test panel.</p><h3>The real criterion is alkalinity</h3><p>The published criterion is a limit on alkalinity, which is how much acid the solution resists. It is not a limit on pH. The working figures are these:</p><ul><li>An alkaline pre-spray passes if no more than 5 mL of 0.1 N hydrochloric acid brings 100 mL of working solution down to pH 7, and no more than 14 mL brings it down to pH 5.5.</li><li>An acid-side rinse must stay at pH 2.5 or higher.</li></ul><p>So a certified pre-spray can read as high as about pH 9.5 to 10 at the meter, if its buffering is low enough. Wool damage comes from alkalinity combined with heat and dwell time, not from pH alone.</p><h3>A practical rule for wool</h3><p>For routine residential wool, a low-alkalinity pre-spray at pH 9.5 with warm water (not hot) and a prompt acidic rinse is gentler than a pH 8 product with high residual alkalinity left on for 30 minutes. For insurance-grade, antique, museum or specified wool jobs, use a product that is currently on the WoolSafe Approved register at woolsafe.org, and keep a copy of the register entry in the job file.</p>",
+       "orderIndex": 2,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "14ba6927-4b1c-562a-93fc-5c58000154e5",
+       "title": "Product starting points and chemistry safety",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Use the product table as a starting point, not a recipe.</li><li>State the non-negotiable chemistry safety rules.</li></ul><p>The CARSI and CCW Product Guide lists the products stocked by the roadshow partner, with dilutions taken from the supplier pages and safety data sheets. The guide states that it was checked against ccwonline.com.au in April 2026. The label and the SDS always beat any table. Ask the supplier where a figure is not published.</p><table><thead><tr><th>Product (Razorback)</th><th>pH</th><th>Published starting dilution</th><th>Notes from the guide</th></tr></thead><tbody><tr><td>PowerShot UHT pre-spray</td><td>10.2 to 10.8</td><td>32:1 standard, 8:1 inline, 16:1 upholstery</td><td>High-alkaline traffic-lane product for commercial nylon. Hot water. Not for wool. Always rinse</td></tr><tr><td>BioShot UHT enzyme pre-spray</td><td>9.5 to 10.5</td><td>50 to 100 g per 10 L pump; 25 g per litre for upholstery</td><td>Sold as wool-compatible but not on the WoolSafe register</td></tr><tr><td>SnapShot Extra LMC</td><td>8.0</td><td>32:1 standard, 8:1 for upholstery and spotting</td><td>Triple use as an encapsulation product, a bonnet product and a pre-spray. Low residue and low alkalinity</td></tr><tr><td>e-Rinse EFR acid rinse</td><td>2.0 to 2.5</td><td>50 mL per 10 L portable; 500 mL per 10 L for browning</td><td>Below the WoolSafe threshold for rinses, so dilute generously and keep contact short on wool. Never on calcareous stone</td></tr><tr><td>CitraBoost booster and spotter</td><td>See the SDS</td><td>75 to 150 mL per 10 L as a pre-spray booster; neat on a test area as a spotter</td><td>Solvent-based. Ventilate well</td></tr></tbody></table><p>None of the stocked products in the guide carries the WoolSafe mark. For high-stakes wool work, source a certified product and keep the register entry.</p><h3>Chemistry safety rules</h3><ol><li>Never mix acid and chlorine. The gas is lethal.</li><li>Never store oxidisers near reducers.</li><li>Label every diluted bottle with the date, the product and the dilution.</li><li>Decant away from the carpet surface.</li><li>Wear gloves and glasses, and a P2 respirator, for every acid-rinse job.</li><li>Ventilate when you use solvent boosters.</li><li>If the SDS calls for specific protective equipment, use it with no exceptions.</li></ol><h3>Take-aways by experience level</h3><ul><li><strong>Newby:</strong> Read a product label. Never mix acids with chlorine. Always rinse.</li><li><strong>Intermediate:</strong> Choose which CHAT dial to turn for a given soil class on a given fibre.</li><li><strong>Pro:</strong> Build a paired pre-spray and rinse that lands the final substrate pH at 6.5 to 8.0, and explain why cationic products hurt nylon blockers.</li></ul>",
+       "orderIndex": 3,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "576c86b1-2241-5aed-b9d7-64d1e4e91ac6",
+       "title": "Module 3 Knowledge Check: Chemistry of Cleaning",
+       "contentType": "quiz",
+       "contentBody": "4e4972a7-6359-53b9-9a43-5c46a3e1065e",
+       "orderIndex": 4,
+       "isPreview": false,
+       "resources": [
+        {
+         "label": "Module 3 Knowledge Check: Chemistry of Cleaning",
+         "url": "quiz:4e4972a7-6359-53b9-9a43-5c46a3e1065e"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "6d1b86fb-db93-518f-8d50-baa3fc62d263",
+     "title": "Module 4: The Five Cleaning Principles",
+     "orderIndex": 3,
+     "lessons": [
+      {
+       "id": "6484b95d-b357-5cfb-8151-3a4893e917f8",
+       "title": "The five principles in order",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Recite the five principles in order.</li><li>Explain why Principle 1 is called the multiplier.</li></ul><p>The five principles are the spine of carpet cleaning. They apply to every method and every fibre, and the order is fixed. If you skip a step you pay for it later in the job.</p><ol><li><strong>Dry particulate soil removal:</strong> vacuuming with airflow and agitation.</li><li><strong>Soil suspension:</strong> chemistry, heat, agitation, time (CHAT).</li><li><strong>Extraction</strong> of the suspended soil.</li><li><strong>Pile setting or grooming:</strong> realign the fibres for even drying and finish.</li><li><strong>Drying:</strong> remove residual moisture to below the fibre's safe threshold.</li></ol><p>Skip Principle 1 and you grind grit into the yarn during Principle 2. Skip Principle 5 and you invite browning and wicking, plus microbial growth. The emphasis shifts with the job. On a lightly soiled house, Principle 1 is most of the work. On a heavily soiled commercial carpet, Principles 2 and 3 earn their keep.</p><h3>Principle 1 in detail</h3><p>These are CARSI teaching figures, and Station A is where you test them yourself. A good upright with a beater bar takes about 50 to 65 per cent of the dry particulate soil from residential carpet in one pass. A second pass in the cross direction typically takes a further 10 to 20 per cent. Pile lifters help on heavily soiled or crushed commercial carpet. To check, run a clean white cloth along one row of pile after vacuuming. The mark on the cloth is your baseline.</p><p>That second pass costs roughly three extra minutes on a 40 square metre house. It needs no new equipment, no new chemistry and no price rise. It is the cheapest upgrade in the trade.</p>",
+       "orderIndex": 0,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "5794541a-3952-584f-9ae2-f57bda8b137e",
+       "title": "Suspension and extraction",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Say how long a pre-spray should dwell.</li><li>Name the four extraction methods.</li><li>Describe the dry-stroke wand technique.</li></ul><h3>Principle 2: soil suspension</h3><p>Chemistry separates soil from the fibre. The CHAT dials decide how hard it needs to work. Most pre-sprays need 5 to 10 minutes on the fibre before you rinse to reach full effect.</p><h3>Principle 3: extraction</h3><p>There are four main methods: hot water extraction, encapsulation, bonnet or absorbent pad, and dry compound. Hot water extraction is still the leading restorative method, and it is what the hands-on session builds muscle memory for.</p><ul><li><strong>Dry stroke:</strong> on every wand stroke the trigger pull is shorter than the vacuum pull. The typical ratio is 1:2, so half the stroke is dry vacuum only.</li><li><strong>Wand angle:</strong> too steep leaves water behind and too flat loses suction. You learn the feel on the day.</li><li><strong>Overlap:</strong> overlap your strokes by about 25 per cent to avoid stripes.</li></ul><p>Plan wand speed and airmover placement before you spray chemistry, not after. Every extra minute of dwell is drying time you owe back.</p>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "f5736138-d950-5e37-8dc4-422ff7c91d7c",
+       "title": "Grooming and drying",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Explain why you groom the pile after extraction.</li><li>Set drying targets and an airmover count for a job.</li></ul><h3>Principle 4: pile setting</h3><p>After extraction the pile is flat and wet, and it lies unevenly. A pile-setting brush or carpet rake puts the pile direction back, speeds up drying and gives the finished carpet an even look. Leave it out and the carpet dries with wand tracks showing.</p><h3>Principle 5: drying</h3><p>Moisture left too long causes browning from cellulosic wicking, wicking stains, microbial growth and complaints. CARSI drying targets:</p><ul><li>Commercial: back in service in 8 hours or less.</li><li>Residential: safe to walk on within 2 hours and fully dry within 12 hours.</li><li>Speed it up with airmovers, one for every 14 to 23 square metres, plus dehumidification in humid weather and the building's air conditioning where it is available.</li></ul><p>Common mistake: unpacking chemistry first and thinking about airmovers at the end. By then the carpet is already wet and the clock is running.</p>",
+       "orderIndex": 2,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "7a619a2c-3501-55dc-9450-98780fb65b68",
+       "title": "The pre-inspection form and the four stations",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Complete the top half of the pre-inspection form before any chemistry touches the fibre.</li><li>Describe what you do at each of the four stations.</li></ul><p>Before you spray anything on a hands-on station you complete the top half of the pre-inspection form. It becomes your permanent job template.</p><table><thead><tr><th>Section</th><th>What you record</th></tr></thead><tbody><tr><td>Customer and site</td><td>Name, address, date, contact details and access notes</td></tr><tr><td>Fibre identification</td><td>Visible fibre, burn-test result, float result, hand-feel and face-weight estimate</td></tr><tr><td>Construction</td><td>Tufted or woven, pile type, whether the backing is visible</td></tr><tr><td>Pre-existing conditions</td><td>Wear patterns, stains (with a photo), existing damage and odours</td></tr><tr><td>Room environment</td><td>Relative humidity, temperature, HVAC status and the ventilation plan</td></tr><tr><td>Planned method</td><td>Hot water extraction, low moisture or dry compound; tool; chemistry and pH; target dwell</td></tr><tr><td>Drying plan</td><td>Airmover count and placement, whether a dehumidifier is needed, expected dry time</td></tr><tr><td>Customer communication</td><td>Moisture addendum signed? Re-entry time given?</td></tr><tr><td>Post-clean verification</td><td>Final substrate pH, moisture meter reading and a photo</td></tr></tbody></table><h3>The four stations (25 minutes each)</h3><ul><li><strong>Station A, dry soil removal:</strong> compare an upright with a pile lifter and the third machine your trainer sets out. Weigh the dry soil you remove and check the beater-bar contact.</li><li><strong>Station B, low-moisture methods:</strong> encapsulation, rotary bonnet and dry compound.</li><li><strong>Station C, hot water extraction:</strong> truck-mount against portable. Take water-lift and pressure readings and practise the dry-stroke technique.</li><li><strong>Station D, drying:</strong> airmover placement, dehumidifier sizing and the vapour-pressure working.</li></ul><h3>Take-aways by experience level</h3><ul><li><strong>Newby:</strong> Memorise the five steps in order. Never skip Principle 1.</li><li><strong>Intermediate:</strong> Set drying targets for every job. Place airmovers before you unpack chemistry.</li><li><strong>Pro:</strong> Trade the CHAT dials against the drying load, and explain wicking and how to prevent it.</li></ul>",
+       "orderIndex": 3,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "686bf6ba-acaa-5eb1-ac2c-9428458e74fe",
+       "title": "Module 4 Knowledge Check: The Five Cleaning Principles",
+       "contentType": "quiz",
+       "contentBody": "2f4e1341-17ce-5843-a376-c3f9b48ee90a",
+       "orderIndex": 4,
+       "isPreview": false,
+       "resources": [
+        {
+         "label": "Module 4 Knowledge Check: The Five Cleaning Principles",
+         "url": "quiz:2f4e1341-17ce-5843-a376-c3f9b48ee90a"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "772d7699-07d6-55f6-b4b6-813501050437",
+     "title": "Module 5: Spot and Stain Removal",
+     "orderIndex": 4,
+     "lessons": [
+      {
+       "id": "8f5e17e3-7eb6-580c-aa92-983f42eaf35c",
+       "title": "Spot or stain, and the six classes",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Explain the difference between a spot and a stain.</li><li>Name the stain class and first-line chemistry for a given soil.</li></ul><p>A spot is something standard cleaning can remove. A stain has permanently altered the fibre's dye structure. Part of your professional judgement is knowing which one you are looking at before you spend two hours and the customer's patience on something that cannot come out.</p><table><thead><tr><th>Class</th><th>Examples</th><th>First-line chemistry</th></tr></thead><tbody><tr><td>Water-soluble</td><td>Sugar, urine salts, most beverages</td><td>Water, or a mild alkaline spotter</td></tr><tr><td>Solvent-soluble</td><td>Oils, grease, lipstick, tar, gum</td><td>Solvent, or a paint-oil-grease (POG) spotter</td></tr><tr><td>Protein</td><td>Blood, egg, dairy, vomit</td><td>Enzyme or mild alkaline spotter in cool water</td></tr><tr><td>Tannin</td><td>Coffee, tea, red wine, tomato</td><td>Acidic spotter (wool-compatible when low in alkalinity), then an oxidiser if needed</td></tr><tr><td>Dye</td><td>Red cordial, red wine pigment, ink</td><td>Heat-assisted reducing agent or dye stripper</td></tr><tr><td>Combination</td><td>Most food spills</td><td>Treat each class in sequence</td></tr></tbody></table><p>Insoluble soil such as clay, carbon or sand is a seventh group, and you remove it mechanically.</p>",
+       "orderIndex": 0,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "16dc09a6-6928-5985-b7f8-b2d58071c9dd",
+       "title": "The decision tree and the three-attempt rule",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Work through the ten steps of the spot-removal decision tree.</li><li>Apply the three-attempt rule and disclose honestly.</li></ul><ol><li>Identify the stain class.</li><li>Test the planned chemistry in an inconspicuous area. Look for bleed, crock or distortion.</li><li>Blot out as much as you can. Never rub.</li><li>Apply cold-appropriate chemistry from the outside in. Wait out the dwell time.</li><li>Blot out. Reapply once if there is partial improvement.</li><li>Escalate: heat, then an oxidiser (for tannin and protein) or a reducing agent (for dye).</li><li>Rinse-extract thoroughly. Over-applied spotter becomes re-soiling or wicking.</li><li>Dry quickly and set an airmover.</li><li>Reinspect at 24 hours. Some stains wick back from deeper in the fibre.</li><li>If there is still no visible improvement after three attempts, stop. Then disclose it honestly.</li></ol><h3>Blot, do not rub</h3><p>Rubbing distorts the pile geometry. The fibres separate from their natural alignment and the visible bruise stays even after the spot is gone. Blot-not-rub is not superstition. It preserves the pile.</p><h3>Urine gets more alkaline with age</h3><p>Fresh urine sits around pH 6. As bacteria break down the urea it turns to ammonia, and aged urine can climb to pH 10 to 12. That is why a fresh spot often responds to a general spotter, while an old yellow stain ignores alkaline chemistry and only gives way to an acid-side spotter. If you inherit a three-year-old pet problem and hit it with an alkaline pre-spray, you add alkalinity to a substrate that is already strongly alkaline. Acid-side first on aged urine, always.</p><h3>The three-attempt rule</h3><p>If a stain has not visibly improved after three rounds of the right chemistry, stop. You are probably looking at a permanent dye stain. Tell the customer plainly: \"I can keep working, but I risk damage, and it is your choice.\" Damaged carpet costs more than a surviving stain.</p>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "d6eb1874-85a0-5723-80ca-55452be202b7",
+       "title": "The six-bottle spotting kit and chemical safety",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>List the six bottles in the minimum spotting kit and what each is for.</li><li>State the two chemical combinations you never make.</li></ul><ul><li><strong>Acid-side spotter</strong> (wool-compatible, pH 2.5 or higher): tannin and urine that has set.</li><li><strong>Alkaline-side spotter:</strong> general organic soil.</li><li><strong>Protein or enzyme spotter:</strong> blood, dairy products and food.</li><li><strong>POG solvent:</strong> adhesives, and gum softener.</li><li><strong>Oxidiser</strong> (hydrogen peroxide, 3 to 12 per cent depending on the fibre): stubborn tannin.</li><li><strong>Reducing agent</strong> (sulphite or bisulphite based): red cordial and other red dyes.</li></ul><h3>Chemistry compatibility</h3><ul><li>Never mix an acid spotter with chlorine bleach. It produces chlorine gas.</li><li>Never mix an oxidiser with a reducing agent. They cancel each other and can give off heat.</li><li>Rinse thoroughly between escalation steps.</li></ul><p>Wear nitrile gloves and eye protection for every one of these.</p><h3>Starting points from the product guide</h3><p>The CARSI and CCW Product Guide gives these first picks as starting points only. Pre-test every one.</p><ul><li>Fresh water-soluble spills: blot, then BioShot UHT at spotter strength (25 g per litre).</li><li>Tannin: e-Rinse EFR on the spot for 60 seconds first, blot, then flush with BioShot. Acid side first, never alkali first.</li><li>Protein: BioShot UHT in cool or tepid water with a 10 minute dwell. Hot water sets protein.</li><li>Oil, grease, gum or tar: CitraBoost neat on the spot for about 60 seconds, then flush with BioShot and rinse. Solvent first on oil. Freeze and chip chewing gum.</li><li>Rust, ink or red dye: use a dedicated remover from your supplier, not CitraBoost. Red-dye chemistry is fibre-specific. The guide says nylon only and never on wool.</li></ul><h3>Take-aways by experience level</h3><ul><li><strong>Newby:</strong> Blot, do not rub. Identify the class before you pick the chemistry. Always test.</li><li><strong>Intermediate:</strong> Run the five-step matrix and escalate cold first and heat second.</li><li><strong>Pro:</strong> Know when to stop. Document the difference between a dye stain and a spot for the customer's records.</li></ul>",
+       "orderIndex": 2,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "75b37022-e7dd-5ab5-adbc-1687f5c4eb6b",
+       "title": "Module 5 Knowledge Check: Spot and Stain Removal",
+       "contentType": "quiz",
+       "contentBody": "b4a02534-9208-54ee-b9c8-61ca4fdd6bb5",
+       "orderIndex": 3,
+       "isPreview": false,
+       "resources": [
+        {
+         "label": "Module 5 Knowledge Check: Spot and Stain Removal",
+         "url": "quiz:b4a02534-9208-54ee-b9c8-61ca4fdd6bb5"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "c1625798-0e6a-5948-9371-9144e879c7a6",
+     "title": "Module 6: Upholstery Theory: Fibre and Fabric Construction",
+     "orderIndex": 5,
+     "lessons": [
+      {
+       "id": "99e5bcc2-fd31-5949-8672-bc208667d4f9",
+       "title": "Why upholstery is not carpet",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Explain why a carpet method cannot be assumed to work on a sofa.</li><li>Name the four construction types and the risk each carries.</li></ul><p>Upholstery is not carpet. Face fabrics are often more delicate, backings are unpredictable, glued trim and latex foam can run or collapse, and frame construction varies widely. The most common cause of upholstery damage is assuming that what works on carpet works on the sofa. It does not.</p><h3>Construction types</h3><ul><li><strong>Woven</strong> (plain, twill, satin, jacquard): the pattern depends on the weave, and loose weaves distort under agitation.</li><li><strong>Tufted:</strong> yarn tufted into a primary fabric and commonly glued. There is a solvent risk.</li><li><strong>Flocked:</strong> short fibres stuck to a base with adhesive. Often water-sensitive.</li><li><strong>Non-durable constructions</strong> (chintz, quilted, moire, velvet): known to distort, crush or watermark under moisture.</li></ul><h3>Rayon lives here</h3><p>Rayon turns up more often in upholstery than anywhere else: decorative throws, cushion covers and cheaper sofa fabrics. It can lose up to 70 per cent of its tensile strength when wet. On rayon, keep moisture low. Use dry compound, dry foam, or hot water extraction with tight dry strokes and fast drying.</p>",
+       "orderIndex": 0,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "5285bb85-6c64-540f-8bb7-b598bbf21187",
+       "title": "Cleaning codes: W, S, WS or X",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Read a cleaning code and name a starting method for it.</li><li>Say why the code is a starting point and not a guarantee.</li></ul><table><thead><tr><th>Code</th><th>Meaning</th><th>Starting-point method</th></tr></thead><tbody><tr><td>W</td><td>Water-based cleaning is permitted</td><td>Wet methods: dry foam, encapsulation, hot water extraction rinse</td></tr><tr><td>S</td><td>Solvent-based cleaning only</td><td>Dry solvent methods only, with no water</td></tr><tr><td>WS</td><td>Water or solvent is permitted</td><td>Choose by soil type. Wet is typical</td></tr><tr><td>X</td><td>Professional vacuuming only</td><td>Do not attempt cleaning. Refer or decline</td></tr></tbody></table><p>The code is a starting point, not a guarantee. Pre-test with the four tests in the next lesson whatever the tag says.</p><h3>Starting points from the product guide</h3><ul><li>Code W: BioShot UHT at 25 g per litre, then e-Rinse EFR at 25 mL per 10 L as a fine-fabric rinse. For delicate weaves the guide suggests SnapShot Extra LMC at 8:1 as a low-moisture option.</li><li>Code S: dry-solvent method only, with no water-based product. Refer out if you have no dry-side training or equipment.</li><li>Code X: no chemistry. Dry vacuum and a soft brush only. Decline the job if the customer insists on cleaning. Honest refusal protects you.</li><li>Rayon, viscose or art-silk labelled items: low-moisture only.</li></ul>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "3c4d1c55-7af0-5177-91bc-e77d0c3a38b2",
+       "title": "The four-test pre-inspection",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Run the bleed and crock tests, then the shrink and distortion tests, and record each.</li><li>Explain why the shrink test is read at 24 hours.</li></ul><p>Before you spray any chemistry on any upholstered piece, run four tests in an inconspicuous area and write each one down. If any test fails, stop. Rethink the method.</p><ol><li><strong>Bleed:</strong> put a drop of water or pre-spray on a white cloth, press it flat and check the cloth for dye.</li><li><strong>Crock:</strong> rub a dry white cloth over the dry fabric and look for loose dye.</li><li><strong>Shrink:</strong> wet a patch about 50 by 50 mm, let it dry, and measure for any change in size.</li><li><strong>Distortion:</strong> apply the chemistry with gentle agitation and look for pile matting, weave separation or glossy spots.</li></ol><h3>Why 24 hours</h3><p>Upholstery fabrics often shrink when wet and then spring back as they dry, partly or fully. Read the shrink test at 2 hours and a borderline fabric can look like a fail, so you turn away a job you could have cleaned. Read it at 24 hours and the fabric has either recovered, which is safe to clean, or it is still tight, which is genuinely unsafe. CARSI's protocol is to wet the 50 by 50 mm patch, dry it with low airflow, and measure at 24 hours and not before. The same protocol catches latex foam collapse, which shows up more slowly than weave distortion.</p><p>Common mistake: relying on the cleaning code alone and skipping the four tests because the tag says W.</p><h3>Take-aways by experience level</h3><ul><li><strong>Newby:</strong> Never clean without the four tests. Respect the X code.</li><li><strong>Intermediate:</strong> Match method to fibre and construction. Flag non-durable fabrics before you quote.</li><li><strong>Pro:</strong> Make the repair-or-restore call. Know when a piece is beyond scope and when an honest refusal is the service.</li></ul>",
+       "orderIndex": 2,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "df18a2b9-66c1-5670-b62c-83297cbf22b2",
+       "title": "Module 6 Knowledge Check: Upholstery Theory: Fibre and Fabric Construction",
+       "contentType": "quiz",
+       "contentBody": "de7a1840-a4b9-5b7c-911b-9ffbd446d565",
+       "orderIndex": 3,
+       "isPreview": false,
+       "resources": [
+        {
+         "label": "Module 6 Knowledge Check: Upholstery Theory: Fibre and Fabric Construction",
+         "url": "quiz:de7a1840-a4b9-5b7c-911b-9ffbd446d565"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "bc71cbfb-18d3-5a53-8227-bf82b1a97b14",
+     "title": "Module 7: Upholstery Hands-On",
+     "orderIndex": 6,
+     "lessons": [
+      {
+       "id": "06871a0e-b22b-585a-97de-a325bf876696",
+       "title": "The six upholstery methods",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Name the six methods and what each is best for.</li><li>Say why you never use live steam on upholstery.</li></ul><p>There are six recognised methods and each has its place. The live session compares all six on matched test sofas so you can see the speed, the residue and the finish side by side.</p><table><thead><tr><th>Method</th><th>Best for</th><th>Watch-outs</th></tr></thead><tbody><tr><td>1. Dry solvent</td><td>S-code fabrics and oily soil</td><td>Ventilation, and flammability on some products</td></tr><tr><td>2. Dry compound</td><td>Delicate or water-sensitive pieces</td><td>Residue. Vacuum it out fully</td></tr><tr><td>3. Dry foam</td><td>Moderately soiled W-code fabric</td><td>Control the foam moisture and rinse by extraction</td></tr><tr><td>4. Encapsulation</td><td>Low-moisture maintenance</td><td>Works well with a post-vacuum recovery</td></tr><tr><td>5. Shampoo</td><td>Heavily soiled, durable fabric</td><td>Residue if not rinsed. Rarely a first choice today</td></tr><tr><td>6. Hot water extraction with a water rinse</td><td>W and WS fabrics that can take it</td><td>Over-wetting. Respect the fibre fence</td></tr></tbody></table><h3>No live steam</h3><p>Hot water extraction on upholstery uses heated water, not live steam. Live steam above 100 degrees Celsius damages adhesives and glues, collapses latex foam and can distort delicate fibres. If a product advertises steam, check the real temperature at the tool.</p><p>Choose the least aggressive method that will clean the piece. Aggression rises as you go from dry compound to hot water extraction, and so does the over-wetting risk.</p>",
+       "orderIndex": 0,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "cd7b7b87-9a92-5e46-a461-ba71990da25f",
+       "title": "Olefin heat limits and tool tiers",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Explain why heat settings matter on olefin.</li><li>Compare the three tiers of upholstery tool.</li></ul><h3>Olefin and truck-mount heat</h3><p>The manual gives olefin (polypropylene) a melt point of about 160 degrees Celsius and a softening point around 130 degrees. It states that a truck-mount can deliver solution at 105 to 120 degrees at the wand inlet on a cold boiler day, and more at the jet. A slow pass on olefin can flatten and gloss the pile for good. The CARSI rule is to dial the machine down to 60 degrees at the jet, keep the wand moving, and never make a second hot pass on known olefin. Check your own machine's output against its manual. That is why the method chart rates hot water extraction on olefin as high aggression.</p><h3>Tool tiers</h3><ul><li>A 100 mm internal upholstery hand tool is the everyday staple.</li><li>A stainless hand wand gives more airflow and is rigid for cushion work.</li><li>An air-driven or external-jet tool is the fastest and over-wets the least, and it costs the most.</li></ul>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "b143c0c1-8d5d-505f-b0af-da719e29b8e6",
+       "title": "Speed-drying and the hands-on rotation",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Plan a speed-drying set-up before you apply chemistry.</li><li>Describe what you do and look for on the six-method rotation.</li></ul><h3>Speed-drying upholstery</h3><ul><li><strong>Airflow first.</strong> Place one axial fan or small airmover to move air across the fabric, not into it.</li><li><strong>Cut the humidity.</strong> Open a window or run a small dehumidifier if the room is above 60 per cent relative humidity.</li><li><strong>Moving warm air beats still hot air.</strong> Air at 30 degrees on the move dries faster than still air at 60 degrees.</li><li><strong>Target:</strong> hand-dry within 2 hours and fully dry within 6 hours on sturdy W-code fabric.</li></ul><h3>The rotation</h3><p>On Day 2 you run all six methods on matched test pieces. Complete the four tests and the pre-inspection form first. Note the dwell time, the moisture you leave behind, the residue, and how long each piece takes to dry. The aim is for you to feel why a speed-drying plan and dwell discipline matter, not only to read about them.</p><p>Starting dilutions from the product guide for upholstery: BioShot UHT at 25 g per litre of warm water, and SnapShot Extra LMC at 8:1. Pre-test every time.</p><h3>Take-aways by experience level</h3><ul><li><strong>Newby:</strong> Six methods exist. Pick the least aggressive one that will clean the piece.</li><li><strong>Intermediate:</strong> Plan a speed-drying set-up before chemistry. Know the trade-offs between tool tiers.</li><li><strong>Pro:</strong> Make rescue-clean and salvage-clean judgement calls, and keep insurance-facing documentation.</li></ul>",
+       "orderIndex": 2,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "91edd7a6-76be-5387-8856-3216dc715744",
+       "title": "Module 7 Knowledge Check: Upholstery Hands-On",
+       "contentType": "quiz",
+       "contentBody": "72586e53-5637-5ba7-a63e-c5ebe453555b",
+       "orderIndex": 3,
+       "isPreview": false,
+       "resources": [
+        {
+         "label": "Module 7 Knowledge Check: Upholstery Hands-On",
+         "url": "quiz:72586e53-5637-5ba7-a63e-c5ebe453555b"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "eaf4b550-6581-5c7b-980b-4d7eb8715a9a",
+     "title": "Module 8: Hard Floors",
+     "orderIndex": 7,
+     "lessons": [
+      {
+       "id": "c8834b94-be6d-56df-9bb4-722ae2ec5765",
+       "title": "Five hard-surface families",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Name the five hard-surface families and the weak point of each.</li><li>Run the vinegar drop test and read the result.</li></ul><p>Hard floors are a natural add-on for a carpet cleaner because the customer already trusts you. The chemistry and the inspection rules are different, and the failures cost more. This module is inspection first, which is the habit that keeps you out of trouble.</p><table><thead><tr><th>Family</th><th>Examples</th><th>Weak point</th></tr></thead><tbody><tr><td>Hardwood</td><td>Solid, engineered, oiled, sealed</td><td>Moisture at the joints</td></tr><tr><td>Laminate</td><td>High-density fibreboard core with an image layer</td><td>Joints swell badly if saturated</td></tr><tr><td>Stone</td><td>Marble, limestone, travertine, granite, slate</td><td>Calcareous stones are etched by acid</td></tr><tr><td>Ceramic and porcelain</td><td>Glazed and unglazed tile</td><td>The grout</td></tr><tr><td>Resilient</td><td>Vinyl, LVT, linoleum, rubber</td><td>Alkaline for grease. Watch stripping chemistry</td></tr></tbody></table><h3>Calcareous and siliceous stone</h3><p>Marble and limestone, along with travertine, are calcareous, which means calcium-based. Any acid etches them permanently. Granite and most slate are siliceous, which means silica-based, and they survive mild acid. Put a drop of distilled white vinegar on an inconspicuous spot. Fizzing means calcareous, and calcareous means never acid. Photograph the result with the date and location for the job file.</p><p>The mistake that costs the most is using an acidic grout cleaner on marble or travertine. The etch is instant and permanent, and it cannot be polished out without professional stone refinishing. A whole-floor resurface can run to five figures. That cost is CARSI professional judgement, not a quoted price. The vinegar test takes 30 seconds.</p>",
+       "orderIndex": 0,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "32974d7e-fe00-5ab3-846b-d99b6af048d1",
+       "title": "Non-destructive inspection",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Describe what a non-destructive hard-floor inspection allows and what it does not.</li><li>List the tools you carry and what the report must contain.</li></ul><p>Under the scope of the hard-floor inspection standard, an inspection is non-destructive. You can measure and observe, and you can document and photograph. You do not pry boards, chip tiles or gouge sealer. The report has to be one you could defend.</p><h3>Tools to carry</h3><ul><li>A moisture meter (pin and pinless types), set for the substrate.</li><li>A thermo-hygrometer to log room humidity and temperature at the time.</li><li>pH strips, distilled water and a white towel for surface chemistry.</li><li>A camera with a light, and a magnifier.</li><li>A tape, rule or calipers, a surface temperature reader and a straight edge or laser level.</li><li>Category-specific extras: a suction cup for laminate, expansion detection and feeler gauges for joints, a UV or IR light for moisture variation, and a gloss meter for ceramic.</li></ul><h3>Photographs</h3><p>Date every photograph, put a scale reference in the frame, take several angles, and caption each one. If you did not photograph it, treat it as if it did not happen.</p>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "6494004e-11e4-5ae4-b21f-f3b5cbb6b4a2",
+       "title": "Cleaning starters by floor type",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Pick a safe starting chemistry for each hard-floor family.</li><li>Say where the product guide is honest about its limits for hard floors.</li></ul><ul><li><strong>Sealed hardwood:</strong> neutral pH cleaner, damp mop only, never saturate the joints.</li><li><strong>Laminate:</strong> damp microfibre, water kept off the seams. Laminate swells from the edge.</li><li><strong>Marble and limestone:</strong> neutral-pH stone-safe cleaner only. No acid and no strong alkaline.</li><li><strong>Ceramic:</strong> mild alkaline for grout soil, then a clear-water rinse.</li><li><strong>Resilient (vinyl and LVT):</strong> mild alkaline for general soil. Use neutral maintenance products to protect the gloss. Avoid solvent boosters that can soften PVC.</li></ul><p>The CARSI and CCW Product Guide says plainly that the supplier's published chemical range is carpet-and-upholstery focused as of April 2026. Stone-safe neutral cleaners, plus tile and grout chemistry and timber cleaners are best sourced by asking the supplier's counter, or from a specialist hard-floor supplier. For tile, the guide pairs the rotary extraction tools with a manufacturer-recommended tile and grout chemical. Never use e-Rinse EFR on calcareous stone.</p><p>Seal grout after cleaning it. Take a moisture meter reading before and after the job and log it, because laminate is moisture-intolerant and dry-side methods are preferred.</p><h3>Take-aways by experience level</h3><ul><li><strong>Newby:</strong> Never use acid on calcareous stone. Always test pH. Never saturate laminate joints.</li><li><strong>Intermediate:</strong> Build an inspection report that would stand up to cross-examination.</li><li><strong>Pro:</strong> Correlate moisture, relative humidity and time for cupping, buckling or tenting claims.</li></ul>",
+       "orderIndex": 2,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "3ce895da-006b-52c3-8ff2-e58d0b509ee9",
+       "title": "Module 8 Knowledge Check: Hard Floors",
+       "contentType": "quiz",
+       "contentBody": "07dea587-c097-5083-aada-3b1884c3494c",
+       "orderIndex": 3,
+       "isPreview": false,
+       "resources": [
+        {
+         "label": "Module 8 Knowledge Check: Hard Floors",
+         "url": "quiz:07dea587-c097-5083-aada-3b1884c3494c"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "a0b88973-c668-5c64-81b7-8f5a99162467",
+     "title": "Module 9: Machinery and Preventive Maintenance",
+     "orderIndex": 8,
+     "lessons": [
+      {
+       "id": "b4349d4f-0d7c-57c3-8aa4-5c44ebe6e80e",
+       "title": "Why preventive maintenance pays",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Explain the difference between preventive and reactive maintenance.</li><li>Run the daily checklist, then the weekly and monthly ones.</li></ul><p>Machines do not break down mysteriously. They wear in ways you can measure, and either you read the signs early or you pay a technician the hard way. The manual's rule of thumb is that every dollar spent on preventive maintenance saves about five to ten dollars of emergency repair and lost income. That is CARSI professional judgement, not a survey figure.</p><h3>Daily (3 minutes before the first job)</h3><ul><li>Truck-mount oil level in the sight glass.</li><li>Belt visible, not glazed, and firm under a thumb press.</li><li>Jet spray pattern: pull the trigger into a bucket and check the fan.</li><li>Hose cuffs with no cracks, and fittings tight.</li><li>The RCD test button on the portable.</li></ul><h3>Weekly (15 minutes)</h3><ul><li>Vacuum test: measure the vacuum at the wand against your baseline.</li><li>Pressure test: measure the pressure at the wand against your baseline.</li><li>Listen for any new vibration or change in pitch from the blower or pump.</li><li>Clean all filters and lubricate the wand swivels.</li></ul><h3>Monthly (45 minutes)</h3><ul><li>Check the chemical pump rebuild kit if the hours are met.</li><li>Inspect the heat exchanger.</li><li>Listen to the blower bearings and grease them to schedule.</li><li>Check all electrical connections for corrosion.</li><li>Update the maintenance log with the hours, the date and the parts replaced.</li></ul><p>The daily checklist catches most failures before they strand you on a job. The weekly pass covers vibration and sound, plus the suction benchmark. The monthly service adds years to the machine's life.</p>",
+       "orderIndex": 0,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "bf7d7312-dc56-55c7-8bff-17dacebe4a1d",
+       "title": "Truck-mounts, portables, rotary tools and wand sets",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>List the preventive checks for a truck-mount and a portable extractor.</li><li>Explain why you replace vacuum motor brushes before they fail.</li></ul><h3>Truck-mount</h3><ul><li>Blower oil: check the level weekly and change it at the manufacturer's hours interval.</li><li>Belt tension: inspect weekly and retension to specification.</li><li>Heat exchanger: flush yearly with a descaler and look for corrosion.</li><li>Vacuum relief valve: test it monthly.</li><li>Chemical pump: watch for a drop in output pressure and rebuild on schedule.</li><li>Winterise every autumn in frost-risk areas, with anti-freeze through the lines.</li></ul><h3>Portable extractor</h3><ul><li>Pump diaphragm: replace on a pressure drop or at the hours interval.</li><li>Filters: clean after every job and replace on schedule.</li><li>Vacuum motors: worn brushes shorten the motor's life, so replace the brushes before the motor.</li><li>Hoses and fittings: inspect for kinks, weeping leaks and cracked cuffs every use.</li></ul><h3>Rotary tools, wands, hoses</h3><ul><li>Rotary and counter-rotating brush tools: brushes typically last 80 to 120 hours, bearings are greased on schedule, and drive belts are checked for tension and wear.</li><li>Wand swivel joints: lubricate monthly and replace the seal kits yearly.</li><li>Jets: clear a blockage with a pin and check the spray fan.</li><li>Corner guards: replace them when worn so they do not snag the carpet.</li></ul><h3>Replace the brushes, save the motor</h3><p>Carbon brushes on portable extractors and upright vacuums typically wear out at roughly 60 to 70 per cent of the motor's full life. Most technicians run them to failure. The worn brush then arcs on the commutator, pits the windings and usually writes off the motor. A pair of brushes is about $15 to $40 (Australian dollars, check current prices), and a replacement motor costs ten to fifteen times that. A good habit is to log motor hours, then pull and measure the brushes at 400 to 500 hours (new is about 25 mm, condemn at about 8 mm), and replace them in a ten-minute job.</p><p>Machine pressure is usually quoted in psi. 100 psi is about 690 kPa. Many vacuum gauges read inches of mercury, and 1 inHg is about 3.4 kPa. Record whichever unit your gauge uses, along with your baseline.</p>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "9da98f22-565d-5062-807b-f6796839bb8b",
+       "title": "Six intervals and schedules for portable machines",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Use the six-interval system and the hours triggers together.</li><li>Match a portable machine to its care type and run the right schedule.</li></ul><p>The schedules below come from the supplier's catalogue at ccwonline.com.au (checked July 2026) and the machine makers' published material. Your own machine's operator manual is the final authority. Where a manufacturer figure could not be confirmed, it is CARSI professional judgement.</p><h3>The six intervals</h3><p>Calendar intervals keep a low-volume operator honest. Hours-based triggers take over when you are busy, because a machine run eight hours a day hits its service hours long before the month ends. Whichever comes first wins.</p><table><thead><tr><th>Interval</th><th>Portable trigger</th><th>Truck-mount trigger</th></tr></thead><tbody><tr><td>Daily</td><td>Every job, and end of day</td><td>Every job, and end of shift</td></tr><tr><td>Weekly</td><td>About 5 working days or 15 to 20 hours</td><td>About 5 working days or 20 to 30 hours</td></tr><tr><td>Monthly</td><td>About 20 days or 60 to 80 hours</td><td>About 50 to 100 engine hours</td></tr><tr><td>Quarterly</td><td>About 200 to 250 hours</td><td>About 300 engine hours</td></tr><tr><td>Half-year</td><td>About 400 to 500 hours</td><td>About 600 engine hours or mid-season</td></tr><tr><td>End of year</td><td>Yearly or 1000 hours</td><td>Yearly full service</td></tr></tbody></table><h3>Care type A: in-tank-heat portables</h3><p>For example the Razorback SPOTX, TRACTX, Creed 220 and Balboa 220 and 500LW, sold through the roadshow partner.</p><ul><li><strong>Daily:</strong> check the spray fan at the wand, because a split or narrow fan is a blocked jet. Clean the vacuum inlet filter and shut-off float screen and make sure the float ball moves freely. At day's end rinse the solution tank, chemical line and pump with fresh water so no pre-spray or acid rinse sits in the pump overnight. Store with the recovery tank lid open.</li><li><strong>Weekly:</strong> clean the solution filter, inspect the hoses and cuffs, and compare water-lift at the wand with your new-machine baseline.</li><li><strong>Monthly:</strong> flush the chemical system with a manufacturer maintainer, clean the air inlet and check the dump valve seal.</li><li><strong>Quarterly (about 250 hours):</strong> flush a white vinegar solution through the solution system to remove alkaline and hard-water scale. Use roughly 1 L of white vinegar to 8 L of water, then rinse with clean water. Check the in-tank heater element for scale and service the pump inlet filter.</li><li><strong>Half-year (about 500 hours):</strong> pull and measure the vacuum motor brushes, and inspect the vacuum gaskets and lid seal.</li><li><strong>End of year:</strong> have a qualified technician inspect it, replace the pump seal kit if the hours are met, and reconcile the machine log.</li></ul><h3>Care type B: dual heat system portables</h3><p>These do everything in type A and also care for the inline heat exchanger that recovers heat from the waste vacuum air. After the fresh-water flush each day, run clean water through the exchanger. Descale the coil with the vinegar flush every quarter. At the half-year check, look at the exchanger fittings for scale weep and corrosion.</p><p>A scaled exchanger fails quietly. A dead in-tank heater gives you cold water and you notice at once. A scaled coil keeps working, but the solution arrives a few degrees cooler each month. Because CHAT lets you trade heat for dwell and chemistry, you make up for it without realising. The quarterly flush keeps the temperature you think you have equal to the temperature you actually have.</p><h3>Care type C: auto fill and auto pump-out portables</h3><p>For example the Drago 1600 Auto and Balboa 700 Auto. They do everything in types A and B and also need these: clean the debris screen on the pump-out each day, run the auto-dump with a full tank of clean water every fortnight to flush lint from the pump base, test the auto-fill float and shut-off monthly, and inspect the pump-out check valve and discharge hose quarterly.</p>",
+       "orderIndex": 2,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "282e7f0c-54e8-5a89-bded-0798aada6135",
+       "title": "Truck-mount schedule, hours card and machine log",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Follow the truck-mount schedule and identify your engine's oil interval.</li><li>Use the hours trigger card and keep a machine log.</li></ul><h3>Care type D: slide-in truck-mounts</h3><p>A truck-mount is an engine, a blower, a heat exchanger and a high-pressure pump on one frame. Engine hours drive the schedule. Examples are the Sapphire 370EFI, Peak 500, Apex 570 and Everest 870HP, and the HydraMaster TITAN and Boxxer ranges and the TMTG4000.</p><ul><li><strong>Daily:</strong> flush the solution system and high-pressure pump with clean water, then empty the waste tank and rinse it. Clean the waste filter and the pump-out screen, check the engine oil on the sight glass or dipstick, check the coolant on liquid-cooled units, and look over the belts and hoses, and the fuel line, for leaks.</li><li><strong>Weekly:</strong> compare vacuum and solution pressure at the wand with your baseline, check the blower belt for tension and glazing, listen for new vibration or pitch, and clean the water box and float filters.</li><li><strong>Monthly:</strong> flush the heat exchanger, test the vacuum relief valve, grease to schedule and check electrical connections for corrosion.</li><li><strong>Quarterly:</strong> change the engine oil to its interval, check the high-pressure pump rebuild kit if the hours are met, and descale the heat exchanger (yearly at a minimum, quarterly in hard water).</li><li><strong>Half-year:</strong> change the blower oil and check the bearings, inspect the exhaust shielding and cooling belt, and inspect all vacuum and solution hoses.</li><li><strong>End of year:</strong> full manufacturer service, reconcile the hours log, and winterise in any frost-risk region before the first cold snap.</li></ul><h3>The 300-hour trap</h3><p>On a Kohler EFI engine with the extended oil life programme, such as the Sapphire 370EFI, the supplier's specification gives an oil and filter change every 300 hours with the approved synthetic oil and no 8-hour break-in change. Most other truck-mount engines need a first change at 8 hours and then every 50 to 100 hours. The expensive mistake is applying 300 hours to a non-EFI engine, which can cook the motor. The rule is not a number to memorise. Read the engine plate, then follow that engine's manual. Write the engine model on the front page of the log so a relief driver cannot get it wrong.</p><p>Example specification as published by the supplier in July 2026: the Sapphire 370EFI has a 26.5 horsepower Kohler V-twin EFI engine and a 341 litre aluminium waste tank. The Razorback Balboa 700 Auto portable has a single 10 amp cord and a pump motor rated 230 V at 3.6 A. Larger TRACTX units ship with 15 amp cords.</p><h3>Hours trigger card</h3><table><thead><tr><th>Component</th><th>Check or service at</th><th>Condemn or act</th></tr></thead><tbody><tr><td>Vacuum motor carbon brushes</td><td>Measure every 400 to 500 hours</td><td>Replace at about 8 mm (new about 25 mm)</td></tr><tr><td>In-tank heater or exchanger coil</td><td>Descale about every 250 hours, or on hard water</td><td>Visible scale crust</td></tr><tr><td>Solution or high-pressure pump</td><td>Pressure check weekly. Rebuild at the maker's hours</td><td>Output below your baseline</td></tr><tr><td>Kohler EFI engine oil</td><td>Every 300 hours, approved synthetic</td><td>None</td></tr><tr><td>Non-EFI truck-mount oil</td><td>First change at 8 hours, then every 50 to 100 hours</td><td>None</td></tr><tr><td>Blower belt</td><td>Inspect weekly</td><td>Glazed, cracked or slack</td></tr><tr><td>Hoses and cuffs</td><td>Inspect weekly</td><td>Crack, weep or loose cuff</td></tr></tbody></table><h3>Machine log</h3><p>Keep one page for each machine and reconcile it at the end of the year. Columns: date, engine or run hours, interval done (daily, weekly, monthly, quarterly, half-year, end of year), parts replaced, vacuum, pressure, notes, initials. On the front page, write the machine model, engine model and oil specification, pump model, your new-machine vacuum and pressure baselines, the cord rating (10 A or 15 A) and the service contact.</p><h3>Take-aways by experience level</h3><ul><li><strong>Newby:</strong> Run the daily checklist without skipping a day, and the weekly and monthly ones on schedule. Find your machine's care type.</li><li><strong>Intermediate:</strong> Run the six-interval calendar and the hours card together, and log baselines each week. Descale on schedule, not on symptom.</li><li><strong>Pro:</strong> Cost the downtime against the preventive spend, plan replacements 6 to 12 months out, and train relief drivers to the log.</li></ul>",
+       "orderIndex": 3,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "cad213e7-9ad7-53f6-af8a-fd0b3d036be0",
+       "title": "Module 9 Knowledge Check: Machinery and Preventive Maintenance",
+       "contentType": "quiz",
+       "contentBody": "bb9f8ee7-b958-5355-927d-a1e68113dc3b",
+       "orderIndex": 4,
+       "isPreview": false,
+       "resources": [
+        {
+         "label": "Module 9 Knowledge Check: Machinery and Preventive Maintenance",
+         "url": "quiz:bb9f8ee7-b958-5355-927d-a1e68113dc3b"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "15817816-ef94-5471-8c5b-f2f38ad22d81",
+     "title": "Module 10: The Business of Cleaning",
+     "orderIndex": 9,
+     "lessons": [
+      {
+       "id": "bd6ececa-8268-5c74-b3c7-5e6ba262ff7b",
+       "title": "Six cost lines and three pricing models",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>List the six cost lines and what each one captures.</li><li>Choose between per square metre, per room and minimum call-out pricing.</li></ul><p>Technical skill without pricing discipline is charity. Customers do not pay for hours. They pay for the result and for trust. This module is the costing and communication framework CARSI-trained cleaners use to protect their margin.</p><table><thead><tr><th>Cost line</th><th>What it captures</th></tr></thead><tbody><tr><td>1. Direct labour</td><td>Wages plus on-costs such as super and insurance, plus leave loading</td></tr><tr><td>2. Consumables</td><td>Chemistry, pads, pre-spray, tank water and detergents</td></tr><tr><td>3. Equipment amortisation</td><td>The truck-mount or portable replacement schedule</td></tr><tr><td>4. Vehicle and fuel</td><td>Cost per kilometre plus scheduled service</td></tr><tr><td>5. Fixed overhead</td><td>Rent, insurance, software, marketing</td></tr><tr><td>6. Profit margin</td><td>What you take home after all of the above</td></tr></tbody></table><h3>Three pricing models</h3><ul><li><strong>Per square metre:</strong> transparent and scales with the job. The default for commercial work.</li><li><strong>Per room:</strong> simple for residential work and it anchors the customer's thinking to rooms.</li><li><strong>Minimum call-out:</strong> covers low-value jobs and protects busy time slots.</li></ul><p>Most profitable cleaners run all three at once and apply whichever model earns most for that type of customer. Know your break-even rate for each hour before you quote.</p>",
+       "orderIndex": 0,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "6c9959c8-b099-5df4-929d-fe6f4ffc0c74",
+       "title": "Callbacks and the moisture addendum",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Read your callback rate as a pricing signal.</li><li>Explain why a signed moisture addendum protects both sides.</li></ul><h3>Your callback rate is a pricing signal</h3><p>These are CARSI benchmarks, from the trainer's professional judgement and not an industry survey. A well-run operation sees a customer-initiated rework request on about 3 to 4 per cent of completed residential jobs. It is never zero, because some wicking and slow-drying complaints come from physics, not poor work. Above 6 per cent, you are paying for rework out of your margin, and the fix is usually in the process: a second vacuum pass, a longer dwell and verified drying. Below 1 per cent often means you are over-delivering and under-charging, because the job is priced as standard but done as premium. Track callbacks by cause for a quarter (wicking, drying, residue, spot return). It tells you which CHAT dial your pricing is not paying for.</p><h3>The moisture addendum</h3><p>A short written disclosure signed at the start of the job protects both sides. Sample wording from the manual:</p><p>The customer acknowledges that carpet may remain damp to the touch for up to 12 hours after cleaning. During this time, walking on the carpet with shoes, placing furniture without protectors, or restricting airflow can extend drying time and in some cases lead to wicking of deeper stains back to the surface. The cleaner will set realistic drying expectations, place airmovers where agreed, and advise reinspection at 24 hours if any concern arises.</p><p>Have your own adviser read your wording before you use it. This is a sample, not legal advice.</p>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "63ba1982-ec98-5524-b68b-eae37a49b938",
+       "title": "Complaint scripts",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Use a calm script for a slow-drying, wicking or dye-bleed complaint.</li><li>Link each script to the record you kept at the time of the job.</li></ul><p>Under pressure you do not invent wording. You recall it. In the workshop you role-play these in pairs, five minutes for each script, then swap roles.</p><h3>Slow drying</h3><p>Thanks for calling, [customer name]. I am glad you raised it early. A few things affect drying time: the humidity today, the airflow in the room, and whether the carpet is over a timber floor. Can you feel the carpet in a few spots and tell me if it is wet, damp or just cool? I will talk you through the next step.</p><h3>A stain returns (wicking)</h3><p>That is wicking. Deeper soil moves up as the carpet dries. It also tells us the stain was deeper than it looked. I will come back and treat the spot, and that is covered under our reinspection policy at no charge.</p><p>Only say that last line if it is your actual policy.</p><h3>Dye bleed on upholstery</h3><p>Thank you for showing me this. Dye bleed usually means the dye was not fully set at the factory. We test for it before cleaning, but some fabrics only fail during a full clean. Let me document what we are looking at, speak to my senior colleague, and call you back within [x] hours with a plan.</p><p>If you ran the four tests and recorded them, say so and show the record. That is what the pre-inspection form is for.</p><h3>Take-aways by experience level</h3><ul><li><strong>Newby:</strong> Know your break-even rate per hour. Use the six cost lines.</li><li><strong>Intermediate:</strong> Quote a commercial contract using a frequency and throughput model.</li><li><strong>Pro:</strong> Build an upsell pathway of protector and deodoriser, then inspection with a report.</li></ul>",
+       "orderIndex": 2,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "e169fe2b-e5bb-5205-808a-2be59fc786b9",
+       "title": "Module 10 Knowledge Check: The Business of Cleaning",
+       "contentType": "quiz",
+       "contentBody": "8d1e6fdf-f369-5e21-a015-362f18624e08",
+       "orderIndex": 3,
+       "isPreview": false,
+       "resources": [
+        {
+         "label": "Module 10 Knowledge Check: The Business of Cleaning",
+         "url": "quiz:8d1e6fdf-f369-5e21-a015-362f18624e08"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "01f939ed-055a-5552-833e-1856f3e74667",
+     "title": "Module 11: Expert Board Case Review",
+     "orderIndex": 10,
+     "lessons": [
+      {
+       "id": "265ceed1-0480-59a4-a8e5-39d3308386e4",
+       "title": "How the council works",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Describe the three stages of the council review.</li><li>Explain why the personas are composite archetypes.</li></ul><p>The CARSI Expert Council is a structured panel review. It applies seven composite expert viewpoints to a real-world cleaning or restoration case. It adapts the three-stage multi-perspective pattern published by Andrej Karpathy as llm-council, reworked here for people in a room. The framework is his, and CARSI credits it.</p><ol><li><strong>First opinions:</strong> each council member gives an independent 60-second opinion on the case. No cross-talk.</li><li><strong>Anonymised peer review:</strong> the opinions are shared with the names removed. Each member ranks the other six from 1 to 6 and points out weaknesses.</li><li><strong>Chairperson synthesis:</strong> the Chair pulls the strongest points into one reasoned recommendation. Phill delivers the final teach.</li></ol><p>Every persona is a labelled composite, a credentialled archetype and not a real person. No quote or opinion should be attributed to any living individual. The council is a teaching device that surfaces professional viewpoints, and the stage is designed to bring disagreement out before the group settles on a view. It is a reasoning pattern, not a checklist.</p>",
+       "orderIndex": 0,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "28aac146-c3d7-5a96-8c47-b5803b15164b",
+       "title": "The seven roles",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Name the seven roles and the bias each brings.</li><li>Play one role for 60 seconds on a case.</li></ul><table><thead><tr><th>Role</th><th>Background</th><th>Viewpoint</th></tr></thead><tbody><tr><td>Chairperson, textile scientist</td><td>A senior textile cleaner with many years in the trade</td><td>Fibre chemistry decides the method.</td></tr><tr><td>Restoration principal</td><td>A senior water and fire restorer</td><td>The carpet technician is often the first responder.</td></tr><tr><td>Equipment engineer</td><td>About 20 years of manufacturing and service work</td><td>The best chemistry cannot outrun a worn blower.</td></tr><tr><td>Maintenance strategist</td><td>Commercial maintenance and facility management</td><td>Interim cadence drives the economics.</td></tr><tr><td>Inspector</td><td>Senior carpet and hard-surface inspection</td><td>If you did not photograph it, it did not happen.</td></tr><tr><td>Upholstery and rug specialist</td><td>Upholstery and rug cleaning, with plant experience</td><td>Test it, then test it again.</td></tr><tr><td>Business and operations coach</td><td>A certified firm owner and pricing coach</td><td>Excellence without pricing is charity.</td></tr></tbody></table><p>Your trainer hands out printed persona cards. Volunteers also get some practice at speaking to a room.</p>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "e3f5a4ea-7d6e-5bfb-aec8-b2ecffb58761",
+       "title": "Running a case, in the room and on your own",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Run a case through the three stages.</li><li>Use the seven-card method alone on a hard job.</li></ul><p>Example (a teaching scenario, not a real job): a customer has an 80/20 wool and nylon lounge carpet with a three-year-old yellow pet stain near the window. They want it back in use tonight and they have mentioned a cheap quote from a competitor. Run it through the council. The textile scientist will talk about the fibre fence and the weakest-member rule. The inspector will ask for photographs and a moisture reading before you touch it. The equipment engineer will ask what temperature your machine really delivers. The business coach will ask what the callback risk costs.</p><p>Then the Chair pulls it together: acid-side chemistry first on the aged urine, warm water and not hot, a low-alkalinity product, a signed moisture addendum, an honest talk about permanent dye change, and a price that covers the drying time.</p><h3>Using the council on the job</h3><p>A working cleaner rarely has seven experts on call. You can still run the method alone. Write the seven viewpoints on seven index cards, spend 60 seconds with each one on a tricky job, then pull it together. The exercise reliably shows up blind spots you could not see from a single point of view.</p>",
+       "orderIndex": 2,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "7c9f64db-f6ec-55f0-97a1-65868fe4812c",
+       "title": "Module 11 Knowledge Check: Expert Board Case Review",
+       "contentType": "quiz",
+       "contentBody": "7a5bf1f1-f950-5dc6-8856-6a04c1fae40e",
+       "orderIndex": 3,
+       "isPreview": false,
+       "resources": [
+        {
+         "label": "Module 11 Knowledge Check: Expert Board Case Review",
+         "url": "quiz:7a5bf1f1-f950-5dc6-8856-6a04c1fae40e"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "8a0bd22c-2018-5480-9e0b-9166fb9a265d",
+     "title": "Module 12: Advanced Stain Removal",
+     "orderIndex": 11,
+     "lessons": [
+      {
+       "id": "6652da82-4ffa-5dc8-b6f1-ee5bf520cf6d",
+       "title": "The escalation ladder and the chromophore",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Name the six rungs of the escalation ladder and what each one does.</li><li>Explain how oxidisers and reducing agents each switch off a chromophore.</li></ul><p>Module 5 gave you the framework: identify the class, blot, go cold first, then escalate. Know when to stop. This module goes one layer deeper into the chemistry of escalation, the problem stains that beat beginners, and the spills you will actually meet in Australian homes and workplaces. It assumes you have the Module 5 decision tree, the six-bottle kit and the three-attempt rule.</p><p>Escalation does not mean trying a stronger product. Each rung uses a different chemical mechanism. Climb only as far as the stain forces you, and rinse between rungs, because a residue from rung 2 can neutralise rung 3.</p><table><thead><tr><th>Rung</th><th>Mechanism</th><th>Use for</th><th>Watch-out</th></tr></thead><tbody><tr><td>1. Aqueous spotter</td><td>Dissolve and suspend</td><td>Water-soluble soils</td><td>Over-application leads to re-soiling</td></tr><tr><td>2. pH shift (acid or alkaline)</td><td>Move the stain off its set point</td><td>Tannin (acid) and general organic soil (alkaline)</td><td>Match it to the fibre fence</td></tr><tr><td>3. Enzyme or protein digester</td><td>Break protein bonds</td><td>Blood, dairy, vomit, urine solids</td><td>Needs dwell and warmth. Cool water first on blood</td></tr><tr><td>4. Solvent (POG)</td><td>Dissolve non-polar soil</td><td>Oil, grease, gum, adhesive, ink</td><td>Ventilate. Some products are flammable</td></tr><tr><td>5. Oxidiser (hydrogen peroxide, 3 to 12 per cent)</td><td>Break the chromophore by adding oxygen</td><td>Set tannin, coffee, some dyes</td><td>Test on the fibre. Can lighten some carpets</td></tr><tr><td>6. Reducing agent (sulphite or bisulphite)</td><td>Break the chromophore by removing oxygen</td><td>Red dye, cordial, some inks</td><td>Heat-assisted. Never mix with the oxidiser</td></tr></tbody></table><h3>The chromophore</h3><p>A stain is visible because part of a molecule, the chromophore, absorbs light. You do not have to remove the whole molecule. You only have to break the part that absorbs light. Oxidisers do it by adding oxygen and reducing agents do it by taking oxygen away. That is why a dye stain that ignores detergent can give way to a reducing agent. You are not lifting it. You are switching its colour off.</p>",
+       "orderIndex": 0,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "132f3919-0f5b-519f-a2bc-ef2098354569",
+       "title": "Problem stains: dyes, urine, tannin, protein, solvent soils",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Treat red dye, aged urine and tannin, then protein and oily soil, in the right order.</li><li>Say why heat is deliberate on red dye and forbidden on protein.</li></ul><p>Cold first and test first apply to every entry below. All chemistry stays inside the fibre fence from Modules 2 and 3. On wool, keep acid-side products at pH 2.5 or higher and keep heat low.</p><h3>Red dye: cordial, red sports drinks, some lollies</h3><ol><li>Blot. Do not heat yet.</li><li>Try an aqueous spotter first, because some fresh red is just water-soluble colour.</li><li>If it holds, apply a reducing-agent red-dye remover, cover it with a damp white towel and apply gentle heat in short bursts. A steam iron over the towel works, or a low pass of the wand. Check every 30 to 60 seconds.</li><li>Rinse-extract fully and reinspect at 24 hours. Never leave a reducing agent in the fibre.</li></ol><p>Heat is the accelerator for the reducing agent, not the enemy. Red-dye reducers are the one deliberate exception to cold first, because they are designed to be heat-activated. The danger is heat on the wrong stain: it sets protein and tannin. So heat is the last rung, used only when you have confirmed a synthetic dye stain on a heat-tolerant fibre.</p><h3>Aged pet urine: the three-year-old yellow</h3><p>Fresh urine is about pH 6, and aged urine climbs to pH 10 to 12 as bacteria convert urea to ammonia. Alkaline pre-spray adds alkalinity to an already alkaline, dye-stripping substrate, so go acid-side first.</p><ul><li>The real job is below the surface. The pad, the underlay and sometimes the floor hold the salts. Tell the customer that treating the surface is not decontamination.</li><li>Urine salts are hygroscopic. They pull moisture from humid air, and the smell returns on the next damp day. That is why the smell came back. It never left the underlay.</li><li>Escalate to an enzyme or oxidiser urine treatment with proper dwell for odour. Heavy contamination may need the floor sealed or the carpet and underlay replaced. That is outside a cleaning scope, so refer it or quote it as restoration.</li></ul><h3>Coffee, tea, red wine and tomato: tannin</h3><p>Use an acidic spotter that is wool-compatible and low in alkalinity. If colour remains, use an oxidiser. Tannin is the textbook oxidiser stain. Rinse between rungs and never chase tannin with strong alkaline, which sets it and browns it.</p><h3>Blood, egg, dairy or vomit: protein</h3><p>Use cool water only, because heat cooks protein and sets it for good. Use an enzyme or mild alkaline digester with proper dwell. Vomit is protein plus acid plus food dye together, so treat it in sequence: protein first, then the dye.</p><h3>Oil, grease, tar, lipstick, gum or adhesive: solvent-soluble</h3><p>Use a POG solvent. For gum, freeze it and shatter it, or use a citrus gum-freeze solvent, then POG for the residue. Ventilate, because some solvents are flammable. Keep ignition sources away and use RCD-protected leads.</p>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "fb190fef-ecfa-5644-9ccd-6995bf5f3275",
+       "title": "Problem stains: ink, rust, turmeric, nail polish, wax or colour loss",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Choose the right chemistry for ink, rust, turmeric, nail polish and wax.</li><li>Recognise a bleach spot as colour loss and handle it honestly.</li></ul><h3>Ink</h3><p>It depends on the ink. Ballpoint is oil-based, so use a solvent or POG. Water-based and gel inks respond to an aqueous spotter and then a reducer. Permanent marker needs solvent and you should expect only partial removal. Test a hidden area first, because some inks spread wider under solvent before they lift.</p><h3>Rust: acid, never alkaline</h3><p>Use a dedicated oxalic-acid rust remover. It is a strong acid, so ventilate, wear nitrile gloves, and keep it off calcareous surfaces nearby. Rinse thoroughly, because leftover acid re-soils and can damage the fibre dye.</p><h3>Turmeric, curry or mustard</h3><p>Common in Australian kitchens and share houses. The oil comes out first with POG. The yellow curcumin is a dye, so treat it with an oxidiser, and it is famously stubborn. Sunlight fades curcumin, so an honest \"it will keep fading over a week in daylight\" is often the truest advice. Say it may not clear fully.</p><h3>Nail polish</h3><p>Acetone lifts polish but it also dissolves acetate and some dyes and backings. Test hard. On a doubtful fibre, refer the job rather than risk a hole.</p><h3>Candle wax</h3><p>This is heat transfer, not chemistry. Scrape off the surface, lay a white blotter or paper towel on top and warm it with a low iron to wick the wax up into the paper. Then POG any dye residue. Do not start with solvent, because you will spread it.</p><h3>Bleach spots are not stains</h3><p>A bleach spot has removed colour, not added it, and no cleaner brings it back. It is colour repair, which means re-dyeing the affected tufts. Recognise it, disclose it honestly, and quote it as a repair or refer it. Never imply that cleaning will fix it.</p><h3>The Australian spill profile</h3><p>You will meet these more than anything else in Australian homes and workplaces: red cordial from kids' parties, coffee, red wine, turmeric or curry, pet urine, fake tan (a dihydroxyacetone stain that responds to an oxidiser), grass and clay on entry carpets, and sunscreen oil transferred to upholstery and vehicle interiors in summer. Stock the six-bottle kit plus a rust remover, a red-dye reducer and an oxidiser and you cover most of them.</p><h3>Safety rules, repeated</h3><ul><li>Never mix an acid spotter with chlorine bleach. It produces chlorine gas.</li><li>Never mix an oxidiser with a reducing agent. They neutralise each other and can give off heat.</li><li>Rinse thoroughly between escalation rungs.</li><li>Wear nitrile gloves and eye protection for oxidisers, reducers, rust removers and solvents, every time.</li></ul><h3>Take-aways by experience level</h3><ul><li><strong>Newby:</strong> Identify the class, test it, blot it, and start cold. A bleach spot is colour loss and not a stain. Never mix acid with chlorine or an oxidiser with a reducer.</li><li><strong>Intermediate:</strong> Climb the ladder one rung at a time and rinse between rungs. Know which stains are oxidiser stains (tannin) and which are reducer stains (red dye), and why heat is deliberate on red dye and forbidden on protein.</li><li><strong>Pro:</strong> Read sub-surface contamination and set honest expectations. Recognise colour repair as separate from cleaning, document a permanent dye stain for the customer's record, and stop at the three-attempt line.</li></ul>",
+       "orderIndex": 2,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "a3295ba3-2c59-5041-a95d-e1375cdb9507",
+       "title": "Module 12 Knowledge Check: Advanced Stain Removal",
+       "contentType": "quiz",
+       "contentBody": "8411c56d-5394-5984-8820-2a06b8dc0f44",
+       "orderIndex": 3,
+       "isPreview": false,
+       "resources": [
+        {
+         "label": "Module 12 Knowledge Check: Advanced Stain Removal",
+         "url": "quiz:8411c56d-5394-5984-8820-2a06b8dc0f44"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "c43819cd-45f7-5436-80b3-db53493b8a20",
+     "title": "Module 13: Strip and Seal",
+     "orderIndex": 12,
+     "lessons": [
+      {
+       "id": "ec9d0470-8f4c-5ef6-b742-f5a14fe0240d",
+       "title": "Where strip and seal belongs and the chemistry",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Say which floors you strip and seal and which you never strip.</li><li>Describe what the stripper, the neutraliser and the sealer each do.</li></ul><p>Module 8 taught you to clean hard floors safely: inspection first, the vinegar drop test, the calcareous and siliceous rule. Strip and seal is the next service up. You remove spent floor finish and lay fresh protective coats on resilient floors. It is one of the most valuable add-ons a carpet cleaner can offer, because the customer already trusts you and much of the equipment overlaps. It also carries more chemical and slip risk than anything else in the workshop, so it is taught as a disciplined sequence and not a knack.</p><table><thead><tr><th>Floor</th><th>Strip and seal?</th><th>Why</th></tr></thead><tbody><tr><td>Vinyl sheet or VCT (vinyl composition tile)</td><td>Yes, the core case</td><td>Made for a stripped and sealed acrylic finish</td></tr><tr><td>Linoleum</td><td>Yes, with care</td><td>Alkali-sensitive. Use a lino-safe stripper, never a high-pH flood</td></tr><tr><td>LVT (luxury vinyl tile or plank)</td><td>Usually no top coat</td><td>Most LVT has a factory wear layer. Clean and protect it, do not strip it</td></tr><tr><td>Sealed timber or laminate</td><td>No</td><td>Water and alkali swell the joints. Refinishing is a joiner's trade</td></tr><tr><td>Marble, limestone, travertine</td><td>No, and never acid</td><td>Calcareous. Stone sealing is a separate discipline</td></tr><tr><td>Ceramic or porcelain with grout</td><td>Grout seal only</td><td>The tile itself is not stripped</td></tr></tbody></table><p>If you are not certain a floor is resilient and finish-coated, inspect it first (Module 8) and do not strip. A stripped timber floor or an etched marble floor is a five-figure mistake. That is CARSI professional judgement, not a quoted price.</p><h3>The chemistry</h3><ul><li><strong>Stripper:</strong> a strong alkali, often with a solvent booster, that softens and dissolves the old finish so it can be lifted. High pH, so protective equipment matters.</li><li><strong>Neutraliser or rinse:</strong> a mild acid or neutral rinse that brings the floor back to neutral so the new finish bonds. Skip it and the new sealer will not adhere and will powder off.</li><li><strong>Sealer or finish:</strong> a water-based acrylic or metal-cross-linked polymer laid in thin coats that level and cure to a protective, buffable film.</li></ul><p>Source the stripper, the neutraliser and the finish from your supplier. The current label and SDS for the specific product beat any general rule here.</p>",
+       "orderIndex": 0,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "c4230d78-0268-59a7-8ff5-270fe463affa",
+       "title": "The nine steps in order",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Run the nine steps in the right order.</li><li>Say why the neutral rinse is the step that decides the job.</li></ul><p>Every step assumes Australian site conditions: a 230 V, 10 A general power outlet, RCD-protected leads, and wet-floor signage from the first drop of stripper.</p><ol><li><strong>Inspect and confirm the floor is resilient.</strong> Check for lifting tiles and moisture, and for old tile that may contain asbestos (see the next lesson).</li><li><strong>Protect the site.</strong> Put up wet-floor signs, cordon the area, mask the skirting and edges, lift or protect adjacent carpet, and ventilate.</li><li><strong>Dust-mop or vacuum all loose grit.</strong> Grit under a pad scratches the floor.</li><li><strong>Apply stripper</strong> to a section you can manage at the label dilution and let it dwell. Do not let it dry. Re-wet if it flashes off.</li><li><strong>Agitate</strong> with a rotary machine and a stripping pad, or a stiff deck brush in corners and edges. The finish should turn to a milky slurry.</li><li><strong>Pick up the slurry</strong> with a wet vacuum or extractor straight away, before it dries back onto the floor.</li><li><strong>Neutralise and rinse</strong> with a neutral or mild acid rinse, pick it up, then repeat with clean water until the floor squeaks clean and a pH test reads neutral.</li><li><strong>Dry fully.</strong> The floor must be bone dry before sealer goes down. Trapped moisture clouds the finish and wrecks adhesion. Airmovers help.</li><li><strong>Apply sealer in thin, even coats,</strong> edges first and then a figure-eight fill. Let each coat cure to the label, typically 2 to 5 coats. Burnish at high speed once cured if you want more gloss.</li></ol><h3>The neutral rinse is the whole job</h3><p>Nine times out of ten a strip and seal that fails, with a finish that powders, peels or never gains gloss, failed at step 7 and not step 9. That is CARSI professional judgement from the trainer's experience. Stripper residue is alkaline, and fresh acrylic finish needs a neutral floor to bond. Leave a fifth of the stripper behind and the customer gets a lovely floor for a fortnight and then a chalky, streaky one. Two checks separate a job that lasts a year from a callback in three weeks: the rinse water running clear, and a pH strip that reads neutral.</p>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "1cbf2b89-0350-5c02-b275-16adba1f7b61",
+       "title": "Safety, the asbestos stop rule and pricing",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>State the protective equipment and site controls for strip and seal.</li><li>Apply the asbestos stop rule to an old resilient floor.</li><li>Price coat count and drying time honestly.</li></ul><h3>Safety for strip and seal</h3><ul><li><strong>Protective equipment:</strong> chemical-grade nitrile gloves, safety glasses or goggles, non-slip closed footwear, and a P2 respirator if the product or the ventilation calls for it. Strippers blister skin and sting eyes.</li><li><strong>Slip:</strong> a stripped or freshly sealed floor is extremely slippery. Keep signs and a cordon up until it is fully cured and safe to walk on.</li><li><strong>Electrical:</strong> RCD-protected leads only. Keep leads and machine bodies out of the slurry. Power at 230 V plus water is an electrocution risk, and the safety switch is what manages it.</li><li><strong>SDS</strong> on site for the stripper, the neutraliser and the sealer, and labels on decanted containers.</li><li><strong>Ventilation</strong> for solvent-boosted strippers.</li></ul><h3>Old tile can contain asbestos</h3><p>Vinyl-asbestos tile was widely laid in Australian schools and halls, and in shops before the late 1980s. Aggressive stripping and machine sanding of unknown old tile can release fibres. If a tiled resilient floor looks like it was laid before 1990 and you do not know its history, stop, do not disturb it, and refer it for assessment. Safe Work Australia's asbestos rules govern here, not the finish maker. In New Zealand, check the current asbestos requirements with WorkSafe New Zealand.</p><h3>Pricing</h3><p>Strip and seal is priced per square metre and takes plenty of labour and coats. Two traps:</p><ul><li><strong>Coat count.</strong> A four-coat finish is roughly double the finishing labour of two coats. Quote the coat count.</li><li><strong>Rinse and dry time.</strong> The neutral rinse and the full dry look unbillable and they are not optional. Price them in or you pay for them out of your margin. This is the drying trade-off from Module 4, applied to hard floors.</li></ul><h3>Take-aways by experience level</h3><ul><li><strong>Newby:</strong> Strip and seal is a resilient-floor service, mainly VCT and vinyl. Never strip timber, laminate or stone. Signs and protective equipment from the first drop. Old unknown tile means stop and refer.</li><li><strong>Intermediate:</strong> Run the nine steps and never skip the neutral rinse. Confirm bone dry before sealer, lay thin even coats and quote the coat count.</li><li><strong>Pro:</strong> Tell LVT from VCT and finished from unfinished floors on sight. Trace adhesion failures back to the rinse step, price coat count and cure time honestly, and spot asbestos-risk floors before machinery touches them.</li></ul>",
+       "orderIndex": 2,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "703dc4cb-3871-5878-a6ab-fad701699d7c",
+       "title": "Module 13 Knowledge Check: Strip and Seal",
+       "contentType": "quiz",
+       "contentBody": "31f2cb09-44ab-5a1e-b916-cc9045f6ee7d",
+       "orderIndex": 3,
+       "isPreview": false,
+       "resources": [
+        {
+         "label": "Module 13 Knowledge Check: Strip and Seal",
+         "url": "quiz:31f2cb09-44ab-5a1e-b916-cc9045f6ee7d"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "82771773-e261-5e68-8764-906e256421bc",
+     "title": "Module 14: Add-On Services",
+     "orderIndex": 13,
+     "lessons": [
+      {
+       "id": "af62eced-43b7-5d8e-9524-eb6d21d6d90c",
+       "title": "The add-on principle and the one-visit maths",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Explain why a second service on the same visit earns a higher margin.</li><li>Tell an honest add-on offer from a prohibited pressure upsell.</li></ul><p>Module 10 taught the six cost lines and three pricing models. This module answers the question that decides whether a run of jobs is profitable or just busy: what else can you honestly sell on the visit you are already standing in?</p><h3>Inspection-led, not pressure-led</h3><p>A CARSI add-on is offered because the inspection found a genuine need or opportunity. You disclose it plainly and leave the choice with the customer. \"Your traffic lanes will re-soil fast without protector. Here is what it does and what it costs, and it is your call\" is a service. Invented urgency and phantom problems are not. They are prohibited under the Australian Consumer Law, which bans misleading conduct. Sell the truth. On a trusted visit the truth sells well enough.</p><h3>Why add-ons multiply margin</h3><p>The first service on a visit pays the fixed costs: drive time, set-up, pack-down and the minimum call-out. A second service added while you are already on site skips almost all of that. Your average job value rises much faster than your cost per visit, which makes it the most reliable lever a small operator has on take-home profit. Track average services per visit as a measure alongside your callback rate.</p>",
+       "orderIndex": 0,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "75789f94-7090-5018-8e6a-af72dffdcb26",
+       "title": "The CARSI add-on menu",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Match common add-ons to the trigger you find at inspection.</li><li>Explain why end-of-lease cleaning is a standing job type in Australia.</li></ul><h3>Tier 1: attaches to almost every carpet job</h3><table><thead><tr><th>Service</th><th>What it is</th><th>Trigger at inspection</th></tr></thead><tbody><tr><td>Carpet protector</td><td>A fibre protector applied after cleaning</td><td>Worn traffic lanes, kids or pets, light-coloured carpet</td></tr><tr><td>Deodorising</td><td>An odour treatment</td><td>Pet, smoke, damp or a general musty smell</td></tr><tr><td>Spot and stain treatment</td><td>Targeted work beyond the standard clean</td><td>Any stain flagged at pre-inspection</td></tr><tr><td>Sanitising or anti-allergen</td><td>An antimicrobial or dust-mite treatment</td><td>Asthma or allergy households, aged care, childcare</td></tr></tbody></table><h3>Tier 2: same site, different surface</h3><table><thead><tr><th>Service</th><th>What it is</th><th>Trigger at inspection</th></tr></thead><tbody><tr><td>Upholstery cleaning</td><td>Lounges, sofas, dining chairs (Modules 6 and 7)</td><td>Matching soil on soft furniture</td></tr><tr><td>Mattress cleaning and sanitising</td><td>Dust-mite and stain treatment</td><td>Bedrooms and allergy households</td></tr><tr><td>Tile and grout cleaning</td><td>High-pressure hard-floor clean (Module 8)</td><td>Kitchens, bathrooms, entries</td></tr><tr><td>Grout sealing</td><td>A penetrating sealer after the grout clean</td><td>Porous or stained grout lines</td></tr><tr><td>Strip and seal</td><td>Resilient floor finish renewal (Module 13)</td><td>VCT or vinyl in shops, halls, offices</td></tr><tr><td>Rug cleaning</td><td>Area rugs, wool rugs and oriental rugs</td><td>Loose rugs on the same job</td></tr></tbody></table><h3>Tier 3: specialist, seasonal, commercial</h3><table><thead><tr><th>Service</th><th>What it is</th><th>Trigger at inspection</th></tr></thead><tbody><tr><td>Pet treatment package</td><td>Urine decontamination plus deodorising and protector</td><td>Pet households (see Module 12)</td></tr><tr><td>Vehicle and marine interior</td><td>Car and boat carpet and upholstery</td><td>Read the safety lesson that follows first</td></tr><tr><td>End-of-lease carpet cleaning</td><td>A documented clean to a standard</td><td>Rental turnover</td></tr><tr><td>Commercial maintenance plan</td><td>A scheduled interim and restorative cadence</td><td>Any commercial site</td></tr><tr><td>Post-event and hospitality</td><td>Fast turnaround on venue carpet</td><td>Function centres and clubs</td></tr></tbody></table><h3>End-of-lease is a standing job type</h3><p>Roughly a third of Australian households rent. The 2021 Census puts it at about 30.6 per cent (Australian Bureau of Statistics). That makes bond cleaning a steady, repeatable job with good documentation, often with a receipt the tenant needs to get their bond back. It rewards a clean, dated, photographed report, and your drying discipline from Module 4 and the pre-inspection sheet become the deliverable.</p>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "4a3c98a4-789a-512f-883d-b31f20f681a8",
+       "title": "Vehicles, boats or caravans: remove the fuel hazard first",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>List the controls you apply before wet extraction inside an enclosed vehicle, boat or caravan.</li><li>Explain why petrol vapour is the hazard that matters.</li></ul><p>Interior detailing is a natural add-on, but working inside an enclosed vehicle, boat or caravan carries a hazard a carpet-only job does not: petrol vapour. Before any wet extraction or mains-powered cleaning in a closed cabin or cargo space, do these things.</p><ul><li><strong>Remove any fuel cell, auxiliary tank, jerry can or portable fuel container</strong> from the cabin, boot or cargo bay before you start. This is the step skipped most often and it matters most.</li><li><strong>Ventilate fully.</strong> Open every door and hatch and air the space before and during the work. A closed cabin concentrates both fuel vapour and cleaning-solvent fumes.</li><li><strong>Control ignition.</strong> No smoking and no naked flame. Use RCD-protected leads and keep switching gear out of any low-lying vapour.</li><li><strong>Flag LPG and dual-fuel vehicles, and electric and hybrid ones.</strong> LPG systems and high-voltage battery systems have their own isolation requirements. If you are not competent to make them safe, do not proceed.</li><li><strong>Never run a combustion engine</strong> (a truck-mount included) in an unventilated garage or enclosed space. That is a carbon monoxide hazard on top of the fuel-vapour one.</li></ul><h3>Why vapour sinks to where you work</h3><p>Petrol vapour is roughly three to four times the density of air. It does not drift up and away. It falls and pools in the lowest enclosed space it finds, which in a car is the footwell and the boot well you are about to soak and extract with a 230 V machine. Your extractor and its leads, plus the switches and the vacuum motor, are all ignition sources. Removing the fuel cell takes the fuel out of the fire triangle, so even if a switch arcs there is nothing at floor level to burn. Make it step one of every vehicle job, written on the pre-inspection sheet, before a hose comes off the van.</p>",
+       "orderIndex": 2,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "50b69629-e7df-5666-b64a-208f3487f2de",
+       "title": "Further training, the honest script and what to track",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Match add-ons to the kind of further training that backs them.</li><li>Present an add-on using the four-step honest script.</li></ul><h3>Add-ons and further training</h3><p>Some add-ons are backed by further training that you take through schools and examinations approved by the IICRC, for example odour control, rug cleaning, upholstery cleaning, fabric cleaning, commercial carpet maintenance or colour repair. CARSI is accredited as an IICRC CEC provider. They do not replace the school and the exam. A technician trained in carpet cleaning, upholstery work and odour control can offer all three on one visit and charge for each.</p><table><thead><tr><th>Add-on</th><th>Backed by</th></tr></thead><tbody><tr><td>Deodorising</td><td>Odour-control training</td></tr><tr><td>Upholstery and mattress cleaning</td><td>Upholstery and fabric cleaning training</td></tr><tr><td>Rug cleaning</td><td>Rug cleaning training</td></tr><tr><td>Commercial maintenance plans</td><td>Commercial carpet maintenance training</td></tr><tr><td>Colour and bleach-spot repair</td><td>Colour repair training</td></tr><tr><td>Strip and seal; tile and grout</td><td>Hard-floor competence from Modules 8 and 13</td></tr></tbody></table><h3>The honest script</h3><ol><li>Find it at the inspection, not halfway through the clean. Write it on the pre-inspection sheet.</li><li>Show the customer the actual condition: the traffic lane, the stained grout, the pet spot.</li><li>State plainly what the service does, what it costs, and what happens if they decline. No urgency theatre.</li><li>Leave the choice with them and record accept or decline on the job sheet.</li></ol><p>Example wording: \"While I had the machine out I noticed the grout in your entry is holding soil the mop cannot reach. I can high-pressure clean and seal it today for [price], or leave it. It is entirely your call.\" It is specific, it is priced and it is optional. That is the whole technique.</p><h3>What to track</h3><p>Average services per visit, alongside callback rate. If the first goes up and the second does not, your add-on habit is working.</p><h3>Take-aways by experience level</h3><ul><li><strong>Newby:</strong> Learn the menu and offer only what you can do well. Find add-ons at inspection and disclose them honestly. Never invent a problem. On any vehicle, boat or caravan job, remove enclosed fuel cells and ventilate before you start.</li><li><strong>Intermediate:</strong> Track services per visit and average job value. Attach protector and deodorising to most jobs and quote each service as its own line.</li><li><strong>Pro:</strong> Build packages that combine services, design commercial maintenance cadences, and own repeatable Australian job types such as bond cleans and commercial plans.</li></ul>",
+       "orderIndex": 3,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "a2eca44f-b0a6-5982-95ea-5c5cf37740e3",
+       "title": "Module 14 Knowledge Check: Add-On Services",
+       "contentType": "quiz",
+       "contentBody": "2c28f66e-f412-5f34-9df7-784ddc2a288c",
+       "orderIndex": 4,
+       "isPreview": false,
+       "resources": [
+        {
+         "label": "Module 14 Knowledge Check: Add-On Services",
+         "url": "quiz:2c28f66e-f412-5f34-9df7-784ddc2a288c"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "c71ae896-489a-5a64-9e4a-79ea2cc51a95",
+     "title": "Module 15: The Marketing Engine",
+     "orderIndex": 14,
+     "lessons": [
+      {
+       "id": "7e8b15cb-b90e-5a71-ab16-099f561027cf",
+       "title": "What the 2026 data says, with its limits",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>State each finding and where its figure comes from.</li><li>Explain why a US study is read as directional for an Australian business.</li></ul><p>Technical excellence with an empty diary is a hobby. Module 10 protects your margin on each job. This module fills the diary those jobs come from. It rests on one idea the trade under-uses: for a local service business, video connected across your channels is now the front door.</p><p>Every figure below carries its source and its limits, so you can weigh it for yourself. Anything without a source is labelled as CARSI professional judgement.</p><ul><li><strong>The Local Pack is where local customers land.</strong> A 2026 WebFX study of 100 US home-services search terms (500 searches) found the Google Local Pack, the top-three map block, in 98 per cent of the searches. It is the one placement you earn through your Google Business Profile, with reviews and relevance, and not one you buy. Read it as directional for an Australian carpet cleaner. It is a US study of home services in general, including heating, plumbing or roofing, and it is not about carpet. The lesson about owning your Local Pack still carries across. This one is verified against the published method.</li><li><strong>Video is under-used.</strong> Publisher-reported figures say videos on Google Business Profiles are viewed about twice as often as photos, while only about 4 per cent of profiles use video (SOCi and Publer). These are publisher-reported and not independently audited, so treat them as a direction and not as proof.</li><li><strong>Customer photos help.</strong> SOCi reports that profiles with customer photos get 42 per cent more direction requests. That is attributed to the publisher and also directional.</li></ul><p>The takeaway stands on its own. A complete profile with photos and video engages more people than a bare one.</p><h3>What was cut, and why</h3><p>Two popular statistics were left out. One says 76 per cent of local searchers visit within 24 hours. It traces back to a 2016 US retail diary study, which is a decade old, the wrong market and the wrong kind of business. The other says 46 per cent of searches have local intent, and no current primary source could be confirmed. Repeating stale or out-of-context statistics as current fact is a hard stop for CARSI.</p>",
+       "orderIndex": 0,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "9845876d-dd97-549f-b665-f0a53997e8e3",
+       "title": "The connected system and how to wire it",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Name the four accounts in the connected system.</li><li>Link the accounts so one filming session feeds every channel.</li></ul><p>Think of a hub and spokes. YouTube is the library, your Google Business Profile is the shopfront, the social feeds are the reminders and your website closes the sale. One 30-second video, filmed on the job, goes to YouTube, the Google Business Profile, your Facebook Page, Instagram Reels and the matching service page on your website. Connect them once and each new video feeds all of them.</p><h3>The wiring</h3><ol><li><strong>Claim or create four accounts</strong> under one business identity: a YouTube channel, a Google Business Profile, a Facebook Page and an Instagram Business account.</li><li><strong>Link Instagram to the Facebook Page</strong> through a Meta Business account so a post or Reel publishes to both. The most common gap is that the two are not linked, which doubles the work.</li><li><strong>Add video to the Google Business Profile,</strong> not just photos. This is the move almost no one makes.</li><li><strong>Put your YouTube link</strong> on the website, the Facebook Page, the Instagram bio and the Business Profile.</li><li><strong>Link every video description and post back</strong> to the matching service page on your site, with the phone number. A tile and grout clip links to the tile and grout page, not the homepage.</li></ol>",
+       "orderIndex": 1,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "72e2c2de-1859-5824-8b60-9aa89311d27a",
+       "title": "What to film, how to measure and the compliance line",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Film the five clip types in the recommended format.</li><li>Measure results over a sensible window.</li><li>Apply the Australian Consumer Law to before and after images and reviews.</li></ul><h3>What to film</h3><p>Home-service customers tend to trust job-site footage over studio ads. You do not need a studio. You need a weekly rhythm, and one useful video a week is enough for most local brands. These points come from practitioner guidance, not from a controlled study. Film the five clips as you work:</p><table><thead><tr><th>Clip</th><th>What to show</th><th>What it does</th></tr></thead><tbody><tr><td>Before and after</td><td>The traffic lane or stain, then the result</td><td>Proof, the trade's strongest asset</td></tr><tr><td>\"Did you know\" tip</td><td>One 20-second fact, such as blot, do not rub</td><td>Authority and repeat views</td></tr><tr><td>Service in action</td><td>A safe part of the process, such as a wand pass</td><td>Shows expertise</td></tr><tr><td>Verification clip</td><td>The van, uniform, tools, a street sign and one live action</td><td>Local proof for the Business Profile</td></tr><tr><td>Result walkthrough</td><td>The finished room, shown honestly</td><td>Supports the sale</td></tr></tbody></table><p>The format that holds attention: about 3 seconds of location, then 15 to 20 seconds of the work, then a few seconds of the result. Keep it under 30 seconds, hold the phone steady and skip the long intro.</p><h3>The image plan</h3><ul><li>A hero before-and-after still for the website service page and the Business Profile photo set.</li><li>The 30-second video for YouTube, the Business Profile, Facebook, plus an Instagram Reel.</li><li>Three to five Business Profile photos for each category: exterior, interior, team, equipment, results.</li><li>A branded thumbnail in your business colours.</li></ul><p>Shoot in Australian homes and workplaces, with customer permission on file and no private details in frame. Looking local is the point of local discovery.</p><h3>Measurement</h3><ul><li>Add UTM tags to the website link on your Business Profile and social bios so the traffic shows up in your analytics.</li><li>Track the actions that pay: profile calls, website clicks, direction requests and form fills, then lead quality after each upload.</li><li>Judge over 60 to 90 days, not one week. Video builds familiarity over time.</li><li>Reviews add up. SOCi reports about a 3 per cent lift in Business Profile conversions for every 10 new reviews. It is an attributed figure, so use it as a direction. Ask for a review after each job as part of the same weekly rhythm.</li></ul><h3>Market honestly</h3><p>Everything you publish falls under the Australian Consumer Law. Claims must be truthful and substantiated, testimonials genuine, and before and after images must come from the same real job, never a stock image or a swapped \"after\". Any incentive or connection behind a review must be disclosed. Sell the truth.</p><h3>Take-aways by experience level</h3><ul><li><strong>Newby:</strong> Claim the four accounts, link Instagram to Facebook, add video to your Google Business Profile, and film one honest before and after this week.</li><li><strong>Intermediate:</strong> Run the weekly one-video rhythm across every channel from one filming session, link each video to its service page, and ask for a review after every job.</li><li><strong>Pro:</strong> Read the analytics over 60 to 90 days, build a content calendar by service and season, and make \"the most real, most consistently\" your advantage.</li></ul>",
+       "orderIndex": 2,
+       "isPreview": false,
+       "resources": null
+      },
+      {
+       "id": "385ffaa4-c1e7-5b95-abf7-2586f399a47f",
+       "title": "Module 15 Knowledge Check: The Marketing Engine",
+       "contentType": "quiz",
+       "contentBody": "a4f3b093-3a8c-5785-a878-b5421fff868c",
+       "orderIndex": 3,
+       "isPreview": false,
+       "resources": [
+        {
+         "label": "Module 15 Knowledge Check: The Marketing Engine",
+         "url": "quiz:a4f3b093-3a8c-5785-a878-b5421fff868c"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "34ae01e3-f37e-5c56-8f13-9518cab31fac",
+     "title": "Module 16: Workshop Close-Out",
+     "orderIndex": 15,
+     "lessons": [
+      {
+       "id": "dba03b9e-7def-51c5-b592-40ac82b7009e",
+       "title": "Your manual, your certificate and what comes next",
+       "contentType": "text",
+       "contentBody": "<h3>Learning objectives</h3><p>By the end of this lesson you can:</p><ul><li>Find and keep your digital copy of the participant manual.</li><li>Say what you need for the certificate of attendance.</li><li>Choose a next step with CARSI.</li></ul><h3>The participant manual</h3><p>The Participant Take-Home Manual is a CARSI document that follows the two days module by module. It has a quick-reference panel and a take-away for each experience level in every module, plus appendices: a fibre identification field card, pH ranges and safe defaults, the spot removal decision tree, the pre-inspection checklist, and the machinery checklist (daily, then weekly, then monthly). Download it any time from carsi.com.au/workshops/carpet-cleaning: sign in with the email you checked in with and choose Participant manual. It opens as a printable page you can save as a PDF. Printed items are handed out at the close. If you have not received your copy within a few days, contact CARSI through carsi.com.au and say which session you attended. Keep a copy on your phone, and print the field cards for the van.</p><h3>The certificate of attendance</h3><ul><li>You receive a CARSI certificate of attendance when you have been checked in on both days: once on Day 1 and once on Day 2.</li><li>If you were checked in on one day only, you do not qualify for the certificate. Talk to your trainer before you leave if your check-in was missed.</li><li>The certificate records attendance. It is not an IICRC certification and it does not carry IICRC CECs.</li></ul><h3>Next steps with CARSI</h3><ul><li>Work through Modules 12 to 15 of this course at your own pace. They cover advanced stain removal, then strip and seal, then add-on services and marketing.</li><li>Look at the other CARSI courses at carsi.com.au. CARSI is accredited as an IICRC CEC provider. IICRC certification itself comes only through schools and examinations approved by the IICRC.</li><li>Use the pre-inspection form from Module 4 on your next ten jobs and keep a maintenance log from Module 9. Both are free habits that you can start the day after the workshop.</li></ul><p>You have spent two days on the van floor. Keep the standards alive in your work.</p>",
+       "orderIndex": 0,
+       "isPreview": false,
+       "resources": null
+      }
+     ]
+    }
+   ]
   }
  ]
 }

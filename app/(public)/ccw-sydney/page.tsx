@@ -30,19 +30,19 @@ export function generateMetadata(): Metadata {
     const description = getCcwNextDatesDescription('Sydney');
     return {
       ...page,
-      title: 'CARSI x CCW Sydney | Grow Your Cleaning Business — Next dates to be announced',
+      title: 'CARSI Roadshow Sydney | Grow Your Cleaning Business — Next dates to be announced',
       description,
-      openGraph: { ...page.openGraph, title: 'CARSI x CCW Sydney — Grow Your Cleaning Business', description },
+      openGraph: { ...page.openGraph, title: 'CARSI Roadshow Sydney — Grow Your Cleaning Business', description },
     };
   }
   const sydneyDates = sydney.dates;
   return {
     ...page,
-    title: `CARSI x CCW Sydney | Grow Your Cleaning Business — ${sydneyDates}`,
+    title: `CARSI Roadshow Sydney | Grow Your Cleaning Business — ${sydneyDates}`,
     description: `Two practical business-growth days with Phill McGurk at Carpet Cleaners Warehouse Sydney (Seven Hills), ${sydneyDates}. Seats are booked through Carpet Cleaners Warehouse.`,
     openGraph: {
       ...page.openGraph,
-      title: 'CARSI x CCW Sydney — Grow Your Cleaning Business',
+      title: 'CARSI Roadshow Sydney — Grow Your Cleaning Business',
       description: `Two practical business-growth days with Phill McGurk inside Carpet Cleaners Warehouse Sydney, ${sydneyDates}.`,
     },
   };

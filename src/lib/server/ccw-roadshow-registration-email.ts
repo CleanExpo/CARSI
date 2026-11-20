@@ -55,13 +55,13 @@ export function buildRegistrationEmail(input: RegistrationEmailInput): BuiltEmai
   // credit immediately + $50 bonus on day-1 sign-in = $150 total.
   const voucherHeadline = 'Lock in your seat — and get store credit';
   const voucherLine =
-    'Pay $100 now for your CCW/CARSI training voucher and get $100 in store credit straight away, ' +
+    'Pay $100 now for your CARSI training voucher (sold through roadshow partner CCW) and get $100 in store credit straight away, ' +
     'plus a $50 bonus — $150 in total — when you turn up and sign in on day one.';
 
   const greeting = `Hi ${attendeeName || 'there'},`;
   const seatsLabel = `${seatCount} ${seatCount === 1 ? 'seat' : 'seats'}`;
   const whenWhere = [
-    `Event: CARSI x CCW Business Growth Days — ${eventCity}`,
+    `Event: CARSI Business Growth Days — ${eventCity}`,
     `When: ${dateRangeLabel}, ${timeLabel}`,
     `Where: ${venueName}, ${venueAddress}`,
     `Covers: ${seatsLabel}`,
@@ -73,25 +73,25 @@ export function buildRegistrationEmail(input: RegistrationEmailInput): BuiltEmai
   let closing: string;
 
   if (kind === 'waitlisted') {
-    subject = `You're on the waitlist — CARSI x CCW ${eventCity}`;
+    subject = `You're on the waitlist — CARSI Roadshow ${eventCity}`;
     intro =
-      `Thanks for registering for the CARSI x CCW Business Growth Days in ${eventCity}. ` +
+      `Thanks for registering for the CARSI Business Growth Days in ${eventCity}. ` +
       `This city is currently full, so you're on the waitlist. We'll email you as soon as a seat opens up.`;
     tokenBlock =
       `Your waitlist reference is ${freeEntryToken}. ` +
       `Please note this is not yet valid for entry — wait for our confirmation before making travel plans.`;
     closing = 'We will be in touch if a place becomes available.';
   } else if (kind === 'promoted') {
-    subject = `You're in! Your seat for CARSI x CCW ${eventCity} is confirmed`;
+    subject = `You're in! Your seat for CARSI Roadshow ${eventCity} is confirmed`;
     intro =
-      `Good news — a seat has opened up and your place at the CARSI x CCW Business Growth Days in ${eventCity} is now confirmed.`;
+      `Good news — a seat has opened up and your place at the CARSI Business Growth Days in ${eventCity} is now confirmed.`;
     tokenBlock =
       `Your free entry token is ${freeEntryToken}. Show this token at check-in when you arrive at the CCW location.`;
     closing = 'We look forward to seeing you there.';
   } else {
-    subject = `You're confirmed — CARSI x CCW ${eventCity}`;
+    subject = `You're confirmed — CARSI Roadshow ${eventCity}`;
     intro =
-      `Thanks for registering for the CARSI x CCW Business Growth Days in ${eventCity}. Your place is confirmed.`;
+      `Thanks for registering for the CARSI Business Growth Days in ${eventCity}. Your place is confirmed.`;
     tokenBlock =
       `Your free entry token is ${freeEntryToken}. Show this token at check-in when you arrive at the CCW location.`;
     closing = 'We look forward to seeing you there.';
@@ -123,7 +123,7 @@ export function buildRegistrationEmail(input: RegistrationEmailInput): BuiltEmai
       <p>${escapeHtml(greeting)}</p>
       <p>${escapeHtml(intro)}</p>
       <table style="border-collapse: collapse; margin: 16px 0;">
-        <tr><td style="padding: 2px 12px 2px 0; color: #666;">Event</td><td>CARSI x CCW Business Growth Days — ${escapeHtml(eventCity)}</td></tr>
+        <tr><td style="padding: 2px 12px 2px 0; color: #666;">Event</td><td>CARSI Business Growth Days — ${escapeHtml(eventCity)}</td></tr>
         <tr><td style="padding: 2px 12px 2px 0; color: #666;">When</td><td>${escapeHtml(dateRangeLabel)}, ${escapeHtml(timeLabel)}</td></tr>
         <tr><td style="padding: 2px 12px 2px 0; color: #666;">Where</td><td>${escapeHtml(venueName)}, ${escapeHtml(venueAddress)}</td></tr>
         <tr><td style="padding: 2px 12px 2px 0; color: #666;">Covers</td><td>${escapeHtml(seatsLabel)}</td></tr>

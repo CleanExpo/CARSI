@@ -54,6 +54,13 @@ const nextConfig: NextConfig = {
   // it. Vercel optimises output natively and does not need standalone, so drop
   // it on Vercel (process.env.VERCEL) and keep it for every other target. #659.
   output: process.env.VERCEL ? undefined : 'standalone',
+  // The workshop instructor manual is read from docs/ at request time (staff-only route);
+  // ship that one file with the route in standalone output.
+  outputFileTracingIncludes: {
+    '/api/lms/workshops/carpet-cleaning/instructor-manual': [
+      './docs/course-content/ccw-workshop/instructor-guide.md',
+    ],
+  },
   reactStrictMode: true,
   poweredByHeader: false,
   devIndicators: false,
@@ -86,9 +93,12 @@ const nextConfig: NextConfig = {
       // 200 + meta refresh once the response streams, so do it here as a real 308.
       {
         source: '/ccw-materials',
-        destination: '/ccw-training/workshop?section=materials',
+        destination: '/workshops/carpet-cleaning#materials',
         permanent: true,
       },
+      // The CARSI workshop moved to its permanent CARSI URL (the old path carried the
+      // roadshow partner's name). Keep old links and printed QR codes working.
+      { source: '/ccw-training/workshop', destination: '/workshops/carpet-cleaning', permanent: true },
       // IICRC's public online-CEC listing links to /restoration-courses (404 until
       // 17/09/2026). `:path*` also matches the bare path and any sub-path.
       { source: '/restoration-courses/:path*', destination: '/courses', permanent: true },

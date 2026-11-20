@@ -17,7 +17,7 @@ export const DEFAULT_PATHS = [
   '/contact',
   '/about',
   '/ccw-training',
-  '/ccw-training/workshop',
+  '/workshops/carpet-cleaning',
   '/calendar',
   '/events/ccw-roadshow',
   '/authority',

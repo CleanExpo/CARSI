@@ -145,7 +145,7 @@ describe('sitemap lists only real pages', () => {
 
   it('the legacy /ccw-materials URL is a real 308 to the workshop materials section', async () => {
     expect(await redirectFor('/ccw-materials')).toEqual({
-      destination: '/ccw-training/workshop?section=materials',
+      destination: '/workshops/carpet-cleaning#materials',
       statusCode: 308,
     });
   });

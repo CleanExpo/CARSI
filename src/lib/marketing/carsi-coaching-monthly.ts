@@ -1,7 +1,7 @@
 /** CARSI Business Coaching — scalable monthly program (LMS + monthly owner session). */
 export const carsiCoachingMonthlyPath = '/ccw-training';
 
-export const carsiCoachingWorkshopPath = '/ccw-training/workshop';
+export const carsiCoachingWorkshopPath = '/workshops/carpet-cleaning';
 
 export const carsiCoachingMonthlyPriceCents = 49_500;
 

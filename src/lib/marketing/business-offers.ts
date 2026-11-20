@@ -2,7 +2,7 @@
  * CARSI's three business-development offers, side by side.
  *
  * Two of them carry a "$495" figure — the CARSI Business Coaching subscription ($495 a month) and
- * a paid CARSI x CCW Business Growth Days seat ($495 per person, one-off) — and the Owner Circle
+ * a paid CARSI Business Growth Days seat ($495 per person, one-off) — and the Owner Circle
  * page used to call itself "not $495 Growth Days" without mentioning the monthly coaching at all.
  * This module is the single place that names all three and says what each costs and how often,
  * so every sales page describes them the same way.

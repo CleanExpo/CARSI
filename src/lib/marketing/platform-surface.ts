@@ -30,8 +30,8 @@ export const PLATFORM_SURFACE_PAGES: PlatformSurfacePage[] = [
     summary: 'After-hours group coaching, portal tools and a plan that lives in CARSI.',
   },
   {
-    href: '/ccw-training/workshop',
-    label: 'CCW Workshop',
+    href: '/workshops/carpet-cleaning',
+    label: 'CARSI Workshop',
     eyebrow: 'Hands-on CARSI workshop',
     headline: 'The Carpet Cleaning Workshop — fibre, chemistry and business on the tools',
     lead: 'Two days of practical modules anchored in ANSI/IICRC S100, S300 and S220, with a cohort resource pack for enrolled participants.',

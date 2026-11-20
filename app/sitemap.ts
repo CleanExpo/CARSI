@@ -32,7 +32,7 @@ const staticPages = [
   { path: '/pathways', priority: 0.8, changeFreq: 'weekly' as const },
   { path: '/industries', priority: 0.8, changeFreq: 'monthly' as const },
   { path: '/ccw-training', priority: 0.82, changeFreq: 'weekly' as const },
-  { path: '/ccw-training/workshop', priority: 0.72, changeFreq: 'monthly' as const },
+  { path: '/workshops/carpet-cleaning', priority: 0.72, changeFreq: 'monthly' as const },
   { path: '/ccw-truckmount-operations', priority: 0.78, changeFreq: 'weekly' as const },
   { path: '/calendar', priority: 0.7, changeFreq: 'weekly' as const },
   { path: '/research', priority: 0.72, changeFreq: 'weekly' as const },

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { getRoadshowSuccessView } from './ccw-roadshow-success';
 
-const TITLE = 'CARSI x CCW Business Growth Days';
+const TITLE = 'CARSI Business Growth Days';
 
 describe('getRoadshowSuccessView', () => {
   it('shows a waitlist state (token NOT valid for entry) when status=waitlisted', () => {

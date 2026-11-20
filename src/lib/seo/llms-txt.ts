@@ -2,7 +2,7 @@
  * /llms.txt, built per request from live sources (app/llms.txt/route.ts):
  *   - the published catalogue (same query as /courses and the sitemap),
  *   - the yearly membership tier that /pricing renders (INDIVIDUAL_TIERS + the subscriptions flag),
- *   - the CARSI x CCW roadshow events that have not ended, with each event's registration mode,
+ *   - the CARSI roadshow events that have not ended, with each event's registration mode,
  *   - the IICRC CEC approvals registry, filtered to approvals in force today,
  *   - the CARSI entity record (carsi-entity.ts).
  *
@@ -201,8 +201,8 @@ export function buildLlmsTxt(facts: LlmsFacts, opts: LlmsBuildOptions = {}): str
     '- /start-carpet-cleaning-business — Start Smart hub for people researching carpet cleaning as a business, add-on service or acquisition',
     '- /start-smart-readiness.json — Machine-readable Start Smart readiness manifest (equipment, service, chemicals and training gates)',
     events.length > 0
-      ? '- /events/ccw-roadshow — CARSI x CCW Business Growth Days (see "Upcoming events" above)'
-      : '- /events/ccw-roadshow — CARSI x CCW Business Growth Days event page',
+      ? '- /events/ccw-roadshow — CARSI Business Growth Days (see "Upcoming events" above)'
+      : '- /events/ccw-roadshow — CARSI Business Growth Days event page',
     '- /subscribe — Yearly membership sign-up',
     '- /verify/credential/{id} — Public credential verification pages',
     '',

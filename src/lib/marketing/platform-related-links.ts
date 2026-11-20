@@ -21,8 +21,8 @@ export const PLATFORM_RELATED_BY_HREF: Record<string, PlatformRelatedLink[]> = {
   ],
   '/ccw-training': [
     {
-      href: '/ccw-training/workshop',
-      label: 'CCW Workshop',
+      href: '/workshops/carpet-cleaning',
+      label: 'CARSI Workshop',
       detail: 'Two days hands-on on the tools',
     },
     {
@@ -36,7 +36,7 @@ export const PLATFORM_RELATED_BY_HREF: Record<string, PlatformRelatedLink[]> = {
       detail: 'Separate coaching from course spend',
     },
   ],
-  '/ccw-training/workshop': [
+  '/workshops/carpet-cleaning': [
     {
       href: '/ccw-training',
       label: 'Business Coaching',

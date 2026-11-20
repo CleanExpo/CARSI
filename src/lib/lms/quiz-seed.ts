@@ -33,6 +33,7 @@ export const QUIZ_FILES = [
   'floor-care-quizzes.json',
   'commercial-floor-care-quiz.json',
   'ccw-truckmount.quizzes.json',
+  'ccw-2-day-workshop-quiz.json',
   'water-damage-restoration-fundamentals-quiz.json',
   'mould-remediation-fundamentals-quiz.json',
   'structural-drying-fundamentals-quiz.json',

@@ -5,7 +5,7 @@ import { ROLE_GUIDES_HUB_PATH } from '@/lib/marketing/role-guides-path';
 export const PLATFORM_NAV = [
   { href: '/restoration-training-cost-australia', label: 'Training costs' },
   { href: '/ccw-training', label: 'Business Coaching' },
-  { href: '/ccw-training/workshop', label: 'CCW Workshop' },
+  { href: '/workshops/carpet-cleaning', label: 'CARSI Workshop' },
   { href: '/start-carpet-cleaning-business', label: 'Start Smart' },
   { href: '/authority', label: 'Authority Hub' },
   { href: ROLE_GUIDES_HUB_PATH, label: 'Role guides' },

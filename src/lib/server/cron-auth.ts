@@ -6,7 +6,7 @@ import { NextResponse } from 'next/server';
  * Shared cron authentication (WS5). FAIL CLOSED: when CRON_SECRET is unset/blank the
  * route returns 503 and never runs — so an `Authorization: Bearer undefined` header
  * can no longer match an empty secret (the original bug). The token compare is
- * constant-time (sha256 digests + timingSafeEqual), mirroring ccw-unlock.ts.
+ * constant-time (sha256 digests + timingSafeEqual).
  */
 export type CronAuthDecision =
   | { ok: true }

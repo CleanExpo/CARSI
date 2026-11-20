@@ -71,7 +71,7 @@ async function main() {
 
   const plan = {
     slug: CCW_2DAY_COURSE_SLUG,
-    title: 'CARSI x CCW Business Growth Days (2-Day Workshop)',
+    title: 'CARSI Carpet Cleaning Workshop (2-Day)',
     instructorId: instructor.id,
     // Unlisted: not surfaced in the public catalog (which only lists
     // status='published'); attendees receive access via the attendance batch.

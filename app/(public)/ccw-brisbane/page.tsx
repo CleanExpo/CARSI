@@ -32,9 +32,9 @@ export function generateMetadata(): Metadata {
     const description = getCcwNextDatesDescription('Brisbane');
     return {
       ...page,
-      title: 'CARSI x CCW Brisbane | Carpet and Upholstery Training - Next dates to be announced',
+      title: 'CARSI Roadshow Brisbane | Carpet and Upholstery Training - Next dates to be announced',
       description,
-      openGraph: { ...page.openGraph, title: 'CARSI x CCW Brisbane - Carpet and Upholstery Training', description },
+      openGraph: { ...page.openGraph, title: 'CARSI Roadshow Brisbane - Carpet and Upholstery Training', description },
     };
   }
   const brisbaneDates = brisbane.dates;
@@ -43,12 +43,12 @@ export function generateMetadata(): Metadata {
     : '';
   return {
     ...page,
-    title: `CARSI x CCW Brisbane | Carpet and Upholstery Training - ${brisbaneDates}`,
+    title: `CARSI Roadshow Brisbane | Carpet and Upholstery Training - ${brisbaneDates}`,
     description:
       `Carpet and upholstery training with Phill McGurk at Carpet Cleaners Warehouse Boondall, ${brisbaneDates}. ${brisbanePrice}book through CCW.`,
     openGraph: {
       ...page.openGraph,
-      title: 'CARSI x CCW Brisbane - Carpet and Upholstery Training',
+      title: 'CARSI Roadshow Brisbane - Carpet and Upholstery Training',
       description: `Two practical training days with Phill McGurk at Carpet Cleaners Warehouse Boondall, ${brisbaneDates}.`,
     },
   };
