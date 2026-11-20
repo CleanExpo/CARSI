@@ -16,14 +16,15 @@
  * Exit codes: 0 pass, 1 an enforced course misses a floor, 2 input error (missing or empty
  * catalogue, unknown meta.standard value). A scan of nothing is never a pass.
  *
- * Node built-ins plus two existing guards (reused, not copied): findUsForms from
- * check-au-english.mjs and scanText from check-iicrc-terminology.mjs.
+ * Node built-ins, the `entities` HTML decoder (floor 5.15), plus two existing guards (reused,
+ * not copied): findUsForms from check-au-english.mjs and scanText from check-iicrc-terminology.mjs.
  */
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { isEntryPoint } from './lib/is-entry-point.mjs';
 import { findUsForms } from './check-au-english.mjs';
 import { scanText as scanIicrcTerminology } from './check-iicrc-terminology.mjs';
+import { decodeHTMLStrict } from 'entities';
 
 // ── Standard v1 constants (docs/content/COURSE_STANDARD.md §3–5) ─────────────────────────────
 export const STANDARD_VERSION = 'v1';
@@ -87,8 +88,41 @@ const FLOORS = [
   'practical',
   'australian',
   'licence',
+  'plainText',
 ];
 export { FLOORS };
+// Plain-text fields are rendered as text, so an HTML entity in one shows up on the page
+// literally (e.g. "maker&rsquo;s"). Whether "&name;" is an entity is decided by the HTML
+// entity table (via the `entities` decoder), never by its shape, so "R&D;" and "Q&As;" stay
+// ordinary text while "&rsquo;", "&#8212;" and "&#x2014;" are caught.
+const ENTITY_CANDIDATE = /&(?:[a-z][a-z0-9]*|#\d+|#x[0-9a-f]+);/gi;
+/** The first real HTML entity written literally in `s`, or null. */
+export function findRawEntity(s) {
+  for (const m of String(s ?? '').matchAll(ENTITY_CANDIDATE)) {
+    if (decodeHTMLStrict(m[0]) !== m[0]) return m[0];
+  }
+  return null;
+}
+// Tolerates leading and repeated whitespace, so " Module 4  reference card" is still caught.
+export const REFERENCE_CARD_TITLE = /^\s*Module\s+(\d+)\s+reference\s+card\b/i;
+/** Short labels for the text table's "failing" column; every floor must have one. */
+export const FLOOR_ABBR = {
+  metadata: 'meta',
+  structure: 'struct',
+  depth: 'depth',
+  moduleChecks: 'modchk',
+  explanations: 'explain',
+  finalQuiz: 'final',
+  fieldDownloads: 'dl',
+  lessonPattern: '7part',
+  lessonWords: 'words',
+  visual: 'visual',
+  metricExample: 'metric',
+  practical: 'prac',
+  australian: 'au',
+  licence: 'licence',
+  plainText: 'plain',
+};
 
 // ── helpers ─────────────────────────────────────────────────────────────────────────────────
 function stripHtml(s) {
@@ -402,6 +436,28 @@ export function scoreCourse(course, ctx) {
       why.push('designation course with iicrcDiscipline set');
     set('licence', why.length === 0, why.join('; '));
   }
+  // 5.15 plainText: plain-text fields carry no raw HTML entity, and a "Module N reference card"
+  // lesson sits in module N (a regrouping that renumbers modules must renumber its cards).
+  {
+    const why = [];
+    const plain = [
+      ['course title', course.title],
+      ['shortDescription', course.shortDescription],
+    ];
+    modules.forEach((m, i) => {
+      plain.push([`module ${i + 1} title`, m.title]);
+      for (const l of m.lessons || []) {
+        plain.push(['lesson title', l.title]);
+        for (const x of resourcesOf(l)) plain.push(['resource label', x?.label]);
+        const card = REFERENCE_CARD_TITLE.exec(String(l.title || ''));
+        if (card && Number(card[1]) !== i + 1) why.push(`"${l.title}" sits in module ${i + 1}`);
+      }
+    });
+    const raw = plain.filter(([, s]) => typeof s === 'string' && findRawEntity(s));
+    if (raw.length)
+      why.unshift(`${raw.length} raw HTML entity(ies), e.g. ${raw[0][0]} "${raw[0][1]}"`);
+    set('plainText', why.length === 0, why.join('; '));
+  }
 
   const applicable = FLOORS.filter((k) => r[k].applicable);
   const failing = applicable.filter((k) => !r[k].ok);
@@ -486,22 +542,6 @@ if (isEntryPoint(import.meta.url)) {
     process.exit(exitCode);
   }
 
-  const ABBR = {
-    metadata: 'meta',
-    structure: 'struct',
-    depth: 'depth',
-    moduleChecks: 'modchk',
-    explanations: 'explain',
-    finalQuiz: 'final',
-    fieldDownloads: 'dl',
-    lessonPattern: '7part',
-    lessonWords: 'words',
-    visual: 'visual',
-    metricExample: 'metric',
-    practical: 'prac',
-    australian: 'au',
-    licence: 'licence',
-  };
   console.log(`\nCARSI Course Standard ${STANDARD_VERSION} depth audit — ${seedDir}\n`);
   console.log('  ' + 'course'.padEnd(46) + 'v1  mods  less  words/h  evid%  floors  failing');
   console.log('  ' + '-'.repeat(120));
@@ -522,7 +562,7 @@ if (isEntryPoint(import.meta.url)) {
         String(Math.round(s.evidencedShare * 100)).padStart(7) +
         `${s.passed}/${s.applicable}`.padStart(8) +
         '  ' +
-        s.failing.map((k) => ABBR[k]).join(',')
+        s.failing.map((k) => FLOOR_ABBR[k]).join(',')
     );
   }
   console.log('\n  Courses missing each floor:');
