@@ -100,6 +100,21 @@ async function seedCourse(c: CatalogCourse, instructorOverride: string | undefin
     });
     const courseId = existing?.id ?? c.id;
 
+    // The batch preflight in main() reads outside any transaction, so it can be stale by the
+    // time this runs: it walks every course in the run, and another writer can add curriculum to
+    // this one in between. Re-check at the destructive boundary, where the answer still matters.
+    // A zero-module catalogue entry must never reach deleteCourseCurriculum against a populated
+    // course -- the delete has no corresponding create, so the curriculum simply goes.
+    if (c.modules.length === 0) {
+      const populated = await tx.lmsModule.count({ where: { courseId } });
+      if (populated > 0) {
+        throw new Error(
+          `aborted: "${c.slug}" has no modules in the catalogue but ${populated} in the database.\n` +
+            `  Curriculum appeared since the preflight ran. Nothing was written for this course.`
+        );
+      }
+    }
+
     await deleteCourseCurriculum(tx, courseId);
 
     const priceAud = new Prisma.Decimal(c.priceAud);
@@ -249,16 +264,6 @@ async function main() {
 
   const override = process.env.SEED_INSTRUCTOR_ID?.trim();
 
-  await ensureInstructors(data);
-
-  if (override) {
-    const inst = await prisma.lmsUser.findUnique({ where: { id: override }, select: { id: true } });
-    if (!inst) {
-      console.error(`SEED_INSTRUCTOR_ID=${override} not found. Create that user or omit override.`);
-      process.exit(1);
-    }
-  }
-
   // PREFLIGHT: refuse any course whose catalogue entry would empty a populated curriculum.
   //
   // 34 of the 80 entries in this catalogue are metadata-only stubs with zero modules, recorded
@@ -315,6 +320,21 @@ async function main() {
         `\n    npm run db:import-course -- --slug=<slug>\n`
     );
     process.exit(1);
+  }
+
+  // AFTER the preflight, deliberately. ensureInstructors upserts every catalogue instructor
+  // outside any course transaction, so running it first made the refusal above print
+  // "NOTHING has been written" when instructor rows had in fact already been committed. The
+  // preflight reads only lmsCourse and lmsLessonProgress, so it does not need them; the override
+  // check does, because on a fresh database that instructor exists only once this has run.
+  await ensureInstructors(data);
+
+  if (override) {
+    const inst = await prisma.lmsUser.findUnique({ where: { id: override }, select: { id: true } });
+    if (!inst) {
+      console.error(`SEED_INSTRUCTOR_ID=${override} not found. Create that user or omit override.`);
+      process.exit(1);
+    }
   }
 
   for (const c of courses) {

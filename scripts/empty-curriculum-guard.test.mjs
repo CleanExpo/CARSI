@@ -99,6 +99,16 @@ const curriculum = () => ({
 
 /** Give the stub course a populated curriculum, which is what makes it destructible. */
 const populate = () => {
+  // lms_courses.instructor_id has an enforced FK to lms_users.id and no migration creates that
+  // row. Without this the first insert dies of a foreign-key violation on a schema-only
+  // database and the test stops before a single guard assertion runs -- it only passed for me
+  // because my database happened to be seeded already. Idempotent, so it does not fight the
+  // seeder's own upsert of the same instructor.
+  sql(`insert into lms_users (id, email, hashed_password, full_name, created_at, updated_at)
+       values ('${stub.instructorId}', 'guard-fixture-instructor@example.test',
+               '$2b$12$syntheticfixturehashnotarealsecret', 'Guard Fixture Instructor',
+               now(), now())
+       on conflict (id) do nothing`);
   sql(`insert into lms_courses (id, slug, title, instructor_id, status, price_aud, is_free,
          created_at, updated_at)
        values ('${stub.id}', '${stub.slug}', '${stub.title.replace(/'/g, "''")}',
