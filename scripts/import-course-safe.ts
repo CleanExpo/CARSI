@@ -108,6 +108,12 @@ export type ImportPlan = {
   progressAtRisk: number;
   /** Progress rows that survive because their lesson is updated in place. */
   progressPreserved: number;
+  /**
+   * Incoming module/lesson ids that already belong to a DIFFERENT course. Upserts select by
+   * global id and overwrite the parent, so importing course A with one of course B's ids
+   * would silently move that row out of B. Never a legitimate import; always refused.
+   */
+  foreignIds: string[];
 };
 
 /**
@@ -138,9 +144,26 @@ export async function planImport(course: Course): Promise<ImportPlan> {
     ? await prisma.lmsLessonProgress.count({ where: { lessonId: { in: lessonSurvivors } } })
     : 0;
 
+  // Ownership. An upsert selects by global id, so an incoming id that already belongs to
+  // another course would reparent that row into this one — removing curriculum from a course
+  // this run never named, and reporting nothing.
+  const thisCourseId = existing?.id ?? course.id;
+  const foreignModules = await prisma.lmsModule.findMany({
+    where: { id: { in: [...incomingModuleIds] }, courseId: { not: thisCourseId } },
+    select: { id: true },
+  });
+  const foreignLessons = await prisma.lmsLesson.findMany({
+    where: {
+      id: { in: [...incomingLessonIds] },
+      module: { courseId: { not: thisCourseId } },
+    },
+    select: { id: true },
+  });
+
   return {
     slug: course.slug,
     courseExists: Boolean(existing),
+    foreignIds: [...foreignModules.map((m) => m.id), ...foreignLessons.map((l) => l.id)],
     moduleAdds: [...incomingModuleIds].filter((id) => !existingModuleIds.has(id)),
     moduleUpdates: [...incomingModuleIds].filter((id) => existingModuleIds.has(id)),
     moduleRemovals: [...existingModuleIds].filter((id) => !incomingModuleIds.has(id)),
@@ -173,8 +196,31 @@ function printPlan(plan: ImportPlan, outcome: 'dry-run' | 'applying' | 'blocked'
 const asJson = (v: unknown) =>
   v === undefined || v === null ? Prisma.DbNull : (v as Prisma.InputJsonValue);
 
-async function applyImport(course: Course, plan: ImportPlan) {
+async function applyImport(course: Course, plan: ImportPlan, allowProgressLoss: boolean) {
   await prisma.$transaction(async (tx) => {
+    // Close the window between planning and applying. planImport counted progress outside any
+    // transaction, so a learner could complete a doomed lesson in between and lose it without
+    // the consent flag ever being asked for.
+    //
+    // Locking the doomed LESSON rows is what makes the recount trustworthy: in Postgres an
+    // insert into lms_lesson_progress takes FOR KEY SHARE on its parent lesson, which
+    // conflicts with FOR UPDATE. So holding FOR UPDATE on these lessons blocks new progress
+    // for them until this transaction ends. Recounting inside the transaction alone would not
+    // — nothing would stop a concurrent insert landing right after the count.
+    if (plan.lessonRemovals.length) {
+      await tx.$queryRaw`SELECT id FROM lms_lessons WHERE id = ANY(${plan.lessonRemovals}::uuid[]) FOR UPDATE`;
+      const atRiskNow = await tx.lmsLessonProgress.count({
+        where: { lessonId: { in: plan.lessonRemovals } },
+      });
+      if (atRiskNow > 0 && !allowProgressLoss) {
+        throw new Error(
+          `aborted: ${atRiskNow} learner progress row(s) appeared since the plan was computed. ` +
+            `Nothing was written. Re-run to see the current plan, and pass --allow-progress-loss ` +
+            `only if losing them is genuinely intended.`
+        );
+      }
+    }
+
     const courseId = plan.courseExists
       ? ((await tx.lmsCourse.findUnique({ where: { slug: course.slug }, select: { id: true } }))
           ?.id ?? course.id)
@@ -268,13 +314,23 @@ async function main() {
   if (!course) die(`slug "${slug}" is not in ${CATALOG}`);
 
   const apply = has('apply');
+  const allowProgressLoss = has('allow-progress-loss');
   const plan = await planImport(course);
 
   // Decide BEFORE printing. An earlier version printed "applying..." and then refused, which
   // reads as though a write had already begun.
-  const blocked = apply && plan.progressAtRisk > 0 && !has('allow-progress-loss');
-  printPlan(plan, blocked ? 'blocked' : apply ? 'applying' : 'dry-run');
+  const blocked = apply && plan.progressAtRisk > 0 && !allowProgressLoss;
+  printPlan(plan, plan.foreignIds.length || blocked ? 'blocked' : apply ? 'applying' : 'dry-run');
 
+  // Never consentable: these ids belong to another course, so there is no version of this
+  // import that is correct. Refused in dry run too, so the plan is never shown as safe.
+  if (plan.foreignIds.length) {
+    die(
+      `${plan.foreignIds.length} incoming id(s) already belong to a different course:\n` +
+        plan.foreignIds.map((id) => `    ${id}`).join('\n') +
+        `\n  Importing would move them out of that course. Fix the catalogue ids.`
+    );
+  }
   if (blocked) {
     die(
       `this import would delete ${plan.progressAtRisk} learner progress row(s).\n` +
@@ -283,7 +339,7 @@ async function main() {
   }
   if (!apply) return;
 
-  await applyImport(course, plan);
+  await applyImport(course, plan, allowProgressLoss);
   const after = await planImport(course);
   console.log(
     `done. ${after.lessonAdds.length + after.lessonRemovals.length === 0 ? 'curriculum now matches the catalogue' : 'WARNING: drift remains'}; ` +

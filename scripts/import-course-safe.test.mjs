@@ -112,8 +112,20 @@ check('fixture: learner has progress', before === 2, `expected 2, got ${before}`
   sql(`insert into lms_lesson_progress (id, student_id, lesson_id, completed, last_accessed_at, updated_at)
        values (gen_random_uuid(), '${LEARNER}', '${ORPHAN}', true, now(), now())`);
 
+  // Snapshot every progress row for this learner before the refused run. Asserting only that
+  // the orphan LESSON survives would miss an importer that deleted its PROGRESS and then
+  // refused — the later consented import removes that lesson anyway, hiding the write.
+  const snapshot = sql(`select p.lesson_id || ':' || p.completed from lms_lesson_progress p
+       where p.student_id='${LEARNER}' order by p.lesson_id`);
+
   const { code, out } = importer('--apply');
   check('destructive import REFUSES', code !== 0, out);
+  check(
+    'refusal changed no progress row at all',
+    sql(`select p.lesson_id || ':' || p.completed from lms_lesson_progress p
+         where p.student_id='${LEARNER}' order by p.lesson_id`) === snapshot,
+    'progress rows differ before vs immediately after the refused import'
+  );
   check('refusal names the progress at risk', /would delete 1 learner progress row/.test(out), out);
   check(
     'refusal does not claim to be applying',
@@ -189,6 +201,38 @@ check('fixture: learner has progress', before === 2, `expected 2, got ${before}`
     sql(`select count(*) from lms_modules where id='${ORPHAN_MODULE}'`) === '0',
     'the emptied module should have been deleted after the reparent'
   );
+}
+
+// 5. An incoming id owned by ANOTHER course is refused outright, in dry run too.
+//
+// Upserts select by global id and overwrite the parent, so importing course A with one of
+// course B's module ids would reparent that module into A — stripping curriculum from a
+// course this run never named. There is no consent flag for this: it is always wrong.
+{
+  const otherSlug = sql(`select slug from lms_courses where slug <> '${SLUG}' limit 1`);
+  if (!otherSlug) {
+    console.log('  skip  foreign-id guard: only one course in this database');
+  } else {
+    // Make one of OUR catalogue module ids currently belong to the other course. Planning our
+    // import then sees an incoming id owned elsewhere — the exact shape that would silently
+    // reparent it. (Re-pointing ownership rather than renaming an id avoids a PK collision.)
+    const ours = sql(`select m.id from lms_modules m join lms_courses c on c.id=m.course_id
+         where c.slug='${SLUG}' order by m.order_index limit 1`);
+    sql(`update lms_modules set course_id=(select id from lms_courses where slug='${otherSlug}')
+         where id='${ours}'`);
+
+    const { code, out } = importer();
+    check('foreign-id guard refuses in DRY RUN', code !== 0, out);
+    check('foreign-id refusal names the id', out.includes(ours), out);
+    check(
+      'the other course did not lose the module',
+      sql(`select c.slug from lms_modules m join lms_courses c on c.id=m.course_id
+           where m.id='${ours}'`) === otherSlug,
+      'a refused dry run must not move anything'
+    );
+    sql(`update lms_modules set course_id=(select id from lms_courses where slug='${SLUG}')
+         where id='${ours}'`);
+  }
 }
 
 if (failed > 0) {
