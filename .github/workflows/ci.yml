@@ -256,6 +256,23 @@ jobs:
       # Course Standard v1 (docs/content/COURSE_STANDARD.md). Report-only for courses that have
       # not opted in; a course with meta.standard "v1" that drops below any floor fails here.
       # The self-test proves the audit still fails a below-floor v1 course and ignores the rest.
+      # Gate 0 (CDC directive): no verified evidence contract = no course generation. The
+      # ledger contract and its rule-by-rule mutation proof already existed; until now nothing
+      # ran them in CI, and the validator defaulted to the 31-entry audit ledger, so the 1020
+      # entries under data/courses/ were never checked. All three steps below are BLOCKING.
+      - name: Gate 0 evidence ledgers
+        run: npm run check:evidence-ledgers
+
+      # Non-vacuity: a bad entry in any one ledger must fail the whole run, an empty tree must
+      # fail, and a clean tree must still pass.
+      - name: Gate 0 evidence ledger fan-out self-test
+        run: npm run test:evidence-ledgers
+
+      # The validator's own negative control: every registry rule observed firing against a
+      # planted mutant. Proves the contract can reject, not merely parse.
+      - name: Evidence ledger validator mutation suite
+        run: npm run test:ledger-mutants
+
       - name: Course Standard depth audit
         run: npm run check:course-standard
 
