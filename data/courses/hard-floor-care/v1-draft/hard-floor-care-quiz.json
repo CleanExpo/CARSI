@@ -201,7 +201,7 @@
           ],
           "correctIndex": 1,
           "points": 1,
-          "explanation": "Using a power tool to cut, grind or drill a material with at least 1% crystalline silica is processing. Cement grout can contain it, and a multi-tool is a power tool. The other tasks use no power tool on the material."
+          "explanation": "Using a power tool to cut, grind or drill a material with at least 1% crystalline silica is processing. Cement grout can contain it, and a multi-tool is a power tool. The other three tasks are wet or light contact and raise no silica dust. Hand tools that raise the dust, or dry sweeping or vacuuming it up, would also count."
         },
         {
           "questionText": "In Australia, when may a respirator be the only control for silica processing?",

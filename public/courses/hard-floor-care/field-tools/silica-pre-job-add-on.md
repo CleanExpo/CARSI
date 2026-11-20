@@ -5,9 +5,9 @@ Job: ____________  Date: ____  Supervisor: ____________  Country/state: ____
 ## 1. Is this silica work?
 - [ ] Material: concrete / brick / stone / porcelain / tile / terrazzo / cement grout / other: ______
 - [ ] Silica content checked (SDS or supplier data): ____ %   [ ] Unknown, so treated as silica
-- [ ] Power tool will drill / cut / grind / sand / abrasive-polish it?  Yes / No
+- [ ] Will the work make silica dust someone could breathe? Power tool drill / cut / grind / sand / polish; hand tools that raise dust; sweeping or vacuuming its dust. Unsure counts as yes.  Yes / No
 - [ ] Engineered stone present? If yes: STOP and refer (Australia: banned work; notice needed for legacy stone).
-If both answers are yes, complete sections 2 to 4 before the machine starts.
+If both answers are yes, complete sections 2 to 4 before the work starts.
 
 ## 2. Controls (in this order)
 - [ ] Engineering control at the tool: wet / on-tool extraction (vacuum class: H / M) / LEV / isolation
