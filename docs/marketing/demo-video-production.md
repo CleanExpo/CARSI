@@ -26,7 +26,7 @@ Flows with `brandVideoScriptId: null` are **silent b-roll** (transcode only).
 | Requirement | How |
 | --- | --- |
 | App running | `npm run dev` (or point `DEMO_RECORD_BASE_URL` at a deployed preview) |
-| Demo account seeded | `npm run db:seed-courses -- --all --apply` then `npm run db:seed-e2e-user` (creates `student@carsi.com.au`, enrolled in the first catalogue course). Without `--apply` the seed only previews. |
+| Demo account seeded | **Local or disposable database only:** `npm run db:seed-courses -- --all --apply` then `npm run db:seed-e2e-user` (creates `student@carsi.com.au`, enrolled in the first catalogue course). Without `--apply` the seed only previews. `--all --apply` rewrites course metadata and lesson content for **every** catalogue course from the repo, so never point it at production — seed the one slug you are recording and follow `docs/runbooks/course-go-live.md` instead. |
 | HeyGen secret | `HEYGEN_API_KEY` (+ optional `HEYGEN_AVATAR_ID`, `HEYGEN_VOICE_ID` for avatar mode) |
 | Cloudinary secrets | `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` |
 | FFmpeg | bundled via `@ffmpeg-installer/ffmpeg` (installed with `npm ci`); or set `FFMPEG_PATH` |

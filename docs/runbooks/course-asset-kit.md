@@ -35,9 +35,11 @@ be authored. It cannot introduce a new factual claim.
 
 ```
    ┌── 1. scaffold ──┐   ┌── 2. truth-gate ──┐   ┌── 3. generate ──┐   ┌── 4. attach ──┐   ┌── 5. seed ──┐
-   │ course-asset-kit │→ │ human author fills │→ │ spend scripts    │→ │ resources on   │→ │ deploy runs  │
-   │ --generate       │   │ empty fields, SME  │   │ (voice, thumbs,  │   │ lessons in the │   │ db:seed-*    │
-   │ (this tool)      │   │ review, AU/IICRC   │   │ video) if needed │   │ catalogue      │   │ on boot      │
+   │ course-asset-kit │→ │ human author fills │→ │ spend scripts    │→ │ resources on   │→ │ someone runs │
+   │ --generate       │   │ empty fields, SME  │   │ (voice, thumbs,  │   │ lessons in the │   │ db:seed-     │
+   │                  │   │                    │   │                  │   │                │   │ courses      │
+   │ (this tool)      │   │ review, AU/IICRC   │   │ video) if needed │   │ catalogue      │   │ --slug +     │
+   │                  │   │                    │   │                  │   │                │   │ --apply (§5) │
    └──────────────────┘   └────────────────────┘   └──────────────────┘   └────────────────┘   └─────────────┘
 ```
 
