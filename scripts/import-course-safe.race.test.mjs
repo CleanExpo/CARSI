@@ -119,25 +119,28 @@ function importerAsync(...args) {
 }
 
 /**
- * Wait until PostgreSQL itself reports a backend parked on the course row we hold.
+ * Wait until PostgreSQL reports a backend blocked SPECIFICALLY BY OUR lock holder.
  *
- * Waiting for the CLI to print "applying (one transaction)" is NOT enough, and review was right
- * to call that out: that line is printed before applyImport opens the transaction, so the marker
- * plus a sleep proves only that the process had not exited -- it could be slow for any reason and
- * the race would silently never happen. Measured on Postgres 16.15, a backend blocked on our
- * FOR UPDATE reports exactly:
+ * Two earlier versions of this were too weak, both caught in review:
  *
- *   state=active  wait_event_type=Lock  wait_event=transactionid
- *   query=INSERT INTO "public"."lms_courses" (...)
+ *   1. Waiting for the CLI to print "applying (one transaction)" and then sleeping. That line is
+ *      printed before applyImport opens the transaction, so it proved only that the process had
+ *      not exited -- a slow start for any unrelated reason and the race never happens while every
+ *      later assertion still passes.
+ *   2. Polling pg_stat_activity for ANY backend with wait_event='transactionid' and a query
+ *      mentioning lms_courses. On a shared or CI database an unrelated session can satisfy that
+ *      while the importer has not reached its course upsert at all -- the same vacuous-pass
+ *      failure in a subtler disguise.
  *
- * which is the importer's own course upsert waiting on the lock holder's transaction id. That is
- * the signal, and it means the importer is inside its transaction, past the ownership check and
- * before the module and lesson upserts.
+ * pg_blocking_pids() removes the ambiguity: it names the backends actually blocking a given pid.
+ * Requiring OUR holder's pid to appear in it proves this exact importer is waiting on this exact
+ * lock, which places it inside its transaction, past the ownership check and before the module
+ * and lesson upserts.
  */
-async function waitUntilBlockedOnCourse(ms = 25000) {
-  const probe = `select count(*) from pg_stat_activity
-       where wait_event_type='Lock' and wait_event='transactionid'
-         and query ilike '%lms_courses%'`;
+async function waitUntilBlockedBy(holderPid, ms = 25000) {
+  const probe = `select count(*) from pg_stat_activity a
+       where a.query ilike '%lms_courses%'
+         and ${Number(holderPid)} = any(pg_blocking_pids(a.pid))`;
   const deadline = Date.now() + ms;
   while (sql(probe) === '0') {
     if (Date.now() > deadline) return false;
@@ -152,8 +155,14 @@ function holdRowLock(lockSql) {
   let seen = '';
   proc.stdout.on('data', (d) => (seen += d));
   proc.stderr.on('data', (d) => (seen += d));
-  proc.stdin.write(`BEGIN;\n${lockSql}\nSELECT 'LOCK-HELD';\n`);
+  // Emit this session's backend pid before the sentinel, so the probe can name it.
+  proc.stdin.write(`BEGIN;\n${lockSql}\nSELECT pg_backend_pid();\nSELECT 'LOCK-HELD';\n`);
   return {
+    /** The lock holder's backend pid, for pg_blocking_pids(). Valid once acquired() resolves. */
+    get pid() {
+      const line = seen.split('\n').find((l) => /^\d+$/.test(l.trim()));
+      return line ? Number(line.trim()) : null;
+    },
     async acquired(ms = 15000) {
       const deadline = Date.now() + ms;
       while (!seen.includes('LOCK-HELD')) {
@@ -227,14 +236,20 @@ async function raceCase(target) {
   let result;
   try {
     await lock.acquired();
+    const holderPid = lock.pid;
+    check(
+      'test lock holder reported its backend pid',
+      Number.isInteger(holderPid) && holderPid > 0,
+      `got ${holderPid}; without it the probe below cannot name its blocker`
+    );
     const run = importerAsync('--apply');
     await run.waitFor('applying (one transaction)');
-    // Then wait for POSTGRES to confirm the wait, not for a sleep to elapse.
-    const blocked = await waitUntilBlockedOnCourse();
+    // Then wait for POSTGRES to confirm that OUR holder is the one blocking it.
+    const blocked = await waitUntilBlockedBy(holderPid);
     check(
-      'importer is confirmed by Postgres to be blocked on the course row',
+      'Postgres confirms the importer is blocked BY OUR lock (pg_blocking_pids)',
       blocked && run.alive,
-      'no backend was waiting on our lock, so the race never happened and everything below' +
+      'no backend was blocked by our holder, so the race never happened and everything below' +
         ' would be measuring nothing'
     );
     target.rivalCreates();
