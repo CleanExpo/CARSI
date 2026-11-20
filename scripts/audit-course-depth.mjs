@@ -90,10 +90,30 @@ const FLOORS = [
   'plainText',
 ];
 export { FLOORS };
-// A named or numeric HTML entity. Plain-text fields are rendered as text, so one of these shows
-// up on the page literally (e.g. "maker&rsquo;s").
-const RAW_ENTITY = /&(?:[a-z][a-z0-9]*|#\d+|#x[0-9a-f]+);/i;
-const REFERENCE_CARD_TITLE = /^Module (\d+) reference card\b/i;
+// A named (two or more characters) or numeric HTML entity. Plain-text fields are rendered as
+// text, so one of these shows up on the page literally (e.g. "maker&rsquo;s"). A single letter
+// after "&" is ordinary text ("R&D;", "Q&A;"), not an entity.
+export const RAW_ENTITY = /&(?:[a-z][a-z0-9]+|#\d+|#x[0-9a-f]+);/i;
+// Tolerates leading and repeated whitespace, so " Module 4  reference card" is still caught.
+export const REFERENCE_CARD_TITLE = /^\s*Module\s+(\d+)\s+reference\s+card\b/i;
+/** Short labels for the text table's "failing" column; every floor must have one. */
+export const FLOOR_ABBR = {
+  metadata: 'meta',
+  structure: 'struct',
+  depth: 'depth',
+  moduleChecks: 'modchk',
+  explanations: 'explain',
+  finalQuiz: 'final',
+  fieldDownloads: 'dl',
+  lessonPattern: '7part',
+  lessonWords: 'words',
+  visual: 'visual',
+  metricExample: 'metric',
+  practical: 'prac',
+  australian: 'au',
+  licence: 'licence',
+  plainText: 'plain',
+};
 
 // ── helpers ─────────────────────────────────────────────────────────────────────────────────
 function stripHtml(s) {
@@ -513,22 +533,6 @@ if (isEntryPoint(import.meta.url)) {
     process.exit(exitCode);
   }
 
-  const ABBR = {
-    metadata: 'meta',
-    structure: 'struct',
-    depth: 'depth',
-    moduleChecks: 'modchk',
-    explanations: 'explain',
-    finalQuiz: 'final',
-    fieldDownloads: 'dl',
-    lessonPattern: '7part',
-    lessonWords: 'words',
-    visual: 'visual',
-    metricExample: 'metric',
-    practical: 'prac',
-    australian: 'au',
-    licence: 'licence',
-  };
   console.log(`\nCARSI Course Standard ${STANDARD_VERSION} depth audit — ${seedDir}\n`);
   console.log('  ' + 'course'.padEnd(46) + 'v1  mods  less  words/h  evid%  floors  failing');
   console.log('  ' + '-'.repeat(120));
@@ -549,7 +553,7 @@ if (isEntryPoint(import.meta.url)) {
         String(Math.round(s.evidencedShare * 100)).padStart(7) +
         `${s.passed}/${s.applicable}`.padStart(8) +
         '  ' +
-        s.failing.map((k) => ABBR[k]).join(',')
+        s.failing.map((k) => FLOOR_ABBR[k]).join(',')
     );
   }
   console.log('\n  Courses missing each floor:');

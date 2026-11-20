@@ -21,6 +21,7 @@ import {
   loadContext,
   decide,
   FLOORS,
+  FLOOR_ABBR,
   ROLE_PATHS,
   hasPartHeading,
   isFieldDownload,
@@ -222,7 +223,33 @@ const KNOCKOUTS = [
     'reference card numbered for another module',
     (c) => (teachingLessons(c)[0].title = 'Module 4 reference card: corrections'),
   ],
+  [
+    'plainText',
+    'misnumbered reference card with a leading space',
+    (c) => (teachingLessons(c)[0].title = ' Module 4 reference card: corrections'),
+  ],
+  [
+    'plainText',
+    'misnumbered reference card with a double space',
+    (c) => (teachingLessons(c)[0].title = 'Module 4  reference card: corrections'),
+  ],
 ];
+
+test('plainText passes: a letter after "&" with a semicolon is ordinary text, not an entity', () => {
+  for (const t of ['R&D; methods', 'Q&A; session', 'AT&T; training']) {
+    const c = clone();
+    teachingLessons(c)[0].title = t;
+    const s = scoreCourse(c, ctx);
+    assert.equal(s.floors.plainText.ok, true, `${t}: ${s.floors.plainText.why}`);
+  }
+});
+
+test('every floor has a label for the text table', () => {
+  assert.deepEqual(
+    FLOORS.filter((f) => !FLOOR_ABBR[f]),
+    []
+  );
+});
 
 test('plainText passes: a reference card numbered for its own module, and a real apostrophe', () => {
   const c = clone();
