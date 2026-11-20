@@ -18,6 +18,10 @@
  *   B. FOR UPDATE on a module blocks a new lms_lessons row in that module.
  *      (Guards: a lesson added to a doomed module after planning, which would be
  *      cascade-deleted with its progress, uncounted.)
+ *   C. SERIALIZABLE aborts the one case no row lock can reach — an incoming id CREATED under
+ *      another course inside the window, which FOR UPDATE cannot lock because it does not exist
+ *      yet. Its control is the vulnerability itself: the same interleaving under READ COMMITTED
+ *      must actually steal the module.
  *
  * EACH TEST HAS A POSITIVE CONTROL. A blocked insert is only evidence if the same insert
  * succeeds when the lock is NOT held — otherwise a typo, a missing column or a bad id would
@@ -82,6 +86,42 @@ async function whileHoldingLock(lockSql, body) {
     }
     holder.kill('SIGTERM');
   }
+}
+
+/**
+ * Open a session we can drive statement by statement, so an interleaving can be constructed:
+ * write some SQL, wait for its sentinel, let another session act, then continue.
+ */
+function openSession() {
+  const proc = spawn('psql', [URL, '-tA', '-v', 'ON_ERROR_STOP=0'], {
+    stdio: ['pipe', 'pipe', 'pipe'],
+  });
+  let seen = '';
+  proc.stdout.on('data', (d) => (seen += d));
+  proc.stderr.on('data', (d) => (seen += d));
+  return {
+    get log() {
+      return seen;
+    },
+    /** Send SQL, then block until its sentinel comes back, so ordering is never assumed. */
+    async run(statements, sentinel) {
+      proc.stdin.write(`${statements}\nSELECT '${sentinel}';\n`);
+      const deadline = Date.now() + 15000;
+      while (!seen.includes(sentinel)) {
+        if (Date.now() > deadline) throw new Error(`"${sentinel}" never arrived; saw: ${seen}`);
+        await new Promise((r) => setTimeout(r, 100));
+      }
+    },
+    close() {
+      try {
+        proc.stdin.write('ROLLBACK;\n');
+        proc.stdin.end();
+      } catch {
+        /* already gone */
+      }
+      proc.kill('SIGTERM');
+    },
+  };
 }
 
 let failed = 0;
@@ -203,6 +243,71 @@ const insertLesson = (lessonId) =>
   );
 }
 
+// ---------------------------------------------------------------------------------------------
+// C. SERIALIZABLE blocks the PHANTOM reparent that no row lock can reach.
+//
+// FOR UPDATE cannot lock a row that does not exist, so an incoming id CREATED under another
+// course between the importer's ownership check and its upserts is outside every lock it takes.
+// The importer answers that with SERIALIZABLE isolation. This measures the claim instead of
+// taking it from the manual — and its control is the vulnerability itself: the same interleaving
+// under READ COMMITTED must actually steal the module, or this proves nothing about isolation.
+// ---------------------------------------------------------------------------------------------
+{
+  const otherCourse = sql(`select id from lms_courses where id <> '${ids.course}' limit 1`);
+  if (!otherCourse) {
+    console.log('  skip  phantom-reparent: only one course in this database');
+  } else {
+    /** Interleave: importer reads ownership -> rival creates the id elsewhere -> importer upserts. */
+    const race = async (isolation) => {
+      const phantom = randomUUID();
+      const importer = openSession();
+      try {
+        await importer.run(
+          `BEGIN ISOLATION LEVEL ${isolation};\n` +
+            `SELECT id FROM lms_modules WHERE id = ANY(array['${phantom}']::uuid[])\n` +
+            `  AND course_id <> '${ids.course}';`,
+          'OWNERSHIP-READ-DONE'
+        );
+        // A rival writer creates that id under a DIFFERENT course, and commits.
+        sql(`insert into lms_modules (id, course_id, title, order_index, created_at)
+             values ('${phantom}', '${otherCourse}', 'phantom module', 96, now())`);
+        // The importer now upserts by global id — the reparent we are trying to prevent.
+        await importer.run(
+          `INSERT INTO lms_modules (id, course_id, title, order_index, created_at)\n` +
+            `VALUES ('${phantom}', '${ids.course}', 'ours', 96, now())\n` +
+            `ON CONFLICT (id) DO UPDATE SET course_id='${ids.course}';\nCOMMIT;`,
+          'IMPORTER-DONE'
+        );
+        const owner = sql(`select course_id from lms_modules where id='${phantom}'`);
+        return { stolen: owner === ids.course, log: importer.log };
+      } finally {
+        importer.close();
+        try {
+          sql(`delete from lms_modules where id='${phantom}'`);
+        } catch {
+          /* best effort */
+        }
+      }
+    };
+
+    // Control: the vulnerability is real at the default isolation level.
+    const rc = await race('READ COMMITTED');
+    check(
+      'control: under READ COMMITTED the phantom IS reparented (vulnerable)',
+      rc.stolen,
+      'the race did not reproduce, so the serializable result below proves nothing'
+    );
+
+    const ser = await race('SERIALIZABLE');
+    check('SERIALIZABLE prevents the phantom reparent', !ser.stolen, ser.log);
+    check(
+      '  ...by aborting with a serialization failure, not by silently doing nothing',
+      /could not serialize/i.test(ser.log),
+      ser.log
+    );
+  }
+}
+
 if (failed > 0) {
   console.error(`\n✖ lock-semantics test FAILED — ${failed} assertion(s).`);
   console.error('  The safe importer’s concurrency guard rests on these locks. If they do not');
@@ -210,7 +315,8 @@ if (failed > 0) {
   process.exit(1);
 }
 console.log(
-  '\n✓ FOR UPDATE on a lesson blocks new progress, and on a module blocks new lessons —' +
-    '\n  both measured, both with a passing positive control.'
+  '\n✓ Measured, each against a passing control: FOR UPDATE on a lesson blocks new progress,' +
+    '\n  FOR UPDATE on a module blocks new lessons, and SERIALIZABLE aborts the phantom reparent' +
+    '\n  that READ COMMITTED lets through.'
 );
 process.exit(0);
