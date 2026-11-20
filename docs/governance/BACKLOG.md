@@ -975,9 +975,14 @@ production-database credential):
 
 - ~~**A re-seed deletes learner progress.**~~ **RESOLVED 2026-11-20 (PR #1137, #1141, #1144).** The
   structural fix proposed here was built, and both halves of it: `scripts/import-course-safe.ts`
-  upserts modules and lessons **by id** instead of deleting them, and refuses (exit non-zero,
-  nothing written) when the import would delete progress rows unless `--allow-progress-loss` is
-  passed. It is now the `db:seed-courses` default path and is a dry run until `--apply`. The
+  upserts modules and lessons **by id** instead of deleting them, and refuses when the import
+  would delete progress rows unless `--allow-progress-loss` is passed. **Scope of that refusal:** a
+  blocker found during *planning* stops the run before anything is written, including under
+  `--all`, which plans every course first. A refusal raised *during* the apply loop is different —
+  each course commits in its own transaction, so an in-transaction check that fires on course N
+  (ownership re-check, the doomed-lesson recount under lock, a write conflict) leaves courses
+  1..N-1 already applied. `--all` is not one atomic catalogue write, and recovery from a
+  part-applied run means re-running the remaining slugs, not assuming nothing happened. It is now the `db:seed-courses` default path and is a dry run until `--apply`. The
   delete-and-recreate seeder survives as `db:seed-courses-legacy`, unreachable without
   `--legacy-destructive-replace`. It also refuses to empty a curriculum
   (`--allow-empty-curriculum`) and refuses, with no override, an incoming id owned by another

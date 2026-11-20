@@ -26,7 +26,9 @@ on deploy but does **not** seed. Seed order matters — the quiz needs its cours
 npm ci && npx prisma generate && npm run type-check          # the mandatory gate (blocked in the sandbox)
 
 # 1. Seed the branded course, then its quizzes — ORDER MATTERS.
-DATABASE_URL=<prod> npm run db:seed-floor-care-course        # imports this course only (still draft)
+DATABASE_URL=<prod> npm run db:seed-floor-care-course        # imports this course only. NOT still draft:
+#   the importer writes status/isPublished from courses-catalog.json, where this slug is
+#   published/true, so this PUBLISHES the course. Set both unpublished first to stage it.
 DATABASE_URL=<prod> npm run db:seed-floor-care-quizzes       # creates the 11 LmsQuiz + questions
 
 # 2. Smoke-test the quiz flow with an enrolled student.

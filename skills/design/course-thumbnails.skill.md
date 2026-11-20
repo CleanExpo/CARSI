@@ -74,7 +74,14 @@ course **title in white** on top. So every generated image must be:
    course; a hard cap of 25/run + write-after-each protect against runaway spend).
 8. **Import + verify.** Default persistence writes `thumbnailUrl` into the seed JSON; run
    `npm run db:seed-courses -- --slug=<slug> --apply` to import into the DB (without `--apply` it
-   only previews). Verify rendering (below).
+   only previews). The batch step above generates for **many** courses, and the import is scoped to
+   one slug, so repeat it **once per affected course** — otherwise the rest of the generated
+   thumbnails stay in the seed JSON and never reach the database.
+   **The import is not thumbnail-only.** It writes the repo's `title`, `price`, `status`,
+   `isPublished`, `description` and every lesson's content over whatever is in the target database.
+   Against **production** that is a course change, not an asset change: preview it first (no
+   `--apply`), then follow `docs/runbooks/course-go-live.md` — the `progress_rows` preflight, and
+   Phill's written OK if that count is above 0 — before applying. Verify rendering (below).
 
 ### Brief-quality rubric (all must hold)
 

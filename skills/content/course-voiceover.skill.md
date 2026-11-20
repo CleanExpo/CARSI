@@ -52,9 +52,15 @@ deterministic:
 5. **One real generation.** `npm run voice:generate -- --slug=<slug> --limit=1 --yes` → play the returned Cloudinary MP3; confirm pace, tone and pronunciation of technical terms.
 6. **Review — BLOCKING gate before the batch.** Re-author and regenerate weak audio with `--force --yes`.
 7. **Batch generate.** `npm run voice:generate -- --slug=<slug> --yes` (hard cap `VOICE_MAX_GENERATIONS`, write-after-each manifest protect against runaway spend).
-8. **Import + verify.** Default persistence writes the audio URL into the seed JSON; run `npm run db:seed-courses -- --slug=<slug> --apply` to import (without `--apply` it only
-   previews; the generator prints one apply command per affected course). Confirm the lesson exposes
-   the audio resource.
+8. **Import + verify.** Default persistence writes the audio URL into the seed JSON; run `npm run db:seed-courses -- --slug=<slug> --apply` to import. Without `--apply` it only
+   previews; the generator prints one apply command per affected course, and **each** needs running
+   or the other courses' audio stays in the seed JSON only.
+   **The import is not audio-only.** It writes the repo's `title`, `price`, `status`,
+   `isPublished`, `description` and every lesson's content over whatever is in the target database.
+   Against **production** that is a course change, not an asset change: preview it first (no
+   `--apply`), then follow `docs/runbooks/course-go-live.md` — the `progress_rows` preflight, and
+   Phill's written OK if that count is above 0 — before applying. Confirm the lesson exposes the
+   audio resource.
 
 ### Script-quality rubric (all must hold)
 

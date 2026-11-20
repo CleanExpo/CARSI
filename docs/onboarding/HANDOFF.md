@@ -78,7 +78,7 @@ git diff data/seed/courses-catalog.json                     # review; if drift y
 git checkout -- data/seed/courses-catalog.json              # restore the committed (intended) JSON before seeding
 
 # 3b. Seed the course, then its quizzes — the quiz needs its course to exist first.
-DATABASE_URL=<prod> npm run db:seed-floor-care-course       # imports THIS course only (--slug + --apply); lands as DRAFT
+DATABASE_URL=<prod> npm run db:seed-floor-care-course       # imports THIS course only (--slug + --apply). NOT a draft: see the warning below
 DATABASE_URL=<prod> npm run db:seed-floor-care-quizzes      # idempotent upsert by quiz id; creates 11 quizzes
 ```
 
@@ -86,8 +86,20 @@ Both seeds are safe to re-run. `db:seed-floor-care-course` **reconciles** this c
 modules/lessons against the JSON rather than replacing them, so a lesson still in the catalogue keeps
 its row and every learner's progress on it; it refuses outright if the import would delete learner
 progress or leave the course with no curriculum. `db:seed-floor-care-quizzes` upserts each quiz by id
-and replaces its questions. To see what either would do without writing, run the importer directly:
+and replaces its questions.
+
+> ⚠️ **This import PUBLISHES the course.** The importer writes `status` and `isPublished` from
+> `data/seed/courses-catalog.json` on every apply, and the committed entry for
+> `floor-care-onboarding-operational-readiness` is `"status": "published"` with
+> `"isPublished": true`. So the course goes live at step 3b — before the quizzes exist and before
+> the §4 smoke test. If it must stay hidden until the smoke test passes, set both values to
+> unpublished in the catalogue first, seed, test, then publish via §5.
+
+To see what the **course** import would do without writing, run the importer directly:
 `npm run db:seed-courses -- --slug=floor-care-onboarding-operational-readiness` (no `--apply`).
+That previews the course only — it does not preview or run `db:seed-floor-care-quizzes`, which has
+no dry run of its own, so review the question changes in
+`data/seed/floor-care-quizzes.json` before seeding them.
 
 ---
 
@@ -217,7 +229,8 @@ Find them all: `grep -rno "\[COMPANY TO CONFIRM[^]]*\]" docs/onboarding`.
 - [ ] Production DB snapshot taken.
 - [ ] `npm run type-check` green in a networked env.
 - [ ] Drift check done (§3a); committed JSON is the intended catalogue.
-- [ ] `db:seed-floor-care-course` then `db:seed-floor-care-quizzes` run against prod (course is in, as draft).
+- [ ] Catalogue `status`/`isPublished` for this slug checked against the intended visibility BEFORE the prod run (they are `published`/`true` as committed, so the import publishes it).
+- [ ] `db:seed-floor-care-course` then `db:seed-floor-care-quizzes` run against prod.
 - [ ] Quiz flow smoke-tested (GET hides answers; POST scores; attempts limited).
 - [ ] **Access-control decision made** (§5): free pilot / manual provisioning vs build billing first.
 - [ ] Published via chosen lever **and** published state committed to `courses-catalog.json`.
