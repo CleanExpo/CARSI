@@ -80,7 +80,8 @@ describe('TSX syntax guard (GP-696)', () => {
     expect(files.length).toBeGreaterThan(100);
     const errors = files.flatMap((f) => syntaxErrors(relative(ROOT, f), readFileSync(f, 'utf8')));
     expect(errors).toEqual([]);
-    // Parses every source file (about 3 s alone). Under a full parallel run on a busy
-    // machine it has passed the 15 s default, so it gets its own limit.
-  }, 120_000);
+    // Parses every source file (about 3 to 5 s alone). Under a full parallel run on a busy
+    // machine it has passed the 15 s default, so it gets its own limit, still low enough
+    // that a real hang fails inside a minute.
+  }, 60_000);
 });

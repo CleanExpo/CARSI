@@ -17,10 +17,10 @@ sys.path.insert(0, os.path.dirname(__file__))
 import crosscheck as cc  # noqa: E402
 
 cc.LEDGER_DIR = tempfile.mkdtemp(prefix="crosscheck-test-ledger-")
-# Model-run tests must not depend on pypdf being installed on the machine running
-# them. The PdfReader class below tests the real check and the refusal.
-REAL_PDF_READER_AVAILABLE = cc.pdf_reader_available
-cc.pdf_reader_available = lambda: True
+
+
+class StandInReader:
+    """Stands in for pypdf.PdfReader so model-run tests do not depend on the machine."""
 
 
 def claims_file(rows):
@@ -30,11 +30,12 @@ def claims_file(rows):
     return f.name
 
 
-def run_main(argv, ledger_dir=None):
+def run_main(argv, ledger_dir=None, pdf_reader=StandInReader):
     out = io.StringIO()
     ledger_dir = ledger_dir or tempfile.mkdtemp(prefix="crosscheck-test-ledger-")
     with mock.patch.object(sys, "argv", ["crosscheck.py", *argv]), redirect_stdout(out), \
-            mock.patch.object(cc, "LEDGER_DIR", ledger_dir):
+            mock.patch.object(cc, "LEDGER_DIR", ledger_dir), \
+            mock.patch.object(cc, "load_pdf_reader", lambda: pdf_reader):
         try:
             code = cc.main()
         except SystemExit as e:
@@ -498,25 +499,71 @@ class QuoteCheck(unittest.TestCase):
 class PdfReader(unittest.TestCase):
     """A missing pypdf must stop the run, never pass PDF sources off as unreadable."""
 
-    def test_real_check_follows_the_installed_packages(self):
-        with mock.patch("importlib.util.find_spec", return_value=None):
-            self.assertFalse(REAL_PDF_READER_AVAILABLE())
-        with mock.patch("importlib.util.find_spec", return_value=object()):
-            self.assertTrue(REAL_PDF_READER_AVAILABLE())
+    @staticmethod
+    def _package(body):
+        """A pypdf package on disk whose __init__ runs body; returns its parent folder."""
+        root = tempfile.mkdtemp(prefix="crosscheck-fake-pypdf-")
+        os.mkdir(os.path.join(root, "pypdf"))
+        with open(os.path.join(root, "pypdf", "__init__.py"), "w") as f:
+            f.write(body)
+        return root
+
+    def _with_package(self, body):
+        root = self._package(body)
+        saved = {k: v for k, v in sys.modules.items() if k == "pypdf" or k.startswith("pypdf.")}
+        for k in saved:
+            del sys.modules[k]
+        sys.path.insert(0, root)
+
+        def restore():
+            sys.path.remove(root)
+            for k in [k for k in sys.modules if k == "pypdf" or k.startswith("pypdf.")]:
+                del sys.modules[k]
+            sys.modules.update(saved)
+        self.addCleanup(restore)
+
+    def test_loader_returns_the_reader_when_pypdf_imports(self):
+        self._with_package("class PdfReader:\n    pass\n")
+        self.assertEqual(cc.load_pdf_reader().__name__, "PdfReader")
+
+    def test_loader_refuses_a_present_but_broken_package(self):
+        for body in ['raise ImportError("broken dependency")', 'raise RuntimeError("bad build")',
+                     "x = 1  # no PdfReader exported"]:
+            with self.subTest(body=body):
+                self._with_package(body)
+                self.assertIsNone(cc.load_pdf_reader())
+
+    def test_broken_package_stops_a_model_run_before_key_or_spend(self):
+        # End to end through the real loader: a pypdf that can be found but not imported.
+        self._with_package('raise ImportError("broken dependency")')
+        fake = FakeChat(daily=0.0)
+        k = mock.Mock(return_value="x")
+        with mock.patch.object(cc, "key", k), mock.patch.object(cc, "call", fake), \
+                mock.patch.object(sys, "argv", ["crosscheck.py", "--claims", claims_file([CLAIM]),
+                                                "--out", tempfile.mktemp(), "--max-usd", "1"]):
+            with self.assertRaises(SystemExit) as e:
+                cc.main()
+        self.assertEqual(e.exception.code, cc.PDF_READER_HELP)
+        self.assertEqual((fake.chat_calls, k.call_count), (0, 0))
 
     def test_model_run_refused_before_key_or_spend(self):
         fake = FakeChat(daily=0.0)
         k = mock.Mock(return_value="x")
-        with mock.patch.object(cc, "pdf_reader_available", lambda: False), \
-                mock.patch.object(cc, "key", k), mock.patch.object(cc, "call", fake):
-            code, _ = run_main(["--claims", claims_file([CLAIM]), "--out", tempfile.mktemp(), "--max-usd", "1"])
+        with mock.patch.object(cc, "key", k), mock.patch.object(cc, "call", fake):
+            code, _ = run_main(["--claims", claims_file([CLAIM]), "--out", tempfile.mktemp(), "--max-usd", "1"],
+                               pdf_reader=None)
         self.assertEqual(code, cc.PDF_READER_HELP)
         self.assertEqual((fake.chat_calls, k.call_count), (0, 0))
 
     def test_recheck_refused(self):
-        with mock.patch.object(cc, "pdf_reader_available", lambda: False):
-            code, _ = run_main(["--recheck", tempfile.mktemp()])
+        code, _ = run_main(["--recheck", tempfile.mktemp()], pdf_reader=None)
         self.assertEqual(code, cc.PDF_READER_HELP)
+
+    def test_summary_still_works_without_the_reader(self):
+        f = tempfile.NamedTemporaryFile("w", suffix=".jsonl", delete=False)
+        f.close()
+        code, _ = run_main(["--summary", f.name], pdf_reader=None)
+        self.assertNotEqual(code, cc.PDF_READER_HELP)
 
     def test_quote_check_names_the_missing_reader(self):
         class H(http.server.BaseHTTPRequestHandler):

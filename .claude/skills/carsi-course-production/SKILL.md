@@ -172,10 +172,10 @@ substantive point (law, duty, number, limit, date, product, standard edition) ru
    "section 274", not "s 274": a lone "s" before a number reads as an S-standard and is
    refused. Training knowledge may suggest a
    claim; it never settles one.
-2. **Cross-check with two independent models**:
+2. **Cross-check with two independent models**. Install its one package first
+   (`python3 -m pip install -r scripts/research/requirements.txt`, pypdf for PDF sources); a
+   model run and `--recheck` refuse to start if pypdf cannot be imported (`--summary` does not need it). Then:
    `python3 scripts/research/crosscheck.py --claims claims.jsonl --out results.jsonl --max-usd <n>`.
-   Install its one package first (`python3 -m pip install -r scripts/research/requirements.txt`,
-   pypdf for PDF sources); the runner refuses to start without it.
    It sends each claim to Kimi (`moonshotai/kimi-k3.1-pro`) and DeepSeek
    (`deepseek/deepseek-v4.1-flash-1017`) through OpenRouter with web search, asks for primary
    sources only, then fetches each cited page and checks the quoted words are on it

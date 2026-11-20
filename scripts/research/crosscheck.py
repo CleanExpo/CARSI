@@ -19,7 +19,6 @@ import contextlib
 import datetime
 import fcntl
 import html
-import importlib.util
 import json
 import math
 import os
@@ -308,13 +307,12 @@ def quote_found(url, quote):
     except Exception as e:  # any fetch failure is a failure, never a crash or a pass
         return f"FETCH_FAILED:{type(e).__name__}"
     if "pdf" in ctype.lower() or raw[:5] == b"%PDF-":
-        try:
-            import io
-            from pypdf import PdfReader
-        except ImportError:  # a missing tool is not a source fault; say which it is
+        reader = load_pdf_reader()
+        if reader is None:  # a missing or broken tool is not a source fault; say which it is
             return "PDF_READER_MISSING"
         try:
-            text = " ".join((p.extract_text() or "") for p in PdfReader(io.BytesIO(raw)).pages)
+            import io
+            text = " ".join((p.extract_text() or "") for p in reader(io.BytesIO(raw)).pages)
         except Exception as e:  # unreadable PDF is a failure, never a pass
             return f"PDF_UNREADABLE:{type(e).__name__}"
     else:
@@ -358,12 +356,21 @@ def summary(path):
     return 0
 
 
-PDF_READER_HELP = ("REFUSED: pypdf is not installed, so PDF sources cannot be checked. "
-                   "Install it first: python3 -m pip install -r scripts/research/requirements.txt")
+PDF_READER_HELP = ("REFUSED: pypdf cannot be imported, so PDF sources cannot be checked. "
+                   "Install or repair it first: python3 -m pip install -r scripts/research/requirements.txt")
 
 
-def pdf_reader_available():
-    return importlib.util.find_spec("pypdf") is not None
+def load_pdf_reader():
+    """The one owner of the pypdf import: the PdfReader class, or None if it cannot be imported.
+
+    Importing (not just finding the package) is the test, so a present but broken
+    install is refused before the key is read, exactly as a missing one is.
+    """
+    try:
+        from pypdf import PdfReader
+    except Exception:
+        return None
+    return PdfReader
 
 
 def main():
@@ -377,7 +384,7 @@ def main():
     if a.summary:
         return summary(a.summary)
     if a.recheck:
-        if not pdf_reader_available():
+        if load_pdf_reader() is None:
             sys.exit(PDF_READER_HELP)
         return recheck(a.recheck)
     if not (a.claims and a.out and a.max_usd is not None):
@@ -386,7 +393,7 @@ def main():
         sys.exit(f"--max-usd must be a number above 0 and at most {DAILY_CAP_USD}")
     # Checked before the key is read or any money is spent: without pypdf every PDF
     # source would come back unreadable and look like a bad source.
-    if not pdf_reader_available():
+    if load_pdf_reader() is None:
         sys.exit(PDF_READER_HELP)
     claims = [json.loads(l) for l in open(a.claims) if l.strip()]
     for c in claims:
