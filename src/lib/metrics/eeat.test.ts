@@ -31,9 +31,13 @@ function fakeSemrush(bodies: { backlinks?: string; history?: string; status?: nu
 }
 
 const OK_BACKLINKS = 'domains_num\r\n57\r\n';
-/** Shape of the 2026-11-21 connector run for carsi.com.au / au, cut to Dt,Or,FK52. */
-const OK_HISTORY = 'Date;Organic Keywords;AI overview\r\n20261015;161;148\r\n20260915;110;94\r\n';
-const H = 'Date;Organic Keywords;AI overview';
+/**
+ * The exact rows of the 2026-11-21 live connector run (carsi.com.au, au, date_desc) for
+ * Dt,Or,FK52,FP52. Both AI columns come back headed "AI overview".
+ */
+const OK_HISTORY =
+  'Date;Organic Keywords;AI overview;AI overview\r\n20261015;161;148;0\r\n20260915;110;94;0\r\n';
+const H = 'Date;Organic Keywords;AI overview;AI overview';
 
 describe('parse — Semrush CSV', () => {
   it('reads referring domains', () => {
@@ -44,7 +48,7 @@ describe('parse — Semrush CSV', () => {
   });
 
   it('reads keyword growth and AI Overview SERPs newest-first whatever the row order', () => {
-    const body = `${H}\n20260915;110;94\n20261015;161;148\n`;
+    const body = `${H}\n20260915;110;94;0\n20261015;161;148;0\n`;
     expect(parseRankHistory({ status: 200, body }, KEY, NOW)).toEqual({
       keywordGrowth: {
         status: 'ok',
@@ -64,17 +68,58 @@ describe('parse — Semrush CSV', () => {
         previousDate: '2026-09-15',
         change: 54,
       },
+      aiOverviewCitations: {
+        status: 'ok',
+        label: 'CARSI appears in 0 of 148 AI Overviews on its ranking keywords',
+        latest: 0,
+        aiOverviews: 148,
+        latestDate: '2026-10-15',
+        previous: 0,
+        previousDate: '2026-09-15',
+        change: 0,
+      },
     });
+  });
+
+  it('the exact live fixture: a real 0 citations is printed as 0, not "not available"', async () => {
+    const lines: string[] = [];
+    await runEeatReport({
+      env: ENV,
+      fetchText: fakeSemrush({ backlinks: OK_BACKLINKS, history: OK_HISTORY }).fetchText,
+      now: NOW,
+      json: false,
+      out: (l) => lines.push(l),
+    });
+    expect(lines).toContain(
+      '  AI Overview citations: CARSI appears in 0 of 148 AI Overviews on its ranking keywords ' +
+        '(2026-10-15); 0 on 2026-09-15, 0'
+    );
+  });
+
+  it('FK52 and FP52 share a header name, so they are read by position', () => {
+    const swapped = `${H}\n20261015;161;0;148\n20260915;110;0;94\n`;
+    const r = parseRankHistory({ status: 200, body: swapped }, KEY, NOW);
+    expect(r.aiOverviewKeywords).toMatchObject({ status: 'ok', latest: 0 });
+    expect(r.aiOverviewCitations).toMatchObject({
+      status: 'ok',
+      latest: 148,
+      label: 'CARSI appears in 148 of 0 AI Overviews on its ranking keywords',
+    });
+    const normal = parseRankHistory({ status: 200, body: OK_HISTORY }, KEY, NOW);
+    expect(normal.aiOverviewCitations).toMatchObject({ latest: 0, aiOverviews: 148 });
   });
 
   it('a missing or reordered AI overview column is not available, never misread', () => {
     for (const body of [
       'Date;Organic Keywords\n20261015;161\n20260915;110\n',
       'Date;AI overview;Organic Keywords\n20261015;148;161\n20260915;94;110\n',
+      'Date;Organic Keywords;AI overview\n20261015;161;148\n20260915;110;94\n',
+      `${H};AI overview\n20261015;161;148;0;0\n20260915;110;94;0;0\n`,
     ]) {
       const r = parseRankHistory({ status: 200, body }, KEY, NOW);
       expect(r.keywordGrowth.status).toBe('not_available');
       expect(r.aiOverviewKeywords.status).toBe('not_available');
+      expect(r.aiOverviewCitations.status).toBe('not_available');
     }
   });
 
@@ -93,7 +138,7 @@ describe('parse — Semrush CSV', () => {
   });
 
   it('a stale latest snapshot is not passed off as current', () => {
-    const body = `${H}\n20260601;131;100\n20260501;119;90\n`;
+    const body = `${H}\n20260601;131;100;0\n20260501;119;90;0\n`;
     const r = parseRankHistory({ status: 200, body }, KEY, NOW);
     expect(r.aiOverviewKeywords.status).toBe('not_available');
     const kg = r.keywordGrowth;
@@ -101,7 +146,7 @@ describe('parse — Semrush CSV', () => {
   });
 
   it('one snapshot cannot show growth', () => {
-    const body = `${H}\n20261015;161;148\n`;
+    const body = `${H}\n20261015;161;148;0\n`;
     expect(parseRankHistory({ status: 200, body }, KEY, NOW).keywordGrowth.status).toBe(
       'not_available'
     );
@@ -144,7 +189,8 @@ describe('collectEeat — fail closed before any metered call', () => {
     expect(s.aiOverviewKeywords).toMatchObject({ status: 'ok', latest: 148, change: 54 });
     const history = new URL(f.calls[1]).searchParams;
     expect(history.get('database')).toBe('au');
-    expect(history.get('export_columns')).toBe('Dt,Or,FK52');
+    expect(history.get('export_columns')).toBe('Dt,Or,FK52,FP52');
+    expect(s.aiOverviewCitations).toMatchObject({ status: 'ok', latest: 0, aiOverviews: 148 });
   });
 
   it('a thrown fetch error carrying the URL reports the type only', async () => {
@@ -193,6 +239,7 @@ describe('runEeatReport — output and exit code', () => {
     expect(text).toMatch(/Referring domains: not available \(/);
     expect(text).toMatch(/Organic keywords: not available \(/);
     expect(text).toMatch(/AI Overview SERPs: not available \(/);
+    expect(text).toMatch(/AI Overview citations: not available \(/);
     expect(text).not.toMatch(/:\s*0\b/);
   });
 

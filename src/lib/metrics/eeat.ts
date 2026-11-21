@@ -1,6 +1,6 @@
 /**
  * BACKLOG #27 — E-E-A-T authority metrics for the Monday pulse: referring domains, keyword growth
- * and AI-answer presence (as ranking keywords whose SERP shows an AI Overview, Semrush FK52). An AUTHORITY metric, not RWR: it compounds slowly and must not be read
+ * and AI-answer presence (Semrush FK52: ranking keywords whose SERP shows an AI Overview; FP52: those CARSI appears in). An AUTHORITY metric, not RWR: it compounds slowly and must not be read
  * as revenue movement.
  *
  * Fails closed exactly like the RWR report (`rwr-report.ts`): a metric that could not be read is
@@ -35,6 +35,20 @@ export type KeywordGrowth = Metric<{
  * results page that shows a Google AI Overview. It does NOT say CARSI is cited in the overview
  * (that would be FP52), so it is always labelled with AI_OVERVIEW_LABEL.
  */
+/**
+ * Semrush FP52: of those AI Overviews, how many CARSI itself appears in. A real 0 is printed as 0;
+ * only an unreadable reply is "not available".
+ */
+export type AiOverviewCitations = Metric<{
+  label: string;
+  latest: number;
+  aiOverviews: number;
+  latestDate: string;
+  previous: number;
+  previousDate: string;
+  change: number;
+}>;
+
 export type AiOverviewKeywords = Metric<{
   label: typeof AI_OVERVIEW_LABEL;
   latest: number;
@@ -51,6 +65,7 @@ export type EeatSnapshot = {
   referringDomains: ReferringDomains;
   keywordGrowth: KeywordGrowth;
   aiOverviewKeywords: AiOverviewKeywords;
+  aiOverviewCitations: AiOverviewCitations;
 };
 
 export type HttpText = { status: number; body: string };
@@ -63,6 +78,9 @@ export type EeatDeps = {
 };
 
 const missing = (reason: string): MetricMissing => ({ status: 'not_available', reason });
+
+export const citationLabel = (n: number, m: number) =>
+  `CARSI appears in ${n} of ${m} AI Overviews on its ranking keywords`;
 
 export const AI_OVERVIEW_LABEL =
   'ranking keywords whose results page shows a Google AI Overview (does not mean CARSI is cited)';
@@ -108,11 +126,14 @@ function isoDate(cell: string | undefined): string | null {
   return m ? `${m[1]}-${m[2]}-${m[3]}` : null;
 }
 
-/** Header names Semrush returns for `export_columns=Dt,Or,FK52`, in that order. */
-const RANK_HISTORY_HEADER = ['date', 'organic keywords', 'ai overview'];
+/**
+ * Header Semrush returns for `export_columns=Dt,Or,FK52,FP52`. FK52 and FP52 are BOTH headed
+ * "AI overview", so they are told apart by position only: column 3 is FK52, column 4 is FP52.
+ */
+const RANK_HISTORY_HEADER = ['date', 'organic keywords', 'ai overview', 'ai overview'];
 
 /**
- * `type=domain_rank_history`, `export_columns=Dt,Or,FK52` — monthly snapshots of organic keyword
+ * `type=domain_rank_history`, `export_columns=Dt,Or,FK52,FP52` — monthly snapshots of organic keyword
  * count and of ranking keywords whose SERP shows an AI Overview. One call feeds both metrics.
  * The header is checked so a renamed or reordered column is "not available", never misread.
  */
@@ -120,25 +141,39 @@ export function parseRankHistory(
   res: HttpText,
   key: string,
   now: Date
-): { keywordGrowth: KeywordGrowth; aiOverviewKeywords: AiOverviewKeywords } {
-  const both = (m: MetricMissing) => ({ keywordGrowth: m, aiOverviewKeywords: m });
+): {
+  keywordGrowth: KeywordGrowth;
+  aiOverviewKeywords: AiOverviewKeywords;
+  aiOverviewCitations: AiOverviewCitations;
+} {
+  const both = (m: MetricMissing) => ({
+    keywordGrowth: m,
+    aiOverviewKeywords: m,
+    aiOverviewCitations: m,
+  });
   const err = describeSemrushError(res, key);
   if (err) return both(missing(err));
   const header = (res.body.split(/\r?\n/)[0] ?? '').split(';').map((c) => c.trim().toLowerCase());
-  if (RANK_HISTORY_HEADER.some((h, i) => header[i] !== h)) {
+  if (
+    header.length !== RANK_HISTORY_HEADER.length ||
+    RANK_HISTORY_HEADER.some((h, i) => header[i] !== h)
+  ) {
     return both(
-      missing('Semrush keyword history header was not Date;Organic Keywords;AI overview')
+      missing(
+        'Semrush keyword history header was not Date;Organic Keywords;AI overview;AI overview'
+      )
     );
   }
-  const points: { date: string; count: number; aio: number }[] = [];
+  const points: { date: string; count: number; aio: number; cited: number }[] = [];
   for (const row of dataRows(res.body)) {
     const date = isoDate(row[0]);
     const count = wholeNumber(row[1]);
-    const aio = wholeNumber(row[2]);
-    if (date === null || count === null || aio === null) {
+    const aio = wholeNumber(row[2]); // FK52
+    const cited = wholeNumber(row[3]); // FP52
+    if (date === null || count === null || aio === null || cited === null) {
       return both(missing('Semrush keyword history had an unreadable row'));
     }
-    points.push({ date, count, aio });
+    points.push({ date, count, aio, cited });
   }
   if (points.length < 2) {
     return both(missing('Semrush keyword history has fewer than two snapshots to compare'));
@@ -171,6 +206,15 @@ export function parseRankHistory(
       previous: previous.aio,
       change: latest.aio - previous.aio,
     },
+    aiOverviewCitations: {
+      status: 'ok',
+      label: citationLabel(latest.cited, latest.aio),
+      ...dates,
+      latest: latest.cited,
+      aiOverviews: latest.aio,
+      previous: previous.cited,
+      change: latest.cited - previous.cited,
+    },
   };
 }
 
@@ -193,7 +237,7 @@ function keywordHistoryUrl(key: string, domain: string, database: string): strin
     database,
     display_limit: '2',
     display_sort: 'dt_desc',
-    export_columns: 'Dt,Or,FK52',
+    export_columns: 'Dt,Or,FK52,FP52',
   });
   return `https://api.semrush.com/?${q}`;
 }
@@ -219,13 +263,25 @@ export async function collectEeat(deps: EeatDeps): Promise<EeatSnapshot> {
   const key = deps.env.SEMRUSH_API_KEY?.trim() ?? '';
   if (!key) {
     const why = missing('SEMRUSH_API_KEY is not set, so Semrush cannot be read');
-    return { ...base, referringDomains: why, keywordGrowth: why, aiOverviewKeywords: why };
+    return {
+      ...base,
+      referringDomains: why,
+      keywordGrowth: why,
+      aiOverviewKeywords: why,
+      aiOverviewCitations: why,
+    };
   }
   if (deps.env.SEMRUSH_ALLOW_METERED?.trim() !== '1') {
     const why = missing(
       'Semrush calls are metered; the founder has not set SEMRUSH_ALLOW_METERED=1 (SPEC row 27 stop-line)'
     );
-    return { ...base, referringDomains: why, keywordGrowth: why, aiOverviewKeywords: why };
+    return {
+      ...base,
+      referringDomains: why,
+      keywordGrowth: why,
+      aiOverviewKeywords: why,
+      aiOverviewCitations: why,
+    };
   }
 
   const now = deps.now ?? new Date();
@@ -237,7 +293,7 @@ export async function collectEeat(deps: EeatDeps): Promise<EeatSnapshot> {
     ...base,
     referringDomains: isMissing(rd) ? rd : parseReferringDomains(rd, key),
     ...(isMissing(kw)
-      ? { keywordGrowth: kw, aiOverviewKeywords: kw }
+      ? { keywordGrowth: kw, aiOverviewKeywords: kw, aiOverviewCitations: kw }
       : parseRankHistory(kw, key, now)),
   };
 }
@@ -263,11 +319,16 @@ export function formatEeat(s: EeatSnapshot): string[] {
         `${m.latest} of ${m.rankingKeywords} ${m.label} (${m.latestDate}); ` +
         `${m.previous} on ${m.previousDate}, ${signed(m.change)}`
     ),
+    line(
+      'AI Overview citations',
+      s.aiOverviewCitations,
+      (m) => `${m.label} (${m.latestDate}); ${m.previous} on ${m.previousDate}, ${signed(m.change)}`
+    ),
   ];
 }
 
 /**
- * Exit codes: 0 only when all three metrics were read; 2 when any is not available. Every
+ * Exit codes: 0 only when every metric was read; 2 when any is not available. Every
  * metric is still printed (text or `--json`), so the pulse shows what was read and names the
  * blocker for the rest.
  */
@@ -277,6 +338,6 @@ export async function runEeatReport(
   const s = await collectEeat(deps);
   if (deps.json) deps.out(JSON.stringify(s));
   else for (const l of formatEeat(s)) deps.out(l);
-  const all = [s.referringDomains, s.keywordGrowth, s.aiOverviewKeywords];
+  const all = [s.referringDomains, s.keywordGrowth, s.aiOverviewKeywords, s.aiOverviewCitations];
   return all.every((m) => m.status === 'ok') ? 0 : 2;
 }
