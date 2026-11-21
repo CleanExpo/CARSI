@@ -11,6 +11,7 @@ import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
 import { extractQuizIdFromLesson } from '@/lib/lms/quiz-from-lesson';
 import { parseLessonResources } from '@/lib/lms/lesson-resources';
 import { requireCurrentAdmin, type AdminSessionProvenance } from '@/lib/server/current-admin';
+import { lockEnrollmentForAdminChange } from '@/lib/server/enrollment-row-lock';
 import { isEnrolmentAccessAllowed, isRevokedStatus } from '@/lib/server/enrollment-access';
 import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
 import {
@@ -356,9 +357,9 @@ export async function forceCompleteEnrollment(
 
   const admin = await prisma.$transaction(async (tx) => {
     const current = await requireCurrentAdmin(tx, options.session);
-    // Re-read inside the transaction so a revocation that lands after the check above still wins.
-    const live = await tx.lmsEnrollment.findUnique({ where: { id: en.id }, select: { status: true } });
-    if (!live || isRevokedStatus(live.status)) throw new Error('ENROLLMENT_REVOKED');
+    // Lock the row and re-check: a revocation either committed before this (refused here) or
+    // waits until this transaction commits.
+    await lockEnrollmentForAdminChange(tx, en.id);
     for (const lessonId of ids) {
       await tx.lmsLessonProgress.upsert({
         where: { studentId_lessonId: { studentId: en.studentId, lessonId } },

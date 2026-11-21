@@ -57,6 +57,12 @@ export async function POST(request: NextRequest, context: RouteContext) {
     if (msg === 'ENROLLMENT_NOT_FOUND') {
       return NextResponse.json({ detail: 'Enrollment not found' }, { status: 404 });
     }
+    if (msg === 'ENROLLMENT_REVOKED') {
+      return NextResponse.json(
+        { detail: 'This enrolment is revoked or refunded, so its quiz attempts cannot be reset.' },
+        { status: 409 },
+      );
+    }
     if (msg === 'QUIZ_NOT_FOUND') {
       return NextResponse.json({ detail: 'Quiz not found for this enrolment' }, { status: 404 });
     }

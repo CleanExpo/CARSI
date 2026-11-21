@@ -70,6 +70,8 @@ vi.mock('@/lib/prisma', () => ({
         return args.data;
       }),
     },
+    // SELECT ... FOR UPDATE in enrollment-row-lock.ts: the locked row as the database holds it.
+    $queryRaw: vi.fn(async () => (state.enrollment ? [{ ...state.enrollment }] : [])),
     async $transaction(arg: unknown) {
       if (typeof arg === 'function') return (arg as (tx: unknown) => Promise<unknown>)(this);
       return Promise.all(arg as Promise<unknown>[]);
@@ -156,9 +158,10 @@ describe('GP-432 path 4: admin force-complete', () => {
     expect(state.enrollment?.status).toBe(status);
   });
 
-  it('refuses when the enrolment is revoked after the batch check (re-read in the transaction)', async () => {
+  it('refuses when the enrolment is revoked after the batch check (locked read in the transaction)', async () => {
     const { prisma } = await import('@/lib/prisma');
-    vi.mocked(prisma.lmsEnrollment.findUnique).mockResolvedValueOnce({ ...state.enrollment, status: 'revoked' } as never);
+    // The batch check read 'active'; the locked read inside the transaction sees the revocation.
+    vi.mocked(prisma.$queryRaw).mockResolvedValueOnce([{ ...state.enrollment, status: 'revoked' }] as never);
 
     const res = await POST(request({ studentId: STUDENT_ID, enrollmentIds: [ENROLLMENT_ID], reason: 'Support request' }));
 

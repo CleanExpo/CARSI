@@ -22,7 +22,7 @@ const OTHER_QUIZ_ID = '40000000-0000-4000-8000-000000000006';
 type Attempt = { id: string; quizId: string; studentId: string; passed: boolean; voidedAt: Date | null };
 
 const state = vi.hoisted(() => ({
-  enrollment: null as null | { id: string; studentId: string; courseId: string },
+  enrollment: null as null | { id: string; studentId: string; courseId: string; status: string },
   quizzes: [] as Array<{ id: string }>,
   attempts: [] as Attempt[],
   audits: [] as Array<Record<string, unknown>>,
@@ -72,6 +72,8 @@ vi.mock('@/lib/prisma', () => ({
         return args.data;
       }),
     },
+    // SELECT ... FOR UPDATE in enrollment-row-lock.ts.
+    $queryRaw: vi.fn(async () => (state.enrollment ? [{ ...state.enrollment }] : [])),
     async $transaction(fn: (tx: unknown) => Promise<unknown>) {
       return fn(this);
     },
@@ -92,7 +94,7 @@ function request(body: unknown) {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  state.enrollment = { id: ENROLLMENT_ID, studentId: STUDENT_ID, courseId: COURSE_ID };
+  state.enrollment = { id: ENROLLMENT_ID, studentId: STUDENT_ID, courseId: COURSE_ID, status: 'active' };
   state.quizzes = [{ id: QUIZ_ID }, { id: OTHER_QUIZ_ID }];
   state.attempts = [
     { id: 'a1', quizId: QUIZ_ID, studentId: STUDENT_ID, passed: false, voidedAt: null },
@@ -116,6 +118,14 @@ describe('GP-432 path 5: admin quiz-attempt reset', () => {
   it.each([undefined, '', '  '])('refuses without a reason (%j)', async (reason) => {
     const res = await route.POST(request({ reason }), ctx);
     expect(res.status).toBe(400);
+    expect(state.attempts.every((a) => a.voidedAt === null)).toBe(true);
+    expect(state.audits).toEqual([]);
+  });
+
+  it.each(['revoked', 'refunded'])('refuses a %s enrolment (409) and voids nothing', async (status) => {
+    state.enrollment = { ...state.enrollment!, status };
+    const res = await route.POST(request({ reason: 'Learner asked for another go' }), ctx);
+    expect(res.status).toBe(409);
     expect(state.attempts.every((a) => a.voidedAt === null)).toBe(true);
     expect(state.audits).toEqual([]);
   });

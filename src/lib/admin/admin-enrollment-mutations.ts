@@ -11,6 +11,7 @@ import {
 import type { AdminSessionProvenance } from '@/lib/server/current-admin';
 import { forceCompleteEnrollment } from '@/lib/server/enrollment-service';
 import { isRevokedStatus } from '@/lib/server/enrollment-access';
+import { lockEnrollmentRow } from '@/lib/server/enrollment-row-lock';
 
 function isWorkbookInfrastructureError(message: string): boolean {
   const m = message.toLowerCase();
@@ -139,18 +140,23 @@ export async function adminRevokeEnrollment(enrollmentId: string) {
   // P2003) along with the enrolment's own history. Setting status='revoked'
   // removes access via the WS3 read gates while preserving the audit trail and
   // the regulatory record.
-  await prisma.$transaction([
-    prisma.lmsLessonProgress.deleteMany({
+  //
+  // GP-432: lock the enrolment row first (one owner: enrollment-row-lock.ts). An admin
+  // force-complete or quiz reset holding the lock finishes before this deletes progress, so
+  // its lesson writes cannot survive the revocation.
+  await prisma.$transaction(async (tx) => {
+    if (!(await lockEnrollmentRow(tx, en.id))) throw new Error('ENROLLMENT_NOT_FOUND');
+    await tx.lmsLessonProgress.deleteMany({
       where: {
         studentId: en.studentId,
         lessonId: { in: lessonIds.map((l) => l.id) },
       },
-    }),
-    prisma.lmsEnrollment.update({
+    });
+    await tx.lmsEnrollment.update({
       where: { id: en.id },
       data: { status: 'revoked', certificateIssuedAt: null, completedAt: null },
-    }),
-  ]);
+    });
+  });
 }
 
 type MarkCompleteResult = { enrollmentId: string; lessonsMarked: number; completed: boolean };

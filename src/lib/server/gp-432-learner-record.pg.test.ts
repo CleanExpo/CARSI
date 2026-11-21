@@ -206,6 +206,70 @@ describe.runIf(RUNNABLE)('GP-432 learner record (real PostgreSQL)', () => {
     expect(audit.rows).toEqual([]);
   });
 
+  // GP-432 verdict review: the revocation check and the admin writes must not interleave.
+  // A second connection holds the row the way a concurrent transaction would.
+  async function otherConnection() {
+    const other = new pg.Client({ connectionString: DB_URL });
+    await other.connect();
+    await other.query('BEGIN');
+    return other;
+  }
+  const settle = <T,>(p: Promise<T>) => p.then(() => 'resolved', (e: Error) => e.message);
+  const pause = () => new Promise((r) => setTimeout(r, 500));
+
+  it('force-complete waits for an in-flight revocation and then refuses, writing nothing', async () => {
+    const other = await otherConnection();
+    await other.query("UPDATE lms_enrollments SET status = 'revoked' WHERE id = $1", [ids.enrolment]);
+    const pending = settle(
+      service.forceCompleteEnrollment(ids.enrolment, ids.learner, { session, reason: 'Support request' }),
+    );
+    await pause();
+    await other.query('COMMIT');
+    await other.end();
+
+    expect(await pending).toBe('ENROLLMENT_REVOKED');
+    const progress = await db.query('SELECT 1 FROM lms_lesson_progress WHERE student_id = $1', [ids.learner]);
+    expect(progress.rows).toEqual([]);
+    const audit = await db.query('SELECT 1 FROM lms_learner_admin_audit_events WHERE student_ref = $1', [ids.learner]);
+    expect(audit.rows).toEqual([]);
+  });
+
+  it('admin revoke waits for an admin change holding the enrolment lock, then clears its lesson writes', async () => {
+    const mutations = await import('@/lib/admin/admin-enrollment-mutations');
+    // Admin revoke only acts on seed-workbook courses; give this throwaway course one of their slugs.
+    const { getAllSeedSlugs } = await import('@/lib/lms-seed-catalog');
+    await db.query('UPDATE lms_courses SET slug = $1 WHERE id = $2', [getAllSeedSlugs()[0], ids.course]);
+    const other = await otherConnection();
+    await other.query('SELECT 1 FROM lms_enrollments WHERE id = $1 FOR UPDATE', [ids.enrolment]);
+    await other.query(
+      'INSERT INTO lms_lesson_progress (id, student_id, lesson_id, completed, completed_at) VALUES ($1, $2, $3, TRUE, now())',
+      [randomUUID(), ids.learner, ids.lesson],
+    );
+    const pending = settle(mutations.adminRevokeEnrollment(ids.enrolment));
+    await pause();
+    await other.query('COMMIT');
+    await other.end();
+
+    expect(await pending).toBe('resolved');
+    expect(await status()).toBe('revoked');
+    const progress = await db.query('SELECT 1 FROM lms_lesson_progress WHERE student_id = $1', [ids.learner]);
+    expect(progress.rows).toEqual([]);
+  });
+
+  it('quiz-attempt reset refuses a revoked enrolment and voids nothing', async () => {
+    await addQuiz(ids.quiz);
+    await addAttempt(ids.quiz, false);
+    await db.query("UPDATE lms_enrollments SET status = 'revoked' WHERE id = $1", [ids.enrolment]);
+    await expect(
+      reset.resetQuizAttemptsForEnrollment({ enrollmentId: ids.enrolment, session, reason: 'Support request' }),
+    ).rejects.toThrow('ENROLLMENT_REVOKED');
+    const voided = await db.query(
+      'SELECT 1 FROM lms_quiz_attempts WHERE student_id = $1 AND voided_at IS NOT NULL',
+      [ids.learner],
+    );
+    expect(voided.rows).toEqual([]);
+  });
+
   it('quiz-attempt reset voids failed attempts, keeps the passed one, frees the attempt limit and audits it', async () => {
     await addQuiz(ids.quiz);
     await addQuiz(ids.otherQuiz);

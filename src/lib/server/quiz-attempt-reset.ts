@@ -1,6 +1,7 @@
 import { runSerializable } from '@/lib/server/db-tx';
 import { requireCurrentAdmin, type AdminSessionProvenance } from '@/lib/server/current-admin';
 import { ADMIN_AUDIT_REASON_MAX } from '@/lib/server/enrollment-service';
+import { lockEnrollmentForAdminChange } from '@/lib/server/enrollment-row-lock';
 
 /**
  * Admin-only: give a learner fresh attempts on a course's quizzes (GP-432). Without this a
@@ -28,11 +29,8 @@ export async function resetQuizAttemptsForEnrollment(params: {
   return runSerializable(async (tx) => {
     const admin = await requireCurrentAdmin(tx, params.session);
 
-    const enrollment = await tx.lmsEnrollment.findUnique({
-      where: { id: params.enrollmentId },
-      select: { id: true, studentId: true, courseId: true },
-    });
-    if (!enrollment) throw new Error('ENROLLMENT_NOT_FOUND');
+    // Locked, and refused when missing or revoked (one owner: enrollment-row-lock.ts).
+    const enrollment = await lockEnrollmentForAdminChange(tx, params.enrollmentId);
 
     const courseQuizIds = (
       await tx.lmsQuiz.findMany({ where: { courseId: enrollment.courseId }, select: { id: true } })
