@@ -553,11 +553,18 @@ function checkoutFrom(tab: Tab, slug: string): NextRequest {
   });
 }
 
+/** Each survey post gets its own client IP so the route's per-IP limit (GP-694) stays out of these cases. */
+let surveyIpCounter = 0;
+
 async function surveyStatus(tab: Tab | null, sessionId: string): Promise<number> {
+  surveyIpCounter += 1;
   const res = await SURVEY_POST(
     new NextRequest('https://carsi.example.test/api/lms/checkout/survey', {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
+      headers: {
+        'content-type': 'application/json',
+        'x-forwarded-for': `192.0.2.${surveyIpCounter % 250}`,
+      },
       body: JSON.stringify({
         session_id: sessionId,
         industry: 'commercial_cleaning',

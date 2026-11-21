@@ -18,14 +18,32 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getStripeClient } from '@/lib/api/stripe';
 import { surveyMetadata, validateSurvey } from '@/lib/marketing/purchase-survey';
+import { applyRateLimit, clientIpFrom } from '@/lib/rate-limit';
 import { isPurchaseSurveyEnabled } from '@/lib/server/purchase-survey-flag';
 import { parsePurchaseSurveyKeys, sessionAuthorisedForSurvey } from '@/lib/server/purchase-survey-token';
 
 const SESSION_ID_PATTERN = /^cs_[A-Za-z0-9_]{1,250}$/;
 
+/**
+ * Per-IP cap, applied before any Stripe call (GP-694). Any well-formed key list reaches
+ * `checkout.sessions.retrieve`, so without it a flood could spend Stripe's per-endpoint limit
+ * that real payment-success lookups need. A buyer answers once, maybe retries a few times.
+ */
+const SURVEY_RATE_LIMIT = 10;
+const SURVEY_RATE_WINDOW_MS = 60 * 60 * 1000;
+
 export async function POST(request: NextRequest) {
   if (!isPurchaseSurveyEnabled()) {
     return NextResponse.json({ detail: 'Not found' }, { status: 404 });
+  }
+
+  const ip = clientIpFrom(request.headers.get('x-forwarded-for'), request.headers.get('x-real-ip'));
+  const rl = applyRateLimit(`checkout-survey:${ip}`, SURVEY_RATE_LIMIT, SURVEY_RATE_WINDOW_MS);
+  if (!rl.ok) {
+    return NextResponse.json(
+      { detail: 'Too many requests. Please try again later.' },
+      { status: 429, headers: { 'Retry-After': String(Math.ceil((rl.resetAt - Date.now()) / 1000)) } }
+    );
   }
 
   const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
