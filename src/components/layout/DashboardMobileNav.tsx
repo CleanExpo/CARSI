@@ -38,7 +38,7 @@ export function DashboardMobileNav() {
 
   async function handleSignOut() {
     await signOut();
-    window.location.assign('/login');
+    window.location.assign(new URL('/login', window.location.origin).href);
   }
 
   const menuItems = [...LEARNER_NAV_PRIMARY, ...LEARNER_NAV_RECORDS];
