@@ -672,3 +672,28 @@ describe('overlapping checkout starts keep every survey answerable (GP-662)', ()
     expect(await surveyStatus(tab, 'cs_test_junk')).toBe(200);
   });
 });
+
+describe('GP-732: the visitor analytics choice is recorded on the course checkout session', () => {
+  it.each([
+    ['granted', 'carsi_analytics_consent=granted', 'granted'],
+    ['refused', 'carsi_analytics_consent=denied', 'denied'],
+    ['unknown (no cookie)', undefined, 'unknown'],
+  ])('%s', async (_label, cookie, expected) => {
+    mocks.findUser.mockResolvedValue(null);
+    mocks.findEnrollment.mockResolvedValue(null);
+    const res = await POST(
+      new NextRequest('https://carsi.example.test/api/lms/checkout', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', ...(cookie ? { cookie } : {}) },
+        body: JSON.stringify({
+          slug: COURSE_SLUG,
+          customer_email: 'buyer@example.test',
+          guest_checkout: true,
+        }),
+      })
+    );
+    expect(res.status).toBe(200);
+    expect(mocks.createStripe).toHaveBeenCalledTimes(1);
+    expect(mocks.createStripe.mock.calls[0][0].analytics_consent).toBe(expected);
+  });
+});

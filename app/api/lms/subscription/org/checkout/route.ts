@@ -19,6 +19,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAppOrigin, getCheckoutReturnUrl } from '@/lib/server/app-url';
 
 import { getStripeClient } from '@/lib/api/stripe';
+import { analyticsConsentMetadata, readAnalyticsConsent } from '@/lib/analytics/analytics-consent';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { resolveOrgMonthlyPriceId } from '@/lib/server/org-subscription-price';
 import { provisionOrgSubscriptionContainer } from '@/lib/server/org-subscription-provision';
@@ -120,6 +121,9 @@ export async function POST(request: NextRequest) {
   const cancel_url = getCheckoutReturnUrl(body.cancel_url, `${origin}/pricing?checkout=cancelled`);
 
   try {
+    // GP-732: the visitor's analytics choice, on the session and on the subscription (renewals
+    // and lapses are sent from the subscription's metadata). No recorded yes, no GA4 event.
+    const consentMetadata = analyticsConsentMetadata(readAnalyticsConsent(request));
     const session = await getStripeClient().checkout.sessions.create(
       {
         mode: 'subscription',
@@ -135,12 +139,14 @@ export async function POST(request: NextRequest) {
           plan: 'org_monthly',
           organisation_name: organisationName.slice(0, 200),
           source: 'carsi-org-subscription',
+          ...consentMetadata,
         },
         subscription_data: {
           metadata: {
             carsi_user_id: claims.sub,
             carsi_team_id: teamId,
             plan: 'org_monthly',
+            ...consentMetadata,
           },
         },
         allow_promotion_codes: true,

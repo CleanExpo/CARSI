@@ -15,7 +15,14 @@
  * No-ops (resolves without throwing or sending a request) when
  * `NEXT_PUBLIC_GA_MEASUREMENT_ID` or `GA4_MEASUREMENT_PROTOCOL_API_SECRET`
  * is unset, so local/dev/CI environments never fire real events.
+ *
+ * Consent (GP-732): every event carries the visitor's analytics choice, recorded at checkout
+ * (`src/lib/analytics/analytics-consent.ts`). The sender itself refuses anything but
+ * `granted`, so a call site cannot forget the check: a refusal or an unknown choice sends
+ * nothing.
  */
+
+import type { AnalyticsConsent } from '@/lib/analytics/analytics-consent';
 
 const MEASUREMENT_PROTOCOL_ENDPOINT = 'https://www.google-analytics.com/mp/collect';
 
@@ -34,6 +41,8 @@ export interface Ga4MeasurementProtocolEvent {
   clientId: string;
   /** Optional GA4 user_id for cross-device / logged-in attribution. */
   userId?: string;
+  /** The visitor's analytics choice. Only `granted` is sent; anything else is skipped. */
+  consent: AnalyticsConsent;
 }
 
 function getMeasurementId(): string | undefined {
@@ -58,7 +67,10 @@ export function isGa4MeasurementProtocolEnabled(): boolean {
 export async function sendGa4MeasurementProtocolEvent(
   event: Ga4MeasurementProtocolEvent,
   opts: { fetchImpl?: typeof fetch } = {},
-): Promise<{ sent: boolean; status?: number }> {
+): Promise<{ sent: boolean; status?: number; skipped?: 'no-consent' }> {
+  if (event.consent !== 'granted') {
+    return { sent: false, skipped: 'no-consent' };
+  }
   const measurementId = getMeasurementId();
   const apiSecret = getApiSecret();
   const fetchImpl = opts.fetchImpl ?? fetch;
@@ -107,9 +119,11 @@ export async function sendGa4PurchaseEvent(input: {
   courseSlug: string;
   valueAud: number;
   transactionId: string;
-}): Promise<{ sent: boolean; status?: number }> {
+  consent: AnalyticsConsent;
+}): Promise<{ sent: boolean; status?: number; skipped?: 'no-consent' }> {
   return sendGa4MeasurementProtocolEvent({
     name: 'purchase',
+    consent: input.consent,
     clientId: input.clientId,
     userId: input.userId,
     params: {

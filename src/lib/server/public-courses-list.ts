@@ -33,15 +33,7 @@ export const lmsPublishedCourseWhere: Prisma.LmsCourseWhereInput = {
 /** Catalogue list bounds — CARSI_VERIFICATION_GATE.md rule 2 (bounded queries). */
 export const CATALOGUE_QUERY_CAP = 200;
 
-export function isPublishedCourseStatus(status: string | null | undefined): boolean {
-  // Deliberately NOT trimmed. Prisma's `equals: 'published', mode: 'insensitive'` does not
-  // trim either, and the whole point of this predicate is to give the same answer as the
-  // database. Trimming here made '  published  ' visible in pathway and team filters while
-  // the catalogue, checkout and team queries excluded the same row — the split-brain this
-  // function exists to close, reintroduced one layer up. `status` is an unconstrained
-  // String column, so the padded value is allowed even though no seed row currently uses it.
-  return typeof status === 'string' && status.toLowerCase() === 'published';
-}
+export { isPublishedCourseStatus } from '@/lib/courses/course-status';
 
 const publishedWhere = lmsPublishedCourseWhere;
 

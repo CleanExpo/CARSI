@@ -315,3 +315,26 @@ describe('an unauthenticated caller', () => {
     expect(mocks.sessionsCreate).not.toHaveBeenCalled();
   });
 });
+
+describe('GP-732: the visitor analytics choice is recorded on the session and the subscription', () => {
+  function withCookie(cookie?: string): NextRequest {
+    return new NextRequest('https://carsi.example.test/api/lms/subscription/checkout', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', ...(cookie ? { cookie } : {}) },
+      body: JSON.stringify({}),
+    });
+  }
+
+  it.each([
+    ['granted', 'carsi_analytics_consent=granted', 'granted'],
+    ['refused', 'carsi_analytics_consent=denied', 'denied'],
+    ['unknown (no cookie)', undefined, 'unknown'],
+    ['unknown (unrecognised value)', 'carsi_analytics_consent=yes', 'unknown'],
+  ])('%s', async (_label, cookie, expected) => {
+    const res = await POST(withCookie(cookie));
+    expect(res.status).toBe(200);
+    const params = mocks.sessionsCreate.mock.calls[0][0];
+    expect(params.metadata.analytics_consent).toBe(expected);
+    expect(params.subscription_data.metadata.analytics_consent).toBe(expected);
+  });
+});

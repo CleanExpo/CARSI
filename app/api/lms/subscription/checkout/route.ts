@@ -25,6 +25,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAppOrigin, getCheckoutReturnUrl } from '@/lib/server/app-url';
 
 import { getStripeClient } from '@/lib/api/stripe';
+import { analyticsConsentMetadata, readAnalyticsConsent } from '@/lib/analytics/analytics-consent';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { membershipCheckoutDecisionFor } from '@/lib/server/membership-checkout-guard';
 import {
@@ -119,6 +120,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ detail: UNAVAILABLE }, { status: 503 });
     }
 
+    // GP-732: the visitor's analytics choice, on the session and on the subscription (renewals
+    // and lapses are sent from the subscription's metadata). No recorded yes, no GA4 event.
+    const consentMetadata = analyticsConsentMetadata(readAnalyticsConsent(request));
     const session = await getStripeClient().checkout.sessions.create(
       {
         mode: 'subscription',
@@ -133,6 +137,7 @@ export async function POST(request: NextRequest) {
           plan: 'pro_annual',
           source: 'carsi-pro-annual',
           ...(attributionJourneyId ? { attribution_journey_id: attributionJourneyId } : {}),
+          ...consentMetadata,
         },
         subscription_data: {
           trial_period_days: 7,
@@ -140,6 +145,7 @@ export async function POST(request: NextRequest) {
             carsi_user_id: claims.sub,
             plan: 'pro_annual',
             ...(attributionJourneyId ? { attribution_journey_id: attributionJourneyId } : {}),
+            ...consentMetadata,
           },
         },
         allow_promotion_codes: true,

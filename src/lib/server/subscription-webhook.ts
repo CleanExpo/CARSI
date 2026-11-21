@@ -59,6 +59,7 @@ import {
 } from '@/lib/server/org-subscription-store';
 import { sendUpcomingRenewalReminder } from '@/lib/server/renewal-reminder';
 import { trackSubscriptionLifecycleEvent } from '@/lib/server/subscription-analytics';
+import { analyticsConsentFromMetadata } from '@/lib/analytics/analytics-consent';
 
 /** Stripe subscription lifecycle + invoice events this module owns. */
 export const SUBSCRIPTION_EVENT_TYPES = new Set<string>([
@@ -108,6 +109,7 @@ async function trackStarted(subscription: Stripe.Subscription): Promise<void> {
     plan: planFromSubscription(subscription),
     userId: userId ?? undefined,
     subscriptionId: subscription.id,
+    consent: analyticsConsentFromMetadata(subscription.metadata),
   });
 }
 
@@ -116,6 +118,7 @@ async function trackLapsed(subscription: Stripe.Subscription): Promise<void> {
     event: 'subscription_lapsed',
     plan: planFromSubscription(subscription),
     subscriptionId: subscription.id,
+    consent: analyticsConsentFromMetadata(subscription.metadata),
   });
 }
 
@@ -438,6 +441,7 @@ export async function handleSubscriptionEvent(event: Stripe.Event): Promise<void
             event: 'subscription_renewed',
             plan: planFromSubscription(subscription),
             subscriptionId: subscription.id,
+            consent: analyticsConsentFromMetadata(subscription.metadata),
           });
         }
       } catch (error) {

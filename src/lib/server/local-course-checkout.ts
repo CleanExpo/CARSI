@@ -1,3 +1,4 @@
+import { analyticsConsentMetadata, type AnalyticsConsent } from '@/lib/analytics/analytics-consent';
 import type { CheckoutCourse } from '@/lib/course-list-item';
 import { getStripeClient } from '@/lib/api/stripe';
 import { verifySessionToken } from '@/lib/auth/session-jwt';
@@ -48,6 +49,11 @@ export async function createStripeCheckoutForCourse(params: {
   purchase_mode?: 'self' | 'team';
   team_seat_count?: number;
   attribution_journey_id?: string;
+  /**
+   * The visitor's analytics choice at checkout (GP-732). Required so no caller can leave it out;
+   * the webhook sends the server-side GA4 purchase event only when it is `granted`.
+   */
+  analytics_consent: AnalyticsConsent;
 }): Promise<{ checkout_url: string; checkout_session_id: string }> {
   const {
     slug,
@@ -63,6 +69,7 @@ export async function createStripeCheckoutForCourse(params: {
     purchase_mode = 'self',
     team_seat_count,
     attribution_journey_id,
+    analytics_consent,
   } = params;
 
   const priceNum = Number(course.price_aud);
@@ -98,6 +105,8 @@ export async function createStripeCheckoutForCourse(params: {
       ...(guest_checkout ? { guest_checkout: 'true' } : {}),
       ...(attribution_journey_id ? { attribution_journey_id } : {}),
       ...(extra_metadata ?? {}),
+      // After extra_metadata, so nothing passed through it can overwrite the recorded choice.
+      ...analyticsConsentMetadata(analytics_consent),
     },
     line_items: [
       {

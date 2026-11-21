@@ -25,6 +25,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAppOrigin, getCheckoutReturnUrl } from '@/lib/server/app-url';
 
 import { getStripeClient } from '@/lib/api/stripe';
+import { analyticsConsentMetadata, readAnalyticsConsent } from '@/lib/analytics/analytics-consent';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { teamTierById, type TeamBundleTierId } from '@/lib/lms/pricing-tiers';
 import { resolveTeamTierPriceId } from '@/lib/server/team-subscription-price';
@@ -126,6 +127,9 @@ export async function POST(request: NextRequest) {
   const cancel_url = getCheckoutReturnUrl(body.cancel_url, `${origin}/pricing?checkout=cancelled`);
 
   try {
+    // GP-732: the visitor's analytics choice, on the session and on the subscription (renewals
+    // and lapses are sent from the subscription's metadata). No recorded yes, no GA4 event.
+    const consentMetadata = analyticsConsentMetadata(readAnalyticsConsent(request));
     const session = await getStripeClient().checkout.sessions.create(
       {
         mode: 'subscription',
@@ -141,6 +145,7 @@ export async function POST(request: NextRequest) {
           plan: tierId,
           seat_count: String(seats),
           source: 'carsi-teams-subscription',
+          ...consentMetadata,
         },
         subscription_data: {
           metadata: {
@@ -148,6 +153,7 @@ export async function POST(request: NextRequest) {
             carsi_team_id: teamId,
             plan: tierId,
             seat_count: String(seats),
+            ...consentMetadata,
           },
         },
         allow_promotion_codes: true,
