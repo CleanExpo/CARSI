@@ -6,7 +6,8 @@
  * main before GitHub CI finished. With auto-deploy off, .github/workflows/deploy-production.yml
  * is the only automatic path to production, and it uses this script to decide:
  *
- *   checks <sha>                    exit 0 only when every required check on <sha> passed
+ *   checks <sha>                    exit 0 only when main's own push CI run for <sha> succeeded
+ *                                   and every required check in that run passed
  *   decide <sha> <phase> <commit>   print wait|cancel|live|failed for an in-flight deployment
  *   wait-health <sha> [secs]        exit 0 once HEALTH_URL reports build.commit === <sha>
  *
@@ -82,19 +83,41 @@ export function healthCommit(body) {
   return typeof commit === 'string' && SHA_RE.test(commit) ? commit : null;
 }
 
-async function listCheckRuns(repo, sha, token) {
-  const runs = [];
-  for (let page = 1; page <= 10; page += 1) {
-    const res = await fetch(
-      `https://api.github.com/repos/${repo}/commits/${sha}/check-runs?per_page=100&page=${page}`,
-      { headers: { authorization: `Bearer ${token}`, accept: 'application/vnd.github+json' } },
-    );
-    if (!res.ok) throw new Error(`GitHub check-runs API returned ${res.status}`);
-    const data = await res.json();
-    runs.push(...data.check_runs);
-    if (runs.length >= data.total_count || data.check_runs.length === 0) return runs;
+/**
+ * The CI run that counts for <sha>: the newest run of the CI workflow for a push to main at
+ * exactly that commit. Check runs on the same SHA from a pull request, a branch push or a
+ * manual dispatch are not evidence that main's own CI passed.
+ *
+ * @param {Array<{id:number,head_sha:string,event:string,head_branch:string,status:string,conclusion:string|null,check_suite_id:number}>} workflowRuns
+ * @param {string} sha
+ */
+export function mainPushRunVerdict(workflowRuns, sha) {
+  const run = workflowRuns
+    .filter((r) => r.head_sha === sha && r.event === 'push' && r.head_branch === 'main')
+    .sort((a, b) => b.id - a.id)[0];
+  if (!run) return { ok: false, reason: 'no CI run for a push to main at this commit', run: null };
+  if (run.status !== 'completed' || run.conclusion !== 'success') {
+    return { ok: false, reason: `main push CI run ${run.id} is ${run.status}/${run.conclusion ?? 'none'}`, run };
   }
-  throw new Error('more than 1000 check runs on one commit; refusing to guess');
+  return { ok: true, reason: `main push CI run ${run.id} succeeded`, run };
+}
+
+async function getJson(url, token) {
+  const res = await fetch(url, {
+    headers: { authorization: `Bearer ${token}`, accept: 'application/vnd.github+json' },
+  });
+  if (!res.ok) throw new Error(`GitHub API returned ${res.status} for ${new URL(url).pathname}`);
+  return res.json();
+}
+
+async function listAll(url, key, token) {
+  const items = [];
+  for (let page = 1; page <= 10; page += 1) {
+    const data = await getJson(`${url}&per_page=100&page=${page}`, token);
+    items.push(...data[key]);
+    if (items.length >= data.total_count || data[key].length === 0) return items;
+  }
+  throw new Error(`more than 1000 ${key}; refusing to guess`);
 }
 
 async function main([mode, sha, secs, ...rest]) {
@@ -109,8 +132,24 @@ async function main([mode, sha, secs, ...rest]) {
   if (mode === 'checks') {
     const { GITHUB_REPOSITORY: repo, GH_TOKEN: token } = process.env;
     if (!repo || !token) throw new Error('GITHUB_REPOSITORY and GH_TOKEN must be set');
-    const result = evaluateRequiredChecks(await listCheckRuns(repo, sha, token));
-    console.log(JSON.stringify({ sha, ...result }));
+    const api = `https://api.github.com/repos/${repo}`;
+    const runs = await listAll(
+      `${api}/actions/workflows/ci.yml/runs?head_sha=${sha}&event=push&branch=main`,
+      'workflow_runs',
+      token,
+    );
+    const ci = mainPushRunVerdict(runs, sha);
+    if (!ci.ok) {
+      console.log(JSON.stringify({ sha, ok: false, reason: ci.reason }));
+      return 1;
+    }
+    const checkRuns = await listAll(
+      `${api}/check-suites/${ci.run.check_suite_id}/check-runs?filter=latest`,
+      'check_runs',
+      token,
+    );
+    const result = evaluateRequiredChecks(checkRuns);
+    console.log(JSON.stringify({ sha, ci_run: ci.run.id, ...result }));
     return result.ok ? 0 : 1;
   }
 

@@ -7,6 +7,7 @@ import {
   deploymentDecision,
   evaluateRequiredChecks,
   healthCommit,
+  mainPushRunVerdict,
 } from '../../../scripts/ci/production-deploy-gate.mjs';
 
 // Production deploy gate (Phill, 22/11/2026: "Wait for green"). DigitalOcean must not
@@ -110,6 +111,43 @@ describe('evaluateRequiredChecks', () => {
     expect(evaluateRequiredChecks(failedThenPassed).ok).toBe(true);
     const passedThenFailed = [...allPass(), { id: 99, name: 'Unit Tests', status: 'completed', conclusion: 'failure' }];
     expect(evaluateRequiredChecks(passedThenFailed).ok).toBe(false);
+  });
+});
+
+describe('mainPushRunVerdict', () => {
+  const run = (over: Record<string, unknown>) => ({
+    id: 1,
+    head_sha: SHA,
+    event: 'push',
+    head_branch: 'main',
+    status: 'completed',
+    conclusion: 'success',
+    check_suite_id: 10,
+    ...over,
+  });
+
+  it('accepts a successful CI run for a push to main at the commit', () => {
+    expect(mainPushRunVerdict([run({})], SHA)).toMatchObject({ ok: true, run: { id: 1 } });
+  });
+
+  it('does not count successful pull-request, branch or dispatch runs on the same commit', () => {
+    const others = [
+      run({ id: 2, event: 'pull_request', head_branch: 'feature' }),
+      run({ id: 3, event: 'push', head_branch: 'feature' }),
+      run({ id: 4, event: 'workflow_dispatch' }),
+    ];
+    expect(mainPushRunVerdict(others, SHA).ok).toBe(false);
+    expect(mainPushRunVerdict([...others, run({ id: 5, status: 'in_progress', conclusion: null })], SHA).ok).toBe(false);
+    expect(mainPushRunVerdict([...others, run({ id: 5, conclusion: 'failure' })], SHA).ok).toBe(false);
+  });
+
+  it('does not count a run for another commit', () => {
+    expect(mainPushRunVerdict([run({ head_sha: 'a'.repeat(40) })], SHA).ok).toBe(false);
+  });
+
+  it('uses the newest main push run', () => {
+    expect(mainPushRunVerdict([run({ id: 1 }), run({ id: 2, conclusion: 'failure' })], SHA).ok).toBe(false);
+    expect(mainPushRunVerdict([run({ id: 2 }), run({ id: 1, conclusion: 'failure' })], SHA).ok).toBe(true);
   });
 });
 

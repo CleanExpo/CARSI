@@ -6,7 +6,8 @@ name: Deploy Production
 # this workflow is the only automatic path to production. After the CI workflow finishes
 # on a push to main it:
 #   1. deploys only if that commit is still the head of main (a newer commit gets its own run),
-#   2. deploys only if every required check on that exact commit passed,
+#   2. deploys only if main's own push CI run for that exact commit succeeded and every
+#      required check in that run passed (PR or branch runs on the same SHA do not count),
 #   3. asks DigitalOcean to build main and watches the deployment: if DigitalOcean resolved
 #      any commit other than the checked one (main moved after the checks), the deployment is
 #      cancelled before it goes live and the job fails,
@@ -37,6 +38,7 @@ on:
         default: false
 
 permissions:
+  actions: read
   contents: read
   checks: read
 
