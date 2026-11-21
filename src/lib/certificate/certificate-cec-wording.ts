@@ -46,8 +46,7 @@ export function certificateCecWording(
       recordLine: 'Issued by CARSI. Retain this certificate with your training records.',
       cardLabel: 'CARSI certificate',
       scopeStatement:
-        'A CARSI-issued credential for a CARSI course. It is not a trade licence or a ' +
-        'third-party certification.',
+        'A CARSI-issued credential for a CARSI course. It is not a trade licence.',
     };
   }
   return {
