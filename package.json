@@ -52,6 +52,8 @@
     "test:guard-enumeration": "node scripts/check-guard-enumeration.test.mjs",
     "test:agent-doc-paths": "node --test scripts/check-agent-doc-entrypoints.test.mjs",
     "test:water-go-live": "node scripts/verify-water-course-go-live.test.mjs",
+    "check:migrations": "node scripts/check-migrations.mjs",
+    "test:migrations": "node --test scripts/check-migrations.test.mjs",
     "check:cec": "node scripts/check-cec-approvals.mjs",
     "check:hero-tiles": "node scripts/check-hero-tiles.mjs",
     "test:hero-tiles": "node --test scripts/check-hero-tiles.test.mjs",
