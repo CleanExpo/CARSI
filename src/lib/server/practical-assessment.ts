@@ -12,7 +12,7 @@ import {
   filterCoursesPassingPrerequisites,
   type AdminFlag,
 } from '@/lib/server/course-prerequisites';
-import { gradeRubric, isCriticalCriterion } from '@/lib/practical-assessment-grading';
+import { gradeRubric } from '@/lib/practical-assessment-grading';
 import { runSerializable } from '@/lib/server/db-tx';
 import { ACCESS_GRANTING_STATUS_LIST } from '@/lib/server/enrollment-access';
 
@@ -39,7 +39,7 @@ export type RubricCriterionDTO = {
   description: string;
   maxPoints: number;
   orderIndex: number;
-  /** True when the label carries the "(critical)" marker: it must be met in full to pass. */
+  /** Stored flag: a critical criterion must be met in full to pass. */
   critical: boolean;
 };
 
@@ -149,7 +149,7 @@ export async function getSubmissionForReview(submissionId: string): Promise<Subm
       description: c.description,
       maxPoints: c.maxPoints,
       orderIndex: c.orderIndex,
-      critical: isCriticalCriterion(c.label),
+      critical: c.critical,
     })),
     student: { id: r.student.id, name: r.student.fullName ?? 'Unknown', email: r.student.email },
     criterionScores: asScores(r.criterionScores),
@@ -330,7 +330,7 @@ export async function getPublishedAssessment(assessmentId: string) {
       description: c.description,
       maxPoints: c.maxPoints,
       orderIndex: c.orderIndex,
-      critical: isCriticalCriterion(c.label),
+      critical: c.critical,
     })),
   };
 }
@@ -350,7 +350,7 @@ export type AuthoringInput = {
   instructions: string;
   passThreshold: number;
   isPublished: boolean;
-  criteria: { label: string; description?: string; maxPoints: number }[];
+  criteria: { label: string; description?: string; maxPoints: number; critical: boolean }[];
 };
 
 /** Narrow an untyped request body into AuthoringInput (route helper). */
@@ -363,6 +363,7 @@ export function parseAuthoringInput(raw: unknown): AuthoringInput {
       label: typeof x.label === 'string' ? x.label : '',
       description: typeof x.description === 'string' ? x.description : '',
       maxPoints: Number(x.maxPoints ?? 5),
+      critical: x.critical === true,
     };
   });
   return {
@@ -383,6 +384,7 @@ function criteriaCreate(criteria: AuthoringInput['criteria']) {
       description: (c.description ?? '').trim(),
       maxPoints: Math.max(1, Math.round(c.maxPoints) || 1),
       orderIndex: i,
+      critical: c.critical,
     }));
 }
 
@@ -458,6 +460,7 @@ export async function getPracticalAssessmentForAdmin(id: string) {
       description: c.description,
       maxPoints: c.maxPoints,
       orderIndex: c.orderIndex,
+      critical: c.critical,
     })),
   };
 }
@@ -541,7 +544,7 @@ export async function listAvailableAssessmentsForStudent(
         label: c.label,
         description: c.description,
         maxPoints: c.maxPoints,
-        critical: isCriticalCriterion(c.label),
+        critical: c.critical,
       })),
       submission: sub
         ? {

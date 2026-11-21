@@ -33,6 +33,8 @@ type Criterion = {
   label: string;
   description: string;
   maxPoints: number;
+  /** Must be met in full to pass; absent means false. */
+  critical?: boolean;
 };
 
 type AssessmentFile = {
@@ -118,6 +120,7 @@ async function main() {
         description: c.description,
         maxPoints: c.maxPoints,
         orderIndex: i,
+        critical: c.critical === true,
       },
     });
   }

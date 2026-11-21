@@ -2,8 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
  * GP-729 — a failed critical criterion fails the practical assessment whatever the
- * total. A criterion is critical when its label carries the "(critical)" marker the
- * course drafts use. Full marks on a critical criterion means it was met.
+ * total. A criterion is critical when its `critical` column is true (never from its
+ * wording). Full marks on a critical criterion means it was met.
  */
 const mock = vi.hoisted(() => ({
   subFindUnique: vi.fn(),
@@ -33,10 +33,10 @@ const { gradeRubric } = await import('@/lib/practical-assessment-grading');
 // Pass threshold 80%. Site safety (critical) is 5 of 100 points, so a learner can
 // reach 95% with 0 on it.
 const CRITERIA = [
-  { id: 'c1', label: 'Pre-job check (critical)', maxPoints: 45, orderIndex: 0 },
-  { id: 'c2', label: 'Timber, quote and handover', maxPoints: 45, orderIndex: 1 },
-  { id: 'c3', label: 'Site safety throughout (critical)', maxPoints: 5, orderIndex: 2 },
-  { id: 'c4', label: 'Tile and grout (critical for the tap test)', maxPoints: 5, orderIndex: 3 },
+  { id: 'c1', label: 'Pre-job check (critical)', maxPoints: 45, orderIndex: 0, critical: true },
+  { id: 'c2', label: 'Timber, quote and handover', maxPoints: 45, orderIndex: 1, critical: false },
+  { id: 'c3', label: 'Site safety throughout (critical)', maxPoints: 5, orderIndex: 2, critical: true },
+  { id: 'c4', label: 'Tile and grout (critical for the tap test)', maxPoints: 5, orderIndex: 3, critical: false },
 ];
 
 function scores(points: Record<string, number>) {
@@ -91,9 +91,9 @@ describe('reviewSubmission — critical criteria', () => {
       assessment: {
         passThreshold: 80,
         criteria: [
-          { id: 'a', label: 'Core task (critical)', maxPoints: 70, orderIndex: 0 },
-          { id: 'b', label: 'Handover', maxPoints: 20, orderIndex: 1 },
-          { id: 'c', label: 'Extras', maxPoints: 10, orderIndex: 2 },
+          { id: 'a', label: 'Core task (critical)', maxPoints: 70, orderIndex: 0, critical: true },
+          { id: 'b', label: 'Handover', maxPoints: 20, orderIndex: 1, critical: false },
+          { id: 'c', label: 'Extras', maxPoints: 10, orderIndex: 2, critical: false },
         ],
       },
     });
@@ -129,6 +129,41 @@ describe('reviewSubmission — critical criteria', () => {
       scores: scores({ c1: 45, c2: 45, c3: 5, c4: 0 }),
     });
     expect(r.passed).toBe(true);
+  });
+
+  it('a criterion with the "(critical)" wording but no flag is NOT critical', async () => {
+    mock.subFindUnique.mockResolvedValue({
+      id: 's1',
+      status: 'pending',
+      assessment: {
+        passThreshold: 80,
+        criteria: [
+          { id: 'a', label: 'Core task (critical)', maxPoints: 5, orderIndex: 0, critical: false },
+          { id: 'b', label: 'Everything else', maxPoints: 95, orderIndex: 1, critical: false },
+        ],
+      },
+    });
+    const r = await reviewSubmission({ submissionId: 's1', scores: scores({ a: 0, b: 95 }) });
+    expect(r.passed).toBe(true);
+    expect(r.failedCriticalCriteria).toEqual([]);
+  });
+
+  it('a criterion with the flag but no wording IS critical', async () => {
+    mock.subFindUnique.mockResolvedValue({
+      id: 's1',
+      status: 'pending',
+      assessment: {
+        passThreshold: 80,
+        criteria: [
+          { id: 'a', label: 'Isolate the power', maxPoints: 5, orderIndex: 0, critical: true },
+          { id: 'b', label: 'Everything else', maxPoints: 95, orderIndex: 1, critical: false },
+        ],
+      },
+    });
+    const r = await reviewSubmission({ submissionId: 's1', scores: scores({ a: 0, b: 95 }) });
+    expect(r.passed).toBe(false);
+    expect(r.status).toBe('failed');
+    expect(r.failedCriticalCriteria).toEqual(['Isolate the power']);
   });
 
   it('a partial mark on a critical criterion is not met', async () => {
@@ -183,14 +218,37 @@ describe('reviewSubmission — the submitted ids must equal the rubric ids exact
 
 describe('gradeRubric — the one rule shared by the server and the review screen', () => {
   const rubric = [
-    { id: 'safety', label: 'Site safety (critical)', maxPoints: 5 },
-    { id: 'other', label: 'Everything else', maxPoints: 95 },
+    { id: 'safety', label: 'Site safety (critical)', maxPoints: 5, critical: true },
+    { id: 'other', label: 'Everything else', maxPoints: 95, critical: false },
   ];
   it('projects not-passed for 95/100 with 0 on a critical criterion', () => {
     const g = gradeRubric({ criteria: rubric, scores: { safety: 0, other: 95 }, passThreshold: 80 });
     expect(g.passed).toBe(false);
     expect(g.failedCriticalCriteria).toEqual(['Site safety (critical)']);
     expect(g.total).toBe(95);
+  });
+  it('ignores the wording: "(critical)" in a label without the flag does not fail', () => {
+    const g = gradeRubric({
+      criteria: [
+        { id: 'a', label: 'Safety (critical)', maxPoints: 5, critical: false },
+        { id: 'b', label: 'Rest', maxPoints: 95, critical: false },
+      ],
+      scores: { a: 0, b: 95 },
+      passThreshold: 80,
+    });
+    expect(g.passed).toBe(true);
+  });
+  it('uses the flag: a critical criterion with plain wording fails', () => {
+    const g = gradeRubric({
+      criteria: [
+        { id: 'a', label: 'Isolate the power', maxPoints: 5, critical: true },
+        { id: 'b', label: 'Rest', maxPoints: 95, critical: false },
+      ],
+      scores: { a: 0, b: 95 },
+      passThreshold: 80,
+    });
+    expect(g.passed).toBe(false);
+    expect(g.failedCriticalCriteria).toEqual(['Isolate the power']);
   });
   it('projects passed when the critical criterion is met', () => {
     const g = gradeRubric({ criteria: rubric, scores: { safety: 5, other: 80 }, passThreshold: 80 });
@@ -210,8 +268,8 @@ describe('listAvailableAssessmentsForStudent — critical flag on the learner li
         course: { title: 'C' },
         createdAt: new Date(),
         criteria: [
-          { id: 'x', label: 'Site safety (critical)', description: '', maxPoints: 5 },
-          { id: 'y', label: 'Handover', description: '', maxPoints: 5 },
+          { id: 'x', label: 'Site safety', description: '', maxPoints: 5, critical: true },
+          { id: 'y', label: 'Handover (critical)', description: '', maxPoints: 5, critical: false },
         ],
         submissions: [],
       },

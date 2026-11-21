@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { AdminPagination } from '@/components/admin/AdminPagination';
 import { useAdminListPaging } from '@/components/admin/use-admin-list-paging';
-import { gradeRubric } from '@/lib/practical-assessment-grading';
+import { previewWouldPass, gradeRubric } from '@/lib/practical-assessment-grading';
 
 type QueueItem = {
   id: string;
@@ -23,6 +23,7 @@ type Criterion = {
   description: string;
   maxPoints: number;
   orderIndex: number;
+  critical: boolean;
 };
 
 type SubmissionDetail = {
@@ -160,7 +161,9 @@ export function PracticalAssessmentReviewClient() {
   const projected = active
     ? gradeRubric({ criteria: active.criteria, scores, passThreshold: active.assessment.passThreshold })
     : null;
-  const wouldPass = projected?.passed ?? false;
+  const wouldPass = active
+    ? previewWouldPass({ criteria: active.criteria, scores, passThreshold: active.assessment.passThreshold })
+    : false;
   const projectedCriticalFails = projected?.failedCriticalCriteria ?? [];
   const queuePaging = useAdminListPaging(queue);
 

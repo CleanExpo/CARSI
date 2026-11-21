@@ -4,16 +4,6 @@
  * live "would pass" preview can never differ from the stored result.
  */
 
-/**
- * The schema has no critical flag, so a criterion is critical when its label
- * contains the exact marker "(critical)" that the course drafts use. A conditional
- * label such as "(critical for the tap test)" is deliberately NOT matched: the
- * platform cannot tell whether the condition applied, so the assessor still decides.
- */
-export function isCriticalCriterion(label: string): boolean {
-  return /\(\s*critical\s*\)/i.test(label);
-}
-
 export type GradeRubricResult = {
   total: number;
   maxScore: number;
@@ -27,7 +17,7 @@ export type GradeRubricResult = {
 
 /** `scores` maps criterion id to points; a missing id counts as 0. */
 export function gradeRubric(input: {
-  criteria: { id: string; label: string; maxPoints: number }[];
+  criteria: { id: string; label: string; maxPoints: number; critical: boolean }[];
   scores: Record<string, number>;
   passThreshold: number;
 }): GradeRubricResult {
@@ -38,7 +28,7 @@ export function gradeRubric(input: {
     const points = input.scores[c.id] ?? 0;
     total += points;
     maxScore += c.maxPoints;
-    if (isCriticalCriterion(c.label) && points < c.maxPoints) {
+    if (c.critical && points < c.maxPoints) {
       failedCriticalCriteria.push(c.label);
     }
   }
@@ -50,4 +40,12 @@ export function gradeRubric(input: {
     failedCriticalCriteria,
     passed: pct >= input.passThreshold && failedCriticalCriteria.length === 0,
   };
+}
+
+/**
+ * The admin review screen's live "would pass" projection. It is the server's own rule,
+ * so a critical criterion below full points can never show Pass (GP-729).
+ */
+export function previewWouldPass(input: Parameters<typeof gradeRubric>[0]): boolean {
+  return gradeRubric(input).passed;
 }

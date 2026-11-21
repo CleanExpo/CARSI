@@ -19,7 +19,7 @@ type AssessmentRow = {
   createdAt: string;
 };
 
-type CriterionForm = { label: string; description: string; maxPoints: number };
+type CriterionForm = { label: string; description: string; maxPoints: number; critical: boolean };
 
 type EditForm = {
   id: string | null;
@@ -38,7 +38,7 @@ type AdminAssessment = {
   instructions: string;
   passThreshold: number;
   isPublished: boolean;
-  criteria: { id: string; label: string; description: string; maxPoints: number }[];
+  criteria: { id: string; label: string; description: string; maxPoints: number; critical: boolean }[];
 };
 
 async function getJson<T>(url: string): Promise<T> {
@@ -50,7 +50,7 @@ async function getJson<T>(url: string): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-const BLANK_CRITERION: CriterionForm = { label: '', description: '', maxPoints: 5 };
+const BLANK_CRITERION: CriterionForm = { label: '', description: '', maxPoints: 5, critical: false };
 
 export function PracticalAssessmentAuthorClient() {
   const [assessments, setAssessments] = useState<AssessmentRow[]>([]);
@@ -119,7 +119,12 @@ export function PracticalAssessmentAuthorClient() {
         passThreshold: a.passThreshold,
         isPublished: a.isPublished,
         criteria: a.criteria.length
-          ? a.criteria.map((c) => ({ label: c.label, description: c.description, maxPoints: c.maxPoints }))
+          ? a.criteria.map((c) => ({
+              label: c.label,
+              description: c.description,
+              maxPoints: c.maxPoints,
+              critical: c.critical,
+            }))
           : [{ ...BLANK_CRITERION }],
       });
     } catch (e) {
@@ -323,6 +328,14 @@ export function PracticalAssessmentAuthorClient() {
                     onChange={(e) => patchCriterion(i, { description: e.target.value })}
                     className="rounded-md border border-white/15 bg-white/[0.04] px-2 py-1.5 text-xs text-white/70 focus:border-[#2490ed] focus:outline-none"
                   />
+                  <label className="flex items-center gap-2 text-xs text-white/60">
+                    <input
+                      type="checkbox"
+                      checked={c.critical}
+                      onChange={(e) => patchCriterion(i, { critical: e.target.checked })}
+                    />
+                    Critical: must be met in full to pass, whatever the total
+                  </label>
                 </div>
                 <div className="flex shrink-0 items-center gap-1 pt-0.5">
                   <input
