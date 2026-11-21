@@ -173,6 +173,13 @@ describe('backfill SQL matches the retired label rule', () => {
     );
   });
 
+  it('contains no invisible or non-ASCII characters except the em dash (U+2014) in the CO label', () => {
+    const bad = [...sql()]
+      .filter((ch) => ch.codePointAt(0)! > 126 && ch !== '—')
+      .map((ch) => 'U+' + ch.codePointAt(0)!.toString(16).toUpperCase().padStart(4, '0'));
+    expect(bad).toEqual([]);
+  });
+
   it('backfills with a pattern that selects exactly what the old rule selected', () => {
     const m = sql().match(/SET "critical" = true\s+WHERE "label" ~\* '([^']+)'/);
     expect(m).not.toBeNull();

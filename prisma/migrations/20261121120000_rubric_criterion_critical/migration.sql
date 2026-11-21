@@ -10,7 +10,7 @@ ALTER TABLE "lms_rubric_criteria"
 -- JavaScript's \s matches, so the two rules select the same rows.
 UPDATE "lms_rubric_criteria"
 SET "critical" = true
-WHERE "label" ~* '\([\s   -     　﻿]*critical[\s   -     　﻿]*\)';
+WHERE "label" ~* '\([\s\u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\ufeff]*critical[\s\u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\ufeff]*\)';
 
 -- The published CCW truck-mount assessment states in its instructions that a failed carbon
 -- monoxide criterion fails the whole assessment, but its label says "ZERO-TOLERANCE", not
