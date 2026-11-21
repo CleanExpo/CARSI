@@ -58,7 +58,7 @@ describe('partner referral settlement CSV (GP-767)', () => {
     const csv = await getPartnerReferralSalesCsv('ccw');
     const lines = csv.trim().split('\n');
 
-    expect(lines[0]).toBe('date,partner,course,amount_paid,currency,refunded,refunded_amount,disputed,stripe_checkout_session');
+    expect(lines[0]).toBe('date,partner,course,amount_paid,currency,refunded,refunded_amount,dispute_not_won,stripe_checkout_session');
     expect(lines[1]).toBe('2026-11-23,ccw,ccw-carsi-truckmount-operations,99.00,AUD,no,0.00,no,cs_kept');
     expect(lines[2]).toBe('2026-11-24,ccw,carpet-cleaning-basics,49.00,AUD,yes,49.00,no,cs_refunded');
     expect(mocks.findSales).toHaveBeenCalledWith(
@@ -87,6 +87,28 @@ describe('partner referral settlement CSV (GP-767)', () => {
     const lines = (await getPartnerReferralSalesCsv('ccw')).trim().split('\n');
     expect(lines[1].endsWith(',no,0.00,yes,cs_kept')).toBe(true);
     expect(lines[2].endsWith(',no,0.00,no,cs_refunded')).toBe(true);
+  });
+
+  it('caps the refunded amount at the amount paid', async () => {
+    mocks.findReversals.mockResolvedValue([
+      { stripeEventId: 'evt_big', providerObjectId: null, transactionId: 'cs_kept', reversedRevenueCents: 50_000, reason: 'refunded', eventAt: new Date('2026-11-25T00:00:00.000Z') },
+    ]);
+    const lines = (await getPartnerReferralSalesCsv('ccw')).trim().split('\n');
+    expect(lines[1]).toBe('2026-11-23,ccw,ccw-carsi-truckmount-operations,99.00,AUD,yes,99.00,no,cs_kept');
+  });
+
+  it('no sales gives the header only and reads no reversals', async () => {
+    mocks.findSales.mockResolvedValue([]);
+    const csv = await getPartnerReferralSalesCsv('ccw');
+    expect(csv).toBe('date,partner,course,amount_paid,currency,refunded,refunded_amount,dispute_not_won,stripe_checkout_session\n');
+    expect(mocks.findReversals).not.toHaveBeenCalled();
+  });
+
+  it('dates a sale by its Brisbane business day', async () => {
+    mocks.findSales.mockResolvedValue([{ ...SALES[0], paidAt: new Date('2026-11-23T15:30:00.000Z') }]);
+    mocks.findReversals.mockResolvedValue([]);
+    const lines = (await getPartnerReferralSalesCsv('ccw')).trim().split('\n');
+    expect(lines[1].startsWith('2026-11-24,')).toBe(true);
   });
 
   it('an unknown partner is refused rather than returning an empty report', async () => {

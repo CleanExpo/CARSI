@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
  * GET /api/admin/partner-referrals?partner=ccw
  *
  * GP-767: settlement CSV of course sales that came through a partner's referral link: date,
- * course, amount actually paid, refunded yes/no (and amount), open dispute. Admin only.
+ * course, amount actually paid, refunded yes/no (and amount), dispute not won. Admin only.
  */
 export async function GET(request: NextRequest) {
   const session = await getAdminSessionOrNull();

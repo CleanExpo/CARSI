@@ -10,6 +10,9 @@ const mocks = vi.hoisted(() => ({
   markProcessed: vi.fn(),
   release: vi.fn(),
   fulfil: vi.fn(),
+  claimsFor: vi.fn(),
+  findUser: vi.fn(),
+  welcome: vi.fn(),
   upsertSale: vi.fn(),
   recordStage: vi.fn(),
 }));
@@ -33,18 +36,19 @@ vi.mock('@/lib/server/stripe-webhook-idempotency', () => ({
 }));
 vi.mock('@/lib/server/sentry', () => ({ captureServerError: vi.fn() }));
 vi.mock('@/lib/server/lms-auth', () => ({
-  sessionClaimsForUserId: vi.fn().mockResolvedValue({ sub: 'student-1', email: 'buyer@example.test' }),
+  sessionClaimsForUserId: mocks.claimsFor,
 }));
 vi.mock('@/lib/server/team-course-purchase', () => ({
   fulfillCourseCheckoutForUser: mocks.fulfil,
 }));
-vi.mock('@/lib/server/enrollment-email', () => ({ sendEnrollmentWelcomeEmail: vi.fn().mockResolvedValue(undefined) }));
+vi.mock('@/lib/server/enrollment-email', () => ({ sendEnrollmentWelcomeEmail: mocks.welcome }));
 vi.mock('@/lib/server/crm-enrollment-notify', () => ({ notifyCrmEnrollmentCreated: vi.fn() }));
 vi.mock('@/lib/server/ga4-measurement-protocol', () => ({ sendGa4PurchaseEvent: vi.fn().mockResolvedValue(undefined) }));
 vi.mock('@/lib/prisma', () => ({
   prisma: {
     stripeWebhookEvent: { create: vi.fn(), update: vi.fn(), delete: vi.fn(), findUnique: vi.fn() },
     partnerReferralSale: { upsert: mocks.upsertSale },
+    lmsUser: { findUnique: mocks.findUser },
   },
 }));
 
@@ -95,6 +99,9 @@ beforeEach(() => {
   mocks.fulfil.mockResolvedValue({ alreadyEnrolled: true });
   mocks.recordStage.mockResolvedValue(undefined);
   mocks.upsertSale.mockResolvedValue({});
+  mocks.claimsFor.mockResolvedValue({ sub: 'student-1', email: 'buyer@example.test' });
+  mocks.findUser.mockResolvedValue(null);
+  mocks.welcome.mockResolvedValue(undefined);
 });
 
 afterEach(() => {
@@ -143,15 +150,52 @@ describe('Stripe webhook partner referral sale (GP-767)', () => {
     expect(mocks.upsertSale).not.toHaveBeenCalled();
   });
 
-  it('a failed partner write returns 500 so Stripe retries, and the sale is not lost', async () => {
+  it('a failed partner write returns 500 before fulfilment, so the retry still sends the welcome email', async () => {
     mocks.construct.mockReturnValue(completedSession({ referral_partner: 'ccw' }));
-    mocks.upsertSale.mockRejectedValue(new Error('connection refused'));
+    mocks.upsertSale.mockRejectedValueOnce(new Error('connection refused'));
+    mocks.fulfil.mockResolvedValue({ alreadyEnrolled: false, enrollmentId: 'enr-1', courseId: 'course-1' });
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const first = await deliver();
+
+    expect(first.status).toBe(500);
+    expect(mocks.fulfil).not.toHaveBeenCalled();
+    expect(mocks.release).toHaveBeenCalledWith(expect.anything(), 'evt_partner_sale');
+    expect(mocks.markProcessed).not.toHaveBeenCalled();
+
+    // Stripe's retry: the write succeeds and the first-time enrolment side effects still run.
+    const retry = await deliver();
+
+    expect(retry.status).toBe(200);
+    expect(mocks.upsertSale).toHaveBeenCalledTimes(2);
+    expect(mocks.fulfil).toHaveBeenCalledTimes(1);
+    expect(mocks.welcome).toHaveBeenCalledTimes(1);
+  });
+
+  it('records the CCW sale even when the learner cannot be resolved', async () => {
+    mocks.construct.mockReturnValue(completedSession({ referral_partner: 'ccw', student_id: '' }));
+    mocks.claimsFor.mockResolvedValue(null);
+    mocks.findUser.mockResolvedValue(null);
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    const response = await deliver();
+
+    expect(response.status).toBe(200);
+    expect(mocks.fulfil).not.toHaveBeenCalled();
+    expect(mocks.upsertSale).toHaveBeenCalledTimes(1);
+    expect(mocks.upsertSale.mock.calls[0][0].create.partnerId).toBe('ccw');
+  });
+
+  it('does not write a sale row without a verified amount, and does not block the enrolment', async () => {
+    const event = completedSession({ referral_partner: 'ccw' });
+    (event.data.object as { amount_total: number | null }).amount_total = null;
+    mocks.construct.mockReturnValue(event);
     vi.spyOn(console, 'error').mockImplementation(() => {});
 
     const response = await deliver();
 
-    expect(response.status).toBe(500);
-    expect(mocks.release).toHaveBeenCalledWith(expect.anything(), 'evt_partner_sale');
-    expect(mocks.markProcessed).not.toHaveBeenCalled();
+    expect(response.status).toBe(200);
+    expect(mocks.upsertSale).not.toHaveBeenCalled();
+    expect(mocks.fulfil).toHaveBeenCalledTimes(1);
   });
 });

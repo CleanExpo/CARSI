@@ -1,7 +1,7 @@
 /**
  * GP-767: partner referral sales. The Stripe webhook records one row per paid course checkout
  * whose metadata names a known referral partner; the admin settlement CSV lists them with the
- * amount actually paid and any refund or open dispute.
+ * amount actually paid, any refund, and any dispute not won.
  *
  * Refunds are not written here. The webhook already stores every refund and dispute of a one-off
  * checkout in `event_attribution_reversals`, keyed by the same checkout session id, and that
@@ -19,6 +19,7 @@ import {
 } from '@/lib/partners/referral-partners';
 import { prisma } from '@/lib/prisma';
 import { reduceAttributionReversals, type AttributionReversalReason } from '@/lib/server/event-attribution';
+import { captureServerError } from '@/lib/server/sentry';
 
 /**
  * Stores the partner sale for a paid course checkout, when its metadata names a known partner.
@@ -34,12 +35,24 @@ export async function recordPartnerReferralSale(
   const partnerId = parseReferralPartnerId(session.metadata?.[PARTNER_REF_METADATA_KEY]);
   if (!partnerId) return null;
 
+  // Never invent a payment fact: a session without a whole-cent total and a currency is not
+  // written (and is reported loudly) rather than settled as a $0.00 or AUD-assumed sale. It does
+  // not throw, so a malformed session cannot hold up the learner's enrolment.
+  const amount = session.amount_total;
+  const currency = session.currency?.trim().toUpperCase() ?? '';
+  if (typeof amount !== 'number' || !Number.isInteger(amount) || amount < 0 || !/^[A-Z]{3}$/.test(currency)) {
+    const error = new Error('Partner referral sale not recorded: session has no verified amount or currency');
+    console.error('[partner-referral]', error.message, { transactionId, partnerId });
+    void captureServerError(error, { route: '/api/lms/webhooks/stripe', tags: { partnerId } });
+    return null;
+  }
+
   const row = {
     partnerId,
     transactionId,
     courseSlug,
-    amountPaidCents: Math.max(0, Math.round(session.amount_total ?? 0)),
-    currency: (session.currency ?? 'aud').trim().toUpperCase(),
+    amountPaidCents: amount,
+    currency,
     paidAt,
   };
   await prisma.partnerReferralSale.upsert({
@@ -58,7 +71,7 @@ const CSV_HEADER = [
   'currency',
   'refunded',
   'refunded_amount',
-  'disputed',
+  'dispute_not_won',
   'stripe_checkout_session',
 ];
 
@@ -123,11 +136,15 @@ export async function getPartnerReferralSalesCsv(partner: string): Promise<strin
       ...r,
       reason: r.reason as AttributionReversalReason,
     }));
-    // Stripe reports refunds cumulatively, so the largest refund event is the total refunded.
-    const refundedCents = facts
-      .filter((r) => r.reason === 'refunded')
-      .reduce((max, r) => Math.max(max, r.reversedRevenueCents), 0);
-    const disputed = reduceAttributionReversals(facts)?.reason === 'disputed';
+    // Stripe reports refunds cumulatively, so the largest refund event is the total refunded,
+    // never more than was paid.
+    const refundedCents = Math.min(
+      sale.amountPaidCents,
+      facts.filter((r) => r.reason === 'refunded').reduce((max, r) => Math.max(max, r.reversedRevenueCents), 0)
+    );
+    // The ledger records a dispute opening and a dispute won, not a dispute lost, so this is
+    // "a dispute was opened and not won": still open, or lost.
+    const disputeNotWon = reduceAttributionReversals(facts)?.reason === 'disputed';
     lines.push(
       [
         settlementDate(sale.paidAt),
@@ -137,7 +154,7 @@ export async function getPartnerReferralSalesCsv(partner: string): Promise<strin
         sale.currency,
         refundedCents > 0 ? 'yes' : 'no',
         money(refundedCents),
-        disputed ? 'yes' : 'no',
+        disputeNotWon ? 'yes' : 'no',
         sale.transactionId,
       ]
         .map(csvCell)

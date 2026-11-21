@@ -425,6 +425,15 @@ export async function POST(request: NextRequest) {
       return await acknowledge();
     }
 
+    // GP-767: a paid sale through a partner link (?ref=ccw) is stored for settlement from the
+    // verified session, before learner resolution and fulfilment. An unresolved learner cannot
+    // drop it, and a failed write returns 500 before any enrolment side effect has run, so
+    // Stripe's retry repeats the whole event. Idempotent upsert on the checkout session id.
+    const partnerSaleRef = resolveStripePaymentReference(session.id);
+    if (partnerSaleRef) {
+      await recordPartnerReferralSale(session, partnerSaleRef, slug, new Date(event.created * 1000));
+    }
+
     const studentIdMeta = session.metadata?.student_id?.trim();
     const email =
       (session.customer_email ?? session.customer_details?.email)?.trim().toLowerCase() ?? '';
@@ -468,10 +477,6 @@ export async function POST(request: NextRequest) {
         purchaseMode,
         teamSeatCount: Number.isFinite(teamSeatCount) ? teamSeatCount : undefined,
       });
-
-      // GP-767: a sale through a partner link (?ref=ccw) is stored for settlement. A failed
-      // write throws into the retry path below; fulfilment and this upsert are both idempotent.
-      await recordPartnerReferralSale(session, ref, slug, new Date(event.created * 1000));
 
       await recordAttributedStage(
         parseAttributionJourneyId(session.metadata?.attribution_journey_id),
