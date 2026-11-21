@@ -1,0 +1,476 @@
+{
+  "version": 1,
+  "courses": [
+    {
+      "id": "3e86eb42-a5e9-4ea5-b1eb-adf228fdc044",
+      "slug": "psychrometry-building-science-for-drying",
+      "title": "CARSI Building Science Foundations: Psychrometry, Moisture and Condensation",
+      "description": "<p><strong>CARSI Building Science Foundations: Psychrometry, Moisture and Condensation</strong> is CARSI&rsquo;s foundation building-science course for restoration technicians, supervisors, assessors and insurance-support staff in Australia and New Zealand. It teaches the physics under every drying decision, and the arithmetic that makes a decision defensible: you measure the air and the materials, calculate what the numbers mean, and write it down so another professional can check it.</p><p>Six modules: moist air and the four numbers, with the full calculation from temperature and RH to dew point and g/kg; evaporation and the two levers, warming the material or drying the air; moisture content, equilibrium moisture content and why the dry standard comes from the building, not a universal number; heat flow, U-values and the surface condensation check in a Canberra winter and a Brisbane summer; air changes, the CO<sub>2</sub> decay test, the ventilate-or-dehumidify decision and the building rules in each country; and Bureau of Meteorology and NIWA climate data with daily monitoring and grain depression in g/kg. Every lesson has a worked metric example, a diagram, a field tool and a three-question check, and the course ends with a 20-question knowledge check.</p><p>Australian and New Zealand rules are stated side by side where they differ: NCC climate zones and wall requirements, the New Zealand Building Code clauses on internal and subfloor moisture, and the Healthy Homes Standards. Metric throughout, at 230 V and 50 Hz in both countries. Moisture readings are taught as moisture findings only: they never stand in for a mould or exposure assessment. Built on open public sources, including the ABCB Condensation in buildings handbook (CC BY 4.0), the Bureau of Meteorology, YourHome, NIST, the USDA Wood Handbook and New Zealand legislation. ANSI/IICRC S500:2025 is named by title only. It is a recommended foundation step for the CARSI Water Restoration Practitioner and CARSI Structural Drying Practitioner designations.</p>",
+      "shortDescription": "CARSI Building Science Foundations for drying in Australia and New Zealand: dew point and g/kg calculated by hand, vapour pressure and evaporation, moisture content and EMC, surface condensation, air changes and CO2 decay, NCC and NZ rules, and climate data for daily monitoring.",
+      "thumbnailUrl": "https://res.cloudinary.com/dmaulkthb/image/upload/v1783789575/carsi/admin-courses/36ea5c29-d1a4-4da6-a9a2-dc31fc9d1d55.png",
+      "instructorId": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+      "status": "draft",
+      "priceAud": "99",
+      "isFree": false,
+      "durationHours": 4,
+      "level": "Foundational",
+      "category": "Water Damage Restoration",
+      "tags": [
+        "building science",
+        "psychrometry",
+        "dew point",
+        "humidity ratio g/kg",
+        "vapour pressure",
+        "equilibrium moisture content",
+        "dry standard",
+        "condensation",
+        "air changes per hour",
+        "NCC climate zones",
+        "BoM climate data",
+        "New Zealand Building Code",
+        "Australian",
+        "CARSI designation pathway"
+      ],
+      "iicrcDiscipline": null,
+      "cecHours": 0,
+      "meta": {
+        "audience": "restoration technicians, supervisors and insurance-support staff",
+        "discipline": "CARSI Southern Hemisphere foundation course (building science)",
+        "linearIssue": "GP-471",
+        "australianProduced": true,
+        "designationProgram": "CARSI Southern Hemisphere Restoration Designations",
+        "designation": null,
+        "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784198022/carsi/course-intro/081f96c6-0f95-4674-be61-f6751c620967.mp4",
+        "pathway": {
+          "role": "foundation",
+          "foundationFor": [
+            "carsi-water-restoration-practitioner",
+            "carsi-structural-drying-practitioner"
+          ],
+          "nextSteps": [
+            {
+              "slug": "moisture-meters-readings-and-dry-standards",
+              "status": "in-catalogue"
+            },
+            {
+              "slug": "introduction-to-digital-moisture-mapping",
+              "status": "in-catalogue"
+            },
+            {
+              "slug": "introduction-to-infrared-thermography-for-drying",
+              "status": "in-catalogue-unpublished"
+            },
+            {
+              "slug": "heat-drying",
+              "status": "in-progress"
+            },
+            {
+              "slug": "timber-drying",
+              "status": "in-progress"
+            },
+            {
+              "slug": "initial-inspection-report-course",
+              "status": "in-progress"
+            }
+          ]
+        },
+        "priceComparison": "AUD 99 matches the other multi-module CARSI full courses in the catalogue (floor-care-onboarding-operational-readiness 12 modules/8 h, ccw-carsi-truckmount-operations 10 modules/6 h, and the CARSI designation fundamentals courses), all AUD 99.",
+        "productsNote": "No products or brands named. Equipment figures (airflow, wattage) are labelled illustrative.",
+        "buildStage": "v1-draft-pending-sme-review",
+        "standard": "v1",
+        "standardLevel": "L1-foundation",
+        "rolePaths": [
+          "water-and-drying",
+          "new-technician"
+        ],
+        "marketScope": "AU+NZ (DECISIONS #35)",
+        "standardsReferenced": "Nominative only: ANSI/IICRC S500:2025 named by title in the description; no standard text read, reproduced or entered into any AI tool (IICRC AI Use Policy). Other codes cited from public text: NCC 2025 via the ABCB Condensation in buildings handbook (CC BY 4.0) and ABCB NCC Navigator; NZ Building Code (Building Regulations 1992, Schedule 1); NZ Healthy Homes Standards 2019. NZS 4218:2009 and ISO 6946:2017 named only.",
+        "quizFile": "data/courses/psychrometry-building-science-for-drying/v1-draft/psychrometry-building-science-for-drying-quiz.json",
+        "practicalAssessment": "data/courses/psychrometry-building-science-for-drying/v1-draft/psychrometry-building-science-for-drying-assessment.json",
+        "evidenceLedger": "data/courses/psychrometry-building-science-for-drying/v1-draft/evidence/evidence-ledger.jsonl",
+        "draftNote": "DRAFT v1 for SME verification (DECISIONS #24). Every claim is in the evidence ledger; GAP rows go to Phill (SME) or the founder. Do not seed until every GAP is cleared and the founder signs off. Diagrams and lesson images are briefed in research-pack.md and not yet built.",
+        "sources": "Sources listed per lesson and in data/courses/psychrometry-building-science-for-drying/v1-draft/research-pack.md.",
+        "retiredFromSeedOnPromotion": {
+          "modules": [
+            "297c6f0d-f746-4ed5-a10c-d13b17e65fb3",
+            "c8ff8ddf-cce7-41b8-a2ac-073afb7a1b0a",
+            "0a0f12be-46ab-4c4e-ba89-1ce65f45e4c9",
+            "ee924aa3-4382-414d-9033-3d98448d6384"
+          ],
+          "lessons": [
+            "76361a3e-e53e-41f9-94f2-067002864280",
+            "564663a6-0ce3-4742-9e2c-609a9a166121",
+            "0261abcc-5da3-4a19-aba1-98ae3b139de7",
+            "65dc31bd-6083-4629-a555-0e63fd1adc4b",
+            "0e3294ed-832b-4fa1-86b6-58f3f0793024",
+            "85e10570-839d-4791-a283-6b6206d4578f",
+            "23c0a44a-5c12-4c65-93c4-6da827187b63",
+            "980ddd81-ac97-4442-9eae-df440c60dcb3",
+            "dd87ccd7-2f5b-4ad9-b186-3276f78cb7a8",
+            "22765362-81f8-44c8-aeb5-7e3a09590e3b",
+            "9a50e795-7de8-41c6-9e8d-0748b49f2270",
+            "c7468a15-0baf-42e8-a9b3-4f943def62f0",
+            "9e353e09-2c63-4e46-b802-044d0c27564b",
+            "4f276f4e-e9a5-4cdc-b113-8dbd5bd6f431",
+            "a34b7e64-e3f4-4d39-a4df-20832237eb1c",
+            "730d52d0-568e-45cb-baef-684ff52ec9bc",
+            "db3d73da-ab65-4f7c-b38d-73e6c5050959",
+            "6dbe80a6-4ba0-46eb-a895-2af2eb4fae4f",
+            "c85ae5d5-dc3d-43ea-91ef-5eef4578e84f",
+            "e6ef997a-c299-4c20-8056-0b99433f3297",
+            "cf37b0ac-0847-4290-bebe-aa5474fea5a7",
+            "d3683a4d-cec4-424b-91c8-9b563adbb0e8",
+            "9d52ed19-6f1b-4abb-b5ae-63d66542d587",
+            "21e2a8f4-f50c-4456-acd1-b6dcd2be76ac",
+            "de466243-571d-4ca3-9cf1-1f973da99af8",
+            "7a394114-3289-452f-9331-a0739fbad9c0",
+            "d6bc5515-8a96-445a-9422-94bba878a97b"
+          ]
+        },
+        "humanReview": {
+          "scanner": "not yet run on v1 draft",
+          "signOff": "PENDING"
+        }
+      },
+      "isPublished": false,
+      "modules": [
+        {
+          "id": "1ce29a59-e5cf-448b-8afc-43480b36eb57",
+          "title": "Module 1: Moist Air — The Four Numbers and the Calculation",
+          "orderIndex": 0,
+          "lessons": [
+            {
+              "id": "596778a2-6978-4c8b-a4c4-78bf47aa05fe",
+              "title": "Moist air: the four numbers, and why RH alone misleads",
+              "contentType": "text",
+              "contentBody": "<p><em>DRAFT v1 for SME review. Scenarios are illustrative and labelled; every figure is in the evidence ledger.</em></p><h3>On the job</h3><p>February in Brisbane. A burst flexible hose has wet the lounge of a 1970s brick-veneer house. On day one the room reads 22 °C and 80 %RH. Overnight the owner runs the reverse-cycle air conditioner on heat, and on day two the room reads 28 °C and 56 %RH. The new technician writes &ldquo;humidity down 24 points, drying well&rdquo; in the log. Two days later the assessor rings and asks a fair question: how much water actually left the room? From those two RH readings, nobody can say.</p><h3>The idea</h3><p>Four numbers describe the air on every job. <strong>Temperature</strong> (°C) is the dry-bulb reading. <strong>Relative humidity</strong> (RH, %) compares the water vapour in the air with the most the air could hold at that temperature. <strong>Dew point</strong> (°C) is the temperature to which the air must be cooled for dew to form. <strong>Humidity ratio</strong> is the mass of water vapour carried by each kilogram of dry air, written in grams per kilogram (g/kg).</p><p>The trap is RH. The Bureau of Meteorology states it plainly: relative humidity is not a measure of the actual amount of moisture in the air, because it depends on the air temperature. Warm a room and its RH falls, even though not one gram of water has gone. The Australian Building Codes Board (ABCB) condensation handbook gives a worked case: outdoor air at 7 °C and 70 %RH, heated indoors to 20 °C, drops to about 30 %RH, while its dew point stays at 1.9 °C. The water in the air did not change. Only the temperature did.</p><p>Dew point and humidity ratio behave differently. They change only when water is added to the air or taken out of it. That makes them the numbers to compare between rooms, between days, and between the inlet and outlet of a dehumidifier. A falling g/kg in a closed room is evidence that water is leaving the air. A falling RH, on its own, is not.</p><p>You will also meet imported equipment that reports grains per pound. Using the NIST conversion factors for the grain and the pound, 1 g/kg is 7.0 grains per pound. Write g/kg first and put the imported unit in brackets if a client needs it.</p><p>Keep one more line clear in your head and in your reports. These four numbers describe the air. They show whether conditions favour condensation, or favour a material staying damp. They do not show, on their own, that mould is present or that anyone has been exposed to anything. That takes a different assessment.</p><p><strong>Common mistakes.</strong> Logging RH and nothing else. Comparing a reading taken beside a heater with one from a cold corner. Reading a thermo-hygrometer the moment you walk in from a hot van, before it settles. Telling an assessor &ldquo;humidity is down&rdquo; when the room only got warmer.</p><h3>See it</h3><p><img src='/courses/psychrometry-building-science-for-drying/diagrams/four-numbers.svg' alt='Two air samples from the Brisbane lounge: 22 degrees at 80 percent and 28 degrees at 56 percent. Both carry 13.3 grams of water per kilogram of dry air and share a dew point of 18.4 degrees.'></p><p>RH changed by 24 points. The grams of water in each kilogram of air did not change at all.</p><h3>Do it in metric</h3><p>Test the Brisbane log. Station pressure is taken as the standard atmosphere, 1013.25 hPa (101.325 kPa). The method is shown in full in the next lesson.</p><ol><li>Day one, 22 °C: saturation vapour pressure = 26.45 hPa. Actual vapour pressure = 0.80 × 26.45 = 21.16 hPa.</li><li>Humidity ratio = 621.97 × 21.16 ÷ (1013.25 − 21.16) = <strong>13.26 g/kg</strong>. Dew point = <strong>18.4 °C</strong>.</li><li>Day two, 28 °C: saturation vapour pressure = 37.81 hPa. If no water had left, RH would be 21.16 ÷ 37.81 = <strong>56.0 %</strong>.</li><li>The log shows 56 %RH. That is exactly what warming alone produces. The evidence says <strong>no water has left the air</strong>; the room just got warmer.</li></ol><h3>Field download</h3><p>The <strong>Moist air four-numbers field card</strong> records temperature, RH, dew point and g/kg at the same points every visit, with a column that flags any RH change not matched by a g/kg change.</p><h3>Check yourself</h3><p>The Module 1 check asks which number proves water removal, what happens to RH when air warms, and what dew point means.</p><h3>Takeaway</h3><p>RH moves with temperature. Dew point and g/kg move with water. Log all four, and argue from g/kg.</p><p>Next: the calculation behind those numbers, step by step.</p><h3>Sources for this lesson</h3><ul><li><a href=\"https://www.weather.gov/media/epz/wxcalc/vaporPressure.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">US National Weather Service, wxcalc worksheet: saturation and actual vapour pressure (public domain)</a>. Read 21/11/2026.</li><li><a href=\"https://www.weather.gov/media/epz/wxcalc/mixingRatio.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">US National Weather Service, wxcalc worksheet: mixing ratio (public domain)</a>. Read 21/11/2026.</li><li><a href=\"https://www.nist.gov/pml/special-publication-811/nist-guide-si-appendix-b-conversion-factors/nist-guide-si-appendix-b8\" target=\"_blank\" rel=\"noopener noreferrer\">NIST Guide to the SI (SP 811), Appendix B.8 conversion factors</a>. Read 21/11/2026.</li><li><a href=\"https://www.bom.gov.au/climate/cdo/about/definitions9and3.shtml\" target=\"_blank\" rel=\"noopener noreferrer\">Bureau of Meteorology, Definitions for 9am and 3pm climate statistics</a>. Read 21/11/2026.</li><li><a href=\"https://www.abcb.gov.au/sites/default/files/resources/2026/NCC%202025%20Condensation%20in%20building%20handbook.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">Australian Building Codes Board, Condensation in buildings handbook, NCC 2025 edition (CC BY 4.0)</a>. Read 21/11/2026.</li></ul><p>Worked numbers are CARSI arithmetic, shown in the lesson and logged in the course evidence ledger.</p>",
+              "orderIndex": 0,
+              "isPreview": true,
+              "resources": [
+                {
+                  "label": "Moist air four-numbers field card",
+                  "url": "/courses/psychrometry-building-science-for-drying/field-tools/moist-air-four-numbers-card.md",
+                  "kind": "field-card"
+                }
+              ]
+            },
+            {
+              "id": "12a4443e-5261-48f2-a88c-6abd54a31f85",
+              "title": "Vapour pressure, humidity ratio and dew point: doing the calculation",
+              "contentType": "text",
+              "contentBody": "<p><em>DRAFT v1 for SME review. Scenarios are illustrative and labelled; every figure is in the evidence ledger.</em></p><h3>On the job</h3><p>A Cairns loss adjuster sends you a photo of a thermo-hygrometer screen reading 25 °C and 60 %RH, with the dew point field blank because the unit is set to the wrong mode. Attached is an imported dehumidifier spec sheet quoting its rated conditions in grains per pound. The report is due today. You have a phone calculator and ten minutes, and you need dew point and g/kg you can defend line by line.</p><h3>The idea</h3><p>Underneath all four numbers sits one quantity: <strong>vapour pressure</strong>, the share of the air&rsquo;s pressure exerted by its water vapour. Every other number comes from it in three short steps. This course uses the public formulas published by the US National Weather Service (NWS) for its weather calculator. They are simple enough for a phone calculator, and they reproduce the ABCB handbook&rsquo;s worked example from Module 1: 7 °C and 70 %RH gives a dew point of 1.9 °C and about 30 %RH once heated to 20 °C.</p><p><strong>Step 1, saturation vapour pressure</strong> depends on temperature alone: e<sub>s</sub> = 6.11 × 10<sup>(7.5 T ÷ (237.3 + T))</sup>, in hectopascals (hPa), with T in °C. It is the most vapour pressure air at that temperature can carry before water condenses.</p><p><strong>Step 2, actual vapour pressure</strong>: e = (RH ÷ 100) × e<sub>s</sub>. This is the line the NWS uses in reverse to define RH as 100 × e ÷ e<sub>s</sub>.</p><p><strong>Step 3, humidity ratio</strong>: w = 621.97 × e ÷ (P − e), in g/kg, where P is the station pressure in hPa. The constant 621.97 is 1000 times the ratio of the molar mass of water (18.0153 g/mol, NIST) to that of dry air (about 28.97 g/mol). The standard atmosphere is 101.325 kPa, which is 1013.25 hPa.</p><p><strong>Dew point</strong> is the temperature at which the saturation vapour pressure equals the air&rsquo;s actual vapour pressure. Rearranging step 1 gives T<sub>d</sub> = 237.3 x ÷ (7.5 − x), where x = log<sub>10</sub>(e ÷ 6.11).</p><p>Pressure matters at altitude. Canberra Airport sits at 578 m. For comparisons on one job the pressure is the same in every room, so it cancels. Use a station pressure, not 1013.25 hPa, when you report an absolute figure from an elevated site.</p><p>Why bother, when the meter does this for you? Because instruments get set to the wrong unit, sensors fog, and a reading taken straight from a hot vehicle is wrong for minutes. If you can work the numbers on paper, you will notice when a screen is lying.</p><h3>See it</h3><p><img src='/courses/psychrometry-building-science-for-drying/diagrams/vapour-pressure-steps.svg' alt='Three boxes in a row: temperature gives saturation vapour pressure, RH gives actual vapour pressure, and pressure gives humidity ratio in grams per kilogram. A return arrow from actual vapour pressure gives the dew point.'></p><p>One quantity, vapour pressure, connects all four numbers.</p><h3>Do it in metric</h3><p>Air at 25 °C and 60 %RH, at 1013.25 hPa.</p><ol><li>e<sub>s</sub> = 6.11 × 10<sup>(187.5 ÷ 262.3)</sup> = <strong>31.69 hPa</strong>.</li><li>e = 0.60 × 31.69 = <strong>19.01 hPa</strong> (1.901 kPa).</li><li>w = 621.97 × 19.01 ÷ (1013.25 − 19.01) = <strong>11.89 g/kg</strong>.</li><li>x = log<sub>10</sub>(19.01 ÷ 6.11) = 0.4930; T<sub>d</sub> = 237.3 × 0.4930 ÷ (7.5 − 0.4930) = <strong>16.7 °C</strong>.</li><li>Same air at 950 hPa: w = 621.97 × 19.01 ÷ 930.99 = 12.70 g/kg, about 7 % higher.</li><li>The spec sheet&rsquo;s 80 grains per pound ÷ 7.0 = <strong>11.4 g/kg</strong>.</li></ol><h3>Field download</h3><p>The <strong>Moist air four-numbers field card</strong> carries the three formulas, the dew-point line and the grains conversion on one side, so you can check a screen on site.</p><h3>Check yourself</h3><p>The Module 1 check includes a full calculation from temperature and RH to g/kg, and a grains conversion.</p><h3>Takeaway</h3><p>Temperature gives e<sub>s</sub>, RH gives e, pressure gives g/kg, and e gives dew point. Learn the chain once and you can check any instrument.</p><p>Next: Module 2, how vapour pressure drives evaporation.</p><h3>Sources for this lesson</h3><ul><li><a href=\"https://www.weather.gov/media/epz/wxcalc/vaporPressure.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">US National Weather Service, wxcalc worksheet: saturation and actual vapour pressure (public domain)</a>. Read 21/11/2026.</li><li><a href=\"https://www.weather.gov/media/epz/wxcalc/mixingRatio.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">US National Weather Service, wxcalc worksheet: mixing ratio (public domain)</a>. Read 21/11/2026.</li><li><a href=\"https://www.nist.gov/pml/special-publication-811/nist-guide-si-appendix-b-conversion-factors/nist-guide-si-appendix-b8\" target=\"_blank\" rel=\"noopener noreferrer\">NIST Guide to the SI (SP 811), Appendix B.8 conversion factors</a>. Read 21/11/2026.</li><li><a href=\"https://webbook.nist.gov/cgi/cbook.cgi?ID=C7732185\" target=\"_blank\" rel=\"noopener noreferrer\">NIST Chemistry WebBook: water</a>. Read 21/11/2026.</li><li><a href=\"https://www.abcb.gov.au/sites/default/files/resources/2026/NCC%202025%20Condensation%20in%20building%20handbook.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">Australian Building Codes Board, Condensation in buildings handbook, NCC 2025 edition (CC BY 4.0)</a>. Read 21/11/2026.</li><li><a href=\"https://www.bom.gov.au/climate/averages/tables/cw_070014.shtml\" target=\"_blank\" rel=\"noopener noreferrer\">Bureau of Meteorology, Climate statistics: Canberra Airport Comparison (station 070014)</a>. Read 21/11/2026.</li></ul><p>Worked numbers are CARSI arithmetic, shown in the lesson and logged in the course evidence ledger.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": [
+                {
+                  "label": "Moist air four-numbers field card",
+                  "url": "/courses/psychrometry-building-science-for-drying/field-tools/moist-air-four-numbers-card.md",
+                  "kind": "field-card"
+                }
+              ]
+            },
+            {
+              "id": "5000167a-af51-5f1a-b507-2ff6489d2f44",
+              "title": "Module 1 check",
+              "contentType": "quiz",
+              "contentBody": "f0961610-14bb-5d95-a241-1b32a5cb3d9b",
+              "orderIndex": 2,
+              "isPreview": false,
+              "resources": [
+                {
+                  "label": "Module 1 check",
+                  "url": "quiz:f0961610-14bb-5d95-a241-1b32a5cb3d9b"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "d9e45b1d-861d-440c-bf10-82da87c04963",
+          "title": "Module 2: Evaporation — Vapour Pressure and the Two Levers",
+          "orderIndex": 1,
+          "lessons": [
+            {
+              "id": "d22b54e2-2951-45b8-8efd-d20372c58927",
+              "title": "Evaporation: the vapour pressure difference that drives drying",
+              "contentType": "text",
+              "contentBody": "<p><em>DRAFT v1 for SME review. Scenarios are illustrative and labelled; every figure is in the evidence ledger.</em></p><h3>On the job</h3><p>A childcare centre in Launceston, Tasmania. A cracked flexible hose has soaked a plasterboard partition between two playrooms. On day two the room is at 20 °C and 70 %RH, the wet wall reads 20 °C on your thermometer, and two air movers are running. The centre director wants the room back by Monday and asks why the wall is drying so slowly. You want to answer with a number, not a shrug.</p><h3>The idea</h3><p>Water leaves a wet surface when the vapour pressure at the surface is higher than the vapour pressure of the air around it. That difference is the <strong>driving force</strong> of evaporation. The bigger it is, the faster water moves from the material into the air.</p><p>At a wet surface, the thin layer of air touching the water is close to saturated at the <em>surface</em> temperature. So the surface vapour pressure is roughly the saturation vapour pressure at the surface temperature, e<sub>s</sub>(T<sub>surface</sub>). The air&rsquo;s vapour pressure is e, from Module 1. The driving force is the gap: Δp = e<sub>s</sub>(T<sub>surface</sub>) − e<sub>air</sub>.</p><p>That one line gives you exactly two levers. You can <strong>raise the surface vapour pressure</strong> by warming the wet material, because e<sub>s</sub> climbs steeply with temperature. Or you can <strong>lower the air&rsquo;s vapour pressure</strong> by taking water out of the air, with dehumidification or with drier air from somewhere else. Everything you do with drying equipment works through one or both of these levers.</p><p>Evaporation also cools the surface it leaves. The Bureau of Meteorology describes the same effect in its wet-bulb thermometer: provided the air is not saturated, water evaporates from the wet muslin and cools the bulb. A wet wall behaves the same way, which is why actively evaporating materials often read cooler than the room. A cooler surface has a lower e<sub>s</sub>, so evaporation partly slows itself down.</p><p>Airflow is the third tool, and it works differently. Near-saturated air tends to sit against a wet surface. Moving air across the surface replaces that layer with room air, so the full Δp can act. Airflow does not create a driving force. It lets the one you have work. If the room air is nearly saturated, more air movers add noise and power use, but little drying.</p><p><strong>Common mistakes.</strong> Adding air movers when Δp is small. Measuring the room but never the wet surface. Forgetting that evaporation puts the water into the room air, where something must then remove it.</p><h3>See it</h3><p><img src='/courses/psychrometry-building-science-for-drying/diagrams/vapour-pressure-difference.svg' alt='A wet wall at 20 degrees with a thin saturated layer at 23.4 hectopascals, facing room air at 16.4 hectopascals. The 7.0 hectopascal difference is shown as an arrow from wall to air.'></p><p>Drying speed follows the gap between surface and air vapour pressure.</p><h3>Do it in metric</h3><ol><li>Wet wall at 20 °C: surface e<sub>s</sub> = <strong>23.39 hPa</strong>.</li><li>Room at 20 °C, 70 %RH: e = 0.70 × 23.39 = 16.37 hPa. Δp = 23.39 − 16.37 = <strong>7.02 hPa</strong>.</li><li>Lever 1, dry the air to 45 %RH at 20 °C: e = 10.53 hPa. Δp = <strong>12.86 hPa</strong>, about 1.8 times the start.</li><li>Lever 2, warm the wall to 26 °C, room air unchanged: surface e<sub>s</sub> = 33.62 hPa. Δp = 33.62 − 16.37 = <strong>17.25 hPa</strong>, about 2.5 times the start.</li><li>The director&rsquo;s answer: the room air is too close to the wall&rsquo;s own vapour pressure. More air movers will not change that.</li></ol><h3>Field download</h3><p>The <strong>Evaporation lever worksheet</strong> sets out surface temperature, room temperature and RH, and calculates Δp before and after each lever, so the choice is written down.</p><h3>Check yourself</h3><p>The Module 2 check asks you to name the driving force, calculate Δp, and say what airflow can and cannot do.</p><h3>Takeaway</h3><p>Evaporation runs on Δp = e<sub>s</sub>(surface) − e<sub>air</sub>. Warm the material, dry the air, and use airflow to let the gap act.</p><p>Next: choosing between the two levers in a cold climate and a humid one.</p><h3>Sources for this lesson</h3><ul><li><a href=\"https://www.weather.gov/media/epz/wxcalc/vaporPressure.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">US National Weather Service, wxcalc worksheet: saturation and actual vapour pressure (public domain)</a>. Read 21/11/2026.</li><li><a href=\"https://www.bom.gov.au/climate/cdo/about/definitions9and3.shtml\" target=\"_blank\" rel=\"noopener noreferrer\">Bureau of Meteorology, Definitions for 9am and 3pm climate statistics</a>. Read 21/11/2026.</li></ul><p>Worked numbers are CARSI arithmetic, shown in the lesson and logged in the course evidence ledger.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": [
+                {
+                  "label": "Evaporation lever worksheet",
+                  "url": "/courses/psychrometry-building-science-for-drying/field-tools/evaporation-lever-worksheet.md",
+                  "kind": "template"
+                }
+              ]
+            },
+            {
+              "id": "de581cf9-4fa9-451f-aae3-a34870c5986f",
+              "title": "Warm the material or dry the air? Choosing the lever by climate",
+              "contentType": "text",
+              "contentBody": "<p><em>DRAFT v1 for SME review. Scenarios are illustrative and labelled; every figure is in the evidence ledger.</em></p><h3>On the job</h3><p>Two calls in the same year. In July, a laundry floor in a Canberra house is wet after a washing machine hose let go; the house is barely heated, and the timber floor surface reads 8 °C. In February, a bedroom carpet in Brisbane is wet after a roof leak; the room is 26 °C and humid. Your manager asks whether the same drying set-up suits both. The numbers say no.</p><h3>The idea</h3><p>Module 2 began with Δp = e<sub>s</sub>(surface) − e<sub>air</sub>. Which lever moves Δp most depends on where the job starts.</p><p><strong>When the material is cold, warming it is powerful.</strong> Saturation vapour pressure climbs steeply with temperature: from the formula, it goes from 12.28 hPa at 10 °C to 23.39 hPa at 20 °C, close to double. A cold wet surface has a low e<sub>s</sub>, so even dry room air leaves only a small gap. In a cold building, raising the material temperature often does more than anything else.</p><p><strong>When the air is warm and humid, drying the air matters more.</strong> In a Brisbane summer, the room air already carries a high vapour pressure. Warming a carpet that is already at 26 °C adds less, makes the room uncomfortable, and puts more water into air that must then be dried.</p><p>Heat has a catch. Warming the air drops its RH but leaves its g/kg unchanged (Module 1). As materials give up water, the room&rsquo;s g/kg <em>rises</em> unless something removes the vapour. The ABCB handbook explains that the main risk to buildings is RH rising as air cools against cooler surfaces. Warm, wet air that reaches a cold window or wall can condense there. So heat is used with vapour removal, not instead of it.</p><p>Ventilation is a way to remove vapour if, and only if, the outside air holds less water than the inside air in g/kg. Module 5 shows the comparison.</p><p><strong>The mould exception.</strong> Moving air across visible or suspected mould growth is a separate decision. Where you see or suspect growth, stop and plan the job under CARSI&rsquo;s mould remediation training before any air mover runs. This lesson teaches the physics of drying, not mould work.</p><p>CARSI&rsquo;s Structural Drying Practitioner course applies these levers with real equipment, power budgets and the electrical-safety rules. This course stays with the science underneath.</p><h3>See it</h3><p><img src='/courses/psychrometry-building-science-for-drying/diagrams/two-levers-by-climate.svg' alt='Two bar charts side by side. Canberra July: a tiny starting gap of 0.3 hectopascals, 4.6 after drying the air and 10.2 after warming the floor. Brisbane February: 8.4 at the start, 16.8 after drying the air and 17.2 after warming the carpet.'></p><p>In the cold job, warming wins by far. In the humid job, the two levers are close and drying the air is the practical choice.</p><h3>Do it in metric</h3><p><strong>Canberra laundry</strong> (room 10 °C, 85 %RH; floor surface 8 °C):</p><ol><li>e<sub>air</sub> = 0.85 × 12.28 = 10.44 hPa. Surface e<sub>s</sub>(8 °C) = 10.73 hPa. Δp = <strong>0.29 hPa</strong>: almost no drying force.</li><li>Dry the air to 50 %RH at 10 °C: e = 6.14 hPa; Δp = 10.73 − 6.14 = <strong>4.59 hPa</strong>.</li><li>Warm the floor surface to 18 °C instead: e<sub>s</sub> = 20.65 hPa; Δp = 20.65 − 10.44 = <strong>10.20 hPa</strong>.</li></ol><p><strong>Brisbane bedroom</strong> (room 26 °C, 75 %RH; carpet 26 °C):</p><ol><li>e<sub>air</sub> = 0.75 × 33.62 = 25.22 hPa; Δp = 33.62 − 25.22 = <strong>8.41 hPa</strong>.</li><li>Dry the air to 50 %RH: e = 16.81 hPa; Δp = <strong>16.81 hPa</strong>.</li><li>Warm the carpet to 30 °C instead: e<sub>s</sub> = 42.44 hPa; Δp = <strong>17.22 hPa</strong>, barely more, at a real comfort cost.</li></ol><h3>Field download</h3><p>The <strong>Evaporation lever worksheet</strong> has a second page for the climate comparison: fill in both levers and tick the one that moves Δp most for this job.</p><h3>Check yourself</h3><p>The Module 2 check asks which lever suits a cold job, why heat alone can cause condensation, and when to stop for mould.</p><h3>Takeaway</h3><p>Cold job: warm the material. Humid job: dry the air. Heat always needs vapour removal, and suspected mould means stop and plan first.</p><p>Next: Module 3, what &ldquo;dry&rdquo; means for the materials themselves.</p><h3>Sources for this lesson</h3><ul><li><a href=\"https://www.weather.gov/media/epz/wxcalc/vaporPressure.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">US National Weather Service, wxcalc worksheet: saturation and actual vapour pressure (public domain)</a>. Read 21/11/2026.</li><li><a href=\"https://www.abcb.gov.au/sites/default/files/resources/2026/NCC%202025%20Condensation%20in%20building%20handbook.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">Australian Building Codes Board, Condensation in buildings handbook, NCC 2025 edition (CC BY 4.0)</a>. Read 21/11/2026.</li></ul><p>Worked numbers are CARSI arithmetic, shown in the lesson and logged in the course evidence ledger.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": [
+                {
+                  "label": "Evaporation lever worksheet",
+                  "url": "/courses/psychrometry-building-science-for-drying/field-tools/evaporation-lever-worksheet.md",
+                  "kind": "template"
+                }
+              ]
+            },
+            {
+              "id": "297ff6b0-4a07-588d-83d6-ee2564cce2d2",
+              "title": "Module 2 check",
+              "contentType": "quiz",
+              "contentBody": "f0ec5518-4179-5737-ad07-fce86828bed9",
+              "orderIndex": 2,
+              "isPreview": false,
+              "resources": [
+                {
+                  "label": "Module 2 check",
+                  "url": "quiz:f0ec5518-4179-5737-ad07-fce86828bed9"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "6363915c-99b5-4ff7-a602-e6d32bc3ce7e",
+          "title": "Module 3: Materials — Moisture Content, EMC and the Dry Standard",
+          "orderIndex": 2,
+          "lessons": [
+            {
+              "id": "f48efa5a-2b21-476e-b856-904cfcd8e137",
+              "title": "Moisture content: the oven-dry method, meters and WME",
+              "contentType": "text",
+              "contentBody": "<p><em>DRAFT v1 for SME review. Scenarios are illustrative and labelled; every figure is in the evidence ledger.</em></p><h3>On the job</h3><p>A 1960s house in Hamilton, New Zealand, with a suspended timber floor wet from a burst pipe. Your pin meter reads 22 % on a pine joist. The flooring installer&rsquo;s meter reads 16 % on the same joist, and the insurer wants to know who is right before the new floor goes down. Both meters are working. The disagreement is about what a meter reading actually is.</p><h3>The idea</h3><p>For timber, moisture content (MC) has a precise meaning. The US Forest Products Laboratory&rsquo;s Wood Handbook defines it as the mass of water in the wood divided by the mass of the oven-dry wood, as a percentage. Operationally: MC = (m<sub>wet</sub> − m<sub>dry</sub>) ÷ m<sub>dry</sub> × 100, where m<sub>dry</sub> is the mass after oven drying.</p><p>Two things follow. First, MC is on a <em>dry basis</em>, so it can exceed 100 %. The Wood Handbook gives green wood a range from about 30 % to more than 200 %. Second, the oven-dry test is the reference. Every other method is an estimate checked against it.</p><p>The Handbook also describes the <strong>fibre saturation point</strong>: below about 30 % MC on average, most wood properties start to change with moisture content, though the value varies between species and pieces. Above it, extra water sits in the cell cavities.</p><p><strong>Meters estimate.</strong> A pin meter measures the electrical resistance between its pins; water lowers resistance, and the meter converts the reading to an MC using a calibration made on wood. That is why species and temperature settings matter, and why two meters on different settings can disagree on the same joist. Pinless meters sense a shallow zone under the pad. Read the maker&rsquo;s instructions for both settings and depth.</p><p>On plasterboard, masonry or concrete, many meters show a <strong>wood moisture equivalent (WME)</strong>: the reading the material would give if it were wood. It is a comparison scale, not that material&rsquo;s moisture content. A WME number is useful against a reading from the same material, in an unaffected area, with the same meter on the same scale. On its own it proves very little.</p><p>CARSI&rsquo;s Moisture Meters, Readings and Dry Standards course covers instrument choice and technique in depth. This lesson gives you the science you need to explain a disagreement.</p><p><strong>Common mistakes.</strong> Treating a WME number as a percentage of water. Comparing two meters on different species or scale settings. Reporting a single reading as &ldquo;the&rdquo; moisture content of a whole floor.</p><h3>See it</h3><p><img src='/courses/psychrometry-building-science-for-drying/diagrams/oven-dry-method.svg' alt='A timber sample weighed wet at 58.4 grams, dried in an oven, then weighed dry at 50.0 grams. The calculation 8.4 divided by 50.0 equals 16.8 percent moisture content.'></p><p>The oven-dry test is the reference every moisture meter is calibrated against.</p><h3>Do it in metric</h3><ol><li>An offcut from the Hamilton joist weighs <strong>58.4 g</strong> wet and <strong>50.0 g</strong> after oven drying.</li><li>MC = (58.4 − 50.0) ÷ 50.0 × 100 = <strong>16.8 %</strong>. The installer&rsquo;s reading was closer; check your meter&rsquo;s species setting.</li><li>Water in a subfloor: 120 kg of oven-dry bearers and joists at 25 % MC hold 0.25 × 120 = 30 kg of water. At 15 % they hold 18 kg.</li><li>Drying from 25 % to 15 % releases <strong>12 kg of water, about 12 L</strong>, into the subfloor air, which then has to leave the building.</li></ol><h3>Field download</h3><p>The <strong>Material moisture and dry-standard sheet</strong> records meter type, mode, species or scale setting, the reading and the unaffected reference for every point, so readings can be compared fairly.</p><h3>Check yourself</h3><p>The Module 3 check asks you to calculate an oven-dry MC, explain what WME means, and spot an unfair meter comparison.</p><h3>Takeaway</h3><p>MC is water mass over oven-dry mass. Meters estimate it; WME compares materials. Always record the setting and a same-material reference.</p><p>Next: why timber settles at a moisture content set by the room.</p><h3>Sources for this lesson</h3><ul><li><a href=\"https://research.fs.usda.gov/download/treesearch/62243.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">USDA Forest Products Laboratory, Wood Handbook (FPL-GTR-282, 2021), Chapter 4: Moisture relations and physical properties of wood</a>. Read 21/11/2026.</li></ul><p>Worked numbers are CARSI arithmetic, shown in the lesson and logged in the course evidence ledger.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": [
+                {
+                  "label": "Material moisture and dry-standard sheet",
+                  "url": "/courses/psychrometry-building-science-for-drying/field-tools/material-moisture-and-dry-standard-sheet.md",
+                  "kind": "template"
+                }
+              ]
+            },
+            {
+              "id": "9d6f184b-5150-4d30-87fe-a105f71344c9",
+              "title": "Equilibrium moisture content: why there is no universal dry number",
+              "contentType": "text",
+              "contentBody": "<p><em>DRAFT v1 for SME review. Scenarios are illustrative and labelled; every figure is in the evidence ledger.</em></p><h3>On the job</h3><p>A builder in Canberra rings in July about a hardwood floor you are drying after a dishwasher leak. &ldquo;Get it to 12 % and we&rsquo;ll lay the new boards,&rdquo; he says. The house is heated to 20 °C and the unaffected rooms read about 45 %RH. The same week, a colleague in Brisbane is drying an unconditioned house at 27 °C and about 65 %RH. One number cannot be right for both houses.</p><h3>The idea</h3><p>Timber constantly swaps water with the air around it. The Wood Handbook defines <strong>equilibrium moisture content (EMC)</strong> as the moisture content at which wood is neither gaining nor losing moisture. EMC depends on the air&rsquo;s RH and temperature, and the Handbook tabulates it.</p><p>From that table, wood at 21.1 °C and 45 %RH settles near <strong>8.5 %</strong>. At 26.7 °C and 65 %RH it settles near <strong>11.7 %</strong>. At 21.1 °C and 80 %RH it heads for <strong>16.0 %</strong>. So the moisture content timber will hold in service depends on the building and the season. A fixed &ldquo;12 %&rdquo; is too wet for the heated Canberra house and close to normal for the Brisbane one.</p><p>The Handbook adds two cautions. Its tabulated 0.1 % precision is only there to show trends; real EMC varies between species and pieces. And wood that is drying down sits higher than wood that is taking up water: the ratio of adsorption to desorption EMC averages about 0.8 near room temperature. Expect a drying floor to settle a little above the table value.</p><p><strong>So where does the drying goal come from?</strong> From the building itself. Take readings on the <em>same material</em>, in <em>unaffected</em> areas of the same building, with the <em>same meter</em> on the <em>same setting</em>. That reference is the dry standard for this job. It already reflects this house, this climate and this season, which no single number can.</p><p>Moisture and mould are related but different. The ABCB handbook says prolonged RH above about 50 % can increase the likelihood of mould growth, and recommends keeping conditioned air below about 70 %RH to inhibit it. Those are design guidance figures. A damp reading tells you conditions could support growth. It does not tell you growth is present, and it never tells you anyone has been exposed.</p><p><strong>Common mistakes.</strong> Quoting a universal &ldquo;dry&rdquo; percentage. Taking the reference on a different material or in a heated room next to a wet one. Changing meter settings between the reference and the wet reading.</p><h3>See it</h3><p><img src='/courses/psychrometry-building-science-for-drying/diagrams/emc-by-room.svg' alt='Three rooms, each with its air condition and the timber equilibrium moisture content beside it: 21 degrees and 45 percent gives 8.5 percent, 27 degrees and 65 percent gives 11.7 percent, and 21 degrees and 80 percent gives 16.0 percent.'></p><p>Same timber, three rooms, three different equilibrium moisture contents.</p><h3>Do it in metric</h3><ol><li>Canberra unaffected hardwood reads 9, 10 and 9 % (same meter, same setting). Reference mean = (9 + 10 + 9) ÷ 3 = <strong>9.3 %</strong>.</li><li>Affected boards read 19, 17 and 15 %. Their gaps from the reference are 9.7, 7.7 and 5.7 percentage points.</li><li>The builder&rsquo;s &ldquo;12 %&rdquo; would leave the boards about 2.7 points wetter than the rest of the house, so they would keep drying and moving after the new floor goes down.</li><li>Brisbane check: EMC near 11.7 % at 26.7 °C and 65 %RH, so a reference near 12 % there is plausible.</li></ol><h3>Field download</h3><p>The <strong>Material moisture and dry-standard sheet</strong> has the reference table: three same-material readings, the mean, and each affected reading&rsquo;s gap from it, ready for the job file.</p><h3>Check yourself</h3><p>The Module 3 check asks you to read an EMC value, set a reference, and separate a moisture finding from a mould finding.</p><h3>Takeaway</h3><p>Timber settles to its room. Set the dry standard from unaffected material on this job, and never let a moisture number stand in for a mould or exposure finding.</p><p>Next: Module 4, heat flow and surface temperature.</p><h3>Sources for this lesson</h3><ul><li><a href=\"https://research.fs.usda.gov/download/treesearch/62243.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">USDA Forest Products Laboratory, Wood Handbook (FPL-GTR-282, 2021), Chapter 4: Moisture relations and physical properties of wood</a>. Read 21/11/2026.</li><li><a href=\"https://research.fs.usda.gov/download/treesearch/37428.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">USDA Forest Products Laboratory, Wood Handbook (2010), Chapter 4: Moisture relations and physical properties of wood</a>. Read 21/11/2026.</li><li><a href=\"https://www.abcb.gov.au/sites/default/files/resources/2026/NCC%202025%20Condensation%20in%20building%20handbook.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">Australian Building Codes Board, Condensation in buildings handbook, NCC 2025 edition (CC BY 4.0)</a>. Read 21/11/2026.</li></ul><p>Worked numbers are CARSI arithmetic, shown in the lesson and logged in the course evidence ledger.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": [
+                {
+                  "label": "Material moisture and dry-standard sheet",
+                  "url": "/courses/psychrometry-building-science-for-drying/field-tools/material-moisture-and-dry-standard-sheet.md",
+                  "kind": "template"
+                }
+              ]
+            },
+            {
+              "id": "212a4c9e-457f-5323-8516-80f318a6697f",
+              "title": "Module 3 check",
+              "contentType": "quiz",
+              "contentBody": "bdd769ba-2731-502c-b8cf-6519e3738707",
+              "orderIndex": 2,
+              "isPreview": false,
+              "resources": [
+                {
+                  "label": "Module 3 check",
+                  "url": "quiz:bdd769ba-2731-502c-b8cf-6519e3738707"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "620582e3-c336-47f8-b2fb-049afb7a0779",
+          "title": "Module 4: Heat Flow and Surface Condensation",
+          "orderIndex": 3,
+          "lessons": [
+            {
+              "id": "e7dd8da4-7b46-4668-94f0-2284177142e3",
+              "title": "Heat flow, U-values and inside surface temperature",
+              "contentType": "text",
+              "contentBody": "<p><em>DRAFT v1 for SME review. Scenarios are illustrative and labelled; every figure is in the evidence ledger.</em></p><h3>On the job</h3><p>July in Canberra. A tenant in a 1980s brick-veneer house reports water running down the bedroom window every morning and black spots on the timber reveal. The landlord is sure the roof leaks and has called a plumber. Before anyone climbs on the roof, you can work out how cold that window gets on an average July night, with a pencil.</p><h3>The idea</h3><p>Heat flows from warm to cold. In winter it flows from the heated room, through the wall or window, to the outside. How fast it flows through a window is described by its <strong>U-value</strong>, in watts per square metre per degree of temperature difference (W/m²·K). The Australian Government&rsquo;s YourHome guide explains that the window U-value describes the conduction of the whole window, glass and frame together, and that a lower U-value means better resistance to heat flow. Heat loss is U × temperature difference × area.</p><p>The inside surface of a window or wall is colder than the room air. A thin film of still air on the inside resists heat flow, and the surface sits below room temperature by the share of the temperature difference lost across that film. CARSI uses this steady-state estimate:</p><p><strong>T<sub>si</sub> = T<sub>i</sub> − U × R<sub>si</sub> × (T<sub>i</sub> − T<sub>o</sub>)</strong></p><p>T<sub>i</sub> and T<sub>o</sub> are inside and outside air temperatures, and R<sub>si</sub> is the inside surface resistance. This course assumes R<sub>si</sub> = 0.13 m²·K/W for a vertical surface in still room air, and every worked example says so. State the value you use in your own reports.</p><p>The ABCB handbook explains why windows show trouble first: they tend to have the coldest interior surface temperatures and respond quickly to falling outdoor temperatures. It also names the other cold spots. Where insulation is missing or interrupted by framing or other <strong>thermal bridges</strong>, inside surfaces run colder; corners of walls and window and door openings are particularly vulnerable. A thermal camera often shows these as cold stripes at studs or a cold band around a reveal.</p><p>The estimate has limits. It assumes steady conditions, so it gives you a typical night, not the coldest hour. Curtains trap cold air against the glass and make the surface colder still. Treat the answer as &ldquo;about this cold&rdquo; and confirm with a surface thermometer on site.</p><p><strong>Common mistakes.</strong> Assuming a wall is at room temperature. Measuring surface temperature in the afternoon and applying it to the night. Forgetting the frame: aluminium frames conduct heat readily.</p><h3>See it</h3><p><img src='/courses/psychrometry-building-science-for-drying/diagrams/window-surface-temperature.svg' alt='Cross-sections of two windows between an 18 degree bedroom and minus 0.1 degree outside air. Aluminium-framed clear glazing, U 6.2, has an inside surface of 3.4 degrees. Argon-filled double glazing, U 3.1, has an inside surface of 10.7 degrees.'></p><p>Halving the U-value lifts the inside glass surface by about 7 °C on the same night.</p><h3>Do it in metric</h3><p>Canberra Airport&rsquo;s long-term July mean minimum is <strong>−0.1 °C</strong> (Bureau of Meteorology). Bedroom 18 °C, so T<sub>i</sub> − T<sub>o</sub> = 18.1 °C. R<sub>si</sub> = 0.13 m²·K/W (CARSI assumption).</p><ol><li>Aluminium-framed clear glazing, U = 6.2 W/m²·K (the YourHome example): U × R<sub>si</sub> = 0.806. Drop = 0.806 × 18.1 = 14.59 °C. T<sub>si</sub> = 18 − 14.59 = <strong>3.4 °C</strong>.</li><li>Double glazing with an argon-filled gap at half that U-value, 3.1 (also YourHome): U × R<sub>si</sub> = 0.403; drop = 7.29 °C; T<sub>si</sub> = <strong>10.7 °C</strong>.</li><li>Heat loss through a 2.0 m² window at U 6.2: 6.2 × 18.1 × 2.0 = <strong>224 W</strong>, all night. At U 3.1: 112 W.</li></ol><h3>Field download</h3><p>The <strong>Surface condensation check card</strong> has a box for U-value, R<sub>si</sub>, indoor and outdoor temperatures and the calculated inside surface temperature for each cold surface you check.</p><h3>Check yourself</h3><p>The Module 4 check asks you to calculate an inside surface temperature and name where thermal bridges hide.</p><h3>Takeaway</h3><p>Higher U-value, colder inside surface. T<sub>si</sub> = T<sub>i</sub> − U × R<sub>si</sub> × (T<sub>i</sub> − T<sub>o</sub>) tells you about how cold.</p><p>Next: comparing that surface with the room&rsquo;s dew point.</p><h3>Sources for this lesson</h3><ul><li><a href=\"https://www.yourhome.gov.au/passive-design/glazing\" target=\"_blank\" rel=\"noopener noreferrer\">YourHome (Australian Government), Glazing</a>. Read 21/11/2026.</li><li><a href=\"https://www.abcb.gov.au/sites/default/files/resources/2026/NCC%202025%20Condensation%20in%20building%20handbook.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">Australian Building Codes Board, Condensation in buildings handbook, NCC 2025 edition (CC BY 4.0)</a>. Read 21/11/2026.</li><li><a href=\"https://www.bom.gov.au/climate/averages/tables/cw_070014.shtml\" target=\"_blank\" rel=\"noopener noreferrer\">Bureau of Meteorology, Climate statistics: Canberra Airport Comparison (station 070014)</a>. Read 21/11/2026.</li></ul><p>Worked numbers are CARSI arithmetic, shown in the lesson and logged in the course evidence ledger.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": [
+                {
+                  "label": "Surface condensation check card",
+                  "url": "/courses/psychrometry-building-science-for-drying/field-tools/surface-condensation-check-card.md",
+                  "kind": "field-card"
+                }
+              ]
+            },
+            {
+              "id": "fce81c98-fc8f-4cbe-966f-a9844cabfd28",
+              "title": "The surface condensation check: Canberra windows and Brisbane walls",
+              "contentType": "text",
+              "contentBody": "<p><em>DRAFT v1 for SME review. Scenarios are illustrative and labelled; every figure is in the evidence ledger.</em></p><h3>On the job</h3><p>Two condensation calls in different climates. The Canberra bedroom from the last lesson, with water on the glass every morning. And a 2010s apartment in Brisbane where the owner runs the air conditioner at 21 °C right through summer, then finds swollen skirting boards and a musty smell along the bedroom&rsquo;s outside wall. The strata manager suspects a leaking pipe in the wall. Is either job a leak?</p><h3>The idea</h3><p>The check is one comparison. <strong>Find the dew point of the air on the warm side. Find the temperature of the surface. If the surface is at or below the dew point, condensation can form there.</strong> The ABCB handbook defines dew point as the temperature at which the air&rsquo;s RH reaches 100 % and water vapour begins to condense.</p><p>In a heated house in winter, the warm side is the room, and the cold surfaces are windows, external corners and thermal bridges. This is the Canberra pattern.</p><p>In an air-conditioned house in a humid summer, the direction flips. The cool side is the room; the humid air is outside and in the wall cavity. YourHome&rsquo;s condensation table rates NCC climate zones 1 and 2 at high summer risk, if air-conditioned, of condensation forming on cold surfaces within the structure. Brisbane is in climate zone 2. For climate zone 1, the ABCB handbook says the layer immediately behind the interior lining is often the coldest surface at risk when spaces are mechanically cooled. The water then appears inside the wall, where nobody sees it until the skirting swells.</p><p><strong>Condensation or leak?</strong> Condensation follows the weather and the thermostat: it comes and goes with cold nights or cooling settings, it collects on the coldest surfaces first, and it often shows as a broad, even band. A leak follows the pipework or the roof: it is there whether or not the heater or air conditioner runs, it spreads from a point, and it often gets worse after rain or water use. Record the pattern before you scope anything.</p><p>Neither pattern is proof of mould or of exposure. A wet reveal or a damp cavity is a moisture finding. Whether growth is present is a separate assessment, under CARSI&rsquo;s mould remediation training.</p><p><strong>Common mistakes.</strong> Checking the dew point of the wrong side of the wall. Taking one reading in the afternoon. Scoping a plumber for a problem the thermostat explains.</p><h3>See it</h3><p><img src='/courses/psychrometry-building-science-for-drying/diagrams/condensation-check-two-climates.svg' alt='Left: a Canberra window at 3.4 degrees beside room air with a dew point of 11.3 degrees, condensation on the glass. Right: a Brisbane wall where outdoor air with a dew point of 19.4 to 23.9 degrees meets the back of a lining cooled to about 22 degrees, condensation inside the cavity on humid days.'></p><p>Winter heating pushes the risk to the window. Summer cooling pushes it into the wall.</p><h3>Do it in metric</h3><p><strong>Canberra bedroom</strong>, 18 °C and 65 %RH:</p><ol><li>e = 0.65 × 20.65 = 13.42 hPa; dew point = <strong>11.3 °C</strong>.</li><li>U 6.2 window at 3.4 °C: 7.9 °C below the dew point. <strong>Condensation every cold night.</strong></li><li>U 3.1 window at 10.7 °C: still 0.6 °C below. Less water, but not none.</li></ol><p><strong>Brisbane wall</strong>, February:</p><ol><li>Mean 3 pm outdoor conditions 28.2 °C and 59 %RH (Bureau of Meteorology): e = 0.59 × 38.25 = 22.57 hPa; dew point = <strong>19.4 °C</strong>.</li><li>Back of the lining near 22 °C with the room held at 21 °C (CARSI estimate): on an average afternoon, about 2.6 °C above the dew point.</li><li>A humid day at 30 °C and 70 %RH (illustrative): e = 29.71 hPa; dew point = <strong>23.9 °C</strong>, above the 22 °C lining. <strong>Condensation inside the wall</strong> on those days.</li></ol><h3>Field download</h3><p>The <strong>Surface condensation check card</strong> walks through the check for each surface: warm-side dew point, surface temperature, margin, and the condensation-or-leak pattern questions.</p><h3>Check yourself</h3><p>The Module 4 check asks you to run the check for a window, name the cold side in an air-conditioned wall, and tell condensation from a leak.</p><h3>Takeaway</h3><p>Surface at or below the warm-side dew point means condensation can form. Heating pushes it to windows; cooling pushes it into walls.</p><p>Next: Module 5, air changes and ventilation.</p><h3>Sources for this lesson</h3><ul><li><a href=\"https://www.weather.gov/media/epz/wxcalc/vaporPressure.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">US National Weather Service, wxcalc worksheet: saturation and actual vapour pressure (public domain)</a>. Read 21/11/2026.</li><li><a href=\"https://www.yourhome.gov.au/passive-design/glazing\" target=\"_blank\" rel=\"noopener noreferrer\">YourHome (Australian Government), Glazing</a>. Read 21/11/2026.</li><li><a href=\"https://www.abcb.gov.au/sites/default/files/resources/2026/NCC%202025%20Condensation%20in%20building%20handbook.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">Australian Building Codes Board, Condensation in buildings handbook, NCC 2025 edition (CC BY 4.0)</a>. Read 21/11/2026.</li><li><a href=\"https://www.yourhome.gov.au/passive-design/condensation\" target=\"_blank\" rel=\"noopener noreferrer\">YourHome (Australian Government), Condensation</a>. Read 21/11/2026.</li><li><a href=\"https://abcb.prod.abcb.gov.au/ncc-navigator/understanding-ncc-climate-zones\" target=\"_blank\" rel=\"noopener noreferrer\">Australian Building Codes Board, NCC Navigator: Understanding NCC climate zones</a>. Read 21/11/2026.</li><li><a href=\"https://www.bom.gov.au/climate/averages/tables/cw_040913.shtml\" target=\"_blank\" rel=\"noopener noreferrer\">Bureau of Meteorology, Climate statistics: Brisbane (station 040913)</a>. Read 21/11/2026.</li></ul><p>Worked numbers are CARSI arithmetic, shown in the lesson and logged in the course evidence ledger.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": [
+                {
+                  "label": "Surface condensation check card",
+                  "url": "/courses/psychrometry-building-science-for-drying/field-tools/surface-condensation-check-card.md",
+                  "kind": "field-card"
+                }
+              ]
+            },
+            {
+              "id": "d3c89a8a-f32b-5002-bfe3-9aab03473e90",
+              "title": "Module 4 check",
+              "contentType": "quiz",
+              "contentBody": "d596e926-b917-5366-b117-6596b98860c0",
+              "orderIndex": 2,
+              "isPreview": false,
+              "resources": [
+                {
+                  "label": "Module 4 check",
+                  "url": "quiz:d596e926-b917-5366-b117-6596b98860c0"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "7ad62d39-b90f-4e60-a1fb-e8e4dafe6572",
+          "title": "Module 5: Ventilation, Air Changes and the Building Envelope in Australia and New Zealand",
+          "orderIndex": 4,
+          "lessons": [
+            {
+              "id": "72261aa3-30a0-47a5-b60e-443e510619ea",
+              "title": "Air changes per hour: from airflow, and from a CO2 decay test",
+              "contentType": "text",
+              "contentBody": "<p><em>DRAFT v1 for SME review. Scenarios are illustrative and labelled; every figure is in the evidence ledger.</em></p><h3>On the job</h3><p>A bathroom in a Perth unit grows black spots on the ceiling every winter. The owner says the exhaust fan &ldquo;works fine&rdquo; because it makes a noise. The label says 50 L/s. You want two numbers before you advise anyone: how many air changes the fan should give, and how many the room actually gets. One comes from arithmetic. The other you measure.</p><h3>The idea</h3><p><strong>Air changes per hour (ACH)</strong> is the volume of air moved through a room each hour divided by the room&rsquo;s volume. A room with 1 ACH has, in a well-mixed sense, swapped a whole room&rsquo;s worth of air in an hour. The definition is simple: ACH = airflow (m³/h) ÷ room volume (m³). Airflow in L/s converts at 1 L/s = 3.6 m³/h. Imported fans rated in cubic feet per minute convert at 1 CFM = 0.4719 L/s (NIST).</p><p>A label gives the airflow a fan can move in test conditions. A real fan, behind a grille, through a duct and a back-draught flap, with the door shut and no gap for make-up air, often moves much less. So you measure.</p><p><strong>The CO2 decay test.</strong> Carbon dioxide works as a tracer gas. You raise the room&rsquo;s CO2 well above the outdoor level, stop the source, and log how fast it falls. In a well-mixed room the excess above outdoor air decays exponentially, and the air change rate is calculated from two readings: ACH = ln[(C<sub>start</sub> − C<sub>out</sub>) ÷ (C<sub>end</sub> − C<sub>out</sub>)] ÷ time in hours. This is the two-point decay method described in the peer-reviewed literature on CO2-based ventilation measurement (Batterman, 2017).</p><p>Run it carefully. People breathe out CO2, so a review of room-level ventilation testing (McNeill and others, 2022) notes the room must be unoccupied during the measurement when the tracer is CO2. Mix the room with a fan before the decay starts. Measure outdoor CO2 before and after. Batterman describes a fall of several hundred ppm as desirable, given the accuracy of typical sensors. Keep the door and fan settings exactly as they will be in normal use.</p><p>ACH tells you how fast air is replaced. It does not tell you whether the replacement air is drier. That is the next lesson.</p><p><strong>Common mistakes.</strong> Trusting the fan label. Testing with the door open when the family closes it. Leaving people in the room during a CO2 test. Forgetting to subtract outdoor CO2.</p><h3>See it</h3><p><img src='/courses/psychrometry-building-science-for-drying/diagrams/co2-decay.svg' alt='A curve of carbon dioxide in a bathroom falling from 1800 parts per million to 900 parts per million over 30 minutes, approaching an outdoor level of 420 parts per million. The calculated rate, 2.1 air changes per hour, is shown beside it.'></p><p>The fan label promised 5.4 air changes per hour. The decay test measured 2.1.</p><h3>Do it in metric</h3><ol><li>Bathroom 4.0 m × 3.5 m × 2.4 m = <strong>33.6 m³</strong>.</li><li>Label airflow 50 L/s × 3.6 = 180 m³/h. Rated ACH = 180 ÷ 33.6 = <strong>5.4 ACH</strong>.</li><li>Decay test, room empty, door shut, fan on: CO2 1800 ppm at the start, 900 ppm after 30 minutes (0.5 h), outdoors 420 ppm.</li><li>ACH = ln[(1800 − 420) ÷ (900 − 420)] ÷ 0.5 = ln(2.875) ÷ 0.5 = <strong>2.1 ACH</strong>.</li><li>Measured airflow ≈ 2.1 × 33.6 = 71 m³/h, about 20 L/s: well under half the label.</li></ol><h3>Field download</h3><p>The <strong>Ventilation and air-change worksheet</strong> has the room volume box, the label-to-ACH conversion and a CO2 decay table with the two-point calculation laid out.</p><h3>Check yourself</h3><p>The Module 5 check asks you to calculate ACH from airflow, run the decay formula, and name the test conditions that matter.</p><h3>Takeaway</h3><p>ACH = airflow ÷ volume. Labels promise; a CO2 decay test in an empty, mixed room measures.</p><p>Next: whether swapping that air helps or hurts drying.</p><h3>Sources for this lesson</h3><ul><li><a href=\"https://www.nist.gov/pml/special-publication-811/nist-guide-si-appendix-b-conversion-factors/nist-guide-si-appendix-b8\" target=\"_blank\" rel=\"noopener noreferrer\">NIST Guide to the SI (SP 811), Appendix B.8 conversion factors</a>. Read 21/11/2026.</li><li><a href=\"https://pmc.ncbi.nlm.nih.gov/articles/PMC8789458/\" target=\"_blank\" rel=\"noopener noreferrer\">McNeill V.F. and others (2022), Room-level ventilation in schools and universities, Atmospheric Environment: X (open access)</a>. Read 21/11/2026.</li><li><a href=\"https://pmc.ncbi.nlm.nih.gov/articles/PMC5334699/\" target=\"_blank\" rel=\"noopener noreferrer\">Batterman S. (2017), Review and extension of CO2-based methods to determine ventilation rates, Int. J. Environ. Res. Public Health (open access)</a>. Read 21/11/2026.</li></ul><p>Worked numbers are CARSI arithmetic, shown in the lesson and logged in the course evidence ledger.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": [
+                {
+                  "label": "Ventilation and air-change worksheet",
+                  "url": "/courses/psychrometry-building-science-for-drying/field-tools/ventilation-and-air-change-worksheet.md",
+                  "kind": "template"
+                }
+              ]
+            },
+            {
+              "id": "384cc2c0-6d70-46a7-b166-a767fb369318",
+              "title": "Ventilate or dehumidify? Comparing inside and outside air in g/kg",
+              "contentType": "text",
+              "contentBody": "<p><em>DRAFT v1 for SME review. Scenarios are illustrative and labelled; every figure is in the evidence ledger.</em></p><h3>On the job</h3><p>A wet house in Brisbane in February, every window shut and two dehumidifiers running. The owner&rsquo;s brother arrives and opens every window &ldquo;to let it breathe&rdquo;. Six months later, a winter job in a cold New Zealand town: a wet room at 18 °C and 80 %RH, and cool, damp-looking air outside. In which house does opening the windows help drying?</p><h3>The idea</h3><p>Ventilation swaps inside air for outside air. It removes water from the building only when the outside air carries <strong>less water per kilogram</strong> than the inside air. Comparing RH will mislead you, because RH depends on temperature (Module 1). Compare <strong>g/kg</strong> or dew point, inside and outside, at the time you are deciding.</p><p>The rule is short. <strong>Outside g/kg clearly lower than inside: ventilation removes water.</strong> Outside g/kg close to or higher than inside: ventilation adds little or adds water, and it fights the dehumidifiers. Recheck at different times of day, because outdoor g/kg moves with the weather.</p><p>Two side effects matter. Cold outside air, once it warms inside, has a low RH (the ABCB example: 7 °C and 70 %RH outdoors becomes about 30 %RH at 20 °C). That helps drying, but it costs heat, and cold incoming air can chill materials and cut evaporation (Module 2). And humid outside air drawn into a cooled building can reach cold surfaces in the structure (Module 4).</p><p><strong>Australia and New Zealand.</strong> The physics is the same in both countries. The building rules around it differ, and the next lesson covers them. In New Zealand, Building Code clause E3 asks for an adequate combination of thermal resistance, ventilation and space temperature in habitable spaces, bathrooms, laundries and other spaces where moisture is generated. That is the same three-way balance this lesson calculates: heat, air exchange and the water in the air.</p><p>Indoor moisture keeps coming. The ABCB handbook puts a typical family of four at between 7 kg and 22 kg of water vapour a day, from breathing, cooking, washing and showering. During drying, the wet materials add far more. Whatever removes vapour has to beat both.</p><p><strong>Common mistakes.</strong> Opening windows because the outside &ldquo;feels drier&rdquo;. Comparing RH instead of g/kg. Deciding once at 3 pm and never rechecking at night.</p><h3>See it</h3><p><img src='/courses/psychrometry-building-science-for-drying/diagrams/ventilate-or-dehumidify.svg' alt='Two houses. Brisbane: inside 14.9 grams per kilogram, outside 14.2, almost equal, so ventilation adds little. Cold New Zealand town: inside 10.3 grams per kilogram, outside 5.7, so ventilation removes water.'></p><p>Compare g/kg, not RH, before you open a window.</p><h3>Do it in metric</h3><p><strong>Brisbane</strong>: inside 25 °C, 75 %RH; outside the mean 9 am February conditions, 26.3 °C and 66 %RH (Bureau of Meteorology).</p><ol><li>Inside: e = 0.75 × 31.69 = 23.76 hPa; w = <strong>14.94 g/kg</strong>.</li><li>Outside: e = 0.66 × 34.22 = 22.59 hPa; w = <strong>14.18 g/kg</strong>.</li><li>Difference 0.76 g/kg. Ventilating barely helps, and it pours humid air past the dehumidifiers. <strong>Close the windows.</strong></li></ol><p><strong>Cold New Zealand town</strong> (illustrative): inside 18 °C, 80 %RH; outside 8 °C, 85 %RH.</p><ol><li>Inside: e = 0.80 × 20.65 = 16.52 hPa; w = <strong>10.31 g/kg</strong>.</li><li>Outside: e = 0.85 × 10.73 = 9.12 hPa; w = <strong>5.65 g/kg</strong>. Warmed to 18 °C, that air would read about 44 %RH.</li><li>Ventilation removes about 4.7 g of water per kilogram of air exchanged, at the cost of heating it.</li></ol><h3>Field download</h3><p>The <strong>Ventilation and air-change worksheet</strong> has an inside-versus-outside table in °C, %RH and g/kg, with the decision rule printed under it and space for rechecks.</p><h3>Check yourself</h3><p>The Module 5 check asks you to compare two airs in g/kg, decide whether to ventilate, and explain the NZ E3 balance.</p><h3>Takeaway</h3><p>Ventilate only when the outside air is clearly drier in g/kg. RH comparisons fool you; g/kg does not.</p><p>Next: the building envelope and the codes in both countries.</p><h3>Sources for this lesson</h3><ul><li><a href=\"https://www.weather.gov/media/epz/wxcalc/vaporPressure.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">US National Weather Service, wxcalc worksheet: saturation and actual vapour pressure (public domain)</a>. Read 21/11/2026.</li><li><a href=\"https://www.weather.gov/media/epz/wxcalc/mixingRatio.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">US National Weather Service, wxcalc worksheet: mixing ratio (public domain)</a>. Read 21/11/2026.</li><li><a href=\"https://www.bom.gov.au/climate/cdo/about/definitions9and3.shtml\" target=\"_blank\" rel=\"noopener noreferrer\">Bureau of Meteorology, Definitions for 9am and 3pm climate statistics</a>. Read 21/11/2026.</li><li><a href=\"https://www.abcb.gov.au/sites/default/files/resources/2026/NCC%202025%20Condensation%20in%20building%20handbook.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">Australian Building Codes Board, Condensation in buildings handbook, NCC 2025 edition (CC BY 4.0)</a>. Read 21/11/2026.</li><li><a href=\"https://www.legislation.govt.nz/secondary-legislation/pco-drafted/1992/150/en/2026-01-15.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">New Zealand Legislation, Building Regulations 1992, Schedule 1 (the Building Code), version as at 15 January 2026</a>. Read 21/11/2026.</li><li><a href=\"https://www.bom.gov.au/climate/averages/tables/cw_040913.shtml\" target=\"_blank\" rel=\"noopener noreferrer\">Bureau of Meteorology, Climate statistics: Brisbane (station 040913)</a>. Read 21/11/2026.</li></ul><p>Worked numbers are CARSI arithmetic, shown in the lesson and logged in the course evidence ledger.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": [
+                {
+                  "label": "Ventilation and air-change worksheet",
+                  "url": "/courses/psychrometry-building-science-for-drying/field-tools/ventilation-and-air-change-worksheet.md",
+                  "kind": "template"
+                }
+              ]
+            },
+            {
+              "id": "102a0311-cda3-4964-ba5c-df136b3d6b25",
+              "title": "The building envelope: NCC climate zones, walls, subfloors and NZ rules",
+              "contentType": "text",
+              "contentBody": "<p><em>DRAFT v1 for SME review. Scenarios are illustrative and labelled; every figure is in the evidence ledger.</em></p><h3>On the job</h3><p>You open a wet external wall in a new Hobart townhouse and find a membrane behind the cladding and a gap behind that. A month later you lift floorboards in an old Auckland rental and find bare, damp soil under the house. Both times, the owner asks whether the building &ldquo;was built right&rdquo;. You are not the building certifier, but you need to know what the codes in each country ask about moisture.</p><h3>The idea</h3><p><strong>Australia: NCC climate zones.</strong> The National Construction Code groups locations into eight climate zones, from zone 1 (high humidity summer, warm winter: Darwin, Cairns) through zone 2 (Brisbane), zone 5 (Sydney, Perth, Adelaide), zone 7 (Canberra, Hobart) to zone 8 (alpine). The ABCB says these zones are the primary classification for energy-efficiency and condensation-management requirements. Its condensation handbook adds a caution: the zones give only a limited indication of condensation risk, so local climate data is more reliable (Module 6).</p><p><strong>External walls.</strong> Under NCC 2025, Clause F8D3 in Volume One and Clause 10.8.1 of the Housing Provisions set requirements for external walls by climate zone. The handbook summarises that in climate zones 6 to 8, external walls must incorporate a drained and ventilated cavity, and that these requirements do not apply in climate zone 2. In cooler climates such as Melbourne and Hobart, more vapour-permeable control layers support outward drying; in tropical climates such as Cairns and Darwin, lower-permeance materials help limit inward moisture drive. The Hobart membrane and cavity are what you would expect to find.</p><p><strong>Subfloors.</strong> The NCC uses a separate classification, climatic zones A, B and C based on seasonal RH, for subfloor ventilation. Do not confuse these with the eight climate zones.</p><p><strong>New Zealand: the Building Code and Healthy Homes.</strong> New Zealand&rsquo;s Building Code is set out in Schedule 1 of the Building Regulations 1992. Clause E2.3.4 requires building elements susceptible to damage to be protected from the adverse effects of moisture entering the space below suspended floors. Clause E3.2 requires buildings to be constructed to avoid the likelihood of fungal growth or the accumulation of contaminants on linings and other building elements. For rentals, the Residential Tenancies (Healthy Homes Standards) Regulations 2019 require an enclosed subfloor under a suspended floor to have a ground moisture barrier, and the main living room to be able to be heated to at least 18 °C. The bare Auckland soil is a Healthy Homes matter for the landlord, not just a drying note.</p><p>Your job is to record what you find, not to certify compliance. Note the construction you open up, photograph it, and refer code questions to the builder, certifier or council.</p><p><strong>Common mistakes.</strong> Confusing climate zones with subfloor climatic zones. Telling an owner their building is non-compliant. Applying an Australian rule to a New Zealand house, or the reverse.</p><h3>See it</h3><p><img src='/courses/psychrometry-building-science-for-drying/diagrams/envelope-au-nz.svg' alt='A map strip of Australian NCC climate zones from 1 to 8 with example cities, beside a New Zealand house section showing the subfloor ground moisture barrier and the 18 degree living-room heating requirement.'></p><p>The physics is shared. The building rules differ by country and by zone.</p><h3>Do it in metric</h3><p>How much does everyday moisture lift a closed house&rsquo;s g/kg? Take 12 kg of vapour a day (inside the ABCB 7 to 22 kg range), a 300 m³ house and 0.5 ACH (all illustrative).</p><ol><li>Air exchanged per day: 300 × 0.5 × 24 = 3600 m³.</li><li>Mass of that air at about 1.2 kg/m³: 3600 × 1.2 = 4320 kg.</li><li>Moisture added per kilogram exchanged: 12 000 g ÷ 4320 kg = <strong>2.8 g/kg</strong> above outdoor air, at steady state.</li><li>Halve the air change rate to 0.25 ACH and the lift doubles to about 5.6 g/kg.</li></ol><h3>Field download</h3><p>The <strong>Ventilation and air-change worksheet</strong> has an envelope page: climate zone or NZ region, wall and subfloor construction found, photos taken, and the code questions referred on.</p><h3>Check yourself</h3><p>The Module 5 check asks you to place cities in climate zones, separate the two zone systems, and state the NZ subfloor and heating rules.</p><h3>Takeaway</h3><p>Know the zone, record the construction, and keep the two countries&rsquo; rules apart. You report; the certifier certifies.</p><p>Next: Module 6, reading climate data for a job.</p><h3>Sources for this lesson</h3><ul><li><a href=\"https://abcb.prod.abcb.gov.au/ncc-navigator/understanding-ncc-climate-zones\" target=\"_blank\" rel=\"noopener noreferrer\">Australian Building Codes Board, NCC Navigator: Understanding NCC climate zones</a>. Read 21/11/2026.</li><li><a href=\"https://www.abcb.gov.au/sites/default/files/resources/2026/NCC%202025%20Condensation%20in%20building%20handbook.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">Australian Building Codes Board, Condensation in buildings handbook, NCC 2025 edition (CC BY 4.0)</a>. Read 21/11/2026.</li><li><a href=\"https://www.legislation.govt.nz/secondary-legislation/pco-drafted/1992/150/en/2026-01-15.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">New Zealand Legislation, Building Regulations 1992, Schedule 1 (the Building Code), version as at 15 January 2026</a>. Read 21/11/2026.</li><li><a href=\"https://www.legislation.govt.nz/secondary-legislation/pco-drafted/2019/88/en/2025-09-25.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">New Zealand Legislation, Residential Tenancies (Healthy Homes Standards) Regulations 2019, version as at 25 September 2025</a>. Read 21/11/2026.</li></ul><p>Worked numbers are CARSI arithmetic, shown in the lesson and logged in the course evidence ledger.</p>",
+              "orderIndex": 2,
+              "isPreview": false,
+              "resources": [
+                {
+                  "label": "Ventilation and air-change worksheet",
+                  "url": "/courses/psychrometry-building-science-for-drying/field-tools/ventilation-and-air-change-worksheet.md",
+                  "kind": "template"
+                }
+              ]
+            },
+            {
+              "id": "bcd17f20-5b39-54af-80d0-011fee4119d5",
+              "title": "Module 5 check",
+              "contentType": "quiz",
+              "contentBody": "23a3783f-caf3-5024-97db-e0d9bbd56ad8",
+              "orderIndex": 3,
+              "isPreview": false,
+              "resources": [
+                {
+                  "label": "Module 5 check",
+                  "url": "quiz:23a3783f-caf3-5024-97db-e0d9bbd56ad8"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "7e55944e-1de6-4e9a-8990-5cd985428e4e",
+          "title": "Module 6: Climate Data, Daily Monitoring and the Final Check",
+          "orderIndex": 5,
+          "lessons": [
+            {
+              "id": "2581fed0-2d04-4f9a-b73c-54a3c1e5999d",
+              "title": "Reading climate data for a job: Brisbane and Canberra compared",
+              "contentType": "text",
+              "contentBody": "<p><em>DRAFT v1 for SME review. Scenarios are illustrative and labelled; every figure is in the evidence ledger.</em></p><h3>On the job</h3><p>An insurer asks you to set expectations for two drying jobs before they start. One is in Brisbane in February, the other in Canberra in July. The client in Canberra also wants to know whether the water on the outside of her car and her roof each morning is &ldquo;from the leak&rdquo;. Public climate statistics answer both questions in a few minutes.</p><h3>The idea</h3><p>The Bureau of Meteorology publishes long-term climate statistics for Australian stations: monthly mean maximum and minimum temperatures, and mean 9 am and 3 pm temperature and RH. The ABCB condensation handbook names these statistics as among the most useful sources for judging condensation potential.</p><p>The handbook&rsquo;s method compares the monthly mean dew point with the monthly mean minimum temperature. Where the mean minimum falls below the dew point, condensation may occur under suitable surface and exposure conditions. It notes this potential is not limited to the colder months, and that its preliminary analysis found 95 of about 160 Bureau locations could see outdoor overnight condensation in at least one month of the year.</p><p>You can estimate a mean dew point from the mean 9 am temperature and RH with the Module 1 formulas. Treat it as an approximation: the Bureau notes its RH statistics do not take full account of the dependence of RH on temperature, and are approximations only.</p><p>What the data tells you on a drying job:</p><ul><li><strong>Outdoor g/kg</strong> by month, for the ventilate-or-dehumidify decision (Module 5).</li><li><strong>Overnight condensation potential</strong>, so outdoor dew on roofs, cars and cladding is not mistaken for a leak.</li><li><strong>Cold-night surface temperatures</strong> for the condensation check (Module 4).</li><li><strong>Seasonal EMC</strong>, so the dry standard is expected to sit higher in a humid month (Module 3).</li></ul><p><strong>New Zealand.</strong> The equivalent long-term station data is New Zealand&rsquo;s National Climate Database, which NIWA provides through its DataHub service. Use the nearest station to the job and the same method.</p><p><strong>Common mistakes.</strong> Using a station hundreds of kilometres away or hundreds of metres higher. Treating a monthly mean as the worst night. Forgetting the station&rsquo;s period of record.</p><h3>See it</h3><p><img src='/courses/psychrometry-building-science-for-drying/diagrams/climate-two-cities.svg' alt='Two monthly charts. Brisbane: the mean minimum temperature line sits above the estimated dew point in February and July. Canberra: in July the mean minimum of minus 0.1 degrees sits below the estimated dew point of 1.6 degrees.'></p><p>Where the mean minimum drops below the dew point, overnight outdoor condensation is likely.</p><h3>Do it in metric</h3><p><strong>Brisbane</strong> (station 040913):</p><ol><li>February 9 am mean 26.3 °C and 66 %RH: e = 22.59 hPa; dew point ≈ <strong>19.4 °C</strong>; outdoor air about 14.2 g/kg.</li><li>February mean minimum <strong>21.4 °C</strong>, about 2 °C above the dew point. July: 15.1 °C and 64 %RH gives a dew point near 8.3 °C, against a mean minimum of 10.6 °C. On the means, outdoor overnight condensation is not expected; humid summer air is the drying problem.</li></ol><p><strong>Canberra</strong> (Canberra Airport Comparison, 070014, 1939 to 2010):</p><ol><li>July 9 am mean 3.9 °C and 85 %RH: e = 0.85 × 8.08 = 6.87 hPa; dew point ≈ <strong>1.6 °C</strong>; outdoor air about 4.2 g/kg.</li><li>July mean minimum <strong>−0.1 °C</strong>: below the dew point. Dew or frost on roofs and cars is expected on many July mornings. It is not the leak.</li></ol><h3>Field download</h3><p>The <strong>Climate and daily monitoring log</strong> starts with a climate box: station, month, mean minimum, 9 am temperature and RH, estimated dew point and outdoor g/kg.</p><h3>Check yourself</h3><p>The Module 6 check asks you to compare a mean minimum with a dew point, and name the NZ climate data source.</p><h3>Takeaway</h3><p>Climate data sets expectations before day one. Mean minimum below dew point means outdoor condensation is normal.</p><p>Next: daily monitoring, and proving water is leaving.</p><h3>Sources for this lesson</h3><ul><li><a href=\"https://www.weather.gov/media/epz/wxcalc/vaporPressure.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">US National Weather Service, wxcalc worksheet: saturation and actual vapour pressure (public domain)</a>. Read 21/11/2026.</li><li><a href=\"https://www.weather.gov/media/epz/wxcalc/mixingRatio.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">US National Weather Service, wxcalc worksheet: mixing ratio (public domain)</a>. Read 21/11/2026.</li><li><a href=\"https://www.bom.gov.au/climate/averages/tables/cw_070014.shtml\" target=\"_blank\" rel=\"noopener noreferrer\">Bureau of Meteorology, Climate statistics: Canberra Airport Comparison (station 070014)</a>. Read 21/11/2026.</li><li><a href=\"https://www.bom.gov.au/climate/averages/tables/cw_040913.shtml\" target=\"_blank\" rel=\"noopener noreferrer\">Bureau of Meteorology, Climate statistics: Brisbane (station 040913)</a>. Read 21/11/2026.</li><li><a href=\"https://www.bom.gov.au/climate/cdo/about/definitions9and3.shtml\" target=\"_blank\" rel=\"noopener noreferrer\">Bureau of Meteorology, Definitions for 9am and 3pm climate statistics</a>. Read 21/11/2026.</li><li><a href=\"https://www.abcb.gov.au/sites/default/files/resources/2026/NCC%202025%20Condensation%20in%20building%20handbook.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">Australian Building Codes Board, Condensation in buildings handbook, NCC 2025 edition (CC BY 4.0)</a>. Read 21/11/2026.</li><li><a href=\"https://niwa.co.nz/climate-and-weather/national-climate-database\" target=\"_blank\" rel=\"noopener noreferrer\">Earth Sciences New Zealand (NIWA), National Climate Database</a>. Read 21/11/2026.</li></ul><p>Worked numbers are CARSI arithmetic, shown in the lesson and logged in the course evidence ledger.</p>",
+              "orderIndex": 0,
+              "isPreview": false,
+              "resources": [
+                {
+                  "label": "Climate and daily monitoring log",
+                  "url": "/courses/psychrometry-building-science-for-drying/field-tools/climate-and-daily-monitoring-log.md",
+                  "kind": "template"
+                }
+              ]
+            },
+            {
+              "id": "fb69b393-59f4-464e-a182-b685ddbe8b50",
+              "title": "Daily monitoring: readings you can trust and grain depression in g/kg",
+              "contentType": "text",
+              "contentBody": "<p><em>DRAFT v1 for SME review. Scenarios are illustrative and labelled; every figure is in the evidence ledger.</em></p><h3>On the job</h3><p>Day three on a Gold Coast kitchen loss. Two dehumidifiers run on the same 10 A circuit; the affected room reads 24 °C and 60 %RH and the assessor wants proof, in numbers, that the units are removing water and that the job is heading towards dry. Your log has to answer that without anyone needing to trust your opinion.</p><h3>The idea</h3><p>A defensible log takes the <strong>same readings, at the same points, in the same order, every visit</strong>:</p><ul><li>Outside air: °C, %RH, g/kg, for context.</li><li>An unaffected room: the target the job is drying towards.</li><li>Each affected room: °C, %RH, dew point, g/kg.</li><li>Each dehumidifier: inlet and outlet °C and %RH, converted to g/kg.</li><li>Materials: the moisture map against the dry standard (Module 3).</li></ul><p>The key dehumidifier number is <strong>grain depression</strong>: the inlet humidity ratio minus the outlet humidity ratio, in g/kg. The name comes from the imperial grains unit, but CARSI reports it in g/kg. A positive depression shows the unit is taking water out of the air passing through it. The outlet will usually be warmer and lower in RH; only g/kg tells you how much water was removed.</p><p>You can estimate how much water that is. Water removed per hour ≈ airflow (m³/h) × air density (kg/m³) × depression (g/kg) ÷ 1000, giving kilograms, about the same number of litres. Air density follows from the ideal gas law: at 101.325 kPa and 24 °C, dry air is about 1.19 kg/m³. Use the maker&rsquo;s airflow figure or a measured one, and cross-check against what the unit actually collects or pumps out.</p><p>Expect the depression to shrink as the room dries: a refrigerant unit removes less water from air that carries less. A depression that collapses while the room is still wet points to the unit, not the job: check filters, coil and airflow before you trust its numbers.</p><p><strong>Power.</strong> Australia and New Zealand both supply 230 V at 50 Hz. Current is power ÷ voltage, so loads are budgeted at 230 V. CARSI&rsquo;s Structural Drying Practitioner course teaches the full power budget and the electrical-safety rules in both countries.</p><p><strong>Common mistakes.</strong> Logging RH at the outlet and calling it dry air. Moving the reading points between visits. Reporting litres a unit &ldquo;should&rdquo; remove without checking its tank or pump.</p><h3>See it</h3><p><img src='/courses/psychrometry-building-science-for-drying/diagrams/grain-depression.svg' alt='A dehumidifier with an inlet arrow at 24 degrees, 60 percent and 11.19 grams per kilogram, and an outlet arrow at 32 degrees, 22 percent and 6.49 grams per kilogram. The difference, 4.70 grams per kilogram, is labelled grain depression.'></p><p>The outlet RH looks very low, but the g/kg difference is the evidence of water removed.</p><h3>Do it in metric</h3><ol><li>Inlet 24 °C, 60 %RH: e = 0.60 × 29.85 = 17.91 hPa; w = <strong>11.19 g/kg</strong>.</li><li>Outlet 32 °C, 22 %RH: e = 0.22 × 47.56 = 10.46 hPa; w = <strong>6.49 g/kg</strong>.</li><li>Depression = 11.19 − 6.49 = <strong>4.70 g/kg</strong>.</li><li>At 400 m³/h (illustrative maker&rsquo;s figure) and 1.19 kg/m³: 400 × 1.19 × 4.70 ÷ 1000 = <strong>2.2 L/h</strong>, about 54 L per day while conditions hold.</li><li>Power: two units at an illustrative 1000 W each draw 2000 ÷ 230 = <strong>8.7 A</strong> on one 10 A circuit. Add one more load and the circuit is over; read the rating plates and split the load.</li></ol><h3>Field download</h3><p>The <strong>Climate and daily monitoring log</strong> is the daily log: the five reading points, inlet and outlet g/kg, the depression column, the litres check and a power line at 230 V.</p><h3>Check yourself</h3><p>The Module 6 check asks you to calculate a depression and a litres-per-hour estimate, and to diagnose a collapsing depression.</p><h3>Takeaway</h3><p>Same points, same order, every visit. Depression in g/kg proves a dehumidifier works; airflow × density × depression estimates the litres.</p><p>Next: the Module 6 check, then the final knowledge check across the whole course.</p><h3>Sources for this lesson</h3><ul><li><a href=\"https://www.energy.nsw.gov.au/sites/default/files/2022-08/2016_04_NSW_VoltageOptimisationFactsheet.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">NSW Government, Voltage optimisation fact sheet</a>. Read 21/11/2026.</li><li><a href=\"https://www.electricitysafety.com.au/home-and-school/electrical-equipment\" target=\"_blank\" rel=\"noopener noreferrer\">Electricity Safety, Electrical equipment: Australian voltages</a>. Read 21/11/2026.</li><li><a href=\"https://www.legislation.govt.nz/regulation/public/2010/0036/latest/whole.html\" target=\"_blank\" rel=\"noopener noreferrer\">New Zealand Legislation, Electricity (Safety) Regulations 2010</a>. Read 21/11/2026.</li><li><a href=\"https://www.weather.gov/media/epz/wxcalc/vaporPressure.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">US National Weather Service, wxcalc worksheet: saturation and actual vapour pressure (public domain)</a>. Read 21/11/2026.</li><li><a href=\"https://www.weather.gov/media/epz/wxcalc/mixingRatio.pdf\" target=\"_blank\" rel=\"noopener noreferrer\">US National Weather Service, wxcalc worksheet: mixing ratio (public domain)</a>. Read 21/11/2026.</li><li><a href=\"https://www.nist.gov/pml/special-publication-811/nist-guide-si-appendix-b-conversion-factors/nist-guide-si-appendix-b8\" target=\"_blank\" rel=\"noopener noreferrer\">NIST Guide to the SI (SP 811), Appendix B.8 conversion factors</a>. Read 21/11/2026.</li><li><a href=\"https://physics.nist.gov/cgi-bin/cuu/Value?r\" target=\"_blank\" rel=\"noopener noreferrer\">NIST CODATA value: molar gas constant</a>. Read 21/11/2026.</li></ul><p>Worked numbers are CARSI arithmetic, shown in the lesson and logged in the course evidence ledger.</p>",
+              "orderIndex": 1,
+              "isPreview": false,
+              "resources": [
+                {
+                  "label": "Climate and daily monitoring log",
+                  "url": "/courses/psychrometry-building-science-for-drying/field-tools/climate-and-daily-monitoring-log.md",
+                  "kind": "template"
+                }
+              ]
+            },
+            {
+              "id": "4b87ae50-d4b0-5a9c-8e58-7f6022f0d2cb",
+              "title": "Module 6 check",
+              "contentType": "quiz",
+              "contentBody": "5ba0ee15-f579-56b2-b087-1ff71a93600e",
+              "orderIndex": 2,
+              "isPreview": false,
+              "resources": [
+                {
+                  "label": "Module 6 check",
+                  "url": "quiz:5ba0ee15-f579-56b2-b087-1ff71a93600e"
+                }
+              ]
+            },
+            {
+              "id": "48c428f8-c1f0-4502-8b8e-dd4de2c16185",
+              "title": "Final knowledge check",
+              "contentType": "quiz",
+              "contentBody": "02f50dfb-f5e3-4b1e-8108-4cdce4e6f4cd",
+              "orderIndex": 3,
+              "isPreview": false,
+              "resources": [
+                {
+                  "label": "Final knowledge check",
+                  "url": "quiz:02f50dfb-f5e3-4b1e-8108-4cdce4e6f4cd"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "introVideoUrl": "https://res.cloudinary.com/dmaulkthb/video/upload/v1784198022/carsi/course-intro/081f96c6-0f95-4674-be61-f6751c620967.mp4"
+    }
+  ]
+}
