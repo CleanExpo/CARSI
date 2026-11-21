@@ -154,7 +154,8 @@ function CourseEnrollmentCard({
               />
             </label>
           ) : null}
-          <div className="min-w-0 flex-1 space-y-2">
+          {/* min-w keeps the course text readable on a phone: the actions wrap below it. */}
+          <div className="min-w-[14rem] flex-1 space-y-2">
             <div className="flex flex-wrap items-center gap-2">
               <StatusBadge label={statusLabel} tone={enrollmentStatusTone(enrollment.status)} />
               {stuck ? <StatusBadge label="Not started" tone="warning" /> : null}
