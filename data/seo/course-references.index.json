@@ -1,0 +1,237 @@
+{
+  "moisture-meters-readings-and-dry-standards": {
+    "lessonsWithSources": 31,
+    "references": [
+      {
+        "label": "Bergman (2010), Wood Handbook chapter 13, USDA Forest Products Laboratory FPL-GTR-190 (public domain)",
+        "url": "https://research.fs.usda.gov/treesearch/37419",
+        "readOn": "20/11/2026"
+      },
+      {
+        "label": "Queensland Building and Construction Commission, A contractor's guide to rebuilding after a flood (May 2020), CC BY 4.0, p. 4",
+        "url": "https://www.qbcc.qld.gov.au/sites/default/files/2022-01/guide-contractor-rebuilding-after-flood.pdf",
+        "readOn": "20/11/2026"
+      },
+      {
+        "label": "Safe Work Australia, Electrical safety: WHS duties",
+        "url": "https://www.safeworkaustralia.gov.au/safety-topic/hazards/electrical-safety/whs-duties",
+        "readOn": "20/11/2026"
+      },
+      {
+        "label": "Safe Work Australia, Model Code of Practice: Managing electrical risks in the workplace (2018)",
+        "url": "https://www.safeworkaustralia.gov.au/doc/model-code-practice-managing-electrical-risks-workplace",
+        "readOn": "20/11/2026"
+      },
+      {
+        "label": "Australian Resilient Flooring Association, Technical Bulletin 001, Moisture testing of concrete subfloors (April 2025), Testing Depths",
+        "url": "https://www.arfa.org.au/uploads/1/2/3/5/123589590/arfa_tech_bulletin_001_moisture_testing.pdf",
+        "readOn": "20/11/2026"
+      },
+      {
+        "label": "Construction timbers in Queensland, Book 1: Definitions (January 2020), CC BY 4.0, definitions list",
+        "url": "https://www.publications.qld.gov.au/dataset/34cb31ba-7ae9-48ea-a7c9-228525e4c638/resource/976103a3-9ea1-44e7-a950-78ba1bd952e8/download/ctiq-book-1-definitions-jan-2020.pdf",
+        "readOn": "20/11/2026"
+      },
+      {
+        "label": "New Zealand Building Code (Building Regulations 1992, Schedule 1), clauses E2 and E3",
+        "url": "https://www.legislation.govt.nz/secondary-legislation/pco-drafted/1992/150/en/2026-01-15.pdf",
+        "readOn": "20/11/2026"
+      },
+      {
+        "label": "Ministry of Business, Innovation and Employment (NZ), Guide to tolerances, materials and workmanship in new residential construction (2015), CC BY 3.0, section 2.5 Timber floor boards",
+        "url": "https://building.govt.nz/assets/Uploads/projects-and-consents/guide-to-tolerances/guide-to-tolerances.pdf",
+        "readOn": "20/11/2026"
+      },
+      {
+        "label": "Standards Australia store listing, AS/NZS 1080.1:2012, shown as Current",
+        "url": "https://store.standards.org.au/product/as-nzs-1080-1-2012",
+        "readOn": "20/11/2026"
+      },
+      {
+        "label": "Standards Australia store listing, AS 1884:2021, shown as Current",
+        "url": "https://store.standards.org.au/product/as-1884-2021",
+        "readOn": "20/11/2026"
+      },
+      {
+        "label": "ASTM International store, F2170 (F2170-19a listed)",
+        "url": "https://store.astm.org/standards/f2170",
+        "readOn": "20/11/2026"
+      },
+      {
+        "label": "Wood Handbook ch. 4, Thermal, Electrical, and Other Properties, USDA Forest Products Laboratory FPL-GTR-190 (public domain)",
+        "url": "https://research.fs.usda.gov/treesearch/37428",
+        "readOn": "20/11/2026"
+      },
+      {
+        "label": "RICS Built Environment Journal, An introduction to building thermography (17 November 2020), professional body source",
+        "url": "https://ww3.rics.org/uk/en/journals/built-environment-journal/an-introduction-to-building-thermography.html",
+        "readOn": "20/11/2026"
+      },
+      {
+        "label": "IRISS, Moisture intrusion detection with infrared thermography (industry source)",
+        "url": "https://iriss.com/discover/blog/moisture-intrusion-detection-infrared-thermography/",
+        "readOn": "20/11/2026"
+      },
+      {
+        "label": "State of Queensland, Construction timbers in Queensland, Book 2: Specifications (January 2020), Schedule B, CC BY 4.0",
+        "url": "https://www.publications.qld.gov.au/dataset/34cb31ba-7ae9-48ea-a7c9-228525e4c638/resource/9393cc58-6f73-467a-8900-5b688888fbdb/download/ctiq-book-2-specifications-jan-2020.pdf",
+        "readOn": "20/11/2026"
+      },
+      {
+        "label": "Standards Australia store preview, AS 1884:2021, normative references",
+        "url": "https://store.standards.org.au/reader/as-1884-2021?preview=1",
+        "readOn": "20/11/2026"
+      },
+      {
+        "label": "AS 1884:2021 and ASTM F2170-19a are named by number and edition; only their public store listings were read, and no standard text is reproduced.",
+        "url": null,
+        "readOn": null
+      },
+      {
+        "label": "ARDEX Australia, TB018 Lightweight Bulk Fill Systems (2 October 2024)",
+        "url": "https://ardexaustralia.com/pdf/tech%20bulletins/TB018.008_Ardex_LightWeightBulkFill_System.pdf",
+        "readOn": "20/11/2026"
+      },
+      {
+        "label": "Hunter Pods, How to install",
+        "url": "https://www.hunterpods.com.au/how-to-install/",
+        "readOn": "20/11/2026"
+      },
+      {
+        "label": "ASTM International, F2659-23 scope, store page",
+        "url": "https://store.astm.org/f2659-23.html",
+        "readOn": "20/11/2026"
+      },
+      {
+        "label": "Wagner Meters, 10 Guidelines for ASTM F2170 Concrete Testing and Preparation",
+        "url": "https://www.wagnermeters.com/concrete-moisture-test/concrete-info/10-guidelines-for-astm-f2170-compliance/",
+        "readOn": "20/11/2026"
+      },
+      {
+        "label": "SafeWork NSW, Working safely when cutting, drilling and grinding concrete and masonry products (code of practice, commenced 22 May 2026)",
+        "url": "https://www.safework.nsw.gov.au/__data/assets/pdf_file/0017/1411433/Working_safely-COP.pdf",
+        "readOn": "20/11/2026"
+      },
+      {
+        "label": "WorkSafe Victoria, Safe concrete cutting and drilling (edition 3)",
+        "url": "https://content-v2.api.worksafe.vic.gov.au/sites/default/files/2018-06/ISBN-Safe-concrete-cutting-and-drilling-industry-standard-2017-06.pdf",
+        "readOn": "20/11/2026"
+      },
+      {
+        "label": "WorkSafe Queensland, Handheld and stand-mounted drills (last updated 28 April 2023)",
+        "url": "https://www.worksafe.qld.gov.au/safety-and-prevention/hazards/hazardous-exposures/handheld-and-stand-mounted-drills",
+        "readOn": "20/11/2026"
+      },
+      {
+        "label": "Delmhorst, What to avoid when testing moisture in your flooring system (meter maker guidance)",
+        "url": "https://www.delmhorst.com/blog/what-to-avoid-when-testing-moisture-in-your-flooring-system",
+        "readOn": "20/11/2026"
+      },
+      {
+        "label": "Delmhorst, Take care of your moisture meter (meter maker guidance on cleaning the pins)",
+        "url": "https://www.delmhorst.com/blog/take-care-of-your-moisture-meter",
+        "readOn": "20/11/2026"
+      }
+    ]
+  },
+  "water-damage-restoration-fundamentals": {
+    "lessonsWithSources": 12,
+    "references": [
+      {
+        "label": "NSW Government, Voltage optimisation fact sheet",
+        "url": "https://www.energy.nsw.gov.au/sites/default/files/2022-08/2016_04_NSW_VoltageOptimisationFactsheet.pdf",
+        "readOn": "02/11/2026"
+      },
+      {
+        "label": "Ausgrid, Electricity Safety: Electrical equipment",
+        "url": "https://www.electricitysafety.com.au/home-and-school/electrical-equipment",
+        "readOn": "02/11/2026"
+      },
+      {
+        "label": "WorkSafe ACT, Residual current devices",
+        "url": "https://www.worksafe.act.gov.au/health-and-safety-portal/safety-by-industry/electrical-and-electronics/residual-current-devices",
+        "readOn": "02/11/2026"
+      },
+      {
+        "label": "Safe Work Australia, Model WHS laws",
+        "url": "https://www.safeworkaustralia.gov.au/law-and-regulation/model-whs-laws",
+        "readOn": "02/11/2026"
+      },
+      {
+        "label": "WorkSafe Victoria, Occupational Health and Safety Act and regulations",
+        "url": "https://www.worksafe.vic.gov.au/occupational-health-and-safety-act-and-regulations",
+        "readOn": "02/11/2026"
+      },
+      {
+        "label": "WorkSafe Victoria, Information for employers: Occupational Health and Safety Act 2004",
+        "url": "https://www.worksafe.vic.gov.au/information-employers-occupational-health-and-safety-act-2004",
+        "readOn": "02/11/2026"
+      },
+      {
+        "label": "Safe Work Australia, Principles that apply to work health and safety duties",
+        "url": "https://www.safeworkaustralia.gov.au/law-and-regulation/duties-under-whs-laws/principles-apply-work-health-and-safety-duties",
+        "readOn": "02/11/2026"
+      },
+      {
+        "label": "Safe Work Australia, Duties of a PCBU",
+        "url": "https://www.safeworkaustralia.gov.au/law-and-regulation/duties-under-whs-laws/duties-pcbu",
+        "readOn": "02/11/2026"
+      },
+      {
+        "label": "Safe Work Australia, Manage the risks",
+        "url": "https://www.safeworkaustralia.gov.au/duties-tool/construction/pcbu/manage-risks",
+        "readOn": "02/11/2026"
+      },
+      {
+        "label": "Safe Work Australia, Managing risks (hierarchy of control measures)",
+        "url": "https://www.safeworkaustralia.gov.au/safety-topic/industry-and-business/agriculture/managing-risks",
+        "readOn": "02/11/2026"
+      },
+      {
+        "label": "SafeWork NSW, Electrical inspection and testing",
+        "url": "https://www.safework.nsw.gov.au/hazards-a-z/electrical-and-power/electrical-inspection-and-testing",
+        "readOn": "02/11/2026"
+      },
+      {
+        "label": "SafeWork SA, Inspection and testing of electrical equipment",
+        "url": "https://www.safework.sa.gov.au/workplaces/electrical/inspection-and-testing-of-electrical-equipment",
+        "readOn": "02/11/2026"
+      },
+      {
+        "label": "NSW Poisons Information Centre, About",
+        "url": "https://www.poisonsinfo.nsw.gov.au/about",
+        "readOn": "02/11/2026"
+      },
+      {
+        "label": "SafeWork SA, Fit testing and fit checking of RPE",
+        "url": "https://safework.sa.gov.au/workers/respiratory-protective-equipment/fit-testing-and-fit-checking-of-rpe",
+        "readOn": "02/11/2026"
+      },
+      {
+        "label": "NSW Resources Regulator, Facial hair and respiratory protective equipment (fact sheet, March 2024)",
+        "url": "https://www.resources.nsw.gov.au/sites/default/files/2024-04/fact-sheet-facial-hair-and-respiratory-protective-equipment.pdf",
+        "readOn": "02/11/2026"
+      },
+      {
+        "label": "Bureau of Meteorology, Definitions for 9am and 3pm statistics",
+        "url": "https://www.bom.gov.au/climate/cdo/about/definitions9and3.shtml",
+        "readOn": "02/11/2026"
+      },
+      {
+        "label": "Electrical Safety Office Queensland, Safety switches",
+        "url": "https://www.electricalsafety.qld.gov.au/electrical-safety-home/safety-switches",
+        "readOn": "02/11/2026"
+      },
+      {
+        "label": "ACCC, Consumer rights and guarantees",
+        "url": "https://www.accc.gov.au/consumers/buying-products-and-services/consumer-rights-and-guarantees",
+        "readOn": "02/11/2026"
+      },
+      {
+        "label": "Australian Taxation Office, How GST works",
+        "url": "https://www.ato.gov.au/businesses-and-organisations/gst-excise-and-indirect-taxes/gst/how-gst-works",
+        "readOn": "02/11/2026"
+      }
+    ]
+  }
+}

@@ -1,5 +1,6 @@
 import { CourseViewTracker } from '@/components/analytics/CourseViewTracker';
 import { CoursePublicDetail } from '@/components/lms/CoursePublicDetail';
+import { CourseReferences } from '@/components/lms/CourseReferences';
 import { HomeFaqSection } from '@/components/landing/HomeFaqSection';
 import { BreadcrumbSchema, CourseSchema, FAQSchema, VideoObjectSchema } from '@/components/seo';
 import {
@@ -8,6 +9,7 @@ import {
 } from '@/lib/designations/registry';
 import { getBackendOrigin, getPublicSiteUrl } from '@/lib/env/public-url';
 import { stripLegacyPurchaseCta } from '@/lib/lms/format-course-body';
+import { getCourseReferences } from '@/lib/seo/course-references-index';
 import { hasPublicCoursePage } from '@/lib/seo/public-course-page';
 import { normalizePublicAssetUrl } from '@/lib/remote-image';
 import {
@@ -352,6 +354,8 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
         }
         aggregateRating={aggregateRating}
       />
+      {/* BACKLOG #22: only the sources the lessons themselves cite; nothing when there are none. */}
+      <CourseReferences references={getCourseReferences(course.slug)} />
       {courseFaqs.length > 0 ? (
         <HomeFaqSection
           faqs={courseFaqs}
