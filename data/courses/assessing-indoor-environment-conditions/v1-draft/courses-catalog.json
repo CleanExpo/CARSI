@@ -63,6 +63,38 @@
           "quizzes": [
             "16f9c422-8e30-5484-a126-32565b8144a6"
           ]
+        },
+        "caseAssessments": {
+          "linearIssue": "GP-721",
+          "folder": "data/courses/assessing-indoor-environment-conditions/v1-draft/case-assessments",
+          "learnerCards": "public/courses/assessing-indoor-environment-conditions/case-assessments",
+          "cases": [
+            {
+              "id": "IE-001",
+              "quizId": "1467ead9-5d75-4ae1-a2ee-850dddd3c92b",
+              "lessonId": "24a3701d-5b8b-4c7e-a1f5-78ab15588e0d",
+              "pack": "IE-001-bedroom-moisture.md"
+            },
+            {
+              "id": "IE-002",
+              "quizId": "2c6669f8-83f8-47d3-adaf-a233d1fc7c66",
+              "lessonId": "d6183a6e-e1c4-4ee4-9f83-92f701b1d97a",
+              "pack": "IE-002-floodwater-with-pets.md"
+            },
+            {
+              "id": "IE-003",
+              "quizId": "eebd60b3-40f1-4d9d-b602-e143def5d2d7",
+              "lessonId": "804ed6cc-9aa3-4799-b522-b8deeae0d8df",
+              "pack": "IE-003-renovation-vocs-hvac.md"
+            },
+            {
+              "id": "IE-004",
+              "quizId": "5f1eb696-205c-404c-b5d3-6ab60f11ec31",
+              "lessonId": "7f6e4aeb-3afd-4571-a69f-cfa6660fe733",
+              "pack": "IE-004-commercial-dust.md"
+            }
+          ],
+          "status": "DRAFT; needs independent qualified SME and instructor signature before release"
         }
       },
       "isPublished": false,
@@ -166,6 +198,25 @@
                   "url": "quiz:2da4f327-0245-40ba-a9d6-f35c37e7ce55"
                 }
               ]
+            },
+            {
+              "id": "24a3701d-5b8b-4c7e-a1f5-78ab15588e0d",
+              "title": "Case assessment IE-001: bedroom moisture",
+              "contentType": "quiz",
+              "orderIndex": 3,
+              "isPreview": false,
+              "contentBody": "1467ead9-5d75-4ae1-a2ee-850dddd3c92b",
+              "resources": [
+                {
+                  "label": "Case assessment IE-001: bedroom moisture",
+                  "url": "quiz:1467ead9-5d75-4ae1-a2ee-850dddd3c92b"
+                },
+                {
+                  "label": "IE-001 case card",
+                  "url": "/courses/assessing-indoor-environment-conditions/case-assessments/IE-001-case-card.md",
+                  "kind": "template"
+                }
+              ]
             }
           ]
         },
@@ -215,6 +266,25 @@
                 {
                   "label": "Module 3 check",
                   "url": "quiz:c5dc143f-0393-4e00-99d3-fc3c6f349555"
+                }
+              ]
+            },
+            {
+              "id": "804ed6cc-9aa3-4799-b522-b8deeae0d8df",
+              "title": "Case assessment IE-003: renovation, VOCs and HVAC",
+              "contentType": "quiz",
+              "orderIndex": 3,
+              "isPreview": false,
+              "contentBody": "eebd60b3-40f1-4d9d-b602-e143def5d2d7",
+              "resources": [
+                {
+                  "label": "Case assessment IE-003: renovation, VOCs and HVAC",
+                  "url": "quiz:eebd60b3-40f1-4d9d-b602-e143def5d2d7"
+                },
+                {
+                  "label": "IE-003 case card",
+                  "url": "/courses/assessing-indoor-environment-conditions/case-assessments/IE-003-case-card.md",
+                  "kind": "template"
                 }
               ]
             }
@@ -268,6 +338,25 @@
                   "url": "quiz:663d808a-f9eb-4304-9740-bf67f9d5bab2"
                 }
               ]
+            },
+            {
+              "id": "d6183a6e-e1c4-4ee4-9f83-92f701b1d97a",
+              "title": "Case assessment IE-002: floodwater with pets",
+              "contentType": "quiz",
+              "orderIndex": 3,
+              "isPreview": false,
+              "contentBody": "2c6669f8-83f8-47d3-adaf-a233d1fc7c66",
+              "resources": [
+                {
+                  "label": "Case assessment IE-002: floodwater with pets",
+                  "url": "quiz:2c6669f8-83f8-47d3-adaf-a233d1fc7c66"
+                },
+                {
+                  "label": "IE-002 case card",
+                  "url": "/courses/assessing-indoor-environment-conditions/case-assessments/IE-002-case-card.md",
+                  "kind": "template"
+                }
+              ]
             }
           ]
         },
@@ -317,6 +406,25 @@
                 {
                   "label": "Module 5 check",
                   "url": "quiz:aef944c9-fab8-4f0a-9750-f532123c1938"
+                }
+              ]
+            },
+            {
+              "id": "7f6e4aeb-3afd-4571-a69f-cfa6660fe733",
+              "title": "Case assessment IE-004: commercial renovation dust",
+              "contentType": "quiz",
+              "orderIndex": 3,
+              "isPreview": false,
+              "contentBody": "5f1eb696-205c-404c-b5d3-6ab60f11ec31",
+              "resources": [
+                {
+                  "label": "Case assessment IE-004: commercial renovation dust",
+                  "url": "quiz:5f1eb696-205c-404c-b5d3-6ab60f11ec31"
+                },
+                {
+                  "label": "IE-004 case card",
+                  "url": "/courses/assessing-indoor-environment-conditions/case-assessments/IE-004-case-card.md",
+                  "kind": "template"
                 }
               ]
             }

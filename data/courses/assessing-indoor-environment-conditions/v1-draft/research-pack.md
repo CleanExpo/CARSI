@@ -37,16 +37,18 @@ entered into any AI tool, and no claim is made about what any standard contains 
 
 | Status | Rows | Meaning |
 | --- | ---: | --- |
-| VERIFIED | 67 | Primary source opened; quote ≤ 25 words. 53 opened 21/11/2026; 14 carried (see above). |
-| JUSTIFIED | 31 | 15 are our own arithmetic on labelled illustrative figures (areas, volumes, g/kg and dew point by the Magnus approximation at 101.325 kPa, ppm to mg/m³, GST). 16 are CARSI method rules built on the verified sources (reasoning in each row). |
-| GAP | 6 | Not verifiable here. **Every GAP must be cleared before go-live.** |
+| VERIFIED | 152 | Primary source opened; quote ≤ 25 words. 67 from the GP-468 draft (53 opened 21/11/2026; 14 carried, see above) and 85 added for the GP-721 case assessments, all opened 21/11/2026 (none carried). |
+| JUSTIFIED | 49 | 31 from the GP-468 draft; 18 added for the cases (4 arithmetic on labelled illustrative readings, 14 CARSI method, referral and mapping rules with reasoning in each row). |
+| GAP | 10 | 6 from the GP-468 draft, 4 added for the cases (IEA-206 to IEA-209). **Every GAP must be cleared before go-live.** |
 
-Grades: VERIFIED A1 ×4, A2 ×61, A3 ×1, B1 ×1 (AIOH, a professional body, used only to say it is
-the peak body). JUSTIFIED rows are graded B2. No vendor page is used for any claim.
+Grades: GP-468 rows VERIFIED A1 ×4, A2 ×61, A3 ×1, B1 ×1 (AIOH, a professional body, used only to
+say it is the peak body). GP-721 case rows VERIFIED A2 ×84, B2 ×1 (RSPCA Australia Knowledgebase,
+used only for "take the dog to a vet"; a government source is GAP IEA-208). JUSTIFIED rows are
+graded B2. No vendor page is used for any claim.
 
-Validate: `node scripts/audit/validate-ledger.mjs <ledger>` (exit 0, 104 entries),
+Validate: `node scripts/audit/validate-ledger.mjs <ledger>` (exit 0, 211 entries),
 `node scripts/audit/check-mutants.mjs` (OK), `node scripts/check-evidence-ledger.mjs --report <ledger>`
-(schema 0, orphan 0, founder 0, cut 0, gap 6).
+(schema 0, orphan 0, founder 0, cut 0, gap 10).
 
 ## Sources opened and graded
 
@@ -117,10 +119,16 @@ threshold (IEA-041, IEA-071, IEA-076).
 | IEA-070 | Queensland amending regulation for the WEL list and 15-substance transition actually made (WorkSafe Qld guidance states it; a practitioner source said on 12/11/2026 the regulation was not yet on the register) | Phill (SME); founder | substantiate |
 | IEA-081 | NZ CO WES-TWA still 20 ppm in the 16th edition (July 2026) | Phill (SME) | substantiate |
 | IEA-102 | Named instrument models available in AU and NZ (draft names types only; any brand needs a dated C1 availability check) | Phill (SME) | substantiate |
+| IEA-206 | IE-004: the Queensland instrument giving the 15-substance transition legal force is in force on the scenario dates (March and May 2027) | Phill (SME); founder | substantiate |
+| IEA-207 | NZ 16th-edition WES values for benzene, softwood dust, Portland cement and DPM (the cases teach no NZ numbers for these) | Phill (SME) | substantiate |
+| IEA-208 | IE-002: an AU or NZ government animal-health source on pets exposed to floodwater (currently RSPCA, B2) | Phill (SME); veterinary reviewer | substantiate |
+| IEA-209 | Independently reviewed manufacturer procedures for the case practical stations' instruments | Phill (SME); instructor | substantiate |
 
 Also for the SME to confirm (JUSTIFIED, medium confidence): IEA-004 (four-stage method), IEA-008
 (source-pathway-receptor frame), IEA-033 (thermo-hygrometer practice), IEA-044 (particle counter
-limits).
+limits); and for the cases, IEA-115 (competing-cause elimination), IEA-119 (split-system
+condensate in heating mode), IEA-174 (TVOC/PID indicator limits), IEA-175 (dry floor-waste trap) and
+IEA-203 (particle counter as a pathway indicator).
 
 ## Diagram briefs (SVGs not yet built)
 
@@ -152,3 +160,46 @@ draft. Build each to the production-skill diagram rules (viewBox `0 0 800 H`, CA
   made. `thumbnailUrl` is the existing seed image.
 - The 12 diagrams above — briefs only.
 - Narration — optional, needs a founder-approved cost quote.
+
+## Case assessments IE-001 to IE-004 (Linear GP-721, added 21/11/2026)
+
+Four original CARSI case assessments built on this draft, not a new course. Each has a case card,
+an observation / measurement / hypothesis table, a reasoned Five Whys, plausible competing causes,
+trade / IEP / medical / vet referral boundaries, a student debrief, instructor notes (with practical
+stations from the founder addendum of 14/11/2026 and the answer key), image and video briefs (briefs
+only, nothing generated) and a CPCSUS4002 reference mapping. Each has an answer-keyed quiz in
+`assessing-indoor-environment-conditions-quiz.json` (9 questions, pass 80 %, 3 attempts), linked as a
+quiz lesson after the relevant module check, with a learner case card as a lesson resource.
+
+| Case | Instructor pack (`case-assessments/`) | Learner card (`public/courses/<slug>/case-assessments/`) | Module | Quiz id | Ledger rows | Negative case |
+| --- | --- | --- | --- | --- | --- | --- |
+| IE-001 bedroom moisture (Hobart; NZ: Dunedin rental) | IE-001-bedroom-moisture.md | IE-001-case-card.md | 2 | 1467ead9-5d75-4ae1-a2ee-850dddd3c92b | IEA-105 to IEA-126 | No universal numeric mould or humidity threshold |
+| IE-002 floodwater with pets (Ipswich; NZ: Gisborne) | IE-002-floodwater-with-pets.md | IE-002-case-card.md | 4 | 2c6669f8-83f8-47d3-adaf-a233d1fc7c66 | IEA-127 to IEA-149, IEA-208 | Flood without mould |
+| IE-003 renovation, VOCs and HVAC (Melbourne; NZ: Wellington) | IE-003-renovation-vocs-hvac.md | IE-003-case-card.md | 3 | eebd60b3-40f1-4d9d-b602-e143def5d2d7 | IEA-150 to IEA-176 | VOC without CO; benzene May vs June 2027 |
+| IE-004 commercial renovation dust (Toowoomba; NZ: Hamilton) | IE-004-commercial-dust.md | IE-004-case-card.md | 5 | 5f1eb696-205c-404c-b5d3-6ab60f11ec31 | IEA-177 to IEA-206 | Queensland 2027 softwood dust, Portland cement and DPM |
+
+Cross-case rules: IEA-171 (no workplace figure is a household, pet or clearance level; every figure
+tagged with jurisdiction, substance, date, units and averaging time), IEA-210 (simulation evidence
+ceiling: no competency, clearance, verification or credential from a case), IEA-211 (observation,
+measurement and hypothesis kept apart), IEA-124 (CPCSUS4002 mapping is a reference only).
+
+**CPCSUS4002 checked 21/11/2026 on training.gov.au:** *CPCSUS4002 Use building science principles to
+construct energy efficient buildings*, Release 2, release date 24 December 2024 (first released
+27 November 2020), usage "Current" (IEA-122). Criteria mapped: 1.2, 1.3, 1.4, 2.3, 2.4, 3.2, 3.3 and
+the performance evidence on condensation and dampness (IEA-123, IEA-125, IEA-126). The mapping shows
+overlap only; it makes no recognition claim and gives no credit.
+
+**Date-scoped exposure figures used in the cases (workplace only):** WES until 30 November 2026,
+WEL from 1 December 2026 (IEA-168, IEA-169); benzene 1 ppm (3.2 mg/m³) 8-hour TWA until 1 June 2027,
+then 0.2 ppm (0.7 mg/m³) (IEA-165, IEA-166); Queensland and Victoria 15-substance transitions to
+1 December 2029, including softwood dust and Portland cement (IEA-177 to IEA-179, IEA-183, IEA-184);
+Queensland DPM interim 0.1 mg/m³ TWA (IEA-180); RCS 0.05 mg/m³ 8-hour TWA in Australia (IEA-189,
+IEA-193) and 0.025 mg/m³ in New Zealand (IEA-200).
+
+**Tests:** `src/lib/courses/indoor-environment-case-quizzes.test.ts` loads the four case quizzes and
+proves 20 groups of specific unsafe options are marked wrong, with planted-failure controls.
+
+**Still needed from a human before release:** an independent qualified SME and the instructor sign
+each case pack and quiz; the four GAP rows above are cleared; the case images, video and diagrams are
+made from the briefs and reviewed in a browser; no quiz, lesson or credential is released by this
+draft.

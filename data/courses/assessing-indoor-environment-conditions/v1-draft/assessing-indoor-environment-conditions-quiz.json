@@ -738,6 +738,474 @@
           "explanation": "Everyone gets the same facts; only the language changes. State who commissioned the report, and go back to the readings when readers disagree."
         }
       ]
+    },
+    {
+      "quizId": "1467ead9-5d75-4ae1-a2ee-850dddd3c92b",
+      "lessonTitle": "Case assessment IE-001: bedroom moisture",
+      "title": "CARSI Indoor Environment Assessment Practitioner — Case assessment IE-001: bedroom moisture",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "IE-001 (Hobart bedroom, July). You see dark spotting where the ceiling meets the outside wall. How do you record it in the observation column?",
+          "options": [
+            "Toxic mould confirmed by sight alone",
+            "Harmful mould species identified by colour",
+            "Health hazard confirmed for the infant",
+            "Dark spotting at corner, visual only"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "An observation records what you saw. Mould can look like a stain, smudge or discolouration and can be many colours, so neither its look nor its colour identifies a species or a health risk (enHealth)."
+        },
+        {
+          "questionText": "IE-001. The bedroom reads 17.0 °C and 74 %RH (dew point 12.3 °C). The corner surface reads 10.5 °C and the mid-wall 15.5 °C. What does this measurement support?",
+          "options": [
+            "Condensation can form on corner",
+            "Roof leak is now proven",
+            "Mould levels exceed safe limits",
+            "The room humidity is unsafe"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "The corner surface is below the room's dew point, so water vapour can condense on it; the mid-wall is above it. That supports the condensation hypothesis. It proves no leak and sets no health limit."
+        },
+        {
+          "questionText": "IE-001. The landlord asks for the humidity or spore number above which the bedroom becomes unsafe for the baby. What do you tell him?",
+          "options": [
+            "Seventy per cent RH is unsafe",
+            "Use a workplace limit as threshold",
+            "There is no universal safe number",
+            "Spore counts above 500 mean unsafe"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "There is no exposure limit or health guideline value for mould (enHealth). Humidity is a building condition you compare with dew point and surfaces; health questions go to a doctor."
+        },
+        {
+          "questionText": "IE-001. It has been dry for five days, yet the corner is damp every morning and dry by mid-afternoon. Which cause does this weaken most?",
+          "options": [
+            "Overnight condensation on cold surface",
+            "Rainwater leaking from roof gutters",
+            "Moisture from sleeping occupants overnight",
+            "The missing insulation at eave"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "A liquid-water leak tracks rain; dampness that comes and goes with the night and the cold surface tracks condensation. The pattern weakens the leak hypothesis without ruling it out for good."
+        },
+        {
+          "questionText": "IE-001. You run the adjoining shower for 10 minutes and re-read the shared wall: no change from the reference. What do you record?",
+          "options": [
+            "Plumbing completely ruled out forever",
+            "Shower leak not supported today",
+            "Shower leak confirmed by test",
+            "Wall is safe to occupy"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "One negative test narrows the hypothesis for that test only. Record the method, time and readings; a slow or intermittent leak can still need a licensed plumber later."
+        },
+        {
+          "questionText": "IE-001. Your fourth 'why' finds two adults and an infant sleeping with door and window shut, and clothes drying on an airer. What is the fifth 'why' looking for?",
+          "options": [
+            "Why moisture is not being removed",
+            "Who is to blame for mould",
+            "Which mould species is growing there",
+            "Whether the tenant should be evicted"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "The Five Whys ends at a cause someone can fix, not at blame. Here: no ventilation habit, no exhaust and a window kept shut. enHealth says opening a door or window is the cheapest way to reduce indoor moisture."
+        },
+        {
+          "questionText": "IE-001. From the manhole you see the ceiling insulation pulled back at the eave above the corner. Who puts it right?",
+          "options": [
+            "The assessor, during the visit",
+            "An occupational hygienist, after sampling",
+            "The tenant's doctor, by referral",
+            "A builder or insulation installer"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Fixing building fabric is trade work. The assessor records it from the manhole and does not enter or work in the roof space, which may hold cabling and, in older houses, asbestos."
+        },
+        {
+          "questionText": "IE-001. The parent says the baby has had a cough for two weeks. What goes in your report?",
+          "options": [
+            "The mould is causing the cough",
+            "Cough confirms mould exposure in bedroom",
+            "Recorded as reported; refer to doctor",
+            "The cough rules out condensation entirely"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Symptoms are recorded as reported and never diagnosed. enHealth: if you are concerned about symptoms, seek medical advice."
+        },
+        {
+          "questionText": "IE-001, New Zealand version: the same house is a Dunedin rental. Which NZ rule speaks directly to the bedroom?",
+          "options": [
+            "Healthy homes ventilation standard for rentals",
+            "Australian NCC climate zone seven rules",
+            "WorkSafe NZ workplace exposure standards apply",
+            "No rule covers rental home ventilation"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Under the healthy homes ventilation standard, openable windows, doors and skylights in each room of a rental must together be at least 5% of its floor area (Tenancy Services)."
+        }
+      ]
+    },
+    {
+      "quizId": "2c6669f8-83f8-47d3-adaf-a233d1fc7c66",
+      "lessonTitle": "Case assessment IE-002: floodwater with pets",
+      "title": "CARSI Indoor Environment Assessment Practitioner — Case assessment IE-002: floodwater with pets",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "IE-002 (Ipswich house, day 2 after floodwater reached 320 mm). No mould is visible and there is no musty smell. What do you record about mould?",
+          "options": [
+            "Present, because every flood means mould",
+            "Not observed today; later risk noted",
+            "Confirmed by smell of the floodwater",
+            "Present; take spore samples to confirm"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Record only what you observed. Wet furniture and surfaces get mouldy after a couple of days (NZ Civil Defence), so mould is a developing risk to note and manage by drying, not a finding to assume."
+        },
+        {
+          "questionText": "IE-002. Do you sample the floodwater to decide whether it is contaminated?",
+          "options": [
+            "Yes, before anyone wears gloves",
+            "Yes, results decide the PPE",
+            "Only if sewage smell present",
+            "No, presume it is contaminated"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Floodwater is often contaminated by sewage and agricultural or industrial wastes (Queensland Government), so it is treated as contaminated. A sample would answer no decision question."
+        },
+        {
+          "questionText": "IE-002. The owner wants to switch the power back on to run fans. What do you say?",
+          "options": [
+            "Not until a licensed electrician checks",
+            "Yes, if the safety switch holds",
+            "Yes, the floor has now dried",
+            "Only the circuits above water level"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "After flood damage a licensed electrician carries out verification tests before supply is reconnected (Electrical Safety Office Queensland). Stay away from a water-damaged switchboard."
+        },
+        {
+          "questionText": "IE-002. One dog drank floodwater and is now lethargic. What is your role?",
+          "options": [
+            "Diagnose leptospirosis from the dog's symptoms",
+            "Advise antibiotics from the first-aid kit",
+            "Record it; owner contacts vet now",
+            "Wait until the house is dry"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Animal health belongs to a vet. Leptospirosis affects people and animals and spreads more easily after floods (Queensland Government); a lethargic dog should see a vet promptly. You record a non-clinical concern only."
+        },
+        {
+          "questionText": "IE-002. A fibre-cement eave lining on the 1960s house has been broken by debris. What do you do?",
+          "options": [
+            "Treat as suspect; do not disturb",
+            "Sweep it up with the silt",
+            "Snap off a sample to test",
+            "Water-blast it clean, then inspect it"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "You cannot tell asbestos by looking, and damaged non-friable asbestos can release fibres (Safe Work Australia). Keep people away and refer to a licensed asbestos assessor or competent person."
+        },
+        {
+          "questionText": "IE-002. The kitchen smells strongly. Which is a plausible competing cause to the sewage hypothesis?",
+          "options": [
+            "Carbon dioxide from the occupants' breath",
+            "Radio signals from the meter box",
+            "Food spoiling in an unpowered fridge",
+            "The relative humidity reading on screen"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Good hypotheses are physically possible and testable. Spoiled food in a fridge without power is a real odour source to check before blaming sewage; carbon dioxide has no smell."
+        },
+        {
+          "questionText": "IE-002. Indoors reads 27 °C and 85 %RH (19.1 g/kg); outdoors 29 °C and 78 %RH (19.7 g/kg). What does this tell you?",
+          "options": [
+            "Indoor air is unsafe to breathe",
+            "Outdoor air is far drier today",
+            "Mould will grow within one hour",
+            "Opening up removes little moisture today"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Outdoor air holds as much water per kilogram as indoor air, so natural ventilation carries little moisture out that day. It is a drying decision, not a health verdict."
+        },
+        {
+          "questionText": "IE-002. The back stairs move underfoot and part of the deck has dropped. What happens?",
+          "options": [
+            "Test it by jumping on it",
+            "Keep off; refer to structural engineer",
+            "Prop it with a dehumidifier box",
+            "Note it only if it's insured"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Structural adequacy is outside assessor competency. Exclude people from the area and refer to a builder or structural engineer before anyone uses it."
+        },
+        {
+          "questionText": "IE-002, New Zealand version: a flooded Gisborne house. What does Health New Zealand say about floodwater?",
+          "options": [
+            "Safe once it looks clear again",
+            "Test before deciding on any PPE",
+            "Assume contaminated with sewage and chemicals",
+            "Only farm floodwater carries any risk"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Health NZ: always assume floodwater is contaminated with farm run-off, animal and human sewage and chemicals. Health questions go to a doctor or Healthline 0800 611 116."
+        }
+      ]
+    },
+    {
+      "quizId": "eebd60b3-40f1-4d9d-b602-e143def5d2d7",
+      "lessonTitle": "Case assessment IE-003: renovation, VOCs and HVAC",
+      "title": "CARSI Indoor Environment Assessment Practitioner — Case assessment IE-003: renovation, VOCs and HVAC",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "IE-003 (Melbourne townhouse, new kitchen). Heater off. A TVOC indicator reads 2.1 in the kitchen and 0.1 outdoors; the personal CO monitor reads 0 ppm. What do you record?",
+          "options": [
+            "VOC indicator raised; CO not detected",
+            "Carbon monoxide confirmed by chemical odour",
+            "VOC reading proves the heater leaks",
+            "Air is unsafe above workplace limit"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Record each reading as it is. A raised VOC indicator says nothing about carbon monoxide, and 0 ppm with the heater off says nothing about the heater in use. CO has no smell (WorkSafe NZ)."
+        },
+        {
+          "questionText": "IE-003. The occupant says: 'There's no smell when the heater runs, so there can't be CO.' What do you reply?",
+          "options": [
+            "Correct, no smell means no CO",
+            "A VOC meter will detect CO",
+            "CO has no smell; refer gasfitter",
+            "Open a window and stop worrying"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Carbon monoxide is invisible and has no smell or taste; other combustion gases may smell, but an odour can neither confirm nor exclude CO. A gasfitter checks the heater."
+        },
+        {
+          "questionText": "IE-003. Headaches are worse in the evening when the open-flued heater, rangehood and bathroom fan all run. Which hypothesis does this raise?",
+          "options": [
+            "Particleboard producing carbon monoxide at night",
+            "Exhaust fans drawing flue gases indoors",
+            "The CO monitor being too sensitive",
+            "Humidity alone causing the evening headaches"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Energy Safe Victoria: with an exhaust fan running and too little ventilation, negative pressure can draw carbon monoxide into living spaces through the heater's flue. It is a hypothesis for a gasfitter to test."
+        },
+        {
+          "questionText": "IE-003. Do you run the heater with every fan on to test for spillage yourself?",
+          "options": [
+            "Yes, for thirty minutes, windows shut",
+            "Yes, if the monitor is calibrated",
+            "Yes, with the doors left open",
+            "No; a licensed gasfitter tests it"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Negative-pressure and spillage testing is gas service work, guided for gasfitters by Energy Safe Victoria. Creating a possible CO exposure to test a hypothesis is never part of an assessment."
+        },
+        {
+          "questionText": "IE-003. Until the gasfitter attends, what interim advice do you pass on from Energy Safe Victoria?",
+          "options": [
+            "Run every fan to clear the air",
+            "Seal the vents to keep warmth in",
+            "Use the heater only at night time",
+            "Do not run exhaust fans with heater"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Energy Safe Victoria: don't operate exhaust fans at the same time as your heater. If anyone is unwell, get into fresh air and call 000 (Australia) or 111 (New Zealand)."
+        },
+        {
+          "questionText": "IE-003. The owner asks whether the kitchen VOC reading is under 'the safe limit' in the workplace list. What do you answer?",
+          "options": [
+            "Yes, below the WEL means safe",
+            "Workplace limits are not home thresholds",
+            "Yes, compare with the benzene limit",
+            "No, any reading above zero harms"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Workplace limits are set for workers and are not even a dividing line at work (Safe Work Australia). Home readings are compared with outdoors and unaffected rooms, and ventilation follows YourHome advice."
+        },
+        {
+          "questionText": "IE-003, occupational extension. In May 2027 the contractor's workers are on a site where benzene is a listed airborne contaminant. Which Australian limit applies?",
+          "options": [
+            "1 ppm (3.2 mg/m³) 8-hour TWA",
+            "0.2 ppm (0.7 mg/m³) 8-hour TWA",
+            "No benzene limit applies until 2029",
+            "The home TVOC reading applies instead"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Safe Work Australia (29/10/2026): until 1 June 2027 the benzene limit stays at 1 ppm (3.2 mg/m³) 8-hour TWA, workplace only, subject to each jurisdiction's WHS laws."
+        },
+        {
+          "questionText": "IE-003, occupational extension. The same contractor starts a job on 15 June 2027. Which Australian benzene limit applies?",
+          "options": [
+            "1 ppm (3.2 mg/m³) 8-hour TWA",
+            "The 2025 WES value still applies",
+            "0.2 ppm (0.7 mg/m³) 8-hour TWA",
+            "The residential reading sets the limit"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "From 1 June 2027 the WEL for benzene falls to 0.2 ppm (0.7 mg/m³) 8-hour TWA (Safe Work Australia). Check implementation with the state or territory WHS regulator; it is never a household figure."
+        },
+        {
+          "questionText": "IE-003, New Zealand version: a Wellington house where the flued gas heater shows soot and a yellow flame. What does WorkSafe NZ say?",
+          "options": [
+            "Keep it running to burn soot off",
+            "Turn it off; call licensed gas worker",
+            "Yellow flames are always a normal feature",
+            "Clean the flue yourself, then relight it"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "WorkSafe NZ: a yellow flame, soot or a car-exhaust smell are warning signs; turn the appliance off and contact a licensed gas worker immediately."
+        }
+      ]
+    },
+    {
+      "quizId": "5f1eb696-205c-404c-b5d3-6ab60f11ec31",
+      "lessonTitle": "Case assessment IE-004: commercial renovation dust",
+      "title": "CARSI Indoor Environment Assessment Practitioner — Case assessment IE-004: commercial renovation dust",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "IE-004 (Toowoomba, March 2027). Contractors are cutting fibre-cement sheet in a 1978 tenancy and no asbestos register is on site. What do you do?",
+          "options": [
+            "Collect the offcuts for lab testing",
+            "Ask them to wet it down",
+            "Stop that work; refer licensed assessor",
+            "Continue; bonded sheet is always safe"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Asbestos was banned in Australia in December 2003, you cannot tell it by looking, and businesses working with it must keep an asbestos register (Safe Work Australia). Stop, keep people away and refer."
+        },
+        {
+          "questionText": "IE-004. The sheet is confirmed as non-friable asbestos and 14.4 m² must come out. In Queensland, who removes it?",
+          "options": [
+            "The shopfitter, as it is bonded",
+            "A Class A or B removalist",
+            "Anyone wearing a P2 face mask",
+            "The property manager's own cleaning crew"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "WorkSafe Queensland: a class B licence covers removal of more than 10 m² of non-friable asbestos, and class A holders may also do class B work."
+        },
+        {
+          "questionText": "IE-004. In Queensland in March 2027, which limit applies to softwood dust for the framing crew?",
+          "options": [
+            "The new WEL applied from December 2026",
+            "No limit at all applies to it",
+            "The pharmacy particle count sets the limit",
+            "The WES continues until 1 December 2029"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Softwood dust is one of Queensland's 15 transition substances: the WES continues to apply until 1 December 2029 (WorkSafe Queensland). The PCBU must still minimise exposure so far as is reasonably practicable."
+        },
+        {
+          "questionText": "IE-004. A diesel forklift runs in the loading dock. In Queensland in 2027, what applies to diesel particulate matter?",
+          "options": [
+            "Interim 0.1 mg/m³ TWA until 2029",
+            "No limit until 1 December 2029",
+            "The national WEL from December 2026",
+            "The shop's PM2.5 reading sets it"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "WorkSafe Queensland: for DPM measured as respirable elemental carbon, a TWA of 0.1 mg/m³ applies until 1 December 2029. 'No limit' is the flour-dust arrangement, not DPM."
+        },
+        {
+          "questionText": "IE-004. In May 2027 a labourer mixes Portland cement for a slab patch on the Queensland site. Which list applies?",
+          "options": [
+            "The new WEL, since December 2026",
+            "No list; cement is not covered",
+            "Victoria's list, being the stricter one",
+            "The existing WES, until December 2029"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Portland cement is a Queensland transition substance, so the WES continues until 1 December 2029. Victoria has its own 15-substance transition; never flatten the dates into one national rule."
+        },
+        {
+          "questionText": "IE-004. The pharmacy manager asks whether the shop is 'clear' because silica is under 0.05 mg/m³. What do you answer?",
+          "options": [
+            "A workplace limit is not clearance",
+            "Yes, below 0.05 means customers safe",
+            "Yes, if the reading was 8-hour",
+            "No, it must be 0.025 instead"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "0.05 mg/m³ 8-hour TWA is the Australian workplace exposure standard for workers' breathing zones (Safe Work Australia). It is not a customer, household or clearance level."
+        },
+        {
+          "questionText": "IE-004. Particle counts in the pharmacy rise when the grinder runs while outdoor counts stay steady, and the shared ceiling void above the hoarding is unsealed. Which pathway fits best?",
+          "options": [
+            "From the street, through the doors",
+            "Through the open shared ceiling void",
+            "From the pharmacy's own cardboard stock",
+            "From people breathing inside the shop"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "The counts track the grinder, not the street, and there is an open path through the ceiling void. A particle counter is an indicator: it shows a pathway, not what the dust is."
+        },
+        {
+          "questionText": "IE-004. Old painted timber window frames are being dry-sanded. What does WorkSafe Queensland say about identifying lead paint?",
+          "options": [
+            "Lead paint is always bright white",
+            "A negative swab proves it absent",
+            "It cannot be identified by appearance",
+            "Only pre-1950 homes ever contain it"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Lead-based paint cannot be identified by its appearance, and test kits can give false results (WorkSafe Queensland). Treat it as possible and refer to the PCBU and an occupational hygienist."
+        },
+        {
+          "questionText": "IE-004, New Zealand version: the tenancy is in Hamilton. Which NZ position on non-friable asbestos removal is right?",
+          "options": [
+            "More than 10 m² needs a licence",
+            "Any amount can go without a licence",
+            "Only friable asbestos is ever licensed work",
+            "Australian state rules apply in New Zealand"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "WorkSafe NZ: up to and including 10 m² of non-friable asbestos over the whole project needs no licence; more needs a Class A or Class B removalist."
+        }
+      ]
     }
   ]
 }
