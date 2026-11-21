@@ -234,6 +234,13 @@ export async function enrollTeamMemberInPurchasedCourse(
   const claims = await sessionClaimsForUserId(userId);
   if (!claims) return;
 
+  // GP-759: membership survives a seat refund, so check for a paid seat before issuing one.
+  const { teamCourseSeatIsFree } = await import('@/lib/server/team-seat-refund');
+  if (!(await teamCourseSeatIsFree(teamId, slug, userId))) {
+    console.warn('[team-course-purchase] no paid seat left for member', { teamId, userId });
+    return;
+  }
+
   try {
     // Without the prerequisite the seat is issued LOCKED, not skipped (02/11/2026).
     await enrollStudentInCourse(claims, slug, `team:${teamId}`, { onPrerequisiteNotMet: 'lock' });

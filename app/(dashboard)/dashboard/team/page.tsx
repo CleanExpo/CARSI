@@ -8,6 +8,10 @@ import { useAuth } from '@/components/auth/auth-provider';
 import { ErrorBanner } from '@/components/lms/ErrorBanner';
 import { teamTierById, type TeamBundleTierId } from '@/lib/lms/pricing-tiers';
 import { apiClient, ApiClientError } from '@/lib/api/client';
+import {
+  createSeatExpansionRequests,
+  type SeatExpansionRequests,
+} from '@/lib/lms/seat-expansion-request';
 
 interface TeamMember {
   user_id: string;
@@ -118,6 +122,7 @@ function TeamDashboardPage() {
   const needsCheckoutSetup = Boolean(sessionId && !user);
   const hasSyncedRef = useRef(false);
   const initialSessionIdRef = useRef(sessionId);
+  const seatExpansionRequestsRef = useRef<SeatExpansionRequests | null>(null);
 
   // eslint-disable-next-line react-hooks/preserve-manual-memoization -- pre-existing rule promotion; behaviour-preserving suppression, real fix tracked separately
   const syncTeam = useCallback(async (activateSessionId?: string) => {
@@ -230,19 +235,22 @@ function TeamDashboardPage() {
     setExpandLoading(true);
     setError(null);
     setSuccess(null);
+    // One id per purchase: kept across a lost response and the buyer's retry, and used by the
+    // server as the Stripe idempotency key, so a retry can never charge for the seats twice.
+    const requests = (seatExpansionRequestsRef.current ??= createSeatExpansionRequests());
     try {
-      // One id per click: the API client resends it unchanged on a retry, and the server uses
-      // it as the Stripe idempotency key, so a retry can never charge for the seats twice.
       await apiClient.post('/api/lms/subscription/teams/expand-seats', {
         additional_seats: additionalSeats,
-        request_id: crypto.randomUUID(),
+        request_id: requests.currentId(),
       });
+      requests.settle(200);
       setSuccess(
         `Added ${additionalSeats} seat${additionalSeats === 1 ? '' : 's'}. You can invite again.`,
       );
       setSeatExpansionOpen(false);
       await syncTeam();
     } catch (err) {
+      requests.settle(err instanceof ApiClientError ? err.status : undefined);
       setError(err instanceof ApiClientError ? err.message : 'Could not add seats.');
     } finally {
       setExpandLoading(false);

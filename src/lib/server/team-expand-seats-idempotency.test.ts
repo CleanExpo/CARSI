@@ -70,6 +70,7 @@ vi.mock('@/lib/api/stripe', () => ({
 }));
 
 const { POST } = await import('../../../app/api/lms/subscription/teams/expand-seats/route');
+const { createSeatExpansionRequests } = await import('@/lib/lms/seat-expansion-request');
 
 function expand(body: Record<string, unknown>) {
   return POST(
@@ -112,6 +113,29 @@ describe('GP-759 (c): Teams seat expansion is idempotent per click', () => {
     await expand({ additional_seats: 1, request_id: 'click-bbbb-000002' });
 
     expect(h.applied).toEqual([6, 7]);
+  });
+
+  it("the buyer's own retry after a lost response (timeout) reuses the id, so seats are added once", async () => {
+    let n = 0;
+    const requests = createSeatExpansionRequests(() => `purchase-${String(++n).padStart(4, '0')}-id`);
+
+    // Attempt 1 reached Stripe, but the browser timed out (the API client reports 408).
+    const first = await expand({ additional_seats: 2, request_id: requests.currentId() });
+    expect(first.status).toBe(200);
+    requests.settle(408);
+    h.sub.seatLimit = 7; // the webhook stored the new count
+
+    // The buyer clicks Add again.
+    const retry = await expand({ additional_seats: 2, request_id: requests.currentId() });
+    requests.settle(retry.status);
+
+    expect(h.applied).toEqual([7]);
+    expect(retry.status).toBe(409);
+
+    // A known outcome ends that purchase: the next one gets a new id and is applied.
+    const next = await expand({ additional_seats: 1, request_id: requests.currentId() });
+    expect(next.status).toBe(200);
+    expect(h.applied).toEqual([7, 8]);
   });
 
   it('a request without a click id is refused before Stripe is called', async () => {

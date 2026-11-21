@@ -67,6 +67,21 @@ vi.mock('@/lib/server/stripe-revocation', async (importOriginal) => ({
   }),
 }));
 
+// Spare-invite path: the real member-enrol entry point, with the enrolment writer faked to
+// reactivate the row the way the real writer does for a revoked team seat.
+const enrolSpy = vi.hoisted(() => vi.fn());
+vi.mock('@/lib/server/enrollment-service', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/server/enrollment-service')>()),
+  enrollStudentInCourse: enrolSpy,
+}));
+vi.mock('@/lib/server/team-course-slug-db', () => ({
+  readTeamCourseSlug: vi.fn(async () => 'team-course'),
+  writeTeamCourseSlug: vi.fn(async () => {}),
+}));
+vi.mock('@/lib/server/lms-auth', () => ({
+  sessionClaimsForUserId: vi.fn(async (userId: string) => ({ sub: userId, email: `${userId}@seat-refund-test.invalid` })),
+}));
+
 vi.mock('@/lib/prisma', () => {
   const client = {
     lmsTeamCoursePurchase: {
@@ -147,7 +162,7 @@ vi.mock('@/lib/prisma', () => {
 });
 
 const { POST } = await import('../../../app/api/lms/webhooks/stripe/route');
-const { provisionTeamCoursePurchase } = await import('./team-course-purchase');
+const { provisionTeamCoursePurchase, enrollTeamMemberInPurchasedCourse } = await import('./team-course-purchase');
 
 let seq = 0;
 async function refund(sessionId: string, amountRefunded = 100_000) {
@@ -173,6 +188,12 @@ async function refund(sessionId: string, amountRefunded = 100_000) {
 const active = () => db.enrolments.filter((e) => e.status === 'active').map((e) => e.studentId);
 
 beforeEach(() => {
+  enrolSpy.mockReset();
+  enrolSpy.mockImplementation(async (claims: { sub: string }, _slug: string, ref: string) => {
+    const row = db.enrolments.find((e) => e.studentId === claims.sub);
+    if (row) Object.assign(row, { status: 'active', revokedReason: null, paymentReference: ref });
+    return { status: 'reactivated' };
+  });
   process.env.STRIPE_WEBHOOK_SECRET = 'whsec_test_placeholder';
   process.env.DATABASE_URL = 'postgresql://offline.invalid/test';
   db.team.seatLimit = 8;
@@ -243,5 +264,23 @@ describe('GP-759 (c): refunding a team seat purchase revokes those seats', () =>
 
     expect(db.team.seatLimit).toBe(5);
     expect(active()).toEqual(['owner', 'm1', 'm2', 'm3', 'm4']);
+  });
+  it('a spare invite accepted after the refund does not reissue a refunded member seat', async () => {
+    await refund('cs_test_second');
+    expect(db.enrolments.find((e) => e.studentId === 'm6')?.status).toBe('revoked');
+
+    await enrollTeamMemberInPurchasedCourse('m6', 'team-1');
+
+    expect(enrolSpy).not.toHaveBeenCalled();
+    expect(db.enrolments.find((e) => e.studentId === 'm6')?.status).toBe('revoked');
+  });
+
+  it('control: a member re-accepting while a paid seat is free is enrolled', async () => {
+    db.enrolments.find((e) => e.studentId === 'm6')!.status = 'revoked';
+
+    await enrollTeamMemberInPurchasedCourse('m6', 'team-1');
+
+    expect(enrolSpy).toHaveBeenCalledTimes(1);
+    expect(db.enrolments.find((e) => e.studentId === 'm6')?.status).toBe('active');
   });
 });

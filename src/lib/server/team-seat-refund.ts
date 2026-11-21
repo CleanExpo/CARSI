@@ -107,3 +107,46 @@ export async function revokeTeamSeatBlocksForRefund(
 
   return { blocks: blocks.length, seatsRevoked };
 }
+
+/**
+ * GP-759 (c): whether a paid seat in this course is free for `userId` in a course-purchase team.
+ * Counts the same way as the refund rule above: seats are the team's blocks for the course, and
+ * holders are the team's members with an active or completed enrolment in it (not counting
+ * `userId`). Team membership survives a refund, so a spare invite or a re-accept must pass this
+ * before a refunded member seat is issued again. A team with no blocks for the course (older
+ * teams, before seat blocks existed) is left to the team seat limit, as before.
+ */
+export async function teamCourseSeatIsFree(
+  teamId: string,
+  courseSlug: string,
+  userId: string,
+): Promise<boolean> {
+  const slug = courseSlug.trim().toLowerCase();
+  const blocks = (
+    await prisma.lmsTeamCoursePurchase.findMany({
+      where: { teamId },
+      select: { courseSlug: true, seatLimit: true },
+    })
+  ).filter((p) => p.courseSlug.trim().toLowerCase() === slug);
+  if (blocks.length === 0) return true;
+  const courseSeats = blocks.reduce((sum, p) => sum + p.seatLimit, 0);
+  if (courseSeats <= 0) return false;
+
+  const course = await prisma.lmsCourse.findUnique({ where: { slug }, select: { id: true } });
+  if (!course) return true; // the enrolment writer reports COURSE_NOT_FOUND
+  const others = (
+    await prisma.lmsTeamMember.findMany({ where: { teamId }, select: { userId: true } })
+  )
+    .map((m) => m.userId)
+    .filter((id) => id !== userId);
+  if (others.length === 0) return true;
+  const holders = await prisma.lmsEnrollment.findMany({
+    where: {
+      courseId: course.id,
+      studentId: { in: others },
+      status: { in: ['active', 'completed'] },
+    },
+    select: { id: true },
+  });
+  return holders.length < courseSeats;
+}
