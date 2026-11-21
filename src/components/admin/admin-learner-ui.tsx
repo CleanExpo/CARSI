@@ -10,7 +10,9 @@ export function completionColor(completionPct: number) {
 export function formatAdminDateTime(iso: string | null | undefined): string {
   if (!iso) return '—';
   try {
-    return new Date(iso).toLocaleString(undefined, {
+    // A fixed locale: the server and the browser must render the same text, or React's
+    // hydration check (#418) fails and the page is rebuilt on the client.
+    return new Date(iso).toLocaleString('en-AU', {
       dateStyle: 'medium',
       timeStyle: 'short',
     });
@@ -22,7 +24,7 @@ export function formatAdminDateTime(iso: string | null | undefined): string {
 export function formatAdminDate(iso: string | null | undefined): string {
   if (!iso) return '—';
   try {
-    return new Date(iso).toLocaleDateString(undefined, { dateStyle: 'medium' });
+    return new Date(iso).toLocaleDateString('en-AU', { dateStyle: 'medium' });
   } catch {
     return '—';
   }
