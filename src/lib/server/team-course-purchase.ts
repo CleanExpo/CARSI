@@ -108,12 +108,18 @@ export async function provisionTeamCoursePurchase(params: {
         throw new Error('ALREADY_ON_TEAM');
       }
 
-      await insertTeamCoursePurchaseTx(tx, {
+      const inserted = await insertTeamCoursePurchaseTx(tx, {
         teamId: team.id,
         courseSlug,
         seatLimit: seatCount,
         paymentReference,
       });
+      // A replayed fulfilment of a session already on record changes nothing. Recomputing here
+      // used to fall back to `seatCount` when the blocks summed to 0, which put the seats of a
+      // refunded block (zeroed by team-seat-refund.ts) straight back (GP-759).
+      if (!inserted) {
+        return { teamId: team.id, teamSlug: team.slug };
+      }
 
       const totalSeats = await sumTeamCoursePurchaseSeatsTx(tx, team.id);
       await tx.lmsTeam.update({

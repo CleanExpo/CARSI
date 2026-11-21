@@ -231,8 +231,11 @@ function TeamDashboardPage() {
     setError(null);
     setSuccess(null);
     try {
+      // One id per click: the API client resends it unchanged on a retry, and the server uses
+      // it as the Stripe idempotency key, so a retry can never charge for the seats twice.
       await apiClient.post('/api/lms/subscription/teams/expand-seats', {
         additional_seats: additionalSeats,
+        request_id: crypto.randomUUID(),
       });
       setSuccess(
         `Added ${additionalSeats} seat${additionalSeats === 1 ? '' : 's'}. You can invite again.`,

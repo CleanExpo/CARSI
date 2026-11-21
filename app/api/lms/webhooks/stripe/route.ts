@@ -54,6 +54,7 @@ import {
 import { markSubscriptionStatusBySubscriptionId } from '@/lib/server/subscription-store';
 import { handleSubscriptionEvent, isSubscriptionEvent } from '@/lib/server/subscription-webhook';
 import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase';
+import { revokeTeamSeatBlocksForRefund } from '@/lib/server/team-seat-refund';
 import { markTeamSubscriptionStatusBySubscriptionId } from '@/lib/server/team-subscription-store';
 
 /**
@@ -193,6 +194,10 @@ async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
     }
     if (revokeEntitlement) {
       await revokeEnrollmentsByPaymentReference(ref, reason, eventTimestamp);
+    }
+    // GP-759 (c): a refunded team seat checkout also takes its seats back.
+    if (revokeEntitlement && reason === 'refunded') {
+      await revokeTeamSeatBlocksForRefund(ref, eventTimestamp);
     }
   }
 }
