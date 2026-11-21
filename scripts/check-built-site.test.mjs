@@ -17,7 +17,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { checkBuiltSite, HTML_TAG, listServedFiles, scanBuiltFile } from './check-built-site.mjs';
-import { bannedRules, neutraliseCecExemptions } from './check-iicrc-terminology.mjs';
+import { bannedRules } from './check-iicrc-terminology.mjs';
 
 const SCRIPT = join(dirname(fileURLToPath(import.meta.url)), 'check-built-site.mjs');
 let failed = 0;
@@ -52,17 +52,21 @@ const timed = (fn) => {
 };
 {
   const rules = bannedRules();
-  const cec = rules.findIndex((r) => r.neutralise === neutraliseCecExemptions);
-  ok(cec >= 0, 'rule #4 (CEC claim) is found by its neutralise function');
-  const rule4 = (line) => rules[cec].re.test(neutraliseCecExemptions(line));
-  const [small] = timed(() => rule4(vlq(262_144)));
-  const [large] = timed(() => rule4(vlq(1_048_576)));
+  const cec = rules.findIndex((r) => /earns\/awards IICRC CECs/.test(r.message));
+  ok(cec >= 0, 'rule #4 (CEC claim) is found by its message');
+  const { re, neutralise } = rules[cec];
+  const rule4 = (line) =>
+    re.test(typeof neutralise === 'function' ? neutralise(line) : line.replace(neutralise, ' '));
+  // The small size runs first, and a slow one stops the test there, so a regression fails in
+  // seconds instead of hanging CI the way the original walk did.
+  const [small] = timed(() => rule4(vlq(65_536)));
+  const [large] = small < 2_000 ? timed(() => rule4(vlq(1_048_576))) : [Infinity];
   ok(
-    large < 5_000 && large / Math.max(small, 1) < 8,
-    `rule #4 is linear on a VLQ line: 256k ${small.toFixed(0)}ms, 1M ${large.toFixed(0)}ms`
+    large < 5_000 && large / Math.max(small, 1) < 32,
+    `rule #4 is linear on a VLQ line: 64k ${small.toFixed(0)}ms, 1M ${large.toFixed(0)}ms`
   );
   ok(
-    rule4(`${vlq(500_000)};This course earns 8 IICRC CECs;${vlq(500_000)}`),
+    large !== Infinity && rule4(`${vlq(500_000)};This course earns 8 IICRC CECs;${vlq(500_000)}`),
     'rule #4 still catches a CEC claim in the middle of a 1M-character line'
   );
 
