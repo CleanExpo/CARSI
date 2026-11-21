@@ -336,6 +336,11 @@ check('a script line is suppressed only when a JS lexer confirms the comment (#1
     '<script>if (a) /[/*]/.test(b);\n// */ fetch("//localhost:3000/api")</script>',
     '<script>if (a) /\'/.test(b);\n// "//localhost:3000/api"</script>',
     '<script>/* never closed\n// "//localhost:3000/api"</script>',
+    // CodeRabbit on #1192: a `/` after an expression end is division, not a regex start.
+    '<script>\nlet x = 2; x++ / 2 /*\n// */ fetch("//localhost:3000/api")\n</script>',
+    '<script>let x = 2; x-- / 2 /*\n// */ fetch("//localhost:3000/api")</script>',
+    '<script>a[0] / 2 /*\n// */ fetch("//localhost:3000/api")</script>',
+    '<script>f() / 2 /*\n// */ fetch("//localhost:3000/api")</script>',
   ]) {
     assert.deepEqual(findLocalOrigins(html), ['//localhost:3000'], JSON.stringify(html));
   }

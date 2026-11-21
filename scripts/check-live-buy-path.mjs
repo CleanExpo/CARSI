@@ -86,6 +86,13 @@ const REGEX_AFTER_WORD = new Set(
   'return typeof instanceof in of new delete void throw case do else yield await'.split(' ')
 );
 
+/**
+ * Punctuators after which a `/` starts a regular expression ('' is the start of the script, '='
+ * also stands for a REGEX_AFTER_WORD keyword). `)` and `}` are left out on purpose: either can
+ * end an expression, so a `/` after them stops recording (a false red, never a false green).
+ */
+const REGEX_AFTER_PUNCT = new Set(['', ...'(,=:[!&|?{;~+-*%<>^']);
+
 function precededByEquals(s, i) {
   let j = i - 1;
   while (j >= 0 && isSpace(s[j])) j -= 1;
@@ -133,7 +140,8 @@ function readAttributes(s, j, onAttr) {
  * `${}` nesting) and regular expressions, so `/*\n// *\/ fetch("//h")` is code, not a comment.
  * Only a comment that is the first token on its line is recorded. The scan stops recording at
  * the first thing it cannot read with certainty (an unterminated string or regex, an unclosed
- * block comment, a `/` after `)` or `}`): a missed suppression is a false red, never a false
+ * block comment, a `/` after `)`, `}`, `++`, `--` or any other context that is not plainly a
+ * regex start): a missed suppression is a false red, never a false
  * green.
  */
 function scriptLineComments(s, a, b, out) {
@@ -202,12 +210,14 @@ function scriptLineComments(s, a, b, out) {
       continue;
     }
     if (c === '/') {
-      if (prev === ')' || prev === '}') return;
       if (prev === 'x') {
         i += 1;
         prev = '/';
         continue;
       }
+      // CodeRabbit on #1192: a regex may start only where no expression can end. After `)`,
+      // `}`, a postfix `++`/`--` or anything else not listed, the reading is unclear, so stop.
+      if (!REGEX_AFTER_PUNCT.has(prev)) return;
       let j = i + 1;
       let inClass = false;
       for (;;) {
@@ -239,6 +249,12 @@ function scriptLineComments(s, a, b, out) {
         continue;
       }
       braces[braces.length - 1] -= 1;
+    }
+    if ((c === '+' || c === '-') && s[i + 1] === c) {
+      // `++` / `--`: prefix or postfix cannot be told apart here, so a `/` after it is unclear.
+      prev = '++';
+      i += 2;
+      continue;
     }
     prev = c === ']' ? 'x' : c;
     i += 1;

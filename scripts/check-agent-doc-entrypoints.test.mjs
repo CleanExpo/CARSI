@@ -289,3 +289,60 @@ test('control: the section holds only an indented nested ### heading fails', () 
     assert.ok(licenceGone(errs), JSON.stringify(pad) + '\n' + errs.join('\n'));
   }
 });
+
+// ---- CodeRabbit on #1192: a code span can run over several lines of one paragraph ----
+
+const importsMissing = (errs) =>
+  ['docs/agents/CLAUDE.md', 'docs/agents/AGENTS.md'].every((doc) =>
+    errs.some((m) => m.includes('.claude/CLAUDE.md') && m.includes(doc))
+  );
+
+test('control: imports inside a multi-line code span do not count', () => {
+  const errs = rewrite('.claude/CLAUDE.md', (t) =>
+    t
+      .replace('@../docs/agents/CLAUDE.md', '')
+      .replace(
+        '@../docs/agents/AGENTS.md',
+        'Example `first line\nmarker <!-- literal -->\n@../docs/agents/CLAUDE.md\n@../docs/agents/AGENTS.md\nlast line`.'
+      )
+  );
+  assert.ok(importsMissing(errs), errs.join('\n'));
+});
+
+test('control: a <!-- inside a multi-line code span does not hide the imports after it', () => {
+  const errs = rewrite('.claude/CLAUDE.md', (t) =>
+    t.replace(
+      'Licence, course production',
+      'Use `literal\nas <!--` in an example.\n\nLicence, course production'
+    )
+  );
+  assert.deepEqual(errs, []);
+});
+
+test('control: a <!-- that starts a line ends the paragraph, so it still opens a comment', () => {
+  // CommonMark: a line starting with <!-- begins an HTML block, which interrupts the paragraph,
+  // so the backtick before it closes nothing (marked lexes it the same way).
+  const errs = rewrite('.claude/CLAUDE.md', (t) =>
+    t.replace(
+      'Licence, course production',
+      'Use `literal\n<!--` in an example.\n\nLicence, course production'
+    )
+  );
+  assert.ok(importsMissing(errs), errs.join('\n'));
+});
+
+for (const [name, wrap] of [
+  ['after an unmatched backtick', (r) => `a stray \` here\n${r}\nmore text`],
+  ['after a `` run that only a ` run follows', (r) => `opens \`\` here\n${r}\ncloses \` only`],
+  [
+    'after a backtick whose match is past a blank line',
+    (r) => `starts \`here\n\n${r}\nends here\``,
+  ],
+  ['after a multi-line span that closed earlier', (r) => `Example \`first\nline\` then\n${r}`],
+  ['after an escaped backtick', (r) => `a \\\` here\n${r}\nand \` there`],
+]) {
+  test(`control: an import ${name} still counts`, () => {
+    const errs = importHidden(wrap);
+    assert.ok(!importMissing(errs), errs.join('\n'));
+  });
+}
