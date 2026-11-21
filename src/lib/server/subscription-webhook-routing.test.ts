@@ -84,6 +84,11 @@ vi.mock('@/lib/api/stripe', () => ({
     subscriptions: { retrieve: vi.fn() },
   }),
 }));
+// GP-759 unfulfilled-payment ledger: a database write, covered by stripe-webhook-unfulfilled.test.ts.
+vi.mock('./payment-integrity-ledger', () => ({
+  recordUnfulfilledPayment: vi.fn(async () => {}),
+  resolveUnfulfilledPayment: vi.fn(async () => {}),
+}));
 
 import { handleSubscriptionEvent, subscriptionKindFromPlan } from './subscription-webhook';
 

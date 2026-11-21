@@ -9,7 +9,8 @@
  * silently dropped.
  */
 
-const TERMINAL_FULFILLMENT_REASONS = new Set<string>(['ALREADY_ON_TEAM']);
+// PAYMENT_REVERSED (GP-759): the session was refunded or charged back; no retry can fulfil it.
+const TERMINAL_FULFILLMENT_REASONS = new Set<string>(['ALREADY_ON_TEAM', 'PAYMENT_REVERSED']);
 
 export function shouldRetryWebhookFulfillment(errorMessage: string): boolean {
   return !TERMINAL_FULFILLMENT_REASONS.has(errorMessage);

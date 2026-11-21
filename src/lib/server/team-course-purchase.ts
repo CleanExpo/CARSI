@@ -2,7 +2,12 @@ import { Prisma } from '@/generated/prisma/client';
 import type { SessionClaims } from '@/lib/auth/session-jwt';
 import { prisma } from '@/lib/prisma';
 import { enrollStudentInCourse } from '@/lib/server/enrollment-service';
+import { isStripeCheckoutPaymentReference } from '@/lib/lms/course-prerequisites';
 import { sessionClaimsForUserId } from '@/lib/server/lms-auth';
+import {
+  isCheckoutPaymentReversed,
+  PAYMENT_REVERSED,
+} from '@/lib/server/payment-integrity-ledger';
 import { createUniqueTeamSlug } from '@/lib/server/teams';
 
 const COURSE_BUNDLE_TIER = 'course_purchase';
@@ -189,6 +194,15 @@ export async function fulfillCourseCheckoutForUser(params: {
       courseId: alreadyEnrolled ? undefined : result.courseId,
       redirectPath: learnPath,
     };
+  }
+
+  // GP-759: the buyer may already hold the course through another payment ('already_enrolled'
+  // skips the enrolment writer's reversal check), so check again before provisioning seats.
+  if (
+    isStripeCheckoutPaymentReference(paymentReference) &&
+    (await isCheckoutPaymentReversed(paymentReference))
+  ) {
+    throw new Error(PAYMENT_REVERSED);
   }
 
   const user = await prisma.lmsUser.findUnique({

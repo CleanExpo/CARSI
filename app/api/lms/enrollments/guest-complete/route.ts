@@ -5,6 +5,11 @@ import { getStripeClient } from '@/lib/api/stripe';
 import { notifyCrmEnrollmentCreated } from '@/lib/server/crm-enrollment-notify';
 import { sendEnrollmentWelcomeEmail } from '@/lib/server/enrollment-email';
 import { findOrCreateGuestUser } from '@/lib/server/guest-checkout';
+import {
+  markUnfulfilledPaymentResolved,
+  PAYMENT_REVERSED,
+  PAYMENT_REVERSED_BODY,
+} from '@/lib/server/payment-integrity-ledger';
 import { captureServerError } from '@/lib/server/sentry';
 import { getTeamForUser } from '@/lib/server/teams';
 import { fulfillCourseCheckoutForUser } from '@/lib/server/team-course-purchase';
@@ -98,6 +103,8 @@ export async function POST(request: NextRequest) {
       teamSeatCount: Number.isFinite(teamSeatCount) ? teamSeatCount : undefined,
     });
 
+    await markUnfulfilledPaymentResolved(sessionId, '[guest-complete]');
+
     const teamName = typeof body.team_name === 'string' ? body.team_name.trim() : '';
     if (purchaseMode === 'team' && teamName.length >= 2) {
       const ownedTeam = await getTeamForUser(claims.sub);
@@ -153,6 +160,9 @@ export async function POST(request: NextRequest) {
         { detail: 'You already belong to another team. Contact support@carsi.com.au' },
         { status: 409 },
       );
+    }
+    if (msg === PAYMENT_REVERSED) {
+      return NextResponse.json(PAYMENT_REVERSED_BODY, { status: 403 });
     }
     console.error('[guest-complete]', e);
     void captureServerError(e, { route: '/api/lms/enrollments/guest-complete' });

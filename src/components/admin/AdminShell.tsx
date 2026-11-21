@@ -15,6 +15,7 @@ import {
   Megaphone,
   NotebookPen,
   Percent,
+  ReceiptText,
   Send,
   Users,
   MessageCircleQuestion,
@@ -112,6 +113,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const accountabilityActive = pathname.startsWith('/admin/coaching-accountability');
   const analyticsActive = pathname.startsWith('/admin/analytics');
   const yearlyMembershipActive = pathname.startsWith('/admin/yearly-membership');
+  const unfulfilledPaymentsActive = pathname.startsWith('/admin/unfulfilled-payments');
   const iicrcCecActive = pathname.startsWith('/admin/iicrc-cec');
   const assessmentsActive = pathname.startsWith('/admin/practical-assessments');
   const ccwRoadshowActive = pathname.startsWith('/admin/ccw-roadshow');
@@ -172,6 +174,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           label="Yearly Membership"
           icon={BadgeCheck}
           active={yearlyMembershipActive}
+        />
+        <NavButton
+          href="/admin/unfulfilled-payments"
+          label="Unfulfilled Payments"
+          icon={ReceiptText}
+          active={unfulfilledPaymentsActive}
         />
         <NavButton href="/admin/iicrc-cec" label="IICRC CEC" icon={Send} active={iicrcCecActive} />
         <NavButton

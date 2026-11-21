@@ -24,6 +24,10 @@ import {
   findCoursePrerequisiteBlock,
   PrerequisiteNotMetError,
 } from '@/lib/server/course-prerequisites';
+import {
+  isCheckoutPaymentReversed,
+  PAYMENT_REVERSED,
+} from '@/lib/server/payment-integrity-ledger';
 
 /**
  * Quiz gate for completion (Phase 6, 2026-06-29 audit): a course is only
@@ -83,8 +87,25 @@ export async function enrollStudentInCourse(
     where: {
       studentId_courseId: { studentId: claims.sub, courseId: course.id },
     },
-    select: { id: true, status: true },
+    select: { id: true, status: true, paymentReference: true, revokedReason: true },
   });
+
+  // GP-759: a refunded or charged-back checkout session never issues or reactivates access.
+  // Stripe still reports such a session as `paid`, so the success page alone cannot tell.
+  // Refused when the revoked row was revoked for this very session, or when the reversal was
+  // recorded before any row existed. A NEW paid session still reactivates (re-purchase below).
+  // Checked only when this call would issue access (no row, or a revoked row): a learner who
+  // already holds live access through another payment still gets 'already_enrolled'.
+  const wouldIssueAccess = !existing || isRevokedStatus(existing.status);
+  if (wouldIssueAccess && isStripeCheckoutPaymentReference(paymentReference)) {
+    const revokedForThisPayment =
+      existing !== null &&
+      existing.paymentReference === paymentReference &&
+      (existing.revokedReason === 'refunded' || existing.revokedReason === 'disputed');
+    if (revokedForThisPayment || (await isCheckoutPaymentReversed(paymentReference))) {
+      throw new Error(PAYMENT_REVERSED);
+    }
+  }
 
   // Prerequisite gate (DECISIONS #41) — checked only when an enrolment is ISSUED (a new
   // row, or a revoked row being reactivated). An existing active/completed row is

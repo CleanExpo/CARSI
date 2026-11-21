@@ -17,6 +17,11 @@ import type Stripe from 'stripe';
 const upsertSubscription = vi.fn(async () => {});
 const resolveUserIdForStripeSubscription = vi.fn(async () => 'user-trial-1');
 
+// GP-759 unfulfilled-payment ledger (a database write), covered by stripe-webhook-unfulfilled.test.ts.
+vi.mock('./payment-integrity-ledger', () => ({
+  recordUnfulfilledPayment: vi.fn(async () => {}),
+  resolveUnfulfilledPayment: vi.fn(async () => {}),
+}));
 vi.mock('./subscription-store', () => ({
   upsertSubscription: (...a: unknown[]) => upsertSubscription(...(a as [])),
   resolveUserIdForStripeSubscription: (...a: unknown[]) =>
