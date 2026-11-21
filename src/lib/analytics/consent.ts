@@ -15,7 +15,8 @@
  *     lower-case words. Every other query key is stripped. The title sent is the route form,
  *     never document.title. These are allow-lists: nothing is sent because it "looks safe".
  *  4. The same rules are applied again to each request at the moment the browser sends it
- *     (`screenCollect`), because the Google library adds data of its own.
+ *     (`screenCollect`), because the Google library adds data of its own. A field the wire check
+ *     does not know drops the event (GP-750).
  */
 
 import { PUBLIC_ROUTES } from './public-routes';
@@ -406,7 +407,76 @@ export interface ScreenedRequest {
 }
 
 const NUMBER_VALUE = /^-?\d{1,15}(\.\d{1,10})?$/;
-const RULED_FIELDS: ReadonlySet<string> = new Set(['tid', 'en', 'dl', 'dr', 'dt', 'dp']);
+const RULED_FIELDS: ReadonlySet<string> = new Set(['tid', 'en', 'dl', 'dr', 'dt', 'dp', 'cu']);
+
+/**
+ * The Google library's own fields that may appear in a request, outside the event parameters
+ * (`ep.` and `epn.`) and the ruled fields above. This is an allow-list (GP-750): a field not
+ * named here, or in RULED_FIELDS, drops the event, whatever its value looks like, because a
+ * plain user id or member number has no shape to catch. Values are still refused when they
+ * carry an email or a web address.
+ *
+ * When Google adds a field, the hits that carry it stop leaving until it is named here: rerun
+ * scripts/analytics-proof/consent-proof.mjs, read the fields of the hits it records, and add only
+ * fields that are the library's bookkeeping, never one that can carry who the visitor is.
+ */
+export const LIBRARY_FIELDS: ReadonlySet<string> = new Set([
+  // Protocol, property and tag
+  'v',
+  'gtm',
+  '_p',
+  '_gaz',
+  'tag_exp',
+  'ptag_exp',
+  'pscdl',
+  // Consent state and advertising signals (all denied by public/ga-init.js and the config call)
+  'gcs',
+  'gcd',
+  'gcu',
+  'gcut',
+  'npa',
+  'dma',
+  'dma_cps',
+  // The pseudonymous browser and session the library keeps in the _ga cookies
+  'cid',
+  'sid',
+  'sct',
+  'seg',
+  '_s',
+  '_fv',
+  '_ss',
+  '_nsi',
+  '_c',
+  '_ee',
+  '_et',
+  'tfd',
+  // Browser language, screen size and user-agent client hints
+  'ul',
+  'sr',
+  'uaa',
+  'uab',
+  'uafvl',
+  'uamb',
+  'uam',
+  'uap',
+  'uapv',
+  'uaw',
+  // Library feature and transport flags
+  'are',
+  'frm',
+  'pae',
+  '_eu',
+  '_tu',
+  '_z',
+  '_r',
+  '_dbg',
+  'ir',
+  'ngs',
+  'richsstsse',
+]);
+
+/** The only currency this site sends (`cu` on the wire, from the `currency` event parameter). */
+const SENT_CURRENCY = 'AUD';
 const PERCENT_ESCAPES = /%[0-9A-Fa-f]{2}/g;
 
 /** Every reading of a value: as given, then with percent escapes undone, up to four rounds. */
@@ -504,6 +574,9 @@ function eventAllowed(
   if (pagePath !== undefined && (address === undefined || pagePath !== new URL(address).pathname))
     return false;
 
+  const currency = fields.get('cu');
+  if (currency !== undefined && currency !== SENT_CURRENCY) return false;
+
   for (const [key, value] of fields) {
     if (RULED_FIELDS.has(key)) continue;
     // A user id or user property is never sent.
@@ -525,8 +598,10 @@ function eventAllowed(
       if (!ALLOWED_NUMBER_PARAMS.has(key.slice(4)) || !NUMBER_VALUE.test(value)) return false;
       continue;
     }
-    // Any other field is the library's own bookkeeping. It never needs an address or an email.
-    if (looksPersonal(value)) return false;
+    // Any other field must be one of the library's own, listed fields (GP-750): an unknown field
+    // can carry a plain user id that no value shape would catch. Listed fields never need an
+    // address or an email either.
+    if (!LIBRARY_FIELDS.has(key) || looksPersonal(value)) return false;
   }
   return true;
 }

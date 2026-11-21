@@ -287,6 +287,82 @@ describe('the wire: each request to Google is screened again as it leaves', () =
     expect(screenCollect(collect({ ...clean, ...fields }), undefined, context)).toBeNull();
   });
 
+  // GP-750: a field the wire check does not know is refused, whatever its value looks like. On the
+  // GP-731 code these passed, because only an email or a web address in the value was refused.
+  it.each([
+    ['a plain user id in an unknown field', { user_id: 'abc123' }],
+    ['a member number in an unknown field', { member: 'm-2041' }],
+    ['a name in an unknown field', { customer: 'jane' }],
+    ['an unknown field with no value', { user_id: '' }],
+  ])('drops a request carrying %s', (_label, fields) => {
+    expect(screenCollect(collect({ ...clean, ...fields }), undefined, context)).toBeNull();
+  });
+
+  it('drops a batched event whose own line carries an unknown field, and keeps the rest', () => {
+    const url = `https://region1.google-analytics.com/g/collect?v=2&tid=${ID}&cid=1.2&dl=${encodeURIComponent(`${ORIGIN}/courses/:slug`)}`;
+    const body = 'en=course_view&ep.course_slug=water\nen=course_view&user_id=abc123';
+    expect(screenCollect(url, body, context)?.body).toBe('en=course_view&ep.course_slug=water');
+    expect(screenCollect(`${url}&user_id=abc123`, 'en=course_view', context)).toBeNull();
+  });
+
+  it('lets through the fields the Google library adds to a real page view and funnel events', () => {
+    // The shape of a gtag.js GA4 hit: request-level bookkeeping in the address, events in the body.
+    const shared = new URLSearchParams({
+      v: '2',
+      tid: ID,
+      gtm: '45je5b10v9101234567za200',
+      _p: '1732150000000',
+      gcs: 'G101',
+      gcd: '13l3lPl3l1l1',
+      npa: '1',
+      dma: '0',
+      tag_exp: '101671035~101747727',
+      cid: '123456789.1732150000',
+      ul: 'en-au',
+      sr: '1440x900',
+      uaa: 'x86',
+      uab: '64',
+      uafvl: 'Chromium;131.0.0.0|Not_A%20Brand;24.0.0.0',
+      uamb: '0',
+      uam: '',
+      uap: 'Linux',
+      uapv: '6.5.0',
+      uaw: '0',
+      are: '1',
+      frm: '0',
+      pscdl: 'noapi',
+      _eu: 'AAAI',
+      _s: '1',
+      sid: '1732150000',
+      sct: '1',
+      seg: '0',
+      dl: `${ORIGIN}/courses/:slug`,
+      dr: '',
+      dt: '/courses/:slug',
+      _tu: 'CA',
+    }).toString();
+    const url = `https://region1.google-analytics.com/g/collect?${shared}`;
+    const body = [
+      'en=page_view&_fv=1&_nsi=1&_ss=1&_ee=1&tfd=812&_et=4',
+      'en=course_view&ep.course_slug=water-damage-restoration&ep.course_title=Water%20Damage&_et=9&tfd=1204',
+      'en=enrol_click&ep.course_slug=water-damage-restoration&ep.purchase_mode=self&ep.is_free=false&_et=30',
+      'en=checkout_started&ep.course_slug=water-damage-restoration&ep.purchase_mode=team&epn.value=495&cu=AUD&_et=5',
+      'en=membership_view&ep.checkout_enabled=true&_et=2',
+      'en=membership_checkout_started&epn.value=199&cu=AUD&_c=1&_dbg=1&ir=1&richsstsse=',
+    ].join('\n');
+    expect(screenCollect(url, body, context)).toEqual({ url, body });
+    expect(screenCollect(collect({ ...clean, _z: 'ccd.AAB' }), undefined, context)).not.toBeNull();
+  });
+
+  it('sends a currency only as AUD', () => {
+    expect(
+      screenCollect(collect({ ...clean, en: 'checkout_started', cu: 'AUD' }), undefined, context)
+    ).not.toBeNull();
+    expect(
+      screenCollect(collect({ ...clean, en: 'checkout_started', cu: 'jane' }), undefined, context)
+    ).toBeNull();
+  });
+
   it('trims the bad events out of a batch and keeps the good ones', () => {
     const url = `https://region1.google-analytics.com/g/collect?v=2&tid=${ID}&cid=1.2&dl=${encodeURIComponent(`${ORIGIN}/courses/:slug`)}`;
     const body = [
