@@ -7,6 +7,7 @@ import { CARSI_LINKEDIN_ORGANIZATION_ID } from '@/lib/brand/social-profiles';
 function LinkedInIcon({ className }: { className?: string }) {
   return (
     <svg
+      data-pv-allow="logo"
       viewBox="0 0 24 24"
       fill="currentColor"
       aria-hidden="true"
