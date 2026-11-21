@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { verifySessionToken } from '@/lib/auth/session-jwt';
+import { verifyActiveSession } from '@/lib/server/user-active-cache';
 import { computeDiscountedAud, findActiveUserDiscount } from '@/lib/server/user-discounts';
 import { getOrCreateCourseBySlug } from '@/lib/server/course-catalog-sync';
 
@@ -34,7 +34,8 @@ export async function GET(request: NextRequest, context: Params) {
   const token = request.cookies.get('auth_token')?.value;
   let userId: string | null = null;
   if (token) {
-    const claims = await verifySessionToken(token);
+    // GP-760: a session ended by a password reset (or a deactivated user) gets list pricing.
+    const claims = await verifyActiveSession(token);
     if (claims?.sub) userId = claims.sub;
   }
 

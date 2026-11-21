@@ -14,9 +14,12 @@ const mocks = vi.hoisted(() => ({
   verifySession: vi.fn(),
   completed: vi.fn(),
   dbCourse: vi.fn(),
+  adminNow: vi.fn(),
 }));
 
 vi.mock('@/lib/auth/session-jwt', () => ({ verifySessionToken: mocks.verifySession }));
+// GP-760: the admin exemption asks the database (isLmsSessionAdminNow), never the token role.
+vi.mock('@/lib/server/lms-admin-now', () => ({ isLmsSessionAdminNow: mocks.adminNow }));
 vi.mock('@/lib/server/local-course-checkout', () => ({
   resolveCheckoutEmail: vi.fn(async () => 'learner@example.com.au'),
   createStripeCheckoutForCourse: mocks.createStripe,
@@ -87,6 +90,7 @@ beforeEach(() => {
   mocks.createStripe.mockResolvedValue({ checkout_url: 'https://checkout.stripe.test/cs_new', checkout_session_id: 'cs_new' });
   mocks.verifySession.mockResolvedValue({ sub: 'stu', email: 'learner@example.com.au', full_name: 'L', role: 'student' });
   mocks.completed.mockResolvedValue([]);
+  mocks.adminNow.mockResolvedValue(false);
   mocks.dbCourse.mockResolvedValue({
     id: 'crs-mould',
     slug: SLUG,
@@ -124,9 +128,18 @@ describe('checkout — prerequisite gate', () => {
 
   it('an admin reaches Stripe without the prerequisite', async () => {
     mocks.verifySession.mockResolvedValue({ sub: 'adm', email: 'a@carsi.com.au', full_name: 'A', role: 'admin' });
+    mocks.adminNow.mockResolvedValue(true);
     const res = await POST(request(true));
     expect(res.status).toBe(200);
     expect(mocks.createStripe).toHaveBeenCalledTimes(1);
+  });
+
+  it('a demoted admin (token still says admin) needs the prerequisite (GP-760)', async () => {
+    mocks.verifySession.mockResolvedValue({ sub: 'adm', email: 'a@carsi.com.au', full_name: 'A', role: 'admin' });
+    mocks.adminNow.mockResolvedValue(false);
+    const res = await POST(request(true));
+    expect(res.status).toBe(403);
+    expect(mocks.createStripe).not.toHaveBeenCalled();
   });
 
   it('a course with no prerequisites is unaffected (no prerequisite lookups)', async () => {
