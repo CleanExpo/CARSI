@@ -256,6 +256,26 @@ describe.runIf(RUNNABLE)('GP-432 learner record (real PostgreSQL)', () => {
     expect(progress.rows).toEqual([]);
   });
 
+  it('the completion sync waits for an in-flight revocation and never overwrites it with completed', async () => {
+    await db.query(
+      'INSERT INTO lms_lesson_progress (id, student_id, lesson_id, completed, completed_at) VALUES ($1, $2, $3, TRUE, now())',
+      [randomUUID(), ids.learner, ids.lesson],
+    );
+    await addQuiz(ids.quiz);
+    await addAttempt(ids.quiz, true);
+    const other = await otherConnection();
+    await other.query("UPDATE lms_enrollments SET status = 'revoked' WHERE id = $1", [ids.enrolment]);
+    const pending = settle(
+      service.syncEnrollmentCompletion(ids.enrolment, ids.learner, ids.course, { skipIicrcAutoSubmit: true }),
+    );
+    await pause();
+    await other.query('COMMIT');
+    await other.end();
+
+    expect(await pending).toBe('resolved');
+    expect(await status()).toBe('revoked');
+  });
+
   it('quiz-attempt reset refuses a revoked enrolment and voids nothing', async () => {
     await addQuiz(ids.quiz);
     await addAttempt(ids.quiz, false);

@@ -11,7 +11,7 @@ import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
 import { extractQuizIdFromLesson } from '@/lib/lms/quiz-from-lesson';
 import { parseLessonResources } from '@/lib/lms/lesson-resources';
 import { requireCurrentAdmin, type AdminSessionProvenance } from '@/lib/server/current-admin';
-import { lockEnrollmentForAdminChange } from '@/lib/server/enrollment-row-lock';
+import { lockEnrollmentForAdminChange, lockEnrollmentRow } from '@/lib/server/enrollment-row-lock';
 import { isEnrolmentAccessAllowed, isRevokedStatus } from '@/lib/server/enrollment-access';
 import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
 import {
@@ -464,56 +464,64 @@ export async function syncEnrollmentCompletion(
   // the two-day attendance finalisation (ccw-attendance/provision.ts). Lessons and quizzes
   // never complete it, and this sync never downgrades the attendance completion (GP-736).
   if (isCohortOnlyCourse(slug)) return;
-  const prior = await prisma.lmsEnrollment.findUnique({
-    where: { id: enrollmentId },
-    select: { completedAt: true, status: true },
-  });
 
-  // STICKY REVOCATION (WS3 / P0-C): a revoked/refunded/disputed enrolment is a
-  // terminal state. NEVER resurrect it to active/completed on a later sync —
-  // otherwise a refunded learner un-revokes themselves simply by marking a lesson
-  // or opening their certificate (completedAt survives revocation, so the
-  // wasAlreadyCompleted branch below would flip it straight back). This guard
-  // covers BOTH the zero-lesson branch and the main completion write.
-  if (isRevokedStatus(prior?.status)) {
-    return;
-  }
+  // Evidence first (lessons and assessments); the status decision is made below from the
+  // LOCKED enrolment row.
+  const completed =
+    total === 0
+      ? 0
+      : await prisma.lmsLessonProgress.count({
+          where: { studentId, lessonId: { in: ids }, completed: true },
+        });
+  const allLessonsDone = total > 0 && completed >= total;
+  const quizGateSatisfied =
+    total === 0 ? false : await requiredAssessmentsPassed(courseId, slug, studentId);
 
-  const wasAlreadyCompleted =
-    prior?.status === 'completed' || prior?.completedAt != null;
-
-  if (total === 0) {
-    await prisma.lmsEnrollment.update({
-      where: { id: enrollmentId },
-      data: { status: 'active', completedAt: null },
-    });
-    return;
-  }
-
-  const completed = await prisma.lmsLessonProgress.count({
-    where: { studentId, lessonId: { in: ids }, completed: true },
-  });
-
-  const allLessonsDone = completed >= total;
-  const quizGateSatisfied = await requiredAssessmentsPassed(courseId, slug, studentId);
-
-  // Certificate/CEC integrity: completion needs lessons AND every required assessment
-  // passed, but an already-completed enrollment is never downgraded (GP-439 item 3:
-  // issued certificates are always retained).
-  const isCompleted = decideEnrollmentCompleted({
-    allLessonsDone,
-    quizGateSatisfied,
-    wasAlreadyCompleted,
-  });
-
-  // Only fire the (irreversible) IICRC CEC auto-submit on a genuinely new,
-  // fully-gated completion — not on a lesson-count-only or downgrade-protected one.
-  const newlyGatedCompletion = allLessonsDone && quizGateSatisfied && !wasAlreadyCompleted;
-
-  const completedAt = isCompleted ? (prior?.completedAt ?? new Date()) : null;
-  // One transaction: if the first-completion write fails, the completion rolls back, so a retry
-  // is still a new completion and still triggers the IICRC auto-submit below.
+  // GP-432: read the prior state and write the new one under the enrolment row lock (one owner:
+  // enrollment-row-lock.ts). A revocation (Stripe or admin) either committed before the lock,
+  // and is seen here, or waits until this commits; it can no longer land between the read and
+  // the write and be overwritten. One transaction also keeps the first-completion record with
+  // the completion, so a failed write rolls both back and a retry is still a new completion.
+  let newlyGatedCompletion = false;
   await prisma.$transaction(async (tx) => {
+    if (!(await lockEnrollmentRow(tx, enrollmentId))) return;
+    const prior = await tx.lmsEnrollment.findUnique({
+      where: { id: enrollmentId },
+      select: { completedAt: true, status: true },
+    });
+
+    // STICKY REVOCATION (WS3 / P0-C): a revoked/refunded/disputed enrolment is a
+    // terminal state. NEVER resurrect it to active/completed on a later sync —
+    // otherwise a refunded learner un-revokes themselves simply by marking a lesson
+    // or opening their certificate (completedAt survives revocation, so the
+    // wasAlreadyCompleted branch below would flip it straight back). This guard
+    // covers BOTH the zero-lesson branch and the main completion write.
+    if (!prior || isRevokedStatus(prior.status)) return;
+
+    if (total === 0) {
+      await tx.lmsEnrollment.update({
+        where: { id: enrollmentId },
+        data: { status: 'active', completedAt: null },
+      });
+      return;
+    }
+
+    const wasAlreadyCompleted = prior.status === 'completed' || prior.completedAt != null;
+
+    // Certificate/CEC integrity: completion needs lessons AND every required assessment
+    // passed, but an already-completed enrollment is never downgraded (GP-439 item 3:
+    // issued certificates are always retained).
+    const isCompleted = decideEnrollmentCompleted({
+      allLessonsDone,
+      quizGateSatisfied,
+      wasAlreadyCompleted,
+    });
+
+    // Only fire the (irreversible) IICRC CEC auto-submit on a genuinely new,
+    // fully-gated completion — not on a lesson-count-only or downgrade-protected one.
+    newlyGatedCompletion = allLessonsDone && quizGateSatisfied && !wasAlreadyCompleted;
+
+    const completedAt = isCompleted ? (prior.completedAt ?? new Date()) : null;
     await tx.lmsEnrollment.update({
       where: { id: enrollmentId },
       data: {

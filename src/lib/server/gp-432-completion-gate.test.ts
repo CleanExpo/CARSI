@@ -97,6 +97,8 @@ vi.mock('@/lib/prisma', () => ({
         state.passedPracticalIds.map((assessmentId) => ({ assessmentId })),
       ),
     },
+    // Row lock (enrollment-row-lock.ts): the sync reads the prior status after it, via findUnique.
+    $queryRaw: async () => [{ id: "locked-row" }],
     async $transaction(fn: (tx: unknown) => Promise<unknown>) {
       const before = state.enrollment && { ...state.enrollment };
       try {
@@ -462,6 +464,28 @@ describe('GP-432 path 4b: one gated writer of a completed enrolment', () => {
 
   it('no code outside syncEnrollmentCompletion and the allow-listed files can write a completed enrolment', () => {
     expect(completedWriterOffenders(root)).toEqual([]);
+  });
+
+  // Design guard (GP-432 verdict rounds 1 and 2 found the same kind twice: a revoked-status
+  // decision made from a read that a revocation could overtake). Every writer of one learner's
+  // enrolment record takes the row lock (enrollment-row-lock.ts) before its first write.
+  it.each([
+    [GATED_WRITER_FILE, 'syncEnrollmentCompletion', 'lockEnrollmentRow('],
+    [GATED_WRITER_FILE, 'forceCompleteEnrollment', 'lockEnrollmentForAdminChange('],
+    [join('src', 'lib', 'server', 'quiz-attempt-reset.ts'), 'resetQuizAttemptsForEnrollment', 'lockEnrollmentForAdminChange('],
+    [join('src', 'lib', 'admin', 'admin-enrollment-mutations.ts'), 'adminRevokeEnrollment', 'lockEnrollmentRow('],
+  ])('%s %s takes the enrolment row lock before its first write', (file, fn, lockCall) => {
+    const text = readFileSync(join(root, file), 'utf8');
+    const [s, e] = functionSpan(text, fn);
+    expect(s, `${fn} not found`).toBeGreaterThan(-1);
+    const body = text.slice(s, e);
+    const lockAt = body.indexOf(lockCall);
+    const firstWrite = body.search(
+      /\.\s*(lmsEnrollment|lmsLessonProgress|lmsQuizAttempt|lmsLearnerAdminAuditEvent)\s*\.\s*(update|updateMany|upsert|create|createMany|delete|deleteMany)\s*\(/,
+    );
+    expect(lockAt, `${fn} does not call ${lockCall}`).toBeGreaterThan(-1);
+    expect(firstWrite, `${fn} has no write to guard`).toBeGreaterThan(-1);
+    expect(lockAt).toBeLessThan(firstWrite);
   });
 
   it('the gated writer itself is still found (the scan is not blind)', () => {

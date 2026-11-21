@@ -69,6 +69,8 @@ vi.mock('@/lib/prisma', () => ({
     lmsQuizAttempt: {
       findMany: vi.fn(async () => state.passedQuizIds.map((quizId) => ({ quizId }))),
     },
+    // Row lock (enrollment-row-lock.ts): the sync reads the prior status after it, via findUnique.
+    $queryRaw: async () => [{ id: "locked-row" }],
     async $transaction(fn: (tx: unknown) => Promise<unknown>) {
       return fn(this);
     },
