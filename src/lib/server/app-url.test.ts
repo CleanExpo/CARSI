@@ -133,8 +133,14 @@ describe('getCheckoutReturnUrl', () => {
     'https://carsi.com.au.evil.example/paid',
     'http://carsi.com.au/paid',
     'https://carsi.com.au:8443/paid',
-    'https://www.carsi.com.au/paid',
+    'https://www.carsi.com.au:8443/paid',
+    'http://www.carsi.com.au/paid',
   ])('GP-700: a production return URL off the canonical origin falls back (%s)', (value) => {
     expect(getCheckoutReturnUrl(value, fallback)).toBe(fallback);
+  });
+
+  it("GP-700: keeps a return URL on CARSI's www host, where a www buyer's session cookie lives", () => {
+    const value = 'https://www.carsi.com.au/dashboard/student?session_id={CHECKOUT_SESSION_ID}';
+    expect(getCheckoutReturnUrl(value, fallback)).toBe(value);
   });
 });

@@ -1,6 +1,11 @@
 type OriginRequest = { nextUrl?: { origin: string } };
 
 const PRODUCTION_ORIGIN = 'https://carsi.com.au';
+/**
+ * CARSI's own public origins, as fixed strings (no port). Both hosts serve the site, so a
+ * buyer on www must return to www, where their session cookie lives. Never read from a request.
+ */
+const CARSI_ORIGINS = new Set([PRODUCTION_ORIGIN, 'https://www.carsi.com.au']);
 
 function isLocalHost(hostname: string): boolean {
   const host = hostname.toLowerCase().replace(/\.$/, '');
@@ -57,14 +62,19 @@ export function getAppOrigin(request?: OriginRequest | null): string {
 }
 
 /**
- * Accept a client return URL only when it is on the same origin as `fallback`, which callers
- * build from `getAppOrigin`. GP-700: in production a return URL on any other site falls back.
+ * Accept a client return URL only on the same origin as `fallback` (which callers build from
+ * `getAppOrigin`) or on one of CARSI's own fixed origins. GP-700: in production a return URL
+ * on any other site, or on a CARSI host with a port or over http, falls back.
  */
 export function getCheckoutReturnUrl(value: unknown, fallback: string): string {
   if (typeof value !== 'string') return fallback;
   const url = parseHttpUrl(value);
   if (!url) return fallback;
-  if (process.env.NODE_ENV === 'production' && url.origin !== parseHttpUrl(fallback)?.origin) {
+  if (
+    process.env.NODE_ENV === 'production' &&
+    url.origin !== parseHttpUrl(fallback)?.origin &&
+    !CARSI_ORIGINS.has(url.origin)
+  ) {
     return fallback;
   }
   // Preserve Stripe's literal {CHECKOUT_SESSION_ID} placeholder.
