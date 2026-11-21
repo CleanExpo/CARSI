@@ -92,6 +92,10 @@ const CASES = [
     build: () => fixture({ rows: [verified(), gapRow({ check_owner: undefined })] }) },
   { name: 'also_in surface that is not in the course is an orphan', rule: 'orphan-also-in', code: 4,
     build: () => fixture({ rows: [verified({ also_in: [surface('99999999-9999-4999-8999-999999999999')] })] }) },
+  { name: 'also_in present but not an array is a schema failure', rule: 'also-in-not-array', code: 3,
+    build: () => fixture({ rows: [verified({ also_in: surface('missing-surface') })] }) },
+  { name: 'also_in element that is not a string is a schema failure', rule: 'also-in-element-not-string', code: 3,
+    build: () => fixture({ rows: [verified({ also_in: [surface('description'), 7] })] }) },
   { name: 'lesson_id that is not in the course is an orphan', rule: 'orphan-lesson-id', code: 4,
     build: () => fixture({ rows: [verified({ lesson_id: '99999999-9999-4999-8999-999999999999' })] }) },
   { name: 'founder-only id from the baseline deleted from the ledger', rule: 'founder-baseline-id-missing', code: 5,
@@ -170,6 +174,79 @@ describe('options and exit codes', () => {
     const r = run(BIN, [f, '--report']);
     assert.match(r.out, /course rules skipped/);
     assert.match(r.out, /^ {2}schema: 0$/m);
+  });
+});
+
+/** Discovery-sweep classes (97af5b46): each case is a planted defect that exited 0 or the wrong class before the fix. */
+describe('discovery classes', () => {
+  const OTHER = '99999999-9999-4999-8999-999999999999';
+  const exitOf = (fx, extra = []) => run(BIN, [fx.ledger, ...fx.extra, ...extra]);
+  const done = (fx) => fs.rmSync(fx.root, { recursive: true, force: true });
+
+  it('a bare or scoped surface of ANOTHER course is unresolved (4); the ledger\'s own course resolves', () => {
+    for (const s of ['course:another-course', `course:another-course#${L1}`, `course:another-course#description`]) {
+      const fx = fixture({ rows: [verified({ also_in: [s] })] });
+      const r = exitOf(fx);
+      assert.equal(r.code, 4, `${s}: ${r.out}`);
+      assert.match(r.out, /orphan-also-in/);
+      done(fx);
+    }
+    const ok = fixture({ rows: [verified({ also_in: ['course:demo', `course:demo#${L2}`] })] });
+    assert.equal(exitOf(ok).code, 0);
+    done(ok);
+  });
+  it('an id that appears only in unrelated copy text is an orphan, for lesson_id and also_in alike', () => {
+    const a = fixture({ rows: [verified({ lesson_id: OTHER })], catalogExtra: `see ${OTHER}` });
+    const ra = exitOf(a);
+    assert.equal(ra.code, 4, ra.out);
+    assert.match(ra.out, /orphan-lesson-id/);
+    done(a);
+    const b = fixture({ rows: [verified({ also_in: ['course:demo#accidental'] })], catalogExtra: 'accidental' });
+    const rb = exitOf(b);
+    assert.equal(rb.code, 4, rb.out);
+    assert.match(rb.out, /orphan-also-in/);
+    done(b);
+  });
+  it('a CUT key_phrase stored \\u-escaped in JSON copy is still found (6)', () => {
+    const fx = fixture({ rows: [verified(), cutRow({ key_phrase: 'caf\u00e9' })] });
+    fs.writeFileSync(path.join(fx.root, 'data/courses/demo/v1-draft/extra.json'), '{"title":"This caf\\u00e9 works"}');
+    const r = exitOf(fx);
+    assert.equal(r.code, 6, r.out);
+    assert.match(r.out, /cut-key-phrase-remains/);
+    done(fx);
+  });
+  it('another row\'s answer does not satisfy a founder-only row (5)', () => {
+    const fx = fixture({ rows: [verified(), founderCut({ answer_ref: 'OTHER' })], answers: [{ row_id: 'OTHER' }], baseline: BASELINE });
+    const r = exitOf(fx);
+    assert.equal(r.code, 5, r.out);
+    assert.match(r.out, /founder-answer-ref-unresolved/);
+    done(fx);
+  });
+  it('an invalid status reports only the schema error, not the founder answer rule', () => {
+    const fx = fixture({ rows: [verified(), gapRow({ status: 'GAP ' })] });
+    const r = exitOf(fx);
+    assert.equal(r.code, 3);
+    assert.match(r.out, /status-not-in-set/);
+    assert.doesNotMatch(r.out, /founder-answer-ref-unresolved/);
+    done(fx);
+  });
+  it('unreadable course copy is a controlled error (2) naming the path, with no stack trace', () => {
+    const fx = fixture();
+    const link = path.join(fx.root, 'data/courses/demo/v1-draft/broken.md');
+    fs.symlinkSync(path.join(fx.root, 'does-not-exist.md'), link);
+    const r = exitOf(fx);
+    assert.equal(r.code, 2, r.out);
+    assert.ok(r.out.includes('broken.md'), r.out);
+    assert.doesNotMatch(r.out, /node:internal|\n\s+at /);
+    done(fx);
+  });
+  it('--max-gap rejects an integer too large to compare exactly (2)', () => {
+    const fx = fixture();
+    const r = exitOf(fx, ['--max-gap=9007199254740993']);
+    assert.equal(r.code, 2, r.out);
+    assert.match(r.out, /--max-gap/);
+    assert.equal(exitOf(fx, ['--max-gap=9007199254740991']).code, 0);
+    done(fx);
   });
 });
 

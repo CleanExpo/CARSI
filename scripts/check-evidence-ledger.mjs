@@ -14,12 +14,19 @@
  * Exit codes (the lowest-numbered failing class wins, then 1):
  *   0  every rule passes
  *   1  GAP rows exceed --max-gap=N            message: "<n> GAP > <N>"
- *   2  usage error, or a file that cannot be read (ledger, baseline, answers)
- *   3  schema: bad JSON, status outside the closed set, GAP without reason / recommended_action
- *      / check_owner, CUT without key_phrase, founder_only not a boolean
- *   4  orphan: lesson_id or an also_in surface that is not in the course copy
+ *   2  usage error, a --max-gap that is not a safe integer, or a file that cannot be read
+ *      (ledger, baseline, answers, or any file of the course copy, e.g. a broken symlink)
+ *   3  schema: bad JSON, status outside the closed set (a "GAP " with a trailing space is this
+ *      class, spec 11: it is not a GAP row, so it is never counted by --max-gap and never
+ *      reaches the founder-answer rule), GAP without reason / recommended_action / check_owner,
+ *      CUT without key_phrase, founder_only not a boolean, also_in not an array of strings
+ *   4  orphan: lesson_id or an also_in surface that is not in the course copy. A surface names
+ *      THIS ledger's course (course:<slug>[#id]; another course's slug is unresolved) and an id
+ *      resolves only against the structured "id" / "quizId" values of the course JSON, never
+ *      against raw text
  *   5  founder-only breach: baseline id deleted, relabelled (claim_class) or un-flagged, or a
- *      founder_only row that is not GAP whose answer_ref is not a row_id in the answers file
+ *      founder_only row with a valid non-GAP status whose answer_ref is not its OWN row id
+ *      present as a row_id in the answers file
  *   6  cut not applied: a CUT row whose key_phrase still appears in the course copy
  * --report prints the counts per class and exits 0 on rule failures (2 still applies).
  * --json prints the same facts as JSON (with the GAP ids), for scripts.
@@ -27,6 +34,9 @@
  * Baseline file: {"rows":[{"id":"X-001","claim_class":"standards-citation"}, ...]} — the
  * founder-only GAP rows frozen before the founder's answers are applied. Answers file: one
  * JSON object per line with at least {"row_id": "..."}; a row's answer_ref names a row_id.
+ *
+ * A CUT key_phrase is searched in the decoded string values of JSON copy (so \u-escaped text is
+ * found) and in the raw text of Markdown.
  *
  * Course copy = the draft folder (data/courses/<slug>/v1-draft, JSON and .md, evidence/
  * excluded) or, for a course with no draft, data/seed/courses-catalog.json and
@@ -38,7 +48,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { validateFileRules } from './audit/validate-ledger.mjs';
+import { validateFileRules, STATUSES } from './audit/validate-ledger.mjs';
 
 export const CODES = { ok: 0, gap: 1, usage: 2, schema: 3, orphan: 4, founder: 5, cut: 6 };
 const CLASS_ORDER = ['schema', 'orphan', 'founder', 'cut'];
@@ -46,6 +56,8 @@ const CLASS_ORDER = ['schema', 'orphan', 'founder', 'cut'];
 /** Course rules and the class (exit code) each belongs to. */
 export const COURSE_RULES = Object.freeze({
   'gap-no-check-owner': 'schema',
+  'also-in-not-array': 'schema',
+  'also-in-element-not-string': 'schema',
   'orphan-lesson-id': 'orphan',
   'orphan-also-in': 'orphan',
   'founder-baseline-id-missing': 'founder',
@@ -131,24 +143,74 @@ function courseCopy({ repoRoot, slug, courseDir }) {
       : [];
   }
   files = files.concat(listFiles(`${repoRoot}/public/courses/${slug}`));
-  const text = new Map(files.map((f) => [f, fs.readFileSync(f, 'utf8')]));
-  return { files, text };
+  const text = new Map();
+  const ids = new Set();
+  const keys = new Set();
+  for (const f of files) {
+    let raw;
+    try {
+      raw = fs.readFileSync(f, 'utf8');
+    } catch (e) {
+      throw new Unreadable(`cannot read course copy ${f}: ${e.code ?? e.message}`);
+    }
+    let parsed;
+    if (f.endsWith('.json')) {
+      try {
+        parsed = JSON.parse(raw);
+      } catch {
+        parsed = undefined; // not valid JSON: scan its raw text, it contributes no ids
+      }
+    }
+    if (parsed === undefined) {
+      text.set(f, [raw]);
+      continue;
+    }
+    const strings = [];
+    const collect = (o) => {
+      if (Array.isArray(o)) o.forEach(collect);
+      else if (o && typeof o === 'object') Object.values(o).forEach(collect);
+      else if (typeof o === 'string') strings.push(o);
+    };
+    collect(parsed);
+    // Structured ids and keys. A multi-course catalog (data/seed/courses-catalog.json) only
+    // contributes the entry whose slug is this course's, so another course's ids never resolve.
+    const roots = parsed && Array.isArray(parsed.courses) ? parsed.courses.filter((c) => c && c.slug === slug) : [parsed];
+    const walk = (o) => {
+      if (Array.isArray(o)) o.forEach(walk);
+      else if (o && typeof o === 'object') {
+        for (const [k, v] of Object.entries(o)) {
+          keys.add(k);
+          if ((k === 'id' || k === 'quizId') && typeof v === 'string') ids.add(v);
+          walk(v);
+        }
+        // a quiz lesson names its quiz in contentBody
+        if (o.contentType === 'quiz' && typeof o.contentBody === 'string') ids.add(o.contentBody);
+      }
+    };
+    roots.forEach(walk);
+    text.set(f, strings);
+  }
+  return { files, text, ids, keys };
 }
 
 const norm = (s) => String(s).toLowerCase().replace(/\s+/g, ' ');
 
-/** Does this surface token resolve to something in the course copy? */
-function surfaceResolves(token, copy) {
+/** Does this surface token resolve to something in THIS course's copy? */
+function surfaceResolves(token, copy, slug) {
   let t = String(token);
-  if (/^course:[^#]+$/.test(t)) return copy.files.length > 0; // the bare course
-  t = t.replace(/^course:[^#]+#/, '');
-  const m = t.match(/^(quiz:|field-tool:|diagram:)?(.*)$/);
+  const scoped = t.match(/^course:([^#]*)(#(.*))?$/s);
+  if (scoped) {
+    if (scoped[1] !== slug) return false; // another course's surface is not this course's copy
+    if (scoped[2] === undefined) return copy.files.length > 0; // the bare course
+    t = scoped[3];
+  }
+  const m = t.match(/^(quiz:|field-tool:|diagram:)?(.*)$/s);
   const kind = m[1] ?? '';
   const key = m[2];
   if (kind === 'field-tool:' || kind === 'diagram:') return copy.files.some((f) => f.endsWith(`/${key}`));
-  if (key === 'description') return [...copy.text.values()].some((x) => x.includes('"description"'));
+  if (key === 'description') return copy.keys.has('description');
   if (key === 'assessment') return copy.files.some((f) => /assessment/.test(path.basename(f)));
-  return key !== '' && [...copy.text.values()].some((x) => x.includes(key));
+  return key !== '' && copy.ids.has(key);
 }
 
 /**
@@ -200,11 +262,17 @@ export function checkLedger(ledger, { baseline, answers } = {}) {
 
   const copy = courseCopy(course);
   for (const { r, line } of rows) {
-    if (r.lesson_id !== undefined && !surfaceResolves(String(r.lesson_id), copy)) {
+    if (r.lesson_id !== undefined && !surfaceResolves(String(r.lesson_id), copy, course.slug)) {
       emit('orphan-lesson-id', line, `row ${r.id ?? '?'} lesson_id "${r.lesson_id}" is not in the course copy`);
     }
-    for (const s of Array.isArray(r.also_in) ? r.also_in : []) {
-      if (!surfaceResolves(String(s), copy)) {
+    if (r.also_in !== undefined && !Array.isArray(r.also_in)) {
+      emit('also-in-not-array', line, `row ${r.id ?? '?'} also_in must be an array of surface strings`);
+      continue;
+    }
+    for (const s of r.also_in ?? []) {
+      if (typeof s !== 'string') {
+        emit('also-in-element-not-string', line, `row ${r.id ?? '?'} also_in holds a ${s === null ? 'null' : typeof s}, not a surface string`);
+      } else if (!surfaceResolves(s, copy, course.slug)) {
         emit('orphan-also-in', line, `row ${r.id ?? '?'} also_in surface "${s}" is not in the course copy`);
       }
     }
@@ -229,8 +297,8 @@ export function checkLedger(ledger, { baseline, answers } = {}) {
 
   const answerIds = new Set((answers ?? []).map((a) => a && a.row_id));
   for (const { r, line } of rows) {
-    if (r.founder_only === true && r.status !== 'GAP' && !(typeof r.answer_ref === 'string' && answerIds.has(r.answer_ref))) {
-      emit('founder-answer-ref-unresolved', line, `founder-only row ${r.id ?? '?'} is ${r.status} but answer_ref "${r.answer_ref ?? ''}" is not a row_id in the answers file`);
+    if (r.founder_only === true && STATUSES.includes(r.status) && r.status !== 'GAP' && !(typeof r.id === 'string' && r.answer_ref === r.id && answerIds.has(r.id))) {
+      emit('founder-answer-ref-unresolved', line, `founder-only row ${r.id ?? '?'} is ${r.status} but answer_ref "${r.answer_ref ?? ''}" is not this row's own row_id in the answers file`);
     }
   }
 
@@ -238,7 +306,7 @@ export function checkLedger(ledger, { baseline, answers } = {}) {
     const needle = norm(r.key_phrase).trim();
     const where = copy.files.length === 0
       ? ['no course copy found, so the phrase cannot be shown absent']
-      : [...copy.text].filter(([, t]) => norm(t).includes(needle)).map(([f]) => path.relative(course.repoRoot, f));
+      : [...copy.text].filter(([, ts]) => ts.some((t) => norm(t).includes(needle))).map(([f]) => path.relative(course.repoRoot, f));
     if (where.length > 0) emit('cut-key-phrase-remains', line, `CUT row ${r.id ?? '?'} key_phrase "${r.key_phrase}" still appears: ${where.join(', ')}`);
   }
   return result;
@@ -253,7 +321,7 @@ function parseArgs(argv) {
     else if (a === '--json') o.json = true;
     else if (a.startsWith('--max-gap=')) {
       const n = a.slice('--max-gap='.length);
-      if (!/^\d+$/.test(n)) throw new Unreadable(`--max-gap needs a whole number, got "${n}"`);
+      if (!/^\d+$/.test(n) || !Number.isSafeInteger(Number(n))) throw new Unreadable(`--max-gap needs a whole number up to ${Number.MAX_SAFE_INTEGER}, got "${n}"`);
       o.maxGap = Number(n);
     } else if (a.startsWith('--baseline=')) o.baseline = a.slice('--baseline='.length);
     else if (a.startsWith('--answers=')) o.answers = a.slice('--answers='.length);
