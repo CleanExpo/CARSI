@@ -18,6 +18,7 @@
     "check:secrets": "node scripts/check-secrets.mjs",
     "check:iicrc-terminology": "node scripts/check-iicrc-terminology.mjs",
     "check:course-diagrams": "node scripts/check-course-diagrams.mjs",
+    "test:wire-water-diagrams": "node --test scripts/wire-water-course-diagrams.test.mjs",
     "check:live-catalogue": "node scripts/check-live-catalogue.mjs",
     "check:live-course-fields": "node scripts/check-live-course-fields.mjs",
     "test:live-course-fields": "node scripts/check-live-course-fields.test.mjs",
