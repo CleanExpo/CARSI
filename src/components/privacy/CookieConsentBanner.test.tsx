@@ -204,4 +204,18 @@ describe('the consent panel is readable in both themes', () => {
       .filter(({ ratio }) => ratio < 4.5);
     expect(failing).toEqual([]);
   });
+
+  it.each([false, true])(
+    'the panel is opaque, so page content never shows through its text (dark theme: %s)',
+    (dark) => {
+      // The ratios above assume the surface sits on --bg-deep. The public pages stay light even when
+      // the dark theme is chosen, so a see-through dark panel let the page's own text show through.
+      window.localStorage.clear();
+      render();
+      const card = panel()!.firstElementChild!;
+      const cls = card.getAttribute('class') ?? '';
+      expect(cls).toMatch(/(?:^|\s)bg-\[var\(--bg-deep\)\]/);
+      expect(parse(token('bg-deep', dark))[3]).toBe(1);
+    }
+  );
 });

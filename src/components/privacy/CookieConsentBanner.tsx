@@ -94,7 +94,7 @@ export function CookieConsentBanner() {
           data-testid="cookie-consent"
           className="fixed inset-x-0 bottom-0 z-[60] px-4 pb-4 sm:px-6 sm:pb-6"
         >
-          <div className="mx-auto max-w-3xl rounded-2xl border border-[var(--glass-border)] bg-[var(--bg-surface)] p-5 text-[var(--text-secondary)] shadow-[var(--glow-card-hover)] sm:p-6">
+          <div className="mx-auto max-w-3xl rounded-2xl border border-[var(--glass-border)] bg-[var(--bg-deep)] bg-[image:linear-gradient(var(--bg-surface),var(--bg-surface))] p-5 text-[var(--text-secondary)] shadow-[var(--glow-card-hover)] sm:p-6">
             <h2
               id={headingId}
               tabIndex={-1}
