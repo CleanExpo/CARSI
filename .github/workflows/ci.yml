@@ -287,6 +287,17 @@ jobs:
       - name: W0a evidence ledger check tests
         run: npm run test:evidence-ledger
 
+      # GP-719: every VERIFIED quote checked offline against what CI can read (repo: sources and
+      # committed open-licence snapshots under data/evidence-sources/), plus the licensed-standards
+      # rule (short reference only, needs_human_verification). BLOCKING; the findings on main when
+      # it landed are listed in data/evidence-sources/quote-findings-baseline.json and only shrink.
+      # The live fetch (npm run check:ledger-quotes:live) needs network and is opt-in, not here.
+      - name: GP-719 ledger quote check
+        run: npm run check:ledger-quotes
+
+      - name: GP-719 ledger quote check tests
+        run: npm run test:ledger-quotes
+
       - name: Course Standard depth audit
         run: npm run check:course-standard
 
