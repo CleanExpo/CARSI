@@ -18,7 +18,7 @@
 | --- | --- |
 | Laboratory name | |
 | Accreditation (NATA in Australia / IANZ in New Zealand) and number | |
-| Test needed is inside the accreditation scope? (Y/N, checked on date) | |
+| Test needed is on the laboratory's NATA (AU) or IANZ (NZ) scope of tests? (Y/N, checked on date) | |
 | Submission, storage and transport rules read? | |
 | Quoted price (AUD ex GST) and turnaround | |
 

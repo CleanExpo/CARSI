@@ -6,7 +6,7 @@
 | Trigger | First action | Refer to |
 | --- | --- | --- |
 | Personal CO monitor alarms; combustion appliance running; headaches or dizziness reported | Stop. Turn the appliance off only if safe. Everyone into fresh air. Call 000 / 111 if anyone is unwell. Do not resume until the appliance has been checked by a qualified person. | Emergency services; qualified appliance technician; occupational hygienist for monitoring |
-| Suspect asbestos (you cannot tell by looking; Australia: banned December 2003, pre-1990 homes most likely; NZ: any building built or renovated before 2000) | Do not drill, cut, sample or disturb at any size. Keep people away. Record as suspected. | Licensed asbestos assessor or competent person |
+| Suspect asbestos (you cannot tell by looking; Australia: banned December 2003; most likely in homes built before 1990; NZ: any building built or renovated before 2000) | Do not drill, cut, sample or disturb at any size. Keep people away. Record as suspected. | Licensed asbestos assessor or competent person |
 | Silica dust from cutting, grinding, drilling or sanding brick, concrete or stone | Stop the work. Use a non-destructive method or leave it to someone with controls. | Occupational hygienist (exposure); the PCBU |
 | Health or symptom questions | Record as reported. No diagnosis. | The occupant's doctor (enHealth: seek medical advice) |
 | Animal-health questions | Record as reported. No veterinary claim. | A vet |
