@@ -13,7 +13,8 @@
       {
         "label": "Pre-job check and asbestos stop-and-refer (critical)",
         "description": "Completes the pre-job check; applies the Australian and New Zealand dates; decides to stop and refer when asbestos cannot be ruled out; gives no work method for it; records who was told. Completes the silica add-on: identifies whether a step is silica work, names the engineering control and the respirator in that order, and states a clean-up method that makes no dust.",
-        "maxPoints": 15
+        "maxPoints": 15,
+        "critical": true
       },
       {
         "label": "SDS reading and floor identification (critical for flagged floors)",
@@ -23,12 +24,14 @@
       {
         "label": "Chemistry by compatibility (critical)",
         "description": "Mixes at the label dilution; records the product and dilution; matches products to floors with no unsafe match; never mixes two products; does not use a universal pH band as proof of safety.",
-        "maxPoints": 15
+        "maxPoints": 15,
+        "critical": true
       },
       {
         "label": "Approved setup record and machine pre-start check (critical)",
         "description": "Completes the approved setup record before work (floor, coating, product, dilution, dwell, pad or brush, speed and pressure limits from the maker, recovery, drying); stops when limits cannot be established; completes the pre-start check including leads, RCD and guards.",
-        "maxPoints": 15
+        "maxPoints": 15,
+        "critical": true
       },
       {
         "label": "Tile and grout (critical for the tap test)",
@@ -48,7 +51,8 @@
       {
         "label": "Site safety throughout (critical)",
         "description": "Signs and barriers in place and personal protective equipment worn for the whole day; no unsafe power or slip hazard left unaddressed.",
-        "maxPoints": 5
+        "maxPoints": 5,
+        "critical": true
       }
     ]
   }
