@@ -5,15 +5,16 @@
  * reachable by anyone with the exact address before the course was published. The proxy now
  * asks this module first: a course file is served only when its folder belongs to a course that
  * the catalogue (`data/seed/courses-catalog.json`, the SSOT) marks as published, i.e.
- * `status === 'published'` AND `isPublished === true` (the same pair the course routes gate on).
+ * `isPublishedCourseStatus(status)`, the canonical rule (#137) the course routes gate on.
  *
  * Fail-closed: a folder with no catalogue course, a draft, an archived course, an undecodable
  * address or a path with `.`/`..` segments is refused. Publishing a course in the catalogue is
  * the only step that opens its files; there is no hand list of allowed folders.
  */
 import catalog from '../../../data/seed/courses-catalog.json';
+import { isPublishedCourseStatus } from './course-status';
 
-type CatalogPublicationFields = { slug: string; status?: string | null; isPublished?: boolean | null };
+type CatalogPublicationFields = { slug: string; status?: string | null };
 
 /**
  * Asset folders whose name differs from the catalogue slug of the course they belong to.
@@ -26,7 +27,7 @@ export const COURSE_ASSET_FOLDER_ALIASES: Readonly<Record<string, string>> = {
 };
 
 export function isPublishedCatalogCourse(course: CatalogPublicationFields): boolean {
-  return course.status === 'published' && course.isPublished === true;
+  return isPublishedCourseStatus(course.status);
 }
 
 /** Slugs of the courses the catalogue marks as published. */
