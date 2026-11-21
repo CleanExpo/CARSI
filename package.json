@@ -163,6 +163,8 @@
     "check:water-go-live": "node scripts/verify-water-course-go-live.mjs",
     "check:water-go-live:live": "node scripts/verify-water-course-go-live.mjs --require-live",
     "test:course-depth": "node --test scripts/audit-course-depth.test.mjs",
+    "check:course-visuals": "node scripts/check-course-visuals.mjs",
+    "test:course-visuals": "node --test scripts/check-course-visuals.test.mjs",
     "check:quiz-balance": "node scripts/check-quiz-option-balance.mjs",
     "test:quiz-balance": "node scripts/check-quiz-option-balance.test.mjs",
     "check:sources": "node scripts/check-source-citations.mjs",
