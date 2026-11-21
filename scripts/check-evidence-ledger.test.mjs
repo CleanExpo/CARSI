@@ -266,26 +266,88 @@ function mutantBin(file, ruleId, call) {
 }
 
 describe('GP-743: a multi-course catalog only counts this course for CUT phrases', () => {
+  const OTHER_L = '33333333-3333-4333-8333-333333333333';
+  const entry = (slug, note, lessons) => ({ slug, description: `${slug} course`, note, lessons: lessons.map((id) => ({ id })) });
   const catalog = (otherNote, demoNote = '') =>
-    JSON.stringify({
-      courses: [
-        { slug: 'demo', description: 'Demo', note: demoNote, lessons: [{ id: L1 }, { id: L2 }] },
-        { slug: 'other', description: 'Another course', note: otherNote, lessons: [{ id: 'x-1' }] },
-      ],
-    });
+    JSON.stringify({ courses: [entry('demo', demoNote, [L1, L2]), entry('other', otherNote, [OTHER_L])] });
+  const done = (root) => fs.rmSync(root, { recursive: true, force: true });
 
-  it("another course's copy carrying the cut phrase is not a failure", () => {
+  /**
+   * The real shared-catalog layout: courses with no v1-draft read data/seed/courses-catalog.json
+   * (the draft fixture above never reaches that path). One ledger per slug, one seed catalog.
+   */
+  function seedFixture(slugs, catalogJson) {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'gp743-seed-'));
+    fs.mkdirSync(path.join(root, 'data/seed'), { recursive: true });
+    fs.writeFileSync(path.join(root, 'data/seed/courses-catalog.json'), catalogJson);
+    const ledgers = {};
+    for (const slug of slugs) {
+      const dir = path.join(root, `data/courses/${slug}/evidence`);
+      fs.mkdirSync(dir, { recursive: true });
+      ledgers[slug] = path.join(dir, 'evidence-ledger.jsonl');
+      fs.writeFileSync(ledgers[slug], JSON.stringify(cutRow({ surface: `course:${slug}`, feeds: [`course:${slug}`], lesson_id: undefined })) + '\n');
+    }
+    return { root, ledgers };
+  }
+
+  it("draft catalog: another course's copy carrying the cut phrase is not a failure", () => {
     const fx = fixture();
     fs.writeFileSync(path.join(fx.root, 'data/courses/demo/v1-draft/courses-catalog.json'), catalog('a miracle cure'));
     const r = run(BIN, [fx.ledger, ...fx.extra]);
     assert.equal(r.code, 0, r.out);
+    done(fx.root);
   });
 
-  it('the same phrase in this course\'s own entry still fails (exit 6)', () => {
+  it("draft catalog: the same phrase in this course's own entry still fails (exit 6)", () => {
     const fx = fixture();
     fs.writeFileSync(path.join(fx.root, 'data/courses/demo/v1-draft/courses-catalog.json'), catalog('', 'a miracle cure'));
     const r = run(BIN, [fx.ledger, ...fx.extra]);
     assert.equal(r.code, 6, r.out);
+    assert.match(r.out, /cut-key-phrase-remains/);
+    done(fx.root);
+  });
+
+  it("shared seed catalog: another course's entry carrying the cut phrase is not a failure", () => {
+    const fx = seedFixture(['demo'], catalog('This Miracle Cure works.'));
+    const r = run(BIN, [fx.ledgers.demo]);
+    assert.equal(r.code, 0, r.out);
+    done(fx.root);
+  });
+
+  it("shared seed catalog: this course's own entry carrying it fails (exit 6) and names the catalog", () => {
+    const fx = seedFixture(['demo'], catalog('', 'This Miracle Cure works.'));
+    const r = run(BIN, [fx.ledgers.demo]);
+    assert.equal(r.code, 6, r.out);
+    assert.match(r.out, /cut-key-phrase-remains.*data\/seed\/courses-catalog\.json/);
+    done(fx.root);
+  });
+
+  it('a run over several ledgers checks each against its own entry and names only the violating course', () => {
+    const fx = seedFixture(['demo', 'other'], catalog('This Miracle Cure works.'));
+    const r = run(BIN, [fx.ledgers.demo, fx.ledgers.other]);
+    assert.equal(r.code, 6, r.out);
+    assert.ok(r.out.includes(`${fx.ledgers.other}: [cut:cut-key-phrase-remains]`), r.out);
+    assert.ok(!r.out.includes(`${fx.ledgers.demo}: [cut:`), `the clean course was reported:\n${r.out}`);
+    done(fx.root);
+  });
+
+  it('a catalog that does not hold this course is not its copy: a CUT row cannot pass with nothing scanned', () => {
+    const fx = seedFixture(['demo'], JSON.stringify({ courses: [entry('other', '', [OTHER_L])] }));
+    const r = run(BIN, [fx.ledgers.demo]);
+    assert.equal(r.code, 6, r.out);
+    assert.match(r.out, /cut-key-phrase-remains.*no course copy found/);
+    done(fx.root);
+  });
+
+  it("that course's own seed files are still read when the catalog does not hold it", () => {
+    const fx = seedFixture(['demo'], JSON.stringify({ courses: [entry('other', '', [OTHER_L])] }));
+    fs.writeFileSync(path.join(fx.root, 'data/seed/demo-quiz.json'), JSON.stringify({ q: 'Plain question.' }));
+    assert.equal(run(BIN, [fx.ledgers.demo]).code, 0);
+    fs.writeFileSync(path.join(fx.root, 'data/seed/demo-quiz.json'), JSON.stringify({ q: 'A miracle cure?' }));
+    const r = run(BIN, [fx.ledgers.demo]);
+    assert.equal(r.code, 6, r.out);
+    assert.match(r.out, /data\/seed\/demo-quiz\.json/);
+    done(fx.root);
   });
 });
 
