@@ -6,7 +6,15 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, symlinkSync } from 'node:fs';
+import {
+  cpSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  symlinkSync,
+  writeFileSync,
+} from 'node:fs';
 import { dirname, join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { spawnSync } from 'node:child_process';
@@ -64,18 +72,27 @@ test('dry run on the real catalogues plans every missing insertion and writes no
   CATALOGUES.forEach((rel, i) => assert.equal(readFileSync(join(root, rel), 'utf8'), before[i]));
 });
 
-test('--write adds each diagram in the See it part, changes nothing else, and is idempotent', () => {
-  const root = copyRepo();
+const ADDS = MAPPING.flatMap((m) => m.add);
+/** The exact figure block the script inserts for one diagram file. */
+const blockRe = (file) =>
+  new RegExp(
+    `<p><img src='/courses/${SLUG}/diagrams/${file.replace(/\./g, '\\.')}'[^>]*></p><p>[^<"]*</p>`,
+    'g'
+  );
+const strip = (text, files) => files.reduce((t, f) => t.replace(blockRe(f), ''), text);
+
+/**
+ * Run --write on `root` and check the result against what was in `root` beforehand, never
+ * against the repository: the test must hold whether the repository is unwired, wired or
+ * partly wired.
+ */
+function checkWrite(root) {
+  const before = CATALOGUES.map((rel) => readFileSync(join(root, rel), 'utf8'));
   assert.equal(run(root, '--write').status, 0);
-  for (const rel of CATALOGUES) {
-    const course = JSON.parse(readFileSync(join(root, rel), 'utf8')).courses.find(
-      (c) => c.slug === SLUG
-    );
-    const orig = JSON.parse(readFileSync(join(REPO, rel), 'utf8')).courses.find(
-      (c) => c.slug === SLUG
-    );
+  CATALOGUES.forEach((rel, i) => {
+    const written = readFileSync(join(root, rel), 'utf8');
+    const course = JSON.parse(written).courses.find((c) => c.slug === SLUG);
     const lessons = course.modules.flatMap((m) => m.lessons);
-    const origLessons = orig.modules.flatMap((m) => m.lessons);
     for (const m of MAPPING) {
       const body = lessons.find((l) => l.id === m.lessonId).contentBody;
       const seeIt = body.indexOf('<h3>See it</h3>');
@@ -85,27 +102,51 @@ test('--write adds each diagram in the See it part, changes nothing else, and is
         assert.ok(at > seeIt && at < metric, `${a.file} sits between See it and Do it in metric`);
       }
     }
-    for (const l of origLessons.filter((x) => !MAPPING.some((m) => m.lessonId === x.id)))
-      assert.equal(lessons.find((x) => x.id === l.id).contentBody, l.contentBody);
-    // Byte level: the written file minus exactly the inserted figure blocks is the original file,
-    // so no title, metadata, other course or formatting can change.
-    const written = readFileSync(join(root, rel), 'utf8');
-    let stripped = written;
-    for (const a of MAPPING.flatMap((m) => m.add)) {
-      const block = new RegExp(
-        `<p><img src='/courses/${SLUG}/diagrams/${a.file.replace(/\./g, '\\.')}'[^>]*></p><p>[^<"]*</p>`,
-        'g'
-      );
-      assert.equal((stripped.match(block) || []).length, 1, `${rel}: one block for ${a.file}`);
-      stripped = stripped.replace(block, '');
-    }
-    assert.equal(stripped, readFileSync(join(REPO, rel), 'utf8'), `${rel}: nothing else changed`);
-  }
+    for (const a of ADDS)
+      assert.equal((written.match(blockRe(a.file)) || []).length, 1, `${rel}: one ${a.file}`);
+    // Byte level: removing only the blocks that were not there before gives back the file as it
+    // was, so no title, metadata, other course or formatting can change.
+    const added = ADDS.map((a) => a.file).filter((f) => !blockRe(f).test(before[i]));
+    assert.equal(strip(written, added), before[i], `${rel}: nothing else changed`);
+  });
   const after = CATALOGUES.map((rel) => readFileSync(join(root, rel), 'utf8'));
   const again = run(root, '--write');
   assert.equal(again.status, 0);
   assert.match(again.stdout, /already wired/);
   CATALOGUES.forEach((rel, i) => assert.equal(readFileSync(join(root, rel), 'utf8'), after[i]));
+}
+/** A copy with every figure block removed, whatever state the repository is in. */
+function unwiredCopy() {
+  const root = copyRepo();
+  for (const rel of CATALOGUES) {
+    const p = join(root, rel);
+    writeFileSync(
+      p,
+      strip(
+        readFileSync(p, 'utf8'),
+        ADDS.map((a) => a.file)
+      )
+    );
+  }
+  return root;
+}
+
+test('--write on unwired catalogues adds each diagram in See it and changes nothing else', () => {
+  checkWrite(unwiredCopy());
+});
+
+test('--write on already wired catalogues changes nothing', () => {
+  const root = unwiredCopy();
+  assert.equal(run(root, '--write').status, 0);
+  checkWrite(root);
+});
+
+test('--write on partly wired catalogues adds only what is missing', () => {
+  const root = unwiredCopy();
+  assert.equal(run(root, '--write').status, 0);
+  const p = join(root, CATALOGUES[0]);
+  writeFileSync(p, strip(readFileSync(p, 'utf8'), [ADDS[0].file]));
+  checkWrite(root);
 });
 
 test('a missing lesson is an error, not a silent skip', () => {
