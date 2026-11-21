@@ -10,6 +10,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getAppOrigin, getCheckoutReturnUrl } from '@/lib/server/app-url';
 
+import { readAnalyticsConsent } from '@/lib/analytics/analytics-consent';
 import { verifySessionToken } from '@/lib/auth/session-jwt';
 import { buildCourseCheckoutUrls } from '@/lib/checkout-urls';
 import {
@@ -106,6 +107,9 @@ export async function POST(request: NextRequest) {
     const checkoutMetadata: Record<string, string> = surveyKey
       ? { ...attributionMetadata, [PURCHASE_SURVEY_BINDING_METADATA_KEY]: purchaseSurveyBinding(surveyKey) }
       : attributionMetadata;
+    // GP-732: the visitor's analytics choice travels with the session, so the webhook sends the
+    // server-side GA4 purchase event only on a recorded yes.
+    const analyticsConsent = readAnalyticsConsent(request);
 
     const slug = typeof body.slug === 'string' ? body.slug.trim() : '';
     if (!slug) {
@@ -386,6 +390,7 @@ export async function POST(request: NextRequest) {
             purchase_mode: purchaseMode,
             team_seat_count: teamSeatCount ?? undefined,
             attribution_journey_id: attributionJourneyId ?? undefined,
+            analytics_consent: analyticsConsent,
           });
           await tryRecordAttributedStage(attributionJourneyId, 'checkout_started', {
             courseSlug: slug,
@@ -437,6 +442,7 @@ export async function POST(request: NextRequest) {
         team_seat_count: teamSeatCount ?? undefined,
         attribution_journey_id: attributionJourneyId ?? undefined,
         extra_metadata: checkoutMetadata,
+        analytics_consent: analyticsConsent,
       });
       await tryRecordAttributedStage(attributionJourneyId, 'checkout_started', {
         courseSlug: slug,

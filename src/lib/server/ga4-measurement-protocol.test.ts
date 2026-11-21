@@ -53,7 +53,7 @@ describe('sendGa4MeasurementProtocolEvent', () => {
     setEnv(undefined, undefined);
     const fetchImpl = vi.fn();
     const result = await sendGa4MeasurementProtocolEvent(
-      { name: 'purchase', clientId: 'abc', params: {} },
+      { name: 'purchase', clientId: 'abc', params: {}, consent: 'granted' },
       { fetchImpl },
     );
     expect(result).toEqual({ sent: false });
@@ -70,6 +70,7 @@ describe('sendGa4MeasurementProtocolEvent', () => {
         clientId: 'client-1',
         userId: 'user-1',
         params: { currency: 'AUD', value: 199 },
+        consent: 'granted',
       },
       { fetchImpl },
     );
@@ -90,7 +91,7 @@ describe('sendGa4MeasurementProtocolEvent', () => {
     const fetchImpl = vi.fn().mockRejectedValue(new Error('network down'));
 
     const result = await sendGa4MeasurementProtocolEvent(
-      { name: 'purchase', clientId: 'client-1', params: {} },
+      { name: 'purchase', clientId: 'client-1', params: {}, consent: 'granted' },
       { fetchImpl },
     );
 
@@ -102,7 +103,7 @@ describe('sendGa4MeasurementProtocolEvent', () => {
     const fetchImpl = vi.fn().mockResolvedValue({ ok: false, status: 400 });
 
     const result = await sendGa4MeasurementProtocolEvent(
-      { name: 'purchase', clientId: 'client-1', params: {} },
+      { name: 'purchase', clientId: 'client-1', params: {}, consent: 'granted' },
       { fetchImpl },
     );
 
@@ -119,6 +120,7 @@ describe('sendGa4PurchaseEvent', () => {
       courseSlug: 'water-damage-101',
       valueAud: 199,
       transactionId: 'cs_test_123',
+      consent: 'granted',
     });
     expect(result).toEqual({ sent: false });
     expect(fetchImpl).not.toHaveBeenCalled();
@@ -137,6 +139,7 @@ describe('sendGa4PurchaseEvent', () => {
         courseSlug: 'water-damage-101',
         valueAud: 199,
         transactionId: 'cs_test_123',
+      consent: 'granted',
       });
 
       expect(result).toEqual({ sent: true, status: 204 });
@@ -152,6 +155,65 @@ describe('sendGa4PurchaseEvent', () => {
           items: [{ item_id: 'water-damage-101', item_name: 'water-damage-101' }],
         },
       });
+    } finally {
+      global.fetch = originalFetch;
+    }
+  });
+});
+
+describe('GP-732: server-side events honour the visitor analytics choice (fail closed)', () => {
+  const base = { name: 'purchase', clientId: 'client-1', params: { value: 1 } };
+
+  it('sends when the visitor granted analytics', async () => {
+    setEnv('G-TEST123', 'secret-abc');
+    const fetchImpl = vi.fn().mockResolvedValue({ ok: true, status: 204 });
+    const result = await sendGa4MeasurementProtocolEvent({ ...base, consent: 'granted' }, { fetchImpl });
+    expect(result).toEqual({ sent: true, status: 204 });
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+  });
+
+  it('sends nothing when the visitor refused analytics', async () => {
+    setEnv('G-TEST123', 'secret-abc');
+    const fetchImpl = vi.fn().mockResolvedValue({ ok: true, status: 204 });
+    const result = await sendGa4MeasurementProtocolEvent({ ...base, consent: 'denied' }, { fetchImpl });
+    expect(result).toEqual({ sent: false, skipped: 'no-consent' });
+    expect(fetchImpl).not.toHaveBeenCalled();
+  });
+
+  it('sends nothing when the choice is unknown', async () => {
+    setEnv('G-TEST123', 'secret-abc');
+    const fetchImpl = vi.fn().mockResolvedValue({ ok: true, status: 204 });
+    const result = await sendGa4MeasurementProtocolEvent({ ...base, consent: 'unknown' }, { fetchImpl });
+    expect(result).toEqual({ sent: false, skipped: 'no-consent' });
+    expect(fetchImpl).not.toHaveBeenCalled();
+  });
+
+  it('sends nothing when a caller passes no choice at all (untyped call)', async () => {
+    setEnv('G-TEST123', 'secret-abc');
+    const fetchImpl = vi.fn().mockResolvedValue({ ok: true, status: 204 });
+    const result = await sendGa4MeasurementProtocolEvent(
+      base as unknown as Parameters<typeof sendGa4MeasurementProtocolEvent>[0],
+      { fetchImpl },
+    );
+    expect(result.sent).toBe(false);
+    expect(fetchImpl).not.toHaveBeenCalled();
+  });
+
+  it('the purchase wrapper skips a refused purchase', async () => {
+    setEnv('G-TEST123', 'secret-abc');
+    const originalFetch = global.fetch;
+    const fetchImpl = vi.fn().mockResolvedValue({ ok: true, status: 204 });
+    global.fetch = fetchImpl as unknown as typeof fetch;
+    try {
+      const result = await sendGa4PurchaseEvent({
+        clientId: 'client-1',
+        courseSlug: 'water-damage-101',
+        valueAud: 199,
+        transactionId: 'cs_test_123',
+        consent: 'denied',
+      });
+      expect(result).toEqual({ sent: false, skipped: 'no-consent' });
+      expect(fetchImpl).not.toHaveBeenCalled();
     } finally {
       global.fetch = originalFetch;
     }
