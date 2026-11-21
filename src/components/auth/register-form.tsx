@@ -29,7 +29,7 @@ import {
 } from '@/lib/membership-signup-path';
 import { confirmFreeEnrolment } from '@/lib/lms/confirm-free-enrolment';
 import { useToast } from '@/hooks/use-toast';
-import { purchaseSurveyCheckoutField } from '@/lib/marketing/purchase-survey-key';
+import { purchaseSurveyCheckoutField, rememberPurchaseSurveyKey } from '@/lib/marketing/purchase-survey-key';
 
 export const formSchema = z
   .object({
@@ -109,12 +109,15 @@ export function RegisterForm() {
         const slug = decodeURIComponent(courseMatch[1]);
         try {
           const { success_url, cancel_url } = buildCourseCheckoutUrls(window.location.origin, slug);
+          // The survey key is kept in this tab only once checkout returns a checkout_url (GP-694).
+          const surveyField = purchaseSurveyCheckoutField();
           const checkout = await apiClient.post<{ enrolled?: boolean; checkout_url?: string }>(
             '/api/lms/checkout',
-            { slug, success_url, cancel_url, customer_email: values.email, ...purchaseSurveyCheckoutField() }
+            { slug, success_url, cancel_url, customer_email: values.email, ...surveyField }
           );
           const checkoutUrl = checkout.checkout_url;
           if (checkoutUrl) {
+            rememberPurchaseSurveyKey(surveyField);
             toast({ title: 'Redirecting to checkout…' });
             window.setTimeout(() => {
               window.location.href = checkoutUrl;

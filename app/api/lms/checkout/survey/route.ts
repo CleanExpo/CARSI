@@ -8,6 +8,7 @@
  * Capability: `survey_keys`, the browser tab's recent per-checkout keys (1 to 5); one must match
  * the binding the checkout route stored on this session's metadata (the id alone is not enough;
  * it travels in the success URL). The session must also be under 24 hours old and paid.
+ * Rate limited per client IP before anything else is parsed, so junk never reaches Stripe (GP-694).
  * Write-once: a PaymentIntent that already carries `svy_at` is left unchanged, and a per-intent
  * idempotency key stops a concurrent second write. PaymentIntent
  * metadata is used because it stays writable after payment.
@@ -18,14 +19,29 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getStripeClient } from '@/lib/api/stripe';
 import { surveyMetadata, validateSurvey } from '@/lib/marketing/purchase-survey';
+import { applyRateLimit, clientIpFrom } from '@/lib/rate-limit';
 import { isPurchaseSurveyEnabled } from '@/lib/server/purchase-survey-flag';
-import { parsePurchaseSurveyKeys, sessionAuthorisedForSurvey } from '@/lib/server/purchase-survey-token';
+import {
+  parsePurchaseSurveyKeys,
+  PURCHASE_SURVEY_RATE_LIMIT,
+  PURCHASE_SURVEY_RATE_WINDOW_MS,
+  sessionAuthorisedForSurvey,
+} from '@/lib/server/purchase-survey-token';
 
 const SESSION_ID_PATTERN = /^cs_[A-Za-z0-9_]{1,250}$/;
 
 export async function POST(request: NextRequest) {
   if (!isPurchaseSurveyEnabled()) {
     return NextResponse.json({ detail: 'Not found' }, { status: 404 });
+  }
+
+  const ip = clientIpFrom(request.headers.get('x-forwarded-for'), request.headers.get('x-real-ip'));
+  const rl = applyRateLimit(`purchase-survey:${ip}`, PURCHASE_SURVEY_RATE_LIMIT, PURCHASE_SURVEY_RATE_WINDOW_MS);
+  if (!rl.ok) {
+    return NextResponse.json(
+      { detail: 'Too many requests. Please try again later.' },
+      { status: 429, headers: { 'Retry-After': String(Math.ceil((rl.resetAt - Date.now()) / 1000)) } }
+    );
   }
 
   const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
