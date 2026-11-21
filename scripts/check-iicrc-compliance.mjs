@@ -199,6 +199,49 @@ const CEC_NUMBER = {
     'Specific IICRC CEC-hour claim on a non-approved course. Every numbered "N IICRC CEC(s)" claim is blocked by default; it ships ONLY if a human adds the line\'s exact text to scripts/iicrc-cec-allowlist.json (approvedLines) after review, or the file sits under a founder-approved course slug (data/seed/cec-approvals.json). No pattern/auto-exemption — a near-miss still blocks. If this is a genuine IICRC program-requirement fact, add the exact line to the allowlist; if it is a course-award claim, remove the CEC number (fail-closed, CLAUDE.md).',
 };
 
+/** GAP CLOSED 2026-11-21 — a numbered CEC claim WITHOUT the word "IICRC" next to the number.
+ *  A planted "This course earns 4 CEC hours." in a public field tool exited 0, because CEC_NUMBER
+ *  needs "N IICRC CEC". This rule catches the bare forms a learner reads as the same claim:
+ *    - number + CEC + unit:        "4 CEC hours", "2 CEC points", "3-CEC-credit", "1.5 CEC hrs"
+ *    - number + unit + CEC:        "4 hours of CEC", "4 CE hours (CEC)"-style "4 hours CEC"
+ *    - award verb + number + CEC:  "earns 3 CECs", "worth 4 CEC", "awarded up to 6 CECs"
+ *    - label:                      "CEC hours: 4", "CECs: 3"
+ *  Numbers may be digits or words one–twenty ("earns four CECs").
+ *
+ *  It does NOT bind a bare number to "CEC" on its own (see the KNOWN LIMIT above): learner tracking
+ *  ("10 CECs Earned"), requirement facts ("require 14 CECs per 4-year cycle"), calculator maths
+ *  ("21 CECs as a Master"), ticket refs and code comments stay silent. Zero is not a claim
+ *  ("0 CEC hours", "earns 0 CECs") and is skipped. Gated exactly like CEC_NUMBER: approved-slug
+ *  files are exempt, and a genuine requirement line ships only via the exact-text allowlist. */
+const CEC_NUM_WORD = String.raw`(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty)`;
+// A non-zero quantity: digits (not all zeros), optionally decimal, or a number word.
+const CEC_QTY = String.raw`(?:(?!0+(?:\.0+)?\b)\d+(?:\.\d+)?|${CEC_NUM_WORD})`;
+const CEC_UNIT = String.raw`(?:hours?|hrs?|points?|credits?|units?)`;
+const CEC_AWARD_VERB = String.raw`(?:earn|award|grant|give|gives|giving|carr(?:y|ies|ied|ying)|provid|offer|worth|attract|gain|receiv|deliver|accru|yield|count(?:s|ed)?\s+(?:for|towards?)|qualif\w*\s+for)\w*`;
+const CEC_AWARD_GAP = String.raw`(?:\s+(?:you|learners?|students?|participants?|up\s+to|a\s+total\s+of|an?\s+(?:extra|additional|further)|another))*`;
+const CEC_NUMBER_BARE_PROSE = new RegExp(
+  [
+    String.raw`\b${CEC_QTY}[\s-]*(?:IICRC[\s-]+)?CECs?[\s-]+${CEC_UNIT}\b`,
+    String.raw`\b${CEC_QTY}[\s-]*${CEC_UNIT}[\s-]+(?:of[\s-]+)?(?:IICRC[\s-]+)?CECs?\b`,
+    String.raw`\b${CEC_AWARD_VERB}${CEC_AWARD_GAP}\s+${CEC_QTY}[\s-]*(?:IICRC[\s-]+)?CECs?\b`,
+  ].join('|'),
+  'i'
+);
+// Label form ("CEC hours: 4", "CECs: 3"). TIGHTENED (false positive, 2026-11-21): the acronym must
+// be upper-case, so code keys such as `meta: { cec: 9 }` in a fixture do not read as copy.
+const CEC_NUMBER_BARE_LABEL = new RegExp(String.raw`\bCECs?(?:[\s-]+${CEC_UNIT})?\s*:\s*${CEC_QTY}\b`, 'gi');
+const hasUpperCaseCecLabel = (s) => [...s.matchAll(CEC_NUMBER_BARE_LABEL)].some((m) => m[0].startsWith('CEC'));
+const CEC_NUMBER_BARE = {
+  re: { test: (s) => CEC_NUMBER_BARE_PROSE.test(s) || hasUpperCaseCecLabel(s) },
+  // TIGHTENED (false positive, 2026-11-21): unit-test files never reach a learner, and they
+  // legitimately describe registry fixtures ("1 CEC hour each in data/seed/cec-approvals.json").
+  // This exemption applies to THIS rule only; CEC_NUMBER and every BANNED rule still scan tests.
+  skipFile: (file) => /\.(?:test|spec)\.[cm]?[jt]sx?$/.test(file),
+  allowlisted: true,
+  message:
+    'Numbered CEC claim on a non-approved course (e.g. "4 CEC hours", "earns 3 CECs", "2 CEC points") — the same licence exposure as "N IICRC CECs", even without the word IICRC. Remove the CEC number unless the course is approved in data/seed/cec-approvals.json; a genuine IICRC program-requirement line ships only by adding its exact text to scripts/iicrc-cec-allowlist.json after human review (fail-closed, CLAUDE.md).',
+};
+
 /** Normalise a line for exact allowlist comparison: trim ends, collapse internal whitespace runs.
  *  Deliberately conservative — case and wording are preserved, so a near-miss variant does NOT
  *  match an allowlisted line (no accidental wildcarding). */
@@ -297,12 +340,13 @@ function scanLine(file, lineNo, content, findings, allowlist) {
   // course — i.e. its path contains a slug listed in CEC_APPROVED_SLUGS (empty = none approved).
   const nf = file.replace(/\\/g, '/');
   const cecApproved = CEC_APPROVED_SLUGS.some((slug) => nf.includes(slug));
-  for (const rule of [...BANNED, CEC_NUMBER]) {
-    if (rule === CEC_NUMBER && cecApproved) continue;
+  for (const rule of [...BANNED, CEC_NUMBER, CEC_NUMBER_BARE]) {
+    if ((rule === CEC_NUMBER || rule === CEC_NUMBER_BARE) && cecApproved) continue;
+    if (rule.skipFile && rule.skipFile(nf)) continue;
     if (!rule.re.test(content)) continue;
     let flagged;
     if (rule.allowlisted) {
-      // CEC_NUMBER: block EVERY numbered-CEC line unless its exact normalised text is human
+      // CEC_NUMBER / CEC_NUMBER_BARE: block EVERY numbered-CEC line unless its exact normalised text is human
       // -approved in the allowlist. No regex exemption — the human review is the control.
       flagged = !allowlist.has(normaliseLine(content));
     } else {
@@ -919,8 +963,8 @@ export function evaluateRecords(file, jsonText, { approvedSlugs, allowlist = ALL
     if (seenSlugs.has(slug)) structural(`slug "${slug}" appears in more than one record; one course, one record`);
     seenSlugs.add(slug);
     const isApproved = approved.has(slug) && row.slug === slug;
-    const rules = [...BANNED, CEC_NUMBER, CEC_APPROVAL_PROSE, CEC_INSIDE_WORD].filter(
-      (rule) => !(isApproved && (rule === CEC_NUMBER || rule === CEC_APPROVAL_PROSE || rule === CEC_INSIDE_WORD))
+    const rules = [...BANNED, CEC_NUMBER, CEC_NUMBER_BARE, CEC_APPROVAL_PROSE, CEC_INSIDE_WORD].filter(
+      (rule) => !(isApproved && (rule === CEC_NUMBER || rule === CEC_NUMBER_BARE || rule === CEC_APPROVAL_PROSE || rule === CEC_INSIDE_WORD))
     );
     // GP-673: an unapproved course must be fully readable (shape, markup, CSS, characters).
     if (!isApproved) {
@@ -1074,7 +1118,7 @@ function formatRecordFinding(f) {
 
 function inRecordScope(f) { const n = f.replace(/\\/g, '/'); return n.endsWith('.json') && RECORD_SCANNED_DIRS.some((d) => n.startsWith(d)); }
 
-export { BANNED, CEC_NUMBER, CEC_APPROVED_SLUGS, inScope, isExempt, normaliseLine, ALLOWLIST, IICRC_FREE_FILES };
+export { BANNED, CEC_NUMBER, CEC_NUMBER_BARE, CEC_APPROVED_SLUGS, inScope, isExempt, normaliseLine, ALLOWLIST, IICRC_FREE_FILES };
 // The rendered-output layer on its own, so the self-test can prove each part works even where the
 // input gate would already block the same record.
 export { studentView, renderedProblems };
