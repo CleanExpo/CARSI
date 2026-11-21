@@ -230,3 +230,62 @@ for (const [name, fn] of [
     assert.ok(licenceGone(errs), errs.join('\n'));
   });
 }
+
+// ---- CodeRabbit on #1192: line endings, literal comment openers, indented headings ----
+
+function rewrite(rel, fn) {
+  return errorsFor((d) => {
+    const p = join(d, rel);
+    writeFileSync(p, fn(readFileSync(p, 'utf8')));
+  });
+}
+const crlf = (t) => t.replace(/\r?\n/g, '\r\n');
+
+test('control: a CRLF copy of the real files still passes', () => {
+  const errs = errorsFor((d) => {
+    for (const rel of [...ENTRYPOINTS.map((e) => e.path), 'docs/agents/CLAUDE.md']) {
+      const p = join(d, rel);
+      writeFileSync(p, crlf(readFileSync(p, 'utf8')));
+    }
+  });
+  assert.deepEqual(errs, []);
+});
+
+for (const [name, eol] of [
+  ['CRLF', '\r\n'],
+  ['CR', '\r'],
+]) {
+  test(`control: import inside a ~~~ fence in a ${name} file does not count`, () => {
+    const errs = rewrite('.claude/CLAUDE.md', (t) =>
+      t
+        .replace('@../docs/agents/CLAUDE.md', '~~~\n@../docs/agents/CLAUDE.md\n~~~')
+        .replace(/\r?\n/g, eol)
+    );
+    assert.ok(importMissing(errs), errs.join('\n'));
+  });
+}
+
+for (const [name, before] of [
+  ['an inline code span', 'Use `<!--` to open a comment.\n\n'],
+  ['a double-backtick code span', 'Write ``<!-- x`` and close it.\n\n'],
+  ['an indented code block', '\n    <!-- example opener\n\n'],
+]) {
+  test(`control: a literal <!-- in ${name} does not hide the imports after it`, () => {
+    const errs = rewrite('.claude/CLAUDE.md', (t) =>
+      t.replace('Licence, course production', `${before}Licence, course production`)
+    );
+    assert.deepEqual(errs, []);
+  });
+}
+
+test('control: a <!-- after an unmatched backtick still opens a comment', () => {
+  const errs = importHidden((r) => `a stray \` then <!--\n${r}\n-->`);
+  assert.ok(importMissing(errs), errs.join('\n'));
+});
+
+test('control: the section holds only an indented nested ### heading fails', () => {
+  for (const pad of [' ', '  ', '   ']) {
+    const errs = licenceSection((h) => `${h}\n${pad}### More\n\n`);
+    assert.ok(licenceGone(errs), JSON.stringify(pad) + '\n' + errs.join('\n'));
+  }
+});

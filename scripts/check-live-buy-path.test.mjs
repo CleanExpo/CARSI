@@ -323,6 +323,69 @@ check('a comma or quote inside a comment does not make //host a URL (GP-691)', (
   ]);
   assert.deepEqual(findLocalOrigins('<script>x</script>\n// "//127.1:8080"'), ['//127.1:8080']);
 });
+check('a script line is suppressed only when a JS lexer confirms the comment (#1192)', () => {
+  // Positive controls: each `//` looks like a whole-line comment but is not one, so the URL
+  // after it is live code. Before this fix the first returned [] (a false green).
+  for (const html of [
+    '<script>/*\n// */ fetch("//localhost:3000/api")\n</script>',
+    '<script>/* a\n b\n// */ fetch("//localhost:3000/api")</script>',
+    '<script>const t = `\n// ${x}`; fetch("//localhost:3000/api")</script>',
+    '<script>const t = `\n// "//localhost:3000/api"`;</script>',
+    '<script>const t = `${`\n// "//localhost:3000/api"`}`;</script>',
+    '<script>const s = \'a\\\n// "//localhost:3000/api"\';</script>',
+    '<script>if (a) /[/*]/.test(b);\n// */ fetch("//localhost:3000/api")</script>',
+    '<script>if (a) /\'/.test(b);\n// "//localhost:3000/api"</script>',
+    '<script>/* never closed\n// "//localhost:3000/api"</script>',
+  ]) {
+    assert.deepEqual(findLocalOrigins(html), ['//localhost:3000'], JSON.stringify(html));
+  }
+  // Negative controls: confirmed line comments stay suppressed after code the lexer can read.
+  for (const html of [
+    '<script>/* a */\n// "//localhost:3000/api" old</script>',
+    '<script>const t = `a ${b ? "x" : `y`} c`;\n// "//localhost:3000/api" old</script>',
+    '<script>const r = /"\\//g; const q = "it\'s";\n// "//localhost:3000/api" old</script>',
+    '<script>return /a/.test(b) && c / 2;\n// "//localhost:3000/api" old</script>',
+    '<script>const d = a / b;\n// "//localhost:3000/api" old</script>',
+    '<script>x = /[/*]/;\n// */ "//localhost:3000/api" old</script>',
+  ]) {
+    assert.deepEqual(findLocalOrigins(html), [], JSON.stringify(html));
+  }
+});
+check('srcset spans come from real HTML attributes, not script text (#1192)', () => {
+  // Positive controls: before this fix the script string swallowed the real attribute.
+  for (const html of [
+    '<script>const note=\'srcset="\';</script><img srcset="a.png, //localhost:3000/b.png 2x">',
+    '<style>/* srcset="x */</style><img srcset="a.png, //localhost:3000/b.png 2x">',
+    '<!-- srcset=" --><img srcset="a.png, //localhost:3000/b.png 2x">',
+    '<img alt=\'srcset="\' srcset="a.png, //localhost:3000/b.png 2x">',
+    '<img srcset=a.png,//localhost:3000/b.png>',
+    '<link rel="preload" IMAGESRCSET=\'a.png, //localhost:3000/b.png 2x\'>',
+  ]) {
+    assert.deepEqual(findLocalOrigins(html), ['//localhost:3000'], html);
+  }
+  // Negative controls: srcset-looking text inside a script or style opens no srcset span.
+  assert.deepEqual(
+    findLocalOrigins('<script>const n = \'srcset="a, //127.1:8080 b"\';</script>'),
+    []
+  );
+  assert.deepEqual(findLocalOrigins('<style>/* srcset=a.png, //127.1:8080 dev */</style>'), []);
+});
+check('a serialized srcSet value counts a descriptor-free first candidate (#1192)', () => {
+  for (const html of [
+    '{"srcSet":"a.png, //localhost:3000/b.png 2x"}',
+    '{"imageSrcSet":"a.png,//localhost:3000/b.png"}',
+    'self.__next_f.push([1,"{\\"srcSet\\":\\"a.png, //localhost:3000/b.png 2x\\"}"])',
+    '<div data-i="{&quot;srcSet&quot;:&quot;a.png, //localhost:3000/b.png 2x&quot;}">',
+  ]) {
+    assert.deepEqual(findLocalOrigins(html), ['//localhost:3000'], html);
+  }
+  // Negative controls: a comma outside any srcset value is still not a link.
+  assert.deepEqual(findLocalOrigins('<style>/* old, //127.1:8080 dev */</style>'), []);
+  assert.deepEqual(
+    findLocalOrigins('{"srcSet":"a.png 1x"}<style>/* old, //127.1:8080 dev */</style>'),
+    []
+  );
+});
 check('an attribute value is found after any run of padding spaces (GP-686 item 3)', () => {
   // CodeRabbit on #1033 (round 3): the look-back was a fixed 16 characters.
   const pad = ' '.repeat(40);

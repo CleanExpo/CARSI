@@ -46,19 +46,61 @@ function stripIndentedCode(text) {
 }
 
 /**
+ * Index of the first `<!--` in `line` that is not inside an inline code span, or -1. A code
+ * span opens with a run of N backticks and closes with the next run of exactly N on the same
+ * line; an unmatched run is literal text, so a `<!--` after it still opens a comment.
+ */
+function commentOpenOutsideCode(line) {
+  let i = 0;
+  while (i < line.length) {
+    if (line.startsWith('<!--', i)) return i;
+    if (line[i] !== '`') {
+      i += 1;
+      continue;
+    }
+    let n = 1;
+    while (line[i + n] === '`') n += 1;
+    const run = '`'.repeat(n);
+    let close = line.indexOf(run, i + n);
+    while (close >= 0 && line[close + n] === '`') {
+      let k = close + n;
+      while (line[k] === '`') k += 1;
+      close = line.indexOf(run, k);
+    }
+    i = close >= 0 ? close + n : i + n;
+  }
+  return -1;
+}
+
+/**
  * GP-692: blank out HTML comments and fenced code blocks, keeping the line count. A fence
  * opens with 3+ backticks or tildes (up to 3 spaces in) and closes only on a line of the SAME
  * character at least as long; an unclosed fence or comment runs to the end of the file. A rule
  * hidden in either is not loaded by the agent, so it must not count as present here.
+ * CR and CRLF line endings are read as LF (CodeRabbit on #1192), and a `<!--` inside an inline
+ * code span or an indented code block is literal text, not a comment opener.
  */
 function stripHidden(text) {
   const out = [];
   let fence = null;
   let comment = false;
-  for (const line of text.split('\n')) {
+  let prevBlank = true;
+  let inIndented = false;
+  for (const line of text.replace(/\r\n?/g, '\n').split('\n')) {
+    const blank = line.trim() === '';
     if (fence) {
       if (fence.test(line)) fence = null;
       out.push('');
+      prevBlank = blank;
+      inIndented = false;
+      continue;
+    }
+    // Indented code (4 spaces or a tab, opened after a blank line) is literal, so it can open
+    // neither a fence nor a comment. stripIndentedCode drops it later for import lookup.
+    inIndented = !comment && /^( {4}|\t)/.test(line) && (inIndented || prevBlank);
+    prevBlank = blank;
+    if (inIndented) {
+      out.push(line);
       continue;
     }
     let rest = line;
@@ -78,7 +120,7 @@ function stripHidden(text) {
         comment = false;
         rest = rest.slice(end + 3);
       } else {
-        const start = rest.indexOf('<!--');
+        const start = commentOpenOutsideCode(rest);
         if (start < 0) {
           kept += rest;
           break;
@@ -102,18 +144,21 @@ function references(text) {
 /** Body of the heading whose text contains `marker`, up to the next heading of the same or higher level; comments and fenced code are ignored. */
 function sectionBody(text, marker) {
   const lines = stripHidden(text).split('\n');
-  const at = lines.findIndex((l) => /^#{1,6}\s/.test(l) && l.includes(marker));
+  // An ATX heading may sit up to 3 spaces in (CodeRabbit on #1192).
+  const at = lines.findIndex((l) => /^ {0,3}#{1,6}(\s|$)/.test(l) && l.includes(marker));
   if (at < 0) return null;
-  const level = /^#+/.exec(lines[at])[0].length;
+  const level = /^ {0,3}(#+)/.exec(lines[at])[1].length;
   const body = [];
   for (const line of lines.slice(at + 1)) {
-    const h = /^(#+)\s/.exec(line);
+    const h = /^ {0,3}(#{1,6})(\s|$)/.exec(line);
     if (h && h[1].length <= level) break;
     body.push(line);
   }
   // A section holding only nested headings or thematic breaks (---, ***, ___) is empty.
   return body
-    .filter((l) => !/^#{1,6}(\s|$)/.test(l) && !/^ {0,3}([-*_])(?:[ \t]*\1){2,}[ \t]*$/.test(l))
+    .filter(
+      (l) => !/^ {0,3}#{1,6}(\s|$)/.test(l) && !/^ {0,3}([-*_])(?:[ \t]*\1){2,}[ \t]*$/.test(l)
+    )
     .join('\n')
     .trim();
 }
