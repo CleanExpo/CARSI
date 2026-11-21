@@ -97,6 +97,8 @@ const DETECTORS = [
   'src/lib/marketing/public-claims-guard.test.ts',
   'src/lib/seo/neosan-claims.test.ts',
   'src/lib/server/public-catalogue-facts.branding.test.ts',
+  // This guard: its pattern controls spell the retired wording on purpose.
+  'src/lib/iicrc/approved-provider-wording.test.tsx',
 ];
 
 /**
@@ -137,8 +139,10 @@ const PENDING_PDFS: Record<string, string> = {
 const BINARY =
   /\.(?:png|jpe?g|gif|webp|avif|ico|pdf|mp4|mov|webm|mp3|wav|woff2?|ttf|otf|zip|gz|lock)$/i;
 
+// Untracked, non-ignored files are scanned too, so a local run sees a new file before it is
+// committed (a committed-only scan let this guard pass on its own uncommitted file).
 function trackedTextFiles(): string[] {
-  return execFileSync('git', ['ls-files', '-z'], {
+  return execFileSync('git', ['ls-files', '-z', '--cached', '--others', '--exclude-standard'], {
     cwd: ROOT,
     encoding: 'utf8',
     maxBuffer: 64 * 1024 * 1024,
