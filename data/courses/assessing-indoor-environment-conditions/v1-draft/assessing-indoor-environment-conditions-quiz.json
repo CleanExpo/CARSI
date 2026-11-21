@@ -1,0 +1,743 @@
+{
+  "version": 1,
+  "courseSlug": "assessing-indoor-environment-conditions",
+  "status": "draft",
+  "note": "DRAFT v1 module checks and final designation exam for the CARSI Indoor Environment Assessment Practitioner course. Original CARSI questions written for Australian and New Zealand conditions; no IICRC standard text reproduced. SME review and sign-off required before seeding.",
+  "quizzes": [
+    {
+      "quizId": "eebbd52e-33f5-448e-9a2a-66915769e72b",
+      "lessonTitle": "Module 1 check",
+      "title": "CARSI Indoor Environment Assessment Practitioner — Module 1 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "A tenant asks you whether the air in her bedroom is safe for her toddler. What do you do?",
+          "options": [
+            "Compare readings with a workplace limit",
+            "Give a safe or unsafe verdict",
+            "Take an air sample for verdict",
+            "Describe the building, refer health questions"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "An assessment describes the building. Australian public health guidance says mould test results cannot decide whether a health risk exists, so health questions go to a doctor."
+        },
+        {
+          "questionText": "Which order are the four assessment stages recorded in?",
+          "options": [
+            "Observe, measure, interpret, recommend",
+            "Measure, observe, recommend, interpret",
+            "Recommend, measure, observe, interpret",
+            "Interpret, observe, measure, recommend"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Observe, measure, interpret, recommend. Keeping each stage separate lets a reader check your interpretation against what you actually saw and measured."
+        },
+        {
+          "questionText": "Why does a limitation belong in the written report?",
+          "options": [
+            "It transfers liability to the insurer",
+            "It makes the report look longer",
+            "It shows what was not checked",
+            "It replaces the need for readings"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "A limitation written down tells every reader what you could not access or measure. Left out, it becomes an argument later about what you missed."
+        },
+        {
+          "questionText": "Unit 4 leaks; Unit 5 next door smells musty. Which is the pathway in the hypothesis?",
+          "options": [
+            "The shared wall cavity and gaps",
+            "The body corporate that hired you",
+            "The Unit 5 occupant with asthma",
+            "The leaking shower mixer, Unit 4"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "The source is the leak, the receptor is the Unit 5 occupant, and the pathway is how the problem travels between them: the shared cavity and the gaps into Unit 5."
+        },
+        {
+          "questionText": "Which reading would best rule out the cavity link to Unit 5?",
+          "options": [
+            "Outdoor air humidity is high this week",
+            "Unit 5 wall matches its own reference",
+            "Unit 5 occupant reports fewer symptoms now",
+            "Unit 4 wall reads much wetter today"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "If the Unit 5 side of the shared wall reads the same as an unaffected reference in Unit 5, the moisture is not reaching it, which weakens the cavity hypothesis."
+        },
+        {
+          "questionText": "An occupant tells you they have severe asthma. How does that go in your notes?",
+          "options": [
+            "As a reported fact about receptors",
+            "As a reason to skip readings",
+            "As proof the house is unsafe",
+            "As a diagnosis linked to mould"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Record it as a reported fact. It can raise the priority of the work and supports a recommendation to see a doctor, but you do not judge or link symptoms."
+        }
+      ]
+    },
+    {
+      "quizId": "2da4f327-0245-40ba-a9d6-f35c37e7ce55",
+      "lessonTitle": "Module 2 check",
+      "title": "CARSI Indoor Environment Assessment Practitioner — Module 2 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Which NCC climate zone is Brisbane in?",
+          "options": [
+            "Zone 2, warm humid summer",
+            "Zone 7, cool temperate climate",
+            "Zone 8, alpine mountain climate",
+            "Zone 5, warm temperate climate"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Brisbane is in NCC climate zone 2. In humid summers, outdoor air meeting air-conditioned surfaces can condense inside walls and behind furniture."
+        },
+        {
+          "questionText": "In a Hobart winter, where does condensation risk usually run?",
+          "options": [
+            "Humid outdoor air onto cooled interiors",
+            "Ground moisture up into roof spaces",
+            "Bathroom fans out into living rooms",
+            "Moist indoor air onto cold surfaces"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Hobart is cool temperate (zone 7). Warm, moist indoor air reaches cold external walls and ceilings, so condensation forms on the inside in winter."
+        },
+        {
+          "questionText": "A bathroom fan exhausts 25 L/s. About how many cubic metres per hour is that?",
+          "options": [
+            "About 250 cubic metres per hour",
+            "About 90 cubic metres per hour",
+            "About 900 cubic metres per hour",
+            "About 25 cubic metres per hour"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "25 L/s × 3,600 s = 90,000 L/h, and 1,000 L is 1 m³, so the fan moves 90 m³/h."
+        },
+        {
+          "questionText": "Room A is 18 °C / 70% RH; room B is 21 °C / 55% RH. Which statement is right?",
+          "options": [
+            "Both hold about 9 g/kg moisture",
+            "Room A holds far more moisture",
+            "RH alone shows the moisture content",
+            "Room B holds far more moisture"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "About 9.0 and 8.5 g/kg. RH depends on temperature, so the colder room looks damper while holding almost the same moisture."
+        },
+        {
+          "questionText": "Room air has a dew point of 12.4 °C. A ceiling corner reads 12 °C. What do you expect?",
+          "options": [
+            "A drop in room humidity ratio",
+            "No effect at that surface temperature",
+            "Higher RH in the room centre",
+            "Condensation forms on the cold corner"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "A surface at or below the dew point collects condensation. At 12 °C the corner is just below 12.4 °C, so it is effectively at 100% RH."
+        },
+        {
+          "questionText": "Why do you record which equipment was running with each reading?",
+          "options": [
+            "It replaces the outdoor comparison",
+            "It proves equipment was tested",
+            "Equipment changes the readings directly",
+            "Insurers charge for equipment hire"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Dehumidifiers, heaters and air conditioners change temperature and moisture directly. Without the equipment state, readings from different visits cannot be compared."
+        }
+      ]
+    },
+    {
+      "quizId": "c5dc143f-0393-4e00-99d3-fc3c6f349555",
+      "lessonTitle": "Module 3 check",
+      "title": "CARSI Indoor Environment Assessment Practitioner — Module 3 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "A note says \"wall dry, 15\". What is the biggest problem with it?",
+          "options": [
+            "The number fifteen is too low",
+            "No reference, instrument, location or time",
+            "It should be written in percent",
+            "It should use the imperial scale"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "A defensible reading needs value, scale, instrument and mode, location and time, against a reference. \"15\" alone cannot be repeated or compared."
+        },
+        {
+          "questionText": "A thermal camera shows a cool patch on a wall. What do you do next?",
+          "options": [
+            "Ignore it as camera fault",
+            "Report the patch as wet",
+            "Confirm with a moisture meter",
+            "Paint over the cool patch"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Thermal cameras show surface temperature, not moisture. Cool can mean wet, draughty or uninsulated, so confirm with a moisture meter before reporting."
+        },
+        {
+          "questionText": "How are moisture meter readings made comparable?",
+          "options": [
+            "Same material, instrument, mode, reference",
+            "Same room, different meters, averaged",
+            "Any material, any meter, today",
+            "Different materials, same numeric scale"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Meter scales are relative or material-specific. Compare like with like against a reference from an unaffected area of the same material."
+        },
+        {
+          "questionText": "When is indoor CO2 a fair indicator of ventilation?",
+          "options": [
+            "When a gas heater is running",
+            "When the room is empty overnight",
+            "When no combustion sources are present",
+            "When the windows are all open"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "The ABCB handbook says CO2 can be relied on as a ventilation indicator only without significant non-breathing sources such as combustion."
+        },
+        {
+          "questionText": "What can an optical particle counter NOT tell you?",
+          "options": [
+            "How many particles were counted",
+            "Which size channels were counted",
+            "When the sample was collected",
+            "What the particles actually are"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "It counts particles by size. Dust, smoke, pollen and spores look alike to it, so use it for same-instrument comparisons, not identification."
+        },
+        {
+          "questionText": "A swab gives a high ATP reading. What does that show?",
+          "options": [
+            "A specific germ has been found",
+            "Mould is growing on the surface",
+            "The surface is unsafe to touch",
+            "Organic residue is on the surface"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "ATP devices measure all cellular ATP, so they are a general cleanliness measure. They cannot tell types of organic material apart and are not a mould test."
+        }
+      ]
+    },
+    {
+      "quizId": "663d808a-f9eb-4304-9740-bf67f9d5bab2",
+      "lessonTitle": "Module 4 check",
+      "title": "CARSI Indoor Environment Assessment Practitioner — Module 4 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Mould is clearly visible behind a wardrobe. A buyer wants \"a mould test\". What is your view?",
+          "options": [
+            "Testing is required before any repair",
+            "Testing is generally not considered necessary",
+            "Testing will identify the health risk",
+            "Testing will prove it is safe"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "enHealth says testing is generally not considered necessary where mould is visible, and results cannot decide health risk. Find the moisture source instead."
+        },
+        {
+          "questionText": "When is a sample justified?",
+          "options": [
+            "Whenever the client asks for one",
+            "When an occupant reports any symptoms",
+            "When it answers a written question",
+            "Whenever mould is visible somewhere inside"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Sample only to answer a written question a sample can actually answer, such as hidden growth or a before-and-after comparison of a defined area."
+        },
+        {
+          "questionText": "A pump runs at 15 L/min for 5 minutes. What volume was sampled?",
+          "options": [
+            "0.075 cubic metres of air",
+            "7.5 cubic metres of air",
+            "0.75 cubic metres of air",
+            "75 cubic metres of air"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "15 × 5 = 75 L, and 75 ÷ 1,000 = 0.075 m³. The laboratory uses this volume to report a count per cubic metre."
+        },
+        {
+          "questionText": "What do you check about a laboratory before sending samples?",
+          "options": [
+            "It returns results within one day",
+            "It is the cheapest laboratory nearby",
+            "Its accreditation scope covers the test",
+            "It will agree with your hypothesis"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "NATA (Australia) and IANZ (New Zealand) accredit laboratories for specific activities. Confirm the test you need is inside the laboratory's scope."
+        },
+        {
+          "questionText": "Which gap makes a sample result hardest to rely on?",
+          "options": [
+            "The cassettes were a new brand",
+            "The report arrived on a Friday",
+            "No record of the collection location",
+            "A courier arrived later than planned"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "A result that cannot be tied to a place and time cannot support a decision. Location, time and every hand-over belong on the chain-of-custody form."
+        },
+        {
+          "questionText": "Four air samples cost AUD 85 each and two tape lifts AUD 45 each, ex GST. What is the total inc GST?",
+          "options": [
+            "AUD 430 including GST",
+            "AUD 516 including GST",
+            "AUD 387 including GST",
+            "AUD 473 including GST"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "4 × 85 + 2 × 45 = 430 ex GST. GST at 10% is 43, so the total is AUD 473 inc GST."
+        }
+      ]
+    },
+    {
+      "quizId": "aef944c9-fab8-4f0a-9750-f532123c1938",
+      "lessonTitle": "Module 5 check",
+      "title": "CARSI Indoor Environment Assessment Practitioner — Module 5 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "What is the \"safe spore count\" for a home?",
+          "options": [
+            "There is no such guideline value",
+            "Below the workplace exposure limit value",
+            "Below 400 spores per cubic metre",
+            "Whatever the outdoor sample reads today"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "enHealth says there is no exposure limit or health guideline value for mould. Interpret by comparison with references, outdoors and trends."
+        },
+        {
+          "questionText": "From when do workplace exposure limits (WEL) apply in Australia?",
+          "options": [
+            "From 30 November 2025",
+            "From 1 December 2026",
+            "From 1 December 2029",
+            "From 1 June 2027"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Safe Work Australia: from 1 December 2026, as each jurisdiction implements it in its WHS laws. Benzene and some state transitions have their own dates."
+        },
+        {
+          "questionText": "What is the benzene WEL from 1 June 2027?",
+          "options": [
+            "1 ppm 8-hour TWA",
+            "0.2 ppm 8-hour TWA",
+            "3.2 ppm 8-hour TWA",
+            "0.7 ppm 8-hour TWA"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "From 1 June 2027 benzene is 0.2 ppm (0.7 mg/m³) 8-hour TWA; until then 1 ppm (3.2 mg/m³) continues. Quote the published pair with source and date."
+        },
+        {
+          "questionText": "A renovator says a solvent level is \"fine because it is under the WEL\". What is wrong?",
+          "options": [
+            "Nothing, a WEL proves the home safe",
+            "A WEL is not a home threshold",
+            "The WEL is for mould spores only",
+            "The WEL only applies from 2029 onward"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Workplace limits are set for fit adult workers and do not divide healthy from unhealthy. They are never a residential safe-occupancy or clearance threshold."
+        },
+        {
+          "questionText": "How are New Zealand WES described by WorkSafe?",
+          "options": [
+            "As guidance values, not prescribed standards",
+            "As identical to the Australian WEL",
+            "As limits untrained people should use",
+            "As mandatory limits for every home"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "WorkSafe NZ says WES and BEI are guidance values, not prescribed exposure standards, and does not recommend untrained people use them to assess risk."
+        },
+        {
+          "questionText": "What must a source tag on a regulatory figure include?",
+          "options": [
+            "Only the number and its unit",
+            "A link to some online forums",
+            "The assessor name and phone number",
+            "Jurisdiction, date, units and averaging time"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Jurisdiction, the date it applies from, units and averaging time, plus a note on what the figure is not (for example, not a residential threshold)."
+        }
+      ]
+    },
+    {
+      "quizId": "f5af62d4-9ea4-498d-8e29-44ab9b89ccaf",
+      "lessonTitle": "Module 6 check",
+      "title": "CARSI Indoor Environment Assessment Practitioner — Module 6 check",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Your personal CO monitor alarms in a room with an unflued gas heater. What first?",
+          "options": [
+            "Finish the readings, then leave the room",
+            "Open one window and keep working on",
+            "Stop and get everyone into fresh air",
+            "Take an air sample for the laboratory"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "CO has no smell or taste. Stop, turn off the appliance only if safe, get everyone into fresh air, and call 000 (AU) or 111 (NZ) if anyone is unwell."
+        },
+        {
+          "questionText": "You find a cracked ceiling sheet in a 1975 house. What do you do?",
+          "options": [
+            "Break a piece off to sample",
+            "Treat as suspect, do not disturb",
+            "Proceed because the crack is small",
+            "Look closely to decide by eye"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "You cannot tell asbestos by looking. Do not disturb suspect material at any size; record it and refer to a licensed asbestos assessor or competent person."
+        },
+        {
+          "questionText": "According to WorkSafe NZ, which New Zealand buildings could contain asbestos?",
+          "options": [
+            "Any built or renovated before 2000",
+            "Only those built before about 2016",
+            "Only those built before about 1984",
+            "Only those built before about 1990"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "WorkSafe NZ says any building built or renovated before 2000 could contain asbestos. In Australia, asbestos was banned in December 2003."
+        },
+        {
+          "questionText": "Someone is sanding a brick wall \"to see if it is damp inside\". Why stop it?",
+          "options": [
+            "It voids the building insurance policy",
+            "It wears out the meter pins",
+            "It changes the room dew point",
+            "It creates respirable crystalline silica dust"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Cutting, grinding, drilling or sanding brick, concrete or stone creates RCS dust. Choose a non-destructive method or leave it to someone with controls."
+        },
+        {
+          "questionText": "An occupant asks whether the mould caused her child's cough. What do you say?",
+          "options": [
+            "Rule out mould as the cause",
+            "Take a sample to find out",
+            "Confirm the mould caused the cough",
+            "Recommend she talks to her doctor"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Assessors do not diagnose. Public health guidance directs people with symptoms to seek medical advice; record what was reported and recommend that."
+        },
+        {
+          "questionText": "Who is the right referral for exposure monitoring against a workplace limit?",
+          "options": [
+            "The owner or the tenant",
+            "The insurer or loss adjuster",
+            "An occupational hygienist or IEP",
+            "The plumber or the electrician"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Exposure monitoring and interpretation need a competent person such as an occupational hygienist or other indoor environmental professional (IEP)."
+        }
+      ]
+    },
+    {
+      "quizId": "c53ece9f-fdd0-494b-8fa9-38ad3552ed9a",
+      "lessonTitle": "Final designation exam",
+      "title": "CARSI Indoor Environment Assessment Practitioner — Final designation exam",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "What comes first in an indoor environment assessment?",
+          "options": [
+            "A thermal camera room sweep",
+            "The written question and scope",
+            "A full set of samples",
+            "A laboratory booking for results"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "The written question and scope come first: who commissioned it, the decision it supports and what is excluded. Every reading is planned from it."
+        },
+        {
+          "questionText": "Which of these is a building question an assessment can answer?",
+          "options": [
+            "Is the air safe for babies?",
+            "Where is the moisture coming from?",
+            "Is the family dog unwell now?",
+            "Did mould cause this asthma attack?"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Assessments describe buildings. Health and animal-health questions go to a doctor or vet; mould test results cannot decide health risk."
+        },
+        {
+          "questionText": "In source-pathway-receptor terms, what removes the exposure?",
+          "options": [
+            "Naming the receptor in the report",
+            "Measuring every link many more times",
+            "Breaking any one of the links",
+            "Sampling only at the receptor location"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "Exposure needs all three links. Break the source, the pathway or the contact with the receptor and the exposure changes."
+        },
+        {
+          "questionText": "What is usually the root source when mould is the concern?",
+          "options": [
+            "Poor cleaning by the occupants",
+            "Old paint on window frames",
+            "Outdoor spores blowing in daily",
+            "Moisture on surfaces or air"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Mould only grows with enough moisture, and the way to control it is to control the moisture source. Your first hypotheses are about water."
+        },
+        {
+          "questionText": "How many NCC climate zones are there in Australia?",
+          "options": [
+            "Twelve climate zones",
+            "Eight climate zones",
+            "Four climate zones",
+            "Six climate zones"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "The NCC groups locations with similar climates into 8 climate zones, used mainly for energy efficiency and condensation management requirements."
+        },
+        {
+          "questionText": "Why compare rooms by g/kg rather than %RH?",
+          "options": [
+            "g/kg is easier for clients to read",
+            "RH changes with the air temperature too",
+            "g/kg is just the dew point again",
+            "RH is only used outdoors in Australia"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "RH is not a measure of the actual moisture because it depends on temperature. The humidity ratio (g/kg) compares rooms at different temperatures."
+        },
+        {
+          "questionText": "A surface is below the room dew point. What happens?",
+          "options": [
+            "Nothing until the RH reaches 100%",
+            "Condensation forms on that cold surface",
+            "The room air becomes drier quickly",
+            "The surface warms to room temperature"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Any surface at or below the dew point collects condensation, whatever the room RH reads."
+        },
+        {
+          "questionText": "What makes a moisture meter reading defensible?",
+          "options": [
+            "A single reading per whole room",
+            "A reading from a different building",
+            "A round number such as ten",
+            "A reference from the same material"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Compare like with like: same material, same instrument and mode, against an unaffected reference in the same building, with location and time."
+        },
+        {
+          "questionText": "The NCC F6V1 850 ppm CO2 figure is based on what?",
+          "options": [
+            "An outdoor level of 850 ppm",
+            "A 450 ppm rise over 400",
+            "A health limit for young children",
+            "The Australian workplace limit for CO2"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "The ABCB handbook explains it as a 450 ppm rise above an assumed 400 ppm ambient level, an odour and ventilation measure, not a health limit."
+        },
+        {
+          "questionText": "An ATP swab shows a low reading after cleaning. What can you say?",
+          "options": [
+            "The surface is now fully sterile",
+            "No mould can be on it",
+            "Less organic residue remains on it",
+            "The room air is safe now"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "ATP is a general cleanliness measure. A low reading shows less organic residue; it is not a mould test or a sterility test."
+        },
+        {
+          "questionText": "What does enHealth say about mould testing in homes generally?",
+          "options": [
+            "It does not recommend testing generally",
+            "It requires testing before any sale",
+            "It recommends ATP for mould testing",
+            "It sets a safe spore count"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "enHealth does not recommend testing for mould in general, because there are no health guideline values to compare results with."
+        },
+        {
+          "questionText": "Which body accredits testing laboratories in New Zealand?",
+          "options": [
+            "ABCB in New Zealand",
+            "NATA in New Zealand",
+            "IANZ in New Zealand",
+            "AIOH in New Zealand"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "International Accreditation New Zealand (IANZ). In Australia it is NATA. Check that the test you need is in the laboratory's scope."
+        },
+        {
+          "questionText": "What closes the chain of custody for a sample?",
+          "options": [
+            "The courier delivery notice email",
+            "The laboratory signed receipt record",
+            "The client paying the invoice",
+            "The photo taken on site"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Every hand-over is signed and timed, and the laboratory's receipt closes the chain. Photos and IDs tie the sample back to the place it came from."
+        },
+        {
+          "questionText": "Until when do Queensland and Victoria each have a 15-substance WEL transition?",
+          "options": [
+            "Until 30 November 2026",
+            "Until 1 December 2029",
+            "Until 1 December 2026",
+            "Until 1 June 2027"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "WorkSafe Queensland and WorkSafe Victoria each set transition arrangements for 15 substances until 1 December 2029."
+        },
+        {
+          "questionText": "Why is a workplace exposure limit never a home clearance threshold?",
+          "options": [
+            "It is set for fit adult workers",
+            "It is set by the home insurer",
+            "It only applies to the building trade",
+            "It is always higher than outdoor air"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Workplace limits are set for fit adult workers over a working week and do not divide healthy from unhealthy. Homes include children and vulnerable people."
+        },
+        {
+          "questionText": "What is the Australian 8-hour standard for respirable crystalline silica?",
+          "options": [
+            "0.05 mg/m³ 8-hour TWA",
+            "0.025 mg/m³ 8-hour TWA",
+            "5 mg/m³ 8-hour TWA",
+            "0.5 mg/m³ 8-hour TWA"
+          ],
+          "correctIndex": 0,
+          "points": 1,
+          "explanation": "Safe Work Australia: 0.05 mg/m³ 8-hour TWA, carried into the WEL list at the same value from 1 December 2026. New Zealand's standard is 0.025 mg/m³."
+        },
+        {
+          "questionText": "Carbon monoxide can be detected by which human sense?",
+          "options": [
+            "Taste, as a metal tang",
+            "Sight, as a faint haze",
+            "None of the human senses",
+            "Smell, as a sweet odour"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "CO is invisible and has no smell or taste. Only an instrument detects it, which is why a personal monitor alarm is a stop trigger."
+        },
+        {
+          "questionText": "In New Zealand, which section of HSWA 2015 holds the PCBU primary duty of care?",
+          "options": [
+            "Section 56 of HSWA",
+            "Section 19 of HSWA",
+            "Section 36 of HSWA",
+            "Section 23 of HSWA"
+          ],
+          "correctIndex": 2,
+          "points": 1,
+          "explanation": "HSWA 2015 section 36: a PCBU must ensure, so far as is reasonably practicable, the health and safety of workers and others."
+        },
+        {
+          "questionText": "Which word needs the most support before it goes in a home report?",
+          "options": [
+            "Metres, as a unit measure",
+            "Reference, as in a reading",
+            "Moisture, as in a finding",
+            "Safe, as a health verdict"
+          ],
+          "correctIndex": 3,
+          "points": 1,
+          "explanation": "Words such as \"safe\", \"toxic\" or \"clear\" need the scope, method and competency behind them; for a home they almost never have it."
+        },
+        {
+          "questionText": "The tenant, landlord and insurer each want a different conclusion. What do you give them?",
+          "options": [
+            "A different version for each one",
+            "The same facts in plain words",
+            "Only facts that suit the payer",
+            "No report until they all agree"
+          ],
+          "correctIndex": 1,
+          "points": 1,
+          "explanation": "Everyone gets the same facts; only the language changes. State who commissioned the report, and go back to the readings when readers disagree."
+        }
+      ]
+    }
+  ]
+}
