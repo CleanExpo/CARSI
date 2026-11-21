@@ -15,9 +15,13 @@ import { markEmailVerified } from '@/lib/server/lms-auth';
  *
  * The signed token (subject = user id, plus the address it was issued for) IS
  * the authorisation, so no session is needed: the person may open the email on
- * a different device. Always redirects to the login page on this site with
- * `email_confirmed=1` or `=0`; it never follows a caller-supplied destination,
- * and a failed write is reported as `0`, never as success.
+ * a different device. Always redirects to the /confirm-email page on this site
+ * with `email_confirmed=1` or `=0`; it never follows a caller-supplied
+ * destination, and a failed write is reported as `0`, never as success.
+ *
+ * GP-701: the outcome lands on /confirm-email, not /login. The middleware sends
+ * a signed-in person away from /login to their dashboard, so a notice shown on
+ * /login was never seen by someone confirming while signed in.
  */
 function done(confirmed: boolean): NextResponse {
   // A path-only Location: the browser resolves it against the address it
@@ -27,7 +31,7 @@ function done(confirmed: boolean): NextResponse {
   return new NextResponse(null, {
     status: 303,
     headers: {
-      Location: `/login?email_confirmed=${confirmed ? '1' : '0'}`,
+      Location: `/confirm-email?email_confirmed=${confirmed ? '1' : '0'}`,
       'Cache-Control': 'no-store',
     },
   });
