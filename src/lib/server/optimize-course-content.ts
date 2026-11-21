@@ -32,7 +32,6 @@ export class OptimizeCourseError extends Error {
 
 const META_KEY = 'optimizeDraft';
 export const OPTIMIZE_APPLIED_META_KEY = 'optimizeAppliedAt';
-export const OPTIMIZE_BEFORE_META_KEY = 'optimizeBefore';
 const MIN_MODULES = 7;
 const MAX_MODULES = 24;
 export const RECAP_MODULE_TITLE = 'What you learnt';
@@ -422,26 +421,6 @@ export function freeCourseNeedsOptimize(input: {
   return appliedAtNeedsOptimize(input.updatedAt, input.meta);
 }
 
-export async function snapshotCourseBeforeOptimize(
-  courseId: string,
-  existingMeta: unknown,
-  modules: Array<{ title: string; textContent: string }>
-): Promise<void> {
-  const next = metaObject(existingMeta);
-  next[OPTIMIZE_BEFORE_META_KEY] = {
-    snapshotAt: new Date().toISOString(),
-    moduleCount: modules.length,
-    modules: modules.map((m) => ({
-      title: m.title,
-      textContent: m.textContent.slice(0, 8_000),
-    })),
-  };
-  await prisma.lmsCourse.update({
-    where: { id: courseId },
-    data: { meta: JSON.parse(JSON.stringify(next)) as Prisma.InputJsonValue },
-  });
-}
-
 function metaObject(meta: unknown): Record<string, unknown> {
   if (meta && typeof meta === 'object' && !Array.isArray(meta)) {
     return { ...(meta as Record<string, unknown>) };
@@ -725,7 +704,17 @@ export async function applyOptimizedCourseDraft(
   return courseToAdminDto(updated);
 }
 
-export async function optimizeAndApplyCourse(
+/** Admin page where a stored optimisation draft is reviewed and applied by hand. */
+export function optimizeReviewPath(courseId: string): string {
+  return `/admin/courses/${courseId}/optimize`;
+}
+
+/**
+ * Batch (cron) path. Generates a rewrite and stores it as `meta.optimizeDraft` only. It never
+ * changes live course content: an admin reviews the draft and applies it by hand at
+ * `optimizeReviewPath`. A draft already waiting for review is never overwritten (GP-758).
+ */
+export async function draftCourseOptimizationForReview(
   courseId: string,
   opts?: { allowFree?: boolean }
 ): Promise<{
@@ -733,7 +722,7 @@ export async function optimizeAndApplyCourse(
   title: string;
   previousModuleCount: number;
   moduleCount: number;
-  summary: string;
+  reviewPath: string;
 }> {
   const existing = await adminGetCourse(courseId);
   if (!existing) throw new OptimizeCourseError('Not found', 404);
@@ -747,21 +736,17 @@ export async function optimizeAndApplyCourse(
   if (!dto.isFree && opts?.allowFree) {
     throw new OptimizeCourseError('Paid courses are not optimised by the free cron', 400);
   }
-  const previousModuleCount = dto.modules.length;
-  await snapshotCourseBeforeOptimize(
-    courseId,
-    existing.meta,
-    dto.modules.map((m) => ({ title: m.title, textContent: m.textContent }))
-  );
+  if (readOptimizeDraft(existing.meta)) {
+    throw new OptimizeCourseError('A draft is already waiting for review', 409);
+  }
   const draft = await generateOptimizedCourseDraft(courseId);
-  const course = await applyOptimizedCourseDraft(courseId, draft.token);
-  const moduleCount = course.modules.length;
-  const added = Math.max(0, moduleCount - previousModuleCount);
-  const summary =
-    added > 0
-      ? `Rewrote ${previousModuleCount} modules and added ${added} (now ${moduleCount}), including a recap and job-site examples.`
-      : `Rewrote ${moduleCount} modules with practical scenarios and a recap.`;
-  return { courseId, title: course.title, previousModuleCount, moduleCount, summary };
+  return {
+    courseId,
+    title: dto.title,
+    previousModuleCount: dto.modules.length,
+    moduleCount: draft.modules.length,
+    reviewPath: optimizeReviewPath(courseId),
+  };
 }
 
 export { AnthropicAPIError };

@@ -95,8 +95,9 @@ services:
       - key: OPENROUTER_MODEL
         scope: RUN_TIME
 
-      # Course-content optimiser (admin + DigitalOcean scheduled job).
-      # Job hits GET /api/cron/optimize-course-content with Bearer CRON_SECRET.
+      # Course-content optimiser (admin review page + manual cron route, no schedule).
+      # GET /api/cron/optimize-course-content with Bearer CRON_SECRET stores review
+      # drafts only; an admin applies each draft by hand (GP-758).
       - key: ANTHROPIC_API_KEY
         scope: RUN_TIME
       - key: ANTHROPIC_OPTIMIZE_MODEL
@@ -135,6 +136,8 @@ services:
         scope: RUN_TIME
 
 # No scheduled job. Curl returns in seconds (202). Work + email continue on the app.
+# The run only stores review drafts (meta.optimizeDraft). Live courses change only when
+# an admin applies a draft at /admin/courses/<id>/optimize (GP-758).
 # Paid:
 # curl -S -H "Authorization: Bearer $CRON_SECRET" \
 #   "$NEXT_PUBLIC_APP_URL/api/cron/optimize-course-content"
