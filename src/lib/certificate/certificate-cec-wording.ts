@@ -22,6 +22,8 @@ export type CertificateCecWording = {
   recordLine: string;
   /** Short label for a credential card. */
   cardLabel: string;
+  /** "What this credential is" statement on the public verify page. */
+  scopeStatement: string;
 };
 
 export const COURSE_APPROVED_FOR_IICRC_CECS = 'Course approved for IICRC CECs';
@@ -43,6 +45,9 @@ export function certificateCecWording(
       cecCreditsValue: null,
       recordLine: 'Issued by CARSI. Retain this certificate with your training records.',
       cardLabel: 'CARSI certificate',
+      scopeStatement:
+        'A CARSI-issued credential for a CARSI course. It is not a trade licence or a ' +
+        'third-party certification.',
     };
   }
   return {
@@ -50,5 +55,55 @@ export function certificateCecWording(
     cecCreditsValue,
     recordLine: `${COURSE_APPROVED_FOR_IICRC_CECS}. Retain this certificate with your renewal records.`,
     cardLabel: COURSE_APPROVED_FOR_IICRC_CECS,
+    scopeStatement:
+      `A CARSI-issued credential, not an IICRC certification. ${COURSE_APPROVED_FOR_IICRC_CECS}. ` +
+      'IICRC certification itself is obtained through a school and examination approved by the IICRC.',
+  };
+}
+
+/**
+ * The per-course line on the shared training record (/verify/training-record and its PDF).
+ * `cec_hours` is the register value (src/lib/server/proof-pack.ts). A course that is not approved
+ * shows only its issue date: no CEC count and no discipline code.
+ */
+export function trainingRecordCourseMeta(row: {
+  iicrc_discipline: string | null;
+  cec_hours: number;
+  issued_date: string;
+}): string {
+  const wording = certificateCecWording(row.cec_hours);
+  if (!wording.cecCreditsValue) return `issued ${row.issued_date}`;
+  return `${row.iicrc_discipline?.trim() || '—'} · ${wording.cecCreditsValue} · issued ${row.issued_date}`;
+}
+
+/**
+ * Record-level wording for the shared training record. `totalCecHours` is the sum of register
+ * hours over the learner's completed courses. A record with no approved course names neither the
+ * IICRC nor CECs.
+ */
+export function trainingRecordWording(totalCecHours: number): {
+  heading: string;
+  pdfSubtitle: string;
+  totalLabel: string | null;
+  totalLine: string | null;
+  byDisciplineHeading: string;
+} {
+  const hasCec = Number.isFinite(totalCecHours) && totalCecHours > 0;
+  if (!hasCec) {
+    return {
+      heading: 'Training record',
+      pdfSubtitle: 'For employer, HR, or insurer evidence: completions on CARSI.',
+      totalLabel: null,
+      totalLine: null,
+      byDisciplineHeading: '',
+    };
+  }
+  return {
+    heading: 'Training & CEC summary',
+    pdfSubtitle:
+      'For employer, HR, or insurer evidence: completions on CARSI; IICRC CEC hours only for approved courses.',
+    totalLabel: 'Total IICRC CEC hours',
+    totalLine: `Total IICRC CEC hours (from approved courses): ${totalCecHours}`,
+    byDisciplineHeading: 'CEC hours by discipline',
   };
 }

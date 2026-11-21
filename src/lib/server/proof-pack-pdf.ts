@@ -3,6 +3,10 @@ import path from 'node:path';
 
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 
+import {
+  trainingRecordCourseMeta,
+  trainingRecordWording,
+} from '@/lib/certificate/certificate-cec-wording';
 import type { ProofPackPayload } from '@/types/proof-pack';
 
 function wrapLines(text: string, maxChars: number): string[] {
@@ -69,7 +73,9 @@ export async function buildProofPackPdf(payload: ProofPackPayload): Promise<Uint
     }
   }
 
-  const title = 'Training & CEC summary';
+  // All credit wording comes from the certificate wording owner (GP-757).
+  const recordWording = trainingRecordWording(payload.summary.total_cec_hours);
+  const title = recordWording.heading;
   page.drawText(title, {
     x: MARGIN,
     y,
@@ -79,7 +85,7 @@ export async function buildProofPackPdf(payload: ProofPackPayload): Promise<Uint
   });
   y -= 26;
 
-  page.drawText('For employer, HR, or insurer evidence — completions on CARSI; IICRC CEC hours only for approved courses.', {
+  page.drawText(recordWording.pdfSubtitle, {
     x: MARGIN,
     y,
     size: 9,
@@ -138,18 +144,21 @@ export async function buildProofPackPdf(payload: ProofPackPayload): Promise<Uint
     color: BLACK,
   });
   y -= 14;
-  page.drawText(`Total IICRC CEC hours (from completed courses): ${payload.summary.total_cec_hours}`, {
-    x: MARGIN,
-    y,
-    size: 10,
-    font: helvetica,
-    color: BLACK,
-  });
-  y -= 28;
+  if (recordWording.totalLine) {
+    page.drawText(recordWording.totalLine, {
+      x: MARGIN,
+      y,
+      size: 10,
+      font: helvetica,
+      color: BLACK,
+    });
+    y -= 14;
+  }
+  y -= 14;
 
   if (payload.cec_by_discipline.length > 0) {
     ensureSpace(40 + payload.cec_by_discipline.length * 16);
-    page.drawText('CEC hours by discipline', {
+    page.drawText(recordWording.byDisciplineHeading, {
       x: MARGIN,
       y,
       size: 12,
@@ -206,7 +215,7 @@ export async function buildProofPackPdf(payload: ProofPackPayload): Promise<Uint
 
   for (const c of payload.credentials) {
     const titleLines = wrapLines(c.course_title, 72);
-    const metaLine = `${c.iicrc_discipline ?? '—'} · ${c.cec_hours} CEC · issued ${c.issued_date} · ID ${c.credential_id}`;
+    const metaLine = `${trainingRecordCourseMeta(c)} · ID ${c.credential_id}`;
     const urlLines = wrapLines(c.verification_url, 92);
     const blockH = titleLines.length * 11 + 14 + 12 + urlLines.length * 10 + 12;
     ensureSpace(blockH);
