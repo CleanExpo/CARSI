@@ -1,0 +1,783 @@
+{
+  "comment": [
+    "Frozen gaps for scripts/check-course-visuals.mjs (Course Standard v1 section 4.1 items 1-3, Linear GP-752), taken on origin/main 9f709922, 21/11/2026.",
+    "Each entry is a known missing cover, lesson image or diagram, keyed by course slug, lesson id and kind; it covers that lesson in the seed catalogue and in its v1-draft copy.",
+    "This file only shrinks: when you add the missing visual, delete its entry in the same change (the check fails until you do). Adding an entry needs the founder's or lead's written approval in that PR; it is never a quiet way to let a new lesson through."
+  ],
+  "gaps": [
+    {
+      "slug": "category-3-sewage-black-water-remediation",
+      "lessonId": "2bf5ba46-ed5f-4fb3-a842-2976c7cb2461",
+      "lessonTitle": "Choosing PPE for a biohazard",
+      "missing": "image"
+    },
+    {
+      "slug": "category-3-sewage-black-water-remediation",
+      "lessonId": "30e9e315-2616-4308-a1f2-0d96d2fad5ac",
+      "lessonTitle": "The law on both sides of the Tasman",
+      "missing": "image"
+    },
+    {
+      "slug": "category-3-sewage-black-water-remediation",
+      "lessonId": "401c2a48-9730-4dca-ae67-694451ffad15",
+      "lessonTitle": "Drying after decontamination, and the mould rule",
+      "missing": "image"
+    },
+    {
+      "slug": "category-3-sewage-black-water-remediation",
+      "lessonId": "57e5feaf-8d60-4091-aeb3-db8a0705a19d",
+      "lessonTitle": "The hazard walk before anyone goes in",
+      "missing": "image"
+    },
+    {
+      "slug": "category-3-sewage-black-water-remediation",
+      "lessonId": "8ed6277e-9422-4a50-aa3f-b1f9e2b90040",
+      "lessonTitle": "Category 3 water: what it is and how you make the call",
+      "missing": "image"
+    },
+    {
+      "slug": "category-3-sewage-black-water-remediation",
+      "lessonId": "96bfbb9e-c7b3-4800-a036-727aa4e55a1e",
+      "lessonTitle": "Containment, extraction and what comes out",
+      "missing": "image"
+    },
+    {
+      "slug": "category-3-sewage-black-water-remediation",
+      "lessonId": "a512dfa4-9f4f-4370-a801-9baa8d677573",
+      "lessonTitle": "Solid waste, asbestos and the paper trail",
+      "missing": "image"
+    },
+    {
+      "slug": "category-3-sewage-black-water-remediation",
+      "lessonId": "bc6a010b-783d-4412-a150-41cf124caf81",
+      "lessonTitle": "How Category 3 water makes people sick",
+      "missing": "image"
+    },
+    {
+      "slug": "category-3-sewage-black-water-remediation",
+      "lessonId": "d2da4ad5-33d9-4e02-a969-de2d12227f94",
+      "lessonTitle": "Decontamination: getting out clean",
+      "missing": "image"
+    },
+    {
+      "slug": "category-3-sewage-black-water-remediation",
+      "lessonId": "d4e4b93a-ec24-4b0b-a805-8414ed70d804",
+      "lessonTitle": "Clean, then disinfect, with products legal to use here",
+      "missing": "image"
+    },
+    {
+      "slug": "category-3-sewage-black-water-remediation",
+      "lessonId": "d7303d0a-23b3-4994-a24a-33c6b98ef6cb",
+      "lessonTitle": "Preparing your practical submission and the designation exam",
+      "missing": "image"
+    },
+    {
+      "slug": "category-3-sewage-black-water-remediation",
+      "lessonId": "fa1c430a-d82c-45ea-a3a1-d12f8ae9d133",
+      "lessonTitle": "Wastewater: sewer, tanker, never stormwater",
+      "missing": "image"
+    },
+    {
+      "slug": "category-3-sewage-black-water-remediation",
+      "lessonId": "fe28f2c9-8fc5-4904-ace4-f61c665c45f4",
+      "lessonTitle": "Clearance and the defensible job file",
+      "missing": "image"
+    },
+    {
+      "slug": "fire-smoke-damage-restoration-fundamentals",
+      "lessonId": "0143fa19-f7e4-476d-9c68-3177c4f79ea5",
+      "lessonTitle": "How fire makes smoke and soot",
+      "missing": "image"
+    },
+    {
+      "slug": "fire-smoke-damage-restoration-fundamentals",
+      "lessonId": "2d75a558-96d5-4b76-9c40-e3154c9194e1",
+      "lessonTitle": "Contents triage and the HVAC system",
+      "missing": "image"
+    },
+    {
+      "slug": "fire-smoke-damage-restoration-fundamentals",
+      "lessonId": "419c93db-299b-41f9-9c51-221455a3d9b2",
+      "lessonTitle": "The fire restoration arc: make safe first",
+      "missing": "image"
+    },
+    {
+      "slug": "fire-smoke-damage-restoration-fundamentals",
+      "lessonId": "6fa2f113-691d-466e-a32a-56aa195f4e9e",
+      "lessonTitle": "Lead paint, silica dust and treated-timber ash",
+      "missing": "image"
+    },
+    {
+      "slug": "fire-smoke-damage-restoration-fundamentals",
+      "lessonId": "78a8d316-ee1c-48da-b3a5-440e2322a760",
+      "lessonTitle": "How smoke travels through a building",
+      "missing": "image"
+    },
+    {
+      "slug": "fire-smoke-damage-restoration-fundamentals",
+      "lessonId": "7f332f1c-08b4-4da7-9f1b-ad0bcd4560aa",
+      "lessonTitle": "Corrosion urgency: why metals and electronics cannot wait",
+      "missing": "image"
+    },
+    {
+      "slug": "fire-smoke-damage-restoration-fundamentals",
+      "lessonId": "913c19c7-317d-4888-8228-bc3bacc0eefc",
+      "lessonTitle": "Asbestos in fire-damaged buildings: Australia and New Zealand",
+      "missing": "image"
+    },
+    {
+      "slug": "fire-smoke-damage-restoration-fundamentals",
+      "lessonId": "95cfc7a4-7598-4ce2-9f97-e37bfd981317",
+      "lessonTitle": "What this course covers and who it is for",
+      "missing": "image"
+    },
+    {
+      "slug": "fire-smoke-damage-restoration-fundamentals",
+      "lessonId": "ae44f620-dd9c-45fc-9e8c-49b4a613070d",
+      "lessonTitle": "Source removal and cleaning: method and sequence",
+      "missing": "image"
+    },
+    {
+      "slug": "fire-smoke-damage-restoration-fundamentals",
+      "lessonId": "bad52a73-8d9b-47d2-ba89-0013c6d2eb0b",
+      "lessonTitle": "Reading the residue: types and the test patch",
+      "missing": "image"
+    },
+    {
+      "slug": "fire-smoke-damage-restoration-fundamentals",
+      "lessonId": "ce6abcef-6da8-4d75-aa51-0e0584515c60",
+      "lessonTitle": "Verification, the job file and the insurance context",
+      "missing": "image"
+    },
+    {
+      "slug": "fire-smoke-damage-restoration-fundamentals",
+      "lessonId": "d275b201-57eb-48eb-be4a-df404d7d981d",
+      "lessonTitle": "Odour control: source first, devices last",
+      "missing": "image"
+    },
+    {
+      "slug": "hard-floor-care",
+      "lessonId": "-",
+      "lessonTitle": "(course cover)",
+      "missing": "cover"
+    },
+    {
+      "slug": "hard-floor-care",
+      "lessonId": "00e56940-9266-5bd2-9581-3dfa492360ad",
+      "lessonTitle": "Handover, records and the supervised practical day",
+      "missing": "image"
+    },
+    {
+      "slug": "hard-floor-care",
+      "lessonId": "2d8fd01e-d8d4-55e6-b30f-1daa3c27c7d5",
+      "lessonTitle": "Resilient floors: strip, rinse, dry and recoat",
+      "missing": "image"
+    },
+    {
+      "slug": "hard-floor-care",
+      "lessonId": "2fa83b7c-41af-5912-971a-21c905ee616f",
+      "lessonTitle": "Three floor families and the surface layer",
+      "missing": "image"
+    },
+    {
+      "slug": "hard-floor-care",
+      "lessonId": "5147e3f8-8cee-52a8-8a20-7362c14b1a4a",
+      "lessonTitle": "The floor identification routine",
+      "missing": "image"
+    },
+    {
+      "slug": "hard-floor-care",
+      "lessonId": "5e714f55-f9e5-5b85-8166-36b2c3c1d4cb",
+      "lessonTitle": "Silica dust: grinding, drilling, cutting and grout removal",
+      "missing": "image"
+    },
+    {
+      "slug": "hard-floor-care",
+      "lessonId": "672fe706-cb43-560b-9e98-48bf7b730280",
+      "lessonTitle": "The approved setup record",
+      "missing": "image"
+    },
+    {
+      "slug": "hard-floor-care",
+      "lessonId": "67aaa933-c5af-5c3b-91cd-5052372db21a",
+      "lessonTitle": "Coatings on tile and stone, sealers and slip",
+      "missing": "image"
+    },
+    {
+      "slug": "hard-floor-care",
+      "lessonId": "6b30a24c-2427-5401-839f-47ac3d9a0b05",
+      "lessonTitle": "Coated timber floors: damp-only care and referral",
+      "missing": "image"
+    },
+    {
+      "slug": "hard-floor-care",
+      "lessonId": "ae83863d-7fe0-5b09-9fad-48a7a1a95947",
+      "lessonTitle": "Chemistry: soil, surface, label and SDS",
+      "missing": "image"
+    },
+    {
+      "slug": "hard-floor-care",
+      "lessonId": "bd078b91-818d-5d74-b6c7-4b7db37c49fd",
+      "lessonTitle": "Which machine for which job, and the pre-start check",
+      "missing": "image"
+    },
+    {
+      "slug": "hard-floor-care",
+      "lessonId": "c660e1d5-320b-5610-9fb0-0fe3749473a1",
+      "lessonTitle": "Asbestos: identify, presume, stop and refer",
+      "missing": "image"
+    },
+    {
+      "slug": "hard-floor-care",
+      "lessonId": "cacea7ad-1933-5788-ad66-1eb373874c5e",
+      "lessonTitle": "SDS, protective equipment, slip risk and power",
+      "missing": "image"
+    },
+    {
+      "slug": "hard-floor-care",
+      "lessonId": "e622cbc7-d645-5b82-a28b-11aaae75a54c",
+      "lessonTitle": "Quoting: residential and commercial programs",
+      "missing": "image"
+    },
+    {
+      "slug": "hard-floor-care",
+      "lessonId": "ef8e56a0-1ef1-5020-93eb-aee569fb28c6",
+      "lessonTitle": "Tile and grout restorative clean",
+      "missing": "image"
+    },
+    {
+      "slug": "level-2-mould-remediation-30ee3492",
+      "lessonId": "-",
+      "lessonTitle": "(course cover)",
+      "missing": "cover"
+    },
+    {
+      "slug": "level-2-mould-remediation-30ee3492",
+      "lessonId": "017cc3c5-ea43-4e76-97d9-f59f0fab5bbb",
+      "lessonTitle": "3.3 Respirators and PPE",
+      "missing": "image"
+    },
+    {
+      "slug": "level-2-mould-remediation-30ee3492",
+      "lessonId": "07226428-dbe2-4140-abae-6118774cc738",
+      "lessonTitle": "3.2 Negative air: how many air scrubbers?",
+      "missing": "image"
+    },
+    {
+      "slug": "level-2-mould-remediation-30ee3492",
+      "lessonId": "1bbf8ade-6236-4027-b033-174b83c8bd4c",
+      "lessonTitle": "2.3 Writing the scope and work plan",
+      "missing": "image"
+    },
+    {
+      "slug": "level-2-mould-remediation-30ee3492",
+      "lessonId": "1faddf81-7a1d-4f77-91dc-ba31f809909b",
+      "lessonTitle": "1.1 When mould is in the material, not on it",
+      "missing": "image"
+    },
+    {
+      "slug": "level-2-mould-remediation-30ee3492",
+      "lessonId": "2a919504-2b75-45e4-b095-d6a1f8cbf86c",
+      "lessonTitle": "1.4 The moulds you'll meet in Australian buildings",
+      "missing": "image"
+    },
+    {
+      "slug": "level-2-mould-remediation-30ee3492",
+      "lessonId": "517a53be-9277-4d27-ac61-2009fed839e2",
+      "lessonTitle": "3.1 Choosing and building containment",
+      "missing": "image"
+    },
+    {
+      "slug": "level-2-mould-remediation-30ee3492",
+      "lessonId": "55e72819-92dd-4a2d-ba6a-47209d352e54",
+      "lessonTitle": "5.2 Verification and clearance",
+      "missing": "image"
+    },
+    {
+      "slug": "level-2-mould-remediation-30ee3492",
+      "lessonId": "61a7fd7c-83d1-4640-8cb9-73c6ef64e155",
+      "lessonTitle": "4.2 HEPA vacuuming and damp wiping",
+      "missing": "image"
+    },
+    {
+      "slug": "level-2-mould-remediation-30ee3492",
+      "lessonId": "70825bd2-4826-4675-b47b-4f0e63d85bf5",
+      "lessonTitle": "5.1 Bagging and removing waste",
+      "missing": "image"
+    },
+    {
+      "slug": "level-2-mould-remediation-30ee3492",
+      "lessonId": "ac109b41-f93b-453f-bce7-9d23e3dffde6",
+      "lessonTitle": "1.2 Your WHS duties on a mould job",
+      "missing": "image"
+    },
+    {
+      "slug": "level-2-mould-remediation-30ee3492",
+      "lessonId": "afc43d4d-bde8-4111-8909-50e964446d82",
+      "lessonTitle": "3.4 Site safety on a mould job",
+      "missing": "image"
+    },
+    {
+      "slug": "level-2-mould-remediation-30ee3492",
+      "lessonId": "b1f7c0f5-4bb2-4317-a18b-f275d3d540a9",
+      "lessonTitle": "5.3 The job file, the client and the assessor",
+      "missing": "image"
+    },
+    {
+      "slug": "level-2-mould-remediation-30ee3492",
+      "lessonId": "b388943e-4b5d-423c-863d-ed08fad2524c",
+      "lessonTitle": "4.1 Remove or clean? Deciding by material",
+      "missing": "image"
+    },
+    {
+      "slug": "level-2-mould-remediation-30ee3492",
+      "lessonId": "b7806a40-bb11-4fb4-aa38-c98449ab707c",
+      "lessonTitle": "2.1 The inspection route and finding the water",
+      "missing": "image"
+    },
+    {
+      "slug": "level-2-mould-remediation-30ee3492",
+      "lessonId": "bbc9ed0e-accf-4885-ab9d-4fc410e022ba",
+      "lessonTitle": "4.4 Drying the structure so it does not come back",
+      "missing": "image"
+    },
+    {
+      "slug": "level-2-mould-remediation-30ee3492",
+      "lessonId": "c76447fa-9c50-4ebf-ad9d-544093e7d267",
+      "lessonTitle": "1.3 Health risks and when to stop",
+      "missing": "image"
+    },
+    {
+      "slug": "level-2-mould-remediation-30ee3492",
+      "lessonId": "c7e7cddb-ed0c-43ff-b447-d0e0f3997be2",
+      "lessonTitle": "4.3 Antimicrobials and coatings: a limited role",
+      "missing": "image"
+    },
+    {
+      "slug": "level-2-mould-remediation-30ee3492",
+      "lessonId": "f0484b9e-f95f-4ea3-9bce-c23f5ff4b903",
+      "lessonTitle": "2.2 Moisture readings, dry references and the drying goal",
+      "missing": "image"
+    },
+    {
+      "slug": "level-3-mould-remediation-c5797369",
+      "lessonId": "-",
+      "lessonTitle": "(course cover)",
+      "missing": "cover"
+    },
+    {
+      "slug": "level-3-mould-remediation-c5797369",
+      "lessonId": "0d87e049-d96f-593b-9746-9ff6bad25f6d",
+      "lessonTitle": "2.2 Finding the cause: condensation, building faults and the NCC",
+      "missing": "image"
+    },
+    {
+      "slug": "level-3-mould-remediation-c5797369",
+      "lessonId": "1ce4d6c7-de8e-51e8-a52c-0301ea02a499",
+      "lessonTitle": "1.1 What makes a mould job Level 3",
+      "missing": "image"
+    },
+    {
+      "slug": "level-3-mould-remediation-c5797369",
+      "lessonId": "267386a3-03c1-5915-a9fd-559a85b01ee8",
+      "lessonTitle": "2.1 Hidden cavities and structural investigation",
+      "missing": "image"
+    },
+    {
+      "slug": "level-3-mould-remediation-c5797369",
+      "lessonId": "35173769-60da-5eef-84d4-5f9d83471307",
+      "lessonTitle": "5.3 Change control when the scope grows",
+      "missing": "image"
+    },
+    {
+      "slug": "level-3-mould-remediation-c5797369",
+      "lessonId": "409eabd1-d781-556c-90ba-99e3bbf2023f",
+      "lessonTitle": "4.1 Aged care and healthcare",
+      "missing": "image"
+    },
+    {
+      "slug": "level-3-mould-remediation-c5797369",
+      "lessonId": "4be1088f-9f2e-5774-a0ac-8f6ef8e75371",
+      "lessonTitle": "5.4 Reports that stand up: insurers, strata and disputes",
+      "missing": "image"
+    },
+    {
+      "slug": "level-3-mould-remediation-c5797369",
+      "lessonId": "51a4a314-5ba3-5f3c-b4a2-aebed576880f",
+      "lessonTitle": "1.4 Supervising the crew",
+      "missing": "image"
+    },
+    {
+      "slug": "level-3-mould-remediation-c5797369",
+      "lessonId": "5a4076bc-8321-5bd1-b4c9-1612e8544a20",
+      "lessonTitle": "5.1 Working with an occupational hygienist",
+      "missing": "image"
+    },
+    {
+      "slug": "level-3-mould-remediation-c5797369",
+      "lessonId": "6821b1a7-de1a-54ab-9773-98db446f7bd7",
+      "lessonTitle": "1.3 The remediation work plan and the SWMS",
+      "missing": "image"
+    },
+    {
+      "slug": "level-3-mould-remediation-c5797369",
+      "lessonId": "8594ec74-8e96-52af-af2c-bdb15eb9a76a",
+      "lessonTitle": "3.2 Pressure monitoring and logging across zones",
+      "missing": "image"
+    },
+    {
+      "slug": "level-3-mould-remediation-c5797369",
+      "lessonId": "945627e0-08cb-528b-aadc-7a9ce6597e3e",
+      "lessonTitle": "4.2 Childcare centres and schools",
+      "missing": "image"
+    },
+    {
+      "slug": "level-3-mould-remediation-c5797369",
+      "lessonId": "9565ce63-11fe-5c1f-95cb-cd7a351d0a98",
+      "lessonTitle": "3.4 Power for a large job: three-phase supply and load",
+      "missing": "image"
+    },
+    {
+      "slug": "level-3-mould-remediation-c5797369",
+      "lessonId": "9c1488ea-29e1-5b28-89f6-dd1166e5b9f6",
+      "lessonTitle": "3.1 Containment for large and multi-zone jobs",
+      "missing": "image"
+    },
+    {
+      "slug": "level-3-mould-remediation-c5797369",
+      "lessonId": "9e685e06-53df-53ac-8a24-5620f1e9ef21",
+      "lessonTitle": "1.2 Duties on a shared site",
+      "missing": "image"
+    },
+    {
+      "slug": "level-3-mould-remediation-c5797369",
+      "lessonId": "af878d7a-5e2d-5105-80a4-37576c6f8667",
+      "lessonTitle": "4.3 Occupied strata, multi-unit and commercial buildings",
+      "missing": "image"
+    },
+    {
+      "slug": "level-3-mould-remediation-c5797369",
+      "lessonId": "e3fc475c-6e3e-5365-a5d5-a2c1a6c7c66c",
+      "lessonTitle": "2.3 Asbestos, lead and silica in older buildings",
+      "missing": "image"
+    },
+    {
+      "slug": "level-3-mould-remediation-c5797369",
+      "lessonId": "eb9b6810-1699-5935-aaf9-cbb0cccf2b25",
+      "lessonTitle": "2.4 Category 3 water and sewage-affected mould",
+      "missing": "image"
+    },
+    {
+      "slug": "level-3-mould-remediation-c5797369",
+      "lessonId": "f12ac8d4-7887-56da-8047-9d0c9e057c92",
+      "lessonTitle": "3.3 HVAC and ductwork contamination",
+      "missing": "image"
+    },
+    {
+      "slug": "level-3-mould-remediation-c5797369",
+      "lessonId": "fcb40671-1188-56f7-9bbd-d376149c3d98",
+      "lessonTitle": "5.2 Sampling basics and reading a lab report",
+      "missing": "image"
+    },
+    {
+      "slug": "mould-remediation-fundamentals",
+      "lessonId": "00e0238a-7eb4-4380-aae3-2c5880730879",
+      "lessonTitle": "Case study: deciding between conditions across three rooms",
+      "missing": "diagram"
+    },
+    {
+      "slug": "mould-remediation-fundamentals",
+      "lessonId": "00e0238a-7eb4-4380-aae3-2c5880730879",
+      "lessonTitle": "Case study: deciding between conditions across three rooms",
+      "missing": "image"
+    },
+    {
+      "slug": "mould-remediation-fundamentals",
+      "lessonId": "2bbf5627-4553-45d0-9f32-266007b8da46",
+      "lessonTitle": "Preparing your practical submission",
+      "missing": "diagram"
+    },
+    {
+      "slug": "mould-remediation-fundamentals",
+      "lessonId": "2bbf5627-4553-45d0-9f32-266007b8da46",
+      "lessonTitle": "Preparing your practical submission",
+      "missing": "image"
+    },
+    {
+      "slug": "mould-remediation-fundamentals",
+      "lessonId": "3dae611c-dd3d-49d3-9cb9-b1251ed1aafa",
+      "lessonTitle": "Common-failure analysis: why mould jobs come back",
+      "missing": "diagram"
+    },
+    {
+      "slug": "mould-remediation-fundamentals",
+      "lessonId": "3dae611c-dd3d-49d3-9cb9-b1251ed1aafa",
+      "lessonTitle": "Common-failure analysis: why mould jobs come back",
+      "missing": "image"
+    },
+    {
+      "slug": "mould-remediation-fundamentals",
+      "lessonId": "48fa6240-5236-4926-a1cb-fcf3a73db835",
+      "lessonTitle": "Case study: one job from scope to sign-off",
+      "missing": "diagram"
+    },
+    {
+      "slug": "mould-remediation-fundamentals",
+      "lessonId": "48fa6240-5236-4926-a1cb-fcf3a73db835",
+      "lessonTitle": "Case study: one job from scope to sign-off",
+      "missing": "image"
+    },
+    {
+      "slug": "mould-remediation-fundamentals",
+      "lessonId": "5d2b7111-8264-4315-a7f9-7afdbd38dac6",
+      "lessonTitle": "Case study: talking to the client, occupants and the insurer",
+      "missing": "diagram"
+    },
+    {
+      "slug": "mould-remediation-fundamentals",
+      "lessonId": "5d2b7111-8264-4315-a7f9-7afdbd38dac6",
+      "lessonTitle": "Case study: talking to the client, occupants and the insurer",
+      "missing": "image"
+    },
+    {
+      "slug": "mould-remediation-fundamentals",
+      "lessonId": "95db566a-26d4-4129-8b11-7b6255a32651",
+      "lessonTitle": "The designation: what it requires and how you earn it",
+      "missing": "diagram"
+    },
+    {
+      "slug": "mould-remediation-fundamentals",
+      "lessonId": "95db566a-26d4-4129-8b11-7b6255a32651",
+      "lessonTitle": "The designation: what it requires and how you earn it",
+      "missing": "image"
+    },
+    {
+      "slug": "mould-remediation-fundamentals",
+      "lessonId": "d2e87f23-e9be-45a5-81de-f41ba8bc7dbd",
+      "lessonTitle": "Case study: writing the defensible job file",
+      "missing": "diagram"
+    },
+    {
+      "slug": "mould-remediation-fundamentals",
+      "lessonId": "d2e87f23-e9be-45a5-81de-f41ba8bc7dbd",
+      "lessonTitle": "Case study: writing the defensible job file",
+      "missing": "image"
+    },
+    {
+      "slug": "structural-drying-fundamentals",
+      "lessonId": "02af69aa-f84d-5319-861d-62e0a70a2641",
+      "lessonTitle": "230 V power budgets and electrical safety in Australia and New Zealand",
+      "missing": "image"
+    },
+    {
+      "slug": "structural-drying-fundamentals",
+      "lessonId": "1c04f7fb-d061-5cd8-8bca-790ba03c1ad7",
+      "lessonTitle": "Refrigerant, LGR and desiccant: how each removes water",
+      "missing": "image"
+    },
+    {
+      "slug": "structural-drying-fundamentals",
+      "lessonId": "50dd220b-bf5b-593d-a0df-f96317b02fef",
+      "lessonTitle": "Reading the job: g/kg depression and the condensation check",
+      "missing": "image"
+    },
+    {
+      "slug": "structural-drying-fundamentals",
+      "lessonId": "5e2fabb9-669f-55e3-83cd-5a25d38e217e",
+      "lessonTitle": "Placing air movers, and when not to",
+      "missing": "image"
+    },
+    {
+      "slug": "structural-drying-fundamentals",
+      "lessonId": "64ea2aa6-085c-591e-a82c-0e0174ebea03",
+      "lessonTitle": "What a structural drying practitioner does",
+      "missing": "image"
+    },
+    {
+      "slug": "structural-drying-fundamentals",
+      "lessonId": "86a897b9-fc3d-5215-b58c-c58e7b2559e0",
+      "lessonTitle": "The four numbers: temperature, RH, dew point and g/kg",
+      "missing": "image"
+    },
+    {
+      "slug": "structural-drying-fundamentals",
+      "lessonId": "b73c66de-5979-548f-ae1a-6aa901c798ea",
+      "lessonTitle": "Whole-job case study: a Christchurch winter loss",
+      "missing": "image"
+    },
+    {
+      "slug": "structural-drying-fundamentals",
+      "lessonId": "c395ebb1-0c39-5334-bab3-222333b1ad85",
+      "lessonTitle": "Daily monitoring, the drying log and when to change the plan",
+      "missing": "image"
+    },
+    {
+      "slug": "structural-drying-fundamentals",
+      "lessonId": "cb7e3eb2-bcab-504a-a7e6-93ea79501d08",
+      "lessonTitle": "How wet materials give up water",
+      "missing": "image"
+    },
+    {
+      "slug": "structural-drying-fundamentals",
+      "lessonId": "d08a0312-ac9a-5eb9-b54d-979e8d1d4c58",
+      "lessonTitle": "Setting the dry standard and the drying goal",
+      "missing": "image"
+    },
+    {
+      "slug": "structural-drying-fundamentals",
+      "lessonId": "eb10a29c-5ef2-5927-a7ab-afe95f301cb7",
+      "lessonTitle": "Closed, open and heat-assisted drying systems",
+      "missing": "image"
+    },
+    {
+      "slug": "structural-drying-fundamentals",
+      "lessonId": "fbd6474a-1873-52ad-863b-e36a097a5624",
+      "lessonTitle": "Proving a dehumidifier works: litres per day from g/kg",
+      "missing": "image"
+    },
+    {
+      "slug": "trauma-crime-scene-decontamination-fundamentals",
+      "lessonId": "0df1b5ed-aad7-48dd-9df3-787e0f88e5f8",
+      "lessonTitle": "Verification, handover and the defensible job file",
+      "missing": "image"
+    },
+    {
+      "slug": "trauma-crime-scene-decontamination-fundamentals",
+      "lessonId": "1e57e65f-aa59-487c-be35-cc3cc6518056",
+      "lessonTitle": "Psychosocial hazards and looking after your crew",
+      "missing": "image"
+    },
+    {
+      "slug": "trauma-crime-scene-decontamination-fundamentals",
+      "lessonId": "25fc5eb9-4650-4717-bd4e-5351253bbcaf",
+      "lessonTitle": "Hepatitis B vaccination and the exposure response",
+      "missing": "image"
+    },
+    {
+      "slug": "trauma-crime-scene-decontamination-fundamentals",
+      "lessonId": "495f4e6e-94a5-45b7-9900-aeb152329607",
+      "lessonTitle": "What this course covers and who it is for",
+      "missing": "image"
+    },
+    {
+      "slug": "trauma-crime-scene-decontamination-fundamentals",
+      "lessonId": "58ab850d-44af-4fce-b9ee-44a6f3352dbe",
+      "lessonTitle": "Selecting, fitting and removing PPE",
+      "missing": "image"
+    },
+    {
+      "slug": "trauma-crime-scene-decontamination-fundamentals",
+      "lessonId": "5cc2b7c6-29ef-4780-abfe-4aaadde27fb7",
+      "lessonTitle": "Blood-borne viruses and how exposure happens",
+      "missing": "image"
+    },
+    {
+      "slug": "trauma-crime-scene-decontamination-fundamentals",
+      "lessonId": "876d0c54-3b63-4165-b85a-0d998ead9ac0",
+      "lessonTitle": "Clean, then disinfect: products, claims and contact time",
+      "missing": "image"
+    },
+    {
+      "slug": "trauma-crime-scene-decontamination-fundamentals",
+      "lessonId": "9840e459-0c31-4cd6-9a6b-f244f191b907",
+      "lessonTitle": "Clinical waste: package, label, track and dispose",
+      "missing": "image"
+    },
+    {
+      "slug": "trauma-crime-scene-decontamination-fundamentals",
+      "lessonId": "9865703d-13c1-4f24-9e9f-5dfe680c9c3f",
+      "lessonTitle": "Sharps: find, handle and contain",
+      "missing": "image"
+    },
+    {
+      "slug": "trauma-crime-scene-decontamination-fundamentals",
+      "lessonId": "abfbac6b-b097-4e80-b911-0c488c0aaeaa",
+      "lessonTitle": "Discretion, dignity and conduct on a trauma site",
+      "missing": "image"
+    },
+    {
+      "slug": "trauma-crime-scene-decontamination-fundamentals",
+      "lessonId": "e17b0995-01bc-45ea-86b5-7d542e3684c8",
+      "lessonTitle": "Site risk assessment and the SWMS",
+      "missing": "image"
+    },
+    {
+      "slug": "trauma-crime-scene-decontamination-fundamentals",
+      "lessonId": "ecd204d2-e52f-43fb-ad99-8b05fe5ce0a9",
+      "lessonTitle": "Zones, containment and removing affected materials",
+      "missing": "image"
+    },
+    {
+      "slug": "water-damage-restoration-fundamentals",
+      "lessonId": "11361327-8613-44d4-9b39-07cac71a405a",
+      "lessonTitle": "Build a defensible job file",
+      "missing": "image"
+    },
+    {
+      "slug": "water-damage-restoration-fundamentals",
+      "lessonId": "2511b0e2-c687-452a-85a0-206659c47150",
+      "lessonTitle": "Equipment, power budgeting and the mould rule",
+      "missing": "image"
+    },
+    {
+      "slug": "water-damage-restoration-fundamentals",
+      "lessonId": "29848630-0d50-4a7d-9a1f-215f44c80709",
+      "lessonTitle": "The Australian insurance context",
+      "missing": "image"
+    },
+    {
+      "slug": "water-damage-restoration-fundamentals",
+      "lessonId": "39679c17-e9e1-47f5-aba8-1239efcdd7d3",
+      "lessonTitle": "Select PPE by the hazard present",
+      "missing": "image"
+    },
+    {
+      "slug": "water-damage-restoration-fundamentals",
+      "lessonId": "50355ac7-88f6-4431-998c-65b851347823",
+      "lessonTitle": "How the restoration mindset works",
+      "missing": "image"
+    },
+    {
+      "slug": "water-damage-restoration-fundamentals",
+      "lessonId": "51c6821e-1153-4319-a977-a18768e45ac7",
+      "lessonTitle": "Identify the hazards first",
+      "missing": "image"
+    },
+    {
+      "slug": "water-damage-restoration-fundamentals",
+      "lessonId": "549e8ba9-cec0-4a48-b286-b86676295418",
+      "lessonTitle": "The three water categories",
+      "missing": "image"
+    },
+    {
+      "slug": "water-damage-restoration-fundamentals",
+      "lessonId": "8e3ac808-501b-419f-a3a2-cb54ef0e3fb8",
+      "lessonTitle": "Classes: how much water and how hard to dry",
+      "missing": "image"
+    },
+    {
+      "slug": "water-damage-restoration-fundamentals",
+      "lessonId": "9df19425-5d0f-42c7-b3ef-b8c134a84571",
+      "lessonTitle": "The drying equation: heat, airflow and humidity",
+      "missing": "image"
+    },
+    {
+      "slug": "water-damage-restoration-fundamentals",
+      "lessonId": "b5aff281-5122-439b-9e7d-6ba20f9a4be3",
+      "lessonTitle": "Mapping moisture and setting a dry goal",
+      "missing": "image"
+    },
+    {
+      "slug": "water-damage-restoration-fundamentals",
+      "lessonId": "d4c218ea-bb56-4a2c-beff-29154009d0ab",
+      "lessonTitle": "What this course covers and who it is for",
+      "missing": "image"
+    },
+    {
+      "slug": "water-damage-restoration-fundamentals",
+      "lessonId": "e95fd84c-cf63-40b7-816d-cf642c35e307",
+      "lessonTitle": "Instruments and what they tell you",
+      "missing": "image"
+    }
+  ]
+}
