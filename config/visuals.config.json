@@ -1,11 +1,7 @@
 {
   "mode": "report",
   "manifest": "config/media.manifest.json",
-  "allowlist": [
-    "**/components/ui/**",
-    "**/icons/**",
-    "**/*logo*"
-  ],
+  "allowlist": ["**/components/ui/**", "**/icons/**"],
   "budgets": {
     "imageMaxKB": 450,
     "videoMaxKB": 6000,
