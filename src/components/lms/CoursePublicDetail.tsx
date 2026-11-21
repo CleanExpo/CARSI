@@ -14,6 +14,7 @@ import { CourseThumbnail } from '@/components/lms/CourseThumbnail';
 import { EnrolButton } from '@/components/lms/EnrolButton';
 import { ReviewPolicyLink } from '@/components/lms/ReviewPolicy';
 import { courseDurationLabel } from '@/lib/course-duration-label';
+import { CARSI_CREDENTIAL_STATEMENT } from '@/components/seo/JsonLd';
 import type { DesignationDefinition } from '@/lib/designations/registry';
 
 /** The "Earns N IICRC CEC hour(s)" label, pluralised, from the resolved approval hours. */
@@ -77,6 +78,7 @@ export function CoursePublicDetail({
   audienceItems,
   previewLesson,
   aggregateRating,
+  cecApproved = false,
 }: {
   course: CoursePublicDetailModel;
   designation: DesignationDefinition | null;
@@ -86,6 +88,12 @@ export function CoursePublicDetail({
   audienceItems: string[];
   previewLesson?: { title: string; preview_body: string } | null;
   aggregateRating?: { ratingValue: number; reviewCount: number } | null;
+  /**
+   * True only for a course approved in data/seed/cec-approvals.json (isCecApprovedCourse). Only
+   * then does the page name the IICRC (the GP-704 disclaimer); every other course says only that
+   * it is a CARSI course and credential (GP-748). Defaults to false: fail closed.
+   */
+  cecApproved?: boolean;
 }) {
   const lead =
     course.short_description ??
@@ -161,11 +169,21 @@ export function CoursePublicDetail({
               ) : null}
 
               <p className="mt-6 max-w-2xl text-sm leading-relaxed text-slate-500">
-                <span className="font-semibold text-slate-800">
-                  A CARSI-issued credential — not an IICRC certification.
-                </span>{' '}
-                CARSI is an IICRC CEC Accredited provider. IICRC certification is obtained through a
-                school and examination approved by the IICRC.{' '}
+                {cecApproved ? (
+                  <>
+                    <span className="font-semibold text-slate-800">
+                      A CARSI-issued credential — not an IICRC certification.
+                    </span>{' '}
+                    CARSI is an IICRC CEC Accredited provider. IICRC certification is obtained
+                    through a school and examination approved by the IICRC.{' '}
+                  </>
+                ) : (
+                  <>
+                    <span className="font-semibold text-slate-800">
+                      {CARSI_CREDENTIAL_STATEMENT}
+                    </span>{' '}
+                  </>
+                )}
                 <Link
                   href="/verify/training-record"
                   className="font-semibold text-[#146fc2] underline underline-offset-4"
