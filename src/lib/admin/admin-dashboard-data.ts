@@ -1,13 +1,19 @@
 import { prisma } from '@/lib/prisma';
 
 import { loadAdminCatalogSource } from '@/lib/admin/admin-catalog-source';
-import { summariseOpsPeriod, type AdminOpsPeriodKpis } from '@/lib/admin/admin-ops-metrics';
 import {
-  enrollmentLooksPaid,
+  enrollmentIsStripePaid,
+  summariseOpsMonthly,
+  summariseOpsPeriod,
+  topCoursesByPaidEnrollments,
+  type AdminOpsMonth,
+  type AdminOpsPeriodKpis,
+  type AdminOpsTopCourse,
+} from '@/lib/admin/admin-ops-metrics';
+import {
   fetchCompletedLessonCounts,
   fetchEnrollmentsForUsers,
   fetchLastActiveByUserId,
-  listPriceAudFromCourse,
   mapUserToAdminProgress,
   normalizeEnrollmentStatus,
   type AdminCatalogCourseOption,
@@ -41,8 +47,8 @@ export type AdminDashboardClientData = {
     thisMonth: AdminOpsPeriodKpis;
     lastMonth: AdminOpsPeriodKpis;
     thisYear: AdminOpsPeriodKpis;
-    monthly: { month: string; revenueAud: number; enrollments: number; completions: number }[];
-    topByRevenue: { title: string; revenueAud: number; enrollments: number }[];
+    monthly: AdminOpsMonth[];
+    topByPaidEnrollments: AdminOpsTopCourse[];
     attention: {
       neverStarted: { userId: string; name: string; email: string; courseTitle: string }[];
       refunds: {
@@ -251,55 +257,12 @@ export async function getAdminDashboardData(): Promise<AdminDashboardClientData>
     certificateIssuedAt: e.certificateIssuedAt,
     status: e.status,
     paymentReference: e.paymentReference,
-    course: e.course,
   }));
   const createdAts = users.map((u) => u.createdAt);
 
-  const revenueByCourse = new Map<
-    string,
-    { title: string; revenueAud: number; enrollments: number }
-  >();
-  for (const e of enrollments) {
-    if (!enrollmentLooksPaid(e)) continue;
-    const row = revenueByCourse.get(e.courseId) ?? {
-      title: e.course.title,
-      revenueAud: 0,
-      enrollments: 0,
-    };
-    row.revenueAud += listPriceAudFromCourse(e.course);
-    row.enrollments += 1;
-    revenueByCourse.set(e.courseId, row);
-  }
-  const topByRevenue = Array.from(revenueByCourse.values())
-    .sort((a, b) => b.revenueAud - a.revenueAud)
-    .slice(0, 8)
-    .map((r) => ({ ...r, revenueAud: Math.round(r.revenueAud * 100) / 100 }));
-
-  const monthly: { month: string; revenueAud: number; enrollments: number; completions: number }[] =
-    [];
-  for (let i = 7; i >= 0; i -= 1) {
-    const cursor = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const next = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
-    const key = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}`;
-    let revenueAud = 0;
-    let monthEnrollments = 0;
-    let monthCompletions = 0;
-    for (const e of enrollments) {
-      if (e.enrolledAt >= cursor && e.enrolledAt < next) {
-        monthEnrollments += 1;
-        if (enrollmentLooksPaid(e)) revenueAud += listPriceAudFromCourse(e.course);
-      }
-      if (e.completedAt && e.completedAt >= cursor && e.completedAt < next) {
-        monthCompletions += 1;
-      }
-    }
-    monthly.push({
-      month: key,
-      revenueAud: Math.round(revenueAud * 100) / 100,
-      enrollments: monthEnrollments,
-      completions: monthCompletions,
-    });
-  }
+  // GP-763: ranked and plotted by Stripe-paid enrolments, never valued at today's price.
+  const topByPaidEnrollments = topCoursesByPaidEnrollments(enrollments);
+  const monthly = summariseOpsMonthly(saleRows, now);
 
   const neverStarted: { userId: string; name: string; email: string; courseTitle: string }[] = [];
   const refunds: {
@@ -316,7 +279,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardClientData>
     const email = owner?.email ?? '';
     const status = normalizeEnrollmentStatus(e.status);
     const done = completedLessonCounts.get(`${e.studentId}-${e.courseId}`) ?? 0;
-    if (status === 'active' && done <= 0 && enrollmentLooksPaid(e) && neverStarted.length < 8) {
+    if (status === 'active' && done <= 0 && enrollmentIsStripePaid(e) && neverStarted.length < 8) {
       neverStarted.push({ userId: e.studentId, name, email, courseTitle: e.course.title });
     }
     const raw = (e.status ?? '').toLowerCase();
@@ -356,13 +319,13 @@ export async function getAdminDashboardData(): Promise<AdminDashboardClientData>
     },
     ops: {
       revenueNote:
-        'Recognised catalogue AUD on paid enrolments (payment reference present, not refunded). Not a Stripe payout ledger.',
+        'Paid enrolments are Stripe Checkout purchases that were not refunded or revoked. Price at purchase unknown: the database keeps no amount paid per enrolment, so no dollar figure is shown. Free, admin, team-seat, membership and discount enrolments are not counted. Not a Stripe payout ledger.',
       allTime: summariseOpsPeriod(saleRows, createdAts, 'all', now),
       thisMonth: summariseOpsPeriod(saleRows, createdAts, 'this_month', now),
       lastMonth: summariseOpsPeriod(saleRows, createdAts, 'last_month', now),
       thisYear: summariseOpsPeriod(saleRows, createdAts, 'this_year', now),
       monthly,
-      topByRevenue,
+      topByPaidEnrollments,
       attention: {
         neverStarted,
         refunds,

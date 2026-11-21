@@ -25,7 +25,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import type { AdminDashboardUserEntry } from '@/lib/admin/admin-dashboard-data';
-import { formatAud } from '@/lib/admin/admin-ops-format';
+import { formatRevenueAud } from '@/lib/admin/admin-ops-format';
 import {
   ADMIN_USER_SEGMENTS,
   matchesAdminUserSegment,
@@ -181,7 +181,7 @@ export function AdminUsersClient({ users }: { users: AdminDashboardUserEntry[] }
                       )}
                     </TableCell>
                     <TableCell className="hidden text-sm text-white/70 tabular-nums sm:table-cell">
-                      {u.spentAud > 0 ? formatAud(u.spentAud) : '—'}
+                      {u.spentAud === 0 ? '—' : formatRevenueAud(u.spentAud)}
                     </TableCell>
                     <TableCell className="hidden text-xs text-white/45 xl:table-cell">
                       {formatAdminDateTime(u.lastActiveAt)}
