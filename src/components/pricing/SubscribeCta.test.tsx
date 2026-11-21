@@ -53,7 +53,8 @@ describe('SubscribeCta "Start membership"', () => {
   it('logged out (401): goes to register in-flow returning to /subscribe, not /login', async () => {
     post.mockRejectedValue(new ApiClientError('Sign in to start your membership.', 401));
     await clickStart();
-    expect(post).toHaveBeenCalledWith('/api/lms/subscription/checkout', {});
+    // GP-732: the visitor's analytics choice travels with checkout (unset when none is stored).
+    expect(post).toHaveBeenCalledWith('/api/lms/subscription/checkout', { analytics_consent: 'unset' });
     expect(nav.href).toBe('/register?next=%2Fsubscribe');
   });
 
