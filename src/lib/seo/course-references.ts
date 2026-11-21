@@ -136,9 +136,14 @@ function dedupeKey(ref: CourseReference): string {
   return ref.url ? `url:${ref.url}` : `name:${ref.label.toLowerCase()}`;
 }
 
-/** Whether a catalogue course is live (the course page only renders published courses). */
+/**
+ * Whether a catalogue course is live. `status` is canonical (#137); the legacy `isPublished`
+ * column is deliberately ignored. Same rule as `isPublishedCourseStatus` in
+ * src/lib/server/public-courses-list.ts, inlined so this module (used by a build script)
+ * never loads the Prisma client.
+ */
 export function isPublishedCatalogueCourse(course: CatalogueCourseForReferences): boolean {
-  return course.status === 'published' && course.isPublished !== false;
+  return typeof course.status === 'string' && course.status.toLowerCase() === 'published';
 }
 
 /**
