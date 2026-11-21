@@ -40,7 +40,7 @@ export const homePathwayItems: HomePathwayItem[] = [
   {
     href: ccwRoadshowPath,
     label: 'Roadshow program',
-    title: 'CARSI × CCW Business Growth Days',
+    title: 'CARSI Business Growth Days',
     detail: 'Why attend, who it is for, venues and daily focus',
     cta: 'View program',
     icon: Sparkles,

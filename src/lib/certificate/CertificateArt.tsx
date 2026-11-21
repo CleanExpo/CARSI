@@ -16,6 +16,8 @@ export type CertificateArtInput = {
   credentialId?: string;
   cecHoursLabel?: number | null;
   courseLevel?: string | null;
+  /** 'attendance' for cohort workshops (e.g. the CARSI 2-day carpet cleaning workshop). */
+  certificateKind?: 'completion' | 'attendance';
 };
 
 const DISCIPLINE_COLORS: Record<string, string> = {
@@ -44,6 +46,7 @@ export function CertificateArt({ logoSrc, ...input }: CertificateArtInput & { lo
   const accent = DISCIPLINE_COLORS[discCode] ?? '#2490ed';
   const studentName = input.studentName ?? 'James Wilson';
   const courseName = input.courseName ?? 'Introduction to Water Damage Restoration';
+  const isAttendance = input.certificateKind === 'attendance';
   const completedDate = input.completedDate ?? '';
   const issuedDate = input.issuedDate ?? completedDate;
   const discLabel =
@@ -132,7 +135,7 @@ export function CertificateArt({ logoSrc, ...input }: CertificateArtInput & { lo
             Centre for Applied Restoration Science & Industry
           </Text>
           <Text style={{ fontSize: 48, color: '#020617', marginTop: 14 }}>
-            Certificate of Completion
+            {isAttendance ? 'Certificate of Attendance' : 'Certificate of Completion'}
           </Text>
           <Text style={{ fontSize: 20, color: '#64748b', marginTop: 6 }}>
             Official record of achievement
@@ -151,7 +154,9 @@ export function CertificateArt({ logoSrc, ...input }: CertificateArtInput & { lo
           </Text>
           <Text style={{ fontSize: 52, color: '#146fc2', marginTop: 4 }}>{studentName}</Text>
           <Text style={{ fontSize: 22, color: '#64748b', marginTop: 12, textAlign: 'center' }}>
-            has demonstrated the required competency and successfully completed the CARSI programme
+            {isAttendance
+              ? 'attended both days of the CARSI workshop'
+              : 'has demonstrated the required competency and successfully completed the CARSI programme'}
           </Text>
           <Text style={{ fontSize: 30, color: '#020617', marginTop: 10, textAlign: 'center' }}>
             {courseName}
@@ -189,8 +194,9 @@ export function CertificateArt({ logoSrc, ...input }: CertificateArtInput & { lo
             {`Credential ${credentialRef}`}
           </Text>
           <Text style={{ fontSize: 18, color: '#64748b', marginTop: 8, textAlign: 'center' }}>
-            Designed for IICRC Continuing Education Credits (CECs) where applicable. Retain this
-            certificate with your renewal records.
+            {cecValue
+              ? 'IICRC Continuing Education Credits (CECs) as shown. Retain this certificate with your renewal records.'
+              : 'Issued by CARSI. No IICRC CECs are attached to this certificate. Retain it with your training records.'}
           </Text>
         </div>
 

@@ -19,8 +19,8 @@ import { verifyCheckInToken } from '@/lib/server/ccw-attendance/checkin-token';
 
 export const metadata: Metadata = {
   // Door page — never indexed; it is reached only via the venue QR / link.
-  title: 'Event Check-in | CARSI x CCW',
-  description: 'Self-service check-in for CARSI x CCW Business Growth Days attendees.',
+  title: 'Event Check-in | CARSI Roadshow',
+  description: 'Self-service check-in for CARSI Business Growth Days attendees.',
   robots: { index: false, follow: false },
 };
 

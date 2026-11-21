@@ -142,7 +142,7 @@ describe('past sittings are not presented as upcoming', () => {
 
   const afterEverySitting = new Date('2026-10-19T00:00:00Z');
   const melbourneInterestHref =
-    'href="/contact?source=ccw-roadshow&amp;city=melbourne&amp;topic=the%20next%20Melbourne%20CARSI%20x%20CCW%20training%20dates"';
+    'href="/contact?source=ccw-roadshow&amp;city=melbourne&amp;topic=the%20next%20Melbourne%20CARSI%20roadshow%20training%20dates"';
 
   it('shows next Melbourne dates as to be announced at the CCW Melbourne store once July has ended', () => {
     vi.useFakeTimers();

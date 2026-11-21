@@ -165,7 +165,7 @@ export const carsiCoachingAddOns: CoachingAddOn[] = [
   },
   {
     id: 'growth-days',
-    title: 'CARSI × CCW Business Growth Days',
+    title: 'CARSI Business Growth Days',
     priceLabel: 'From $149',
     billing: 'from',
     description:

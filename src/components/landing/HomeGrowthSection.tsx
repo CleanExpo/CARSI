@@ -77,7 +77,7 @@ function useClientTodayInBrisbane(): string | null {
 
 /**
  * Growth Days departures. The centrepiece is a life-like event ticket for the
- * CARSI x CCW Business Growth Days, with a tear-off check-in stub, barcode and
+ * CARSI Business Growth Days, with a tear-off check-in stub, barcode and
  * a stamped in-person mark. The three pathways sit beside it as boarding rows,
  * and the workshop hangs off the end as a small dashed stub.
  *

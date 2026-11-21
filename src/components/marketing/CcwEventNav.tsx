@@ -1,11 +1,11 @@
 import Link from 'next/link';
 
 export const CCW_EVENT_NAV = [
-  { href: '/events/ccw-roadshow', label: 'CCW Roadshow' },
+  { href: '/events/ccw-roadshow', label: 'CARSI Roadshow' },
   { href: '/ccw-melbourne', label: 'Melbourne' },
   { href: '/ccw-sydney', label: 'Sydney' },
   { href: '/ccw-brisbane', label: 'Brisbane' },
-  { href: '/ccw-training/workshop?section=materials', label: 'Materials' },
+  { href: '/workshops/carpet-cleaning#materials', label: 'Materials' },
 ] as const;
 
 export function CcwEventNav({ current }: { current: string }) {

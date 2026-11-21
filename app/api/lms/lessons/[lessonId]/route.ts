@@ -4,8 +4,7 @@ import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { findEnrolledCoursePrerequisiteBlock, prerequisiteBlockBody } from '@/lib/server/course-prerequisites';
 import {
-  ensureAdminEnrollmentForCourse,
-  getCourseIdForLesson,
+  ensureStaffEnrollmentForLesson,
   getLessonContextForStudent,
   touchLessonProgress,
 } from '@/lib/server/enrollment-service';
@@ -44,10 +43,8 @@ export async function GET(request: NextRequest, ctx: Ctx) {
 
   const { lessonId } = await ctx.params;
 
-  if (isLmsClaimsAllowedAdminPanel(claims)) {
-    const courseId = await getCourseIdForLesson(lessonId);
-    if (courseId) await ensureAdminEnrollmentForCourse(claims, courseId);
-  }
+  // Staff access: admins (any course), instructors (allow-listed workshop courses only).
+  await ensureStaffEnrollmentForLesson(claims, lessonId);
 
   const ctxRow = await getLessonContextForStudent(lessonId, claims.sub);
   if (!ctxRow) {

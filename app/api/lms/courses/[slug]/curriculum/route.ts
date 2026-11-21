@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
 import { parseOnboardingMeta, isOnboardingCourse } from '@/lib/onboarding/enterprise';
 import { projectLearnerCourseMeta } from '@/lib/lms/learner-course-meta';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
+import { shouldStaffAutoEnrol } from '@/lib/server/carsi-workshop-access';
 import { ensureAdminEnrollmentForCourse } from '@/lib/server/enrollment-service';
 import { isEnrolmentAccessAllowed } from '@/lib/server/enrollment-access';
 import { prisma } from '@/lib/prisma';
@@ -66,7 +66,7 @@ export async function GET(request: NextRequest, ctx: Ctx) {
     },
   });
 
-  if (!enrollment && isLmsClaimsAllowedAdminPanel(claims)) {
+  if (!enrollment && shouldStaffAutoEnrol(claims, course.slug)) {
     await ensureAdminEnrollmentForCourse(claims, course.id);
     enrollment = await prisma.lmsEnrollment.findUnique({
       where: {

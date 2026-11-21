@@ -376,7 +376,7 @@ describe('llms.txt events come from the event records', () => {
     expect(text).not.toMatch(/free entry/i);
     expect(text).not.toMatch(/current dates/i);
     expect(text).not.toContain('Old Day - Sydney');
-    expect(text).toContain('- /events/ccw-roadshow — CARSI x CCW Business Growth Days event page');
+    expect(text).toContain('- /events/ccw-roadshow — CARSI Business Growth Days event page');
   });
 
   it('event: the real event list on the review date (all ended) makes no event claim', async () => {

@@ -27,7 +27,7 @@ function pricingLine(now: Date): string {
 }
 
 const baseMetadata: Metadata = {
-  title: 'Grow Your Cleaning Business | CARSI x CCW Roadshow 2026',
+  title: 'Grow Your Cleaning Business | CARSI Roadshow 2026',
   alternates: { canonical },
   keywords: [
     'carpet cleaning training Melbourne',
@@ -40,7 +40,7 @@ const baseMetadata: Metadata = {
     'CARSI CCW training',
   ],
   openGraph: {
-    title: 'Grow Your Cleaning Business with CARSI x CCW',
+    title: 'Grow Your Cleaning Business with the CARSI Roadshow',
     description:
       'Two practical business-growth days with Phill McGurk inside CCW Melbourne, Sydney and Brisbane locations.',
     url: canonical,

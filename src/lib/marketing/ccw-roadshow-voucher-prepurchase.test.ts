@@ -15,7 +15,7 @@ const event = {
 const liveVoucher: CcwAttendeeOffer = {
   key: 'ccw-store-credit',
   label: 'CCW attendee voucher',
-  detail: 'Purchase your CCW/CARSI 2-day training voucher.',
+  detail: 'Purchase your CARSI 2-day training voucher (sold through roadshow partner CCW).',
   url: 'https://ccwonline.com.au/products/ccw-carsi-2-day-in-house-training',
   live: true,
 };
