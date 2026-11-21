@@ -9,7 +9,8 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'
 // GitHub never sets E2E_PORT*, so CI listens on 3000, 3100 and 3101. The release gate's local
 // CI mirror sets them to free ports, because on a shared Mac another session's dev server
 // often holds 3000 (UNI-3468).
-const MAIN_PORT = process.env.E2E_PORT || '3000';
+// A developer's own PORT is kept when E2E_PORT is unset (UNI-3472); no workflow sets PORT.
+const MAIN_PORT = process.env.E2E_PORT || process.env.PORT || '3000';
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:${MAIN_PORT}`;
 
 /**
