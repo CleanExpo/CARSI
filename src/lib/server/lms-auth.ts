@@ -228,7 +228,10 @@ export async function authenticateWithPassword(
   const ok = await verifyPassword(password, user.hashedPassword);
   if (!ok) return null;
 
-  return sessionClaimsForUserId(user.id);
+  // GP-760: mint only for the generation the checked password belongs to. If a password reset
+  // committed between reading the hash and here, the generation has moved on and the old
+  // password must not produce a session of the new generation.
+  return sessionClaimsForUserId(user.id, { sessionGeneration: user.sessionGeneration });
 }
 
 export type RegisterPrismaResult =
