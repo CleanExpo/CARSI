@@ -1,12 +1,13 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import * as lucide from 'lucide-react';
 import { describe, expect, it } from 'vitest';
 
 // lucide-react 1.x removed its brand icons (Linkedin, Github, ...). A removed named import is
 // `undefined` at runtime: it passes type-stripped tooling and then throws "Element type is
 // invalid" when rendered. This guard fails on the import itself.
-const SRC = join(process.cwd(), 'src');
+const SRC = join(dirname(fileURLToPath(import.meta.url)), '..');
 const IMPORT_RE = /import\s+(?:type\s+)?\{([^}]*)\}\s*from\s*['"]lucide-react['"]/g;
 
 function sourceFiles(dir: string): string[] {
