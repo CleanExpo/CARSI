@@ -50,8 +50,13 @@ A flow with `brandVideoScriptId: null` is **silent B-roll** — transcoded only,
 ## Prerequisites (operator)
 
 - The app is running at `DEMO_RECORD_BASE_URL` (default `http://localhost:3000`).
-- The demo account is seeded: `npm run db:seed-courses` then `npm run db:seed-e2e-user`
+- The demo account is seeded, **against a local or disposable database only**:
+  `npm run db:seed-courses -- --all --apply` then `npm run db:seed-e2e-user`
   (creates `student@carsi.com.au`, enrolled in the first catalogue course).
+  `--all --apply` rewrites course metadata and lesson content for **every** course in the
+  catalogue from the repo. Never point it at production for a screencast: if you need a demo
+  against live data, seed only the slug you are recording and follow
+  `docs/runbooks/course-go-live.md` first.
 - For any non-silent flow, the paired avatar exists — run
   `npm run video:brand:generate -- --ids=<brandVideoScriptId>` first (needs `HEYGEN_*`).
 - `@ffmpeg-installer/ffmpeg` is installed (bundled binary) **or** `FFMPEG_PATH` points at a
@@ -104,12 +109,12 @@ A flow with `brandVideoScriptId: null` is **silent B-roll** — transcoded only,
 
 ## Critical files
 
-| File | Role |
-|---|---|
-| `src/lib/screencast/demo-flows.ts` | The authored flow manifest (edit this to add videos). |
-| `src/lib/screencast/demo-flow-types.ts` | `DemoFlow`/`DemoStep` types + guards. |
-| `scripts/generate-demo-videos.ts` | record → composite → upload pipeline. |
-| `src/lib/brand-video-assistant.ts` | Narration scripts paired by `brandVideoScriptId`. |
-| `scripts/automate-brand-videos.ts` | Produces the avatar MP4 + SRT the composite overlays. |
-| `e2e/auth.setup.ts` | The demo-account login this tool mirrors. |
-| `src/lib/server/cloudinary-upload.ts` | `uploadVideoToCloudinary()` for the final MP4. |
+| File                                    | Role                                                  |
+| --------------------------------------- | ----------------------------------------------------- |
+| `src/lib/screencast/demo-flows.ts`      | The authored flow manifest (edit this to add videos). |
+| `src/lib/screencast/demo-flow-types.ts` | `DemoFlow`/`DemoStep` types + guards.                 |
+| `scripts/generate-demo-videos.ts`       | record → composite → upload pipeline.                 |
+| `src/lib/brand-video-assistant.ts`      | Narration scripts paired by `brandVideoScriptId`.     |
+| `scripts/automate-brand-videos.ts`      | Produces the avatar MP4 + SRT the composite overlays. |
+| `e2e/auth.setup.ts`                     | The demo-account login this tool mirrors.             |
+| `src/lib/server/cloudinary-upload.ts`   | `uploadVideoToCloudinary()` for the final MP4.        |

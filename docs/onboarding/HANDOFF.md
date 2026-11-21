@@ -30,7 +30,12 @@ controls below.
 
 - Course slug: `floor-care-onboarding-operational-readiness`
 - Course id (for the admin publish API): `6011d465-1981-487b-84e3-a53b10a2bd07`
-- Current state in JSON: `status: "draft"`, `isPublished: false`, `isFree: true`, `priceAud: "0"`
+- Committed catalogue state (`data/seed/courses-catalog.json`, checked 2026-11-20):
+  `status: "published"`, `isPublished: true`, `isFree: false`, `priceAud: "99"` — **all four of these
+  were previously documented here as draft/false/true/"0", which was wrong on every field.** The
+  importer writes all four to the database on apply, so they decide whether the course is live and
+  what it costs. These are the *repo's* values; what is currently in the production database has
+  **not** been verified from this environment — check it with the §1 preflight before acting.
 - Quiz bank: `data/seed/floor-care-quizzes.json` — 11 quizzes, 34 questions
 - Scripts: `db:seed-courses`, `db:seed-floor-care-quizzes`, `db:seed-e2e-user`, `db:export-courses`
 
@@ -78,12 +83,28 @@ git diff data/seed/courses-catalog.json                     # review; if drift y
 git checkout -- data/seed/courses-catalog.json              # restore the committed (intended) JSON before seeding
 
 # 3b. Seed the course, then its quizzes — the quiz needs its course to exist first.
-DATABASE_URL=<prod> npm run db:seed-courses                 # idempotent upsert by slug; course lands as DRAFT
+DATABASE_URL=<prod> npm run db:seed-floor-care-course       # imports THIS course only (--slug + --apply). NOT a draft: see the warning below
 DATABASE_URL=<prod> npm run db:seed-floor-care-quizzes      # idempotent upsert by quiz id; creates 11 quizzes
 ```
 
-Both seeds are safe to re-run. `db:seed-courses` replaces this course's modules/lessons to match the
-JSON; `db:seed-floor-care-quizzes` upserts each quiz by id and replaces its questions.
+Both seeds are safe to re-run. `db:seed-floor-care-course` **reconciles** this course's
+modules/lessons against the JSON rather than replacing them, so a lesson still in the catalogue keeps
+its row and every learner's progress on it; it refuses outright if the import would delete learner
+progress or leave the course with no curriculum. `db:seed-floor-care-quizzes` upserts each quiz by id
+and replaces its questions.
+
+> ⚠️ **This import PUBLISHES the course.** The importer writes `status` and `isPublished` from
+> `data/seed/courses-catalog.json` on every apply, and the committed entry for
+> `floor-care-onboarding-operational-readiness` is `"status": "published"` with
+> `"isPublished": true`. So the course goes live at step 3b — before the quizzes exist and before
+> the §4 smoke test. If it must stay hidden until the smoke test passes, set both values to
+> unpublished in the catalogue first, seed, test, then publish via §5.
+
+To see what the **course** import would do without writing, run the importer directly:
+`npm run db:seed-courses -- --slug=floor-care-onboarding-operational-readiness` (no `--apply`).
+That previews the course only — it does not preview or run `db:seed-floor-care-quizzes`, which has
+no dry run of its own, so review the question changes in
+`data/seed/floor-care-quizzes.json` before seeding them.
 
 ---
 
@@ -114,14 +135,25 @@ Or run the Playwright suite (Journey 8 covers the quiz render): `npm run test:e2
 
 ## 5. Publish — and the access-control decision ⚠️
 
-**Read before publishing.** The course is currently `isFree: true` / `priceAud: "0"`. **If you publish
-it to the public catalogue as-is, any logged-in user can enrol for free.** That is fine for an internal
-pilot, but it is **not** access control for the paid **$1,295/month + GST** organisation subscription.
+**Read before publishing.** The committed catalogue has this course as `isFree: false` /
+`priceAud: "99"` and already `published` / `isPublished: true`. Two consequences, both different from
+what this section used to say:
+
+- **Seeding publishes it.** §3b's import writes `status` and `isPublished`, so the course goes live as
+  a side effect of seeding, not as a separate decision at this step. Stage it by setting both to
+  unpublished in the catalogue first if that is not what you want.
+- **It is a paid course, not a free one.** This section previously said it was `isFree: true` /
+  `priceAud: "0"` and that publishing as-is let any logged-in user enrol for free. That is not the
+  catalogue's state. Publishing as-is lists an **A$99** course.
+
+Either way, a public publish is **not** access control for the paid **$1,295/month + GST**
+organisation subscription.
 
 Choose the model that matches intent:
 
-- **A — Internal/free pilot or manual provisioning (no billing yet):** publish (or keep off the public
-  catalogue and provision enrolments per organisation). Access is not metered.
+- **A — Internal/free pilot or manual provisioning (no billing yet):** this now requires a catalogue
+  change as well — set `isFree: true` and `priceAud: "0"` — or keep it off the public catalogue and
+  provision enrolments per organisation. Access is not metered.
 - **B — Paid org subscription enforced:** do **not** rely on a public free publish. Build the
   subscription billing + access gating first (Deferred build A), or provision access per-organisation
   via a team/manual enrolment until then.
@@ -133,7 +165,8 @@ To publish (when you've chosen), pick one lever and then make it **durable in gi
 PATCH /api/admin/courses   { "courseIds": ["6011d465-1981-487b-84e3-a53b10a2bd07"], "published": true }
 
 # Lever 2 — JSON + reseed (durable, but re-syncs the whole catalogue — mind §1 drift warning):
-#   set status:"published", isPublished:true on this course in courses-catalog.json, then db:seed-courses
+#   set status:"published", isPublished:true on this course in courses-catalog.json, then
+#   db:seed-floor-care-course (or db:seed-courses -- --slug=<slug> --apply)
 ```
 
 A course is public when `isPublished === true` **OR** `status === 'published'`
@@ -172,8 +205,12 @@ recorded on the course in `meta.pricing` so nothing is lost.
 3. **Webhook handling** for `customer.subscription.created/updated/deleted` and
    `invoice.payment_failed` to provision/deprovision access (extend the existing Stripe webhook
    handler).
-4. **Access gating** so the course is granted via active subscription rather than `isFree` — and flip
-   the course off `isFree` once gating exists.
+4. **Access gating** so the course is granted via active subscription rather than by being free.
+   Note this item was written when the catalogue had the course as `isFree: true`; it is now
+   `isFree: false` / `priceAud: "99"`, which is itself an unresolved discrepancy against the
+   documented org-subscription intent (see §"Current state" above and the table in
+   `floor-care/publish-runbook.md`). Settle that first — the gating work depends on which pricing
+   model is actually intended.
 
 Treat this as its own scoped PR with its own plan, tests, and the Verification Gate. Until it exists,
 use §5 option A/B for access.
@@ -212,7 +249,8 @@ Find them all: `grep -rno "\[COMPANY TO CONFIRM[^]]*\]" docs/onboarding`.
 - [ ] Production DB snapshot taken.
 - [ ] `npm run type-check` green in a networked env.
 - [ ] Drift check done (§3a); committed JSON is the intended catalogue.
-- [ ] `db:seed-courses` then `db:seed-floor-care-quizzes` run against prod (course is in, as draft).
+- [ ] Catalogue `status`/`isPublished` for this slug checked against the intended visibility BEFORE the prod run (they are `published`/`true` as committed, so the import publishes it).
+- [ ] `db:seed-floor-care-course` then `db:seed-floor-care-quizzes` run against prod.
 - [ ] Quiz flow smoke-tested (GET hides answers; POST scores; attempts limited).
 - [ ] **Access-control decision made** (§5): free pilot / manual provisioning vs build billing first.
 - [ ] Published via chosen lever **and** published state committed to `courses-catalog.json`.

@@ -8,20 +8,37 @@ Agents cannot run this: no agent session holds a production database credential.
 A merged course change does **not** reach carsi.com.au. Deploys run migrations only
 (`start` = `prisma migrate deploy && next start`). Course content reaches the live site only when
 someone runs the seed script against production. The live database, not the repo, is the source
-of truth (`scripts/seed-courses-catalog.ts`, GP-503). The two have drifted: the live site lists
+of truth (the importer at `scripts/import-course-safe.ts`, GP-503). The two have drifted: the live site lists
 80 published courses, while `data/seed/courses-catalog.json` marks 54 as published.
 
 ## The two hazards (read before every run)
 
-1. **A re-seed deletes learner progress.** For a course that already exists in the database, the
-   script first deletes **every `lms_lesson_progress` row for that course's lessons**, then
-   rebuilds the modules and lessons (`deleteCourseCurriculum`). Enrolments survive, but every
-   learner's lesson completion is lost. **Never re-seed a course that has progress rows** without
-   the founder's written OK.
-2. **The repo copy overwrites the live copy.** The seed writes the repo's title, price, status,
-   `isPublished`, description and lessons over whatever is live, including any edits made in
-   production that were never brought back into the repo. Always seed **one course at a time**
-   with `--slug=`, never the whole catalogue.
+> **What changed (PR #1144).** `db:seed-courses` is now the safe importer
+> (`scripts/import-course-safe.ts`). It **reconciles** rather than replaces, and it is a **dry run
+> until you add `--apply`**. The delete-and-recreate seeder still exists as
+> `db:seed-courses-legacy`, and refuses to run without `--legacy-destructive-replace`. Hazard 1
+> below applies in full to that legacy path; for the default path it is now enforced by the tool.
+
+1. **Deleting learner progress — now refused, not merely discouraged.** For a course that already
+   exists, the importer upserts each module and lesson **by id**, so a lesson still present in the
+   catalogue keeps its row and every learner's completion of it. Progress dies only with a lesson
+   the catalogue no longer contains, and in that case the importer **exits non-zero and writes
+   nothing** unless `--allow-progress-loss` is passed. It likewise refuses to leave a course with
+   no curriculum at all (`--allow-empty-curriculum`), and refuses outright — with no override — if
+   an incoming module or lesson id belongs to a different course.
+   **This does not relax the governance rule:** if the preflight shows progress rows, still send
+   the counts to Phill and get a written OK before applying. The tool now stops an accident; it
+   does not grant the authority.
+   `db:seed-courses-legacy -- --legacy-destructive-replace` still deletes every
+   `lms_lesson_progress` row for the course's lessons before rebuilding them
+   (`deleteCourseCurriculum`). Enrolments survive; completions do not. Use it only to rebuild a
+   curriculum that is already corrupt.
+2. **The repo copy overwrites the live copy.** This hazard is unchanged. The importer writes the
+   repo's title, price, status, `isPublished`, description and lesson content over whatever is
+   live, including edits made in production that were never brought back into the repo — and it
+   does so for **every** course it applies, whether or not the curriculum structure moved. Always
+   seed **one course at a time** with `--slug=`, never the whole catalogue. Run it once without
+   `--apply` first and read the plan.
 
 ## Procedure (every course)
 
@@ -40,9 +57,12 @@ WHERE c.slug = '<slug>';
 
 | Result | Go? |
 | --- | --- |
-| No row | Safe: the seed creates the course. |
+| No row | Safe: the import creates the course. |
 | Row with `progress_rows = 0` | Safe: nothing is lost. Check the title and price match what you expect. |
-| Row with `progress_rows > 0` | **STOP.** Send the counts to Phill. Do not seed without a written OK. |
+| Row with `progress_rows > 0` | **STOP.** Send the counts to Phill. Do not apply without a written OK. The importer will preserve progress on every lesson the catalogue still lists, and will refuse the run rather than delete any — but whether this course should be re-imported at all is Phill's call, not the tool's. |
+
+A dry run (no `--apply`) is read-only and needs no approval: it prints what would change, including
+how many progress rows would be preserved and how many are at risk. Run it first, every time.
 
 **2. Seed that one course** from an up-to-date `main` checkout:
 
@@ -51,7 +71,8 @@ git pull origin main
 read -r -s -p 'Production DATABASE_URL: ' DATABASE_URL
 printf '\n'
 export DATABASE_URL
-npm run db:seed-courses -- --slug=<slug>
+npm run db:seed-courses -- --slug=<slug>            # preview only: writes NOTHING
+npm run db:seed-courses -- --slug=<slug> --apply    # write it, once the preview reads right
 unset DATABASE_URL
 ```
 
@@ -83,7 +104,7 @@ re-checks banned branding the next morning.
 | Level 2 — Mould Remediation | `level-2-mould-remediation-30ee3492` | **Live**, A$49. Course Standard v1, 14/14. | **Nothing. Do not re-seed.** The repo now marks it `published` to match the live site. Before this change, a re-seed would have unpublished it. Phill confirmed on 2026-11-02 that it was SME-reviewed before go-live. |
 | Level 3 — Mould Remediation | `level-3-mould-remediation-c5797369` | Rebuilt draft, Course Standard v1, 14/14. **Replaces the live course at this slug** (founder 2026-11-02), at the same A$148.95. The rebuild was renamed to the live slug, so the seed updates the live row in place and keeps its id, links and enrolments. | (1) Phill's SME sign-off. Until then, **do not seed**: the repo copy is `draft`, so seeding early would unpublish the live course. (2) A PR sets `status: published`, `isPublished: true`. (3) Preflight: the old curriculum's `progress_rows` will be deleted by the seed, so send Phill the count and get a written OK. (4) Seed. |
 | Ozone & Hydroxyl Generators (free sign-in course) | `ozone-and-hydroxyl-generators-what-the-evidence-says` | Draft. `meta.humanSignOff: PENDING`. Chosen 14/10/2026 as the free funnel course (DECISIONS #21). | (1) Phill's human sign-off (the course is marked `noAiRewrite`, so agents must not edit its text). (2) A PR records the sign-off and sets `published` / `isPublished: true`. (3) Seed. |
-| CARSI Water Restoration Practitioner | `water-damage-restoration-fundamentals` | **Promoted, ready to seed. First course to go live (DECISIONS #48).** SME sign-off 02/11/2026 (PR #992: ledger 68 rows, 0 GAP). On 03/11/2026 the v1 course was moved into `data/seed/courses-catalog.json` as `published`, `isPublished: true`, A$99, `cecHours: 0`, Course Standard v1, 14/14. Same course `id`, so the seed updates the existing row in place. Quiz: `data/seed/water-damage-restoration-fundamentals-quiz.json` (6 module checks and a 12-question final, 48 questions, 80% pass). Practical task: `data/seed/water-damage-restoration-fundamentals-assessment.json`. The staging folder stays as the evidence record. | (1) Preflight (step 1). The slug may already exist unpublished, so check `progress_rows`; if it is above 0, stop and send Phill the counts. (2) Seed this one slug: `npm run db:seed-courses -- --slug=water-damage-restoration-fundamentals`. (3) Quiz: the seed creates quiz lessons that point at 7 quiz ids, and until those quizzes exist they will not load. Once PR #997 (per-course quiz loader) has merged, seed only this course's quizzes. First run `npm run db:seed-quizzes -- --slug=water-damage-restoration-fundamentals --dry-run` and check that it lists the 7 quizzes below. Then run the same command without `--dry-run`. If #997 has not merged, do not run `db:seed-quizzes` with no options, because it rewrites every quiz on the list (step 3). The fallback is to ask Phill to approve seeding this one file with `npm run db:seed-assessment-draft -- --file=data/seed/water-damage-restoration-fundamentals-quiz.json`, which reads only that file. Seed the course and its quiz in the same session, so learners never see quiz lessons that do not load. The final check keeps the old quiz id `e7798876-961d-4e4c-a2f0-f91ded4cc2d1`, so it is updated in place. The other 6 ids are new. (3a) Orphan-quiz check, read-only, after the quiz seed. Completing a course needs a pass on every quiz attached to it, so any quiz not in the 7 below blocks every learner. One known candidate is the retired draft `459ef333-f67e-5516-a2ed-cb2426b27916` ("CARSI Water Restoration Practitioner — Knowledge Check", 70%, from the removed `assessment-drafts` file). It exists only if someone ran `db:seed-assessment-draft --dir`. Run: `SELECT q.id, q.title, q.pass_percentage, q.created_at, (SELECT count(*) FROM lms_quiz_attempts a WHERE a.quiz_id = q.id) AS attempts FROM lms_quizzes q JOIN lms_courses c ON c.id = q.course_id WHERE c.slug = 'water-damage-restoration-fundamentals' AND q.id NOT IN ('8874f437-a8ad-4c2c-bcdb-6dbf36c108a0','9860fee3-daf0-4007-92b7-93229547a9d8','618e4230-aa48-4ed6-977b-2389f20971e2','eb442750-ac7a-4baf-bac4-fd6db0f7f30c','ed90b217-493e-4dc0-93ac-87e51e86451c','6220f5b8-3191-4701-8811-b1714153388b','e7798876-961d-4e4c-a2f0-f91ded4cc2d1');`. If it returns no rows, carry on. If it returns rows, **do not publish-check or announce the course**. Send Phill the rows. Removing a quiz is a delete that no script performs, so it needs his written OK first. (4) Practical task: no script seeds it (`seed-ccw-truckmount-assessment.ts` reads only the CCW file). Enter it in the admin practical-assessment screen from the JSON, or leave it for a later seeder. (5) Check the live page (step 4). |
+| CARSI Water Restoration Practitioner | `water-damage-restoration-fundamentals` | **Promoted, ready to seed. First course to go live (DECISIONS #48).** SME sign-off 02/11/2026 (PR #992: ledger 68 rows, 0 GAP). On 03/11/2026 the v1 course was moved into `data/seed/courses-catalog.json` as `published`, `isPublished: true`, A$99, `cecHours: 0`, Course Standard v1, 14/14. Same course `id`, so the seed updates the existing row in place. Quiz: `data/seed/water-damage-restoration-fundamentals-quiz.json` (6 module checks and a 12-question final, 48 questions, 80% pass). Practical task: `data/seed/water-damage-restoration-fundamentals-assessment.json`. The staging folder stays as the evidence record. | (1) Preflight (step 1). The slug may already exist unpublished, so check `progress_rows`; if it is above 0, stop and send Phill the counts. (2) Seed this one slug, previewing first: `npm run db:seed-courses -- --slug=water-damage-restoration-fundamentals` writes nothing and prints the plan; re-run it with `--apply` to write. The importer reconciles rather than replaces, so progress on a retained lesson survives, and it refuses outright if the import would delete learner progress or empty the curriculum. (3) Quiz: the seed creates quiz lessons that point at 7 quiz ids, and until those quizzes exist they will not load. Once PR #997 (per-course quiz loader) has merged, seed only this course's quizzes. First run `npm run db:seed-quizzes -- --slug=water-damage-restoration-fundamentals --dry-run` and check that it lists the 7 quizzes below. Then run the same command without `--dry-run`. If #997 has not merged, do not run `db:seed-quizzes` with no options, because it rewrites every quiz on the list (step 3). The fallback is to ask Phill to approve seeding this one file with `npm run db:seed-assessment-draft -- --file=data/seed/water-damage-restoration-fundamentals-quiz.json`, which reads only that file. Seed the course and its quiz in the same session, so learners never see quiz lessons that do not load. The final check keeps the old quiz id `e7798876-961d-4e4c-a2f0-f91ded4cc2d1`, so it is updated in place. The other 6 ids are new. (3a) Orphan-quiz check, read-only, after the quiz seed. Completing a course needs a pass on every quiz attached to it, so any quiz not in the 7 below blocks every learner. One known candidate is the retired draft `459ef333-f67e-5516-a2ed-cb2426b27916` ("CARSI Water Restoration Practitioner — Knowledge Check", 70%, from the removed `assessment-drafts` file). It exists only if someone ran `db:seed-assessment-draft --dir`. Run: `SELECT q.id, q.title, q.pass_percentage, q.created_at, (SELECT count(*) FROM lms_quiz_attempts a WHERE a.quiz_id = q.id) AS attempts FROM lms_quizzes q JOIN lms_courses c ON c.id = q.course_id WHERE c.slug = 'water-damage-restoration-fundamentals' AND q.id NOT IN ('8874f437-a8ad-4c2c-bcdb-6dbf36c108a0','9860fee3-daf0-4007-92b7-93229547a9d8','618e4230-aa48-4ed6-977b-2389f20971e2','eb442750-ac7a-4baf-bac4-fd6db0f7f30c','ed90b217-493e-4dc0-93ac-87e51e86451c','6220f5b8-3191-4701-8811-b1714153388b','e7798876-961d-4e4c-a2f0-f91ded4cc2d1');`. If it returns no rows, carry on. If it returns rows, **do not publish-check or announce the course**. Send Phill the rows. Removing a quiz is a delete that no script performs, so it needs his written OK first. (4) Practical task: no script seeds it (`seed-ccw-truckmount-assessment.ts` reads only the CCW file). Enter it in the admin practical-assessment screen from the JSON, or leave it for a later seeder. (5) Check the live page (step 4). |
 | CARSI Mould Remediation Practitioner | `mould-remediation-fundamentals` | Being rebuilt as the **designation wrapper for Level 2** (founder 2026-11-02): Level 2 is the prerequisite, and this course adds the whole-job case studies, the practical assessment and the designation exam. | Same path as the Water course. |
 | WHS Fundamentals for Restoration and Cleaning Professionals | `whs-fundamentals-for-restoration-and-cleaning-professionals` | Written by an Australian registered trainer about three years ago and not updated since. | A dated currency review against current Safe Work Australia model laws and state regulators. Phill signs off the changes. Then a PR, then the seed. |
 

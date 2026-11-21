@@ -1,7 +1,8 @@
 /**
  * Seed course knowledge-check quizzes from the repo's seed data (GP-484), one course or all.
  *
- * USAGE (run AFTER `db:seed-courses` has created the target course):
+ * USAGE (run AFTER `db:seed-courses -- --slug=<course-slug> --apply` has created the target course;
+ * without --apply that command only previews and writes nothing):
  *   npm run db:seed-quizzes -- --slug=<course-slug> --dry-run   # preview, no DB connection
  *   npm run db:seed-quizzes -- --slug=<course-slug>             # seed ONLY that course
  *   npm run db:seed-quizzes -- --slug=<course-slug> --allow-draft
