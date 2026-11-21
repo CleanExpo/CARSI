@@ -45,15 +45,63 @@ function stripIndentedCode(text) {
   return out.join('\n');
 }
 
-/** `@path` references outside fenced, indented and inline code. */
+/**
+ * GP-692: blank out HTML comments and fenced code blocks, keeping the line count. A fence
+ * opens with 3+ backticks or tildes (up to 3 spaces in) and closes only on a line of the SAME
+ * character at least as long; an unclosed fence or comment runs to the end of the file. A rule
+ * hidden in either is not loaded by the agent, so it must not count as present here.
+ */
+function stripHidden(text) {
+  const out = [];
+  let fence = null;
+  let comment = false;
+  for (const line of text.split('\n')) {
+    if (fence) {
+      if (fence.test(line)) fence = null;
+      out.push('');
+      continue;
+    }
+    let rest = line;
+    let kept = '';
+    if (!comment) {
+      const open = /^ {0,3}(`{3,}|~{3,})(.*)$/.exec(line);
+      if (open && !(open[1][0] === '`' && open[2].includes('`'))) {
+        fence = new RegExp(`^ {0,3}${open[1][0]}{${open[1].length},}[ \\t]*$`);
+        out.push('');
+        continue;
+      }
+    }
+    for (;;) {
+      if (comment) {
+        const end = rest.indexOf('-->');
+        if (end < 0) break;
+        comment = false;
+        rest = rest.slice(end + 3);
+      } else {
+        const start = rest.indexOf('<!--');
+        if (start < 0) {
+          kept += rest;
+          break;
+        }
+        kept += rest.slice(0, start);
+        comment = true;
+        rest = rest.slice(start + 4);
+      }
+    }
+    out.push(kept);
+  }
+  return out.join('\n');
+}
+
+/** `@path` references outside comments and fenced, indented and inline code. */
 function references(text) {
-  const prose = stripIndentedCode(text.replace(/```[\s\S]*?```/g, '')).replace(/`[^`\n]*`/g, '');
+  const prose = stripIndentedCode(stripHidden(text)).replace(/`[^`\n]*`/g, '');
   return [...prose.matchAll(/(?:^|\s)@([^\s`]+\.mdc?)\b/g)].map((m) => m[1]);
 }
 
-/** Body of the heading whose text contains `marker`, up to the next heading of the same or higher level. */
+/** Body of the heading whose text contains `marker`, up to the next heading of the same or higher level; comments and fenced code are ignored. */
 function sectionBody(text, marker) {
-  const lines = text.split('\n');
+  const lines = stripHidden(text).split('\n');
   const at = lines.findIndex((l) => /^#{1,6}\s/.test(l) && l.includes(marker));
   if (at < 0) return null;
   const level = /^#+/.exec(lines[at])[0].length;
@@ -63,9 +111,10 @@ function sectionBody(text, marker) {
     if (h && h[1].length <= level) break;
     body.push(line);
   }
+  // A section holding only nested headings or thematic breaks (---, ***, ___) is empty.
   return body
+    .filter((l) => !/^#{1,6}(\s|$)/.test(l) && !/^ {0,3}([-*_])(?:[ \t]*\1){2,}[ \t]*$/.test(l))
     .join('\n')
-    .replace(/^-{3,}\s*$/gm, '')
     .trim();
 }
 

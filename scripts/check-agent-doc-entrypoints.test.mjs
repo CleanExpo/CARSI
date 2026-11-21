@@ -166,3 +166,67 @@ test('control: licence section removed from CLAUDE.md fails', () => {
     errs.join('\n')
   );
 });
+
+// ---- GP-692: a rule hidden in Markdown the agent does not read must not count ----
+
+function importHidden(wrap) {
+  return errorsFor((d) => {
+    const p = join(d, '.claude/CLAUDE.md');
+    const text = readFileSync(p, 'utf8');
+    writeFileSync(p, text.replace('@../docs/agents/CLAUDE.md', wrap('@../docs/agents/CLAUDE.md')));
+  });
+}
+const importMissing = (errs) =>
+  errs.some((m) => m.includes('.claude/CLAUDE.md') && m.includes('docs/agents/CLAUDE.md'));
+
+for (const [name, wrap] of [
+  ['a ~~~ fence', (r) => `~~~\n${r}\n~~~`],
+  ['a ``` fence that a ~~~ line does not close', (r) => '```\n~~~\n' + r + '\n```'],
+  ['a ```` fence that a shorter ``` line does not close', (r) => '````\n```\n' + r + '\n````'],
+  ['an unclosed fence', (r) => '~~~\n' + r],
+  ['an HTML comment on one line', (r) => `<!-- ${r} -->`],
+  ['a multi-line HTML comment', (r) => `<!--\n${r}\n-->`],
+  ['an unclosed HTML comment', (r) => `<!--\n${r}`],
+]) {
+  test(`control: import inside ${name} does not count`, () => {
+    const errs = importHidden(wrap);
+    assert.ok(importMissing(errs), errs.join('\n'));
+  });
+}
+
+test('control: import after a closed comment and a closed ~~~ fence still counts', () => {
+  const errs = importHidden((r) => `<!-- x -->\n~~~\ncode\n~~~\n${r}`);
+  assert.ok(!importMissing(errs), errs.join('\n'));
+});
+
+/** Rewrite the licence section of docs/agents/CLAUDE.md: `fn(heading, body)` returns its new text. */
+function licenceSection(fn) {
+  return errorsFor((d) => {
+    const p = join(d, 'docs/agents/CLAUDE.md');
+    const text = readFileSync(p, 'utf8');
+    const start = text.indexOf('## IICRC CEC terminology');
+    const bodyStart = text.indexOf('\n', start) + 1;
+    const next = text.indexOf('\n## ', bodyStart) + 1;
+    const heading = text.slice(start, bodyStart);
+    writeFileSync(
+      p,
+      text.slice(0, start) + fn(heading, text.slice(bodyStart, next)) + text.slice(next)
+    );
+  });
+}
+const licenceGone = (errs) => errs.some((m) => /IICRC CEC terminology/.test(m));
+
+for (const [name, fn] of [
+  ['the heading survives only inside a ~~~ fence', (h, b) => `~~~\n${h}${b}~~~\n`],
+  ['the heading survives only inside a ``` fence', (h, b) => '```md\n' + h + b + '```\n'],
+  ['the heading survives only inside an HTML comment', (h, b) => `<!--\n${h}${b}-->\n`],
+  ['the section holds only a nested ### heading', (h) => `${h}\n### More\n\n`],
+  ['the section holds only *** and ___ breaks', (h) => `${h}\n***\n\n___\n\n- - -\n`],
+  ['the section body is only in a fence', (h) => `${h}\n~~~\nrule text\n~~~\n`],
+  ['the section body is only in an HTML comment', (h, b) => `${h}<!--\n${b}-->\n`],
+]) {
+  test(`control: ${name} fails`, () => {
+    const errs = licenceSection(fn);
+    assert.ok(licenceGone(errs), errs.join('\n'));
+  });
+}
