@@ -19,7 +19,7 @@ import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, join, relative } from 'node:path';
+import { dirname, join } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 
@@ -270,8 +270,25 @@ test('a relative --root reads the same files as an absolute one', () => {
     const run = spawnSync(process.execPath, [GUARD, '--root=.'], { cwd: root, encoding: 'utf8' });
     assert.equal(run.status, 0, run.stderr);
     assert.match(run.stdout, /IICRC scope guard passed/);
-    // The exported evaluate() resolves a relative root itself, so a programmatic caller is safe too.
-    assert.deepEqual(evaluate(relative(process.cwd(), root)).findings, []);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('evaluate(".") itself resolves the root: exact repo-relative paths, no false registry failures', () => {
+  // The CLI resolves --root before calling evaluate(), so this runs evaluate('.') directly in a
+  // child whose cwd is the fixture. Unresolved, rel() cut "data/seed/..." to "ta/seed/...": the
+  // known registries read as unknown files and the planted hit carried a truncated path.
+  const root = fixture((f) => { cat(f).description = 'Aligned to IICRC S500.'; });
+  try {
+    const code = `import { evaluate } from ${JSON.stringify(GUARD)}; console.log(JSON.stringify(evaluate('.').findings));`;
+    const run = spawnSync(process.execPath, ['--input-type=module', '-e', code], { cwd: root, encoding: 'utf8' });
+    assert.equal(run.status, 0, run.stderr);
+    const findings = JSON.parse(run.stdout);
+    assert.ok(findings.length > 0, 'the planted hit must be found');
+    for (const x of findings) assert.match(x, /^data\/seed\/courses-catalog\.json :: plain-course :: courses\[1\]\.description :: /, x);
+    // Same answer as an absolute root.
+    assert.deepEqual(findings, evaluate(root).findings);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
