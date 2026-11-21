@@ -59,24 +59,16 @@ DATABASE_URL=<prod> npm run db:seed-e2e-user                 # student@carsi.com
 
 - **AUD $1,295/month + GST, unlimited students** — organisation subscription, recorded on the course in
   `meta.pricing` and in `docs/onboarding/README.md`.
-- ⚠️ **UNRESOLVED DISCREPANCY — needs Phill's decision, do not "fix" either side unilaterally.**
-  This runbook was written on the basis that the course is `isFree: true` / `priceAud: "0"`
-  **on purpose**: provisioned as an org subscription, not sold via individual self-checkout, so the
-  catalogue must not show a one-off buy price. The committed catalogue
-  (`data/seed/courses-catalog.json`, checked 2026-11-20) does not match that:
-
-  | field | catalogue says | this runbook's stated intent |
-  | --- | --- | --- |
-  | `isFree` | `false` | `true` |
-  | `priceAud` | `"99"` | `"0"` |
-  | `status` / `isPublished` | `published` / `true` | draft until signed off |
-  | `meta.pricing` | `org_subscription`, A$1,295/month, unlimited seats, "provisioned manually; recurring billing is not yet wired" | same |
-
-  So the catalogue would publish this as a **one-off A$99 course** while its own `meta.pricing`
-  says it is a A$1,295/month organisation subscription whose billing is not built. One of the two
-  is wrong, and which one is a commercial decision, not a documentation one. Production's current
-  values have **not** been verified from the authoring environment — check the live row before
-  drawing conclusions, and get Phill's call before changing a price or a visibility flag.
+- **Individual price: A$99 (`isFree: false`, `priceAud: "99"`) — settled, DECISIONS #55
+  (founder, 2026-11-21).** The catalogue is authoritative here. An earlier version of this runbook
+  said the course was `isFree: true` / `priceAud: "0"` **on purpose**, so that the catalogue would
+  show no one-off buy price; **that claim is withdrawn.** The A$99 list price is correct and the
+  course is `published` / `isPublished: true` as committed, so a seed publishes it at A$99 — which
+  is intended, not a defect.
+  The org-subscription terms in `meta.pricing` are a **separate** commercial track, not a
+  contradiction of the list price: recurring billing is still unwired, so those seats are
+  provisioned manually. Do not change `isFree`, `priceAud`, `status` or `isPublished` to "reconcile"
+  the two.
 - Recurring billing (Stripe subscription) is a **separate build** — the Stripe subscription helpers
   exist (`src/lib/api/stripe.ts`) but are not wired to courses/teams.
 - When recurring billing is built, update `meta.pricing` (add the Stripe product/price ids) and revisit

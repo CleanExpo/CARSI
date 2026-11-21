@@ -31,11 +31,12 @@ controls below.
 - Course slug: `floor-care-onboarding-operational-readiness`
 - Course id (for the admin publish API): `6011d465-1981-487b-84e3-a53b10a2bd07`
 - Committed catalogue state (`data/seed/courses-catalog.json`, checked 2026-11-20):
-  `status: "published"`, `isPublished: true`, `isFree: false`, `priceAud: "99"` — **all four of these
-  were previously documented here as draft/false/true/"0", which was wrong on every field.** The
-  importer writes all four to the database on apply, so they decide whether the course is live and
-  what it costs. These are the *repo's* values; what is currently in the production database has
-  **not** been verified from this environment — check it with the §1 preflight before acting.
+  `status: "published"`, `isPublished: true`, `isFree: false`, `priceAud: "99"` — **correct and
+  settled, DECISIONS #55 (founder, 2026-11-21).** All four were previously documented here as
+  draft/false/true/`"0"`, which was wrong on every field. The importer writes all four to the
+  database on apply, so they decide whether the course is live and what it costs. These are the
+  *repo's* values; what is currently in the production database has **not** been verified from this
+  environment — check it with the §1 preflight before acting.
 - Quiz bank: `data/seed/floor-care-quizzes.json` — 11 quizzes, 34 questions
 - Scripts: `db:seed-courses`, `db:seed-floor-care-quizzes`, `db:seed-e2e-user`, `db:export-courses`
 
@@ -142,17 +143,20 @@ what this section used to say:
 - **Seeding publishes it.** §3b's import writes `status` and `isPublished`, so the course goes live as
   a side effect of seeding, not as a separate decision at this step. Stage it by setting both to
   unpublished in the catalogue first if that is not what you want.
-- **It is a paid course, not a free one.** This section previously said it was `isFree: true` /
-  `priceAud: "0"` and that publishing as-is let any logged-in user enrol for free. That is not the
-  catalogue's state. Publishing as-is lists an **A$99** course.
+- **It is a paid course at A$99, and that is intended.** This section previously said it was
+  `isFree: true` / `priceAud: "0"` and that publishing as-is let any logged-in user enrol for free.
+  That was wrong, and the price is now settled: **A$99 is correct** (DECISIONS #55, founder
+  2026-11-21). Publishing as-is lists an A$99 course, which is the intended outcome.
 
-Either way, a public publish is **not** access control for the paid **$1,295/month + GST**
-organisation subscription.
+A public publish is still **not** access control for the **$1,295/month + GST** organisation
+subscription, whose recurring billing is unwired and whose seats are provisioned manually. The A$99
+list price and that subscription are separate tracks.
 
 Choose the model that matches intent:
 
-- **A — Internal/free pilot or manual provisioning (no billing yet):** this now requires a catalogue
-  change as well — set `isFree: true` and `priceAud: "0"` — or keep it off the public catalogue and
+- **A — Internal/free pilot or manual provisioning (no billing yet):** this would require a
+  catalogue change against the settled price — set `isFree: true` and `priceAud: "0"` — so it needs
+  the founder's agreement to revisit DECISIONS #55. Otherwise keep it off the public catalogue and
   provision enrolments per organisation. Access is not metered.
 - **B — Paid org subscription enforced:** do **not** rely on a public free publish. Build the
   subscription billing + access gating first (Deferred build A), or provision access per-organisation
@@ -205,12 +209,11 @@ recorded on the course in `meta.pricing` so nothing is lost.
 3. **Webhook handling** for `customer.subscription.created/updated/deleted` and
    `invoice.payment_failed` to provision/deprovision access (extend the existing Stripe webhook
    handler).
-4. **Access gating** so the course is granted via active subscription rather than by being free.
-   Note this item was written when the catalogue had the course as `isFree: true`; it is now
-   `isFree: false` / `priceAud: "99"`, which is itself an unresolved discrepancy against the
-   documented org-subscription intent (see §"Current state" above and the table in
-   `floor-care/publish-runbook.md`). Settle that first — the gating work depends on which pricing
-   model is actually intended.
+4. **Access gating** so a subscription seat grants the course without a A$99 purchase. This item
+   was written when the catalogue had the course as `isFree: true`; it is now `isFree: false` /
+   `priceAud: "99"`, which is the settled price (DECISIONS #55). So the gating work is no longer
+   "flip it off `isFree`" — it is: an active org subscription must grant access to a course that is
+   otherwise sold at A$99.
 
 Treat this as its own scoped PR with its own plan, tests, and the Verification Gate. Until it exists,
 use §5 option A/B for access.
