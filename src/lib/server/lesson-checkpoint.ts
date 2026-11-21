@@ -11,6 +11,7 @@ import {
 import { ACCESS_GRANTING_STATUS_LIST } from '@/lib/server/enrollment-access';
 import { withSerializationRetry } from '@/lib/server/db-tx';
 import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
+import { countCountedQuizAttempts } from '@/lib/server/quiz-attempt-count';
 
 type Context = {
   enrollmentId: string; courseId: string; moduleId: string; lessonId: string;
@@ -123,8 +124,7 @@ async function response(tx: Prisma.TransactionClient, studentId: string, graph: 
     FROM lms_quiz_attempts WHERE quiz_id = ${graph.quiz.id}::uuid
       AND student_id = ${studentId}::uuid AND passed = TRUE
     ORDER BY COALESCE(content_version = ${version}, FALSE) DESC, created_at DESC, id DESC LIMIT 1` : [];
-  const counts = graph.quiz ? await tx.$queryRaw<{ count: number }[]>`SELECT COUNT(*)::int AS count
-    FROM lms_quiz_attempts WHERE quiz_id = ${graph.quiz.id}::uuid AND student_id = ${studentId}::uuid` : [];
+  const attemptsUsed = graph.quiz ? await countCountedQuizAttempts(tx, graph.quiz.id, studentId) : 0;
   const { context, quiz, questions } = graph;
   const content: LessonCheckpointContent = {
     lesson: { id: context.lessonId, title: context.title, content_type: context.contentType,
@@ -136,7 +136,7 @@ async function response(tx: Prisma.TransactionClient, studentId: string, graph: 
     course: { id: context.courseId, slug: context.courseSlug, title: context.courseTitle },
     quiz: quiz ? { id: quiz.id, title: quiz.title, pass_percentage: quiz.passPercentage,
       time_limit_minutes: quiz.timeLimitMinutes, attempts_allowed: quiz.attemptsAllowed,
-      attempts_used: counts[0].count,
+      attempts_used: attemptsUsed,
       questions: questions.map((question) => ({ id: question.id, question_text: question.questionText,
         question_type: 'single_choice', options: (question.options as Prisma.JsonArray).map((option) =>
           ({ text: typeof option === 'string' ? option : (option as { text: string }).text })),

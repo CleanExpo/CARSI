@@ -7,6 +7,10 @@ import { getOrCreateCourseBySlug } from '@/lib/server/course-catalog-sync';
 import { ensureLmsUserFromClaims } from '@/lib/server/lms-user-sync';
 import { isUniqueConstraintError } from '@/lib/server/db-errors';
 import { decideEnrollmentCompleted } from '@/lib/server/lms-completion';
+import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
+import { extractQuizIdFromLesson } from '@/lib/lms/quiz-from-lesson';
+import { parseLessonResources } from '@/lib/lms/lesson-resources';
+import { requireCurrentAdmin, type AdminSessionProvenance } from '@/lib/server/current-admin';
 import { isEnrolmentAccessAllowed, isRevokedStatus } from '@/lib/server/enrollment-access';
 import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
 import {
@@ -26,25 +30,91 @@ import {
 } from '@/lib/server/course-prerequisites';
 
 /**
- * Quiz gate for completion (Phase 6, 2026-06-29 audit): a course is only
- * "complete" once every quiz in it has at least one passing attempt by the
- * student. A course with no quizzes is trivially satisfied.
+ * Assessment gate for completion: the ONE rule for "has this learner passed every required
+ * assessment of this course" (Phase 6, 2026-06-29 audit; GP-432).
+ *  - every quiz in the course has a passing attempt by the learner;
+ *  - every PUBLISHED practical assessment has a submission reviewed as 'passed';
+ *  - a course approved for IICRC CECs (the approvals registry, GP-498) must HAVE at least
+ *    one assessment: a CEC certificate is never issued on lessons alone (GP-432). A course
+ *    with no CEC approval and no assessment completes on lessons, and claims no CEC.
  */
-async function allCourseQuizzesPassed(
+async function requiredAssessmentsPassed(
   courseId: string,
+  courseSlug: string | null,
   studentId: string,
 ): Promise<boolean> {
-  const quizIds = (
-    await prisma.lmsQuiz.findMany({ where: { courseId }, select: { id: true } })
-  ).map((q) => q.id);
-  if (quizIds.length === 0) return true;
+  const [quizzes, practicals] = await Promise.all([
+    prisma.lmsQuiz.findMany({ where: { courseId }, select: { id: true } }),
+    prisma.lmsPracticalAssessment.findMany({
+      where: { courseId, isPublished: true },
+      select: { id: true },
+    }),
+  ]);
+  const quizIds = quizzes.map((q) => q.id);
+  const practicalIds = practicals.map((p) => p.id);
 
-  const passed = await prisma.lmsQuizAttempt.findMany({
-    where: { quizId: { in: quizIds }, studentId, passed: true },
-    select: { quizId: true },
-    distinct: ['quizId'],
+  if (quizIds.length === 0 && practicalIds.length === 0) {
+    return courseSlug == null ? false : resolveLmsCourseCecHours({ slug: courseSlug }) == null;
+  }
+
+  if (quizIds.length > 0) {
+    const passed = await prisma.lmsQuizAttempt.findMany({
+      where: { quizId: { in: quizIds }, studentId, passed: true },
+      select: { quizId: true },
+      distinct: ['quizId'],
+    });
+    if (new Set(passed.map((p) => p.quizId)).size < quizIds.length) return false;
+  }
+
+  if (practicalIds.length > 0) {
+    const passed = await prisma.lmsAssessmentSubmission.findMany({
+      where: { assessmentId: { in: practicalIds }, studentId, status: 'passed' },
+      select: { assessmentId: true },
+      distinct: ['assessmentId'],
+    });
+    if (new Set(passed.map((p) => p.assessmentId)).size < practicalIds.length) return false;
+  }
+
+  return true;
+}
+
+/**
+ * Thrown when a learner asks to mark a lesson complete and the server holds no evidence for
+ * it (GP-432). Today the only lesson type with server-checked evidence is a quiz lesson (or a
+ * lesson whose resources attach a quiz): it needs a passing attempt, graded on the server.
+ */
+export class LessonCompletionEvidenceError extends Error {
+  constructor(public readonly code: 'QUIZ_NOT_PASSED') {
+    super('Pass the quiz to complete this lesson.');
+    this.name = 'LessonCompletionEvidenceError';
+  }
+}
+
+/**
+ * Server evidence a lesson may be marked complete by the learner (GP-432):
+ *  - quiz lesson, or any lesson whose resources attach a quiz: a passing attempt on that quiz;
+ *  - reading, video and file lessons: the lesson model records nothing the server can check
+ *    (video position is reported by the browser, durationMinutes is usually null and embedded
+ *    video saves nothing), so the learner's mark stands. Such lessons cannot by themselves
+ *    complete a course that needs an assessment: requiredAssessmentsPassed decides that.
+ */
+async function assertLessonCompletionEvidence(studentId: string, lessonId: string): Promise<void> {
+  const lesson = await prisma.lmsLesson.findUnique({
+    where: { id: lessonId },
+    select: { contentType: true, contentBody: true, resources: true },
   });
-  return passed.length >= quizIds.length;
+  if (!lesson) return;
+  const quizId = extractQuizIdFromLesson(
+    lesson.contentType,
+    lesson.contentBody,
+    parseLessonResources(lesson.resources),
+  );
+  if (!quizId) return;
+  const passed = await prisma.lmsQuizAttempt.findFirst({
+    where: { quizId, studentId, passed: true },
+    select: { id: true },
+  });
+  if (!passed) throw new LessonCompletionEvidenceError('QUIZ_NOT_PASSED');
 }
 
 export type EnrollResult =
@@ -253,12 +323,26 @@ async function lessonTotalsForCourse(
   return { ids, total: ids.length, slug: course?.slug ?? null };
 }
 
-/** Admin/support: mark every lesson in an enrollment complete and sync enrollment status. */
+/** Longest reason an admin may record on a learner-record action (DB CHECK matches). */
+export const ADMIN_AUDIT_REASON_MAX = 1000;
+
+/**
+ * Admin/support: mark every lesson in an enrollment complete, then sync enrollment status.
+ *
+ * GP-432: this no longer bypasses assessments (no founder ruling allows an admin to skip
+ * them). The enrolment completes only when requiredAssessmentsPassed holds, exactly as for
+ * the learner. The admin must give a reason; the current admin (re-checked against the
+ * database inside the transaction) and the reason are written to the append-only
+ * lms_learner_admin_audit_events in the same transaction as the lesson writes.
+ */
 export async function forceCompleteEnrollment(
   enrollmentId: string,
   studentId: string,
-  options?: { initiatedByAdminEmail?: string | null },
-): Promise<{ lessonsMarked: number }> {
+  options: { session: AdminSessionProvenance | null; reason: string },
+): Promise<{ lessonsMarked: number; completed: boolean }> {
+  const reason = options.reason.trim();
+  if (!reason || reason.length > ADMIN_AUDIT_REASON_MAX) throw new Error('INVALID_REASON');
+
   const en = await prisma.lmsEnrollment.findFirst({
     where: { id: enrollmentId, studentId },
     select: { id: true, studentId: true, courseId: true },
@@ -268,17 +352,10 @@ export async function forceCompleteEnrollment(
   const { ids, total } = await lessonTotalsForCourse(en.courseId);
   const now = new Date();
 
-  if (total === 0) {
-    await syncEnrollmentCompletion(en.id, en.studentId, en.courseId, {
-    ...options,
-    bypassQuizGate: true,
-  });
-    return { lessonsMarked: 0 };
-  }
-
-  await prisma.$transaction([
-    ...ids.map((lessonId) =>
-      prisma.lmsLessonProgress.upsert({
+  const admin = await prisma.$transaction(async (tx) => {
+    const current = await requireCurrentAdmin(tx, options.session);
+    for (const lessonId of ids) {
+      await tx.lmsLessonProgress.upsert({
         where: { studentId_lessonId: { studentId: en.studentId, lessonId } },
         create: {
           studentId: en.studentId,
@@ -292,19 +369,38 @@ export async function forceCompleteEnrollment(
           completedAt: now,
           lastAccessedAt: now,
         },
-      }),
-    ),
-    prisma.lmsEnrollment.update({
-      where: { id: en.id },
-      data: { lastAccessedLessonId: ids[ids.length - 1]! },
-    }),
-  ]);
+      });
+    }
+    if (total > 0) {
+      await tx.lmsEnrollment.update({
+        where: { id: en.id },
+        data: { lastAccessedLessonId: ids[ids.length - 1]! },
+      });
+    }
+    await tx.lmsLearnerAdminAuditEvent.create({
+      data: {
+        action: 'force_complete',
+        reason,
+        actorKind: current.kind,
+        actorRef: current.ref,
+        actorEmail: current.email,
+        studentRef: en.studentId,
+        enrollmentRef: en.id,
+        courseRef: en.courseId,
+        details: { lessonsMarked: total },
+      },
+    });
+    return current;
+  });
 
   await syncEnrollmentCompletion(en.id, en.studentId, en.courseId, {
-    ...options,
-    bypassQuizGate: true,
+    initiatedByAdminEmail: admin.email,
   });
-  return { lessonsMarked: total };
+  const after = await prisma.lmsEnrollment.findUnique({
+    where: { id: en.id },
+    select: { status: true },
+  });
+  return { lessonsMarked: total, completed: after?.status === 'completed' };
 }
 
 /**
@@ -331,8 +427,6 @@ export async function syncEnrollmentCompletion(
   options?: {
     initiatedByAdminEmail?: string | null;
     skipIicrcAutoSubmit?: boolean;
-    /** Admin force-complete bypasses the quiz gate. */
-    bypassQuizGate?: boolean;
   },
 ): Promise<void> {
   const { ids, total, slug } = await lessonTotalsForCourse(courseId);
@@ -371,12 +465,11 @@ export async function syncEnrollmentCompletion(
   });
 
   const allLessonsDone = completed >= total;
-  const quizGateSatisfied =
-    options?.bypassQuizGate === true ||
-    (await allCourseQuizzesPassed(courseId, studentId));
+  const quizGateSatisfied = await requiredAssessmentsPassed(courseId, slug, studentId);
 
-  // Certificate/CEC integrity: completion needs lessons AND required quizzes
-  // passed, but an already-completed enrollment is never downgraded.
+  // Certificate/CEC integrity: completion needs lessons AND every required assessment
+  // passed, but an already-completed enrollment is never downgraded (GP-439 item 3:
+  // issued certificates are always retained).
   const isCompleted = decideEnrollmentCompleted({
     allLessonsDone,
     quizGateSatisfied,
@@ -450,6 +543,10 @@ export async function patchLessonProgress(params: {
 }): Promise<void> {
   const { studentId, lessonId, enrollmentId, courseId, completed } = params;
   const now = new Date();
+
+  // GP-432: the server decides. A learner may mark a lesson complete only on evidence the
+  // server holds for that lesson type; un-marking needs none.
+  if (completed) await assertLessonCompletionEvidence(studentId, lessonId);
 
   await prisma.lmsLessonProgress.upsert({
     where: {

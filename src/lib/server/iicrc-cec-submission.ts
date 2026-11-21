@@ -13,7 +13,7 @@ import {
 import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
 import { sendEmail } from '@/lib/server/email';
 import { isRevokedStatus } from '@/lib/server/enrollment-access';
-import { recordFirstCompletion } from '@/lib/server/enrollment-service';
+import { syncEnrollmentCompletion } from '@/lib/server/enrollment-service';
 import {
   courseEligibleForIicrcCecSubmission,
   getIicrcCecSubmissionEmail,
@@ -638,27 +638,23 @@ export type ManualIicrcSendResult = {
 async function ensureEnrollmentReadyForIicrcManual(enrollmentId: string): Promise<void> {
   const row = await prisma.lmsEnrollment.findUnique({
     where: { id: enrollmentId },
-    select: { status: true, completedAt: true },
+    select: { status: true, completedAt: true, studentId: true, courseId: true },
   });
 
-  // Never force-complete a revoked/refunded enrolment (WS3 / P0-C) — that would
+  // Never complete a revoked/refunded enrolment (WS3 / P0-C) — that would
   // resurrect it AND re-file the CEC with IICRC for a learner who was refunded.
   // Leaving it revoked makes the caller's `status !== 'completed'` reload check
   // throw ENROLLMENT_NOT_COMPLETED, which is the correct fail-closed outcome.
-  if (isRevokedStatus(row?.status)) return;
+  if (!row || isRevokedStatus(row.status)) return;
 
-  if (row?.status === 'completed' && row.completedAt) return;
+  if (row.status === 'completed' && row.completedAt) return;
 
-  const completedAt = row?.completedAt ?? new Date();
-  await prisma.$transaction(async (tx) => {
-    await tx.lmsEnrollment.update({
-      where: { id: enrollmentId },
-      data: {
-        status: 'completed',
-        completedAt,
-      },
-    });
-    await recordFirstCompletion(enrollmentId, completedAt, tx);
+  // GP-432: the manual send no longer writes `completed` itself. It asks the one gated writer,
+  // which completes the enrolment only when every lesson is done AND every required assessment
+  // is passed (and records the first completion, GP-659). Otherwise the enrolment stays active
+  // and the caller throws ENROLLMENT_NOT_COMPLETED: no CEC is filed for an unassessed learner.
+  await syncEnrollmentCompletion(enrollmentId, row.studentId, row.courseId, {
+    skipIicrcAutoSubmit: true,
   });
 }
 

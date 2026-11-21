@@ -39,6 +39,8 @@ vi.mock('@/lib/prisma', () => ({
   prisma: {
     lmsCourse: {
       findUnique: vi.fn(async () => ({
+        // Not in the CEC approvals registry, so no assessment is required (GP-432).
+        slug: 'non-cec-test-course',
         modules: [{ lessons: state.lessonIds.map((id) => ({ id })) }],
       })),
     },
@@ -61,6 +63,9 @@ vi.mock('@/lib/prisma', () => ({
     lmsLesson: { findUnique: vi.fn(async () => state.lesson) },
     lmsLessonProgress: { count: vi.fn(async () => state.completedLessonCount) },
     lmsQuiz: { findMany: vi.fn(async () => state.quizzes) },
+    // GP-432: published practical assessments also gate completion; none in these courses.
+    lmsPracticalAssessment: { findMany: vi.fn(async () => []) },
+    lmsAssessmentSubmission: { findMany: vi.fn(async () => []) },
     lmsQuizAttempt: {
       findMany: vi.fn(async () => state.passedQuizIds.map((quizId) => ({ quizId }))),
     },

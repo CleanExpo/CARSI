@@ -168,7 +168,9 @@ describe('headerless legacy attempt compatibility', () => {
       pass_percentage: 80, correct_count: 1, question_count: 1, attempts_remaining: 1, feedback: [] });
     expect(mocks.create).toHaveBeenCalledWith({ data: { quizId, studentId, scorePercent: 100, passed: true,
       answers: { [questionId]: 1 } } });
-    expect(mocks.graph).not.toHaveBeenCalled(); expect(mocks.raw).not.toHaveBeenCalled();
+    // The only raw query is the shared attempt count (GP-432: voided attempts do not count).
+    expect(mocks.graph).not.toHaveBeenCalled(); expect(mocks.raw).toHaveBeenCalledTimes(1);
+    expect((mocks.raw.mock.calls[0][0] as TemplateStringsArray).join('?')).toMatch(/voided_at IS NULL/);
   });
   it('retains legacy entitlement rejection', async () => {
     mocks.enrollment.mockResolvedValue(null);
@@ -176,7 +178,8 @@ describe('headerless legacy attempt compatibility', () => {
     expect(mocks.transaction).not.toHaveBeenCalled();
   });
   it('retains legacy atomic attempt limit', async () => {
-    mocks.count.mockResolvedValue(2);
+    mocks.raw.mockImplementation(async (sql: TemplateStringsArray) =>
+      sql.join('?').includes('COUNT(*)') ? [{ count: 2 }] : [{ id: 'bound-attempt' }]);
     expect((await POST(request({ answers: {} }, null), ctx)).status).toBe(409);
     expect(mocks.create).not.toHaveBeenCalled();
   });

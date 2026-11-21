@@ -80,6 +80,9 @@ vi.mock('@/lib/prisma', () => ({
     // Every lesson marked complete by the learner.
     lmsLessonProgress: { count: vi.fn(async () => state.lessonIds.length) },
     lmsQuiz: { findMany: vi.fn(async () => state.quizIds.map((id) => ({ id }))) },
+    // GP-432: published practical assessments also gate completion; none in these courses.
+    lmsPracticalAssessment: { findMany: vi.fn(async () => []) },
+    lmsAssessmentSubmission: { findMany: vi.fn(async () => []) },
     lmsQuizAttempt: {
       findMany: vi.fn(async () => state.passedQuizIds.map((quizId) => ({ quizId }))),
     },

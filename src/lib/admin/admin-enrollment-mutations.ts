@@ -8,6 +8,7 @@ import {
   getOrCreateCourseBySlug,
   type CourseWithCurriculum,
 } from '@/lib/server/course-catalog-sync';
+import type { AdminSessionProvenance } from '@/lib/server/current-admin';
 import { forceCompleteEnrollment } from '@/lib/server/enrollment-service';
 
 function isWorkbookInfrastructureError(message: string): boolean {
@@ -151,12 +152,19 @@ export async function adminRevokeEnrollment(enrollmentId: string) {
   ]);
 }
 
-/** Mark one or more enrollments fully complete (all lessons + enrollment status). */
+type MarkCompleteResult = { enrollmentId: string; lessonsMarked: number; completed: boolean };
+
+/**
+ * Mark every lesson of one or more enrollments complete (GP-432). Each enrolment then completes
+ * only if its required assessments are passed; `completed` in each result says which did. A
+ * reason is required and each enrolment gets its own audit row (forceCompleteEnrollment).
+ */
 export async function adminMarkEnrollmentsComplete(params: {
   studentId: string;
   enrollmentIds: string[];
-  initiatedByAdminEmail?: string | null;
-}): Promise<{ updated: number; results: { enrollmentId: string; lessonsMarked: number }[] }> {
+  session: AdminSessionProvenance | null;
+  reason: string;
+}): Promise<{ updated: number; results: MarkCompleteResult[] }> {
   const student = await prisma.lmsUser.findUnique({ where: { id: params.studentId } });
   if (!student) throw new Error('USER_NOT_FOUND');
 
@@ -171,12 +179,13 @@ export async function adminMarkEnrollmentsComplete(params: {
     throw new Error('ENROLLMENT_NOT_FOUND');
   }
 
-  const results: { enrollmentId: string; lessonsMarked: number }[] = [];
+  const results: MarkCompleteResult[] = [];
   for (const enrollmentId of uniqueIds) {
     const r = await forceCompleteEnrollment(enrollmentId, params.studentId, {
-      initiatedByAdminEmail: params.initiatedByAdminEmail,
+      session: params.session,
+      reason: params.reason,
     });
-    results.push({ enrollmentId, lessonsMarked: r.lessonsMarked });
+    results.push({ enrollmentId, lessonsMarked: r.lessonsMarked, completed: r.completed });
   }
 
   return { updated: results.length, results };

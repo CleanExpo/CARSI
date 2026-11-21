@@ -12,6 +12,7 @@ import { buildQuizFeedback } from '@/lib/lms/quiz-feedback';
 import { CHECKPOINT_UUID, CheckpointError } from '@/lib/lms/lesson-checkpoint';
 import { getVersionBoundQuizForAttempt, readCheckpointJsonBody } from '@/lib/server/lesson-checkpoint';
 import { getUpstreamBaseUrl } from '@/lib/server/upstream-api';
+import { countCountedQuizAttempts } from '@/lib/server/quiz-attempt-count';
 
 type Ctx = { params: Promise<{ quizId: string }> };
 
@@ -44,9 +45,7 @@ async function submitBound(studentId: string, quizId: string, body: unknown) {
         const question = graph.questions.find((candidate) => candidate.id === id);
         if (!question || !Array.isArray(question.options) || answer >= question.options.length) throw new CheckpointError(400);
       }
-      const counts = await tx.$queryRaw<{ count: number }[]>`SELECT COUNT(*)::int AS count FROM lms_quiz_attempts
-        WHERE quiz_id = ${quizId}::uuid AND student_id = ${studentId}::uuid`;
-      const attemptsUsed = counts[0].count;
+      const attemptsUsed = await countCountedQuizAttempts(tx, quizId, studentId);
       if (attemptsUsed >= graph.quiz.attemptsAllowed) throw new CheckpointError(409);
       let earned = 0;
       let totalPoints = 0;
@@ -178,9 +177,7 @@ export async function POST(request: NextRequest, ctx: Ctx) {
     // read/write conflict and abort all but one racer (retried below), so the
     // limit holds under concurrency.
     const result = await runSerializable(async (tx) => {
-      const attemptsUsed = await tx.lmsQuizAttempt.count({
-        where: { quizId, studentId: claims.sub },
-      });
+      const attemptsUsed = await countCountedQuizAttempts(tx, quizId, claims.sub);
       if (attemptsUsed >= quiz.attemptsAllowed) {
         return { limitReached: true as const };
       }
