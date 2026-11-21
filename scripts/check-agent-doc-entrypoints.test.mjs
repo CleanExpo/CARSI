@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
  * GP-680: the agent rule files moved from the repo root to docs/agents/ (GP-679 layout).
- * Claude Code only auto-loads ./CLAUDE.md or ./.claude/CLAUDE.md, and Cursor only
- * auto-loads ./AGENTS.md or .cursor/rules/*.mdc. After the move nothing at either
+ * Claude Code only auto-loads ./CLAUDE.md or ./.claude/CLAUDE.md, and Codex only
+ * auto-loads ./AGENTS.md. After the move nothing at either
  * entry point named the new files, so agents started work WITHOUT the licence rules
  * (IICRC CEC terminology) or the Premium Visual & Motion Standard, and nothing failed.
  *
@@ -10,7 +10,6 @@
  *   - an entry point is missing or not committed-able (git-ignored),
  *   - an entry point stops referencing docs/agents/AGENTS.md or docs/agents/CLAUDE.md,
  *   - a reference resolves to a file that does not exist,
- *   - the Cursor rule stops being alwaysApply,
  *   - the referenced files lose the rule sections the entry points exist to load.
  * Each failure mode is planted below in a throwaway fixture, so a pass on the real
  * repo cannot come from a check that is unable to fail.
@@ -89,17 +88,6 @@ for (const e of ENTRYPOINTS) {
   });
 }
 
-test('control: Cursor rule without alwaysApply: true fails', () => {
-  const errs = errorsFor((d) => {
-    const p = join(d, '.cursor/rules/carsi-agent-rules.mdc');
-    writeFileSync(p, readFileSync(p, 'utf8').replace('alwaysApply: true', 'alwaysApply: false'));
-  });
-  assert.ok(
-    errs.some((m) => /alwaysApply/.test(m)),
-    errs.join('\n')
-  );
-});
-
 test('control: referenced doc deleted fails', () => {
   const errs = errorsFor((d) => rmSync(join(d, 'docs/agents/CLAUDE.md')));
   assert.ok(
@@ -115,18 +103,6 @@ test('control: premium visual section removed from AGENTS.md fails', () => {
   });
   assert.ok(
     errs.some((m) => /Premium Visual/.test(m)),
-    errs.join('\n')
-  );
-});
-
-test('control: alwaysApply: true only in a later --- block (not the front matter) fails', () => {
-  const errs = errorsFor((d) => {
-    const p = join(d, '.cursor/rules/carsi-agent-rules.mdc');
-    const text = readFileSync(p, 'utf8').replace('alwaysApply: true', 'alwaysApply: false');
-    writeFileSync(p, `${text}\n---\nalwaysApply: true\n---\n`);
-  });
-  assert.ok(
-    errs.some((m) => /alwaysApply/.test(m)),
     errs.join('\n')
   );
 });
@@ -174,7 +150,7 @@ test('control: default git check-ignore detects an ignored entry point', () => {
       errs.some((m) => m.includes('.claude/CLAUDE.md') && /ignored/.test(m)),
       errs.join('\n')
     );
-    assert.ok(!errs.some((m) => m.includes('.cursor/rules') && /ignored/.test(m)), errs.join('\n'));
+    assert.ok(!errs.some((m) => m.startsWith('AGENTS.md ') && /ignored/.test(m)), errs.join('\n'));
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
