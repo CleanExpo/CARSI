@@ -1156,7 +1156,9 @@ const isCli = isEntryPoint(import.meta.url);
 const staged = process.argv.includes('--staged');
 const findings = [];
 
-if (staged) {
+// The scan itself is CLI-only too (GP-711): it ran at import time, so every importer (the
+// self-test, check-built-site) paid a full repository scan (~65s) before doing its own work.
+if (isCli && staged) {
   // Pre-commit: scan STAGED additions only, no context lines (matches check-secrets).
   let diff = '';
   try {
@@ -1186,7 +1188,7 @@ if (staged) {
     scanLine(currentFile, lineNo, line.slice(1), findings);
     lineNo++;
   }
-} else {
+} else if (isCli) {
   // CI / manual: scan all tracked source-copy files.
   let list = '';
   try {
