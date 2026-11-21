@@ -15,16 +15,31 @@ import { describe, expect, it } from 'vitest';
 
 const ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 const SOURCE_DIRS = ['app', 'src'];
+// GP-738: `prisma generate` (postinstall, so every CI run and dev checkout) writes its
+// client into src/generated/prisma/. It is gitignored, machine-written, and about 5 MB:
+// roughly 40% of the bytes this guard used to parse. No one edits it, so it cannot carry
+// the hand-edit breakage this guard exists for. Skip it; everything committed is parsed.
+const SKIP_DIRS = [join('src', 'generated') + sep];
+
+// GP-738: this one test reads and parses every source file, so its work grows with the
+// repository, unlike the rest of the suite. It runs in a few seconds, but inside the full
+// parallel suite on a loaded machine wall-clock time stretches several-fold (observed
+// 12-17 s before the GP-733/GP-738 speed-ups), so the global 15 s default is not a fair
+// limit for it. 60 s still fails a guard that has genuinely hung. Do not raise the global
+// testTimeout in config/vitest.config.ts for this; that file says the same.
+const FULL_SWEEP_TIMEOUT_MS = 60_000;
 
 function syntaxErrors(fileName: string, text: string): string[] {
   // Parse only. transpileModule also transforms and prints every file, which is where the
   // time went (GP-733); the syntax errors are exactly the parser's own diagnostics.
+  // JSDoc parsing is skipped (GP-738): malformed JSDoc never produces a parse diagnostic,
+  // so skipping it changes no result and saves parser work on every comment.
   const sf = ts.createSourceFile(
     fileName,
     text,
-    ts.ScriptTarget.ESNext,
+    { languageVersion: ts.ScriptTarget.ESNext, jsDocParsingMode: ts.JSDocParsingMode.ParseNone },
     false,
-    fileName.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS,
+    fileName.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS
   );
   // parseDiagnostics is not in the public typings. If a TypeScript upgrade removes it the
   // guard must fail loudly, never report "no errors".
@@ -48,6 +63,7 @@ function sourceFiles(): string[] {
       if (!/\.tsx?$/.test(entry.name) || entry.name.endsWith('.d.ts')) continue;
       const full = join(entry.parentPath, entry.name);
       if (full.includes(`${sep}node_modules${sep}`)) continue;
+      if (SKIP_DIRS.some((d) => relative(ROOT, full).startsWith(d))) continue;
       files.push(full);
     }
   }
@@ -85,10 +101,22 @@ describe('TSX syntax guard (GP-696)', () => {
     expect(syntaxErrors('ok.tsx', 'export const A = () => <ul><li /></ul>;')).toEqual([]);
   });
 
-  it('every .ts/.tsx file under app/ and src/ parses', () => {
-    const files = sourceFiles();
-    expect(files.length).toBeGreaterThan(100);
-    const errors = files.flatMap((f) => syntaxErrors(relative(ROOT, f), readFileSync(f, 'utf8')));
-    expect(errors).toEqual([]);
+  it(
+    'every .ts/.tsx file under app/ and src/ parses',
+    () => {
+      const files = sourceFiles();
+      expect(files.length).toBeGreaterThan(100);
+      const errors = files.flatMap((f) => syntaxErrors(relative(ROOT, f), readFileSync(f, 'utf8')));
+      expect(errors).toEqual([]);
+    },
+    FULL_SWEEP_TIMEOUT_MS
+  );
+
+  it('skips only the generated Prisma client, never committed source', () => {
+    const files = sourceFiles().map((f) => relative(ROOT, f));
+    expect(files.some((f) => f.startsWith(join('src', 'generated') + sep))).toBe(false);
+    // The skip must not swallow neighbouring committed code.
+    expect(files).toContain(join('src', 'lib', 'ci', 'tsx-syntax.test.ts'));
+    expect(files.some((f) => f.startsWith(`app${sep}`))).toBe(true);
   });
 });
