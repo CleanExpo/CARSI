@@ -459,6 +459,139 @@ function completedWriterOffenders(root: string): string[] {
   return offenders;
 }
 
+// ---------------------------------------------------------------------------------------------
+// Design guard for the revoked-state kind (GP-432 verdict rounds 1 and 2: a status decision made
+// from a read that a revocation could overtake). Every write that sets an enrolment's STATUS, in
+// any file, must be listed here with how it stays safe against a concurrent revocation:
+//   locks    - its function takes the enrolment row lock (enrollment-row-lock.ts) before it;
+//   guarded  - one statement whose own filter names the status it moves from (the database
+//              re-checks it atomically, so nothing read earlier can be stale);
+//   new-row  - a create, or the create half of an upsert with an empty update;
+//   limit    - a stated limit, with the reason it is outside GP-432.
+// An unlisted status writer, or a listing that no longer matches the code, fails.
+// ---------------------------------------------------------------------------------------------
+
+type StatusWriterHow = 'locks' | 'guarded' | 'new-row' | 'limit';
+const STATUS_WRITER_ALLOW = new Map<string, StatusWriterHow>([
+  [`${join('src', 'lib', 'server', 'enrollment-service.ts')}#syncEnrollmentCompletion`, 'locks'],
+  [`${join('src', 'lib', 'admin', 'admin-enrollment-mutations.ts')}#adminRevokeEnrollment`, 'locks'],
+  // The revocation itself: one updateMany whose status filter is built in `statusCondition`
+  // (out of the scan's sight). It is what the other writers must not overwrite.
+  [`${join('src', 'lib', 'server', 'stripe-revocation.ts')}#revokeEnrollmentsByPaymentReference`, 'limit'],
+  [`${join('src', 'lib', 'server', 'stripe-revocation.ts')}#reactivateDisputeWonEnrollmentsByPaymentReference`, 'guarded'],
+  [`${join('src', 'lib', 'server', 'ccw-attendance', 'provision.ts')}#finalizeAttendanceForSignIn`, 'guarded'],
+  // Re-purchase after a refund: runs only after a verified payment and sets 'active', which is
+  // the intended result whatever the row held; unchanged by GP-432.
+  [`${join('src', 'lib', 'server', 'enrollment-service.ts')}#enrollStudentInCourse`, 'limit'],
+  [`${join('src', 'lib', 'server', 'enrollment-service.ts')}#ensureAdminEnrollmentForCourse`, 'new-row'],
+  [`${join('src', 'lib', 'admin', 'admin-enrollment-mutations.ts')}#adminGrantEnrollment`, 'new-row'],
+]);
+
+const FUNCTION_DECL = /(?:export\s+)?(?:async\s+)?function\s+([A-Za-z0-9_$]+)\s*[<(]/g;
+
+function enclosingFunction(text: string, offset: number): { name: string; start: number } {
+  let found = { name: '<module>', start: 0 };
+  for (const m of text.matchAll(FUNCTION_DECL)) {
+    if ((m.index ?? 0) > offset) break;
+    found = { name: m[1]!, start: m.index ?? 0 };
+  }
+  return found;
+}
+
+/** Each enrolment write in `text` that sets status, with its function and how it is safe. */
+function statusWrites(text: string): { fn: string; how: StatusWriterHow | 'unsafe' }[] {
+  const out: { fn: string; how: StatusWriterHow | 'unsafe' }[] = [];
+  for (const m of text.matchAll(ENROLMENT_WRITE)) {
+    const at = m.index ?? 0;
+    const call = callText(text, at);
+    const data = withoutFilters(call);
+    const setsStatus = /\bstatus\s*:/.test(data) || /\bSET\b[\s\S]*\bstatus\s*=/i.test(data);
+    if (!setsStatus) continue;
+    const { name, start } = enclosingFunction(text, at);
+    const before = text.slice(start, at);
+    const isNewRow =
+      /\.\s*(create|createMany)\s*\(|INSERT\s+INTO/i.test(m[0]) ||
+      (/\.\s*upsert\s*\(/.test(m[0]) && /\bupdate\s*:\s*\{\s*\}/.test(call));
+    let how: StatusWriterHow | 'unsafe' = 'unsafe';
+    if (isNewRow) how = 'new-row';
+    else if (/\block(EnrollmentRow|EnrollmentForAdminChange)\s*\(/.test(before)) how = 'locks';
+    else if (/\.\s*updateMany\s*\(/.test(m[0]) && /\bwhere\s*:\s*\{[\s\S]*\bstatus\b/.test(call)) how = 'guarded';
+    else if (/^UPDATE/i.test(m[0]) && /\bWHERE\b[\s\S]*\bstatus\b/i.test(call)) how = 'guarded';
+    out.push({ fn: name, how });
+  }
+  return out;
+}
+
+function statusWriterProblems(root: string): string[] {
+  const problems: string[] = [];
+  const seen = new Set<string>();
+  const walk = (dir: string) => {
+    for (const name of readdirSync(dir)) {
+      if (name === 'node_modules' || name === 'generated' || name.startsWith('.')) continue;
+      const path = join(dir, name);
+      if (statSync(path).isDirectory()) {
+        walk(path);
+        continue;
+      }
+      if (!/\.(ts|tsx)$/.test(name) || /\.test\.tsx?$/.test(name)) continue;
+      const rel = relative(root, path);
+      const text = readFileSync(path, 'utf8');
+      for (const w of statusWrites(text)) {
+        const key = `${rel}#${w.fn}`;
+        seen.add(key);
+        const listed = STATUS_WRITER_ALLOW.get(key);
+        if (!listed) problems.push(`unlisted status writer ${key} (${w.how})`);
+        else if (listed !== 'limit' && listed !== w.how) problems.push(`${key} listed ${listed}, found ${w.how}`);
+      }
+    }
+  };
+  walk(join(root, 'app'));
+  walk(join(root, 'src'));
+  for (const key of STATUS_WRITER_ALLOW.keys()) if (!seen.has(key)) problems.push(`stale listing ${key}`);
+  return problems;
+}
+
+describe('GP-432 design guard: every enrolment status writer is safe against a revocation', () => {
+  const root = join(__dirname, '..', '..', '..');
+
+  it('every status writer is listed, and each listing matches the code', () => {
+    expect(statusWriterProblems(root)).toEqual([]);
+  });
+
+  it('positive control: a read-then-write status change with no lock is unsafe', () => {
+    const src = `export async function planted(id: string) {
+      const row = await prisma.lmsEnrollment.findUnique({ where: { id } });
+      if (row?.status === 'active') await prisma.lmsEnrollment.update({ where: { id }, data: { status: 'completed' } });
+    }`;
+    expect(statusWrites(src)).toEqual([{ fn: 'planted', how: 'unsafe' }]);
+  });
+
+  it('positive control: a status filter on a single-row update by id alone does not count as guarded', () => {
+    const src = `export async function planted(id: string) {
+      await prisma.lmsEnrollment.update({ where: { id }, data: { status: 'active' } });
+    }`;
+    expect(statusWrites(src)).toEqual([{ fn: 'planted', how: 'unsafe' }]);
+  });
+
+  it('negative controls: a locked write, a guarded updateMany and a raw guarded UPDATE are recognised', () => {
+    const src = `export async function a(tx, id) {
+      await lockEnrollmentRow(tx, id);
+      await tx.lmsEnrollment.update({ where: { id }, data: { status: 'active' } });
+    }
+    export async function b(id) {
+      await prisma.lmsEnrollment.updateMany({ where: { id, status: 'active' }, data: { status: 'revoked' } });
+    }
+    export async function c(tx, id) {
+      await tx.$executeRaw\`UPDATE lms_enrollments SET status = 'revoked' WHERE id = \${id}::uuid AND status = 'active'\`;
+    }`;
+    expect(statusWrites(src)).toEqual([
+      { fn: 'a', how: 'locks' },
+      { fn: 'b', how: 'guarded' },
+      { fn: 'c', how: 'guarded' },
+    ]);
+  });
+});
+
 describe('GP-432 path 4b: one gated writer of a completed enrolment', () => {
   const root = join(__dirname, '..', '..', '..');
 
