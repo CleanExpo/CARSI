@@ -65,8 +65,7 @@ function buildFaqItems(perCourseLabel: string | null) {
   return [
     {
       question: 'Does a CARSI course make me IICRC certified?',
-      answer:
-        'No, and any provider telling you otherwise is misleading you. IICRC certification is earned through a school approved by the IICRC and its examination. CARSI is accredited as an IICRC CEC provider, which is a different standing: CARSI courses carry CARSI Southern Hemisphere Restoration Designations in their own right, and where an individual course has been approved by the IICRC, the credits it carries are shown on that course and tracked in your dashboard.',
+      answer: `No, and any provider telling you otherwise is misleading you. IICRC certification is earned through a school approved by the IICRC and its examination. CARSI is an ${IICRC_APPROVED_CEC_PROVIDER}, which is a different standing: CARSI courses carry CARSI Southern Hemisphere Restoration Designations in their own right, and where an individual course has been approved by the IICRC, the credits it carries are shown on that course and tracked in your dashboard.`,
     },
     {
       question: 'So what am I actually comparing?',
