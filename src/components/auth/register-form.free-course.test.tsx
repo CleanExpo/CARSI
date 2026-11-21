@@ -120,7 +120,7 @@ describe('RegisterForm — sign up from a free course', () => {
 
     await registerWith(`next=%2Fcourses%2F${SLUG}`);
 
-    expect(nav.href).toBe(`/courses/${SLUG}`);
+    expect(nav.href).toBe(`https://carsi.example.test/courses/${SLUG}`);
     expect(toastTitles().some((t) => /enrolled/i.test(t) && !/did not finish/i.test(t))).toBe(false);
     expect(container.textContent).toContain('Press Enrol to try again');
   });
