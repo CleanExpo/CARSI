@@ -183,6 +183,48 @@ const BANNED = [
     message:
       'Do not sell "IICRC certs/creds" — CARSI does not deliver IICRC certification. Name the skill area or the CARSI credential.',
   },
+  // GAP CLOSED (GP-753 follow-up, 2026-11-21) — the same certification promise WITHOUT the word
+  // "IICRC". On a CARSI course or marketing surface, "certification course", "get certified" or
+  // "earn your certification" reads as CARSI granting certification; the only certification in
+  // this market is the IICRC's. CARSI issues its own *designations* (DECISIONS: CARSI Southern
+  // Hemisphere Restoration Designations), so the approved wording is "CARSI designation" /
+  // "verifiable CARSI credentials". Probed against the rules above before this landed: all of
+  // these passed. Still passing: third-person facts ("FSRT is an IICRC certification covering…",
+  // "IICRC certification is obtained only through IICRC-approved schools"), a learner's own
+  // certification ("renew / maintain your IICRC certification", "recertification", member
+  // number, CEC tracking), denials ("not a certification course", "does not get you certified")
+  // and the route through an IICRC-approved school. Lines already on main are pinned in
+  // CERT_BASELINE_FILE, not approved.
+  {
+    // A course or programme sold as a certification product.
+    re: /\bcertification[\s-]+(?:courses?|training|programs?|programmes?|class(?:es)?|workshops?|bootcamps?)\b/i,
+    allow:
+      // Denials, incl. one paired adjective ("not an accredited or certification course",
+      // data/seed/ccw-truckmount-assessment.json), and the IICRC-approved-school route.
+      /\b(?:not|never|no|isn['’]t|aren['’]t)\s+(?:an?\s+)?(?:[\w-]+\s+or\s+)?(?:IICRC[\s-]+)?certification[\s-]+(?:courses?|training|programs?|programmes?|class(?:es)?|workshops?|bootcamps?)\b|\bIICRC[\s-]*approved\s+(?:schools?|instructors?|examinations?|exams?)\b/i,
+    baselined: true,
+    message:
+      'Do not sell a CARSI course as a "certification course / training / program". CARSI is an IICRC CEC Accredited provider and issues CARSI designations; say "IICRC CEC Accredited course" or name the CARSI designation.',
+  },
+  {
+    // "get certified", "become (a) certified technician", "become fully certified". Denials and
+    // the third-person IICRC-school route pass. "be certified" is not matched (third-person
+    // requirements: "technicians must be certified by the IICRC").
+    re: /(?<!\b(?:not|never|no|cannot|can['’]t)\s+(?:\w+\s+){0,3})(?<!n['’]t\s+(?:\w+\s+){0,3})\b(?:get|gets|getting|become|becomes|becoming)\s+(?:(?:an?|fully|officially|properly|industry|professionally)\s+)*(?:IICRC[\s-]*)?certified\b/i,
+    allow: /\bthrough\s+(?:an?\s+)?IICRC[\s-]*approved\s+(?:schools?|examinations?|exams?)\b/i,
+    baselined: true,
+    message:
+      'CARSI does not certify anyone — do not say "get certified" / "become certified". Say "earn a CARSI designation" or "earn IICRC CECs toward your existing certification".',
+  },
+  {
+    // "earn your certification", "achieve certification", "gain an industry certification".
+    // Holder forms ("maintain / renew / keep your certification") use other verbs and pass.
+    re: /(?<!\b(?:not|never|no|cannot|can['’]t)\s+(?:\w+\s+){0,3})(?<!n['’]t\s+(?:\w+\s+){0,3})\b(?:earn|earns|earning|gain|gains|gaining|achiev(?:e|es|ing)|obtain|obtains|obtaining|receiv(?:e|es|ing)|get|gets|getting)\s+(?:(?:your|a|an|the|full|official|industry|recognised|recognized|professional|accredited)\s+)*certifications?\b/i,
+    allow: /\bthrough\s+(?:an?\s+)?IICRC[\s-]*approved\s+(?:schools?|examinations?|exams?)\b/i,
+    baselined: true,
+    message:
+      'CARSI does not grant certification — do not say "earn / achieve / get your certification". Say "earn your CARSI designation" or "verifiable CARSI credentials".',
+  },
   // GAP CLOSED — "IICRC-approved" as a CARSI offering. Legitimate uses (real IICRC schools /
   // exams / the CE-provider program / board-approval process) are allowed.
   {
