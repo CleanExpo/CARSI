@@ -259,4 +259,18 @@ describe('course pages and odd addresses', () => {
       ).toBe('refuse');
     }
   });
+
+  it('refuses a draft file addressed with encoded slashes, which the static server decodes', async () => {
+    // Observed on next dev 16.4.6: /courses/<folder>%2F<path> served the draft file while the
+    // proxy saw a single segment.
+    for (const url of [
+      '/courses/hard-floor-care%2Ffield-tools%2Ffloor-family-and-surface-layer-card.md',
+      '/courses/hard-floor-care%2ffield-tools/floor-family-and-surface-layer-card.md',
+      '/courses/hard-floor-care%5Cfield-tools%5Cx.md',
+    ]) {
+      expect(unstable_doesMiddlewareMatch({ config, url }), url).toBe(true);
+      const res = await proxy(new NextRequest(`https://carsi.com.au${url}`));
+      expect(res.status, url).toBe(404);
+    }
+  });
 });

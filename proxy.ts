@@ -54,8 +54,10 @@ export const config = {
     /*
      * GP-730: course files under public/courses/<folder>/ (field tools, diagrams, packs). The
      * pattern above skips every path with a file extension, so these need their own entry; the
-     * proxy serves them publicly only for a published course.
+     * proxy serves them publicly only for a published course. `:path+` with no fixed folder
+     * segment so `/courses/<folder>%2F<file>` (one raw segment, decoded to a real file by the
+     * static server) still reaches the proxy and is refused.
      */
-    '/courses/:folder/:path+',
+    '/courses/:path+',
   ],
 };

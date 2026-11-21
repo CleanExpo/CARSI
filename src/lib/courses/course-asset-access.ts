@@ -60,16 +60,19 @@ export const CATALOG_PUBLISHED_SLUGS = publishedCatalogSlugs(
  */
 export function courseAssetFolder(pathname: string): string | null {
   const raw = pathname.split('/').filter((s) => s.length > 0);
-  if (raw[0] !== 'courses' || raw.length < 3) return null;
+  if (raw[0] !== 'courses' || raw.length < 2) return null;
   let segments: string[];
   try {
     segments = raw.map((s) => decodeURIComponent(s));
   } catch {
     return '';
   }
+  // Checked before the segment count: the static file server decodes `%2F`, so
+  // `/courses/<folder>%2F<path>` reaches a real file while looking like one segment here.
   if (segments.some((s) => s === '.' || s === '..' || s.includes('/') || s.includes('\\'))) {
     return '';
   }
+  if (segments.length < 3) return null;
   const last = segments[segments.length - 1];
   if (!/\.[^./]+$/.test(last)) return null;
   return segments[1];
