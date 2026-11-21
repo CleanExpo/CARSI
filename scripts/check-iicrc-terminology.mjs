@@ -229,6 +229,34 @@ function renderedViews(line) {
   return [text.replace(MARKUP, ' '), text.replace(MARKUP, '')];
 }
 
+// CEC-claim exemptions (GP-656). These were one /g regex whose every branch opened with an
+// unbounded `[^.!?]*`: retried at each position that made a 10,000-character unpunctuated
+// line cost ~200ms, and `gate` repeated 2,000 times ran for minutes (cubic). This walks each
+// sentence (a run of non-[.!?] text plus its one terminator) once and deletes exactly the
+// span the regex deleted, so nothing it exempted or caught changes. Order is the regex's
+// alternation order. scripts/check-iicrc-terminology.test.mjs compares the two on generated
+// lines and times the adversarial shapes.
+const CEC_TOKEN = String.raw`(?:CECs?\b|continuing[\s-]+education[\s-]+credits?)`;
+const CEC_DENIAL = new RegExp(
+  String.raw`\b(?:not|never|cannot|isn't|doesn't|does\s+not)\b\s*(?:\w+\s+){0,2}?\b(?:earns?|earning|awards?|awarding|carr(?:y|ies|ying)|counts?|counting|confers?|accredit\w*|eligible|approved|grants?|toward)\b[^.!?]{0,40}?${CEC_TOKEN}`,
+  'i'
+);
+const CEC_NONE = new RegExp(String.raw`\bno\s+(?:IICRC\s+)?${CEC_TOKEN}`, 'i');
+const CEC_GATE_WORD = /\b(?:assert\w*|exclude|refuses?|gate|gated|only\s+wh(?:en|ere)|filed)\b/i;
+const CEC_ANY = new RegExp(CEC_TOKEN, 'i');
+const CEC_DEFINITION = /\b1\s+CEC\s*=/i;
+export function neutraliseCecExemptions(text) {
+  return text.replace(/([^.!?]+)([.!?]?)/g, (_, s, end) => {
+    if (CEC_DENIAL.test(s) || CEC_NONE.test(s) || (end === '?' && /\w$/.test(s))) return ' ';
+    // The gate word comes first and a CEC token follows it. The earliest gate word also ends
+    // earliest, so testing what follows it alone is exact.
+    const gate = CEC_GATE_WORD.exec(s);
+    if (gate && CEC_ANY.test(s.slice(gate.index + gate[0].length))) return ` ${end}`;
+    const def = CEC_DEFINITION.exec(s);
+    return def ? `${s.slice(0, def.index)} ${end}` : s + end;
+  });
+}
+
 // Banned selling/descriptive phrasings. Each must be something that implies
 // CARSI itself delivers IICRC courses or IICRC certification.
 /** Every rule; code-bearing rules are built from `codes` (the shared list by default). */
@@ -446,8 +474,8 @@ export function bannedRules(CODES = IICRC_CODE_ALT) {
       //    registry-approved hours", "refuse to hard-delete a course carrying filed CEC
       //    records") — this is the logic that enforces the rule, not a marketing claim;
       //  - a third-person definition of what a CEC is ("1 CEC = 1 hour of learning").
-      neutralise:
-        /[^.!?]*\b(?:not|never|cannot|isn't|doesn't|does\s+not)\b\s*(?:\w+\s+){0,2}?\b(?:earns?|earning|awards?|awarding|carr(?:y|ies|ying)|counts?|counting|confers?|accredit\w*|eligible|approved|grants?|toward)\b[^.!?]{0,40}?(?:CECs?\b|continuing[\s-]+education[\s-]+credits?)[^.!?]*[.!?]?|[^.!?]*\bno\s+(?:IICRC\s+)?(?:CECs?\b|continuing[\s-]+education[\s-]+credits?)[^.!?]*[.!?]?|[^.!?]*\w\?|[^.!?]*\b(?:assert\w*|exclude|refuses?|gate|gated|only\s+wh(?:en|ere)|filed)\b[^.!?]*?(?:CECs?\b|continuing[\s-]+education[\s-]+credits?)[^.!?]*|\b1\s+CEC\s*=[^.!?]*/gi,
+      //  Linear by construction: see neutraliseCecExemptions (GP-656).
+      neutralise: neutraliseCecExemptions,
       message:
         "Do not claim a CARSI course earns/awards IICRC CECs — that requires per-course IICRC approval recorded in data/seed/cec-approvals.json (currently the SSOT gates every claim). State CARSI's provider standing instead.",
     },
@@ -1072,9 +1100,17 @@ export function renderedRuns(file, text) {
   return runs;
 }
 
+// `neutralise` is a /g regex whose matches are deleted, or a function doing the same.
+function neutralised(rule, base) {
+  if (!rule.neutralise) return base;
+  return typeof rule.neutralise === 'function'
+    ? rule.neutralise(base)
+    : base.replace(rule.neutralise, ' ');
+}
+
 function ruleHits(rule, content) {
   const base = rule.prepare ? rule.prepare(content) : content;
-  const probe = rule.neutralise ? base.replace(rule.neutralise, ' ') : base;
+  const probe = neutralised(rule, base);
   return rule.re.test(probe) && !(rule.allow && rule.allow.test(content));
 }
 
@@ -1142,7 +1178,7 @@ function scanLine(file, lineNo, content, findings, rules = BANNED) {
     // what is LEFT, so a legitimate token can no longer shelter branding beside it.
     // `prepare` normalises the line for one rule before anything else runs (see the rule).
     const base = rule.prepare ? rule.prepare(content) : content;
-    const probe = rule.neutralise ? base.replace(rule.neutralise, ' ') : base;
+    const probe = neutralised(rule, base);
     if (rule.re.test(probe) && !(rule.allow && rule.allow.test(content))) {
       findings.push(`  ${file}:${lineNo}: ${rule.message}\n    → ${content.trim().slice(0, 140)}`);
     }
