@@ -41,7 +41,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { hostOf, isLicensedHost, normalise, quoteInText, quoteInAny, wordCount, LICENSED_MAX_QUOTE_WORDS } from './ledger-quotes/match.mjs';
+import { hostOf, isLicensedHost, normalise, quoteInAny, wordCount, LICENSED_MAX_QUOTE_WORDS } from './ledger-quotes/match.mjs';
 
 export const RULES = Object.freeze([
   'locator-invalid',
