@@ -181,11 +181,23 @@ export default function PrivacyPage() {
           <code>_ga_&lt;id&gt;</code>, which Google keeps for up to two years by default. Google
           processes this information in the United States (see Section 9).
         </p>
+        <h3 className={marketingLegalH3}>PostHog</h3>
+        <p>
+          With the same permission, we use PostHog, a product analytics service of PostHog Inc., to
+          count a small number of steps on our public pages, such as viewing a course or starting a
+          checkout. It does not load, and nothing is sent to PostHog, until you choose &ldquo;Accept
+          analytics&rdquo;. It follows the same rules as Google Analytics: it is never used on your
+          dashboard, account, administration or sign-in pages, and page addresses are cleaned in the
+          same way before they are sent. PostHog keeps an identifier for this browser in a cookie
+          and in your browser&rsquo;s local storage on this site, and processes this information
+          outside Australia, in the United States or the European Union (see Section 9).
+        </p>
         <p>
           You can change your choice at any time with &ldquo;Cookie settings&rdquo; at the foot of
           each page, or here: <CookieSettingsButton className={`${marketingLink} cursor-pointer`} />
-          . Choosing &ldquo;Reject optional&rdquo; stops analytics on this device and deletes the
-          Google Analytics cookies. It does not delete information Google already holds.
+          . Choosing &ldquo;Reject optional&rdquo; stops Google Analytics and PostHog on this device
+          and deletes the Google Analytics cookies. It does not delete information Google or PostHog
+          already holds.
         </p>
       </section>
 
@@ -227,7 +239,8 @@ export default function PrivacyPage() {
           the voice assistant, the United States and Singapore (voice processing and transcription
           by ElevenLabs — see Section 2.3). We ensure appropriate safeguards are in place to protect
           your information in accordance with this Privacy Policy and applicable law. If you accept
-          analytics, Google Analytics information is processed in the United States (see Section 7).
+          analytics, Google Analytics information is processed in the United States, and PostHog
+          information in the United States or the European Union (see Section 7).
         </p>
       </section>
 

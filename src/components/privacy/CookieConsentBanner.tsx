@@ -16,7 +16,7 @@ const isClient = () => true;
 const isServer = () => false;
 
 const choiceButton =
-  'inline-flex min-h-11 min-w-[11rem] flex-1 items-center justify-center rounded-full border border-[var(--text-accent)] bg-[var(--bg-surface)] px-5 py-2.5 text-sm font-semibold text-[var(--text-accent)] transition-colors duration-200 hover:bg-[var(--bg-elevated)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--text-accent)] sm:flex-none';
+  'inline-flex min-h-11 min-w-[11rem] flex-1 items-center justify-center rounded-full border border-[var(--text-accent)] bg-[var(--bg-surface)] px-5 py-2.5 text-sm font-semibold text-[var(--text-accent)] dark:text-[var(--text-primary)] transition-colors duration-200 hover:bg-[var(--bg-elevated)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--text-accent)] dark:focus-visible:outline-[var(--text-primary)] sm:flex-none';
 
 /**
  * The analytics choice (GP-731). Shown until the visitor chooses, and again whenever a
@@ -103,14 +103,14 @@ export function CookieConsentBanner() {
               Cookie settings
             </h2>
             <p id={textId} className="mt-2 text-sm leading-relaxed">
-              With your permission we use Google Analytics to count visits to our public pages. It
-              is never used on your dashboard, account or sign-in pages, and personal details are
-              removed from page addresses before anything is sent. Nothing is sent unless you
-              accept, and you can change your choice at any time with &ldquo;Cookie settings&rdquo;
-              at the foot of each page. See our{' '}
+              With your permission we use Google Analytics and PostHog to count visits to our public
+              pages. They are never used on your dashboard, account or sign-in pages, and personal
+              details are removed from page addresses before anything is sent. Nothing is sent
+              unless you accept, and you can change your choice at any time with &ldquo;Cookie
+              settings&rdquo; at the foot of each page. See our{' '}
               <Link
                 href="/privacy#cookies"
-                className="font-medium text-[var(--text-accent)] underline underline-offset-2"
+                className="font-medium text-[var(--text-accent)] underline underline-offset-2 dark:text-[var(--text-primary)]"
               >
                 privacy policy
               </Link>

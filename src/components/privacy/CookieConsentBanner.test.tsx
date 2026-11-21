@@ -4,6 +4,9 @@
  * weight; reopened by the "Cookie settings" control with the current choice shown; Escape and
  * Cancel change nothing; focus goes back to the control that opened it; the result is announced.
  */
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
 import { act, createElement } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -129,5 +132,76 @@ describe('CookieConsentBanner', () => {
     act(() => button('Reject optional')!.click());
     expect(getAnalyticsChoice()).toBe('denied');
     expect(status()).toBe('Analytics off');
+  });
+});
+
+describe('the consent panel is readable in both themes', () => {
+  // Read the real colour tokens from app/globals.css: the light set, then the .dark overrides.
+  const css = readFileSync(resolve(__dirname, '../../../app/globals.css'), 'utf8');
+  const darkStart = css.indexOf('.dark {');
+  const darkBlock = css.slice(darkStart, css.indexOf('}', darkStart));
+  const token = (name: string, dark: boolean): string => {
+    const pattern = new RegExp(`--${name}:\\s*([^;]+);`);
+    const value =
+      (dark ? darkBlock.match(pattern) : null) ?? css.slice(0, darkStart).match(pattern);
+    if (!value) throw new Error(`token --${name} not found`);
+    return value[1].trim();
+  };
+  type Rgba = [number, number, number, number];
+  const parse = (value: string): Rgba => {
+    const hex = value.match(/^#([0-9a-f]{6})$/i);
+    if (hex) {
+      const n = parseInt(hex[1], 16);
+      return [(n >> 16) & 255, (n >> 8) & 255, n & 255, 1];
+    }
+    const rgba = value.match(/^rgba?\(\s*(\d+)\s+(\d+)\s+(\d+)\s*(?:\/\s*([\d.]+))?\s*\)$/);
+    if (!rgba) throw new Error(`cannot read colour ${value}`);
+    return [Number(rgba[1]), Number(rgba[2]), Number(rgba[3]), rgba[4] ? Number(rgba[4]) : 1];
+  };
+  const over = (top: Rgba, under: Rgba): Rgba => [
+    top[0] * top[3] + under[0] * (1 - top[3]),
+    top[1] * top[3] + under[1] * (1 - top[3]),
+    top[2] * top[3] + under[2] * (1 - top[3]),
+    1,
+  ];
+  const luminance = ([r, g, b]: Rgba) => {
+    const lin = (c: number) => {
+      const s = c / 255;
+      return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+    };
+    return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+  };
+  const contrast = (a: Rgba, b: Rgba) => {
+    const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+    return (hi + 0.05) / (lo + 0.05);
+  };
+  // The colour token an element's text uses in a theme: its own class, else its nearest ancestor's.
+  const textToken = (element: Element, dark: boolean): string => {
+    for (let node: Element | null = element; node; node = node.parentElement) {
+      const cls = node.getAttribute('class') ?? '';
+      const darkMatch = cls.match(/(?:^|\s)dark:text-\[var\(--([a-z-]+)\)\]/);
+      if (dark && darkMatch) return darkMatch[1];
+      const match = cls.match(/(?:^|\s)text-\[var\(--([a-z-]+)\)\]/);
+      if (match) return match[1];
+    }
+    throw new Error('no text colour found');
+  };
+
+  it.each([false, true])('every piece of text meets 4.5:1 (dark theme: %s)', (dark) => {
+    window.localStorage.clear();
+    render();
+    act(() => button('Accept analytics')!.click());
+    act(() => button('Cookie settings')!.click());
+    const surface = over(parse(token('bg-surface', dark)), parse(token('bg-deep', dark)));
+    const texts = Array.from(panel()!.querySelectorAll('h2, p, a, button'));
+    expect(texts.length).toBeGreaterThanOrEqual(6);
+    const failing = texts
+      .map((element) => {
+        const name = textToken(element, dark);
+        const ratio = contrast(over(parse(token(name, dark)), surface), surface);
+        return { text: element.textContent?.trim().slice(0, 30), name, ratio };
+      })
+      .filter(({ ratio }) => ratio < 4.5);
+    expect(failing).toEqual([]);
   });
 });
