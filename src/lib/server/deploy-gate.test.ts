@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { parse } from 'yaml';
 import {
   REQUIRED_CHECKS,
+  deploymentDecision,
   evaluateRequiredChecks,
   healthCommit,
 } from '../../../scripts/ci/production-deploy-gate.mjs';
@@ -59,6 +60,15 @@ describe('deploy-production workflow', () => {
     expect(script).toContain('source_commit_hash');
   });
 
+  it('decides on the deployment before it goes live and can cancel it', () => {
+    const deploy = script.indexOf('doctl apps create-deployment');
+    const decide = script.indexOf('production-deploy-gate.mjs decide');
+    const cancel = script.indexOf('/deployments/$dep/cancel');
+    expect(decide).toBeGreaterThan(deploy);
+    expect(cancel).toBeGreaterThan(decide);
+    expect(script).not.toMatch(/create-deployment[^\n]*--wait/);
+  });
+
   it('reads the DigitalOcean token only from the named secret, inside the main-only environment', () => {
     expect(job.environment).toBe('production-deploy');
     const text = readFileSync(join(root, '.github/workflows/deploy-production.yml'), 'utf8');
@@ -100,6 +110,28 @@ describe('evaluateRequiredChecks', () => {
     expect(evaluateRequiredChecks(failedThenPassed).ok).toBe(true);
     const passedThenFailed = [...allPass(), { id: 99, name: 'Unit Tests', status: 'completed', conclusion: 'failure' }];
     expect(evaluateRequiredChecks(passedThenFailed).ok).toBe(false);
+  });
+});
+
+describe('deploymentDecision', () => {
+  const OTHER = 'a'.repeat(40);
+
+  it.each([
+    ['PENDING_BUILD', '', 'wait'],
+    ['BUILDING', '', 'wait'],
+    ['BUILDING', SHA, 'wait'],
+    ['DEPLOYING', SHA, 'wait'],
+    ['ACTIVE', SHA, 'live'],
+    ['PENDING_BUILD', OTHER, 'cancel'],
+    ['BUILDING', OTHER, 'cancel'],
+    ['DEPLOYING', OTHER, 'cancel'],
+    ['ACTIVE', OTHER, 'failed'],
+    ['ACTIVE', '', 'failed'],
+    ['ERROR', SHA, 'failed'],
+    ['CANCELED', '', 'failed'],
+    ['SUPERSEDED', SHA, 'failed'],
+  ])('%s with commit "%s" -> %s', (phase, commit, expected) => {
+    expect(deploymentDecision({ phase, commit }, SHA)).toBe(expected);
   });
 });
 

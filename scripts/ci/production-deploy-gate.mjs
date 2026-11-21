@@ -6,8 +6,9 @@
  * main before GitHub CI finished. With auto-deploy off, .github/workflows/deploy-production.yml
  * is the only automatic path to production, and it uses this script to decide:
  *
- *   checks <sha>               exit 0 only when every required check on <sha> passed
- *   wait-health <sha> [secs]   exit 0 once HEALTH_URL reports build.commit === <sha>
+ *   checks <sha>                    exit 0 only when every required check on <sha> passed
+ *   decide <sha> <phase> <commit>   print wait|cancel|live|failed for an in-flight deployment
+ *   wait-health <sha> [secs]        exit 0 once HEALTH_URL reports build.commit === <sha>
  *
  * Fail closed: a missing, skipped, cancelled or still-running check is not a pass, and an
  * unreachable or unparseable health response is not a match.
@@ -51,6 +52,30 @@ export function evaluateRequiredChecks(checkRuns, required = REQUIRED_CHECKS) {
   return { ok: missing.length === 0 && notPassed.length === 0, missing, notPassed };
 }
 
+const FAILED_PHASES = new Set(['ERROR', 'CANCELED', 'SUPERSEDED']);
+
+/**
+ * What to do with an in-flight DigitalOcean deployment of the checked commit <sha>.
+ * DigitalOcean builds the head of main when the deployment starts, so if main moved after
+ * the checks ran, the deployment carries a different commit: it must be cancelled before it
+ * goes live, never discovered afterwards.
+ *
+ *   wait    keep polling (commit not resolved yet, or it is <sha> and not yet ACTIVE)
+ *   cancel  the deployment resolved a different commit and is not live yet: cancel it, fail
+ *   live    ACTIVE with exactly <sha>
+ *   failed  anything else (ended without going live, or went live with an unverified commit)
+ *
+ * @param {{phase?: string, commit?: string|null}} deployment
+ * @param {string} sha
+ */
+export function deploymentDecision({ phase, commit }, sha) {
+  const resolved = SHA_RE.test(commit ?? '') ? commit : null;
+  if (FAILED_PHASES.has(phase)) return 'failed';
+  if (resolved && resolved !== sha) return phase === 'ACTIVE' ? 'failed' : 'cancel';
+  if (phase === 'ACTIVE') return resolved === sha ? 'live' : 'failed';
+  return 'wait';
+}
+
 /** The commit a /api/health body reports, or null when it reports none or is malformed. */
 export function healthCommit(body) {
   const commit = body && typeof body === 'object' ? body.build?.commit : null;
@@ -72,8 +97,14 @@ async function listCheckRuns(repo, sha, token) {
   throw new Error('more than 1000 check runs on one commit; refusing to guess');
 }
 
-async function main([mode, sha, secs]) {
+async function main([mode, sha, secs, ...rest]) {
   if (!SHA_RE.test(sha ?? '')) throw new Error(`expected a full 40-character commit SHA, got "${sha}"`);
+
+  if (mode === 'decide') {
+    const [phase, commit] = [secs, rest[0]];
+    console.log(deploymentDecision({ phase, commit }, sha));
+    return 0;
+  }
 
   if (mode === 'checks') {
     const { GITHUB_REPOSITORY: repo, GH_TOKEN: token } = process.env;
@@ -105,7 +136,7 @@ async function main([mode, sha, secs]) {
     return 1;
   }
 
-  throw new Error(`unknown mode "${mode}"; use checks or wait-health`);
+  throw new Error(`unknown mode "${mode}"; use checks, decide or wait-health`);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
