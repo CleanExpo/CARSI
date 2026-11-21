@@ -71,7 +71,7 @@ function readJsonLines(file, what) {
     if (!l.trim()) return;
     try {
       out.push(JSON.parse(l));
-    } catch (e) {
+    } catch {
       throw new Unreadable(`${what} ${file} line ${i + 1} is not valid JSON`);
     }
   });
