@@ -341,6 +341,9 @@ check('a script line is suppressed only when a JS lexer confirms the comment (#1
     '<script>let x = 2; x-- / 2 /*\n// */ fetch("//localhost:3000/api")</script>',
     '<script>a[0] / 2 /*\n// */ fetch("//localhost:3000/api")</script>',
     '<script>f() / 2 /*\n// */ fetch("//localhost:3000/api")</script>',
+    // A keyword used as a property name is an operand, so the `/` after it is division.
+    '<script>\nlet obj = { return: 2 }; obj.return / 2 /*\n// */ fetch("//localhost:3000/api")\n</script>',
+    '<script>o?.typeof / 2 /*\n// */ fetch("//localhost:3000/api")</script>',
   ]) {
     assert.deepEqual(findLocalOrigins(html), ['//localhost:3000'], JSON.stringify(html));
   }

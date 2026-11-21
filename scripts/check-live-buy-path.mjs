@@ -236,7 +236,9 @@ function scriptLineComments(s, a, b, out) {
     if (isIdentChar(c)) {
       let j = i + 1;
       while (j < b && isIdentChar(s[j])) j += 1;
-      prev = REGEX_AFTER_WORD.has(s.slice(i, j)) ? '=' : 'x';
+      // A keyword after `.` / `?.` is a property name (`obj.return / 2`), so it ends an
+      // expression like any identifier (CodeRabbit on #1192).
+      prev = prev !== '.' && REGEX_AFTER_WORD.has(s.slice(i, j)) ? '=' : 'x';
       i = j;
       continue;
     }
