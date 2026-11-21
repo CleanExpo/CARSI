@@ -116,14 +116,15 @@ describe('the decision follows the catalogue, not a hand list', () => {
     expect(courseAssetDecision(url, new Set(['hard-floor-care']))).toBe('serve');
   });
 
-  it('needs both status published and isPublished true', () => {
+  it('follows the canonical status rule (#137), never the legacy isPublished column alone', () => {
     const slugs = publishedCatalogSlugs([
-      { slug: 'a', status: 'published', isPublished: true },
-      { slug: 'b', status: 'published', isPublished: false },
-      { slug: 'c', status: 'draft', isPublished: true },
-      { slug: 'd', status: 'archived', isPublished: true },
+      { slug: 'a', status: 'published' },
+      { slug: 'b', status: 'PUBLISHED' },
+      { slug: 'c', status: 'draft' },
+      { slug: 'd', status: 'archived' },
+      { slug: 'e', status: null },
     ]);
-    expect([...slugs]).toEqual(['a']);
+    expect([...slugs]).toEqual(['a', 'b']);
     expect(published.has('hard-floor-care')).toBe(false);
   });
 
