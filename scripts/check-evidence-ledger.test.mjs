@@ -265,6 +265,30 @@ function mutantBin(file, ruleId, call) {
   return { dir, bin: path.join(dir, 'check-evidence-ledger.mjs') };
 }
 
+describe('GP-743: a multi-course catalog only counts this course for CUT phrases', () => {
+  const catalog = (otherNote, demoNote = '') =>
+    JSON.stringify({
+      courses: [
+        { slug: 'demo', description: 'Demo', note: demoNote, lessons: [{ id: L1 }, { id: L2 }] },
+        { slug: 'other', description: 'Another course', note: otherNote, lessons: [{ id: 'x-1' }] },
+      ],
+    });
+
+  it("another course's copy carrying the cut phrase is not a failure", () => {
+    const fx = fixture();
+    fs.writeFileSync(path.join(fx.root, 'data/courses/demo/v1-draft/courses-catalog.json'), catalog('a miracle cure'));
+    const r = run(BIN, [fx.ledger, ...fx.extra]);
+    assert.equal(r.code, 0, r.out);
+  });
+
+  it('the same phrase in this course\'s own entry still fails (exit 6)', () => {
+    const fx = fixture();
+    fs.writeFileSync(path.join(fx.root, 'data/courses/demo/v1-draft/courses-catalog.json'), catalog('', 'a miracle cure'));
+    const r = run(BIN, [fx.ledger, ...fx.extra]);
+    assert.equal(r.code, 6, r.out);
+  });
+});
+
 describe('source mutants: removing one rule turns exactly its own case red', () => {
   const rules = CASES.filter((c) => c.rule !== null);
   for (const c of rules) {

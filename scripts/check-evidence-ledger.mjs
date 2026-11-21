@@ -171,10 +171,11 @@ function courseCopy({ repoRoot, slug, courseDir }) {
       else if (o && typeof o === 'object') Object.values(o).forEach(collect);
       else if (typeof o === 'string') strings.push(o);
     };
-    collect(parsed);
-    // Structured ids and keys. A multi-course catalog (data/seed/courses-catalog.json) only
-    // contributes the entry whose slug is this course's, so another course's ids never resolve.
+    // A multi-course catalog (data/seed/courses-catalog.json) only contributes the entry whose
+    // slug is this course's: another course's ids never resolve, and (GP-743) another course's
+    // copy never counts as this course still carrying a CUT phrase.
     const roots = parsed && Array.isArray(parsed.courses) ? parsed.courses.filter((c) => c && c.slug === slug) : [parsed];
+    roots.forEach(collect);
     const walk = (o) => {
       if (Array.isArray(o)) o.forEach(walk);
       else if (o && typeof o === 'object') {
