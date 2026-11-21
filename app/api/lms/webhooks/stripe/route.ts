@@ -201,7 +201,7 @@ async function handleStripeRevocation(event: Stripe.Event): Promise<void> {
     if (revokeEntitlement) {
       // GP-759: record the reversal first, so the success page can never re-grant access
       // from this session, even when no enrolment row exists yet.
-      await recordCheckoutPaymentReversed(ref, reason);
+      await recordCheckoutPaymentReversed(ref, reason, eventTimestamp);
       await revokeEnrollmentsByPaymentReference(ref, reason, eventTimestamp);
     }
   }
@@ -282,7 +282,7 @@ async function handleDisputeWonRegrant(event: Stripe.Event): Promise<void> {
         currency: dispute.currency,
       });
     }
-    await clearDisputedCheckoutReversal(ref);
+    await clearDisputedCheckoutReversal(ref, eventTimestamp);
     await reactivateDisputeWonEnrollmentsByPaymentReference(ref, eventTimestamp);
   }
 }
@@ -455,10 +455,15 @@ export async function POST(request: NextRequest) {
 
     if (session.metadata?.source === 'carsi-coaching-monthly') {
       return await sourceOutcome('carsi-coaching-monthly', async () => {
-        await processCarsiCoachingMonthlyCheckoutCompleted(session, {
+        const result = await processCarsiCoachingMonthlyCheckoutCompleted(session, {
           appOrigin: getAppOrigin(),
         });
-        return {};
+        if (result.fulfilled) return {};
+        // Not a payment for this processor: nothing was owed.
+        if (result.skipped === 'not_paid' || result.skipped === 'not_coaching_monthly') return {};
+        // Paid but no address to fulfil to: a retry cannot fix it, so keep it for an admin.
+        if (result.skipped === 'no_email') return { terminalSkip: result.skipped };
+        return { retry: true };
       });
     }
 

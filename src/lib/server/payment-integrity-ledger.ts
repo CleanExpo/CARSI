@@ -49,35 +49,78 @@ function unfulfilledId(stripeObjectId: string): string {
   return `${UNFULFILLED_PREFIX}${stripeObjectId.trim()}`;
 }
 
+const REVERSED_TYPE_PREFIX = 'payment_reversed:';
+/** A won dispute leaves this tombstone, so a delayed dispute-created event cannot relock. */
+const DISPUTE_WON_TYPE = 'payment_reversal_lifted:dispute_won';
+
 /**
- * Record that a checkout session's payment was reversed. A refund always wins (it overwrites a
- * dispute marker); a dispute never downgrades an existing refund marker.
+ * Record that a checkout session's payment was reversed. `processedAt` holds the Stripe event
+ * time. A refund always wins (it overwrites any dispute state). A dispute never downgrades a
+ * refund marker, and is ignored when a dispute-won tombstone is at least as new (Stripe does not
+ * deliver events in order).
  */
 export async function recordCheckoutPaymentReversed(
   checkoutSessionId: string,
   reason: PaymentReversalReason,
+  eventAt: Date,
 ): Promise<void> {
   const id = reversalId(checkoutSessionId);
-  const type = `payment_reversed:${reason}`;
-  await prisma.stripeWebhookEvent.upsert({
-    where: { id },
-    create: { id, type },
-    update: reason === 'refunded' ? { type } : {},
-  });
+  const type = `${REVERSED_TYPE_PREFIX}${reason}`;
+  if (reason === 'refunded') {
+    await prisma.stripeWebhookEvent.upsert({
+      where: { id },
+      create: { id, type, processedAt: eventAt },
+      update: { type, processedAt: eventAt },
+    });
+    return;
+  }
+  const existing = await prisma.stripeWebhookEvent.findUnique({ where: { id } });
+  if (!existing) {
+    await prisma.stripeWebhookEvent.create({ data: { id, type, processedAt: eventAt } });
+    return;
+  }
+  if (existing.type === DISPUTE_WON_TYPE) {
+    const wonAt = existing.processedAt;
+    if (wonAt && wonAt.getTime() >= eventAt.getTime()) return; // stale dispute-created
+    await prisma.stripeWebhookEvent.updateMany({
+      where: { id, type: DISPUTE_WON_TYPE },
+      data: { type, processedAt: eventAt },
+    });
+  }
+  // An existing refund or dispute marker stays as it is.
 }
 
-/** A dispute closed in the merchant's favour lifts a dispute marker, never a refund marker. */
-export async function clearDisputedCheckoutReversal(checkoutSessionId: string): Promise<void> {
-  await prisma.stripeWebhookEvent.deleteMany({
-    where: { id: reversalId(checkoutSessionId), type: 'payment_reversed:disputed' },
-  });
+/**
+ * A dispute closed in the merchant's favour lifts a dispute marker (never a refund marker) and
+ * leaves a tombstone carrying the event time, which a delayed dispute-created event respects.
+ */
+export async function clearDisputedCheckoutReversal(
+  checkoutSessionId: string,
+  eventAt: Date,
+): Promise<void> {
+  const id = reversalId(checkoutSessionId);
+  const existing = await prisma.stripeWebhookEvent.findUnique({ where: { id } });
+  if (!existing) {
+    await prisma.stripeWebhookEvent.create({
+      data: { id, type: DISPUTE_WON_TYPE, processedAt: eventAt },
+    });
+    return;
+  }
+  if (existing.type === `${REVERSED_TYPE_PREFIX}disputed` || existing.type === DISPUTE_WON_TYPE) {
+    const markedAt = existing.processedAt;
+    if (markedAt && markedAt.getTime() > eventAt.getTime()) return; // a newer dispute stands
+    await prisma.stripeWebhookEvent.updateMany({
+      where: { id, type: existing.type },
+      data: { type: DISPUTE_WON_TYPE, processedAt: eventAt },
+    });
+  }
 }
 
 export async function isCheckoutPaymentReversed(checkoutSessionId: string): Promise<boolean> {
   const row = await prisma.stripeWebhookEvent.findUnique({
     where: { id: reversalId(checkoutSessionId) },
   });
-  return Boolean(row);
+  return Boolean(row && row.type.startsWith(REVERSED_TYPE_PREFIX));
 }
 
 /**

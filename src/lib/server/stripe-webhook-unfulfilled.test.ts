@@ -63,20 +63,31 @@ vi.mock('@/lib/prisma', () => ({
           const existing = h.ledger.get(args.where.id);
           const row = existing
             ? { ...existing, ...args.update }
-            : { ...args.create, processedAt: null, createdAt: new Date() };
+            : { processedAt: null, createdAt: new Date(), ...args.create };
           h.ledger.set(args.where.id, row as LedgerRow);
           return row;
         },
       ),
       updateMany: vi.fn(
-        async (args: { where: { id: string; processedAt: null }; data: { processedAt: Date } }) => {
+        async (args: {
+          where: { id: string; processedAt?: null; type?: string };
+          data: { processedAt?: Date | null; type?: string };
+        }) => {
           const row = h.ledger.get(args.where.id);
-          if (!row || row.processedAt !== null) return { count: 0 };
-          row.processedAt = args.data.processedAt;
+          if (!row) return { count: 0 };
+          if ('processedAt' in args.where && row.processedAt !== null) return { count: 0 };
+          if (args.where.type !== undefined && row.type !== args.where.type) return { count: 0 };
+          Object.assign(row, args.data);
           return { count: 1 };
         },
       ),
-      findUnique: vi.fn(async () => null),
+      create: vi.fn(async (args: { data: { id: string; type: string; processedAt?: Date } }) => {
+        if (h.ledger.has(args.data.id)) throw new Error('P2002 unique constraint');
+        const row = { processedAt: null, createdAt: new Date(), ...args.data } as LedgerRow;
+        h.ledger.set(args.data.id, row);
+        return row;
+      }),
+      findUnique: vi.fn(async (args: { where: { id: string } }) => h.ledger.get(args.where.id) ?? null),
       deleteMany: vi.fn(async (args: { where: { id: string; type: string } }) => {
         const row = h.ledger.get(args.where.id);
         if (!row || row.type !== args.where.type) return { count: 0 };
@@ -134,6 +145,7 @@ vi.mock('@/lib/server/ga4-measurement-protocol', () => ({
 vi.mock('@/lib/server/sentry', () => ({ captureServerError: vi.fn(async () => {}) }));
 
 const { POST } = await import('../../../app/api/lms/webhooks/stripe/route');
+const { isCheckoutPaymentReversed } = await import('./payment-integrity-ledger');
 
 let eventSeq = 0;
 
@@ -265,6 +277,17 @@ describe('GP-759 (b): paid checkout sessions that cannot be fulfilled are record
     expect(record('cs_test_coaching')?.type).toBe('unfulfilled:fulfilment_failed');
   });
 
+  it('coaching monthly paid but no email to fulfil to: recorded and acknowledged', async () => {
+    h.coachingMonthly.mockResolvedValue({ fulfilled: false, skipped: 'no_email' });
+    checkoutCompleted({ id: 'cs_test_coaching_noemail', metadata: { source: 'carsi-coaching-monthly' } });
+
+    const res = await deliver();
+
+    expect(res.status).toBe(200);
+    expect(record('cs_test_coaching_noemail')?.type).toBe('unfulfilled:fulfilment_failed');
+    expect(record('cs_test_coaching_noemail')?.processedAt).toBeNull();
+  });
+
   it('business coaching fulfilment throws: recorded and retried', async () => {
     h.businessCoaching.mockRejectedValue(new Error('database unavailable'));
     checkoutCompleted({ id: 'cs_test_business', metadata: { source: 'carsi-business-coaching' } });
@@ -340,13 +363,60 @@ describe('GP-759 (a): the refund handler records the reversal before any success
 
     reversalEvent('charge.dispute.closed', { id: 'dp_test', amount: 14_900, status: 'won' });
     await deliver();
-    expect(marker()).toBeUndefined();
+    expect(marker()?.type.startsWith('payment_reversed:')).not.toBe(true);
 
     reversalEvent('charge.refunded', { amount: 14_900, amount_refunded: 14_900 });
     await deliver();
     reversalEvent('charge.dispute.closed', { id: 'dp_test2', amount: 14_900, status: 'won' });
     await deliver();
     expect(marker()?.type).toBe('payment_reversed:refunded');
+  });
+
+  it('a dispute-created event delivered after the won close (Stripe order is not guaranteed) does not relock', async () => {
+    // Won close at T2 arrives first, then the delayed created event from T1.
+    h.event = {
+      id: 'evt_gp759_won_first',
+      object: 'event',
+      livemode: false,
+      type: 'charge.dispute.closed',
+      created: 1_790_100_200,
+      data: { object: { id: 'dp_late', payment_intent: 'pi_test_reversed', currency: 'aud', amount: 14_900, status: 'won' } },
+    };
+    expect((await deliver()).status).toBe(200);
+    h.event = {
+      id: 'evt_gp759_created_late',
+      object: 'event',
+      livemode: false,
+      type: 'charge.dispute.created',
+      created: 1_790_100_100,
+      data: { object: { id: 'dp_late', payment_intent: 'pi_test_reversed', currency: 'aud', amount: 14_900 } },
+    };
+    expect((await deliver()).status).toBe(200);
+
+    expect(await isCheckoutPaymentReversed('cs_test_reversed')).toBe(false);
+  });
+
+  it('control: a NEW dispute after an earlier won one still locks', async () => {
+    h.event = {
+      id: 'evt_gp759_won_old',
+      object: 'event',
+      livemode: false,
+      type: 'charge.dispute.closed',
+      created: 1_790_200_100,
+      data: { object: { id: 'dp_one', payment_intent: 'pi_test_reversed', currency: 'aud', amount: 14_900, status: 'won' } },
+    };
+    await deliver();
+    h.event = {
+      id: 'evt_gp759_created_new',
+      object: 'event',
+      livemode: false,
+      type: 'charge.dispute.created',
+      created: 1_790_200_200,
+      data: { object: { id: 'dp_two', payment_intent: 'pi_test_reversed', currency: 'aud', amount: 14_900 } },
+    };
+    await deliver();
+
+    expect(await isCheckoutPaymentReversed('cs_test_reversed')).toBe(true);
   });
 });
 
