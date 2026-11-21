@@ -17,14 +17,24 @@ const ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 const SOURCE_DIRS = ['app', 'src'];
 
 function syntaxErrors(fileName: string, text: string): string[] {
-  const result = ts.transpileModule(text, {
+  // Parse only. transpileModule also transforms and prints every file, which is where the
+  // time went (GP-733); the syntax errors are exactly the parser's own diagnostics.
+  const sf = ts.createSourceFile(
     fileName,
-    reportDiagnostics: true,
-    compilerOptions: { jsx: ts.JsxEmit.Preserve, target: ts.ScriptTarget.ESNext },
-  });
-  return (result.diagnostics ?? []).map((d) => {
-    const pos =
-      d.file && d.start !== undefined ? d.file.getLineAndCharacterOfPosition(d.start) : undefined;
+    text,
+    ts.ScriptTarget.ESNext,
+    false,
+    fileName.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS,
+  );
+  // parseDiagnostics is not in the public typings. If a TypeScript upgrade removes it the
+  // guard must fail loudly, never report "no errors".
+  const diagnostics = (sf as unknown as { parseDiagnostics?: readonly ts.Diagnostic[] })
+    .parseDiagnostics;
+  if (!Array.isArray(diagnostics)) {
+    throw new Error('TypeScript no longer exposes parseDiagnostics; update the syntax guard');
+  }
+  return diagnostics.map((d) => {
+    const pos = d.start !== undefined ? sf.getLineAndCharacterOfPosition(d.start) : undefined;
     const where = pos ? `${pos.line + 1}:${pos.character + 1}` : '?';
     return `${fileName}:${where} ${ts.flattenDiagnosticMessageText(d.messageText, '\n')}`;
   });
@@ -80,8 +90,5 @@ describe('TSX syntax guard (GP-696)', () => {
     expect(files.length).toBeGreaterThan(100);
     const errors = files.flatMap((f) => syntaxErrors(relative(ROOT, f), readFileSync(f, 'utf8')));
     expect(errors).toEqual([]);
-    // Parses every source file (about 3 to 5 s alone). Under a full parallel run on a busy
-    // machine it has passed the 15 s default, so it gets its own limit, still low enough
-    // that a real hang fails inside a minute.
-  }, 60_000);
+  });
 });
