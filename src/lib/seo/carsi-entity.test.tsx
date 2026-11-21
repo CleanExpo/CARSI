@@ -13,7 +13,12 @@ import { PublicFooter } from '@/components/landing/PublicFooter';
 import { OrganizationSchema } from '@/components/seo/JsonLd';
 import { buildOrganizationSchema } from '@/lib/schema/organization';
 
-import { CARSI_ENTITY, postalAddressLine } from './carsi-entity';
+import {
+  CARSI_ENTITY,
+  entityAreaServed,
+  entityPostalAddress,
+  postalAddressLine,
+} from './carsi-entity';
 import { buildLlmsTxt } from './llms-txt';
 
 type Org = {
@@ -90,5 +95,51 @@ describe('CARSI entity consistency', () => {
     expect(text).toContain(postalAddressLine());
     for (const url of sameAsUrls) expect(text).toContain(url);
     expect(publicEmails(text)).toEqual([CARSI_ENTITY.email]);
+  });
+});
+
+/**
+ * Backlog row 19 (NZ locale pass): CARSI's market is Australia and New Zealand (DECISIONS #35),
+ * but both Organization builders listed the eight Australian states only and a contactPoint
+ * for 'AU' alone, so the entity told search and answer engines it did not serve NZ.
+ */
+describe('CARSI entity service area covers Australia and New Zealand', () => {
+  type Area = { '@type': string; name: string; sameAs?: string };
+  type OrgWithArea = { areaServed: Area[]; contactPoint: { areaServed: string[] } };
+
+  const builders: Array<[string, () => OrgWithArea]> = [
+    ['rendered OrganizationSchema', () => renderedOrganization() as unknown as OrgWithArea],
+    ['buildOrganizationSchema', () => buildOrganizationSchema() as unknown as OrgWithArea],
+  ];
+
+  it.each(builders)('%s lists every AU state and territory and New Zealand', (_n, build) => {
+    const { areaServed } = build();
+    expect(areaServed).toEqual(entityAreaServed());
+    const names = areaServed.map((a) => a.name);
+    for (const name of [
+      'New South Wales',
+      'Victoria',
+      'Queensland',
+      'Western Australia',
+      'South Australia',
+      'Tasmania',
+      'Australian Capital Territory',
+      'Northern Territory',
+    ]) {
+      expect(names).toContain(name);
+    }
+    expect(areaServed).toContainEqual({
+      '@type': 'Country',
+      name: 'New Zealand',
+      sameAs: 'https://en.wikipedia.org/wiki/New_Zealand',
+    });
+  });
+
+  it.each(builders)('%s contactPoint serves AU and NZ', (_n, build) => {
+    expect(build().contactPoint.areaServed).toEqual(['AU', 'NZ']);
+  });
+
+  it('the postal address stays Australian: NZ is a service area, not an address', () => {
+    expect(entityPostalAddress().addressCountry).toBe('AU');
   });
 });

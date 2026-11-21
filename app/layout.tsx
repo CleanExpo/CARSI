@@ -9,6 +9,7 @@ import type { Metadata, Viewport } from 'next';
 import { Outfit, Plus_Jakarta_Sans } from 'next/font/google';
 import Script from 'next/script';
 import './globals.css';
+import { OG_LOCALE_FIELDS, SITE_LANG } from '@/lib/seo/locale';
 
 const outfit = Outfit({
   subsets: ['latin'],
@@ -71,7 +72,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: 'website',
-    locale: 'en_AU',
+    ...OG_LOCALE_FIELDS,
     // Relative on purpose: Next resolves './' against the current pathname, so a page that
     // inherits this gets its own URL rather than the homepage's.
     url: './',
@@ -120,7 +121,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en-AU" suppressHydrationWarning>
+    <html lang={SITE_LANG} suppressHydrationWarning>
       <head>
         <OrganizationSchema />
         <WebsiteSchema />

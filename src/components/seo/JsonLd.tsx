@@ -5,7 +5,7 @@
 
 import { CARSI_SOCIAL_PROFILE_URLS } from '@/lib/brand/social-profiles';
 import { buildFounderPersonSchema } from '@/lib/schema/founder';
-import { CARSI_ENTITY, entityPostalAddress } from '@/lib/seo/carsi-entity';
+import { CARSI_ENTITY, entityAreaServed, entityPostalAddress } from '@/lib/seo/carsi-entity';
 import { serializeJsonLd } from '@/lib/seo/json-ld';
 
 interface OrganizationSchemaProps {
@@ -36,49 +36,8 @@ export function OrganizationSchema({
     email: CARSI_ENTITY.email,
     // SAB: postal address only — no street address exposed publicly
     address: entityPostalAddress(),
-    // SAB: explicit state-by-state service area coverage
-    areaServed: [
-      {
-        '@type': 'AdministrativeArea',
-        name: 'New South Wales',
-        sameAs: 'https://en.wikipedia.org/wiki/New_South_Wales',
-      },
-      {
-        '@type': 'AdministrativeArea',
-        name: 'Victoria',
-        sameAs: 'https://en.wikipedia.org/wiki/Victoria_(Australia)',
-      },
-      {
-        '@type': 'AdministrativeArea',
-        name: 'Queensland',
-        sameAs: 'https://en.wikipedia.org/wiki/Queensland',
-      },
-      {
-        '@type': 'AdministrativeArea',
-        name: 'Western Australia',
-        sameAs: 'https://en.wikipedia.org/wiki/Western_Australia',
-      },
-      {
-        '@type': 'AdministrativeArea',
-        name: 'South Australia',
-        sameAs: 'https://en.wikipedia.org/wiki/South_Australia',
-      },
-      {
-        '@type': 'AdministrativeArea',
-        name: 'Tasmania',
-        sameAs: 'https://en.wikipedia.org/wiki/Tasmania',
-      },
-      {
-        '@type': 'AdministrativeArea',
-        name: 'Australian Capital Territory',
-        sameAs: 'https://en.wikipedia.org/wiki/Australian_Capital_Territory',
-      },
-      {
-        '@type': 'AdministrativeArea',
-        name: 'Northern Territory',
-        sameAs: 'https://en.wikipedia.org/wiki/Northern_Territory',
-      },
-    ],
+    // SAB: each AU state and territory, plus New Zealand (DECISIONS #35)
+    areaServed: entityAreaServed(),
     knowsAbout: [
       'IICRC certifications',
       'water restoration technician',
@@ -98,7 +57,7 @@ export function OrganizationSchema({
       contactType: 'customer support',
       email: 'support@carsi.com.au',
       url: 'https://carsi.com.au/contact',
-      areaServed: 'AU',
+      areaServed: [...CARSI_ENTITY.serviceCountries],
       availableLanguage: 'en',
     },
   };
