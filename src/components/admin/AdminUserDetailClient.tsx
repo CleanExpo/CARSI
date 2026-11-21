@@ -906,7 +906,10 @@ export function AdminUserDetailClient({
         </div>
         <div className="grid gap-px bg-white/[0.06] sm:grid-cols-2 lg:grid-cols-5">
           {[
-            { label: 'Paid', value: formatRevenueAud(user.spentAud), icon: Award },
+            // GP-763: a count, not dollars; the amount paid is not stored.
+            user.spentAud === null
+              ? { label: 'Paid · price unknown', value: user.paidEnrollmentCount, icon: Award }
+              : { label: 'Paid', value: formatRevenueAud(user.spentAud), icon: Award },
             { label: 'Enrolments', value: user.enrollments.length, icon: BookOpen },
             { label: 'Complete', value: completedCourses, icon: CheckCircle2 },
             {
