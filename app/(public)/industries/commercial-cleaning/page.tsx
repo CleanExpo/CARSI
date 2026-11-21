@@ -14,6 +14,7 @@ import { FAQSchema } from '@/components/seo/JsonLd';
 import { buildIndustryMetadata } from '@/lib/marketing/industry-metadata';
 import { industryBundlePriceLabel } from '@/lib/lms/pricing-tiers';
 
+import { IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = buildIndustryMetadata(
@@ -46,8 +47,7 @@ const stats = [
 const faqs = [
   {
     question: 'How do cleaning companies add restoration services in Australia?',
-    answer:
-      'Most start by upskilling existing staff in water damage restoration, carpet cleaning and odour control, then add structural drying and mould remediation. CARSI courses in those subjects are online and self-paced, and every completed course issues a verifiable CARSI credential. CARSI is an IICRC CEC Accredited provider: where the IICRC has approved a course, its CEC hours are shown on the course page. CARSI does not deliver IICRC certification, which is obtained only through IICRC-approved schools and examinations.',
+    answer: `Most start by upskilling existing staff in water damage restoration, carpet cleaning and odour control, then add structural drying and mould remediation. CARSI courses in those subjects are online and self-paced, and every completed course issues a verifiable CARSI credential. CARSI is an ${IICRC_APPROVED_CEC_PROVIDER}: where the IICRC has approved a course, its CEC hours are shown on the course page. CARSI does not deliver IICRC certification, which is obtained only through IICRC-approved schools and examinations.`,
   },
   {
     question: 'What IICRC certifications help win insurance restoration panels?',

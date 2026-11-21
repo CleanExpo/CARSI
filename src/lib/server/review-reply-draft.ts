@@ -10,6 +10,7 @@
 import { OpenRouterClient } from '@/lib/openrouter/client';
 import { resolveOpenRouterConfig } from '@/lib/openrouter/provider';
 
+import { IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 const REQUEST_TIMEOUT_MS = 20_000;
 
 export type ReviewReplyDraftInput = {
@@ -25,7 +26,7 @@ type ChatMessage = { role: 'system' | 'user'; content: string };
 export function buildReviewReplyMessages(input: ReviewReplyDraftInput): ChatMessage[] {
   const system = [
     'You draft short, warm, professional replies from a CARSI course instructor to a student review.',
-    'CARSI is an Australian IICRC CEC Accredited restoration training provider. Use Australian English spelling.',
+    `CARSI is an Australian restoration training provider and an ${IICRC_APPROVED_CEC_PROVIDER}. Use Australian English spelling.`,
     'Rules: thank the reviewer by sentiment (not by name); keep it 2–4 sentences; be specific to what they said;',
     'if the rating is low, acknowledge the concern sincerely and note it informs course improvements — never argue or make excuses;',
     'do not promise refunds, certifications, or outcomes; do not invent facts about the course; no marketing hype; no emojis.',

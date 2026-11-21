@@ -1,3 +1,4 @@
+import { IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 export type StartSmartSource = {
   label: string;
   url: string;
@@ -413,8 +414,7 @@ export const startSmartOperatingConnectionsBySlug: Record<string, StartSmartOper
         pillar: 'Service',
         impact:
           'Trust is earned when the service promise is honest about limits, credentials and local requirements.',
-        decision:
-          'Present CARSI, CECs and IICRC CEC Accredited learning accurately without overstating legal status.',
+        decision: `Present CARSI and its standing as an ${IICRC_APPROVED_CEC_PROVIDER} accurately without overstating legal status.`,
         evidence: 'Website, quote and credential wording that avoids licence or RTO confusion.',
       },
       {
@@ -671,7 +671,7 @@ export const startSmartPages: StartSmartPage[] = [
       'Whether staff can explain method choice, chemistry, drying, odour and escalation decisions.',
       'What records exist for training, certificates, complaints, callbacks and repeat clients.',
       'How equipment, chemicals, service areas and pricing support the claimed revenue.',
-      'Which CARSI or IICRC CEC Accredited learning gaps should be closed after acquisition.',
+      'Which CARSI learning gaps should be closed after acquisition.',
     ],
     actionSteps: [
       'Audit the service menu against staff capability and equipment condition.',
@@ -964,8 +964,7 @@ export const startSmartPages: StartSmartPage[] = [
       },
       {
         question: 'Is CARSI an RTO?',
-        answer:
-          'No. CARSI provides online continuing education and IICRC CEC Accredited courses. It does not award nationally accredited VET qualifications.',
+        answer: `No. CARSI provides online continuing education as an ${IICRC_APPROVED_CEC_PROVIDER}. It does not award nationally accredited VET qualifications.`,
       },
       {
         question: 'Why do customers care about training?',

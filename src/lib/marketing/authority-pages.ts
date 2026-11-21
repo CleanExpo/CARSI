@@ -4,6 +4,7 @@ import { MAX_INDUSTRY_SLUGS } from '@/lib/marketing/industry-slugs';
 import { healthcareRecommendedSlugs } from '@/lib/marketing/industry-track1-topics';
 import { roleGuidePagePath } from '@/lib/marketing/role-guides-path';
 
+import { CARSI_PROVIDER_STATUS, IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 /**
  * Registry for the six /for/<industry> authority pages (CARSI Authority Machine, slice 3).
  *
@@ -106,8 +107,7 @@ const swaCode = (text: string): AuthorityClaim => ({
 
 const iicrcFaq = {
   question: 'Does CARSI deliver IICRC certification?',
-  answer:
-    'No. CARSI is an IICRC CEC Accredited provider. Where the IICRC has approved a course, its CEC hours are shown on the course page. IICRC certification itself is obtained only through schools and examinations approved by the IICRC.',
+  answer: `No. ${CARSI_PROVIDER_STATUS} Where the IICRC has approved a course, its CEC hours are shown on the course page. IICRC certification itself is obtained only through schools and examinations approved by the IICRC.`,
 };
 
 function forHero(slug: AuthorityPageEntry['slug'], alt: string): AuthorityHeroImage {
@@ -461,8 +461,7 @@ export const authorityPages: AuthorityPageEntry[] = [
         lastVerified: VERIFIED,
       },
     ],
-    scopeNote:
-      'Those IICRC certifications are obtained only through schools and examinations approved by the IICRC. CARSI does not deliver them. CARSI is an IICRC CEC Accredited provider, and CEC hours are shown only on a course with an approval in force. The advice above covers Victoria; check the rules in your state. CARSI courses sit beside, and do not replace, hospital infection-control policy. The modules listed as being built are not for sale yet.',
+    scopeNote: `Those IICRC certifications are obtained only through schools and examinations approved by the IICRC. CARSI does not deliver them. CARSI is an ${IICRC_APPROVED_CEC_PROVIDER}, and CEC hours are shown only on a course with an approval in force. The advice above covers Victoria; check the rules in your state. CARSI courses sit beside, and do not replace, hospital infection-control policy. The modules listed as being built are not for sale yet.`,
     bundle: {
       publishedSlugs: [
         ...healthcareRecommendedSlugs,

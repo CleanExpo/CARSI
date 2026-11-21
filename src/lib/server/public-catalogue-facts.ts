@@ -8,6 +8,7 @@ import { prisma } from '@/lib/prisma';
 
 import { lmsPublishedCourseWhere } from '@/lib/server/public-courses-list';
 
+import { IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 export type CatalogueFactsSource = 'database' | 'api' | 'none';
 
 export type PublicCatalogueFacts = {
@@ -200,12 +201,12 @@ export function restorationTopicCount(
  * `data/seed/cec-approvals.json` (the fail-closed SSOT, currently empty), so catalogue
  * copy states CARSI's accreditation as a CEC provider instead of promising credits.
  */
-const PROVIDER_STANDING_SENTENCE = 'Study online with CARSI, an IICRC CEC Accredited provider.';
+const PROVIDER_STANDING_SENTENCE = `Study online with CARSI, an ${IICRC_APPROVED_CEC_PROVIDER}.`;
 
 /**
  * No catalogue-wide accreditation adjective, deliberately.
  *
- * "IICRC CEC Accredited" is a true statement about CARSI's standing as a CEC PROVIDER. Attached
+ * The provider phrase (IICRC Approved CEC Provider) is a true statement about CARSI's standing as a CEC PROVIDER. Attached
  * to the plural noun and applied across the whole catalogue, it stops describing the provider and
  * starts describing each listed item — an accreditation assertion at the item level. As of
  * 2026-08-18 the approvals registry `data/seed/cec-approvals.json` holds `"approvals": []` and 0

@@ -74,14 +74,14 @@ edit is saved.
   (Phill McGurk). Honour the SEO/GEO/AEO initiative (see memory `carsi-seo-geo-aeo-initiative`).
 
 ### 8. IICRC CEC terminology — licence-critical (MUST)
-- CARSI is accredited as an **IICRC CEC provider** — NOT accredited to deliver IICRC courses or
-  certification. In every course title, description, lesson, quiz and piece of course marketing
-  copy, describe what CARSI offers as "IICRC CEC Accredited courses" / "IICRC CEC Accredited" /
-  "IICRC Continuing Education Credit (CEC) courses".
-- "Accredited" must always be paired with "CEC" (e.g. "IICRC CEC Accredited"). BANNED: bare
-  "IICRC Accredited" (drop the CEC qualifier) and "IICRC Course Accredited" / "IICRC-accredited
-  course(s)" — both wrongly imply IICRC accredits the course/certification itself rather than
-  CARSI's standing as a CEC provider.
+- CARSI is an **IICRC Approved CEC Provider** (the IICRC's own term, GP-704). It does NOT deliver
+  IICRC courses or certification. Take the wording from `src/lib/iicrc/approved-wording.ts`;
+  never retype it.
+- A single class is "approved for IICRC CECs" ONLY when it is listed in
+  `data/seed/cec-approvals.json`. A course not in that register names no IICRC at all (GP-748).
+- Never call CARSI or any course "accredited" in connection with the IICRC or CECs, in any form.
+  The guard `src/lib/iicrc/approved-provider-wording.test.tsx` fails the build on the retired
+  wording.
 - BANNED in any selling/descriptive context: "IICRC courses", "IICRC certification course(s)",
   "IICRC-certified course(s)", "get IICRC certified with CARSI", or any copy implying CARSI
   delivers IICRC certification, examinations, or credentials. IICRC certification is obtained only
