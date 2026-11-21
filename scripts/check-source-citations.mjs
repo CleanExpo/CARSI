@@ -15,6 +15,9 @@
  * Asset hosts (CDNs, image stores, the CARSI domain itself) are excluded so an image-heavy
  * lesson is not scored as though it cited a source.
  *
+ * Also scans every data/courses/<slug>/v1-draft folder, where new courses are built before
+ * promotion (GP-718), and exits 2 when it finds no content files at all.
+ *
  * ADVISORY by default (exit 0), matching check-course-completeness. Pass --enforce to fail on
  * unvetted domains once the registry is settled.
  *
@@ -25,6 +28,26 @@ import { join, extname } from 'node:path';
 
 const REGISTRY = 'data/seed/source-registry.json';
 const SCAN_DIRS = ['data/seed', 'docs/course-content', 'docs/marketing', 'docs/content'];
+/** New courses are built here before promotion; their citations were skipped (GP-718). */
+const DRAFTS_ROOT = 'data/courses';
+
+function draftDirs() {
+  let entries;
+  try {
+    entries = readdirSync(DRAFTS_ROOT);
+  } catch {
+    return [];
+  }
+  return entries
+    .map((c) => join(DRAFTS_ROOT, c, 'v1-draft'))
+    .filter((d) => {
+      try {
+        return statSync(d).isDirectory();
+      } catch {
+        return false;
+      }
+    });
+}
 const SCAN_EXT = new Set(['.json', '.md', '.txt']);
 const URL_RE = /https?:\/\/([a-zA-Z0-9.-]+\.[a-z]{2,})/g;
 
@@ -46,7 +69,11 @@ function classify(host) {
 
 function walk(dir, out = []) {
   let entries;
-  try { entries = readdirSync(dir); } catch { return out; }
+  try {
+    entries = readdirSync(dir);
+  } catch {
+    return out;
+  }
   for (const e of entries) {
     const p = join(dir, e);
     const st = statSync(p);
@@ -61,7 +88,17 @@ const unvetted = new Map();
 const supplierOnlyFiles = [];
 let totalReal = 0;
 
-for (const file of SCAN_DIRS.flatMap((d) => walk(d))) {
+const seedFiles = SCAN_DIRS.flatMap((d) => walk(d)).filter((f) => f !== join(REGISTRY));
+const draftFiles = draftDirs().flatMap((d) => walk(d));
+const scanned = { files: seedFiles.length + draftFiles.length, draftFiles: draftFiles.length };
+
+// Fail closed: a scan that found no content files cannot report a pass.
+if (scanned.files === 0) {
+  console.error('check-source-citations: scanned 0 content files — refusing to report a pass.');
+  process.exit(2);
+}
+
+for (const file of [...seedFiles, ...draftFiles]) {
   const text = readFileSync(file, 'utf8');
   const local = { 1: 0, 2: 0, 3: 0, 4: 0, unvetted: 0 };
   for (const m of text.matchAll(URL_RE)) {
@@ -73,32 +110,48 @@ for (const file of SCAN_DIRS.flatMap((d) => walk(d))) {
       unvetted.set(h, (unvetted.get(h) ?? 0) + 1);
       continue;
     }
-    local[c]++; byTier[c]++; totalReal++;
+    local[c]++;
+    byTier[c]++;
+    totalReal++;
   }
   const authoritative = local[1] + local[2];
   const cited = authoritative + local[3] + local[4];
-  if (cited > 0 && authoritative === 0 && local[4] > 0) supplierOnlyFiles.push({ file, supplier: local[4] });
+  if (cited > 0 && authoritative === 0 && local[4] > 0)
+    supplierOnlyFiles.push({ file, supplier: local[4] });
 }
 
 const authoritative = byTier[1] + byTier[2];
 const ratio = totalReal === 0 ? 0 : Math.round((authoritative / totalReal) * 100);
 
 if (asJson) {
-  console.log(JSON.stringify({ byTier, authorityRatio: ratio, unvetted: [...unvetted], supplierOnlyFiles }, null, 2));
+  console.log(
+    JSON.stringify(
+      { scanned, byTier, authorityRatio: ratio, unvetted: [...unvetted], supplierOnlyFiles },
+      null,
+      2
+    )
+  );
 } else {
   console.log('\nCARSI source-citation scorecard\n');
+  console.log(
+    `  scanned ${scanned.files} content files (${scanned.draftFiles} in v1-draft courses)\n`
+  );
   console.log(`  tier 1 primary regulator/standards   ${byTier[1]}`);
   console.log(`  tier 2 peer-reviewed / health body   ${byTier[2]}`);
   console.log(`  tier 3 industry body (nominative)    ${byTier[3]}`);
   console.log(`  tier 4 supplier / product            ${byTier[4]}`);
   console.log(`\n  AUTHORITY RATIO (tier 1+2 of all cited): ${ratio}%`);
   if (supplierOnlyFiles.length) {
-    console.log(`\n  Supplier-only surfaces (cite vendors, zero authority): ${supplierOnlyFiles.length}`);
-    for (const s of supplierOnlyFiles.slice(0, 10)) console.log(`    ${s.file} (${s.supplier} supplier citation(s))`);
+    console.log(
+      `\n  Supplier-only surfaces (cite vendors, zero authority): ${supplierOnlyFiles.length}`
+    );
+    for (const s of supplierOnlyFiles.slice(0, 10))
+      console.log(`    ${s.file} (${s.supplier} supplier citation(s))`);
   }
   if (unvetted.size) {
     console.log(`\n  Unvetted domains (cited, not in registry) — review and tier, or replace:`);
-    for (const [d, n] of [...unvetted].sort((a, b) => b[1] - a[1]).slice(0, 15)) console.log(`    ${String(n).padStart(4)}  ${d}`);
+    for (const [d, n] of [...unvetted].sort((a, b) => b[1] - a[1]).slice(0, 15))
+      console.log(`    ${String(n).padStart(4)}  ${d}`);
   }
   console.log(
     unvetted.size === 0
