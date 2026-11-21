@@ -13,7 +13,7 @@ and high-traffic facilities.
 
 | Program | Folder | LMS course slug | Status |
 | --- | --- | --- | --- |
-| Professional Floor Care & Operational Readiness | [`floor-care/`](./floor-care/) | `floor-care-onboarding-operational-readiness` | Draft (publish via `floor-care/publish-runbook.md`) |
+| Professional Floor Care & Operational Readiness | [`floor-care/`](./floor-care/) | `floor-care-onboarding-operational-readiness` | Content: draft pending sign-off. **Catalogue: `published` / `isPublished: true`** — so a seed makes it live; see `floor-care/publish-runbook.md` for the go-live steps and the unresolved pricing/visibility discrepancy. |
 
 _More onboarding programs will sit under this brand as they are built._
 
