@@ -26,6 +26,7 @@ import { getPublishedCourseDetailBySlugFromDatabase } from '@/lib/server/public-
 import { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import { formatCecHoursForDisplay } from '@/lib/cec-display';
+import { OG_LOCALE_FIELDS } from '@/lib/seo/locale';
 
 // ISR: render each course detail on demand and cache for 5 minutes (issue #129).
 // Build-safe via the build-phase guard in getCourse's DB reader; publish busts the
@@ -206,7 +207,7 @@ export async function generateMetadata({
       images: thumbnailUrl
         ? [{ url: thumbnailUrl, width: 1200, height: 630, alt: imageAlt }]
         : OG_IMAGES,
-      locale: 'en_AU',
+      ...OG_LOCALE_FIELDS,
       type: 'website',
     },
     twitter: {

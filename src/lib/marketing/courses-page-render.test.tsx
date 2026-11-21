@@ -205,10 +205,14 @@ const REVIEWED_SOURCE_SHA256: Record<string, string> = {
   // BACKLOG #22 re-pin: adds the <CourseReferences> block only (import + one element). It adds no
   // IICRC, CEC, certification, accreditation or approval sentence: IICRC-naming sources are held
   // back from that block (src/lib/seo/course-references.ts NAMES_IICRC_RE) pending GP-639 review.
+  // Row 19 (NZ) re-pin: `locale: 'en_AU'` → `...OG_LOCALE_FIELDS` (en_AU + alternate en_NZ) and its
+  // import. Metadata only; no IICRC, CEC, certification, accreditation or approval sentence changed.
   'app/(public)/courses/[slug]/page.tsx':
-    '4c29f3f7764872b4f2cc2d6976d7193f737052c522b414b5a0130507acd3e264',
+    'd944bbd59dfd53e62f5bcb85ff0d615a8e94aa9d7f69c04cd47d957cfb604b97',
+  // Row 19 (NZ) re-pin: `locale: 'en_AU'` → `...OG_LOCALE_FIELDS` (en_AU + alternate en_NZ) and its
+  // import. Metadata only; no IICRC, CEC, certification, accreditation or approval sentence changed.
   'app/(public)/pathways/[slug]/page.tsx':
-    '66e4c37b9c7f7e37c7cb0f7bc7cd677db0a6f3c4814aacc6f78bcf8deab9a044',
+    'e254162212a4d11a365c5900c1e93019c71260af33852ca730b8790412acd35c',
   // GP-696 re-pin after GP-661 b3613864 (embedded preset: layout only; every IICRC, CEC,
   // certification, accreditation and approval line is byte-identical to the GP-639 review).
   'src/components/lms/CourseGrid.tsx':
