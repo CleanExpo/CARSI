@@ -58,16 +58,6 @@
         "readOn": "20/11/2026"
       },
       {
-        "label": "IICRC, ANSI/IICRC S500 Standard for Professional Water Damage Restoration page (refers to the 2021 edition); cited by name, no standard text reproduced",
-        "url": "https://www.iicrc.org/s500/",
-        "readOn": "20/11/2026"
-      },
-      {
-        "label": "IICRC media release (April 2025), Australian Standard AS-IICRC S500:2025 published",
-        "url": "https://iicrc.org/wp-content/uploads/2025/04/AS-IICRC-S500-Published-Press-Release_March-2025.pdf",
-        "readOn": "20/11/2026"
-      },
-      {
         "label": "Wood Handbook ch. 4, Thermal, Electrical, and Other Properties, USDA Forest Products Laboratory FPL-GTR-190 (public domain)",
         "url": "https://research.fs.usda.gov/treesearch/37428",
         "readOn": "20/11/2026"
@@ -147,11 +137,6 @@
   "water-damage-restoration-fundamentals": {
     "lessonsWithSources": 12,
     "references": [
-      {
-        "label": "ANSI/IICRC S500:2025 (cited by name only; no text reproduced).",
-        "url": null,
-        "readOn": null
-      },
       {
         "label": "NSW Government, Voltage optimisation fact sheet",
         "url": "https://www.energy.nsw.gov.au/sites/default/files/2022-08/2016_04_NSW_VoltageOptimisationFactsheet.pdf",

@@ -49,13 +49,13 @@ describe('extractLessonSources', () => {
   it('reads linked and named sources from the template block', () => {
     const refs = extractLessonSources(
       BLOCK(
-        '<li>ANSI/IICRC S500:2025 (cited by name only; no text reproduced).</li>' +
+        '<li>AS/NZS 3000:2018, Wiring Rules (cited by name only; no text reproduced).</li>' +
           LINK('https://www.safeworkaustralia.gov.au/x', 'Safe Work Australia, Model WHS laws')
       )
     );
     expect(refs).toEqual([
       {
-        label: 'ANSI/IICRC S500:2025 (cited by name only; no text reproduced).',
+        label: 'AS/NZS 3000:2018, Wiring Rules (cited by name only; no text reproduced).',
         url: null,
         readOn: null,
       },
@@ -65,6 +65,18 @@ describe('extractLessonSources', () => {
         readOn: '02/11/2026',
       },
     ]);
+  });
+
+  it('holds IICRC-naming sources back from the public block until GP-639 review', () => {
+    const refs = extractLessonSources(
+      BLOCK(
+        '<li>ANSI/IICRC S500:2025 (cited by name only; no text reproduced).</li>' +
+          LINK('https://www.iicrc.org/s500', 'IICRC, ANSI/IICRC S500 page') +
+          LINK('https://example.com/x', 'I1CRC look-alike page') +
+          LINK('https://www.safeworkaustralia.gov.au/x', 'Safe Work Australia, Model WHS laws')
+      )
+    );
+    expect(refs.map((r) => r.label)).toEqual(['Safe Work Australia, Model WHS laws']);
   });
 
   it('a lesson without the block, or with only the no-source placeholder, cites nothing', () => {

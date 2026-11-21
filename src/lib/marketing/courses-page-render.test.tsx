@@ -202,8 +202,11 @@ const REVIEWED_IICRC_COUNTS: Record<string, number> = {
 const REVIEWED_SOURCE_SHA256: Record<string, string> = {
   'app/(public)/courses/page.tsx':
     '85ba8041bd6b994d2f881073cd37664b807fffc93dc2154a4e04a695ba429d4a',
+  // BACKLOG #22 re-pin: adds the <CourseReferences> block only (import + one element). It adds no
+  // IICRC, CEC, certification, accreditation or approval sentence: IICRC-naming sources are held
+  // back from that block (src/lib/seo/course-references.ts NAMES_IICRC_RE) pending GP-639 review.
   'app/(public)/courses/[slug]/page.tsx':
-    'd8d3fa2564c63e065f06025d673f027f648f2e11d5a1369042b2d42e96639b39',
+    '4c29f3f7764872b4f2cc2d6976d7193f737052c522b414b5a0130507acd3e264',
   'app/(public)/pathways/[slug]/page.tsx':
     '66e4c37b9c7f7e37c7cb0f7bc7cd677db0a6f3c4814aacc6f78bcf8deab9a044',
   // GP-696 re-pin after GP-661 b3613864 (embedded preset: layout only; every IICRC, CEC,

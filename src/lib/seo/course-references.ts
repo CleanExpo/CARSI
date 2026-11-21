@@ -54,6 +54,13 @@ const LI_RE = /<li[^>]*>([\s\S]*?)<\/li>/gi;
 const ANCHOR_RE = /<a\b[^>]*\bhref\s*=\s*"([^"]*)"[^>]*>([\s\S]*?)<\/a>/i;
 const READ_RE = /\bRead\s+(\d{2}\/\d{2}\/\d{4})\b/;
 const NO_SOURCE_RE = /^No external source is cited for this lesson\b/i;
+/**
+ * IICRC-naming sources are held back from the PUBLIC References block. Any new IICRC sentence on
+ * a public course page needs GP-639 review first (src/lib/marketing/courses-page-render.test.tsx),
+ * so these stay in the lesson source lists only until the founder opts them in. Same loose match
+ * as GP-639's NAMES_IICRC (catches I1CRC / lICRC look-alikes).
+ */
+const NAMES_IICRC_RE = /[il1|][il1|]\s?c\s?r\s?c/i;
 
 const NAMED_ENTITIES: Record<string, string> = {
   amp: '&',
@@ -114,12 +121,12 @@ export function extractLessonSources(html: string | null | undefined): CourseRef
       const readOn = plainText(inner).match(READ_RE)?.[1] ?? null;
       if (anchor) {
         const label = plainText(anchor[2]);
-        if (!label) continue;
+        if (!label || NAMES_IICRC_RE.test(label)) continue;
         out.push({ label, url: httpUrl(anchor[1]), readOn });
         continue;
       }
       const label = plainText(inner);
-      if (!label || NO_SOURCE_RE.test(label)) continue;
+      if (!label || NO_SOURCE_RE.test(label) || NAMES_IICRC_RE.test(label)) continue;
       out.push({ label, url: null, readOn });
     }
   }
