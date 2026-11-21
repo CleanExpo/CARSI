@@ -25,7 +25,8 @@ console.log(JSON.stringify({
 function load(env) {
   const base = { ...process.env };
   for (const k of Object.keys(base)) {
-    if (k.startsWith('E2E_PORT') || k.startsWith('PLAYWRIGHT_') || k === 'CI') delete base[k];
+    if (k.startsWith('E2E_PORT') || k.startsWith('PLAYWRIGHT_') || k === 'CI' || k === 'PORT')
+      delete base[k];
   }
   const r = spawnSync(process.execPath, ['--import', 'tsx', '--input-type=module', '-e', PRINT], {
     cwd: root,
@@ -42,7 +43,7 @@ test('without E2E_PORT* the servers keep 3000, 3100 and 3101', () => {
   assert.equal(c.baseURL, 'http://localhost:3000');
   assert.deepEqual(
     c.servers.map((s) => s.url),
-    ['http://localhost:3000', 'http://localhost:3100', 'http://localhost:3101'],
+    ['http://localhost:3000', 'http://localhost:3100', 'http://localhost:3101']
   );
   assert.equal(c.servers[0].port, '3000');
   assert.match(c.servers[1].command, /-p 3100$/);
@@ -54,7 +55,7 @@ test('E2E_PORT, E2E_PORT_2 and E2E_PORT_3 move every server and base URL', () =>
   assert.equal(c.baseURL, 'http://localhost:45001');
   assert.deepEqual(
     c.servers.map((s) => s.url),
-    ['http://localhost:45001', 'http://localhost:45002', 'http://localhost:45003'],
+    ['http://localhost:45001', 'http://localhost:45002', 'http://localhost:45003']
   );
   assert.equal(c.servers[0].port, '45001');
   assert.match(c.servers[1].command, /-p 45002$/);
@@ -62,6 +63,75 @@ test('E2E_PORT, E2E_PORT_2 and E2E_PORT_3 move every server and base URL', () =>
   const byName = Object.fromEntries(c.projects);
   assert.equal(byName['membership-checkout'], 'http://localhost:45002');
   assert.equal(byName['purchase-survey'], 'http://localhost:45003');
+});
+
+// UNI-3472: a developer's own PORT is kept when E2E_PORT is unset, so the server and the URL
+// Playwright waits on agree. E2E_PORT still wins when both are set.
+test('a local PORT is kept for the main server when E2E_PORT is unset', () => {
+  const c = load({ PORT: '4999' });
+  assert.equal(c.baseURL, 'http://localhost:4999');
+  assert.equal(c.servers[0].url, 'http://localhost:4999');
+  assert.equal(c.servers[0].port, '4999');
+  assert.equal(load({ PORT: '4999', E2E_PORT: '45001' }).servers[0].port, '45001');
+});
+
+// A PORT equal to a default for another server must not put two servers on one port.
+test('a local PORT equal to a default for another server moves that default aside', () => {
+  const a = load({ PORT: '3100' }).servers.map((s) => s.url);
+  assert.deepEqual(a, ['http://localhost:3100', 'http://localhost:3102', 'http://localhost:3101']);
+  const b = load({ PORT: '3101' }).servers.map((s) => s.url);
+  assert.deepEqual(b, ['http://localhost:3101', 'http://localhost:3100', 'http://localhost:3103']);
+  // The survey fallback also avoids a main or membership port set explicitly to its candidates.
+  const c = load({ PORT: '3103', E2E_PORT_2: '3101' }).servers.map((s) => s.url);
+  assert.deepEqual(c, ['http://localhost:3103', 'http://localhost:3101', 'http://localhost:3105']);
+  const d = load({ PORT: '3102', E2E_PORT_2: '3100' }).servers.map((s) => s.url);
+  assert.deepEqual(d, ['http://localhost:3102', 'http://localhost:3100', 'http://localhost:3101']);
+  // An explicit E2E_PORT_2 still wins, even when it matches nothing else.
+  assert.equal(
+    load({ PORT: '3100', E2E_PORT_2: '45002' }).servers[1].url,
+    'http://localhost:45002'
+  );
+});
+
+// The whole allocation, every kind of collision at once (UNI-3472: three review rounds each found
+// another collision). One child process walks a grid of main/membership/survey inputs, including
+// every default port as an explicit value, and checks the three servers always get three ports.
+test('allocateE2EPorts gives three distinct ports for every non-colliding explicit input', () => {
+  const script = `const { allocateE2EPorts } = await import(${JSON.stringify(
+    pathToFileURL(join(root, 'config', 'e2e-ports.ts')).href
+  )});
+const vals = [undefined, '3000', '3100', '3101', '3102', '3103', '3104', '3105', '4999', '45002'];
+const bad = []; let n = 0;
+for (const main of vals) for (const a of vals) for (const b of vals) {
+  const env = {};
+  if (main) env.PORT = main;
+  if (a) env.E2E_PORT_2 = a;
+  if (b) env.E2E_PORT_3 = b;
+  const m = main ?? '3000';
+  if ((a && a === m) || (b && b === m)) continue;
+  if (a && b && a === b) {
+    let threw = false;
+    try { allocateE2EPorts(env); } catch { threw = true; }
+    if (!threw) bad.push(['no-throw', main, a, b]);
+    continue;
+  }
+  n++;
+  const r = allocateE2EPorts(env);
+  if (new Set([r.main, r.membership, r.survey]).size !== 3) bad.push([main, a, b, r]);
+  if (a && r.membership !== a) bad.push(['explicit2 lost', main, a, b, r]);
+  if (b && r.survey !== b) bad.push(['explicit3 lost', main, a, b, r]);
+}
+console.log(JSON.stringify({ n, bad }));`;
+  const r = spawnSync(process.execPath, ['--import', 'tsx', '--input-type=module', '-e', script], {
+    cwd: root,
+    env: { PATH: process.env.PATH, HOME: process.env.HOME },
+    encoding: 'utf8',
+    timeout: 60_000,
+  });
+  assert.equal(r.status, 0, r.stderr);
+  const out = JSON.parse(r.stdout.trim().split('\n').pop());
+  assert.ok(out.n > 300, `grid too small: ${out.n}`);
+  assert.deepEqual(out.bad, []);
 });
 
 test('an explicit PLAYWRIGHT_BASE_URL still wins over E2E_PORT', () => {
