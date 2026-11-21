@@ -160,6 +160,13 @@ export async function POST(request: NextRequest) {
     if (msg === 'COURSE_NOT_FOUND') {
       return NextResponse.json({ detail: 'Course not found' }, { status: 404 });
     }
+    if (msg === 'COURSE_NOT_SELF_ENROLABLE') {
+      // Cohort-only course (CARSI roadshow workshop): enrolment comes from the Day-1 check-in.
+      return NextResponse.json(
+        { detail: 'This course is for enrolled workshop attendees only.' },
+        { status: 403 }
+      );
+    }
     if (msg === 'ALREADY_ON_TEAM') {
       return NextResponse.json(
         { detail: 'You already belong to another team. Contact support to move your purchase.' },

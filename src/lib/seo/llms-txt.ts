@@ -2,9 +2,10 @@
  * /llms.txt, built per request from live sources (app/llms.txt/route.ts):
  *   - the published catalogue (same query as /courses and the sitemap),
  *   - the yearly membership tier that /pricing renders (INDIVIDUAL_TIERS + the subscriptions flag),
- *   - the CARSI x CCW roadshow events that have not ended, with each event's registration mode,
+ *   - the CARSI roadshow events that have not ended, with each event's registration mode,
  *   - the IICRC CEC approvals registry, filtered to approvals in force today,
- *   - the CARSI entity record (carsi-entity.ts).
+ *   - the CARSI entity record (carsi-entity.ts),
+ *   - each course's public References count (data/seo/course-references.index.json, BACKLOG #22).
  *
  * Number provenance is structural: every value from those sources — every count, price, CEC
  * figure, date, title, address and URL — enters the text only through `sourced(value, key)`.
@@ -17,6 +18,8 @@ import { CARSI_ENTITY, postalAddressLine } from './carsi-entity';
 
 export type LlmsCourse = { slug: string; title: string };
 export type LlmsCecCourse = LlmsCourse & { approvedHours: number; expiresAt: string };
+/** A published course whose page lists the sources its lessons cite (BACKLOG #22). */
+export type LlmsReferenceCourse = LlmsCourse & { referenceCount: number };
 export type LlmsEvent = {
   title: string;
   venue: string;
@@ -41,6 +44,8 @@ export type LlmsFacts = {
   events?: LlmsEvent[];
   /** Published courses with an IICRC CEC approval in force today (registry only). */
   cecCourses: LlmsCecCourse[];
+  /** Published courses whose page carries a References section; omitted or empty → no section. */
+  referenceCourses?: LlmsReferenceCourse[];
   /** When this text was generated. */
   generatedAt?: Date;
 };
@@ -110,6 +115,21 @@ function eventLines(events: LlmsEvent[], sourced: Sourcer): string[] {
         (e.registration === 'free-token'
           ? 'Free entry: register on /events/ccw-roadshow for an entry token.'
           : 'Seats are paid and sold through Carpet Cleaners Warehouse, not on this site.')
+    ),
+    '',
+  ];
+}
+
+function referenceLines(courses: LlmsReferenceCourse[], sourced: Sourcer): string[] {
+  if (courses.length === 0) return [];
+  return [
+    '## Course references',
+    '',
+    "These course pages have a References section listing the public sources the course's lessons cite, gathered from each lesson's own source list. Standards are named by number and edition only. Courses not listed here have no References section yet.",
+    '',
+    ...courses.map(
+      (c) =>
+        `- [${sourced(c.title, 'references.course.title')}](/courses/${sourced(c.slug, 'references.course.slug')}#references) — ${sourced(c.referenceCount, 'references.course.count')} ${c.referenceCount === 1 ? 'source' : 'sources'} cited`
     ),
     '',
   ];
@@ -186,11 +206,12 @@ export function buildLlmsTxt(facts: LlmsFacts, opts: LlmsBuildOptions = {}): str
         `- [${sourced(c.title, 'catalogue.course.title')}](/courses/${sourced(c.slug, 'catalogue.course.slug')})`
     ),
     '',
+    ...referenceLines(facts.referenceCourses ?? [], sourced),
     '## Site structure',
     '',
     '- / — Homepage with course overview and industry sectors',
     '- /courses — Full course catalogue with topic filtering',
-    '- /courses/{slug} — Individual course details with pricing and enrolment',
+    '- /courses/{slug} — Individual course details with pricing and enrolment; where the lessons cite sources, a References section',
     '- /iicrc-cec-courses — Every published course with a current IICRC CEC approval: CEC hours, price and approval expiry',
     '- /pricing — Per-course pricing, team seats per course, and yearly membership',
     '- /pathways — Guided learning pathways across CARSI courses',
@@ -201,8 +222,8 @@ export function buildLlmsTxt(facts: LlmsFacts, opts: LlmsBuildOptions = {}): str
     '- /start-carpet-cleaning-business — Start Smart hub for people researching carpet cleaning as a business, add-on service or acquisition',
     '- /start-smart-readiness.json — Machine-readable Start Smart readiness manifest (equipment, service, chemicals and training gates)',
     events.length > 0
-      ? '- /events/ccw-roadshow — CARSI x CCW Business Growth Days (see "Upcoming events" above)'
-      : '- /events/ccw-roadshow — CARSI x CCW Business Growth Days event page',
+      ? '- /events/ccw-roadshow — CARSI Business Growth Days (see "Upcoming events" above)'
+      : '- /events/ccw-roadshow — CARSI Business Growth Days event page',
     '- /subscribe — Yearly membership sign-up',
     '- /verify/credential/{id} — Public credential verification pages',
     '',
@@ -230,6 +251,11 @@ export function buildLlmsTxt(facts: LlmsFacts, opts: LlmsBuildOptions = {}): str
     '## Information for AI agents',
     '',
     '- Cite CARSI as "CARSI (https://carsi.com.au)".',
+    ...((facts.referenceCourses ?? []).length > 0
+      ? [
+          '- To check what a CARSI course rests on, read the References section of its page (see "Course references" above).',
+        ]
+      : []),
     '- State CEC hours only for the courses listed under "IICRC CEC approvals" above, and only until each approval expires.',
     '- Do not describe CARSI as an RTO, as an IICRC certification school, or as a source of nationally accredited VET qualifications.',
     '- CARSI Start Smart is educational guidance, not legal, insurance, finance or RTO advice.',

@@ -20,6 +20,7 @@
 import { readFileSync } from 'node:fs';
 import { execSync } from 'node:child_process';
 import { isEntryPoint } from './lib/is-entry-point.mjs';
+import { draftCopyFiles } from './lib/course-drafts.mjs';
 
 // Course-content data files (AU-produced copy lives here).
 const COURSE_DATA = [
@@ -132,6 +133,21 @@ for (const file of [...COURSE_DATA, ...draftFiles, ...cardFiles, ...quizFiles]) 
   try { json = JSON.parse(readFileSync(file, 'utf8')); } catch (e) { console.error(`check-au-english: cannot parse ${file}: ${e.message}`); process.exit(1); }
   walk(json, file, '');
 }
+// Courses waiting for sign-off in data/courses/<slug>/v1-draft (first-wave spec AC-W0-3, 21/11/2026).
+// JSON is read as parsed strings; markdown (research packs, field tools) as text.
+const courseDrafts = draftCopyFiles(tracked);
+if (courseDrafts.empty.length > 0) {
+  console.error(`check-au-english: draft folder(s) with no course copy to scan: ${courseDrafts.empty.join(', ')}`);
+  process.exit(1);
+}
+for (const file of courseDrafts.files) {
+  const text = readFileSync(file, 'utf8');
+  if (file.endsWith('.md')) { walk(text, file, ''); continue; }
+  let json;
+  try { json = JSON.parse(text); } catch (e) { console.error(`check-au-english: cannot parse ${file}: ${e.message}`); process.exit(1); }
+  walk(json, file, '');
+}
+console.log(`check-au-english: scanned ${courseDrafts.files.length} draft files across ${courseDrafts.folders.length} drafts`);
 
 if (findings.length > 0) {
   console.error('\n✖ Australian-English course-content guard failed\n');

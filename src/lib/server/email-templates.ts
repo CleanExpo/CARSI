@@ -981,7 +981,7 @@ export function renderCcwRoadshowBookingConfirmationEmail(params: {
       appOrigin: params.appOrigin,
       preheader: `You're booked for ${params.eventCity} — ${params.eventDates}`,
       eyebrow: 'Booking confirmed',
-      title: 'Your CARSI x CCW seat is reserved',
+      title: 'Your CARSI Roadshow seat is reserved',
       greeting: `Hi ${name},`,
       paragraphs: [
         'Thank you — your payment was received through Stripe and your seat is confirmed.',
@@ -991,7 +991,7 @@ export function renderCcwRoadshowBookingConfirmationEmail(params: {
       cta: { label: 'View event details', href: params.eventPageUrl },
       noteHtml: `Questions? Reply to this email or visit ${brandLink(params.eventPageUrl, 'the event page')}.`,
     },
-    `Hi ${name},\n\nYour booking for CARSI x CCW Business Growth Days is confirmed.\n\nEvent: ${params.eventCity} — ${params.eventDates}\nWhen: ${params.dateRangeLabel}. ${params.timeLabel}\nVenue: ${params.venueName}, ${params.venueAddress}\nTicket: ${params.ticketLabel} (${params.seatCount} seats)\nPaid: ${params.amountLabel}\n\nEvent page: ${params.eventPageUrl}`
+    `Hi ${name},\n\nYour booking for CARSI Business Growth Days is confirmed.\n\nEvent: ${params.eventCity} — ${params.eventDates}\nWhen: ${params.dateRangeLabel}. ${params.timeLabel}\nVenue: ${params.venueName}, ${params.venueAddress}\nTicket: ${params.ticketLabel} (${params.seatCount} seats)\nPaid: ${params.amountLabel}\n\nEvent page: ${params.eventPageUrl}`
   );
 }
 
@@ -1054,7 +1054,7 @@ export function renderContactReplyEmail(params: {
   );
 }
 
-/** Post-event offer pack for both-days + email-opt-in CCW/CARSI attendees. */
+/** Post-event offer pack for both-days + email-opt-in CARSI roadshow attendees. */
 export function renderCcwRoadshowOfferPackEmail(params: {
   appOrigin: string;
   attendeeName: string;
@@ -1079,20 +1079,20 @@ export function renderCcwRoadshowOfferPackEmail(params: {
   return render(
     {
       appOrigin: params.appOrigin,
-      preheader: `Thanks for joining us in ${params.eventCity} — your exclusive CCW/CARSI offers`,
+      preheader: `Thanks for joining us in ${params.eventCity} — your exclusive CARSI roadshow offers`,
       eyebrow: 'Post-event offers',
       title: `Thanks for attending ${params.eventCity}`,
       greeting: `Hi ${name},`,
       paragraphs: [
-        `You completed both days of the CARSI x CCW Business Growth Days (${params.eventDates}). Here are your exclusive follow-up offers.`,
+        `You completed both days of the CARSI Business Growth Days (${params.eventDates}). Here are your exclusive follow-up offers.`,
         ...(shopifyUrl
           ? [
-              `Shopify — CCW/CARSI 2 Day In-house Training: open the training product via the button below.`,
+              `Training voucher: available on our roadshow partner Carpet Cleaners Warehouse (CCW) store. Open it via the button below.`,
             ]
           : []),
       ],
       details: [{ label: 'Event', value: `${params.eventCity} — ${params.eventDates}` }],
-      ...(shopifyUrl ? { cta: { label: 'View Shopify training product', href: shopifyUrl } } : {}),
+      ...(shopifyUrl ? { cta: { label: 'View the training voucher', href: shopifyUrl } } : {}),
       messageHtml: `
         <p style="margin: 20px 0 8px; font-family: ${BRAND.font}; font-size: 14px; font-weight: 600; color: ${BRAND.silverHi};">Stay connected with CCW</p>
         <ul style="margin: 0; padding-left: 18px; font-family: ${BRAND.font}; font-size: 14px; line-height: 1.5; color: ${BRAND.text};">

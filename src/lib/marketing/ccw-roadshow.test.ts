@@ -60,7 +60,7 @@ describe('separate Brisbane October occurrence', () => {
   it('preserves the entire September configuration and identity', () => {
     expect(getCcwRoadshowEvent('brisbane')).toEqual({
       slug: 'brisbane', city: 'Brisbane',
-      title: 'CARSI x CCW Business Growth Days - Brisbane',
+      title: 'CARSI Business Growth Days - Brisbane',
       dates: '11-12 September 2026',
       dateRangeLabel: 'Friday 11 September - Saturday 12 September 2026',
       startDateIso: '2026-09-11T08:30:00+10:00',
@@ -69,7 +69,7 @@ describe('separate Brisbane October occurrence', () => {
       venueName: 'Carpet Cleaners Warehouse Boondall',
       streetAddress: 'D1-3/194 Zillmere Road',
       suburb: 'Boondall', suburbStatePostcode: 'Boondall QLD 4034', state: 'QLD',
-      description: 'Two practical days with Phill McGurk and the CCW team, connecting training, equipment, service design, chemistry, quoting confidence and business growth for carpet, rug, stain and tile cleaning operators.',
+      description: 'Two practical days with Phill McGurk of CARSI, hosted by roadshow partner CCW, connecting training, equipment, service design, chemistry, quoting confidence and business growth for carpet, rug, stain and tile cleaning operators.',
       capacity: 10, calendarEventId: '1nnfc9hv164f4882q09krd1ies', registration: 'external',
     });
   });

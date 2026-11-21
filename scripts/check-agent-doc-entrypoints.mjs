@@ -3,7 +3,7 @@
  * See check-agent-doc-entrypoints.test.mjs for why this exists.
  *
  * Claude Code reads .claude/CLAUDE.md and follows `@path` imports relative to that file.
- * Cursor reads .cursor/rules/*.mdc and follows `@path` references relative to the repo root.
+ * Codex reads ./AGENTS.md; its `@path` references are written relative to the repo root.
  */
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
@@ -16,7 +16,7 @@ export const RULE_DOCS = [
 
 export const ENTRYPOINTS = [
   { path: '.claude/CLAUDE.md', agent: 'Claude Code', base: 'file' },
-  { path: '.cursor/rules/carsi-agent-rules.mdc', agent: 'Cursor', base: 'root', alwaysApply: true },
+  { path: 'AGENTS.md', agent: 'Codex', base: 'root' },
 ];
 
 function gitIgnored(root) {
@@ -51,12 +51,6 @@ function references(text) {
   return [...prose.matchAll(/(?:^|\s)@([^\s`]+\.mdc?)\b/g)].map((m) => m[1]);
 }
 
-/** The leading `---` front matter block only (Cursor ignores later blocks). */
-function frontMatter(text) {
-  const m = /^---\r?\n([\s\S]*?)\r?\n---\r?\n/.exec(text);
-  return m ? m[1] : '';
-}
-
 /** Body of the heading whose text contains `marker`, up to the next heading of the same or higher level. */
 function sectionBody(text, marker) {
   const lines = text.split('\n');
@@ -86,9 +80,6 @@ export function checkAgentDocEntrypoints(root, { isIgnored = gitIgnored(root) } 
     if (isIgnored(e.path))
       errors.push(`${e.path} is git-ignored, so it never reaches other machines`);
     const text = readFileSync(abs, 'utf8');
-    if (e.alwaysApply && !/^alwaysApply:\s*true\s*$/m.test(frontMatter(text))) {
-      errors.push(`${e.path} must set alwaysApply: true in its front matter`);
-    }
     const base = e.base === 'file' ? dirname(abs) : root;
     const loaded = references(text).map((ref) => relative(root, resolve(base, ref)));
     for (const doc of RULE_DOCS) {

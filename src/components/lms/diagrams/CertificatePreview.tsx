@@ -189,8 +189,9 @@ export function CertificatePreview({
                 Credential {credentialRef}
               </p>
               <p className="mx-auto mt-3 max-w-xl text-[9px] leading-relaxed text-slate-500 italic sm:text-[10px]">
-                Designed for IICRC Continuing Education Credits (CECs) where applicable. Retain this
-                certificate with your renewal records.
+                {cecValue
+                  ? 'IICRC Continuing Education Credits (CECs) as shown. Retain this certificate with your renewal records.'
+                  : 'Issued by CARSI. No IICRC CECs are attached to this certificate. Retain it with your training records.'}
               </p>
             </div>
           </div>

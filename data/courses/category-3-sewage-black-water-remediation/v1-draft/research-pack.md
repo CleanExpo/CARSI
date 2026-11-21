@@ -190,7 +190,7 @@ figures.
 
 ## Licence and production guardrails honoured
 
-- `iicrcDiscipline: null`, `cecHours: 0`; no claim that the course earns or awards CECs; no IICRC discipline
+- `iicrcDiscipline: null`, `cecHours: 0`; no CEC claim of any kind; no IICRC discipline
   acronym; no wording that implies the IICRC approves or accredits this course; no IICRC mark.
 - Australian English, 230 V / 50 Hz / 10 A GPO / RCD, metric units, AUD with GST, AS/NZS and regulator framing
   for both countries. No US framing.

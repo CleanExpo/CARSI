@@ -42,7 +42,7 @@ function buildLeadContext(params: Awaited<ContactPageProps['searchParams']>): Co
       source,
       topic,
       pageUrl: resolveCcwInterestPageUrl(city),
-      initialMessage: `Hi CARSI, please let me know when ${topic ?? 'the next CARSI x CCW training dates'} are confirmed.`,
+      initialMessage: `Hi CARSI, please let me know when ${topic ?? 'the next CARSI roadshow training dates'} are confirmed.`,
     };
   }
 
@@ -138,7 +138,7 @@ export default async function ContactPage({ searchParams }: ContactPageProps) {
                     : leadContext.source === 'facility-management'
                       ? 'This enquiry is tagged for team seats on hospital, aged-care or hotel contracts.'
                       : leadContext.source === 'ccw-roadshow'
-                        ? 'This enquiry is tagged for the next CARSI x CCW training dates.'
+                        ? 'This enquiry is tagged for the next CARSI roadshow training dates.'
                         : 'This enquiry includes the source, topic and pathway so CARSI can quickly see what guidance you need.'}
                 </p>
               </div>

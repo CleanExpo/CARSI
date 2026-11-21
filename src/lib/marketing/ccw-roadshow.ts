@@ -54,7 +54,7 @@ export type CcwRoadshowTicketPackage = {
 
 export const ccwRoadshowPath = '/events/ccw-roadshow';
 
-export const ccwRoadshowTitle = 'CARSI x CCW Business Growth Days';
+export const ccwRoadshowTitle = 'CARSI Business Growth Days';
 
 export const ccwRoadshowHeroHeadline = 'Grow Your Cleaning Business';
 
@@ -69,7 +69,7 @@ export const ccwRoadshowPresenter = {
   name: 'Phill McGurk',
   role: 'CARSI founder and cleaning and restoration educator',
   value:
-    'Spend two practical days learning directly from Phill McGurk and the CCW team, with the conversation tied back to real equipment, chemicals, service decisions and customer outcomes.',
+    'Spend two practical days learning directly from Phill McGurk of CARSI, hosted by roadshow partner CCW, with the conversation tied back to real equipment, chemicals, service decisions and customer outcomes.',
 };
 
 export const ccwRoadshowTopics = [
@@ -214,7 +214,7 @@ export function getCcwNextDatesDescription(city: CcwRoadshowEvent['city']): stri
 
 /** The existing /contact lead-context path, pre-filled for the next dates in a city. */
 export function getCcwRegisterInterestHref(city?: CcwRoadshowEvent['city']): string {
-  const topic = `the next ${city ? `${city} ` : ''}CARSI x CCW training dates`;
+  const topic = `the next ${city ? `${city} ` : ''}CARSI roadshow training dates`;
   const cityParam = city ? `&city=${city.toLowerCase()}` : '';
   return `/contact?source=ccw-roadshow${cityParam}&topic=${encodeURIComponent(topic)}`;
 }
@@ -249,7 +249,7 @@ export const ccwRoadshowEvents: CcwRoadshowEvent[] = [
     suburbStatePostcode: 'Bayswater North VIC 3153',
     state: 'VIC',
     description:
-      'Two practical days with Phill McGurk and the CCW team, connecting training, equipment, service design, chemistry, quoting confidence and business growth for carpet, rug, stain and tile cleaning operators.',
+      'Two practical days with Phill McGurk of CARSI, hosted by roadshow partner CCW, connecting training, equipment, service design, chemistry, quoting confidence and business growth for carpet, rug, stain and tile cleaning operators.',
     capacity: 20,
     // Real recurring event on phill.mcgurk@gmail.com ("CARSI x CCW Business Growth
     // Days — Melbourne", 22–23 Jul 2026). The previous id was stale → guest-add 404'd
@@ -274,7 +274,7 @@ export const ccwRoadshowEvents: CcwRoadshowEvent[] = [
     suburbStatePostcode: 'Seven Hills NSW 2147',
     state: 'NSW',
     description:
-      'Two practical days with Phill McGurk and the CCW team, connecting training, equipment, service design, chemistry, quoting confidence and business growth for carpet, rug, stain and tile cleaning operators.',
+      'Two practical days with Phill McGurk of CARSI, hosted by roadshow partner CCW, connecting training, equipment, service design, chemistry, quoting confidence and business growth for carpet, rug, stain and tile cleaning operators.',
     capacity: 12,
     // Calendar id still points at the 30-31 Jul 2026 sitting. Inert while Sydney is
     // `external` (the guest-add path never fires), and must be re-pointed at the
@@ -301,7 +301,7 @@ export const ccwRoadshowEvents: CcwRoadshowEvent[] = [
     suburbStatePostcode: 'Boondall QLD 4034',
     state: 'QLD',
     description:
-      'Two practical days with Phill McGurk and the CCW team, connecting training, equipment, service design, chemistry, quoting confidence and business growth for carpet, rug, stain and tile cleaning operators.',
+      'Two practical days with Phill McGurk of CARSI, hosted by roadshow partner CCW, connecting training, equipment, service design, chemistry, quoting confidence and business growth for carpet, rug, stain and tile cleaning operators.',
     capacity: 10,
     // Calendar event still points at the original 11-12 Aug 2026 booking. Left as-is
     // deliberately: with `registration: 'external'` the guest-add path never fires for
@@ -318,7 +318,7 @@ export const ccwRoadshowEvents: CcwRoadshowEvent[] = [
   {
     slug: 'brisbane-2026-10-09',
     city: 'Brisbane',
-    title: 'CARSI x CCW Carpet and Upholstery Training - Brisbane',
+    title: 'CARSI Carpet and Upholstery Training - Brisbane',
     dates: '9-10 October 2026',
     dateRangeLabel: 'Friday 9 October - Saturday 10 October 2026',
     startDateIso: '2026-10-09T08:30:00+10:00',
@@ -333,7 +333,7 @@ export const ccwRoadshowEvents: CcwRoadshowEvent[] = [
     suburbStatePostcode: 'Boondall QLD 4034',
     state: 'QLD',
     description:
-      'Two practical days of carpet and upholstery training with Phill McGurk and the CCW team at Carpet Cleaners Warehouse Boondall.',
+      'Two practical days of carpet and upholstery training with Phill McGurk of CARSI at roadshow partner Carpet Cleaners Warehouse Boondall.',
     capacity: 15,
     registration: 'external',
     // Verified against CCW's product page on 8 October 2026. Calendar guest-add
@@ -353,7 +353,7 @@ export const ccwRoadshowTicketPackages: CcwRoadshowTicketPackage[] = [
     unitAmountCents: 0,
     attendeeCount: 1,
     description:
-      'One free seat for a past or current CCW customer at the selected two-day CARSI x CCW Business Growth Days event.',
+      'One free seat for a past or current CCW customer at the selected two-day CARSI Business Growth Days event.',
   },
   {
     id: 'team-five',
@@ -362,7 +362,7 @@ export const ccwRoadshowTicketPackages: CcwRoadshowTicketPackage[] = [
     unitAmountCents: 0,
     attendeeCount: 5,
     description:
-      'Five free seats for a past or current CCW customer team at the selected two-day CARSI x CCW Business Growth Days event.',
+      'Five free seats for a past or current CCW customer team at the selected two-day CARSI Business Growth Days event.',
   },
 ];
 

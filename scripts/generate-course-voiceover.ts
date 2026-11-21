@@ -396,7 +396,9 @@ async function generate(timestamp: string): Promise<void> {
     for (const brief of queue) {
       const req = buildRequest(brief);
       console.log(`\n── ${brief.courseSlug} / ${brief.lessonTitle || brief.lessonId} ──`);
-      console.log(`voice: ${req.voiceId || '(missing — set ELEVENLABS_VOICE_ID or brief.voiceId)'}`);
+      console.log(
+        `voice: ${req.voiceId || '(missing — set ELEVENLABS_VOICE_ID or brief.voiceId)'}`
+      );
       console.log(`model: ${req.modelId}  settings: ${JSON.stringify(req.voiceSettings)}`);
       console.log(`text (${req.text.length} chars): ${req.text}`);
     }
@@ -474,7 +476,17 @@ async function generate(timestamp: string): Promise<void> {
   if (seedUpdates.size) {
     const changed = await persistToSeed(seedUpdates);
     console.log(`Updated ${changed} lesson resource list(s) in ${CATALOG_PATH}.`);
-    console.log('Next: run `npm run db:seed-courses` to import the new audio links into the DB.');
+    // A run with no --slug narrates lessons across many courses, and seedUpdates is keyed
+    // `${courseSlug}::${lessonId}`, so the affected slugs are known exactly. Printing one
+    // placeholder command left the operator to import a single course and silently leave the
+    // rest of the generated audio links unimported.
+    const touched = [...new Set([...seedUpdates.keys()].map((k) => k.split('::')[0]))].sort();
+    console.log(
+      `Next: import the new audio links for ${touched.length} affected course(s) \u2014 each needs its own run:`
+    );
+    for (const courseSlug of touched) {
+      console.log(`  npm run db:seed-courses -- --slug=${courseSlug} --apply`);
+    }
   }
   console.log(`\nDone. ${ok}/${queue.length} narrated.`);
 }

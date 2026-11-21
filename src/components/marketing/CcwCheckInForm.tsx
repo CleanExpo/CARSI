@@ -195,7 +195,7 @@ export function CcwCheckInForm({ token, dayIndex, eventCity, eventDates }: Check
             className="mt-1 h-4 w-4 shrink-0 rounded border-white/30"
           />
           <span className={marketingBodySm}>
-            Email me after the event with exclusive CCW/CARSI offers (including the Shopify training
+            Email me after the event with exclusive CARSI roadshow offers (including the Shopify training
             link and a one-year CARSI membership special), plus CCW social and shop links. You can
             unsubscribe anytime.
           </span>

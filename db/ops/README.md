@@ -37,3 +37,22 @@ order of strength:
 
 **Run one:** Actions → DB ops → Run workflow → pick the file path (e.g. `db/ops/read/04-water-go-live-preflight.sql`).
 The same files also work pasted into TablePlus.
+
+## Trusted sources (DigitalOcean database firewall)
+
+carsi-db accepts connections only from its **Trusted sources** list. GitHub-hosted runners get a
+new public address on every run, so each read or write job:
+
+1. adds its own IPv4 address to carsi-db's Trusted sources (`db/ops/do_firewall.py open`),
+2. runs the file, retrying the connection for about a minute while the rule takes effect,
+3. removes exactly that address again in an always-run step (`do_firewall.py close`), even when
+   the run fails or is cancelled.
+
+Every other Trusted source (the app, your office, TablePlus) is sent back unchanged: the API
+replaces the whole list, and `db/ops/test_do_firewall.py` proves only the runner's rule moves.
+No rule value other than the runner's own address is printed.
+
+**One-time setup (founder or ops):** in DigitalOcean, API → Tokens → Generate New Token, with
+custom scopes **database: read** and **database: update** (or full access with an expiry). Save
+it in GitHub → Settings → Environments → **production-db** → Environment secrets as
+`DIGITALOCEAN_TOKEN`. Without it, the job stops with a named error before connecting.

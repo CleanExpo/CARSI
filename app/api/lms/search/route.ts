@@ -4,6 +4,7 @@ import { isOnboardingCourse, parseOnboardingMeta } from '@/lib/onboarding/enterp
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { formatCurrentCecHoursLabel } from '@/lib/server/course-cec-hours';
 import { prisma } from '@/lib/prisma';
+import { lmsSearchVisibilityWhere } from '@/lib/server/lms-search-visibility';
 
 export async function GET(request: NextRequest) {
   const claims = await getSessionClaimsFromRequest(request);
@@ -26,11 +27,16 @@ export async function GET(request: NextRequest) {
   try {
     const courses = await prisma.lmsCourse.findMany({
       where: {
-        OR: [
-          { title: { contains: q, mode: 'insensitive' } },
-          { slug: { contains: q, mode: 'insensitive' } },
-          { shortDescription: { contains: q, mode: 'insensitive' } },
-          { category: { contains: q, mode: 'insensitive' } },
+        AND: [
+          {
+            OR: [
+              { title: { contains: q, mode: 'insensitive' } },
+              { slug: { contains: q, mode: 'insensitive' } },
+              { shortDescription: { contains: q, mode: 'insensitive' } },
+              { category: { contains: q, mode: 'insensitive' } },
+            ],
+          },
+          lmsSearchVisibilityWhere(claims),
         ],
       },
       orderBy: [{ title: 'asc' }],

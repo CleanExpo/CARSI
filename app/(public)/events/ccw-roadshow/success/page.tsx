@@ -23,7 +23,7 @@ import { getRoadshowSuccessView } from '@/lib/marketing/ccw-roadshow-success';
 
 export const metadata: Metadata = {
   title: 'Roadshow Booking Status',
-  description: 'Booking status for CARSI x CCW Business Growth Days.',
+  description: 'Booking status for CARSI Business Growth Days.',
   robots: { index: false, follow: false },
 };
 

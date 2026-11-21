@@ -1,6 +1,7 @@
 /**
  * JSON shape for `data/seed/courses-catalog.json`.
- * Produced by `scripts/export-courses-catalog.ts` and consumed by `scripts/seed-courses-catalog.ts`.
+ * Produced by `scripts/export-courses-catalog.ts` and consumed by `scripts/import-course-safe.ts`
+ * (the `db:seed-courses` default path) and by the gated legacy `scripts/seed-courses-catalog.ts`.
  */
 export const COURSES_CATALOG_VERSION = 1 as const;
 

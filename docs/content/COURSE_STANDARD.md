@@ -112,27 +112,55 @@ Every teaching lesson uses these seven parts, in this order, each under its own 
 7. **Takeaway.** Two lines the learner remembers, plus the next step (the next lesson, a glossary
    term or a calculator).
 
+### 4.1 Minimum deliverable for every course (founder, 19/11/2026)
+
+Phill set this as "the absolute minimum" for CARSI course development. A course that misses any
+item is not ready to launch or to sell. The full working rules are in the
+`carsi-course-production` skill (`.claude/skills/carsi-course-production/SKILL.md`).
+
+1. **Cover image.** Made for the course with the OpenAI image model (`gpt_image_2_6` on the
+   Higgsfield plan, or `gpt-image-1` through the generate-course-media workflow), set as
+   `thumbnailUrl`. Never stock. No words or logos generated inside the image.
+2. **A lesson-specific OpenAI image in every teaching lesson.** It shows that lesson's job,
+   material or technique, not a generic scene. Captioned "AI illustration, not a site photo", with
+   alt text.
+3. **A diagram in every teaching lesson.** Hand-written SVG that passes
+   `npm run check:course-diagrams`.
+4. **The seven-part layout** above, in every teaching lesson.
+5. **Four learning styles in every teaching lesson:**
+   - **See it:** the image and the diagram.
+   - **Read it:** The idea and the Takeaway.
+   - **Do it:** the metric worked example and the field download.
+   - **Recall it:** the Check yourself questions and the module check.
+     Listening (narration) is optional. It costs money, so it needs the founder's approval.
+6. **Guardrails.** No IICRC standard text in any AI prompt. Australian and New Zealand settings,
+   equipment and units. Every image is looked at on a desktop and on a phone before review.
+
+The audit checks only that a visual exists (floor 5.10). It does not yet check for the cover, the
+lesson image or the diagram separately, so human review checks items 1 to 3 until the audit does.
+
 ## 5. Measurable floors
 
 Each floor is checked by `scripts/audit-course-depth.mjs` against the seed data. The numbers here
 and the constants in the script must match. Change both together, in one reviewed commit.
 
-| #    | Floor            | Rule                                                                                                                                                                                     | Measured from                                                                               |
-| ---- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| 5.1  | `metadata`       | `meta.standard` is `v1`, `meta.standardLevel` is one of the four levels, `meta.rolePaths` lists at least one known path, `durationHours` > 0, `shortDescription` is set                  | catalogue entry                                                                             |
-| 5.2  | `structure`      | L1–L3: 4–6 modules. L0: 1–6. Every module has at least 3 lessons                                                                                                                         | `modules[].lessons[]`                                                                       |
-| 5.3  | `depth`          | Evidenced learning minutes ≥ **50%** of stated minutes (`durationHours` × 60)                                                                                                            | see 5.3 below                                                                               |
-| 5.4  | `moduleChecks`   | Every module contains a quiz lesson that resolves to a quiz with at least 3 questions per teaching lesson in that module (minimum 3)                                                     | quiz lesson `contentBody` or a `quiz:<id>` resource, resolved against `data/seed/**/*.json` |
-| 5.5  | `explanations`   | Every question in those quizzes has an `explanation` of at least 20 characters                                                                                                           | quiz files                                                                                  |
-| 5.6  | `finalQuiz`      | The last lesson of the last module is a quiz with at least 10 questions and a pass mark of at least 70%                                                                                  | quiz files                                                                                  |
-| 5.7  | `fieldDownloads` | Every module has at least one field download resource                                                                                                                                    | lesson `resources[]`                                                                        |
-| 5.8  | `lessonPattern`  | Every teaching lesson has all seven part headings                                                                                                                                        | lesson `contentBody`                                                                        |
-| 5.9  | `lessonWords`    | Every teaching lesson has at least 400 words                                                                                                                                             | lesson `contentBody`                                                                        |
-| 5.10 | `visual`         | Every teaching lesson carries a visual                                                                                                                                                   | body tags or `image`/`video` resource                                                       |
-| 5.11 | `metricExample`  | Every teaching lesson contains at least one number with a metric unit                                                                                                                    | lesson `contentBody`                                                                        |
-| 5.12 | `practical`      | Courses at L2/L3, and every course with `meta.designation`, have a practical task: `data/seed/<slug>-assessment.json` with instructions and at least 3 rubric criteria                   | seed file (matches `LmsPracticalAssessment`)                                                |
-| 5.13 | `australian`     | No US spelling, US voltage or US circuit framing anywhere in the course copy                                                                                                             | `findUsForms` from `scripts/check-au-english.mjs`                                           |
-| 5.14 | `licence`        | No banned IICRC phrasing in the course copy; `cecHours` is 0 unless the slug is approved in `data/seed/cec-approvals.json`; a course with `meta.designation` has `iicrcDiscipline: null` | `scanText` from `scripts/check-iicrc-terminology.mjs`, `cec-approvals.json`                 |
+| #    | Floor            | Rule                                                                                                                                                                                                  | Measured from                                                                               |
+| ---- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| 5.1  | `metadata`       | `meta.standard` is `v1`, `meta.standardLevel` is one of the four levels, `meta.rolePaths` lists at least one known path, `durationHours` > 0, `shortDescription` is set                               | catalogue entry                                                                             |
+| 5.2  | `structure`      | L1–L3: 4–6 modules. L0: 1–6. Every module has at least 3 lessons                                                                                                                                      | `modules[].lessons[]`                                                                       |
+| 5.3  | `depth`          | Evidenced learning minutes ≥ **50%** of stated minutes (`durationHours` × 60)                                                                                                                         | see 5.3 below                                                                               |
+| 5.4  | `moduleChecks`   | Every module contains a quiz lesson that resolves to a quiz with at least 3 questions per teaching lesson in that module (minimum 3)                                                                  | quiz lesson `contentBody` or a `quiz:<id>` resource, resolved against `data/seed/**/*.json` |
+| 5.5  | `explanations`   | Every question in those quizzes has an `explanation` of at least 20 characters                                                                                                                        | quiz files                                                                                  |
+| 5.6  | `finalQuiz`      | The last lesson of the last module is a quiz with at least 10 questions and a pass mark of at least 70%                                                                                               | quiz files                                                                                  |
+| 5.7  | `fieldDownloads` | Every module has at least one field download resource                                                                                                                                                 | lesson `resources[]`                                                                        |
+| 5.8  | `lessonPattern`  | Every teaching lesson has all seven part headings                                                                                                                                                     | lesson `contentBody`                                                                        |
+| 5.9  | `lessonWords`    | Every teaching lesson has at least 400 words                                                                                                                                                          | lesson `contentBody`                                                                        |
+| 5.10 | `visual`         | Every teaching lesson carries a visual                                                                                                                                                                | body tags or `image`/`video` resource                                                       |
+| 5.11 | `metricExample`  | Every teaching lesson contains at least one number with a metric unit                                                                                                                                 | lesson `contentBody`                                                                        |
+| 5.12 | `practical`      | Courses at L2/L3, and every course with `meta.designation`, have a practical task: `data/seed/<slug>-assessment.json` with instructions and at least 3 rubric criteria                                | seed file (matches `LmsPracticalAssessment`)                                                |
+| 5.13 | `australian`     | No US spelling, US voltage or US circuit framing anywhere in the course copy                                                                                                                          | `findUsForms` from `scripts/check-au-english.mjs`                                           |
+| 5.14 | `licence`        | No banned IICRC phrasing in the course copy; `cecHours` is 0 unless the slug is approved in `data/seed/cec-approvals.json`; a course with `meta.designation` has `iicrcDiscipline: null`              | `scanText` from `scripts/check-iicrc-terminology.mjs`, `cec-approvals.json`                 |
+| 5.15 | `plainText`      | Plain-text fields (course title, `shortDescription`, module and lesson titles, resource labels) hold no raw HTML entity such as `&rsquo;`; a lesson titled "Module N reference card" sits in module N | catalogue entry                                                                             |
 
 ### Designation pass mark (founder decision 02/11/2026)
 

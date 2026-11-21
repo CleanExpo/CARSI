@@ -1,2 +1,2 @@
-/** @deprecated Import {@link CcwBusinessCoachingClient} or {@link CcwWorkshopClient} directly. */
+/** @deprecated Import {@link CcwBusinessCoachingClient} directly. */
 export { CcwBusinessCoachingClient as CcwTrainingClient } from '@/components/ccw/CcwBusinessCoachingClient';

@@ -85,6 +85,11 @@ jobs:
       - name: Australian-English guard self-test
         run: npm run test:au-english
 
+      # The seed script must refuse a run with no course slug (a whole-catalogue seed deletes
+      # learner progress), and the media workflow must refuse multi-line slug/limit inputs.
+      - name: Seed and media-input guard tests
+        run: npm run test:seed-guards
+
       # CARSI designation registry validity. This script existed but was run by NO workflow
       # (audited 2026-08-07) — a guard nothing invokes is not a guard. It validates that every
       # designation resolves to a real catalogue course, so a renamed or removed course cannot
@@ -196,8 +201,8 @@ jobs:
       - name: Guard enumeration self-test
         run: npm run test:guard-enumeration
 
-      # GP-680: the rule files moved to docs/agents/. Claude Code and Cursor only auto-load
-      # their own entry points, so .claude/CLAUDE.md and .cursor/rules/carsi-agent-rules.mdc
+      # GP-680: the rule files moved to docs/agents/. Claude Code and Codex only auto-load
+      # their own entry points, so .claude/CLAUDE.md and ./AGENTS.md
       # must keep pointing at the licence and premium-visual rules, or agents work without them.
       - name: Agent rule entry-point self-test
         run: npm run test:agent-doc-paths
@@ -251,6 +256,37 @@ jobs:
       # Course Standard v1 (docs/content/COURSE_STANDARD.md). Report-only for courses that have
       # not opted in; a course with meta.standard "v1" that drops below any floor fails here.
       # The self-test proves the audit still fails a below-floor v1 course and ignores the rest.
+      # Gate 0 (CDC directive): no verified evidence contract = no course generation. The
+      # ledger contract and its rule-by-rule mutation proof already existed; until now nothing
+      # ran them in CI, and the validator defaulted to the 31-entry audit ledger, so the 1020
+      # entries under data/courses/ were never checked. All three steps below are BLOCKING.
+      - name: Gate 0 evidence ledgers
+        run: npm run check:evidence-ledgers
+
+      # Non-vacuity: a bad entry in any one ledger must fail the whole run, an empty tree must
+      # fail, and a clean tree must still pass.
+      - name: Gate 0 evidence ledger fan-out self-test
+        run: npm run test:evidence-ledgers
+
+      # The validator's own negative control: every registry rule observed firing against a
+      # planted mutant. Proves the contract can reject, not merely parse.
+      - name: Evidence ledger validator mutation suite
+        run: npm run test:ledger-mutants
+
+      # W0a per-course ledger check (spec 11, AC-W0-8). BLOCKING for exit codes 3-6 (schema,
+      # orphan, founder-only breach, cut not applied) over every ledger under data/courses, with
+      # no path filter. GAP counts are printed by the report step and are NOT blocking until a
+      # course's go-live PR (--max-gap=0 is that PR's own check). The test step proves each rule
+      # fires and that removing any one rule turns its case red.
+      - name: W0a evidence ledger check
+        run: npm run check:evidence-ledger
+
+      - name: W0a evidence ledger counts (report)
+        run: npm run report:evidence-ledger
+
+      - name: W0a evidence ledger check tests
+        run: npm run test:evidence-ledger
+
       - name: Course Standard depth audit
         run: npm run check:course-standard
 
@@ -424,8 +460,13 @@ jobs:
       # Seed the course catalogue so the data-dependent journeys in
       # e2e/carsi-journeys.spec.ts (course list, WRT filter, "Carpet" search,
       # course detail by slug) run against real data instead of an empty DB.
+      #
+      # db:seed-courses is now the SAFE IMPORTER (scripts/import-course-safe.ts), not the
+      # delete-and-recreate seeder. It reconciles, and it is a dry run until asked to write, so
+      # --apply is required and --all is still explicit. On this fresh database every course is
+      # an add: nothing to reconcile, no progress to protect, no stub to refuse.
       - name: Seed course catalogue for E2E
-        run: npm run db:seed-courses
+        run: npm run db:seed-courses -- --all --apply
 
       # Seed the deterministic E2E student (student@carsi.com.au / student123) and
       # enrol them in the first catalogue course. Must run AFTER db:seed-courses so
@@ -436,7 +477,7 @@ jobs:
 
       - name: Cache Playwright browsers
         id: playwright-cache
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('package.json') }}
@@ -511,3 +552,100 @@ jobs:
           path: test-results/
 
   # accessibility-tests job removed — Playwright a11y specs lived under tests/ (deleted).
+
+  # ------------------------------------------------------------------------------------------
+  # Learner data protection.
+  #
+  # These four suites are the only evidence that a course re-import cannot destroy learner
+  # progress or curriculum, and every one of them needs a real Postgres: the guarantees rest on
+  # row-lock conflicts, SERIALIZABLE aborts and foreign-key cascades, none of which can be
+  # demonstrated against a mock.
+  #
+  # Its OWN Postgres service, deliberately not shared with E2E. These suites mutate the
+  # catalogue — the empty-curriculum guard runs whole-catalogue seeds and depopulates a
+  # course to prove the refusal — so sharing a database with the E2E specs would make one job's
+  # fixtures the other job's flake.
+  # ------------------------------------------------------------------------------------------
+  learner-data-protection:
+    name: Learner Data Protection
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    needs: [frontend-tests]
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: root
+          POSTGRES_DB: carsi
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U root"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      # root is the service container's superuser. The race suite reads another backend's
+      # application_name and query from pg_stat_activity to prove the importer is the session
+      # blocked on its lock; a non-superuser without pg_read_all_stats sees those as NULL. That
+      # fails closed — the probe matches nothing and the assertion fails — but if this role ever
+      # changes, that is the reason why.
+      DATABASE_URL: postgresql://root:root@localhost:5432/carsi
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # The suites drive psql directly: two real sessions are the only way to show that one
+      # blocks the other, or that a serializable transaction aborts.
+      - name: Ensure a psql client
+        run: psql --version || (sudo apt-get update && sudo apt-get install -y postgresql-client)
+
+      - name: Apply Prisma migrations
+        run: npx prisma migrate deploy
+
+      # Real curriculum to protect — and the job's first assertion in its own right. 34 of the
+      # 80 catalogue entries have no modules, and the new guards refuse to let one of those empty
+      # a populated course. On a FRESH database nothing has curriculum yet, so the guards must be
+      # no-ops and this whole-catalogue seed must still succeed. If this step fails, the guard is
+      # over-firing, and it would have broken the E2E job's own seed step too.
+      - name: Seed the catalogue (proves the guards are no-ops on a fresh database)
+        run: npm run db:seed-courses -- --all --apply
+
+      # Order is deliberate: each suite leaves the database usable for the next, and the guard
+      # suite runs last because its final act is a full re-seed.
+      #
+      # Each runs through scripts/ci-db-suite.sh, which fails the job if a suite SKIPPED or ran
+      # only PARTIALLY. The suites exit 0 when they find no database, by design, so that a
+      # developer running them by hand is told rather than failed — without this wrapper a
+      # dropped env block would give a green job that exercised nothing.
+      # First, because it is the only suite that does not depend on the seed step above having
+      # worked: it creates and migrates a database of its own and seeds that. Adopting the
+      # importer as db:seed-courses broke exactly this path -- the importer did not create the
+      # instructor row that lms_courses.instructor_id requires -- and every other suite here
+      # passed anyway, because they all run against a database something else had already seeded.
+      - name: Cold start - the default seed path on a schema-only database
+        run: bash scripts/ci-db-suite.sh test:import-course-bootstrap
+
+      - name: Learner progress survives a course re-import
+        run: bash scripts/ci-db-suite.sh test:import-course
+
+      - name: Lock and isolation semantics the progress guard rests on
+        run: bash scripts/ci-db-suite.sh test:import-course-locks
+
+      - name: A concurrent id collision cannot take another course's curriculum
+        run: bash scripts/ci-db-suite.sh test:import-course-race
+
+      - name: A metadata-only catalogue stub cannot empty a real curriculum
+        run: bash scripts/ci-db-suite.sh test:empty-curriculum-guard

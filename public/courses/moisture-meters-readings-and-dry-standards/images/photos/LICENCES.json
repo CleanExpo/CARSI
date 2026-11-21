@@ -1,0 +1,46 @@
+[
+ {
+  "file": "protimeter-mini-pin.webp",
+  "maker": "Protimeter",
+  "model": "Mini (older LED-scale model)",
+  "source_url": "https://www.flickr.com/photos/117017126@N08/12413454315",
+  "author": "George Fryd",
+  "licence": "CC BY 2.0",
+  "licence_url": "https://creativecommons.org/licenses/by/2.0/",
+  "retrieved": "20/11/2026",
+  "modified": "resized and converted to WebP"
+ },
+ {
+  "file": "trotec-t3000-electrodes.webp",
+  "maker": "Trotec",
+  "model": "T3000",
+  "source_url": "https://commons.wikimedia.org/wiki/File:Maeder-Hygrometer-measuring-moisture_meter_Trotec_T3000-02ASD.jpg",
+  "author": "Asurnipal",
+  "licence": "CC BY-SA 4.0",
+  "licence_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "retrieved": "20/11/2026",
+  "modified": "resized and converted to WebP"
+ },
+ {
+  "file": "wagner-orion-950-pinless.webp",
+  "maker": "Wagner Meters",
+  "model": "Orion 950",
+  "source_url": "https://commons.wikimedia.org/wiki/File:Wood_moisture_meter_reading_for_wikipedia.jpg",
+  "author": "Hrco",
+  "licence": "CC BY-SA 4.0",
+  "licence_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "retrieved": "20/11/2026",
+  "modified": "resized and converted to WebP"
+ },
+ {
+  "file": "remote-thermo-hygrometer.webp",
+  "maker": "not shown",
+  "model": "remote thermo-hygrometer sensor (no maker shown)",
+  "source_url": "https://commons.wikimedia.org/wiki/File:Remote_Thermo-_Hygrometer_(26457297311).jpg",
+  "author": "FaceMePLS",
+  "licence": "CC BY 2.0",
+  "licence_url": "https://creativecommons.org/licenses/by/2.0/",
+  "retrieved": "20/11/2026",
+  "modified": "resized and converted to WebP"
+ }
+]

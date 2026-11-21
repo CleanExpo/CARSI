@@ -13,11 +13,11 @@ import sys
 import psycopg
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from dburl import from_env  # noqa: E402  accepts every DigitalOcean format, prints none
+from dburl import connect, from_env  # noqa: E402  accepts every DigitalOcean format, prints none
 
 url, path = from_env(), sys.argv[1]
 sql = open(path, encoding="utf-8").read()
-with psycopg.connect(url, connect_timeout=15, autocommit=False) as conn:
+with connect(psycopg, url) as conn:
     conn.add_notice_handler(lambda d: print(f"NOTICE: {d.message_primary}"))
     with conn.cursor() as cur:
         cur.execute("SET LOCAL statement_timeout = '60s'")

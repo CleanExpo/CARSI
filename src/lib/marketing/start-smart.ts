@@ -151,7 +151,7 @@ export const startSmartLeadPaths: StartSmartLeadPath[] = [
     id: 'ccw-workshop',
     title: 'Ask about CCW hands-on workshop support',
     body: 'For learners who need practical equipment, service, chemical and operator decision support connected to CCW training.',
-    href: '/ccw-training/workshop?utm_source=start-smart&utm_medium=organic&utm_campaign=ccw_hands_on_workshop',
+    href: '/workshops/carpet-cleaning?utm_source=start-smart&utm_medium=organic&utm_campaign=ccw_hands_on_workshop',
     label: 'View CCW workshop',
     topic: 'CCW hands-on carpet cleaning workshop',
     intent: 'ccw-workshop',
@@ -751,7 +751,7 @@ export const startSmartPages: StartSmartPage[] = [
     cta: {
       title: 'Learn the work before the machine',
       body: 'A machine is only useful when the operator understands why, when and how to use it.',
-      href: '/ccw-training/workshop',
+      href: '/workshops/carpet-cleaning',
       label: 'View CCW-linked training',
     },
     faqs: [

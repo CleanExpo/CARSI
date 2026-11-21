@@ -339,7 +339,7 @@ export async function sendCcwRoadshowBookingConfirmationEmail(params: {
   try {
     const result = await sendEmail({
       to: params.to,
-      subject: `Booking confirmed — CARSI x CCW ${params.eventCity}`,
+      subject: `Booking confirmed — CARSI Roadshow ${params.eventCity}`,
       html,
       text,
     });
@@ -457,7 +457,7 @@ export async function sendCcwRoadshowOrganizerNotificationEmail(params: {
     .join('');
 
   const text = [
-    `New CARSI x CCW ${params.eventCity} registration — ${statusLabel}`,
+    `New CARSI Roadshow ${params.eventCity} registration — ${statusLabel}`,
     '',
     `Event: ${params.eventCity} (${params.dateRangeLabel})`,
     `Status: ${statusLabel}`,
@@ -474,7 +474,7 @@ export async function sendCcwRoadshowOrganizerNotificationEmail(params: {
 
   const html = `
     <div style="font-family:system-ui,Segoe UI,Arial,sans-serif;font-size:14px;color:#0f172a;">
-      <h2 style="margin:0 0 12px;">New CARSI x CCW ${esc(params.eventCity)} registration — ${statusLabel}</h2>
+      <h2 style="margin:0 0 12px;">New CARSI Roadshow ${esc(params.eventCity)} registration — ${statusLabel}</h2>
       <p style="margin:0 0 4px;"><strong>Event:</strong> ${esc(params.eventCity)} (${esc(params.dateRangeLabel)})</p>
       <p style="margin:0 0 4px;"><strong>Status:</strong> ${statusLabel}</p>
       <p style="margin:0 0 4px;"><strong>Seats:</strong> ${params.seatCount}</p>
@@ -676,7 +676,7 @@ export async function sendCcwRoadshowOfferPackEmail(params: {
 
   return sendEmail({
     to: params.to,
-    subject: `Thanks for ${params.eventCity} — your CCW/CARSI offers`,
+    subject: `Thanks for ${params.eventCity} — your CARSI roadshow offers`,
     html,
     text,
   });

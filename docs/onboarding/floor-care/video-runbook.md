@@ -58,7 +58,7 @@ npm run video:lessons:generate -- --slug=floor-care-onboarding-operational-readi
 npm run video:lessons:generate -- --slug=floor-care-onboarding-operational-readiness --yes
 
 # 5. Import the new video links into the DB:
-npm run db:seed-courses        # (against the target DATABASE_URL)
+npm run db:seed-floor-care-course   # (against the target DATABASE_URL; --slug + --apply)
 ```
 
 The generated SRT tracks are also written to `output/course-video/captions/<lessonId>.<locale>.srt`.

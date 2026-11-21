@@ -15,6 +15,7 @@ import {
 } from '@/lib/marketing/marketing-ui';
 import { OG_IMAGES, OG_IMAGE_URLS } from '@/lib/seo/og-image';
 import { formatCecCountLabel } from '@/lib/cec-display';
+import { OG_LOCALE_FIELDS } from '@/lib/seo/locale';
 
 export const dynamic = 'force-dynamic';
 
@@ -90,7 +91,7 @@ export async function generateMetadata({
       url: canonical,
       siteName: 'CARSI',
       images: OG_IMAGES,
-      locale: 'en_AU',
+      ...OG_LOCALE_FIELDS,
       type: 'website',
     },
     twitter: {

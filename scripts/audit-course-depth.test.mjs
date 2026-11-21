@@ -21,6 +21,7 @@ import {
   loadContext,
   decide,
   FLOORS,
+  FLOOR_ABBR,
   ROLE_PATHS,
   hasPartHeading,
   isFieldDownload,
@@ -207,7 +208,65 @@ const KNOCKOUTS = [
     'banned IICRC selling phrase in the description',
     (c) => (c.description = 'Get IICRC certified with CARSI in one weekend.'),
   ],
+  [
+    'plainText',
+    'raw HTML entity in a lesson title',
+    (c) => (teachingLessons(c)[0].title = 'Species correction: the maker&rsquo;s table'),
+  ],
+  [
+    'plainText',
+    'numeric HTML entity in a module title',
+    (c) => (c.modules[0].title = 'Readings &#8212; what they mean'),
+  ],
+  [
+    'plainText',
+    'hex HTML entity in a lesson title',
+    (c) => (teachingLessons(c)[0].title = 'Readings &#x2014; what they mean'),
+  ],
+  [
+    'plainText',
+    'two-letter named entity in a lesson title',
+    (c) => (teachingLessons(c)[0].title = 'Readings &lt; 15%'),
+  ],
+  [
+    'plainText',
+    'reference card numbered for another module',
+    (c) => (teachingLessons(c)[0].title = 'Module 4 reference card: corrections'),
+  ],
+  [
+    'plainText',
+    'misnumbered reference card with a leading space',
+    (c) => (teachingLessons(c)[0].title = ' Module 4 reference card: corrections'),
+  ],
+  [
+    'plainText',
+    'misnumbered reference card with a double space',
+    (c) => (teachingLessons(c)[0].title = 'Module 4  reference card: corrections'),
+  ],
 ];
+
+test('plainText passes: a letter after "&" with a semicolon is ordinary text, not an entity', () => {
+  for (const t of ['R&D; methods', 'Q&A; session', 'AT&T; training', 'Q&As; worked examples']) {
+    const c = clone();
+    teachingLessons(c)[0].title = t;
+    const s = scoreCourse(c, ctx);
+    assert.equal(s.floors.plainText.ok, true, `${t}: ${s.floors.plainText.why}`);
+  }
+});
+
+test('every floor has a label for the text table', () => {
+  assert.deepEqual(
+    FLOORS.filter((f) => !FLOOR_ABBR[f]),
+    []
+  );
+});
+
+test('plainText passes: a reference card numbered for its own module, and a real apostrophe', () => {
+  const c = clone();
+  c.modules[1].lessons[0].title = 'Module 2 reference card: the maker’s table';
+  const s = scoreCourse(c, ctx);
+  assert.equal(s.floors.plainText.ok, true, s.floors.plainText.why);
+});
 
 for (const [floor, label, mutate, makeCtx] of KNOCKOUTS) {
   test(`${floor} fails: ${label}`, () => {

@@ -62,7 +62,9 @@ function loadCatalog(): CoursesCatalogFile {
   const raw = readFileSync(CATALOG_PATH, 'utf8');
   const data = JSON.parse(raw) as unknown;
   if (!isCoursesCatalogFile(data)) {
-    throw new Error('Invalid courses-catalog.json: cannot resolve a course to enrol the E2E user in.');
+    throw new Error(
+      'Invalid courses-catalog.json: cannot resolve a course to enrol the E2E user in.'
+    );
   }
   return data;
 }
@@ -82,7 +84,10 @@ async function ensureStudentRole(userId: string): Promise<void> {
   } catch (e) {
     // Role wiring is best-effort: the user's `role` column ('student') already
     // drives session-role resolution. Don't fail the seed on a race/duplicate.
-    console.warn('[seed-e2e-user] student role wiring skipped:', e instanceof Error ? e.message : e);
+    console.warn(
+      '[seed-e2e-user] student role wiring skipped:',
+      e instanceof Error ? e.message : e
+    );
   }
 }
 
@@ -96,7 +101,8 @@ async function main() {
   const course = catalog.courses[0];
   if (!course) {
     console.error(
-      'No courses in catalogue. Run `npm run db:seed-courses` first so the E2E user has a course to enrol in.'
+      'No courses in catalogue. Run `npm run db:seed-courses -- --all --apply` first so the ' +
+        'E2E user has a course to enrol in.'
     );
     process.exit(1);
   }
@@ -135,7 +141,8 @@ async function main() {
   });
   if (!dbCourse) {
     console.error(
-      `Course "${course.slug}" not found in DB. Run \`npm run db:seed-courses\` before this script.`
+      `Course "${course.slug}" not found in DB. Run ` +
+        `\`npm run db:seed-courses -- --slug=${course.slug} --apply\` before this script.`
     );
     process.exit(1);
   }

@@ -10,6 +10,13 @@ import { decideEnrollmentCompleted } from '@/lib/server/lms-completion';
 import { isEnrolmentAccessAllowed, isRevokedStatus } from '@/lib/server/enrollment-access';
 import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
 import {
+  isAdminClaims,
+  isCohortOnlyCourse,
+  isInstructorClaims,
+  mayIssueEnrolment,
+  shouldStaffAutoEnrol,
+} from '@/lib/server/carsi-workshop-access';
+import {
   isAdminOverridePaymentReference,
   isStripeCheckoutPaymentReference,
 } from '@/lib/lms/course-prerequisites';
@@ -64,6 +71,13 @@ export async function enrollStudentInCourse(
 ): Promise<EnrollResult> {
   await ensureLmsUserFromClaims(claims);
   const course = await getOrCreateCourseBySlug(slug);
+
+  // Cohort-only courses (the CARSI roadshow workshop): learners enter only through the
+  // attendance check-in or an admin. Refused here, in the shared writer, so no free-confirm,
+  // membership, team or Stripe route can issue or reactivate one (GP-736 review, P0).
+  if (!mayIssueEnrolment(course.slug ?? slug, paymentReference)) {
+    throw new Error('COURSE_NOT_SELF_ENROLABLE');
+  }
 
   const existing = await prisma.lmsEnrollment.findUnique({
     where: {
@@ -205,7 +219,28 @@ export async function getCourseIdForLesson(lessonId: string): Promise<string | n
   return lesson?.module.courseId ?? null;
 }
 
-async function lessonTotalsForCourse(courseId: string): Promise<{ ids: string[]; total: number }> {
+/**
+ * Staff access for a lesson: admins (any course) and instructors (allow-listed courses only,
+ * see `carsi-workshop-access.ts`) receive a no-purchase enrolment before the normal
+ * enrolment check runs. Everyone else is untouched and must hold their own enrolment.
+ */
+export async function ensureStaffEnrollmentForLesson(
+  claims: SessionClaims,
+  lessonId: string
+): Promise<void> {
+  if (!isAdminClaims(claims) && !isInstructorClaims(claims)) return;
+  const lesson = await prisma.lmsLesson.findUnique({
+    where: { id: lessonId },
+    select: { module: { select: { course: { select: { id: true, slug: true } } } } },
+  });
+  const course = lesson?.module.course;
+  if (!course || !shouldStaffAutoEnrol(claims, course.slug)) return;
+  await ensureAdminEnrollmentForCourse(claims, course.id);
+}
+
+async function lessonTotalsForCourse(
+  courseId: string
+): Promise<{ ids: string[]; total: number; slug: string | null }> {
   const course = await prisma.lmsCourse.findUnique({
     where: { id: courseId },
     include: {
@@ -215,7 +250,7 @@ async function lessonTotalsForCourse(courseId: string): Promise<{ ids: string[];
     },
   });
   const ids = course?.modules.flatMap((m) => m.lessons.map((l) => l.id)) ?? [];
-  return { ids, total: ids.length };
+  return { ids, total: ids.length, slug: course?.slug ?? null };
 }
 
 /** Admin/support: mark every lesson in an enrollment complete and sync enrollment status. */
@@ -300,7 +335,11 @@ export async function syncEnrollmentCompletion(
     bypassQuizGate?: boolean;
   },
 ): Promise<void> {
-  const { ids, total } = await lessonTotalsForCourse(courseId);
+  const { ids, total, slug } = await lessonTotalsForCourse(courseId);
+  // Cohort-only course: completion (and its certificate of attendance) is written only by
+  // the two-day attendance finalisation (ccw-attendance/provision.ts). Lessons and quizzes
+  // never complete it, and this sync never downgrades the attendance completion (GP-736).
+  if (isCohortOnlyCourse(slug)) return;
   const prior = await prisma.lmsEnrollment.findUnique({
     where: { id: enrollmentId },
     select: { completedAt: true, status: true },

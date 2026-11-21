@@ -14,13 +14,31 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');
 
 const DATA_SOURCES = [
-  { file: 'data/CARSI_Specialty_Courses_Collection.txt', seedScript: 'scripts/seed-carsi-specialty-courses-collection-txt.ts' },
-  { file: 'data/CONTENTS & SPECIALTY DRYING COURSES.txt', seedScript: 'scripts/seed-contents-specialty-drying-courses-txt.ts' },
-  { file: 'data/contents_specialty_drying_courses.txt', seedScript: 'scripts/seed-contents-specialty-drying-courses-txt.ts' },
-  { file: 'data/technology_inspection_tools_courses.txt', seedScript: 'scripts/seed-technology-inspection-tools-txt.ts' },
-  { file: 'data/specialty_courses_resources.txt', seedScript: 'scripts/seed-specialty-courses-resources-txt.ts' },
-  { file: 'data/water_damage_restoration_courses.txt', seedScript: 'scripts/seed-water-damage-txt.ts' },
-  { file: 'data/seed/courses-catalog.json', seedScript: 'scripts/seed-courses-catalog.ts' },
+  {
+    file: 'data/CARSI_Specialty_Courses_Collection.txt',
+    seedScript: 'scripts/seed-carsi-specialty-courses-collection-txt.ts',
+  },
+  {
+    file: 'data/CONTENTS & SPECIALTY DRYING COURSES.txt',
+    seedScript: 'scripts/seed-contents-specialty-drying-courses-txt.ts',
+  },
+  {
+    file: 'data/contents_specialty_drying_courses.txt',
+    seedScript: 'scripts/seed-contents-specialty-drying-courses-txt.ts',
+  },
+  {
+    file: 'data/technology_inspection_tools_courses.txt',
+    seedScript: 'scripts/seed-technology-inspection-tools-txt.ts',
+  },
+  {
+    file: 'data/specialty_courses_resources.txt',
+    seedScript: 'scripts/seed-specialty-courses-resources-txt.ts',
+  },
+  {
+    file: 'data/water_damage_restoration_courses.txt',
+    seedScript: 'scripts/seed-water-damage-txt.ts',
+  },
+  { file: 'data/seed/courses-catalog.json', seedScript: 'scripts/import-course-safe.ts' },
 ];
 
 function slugify(title: string): string {
@@ -93,7 +111,7 @@ function indexTxtCourses(path: string): Map<string, { title: string; moduleHeade
 }
 
 async function main() {
-  const sourceIndex = new Map<string, typeof DATA_SOURCES[number]>();
+  const sourceIndex = new Map<string, (typeof DATA_SOURCES)[number]>();
   for (const src of DATA_SOURCES) {
     const full = join(ROOT, src.file);
     const idx = indexTxtCourses(full);
@@ -128,7 +146,10 @@ async function main() {
           const full = join(ROOT, src.file);
           if (!existsSync(full)) continue;
           const raw = readFileSync(full, 'utf8');
-          if (raw.includes(baseTitle(c.title)) || raw.includes(c.title.split('|')[0]?.trim() ?? '')) {
+          if (
+            raw.includes(baseTitle(c.title)) ||
+            raw.includes(c.title.split('|')[0]?.trim() ?? '')
+          ) {
             source = src;
             break;
           }

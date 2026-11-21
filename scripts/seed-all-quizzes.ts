@@ -1,7 +1,8 @@
 /**
  * Seed course knowledge-check quizzes from the repo's seed data (GP-484), one course or all.
  *
- * USAGE (run AFTER `db:seed-courses` has created the target course):
+ * USAGE (run AFTER `db:seed-courses -- --slug=<course-slug> --apply` has created the target course;
+ * without --apply that command only previews and writes nothing):
  *   npm run db:seed-quizzes -- --slug=<course-slug> --dry-run   # preview, no DB connection
  *   npm run db:seed-quizzes -- --slug=<course-slug>             # seed ONLY that course
  *   npm run db:seed-quizzes -- --slug=<course-slug> --allow-draft
@@ -24,7 +25,7 @@
  * MANUAL ONLY — this does NOT run at deploy. The production boot path is `start:production`
  * (do-migrate.sh → node server.js), which applies Prisma migrations and never seeds course
  * content; the live DB is the source of truth for quizzes/courses (GP-503). `--all` also runs
- * inside the manual `start:with-course-seed` convenience script and keeps its original
+ * inside the removed `start:with-course-seed` boot script and keeps its original
  * fault-tolerant contract: a bad file or missing course is logged and skipped, exit 0.
  */
 import 'dotenv/config';

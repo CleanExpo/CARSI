@@ -6,7 +6,11 @@ import { defineConfig, devices } from '@playwright/test';
 // directory) must resolve from the repo root, where package.json and next.config.ts live.
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:3000';
+// GitHub never sets E2E_PORT*, so CI listens on 3000, 3100 and 3101. The release gate's local
+// CI mirror sets them to free ports, because on a shared Mac another session's dev server
+// often holds 3000 (UNI-3468).
+const MAIN_PORT = process.env.E2E_PORT || '3000';
+const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:${MAIN_PORT}`;
 
 /**
  * The membership checkout journeys (e2e/membership-checkout.spec.ts) need a server with the
@@ -15,7 +19,7 @@ const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:3000';
  * 3100 with the flag on, so the checkout journeys run in the normal gate. Locally, point
  * PLAYWRIGHT_MEMBERSHIP_BASE_URL at a flag-on server; without it the project is not defined.
  */
-const MEMBERSHIP_CI_PORT = 3100;
+const MEMBERSHIP_CI_PORT = process.env.E2E_PORT_2 || '3100';
 const membershipBaseURL =
   process.env.PLAYWRIGHT_MEMBERSHIP_BASE_URL ??
   (process.env.CI ? `http://localhost:${MEMBERSHIP_CI_PORT}` : undefined);
@@ -27,7 +31,7 @@ const MEMBERSHIP_SPEC = /e2e\/membership-checkout\.spec\.ts$/;
  * Flag-on tests carry the @survey-on tag and run only in the `purchase-survey` project; the
  * flag-off test in the same file runs in the default project.
  */
-const SURVEY_CI_PORT = 3101;
+const SURVEY_CI_PORT = process.env.E2E_PORT_3 || '3101';
 const surveyBaseURL =
   process.env.PLAYWRIGHT_SURVEY_BASE_URL ??
   (process.env.CI ? `http://localhost:${SURVEY_CI_PORT}` : undefined);
@@ -107,6 +111,7 @@ export default defineConfig({
       command: process.env.CI ? 'npm run build && npm run start' : 'npm run dev',
       url: baseURL,
       cwd: repoRoot,
+      env: { PORT: MAIN_PORT },
       reuseExistingServer: !process.env.CI,
       // CI runs a full production build inside the webServer; allow headroom so a
       // cold `next build` doesn't trip the startup timeout on slower runners.

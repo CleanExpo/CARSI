@@ -19,7 +19,7 @@ describe('renderEnrollmentWelcomeEmail — attendee offers', () => {
   const ccwOffer = {
     key: 'ccw-store-credit' as const,
     label: 'CCW attendee voucher',
-    detail: 'Purchase your CCW/CARSI 2-day training voucher.',
+    detail: 'Purchase your CARSI 2-day training voucher (sold through roadshow partner CCW).',
     url: 'https://ccwonline.com.au/products/ccw-carsi-2-day-in-house-training',
     live: true,
   };
@@ -159,7 +159,7 @@ describe('CCW offer pack — the Shopify CTA is omitted, never broken', () => {
       shopifyTrainingUrl: 'https://ccwonline.com.au/products/ccw-carsi-2-day-in-house-training',
     });
 
-    expect(html).toContain('View Shopify training product');
+    expect(html).toContain('View the training voucher');
     expect(html).toContain('https://ccwonline.com.au/products/ccw-carsi-2-day-in-house-training');
     expect(text).toContain('Shopify training product:');
   });
@@ -170,7 +170,7 @@ describe('CCW offer pack — the Shopify CTA is omitted, never broken', () => {
       shopifyTrainingUrl: null,
     });
 
-    expect(html).not.toContain('View Shopify training product');
+    expect(html).not.toContain('View the training voucher');
     expect(html).not.toContain('Shopify —');
     expect(text).not.toContain('Shopify training product:');
     // The rest of the pack must still send.

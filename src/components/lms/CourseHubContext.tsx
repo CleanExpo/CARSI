@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { getBackendOrigin } from '@/lib/env/public-url';
 
@@ -52,12 +53,12 @@ export function CourseHubContext({ slug }: CourseHubContextProps) {
       <ul className="flex flex-wrap gap-2" aria-label="Related job keywords">
         {data.job_keywords.map((keyword) => (
           <li key={keyword}>
-            <a
-              href={`/hub/jobs?q=${encodeURIComponent(keyword)}`}
+            <Link
+              href="/jobs"
               className="inline-block rounded-full bg-[#eef5fb] px-3 py-1 text-xs font-medium text-[#146fc2] transition-colors hover:bg-[#dbebff]"
             >
               {keyword}
-            </a>
+            </Link>
           </li>
         ))}
       </ul>

@@ -96,7 +96,7 @@ function loadApprovedCecSlugs(): Set<string> {
     return new Set(
       parsed.approvals
         .filter((e) => e && e.status === 'approved' && typeof e.slug === 'string' && e.slug.trim())
-        .map((e) => (e.slug as string).trim()),
+        .map((e) => (e.slug as string).trim())
     );
   } catch {
     return new Set(); // fail-closed: unreadable registry → no accredited styling
@@ -116,7 +116,8 @@ const CEC_SIGNATURE = {
     'subject and a subtle radial gold glow in the darker upper region — so every accredited ' +
     'course shares the same recognisable distinguished look.',
   // Reinforce the mark ban: no invented seal/badge that could read as an IICRC mark.
-  negative: 'no seals, no badges, no medallions, no crests, no emblems, no ribbons, no stamps, no shields',
+  negative:
+    'no seals, no badges, no medallions, no crests, no emblems, no ribbons, no stamps, no shields',
 };
 
 // Prisma is loaded lazily: --plan, --dry-run and the default seed-JSON source need no DB,
@@ -537,7 +538,14 @@ async function generate(timestamp: string): Promise<void> {
       if (persist === 'db' || persist === 'both') await persistToDb(brief.slug, url);
       if (persist === 'seed' || persist === 'both') seedUpdates.set(brief.slug, url);
 
-      upsertResult({ slug: brief.slug, status: 'done', url, publicId, promptHash, generatedAt: timestamp });
+      upsertResult({
+        slug: brief.slug,
+        status: 'done',
+        url,
+        publicId,
+        promptHash,
+        generatedAt: timestamp,
+      });
       await writeJson(RESULTS_PATH, results); // write-after-each (resumable)
       ok += 1;
       console.log(`✓ ${brief.slug} → ${url}`);
@@ -552,7 +560,9 @@ async function generate(timestamp: string): Promise<void> {
   if (seedUpdates.size) {
     const changed = await persistToSeed(seedUpdates);
     console.log(`Updated ${changed} thumbnailUrl(s) in ${CATALOG_PATH}.`);
-    console.log('Next: run `npm run db:seed-courses` to import the new thumbnails into the DB.');
+    console.log(
+      'Next: run `npm run db:seed-courses -- --slug=<slug> --apply` to import the new thumbnails.'
+    );
   }
   console.log(`\nDone. ${ok}/${queue.length} generated.`);
 }

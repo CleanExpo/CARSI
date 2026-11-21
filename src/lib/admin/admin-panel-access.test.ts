@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import type { SessionClaims } from '@/lib/auth/session-jwt';
 
 import {
+  getPostLoginRedirectPath,
   getReservedStaffEmails,
   isLmsClaimsAllowedAdminPanel,
   isReservedStaffEmail,
@@ -53,5 +54,25 @@ describe('admin-panel-access', () => {
     const set = getReservedStaffEmails();
     expect(set.has('phill.m@carsi.com.au')).toBe(true);
     expect(set.has('extra@carsi.com.au')).toBe(true);
+  });
+});
+
+/** GP-591: sign-in honours `next` only when it is a same-origin path (one rule: safeNextPath). */
+describe('getPostLoginRedirectPath', () => {
+  const learner = claims('learner@example.com');
+
+  it('returns the learner to the course they came from', () => {
+    expect(getPostLoginRedirectPath(learner, '/courses/intro?ref=x')).toBe('/courses/intro?ref=x');
+  });
+
+  it.each(['/\\evil.example', '//evil.example', 'https://evil.example', '', null])(
+    'refuses unsafe next %j and uses the default path',
+    (next) => {
+      expect(getPostLoginRedirectPath(learner, next)).toBe('/dashboard/student');
+    },
+  );
+
+  it('still keeps non-admins out of /admin', () => {
+    expect(getPostLoginRedirectPath(learner, '/admin/courses')).toBe('/dashboard/student');
   });
 });

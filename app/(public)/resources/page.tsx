@@ -9,6 +9,7 @@ import {
 import { RESOURCES_HEADING_ID, ResourcesBrowser } from '@/components/resources/ResourcesBrowser';
 import { ItemListSchema } from '@/components/seo/JsonLd';
 import { FREE_RESOURCES } from '@/lib/resources/free-resources';
+import { OG_LOCALE_FIELDS } from '@/lib/seo/locale';
 
 const pageUrl = 'https://carsi.com.au/resources';
 
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
       'Open-licence government guides on moisture, ventilation, timber, flood recovery and mould, linked to the official publisher.',
     url: pageUrl,
     siteName: 'CARSI',
-    locale: 'en_AU',
+    ...OG_LOCALE_FIELDS,
     type: 'website',
   },
 };

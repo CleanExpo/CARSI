@@ -16,7 +16,7 @@ vi.mock('@/lib/server/ccw-roadshow-booking-email', () => ({ processCcwRoadshowBo
 
 it('uses neutral success metadata for paid bookings and when no free sitting is open', () => {
   expect(successMetadata.title).toBe('Roadshow Booking Status');
-  expect(successMetadata.description).toBe('Booking status for CARSI x CCW Business Growth Days.');
+  expect(successMetadata.description).toBe('Booking status for CARSI Business Growth Days.');
   expect(JSON.stringify(successMetadata)).not.toMatch(/\bfree\b/i);
 });
 

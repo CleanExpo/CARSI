@@ -33,6 +33,8 @@ type Criterion = {
   label: string;
   description: string;
   maxPoints: number;
+  /** Must be met in full to pass; absent means false. */
+  critical?: boolean;
 };
 
 type AssessmentFile = {
@@ -83,7 +85,10 @@ async function main() {
     select: { id: true },
   });
   if (!course) {
-    throw new Error(`Course "${courseSlug}" not found. Run "npm run db:seed-courses" first.`);
+    throw new Error(
+      `Course "${courseSlug}" not found. Run ` +
+        `"npm run db:seed-courses -- --slug=${courseSlug} --apply" first.`
+    );
   }
 
   await prisma.lmsPracticalAssessment.upsert({
@@ -115,6 +120,7 @@ async function main() {
         description: c.description,
         maxPoints: c.maxPoints,
         orderIndex: i,
+        critical: c.critical === true,
       },
     });
   }

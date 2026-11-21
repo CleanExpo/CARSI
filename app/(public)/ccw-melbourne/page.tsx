@@ -29,21 +29,21 @@ export function generateMetadata(): Metadata {
     const description = getCcwNextDatesDescription('Melbourne');
     return {
       ...page,
-      title: 'CARSI x CCW Melbourne | Grow Your Cleaning Business — Next dates to be announced',
+      title: 'CARSI Roadshow Melbourne | Grow Your Cleaning Business — Next dates to be announced',
       description,
-      openGraph: { ...page.openGraph, title: 'CARSI x CCW Melbourne — Grow Your Cleaning Business', description },
+      openGraph: { ...page.openGraph, title: 'CARSI Roadshow Melbourne — Grow Your Cleaning Business', description },
     };
   }
   const melbourneDates = melbourne.dates;
   return {
     ...page,
-    title: `CARSI x CCW Melbourne | Grow Your Cleaning Business — ${melbourneDates}`,
+    title: `CARSI Roadshow Melbourne | Grow Your Cleaning Business — ${melbourneDates}`,
     description: isOpenFreeEntrySitting(melbourne, new Date())
       ? `Free for CCW past and current customers. Two practical business-growth days with Phill McGurk at ${melbourne.venueName} (${melbourne.suburb}), ${melbourneDates}. Claim your free entry token.`
       : `Two practical business-growth days with Phill McGurk at ${melbourne.venueName} (${melbourne.suburb}), ${melbourneDates}. Seats are booked through Carpet Cleaners Warehouse.`,
     openGraph: {
       ...page.openGraph,
-      title: 'CARSI x CCW Melbourne — Grow Your Cleaning Business',
+      title: 'CARSI Roadshow Melbourne — Grow Your Cleaning Business',
       description: `Two practical business-growth days with Phill McGurk at ${melbourne.venueName}, ${melbourneDates}.`,
     },
   };

@@ -1,5 +1,6 @@
 import { CourseViewTracker } from '@/components/analytics/CourseViewTracker';
 import { CoursePublicDetail } from '@/components/lms/CoursePublicDetail';
+import { CourseReferences } from '@/components/lms/CourseReferences';
 import { HomeFaqSection } from '@/components/landing/HomeFaqSection';
 import { BreadcrumbSchema, CourseSchema, FAQSchema, VideoObjectSchema } from '@/components/seo';
 import {
@@ -8,6 +9,7 @@ import {
 } from '@/lib/designations/registry';
 import { getBackendOrigin, getPublicSiteUrl } from '@/lib/env/public-url';
 import { stripLegacyPurchaseCta } from '@/lib/lms/format-course-body';
+import { getCourseReferences } from '@/lib/seo/course-references-index';
 import { hasPublicCoursePage } from '@/lib/seo/public-course-page';
 import { normalizePublicAssetUrl } from '@/lib/remote-image';
 import {
@@ -24,6 +26,7 @@ import { getPublishedCourseDetailBySlugFromDatabase } from '@/lib/server/public-
 import { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import { formatCecHoursForDisplay } from '@/lib/cec-display';
+import { OG_LOCALE_FIELDS } from '@/lib/seo/locale';
 
 // ISR: render each course detail on demand and cache for 5 minutes (issue #129).
 // Build-safe via the build-phase guard in getCourse's DB reader; publish busts the
@@ -204,7 +207,7 @@ export async function generateMetadata({
       images: thumbnailUrl
         ? [{ url: thumbnailUrl, width: 1200, height: 630, alt: imageAlt }]
         : OG_IMAGES,
-      locale: 'en_AU',
+      ...OG_LOCALE_FIELDS,
       type: 'website',
     },
     twitter: {
@@ -352,6 +355,8 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
         }
         aggregateRating={aggregateRating}
       />
+      {/* BACKLOG #22: only the sources the lessons themselves cite; nothing when there are none. */}
+      <CourseReferences references={getCourseReferences(course.slug)} />
       {courseFaqs.length > 0 ? (
         <HomeFaqSection
           faqs={courseFaqs}

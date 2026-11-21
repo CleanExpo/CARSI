@@ -35,9 +35,11 @@ be authored. It cannot introduce a new factual claim.
 
 ```
    ┌── 1. scaffold ──┐   ┌── 2. truth-gate ──┐   ┌── 3. generate ──┐   ┌── 4. attach ──┐   ┌── 5. seed ──┐
-   │ course-asset-kit │→ │ human author fills │→ │ spend scripts    │→ │ resources on   │→ │ deploy runs  │
-   │ --generate       │   │ empty fields, SME  │   │ (voice, thumbs,  │   │ lessons in the │   │ db:seed-*    │
-   │ (this tool)      │   │ review, AU/IICRC   │   │ video) if needed │   │ catalogue      │   │ on boot      │
+   │ course-asset-kit │→ │ human author fills │→ │ spend scripts    │→ │ resources on   │→ │ someone runs │
+   │ --generate       │   │ empty fields, SME  │   │ (voice, thumbs,  │   │ lessons in the │   │ db:seed-     │
+   │                  │   │                    │   │                  │   │                │   │ courses      │
+   │ (this tool)      │   │ review, AU/IICRC   │   │ video) if needed │   │ catalogue      │   │ --slug +     │
+   │                  │   │                    │   │                  │   │                │   │ --apply (§5) │
    └──────────────────┘   └────────────────────┘   └──────────────────┘   └────────────────┘   └─────────────┘
 ```
 
@@ -96,10 +98,12 @@ npm run db:thumbnails:plan && npm run db:thumbnails:generate   # course thumbnai
 
 Attach the finished flashcards/slides/audio/image/video as lesson `resources` in
 `data/seed/courses-catalog.json` (see `src/lib/lms/lesson-resources.ts` for the shapes
-the player renders), then let the deploy boot path seed them:
+the player renders), then import them. Boot seeding is gone -- `start:with-course-seed` was removed -- so this is a
+step someone runs deliberately:
 
 ```bash
-npm run db:seed-courses    # imports the catalogue (incl. attached resources)
+npm run db:seed-courses -- --slug=<slug>           # preview one course; writes nothing
+npm run db:seed-courses -- --slug=<slug> --apply   # import it (incl. attached resources)
 npm run db:seed-quizzes -- --slug=<slug> --dry-run   # preview one course's quiz file(s)
 npm run db:seed-quizzes -- --slug=<slug>             # imports that course's quiz file(s) only
 ```

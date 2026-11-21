@@ -3,6 +3,7 @@ import { PDFDocument } from 'pdf-lib';
 import { CERT_ART_HEIGHT, CERT_ART_WIDTH } from '@/lib/certificate/CertificateArt';
 import { renderCertificatePng } from '@/lib/certificate/render-certificate-png';
 import { certificateHolderDisplayName } from '@/lib/server/certificate-name';
+import { certificateKindForCourseSlug } from '@/lib/server/carsi-workshop-access';
 import { resolveLmsCourseCecHours, type LmsCourseCecSource } from '@/lib/server/course-cec-hours';
 
 export type CompletionCertificateData = {
@@ -14,6 +15,7 @@ export type CompletionCertificateData = {
   resolvedCecHours?: number | null;
   courseLevel?: string | null;
   credentialId?: string;
+  certificateKind?: 'completion' | 'attendance';
 };
 
 function formatAuDate(d: Date): string {
@@ -37,6 +39,7 @@ export async function buildCompletionCertificatePdf(
     credentialId: params.credentialId,
     cecHoursLabel: params.resolvedCecHours,
     courseLevel: params.courseLevel,
+    certificateKind: params.certificateKind,
   });
 
   const doc = await PDFDocument.create();
@@ -91,5 +94,6 @@ export function completionCertificateDataFromEnrollment(
     resolvedCecHours: resolveLmsCourseCecHours(cecSource),
     courseLevel: row.course.level,
     credentialId: row.id,
+    certificateKind: certificateKindForCourseSlug(row.course.slug),
   };
 }

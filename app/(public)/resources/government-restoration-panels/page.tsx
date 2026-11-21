@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 
 import { GovGuideForm } from '@/components/lead-magnet/GovGuideForm';
 import { leadMagnetEnabled } from '@/lib/server/lead-magnet-flag';
+import { OG_LOCALE_FIELDS } from '@/lib/seo/locale';
 
 const pageUrl = 'https://carsi.com.au/resources/government-restoration-panels';
 
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
       'Free guide for Australian restoration contractors pursuing government panel work — procurement, certifications, WHS compliance and a 90-day action plan.',
     url: pageUrl,
     siteName: 'CARSI',
-    locale: 'en_AU',
+    ...OG_LOCALE_FIELDS,
     type: 'article',
   },
 };

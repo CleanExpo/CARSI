@@ -29,9 +29,9 @@ export const marketingGrowthLinks: MarketingGrowthLink[] = [
   },
   {
     href: ccwRoadshowPath,
-    label: 'CCW Roadshow',
+    label: 'CARSI Roadshow',
     title: 'Business Growth Days',
-    detail: 'Melbourne & Sydney — practical in-person growth with CCW',
+    detail: 'Melbourne & Sydney — practical in-person growth days with roadshow partner CCW',
     icon: Ticket,
   },
   {
@@ -50,7 +50,7 @@ export const marketingGrowthLinks: MarketingGrowthLink[] = [
   },
   {
     href: ccwWorkshopPath,
-    label: 'CCW Workshop',
+    label: 'CARSI Workshop',
     title: '2-Day Carpet Cleaning Workshop',
     detail: 'Hands-on fibre, chemistry, upholstery and business modules',
     icon: GraduationCap,
