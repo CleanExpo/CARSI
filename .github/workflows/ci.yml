@@ -201,8 +201,8 @@ jobs:
       - name: Guard enumeration self-test
         run: npm run test:guard-enumeration
 
-      # GP-680: the rule files moved to docs/agents/. Claude Code and Cursor only auto-load
-      # their own entry points, so .claude/CLAUDE.md and .cursor/rules/carsi-agent-rules.mdc
+      # GP-680: the rule files moved to docs/agents/. Claude Code and Codex only auto-load
+      # their own entry points, so .claude/CLAUDE.md and ./AGENTS.md
       # must keep pointing at the licence and premium-visual rules, or agents work without them.
       - name: Agent rule entry-point self-test
         run: npm run test:agent-doc-paths
