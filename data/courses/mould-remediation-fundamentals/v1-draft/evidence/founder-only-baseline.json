@@ -1,0 +1,40 @@
+{
+  "rows": [
+    {
+      "id": "MRP-001",
+      "claim_class": "standards-citation"
+    },
+    {
+      "id": "MRP-002",
+      "claim_class": "standards-citation"
+    },
+    {
+      "id": "MRP-003",
+      "claim_class": "standards-citation"
+    },
+    {
+      "id": "MRP-004",
+      "claim_class": "standards-citation"
+    },
+    {
+      "id": "MRP-005",
+      "claim_class": "method"
+    },
+    {
+      "id": "MRP-006",
+      "claim_class": "method"
+    },
+    {
+      "id": "MRP-037",
+      "claim_class": "method"
+    },
+    {
+      "id": "MRP-038",
+      "claim_class": "method"
+    },
+    {
+      "id": "MRP-048",
+      "claim_class": "consumer-law"
+    }
+  ]
+}
