@@ -15,7 +15,7 @@
  */
 import { existsSync, readFileSync } from 'node:fs';
 
-import { evaluateContent, evaluateIicrcFree, IICRC_FREE_FILES, normaliseLine } from './check-iicrc-compliance.mjs';
+import { CEC_APPROVED_SLUGS, evaluateContent, evaluateIicrcFree, IICRC_FREE_FILES, normaliseLine } from './check-iicrc-compliance.mjs';
 
 // A non-approved course fixture path (no slug appears in cec-approvals.json → not slug-exempt).
 const NON_APPROVED = 'data/seed/courses-catalog.json';
@@ -174,6 +174,71 @@ for (const f of IICRC_FREE_FILES) {
   else if (evaluateIicrcFree(f, readFileSync(f, 'utf8')).length > 0) fail(`IICRC-free file carries IICRC/CEC wording: ${f}`);
 }
 
+// (8) 2026-11-21 — numbered CEC claims WITHOUT "IICRC" (CEC_NUMBER_BARE). The planted line below
+// exited 0 in a public field tool because CEC_NUMBER needs "N IICRC CEC". Each must now block on a
+// non-approved surface, and pass only under an approved slug or via the exact-text allowlist.
+const PLANTED_FIELD_TOOL = 'public/courses/psychrometry-building-science-for-drying/field-tools/moist-air-four-numbers-card.md';
+const BARE_MUST_BLOCK = [
+  'This course earns 4 CEC hours.',
+  'Completing it earns 3 CECs.',
+  'Pass the quiz to receive 2 CEC points.',
+  'This module is worth 1.5 CEC hours.',
+  'Learners are awarded up to 6 CECs.',
+  'This course earns four CECs.',
+  'A 3-CEC-hour course on drying.',
+  'Includes 4 hours of CEC.',
+  'CEC hours: 4',
+  'CECs: 3',
+  '| Course | 2 CEC credits |',
+];
+for (const line of BARE_MUST_BLOCK) {
+  for (const file of [PLANTED_FIELD_TOOL, NON_APPROVED]) {
+    if (evaluateContent(file, line, EMPTY).length === 0) fail(`bare CEC claim MUST BLOCK but passed (${file}):\n    ${line}`);
+  }
+}
+// The exact planted file content from the incident: the field tool as a whole must fail.
+if (evaluateContent(PLANTED_FIELD_TOOL, '# Moist air: four numbers\n\nRead RH, temperature, dew point and GPK.\nThis course earns 4 CEC hours.\n', EMPTY).length !== 1) {
+  fail('planted field-tool file should produce exactly one finding (the CEC-hour line)');
+}
+// Approved-slug exemption still holds for the new rule: the same claim under an approved course passes.
+const approvedSlug = CEC_APPROVED_SLUGS[0];
+if (!approvedSlug) fail('no approved slug in data/seed/cec-approvals.json — cannot prove the approved-slug exemption');
+else {
+  for (const line of BARE_MUST_BLOCK) {
+    const f = evaluateContent(`public/courses/${approvedSlug}/field-tools/card.md`, line, EMPTY);
+    if (f.length > 0) fail(`bare CEC claim under APPROVED slug ${approvedSlug} should pass:\n    ${line}\n    ${f.join('\n    ')}`);
+  }
+}
+// Allowlist path still works for the new rule (exact text only; a near-miss still blocks).
+const BARE_GENUINE = 'Standard IICRC certifications require 14 CEC hours every 4 years.';
+if (evaluateContent(NON_APPROVED, BARE_GENUINE, EMPTY).length === 0) fail('bare genuine requirement line should block until allowlisted');
+if (evaluateContent(NON_APPROVED, BARE_GENUINE, allowOf(BARE_GENUINE)).length > 0) fail('bare genuine requirement line should pass once allowlisted');
+if (evaluateContent(NON_APPROVED, BARE_GENUINE.replace('14', '16'), allowOf(BARE_GENUINE)).length === 0) fail('near-miss of allowlisted bare line should block');
+// Legitimate lines that must stay silent on a non-approved course.
+const BARE_MUST_PASS = [
+  '"cecHours": 0,',
+  'cecHours: 0,',
+  'This course carries 0 CEC hours.',
+  'It earns 0 CECs.',
+  'This course is not IICRC CEC accredited.',
+  'This course is not IICRC CEC accredited and does not award CECs.',
+  'It is <strong>not</strong> IICRC CEC accredited.',
+  "{ label: '10 CECs Earned' }",
+  'Standard IICRC certifications require 14 CECs every 4 years to maintain.',
+  'Track the CEC hours you have logged towards your renewal.',
+  'meta: { cec_hours: 9, cec: 9 },',
+  'Open the CEC tracker to see your hours.',
+  'Lesson 4: four numbers that describe moist air.',
+];
+for (const line of BARE_MUST_PASS) {
+  const f = evaluateContent(PLANTED_FIELD_TOOL, line, EMPTY);
+  if (f.length > 0) fail(`legitimate line MUST PASS but blocked:\n    ${line}\n    ${f.join('\n    ')}`);
+}
+// Test files are exempt from the bare rule only — CEC_NUMBER still scans them.
+if (evaluateContent('src/lib/x.test.ts', '// 1 CEC hour each in data/seed/cec-approvals.json', EMPTY).length > 0) fail('bare rule should skip *.test.* files');
+if (evaluateContent('src/lib/x.test.ts', 'This course awards 4 IICRC CECs.', EMPTY).length === 0) fail('CEC_NUMBER must still scan *.test.* files');
+if (evaluateContent('src/lib/x.ts', '// 1 CEC hour each in data/seed/cec-approvals.json', EMPTY).length === 0) fail('bare rule must still scan non-test source files');
+
 if (failed > 0) {
   console.error(`\n✖ IICRC/CEC compliance guard self-test failed — ${failed} case(s).`);
   process.exit(1);
@@ -181,6 +246,6 @@ if (failed > 0) {
 console.log(
   `✓ IICRC/CEC compliance guard self-test passed ` +
   `(${MUST_BLOCK.length} block, ${GENUINE_ALLOWLISTABLE.length} genuine block+allowlist, ` +
-  `${MUST_PASS_ALWAYS.length} always-pass, near-miss + normalisation + plant/clean controls OK).`
+  `${MUST_PASS_ALWAYS.length} always-pass, ${BARE_MUST_BLOCK.length} bare-CEC block, ${BARE_MUST_PASS.length} bare-CEC pass, near-miss + normalisation + plant/clean controls OK).`
 );
 process.exit(0);
