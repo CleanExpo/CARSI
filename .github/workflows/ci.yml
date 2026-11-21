@@ -273,13 +273,16 @@ jobs:
       - name: Evidence ledger validator mutation suite
         run: npm run test:ledger-mutants
 
-      # W0a per-course ledger check (spec 11). REPORT-ONLY for now: it prints schema / orphan /
-      # founder / cut / gap counts per course ledger and exits 0. It becomes blocking for exit
-      # codes 3-6 after the check_owner backfill commit lands and every ledger reads schema: 0
-      # (AC-W0-8); GAP counts stay non-blocking until a course's go-live PR. The test below is
-      # blocking: it proves each rule fires and that removing any one rule turns its case red.
-      - name: W0a evidence ledger check (report only)
+      # W0a per-course ledger check (spec 11, AC-W0-8). BLOCKING for exit codes 3-6 (schema,
+      # orphan, founder-only breach, cut not applied) over every ledger under data/courses, with
+      # no path filter. GAP counts are printed by the report step and are NOT blocking until a
+      # course's go-live PR (--max-gap=0 is that PR's own check). The test step proves each rule
+      # fires and that removing any one rule turns its case red.
+      - name: W0a evidence ledger check
         run: npm run check:evidence-ledger
+
+      - name: W0a evidence ledger counts (report)
+        run: npm run report:evidence-ledger
 
       - name: W0a evidence ledger check tests
         run: npm run test:evidence-ledger
