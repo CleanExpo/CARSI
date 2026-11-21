@@ -12,6 +12,7 @@ import type {
   MembershipCheckoutStartedPayload,
   MembershipViewPayload,
 } from './funnel-events';
+import { getAnalyticsChoice } from './consent-client';
 
 declare global {
   interface Window {
@@ -40,7 +41,7 @@ let pending: Array<[string, Record<string, unknown>]> = [];
 let dropTimer: ReturnType<typeof setTimeout> | null = null;
 
 function canSend(): boolean {
-  return configured && typeof window.gtag === 'function';
+  return configured && typeof window.gtag === 'function' && getAnalyticsChoice() === 'granted';
 }
 
 function flushPending(): void {
@@ -52,6 +53,17 @@ function flushPending(): void {
   for (const [name, params] of batch) window.gtag!('event', name, params);
 }
 
+/**
+ * Called when the visitor says no (GP-731): the queue is dropped and nothing more is sent until
+ * GoogleAnalytics.tsx configures GA4 again after a fresh yes.
+ */
+export function resetGa4Queue(): void {
+  configured = false;
+  pending = [];
+  if (dropTimer) clearTimeout(dropTimer);
+  dropTimer = null;
+}
+
 /** Called by GoogleAnalytics.tsx immediately after it sends `gtag('config', measurementId)`. */
 export function markGa4Configured(): void {
   configured = true;
@@ -60,6 +72,8 @@ export function markGa4Configured(): void {
 
 function sendGa4Event(name: string, params: Record<string, unknown>): void {
   if (typeof window === 'undefined') return;
+  // Nothing is sent, or kept for later, without a stored yes (GP-731).
+  if (getAnalyticsChoice() !== 'granted') return;
   if (canSend() && pending.length === 0) {
     window.gtag!('event', name, params);
     return;

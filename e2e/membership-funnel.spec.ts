@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { configIndex, events, recordGtag } from './membership-analytics';
+import { acceptAnalytics, configIndex, events, recordGtag } from './membership-analytics';
 
 /**
  * V6 — /subscribe sends membership_view through the real analytics path, once, only after GA4 has
@@ -9,6 +9,7 @@ import { configIndex, events, recordGtag } from './membership-analytics';
  */
 test.describe('membership funnel events', () => {
   test('membership_view is sent once, after GA4 config, with site state only', async ({ page }) => {
+    await acceptAnalytics(page);
     const calls = await recordGtag(page);
     await page.goto('/subscribe');
     await expect.poll(() => events(calls, 'membership_view').length).toBe(1);
