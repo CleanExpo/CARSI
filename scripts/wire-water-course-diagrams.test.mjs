@@ -87,6 +87,19 @@ test('--write adds each diagram in the See it part, changes nothing else, and is
     }
     for (const l of origLessons.filter((x) => !MAPPING.some((m) => m.lessonId === x.id)))
       assert.equal(lessons.find((x) => x.id === l.id).contentBody, l.contentBody);
+    // Byte level: the written file minus exactly the inserted figure blocks is the original file,
+    // so no title, metadata, other course or formatting can change.
+    const written = readFileSync(join(root, rel), 'utf8');
+    let stripped = written;
+    for (const a of MAPPING.flatMap((m) => m.add)) {
+      const block = new RegExp(
+        `<p><img src='/courses/${SLUG}/diagrams/${a.file.replace(/\./g, '\\.')}'[^>]*></p><p>[^<"]*</p>`,
+        'g'
+      );
+      assert.equal((stripped.match(block) || []).length, 1, `${rel}: one block for ${a.file}`);
+      stripped = stripped.replace(block, '');
+    }
+    assert.equal(stripped, readFileSync(join(REPO, rel), 'utf8'), `${rel}: nothing else changed`);
   }
   const after = CATALOGUES.map((rel) => readFileSync(join(root, rel), 'utf8'));
   const again = run(root, '--write');
