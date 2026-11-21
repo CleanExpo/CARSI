@@ -62,7 +62,8 @@ export async function POST(request: NextRequest) {
     // Only do work for a real, active account — but always return the same
     // neutral response below so existence is never revealed.
     if (user?.isActive) {
-      const token = await signPasswordResetToken(user.id);
+      // GP-760: the link is bound to the user's session generation now, so a reset spends it.
+      const token = await signPasswordResetToken(user.id, user.sessionGeneration);
       const base = getAppOrigin(request);
       const link = next
         ? `${base}/reset-password?token=${encodeURIComponent(token)}&next=${encodeURIComponent(next)}`

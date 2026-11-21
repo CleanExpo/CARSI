@@ -21,8 +21,10 @@
  * committed.
  */
 import { getAdminEmail } from '@/lib/admin/admin-panel-access';
-import { cutoffSeconds, issuedWithinCutoff } from '@/lib/auth/session-cutoff';
-import { pickSessionRole } from '@/lib/server/lms-auth';
+import { isCurrentGeneration } from '@/lib/auth/session-generation';
+import { pickSessionRole, readLmsUserNow, type RawQueryClient } from '@/lib/server/lms-auth';
+
+export { readLmsUserNow, type LmsUserNow, type RawQueryClient } from '@/lib/server/lms-auth';
 
 export type CurrentAdmin = {
   kind: 'bootstrap_admin' | 'admin_user' | 'lms_admin';
@@ -42,11 +44,6 @@ export class NotCurrentAdminError extends Error {
     this.name = 'NotCurrentAdminError';
   }
 }
-
-/** A Prisma client or interactive transaction (anything that can run a tagged raw query). */
-export type RawQueryClient = {
-  $queryRaw: <T>(strings: TemplateStringsArray, ...values: unknown[]) => Promise<T>;
-};
 
 export async function resolveCurrentAdmin(
   db: RawQueryClient,
@@ -88,62 +85,20 @@ export async function resolveCurrentAdmin(
   return null;
 }
 
-/** An LMS user as the database has them now (GP-760). */
-export type LmsUserNow = {
-  active: boolean;
-  /** Effective role: pickSessionRole over lms_user_roles, then the lms_users.role column. */
-  role: string;
-  /** lms_users.sessions_valid_after_sec, or null when no cut-off is recorded. */
-  validAfterSec: number | null;
-};
-
 /**
- * GP-760: read one LMS user's active flag, effective role and sessions cut-off in ONE statement
- * (primary-key lookup on lms_users plus its lms_user_roles rows). The role is computed by
- * pickSessionRole, exactly as the session token and resolveCurrentAdmin compute it. Null when the
- * user does not exist. No row locks: this gates a request, it does not order an action; actions
- * that must be ordered against a demotion use resolveCurrentAdmin inside their transaction.
- */
-export async function readLmsUserNow(db: RawQueryClient, userId: string): Promise<LmsUserNow | null> {
-  if (!userId) return null;
-  const rows = await db.$queryRaw<
-    Array<{
-      is_active: boolean;
-      role: string | null;
-      sessions_valid_after_sec: bigint | number | string | null;
-      role_names: string[] | null;
-    }>
-  >`
-    SELECT u."is_active", u."role", u."sessions_valid_after_sec",
-           array_remove(array_agg(r."name"), NULL) AS "role_names"
-      FROM "lms_users" u
-      LEFT JOIN "lms_user_roles" ur ON ur."user_id" = u."id"
-      LEFT JOIN "lms_roles" r ON r."id" = ur."role_id"
-     WHERE u."id" = ${userId}::uuid
-     GROUP BY u."id"`;
-  const user = rows[0];
-  if (!user) return null;
-  return {
-    active: user.is_active === true,
-    role: pickSessionRole(user.role_names ?? [], user.role),
-    validAfterSec: cutoffSeconds(user.sessions_valid_after_sec),
-  };
-}
-
-/**
- * GP-760: the admin-panel gate for an LMS session (getAdminSessionOrNull), read from the database
- * on every request (readLmsUserNow, no cache). True only when the user is active now, the session
- * was issued within the user's sessions cut-off (a password reset ends older sessions), and the
- * user's effective role is 'admin' now. The token's role claim is never consulted.
+ * GP-760: the admin-panel gate for an LMS session, read from the database on every request
+ * (readLmsUserNow, no cache). True only when the user is active now, the session carries the
+ * user's current session generation (a password reset ends older sessions), and the user's
+ * effective role is 'admin' now. The token's role claim is never consulted.
  */
 export async function isLmsAdminNow(
   db: RawQueryClient,
   userId: string,
-  issuedAt: number | undefined
+  sessionGeneration: number | undefined
 ): Promise<boolean> {
   const user = await readLmsUserNow(db, userId);
   if (!user || !user.active) return false;
-  if (!issuedWithinCutoff(issuedAt, user.validAfterSec)) return false;
+  if (!isCurrentGeneration(sessionGeneration, user.generation)) return false;
   return user.role === 'admin';
 }
 

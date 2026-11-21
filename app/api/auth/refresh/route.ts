@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
 
   let current;
   try {
-    current = await sessionClaimsForUserId(claims.sub, { issuedAt: claims.iat ?? 0 });
+    current = await sessionClaimsForUserId(claims.sub, { sessionGeneration: claims.sg ?? 0 });
   } catch (e) {
     console.error('[auth/refresh] account re-check failed:', e instanceof Error ? e.message : String(e));
     return NextResponse.json({ error: 'Session service unavailable' }, { status: 503 });

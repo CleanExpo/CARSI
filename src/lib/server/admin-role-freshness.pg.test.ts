@@ -68,25 +68,20 @@ describe.runIf(RUNNABLE)('GP-760 admin role freshness (real PostgreSQL)', () => 
     await db.end().catch(() => {});
   });
 
-  const nowSec = () => Math.floor(Date.now() / 1000);
-
-  it('follows the database: role row, removal, deactivation and the sessions cut-off', async () => {
+  it('follows the database: role row, removal, deactivation and the session generation', async () => {
     // No role row and no column role: not an admin.
-    expect(await isLmsAdminNow(prisma, userId, nowSec())).toBe(false);
+    expect(await isLmsAdminNow(prisma, userId, 0)).toBe(false);
 
     await db.query('INSERT INTO lms_user_roles (user_id, role_id) VALUES ($1, $2)', [
       userId,
       adminRoleId,
     ]);
-    expect(await isLmsAdminNow(prisma, userId, nowSec())).toBe(true);
+    expect(await isLmsAdminNow(prisma, userId, 0)).toBe(true);
 
-    // A session issued before the cut-off second is refused; one issued in it is accepted.
-    const cutoff = nowSec();
-    await db.query('UPDATE lms_users SET sessions_valid_after_sec = $2 WHERE id = $1', [
-      userId,
-      cutoff,
-    ]);
-    expect(await isLmsAdminNow(prisma, userId, cutoff - 1)).toBe(false);
+    // A session from an earlier generation is refused; one from the current generation is accepted.
+    const cutoff = 1;
+    await db.query('UPDATE lms_users SET session_generation = $2 WHERE id = $1', [userId, cutoff]);
+    expect(await isLmsAdminNow(prisma, userId, 0)).toBe(false);
     expect(await isLmsAdminNow(prisma, userId, cutoff)).toBe(true);
 
     await db.query('UPDATE lms_users SET is_active = false WHERE id = $1', [userId]);
@@ -101,6 +96,6 @@ describe.runIf(RUNNABLE)('GP-760 admin role freshness (real PostgreSQL)', () => 
     expect(await isLmsAdminNow(prisma, userId, cutoff)).toBe(true);
 
     // An unknown user is not an admin.
-    expect(await isLmsAdminNow(prisma, randomUUID(), nowSec())).toBe(false);
+    expect(await isLmsAdminNow(prisma, randomUUID(), 0)).toBe(false);
   });
 });

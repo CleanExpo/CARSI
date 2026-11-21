@@ -57,13 +57,14 @@ export async function POST(request: NextRequest) {
     if (!resetToken) {
       return NextResponse.json({ error: INVALID_LINK }, { status: 400 });
     }
-    const { userId, issuedAt } = resetToken;
+    const { userId, generation } = resetToken;
 
     // GP-760: one conditional UPDATE spends the link, sets the password and ends every other
-    // session (sessions_valid_after_sec). A used, superseded or concurrent second use matches no row.
+    // session (it adds one to the user's session generation). A used, superseded or concurrent
+    // second use matches no row.
     // GP-699: the same write marks the email verified, because the reset link is only ever
     // emailed to the account address (forgot-password is its sole issuer).
-    const consumed = await consumePasswordReset(userId, issuedAt, await hashPassword(newPassword));
+    const consumed = await consumePasswordReset(userId, generation, await hashPassword(newPassword));
     if (!consumed) {
       return NextResponse.json({ error: INVALID_LINK }, { status: 400 });
     }

@@ -6,7 +6,7 @@ import { getSessionSecretBytes } from '@/lib/auth/jwt-secret';
 
 /**
  * GP-760 (b), unit level: the reset route refuses a link the database did not spend, and the
- * session reader refuses a session issued before the cut-off the reset wrote. The database is a
+ * session reader refuses a session from the generation the reset ended. The database is a
  * small in-memory stand-in for one lms_users row whose `$executeRaw` re-implements the UPDATE's
  * WHERE, so this file does NOT test that SQL predicate: a mutant that drops it still passes here.
  * The predicate, and its atomicity under a concurrent double submit, are proved on Postgres in
@@ -21,7 +21,7 @@ const row = vi.hoisted(() => ({
     isActive: true,
     hashedPassword: 'x',
     isVerified: false,
-    sessionsValidAfterSec: null as bigint | null,
+    sessionGeneration: 0,
   },
 }));
 
@@ -43,16 +43,15 @@ vi.mock('@/lib/prisma', () => ({
     },
     lmsUserRole: { findMany: vi.fn(async () => []) },
     // consumePasswordReset's conditional UPDATE: values are
-    // [hashedPassword, cutoffSec, userId, issuedAt] in template order.
+    // [hashedPassword, userId, generation] in template order.
     $executeRaw: vi.fn(async (_s: TemplateStringsArray, ...values: unknown[]) => {
-      const [hashedPassword, cutoffSec, , issuedAt] = values as [string, number, string, number];
-      const sva = row.current.sessionsValidAfterSec;
+      const [hashedPassword, , generation] = values as [string, string, number];
       if (!row.current.isActive) return 0;
-      if (sva !== null && !(Number(sva) < issuedAt)) return 0;
+      if (row.current.sessionGeneration !== generation) return 0;
       Object.assign(row.current, {
         hashedPassword,
         isVerified: true,
-        sessionsValidAfterSec: BigInt(cutoffSec),
+        sessionGeneration: row.current.sessionGeneration + 1,
       });
       return 1;
     }),
@@ -64,10 +63,12 @@ vi.mock('@/lib/prisma', () => ({
       }
       return [
         {
+          id: USER_ID,
+          email: EMAIL,
+          full_name: 'Learner',
           is_active: row.current.isActive,
           role: null,
-          sessions_valid_after_sec:
-            row.current.sessionsValidAfterSec === null ? null : String(row.current.sessionsValidAfterSec),
+          session_generation: row.current.sessionGeneration,
           role_names: ['student'],
         },
       ];
@@ -115,7 +116,7 @@ function withSession(token: string) {
 
 beforeEach(() => {
   vi.stubEnv('DATABASE_URL', 'postgres://configured');
-  row.current = { isActive: true, hashedPassword: 'x', isVerified: false, sessionsValidAfterSec: null };
+  row.current = { isActive: true, hashedPassword: 'x', isVerified: false, sessionGeneration: 0 };
   __clearActiveCache();
   vi.spyOn(console, 'error').mockImplementation(() => {});
   vi.spyOn(console, 'warn').mockImplementation(() => {});
@@ -131,7 +132,7 @@ describe('GP-760 password reset link is single-use and ends other sessions', () 
   });
 
   it('ends a session issued before the reset, and keeps the session the reset issued', async () => {
-    const before = await session(nowSec() - 30);
+    const before = await session(nowSec());
     expect(await getSessionClaimsFromRequest(withSession(before))).not.toBeNull();
 
     const res = await reset(post(await resetLink(nowSec() - 10)));

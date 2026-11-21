@@ -37,7 +37,7 @@ beforeEach(() => {
   mocks.hash.mockReset();
   mocks.claims.mockReset();
   mocks.signSession.mockReset();
-  mocks.verifyToken.mockResolvedValue({ userId: 'user-1', issuedAt: 1_800_000_000 });
+  mocks.verifyToken.mockResolvedValue({ userId: 'user-1', generation: 3 });
   mocks.consume.mockResolvedValue(true);
   mocks.hash.mockResolvedValue('$2a$12$new');
   mocks.claims.mockResolvedValue({
@@ -89,7 +89,7 @@ describe('POST /api/auth/reset-password', () => {
     // GP-760: one conditional write sets the password, marks the email verified (GP-699) and
     // spends the link (consumePasswordReset).
     expect(mocks.consume).toHaveBeenCalledTimes(1);
-    expect(mocks.consume).toHaveBeenCalledWith('user-1', 1_800_000_000, '$2a$12$new');
+    expect(mocks.consume).toHaveBeenCalledWith('user-1', 3, '$2a$12$new');
   });
 
   it('does not mark anything verified when the reset token is invalid (GP-699)', async () => {

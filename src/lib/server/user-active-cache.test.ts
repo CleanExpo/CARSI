@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { cutoffSeconds, issuedWithinCutoff } from '@/lib/auth/session-cutoff';
+import { generationClaim, isCurrentGeneration } from '@/lib/auth/session-generation';
 
 import {
   ACTIVE_TTL_MS,
@@ -12,8 +12,8 @@ import {
 
 beforeEach(() => __clearActiveCache());
 
-const ACTIVE: UserSessionState = { active: true, role: 'student', validAfterSec: null };
-const INACTIVE: UserSessionState = { active: false, role: 'student', validAfterSec: null };
+const ACTIVE: UserSessionState = { active: true, role: 'student', generation: 0 };
+const INACTIVE: UserSessionState = { active: false, role: 'student', generation: 0 };
 
 describe('resolveSessionState', () => {
   it('returns the fetched value and caches it', async () => {
@@ -49,33 +49,35 @@ describe('resolveSessionState', () => {
   });
 });
 
-describe('issuedWithinCutoff (GP-760)', () => {
-  it('accepts any session when there is no cut-off', () => {
-    expect(issuedWithinCutoff(1, null)).toBe(true);
+describe('session generation (GP-760)', () => {
+  it('accepts only the current generation', () => {
+    expect(isCurrentGeneration(0, 0)).toBe(true);
+    expect(isCurrentGeneration(3, 3)).toBe(true);
+    expect(isCurrentGeneration(2, 3)).toBe(false);
+    expect(isCurrentGeneration(4, 3)).toBe(false);
   });
 
-  it('accepts a session issued in or after the cut-off second, refuses an earlier one', () => {
-    const cutoff = cutoffSeconds(BigInt(1_800_000_000));
-    expect(cutoff).toBe(1_800_000_000);
-    expect(cutoffSeconds('1800000000')).toBe(1_800_000_000);
-    expect(cutoffSeconds(null)).toBeNull();
-    expect(issuedWithinCutoff(1_800_000_000, cutoff)).toBe(true);
-    expect(issuedWithinCutoff(1_800_000_001, cutoff)).toBe(true);
-    expect(issuedWithinCutoff(1_799_999_999, cutoff)).toBe(false);
+  it('treats a token with no generation claim as generation 0', () => {
+    expect(isCurrentGeneration(undefined, 0)).toBe(true);
+    expect(isCurrentGeneration(undefined, 1)).toBe(false);
   });
 
-  it('treats a token with no iat as issued at 0', () => {
-    expect(issuedWithinCutoff(undefined, 1)).toBe(false);
+  it('reads only a non-negative integer claim', () => {
+    expect(generationClaim(2)).toBe(2);
+    expect(generationClaim('2')).toBe(0);
+    expect(generationClaim(-1)).toBe(0);
+    expect(generationClaim(1.5)).toBe(0);
+    expect(generationClaim(undefined)).toBe(0);
   });
 });
 
 describe('sessionMatchesState (GP-760)', () => {
-  const claims = (role: string, iat = 1_800_000_000) => ({
+  const claims = (role: string, sg = 0) => ({
     sub: 'u',
     email: 'u@example.test',
     full_name: 'U',
     role,
-    iat,
+    sg,
   });
 
   it('accepts an active user whose token role is the current role', () => {
@@ -86,10 +88,8 @@ describe('sessionMatchesState (GP-760)', () => {
     expect(sessionMatchesState(claims('admin'), { ...ACTIVE, role: 'student' })).toBe(false);
   });
 
-  it('refuses an inactive user and a session before the cut-off', () => {
+  it('refuses an inactive user and a session from an earlier generation', () => {
     expect(sessionMatchesState(claims('student'), INACTIVE)).toBe(false);
-    expect(
-      sessionMatchesState(claims('student', 99), { ...ACTIVE, validAfterSec: 100 })
-    ).toBe(false);
+    expect(sessionMatchesState(claims('student', 0), { ...ACTIVE, generation: 1 })).toBe(false);
   });
 });

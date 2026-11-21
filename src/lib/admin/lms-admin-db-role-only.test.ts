@@ -24,7 +24,7 @@ vi.mock('next/headers', () => ({
 vi.mock('@/lib/prisma', () => ({
   prisma: {
     $queryRaw: async () => [
-      { is_active: true, role: null, sessions_valid_after_sec: null, role_names: ['admin'] },
+      { is_active: true, role: null, session_generation: 0, role_names: ['admin'] },
     ],
   },
 }));

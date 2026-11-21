@@ -1,6 +1,7 @@
 import { SignJWT, jwtVerify } from 'jose';
 
 import { getSessionSecretBytes } from '@/lib/auth/jwt-secret';
+import { generationClaim } from '@/lib/auth/session-generation';
 
 export interface SessionClaims {
   sub: string;
@@ -8,10 +9,10 @@ export interface SessionClaims {
   full_name: string;
   role: string;
   /**
-   * GP-760: when the token was issued (JWT `iat`, whole seconds). Set by verifySessionToken and
-   * compared with lms_users.sessions_valid_after_sec; never written into a token by signSessionToken.
+   * GP-760: the user's session generation when the session was issued (claim `sg`; see
+   * session-generation.ts). Claims built from the database carry it; a token without it reads as 0.
    */
-  iat?: number;
+  sg?: number;
 }
 
 export async function signSessionToken(claims: SessionClaims): Promise<string> {
@@ -19,6 +20,7 @@ export async function signSessionToken(claims: SessionClaims): Promise<string> {
     email: claims.email,
     full_name: claims.full_name,
     role: claims.role,
+    sg: generationClaim(claims.sg),
   })
     .setProtectedHeader({ alg: 'HS256' })
     .setSubject(claims.sub)
@@ -40,16 +42,15 @@ export async function verifySessionToken(token: string): Promise<SessionClaims |
     const full_name = typeof payload.full_name === 'string' ? payload.full_name : 'User';
     const role = typeof payload.role === 'string' ? payload.role : 'student';
     if (!sub || !email) return null;
-    // A token with no numeric iat counts as issued at 0, so any sessions cut-off refuses it.
-    const iat = typeof payload.iat === 'number' ? payload.iat : 0;
-    return { sub, email, full_name, role, iat };
+    return { sub, email, full_name, role, sg: generationClaim(payload.sg) };
   } catch {
     return null;
   }
 }
 
-export async function signPasswordResetToken(userId: string): Promise<string> {
-  return new SignJWT({ purpose: 'password_reset' })
+/** GP-760: the link carries the user's session generation now; a reset spends that generation. */
+export async function signPasswordResetToken(userId: string, generation: number): Promise<string> {
+  return new SignJWT({ purpose: 'password_reset', sg: generationClaim(generation) })
     .setProtectedHeader({ alg: 'HS256' })
     .setSubject(userId)
     .setIssuedAt()
@@ -58,20 +59,19 @@ export async function signPasswordResetToken(userId: string): Promise<string> {
 }
 
 /**
- * GP-760: returns the user and the token's issue time. The signature alone does not make a link
- * usable: consumePasswordReset (lms-auth) spends it, and refuses any link issued at or before the
- * user's sessions_valid_after_sec, which every successful reset moves forward.
+ * GP-760: returns the user and the session generation the link was issued under (0 for a link
+ * issued before generations existed). The signature alone does not make a link usable:
+ * consumePasswordReset (lms-auth) spends it only while that generation is still the user's.
  */
 export async function verifyPasswordResetToken(
   token: string,
-): Promise<{ userId: string; issuedAt: number } | null> {
+): Promise<{ userId: string; generation: number } | null> {
   try {
     const { payload } = await jwtVerify(token, getSessionSecretBytes());
     if (payload.purpose !== 'password_reset') return null;
     const sub = typeof payload.sub === 'string' ? payload.sub : '';
-    const issuedAt = typeof payload.iat === 'number' ? payload.iat : 0;
-    if (!sub || !issuedAt) return null;
-    return { userId: sub, issuedAt };
+    if (!sub) return null;
+    return { userId: sub, generation: generationClaim(payload.sg) };
   } catch {
     return null;
   }

@@ -40,7 +40,7 @@ import {
   findActivePaidCourseOwnership,
 } from '@/lib/server/paid-course-ownership';
 import { getPublishedCourseForCheckout } from '@/lib/server/public-courses-list';
-import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
+import { isLmsSessionAdminNow } from '@/lib/server/lms-admin-now';
 import { parseCoursePrerequisites, courseHasPrerequisites } from '@/lib/lms/course-prerequisites';
 import {
   findCoursePrerequisiteBlock,
@@ -338,10 +338,11 @@ export async function POST(request: NextRequest) {
       const block =
         purchaseMode === 'team'
           ? null
-          : await guardLookup(() =>
+          : await guardLookup(async () =>
               findCoursePrerequisiteBlock({
                 userId: studentId!,
-                isAdmin: () => (buyerClaims ? isLmsClaimsAllowedAdminPanel(buyerClaims) : false),
+                // GP-760: the database role now, not the 7-day token's role.
+                isAdmin: await isLmsSessionAdminNow(buyerClaims),
                 course: { slug: dbCourse!.slug, meta: dbCourse!.meta },
               }),
             );

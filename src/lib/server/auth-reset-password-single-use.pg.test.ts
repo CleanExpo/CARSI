@@ -8,8 +8,9 @@
  *      /api/auth/me and by /api/auth/refresh. The session the reset issued: accepted.
  *   4. A second link issued before the reset: refused (every earlier link dies with the reset).
  *
- * Only the clock of the earlier tokens is set by hand (signed with the same secret and an iat a
- * few seconds back), so the test does not have to wait.
+ * The earlier session and links are signed by hand with no generation claim, as every token issued
+ * before GP-760 was (generation 0). Same-second timing is covered by
+ * auth-session-generation.pg.test.ts.
  *
  * Where it runs: CI's E2E job (`npm run test:pg`) against its migrated postgres:16 service. It
  * needs a disposable loopback database (src/test-utils/pg-disposable.ts); locally it skips.
@@ -120,9 +121,9 @@ describe.runIf(RUNNABLE)('GP-760 single-use password reset (real PostgreSQL)', (
   }
 
   it('spends the link once, ends older sessions and older links, keeps the new session', async () => {
-    const oldSession = await session(nowSec() - 30);
-    const link = await resetLink(nowSec() - 20);
-    const olderLink = await resetLink(nowSec() - 25);
+    const oldSession = await session(nowSec());
+    const link = await resetLink(nowSec());
+    const olderLink = await resetLink(nowSec());
 
     // Before the reset the old session is current.
     clearCache();
@@ -145,7 +146,7 @@ describe.runIf(RUNNABLE)('GP-760 single-use password reset (real PostgreSQL)', (
     const again = await resetPOST(resetRequest(link, ips[2]));
     expect(again.status).toBe(400);
 
-    // 4. A link issued before the reset.
+    // 4. Another link issued before the reset (same generation).
     const older = await resetPOST(resetRequest(olderLink, ips[3]));
     expect(older.status).toBe(400);
 

@@ -70,7 +70,7 @@ describe('email verification token (GP-699)', () => {
 
   it('rejects every other token this key signs', async () => {
     expect(await verifyEmailVerificationToken(await signSessionToken(SESSION))).toBeNull();
-    expect(await verifyEmailVerificationToken(await signPasswordResetToken('user-123'))).toBeNull();
+    expect(await verifyEmailVerificationToken(await signPasswordResetToken('user-123', 0))).toBeNull();
     expect(
       await verifyEmailVerificationToken(await signProofPackShareToken('user-123'))
     ).toBeNull();
@@ -116,15 +116,12 @@ describe('email verification token (GP-699)', () => {
 
 describe('session token isolation (GP-699)', () => {
   it('still accepts a real session token', async () => {
-    // GP-760: the verified claims also carry the token's issue time (iat, whole seconds).
-    expect(await verifySessionToken(await signSessionToken(SESSION))).toEqual({
-      ...SESSION,
-      iat: expect.any(Number),
-    });
+    // GP-760: the verified claims also carry the session generation (0 when none was given).
+    expect(await verifySessionToken(await signSessionToken(SESSION))).toEqual({ ...SESSION, sg: 0 });
   });
 
   it('never accepts a link token as a login session', async () => {
-    expect(await verifySessionToken(await signPasswordResetToken('user-123'))).toBeNull();
+    expect(await verifySessionToken(await signPasswordResetToken('user-123', 0))).toBeNull();
     expect(await verifySessionToken(await signProofPackShareToken('user-123'))).toBeNull();
     expect(await verifySessionToken(await signEmailUnsubscribeToken('user-123'))).toBeNull();
     expect(

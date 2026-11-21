@@ -23,7 +23,7 @@ type DbUser = {
   isActive: boolean;
   role: string | null;
   roleNames: string[];
-  sessionsValidAfterSec: bigint | null;
+  sessionGeneration: number;
 };
 
 const db = vi.hoisted(() => ({
@@ -49,9 +49,8 @@ vi.mock('@/lib/prisma', () => {
               email: db.user.email,
               is_active: db.user.isActive,
               role: db.user.role,
-              // pg returns BIGINT through a raw query as a string
-              sessions_valid_after_sec:
-                db.user.sessionsValidAfterSec === null ? null : String(db.user.sessionsValidAfterSec),
+              full_name: db.user.fullName,
+              session_generation: db.user.sessionGeneration,
               role_names: db.user.roleNames,
             },
           ];
@@ -69,7 +68,7 @@ vi.mock('@/lib/prisma', () => {
             fullName: db.user.fullName,
             isActive: db.user.isActive,
             role: db.user.role,
-            sessionsValidAfterSec: db.user.sessionsValidAfterSec,
+            sessionGeneration: db.user.sessionGeneration,
           };
         }),
       },
@@ -100,7 +99,7 @@ function dbUser(over: Partial<DbUser> = {}): DbUser {
     isActive: true,
     role: null,
     roleNames: ['admin'],
-    sessionsValidAfterSec: null,
+    sessionGeneration: 0,
     ...over,
   };
 }
@@ -159,7 +158,7 @@ describe('GP-760 admin panel: the database role now, not the token role', () => 
   });
 
   it('an admin session ended by a password reset loses it', async () => {
-    db.user = dbUser({ sessionsValidAfterSec: BigInt(Math.floor(Date.now() / 1000) + 5) });
+    db.user = dbUser({ sessionGeneration: 1 }); // a reset moved the user to generation 1
     expect(await adminView()).toBeNull();
   });
 
@@ -206,7 +205,7 @@ describe('GP-760 token refresh: minted from the database, never re-signed from o
   });
 
   it('a session ended by a password reset cannot be refreshed into a new one', async () => {
-    db.user = dbUser({ sessionsValidAfterSec: BigInt(Math.floor(Date.now() / 1000) + 5) });
+    db.user = dbUser({ sessionGeneration: 1 });
     const res = await refreshWith(await signSessionToken(adminClaims()));
     expect(res.status).toBe(401);
   });
