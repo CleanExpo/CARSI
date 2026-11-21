@@ -30,6 +30,7 @@ import { sendGa4PurchaseEvent } from '@/lib/server/ga4-measurement-protocol';
 import { ensureGuestUserFromStripeEmail } from '@/lib/server/guest-checkout';
 import { sessionClaimsForUserId } from '@/lib/server/lms-auth';
 import { markOrgSubscriptionStatusBySubscriptionId } from '@/lib/server/org-subscription-store';
+import { recordPartnerReferralSale } from '@/lib/server/partner-referral-sales';
 import { captureServerError } from '@/lib/server/sentry';
 import { resolveStripePaymentReference } from '@/lib/server/stripe-payment-reference';
 import {
@@ -467,6 +468,10 @@ export async function POST(request: NextRequest) {
         purchaseMode,
         teamSeatCount: Number.isFinite(teamSeatCount) ? teamSeatCount : undefined,
       });
+
+      // GP-767: a sale through a partner link (?ref=ccw) is stored for settlement. A failed
+      // write throws into the retry path below; fulfilment and this upsert are both idempotent.
+      await recordPartnerReferralSale(session, ref, slug, new Date(event.created * 1000));
 
       await recordAttributedStage(
         parseAttributionJourneyId(session.metadata?.attribution_journey_id),

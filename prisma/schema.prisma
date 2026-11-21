@@ -870,6 +870,24 @@ model EventAttributionReversal {
   @@map("event_attribution_reversals")
 }
 
+/// GP-767: one row per paid course checkout that came through a referral partner link
+/// (`?ref=<partner>`). Keyed by the Stripe Checkout Session id, the same key the reversal ledger
+/// uses, so the settlement report reads refunds from `event_attribution_reversals`. Holds no
+/// learner identity. Not pruned: it is the record CARSI settles with the partner from.
+model PartnerReferralSale {
+  id              String   @id @default(uuid()) @db.Uuid
+  partnerId       String   @map("partner_id") @db.VarChar(32)
+  transactionId   String   @unique @map("transaction_id") @db.VarChar(255)
+  courseSlug      String   @map("course_slug") @db.VarChar(200)
+  amountPaidCents Int      @map("amount_paid_cents")
+  currency        String   @db.VarChar(3)
+  paidAt          DateTime @map("paid_at") @db.Timestamptz(6)
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([partnerId, paidAt])
+  @@map("partner_referral_sales")
+}
+
 /// One row per learner; mirrors the Stripe subscription lifecycle. The
 /// `getEntitlements` service reads `status` + `currentPeriodEnd` to decide new-
 /// enrolment access (active / 7-day past-due grace / lapsed). Additive table —
