@@ -16,6 +16,7 @@ import { LearnerLessonNotes } from '@/components/lms/LearnerLessonNotes';
 import { LearnModuleOverview } from '@/components/lms/LearnModuleOverview';
 import { LessonFooterNav } from '@/components/lms/LessonFooterNav';
 import { LessonPlayer } from '@/components/lms/LessonPlayer';
+import { scrollLessonToTop } from '@/lib/lms/lesson-scroll';
 import { ProgressSharePrompt } from '@/components/lms/ProgressSharePrompt';
 import { ReviewAsk } from '@/components/lms/ReviewAsk';
 import { shouldMountPlayerReviewAsk } from '@/lib/reviews/review-ask';
@@ -108,6 +109,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
   const resetLock = useRef(false);
   const [resettingDraft, setResettingDraft] = useState(false);
   const [unknownResultKey, setUnknownResultKey] = useState<string | null>(null);
+  const shellRef = useRef<HTMLDivElement>(null);
   const lessonFromQuery = searchParams.get('lesson');
   const moduleFromQuery = searchParams.get('module');
 
@@ -440,6 +442,8 @@ export function LearnCourseShell({ slug }: { slug: string }) {
     setActiveLessonId(lessonId);
     setActiveModuleId(null);
     replaceLessonQuery(lessonId);
+    // GP-627: the next lesson (including a quiz) opens at the top, not at the old offset.
+    scrollLessonToTop(shellRef.current);
   }
 
   async function selectModuleOverview(moduleId: string) {
@@ -726,7 +730,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
   }
 
   return (
-    <div className="learner-home flex w-full max-w-none min-w-0 flex-col gap-6"
+    <div ref={shellRef} className="learner-home flex w-full max-w-none min-w-0 flex-col gap-6"
       onClickCapture={(event) => {
         const anchor = (event.target as HTMLElement).closest('a');
         const href = anchor?.getAttribute('href');
@@ -1003,6 +1007,7 @@ export function LearnCourseShell({ slug }: { slug: string }) {
                         initialPosition={checkpoint.state.draft?.position}
                         onPositionChange={(position) => { if (checkpoint.state.draft) checkpoint.controller?.update({ position, answers: checkpoint.state.draft.answers }); }}
                         lesson={lessonDetail.lesson}
+                        enrolled={Boolean(lessonDetail.enrollment_id)}
                         resources={lessonDetail.resources}
                         variant={isOnboardingProgram ? 'enterprise' : 'default'}
                         moduleTitle={activeModule?.title}
