@@ -21,6 +21,7 @@ import { trackFunnelEvent } from '@/lib/analytics/track-funnel-event';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { purchaseSurveyCheckoutField } from '@/lib/marketing/purchase-survey-key';
+import { analyticsConsentCheckoutField } from '@/lib/analytics/consent-client';
 
 interface EnrolButtonProps {
   slug: string;
@@ -239,6 +240,7 @@ export function EnrolButton({
         ...(buyMode === 'team' ? { team_seat_count: teamSeats } : {}),
         ...(currentUser.email ? { customer_email: currentUser.email } : {}),
         ...purchaseSurveyCheckoutField(),
+        ...analyticsConsentCheckoutField(),
       });
 
       if (data.enrolled) {

@@ -311,6 +311,31 @@ describe('campaign attribution', () => {
   });
 });
 
+describe('the visitor analytics choice (GP-732)', () => {
+  it.each([
+    ['granted', true],
+    ['denied', false],
+    ['unset', false],
+    [undefined, false],
+    [true, false],
+  ])('passes analytics_consent=%s on as %s, outside the attribution metadata', async (sent, expected) => {
+    mocks.findUser.mockResolvedValue(null);
+
+    const res = await POST(
+      request({
+        slug: COURSE_SLUG,
+        customer_email: 'new@example.test',
+        ...(sent === undefined ? {} : { analytics_consent: sent }),
+      })
+    );
+
+    expect(res.status).toBe(200);
+    const params = mocks.createStripe.mock.calls[0][0];
+    expect(params.analytics_consent).toBe(expected);
+    expect(params.extra_metadata).toEqual({});
+  });
+});
+
 describe('purchase survey tab key (Authority Machine slice 1b, GP-662)', () => {
   const FLAG = 'PURCHASE_SURVEY_ENABLED';
   const TAB_KEY = '0123456789abcdef0123456789abcdef';

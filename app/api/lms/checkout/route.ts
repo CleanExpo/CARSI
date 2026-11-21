@@ -1,6 +1,9 @@
 /**
  * POST /api/lms/checkout
- * Body: { slug, success_url?, cancel_url?, customer_email? }
+ * Body: { slug, success_url?, cancel_url?, customer_email?, analytics_consent? }
+ *
+ * `analytics_consent` is the visitor's analytics choice from the browser (GP-732). Only
+ * `'granted'` lets the webhook send the server-side GA4 `purchase` event.
  *
  * Stripe Checkout via STRIPE_SECRET_KEY + published LMS catalogue; enrolment finalised in-app.
  * Applies `user_discounts` when the learner has an active row for the course in Postgres.
@@ -17,6 +20,7 @@ import {
   parseTeamSeatCount,
   validateTeamSeatCount,
 } from '@/lib/checkout-purchase-mode';
+import { analyticsConsentFromBody } from '@/lib/server/analytics-consent';
 import {
   createStripeCheckoutForCourse,
   resolveCheckoutEmail,
@@ -88,6 +92,7 @@ export async function POST(request: NextRequest) {
       purchase_mode?: string;
       team_seat_count?: number;
       survey_key?: unknown;
+      analytics_consent?: unknown;
     };
     const attributionJourneyId = readAttributionJourneyId(request);
     const utmMetadata = parseUtmCookie(request.cookies.get(UTM_COOKIE_NAME)?.value);
@@ -106,6 +111,8 @@ export async function POST(request: NextRequest) {
     const checkoutMetadata: Record<string, string> = surveyKey
       ? { ...attributionMetadata, [PURCHASE_SURVEY_BINDING_METADATA_KEY]: purchaseSurveyBinding(surveyKey) }
       : attributionMetadata;
+    // GP-732: the visitor's analytics choice, read back by the webhook before any GA4 event.
+    const analyticsConsent = analyticsConsentFromBody(body.analytics_consent);
 
     const slug = typeof body.slug === 'string' ? body.slug.trim() : '';
     if (!slug) {
@@ -386,6 +393,7 @@ export async function POST(request: NextRequest) {
             purchase_mode: purchaseMode,
             team_seat_count: teamSeatCount ?? undefined,
             attribution_journey_id: attributionJourneyId ?? undefined,
+        analytics_consent: analyticsConsent,
           });
           await tryRecordAttributedStage(attributionJourneyId, 'checkout_started', {
             courseSlug: slug,
@@ -436,6 +444,7 @@ export async function POST(request: NextRequest) {
         purchase_mode: purchaseMode,
         team_seat_count: teamSeatCount ?? undefined,
         attribution_journey_id: attributionJourneyId ?? undefined,
+        analytics_consent: analyticsConsent,
         extra_metadata: checkoutMetadata,
       });
       await tryRecordAttributedStage(attributionJourneyId, 'checkout_started', {

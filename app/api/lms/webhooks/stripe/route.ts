@@ -26,6 +26,7 @@ import {
   persistAttributedRevenueReversal,
   recordAttributedStage,
 } from '@/lib/server/event-attribution';
+import { hasAnalyticsConsent } from '@/lib/server/analytics-consent';
 import { sendGa4PurchaseEvent } from '@/lib/server/ga4-measurement-protocol';
 import { ensureGuestUserFromStripeEmail } from '@/lib/server/guest-checkout';
 import { sessionClaimsForUserId } from '@/lib/server/lms-auth';
@@ -493,10 +494,12 @@ export async function POST(request: NextRequest) {
 
         // WS3 / GP-447: server-side `purchase` event (GA4 Measurement Protocol).
         // Never blocks fulfilment — the utility itself no-ops/swallows errors.
+        // GP-732: sent only when the session records the visitor's yes to
+        // analytics at checkout; never with the learner's account id.
         const valueAud = typeof session.amount_total === 'number' ? session.amount_total / 100 : 0;
         void sendGa4PurchaseEvent({
           clientId: ref,
-          userId: claims.sub,
+          analyticsConsent: hasAnalyticsConsent(session.metadata),
           courseSlug: slug,
           valueAud,
           transactionId: ref,

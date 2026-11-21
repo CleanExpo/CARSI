@@ -18,6 +18,7 @@ import { trackFunnelEvent } from '@/lib/analytics/track-funnel-event';
 import { TurnstileWidget } from '@/components/security/TurnstileWidget';
 import { isSafeInternalPath } from '@/lib/auth/guest-recovery-path';
 import { purchaseSurveyCheckoutField } from '@/lib/marketing/purchase-survey-key';
+import { analyticsConsentCheckoutField } from '@/lib/analytics/consent-client';
 
 /** Fail-closed client check: empty or space-only email never reaches checkout or free enrol. */
 export function guestEnrolEmailIsUsable(value: string): boolean {
@@ -141,6 +142,7 @@ export function GuestEnrolForm({
           purchase_mode: purchaseMode,
           ...(purchaseMode === 'team' ? { team_seat_count: teamSeats } : {}),
           ...purchaseSurveyCheckoutField(),
+          ...analyticsConsentCheckoutField(),
         }),
       });
       const data = (await res.json().catch(() => ({}))) as {

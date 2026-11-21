@@ -94,10 +94,6 @@ function planFromSubscription(subscription: Stripe.Subscription): string {
 
 async function trackStarted(subscription: Stripe.Subscription): Promise<void> {
   if (subscription.status !== 'active' && subscription.status !== 'trialing') return;
-  const userId = await resolveUserIdForStripeSubscription(
-    subscription,
-    await emailForSubscriptionCustomer(subscription),
-  );
   await tryRecordAttributedStage(
     parseAttributionJourneyId(subscription.metadata?.attribution_journey_id),
     'subscription',
@@ -106,8 +102,8 @@ async function trackStarted(subscription: Stripe.Subscription): Promise<void> {
   void trackSubscriptionLifecycleEvent({
     event: 'subscription_started',
     plan: planFromSubscription(subscription),
-    userId: userId ?? undefined,
     subscriptionId: subscription.id,
+    metadata: subscription.metadata,
   });
 }
 
@@ -116,6 +112,7 @@ async function trackLapsed(subscription: Stripe.Subscription): Promise<void> {
     event: 'subscription_lapsed',
     plan: planFromSubscription(subscription),
     subscriptionId: subscription.id,
+    metadata: subscription.metadata,
   });
 }
 
@@ -438,6 +435,7 @@ export async function handleSubscriptionEvent(event: Stripe.Event): Promise<void
             event: 'subscription_renewed',
             plan: planFromSubscription(subscription),
             subscriptionId: subscription.id,
+            metadata: subscription.metadata,
           });
         }
       } catch (error) {
