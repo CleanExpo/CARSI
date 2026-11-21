@@ -125,7 +125,11 @@ export function extractLessonSources(html: string | null | undefined): CourseRef
         out.push({ label, url: httpUrl(anchor[1]), readOn });
         continue;
       }
-      const label = plainText(inner);
+      // The read date is carried in readOn; leaving it in the label would split one source into
+      // several on dedupe and show the date twice.
+      const label = plainText(inner)
+        .replace(/[\s.,;:]*\bRead\s+\d{2}\/\d{2}\/\d{4}\b\.?\s*$/, '')
+        .trim();
       if (!label || NO_SOURCE_RE.test(label) || NAMES_IICRC_RE.test(label)) continue;
       out.push({ label, url: null, readOn });
     }

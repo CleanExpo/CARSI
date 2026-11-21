@@ -67,6 +67,17 @@ describe('extractLessonSources', () => {
     ]);
   });
 
+  it('strips the read date from a name-only label so one source dedupes to one entry', () => {
+    const lesson = (d: string) =>
+      extractLessonSources(BLOCK(`<li>AS 1884:2021, Floor coverings. Read ${d}.</li>`));
+    expect(lesson('02/11/2026')).toEqual([
+      { label: 'AS 1884:2021, Floor coverings', url: null, readOn: '02/11/2026' },
+    ]);
+    expect(extractLessonSources(BLOCK('<li>Undated source name</li>'))[0].label).toBe(
+      'Undated source name'
+    );
+  });
+
   it('holds IICRC-naming sources back from the public block until GP-639 review', () => {
     const refs = extractLessonSources(
       BLOCK(
