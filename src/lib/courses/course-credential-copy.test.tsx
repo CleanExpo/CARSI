@@ -39,9 +39,9 @@ const approved = new Set(getApprovedCecSlugs());
 const nonApproved = catalogue.courses.filter((c) => !approved.has(c.slug));
 const anApproved = catalogue.courses.find((c) => approved.has(c.slug));
 
-function renderPage(slug: string, title: string, cecApproved: boolean): string {
+function renderPage(slug: string, title: string, cecApproved: boolean, cecHours: string | null = null): string {
   const designation = getDesignationForCourseSlug(slug);
-  const course = { slug, title, price_aud: '29', is_free: false, cec_hours: null, thumbnailUrl: null };
+  const course = { slug, title, price_aud: '29', is_free: false, cec_hours: cecHours, thumbnailUrl: null };
   const page = renderToStaticMarkup(
     createElement(CoursePublicDetail, {
       course,
@@ -93,6 +93,19 @@ describe('course page credential wording (GP-748)', () => {
     expect(getCourseLearningOutcomes({ cec_hours: null }, null, false).join(' ')).not.toMatch(/iicrc/i);
     expect(getCourseLearningOutcomes({ cec_hours: null }, null).join(' ')).not.toMatch(/iicrc/i);
     expect(getCourseLearningOutcomes({ cec_hours: null }, null, true).join(' ')).toMatch(/not an IICRC certification/);
+  });
+
+  // PR #1205 review: the approval flag, not the presence of `cec_hours`, decides every IICRC line.
+  // The page sanitises hours upstream today; these pin the helpers so they hold on their own.
+  it('CEC hours on a non-approved course name no IICRC, in the outcomes or anywhere on the page', () => {
+    expect(getCourseLearningOutcomes({ cec_hours: '2' }, null, false).join(' ')).not.toMatch(/iicrc|CEC/i);
+    expect(getCourseLearningOutcomes({ cec_hours: '2' }, null).join(' ')).not.toMatch(/iicrc|CEC/i);
+    expect(getCourseLearningOutcomes({ cec_hours: '2' }, null, true).join(' ')).toMatch(/Earn 2 IICRC Continuing Education Credits/);
+    const plain = nonApproved[0];
+    const html = renderPage(plain.slug, plain.title, false, '2');
+    expect(html).not.toMatch(/iicrc/i);
+    const html2 = renderPage(anApproved!.slug, anApproved!.title, true, '2');
+    expect(html2).toContain('Earns 2 IICRC CEC hours');
   });
 
   it('the course page computes the flag from the registry and passes it to both components', () => {

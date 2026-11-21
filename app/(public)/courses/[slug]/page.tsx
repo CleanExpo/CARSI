@@ -249,7 +249,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ s
   const previewLesson = course.syllabus
     ?.flatMap((m) => m.lessons)
     .find((l) => l.is_preview && l.preview_body);
-  const audienceItems = getCourseAudienceItems(course, designation);
+  const audienceItems = getCourseAudienceItems(course, designation, cecApproved);
 
   const breadcrumbs = [
     { name: 'Home', url: siteUrl },

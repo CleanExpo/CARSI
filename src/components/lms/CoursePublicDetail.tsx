@@ -14,6 +14,7 @@ import { CourseThumbnail } from '@/components/lms/CourseThumbnail';
 import { EnrolButton } from '@/components/lms/EnrolButton';
 import { ReviewPolicyLink } from '@/components/lms/ReviewPolicy';
 import { courseDurationLabel } from '@/lib/course-duration-label';
+import { approvedCecHours } from '@/lib/courses/course-credential-copy';
 import { CARSI_CREDENTIAL_STATEMENT } from '@/components/seo/JsonLd';
 import type { DesignationDefinition } from '@/lib/designations/registry';
 
@@ -100,6 +101,10 @@ export function CoursePublicDetail({
     'Australian-produced restoration training built for Southern-Hemisphere conditions.';
 
   const durationLabel = courseDurationLabel(course.duration_hours);
+  // GP-748: every IICRC/CEC line on this page reads these hours, and they exist only for a
+  // CEC-approved course. One gate, so no branch can name the IICRC on a non-approved course
+  // because its `cec_hours` happened to be set.
+  const cecHours = approvedCecHours(course.cec_hours, cecApproved);
 
   const stats = [
     { value: priceLabel, label: course.is_free || priceNum === 0 ? 'No cost' : 'Price' },
@@ -109,7 +114,7 @@ export function CoursePublicDetail({
     },
     // A course without an in-force IICRC approval shows no CEC stat at all: "CEC hours —"
     // beside a CEC audience line read as a contradiction.
-    ...(course.cec_hours ? [{ value: course.cec_hours, label: 'IICRC CEC hours' }] : []),
+    ...(cecHours ? [{ value: cecHours, label: 'IICRC CEC hours' }] : []),
     { value: '24/7', label: 'Online access' },
   ];
 
@@ -153,7 +158,7 @@ export function CoursePublicDetail({
               <div className="mt-5 flex flex-wrap gap-2">
                 {course.level ? <Pill>{course.level}</Pill> : null}
                 {course.category ? <Pill>{course.category}</Pill> : null}
-                {course.cec_hours ? <Pill>{cecEarnsLabel(course.cec_hours)}</Pill> : null}
+                {cecHours ? <Pill>{cecEarnsLabel(cecHours)}</Pill> : null}
               </div>
 
               {aggregateRating ? (
@@ -253,7 +258,7 @@ export function CoursePublicDetail({
                     }
                     isFree={course.is_free || priceNum === 0}
                     level={course.level}
-                    cecHoursLabel={course.cec_hours}
+                    cecHoursLabel={cecHours}
                     durationHours={course.duration_hours}
                   />
                 </div>
@@ -434,8 +439,8 @@ export function CoursePublicDetail({
             Start this course when the roster allows
           </h2>
           <p className={`mx-auto mt-5 max-w-lg ${LANDING_LEAD_CLASS}`}>
-            {course.cec_hours
-              ? `${cecEarnsLabel(course.cec_hours)} and a verifiable digital credential on completion.`
+            {cecHours
+              ? `${cecEarnsLabel(cecHours)} and a verifiable digital credential on completion.`
               : 'Complete the course and receive a verifiable digital credential for your portfolio.'}
           </p>
           <div className="mx-auto mt-10 max-w-sm">

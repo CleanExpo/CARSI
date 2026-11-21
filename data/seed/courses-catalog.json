@@ -5113,7 +5113,7 @@
     ],
     "linearIssue": "GP-469",
     "australianProduced": true,
-    "standardsReferenced": "None named.",
+    "standardsReferenced": "Nominative only (AS/NZS 3000, AS/NZS 3112 and AS/NZS 3760 for electrical safety and test-and-tag). No standard text reproduced.",
     "designationProgram": "CARSI Southern Hemisphere Restoration Designations",
     "designation": "CARSI Water Restoration Practitioner",
     "quizFile": "data/seed/water-damage-restoration-fundamentals-quiz.json",
@@ -7559,7 +7559,7 @@
     "buildStage": "seeded-unpublished-draft-pending-founder-review",
     "linearIssue": "GP-473",
     "australianProduced": true,
-    "standardsReferenced": "None named.",
+    "standardsReferenced": "Nominative only (AS/NZS 3760 for test-and-tag). No standard text reproduced.",
     "designationProgram": "CARSI Southern Hemisphere Restoration Designations",
     "designation": "CARSI Fire & Smoke Restoration Practitioner",
     "introVideoUnlinked": "2026-11-02: unlinked pending re-render; the old render spoke an unapproved CEC claim (DECISIONS #40, #46)"

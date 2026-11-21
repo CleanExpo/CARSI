@@ -19,7 +19,7 @@ import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, join } from 'node:path';
+import { dirname, join, relative } from 'node:path';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 
@@ -228,4 +228,62 @@ test('reads the real repository at full scope (scope floor)', () => {
   assert.ok(stats.courses.size >= 40, `only ${stats.courses.size} non-approved courses scanned`);
   assert.ok(stats.approvedSkipped.size >= 38, `only ${stats.approvedSkipped.size} approved courses seen`);
   assert.ok(stats.surfaces >= 2000, `only ${stats.surfaces} surfaces scanned`);
+});
+
+// ── PR #1205 review (CodeRabbit): forms of a hit the reader sees but the first guard missed ──
+// One owner (readerViews) builds every view; these pin each form so the class cannot return.
+test('a lowercase standard number is a hit (s500:2025 names the standard)', () => {
+  assert.deepEqual(scopeHits('Refer to s500:2025.'), ['IICRC standard number']);
+  assert.deepEqual(scopeHits('Refer to s-520.'), ['IICRC standard number']);
+  const found = findingsFor((f) => { cat(f).shortDescription = 'Refer to s500:2025.'; });
+  assert.ok(found.some((x) => x.includes('shortDescription') && x.includes('IICRC standard number')), found.join('\n'));
+});
+
+test('a name split by inline markup is a hit; block markup keeps words apart', () => {
+  assert.deepEqual(scopeHits('<p>ii<strong>crc</strong></p>'), ['IICRC']);
+  assert.deepEqual(scopeHits('<p>See <em>S</em>500 here</p>'), ['IICRC standard number']);
+  assert.deepEqual(scopeHits('<p>II</p><p>CRC</p>'), []);
+  const found = findingsFor((f) => { cat(f).modules[0].lessons[0].contentBody = '<p>ii<strong>crc</strong></p>'; });
+  assert.ok(found.some((x) => x.includes('contentBody')), found.join('\n'));
+});
+
+test('an SEO index entry is scanned even when its course has no standalone card', () => {
+  const found = findingsFor((f) => {
+    f[`data/seo/course-cards/${NO}.json`] = undefined;
+    f['data/seo/course-cards.index.json'][NO].seoTitle = 'IICRC course';
+  });
+  assert.ok(found.some((x) => x.startsWith('data/seo/course-cards.index.json') && x.includes('IICRC')), found.join('\n'));
+  // A legacy index entry (slug in no catalogue) stays out of scope and is counted, as documented.
+  const root = fixture((f) => { f['data/seo/course-cards.index.json']['legacy-only'] = { seoTitle: 'IICRC legacy' }; });
+  try {
+    const { findings, stats } = evaluate(root);
+    assert.deepEqual(findings, []);
+    assert.equal(stats.legacyIndexEntries, 1);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('a relative --root reads the same files as an absolute one', () => {
+  const root = fixture();
+  try {
+    const run = spawnSync(process.execPath, [GUARD, '--root=.'], { cwd: root, encoding: 'utf8' });
+    assert.equal(run.status, 0, run.stderr);
+    assert.match(run.stdout, /IICRC scope guard passed/);
+    // The exported evaluate() resolves a relative root itself, so a programmatic caller is safe too.
+    assert.deepEqual(evaluate(relative(process.cwd(), root)).findings, []);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('a course that names a standard may not declare "None named." in meta.standardsReferenced', () => {
+  const plant = (f, c) => {
+    c.meta = { ...(c.meta ?? {}), standardsReferenced: 'None named.' };
+    c.modules[0].lessons[0].contentBody = '<p>Test and tag to AS/NZS 3760.</p>';
+  };
+  const found = findingsFor((f) => plant(f, cat(f)));
+  assert.ok(found.some((x) => x.includes('meta.standardsReferenced') && x.includes('AS/NZS 3760')), found.join('\n'));
+  assert.deepEqual(findingsFor((f) => { plant(f, cat(f)); cat(f).meta.standardsReferenced = 'Nominative only (AS/NZS 3760).'; }), []);
+  assert.deepEqual(findingsFor((f) => { cat(f).meta = { standardsReferenced: 'None named.' }; }), []);
 });

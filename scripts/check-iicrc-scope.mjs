@@ -58,6 +58,14 @@
  *   WordPress seed, owned by GP-525 and GP-749); SEO course cards whose slug is in no
  *   catalogue file (legacy WordPress slugs, GP-749); the live database.
  *
+ * READER VIEWS (one owner, readerViews): each string is matched as written, as the reader sees it
+ * (block tags a space, inline tags joined with no space, so ii<strong>crc</strong> is a hit) and
+ * with every tag a space. Standard numbers match in any case (s500 is a hit).
+ *
+ * STANDARDS METADATA: a non-approved course whose meta.standardsReferenced says "None named" while
+ * its text names an AS, AS/NZS, NZS or ISO standard fails, so cutting an IICRC standard cannot
+ * blank the course's real standards list.
+ *
  * FAIL CLOSED: exits 1 on a hit, on no approved slugs, on no catalogue course read, on a JSON
  * file that will not parse, on a data/seed JSON file that is neither a course file nor a known
  * registry, and on any field this header does not classify (a new field must be classified here
@@ -68,7 +76,7 @@
  * may carry IICRC content only once it is approved in data/seed/cec-approvals.json.
  */
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { normaliseForScan } from './check-cec-course-brand.mjs';
 import { IICRC_CODES, IICRC_ORDINARY_WORD_CODES } from './iicrc-codes.mjs';
 import { isEntryPoint } from './lib/is-entry-point.mjs';
@@ -81,7 +89,9 @@ const TERMS = [
   { label: 'IICRC name spelled out', pattern: /institute\s+of\s+inspection,?\s+cleaning,?\s+and\s+restoration/i },
   {
     label: 'IICRC standard number',
-    pattern: new RegExp(`(?<![A-Za-z0-9])S[\\s-]?(?:${STANDARD_NUMBERS.join('|')})(?![0-9])`),
+    // Case-insensitive: "s500:2025" names the standard as surely as "S500". (Acronyms below stay
+    // uppercase-only, because several are ordinary lowercase words.)
+    pattern: new RegExp(`(?<![A-Za-z0-9])S[\\s-]?(?:${STANDARD_NUMBERS.join('|')})(?![0-9])`, 'i'),
   },
   {
     label: 'IICRC certification acronym',
@@ -95,22 +105,47 @@ const TERMS = [
  */
 const PRODUCT_NAMES = [/\bCDS xDrive\b/g];
 
-/** Labels of every banned term in the text, as written or with markup removed. */
-export function scopeHits(text) {
+/** Tags that start a new line of text for the reader; every other tag is inline. */
+const BLOCK_TAG = /<\/?(?:address|article|aside|blockquote|br|dd|details|div|dl|dt|figcaption|figure|footer|h[1-6]|header|hr|li|main|nav|ol|p|pre|section|summary|table|tbody|td|tfoot|th|thead|tr|ul)\b[^>]*>/gi;
+
+/**
+ * Every view of the text a reader or a search engine can see. One owner for this: the guard and
+ * its snippets both read these views, never a copy of them.
+ *  - as written (markup and all);
+ *  - reader text: block tags become a space, inline tags are joined with NO space, so
+ *    `ii<strong>crc</strong>` reads `iicrc` exactly as the learner sees it;
+ *  - every tag a space (keeps words apart where a block tag is unusual markup).
+ */
+export function readerViews(text) {
   const normal = normaliseForScan(String(text));
-  const views = [normal, normal.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ')].map((v) =>
-    PRODUCT_NAMES.reduce((t, re) => t.replace(re, ' '), v)
-  );
+  const reader = normal.replace(BLOCK_TAG, ' ').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ');
+  const spaced = normal.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ');
+  return [normal, reader, spaced].map((v) => PRODUCT_NAMES.reduce((t, re) => t.replace(re, ' '), v));
+}
+
+/** Labels of every banned term in any reader view of the text. */
+export function scopeHits(text) {
+  const views = readerViews(text);
   return TERMS.filter(({ pattern }) => views.some((v) => pattern.test(v))).map(({ label }) => label);
 }
 
 function snippet(text, label) {
-  const normal = normaliseForScan(String(text)).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ');
   const term = TERMS.find((t) => t.label === label);
+  const views = readerViews(text).slice(1);
+  const normal = (term && views.find((v) => term.pattern.test(v))) || views[0];
   const m = term ? normal.match(term.pattern) : null;
   if (!m) return normal.slice(0, 120);
   const start = Math.max(0, m.index - 60);
   return normal.slice(start, m.index + m[0].length + 60).trim();
+}
+
+/** Australian, NZ and international standards a course names outside meta.standardsReferenced. */
+const NAMED_STANDARD = /\b(?:AS\/NZS|AS|NZS|ISO)\s?\d{3,5}(?:\.\d+)?/g;
+export function namedStandards(course) {
+  const { meta = {}, ...rest } = course ?? {};
+  const { standardsReferenced: _declared, ...metaRest } = meta ?? {};
+  const text = readerViews(JSON.stringify({ ...rest, meta: metaRest }))[1];
+  return [...new Set(text.match(NAMED_STANDARD) ?? [])].sort();
 }
 
 // ── Field classification ─────────────────────────────────────────────────────────────────────
@@ -180,9 +215,13 @@ function draftDirs(root) {
  * Scan a repository (or a fixture copy of one). Returns { findings, stats }; findings are
  * strings "file :: course :: field :: term :: text". Throws on an unreadable registry.
  */
-export function evaluate(root) {
+export function evaluate(rootDir) {
+  // rel() strips `root/` by length, so every path must start with the exact absolute root.
+  const root = resolve(rootDir);
   const findings = [];
-  const stats = { courses: new Set(), approvedSkipped: new Set(), surfaces: 0, notInspected: [], legacyCards: 0 };
+  const stats = {
+    courses: new Set(), approvedSkipped: new Set(), surfaces: 0, notInspected: [], legacyCards: 0, legacyIndexEntries: 0,
+  };
   const approved = new Set(
     (JSON.parse(readFileSync(join(root, 'data/seed/cec-approvals.json'), 'utf8')).approvals ?? [])
       .filter((a) => a && a.status === 'approved' && typeof a.slug === 'string')
@@ -251,6 +290,15 @@ export function evaluate(root) {
             })
           );
         } else unclassified(file, slug, `${at}.${k}`);
+      }
+      // Removing an IICRC standard must not blank the course's standards metadata: a course that
+      // still names an Australian or international standard must list it (review of #1205).
+      const named = namedStandards(c);
+      const declared = c?.meta?.standardsReferenced;
+      if (typeof declared === 'string' && /^\s*none named/i.test(declared) && named.length > 0) {
+        findings.push(
+          `${file} :: ${slug} :: ${at}.meta.standardsReferenced :: says "None named" but the course names ${named.join(', ')} :: "${declared}"`
+        );
       }
     });
   }
@@ -333,7 +381,18 @@ export function evaluate(root) {
       if (approved.has(slug)) continue;
       const doc = readJson(join(cardDir, n));
       if (doc) scanAll(`data/seo/course-cards/${n}`, slug, 'card', doc);
-      if (index && index[slug]) scanAll('data/seo/course-cards.index.json', slug, `["${slug}"]`, index[slug]);
+    }
+  }
+  // 6. The SEO index, entry by entry, on its own: an index entry is served whether or not a
+  // standalone card file exists for it. Same catalogue-slug and approval filters as the cards.
+  if (index) {
+    for (const slug of Object.keys(index).sort()) {
+      if (!catalogueSlugs.has(slug)) {
+        stats.legacyIndexEntries += 1;
+        continue;
+      }
+      if (approved.has(slug)) continue;
+      scanAll('data/seo/course-cards.index.json', slug, `["${slug}"]`, index[slug]);
     }
   }
   return { findings, stats };
@@ -341,7 +400,8 @@ export function evaluate(root) {
 
 function main() {
   const rootArg = process.argv.find((a) => a.startsWith('--root='));
-  const root = rootArg ? rootArg.slice('--root='.length).replace(/\/+$/, '') : process.cwd();
+  // Resolve to an absolute path: rel() strips `root/` by length, so `--root=.` must not reach it as `.`.
+  const root = resolve(rootArg ? rootArg.slice('--root='.length) : process.cwd());
   let result;
   try {
     result = evaluate(root);
@@ -352,7 +412,7 @@ function main() {
   const { findings, stats } = result;
   const notScanned =
     `Not scanned: ${stats.notInspected.length} binary file(s) under public/courses (NOT INSPECTED, not clean): ` +
-    `${stats.notInspected.join(', ') || 'none'}; ${stats.legacyCards} SEO course card(s) with a legacy slug in no catalogue; ` +
+    `${stats.notInspected.join(', ') || 'none'}; ${stats.legacyCards} SEO course card(s) and ${stats.legacyIndexEntries} index entr(ies) with a legacy slug in no catalogue; ` +
     'data/wordpress-export (GP-525, GP-749). See the header for the full list.';
   if (findings.length > 0) {
     console.error(`\n✖ IICRC scope guard failed — ${findings.length} issue(s)\n`);

@@ -9,6 +9,15 @@
 import { formatCecHoursForDisplay } from '@/lib/cec-display';
 import type { DesignationDefinition } from '@/lib/designations/registry';
 
+/**
+ * The CEC hours a course page may show: the course's hours only when the course is CEC-approved,
+ * otherwise null. CEC hours are IICRC wording, so this is the ONE gate every page line that names
+ * them reads (outcomes, audience, stats, pill, sidebar, enrol line). Never test `cec_hours` alone.
+ */
+export function approvedCecHours(cecHours: string | null | undefined, cecApproved: boolean | undefined): string | null {
+  return cecApproved === true ? (cecHours ?? null) : null;
+}
+
 export function getCourseLearningOutcomes(
   course: { cec_hours?: string | null },
   designation: DesignationDefinition | null,
@@ -22,7 +31,8 @@ export function getCourseLearningOutcomes(
     );
   }
 
-  const cecHoursLabel = formatCecHoursForDisplay(course.cec_hours);
+  // CEC hours are IICRC wording, so they too are shown only for a CEC-approved course (GP-748).
+  const cecHoursLabel = formatCecHoursForDisplay(approvedCecHours(course.cec_hours, cecApproved));
   if (cecHoursLabel) {
     const plural = cecHoursLabel === '1' ? '' : 's';
     outcomes.push(
