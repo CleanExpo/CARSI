@@ -1,6 +1,6 @@
 /**
  * BACKLOG #27 — E-E-A-T authority metrics for the Monday pulse: referring domains, keyword growth
- * and AI-answer presence. An AUTHORITY metric, not RWR: it compounds slowly and must not be read
+ * and AI-answer presence (as ranking keywords whose SERP shows an AI Overview, Semrush FK52). An AUTHORITY metric, not RWR: it compounds slowly and must not be read
  * as revenue movement.
  *
  * Fails closed exactly like the RWR report (`rwr-report.ts`): a metric that could not be read is
@@ -30,14 +30,27 @@ export type KeywordGrowth = Metric<{
   previousDate: string;
   change: number;
 }>;
-export type AiAnswerPresence = Metric<{ value: number }>;
+/**
+ * Semrush FK52 (SERP feature 52 = "AI overview"): how many of the domain's ranking keywords have a
+ * results page that shows a Google AI Overview. It does NOT say CARSI is cited in the overview
+ * (that would be FP52), so it is always labelled with AI_OVERVIEW_LABEL.
+ */
+export type AiOverviewKeywords = Metric<{
+  label: typeof AI_OVERVIEW_LABEL;
+  latest: number;
+  rankingKeywords: number;
+  latestDate: string;
+  previous: number;
+  previousDate: string;
+  change: number;
+}>;
 
 export type EeatSnapshot = {
   domain: string;
   database: string;
   referringDomains: ReferringDomains;
   keywordGrowth: KeywordGrowth;
-  aiAnswerPresence: AiAnswerPresence;
+  aiOverviewKeywords: AiOverviewKeywords;
 };
 
 export type HttpText = { status: number; body: string };
@@ -51,10 +64,8 @@ export type EeatDeps = {
 
 const missing = (reason: string): MetricMissing => ({ status: 'not_available', reason });
 
-/** AI-answer presence has no automated source wired. Stated, not guessed. */
-export const AI_PRESENCE_UNWIRED =
-  'no automated source is wired: the Semrush AI-visibility / prompt-tracking data has no ' +
-  'documented REST endpoint in this repo; check the target questions by hand and record the date';
+export const AI_OVERVIEW_LABEL =
+  'ranking keywords whose results page shows a Google AI Overview (does not mean CARSI is cited)';
 
 /**
  * Semrush reports failures as HTTP 200 with a body like `ERROR 50 :: NOTHING FOUND`. Only that
@@ -97,37 +108,69 @@ function isoDate(cell: string | undefined): string | null {
   return m ? `${m[1]}-${m[2]}-${m[3]}` : null;
 }
 
-/** `type=domain_rank_history`, `export_columns=Dt,Or` — monthly organic keyword snapshots. */
-export function parseKeywordGrowth(res: HttpText, key: string, now: Date): KeywordGrowth {
+/** Header names Semrush returns for `export_columns=Dt,Or,FK52`, in that order. */
+const RANK_HISTORY_HEADER = ['date', 'organic keywords', 'ai overview'];
+
+/**
+ * `type=domain_rank_history`, `export_columns=Dt,Or,FK52` — monthly snapshots of organic keyword
+ * count and of ranking keywords whose SERP shows an AI Overview. One call feeds both metrics.
+ * The header is checked so a renamed or reordered column is "not available", never misread.
+ */
+export function parseRankHistory(
+  res: HttpText,
+  key: string,
+  now: Date
+): { keywordGrowth: KeywordGrowth; aiOverviewKeywords: AiOverviewKeywords } {
+  const both = (m: MetricMissing) => ({ keywordGrowth: m, aiOverviewKeywords: m });
   const err = describeSemrushError(res, key);
-  if (err) return missing(err);
-  const points: { date: string; count: number }[] = [];
+  if (err) return both(missing(err));
+  const header = (res.body.split(/\r?\n/)[0] ?? '').split(';').map((c) => c.trim().toLowerCase());
+  if (RANK_HISTORY_HEADER.some((h, i) => header[i] !== h)) {
+    return both(
+      missing('Semrush keyword history header was not Date;Organic Keywords;AI overview')
+    );
+  }
+  const points: { date: string; count: number; aio: number }[] = [];
   for (const row of dataRows(res.body)) {
     const date = isoDate(row[0]);
     const count = wholeNumber(row[1]);
-    if (date === null || count === null) {
-      return missing('Semrush keyword history had an unreadable row');
+    const aio = wholeNumber(row[2]);
+    if (date === null || count === null || aio === null) {
+      return both(missing('Semrush keyword history had an unreadable row'));
     }
-    points.push({ date, count });
+    points.push({ date, count, aio });
   }
   if (points.length < 2) {
-    return missing('Semrush keyword history has fewer than two snapshots to compare');
+    return both(missing('Semrush keyword history has fewer than two snapshots to compare'));
   }
   points.sort((a, b) => b.date.localeCompare(a.date));
   const [latest, previous] = points;
   const ageDays = (now.getTime() - Date.parse(`${latest.date}T00:00:00Z`)) / 86_400_000;
   if (!(ageDays <= EEAT_MAX_SNAPSHOT_AGE_DAYS)) {
-    return missing(
-      `latest Semrush keyword snapshot is ${latest.date}, older than ${EEAT_MAX_SNAPSHOT_AGE_DAYS} days`
+    return both(
+      missing(
+        `latest Semrush keyword snapshot is ${latest.date}, older than ${EEAT_MAX_SNAPSHOT_AGE_DAYS} days`
+      )
     );
   }
+  const dates = { latestDate: latest.date, previousDate: previous.date };
   return {
-    status: 'ok',
-    latest: latest.count,
-    latestDate: latest.date,
-    previous: previous.count,
-    previousDate: previous.date,
-    change: latest.count - previous.count,
+    keywordGrowth: {
+      status: 'ok',
+      ...dates,
+      latest: latest.count,
+      previous: previous.count,
+      change: latest.count - previous.count,
+    },
+    aiOverviewKeywords: {
+      status: 'ok',
+      label: AI_OVERVIEW_LABEL,
+      ...dates,
+      latest: latest.aio,
+      rankingKeywords: latest.count,
+      previous: previous.aio,
+      change: latest.aio - previous.aio,
+    },
   };
 }
 
@@ -150,7 +193,7 @@ function keywordHistoryUrl(key: string, domain: string, database: string): strin
     database,
     display_limit: '2',
     display_sort: 'dt_desc',
-    export_columns: 'Dt,Or',
+    export_columns: 'Dt,Or,FK52',
   });
   return `https://api.semrush.com/?${q}`;
 }
@@ -171,18 +214,18 @@ const isMissing = (x: HttpText | MetricMissing): x is MetricMissing =>
 export async function collectEeat(deps: EeatDeps): Promise<EeatSnapshot> {
   const domain = deps.env.EEAT_DOMAIN?.trim() || EEAT_DEFAULT_DOMAIN;
   const database = deps.env.EEAT_SEMRUSH_DATABASE?.trim() || EEAT_DEFAULT_DATABASE;
-  const base = { domain, database, aiAnswerPresence: missing(AI_PRESENCE_UNWIRED) };
+  const base = { domain, database };
 
   const key = deps.env.SEMRUSH_API_KEY?.trim() ?? '';
   if (!key) {
     const why = missing('SEMRUSH_API_KEY is not set, so Semrush cannot be read');
-    return { ...base, referringDomains: why, keywordGrowth: why };
+    return { ...base, referringDomains: why, keywordGrowth: why, aiOverviewKeywords: why };
   }
   if (deps.env.SEMRUSH_ALLOW_METERED?.trim() !== '1') {
     const why = missing(
       'Semrush calls are metered; the founder has not set SEMRUSH_ALLOW_METERED=1 (SPEC row 27 stop-line)'
     );
-    return { ...base, referringDomains: why, keywordGrowth: why };
+    return { ...base, referringDomains: why, keywordGrowth: why, aiOverviewKeywords: why };
   }
 
   const now = deps.now ?? new Date();
@@ -193,7 +236,9 @@ export async function collectEeat(deps: EeatDeps): Promise<EeatSnapshot> {
   return {
     ...base,
     referringDomains: isMissing(rd) ? rd : parseReferringDomains(rd, key),
-    keywordGrowth: isMissing(kw) ? kw : parseKeywordGrowth(kw, key, now),
+    ...(isMissing(kw)
+      ? { keywordGrowth: kw, aiOverviewKeywords: kw }
+      : parseRankHistory(kw, key, now)),
   };
 }
 
@@ -208,9 +253,16 @@ export function formatEeat(s: EeatSnapshot): string[] {
     line(
       'Organic keywords',
       s.keywordGrowth,
-      (m) => `${m.latest} (${m.latestDate}) vs ${m.previous} (${m.previousDate}), ${signed(m.change)}`
+      (m) =>
+        `${m.latest} (${m.latestDate}) vs ${m.previous} (${m.previousDate}), ${signed(m.change)}`
     ),
-    line('AI-answer presence', s.aiAnswerPresence, (m) => `${m.value}`),
+    line(
+      'AI Overview SERPs',
+      s.aiOverviewKeywords,
+      (m) =>
+        `${m.latest} of ${m.rankingKeywords} ${m.label} (${m.latestDate}); ` +
+        `${m.previous} on ${m.previousDate}, ${signed(m.change)}`
+    ),
   ];
 }
 
@@ -225,6 +277,6 @@ export async function runEeatReport(
   const s = await collectEeat(deps);
   if (deps.json) deps.out(JSON.stringify(s));
   else for (const l of formatEeat(s)) deps.out(l);
-  const all = [s.referringDomains, s.keywordGrowth, s.aiAnswerPresence];
+  const all = [s.referringDomains, s.keywordGrowth, s.aiOverviewKeywords];
   return all.every((m) => m.status === 'ok') ? 0 : 2;
 }

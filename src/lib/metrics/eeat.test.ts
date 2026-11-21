@@ -7,7 +7,8 @@ import { describe, expect, it } from 'vitest';
 import {
   collectEeat,
   formatEeat,
-  parseKeywordGrowth,
+  AI_OVERVIEW_LABEL,
+  parseRankHistory,
   parseReferringDomains,
   runEeatReport,
   type FetchText,
@@ -30,7 +31,9 @@ function fakeSemrush(bodies: { backlinks?: string; history?: string; status?: nu
 }
 
 const OK_BACKLINKS = 'domains_num\r\n57\r\n';
-const OK_HISTORY = 'Date;Organic Keywords\r\n20261015;131\r\n20260915;119\r\n';
+/** Shape of the 2026-11-21 connector run for carsi.com.au / au, cut to Dt,Or,FK52. */
+const OK_HISTORY = 'Date;Organic Keywords;AI overview\r\n20261015;161;148\r\n20260915;110;94\r\n';
+const H = 'Date;Organic Keywords;AI overview';
 
 describe('parse — Semrush CSV', () => {
   it('reads referring domains', () => {
@@ -40,16 +43,39 @@ describe('parse — Semrush CSV', () => {
     });
   });
 
-  it('reads keyword growth newest-first whatever the row order', () => {
-    const body = 'Date;Organic Keywords\n20260915;119\n20261015;131\n';
-    expect(parseKeywordGrowth({ status: 200, body }, KEY, NOW)).toEqual({
-      status: 'ok',
-      latest: 131,
-      latestDate: '2026-10-15',
-      previous: 119,
-      previousDate: '2026-09-15',
-      change: 12,
+  it('reads keyword growth and AI Overview SERPs newest-first whatever the row order', () => {
+    const body = `${H}\n20260915;110;94\n20261015;161;148\n`;
+    expect(parseRankHistory({ status: 200, body }, KEY, NOW)).toEqual({
+      keywordGrowth: {
+        status: 'ok',
+        latest: 161,
+        latestDate: '2026-10-15',
+        previous: 110,
+        previousDate: '2026-09-15',
+        change: 51,
+      },
+      aiOverviewKeywords: {
+        status: 'ok',
+        label: AI_OVERVIEW_LABEL,
+        latest: 148,
+        rankingKeywords: 161,
+        latestDate: '2026-10-15',
+        previous: 94,
+        previousDate: '2026-09-15',
+        change: 54,
+      },
     });
+  });
+
+  it('a missing or reordered AI overview column is not available, never misread', () => {
+    for (const body of [
+      'Date;Organic Keywords\n20261015;161\n20260915;110\n',
+      'Date;AI overview;Organic Keywords\n20261015;148;161\n20260915;94;110\n',
+    ]) {
+      const r = parseRankHistory({ status: 200, body }, KEY, NOW);
+      expect(r.keywordGrowth.status).toBe('not_available');
+      expect(r.aiOverviewKeywords.status).toBe('not_available');
+    }
   });
 
   it('a Semrush ERROR body is not available, never 0', () => {
@@ -67,15 +93,18 @@ describe('parse — Semrush CSV', () => {
   });
 
   it('a stale latest snapshot is not passed off as current', () => {
-    const body = 'Date;Organic Keywords\n20260601;131\n20260501;119\n';
-    const r = parseKeywordGrowth({ status: 200, body }, KEY, NOW);
-    expect(r.status).toBe('not_available');
-    expect(r.status === 'not_available' && r.reason).toMatch(/older than 62 days/);
+    const body = `${H}\n20260601;131;100\n20260501;119;90\n`;
+    const r = parseRankHistory({ status: 200, body }, KEY, NOW);
+    expect(r.aiOverviewKeywords.status).toBe('not_available');
+    const kg = r.keywordGrowth;
+    expect(kg.status === 'not_available' && kg.reason).toMatch(/older than 62 days/);
   });
 
   it('one snapshot cannot show growth', () => {
-    const body = 'Date;Organic Keywords\n20261015;131\n';
-    expect(parseKeywordGrowth({ status: 200, body }, KEY, NOW).status).toBe('not_available');
+    const body = `${H}\n20261015;161;148\n`;
+    expect(parseRankHistory({ status: 200, body }, KEY, NOW).keywordGrowth.status).toBe(
+      'not_available'
+    );
   });
 
   it('a non-2xx status is not available', () => {
@@ -106,14 +135,16 @@ describe('collectEeat — fail closed before any metered call', () => {
     );
   });
 
-  it('with key and opt-in: reads both Semrush metrics for the AU database', async () => {
+  it('with key and opt-in: two calls read all three metrics for the AU database', async () => {
     const f = fakeSemrush({ backlinks: OK_BACKLINKS, history: OK_HISTORY });
     const s = await collectEeat({ env: ENV, fetchText: f.fetchText, now: NOW });
     expect(f.calls).toHaveLength(2);
     expect(s.referringDomains).toEqual({ status: 'ok', value: 57 });
-    expect(s.keywordGrowth).toMatchObject({ status: 'ok', latest: 131, change: 12 });
-    expect(new URL(f.calls[1]).searchParams.get('database')).toBe('au');
-    expect(s.aiAnswerPresence.status).toBe('not_available');
+    expect(s.keywordGrowth).toMatchObject({ status: 'ok', latest: 161, change: 51 });
+    expect(s.aiOverviewKeywords).toMatchObject({ status: 'ok', latest: 148, change: 54 });
+    const history = new URL(f.calls[1]).searchParams;
+    expect(history.get('database')).toBe('au');
+    expect(history.get('export_columns')).toBe('Dt,Or,FK52');
   });
 
   it('a thrown fetch error carrying the URL reports the type only', async () => {
@@ -161,7 +192,7 @@ describe('runEeatReport — output and exit code', () => {
     const text = lines.join('\n');
     expect(text).toMatch(/Referring domains: not available \(/);
     expect(text).toMatch(/Organic keywords: not available \(/);
-    expect(text).toMatch(/AI-answer presence: not available \(/);
+    expect(text).toMatch(/AI Overview SERPs: not available \(/);
     expect(text).not.toMatch(/:\s*0\b/);
   });
 
@@ -175,6 +206,38 @@ describe('runEeatReport — output and exit code', () => {
       out: (l) => lines.push(l),
     });
     expect(lines).toContain('  Referring domains: 57');
-    expect(lines).toContain('  Organic keywords: 131 (2026-10-15) vs 119 (2026-09-15), +12');
+    expect(lines).toContain('  Organic keywords: 161 (2026-10-15) vs 110 (2026-09-15), +51');
+  });
+
+  it('pins the AI Overview wording: not a citation claim, in text and JSON', async () => {
+    expect(AI_OVERVIEW_LABEL).toBe(
+      'ranking keywords whose results page shows a Google AI Overview (does not mean CARSI is cited)'
+    );
+    const run = async (json: boolean) => {
+      const lines: string[] = [];
+      const code = await runEeatReport({
+        env: ENV,
+        fetchText: fakeSemrush({ backlinks: OK_BACKLINKS, history: OK_HISTORY }).fetchText,
+        now: NOW,
+        json,
+        out: (l) => lines.push(l),
+      });
+      return { code, lines };
+    };
+    const text = await run(false);
+    expect(text.code).toBe(0);
+    expect(text.lines).toContain(
+      '  AI Overview SERPs: 148 of 161 ranking keywords whose results page shows a Google AI ' +
+        'Overview (does not mean CARSI is cited) (2026-10-15); 94 on 2026-09-15, +54'
+    );
+    const json = await run(true);
+    const parsed = JSON.parse(json.lines[0]);
+    expect(parsed.aiOverviewKeywords.label).toBe(AI_OVERVIEW_LABEL);
+    expect(parsed.aiOverviewKeywords).toMatchObject({
+      latest: 148,
+      rankingKeywords: 161,
+      change: 54,
+    });
+    expect(json.lines[0]).not.toMatch(/presence|cited in/i);
   });
 });
