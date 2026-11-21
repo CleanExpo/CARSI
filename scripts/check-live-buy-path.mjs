@@ -65,11 +65,65 @@ const URL_LIKE_RE =
 const HTML_QUOTE_ENTITY_RE = /&(?:quot|apos|#0*3[49]|#x0*2[27]);$/i;
 const isSpace = (c) => c === ' ' || c === '\t' || c === '\n' || c === '\r' || c === '\f';
 
+/** A srcset width or density descriptor ending just before a comma: `a.png 640w,` `b 1.5x ,`. */
+const SRCSET_DESCRIPTOR_RE = /\s(?:\d+w|\d*\.?\d+x)\s*$/i;
+const SRCSET_VALUE_RE = /srcset\s*=\s*(?:"[^"]*"|'[^']*'|[^\s"'=<>`]+)/gi;
+const SCRIPT_RE = /<script(?=[\s/>])[\s\S]*?(?:<\/script|$)/gi;
+/**
+ * In a <script>, each `//` comment that starts a line (after the <script ...> tag or a JS line
+ * terminator: LF, CR, U+2028, U+2029) and runs to the next terminator. Group 1 is the comment.
+ */
+const SCRIPT_LINE_COMMENT_RE =
+  /(?:^<script(?:\s(?:[^<>"']|"[^"<>]*"|'[^'<>]*')*)?>|[\n\r\u2028\u2029])[\t\v\f \u00a0\ufeff]*(\/\/[^\n\r\u2028\u2029]*)/giu;
+
+function precededByEquals(s, i) {
+  let j = i - 1;
+  while (j >= 0 && isSpace(s[j])) j -= 1;
+  return j >= 0 && s[j] === '=';
+}
+
+/** Srcset values and whole-line script comments in `s`, each found once on first use. */
+function textSpans(s) {
+  let srcset = null;
+  let comments = null;
+  // Spans are sorted and do not overlap: binary search keeps a page of many links linear-ish.
+  const within = (list, i) => {
+    let lo = 0;
+    let hi = list.length - 1;
+    while (lo <= hi) {
+      const mid = (lo + hi) >> 1;
+      if (i < list[mid][0]) hi = mid - 1;
+      else if (i >= list[mid][1]) lo = mid + 1;
+      else return true;
+    }
+    return false;
+  };
+  return {
+    inSrcset(i) {
+      srcset ??= [...s.matchAll(SRCSET_VALUE_RE)].map((m) => [m.index, m.index + m[0].length]);
+      return within(srcset, i);
+    },
+    inScriptComment(i) {
+      if (!comments) {
+        comments = [];
+        for (const script of s.matchAll(SCRIPT_RE)) {
+          for (const m of script[0].matchAll(SCRIPT_LINE_COMMENT_RE)) {
+            const end = script.index + m.index + m[0].length;
+            comments.push([end - m[1].length, end]);
+          }
+        }
+      }
+      return within(comments, i);
+    },
+  };
+}
+
 /**
  * Whether a scheme-relative `//host` starting at `index` sits where a browser or parser reads a
  * URL: the whole text (a Location header), an attribute value (`=` then optional padding, an
  * optional quote, optional padding), a quoted string (JS, JSON, an `&quot;`-encoded data
- * attribute, CSS `@import "..."`), CSS `url(`, or a later srcset candidate after a comma.
+ * attribute, CSS `@import "..."`) unless it sits in a whole-line script comment, CSS `url(`, or
+ * a later srcset candidate after a comma (GP-691).
  * JSON-escaped `\/\/` only ever appears inside a string, so it always counts.
  *
  * Anything else, above all a `//` that opens a script line comment or sits inside a CSS
@@ -77,17 +131,24 @@ const isSpace = (c) => c === ' ' || c === '\t' || c === '\n' || c === '\r' || c 
  * front of this match, so the whole scan stays linear however much padding a page carries
  * (GP-686 item 3: the old look-back was a fixed 16 characters).
  */
-function inUrlPosition(s, index) {
+function inUrlPosition(s, index, spans) {
   if (s.startsWith('\\/', index)) return true;
   let i = index - 1;
   while (i >= 0 && isSpace(s[i])) i -= 1;
   if (i < 0) return true;
   const c = s[i];
-  if (c === '=' || c === ',') return true;
+  if (c === '=') return true;
+  // GP-691: a comma starts a URL only as a later srcset candidate: inside a srcset value, or
+  // after a width or density descriptor (`640w,` `2x,`, as in an RSC srcSet string). The comma
+  // in `/* old, //127.1:8080 dev */` is neither.
+  if (c === ',') return spans.inSrcset(i) || SRCSET_DESCRIPTOR_RE.test(s.slice(Math.max(0, i - 24), i));
   if (c === '(') return /url$/i.test(s.slice(Math.max(0, i - 3), i));
   const entity = c === ';' && HTML_QUOTE_ENTITY_RE.exec(s.slice(Math.max(0, i - 9), i + 1));
   if (c !== '"' && c !== "'" && c !== '`' && !entity) return false;
-  if (i === index - 1) return true;
+  // GP-691: a quote inside a whole-line `//` comment in a <script> opens no string. Only a
+  // comment that starts its line (or directly follows the <script> tag) counts, so no string,
+  // regex or code can sit in front of it; a quote after `=` is still read, as an attribute.
+  if (i === index - 1) return !!entity || precededByEquals(s, i) || !spans.inScriptComment(i);
   // Padding between a quote and the URL counts only inside an attribute value: `href=" //h"`.
   let j = i - (entity ? entity[0].length : 1);
   while (j >= 0 && isSpace(s[j])) j -= 1;
@@ -111,7 +172,8 @@ export function findLocalOrigins(text, { attributeValues = false } = {}) {
   const s = String(text);
   // A scheme makes a string a URL wherever it stands. A scheme-relative `//host` is a URL only
   // where a browser or parser reads one (GP-686): elsewhere it is a script or CSS comment.
-  const isLink = (scheme, index) => scheme || attributeValues || inUrlPosition(s, index);
+  const spans = textSpans(s);
+  const isLink = (scheme, index) => scheme || attributeValues || inUrlPosition(s, index, spans);
   const found = [];
   for (const m of s.matchAll(LOCAL_ORIGIN_RE)) {
     if (isLink(/^https?:/i.test(m[0]), m.index)) {

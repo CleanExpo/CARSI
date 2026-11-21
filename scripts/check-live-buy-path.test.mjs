@@ -284,6 +284,39 @@ check('URL-like text in script and CSS comments is not a link (GP-686 item 2)', 
   assert.deepEqual(findLocalOrigins('//127.1:8080/login'), ['//127.1:8080']);
   assert.deepEqual(findLocalOrigins('//localhost/login'), ['//localhost']);
 });
+check('a comma or quote inside a comment does not make //host a URL (GP-691)', () => {
+  // Negative controls: both raised a false LOCALHOST before GP-691.
+  assert.deepEqual(findLocalOrigins('<style>/* old, //127.1:8080 dev */</style>'), []);
+  assert.deepEqual(findLocalOrigins('<script>// "//127.1:8080" dev</script>'), []);
+  assert.deepEqual(findLocalOrigins('<script type="module">\n  // \'//localhost:3000/x\' old\n</script>'), []);
+  assert.deepEqual(findLocalOrigins('<script>go();\r\n// `//10.0.0.1:8080` staging\r\nrun();</script>'), []);
+  // Positive controls: every later srcset candidate still fires, with or without descriptors.
+  for (const html of [
+    '<img srcset="a.png, //127.1:8080/b.png 2x">',
+    "<img srcset='a.png 1x,//127.1:8080/b.png 2x'>",
+    '<img srcset=a.png,//127.1:8080/b.png>',
+    '<link rel="preload" imagesrcset="a.png 1x, //127.1:8080/b.png 2x">',
+    '{"srcSet":"/a.png 640w, //127.1:8080/b.png 1080w"}',
+    '<div data-i="{&quot;srcSet&quot;:&quot;/a.png 1.5x , //127.1:8080/b.png 2x&quot;}">',
+  ]) {
+    assert.deepEqual(findLocalOrigins(html), ['//127.1:8080'], html);
+  }
+  // Positive controls: a working string after the comment line, whatever ends that line.
+  for (const end of ['\n', '\r', ' ', ' ']) {
+    const html = `<script>// note "x"${end}fetch("//127.1:8080/x")</script>`;
+    assert.deepEqual(findLocalOrigins(html), ['//127.1:8080'], JSON.stringify(html));
+  }
+  // Positive controls: a comment after code, a comment outside a script, an attribute.
+  assert.deepEqual(findLocalOrigins('<script>go(); // "//127.1:8080"</script>'), ['//127.1:8080']);
+  assert.deepEqual(findLocalOrigins('<script>u = "//a" + "//127.1:8080/x"</script>'), [
+    '//127.1:8080',
+  ]);
+  assert.deepEqual(findLocalOrigins('<p>\n// "//127.1:8080"</p>'), ['//127.1:8080']);
+  assert.deepEqual(findLocalOrigins('<script\n// src="//127.1:8080/x.js"></script>'), [
+    '//127.1:8080',
+  ]);
+  assert.deepEqual(findLocalOrigins('<script>x</script>\n// "//127.1:8080"'), ['//127.1:8080']);
+});
 check('an attribute value is found after any run of padding spaces (GP-686 item 3)', () => {
   // CodeRabbit on #1033 (round 3): the look-back was a fixed 16 characters.
   const pad = ' '.repeat(40);
@@ -297,6 +330,14 @@ check('the parsed pass stays linear on a long run of spaces', () => {
   const big = '<a href="' + ' '.repeat(200000) + '//2130706433">x</a>' + ' //1'.repeat(50000);
   const t0 = Date.now();
   assert.deepEqual(findLocalOrigins(big), ['//2130706433']);
+  assert.ok(Date.now() - t0 < 2000, `took ${Date.now() - t0} ms`);
+});
+check('the comma and comment look-ups stay fast on many srcsets and comments (GP-691)', () => {
+  const big =
+    '<img srcset="a.png 1x, //cdn.example/b.png 2x">'.repeat(20000) +
+    `<script>${'\n// "//1"'.repeat(20000)}</script>`;
+  const t0 = Date.now();
+  assert.deepEqual(findLocalOrigins(big), []);
   assert.ok(Date.now() - t0 < 2000, `took ${Date.now() - t0} ms`);
 });
 check('the quick-enrol card selector is the data attribute on the card (GP-674)', () => {
