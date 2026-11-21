@@ -344,6 +344,10 @@ check('a script line is suppressed only when a JS lexer confirms the comment (#1
     // A keyword used as a property name is an operand, so the `/` after it is division.
     '<script>\nlet obj = { return: 2 }; obj.return / 2 /*\n// */ fetch("//localhost:3000/api")\n</script>',
     '<script>o?.typeof / 2 /*\n// */ fetch("//localhost:3000/api")</script>',
+    // `of` / `yield` / `await` may be identifiers, so a `/` after one is not trusted as a regex.
+    '<script>\nlet of = 2; of / 2 /*\n// */ fetch("//localhost:3000/api")\n</script>',
+    '<script>var yield = 4; yield / 2 /*\n// */ fetch("//localhost:3000/api")</script>',
+    '<script>var await = 4; await / 2 /*\n// */ fetch("//localhost:3000/api")</script>',
   ]) {
     assert.deepEqual(findLocalOrigins(html), ['//localhost:3000'], JSON.stringify(html));
   }

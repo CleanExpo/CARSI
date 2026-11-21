@@ -83,8 +83,10 @@ const isJsSpace = (c) =>
 const isIdentChar = (c) => /[\w$\u0080-￿]/.test(c);
 /** Keywords after which a `/` starts a regular expression, not a division. */
 const REGEX_AFTER_WORD = new Set(
-  'return typeof instanceof in of new delete void throw case do else yield await'.split(' ')
+  'return typeof instanceof in new delete void throw case do else'.split(' ')
 );
+/** Words that are keywords in some positions and identifiers in others. */
+const CONTEXTUAL_WORD = new Set(['of', 'yield', 'await']);
 
 /**
  * Punctuators after which a `/` starts a regular expression ('' is the start of the script, '='
@@ -238,7 +240,12 @@ function scriptLineComments(s, a, b, out) {
       while (j < b && isIdentChar(s[j])) j += 1;
       // A keyword after `.` / `?.` is a property name (`obj.return / 2`), so it ends an
       // expression like any identifier (CodeRabbit on #1192).
-      prev = prev !== '.' && REGEX_AFTER_WORD.has(s.slice(i, j)) ? '=' : 'x';
+      // `of`, `yield` and `await` can also be plain identifiers (`let of = 2; of / 2`), so their
+      // role is unknown: a `/` right after one stops recording (false red, never false green).
+      const word = s.slice(i, j);
+      if (prev === '.') prev = 'x';
+      else if (CONTEXTUAL_WORD.has(word)) prev = 'unclear';
+      else prev = REGEX_AFTER_WORD.has(word) ? '=' : 'x';
       i = j;
       continue;
     }
