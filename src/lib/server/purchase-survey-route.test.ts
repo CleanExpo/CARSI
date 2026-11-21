@@ -22,7 +22,7 @@ vi.mock('@/lib/api/stripe', () => ({
 }));
 
 const { POST } = await import('../../../app/api/lms/checkout/survey/route');
-const { purchaseSurveyBinding } = await import('@/lib/server/purchase-survey-token');
+const { purchaseSurveyBinding, PURCHASE_SURVEY_RATE_LIMIT } = await import('@/lib/server/purchase-survey-token');
 
 const FLAG = 'PURCHASE_SURVEY_ENABLED';
 const SESSION = 'cs_test_paid';
@@ -32,13 +32,20 @@ const TAB_KEY = '00112233445566778899aabbccddeeff';
 const OTHER_TAB_KEY = 'ffeeddccbbaa99887766554433221100';
 const BINDING = purchaseSurveyBinding(TAB_KEY);
 
+/** Each request comes from its own address unless a test names one, so the per-IP limit stays out of the way. */
+let nextIp = 0;
+function freshIp(): string {
+  nextIp += 1;
+  return `2001:db8::${nextIp.toString(16)}`;
+}
+
 /** A survey POST. `key` is sent in survey_keys (a lone value is wrapped) unless it is null. */
-function post(body: unknown, key: unknown = TAB_KEY, cookie?: string): NextRequest {
+function post(body: unknown, key: unknown = TAB_KEY, cookie?: string, ip: string = freshIp()): NextRequest {
   const keys = Array.isArray(key) ? key : [key];
   const withKey = key === null || typeof body !== 'object' || body === null ? body : { ...body, survey_keys: keys };
   return new NextRequest('https://carsi.example.test/api/lms/checkout/survey', {
     method: 'POST',
-    headers: { 'content-type': 'application/json', ...(cookie ? { cookie } : {}) },
+    headers: { 'content-type': 'application/json', 'x-forwarded-for': ip, ...(cookie ? { cookie } : {}) },
     body: JSON.stringify(withKey),
   });
 }
@@ -286,5 +293,42 @@ describe('POST /api/lms/checkout/survey', () => {
     });
     const res = await POST(req);
     expect(res.status).toBe(400);
+  });
+});
+
+describe('rate limit before any Stripe call (GP-694)', () => {
+  it('allows a small number of requests per address', () => {
+    expect(PURCHASE_SURVEY_RATE_LIMIT).toBeGreaterThanOrEqual(3);
+    expect(PURCHASE_SURVEY_RATE_LIMIT).toBeLessThanOrEqual(20);
+  });
+
+  it('a flood of well-formed keys from one address is refused with 429 and never reaches Stripe', async () => {
+    const ip = '2001:db8:ffff::1';
+    const statuses: number[] = [];
+    for (let i = 0; i < PURCHASE_SURVEY_RATE_LIMIT + 5; i++) {
+      const res = await POST(post(GOOD, OTHER_TAB_KEY, undefined, ip));
+      statuses.push(res.status);
+    }
+    expect(statuses.slice(0, PURCHASE_SURVEY_RATE_LIMIT).every((s) => s === 403)).toBe(true);
+    expect(statuses.slice(PURCHASE_SURVEY_RATE_LIMIT).every((s) => s === 429)).toBe(true);
+    expect(stripe.retrieveSession).toHaveBeenCalledTimes(PURCHASE_SURVEY_RATE_LIMIT);
+  });
+
+  it('a limited address gets Retry-After, and another address is unaffected', async () => {
+    const ip = '2001:db8:ffff::2';
+    for (let i = 0; i < PURCHASE_SURVEY_RATE_LIMIT; i++) await POST(post(GOOD, OTHER_TAB_KEY, undefined, ip));
+    const limited = await POST(post(GOOD, TAB_KEY, undefined, ip));
+    expect(limited.status).toBe(429);
+    expect(Number(limited.headers.get('retry-after'))).toBeGreaterThan(0);
+    const other = await POST(post(GOOD, TAB_KEY, undefined, '2001:db8:ffff::3'));
+    expect(other.status).toBe(200);
+  });
+
+  it('flag off is still a plain 404, never 429', async () => {
+    delete process.env[FLAG];
+    const ip = '2001:db8:ffff::4';
+    for (let i = 0; i < PURCHASE_SURVEY_RATE_LIMIT + 2; i++) {
+      expect((await POST(post(GOOD, TAB_KEY, undefined, ip))).status).toBe(404);
+    }
   });
 });

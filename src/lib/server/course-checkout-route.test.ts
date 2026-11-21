@@ -542,7 +542,7 @@ function freshKey(): string {
   return [...crypto.getRandomValues(new Uint8Array(16))].map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
-/** Every checkout makes a fresh key, kept at the front of the tab's list (at most five). */
+/** Every checkout makes a fresh key, kept at the front of the tab's list (at most five); each here returns a checkout_url. */
 function checkoutFrom(tab: Tab, slug: string): NextRequest {
   const key = freshKey();
   tab.keys = [key, ...tab.keys].slice(0, 5);
@@ -553,11 +553,15 @@ function checkoutFrom(tab: Tab, slug: string): NextRequest {
   });
 }
 
+/** Each survey call comes from its own address, so the survey route's per-IP limit (GP-694) stays out of the way. */
+let surveyIp = 0;
+
 async function surveyStatus(tab: Tab | null, sessionId: string): Promise<number> {
+  surveyIp += 1;
   const res = await SURVEY_POST(
     new NextRequest('https://carsi.example.test/api/lms/checkout/survey', {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
+      headers: { 'content-type': 'application/json', 'x-forwarded-for': `2001:db8::${surveyIp.toString(16)}` },
       body: JSON.stringify({
         session_id: sessionId,
         industry: 'commercial_cleaning',

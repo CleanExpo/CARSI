@@ -78,6 +78,7 @@ beforeEach(() => {
   mocks.post.mockReset();
   mocks.toast.mockReset();
   nav.href = '';
+  window.sessionStorage.clear();
   Object.defineProperty(window, 'location', { configurable: true, value: nav });
   container = document.createElement('div');
   document.body.appendChild(container);
@@ -132,6 +133,29 @@ describe('RegisterForm — sign up from a free course', () => {
 
     expect(mocks.post).toHaveBeenCalledTimes(1);
     expect(nav.href).toBe('https://checkout.stripe.test/cs_course');
+  });
+
+  it('a paid checkout sends a survey key and keeps it in this tab once checkout_url comes back (GP-694)', async () => {
+    mocks.post.mockResolvedValue({ checkout_url: 'https://checkout.stripe.test/cs_course' });
+
+    await registerWith(`next=%2Fcourses%2F${SLUG}`);
+
+    const body = mocks.post.mock.calls[0][1] as { survey_key?: string };
+    expect(body.survey_key).toMatch(/^[0-9a-f]{32}$/);
+    expect(window.sessionStorage.getItem('carsi_svk')).toBe(body.survey_key);
+  });
+
+  it('a free course (no checkout_url) sends a survey key but never stores it (GP-694)', async () => {
+    mocks.post.mockImplementation(async (path: string) => {
+      if (path === '/api/lms/checkout') return { enrolled: true };
+      return { learn_url: `/dashboard/learn/${SLUG}/lesson-1` };
+    });
+
+    await registerWith(`next=%2Fcourses%2F${SLUG}`);
+
+    const body = mocks.post.mock.calls[0][1] as { survey_key?: string };
+    expect(body.survey_key).toMatch(/^[0-9a-f]{32}$/);
+    expect(window.sessionStorage.getItem('carsi_svk')).toBeNull();
   });
 
   it.each([

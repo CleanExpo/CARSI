@@ -30,6 +30,14 @@ export const PURCHASE_SURVEY_BINDING_METADATA_KEY = 'svy_bk';
 /** Answers are accepted for 24 hours after the Checkout Session was created. */
 export const PURCHASE_SURVEY_WINDOW_SECONDS = 60 * 60 * 24;
 
+/**
+ * Survey requests allowed per client IP per window, checked before any Stripe call (GP-694): any
+ * well-formed key reaches `checkout.sessions.retrieve`, so a flood must not use up Stripe's
+ * per-endpoint limit that real payment-success lookups share. One purchase sends one request.
+ */
+export const PURCHASE_SURVEY_RATE_LIMIT = 10;
+export const PURCHASE_SURVEY_RATE_WINDOW_MS = 10 * 60 * 1000;
+
 /** The survey accepts at most this many keys, matching the client's per-tab list. */
 export const PURCHASE_SURVEY_MAX_KEYS = 5;
 

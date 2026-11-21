@@ -20,7 +20,7 @@ import {
 import { trackFunnelEvent } from '@/lib/analytics/track-funnel-event';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { purchaseSurveyCheckoutField } from '@/lib/marketing/purchase-survey-key';
+import { purchaseSurveyCheckoutField, rememberPurchaseSurveyKey } from '@/lib/marketing/purchase-survey-key';
 
 interface EnrolButtonProps {
   slug: string;
@@ -231,6 +231,8 @@ export function EnrolButton({
         undefined,
         buyMode === 'team' ? { teamSeats } : undefined,
       );
+      // The survey key is kept in this tab only once checkout returns a checkout_url (GP-694).
+      const surveyField = purchaseSurveyCheckoutField();
       const data = await apiClient.post<CheckoutResponse>('/api/lms/checkout', {
         slug,
         success_url,
@@ -238,7 +240,7 @@ export function EnrolButton({
         purchase_mode: buyMode,
         ...(buyMode === 'team' ? { team_seat_count: teamSeats } : {}),
         ...(currentUser.email ? { customer_email: currentUser.email } : {}),
-        ...purchaseSurveyCheckoutField(),
+        ...surveyField,
       });
 
       if (data.enrolled) {
@@ -254,6 +256,7 @@ export function EnrolButton({
       }
 
       if (data.checkout_url) {
+        rememberPurchaseSurveyKey(surveyField);
         trackFunnelEvent({
           name: 'checkout_started',
           course_slug: slug,
