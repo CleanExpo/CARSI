@@ -12,6 +12,7 @@ import {
   filterCoursesPassingPrerequisites,
   type AdminFlag,
 } from '@/lib/server/course-prerequisites';
+import { gradeRubric, isCriticalCriterion } from '@/lib/practical-assessment-grading';
 import { runSerializable } from '@/lib/server/db-tx';
 import { ACCESS_GRANTING_STATUS_LIST } from '@/lib/server/enrollment-access';
 
@@ -41,16 +42,6 @@ export type RubricCriterionDTO = {
   /** True when the label carries the "(critical)" marker: it must be met in full to pass. */
   critical: boolean;
 };
-
-/**
- * GP-729: the schema has no critical flag, so a criterion is critical when its label
- * contains the exact marker "(critical)" that the course drafts use. A conditional
- * label such as "(critical for the tap test)" is deliberately NOT matched: the
- * platform cannot tell whether the condition applied, so the assessor still decides.
- */
-export function isCriticalCriterion(label: string): boolean {
-  return /\(\s*critical\s*\)/i.test(label);
-}
 
 function asStringArray(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((x): x is string => typeof x === 'string') : [];
@@ -241,26 +232,35 @@ export async function reviewSubmission(input: {
 
     const criteria = sub.assessment.criteria;
     const byId = new Map(criteria.map((c) => [c.id, c]));
-    if (input.scores.length !== criteria.length) {
-      throw new AssessmentError(400, 'Every rubric criterion must be scored');
-    }
-    let total = 0;
-    const failedCriticalCriteria: string[] = [];
+    // The submitted ids must equal the rubric ids exactly: each rubric criterion once,
+    // no unknown ids, no repeats. A count check alone lets a repeated id hide an
+    // unscored (possibly critical) criterion.
+    const scoreById: Record<string, number> = {};
     for (const s of input.scores) {
       const c = byId.get(s.criterionId);
       if (!c) throw new AssessmentError(400, `Unknown criterion ${s.criterionId}`);
-      if (typeof s.points !== 'number' || s.points < 0 || s.points > c.maxPoints) {
+      if (Object.prototype.hasOwnProperty.call(scoreById, s.criterionId)) {
+        throw new AssessmentError(400, `Criterion "${c.label}" is scored more than once`);
+      }
+      if (
+        typeof s.points !== 'number' ||
+        !Number.isFinite(s.points) ||
+        s.points < 0 ||
+        s.points > c.maxPoints
+      ) {
         throw new AssessmentError(400, `Score for "${c.label}" must be between 0 and ${c.maxPoints}`);
       }
-      total += s.points;
-      if (isCriticalCriterion(c.label) && s.points < c.maxPoints) {
-        failedCriticalCriteria.push(c.label);
-      }
+      scoreById[s.criterionId] = s.points;
+    }
+    if (Object.keys(scoreById).length !== criteria.length) {
+      throw new AssessmentError(400, 'Every rubric criterion must be scored');
     }
 
-    const maxScore = criteria.reduce((acc, c) => acc + c.maxPoints, 0);
-    const pct = maxScore > 0 ? (total / maxScore) * 100 : 0;
-    const passed = pct >= sub.assessment.passThreshold && failedCriticalCriteria.length === 0;
+    const { total, maxScore, failedCriticalCriteria, passed } = gradeRubric({
+      criteria,
+      scores: scoreById,
+      passThreshold: sub.assessment.passThreshold,
+    });
     const reason =
       failedCriticalCriteria.length > 0
         ? `Not passed: every critical criterion must be met in full, whatever the total. Not met: ${failedCriticalCriteria.join('; ')}.`
@@ -541,6 +541,7 @@ export async function listAvailableAssessmentsForStudent(
         label: c.label,
         description: c.description,
         maxPoints: c.maxPoints,
+        critical: isCriticalCriterion(c.label),
       })),
       submission: sub
         ? {

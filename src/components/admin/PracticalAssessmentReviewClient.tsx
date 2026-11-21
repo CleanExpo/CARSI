@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { AdminPagination } from '@/components/admin/AdminPagination';
 import { useAdminListPaging } from '@/components/admin/use-admin-list-paging';
+import { gradeRubric } from '@/lib/practical-assessment-grading';
 
 type QueueItem = {
   id: string;
@@ -155,7 +156,12 @@ export function PracticalAssessmentReviewClient() {
   const maxTotal = active ? active.criteria.reduce((a, c) => a + c.maxPoints, 0) : 0;
   const currentTotal = active ? active.criteria.reduce((a, c) => a + (scores[c.id] ?? 0), 0) : 0;
   const projectedPct = maxTotal > 0 ? Math.round((currentTotal / maxTotal) * 100) : 0;
-  const wouldPass = active ? projectedPct >= active.assessment.passThreshold : false;
+  // Same rule as the server (total threshold AND every critical criterion in full).
+  const projected = active
+    ? gradeRubric({ criteria: active.criteria, scores, passThreshold: active.assessment.passThreshold })
+    : null;
+  const wouldPass = projected?.passed ?? false;
+  const projectedCriticalFails = projected?.failedCriticalCriteria ?? [];
   const queuePaging = useAdminListPaging(queue);
 
   return (
@@ -286,6 +292,11 @@ export function PracticalAssessmentReviewClient() {
                 {wouldPass ? 'Pass' : 'Fail'}
               </span>{' '}
               <span className="text-white/40">(threshold {active.assessment.passThreshold}%)</span>
+              {projectedCriticalFails.length > 0 && (
+                <span className="mt-1 block text-xs text-red-300">
+                  Critical criterion not met in full: {projectedCriticalFails.join('; ')}
+                </span>
+              )}
             </p>
             <button
               onClick={submitReview}

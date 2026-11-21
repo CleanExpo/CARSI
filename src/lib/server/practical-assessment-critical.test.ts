@@ -8,15 +8,27 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const mock = vi.hoisted(() => ({
   subFindUnique: vi.fn(),
   subUpdate: vi.fn(),
+  enrolFindMany: vi.fn(),
+  assessmentFindMany: vi.fn(),
 }));
 
-vi.mock('@/lib/prisma', () => ({ prisma: {} }));
+vi.mock('@/lib/prisma', () => ({
+  prisma: {
+    lmsEnrollment: { findMany: mock.enrolFindMany },
+    lmsPracticalAssessment: { findMany: mock.assessmentFindMany },
+  },
+}));
+vi.mock('@/lib/server/course-prerequisites', () => ({
+  filterCoursesPassingPrerequisites: async (a: { courseIds: string[] }) => new Set(a.courseIds),
+}));
 vi.mock('@/lib/server/db-tx', () => ({
   runSerializable: (fn: (tx: unknown) => Promise<unknown>) =>
     fn({ lmsAssessmentSubmission: { findUnique: mock.subFindUnique, update: mock.subUpdate } }),
 }));
 
-const { reviewSubmission } = await import('./practical-assessment');
+const { reviewSubmission, listAvailableAssessmentsForStudent, AssessmentError } =
+  await import('./practical-assessment');
+const { gradeRubric } = await import('@/lib/practical-assessment-grading');
 
 // Pass threshold 80%. Site safety (critical) is 5 of 100 points, so a learner can
 // reach 95% with 0 on it.
@@ -126,5 +138,85 @@ describe('reviewSubmission — critical criteria', () => {
     });
     expect(r.passed).toBe(false);
     expect(r.failedCriticalCriteria).toEqual(['Pre-job check (critical)']);
+  });
+});
+
+describe('reviewSubmission — the submitted ids must equal the rubric ids exactly', () => {
+  it('refuses a duplicate id that hides a skipped critical criterion (400, nothing stored)', async () => {
+    const dup = [
+      { criterionId: 'c1', points: 45 },
+      { criterionId: 'c2', points: 45 },
+      { criterionId: 'c2', points: 5 },
+      { criterionId: 'c4', points: 5 },
+    ];
+    await expect(reviewSubmission({ submissionId: 's1', scores: dup })).rejects.toMatchObject({
+      status: 400,
+    });
+    expect(mock.subUpdate).not.toHaveBeenCalled();
+  });
+
+  it('refuses the same id repeated to reach the right count', async () => {
+    const dup = ['c2', 'c2', 'c2', 'c2'].map((criterionId) => ({ criterionId, points: 45 }));
+    await expect(reviewSubmission({ submissionId: 's1', scores: dup })).rejects.toBeInstanceOf(
+      AssessmentError,
+    );
+    expect(mock.subUpdate).not.toHaveBeenCalled();
+  });
+
+  it('refuses a non-finite score (NaN would slip past the range check)', async () => {
+    await expect(
+      reviewSubmission({ submissionId: 's1', scores: scores({ c1: 45, c2: 45, c3: Number.NaN, c4: 5 }) }),
+    ).rejects.toMatchObject({ status: 400 });
+    expect(mock.subUpdate).not.toHaveBeenCalled();
+  });
+
+  it('refuses an unknown id and a missing id', async () => {
+    await expect(
+      reviewSubmission({ submissionId: 's1', scores: scores({ c1: 45, c2: 45, c3: 5, zzz: 5 }) }),
+    ).rejects.toMatchObject({ status: 400 });
+    await expect(
+      reviewSubmission({ submissionId: 's1', scores: scores({ c1: 45, c2: 45, c3: 5 }) }),
+    ).rejects.toMatchObject({ status: 400 });
+    expect(mock.subUpdate).not.toHaveBeenCalled();
+  });
+});
+
+describe('gradeRubric — the one rule shared by the server and the review screen', () => {
+  const rubric = [
+    { id: 'safety', label: 'Site safety (critical)', maxPoints: 5 },
+    { id: 'other', label: 'Everything else', maxPoints: 95 },
+  ];
+  it('projects not-passed for 95/100 with 0 on a critical criterion', () => {
+    const g = gradeRubric({ criteria: rubric, scores: { safety: 0, other: 95 }, passThreshold: 80 });
+    expect(g.passed).toBe(false);
+    expect(g.failedCriticalCriteria).toEqual(['Site safety (critical)']);
+    expect(g.total).toBe(95);
+  });
+  it('projects passed when the critical criterion is met', () => {
+    const g = gradeRubric({ criteria: rubric, scores: { safety: 5, other: 80 }, passThreshold: 80 });
+    expect(g.passed).toBe(true);
+  });
+});
+
+describe('listAvailableAssessmentsForStudent — critical flag on the learner list', () => {
+  it('carries critical on each criterion', async () => {
+    mock.enrolFindMany.mockResolvedValue([{ courseId: 'crs' }]);
+    mock.assessmentFindMany.mockResolvedValue([
+      {
+        id: 'a1',
+        title: 'T',
+        instructions: '',
+        passThreshold: 80,
+        course: { title: 'C' },
+        createdAt: new Date(),
+        criteria: [
+          { id: 'x', label: 'Site safety (critical)', description: '', maxPoints: 5 },
+          { id: 'y', label: 'Handover', description: '', maxPoints: 5 },
+        ],
+        submissions: [],
+      },
+    ]);
+    const out = await listAvailableAssessmentsForStudent('stu');
+    expect(out[0].criteria.map((c: { critical: boolean }) => c.critical)).toEqual([true, false]);
   });
 });
