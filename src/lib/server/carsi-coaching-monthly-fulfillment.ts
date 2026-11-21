@@ -22,6 +22,98 @@ import {
 
 const CONFIRMATION_SENT_META = 'coaching_monthly_emails_sent';
 
+/**
+ * GP-672: per-email delivery record, kept in the existing `stripe_webhook_events`
+ * table (primary key = unique claim) so no migration is needed. Rows of this type
+ * are not Stripe events; counts of that table should filter by `type`.
+ */
+export const COACHING_MONTHLY_EMAIL_RECORD_TYPE = 'carsi_coaching_monthly_email';
+
+type CoachingMonthlyEmailKind = 'welcome' | 'coach_notice';
+
+/**
+ * - `sent`: sent on this run.
+ * - `already_claimed`: a delivery record already exists (sent, in flight, or an
+ *   uncertain failure). The email is NOT owed; never resend.
+ * - `not_configured`: mail was not configured, nothing was sent, record released.
+ * - `failed`: the send failed in a way that may still have delivered (timeout,
+ *   provider error, throw). Record kept, not retried (founder rule: at most once).
+ * - `unavailable`: the delivery record could not be written, so nothing was sent.
+ */
+export type CoachingMonthlyEmailDelivery =
+  'sent' | 'already_claimed' | 'not_configured' | 'failed' | 'unavailable';
+
+type SendResult = { sent: boolean; reason?: string };
+
+function deliveryRecordId(sessionId: string, kind: CoachingMonthlyEmailKind): string {
+  return `coaching_monthly_email:${sessionId}:${kind}`;
+}
+
+function prismaErrorCode(err: unknown): string | undefined {
+  return err && typeof err === 'object' && 'code' in err
+    ? String((err as { code: unknown }).code)
+    : undefined;
+}
+
+/**
+ * Sends one email at most once per checkout session: the delivery record is
+ * written BEFORE sending, and whoever inserts it first is the only sender.
+ */
+async function deliverOnce(
+  sessionId: string,
+  kind: CoachingMonthlyEmailKind,
+  send: () => Promise<SendResult>
+): Promise<CoachingMonthlyEmailDelivery> {
+  const id = deliveryRecordId(sessionId, kind);
+  try {
+    await prisma.stripeWebhookEvent.create({
+      data: { id, type: COACHING_MONTHLY_EMAIL_RECORD_TYPE },
+    });
+  } catch (err) {
+    if (prismaErrorCode(err) === 'P2002') return 'already_claimed';
+    console.error(
+      `[coaching-monthly] ${kind} delivery record unavailable; not sent (session ${sessionId}):`,
+      prismaErrorCode(err) ?? 'unknown'
+    );
+    return 'unavailable';
+  }
+
+  let result: SendResult;
+  try {
+    result = await send();
+  } catch (err) {
+    console.error(
+      `[coaching-monthly] ${kind} send threw; record kept, not retried (session ${sessionId}):`,
+      err instanceof Error ? err.message : 'unknown'
+    );
+    return 'failed';
+  }
+
+  if (result.sent) {
+    try {
+      await prisma.stripeWebhookEvent.update({ where: { id }, data: { processedAt: new Date() } });
+    } catch {
+      // Record still exists (processed_at empty), so the email is still never resent.
+    }
+    return 'sent';
+  }
+
+  if (result.reason === 'not_configured') {
+    // Definitely nothing went out: release the record so a later run can send.
+    try {
+      await prisma.stripeWebhookEvent.delete({ where: { id } });
+    } catch {
+      // A kept record only means this email is not retried.
+    }
+    return 'not_configured';
+  }
+
+  console.warn(
+    `[coaching-monthly] ${kind} send failed (${result.reason ?? 'unknown'}); record kept, not retried (session ${sessionId})`
+  );
+  return 'failed';
+}
+
 export function isCarsiCoachingMonthlyCheckoutSession(session: Stripe.Checkout.Session): boolean {
   return session.metadata?.source === CARSI_COACHING_MONTHLY_CHECKOUT_SOURCE;
 }
@@ -31,6 +123,8 @@ export type CarsiCoachingMonthlyFulfillmentResult = {
   skipped?: string;
   customerEmailSent?: boolean;
   founderEmailSent?: boolean;
+  customerEmailDelivery?: CoachingMonthlyEmailDelivery;
+  founderEmailDelivery?: CoachingMonthlyEmailDelivery;
 };
 
 function resolveAmountLabel(session: Stripe.Checkout.Session): string {
@@ -147,16 +241,17 @@ export async function processCarsiCoachingMonthlyCheckoutCompleted(
     coachingPageUrl,
   });
 
-  const customerResult = await sendEmail({
-    to: email,
-    subject: `Welcome to ${carsiCoachingProductName}`,
-    html,
-    text,
-  });
+  const customerEmailDelivery = await deliverOnce(session.id, 'welcome', () =>
+    sendEmail({
+      to: email,
+      subject: `Welcome to ${carsiCoachingProductName}`,
+      html,
+      text,
+    })
+  );
 
-  let founderResult: { sent: boolean } = { sent: false };
-  try {
-    founderResult = await sendCarsiCoachingMonthlyFounderNotificationEmail({
+  const founderEmailDelivery = await deliverOnce(session.id, 'coach_notice', () =>
+    sendCarsiCoachingMonthlyFounderNotificationEmail({
       appOrigin,
       contactName,
       contactEmail: email,
@@ -165,12 +260,14 @@ export async function processCarsiCoachingMonthlyCheckoutCompleted(
       amountLabel,
       stripeCheckoutSessionId: session.id,
       stripeSubscriptionId: subscriptionId,
-    });
-  } catch (err) {
-    console.error('[coaching-monthly] founder notification failed:', err);
-  }
+    })
+  );
 
-  if (customerResult.sent || founderResult.sent) {
+  const bothHandled = [customerEmailDelivery, founderEmailDelivery].every(
+    (d) => d === 'sent' || d === 'already_claimed'
+  );
+  if (bothHandled) {
+    // Fast path only: the delivery records above are what prevent repeats (GP-672).
     try {
       const stripe = getStripeClient();
       await stripe.checkout.sessions.update(session.id, {
@@ -180,13 +277,15 @@ export async function processCarsiCoachingMonthlyCheckoutCompleted(
         },
       });
     } catch {
-      // non-fatal — success-page retry may duplicate; Stripe metadata reduces duplicates
+      // non-fatal — the delivery records still stop a repeat send
     }
   }
 
   return {
     fulfilled: true,
-    customerEmailSent: customerResult.sent,
-    founderEmailSent: founderResult.sent,
+    customerEmailSent: customerEmailDelivery === 'sent',
+    founderEmailSent: founderEmailDelivery === 'sent',
+    customerEmailDelivery,
+    founderEmailDelivery,
   };
 }
