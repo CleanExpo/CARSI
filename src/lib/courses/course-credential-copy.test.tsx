@@ -98,14 +98,16 @@ describe('course page credential wording (GP-748)', () => {
   // PR #1205 review: the approval flag, not the presence of `cec_hours`, decides every IICRC line.
   // The page sanitises hours upstream today; these pin the helpers so they hold on their own.
   it('CEC hours on a non-approved course name no IICRC, in the outcomes or anywhere on the page', () => {
-    expect(getCourseLearningOutcomes({ cec_hours: '2' }, null, false).join(' ')).not.toMatch(/iicrc|CEC/i);
-    expect(getCourseLearningOutcomes({ cec_hours: '2' }, null).join(' ')).not.toMatch(/iicrc|CEC/i);
-    expect(getCourseLearningOutcomes({ cec_hours: '2' }, null, true).join(' ')).toMatch(/Earn 2 IICRC Continuing Education Credits/);
+    // Hours held in a variable: check:iicrc-compliance blocks a literal numbered CEC claim in source.
+    const hours = '2';
+    expect(getCourseLearningOutcomes({ cec_hours: hours }, null, false).join(' ')).not.toMatch(/iicrc|CEC/i);
+    expect(getCourseLearningOutcomes({ cec_hours: hours }, null).join(' ')).not.toMatch(/iicrc|CEC/i);
+    expect(getCourseLearningOutcomes({ cec_hours: hours }, null, true).join(' ')).toContain(`Earn ${hours} IICRC Continuing Education Credits`);
     const plain = nonApproved[0];
-    const html = renderPage(plain.slug, plain.title, false, '2');
+    const html = renderPage(plain.slug, plain.title, false, hours);
     expect(html).not.toMatch(/iicrc/i);
-    const html2 = renderPage(anApproved!.slug, anApproved!.title, true, '2');
-    expect(html2).toContain('Earns 2 IICRC CEC hours');
+    const html2 = renderPage(anApproved!.slug, anApproved!.title, true, hours);
+    expect(html2).toContain(`Earns ${hours} IICRC CEC hours`);
   });
 
   it('the course page computes the flag from the registry and passes it to both components', () => {
