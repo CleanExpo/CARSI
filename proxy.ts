@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { updateSession } from '@/lib/api/middleware';
 import {
+  CATALOG_PUBLISHED_SLUGS,
   cachedCourseSlugLookup,
   courseAssetDecision,
   hasStaffSession,
@@ -10,7 +11,7 @@ import { isAttributionCaptureEnabled } from '@/lib/server/attribution-capture-fl
 import { withFirstTouchCookie } from '@/lib/server/first-touch-capture';
 import { lookupCourseSlugInDatabase, renamedCourseRedirect } from '@/lib/seo/renamed-course-slugs';
 
-/** Course publication state for course files, cached briefly (a lesson page pulls many files). */
+/** Course publication state for course files. Only closed answers are cached (see the module). */
 const courseFileLookup = cachedCourseSlugLookup(lookupCourseSlugInDatabase);
 
 export async function proxy(request: NextRequest) {
@@ -20,6 +21,9 @@ export async function proxy(request: NextRequest) {
   const courseAsset = await courseAssetDecision(request.nextUrl.pathname, {
     lookup: courseFileLookup,
     isStaff: () => hasStaffSession(request.cookies),
+    // The seed answers only where no database exists (local runs, CI). With a database
+    // configured, a failed lookup refuses rather than trusting the seed.
+    seedWhenNoDatabase: process.env.DATABASE_URL?.trim() ? undefined : CATALOG_PUBLISHED_SLUGS,
   });
   if (courseAsset === 'refuse') {
     return new NextResponse('Not Found', {

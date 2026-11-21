@@ -9,11 +9,15 @@
  * catalogue is not the live truth: on 21/11/2026 `level-3-mould-remediation-c5797369` was
  * `draft` in `data/seed/courses-catalog.json` while the live page and course list served it.
  *
- * - Published in the database: served to everyone.
+ * One design rule: only a fresh, successful database answer can open a file to the public.
+ * Every other source (a failed query, a cached answer, the seed) can only keep it closed.
+ *
+ * - Published in the database (asked on this request): served to everyone.
  * - Draft, archived or no row: served only to staff (a valid admin cookie, or a verified session
  *   whose role opens the admin panel), never cached; everyone else gets 404.
- * - Database not configured or the query failed: the seed catalogue decides, so local runs and
- *   CI keep working. A file neither source publishes is never served to the public.
+ * - Database configured but the query failed: refused (staff still served). Fail closed.
+ * - No database configured at all (local runs, CI): the seed catalogue decides. The proxy only
+ *   passes the seed when `DATABASE_URL` is unset.
  * - An undecodable address, or a `.`/`..`/backslash segment: refused for everyone.
  */
 import catalog from '../../../data/seed/courses-catalog.json';
@@ -96,8 +100,11 @@ export type CourseAssetAccessDeps = {
   lookup: LookupCourseSlug;
   /** True when the request carries a staff (admin) session. Asked only for unpublished files. */
   isStaff: () => Promise<boolean>;
-  /** Seed catalogue fallback for when the database cannot be asked. */
-  catalogPublished?: ReadonlySet<string>;
+  /**
+   * Seed catalogue published slugs, used only when NO database is configured (local runs, CI).
+   * Leave it out where a database exists: a failed lookup must then refuse, never fall back.
+   */
+  seedWhenNoDatabase?: ReadonlySet<string>;
 };
 
 export async function courseAssetDecision(
@@ -110,17 +117,17 @@ export async function courseAssetDecision(
   const slug = courseSlugForAssetFolder(folder);
   const state = await deps.lookup(slug);
   const publiclyPublished =
-    state === null
-      ? (deps.catalogPublished ?? CATALOG_PUBLISHED_SLUGS).has(slug)
-      : state === 'published';
+    state === null ? Boolean(deps.seedWhenNoDatabase?.has(slug)) : state === 'published';
   if (publiclyPublished) return 'serve';
   return (await deps.isStaff()) ? 'serve-private' : 'refuse';
 }
 
 /**
- * Wraps a lookup with a short in-process cache. A lesson page pulls many files from one folder,
- * so without it every image would cost database round trips. Only answers are cached; a failed
- * lookup (null) is asked again next time. Publishing or unpublishing takes effect within the TTL.
+ * Wraps a lookup with a short in-process cache of CLOSED answers only ('unpublished', 'absent').
+ * A 'published' answer is never cached, so unpublishing closes the files on the next request;
+ * a failed lookup (null) is never cached either. Caching closed answers only delays opening a
+ * newly published course by up to the TTL, and stops invented folder names from costing a
+ * database round trip each time.
  */
 export function cachedCourseSlugLookup(
   lookup: LookupCourseSlug,
@@ -132,7 +139,7 @@ export function cachedCourseSlugLookup(
     const hit = cache.get(key);
     if (hit && now() - hit.at < ttlMs) return hit.state;
     const state = await lookup(key);
-    if (state === null) return null;
+    if (state === null || state === 'published') return state;
     // Unknown folders are chosen by the caller; bound the map rather than let it grow.
     if (cache.size >= maxEntries) cache.clear();
     cache.set(key, { state, at: now() });

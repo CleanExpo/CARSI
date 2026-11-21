@@ -135,7 +135,7 @@ describe('GP-730: draft course files are not served by direct address', () => {
   });
 });
 
-describe('the decision follows the database, then the seed, never a hand list', () => {
+describe('only a fresh database answer opens a file; the seed only where no database exists', () => {
   const url = '/courses/hard-floor-care/diagrams/hf-1.svg';
   const anon = { isStaff: async () => false };
 
@@ -157,33 +157,48 @@ describe('the decision follows the database, then the seed, never a hand list', 
       await courseAssetDecision(url, {
         ...anon,
         lookup: async () => 'unpublished',
-        catalogPublished: seedPublishes,
+        seedWhenNoDatabase: seedPublishes,
       })
     ).toBe('refuse');
     expect(
       await courseAssetDecision(url, {
         ...anon,
         lookup: async () => 'published',
-        catalogPublished: new Set(),
+        seedWhenNoDatabase: new Set(),
       })
     ).toBe('serve');
   });
 
-  it('when the database cannot be asked, the seed decides and an unknown course stays closed', async () => {
+  it('a failed lookup with a database configured refuses, even for a seed-published course', async () => {
+    // Review round 1, P1: a transient query error must not open a course the live database
+    // unpublished. The proxy passes no seed when DATABASE_URL is set.
     const lookup = async () => null;
-    expect(await courseAssetDecision(url, { ...anon, lookup, catalogPublished: new Set() })).toBe(
-      'refuse'
-    );
+    const seedPublished = [...publishedCatalogSlugs(catalog.courses)][0];
+    expect(seedPublished).toBeTruthy();
+    expect(
+      await courseAssetDecision(`/courses/${seedPublished}/field-tools/x.md`, { ...anon, lookup })
+    ).toBe('refuse');
+    // Staff can still review while the database is down.
+    expect(
+      await courseAssetDecision(`/courses/${seedPublished}/field-tools/x.md`, {
+        lookup,
+        isStaff: async () => true,
+      })
+    ).toBe('serve-private');
+  });
+
+  it('with no database configured, the seed decides and an unknown course stays closed', async () => {
+    const lookup = async () => null;
+    expect(
+      await courseAssetDecision(url, { ...anon, lookup, seedWhenNoDatabase: new Set() })
+    ).toBe('refuse');
     expect(
       await courseAssetDecision(url, {
         ...anon,
         lookup,
-        catalogPublished: new Set(['hard-floor-care']),
+        seedWhenNoDatabase: new Set(['hard-floor-care']),
       })
     ).toBe('serve');
-    expect(
-      await courseAssetDecision('/courses/not-a-course/field-tools/x.md', { ...anon, lookup })
-    ).toBe('refuse');
   });
 
   it('follows the canonical status rule (#137) for the seed fallback', () => {
@@ -208,14 +223,30 @@ describe('the decision follows the database, then the seed, never a hand list', 
 });
 
 describe('the publication cache', () => {
-  it('asks once per slug within the TTL, again after it, and never caches a failed lookup', async () => {
+  it('never caches a published answer, so unpublishing closes the files on the next request', async () => {
+    // Review round 1, P1: a cached 'published' kept files public after unpublish.
+    let state: CourseSlugState = 'published';
+    const inner = vi.fn(async () => state);
+    const cached = cachedCourseSlugLookup(inner, { ttlMs: 60_000, now: () => 0 });
+    const decide = () =>
+      courseAssetDecision('/courses/some-course/diagrams/x.svg', {
+        lookup: cached,
+        isStaff: async () => false,
+      });
+    expect(await decide()).toBe('serve');
+    state = 'unpublished';
+    expect(await decide()).toBe('refuse');
+    expect(inner).toHaveBeenCalledTimes(2);
+  });
+
+  it('caches closed answers within the TTL, asks again after it, and never caches a failure', async () => {
     let t = 0;
     const inner = vi.fn<(slug: string) => Promise<CourseSlugState | null>>();
-    inner.mockResolvedValueOnce(null).mockResolvedValue('published');
+    inner.mockResolvedValueOnce(null).mockResolvedValue('unpublished');
     const cached = cachedCourseSlugLookup(inner, { ttlMs: 1000, now: () => t });
     expect(await cached('x')).toBeNull();
-    expect(await cached('x')).toBe('published');
-    expect(await cached('X')).toBe('published');
+    expect(await cached('x')).toBe('unpublished');
+    expect(await cached('X')).toBe('unpublished');
     expect(inner).toHaveBeenCalledTimes(2);
     t = 1500;
     await cached('x');
