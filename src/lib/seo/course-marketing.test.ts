@@ -330,6 +330,90 @@ describe('current repository truth', () => {
     expect(sourceCards).toEqual(cardsIndex);
   });
 
+  it('keeps every card offer price equal to its source of truth, not to its own copy (GP-578)', () => {
+    // The parity test above proves the card files and the index agree with each other. It cannot
+    // see a wrong price written into both. This test checks each card's authored
+    // courseJsonLd.offers.price against an independent price source: the seed catalogue
+    // (data/seed/courses-catalog.json) for a catalogued course, otherwise the live price captured
+    // in docs/evidence/seo-card-grounding-*.json. Card files and the index are both checked, so a
+    // wrong price planted in either one fails here.
+    const evidencePrices = new Map<string, number | null>();
+    const evidenceDirectory = join(ROOT, 'docs', 'evidence');
+    for (const name of readdirSync(evidenceDirectory)) {
+      if (!name.startsWith('seo-card-grounding-') || !name.endsWith('.json')) continue;
+      const evidence = JSON.parse(readFileSync(join(evidenceDirectory, name), 'utf8')) as {
+        courses: Array<{ slug: string; liveOfferPrice: number | null; carded: boolean }>;
+      };
+      for (const course of evidence.courses) {
+        if (course.carded) evidencePrices.set(course.slug, course.liveOfferPrice);
+      }
+    }
+
+    const cardFiles = readdirSync(cardsDirectory)
+      .filter((name) => name.endsWith('.json'))
+      .map((name) => JSON.parse(readFileSync(join(cardsDirectory, name), 'utf8')) as CourseMarketing);
+    const checked = new Set<string>();
+    const unsourced = new Set<string>();
+    const mismatches: string[] = [];
+
+    for (const [origin, card] of [
+      ...cardFiles.map((card) => ['card file', card] as const),
+      ...Object.values(cardsIndex).map((card) => ['index', card] as const),
+    ]) {
+      const offer = card.courseJsonLd?.offers as
+        | { price?: string | number; priceCurrency?: string }
+        | undefined;
+      if (!offer) continue;
+
+      const catalogueCourse = catalogueBySlug.get(card.slug);
+      const truth = catalogueCourse
+        ? { source: 'catalogue', price: Number(catalogueCourse.priceAud) }
+        : evidencePrices.has(card.slug)
+          ? { source: 'live evidence', price: Number(evidencePrices.get(card.slug)) }
+          : null;
+      if (!truth) {
+        unsourced.add(card.slug);
+        continue;
+      }
+
+      checked.add(card.slug);
+      if (Number(offer.price) !== truth.price || offer.priceCurrency !== 'AUD') {
+        mismatches.push(
+          `${origin} ${card.slug}: offers ${offer.price} ${offer.priceCurrency}, ${truth.source} ${truth.price} AUD`,
+        );
+      }
+    }
+
+    expect(mismatches).toEqual([]);
+    // Non-vacuous: 50 catalogued cards plus 9 live-evidence cards are checked.
+    expect(checked.size).toBe(59);
+    // Cards with an offer but no independent price source. Frozen so a new card cannot join
+    // this list unnoticed: give it a catalogue entry or live evidence instead.
+    expect([...unsourced].sort()).toEqual([
+      'commercial-carpet-core',
+      'fire-smoke-restoration-core',
+      'insurance-adjusters-and-their-roles',
+      'introduction-to-advanced-structural-drying',
+      'introduction-to-asbestos-asbestos-awareness',
+      'introduction-to-creating-a-clean-air-environment',
+      'introduction-to-iaq-and-mould',
+      'job-safety-and-environmental-analysis-jsea-course',
+      'large-loss-mastery-course',
+      'level-1-mould-remediation-2cc96b85',
+      'microbe-clean-basic-understanding-course',
+      'moisture-meter-course',
+      'refrigerant-dehumidifiers-for-water-loss-restoration',
+      'restoration-project-management-premium',
+      'risk-assessment-course',
+      'safe-work-method-statements-swms-course',
+      'safety-data-sheet-sds-course',
+      'standard-operating-procedures-sop-course',
+      'structural-drying-core',
+      'tile-cleaning-for-carpet-cleaners',
+      'using-atp-to-create-protocols',
+    ]);
+  });
+
   it('keeps every card meta description inside the length search engines render', () => {
     // Observed on carsi.com.au 2026-09-10: three cards shipped 173-192 chars and were
     // cut off in the SERP - the exact defect the card programme exists to remove.
