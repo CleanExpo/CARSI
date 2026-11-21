@@ -10,6 +10,7 @@ const mocks = vi.hoisted(() => ({
   findMany: vi.fn(),
   findUnique: vi.fn(),
   update: vi.fn(),
+  executeRaw: vi.fn(),
   complete: vi.fn(),
   sendEmail: vi.fn(),
 }));
@@ -21,6 +22,7 @@ vi.mock('@/lib/admin/admin-courses-service', () => ({
 }));
 vi.mock('@/lib/prisma', () => ({
   prisma: {
+    $executeRaw: mocks.executeRaw,
     lmsCourse: { findMany: mocks.findMany, findUnique: mocks.findUnique, update: mocks.update },
   },
 }));
@@ -46,7 +48,17 @@ const LIVE_MODULES = Array.from({ length: 9 }, (_, i) => ({
   textContent: `<p>Original live text for module ${i + 1}.</p>`,
 }));
 
-function liveCourse(id: string, meta: Record<string, unknown>) {
+function liveCourse(
+  id: string,
+  meta: Record<string, unknown>
+): {
+  id: string;
+  slug: string;
+  title: string;
+  isFree: boolean;
+  updatedAt: Date;
+  meta: Record<string, unknown>;
+} {
   return {
     id,
     slug: id,
@@ -98,25 +110,47 @@ beforeEach(() => {
       return courses[where.id];
     }
   );
+  // Stand-in for the single-statement draft write (persistOptimizeDraft). The real SQL, its
+  // conditions and its atomicity are proven on PostgreSQL in optimize-course-draft-write.pg.test.ts.
+  mocks.executeRaw.mockImplementation(
+    async (strings: TemplateStringsArray, ...values: unknown[]) => {
+      const sql = strings.join('?');
+      const [json, id] = values as [string, string];
+      const meta = courses[id]?.meta ?? {};
+      const conditional = sql.includes('noAiRewrite');
+      if (conditional && (meta.optimizeDraft != null || meta.noAiRewrite === true)) return 0;
+      courses[id] = { ...courses[id], meta: { ...meta, optimizeDraft: JSON.parse(json) } };
+      return 1;
+    }
+  );
   mocks.complete.mockResolvedValue(MODULE_BODY);
 });
+
+/** Every database write the run made: [course id, the columns it set]. */
+function writes(): Array<[string, string[]]> {
+  const viaUpdate = mocks.update.mock.calls.map(
+    ([args]) => [args.where.id, Object.keys(args.data)] as [string, string[]]
+  );
+  const viaSql = mocks.executeRaw.mock.calls.map(([strings, ...values]) => {
+    const set = /SET([\s\S]*?)WHERE/.exec((strings as TemplateStringsArray).join('?'))?.[1] ?? '';
+    const columns = [...set.matchAll(/^\s*,?\s*(\w+)\s*=/gm)].map((m) => m[1]);
+    return [values[1], columns] as [string, string[]];
+  });
+  return [...viaUpdate, ...viaSql];
+}
 
 describe('optimiser cron leaves live course content unchanged (GP-758)', () => {
   it('stores a draft for review and never writes live modules', async () => {
     await runOptimizeCoursesCron({ scope: 'paid' });
 
     expect(mocks.adminUpdateCourse).not.toHaveBeenCalled();
-    expect(mocks.update).toHaveBeenCalled();
-    for (const [args] of mocks.update.mock.calls) {
-      expect(Object.keys(args.data)).toEqual(['meta']);
+    const all = writes();
+    expect(all.length).toBeGreaterThan(0);
+    for (const [, columns] of all) {
+      expect(columns.filter((c) => c !== 'updated_at')).toEqual(['meta']);
     }
 
-    const freshWrites = mocks.update.mock.calls
-      .map(([args]) => args)
-      .filter((args) => args.where.id === 'fresh');
-    expect(freshWrites.length).toBeGreaterThan(0);
-    const savedMeta = freshWrites.at(-1).data.meta as Record<string, unknown>;
-    const { optimizeDraft, ...rest } = savedMeta;
+    const { optimizeDraft, ...rest } = courses.fresh.meta;
     expect(rest).toEqual({ keep: 'yes' });
     expect(optimizeDraft).toMatchObject({ modules: expect.any(Array) });
   });
@@ -124,8 +158,29 @@ describe('optimiser cron leaves live course content unchanged (GP-758)', () => {
   it('does not overwrite a draft that is already waiting for review', async () => {
     await runOptimizeCoursesCron({ scope: 'paid' });
 
-    const pendingWrites = mocks.update.mock.calls.filter(([args]) => args.where.id === 'pending');
-    expect(pendingWrites).toEqual([]);
+    expect(writes().filter(([id]) => id === 'pending')).toEqual([]);
+    expect(courses.pending.meta).toEqual({ optimizeDraft: pendingDraft });
     expect(mocks.adminGetCourse).not.toHaveBeenCalledWith('pending');
+  });
+
+  it.each([
+    ['an admin draft', { optimizeDraft: { ...pendingDraft, token: 'admin-draft' } }],
+    ['an AI-rewrite lock', { noAiRewrite: true }],
+  ])('keeps %s saved while the model was writing', async (_label, planted) => {
+    mocks.complete.mockImplementationOnce(async () => {
+      courses.fresh = { ...courses.fresh, meta: { ...courses.fresh.meta, ...planted } };
+      return MODULE_BODY;
+    });
+
+    const result = await runOptimizeCoursesCron({ scope: 'paid' });
+
+    expect(courses.fresh.meta).toEqual({ keep: 'yes', ...planted });
+    expect(result.drafted).toBe(0);
+    expect(result.results).toEqual([
+      expect.objectContaining({
+        courseId: 'fresh',
+        error: expect.stringMatching(/Nothing was changed/),
+      }),
+    ]);
   });
 });

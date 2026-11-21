@@ -6,8 +6,8 @@ import {
   draftCourseOptimizationForReview,
   isAiRewriteLocked,
   OptimizeCourseError,
+  hasPendingOptimizeDraft,
   paidCourseNeedsOptimize,
-  readOptimizeDraft,
 } from '@/lib/server/optimize-course-content';
 
 export const OPTIMIZE_CRON_EMAIL = 'ranamuzamil1199@gmail.com';
@@ -126,7 +126,7 @@ export function selectOptimizeBatch<T extends OptimizeCandidate>(
   const pending = courses
     .filter((c) => (scope === 'free' ? c.isFree : !c.isFree))
     .filter((c) => !isAiRewriteLocked({ slug: c.slug, meta: c.meta }))
-    .filter((c) => readOptimizeDraft(c.meta) == null)
+    .filter((c) => !hasPendingOptimizeDraft(c.meta))
     .filter((c) =>
       scope === 'free'
         ? freeCourseNeedsOptimize({ isFree: c.isFree, updatedAt: c.updatedAt, meta: c.meta })

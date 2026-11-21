@@ -361,6 +361,17 @@ export function readOptimizeDraft(meta: unknown): OptimizedCourseDraft | null {
   };
 }
 
+/**
+ * True when `meta.optimizeDraft` holds anything at all, valid or not. The one rule for "a draft is
+ * waiting for review": cron selection, the cron pre-check and the conditional SQL write in
+ * `persistOptimizeDraft` all use it, so a malformed draft still blocks an overwrite.
+ */
+export function hasPendingOptimizeDraft(meta: unknown): boolean {
+  if (!meta || typeof meta !== 'object' || Array.isArray(meta)) return false;
+  const raw = (meta as Record<string, unknown>)[META_KEY];
+  return raw !== undefined && raw !== null;
+}
+
 export function hasOptimizeApplied(meta: unknown): boolean {
   if (!meta || typeof meta !== 'object' || Array.isArray(meta)) return false;
   return typeof (meta as Record<string, unknown>)[OPTIMIZE_APPLIED_META_KEY] === 'string';
@@ -428,17 +439,46 @@ function metaObject(meta: unknown): Record<string, unknown> {
   return {};
 }
 
+/**
+ * Stores `draft` as `meta.optimizeDraft` in one SQL statement that merges only that key into the
+ * row's CURRENT meta, so keys written while the draft was being generated are kept (GP-758).
+ *
+ * `onlyIfNoPendingDraft` (the cron path) adds the conditions to the same statement: the write
+ * happens only when no draft is waiting (see `hasPendingOptimizeDraft`) and the course is not
+ * locked with `meta.noAiRewrite: true`. Returns false when no row was written: the course is gone,
+ * or (cron path) a draft or a lock appeared while this draft was generated.
+ */
 export async function persistOptimizeDraft(
   courseId: string,
-  existingMeta: unknown,
-  draft: OptimizedCourseDraft
-): Promise<void> {
-  const next = metaObject(existingMeta);
-  next[META_KEY] = JSON.parse(JSON.stringify(draft)) as OptimizedCourseDraft;
-  await prisma.lmsCourse.update({
-    where: { id: courseId },
-    data: { meta: next as Prisma.InputJsonValue },
-  });
+  draft: OptimizedCourseDraft,
+  opts?: { onlyIfNoPendingDraft?: boolean }
+): Promise<boolean> {
+  const json = JSON.stringify(draft);
+  const affected = opts?.onlyIfNoPendingDraft
+    ? await prisma.$executeRaw`
+        UPDATE lms_courses
+        SET meta = jsonb_set(
+              CASE WHEN jsonb_typeof(meta) = 'object' THEN meta ELSE '{}'::jsonb END,
+              '{optimizeDraft}', ${json}::jsonb, true),
+            updated_at = now()
+        WHERE id = ${courseId}::uuid
+          AND (
+            jsonb_typeof(meta) IS DISTINCT FROM 'object'
+            OR (
+              (meta -> 'optimizeDraft' IS NULL OR meta -> 'optimizeDraft' = 'null'::jsonb)
+              AND (meta -> 'noAiRewrite') IS DISTINCT FROM 'true'::jsonb
+            )
+          )
+      `
+    : await prisma.$executeRaw`
+        UPDATE lms_courses
+        SET meta = jsonb_set(
+              CASE WHEN jsonb_typeof(meta) = 'object' THEN meta ELSE '{}'::jsonb END,
+              '{optimizeDraft}', ${json}::jsonb, true),
+            updated_at = now()
+        WHERE id = ${courseId}::uuid
+      `;
+  return affected === 1;
 }
 
 export async function discardOptimizeDraft(courseId: string, existingMeta: unknown): Promise<void> {
@@ -497,7 +537,8 @@ export type OptimizeProgress = { step: string; message: string; percent: number 
 
 export async function generateOptimizedCourseDraft(
   courseId: string,
-  onProgress?: (p: OptimizeProgress) => void
+  onProgress?: (p: OptimizeProgress) => void,
+  opts?: { onlyIfNoPendingDraft?: boolean }
 ): Promise<OptimizedCourseDraft> {
   if (!resolveAnthropicConfig().configured) {
     throw new OptimizeCourseError('ANTHROPIC_API_KEY is not configured', 503);
@@ -641,7 +682,15 @@ export async function generateOptimizedCourseDraft(
     description: dto.description,
     modules,
   };
-  await persistOptimizeDraft(courseId, course.meta, draft);
+  const saved = await persistOptimizeDraft(courseId, draft, opts);
+  if (!saved) {
+    throw opts?.onlyIfNoPendingDraft
+      ? new OptimizeCourseError(
+          'A draft was saved or the course was locked while this draft was generated. Nothing was changed.',
+          409
+        )
+      : new OptimizeCourseError('Not found', 404);
+  }
   onProgress?.({ step: 'done', message: 'Draft ready to review.', percent: 100 });
   return draft;
 }
@@ -736,10 +785,13 @@ export async function draftCourseOptimizationForReview(
   if (!dto.isFree && opts?.allowFree) {
     throw new OptimizeCourseError('Paid courses are not optimised by the free cron', 400);
   }
-  if (readOptimizeDraft(existing.meta)) {
+  if (hasPendingOptimizeDraft(existing.meta)) {
     throw new OptimizeCourseError('A draft is already waiting for review', 409);
   }
-  const draft = await generateOptimizedCourseDraft(courseId);
+  // The pre-check above saves model spend; the conditional write is what enforces it.
+  const draft = await generateOptimizedCourseDraft(courseId, undefined, {
+    onlyIfNoPendingDraft: true,
+  });
   return {
     courseId,
     title: dto.title,
