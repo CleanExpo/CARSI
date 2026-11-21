@@ -196,4 +196,18 @@ describe('backfill SQL matches the retired label rule', () => {
     ];
     for (const l of labels) expect(re.test(l), l).toBe(legacy(l));
   });
+
+  it('also flags the already-seeded CCW carbon monoxide row, by assessment id and exact label', () => {
+    const seed = JSON.parse(
+      readFileSync(join(process.cwd(), 'data', 'seed', 'ccw-truckmount-assessment.json'), 'utf8'),
+    ) as { assessment: { id: string; criteria: { label: string; critical?: boolean }[] } };
+    const co = seed.assessment.criteria.find((c) => /zero-tolerance/i.test(c.label))!;
+    expect(co.critical).toBe(true);
+    const m = sql().match(
+      /UPDATE "lms_rubric_criteria"\s+SET "critical" = true\s+WHERE "assessment_id" = '([^']+)'\s+AND "label" = '((?:[^']|'')+)';/,
+    );
+    expect(m).not.toBeNull();
+    expect(m![1]).toBe(seed.assessment.id);
+    expect(m![2].replace(/''/g, "'")).toBe(co.label);
+  });
 });

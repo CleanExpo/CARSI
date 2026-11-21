@@ -11,3 +11,12 @@ ALTER TABLE "lms_rubric_criteria"
 UPDATE "lms_rubric_criteria"
 SET "critical" = true
 WHERE "label" ~* '\([\s   -     　﻿]*critical[\s   -     　﻿]*\)';
+
+-- The published CCW truck-mount assessment states in its instructions that a failed carbon
+-- monoxide criterion fails the whole assessment, but its label says "ZERO-TOLERANCE", not
+-- the exact "(critical)" marker, so the label rule above leaves the already-seeded row
+-- false. Flag it by its stable assessment id and exact label (no wording match).
+UPDATE "lms_rubric_criteria"
+SET "critical" = true
+WHERE "assessment_id" = 'f5d40001-0e5c-4b8a-9d3e-7a6f2c9b1d71'
+  AND "label" = 'Carbon monoxide controls — ZERO-TOLERANCE (automatic fail if not fully competent)';
