@@ -14,6 +14,7 @@
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -146,14 +147,23 @@ const BINARY =
 
 // Untracked, non-ignored files are scanned too, so a local run sees a new file before it is
 // committed (a committed-only scan let this guard pass on its own uncommitted file).
-function trackedTextFiles(): string[] {
+function repoFiles(): string[] {
   return execFileSync('git', ['ls-files', '-z', '--cached', '--others', '--exclude-standard'], {
     cwd: ROOT,
     encoding: 'utf8',
     maxBuffer: 64 * 1024 * 1024,
   })
     .split('\0')
-    .filter((f) => f && !BINARY.test(f));
+    .filter(Boolean);
+}
+
+function trackedTextFiles(): string[] {
+  return repoFiles().filter((f) => !BINARY.test(f));
+}
+
+/** Served PDFs, listed from the unfiltered file list (the text list drops binaries). */
+function servedPdfs(): string[] {
+  return repoFiles().filter((f) => /^public\/.*\.pdf$/i.test(f));
 }
 
 function matchesIn(text: string): string[] {
@@ -252,18 +262,49 @@ describe('tracked source carries no retired provider wording', () => {
     expect(missing).toEqual([]);
   });
 
-  it('served PDFs carry no retired wording outside PENDING_PDFS (and pending ones still need it)', async () => {
-    const { pdfText } = await import('../../../scripts/pdf-text.mjs');
+  // pdf-lib refuses a jsdom-realm Buffer, so the text is read in a plain Node process.
+  const PDF_TEXT_SCRIPT =
+    "const { pdfText } = await import(process.argv[1]); const raw = await pdfText(process.argv[2]); process.stdout.write(Array.isArray(raw) ? raw.join(' ') : String(raw));";
+  const pdfText = (path: string) =>
+    execFileSync(
+      process.execPath,
+      [
+        '--input-type=module',
+        '-e',
+        PDF_TEXT_SCRIPT,
+        pathToFileURL(join(ROOT, 'scripts/pdf-text.mjs')).href,
+        path,
+      ],
+      { cwd: ROOT, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }
+    );
+
+  /** Problems in the served PDFs, given the pending exemptions. One owner for the PDF rule. */
+  function pdfProblems(pending: Record<string, string>): string[] {
     const problems: string[] = [];
-    for (const pdf of files.filter((f) => /^public\/.*\.pdf$/i.test(f))) {
-      const raw = await pdfText(join(ROOT, pdf));
-      const text = (Array.isArray(raw) ? raw.join(' ') : String(raw)).replace(/\s+/g, ' ');
+    for (const pdf of servedPdfs()) {
+      const text = pdfText(join(ROOT, pdf)).replace(/\s+/g, ' ');
+      if (text.trim().length < 200) problems.push(`${pdf}: no text extracted`);
       const dirty = matchesIn(text).length > 0;
-      if (dirty && !PENDING_PDFS[pdf]) problems.push(`${pdf}: carries the retired wording`);
-      if (!dirty && PENDING_PDFS[pdf])
-        problems.push(`${pdf}: clean now, remove it from PENDING_PDFS`);
+      if (dirty && !pending[pdf]) problems.push(`${pdf}: carries the retired wording`);
+      if (!dirty && pending[pdf]) problems.push(`${pdf}: clean now, remove it from PENDING_PDFS`);
     }
-    expect(problems).toEqual([]);
+    return problems;
+  }
+
+  // GP-704 review round 2: the PDF loop once read a list with every PDF filtered out, so it
+  // could not fail. These controls fail if it reads nothing, misses a pending PDF, or cannot
+  // see the wording in a PDF that carries it.
+  it('the PDF check sees every served PDF and fires without its exemptions', () => {
+    const pdfs = servedPdfs();
+    expect(pdfs.length).toBeGreaterThan(0);
+    expect(Object.keys(PENDING_PDFS).filter((k) => !pdfs.includes(k))).toEqual([]);
+    const withoutExemptions = pdfProblems({});
+    for (const pdf of Object.keys(PENDING_PDFS))
+      expect(withoutExemptions).toContain(`${pdf}: carries the retired wording`);
+  }, 60_000);
+
+  it('served PDFs carry no retired wording outside PENDING_PDFS (and pending ones still need it)', () => {
+    expect(pdfProblems(PENDING_PDFS)).toEqual([]);
   }, 60_000);
 
   // The phrase inside a string literal or JSX text; comments may name it.
