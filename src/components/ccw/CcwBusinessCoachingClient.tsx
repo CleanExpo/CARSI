@@ -45,8 +45,8 @@ import {
   carsiCoachingWorkshopPath,
 } from '@/lib/marketing/carsi-coaching-monthly';
 import {
-  carsiCoachingAddOnsComingSoon,
   carsiCoachingPortalPath,
+  publicCoachingOffer,
 } from '@/lib/marketing/carsi-coaching-program';
 import { ccwRoadshowPath } from '@/lib/marketing/ccw-roadshow';
 
@@ -116,11 +116,16 @@ const faqs = [
     answer:
       'A dedicated coaching area (separate from My Learning) for your plan, monthly actions, session prep, and resources. Sign in after subscribing to open it at /dashboard/coaching.',
   },
-  {
-    question: 'Are add-ons included in $495/month?',
-    answer:
-      'No. Optional extras (partner seats, extra 1:1s, implementation sprints, etc.) are listed with planned pricing for transparency. Add-on booking is coming soon — email support@carsi.com.au if you need something urgently.',
-  },
+  // GP-734: the add-ons question is asked only while add-ons can be booked.
+  ...(publicCoachingOffer().addOnsBookable
+    ? [
+        {
+          question: 'Are add-ons included in $495/month?',
+          answer:
+            'No. Optional extras (partner seats, extra 1:1s, implementation sprints, etc.) are listed with their prices on this page.',
+        },
+      ]
+    : []),
   {
     question: 'Do I need to be on-site?',
     answer:
@@ -168,7 +173,7 @@ export function CcwBusinessCoachingClient({ checkoutEnabled }: { checkoutEnabled
                   href="#coaching-addons"
                   className="font-medium text-[#146fc2] hover:underline"
                 >
-                  Add-ons {carsiCoachingAddOnsComingSoon ? '(soon)' : '& prices'}
+                  {publicCoachingOffer().addOnsBookable ? 'Add-ons & prices' : 'Pricing'}
                 </Link>
                 <Link
                   href={carsiCoachingPortalPath}

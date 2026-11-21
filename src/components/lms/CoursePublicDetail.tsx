@@ -251,7 +251,7 @@ export function CoursePublicDetail({
                 <p className="mt-1 text-xs text-slate-500">
                   {course.is_free || priceNum === 0
                     ? 'Free access — no payment required'
-                    : 'One-time payment — lifetime access'}
+                    : 'One-time payment — lifetime access · GST included'}
                 </p>
                 <div className="mt-6">
                   <EnrolButton
@@ -264,9 +264,9 @@ export function CoursePublicDetail({
                 <p className="mt-4 text-center text-xs text-slate-500">
                   or included with{' '}
                   <Link href="/subscribe" className="font-semibold text-[#146fc2]">
-                    CARSI Pro
+                    Yearly membership
                   </Link>{' '}
-                  — $795/yr
+                  — $795/yr, GST included
                 </p>
               </div>
 
