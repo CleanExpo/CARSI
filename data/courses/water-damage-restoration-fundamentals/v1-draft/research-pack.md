@@ -128,7 +128,7 @@ rating-plate and rate-card figures.
 
 ## Licence / production guardrails honoured
 
-- `iicrcDiscipline: null`, `cecHours: 0`; no claim that the course earns or awards CECs; the
+- `iicrcDiscipline: null`, `cecHours: 0`; no CEC claim of any kind; the
   credential is carried in `meta.designation` ("CARSI Water Restoration Practitioner"), a CARSI
   Southern Hemisphere Restoration Designation.
 - Australian English, 230 V / 50 Hz / 10 A GPO / RCD, metric units, AUD, and AS/NZS + Safe Work

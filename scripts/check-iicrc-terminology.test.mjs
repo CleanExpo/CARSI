@@ -12,7 +12,7 @@
  * The allow-cases matter as much as the block-cases: every one is a phrasing CLAUDE.md
  * explicitly permits, and a guard that blocks them would be turned off within a week.
  */
-import { bannedRules, scanFile, scanText } from './check-iicrc-terminology.mjs';
+import { bannedRules, inScope, scanFile, scanText } from './check-iicrc-terminology.mjs';
 import { IICRC_CODES } from './iicrc-codes.mjs';
 
 const F = 'app/(public)/fixture/page.tsx';
@@ -1094,6 +1094,28 @@ if (scanText(F, DOCS_LINE).length === 0) {
 }
 if (scanFile('docs/marketing/x.md', DOCS_LINE).length > 0) {
   console.error(`✖ MUST PASS in docs/ but blocked:\n    ${DOCS_LINE}`);
+  failed++;
+}
+
+// Draft courses (data/courses/<slug>/v1-draft) are in scope, evidence/ is not (first-wave spec
+// AC-W0-4). A seed-only rule also fires on a draft catalogue, which becomes seed data at go-live.
+for (const [path, want] of [
+  ['data/courses/x/v1-draft/a.md', true],
+  ['data/courses/x/v1-draft/courses-catalog.json', true],
+  ['data/courses/x/v1-draft/evidence/notes.md', false],
+  ['data/courses/x/evidence/evidence-ledger.jsonl', false],
+]) {
+  if (inScope(path) !== want) {
+    console.error(`✖ inScope('${path}') should be ${want}`);
+    failed++;
+  }
+}
+if (scanFile('data/courses/x/v1-draft/a.md', 'Learn WRT training basics.').length === 0) {
+  console.error('✖ MUST BLOCK in a draft course: "WRT training"');
+  failed++;
+}
+if (scanFile('data/courses/x/v1-draft/courses-catalog.json', '{"iicrcDiscipline": "WRT"}').length === 0) {
+  console.error('✖ MUST BLOCK in a draft catalogue: a non-null iicrcDiscipline (seed-only rule)');
   failed++;
 }
 
