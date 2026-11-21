@@ -68,6 +68,7 @@ import {
 import { roleGuidePagePath } from './role-guides-path';
 import { MAX_INDUSTRY_SLUGS } from './industry-slugs';
 import { publishableAuthorityPaths } from '@/lib/server/authority-page-data';
+import { getPublishedCourseSlugsFromDatabase } from '@/lib/server/public-courses-list';
 
 process.env.DATABASE_URL ||= 'postgresql://test-only-placeholder/none';
 
@@ -302,6 +303,55 @@ describe('GP-695 sitemap and page agree', () => {
     const before = db.calls;
     expect(await publishableAuthorityPaths([authorityPages[0]])).toEqual([]);
     expect(db.calls).toBe(before);
+  });
+});
+
+describe('GP-695 sitemap() wiring', () => {
+  // The tests above call publishableAuthorityPaths directly; these call sitemap() itself, so a
+  // sitemap that goes back to the newest-N catalogue window fails here in both directions.
+  const catalogueWindow = vi.mocked(getPublishedCourseSlugsFromDatabase);
+
+  async function withApprovedEntry(run: (path: string) => Promise<void>): Promise<void> {
+    const original = authorityPages[1];
+    authorityPages[1] = fresh(approved(original));
+    try {
+      await run(roleGuidePagePath(original.slug));
+    } finally {
+      authorityPages[1] = original;
+    }
+  }
+
+  const sitemapPaths = async () => (await sitemap()).map((e) => new URL(e.url).pathname);
+
+  it('lists an approved page whose bundle read succeeds, even when the catalogue window misses it', async () => {
+    await withApprovedEntry(async (path) => {
+      catalogueWindow.mockResolvedValueOnce([]);
+      expect(await sitemapPaths()).toContain(path);
+    });
+  });
+
+  it('leaves the page out when the window holds every slug but the bundle read disagrees', async () => {
+    await withApprovedEntry(async (path) => {
+      const rows = authorityPages[1].bundle.publishedSlugs.map((slug) => ({
+        slug,
+        updated_at: '2026-11-01T00:00:00.000Z',
+        category: null,
+      }));
+      db.hiddenSlugs.add(authorityPages[1].bundle.publishedSlugs[0]);
+      try {
+        catalogueWindow.mockResolvedValueOnce(rows);
+        expect(await sitemapPaths()).not.toContain(path);
+      } finally {
+        db.hiddenSlugs.clear();
+      }
+      db.fail = true;
+      try {
+        catalogueWindow.mockResolvedValueOnce(rows);
+        expect(await sitemapPaths()).not.toContain(path);
+      } finally {
+        db.fail = false;
+      }
+    });
   });
 });
 
