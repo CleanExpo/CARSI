@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { getProofPackPayloadForStudent } from '@/lib/server/proof-pack';
+import { getAppOrigin } from '@/lib/server/app-url';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,7 +19,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ detail: 'Database not configured' }, { status: 503 });
   }
 
-  const payload = await getProofPackPayloadForStudent(claims.sub, request.nextUrl.origin);
+  const payload = await getProofPackPayloadForStudent(claims.sub, getAppOrigin(request));
   if (!payload) {
     return NextResponse.json({ detail: 'Not found' }, { status: 404 });
   }
