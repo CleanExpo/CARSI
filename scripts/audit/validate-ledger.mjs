@@ -3,14 +3,15 @@
  * GP-567 D2 — Evidence Ledger validator.
  *
  * The founder's rule as an executable schema. Every factual claim resolves to
- * EXACTLY ONE status:
+ * EXACTLY ONE status (the original three, plus CUT added in W0a):
  *
  *   VERIFIED  — primary source: source_url + access_date + quote of <= 25 words
  *   JUSTIFIED — 100% unavailable: confidence + reasoning + best_available_source
  *   GAP       — no defensible basis: reason + recommended_action
+ *   CUT       — removed from the course: key_phrase (absence enforced by check-evidence-ledger.mjs)
  *
- * There is no fourth state. CONFLICT is a SIDECAR field that may sit beside any
- * of the three; it never replaces one, because overwriting the original with a
+ * The set is closed. CONFLICT is a SIDECAR field that may sit beside any
+ * of the four; it never replaces one, because overwriting the original with a
  * disagreement destroys the very thing the ledger exists to preserve.
  *
  * Exit 0 = every entry conforms. Exit 1 = at least one violation, each named.
@@ -47,7 +48,10 @@
  */
 import fs from 'node:fs';
 
-export const STATUSES = ['VERIFIED', 'JUSTIFIED', 'GAP'];
+// CUT (W0a, spec 11): the claim was removed from the course on the founder's or an agent's
+// call. It carries `key_phrase`, the wording that must no longer appear in the course copy;
+// scripts/check-evidence-ledger.mjs enforces that absence, this schema only demands the field.
+export const STATUSES = ['VERIFIED', 'JUSTIFIED', 'GAP', 'CUT'];
 export const CONFIDENCES = ['high', 'medium', 'low'];
 const MAX_QUOTE_WORDS = 25;
 export const REQUIRED_ALWAYS = ['id', 'claim', 'claim_class', 'surface', 'status', 'feeds'];
@@ -82,6 +86,8 @@ export const ENTRY_RULES = Object.freeze([
   'gap-no-reason',
   'gap-no-action',
   'gap-action-not-in-set',
+  'cut-no-key-phrase',
+  'founder-only-not-boolean',
   'conflict-not-object',
   'conflict-no-engines',
   'conflict-no-disagreement',
@@ -185,7 +191,7 @@ function entryRulesImpl(e, lineNo) {
 
   // Exactly one status, from the closed set. Silence is a gap, not a pass.
   if (e.status !== undefined && !STATUSES.includes(e.status)) {
-    at('status-not-in-set', `status "${e.status}" is not one of ${STATUSES.join(' | ')} — there is no fourth state`);
+    at('status-not-in-set', `status "${e.status}" is not one of ${STATUSES.join(' | ')} — the set is closed`);
   }
 
   // CONFLICT must never be smuggled in as a status.
@@ -220,6 +226,16 @@ function entryRulesImpl(e, lineNo) {
     else if (!GAP_ACTIONS.includes(e.recommended_action)) {
       at('gap-action-not-in-set', `GAP recommended_action "${e.recommended_action}" is not one of ${GAP_ACTIONS.join(' | ')}`);
     }
+  }
+
+  if (e.status === 'CUT' && (typeof e.key_phrase !== 'string' || e.key_phrase.trim() === '')) {
+    at('cut-no-key-phrase', 'CUT requires key_phrase, the wording that must no longer appear in the course copy');
+  }
+
+  // `founder_only` is set row by row by judgement; a string "true" would be read as truthy by
+  // one reader and as false by another, so only a real boolean is accepted.
+  if (e.founder_only !== undefined && typeof e.founder_only !== 'boolean') {
+    at('founder-only-not-boolean', 'founder_only must be true or false (a JSON boolean)');
   }
 
   // Sidecar shape, when present.

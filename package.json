@@ -42,6 +42,8 @@
     "check:cec-surfaces": "node scripts/check-cec-surfaces.mjs",
     "check:evidence-ledgers": "node scripts/check-evidence-ledgers.mjs",
     "test:evidence-ledgers": "node scripts/check-evidence-ledgers.test.mjs",
+    "check:evidence-ledger": "node scripts/check-evidence-ledger.mjs --report $(find data/courses -name evidence-ledger.jsonl | sort)",
+    "test:evidence-ledger": "node --test scripts/check-evidence-ledger.test.mjs",
     "test:ledger-mutants": "node scripts/audit/check-mutants.mjs",
     "audit:verify": "node scripts/audit/verify-all.mjs",
     "test:cec-surfaces": "node scripts/check-cec-surfaces.test.mjs",
