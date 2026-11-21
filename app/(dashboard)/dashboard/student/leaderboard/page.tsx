@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { ErrorBanner } from '@/components/lms/ErrorBanner';
 import { apiClient } from '@/lib/api/client';
+import { isEnrollmentCompleted } from '@/lib/lms/enrollment-completion';
 
 interface LeaderboardEntry {
   rank: number;
@@ -88,7 +89,7 @@ export default function LeaderboardPage() {
         setMeta({ period_label: boardRes.period_label, period_timezone: boardRes.period_timezone });
       }
       setLevel(levelData);
-      const done = enrollments.filter((e) => e.status === 'completed' || e.all_lessons_complete);
+      const done = enrollments.filter((e) => isEnrollmentCompleted(e.status));
       setCompletedCount(done.length);
       setCertificateCount(done.filter((e) => e.certificate_issued_at).length);
     } catch {

@@ -5,6 +5,7 @@ import {
 import type { AdminCatalogCourse } from '@/lib/admin/load-admin-catalog';
 import { buildAdminCatalogFromSeed } from '@/lib/lms-seed-catalog';
 import { prisma } from '@/lib/prisma';
+import { isEnrollmentCompleted } from '@/lib/lms/enrollment-completion';
 import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
 import { getRenewalSummaryByEnrollmentIds } from '@/lib/server/iicrc-renewal-communication';
 
@@ -272,9 +273,10 @@ export function mapUserToAdminProgress(
     };
   });
 
-  const completedCourseCount = enrollmentsProgress.filter((e) => e.completionPct >= 100).length;
+  // Completed means the server marked the enrolment completed (GP-432 / GP-769), not 100% lessons.
+  const completedCourseCount = enrollmentsProgress.filter((e) => isEnrollmentCompleted(e.status)).length;
   const activeCourseCount = enrollmentsProgress.filter(
-    (e) => e.completionPct > 0 && e.completionPct < 100
+    (e) => e.completionPct > 0 && !isEnrollmentCompleted(e.status)
   ).length;
   const neverStartedCount = enrollmentsProgress.filter((e) => {
     const status = normalizeEnrollmentStatus(e.status);

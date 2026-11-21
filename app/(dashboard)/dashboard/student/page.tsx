@@ -21,6 +21,7 @@ import { renewalProgress } from '@/lib/renewal-progress';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { isEnrollmentCompleted } from '@/lib/lms/enrollment-completion';
 
 const surface = 'learner-home-surface learner-home-card overflow-hidden rounded-[1.25rem]';
 const inset = 'learner-home-inset';
@@ -191,11 +192,11 @@ export default function StudentDashboardPage() {
   }, [user, fetchSub, fetchEnrollments, fetchResume]);
 
   const inProgress = useMemo(
-    () => enrollments.filter((e) => e.status !== 'completed' && e.all_lessons_complete !== true),
+    () => enrollments.filter((e) => !isEnrollmentCompleted(e.status)),
     [enrollments]
   );
   const completed = useMemo(
-    () => enrollments.filter((e) => e.status === 'completed' || e.all_lessons_complete === true),
+    () => enrollments.filter((e) => isEnrollmentCompleted(e.status)),
     [enrollments]
   );
   const visible = tab === 'completed' ? completed : inProgress;

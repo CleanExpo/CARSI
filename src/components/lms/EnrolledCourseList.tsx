@@ -5,6 +5,7 @@ import { formatCecHoursForDisplay } from '@/lib/cec-display';
 import { formatLearnerActivity } from '@/lib/learner-course-cta';
 import { isOnboardingCourse } from '@/lib/onboarding/enterprise';
 import { getOnboardingLearnPath, getOnboardingProgramPath } from '@/lib/onboarding/navigation';
+import { isEnrollmentCompleted } from '@/lib/lms/enrollment-completion';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
@@ -72,7 +73,7 @@ export function EnrolledCourseList({ enrollments }: EnrolledCourseListProps) {
             ? getOnboardingLearnPath(enr.course_slug, enr.last_lesson_id)
             : learnBase;
         const hubHref = getOnboardingProgramPath(enr.course_slug);
-        const done = enr.all_lessons_complete === true || enr.status === 'completed';
+        const done = isEnrollmentCompleted(enr.status);
         const cecSubmitted = enr.cec_submission_status === 'sent';
         const completedLabel = formatLearnerActivity(enr.completed_at ?? enr.certificate_issued_at);
         const activityLabel = formatLearnerActivity(enr.last_activity_at ?? enr.enrolled_at);
