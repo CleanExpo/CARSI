@@ -111,19 +111,19 @@ const BANNED = [
   {
     re: /\bIICRC[\s-]*Accredited\b/i,
     allow: /\bIICRC[\s-]+CEC[\s-]+Accredited\b/i,
-    message: 'Say "IICRC CEC Accredited", never bare "IICRC Accredited".',
+    message: 'Say "IICRC Approved CEC Provider" (GP-704); never call CARSI or a course accredited.',
   },
   {
     re: /\bIICRC[\s-]*accredited[\s-]+courses?\b/i,
     allow: null,
     message:
-      'Not "IICRC-accredited course(s)" — say "IICRC CEC Accredited course(s)" (even in a negated disclaimer, write "not IICRC CEC accredited").',
+      'Not an accredited course — a single approved class is "approved for IICRC CECs" (in a negated disclaimer, write "not approved for IICRC CECs").',
   },
   {
     re: /\bIICRC[\s-]+courses?[\s-]+accredit\w*\b/i,
     allow: null,
     message:
-      'Do not imply IICRC accredits CARSI\'s courses — say "IICRC CEC Accredited course(s)".',
+      'Do not imply the IICRC approves or endorses CARSI\'s courses — a single approved class is "approved for IICRC CECs".',
   },
   // GAP CLOSED — "IICRC-approved" as a CARSI offering. Legitimate uses (real IICRC schools /
   // exams / the CE-provider program / board-approval process) are allowed.
@@ -132,7 +132,7 @@ const BANNED = [
     allow:
       /\bIICRC[\s-]*approved\s+(school|examination|exam|instructor|course\s+of\s+study)|IICRC[\s-]*board[\s-]*approv|(CE|CEC)[\s-]*provider|IICRC[\s-]*approv\w*\s+CE\b/i,
     message:
-      'Bare "IICRC-approved" implies IICRC approves CARSI\'s courses/certifications — say "IICRC CEC Accredited".',
+      'Bare "IICRC-approved" implies IICRC approves CARSI\'s courses/certifications — say "IICRC Approved CEC Provider" for CARSI, or "approved for IICRC CECs" for a class in the register.',
   },
   // GAP CLOSED — "get / certified ... with CARSI" without IICRC adjacency.
   {

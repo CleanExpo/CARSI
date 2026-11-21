@@ -7,7 +7,7 @@ export type IndustrySearchTopic = {
   cta: string;
 };
 
-/** Technician-search topics mapped to live IICRC CEC Accredited intro courses. */
+/** Technician-search topics mapped to live intro courses approved for IICRC CECs. */
 export const healthcareSearchTopics: IndustrySearchTopic[] = [
   {
     title: 'Mould in healthcare facilities',

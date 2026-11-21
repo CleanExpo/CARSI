@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import { TurnstileWidget } from '@/components/security/TurnstileWidget';
 
+import { IICRC_APPROVED_CEC_PROVIDER } from '@/lib/iicrc/approved-wording';
 interface FormState {
   firstName: string;
   lastName: string;
@@ -121,7 +122,7 @@ export function ContactForm({ leadContext }: { leadContext?: ContactLeadContext 
       className="space-y-5"
       // @ts-expect-error WebMCP attributes are W3C-draft and not yet in React's type defs
       toolname="submit_contact_enquiry"
-      tooldescription="Submit a contact enquiry to CARSI (an Australian IICRC CEC Accredited continuing-education provider). Routes to support@carsi.com.au for human follow-up. Use for course questions, membership enquiries, certification queries, or general support."
+      tooldescription={`Submit a contact enquiry to CARSI (an Australian continuing-education provider and an ${IICRC_APPROVED_CEC_PROVIDER}). Routes to support@carsi.com.au for human follow-up. Use for course questions, membership enquiries, certification queries, or general support.`}
     >
       {hasLeadContext ? (
         <div

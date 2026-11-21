@@ -218,7 +218,7 @@ These restate the carsi-course-production skill. The skill is the full checklist
 
 ## 7. Licence rules
 
-- CARSI is an **IICRC CEC Accredited** provider. That accreditation covers continuing education
+- CARSI is an **IICRC Approved CEC Provider**. That approval covers continuing education
   credits only. IICRC certification comes only through IICRC-approved schools and examinations,
   and CARSI course copy never says or implies that a CARSI course leads to it.
 - CARSI credentials are the **CARSI Southern Hemisphere Restoration Designations**. A CARSI course

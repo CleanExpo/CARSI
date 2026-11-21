@@ -13,7 +13,7 @@ course is *deep and well-formed*; **this standard proves it is *true, defensible
 CARSI's strength is its **own** designations and catalogue, built on research deep enough to
 survive challenge. Two claim disciplines bind this whole standard:
 
-- **IICRC/peer bodies:** CARSI is an **IICRC CEC Accredited provider**; it is not positioned as
+- **IICRC/peer bodies:** CARSI is an **IICRC Approved CEC Provider**; it is not positioned as
   replacing or outranking IICRC/RIA/ISSA/IAQ. Lead by depth ("beyond the standard"), never rivalry.
 - **"Registered" is a regulated status.** In the Australian VET system these are distinct steps:
   **ASQA (or a state course-accreditation body) accredits a course**, and a **Registered Training
