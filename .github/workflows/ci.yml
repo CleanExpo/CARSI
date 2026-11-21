@@ -508,6 +508,11 @@ jobs:
       - name: Course diagram check
         run: npm run check:course-diagrams
 
+      # GP-752: the water-course diagram wiring script still matches both catalogues (run it with
+      # --write after the GP-748 catalogue PR merges).
+      - name: Water course diagram wiring self-test
+        run: npm run test:wire-water-diagrams
+
       - name: Run E2E tests
         run: npm run test:e2e
         env:
