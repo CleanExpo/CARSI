@@ -141,7 +141,8 @@ function inUrlPosition(s, index, spans) {
   // GP-691: a comma starts a URL only as a later srcset candidate: inside a srcset value, or
   // after a width or density descriptor (`640w,` `2x,`, as in an RSC srcSet string). The comma
   // in `/* old, //127.1:8080 dev */` is neither.
-  if (c === ',') return spans.inSrcset(i) || SRCSET_DESCRIPTOR_RE.test(s.slice(Math.max(0, i - 24), i));
+  if (c === ',')
+    return spans.inSrcset(i) || SRCSET_DESCRIPTOR_RE.test(s.slice(Math.max(0, i - 24), i));
   if (c === '(') return /url$/i.test(s.slice(Math.max(0, i - 3), i));
   const entity = c === ';' && HTML_QUOTE_ENTITY_RE.exec(s.slice(Math.max(0, i - 9), i + 1));
   if (c !== '"' && c !== "'" && c !== '`' && !entity) return false;

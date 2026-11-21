@@ -1096,11 +1096,47 @@ for (const [name, file, src, drop] of LIST_FIXTURES) {
   // The pre-GP-656 regex, kept here only as the reference the linear version must match.
   const OLD =
     /[^.!?]*\b(?:not|never|cannot|isn't|doesn't|does\s+not)\b\s*(?:\w+\s+){0,2}?\b(?:earns?|earning|awards?|awarding|carr(?:y|ies|ying)|counts?|counting|confers?|accredit\w*|eligible|approved|grants?|toward)\b[^.!?]{0,40}?(?:CECs?\b|continuing[\s-]+education[\s-]+credits?)[^.!?]*[.!?]?|[^.!?]*\bno\s+(?:IICRC\s+)?(?:CECs?\b|continuing[\s-]+education[\s-]+credits?)[^.!?]*[.!?]?|[^.!?]*\w\?|[^.!?]*\b(?:assert\w*|exclude|refuses?|gate|gated|only\s+wh(?:en|ere)|filed)\b[^.!?]*?(?:CECs?\b|continuing[\s-]+education[\s-]+credits?)[^.!?]*|\b1\s+CEC\s*=[^.!?]*/gi;
-  const words = ['not', 'never', "doesn't", 'does not', 'earn', 'earns', 'award', 'toward',
-    'eligible', 'CEC', 'CECs', 'cecs', 'XCEC', 'continuing education credits',
-    'continuing-education credit', 'no', 'No IICRC', 'IICRC', 'gate', 'gated', 'assertion',
-    'only when', 'filed', '1 CEC =', '1', '=', 'this', 'course', 'x', '.', '!', '?', '??',
-    ' ', '\t', '\n', ',', 'ok?', 'e.g.'];
+  const words = [
+    'not',
+    'never',
+    "doesn't",
+    'does not',
+    'earn',
+    'earns',
+    'award',
+    'toward',
+    'eligible',
+    'CEC',
+    'CECs',
+    'cecs',
+    'XCEC',
+    'continuing education credits',
+    'continuing-education credit',
+    'no',
+    'No IICRC',
+    'IICRC',
+    'gate',
+    'gated',
+    'assertion',
+    'only when',
+    'filed',
+    '1 CEC =',
+    '1',
+    '=',
+    'this',
+    'course',
+    'x',
+    '.',
+    '!',
+    '?',
+    '??',
+    ' ',
+    '\t',
+    '\n',
+    ',',
+    'ok?',
+    'e.g.',
+  ];
   let seed = 7;
   const pick = (n) => (seed = (seed * 1103515245 + 12345) & 0x7fffffff) % n;
   let mismatches = 0;
@@ -1129,7 +1165,9 @@ for (const [name, file, src, drop] of LIST_FIXTURES) {
     scanText(F, line, cecRule);
     const ms = performance.now() - t0;
     if (ms > 50) {
-      console.error(`✖ GP-656 CEC-claim rule took ${ms.toFixed(0)}ms (> 50ms): ${line.slice(0, 20)}…`);
+      console.error(
+        `✖ GP-656 CEC-claim rule took ${ms.toFixed(0)}ms (> 50ms): ${line.slice(0, 20)}…`
+      );
       failed++;
     }
   }

@@ -288,8 +288,14 @@ check('a comma or quote inside a comment does not make //host a URL (GP-691)', (
   // Negative controls: both raised a false LOCALHOST before GP-691.
   assert.deepEqual(findLocalOrigins('<style>/* old, //127.1:8080 dev */</style>'), []);
   assert.deepEqual(findLocalOrigins('<script>// "//127.1:8080" dev</script>'), []);
-  assert.deepEqual(findLocalOrigins('<script type="module">\n  // \'//localhost:3000/x\' old\n</script>'), []);
-  assert.deepEqual(findLocalOrigins('<script>go();\r\n// `//10.0.0.1:8080` staging\r\nrun();</script>'), []);
+  assert.deepEqual(
+    findLocalOrigins('<script type="module">\n  // \'//localhost:3000/x\' old\n</script>'),
+    []
+  );
+  assert.deepEqual(
+    findLocalOrigins('<script>go();\r\n// `//10.0.0.1:8080` staging\r\nrun();</script>'),
+    []
+  );
   // Positive controls: every later srcset candidate still fires, with or without descriptors.
   for (const html of [
     '<img srcset="a.png, //127.1:8080/b.png 2x">',
