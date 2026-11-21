@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
+import { cutoffSeconds, issuedWithinCutoff } from '@/lib/auth/session-cutoff';
 import { verifySessionToken } from '@/lib/auth/session-jwt';
 import { prisma } from '@/lib/prisma';
 
@@ -31,10 +32,20 @@ export async function GET(request: NextRequest) {
     try {
       const row = await prisma.lmsUser.findUnique({
         where: { id: claims.sub },
-        select: { fullName: true, themePreference: true, isActive: true, isVerified: true },
+        select: {
+          fullName: true,
+          themePreference: true,
+          isActive: true,
+          isVerified: true,
+          sessionsValidAfterSec: true,
+        },
       });
       if (row && !row.isActive) {
         return NextResponse.json({ detail: 'Account deactivated' }, { status: 401 });
+      }
+      // GP-760: a session issued before the user's cut-off (set by a password reset) has ended.
+      if (row && !issuedWithinCutoff(claims.iat, cutoffSeconds(row.sessionsValidAfterSec))) {
+        return NextResponse.json({ detail: 'Session ended' }, { status: 401 });
       }
       if (row?.fullName?.trim()) full_name = row.fullName.trim();
       if (row?.themePreference) theme_preference = row.themePreference;

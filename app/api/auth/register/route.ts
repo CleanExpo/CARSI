@@ -5,7 +5,8 @@ import { SESSION_SENTINEL_COOKIE } from '@/lib/auth/session-sentinel';
 import { sendRegistrationWelcomeEmail } from '@/lib/server/auth-email';
 import { getAppOrigin } from '@/lib/server/app-url';
 import { registerUserWithPassword } from '@/lib/server/lms-auth';
-import { applyRateLimit, clientIpFrom } from '@/lib/rate-limit';
+import { clientIpFrom } from '@/lib/rate-limit';
+import { applyDurableRateLimit } from '@/lib/server/durable-rate-limit';
 import { validateNewPassword } from '@/lib/auth/password-policy';
 
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
@@ -18,7 +19,7 @@ export async function POST(request: NextRequest) {
       request.headers.get('x-forwarded-for'),
       request.headers.get('x-real-ip'),
     );
-    const rl = applyRateLimit(`auth-register:${ip}`, AUTH_LIMIT, AUTH_WINDOW_MS);
+    const rl = await applyDurableRateLimit(`auth-register:${ip}`, AUTH_LIMIT, AUTH_WINDOW_MS);
     if (!rl.ok) {
       return NextResponse.json(
         { error: 'Too many attempts. Please try again later.' },

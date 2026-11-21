@@ -3,7 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { isSafeInternalPath } from '@/lib/auth/guest-recovery-path';
 import { signPasswordResetToken } from '@/lib/auth/session-jwt';
 import { prisma } from '@/lib/prisma';
-import { applyRateLimit, clientIpFrom } from '@/lib/rate-limit';
+import { clientIpFrom } from '@/lib/rate-limit';
+import { applyDurableRateLimit } from '@/lib/server/durable-rate-limit';
 import { getAppOrigin } from '@/lib/server/app-url';
 import { isEmailConfigured, sendPasswordResetEmail } from '@/lib/server/auth-email';
 
@@ -34,7 +35,7 @@ export async function POST(request: NextRequest) {
       request.headers.get('x-forwarded-for'),
       request.headers.get('x-real-ip')
     );
-    const ipRl = applyRateLimit(`forgot-pw-ip:${ip}`, IP_LIMIT, IP_WINDOW_MS);
+    const ipRl = await applyDurableRateLimit(`forgot-pw-ip:${ip}`, IP_LIMIT, IP_WINDOW_MS);
     if (!ipRl.ok) return tooMany(ipRl.resetAt);
 
     const body = (await request.json()) as { email?: unknown; next?: unknown };
@@ -46,7 +47,7 @@ export async function POST(request: NextRequest) {
     const normalized = email.trim().toLowerCase();
     const next = typeof body.next === 'string' && isSafeInternalPath(body.next) ? body.next : '';
 
-    const emailRl = applyRateLimit(`forgot-pw-email:${normalized}`, EMAIL_LIMIT, EMAIL_WINDOW_MS);
+    const emailRl = await applyDurableRateLimit(`forgot-pw-email:${normalized}`, EMAIL_LIMIT, EMAIL_WINDOW_MS);
     if (!emailRl.ok) return tooMany(emailRl.resetAt);
 
     if (!process.env.DATABASE_URL?.trim()) {

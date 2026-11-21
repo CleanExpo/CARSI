@@ -3,10 +3,42 @@ import { randomUUID } from 'node:crypto';
 import bcrypt from 'bcryptjs';
 
 import { isReservedStaffEmail } from '@/lib/admin/admin-panel-access';
+import { cutoffSeconds, issuedWithinCutoff } from '@/lib/auth/session-cutoff';
 import type { SessionClaims } from '@/lib/auth/session-jwt';
 import { prisma } from '@/lib/prisma';
 
 const BCRYPT_ROUNDS = 12;
+
+/**
+ * GP-760: spend a password-reset link and set the new password in ONE conditional UPDATE.
+ *
+ * The link is usable only while it was issued AFTER the user's sessions_valid_after_sec; the same
+ * statement moves that cut-off to "now" (never earlier than the link's own issue second). So:
+ *   - the link works once: a second use, even concurrent, re-reads the row after the first commits
+ *     and no longer matches (Postgres re-checks the WHERE on the updated row), so it updates 0 rows;
+ *   - every reset link issued before this one dies with it;
+ *   - every session issued before the cut-off second is refused (issuedWithinCutoff), which ends
+ *     the user's other sessions. The caller signs the new session after this returns, so it passes.
+ * A deactivated account cannot reset. Returns true only when exactly this request spent the link.
+ */
+export async function consumePasswordReset(
+  userId: string,
+  issuedAt: number,
+  hashedPassword: string
+): Promise<boolean> {
+  // Whole epoch seconds throughout (the JWT `iat` unit): no timestamp, so no time zone can shift it.
+  const cutoffSec = Math.max(Math.floor(Date.now() / 1000), issuedAt);
+  const updated = await prisma.$executeRaw`
+    UPDATE "lms_users"
+       SET "hashed_password" = ${hashedPassword},
+           "is_verified" = true,
+           "sessions_valid_after_sec" = ${cutoffSec}::bigint,
+           "updated_at" = now()
+     WHERE "id" = ${userId}::uuid
+       AND "is_active" = true
+       AND ("sessions_valid_after_sec" IS NULL OR "sessions_valid_after_sec" < ${issuedAt}::bigint)`;
+  return updated === 1;
+}
 
 /** Rows created only for JWT sync (e.g. ensureLmsUserFromClaims) are not password-login accounts. */
 function isJwtProvisionedPasswordHash(hash: string): boolean {
@@ -110,9 +142,24 @@ export async function resolveSessionRole(
   );
 }
 
-export async function sessionClaimsForUserId(userId: string): Promise<SessionClaims | null> {
+/**
+ * Claims for a new session, read from the database now: the user must be active, and the role is
+ * the current database role. With `issuedAt` (GP-760, token refresh), the session being renewed
+ * must also have been issued within the user's sessions cut-off, so a session ended by a password
+ * reset cannot be renewed into a fresh one.
+ */
+export async function sessionClaimsForUserId(
+  userId: string,
+  options: { issuedAt?: number } = {}
+): Promise<SessionClaims | null> {
   const user = await prisma.lmsUser.findUnique({ where: { id: userId } });
   if (!user || !user.isActive) return null;
+  if (
+    options.issuedAt !== undefined &&
+    !issuedWithinCutoff(options.issuedAt, cutoffSeconds(user.sessionsValidAfterSec))
+  ) {
+    return null;
+  }
   const role = await resolveSessionRole(user.id, user.role);
   return {
     sub: user.id,

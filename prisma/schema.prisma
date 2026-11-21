@@ -42,6 +42,10 @@ model LmsUser {
   /// Marketing-style email opt-out (Australian Spam Act). When true, the monthly toolbox-talk drip
   /// email is suppressed. In-app notifications and compliance (recert) emails are NOT affected.
   emailOptOut                Boolean   @default(false) @map("email_opt_out")
+  /// GP-760: Unix epoch second (JWT `iat` unit). Sessions issued before it, and reset links issued at
+  /// or before it, are refused. A successful password reset sets it, which ends every other session and
+  /// spends the reset link. NULL = no cut-off.
+  sessionsValidAfterSec      BigInt?   @map("sessions_valid_after_sec")
   /// When true, `leaderboardDisplayName` may appear on the monthly leaderboard; otherwise an anonymous label is shown.
   leaderboardShowDisplayName Boolean   @default(false) @map("leaderboard_show_display_name")
   /// Optional public label for the monthly leaderboard only (never auto-filled from legal name).
@@ -1405,4 +1409,16 @@ model CarsiCoachingCoachCorpusItem {
 
   @@index([coachId, approvedAt], map: "idx_carsi_coaching_coach_corpus_coach_approved")
   @@map("carsi_coaching_coach_corpus")
+}
+
+/// GP-760: fixed-window counters for the auth endpoints (login, register, forgot and reset
+/// password, verify-email, refresh, admin login). Shared by every instance and kept across
+/// deploys. `key` is a SHA-256 hex of "<bucket>:<ip or email>", never the address itself.
+model AuthRateLimit {
+  key     String   @id @db.VarChar(64)
+  count   Int
+  resetAt DateTime @map("reset_at") @db.Timestamptz(6)
+
+  @@index([resetAt], map: "idx_auth_rate_limits_reset_at")
+  @@map("auth_rate_limits")
 }

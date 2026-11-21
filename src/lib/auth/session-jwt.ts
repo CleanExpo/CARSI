@@ -7,6 +7,11 @@ export interface SessionClaims {
   email: string;
   full_name: string;
   role: string;
+  /**
+   * GP-760: when the token was issued (JWT `iat`, whole seconds). Set by verifySessionToken and
+   * compared with lms_users.sessions_valid_after_sec; never written into a token by signSessionToken.
+   */
+  iat?: number;
 }
 
 export async function signSessionToken(claims: SessionClaims): Promise<string> {
@@ -35,7 +40,9 @@ export async function verifySessionToken(token: string): Promise<SessionClaims |
     const full_name = typeof payload.full_name === 'string' ? payload.full_name : 'User';
     const role = typeof payload.role === 'string' ? payload.role : 'student';
     if (!sub || !email) return null;
-    return { sub, email, full_name, role };
+    // A token with no numeric iat counts as issued at 0, so any sessions cut-off refuses it.
+    const iat = typeof payload.iat === 'number' ? payload.iat : 0;
+    return { sub, email, full_name, role, iat };
   } catch {
     return null;
   }
@@ -50,12 +57,21 @@ export async function signPasswordResetToken(userId: string): Promise<string> {
     .sign(getSessionSecretBytes());
 }
 
-export async function verifyPasswordResetToken(token: string): Promise<string | null> {
+/**
+ * GP-760: returns the user and the token's issue time. The signature alone does not make a link
+ * usable: consumePasswordReset (lms-auth) spends it, and refuses any link issued at or before the
+ * user's sessions_valid_after_sec, which every successful reset moves forward.
+ */
+export async function verifyPasswordResetToken(
+  token: string,
+): Promise<{ userId: string; issuedAt: number } | null> {
   try {
     const { payload } = await jwtVerify(token, getSessionSecretBytes());
     if (payload.purpose !== 'password_reset') return null;
     const sub = typeof payload.sub === 'string' ? payload.sub : '';
-    return sub || null;
+    const issuedAt = typeof payload.iat === 'number' ? payload.iat : 0;
+    if (!sub || !issuedAt) return null;
+    return { userId: sub, issuedAt };
   } catch {
     return null;
   }

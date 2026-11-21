@@ -1,19 +1,7 @@
 import type { NextRequest } from 'next/server';
 
-import { verifySessionToken, type SessionClaims } from '@/lib/auth/session-jwt';
-import { isLmsUserActive } from '@/lib/server/user-active-cache';
-
-/**
- * Verify a token, then confirm the user is still active. The short-cached active
- * re-check means a deactivated/deleted account loses access within the cache TTL
- * instead of for the JWT's full 7-day life.
- */
-async function verifyActiveSession(token: string): Promise<SessionClaims | null> {
-  const claims = await verifySessionToken(token);
-  if (!claims) return null;
-  if (!(await isLmsUserActive(claims.sub))) return null;
-  return claims;
-}
+import type { SessionClaims } from '@/lib/auth/session-jwt';
+import { verifyActiveSession } from '@/lib/server/user-active-cache';
 
 /** Bearer token or `auth_token` cookie (httpOnly). */
 export async function getSessionClaimsFromRequest(

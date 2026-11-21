@@ -116,7 +116,11 @@ describe('email verification token (GP-699)', () => {
 
 describe('session token isolation (GP-699)', () => {
   it('still accepts a real session token', async () => {
-    expect(await verifySessionToken(await signSessionToken(SESSION))).toEqual(SESSION);
+    // GP-760: the verified claims also carry the token's issue time (iat, whole seconds).
+    expect(await verifySessionToken(await signSessionToken(SESSION))).toEqual({
+      ...SESSION,
+      iat: expect.any(Number),
+    });
   });
 
   it('never accepts a link token as a login session', async () => {

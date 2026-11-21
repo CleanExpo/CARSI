@@ -3,8 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   verifyToken: vi.fn(),
-  findUser: vi.fn(),
-  updateUser: vi.fn(),
+  consume: vi.fn(),
   hash: vi.fn(),
   claims: vi.fn(),
   signSession: vi.fn(),
@@ -14,12 +13,9 @@ vi.mock('@/lib/auth/session-jwt', () => ({
   verifyPasswordResetToken: mocks.verifyToken,
   signSessionToken: mocks.signSession,
 }));
-vi.mock('@/lib/prisma', () => ({
-  prisma: {
-    lmsUser: { findUnique: mocks.findUser, update: mocks.updateUser },
-  },
-}));
+vi.mock('@/lib/prisma', () => ({ prisma: {} }));
 vi.mock('@/lib/server/lms-auth', () => ({
+  consumePasswordReset: mocks.consume,
   hashPassword: mocks.hash,
   sessionClaimsForUserId: mocks.claims,
 }));
@@ -37,14 +33,12 @@ function request(body: Record<string, unknown>): NextRequest {
 beforeEach(() => {
   process.env.DATABASE_URL = 'postgres://configured';
   mocks.verifyToken.mockReset();
-  mocks.findUser.mockReset();
-  mocks.updateUser.mockReset();
+  mocks.consume.mockReset();
   mocks.hash.mockReset();
   mocks.claims.mockReset();
   mocks.signSession.mockReset();
-  mocks.verifyToken.mockResolvedValue('user-1');
-  mocks.findUser.mockResolvedValue({ id: 'user-1', email: 'buyer@carsi.com.au' });
-  mocks.updateUser.mockResolvedValue({});
+  mocks.verifyToken.mockResolvedValue({ userId: 'user-1', issuedAt: 1_800_000_000 });
+  mocks.consume.mockResolvedValue(true);
   mocks.hash.mockResolvedValue('$2a$12$new');
   mocks.claims.mockResolvedValue({
     sub: 'user-1',
@@ -92,11 +86,10 @@ describe('POST /api/auth/reset-password', () => {
     const res = await POST(request({ token: 'reset-token', new_password: 'A-strong-pass-9' }));
 
     expect(res.status).toBe(200);
-    expect(mocks.updateUser).toHaveBeenCalledTimes(1);
-    expect(mocks.updateUser.mock.calls[0][0]).toMatchObject({
-      where: { id: 'user-1' },
-      data: { hashedPassword: '$2a$12$new', isVerified: true },
-    });
+    // GP-760: one conditional write sets the password, marks the email verified (GP-699) and
+    // spends the link (consumePasswordReset).
+    expect(mocks.consume).toHaveBeenCalledTimes(1);
+    expect(mocks.consume).toHaveBeenCalledWith('user-1', 1_800_000_000, '$2a$12$new');
   });
 
   it('does not mark anything verified when the reset token is invalid (GP-699)', async () => {
@@ -105,6 +98,16 @@ describe('POST /api/auth/reset-password', () => {
     const res = await POST(request({ token: 'bad', new_password: 'A-strong-pass-9' }));
 
     expect(res.status).toBe(400);
-    expect(mocks.updateUser).not.toHaveBeenCalled();
+    expect(mocks.consume).not.toHaveBeenCalled();
+  });
+
+  it('refuses a link that was already used or superseded (GP-760)', async () => {
+    mocks.consume.mockResolvedValue(false);
+
+    const res = await POST(request({ token: 'used', new_password: 'A-strong-pass-9' }));
+
+    expect(res.status).toBe(400);
+    expect(res.cookies.get('auth_token')).toBeUndefined();
+    expect(mocks.signSession).not.toHaveBeenCalled();
   });
 });
