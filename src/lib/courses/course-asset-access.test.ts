@@ -1,9 +1,10 @@
 /**
  * GP-730: a draft course's field tools and diagrams under public/courses/<folder>/ must not be
  * served by direct address. Covers both halves: the proxy matcher must reach the file (static
- * files skipped the proxy before), and the proxy must answer 404 unless the catalogue marks the
- * course published. The guard walks the real public/courses tree against the real catalogue, so
- * a new draft folder is covered the moment it lands.
+ * files skipped the proxy before), and the proxy must answer 404 unless the course is published
+ * (database first, seed catalogue only when the database cannot be asked). The guard walks the
+ * real public/courses tree, so a new draft folder is covered the moment it lands. Staff and
+ * learner sessions are covered in course-asset-staff.test.ts.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -12,20 +13,38 @@ import { NextRequest, NextResponse } from 'next/server';
 import { unstable_doesMiddlewareMatch } from 'next/experimental/testing/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type { CourseSlugState } from '@/lib/seo/renamed-course-slugs';
+
 import catalog from '../../../data/seed/courses-catalog.json';
 
 import {
+  cachedCourseSlugLookup,
   courseAssetDecision,
   courseAssetFolder,
-  isCourseAssetFolderPublished,
+  courseSlugForAssetFolder,
   publishedCatalogSlugs,
 } from './course-asset-access';
 
-const mocks = vi.hoisted(() => ({ updateSession: vi.fn(), renamed: vi.fn() }));
+/**
+ * The live database as observed on 21/11/2026: every course the seed publishes, plus
+ * level-3 mould, which the seed still marks draft while carsi.com.au lists and serves it.
+ */
+const LIVE_PUBLISHED = new Set([
+  ...publishedCatalogSlugs(catalog.courses),
+  'level-3-mould-remediation-c5797369',
+]);
+const liveDatabase = async (slug: string): Promise<CourseSlugState> =>
+  LIVE_PUBLISHED.has(slug) ? 'published' : 'unpublished';
+
+const mocks = vi.hoisted(() => ({
+  updateSession: vi.fn(),
+  renamed: vi.fn(),
+  lookup: vi.fn(),
+}));
 vi.mock('@/lib/api/middleware', () => ({ updateSession: mocks.updateSession }));
 vi.mock('@/lib/seo/renamed-course-slugs', () => ({
   renamedCourseRedirect: mocks.renamed,
-  lookupCourseSlugInDatabase: vi.fn(),
+  lookupCourseSlugInDatabase: mocks.lookup,
 }));
 
 const { proxy, config } = await import('../../../proxy');
@@ -43,12 +62,14 @@ function walk(dir: string): string[] {
 const allCourseFiles = walk(PUBLIC_COURSES).map(
   (abs) => '/' + path.relative(path.join(ROOT, 'public'), abs).split(path.sep).join('/')
 );
-const folderOf = (url: string) => url.split('/')[2];
-const published = publishedCatalogSlugs(catalog.courses);
-const draftFiles = allCourseFiles.filter((u) => !isCourseAssetFolderPublished(folderOf(u)));
-const publishedFiles = allCourseFiles.filter((u) => isCourseAssetFolderPublished(folderOf(u)));
+const isLive = (url: string) => LIVE_PUBLISHED.has(courseSlugForAssetFolder(url.split('/')[2]));
+const draftFiles = allCourseFiles.filter((u) => !isLive(u));
+const publishedFiles = allCourseFiles.filter(isLive);
 
 const DRAFT_FIELD_TOOL = '/courses/hard-floor-care/field-tools/floor-family-and-surface-layer-card.md';
+const LEVEL_3_FILE = allCourseFiles.find((u) =>
+  u.startsWith('/courses/level-3-mould-remediation-c5797369/')
+)!;
 
 async function fetchThroughProxy(url: string) {
   return proxy(new NextRequest(`https://carsi.com.au${encodeURI(url)}`));
@@ -59,6 +80,8 @@ beforeEach(() => {
   mocks.renamed.mockResolvedValue(null);
   mocks.updateSession.mockReset();
   mocks.updateSession.mockImplementation(async () => NextResponse.next());
+  mocks.lookup.mockReset();
+  mocks.lookup.mockImplementation(liveDatabase);
 });
 
 describe('the fixture is real', () => {
@@ -67,6 +90,12 @@ describe('the fixture is real', () => {
     expect(draftFiles.length).toBeGreaterThan(20);
     expect(publishedFiles.length).toBeGreaterThan(20);
     expect(fs.existsSync(path.join(ROOT, 'public', DRAFT_FIELD_TOOL))).toBe(true);
+    expect(LEVEL_3_FILE).toBeTruthy();
+  });
+
+  it('every file under public/courses is a course file the proxy decides on', () => {
+    // An extension-less file would be treated as a page and slip past the gate.
+    for (const url of allCourseFiles) expect(courseAssetFolder(url), url).toBeTruthy();
   });
 });
 
@@ -79,7 +108,7 @@ describe('GP-730: draft course files are not served by direct address', () => {
     expect(mocks.updateSession).not.toHaveBeenCalled();
   });
 
-  it('every file of a course the catalogue does not publish is reached by the proxy and refused', async () => {
+  it('every file of an unpublished course is reached by the proxy and refused', async () => {
     for (const url of draftFiles) {
       expect(unstable_doesMiddlewareMatch({ config, url: encodeURI(url) }), url).toBe(true);
       const res = await fetchThroughProxy(url);
@@ -89,34 +118,75 @@ describe('GP-730: draft course files are not served by direct address', () => {
 
   it('every file of a published course is still served untouched', async () => {
     for (const url of publishedFiles) {
+      expect(unstable_doesMiddlewareMatch({ config, url: encodeURI(url) }), url).toBe(true);
       const res = await fetchThroughProxy(url);
       expect(res.status, url).toBe(200);
       expect(res.headers.get('x-middleware-next'), url).toBe('1');
+      expect(res.headers.get('cache-control'), url).toBeNull();
     }
     expect(mocks.updateSession).not.toHaveBeenCalled();
   });
 
-  it('serves the published courses that link to their files today', () => {
-    for (const url of [
-      '/courses/level-2-mould-remediation-30ee3492/diagrams/l2-1-2-hierarchy-of-controls.svg',
-      '/courses/water-damage-restoration-fundamentals/field-tools/x.md',
-      '/courses/moisture-meters-readings-and-dry-standards/diagrams/x.svg',
-      // Folder name differs from the catalogue slug (ccw-carsi-truckmount-operations).
-      '/courses/ccw-carsi-truckmount/course-pack.html',
-    ]) {
-      expect(courseAssetDecision(url), url).toBe('serve');
-    }
+  it('serves a course the database publishes even when the seed still says draft (level 3 mould)', async () => {
+    const seed = catalog.courses.find((c) => c.slug === 'level-3-mould-remediation-c5797369');
+    expect(seed?.status).not.toBe('published');
+    const res = await fetchThroughProxy(LEVEL_3_FILE);
+    expect(res.status).toBe(200);
   });
 });
 
-describe('the decision follows the catalogue, not a hand list', () => {
-  it('a draft folder opens once its course is published, and closes again on unpublish', () => {
-    const url = '/courses/hard-floor-care/diagrams/hf-1.svg';
-    expect(courseAssetDecision(url, new Set())).toBe('refuse');
-    expect(courseAssetDecision(url, new Set(['hard-floor-care']))).toBe('serve');
+describe('the decision follows the database, then the seed, never a hand list', () => {
+  const url = '/courses/hard-floor-care/diagrams/hf-1.svg';
+  const anon = { isStaff: async () => false };
+
+  it('opens once the database publishes the course, and closes again on unpublish', async () => {
+    expect(await courseAssetDecision(url, { ...anon, lookup: async () => 'unpublished' })).toBe(
+      'refuse'
+    );
+    expect(await courseAssetDecision(url, { ...anon, lookup: async () => 'absent' })).toBe(
+      'refuse'
+    );
+    expect(await courseAssetDecision(url, { ...anon, lookup: async () => 'published' })).toBe(
+      'serve'
+    );
   });
 
-  it('follows the canonical status rule (#137), never the legacy isPublished column alone', () => {
+  it('the database wins over the seed in both directions', async () => {
+    const seedPublishes = new Set(['hard-floor-care']);
+    expect(
+      await courseAssetDecision(url, {
+        ...anon,
+        lookup: async () => 'unpublished',
+        catalogPublished: seedPublishes,
+      })
+    ).toBe('refuse');
+    expect(
+      await courseAssetDecision(url, {
+        ...anon,
+        lookup: async () => 'published',
+        catalogPublished: new Set(),
+      })
+    ).toBe('serve');
+  });
+
+  it('when the database cannot be asked, the seed decides and an unknown course stays closed', async () => {
+    const lookup = async () => null;
+    expect(await courseAssetDecision(url, { ...anon, lookup, catalogPublished: new Set() })).toBe(
+      'refuse'
+    );
+    expect(
+      await courseAssetDecision(url, {
+        ...anon,
+        lookup,
+        catalogPublished: new Set(['hard-floor-care']),
+      })
+    ).toBe('serve');
+    expect(
+      await courseAssetDecision('/courses/not-a-course/field-tools/x.md', { ...anon, lookup })
+    ).toBe('refuse');
+  });
+
+  it('follows the canonical status rule (#137) for the seed fallback', () => {
     const slugs = publishedCatalogSlugs([
       { slug: 'a', status: 'published' },
       { slug: 'b', status: 'PUBLISHED' },
@@ -125,11 +195,39 @@ describe('the decision follows the catalogue, not a hand list', () => {
       { slug: 'e', status: null },
     ]);
     expect([...slugs]).toEqual(['a', 'b']);
-    expect(published.has('hard-floor-care')).toBe(false);
   });
 
-  it('refuses a folder that has no catalogue course at all', () => {
-    expect(courseAssetDecision('/courses/not-a-course/field-tools/x.md')).toBe('refuse');
+  it('maps an aliased folder to its course before asking', async () => {
+    const lookup = vi.fn(async () => 'published' as const);
+    await courseAssetDecision('/courses/ccw-carsi-truckmount/course-pack.html', {
+      ...anon,
+      lookup,
+    });
+    expect(lookup).toHaveBeenCalledWith('ccw-carsi-truckmount-operations');
+  });
+});
+
+describe('the publication cache', () => {
+  it('asks once per slug within the TTL, again after it, and never caches a failed lookup', async () => {
+    let t = 0;
+    const inner = vi.fn<(slug: string) => Promise<CourseSlugState | null>>();
+    inner.mockResolvedValueOnce(null).mockResolvedValue('published');
+    const cached = cachedCourseSlugLookup(inner, { ttlMs: 1000, now: () => t });
+    expect(await cached('x')).toBeNull();
+    expect(await cached('x')).toBe('published');
+    expect(await cached('X')).toBe('published');
+    expect(inner).toHaveBeenCalledTimes(2);
+    t = 1500;
+    await cached('x');
+    expect(inner).toHaveBeenCalledTimes(3);
+  });
+
+  it('stays bounded when callers invent folders', async () => {
+    const inner = vi.fn(async () => 'absent' as const);
+    const cached = cachedCourseSlugLookup(inner, { maxEntries: 3 });
+    for (const s of ['a', 'b', 'c', 'd']) await cached(s);
+    await cached('a');
+    expect(inner).toHaveBeenCalledTimes(5);
   });
 });
 
@@ -147,7 +245,7 @@ describe('course pages and odd addresses', () => {
     expect(mocks.updateSession).toHaveBeenCalledTimes(1);
   });
 
-  it('refuses percent-encoded, traversal and doubled-slash forms of a draft file', () => {
+  it('refuses percent-encoded, traversal and doubled-slash forms of a draft file', async () => {
     for (const url of [
       '/courses/hard%2Dfloor%2Dcare/field-tools/x.md',
       '/courses//hard-floor-care/field-tools/x.md',
@@ -155,7 +253,10 @@ describe('course pages and odd addresses', () => {
       '/courses/water-damage-restoration-fundamentals/..%2fhard-floor-care/x.md',
       '/courses/water-damage-restoration-fundamentals/%E0%A4%A/x.md',
     ]) {
-      expect(courseAssetDecision(url), url).toBe('refuse');
+      expect(
+        await courseAssetDecision(url, { lookup: liveDatabase, isStaff: async () => false }),
+        url
+      ).toBe('refuse');
     }
   });
 });

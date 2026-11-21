@@ -1,20 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { updateSession } from '@/lib/api/middleware';
-import { courseAssetDecision } from '@/lib/courses/course-asset-access';
+import {
+  cachedCourseSlugLookup,
+  courseAssetDecision,
+  hasStaffSession,
+} from '@/lib/courses/course-asset-access';
 import { isAttributionCaptureEnabled } from '@/lib/server/attribution-capture-flag';
 import { withFirstTouchCookie } from '@/lib/server/first-touch-capture';
 import { lookupCourseSlugInDatabase, renamedCourseRedirect } from '@/lib/seo/renamed-course-slugs';
 
+/** Course publication state for course files, cached briefly (a lesson page pulls many files). */
+const courseFileLookup = cachedCourseSlugLookup(lookupCourseSlugInDatabase);
+
 export async function proxy(request: NextRequest) {
-  // GP-730: files under public/courses/<folder>/ are served only for a course the catalogue marks
-  // as published. A draft's field tools and diagrams get the same 404 as an address that never
-  // existed, so the response does not confirm that the file is there.
-  const courseAsset = courseAssetDecision(request.nextUrl.pathname);
+  // GP-730: files under public/courses/<folder>/ are public only for a published course (the same
+  // database rule as the course page). A draft's field tools and diagrams are served to staff
+  // only; everyone else gets the same 404 as an address that never existed.
+  const courseAsset = await courseAssetDecision(request.nextUrl.pathname, {
+    lookup: courseFileLookup,
+    isStaff: () => hasStaffSession(request.cookies),
+  });
   if (courseAsset === 'refuse') {
     return new NextResponse('Not Found', {
       status: 404,
       headers: { 'Cache-Control': 'no-store', 'Content-Type': 'text/plain; charset=utf-8' },
+    });
+  }
+  // Staff reviewing a draft: never let a shared cache keep the file for the next visitor.
+  if (courseAsset === 'serve-private') {
+    return NextResponse.next({
+      headers: { 'Cache-Control': 'private, no-store', Vary: 'Cookie' },
     });
   }
   // A published course's file is served as before, with no session or attribution work: static
@@ -38,7 +54,7 @@ export const config = {
     /*
      * GP-730: course files under public/courses/<folder>/ (field tools, diagrams, packs). The
      * pattern above skips every path with a file extension, so these need their own entry; the
-     * proxy serves them only for a published course.
+     * proxy serves them publicly only for a published course.
      */
     '/courses/:folder/:path+',
   ],

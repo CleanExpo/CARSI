@@ -3,23 +3,33 @@
  *
  * Next.js serves `public/` as static files, so a draft course's field tools and diagrams were
  * reachable by anyone with the exact address before the course was published. The proxy now
- * asks this module first: a course file is served only when its folder belongs to a course that
- * the catalogue (`data/seed/courses-catalog.json`, the SSOT) marks as published, i.e.
- * `isPublishedCourseStatus(status)`, the canonical rule (#137) the course routes gate on.
+ * asks this module first. A course file is served to everyone only when its course is
+ * published by the same rule the course page uses: the database row, through
+ * `lookupCourseSlugInDatabase` (`lmsPublishedCourseWhere`, status canonical per #137). The seed
+ * catalogue is not the live truth: on 21/11/2026 `level-3-mould-remediation-c5797369` was
+ * `draft` in `data/seed/courses-catalog.json` while the live page and course list served it.
  *
- * Fail-closed: a folder with no catalogue course, a draft, an archived course, an undecodable
- * address or a path with `.`/`..` segments is refused. Publishing a course in the catalogue is
- * the only step that opens its files; there is no hand list of allowed folders.
+ * - Published in the database: served to everyone.
+ * - Draft, archived or no row: served only to staff (a valid admin cookie, or a verified session
+ *   whose role opens the admin panel), never cached; everyone else gets 404.
+ * - Database not configured or the query failed: the seed catalogue decides, so local runs and
+ *   CI keep working. A file neither source publishes is never served to the public.
+ * - An undecodable address, or a `.`/`..`/backslash segment: refused for everyone.
  */
 import catalog from '../../../data/seed/courses-catalog.json';
+import { ADMIN_COOKIE_NAME } from '@/lib/admin/admin-constants';
+import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
+import { isValidAdminSessionCookie } from '@/lib/admin/admin-session-edge';
+import { verifySessionToken } from '@/lib/auth/session-jwt';
+import type { CourseSlugState, LookupCourseSlug } from '@/lib/seo/renamed-course-slugs';
+
 import { isPublishedCourseStatus } from './course-status';
 
 type CatalogPublicationFields = { slug: string; status?: string | null };
 
 /**
- * Asset folders whose name differs from the catalogue slug of the course they belong to.
- * This maps a folder to its course; it does not decide access. The course's catalogue status
- * still does.
+ * Asset folders whose name differs from the slug of the course they belong to. This maps a
+ * folder to its course; it does not decide access. The course's publication state still does.
  */
 export const COURSE_ASSET_FOLDER_ALIASES: Readonly<Record<string, string>> = {
   // Course pack linked from /ccw-truckmount-operations (src/lib/ccw/truckmount-course.ts).
@@ -30,14 +40,14 @@ export function isPublishedCatalogCourse(course: CatalogPublicationFields): bool
   return isPublishedCourseStatus(course.status);
 }
 
-/** Slugs of the courses the catalogue marks as published. */
+/** Slugs of the courses the seed catalogue marks as published. */
 export function publishedCatalogSlugs(
   courses: readonly CatalogPublicationFields[]
 ): ReadonlySet<string> {
   return new Set(courses.filter(isPublishedCatalogCourse).map((c) => c.slug));
 }
 
-const CATALOG_PUBLISHED_SLUGS = publishedCatalogSlugs(
+export const CATALOG_PUBLISHED_SLUGS = publishedCatalogSlugs(
   (catalog as { courses: CatalogPublicationFields[] }).courses
 );
 
@@ -65,25 +75,78 @@ export function courseAssetFolder(pathname: string): string | null {
   return segments[1];
 }
 
-/** True when the course owning `folder` is published in the catalogue. */
-export function isCourseAssetFolderPublished(
-  folder: string,
-  published: ReadonlySet<string> = CATALOG_PUBLISHED_SLUGS
-): boolean {
-  if (!folder) return false;
-  const slug = Object.prototype.hasOwnProperty.call(COURSE_ASSET_FOLDER_ALIASES, folder)
+/** The course slug that owns an asset folder. */
+export function courseSlugForAssetFolder(folder: string): string {
+  return Object.prototype.hasOwnProperty.call(COURSE_ASSET_FOLDER_ALIASES, folder)
     ? COURSE_ASSET_FOLDER_ALIASES[folder]
     : folder;
-  return published.has(slug);
 }
 
-export type CourseAssetDecision = 'not-a-course-asset' | 'serve' | 'refuse';
+/**
+ * `serve`: anyone may have it. `serve-private`: an unpublished course's file, answered for staff
+ * only and never cached. `refuse`: 404.
+ */
+export type CourseAssetDecision = 'not-a-course-asset' | 'serve' | 'serve-private' | 'refuse';
 
-export function courseAssetDecision(
+export type CourseAssetAccessDeps = {
+  /** Publication state of a slug in the database; null when the database cannot be asked. */
+  lookup: LookupCourseSlug;
+  /** True when the request carries a staff (admin) session. Asked only for unpublished files. */
+  isStaff: () => Promise<boolean>;
+  /** Seed catalogue fallback for when the database cannot be asked. */
+  catalogPublished?: ReadonlySet<string>;
+};
+
+export async function courseAssetDecision(
   pathname: string,
-  published: ReadonlySet<string> = CATALOG_PUBLISHED_SLUGS
-): CourseAssetDecision {
+  deps: CourseAssetAccessDeps
+): Promise<CourseAssetDecision> {
   const folder = courseAssetFolder(pathname);
   if (folder === null) return 'not-a-course-asset';
-  return isCourseAssetFolderPublished(folder, published) ? 'serve' : 'refuse';
+  if (!folder) return 'refuse';
+  const slug = courseSlugForAssetFolder(folder);
+  const state = await deps.lookup(slug);
+  const publiclyPublished =
+    state === null
+      ? (deps.catalogPublished ?? CATALOG_PUBLISHED_SLUGS).has(slug)
+      : state === 'published';
+  if (publiclyPublished) return 'serve';
+  return (await deps.isStaff()) ? 'serve-private' : 'refuse';
+}
+
+/**
+ * Wraps a lookup with a short in-process cache. A lesson page pulls many files from one folder,
+ * so without it every image would cost database round trips. Only answers are cached; a failed
+ * lookup (null) is asked again next time. Publishing or unpublishing takes effect within the TTL.
+ */
+export function cachedCourseSlugLookup(
+  lookup: LookupCourseSlug,
+  { ttlMs = 60_000, maxEntries = 500, now = () => Date.now() } = {}
+): LookupCourseSlug {
+  const cache = new Map<string, { state: CourseSlugState; at: number }>();
+  return async (slug) => {
+    const key = slug.toLowerCase();
+    const hit = cache.get(key);
+    if (hit && now() - hit.at < ttlMs) return hit.state;
+    const state = await lookup(key);
+    if (state === null) return null;
+    // Unknown folders are chosen by the caller; bound the map rather than let it grow.
+    if (cache.size >= maxEntries) cache.clear();
+    cache.set(key, { state, at: now() });
+    return state;
+  };
+}
+
+/**
+ * Staff session check for the proxy: a valid admin cookie, or a verified `auth_token` whose
+ * role opens the admin panel (the same two checks the /admin gate in `updateSession` uses).
+ */
+export async function hasStaffSession(cookies: {
+  get(name: string): { value: string } | undefined;
+}): Promise<boolean> {
+  if (await isValidAdminSessionCookie(cookies.get(ADMIN_COOKIE_NAME)?.value)) return true;
+  const token = cookies.get('auth_token')?.value;
+  if (!token) return false;
+  const claims = await verifySessionToken(token);
+  return claims ? isLmsClaimsAllowedAdminPanel(claims) : false;
 }
