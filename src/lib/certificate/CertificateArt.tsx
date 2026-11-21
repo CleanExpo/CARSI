@@ -1,8 +1,8 @@
 import type { CSSProperties } from 'react';
 
-import { formatCecHoursForCertificate } from '@/lib/cec-display';
 import { formatCredentialRef } from '@/lib/credential-format';
 import { IICRC_DISCIPLINE_SHORT } from '@/lib/iicrc-discipline-display';
+import { certificateCecWordingForCourse } from '@/lib/server/certificate-cec-wording';
 
 export const CERT_ART_WIDTH = 1684;
 export const CERT_ART_HEIGHT = 1190;
@@ -14,7 +14,11 @@ export type CertificateArtInput = {
   completedDate?: string;
   issuedDate?: string;
   credentialId?: string;
-  cecHoursLabel?: number | null;
+  /**
+   * Catalogue slug. Every IICRC and CEC line is decided from the approvals register for this
+   * slug (GP-757); without a slug the certificate carries no IICRC wording.
+   */
+  courseSlug?: string | null;
   courseLevel?: string | null;
   /** 'attendance' for cohort workshops (e.g. the CARSI 2-day carpet cleaning workshop). */
   certificateKind?: 'completion' | 'attendance';
@@ -56,7 +60,8 @@ export function CertificateArt({ logoSrc, ...input }: CertificateArtInput & { lo
   const credentialRef = input.credentialId
     ? formatCredentialRef(input.credentialId)
     : 'CARSI-EXAMPLE000';
-  const cecValue = formatCecHoursForCertificate(input.cecHoursLabel);
+  const cecWording = certificateCecWordingForCourse(input.courseSlug);
+  const cecValue = cecWording.cecCreditsValue;
   const courseLevel = input.courseLevel ?? 'Professional development';
 
   const details = [
@@ -194,9 +199,7 @@ export function CertificateArt({ logoSrc, ...input }: CertificateArtInput & { lo
             {`Credential ${credentialRef}`}
           </Text>
           <Text style={{ fontSize: 18, color: '#64748b', marginTop: 8, textAlign: 'center' }}>
-            {cecValue
-              ? 'IICRC Continuing Education Credits (CECs) as shown. Retain this certificate with your renewal records.'
-              : 'Issued by CARSI. No IICRC CECs are attached to this certificate. Retain it with your training records.'}
+            {cecWording.recordLine}
           </Text>
         </div>
 
@@ -253,9 +256,7 @@ export function CertificateArt({ logoSrc, ...input }: CertificateArtInput & { lo
             padding: '14px 24px',
           }}
         >
-          <Text style={{ fontSize: 18, color: '#64748b' }}>
-            IICRC CEC Accredited · carsi.com.au
-          </Text>
+          <Text style={{ fontSize: 18, color: '#64748b' }}>carsi.com.au</Text>
         </div>
       </div>
     </div>

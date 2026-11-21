@@ -8,6 +8,8 @@ import {
   completionCertificateDataFromEnrollment,
 } from '@/lib/server/certificate-pdf';
 import { resolveLmsCourseCecHours } from '@/lib/server/course-cec-hours';
+import { certificateCecWordingForCourse } from '@/lib/server/certificate-cec-wording';
+import type { CertificateCecWording } from '@/lib/certificate/certificate-cec-wording';
 
 /** Public verification JSON (matches CredentialVerificationCard + certificate preview). */
 export type PublicCredentialJson = {
@@ -24,6 +26,8 @@ export type PublicCredentialJson = {
   cppp40421_unit_code?: string;
   completed_at?: string;
   discipline?: string;
+  /** Certificate IICRC and CEC wording from the approvals register (GP-757). */
+  certificate_wording: CertificateCecWording;
 };
 
 /**
@@ -65,6 +69,7 @@ export async function getPublicCredentialJson(
     verification_url: `${origin.replace(/\/$/, '')}/verify/credential/${row.id}`,
     completed_at: issued.toISOString(),
     discipline: row.course.iicrcDiscipline ?? undefined,
+    certificate_wording: certificateCecWordingForCourse(row.course.slug),
   };
 }
 

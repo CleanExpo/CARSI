@@ -4,7 +4,6 @@ import { CERT_ART_HEIGHT, CERT_ART_WIDTH } from '@/lib/certificate/CertificateAr
 import { renderCertificatePng } from '@/lib/certificate/render-certificate-png';
 import { certificateHolderDisplayName } from '@/lib/server/certificate-name';
 import { certificateKindForCourseSlug } from '@/lib/server/carsi-workshop-access';
-import { resolveLmsCourseCecHours, type LmsCourseCecSource } from '@/lib/server/course-cec-hours';
 
 export type CompletionCertificateData = {
   studentName: string;
@@ -12,7 +11,8 @@ export type CompletionCertificateData = {
   completedDate: Date;
   issuedDate?: Date;
   discipline?: string;
-  resolvedCecHours?: number | null;
+  /** Catalogue slug: the certificate's IICRC and CEC wording is read from the register by it. */
+  courseSlug?: string | null;
   courseLevel?: string | null;
   credentialId?: string;
   certificateKind?: 'completion' | 'attendance';
@@ -37,7 +37,7 @@ export async function buildCompletionCertificatePdf(
     completedDate: formatAuDate(params.completedDate),
     issuedDate: formatAuDate(params.issuedDate ?? params.completedDate),
     credentialId: params.credentialId,
-    cecHoursLabel: params.resolvedCecHours,
+    courseSlug: params.courseSlug,
     courseLevel: params.courseLevel,
     certificateKind: params.certificateKind,
   });
@@ -76,22 +76,13 @@ export function completionCertificateDataFromEnrollment(
 ): CompletionCertificateData {
   void verificationOrigin;
   const studentName = certificateHolderDisplayName(row.student);
-  const cecSource: LmsCourseCecSource = {
-    slug: row.course.slug,
-    cecHours: null,
-    shortDescription: row.course.shortDescription,
-    description: row.course.description,
-    meta: row.course.meta,
-    durationHours: row.course.durationHours != null ? Number(row.course.durationHours) : null,
-    iicrcDiscipline: row.course.iicrcDiscipline,
-  };
   return {
     studentName,
     courseTitle: row.course.title,
     completedDate: row.completedAt,
     issuedDate: row.certificateIssuedAt ?? row.completedAt,
     discipline: row.course.iicrcDiscipline?.trim() || undefined,
-    resolvedCecHours: resolveLmsCourseCecHours(cecSource),
+    courseSlug: row.course.slug,
     courseLevel: row.course.level,
     credentialId: row.id,
     certificateKind: certificateKindForCourseSlug(row.course.slug),

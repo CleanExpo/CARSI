@@ -6,6 +6,7 @@ import { LinkedInShareButton } from '@/components/lms/LinkedInShareButton';
 import { useToast } from '@/hooks/use-toast';
 import { apiClient } from '@/lib/api/client';
 import { formatCecHoursForDisplay } from '@/lib/cec-display';
+import { certificateCecWording } from '@/lib/certificate/certificate-cec-wording';
 import { CecRenewalFigure, CecRenewalStatus } from '@/components/lms/CecRenewalStatus';
 import { useRenewalSummary } from '@/hooks/use-renewal-summary';
 import { renewalProgress } from '@/lib/renewal-progress';
@@ -43,12 +44,6 @@ function formatIssued(iso: string): string {
     month: 'long',
     year: 'numeric',
   });
-}
-
-function formatCecHours(hours: number): string {
-  const label = formatCecHoursForDisplay(hours);
-  if (!label) return 'No approved IICRC CEC hours';
-  return `${label} IICRC CEC hour${label === '1' ? '' : 's'}`;
 }
 
 function ProgressTrack({ percent }: { percent: number }) {
@@ -130,8 +125,9 @@ function BrandRing({
 function CredentialCard({ credential }: { credential: CredentialOut }) {
   const pdfUrl = `/api/lms/credentials/${encodeURIComponent(credential.credential_id)}?pdf=1`;
   const issuedDate = new Date(credential.issued_date);
-  const cecLabel = formatCecHours(credential.cec_hours);
-  const hasCec = (formatCecHoursForDisplay(credential.cec_hours) ?? null) != null;
+  // cec_hours is the approvals-register value (/api/lms/credentials/me); the words come from the
+  // certificate wording owner, so a non-approved course shows no IICRC line (GP-757).
+  const cecWording = certificateCecWording(credential.cec_hours);
 
   return (
     <article className={`${surface} flex h-full flex-col`}>
@@ -144,14 +140,16 @@ function CredentialCard({ credential }: { credential: CredentialOut }) {
             <Award className="h-5 w-5" aria-hidden />
           </span>
           <div className="min-w-0">
-            <p className={kicker}>{hasCec ? 'IICRC CEC Accredited' : 'CARSI certificate'}</p>
+            <p className={kicker}>{cecWording.cardLabel}</p>
             <h3 className={`mt-2 text-[1.15rem] leading-snug ${heading}`}>
               {credential.course_title}
             </h3>
             <p className={`mt-2 text-[13px] ${muted}`}>
               Issued {formatIssued(credential.issued_date)}
             </p>
-            <p className={`mt-1 text-[13px] ${muted}`}>{cecLabel}</p>
+            {cecWording.cecCreditsValue ? (
+              <p className={`mt-1 text-[13px] ${muted}`}>{cecWording.cecCreditsValue}</p>
+            ) : null}
             <p className="mt-3 text-[11px] tracking-wide text-slate-400 uppercase">
               Certificate {credential.credential_id}
             </p>

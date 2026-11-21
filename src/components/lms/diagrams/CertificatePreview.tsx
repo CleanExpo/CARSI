@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 
-import { formatCecHoursForCertificate } from '@/lib/cec-display';
+import type { CertificateCecWording } from '@/lib/certificate/certificate-cec-wording';
 import { formatCredentialRef } from '@/lib/credential-format';
 import { IICRC_DISCIPLINE_SHORT } from '@/lib/iicrc-discipline-display';
 
@@ -23,8 +23,12 @@ export interface CertificatePreviewProps {
   completedDate?: string;
   issuedDate?: string;
   credentialId?: string;
-  cecHoursLabel?: number | null;
   courseLevel?: string | null;
+  /**
+   * IICRC and CEC wording, computed on the server from the approvals register by course slug
+   * (certificateCecWordingForCourse, GP-757). Required, so no default can print IICRC wording.
+   */
+  cecWording: CertificateCecWording;
 }
 
 function disciplineCode(raw?: string): string {
@@ -61,7 +65,7 @@ function ProgrammeDetail({
 export function CertificatePreview({
   studentName = 'James Wilson',
   courseName = 'Introduction to Water Damage Restoration',
-  discipline = 'WRT',
+  discipline,
   completedDate = new Date().toLocaleDateString('en-AU', {
     day: 'numeric',
     month: 'long',
@@ -69,8 +73,8 @@ export function CertificatePreview({
   }),
   issuedDate,
   credentialId,
-  cecHoursLabel = 4,
   courseLevel = 'Professional development',
+  cecWording,
 }: CertificatePreviewProps) {
   const discCode = disciplineCode(discipline);
   const discColor = DISCIPLINE_COLORS[discCode] ?? '#2490ed';
@@ -80,7 +84,7 @@ export function CertificatePreview({
       : (IICRC_DISCIPLINE_SHORT[discCode] ?? 'General restoration training');
   const issued = issuedDate ?? completedDate;
   const credentialRef = credentialId ? formatCredentialRef(credentialId) : 'CARSI-EXAMPLE000';
-  const cecValue = formatCecHoursForCertificate(cecHoursLabel);
+  const cecValue = cecWording.cecCreditsValue;
 
   return (
     <div
@@ -189,9 +193,7 @@ export function CertificatePreview({
                 Credential {credentialRef}
               </p>
               <p className="mx-auto mt-3 max-w-xl text-[9px] leading-relaxed text-slate-500 italic sm:text-[10px]">
-                {cecValue
-                  ? 'IICRC Continuing Education Credits (CECs) as shown. Retain this certificate with your renewal records.'
-                  : 'Issued by CARSI. No IICRC CECs are attached to this certificate. Retain it with your training records.'}
+                {cecWording.recordLine}
               </p>
             </div>
           </div>
@@ -235,7 +237,7 @@ export function CertificatePreview({
                 </div>
               </div>
               <p className="mt-2 max-w-[9rem] text-center text-[7px] leading-snug text-slate-400 sm:text-[8px]">
-                IICRC CEC Accredited · carsi.com.au
+                carsi.com.au
               </p>
             </div>
 
