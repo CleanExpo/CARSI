@@ -199,7 +199,7 @@ export function restorationTopicCount(
  * Provider standing, not a course-level CEC claim. A CARSI course may only assert that it
  * earns CECs once the founder records its per-course IICRC approval in
  * `data/seed/cec-approvals.json` (the fail-closed SSOT, currently empty), so catalogue
- * copy states CARSI's accreditation as a CEC provider instead of promising credits.
+ * copy states CARSI's standing as a CEC provider instead of promising credits.
  */
 const PROVIDER_STANDING_SENTENCE = `Study online with CARSI, an ${IICRC_APPROVED_CEC_PROVIDER}.`;
 

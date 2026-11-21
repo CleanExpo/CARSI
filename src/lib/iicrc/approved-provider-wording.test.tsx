@@ -51,9 +51,12 @@ const ROOT = process.cwd();
  * "accredited" followed within four words by IICRC or CEC ("accredited as an IICRC CEC provider",
  * "accredited by the IICRC"). A negation in the two words before "accredited" ("not accredited by
  * the IICRC", "not nationally accredited and awards no IICRC CECs") is a true statement and passes.
+ * Reverse forms are caught too: IICRC or CEC followed within three words by an "accredit" word ("the
+ * IICRC has accredited", "IICRC CEC provider accreditation"), and "accreditation from/by the IICRC".
+ * "nationally accredited" (VET qualifications) is a different claim and passes.
  */
 export const RETIRED_PROVIDER_WORDING =
-  /\b(?:IICRC|CECs?)[\s-]+accredit\w*|\baccredit\w*[\s-]+(?:IICRC|CECs?)\b|\baccredited[\s-]+provider\b|(?<!\b(?:not|never)(?:[\s-]+\w+)?[\s-]+)\baccredited(?:[\s-]+[\w'’]+){0,4}?[\s-]+(?:IICRC|CECs?)\b/gi;
+  /\b(?:IICRC|CECs?)[\s-]+accredit\w*|\baccredit\w*[\s-]+(?:IICRC|CECs?)\b|\baccredited[\s-]+provider\b|(?<!\b(?:not|never)(?:[\s-]+\w+)?[\s-]+)\baccredited(?:[\s-]+[\w'’]+){0,4}?[\s-]+(?:IICRC|CECs?)\b|\b(?:IICRC|CECs?)(?:[\s-]+[\w'’]+){0,3}?[\s-]+(?<!nationally[\s-]+)accredit\w*|\baccreditation[\s-]+(?:from|by|with)[\s-]+(?:the[\s-]+)?(?:IICRC|CECs?)\b/gi;
 
 /**
  * Dated records of the past: audits, handoffs, session notes, specs, decision logs and applied
@@ -66,6 +69,7 @@ const HISTORICAL = [
   'docs/sessions/',
   'docs/plans/archive/',
   'docs/specs/',
+  'docs/ai-demonstration/source-of-truth/history/',
   'docs/superpowers/specs/',
   'docs/agent-framework/GAP-BACKLOG-2026-08-07.md',
   'docs/agent-framework/PIPELINE.md',
@@ -129,10 +133,10 @@ const PENDING: Record<string, string> = {
     'certificate wording builder (fix/certificate-cec-wording)',
   'app/(public)/verify/credential/[credentialId]/page.tsx':
     'certificate wording builder (fix/certificate-cec-wording)',
-  'docs/marketing/': 'GP-704 follow-up: unsent marketing drafts',
-  'docs/campaigns/': 'GP-704 follow-up: unsent marketing drafts',
-  'docs/cec-submissions/': 'GP-704 follow-up: unsent marketing drafts',
-  'docs/content/': 'GP-704 follow-up: unsent marketing drafts',
+  'docs/marketing/': 'GP-770: unsent marketing drafts',
+  'docs/campaigns/': 'GP-770: unsent marketing drafts',
+  'docs/cec-submissions/': 'GP-770: unsent marketing drafts',
+  'docs/content/': 'GP-770: unsent marketing drafts',
   'docs/course-content/': 'GP-749: workshop course content',
 };
 
@@ -196,6 +200,10 @@ describe('the retired-wording pattern (positive and negative controls)', () => {
     // GP-704 review round 1: a few words between "accredited" and the IICRC.
     'CARSI is accredited as an ' + 'IICRC CEC provider',
     'CARSI courses are accredited by the ' + 'IICRC',
+    // Reverse forms (GP-704, before review round 3).
+    'the IICRC has ' + 'accredited CARSI',
+    'IICRC CEC provider ' + 'accreditation',
+    'accreditation from the ' + 'IICRC',
   ];
   for (const s of retired) {
     it(`flags "${s}"`, () => {
@@ -209,6 +217,8 @@ describe('the retired-wording pattern (positive and negative controls)', () => {
     'accredited by the RTO',
     'CARSI courses are not accredited by the IICRC',
     'it is not nationally accredited and awards no IICRC CECs',
+    'confusing CECs with nationally accredited VET qualifications',
+    'IICRC (iicrc.org) is a non-profit, ANSI-accredited standards body',
   ];
   for (const s of allowed) {
     it(`leaves "${s}" alone`, () => {
@@ -307,8 +317,9 @@ describe('tracked source carries no retired provider wording', () => {
     expect(pdfProblems(PENDING_PDFS)).toEqual([]);
   }, 60_000);
 
-  // The phrase inside a string literal or JSX text; comments may name it.
-  const QUOTED_PHRASE = new RegExp(`['"\`>][^'"\`<]*${IICRC_APPROVED_CEC_PROVIDER}`);
+  // The phrase on any code line (string, template or JSX text, even alone on its line);
+  // comment lines may name it.
+  const QUOTED_PHRASE = new RegExp(IICRC_APPROVED_CEC_PROVIDER, 'i');
 
   it('pages and components use the module rather than retyping the phrase', () => {
     const retyped = files.filter(

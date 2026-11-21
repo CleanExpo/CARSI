@@ -103,7 +103,8 @@ edit is saved.
 
 ## Course quality bar (applies with the AU standard)
 - Real, substantive modules (not stubs); consistent structure; correct `iicrcDiscipline` (or neutral
-  for general/knowledge courses); CEC only when genuinely accredited (founder decides value).
+  for general/knowledge courses); CEC hours only when the IICRC has approved the course in `data/seed/cec-approvals.json`
+  (founder decides value).
 - Every course has a generated cover image (see the minimum deliverable below). The data-driven
   `CourseTextThumbnail` placeholder is only a fallback while the cover is being made. Never use
   ad-hoc stock cover images.
