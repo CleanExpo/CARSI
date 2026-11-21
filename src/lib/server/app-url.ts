@@ -1,8 +1,6 @@
 type OriginRequest = { nextUrl?: { origin: string } };
 
 const PRODUCTION_ORIGIN = 'https://carsi.com.au';
-/** CARSI's own production hosts: the only hosts read from a request in production. */
-const TRUSTED_HOSTS = new Set(['carsi.com.au', 'www.carsi.com.au']);
 
 function isLocalHost(hostname: string): boolean {
   const host = hostname.toLowerCase().replace(/\.$/, '');
@@ -26,7 +24,11 @@ function parseHttpUrl(value: string | undefined): URL | null {
   }
 }
 
-/** Canonical public origin for redirects and email links, with env taking precedence. */
+/**
+ * Canonical public origin for redirects, email links, Stripe return URLs and credential links.
+ * GP-700: this is the only place the site address is decided; never build one from the
+ * request's Host or X-Forwarded-Host. The request is read only outside production.
+ */
 export function getAppOrigin(request?: OriginRequest | null): string {
   for (const value of [process.env.NEXT_PUBLIC_APP_URL, process.env.NEXT_PUBLIC_FRONTEND_URL]) {
     const url = parseHttpUrl(value);
@@ -42,12 +44,8 @@ export function getAppOrigin(request?: OriginRequest | null): string {
     return 'http://localhost:3000';
   }
 
-  // GP-700: in production the request's Host header is caller-controlled, so a forged host must
-  // never reach an email link or redirect. Only CARSI's own hosts are taken from the request; a
-  // preview deployment uses the address the platform sets, never the request.
-  if (requestUrl && requestUrl.protocol === 'https:' && TRUSTED_HOSTS.has(requestUrl.hostname)) {
-    return requestUrl.origin;
-  }
+  // GP-700: in production the request's Host header is caller-controlled, so the request is
+  // never read. A preview deployment uses the address the platform sets.
   if (process.env.VERCEL_ENV === 'preview') {
     const preview =
       parseHttpUrl(
@@ -58,11 +56,15 @@ export function getAppOrigin(request?: OriginRequest | null): string {
   return PRODUCTION_ORIGIN;
 }
 
-/** Preserve public client return URLs, but never accept a local destination in production. */
+/**
+ * Accept a client return URL only when it is on the same origin as `fallback`, which callers
+ * build from `getAppOrigin`. GP-700: in production a return URL on any other site falls back.
+ */
 export function getCheckoutReturnUrl(value: unknown, fallback: string): string {
   if (typeof value !== 'string') return fallback;
   const url = parseHttpUrl(value);
-  if (!url || (process.env.NODE_ENV === 'production' && isLocalHost(url.hostname))) {
+  if (!url) return fallback;
+  if (process.env.NODE_ENV === 'production' && url.origin !== parseHttpUrl(fallback)?.origin) {
     return fallback;
   }
   // Preserve Stripe's literal {CHECKOUT_SESSION_ID} placeholder.

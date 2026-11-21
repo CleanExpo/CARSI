@@ -63,10 +63,21 @@ describe('getAppOrigin', () => {
     expect(getAppOrigin(requestWithOrigin('https://evil.example'))).toBe('https://carsi.com.au');
   });
 
-  it("GP-700: keeps CARSI's own www host from the request", () => {
-    expect(getAppOrigin(requestWithOrigin('https://www.carsi.com.au'))).toBe(
-      'https://www.carsi.com.au'
-    );
+  it('GP-700: never reads the request host in production, even a CARSI host', () => {
+    vi.stubEnv('VERCEL_ENV', '');
+    for (const origin of [
+      'https://www.carsi.com.au',
+      'https://carsi.com.au:8443',
+      'https://www.carsi.com.au:8443',
+    ]) {
+      expect(getAppOrigin(requestWithOrigin(origin))).toBe('https://carsi.com.au');
+    }
+  });
+
+  it('GP-700: a production deployment ignores the platform preview address', () => {
+    vi.stubEnv('VERCEL_ENV', 'production');
+    vi.stubEnv('VERCEL_URL', 'carsi-abc123.vercel.app');
+    expect(getAppOrigin(requestWithOrigin('https://evil.example'))).toBe('https://carsi.com.au');
   });
 
   it('GP-700: a preview deployment uses the platform-set address, not the request', () => {
@@ -110,5 +121,20 @@ describe('getCheckoutReturnUrl', () => {
     vi.stubEnv('NODE_ENV', 'development');
     const value = 'http://localhost:3000/success?session_id={CHECKOUT_SESSION_ID}';
     expect(getCheckoutReturnUrl(value, fallback)).toBe(value);
+  });
+
+  it('GP-700: keeps a return URL on the canonical origin, with the Stripe placeholder intact', () => {
+    const value = 'https://carsi.com.au/dashboard/student?session_id={CHECKOUT_SESSION_ID}';
+    expect(getCheckoutReturnUrl(value, fallback)).toBe(value);
+  });
+
+  it.each([
+    'https://evil.example/paid',
+    'https://carsi.com.au.evil.example/paid',
+    'http://carsi.com.au/paid',
+    'https://carsi.com.au:8443/paid',
+    'https://www.carsi.com.au/paid',
+  ])('GP-700: a production return URL off the canonical origin falls back (%s)', (value) => {
+    expect(getCheckoutReturnUrl(value, fallback)).toBe(fallback);
   });
 });
