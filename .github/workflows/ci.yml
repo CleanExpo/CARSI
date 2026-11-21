@@ -161,6 +161,13 @@ jobs:
       - name: Quiz option balance guard
         run: npm run check:quiz-balance -- --enforce=psychrometry-building-science-for-drying,moisture-meters-readings-and-dry-standards
 
+      # GP-740: reads what draft courses say (data/courses/*/v1-draft): exposure-limit dates and
+      # jurisdictions, workplace limits used as home levels, unsourced health claims, copied
+      # standard text. Report only while the existing drafts' findings go to SME review; exits 2
+      # if it scans nothing.
+      - name: Draft course content check (report only)
+        run: npm run check:draft-content
+
       # Licence-critical backstop: scans all course-content + marketing surfaces
       # (data/seed, public/courses, docs/marketing, docs/content) for stray IICRC
       # placements, banned "IICRC-approved"/"certified with CARSI" phrasing, and
