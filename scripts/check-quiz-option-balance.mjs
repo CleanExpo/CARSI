@@ -8,17 +8,19 @@
  * same position for every question in a quiz, or whose positions repeat in a fixed cycle
  * (e.g. 0,1,2,3,0,1,2,3…), because a learner can game either pattern.
  *
- * Scans every data/seed/*-quiz.json and *.quizzes.json file. Advisory by default (exit 0, like
+ * Scans every *-quiz.json and *.quizzes.json file in data/seed and in each
+ * data/courses/<slug>/v1-draft (draft courses, GP-718). Also flags duplicate options. Advisory by default (exit 0, like
  * check-course-completeness) because older quizzes predate the rule. Pass
  * --enforce=<courseSlug,...|all> to exit 1 when a quiz for those courses breaks the rule.
  *
  * Usage: node scripts/check-quiz-option-balance.mjs [--enforce=<slugs|all>] [--json]
  */
-import { readFileSync, readdirSync, realpathSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, realpathSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const SEED_DIR = 'data/seed';
+const DRAFTS_ROOT = 'data/courses';
 /** Characters may differ by at most this share of the longest option, or by MIN_CHAR_SLACK. */
 export const CHAR_TOLERANCE = 0.4;
 export const MIN_CHAR_SLACK = 8;
@@ -38,6 +40,8 @@ export const wordCount = (s) => (visibleText(s) ? visibleText(s).split(' ').leng
 export function questionProblems(options) {
   const out = [];
   if (!Array.isArray(options) || options.length < 2) return ['fewer than 2 options'];
+  const seen = options.map((o) => visibleText(o).toLowerCase());
+  if (new Set(seen).size !== seen.length) out.push('duplicate options');
   const words = options.map(wordCount);
   if (new Set(words).size !== 1) out.push(`word counts differ: ${words.join('/')}`);
   const chars = options.map((o) => visibleText(o).length);
@@ -80,22 +84,45 @@ export function quizProblems(quiz) {
   return out;
 }
 
-function loadQuizFiles(dir = SEED_DIR) {
-  const files = readdirSync(dir).filter(
-    (f) => f.endsWith('-quiz.json') || f.endsWith('.quizzes.json')
-  );
+/**
+ * Folders to scan: data/seed (promoted courses) plus every data/courses/<slug>/v1-draft, where
+ * new courses are built before promotion (GP-718). Draft quizzes used to be skipped silently.
+ */
+export function quizDirs() {
+  const dirs = [{ dir: SEED_DIR, source: 'seed' }];
+  let courses = [];
+  try {
+    courses = readdirSync(DRAFTS_ROOT, { withFileTypes: true }).filter((d) => d.isDirectory());
+  } catch {
+    courses = [];
+  }
+  for (const c of courses) {
+    const draft = join(DRAFTS_ROOT, c.name, 'v1-draft');
+    if (existsSync(draft)) dirs.push({ dir: draft, source: 'draft' });
+  }
+  return dirs;
+}
+
+function loadQuizFiles() {
   const out = [];
   const unreadable = [];
-  for (const f of files) {
-    let data;
-    try {
-      data = JSON.parse(readFileSync(join(dir, f), 'utf8'));
-    } catch (e) {
-      unreadable.push(`${f}: ${e.message}`);
-      continue;
+  for (const { dir, source } of quizDirs()) {
+    const files = readdirSync(dir).filter(
+      (f) => f.endsWith('-quiz.json') || f.endsWith('.quizzes.json')
+    );
+    for (const f of files) {
+      // Seed files keep their bare name in the report, as before; draft files show their path.
+      const label = source === 'seed' ? f : join(dir, f);
+      let data;
+      try {
+        data = JSON.parse(readFileSync(join(dir, f), 'utf8'));
+      } catch (e) {
+        unreadable.push(`${label}: ${e.message}`);
+        continue;
+      }
+      const slug = data.courseSlug || f.replace(/(-quiz|\.quizzes)\.json$/, '');
+      for (const quiz of data.quizzes || []) out.push({ file: label, slug, quiz, source });
     }
-    const slug = data.courseSlug || f.replace(/(-quiz|\.quizzes)\.json$/, '');
-    for (const quiz of data.quizzes || []) out.push({ file: f, slug, quiz });
   }
   return { quizzes: out, unreadable };
 }
@@ -148,12 +175,13 @@ if (isEntryPoint()) {
   }
   let failing = 0;
   const report = [];
-  for (const { file, slug, quiz } of quizzes) {
+  for (const { file, slug, quiz, source } of quizzes) {
     const problems = quizProblems(quiz);
     const enforced = enforceAll || enforceSet.has(slug);
     if (problems.length && enforced) failing += 1;
-    report.push({ file, slug, quiz: quiz.title, enforced, problems });
+    report.push({ file, source, slug, quiz: quiz.title, enforced, problems });
   }
+  const drafts = report.filter((r) => r.source === 'draft').length;
   if (args.includes('--json')) {
     console.log(JSON.stringify(report, null, 2));
   } else {
@@ -164,7 +192,9 @@ if (isEntryPoint()) {
       );
       if (r.enforced) for (const p of r.problems) console.log(`         - ${p}`);
     }
-    console.log(`scanned ${report.length} quizzes; ${failing} enforced quiz(zes) failing`);
+    console.log(
+      `scanned ${report.length} quizzes (${report.length - drafts} seed, ${drafts} draft); ${failing} enforced quiz(zes) failing`
+    );
   }
   process.exit(failing ? 1 : 0);
 }
