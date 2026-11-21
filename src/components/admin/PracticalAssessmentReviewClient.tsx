@@ -35,7 +35,12 @@ type SubmissionDetail = {
   student: { id: string; name: string; email: string };
 };
 
-type ReviewResult = { status?: string; totalScore?: number; maxScore?: number };
+type ReviewResult = {
+  status?: string;
+  totalScore?: number;
+  maxScore?: number;
+  reason?: string | null;
+};
 
 async function getJson<T>(url: string): Promise<T> {
   const res = await fetch(url, { credentials: 'same-origin' });
@@ -134,7 +139,9 @@ export function PracticalAssessmentReviewClient() {
       if (!res.ok) throw new Error(data.detail ?? 'Failed to record review');
       const passed = data.result?.status === 'passed';
       setFlash(
-        `Recorded — ${passed ? 'PASSED' : 'FAILED'} (${data.result?.totalScore ?? 0}/${data.result?.maxScore ?? 0}).`,
+        `Recorded — ${passed ? 'PASSED' : 'FAILED'} (${data.result?.totalScore ?? 0}/${data.result?.maxScore ?? 0}).${
+          data.result?.reason ? ` ${data.result.reason}` : ''
+        }`,
       );
       setQueue((q) => q.filter((x) => x.id !== active.id));
       setActive(null);

@@ -38,7 +38,19 @@ export type RubricCriterionDTO = {
   description: string;
   maxPoints: number;
   orderIndex: number;
+  /** True when the label carries the "(critical)" marker: it must be met in full to pass. */
+  critical: boolean;
 };
+
+/**
+ * GP-729: the schema has no critical flag, so a criterion is critical when its label
+ * contains the exact marker "(critical)" that the course drafts use. A conditional
+ * label such as "(critical for the tap test)" is deliberately NOT matched: the
+ * platform cannot tell whether the condition applied, so the assessor still decides.
+ */
+export function isCriticalCriterion(label: string): boolean {
+  return /\(\s*critical\s*\)/i.test(label);
+}
 
 function asStringArray(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((x): x is string => typeof x === 'string') : [];
@@ -146,6 +158,7 @@ export async function getSubmissionForReview(submissionId: string): Promise<Subm
       description: c.description,
       maxPoints: c.maxPoints,
       orderIndex: c.orderIndex,
+      critical: isCriticalCriterion(c.label),
     })),
     student: { id: r.student.id, name: r.student.fullName ?? 'Unknown', email: r.student.email },
     criterionScores: asScores(r.criterionScores),
@@ -195,14 +208,27 @@ export async function submitPracticalAssessment(input: {
   return { id: created.id, status: created.status, createdAt: created.createdAt.toISOString() };
 }
 
-/** Instructor grades a submission against its rubric; sets passed/failed by the pass threshold. */
+/**
+ * Instructor grades a submission against its rubric. Passed only when the total meets the
+ * pass threshold AND every critical criterion is met in full (GP-729).
+ */
 export async function reviewSubmission(input: {
   /** LMS-user id of the reviewer, or null for an env-admin-panel review. */
   reviewerId?: string | null;
   submissionId: string;
   scores: CriterionScoreInput[];
   notes?: string;
-}): Promise<{ id: string; status: string; totalScore: number; maxScore: number; passed: boolean }> {
+}): Promise<{
+  id: string;
+  status: string;
+  totalScore: number;
+  maxScore: number;
+  passed: boolean;
+  /** Labels of critical criteria not met in full; empty when none. */
+  failedCriticalCriteria: string[];
+  /** Plain-English reason a critical criterion failed the submission, else null. */
+  reason: string | null;
+}> {
   return runSerializable(async (tx) => {
     const sub = await tx.lmsAssessmentSubmission.findUnique({
       where: { id: input.submissionId },
@@ -219,6 +245,7 @@ export async function reviewSubmission(input: {
       throw new AssessmentError(400, 'Every rubric criterion must be scored');
     }
     let total = 0;
+    const failedCriticalCriteria: string[] = [];
     for (const s of input.scores) {
       const c = byId.get(s.criterionId);
       if (!c) throw new AssessmentError(400, `Unknown criterion ${s.criterionId}`);
@@ -226,11 +253,20 @@ export async function reviewSubmission(input: {
         throw new AssessmentError(400, `Score for "${c.label}" must be between 0 and ${c.maxPoints}`);
       }
       total += s.points;
+      if (isCriticalCriterion(c.label) && s.points < c.maxPoints) {
+        failedCriticalCriteria.push(c.label);
+      }
     }
 
     const maxScore = criteria.reduce((acc, c) => acc + c.maxPoints, 0);
     const pct = maxScore > 0 ? (total / maxScore) * 100 : 0;
-    const passed = pct >= sub.assessment.passThreshold;
+    const passed = pct >= sub.assessment.passThreshold && failedCriticalCriteria.length === 0;
+    const reason =
+      failedCriticalCriteria.length > 0
+        ? `Not passed: every critical criterion must be met in full, whatever the total. Not met: ${failedCriticalCriteria.join('; ')}.`
+        : null;
+    const assessorNotes = input.notes?.trim() || '';
+    const reviewerNotes = [assessorNotes, reason].filter(Boolean).join('\n\n') || null;
 
     const updated = await tx.lmsAssessmentSubmission.update({
       where: { id: input.submissionId },
@@ -239,12 +275,20 @@ export async function reviewSubmission(input: {
         criterionScores: input.scores,
         totalScore: total,
         reviewerId: input.reviewerId ?? null,
-        reviewerNotes: input.notes?.trim() || null,
+        reviewerNotes,
         reviewedAt: new Date(),
       },
       select: { id: true, status: true },
     });
-    return { id: updated.id, status: updated.status, totalScore: total, maxScore, passed };
+    return {
+      id: updated.id,
+      status: updated.status,
+      totalScore: total,
+      maxScore,
+      passed,
+      failedCriticalCriteria,
+      reason,
+    };
   });
 }
 
@@ -286,6 +330,7 @@ export async function getPublishedAssessment(assessmentId: string) {
       description: c.description,
       maxPoints: c.maxPoints,
       orderIndex: c.orderIndex,
+      critical: isCriticalCriterion(c.label),
     })),
   };
 }
