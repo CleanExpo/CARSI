@@ -16,6 +16,7 @@ const h = vi.hoisted(() => ({
   stripeQuantity: 5,
   applied: [] as number[],
   keys: new Map<string, number>(),
+  inFlight: new Set<string>(),
   updateCalls: [] as Array<{ quantity: number; idempotencyKey?: string }>,
 }));
 
@@ -50,6 +51,14 @@ vi.mock('@/lib/api/stripe', () => ({
           const quantity = params.items[0]!.quantity;
           h.updateCalls.push({ quantity, idempotencyKey: options?.idempotencyKey });
           const key = options?.idempotencyKey;
+          if (key && h.inFlight.has(key)) {
+            // Stripe is still executing the first request with this key.
+            throw Object.assign(new Error('There is currently another in-progress request using this Idempotent Key'), {
+              type: 'StripeIdempotencyError',
+              rawType: 'idempotency_error',
+              code: 'idempotency_key_in_use',
+            });
+          }
           if (key && h.keys.has(key)) {
             if (h.keys.get(key) !== quantity) {
               throw Object.assign(new Error('Keys for idempotent requests can only be used with the same parameters'), {
@@ -88,6 +97,7 @@ beforeEach(() => {
   h.stripeQuantity = 5;
   h.applied = [];
   h.keys.clear();
+  h.inFlight.clear();
   h.updateCalls = [];
 });
 
@@ -127,7 +137,7 @@ describe('GP-759 (c): Teams seat expansion is idempotent per click', () => {
 
     // The buyer clicks Add again.
     const retry = await expand({ additional_seats: 2, request_id: requests.currentId() });
-    requests.settle(retry.status);
+    requests.settle(retry.status, ((await retry.clone().json()) as { error_code?: string }).error_code);
 
     expect(h.applied).toEqual([7]);
     expect(retry.status).toBe(409);
@@ -136,6 +146,37 @@ describe('GP-759 (c): Teams seat expansion is idempotent per click', () => {
     const next = await expand({ additional_seats: 1, request_id: requests.currentId() });
     expect(next.status).toBe(200);
     expect(h.applied).toEqual([7, 8]);
+  });
+
+  it('a retry that meets the first attempt still running at Stripe keeps the id, so seats are added once', async () => {
+    let n = 0;
+    const requests = createSeatExpansionRequests(() => `purchase-${String(++n).padStart(4, '0')}-id`);
+    const id = requests.currentId();
+    const key = `carsi-expand-seats:sub_test_teams:${id}`;
+
+    // Attempt 1 is executing at Stripe; the browser times out.
+    h.inFlight.add(key);
+    requests.settle(408);
+
+    // The buyer retries while attempt 1 is still running.
+    const during = await expand({ additional_seats: 2, request_id: requests.currentId() });
+    const duringBody = (await during.json()) as { error_code?: string };
+    expect(during.status).toBe(409);
+    expect(duringBody.error_code).toBe('SEAT_ADD_IN_PROGRESS');
+    requests.settle(during.status, duringBody.error_code);
+
+    // Attempt 1 completes: Stripe applies 7 and the webhook stores it.
+    h.inFlight.delete(key);
+    h.keys.set(key, 7);
+    h.applied.push(7);
+    h.sub.seatLimit = 7;
+
+    // The buyer tries once more: same purchase id, so nothing is charged again.
+    const after = await expand({ additional_seats: 2, request_id: requests.currentId() });
+    const afterBody = (await after.json()) as { error_code?: string };
+    expect(after.status).toBe(409);
+    expect(afterBody.error_code).toBe('SEATS_ALREADY_ADDED');
+    expect(h.applied).toEqual([7]);
   });
 
   it('a request without a click id is refused before Stripe is called', async () => {

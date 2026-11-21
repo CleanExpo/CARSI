@@ -250,7 +250,10 @@ function TeamDashboardPage() {
       setSeatExpansionOpen(false);
       await syncTeam();
     } catch (err) {
-      requests.settle(err instanceof ApiClientError ? err.status : undefined);
+      requests.settle(
+        err instanceof ApiClientError ? err.status : undefined,
+        err instanceof ApiClientError ? err.errorCode : undefined,
+      );
       setError(err instanceof ApiClientError ? err.message : 'Could not add seats.');
     } finally {
       setExpandLoading(false);
