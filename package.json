@@ -17,6 +17,7 @@
     "build": "prisma generate && next build",
     "check:secrets": "node scripts/check-secrets.mjs",
     "check:iicrc-terminology": "node scripts/check-iicrc-terminology.mjs",
+    "check:built-site": "node scripts/check-built-site.mjs",
     "check:course-diagrams": "node scripts/check-course-diagrams.mjs",
     "test:wire-water-diagrams": "node --test scripts/wire-water-course-diagrams.test.mjs",
     "check:live-catalogue": "node scripts/check-live-catalogue.mjs",
@@ -174,6 +175,7 @@
     "check:course-visibility": "node scripts/check-course-visibility-predicate.mjs",
     "test:course-visibility": "node scripts/check-course-visibility-predicate.test.mjs",
     "test:iicrc-terminology": "node scripts/check-iicrc-terminology.test.mjs",
+    "test:built-site": "node scripts/check-built-site.test.mjs",
     "test:entry-point": "node scripts/lib/is-entry-point.test.mjs",
     "test:sources": "node scripts/check-source-citations.test.mjs",
     "test:course-completeness": "node scripts/check-course-completeness.test.mjs && node --test scripts/check-course-completeness-cli.test.mjs"
