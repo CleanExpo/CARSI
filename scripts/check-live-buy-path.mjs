@@ -243,7 +243,8 @@ function scriptLineComments(s, a, b, out) {
       // `of`, `yield` and `await` can also be plain identifiers (`let of = 2; of / 2`), so their
       // role is unknown: a `/` right after one stops recording (false red, never false green).
       const word = s.slice(i, j);
-      if (prev === '.') prev = 'x';
+      // After `.`, `?.` or `#` the word is a property or private-field name, not a keyword.
+      if (prev === '.' || prev === '#') prev = 'x';
       else if (CONTEXTUAL_WORD.has(word)) prev = 'unclear';
       else prev = REGEX_AFTER_WORD.has(word) ? '=' : 'x';
       i = j;

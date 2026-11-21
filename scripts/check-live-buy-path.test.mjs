@@ -348,6 +348,8 @@ check('a script line is suppressed only when a JS lexer confirms the comment (#1
     '<script>\nlet of = 2; of / 2 /*\n// */ fetch("//localhost:3000/api")\n</script>',
     '<script>var yield = 4; yield / 2 /*\n// */ fetch("//localhost:3000/api")</script>',
     '<script>var await = 4; await / 2 /*\n// */ fetch("//localhost:3000/api")</script>',
+    // A private field named like a keyword is an operand too.
+    '<script>\nclass C {\n  #return = 2;\n  m() {\n    this.#return / 2 /*\n    // */ fetch("//localhost:3000/api");\n  }\n}\nnew C().m();\n</script>',
   ]) {
     assert.deepEqual(findLocalOrigins(html), ['//localhost:3000'], JSON.stringify(html));
   }
