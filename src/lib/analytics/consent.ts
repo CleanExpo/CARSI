@@ -123,6 +123,14 @@ export const PRIVATE_FIRST_SEGMENTS: ReadonlySet<string> = new Set([
 /** Whole paths (and everything under them) that are never counted. */
 export const PRIVATE_PATH_PREFIXES: readonly string[] = ['/events/ccw-roadshow/checkin'];
 
+/**
+ * Public pages whose next segment is a record identifier (app/(public)/jobs/[id] and
+ * calendar/[id]). The list page itself is counted; a page below it is not, whatever the
+ * identifier looks like, because a short id is still an id. consent.test.ts walks app/ and fails
+ * when a new identifier route is not covered here or by PRIVATE_FIRST_SEGMENTS.
+ */
+export const IDENTIFIER_ROUTES: readonly string[] = ['/calendar', '/jobs'];
+
 const MAX_PATH = 200;
 const PATH_SHAPE = /^\/[a-z0-9\-_/]*$/;
 const DIGIT_RUN = /\d{6,}/;
@@ -164,6 +172,7 @@ export function isCountedPath(pathname: unknown): boolean {
   if (PRIVATE_FIRST_SEGMENTS.has(segments[0])) return false;
   if (PRIVATE_PATH_PREFIXES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`)))
     return false;
+  if (IDENTIFIER_ROUTES.some((route) => path.startsWith(`${route}/`))) return false;
   return !segments.some(isTokenLikeSegment);
 }
 

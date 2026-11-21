@@ -2,11 +2,16 @@
  * GP-731: the pure rules behind the analytics consent gate. Each rule is asserted on the inputs it
  * must refuse as well as the ones it must allow, so a rule that silently allows everything fails.
  */
+import { readdirSync } from 'node:fs';
+import { join, resolve } from 'node:path';
+
 import { describe, expect, it } from 'vitest';
 
 import {
   CONSENT_NOTICE_VERSION,
   CONSENT_STORAGE_KEY,
+  IDENTIFIER_ROUTES,
+  PRIVATE_FIRST_SEGMENTS,
   isCollectionUrl,
   isCountedPath,
   libraryUrl,
@@ -115,6 +120,46 @@ describe('which pages are counted', () => {
     ['not a string', 42],
   ])('fails closed on %s', (_label, path) => {
     expect(isCountedPath(path)).toBe(false);
+  });
+
+  it.each(['/jobs/12345', '/jobs/abc123', '/calendar/7', '/calendar/x9'])(
+    'never sends a record identifier, however short: %s',
+    (path) => {
+      expect(isCountedPath(path)).toBe(false);
+      expect(safeLocation(ORIGIN, path, '')).toBe('');
+    }
+  );
+
+  it('still counts the list pages above those records', () => {
+    expect(isCountedPath('/jobs')).toBe(true);
+    expect(isCountedPath('/calendar')).toBe(true);
+  });
+
+  it('every dynamic page in the app is private, a readable slug, or an identifier route', () => {
+    // Walk app/ for every [param] folder. A new [id]-style route that is not listed fails here, so
+    // an identifier can never reach analytics just because nobody remembered to list it.
+    const appDir = resolve(__dirname, '../../../app');
+    const found: string[] = [];
+    const walk = (dir: string, urlParts: string[]) => {
+      for (const entry of readdirSync(dir, { withFileTypes: true })) {
+        if (!entry.isDirectory()) continue;
+        const name = entry.name;
+        const inUrl = name.startsWith('(') ? urlParts : [...urlParts, name];
+        if (name.startsWith('[')) found.push(`/${inUrl.join('/')}`);
+        walk(join(dir, name), inUrl);
+      }
+    };
+    walk(appDir, []);
+    expect(found.length).toBeGreaterThan(5);
+    const unaccounted = found.filter((route) => {
+      const first = route.split('/')[1];
+      if (first === 'api' || PRIVATE_FIRST_SEGMENTS.has(first)) return false;
+      const parent = route.slice(0, route.lastIndexOf('/'));
+      if (IDENTIFIER_ROUTES.includes(parent)) return false;
+      // A readable slug or a fixed type name is a page name, not a record identifier.
+      return !/\/\[(slug|type)\]$/.test(route);
+    });
+    expect(unaccounted).toEqual([]);
   });
 });
 
