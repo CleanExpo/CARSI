@@ -30,8 +30,18 @@ function localStore(): Storage | null {
   }
 }
 
-/** The choice as stored right now. Read live every time; nothing caches it. */
+/**
+ * True after a "no" on this page that storage refused to record. The old stored value may still
+ * read yes, so this page must not trust it: the gate stays closed until a yes is stored for real.
+ */
+let deniedOnThisPage = false;
+
+/**
+ * The choice right now: the stored value, read live every time, except that a "no" storage refused
+ * to record still counts as no on this page.
+ */
 export function getAnalyticsChoice(): AnalyticsChoice {
+  if (deniedOnThisPage) return 'denied';
   return readAnalyticsChoice(localStore());
 }
 
@@ -40,9 +50,26 @@ export function getServerAnalyticsChoice(): AnalyticsChoice {
   return 'unset';
 }
 
+let watchingOtherTabs = false;
+
+/**
+ * A "no" made in another tab reaches this one only through the storage event. Withdraw here too,
+ * once per page, whatever else is subscribed: the wire guard and every sender read the choice live,
+ * and this also opts PostHog out, disables the property and deletes the cookies.
+ */
+function watchOtherTabs(): void {
+  if (watchingOtherTabs || typeof window === 'undefined') return;
+  watchingOtherTabs = true;
+  window.addEventListener('storage', (event: StorageEvent) => {
+    if (event.key !== null && event.key !== CONSENT_STORAGE_KEY) return;
+    if (getAnalyticsChoice() !== 'granted') withdrawAnalytics();
+  });
+}
+
 /** Notifies `onChange` when the choice changes in this tab or another. Returns the unsubscribe. */
 export function subscribeAnalyticsChoice(onChange: () => void): () => void {
   if (typeof window === 'undefined') return () => {};
+  watchOtherTabs();
   const onStorage = (event: StorageEvent) => {
     if (event.key === null || event.key === CONSENT_STORAGE_KEY) onChange();
   };
@@ -65,13 +92,19 @@ export function onAnalyticsWithdrawn(listener: () => void): () => void {
 /** Store the visitor's choice. A "no" also withdraws analytics from this page at once. */
 export function saveAnalyticsChoice(analytics: boolean): void {
   const store = localStore();
+  let stored = false;
   if (store) {
     try {
       writeAnalyticsChoice(store, analytics);
+      stored = true;
     } catch {
       // Storage refused: the choice cannot be remembered, so the gate stays closed.
     }
   }
+  // A "no" storage refused closes the gate on this page even though storage kept an older yes;
+  // only a yes that was actually stored opens it again.
+  if (!analytics && !stored) deniedOnThisPage = true;
+  else if (stored) deniedOnThisPage = false;
   if (!analytics) withdrawAnalytics();
   window.dispatchEvent(new Event(CONSENT_CHANGED_EVENT));
 }
@@ -175,6 +208,7 @@ function absolute(url: string): string {
  */
 export function installAnalyticsWireGuard(measurementId: string): void {
   if (typeof window === 'undefined') return;
+  watchOtherTabs();
   if (window.__carsiAnalyticsGuard) {
     window.__carsiAnalyticsGuard.measurementId = measurementId;
     return;

@@ -11,6 +11,7 @@ import { CONSENT_CHANGED_EVENT, CONSENT_STORAGE_KEY, COOKIE_SETTINGS_EVENT } fro
 import {
   getAnalyticsChoice,
   installAnalyticsWireGuard,
+  onAnalyticsWithdrawn,
   openCookieSettings,
   saveAnalyticsChoice,
   subscribeAnalyticsChoice,
@@ -155,5 +156,55 @@ describe('the wire guard', () => {
     navigator.sendBeacon('https://carsi.com.au/api/analytics', 'x');
     expect(fetcher).toHaveBeenCalledWith('/api/lms/courses', undefined);
     expect(beacon).toHaveBeenCalledWith('https://carsi.com.au/api/analytics', 'x');
+  });
+});
+
+describe('a "no" always closes the gate on this page', () => {
+  it('holds even when storage refuses to overwrite an earlier yes', async () => {
+    saveAnalyticsChoice(true);
+    expect(getAnalyticsChoice()).toBe('granted');
+    const withdrawn = vi.fn();
+    const stopWithdrawn = onAnalyticsWithdrawn(withdrawn);
+    const refuse = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new DOMException('full', 'QuotaExceededError');
+    });
+    try {
+      saveAnalyticsChoice(false);
+    } finally {
+      refuse.mockRestore();
+      stopWithdrawn();
+    }
+    // The old yes is still in storage, but this page must treat the visitor as having said no.
+    expect(window.localStorage.getItem(CONSENT_STORAGE_KEY)).toContain('"analytics":true');
+    expect(getAnalyticsChoice()).toBe('denied');
+    expect(withdrawn).toHaveBeenCalledTimes(1);
+    navigator.sendBeacon(collect({}));
+    await window.fetch(collect({}));
+    expect(beacon).not.toHaveBeenCalled();
+    expect(fetcher).not.toHaveBeenCalled();
+    // A fresh yes that storage accepts reopens it.
+    saveAnalyticsChoice(true);
+    expect(getAnalyticsChoice()).toBe('granted');
+  });
+
+  it('a "no" made in another tab withdraws analytics here too', () => {
+    saveAnalyticsChoice(true);
+    const withdrawn = vi.fn();
+    const stopWithdrawn = onAnalyticsWithdrawn(withdrawn);
+    (window as unknown as Record<string, unknown>)[`ga-disable-${ID}`] = false;
+    document.cookie = '_ga=GA1.1.123.456; path=/';
+    // The other tab writes its "no" straight to the shared storage, then this tab hears of it.
+    window.localStorage.setItem(
+      CONSENT_STORAGE_KEY,
+      window.localStorage
+        .getItem(CONSENT_STORAGE_KEY)!
+        .replace('"analytics":true', '"analytics":false')
+    );
+    window.dispatchEvent(new StorageEvent('storage', { key: CONSENT_STORAGE_KEY }));
+    stopWithdrawn();
+    expect(getAnalyticsChoice()).toBe('denied');
+    expect(withdrawn).toHaveBeenCalledTimes(1);
+    expect((window as unknown as Record<string, unknown>)[`ga-disable-${ID}`]).toBe(true);
+    expect(document.cookie).not.toContain('_ga=');
   });
 });
