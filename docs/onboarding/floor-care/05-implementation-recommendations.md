@@ -50,8 +50,15 @@ smoke-test, go-live and rollback). Publishing is an operator step against the pr
 **Pricing / billing.** The course is sold as a **CARSI Maintenance Company Onboarding** organisation
 subscription — **AUD $1,295/month + GST, unlimited students** — recorded on the course in `meta.pricing`
 and in `docs/onboarding/README.md`. It is provisioned for the client (not individual self-checkout), so
-the course is kept `isFree`/`$0` in the catalogue to avoid a misleading one-off price. **Wiring the
-recurring subscription billing (Stripe) is a separate build** and is not part of this content work.
+the **intent recorded here** is that the course be kept `isFree: true` / `priceAud: "0"` in the
+catalogue to avoid a misleading one-off price.
+⚠️ **The committed catalogue does not match that intent** — it has `isFree: false` and
+`priceAud: "99"`, and is `published`. Which side is correct is an open commercial decision: see the
+`UNRESOLVED DISCREPANCY` table in
+[`publish-runbook.md`](./publish-runbook.md#pricing--provisioning). Do not change the price or the
+visibility flags to resolve it; that is the founder's call. Production values have not been
+verified from the authoring environment. **Wiring the recurring subscription billing (Stripe) is a
+separate build** and is not part of this content work.
 
 **Recommended next LMS steps:**
 - Track practical sign-offs against the learner record so the 30/60/90 gates are visible to supervisors.

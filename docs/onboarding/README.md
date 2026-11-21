@@ -24,8 +24,13 @@ _More onboarding programs will sit under this brand as they are built._
   per-seat limit.
 - **Provisioning:** organisation subscription — provisioned for the client, not sold via individual
   self-checkout. Recurring billing (Stripe subscription) is **not yet wired**; that is a separate build
-  (the course is `isFree`/`$0` in the catalogue so the UI never shows a misleading one-off price or
-  opens self-checkout). The real terms are recorded on the course in `meta.pricing`.
+  (the **intent** is that the course be `isFree: true` / `priceAud: "0"` in the catalogue so the UI
+  never shows a misleading one-off price or opens self-checkout). The real terms are recorded on
+  the course in `meta.pricing`.
+  ⚠️ The committed catalogue currently has `isFree: false` / `priceAud: "99"` and `published`,
+  contradicting that intent. Open commercial decision — see the `UNRESOLVED DISCREPANCY` table in
+  [`floor-care/publish-runbook.md`](./floor-care/publish-runbook.md#pricing--provisioning). Do not
+  change the price or visibility flags to resolve it.
 
 ## Branding convention (for future onboarding courses)
 

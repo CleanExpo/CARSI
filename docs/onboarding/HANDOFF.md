@@ -205,8 +205,12 @@ recorded on the course in `meta.pricing` so nothing is lost.
 3. **Webhook handling** for `customer.subscription.created/updated/deleted` and
    `invoice.payment_failed` to provision/deprovision access (extend the existing Stripe webhook
    handler).
-4. **Access gating** so the course is granted via active subscription rather than `isFree` — and flip
-   the course off `isFree` once gating exists.
+4. **Access gating** so the course is granted via active subscription rather than by being free.
+   Note this item was written when the catalogue had the course as `isFree: true`; it is now
+   `isFree: false` / `priceAud: "99"`, which is itself an unresolved discrepancy against the
+   documented org-subscription intent (see §"Current state" above and the table in
+   `floor-care/publish-runbook.md`). Settle that first — the gating work depends on which pricing
+   model is actually intended.
 
 Treat this as its own scoped PR with its own plan, tests, and the Verification Gate. Until it exists,
 use §5 option A/B for access.
