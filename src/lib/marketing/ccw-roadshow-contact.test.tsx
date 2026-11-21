@@ -45,7 +45,7 @@ describe('/contact ccw-roadshow lead context', () => {
       );
       expect(lead).toMatchObject({ source: 'ccw-roadshow', pageUrl: page });
       expect(lead?.pageUrl).not.toBe('/start-carpet-cleaning-business');
-      expect(lead?.initialMessage).toContain(`the next ${city} CARSI x CCW training dates`);
+      expect(lead?.initialMessage).toContain(`the next ${city} CARSI roadshow training dates`);
     }
   );
 

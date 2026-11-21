@@ -70,7 +70,8 @@ async function main() {
   });
   if (!course) {
     throw new Error(
-      `Course "${parsed.courseSlug}" not found. Run "npm run db:seed-courses" first.`,
+      `Course "${parsed.courseSlug}" not found. Run ` +
+        `"npm run db:seed-courses -- --slug=${parsed.courseSlug} --apply" first.`
     );
   }
 
@@ -107,7 +108,9 @@ async function main() {
     seeded += 1;
   }
 
-  console.log(`Seeded ${seeded} commercial floor care quiz(zes) for course "${parsed.courseSlug}".`);
+  console.log(
+    `Seeded ${seeded} commercial floor care quiz(zes) for course "${parsed.courseSlug}".`
+  );
 }
 
 main()

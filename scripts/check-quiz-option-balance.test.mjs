@@ -184,4 +184,68 @@ try {
 } finally {
   rmSync(empty, { recursive: true, force: true });
 }
+// Planted control: two identical options leave the learner fewer real choices (GP-718).
+assert.ok(
+  questionProblems(['Dry air', 'Wet air', 'Dry air', 'Hot air']).some((p) =>
+    p.startsWith('duplicate')
+  ),
+  'duplicate options must fail'
+);
+
+// GP-718: new courses are built under data/courses/<slug>/v1-draft/ before promotion. A draft
+// quiz must be scanned and enforceable, not silently skipped.
+const drafts = mkdtempSync(join(tmpdir(), 'quiz-balance-drafts-'));
+try {
+  mkdirSync(join(drafts, 'data/seed'), { recursive: true });
+  const draftDir = join(drafts, 'data/courses/draft-course/v1-draft');
+  mkdirSync(draftDir, { recursive: true });
+  writeFileSync(
+    join(draftDir, 'draft-course-quiz.json'),
+    JSON.stringify({
+      courseSlug: 'draft-course',
+      quizzes: [
+        {
+          title: 'Draft planted',
+          questions: [
+            {
+              options: ['Yes', 'Absolutely yes in every single case', 'No', 'Maybe'],
+              correctIndex: 1,
+            },
+          ],
+        },
+      ],
+    })
+  );
+  // A folder that is not a v1-draft must not be scanned.
+  mkdirSync(join(drafts, 'data/courses/draft-course/scaffold'), { recursive: true });
+  writeFileSync(
+    join(drafts, 'data/courses/draft-course/scaffold/scaffold-quiz.json'),
+    '{ not json'
+  );
+  const runDraft = (args) => {
+    try {
+      return {
+        status: 0,
+        out: execFileSync(process.execPath, [here, ...args], {
+          cwd: drafts,
+          encoding: 'utf8',
+          stdio: 'pipe',
+        }),
+      };
+    } catch (e) {
+      return { status: e.status, out: String(e.stdout) + String(e.stderr) };
+    }
+  };
+  const enforced = runDraft(['--enforce=draft-course']);
+  assert.equal(enforced.status, 1, 'an enforced unbalanced draft quiz must exit 1');
+  assert.match(
+    enforced.out,
+    /data\/courses\/draft-course\/v1-draft\/draft-course-quiz\.json/,
+    'the report must name the draft file by its path'
+  );
+  assert.match(enforced.out, /scanned 1 quizzes \(0 seed, 1 draft\)/, 'scanned totals by source');
+  assert.equal(runDraft([]).status, 0, 'a draft quiz is advisory unless enforced');
+} finally {
+  rmSync(drafts, { recursive: true, force: true });
+}
 console.log('check-quiz-option-balance: all planted controls rejected, positive control passed');

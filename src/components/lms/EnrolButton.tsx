@@ -189,7 +189,10 @@ export function EnrolButton({
 
     const currentUser = user ?? (await authApi.getCurrentUser());
     if (!currentUser) {
-      window.location.href = `/login?next=${encodeURIComponent(returnTo)}`;
+      window.location.href = new URL(
+        `/login?next=${encodeURIComponent(returnTo)}`,
+        window.location.origin,
+      ).href;
       setLoading(false);
       return;
     }

@@ -165,7 +165,7 @@ export const carsiCoachingAddOns: CoachingAddOn[] = [
   },
   {
     id: 'growth-days',
-    title: 'CARSI × CCW Business Growth Days',
+    title: 'CARSI Business Growth Days',
     priceLabel: 'From $149',
     billing: 'from',
     description:
@@ -236,6 +236,24 @@ export const carsiCoachingPortalFeatures: PortalFeature[] = [
       'Link to manage your Stripe subscription (payment method, invoices, cancel) once your coaching subscription is active.',
   },
 ];
+
+/** Portal feature that advertises add-on requests; shown only once add-ons can be booked. */
+const addOnsPortalFeatureTitle = 'Add-ons & upgrades';
+
+/**
+ * The one rule for what the public pages may advertise (GP-734). While add-on booking is not
+ * live, nothing that cannot be bought is listed: no add-on rows, and no portal feature
+ * promising add-on requests. The base program row is never an add-on.
+ */
+export function publicCoachingOffer(addOnsComingSoon: boolean = carsiCoachingAddOnsComingSoon) {
+  return {
+    addOnsBookable: !addOnsComingSoon,
+    addOns: addOnsComingSoon ? [] : carsiCoachingAddOns.filter((a) => !a.includedInBase),
+    portalFeatures: addOnsComingSoon
+      ? carsiCoachingPortalFeatures.filter((f) => f.title !== addOnsPortalFeatureTitle)
+      : carsiCoachingPortalFeatures,
+  };
+}
 
 export const carsiCoachingAddOnContactEmail = 'support@carsi.com.au';
 

@@ -38,6 +38,7 @@ import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import ts from 'typescript';
 import { isEntryPoint } from './lib/is-entry-point.mjs';
+import { isDraftCopy } from './lib/course-drafts.mjs';
 
 import { IICRC_CODE_ALT } from './iicrc-codes.mjs';
 
@@ -684,8 +685,11 @@ const JSON_SCANNED_DIRS = ['data/seed/', '.curation/', 'data/wordpress-export/',
 const PUBLIC_COPY_EXT = /\.(txt|json|md|mdx)$/;
 const PUBLIC_SCANNED_DIRS = ['public/'];
 
-function inScope(file) {
+// Courses waiting for sign-off in data/courses/<slug>/v1-draft become seed data at go-live, so
+// their JSON and markdown are scanned now (first-wave spec AC-W0-4, 21/11/2026); evidence/ is not.
+export function inScope(file) {
   const norm = file.replace(/\\/g, '/');
+  if (isDraftCopy(norm)) return true;
   if (COPY_EXT.test(norm) && SCANNED_DIRS.some((d) => norm.startsWith(d))) return true;
   if (norm.endsWith('.json') && JSON_SCANNED_DIRS.some((d) => norm.startsWith(d))) return true;
   if (PUBLIC_COPY_EXT.test(norm) && PUBLIC_SCANNED_DIRS.some((d) => norm.startsWith(d)))
@@ -1130,7 +1134,7 @@ export function scanFile(file, text, rules = BANNED) {
 function scanLine(file, lineNo, content, findings, rules = BANNED) {
   const norm = file.replace(/\\/g, '/');
   for (const rule of rules) {
-    if (rule.seedOnly && !norm.startsWith('data/seed/')) continue;
+    if (rule.seedOnly && !norm.startsWith('data/seed/') && !isDraftCopy(norm)) continue;
     if (rule.skipDocs && norm.startsWith('docs/')) continue;
     // `allow` exempts the whole LINE, so any line carrying both a violation and an allow
     // token escapes — `title: "IICRC WRT course", slug: "x-iicrc-wrt"` passed on the slug

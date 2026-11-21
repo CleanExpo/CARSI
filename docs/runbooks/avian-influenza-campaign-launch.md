@@ -30,6 +30,8 @@ npm run check:iicrc-terminology
 npm run lint
 npm run type-check
 npm run db:seed-courses -- --slug=avian-influenza-awareness-restoration-iaq-facilities
+#   ^ preview: writes nothing. Read the plan, then:
+npm run db:seed-courses -- --slug=avian-influenza-awareness-restoration-iaq-facilities --apply
 ```
 
 ## Rollback

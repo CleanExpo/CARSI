@@ -18,7 +18,15 @@ A matching LMS course has been authored into the CARSI catalogue
 
 - **12 modules** mirroring `01-module-structure.md`, each with text lessons and a knowledge check
   (inline Q&A + answer key), ending in a final practical-assessment module.
-- Seed it with `npm run db:seed-courses` (after `npm run type-check`); it starts as a **draft** and free.
+- Seed it with `npm run db:seed-floor-care-course` (after `npm run type-check`). That script is the
+  safe importer scoped to this slug, with `--apply`. To preview instead of writing, run
+  `npm run db:seed-courses -- --slug=floor-care-onboarding-operational-readiness` with no `--apply`;
+  the **bare** `npm run db:seed-courses` is not a preview — it exits 1, because the importer requires
+  exactly one of `--slug` / `--all`.
+  **It does not land as a draft.** The importer writes `status` and `isPublished` from
+  `data/seed/courses-catalog.json` on every apply, and the committed entry for this slug is
+  `"status": "published"` with `"isPublished": true`, so the apply publishes it. Set both to
+  unpublished in the catalogue first if it must stay hidden.
 - Keep the LMS lesson content and these docs in step — the docs are the master; the course is the
   delivery. When a doc changes, update the matching lesson.
 
@@ -31,8 +39,8 @@ safety/reputation-critical modules, 80–85% elsewhere).
 
 > **Seed order matters.** Quizzes are a separate seed step from the catalogue:
 > ```bash
-> npm run db:seed-courses              # recreates lessons (knowledge-checks are contentType 'quiz')
-> npm run db:seed-floor-care-quizzes   # creates the LmsQuiz/LmsQuizQuestion rows they point to
+> npm run db:seed-floor-care-course   # reconciles lessons (knowledge-checks are contentType 'quiz')
+> npm run db:seed-floor-care-quizzes  # creates the LmsQuiz/LmsQuizQuestion rows they point to
 > ```
 > Run the catalogue seed first (the quiz needs its course to exist); both steps are idempotent.
 
@@ -41,9 +49,14 @@ smoke-test, go-live and rollback). Publishing is an operator step against the pr
 
 **Pricing / billing.** The course is sold as a **CARSI Maintenance Company Onboarding** organisation
 subscription — **AUD $1,295/month + GST, unlimited students** — recorded on the course in `meta.pricing`
-and in `docs/onboarding/README.md`. It is provisioned for the client (not individual self-checkout), so
-the course is kept `isFree`/`$0` in the catalogue to avoid a misleading one-off price. **Wiring the
-recurring subscription billing (Stripe) is a separate build** and is not part of this content work.
+and in `docs/onboarding/README.md`. Those subscription seats are provisioned for the client
+(not individual self-checkout) and their recurring billing is unwired.
+Separately, the course carries an **individual list price of A$99** (`isFree: false`,
+`priceAud: "99"`) and is `published` in the catalogue — **correct and settled**, DECISIONS #55
+(founder, 2026-11-21). An earlier note here said the catalogue should be kept at `$0` to avoid a
+one-off price; that is withdrawn. Do not change the price or the visibility flags without revisiting
+that decision. **Wiring the recurring subscription billing (Stripe) is a separate build** and is not
+part of this content work.
 
 **Recommended next LMS steps:**
 - Track practical sign-offs against the learner record so the 30/60/90 gates are visible to supervisors.
@@ -102,7 +115,8 @@ Short, regular, real-world reinforcement keeps the standard alive:
 1. Fill placeholders; assign an owner and review date.
 2. Train supervisors on the assessment framework and sign-off form first — they run the program.
 3. Issue the induction pack and run the first inductions.
-4. Seed the LMS course (draft); pilot with one cohort; capture feedback.
+4. Seed the LMS course — note it publishes unless you set `status`/`isPublished` to unpublished in
+   the catalogue first; pilot with one cohort; capture feedback.
 5. Add auto-marked quizzes and learner sign-off tracking.
 6. Produce the priority video clips (gated spend) once content is settled.
 7. Start the toolbox-talk loop and the refresher cycle for safety-critical modules.

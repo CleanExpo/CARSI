@@ -92,6 +92,34 @@ assert.deepEqual(
   `quiz files neither scanned nor skipped by name: ${missed.join(', ')}`
 );
 
+// 3. Draft courses (data/courses/<slug>/v1-draft, first-wave spec AC-W0-3): "mold" planted once in
+// a draft catalogue JSON and once in a draft markdown file must fail, naming both files.
+const draftCatalogue = JSON.stringify({ courses: [{ title: 'Mould basics', description: 'Black mold on plasterboard.' }] });
+const drafts = runIn({
+  'data/courses/planted/v1-draft/courses-catalog.json': draftCatalogue,
+  'data/courses/planted/v1-draft/field-tools/checklist.md': '# Checklist\n\nBag the mold-affected carpet.\n',
+  'data/courses/planted/v1-draft/evidence/notes.md': 'Source quote: "mold" (US source, not CARSI copy).\n',
+});
+assert.equal(drafts.status, 1, `mold in draft course copy must exit 1\n${drafts.out}`);
+for (const f of ['data/courses/planted/v1-draft/courses-catalog.json', 'data/courses/planted/v1-draft/field-tools/checklist.md']) {
+  assert.ok(drafts.out.includes(f), `the planted draft file ${f} must be named\n${drafts.out}`);
+}
+assert.ok(drafts.out.includes('"mold"'), `the word must be named\n${drafts.out}`);
+assert.ok(!drafts.out.includes('evidence/notes.md'), `evidence/ holds source quotes and is not scanned\n${drafts.out}`);
+
+// The clean draft passes and says how much it read.
+const cleanDraft = runIn({
+  'data/courses/clean/v1-draft/courses-catalog.json': JSON.stringify({ courses: [{ title: 'Mould basics' }] }),
+  'data/courses/clean/v1-draft/research-pack.md': '# Research\n\nMould grows on damp plasterboard.\n',
+});
+assert.equal(cleanDraft.status, 0, `a clean draft must pass\n${cleanDraft.out}`);
+assert.ok(cleanDraft.out.includes('scanned 2 draft files across 1 drafts'), cleanDraft.out);
+
+// A draft folder holding no copy at all is a scope hole, not a pass.
+const hollow = runIn({ 'data/courses/hollow/v1-draft/evidence/evidence-ledger.jsonl': '{}\n' });
+assert.equal(hollow.status, 1, `a draft folder with nothing to scan must fail\n${hollow.out}`);
+assert.ok(hollow.out.includes('data/courses/hollow/v1-draft'), hollow.out);
+
 console.log(
-  `check-au-english: planted lumber caught in all 3 quiz naming forms; ${real.length} real seed quiz files covered`
+  `check-au-english: planted lumber caught in all 3 quiz naming forms; ${real.length} real seed quiz files covered; planted mold caught in draft JSON and markdown`
 );

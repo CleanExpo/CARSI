@@ -45,6 +45,7 @@
  */
 import { execSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
+import { isDraftCopy } from './lib/course-drafts.mjs';
 
 // Licensed section index — TOP-LEVEL section numbers that EXIST in each standard.
 // SSOT mirror of RestoreAssist lib/standards/s520-sections.ts / s500-sections.ts.
@@ -206,8 +207,11 @@ const SCANNED_DIRS = [
   'public/courses/',
 ];
 const JSON_SCANNED_DIRS = ['data/seed/', '.curation/', 'data/wordpress-export/'];
+// Courses waiting for sign-off in data/courses/<slug>/v1-draft: their JSON and markdown are
+// course copy (first-wave spec AC-W1-6, 21/11/2026). evidence/ holds source quotes and is not.
 function inScope(file) {
   const norm = file.replace(/\\/g, '/');
+  if (isDraftCopy(norm)) return true;
   if (COPY_EXT.test(norm) && SCANNED_DIRS.some((d) => norm.startsWith(d))) return true;
   if (norm.endsWith('.json') && JSON_SCANNED_DIRS.some((d) => norm.startsWith(d))) return true;
   return false;

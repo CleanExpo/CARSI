@@ -596,6 +596,8 @@ model LmsRubricCriterion {
   description  String @default("") @db.Text
   maxPoints    Int    @default(5) @map("max_points")
   orderIndex   Int    @default(0) @map("order_index")
+  /// Must be met in full (points = max_points) to pass, whatever the total (GP-729).
+  critical     Boolean @default(false)
 
   assessment LmsPracticalAssessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
 

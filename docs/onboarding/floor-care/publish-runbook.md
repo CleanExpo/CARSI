@@ -6,7 +6,11 @@
 
 How to verify and take the `floor-care-onboarding-operational-readiness` course live. The course is
 branded (**CARSI Maintenance Company Onboarding — Professional Floor Care & Operational Readiness**) and
-currently `status: draft` / `isPublished: false` in `data/seed/courses-catalog.json`.
+currently `status: published` / `isPublished: true` / `isFree: false` / `priceAud: "99"` in
+`data/seed/courses-catalog.json` — so the §1 import **publishes it as a paid A$99 course**. (This
+file previously said draft/false, which was wrong.) Set both visibility fields to unpublished in the
+catalogue first if you need to seed and smoke-test before it goes live. The production database's
+current values have not been verified from the authoring environment — check them first.
 
 > **Why these steps run by an operator, not in the authoring environment:** the live database is
 > DigitalOcean Postgres (not Supabase) and the authoring sandbox cannot reach it or run
@@ -26,7 +30,9 @@ on deploy but does **not** seed. Seed order matters — the quiz needs its cours
 npm ci && npx prisma generate && npm run type-check          # the mandatory gate (blocked in the sandbox)
 
 # 1. Seed the branded course, then its quizzes — ORDER MATTERS.
-DATABASE_URL=<prod> npm run db:seed-courses                  # upserts the course (still draft)
+DATABASE_URL=<prod> npm run db:seed-floor-care-course        # imports this course only. NOT still draft:
+#   the importer writes status/isPublished from courses-catalog.json, where this slug is
+#   published/true, so this PUBLISHES the course. Set both unpublished first to stage it.
 DATABASE_URL=<prod> npm run db:seed-floor-care-quizzes       # creates the 11 LmsQuiz + questions
 
 # 2. Smoke-test the quiz flow with an enrolled student.
@@ -53,10 +59,18 @@ DATABASE_URL=<prod> npm run db:seed-e2e-user                 # student@carsi.com
 
 - **AUD $1,295/month + GST, unlimited students** — organisation subscription, recorded on the course in
   `meta.pricing` and in `docs/onboarding/README.md`.
-- The course is `isFree: true` / `priceAud: "0"` **on purpose**: it is provisioned as an org
-  subscription, not sold via individual self-checkout, so the catalogue must not show a one-off
-  "$1,295" buy price. Recurring billing (Stripe subscription) is a **separate build** — the Stripe
-  subscription helpers exist (`src/lib/api/stripe.ts`) but are not wired to courses/teams.
+- **Individual price: A$99 (`isFree: false`, `priceAud: "99"`) — settled, DECISIONS #55
+  (founder, 2026-11-21).** The catalogue is authoritative here. An earlier version of this runbook
+  said the course was `isFree: true` / `priceAud: "0"` **on purpose**, so that the catalogue would
+  show no one-off buy price; **that claim is withdrawn.** The A$99 list price is correct and the
+  course is `published` / `isPublished: true` as committed, so a seed publishes it at A$99 — which
+  is intended, not a defect.
+  The org-subscription terms in `meta.pricing` are a **separate** commercial track, not a
+  contradiction of the list price: recurring billing is still unwired, so those seats are
+  provisioned manually. Do not change `isFree`, `priceAud`, `status` or `isPublished` to "reconcile"
+  the two.
+- Recurring billing (Stripe subscription) is a **separate build** — the Stripe subscription helpers
+  exist (`src/lib/api/stripe.ts`) but are not wired to courses/teams.
 - When recurring billing is built, update `meta.pricing` (add the Stripe product/price ids) and revisit
   the access model (organisation/team provisioning) at that time.
 

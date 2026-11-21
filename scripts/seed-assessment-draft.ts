@@ -93,7 +93,7 @@ function resolveTargetFiles(): string[] {
   }
 
   throw new Error(
-    'Missing required argument. Usage: npm run db:seed-assessment-draft -- --file=<path> | --dir=<path>',
+    'Missing required argument. Usage: npm run db:seed-assessment-draft -- --file=<path> | --dir=<path>'
   );
 }
 
@@ -109,7 +109,8 @@ async function seedFile(path: string): Promise<number> {
   });
   if (!course) {
     throw new Error(
-      `Course "${parsed.courseSlug}" not found (from "${path}"). Run "npm run db:seed-courses" first.`,
+      `Course "${parsed.courseSlug}" not found (from "${path}"). Run ` +
+        `"npm run db:seed-courses -- --slug=${parsed.courseSlug} --apply" first.`
     );
   }
 

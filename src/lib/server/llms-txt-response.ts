@@ -6,6 +6,7 @@ import {
   type CcwRoadshowEvent,
 } from '@/lib/marketing/ccw-roadshow';
 import { selectCurrentCecCourses } from '@/lib/seed/cec-approvals';
+import { courseReferenceCounts } from '@/lib/seo/course-references-index';
 import { buildLlmsTxt } from '@/lib/seo/llms-txt';
 import { hasPublicCoursePage } from '@/lib/seo/public-course-page';
 import { minPaidCoursePrice } from '@/lib/server/public-catalogue-facts';
@@ -23,6 +24,8 @@ export type LlmsTxtDeps = {
   now?: Date;
   /** Defaults to the roadshow events in src/lib/marketing/ccw-roadshow.ts. */
   events?: readonly CcwRoadshowEvent[];
+  /** References per course slug; defaults to data/seo/course-references.index.json. */
+  referenceCounts?: Readonly<Record<string, number>>;
 };
 
 /** Longest a shared cache may hold a 200, in seconds. */
@@ -97,6 +100,8 @@ export async function llmsTxtResponse(deps: LlmsTxtDeps): Promise<Response> {
     .filter((e) => new Date(e.endDateIso).getTime() > now.getTime())
     .sort((a, b) => a.startDateIso.localeCompare(b.startDateIso));
 
+  // Only published courses with a public page; a draft's references never reach llms.txt.
+  const references = deps.referenceCounts ?? courseReferenceCounts();
   const text = buildLlmsTxt({
     courses: publicCourses.map((c) => ({ slug: c.slug, title: c.title })),
     onboardingProgramCount: read.items.length - publicCourses.length,
@@ -108,6 +113,9 @@ export async function llmsTxtResponse(deps: LlmsTxtDeps): Promise<Response> {
       terms: membership.description,
     },
     cecCourses,
+    referenceCourses: publicCourses
+      .filter((c) => (references[c.slug] ?? 0) > 0)
+      .map((c) => ({ slug: c.slug, title: c.title, referenceCount: references[c.slug] })),
     events: upcoming.map((e) => ({
       title: e.title,
       venue: `${e.venueName}, ${e.suburbStatePostcode}`,

@@ -136,8 +136,10 @@ export default function TermsPage() {
         <address className="mt-2 not-italic">
           <strong className={marketingTextStrong}>CARSI Pty Ltd</strong>
           <br />
-          Support: use the CARSI contact page, or ask Margot, our online assistant (bottom-right of
-          every page)
+          Email: <a href="mailto:support@carsi.com.au">support@carsi.com.au</a>
+          <br />
+          Or use the CARSI contact page, or ask Margot, our online assistant (bottom-right of every
+          page)
         </address>
       </section>
     </LegalDocumentShell>

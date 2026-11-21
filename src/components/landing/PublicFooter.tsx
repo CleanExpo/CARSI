@@ -28,9 +28,9 @@ const platformLinks = [
   { label: 'Courses', href: '/courses' },
   { label: 'Pathways', href: '/pathways' },
   { label: 'Training costs', href: '/restoration-training-cost-australia' },
-  { label: 'CCW Roadshow', href: '/events/ccw-roadshow' },
+  { label: 'CARSI Roadshow', href: '/events/ccw-roadshow' },
   { label: 'Business Coaching', href: '/ccw-training' },
-  { label: 'CCW Workshop', href: '/ccw-training/workshop' },
+  { label: 'CARSI Workshop', href: '/workshops/carpet-cleaning' },
   { label: 'Start Smart', href: '/start-carpet-cleaning-business' },
   { label: 'Authority Hub', href: '/authority' },
   { label: 'About', href: '/about' },
@@ -49,10 +49,10 @@ const communityLinks = [
 ];
 
 const eventLinks = [
-  { label: 'CCW Roadshow', href: '/events/ccw-roadshow' },
+  { label: 'CARSI Roadshow', href: '/events/ccw-roadshow' },
   { label: 'CCW Melbourne', href: '/ccw-melbourne' },
   { label: 'CCW Sydney', href: '/ccw-sydney' },
-  { label: 'CCW Materials', href: '/ccw-training/workshop?section=materials' },
+  { label: 'Workshop Materials', href: '/workshops/carpet-cleaning#materials' },
 ];
 
 /**

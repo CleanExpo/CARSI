@@ -68,7 +68,7 @@ const CATALOGUE: CourseListItem[] = [
 async function generate(
   read: Partial<LlmsCatalogueRead> | (() => Promise<LlmsCatalogueRead>) = {},
   subscriptions = true,
-  extra: Partial<Pick<LlmsTxtDeps, 'now' | 'events'>> = {}
+  extra: Partial<Pick<LlmsTxtDeps, 'now' | 'events' | 'referenceCounts'>> = {}
 ): Promise<Response> {
   const readCatalogue =
     typeof read === 'function'
@@ -271,7 +271,8 @@ describe('llms.txt is generated from its sources (drift)', () => {
   });
 
   it('the generated text passes the terminology, compliance and standards-claim scanners', async () => {
-    const text = await (await generate()).text();
+    const text = await (await generate({}, true, { referenceCounts: { 'mould-core': 3 } })).text();
+    expect(text).toContain('## Course references');
     const lines = text.split('\n');
     expect(lines.flatMap((l) => terminologyFindings('public/llms.txt', l))).toEqual([]);
     expect(lines.flatMap((l) => standardsFindings(l))).toEqual([]);
@@ -287,6 +288,13 @@ describe('llms.txt is generated from its sources (drift)', () => {
         terms: 'Access to all published courses for one learner for a year.',
       },
       cecCourses: [],
+      referenceCourses: [
+        {
+          slug: 'water-damage-essentials',
+          title: 'Water Damage Restoration — Essentials',
+          referenceCount: 3,
+        },
+      ],
     });
     expect(complianceFindings('src/lib/seo/llms-txt.ts', prose)).toEqual([]);
   });
@@ -368,7 +376,7 @@ describe('llms.txt events come from the event records', () => {
     expect(text).not.toMatch(/free entry/i);
     expect(text).not.toMatch(/current dates/i);
     expect(text).not.toContain('Old Day - Sydney');
-    expect(text).toContain('- /events/ccw-roadshow — CARSI x CCW Business Growth Days event page');
+    expect(text).toContain('- /events/ccw-roadshow — CARSI Business Growth Days event page');
   });
 
   it('event: the real event list on the review date (all ended) makes no event claim', async () => {
@@ -401,6 +409,52 @@ describe('llms.txt events come from the event records', () => {
       now: new Date(new Date(FUTURE_FREE.endDateIso).getTime() - 30_000),
     });
     expect(sMaxAge(res.headers.get('Cache-Control'))!).toBeLessThan(30);
+  });
+});
+
+/** BACKLOG #22: llms.txt points answer engines at each course page's References section. */
+describe('llms.txt course references', () => {
+  it('lists only published public courses that carry references, with their counts', async () => {
+    const text = await (
+      await generate({}, true, {
+        referenceCounts: {
+          'mould-core': 7,
+          'water-damage-essentials': 1,
+          [FLOOR_CARE_ONBOARDING_SLUG]: 4, // no public page
+          'draft-course-not-in-catalogue': 9, // not published
+          [current.slug]: 0, // carries none
+        },
+      })
+    ).text();
+    const section = text.split('## Course references\n')[1]?.split('\n## ')[0] ?? '';
+    expect(section).toContain(
+      '- [Mould Remediation — Core](/courses/mould-core#references) — 7 sources cited'
+    );
+    expect(section).toContain(
+      '- [Water Damage Restoration — Essentials](/courses/water-damage-essentials#references) — 1 source cited'
+    );
+    expect(section).not.toContain(FLOOR_CARE_ONBOARDING_SLUG);
+    expect(section).not.toContain('draft-course-not-in-catalogue');
+    expect(section).not.toContain(`/courses/${current.slug}#`);
+    expect(section.split('\n').filter((l) => l.startsWith('- ['))).toHaveLength(2);
+  });
+
+  it('no course with references → no References section and no claim about one', async () => {
+    const text = await (await generate({}, true, { referenceCounts: {} })).text();
+    expect(text).not.toContain('## Course references');
+    expect(text).not.toContain('#references)');
+    expect(text).not.toContain('References section of its page');
+  });
+
+  it('defaults to the committed index: a real published course with references is listed', async () => {
+    const res = await generate({
+      items: [
+        course('water-damage-restoration-fundamentals', 'Water Damage Restoration Fundamentals'),
+      ],
+    });
+    expect(await res.text()).toMatch(
+      /\(\/courses\/water-damage-restoration-fundamentals#references\) — \d+ sources cited/
+    );
   });
 });
 
@@ -511,6 +565,7 @@ describe('llms.txt number provenance is structural', () => {
         expiresAt: '2031-07-08T00:00:00.000Z',
       },
     ],
+    referenceCourses: [{ slug: 'course-c', title: 'Course C', referenceCount: 14 }],
     events: [
       {
         title: 'Growth Day',
@@ -538,6 +593,9 @@ describe('llms.txt number provenance is structural', () => {
     'cec.course.slug': ['course-a', 'course-b'],
     'cec.course.approvedHours': ['9', '11'],
     'cec.course.expiresAt': ['2031-05-06', '2031-07-08'],
+    'references.course.title': ['Course C'],
+    'references.course.slug': ['course-c'],
+    'references.course.count': ['14'],
     'events.title': ['Growth Day'],
     'events.venue': ['Venue Hall, Suburb QLD 4000'],
     'events.startDate': ['2031-03-03'],

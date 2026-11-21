@@ -8,7 +8,7 @@
  * passing attempt on EVERY seeded course quiz, so an unlinked quiz is both
  * unopenable and a permanent block on completion.
  *
- * This test reads the real seed files (the same ones scripts/seed-courses-catalog.ts
+ * This test reads the real seed files (the same ones scripts/import-course-safe.ts
  * and scripts/seed-all-quizzes.ts write to the database) and walks the real path:
  * a lesson resolves to the quiz id, the quiz sits in the learner curriculum, a
  * fully correct attempt passes, and completion is reached only after that pass.
@@ -68,7 +68,10 @@ vi.mock('@/lib/prisma', () => ({
     lmsEnrollment: {
       findUnique: vi.fn(async () => state.enrollment),
       update: vi.fn(async (args: { data: { status: string; completedAt: Date | null } }) => {
-        state.enrollment = { ...(state.enrollment as NonNullable<typeof state.enrollment>), ...args.data };
+        state.enrollment = {
+          ...(state.enrollment as NonNullable<typeof state.enrollment>),
+          ...args.data,
+        };
         return state.enrollment;
       }),
       // recordFirstCompletion (GP-659).
@@ -102,7 +105,8 @@ describe('free ozone/hydroxyl course: the knowledge check is reachable', () => {
 
   it('a lesson in the learner curriculum resolves to the seeded quiz id', () => {
     const linked = lessons.filter(
-      (l) => extractQuizIdFromLesson(l.contentType, l.contentBody, l.resources ?? []) === quiz.quizId,
+      (l) =>
+        extractQuizIdFromLesson(l.contentType, l.contentBody, l.resources ?? []) === quiz.quizId
     );
     expect(linked).toHaveLength(1);
     // seed-all-quizzes.ts reports the lesson by title; it must name the linking lesson.

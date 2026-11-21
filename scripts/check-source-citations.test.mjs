@@ -9,7 +9,10 @@
  *
  * Guards the classification itself, since that is where a wrong answer is invisible.
  */
-import { readFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
 
 const reg = JSON.parse(readFileSync('data/seed/source-registry.json', 'utf8'));
 const tierOf = new Map(reg.sources.map((s) => [s.domain.toLowerCase(), s.tier]));
@@ -75,6 +78,75 @@ if (!authoritative('safeworkaustralia.gov.au')) {
 if (!/nominative/i.test(JSON.stringify(reg.rules) + JSON.stringify(reg.sources))) {
   console.error('✖ registry no longer records the IICRC nominative-only rule');
   failed++;
+}
+
+// GP-718: draft courses live under data/courses/<slug>/v1-draft/ until promoted. A citation that
+// exists only in a draft must be scanned, so an unvetted domain there fails --enforce.
+{
+  const here = resolve('scripts/check-source-citations.mjs');
+  const dir = mkdtempSync(join(tmpdir(), 'source-citations-drafts-'));
+  try {
+    mkdirSync(join(dir, 'data/seed'), { recursive: true });
+    writeFileSync(
+      join(dir, 'data/seed/source-registry.json'),
+      JSON.stringify({
+        rules: ['IICRC is nominative only'],
+        sources: [{ domain: 'safeworkaustralia.gov.au', tier: 1 }],
+        assetHosts: { domains: ['carsi.com.au'] },
+      })
+    );
+    const draft = join(dir, 'data/courses/draft-course/v1-draft');
+    mkdirSync(draft, { recursive: true });
+    writeFileSync(
+      join(draft, 'research-pack.md'),
+      'See https://www.safeworkaustralia.gov.au/x and https://unvetted-draft-only.example/y'
+    );
+    const run = (args) => {
+      try {
+        return {
+          status: 0,
+          out: execFileSync(process.execPath, [here, ...args], {
+            cwd: dir,
+            encoding: 'utf8',
+            stdio: 'pipe',
+          }),
+        };
+      } catch (e) {
+        return { status: e.status, out: String(e.stdout) };
+      }
+    };
+    const enforced = run(['--enforce']);
+    if (enforced.status !== 1) {
+      console.error(
+        `✖ an unvetted domain cited only in a v1-draft course must fail --enforce (exit ${enforced.status})`
+      );
+      failed++;
+    }
+    const json = run(['--json']);
+    let scanned;
+    try {
+      scanned = JSON.parse(json.out).scanned;
+    } catch {
+      scanned = undefined;
+    }
+    if (!scanned || scanned.draftFiles !== 1 || scanned.files !== 1) {
+      console.error(
+        `✖ --json must report scanned files including drafts, got ${JSON.stringify(scanned)}`
+      );
+      failed++;
+    }
+    // Fail closed: a scan that finds no content files (only the registry) is not a pass.
+    rmSync(join(dir, 'data/courses'), { recursive: true, force: true });
+    const empty = run([]);
+    if (empty.status !== 2) {
+      console.error(
+        `✖ a scan that reads only the registry must exit 2, not pass (exit ${empty.status})`
+      );
+      failed++;
+    }
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 }
 
 if (failed > 0) {

@@ -12,7 +12,7 @@ vi.mock('@/lib/server/course-prerequisites', async (original) => ({
 }));
 vi.mock('@/lib/server/upstream-api', () => ({ getUpstreamBaseUrl: mocks.upstream }));
 vi.mock('@/lib/admin/admin-panel-access', () => ({ isLmsClaimsAllowedAdminPanel: mocks.admin }));
-vi.mock('@/lib/server/enrollment-service', () => ({ ensureAdminEnrollmentForCourse: mocks.grant,
+vi.mock('@/lib/server/enrollment-service', () => ({ ensureStaffEnrollmentForLesson: mocks.grant,
   getCourseIdForLesson: mocks.course, getLessonContextForStudent: mocks.context, patchLessonProgress: mocks.patch }));
 import { PATCH } from '../../../app/api/lms/lessons/[lessonId]/progress/route';
 
@@ -65,7 +65,8 @@ describe('progress expected learner identity', () => {
   it('preserves headerless local administrator bootstrap and completion', async () => {
     mocks.admin.mockReturnValue(true);
     expect((await PATCH(request(null), ctx)).status).toBe(200);
-    expect(mocks.grant).toHaveBeenCalledExactlyOnceWith({ sub: studentId }, 'course');
+    // Staff bootstrap now decides admin/instructor access inside the service, keyed by lesson.
+    expect(mocks.grant).toHaveBeenCalledExactlyOnceWith({ sub: studentId }, lessonId);
     expect(mocks.patch).toHaveBeenCalledTimes(1);
   });
 });

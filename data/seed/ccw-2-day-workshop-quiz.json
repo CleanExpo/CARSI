@@ -1,0 +1,1395 @@
+{
+  "version": 1,
+  "courseSlug": "ccw-2-day-workshop",
+  "quizzes": [
+    {
+      "quizId": "9e556294-9c3b-529e-a9cf-80f2c5936887",
+      "lessonTitle": "Safety you do not negotiate",
+      "title": "Module 1 Knowledge Check: Welcome to the Workshop: Safety and Standards",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Which standard is the primary reference for cleaning carpet and other textile floor coverings?",
+          "options": [
+            "ANSI/IICRC S220",
+            "ANSI/IICRC S500",
+            "ANSI/IICRC S700",
+            "ANSI/IICRC S100"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        },
+        {
+          "questionText": "A kitchen flood has left Category 3 (grossly contaminated) water in a carpet. What should you do?",
+          "options": [
+            "Clean it with a hot water extraction pass and acid rinse",
+            "Use a much stronger pre-spray, then extract the whole area twice",
+            "Dry it with airmovers first, then clean it as normal afterwards",
+            "Stop, photograph it, document it and refer it to a restorer"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        },
+        {
+          "questionText": "How should every decanted chemical container be labelled?",
+          "options": [
+            "The product name written on the lid",
+            "Just the date and the operator's initials",
+            "The product, the hazard and the date",
+            "No label is needed for same-day use"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "What do you do with the test button on the RCD protecting a portable extractor?",
+          "options": [
+            "Press it once a year at the service",
+            "Press it at the start of every job",
+            "Never press it, because it trips the power",
+            "Press it only after a fault has occurred"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Where must a Safety Data Sheet be kept for each hazardous chemical you use?",
+          "options": [
+            "Filed away in the office",
+            "On site, in the vehicle",
+            "Held on the supplier's website",
+            "Left with the customer afterwards"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Why do you wear hearing protection around a truck-mount?",
+          "options": [
+            "They give off harmful fumes during every job",
+            "They shake the floor and loosen the tiles",
+            "The law requires it only for truck-mount operators",
+            "Truck-mounts are loud, typically 85 dBA or more"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        },
+        {
+          "questionText": "Soot on a carpet after a fire is best handled by:",
+          "options": [
+            "Referring the job to a restorer",
+            "A single hot water extraction pass",
+            "A strong alkaline pre-spray and agitation",
+            "A dry absorbent compound and vacuum"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "quizId": "b2d367f6-4c93-5411-8c51-ee40c0e77f3e",
+      "lessonTitle": "The fibre fence and the weakest-member rule",
+      "title": "Module 2 Knowledge Check: Fibre Science",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Which fibre family does wool belong to?",
+          "options": [
+            "Synthetic",
+            "Cellulosic",
+            "Mineral",
+            "Protein"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        },
+        {
+          "questionText": "A tuft burns slowly, self-extinguishes, leaves crushable black ash and smells like burnt hair. It is most likely:",
+          "options": [
+            "Nylon",
+            "Wool",
+            "Polyester",
+            "Olefin"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "A tuft melts to a hard grey bead and smells like celery. It is most likely:",
+          "options": [
+            "Polyester",
+            "Nylon",
+            "Wool",
+            "Cotton"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Which fibre floats in cool water?",
+          "options": [
+            "Nylon (polyamide)",
+            "Wool (keratin)",
+            "Olefin (polypropylene)",
+            "Silk (fibroin)"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "What is the maximum pH for nylon in this course?",
+          "options": [
+            "7",
+            "8",
+            "10",
+            "12"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "What is the maximum water temperature for wool in the CARSI fibre table?",
+          "options": [
+            "20 °C",
+            "40 °C",
+            "60 °C",
+            "80 °C"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "You are cleaning an 80 per cent wool, 20 per cent nylon carpet. Which fibre decides the chemistry?",
+          "options": [
+            "Nylon, because it is the cheaper fibre",
+            "Wool, because the more delicate fibre governs",
+            "Whichever fibre has the greater surface area",
+            "Neither, because any pre-spray can be used"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Roughly how much strength can rayon lose when wet, according to the manual?",
+          "options": [
+            "Less than 5 per cent",
+            "Close to 20 per cent",
+            "No strength loss at all",
+            "Up to 70 per cent"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "quizId": "4e4972a7-6359-53b9-9a43-5c46a3e1065e",
+      "lessonTitle": "Product starting points and chemistry safety",
+      "title": "Module 3 Knowledge Check: Chemistry of Cleaning",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "What does CHAT stand for?",
+          "options": [
+            "Cleaning, Heating, Airflow, Timing",
+            "Chemistry, Humidity, Airflow, Temperature",
+            "Chemistry, Heat, Agitation, Time",
+            "Contact, Heat, Agitation, Treatment"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "What is the pH ceiling for nylon?",
+          "options": [
+            "8",
+            "10",
+            "12",
+            "14"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Which surfactant family damages the acid-dye blockers on nylon?",
+          "options": [
+            "Anionic",
+            "Non-ionic",
+            "Cationic",
+            "Amphoteric"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "What final substrate pH should you aim for after extraction?",
+          "options": [
+            "2.0 to 4.0",
+            "6.5 to 8.0",
+            "4.5 to 5.5",
+            "9.0 to 10.0"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "A pH strip dipped in your pre-spray bottle tells you:",
+          "options": [
+            "The pH of the chemistry the fibre is still holding",
+            "The final rinse pH of the carpet after extraction finishes",
+            "The chemistry of the bottle, not what the fibre holds",
+            "The dwell time needed before you start the extraction pass"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "What is the WoolSafe criterion for an alkaline pre-spray based on?",
+          "options": [
+            "Alkalinity (buffering), not pH alone",
+            "Neutral pH reading of 7",
+            "The final water temperature used",
+            "The colour of the product"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "Which soil class is removed mainly by vacuuming and pile-lifting?",
+          "options": [
+            "Water-soluble soil such as sugar and salt",
+            "Solvent-soluble soil such as grease and oil",
+            "Insoluble soil such as sand and grit",
+            "Protein soil such as blood and milk"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "Which pair must never be mixed?",
+          "options": [
+            "An acid and chlorine",
+            "Two diluted pre-sprays together",
+            "Enzyme and cool water",
+            "Pre-spray and fresh water"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "quizId": "2f4e1341-17ce-5843-a376-c3f9b48ee90a",
+      "lessonTitle": "The pre-inspection form and the four stations",
+      "title": "Module 4 Knowledge Check: The Five Cleaning Principles",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Which is Principle 3 of the five cleaning principles?",
+          "options": [
+            "Extraction of suspended soil",
+            "Vacuuming of dry soil",
+            "Drying of the carpet",
+            "Pile setting and grooming"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "Why is Principle 1 never skipped?",
+          "options": [
+            "It is the only principle that uses any chemistry",
+            "Skipping it grinds grit into the yarn during suspension",
+            "It makes the carpet dry faster than any step",
+            "It is optional on most residential jobs and rentals"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "About how long should most pre-sprays dwell on the fibre?",
+          "options": [
+            "Less than 30 seconds",
+            "At least 45 minutes",
+            "5 to 10 minutes",
+            "Until it is dry"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "In the dry-stroke technique the typical trigger-to-vacuum ratio is:",
+          "options": [
+            "1:1, with every single stroke fully wet",
+            "1:2, with half the stroke vacuum only",
+            "2:1, with most of the stroke wet",
+            "No trigger used during the whole stroke"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "How much should wand strokes overlap?",
+          "options": [
+            "No overlap at all",
+            "About 75 per cent",
+            "About 100 per cent",
+            "About 25 per cent"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        },
+        {
+          "questionText": "What is the CARSI residential drying target?",
+          "options": [
+            "Safe to walk on within 30 minutes, fully dry within 2 hours",
+            "Safe to walk on within 12 hours, fully dry within 48 hours",
+            "No target is needed for walking on it or for full drying",
+            "Safe to walk on within 2 hours, fully dry within 12 hours"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        },
+        {
+          "questionText": "What is the commercial drying target?",
+          "options": [
+            "Back in service in 8 hours or less",
+            "Back in service within 15 minutes of finishing",
+            "Back in service within 3 days of finishing",
+            "Back in service within 30 days of finishing"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "When do you complete the top half of the pre-inspection form?",
+          "options": [
+            "After the extraction pass is finished",
+            "On completion of the whole job",
+            "Only if the customer requests it",
+            "Before any chemistry touches the fibre"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "quizId": "b4a02534-9208-54ee-b9c8-61ca4fdd6bb5",
+      "lessonTitle": "The six-bottle spotting kit and chemical safety",
+      "title": "Module 5 Knowledge Check: Spot and Stain Removal",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "What is the difference between a spot and a stain?",
+          "options": [
+            "A spot is always much darker than any stain",
+            "A stain is always removable with the right chemistry",
+            "A stain has permanently altered the fibre's dye structure",
+            "There is no real difference between the two terms"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "Which stain class does coffee belong to?",
+          "options": [
+            "Tannin",
+            "Protein",
+            "Oil-soluble",
+            "Insoluble"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "What do you do first with a fresh spill?",
+          "options": [
+            "Rub it hard first",
+            "Apply hot water first",
+            "Blot it, never rub",
+            "Spray a strong alkaline"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "You have treated a stain with appropriate chemistry three times and it has not visibly improved. What now?",
+          "options": [
+            "Try a stronger alkaline until it works",
+            "Keep treating it until the fibre breaks",
+            "Quietly walk away without telling the customer",
+            "Stop and disclose honestly to the customer"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        },
+        {
+          "questionText": "Aged pet urine can reach what pH, and what do you try first?",
+          "options": [
+            "pH 3 to 4; an alkaline-side spotter first",
+            "pH 7 to 8; hot water extraction first",
+            "pH 13 to 14; a chlorine bleach first",
+            "pH 10 to 12; an acid-side spotter first"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        },
+        {
+          "questionText": "Which combination must never be mixed?",
+          "options": [
+            "An enzyme spotter and cool water",
+            "A POG solvent and dry cloth",
+            "Two blots of the same spotter",
+            "An acid spotter and chlorine bleach"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        },
+        {
+          "questionText": "Why does the oxidiser stay apart from the reducing agent?",
+          "options": [
+            "They turn the whole carpet a deep blue colour",
+            "They only work properly on silk and wool fibres",
+            "They combine to become a much stronger pre-spray mix",
+            "They cancel each other and can give off heat"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        },
+        {
+          "questionText": "When should you reinspect a treated stain?",
+          "options": [
+            "Straight away, because stains can never wick back",
+            "After 6 months, because dye migrates very slowly",
+            "After 24 hours, because some stains wick back",
+            "Never, because a treated stain cannot change again"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "quizId": "de7a1840-a4b9-5b7c-911b-9ffbd446d565",
+      "lessonTitle": "The four-test pre-inspection",
+      "title": "Module 6 Knowledge Check: Upholstery Theory: Fibre and Fabric Construction",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Which construction type is known to distort, crush or watermark under moisture?",
+          "options": [
+            "Plain woven cotton drill, denim, twill and other sturdy fabrics",
+            "Stable constructions such as tightly woven synthetics, microfibre and canvas",
+            "No fabric construction is affected by moisture in any way",
+            "Non-durable constructions such as velvet and chintz, or quilted fabrics"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        },
+        {
+          "questionText": "What does a cleaning code of X mean?",
+          "options": [
+            "Water-based cleaning permitted",
+            "Solvent cleaning permitted",
+            "Professional vacuuming only",
+            "Steam cleaning permitted"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "A tag says W. What should you still do?",
+          "options": [
+            "Pre-test with the four tests",
+            "Skip tests, W is safe",
+            "Switch to solvent cleaning instead",
+            "Add a much stronger pre-spray"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "What does a code of S allow?",
+          "options": [
+            "Water-based cleaning only",
+            "Water or solvent",
+            "No cleaning allowed",
+            "Solvent-based cleaning only"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        },
+        {
+          "questionText": "What are the four pre-inspection tests?",
+          "options": [
+            "Bleed, crock, shrink, distortion",
+            "Bleed, brush, soak, rinse",
+            "Burn, float, melt, weigh",
+            "Vacuum, spray, extract, dry"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "How large is the shrink-test patch, and when is it read?",
+          "options": [
+            "About 500 by 500 mm, read at 5 minutes",
+            "About 50 by 50 mm, read at 2 hours",
+            "About 50 by 50 mm, read at 24 hours",
+            "About 5 by 5 mm, read at 1 week"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "How much strength can rayon lose when wet, according to the manual?",
+          "options": [
+            "Up to 70 per cent",
+            "Less than 2 per cent",
+            "Rayon keeps all its strength",
+            "It gains some strength wet"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "If one of the four tests fails you should:",
+          "options": [
+            "Clean anyway and apologise afterwards",
+            "Stop and reassess the method",
+            "Double the chemistry and proceed",
+            "Add heat and keep going"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "quizId": "72586e53-5637-5ba7-a63e-c5ebe453555b",
+      "lessonTitle": "Speed-drying and the hands-on rotation",
+      "title": "Module 7 Knowledge Check: Upholstery Hands-On",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Which upholstery method is best for S-code fabric and oily soil?",
+          "options": [
+            "Wet shampoo",
+            "Dry solvent",
+            "Water extraction",
+            "Dry foam"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Why is no live steam used on upholstery?",
+          "options": [
+            "It can damage adhesives and glues, and collapse latex foam",
+            "It always shrinks cotton fabric and causes severe dye bleeding",
+            "It leaves no residue, so it is the safest choice",
+            "It is cheaper than hot water and far more convenient"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "What CARSI jet temperature is recommended on olefin?",
+          "options": [
+            "60 degrees Celsius",
+            "100 degrees Celsius",
+            "130 degrees Celsius",
+            "160 degrees Celsius"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "Which tool tier is the fastest and over-wets the least?",
+          "options": [
+            "A standard hand tool",
+            "Air-driven or external-jet tool",
+            "A bucket and cloth",
+            "A stainless hand wand"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Where do you point the air when speed-drying upholstery?",
+          "options": [
+            "Straight down into the cushion seam",
+            "Out toward the nearest open window",
+            "Across the fabric, not into it",
+            "Nowhere, the fabric dries by itself"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "What is the hand-dry target on sturdy W-code fabric?",
+          "options": [
+            "Within 20 minutes",
+            "Within 2 hours",
+            "Within 12 hours",
+            "Within 2 days"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Which method leaves residue if not rinsed and is rarely a first choice today?",
+          "options": [
+            "Encapsulation",
+            "Extraction",
+            "Shampoo",
+            "Solvent"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "Above what relative humidity should you open a window or run a dehumidifier on an upholstery job?",
+          "options": [
+            "10 per cent",
+            "30 per cent",
+            "60 per cent",
+            "95 per cent"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "quizId": "07dea587-c097-5083-aada-3b1884c3494c",
+      "lessonTitle": "Cleaning starters by floor type",
+      "title": "Module 8 Knowledge Check: Hard Floors",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Which of these is calcareous and etched by acid?",
+          "options": [
+            "Granite",
+            "Porcelain",
+            "Vinyl",
+            "Marble"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        },
+        {
+          "questionText": "What does fizzing with a drop of distilled white vinegar tell you?",
+          "options": [
+            "The stone is siliceous, so acid is safe",
+            "The stone is calcareous, so never use acid",
+            "The stone is sealed, so it is waterproof",
+            "The stone is dry, so cleaning can start"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "A non-destructive inspection allows you to:",
+          "options": [
+            "Measure and observe, then document and photograph",
+            "Pry up several floor boards to check",
+            "Chip a small piece off the tile",
+            "Gouge the sealer to test its depth"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "What is the weak point of ceramic tile flooring?",
+          "options": [
+            "The grout",
+            "The glaze",
+            "The tile",
+            "The subfloor"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "What happens to laminate joints that are saturated?",
+          "options": [
+            "They shrink up",
+            "Nothing at all",
+            "They turn glossy",
+            "They swell badly"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        },
+        {
+          "questionText": "Which cleaner starter suits marble?",
+          "options": [
+            "An acidic grout cleaner",
+            "A strong alkaline degreaser",
+            "A neutral-pH stone-safe cleaner",
+            "A diluted vinegar flush"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "What should every inspection photograph have?",
+          "options": [
+            "A date, a scale reference and a caption",
+            "A filter, a border and a large watermark",
+            "Just the customer's name and the street address",
+            "Nothing, as one photo per job is enough"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "What does the guide say about the supplier's hard-floor chemistry range in April 2026?",
+          "options": [
+            "It stocks every stone product, so you can simply ask the counter",
+            "It does not sell any chemistry, so buy online from any retailer",
+            "It is carpet-and-upholstery focused, so ask the counter or a specialist supplier",
+            "It sells only acid cleaners, so use them on all natural stone"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "quizId": "bb9f8ee7-b958-5355-927d-a1e68113dc3b",
+      "lessonTitle": "Truck-mount schedule, hours card and machine log",
+      "title": "Module 9 Knowledge Check: Machinery and Preventive Maintenance",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "A Razorback Balboa 700 Auto ships with a single 10 amp cord. What cord rating do the larger TRACTX units ship with?",
+          "options": [
+            "5 amp",
+            "20 amp",
+            "15 amp",
+            "32 amp"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "At how many hours do you change the oil on a Kohler EFI truck-mount engine with the extended programme, and what is the trap?",
+          "options": [
+            "Every 8 hours; applying that interval to a modern EFI engine that needs changes at around 3000 hours",
+            "Every 3000 hours; applying that interval to a diesel engine that needs changes at 25 to 50 hours",
+            "Every 300 hours; applying that interval to a non-EFI engine that needs changes at 50 to 100 hours",
+            "Every 300 hours; there is no trap because every engine in the workshop accepts that same oil interval"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "New vacuum motor brushes measure about 25 mm. At what length do you condemn them, and why replace before they fail?",
+          "options": [
+            "About 1 mm; brushes keep working until almost nothing is left, and replacing them early wastes money for no good reason at all",
+            "About 15 mm; a worn brush cannot be measured accurately, so you replace the whole set only after the motor itself completely fails",
+            "About 8 mm; because a new brush set makes the motor run quieter and use noticeably less power during every hour of work",
+            "About 8 mm; a worn brush arcs, pits the windings and writes off a motor that costs ten to fifteen times as much"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        },
+        {
+          "questionText": "What household liquid, at about 1 L to 8 L of water, do you flush quarterly through a portable's solution system, and why?",
+          "options": [
+            "Household bleach, to disinfect the whole solution tank",
+            "White vinegar, to remove alkaline and hard-water scale",
+            "Cooking oil, to lubricate the pump and seals",
+            "Fabric softener, to scent and soften the lines"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "A dual-heat portable still runs but jobs need more dwell each month. What silent fault do you suspect?",
+          "options": [
+            "A blocked jet screen, prevented by cleaning the filter every week",
+            "A worn wand hose, prevented by greasing the fittings every week",
+            "A scaled heat exchanger coil, prevented by the quarterly vinegar flush",
+            "An empty chemical bottle, prevented by checking the level every morning"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "Which daily task most directly protects a portable's vacuum motors from water damage?",
+          "options": [
+            "Cleaning the vacuum inlet filter and checking the float ball moves freely",
+            "Wiping down the outside of the machine and the wand and hoses",
+            "Greasing the wheels and checking that all four castors still turn freely",
+            "Rewinding the cord tightly and checking the plug pins are not bent"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "How long is the daily checklist meant to take before the first job?",
+          "options": [
+            "About 3 minutes",
+            "About 3 hours",
+            "About 3 days",
+            "It is optional"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "quizId": "8d1e6fdf-f369-5e21-a015-362f18624e08",
+      "lessonTitle": "Complaint scripts",
+      "title": "Module 10 Knowledge Check: The Business of Cleaning",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "How many cost lines make up a job, and which one is what you take home?",
+          "options": [
+            "Three; direct labour",
+            "Four; fuel costs",
+            "Six; profit margin",
+            "Ten; fixed overhead"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "Which pricing model is the default for commercial work?",
+          "options": [
+            "Per square metre",
+            "Per room cleaned",
+            "Per window pane",
+            "Per cleaning vehicle"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "What does a minimum call-out cover?",
+          "options": [
+            "Only large commercial contracts and long-term maintenance agreements",
+            "Low-value jobs and protection of busy time slots",
+            "Nothing extra, because it works as a discount",
+            "Only upholstery work, rugs and other specialist jobs"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "A callback rate above 6 per cent usually means:",
+          "options": [
+            "You are paying for rework out of your margin and the process needs fixing",
+            "You are over-delivering to every customer and your process is already working very well",
+            "You have the perfect price and your margin is fully protected from any rework",
+            "You should stop vacuuming first because it causes all the callbacks and extra rework"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "A callback rate below 1 per cent often means:",
+          "options": [
+            "You may be over-delivering and under-charging",
+            "You may be significantly overpriced overall",
+            "Customers may dislike your whole service",
+            "Wicking has now been completely solved"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "For how long may carpet stay damp to the touch, according to the sample addendum?",
+          "options": [
+            "Up to 1 hour",
+            "Up to 5 days",
+            "Up to 12 hours",
+            "No damp at all"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "In the wicking script, what does the technician explain?",
+          "options": [
+            "Deeper soil moves up as the carpet dries, so the stain was deeper than it looked",
+            "The carpet was never cleaned properly, so the stain was always going to come back again",
+            "The customer caused the stain by walking on the damp carpet, so it is their responsibility",
+            "It will never come back, because the stain was fully removed from the carpet and backing"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "What should you say about the free reinspection line in the wicking script?",
+          "options": [
+            "Always say it, whatever your actual business policy is",
+            "Say it only if it is your actual policy",
+            "Never mention reinspection to customers, whatever your policy is",
+            "Offer a full refund instead of any free reinspection"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "quizId": "7a5bf1f1-f950-5dc6-8856-6a04c1fae40e",
+      "lessonTitle": "Running a case, in the room and on your own",
+      "title": "Module 11 Knowledge Check: Expert Board Case Review",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "How many stages does the council review have?",
+          "options": [
+            "Two",
+            "Three",
+            "Five",
+            "Seven"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "What happens in Stage 1?",
+          "options": [
+            "Each member gives an independent 60-second opinion with no cross-talk",
+            "The Chair gives the final answer and members then agree",
+            "Members rank each other by name and seniority in turn",
+            "The case is voted on immediately by every member present"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "What happens in Stage 2?",
+          "options": [
+            "Members swap seats and then repeat their opinions in a new order",
+            "Opinions are deleted unread so that the Chair can start again fresh",
+            "The trainer decides the final outcome and the other members stay silent",
+            "Opinions are anonymised, ranked from 1 to 6 and weaknesses are flagged"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        },
+        {
+          "questionText": "Who combines the strongest points into one recommendation?",
+          "options": [
+            "The Inspector",
+            "The Coach",
+            "The customer",
+            "The Chairperson"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        },
+        {
+          "questionText": "Why are the personas composite archetypes?",
+          "options": [
+            "They are all the same person playing several very different professional roles",
+            "They are fictional customers invented to test how every technician will respond",
+            "No quote or opinion should be attributed to any specific living person",
+            "The law requires it because every persona must be reviewed by lawyers"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "Which role says \"If you did not photograph it, it did not happen\"?",
+          "options": [
+            "The Engineer",
+            "The Principal",
+            "The Chair",
+            "The Inspector"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        },
+        {
+          "questionText": "How can a working cleaner use the council alone?",
+          "options": [
+            "Ignore it completely and rely on your own gut feeling for every job",
+            "Ask the customer to vote on every viewpoint, then follow the winning majority",
+            "Write the seven viewpoints on cards, spend 60 seconds on each, then synthesise",
+            "Only use the first card and skip all of the other six viewpoints"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "quizId": "8411c56d-5394-5984-8820-2a06b8dc0f44",
+      "lessonTitle": "Problem stains: ink, rust, turmeric, nail polish, wax or colour loss",
+      "title": "Module 12 Knowledge Check: Advanced Stain Removal",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "What is a chromophore, and how do oxidisers and reducing agents each switch it off?",
+          "options": [
+            "The part of a molecule that gives odour; oxidisers add water and reducers remove it",
+            "A type of brush head; oxidisers lift it away and reducers slowly soak it in",
+            "The part of a molecule that absorbs light; oxidisers add oxygen and reducers remove it",
+            "A type of surfactant molecule; oxidisers neutralise it chemically and reducers coat it in oil"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "Which stain do you deliberately apply heat to, and why is it dangerous on protein?",
+          "options": [
+            "Blood stains with an enzyme; heat dissolves protein and lifts it out",
+            "Tannin stains with an oxidiser; heat bleaches the dye and sets nothing",
+            "Grease with a solvent spotter; heat softens oil and lifts it out",
+            "Red dye with a reducing agent; heat cooks and permanently sets protein"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        },
+        {
+          "questionText": "A customer says a pet urine smell keeps coming back on rainy days. Why?",
+          "options": [
+            "Urine salts are hygroscopic, so damp air re-wets them and the odour returns",
+            "The carpet has grown new fibre that releases odour whenever the weather changes",
+            "Leftover detergent in the carpet reacts with the rain outside and releases odour",
+            "Rain soaks through the floor, washes the carpet and spreads the old odour"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "Which product treats rust, and what must you keep it away from?",
+          "options": [
+            "An oxalic-acid rust remover; calcareous stone such as marble",
+            "Chlorine bleach; protein fibres such as wool and silk",
+            "A solvent; plastic items such as bottles and trays",
+            "An enzyme; acid-dyed nylon such as most stain-resistant carpet"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "A white patch is where a cleaning product was spilled months ago. Is it a stain, and what fixes it?",
+          "options": [
+            "No, it is colour loss; colour repair or re-dyeing, or refer",
+            "Yes, it is a stain; a stronger oxidiser applied several times",
+            "Yes, it is a stain; an acid rinse then hot extraction",
+            "No, it is colour loss; nothing can restore any lost colour"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "What is the correct order for a set coffee stain on nylon?",
+          "options": [
+            "Aqueous spotter, acidic spotter, rinse, oxidiser, rinse-extract",
+            "Oxidiser, acidic spotter, aqueous spotter, rinse, extract",
+            "Rinse-extract, oxidiser, aqueous spotter, acidic spotter, rinse",
+            "Acidic spotter, oxidiser, rinse, aqueous spotter, rinse-extract"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "Which water temperature do you use on blood and other protein stains?",
+          "options": [
+            "Boiling hot water",
+            "Hot water first",
+            "Cool water only",
+            "Any water temperature"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "quizId": "31f2cb09-44ab-5a1e-b916-cc9045f6ee7d",
+      "lessonTitle": "Safety, the asbestos stop rule and pricing",
+      "title": "Module 13 Knowledge Check: Strip and Seal",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "Strip and seal suits which floor type, and name two you must never strip?",
+          "options": [
+            "Polished sealed timber or parquet floors; never terrazzo, ceramic tile, concrete, slate or porcelain tile",
+            "Polished marble or granite stone floors; never VCT, vinyl sheet, rubber tiles, linoleum or cork",
+            "Laminate floors or engineered timber boards; never vinyl sheet, rubber tiles, linoleum, cork or marble",
+            "Resilient floors such as VCT or vinyl sheet; never sealed timber, laminate or calcareous stone"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        },
+        {
+          "questionText": "A finish looks great for two weeks and then goes chalky and peels. Which step most likely failed?",
+          "options": [
+            "Step 1, the site walk-through, because the room was far too bright",
+            "Step 9, the final coat, because two coats are always too many",
+            "Step 3, the dry sweep, because the floor was swept clean first",
+            "Step 7, the neutral rinse, because stripper residue stops the finish bonding"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        },
+        {
+          "questionText": "What is the stripper chemically, and what does the neutral rinse do for the sealer?",
+          "options": [
+            "A strong acid; it dries the floor completely so the sealer can bond and cure",
+            "A strong alkali; it returns the floor to neutral so the sealer bonds and cures",
+            "A neutral cleaner; it adds gloss and shine so the sealer needs far fewer coats",
+            "A solvent blend; it scents the floor and removes any remaining wax or polish film"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "A 1970s community hall has a tiled resilient floor of unknown history. What do you do, and which hazard drives it?",
+          "options": [
+            "Strip it with extra stripper and extra rinsing, because it is probably fine",
+            "Sand it first to remove the old finish, because it is probably safe",
+            "Stop, do not disturb and refer for assessment, because it may contain asbestos",
+            "Seal over it quickly to trap any fibres, because it is probably stable"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "Why must the floor be bone dry before the first sealer coat?",
+          "options": [
+            "Water makes the sealer smell strongly for weeks",
+            "Trapped moisture clouds the finish and wrecks adhesion",
+            "The sealer needs a damp floor to level",
+            "It does not matter for any water-based sealer"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Name two site-safety controls that a carpet-only job would not need.",
+          "options": [
+            "Wet-floor signs with a cordon, and goggles for high-pH stripper",
+            "A hard hat and a harness, plus a safety line",
+            "A lifejacket and a flare, plus a whistle and compass",
+            "Ear defenders and a fire blanket, plus a first-aid kit"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "Which step comes immediately after you apply the stripper and let it dwell?",
+          "options": [
+            "Apply the first coat of sealer to the floor",
+            "Neutralise the floor with a clean neutral rinse solution",
+            "Agitate with a rotary machine and a stripping pad",
+            "Take final photographs of the floor and then leave"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "quizId": "2c28f66e-f412-5f34-9df7-784ddc2a288c",
+      "lessonTitle": "Further training, the honest script and what to track",
+      "title": "Module 14 Knowledge Check: Add-On Services",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "In one sentence, why does a second service on the same visit earn a higher margin than the first?",
+          "options": [
+            "The second service uses much cheaper chemistry, and the customer always pays a lower price",
+            "The customer pays double for any second service, and that doubled price is pure margin",
+            "The second service needs no labour at all, and so it always adds pure margin",
+            "The first service pays the fixed costs, and the second adds almost no new overhead"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        },
+        {
+          "questionText": "What separates a legitimate add-on from a prohibited pressure upsell, and which law matters?",
+          "options": [
+            "The legitimate one is always cheaper and quicker; the Fair Work Act",
+            "The legitimate one is always free of any charge; the Privacy Act",
+            "There is no difference between them; no law applies to either one",
+            "The legitimate one is inspection-led, honest, priced, optional; the Australian Consumer Law"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        },
+        {
+          "questionText": "Which type of further training backs deodorising as an add-on?",
+          "options": [
+            "Rug-cleaning training",
+            "Upholstery training",
+            "Odour-control training",
+            "Maintenance training"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "Which large, repeatable Australian job type is driven by the rental market, and what deliverable helps the tenant?",
+          "options": [
+            "Wedding venue cleaning, with a printed menu and a seating plan",
+            "Solar panel cleaning, with a dated warranty card and a brochure",
+            "End-of-lease carpet cleaning, with a dated and photographed report or receipt",
+            "Roof cleaning, with a dated certificate and a photographed insurance warranty"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "At what point should an add-on be found, and where is it recorded?",
+          "options": [
+            "Halfway through the clean, on a scrap of paper",
+            "After payment, by text message or an emailed invoice",
+            "At the inspection, on the pre-inspection or job sheet",
+            "At the next visit, in the office diary book"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "Which measure, tracked alongside callback rate, tells you whether your add-on habit is working?",
+          "options": [
+            "Number of cars owned",
+            "Hours of sleep nightly",
+            "Number of brochures printed",
+            "Average services per visit"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        },
+        {
+          "questionText": "Before wet extraction inside an enclosed vehicle, what must you remove first?",
+          "options": [
+            "Any fuel cell, tank or jerry can inside the vehicle",
+            "The rear seats and all of the removable seat covers",
+            "The windscreen wipers and the rear parcel shelf cover panel",
+            "The spare tyre and the boot jack and tool kit"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        },
+        {
+          "questionText": "Why is petrol vapour a special hazard in a vehicle footwell?",
+          "options": [
+            "It rises into the roof lining, so it collects high where you spray the fine pre-spray mist",
+            "It cleans carpet well, leaving the damp footwell fresh where you extract with a 230 V machine",
+            "It is only dangerous in cold winter weather, even when you extract with a 230 V machine",
+            "It is heavier than air, so it pools low where you extract with a 230 V machine"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "quizId": "a4f3b093-3a8c-5785-a878-b5421fff868c",
+      "lessonTitle": "What to film, how to measure and the compliance line",
+      "title": "Module 15 Knowledge Check: The Marketing Engine",
+      "passPercentage": 80,
+      "attemptsAllowed": 3,
+      "questions": [
+        {
+          "questionText": "In a 2026 home-services study, the Google Local Pack appeared in what share of searches, and how does it differ from paid ads?",
+          "options": [
+            "About 10 per cent; you buy it through paid ads only",
+            "About 50 per cent; it is free of any local rules",
+            "About 98 per cent; it is bought with paid search ads",
+            "About 98 per cent; you earn it rather than buy it"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        },
+        {
+          "questionText": "How do video views compare with photo views on Google Business Profiles, and what share of profiles use video?",
+          "options": [
+            "Photos are viewed about twice as often; about 90 per cent now use video",
+            "They are viewed about the same amount; none of the profiles ever use video",
+            "Videos are viewed about twice as often; only about 4 per cent use video",
+            "Videos are viewed about half as often; only about 4 per cent use video"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "Name the four accounts in the connected system. Which two must be linked so one post publishes to both?",
+          "options": [
+            "Email, Slack, text messages and phone calls; the email and the text messages",
+            "TikTok, X, Reddit and LinkedIn; the TikTok account and the X account together",
+            "YouTube, Wikipedia, a blog and radio; the blog and the local radio show",
+            "YouTube, Google Business Profile, Facebook Page and Instagram; Instagram and the Facebook Page"
+          ],
+          "correctIndex": 3,
+          "points": 1
+        },
+        {
+          "questionText": "What shot structure and maximum length does the course recommend for a video?",
+          "options": [
+            "A 5 minute intro, then 10 minutes of work, and then a long result shot; under 20 minutes",
+            "About 3 seconds of location, 15 to 20 seconds of work and a short result; under 30 seconds",
+            "About 5 seconds of a single photo, 10 seconds of caption and a short logo; under 1 minute",
+            "About 3 seconds of result shot, then 60 seconds of talking and a long outro; over 3 minutes"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Over what time window should you judge video marketing, and which actions do you track?",
+          "options": [
+            "One week; followers, likes, shares, comments, story views, emoji reactions and profile page visits",
+            "60 to 90 days; calls, website clicks, direction requests, form fills and lead quality",
+            "Three years; fax pages, letters, printed flyers, posters, brochures, radio adverts and street signage",
+            "One day; the colour of the logo, the font and the exact banner shade"
+          ],
+          "correctIndex": 1,
+          "points": 1
+        },
+        {
+          "questionText": "Under the Australian Consumer Law, which is a rule for before and after images and reviews?",
+          "options": [
+            "A stock image is fine for the after shot if it looks like the job",
+            "Reviews can be bought or traded for free cleans without ever telling anyone at all",
+            "Images must come from the same real job and any review incentive must be disclosed",
+            "Claims do not need to be true as long as the video looks very good"
+          ],
+          "correctIndex": 2,
+          "points": 1
+        },
+        {
+          "questionText": "Why were the 76 per cent and 46 per cent statistics left out?",
+          "options": [
+            "They were stale or out of context, or had no confirmable current source",
+            "They were too low to matter, so the course simply left them out",
+            "They were about another country's tax rules and nothing to do with video",
+            "They were never published in any report, so nobody could have quoted them"
+          ],
+          "correctIndex": 0,
+          "points": 1
+        }
+      ]
+    }
+  ]
+}

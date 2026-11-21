@@ -13,7 +13,7 @@ and high-traffic facilities.
 
 | Program | Folder | LMS course slug | Status |
 | --- | --- | --- | --- |
-| Professional Floor Care & Operational Readiness | [`floor-care/`](./floor-care/) | `floor-care-onboarding-operational-readiness` | Draft (publish via `floor-care/publish-runbook.md`) |
+| Professional Floor Care & Operational Readiness | [`floor-care/`](./floor-care/) | `floor-care-onboarding-operational-readiness` | Content: draft pending sign-off. **Catalogue: `published` / `isPublished: true`** — so a seed makes it live; see `floor-care/publish-runbook.md` for the go-live steps and the unresolved pricing/visibility discrepancy. |
 
 _More onboarding programs will sit under this brand as they are built._
 
@@ -23,9 +23,13 @@ _More onboarding programs will sit under this brand as they are built._
 - **What it covers:** organisation-wide access to the onboarding course(s) under this brand, no
   per-seat limit.
 - **Provisioning:** organisation subscription — provisioned for the client, not sold via individual
-  self-checkout. Recurring billing (Stripe subscription) is **not yet wired**; that is a separate build
-  (the course is `isFree`/`$0` in the catalogue so the UI never shows a misleading one-off price or
-  opens self-checkout). The real terms are recorded on the course in `meta.pricing`.
+  self-checkout. Recurring billing (Stripe subscription) is **not yet wired**, so those seats are
+  provisioned manually; that is a separate build. The subscription terms are recorded on the course
+  in `meta.pricing`.
+  The course also carries an **individual list price of A$99** (`isFree: false`,
+  `priceAud: "99"`) and is `published` in the catalogue — correct and settled per DECISIONS #55
+  (founder, 2026-11-21). An earlier note here said the catalogue should show `$0` so no one-off
+  price appeared; that is withdrawn.
 
 ## Branding convention (for future onboarding courses)
 

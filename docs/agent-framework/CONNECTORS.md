@@ -15,7 +15,8 @@ Everything funnels through one idempotent spine:
 
 ```
 external source ──▶ data/seed/courses-catalog.json ──▶ npm run db:seed-courses ──▶ Postgres
-   (WP / DOCX / TXT)        (JSON snapshot)            (idempotent upsert by slug)   (LmsCourse / LmsModule / LmsLesson)
+   (WP / DOCX / TXT)        (JSON snapshot)         (reconciling importer; needs   (LmsCourse / LmsModule / LmsLesson)
+                                                    --slug|--all and --apply)
 ```
 
 - **Idempotency key:** course `slug`. Seeding replaces a course's modules/lessons to match the
@@ -31,7 +32,8 @@ external source ──▶ data/seed/courses-catalog.json ──▶ npm run db:se
 
 | Connector | npm script | Source → Target |
 | --- | --- | --- |
-| `seed-courses-catalog.ts` | `db:seed-courses` | `data/seed/courses-catalog.json` → Postgres (idempotent upsert by slug) |
+| `import-course-safe.ts` | `db:seed-courses` (= `db:import-course`) | `data/seed/courses-catalog.json` → Postgres. Reconciles rather than replaces, so a lesson still in the catalogue keeps its row and its learner progress. Needs exactly one of `--slug=<slug>` / `--all`, and is a dry run until `--apply`. Refuses to delete learner progress or empty a curriculum without explicit consent. |
+| `seed-courses-catalog.ts` | `db:seed-courses-legacy` | The old delete-and-recreate path. Refuses to run without `--legacy-destructive-replace`; destroys learner progress for the courses it touches. Migration use only. |
 | `export-courses-catalog.ts` | `db:export-courses` (`-- --all`) | Postgres → `data/seed/courses-catalog.json` |
 | `seed-course-cec-hours.ts` | `db:seed-cec-hours` (`--overwrite`, `--dry-run`) | Backfills `lms_courses.cec_hours` via the CEC resolver; never overwrites existing values unless `--overwrite` |
 
@@ -147,7 +149,7 @@ The media connectors are consolidated and gated; the **ingest side has sprawled*
 1. **13 near-duplicate seeders.** The DOCX (6) and TXT (7) seeders each re-implement
    parse → normalise → Postgres upsert with copy-pasted logic and no shared adapter interface.
    A single `Connector` contract (`parse(file) → CatalogCourse[]`) feeding the canonical
-   `seed-courses-catalog` upsert would collapse them.
+   `import-course-safe` reconcile would collapse them.
 2. **Two write paths.** Catalogue + WP seeders go *through* `courses-catalog.json`; the DOCX/TXT
    seeders write *directly to Postgres*, so their content never round-trips into the snapshot and
    isn't covered by `db:export-courses`.

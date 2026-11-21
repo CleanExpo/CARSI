@@ -134,7 +134,10 @@ export function RegisterForm() {
               setError(message);
               toast({ title: message, variant: 'destructive' });
               window.setTimeout(() => {
-                window.location.href = `/courses/${encodeURIComponent(slug)}`;
+                window.location.href = new URL(
+                  `/courses/${encodeURIComponent(slug)}`,
+                  window.location.origin,
+                ).href;
               }, 1500);
               return;
             }

@@ -90,7 +90,7 @@ export function GrowthPathInfographic({ className = '' }: { className?: string }
                 </li>
                 <li className="flex items-center gap-1.5">
                   <Users className="h-3 w-3 text-[#a85500]" aria-hidden />
-                  CARSI × CCW events
+                  CARSI roadshow events
                 </li>
               </ul>
             </div>

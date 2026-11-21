@@ -109,7 +109,7 @@ async function fetchApi<T>(
       }
       // Refresh failed — redirect only from protected LMS routes (not /courses, /, etc.)
       if (typeof window !== 'undefined' && shouldRedirect401ToLogin()) {
-        window.location.href = '/login';
+        window.location.href = new URL('/login', window.location.origin).href;
       }
       throw new ApiClientError('Session expired', 401);
     }

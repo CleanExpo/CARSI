@@ -4,7 +4,6 @@ import { Check, Plus } from 'lucide-react';
 import Link from 'next/link';
 
 import { BusinessCoachingMonthlySubscribe } from '@/components/ccw/BusinessCoachingMonthlySubscribe';
-import { CoachingComingSoonBanner } from '@/components/ccw/CoachingComingSoonBanner';
 import {
   LANDING_DISPLAY_H2_CLASS,
   LANDING_EYEBROW_CLASS,
@@ -16,11 +15,9 @@ import {
   carsiCoachingProductName,
 } from '@/lib/marketing/carsi-coaching-monthly';
 import {
-  carsiCoachingAddOns,
-  carsiCoachingAddOnsComingSoon,
   carsiCoachingPortalPath,
   carsiCoachingMonthlyInclusions,
-  carsiCoachingPortalFeatures,
+  publicCoachingOffer,
 } from '@/lib/marketing/carsi-coaching-program';
 
 function BillingBadge({ billing }: { billing: string }) {
@@ -83,7 +80,8 @@ export function BusinessCoachingInclusionsSection() {
 }
 
 export function BusinessCoachingAddOnsSection({ checkoutEnabled }: { checkoutEnabled: boolean }) {
-  const addOns = carsiCoachingAddOns.filter((a) => !a.includedInBase);
+  // GP-734: only what can be bought today is listed; see publicCoachingOffer.
+  const { addOns } = publicCoachingOffer();
 
   return (
     <section
@@ -91,20 +89,14 @@ export function BusinessCoachingAddOnsSection({ checkoutEnabled }: { checkoutEna
       aria-labelledby="coaching-addons-heading"
     >
       <div className={PUBLIC_SHELL_INNER_CLASS}>
-        <p className={LANDING_EYEBROW_CLASS}>Add-ons</p>
+        <p className={LANDING_EYEBROW_CLASS}>{addOns.length > 0 ? 'Add-ons' : 'Pricing'}</p>
         <h2 id="coaching-addons-heading" className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>
-          Optional extras with clear pricing
+          {addOns.length > 0 ? 'Optional extras with clear pricing' : 'One clear price'}
         </h2>
         <p className={`mt-4 max-w-2xl ${LANDING_LEAD_CLASS}`}>
-          The core program is {carsiCoachingMonthlyPriceLabel}. Planned optional extras and prices
-          are below for transparency.
+          The core program is {carsiCoachingMonthlyPriceLabel}.
+          {addOns.length > 0 ? ' Optional extras and their prices are below.' : null}
         </p>
-
-        {carsiCoachingAddOnsComingSoon ? (
-          <div className="mt-6">
-            <CoachingComingSoonBanner label="Add-on booking — coming soon" />
-          </div>
-        ) : null}
 
         <div className="mt-10 overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
           <div className="overflow-x-auto">
@@ -158,11 +150,7 @@ export function BusinessCoachingAddOnsSection({ checkoutEnabled }: { checkoutEna
                       {addOn.description}
                     </td>
                     <td className="px-4 py-4 text-right sm:px-6">
-                      {carsiCoachingAddOnsComingSoon ? (
-                        <span className="text-xs font-semibold tracking-wide text-slate-400 uppercase">
-                          Coming soon
-                        </span>
-                      ) : addOn.href ? (
+                      {addOn.href ? (
                         <a
                           href={addOn.href}
                           className="inline-flex items-center gap-1 text-sm font-semibold text-[#146fc2] hover:underline"
@@ -212,7 +200,7 @@ export function BusinessCoachingPortalSection() {
           <div className="rounded-2xl border border-slate-200/80 bg-[#fafbfc] p-6 shadow-sm md:p-8">
             <h3 className="text-sm font-semibold text-slate-950">Planned for the portal</h3>
             <ul className="mt-4 space-y-4">
-              {carsiCoachingPortalFeatures.map((f) => (
+              {publicCoachingOffer().portalFeatures.map((f) => (
                 <li
                   key={f.title}
                   className="border-b border-slate-200/80 pb-4 last:border-0 last:pb-0"

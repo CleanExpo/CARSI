@@ -39,11 +39,8 @@ CLAUDE.local.md
 
 # IDE
 .idea/
-# Personal Cursor state stays local; the shared rule that loads docs/agents/ is committed (GP-680).
-.cursor/*
-!.cursor/rules/
-.cursor/rules/*
-!.cursor/rules/carsi-agent-rules.mdc
+# Cursor is removed from this repo (founder order 2026-11-21); never commit Cursor config.
+.cursor/
 *.swp
 *.swo
 .DS_Store

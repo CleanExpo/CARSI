@@ -61,7 +61,7 @@ course **title in white** on top. So every generated image must be:
    `style`, `composition`, `negativePrompt`, `authorNote`. Ground `motifs` in the course's
    ACTUAL content (e.g. WRT → moisture meter, air movers, tide line; FSRT → soot-stained then
    restored surfaces; IR thermography → false-colour heat map of a damp wall; UV → fluorescing
-   traces in a darkened room). The `authorNote` records *why* the motifs fit the subject +
+   traces in a darkened room). The `authorNote` records _why_ the motifs fit the subject +
    benefit. Apply the rubric below.
 4. **Dry-run a prompt (free).** `npm run db:thumbnails:generate -- --slug=<slug> --dry-run`
    prints the assembled prompt — no API/Cloudinary/DB. Tighten the brief if it reads generic
@@ -73,12 +73,20 @@ course **title in white** on top. So every generated image must be:
 7. **Batch generate.** `npm run db:thumbnails:generate -- --yes` (skips the already-done test
    course; a hard cap of 25/run + write-after-each protect against runaway spend).
 8. **Import + verify.** Default persistence writes `thumbnailUrl` into the seed JSON; run
-   `npm run db:seed-courses` to import into the DB. Verify rendering (below).
+   `npm run db:seed-courses -- --slug=<slug> --apply` to import into the DB (without `--apply` it
+   only previews). The batch step above generates for **many** courses, and the import is scoped to
+   one slug, so repeat it **once per affected course** — otherwise the rest of the generated
+   thumbnails stay in the seed JSON and never reach the database.
+   **The import is not thumbnail-only.** It writes the repo's `title`, `price`, `status`,
+   `isPublished`, `description` and every lesson's content over whatever is in the target database.
+   Against **production** that is a course change, not an asset change: preview it first (no
+   `--apply`), then follow `docs/runbooks/course-go-live.md` — the `progress_rows` preflight, and
+   Phill's written OK if that count is above 0 — before applying. Verify rendering (below).
 
 ### Brief-quality rubric (all must hold)
 
 - **Specific, not generic** — a reviewer could guess the course/discipline from the image
-  alone; motifs trace to *this* course, not "abstract restoration imagery".
+  alone; motifs trace to _this_ course, not "abstract restoration imagery".
 - **Text-free by construction** — `negativePrompt` excludes text/words/letters/numbers/logos/
   watermarks/signage/UI/readable-displays (and human faces by default).
 - **Overlay-safe composition** — calm/darker upper-left, off-centre/lower focal mass; survives

@@ -80,6 +80,16 @@ const BASE_GAP = {
   feeds: ['catalogue'],
 };
 
+const BASE_CUT = {
+  id: 'mutant-base-c',
+  claim: 'A cut claim that no longer appears in the course.',
+  claim_class: 'banned-language',
+  surface: 'https://carsi.com.au/courses',
+  status: 'CUT',
+  key_phrase: 'the cut wording',
+  feeds: ['catalogue'],
+};
+
 const drop = (o, k) => {
   const c = structuredClone(o);
   delete c[k];
@@ -97,7 +107,7 @@ const MUTANTS = [
   { rule: 'missing-required:feeds', name: 'missing feeds', entry: drop(BASE_VERIFIED, 'feeds'), expect: /missing required field "feeds"/ },
   { rule: 'missing-required:status', name: 'missing status', entry: drop(BASE_VERIFIED, 'status'), expect: /missing required field "status"/ },
   { rule: 'gap-action-not-in-set', name: 'GAP recommended_action off-vocabulary', entry: set(BASE_GAP, 'recommended_action', 'launder'), expect: /recommended_action "launder" is not one of/ },
-  { rule: 'status-not-in-set', name: 'fourth status invented', entry: set(BASE_VERIFIED, 'status', 'PROBABLY_FINE'), expect: /there is no fourth state/ },
+  { rule: 'status-not-in-set', name: 'fourth status invented', entry: set(BASE_VERIFIED, 'status', 'PROBABLY_FINE'), expect: /the set is closed/ },
   { rule: 'conflict-as-status', name: 'CONFLICT smuggled in as status', entry: set(BASE_VERIFIED, 'status', 'CONFLICT'), expect: /CONFLICT is a sidecar field, never a status/ },
   { rule: 'verified-no-source-url', name: 'VERIFIED without source_url', entry: drop(BASE_VERIFIED, 'source_url'), expect: /VERIFIED requires source_url/ },
   { rule: 'verified-source-url-shape', name: 'VERIFIED source_url not a URL', entry: set(BASE_VERIFIED, 'source_url', 'I looked at it'), expect: /neither a URL nor a repo: path/ },
@@ -116,6 +126,8 @@ const MUTANTS = [
   { rule: 'justified-no-best-source', name: 'JUSTIFIED without best_available_source', entry: drop(BASE_JUSTIFIED, 'best_available_source'), expect: /JUSTIFIED requires best_available_source/ },
   { rule: 'gap-no-reason', name: 'GAP without reason', entry: drop(BASE_GAP, 'reason'), expect: /GAP requires reason/ },
   { rule: 'gap-no-action', name: 'GAP without recommended_action', entry: drop(BASE_GAP, 'recommended_action'), expect: /GAP requires recommended_action/ },
+  { rule: 'cut-no-key-phrase', name: 'CUT without key_phrase', entry: drop(BASE_CUT, 'key_phrase'), expect: /CUT requires key_phrase/ },
+  { rule: 'founder-only-not-boolean', name: 'founder_only is a string', entry: set(BASE_GAP, 'founder_only', 'true'), expect: /founder_only must be true or false/ },
   // Added in round 3. `conflict-not-object` was reachable in the validator and
   // had NO mutant — the exact "uncovered by construction" class the reviewer
   // demonstrated. The coverage assertion below now names such a rule rather
@@ -154,6 +166,7 @@ for (const [name, base] of [
   ['VERIFIED', BASE_VERIFIED],
   ['JUSTIFIED', BASE_JUSTIFIED],
   ['GAP', BASE_GAP],
+  ['CUT', BASE_CUT],
 ]) {
   const v = validateEntryRules(base, 0);
   if (v.length !== 0) {

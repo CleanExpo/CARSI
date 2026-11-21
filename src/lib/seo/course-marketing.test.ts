@@ -235,7 +235,9 @@ describe('current repository truth', () => {
     // unpublished, Course Standard v1 pilot, 20/10/2026 (feat/gp-658-course-standard).
     // 80 = 79 + Level 3 Mould Remediation, draft, 20/10/2026 (built as level-3-mould-remediation-6c55a1ef;
     // renamed 02/11/2026 to the live slug level-3-mould-remediation-c5797369, which it replaces).
-    expect(catalogue).toHaveLength(80);
+    // 81 = 80 + CARSI Carpet Cleaning Workshop (ccw-2-day-workshop), unlisted roadshow cohort
+    // course, free, no CEC, 20/11/2026. Deliberately no SEO card: it is not marketed or listed.
+    expect(catalogue).toHaveLength(81);
     expect(surfaceSlugs).toHaveLength(24);
     expect(new Set(surfaceSlugs).size).toBe(24);
     expect(readdirSync(cardsDirectory).filter((name) => name.endsWith('.json'))).toHaveLength(80);

@@ -21,6 +21,7 @@ import type { Metadata } from 'next';
 
 import cardsIndex from '../../../data/seo/course-cards.index.json';
 import { buildCourseSchema, buildFaqSchema, type SchemaObject } from '@/lib/schema';
+import { OG_LOCALE_FIELDS } from '@/lib/seo/locale';
 
 export interface CourseMarketing {
   slug: string;
@@ -202,7 +203,7 @@ export function courseMetadata(opts: {
       description: m?.og.description ?? description,
       url: opts.url,
       type: 'website',
-      locale: 'en_AU',
+      ...OG_LOCALE_FIELDS,
       ...(opts.image ? { images: [{ url: opts.image, alt: m?.imageAlt ?? opts.fallbackTitle }] } : {}),
     },
     twitter: {

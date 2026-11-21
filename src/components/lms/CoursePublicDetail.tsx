@@ -13,6 +13,7 @@ import { CoursesIndexLink } from '@/components/lms/CoursesIndexLink';
 import { CourseThumbnail } from '@/components/lms/CourseThumbnail';
 import { EnrolButton } from '@/components/lms/EnrolButton';
 import { ReviewPolicyLink } from '@/components/lms/ReviewPolicy';
+import { courseDurationLabel } from '@/lib/course-duration-label';
 import type { DesignationDefinition } from '@/lib/designations/registry';
 
 /** The "Earns N IICRC CEC hour(s)" label, pluralised, from the resolved approval hours. */
@@ -90,10 +91,12 @@ export function CoursePublicDetail({
     course.short_description ??
     'Australian-produced restoration training built for Southern-Hemisphere conditions.';
 
+  const durationLabel = courseDurationLabel(course.duration_hours);
+
   const stats = [
     { value: priceLabel, label: course.is_free || priceNum === 0 ? 'No cost' : 'Price' },
     {
-      value: course.duration_hours ? `${course.duration_hours}h` : 'Own pace',
+      value: durationLabel ?? 'Own pace',
       label: 'Duration',
     },
     // A course without an in-force IICRC approval shows no CEC stat at all: "CEC hours —"
@@ -248,7 +251,7 @@ export function CoursePublicDetail({
                 <p className="mt-1 text-xs text-slate-500">
                   {course.is_free || priceNum === 0
                     ? 'Free access — no payment required'
-                    : 'One-time payment — lifetime access'}
+                    : 'One-time payment — lifetime access · GST included'}
                 </p>
                 <div className="mt-6">
                   <EnrolButton
@@ -261,9 +264,9 @@ export function CoursePublicDetail({
                 <p className="mt-4 text-center text-xs text-slate-500">
                   or included with{' '}
                   <Link href="/subscribe" className="font-semibold text-[#146fc2]">
-                    CARSI Pro
+                    Yearly membership
                   </Link>{' '}
-                  — $795/yr
+                  — $795/yr, GST included
                 </p>
               </div>
 
@@ -299,7 +302,9 @@ export function CoursePublicDetail({
       <section className="border-t border-slate-200/70 bg-[#fafbfc] py-16 md:py-24">
         <div className={PUBLIC_SHELL_INNER_CLASS}>
           <p className={LANDING_EYEBROW_CLASS}>Outcomes</p>
-          <h2 className={`mt-3 max-w-xl ${LANDING_DISPLAY_H2_CLASS}`}>What you will take back to site</h2>
+          <h2 className={`mt-3 max-w-xl ${LANDING_DISPLAY_H2_CLASS}`}>
+            What you will take back to site
+          </h2>
           <div className="mt-12 grid gap-10 border-t border-slate-200/70 pt-10 md:grid-cols-2 lg:grid-cols-3">
             {learningOutcomes.map((outcome, i) => (
               <div
@@ -326,7 +331,7 @@ export function CoursePublicDetail({
               {course.lesson_count
                 ? ` · ${course.lesson_count} lesson${course.lesson_count === 1 ? '' : 's'}`
                 : ''}
-              {course.duration_hours ? ` · ${course.duration_hours}` : ''}
+              {durationLabel ? ` · ${durationLabel}` : ''}
             </p>
             <ol className="mt-12 divide-y divide-slate-200/80 border-y border-slate-200/80">
               {course.syllabus.map((mod, modIndex) => (
@@ -381,10 +386,15 @@ export function CoursePublicDetail({
       <section className="border-t border-slate-200/70 bg-white py-16 md:py-24">
         <div className={PUBLIC_SHELL_INNER_CLASS}>
           <p className={LANDING_EYEBROW_CLASS}>Who it is for</p>
-          <h2 className={`mt-3 max-w-xl ${LANDING_DISPLAY_H2_CLASS}`}>Built for crews who cannot leave site</h2>
+          <h2 className={`mt-3 max-w-xl ${LANDING_DISPLAY_H2_CLASS}`}>
+            Built for crews who cannot leave site
+          </h2>
           <ul className="mt-12 max-w-2xl space-y-4">
             {audienceItems.map((item) => (
-              <li key={item} className="border-l-2 border-[#2490ed]/35 pl-5 text-sm leading-relaxed text-slate-600">
+              <li
+                key={item}
+                className="border-l-2 border-[#2490ed]/35 pl-5 text-sm leading-relaxed text-slate-600"
+              >
                 {item}
               </li>
             ))}
@@ -402,7 +412,9 @@ export function CoursePublicDetail({
         />
         <div className={`relative mx-auto max-w-2xl text-center ${PUBLIC_SHELL_INNER_CLASS}`}>
           <p className={LANDING_EYEBROW_CLASS}>Enrol</p>
-          <h2 className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>Start this course when the roster allows</h2>
+          <h2 className={`mt-3 ${LANDING_DISPLAY_H2_CLASS}`}>
+            Start this course when the roster allows
+          </h2>
           <p className={`mx-auto mt-5 max-w-lg ${LANDING_LEAD_CLASS}`}>
             {course.cec_hours
               ? `${cecEarnsLabel(course.cec_hours)} and a verifiable digital credential on completion.`

@@ -68,6 +68,8 @@ const MUST_PASS_SCAN = [
 const SCOPE_MUST_INCLUDE = [
   ['wordpress-export is scanned (84 published rows seed lms_courses)', 'data/wordpress-export/courses.json'],
   ['data/seed is scanned', 'data/seed/courses-catalog.json'],
+  ['a draft course catalogue is scanned (AC-W1-6)', 'data/courses/x/v1-draft/courses-catalog.json'],
+  ['a draft course research pack is scanned (AC-W1-6)', 'data/courses/x/v1-draft/research-pack.md'],
 ];
 
 // Rule-describing sources — the guard already exempts its own text, its test and
@@ -92,6 +94,11 @@ for (const [name, file] of SCOPE_MUST_INCLUDE) {
   const ok = inScope(file) && !isExempt(file);
   console.log(`${ok ? '✓ IN-SCOPE' : '✗ BLIND  '} | ${name}`);
   if (!ok) { console.log(`           → "${file}" is not scanned — the guard is blind here.`); fail++; }
+}
+// A draft's evidence/ holds source quotes word for word, not CARSI copy.
+if (inScope('data/courses/x/v1-draft/evidence/notes.md')) {
+  console.log('✗ SCOPE    | a draft evidence/ file is scanned; it holds source quotes, not copy.');
+  fail++;
 }
 for (const [name, file] of MUST_BE_EXEMPT) {
   const ok = isExempt(file);

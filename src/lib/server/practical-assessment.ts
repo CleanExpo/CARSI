@@ -12,6 +12,7 @@ import {
   filterCoursesPassingPrerequisites,
   type AdminFlag,
 } from '@/lib/server/course-prerequisites';
+import { gradeRubric } from '@/lib/practical-assessment-grading';
 import { runSerializable } from '@/lib/server/db-tx';
 import { ACCESS_GRANTING_STATUS_LIST } from '@/lib/server/enrollment-access';
 
@@ -38,6 +39,8 @@ export type RubricCriterionDTO = {
   description: string;
   maxPoints: number;
   orderIndex: number;
+  /** Stored flag: a critical criterion must be met in full to pass. */
+  critical: boolean;
 };
 
 function asStringArray(value: unknown): string[] {
@@ -146,6 +149,7 @@ export async function getSubmissionForReview(submissionId: string): Promise<Subm
       description: c.description,
       maxPoints: c.maxPoints,
       orderIndex: c.orderIndex,
+      critical: c.critical,
     })),
     student: { id: r.student.id, name: r.student.fullName ?? 'Unknown', email: r.student.email },
     criterionScores: asScores(r.criterionScores),
@@ -195,14 +199,27 @@ export async function submitPracticalAssessment(input: {
   return { id: created.id, status: created.status, createdAt: created.createdAt.toISOString() };
 }
 
-/** Instructor grades a submission against its rubric; sets passed/failed by the pass threshold. */
+/**
+ * Instructor grades a submission against its rubric. Passed only when the total meets the
+ * pass threshold AND every critical criterion is met in full (GP-729).
+ */
 export async function reviewSubmission(input: {
   /** LMS-user id of the reviewer, or null for an env-admin-panel review. */
   reviewerId?: string | null;
   submissionId: string;
   scores: CriterionScoreInput[];
   notes?: string;
-}): Promise<{ id: string; status: string; totalScore: number; maxScore: number; passed: boolean }> {
+}): Promise<{
+  id: string;
+  status: string;
+  totalScore: number;
+  maxScore: number;
+  passed: boolean;
+  /** Labels of critical criteria not met in full; empty when none. */
+  failedCriticalCriteria: string[];
+  /** Plain-English reason a critical criterion failed the submission, else null. */
+  reason: string | null;
+}> {
   return runSerializable(async (tx) => {
     const sub = await tx.lmsAssessmentSubmission.findUnique({
       where: { id: input.submissionId },
@@ -215,22 +232,41 @@ export async function reviewSubmission(input: {
 
     const criteria = sub.assessment.criteria;
     const byId = new Map(criteria.map((c) => [c.id, c]));
-    if (input.scores.length !== criteria.length) {
-      throw new AssessmentError(400, 'Every rubric criterion must be scored');
-    }
-    let total = 0;
+    // The submitted ids must equal the rubric ids exactly: each rubric criterion once,
+    // no unknown ids, no repeats. A count check alone lets a repeated id hide an
+    // unscored (possibly critical) criterion.
+    const scoreById: Record<string, number> = {};
     for (const s of input.scores) {
       const c = byId.get(s.criterionId);
       if (!c) throw new AssessmentError(400, `Unknown criterion ${s.criterionId}`);
-      if (typeof s.points !== 'number' || s.points < 0 || s.points > c.maxPoints) {
+      if (Object.prototype.hasOwnProperty.call(scoreById, s.criterionId)) {
+        throw new AssessmentError(400, `Criterion "${c.label}" is scored more than once`);
+      }
+      if (
+        typeof s.points !== 'number' ||
+        !Number.isFinite(s.points) ||
+        s.points < 0 ||
+        s.points > c.maxPoints
+      ) {
         throw new AssessmentError(400, `Score for "${c.label}" must be between 0 and ${c.maxPoints}`);
       }
-      total += s.points;
+      scoreById[s.criterionId] = s.points;
+    }
+    if (Object.keys(scoreById).length !== criteria.length) {
+      throw new AssessmentError(400, 'Every rubric criterion must be scored');
     }
 
-    const maxScore = criteria.reduce((acc, c) => acc + c.maxPoints, 0);
-    const pct = maxScore > 0 ? (total / maxScore) * 100 : 0;
-    const passed = pct >= sub.assessment.passThreshold;
+    const { total, maxScore, failedCriticalCriteria, passed } = gradeRubric({
+      criteria,
+      scores: scoreById,
+      passThreshold: sub.assessment.passThreshold,
+    });
+    const reason =
+      failedCriticalCriteria.length > 0
+        ? `Not passed: every critical criterion must be met in full, whatever the total. Not met: ${failedCriticalCriteria.join('; ')}.`
+        : null;
+    const assessorNotes = input.notes?.trim() || '';
+    const reviewerNotes = [assessorNotes, reason].filter(Boolean).join('\n\n') || null;
 
     const updated = await tx.lmsAssessmentSubmission.update({
       where: { id: input.submissionId },
@@ -239,12 +275,20 @@ export async function reviewSubmission(input: {
         criterionScores: input.scores,
         totalScore: total,
         reviewerId: input.reviewerId ?? null,
-        reviewerNotes: input.notes?.trim() || null,
+        reviewerNotes,
         reviewedAt: new Date(),
       },
       select: { id: true, status: true },
     });
-    return { id: updated.id, status: updated.status, totalScore: total, maxScore, passed };
+    return {
+      id: updated.id,
+      status: updated.status,
+      totalScore: total,
+      maxScore,
+      passed,
+      failedCriticalCriteria,
+      reason,
+    };
   });
 }
 
@@ -286,6 +330,7 @@ export async function getPublishedAssessment(assessmentId: string) {
       description: c.description,
       maxPoints: c.maxPoints,
       orderIndex: c.orderIndex,
+      critical: c.critical,
     })),
   };
 }
@@ -305,7 +350,7 @@ export type AuthoringInput = {
   instructions: string;
   passThreshold: number;
   isPublished: boolean;
-  criteria: { label: string; description?: string; maxPoints: number }[];
+  criteria: { label: string; description?: string; maxPoints: number; critical: boolean }[];
 };
 
 /** Narrow an untyped request body into AuthoringInput (route helper). */
@@ -318,6 +363,7 @@ export function parseAuthoringInput(raw: unknown): AuthoringInput {
       label: typeof x.label === 'string' ? x.label : '',
       description: typeof x.description === 'string' ? x.description : '',
       maxPoints: Number(x.maxPoints ?? 5),
+      critical: x.critical === true,
     };
   });
   return {
@@ -338,6 +384,7 @@ function criteriaCreate(criteria: AuthoringInput['criteria']) {
       description: (c.description ?? '').trim(),
       maxPoints: Math.max(1, Math.round(c.maxPoints) || 1),
       orderIndex: i,
+      critical: c.critical,
     }));
 }
 
@@ -413,6 +460,7 @@ export async function getPracticalAssessmentForAdmin(id: string) {
       description: c.description,
       maxPoints: c.maxPoints,
       orderIndex: c.orderIndex,
+      critical: c.critical,
     })),
   };
 }
@@ -496,6 +544,7 @@ export async function listAvailableAssessmentsForStudent(
         label: c.label,
         description: c.description,
         maxPoints: c.maxPoints,
+        critical: c.critical,
       })),
       submission: sub
         ? {

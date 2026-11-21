@@ -135,9 +135,7 @@ export async function probeLiveCoursePage(site = SITE, fetchImpl = globalThis.fe
   }
   const html = await res.text();
   const notFound =
-    res.status === 404 ||
-    /Course Not Found/i.test(html) ||
-    /course not found/i.test(html);
+    res.status === 404 || /Course Not Found/i.test(html) || /course not found/i.test(html);
   const hasTitle = html.includes(EXPECTED_TITLE);
   return {
     url,
@@ -165,7 +163,9 @@ export async function run(argv = process.argv.slice(2), opts = {}) {
     console.error('\nRepo is not ready for production seed.\n');
     return 1;
   }
-  console.log('\n  ✓ repo ready for Rana preflight + db:seed-courses + db:seed-quizzes (--slug)\n');
+  console.log(
+    '\n  ✓ repo ready for Rana preflight + db:seed-courses (--slug + --apply) + db:seed-quizzes (--slug)\n'
+  );
 
   if (!live) {
     console.log('  (pass --live or --require-live to probe the public course page)\n');

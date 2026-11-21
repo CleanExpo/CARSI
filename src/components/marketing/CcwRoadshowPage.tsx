@@ -58,7 +58,7 @@ const breadcrumbs = [
 function buildFaqs(now: Date) {
   return [
   {
-    question: 'Who should attend the CARSI x CCW Business Growth Days?',
+    question: 'Who should attend the CARSI Business Growth Days?',
     answer:
       'The days suit carpet cleaning operators, rug and stain removal technicians, tile cleaning teams, cleaners adding carpet cleaning, and owners looking for practical business growth support.',
   },
@@ -165,8 +165,8 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
       <BreadcrumbSchema items={breadcrumbs} />
       <FAQSchema questions={pageFaqs} />
       <ItemListSchema
-        name="CARSI x CCW Business Growth Days event dates"
-        description="Melbourne, Sydney and Brisbane CARSI x CCW roadshow events for cleaners who want better jobs, stronger quoting confidence and practical business growth."
+        name="CARSI Business Growth Days event dates"
+        description="Melbourne, Sydney and Brisbane CARSI roadshow events for cleaners who want better jobs, stronger quoting confidence and practical business growth."
         items={ccwRoadshowEvents.map((event) => ({
           name: event.title,
           description: event.description,
@@ -192,7 +192,7 @@ export function CcwRoadshowContent({ focusSlug }: { focusSlug?: CcwFocusCity }) 
               <p className={LANDING_EYEBROW_CLASS}>
                 {focusEvent
                   ? `Stop ${stopIndex(focusEvent.slug)} · ${focusEvent.city}`
-                  : 'CARSI × CCW roadshow'}
+                  : 'CARSI roadshow'}
               </p>
               <h1 className="mt-3 max-w-3xl font-[family-name:var(--font-display)] text-[2.15rem] leading-[1.1] font-semibold tracking-[-0.02em] text-slate-950 md:text-[3.1rem] md:leading-[1.06]">
                 {focusEvent?.bookingUrl && !nextDatesTba ? focusEvent.title : focusEvent ? `${focusEvent.city} growth days` : ccwRoadshowHeroHeadline}
