@@ -15,6 +15,8 @@ const mocks = vi.hoisted(() => ({
   completed: vi.fn(),
   dbCourse: vi.fn(),
   adminNow: vi.fn(),
+  // GP-760: the buyer's role in the database now, read by the session reader (verifyActiveSession).
+  dbRole: 'student',
 }));
 
 vi.mock('@/lib/auth/session-jwt', () => ({ verifySessionToken: mocks.verifySession }));
@@ -63,6 +65,18 @@ vi.mock('@/lib/prisma', () => ({
       findMany: vi.fn(async () => [{ id: 'crs-l2', slug: L2, title: 'Level 2 — Mould Remediation' }]),
     },
     lmsEnrollment: { findMany: mocks.completed },
+    // The session reader's one-statement user read (readLmsUserNow).
+    $queryRaw: vi.fn(async (_s: TemplateStringsArray, userId: string) => [
+      {
+        id: userId,
+        email: 'buyer@example.com.au',
+        full_name: 'B',
+        is_active: true,
+        role: null,
+        session_generation: 0,
+        role_names: [mocks.dbRole],
+      },
+    ]),
   },
 }));
 
@@ -91,6 +105,7 @@ beforeEach(() => {
   mocks.verifySession.mockResolvedValue({ sub: 'stu', email: 'learner@example.com.au', full_name: 'L', role: 'student' });
   mocks.completed.mockResolvedValue([]);
   mocks.adminNow.mockResolvedValue(false);
+  mocks.dbRole = 'student';
   mocks.dbCourse.mockResolvedValue({
     id: 'crs-mould',
     slug: SLUG,
@@ -128,17 +143,27 @@ describe('checkout — prerequisite gate', () => {
 
   it('an admin reaches Stripe without the prerequisite', async () => {
     mocks.verifySession.mockResolvedValue({ sub: 'adm', email: 'a@carsi.com.au', full_name: 'A', role: 'admin' });
+    mocks.dbRole = 'admin';
     mocks.adminNow.mockResolvedValue(true);
     const res = await POST(request(true));
     expect(res.status).toBe(200);
     expect(mocks.createStripe).toHaveBeenCalledTimes(1);
   });
 
-  it('a demoted admin (token still says admin) needs the prerequisite (GP-760)', async () => {
+  it('an admin the exemption check refuses needs the prerequisite (GP-760)', async () => {
     mocks.verifySession.mockResolvedValue({ sub: 'adm', email: 'a@carsi.com.au', full_name: 'A', role: 'admin' });
+    mocks.dbRole = 'admin';
     mocks.adminNow.mockResolvedValue(false);
     const res = await POST(request(true));
     expect(res.status).toBe(403);
+    expect(mocks.createStripe).not.toHaveBeenCalled();
+  });
+
+  it('a demoted admin (token still says admin) is not a signed-in buyer at all (GP-760)', async () => {
+    mocks.verifySession.mockResolvedValue({ sub: 'adm', email: 'a@carsi.com.au', full_name: 'A', role: 'admin' });
+    mocks.dbRole = 'student';
+    const res = await POST(request(true));
+    expect(res.status).toBe(401);
     expect(mocks.createStripe).not.toHaveBeenCalled();
   });
 

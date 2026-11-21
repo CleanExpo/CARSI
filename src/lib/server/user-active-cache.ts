@@ -92,8 +92,8 @@ async function fetchSessionState(id: string): Promise<UserSessionState> {
 const STAFF_ROLES = new Set(['admin', 'instructor']);
 
 /** True for a token that claims a staff role, so it must never be served from the cache. */
-export function isStaffTokenRole(role: string): boolean {
-  return STAFF_ROLES.has(role.trim().toLowerCase());
+export function isStaffTokenRole(role: unknown): boolean {
+  return typeof role === 'string' && STAFF_ROLES.has(role.trim().toLowerCase());
 }
 
 /** True when the user is active, the session generation is current and its role is current. */
