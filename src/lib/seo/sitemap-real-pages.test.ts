@@ -122,6 +122,11 @@ describe('sitemap lists only real pages', () => {
     ).toBe(false);
   });
 
+  /** GP-703: /resources is live (200, index/follow, canonical self) and must be listed. */
+  it('lists the live /resources library page', async () => {
+    expect(await sitemapPaths()).toContain('/resources');
+  });
+
   it('every static sitemap path resolves to a page that renders content', async () => {
     const routes = pageRoutes();
     const offenders: string[] = [];
