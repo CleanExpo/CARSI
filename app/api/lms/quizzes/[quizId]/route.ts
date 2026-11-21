@@ -3,6 +3,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { ACCESS_GRANTING_STATUS_LIST } from '@/lib/server/enrollment-access';
+import { ensureStaffEnrollmentForQuiz } from '@/lib/server/enrollment-service';
 import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
 import { findEnrolledCoursePrerequisiteBlock, prerequisiteBlockBody } from '@/lib/server/course-prerequisites';
 type Ctx = { params: Promise<{ quizId: string }> };
@@ -42,6 +43,10 @@ export async function GET(request: NextRequest, ctx: Ctx) {
     if (!quiz) {
       return NextResponse.json({ detail: 'Quiz not found' }, { status: 404 });
     }
+
+    // Staff access, same rule as the lesson GET: admins (any course), instructors (allow-listed
+    // workshop courses only). Runs before the enrolment check below (GP-737).
+    await ensureStaffEnrollmentForQuiz(claims, quizId);
 
     // Allow-set (WS3 / P0-C): only active/completed enrolments may view a quiz —
     // a revoked/refunded row is denied (the old `not: 'cancelled'` admitted it).

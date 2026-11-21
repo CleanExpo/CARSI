@@ -188,6 +188,11 @@ export const ADMIN_ACCESS_PAYMENT_REFERENCE = 'admin:full-access';
  * Admin-panel users get a self-service enrolment on first access so the whole
  * learner stack (curriculum, lesson view, progress, certificates) works for any
  * course without a purchase.
+ *
+ * An EXISTING row is never changed (`update: {}`). In particular a `revoked` staff row stays
+ * revoked: revocation is a deliberate lock-out, and every learner route then denies it
+ * (allow-set, `enrollment-access.ts`). Only a fresh fulfilment or an admin may reactivate it
+ * (GP-737).
  */
 export async function ensureAdminEnrollmentForCourse(
   claims: SessionClaims,
@@ -234,6 +239,24 @@ export async function ensureStaffEnrollmentForLesson(
     select: { module: { select: { course: { select: { id: true, slug: true } } } } },
   });
   const course = lesson?.module.course;
+  if (!course || !shouldStaffAutoEnrol(claims, course.slug)) return;
+  await ensureAdminEnrollmentForCourse(claims, course.id);
+}
+
+/**
+ * Staff access for a quiz: the same rule as `ensureStaffEnrollmentForLesson`, keyed by quiz id,
+ * so an instructor who opens a knowledge check before any lesson is not shut out (GP-737).
+ */
+export async function ensureStaffEnrollmentForQuiz(
+  claims: SessionClaims,
+  quizId: string
+): Promise<void> {
+  if (!isAdminClaims(claims) && !isInstructorClaims(claims)) return;
+  const quiz = await prisma.lmsQuiz.findUnique({
+    where: { id: quizId },
+    select: { course: { select: { id: true, slug: true } } },
+  });
+  const course = quiz?.course;
   if (!course || !shouldStaffAutoEnrol(claims, course.slug)) return;
   await ensureAdminEnrollmentForCourse(claims, course.id);
 }

@@ -52,6 +52,19 @@ describe('CARSI workshop access', () => {
     expect(canViewInstructorManual(admin)).toBe(true);
   });
 
+  it('a revoked workshop enrolment outranks the staff role (GP-737)', () => {
+    for (const claims of [instructor, admin]) {
+      for (const status of ['revoked', 'Refunded ', 'chargeback']) {
+        const s = workshopAccessState(claims, status);
+        expect(s).toBe('not-enrolled');
+        expect(canDownloadParticipantManual(s)).toBe(false);
+      }
+      // Staff with a live row, or no row, keep staff access.
+      expect(workshopAccessState(claims, 'active')).toBe('staff');
+      expect(workshopAccessState(claims, null)).toBe('staff');
+    }
+  });
+
   it('instructors auto-enrol only on the allow-listed workshop; admins on any course; learners never', () => {
     expect(shouldStaffAutoEnrol(instructor, 'ccw-2-day-workshop')).toBe(true);
     expect(shouldStaffAutoEnrol(instructor, 'water-damage-restoration-fundamentals')).toBe(false);

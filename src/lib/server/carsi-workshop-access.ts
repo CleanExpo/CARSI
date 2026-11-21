@@ -11,7 +11,7 @@
  * same question; the routes do the database reads.
  */
 import type { SessionClaims } from '@/lib/auth/session-jwt';
-import { isEnrolmentAccessAllowed } from '@/lib/server/enrollment-access';
+import { isEnrolmentAccessAllowed, isRevokedStatus } from '@/lib/server/enrollment-access';
 
 /** The workshop's LMS slug. Re-exported from the attendance foundation's single source. */
 export { CCW_2DAY_COURSE_SLUG as CARSI_WORKSHOP_COURSE_SLUG } from '@/lib/server/ccw-attendance/eligibility';
@@ -61,14 +61,19 @@ export function canViewInstructorManual(claims: SessionClaims | null | undefined
 export type WorkshopAccessState = 'signed-out' | 'not-enrolled' | 'enrolled' | 'staff';
 
 /**
- * What the workshop page and the participant-manual download may show this visitor.
+ * What the workshop page and the manual downloads may show this visitor.
  * `enrollmentStatus` is the visitor's enrolment status on the workshop course, or null.
+ *
+ * A revoked (refund/chargeback family) workshop enrolment outranks the staff role: it is a
+ * deliberate lock-out, and the lesson, curriculum, checkpoint and quiz routes already deny it,
+ * so the manuals and the page must too (GP-737). Staff with no row at all keep access.
  */
 export function workshopAccessState(
   claims: SessionClaims | null | undefined,
   enrollmentStatus: string | null | undefined
 ): WorkshopAccessState {
   if (!claims) return 'signed-out';
+  if (isRevokedStatus(enrollmentStatus)) return 'not-enrolled';
   if (canViewInstructorManual(claims)) return 'staff';
   if (isEnrolmentAccessAllowed(enrollmentStatus)) return 'enrolled';
   return 'not-enrolled';

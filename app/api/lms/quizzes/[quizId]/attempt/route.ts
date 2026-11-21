@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
 import { runSerializable } from '@/lib/server/db-tx';
 import { ACCESS_GRANTING_STATUS_LIST } from '@/lib/server/enrollment-access';
+import { ensureStaffEnrollmentForQuiz } from '@/lib/server/enrollment-service';
 import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
 import { findQuizPrerequisiteBlock, prerequisiteBlockBody } from '@/lib/server/course-prerequisites';
 import { computeQuizResult } from '@/lib/server/lms-completion';
@@ -108,6 +109,10 @@ export async function POST(request: NextRequest, ctx: Ctx) {
 
   const bindingPresent = parsed !== null && typeof parsed === 'object' &&
     (Object.hasOwn(parsed, 'lessonId') || Object.hasOwn(parsed, 'contentVersion'));
+  // Staff access, same rule as the lesson GET: admins (any course), instructors (allow-listed
+  // workshop courses only). Runs before the enrolment check on both submission paths (GP-737).
+  await ensureStaffEnrollmentForQuiz(claims, quizId);
+
   // Prerequisite gate (DECISIONS #41) for both submission paths. Grandfathered and
   // admin-created enrolments pass; see src/lib/server/course-prerequisites.ts.
   const prereqBlock = await findQuizPrerequisiteBlock({
