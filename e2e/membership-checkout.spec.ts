@@ -1,6 +1,12 @@
 import { expect, test } from '@playwright/test';
 
-import { events, recordGtag, STRIPE_URL, stubStripe } from './membership-analytics';
+import {
+  acceptAnalytics,
+  events,
+  recordGtag,
+  STRIPE_URL,
+  stubStripe,
+} from './membership-analytics';
 
 /**
  * V6 — membership checkout journeys against a server with the yearly membership switched on.
@@ -15,6 +21,7 @@ test.describe('membership checkout events (membership switched on)', () => {
   test('a CTA checkout sends membership_checkout_started once, with the price only', async ({
     page,
   }) => {
+    await acceptAnalytics(page);
     const calls = await recordGtag(page);
     let checkoutCalls = 0;
     await page.route('**/api/lms/subscription/checkout', async (route) => {
@@ -42,6 +49,7 @@ test.describe('membership checkout events (membership switched on)', () => {
 
   // Review r1 P1-V6-GUEST-CHECKOUT-UNTRACKED: the real guest path, through /register.
   test('a guest who registers in-flow sends membership_checkout_started once', async ({ page }) => {
+    await acceptAnalytics(page);
     const calls = await recordGtag(page);
     const statuses: number[] = [];
     await page.route('**/api/lms/subscription/checkout', async (route) => {
