@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 import { prisma } from '@/lib/prisma';
 import { getSessionClaimsFromRequest } from '@/lib/server/auth-from-request';
+import { ensureStaffEnrollmentForQuiz } from '@/lib/server/enrollment-service';
 import { ACCESS_GRANTING_STATUS_LIST } from '@/lib/server/enrollment-access';
 import { isLmsClaimsAllowedAdminPanel } from '@/lib/admin/admin-panel-access';
 import { findEnrolledCoursePrerequisiteBlock, prerequisiteBlockBody } from '@/lib/server/course-prerequisites';
@@ -31,6 +32,9 @@ export async function GET(request: NextRequest, ctx: Ctx) {
   const { quizId } = await ctx.params;
 
   try {
+    // Staff access (GP-737): admins (any course), instructors (allow-listed only).
+    await ensureStaffEnrollmentForQuiz(claims, quizId);
+
     const quiz = await prisma.lmsQuiz.findUnique({
       where: { id: quizId },
       include: {
